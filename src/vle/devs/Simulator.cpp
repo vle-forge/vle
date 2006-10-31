@@ -733,7 +733,7 @@ ExternalEventList* Simulator::run()
     return 0;
 }
 
-devs::Stream* Simulator::getStreamPlugin(const vpz::Output& o)
+vle::devs::Stream* Simulator::getStreamPlugin(const vpz::Output& o)
 {
     DTRACE1(boost::format("getStreamPlugin: '%1%' '%2%'\n") % o.plugin() %
             o.streamformat());
@@ -766,7 +766,7 @@ devs::Stream* Simulator::getStreamPlugin(const vpz::Output& o)
         }
     }
     module->make_resident();
-    devs::Stream* call = 0;
+    vle::devs::Stream* call = 0;
     void* makeNewStream = 0;
 
     bool getSymbol = module->get_symbol("makeNewStream", makeNewStream);
@@ -774,7 +774,7 @@ devs::Stream* Simulator::getStreamPlugin(const vpz::Output& o)
             "Error in module '%1%', function makeNewStream not found\n") %
         o.plugin());
 
-    call = ((devs::Stream*(*)())(makeNewStream))();
+    call = ((vle::devs::Stream*(*)())(makeNewStream))();
     Assert(utils::FileError, call, boost::format(
             "Error in module '%1%', function makeNewStream problem allocation "
             "a new plugin: %1%\n") % o.plugin() %

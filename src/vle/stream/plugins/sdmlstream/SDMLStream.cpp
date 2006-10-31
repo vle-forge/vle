@@ -122,10 +122,10 @@ void SDMLStream::writeValue(const vle::devs::Time& p_time,
 }
 
 void SDMLStream::writeValues(const devs::Time& time,
-			     const devs::StreamModelPortValue& valuelst,
+			     const vle::devs::StreamModelPortValue& valuelst,
 			     const Stream::ObservableVector& /*obslst*/)
 {
-    devs::StreamModelPortValue::const_iterator it = valuelst.begin();
+    vle::devs::StreamModelPortValue::const_iterator it = valuelst.begin();
 
     size++;
     m_tmpStream << "      <e>" << time.getValue() << "</e>";

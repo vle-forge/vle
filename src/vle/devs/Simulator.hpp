@@ -315,7 +315,7 @@ namespace vle { namespace devs {
          *
          * @throw Exception::File if problem loading file.
          */
-        devs::Stream* getStreamPlugin(const vpz::Output& o);
+        vle::devs::Stream* getStreamPlugin(const vpz::Output& o);
 
     };
 

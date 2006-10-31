@@ -147,11 +147,11 @@ void NetStream::writeValues(const vle::devs::Time& time,
 	std::vector < devs::Observable >::const_iterator it =
 	    obslst.begin();
 
-        devs::StreamModelPort index;
+        vle::devs::StreamModelPort index;
         while (it != obslst.end()) {
 	    index.first = it->model;
 	    index.second = it->portName;
-	    devs::StreamModelPortValue::const_iterator jt;
+	    vle::devs::StreamModelPortValue::const_iterator jt;
 	    jt = valuelst.find(index);
 	    if (jt != valuelst.end()) {
 		msg += "  ";
@@ -167,7 +167,7 @@ void NetStream::writeValues(const vle::devs::Time& time,
 		obslst.begin();
 	    int index = -2;
 
-            devs::StreamModelPort index2;
+            vle::devs::StreamModelPort index2;
             while (it != obslst.end()) {
                 if (it->group == *it2) {
 		    index2.first = it->model;
@@ -185,7 +185,7 @@ void NetStream::writeValues(const vle::devs::Time& time,
 		    msg += it->portName;
 		    msg += "=\"";
 
-		    devs::StreamModelPortValue::const_iterator jt;
+		    vle::devs::StreamModelPortValue::const_iterator jt;
 		    jt = valuelst.find(index2);
 		    if (jt != valuelst.end()) {
 			msg += (*jt).second->toString();

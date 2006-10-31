@@ -102,7 +102,7 @@ namespace vle { namespace devs {
 	    return m_size;
 	}
 
-        inline devs::Stream * getStream() const
+        inline vle::devs::Stream * getStream() const
         { return m_stream; }
 
         virtual StateEventList init();

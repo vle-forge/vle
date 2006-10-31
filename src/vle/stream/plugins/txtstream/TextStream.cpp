@@ -101,8 +101,9 @@ void TextStream::writeValues(const vle::devs::Time& time,
     m_tmpStream << time.getValue();
 
     while (it != obslst.end()) {
-	devs::StreamModelPortValue::const_iterator val;
-	val = valuelst.find(devs::StreamModelPort((*it).model, (*it).portName));
+	vle::devs::StreamModelPortValue::const_iterator val;
+        val = valuelst.find(vle::devs::StreamModelPort((*it).model,
+                                                       (*it).portName));
 
 	if (val != valuelst.end()) {
 	    m_tmpStream << "\t";
