@@ -125,7 +125,10 @@ const Dynamic& Dynamics::find(const std::string& name) const
 {
     std::map < std::string, Dynamic >::const_iterator it =
         m_lst.find(name);
-    AssertI(it != m_lst.end());
+
+    Assert(utils::InternalError, it != m_lst.end(),
+           boost::format("Dynamic '%1%' not found in dynamics list") %
+           name);
 
     return (*it).second;
 }
@@ -133,7 +136,10 @@ const Dynamic& Dynamics::find(const std::string& name) const
 Dynamic& Dynamics::find(const std::string& name)
 {
     std::map < std::string, Dynamic >::iterator it = m_lst.find(name);
-    AssertI(it != m_lst.end());
+
+    Assert(utils::InternalError, it != m_lst.end(),
+           boost::format("Dynamic '%1%' not found in dynamics list") %
+           name);
 
     return (*it).second;
 }
