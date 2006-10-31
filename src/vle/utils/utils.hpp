@@ -26,28 +26,28 @@
 #ifndef UTILS_UTILS_HPP
 #define UTILS_UTILS_HPP
 
-#include <vle/utils/Compose.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Host.hpp>
 #include <vle/utils/Path.hpp>
-#include <vle/utils/ProjectXML.hpp>
 #include <vle/utils/Rand.hpp>
+#include <vle/utils/Simpson.hpp>
 #include <vle/utils/Socket.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/utils/UCompose.hpp>
+#include <vle/utils/Trace.hpp>
 #include <vle/utils/XML.hpp>
 
+namespace vle {
 
+    /**
+     * A complete library to provide tools like string utilities, dates, paths,
+     * XML parsing, VPZ and VPZi reading.
+     *
+     */
+    namespace utils {
 
-/**
- * A complete library to provide tools like string utilities, dates, paths, XML
- * parsing, VPZ and VPZi reading.
- *
- */
-namespace vle { namespace utils {
+    }
 
-
-}} // namespace vle utils
+} // namespace vle utils
 
 #endif
