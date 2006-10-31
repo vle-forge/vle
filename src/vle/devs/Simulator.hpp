@@ -1,0 +1,324 @@
+/**
+ * @file Simulator.hpp
+ * @author The VLE Development Team.
+ * @brief Represent the DEVS Simulator class. This class provide a non
+ * hierarchical DEVS simulator ie. all models are in the same coupled model.
+ */
+
+/*
+ * Copyright (c) 2004, 2005 The VLE Development Team.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307, USA.
+ */
+
+#ifndef DEVS_SIMULATOR_HPP
+#define DEVS_SIMULATOR_HPP
+
+#include <vle/devs/sAtomicModel.hpp>
+#include <vle/devs/sCoupledModel.hpp>
+#include <vle/devs/EventObserver.hpp>
+#include <vle/devs/EventTable.hpp>
+#include <vle/devs/Observer.hpp>
+#include <vle/devs/Time.hpp>
+#include <vle/devs/TimedObserver.hpp>
+#include <vle/graph/Port.hpp>
+#include <vle/graph/TargetPort.hpp>
+#include <vle/vpz/Vpz.hpp>
+#include <vle/utils/Socket.hpp>
+#include <libxml++/libxml++.h>
+
+namespace vle { namespace devs {
+
+    class ModelFactory;
+    
+    typedef std::vector < sAtomicModel* > SAtomicModelList;
+
+    /**
+     * @brief Represent the DEVS Simulator class. This class provide a non
+     * hierarchical DEVS simulator ie. all models are in the same coupled
+     * model.
+     *
+     */
+    class Simulator
+    {
+    public:
+        typedef std::map < graph::AtomicModel*, devs::sAtomicModel* >
+            sAtomicModelMap;
+
+	Simulator(long simulatorIndex, const vpz::Vpz& io);
+
+	~Simulator();
+
+	void addCondition(const std::string& modelName,
+			  const std::string& portName,
+			  value::Value* value);
+
+	void addModels(const vpz::Model& model);
+
+	void addObserver(devs::Observer* observer);
+
+        /** 
+         * @brief Build new models using ClassModel or Dynamic depends of
+         * classNamed parameter that define ClassModel name or Dynamic name.
+         * 
+         * @param model the coupled where to add new models. 
+         * @param className the ClassModel name or Dynamic name.
+         * @param xmlDynamics the dynamics of all atomic model build.
+         * @param xmlInit to initialise the models.
+         * 
+         * @return A reference to the top node of build model.
+         */
+        graph::Model* createModels(graph::CoupledModel* model,
+                                   const std::string& className,
+                                   const std::string& xmlDynamics,
+                                   const std::string& xmlInit);
+
+        /** 
+         * @brief Delete the specified model from coupled model. All
+         * connection are deleted, sAtomicModel are deleted and all events are
+         * deleted from event table.
+         * 
+         * @param parent the coupled model parent of model to delete.
+         * @param modelname the name of model to delete.
+         */
+        bool delModel(graph::CoupledModel* parent,
+                      const std::string& modelname);
+
+	void finish();
+
+	inline Time getCurrentTime()const { return m_currentTime; }
+
+	inline long getIndex() const { return m_index; }
+
+	/**
+	 * Return the sAtomicModel with a specified AtomicModel.
+	 *
+	 * @param model the atomicmodel reference to search, O(N).
+	 *
+	 * @return
+	 */
+	sAtomicModel* getModel(graph::AtomicModel* model) const;
+
+	/**
+	 * Return the sAtomicModel with a specified Atomic model name.
+	 *
+	 * @param model the name of atomic model to search O(N).
+	 *
+	 * @return a reference to sAtomicModel or 0.
+	 */
+	sAtomicModel* getModel(const std::string& model) const;
+
+	devs::Observer* getObserver(std::string const & name) const;
+
+	const Time& getNextTime();
+
+        /** 
+         * @brief Initialise simulator before running simulation. Rand is
+         * initialized, send to all sAtomicModel the first init event found and
+         * call for each sAtomicModel the processInitEvent. Before this,
+         * dispatchStateEvent is call for all StateEvent.
+         *
+         * @throw Exception::Internal if a condition have no model port name
+         * associed.
+         */
+        void init();
+
+        void parseExperiment();
+
+        /**
+         * Return the event selected by dynamics plugins, Internal or Externals
+         * or between Externals. The event is delete from the bag and returned
+         * by the function.
+         *
+         * @param bag the bag that containt internal and externals events.
+         * @param mdl the sAtomicModel source or target.
+         *
+         * @return the event selected.
+         *
+         * @throw Exception::Internal if bag are empty.
+         */
+        Event* processConflict(EventBagModel& bag, sAtomicModel& mdl);
+
+        inline Event* popInternal(EventBagModel& bag)
+        {
+            Event* ev = bag.internal();
+            bag.delInternal();
+            return ev;
+        }
+
+        inline Event* popExternal(EventBagModel& bag, sAtomicModel& mdl)
+        {
+            size_t index = mdl.processConflict(bag.externals());
+            Event* ev = bag.externals().at(index);
+            bag.delExternal(index);
+            return ev;
+        }
+
+        inline Event* popInstantaneous(EventBagModel& bag)
+        {
+            Event* ev = bag.instantaneous().at(0);
+            bag.delInstantaneous(0);
+            return ev;
+        }
+ 
+	ExternalEventList* run();
+
+    private:
+        vpz::Experiment                                  m_experiment;
+
+
+	// Index du simulateur dans la table des simulateurs
+	// genere par le coordinateur
+	long m_index;
+
+	// Duree de la simulation
+	double m_duration;
+
+	// Date courante
+	Time m_currentTime;
+
+	// Liste des modeles atomiques geres par le simulateur
+	sAtomicModelMap m_modelList;
+
+	// Liste des ports d'entree connectes aux ports de sortie
+	//  des modeles atomiques geres par le simulateur
+	std::map < std::pair < std::string , std::string > ,
+		   std::vector < graph::TargetPort* > > m_targetPortMap;
+
+	// Modele couple racine
+	sCoupledModel * m_model;
+
+	// La fabrique de modèles
+	ModelFactory* m_modelFactory;
+
+	// Echeancier
+	EventTable m_eventTable;
+
+	// Liste des conditions experimentales
+	std::map < std::string ,
+		   std::vector < std::pair < std::string ,
+					     value::Value* > > > m_conditionList;
+
+	// Liste des observateurs
+	std::map < std::string , devs::Observer* > m_observerList;
+
+	std::map < std::string ,
+		   std::vector < devs::EventObserver* > > m_eventObserverList;
+
+	std::vector < devs::TimedObserver* > m_timedObserverList;
+
+        /**
+         * Read all ExternalEventList including External and Instantaneous
+         * events and found the destination models. If event is an
+         * Instantaneous then, a new Event is attached to
+         * CompleteEventBagModel otherwise, if event is an External then is
+         * push int the Schuduller.
+         *
+         * @param eventList the external event list to treat.
+         * @param bags output parameter to add Instantaneous events.
+         */
+        void dispatchExternalEvent(ExternalEventList* eventList,
+                                   CompleteEventBagModel& bags);
+
+	void dispatchInternalEvent(InternalEvent * event);
+
+	void dispatchStateEvent(StateEvent * event);
+
+        /** 
+         * @brief Delete the atomic model from Devs::Graph, the sAtomicModel
+         * from Simulator and clean all events on devs::EventTable. Do not use
+         * the AtomicModel after this function, it is delete.
+         * 
+         * @param parent a reference to the parent.
+         * @param atom the model to delete.
+         */
+        void delAtomicModel(graph::CoupledModel* parent,
+                            graph::AtomicModel* atom);
+
+        /** 
+         * @brief Delete the coupled model from Devs::Graph. All the
+         * sAtomicModel from Simulator and clean all events on
+         * devs::EventTable.  Do not use the AtomicModel child or CoupledModel
+         * after this function.  All are delete. This function is recursive.
+         * 
+         * @param parent a reference to the parent.
+         * @param mdl the model to delete.
+         */
+        void delCoupledModel(graph::CoupledModel* parent,
+                             graph::CoupledModel* mdl);
+
+        std::vector < graph::TargetPort* > getTargetPortList(
+                graph::Port* port);
+
+        std::vector < graph::TargetPort* > getTargetPortList(
+                graph::AtomicModel* model, const std::string& portName);
+
+	value::Value* parseSimpleValue(xmlpp::Element* node);
+
+
+        void startEOVStream();
+
+        void startNetStream(const std::string& output,
+                            const std::string& outputhost);
+
+        void startLocalStream();
+
+        /** 
+         * @brief parse the xmlDynamics XML, and affect the dynamics to the
+         * sAtomic Models.
+         * 
+         * @param lst list of atomic models.
+         * @param xmlDynamics string representation of XML dynamics.
+         */
+        void applyDynamics(SAtomicModelList& lst,
+                           const std::string& xmlDynamics);
+
+        /** 
+         * @brief parse the xmlInits XML, and build the initialisation events
+         * to initialise the sAtomic Models.
+         * 
+         * @param lst list of atomic models.
+         * @param xmlInits string representation of XML initialisation.
+         */
+        void applyInits(SAtomicModelList& lst,
+                        const std::string& xmlInits);
+
+        void processEventObserver(sAtomicModel* model, Event* event);
+
+        /**
+         * Set a new date to the simulator.
+         *
+         * @param time the new date to affect simulator.
+         */
+        inline void updateCurrentTime(const Time& time)
+        { m_currentTime = time; }
+
+        /** 
+         * @brief Build a new Stream plugin using specified output value.
+         * 
+         * @param o the output to get a new Stream.
+         * 
+         * @return a reference to the loaded plugin.
+         *
+         * @throw Exception::File if problem loading file.
+         */
+        devs::Stream* getStreamPlugin(const vpz::Output& o);
+
+    };
+
+}} // namespace vle devs
+
+#endif

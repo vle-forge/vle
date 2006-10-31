@@ -1,0 +1,11 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: vlepython
+Description: VLE multimodelling and Simulation tools, Python
+Requires: libxml++-2.6 glibmm-2.4
+Version: @VERSION@
+Libs:	-L${libdir}/vle -lpython
+Cflags: -I${includedir}/vle

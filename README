@@ -1,0 +1,24 @@
+Requirements
+============
+
+glibmm		2.4.0 http://www.gtkmm.org/
+libxml++	2.6.0 http://libxmlplusplus.sourceforge.net/
+libtool		1.5
+automake	1.4
+autoconf	2.50
+
+Installation
+============
+
+See documentation available on VLE wesite http://vle.univ-littoral.fr
+
+The fallowing commands compile et install VLE:
+
+$ ./autogen.sh
+
+or
+
+$ autoreconf --force --install
+$ ./configure --prefix=/usr/local
+$ make
+$ make install

@@ -1,0 +1,1 @@
+SUBDIRS = txtstream eovstream sdmlstream
