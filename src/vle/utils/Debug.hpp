@@ -64,7 +64,7 @@ namespace vle { namespace utils {
                 "%5%\nAssertion '%1%' failed in file %2% : line " \
                                       "%3%\n'%4%'\n%6%\n") % \
                 #test % __FILE__ % __LINE__ % __PRETTY_FUNCTION__ % \
-		strerror % vle::utils::print_trace_report())); \
+		(strerror) % vle::utils::print_trace_report())); \
         throw type(err__); }}
 #else // NDEBUG
 #define Assert(type, test, strerror) { \
@@ -151,7 +151,7 @@ namespace vle { namespace utils {
         boost::str(boost::format( \
         "%4%\nThrow exception failed in file %1% : line %2%\n'%3%'\n%5%\n") % \
                    __FILE__ % __LINE__ % __PRETTY_FUNCTION__ % \
-		strerror % vle::utils::print_trace_report())); \
+		(strerror) % vle::utils::print_trace_report())); \
         throw type(err__); }
 #else // NDEBUG
 #define Throw(type, strerror) { \
