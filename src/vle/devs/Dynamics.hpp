@@ -286,6 +286,17 @@ namespace vle { namespace devs {
         std::string getStringAttributeValue(Event* event,
 					    const std::string& name) const;
 
+	/**
+	 * Return the Set value of a attribute of a event
+	 *
+	 * @param event the event
+	 * @param name the name of the attribute
+	 *
+	 * @return the string value
+	 */
+        vle::value::Set* getSetAttributeValue(Event* event,
+					    const std::string& name) const;
+
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 	/**

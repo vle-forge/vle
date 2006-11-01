@@ -206,6 +206,15 @@ std::string Dynamics::getStringAttributeValue(
     return ((vle::value::String*)(event->getAttributeValue(name)))->toString();
 }
 
+vle::value::Set* Dynamics::getSetAttributeValue(Event* event,
+				const std::string& name) const
+{
+    vle::value::Set* s = dynamic_cast< vle::value::Set* >(
+	event->getAttributeValue(name));
+    AssertI(s);
+    return s;
+}
+
 ExternalEventList* Dynamics::processInstantaneousEvent(
                                         InstantaneousEvent*) const
 {
