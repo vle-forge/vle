@@ -64,21 +64,20 @@ void ExperimentGenerator::build_conditions_list()
 void ExperimentGenerator::build_combinations()
 {
     size_t nb = 0;
-    size_t current = mCondition.size() - 1;
-
+    size_t sz = mCondition.size() - 1;
+ 
     do {
         build_combinations_from_replicas(nb);
-        if (mCondition[current].pos != mCondition[current].sz - 1) {
-            mCondition[current].pos++;
+        if (mCondition[sz].pos != mCondition[sz].sz - 1) {
+            mCondition[sz].pos++;
         } else {
-            int i = current;
+            int i = sz;
             while (i >= 0) {
                 if (mCondition[i].pos == mCondition[i].sz - 1) {
                     mCondition[i].pos = 0;
                     i--;
-                    current = i;
                 } else {
-                    current = i;
+                    mCondition[i].pos++;
                     break;
                 }
             }
@@ -104,8 +103,8 @@ void ExperimentGenerator::build_combinations_from_replicas(size_t cmbnumber)
         Assert(utils::InternalError,
                (dest.size() == orig.size()) and
                (dest.size() == mCondition.size()),
-               boost::format("Error: %1% %2% %3%\n") % dest.size() % orig.size() %
-               mCondition.size());
+               boost::format("Error: %1% %2% %3%\n") % dest.size() %
+               orig.size() % mCondition.size());
 
         for (size_t jcom = 0; jcom < mCondition.size(); ++jcom) {
             (*itDest).clearValue();
