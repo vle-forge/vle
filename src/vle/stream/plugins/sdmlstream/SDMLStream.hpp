@@ -64,7 +64,7 @@ namespace vle { namespace stream {
 
     private:
 	std::string m_fileName;
-	std::fstream m_stream;
+	std::ofstream m_stream;
 	std::fstream m_tmpStream;
 	unsigned int size;
     };
