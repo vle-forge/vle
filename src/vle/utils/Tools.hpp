@@ -1,5 +1,5 @@
 /**
- * @file Tools.hpp
+ * @file utils/Tools.hpp
  * @author The VLE Development Team.
  * @brief Most of tools to use into VLE projects, plugins etc.
  */
@@ -191,8 +191,6 @@ namespace vle { namespace utils {
      * @endcode
      *
      * @param c object to transform
-     * @param precision
-     * @param width
      * @return string representation of templace < class C >
      */
     template < class C > inline

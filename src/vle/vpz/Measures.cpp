@@ -1,5 +1,5 @@
 /** 
- * @file Measures.cpp
+ * @file vpz/Measures.cpp
  * @brief 
  * @author The vle Development Team
  * @date lun, 13 fév 2006 18:53:56 +0100

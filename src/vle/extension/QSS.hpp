@@ -1,5 +1,5 @@
 /**
- * @file QSS.hpp
+ * @file extension/QSS.hpp
  * @author The VLE Development Team.
  * @brief
  */
@@ -46,14 +46,14 @@ namespace vle { namespace extension {
         // DEVS Methods
         virtual void finish();
         virtual devs::Time init();
-        virtual devs::ExternalEventList* getOutputFunction(devs::Time const & p_currentTime);
+        virtual devs::ExternalEventList* getOutputFunction(devs::Time const & time);
         virtual devs::Time getTimeAdvance();
         virtual bool  processConflict(const devs::InternalEvent& internal,
                                       const devs::ExternalEventList& extEventlist);
-        virtual void processInitEvent(devs::InitEvent* p_event);
-        virtual void processInternalEvent(devs::InternalEvent* p_event);
-        virtual void processExternalEvent(devs::ExternalEvent* p_event);
-        virtual value::Value* processStateEvent(devs::StateEvent* p_event) const;
+        virtual void processInitEvent(devs::InitEvent* event);
+        virtual void processInternalEvent(devs::InternalEvent* event);
+        virtual void processExternalEvent(devs::ExternalEvent* event);
+        virtual value::Value* processStateEvent(devs::StateEvent* event) const;
 
     private:
         bool m_active;

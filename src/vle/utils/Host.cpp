@@ -1,5 +1,5 @@
 /**
- * @file Hosts.cpp
+ * @file utils/Host.cpp
  * @author The VLE Development Team.
  * @brief These classes define a simulator host and set of simulators. It
  * works on XML file hosts.

@@ -1,5 +1,5 @@
 /** 
- * @file Condition.cpp
+ * @file vpz/Condition.cpp
  * @brief 
  * @author The vle Development Team
  * @date mar, 31 jan 2006 17:28:49 +0100

@@ -1,5 +1,5 @@
 /** 
- * @file CSVResult.hpp
+ * @file data/CSVResult.hpp
  * @brief The result of request in CSV file class.
  * @author The vle Development Team
  * @date lun, 23 jan 2006 14:04:28 +0100

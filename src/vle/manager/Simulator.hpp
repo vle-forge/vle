@@ -1,5 +1,5 @@
 /** 
- * @file Simulator.hpp
+ * @file manager/Simulator.hpp
  * @brief VLE in simulator mode execute the VPZ instances.
  * @author The vle Development Team
  * @date lun, 23 jan 2006 14:06:15 +0100

@@ -30,7 +30,7 @@
 namespace vle { namespace stream {
 
 TextStream::TextStream() :
-    vle::devs::Stream()
+    devs::Stream()
 { }
 
 void TextStream::init(const std::string& /* outputPlugin */,
@@ -41,7 +41,7 @@ void TextStream::init(const std::string& /* outputPlugin */,
     m_fileName = outputType + ".dat";
     m_stream.open(m_fileName.c_str());
 
-    Assert(vle::utils::FileError, m_stream.is_open(),
+    Assert(utils::FileError, m_stream.is_open(),
            boost::format("Cannot open file '%1%'\n") % m_fileName);
 
     m_tmpStream.open(Glib::build_filename(Glib::get_tmp_dir(),
@@ -49,7 +49,7 @@ void TextStream::init(const std::string& /* outputPlugin */,
                      std::fstream::in | std::fstream::out |
                      std::fstream::trunc);
 
-    Assert(vle::utils::FileError, m_tmpStream.is_open(),
+    Assert(utils::FileError, m_tmpStream.is_open(),
            boost::format("Cannot open file '%1%'\n") %
             Glib::build_filename(Glib::get_tmp_dir(), m_fileName));
 
@@ -76,7 +76,7 @@ void TextStream::writeData()
     m_tmpStream.close();
 }
 
-void TextStream::writeHead(std::vector < vle::devs::Observable > const &)
+void TextStream::writeHead(std::vector < devs::Observable > const &)
 {
 }
 
@@ -84,25 +84,25 @@ void TextStream::writeTail()
 {
 }
 
-void TextStream::writeValue(const vle::devs::Time& time,
-                            vle::value::Value* value)
+void TextStream::writeValue(const devs::Time& time,
+                            value::Value* value)
 {
     size++;
     m_tmpStream << time.getValue() << "\t" << value->toString() << std::endl;
 }
 
-void TextStream::writeValues(const vle::devs::Time& time,
-                             const vle::devs::StreamModelPortValue& valuelst,
-                             const vle::devs::Stream::ObservableVector& obslst)
+void TextStream::writeValues(const devs::Time& time,
+                             const devs::StreamModelPortValue& valuelst,
+                             const devs::Stream::ObservableVector& obslst)
 {
-    std::vector < vle::devs::Observable >::const_iterator it = obslst.begin();
+    std::vector < devs::Observable >::const_iterator it = obslst.begin();
 
     size++;
     m_tmpStream << time.getValue();
 
     while (it != obslst.end()) {
-	vle::devs::StreamModelPortValue::const_iterator val;
-        val = valuelst.find(vle::devs::StreamModelPort((*it).model,
+	devs::StreamModelPortValue::const_iterator val;
+        val = valuelst.find(devs::StreamModelPort((*it).model,
                                                        (*it).portName));
 
 	if (val != valuelst.end()) {

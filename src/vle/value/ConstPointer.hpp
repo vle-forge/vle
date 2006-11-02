@@ -1,5 +1,5 @@
 /** 
- * @file ConstPointer.hpp
+ * @file value/ConstPointer.hpp
  * @brief Constant pointer value.
  * @author The vle Development Team
  * @date dim, 04 déc 2005 12:49:20 +0100

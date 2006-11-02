@@ -1,5 +1,5 @@
 /**
- * @file AtomicModel.hpp
+ * @file graph/AtomicModel.hpp
  * @author The VLE Development Team.
  * @brief Represent the Atomic Model in DEVS formalism. This class just
  * represent the graph not the DEVS Simulator.

@@ -1,5 +1,5 @@
 /** 
- * @file Outputs.hpp
+ * @file vpz/Outputs.hpp
  * @brief 
  * @author The vle Development Team
  * @date mar, 31 jan 2006 17:23:33 +0100
@@ -118,7 +118,7 @@ namespace vle { namespace vpz {
         /** 
          * @brief Delete the specified output.
          * 
-         * @param outputname the name of the output to delete.
+         * @param name the name of the output to delete.
          */
         void delOutput(const std::string& name);
 

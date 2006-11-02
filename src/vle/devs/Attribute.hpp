@@ -1,5 +1,5 @@
 /**
- * @file Attribute.hpp
+ * @file devs/Attribute.hpp
  * @author The VLE Development Team.
  * @brief The Event classes need a pair string value, to construct
  * information. Attribute is this class and define some function to quickly

@@ -1,5 +1,5 @@
 /** 
- * @file graph.hpp
+ * @file graph/graph.hpp
  * @brief This namespace defines all class and method to manager the hierarchy
  * of graph::Model: graph::CoupledModel, graph::AtomicModel and
  * graph::NoVLEModel. Connections between these models are stored into the

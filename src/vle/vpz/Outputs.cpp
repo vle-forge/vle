@@ -1,5 +1,5 @@
 /** 
- * @file Outputs.cpp
+ * @file vpz/Outputs.cpp
  * @brief 
  * @author The vle Development Team
  * @date mar, 31 jan 2006 17:30:32 +0100

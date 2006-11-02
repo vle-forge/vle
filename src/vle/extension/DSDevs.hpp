@@ -1,5 +1,5 @@
 /**
- * @file DSDevs.hpp
+ * @file extension/DSDevs.hpp
  * @author The VLE Development Team.
  * @brief A base to executive class allowing modeller to changer graph during
  * simulation. Modeller can, add, changer, del connection or model.
@@ -133,13 +133,12 @@ namespace vle { namespace extension {
 	virtual devs::Time init();
         
         virtual devs::ExternalEventList* getOutputFunction(
-                                    const devs::Time& currentTime);
+                                    const devs::Time& time);
         
 	virtual devs::Time getTimeAdvance();
         
-        virtual bool  processConflict(const devs::InternalEvent& /* internal */,
-                        const devs::ExternalEventList& /* extEventlist */)
-        { return false; }
+        virtual bool processConflict(const devs::InternalEvent& internal,
+                        const devs::ExternalEventList& extEventlist);
         
         virtual void processExternalEvent(devs::ExternalEvent* event);
         

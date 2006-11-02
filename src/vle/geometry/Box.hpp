@@ -1,5 +1,5 @@
 /** 
- * @file Box.hpp
+ * @file geometry/Box.hpp
  * @brief A generic axis aligned box.
  * @author The vle Development Team
  * @date ven, 27 oct 2006 16:56:25 +0200
@@ -38,12 +38,8 @@ namespace vle { namespace geometry {
  * @brief A generic axis aligned box.
  * @param n The number of dimensions.
  * @param Class The class of the elements.
- * @author Blangi, Philippe pblangi@users.sourceforge.net
- * @date Friday 18 February 2005
  *
- * <h4>Example:</h4>
- * <table class="mdTable" border="0"><tr><td>
- * <pre>
+ * @code
  * #include <iostream>
  * #include <vle/geometry/Box.hpp>
  * #include <model/crazy/Point.hpp>
@@ -72,8 +68,7 @@ namespace vle { namespace geometry {
  *
  *	return 0;
  * }
- * </pre>
- * </td></tr></table>
+ * @endcode
  */
     template <size_t n, class Class>
     class Box
@@ -208,7 +203,7 @@ namespace vle { namespace geometry {
 
 	/**
 	 * Sets the upper corner of the box.
-	 * @param The upper corner of the box.
+	 * @param p The upper corner of the box.
 	 */
 	inline void setUpper(const Point<n, Class>& p)
 	    {

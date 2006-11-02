@@ -1,5 +1,5 @@
 /**
- * @file DSDevs.cpp
+ * @file extension/DSDevs.cpp
  * @author The VLE Development Team.
  * @brief A base to executive class allowing modeller to changer graph during
  * simulation. Modeller can, add, changer, del connection or model.
@@ -60,7 +60,7 @@ devs::Time DSDevs::init()
     return devs::Time::infinity;
 }
 
-devs::ExternalEventList* DSDevs::getOutputFunction(const devs::Time& currentTime)
+devs::ExternalEventList* DSDevs::getOutputFunction(const devs::Time& time)
 {
     devs::ExternalEventList* lst = new devs::ExternalEventList;
     devs::ExternalEvent* ev;
@@ -69,7 +69,7 @@ devs::ExternalEventList* DSDevs::getOutputFunction(const devs::Time& currentTime
         AssertI(m_nameList.size() == m_response.size());
 
         while (not m_nameList.empty()) {
-            ev = new devs::ExternalEvent("ok", currentTime, getModel());
+            ev = new devs::ExternalEvent("ok", time, getModel());
             ev << devs::attribute("name", m_nameList.front());
             ev << devs::attribute("ok", m_response.front());
             lst->addEvent(ev);
@@ -84,7 +84,7 @@ devs::ExternalEventList* DSDevs::getOutputFunction(const devs::Time& currentTime
                  m_newName.begin(); it != m_newName.end(); ++it) {
                 eeset->addValue(new value::String(*it));
             }
-            ev = new devs::ExternalEvent("name", currentTime, getModel());
+            ev = new devs::ExternalEvent("name", time, getModel());
             ev << devs::attribute("name", eeset);
             lst->addEvent(ev);
             m_newName.clear();
@@ -96,6 +96,12 @@ devs::ExternalEventList* DSDevs::getOutputFunction(const devs::Time& currentTime
 devs::Time DSDevs::getTimeAdvance()
 {
     return (m_state != IDLE) ? 0 : devs::Time::infinity;
+}
+
+bool DSDevs::processConflict(const devs::InternalEvent& /* internal */,
+                             const devs::ExternalEventList& /* extEventlist */)
+{
+    return false;
 }
 
 void DSDevs::processExternalEvent(devs::ExternalEvent* event)

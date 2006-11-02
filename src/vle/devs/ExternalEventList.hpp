@@ -1,5 +1,5 @@
 /**
- * @file ExternalEventList.hpp
+ * @file devs/ExternalEventList.hpp
  * @author The VLE Development Team.
  * @brief A EventList container to store devs::ExternalEvent. 
  */

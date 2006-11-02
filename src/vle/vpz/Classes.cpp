@@ -1,5 +1,5 @@
 /** 
- * @file Classes.cpp
+ * @file vpz/Classes.cpp
  * @brief 
  * @author The vle Development Team
  * @date lun, 27 fév 2006 17:27:56 +0100

@@ -1,5 +1,5 @@
 /** 
- * @file Graphics.hpp
+ * @file vpz/Graphics.hpp
  * @brief 
  * @author The vle Development Team
  * @date lun, 06 fév 2006 11:48:59 +0100

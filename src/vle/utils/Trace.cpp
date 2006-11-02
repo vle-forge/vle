@@ -1,5 +1,5 @@
 /**
- * @file Trace.cpp
+ * @file utils/Trace.cpp
  * @author The VLE Development Team.
  * @brief A simple class to manage log files.
  */

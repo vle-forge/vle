@@ -1,5 +1,5 @@
 /**
- * @file InitEvent.cpp
+ * @file devs/InitEvent.cpp
  * @author The VLE Development Team.
  * @brief Initialisation event use to initialise models using initialisation
  * port. To each port, a Value objet can be attached.

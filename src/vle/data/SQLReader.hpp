@@ -1,5 +1,5 @@
 /** 
- * @file SQLReader.hpp
+ * @file data/SQLReader.hpp
  * @brief The sql data reader class.
  * @author The vle Development Team
  * @date lun, 23 jan 2006 14:04:28 +0100

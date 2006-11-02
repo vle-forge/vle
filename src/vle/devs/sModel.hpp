@@ -1,5 +1,5 @@
 /**
- * @file sModel.hpp
+ * @file devs/sModel.hpp
  * @author The VLE Development Team.
  * @brief
  */

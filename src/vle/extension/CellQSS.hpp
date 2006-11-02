@@ -1,5 +1,5 @@
 /** 
- * @file CellQSS.hpp
+ * @file extension/CellQSS.hpp
  * @brief 
  * @author The vle Development Team
  * @date ven, 27 oct 2006 00:07:16 +0200
@@ -95,11 +95,11 @@ namespace vle { namespace extension {
 	virtual devs::Time init();
 //	virtual devs::ExternalEventList* getOutputFunction(const Time& p_currentTime);
 //	virtual Time getTimeAdvance();
-	virtual void processInitEvent(devs::InitEvent* p_event);
-	virtual void processInternalEvent(devs::InternalEvent* p_event);
-	virtual void processExternalEvent(devs::ExternalEvent* p_event);
-	virtual void processPerturbation(devs::ExternalEvent* p_event);
-	virtual value::Value* processStateEvent(devs::StateEvent* p_event) const;
+	virtual void processInitEvent(devs::InitEvent* event);
+	virtual void processInternalEvent(devs::InternalEvent* event);
+	virtual void processExternalEvent(devs::ExternalEvent* event);
+	virtual void processPerturbation(devs::ExternalEvent* event);
+	virtual value::Value* processStateEvent(devs::StateEvent* event) const;
     };
 }} // namespace vle extension
 

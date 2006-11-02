@@ -1,5 +1,5 @@
 /** 
- * @file Point.hpp
+ * @file geometry/Point.hpp
  * @brief A generic n elements point.
  * @author The vle Development Team
  * @date ven, 27 oct 2006 16:57:03 +0200
@@ -35,12 +35,8 @@ namespace vle { namespace geometry {
  * @brief A generic n elements point.
  * @param n The number of dimension.
  * @param Class The class of the elements.
- * @author Blangi, Philippe pblangi@users.sourceforge.net
- * @date Friday 18 February 2005
  *
- * <h4>Example:</h4>
- * <table class="mdTable" border="0"><tr><td>
- * <pre>
+ * @code
  * #include <iostream>
  * #include <model/crazy/Point.hpp>
  *
@@ -69,8 +65,7 @@ namespace vle { namespace geometry {
  *
  *	return 0;
  * }
- * </pre>
- * </td></tr></table>
+ * @endcode
  */
 template <size_t n, class Class>
 class Point : public vle::geometry::Tuple<n, Class>

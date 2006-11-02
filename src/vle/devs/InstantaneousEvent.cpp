@@ -1,5 +1,5 @@
 /**
- * @file InstantaneousEvent.cpp
+ * @file devs/InstantaneousEvent.cpp
  * @author The VLE Development Team.
  * @brief Instantaneous event based on the devs::ExternalEvent class and are
  * build by graph::Model to precess Instantaneous event.

@@ -52,15 +52,15 @@ namespace vle { namespace stream {
 
 	virtual void close();
 	virtual void writeData();
-        virtual void writeHead(const std::vector < vle::devs::Observable >&
+        virtual void writeHead(const std::vector < devs::Observable >&
                                variableNameList);
 	virtual void writeTail();
-        virtual void writeValue(const vle::devs::Time&  time,
-                                vle::value::Value* value);
+        virtual void writeValue(const devs::Time& time,
+                                value::Value* value);
 
-	virtual void writeValues(const vle::devs::Time& time,
-				 const vle::devs::StreamModelPortValue& valuelst,
-				 const vle::devs::Stream::ObservableVector& obslst);
+	virtual void writeValues(const devs::Time& time,
+				 const devs::StreamModelPortValue& valuelst,
+				 const devs::Stream::ObservableVector& obslst);
 
     private:
 	std::string m_fileName;

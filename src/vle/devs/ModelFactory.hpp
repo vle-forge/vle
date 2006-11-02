@@ -1,5 +1,5 @@
 /**
- * @file ModelFactory.hpp
+ * @file devs/ModelFactory.hpp
  * @author The VLE Development Team.
  * @brief Read simulations plugin from models directories and manage models
  * classes.
@@ -48,7 +48,8 @@ namespace vle { namespace devs {
          * @brief Build a new ModelFactory using specified dynamics.
          * 
          * @param sim the simulator attached to this ModelFactory.
-         * @param dyn the io::Dynamics to load.
+         * @param dyn the root dynamics of vpz::Dynamics to load.
+         * @param cls the vpz::classes to parse vpz::Dynamics to load.
          */
         ModelFactory(Simulator& sim,
                      const vpz::Dynamics& dyn,

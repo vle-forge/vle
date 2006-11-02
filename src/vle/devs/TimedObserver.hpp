@@ -1,5 +1,5 @@
 /**
- * @file TimedObserver.hpp
+ * @file devs/TimedObserver.hpp
  * @author The VLE Development Team.
  * @brief Define a Timed observer base on devs::Observer class. This class
  * build state event with timed clock.

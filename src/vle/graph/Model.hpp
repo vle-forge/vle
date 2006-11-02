@@ -1,5 +1,5 @@
 /**
- * @file Model.hpp
+ * @file graph/Model.hpp
  * @author The VLE Development Team.
  * @brief The DEVS model base class.
  */
@@ -296,7 +296,7 @@ namespace vle { namespace graph {
 	 * return cast of a Model to an AtomicModel. If Model is not an
          * AtomicModel, return NULL
          *
-         * @param model Model to cast to AtomicModel
+         * @param m Model to cast to AtomicModel
 	 *
          * @return a cast AtomicModel or NULL if error
          */
@@ -306,7 +306,7 @@ namespace vle { namespace graph {
 	 * return cast of a Model to a CoupledModel. If Model is not a
          * CoupledModel, return NULL
          *
-         * @param model Model to cast to CoupledModel
+         * @param m Model to cast to CoupledModel
 	 *
          * @return a cast CoupledModel or NULL if error
          */
@@ -316,7 +316,7 @@ namespace vle { namespace graph {
 	 * return cast of a Model to a NoVLEModel. If Model is not a
          * NoVLEModel, return NULL
          *
-         * @param model Model to cast to NoVLEModel
+         * @param m Model to cast to NoVLEModel
 	 *
          * @return a cast NoVLEModel or NULL if error
          */

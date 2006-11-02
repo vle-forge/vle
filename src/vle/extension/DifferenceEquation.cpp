@@ -1,5 +1,5 @@
 /** 
- * @file DifferenceEquation.cpp
+ * @file extension/DifferenceEquation.cpp
  * @brief 
  * @author The vle Development Team
  * @date ven, 27 oct 2006 00:05:33 +0200
@@ -22,16 +22,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#include "DifferenceEquation.hpp"
+#include <vle/extension/DifferenceEquation.hpp>
+#include <vle/utils/XML.hpp>
 
-using namespace vle;
+
+
+namespace vle { namespace extension {
+
 using namespace devs;
-using namespace extension;
 using namespace utils::xml;
-
-#include <iostream>
-using std::cerr;
-using std::endl;
 
 bool
 DifferenceEquation::parseXML(xmlpp::Element* p_dynamicsNode)
@@ -69,10 +68,10 @@ DifferenceEquation::parseXML(xmlpp::Element* p_dynamicsNode)
 }
 
 ExternalEventList * 
-DifferenceEquation::getOutputFunction(Time const &p_currentTime)
+DifferenceEquation::getOutputFunction(devs::Time const &time)
 {
   if (m_state == _S_CALCUL) {
-		//std::cout<<"~~emission~~"<<(p_currentTime).getValue()<<" "<< getModelName()<<"  m_r:"<<m_result<<endl;
+		//std::cout<<"~~emission~~"<<(time).getValue()<<" "<< getModelName()<<"  m_r:"<<m_result<<endl;
 
     ParameterList::iterator it = m_parameters.begin();
 
@@ -81,12 +80,12 @@ DifferenceEquation::getOutputFunction(Time const &p_currentTime)
       it->second.pop_front();
       ++it;
     }
-    return buildEventWithADouble("out", "V", m_result, p_currentTime);
+    return buildEventWithADouble("out", "V", m_result, time);
   }
   else return noEvent();
 }
 
-Time DifferenceEquation::getTimeAdvance()
+devs::Time DifferenceEquation::getTimeAdvance()
 {
   switch (m_state) {
   case _S_PARAMS:
@@ -105,7 +104,7 @@ Time DifferenceEquation::getTimeAdvance()
   return Time(0);
 }
 
-Time DifferenceEquation::init()
+devs::Time DifferenceEquation::init()
 {
   if (master) {
     m_state = _S_PARAMS;
@@ -117,7 +116,7 @@ Time DifferenceEquation::init()
   }
 }
 
-void DifferenceEquation::processInternalEvent( InternalEvent * )
+void DifferenceEquation::processInternalEvent( devs::InternalEvent * )
 {
 	//std::cout<<"çççç"<<(p_event->getTime()).getValue()<<" IE sur "<<getModelName()<<m_state<<endl;
   switch (m_state) {
@@ -148,54 +147,54 @@ void DifferenceEquation::processInternalEvent( InternalEvent * )
   }
 }
 
-void DifferenceEquation::processExternalEvent(ExternalEvent * p_event)
+void DifferenceEquation::processExternalEvent(devs::ExternalEvent * event)
 {
-//std::cout<<"####"<<(p_event->getTime()).getValue()<<" EE sur "<<getModelName()<<" \t origine:"<<p_event->getSourceModelName()<<"     \t contenu:"<<p_event->getDoubleAttributeValue( "V")<<endl;
+//std::cout<<"####"<<(event->getTime()).getValue()<<" EE sur "<<getModelName()<<" \t origine:"<<event->getSourceModelName()<<"     \t contenu:"<<event->getDoubleAttributeValue( "V")<<endl;
 
-  std::string portName = p_event->getPortName();
+  std::string portName = event->getPortName();
 
   if (m_parameters[portName].size() < m_listMaxSize[portName]) 
     m_parameters[portName].
-      push_back(p_event->getDoubleAttributeValue( "V"));
+      push_back(event->getDoubleAttributeValue( "V"));
   
   if (m_state == _S_PARAMS2)
     m_state = _S_PARAMS;
 }
 
-value::Value* DifferenceEquation::processStateEvent(StateEvent * se) const
+value::Value* DifferenceEquation::processStateEvent(devs::StateEvent * event) const
 {
 //std::cout<<(se->getTime()).getValue()<<"------------------------------"<<m_result<<endl;
-  if (se->onPort("result"))
+  if (event->onPort("result"))
     return buildDouble(m_result);
   return 0;
 }
 
-void DifferenceEquation::processInitEvent(InitEvent * ie)
+void DifferenceEquation::processInitEvent(devs::InitEvent *event)
 {
-  std::string portName = ie->getPortName();
+  std::string portName = event->getPortName();
 
   if (master)
 	  m_parameters[portName].pop_front();
-  m_parameters[portName].push_back(ie->getDoubleAttributeValue(portName));
+  m_parameters[portName].push_back(event->getDoubleAttributeValue(portName));
 
-  /*  Value * b = ie->getAttributeValue(port1);
+  /*  Value * b = event->getAttributeValue(port1);
 
   switch (b->getType()) {
   case 0:
     //BOOLEAN
-    b = new Boolean(ie->getBooleanAttributeValue(port1));
+    b = new Boolean(event->getBooleanAttributeValue(port1));
     break;
   case 1:
     //INTEGER
-    b = new Integer(ie->getIntegerAttributeValue(port1));
+    b = new Integer(event->getIntegerAttributeValue(port1));
     break;
   case 2:
     //DOUBLE
-    b = new Double(ie->getDoubleAttributeValue(port1));
+    b = new Double(event->getDoubleAttributeValue(port1));
     break;
   case 3:
     //STRING
-    b = new String(ie->getStringAttributeValue(port1));
+    b = new String(event->getStringAttributeValue(port1));
     break;
   case 6:
   case 4:
@@ -219,3 +218,5 @@ double DifferenceEquation::getValue(const char* p_name,unsigned int p_delta) {
   }
   return *it;
 }
+
+}} // namespace vle extension

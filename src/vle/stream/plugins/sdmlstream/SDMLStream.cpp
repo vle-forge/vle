@@ -31,7 +31,7 @@
 namespace vle { namespace stream {
 
 SDMLStream::SDMLStream() :
-    vle::devs::Stream()
+    devs::Stream()
 { }
 
 void SDMLStream::init(const std::string& /*outputPlugin */,
@@ -113,8 +113,8 @@ void SDMLStream::writeTail()
     m_stream << "</StatDataML>" << std::endl;
 }
 
-void SDMLStream::writeValue(const vle::devs::Time& p_time,
-                            vle::value::Value* p_value)
+void SDMLStream::writeValue(const devs::Time& p_time,
+                            value::Value* p_value)
 {
     size++;
     m_tmpStream << "      <e>" << p_time.getValue()
@@ -122,10 +122,10 @@ void SDMLStream::writeValue(const vle::devs::Time& p_time,
 }
 
 void SDMLStream::writeValues(const devs::Time& time,
-			     const vle::devs::StreamModelPortValue& valuelst,
-			     const Stream::ObservableVector& /*obslst*/)
+			     const devs::StreamModelPortValue& valuelst,
+			     const devs::Stream::ObservableVector& /*obslst*/)
 {
-    vle::devs::StreamModelPortValue::const_iterator it = valuelst.begin();
+    devs::StreamModelPortValue::const_iterator it = valuelst.begin();
 
     size++;
     m_tmpStream << "      <e>" << time.getValue() << "</e>";

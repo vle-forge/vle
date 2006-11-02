@@ -1,5 +1,5 @@
 /**
- * @file TargetPort.hpp
+ * @file graph/TargetPort.hpp
  * @author The VLE Development Team.
  * @brief Define a couple graph::AtomicModel, port name to help
  * devs::Simulator to find destination models of external events.

@@ -1,5 +1,5 @@
 /** 
- * @file Equation.cpp
+ * @file extension/Equation.cpp
  * @brief 
  * @author The vle Development Team
  * @date ven, 27 oct 2006 00:06:29 +0200
@@ -180,7 +180,7 @@ namespace vle { namespace extension {
             else return devs::Time(1);
     }
 
-    devs::ExternalEventList* Equation::getOutputFunction(devs::Time const & p_currentTime)
+    devs::ExternalEventList* Equation::getOutputFunction(devs::Time const & time)
     {
         devs::ExternalEventList* v_eventList=new devs::ExternalEventList();
 
@@ -188,7 +188,7 @@ namespace vle { namespace extension {
             for (unsigned int i = 0; i < m_equationNumber ; i++)
             {
                 devs::ExternalEvent* e = new devs::ExternalEvent(m_nameList[i],
-                                                                 p_currentTime,
+                                                                 time,
                                                                  getModel());
 
                 e << devs::attribute(m_nameList[i],m_valueList[i]);
@@ -198,7 +198,7 @@ namespace vle { namespace extension {
     }
 
 
-    void Equation::processInternalEvent(devs::InternalEvent* )//p_event)
+    void Equation::processInternalEvent(devs::InternalEvent* )
     {
         if (m_variableNumber > 0)
         {
@@ -217,10 +217,10 @@ namespace vle { namespace extension {
     }
 
 
-    void Equation::processExternalEvent(devs::ExternalEvent* p_event)
+    void Equation::processExternalEvent(devs::ExternalEvent* event)
     {
-        std::string v_name = p_event->getPortName();
-        double v_value = p_event->getDoubleAttributeValue(v_name);
+        std::string v_name = event->getPortName();
+        double v_value = event->getDoubleAttributeValue(v_name);
 
         if (existVariable(v_name)) 
         {
@@ -239,10 +239,10 @@ namespace vle { namespace extension {
     }
 
 
-    void Equation::processInitEvent(devs::InitEvent* p_event)
+    void Equation::processInitEvent(devs::InitEvent* event)
     {
-        std::string v_name = p_event->getPortName();
-        double v_value = p_event->getDoubleAttributeValue(v_name);
+        std::string v_name = event->getPortName();
+        double v_value = event->getDoubleAttributeValue(v_name);
 
         initEquation(m_indexList[v_name],v_value);
     }
@@ -254,11 +254,11 @@ namespace vle { namespace extension {
         return false;
     }
 
-    value::Value* Equation::processStateEvent(devs::StateEvent* p_event) const
+    value::Value* Equation::processStateEvent(devs::StateEvent* event) const
     {
-        if (existEquation(p_event->getPortName()))
+        if (existEquation(event->getPortName()))
         {
-            std::map < std::string, unsigned int>::const_iterator it = m_indexList.find(p_event->getPortName());
+            std::map < std::string, unsigned int>::const_iterator it = m_indexList.find(event->getPortName());
 
             return new value::Double(m_valueList[it->second]);
         }

@@ -1,5 +1,5 @@
 /**
- * @file Path.hpp
+ * @file utils/Path.hpp
  * @author The VLE Development Team.
  * @brief Portable way, i.e. Linux/Unix/Windows to get VLE paths.
  */
@@ -120,11 +120,12 @@ namespace vle { namespace utils {
         /**
          * Build a path using two string.
          *
+         * For instance:
          * @code
          * std::string s = utils::Path::build_path("home", "vle");
-         * // s == "home/vle" on unix
-         * // s == "home\vle" on win32
-         * @encode
+         * @endcode
+         *
+         * This example return "home/vle" on Unix or "home\\vle" on Win32.
          *
          * @param left the string dirname.
          * @param right the string dirname.
@@ -136,7 +137,7 @@ namespace vle { namespace utils {
 
         /**
          * Build a path from user home directory to specified dir. The fallowing
-         * example return the string /home/<user>/.vle/model.
+         * example return the string "/home/<user>/.vle/model".
          *
          * @code
          * std::string s = utils::Path::build_user_path("model");

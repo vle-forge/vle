@@ -1,5 +1,5 @@
 /**
- * @file Simulator.cpp
+ * @file devs/Simulator.cpp
  * @author The VLE Development Team.
  * @brief Represent the DEVS Simulator class. This class provide a non
  * hierarchical DEVS simulator ie. all models are in the same coupled model.
@@ -111,8 +111,8 @@ void Simulator::addModels(const vpz::Model& model)
     m_modelFactory->createModels(atomicmodellist, m_modelList);
 }
 
-void Simulator::addCondition(const string& modelName,
-                             const string& portName,
+void Simulator::addCondition(const std::string& modelName,
+                             const std::string& portName,
                              value::Value* value)
 {
     m_conditionList[modelName].
@@ -347,7 +347,7 @@ const Time& Simulator::getNextTime()
     return m_eventTable.topEvent();
 }
 
-Observer* Simulator::getObserver(const string& p_name) const
+Observer* Simulator::getObserver(const std::string& p_name) const
 {
     map < string , Observer* >::const_iterator it =
         m_observerList.find(p_name);
@@ -366,7 +366,7 @@ vector < graph::TargetPort* > Simulator::getTargetPortList(graph::Port* port)
 
 vector < graph::TargetPort* > Simulator::getTargetPortList(
                     graph::AtomicModel* model,
-                    const string & portName)
+                    const std::string & portName)
 {
     sAtomicModel* smodel = getModel(model);
     if (model) {

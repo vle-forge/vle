@@ -1,5 +1,5 @@
 /** 
- * @file Observable.cpp
+ * @file vpz/Observable.cpp
  * @brief 
  * @author The vle Development Team
  * @date mar, 31 jan 2006 17:30:53 +0100

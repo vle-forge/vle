@@ -1,5 +1,5 @@
 /**
- * @file Coordinator.cpp
+ * @file devs/Coordinator.cpp
  * @author The VLE Development Team.
  * @brief Define the DEVS root coordinator. Manage a lot of DEVS Simulators.
  */

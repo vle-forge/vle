@@ -1,5 +1,5 @@
 /** 
- * @file Dynamics.hpp
+ * @file vpz/Dynamics.hpp
  * @brief 
  * @author The vle Development Team
  * @date lun, 06 fév 2006 11:48:59 +0100
@@ -71,6 +71,7 @@ namespace vle { namespace vpz {
          *   <MODEL>
          *  </MODELS>
          * </DYNAMICS>
+         * @endcode
          * 
          * @param elt An XML reference to the parent tag of DYNAMICS.
          */

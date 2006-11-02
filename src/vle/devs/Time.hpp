@@ -1,5 +1,5 @@
 /**
- * @file Time.hpp
+ * @file devs/Time.hpp
  * @author The VLE Development Team.
  * @brief The definition of time in VLE simulators. This class encapsulate a
  * double simple type to define time.

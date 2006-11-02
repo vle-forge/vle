@@ -1,5 +1,5 @@
 /**
- * @file Model.cpp
+ * @file graph/Model.cpp
  * @author The VLE Development Team.
  * @brief The DEVS model base class.
  */
@@ -143,7 +143,7 @@ int Model::getStatePortNumber() const
     return m_statePortList.size();
 }
 
-Port* Model::getPort(const string & p_name) const
+Port* Model::getPort(const std::string & p_name) const
 {
     Port * port = getInitPort(p_name);
 
@@ -158,25 +158,25 @@ Port* Model::getPort(const string & p_name) const
     return NULL;
 }
 
-Port* Model::getInitPort(const string & p_name) const
+Port* Model::getInitPort(const std::string & p_name) const
 {
     map<string,Port*>::const_iterator it = m_initPortList.find(p_name);
     return (it == m_initPortList.end()) ? NULL : (*it).second;
 }
 
-Port* Model::getInPort(const string & p_name) const
+Port* Model::getInPort(const std::string & p_name) const
 {
     map<string,Port*>::const_iterator it = m_inPortList.find(p_name);
     return (it == m_inPortList.end()) ? NULL : (*it).second;
 }
 
-Port* Model::getOutPort(const string & p_name) const
+Port* Model::getOutPort(const std::string & p_name) const
 {
     map<string,Port*>::const_iterator it = m_outPortList.find(p_name);
     return (it == m_outPortList.end()) ? NULL : (*it).second;
 }
 
-Port* Model::getStatePort(const string & p_name) const
+Port* Model::getStatePort(const std::string & p_name) const
 {
     map<string,Port*>::const_iterator it = m_statePortList.find(p_name);
     return (it == m_statePortList.end()) ? NULL : (*it).second;
@@ -247,27 +247,27 @@ int Model::getStatePortIndex(const std::string & name) const
     return -1;
 }
 
-void Model::addInitPort(const string & name)
+void Model::addInitPort(const std::string & name)
 {
     m_initPortList[name] = new Port(this, name);
 }
 
-void Model::addInputPort(const string & name)
+void Model::addInputPort(const std::string & name)
 {
     m_inPortList[name] = new Port(this, name);
 }
 
-void Model::addOutputPort(const string & name)
+void Model::addOutputPort(const std::string & name)
 {
     m_outPortList[name] = new Port(this, name);
 }
 
-void Model::addStatePort(const string & name)
+void Model::addStatePort(const std::string & name)
 {
     m_statePortList[name] = new Port(this, name);
 }
 
-bool Model::delInitPort(const string& name)
+bool Model::delInitPort(const std::string& name)
 {
     MapStringPort::iterator it = m_initPortList.find(name);
     if (it != m_initPortList.end()) {
@@ -278,7 +278,7 @@ bool Model::delInitPort(const string& name)
     return false;
 }
 
-bool Model::delInputPort(const string& name)
+bool Model::delInputPort(const std::string& name)
 {
     graph::CoupledModel* parent = (m_parent) ? toCoupled(m_parent) : NULL;
     graph::CoupledModel* cpled = (isCoupled() ? Model::toCoupled(this) : NULL);
@@ -309,7 +309,7 @@ bool Model::delInputPort(const string& name)
     return false;
 }
 
-bool Model::delOutputPort(const string& name)
+bool Model::delOutputPort(const std::string& name)
 {
     graph::CoupledModel* parent = (m_parent) ? toCoupled(m_parent) : NULL;
     graph::CoupledModel* cpled = (isCoupled() ? Model::toCoupled(this) : NULL);
@@ -340,7 +340,7 @@ bool Model::delOutputPort(const string& name)
     return false;
 }
 
-bool Model::delStatePort(const string& name)
+bool Model::delStatePort(const std::string& name)
 {
     MapStringPort::iterator it = m_statePortList.find(name);
     if (it != m_statePortList.end()) {
@@ -383,7 +383,7 @@ void Model::delOutputPortAndConnection(const std::string& name)
     delOutputPort(name);
 }
 
-void Model::addInitPort(const list < string > & lst)
+void Model::addInitPort(const std::list < std::string > & lst)
 {
     list < string >::const_iterator it = lst.begin();
     while (it != lst.end()) {
@@ -392,7 +392,7 @@ void Model::addInitPort(const list < string > & lst)
     }
 }
 
-void Model::addInputPort(const list < string > & lst)
+void Model::addInputPort(const std::list < std::string > & lst)
 {
     list < string>::const_iterator it = lst.begin();
     while (it != lst.end()) {
@@ -401,7 +401,7 @@ void Model::addInputPort(const list < string > & lst)
     }
 }
 
-void Model::addOutputPort(const list < string > & lst)
+void Model::addOutputPort(const std::list < std::string > & lst)
 {
     list < string >::const_iterator it = lst.begin();
     while (it != lst.end()) {
@@ -410,7 +410,7 @@ void Model::addOutputPort(const list < string > & lst)
     }
 }
 
-void Model::addStatePort(const list < string > & lst)
+void Model::addStatePort(const std::list < std::string > & lst)
 {
     list < string >::const_iterator it = lst.begin();
     while (it != lst.end()) {
@@ -419,22 +419,22 @@ void Model::addStatePort(const list < string > & lst)
     }
 }
 
-bool Model::existInitPort(const string & name)
+bool Model::existInitPort(const std::string & name)
 {
     return m_initPortList.find(name) != m_initPortList.end();
 }
 
-bool Model::existInputPort(const string & name)
+bool Model::existInputPort(const std::string & name)
 {
     return m_inPortList.find(name) != m_inPortList.end();
 }
 
-bool Model::existOutputPort(const string & name)
+bool Model::existOutputPort(const std::string & name)
 {
     return m_outPortList.find(name) != m_outPortList.end();
 }
 
-bool Model::existStatePort(const string & name)
+bool Model::existStatePort(const std::string & name)
 {
     return m_statePortList.find(name) != m_statePortList.end();
 }
@@ -618,7 +618,7 @@ bool Model::parseXMLports(xmlpp::Element* p_modelNode)
 
 bool Model::parseXMLport(xmlpp::Element*,
 			 xmlpp::Element* p_portNode,
-			 map < string , Port* > &p_portList)
+			 std::map < std::string , Port* > &p_portList)
 {
     xmlpp::Node::NodeList lst = p_portNode->get_children("PORT");
     xmlpp::Node::NodeList::iterator it = lst.begin();
@@ -715,7 +715,7 @@ NoVLEModel* Model::toNoVLE(Model* model)
 }
 
 void Model::getAtomicModelList(Model* p_model,
-                               vector < AtomicModel* >& p_list)
+                               std::vector < AtomicModel* >& p_list)
 {
     if (p_model->isAtomic()) {
         p_list.push_back((AtomicModel*)p_model);

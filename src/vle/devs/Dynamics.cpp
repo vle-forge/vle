@@ -1,5 +1,5 @@
 /**
- * @file Dynamics.cpp
+ * @file devs/Dynamics.cpp
  * @author The VLE Development Team.
  * @brief Dynamics class represent a part of the DEVS simulator. This class
  * must be inherits to build simulation components.
@@ -215,15 +215,32 @@ vle::value::Set* Dynamics::getSetAttributeValue(Event* event,
     return s;
 }
 
+ExternalEventList* Dynamics::getOutputFunction(const Time& /* time */)
+{
+    return new ExternalEventList();
+}
+
 ExternalEventList* Dynamics::processInstantaneousEvent(
-                                        InstantaneousEvent*) const
+            InstantaneousEvent* /* event */) const
 {
     return noEvent();
 }
 
-vle::value::Value* Dynamics::processStateEvent(StateEvent*) const
+vle::value::Value* Dynamics::processStateEvent(StateEvent* /* event */) const
 {
     return 0;
+}
+
+void Dynamics::processInitEvent(InitEvent* /* event */)
+{
+}
+
+void Dynamics::processInternalEvent(InternalEvent* /* event */)
+{
+}
+
+void Dynamics::processExternalEvent(ExternalEvent* /* event */)
+{
 }
 
 }} // namespace vle devs

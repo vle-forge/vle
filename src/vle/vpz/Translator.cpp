@@ -1,5 +1,5 @@
 /** 
- * @file Translator.cpp
+ * @file vpz/Translator.cpp
  * @brief Translator base class to develop translator plugin.
  * @author The vle Development Team
  * @date mar, 28 fév 2006 15:02:18 +0100

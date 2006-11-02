@@ -1,5 +1,5 @@
 /** 
- * @file TotalExperimentGenerator.hpp
+ * @file manager/TotalExperimentGenerator.hpp
  * @brief A class to translate Experiement file into Instance of Experiment.
  * @author The vle Development Team
  * @date jeu, 02 nov 2006 11:13:18 +0100

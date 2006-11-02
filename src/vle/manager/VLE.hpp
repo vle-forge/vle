@@ -1,5 +1,5 @@
 /** 
- * @file VLE.hpp
+ * @file manager/VLE.hpp
  * @brief Classes to start simulator, manager or distributor.
  * @author The vle Development Team
  * @date lun, 29 mai 2006 09:52:59 +0200

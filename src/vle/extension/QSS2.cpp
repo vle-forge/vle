@@ -1,5 +1,5 @@
 /** 
- * @file QSS2.cpp
+ * @file extension/QSS2.cpp
  * @brief 
  * @author The vle Development Team
  * @date ven, 27 oct 2006 00:06:41 +0200
@@ -437,12 +437,12 @@ devs::Time qss2::init()
 }
 
 
-devs::ExternalEventList* qss2::getOutputFunction(devs::Time const & p_currentTime)
+devs::ExternalEventList* qss2::getOutputFunction(devs::Time const & time)
 {
   if (m_active)
     {
       devs::ExternalEvent* ee = new devs::ExternalEvent("out",
-							p_currentTime,
+							time,
 							getModel());
       
       for (unsigned int i = 0; i < m_functionNumber ; i++)
@@ -463,34 +463,34 @@ bool qss2::processConflict(const devs::InternalEvent& /*internal*/,
   return false;
 }
 
-void qss2::processInitEvent(devs::InitEvent* p_event)
+void qss2::processInitEvent(devs::InitEvent* event)
 {
-  unsigned int i = m_variableIndex.find(p_event->getPortName())->second;  
-  double v = p_event->getDoubleAttributeValue(p_event->getPortName());
+  unsigned int i = m_variableIndex.find(event->getPortName())->second;  
+  double v = event->getDoubleAttributeValue(event->getPortName());
 
   m_initialValueList.push_back(std::pair < unsigned int , double >(i,v));
 }
 
-void qss2::processInternalEvent(devs::InternalEvent* p_event)
+void qss2::processInternalEvent(devs::InternalEvent* event)
 {
   unsigned int i = m_currentModel;
   Couple input;
 
   //  std::cout << "[" << i << "] int at " 
-  //	    << p_event->getTime().getValue() << std::endl;
+  //	    << event->getTime().getValue() << std::endl;
 
   input.value = m_value[i]+m_derivative[i]*m_sigma[i].getValue()
     +m_derivative2[i]/2*m_sigma[i].getValue()*m_sigma[i].getValue();
   input.derivative = m_derivative[i]+m_derivative2[i]*m_sigma[i].getValue();
 
-//   std::cout << p_event->getTime().getValue() 
+//   std::cout << event->getTime().getValue() 
 // 	    << " : " << input.value << " ; " 
 // 	    << input.derivative << std::endl;
 
 
   // Mise à jour des sigma
 //   for (unsigned int j = 0;j < m_functionNumber;j++)
-//     m_sigma[j]-=(p_event->getTime() - m_lastTime[j]).getValue();
+//     m_sigma[j]-=(event->getTime() - m_lastTime[j]).getValue();
 
   // Mise à jour de l'index
   m_value[i]+=m_derivative[i]*m_sigma[i].getValue()
@@ -502,19 +502,19 @@ void qss2::processInternalEvent(devs::InternalEvent* p_event)
   if (fabs(m_derivative2[i]) < m_threshold)
     m_sigma[i] = devs::Time::infinity;
   else m_sigma[i] = devs::Time(sqrt(2*m_precision/fabs(m_derivative2[i])));
-  setLastTime(i,p_event->getTime());
+  setLastTime(i,event->getTime());
 
   // Mise à jour des autres équations    
   for (unsigned int j = 0;j < m_functionNumber;j++)
     {
-      double e = (p_event->getTime() - getLastTime(j)).getValue();
+      double e = (event->getTime() - getLastTime(j)).getValue();
 
-      if (e==0) m_mfi[j]->ext(p_event->getTime(),i,input);
+      if (e==0) m_mfi[j]->ext(event->getTime(),i,input);
       else
 	{
-	  setLastTime(j,p_event->getTime());
+	  setLastTime(j,event->getTime());
 	  
-	  Couple ret = m_mfi[j]->ext(p_event->getTime(),i,input);
+	  Couple ret = m_mfi[j]->ext(event->getTime(),i,input);
 	  
 	  m_value[j]+=m_derivative[j]*e+(m_derivative2[j]/2)*e*e;
 	  m_index[j]+=m_index2[j]*e;
@@ -538,12 +538,12 @@ void qss2::processInternalEvent(devs::InternalEvent* p_event)
   minSigma();
 }
 
-void qss2::processExternalEvent(devs::ExternalEvent* p_event)
+void qss2::processExternalEvent(devs::ExternalEvent* event)
 {
-   if (p_event->onPort("parameter"))
+   if (event->onPort("parameter"))
      {
-       std::string v_name = p_event->getStringAttributeValue("name");
-       double v_value = p_event->getDoubleAttributeValue("value");
+       std::string v_name = event->getStringAttributeValue("name");
+       double v_value = event->getDoubleAttributeValue("value");
 
        processPerturbation(v_name,v_value);
 
@@ -551,14 +551,14 @@ void qss2::processExternalEvent(devs::ExternalEvent* p_event)
      }
 //   else
 //     {
-//       unsigned int i = (unsigned int)p_event->getIntegerAttributeValue("index");
+//       unsigned int i = (unsigned int)event->getIntegerAttributeValue("index");
       
 //       if (getState(i) == RUN) {
-//         double e = (p_event->getTime() - getLastTime(i)).getValue();
+//         double e = (event->getTime() - getLastTime(i)).getValue();
 
 // 	for (unsigned int j = 0;j < m_functionNumber;j++)
 // 	  {
-// 	    setLastTime(j,p_event->getTime());
+// 	    setLastTime(j,event->getTime());
 // 	    // Mise à jour de la valeur de la fonction
 // 	    if (e > 0) setValue(j,getValue(j)+e*getGradient(j));
 // 	    // Mise à jour du gradient
@@ -572,11 +572,11 @@ void qss2::processExternalEvent(devs::ExternalEvent* p_event)
 //     }
 }
 
-value::Value* qss2::processStateEvent(devs::StateEvent* p_event) const
+value::Value* qss2::processStateEvent(devs::StateEvent* event) const
 {
-  //  unsigned int i = to_int(p_event->getPortName());
-  unsigned int i = m_variableIndex.find(p_event->getPortName())->second;
-  double e = (p_event->getTime()-m_lastTime[i]).getValue();
+  //  unsigned int i = to_int(event->getPortName());
+  unsigned int i = m_variableIndex.find(event->getPortName())->second;
+  double e = (event->getTime()-m_lastTime[i]).getValue();
   double x = m_value[i]+m_derivative[i]*e+m_derivative2[i]/2*e*e;
 
   return buildDouble(x);

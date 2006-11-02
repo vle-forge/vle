@@ -1,5 +1,5 @@
 /** 
- * @file CellDevs.hpp
+ * @file extension/CellDevs.hpp
  * @brief 
  * @author The vle Development Team
  * @date ven, 27 oct 2006 00:07:06 +0200
@@ -179,12 +179,12 @@ namespace vle { namespace extension {
 
     // DEVS Methods
     virtual devs::Time getTimeAdvance();
-    virtual devs::ExternalEventList* getOutputFunction(devs::Time const & p_currentTime);
+    virtual devs::ExternalEventList* getOutputFunction(devs::Time const & time);
     virtual devs::Time init();
-    virtual void processExternalEvent(devs::ExternalEvent* p_event);
-    virtual void processInitEvent(devs::InitEvent* p_event);
-    virtual void processPerturbation(devs::ExternalEvent* p_event) =0;
-    virtual value::Value* processStateEvent(devs::StateEvent* p_event) const;
+    virtual void processExternalEvent(devs::ExternalEvent* event);
+    virtual void processInitEvent(devs::InitEvent* event);
+    virtual void processPerturbation(devs::ExternalEvent* event) =0;
+    virtual value::Value* processStateEvent(devs::StateEvent* event) const;
   };
 
 }} // namespace vle extension

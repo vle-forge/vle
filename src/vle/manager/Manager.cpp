@@ -1,5 +1,5 @@
 /** 
- * @file Manager.cpp
+ * @file manager/Manager.cpp
  * @brief VLE in manager mode distribute the VPZ instances to VLE simulators.
  * @author The vle Development Team
  * @date lun, 23 jan 2006 14:03:13 +0100

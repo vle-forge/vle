@@ -1,5 +1,5 @@
 /**
- * @file CoupledModel.cpp
+ * @file graph/CoupledModel.cpp
  * @author The VLE Development Team.
  * @brief Represent the DEVS coupled model. This class have a list of children
  * models, three list of input, output and state connections.
@@ -141,8 +141,8 @@ const VectorConnection & CoupledModel::getInternalConnectionList() const
 
 
 
-void CoupledModel::addInputConnection(Model * src, const string & portSrc,
-				      Model * dst, const string & portDst)
+void CoupledModel::addInputConnection(Model * src, const std::string & portSrc,
+				      Model * dst, const std::string & portDst)
 {
     AssertI(src and dst);
 
@@ -158,8 +158,8 @@ void CoupledModel::addInputConnection(Model * src, const string & portSrc,
 }
 
 
-void CoupledModel::addOutputConnection(Model * src, const string & portSrc,
-				       Model * dst, const string & portDst)
+void CoupledModel::addOutputConnection(Model * src, const std::string & portSrc,
+				       Model * dst, const std::string & portDst)
 {
     AssertI(src and dst);
 
@@ -177,9 +177,9 @@ void CoupledModel::addOutputConnection(Model * src, const string & portSrc,
 
 
 
-void CoupledModel::addInternalConnection(Model * src, const string & portSrc,
-					 Model * dst, const string & portDst)
-{
+void CoupledModel::addInternalConnection(Model* src, const std::string&
+                                         portSrc, Model* dst, const
+                                         std::string& portDst) {
     AssertI(src and dst);
 
     Port * psrc = src->getOutPort(portSrc);
@@ -196,20 +196,9 @@ void CoupledModel::addInternalConnection(Model * src, const string & portSrc,
 
 
 
-/**
- * return a pointer to input connection with parameter srcModel
- * srcPort dstModel and dstPort
- *
- * @param srcModel
- * @param srcPort
- * @param dstModel
- * @param dstPort
- *
- * @return pointer to input connection or 0 if not found
- */
 Connection *
-CoupledModel::getInputConnection(Model * src, const string & portSrc,
-				 Model * dst, const string & portDst)
+CoupledModel::getInputConnection(Model * src, const std::string & portSrc,
+				 Model * dst, const std::string & portDst)
 {
     AssertI(src and src);
 
@@ -233,20 +222,9 @@ CoupledModel::getInputConnection(Model * src, const string & portSrc,
 
 
 
-/**
- * return a pointer to output connection with parameter srcModel
- * srcPort dstModel and dstPort
- *
- * @param srcModel
- * @param srcPort
- * @param dstModel
- * @param dstPort
- *
- * @return pointer to ouput connection or 0 if not found
- */
 Connection *
-CoupledModel::getOutputConnection(Model * src, const string & portSrc,
-				  Model * dst, const string & portDst)
+CoupledModel::getOutputConnection(Model * src, const std::string & portSrc,
+				  Model * dst, const std::string & portDst)
 {
     AssertI(src and dst);
 
@@ -270,20 +248,9 @@ CoupledModel::getOutputConnection(Model * src, const string & portSrc,
 
 
 
-/**
- * return a pointer to internal connection with parameter srcModel
- * srcPort dstModel and dstPort
- *
- * @param srcModel
- * @param srcPort
- * @param dstModel
- * @param dstPort
- *
- * @return pointer to internal connection or 0 if not found
- */
 Connection *
-CoupledModel::getInternalConnection(Model * src, const string & portSrc,
-				    Model * dst, const string & portDst)
+CoupledModel::getInternalConnection(Model * src, const std::string & portSrc,
+				    Model * dst, const std::string & portDst)
 {
     AssertI(src and dst);
 
@@ -307,8 +274,8 @@ CoupledModel::getInternalConnection(Model * src, const string & portSrc,
 
 
 
-void CoupledModel::delInputConnection(Model * src, const string & portSrc,
-                                      Model * dst, const string & portDst)
+void CoupledModel::delInputConnection(Model * src, const std::string & portSrc,
+                                      Model * dst, const std::string & portDst)
 {
     AssertI(src and dst);
     AssertI(src == this and dst != this);
@@ -336,8 +303,8 @@ void CoupledModel::delInputConnection(Model * src, const string & portSrc,
 
 
 
-void CoupledModel::delOutputConnection(Model * src, const string & portSrc,
-                                       Model * dst, const string & portDst)
+void CoupledModel::delOutputConnection(Model * src, const std::string & portSrc,
+                                       Model * dst, const std::string & portDst)
 {
     AssertI(src and dst);
     AssertI(dst == this and src != this);
@@ -365,8 +332,8 @@ void CoupledModel::delOutputConnection(Model * src, const string & portSrc,
 
 
 
-void CoupledModel::delInternalConnection(Model * src, const string & portSrc,
-                                         Model * dst, const string & portDst)
+void CoupledModel::delInternalConnection(Model * src, const std::string & portSrc,
+                                         Model * dst, const std::string & portDst)
 {
     AssertI(src and dst);
     AssertI(dst != this and src != this);
@@ -602,7 +569,7 @@ void CoupledModel::replace(Model* old, Model* mdl)
     addModel(mdl);
 }
 
-bool CoupledModel::hasConnection(Model* model, const string& name) const
+bool CoupledModel::hasConnection(Model* model, const std::string& name) const
 {
     VectorConnection::const_iterator it;
 
@@ -645,7 +612,7 @@ bool CoupledModel::hasConnection(Model* model, const string& name) const
     return false;
 }
 
-Connection* CoupledModel::hasConnection(Model* model, const string& name)
+Connection* CoupledModel::hasConnection(Model* model, const std::string& name)
 {
     VectorConnection::const_iterator it;
 
@@ -823,7 +790,7 @@ bool CoupledModel::isNoVLE() const
     return false;
 }
 
-Model* CoupledModel::findModel(const string & name) const
+Model* CoupledModel::findModel(const std::string & name) const
 {
     VectorModel::const_iterator it = m_modelList.begin();
 
@@ -953,7 +920,7 @@ void CoupledModel::detachModels(const VectorModel& models)
 }
 
 void CoupledModel::detachInternalConnection(const VectorModel& lst,
-                                            list < Connection *> & lc)
+                                            std::list < Connection *> & lc)
 {
     lc.clear();
 

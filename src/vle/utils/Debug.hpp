@@ -1,5 +1,5 @@
 /**
- * @file Debug.hpp
+ * @file utils/Debug.hpp
  * @author The VLE Development Team.
  * @brief Macro and filestream to produce debug.
  */

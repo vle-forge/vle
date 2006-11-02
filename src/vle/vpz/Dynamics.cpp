@@ -1,5 +1,5 @@
 /** 
- * @file Dynamics.cpp
+ * @file vpz/Dynamics.cpp
  * @brief 
  * @author The vle Development Team
  * @date lun, 06 fév 2006 12:01:35 +0100

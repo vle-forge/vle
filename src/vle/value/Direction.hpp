@@ -1,5 +1,5 @@
 /** 
- * @file Direction.hpp
+ * @file value/Direction.hpp
  * @brief 
  * @author The vle Development Team
  * @date mar, 06 déc 2005 18:26:32 +0100

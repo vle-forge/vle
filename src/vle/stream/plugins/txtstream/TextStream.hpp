@@ -38,7 +38,7 @@ namespace vle { namespace stream {
      * Observer to store VLE output into a text stream.
      *
      */
-    class TextStream : public vle::devs::Stream
+    class TextStream : public devs::Stream
     {
     public:
 	TextStream();
@@ -55,16 +55,16 @@ namespace vle { namespace stream {
         virtual void writeData();
         
         virtual void writeHead(
-                const std::vector < vle::devs::Observable >& variableNameList);
+                const std::vector < devs::Observable >& variableNameList);
         
         virtual void writeTail();
 
-        virtual void writeValue(const vle::devs::Time& time,
-                                vle::value::Value* value);
+        virtual void writeValue(const devs::Time& time,
+                                value::Value* value);
 
-	virtual void writeValues(const vle::devs::Time& time,
-				 const vle::devs::StreamModelPortValue& valuelst,
-                                 const Stream::ObservableVector& obslst);
+	virtual void writeValues(const devs::Time& time,
+				 const devs::StreamModelPortValue& valuelst,
+                                 const devs::Stream::ObservableVector& obslst);
     private:
 	std::string     m_fileName;
 	std::ofstream   m_stream;

@@ -1,5 +1,5 @@
 /** 
- * @file SMAValue.hpp
+ * @file value/SMAValue.hpp
  * @brief 
  * @author The vle Development Team
  * @date mar, 06 déc 2005 11:39:40 +0100

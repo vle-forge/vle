@@ -1,5 +1,5 @@
 /**
- * @file Trace.hpp
+ * @file utils/Trace.hpp
  * @author The VLE Development Team.
  * @brief A simple class to manage log files.
  */
@@ -87,7 +87,8 @@ namespace vle { namespace utils {
 	/**
 	 * A template method to push information into the file.
 	 *
-	 * @param c
+	 * @param c a object to push into the stream.
+         * @param level the level of this push.
 	 */
 	template < class C >
         void push(const C& c, int level)
@@ -98,7 +99,8 @@ namespace vle { namespace utils {
 	 * A template method to push information into the file. Each call put
 	 * the date into the file.
 	 *
-	 * @param c
+	 * @param c a object to push into the stream.
+         * @param level the level of this push.
 	 */
 	template < class C >
         void push_date(const C& c, int level)

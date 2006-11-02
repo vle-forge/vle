@@ -1,5 +1,5 @@
 /** 
- * @file Dynamic.hpp
+ * @file vpz/Dynamic.hpp
  * @brief 
  * @author The vle Development Team
  * @date lun, 06 fév 2006 10:10:13 +0100
@@ -61,13 +61,13 @@ namespace vle { namespace vpz {
 
         /** 
          * @brief Write Dynamic information under specified node.
-         * @code
+         * @code@
          * <MODEL NAME="counter">
          *  <DYNAMICS FORMALISM="name" TYPE="mapping">
          *   <INIT I="5" />
          *  </DYNAMICS>
          * </MODEL>
-         * @endcode
+         * @endcode@
          * 
          * @param elt A XML reference to the MODEL tag.
          */

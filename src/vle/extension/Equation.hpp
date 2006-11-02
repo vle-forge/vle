@@ -1,5 +1,5 @@
 /** 
- * @file Equation.hpp
+ * @file extension/Equation.hpp
  * @brief 
  * @author The vle Development Team
  * @date ven, 27 oct 2006 00:07:37 +0200
@@ -48,15 +48,15 @@ namespace vle { namespace extension {
         // DEVS Methods
         virtual devs::Time getTimeAdvance();
         virtual devs::ExternalEventList* getOutputFunction(devs::Time const &
-                                                           p_currentTime);
+                                                            time); 
         virtual devs::Time init();
-        virtual void processInternalEvent(devs::InternalEvent* p_event);
-        virtual void processExternalEvent(devs::ExternalEvent* p_event);
-        virtual void processInitEvent(devs::InitEvent* p_event);
-        virtual bool processConflict(const devs::InternalEvent& /*internal*/,
+        virtual void processInternalEvent(devs::InternalEvent* event);
+        virtual void processExternalEvent(devs::ExternalEvent* event);
+        virtual void processInitEvent(devs::InitEvent* event);
+        virtual bool processConflict(const devs::InternalEvent& internal,
                                      const devs::ExternalEventList&
-                                     /*extEventlist*/);
-        virtual value::Value* processStateEvent(devs::StateEvent* p_event) const;
+                                     extEventlist);
+        virtual value::Value* processStateEvent(devs::StateEvent* event) const;
 
     private:
         state m_state;

@@ -1,5 +1,5 @@
 /** 
- * @file Manager.hpp
+ * @file manager/Manager.hpp
  * @brief VLE in manager mode distribute the VPZ instances to VLE simulators.
  * @author The vle Development Team
  * @date lun, 23 jan 2006 14:04:28 +0100
@@ -84,7 +84,7 @@ namespace vle { namespace manager {
          * hosts read in host XML file. If no simulator daemon are found, launch
          * the simulator on localhost.
          *
-         * @param filename VPZ file to simulate.
+         * @param file VPZ filename to simulate.
          */
         void run_localhost(const vpz::Vpz& file);
 

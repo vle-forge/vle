@@ -1,5 +1,5 @@
 /** 
- * @file EOV.cpp
+ * @file vpz/EOV.cpp
  * @brief 
  * @author The vle Development Team
  * @date mer, 01 fév 2006 19:10:54 +0100

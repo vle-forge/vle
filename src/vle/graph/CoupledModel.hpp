@@ -1,5 +1,5 @@
 /**
- * @file CoupledModel.hpp
+ * @file graph/CoupledModel.hpp
  * @author The VLE Development Team.
  * @brief Represent the DEVS coupled model. This class have a list of children
  * models, three list of input, output and state connections.
@@ -147,12 +147,45 @@ namespace vle { namespace graph {
 	void addInternalConnection(Model* src, const std::string& portSrc,
                                    Model* dst, const std::string& portDst);
 
+        /**
+         * return a pointer to input connection with parameter srcModel
+         * srcPort dstModel and dstPort
+         *
+         * @param src
+         * @param portSrc
+         * @param dst
+         * @param portDst
+         *
+         * @return pointer to input connection or 0 if not found
+         */
         Connection* getInputConnection(Model* src, const std::string& portSrc,
                                        Model* dst, const std::string& portDst);
 
+        /**
+         * return a pointer to output connection with parameter srcModel
+         * srcPort dstModel and dstPort
+         *
+         * @param src
+         * @param portSrc
+         * @param dst
+         * @param portDst
+         *
+         * @return pointer to ouput connection or 0 if not found
+         */
         Connection* getOutputConnection(Model* src, const std::string& portSrc,
                                         Model* dst, const std::string& portDst);
 
+        /**
+         * return a pointer to internal connection with parameter srcModel
+         * srcPort dstModel and dstPort
+         *
+         * @param src
+         * @param portSrc
+         * @param dst
+         * @param portDst
+         *
+         * @return pointer to internal connection or 0 if not found
+         */
         Connection* getInternalConnection(Model* src, const std::string&
                                           portSrc, Model* dst, const
                                           std::string& portDst);
@@ -190,7 +223,7 @@ namespace vle { namespace graph {
         
         /**
          * @brief delete all connection (input, output and internal) into
-         * current CoupledModel
+         * current CoupledModel.
          *
          */
         void delAllConnection();

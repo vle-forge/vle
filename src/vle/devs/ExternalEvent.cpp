@@ -1,5 +1,5 @@
 /**
- * @file ExternalEvent.cpp
+ * @file devs/ExternalEvent.cpp
  * @author The VLE Development Team.
  * @brief External event based on the devs::Event class and are build by
  * graph::Model when output function are called.

@@ -69,24 +69,24 @@ namespace vle { namespace stream {
 
         virtual void writeData();
 
-	virtual void writeHead(const std::vector < vle::devs::Observable >&
+	virtual void writeHead(const std::vector < devs::Observable >&
 			       variableNameList);
 
 	virtual void writeTail();
 
-        virtual void writeValue(const vle::devs::Time& time,
-                                vle::value::Value* value);
+        virtual void writeValue(const devs::Time& time,
+                                value::Value* value);
 
-	virtual void writeValues(const vle::devs::Time& time,
-				 const vle::devs::StreamModelPortValue& valuelst,
-				 const vle::devs::Stream::ObservableVector& obslst);
+	virtual void writeValues(const devs::Time& time,
+				 const devs::StreamModelPortValue& valuelst,
+				 const devs::Stream::ObservableVector& obslst);
     private:
 	xmlpp::DomParser            m_parser;
 	xmlpp::Element*             m_parameterRoot;
 	xmlpp::Document             m_document;
 	xmlpp::Element*             m_root;
 	std::vector < std::string > m_groupList;
-        vle::utils::net::Client*    m_client;
+        utils::net::Client*         m_client;
     };
 
 }} // namespace vle stream

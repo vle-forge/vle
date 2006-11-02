@@ -1,5 +1,5 @@
 /** 
- * @file Experiment.hpp
+ * @file vpz/Experiment.hpp
  * @brief 
  * @author The vle Development Team
  * @date lun, 13 fév 2006 18:26:24 +0100

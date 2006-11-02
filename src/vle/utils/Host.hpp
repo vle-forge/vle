@@ -1,5 +1,5 @@
 /**
- * @file Hosts.hpp
+ * @file utils/Host.hpp
  * @author The VLE Development Team.
  * @brief These classes define a simulator host and set of simulators. It
  * works on XML file hosts.
@@ -40,7 +40,9 @@ namespace vle { namespace utils {
      * @brief This class define a simulator host. This class represent an entry
      * into the hosts file. The syntax of this entry is:
      *
+     * @code
      * <HOST HOSTNAME="127.0.0.1" PORT="1234" PROCESS="1" />
+     * @endcode
      *
      * The hostname value is a string and it accepts IP address or complete
      * hostname.
@@ -175,9 +177,7 @@ namespace vle { namespace utils {
         /**
          * Push a new host into the set.
          *
-         * @param hostname host string, TCP/IP number or host name.
-         * @param port number of port.
-         * @param process number of process to launch.
+         * @param host a new host to push into list.
          */
         void push_host(const Host& host);
 
@@ -193,7 +193,7 @@ namespace vle { namespace utils {
          *
          * @param hostname the name of host to find.
          * @return Host reasearch.
-         * @thow Exception::Interal if host not found.
+         * @throw Exception::Interal if host not found.
          */
         const Host& get_host(const std::string& hostname) const;
 

@@ -1,5 +1,5 @@
 /**
- * @file StateEvent.hpp
+ * @file devs/StateEvent.hpp
  * @author The VLE Development Team.
  * @brief State event use to get information from graph::Model using
  * TimedObserver or EventObserver.

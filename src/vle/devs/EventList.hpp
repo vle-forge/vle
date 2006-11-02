@@ -1,5 +1,5 @@
 /**
- * @file EventList.hpp
+ * @file devs/EventList.hpp
  * @author The VLE Development Team.
  * @brief A std::vector container to store template of event. We define two
  * class ExternalEventList and InstantaneousEventList.

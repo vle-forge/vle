@@ -1,5 +1,5 @@
 /**
- * @file xml.cpp
+ * @file utils/XML.cpp
  * @author The VLE Development Team.
  * @brief libxml++ VLE extension.
  */

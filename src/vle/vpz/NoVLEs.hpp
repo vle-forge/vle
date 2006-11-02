@@ -1,5 +1,5 @@
 /** 
- * @file NoVLEs.hpp
+ * @file vpz/NoVLEs.hpp
  * @brief 
  * @author The vle Development Team
  * @date mer, 22 fév 2006 01:46:28 +0100

@@ -1,5 +1,5 @@
 /**
- * @file Measure.cpp
+ * @file devs/Measure.cpp
  * @author The VLE Development Team.
  * @brief Represent an output, a type of measure: timed or event with a time
  * step. A measure is attached to a list of observer.

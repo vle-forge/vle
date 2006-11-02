@@ -1,5 +1,5 @@
 /** 
- * @file Simpson.cpp
+ * @file utils/Simpson.cpp
  * @brief An implementation of Simpson's method to calculate the integrals.
  * @author The vle Development Team
  * @date lun, 06 fév 2006 16:54:12 +0100

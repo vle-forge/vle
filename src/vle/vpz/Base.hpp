@@ -1,5 +1,5 @@
 /** 
- * @file Base.hpp
+ * @file vpz/Base.hpp
  * @brief 
  * @author The vle Development Team
  * @date mar, 31 jan 2006 17:16:52 +0100

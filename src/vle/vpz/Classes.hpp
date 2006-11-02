@@ -1,5 +1,5 @@
 /** 
- * @file Classes.hpp
+ * @file vpz/Classes.hpp
  * @brief 
  * @author The vle Development Team
  * @date lun, 27 fév 2006 16:38:39 +0100

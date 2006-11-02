@@ -1,5 +1,5 @@
 /**
- * @file Stream.cpp
+ * @file devs/Stream.cpp
  * @author The VLE Development Team.
  * @brief Base class of net visualisation plugin.
  */

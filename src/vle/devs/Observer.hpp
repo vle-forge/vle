@@ -1,5 +1,5 @@
 /**
- * @file Observer.hpp
+ * @file devs/Observer.hpp
  * @author The VLE Development Team.
  * @brief Represent an observer on a devs::sAtomicModel and a port name.
  */

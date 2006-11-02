@@ -1,5 +1,5 @@
 /**
- * @file EventTable.cpp
+ * @file devs/EventTable.cpp
  * @author The VLE Development Team.
  * @brief Scheduller class to manage internal, external and state events.
  */

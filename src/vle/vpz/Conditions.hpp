@@ -1,5 +1,5 @@
 /** 
- * @file Conditions.hpp
+ * @file vpz/Conditions.hpp
  * @brief 
  * @author The vle Development Team
  * @date mar, 31 jan 2006 17:21:28 +0100

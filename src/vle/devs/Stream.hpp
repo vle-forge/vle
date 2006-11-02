@@ -1,5 +1,5 @@
 /**
- * @file Stream.hpp
+ * @file devs/Stream.hpp
  * @author The VLE Development Team.
  * @brief Base class of net visualisation plugin.
  */
@@ -62,6 +62,7 @@ namespace vle { namespace devs {
          * @param outputPlugin the name of the instance of plugin loaded like,
          * text, sdml or net.
          * @param outputType type of output like, local, ip.
+         * @param outputLocation where the plugin is launch.
          * @param parameters a string representation of parameters the XML
          * parameters.
          */

@@ -1,5 +1,5 @@
 /** 
- * @file geometry.hpp
+ * @file geometry/geometry.hpp
  * @brief Generic classes for geometry.
  * @author The vle Development Team
  * @date ven, 27 oct 2006 16:56:48 +0200
@@ -36,8 +36,6 @@ namespace vle {
 
 	/**
 	 * @brief Generic classes for geometry.
-	 * @author Blangi, Philippe pblangi@users.sourceforge.net
-	 * @date Thursday 10 February 2005
 	 */
 	namespace geometry {
 	}

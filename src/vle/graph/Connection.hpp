@@ -1,5 +1,5 @@
 /**
- * @file Connection.hpp
+ * @file graph/Connection.hpp
  * @author The VLE Development Team.
  * @brief Represent a DEVS connection between two models: internal, input or
  * output. This class is member of the DEVS Graph.

@@ -1,5 +1,5 @@
 /**
- * @file Exception.hpp
+ * @file utils/Exception.hpp
  * @author The VLE Development Team.
  * @brief A namespace that define all exception use in VLE projects. All
  * classes inherit of the std::runtime_error of the standard C++ exceptions.
@@ -32,11 +32,6 @@
 
 
 
-/**
- * @brief Define exception use into VLE framework. All exception use the base
- * class std::runtime_error.
- *
- */
 namespace vle { namespace utils {
 
     /**

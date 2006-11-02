@@ -1,5 +1,5 @@
 /**
- * @file Socket.hpp
+ * @file utils/Socket.hpp
  * @author The VLE Development Team.
  * @brief Portable and Object oriented socket API.
  */

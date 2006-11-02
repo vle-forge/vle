@@ -1,5 +1,5 @@
 /**
- * @file Simulator.hpp
+ * @file devs/Simulator.hpp
  * @author The VLE Development Team.
  * @brief Represent the DEVS Simulator class. This class provide a non
  * hierarchical DEVS simulator ie. all models are in the same coupled model.

@@ -1,5 +1,5 @@
 /** 
- * @file QSS.cpp
+ * @file extension/QSS.cpp
  * @brief 
  * @author The vle Development Team
  * @date ven, 27 oct 2006 00:06:52 +0200
@@ -238,12 +238,12 @@ qss::init()
 }
 
 
-devs::ExternalEventList* qss::getOutputFunction(devs::Time const & p_currentTime)
+devs::ExternalEventList* qss::getOutputFunction(devs::Time const & time)
 {
   if (getState(0) == RUN and m_active)
     {
       devs::ExternalEvent* ee = new devs::ExternalEvent("out",
-							p_currentTime,
+							time,
 							getModel());
       
       for (unsigned int i = 0; i < m_functionNumber ; i++)
@@ -264,19 +264,19 @@ bool qss::processConflict(const devs::InternalEvent& /*internal*/,
   return false;
 }
 
-void qss::processInitEvent(devs::InitEvent* p_event)
+void qss::processInitEvent(devs::InitEvent* event)
 {
-  unsigned int i = m_variableIndex.find(p_event->getPortName())->second;  
-  double v = p_event->getDoubleAttributeValue(p_event->getPortName());
+  unsigned int i = m_variableIndex.find(event->getPortName())->second;  
+  double v = event->getDoubleAttributeValue(event->getPortName());
 
   m_initialValueList.push_back(std::pair < unsigned int , double >(i,v));
 }
 
-void qss::processInternalEvent(devs::InternalEvent* p_event)
+void qss::processInternalEvent(devs::InternalEvent* event)
 {
   unsigned int i = m_currentModel;
 
-  //  setLastTime(i,p_event->getTime());
+  //  setLastTime(i,event->getTime());
   switch (getState(i)) {
   case INIT: // init du gradient
     {
@@ -295,7 +295,7 @@ void qss::processInternalEvent(devs::InternalEvent* p_event)
       for (unsigned int j = 0;j < m_functionNumber;j++)
 	if (j != i)
 	  {
-	    double e = (p_event->getTime() - getLastTime(j)).getValue();
+	    double e = (event->getTime() - getLastTime(j)).getValue();
 
 	    setValue(j,getValue(j)+e*getGradient(j));
 	  }
@@ -303,7 +303,7 @@ void qss::processInternalEvent(devs::InternalEvent* p_event)
 
       for (unsigned int j = 0;j < m_functionNumber;j++)
 	{
-	  setLastTime(j,p_event->getTime());
+	  setLastTime(j,event->getTime());
 	  // Mise à jour du gradient
 	  setGradient(j,compute(j));
 	  // Mise à jour de sigma
@@ -314,20 +314,20 @@ void qss::processInternalEvent(devs::InternalEvent* p_event)
   }
 }
 
-void qss::processExternalEvent(devs::ExternalEvent* p_event)
+void qss::processExternalEvent(devs::ExternalEvent* event)
 {
-  if (p_event->onPort("parameter"))
+  if (event->onPort("parameter"))
     {
-      std::string v_name = p_event->getStringAttributeValue("name");
-      double v_value = p_event->getDoubleAttributeValue("value");
+      std::string v_name = event->getStringAttributeValue("name");
+      double v_value = event->getDoubleAttributeValue("value");
 
       processPerturbation(v_name,v_value);
 
       for (unsigned int j = 0;j < m_functionNumber;j++)
 	{
-	  double e = (p_event->getTime() - getLastTime(j)).getValue();
+	  double e = (event->getTime() - getLastTime(j)).getValue();
 
-	  setLastTime(j,p_event->getTime());
+	  setLastTime(j,event->getTime());
 	  // Mise à jour de la valeur de la fonction
 	  if (e > 0) setValue(j,getValue(j)+e*getGradient(j));
 	  // Mise à jour du gradient
@@ -340,14 +340,14 @@ void qss::processExternalEvent(devs::ExternalEvent* p_event)
     }
   else
     {
-      unsigned int i = (unsigned int)p_event->getIntegerAttributeValue("index");
+      unsigned int i = (unsigned int)event->getIntegerAttributeValue("index");
       
       if (getState(i) == RUN) {
-        double e = (p_event->getTime() - getLastTime(i)).getValue();
+        double e = (event->getTime() - getLastTime(i)).getValue();
 
 	for (unsigned int j = 0;j < m_functionNumber;j++)
 	  {
-	    setLastTime(j,p_event->getTime());
+	    setLastTime(j,event->getTime());
 	    // Mise à jour de la valeur de la fonction
 	    if (e > 0) setValue(j,getValue(j)+e*getGradient(j));
 	    // Mise à jour du gradient
@@ -361,10 +361,10 @@ void qss::processExternalEvent(devs::ExternalEvent* p_event)
     }
 }
 
-value::Value* qss::processStateEvent(devs::StateEvent* p_event) const
+value::Value* qss::processStateEvent(devs::StateEvent* event) const
 {
-  //  unsigned int i = to_int(p_event->getPortName());
-  unsigned int i = m_variableIndex.find(p_event->getPortName())->second;
+  //  unsigned int i = to_int(event->getPortName());
+  unsigned int i = m_variableIndex.find(event->getPortName())->second;
 
   return buildDouble(getValue(i));
 }

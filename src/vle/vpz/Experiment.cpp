@@ -1,5 +1,5 @@
 /** 
- * @file Experiment.cpp
+ * @file vpz/Experiment.cpp
  * @brief 
  * @author The vle Development Team
  * @date mar, 14 fév 2006 17:40:39 +0100

@@ -1,5 +1,5 @@
 /**
- * @file sAtomicModel.cpp
+ * @file devs/sAtomicModel.cpp
  * @author The VLE Development Team.
  * @brief Represent a couple devs::AtomicModel and devs::Dynamic class to
  * represent the DEVS simulator.

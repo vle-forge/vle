@@ -1,5 +1,5 @@
 /**
- * @file Dynamics.hpp
+ * @file devs/Dynamics.hpp
  * @author The VLE Development Team.
  * @brief Dynamics class represent a part of the DEVS simulator. This class
  * must be inherits to build simulation components.
@@ -314,8 +314,7 @@ namespace vle { namespace devs {
 	 *
 	 * @return the event list
 	 */
-        virtual ExternalEventList* getOutputFunction(const Time&)
-        { return new ExternalEventList(); }
+        virtual ExternalEventList* getOutputFunction(const Time& time);
 
 	/**
 	 * Time advance function: compute the duration of state
@@ -365,7 +364,7 @@ namespace vle { namespace devs {
          * occurs at the same time. Default take internal.
          * 
          * @param internal the internal event.
-         * @param eventlist the external events list.
+         * @param extEventlist the external events list.
          *
          * @return true if priority to Internal Event, false to External events.
          */
@@ -377,7 +376,7 @@ namespace vle { namespace devs {
          * Instantaneous events occurs at the same time. Default take internal.
          * 
          * @param internal the internal event.
-         * @param eventlist the instantaneous events list.
+         * @param instEventlist the instantaneous events list.
          *
          * @return true if priority to Internal Event, false to
          * Instantaneous events.
@@ -417,7 +416,7 @@ namespace vle { namespace devs {
 	 *
 	 * @param event the init event with of the port
 	 */
-	virtual void processInitEvent(InitEvent*) { }
+	virtual void processInitEvent(InitEvent* event);
 
 	/**
 	 * Compute the new state of the model with the internal
@@ -425,7 +424,7 @@ namespace vle { namespace devs {
 	 *
 	 * @param event the internal event with of the port
 	 */
-        virtual void processInternalEvent(InternalEvent*) { }
+        virtual void processInternalEvent(InternalEvent* event);
 
 	/**
 	 * Compute the new state of the model when an external event
@@ -433,7 +432,7 @@ namespace vle { namespace devs {
 	 *
 	 * @param event the external event with of the port
 	 */
-        virtual void processExternalEvent(ExternalEvent*) { }
+        virtual void processExternalEvent(ExternalEvent* event);
 
         /**
          * Process an instantaneous event ; these models occurs when an
@@ -457,7 +456,7 @@ namespace vle { namespace devs {
 	 *
 	 * @return the value of state variable
 	 */
-        virtual vle::value::Value* processStateEvent(StateEvent*) const;
+        virtual vle::value::Value* processStateEvent(StateEvent* event) const;
 
     private:
         sAtomicModel* m_model;

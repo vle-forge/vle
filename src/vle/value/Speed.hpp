@@ -1,5 +1,5 @@
 /** 
- * @file Speed.hpp
+ * @file value/Speed.hpp
  * @brief 
  * @author The vle Development Team
  * @date mar, 06 déc 2005 11:28:06 +0100

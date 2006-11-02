@@ -1,5 +1,5 @@
 /**
- * @file Event.hpp
+ * @file devs/Event.hpp
  * @author The VLE Development Team.
  * @brief The Event base class. Define the base for internal, initialisation,
  * state and external events.

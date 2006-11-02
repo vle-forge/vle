@@ -1,5 +1,5 @@
 /**
- * @file DevsTypes.hpp
+ * @file devs/DevsTypes.hpp
  * @author The VLE Development Team.
  * @brief Just an include to define all typedef use in DEVS library.
  */

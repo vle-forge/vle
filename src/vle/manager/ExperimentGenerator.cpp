@@ -1,5 +1,5 @@
 /** 
- * @file ExperimentGenerator.cpp
+ * @file manager/ExperimentGenerator.cpp
  * @brief A class to translate Experiement file into Instance of Experiment.
  * @author The vle Development Team
  * @date lun, 23 jan 2006 14:00:40 +0100

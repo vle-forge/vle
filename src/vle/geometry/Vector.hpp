@@ -1,5 +1,5 @@
 /** 
- * @file Vector.hpp
+ * @file geometry/Vector.hpp
  * @brief A generic n elements vector.
  * @author The vle Development Team
  * @date ven, 27 oct 2006 16:57:38 +0200
@@ -35,12 +35,8 @@ namespace vle { namespace geometry {
  * @brief A generic n elements vector.
  * @param n The number of dimension.
  * @param Class The class of the elements.
- * @author Blangi, Philippe pblangi@users.sourceforge.net
- * @date Friday 18 February 2005
  *
- * <h4>Example:</h4>
- * <table class="mdTable" border="0"><tr><td>
- * <pre>
+ * @code
  * #include <iostream>
  * #include <vle/geometry/Vector.hpp>
  *
@@ -68,8 +64,7 @@ namespace vle { namespace geometry {
  *
  *	return 0;
  * }
- * </pre>
- * </td></tr></table>
+ * @endcode
  */
 template <size_t n, class Class>
 class Vector : public vle::geometry::Tuple<n, Class>

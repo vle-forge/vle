@@ -1,5 +1,5 @@
 /**
- * @file InstantaneousEventList.hpp
+ * @file devs/InstantaneousEventList.hpp
  * @author The VLE Development Team.
  * @brief A EventList container to store devs::InstantaneousEvent. 
  */

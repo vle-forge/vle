@@ -1,5 +1,5 @@
 /**
- * @file NoVLEModel.hpp
+ * @file graph/NoVLEModel.hpp
  * @author The VLE Development Team.
  * @brief Define no-vle model ie. model that use a different notation.
  */

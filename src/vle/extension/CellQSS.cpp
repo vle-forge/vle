@@ -1,5 +1,5 @@
 /** 
- * @file CellQSS.cpp
+ * @file extension/CellQSS.cpp
  * @brief 
  * @author The vle Development Team
  * @date ven, 27 oct 2006 00:05:20 +0200
@@ -33,15 +33,17 @@
 #include <vle/utils/Exception.hpp>
 #include <cmath>
 
-using namespace vle;
-using namespace devs;
-using namespace extension;
-using namespace utils::xml;
-using namespace utils;
 using std::string;
 using std::map;
 using std::pair;
 using std::vector;
+
+
+namespace vle { namespace extension {
+    
+using namespace devs;
+using namespace utils::xml;
+using namespace utils;
 
 CellQSS::CellQSS(devs::sAtomicModel* p_model):CellDevs(p_model),
 					      m_gradient(0),m_index(0),
@@ -168,14 +170,14 @@ CellQSS::setGradient(unsigned int i,double p_gradient)
 
 
 void
-CellQSS::setLastTime(unsigned int i,const Time & p_time)
+CellQSS::setLastTime(unsigned int i,const devs::Time & p_time)
 {
     m_lastTime[i] = p_time;
 }
 
 
 void
-CellQSS::setCurrentTime(unsigned int i,const Time & p_time)
+CellQSS::setCurrentTime(unsigned int i,const devs::Time & p_time)
 {
     m_currentTime[i] = p_time;
 }
@@ -190,7 +192,7 @@ CellQSS::setState(unsigned int i,state p_state)
 
 
 void
-CellQSS::setSigma(unsigned int i,const Time & p_time)
+CellQSS::setSigma(unsigned int i,const devs::Time & p_time)
 {
     m_sigma[i] = p_time;
 }
@@ -256,7 +258,7 @@ CellQSS::finish()
 }
 
 
-Time
+devs::Time
 CellQSS::init()
 {
     vector < pair < unsigned int , double > >::const_iterator it =
@@ -284,24 +286,24 @@ CellQSS::init()
 
 
 void
-CellQSS::processInitEvent(InitEvent* p_event)
+CellQSS::processInitEvent(devs::InitEvent* event)
 {
-    string v_name = p_event->getPortName();
+    string v_name = event->getPortName();
     unsigned int i = m_variableIndex[v_name];
-    double v = p_event->getDoubleAttributeValue(p_event->getPortName());
+    double v = event->getDoubleAttributeValue(event->getPortName());
 
     m_initialValueList.push_back(pair < unsigned int , double >(i,v));
 }
 
 
 void
-CellQSS::processInternalEvent(InternalEvent* p_event)
+CellQSS::processInternalEvent(devs::InternalEvent* event)
 {
     unsigned int i = m_currentModel;
 
-//    std::cout << p_event->getTime().getValue() << std::endl;
+//    std::cout << event->getTime().getValue() << std::endl;
 
-    setCurrentTime(i,p_event->getTime());
+    setCurrentTime(i,event->getTime());
     switch (getState(i))
     {
     case INIT:
@@ -332,20 +334,20 @@ CellQSS::processInternalEvent(InternalEvent* p_event)
 	updateSigma(i);
     }
     }
-    setLastTime(i,p_event->getTime());
+    setLastTime(i,event->getTime());
 }
 
 void
-CellQSS::processExternalEvent(ExternalEvent* p_event)
+CellQSS::processExternalEvent(devs::ExternalEvent* event)
 {
-    CellDevs::processExternalEvent(p_event);
+    CellDevs::processExternalEvent(event);
     if (getState(0) == RUN)
 	for (unsigned int i = 0; i < m_functionNumber ; i++)
 	{
-	    double e = p_event->getTime().getValue() -
+	    double e = event->getTime().getValue() -
 		getLastTime(i).getValue();
 
-	    setCurrentTime(i,p_event->getTime());
+	    setCurrentTime(i,event->getTime());
 // Mise à jour de la valeur de la fonction
 	    if (e > 0)
 		setValue(i,getValue(i)+e*getGradient(i));
@@ -356,13 +358,13 @@ CellQSS::processExternalEvent(ExternalEvent* p_event)
 
 	    if (getSigma(i) < 0)
 		setSigma(i,Time(0));
-	    setLastTime(i,p_event->getTime());
+	    setLastTime(i,event->getTime());
 	}
 }
 
 
 void
-CellQSS::processPerturbation(ExternalEvent*)
+CellQSS::processPerturbation(devs::ExternalEvent*)
 {
     for (unsigned int i = 0; i < m_functionNumber ; i++)
     {
@@ -376,7 +378,9 @@ CellQSS::processPerturbation(ExternalEvent*)
 
 
 value::Value*
-CellQSS::processStateEvent(StateEvent* p_event) const
+CellQSS::processStateEvent(devs::StateEvent* event) const
 {
-    return buildDouble(getDoubleState(p_event->getPortName()));
+    return buildDouble(getDoubleState(event->getPortName()));
 }
+
+}} // namespace vle extension

@@ -1,5 +1,5 @@
 /**
- * @file sAtomicModel.hpp
+ * @file devs/sAtomicModel.hpp
  * @author The VLE Development Team.
  * @brief Represent a couple devs::AtomicModel and devs::Dynamic class to
  * represent the DEVS simulator.
@@ -104,7 +104,7 @@ namespace vle { namespace devs {
          * occurs at the same time. Default take internal.
          * 
          * @param internal the internal event.
-         * @param eventlist the external events list.
+         * @param extEventlist the external events list.
          *
          * @return true if priority to Internal Event, false to External events.
          */
@@ -117,7 +117,7 @@ namespace vle { namespace devs {
          * Instantaneous events occurs at the same time. Default take internal.
          * 
          * @param internal the internal event.
-         * @param eventlist the instantaneous events list.
+         * @param instEventlist the instantaneous events list.
          *
          * @return true if priority to Internal Event, false to
          * Instantaneous events.

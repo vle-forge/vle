@@ -1,5 +1,5 @@
 /** 
- * @file Coordinate.hpp
+ * @file value/Coordinate.hpp
  * @brief 
  * @author The vle Development Team
  * @date mar, 06 déc 2005 18:21:51 +0100

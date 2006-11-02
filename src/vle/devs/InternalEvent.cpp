@@ -1,5 +1,5 @@
 /**
- * @file InternalEvent.cpp
+ * @file devs/InternalEvent.cpp
  * @author The VLE Development Team.
  * @brief Internal event based on the devs::Event class and are build by
  * graph::Model when internal transition are called.

@@ -1,5 +1,5 @@
 /** 
- * @file Vpz.cpp
+ * @file vpz/Vpz.cpp
  * @brief 
  * @author The vle Development Team
  * @date mar, 28 fév 2006 12:00:10 +0100

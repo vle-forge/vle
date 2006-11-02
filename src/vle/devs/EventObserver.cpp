@@ -1,5 +1,5 @@
 /**
- * @file EventObserver.cpp
+ * @file devs/EventObserver.cpp
  * @author The VLE Development Team.
  * @brief Define a Event observer base on devs::Observer class. This class
  * build state event when event are push.

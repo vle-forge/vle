@@ -1,5 +1,5 @@
 /** 
- * @file DataReader.hpp
+ * @file data/DataReader.hpp
  * @brief The data reader class.
  * @author The vle Development Team
  * @date lun, 23 jan 2006 14:04:28 +0100

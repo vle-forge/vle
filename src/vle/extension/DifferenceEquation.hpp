@@ -1,5 +1,5 @@
 /**
- * @file DifferenceEquation.hpp
+ * @file extension/DifferenceEquation.hpp
  * @author The VLE Development Team.
  * @brief
  */
@@ -86,11 +86,11 @@ namespace vle { namespace extension {
         // DEVS Methods
         virtual devs::Time init();
         devs::Time getTimeAdvance();
-        virtual void processInternalEvent( devs::InternalEvent * p_event);
-        virtual devs::ExternalEventList* getOutputFunction(devs::Time const &p_currentTime);
-        virtual void processExternalEvent( devs::ExternalEvent * p_event);
-        virtual value::Value* processStateEvent( devs::StateEvent * se) const;
-        virtual void processInitEvent( devs::InitEvent * ie);
+        virtual void processInternalEvent( devs::InternalEvent * event);
+        virtual devs::ExternalEventList* getOutputFunction(devs::Time const &time);
+        virtual void processExternalEvent( devs::ExternalEvent * event);
+        virtual value::Value* processStateEvent( devs::StateEvent * event) const;
+        virtual void processInitEvent( devs::InitEvent * event);
         //		virtual bool processConflict(const devs::InternalEvent& , const devs::ExternalEventList& ) { std::cout<<"++++ ProcessConflict2"<<std::endl; return false; }
         virtual double compute() = 0;
     };

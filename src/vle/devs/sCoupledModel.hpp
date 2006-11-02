@@ -1,5 +1,5 @@
 /**
- * @file sCoupledModel.hpp
+ * @file devs/sCoupledModel.hpp
  * @author The VLE Development Team.
  * @brief
  */

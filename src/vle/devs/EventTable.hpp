@@ -1,5 +1,5 @@
 /**
- * @file EventTable.hpp
+ * @file devs/EventTable.hpp
  * @author The VLE Development Team.
  * @brief Scheduller class to manage internal, external and state events.
  */
@@ -44,8 +44,8 @@ namespace vle { namespace devs {
     /**
      * Compare two events with Time like comparator.
      *
-     * @param e1, first event to compare
-     * @param e2, second event to compare
+     * @param e1 first event to compare
+     * @param e2 second event to compare
      * @return true if Time e1 is more recent than Time e2.
      */
     inline bool timeLessThan(const Event* e1, const Event* e2)
