@@ -22,14 +22,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef VLE_EXPERIMENTGENERATOR_HPP
-#define VLE_EXPERIMENTGENERATOR_HPP
+#ifndef VLE_MANAGER_EXPERIMENTGENERATOR_HPP
+#define VLE_MANAGER_EXPERIMENTGENERATOR_HPP
 
 #include <vle/value/Value.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <string>
 #include <vector>
 #include <list>
+
+
 
 namespace vle { namespace manager {
 
@@ -39,85 +41,83 @@ namespace vle { namespace manager {
     class ExperimentGenerator
     {
     public:
-      /**
-       * Just get a constant reference to VPZ. Use get_instances_files() to
-       * generate all VPZ instance file.
-       *
-       */
-      ExperimentGenerator(const vpz::Vpz& file);
+        /**
+         * Just get a constant reference to VPZ. Use get_instances_files() to
+         * generate all VPZ instance file.
+         *
+         */
+        ExperimentGenerator(const vpz::Vpz& file);
 
-      virtual ~ExperimentGenerator() { }
+        virtual ~ExperimentGenerator() { }
 
-      /**
-       * @brief Build all instances
-       * function.
-       */
-      void build();
+        /**
+         * @brief Build all instances function.
+         */
+        void build();
 
-      /**
-       * @return the list of filename build after build_instances
-       * function.
-       */
-      const std::list < std::string >& get_instances_files() const
-      { return mFileList; }
+        /**
+         * @brief Get the list of filename build after build.
+         * @return the list of filename.
+         */
+        const std::list < std::string >& get_instances_files() const
+        { return mFileList; }
 
     private:
-      /** 
-       * @brief Build a list of replicas based on information of VPZ file.
-       */
-      void build_replicas_list();
+        /** 
+         * @brief Build a list of replicas based on information of VPZ file.
+         */
+        void build_replicas_list();
 
-      /** 
-       * @brief Build a list of conditions based on information of VPZ file.
-       */
-      void build_conditions_list();
+        /** 
+         * @brief Build a list of conditions based on information of VPZ file.
+         */
+        void build_conditions_list();
 
-      /** 
-       * @brief Build just one condition based on information of VPZ file.
-       */
-      virtual void build_combination(size_t& nb) = 0;
-      
-      void build_combinations();
+        /** 
+         * @brief Build just one condition based on information of VPZ file.
+         */
+        virtual void build_combination(size_t& nb) = 0;
 
-      void build_combinations_from_replicas(size_t cmbnumber);
+        void build_combinations();
 
-      void write_instance(size_t cmbnumber, size_t replnumber);
+        void build_combinations_from_replicas(size_t cmbnumber);
 
-      /** 
-       * @brief Get the number of combination from vpz file.
-       * 
-       * @return A value greater than 0.
-       */
-      virtual size_t get_combination_number() const = 0;
+        void write_instance(size_t cmbnumber, size_t replnumber);
 
-      /** 
-       * @brief Get the number of replicas from vpz file.
-       * 
-       * @return A value greater than 0.
-       */
-      size_t get_replicas_number() const;
+        /** 
+         * @brief Get the number of combination from vpz file.
+         * 
+         * @return A value greater than 0.
+         */
+        virtual size_t get_combination_number() const = 0;
 
-      /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+        /** 
+         * @brief Get the number of replicas from vpz file.
+         * 
+         * @return A value greater than 0.
+         */
+        size_t get_replicas_number() const;
+
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     protected:
+        /** 
+         * @brief Define a condition used to generate combination list.
+         */
+        struct cond_t {
+            cond_t() : sz(0), pos(0) { }
 
-      /** 
-       * @brief Define a condition used to generate combination list.
-       */
-      struct cond_t {
-	cond_t() : sz(0), pos(0) { }
+            size_t  sz;
+            size_t  pos;
+        };
 
-	size_t  sz;
-	size_t  pos;
-      };
-
-      const vpz::Vpz&             mFile;
-      vpz::Vpz                    mTmpfile;
-      std::vector < guint32 >     mReplicasTab;
-      std::vector < cond_t >      mCondition;
-      std::list < std::string >   mFileList;
+        const vpz::Vpz&             mFile;
+        vpz::Vpz                    mTmpfile;
+        std::vector < guint32 >     mReplicasTab;
+        std::vector < cond_t >      mCondition;
+        std::list < std::string >   mFileList;
     };
 
-  }} // namespace vle manager
+}} // namespace vle manager
 
 #endif

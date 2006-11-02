@@ -2,7 +2,7 @@
  * @file TotalExperimentGenerator.cpp
  * @brief A class to translate Experiement file into Instance of Experiment.
  * @author The vle Development Team
- * @date lun, 23 jan 2006 14:00:40 +0100
+ * @date jeu, 02 nov 2006 11:19:02 +0100
  */
 
 /*
@@ -24,42 +24,44 @@
 
 #include <vle/manager/TotalExperimentGenerator.hpp>
 
+
+
 namespace vle { namespace manager {
 
-    void TotalExperimentGenerator::build_combination(size_t& nb)
-    {
-      size_t sz = mCondition.size() - 1;
+void TotalExperimentGenerator::build_combination(size_t& nb)
+{
+    size_t sz = mCondition.size() - 1;
 
-      if (mCondition[sz].pos != mCondition[sz].sz - 1) {
-	mCondition[sz].pos++;
-      } else {
-	int i = sz;
+    if (mCondition[sz].pos != mCondition[sz].sz - 1) {
+        mCondition[sz].pos++;
+    } else {
+        int i = sz;
 
-	while (i >= 0) {
-	  if (mCondition[i].pos == mCondition[i].sz - 1) {
-	    mCondition[i].pos = 0;
-	    i--;
-	  } else {
-	    mCondition[i].pos++;
-	    break;
-	  }
-	}
-      }
-      nb++;
+        while (i >= 0) {
+            if (mCondition[i].pos == mCondition[i].sz - 1) {
+                mCondition[i].pos = 0;
+                i--;
+            } else {
+                mCondition[i].pos++;
+                break;
+            }
+        }
     }
+    nb++;
+}
 
-    size_t TotalExperimentGenerator::get_combination_number() const
-    {
-      size_t nb = 1;
-      const std::list < vpz::Condition >& cnds =
+size_t TotalExperimentGenerator::get_combination_number() const
+{
+    size_t nb = 1;
+    const std::list < vpz::Condition >& cnds =
         mFile.project().experiment().conditions().conditions();
 
-      for (std::list < vpz::Condition >::const_iterator it = cnds.begin();
-	   it != cnds.end(); ++it) {
+    for (std::list < vpz::Condition >::const_iterator it = cnds.begin();
+         it != cnds.end(); ++it) {
         nb *= (*it).value().size();
-      }
-
-      return nb;
     }
 
-  }} // namespace vle manager
+    return nb;
+}
+
+}} // namespace vle manager

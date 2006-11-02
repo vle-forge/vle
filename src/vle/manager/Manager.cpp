@@ -39,7 +39,7 @@ namespace vle { namespace manager {
 Manager::Manager()
 {
     try {
-	mHost.read_file();
+        mHost.read_file();
     } catch(const std::exception& e) {
         std::cerr << "manager parsing host file error.\n";
     }
@@ -68,15 +68,15 @@ void Manager::run_all_in_localhost(const vpz::Vpz& vpz)
 
     while (lst.empty() == false) {
         std::cerr << " - Simulator start in another process\n";
-        Glib::spawn_command_line_sync(
-            (boost::format("vle -v %1% %2%\n") % utils::Trace::trace().get_level() %
-                           lst.front()).str());
+        Glib::spawn_command_line_sync((boost::format("vle -v %1% %2%\n") %
+                                       utils::Trace::trace().get_level() %
+                                       lst.front()).str());
         if (std::remove(lst.front().c_str()) == -1) {
             std::cerr << boost::format("Delete file %1% error: %2%\n") % 
                 lst.front() % strerror(errno);
         }
         std::cerr << "\n";
-	lst.pop_front();
+        lst.pop_front();
     }
     delete expgen;
 }
@@ -135,16 +135,16 @@ void Manager::scheduller()
     std::list < std::string >::const_iterator it = lst.begin();
 
     std::cerr << "hosts :" << hosts.size() <<" " << lst.size()
-	      << mClients.size() << "\n";
+        << mClients.size() << "\n";
 
     utils::Hosts::SetHosts::const_iterator ithost = hosts.begin();
     std::list < utils::net::Client*>::iterator itclient = mClients.begin();
     ithost = hosts.begin();
     itclient = mClients.begin();
     while (lst.empty() == false) {
-	if (ithost != hosts.end()) {
+        if (ithost != hosts.end()) {
             int nbfiletosend = (*ithost).process() -
-		get_current_number_vpzi(*(*itclient));
+                get_current_number_vpzi(*(*itclient));
 
             while (lst.empty() == false and nbfiletosend > 0) {
                 send_vpzi(*(*itclient), lst.front());
@@ -171,7 +171,7 @@ void Manager::open_connection_with_simulators()
         utils::net::Client* client = 0;
         try {
             client = new utils::net::Client((*ithost).hostname(),
-					    (*ithost).port());
+                                            (*ithost).port());
             mClients.push_back(client);
         } catch (const std::exception& e) {
             std::cerr << boost::format(
@@ -214,7 +214,7 @@ gint32 Manager::get_current_number_vpzi(utils::net::Client& cl)
         current = cl.recv_int();
     } catch (const std::exception& e) {
         std::cerr << boost::format(
-	    "Error get current number of VPZi: %1%\n") % e.what();
+            "Error get current number of VPZi: %1%\n") % e.what();
     }
     return current;
 }
@@ -228,7 +228,7 @@ void Manager::send_vpzi(utils::net::Client& cl, const Glib::ustring& filename)
         cl.send_buffer(file);
     } catch (const std::exception& e) {
         std::cerr << boost::format("Error sendind VPZi %1%: %2%\n") %
-                                   filename.c_str() % e.what();
+            filename.c_str() % e.what();
     }
 }
 

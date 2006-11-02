@@ -22,8 +22,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef VLE_SIMULATOR_HPP
-#define VLE_SIMULATOR_HPP
+#ifndef VLE_MANAGER_SIMULATOR_HPP
+#define VLE_MANAGER_SIMULATOR_HPP
 
 #include <glibmm/thread.h>
 #include <glibmm/threadpool.h>

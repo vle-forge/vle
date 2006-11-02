@@ -22,10 +22,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef VLE_VLE_HPP
-#define VLE_VLE_HPP
+#ifndef VLE_MANAGER_VLE_HPP
+#define VLE_MANAGER_VLE_HPP
 
 #include <vector>
+
+
 
 namespace vle { namespace manager {
 

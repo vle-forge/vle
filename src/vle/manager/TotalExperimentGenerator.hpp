@@ -2,7 +2,7 @@
  * @file TotalExperimentGenerator.hpp
  * @brief A class to translate Experiement file into Instance of Experiment.
  * @author The vle Development Team
- * @date lun, 23 jan 2006 14:01:42 +0100
+ * @date jeu, 02 nov 2006 11:13:18 +0100
  */
 
 /*
@@ -22,38 +22,43 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef VLE_TOTALEXPERIMENTGENERATOR_HPP
-#define VLE_TOTALEXPERIMENTGENERATOR_HPP
+#ifndef VLE_MANAGER_TOTALEXPERIMENTGENERATOR_HPP
+#define VLE_MANAGER_TOTALEXPERIMENTGENERATOR_HPP
 
 #include <vle/manager/ExperimentGenerator.hpp>
+
+
 
 namespace vle { namespace manager {
 
     /** 
      * @brief A class to translate Experiment file into Instance of Experiment.
      */
-    class TotalExperimentGenerator:public ExperimentGenerator
+    class TotalExperimentGenerator : public ExperimentGenerator
     {
     public:
-      /**
-       * Just get a constant reference to VPZ. Use get_instances_files() to
-       * generate all VPZ instance file.
-       *
-       */
-      TotalExperimentGenerator(const vpz::Vpz& file):ExperimentGenerator(file) { }
+        /**
+         * Just get a constant reference to VPZ. Use get_instances_files() to
+         * generate all VPZ instance file.
+         *
+         */
+        TotalExperimentGenerator(const vpz::Vpz& file) :
+            ExperimentGenerator(file)
+        { }
 
-      virtual ~TotalExperimentGenerator() { }
+        virtual ~TotalExperimentGenerator()
+        { }
 
-      virtual void build_combination(size_t& nb);
-      
-      /** 
-       * @brief Get the number of combination from vpz file.
-       * 
-       * @return A value greater than 0.
-       */
-      virtual size_t get_combination_number() const;
+        virtual void build_combination(size_t& nb);
+
+        /** 
+         * @brief Get the number of combination from vpz file.
+         * 
+         * @return A value greater than 0.
+         */
+        virtual size_t get_combination_number() const;
     };
 
-  }} // namespace vle manager
+}} // namespace vle manager
 
 #endif
