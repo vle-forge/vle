@@ -743,7 +743,7 @@ vle::devs::Stream* Simulator::getStreamPlugin(const vpz::Output& o)
     Glib::Module* module = new Glib::Module(file1);
 
     if (not (*module)) {
-        std::string err1 = Glib::Module::get_last_error();
+        std::string err1(Glib::Module::get_last_error());
         delete module;
 
         std::string file2(Glib::Module::build_path(
@@ -751,18 +751,14 @@ vle::devs::Stream* Simulator::getStreamPlugin(const vpz::Output& o)
         module = new Glib::Module(file2);
 
         if (not (*module)) {
-            std::string err2 = Glib::Module::get_last_error();
+            std::string err2(Glib::Module::get_last_error());
             delete module;
 
-            std::string msg((boost::format(
-                        "Error opening stream plugin '%1%' from '%2%' or '%3%' "
-                        "with error:\n\n") % o.streamformat() % file1 %
-                    file2).str());
-            msg += err1;
-            msg += " ";
-            msg += err2;
-
-            Throw(utils::FileError, msg);
+            Throw(utils::FileError, (boost::format(
+                        "Error opening stream plugin '%1%'\n"
+                        "- from '%2%' with error: %3%\n"
+                        "- from '%4%' with error: %5%") % o.streamformat() %
+                    file1 % err1 % file2 % err2).str());
         }
     }
     module->make_resident();

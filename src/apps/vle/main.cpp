@@ -71,7 +71,8 @@ int main(int argc, char* argv[])
 
     if (command.manager()) {
         result = vle.runManager(manag.daemon(), manag.allInLocal(),
-                                vle::manager::VLE::CmdArgs(argv + 1, argv + argc));
+                                vle::manager::VLE::CmdArgs(argv + 1, argv +
+                                                           argc));
     } else if (command.simulator()) {
         result = vle.runSimulator(simu.process());
     } else if (command.justRun()) {
