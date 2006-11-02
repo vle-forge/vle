@@ -80,12 +80,12 @@ void Outputs::addSdmlStream(const std::string& name,
     addOutput(name, o);
 }
 
-void Outputs::addNetStream(const std::string& name,
+void Outputs::addEovStream(const std::string& name,
                            const std::string& plugin,
                            const std::string& location)
 {
     Output o;
-    o.setNetStream(plugin, location);
+    o.setEovStream(plugin, location);
     addOutput(name, o);
 }
 

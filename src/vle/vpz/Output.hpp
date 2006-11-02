@@ -32,8 +32,8 @@ namespace vle { namespace vpz {
 
     /** 
      * @brief This class defines an output information and store the type of
-     * output, text stream, sdml stream or net stream. For text and sdml, it
-     * store the location filename and for net stream, the host.
+     * output, text stream, sdml stream or Eov stream. For text and sdml, it
+     * store the location filename and for Eov stream, the host.
      */
     class Output : public Base
     {
@@ -42,9 +42,9 @@ namespace vle { namespace vpz {
          * @brief Define the output format of the plugin.
          * - TEXT: values are writing into the stream with a text format.
          * - SDML: values are writing into the stream with a SDML format.
-         * - NET: values are writing into the stream with a NET format.
+         * - EOV: values are writing into the stream with a EOV format.
          */
-        enum Format { TEXT, SDML, NET };
+        enum Format { TEXT, SDML, EOV };
 
         Output();
 
@@ -75,7 +75,7 @@ namespace vle { namespace vpz {
         void setSdmlStream(const std::string& location = std::string());
 
         /** 
-         * @brief Set the output with the net stream information. The name and
+         * @brief Set the output with the Eov stream information. The name and
          * the plugin are obligatory,  the location defines host with syntax:
          * host:port. It location is empty, location is initialised by ":8000".
          * 
@@ -84,7 +84,7 @@ namespace vle { namespace vpz {
          *
          * @throw Exception::Internal if plugin is empty.
          */
-        void setNetStream(const std::string& plugin,
+        void setEovStream(const std::string& plugin,
                           const std::string& location = std::string());
 
         /** 
@@ -105,10 +105,10 @@ namespace vle { namespace vpz {
 
         std::string streamformat() const
         { return (m_format == TEXT ? "textstream" : m_format == SDML ?
-                  "sdmlstream" : "netstream"); }
+                  "sdmlstream" : "eovstream"); }
 
         /** 
-         * @brief Get the plugin of this Output. If format is not Output::NET,
+         * @brief Get the plugin of this Output. If format is not Output::Eov,
          * this string is not cleared.
          * 
          * @return a string representation of plugin.

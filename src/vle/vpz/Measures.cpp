@@ -73,7 +73,7 @@ void Measures::buildEOV()
         std::map < std::string, Output >::const_iterator it;
         for (it = m_outputs.outputs().begin(); it !=
              m_outputs.outputs().end(); ++it) {
-            if ((*it).second.format() == Output::NET) {
+            if ((*it).second.format() == Output::EOV) {
                 EOV tmp;
                 tmp.setPluginChild();
                 tmp.host((*it).second.location());
@@ -119,11 +119,11 @@ void Measures::addSdmlStreamOutput(const std::string& name,
     m_outputs.addSdmlStream(name, location);
 }
 
-void Measures::addNetStreamOutput(const std::string& name,
+void Measures::addEovStreamOutput(const std::string& name,
                                   const std::string& plugin,
                                   const std::string& location)
 {
-    m_outputs.addNetStream(name, plugin, location);
+    m_outputs.addEovStream(name, plugin, location);
 }
 
 void Measures::clear()

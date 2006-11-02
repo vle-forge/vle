@@ -41,7 +41,7 @@ namespace vle { namespace vpz {
 
         /** 
          * @brief Parse a MEASURES tags, with OUTPUTS, MEASURE and EOVS tags. If
-         * EOVS tag is empty, and OUTPUTS containt Net plugin, EOVS will build
+         * EOVS tag is empty, and OUTPUTS containt EOV plugin, EOVS will build
          * automatically.
          * 
          * @param elt A reference to the MEASURES tags.
@@ -58,7 +58,7 @@ namespace vle { namespace vpz {
         void addSdmlStreamOutput(const std::string& name,
                                  const std::string& location = std::string());
 
-        void addNetStreamOutput(const std::string& name,
+        void addEovStreamOutput(const std::string& name,
                                 const std::string& plugin,
                                 const std::string& location = std::string());
 
@@ -126,7 +126,7 @@ namespace vle { namespace vpz {
         Measure& addMeasure(const std::string& name, const Measure& m);
 
         /** 
-         * @brief Build EOV from net output when no EOV was defined.
+         * @brief Build EOV from EOV output when no EOV was defined.
          */
         void buildEOV();
     };

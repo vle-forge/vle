@@ -49,8 +49,8 @@ void Output::init(xmlpp::Element* elt)
         setTextStream(xml::get_attribute(elt, "LOCATION"));
     } else if (format == "sdml") {
         setSdmlStream(xml::get_attribute(elt, "LOCATION"));
-    } else if (format == "net") {
-        setNetStream(xml::get_attribute(elt, "PLUGIN"),
+    } else if (format == "eov") {
+        setEovStream(xml::get_attribute(elt, "PLUGIN"),
                      xml::get_attribute(elt, "LOCATION"));
     } else {
         Throw(utils::ParseError, "Unknow output format");
@@ -74,8 +74,8 @@ void Output::write(xmlpp::Element* elt) const
     case Output::SDML:
         elt->set_attribute("FORMAT", "sdml");
         break;
-    case Output::NET:
-        elt->set_attribute("FORMAT", "net");
+    case Output::EOV:
+        elt->set_attribute("FORMAT", "eov");
         elt->set_attribute("PLUGIN", m_plugin);
         break;
     }
@@ -97,12 +97,12 @@ void Output::setSdmlStream(const std::string& location)
     m_format = Output::SDML;
 }
 
-void Output::setNetStream(const std::string& plugin,
+void Output::setEovStream(const std::string& plugin,
                           const std::string& location)
 {
     AssertI(not plugin.empty());
 
-    m_format = Output::NET;
+    m_format = Output::EOV;
     m_location = (location.empty()) ? "localhost:8000" : location;
     m_plugin.assign(plugin);
 }
