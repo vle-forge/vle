@@ -1,1 +1,1 @@
-SUBDIRS = vle
+SUBDIRS = vle test

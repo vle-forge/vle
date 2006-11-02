@@ -291,8 +291,9 @@ AC_CONFIG_FILES([Makefile
 		 src/scripts/Makefile
 		 src/scripts/python/Makefile
 		 src/scripts/python/vlepython.pc
-		 src/apps/vle/Makefile
 		 src/apps/Makefile
+		 src/apps/vle/Makefile
+		 src/apps/test/Makefile
 		 ])
 
 AC_OUTPUT
