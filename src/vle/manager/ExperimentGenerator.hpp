@@ -31,8 +31,6 @@
 #include <vector>
 #include <list>
 
-
-
 namespace vle { namespace manager {
 
     /** 
@@ -41,70 +39,85 @@ namespace vle { namespace manager {
     class ExperimentGenerator
     {
     public:
-        /**
-         * Just get a constant reference to VPZ. Use get_instances_files() to
-         * generate all VPZ instance file.
-         *
-         */
-        ExperimentGenerator(const vpz::Vpz& file);
+      /**
+       * Just get a constant reference to VPZ. Use get_instances_files() to
+       * generate all VPZ instance file.
+       *
+       */
+      ExperimentGenerator(const vpz::Vpz& file);
 
-        /**
-         * @return the list of filename build after build_instances
-         * function.
-         */
-        const std::list < std::string >& get_instances_files() const
-        { return mFileList; }
+      virtual ~ExperimentGenerator() { }
+
+      /**
+       * @brief Build all instances
+       * function.
+       */
+      void build();
+
+      /**
+       * @return the list of filename build after build_instances
+       * function.
+       */
+      const std::list < std::string >& get_instances_files() const
+      { return mFileList; }
 
     private:
-        /** 
-         * @brief Build a list of replicas based on information of VPZ file.
-         */
-        void build_replicas_list();
+      /** 
+       * @brief Build a list of replicas based on information of VPZ file.
+       */
+      void build_replicas_list();
 
-        /** 
-         * @brief Build a list of conditions based on informtion of VPZ file.
-         */
-        void build_conditions_list();
+      /** 
+       * @brief Build a list of conditions based on information of VPZ file.
+       */
+      void build_conditions_list();
 
-        void build_combinations();
+      /** 
+       * @brief Build just one condition based on information of VPZ file.
+       */
+      virtual void build_combination(size_t& nb) = 0;
+      
+      void build_combinations();
 
-        void build_combinations_from_replicas(size_t cmbnumber);
+      void build_combinations_from_replicas(size_t cmbnumber);
 
-        void write_instance(size_t cmbnumber, size_t replnumber);
+      void write_instance(size_t cmbnumber, size_t replnumber);
 
-        /** 
-         * @brief Get the number of combination from vpz file.
-         * 
-         * @return A value greater than 0.
-         */
-        size_t get_combination_number() const;
+      /** 
+       * @brief Get the number of combination from vpz file.
+       * 
+       * @return A value greater than 0.
+       */
+      virtual size_t get_combination_number() const = 0;
 
-        /** 
-         * @brief Get the number of replicas from vpz file.
-         * 
-         * @return A value greater than 0.
-         */
-        size_t get_replicas_number() const;
+      /** 
+       * @brief Get the number of replicas from vpz file.
+       * 
+       * @return A value greater than 0.
+       */
+      size_t get_replicas_number() const;
 
-        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+      /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-        /** 
-         * @brief Define a condition used to generate combination list.
-         */
-        struct cond_t {
-            cond_t() : sz(0), pos(0) { }
+    protected:
 
-            size_t  sz;
-            size_t  pos;
-        };
+      /** 
+       * @brief Define a condition used to generate combination list.
+       */
+      struct cond_t {
+	cond_t() : sz(0), pos(0) { }
 
-        const vpz::Vpz&             mFile;
-        vpz::Vpz                    mTmpfile;
-        std::vector < guint32 >     mReplicasTab;
-        std::vector < cond_t >      mCondition;
-        std::list < std::string >   mFileList;
+	size_t  sz;
+	size_t  pos;
+      };
+
+      const vpz::Vpz&             mFile;
+      vpz::Vpz                    mTmpfile;
+      std::vector < guint32 >     mReplicasTab;
+      std::vector < cond_t >      mCondition;
+      std::list < std::string >   mFileList;
     };
 
-}} // namespace vle manager
+  }} // namespace vle manager
 
 #endif

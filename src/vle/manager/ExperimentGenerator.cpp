@@ -31,71 +31,58 @@
 
 namespace vle { namespace manager {
 
-ExperimentGenerator::ExperimentGenerator(const vpz::Vpz& file) :
-    mFile(file),
-    mTmpfile(file)
-{
-    build_replicas_list();
-    build_conditions_list();
-    build_combinations();
-}
+    ExperimentGenerator::ExperimentGenerator(const vpz::Vpz& file) :
+      mFile(file),
+      mTmpfile(file) {
+    }
 
-void ExperimentGenerator::build_replicas_list()
-{
-    mReplicasTab = mFile.project().experiment().replicas().getNewList();
-    std::cerr << "Replicas: " << mReplicasTab.size() << std::endl;
-}
+    void ExperimentGenerator::build() {
+      build_replicas_list();
+      build_conditions_list();
+      build_combinations();
+    }
 
-void ExperimentGenerator::build_conditions_list()
-{
-    std::cerr << "Combinations: " << get_combination_number() << std::endl;
-    const std::list < vpz::Condition >& conds = 
+    void ExperimentGenerator::build_replicas_list()
+    {
+      mReplicasTab = mFile.project().experiment().replicas().getNewList();
+      std::cerr << "Replicas: " << mReplicasTab.size() << std::endl;
+    }
+
+    void ExperimentGenerator::build_conditions_list()
+    {
+      std::cerr << "Combinations: " << get_combination_number() << std::endl;
+      const std::list < vpz::Condition >& conds = 
         mFile.project().experiment().conditions().conditions();
 
-    std::list < vpz::Condition >::const_iterator it = conds.begin();
-    while (it != conds.end()) {
+      std::list < vpz::Condition >::const_iterator it = conds.begin();
+      while (it != conds.end()) {
         mCondition.push_back(cond_t());
         mCondition[mCondition.size() - 1].sz = (*it).value().size();
         mCondition[mCondition.size() - 1].pos = 0;
         ++it;
+      }
     }
-}
 
-void ExperimentGenerator::build_combinations()
-{
-    size_t nb = 0;
-    size_t sz = mCondition.size() - 1;
+    void ExperimentGenerator::build_combinations()
+    {
+      size_t nb = 0;
  
-    do {
+      do {
         build_combinations_from_replicas(nb);
-        if (mCondition[sz].pos != mCondition[sz].sz - 1) {
-            mCondition[sz].pos++;
-        } else {
-            int i = sz;
-            while (i >= 0) {
-                if (mCondition[i].pos == mCondition[i].sz - 1) {
-                    mCondition[i].pos = 0;
-                    i--;
-                } else {
-                    mCondition[i].pos++;
-                    break;
-                }
-            }
-        }
-        nb++;
-    } while (nb < get_combination_number()); 
-}
+	build_combination(nb);
+      } while (nb < get_combination_number()); 
+    }
 
-void ExperimentGenerator::build_combinations_from_replicas(size_t cmbnumber)
-{
-    for (size_t irep = 0; irep < mReplicasTab.size(); ++irep) {
+    void ExperimentGenerator::build_combinations_from_replicas(size_t cmbnumber)
+    {
+      for (size_t irep = 0; irep < mReplicasTab.size(); ++irep) {
         mTmpfile.project().experiment().setSeed(mReplicasTab[irep]);
         
         std::list < vpz::Condition >& dest = 
-            mTmpfile.project().experiment().conditions().conditions();
+	  mTmpfile.project().experiment().conditions().conditions();
 
         const std::list < vpz::Condition >& orig =
-            mFile.project().experiment().conditions().conditions();
+	  mFile.project().experiment().conditions().conditions();
 
         std::list < vpz::Condition >::iterator itDest = dest.begin();
         std::list < vpz::Condition >::const_iterator itOrig = orig.begin();
@@ -107,46 +94,33 @@ void ExperimentGenerator::build_combinations_from_replicas(size_t cmbnumber)
                orig.size() % mCondition.size());
 
         for (size_t jcom = 0; jcom < mCondition.size(); ++jcom) {
-            (*itDest).clearValue();
-            (*itDest).addValue((*itOrig).nValue(mCondition[jcom].pos));
-            ++itDest;
-            ++itOrig;
+	  (*itDest).clearValue();
+	  (*itDest).addValue((*itOrig).nValue(mCondition[jcom].pos));
+	  ++itDest;
+	  ++itOrig;
         }
         write_instance(cmbnumber, irep);
+      }
+
     }
 
-}
+    void ExperimentGenerator::write_instance(size_t cmbnumber, size_t replnumber)
+    {
+      mTmpfile.project().experiment().
+	setName((boost::format("%1%-%2%-%3%\n") % mFile.project().experiment().
+		 name() % cmbnumber % replnumber).str());
 
-void ExperimentGenerator::write_instance(size_t cmbnumber, size_t replnumber)
-{
-    mTmpfile.project().experiment().setName(
-        (boost::format("%1%-%2%-%3%\n") % mFile.project().experiment().name() %
-                        cmbnumber % replnumber).str());
+      Glib::ustring filename(utils::write_to_temp("vleexp",
+						  mTmpfile.writeToString()));
 
-    Glib::ustring filename(utils::write_to_temp("vleexp",
-                mTmpfile.writeToString()));
+      std::cerr << "Writing file: " << filename << std::endl;
 
-    std::cerr << "Writing file: " << filename << std::endl;
-
-    mFileList.push_back(filename);
-}
-
-size_t ExperimentGenerator::get_replicas_number() const
-{
-    return mReplicasTab.size();
-}
-
-size_t ExperimentGenerator::get_combination_number() const
-{
-    size_t nb = 1;
-    const std::list < vpz::Condition >& cnds =
-        mFile.project().experiment().conditions().conditions();
-    for (std::list < vpz::Condition >::const_iterator it = cnds.begin();
-         it != cnds.end(); ++it) {
-        nb *= (*it).value().size();
+      mFileList.push_back(filename);
     }
 
-    return nb;
-}
+    size_t ExperimentGenerator::get_replicas_number() const
+    {
+      return mReplicasTab.size();
+    }
 
-}} // namespace vle manager
+  }} // namespace vle manager

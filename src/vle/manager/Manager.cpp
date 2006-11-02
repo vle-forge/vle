@@ -26,7 +26,7 @@
 #include <cerrno>
 #include <glibmm/spawn.h>
 #include <vle/manager/Manager.hpp>
-#include <vle/manager/ExperimentGenerator.hpp>
+#include <vle/manager/TotalExperimentGenerator.hpp>
 #include <vle/utils/XML.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Socket.hpp>
@@ -59,8 +59,11 @@ void Manager::run_all_in_localhost(const vpz::Vpz& vpz)
 {
     mFile = vpz;
 
-    ExperimentGenerator expgen(vpz);
-    std::list < std::string > lst = expgen.get_instances_files();
+    ExperimentGenerator* expgen=new TotalExperimentGenerator(vpz);
+
+    expgen->build();
+
+    std::list < std::string > lst = expgen->get_instances_files();
     std::list < std::string >::const_iterator it = lst.begin();
 
     while (lst.empty() == false) {
@@ -75,6 +78,7 @@ void Manager::run_all_in_localhost(const vpz::Vpz& vpz)
         std::cerr << "\n";
 	lst.pop_front();
     }
+    delete expgen;
 }
 
 void Manager::run_localhost(const std::string& filename)
@@ -123,9 +127,11 @@ void Manager::scheduller()
 
     const utils::Hosts::SetHosts hosts = mHost.hosts();
 
-    ExperimentGenerator expgen(mFile);
+    ExperimentGenerator* expgen = new TotalExperimentGenerator(mFile);
 
-    std::list < std::string > lst = expgen.get_instances_files();
+    expgen->build();
+
+    std::list < std::string > lst = expgen->get_instances_files();
     std::list < std::string >::const_iterator it = lst.begin();
 
     std::cerr << "hosts :" << hosts.size() <<" " << lst.size()
@@ -152,6 +158,7 @@ void Manager::scheduller()
             itclient = mClients.begin();
         }
     }
+    delete expgen;
     close_connection_with_simulators();
 }
 
