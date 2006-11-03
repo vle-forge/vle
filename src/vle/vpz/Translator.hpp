@@ -102,6 +102,18 @@ namespace vle { namespace vpz {
                                    const std::string& destinationModelName,
                                    const std::string& destinationPortName);
 
+	void addInputConnection(xmlpp::Element* node,
+				const std::string& originModelName,
+				const std::string& originPortName,
+				const std::string& destinationModelName,
+				const std::string& destinationPortName);
+	
+	void addOutputConnection(xmlpp::Element* node,
+				 const std::string& originModelName,
+				 const std::string& originPortName,
+				 const std::string& destinationModelName,
+				 const std::string& destinationPortName);
+
         void addPort(xmlpp::Element* node , const std::string& portName);
 
         xmlpp::Element* addInitPorts(xmlpp::Element* node);
@@ -162,6 +174,11 @@ namespace vle { namespace vpz {
                                  const std::string& modelName,
                                  const std::string& portName,
                                  long value);
+
+	void addStringCondition(xmlpp::Element* node,
+			     const std::string& modelName,
+			     const std::string& portName,
+			     const std::string& value);
 
         xmlpp::Element* addMeasures(xmlpp::Element* node);
 

@@ -115,6 +115,42 @@ void Translator::addInternalConnection(xmlpp::Element* node,
     destination->set_attribute("PORT", destinationPortName);
 }
 
+void Translator::addInputConnection(xmlpp::Element* node,
+				       const std::string& originModelName,
+				       const std::string& originPortName,
+				       const std::string& destinationModelName,
+				       const std::string& destinationPortName)
+{
+    xmlpp::Element * connection = node->add_child("CONNECTION");
+    connection->set_attribute("TYPE", "input");
+
+    xmlpp::Element * origin = connection->add_child("ORIGIN");
+    origin->set_attribute("MODEL", originModelName);
+    origin->set_attribute("PORT", originPortName);
+
+    xmlpp::Element * destination = connection->add_child("DESTINATION");
+    destination->set_attribute("MODEL", destinationModelName);
+    destination->set_attribute("PORT", destinationPortName);
+}
+
+void Translator::addOutputConnection(xmlpp::Element* node,
+				       const std::string& originModelName,
+				       const std::string& originPortName,
+				       const std::string& destinationModelName,
+				       const std::string& destinationPortName)
+{
+    xmlpp::Element * connection = node->add_child("CONNECTION");
+    connection->set_attribute("TYPE", "output");
+
+    xmlpp::Element * origin = connection->add_child("ORIGIN");
+    origin->set_attribute("MODEL", originModelName);
+    origin->set_attribute("PORT", originPortName);
+
+    xmlpp::Element * destination = connection->add_child("DESTINATION");
+    destination->set_attribute("MODEL", destinationModelName);
+    destination->set_attribute("PORT", destinationPortName);
+}
+
 void  Translator::addPort(xmlpp::Element* node , const std::string& portName)
 {
     xmlpp::Element* portNode = node->add_child("PORT");
@@ -278,6 +314,22 @@ void Translator::addIntegerCondition(xmlpp::Element* node,
 
     newnode2->set_attribute("VALUE", utils::to_string(value));
 }
+
+void Translator::addStringCondition(xmlpp::Element* node,
+				     const std::string& modelName,
+				     const std::string& portName,
+				     const std::string& value)
+{
+    xmlpp::Element* newnode = node->add_child("CONDITION");
+
+    newnode->set_attribute("MODEL_NAME",modelName);
+    newnode->set_attribute("PORT_NAME",portName);
+
+    xmlpp::Element* newnode2 = newnode->add_child("STRING");
+
+    newnode2->set_attribute("VALUE",value);
+}
+
 
 xmlpp::Element* Translator::addMeasures(xmlpp::Element* node)
 {
