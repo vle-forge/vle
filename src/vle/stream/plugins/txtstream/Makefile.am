@@ -1,6 +1,6 @@
 AM_CPPFLAGS = -I$(top_srcdir)/src @VLE_CFLAGS@ @XML_CFLAGS@
 
-stream_LTLIBRARIES = libtextstream.la
+vlestream_LTLIBRARIES = libtextstream.la
 libtextstream_la_LDFLAGS = @SHARED_LIBRARY_LDFLAGS@
 libtextstream_la_SOURCES = TextStream.cpp TextStream.hpp
 

@@ -126,25 +126,27 @@ bool Path::init_path()
 {
     mTab[0] = BINDIR;
     mTab[1] = build_user_path("bin");
-    mTab[2] = MODELDIR;
+    mTab[2] = VLEMODELDIR;
     mTab[3] = build_user_path("models");
-    mTab[4] = PLUGINDIR;
+    mTab[4] = GVLEPLUGINDIR;
     mTab[5] = build_user_path("plugins");
-    mTab[6] = OBSERVERPLUGINDIR;
+    mTab[6] = GVLEOBSERVERDIR;
     mTab[7] = build_user_path("observers");
     mTab[8] = IMGDIR;
     mTab[9] = build_user_path("img");
     mTab[10] = GLADEDIR;
     mTab[11] = build_user_path("glade");
     mTab[12] = build_user_path();
-    mTab[13] = STREAMDIR;
+    mTab[13] = VLESTREAMDIR;
     mTab[14] = build_user_path("stream");
     mTab[15] = PYTHONDIR;
     mTab[16] = build_user_path("python");
-    mTab[17] = TRANSLATORDIR;
+    mTab[17] = VLETRANSLATORDIR;
     mTab[18] = build_user_path("translator");
     mTab[19] = EOVPLUGINDIR;
     mTab[20] = build_user_path("eovplugin");
+    mTab[21] = AVLEPLUGINDIR;
+    mTab[22] = build_user_path("avleplugin");
     return true;
 }
 

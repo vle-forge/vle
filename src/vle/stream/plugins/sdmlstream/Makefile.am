@@ -1,6 +1,6 @@
 AM_CPPFLAGS = -I$(top_srcdir)/src @VLE_CFLAGS@ @XML_CFLAGS@
 
-stream_LTLIBRARIES = libsdmlstream.la
+vlestream_LTLIBRARIES = libsdmlstream.la
 libsdmlstream_la_LDFLAGS = @SHARED_LIBRARY_LDFLAGS@
 libsdmlstream_la_SOURCES = SDMLStream.cpp SDMLStream.hpp
 

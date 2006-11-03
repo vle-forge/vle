@@ -2,16 +2,18 @@ AM_CPPFLAGS = -I$(top_srcdir)/src @VLE_CFLAGS@ @XML_CFLAGS@
 
 AM_CXXFLAGS = \
 	-DBINDIR=\"$(bindir)\" \
-	-DIMGDIR=\"$(datadir)/pixmaps/vle\" \
-	-DGLADEDIR=\"$(datadir)/vle\" \
-	-DLIBDIR=\"$(libdir)/vle\" \
-	-DPLUGINDIR=\"$(libdir)/vle/plugins\" \
-	-DMODELDIR=\"$(libdir)/vle/models\" \
-	-DEOVPLUGINDIR=\"$(libdir)/vle/eovplugin\" \
-	-DOBSERVERPLUGINDIR=\"$(libdir)/vle/observers\" \
-	-DSTREAMDIR=\"$(libdir)/vle/stream\" \
-	-DPYTHONDIR=\"$(pythondir)\" \
-	-DTRANSLATORDIR=\"$(libdir)/vle/translator\"
+	-DIMGDIR=\"$(imgdir)\" \
+	-DGLADEDIR=\"$(gladedir)\" \
+	-DLIBVLEDIR=\"$(libvledir)\" \
+	-DVLEEXAMPLEDIR=\"$(vleexampledir)\" \
+	-DVLEMODELDIR=\"$(vlemodeldir)\" \
+	-DVLETRANSLATORDIR=\"$(vletranslatordir)\" \
+	-DVLESTREAMDIR=\"$(vlestreamdir)\" \
+	-DGVLEPLUGINDIR=\"$(gvleplugindir)\" \
+	-DGVLEOBSERVERDIR=\"$(gvleobserverdir)\" \
+	-DEOVPLUGINDIR=\"$(eovplugindir)\" \
+	-DAVLEPLUGINDIR=\"$(avleplugindir)\" \
+	-DPYTHONDIR=\"$(pythondir)\"
 
 libutils_coresources = Host.cpp Path.cpp Rand.cpp Tools.cpp Trace.cpp XML.cpp \
 		       Simpson.cpp Socket.cpp

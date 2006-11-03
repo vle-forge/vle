@@ -89,45 +89,44 @@ dnl ***************************************************************************
 dnl Build output path
 dnl ***************************************************************************
 
-vleincludedir="\$(includedir)/vle-0.4"
-AC_SUBST(vleincludedir)
-
-modeldir="\$(libdir)/vle/models"
-AC_SUBST(modeldir)
-
 imgdir="\$(datadir)/pixmaps/vle"
 AC_SUBST(imgdir)
-
-exampledir="\$(datadir)/vle/examples"
-AC_SUBST(exampledir)
-
 gladedir="\$(datadir)/vle"
 AC_SUBST(gladedir)
-
 libvledir="\$(libdir)/vle"
 AC_SUBST(libvledir)
 
-plugindir="\$(libdir)/vle/plugins"
-AC_SUBST(plugindir)
+vleincludedir="\$(includedir)/vle-0.4"
+AC_SUBST(vleincludedir)
+gvleincludedir="\$(includedir)/gvle-0.4"
+AC_SUBST(gvleincludedir)
+avleincludedir="\$(includedir)/avle-0.4"
+AC_SUBST(avleincludedir)
+eovincludedir="\$(includedir)/eov-0.4"
+AC_SUBST(eovincludedir)
 
-modeldir="\$(libdir)/vle/models"
-AC_SUBST(modeldir)
+vleexampledir="\$(datadir)/vle/examples"
+AC_SUBST(vleexampledir)
+vlemodeldir="\$(libdir)/vle/models"
+AC_SUBST(vlemodeldir)
+vletranslatordir="\$(libdir)/vle/translator"
+AC_SUBST(vletranslatordir)
+vlestreamdir="\$(libdir)/vle/stream"
+AC_SUBST(vlestreamdir)
 
-observerdir="\$(libdir)/vle/observers"
-AC_SUBST(observerdir)
+gvleplugindir="\$(libdir)/vle/plugins"
+AC_SUBST(gvleplugindir)
+gvleobserverdir="\$(libdir)/vle/observers"
+AC_SUBST(gvleobserverdir)
 
 eovplugindir="\$(libdir)/vle/eovplugin"
 AC_SUBST(eovplugindir)
 
-streamdir="\$(libdir)/vle/stream"
-AC_SUBST(streamdir)
+avleplugindir="\$(libdir)/vle/avleplugin"
+AC_SUBST(avleplugindir)
 
 pythondir="\$(libdir)/vle/python"
 AC_SUBST(pythondir)
-
-translatordir="\$(libdir)/vle/translator"
-AC_SUBST(translatordir)
-
 
 dnl ***************************************************************************
 dnl Checks for Win32 platform

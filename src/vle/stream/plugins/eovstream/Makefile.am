@@ -1,6 +1,6 @@
 AM_CPPFLAGS = -I$(top_srcdir)/src @VLE_CFLAGS@ @XML_CFLAGS@
 
-stream_LTLIBRARIES = libeovstream.la
+vlestream_LTLIBRARIES = libeovstream.la
 libeovstream_la_LDFLAGS = @SHARED_LIBRARY_LDFLAGS@
 libeovstream_la_SOURCES = NetStream.cpp NetStream.hpp
 

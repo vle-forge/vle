@@ -109,6 +109,12 @@ namespace vle { namespace utils {
         inline const std::string& getUserEOVPluginDir() const
         { return mTab[20]; }
 
+        inline const std::string& getDefaultAVLEPluginDir() const
+        { return mTab[21]; }
+
+        inline const std::string& getUserAVLEPluginDir() const
+        { return mTab[22]; }
+
         /** @return a Path object instantiate in singleton method. */
         inline static Path& path()
         { if (mPath == 0) mPath = new Path; return *mPath; }
@@ -159,7 +165,7 @@ namespace vle { namespace utils {
 
         bool init_path();
 
-        std::string  mTab[21];
+        std::string  mTab[23];
         static Path* mPath; /// The static Path for singleton design pattern.
     };
 
