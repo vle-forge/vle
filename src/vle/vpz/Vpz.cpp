@@ -141,4 +141,21 @@ bool Vpz::is_gzip_file(const std::string& filename)
     return sizeGzip < sizefile;
 }
 
+void Vpz::fixExtension(std::string& filename)
+{
+    const std::string::size_type dot = filename.find_last_of('.');
+    if (dot == std::string::npos) {
+	filename += ".vpz";
+    } else {
+        if (filename.size() >= 4) {
+            const std::string extension(filename, dot, 4);
+	    if (extension != ".vpz") {
+                filename += ".vpz";
+            }
+        } else {
+            filename += ".vpz";
+        }
+    }
+}
+
 }} // namespace vle vpz

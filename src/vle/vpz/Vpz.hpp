@@ -113,12 +113,19 @@ namespace vle { namespace vpz {
 
         static std::string gunzip_file(const std::string& filename);
 
+        /**
+         * Add the vpz extension to filename if does not exist, If correct
+         * filename is passed, no modification is apply.
+         * 
+         * @param filename string to change if no extension exist.
+         */
+        static void fixExtension(std::string& filename);
     private:
         std::string         m_filename;
         Project             m_project;
         bool                m_isGzip;
     };
-    
+
 }} // namespace vle vpz
 
 #endif
