@@ -89,6 +89,9 @@ namespace vle { namespace devs {
         inline void addInstantaneous(const InstantaneousEventList& evs)
         { _instev = evs; }
 
+        inline void addInstantaneous(InstantaneousEvent* evt)
+        { _instev.addEvent(evt); }
+
         inline InstantaneousEventList& instantaneous()
         { return _instev; }
 
@@ -158,6 +161,11 @@ namespace vle { namespace devs {
         inline void addInstantaneous(sAtomicModel* m,
                                      const InstantaneousEventList& lst)
         { getBag(m).addInstantaneous(lst); }
+        
+        inline void addInstantaneous(sAtomicModel* m,
+                                     InstantaneousEvent* evt)
+        { getBag(m).addInstantaneous(evt); }
+
 
         inline void addState(StateEvent* ev)
         { _states.push_back(ev); }
