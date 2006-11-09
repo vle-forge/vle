@@ -1,15 +1,16 @@
 AM_CPPFLAGS = -I$(top_srcdir)/src @VLE_CFLAGS@ @XML_CFLAGS@ @PYTHON_CPPFLAGS@
 
 if USE_PYTHON
-libpython_coresources = Pyutils.cpp 
-
-libpython_coreheaders = Pyutils.hpp
+python_coresources = Pyutils.cpp 
+python_coreheaders = Pyutils.hpp
 
 libvle_LTLIBRARIES = libpython.la
 libpython_la_LDFLAGS = @SHARED_LIBRARY_LDFLAGS@
-libpython_la_SOURCES = $(libpython_coresources) $(libpython_coreheaders)
-libpythonincludedir = $(vleincludedir)/vle/scripts/python
-libpythoninclude_HEADERS = $(libutils_coreheaders)
+libpython_la_SOURCES = $(python_coresources) $(python_coreheaders)
+
+pythonincludedir = $(vleincludedir)/vle/scripts/python
+pythoninclude_HEADERS = $(python_coreheaders)
+
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = vlepython.pc
 
