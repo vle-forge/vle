@@ -192,30 +192,13 @@ dnl ***************************************************************************
 dnl Python checking (from Inkscape program)
 dnl ***************************************************************************
 
-AC_MSG_CHECKING(for Python development environment)
-AC_ARG_WITH(python,
-		AS_HELP_STRING([--with-python],[use Python for embedded
-			scripting]), [enable_python=$withval],
-			[enable_python=yes])
-
-if test "x$enable_python" = "xyes"; then
-    checkPYTHON_CFLAGS=`python2.3 -c "import distutils.sysconfig ; print '-I%s' % distutils.sysconfig.get_config_var('INCLUDEPY')" 2>/dev/null`
-    if test "$?" -gt "0"; then
-        enable_python="no"
-    else
-        checkPYTHON_LIBS=`python2.3 -c "import distutils.sysconfig ; print '%s/%s %s' % (distutils.sysconfig.get_config_var('LIBPL'),distutils.sysconfig.get_config_var('LIBRARY'),distutils.sysconfig.get_config_var('LIBS'))" 2>/dev/null`
-        if test "$?" -gt "0"; then
-            enable_python="no"
-        else
-            enable_python="yes"
-	    PYTHON_CFLAGS="$checkPYTHON_CFLAGS"
-	    PYTHON_LIBS="$checkPYTHON_LIBS"
-	    AC_SUBST(PYTHON_CFLAGS)
-	    AC_SUBST(PYTHON_LIBS)
-        fi
-    fi
+AC_PYTHON_DEVEL([>= '2.3.0'])
+if test x"$PYTHON_LDFLAGS" = x || test x$"PYTHON_CPPFLAGS" = x
+then
+	enable_python="no"
+else
+	enable_python="yes"
 fi
-AC_MSG_RESULT([$enable_python])
 AM_CONDITIONAL(USE_PYTHON, test "x$enable_python" = "xyes")
 
 dnl ***************************************************************************

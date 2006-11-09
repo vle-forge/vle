@@ -5,7 +5,8 @@ includedir=@includedir@
 
 Name: vlepython
 Description: VLE multimodelling and Simulation tools, Python
-Requires: libxml++-2.6 glibmm-2.4
+Requires: vle
 Version: @VERSION@
-Libs:	-L${libdir}/vle -lpython
-Cflags: -I${includedir}/vle
+Libs:	-L${libdir}/vle @VLE_LIBS@ @XML_LIBS@ @PYTHON_LDFLAGS@ \
+	@PYTHON_EXTRA_LIBS@ @PYTHON_EXTRA_LDFLAGS@
+Cflags: -I${includedir}/vle-0.4 @PYTHON_CFLAGS@
