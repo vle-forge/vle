@@ -9,4 +9,4 @@ Requires: vle
 Version: @VERSION@
 Libs:	-L${libdir}/vle @VLE_LIBS@ @XML_LIBS@ @PYTHON_LDFLAGS@ \
 	@PYTHON_EXTRA_LIBS@ @PYTHON_EXTRA_LDFLAGS@
-Cflags: -I${includedir}/vle-0.4 @PYTHON_CFLAGS@
+Cflags: -I${includedir}/vle-0.4 @PYTHON_CPPFLAGS@
