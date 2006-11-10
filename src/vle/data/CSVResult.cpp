@@ -80,8 +80,10 @@ namespace vle { namespace data {
       std::vector < std::string > selectionList; //= split(list[1],',');
 
       boost::algorithm::split(list, request, boost::is_any_of("|")); 
-      boost::algorithm::split(conditionList, list[0], boost::is_any_of(",")); 
-      boost::algorithm::split(selectionList, list[1], boost::is_any_of(",")); 
+      if (not list[0].empty())
+      	boost::algorithm::split(conditionList, list[0], boost::is_any_of(",")); 
+      if (not list[1].empty())
+      	boost::algorithm::split(selectionList, list[1], boost::is_any_of(",")); 
 
       // Analyse des conditions
       std::vector < std::string >::iterator itc = conditionList.begin();
