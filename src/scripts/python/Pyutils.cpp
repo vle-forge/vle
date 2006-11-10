@@ -25,6 +25,7 @@
 #include <scripts/python/Pyutils.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Exception.hpp>
+#include <boost/format.hpp>
 #include <string>
 
 namespace vle { namespace scripts { namespace python {
@@ -53,8 +54,8 @@ void Pyutils::set_path()
     const std::string& vle_path = vle::utils::Path::path().getDefaultPythonDir();
     const std::string& local_path = vle::utils::Path::path().getUserPythonDir();
 
-    std::string total_path(
-        std::string(Py_GetPath()) + ':' + vle_path + ':' + local_path + ":.");
+    std::string total_path((boost::format(
+        "%1%:%2%:%3%:.") % Py_GetPath() % vle_path % local_path).str());
 
     PySys_SetPath((char *)total_path.c_str());
 }

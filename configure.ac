@@ -2,7 +2,7 @@ dnl ***************************************************************************
 dnl Process this file with autoconf to produce a configure script.
 dnl ***************************************************************************
 
-AC_PREREQ(2.60a)
+AC_PREREQ(2.59)
 AC_INIT([vle],[0.4.0],[quesnel@users.sourceforge.net])
 AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
@@ -69,7 +69,7 @@ dnl Library strict depends
 dnl ***************************************************************************
 
 AX_CXX_GCC_ABI_DEMANGLE
-AX_BOOST_BASE([1.33.1])
+AX_BOOST_BASE([1.32.0])
 AX_BOOST_UNIT_TEST_FRAMEWORK
 AM_CONDITIONAL(USE_TEST, test ! x$BOOST_UNIT_TEST_FRAMEWORK_LIB = xyes)
 
