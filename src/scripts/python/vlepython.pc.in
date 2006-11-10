@@ -8,5 +8,5 @@ Description: VLE multimodelling and Simulation tools, Python
 Requires: vle
 Version: @VERSION@
 Libs:	-L${libdir}/vle @VLE_LIBS@ @XML_LIBS@ @PYTHON_LDFLAGS@ \
-	@PYTHON_EXTRA_LIBS@ @PYTHON_EXTRA_LDFLAGS@
+	@PYTHON_EXTRA_LIBS@ @PYTHON_EXTRA_LDFLAGS@ -lpython
 Cflags: -I${includedir}/vle-0.4 @PYTHON_CPPFLAGS@
