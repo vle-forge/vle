@@ -27,6 +27,7 @@
 #include <vle/vpz/Vpz.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Path.hpp>
+#include <vle/utils/Trace.hpp>
 #include <glibmm/fileutils.h>
 #include <glibmm/spawn.h>
 #include <iostream>
@@ -43,7 +44,6 @@ void translate(const char* filename)
             file->expandTranslator();
         }
 
-        
         std::string newfile(filename);
         newfile += "-tr";
         std::cerr << "\nWrite under: " << newfile;
@@ -51,14 +51,16 @@ void translate(const char* filename)
 
         delete file;
     } catch(const std::exception& e) {
-        std::cerr << "\n/!\\ Error reported: " << typeid(e).name() << "\n"
-            << e.what();
+        std::cerr << "\n/!\\ Error reported: " << utils::demangle(typeid(e)) <<
+            "\n" << e.what();
     }
     std::cerr << std::endl;
 }
 
 int main(int argc, char* argv[])
 {
+    vle::utils::Trace::trace().set_level(3);
+
     for (int i = 1; i < argc; ++i) {
         translate(argv[i]);
     }
