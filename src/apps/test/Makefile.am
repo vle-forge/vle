@@ -27,3 +27,5 @@ vletranslatortest_LDADD = @VLE_LIBS@ @XML_LIBS@ @THREAD_LIBS@ @SQL_LIBS@ \
 	    $(top_srcdir)/src/vle/devs/libdevs.la \
 	    $(top_srcdir)/src/vle/extension/libextension.la \
 	    $(top_srcdir)/src/vle/manager/libmanager.la
+
+man_MANS = vlemodeltest.1 vletranslatortest.1
