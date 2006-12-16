@@ -5,13 +5,14 @@ libvpz_coreheaders = Base.hpp Classes.hpp Class.hpp Condition.hpp \
 		     Experiment.hpp Graphic.hpp Graphics.hpp Measure.hpp \
 		     Measures.hpp Model.hpp NoVLE.hpp NoVLEs.hpp \
 		     Observable.hpp Output.hpp Outputs.hpp Project.hpp \
-		     Replicas.hpp Translator.hpp Vpz.hpp
+		     SaxVPZ.hpp Replicas.hpp Translator.hpp Vpz.hpp
 
 libvpz_coresources = Class.cpp Classes.cpp Condition.cpp Conditions.cpp \
 		     Dynamic.cpp Dynamics.cpp EOV.cpp Experiment.cpp \
 		     Graphic.cpp Graphics.cpp Measure.cpp Measures.cpp \
 		     Model.cpp NoVLE.cpp NoVLEs.cpp Observable.cpp Output.cpp \
-		     Outputs.cpp Project.cpp Translator.cpp Replicas.cpp Vpz.cpp
+		     Outputs.cpp Project.cpp SaxVPZ.cpp Translator.cpp \
+		     Replicas.cpp Vpz.cpp
 
 libvle_LTLIBRARIES = libvpz.la
 libvpz_la_LDFLAGS = @SHARED_LIBRARY_LDFLAGS@

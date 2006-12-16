@@ -27,12 +27,6 @@
 
 #include <string>
 
-namespace vle { namespace value {
-
-    class Value;
-
-}} // namespace vle value
-
 namespace vle { namespace graph {
 
     class Model;
@@ -88,7 +82,7 @@ namespace vle { namespace graph {
          * 
          * @return the structure affected, can be null.
          */
-        const vle::value::Value* getStructure() const
+        const vle::value::Value getStructure() const
         { return m_structure; }
 
         /** 
@@ -110,7 +104,7 @@ namespace vle { namespace graph {
     private:
         vle::graph::Model*      m_model;
         std::string             m_name;
-        vle::value::Value*      m_structure;
+        vle::value::Value      m_structure;
     };
 
 }} // namespace vle graph

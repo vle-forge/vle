@@ -39,12 +39,9 @@ Condition::Condition() :
 Condition::Condition(const Condition& cond) :
     Base(cond),
     m_modelname(cond.modelname()),
-    m_portname(cond.portname())
+    m_portname(cond.portname()),
+    m_value(cond.value())
 {
-    std::vector < value::Value* >::const_iterator it;
-    for (it = cond.value().begin(); it != cond.value().end(); ++it) {
-        m_value.push_back((*it)->clone());
-    }
 }
 
 Condition& Condition::operator=(const Condition& cond)
@@ -54,7 +51,7 @@ Condition& Condition::operator=(const Condition& cond)
         m_modelname.assign(cond.modelname());
         m_portname.assign(cond.portname());
 
-        std::vector < value::Value* >::const_iterator it;
+        std::vector < value::Value >::const_iterator it;
         for (it = cond.value().begin(); it != cond.value().end(); ++it) {
             m_value.push_back((*it)->clone());
         }
@@ -75,7 +72,8 @@ void Condition::init(xmlpp::Element* elt)
     clearValue();
     m_modelname.assign(xml::get_attribute(elt, "MODEL_NAME"));
     m_portname.assign(xml::get_attribute(elt, "PORT_NAME"));
-    m_value = value::Value::getValues(elt);
+    // FIXME, initialiser les values à partir d'XML.
+    // m_value = value::Value::getValues(elt);
 }
 
 void Condition::write(xmlpp::Element* elt) const
@@ -86,7 +84,7 @@ void Condition::write(xmlpp::Element* elt) const
     condition->set_attribute("MODEL_NAME", m_modelname);
     condition->set_attribute("PORT_NAME", m_portname);
 
-    std::vector < value::Value* >::const_iterator it = m_value.begin();
+    std::vector < value::Value >::const_iterator it = m_value.begin();
     while (it != m_value.end()) {
         std::string xml((*it)->toXML());
         xml::import_children_nodes(condition, xml);
@@ -104,37 +102,36 @@ void Condition::setCondition(const std::string& modelname,
     m_portname.assign(portname);
 }
 
-void Condition::addValue(value::Value* val)
+void Condition::addValue(value::Value val)
 {
     m_value.push_back(val);
 }
 
 void Condition::clearValue()
 {
-    for (std::vector < value::Value* >::iterator it = m_value.begin();
-         it != m_value.end(); ++it) {
-        delete (*it);
-        (*it) = 0;
-    }
     m_value.clear();
 }
 
-value::Value* Condition::firstValue() const
+value::Value Condition::firstValue() const
 {
     Assert(utils::InternalError, not m_value.empty(),
            boost::format("Condition %1% %2% have no firstValue.\n") %
            m_modelname % m_portname);
 
-    return m_value[0]->clone();
+    //FIXME
+    //return m_value[0]->clone();
+    return m_value[0];
 }
 
-value::Value* Condition::nValue(size_t i) const
+value::Value Condition::nValue(size_t i) const
 {
     Assert(utils::InternalError, i < m_value.size(),
            boost::format("Condition %1% %2% have only %3% and no %4% Value\n") %
            m_modelname % m_portname % m_value.size() % i);
 
-    return m_value[i]->clone();
+    //FIXME
+    //return m_value[i]->clone();
+    return m_value[i];
 }
 
 }} // namespace vle vpz

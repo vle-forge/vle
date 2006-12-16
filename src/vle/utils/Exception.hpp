@@ -105,6 +105,17 @@ namespace vle { namespace utils {
         { }
     };
 
+    /** 
+     * @brief Throw to report an error in SaxParser.
+     */
+    class SaxParserError : public BaseError
+    {
+    public:
+        explicit SaxParserError(const std::string& argv) :
+            BaseError(argv)
+        { }
+    };
+
 }} // namespace vle utils
 
 #endif

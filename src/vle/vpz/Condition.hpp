@@ -28,12 +28,7 @@
 #include <vector>
 #include <string>
 #include <vle/vpz/Base.hpp>
-
-namespace vle { namespace value {
-
-    class Value;
-
-}} // namespace vle value
+#include <vle/value/Value.hpp>
 
 namespace vle { namespace vpz {
 
@@ -71,7 +66,7 @@ namespace vle { namespace vpz {
         const std::string& portname() const
         { return m_portname; }
 
-        const std::vector < vle::value::Value* >& value() const
+        const std::vector < vle::value::Value >& value() const
         { return m_value; }
 
         /** 
@@ -81,7 +76,7 @@ namespace vle { namespace vpz {
          *
          * @throw Exception::Internal if value list is empty.
          */
-        vle::value::Value* firstValue() const;
+        vle::value::Value firstValue() const;
 
         /** 
          * @brief Build a clone of the nth condition from value list.
@@ -92,7 +87,7 @@ namespace vle { namespace vpz {
          *
          * @throw Exception::Internal if value list have no nth value.
          */
-        vle::value::Value* nValue(size_t i) const;
+        vle::value::Value nValue(size_t i) const;
         
         /** 
          * @brief Add the value into the vector. Be carrefull, the value is not
@@ -100,7 +95,7 @@ namespace vle { namespace vpz {
          * 
          * @param val the value to add.
          */
-        void addValue(vle::value::Value* val);
+        void addValue(vle::value::Value val);
 
         /** 
          * @brief Delete all value from condition.
@@ -111,7 +106,7 @@ namespace vle { namespace vpz {
     private:
         std::string                         m_modelname;
         std::string                         m_portname;
-        std::vector < vle::value::Value* >  m_value;
+        std::vector < vle::value::Value >   m_value;
     };
 
 }} // namespace vle vpz

@@ -201,11 +201,12 @@ ExternalEventList* sAtomicModel::processInstantaneousEvent(
 
 StateEvent* sAtomicModel::processStateEvent(StateEvent* event) const
 {
-    value::Value* v_value = m_dynamics->processStateEvent(event);
+    value::Value val = m_dynamics->processStateEvent(event);
     StateEvent* v_event = new StateEvent(*event);
 
-    if (v_value)
-	v_event->putAttribute(event->getPortName(),v_value);
+    if (val) {
+        v_event->putAttribute(event->getPortName(), val);
+    }
     return v_event;
 }
 

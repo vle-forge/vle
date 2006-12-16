@@ -30,12 +30,7 @@
 #include <vector>
 #include <map>
 #include <string>
-
-namespace vle { namespace value {
-
-    class Value;
-
-}} // namespace vle value
+#include <vle/value/Value.hpp>
 
 namespace vle { namespace devs {
 
@@ -49,7 +44,7 @@ namespace vle { namespace devs {
     typedef std::deque < StateEvent* >    StateEventList;
     typedef std::vector < InternalEvent* > InternalEventList;
     typedef std::pair < sAtomicModel*, std::string > StreamModelPort;
-    typedef std::map < StreamModelPort, vle::value::Value* > StreamModelPortValue;
+    typedef std::map < StreamModelPort, vle::value::Value > StreamModelPortValue;
 
 }} // namespace vle devs
 

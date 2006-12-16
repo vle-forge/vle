@@ -399,99 +399,101 @@ void Simulator::applyDynamics(SAtomicModelList& lst,
     }
 }
 
-void Simulator::applyInits(SAtomicModelList& lst,
-                           const std::string& xmlInits)
+void Simulator::applyInits(SAtomicModelList& /* lst */,
+                           const std::string& /* xmlInits */)
 {
-    xmlpp::DomParser dom;
-    dom.parse_memory(xmlInits);
-    xmlpp::Element* root =
-        utils::xml::get_root_node(dom, "EXPERIMENTAL_CONDITIONS");
-    xmlpp::Node::NodeList lt = root->get_children("CONDITION");
-    for (xmlpp::Node::NodeList::iterator it = lt.begin(); it != lt.end();
-         ++it) {
-        xmlpp::Element* cdt = (xmlpp::Element*)(*it);
-        Glib::ustring name = utils::xml::get_attribute(cdt, "MODEL_NAME");
-        Glib::ustring port = utils::xml::get_attribute(cdt, "PORT_NAME");
+    //xmlpp::DomParser dom;
+    //dom.parse_memory(xmlInits);
+    //xmlpp::Element* root =
+    //utils::xml::get_root_node(dom, "EXPERIMENTAL_CONDITIONS");
+    //xmlpp::Node::NodeList lt = root->get_children("CONDITION");
+    //for (xmlpp::Node::NodeList::iterator it = lt.begin(); it != lt.end();
+    //++it) {
+    //xmlpp::Element* cdt = (xmlpp::Element*)(*it);
+    //Glib::ustring name = utils::xml::get_attribute(cdt, "MODEL_NAME");
+    //Glib::ustring port = utils::xml::get_attribute(cdt, "PORT_NAME");
 
-        std::vector < value::Value* > result = value::Value::getValues(cdt);
-        vle::value::Value* init = 0;
-        if (not result.empty()) {
-            init = result.front();
-            std::vector < value::Value* >::iterator jt = result.begin();
-            ++jt;
-            for (;jt != result.end(); ++jt)
-                delete (*jt);
-        }
-
-        if (init) {
-            for (SAtomicModelList::iterator jt = lst.begin(); jt != lst.end();
-                 ++jt) {
-                if ((*jt)->getName() == name) {
-                    InitEvent* evt = new InitEvent(m_currentTime, (*jt), port);
-                    evt->putAttribute(port, init);
-                    (*jt)->processInitEvent(evt);
-                    delete evt;
-                    break;
-                }
-            }
-        }
-    }
+        //FIXME
+        //std::vector < value::Value > result = value::Value::getValues(cdt);
+        //vle::value::Value init;
+        //if (not result.empty()) {
+        //init = result.front();
+        //std::vector < value::Value* >::iterator jt = result.begin();
+        //++jt;
+        //for (;jt != result.end(); ++jt)
+        //delete (*jt);
+        //}
+        //
+        //if (init) {
+        //for (SAtomicModelList::iterator jt = lst.begin(); jt != lst.end();
+        //++jt) {
+        //if ((*jt)->getName() == name) {
+        //InitEvent* evt = new InitEvent(m_currentTime, (*jt), port);
+        //evt->putAttribute(port, init);
+        //(*jt)->processInitEvent(evt);
+        //delete evt;
+        //break;
+        //}
+        //}
+        //}
+        //}
 }
 
 void Simulator::startEOVStream()
 {
-    const vpz::EOVs eovs = m_experiment.measures().eovs();
-    std::map < std::string, vpz::EOV >::const_iterator it;
-    for (it = eovs.eovs().begin(); it != eovs.eovs().end(); ++it) {
-        std::string host;
-        int port;
+    //const vpz::EOVs eovs = m_experiment.measures().eovs();
+    //std::map < std::string, vpz::EOV >::const_iterator it;
+    //for (it = eovs.eovs().begin(); it != eovs.eovs().end(); ++it) {
+    //std::string host;
+    //int port;
+    //
+    //utils::net::explodeStringNet((*it).second.host(), host, port);
+    //DTRACE1(boost::format("startEOVStream '%1%' '%2%'.\n") % host % port);
+    // 
+    //if (host == "localhost") {
+    //std::string cmd("eov -p ");
+    //cmd += utils::to_string(port);
+    //Glib::spawn_command_line_async(cmd);
+    //Glib::usleep(1000000); // FIXME pose obligatoire ?!?
+    //}
+    //
+    //utils::net::Client* clt = 0;
+    //try {
+    //clt = new utils::net::Client(host, port);
+    //DTRACE1(boost::format("sendEOV: %1%.\n") % (*it).second.xml());
+    //clt->send_buffer((*it).second.xml());
+    //Glib::ustring tr(clt->recv_string());
+    //clt->close();
+    //delete clt;
+    //
+    //DTRACE2(boost::format("recvEOV: %1%.\n") % tr);
+    //xmlpp::DomParser dom;
+    //dom.parse_memory(tr);
+            //FIXME
+            //value::Value v =
+            //value::Value::getValue(dom.get_document()->get_root_node());
 
-        utils::net::explodeStringNet((*it).second.host(), host, port);
-        DTRACE1(boost::format("startEOVStream '%1%' '%2%'.\n") % host % port);
-        
-        if (host == "localhost") {
-            std::string cmd("eov -p ");
-            cmd += utils::to_string(port);
-            Glib::spawn_command_line_async(cmd);
-            Glib::usleep(1000000); // FIXME pose obligatoire ?!?
-        }
-
-        utils::net::Client* clt = 0;
-        try {
-            clt = new utils::net::Client(host, port);
-            DTRACE1(boost::format("sendEOV: %1%.\n") % (*it).second.xml());
-            clt->send_buffer((*it).second.xml());
-            Glib::ustring tr(clt->recv_string());
-            clt->close();
-            delete clt;
-
-            DTRACE2(boost::format("recvEOV: %1%.\n") % tr);
-            xmlpp::DomParser dom;
-            dom.parse_memory(tr);
-            value::Value* v =
-                value::Value::getValue(dom.get_document()->get_root_node());
-
-            if (v->isMap()) {
-                const value::Map::MapValue& mp = ((value::Map*)v)->getValue();
-                for (value::Map::MapValue::const_iterator it = mp.begin();
-                     it != mp.end(); ++it) {
-                    if ((*it).second->isInteger()) {
-                        std::string output = (*it).first;
-                        int port = ((value::Integer*)(*it).second)->intValue();
-
-                        std::string outputhost = host + ":" + utils::to_string(port);
-                        startNetStream(output, outputhost);
-                    }
-                }
-            }
-        } catch(const std::exception& e) {
-            delete clt;
-            std::string err((boost::format(
-                    "Error connecting on eov '%1%' host '%2%' port '%3%': %4%\n") %
-                (*it).first % host % port % e.what()).str());
-            Throw(utils::InternalError, err);
-        }
-    }
+            //if (v->isMap()) {
+            //const value::Map::MapValue& mp = ((value::Map*)v)->getValue();
+            //for (value::Map::MapValue::const_iterator it = mp.begin();
+            //it != mp.end(); ++it) {
+            //if ((*it).second->isInteger()) {
+            //std::string output = (*it).first;
+            //int port = ((value::Integer*)(*it).second)->intValue();
+            //
+            //std::string outputhost = host + ":" + utils::to_string(port);
+            //startNetStream(output, outputhost);
+            //}
+            //}
+            //}
+            //} catch(const std::exception& e) {
+            //delete clt;
+            //std::string err((boost::format(
+            //"Error connecting on eov '%1%' host '%2%' port '%3%': %4%\n") %
+            //(*it).first % host % port % e.what()).str());
+            //Throw(utils::InternalError, err);
+            //}
+            //}
 //    Glib::usleep(1000000); // FIXME pose obligatoire ?!?
 }
 
