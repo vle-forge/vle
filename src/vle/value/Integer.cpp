@@ -28,26 +28,27 @@
 
 namespace vle { namespace value {
 
-Integer::Integer(xmlpp::Element* root) :
-    m_value(0)
+Integer IntegerFactory::create(long value)
 {
-    if (root->get_name() == "INTEGER") {
-        m_value = vle::utils::to_int(
-            vle::utils::xml::get_attribute(root, "VALUE"));
-    }
+    return Integer(new IntegerFactory(value));
 }
 
-std::string Integer::toFile() const
+Value IntegerFactory::clone() const
 {
-    return vle::utils::to_string(m_value);
+    return Value(new IntegerFactory(m_value));
 }
 
-std::string Integer::toString() const
+std::string IntegerFactory::toFile() const
 {
     return vle::utils::to_string(m_value);
 }
 
-std::string Integer::toXML() const
+std::string IntegerFactory::toString() const
+{
+    return vle::utils::to_string(m_value);
+}
+
+std::string IntegerFactory::toXML() const
 {
     std::string val("<INTEGER VALUE=\"");
     val += vle::utils::to_string(m_value);

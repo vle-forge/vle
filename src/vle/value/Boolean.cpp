@@ -29,22 +29,17 @@
 
 namespace vle { namespace value {
 
-Boolean::Boolean(xmlpp::Element* root)
+Boolean BooleanFactory::create(bool value)
 {
-    if (root->get_name() == "BOOLEAN") {
-        m_value = vle::utils::xml::get_attribute(root, "VALUE") == "true";
-    }
+    return Boolean(new BooleanFactory(value));
 }
 
-std::string Boolean::toFile() const
+Value BooleanFactory::clone() const
 {
-    if (m_value)
-        return "true";
-    else
-        return "false";
+    return Value(new BooleanFactory(m_value));
 }
 
-std::string Boolean::toString() const
+std::string BooleanFactory::toFile() const
 {
     if (m_value)
         return "true";
@@ -52,7 +47,15 @@ std::string Boolean::toString() const
         return "false";
 }
 
-std::string Boolean::toXML() const
+std::string BooleanFactory::toString() const
+{
+    if (m_value)
+        return "true";
+    else
+        return "false";
+}
+
+std::string BooleanFactory::toXML() const
 {
     if (m_value)
 	return "<BOOLEAN VALUE=\"true\" />";

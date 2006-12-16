@@ -54,8 +54,8 @@ namespace vle { namespace value {
         virtual Value* clone() const
         { return new ConstPointer(m_value); }
 
-        virtual Value::type getType() const
-        { return Value::POINTER; }
+        virtual ValueBase::type getType() const
+        { return ValueBase::POINTER; }
 
         virtual std::string toFile() const
         { return utils::to_string(m_value); }

@@ -30,24 +30,30 @@
 namespace vle { namespace value {
 
     template < class Class >
-        class Speed : public Value
+    class SpeedFactory : public ValueBase
     {
-    public:
-        Speed(Class x) :
+    private:
+        SpeedFactory(Class x) :
             m_value(x)
         { }
 
-        Speed(xmlpp::Element* root)
+    public:
+        virtual ~SpeedFactory()
         { }
 
-        virtual Value* clone() const
+        static Speed create(Class x)
         {
-            return new Speed(m_value);
+            return Speed(new SpeedFactory(x));
         }
 
-        virtual Value::type getType() const
+        virtual Value clone() const
         {
-            return Value::SPEED;
+            return Speed(new SpeedFactory(m_value));
+        }
+
+        virtual ValueBase::type getType() const
+        {
+            return ValueBase::SPEED;
         }
 
         inline Class speed() const

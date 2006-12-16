@@ -33,24 +33,30 @@
 namespace vle { namespace value {
 
     template < size_t n, class Class >
-        class Direction : public Value
+    class DirectionFactory : public ValueBase
     {
-    public:
-        Direction(Class x, Class y) :
+    private:
+        DirectionFactory(Class x, Class y) :
             m_value(x, y)
         { }
 
-        Direction(xmlpp::Element* root)
+    public:
+        virtual ~DirectionFactory()
         { }
 
-        virtual Value* clone() const
+        static Direction create(Class x, Class y)
         {
-            return new Direction(m_value);
+            return Direction(new DirectionFactory(x, y));
         }
 
-        virtual Value::type getType() const
+        virtual Value clone() const
         {
-            return Value::DIRECTION;
+            return Direction(new DirectionFactory(m_value));
+        }
+
+        virtual ValueBase::type getType() const
+        {
+            return ValueBase::DIRECTION;
         }
 
         inline utils::geometry::Point < n, Class >& direction()

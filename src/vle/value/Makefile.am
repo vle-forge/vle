@@ -1,8 +1,8 @@
 AM_CPPFLAGS = -I$(top_srcdir)/src @VLE_CFLAGS@ @XML_CFLAGS@
 
-libvalue_coreheaders = Boolean.hpp ConstPointer.hpp Coordinate.hpp \
-		       Direction.hpp Double.hpp Integer.hpp Map.hpp Set.hpp \
-		       SMAValue.hpp Speed.hpp String.hpp Value.hpp
+libvalue_coreheaders = Boolean.hpp Coordinate.hpp Direction.hpp Double.hpp \
+		       Integer.hpp Map.hpp Set.hpp Speed.hpp String.hpp \
+		       Value.hpp
 
 libvalue_coresources = Boolean.cpp Double.cpp Integer.cpp Map.cpp Set.cpp \
 		       String.cpp Value.cpp

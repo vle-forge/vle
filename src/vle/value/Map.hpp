@@ -31,22 +31,39 @@
 
 namespace vle { namespace value {
 
-    class String;
-    class Set;
-
     /**
      * @brief Map Value a container to a pair of (std::string,  Value class).
      *
      */
-    class Map : public Value
+    class MapFactory : public ValueBase
     {
+    private:
+
+        MapFactory()
+        { }
+
+        MapFactory(const MapFactory& mapfactory);
+
     public:
-        typedef std::map < std::string, Value* > MapValue;
+        typedef std::map < std::string, Value > MapValue;
+        typedef std::map < std::string, Value >::iterator MapValueIt;
+        typedef std::map < std::string, Value >::const_iterator MapValueConstIt;
 
-        Map() { }
+        virtual ~MapFactory()
+        { }
 
-        /** 
-         * @brief Parse a xmlpp::Element to build a new Map.
+        static Map create();
+
+        virtual Value clone() const;
+
+        virtual ValueBase::type getType() const
+        { return ValueBase::MAP; }
+
+        virtual std::string toFile() const;
+
+        virtual std::string toString() const;
+
+        /**
          * @code
          * <MAP>
          *  <VALUE NAME="x">
@@ -57,37 +74,22 @@ namespace vle { namespace value {
          *  </VALUE>
          * </MAP>
          * @endcode
-         * 
-         * @param root a reference to the tag MAP.
          */
-        Map(xmlpp::Element* root);
-
-        virtual ~Map();
-
-        virtual Value::type getType() const
-        { return Value::MAP; }
-
-        virtual Value* clone() const;
-
-        virtual std::string toFile() const;
-
-        virtual std::string toString() const;
-
         virtual std::string toXML() const;
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
         /**
-         * Add a value into the map. Be carrefull, the data are not clone, the use
-         * the pointer. Don't delete buffer. If a value already exist, it will be
-         * deleted.
+         * Add a value into the map. Be carrefull, the data are not clone, the
+         * use the pointer. Don't delete buffer. If a value already exist with
+         * the same name it will be replace.
          *
          * @param name the name of Value to add.
          * @param value the Value to add.
          *
          * @throw Exception::Internal if value is null.
          */
-        void addValue(const std::string& name, Value* value);
+        void addValue(const std::string& name, Value value);
 
         /** 
          * @brief Test if the map have a Value with specified name.
@@ -124,7 +126,7 @@ namespace vle { namespace value {
          *
          * @throw Exception::Internal if value don't exist.
          */
-        Value* getValue(const std::string& name) const;
+        Value getValue(const std::string& name) const;
 
         /** 
          * @brief Get the String value objet from specified name.
@@ -163,6 +165,18 @@ namespace vle { namespace value {
         long getLongValue(const std::string& name) const;
 
         /** 
+         * @brief Get the integer value objet from specified name.
+         * 
+         * @param name The name of the Value in the map.
+         * 
+         * @return a reference to the Value.
+         *
+         * @throw Exception::Internal if type is not Value::INTEGER or value do not
+         * exist.
+         */
+        int getIntValue(const std::string& name) const;
+
+        /** 
          * @brief Get the Double value objet from specified name.
          * 
          * @param name The name of the Value in the map.
@@ -184,7 +198,7 @@ namespace vle { namespace value {
          * @throw Exception::Internal if type is not Value::Map or value do not
          * exist.
          */
-        Map* getMapValue(const std::string& name) const;
+        Map getMapValue(const std::string& name) const;
 
         /** 
          * @brief Get the Set value objet from specified name.
@@ -196,7 +210,7 @@ namespace vle { namespace value {
          * @throw Exception::Internal if type is not Value::SET or value do not
          * exist.
          */
-        Set* getSetValue(const std::string& name) const;
+        Set getSetValue(const std::string& name) const;
 
         /** 
          * @brief Delete all value from map.
@@ -208,7 +222,7 @@ namespace vle { namespace value {
          * 
          * @return the first iterator.
          */
-        inline Map::MapValue::const_iterator begin() const
+        inline MapValueConstIt begin() const
         { return m_value.begin(); }
 
         /** 
@@ -216,7 +230,7 @@ namespace vle { namespace value {
          * 
          * @return the last iterator.
          */
-        inline Map::MapValue::const_iterator end() const
+        inline MapValueConstIt end() const
         { return m_value.end(); }
 
     private:

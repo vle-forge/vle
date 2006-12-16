@@ -28,14 +28,17 @@
 
 namespace vle { namespace value {
 
-String::String(xmlpp::Element* root)
+String StringFactory::create(const std::string& value)
 {
-    if (root->get_name() == "STRING") {
-        m_value = vle::utils::xml::get_attribute(root, "VALUE");
-    }
+    return String(new StringFactory(value));
 }
 
-std::string String::toXML() const
+Value StringFactory::clone() const
+{
+    return Value(new StringFactory(m_value));
+}
+
+std::string StringFactory::toXML() const
 {
     std::string val("<STRING VALUE=\"");
     val += m_value;

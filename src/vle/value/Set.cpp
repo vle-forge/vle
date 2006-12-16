@@ -27,43 +27,34 @@
 
 namespace vle { namespace value {
 
-Set::Set(xmlpp::Element* root)
+SetFactory::SetFactory(const SetFactory& setfactory) :
+    ValueBase(setfactory)
 {
-    xmlpp::Node::NodeList lst = root->get_children();
-    for (xmlpp::Node::NodeList::iterator it = lst.begin();
-         it != lst.end(); ++it) {
-        if (vle::utils::xml::is_element(*it)) {
-            addValue(Value::getValue((xmlpp::Element*)*it));
-        }
+    const size_t sz = setfactory.m_value.size();
+    for (size_t i = 0; i < sz; ++i) {
+        addValue(setfactory.m_value[i]->clone());
     }
 }
 
-Set::~Set()
+Set SetFactory::create()
 {
-    for (std::vector < Value* >::iterator it = m_value.begin();
-	 it != m_value.end(); ++it)
-	delete *it;
+    return Set(new SetFactory());
 }
 
-void Set::addValue(Value* p_value)
+Value SetFactory::clone() const
 {
-    m_value.push_back(p_value);
+    return Value(new SetFactory(*this));
 }
 
-Value* Set::clone() const
+void SetFactory::addValue(Value value)
 {
-    Set* r = new Set();
-    for (std::vector<Value*>::const_iterator it = m_value.begin();
-	 it != m_value.end(); ++it)
-	r->addValue((*it)->clone());
-
-    return r;
+    m_value.push_back(value);
 }
 
-std::string Set::toFile() const
+std::string SetFactory::toFile() const
 {
     std::string s;
-    std::vector < Value* >::const_iterator it = m_value.begin();
+    VectorValueConstIt it = m_value.begin();
 
     while (it != m_value.end()) {
 	s += (*it)->toFile();
@@ -74,10 +65,10 @@ std::string Set::toFile() const
     return s;
 }
 
-std::string Set::toString() const
+std::string SetFactory::toString() const
 {
     std::string s = "(";
-    std::vector < Value* >::const_iterator it = m_value.begin();
+    VectorValueConstIt it = m_value.begin();
 
     while (it != m_value.end()) {
 	s += (*it)->toString();
@@ -89,10 +80,10 @@ std::string Set::toString() const
     return s;
 }
 
-std::string Set::toXML() const
+std::string SetFactory::toXML() const
 {
     std::string s="<SET>";
-    std::vector < Value* >::const_iterator it = m_value.begin();
+    VectorValueConstIt it = m_value.begin();
 
     while (it != m_value.end()) {
 	s += (*it)->toXML();

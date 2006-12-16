@@ -29,25 +29,27 @@
 
 namespace vle { namespace value {
 
-Double::Double(xmlpp::Element* root)
+Double DoubleFactory::create(double value)
 {
-    if (root->get_name() == "DOUBLE") {
-        m_value = vle::utils::to_double(
-            vle::utils::xml::get_attribute(root, "VALUE"));
-    }
+    return Double(new DoubleFactory(value));
 }
 
-std::string Double::toFile() const
+Value DoubleFactory::clone() const
 {
-    return vle::utils::to_string(m_value);
+    return Value(new DoubleFactory(m_value));
 }
 
-std::string Double::toString() const
+std::string DoubleFactory::toFile() const
 {
     return vle::utils::to_string(m_value);
 }
 
-std::string Double::toXML() const
+std::string DoubleFactory::toString() const
+{
+    return vle::utils::to_string(m_value);
+}
+
+std::string DoubleFactory::toXML() const
 {
     std::string val("<DOUBLE VALUE=\"");
     val += vle::utils::to_string(m_value);

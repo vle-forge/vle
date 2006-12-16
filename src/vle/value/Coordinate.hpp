@@ -33,24 +33,30 @@
 namespace vle { namespace value {
 
     template < size_t n, class Class >
-        class Coordinate : public Value
+    class CoordinateFactory : public ValueBase
     {
-    public:
-        Coordinate(Class x, Class y) :
+    private:
+        CoordinateFactory(Class x, Class y) :
             m_value(x, y)
         { }
 
-        Coordinate(xmlpp::Element* root)
+    public:
+        virtual ~CoordinateFactory()
         { }
 
-        virtual Value* clone() const
+        static Coordinate create(Class x, Class y)
         {
-            return new Coordinate(m_value);
+            return Coordinate(new CoordinateFactory(x, y));
         }
 
-        virtual Value::type getType() const
+        virtual Value clone() const
         {
-            return Value::COORDINATE;
+            return Coordinate(new CoordinateFactory(m_value);
+        }
+
+        virtual ValueBase::type getType() const
+        {
+            return ValueBase::COORDINATE;
         }
 
         inline utils::geometry::Point < n, Class >& coordinate()
@@ -111,4 +117,5 @@ namespace vle { namespace value {
     };
 
 }} // namespace vle value
+
 #endif

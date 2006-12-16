@@ -33,20 +33,27 @@ namespace vle { namespace value {
     /**
      * @brief Double Value.
      */
-    class Double : public Value
+    class DoubleFactory : public ValueBase
     {
-    public:
-        Double(double value = 0.0) :
+    private:
+        DoubleFactory() :
+            m_value(0.0)
+        { }
+
+        DoubleFactory(double value = 0.0) :
             m_value(value)
         { }
 
-        Double(xmlpp::Element* root);
+    public:
+        virtual ~DoubleFactory()
+        { }
 
-        virtual Value* clone() const
-        { return new Double(m_value); }
+        static Double create(double value = 0.0);
 
-        virtual Value::type getType() const
-        { return Value::DOUBLE; }
+        virtual Value clone() const;
+
+        inline virtual ValueBase::type getType() const
+        { return ValueBase::DOUBLE; }
 
         inline double doubleValue() const
         { return m_value; }
