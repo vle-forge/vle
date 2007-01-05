@@ -7,17 +7,13 @@ python_coreheaders = Pyutils.hpp
 libvle_LTLIBRARIES = libpython.la
 libpython_la_LDFLAGS = @SHARED_LIBRARY_LDFLAGS@
 libpython_la_SOURCES = $(python_coresources) $(python_coreheaders)
-
-pythonincludedir = $(vleincludedir)/vle/scripts/python
-pythoninclude_HEADERS = $(python_coreheaders)
-
-pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = vlepython.pc
-
-if PLATFORM_WIN32
 libpython_la_LIBADD = @VLE_LIBS@ @XML_LIBS@ @PYTHON_LDFLAGS@ \
 		      @PYTHON_EXTRA_LIBS@ @PYTHON_EXTRA_LDFLAGS@ \
 		      $(top_srcdir)/src/vle/utils/libutils.la \
 		      $(top_srcdir)/src/vle/graph/libgraph.la
-endif
+
+pythonincludedir = $(vleincludedir)/vle/scripts/python
+pythoninclude_HEADERS = $(python_coreheaders)
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = vlepython.pc
 endif

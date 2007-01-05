@@ -11,11 +11,7 @@ libmanager_la_LDFLAGS = @SHARED_LIBRARY_LDFLAGS@
 libmanager_la_SOURCES = $(libvle_coresources) $(libvle_coreheaders)
 vlemanagerincludedir = $(vleincludedir)/vle/manager
 vlemanagerinclude_HEADERS = $(libvle_coreheaders)
-
-
-
-if PLATFORM_WIN32
-libmanager_la_LIBADD = @VLE_vle@ @XML_vle@ @THREAD_vle@ \
+libmanager_la_LIBADD = @VLE_LIBS@ @XML_LIBS@ @THREAD_LIBS@ \
 		       $(top_srcdir)/src/vle/devs/libdevs.la \
 		       $(top_srcdir)/src/vle/utils/libutils.la \
 		       $(top_srcdir)/src/vle/value/libvalue.la \
@@ -24,5 +20,3 @@ libmanager_la_LIBADD = @VLE_vle@ @XML_vle@ @THREAD_vle@ \
 		       $(top_srcdir)/src/vle/value/libvalue.la \
 		       $(top_srcdir)/src/vle/geometry/libgeometry.la \
 		       $(top_srcdir)/src/vle/extension/libextension.la
-endif
-

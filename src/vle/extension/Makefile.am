@@ -12,12 +12,8 @@ libextension_la_SOURCES = $(libextension_coresources) \
 			  $(libextension_coreheaders) 
 libextensionincludedir = $(vleincludedir)/vle/extension
 libextensioninclude_HEADERS = $(libextension_coreheaders)
-
-
-
-if PLATFORM_WIN32
 libextension_la_LIBADD = @VLE_LIBS@ @XML_LIBS@ \
 			 $(top_srcdir)/src/vle/devs/libdevs.la \
+			 $(top_srcdir)/src/vle/graph/libgraph.la \
+			 $(top_srcdir)/src/vle/value/libvalue.la \
 			 $(top_srcdir)/src/vle/utils/libutils.la
-endif
-

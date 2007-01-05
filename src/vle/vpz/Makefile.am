@@ -18,12 +18,7 @@ libvpz_la_LDFLAGS = @SHARED_LIBRARY_LDFLAGS@
 libvpz_la_SOURCES = $(libvpz_coreheaders) $(libvpz_coresources)
 libvpzincludedir = $(vleincludedir)/vle/vpz
 libvpzinclude_HEADERS = $(libvpz_coreheaders)
-
-
-
-if PLATFORM_WIN32
 libvpz_la_LIBADD = @VLE_LIBS@ @XML_LIBS@ \
+		   $(top_srcdir)/src/vle/value/libvalue.la \
 		   $(top_srcdir)/src/vle/utils/libutils.la \
 		   $(top_srcdir)/src/vle/graph/libgraph.la
-endif
-

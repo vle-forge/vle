@@ -21,12 +21,8 @@ libdevs_la_LDFLAGS = @SHARED_LIBRARY_LDFLAGS@
 libdevs_la_SOURCES = $(libdevs_coreheaders) $(libdevs_coresources)
 libdevsincludedir = $(vleincludedir)/vle/devs
 libdevsinclude_HEADERS = $(libdevs_coreheaders)
-
-
-
-if PLATFORM_WIN32
 libdevs_la_LIBADD = @VLE_LIBS@ @XML_LIBS@ \
+		    $(top_srcdir)/src/vle/value/libvalue.la \
 		    $(top_srcdir)/src/vle/utils/libutils.la \
-		    $(top_srcdir)/src/vle/graph/libgraph.la
-endif
-
+		    $(top_srcdir)/src/vle/graph/libgraph.la \
+		    $(top_srcdir)/src/vle/vpz/libvpz.la

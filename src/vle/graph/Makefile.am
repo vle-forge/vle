@@ -12,10 +12,5 @@ libgraph_la_LDFLAGS = @SHARED_LIBRARY_LDFLAGS@
 libgraph_la_SOURCES = $(libgraph_coreheaders) $(libgraph_coresources)
 libgraphincludedir = $(vleincludedir)/vle/graph
 libgraphinclude_HEADERS = $(libgraph_coreheaders)
-
-
-
-if PLATFORM_WIN32
 libgraph_la_LIBADD = @VLE_LIBS@ @XML_LIBS@ \
 		     $(top_srcdir)/src/vle/utils/libutils.la
-endif

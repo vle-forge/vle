@@ -27,10 +27,5 @@ libutils_la_LDFLAGS = @SHARED_LIBRARY_LDFLAGS@
 libutils_la_SOURCES = $(libutils_coresources) $(libutils_coreheaders)
 libutilsincludedir = $(vleincludedir)/vle/utils
 libutilsinclude_HEADERS = $(libutils_coreheaders)
-
-
-
-if PLATFORM_WIN32
 libutils_la_LIBADD = @VLE_LIBS@ @XML_LIBS@
-endif
 
