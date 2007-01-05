@@ -413,88 +413,87 @@ void Simulator::applyInits(SAtomicModelList& /* lst */,
     //Glib::ustring name = utils::xml::get_attribute(cdt, "MODEL_NAME");
     //Glib::ustring port = utils::xml::get_attribute(cdt, "PORT_NAME");
 
-        //FIXME
-        //std::vector < value::Value > result = value::Value::getValues(cdt);
-        //vle::value::Value init;
-        //if (not result.empty()) {
-        //init = result.front();
-        //std::vector < value::Value* >::iterator jt = result.begin();
-        //++jt;
-        //for (;jt != result.end(); ++jt)
-        //delete (*jt);
-        //}
-        //
-        //if (init) {
-        //for (SAtomicModelList::iterator jt = lst.begin(); jt != lst.end();
-        //++jt) {
-        //if ((*jt)->getName() == name) {
-        //InitEvent* evt = new InitEvent(m_currentTime, (*jt), port);
-        //evt->putAttribute(port, init);
-        //(*jt)->processInitEvent(evt);
-        //delete evt;
-        //break;
-        //}
-        //}
-        //}
-        //}
+    //FIXME
+    //std::vector < value::Value > result = value::Value::getValues(cdt);
+    //vle::value::Value init;
+    //if (not result.empty()) {
+    //init = result.front();
+    //std::vector < value::Value* >::iterator jt = result.begin();
+    //++jt;
+    //for (;jt != result.end(); ++jt)
+    //delete (*jt);
+    //}
+    //
+    //if (init) {
+    //for (SAtomicModelList::iterator jt = lst.begin(); jt != lst.end();
+    //++jt) {
+    //if ((*jt)->getName() == name) {
+    //InitEvent* evt = new InitEvent(m_currentTime, (*jt), port);
+    //evt->putAttribute(port, init);
+    //(*jt)->processInitEvent(evt);
+    //delete evt;
+    //break;
+    //}
+    //}
+    //}
+    //}
 }
 
 void Simulator::startEOVStream()
 {
-    //const vpz::EOVs eovs = m_experiment.measures().eovs();
-    //std::map < std::string, vpz::EOV >::const_iterator it;
-    //for (it = eovs.eovs().begin(); it != eovs.eovs().end(); ++it) {
-    //std::string host;
-    //int port;
-    //
-    //utils::net::explodeStringNet((*it).second.host(), host, port);
-    //DTRACE1(boost::format("startEOVStream '%1%' '%2%'.\n") % host % port);
-    // 
-    //if (host == "localhost") {
-    //std::string cmd("eov -p ");
-    //cmd += utils::to_string(port);
-    //Glib::spawn_command_line_async(cmd);
-    //Glib::usleep(1000000); // FIXME pose obligatoire ?!?
-    //}
-    //
-    //utils::net::Client* clt = 0;
-    //try {
-    //clt = new utils::net::Client(host, port);
-    //DTRACE1(boost::format("sendEOV: %1%.\n") % (*it).second.xml());
-    //clt->send_buffer((*it).second.xml());
-    //Glib::ustring tr(clt->recv_string());
-    //clt->close();
-    //delete clt;
-    //
-    //DTRACE2(boost::format("recvEOV: %1%.\n") % tr);
-    //xmlpp::DomParser dom;
-    //dom.parse_memory(tr);
-            //FIXME
-            //value::Value v =
-            //value::Value::getValue(dom.get_document()->get_root_node());
+    const vpz::EOVs eovs = m_experiment.measures().eovs();
+    std::map < std::string, vpz::EOV >::const_iterator it;
+    for (it = eovs.eovs().begin(); it != eovs.eovs().end(); ++it) {
+        std::string host;
+        int port;
 
-            //if (v->isMap()) {
-            //const value::Map::MapValue& mp = ((value::Map*)v)->getValue();
-            //for (value::Map::MapValue::const_iterator it = mp.begin();
-            //it != mp.end(); ++it) {
-            //if ((*it).second->isInteger()) {
-            //std::string output = (*it).first;
-            //int port = ((value::Integer*)(*it).second)->intValue();
-            //
-            //std::string outputhost = host + ":" + utils::to_string(port);
-            //startNetStream(output, outputhost);
-            //}
-            //}
-            //}
-            //} catch(const std::exception& e) {
-            //delete clt;
-            //std::string err((boost::format(
-            //"Error connecting on eov '%1%' host '%2%' port '%3%': %4%\n") %
-            //(*it).first % host % port % e.what()).str());
-            //Throw(utils::InternalError, err);
-            //}
-            //}
-//    Glib::usleep(1000000); // FIXME pose obligatoire ?!?
+        utils::net::explodeStringNet((*it).second.host(), host, port);
+        DTRACE1(boost::format("startEOVStream '%1%' '%2%'.\n") % host % port);
+
+        if (host == "localhost") {
+            std::string cmd("eov -p ");
+            cmd += utils::to_string(port);
+            Glib::spawn_command_line_async(cmd);
+            Glib::usleep(1000000); // FIXME pose obligatoire ?!?
+        }
+
+        utils::net::Client* clt = 0;
+        try {
+            clt = new utils::net::Client(host, port);
+            DTRACE1(boost::format("sendEOV: %1%.\n") % (*it).second.xml());
+            clt->send_buffer((*it).second.xml());
+            Glib::ustring tr(clt->recv_string());
+            clt->close();
+            delete clt;
+
+            DTRACE2(boost::format("recvEOV: %1%.\n") % tr);
+            xmlpp::DomParser dom;
+            dom.parse_memory(tr);
+            value::Value v =
+                value::ValueBase::getValue(dom.get_document()->get_root_node());
+
+            if (v->isMap()) {
+                value::MapFactory::MapValue& mp = value::to_map(v)->getValue();
+                for (value::MapFactory::MapValue::const_iterator it = mp.begin();
+                     it != mp.end(); ++it) {
+                    if ((*it).second->isInteger()) {
+                        std::string output = (*it).first;
+                        int port = value::to_integer((*it).second)->intValue();
+
+                        std::string outputhost = host + ":" + utils::to_string(port);
+                        startNetStream(output, outputhost);
+                    }
+                }
+            }
+        } catch(const std::exception& e) {
+            delete clt;
+            std::string err((boost::format(
+                        "Error connecting on eov '%1%' host '%2%' port '%3%': %4%\n") %
+                    (*it).first % host % port % e.what()).str());
+            Throw(utils::InternalError, err);
+        }
+    }
+    Glib::usleep(1000000); // FIXME pose obligatoire ?!?
 }
 
 void Simulator::startNetStream(const std::string& output,
@@ -521,7 +520,7 @@ void Simulator::startNetStream(const std::string& output,
     std::list < vpz::Observable >::const_iterator it;
     for (it = observables.begin(); it != observables.end(); ++it) {
         obs->addObservable(getModel((*it).modelname()), (*it).portname(),
-                               (*it).group(), (*it).index());
+                           (*it).group(), (*it).index());
     }
     addObserver(obs);
 }
@@ -539,7 +538,7 @@ void Simulator::startLocalStream()
             std::string file(m_experiment.name());
             file += "_";
             file += (*it).first;
-            
+
             stream = getStreamPlugin(o);
             stream->init(o.plugin(), file, o.location(), o.xml());
 
@@ -659,7 +658,7 @@ Event* Simulator::processConflict(EventBagModel& bag, sAtomicModel& mdl)
             } else {
                 Throw(utils::InternalError, boost::format(
                         "No internal and external events for model '%1%'\n") %
-                        mdl.getName());
+                    mdl.getName());
             }
         }
     }
@@ -741,7 +740,7 @@ vle::devs::Stream* Simulator::getStreamPlugin(const vpz::Output& o)
             o.streamformat());
 
     std::string file1(Glib::Module::build_path(
-        utils::Path::path().getDefaultStreamDir(), o.streamformat()));
+            utils::Path::path().getDefaultStreamDir(), o.streamformat()));
     Glib::Module* module = new Glib::Module(file1);
 
     if (not (*module)) {
@@ -749,7 +748,7 @@ vle::devs::Stream* Simulator::getStreamPlugin(const vpz::Output& o)
         delete module;
 
         std::string file2(Glib::Module::build_path(
-            utils::Path::path().getUserStreamDir(), o.streamformat()));
+                utils::Path::path().getUserStreamDir(), o.streamformat()));
         module = new Glib::Module(file2);
 
         if (not (*module)) {
@@ -776,7 +775,7 @@ vle::devs::Stream* Simulator::getStreamPlugin(const vpz::Output& o)
     Assert(utils::FileError, call, boost::format(
             "Error in module '%1%', function makeNewStream problem allocation "
             "a new plugin: %1%\n") % o.plugin() %
-            Glib::Module::get_last_error());
+        Glib::Module::get_last_error());
 
     return call;
 }

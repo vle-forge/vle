@@ -254,15 +254,15 @@ namespace vle { namespace extension {
         return false;
     }
 
-    value::Value* Equation::processStateEvent(devs::StateEvent* event) const
+    value::Value Equation::processStateEvent(devs::StateEvent* event) const
     {
         if (existEquation(event->getPortName()))
         {
             std::map < std::string, unsigned int>::const_iterator it = m_indexList.find(event->getPortName());
 
-            return new value::Double(m_valueList[it->second]);
+            return value::DoubleFactory::create(m_valueList[it->second]);
         }
-        else return 0;
+        else return value::ValueBase::empty;
     }
 
 }} // namespace vle extension

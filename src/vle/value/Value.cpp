@@ -31,65 +31,74 @@
 #include <vle/value/Set.hpp>
 #include <vle/value/Map.hpp>
 #include <vle/utils/Debug.hpp>
+#include <vle/utils/XML.hpp>
 
 namespace vle { namespace value {
 
-    const Value ValueBase::empty;
+const Value ValueBase::empty;
 
-    //VectorValue Value::getValues(xmlpp::Element* root)
-    ////{
-    //std::vector < Value* > result;
-    //
-    //if (root) {
-    //xmlpp::Node::NodeList lst = root->get_children();
-    //for (xmlpp::Node::NodeList::iterator it = lst.begin();
-    //it != lst.end(); ++it) {
-    //if (vle::utils::xml::is_element(*it)) {
-    //result.push_back(Value::getValue((xmlpp::Element*)*it));
-    //}
-    //}
-    //}
-    //
-    //return result;
-    //}
-    //
-    //Value* Value::getValue(xmlpp::Element* root)
-    //{
-    //if (root) {
-    //Glib::ustring name(root->get_name());
-    //if (name == "DOUBLE")
-    //return new Double(root);
-    //else if (name == "BOOLEAN")
-    //return new Boolean(root);
-    //else if (name == "INTEGER")
-    //return new Integer(root);
-    //else if (name == "STRING")
-    //return new String(root);
-    //else if (name == "SET")
-    //return new Set(root);
-    //else if (name == "MAP")
-    //return new Map(root);
-    //}
-    //return 0;
-    //}
-    //
-    //void Value::cleanValues(std::vector < Value* >& vals)
-    //{
-    //for (std::vector < Value* >::iterator it = vals.begin();
-    //it != vals.end(); it++) {
-    //delete (*it);
-    //(*it) = 0;
-    //}
-    //}
-    //
-    //bool Value::isComplex(xmlpp::Element* root)
-    //{
-    //if (root) {
-    //Glib::ustring name(root->get_name());
-    //return name == "SET" or name == "MAP";
-    //}
-    //return 0;
-    //}
+std::vector < Value > ValueBase::getValues(xmlpp::Element* root)
+{
+    std::vector < Value > result;
+
+    if (root) {
+        xmlpp::Node::NodeList lst = root->get_children();
+        for (xmlpp::Node::NodeList::iterator it = lst.begin();
+             it != lst.end(); ++it) {
+            if (vle::utils::xml::is_element(*it)) {
+                result.push_back(getValue((xmlpp::Element*)*it));
+            }
+        }
+    }
+
+    return result;
+}
+
+Value ValueBase::getValue(xmlpp::Element* root)
+{
+    if (root) {
+        Glib::ustring name(root->get_name());
+        xmlpp::Attribute* att(root->get_attribute("VALUE"));
+
+        if (att == 0)
+            exit(0);
+
+        Glib::ustring value(att->get_value());
+
+        if (name == "DOUBLE") {
+            return DoubleFactory::create(utils::to_double(value));
+        } else if (name == "BOOLEAN") {
+            return BooleanFactory::create(utils::to_boolean(value));
+        } else if (name == "INTEGER") {
+            return IntegerFactory::create(utils::to_int(value));
+        } else if (name == "STRING") {
+            return StringFactory::create(value);
+        } else if (name == "SET") {// FIXME MACHER PAS !!! {
+            return SetFactory::create();
+
+        } else if (name == "MAP") {// FIXME MACHER PAS !!!
+            return MapFactory::create();
+        }
+    }
+    return empty;
+}
+
+void ValueBase::cleanValues(std::vector < Value >& vals)
+{
+    for (std::vector < Value >::iterator it = vals.begin();
+         it != vals.end(); it++) {
+        (*it).reset();
+    }
+}
+
+bool ValueBase::isComplex(xmlpp::Element* root)
+{
+    if (root) {
+        Glib::ustring name(root->get_name());
+        return name == "SET" or name == "MAP";
+    }
+    return 0;
+}
 
 Boolean to_boolean(Value v)
 {

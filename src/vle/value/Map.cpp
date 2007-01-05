@@ -39,7 +39,8 @@ MapFactory::MapFactory(const MapFactory& mapfactory) :
 {
     for (MapValueConstIt it = mapfactory.m_value.begin();
          it != mapfactory.m_value.end(); ++it) {
-        addValue((*it).first, (*it).second->clone());
+        // addValue((*it).first, (*it).second->clone());
+        addValue((*it).first, (*it).second);
     }
 }
 

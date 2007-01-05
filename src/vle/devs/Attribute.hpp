@@ -104,6 +104,18 @@ namespace vle { namespace devs {
                                value::Value value)
     { return Attribute(name, value); }
 
+    /**
+     * Build an attribute with a specified name and set value. Be carreful, the
+     * set is not clone.
+     *
+     * @param name the name of the attribute.
+     * @param value the value. The value is not cloned.
+     *
+     * @return a new Attribute.
+     */
+    inline Attribute attribute(const std::string& name,
+                               value::Set value)
+    { return Attribute(name, value); }
 }} // namespace vle devs
     
 #endif

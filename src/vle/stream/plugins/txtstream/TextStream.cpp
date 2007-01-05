@@ -85,7 +85,7 @@ void TextStream::writeTail()
 }
 
 void TextStream::writeValue(const devs::Time& time,
-                            value::Value* value)
+                            value::Value value)
 {
     size++;
     m_tmpStream << time.getValue() << "\t" << value->toString() << std::endl;

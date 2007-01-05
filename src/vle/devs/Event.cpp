@@ -40,7 +40,8 @@ namespace vle { namespace devs {
 Event::Event(const Time& time, sAtomicModel* model) :
     m_time(time),
     m_source(model),
-    m_valid(true)
+    m_valid(true),
+    m_attributes(value::MapFactory::create())
 {
 }
 

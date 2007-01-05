@@ -73,7 +73,7 @@ void Condition::init(xmlpp::Element* elt)
     m_modelname.assign(xml::get_attribute(elt, "MODEL_NAME"));
     m_portname.assign(xml::get_attribute(elt, "PORT_NAME"));
     // FIXME, initialiser les values à partir d'XML.
-    // m_value = value::Value::getValues(elt);
+    m_value = value::ValueBase::getValues(elt);
 }
 
 void Condition::write(xmlpp::Element* elt) const
@@ -120,7 +120,7 @@ value::Value Condition::firstValue() const
 
     //FIXME
     //return m_value[0]->clone();
-    return m_value[0];
+    return m_value[0]->clone();
 }
 
 value::Value Condition::nValue(size_t i) const
@@ -131,7 +131,7 @@ value::Value Condition::nValue(size_t i) const
 
     //FIXME
     //return m_value[i]->clone();
-    return m_value[i];
+    return m_value[i]->clone();
 }
 
 }} // namespace vle vpz

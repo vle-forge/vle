@@ -89,7 +89,7 @@ namespace vle { namespace extension {
         virtual void processInternalEvent( devs::InternalEvent * event);
         virtual devs::ExternalEventList* getOutputFunction(devs::Time const &time);
         virtual void processExternalEvent( devs::ExternalEvent * event);
-        virtual value::Value* processStateEvent( devs::StateEvent * event) const;
+        virtual value::Value processStateEvent( devs::StateEvent * event) const;
         virtual void processInitEvent( devs::InitEvent * event);
         //		virtual bool processConflict(const devs::InternalEvent& , const devs::ExternalEventList& ) { std::cout<<"++++ ProcessConflict2"<<std::endl; return false; }
         virtual double compute() = 0;

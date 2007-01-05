@@ -32,7 +32,8 @@ SetFactory::SetFactory(const SetFactory& setfactory) :
 {
     const size_t sz = setfactory.m_value.size();
     for (size_t i = 0; i < sz; ++i) {
-        addValue(setfactory.m_value[i]->clone());
+        //addValue(setfactory.m_value[i]->clone());
+        addValue(setfactory.m_value[i]);
     }
 }
 

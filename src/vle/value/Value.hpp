@@ -27,7 +27,9 @@
 #define UTILS_VALUE_VALUE_HPP
 
 #include <string>
+#include <vector>
 #include <boost/shared_ptr.hpp>
+#include <libxml++/libxml++.h>
 
 namespace vle {
     
@@ -181,7 +183,7 @@ namespace vle {
              * @param root the parent node of elements to parse.
              * @return 0 if error, a vector of new Value on success.
              */
-            //static std::vector < Value > getValues(xmlpp::Element* root);
+            static std::vector < Value > getValues(xmlpp::Element* root);
 
             /**
              * Build a value in parsing root XML node. This function is
@@ -194,21 +196,21 @@ namespace vle {
              * @param root the node element to parse.
              * @return 0 if error, a new Value on success.
              */
-            //static Value getValue(xmlpp::Element* root);
+            static Value getValue(xmlpp::Element* root);
 
             /**
              * Delete all the value contains in Vector.
              *
              * @param vals vector values to delete.
              */
-            //static void cleanValues(std::vector < Value >& vals);
+            static void cleanValues(std::vector < Value >& vals);
 
             /**
              * @return true if the node is a complex value like Set, false if it
              * simple value like String, Boolean, Integer, Double and if an
              * error occured.
              */
-            //static bool isComplex(xmlpp::Element* root);
+            static bool isComplex(xmlpp::Element* root);
         };
 
         String to_string(Value v);

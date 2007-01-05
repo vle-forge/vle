@@ -84,7 +84,7 @@ namespace vle { namespace extension {
         virtual void processInitEvent(devs::InitEvent* event);
         virtual void processInternalEvent(devs::InternalEvent* event);
         virtual void processExternalEvent(devs::ExternalEvent* event);
-        virtual value::Value* processStateEvent(devs::StateEvent* event) const;
+        virtual value::Value processStateEvent(devs::StateEvent* event) const;
 
     private:
         bool m_active;
