@@ -109,7 +109,7 @@ void ExperimentGenerator::build_combinations_from_replicas(size_t cmbnumber)
 void ExperimentGenerator::write_instance(size_t cmbnumber, size_t replnumber)
 {
     mTmpfile.project().experiment().
-        setName((boost::format("%1%-%2%-%3%\n") % mFile.project().experiment().
+        setName((boost::format("%1%-%2%-%3%") % mFile.project().experiment().
                  name() % cmbnumber % replnumber).str());
 
     Glib::ustring filename(utils::write_to_temp("vleexp",
