@@ -8,5 +8,5 @@ Description: VLE multimodelling and Simulation tools
 Requires: libxml++-2.6 glibmm-2.4
 Version: @VERSION@
 Libs:	-L${libdir}/vle -ldata -ldevs -lextension -lgeometry -lgraph \
-	-lmanager -lutils -lvalue -lvpz
+	-lmanager -lutils -lvalue -lvpz -Wl,-rpath -Wl,@libdir@/vle
 Cflags: -I${includedir}/vle-0.4
