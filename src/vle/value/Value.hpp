@@ -30,6 +30,7 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include <libxml++/libxml++.h>
+#include <vle/utils/Debug.hpp>
 
 namespace vle {
     
@@ -47,20 +48,35 @@ namespace vle {
         class StringFactory;
         class SetFactory;
         class MapFactory;
-        class SpeedFactory;
-        class CoordinateFactory;
+
+        template < size_t n, class Class > class CoordinateFactory ;
         class DirectionFactory;
+        class SpeedFactory;
+
 
         typedef boost::shared_ptr < ValueBase > Value;
         typedef boost::shared_ptr < BooleanFactory > Boolean;
         typedef boost::shared_ptr < IntegerFactory > Integer;
         typedef boost::shared_ptr < DoubleFactory > Double;
         typedef boost::shared_ptr < StringFactory > String;
-        typedef boost::shared_ptr < SpeedFactory > Speed;
-        typedef boost::shared_ptr < CoordinateFactory > Coordinate;
-        typedef boost::shared_ptr < DirectionFactory > Direction;
         typedef boost::shared_ptr < SetFactory > Set;
         typedef boost::shared_ptr < MapFactory > Map;
+        
+        typedef boost::shared_ptr < CoordinateFactory < 1, int > >
+            CoordinateInt1;
+        typedef boost::shared_ptr < CoordinateFactory < 1, double > >
+            CoordinateDouble1;
+        typedef boost::shared_ptr < CoordinateFactory < 2, int > >
+            CoordinateInt2;
+        typedef boost::shared_ptr < CoordinateFactory < 2, double > >
+            CoordinateDouble2;
+        typedef boost::shared_ptr < CoordinateFactory < 3, int > >
+            CoordinateInt3;
+        typedef boost::shared_ptr < CoordinateFactory < 3, double > >
+            CoordinateDouble3;
+
+        typedef boost::shared_ptr < DirectionFactory > Direction;
+        typedef boost::shared_ptr < SpeedFactory > Speed;
 
         /**
          * @brief Virtual class to assign Value into Event object.
@@ -76,7 +92,7 @@ namespace vle {
              * function create from all subclass.
              *
              * @code
-             * Value val = vle::value::IntegerFactory::create(13);
+             * Value val = value::IntegerFactory::create(13);
              * @endcode
              */
             ValueBase() { }
@@ -213,12 +229,18 @@ namespace vle {
             static bool isComplex(xmlpp::Element* root);
         };
 
-        String to_string(Value v);
         Boolean to_boolean(Value v);
         Integer to_integer(Value v);
+        String to_string(Value v);
         Double to_double(Value v);
         Map to_map(Value v);
         Set to_set(Value v);
+        CoordinateInt1 to_coordinateInt1(Value v);
+        CoordinateInt2 to_coordinateInt2(Value v);
+        CoordinateInt3 to_coordinateInt3(Value v);
+        CoordinateDouble1 to_coordinateDouble1(Value v);
+        CoordinateDouble2 to_coordinateDouble2(Value v);
+        CoordinateDouble3 to_coordinateDouble3(Value v);
 
     } // namespace value
 

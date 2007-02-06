@@ -30,6 +30,7 @@
 #include <vle/value/String.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/value/Map.hpp>
+#include <vle/value/Coordinate.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/XML.hpp>
 
@@ -102,52 +103,92 @@ bool ValueBase::isComplex(xmlpp::Element* root)
 
 Boolean to_boolean(Value v)
 {
-    Assert(vle::utils::InternalError, v->getType() == ValueBase::BOOLEAN,
+    Assert(utils::InternalError, v->getType() == ValueBase::BOOLEAN,
            "Value is not a Boolean");
-
     return boost::static_pointer_cast < BooleanFactory >(v);
 }
 
 Integer to_integer(Value v)
 {
-    Assert(vle::utils::InternalError, v->getType() == ValueBase::INTEGER,
+    Assert(utils::InternalError, v->getType() == ValueBase::INTEGER,
            "Value is not an Integer");
-
     return boost::static_pointer_cast < IntegerFactory >(v);
 }
 
 String to_string(Value v)
 {
-    Assert(vle::utils::InternalError, v->getType() == ValueBase::STRING,
+    Assert(utils::InternalError, v->getType() == ValueBase::STRING,
            "Value is not a String");
-
     return boost::static_pointer_cast < StringFactory >(v);
 }
 
 Double to_double(Value v)
 {
-    Assert(vle::utils::InternalError, v->getType() == ValueBase::DOUBLE,
+    Assert(utils::InternalError, v->getType() == ValueBase::DOUBLE,
            "Value is not a Double");
-
     return boost::static_pointer_cast < DoubleFactory >(v);
-
 }
 
 Map to_map(Value v)
 {
-    Assert(vle::utils::InternalError, v->getType() == ValueBase::MAP,
+    Assert(utils::InternalError, v->getType() == ValueBase::MAP,
            "Value is not a Map");
-
     return boost::static_pointer_cast < MapFactory >(v);
 }
 
-
 Set to_set(Value v)
 {
-    Assert(vle::utils::InternalError, v->getType() == ValueBase::SET,
+    Assert(utils::InternalError, v->getType() == ValueBase::SET,
            "Value is not a Set");
-
     return boost::static_pointer_cast < SetFactory >(v);
+}
+
+CoordinateInt1 to_coordinateInt1(Value v)
+{
+    Assert(utils::InternalError, v->getType() == ValueBase::COORDINATE,
+           "Value is not a Coordinate");
+    return boost::static_pointer_cast
+        < CoordinateFactory < 1, int > >(v);
+}
+
+CoordinateInt2 to_coordinateInt2(Value v)
+{
+    Assert(utils::InternalError, v->getType() == ValueBase::COORDINATE,
+           "Value is not a Coordinate");
+    return boost::static_pointer_cast
+        < CoordinateFactory < 2, int > >(v);
+}
+
+CoordinateInt3 to_coordinateInt3(Value v)
+{
+    Assert(utils::InternalError, v->getType() == ValueBase::COORDINATE,
+           "Value is not a Coordinate");
+    return boost::static_pointer_cast
+        < CoordinateFactory < 3, int > >(v);
+}
+
+CoordinateDouble1 to_coordinateDouble1(Value v)
+{
+    Assert(utils::InternalError, v->getType() == ValueBase::COORDINATE,
+           "Value is not a Coordinate");
+    return boost::static_pointer_cast
+        < CoordinateFactory < 1, double > >(v);
+}
+
+CoordinateDouble2 to_coordinateDouble2(Value v)
+{
+    Assert(utils::InternalError, v->getType() == ValueBase::COORDINATE,
+           "Value is not a Coordinate");
+    return boost::static_pointer_cast
+        < CoordinateFactory < 2, double > >(v);
+}
+
+CoordinateDouble3 to_coordinateDouble3(Value v)
+{
+    Assert(utils::InternalError, v->getType() == ValueBase::COORDINATE,
+           "Value is not a Coordinate");
+    return boost::static_pointer_cast
+        < CoordinateFactory < 3, double > >(v);
 }
 
 }} // namespace vle value

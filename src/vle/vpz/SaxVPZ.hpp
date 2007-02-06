@@ -29,56 +29,131 @@
 #include <libxml++/libxml++.h>
 #include <vle/vpz/Base.hpp>
 #include <vle/value/Value.hpp>
+#include <vle/value/Set.hpp>
+#include <vle/value/Map.hpp>
+#include <vle/utils/Debug.hpp>
 
 namespace vle { namespace vpz {
 
-    class VLEStack
+    class VpzStackSax
     {
     public:
-        VLEStack()
+        VpzStackSax()
         { }
 
-        ~VLEStack()
+        ~VpzStackSax()
         { }
 
-        void push(vpz::Base* element);
-
-        void pop();
-
-        vpz::Base* top() const;
-
-        bool empty() const;
+        void push_vpz();
+        void push_structure();
+        void push_model(const xmlpp::SaxParser::AttributeList& att);
+        void push_port(const xmlpp::SaxParser::AttributeList& att);
+        void push_in();
+        void push_out();
+        void push_init();
+        void push_state();
+        void push_submodels();
+        void push_dynamics();
+        void push_dynamic(const xmlpp::SaxParser::AttributeList& att);
 
     private:
-        std::stack < vpz::Base* > m_stack;
+        std::stack < vpz::Base* >       m_stack;
     };
-    
-    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-    class ValueStack
+    class ValueStackSax
     {
     public:
-        ValueStack()
-        { }
+        void push_integer();
 
-        ~ValueStack()
-        { }
+        void push_boolean();
 
-        void push(const value::Value& val);
+        void push_string();
 
-        void pop();
+        void push_double();
 
-        value::Value& top();
+        void push_map();
 
-        bool empty() const;
+        void push_map_key(const Glib::ustring& key);
 
-        value::Value clear();
+        void push_set();
+
+        void pop_value();
+
+        const value::Value& top_value();
+
+        inline void push_on_vector_value(const value::Value& val);
+
+        /** 
+         * @brief Pop the current head. If stack is empty, do nothing.
+         */
+        inline void pop()
+        { m_valuestack.pop(); }
+
+        /** 
+         * @brief Return true if this sax parser stack is empty.
+         * 
+         * @return true if empty, false otherwise.
+         */
+        inline bool empty() const
+        { return m_valuestack.empty(); }
+
+        /** 
+         * @brief Clear stack value and result stack value.
+         */
+        void clear();
+
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+        inline void push_result(const value::Value& val)
+        { m_result.push_back(val); }
+
+        inline const value::Value& get_result(size_t i) const
+        {
+            Assert(utils::SaxParserError, m_result.size() >= i,
+                   (boost::format("Get result value with to big index %1%.") %
+                    i));
+
+            return m_result[i];
+        }
+
+        inline const value::Value& get_last_result() const
+        {
+            Assert(utils::SaxParserError, not m_result.empty(),
+                   "Get last result value with empty result vector");
+
+            return m_result[m_result.size() - 1];
+        }
+
+        const std::vector < value::Value >& get_results() const
+        { return m_result; }
 
     private:
-        std::stack < value::Value > m_stack;
+        /** 
+         * @brief Test if top of values stack are a composite like map, set,
+         * coordinate or direction.
+         * 
+         * @return 
+         */
+        bool is_composite_parent() const;
+
+        /** 
+         * @brief Store the value stack, usefull for composite value, set, map,
+         * etc.
+         */
+        std::stack < value::Value >  m_valuestack;
+
+        /** 
+         * @brief Store result of Values parsing from trame, simple value,
+         * factor.
+         */
+        std::vector < value::Value > m_result; 
+
+        /** 
+         * @brief Last map key read.
+         */
+        Glib::ustring                m_lastkey;
     };
+
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -90,6 +165,8 @@ namespace vle { namespace vpz {
         VLESaxParser();
 
         virtual ~VLESaxParser();
+
+        /* xml */
 
         virtual void on_start_document();
 
@@ -118,29 +195,25 @@ namespace vle { namespace vpz {
         //const Glib::ustring& publicId,
         //const Glib::ustring& systemId);
 
-        inline value::Value get_value_stack()
-        { return m_value.clear(); }
-
         inline bool is_value() const
         { return m_isValue; }
 
         inline bool is_vpz() const
         { return m_isVPZ; }
 
-    private:
-        void startValue(value::Value val);
+        inline bool is_trame() const
+        { return m_isTrame; }
 
+        const std::vector < value::Value >& get_values() const;
+
+        const value::Value& get_value(const size_t pos) const;
+
+    private:
         /** 
-         * @brief Add a value into the VLEStack and check if no error is found.
-         * The boolean, integer, double and string values parent are map, set,
-         * experimental factor or empty VLEStack. Map and Set parent are only
-         * VLEStack or experimental factor.
-         * 
-         * @param val the value to push
-         *
-         * @throw SaxParserError if Value inserted with a bad parent.
+         * @brief Delete all information from Sax parser like stack, etc. Use it
+         * before restart a new parse.
          */
-        void addValue(value::Value val);
+        void clear_parser_state();
 
         /** 
          * @brief Get the last characters from internal buffer.
@@ -153,20 +226,16 @@ namespace vle { namespace vpz {
          * @brief Clear the internal buffer for last characters.
          */
         void clearLastCharactersStored();
-        
-        /** 
-         * @brief Store the characters into internal buffer.
-         * @param characters buffer to store.
-         * @throw SaxParserError if buffer is not empty.
-         */
-        void storeCharacters(const Glib::ustring& characters);
 
-        VLEStack        m_stack;
-        ValueStack      m_value;
-        Glib::ustring   m_lastCharacters;
+        void addToCharacters(const Glib::ustring& characters);
 
-        bool            m_isValue;
-        bool            m_isVPZ;
+        VpzStackSax                     m_vpzstack;
+        ValueStackSax                   m_valuestack;
+        Glib::ustring                   m_lastCharacters;
+
+        bool                            m_isValue;
+        bool                            m_isVPZ;
+        bool                            m_isTrame;
     };
 
 }} // namespace vle vpz

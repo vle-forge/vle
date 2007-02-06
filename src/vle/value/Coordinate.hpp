@@ -27,31 +27,34 @@
 #ifndef UTILS_VALUE_COORDINATE_HPP
 #define UTILS_VALUE_COORDINATE_HPP
 
-#include <utils/value/Value.hpp>
-#include <utils/geometry/Point.hpp>
+#include <vle/value/Value.hpp>
+#include <vle/geometry/Point.hpp>
+#include <vle/utils/Debug.hpp>
 
 namespace vle { namespace value {
 
     template < size_t n, class Class >
-    class CoordinateFactory : public ValueBase
+    class CoordinateFactory :
+        public ValueBase,
+        public vle::geometry::Point < n, Class >
     {
     private:
-        CoordinateFactory(Class x, Class y) :
-            m_value(x, y)
+        CoordinateFactory() :
+            vle::geometry::Point < n, Class >()
         { }
 
     public:
         virtual ~CoordinateFactory()
         { }
 
-        static Coordinate create(Class x, Class y)
+        static CoordinateInt1 createInt1()
         {
-            return Coordinate(new CoordinateFactory(x, y));
+            return CoordinateInt1(new CoordinateFactory < 1, int >());
         }
 
         virtual Value clone() const
         {
-            return Coordinate(new CoordinateFactory(m_value);
+            return Coordinate(new CoordinateFactory(*this));
         }
 
         virtual ValueBase::type getType() const
@@ -59,14 +62,19 @@ namespace vle { namespace value {
             return ValueBase::COORDINATE;
         }
 
-        inline utils::geometry::Point < n, Class >& coordinate()
+        inline size_t dimension() const
         {
-            return m_value;
+            return n;
         }
 
-        inline const utils::geometry::Point < n, Class >& coordinate() const
+        inline Class elements(size_t i) const
         {
-            return m_value;
+            if (i < n) {
+                return vle::geometry::Point <n, Class >::operator[](i);
+            } else {
+                Throw(utils::InternalError, (boost::format(
+                      "Coordinate to big value %1% >= %2%") % i % n));
+            }
         }
 
         virtual std::string toFile() const
@@ -74,7 +82,7 @@ namespace vle { namespace value {
             std::string str;
 
             for (size_t sz = 0; sz < n; ++sz) {
-                str += utils::to_string(m_value[sz]);
+                str += utils::to_string(vle::geometry::Point <n, Class >::operator[](sz));
                 if (sz + 1 <= n) {
                     str += ' ';
                 }
@@ -88,7 +96,7 @@ namespace vle { namespace value {
             std::string str('(');
 
             for (size_t sz = 0; sz < n; ++sz) {
-                str += utils::to_string(m_value[sz]);
+                str += utils::to_string(vle::geometry::Point <n, Class >::operator[](sz));
                 if (sz + 1 <= n) {
                     str += ", ";
                 }
@@ -102,7 +110,7 @@ namespace vle { namespace value {
         {
             std::string str("<COORDINATE><VAL>");
             for (size_t sz = 0; sz < n; ++sz) {
-                str += utils::to_string(m_value[sz]);
+                str += utils::to_string(vle::geometry::Point <n, Class >::operator[](sz));
                 if (sz + 1 <= n) {
                     str += "</VAL><VAL>";
                 }
@@ -111,9 +119,6 @@ namespace vle { namespace value {
 
             return str;
         }
-
-    private:
-        utils::geometry::Point < n, Class >     m_value;
     };
 
 }} // namespace vle value

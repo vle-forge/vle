@@ -72,6 +72,9 @@ namespace vle { namespace value {
         inline const VectorValue& getValue() const
         { return m_value; }
 
+        inline const Value& getValue(const size_t i) const
+        { return m_value.at(i); }
+
         virtual std::string toFile() const;
 
         virtual std::string toString() const;

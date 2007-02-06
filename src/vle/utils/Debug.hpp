@@ -90,7 +90,7 @@ namespace vle { namespace utils {
 #define AssertS(type, test) { \
     if (! (test)) { \
         std::string err__( \
-            boost::str(boost:format( \
+            boost::str(boost::format( \
                 "Assertion '%1%' failed in file %2% : line %3%\n'%4%'\n%5%\n") % \
                              #test % __FILE__ % __LINE__ % __PRETTY_FUNCTION__ % \
                              vle::utils::print_trace_report())); \

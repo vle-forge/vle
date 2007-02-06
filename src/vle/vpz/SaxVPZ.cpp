@@ -35,75 +35,159 @@
 
 namespace vle { namespace vpz {
 
+void VpzStackSax::push_vpz()
+{
+    AssertS(utils::SaxParserError, m_stack.empty());
+}
+
+void VpzStackSax::push_structure()
+{
+}
+
+void VpzStackSax::push_model(const xmlpp::SaxParser::AttributeList& /*att*/)
+{
+}
+
+void VpzStackSax::push_port(const xmlpp::SaxParser::AttributeList& /*att*/)
+{
+}
+
+void VpzStackSax::push_in()
+{
+}
+
+void VpzStackSax::push_out()
+{
+}
+
+void VpzStackSax::push_init()
+{
+}
+
+void VpzStackSax::push_state()
+{
+}
+
+void VpzStackSax::push_submodels()
+{
+}
+
+void VpzStackSax::push_dynamics()
+{
+}
+
+void VpzStackSax::push_dynamic(const xmlpp::SaxParser::AttributeList& /*att*/)
+{
+}
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-void VLEStack::push(vpz::Base* element)
+bool ValueStackSax::is_composite_parent() const
 {
-    Assert(utils::SaxParserError, element, "Push an empty element ?");
-    m_stack.push(element);
-}
+    if (not m_valuestack.empty()) {
+        const value::Value val = m_valuestack.top();
 
-void VLEStack::pop()
-{
-    m_stack.pop();
-}
-
-vpz::Base* VLEStack::top() const
-{
-    Assert(utils::SaxParserError, not m_stack.empty(),
-           "Empty sax parser stack for the top() operation");
-
-    return m_stack.top();
-}
-
-bool VLEStack::empty() const
-{
-    return m_stack.empty();
-}
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-void ValueStack::push(const value::Value& val)
-{
-    Assert(utils::SaxParserError, val, "Push an empty value ?");
-    m_stack.push(val);
-}
-
-void ValueStack::pop()
-{
-    m_stack.pop();
-}
-
-value::Value& ValueStack::top()
-{
-    Assert(utils::SaxParserError, not m_stack.empty(),
-           "Empty value sax parser stack for the top() operation");
-
-    return m_stack.top();
-}
-
-bool ValueStack::empty() const
-{
-    return m_stack.empty();
-}
-
-value::Value ValueStack::clear()
-{
-    value::Value last;
-
-    if (not empty()) {
-        last = top();
-        pop();
-        while (not empty()) {
-            last = top();
-            pop();
-        }
+        return val->isMap() or val->isSet();
     }
-    return last;
+    return false;
+}
+
+void ValueStackSax::push_integer()
+{
+    if (not m_valuestack.empty()) {
+        AssertS(utils::SaxParserError, is_composite_parent());
+    }
+}
+
+void ValueStackSax::push_boolean()
+{
+    if (not m_valuestack.empty()) {
+        AssertS(utils::SaxParserError, is_composite_parent());
+    }
+}
+
+void ValueStackSax::push_string()
+{
+    if (not m_valuestack.empty()) {
+        AssertS(utils::SaxParserError, is_composite_parent());
+    }
+}
+
+void ValueStackSax::push_double()
+{
+    if (not m_valuestack.empty()) {
+        AssertS(utils::SaxParserError, is_composite_parent());
+    }
+}
+
+void ValueStackSax::push_map()
+{
+    if (not m_valuestack.empty()) {
+        AssertS(utils::SaxParserError, is_composite_parent());
+    }
+
+    push_on_vector_value(value::MapFactory::create());
+}
+
+void ValueStackSax::push_map_key(const Glib::ustring& key)
+{
+    if (not m_valuestack.empty()) {
+        AssertS(utils::SaxParserError, m_valuestack.top()->isMap());
+    }
+
+    m_lastkey.assign(key);
+}
+
+void ValueStackSax::push_set()
+{
+    if (not m_valuestack.empty()) {
+        AssertS(utils::SaxParserError, is_composite_parent());
+    }
+
+    push_on_vector_value(value::SetFactory::create());
+}
+
+void ValueStackSax::pop_value()
+{
+    if (not m_valuestack.empty()) {
+        m_valuestack.pop();
+    }
+}
+
+const value::Value& ValueStackSax::top_value()
+{
+    Assert(utils::SaxParserError, not m_valuestack.empty(),
+           "Empty sax parser value stack for the top operation");
+
+    return m_valuestack.top();
+}
+
+inline void ValueStackSax::push_on_vector_value(const value::Value& val)
+{
+    if (not m_valuestack.empty()) {
+        if (m_valuestack.top()->isSet()) {
+            value::to_set(m_valuestack.top())->addValue(val);
+        } else if (m_valuestack.top()->isMap()) {
+            value::to_map(m_valuestack.top())->addValue(
+                m_lastkey, val);
+        }
+    } else {
+        m_result.push_back(val);
+    }
+
+    if (val->isSet() or val->isMap()) {
+        m_valuestack.push(val);
+    }
+}
+
+void ValueStackSax::clear()
+{
+    while (not m_valuestack.empty())
+        m_valuestack.pop();
+
+    m_result.clear();
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -120,8 +204,18 @@ VLESaxParser::~VLESaxParser()
 {
 }
 
+void VLESaxParser::clear_parser_state()
+{
+    m_valuestack.clear();
+    m_lastCharacters.clear();
+    m_isValue = false;
+    m_isVPZ = false;
+    m_isTrame = false;
+}
+
 void VLESaxParser::on_start_document()
 {
+    clear_parser_state();
 }
 
 void VLESaxParser::on_end_document()
@@ -130,39 +224,77 @@ void VLESaxParser::on_end_document()
 
 void VLESaxParser::on_start_element(
     const Glib::ustring& name,
-    const xmlpp::SaxParser::AttributeList& /*attributes */)
+    const xmlpp::SaxParser::AttributeList& att)
 {
-    if (name == "boolean" or name == "integer" or name == "double"
-        or name == "string") {
-        // rien ?!?
+    clearLastCharactersStored();
+    if (name == "boolean") {
+        m_valuestack.push_boolean();
+    } else if (name == "integer") {
+        m_valuestack.push_integer();
+    } else if (name == "double") {
+        m_valuestack.push_double();
+    } else if (name == "string") {
+        m_valuestack.push_string();
     } else if (name == "set") {
-        addValue(value::SetFactory::create());
+        m_valuestack.push_set();
     } else if (name == "map") {
-        addValue(value::MapFactory::create());
+        m_valuestack.push_map();
+    } else if (name == "key") {
+        xmlpp::SaxParser::AttributeList::const_iterator it;
+        it = std::find_if(att.begin(), att.end(), 
+                           xmlpp::SaxParser::AttributeHasName("name"));
+        AssertS(utils::SaxParserError, it != att.end());
+
+        m_valuestack.push_map_key((*it).value);
+    } else if (name == "vpz") {
+        AssertS(utils::SaxParserError, not m_isValue and not m_isTrame);
+        m_isValue = true;
+    } else if (name == "structure") {
+        m_vpzstack.push_structure();
+    } else if (name == "model") {
+        m_vpzstack.push_model(att);
+    } else if (name == "port") {
+        m_vpzstack.push_port(att);
+    } else if (name == "submodels") {
+        m_vpzstack.push_submodels();
+    } else if (name == "dynamics") {
+        m_vpzstack.push_dynamics();
+    } else if (name == "dynamic") {
+        m_vpzstack.push_dynamic(att);
+    } else {
+        Throw(utils::SaxParserError,
+              (boost::format("Unknow element %1%") % name));
     }
 }
 
 void VLESaxParser::on_end_element(const Glib::ustring& name)
 {
     if (name == "boolean") {
-        addValue(value::BooleanFactory::create(
+        m_valuestack.push_on_vector_value(
+            value::BooleanFactory::create(
                 utils::to_boolean(lastCharactersStored())));
     } else if (name == "integer") {
-        addValue(value::IntegerFactory::create(
+        m_valuestack.push_on_vector_value(
+            value::IntegerFactory::create(
                 utils::to_int(lastCharactersStored())));
     } else if (name == "double") {
-        addValue(value::DoubleFactory::create(
+        m_valuestack.push_on_vector_value(
+            value::DoubleFactory::create(
                 utils::to_double(lastCharactersStored())));
     } else if (name == "string") {
-        addValue(value::StringFactory::create(
+        m_valuestack.push_on_vector_value(
+            value::StringFactory::create(
                 utils::to_string(lastCharactersStored())));
-    } else if (name == "set" and name == "map") {
+    } else if (name == "key") {
+        // FIXME delete test
+    } else if (name == "set" or name == "map") {
+        m_valuestack.pop_value();
     }
 }
 
 void VLESaxParser::on_characters(const Glib::ustring& characters)
 {
-    storeCharacters(characters);
+    addToCharacters(characters);
 }
 
 void VLESaxParser::on_comment(const Glib::ustring& /* text */)
@@ -192,30 +324,14 @@ void VLESaxParser::on_cdata_block(const Glib::ustring& /* text */)
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-void VLESaxParser::startValue(value::Value val)
+const std::vector < value::Value >& VLESaxParser::get_values() const
 {
-    Assert(utils::SaxParserError, m_value.empty(),
-           "Start value with a no-empty stack");
-
-    m_value.push(val);
+    return m_valuestack.get_results();
 }
 
-void VLESaxParser::addValue(value::Value val)
+const value::Value& VLESaxParser::get_value(const size_t pos) const
 {
-    if (val->isBoolean() or val->isInteger() or val->isDouble() or
-        val->isString()) {
-        if (m_stack.top() == 0) {
-            if (not m_isVPZ) m_isValue = true;
-            // on ne lit plus rien après !
-        }
-        if (m_value.top()) {
-            if (not m_isVPZ) m_isValue = true;
-            // vérif père == MAP / SET / (factor?!?) ou rien)
-        } else if (val->isMap() and val->isSet()) {
-            if (not m_isVPZ) m_isValue = true;
-            // vérif père == MAP / SET / (factor?!?) ou rien)
-        }
-    }
+    return m_valuestack.get_result(pos);
 }
 
 const Glib::ustring& VLESaxParser::lastCharactersStored() const
@@ -228,12 +344,9 @@ void VLESaxParser::clearLastCharactersStored()
     m_lastCharacters.clear();
 }
 
-void VLESaxParser::storeCharacters(const Glib::ustring& characters)
+void VLESaxParser::addToCharacters(const Glib::ustring& characters)
 {
-    Assert(utils::SaxParserError, not m_lastCharacters.empty(),
-           "Characters buffer empty.");
-
-    m_lastCharacters.assign(characters);
+    m_lastCharacters.append(characters);
 }
 
 }} // namespace vle vpz
