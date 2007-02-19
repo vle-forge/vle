@@ -30,7 +30,8 @@
 #include <vle/value/String.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/value/Map.hpp>
-#include <vle/value/Coordinate.hpp>
+#include <vle/value/Tuple.hpp>
+#include <vle/value/Table.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/XML.hpp>
 
@@ -143,52 +144,17 @@ Set to_set(Value v)
     return boost::static_pointer_cast < SetFactory >(v);
 }
 
-CoordinateInt1 to_coordinateInt1(Value v)
+Tuple to_tuple(Value v)
 {
-    Assert(utils::InternalError, v->getType() == ValueBase::COORDINATE,
-           "Value is not a Coordinate");
-    return boost::static_pointer_cast
-        < CoordinateFactory < 1, int > >(v);
+    Assert(utils::InternalError, v->getType() == ValueBase::TUPLE,
+           "Value is not a Tuple");
+    return boost::static_pointer_cast < TupleFactory >(v);
 }
 
-CoordinateInt2 to_coordinateInt2(Value v)
+Table to_table(Value v)
 {
-    Assert(utils::InternalError, v->getType() == ValueBase::COORDINATE,
-           "Value is not a Coordinate");
-    return boost::static_pointer_cast
-        < CoordinateFactory < 2, int > >(v);
+    Assert(utils::InternalError, v->getType() == ValueBase::TABLE,
+           "Value is not a Table");
+    return boost::static_pointer_cast < TableFactory >(v);
 }
-
-CoordinateInt3 to_coordinateInt3(Value v)
-{
-    Assert(utils::InternalError, v->getType() == ValueBase::COORDINATE,
-           "Value is not a Coordinate");
-    return boost::static_pointer_cast
-        < CoordinateFactory < 3, int > >(v);
-}
-
-CoordinateDouble1 to_coordinateDouble1(Value v)
-{
-    Assert(utils::InternalError, v->getType() == ValueBase::COORDINATE,
-           "Value is not a Coordinate");
-    return boost::static_pointer_cast
-        < CoordinateFactory < 1, double > >(v);
-}
-
-CoordinateDouble2 to_coordinateDouble2(Value v)
-{
-    Assert(utils::InternalError, v->getType() == ValueBase::COORDINATE,
-           "Value is not a Coordinate");
-    return boost::static_pointer_cast
-        < CoordinateFactory < 2, double > >(v);
-}
-
-CoordinateDouble3 to_coordinateDouble3(Value v)
-{
-    Assert(utils::InternalError, v->getType() == ValueBase::COORDINATE,
-           "Value is not a Coordinate");
-    return boost::static_pointer_cast
-        < CoordinateFactory < 3, double > >(v);
-}
-
 }} // namespace vle value

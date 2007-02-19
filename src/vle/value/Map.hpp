@@ -86,8 +86,6 @@ namespace vle { namespace value {
          *
          * @param name the name of Value to add.
          * @param value the Value to add.
-         *
-         * @throw Exception::Internal if value is null.
          */
         void addValue(const std::string& name, Value value);
 

@@ -24,8 +24,6 @@
  */
 
 #include <vle/value/Boolean.hpp>
-#include <vle/utils/Tools.hpp>
-#include <vle/utils/XML.hpp>
 
 namespace vle { namespace value {
 
@@ -58,9 +56,9 @@ std::string BooleanFactory::toString() const
 std::string BooleanFactory::toXML() const
 {
     if (m_value)
-	return "<BOOLEAN VALUE=\"true\" />";
+	return "<boolean>true</boolean>";
     else
-	return "<BOOLEAN VALUE=\"false\" />";
+	return "<boolean>false</boolean>";
 }
 
 }} // namespace vle value

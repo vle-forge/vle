@@ -24,7 +24,6 @@
  */
 
 #include <vle/value/String.hpp>
-#include <vle/utils/Tools.hpp>
 
 namespace vle { namespace value {
 
@@ -40,9 +39,9 @@ Value StringFactory::clone() const
 
 std::string StringFactory::toXML() const
 {
-    std::string val("<STRING VALUE=\"");
+    std::string val("<string>");
     val += m_value;
-    val += "\" />";
+    val += "</string>";
     return val;
 }
 

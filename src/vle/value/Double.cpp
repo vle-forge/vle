@@ -24,8 +24,6 @@
  */
 
 #include <vle/value/Double.hpp>
-#include <vle/utils/Tools.hpp>
-#include <vle/utils/XML.hpp>
 
 namespace vle { namespace value {
 
@@ -41,19 +39,19 @@ Value DoubleFactory::clone() const
 
 std::string DoubleFactory::toFile() const
 {
-    return vle::utils::to_string(m_value);
+    return boost::lexical_cast < std::string >(m_value);
 }
 
 std::string DoubleFactory::toString() const
 {
-    return vle::utils::to_string(m_value);
+    return boost::lexical_cast < std::string >(m_value);
 }
 
 std::string DoubleFactory::toXML() const
 {
-    std::string val("<DOUBLE VALUE=\"");
-    val += vle::utils::to_string(m_value);
-    val += "\" />";
+    std::string val("<double>");
+    val += boost::lexical_cast < std::string >(m_value);
+    val += "</double>";
     return val;
 }
 

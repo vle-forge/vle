@@ -29,8 +29,6 @@
 #include <vle/value/Integer.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Boolean.hpp>
-#include <vle/utils/Debug.hpp>
-#include <vle/utils/Exception.hpp>
 
 namespace vle { namespace value {
 
@@ -39,7 +37,6 @@ MapFactory::MapFactory(const MapFactory& mapfactory) :
 {
     for (MapValueConstIt it = mapfactory.m_value.begin();
          it != mapfactory.m_value.end(); ++it) {
-        // addValue((*it).first, (*it).second->clone());
         addValue((*it).first, (*it).second);
     }
 }
@@ -56,9 +53,6 @@ Value MapFactory::clone() const
 
 void MapFactory::addValue(const std::string& name, Value value)
 {
-    Assert(vle::utils::InternalError, value,
-           boost::format("Push null value '%1%' into Map\n") % name);
-    
     MapValueIt it = m_value.find(name);
     if (it == m_value.end()) {
         m_value[name] = value;
@@ -71,8 +65,10 @@ Value MapFactory::getValue(const std::string& name) const
 {
     MapValueConstIt it = m_value.find(name);
 
-    Assert(vle::utils::InternalError, it != m_value.end(),
-           boost::format("Map Value have no value name '%1%'\n") % name);
+    if (it == m_value.end()) {
+        throw(std::runtime_error((boost::format(
+                        "Map Value have no value name '%1%'\n") % name).str()));
+    }
 
     return (*it).second;
 }
@@ -164,18 +160,18 @@ std::string MapFactory::toString() const
 
 std::string MapFactory::toXML() const
 {
-    std::string s="<MAP>";
+    std::string s="<map>";
     MapValueConstIt it = m_value.begin();
 
     while (it != m_value.end()) {
-        s += "<VALUE NAME=\"";
+        s += "<key name=\"";
         s += (*it).first;
         s += "\">";
         s += (*it).second->toXML();
-        s += "</VALUE>";
+        s += "</key>";
 	++it;
     }
-    s += "</MAP>";
+    s += "</map>";
     return s;
 }
 

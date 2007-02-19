@@ -24,7 +24,6 @@
  */
 
 #include <vle/value/Integer.hpp>
-#include <vle/utils/Tools.hpp>
 
 namespace vle { namespace value {
 
@@ -40,19 +39,19 @@ Value IntegerFactory::clone() const
 
 std::string IntegerFactory::toFile() const
 {
-    return vle::utils::to_string(m_value);
+    return boost::lexical_cast < std::string >(m_value);
 }
 
 std::string IntegerFactory::toString() const
 {
-    return vle::utils::to_string(m_value);
+    return boost::lexical_cast < std::string >(m_value); 
 }
 
 std::string IntegerFactory::toXML() const
 {
-    std::string val("<INTEGER VALUE=\"");
-    val += vle::utils::to_string(m_value);
-    val += "\" />";
+    std::string val("<integer>");
+    val += boost::lexical_cast < std::string >(m_value); 
+    val += "</integer>";
     return val;
 }
 

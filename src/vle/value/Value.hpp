@@ -33,8 +33,7 @@
 #include <vle/utils/Debug.hpp>
 
 namespace vle {
-    
-    
+ 
     /** 
      * @brief The value transported by event. All class are manager using a
      * reference counter from Boost.org: boost::shared_ptr < type >.
@@ -48,11 +47,8 @@ namespace vle {
         class StringFactory;
         class SetFactory;
         class MapFactory;
-
-        template < size_t n, class Class > class CoordinateFactory ;
-        class DirectionFactory;
-        class SpeedFactory;
-
+        class TupleFactory;
+        class TableFactory;
 
         typedef boost::shared_ptr < ValueBase > Value;
         typedef boost::shared_ptr < BooleanFactory > Boolean;
@@ -61,22 +57,9 @@ namespace vle {
         typedef boost::shared_ptr < StringFactory > String;
         typedef boost::shared_ptr < SetFactory > Set;
         typedef boost::shared_ptr < MapFactory > Map;
+        typedef boost::shared_ptr < TupleFactory > Tuple;
+        typedef boost::shared_ptr < TableFactory > Table;
         
-        typedef boost::shared_ptr < CoordinateFactory < 1, int > >
-            CoordinateInt1;
-        typedef boost::shared_ptr < CoordinateFactory < 1, double > >
-            CoordinateDouble1;
-        typedef boost::shared_ptr < CoordinateFactory < 2, int > >
-            CoordinateInt2;
-        typedef boost::shared_ptr < CoordinateFactory < 2, double > >
-            CoordinateDouble2;
-        typedef boost::shared_ptr < CoordinateFactory < 3, int > >
-            CoordinateInt3;
-        typedef boost::shared_ptr < CoordinateFactory < 3, double > >
-            CoordinateDouble3;
-
-        typedef boost::shared_ptr < DirectionFactory > Direction;
-        typedef boost::shared_ptr < SpeedFactory > Speed;
 
         /**
          * @brief Virtual class to assign Value into Event object.
@@ -84,8 +67,8 @@ namespace vle {
         class ValueBase
         {
         public:
-            enum type { BOOLEAN, INTEGER, DOUBLE, STRING, SET, MAP, POINTER,
-                SPEED, COORDINATE, DIRECTION };
+            enum type { BOOLEAN, INTEGER, DOUBLE, STRING, SET, MAP,
+                TUPLE, TABLE };
 
             /**
              * Defaut constructor. To use Values class, you must use the static
@@ -167,17 +150,9 @@ namespace vle {
             inline bool isMap() const
             { return getType() == ValueBase::MAP; }
 
-            inline bool isPointer() const
-            { return getType() == ValueBase::POINTER; }
+            inline bool isTuple() const
+            { return getType() == ValueBase::TUPLE; }
 
-            inline bool isSpeed() const
-            { return getType() == ValueBase::SPEED; }
-
-            inline bool isCoordinate() const
-            { return getType() == ValueBase::COORDINATE; }
-
-            inline bool isDirection() const
-            { return getType() == ValueBase::DIRECTION; }
 
             //
             //
@@ -235,12 +210,8 @@ namespace vle {
         Double to_double(Value v);
         Map to_map(Value v);
         Set to_set(Value v);
-        CoordinateInt1 to_coordinateInt1(Value v);
-        CoordinateInt2 to_coordinateInt2(Value v);
-        CoordinateInt3 to_coordinateInt3(Value v);
-        CoordinateDouble1 to_coordinateDouble1(Value v);
-        CoordinateDouble2 to_coordinateDouble2(Value v);
-        CoordinateDouble3 to_coordinateDouble3(Value v);
+        Tuple to_tuple(Value v);
+        Table to_table(Value v);
 
     } // namespace value
 
