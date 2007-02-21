@@ -495,6 +495,19 @@ void Simulator::startEOVStream()
 //    Glib::usleep(1000000); // FIXME pose obligatoire ?!?
 }
 
+void Simulator::startNetStream()
+{
+    const vpz::Measures& measures = m_experiment.measures();
+    std::map < std::string, vpz::Measure >::const_iterator it;
+    for (it = measures.measures().begin(); it != measures.measures().end();
+         ++it) {
+        const vpz::Output& o = measures.outputs().find((*it).second.output());
+
+        if (o.format() == vpz::Output::NET)
+	  startNetStream((*it).second.output(),o.location());
+    }
+}
+
 void Simulator::startNetStream(const std::string& output,
                                const std::string& outputhost)
 {
@@ -533,7 +546,8 @@ void Simulator::startLocalStream()
         Stream* stream = 0;
         const vpz::Output& o = measures.outputs().find((*it).second.output());
 
-        if (o.format() == vpz::Output::TEXT or o.format() == vpz::Output::SDML) {
+        if (o.format() == vpz::Output::TEXT 
+	    or o.format() == vpz::Output::SDML) {
             std::string file(m_experiment.name());
             file += "_";
             file += (*it).first;
@@ -567,6 +581,7 @@ void Simulator::parseExperiment()
 {
     m_duration = m_experiment.duration();
     startEOVStream();
+    startNetStream();
     startLocalStream();
 }
 

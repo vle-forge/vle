@@ -43,8 +43,9 @@ namespace vle { namespace vpz {
          * - TEXT: values are writing into the stream with a text format.
          * - SDML: values are writing into the stream with a SDML format.
          * - EOV: values are writing into the stream with a EOV format.
+         * - NET: values are writing into the stream with a NET format.
          */
-        enum Format { TEXT, SDML, EOV };
+      enum Format { TEXT, SDML, EOV, NET };
 
         Output();
 
@@ -88,6 +89,19 @@ namespace vle { namespace vpz {
                           const std::string& location = std::string());
 
         /** 
+         * @brief Set the output with the Net stream information. The name and
+         * the plugin are obligatory,  the location defines host with syntax:
+         * host:port. It location is empty, location is initialised by ":8000".
+         * 
+         * @param plugin the plugin's name.
+         * @param location the host:port definition.
+         *
+         * @throw Exception::Internal if plugin is empty.
+         */
+        void setNetStream(const std::string& plugin,
+                          const std::string& location = std::string());
+
+        /** 
          * @brief Set the output XML to initialise the plugin. The XML have the
          * OUTPUT tag.
          * 
@@ -105,7 +119,7 @@ namespace vle { namespace vpz {
 
         std::string streamformat() const
         { return (m_format == TEXT ? "textstream" : m_format == SDML ?
-                  "sdmlstream" : "eovstream"); }
+                  "sdmlstream" : m_format == NET ? "netstream" : "eovstream"); }
 
         /** 
          * @brief Get the plugin of this Output. If format is not Output::Eov,

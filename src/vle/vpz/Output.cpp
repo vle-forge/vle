@@ -45,6 +45,7 @@ void Output::init(xmlpp::Element* elt)
     AssertI(elt->get_name() == "OUTPUT");
 
     Glib::ustring format(xml::get_attribute(elt, "FORMAT"));
+
     if (format == "text") {
         setTextStream(xml::get_attribute(elt, "LOCATION"));
     } else if (format == "sdml") {
@@ -52,6 +53,9 @@ void Output::init(xmlpp::Element* elt)
     } else if (format == "eov") {
         setEovStream(xml::get_attribute(elt, "PLUGIN"),
                      xml::get_attribute(elt, "LOCATION"));
+    } else if (format == "net") {
+        setNetStream(xml::get_attribute(elt, "PLUGIN"),
+		     xml::get_attribute(elt, "LOCATION"));
     } else {
         Throw(utils::ParseError, "Unknow output format");
     }
@@ -76,6 +80,10 @@ void Output::write(xmlpp::Element* elt) const
         break;
     case Output::EOV:
         elt->set_attribute("FORMAT", "eov");
+        elt->set_attribute("PLUGIN", m_plugin);
+        break;
+    case Output::NET:
+        elt->set_attribute("FORMAT", "net");
         elt->set_attribute("PLUGIN", m_plugin);
         break;
     }
@@ -103,6 +111,16 @@ void Output::setEovStream(const std::string& plugin,
     AssertI(not plugin.empty());
 
     m_format = Output::EOV;
+    m_location = (location.empty()) ? "localhost:8000" : location;
+    m_plugin.assign(plugin);
+}
+
+void Output::setNetStream(const std::string& plugin,
+                          const std::string& location)
+{
+    AssertI(not plugin.empty());
+
+    m_format = Output::NET;
     m_location = (location.empty()) ? "localhost:8000" : location;
     m_plugin.assign(plugin);
 }

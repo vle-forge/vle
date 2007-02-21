@@ -271,6 +271,8 @@ namespace vle { namespace devs {
 
         void startEOVStream();
 
+        void startNetStream();
+
         void startNetStream(const std::string& output,
                             const std::string& outputhost);
 
