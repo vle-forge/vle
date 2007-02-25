@@ -44,7 +44,8 @@ namespace vle { namespace vpz {
         ~VpzStackSax()
         { }
 
-        void push_vpz();
+        void push_vpz(const std::string& author, float version,
+                      const std::string& date);
         void push_structure();
         void push_model(const xmlpp::SaxParser::AttributeList& att);
         void push_port(const xmlpp::SaxParser::AttributeList& att);
@@ -212,6 +213,10 @@ namespace vle { namespace vpz {
 
         const value::Value& get_value(const size_t pos) const;
 
+        template < typename T >
+        static T get_attribute(const xmlpp::SaxParser::AttributeList& lst,
+                                const Glib::ustring& name);
+
     private:
         /** 
          * @brief Delete all information from Sax parser like stack, etc. Use it
@@ -241,6 +246,28 @@ namespace vle { namespace vpz {
         bool                            m_isVPZ;
         bool                            m_isTrame;
     };
+    
+    template < typename T >
+        T VLESaxParser::get_attribute(
+            const xmlpp::SaxParser::AttributeList& lst,
+            const Glib::ustring& name)
+        {
+            xmlpp::SaxParser::AttributeList::const_iterator it;
+            it = std::find_if(lst.begin(), lst.end(),
+                              xmlpp::SaxParser::AttributeHasName(name));
+            Assert(utils::SaxParserError, it != lst.end(),
+                    (boost::format("Unknow attribute '%1%'") % name).str());
+
+            T result;
+            try {
+                result = boost::lexical_cast < T >((*it).value);
+            } catch(const std::exception& e) {
+                Throw(utils::SaxParserError, (boost::format(
+                            "Cannot convert '%1%' into desired type") %
+                        name).str());
+            }
+            return result;
+        }
 
 }} // namespace vle vpz
 

@@ -23,6 +23,7 @@
  */
 
 #include <vle/vpz/SaxVPZ.hpp>
+#include <vle/vpz/Vpz.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/value/Map.hpp>
@@ -37,9 +38,16 @@
 
 namespace vle { namespace vpz {
 
-void VpzStackSax::push_vpz()
+void VpzStackSax::push_vpz(const std::string& author, float version,
+                           const std::string& date)
 {
     AssertS(utils::SaxParserError, m_stack.empty());
+
+    vpz::Vpz* vpz = new vpz::Vpz();
+    vpz->setAuthor(author);
+    vpz->setVersion(version);
+    vpz->setDate(date);
+    m_stack.push(vpz);
 }
 
 void VpzStackSax::push_structure()
@@ -260,27 +268,21 @@ void VLESaxParser::on_start_element(
     } else if (name == "map") {
         m_valuestack.push_map();
     } else if (name == "key") {
-        xmlpp::SaxParser::AttributeList::const_iterator it;
-        it = std::find_if(att.begin(), att.end(), 
-                           xmlpp::SaxParser::AttributeHasName("name"));
-        AssertS(utils::SaxParserError, it != att.end());
-
-        m_valuestack.push_map_key((*it).value);
+        m_valuestack.push_map_key(get_attribute < Glib::ustring >(att, "name"));
     } else if (name == "tuple") {
         m_valuestack.push_tuple();
     } else if (name == "table") {
-        xmlpp::SaxParser::AttributeList::const_iterator itw, ith;
-        itw = std::find_if(att.begin(), att.end(), 
-                           xmlpp::SaxParser::AttributeHasName("width"));
-        ith = std::find_if(att.begin(), att.end(), 
-                           xmlpp::SaxParser::AttributeHasName("height"));
-        AssertS(utils::SaxParserError, ith != att.end() and itw != att.end());
-
-        m_valuestack.push_table(boost::lexical_cast < size_t >((*itw).value),
-                                boost::lexical_cast < size_t >((*ith).value));
+        m_valuestack.push_table(
+            get_attribute < value::TableFactory::index >(att, "width"),
+            get_attribute < value::TableFactory::index >(att, "height"));
     } else if (name == "vpz") {
         AssertS(utils::SaxParserError, not m_isValue and not m_isTrame);
-        m_isValue = true;
+        m_isVPZ = true;
+        m_vpzstack.push_vpz(
+            get_attribute < std::string >(att, "author"),
+            get_attribute < float >(att, "version"),
+            get_attribute < std::string >(att, "date"));
+
     } else if (name == "structure") {
         m_vpzstack.push_structure();
     } else if (name == "model") {

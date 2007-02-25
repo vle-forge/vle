@@ -30,7 +30,7 @@
 
 namespace vle { namespace vpz {
 
-    class Vpz
+    class Vpz : public Base
     {
     public:
         Vpz() :
@@ -41,6 +41,10 @@ namespace vle { namespace vpz {
 
         ~Vpz()
         { }
+
+        virtual void init(xmlpp::Element*) { }
+
+        virtual void write(xmlpp::Element*) const { }
 
         /** 
          * @brief Open a VPZ file project.
@@ -120,10 +124,33 @@ namespace vle { namespace vpz {
          * @param filename string to change if no extension exist.
          */
         static void fixExtension(std::string& filename);
+
+        inline float getVersion() const
+        { return m_version; }
+
+        inline const std::string& getAuthor() const
+        { return m_author; }
+
+        inline const std::string& getDate() const
+        { return m_date; }
+
+        inline void setVersion(float f)
+        { if (f >= 0) m_version = f; }
+
+        inline void setAuthor(const std::string& author)
+        { if (not author.empty()) m_author.assign(author); }
+
+        inline void setDate(const std::string& date)
+        { if (not date.empty()) m_date.assign(date); }
+
     private:
         std::string         m_filename;
         Project             m_project;
         bool                m_isGzip;
+
+        float               m_version;
+        std::string         m_author;
+        std::string         m_date;
     };
 
 }} // namespace vle vpz
