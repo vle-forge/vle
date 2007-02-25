@@ -13,4 +13,3 @@ libvalueincludedir = $(vleincludedir)/vle/value
 libvalueinclude_HEADERS = $(libvalue_coreheaders)
 libvalue_la_LIBADD = @VLE_LIBS@ @XML_LIBS@ \
 		     $(top_srcdir)/src/vle/utils/libutils.la
-endif
