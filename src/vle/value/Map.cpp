@@ -29,144 +29,101 @@
 #include <vle/value/Integer.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Boolean.hpp>
-#include <vle/utils/Debug.hpp>
-#include <vle/utils/Exception.hpp>
 
 namespace vle { namespace value {
 
-Map::Map(xmlpp::Element* root)
+MapFactory::MapFactory(const MapFactory& mapfactory) :
+    ValueBase(mapfactory)
 {
-    xmlpp::Node::NodeList lst = root->get_children("VALUE");
-    for (xmlpp::Node::NodeList::iterator it = lst.begin();
-         it != lst.end(); ++it) {
-
-        xmlpp::Node::NodeList lst2 = ((xmlpp::Element*)*it)->get_children();
-        for (xmlpp::Node::NodeList::iterator jt = lst2.begin();
-             jt != lst2.end(); ++jt) {
-            if (vle::utils::xml::is_element(*jt)) {
-                addValue(vle::utils::xml::get_attribute(
-                    ((xmlpp::Element*)*it), "NAME"),
-                     Value::getValue((xmlpp::Element*)*jt));
-            }
-        }
+    for (MapValueConstIt it = mapfactory.m_value.begin();
+         it != mapfactory.m_value.end(); ++it) {
+        addValue((*it).first, (*it).second);
     }
 }
 
-Map::~Map()
+Map MapFactory::create()
 {
-    for (MapValue::iterator it = m_value.begin();
-         it != m_value.end(); ++it)
-        delete (*it).second;
+    return Map(new MapFactory());
 }
 
-void Map::addValue(const std::string& name, Value* value)
+Value MapFactory::clone() const
 {
-    Assert(vle::utils::InternalError, value,
-           boost::format("Push null value '%1%' into Map\n") % name);
-    
-    MapValue::iterator it = m_value.find(name);
+    return Value(new MapFactory(*this));
+}
+
+void MapFactory::addValue(const std::string& name, Value value)
+{
+    MapValueIt it = m_value.find(name);
     if (it == m_value.end()) {
         m_value[name] = value;
     } else {
-        delete (*it).second;
         (*it).second = value;
     }
 }
 
-Value* Map::getValue(const std::string& name) const
+Value MapFactory::getValue(const std::string& name) const
 {
-    MapValue::const_iterator it = m_value.find(name);
+    MapValueConstIt it = m_value.find(name);
 
-    Assert(vle::utils::InternalError, it != m_value.end(),
-           boost::format("Map Value have no value name '%1%'\n") % name);
+    if (it == m_value.end()) {
+        throw(std::runtime_error((boost::format(
+                        "Map Value have no value name '%1%'\n") % name).str()));
+    }
 
     return (*it).second;
 }
 
-const std::string& Map::getStringValue(const std::string& name) const
+const std::string& MapFactory::getStringValue(const std::string& name) const
 {
-    Value* val = getValue(name);
-
-    Assert(vle::utils::InternalError, val->getType() == Value::STRING,
-           boost::format("Value is not a String '%1%'\n") % name);
-
-    return ((String*)val)->stringValue();
+    Value val = getValue(name);
+    return to_string(val)->stringValue();
 }
     
-bool Map::getBooleanValue(const std::string& name) const
+bool MapFactory::getBooleanValue(const std::string& name) const
 {
-    Value* val = getValue(name);
-
-    Assert(vle::utils::InternalError, val->getType() == Value::BOOLEAN,
-           boost::format("Value is not a Boolean '%1%'\n") % name);
-
-    return ((Boolean*)val)->boolValue();
+    Value val = getValue(name);
+    return to_boolean(val)->boolValue();
 }
     
-long Map::getLongValue(const std::string& name) const
+long MapFactory::getLongValue(const std::string& name) const
 {
-    Value* val = getValue(name);
+    Value val = getValue(name);
+    return to_integer(val)->longValue();
+}
 
-    Assert(vle::utils::InternalError, val->getType() == Value::INTEGER,
-           boost::format("Value is not a Integer '%1%'\n") % name);
-
-    return ((Integer*)val)->longValue();
+int MapFactory::getIntValue(const std::string& name) const
+{
+    Value val = getValue(name);
+    return to_integer(val)->intValue();
 }
     
-double Map::getDoubleValue(const std::string& name) const
+double MapFactory::getDoubleValue(const std::string& name) const
 {
-    Value* val = getValue(name);
-
-    Assert(vle::utils::InternalError, val->getType() == Value::DOUBLE,
-           boost::format("Value is not a Double '%1%'\n") % name);
-
-    return ((Double*)val)->doubleValue();
+    Value val = getValue(name);
+    return to_double(val)->doubleValue();
 }
     
-Map* Map::getMapValue(const std::string& name) const
+Map MapFactory::getMapValue(const std::string& name) const
 {
-    Value* val = getValue(name);
-
-    Assert(vle::utils::InternalError, val->getType() == Value::MAP,
-           boost::format("Value is not a Map '%1%'\n") % name);
-
-    return ((Map*)val);
+    Value val = getValue(name);
+    return to_map(val);
 }
     
-Set* Map::getSetValue(const std::string& name) const
+Set MapFactory::getSetValue(const std::string& name) const
 {
-    Value* val = getValue(name);
-
-    Assert(vle::utils::InternalError, val->getType() == Value::SET,
-           boost::format("Value is not a Set '%1%'\n") % name);
-
-    return ((Set*)val);
+    Value val = getValue(name);
+    return to_set(val);
 }
 
-void Map::clear()
+void MapFactory::clear()
 {
-    for (MapValue::iterator it = m_value.begin(); it != m_value.end(); ++it) {
-        delete (*it).second;
-        (*it).second = 0;
-    }
-
     m_value.clear();
 }
     
-Value* Map::clone() const
-{
-    Map* r = new Map();
-    for (MapValue::const_iterator it = m_value.begin();
-         it != m_value.end(); ++it)
-	r->addValue((*it).first, (*it).second->clone());
-
-    return r;
-}
-
-std::string Map::toFile() const
+std::string MapFactory::toFile() const
 {
     std::string s;
-    MapValue::const_iterator it = m_value.begin();
+    MapValueConstIt it = m_value.begin();
 
     while (it != m_value.end()) {
         s += "(";
@@ -182,10 +139,10 @@ std::string Map::toFile() const
     return s;
 }
 
-std::string Map::toString() const
+std::string MapFactory::toString() const
 {
     std::string s;
-    MapValue::const_iterator it = m_value.begin();
+    MapValueConstIt it = m_value.begin();
 
     while (it != m_value.end()) {
         s += "(";
@@ -201,20 +158,20 @@ std::string Map::toString() const
     return s;
 }
 
-std::string Map::toXML() const
+std::string MapFactory::toXML() const
 {
-    std::string s="<MAP>";
-    MapValue::const_iterator it = m_value.begin();
+    std::string s="<map>";
+    MapValueConstIt it = m_value.begin();
 
     while (it != m_value.end()) {
-        s += "<VALUE NAME=\"";
+        s += "<key name=\"";
         s += (*it).first;
         s += "\">";
         s += (*it).second->toXML();
-        s += "</VALUE>";
+        s += "</key>";
 	++it;
     }
-    s += "</MAP>";
+    s += "</map>";
     return s;
 }
 

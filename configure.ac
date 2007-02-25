@@ -71,7 +71,15 @@ dnl ***************************************************************************
 AX_CXX_GCC_ABI_DEMANGLE
 AX_BOOST_BASE([1.32.0])
 AX_BOOST_UNIT_TEST_FRAMEWORK
-AM_CONDITIONAL(USE_TEST, test ! x$BOOST_UNIT_TEST_FRAMEWORK_LIB = xyes)
+
+if test "x$BOOST_UNIT_TEST_FRAMEWORK_LIB" = "x"
+then
+	enable_test="no"
+else
+	enable_test="yes"
+fi
+
+AM_CONDITIONAL(USE_TEST, test "$enable_test" = "yes")
 
 PKG_CHECK_MODULES(VLE, glibmm-2.4 >= 2.4.0)
 AC_SUBST(VLE_LIBS)
@@ -262,6 +270,7 @@ AC_CONFIG_FILES([Makefile
 		 src/vle/utils/Makefile
 		 src/vle/graph/Makefile
 		 src/vle/vpz/Makefile
+		 src/vle/vpz/test/Makefile
 		 src/vle/devs/Makefile
 		 src/vle/stream/Makefile
 		 src/vle/stream/plugins/eovstream/Makefile
@@ -293,6 +302,7 @@ AC_MSG_RESULT([* Using '$CC' for C compiler.])
 AC_MSG_RESULT([* Building with '$CFLAGS' for C compiler flags.])
 AC_MSG_RESULT([* Building with '$CXXFLAGS' for C++ compiler flags.])
 AC_MSG_RESULT([*])
+AC_MSG_RESULT([* Build with test case.........: $enable_test])
 AC_MSG_RESULT([* Build with SQL extension.....: $enable_sql])
 AC_MSG_RESULT([* Build with python extension..: $enable_python])
 AC_MSG_RESULT([* Build for win32 platform.....: $platform_win32])

@@ -146,7 +146,7 @@ namespace vle { namespace extension {
         
         virtual void processInternalEvent(devs::InternalEvent* event);
         
-        virtual value::Value* processStateEvent(devs::StateEvent* event) const;
+        virtual value::Value processStateEvent(devs::StateEvent* event) const;
 
         /*
          * 
@@ -154,13 +154,13 @@ namespace vle { namespace extension {
          *
          */
 
-        static value::Map* buildMessageAddConnection(
+        static value::Map buildMessageAddConnection(
                             const std::string& srcModelName,
                             const std::string& srcPortName,
                             const std::string& dstModelName,
                             const std::string& dstPortName);
 
-        static value::Map* buildMessageChangeConnection(
+        static value::Map buildMessageChangeConnection(
                             const std::string& srcModelName,
                             const std::string& srcPortName,
                             const std::string& oldDstModelName,
@@ -168,47 +168,47 @@ namespace vle { namespace extension {
                             const std::string& newDstModelName,
                             const std::string& newDstPortName);
 
-        static value::Map* buildMessageRemoveConnection(
+        static value::Map buildMessageRemoveConnection(
                             const std::string& srcModelName,
                             const std::string& srcPortName,
                             const std::string& dstModelName,
                             const std::string& dstPortName);
 
-        static value::Map* buildMessageAddModel(
+        static value::Map buildMessageAddModel(
                             const std::string& prefixModelName,
                             const std::string& className,
                             const std::string& xmlDynamics,
                             const std::string& xmlInits,
-                            value::Set* connection);
+                            value::Set connection);
 
-        static value::Map* buildMessageRemoveModel(
+        static value::Map buildMessageRemoveModel(
                             const std::string& modelName);
 
-        static value::Map* buildMessageChangeModel(
+        static value::Map buildMessageChangeModel(
                             const std::string& modelName,
                             const std::string& className,
                             const std::string& newClassName);
 
-        static value::Map* buildMessageBuildModel(
+        static value::Map buildMessageBuildModel(
                             const std::string& prefixModelName,
                             const std::string& className,
                             const std::string& xmlCode,
                             const std::string& xmlDynamics,
                             const std::string& xmlInits);
 
-        static value::Map* buildMessageAddInputPort(
+        static value::Map buildMessageAddInputPort(
                             const std::string& modelName,
                             const std::string& portName);
 
-        static value::Map* buildMessageAddOutputPort(
+        static value::Map buildMessageAddOutputPort(
                             const std::string& modelName,
                             const std::string& portName);
 
-        static value::Map* buildMessageRemoveInputPort(
+        static value::Map buildMessageRemoveInputPort(
                             const std::string& modelName,
                             const std::string& portName);
 
-        static value::Map* buildMessageRemoveOutputPort(
+        static value::Map buildMessageRemoveOutputPort(
                             const std::string& modelName,
                             const std::string& portName);
 
@@ -218,74 +218,74 @@ namespace vle { namespace extension {
          *
          */
 
-        static value::Set* addToBagAddConnection(
+        static value::Set addToBagAddConnection(
                             const std::string& srcModelName,
                             const std::string& srcPortName,
                             const std::string& dstModelName,
                             const std::string& dstPortName,
-                            value::Set* currentbag = 0);
+                            value::Set currentbag);
 
-        static value::Set* addToBagChangeConnection(
+        static value::Set addToBagChangeConnection(
                             const std::string& srcModelName,
                             const std::string& srcPortName,
                             const std::string& oldDstModelName,
                             const std::string& oldDstPortName,
                             const std::string& newDstModelName,
                             const std::string& newDstPortName,
-                            value::Set* currentbag = 0);
+                            value::Set currentbag);
 
-        static value::Set* addToBagRemoveConnection(
+        static value::Set addToBagRemoveConnection(
                             const std::string& srcModelName,
                             const std::string& srcPortName,
                             const std::string& dstModelName,
                             const std::string& dstPortName,
-                            value::Set* currentbag = 0);
+                            value::Set currentbag);
 
-        static value::Set* addToBagAddModel(
+        static value::Set addToBagAddModel(
                             const std::string& prefixModelName,
                             const std::string& className,
                             const std::string& xmlDynamics,
                             const std::string& xmlInits,
-                            value::Set* connection,
-                            value::Set* currentbag = 0);
+                            value::Set connection,
+                            value::Set currentbag);
 
-        static value::Set* addToBagRemoveModel(
+        static value::Set addToBagRemoveModel(
                             const std::string& modelName,
-                            value::Set* currentbag = 0);
+                            value::Set currentbag);
 
-        static value::Set* addToBagChangeModel(
+        static value::Set addToBagChangeModel(
                             const std::string& modelName,
                             const std::string& className,
                             const std::string& newClassName,
-                            value::Set* currentbag = 0);
+                            value::Set currentbag);
 
-        static value::Set* addToBagBuildModel(
+        static value::Set addToBagBuildModel(
                             const std::string& prefixModelName,
                             const std::string& className,
                             const std::string& xmlCode,
                             const std::string& xmlDynamics,
                             const std::string& xmlInits,
-                            value::Set* currentbag = 0);
+                            value::Set currentbag);
 
-        static value::Set* addToBagAddInputPort(
+        static value::Set addToBagAddInputPort(
                             const std::string& modelName,
                             const std::string& portName,
-                            value::Set* currentbag = 0);
+                            value::Set currentbag);
 
-        static value::Set* addToBagAddOutputPort(
+        static value::Set addToBagAddOutputPort(
                             const std::string& modelName,
                             const std::string& portName,
-                            value::Set* currentbag = 0);
+                            value::Set currentbag);
 
-        static value::Set* addToBagRemoveInputPort(
+        static value::Set addToBagRemoveInputPort(
                             const std::string& modelName,
                             const std::string& portName,
-                            value::Set* currentbag = 0);
+                            value::Set currentbag);
 
-        static value::Set* addToBagRemoveOutputPort(
+        static value::Set addToBagRemoveOutputPort(
                             const std::string& modelName,
                             const std::string& portName,
-                            value::Set* currentbag = 0);
+                            value::Set currentbag);
 
     protected:
         bool addConnection(const std::string& srcModelName,
@@ -309,7 +309,7 @@ namespace vle { namespace extension {
                       const std::string& className,
                       const std::string& xmlDynamics,
                       const std::string& xmlInits,
-                      value::Set* connection);
+                      value::Set connection);
 
 	bool removeModel(const std::string& modelName);
 

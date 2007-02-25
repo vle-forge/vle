@@ -27,158 +27,196 @@
 #define UTILS_VALUE_VALUE_HPP
 
 #include <string>
-#include <vle/utils/XML.hpp>
+#include <vector>
+#include <boost/shared_ptr.hpp>
+#include <libxml++/libxml++.h>
+#include <vle/utils/Debug.hpp>
 
-namespace vle { namespace value {
-
-    /**
-     * @brief Virtual class to assign Value into Event object.
+namespace vle {
+ 
+    /** 
+     * @brief The value transported by event. All class are manager using a
+     * reference counter from Boost.org: boost::shared_ptr < type >.
      */
-    class Value
-    {
-    public:
-        enum type { BOOLEAN, INTEGER, DOUBLE, STRING, SET, MAP, POINTER,
-            SPEED, COORDINATE, DIRECTION };
+    namespace value {
+
+        class ValueBase;
+        class BooleanFactory;
+        class IntegerFactory;
+        class DoubleFactory;
+        class StringFactory;
+        class SetFactory;
+        class MapFactory;
+        class TupleFactory;
+        class TableFactory;
+
+        typedef boost::shared_ptr < ValueBase > Value;
+        typedef boost::shared_ptr < BooleanFactory > Boolean;
+        typedef boost::shared_ptr < IntegerFactory > Integer;
+        typedef boost::shared_ptr < DoubleFactory > Double;
+        typedef boost::shared_ptr < StringFactory > String;
+        typedef boost::shared_ptr < SetFactory > Set;
+        typedef boost::shared_ptr < MapFactory > Map;
+        typedef boost::shared_ptr < TupleFactory > Tuple;
+        typedef boost::shared_ptr < TableFactory > Table;
+        
 
         /**
-         * Defaut constructor.  All value class must develop a constructor with
-         * xmlpp::Element value to parse the current node set the value. If the
-         * parsing failed, initial value are used, no exception are throw.
-         *
-         * @code
-         * Value* i = new Integer(xmlroot);
-         * @endcode
+         * @brief Virtual class to assign Value into Event object.
          */
-        Value() { }
+        class ValueBase
+        {
+        public:
+            enum type { BOOLEAN, INTEGER, DOUBLE, STRING, SET, MAP,
+                TUPLE, TABLE };
 
-        virtual ~Value() { }
+            /**
+             * Defaut constructor. To use Values class, you must use the static
+             * function create from all subclass.
+             *
+             * @code
+             * Value val = value::IntegerFactory::create(13);
+             * @endcode
+             */
+            ValueBase() { }
 
-        /**
-         * Pure virtual clone function.
-         *
-         * @return Clone of instantiate object.
-         */
-        virtual Value* clone() const =0;
+            virtual ~ValueBase() { }
 
-        //
-        //
-        // Pure virtual function
-        //
-        // 
+            static const Value empty;
 
-        /**
-         * Transform value into a simple std::string for text file.
-         *
-         * @return std::string representation of Value.
-         */
-        virtual std::string toFile() const =0;
+            /**
+             * Pure virtual clone function.
+             *
+             * @return Clone of instantiate object.
+             */
+            virtual Value clone() const =0;
 
-        /**
-         * Transform value into a simple std::string.
-         *
-         * @return std::string representation of Value.
-         */
-        virtual std::string toString() const =0;
+            //
+            //
+            // Pure virtual function
+            //
+            // 
 
-        /**
-         * Transform value into XML structure.
-         *
-         * @return std::string representation of XML structure of Value.
-         */
-        virtual std::string toXML() const =0;
+            /**
+             * Transform value into a simple std::string for text file.
+             *
+             * @return std::string representation of Value.
+             */
+            virtual std::string toFile() const =0;
 
-        //
-        //
-        // Function to check type at runtime.
-        //
-        //
+            /**
+             * Transform value into a simple std::string.
+             *
+             * @return std::string representation of Value.
+             */
+            virtual std::string toString() const =0;
 
-        /**
-         * Return the type of value. The type is one of the 'type' enumeration ie.
-         * BOOL, INTEGER, DOUBLE, STRING, SET, MAP.
-         *
-         * @return the type of value objet.
-         */
-        virtual Value::type getType() const =0;
+            /**
+             * Transform value into XML structure.
+             *
+             * @return std::string representation of XML structure of Value.
+             */
+            virtual std::string toXML() const =0;
 
-        inline bool isInteger() const
-        { return getType() == Value::INTEGER; }
+            //
+            //
+            // Function to check type at runtime.
+            //
+            //
 
-        inline bool isBoolean() const
-        { return getType() == Value::BOOLEAN; }
+            /**
+             * Return the type of value. The type is one of the 'type'
+             * enumeration ie. BOOL, INTEGER, DOUBLE, STRING, SET, MAP.
+             *
+             * @return the type of value objet.
+             */
+            virtual ValueBase::type getType() const =0;
 
-        inline bool isDouble() const
-        { return getType() == Value::DOUBLE; }
+            inline bool isInteger() const
+            { return getType() == ValueBase::INTEGER; }
 
-        inline bool isString() const
-        { return getType() == Value::STRING; }
+            inline bool isBoolean() const
+            { return getType() == ValueBase::BOOLEAN; }
 
-        inline bool isSet() const
-        { return getType() == Value::SET; }
+            inline bool isDouble() const
+            { return getType() == ValueBase::DOUBLE; }
 
-        inline bool isMap() const
-        { return getType() == Value::MAP; }
+            inline bool isString() const
+            { return getType() == ValueBase::STRING; }
 
-        inline bool isPointer() const
-        { return getType() == Value::POINTER; }
+            inline bool isSet() const
+            { return getType() == ValueBase::SET; }
 
-        inline bool isSpeed() const
-        { return getType() == Value::SPEED; }
+            inline bool isMap() const
+            { return getType() == ValueBase::MAP; }
 
-        inline bool isCoordinate() const
-        { return getType() == Value::COORDINATE; }
+            inline bool isTuple() const
+            { return getType() == ValueBase::TUPLE; }
 
-        inline bool isDirection() const
-        { return getType() == Value::DIRECTION; }
+            inline bool isTable() const
+            { return getType() == ValueBase::TABLE; }
 
-        //
-        //
-        // Statical Function to help develpment 
-        //
-        //
 
-        /**
-         * Build values in parsing root XML node. This function is recursive with
-         * the Set value. For example,
-         *
-         * @code
-         * <MY_TAG>
-         *  <DOUBLE VALUE="1.0" />
-         *  <DOUBLE VALUE="4.0" />
-         * </MY_TAG>
-         * @endcode
-         *
-         * @param root the parent node of elements to parse.
-         * @return 0 if error, a vector of new Value on success.
-         */
-        static std::vector < Value* > getValues(xmlpp::Element* root);
+            //
+            //
+            // Statical Function to help develpment 
+            //
+            //
 
-        /**
-         * Build a value in parsing root XML node. This function is recursive with
-         * the Set value. For example,
-         *
-         * @code
-         * <DOUBLE VALUE="1.0" />
-         * @endcode
-         *
-         * @param root the node element to parse.
-         * @return 0 if error, a new Value on success.
-         */
-        static Value* getValue(xmlpp::Element* root);
+            /**
+             * Build values in parsing root XML node. This function is recursive
+             * with the Set value. For example,
+             *
+             * @code
+             * <MY_TAG>
+             *  <DOUBLE VALUE="1.0" />
+             *  <DOUBLE VALUE="4.0" />
+             * </MY_TAG>
+             * @endcode
+             *
+             * @param root the parent node of elements to parse.
+             * @return 0 if error, a vector of new Value on success.
+             */
+            static std::vector < Value > getValues(xmlpp::Element* root);
 
-        /**
-         * Delete all the value contains in Vector.
-         *
-         * @param vals vector values to delete.
-         */
-        static void cleanValues(std::vector < Value* >& vals);
+            /**
+             * Build a value in parsing root XML node. This function is
+             * recursive with the Set value. For example,
+             *
+             * @code
+             * <DOUBLE VALUE="1.0" />
+             * @endcode
+             *
+             * @param root the node element to parse.
+             * @return 0 if error, a new Value on success.
+             */
+            static Value getValue(xmlpp::Element* root);
 
-        /**
-         * @return true if the node is a complex value like Set, false if it simple
-         * value like String, Boolean, Integer, Double and if an error occured.
-         */
-        static bool isComplex(xmlpp::Element* root);
-    };
+            /**
+             * Delete all the value contains in Vector.
+             *
+             * @param vals vector values to delete.
+             */
+            static void cleanValues(std::vector < Value >& vals);
 
-}} // namespace vle value
+            /**
+             * @return true if the node is a complex value like Set, false if it
+             * simple value like String, Boolean, Integer, Double and if an
+             * error occured.
+             */
+            static bool isComplex(xmlpp::Element* root);
+        };
+
+        Boolean to_boolean(Value v);
+        Integer to_integer(Value v);
+        String to_string(Value v);
+        Double to_double(Value v);
+        Map to_map(Value v);
+        Set to_set(Value v);
+        Tuple to_tuple(Value v);
+        Table to_table(Value v);
+
+    } // namespace value
+
+} // namespace vle
 #endif

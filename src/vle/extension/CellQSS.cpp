@@ -377,10 +377,10 @@ CellQSS::processPerturbation(devs::ExternalEvent*)
 }
 
 
-value::Value*
+value::Value
 CellQSS::processStateEvent(devs::StateEvent* event) const
 {
-    return buildDouble(getDoubleState(event->getPortName()));
+    return value::DoubleFactory::create(getDoubleState(event->getPortName()));
 }
 
 }} // namespace vle extension

@@ -33,22 +33,27 @@ namespace vle { namespace value {
     /**
      * @brief Integer Value.
      */
-    class Integer : public Value
+    class IntegerFactory : public ValueBase
     {
-    public:
-        Integer(long value = 0) :
-            m_value(value) { }
-
-        Integer(xmlpp::Element* root);
-
-        virtual ~Integer()
+    private:
+        IntegerFactory() :
+            m_value(0)
         { }
 
-        virtual Value* clone() const
-        { return new Integer(m_value); }
+        IntegerFactory(long value = 0) :
+            m_value(value)
+        { }
 
-        virtual Value::type getType() const
-        { return Value::INTEGER; }
+    public:
+        virtual ~IntegerFactory()
+        { }
+
+        static Integer create(long value = 0);
+
+        virtual Value clone() const;
+
+        virtual ValueBase::type getType() const
+        { return ValueBase::INTEGER; }
 
         inline int intValue() const
         { return (int)m_value; }

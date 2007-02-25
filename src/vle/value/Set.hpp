@@ -35,19 +35,28 @@ namespace vle { namespace value {
      * @brief Set Value a container to Value class.
      * @author The VLE Development Team.
      */
-    class Set : public Value
+    class SetFactory : public ValueBase
     {
+    private:
+        SetFactory()
+        { }
+
+        SetFactory(const SetFactory& setfactory);
+
     public:
-        typedef std::vector < Value* > VectorValue;
+        typedef std::vector < Value > VectorValue;
+        typedef std::vector < Value >::iterator VectorValueIt;
+        typedef std::vector < Value >::const_iterator VectorValueConstIt;
 
-        Set() { }
+        virtual ~SetFactory()
+        { }
 
-        Set(xmlpp::Element* root);
+        static Set create();
+            
+        virtual Value clone() const;
 
-        virtual ~Set();
-
-        virtual Value::type getType() const
-        { return Value::SET; }
+        virtual ValueBase::type getType() const
+        { return ValueBase::SET; }
 
         /**
          * Add a value into the set. Be carrefull, the data are not clone, the use
@@ -55,15 +64,16 @@ namespace vle { namespace value {
          *
          * @param value the Value to add.
          */
-        void addValue(Value* value);
+        void addValue(Value value);
 
-        virtual Value* clone() const;
-
-        inline VectorValue & getValue()
+        inline VectorValue& getValue()
         { return m_value; }
 
         inline const VectorValue& getValue() const
         { return m_value; }
+
+        inline const Value& getValue(const size_t i) const
+        { return m_value.at(i); }
 
         virtual std::string toFile() const;
 

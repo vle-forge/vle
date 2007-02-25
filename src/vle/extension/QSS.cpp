@@ -361,10 +361,10 @@ void qss::processExternalEvent(devs::ExternalEvent* event)
     }
 }
 
-value::Value* qss::processStateEvent(devs::StateEvent* event) const
+value::Value qss::processStateEvent(devs::StateEvent* event) const
 {
   //  unsigned int i = to_int(event->getPortName());
   unsigned int i = m_variableIndex.find(event->getPortName())->second;
 
-  return buildDouble(getValue(i));
+  return value::DoubleFactory::create(getValue(i));
 }

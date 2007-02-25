@@ -45,7 +45,7 @@ StateEventList EventObserver::init()
 
   while (it != getObservableList().end()) {
       m_valueList[StreamModelPort((*it).model, (*it).portName)] =
-	  new value::Double(0.0);
+          value::DoubleFactory::create(0.0);
       ++it;
   }
 
@@ -53,27 +53,23 @@ StateEventList EventObserver::init()
 }
 
 
-StateEvent* EventObserver::processStateEvent(StateEvent* p_event)
+StateEvent* EventObserver::processStateEvent(StateEvent* event)
 {
-    value::Value* v_value = p_event->getAttributeValue(p_event->getPortName());
+    value::Value val = event->getAttributeValue(event->getPortName());
 
-    if (v_value) {
-	if (m_lastTime < p_event->getTime()) {
-	    m_stream->writeValues(p_event->getTime(),
+    if (val) {
+	if (m_lastTime < event->getTime()) {
+	    m_stream->writeValues(event->getTime(),
 				  m_valueList, getObservableList());
-	    m_lastTime = p_event->getTime();
+	    m_lastTime = event->getTime();
 	}
 
 	StreamModelPortValue::iterator it =
-	    m_valueList.find(StreamModelPort(p_event->getModel(),
-					     p_event->getPortName()));
+	    m_valueList.find(StreamModelPort(event->getModel(),
+					     event->getPortName()));
 
-	if (it != m_valueList.end())
-	    delete it->second;
-
-	m_valueList[StreamModelPort(p_event->getModel(),
-				    p_event->getPortName())] =
-	    v_value->clone();
+	m_valueList[StreamModelPort(event->getModel(),
+				    event->getPortName())] = val;
     }
     return 0;
 }

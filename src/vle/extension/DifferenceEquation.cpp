@@ -161,12 +161,12 @@ void DifferenceEquation::processExternalEvent(devs::ExternalEvent * event)
     m_state = _S_PARAMS;
 }
 
-value::Value* DifferenceEquation::processStateEvent(devs::StateEvent * event) const
+value::Value DifferenceEquation::processStateEvent(devs::StateEvent * event) const
 {
 //std::cout<<(se->getTime()).getValue()<<"------------------------------"<<m_result<<endl;
   if (event->onPort("result"))
     return buildDouble(m_result);
-  return 0;
+  return value::ValueBase::empty;
 }
 
 void DifferenceEquation::processInitEvent(devs::InitEvent *event)

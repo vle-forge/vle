@@ -25,13 +25,8 @@
 #ifndef VLE_GRAPH_PORT_HPP
 #define VLE_GRAPH_PORT_HPP
 
+#include <vle/value/Value.hpp>
 #include <string>
-
-namespace vle { namespace value {
-
-    class Value;
-
-}} // namespace vle value
 
 namespace vle { namespace graph {
 
@@ -88,7 +83,7 @@ namespace vle { namespace graph {
          * 
          * @return the structure affected, can be null.
          */
-        const vle::value::Value* getStructure() const
+        const value::Value& getStructure() const
         { return m_structure; }
 
         /** 
@@ -96,7 +91,7 @@ namespace vle { namespace graph {
          * 
          * @param val the value to clone affected, can be null.
          */
-        void setStructure(const vle::value::Value* val);
+        void setStructure(value::Value val);
 
         /** 
          * @brief Valid the value parameter with the value structure.
@@ -105,12 +100,12 @@ namespace vle { namespace graph {
          *
          * @return true if it's valid, otherwise false.
          */
-        bool isValidWithStructure(const vle::value::Value* val);
+        bool isValidWithStructure(const value::Value& val);
 
     private:
-        vle::graph::Model*      m_model;
-        std::string             m_name;
-        vle::value::Value*      m_structure;
+        graph::Model*   m_model;
+        std::string     m_name;
+        value::Value    m_structure;
     };
 
 }} // namespace vle graph

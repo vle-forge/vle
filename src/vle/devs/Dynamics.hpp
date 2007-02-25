@@ -104,8 +104,8 @@ namespace vle { namespace devs {
 	 *
 	 * @return the Double object
 	 */
-        inline vle::value::Value* buildDouble(double value) const
-        { return new vle::value::Double(value); }
+        inline value::Value buildDouble(double value) const
+        { return value::DoubleFactory::create(value); }
 
 	/**
 	 * Build a Integer object from a long value
@@ -114,8 +114,8 @@ namespace vle { namespace devs {
 	 *
 	 * @return the Integer object
 	 */
-        inline vle::value::Value* buildInteger(long value) const
-        { return new vle::value::Integer(value); }
+        inline value::Value buildInteger(long value) const
+        { return value::IntegerFactory::create(value); }
 
 	/**
 	 * Build a Boolean object from a bool value
@@ -124,8 +124,8 @@ namespace vle { namespace devs {
 	 *
 	 * @return the Boolean object
 	 */
-        inline vle::value::Value* buildBoolean(bool value) const 
-        { return new vle::value::Boolean(value); }
+        inline value::Value buildBoolean(bool value) const 
+        { return value::BooleanFactory::create(value); }
 
 	/**
 	 * Build a String object from a string value
@@ -134,8 +134,8 @@ namespace vle { namespace devs {
 	 *
 	 * @return the String object
 	 */
-        inline vle::value::Value* buildString(const std::string& value) const
-        { return new vle::value::String(value); }
+        inline value::Value buildString(const std::string& value) const
+        { return value::StringFactory::create(value); }
 
 	/**
 	 * Build an empty event list
@@ -241,61 +241,6 @@ namespace vle { namespace devs {
 
 	std::string getStringParameter(const std::string& name,
 				       xmlpp::Element* dyn_elt);
-
-	/**
-	 * Return the long value of a attribute of a event
-	 *
-	 * @param event the event
-	 * @param name the name of the attribute
-	 *
-	 * @return the long value
-	 */
-        long getIntegerAttributeValue(Event* event,
-				      const std::string& name) const;
-
-	/**
-	 * Return the double value of a attribute of a event
-	 *
-	 * @param event the event
-	 * @param name the name of the attribute
-	 *
-	 * @return the double value
-	 */
-        double getDoubleAttributeValue(Event* event,
-				       const std::string& name) const;
-
-	/**
-	 * Return the bool value of a attribute of a event
-	 *
-	 * @param event the event
-	 * @param name the name of the attribute
-	 *
-	 * @return the bool value
-	 */
-        bool getBooleanAttributeValue(Event* event,
-				      const std::string& name) const;
-
-	/**
-	 * Return the string value of a attribute of a event
-	 *
-	 * @param event the event
-	 * @param name the name of the attribute
-	 *
-	 * @return the string value
-	 */
-        std::string getStringAttributeValue(Event* event,
-					    const std::string& name) const;
-
-	/**
-	 * Return the Set value of a attribute of a event
-	 *
-	 * @param event the event
-	 * @param name the name of the attribute
-	 *
-	 * @return the string value
-	 */
-        vle::value::Set* getSetAttributeValue(Event* event,
-					    const std::string& name) const;
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -456,7 +401,7 @@ namespace vle { namespace devs {
 	 *
 	 * @return the value of state variable
 	 */
-        virtual vle::value::Value* processStateEvent(StateEvent* event) const;
+        virtual vle::value::Value processStateEvent(StateEvent* event) const;
 
     private:
         sAtomicModel* m_model;

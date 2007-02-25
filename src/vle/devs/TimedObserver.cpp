@@ -49,26 +49,25 @@ StateEventList TimedObserver::init()
 StateEvent*
 TimedObserver::processStateEvent(StateEvent* p_event)
 {
-    value::Value* v_value = p_event->getAttributeValue(p_event->getPortName());
+    value::Value v_value = p_event->getAttributeValue(p_event->getPortName());
 
-    if (v_value)
-    {
+    if (v_value) {
 	m_valueList[StreamModelPort(p_event->getModel(),
 				    p_event->getPortName())] =
 	    v_value->clone();
 	m_counter++;
-	if (m_counter == m_size)
-	{
+        if (m_counter == m_size) {
 	    m_stream->writeValues(p_event->getTime(),
 				  m_valueList,getObservableList());
 	    m_counter = 0;
 
 
-	    StreamModelPortValue::iterator it = m_valueList.begin();
-	    while (it != m_valueList.end()) {
-		delete (*it).second;
-		++it;
-	    }
+            //FIXME
+            //StreamModelPortValue::iterator it = m_valueList.begin();
+            //while (it != m_valueList.end()) {
+                //delete (*it).second;
+                //++it;
+                //}
 	    m_valueList.clear();
 	}
     }
