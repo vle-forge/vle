@@ -45,17 +45,18 @@ namespace vle { namespace value {
     class TableFactory : public ValueBase
     {
     private:
-        TableFactory(const size_t width, const size_t height);
+        TableFactory(const int width, const int height);
 
         TableFactory(const TableFactory& setfactory);
 
     public:
-        typedef boost::array < double, 2 > TableValue;
+        typedef boost::multi_array < double, 2 > TableValue;
+        typedef TableValue::index index;
 
         virtual ~TableFactory()
         { }
 
-        static Table create(const size_t width, const size_t height);
+        static Table create(const int width, const int height);
             
         virtual Value clone() const;
 
@@ -71,6 +72,26 @@ namespace vle { namespace value {
         inline bool empty() const
         { return m_value.empty(); }
 
+        inline index width() const
+        { return m_width; }
+
+        inline index height() const
+        { return m_height; }
+
+        inline double get(const index x, const index y) const
+        { return m_value[x][y]; }
+
+        /** 
+         * @brief Fill the current table with multiple reals read from a string.
+         * The number of real must be equal to width x height.
+         * 
+         * @param str A string with [0.. x] real.
+         *
+         * @throw utils::ArgError if string have problem like bad number of
+         * real.
+         */
+        void fill(const std::string& str);
+
         virtual std::string toFile() const;
 
         virtual std::string toString() const;
@@ -79,8 +100,8 @@ namespace vle { namespace value {
 
     private:
         TableValue      m_value;
-        size_t          m_width;
-        size_t          m_height;
+        index           m_width;
+        index           m_height;
     };
 
 }} // namespace vle value

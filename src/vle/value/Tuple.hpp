@@ -91,6 +91,15 @@ namespace vle { namespace value {
         inline double& operator[](const size_t i)
         { return m_value[i]; }
 
+        /** 
+         * @brief Fill the current tuple with multiple reals read from a string.
+         * 
+         * @param str A string with [0.. x] real.
+         * 
+         * @throw utils::ArgError if string have problem.
+         */
+        void fill(const std::string& str);
+
         virtual std::string toFile() const;
 
         virtual std::string toString() const;

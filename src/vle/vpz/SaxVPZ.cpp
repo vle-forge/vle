@@ -27,6 +27,8 @@
 #include <vle/utils/Trace.hpp>
 #include <vle/value/Map.hpp>
 #include <vle/value/Set.hpp>
+#include <vle/value/Tuple.hpp>
+#include <vle/value/Table.hpp>
 #include <vle/value/Boolean.hpp>
 #include <vle/value/Integer.hpp>
 #include <vle/value/Double.hpp>
@@ -149,6 +151,24 @@ void ValueStackSax::push_set()
     push_on_vector_value(value::SetFactory::create());
 }
 
+void ValueStackSax::push_tuple()
+{
+    if (not m_valuestack.empty()) {
+        AssertS(utils::SaxParserError, is_composite_parent());
+    }
+
+    push_on_vector_value(value::TupleFactory::create());
+}
+
+void ValueStackSax::push_table(const size_t width, const size_t height)
+{
+    if (not m_valuestack.empty()) {
+        AssertS(utils::SaxParserError, is_composite_parent());
+    }
+
+    push_on_vector_value(value::TableFactory::create(width, height));
+}
+
 void ValueStackSax::pop_value()
 {
     if (not m_valuestack.empty()) {
@@ -177,7 +197,7 @@ inline void ValueStackSax::push_on_vector_value(const value::Value& val)
         m_result.push_back(val);
     }
 
-    if (val->isSet() or val->isMap()) {
+    if (val->isSet() or val->isMap() or val->isTuple() or val->isTable()) {
         m_valuestack.push(val);
     }
 }
@@ -246,6 +266,18 @@ void VLESaxParser::on_start_element(
         AssertS(utils::SaxParserError, it != att.end());
 
         m_valuestack.push_map_key((*it).value);
+    } else if (name == "tuple") {
+        m_valuestack.push_tuple();
+    } else if (name == "table") {
+        xmlpp::SaxParser::AttributeList::const_iterator itw, ith;
+        itw = std::find_if(att.begin(), att.end(), 
+                           xmlpp::SaxParser::AttributeHasName("width"));
+        ith = std::find_if(att.begin(), att.end(), 
+                           xmlpp::SaxParser::AttributeHasName("height"));
+        AssertS(utils::SaxParserError, ith != att.end() and itw != att.end());
+
+        m_valuestack.push_table(boost::lexical_cast < size_t >((*itw).value),
+                                boost::lexical_cast < size_t >((*ith).value));
     } else if (name == "vpz") {
         AssertS(utils::SaxParserError, not m_isValue and not m_isTrame);
         m_isValue = true;
@@ -288,6 +320,14 @@ void VLESaxParser::on_end_element(const Glib::ustring& name)
     } else if (name == "key") {
         // FIXME delete test
     } else if (name == "set" or name == "map") {
+        m_valuestack.pop_value();
+    } else if (name == "tuple") {
+        value::Tuple tuple = value::to_tuple(m_valuestack.top_value());
+        tuple->fill(lastCharactersStored());
+        m_valuestack.pop_value();
+    } else if (name == "table") {
+        value::Table table = value::to_table(m_valuestack.top_value());
+        table->fill(lastCharactersStored());
         m_valuestack.pop_value();
     }
 }

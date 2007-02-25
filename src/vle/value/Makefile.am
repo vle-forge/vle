@@ -4,7 +4,7 @@ libvalue_coreheaders = Boolean.hpp Double.hpp Integer.hpp Map.hpp Set.hpp \
 		       String.hpp Table.hpp Tuple.hpp Value.hpp
 
 libvalue_coresources = Boolean.cpp Double.cpp Integer.cpp Map.cpp Set.cpp \
-		       String.cpp Table.hpp Tuple.cpp Value.cpp
+		       String.cpp Table.cpp Tuple.cpp Value.cpp
 
 libvle_LTLIBRARIES = libvalue.la
 libvalue_la_LDFLAGS = @SHARED_LIBRARY_LDFLAGS@

@@ -23,12 +23,12 @@
  * 02111-1307, USA.
  */
 
-#include <vle/value/array.hpp>
+#include <vle/value/Table.hpp>
 
 namespace vle { namespace value {
 
-TableFactory::TableFactory(const size_t width, const size_t height)
-    m_value(boost::extends[width][height]),
+TableFactory::TableFactory(const int width, const int height) :
+    m_value(boost::extents[width][height]),
     m_width(width),
     m_height(height)
 {
@@ -42,9 +42,9 @@ TableFactory::TableFactory(const TableFactory& setfactory) :
 {
 }
 
-array TableFactory::create(const size_t width, const size_t height)
+Table TableFactory::create(const int width, const int height)
 {
-    return array(new TableFactory(width, height));
+    return Table(new TableFactory(width, height));
 }
 
 Value TableFactory::clone() const
@@ -52,14 +52,59 @@ Value TableFactory::clone() const
     return Value(new TableFactory(*this));
 }
 
+void TableFactory::fill(const std::string& str)
+{
+    std::string cpy(str);
+    boost::algorithm::trim(cpy);
+
+    std::vector < std::string > result;
+    boost::algorithm::split(result, cpy, 
+                            boost::algorithm::is_any_of(" \n\t\r"));
+
+    index i = 0;
+    index j = 0;
+    for (std::vector < std::string >::iterator it = result.begin();
+         it != result.end(); ++it) {
+        boost::algorithm::trim(*it);
+        if (not (*it).empty()) {
+            double result;
+            try {
+                result = boost::lexical_cast < double >(*it);
+            } catch(const boost::bad_lexical_cast& e) {
+                try {
+                    result = boost::lexical_cast < long >(*it);
+                } catch(const boost::bad_lexical_cast& e) {
+                    Throw(utils::ArgError,
+                          ((boost::format("Can not convert string \'%1%\' into"
+                                    " double or long") %
+                            (*it)).str()));
+                }
+            }
+            m_value[i][j] = result;
+            if (j + 1 >= m_height) {
+                j = 0;
+                if (i + 1 >= m_width) {
+                    return;
+                } else {
+                    i++;
+                }
+            } else {
+                j++;
+            }
+        }
+    }
+}
+
 std::string TableFactory::toFile() const
 {
     std::string s;
 
-    for (iterator it = m_value.begin(); it != m_value.end(); ++it) {
-	s += boost::lexical_cast < std::string >(*it);
-        if (it + 1 != m_value.end())
-            s+= " ";
+    for (index i = 0; i < m_width; ++i) {
+        for (index j = 0; j < m_height; ++j) {
+	    s += boost::lexical_cast < std::string >(m_value[i][j]);
+            s += " ";
+        }
+        s += "\n";
     }
     return s;
 }
@@ -67,10 +112,14 @@ std::string TableFactory::toFile() const
 std::string TableFactory::toString() const
 {
     std::string s = "(";
-    for (iterator it = m_value.begin(); it != m_value.end(), ++it) {
-	s += boost::lexical_cast < std::string >(*it);
-	if (it + 1 != m_value.end())
-	    s += ",";
+    
+    for (index i = 0; i < m_width; ++i) {
+        s += "(";
+        for (index j = 0; j < m_height; ++j) {
+	    s += boost::lexical_cast < std::string >(m_value[i][j]);
+            s += ",";
+        }
+        s += ")";
     }
     s += ")";
     return s;
@@ -78,13 +127,15 @@ std::string TableFactory::toString() const
 
 std::string TableFactory::toXML() const
 {
-    std::string s = "<array>";
-    for (iterator it = m_value.begin(); it != m_value.end(); ++it) {
-        s += boost::lexical_cast < std::string >(*it);
-        if (it + 1 != m_value.end())
+    std::string s = (boost::format("<table width=\"%1%1\" heigth=\"%2%\">") %
+                     m_width % m_height).str();
+    for (index i = 0; i < m_width; ++i) {
+        for (index j = 0; j < m_height; ++j) {
+	    s += boost::lexical_cast < std::string >(m_value[i][j]);
             s += " ";
+        }
     }
-    s += "</array>";
+    s += "</table>";
     return s;
 }
 

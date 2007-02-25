@@ -153,6 +153,9 @@ namespace vle {
             inline bool isTuple() const
             { return getType() == ValueBase::TUPLE; }
 
+            inline bool isTable() const
+            { return getType() == ValueBase::TABLE; }
+
 
             //
             //

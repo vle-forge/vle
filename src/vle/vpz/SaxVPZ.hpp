@@ -77,6 +77,10 @@ namespace vle { namespace vpz {
 
         void push_set();
 
+        void push_tuple();
+
+        void push_table(const size_t width, const size_t height);
+
         void pop_value();
 
         const value::Value& top_value();

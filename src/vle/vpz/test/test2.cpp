@@ -33,6 +33,7 @@ using namespace vle;
 
 void test_vpz()
 {
+    /*
     const char* xml =
         "<?xml version=\"1.0\"?>\n"
         "<vpz version=\"0.5\" author=\"Gauthier Quesnel\""
@@ -62,9 +63,10 @@ void test_vpz()
         " </dynamics>\n"
         " <experiment duration=\"100\" />\n"
         "</vpz>\n";
-
-    vpz::VLESaxParser sax;
-    sax.parse_memory(xml);
+*/
+    //std::cout << xml << std::endl;
+    //vpz::VLESaxParser sax;
+    //sax.parse_memory(xml);
 }
 
 

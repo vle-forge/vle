@@ -32,6 +32,8 @@
 #include <vle/value/String.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/value/Map.hpp>
+#include <vle/value/Tuple.hpp>
+#include <vle/value/Table.hpp>
 #include <vle/utils/Tools.hpp>
 #include <limits>
 #include <fstream>
@@ -205,6 +207,46 @@ void test_value_map()
     BOOST_CHECK(value::to_string(s->getValue(1))->stringValue() == "test");
 }
 
+void test_value_tuple()
+{
+    const char* t1 = "<?xml version=\"1.0\"?>\n"
+        "<tuple>1\n"
+        "2 "
+        "3</tuple>\n";
+
+    vpz::VLESaxParser sax;
+    value::Tuple v;
+    
+    sax.parse_memory(t1);
+    v = value::to_tuple(sax.get_value(0));
+    BOOST_REQUIRE_EQUAL(v->size(), (size_t)3);
+    BOOST_CHECK_CLOSE(v->operator[](0), 1.0, 0.1);
+    BOOST_CHECK_CLOSE(v->operator[](1), 2.0, 0.1);
+    BOOST_CHECK_CLOSE(v->operator[](2), 3.0, 0.1);
+}
+
+void test_value_table()
+{
+    const char* t1 = "<?xml version=\"1.0\"?>\n"
+        "<table width=\"2\" height=\"3\">\n"
+        "1 2 3 4 5 6"
+        "</table>\n";
+
+    vpz::VLESaxParser sax;
+    value::Table v;
+    
+    sax.parse_memory(t1);
+    v = value::to_table(sax.get_value(0));
+    BOOST_REQUIRE_EQUAL(v->width(), (value::TableFactory::index)2);
+    BOOST_REQUIRE_EQUAL(v->height(), (value::TableFactory::index)3);
+    BOOST_CHECK_CLOSE(v->get(0, 0), 1.0, 0.1);
+    BOOST_CHECK_CLOSE(v->get(0, 1), 2.0, 0.1);
+    BOOST_CHECK_CLOSE(v->get(0, 2), 3.0, 0.1);
+    BOOST_CHECK_CLOSE(v->get(1, 0), 4.0, 0.1);
+    BOOST_CHECK_CLOSE(v->get(1, 1), 5.0, 0.1);
+    BOOST_CHECK_CLOSE(v->get(1, 2), 6.0, 0.1);
+}
+
 boost::unit_test_framework::test_suite*
 init_unit_test_suite(int, char* [])
 {
@@ -218,5 +260,7 @@ init_unit_test_suite(int, char* [])
     test->add(BOOST_TEST_CASE(&test_value_string));
     test->add(BOOST_TEST_CASE(&test_value_set));
     test->add(BOOST_TEST_CASE(&test_value_map));
+    test->add(BOOST_TEST_CASE(&test_value_tuple));
+    test->add(BOOST_TEST_CASE(&test_value_table));
     return test;
 }
