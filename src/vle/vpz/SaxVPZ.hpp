@@ -28,6 +28,7 @@
 #include <stack>
 #include <libxml++/libxml++.h>
 #include <vle/vpz/Base.hpp>
+#include <vle/vpz/SaxStackValue.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/value/Map.hpp>
@@ -60,105 +61,6 @@ namespace vle { namespace vpz {
     private:
         std::stack < vpz::Base* >       m_stack;
     };
-
-    class ValueStackSax
-    {
-    public:
-        void push_integer();
-
-        void push_boolean();
-
-        void push_string();
-
-        void push_double();
-
-        void push_map();
-
-        void push_map_key(const Glib::ustring& key);
-
-        void push_set();
-
-        void push_tuple();
-
-        void push_table(const size_t width, const size_t height);
-
-        void pop_value();
-
-        const value::Value& top_value();
-
-        inline void push_on_vector_value(const value::Value& val);
-
-        /** 
-         * @brief Pop the current head. If stack is empty, do nothing.
-         */
-        inline void pop()
-        { m_valuestack.pop(); }
-
-        /** 
-         * @brief Return true if this sax parser stack is empty.
-         * 
-         * @return true if empty, false otherwise.
-         */
-        inline bool empty() const
-        { return m_valuestack.empty(); }
-
-        /** 
-         * @brief Clear stack value and result stack value.
-         */
-        void clear();
-
-        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-        inline void push_result(const value::Value& val)
-        { m_result.push_back(val); }
-
-        inline const value::Value& get_result(size_t i) const
-        {
-            Assert(utils::SaxParserError, m_result.size() >= i,
-                   (boost::format("Get result value with to big index %1%.") %
-                    i));
-
-            return m_result[i];
-        }
-
-        inline const value::Value& get_last_result() const
-        {
-            Assert(utils::SaxParserError, not m_result.empty(),
-                   "Get last result value with empty result vector");
-
-            return m_result[m_result.size() - 1];
-        }
-
-        const std::vector < value::Value >& get_results() const
-        { return m_result; }
-
-    private:
-        /** 
-         * @brief Test if top of values stack are a composite like map, set,
-         * coordinate or direction.
-         * 
-         * @return 
-         */
-        bool is_composite_parent() const;
-
-        /** 
-         * @brief Store the value stack, usefull for composite value, set, map,
-         * etc.
-         */
-        std::stack < value::Value >  m_valuestack;
-
-        /** 
-         * @brief Store result of Values parsing from trame, simple value,
-         * factor.
-         */
-        std::vector < value::Value > m_result; 
-
-        /** 
-         * @brief Last map key read.
-         */
-        Glib::ustring                m_lastkey;
-    };
-
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
