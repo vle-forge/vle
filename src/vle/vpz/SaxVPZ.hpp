@@ -36,16 +36,19 @@
 
 namespace vle { namespace vpz {
 
+    class Vpz;
+
     class VpzStackSax
     {
     public:
-        VpzStackSax()
+        VpzStackSax() :
+            m_vpz(0)
         { }
 
         ~VpzStackSax()
         { }
 
-        void push_vpz(const std::string& author, float version,
+        vpz::Vpz* push_vpz(const std::string& author, float version,
                       const std::string& date);
         void push_structure();
         void push_model(const xmlpp::SaxParser::AttributeList& att);
@@ -60,6 +63,7 @@ namespace vle { namespace vpz {
 
     private:
         std::stack < vpz::Base* >       m_stack;
+        vpz::Vpz*                       m_vpz;
     };
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -119,6 +123,12 @@ namespace vle { namespace vpz {
         static T get_attribute(const xmlpp::SaxParser::AttributeList& lst,
                                 const Glib::ustring& name);
 
+        const vpz::Vpz& vpz() const
+        {
+            Assert(utils::SaxParserError, m_vpz, "No VPZ was read");
+            return *m_vpz;
+        }
+
     private:
         /** 
          * @brief Delete all information from Sax parser like stack, etc. Use it
@@ -143,6 +153,7 @@ namespace vle { namespace vpz {
         VpzStackSax                     m_vpzstack;
         ValueStackSax                   m_valuestack;
         Glib::ustring                   m_lastCharacters;
+        vpz::Vpz*                       m_vpz;
 
         bool                            m_isValue;
         bool                            m_isVPZ;

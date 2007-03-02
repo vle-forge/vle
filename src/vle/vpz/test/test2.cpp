@@ -26,6 +26,7 @@
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
 #include <vle/vpz/SaxVPZ.hpp>
+#include <vle/vpz/Vpz.hpp>
 #include <limits>
 #include <fstream>
 
@@ -65,6 +66,11 @@ void test_vpz()
     //std::cout << xml << std::endl;
     vpz::VLESaxParser sax;
     sax.parse_memory(xml);
+
+    const vpz::Vpz& vpz = sax.vpz();
+    BOOST_REQUIRE_EQUAL(vpz.author(), "Gauthier Quesnel");
+    BOOST_REQUIRE_CLOSE(vpz.version(), 0.5f, 0.01);
+    BOOST_REQUIRE_EQUAL(vpz.date(), "Mon, 12 Feb 2007 23:40:31 +0100");
 }
 
 

@@ -38,16 +38,18 @@
 
 namespace vle { namespace vpz {
 
-void VpzStackSax::push_vpz(const std::string& author, float version,
+vpz::Vpz* VpzStackSax::push_vpz(const std::string& author, float version,
                            const std::string& date)
 {
     AssertS(utils::SaxParserError, m_stack.empty());
+    AssertS(utils::SaxParserError, not m_vpz);
 
-    vpz::Vpz* vpz = new vpz::Vpz();
-    vpz->setAuthor(author);
-    vpz->setVersion(version);
-    vpz->setDate(date);
-    m_stack.push(vpz);
+    m_vpz = new vpz::Vpz();
+    m_vpz->setAuthor(author);
+    m_vpz->setVersion(version);
+    m_vpz->setDate(date);
+    m_stack.push(m_vpz);
+    return m_vpz;
 }
 
 void VpzStackSax::push_structure()
@@ -95,6 +97,7 @@ void VpzStackSax::push_dynamic(const xmlpp::SaxParser::AttributeList& /*att*/)
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 VLESaxParser::VLESaxParser() :
+    m_vpz(0),
     m_isValue(false),
     m_isVPZ(false)
 {
@@ -150,7 +153,7 @@ void VLESaxParser::on_start_element(
     } else if (name == "vpz") {
         AssertS(utils::SaxParserError, not m_isValue and not m_isTrame);
         m_isVPZ = true;
-        m_vpzstack.push_vpz(
+        m_vpz = m_vpzstack.push_vpz(
             get_attribute < std::string >(att, "author"),
             get_attribute < float >(att, "version"),
             get_attribute < std::string >(att, "date"));

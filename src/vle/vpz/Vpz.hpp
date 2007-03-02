@@ -125,13 +125,13 @@ namespace vle { namespace vpz {
          */
         static void fixExtension(std::string& filename);
 
-        inline float getVersion() const
+        inline float version() const
         { return m_version; }
 
-        inline const std::string& getAuthor() const
+        inline const std::string& author() const
         { return m_author; }
 
-        inline const std::string& getDate() const
+        inline const std::string& date() const
         { return m_date; }
 
         inline void setVersion(float f)
