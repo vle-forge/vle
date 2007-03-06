@@ -26,6 +26,7 @@
 #ifndef UTILS_RAND_HPP
 #define UTILS_RAND_HPP
 
+#include <cmath>
 #include <glibmm/random.h>
 
 namespace vle { namespace utils {
@@ -43,6 +44,31 @@ namespace vle { namespace utils {
     class Rand : public Glib::Rand
     {
     public:
+        /**
+         * Returns a random double uniformaly distributed over the range
+         * [0..1].
+	 *
+         * @return A random number.
+         */
+	inline double get_double_included()
+	{
+	    return get_int()/(G_MAXUINT32-1.0);   
+	}
+
+        /**
+         * Returns a random double uniformaly distributed over the range
+         * [begin..end].
+	 *
+         * @param begin lower closed bound of the interval.
+         * @param end upper closed bound of the interval.
+	 *
+         * @return A random number.
+         */
+	inline double get_double_included(double begin, double end)
+	{
+	    return get_double_included() * std::abs(end - begin) + begin;
+	}
+
         /**
          * Returns a random double equally distributed over the range
          * ]begin..end[.
@@ -109,7 +135,7 @@ namespace vle { namespace utils {
 	double normal(double standarddeviation, double average);
 
 	/**
-	 * Return a random number using Log Normal law.
+	 * Return a random number using the Log Normal law.
 	 *
 	 * @param standarddeviation
 	 * @param average
@@ -118,6 +144,25 @@ namespace vle { namespace utils {
 	 */
 	double log_normal(double standarddeviation, double average);
 
+	/**
+	 * Return a random number between 0 and 2*PI using the von Mises law.
+	 *
+	 * mu is the mean mu is the mean angle, expressed in radians between 
+	 * 0 and 2*pi, and kappa is the concentration parameter, which must 
+	 * be greater than or equal to zero. 
+	 * If kappa is equal to zero, this distribution reduces to a uniform
+	 * random angle over the range 0 to 2*pi.angle, expressed in radians 
+	 * between 0 and 2*pi, and kappa is the concentration parameter, which
+	 * must be greater than or equal to zero.  If kappa is equal to zero,
+	 * this distribution reduces to a uniform random angle over the range
+	 * 0 to 2*pi.
+	 *
+	 * @param kappa
+	 * @param mu
+	 *
+	 * @return a random number [0;2PI]
+	 */
+	double von_mises(double kappa, double mu);
     private:
         static Rand* mRand;
 
