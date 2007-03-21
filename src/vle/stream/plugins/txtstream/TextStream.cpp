@@ -35,19 +35,19 @@ TextStream::TextStream() :
 
 void TextStream::init(const std::string& /* outputPlugin */,
                       const std::string& outputType,
-                      const std::string& /* outputLocation */,
+                      const std::string& outputLocation,
                       const std::string& /* parameters */)
 {
-    m_fileName = outputType + ".dat";
+    m_fileName = Glib::build_filename(outputLocation, outputType + ".dat");
     m_stream.open(m_fileName.c_str());
 
     Assert(utils::FileError, m_stream.is_open(),
            boost::format("Cannot open file '%1%'\n") % m_fileName);
 
-    m_tmpStream.open(Glib::build_filename(Glib::get_tmp_dir(),
-                                          m_fileName).c_str(),
-                     std::fstream::in | std::fstream::out |
-                     std::fstream::trunc);
+    m_tmpStream.open(
+        Glib::build_filename(Glib::get_tmp_dir(), outputType + ".dat").c_str(),
+        std::fstream::in | std::fstream::out |
+        std::fstream::trunc);
 
     Assert(utils::FileError, m_tmpStream.is_open(),
            boost::format("Cannot open file '%1%'\n") %
