@@ -69,7 +69,8 @@ namespace vle { namespace utils {
 #else // NDEBUG
 #define Assert(type, test, strerror) { \
     if (! (test)) { \
-        throw type(strerror); }}
+        throw type(boost::str(boost::format( \
+                "%1%\n") % strerror)); }}
 #endif // NDEBUG
 
 /**
@@ -126,7 +127,7 @@ namespace vle { namespace utils {
 #else // NDEBUG
 #define AssertI(test) { \
     if (! (test)) { \
-        throw Exception::Internal(""); }}
+        throw vle::utils::InternalError(""); }}
 #endif // NDEBUG
 
 
@@ -155,7 +156,8 @@ namespace vle { namespace utils {
         throw type(err__); }
 #else // NDEBUG
 #define Throw(type, strerror) { \
-        throw type(strerror); }
+    throw type(boost::str(boost::format( \
+        "%1%") % strerror)); }
 #endif
 
 /**
