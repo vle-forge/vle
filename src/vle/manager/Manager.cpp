@@ -36,7 +36,8 @@
 
 namespace vle { namespace manager {
 
-Manager::Manager()
+Manager::Manager(bool savevpz) :
+    mSaveVPZ(savevpz)
 {
     try {
         mHost.read_file();
@@ -60,6 +61,7 @@ void Manager::run_all_in_localhost(const vpz::Vpz& vpz)
     mFile = vpz;
 
     ExperimentGenerator* expgen=new TotalExperimentGenerator(vpz);
+    expgen->saveVPZinstance(mSaveVPZ);
 
     expgen->build();
 
@@ -128,6 +130,7 @@ void Manager::scheduller()
     const utils::Hosts::SetHosts hosts = mHost.hosts();
 
     ExperimentGenerator* expgen = new TotalExperimentGenerator(mFile);
+    expgen->saveVPZinstance(mSaveVPZ);
 
     expgen->build();
 

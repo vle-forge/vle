@@ -99,12 +99,15 @@ namespace vle { namespace apps {
         inline bool allInLocal() const { return mAllinlocal; }
         
         inline bool daemon() const { return mDaemon; }
+
+        inline bool savevpz() const { return mSaveVpz; }
         
         virtual void check();
 
     private:
         bool    mAllinlocal;
         bool    mDaemon;
+        bool    mSaveVpz;
     };
 
     /** 

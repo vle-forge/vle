@@ -47,8 +47,9 @@ namespace vle { namespace manager {
         /**
          * Build a new Manager and read Hosts file from user home path.
          *
+         * @param savevpz True if you want to save all VPZ instance.
          */
-        Manager();
+        Manager(bool savevpz);
 
         ~Manager();
 
@@ -109,6 +110,7 @@ namespace vle { namespace manager {
         vpz::Vpz                            mFile;
         utils::Hosts                        mHost;
         std::list < utils::net::Client* >   mClients;
+        bool                                mSaveVPZ;
     };
 
 }} // namespace vle manager

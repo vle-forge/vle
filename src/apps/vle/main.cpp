@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
     bool result;
 
     if (command.manager()) {
-        result = vle.runManager(manag.daemon(), manag.allInLocal(),
+        result = vle.runManager(manag.daemon(), manag.allInLocal(), manag.savevpz(),
                                 vle::manager::VLE::CmdArgs(argv + 1, argv +
                                                            argc));
     } else if (command.simulator()) {

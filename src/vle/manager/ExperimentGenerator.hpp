@@ -62,6 +62,15 @@ namespace vle { namespace manager {
         const std::list < std::string >& get_instances_files() const
         { return mFileList; }
 
+        /** 
+         * @brief Save the generated VPZ instance file.
+         * 
+         * @param save true to save the files, otherwise, this file are remove.
+         * The default option is to remove file.
+         */
+        void saveVPZinstance(bool save = false)
+        { mSaveVpz = save; }
+
     private:
         /** 
          * @brief Build a list of replicas based on information of VPZ file.
@@ -116,6 +125,7 @@ namespace vle { namespace manager {
         std::vector < guint32 >     mReplicasTab;
         std::vector < cond_t >      mCondition;
         std::list < std::string >   mFileList;
+        bool                        mSaveVpz;
     };
 
 }} // namespace vle manager

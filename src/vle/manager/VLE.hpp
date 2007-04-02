@@ -65,7 +65,8 @@ namespace vle { namespace manager {
          * 
          * @return true if manager is a success.
          */
-        bool runManager(bool daemon, bool allInLocal, const CmdArgs& args);
+        bool runManager(bool daemon, bool allInLocal,
+                        bool savevpz, const CmdArgs& args);
 
         /** 
          * @brief vle::Simulator: manage a number of processor and launch

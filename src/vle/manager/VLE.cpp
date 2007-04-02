@@ -57,12 +57,13 @@ VLE::~VLE()
     utils::Trace::kill();
 }
 
-bool VLE::runManager(bool daemon, bool allInLocal, const CmdArgs& args)
+bool VLE::runManager(bool daemon, bool allInLocal, bool savevpz,
+                     const CmdArgs& args)
 {
     CmdArgs::const_iterator it = args.begin();
 
     try {
-        Manager man;
+        Manager man(savevpz);
 
         if (not daemon) {
             if (allInLocal) {

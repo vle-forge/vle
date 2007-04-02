@@ -96,7 +96,8 @@ ManagerOptionGroup::ManagerOptionGroup() :
                    "Manager options",
                    "Description of manager options"),
     mAllinlocal(false),
-    mDaemon(false)
+    mDaemon(false),
+    mSaveVpz(false)
 {
     {
         Glib::OptionEntry en;
@@ -111,6 +112,13 @@ ManagerOptionGroup::ManagerOptionGroup() :
         en.set_short_name('l');
         en.set_description("Run all instance into a local created simulator.");
         add_entry(en, mAllinlocal);
+    }
+    {
+        Glib::OptionEntry en;
+        en.set_long_name("savevpz");
+        en.set_short_name('z');
+        en.set_description("Save all VPZ instance file.");
+        add_entry(en, mSaveVpz);
     }
 }
 

@@ -26,6 +26,7 @@
 #include <vle/utils/XML.hpp>
 #include <vle/utils/Tools.hpp>
 #include <iostream>
+#include <fstream>
 
 
 
@@ -33,7 +34,8 @@ namespace vle { namespace manager {
 
 ExperimentGenerator::ExperimentGenerator(const vpz::Vpz& file) :
     mFile(file),
-    mTmpfile(file)
+    mTmpfile(file),
+    mSaveVpz(false)
 {
 }
 
@@ -108,14 +110,22 @@ void ExperimentGenerator::build_combinations_from_replicas(size_t cmbnumber)
 
 void ExperimentGenerator::write_instance(size_t cmbnumber, size_t replnumber)
 {
-    mTmpfile.project().experiment().
-        setName((boost::format("%1%-%2%-%3%") % mFile.project().experiment().
-                 name() % cmbnumber % replnumber).str());
+    std::string expname(
+        (boost::format("%1%-%2%-%3%") % mFile.project().experiment().
+         name() % cmbnumber % replnumber).str());
 
-    Glib::ustring filename(utils::write_to_temp("vleexp",
-                                                mTmpfile.writeToString()));
+    mTmpfile.project().experiment().setName(expname);
 
-    std::cerr << "Writing file: " << filename << std::endl;
+    std::string buffer(mTmpfile.writeToString());
+
+    Glib::ustring filename(utils::write_to_temp("vleexp", buffer));
+
+    std::cerr << "Writing file: " << filename << " " << mSaveVpz << std::endl;
+    if (mSaveVpz) {
+        expname += ".vpz";
+        std::ofstream file(expname.c_str());
+        file << buffer;
+    }
 
     mFileList.push_back(filename);
 }
