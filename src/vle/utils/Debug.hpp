@@ -53,24 +53,24 @@ namespace vle { namespace utils {
  *
  * @param type exception class to throw
  * @param test represent test to perform
- * @param strerror a message send to exception
+ * @param debugstring a message send to exception
  * @throw an exception define by type
  */
 #ifndef NDEBUG
-#define Assert(type, test, strerror) { \
+#define Assert(type, test, debugstring) { \
     if (! (test)) { \
-        std::string err__( \
+        std::string _vleerr__( \
             boost::str(boost::format( \
                 "%5%\nAssertion '%1%' failed in file %2% : line " \
                                       "%3%\n'%4%'\n%6%\n") % \
                 #test % __FILE__ % __LINE__ % __PRETTY_FUNCTION__ % \
-		(strerror) % vle::utils::print_trace_report())); \
-        throw type(err__); }}
+		(debugstring) % vle::utils::print_trace_report())); \
+        throw type(_vleerr__); }}
 #else // NDEBUG
-#define Assert(type, test, strerror) { \
+#define Assert(type, test, debugstring) { \
     if (! (test)) { \
         throw type(boost::str(boost::format( \
-                "%1%\n") % strerror)); }}
+                "%1%\n") % debugstring)); }}
 #endif // NDEBUG
 
 /**
@@ -90,12 +90,12 @@ namespace vle { namespace utils {
 #ifndef NDEBUG
 #define AssertS(type, test) { \
     if (! (test)) { \
-        std::string err__( \
-            boost::str(boost:format( \
+        std::string _vleerr__( \
+            boost::str(boost::format( \
                 "Assertion '%1%' failed in file %2% : line %3%\n'%4%'\n%5%\n") % \
                              #test % __FILE__ % __LINE__ % __PRETTY_FUNCTION__ % \
                              vle::utils::print_trace_report())); \
-        throw type(err__); }}
+        throw type(_vleerr__); }}
 #else // NDEBUG
 #define AssertS(type, test) { \
     if (! (test)) { \
@@ -118,12 +118,12 @@ namespace vle { namespace utils {
 #ifndef NDEBUG
 #define AssertI(test) { \
     if (! (test)) { \
-        std::string err__( \
+        std::string _vleerr__( \
             boost::str(boost::format( \
                 "Assertion '%1%' failed in file %2% : line %3%\n'%4%'\n%5%\n") % \
                        #test % __FILE__ % __LINE__ % __PRETTY_FUNCTION__ % \
                        vle::utils::print_trace_report())); \
-        throw vle::utils::InternalError(err__); }}
+        throw vle::utils::InternalError(_vleerr__); }}
 #else // NDEBUG
 #define AssertI(test) { \
     if (! (test)) { \
@@ -147,17 +147,17 @@ namespace vle { namespace utils {
  */
 
 #ifndef NDEBUG
-#define Throw(type, strerror) { \
-    std::string err__( \
+#define Throw(type, debugstring) { \
+    std::string _vleerr__( \
         boost::str(boost::format( \
         "%4%\nThrow exception failed in file %1% : line %2%\n'%3%'\n%5%\n") % \
                    __FILE__ % __LINE__ % __PRETTY_FUNCTION__ % \
-		(strerror) % vle::utils::print_trace_report())); \
-        throw type(err__); }
+		(debugstring) % vle::utils::print_trace_report())); \
+        throw type(_vleerr__); }
 #else // NDEBUG
-#define Throw(type, strerror) { \
+#define Throw(type, debugstring) { \
     throw type(boost::str(boost::format( \
-        "%1%") % strerror)); }
+        "%1%") % debugstring)); }
 #endif
 
 /**
@@ -173,12 +173,12 @@ namespace vle { namespace utils {
  */
 #ifndef NDEBUG
 #define ThrowInternal() { \
-    std::string err__( \
+    std::string _vleerr__( \
         boost::str(boost::format( \
                 "Throw Internal error in file %1% : line %2%\n'%3%'\n%4%\n") % \
             __FILE__ % __LINE__ % __PRETTY_FUNCTION__ % \
                          vle::utils::print_trace_report())); \
-    throw vle::utils::InternalError(err__); }
+    throw vle::utils::InternalError(_vleerr__); }
 #else // NDEBUG
 #define ThrowInternal() { \
     throw vle::utils::InternalError(""); }

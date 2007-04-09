@@ -67,12 +67,12 @@ bool VLE::runManager(bool daemon, bool allInLocal, bool savevpz,
 
         if (not daemon) {
             if (allInLocal) {
-                std::cerr << "Manager - all in local\n";
+                std::cerr << "Manager localhost and all simulations in local\n";
                 for (; it != args.end(); ++it) {
                     man.run_all_in_localhost(*it);
                 }
             } else {
-                std::cerr << "Manager - all in local\n";
+                std::cerr << "Manager localhost and distributed simulations\n";
                 for (; it != args.end(); ++it) {
                     man.run_localhost(*it);
                 }

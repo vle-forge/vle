@@ -182,7 +182,7 @@ void Manager::open_connection_with_simulators()
         } catch (const std::exception& e) {
             std::cerr << boost::format(
                 "Error connection with the %1% simulator on port %2%: %3%\n") %
-                (*ithost).hostname(), (*ithost).port(), e.what();
+                (*ithost).hostname() % (*ithost).port() % e.what();
         }
         ++ithost;
     }
