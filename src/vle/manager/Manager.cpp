@@ -24,6 +24,7 @@
 
 #include <iostream>
 #include <cerrno>
+#include <cstdio>
 #include <glibmm/spawn.h>
 #include <vle/manager/Manager.hpp>
 #include <vle/manager/TotalExperimentGenerator.hpp>
@@ -96,6 +97,8 @@ void Manager::run_localhost(const vpz::Vpz& file)
 
 void Manager::run_daemon(int port)
 {
+    utils::buildDaemon();
+
     utils::net::Server* server = 0;
     try {
         server = new utils::net::Server(port);

@@ -94,6 +94,7 @@ bool VLE::runSimulator(int process)
     try {
         std::cerr << "Simulator start in daemon mode\n";
         Glib::thread_init();
+        utils::buildDaemon();
         Simulator sim(process, mPort);
         sim.start();
     } catch(const std::exception& e) {

@@ -38,6 +38,9 @@
 #include <cstring>
 #include <iomanip>
 
+#include <glib.h>
+#include <glib/gstdio.h>
+
 #ifdef G_OS_WIN32
 #include <io.h>
 #endif
@@ -52,6 +55,10 @@
 
 #ifdef HAVE_GCC_ABI_DEMANGLE
 #include <cxxabi.h>
+#endif
+
+#ifdef G_OS_UNIX
+#include <unistd.h>
 #endif
 
 std::string vle::utils::write_to_temp(const std::string& prefix,
@@ -253,4 +260,23 @@ std::string vle::utils::getUserDirectory()
         }
     }
     return home;
+}
+
+void vle::utils::buildDaemon()
+{
+#ifdef G_OS_WIN32
+    g_chdir("c://");
+#else
+    g_chdir("//");
+
+    if (::fork())
+        ::exit(0);
+
+    ::setsid();
+
+    if (::fork())
+        ::exit(0);
+#endif
+    for (int i = 0; i < FOPEN_MAX; ++i)
+        ::close(i);
 }

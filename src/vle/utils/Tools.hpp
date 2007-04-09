@@ -484,6 +484,13 @@ namespace vle { namespace utils {
      */
     std::string getUserDirectory();
 
+    /** 
+     * @brief Change the current process to daemon. Current path is reset to
+     * '/' on Linux/Unix and 'c://' to Windows, adjust the session and
+     * close all opened files.
+     */
+    void buildDaemon();
+
 }} // namespace vle utils
 
 #endif
