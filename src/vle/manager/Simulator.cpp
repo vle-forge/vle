@@ -160,7 +160,7 @@ void Simulator::run()
             mCondRun.signal();
         }
 	std::cerr << boost::format("Simulation start on %1%.\n") % filename;
-        Glib::spawn_command_line_sync((boost::format("vle -v %1% -r %2%\n") %
+        Glib::spawn_command_line_sync((boost::format("vle -v %1% -j %2%\n") %
                                        utils::Trace::trace().get_level() %
                                        filename).str());
     }

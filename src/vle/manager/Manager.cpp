@@ -134,25 +134,25 @@ void Manager::scheduller()
 
     ExperimentGenerator* expgen = new TotalExperimentGenerator(mFile);
     expgen->saveVPZinstance(mSaveVPZ);
-
     expgen->build();
 
     std::list < std::string > lst = expgen->get_instances_files();
     std::list < std::string >::const_iterator it = lst.begin();
 
-    std::cerr << "hosts :" << hosts.size() <<" " << lst.size()
-        << mClients.size() << "\n";
+    std::cerr << "hosts number:" << hosts.size()
+        << "\nfiles number: " << lst.size()
+        << "\nclients: " << mClients.size() << "\n";
 
     utils::Hosts::SetHosts::const_iterator ithost = hosts.begin();
     std::list < utils::net::Client*>::iterator itclient = mClients.begin();
     ithost = hosts.begin();
     itclient = mClients.begin();
-    while (lst.empty() == false) {
+    while (not lst.empty()) {
         if (ithost != hosts.end()) {
             int nbfiletosend = (*ithost).process() -
                 get_current_number_vpzi(*(*itclient));
 
-            while (lst.empty() == false and nbfiletosend > 0) {
+            while (not lst.empty() and nbfiletosend > 0) {
                 send_vpzi(*(*itclient), lst.front());
                 lst.pop_front();
                 --nbfiletosend;
