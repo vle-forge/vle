@@ -200,11 +200,27 @@ namespace vle { namespace vpz {
         const std::string& date() const
         { return m_date; }
 
+        /** 
+         * @brief Set the experimental design combination.
+         * 
+         * @param name The new name of experimental design combination.
+         */
+        inline void setCombination(const std::string& name);
+
+        /** 
+         * @brief Set the experimental design combination.
+         * 
+         * @return the current name of experimental design combination.
+         */
+        const std::string& combination() const
+        { return m_combination; }
+
     private:
         std::string         m_name;
         double              m_duration;
         guint32             m_seed;
         std::string         m_date;
+        std::string         m_combination;
         Replicas            m_replicas;
         Conditions          m_conditions;
         Measures            m_measures;

@@ -1,10 +1,13 @@
 AM_CPPFLAGS = -I$(top_srcdir)/src @VLE_CFLAGS@ @XML_CFLAGS@ @THREAD_CFLAGS@
 
-libvle_coresources = ExperimentGenerator.cpp Manager.cpp \
-		     TotalExperimentGenerator.cpp Simulator.cpp VLE.cpp
+libvle_coresources = ExperimentGenerator.cpp LinearExperimentGenerator.cpp \
+		     Manager.cpp Simulator.cpp TotalExperimentGenerator.cpp \
+		     VLE.cpp
 
-libvle_coreheaders = ExperimentGenerator.hpp Manager.hpp \
-		     TotalExperimentGenerator.hpp Simulator.hpp VLE.hpp
+libvle_coreheaders = ExperimentGenerator.hpp LinearExperimentGenerator.hpp \
+		     Manager.hpp Simulator.hpp TotalExperimentGenerator.hpp \
+		     VLE.hpp
+
 
 libvle_LTLIBRARIES = libmanager.la
 libmanager_la_LDFLAGS = @SHARED_LIBRARY_LDFLAGS@

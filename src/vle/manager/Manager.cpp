@@ -28,6 +28,7 @@
 #include <glibmm/spawn.h>
 #include <vle/manager/Manager.hpp>
 #include <vle/manager/TotalExperimentGenerator.hpp>
+#include <vle/manager/LinearExperimentGenerator.hpp>
 #include <vle/utils/XML.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Socket.hpp>
@@ -61,7 +62,7 @@ void Manager::run_all_in_localhost(const vpz::Vpz& vpz)
 {
     mFile = vpz;
 
-    ExperimentGenerator* expgen=new TotalExperimentGenerator(vpz);
+    ExperimentGenerator* expgen = get_combination_plan();
     expgen->saveVPZinstance(mSaveVPZ);
 
     expgen->build();
@@ -132,7 +133,7 @@ void Manager::scheduller()
 
     const utils::Hosts::SetHosts hosts = mHost.hosts();
 
-    ExperimentGenerator* expgen = new TotalExperimentGenerator(mFile);
+    ExperimentGenerator* expgen = get_combination_plan();
     expgen->saveVPZinstance(mSaveVPZ);
     expgen->build();
 
@@ -166,6 +167,18 @@ void Manager::scheduller()
     }
     delete expgen;
     close_connection_with_simulators();
+}
+
+ExperimentGenerator* Manager::get_combination_plan() const
+{
+    ExperimentGenerator* result = 0;
+    const vpz::Experiment& exp = mFile.project().experiment();
+    if (exp.combination() == "linear") {
+        result = new LinearExperimentGenerator(mFile);
+    } else {
+        result = new TotalExperimentGenerator(mFile);
+    }
+    return result;
 }
 
 void Manager::open_connection_with_simulators()

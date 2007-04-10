@@ -30,6 +30,7 @@
 #include <vle/vpz/Vpz.hpp>
 #include <vle/utils/Host.hpp>
 #include <vle/utils/Socket.hpp>
+#include <vle/manager/ExperimentGenerator.hpp>
 
 
 
@@ -99,6 +100,7 @@ namespace vle { namespace manager {
         void run_daemon(int port);
 
     private:
+        ExperimentGenerator* get_combination_plan() const;
         void open_connection_with_simulators();
         void close_connection_with_simulators();
         void scheduller();

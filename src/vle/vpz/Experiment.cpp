@@ -44,6 +44,12 @@ void Experiment::init(xmlpp::Element* elt)
     setDuration(xml::get_double_attribute(exp, "DURATION"));
     setDate(xml::get_attribute(exp, "DATE"));
 
+    if (xml::exist_attribute(exp, "COMBINATION")) {
+        setCombination(xml::get_attribute(exp, "COMBINATION"));
+    } else {
+        setCombination("total");
+    }
+
     if (xml::exist_attribute(exp, "SEED")) {
         setSeed(utils::translate < guint32 >(
             xml::get_attribute(exp, "SEED")));
@@ -153,6 +159,13 @@ void Experiment::setDate(const std::string& date)
 void Experiment::setCurrentDate()
 {
     m_date = utils::get_current_date();
+}
+    
+void Experiment::setCombination(const std::string& name)
+{
+    AssertI(name == "linear" or name == "total");
+
+    m_combination.assign(name);
 }
 
 }} // namespace vle vpz
