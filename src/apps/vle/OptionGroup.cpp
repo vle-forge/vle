@@ -36,7 +36,7 @@ CommandOptionGroup::CommandOptionGroup() :
                    "Description of commands"),
     mManager(false),
     mSimulator(false),
-    mJustrun(true),
+    mJustrun(false),
     mPort(8000)
 {
     {
