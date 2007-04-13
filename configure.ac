@@ -48,6 +48,7 @@ AC_CHECK_HEADERS([netdb.h])
 AC_CHECK_HEADERS([netinet/in.h])
 AC_CHECK_HEADERS([sys/socket.h])
 AC_CHECK_HEADERS([unistd.h])
+AC_CHECK_HEADERS([zlib.h])
 
 dnl ***************************************************************************
 dnl Checks for library functions
