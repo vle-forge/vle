@@ -268,6 +268,45 @@ xmlpp::Element* Translator::addConditions(xmlpp::Element* node)
     return node->add_child("EXPERIMENTAL_CONDITIONS");
 }
 
+
+xmlpp::Element* Translator::addCondition(xmlpp::Element* node,
+			      const std::string& modelName,
+			      const std::string& portName)
+{
+    xmlpp::Element* newnode = node->add_child("CONDITION");
+    newnode->set_attribute("MODEL_NAME",modelName);
+    newnode->set_attribute("PORT_NAME",portName);
+    return newnode;
+}
+
+void Translator::oneMoreBooleanCondition(xmlpp::Element* node,
+					 bool value)
+{
+     xmlpp::Element* newnode = node->add_child("BOOLEAN");
+     newnode->set_attribute("VALUE", (value ? "true":"false"));
+}
+
+void Translator::oneMoreDoubleCondition(xmlpp::Element* node,
+					double value)
+{
+     xmlpp::Element* newnode = node->add_child("DOUBLE");
+     newnode->set_attribute("VALUE", utils::to_string(value));
+}
+
+void Translator::oneMoreIntegerCondition(xmlpp::Element* node,
+					 long value)
+{
+     xmlpp::Element* newnode = node->add_child("INTEGER");
+     newnode->set_attribute("VALUE", utils::to_string(value));
+}
+
+void Translator::oneMoreStringCondition(xmlpp::Element* node,
+					const std::string& value)
+{
+     xmlpp::Element* newnode = node->add_child("STRING");
+     newnode->set_attribute("VALUE", value);
+}
+
 void Translator::addBooleanCondition(xmlpp::Element* node,
 				     const std::string& modelName,
 				     const std::string& portName,

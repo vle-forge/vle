@@ -158,8 +158,20 @@ namespace vle { namespace vpz {
                                   const std::string& plugin,
                                   const std::string& location);
 
-        xmlpp::Element* addConditions(xmlpp::Element* node);
 
+	xmlpp::Element* addCondition(xmlpp::Element* node,
+				     const std::string& modelName,
+				     const std::string& portName);
+	void oneMoreBooleanCondition(xmlpp::Element* node,
+				     bool value);
+	void oneMoreDoubleCondition(xmlpp::Element* node,
+				    double value);
+	void oneMoreIntegerCondition(xmlpp::Element* node,
+				     long value);
+	void oneMoreStringCondition(xmlpp::Element* node,
+				    const std::string& value);
+
+	xmlpp::Element* addConditions(xmlpp::Element* node);
         void addBooleanCondition(xmlpp::Element* node,
                                  const std::string& modelName,
                                  const std::string& portName,
