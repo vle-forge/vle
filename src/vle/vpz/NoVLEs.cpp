@@ -91,6 +91,8 @@ void NoVLEs::fusion(Model& model, Dynamics& dynamics,
         Graphics g;
         Experiment e;
 
+	e.addMeasures(experiment.measures());
+
         (*it).second.callTranslator(m, d, g, e);          
         model.addModel((*it).first, m);
         dynamics.addDynamics(d);

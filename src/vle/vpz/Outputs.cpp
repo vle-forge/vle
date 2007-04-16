@@ -25,6 +25,7 @@
 #include <vle/vpz/Outputs.hpp>
 #include <vle/utils/XML.hpp>
 #include <vle/utils/Debug.hpp>
+#include <vle/utils/Trace.hpp>
 
 namespace vle { namespace vpz {
 
@@ -113,9 +114,8 @@ void Outputs::addOutputs(const Outputs& o)
 void Outputs::addOutput(const std::string& name, const Output& o)
 {
     std::map < std::string, Output >::iterator it = m_outputs.find(name);
-    Assert(utils::InternalError, it == m_outputs.end(),
-           boost::format("An output have already this name '%1%'\n") %
-           name);
+    TRACE((boost::format("Warning: An output have already this name '%1%'\n") %
+	 name).str());
 
     m_outputs[name] = o;
 }
