@@ -84,6 +84,7 @@ void Experiment::write(xmlpp::Element* elt) const
     exp->set_attribute("DURATION", utils::to_string(m_duration));
     exp->set_attribute("DATE", m_date);
     exp->set_attribute("SEED", utils::to_string(m_seed));
+    exp->set_attribute("COMBINATION", m_combination);
 
     m_replicas.write(exp);
     m_conditions.write(exp);
