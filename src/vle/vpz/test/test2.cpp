@@ -36,7 +36,7 @@ void test_vpz()
 {
     const char* xml =
         "<?xml version=\"1.0\"?>\n"
-        "<vpz version=\"0.5\" author=\"Gauthier Quesnel\""
+        "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
         " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
         " <structures>\n"
         //"  <model name=\"test1\" type=\"atomic\">\n"
@@ -62,7 +62,7 @@ void test_vpz()
         //"  <dynamic name=\"null\" />\n"
         //" </dynamics>\n"
         //" <experiment duration=\"100\" />\n"
-        "</vpz>\n";
+        "</vle_project>\n";
     //std::cout << xml << std::endl;
     vpz::VLESaxParser sax;
     sax.parse_memory(xml);

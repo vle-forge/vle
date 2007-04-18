@@ -159,7 +159,7 @@ void VLESaxParser::on_start_element(
         m_valuestack.push_table(
             get_attribute < value::TableFactory::index >(att, "width"),
             get_attribute < value::TableFactory::index >(att, "height"));
-    } else if (name == "vpz") {
+    } else if (name == "vle_project") {
         AssertS(utils::SaxParserError, not m_isValue and not m_isTrame);
         m_isVPZ = true;
         m_vpz = m_vpzstack.push_vpz(
@@ -167,7 +167,7 @@ void VLESaxParser::on_start_element(
             get_attribute < float >(att, "version"),
             get_attribute < std::string >(att, "date"));
 
-    } else if (name == "structure") {
+    } else if (name == "structures") {
         m_vpzstack.push_structure();
     } else if (name == "model") {
         m_vpzstack.push_model(att);
