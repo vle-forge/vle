@@ -77,21 +77,29 @@ namespace vle { namespace vpz {
 
         NoVLEs& novles() { return m_novles; }
 
-        void setName(const std::string& name);
+        void setAuthor(const std::string& name);
 
-        inline const std::string& name() const
-        { return m_name; }
+        inline const std::string& author() const
+        { return m_author; }
 
         void setDate(const std::string& date);
 
+        inline float version() const
+        { return m_version; }
+
         void setCurrentDate();
+
+        inline void setVersion(float f)
+        { if (f >= 0) m_version = f; }
 
         inline const std::string& date() const
         { return m_date; }
 
     private:
-        std::string     m_name;
+        std::string     m_author;
         std::string     m_date;
+        float           m_version;
+
         Model           m_model;
         Dynamics        m_dynamics;
         Experiment      m_experiment;

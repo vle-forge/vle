@@ -58,7 +58,7 @@ void build_vpz(const std::string& modelname,
         dyn.setMappingDynamic(modelname, 
                               Glib::file_get_contents(xmlname));
     }
-    vpz.project().dynamics().addDynamic("testing model", dyn);
+    //vpz.project().dynamics().addDynamic("testing model", dyn); // FIXME
     vpz.project().experiment().setDuration(1);
     vpz.project().experiment().setName("testing");
 }

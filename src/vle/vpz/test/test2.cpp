@@ -39,38 +39,49 @@ void test_vpz()
         "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
         " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
         " <structures>\n"
-        //"  <model name=\"test1\" type=\"atomic\">\n"
-        //"   <init>\n"
-        //"    <port name=\"init1\" />\n"
-        //"    <port name=\"init2\" />\n"
-        //"   </init>\n"
-        //"   <state>\n"
-        //"    <port name=\"state1\" />\n"
-        //"    <port name=\"state2\" />\n"
-        //"   </state>\n"
-        //"   <in>\n"
-        //"    <port name=\"in1\" />\n"
-        //"    <port name=\"in2\" />\n"
-        //"   </in>\n"
-        //"   <out>\n"
-        //"    <port name=\"out1\" />\n"
-        //"    <port name=\"out2\" />\n"
-        //"   </out>\n"
-        //"  </model>\n"
+        "  <model name=\"test1\" type=\"atomic\">\n"
+        "   <init>\n"
+        "    <port name=\"init1\" />\n"
+        "    <port name=\"init2\" />\n"
+        "   </init>\n"
+        "   <state>\n"
+        "    <port name=\"state1\" />\n"
+        "    <port name=\"state2\" />\n"
+        "   </state>\n"
+        "   <in>\n"
+        "    <port name=\"in1\" />\n"
+        "    <port name=\"in2\" />\n"
+        "   </in>\n"
+        "   <out>\n"
+        "    <port name=\"out1\" />\n"
+        "    <port name=\"out2\" />\n"
+        "   </out>\n"
+        "  </model>\n"
         " </structures>\n"
-        //" <dynamics>\n"
-        //"  <dynamic name=\"null\" />\n"
-        //" </dynamics>\n"
-        //" <experiment duration=\"100\" />\n"
         "</vle_project>\n";
-    //std::cout << xml << std::endl;
     vpz::VLESaxParser sax;
     sax.parse_memory(xml);
 
     const vpz::Vpz& vpz = sax.vpz();
-    BOOST_REQUIRE_EQUAL(vpz.author(), "Gauthier Quesnel");
-    BOOST_REQUIRE_CLOSE(vpz.version(), 0.5f, 0.01);
-    BOOST_REQUIRE_EQUAL(vpz.date(), "Mon, 12 Feb 2007 23:40:31 +0100");
+    BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
+    BOOST_REQUIRE_CLOSE(vpz.project().version(), 0.5f, 0.01);
+    BOOST_REQUIRE_EQUAL(vpz.project().date(), "Mon, 12 Feb 2007 23:40:31 +0100");
+
+    const vpz::Model& mdl = sax.vpz().project().model();
+    BOOST_REQUIRE(mdl.model() != 0);
+    BOOST_REQUIRE_EQUAL(mdl.model()->isAtomic(), true);
+    BOOST_REQUIRE_EQUAL(mdl.model()->getInitPortNumber(), 2);
+    BOOST_REQUIRE_EQUAL(mdl.model()->getStatePortNumber(), 2);
+    BOOST_REQUIRE_EQUAL(mdl.model()->getInPortNumber(), 2);
+    BOOST_REQUIRE_EQUAL(mdl.model()->getOutPortNumber(), 2);
+    BOOST_REQUIRE(mdl.model()->getInitPort("init1") != 0);
+    BOOST_REQUIRE(mdl.model()->getInitPort("init2") != 0);
+    BOOST_REQUIRE(mdl.model()->getStatePort("state1") != 0);
+    BOOST_REQUIRE(mdl.model()->getStatePort("state2") != 0);
+    BOOST_REQUIRE(mdl.model()->getInPort("in1") != 0);
+    BOOST_REQUIRE(mdl.model()->getInPort("in2") != 0);
+    BOOST_REQUIRE(mdl.model()->getOutPort("out1") != 0);
+    BOOST_REQUIRE(mdl.model()->getOutPort("out2") != 0);
 }
 
 

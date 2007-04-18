@@ -52,13 +52,13 @@ namespace vle { namespace vpz {
         void push_structure();
         void push_model(const xmlpp::SaxParser::AttributeList& att);
         void push_port(const xmlpp::SaxParser::AttributeList& att);
-        void push_in();
-        void push_out();
-        void push_init();
-        void push_state();
+        void push_porttype(const Glib::ustring& name);
         void push_submodels();
         void push_dynamics();
         void push_dynamic(const xmlpp::SaxParser::AttributeList& att);
+        vpz::Base* pop();
+
+        vpz::Vpz& vpz();
 
     private:
         std::stack < vpz::Base* >       m_stack;

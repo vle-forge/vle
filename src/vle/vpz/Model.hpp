@@ -52,7 +52,7 @@ namespace vle { namespace vpz {
         virtual void write(std::ostream& out) const;
 
         virtual Base::type getType() const
-        { return MODELS; }
+        { return MODEL; }
 
         /** 
          * @brief Initialise the devs hierachy of model.
@@ -79,39 +79,32 @@ namespace vle { namespace vpz {
          * @param modelname model name to change. Must be a graph::NoVLE.
          * @param m the new model or hierarchy to push.
          */
-        void addModel(const std::string& modelname, const Model& m);
+        //void addModel(const std::string& modelname, const Model& m);
 
         /** 
          * @brief Set a hierachy of graph::Model. If a previous hierarchy
-         * already exist, it is delete same if the new is empty. This function
-         * is just an affectation, no clone is build.
+         * already exist, it is not delete same if the new is empty. This
+         * function is just an affectation, no clone is build.
          * 
          * @param mdl the new graph::Model hierarchy to set.
          */
         void setModel(graph::Model* mdl);
         
         /** 
-         * @brief Build a new graph::Model hierarchy an return it.
+         * @brief Get a reference to the graph::Model hierarchy.
          * 
-         * @return A new hierarchy, don't forget to delete it when finish.
+         * @return A reference to the graph::Model, be carreful, you can damage
+         * graph::Vpz instance.
+         */
+        graph::Model* model();
+
+        /** 
+         * @brief Get a reference to the graph::Model hierarchy.
+         * 
+         * @return A reference to the graph::Model, be carreful, you can damage
+         * graph::Vpz instance.
          */
         graph::Model* model() const;
-
-        /** 
-         * @brief Get a reference to the graph::Model hierarchy.
-         * 
-         * @return A reference to the graph::Model, be carreful, you can damage
-         * graph::Vpz instance.
-         */
-        graph::Model* modelRef();
-
-        /** 
-         * @brief Get a reference to the graph::Model hierarchy.
-         * 
-         * @return A reference to the graph::Model, be carreful, you can damage
-         * graph::Vpz instance.
-         */
-        const graph::Model* modelRef() const;
 
     private:
         graph::Model*       m_graph;

@@ -25,6 +25,8 @@
 #include <vle/vpz/SaxVPZ.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/vpz/Structures.hpp>
+#include <vle/vpz/Model.hpp>
+#include <vle/vpz/Port.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/value/Map.hpp>
@@ -35,6 +37,9 @@
 #include <vle/value/Integer.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/String.hpp>
+#include <vle/graph/CoupledModel.hpp>
+#include <vle/graph/AtomicModel.hpp>
+#include <vle/graph/NoVLEModel.hpp>
 
 
 namespace vle { namespace vpz {
@@ -46,10 +51,11 @@ vpz::Vpz* VpzStackSax::push_vpz(const std::string& author, float version,
     AssertS(utils::SaxParserError, not m_vpz);
 
     m_vpz = new vpz::Vpz();
-    m_vpz->setAuthor(author);
-    m_vpz->setVersion(version);
-    m_vpz->setDate(date);
+    m_vpz->project().setAuthor(author);
+    m_vpz->project().setVersion(version);
+    m_vpz->project().setDate(date);
     m_stack.push(m_vpz);
+
     return m_vpz;
 }
 
@@ -62,31 +68,94 @@ void VpzStackSax::push_structure()
     m_stack.push(structure);
 }
 
-void VpzStackSax::push_model(const xmlpp::SaxParser::AttributeList& /*att*/)
+void VpzStackSax::push_model(const xmlpp::SaxParser::AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
     AssertS(utils::SaxParserError, m_vpz);
-    AssertS(utils::SaxParserError, m_stack.top()->isVpz());
+    AssertS(utils::SaxParserError, m_stack.top()->isStructures() or
+            m_stack.top()->isModel());
+
+    graph::CoupledModel* parent = 0;
+
+    if (m_stack.top()->isModel()) {
+        vpz::Model* tmp = static_cast < vpz::Model* >(m_stack.top());
+        parent = static_cast < graph::CoupledModel* >(tmp->model());
+    }
+
+    graph::Model* gmdl = 0;
+
+    std::string type = VLESaxParser::get_attribute < std::string >(att, "type");
+    if (type == "atomic") {
+        gmdl = new graph::AtomicModel(parent);
+    } else if (type == "coupled") {
+        gmdl = new graph::CoupledModel(parent);
+    } else if (type == "novle") {
+        gmdl = new graph::NoVLEModel(parent);
+    } else {
+        Throw(utils::InternalError, (boost::format(
+                        "Unknow model type %1%") % type));
+    }
+
+    vpz::Model* mdl = new vpz::Model();
+    mdl->setModel(gmdl);
+
+    if (m_stack.top()->isStructures()) {
+        vpz().project().model().setModel(gmdl);
+    }
+
+    m_stack.push(mdl);
+
 }
 
-void VpzStackSax::push_port(const xmlpp::SaxParser::AttributeList& /*att*/)
+void VpzStackSax::push_port(const xmlpp::SaxParser::AttributeList& att)
 {
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_vpz);
+    AssertS(utils::SaxParserError, m_stack.top()->isIn() or
+            m_stack.top()->isOut() or m_stack.top()->isState() or
+            m_stack.top()->isInit());
+
+    vpz::Base* type = pop();
+
+    AssertS(utils::SaxParserError, m_stack.top()->isModel());
+
+    vpz::Model* mdl = static_cast < vpz::Model* >(m_stack.top());
+    graph::Model* gmdl = mdl->model();
+    
+    std::string name = VLESaxParser::get_attribute < std::string >(att, "name");
+
+    if (type->isIn()) {
+        gmdl->addInputPort(name);
+    } else if (type->isOut()) {
+        gmdl->addOutputPort(name);
+    } else if (type->isState()) {
+        gmdl->addStatePort(name);
+    } else if (type->isInit()) {
+        gmdl->addInitPort(name);
+    }
+    m_stack.push(type);
 }
 
-void VpzStackSax::push_in()
+void VpzStackSax::push_porttype(const Glib::ustring& name)
 {
-}
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_vpz);
+    AssertS(utils::SaxParserError, m_stack.top()->isModel());
 
-void VpzStackSax::push_out()
-{
-}
-
-void VpzStackSax::push_init()
-{
-}
-
-void VpzStackSax::push_state()
-{
+    vpz::Base* prt = 0;
+    if (name == "in") {
+        prt = new vpz::In();
+    } else if (name == "out") {
+        prt = new vpz::Out();
+    } else if (name == "state") {
+        prt = new vpz::State();
+    } else if (name == "init") {
+        prt = new vpz::Init();
+    } else {
+        Throw(utils::InternalError, (boost::format("Unknow port type %1%.") %
+                                     name));
+    }
+    m_stack.push(prt);
 }
 
 void VpzStackSax::push_submodels()
@@ -99,6 +168,19 @@ void VpzStackSax::push_dynamics()
 
 void VpzStackSax::push_dynamic(const xmlpp::SaxParser::AttributeList& /*att*/)
 {
+}
+
+vpz::Base* VpzStackSax::pop()
+{
+    vpz::Base* top = m_stack.top();
+    m_stack.pop();
+    return top;
+}
+
+vpz::Vpz& VpzStackSax::vpz()
+{
+    Assert(utils::InternalError, m_vpz, "VPZ stack sax have empty VPZ object");
+    return *m_vpz;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -171,6 +253,9 @@ void VLESaxParser::on_start_element(
         m_vpzstack.push_structure();
     } else if (name == "model") {
         m_vpzstack.push_model(att);
+    } else if (name == "in" or name == "out" or name == "state" or
+               name == "init") {
+        m_vpzstack.push_porttype(name);
     } else if (name == "port") {
         m_vpzstack.push_port(att);
     } else if (name == "submodels") {
@@ -215,6 +300,10 @@ void VLESaxParser::on_end_element(const Glib::ustring& name)
         value::Table table = value::to_table(m_valuestack.top_value());
         table->fill(lastCharactersStored());
         m_valuestack.pop_value();
+    } else if (name == "in" or name == "out" or name == "state" or
+               name == "init" or name == "structures" or name == "model" or
+               name == "vle_project") {
+        m_vpzstack.pop();
     }
 }
 

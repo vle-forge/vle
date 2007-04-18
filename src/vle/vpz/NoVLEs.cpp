@@ -82,7 +82,7 @@ void NoVLEs::delNoVLE(const std::string& modelname)
     }
 }
 
-void NoVLEs::fusion(Model& model, Dynamics& dynamics,
+void NoVLEs::fusion(Model& /* model */, Dynamics& dynamics,
                     Experiment& experiment)
 {
     std::map < std::string, NoVLE >::iterator it;
@@ -92,7 +92,7 @@ void NoVLEs::fusion(Model& model, Dynamics& dynamics,
         Experiment e;
 
         (*it).second.callTranslator(m, d, e);          
-        model.addModel((*it).first, m);
+        //model.addModel((*it).first, m); // FIXME
         dynamics.addDynamics(d);
         experiment.addMeasures(e.measures());
         experiment.addConditions(e.conditions());

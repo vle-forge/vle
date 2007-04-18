@@ -37,10 +37,10 @@ namespace vle { namespace vpz {
     class Base
     {
     public:
-        enum type { STRUCTURES, MODELS, DYNAMICS, DYNAMIC, EXPERIMENT,
-            PROJECT, MEASURES, OBSERVABLE, OUTPUTS, OUTPUT, MEASURE, NOVLES,
-            NOVLE, CONDITIONS, CONDITION, EOVS, EOVCHILD, CLASSES, CLASS,
-            REPLICAS, VPZ };
+        enum type { STRUCTURES, MODEL, IN, OUT, INIT, STATE, PORT, DYNAMICS,
+            DYNAMIC, EXPERIMENT, PROJECT, MEASURES, OBSERVABLE, OUTPUTS, OUTPUT,
+            MEASURE, NOVLES, NOVLE, CONDITIONS, CONDITION, EOVS, EOVCHILD,
+            CLASSES, CLASS, REPLICAS, VPZ };
 
         Base() { }
 
@@ -73,7 +73,12 @@ namespace vle { namespace vpz {
 
 
         inline bool isStructures() const { return getType() == STRUCTURES; }
-        inline bool isModels() const { return getType() == MODELS; }
+        inline bool isModel() const { return getType() == MODEL; }
+        inline bool isIn() const { return getType() == IN; }
+        inline bool isOut() const { return getType() == OUT; }
+        inline bool isInit() const { return getType() == INIT; }
+        inline bool isState() const { return getType() == STATE; }
+        inline bool isPort() const { return getType() == PORT; }
         inline bool isDynamics() const { return getType() == DYNAMICS; }
         inline bool isDynamic() const { return getType() == DYNAMIC; }
         inline bool isExperiment() const { return getType() == EXPERIMENT; }

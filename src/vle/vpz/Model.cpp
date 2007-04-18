@@ -38,15 +38,14 @@ Model::Model() :
 
 Model::Model(const Model& model) :
     Base(model),
-    m_graph(model.model())
+    m_graph(0) // FIXME to disable or not ?
 {
 }
 
 Model& Model::operator=(const Model& model)
 {
     if (this != &model) {
-        delete m_graph;
-        m_graph = model.model();
+        m_graph = 0; // FIXME to disable or not ?
     }
     return *this;
 }
@@ -95,40 +94,34 @@ void Model::clear()
     m_graph = 0;
 }
 
-void Model::addModel(const std::string& modelname, const Model& m)
-{
-    graph::Model* mdl = m_graph->findModel(modelname);
-    Assert(utils::InternalError, mdl,
-           boost::format("Model '%1%' not found\n") % modelname);
-    Assert(utils::InternalError, mdl->isNoVLE(),
-           boost::format("Model '%1%' is not a NoVLE model\n") % modelname);
-
-    graph::CoupledModel* parent = mdl->getParent();
-    if (parent == 0) {
-        delete mdl;
-        m_graph = m.model();
-    } else {
-        parent->replace(mdl, m.model());
-    }
-}
+//void Model::addModel(const std::string& modelname, const Model& m)
+//{
+//graph::Model* mdl = m_graph->findModel(modelname);
+//Assert(utils::InternalError, mdl,
+//boost::format("Model '%1%' not found\n") % modelname);
+//Assert(utils::InternalError, mdl->isNoVLE(),
+//boost::format("Model '%1%' is not a NoVLE model\n") % modelname);
+//
+//graph::CoupledModel* parent = mdl->getParent();
+//if (parent == 0) {
+//delete mdl;
+//m_graph = m.model();
+//} else {
+//parent->replace(mdl, m.model());
+//}
+//}
 
 void Model::setModel(graph::Model* mdl)
 {
-    delete m_graph;
     m_graph = mdl;
 }
 
-graph::Model* Model::model() const
-{
-    return (m_graph == 0) ? 0 : m_graph->clone();
-}
-
-graph::Model* Model::modelRef()
+graph::Model* Model::model()
 {
     return m_graph;
 }
 
-const graph::Model* Model::modelRef() const
+graph::Model* Model::model() const
 {
     return m_graph;
 }

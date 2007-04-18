@@ -66,24 +66,21 @@ using namespace vle::utils;
 void Project::write(std::ostream& out) const
 {
     out << "<vle_project"
+        << " version=\"" << m_version << "\""
         << " date=\"" << m_date << "\""
-        << " name=\"" << m_name << "\""
-        << ">";
-
-    m_model.write(out);
-    m_dynamics.write(out);
-    m_experiment.write(out);
-    m_classes.write(out);
-    m_novles.write(out);
-
-    out << "</vle_project>";
+        << " author=\"" << m_author << "\""
+        << ">"
+        << m_model
+        << m_dynamics
+        << m_experiment
+        << m_classes
+        << m_novles
+        << "</vle_project>";
 }
 
 void Project::clear()
 {
-    m_name.clear();
     m_date.clear();
-
     m_model.clear();
     m_dynamics.clear();
     m_experiment.clear();
@@ -102,10 +99,10 @@ bool Project::hasNoVLE() const
     return not m_novles.noVLEs().empty();
 }
 
-void Project::setName(const std::string& name)
+void Project::setAuthor(const std::string& name)
 {
     AssertI(not name.empty());
-    m_name.assign(name);
+    m_author.assign(name);
 }
 
 void Project::setDate(const std::string& date)
@@ -114,6 +111,8 @@ void Project::setDate(const std::string& date)
     d.set_parse(date);
     if (d.valid()) {
         m_date = d.format_string("%a, %d %b %Y %H:%M:%S %z");
+    } else {
+        m_date.assign(date);
     }
 }
 

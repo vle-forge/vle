@@ -125,32 +125,10 @@ namespace vle { namespace vpz {
          */
         static void fixExtension(std::string& filename);
 
-        inline float version() const
-        { return m_version; }
-
-        inline const std::string& author() const
-        { return m_author; }
-
-        inline const std::string& date() const
-        { return m_date; }
-
-        inline void setVersion(float f)
-        { if (f >= 0) m_version = f; }
-
-        inline void setAuthor(const std::string& author)
-        { if (not author.empty()) m_author.assign(author); }
-
-        inline void setDate(const std::string& date)
-        { if (not date.empty()) m_date.assign(date); }
-
     private:
-        std::string         m_filename;
-        Project             m_project;
         bool                m_isGzip;
-
-        float               m_version;
-        std::string         m_author;
-        std::string         m_date;
+        std::string         m_filename;
+        vpz::Project        m_project;
     };
 
 }} // namespace vle vpz
