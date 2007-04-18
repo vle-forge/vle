@@ -48,10 +48,9 @@ bool NoVLEModel::parseXML(xmlpp::Element*, CoupledModel*)
     return true;
 }
 
-void NoVLEModel::writeXML(xmlpp::Element* elt)
+void NoVLEModel::writeXML(std::ostream& out) const
 {
-    elt->set_attribute("NAME", getName());
-    elt->set_attribute("TYPE", "novle");
+    out << "<model name=\"" << getName() << "\" type=\"novle\" />";
 }
 
 bool NoVLEModel::isAtomic() const

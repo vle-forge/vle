@@ -27,7 +27,6 @@
 #include <vle/vpz/Base.hpp>
 #include <vle/vpz/Model.hpp>
 #include <vle/vpz/Dynamics.hpp>
-#include <vle/vpz/Graphics.hpp>
 #include <vle/vpz/Experiment.hpp>
 #include <vle/vpz/Classes.hpp>
 #include <vle/vpz/NoVLEs.hpp>
@@ -43,9 +42,10 @@ namespace vle { namespace vpz {
 
         void setProject(const std::string& name, const std::string& date);
 
-        virtual void init(xmlpp::Element* elt);
+        virtual void write(std::ostream& out ) const;
 
-        virtual void write(xmlpp::Element* elt) const;
+        virtual Base::type getType() const
+        { return PROJECT; }
 
         void clear();
 
@@ -64,10 +64,6 @@ namespace vle { namespace vpz {
         const Dynamics& dynamics() const { return m_dynamics; }
         
         Dynamics& dynamics() { return m_dynamics; }
-        
-        const Graphics& graphics() const { return m_graphics; }
-        
-        Graphics& graphics() { return m_graphics; }
         
         const Experiment& experiment() const { return m_experiment; }
         
@@ -98,7 +94,6 @@ namespace vle { namespace vpz {
         std::string     m_date;
         Model           m_model;
         Dynamics        m_dynamics;
-        Graphics        m_graphics;
         Experiment      m_experiment;
         Classes         m_classes;
         NoVLEs          m_novles;

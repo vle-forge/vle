@@ -41,38 +41,31 @@ namespace vle { namespace vpz {
     public:
         enum Type { WRAPPING, MAPPING };
         
-        Dynamic() 
+        Dynamic() :
+            m_type(WRAPPING)
         { }
 
-        virtual ~Dynamic()
+        Dynamic(const std::string& name) :
+            m_name(name),
+            m_type(WRAPPING)
         { }
 
-        /** 
-         * @brief Initialise Dynamic with XML information.
-         * @code
-         * <DYNAMICS FORMALISM="name" TYPE="mapping">
-         *  <INIT I="5" />
-         * </DYNAMICS>
-         * @endcode
-         * 
-         * @param elt A XML reference to the DYNAMICS tag.
-         */
-        virtual void init(xmlpp::Element* elt);
+        virtual ~Dynamic() { }
+
+        virtual void write(std::ostream& out) const;
+
+        virtual Base::type getType() const
+        { return DYNAMIC; }
+
 
         /** 
-         * @brief Write Dynamic information under specified node.
-         * @code@
-         * <MODEL NAME="counter">
-         *  <DYNAMICS FORMALISM="name" TYPE="mapping">
-         *   <INIT I="5" />
-         *  </DYNAMICS>
-         * </MODEL>
-         * @endcode@
+         * @brief Assign a new name to the dynamic.
          * 
-         * @param elt A XML reference to the MODEL tag.
+         * @param name new name of the dynamic.
          */
-        virtual void write(xmlpp::Element* elt) const;
-
+        void setName(const std::string& name)
+        { m_name.assign(name); }
+        
         /** 
          * @brief Set this Dynamic using Mapping type.
          * 
@@ -96,6 +89,13 @@ namespace vle { namespace vpz {
                                 const std::string& formalism);
 
         /** 
+         * @brief Get the current name of the dynamic.
+         * 
+         * @return the name of the dynamic.
+         */
+        inline const std::string& name() const { return m_name; }
+
+        /** 
          * @brief Get the XML dynamic. Can be empty.
          * 
          * @return an XML format.
@@ -116,7 +116,20 @@ namespace vle { namespace vpz {
          */
         inline Dynamic::Type type() const { return m_type; }
 
+
+
+        /** 
+         * @brief An operator to the std::set container.
+         * 
+         * @param dynamic The dynamic to search.
+         * 
+         * @return True if current name less that dynamic parameter.
+         */
+        inline bool operator<(const Dynamic& dynamic) const
+        { return m_name < dynamic.m_name; }
+
     private:
+        std::string     m_name;
         std::string     m_dynamic;
         std::string     m_formalism;
         Dynamic::Type   m_type;

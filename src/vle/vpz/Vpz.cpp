@@ -38,16 +38,22 @@ Vpz::Vpz(const std::string& filename) :
     open(filename);
 }
 
-void Vpz::open(const std::string& filename)
+void Vpz::write(std::ostream& /* out */) const
 {
-    m_filename.assign(filename);
+}
 
-    std::string xml = get_gzip_content(filename);
-    xmlpp::DomParser dom;
-    dom.parse_memory(xml);
-
-    xmlpp::Element* root = xml::get_root_node(dom, "VLE_PROJECT");
-    m_project.init(root);
+void Vpz::open(const std::string& /* filename */)
+{
+    //m_filename.assign(filename);
+    //
+    //std::string xml = get_gzip_content(filename);
+    //xmlpp::DomParser dom;
+    //dom.parse_memory(xml);
+    //
+    //xmlpp::Element* root = xml::get_root_node(dom, "VLE_PROJECT");
+    //m_project.init(root);
+    //
+    //FIXME FIXME FIXME
 }
 
 void Vpz::expandTranslator()
@@ -62,11 +68,13 @@ bool Vpz::hasNoVLE() const
 
 void Vpz::write()
 {
-    xmlpp::Document doc;
-    doc.create_root_node("VLE_PROJECT");
-    m_project.write(doc.get_root_node());
-
-    doc.write_to_file_formatted(m_filename);
+    //xmlpp::Document doc;
+    //doc.create_root_node("VLE_PROJECT");
+    //m_project.write(doc.get_root_node());
+    //
+    //doc.write_to_file_formatted(m_filename);
+    //
+    //FIXME FIXME FIXME
 }
 
 void Vpz::write(const std::string& filename)
@@ -84,11 +92,13 @@ void Vpz::clear()
 
 std::string Vpz::writeToString()
 {
-    xmlpp::Document doc;
-    doc.create_root_node("VLE_PROJECT");
-    m_project.write(doc.get_root_node());
-
-    return doc.write_to_string_formatted();
+    //xmlpp::Document doc;
+    //doc.create_root_node("VLE_PROJECT");
+    //m_project.write(doc.get_root_node());
+    //
+    //return doc.write_to_string_formatted();
+    //FIXME FIXME FIXME
+    return "";
 }
 
 std::string Vpz::get_gzip_content(const std::string& filename)

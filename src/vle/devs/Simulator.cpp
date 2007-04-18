@@ -151,9 +151,9 @@ graph::Model* Simulator::createModels(graph::CoupledModel* parent,
     if (not xmlInit.empty())
         applyInits(lst, xmlInit);
 
-    xmlpp::Document doc;
-    xmlpp::Element* root = doc.create_root_node("test");
-    parent->writeXML(root);
+    //xmlpp::Document doc;
+    //xmlpp::Element* root = doc.create_root_node("test");
+    //parent->writeXML(root); FIXME FIXME FIXME
 
     return top;
 }
@@ -499,13 +499,13 @@ void Simulator::startEOVStream()
 void Simulator::startNetStream()
 {
     const vpz::Measures& measures = m_experiment.measures();
-    std::map < std::string, vpz::Measure >::const_iterator it;
+    vpz::Measures::MeasureList::const_iterator it;
     for (it = measures.measures().begin(); it != measures.measures().end();
          ++it) {
-        const vpz::Output& o = measures.outputs().find((*it).second.output());
+        const vpz::Output& o = measures.outputs().find((*it).output());
 
         if (o.format() == vpz::Output::NET)
-	  startNetStream((*it).second.output(),o.location());
+	  startNetStream((*it).output(), o.location());
     }
 }
 
@@ -541,32 +541,32 @@ void Simulator::startNetStream(const std::string& output,
 void Simulator::startLocalStream()
 {
     const vpz::Measures& measures = m_experiment.measures();
-    std::map < std::string, vpz::Measure >::const_iterator it;
+    vpz::Measures::MeasureList::const_iterator it;
     for (it = measures.measures().begin(); it != measures.measures().end();
          ++it) {
         Stream* stream = 0;
-        const vpz::Output& o = measures.outputs().find((*it).second.output());
+        const vpz::Output& o = measures.outputs().find((*it).output());
 
         if (o.format() == vpz::Output::TEXT 
 	    or o.format() == vpz::Output::SDML) {
             std::string file(m_experiment.name());
             file += "_";
-            file += (*it).first;
+            file += (*it).name();
 
             stream = getStreamPlugin(o);
             stream->init(o.plugin(), file, o.location(), o.xml());
 
             Observer* obs = 0;
-            if ((*it).second.type() == vpz::Measure::TIMED) {
-                obs = new devs::TimedObserver((*it).first, stream,
-                                              (*it).second.timestep());
-            } else if ((*it).second.type() == vpz::Measure::EVENT) {
-                obs = new devs::EventObserver((*it).first, stream);
+            if ((*it).type() == vpz::Measure::TIMED) {
+                obs = new devs::TimedObserver((*it).name(), stream,
+                                              (*it).timestep());
+            } else if ((*it).type() == vpz::Measure::EVENT) {
+                obs = new devs::EventObserver((*it).name(), stream);
             }
             stream->setObserver(obs);
 
             const std::list < vpz::Observable >& observables =
-                (*it).second.observables();
+                (*it).observables();
             std::list < vpz::Observable >::const_iterator jt;
             for (jt = observables.begin(); jt != observables.end(); ++jt) {
                 obs->addObservable(getModel((*jt).modelname()),

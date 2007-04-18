@@ -34,13 +34,18 @@ namespace vle { namespace vpz {
     class Classes : public Base
     {
     public:
+        typedef std::map < std::string, Class > ClassList;
+
         Classes() { }
 
         virtual ~Classes() { }
 
-        virtual void init(xmlpp::Element* elt);
+        virtual void write(std::ostream& out) const;
 
-        virtual void write(xmlpp::Element* elt) const;
+        virtual Base::type getType() const
+        { return CLASSES; }
+
+        
 
         void addClass(const std::string& name,
                       const Class& c);
@@ -59,11 +64,11 @@ namespace vle { namespace vpz {
 
         Class& getClass(const std::string& name);
 
-        const std::map < std::string, Class >& classes() const
+        inline const ClassList& classes() const
         { return m_classes; }
 
     private:
-        std::map < std::string, Class >      m_classes;
+        ClassList m_classes;
     };
 
 }} // namespace vle vpz

@@ -134,17 +134,14 @@ devs::SAtomicModelList ModelFactory::createModelsFromDynamics(
 
 Glib::Module* ModelFactory::getPlugin(const std::string& name)
 {
-    std::map < std::string, vpz::Dynamic >::const_iterator it;
-    it = mDynamics.dynamics().find(name);
-    if (it != mDynamics.dynamics().end()) {
-        return buildPlugin((*it).second);
+    if (mDynamics.exist(name)) {
+        return buildPlugin(mDynamics.find(name));
     } else {
-        std::map < std::string, vpz::Class >::const_iterator clit;
+        vpz::Classes::ClassList::const_iterator clit;
         for (clit = mClasses.classes().begin(); clit != mClasses.classes().end();
              ++clit) {
-            it = (*clit).second.dynamics().dynamics().find(name);
-            if (it != (*clit).second.dynamics().dynamics().end()) {
-                return buildPlugin((*it).second);
+            if ((*clit).second.dynamics().exist(name)) {
+                return buildPlugin((*clit).second.dynamics().find(name));
             }
         }
     }

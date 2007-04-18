@@ -37,7 +37,7 @@
 namespace vle { namespace vpz {
 
 class ValueStackSax
-    {
+{
     public:
         void push_integer();
 

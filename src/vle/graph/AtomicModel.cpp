@@ -83,11 +83,13 @@ bool AtomicModel::parseXML(xmlpp::Element* modelNode, CoupledModel *)
     return true;
 }
 
-void AtomicModel::writeXML(xmlpp::Element* elt)
+void AtomicModel::writeXML(std::ostream& out) const
 {
-    elt->set_attribute("NAME", getName());
-    elt->set_attribute("TYPE", "atomic");
-    writePortListXML(elt);
+    out << "<model>"
+        << " name=\"" << getName() << "\""
+        << " type=\"atomic\"";
+
+    writePortListXML(out);
 }
 
 }} // namespace vle graph

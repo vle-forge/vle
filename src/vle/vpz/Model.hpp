@@ -43,28 +43,16 @@ namespace vle { namespace vpz {
         virtual ~Model();
 
         /** 
-         * @brief Initialise the devs hierachy of model.
-         * @code
-         * <STRUCTURES>
-         *  <MODEL NAME="toto">
-         *  </MODEL>
-         * </STRUCTURES>
-         * @endcode
-         * 
-         * @param elt a reference to the STRUCTURES tag.
-         *
-         * @throw Exception::Internal if elt is null or not on a STRUCTURES tag.
-         */
-        virtual void init(xmlpp::Element* elt);
-
-        /** 
          * @brief Write the devs hierachy of model.
          * 
          * @param elt a reference to the parent STRUCTURES tag.
          *
          * @throw Exception::Internal if elt is null.
          */
-        virtual void write(xmlpp::Element* elt) const;
+        virtual void write(std::ostream& out) const;
+
+        virtual Base::type getType() const
+        { return MODELS; }
 
         /** 
          * @brief Initialise the devs hierachy of model.

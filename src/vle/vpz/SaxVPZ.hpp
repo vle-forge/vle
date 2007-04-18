@@ -45,8 +45,7 @@ namespace vle { namespace vpz {
             m_vpz(0)
         { }
 
-        ~VpzStackSax()
-        { }
+        ~VpzStackSax() { }
 
         vpz::Vpz* push_vpz(const std::string& author, float version,
                       const std::string& date);

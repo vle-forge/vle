@@ -31,52 +31,52 @@ namespace vle { namespace vpz {
 
 using namespace vle::utils;
 
-void Project::init(xmlpp::Element* elt)
+//void Project::init(xmlpp::Element* elt)
+//{
+//AssertI(elt);
+//AssertI(elt->get_name() == "VLE_PROJECT");
+//
+//xmlpp::Element* str = xml::get_children(elt, "STRUCTURES");
+//xmlpp::Element* dyn = xml::get_children(elt, "DYNAMICS");
+//
+//m_model.init(str);
+//m_dynamics.init(dyn);
+//
+//if (xml::exist_children(elt, "GRAPHICS")) {
+//xmlpp::Element* grp = xml::get_children(elt, "GRAPHICS");
+//m_graphics.init(grp);
+//}
+//
+//if (xml::exist_children(elt, "EXPERIMENTS")) {
+//xmlpp::Element* exp = xml::get_children(elt, "EXPERIMENTS");
+//m_experiment.init(exp);
+//}
+//
+//if (xml::exist_children(elt, "CLASSES")) {
+//xmlpp::Element* cls = xml::get_children(elt, "CLASSES");
+//m_classes.init(cls);
+//}
+//
+//if (xml::exist_children(elt, "NO_VLES")) {
+//xmlpp::Element* nov = xml::get_children(elt, "NO_VLES");
+//m_novles.init(nov);
+//}
+//}
+
+void Project::write(std::ostream& out) const
 {
-    AssertI(elt);
-    AssertI(elt->get_name() == "VLE_PROJECT");
+    out << "<vle_project"
+        << " date=\"" << m_date << "\""
+        << " name=\"" << m_name << "\""
+        << ">";
 
-    xmlpp::Element* str = xml::get_children(elt, "STRUCTURES");
-    xmlpp::Element* dyn = xml::get_children(elt, "DYNAMICS");
+    m_model.write(out);
+    m_dynamics.write(out);
+    m_experiment.write(out);
+    m_classes.write(out);
+    m_novles.write(out);
 
-    m_model.init(str);
-    m_dynamics.init(dyn);
-
-    if (xml::exist_children(elt, "GRAPHICS")) {
-        xmlpp::Element* grp = xml::get_children(elt, "GRAPHICS");
-        m_graphics.init(grp);
-    }
-
-    if (xml::exist_children(elt, "EXPERIMENTS")) {
-        xmlpp::Element* exp = xml::get_children(elt, "EXPERIMENTS");
-        m_experiment.init(exp);
-    }
-
-    if (xml::exist_children(elt, "CLASSES")) {
-        xmlpp::Element* cls = xml::get_children(elt, "CLASSES");
-        m_classes.init(cls);
-    }
-
-    if (xml::exist_children(elt, "NO_VLES")) {
-        xmlpp::Element* nov = xml::get_children(elt, "NO_VLES");
-        m_novles.init(nov);
-    }
-}
-
-void Project::write(xmlpp::Element* elt) const
-{
-    AssertI(elt);
-    AssertI(elt->get_name() == "VLE_PROJECT");
-
-    elt->set_attribute("DATE", m_date);
-    elt->set_attribute("NAME", m_name);
-
-    m_model.write(elt);
-    m_dynamics.write(elt);
-    m_graphics.write(elt);
-    m_experiment.write(elt);
-    m_classes.write(elt);
-    m_novles.write(elt);
+    out << "</vle_project>";
 }
 
 void Project::clear()
@@ -86,7 +86,6 @@ void Project::clear()
 
     m_model.clear();
     m_dynamics.clear();
-    m_graphics.clear();
     m_experiment.clear();
     m_classes.clear();
     m_novles.clear();
@@ -94,7 +93,7 @@ void Project::clear()
 
 void Project::expandTranslator()
 {
-    m_novles.fusion(m_model, m_dynamics, m_graphics, m_experiment);
+    m_novles.fusion(m_model, m_dynamics, m_experiment);
     m_novles.clear();
 }
 

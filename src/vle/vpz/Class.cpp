@@ -30,37 +30,47 @@ namespace vle { namespace vpz {
 
 using namespace vle::utils;
 
-void Class::init(xmlpp::Element* elt)
+//void Class::init(xmlpp::Element* elt)
+//{
+//AssertI(elt);
+//AssertI(elt->get_name() == "CLASS");
+//
+//xmlpp::Element* str = xml::get_children(elt, "STRUCTURES");
+//xmlpp::Element* dyn = xml::get_children(elt, "DYNAMICS");
+//
+//m_model.init(str);
+//m_dynamics.init(dyn);
+//
+//if (xml::exist_children(elt, "GRAPHICS")) {
+//xmlpp::Element* grp = xml::get_children(elt, "GRAPHICS");
+//m_graphics.init(grp);
+//}
+//
+//if (xml::exist_children(elt, "EXPERIMENTS")) {
+//xmlpp::Element* exp = xml::get_children(elt, "EXPERIMENTS");
+//m_experiement.init(exp);
+//}
+//}
+
+//void Class::write(xmlpp::Element* elt) const
+//{
+//AssertI(elt);
+//AssertI(elt->get_name() == "CLASS");
+//
+//m_model.write(elt);
+//m_dynamics.write(elt);
+//m_graphics.write(elt);
+//m_experiement.write(elt);
+//}
+
+void Class::write(std::ostream& out) const
 {
-    AssertI(elt);
-    AssertI(elt->get_name() == "CLASS");
-
-    xmlpp::Element* str = xml::get_children(elt, "STRUCTURES");
-    xmlpp::Element* dyn = xml::get_children(elt, "DYNAMICS");
-
-    m_model.init(str);
-    m_dynamics.init(dyn);
-
-    if (xml::exist_children(elt, "GRAPHICS")) {
-        xmlpp::Element* grp = xml::get_children(elt, "GRAPHICS");
-        m_graphics.init(grp);
-    }
-
-    if (xml::exist_children(elt, "EXPERIMENTS")) {
-        xmlpp::Element* exp = xml::get_children(elt, "EXPERIMENTS");
-        m_experiement.init(exp);
-    }
+    out << m_model
+        << m_dynamics
+        << m_experiement;
 }
 
-void Class::write(xmlpp::Element* elt) const
-{
-    AssertI(elt);
-    AssertI(elt->get_name() == "CLASS");
 
-    m_model.write(elt);
-    m_dynamics.write(elt);
-    m_graphics.write(elt);
-    m_experiement.write(elt);
-}
+
     
 }} // namespace vle vpz

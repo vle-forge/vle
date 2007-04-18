@@ -30,48 +30,16 @@ namespace vle { namespace vpz {
     
 using namespace vle::utils;
 
-void Dynamic::init(xmlpp::Element* elt)
+void Dynamic::write(std::ostream& out) const
 {
-    AssertI(elt);
-    AssertI(elt->get_name() == "DYNAMICS");
-
-    Glib::ustring type(xml::get_attribute(elt, "TYPE"));
-    if (type == "wrapping") {
-        if (xml::has_children(elt)) {
-            setWrappingDynamic(xml::get_attribute(elt, "FORMALISM"),
-                               xml::write_to_string(elt));
-        } else {
-            setWrappingDynamic(xml::get_attribute(elt, "FORMALISM"), "");
-        }
-    } else if (type == "mapping") {
-        if (xml::has_children(elt)) {
-            setMappingDynamic(xml::get_attribute(elt, "FORMALISM"),
-                              xml::write_to_string(elt));
-        } else {
-            setMappingDynamic(xml::get_attribute(elt, "FORMALISM"), "");
-        }
-    } else {
-        Throw(utils::InternalError, "Unknow type");
-    }
-}
-
-void Dynamic::write(xmlpp::Element* elt) const
-{
-    AssertI(elt);
-    AssertI(elt->get_name() == "MODEL");
-
-    xmlpp::Element* dyn;
+    out << "<dynamic formalism=\"" << m_formalism << "\" type=\""
+        << (m_type == Dynamic::WRAPPING ? "wrapping" : "mapping");
 
     if (m_dynamic.empty()) {
-        dyn = elt->add_child("DYNAMICS");
+        out << "\" />";
     } else {
-        xml::import_children_nodes(elt, m_dynamic);
-        dyn = xml::get_children(elt, "DYNAMICS");
+        out << "\" >" << m_dynamic << "</dynamic>";
     }
-
-    dyn->set_attribute("FORMALISM", m_formalism);
-    dyn->set_attribute("TYPE", (m_type == Dynamic::WRAPPING) ?
-                       "wrapping" : "mapping");
 }
 
 void Dynamic::setWrappingDynamic(const std::string& formalism,

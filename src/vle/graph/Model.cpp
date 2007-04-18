@@ -643,50 +643,42 @@ bool Model::parseXMLtime(xmlpp::Element*, xmlpp::Element*)
     return true;
 }
 
-void Model::writePortListXML( xmlpp::Element * elt )
+void Model::writePortListXML(std::ostream& out) const
 {
-    if ( m_initPortList.size() > 0 ) {
-	xmlpp::Element * init = elt->add_child( "INIT" );
+    if (not m_initPortList.empty()) {
+        out << "<init>";
 	MapStringPort::const_iterator it = m_initPortList.begin();
-        while ( it != m_initPortList.end() ) {
-	    xmlpp::Element * e = init->add_child( "PORT" );
-	    e->set_attribute( "NAME", (*it).first );
-	    e->add_child_text( "" );
-	    ++it;
-	}
+        for (;it != m_initPortList.end(); ++it) {
+            out << "<port name=\"" << (*it).first << "\" />";
+        }
+        out << "</init>";
     }
 
-    if ( m_inPortList.size() > 0 ) {
-	xmlpp::Element * init = elt->add_child( "IN" );
-	MapStringPort::const_iterator it = m_inPortList.begin();
-        while ( it != m_inPortList.end() ) {
-	    xmlpp::Element * e = init->add_child( "PORT" );
-	    e->set_attribute( "NAME", (*it).first );
-	    e->add_child_text( "" );
-	    ++it;
-	}
+    if (not m_inPortList.empty()) {
+        out << "<in>";
+        MapStringPort::const_iterator it = m_inPortList.begin();
+        for (;it != m_inPortList.end(); ++it) {
+            out << "<port name=\"" << (*it).first << "\" />";
+        }
+        out << "</in>";
     }
 
-    if ( m_outPortList.size() > 0 ) {
-	xmlpp::Element * init = elt->add_child( "OUT" );
+    if (not m_outPortList.empty()) {
+        out << "<out>";
 	MapStringPort::const_iterator it = m_outPortList.begin();
-        while ( it != m_outPortList.end() ) {
-	    xmlpp::Element * e = init->add_child( "PORT" );
-	    e->set_attribute( "NAME", (*it).first );
-	    e->add_child_text( "" );
-	    ++it;
+        for(; it != m_outPortList.end(); ++it) {
+            out << "<port name=\"" << (*it).first << "\" />";
 	}
+        out << "</out>";
     }
 
-    if ( m_statePortList.size() > 0 ) {
-	xmlpp::Element * init = elt->add_child( "STATE" );
+    if (not m_statePortList.empty()) {
+        out << "<state>";
 	MapStringPort::const_iterator it = m_statePortList.begin();
-        while ( it != m_statePortList.end() ) {
-	    xmlpp::Element * e = init->add_child( "PORT" );
-	    e->set_attribute( "NAME", (*it).first );
-	    e->add_child_text( "" );
-	    ++it;
+        for (; it != m_statePortList.end(); ++it) {
+            out << "<port name=\"" << (*it).first << "\" />";
 	}
+        out << "</state>";
     }
 }
 

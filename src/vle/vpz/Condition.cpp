@@ -64,32 +64,20 @@ Condition::~Condition()
     clearValue();
 }
 
-void Condition::init(xmlpp::Element* elt)
+void Condition::write(std::ostream& out) const
 {
-    AssertI(elt);
-    AssertI(elt->get_name() == "CONDITION");
+    out << "<condition model_name=\""
+        << m_modelname
+        << "\" port_name=\""
+        << m_portname
+        << "\"";
 
-    clearValue();
-    m_modelname.assign(xml::get_attribute(elt, "MODEL_NAME"));
-    m_portname.assign(xml::get_attribute(elt, "PORT_NAME"));
-    // FIXME, initialiser les values à partir d'XML.
-    m_value = value::ValueBase::getValues(elt);
-}
-
-void Condition::write(xmlpp::Element* elt) const
-{
-    AssertI(elt);
-
-    xmlpp::Element* condition = elt->add_child("CONDITION");
-    condition->set_attribute("MODEL_NAME", m_modelname);
-    condition->set_attribute("PORT_NAME", m_portname);
-
-    std::vector < value::Value >::const_iterator it = m_value.begin();
-    while (it != m_value.end()) {
-        std::string xml((*it)->toXML());
-        xml::import_children_nodes(condition, xml);
-        ++it;
+    std::vector < value::Value >::const_iterator it;
+    for (it = m_value.begin(); it != m_value.end(); ++it) {
+        out << (*it)->toXML();
     }
+
+    out << "</condition>";
 }
 
 void Condition::setCondition(const std::string& modelname,

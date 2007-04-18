@@ -31,74 +31,74 @@ namespace vle { namespace vpz {
 
 using namespace vle::utils;
 
-void Experiment::init(xmlpp::Element* elt)
+//void Experiment::init(xmlpp::Element* elt)
+//{
+//AssertI(elt);
+//AssertI(elt->get_name() == "EXPERIMENTS");
+//
+//if (not xml::exist_children(elt, "EXPERIMENT"))
+//return;
+//
+//xmlpp::Element* exp = xml::get_children(elt, "EXPERIMENT");
+//setName(xml::get_attribute(exp, "NAME"));
+//setDuration(xml::get_double_attribute(exp, "DURATION"));
+//setDate(xml::get_attribute(exp, "DATE"));
+//
+//if (xml::exist_attribute(exp, "SEED")) {
+//setSeed(utils::translate < guint32 >(
+//xml::get_attribute(exp, "SEED")));
+//} else {
+//setSeed(0);
+//}
+//
+//if (xml::exist_children(exp, "REPLICAS")) {
+//xmlpp::Element* rep = xml::get_children(exp, "REPLICAS");
+//m_replicas.init(rep);
+//}
+//
+//if (xml::exist_children(exp, "EXPERIMENTAL_CONDITIONS")) {
+//xmlpp::Element* rep = 
+//xml::get_children(exp, "EXPERIMENTAL_CONDITIONS");
+//m_conditions.init(rep);
+//}
+//
+//if (xml::exist_children(exp, "MEASURES")) {
+//xmlpp::Element* rep = xml::get_children(exp, "MEASURES");
+//m_measures.init(rep);
+//}
+//}
+
+void Experiment::write(std::ostream& out) const
 {
-    AssertI(elt);
-    AssertI(elt->get_name() == "EXPERIMENTS");
+    out << "<experiment "
+        << "name=\"" << m_name << "\" "
+        << "duration=\"" << m_duration << "\" "
+        << "date=\"" << m_date << "\" "
+        << "seed=\"" << m_seed << "\" >";
 
-    if (not xml::exist_children(elt, "EXPERIMENT"))
-        return;
+    m_replicas.write(out);
+    m_conditions.write(out);
+    m_measures.write(out);
 
-    xmlpp::Element* exp = xml::get_children(elt, "EXPERIMENT");
-    setName(xml::get_attribute(exp, "NAME"));
-    setDuration(xml::get_double_attribute(exp, "DURATION"));
-    setDate(xml::get_attribute(exp, "DATE"));
-
-    if (xml::exist_attribute(exp, "SEED")) {
-        setSeed(utils::translate < guint32 >(
-            xml::get_attribute(exp, "SEED")));
-    } else {
-        setSeed(0);
-    }
-
-    if (xml::exist_children(exp, "REPLICAS")) {
-        xmlpp::Element* rep = xml::get_children(exp, "REPLICAS");
-        m_replicas.init(rep);
-    }
-
-    if (xml::exist_children(exp, "EXPERIMENTAL_CONDITIONS")) {
-        xmlpp::Element* rep = 
-            xml::get_children(exp, "EXPERIMENTAL_CONDITIONS");
-        m_conditions.init(rep);
-    }
-
-    if (xml::exist_children(exp, "MEASURES")) {
-        xmlpp::Element* rep = xml::get_children(exp, "MEASURES");
-        m_measures.init(rep);
-    }
+    out << "</experiment>";
 }
 
-void Experiment::write(xmlpp::Element* elt) const
+void Experiment::initFromExperiment(xmlpp::Element* /* elt */)
 {
-    AssertI(elt);
-
-    xmlpp::Element* exps = elt->add_child("EXPERIMENTS");
-    xmlpp::Element* exp = exps->add_child("EXPERIMENT");
-    exp->set_attribute("NAME", m_name);
-    exp->set_attribute("DURATION", utils::to_string(m_duration));
-    exp->set_attribute("DATE", m_date);
-    exp->set_attribute("SEED", utils::to_string(m_seed));
-
-    m_replicas.write(exp);
-    m_conditions.write(exp);
-    m_measures.write(exp);
-}
-
-void Experiment::initFromExperiment(xmlpp::Element* elt)
-{
-    AssertI(elt);
-    AssertI(elt->get_name() == "EXPERIMENT");
-
-    if (xml::exist_children(elt, "EXPERIMENTAL_CONDITIONS")) {
-        xmlpp::Element* rep = 
-            xml::get_children(elt, "EXPERIMENTAL_CONDITIONS");
-        m_conditions.init(rep);
-    }
-
-    if (xml::exist_children(elt, "MEASURES")) {
-        xmlpp::Element* rep = xml::get_children(elt, "MEASURES");
-        m_measures.init(rep);
-    }
+    //FIXME
+    //AssertI(elt);
+    //AssertI(elt->get_name() == "EXPERIMENT");
+    //
+    //if (xml::exist_children(elt, "EXPERIMENTAL_CONDITIONS")) {
+    //xmlpp::Element* rep = 
+    //xml::get_children(elt, "EXPERIMENTAL_CONDITIONS");
+    //m_conditions.init(rep);
+    //}
+    //
+    //if (xml::exist_children(elt, "MEASURES")) {
+    //xmlpp::Element* rep = xml::get_children(elt, "MEASURES");
+    //m_measures.init(rep);
+    //}
 }
 
 void Experiment::clear()

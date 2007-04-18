@@ -43,11 +43,12 @@ namespace vle { namespace vpz {
 
         Measure();
 
-        virtual ~Measure();
+        virtual ~Measure() { }
 
-        virtual void init(xmlpp::Element* elt);
+        virtual void write(std::ostream& out) const;
 
-        virtual void write(xmlpp::Element* elt) const;
+        virtual Base::type getType() const
+        { return MEASURE; }
 
         /** 
          * @brief Set the Measure with Event type and the specified name and
@@ -140,6 +141,12 @@ namespace vle { namespace vpz {
                              const std::string& group = std::string(),
                              int index = -1) const;
 
+        void setName(const std::string& name) 
+        { m_name.assign(name); }
+
+        const std::string& name() const
+        { return m_name; }
+
         const Type& type() const
         { return m_type; }
 
@@ -169,7 +176,15 @@ namespace vle { namespace vpz {
         std::list < Observable >& observables()
         { return m_observables; }
 
+        inline bool operator<(const Measure& measure)
+        { return m_name < measure.name(); }
+
+        inline bool operator==(const std::string& name)
+        { return m_name == name; }
+
+
     private:
+        std::string m_name;
         Type        m_type;
         double      m_timestep;
         std::string m_output;

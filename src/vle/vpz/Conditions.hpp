@@ -39,13 +39,17 @@ namespace vle { namespace vpz {
     class Conditions : public Base
     {
     public:
+        typedef std::list < Condition > ConditionList;
+
         Conditions();
 
-        virtual ~Conditions();
+        virtual ~Conditions() { }
 
-        virtual void init(xmlpp::Element* elt);
+        virtual void write(std::ostream& out) const;
 
-        virtual void write(xmlpp::Element* elt) const;
+        virtual Base::type getType() const
+        { return CONDITIONS; }
+
 
         /** 
          * @brief Add a list of Conditions to the list.
@@ -85,7 +89,7 @@ namespace vle { namespace vpz {
          * 
          * @return A reference to the list of conditions.
          */
-        const std::list < Condition >& conditions() const
+        ConditionList& conditions()
         { return m_conditions; }
 
         /** 
@@ -93,11 +97,45 @@ namespace vle { namespace vpz {
          * 
          * @return A reference to the list of conditions.
          */
-        std::list < Condition >& conditions()
+        const ConditionList& conditions() const
         { return m_conditions; }
 
+        /** 
+         * @brief This functor is a helper to find an condition by name in an
+         * ConditionList using the standard algorithm std::find_if,
+         * std::remove_if etc.
+         *
+         * Example:@n
+         * <code>
+         * Glib::ustring name = "a";@n
+         * ConditionList::const_iterator it;
+         * it = std::find_if(lst.begin(), lst.end(), ConditionHasName("a", "b");
+         * </code>
+         */
+        struct ConditionHasNames
+        {
+            const Glib::ustring& modelname;
+            const Glib::ustring& portname;
+
+            inline ConditionHasNames(const Glib::ustring& modelname,
+                                     const Glib::ustring& portname) :
+                modelname(modelname),
+                portname(portname)
+            { }
+
+            inline bool operator()(const Condition& condition) const
+            { return condition.modelname() == modelname and
+                condition.portname() == portname; }
+        };
+
+        Condition& find(const std::string& modelname,
+                        const std::string& portname);
+
+        const Condition& find(const std::string& modelname,
+                              const std::string& portname) const;
+
     private:
-        std::list < Condition >     m_conditions;
+        ConditionList m_conditions;
     };
 
 }} // namespace vle vpz

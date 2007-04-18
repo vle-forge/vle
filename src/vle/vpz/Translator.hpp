@@ -58,8 +58,7 @@ namespace vle { namespace vpz {
         /**
          * Call to translate original XML application into VLE XML application
          * into document Structure, Dynamics, Experiment. Call getStructure,
-         * getDynamics, getExperiment and getGraphics to get all VLE XML
-         * application.
+         * getDynamics, getExperiment to get all VLE XML application.
          */
         virtual void translate() = 0;
 

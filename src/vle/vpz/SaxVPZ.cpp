@@ -24,6 +24,7 @@
 
 #include <vle/vpz/SaxVPZ.hpp>
 #include <vle/vpz/Vpz.hpp>
+#include <vle/vpz/Structures.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/value/Map.hpp>
@@ -54,10 +55,18 @@ vpz::Vpz* VpzStackSax::push_vpz(const std::string& author, float version,
 
 void VpzStackSax::push_structure()
 {
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_vpz);
+
+    vpz::Structures* structure = new vpz::Structures();
+    m_stack.push(structure);
 }
 
 void VpzStackSax::push_model(const xmlpp::SaxParser::AttributeList& /*att*/)
 {
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_vpz);
+    AssertS(utils::SaxParserError, m_stack.top()->isVpz());
 }
 
 void VpzStackSax::push_port(const xmlpp::SaxParser::AttributeList& /*att*/)

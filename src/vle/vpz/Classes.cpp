@@ -30,33 +30,48 @@ namespace vle { namespace vpz {
     
 using namespace vle::utils;
 
-void Classes::init(xmlpp::Element* elt)
+//void Classes::init(xmlpp::Element* elt)
+//{
+    //AssertI(elt);
+    //AssertI(elt->get_name() == "CLASSES");
+
+    //m_classes.clear();
+
+    //xmlpp::Node::NodeList lst = elt->get_children("CLASS");
+    //xmlpp::Node::NodeList::iterator it;
+    //for (it = lst.begin(); it != lst.end(); ++it) {
+        //Class c;
+        //c.init((xmlpp::Element*)(*it));
+        //addClass(xml::get_attribute((xmlpp::Element*)(*it), "NAME"), c);
+    //}
+//}
+
+//void Classes::write(xmlpp::Element* elt) const
+//{
+    //AssertI(elt);
+
+    //if (not m_classes.empty()) {
+        //xmlpp::Element* classes = elt->add_child("CLASSES");
+        //std::map < std::string, Class >::const_iterator it;
+        //for (it = m_classes.begin(); it != m_classes.end(); ++it) {
+            //xmlpp::Element* clas = classes->add_child("CLASS");
+            //clas->set_attribute("NAME", (*it).first);
+            //(*it).second.write(clas);
+        //}
+    //}
+//}
+
+void Classes::write(std::ostream& out) const
 {
-    AssertI(elt);
-    AssertI(elt->get_name() == "CLASSES");
-
-    m_classes.clear();
-
-    xmlpp::Node::NodeList lst = elt->get_children("CLASS");
-    xmlpp::Node::NodeList::iterator it;
-    for (it = lst.begin(); it != lst.end(); ++it) {
-        Class c;
-        c.init((xmlpp::Element*)(*it));
-        addClass(xml::get_attribute((xmlpp::Element*)(*it), "NAME"), c);
-    }
-}
-
-void Classes::write(xmlpp::Element* elt) const
-{
-    AssertI(elt);
-
     if (not m_classes.empty()) {
-        xmlpp::Element* classes = elt->add_child("CLASSES");
+        out << "<classes>\n";
         std::map < std::string, Class >::const_iterator it;
         for (it = m_classes.begin(); it != m_classes.end(); ++it) {
-            xmlpp::Element* clas = classes->add_child("CLASS");
-            clas->set_attribute("NAME", (*it).first);
-            (*it).second.write(clas);
+            out << "<class name=\""
+                << (*it).first
+                << "\" >"
+                << (*it).second
+                << "</class>";
         }
     }
 }

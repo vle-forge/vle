@@ -36,66 +36,66 @@ Replicas::Replicas() :
     m_begin(0)
 { }
 
-Replicas::~Replicas()
-{
-}
+//void Replicas::init(xmlpp::Element* elt)
+//{
+//AssertI(elt);
+//AssertI(elt->get_name() == "REPLICAS");
+// 
+//m_list.clear();
+//m_number = utils::to_uint(xml::get_attribute(elt, "NUMBER"));
+//
+//Glib::ustring str(xml::get_attribute(elt, "SEED"));
+//if (str == "random") {
+//m_seed = Replicas::RANDOM;
+//m_seedvalue = utils::to_size_t(
+//xml::get_attribute(elt, "SEED_VALUE"));
+//} else if (str == "list") {
+//m_seed = Replicas::ENUMERATE;
+//m_begin = utils::to_uint
+//(xml::get_attribute(elt, "BEGIN"));
+//} else if (str == "enumerate") {
+//m_list.resize(m_number);
+//m_seed = Replicas::LIST;
+//xmlpp::Node::NodeList lst = elt->get_children("REPLICA");
+//for (xmlpp::Node::NodeList::iterator it = lst.begin();
+//it != lst.end(); ++it) {
+//size_t i = xml::get_size_t_attribute(
+//((xmlpp::Element*)(*it)), "NUMBER");
+//m_list[i] = xml::get_size_t_attribute(
+//((xmlpp::Element*)(*it)), "SEED");
+//}
+//}
+//}
 
-void Replicas::init(xmlpp::Element* elt)
+void Replicas::write(std::ostream& out) const
 {
-    AssertI(elt);
-    AssertI(elt->get_name() == "REPLICAS");
+    out << "<replicas"
+        << " number=\"" << m_number << "\"";
     
-    m_list.clear();
-    m_number = utils::to_uint(xml::get_attribute(elt, "NUMBER"));
-
-    Glib::ustring str(xml::get_attribute(elt, "SEED"));
-    if (str == "random") {
-        m_seed = Replicas::RANDOM;
-        m_seedvalue = utils::to_size_t(
-            xml::get_attribute(elt, "SEED_VALUE"));
-    } else if (str == "list") {
-        m_seed = Replicas::ENUMERATE;
-        m_begin = utils::to_uint
-            (xml::get_attribute(elt, "BEGIN"));
-    } else if (str == "enumerate") {
-        m_list.resize(m_number);
-        m_seed = Replicas::LIST;
-        xmlpp::Node::NodeList lst = elt->get_children("REPLICA");
-        for (xmlpp::Node::NodeList::iterator it = lst.begin();
-             it != lst.end(); ++it) {
-            size_t i = xml::get_size_t_attribute(
-                    ((xmlpp::Element*)(*it)), "NUMBER");
-            m_list[i] = xml::get_size_t_attribute(
-                    ((xmlpp::Element*)(*it)), "SEED");
-        }
-    }
-}
-
-void Replicas::write(xmlpp::Element* elt) const
-{
-    AssertI(elt);
-    
-    xmlpp::Element* replicas = elt->add_child("REPLICAS");
-    replicas->set_attribute("NUMBER", utils::to_string(m_number));
-
     switch(m_seed) {
     case Replicas::RANDOM:
-        replicas->set_attribute("SEED", "random");
-        replicas->set_attribute("SEED_VALUE", utils::to_string(m_seedvalue));
+        out << " seed=\"random\""
+            << " seed_value=\"" << m_seedvalue << "\""
+            << " />";
         break;
 
     case Replicas::LIST:
-        replicas->set_attribute("SEED", "list");
-        replicas->set_attribute("BEGIN", utils::to_string(m_begin));
+        out << " seed=\"list\""
+            << " begin=\"" << m_begin << "\""
+            << " />";
         break;
 
     case Replicas::ENUMERATE:
-        replicas->set_attribute("SEED", "enumerate");
+        out << " seed=\"enumerate\""
+            << ">";
         for (size_t i = 0; i < m_number; ++i) {
-            xmlpp::Element* replica = replicas->add_child("REPLICA");
-            replica->set_attribute("NUMBER", utils::to_string(i));
-            replica->set_attribute("SEED", utils::to_string(m_list[i]));
+            out << "<replica"
+                << " number=\"" << i << "\""
+                << " seed=\"" << m_list[i] << "\""
+                << " />";
         }
+
+        out << "</replicas>";
         break;
     }
 }

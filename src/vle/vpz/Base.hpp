@@ -25,6 +25,7 @@
 #ifndef VLE_VPZ_BASE_HPP
 #define VLE_VPZ_BASE_HPP
 
+#include <ostream>
 #include <libxml++/libxml++.h>
 
 namespace vle { namespace vpz {
@@ -36,24 +37,76 @@ namespace vle { namespace vpz {
     class Base
     {
     public:
+        enum type { STRUCTURES, MODELS, DYNAMICS, DYNAMIC, EXPERIMENT,
+            PROJECT, MEASURES, OBSERVABLE, OUTPUTS, OUTPUT, MEASURE, NOVLES,
+            NOVLE, CONDITIONS, CONDITION, EOVS, EOVCHILD, CLASSES, CLASS,
+            REPLICAS, VPZ };
+
         Base() { }
 
         virtual ~Base() { }
 
+
+        //
+        // virtuals functions 
+        //
+
+
         /** 
-         * @brief initialise this object with the XML provide by the elt
-         * reference.
+         * @brief write object information into the stream.
          * 
-         * @param elt a reference to the parent tag or current tag.
+         * @param out an output stream to write xml.
          */
-        virtual void init(xmlpp::Element* elt) = 0;
-        
+        virtual void write(std::ostream& out) const = 0;
+
         /** 
-         * @brief add this object information under the elt reference.
+         * @brief Return the Base::type of the Vpz object.
          * 
-         * @param elt a reference to the EXPERIMENT tag.
+         * @return the Base::type of the object.
          */
-        virtual void write(xmlpp::Element* elt) const = 0;
+        virtual Base::type getType() const = 0;
+
+
+        //
+        // inlines functions
+        //
+
+
+        inline bool isStructures() const { return getType() == STRUCTURES; }
+        inline bool isModels() const { return getType() == MODELS; }
+        inline bool isDynamics() const { return getType() == DYNAMICS; }
+        inline bool isDynamic() const { return getType() == DYNAMIC; }
+        inline bool isExperiment() const { return getType() == EXPERIMENT; }
+        inline bool isProject() const { return getType() == PROJECT; }
+        inline bool isMeasures() const { return getType() == MEASURES; }
+        inline bool isMeasure() const { return getType() == MEASURE; }
+        inline bool isObservable() const { return getType() == OBSERVABLE; }
+        inline bool isOutputs() const { return getType() == OUTPUTS; }
+        inline bool isOutput() const { return getType() == OUTPUT; }
+        inline bool isNoVLES() const { return getType() == NOVLES; }
+        inline bool isNoVLE() const { return getType() == NOVLE; }
+        inline bool isConditions() const { return getType() == CONDITIONS; }
+        inline bool isCondition() const { return getType() == CONDITION; }
+        inline bool isEOVS() const { return getType() == EOVS; }
+        inline bool isEOVchild() const { return getType() == EOVCHILD; }
+        inline bool isClasses() const { return getType() == CLASSES; }
+        inline bool isClass() const { return getType() == CLASS; }
+        inline bool isReplicas() const { return getType() == REPLICAS; }
+        inline bool isVpz() const { return getType() == VPZ; }
+
+
+        //
+        // friend stream
+        //
+
+
+        friend std::ostream& operator<<(std::ostream& out, const Base& obj)
+        {
+            obj.write(out);
+            out << '\n';
+            return out;
+        }
+
     };
 
 }} // namespace vle vpz

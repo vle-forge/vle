@@ -35,61 +35,56 @@ Output::Output()
     setTextStream();
 }
 
-Output::~Output()
+//void Output::init(xmlpp::Element* elt)
+//{
+//AssertI(elt);
+//AssertI(elt->get_name() == "OUTPUT");
+//
+//Glib::ustring format(xml::get_attribute(elt, "FORMAT"));
+//
+//if (format == "text") {
+//setTextStream(xml::get_attribute(elt, "LOCATION"));
+//} else if (format == "sdml") {
+//setSdmlStream(xml::get_attribute(elt, "LOCATION"));
+//} else if (format == "eov") {
+//setEovStream(xml::get_attribute(elt, "PLUGIN"),
+//xml::get_attribute(elt, "LOCATION"));
+//} else if (format == "net") {
+//setNetStream(xml::get_attribute(elt, "PLUGIN"),
+//xml::get_attribute(elt, "LOCATION"));
+//} else {
+//Throw(utils::ParseError, "Unknow output format");
+//}
+//
+//if (xml::has_children(elt)) {
+//m_xml.assign(xml::write_to_string(elt));
+//}
+//}
+
+void Output::write(std::ostream& out) const
 {
-}
-
-void Output::init(xmlpp::Element* elt)
-{
-    AssertI(elt);
-    AssertI(elt->get_name() == "OUTPUT");
-
-    Glib::ustring format(xml::get_attribute(elt, "FORMAT"));
-
-    if (format == "text") {
-        setTextStream(xml::get_attribute(elt, "LOCATION"));
-    } else if (format == "sdml") {
-        setSdmlStream(xml::get_attribute(elt, "LOCATION"));
-    } else if (format == "eov") {
-        setEovStream(xml::get_attribute(elt, "PLUGIN"),
-                     xml::get_attribute(elt, "LOCATION"));
-    } else if (format == "net") {
-        setNetStream(xml::get_attribute(elt, "PLUGIN"),
-		     xml::get_attribute(elt, "LOCATION"));
-    } else {
-        Throw(utils::ParseError, "Unknow output format");
-    }
-
-    if (xml::has_children(elt)) {
-        m_xml.assign(xml::write_to_string(elt));
-    }
-}
-
-void Output::write(xmlpp::Element* elt) const
-{
-    AssertI(elt->get_name() == "OUTPUT");
+    out << "<output name=\"" << m_name << "\" " << "location=\"" << m_location
+        << "\" ";
     
-    elt->set_attribute("LOCATION", m_location);
-
     switch (m_format) {
     case Output::TEXT:
-        elt->set_attribute("FORMAT", "text");
+        out << "format=\"text\"";
         break;
     case Output::SDML:
-        elt->set_attribute("FORMAT", "sdml");
+        out << "format=\"sdml\"";
         break;
     case Output::EOV:
-        elt->set_attribute("FORMAT", "eov");
-        elt->set_attribute("PLUGIN", m_plugin);
+        out << "format=\"eov\" plugin=\"" << m_plugin << "\"";
         break;
     case Output::NET:
-        elt->set_attribute("FORMAT", "net");
-        elt->set_attribute("PLUGIN", m_plugin);
+        out << "format=\"net\" plugin=\"" << m_plugin << "\"";
         break;
     }
 
     if (not m_xml.empty()) {
-        xml::import_children_nodes_without_parent(elt, m_xml);
+        out << ">" << m_xml << "</output>";
+    } else {
+
     }
 }
 

@@ -40,26 +40,7 @@ namespace vle { namespace vpz {
             m_seed(1)
         { }
 
-        virtual ~Experiment()
-        { }
-
-        /** 
-         * @brief Initialise Experiment information from XML including,
-         * Replicas, ExperimentalCondition and Measures.
-         * @code
-         * <EXPERIMENTS>
-         *  <EXPERIMENT NAME="exp1" DURATION="10.0" DATE="" >
-         *   [...]
-         *  </EXPERIMENT>
-         * </EXPERIMENTS>
-         * @endcode
-         * 
-         * @param elt a xml element on the tag EXPERIMENTS.
-         *
-         * @throw Exception::Parse if elt is NULL or name not equal to
-         * Experiment tag.
-         */
-        virtual void init(xmlpp::Element* elt);
+        virtual ~Experiment() { }
 
         /** 
          * @brief Write Experiment information under specified root node
@@ -76,7 +57,10 @@ namespace vle { namespace vpz {
          *
          * @throw Exception::Internal if elt is NULL.
          */
-        virtual void write(xmlpp::Element* elt) const;
+        virtual void write(std::ostream& out) const;
+
+        virtual Base::type getType() const
+        { return EXPERIMENT; }
 
         /** 
          * @brief Initialise Experiment information from XML including,

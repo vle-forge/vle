@@ -294,7 +294,7 @@ namespace vle { namespace graph {
 	virtual bool parseXML(xmlpp::Element* modelNode,
                               CoupledModel* parent);
 
-        void writeXML(xmlpp::Element* elt);
+        void writeXML(std::ostream& out) const;
 
         /** 
          * @brief Return a reference to the direct children model with

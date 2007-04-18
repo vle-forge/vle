@@ -124,18 +124,18 @@ void DSDevs::processInternalEvent(devs::InternalEvent*)
         m_state = IDLE;
 }
 
-value::Value DSDevs::processStateEvent(devs::StateEvent* evt) const
+value::Value DSDevs::processStateEvent(devs::StateEvent* /* evt */) const
 {
     xmlpp::Document doc;
-    xmlpp::Element* root = doc.create_root_node("STATE");
-    
-    if (evt->getPortName() == "coupled") {
-        m_coupledModel->writeXML(root);
-    } else if (evt->getPortName() == "hierarchy") {
-        m_coupledModel->writeXML(root);
-    } else if (evt->getPortName() == "complete") {
-        m_coupledModel->writeXML(root);
-    }
+    //FIXME
+    //xmlpp::Element* root = doc.create_root_node("STATE");
+    //if (evt->getPortName() == "coupled") {
+    //m_coupledModel->writeXML(root);
+    //} else if (evt->getPortName() == "hierarchy") {
+    //m_coupledModel->writeXML(root);
+    //} else if (evt->getPortName() == "complete") {
+    //m_coupledModel->writeXML(root);
+    //}
 
     return buildString(doc.write_to_string_formatted());
 }

@@ -30,54 +30,53 @@ namespace vle { namespace vpz {
 
 using namespace vle::utils;
 
-void Outputs::init(xmlpp::Element* elt)
+//void Outputs::init(xmlpp::Element* elt)
+//{
+//AssertI(elt);
+//AssertI(elt->get_name() == "OUTPUTS");
+//
+//m_outputs.clear();
+//
+//xmlpp::Node::NodeList lst = elt->get_children("OUTPUT");
+//xmlpp::Node::NodeList::iterator it = lst.begin();
+//while (it != lst.end()) {
+//std::string name(xml::get_attribute((xmlpp::Element*)(*it), "NAME"));
+//Output o;
+//o.init((xmlpp::Element*)(*it));
+//addOutput(name, o);
+//++it;
+//}
+//}
+
+void Outputs::write(std::ostream& out) const
 {
-    AssertI(elt);
-    AssertI(elt->get_name() == "OUTPUTS");
-
-    m_outputs.clear();
-
-    xmlpp::Node::NodeList lst = elt->get_children("OUTPUT");
-    xmlpp::Node::NodeList::iterator it = lst.begin();
-    while (it != lst.end()) {
-        std::string name(xml::get_attribute((xmlpp::Element*)(*it), "NAME"));
-        Output o;
-        o.init((xmlpp::Element*)(*it));
-        addOutput(name, o);
-        ++it;
-    }
-}
-
-void Outputs::write(xmlpp::Element* elt) const
-{
-    AssertI(elt);
-
     if (not m_outputs.empty()) {
-        xmlpp::Element* outputs = elt->add_child("OUTPUTS");
+        out << "<ouputs>";
 
-        std::map < std::string, Output >::const_iterator it;
-        for (it = m_outputs.begin(); it != m_outputs.end(); ++it) {
-            xmlpp::Element* output = outputs->add_child("OUTPUT");
-            output->set_attribute("NAME", (*it).first);
-            (*it).second.write(output);
-        }
+        std::copy(m_outputs.begin(), m_outputs.end(),
+                  std::ostream_iterator< Output >(out, "\n"));
+
+        out << "</outputs>";
     }
+
 }
 
 void Outputs::addTextStream(const std::string& name,
                             const std::string& location)
 {
     Output o;
+    o.setName(name);
     o.setTextStream(location);
-    addOutput(name, o);
+    addOutput(o);
 }
 
 void Outputs::addSdmlStream(const std::string& name,
                             const std::string& location)
 {
     Output o;
+    o.setName(name);
     o.setSdmlStream(location);
-    addOutput(name, o);
+    addOutput(o);
 }
 
 void Outputs::addEovStream(const std::string& name,
@@ -85,8 +84,9 @@ void Outputs::addEovStream(const std::string& name,
                            const std::string& location)
 {
     Output o;
+    o.setName(name);
     o.setEovStream(plugin, location);
-    addOutput(name, o);
+    addOutput(o);
 }
 
 void Outputs::clear()
@@ -96,61 +96,62 @@ void Outputs::clear()
 
 void Outputs::delOutput(const std::string& name)
 {
-    std::map < std::string, Output >::iterator it = m_outputs.find(name);
-    if (it != m_outputs.end()) {
-        m_outputs.erase(it);
-    }
+    std::remove_if(m_outputs.begin(), m_outputs.end(), OutputHasName(name));
 }
 
 void Outputs::addOutputs(const Outputs& o)
 {
-    std::map < std::string, Output >::const_iterator it;
-    for (it = o.outputs().begin(); it != o.outputs().end(); ++it) {
-        addOutput((*it).first, (*it).second);
+    for (OutputList::const_iterator it = o.outputs().begin();
+         it != o.outputs().end(); ++it) {
+        addOutput(*it);
     }
 }
 
-void Outputs::addOutput(const std::string& name, const Output& o)
+void Outputs::addOutput(const Output& o)
 {
-    std::map < std::string, Output >::iterator it = m_outputs.find(name);
-    Assert(utils::InternalError, it == m_outputs.end(),
+    Assert(utils::InternalError, exist(o.name()) == false,
            boost::format("An output have already this name '%1%'\n") %
-           name);
+           o.name());
 
-    m_outputs[name] = o;
+    m_outputs.push_back(o);
 }
 
 Output& Outputs::find(const std::string& name)
 {
-    std::map < std::string, Output >::iterator it = m_outputs.find(name);
+    OutputList::iterator it;
+    it = std::find_if(m_outputs.begin(), m_outputs.end(), OutputHasName(name));
     Assert(utils::InternalError, it != m_outputs.end(),
            boost::format("Unknow output '%1%'\n") % name);
 
-    return (*it).second;
+    return (*it);
 }
 
 const Output& Outputs::find(const std::string& name) const
 {
-    std::map < std::string, Output >::const_iterator it = m_outputs.find(name);
+    OutputList::const_iterator it;
+    it = std::find_if(m_outputs.begin(), m_outputs.end(), OutputHasName(name));
     Assert(utils::InternalError, it != m_outputs.end(),
            boost::format("Unknow output '%1%'\n") % name);
 
-    return (*it).second;
+    return (*it);
 }
 
 std::list < std::string > Outputs::outputsname() const
 {
     std::list < std::string > result;
-    std::map < std::string, Output >::const_iterator it;
+
+    OutputList::const_iterator it;
     for (it = m_outputs.begin(); it != m_outputs.end(); ++it) {
-        result.push_back((*it).first);
+        result.push_back((*it).name());
     }
     return result;
 }
 
 bool Outputs::exist(const std::string& name) const
 {
-    std::map < std::string, Output >::const_iterator it = m_outputs.find(name);
+    OutputList::const_iterator it = std::find_if(m_outputs.begin(),
+                                                 m_outputs.end(),
+                                                 OutputHasName(name));
     return it != m_outputs.end();
 }
 

@@ -39,12 +39,12 @@ namespace vle { namespace vpz {
 
         Vpz(const std::string& filename);
 
-        ~Vpz()
-        { }
+        virtual ~Vpz() { }
 
-        virtual void init(xmlpp::Element*) { }
+        virtual void write(std::ostream& out) const;
 
-        virtual void write(xmlpp::Element*) const { }
+        virtual Base::type getType() const
+        { return VPZ; } 
 
         /** 
          * @brief Open a VPZ file project.
@@ -54,7 +54,7 @@ namespace vle { namespace vpz {
          * @throw Exception::VPZ on error.
          */
         void open(const std::string& filename);
-    
+
         /** 
          * @brief Write file into the current VPZ filename open.
          */

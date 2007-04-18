@@ -47,9 +47,23 @@ namespace vle { namespace vpz {
 
         virtual ~Condition();
 
-        virtual void init(xmlpp::Element* elt);
+        virtual void write(std::ostream& out) const;
 
-        virtual void write(xmlpp::Element* elt) const;
+        virtual Base::type getType() const
+        { return CONDITION; }
+
+
+        /** 
+         * @brief A comparaison function. Be carefull, only the model and port
+         * names are used to compare. Not the value.
+         * 
+         * @param cond The condition to test equality.
+         * 
+         * @return True if conditions have same model name and same port.
+         */
+        inline bool operator==(const Condition& cond) const
+        { return m_modelname == cond.modelname() and m_portname ==
+            cond.portname(); }
 
         /** 
          * @brief Set the information for this Condition.

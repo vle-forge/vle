@@ -56,30 +56,26 @@ Model::~Model()
     delete m_graph;
 }
 
-void Model::init(xmlpp::Element* elt)
+//void Model::init(xmlpp::Element* elt)
+//{
+//AssertI(elt);
+//AssertI(elt->get_name() == "STRUCTURES");
+//
+//delete m_graph;
+//m_graph = 0;
+//
+//if (not xml::exist_children(elt, "MODEL"))
+//return;
+//
+//xmlpp::Element* model = xml::get_children(elt, "MODEL");
+//m_graph = graph::Model::parseXMLmodel(model, 0);
+//}
+
+void Model::write(std::ostream& out) const
 {
-    AssertI(elt);
-    AssertI(elt->get_name() == "STRUCTURES");
-
-    delete m_graph;
-    m_graph = 0;
-
-    if (not xml::exist_children(elt, "MODEL"))
-        return;
-
-    xmlpp::Element* model = xml::get_children(elt, "MODEL");
-    m_graph = graph::Model::parseXMLmodel(model, 0);
-}
-
-void Model::write(xmlpp::Element* elt) const
-{
-    AssertI(elt);
-
-    if (m_graph) {
-        xmlpp::Element* structures = elt->add_child("STRUCTURES");
-        xmlpp::Element* model = structures->add_child("MODEL");
-        m_graph->writeXML(model);
-    }
+    out << "<structures><model>";
+    m_graph->writeXML(out);
+    out << "</model></structures>";
 }
 
 void Model::initFromModel(xmlpp::Element* elt)
