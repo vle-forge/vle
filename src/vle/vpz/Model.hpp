@@ -110,6 +110,118 @@ namespace vle { namespace vpz {
         graph::Model*       m_graph;
     };
 
+    class Submodels : public Base
+    {
+    public:
+        Submodels() { }
+
+        virtual ~Submodels() { }
+
+        virtual void write(std::ostream& /* out */) const
+        { }
+
+        virtual Base::type getType() const
+        { return SUBMODELS; }
+    };
+
+    class Connections : public Base
+    {
+    public:
+        Connections() { }
+
+        virtual ~Connections() { }
+
+        virtual void write(std::ostream& /* out */) const
+        { }
+
+        virtual Base::type getType() const
+        { return CONNECTIONS; }
+    };
+
+    class InternalConnection : public Base
+    {
+    public:
+        InternalConnection() { }
+
+        virtual ~InternalConnection() { }
+
+        virtual void write(std::ostream& /* out */) const
+        { }
+
+        virtual Base::type getType() const
+        { return INTERNAL_CONNECTION; }
+    };
+
+    class InputConnection : public Base
+    {
+    public:
+        InputConnection() { }
+
+        virtual ~InputConnection() { }
+
+        virtual void write(std::ostream& /* out */) const
+        { }
+
+        virtual Base::type getType() const
+        { return INPUT_CONNECTION; }
+    };
+
+    class OutputConnection : public Base
+    {
+    public:
+        OutputConnection() { }
+
+        virtual ~OutputConnection() { }
+
+        virtual void write(std::ostream& /* out */) const
+        { }
+
+        virtual Base::type getType() const
+        { return OUTPUT_CONNECTION; }
+    };
+
+    class Origin: public Base
+    {
+    public:
+        Origin(const Glib::ustring& model,
+                    const Glib::ustring& port) :
+            model(model),
+            port(port)
+        { }
+
+        virtual ~Origin() { }
+
+        virtual void write(std::ostream& /* out */) const
+        { }
+
+        virtual Base::type getType() const
+        { return ORIGIN; }
+
+        Glib::ustring model;
+        Glib::ustring port;
+    };
+
+    class Destination: public Base
+    {
+    public:
+        Destination(const Glib::ustring& model,
+                    const Glib::ustring& port) :
+            model(model),
+            port(port)
+        { }
+
+        virtual ~Destination() { }
+
+        virtual void write(std::ostream& /* out */) const
+        { }
+
+        virtual Base::type getType() const
+        { return DESTINATION; }
+        
+        Glib::ustring model;
+        Glib::ustring port;
+    };
+
 }} // namespace vle vpz
 
 #endif

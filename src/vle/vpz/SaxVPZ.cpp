@@ -73,18 +73,21 @@ void VpzStackSax::push_model(const xmlpp::SaxParser::AttributeList& att)
     AssertS(utils::SaxParserError, not m_stack.empty());
     AssertS(utils::SaxParserError, m_vpz);
     AssertS(utils::SaxParserError, m_stack.top()->isStructures() or
-            m_stack.top()->isModel());
+            m_stack.top()->isSubmodels());
 
     graph::CoupledModel* parent = 0;
 
-    if (m_stack.top()->isModel()) {
+    if (m_stack.top()->isSubmodels()) {
+        vpz::Base* sub = pop();
         vpz::Model* tmp = static_cast < vpz::Model* >(m_stack.top());
         parent = static_cast < graph::CoupledModel* >(tmp->model());
+        m_stack.push(sub);
     }
 
     graph::Model* gmdl = 0;
 
     std::string type = VLESaxParser::get_attribute < std::string >(att, "type");
+    std::string name = VLESaxParser::get_attribute < std::string >(att, "name");
     if (type == "atomic") {
         gmdl = new graph::AtomicModel(parent);
     } else if (type == "coupled") {
@@ -95,6 +98,11 @@ void VpzStackSax::push_model(const xmlpp::SaxParser::AttributeList& att)
         Throw(utils::InternalError, (boost::format(
                         "Unknow model type %1%") % type));
     }
+    gmdl->setName(name);
+
+    if (parent) {
+        parent->addModel(gmdl);
+    }
 
     vpz::Model* mdl = new vpz::Model();
     mdl->setModel(gmdl);
@@ -104,7 +112,6 @@ void VpzStackSax::push_model(const xmlpp::SaxParser::AttributeList& att)
     }
 
     m_stack.push(mdl);
-
 }
 
 void VpzStackSax::push_port(const xmlpp::SaxParser::AttributeList& att)
@@ -160,6 +167,114 @@ void VpzStackSax::push_porttype(const Glib::ustring& name)
 
 void VpzStackSax::push_submodels()
 {
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_vpz);
+    AssertS(utils::SaxParserError, m_stack.top()->isModel());
+
+    vpz::Submodels* sub = new vpz::Submodels();
+    m_stack.push(sub);
+}
+
+void VpzStackSax::push_connections()
+{
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_vpz);
+    AssertS(utils::SaxParserError, m_stack.top()->isModel());
+
+    vpz::Connections* cnts = new vpz::Connections();
+    m_stack.push(cnts);
+}
+
+void VpzStackSax::push_connection(const xmlpp::SaxParser::AttributeList& att)
+{
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_vpz);
+    AssertS(utils::SaxParserError, m_stack.top()->isConnections());
+
+    std::string type = VLESaxParser::get_attribute < std::string >(att, "type");
+    vpz::Base* cnt = 0;
+    
+    if (type == "internal") {
+        cnt = new vpz::InternalConnection();
+    } else if (type == "input") {
+        cnt = new vpz::InputConnection();
+    } else if (type == "output") {
+        cnt = new vpz::OutputConnection();
+    } else {
+        Throw(utils::InternalError, (boost::format("Unknow connection type %1%")
+                                     % type));
+    }
+    m_stack.push(cnt);
+}
+
+void VpzStackSax::push_origin(const xmlpp::SaxParser::AttributeList& att)
+{
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_vpz);
+    AssertS(utils::SaxParserError, m_stack.top()->isInternalConnection() or
+            m_stack.top()->isInputConnection() or
+            m_stack.top()->isOutputConnection());
+
+    std::string mdl = VLESaxParser::get_attribute < std::string >(att, "model");
+    std::string port = VLESaxParser::get_attribute < std::string >(att, "port");
+
+    vpz::Base* orig = new vpz::Origin(mdl, port);
+    m_stack.push(orig);
+}
+
+void VpzStackSax::push_destination(const xmlpp::SaxParser::AttributeList& att)
+{
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_vpz);
+    AssertS(utils::SaxParserError, m_stack.top()->isOrigin());
+
+    std::string mdl = VLESaxParser::get_attribute < std::string >(att, "model");
+    std::string port = VLESaxParser::get_attribute < std::string >(att, "port");
+
+    vpz::Base* dest = new vpz::Destination(mdl, port);
+    m_stack.push(dest);
+}
+
+void VpzStackSax::build_connection()
+{
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_vpz);
+
+    AssertS(utils::SaxParserError, m_stack.top()->isDestination());
+    vpz::Destination* dest = static_cast < vpz::Destination* >(pop());
+
+    AssertS(utils::SaxParserError, m_stack.top()->isOrigin());
+    vpz::Origin* orig = static_cast < vpz::Origin* >(pop());
+    
+    AssertS(utils::SaxParserError, m_stack.top()->isInternalConnection() or
+            m_stack.top()->isInputConnection() or
+            m_stack.top()->isOutputConnection());
+    vpz::Base* cnt = pop();
+
+    AssertS(utils::SaxParserError, m_stack.top()->isConnections());
+    vpz::Base* cntx = pop();
+    
+    AssertS(utils::SaxParserError, m_stack.top()->isModel());
+    vpz::Model* model = static_cast < vpz::Model* >(m_stack.top());
+
+    graph::CoupledModel* cpl = static_cast < graph::CoupledModel*
+        >(model->model());
+
+    if (cnt->isInternalConnection()) {
+        cpl->addInternalConnection(orig->model, orig->port, dest->model,
+                                   dest->port);
+    } else if (cnt->isInputConnection()) {
+        cpl->addInputConnection(orig->model, orig->port, dest->model,
+                                dest->port);
+    } else if (cnt->isOutputConnection()) {
+        cpl->addOutputConnection(orig->model, orig->port, dest->model,
+                                 dest->port);
+    }
+
+    m_stack.push(cntx);
+    delete dest;
+    delete orig;
+    delete cnt;
 }
 
 void VpzStackSax::push_dynamics()
@@ -260,6 +375,14 @@ void VLESaxParser::on_start_element(
         m_vpzstack.push_port(att);
     } else if (name == "submodels") {
         m_vpzstack.push_submodels();
+    } else if (name == "connections") {
+        m_vpzstack.push_connections();
+    } else if (name == "connection") {
+        m_vpzstack.push_connection(att);
+    } else if (name == "origin") {
+        m_vpzstack.push_origin(att);
+    } else if (name == "destination") {
+        m_vpzstack.push_destination(att);
     } else if (name == "dynamics") {
         m_vpzstack.push_dynamics();
     } else if (name == "dynamic") {
@@ -300,10 +423,12 @@ void VLESaxParser::on_end_element(const Glib::ustring& name)
         value::Table table = value::to_table(m_valuestack.top_value());
         table->fill(lastCharactersStored());
         m_valuestack.pop_value();
-    } else if (name == "in" or name == "out" or name == "state" or
-               name == "init" or name == "structures" or name == "model" or
-               name == "vle_project") {
+    } else if (name == "in" or name == "out" or name == "state" or name ==
+               "init" or name == "structures" or name == "model" or name ==
+               "submodels" or name == "vle_project" or name == "connections") {
         m_vpzstack.pop();
+    } else if (name == "destination") {
+        m_vpzstack.build_connection();
     }
 }
 

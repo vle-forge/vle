@@ -27,12 +27,14 @@
 #include <stdexcept>
 #include <vle/vpz/SaxVPZ.hpp>
 #include <vle/vpz/Vpz.hpp>
+#include <vle/graph/AtomicModel.hpp>
+#include <vle/graph/CoupledModel.hpp>
 #include <limits>
 #include <fstream>
 
 using namespace vle;
 
-void test_vpz()
+void test_atomicmodel_vpz()
 {
     const char* xml =
         "<?xml version=\"1.0\"?>\n"
@@ -84,6 +86,73 @@ void test_vpz()
     BOOST_REQUIRE(mdl.model()->getOutPort("out2") != 0);
 }
 
+void test_coupledmodel_vpz()
+{
+    const char* xml =
+        "<?xml version=\"1.0\"?>\n"
+        "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
+        " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
+        " <structures>\n"
+        "  <model name=\"test1\" type=\"coupled\">\n"
+        "   <in><port name=\"i\"/></in>\n"
+        "   <out><port name=\"o\"/></out>\n"
+        "   <submodels>\n"
+        "    <model name=\"atom1\" type=\"atomic\">\n"
+        "     <in><port name=\"in\"/></in>\n"
+        "     <out><port name=\"out\"/></out>\n"
+        "    </model>\n"
+        "    <model name=\"atom2\" type=\"atomic\">\n"
+        "     <in><port name=\"in\"/></in>\n"
+        "     <out><port name=\"out\"/></out>\n"
+        "    </model>\n"
+        "   </submodels>\n"
+        "   <connections>\n"
+        "    <connection type=\"internal\">\n"
+        "     <origin model=\"atom1\" port=\"out\" />\n"
+        "     <destination model=\"atom2\" port=\"in\" />\n"
+        "    </connection>\n"
+        "    <connection type=\"input\">\n"
+        "     <origin model=\"test1\" port=\"i\" />\n"
+        "     <destination model=\"atom1\" port=\"in\" />\n"
+        "    </connection>\n"
+        "    <connection type=\"output\">"
+        "     <origin model=\"atom2\" port=\"out\" />\n"
+        "     <destination model=\"test1\" port=\"o\" />\n"
+        "    </connection>\n"
+        "   </connections>\n"
+        "  </model>\n"
+        " </structures>\n"
+        "</vle_project>\n";
+    vpz::VLESaxParser sax;
+    sax.parse_memory(xml);
+
+    const vpz::Model& mdl = sax.vpz().project().model();
+    BOOST_REQUIRE(mdl.model() != 0);
+    BOOST_REQUIRE_EQUAL(mdl.model()->isCoupled(), true);
+
+    graph::CoupledModel* cpl = dynamic_cast < graph::CoupledModel* >(mdl.model());
+    BOOST_REQUIRE(cpl != 0);
+    BOOST_REQUIRE(cpl->getOutPort("o") != 0);
+    BOOST_REQUIRE(cpl->getInPort("i") != 0);
+
+    graph::Model* mdl1 = cpl->find("atom1");
+    graph::Model* mdl2 = cpl->find("atom2");
+    BOOST_REQUIRE(mdl1 != 0);
+    BOOST_REQUIRE(mdl2 != 0);
+
+    graph::AtomicModel* atom1 = dynamic_cast < graph::AtomicModel* >(mdl1);
+    graph::AtomicModel* atom2 = dynamic_cast < graph::AtomicModel* >(mdl2);
+    BOOST_REQUIRE(atom1 != 0);
+    BOOST_REQUIRE(atom1->getOutPort("out") != 0);
+    BOOST_REQUIRE(atom1->getInPort("in") != 0);
+    BOOST_REQUIRE(atom2 != 0);
+    BOOST_REQUIRE(atom2->getInPort("in") != 0);
+    BOOST_REQUIRE(atom2->getOutPort("out") != 0);
+
+    BOOST_REQUIRE(cpl->getInputConnection("i", "atom1", "in") != 0);
+    BOOST_REQUIRE(cpl->getOutputConnection("atom2", "out", "o") != 0);
+    BOOST_REQUIRE(cpl->getInternalConnection("atom1", "out", "atom2", "in") != 0);
+}
 
 boost::unit_test_framework::test_suite*
 init_unit_test_suite(int, char* [])
@@ -91,6 +160,7 @@ init_unit_test_suite(int, char* [])
     boost::unit_test_framework::test_suite* test;
 
     test = BOOST_TEST_SUITE("vpz test");
-    test->add(BOOST_TEST_CASE(&test_vpz));
+    test->add(BOOST_TEST_CASE(&test_atomicmodel_vpz));
+    test->add(BOOST_TEST_CASE(&test_coupledmodel_vpz));
     return test;
 }

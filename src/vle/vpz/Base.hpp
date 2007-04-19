@@ -37,10 +37,12 @@ namespace vle { namespace vpz {
     class Base
     {
     public:
-        enum type { STRUCTURES, MODEL, IN, OUT, INIT, STATE, PORT, DYNAMICS,
-            DYNAMIC, EXPERIMENT, PROJECT, MEASURES, OBSERVABLE, OUTPUTS, OUTPUT,
-            MEASURE, NOVLES, NOVLE, CONDITIONS, CONDITION, EOVS, EOVCHILD,
-            CLASSES, CLASS, REPLICAS, VPZ };
+        enum type { STRUCTURES, MODEL, SUBMODELS, CONNECTIONS,
+            INTERNAL_CONNECTION, INPUT_CONNECTION, OUTPUT_CONNECTION, ORIGIN,
+            DESTINATION, IN, OUT, INIT, STATE, PORT, DYNAMICS, DYNAMIC,
+            EXPERIMENT, PROJECT, MEASURES, OBSERVABLE, OUTPUTS, OUTPUT, MEASURE,
+            NOVLES, NOVLE, CONDITIONS, CONDITION, EOVS, EOVCHILD, CLASSES,
+            CLASS, REPLICAS, VPZ };
 
         Base() { }
 
@@ -74,6 +76,16 @@ namespace vle { namespace vpz {
 
         inline bool isStructures() const { return getType() == STRUCTURES; }
         inline bool isModel() const { return getType() == MODEL; }
+        inline bool isSubmodels() const { return getType() == SUBMODELS; }
+        inline bool isConnections() const { return getType() == CONNECTIONS; }
+        inline bool isInternalConnection() const { return getType() ==
+            INTERNAL_CONNECTION; }
+        inline bool isInputConnection() const { return getType() ==
+            INPUT_CONNECTION; }
+        inline bool isOutputConnection() const { return getType() ==
+            OUTPUT_CONNECTION; }
+        inline bool isOrigin() const { return getType() == ORIGIN; }
+        inline bool isDestination() const { return getType() == DESTINATION; }
         inline bool isIn() const { return getType() == IN; }
         inline bool isOut() const { return getType() == OUT; }
         inline bool isInit() const { return getType() == INIT; }

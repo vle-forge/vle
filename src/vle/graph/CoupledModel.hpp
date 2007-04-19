@@ -147,6 +147,21 @@ namespace vle { namespace graph {
 	void addInternalConnection(Model* src, const std::string& portSrc,
                                    Model* dst, const std::string& portDst);
 
+        void addInputConnection(const std::string& src,
+                                const std::string& portSrc,
+                                const std::string& dst,
+                                const std::string& portDst);
+
+        void addOutputConnection(const std::string& src,
+                                 const std::string& portSrc,
+                                 const std::string& dst,
+                                 const std::string& portDst);
+
+        void addInternalConnection(const std::string& src,
+                                   const std::string& portSrc,
+                                   const std::string& dst,
+                                   const std::string& portDst);
+
         /**
          * return a pointer to input connection with parameter srcModel
          * srcPort dstModel and dstPort
@@ -161,6 +176,47 @@ namespace vle { namespace graph {
         Connection* getInputConnection(Model* src, const std::string& portSrc,
                                        Model* dst, const std::string& portDst);
 
+        /** 
+         * @brief Convenient function to get a input connection between to models.
+         * 
+         * @param portSrc name of the input port of coupled model.
+         * @param dst name of the output model.
+         * @param portDst name of the output port.
+         * 
+         * @return A reference to the connection or 0 otherwise.
+         */
+        Connection* getInputConnection(const std::string& portSrc,
+                                       const std::string& dst,
+                                       const std::string& portDst);
+
+        /** 
+         * @brief Convenient function to get a output connection between to models.
+         * 
+         * @param src name of the input model.
+         * @param portSrc name of the input port.
+         * @param portDst name of the output port of coupled model.
+         * 
+         * @return A reference to the connection or 0 otherwise.
+         */
+        Connection* getOutputConnection(const std::string& src,
+                                        const std::string& portSrc,
+                                        const std::string& portDst);
+
+        /** 
+         * @brief Convenient function to get a internal connection between to
+         * models.
+         * 
+         * @param src name of the input model.
+         * @param portSrc name of the input port.
+         * @param dst name of the output model.
+         * @param portDst name of the output port.
+         * 
+         * @return A reference to the connection or 0 otherwise.
+         */
+        Connection* getInternalConnection(const std::string& src,
+                                          const std::string& portSrc,
+                                          const std::string& dst,
+                                          const std::string& portDst);
         /**
          * return a pointer to output connection with parameter srcModel
          * srcPort dstModel and dstPort

@@ -54,6 +54,11 @@ namespace vle { namespace vpz {
         void push_port(const xmlpp::SaxParser::AttributeList& att);
         void push_porttype(const Glib::ustring& name);
         void push_submodels();
+        void push_connections();
+        void push_connection(const xmlpp::SaxParser::AttributeList& att);
+        void push_origin(const xmlpp::SaxParser::AttributeList& att);
+        void push_destination(const xmlpp::SaxParser::AttributeList& att);
+        void build_connection();
         void push_dynamics();
         void push_dynamic(const xmlpp::SaxParser::AttributeList& att);
         vpz::Base* pop();

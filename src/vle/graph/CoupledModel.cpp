@@ -194,11 +194,80 @@ void CoupledModel::addInternalConnection(Model* src, const std::string&
 	new Connection(src, psrc, dst, pdst));
 }
 
+void CoupledModel::addInputConnection(const std::string& src,
+                                      const std::string& portSrc,
+                                      const std::string& dst,
+                                      const std::string& portDst)
+{
+    AssertI(src == getName());
+    Model* msrc = this;
+    Model* mdst = getModel(dst);
+    Port* psrc = msrc->getInPort(portSrc);
+    Port* pdst = mdst->getInPort(portDst);
+
+    AssertI(msrc);
+    AssertI(mdst);
+    AssertI(psrc);
+    AssertI(pdst);
+
+    m_inputConnectionList.push_back(
+	new Connection(msrc, psrc, mdst, pdst));
+}
+
+void CoupledModel::addOutputConnection(const std::string& src,
+                                       const std::string& portSrc,
+                                       const std::string& dst,
+                                       const std::string& portDst)
+{
+    AssertI(dst == getName());
+    Model* msrc = getModel(src);
+    Model* mdst = this;
+    Port* psrc = msrc->getOutPort(portSrc);
+    Port* pdst = mdst->getOutPort(portDst);
+
+    AssertI(msrc);
+    AssertI(mdst);
+    AssertI(psrc);
+    AssertI(pdst);
+
+    m_outputConnectionList.push_back(
+	new Connection(msrc, psrc, mdst, pdst));
+}
+
+void CoupledModel::addInternalConnection(const std::string& src,
+                                         const std::string& portSrc,
+                                         const std::string& dst,
+                                         const std::string& portDst)
+{
+    Model* msrc = getModel(src);
+    Model* mdst = getModel(dst);
+    Port* psrc = msrc->getOutPort(portSrc);
+    Port* pdst = mdst->getInPort(portDst);
+
+    AssertI(msrc);
+    AssertI(mdst);
+    AssertI(psrc);
+    AssertI(pdst);
+    
+    m_internalConnectionList.push_back(
+	new Connection(msrc, psrc, mdst, pdst));
+}
+
+
+Connection* CoupledModel::getInputConnection(const std::string& portSrc,
+                                             const std::string& dst,
+                                             const std::string& portDst)
+{
+    Model* mdst = getModel(dst);
+    AssertI(mdst);
+
+    return getInputConnection(this, portSrc, mdst, portDst);
+}
 
 
 Connection *
 CoupledModel::getInputConnection(Model * src, const std::string & portSrc,
-				 Model * dst, const std::string & portDst)
+                                 Model * dst, const std::string & portDst)
 {
     AssertI(src and src);
 
@@ -221,6 +290,15 @@ CoupledModel::getInputConnection(Model * src, const std::string & portSrc,
 }
 
 
+Connection* CoupledModel::getOutputConnection(const std::string& src,
+                                              const std::string& portSrc,
+                                              const std::string& portDst)
+{
+    Model* msrc = getModel(src);
+    AssertI(msrc);
+
+    return getOutputConnection(msrc, portSrc, this, portDst);
+}
 
 Connection *
 CoupledModel::getOutputConnection(Model * src, const std::string & portSrc,
@@ -246,7 +324,18 @@ CoupledModel::getOutputConnection(Model * src, const std::string & portSrc,
     return 0;
 }
 
+Connection* CoupledModel::getInternalConnection(const std::string& src,
+                                                const std::string& portSrc,
+                                                const std::string& dst,
+                                                const std::string& portDst)
+{
+    Model* msrc = getModel(src);
+    Model* mdst = getModel(dst);
+    AssertI(msrc);
+    AssertI(mdst);
 
+    return getInternalConnection(msrc, portSrc, mdst, portDst);
+}
 
 Connection *
 CoupledModel::getInternalConnection(Model * src, const std::string & portSrc,
