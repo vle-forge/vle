@@ -62,6 +62,7 @@ using namespace xmlpp;
 namespace vle { namespace devs {
 
 Simulator::Simulator(long simulatorIndex, const vpz::Vpz& vp) :
+    m_vpz(vp),
     m_experiment(vp.project().experiment()),
     m_index(simulatorIndex),
     m_duration(0.0),
@@ -235,20 +236,26 @@ void Simulator::init()
 {
     utils::Rand::rand().set_seed(m_experiment.seed());
 
-    std::list < vpz::Condition >::const_iterator it;
-    for (it = m_experiment.conditions().conditions().begin();
-         it != m_experiment.conditions().conditions().end(); ++it) {
+    const vpz::AtomicModelList& atoms = m_vpz.project().model().atomicModels();
+    const vpz::Conditions& cnds(m_experiment.conditions());
 
-        sAtomicModel* satom = getModel((*it).modelname());
-        Assert(utils::InternalError, satom, boost::format(
-                "Unkwnom condition model name '%1%' port '%2%'\n") %
-                (*it).modelname() % (*it).portname());
+    for (vpz::AtomicModelList::const_iterator it = atoms.begin(); it !=
+         atoms.end(); ++it) {
 
-        InitEvent* evt =
-            new InitEvent(devs::Time(0), satom, (*it).portname());
-        evt->putAttribute((*it).portname(), (*it).firstValue());
-        satom->processInitEvent(evt);
-        delete evt;
+        const vpz::Condition& cnd = cnds.find(it->second.condition());
+        for (vpz::Condition::ValueList::const_iterator jt =
+             cnd.values().begin(); jt != cnd.values().end(); ++jt) {
+            (*it).first->addInitPort(jt->first);
+            sAtomicModel* satom = getModel(it->first);
+
+            Assert(utils::InternalError, satom, boost::format(
+                    "Unknow atomic model '%1%'") % it->first->getName());
+
+            InitEvent* ev = new InitEvent(devs::Time(0), satom, jt->first);
+            ev->putAttribute(jt->first, jt->second);
+            satom->processInitEvent(ev);
+            delete ev;
+        }
     }
 
     for (sAtomicModelMap::iterator satom = m_modelList.begin();
@@ -376,9 +383,10 @@ vector < graph::TargetPort* > Simulator::getTargetPortList(
     else return vector < graph::TargetPort* >();
 }
 
-void Simulator::applyDynamics(SAtomicModelList& lst,
-                              const std::string& xmlDynamics)
+void Simulator::applyDynamics(SAtomicModelList& /* lst */,
+                              const std::string& /* xmlDynamics */)
 {
+    /* FIXME que faire avec cette fonction
     xmlpp::DomParser dom;
     dom.parse_memory(xmlDynamics);
     xmlpp::Element* root = utils::xml::get_root_node(dom, "MODELS");
@@ -392,11 +400,12 @@ void Simulator::applyDynamics(SAtomicModelList& lst,
         for (SAtomicModelList::iterator jt = lst.begin(); jt != lst.end();
              ++jt) {
             if ((*jt)->getName() == name) {
-                (*jt)->parseXML(dynamics);
+                (*jt)->parse(dynamics);
                 break;
             }
         }
     }
+    */
 }
 
 void Simulator::applyInits(SAtomicModelList& /* lst */,

@@ -59,8 +59,8 @@ namespace vle { namespace value {
         { return ValueBase::SET; }
 
         /**
-         * Add a value into the set. Be carrefull, the data are not clone, the use
-         * the pointer. Don't delete buffer.
+         * Add a value into the set. Be carrefull, the data are not clone, the
+         * use the pointer. Don't delete buffer.
          *
          * @param value the Value to add.
          */
@@ -74,6 +74,12 @@ namespace vle { namespace value {
 
         inline const Value& getValue(const size_t i) const
         { return m_value.at(i); }
+
+        inline size_t size() const
+        { return m_value.size(); }
+
+        inline void clear()
+        { return m_value.clear(); }
 
         virtual std::string toFile() const;
 

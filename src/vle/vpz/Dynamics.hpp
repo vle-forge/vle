@@ -33,48 +33,25 @@ namespace vle { namespace vpz {
     class Dynamics : public Base
     {
     public:
-        typedef std::set < Dynamic > DynamicList;
+        typedef std::map < std::string, Dynamic > DynamicList;
+        typedef DynamicList::const_iterator const_iterator;
+        typedef DynamicList::iterator iterator;
 
         Dynamics()
         { }
        
-        virtual ~Dynamics() { }
+        virtual ~Dynamics()
+        { }
 
         /** 
-         * @brief Initialise the Dynamics tag with XML information.
-         * @code
-         * <DYNAMICS>
-         *  <MODELS>
-         *   <MODEL NAME="name">
-         *    <DYNAMICS FORMALISM="f1" TYPE="mapping">
-         *     <INIT I="4" />
-         *    </DYNAMICS>
-         *   <MODEL>
-         *  </MODELS>
-         * </DYNAMICS>
-         * @endcode
-         * 
-         * @param elt An XML reference to the DYNAMICS tag.
-         *
-         * @throw Exception::Internal if elt is null or not on DYNAMICS tags.
-         */
-        //virtual void init(xmlpp::Element* elt);
-
-        /** 
-         * @brief Write the Dynamics information under specified tag.
+         * @brief Write the Dynamics information into stream
          * @code.
-         * <DYNAMICS>
-         *  <MODELS>
-         *   <MODEL NAME="name">
-         *    <DYNAMICS FORMALISM="f1" TYPE="mapping">
-         *     <INIT I="4" />
-         *    </DYNAMICS>
-         *   <MODEL>
-         *  </MODELS>
-         * </DYNAMICS>
+         * <dynamics>
+         *  [...]
+         * </dynamics>
          * @endcode
          * 
-         * @param elt An XML reference to the parent tag of DYNAMICS.
+         * @param out, the output stream.
          */
         virtual void write(std::ostream&  out) const;
 
@@ -113,12 +90,12 @@ namespace vle { namespace vpz {
         /** 
          * @brief Add a Dynamic to the list.
          * 
-         * @param dynamic the Dynamic to add.
+         * @param dyn the Dynamic to add.
          *
          * @throw Exception::Internal if a dynamic with the same model name
          * already exist.
          */
-        void addDynamic(const Dynamic& dynamic);
+        void addDynamic(const Dynamic& dyn);
 
         /** 
          * @brief Just delete the complete list of vpz::Dynamic.
@@ -162,18 +139,6 @@ namespace vle { namespace vpz {
 
 
     private:
-        /** 
-         * @brief Find a dynamic in a dynamics list by name.
-         * 
-         * @param name the name to search.
-         * 
-         * @return A constant iterator to the finded dynamic.
-         *
-         * @throw utils::InternalError if dynamic not exist.
-         */
-        DynamicList::const_iterator findByName(const std::string& name) const;
-
-
         DynamicList     m_lst;
     };
 

@@ -31,30 +31,6 @@ namespace vle { namespace vpz {
 
 using namespace vle::utils;
 
-Model::Model() :
-    m_graph(0)
-{
-}
-
-Model::Model(const Model& model) :
-    Base(model),
-    m_graph(0) // FIXME to disable or not ?
-{
-}
-
-Model& Model::operator=(const Model& model)
-{
-    if (this != &model) {
-        m_graph = 0; // FIXME to disable or not ?
-    }
-    return *this;
-}
-
-Model::~Model()
-{
-    delete m_graph;
-}
-
 //void Model::init(xmlpp::Element* elt)
 //{
 //AssertI(elt);

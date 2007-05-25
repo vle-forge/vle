@@ -32,34 +32,38 @@ using namespace vle::utils;
 
 void Dynamic::write(std::ostream& out) const
 {
-    out << "<dynamic formalism=\"" << m_formalism << "\" type=\""
-        << (m_type == Dynamic::WRAPPING ? "wrapping" : "mapping");
+    out << "<dynamic "
+        << "name=\"" << m_name << "\" "
+        << "library=\"" << m_library << "\" "
+        << "model=\"" << m_model << "\" "
+        << "language=\"" << m_language << "\" ";
 
-    if (m_dynamic.empty()) {
-        out << "\" />";
-    } else {
-        out << "\" >" << m_dynamic << "</dynamic>";
-    }
+    if (m_type == LOCAL)
+        out << " type=\"local\"";
+    else
+        out << " type=\"distant\" location=\"" << m_location << "\"";
+
+    if (m_data.empty())
+        out << " />";
+    else
+        out << ">"
+            << m_data
+            << "</dynamic>";
 }
 
-void Dynamic::setWrappingDynamic(const std::string& formalism,
-                                 const std::string& dynamic)
+void Dynamic::setDistantDynamics(const std::string& host, int port)
 {
-    AssertI(not formalism.empty());
+    AssertI(port > 0);
+    AssertI(port < 65535);
 
-    m_dynamic.assign(dynamic);
-    m_formalism.assign(formalism);
-    m_type = Dynamic::WRAPPING;
+    m_location = (boost::format("%1%:%2%") % host % port).str();
+    m_type = DISTANT;
 }
 
-void Dynamic::setMappingDynamic(const std::string& formalism,
-                                const std::string& dynamic)
+void Dynamic::setLocalDynamics()
 {
-    AssertI(not formalism.empty());
-
-    m_dynamic.assign(dynamic);
-    m_formalism.assign(formalism);
-    m_type = Dynamic::MAPPING;
+    m_location.clear();
+    m_type = LOCAL;
 }
 
 }} // namespace vle vpz

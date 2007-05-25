@@ -34,9 +34,9 @@ void Dynamics::write(std::ostream& out) const
 {
     if (not m_lst.empty()) {
         out << "<dynamics>\n";
-            
-        std::copy(m_lst.begin(), m_lst.end(),
-                  std::ostream_iterator < Dynamic >(out, "\n"));
+
+        for (const_iterator it = m_lst.begin(); it != m_lst.end(); ++it)
+            out << it->second;
 
         out << "</dynamics>\n";
     }
@@ -66,14 +66,14 @@ void Dynamics::initFromModels(xmlpp::Element* elt)
 void Dynamics::addDynamics(const Dynamics& dyns)
 {
     const DynamicList& lst = dyns.dynamics();
-    for (DynamicList::const_iterator it = lst.begin(); it != lst.end(); ++it)
-        addDynamic(*it);
+    for (const_iterator it = lst.begin(); it != lst.end(); ++it)
+        addDynamic(it->second);
 }
 
 void Dynamics::addDynamic(const Dynamic& dynamic)
 {
     AssertI(not exist(dynamic.name())); 
-    m_lst.insert(dynamic);
+    m_lst.insert(std::make_pair(dynamic.name(), dynamic));
 }
 
 void Dynamics::clear()
@@ -83,36 +83,18 @@ void Dynamics::clear()
 
 void Dynamics::delDynamic(const std::string& name)
 {
-    DynamicList::const_iterator it = findByName(name);
-    m_lst.erase(it);
+    m_lst.erase(name);
 }
 
 const Dynamic& Dynamics::find(const std::string& name) const
 {
-    DynamicList::const_iterator it = findByName(name);
-
-    return *it;
+    const_iterator it = m_lst.find(name);
+    return it->second;
 }
 
 bool Dynamics::exist(const std::string& name) const
 {
-    Dynamic compare(name);
-
-    return m_lst.find(compare) != m_lst.end();
-}
-
-Dynamics::DynamicList::const_iterator Dynamics::findByName(
-    const std::string& name) const
-{
-    Dynamic compare(name);
-
-    DynamicList::const_iterator it = m_lst.find(compare);
-
-    Assert(utils::InternalError, it != m_lst.end(),
-           boost::format("Dynamic '%1%' not found in dynamics list") %
-           name);
-
-    return it;
+    return m_lst.find(name) != m_lst.end();
 }
 
 }} // namespace vle vpz

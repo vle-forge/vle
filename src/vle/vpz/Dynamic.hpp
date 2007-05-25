@@ -32,25 +32,37 @@ namespace vle { namespace vpz {
 
     /** 
      * @brief A Dynamic represents the DYNAMICS tag of XML project file. It
-     * stores the name of model, the formalism use, the type, wrapping or
-     * mapping and an XML attached to the formalism to initialise the simulation
-     * plugin.
+     * stores the name of the dynamics, the library used by vle, the type local
+     * or distant and a string data attached to the dynamics initialisation.
+     *
+     * Example:@n
+     * <code>
+     * <dynamics name="xxxx"     <!-- name of the dynamics -->
+     *           library="yyyy"  <!-- name of the library used by simulator -->
+     *           type="distant|local" <!-- distant need attribut location,
+     *                                      default is local -->
+     *           location="xxx:yyy"> <!-- the location of the distant library
+     *                                    used by simulator -->
+     *
+     * </dynamics>
+     * </code>
      */
     class Dynamic : public Base
     {
     public:
-        enum Type { WRAPPING, MAPPING };
+        enum Type { LOCAL, DISTANT };
         
         Dynamic() :
-            m_type(WRAPPING)
+            m_type(LOCAL)
         { }
 
         Dynamic(const std::string& name) :
             m_name(name),
-            m_type(WRAPPING)
+            m_type(LOCAL)
         { }
 
-        virtual ~Dynamic() { }
+        virtual ~Dynamic()
+        { }
 
         virtual void write(std::ostream& out) const;
 
@@ -58,35 +70,53 @@ namespace vle { namespace vpz {
         { return DYNAMIC; }
 
 
+
         /** 
-         * @brief Assign a new name to the dynamic.
+         * @brief Assign a new name to the dynamics.
          * 
          * @param name new name of the dynamic.
          */
         void setName(const std::string& name)
         { m_name.assign(name); }
-        
-        /** 
-         * @brief Set this Dynamic using Mapping type.
-         * 
-         * @param formalism formalism use by simulation plugin.
-         * @param dynamic XML attached to the simulation plugin.
-         *
-         * @throw Exception::Internal if formalism is empty.
-         */
-        void setMappingDynamic(const std::string& dynamic,
-                               const std::string& formalism);
 
         /** 
-         * @brief Set this Dynamic using Wrapping type.
+         * @brief Assign a new library name to the dynamics.
          * 
-         * @param formalism formalism use by simulation plugin.
-         * @param dynamic XML attached to the simulation plugin.
-         *
-         * @throw Exception::Internal if formalism is empty.
+         * @param name new name of the library.
          */
-        void setWrappingDynamic(const std::string& dynamic,
-                                const std::string& formalism);
+        void setLibrary(const std::string& name)
+        { m_library.assign(name); }
+
+        /** 
+         * @brief Assign a model to find into the library.
+         * 
+         * @param name new name of the model.
+         */
+        void setModel(const std::string& name)
+        { m_model.assign(name); }
+
+        /** 
+         * @brief Assign a language to the dynamics.
+         * 
+         * @param name new language of the dynamics.
+         */
+        void setLanguage(const std::string& name)
+        { m_model.assign(name); }
+
+
+        /** 
+         * @brief Assign a location to the dynamics.
+         * 
+         * @param host the host where the dynamics library is running.
+         * @param port the port of the host.
+         */
+        void setDistantDynamics(const std::string& host, int port);
+
+        /** 
+         * @brief Assign a local position of the dynamics.
+         */
+        void setLocalDynamics();
+
 
         /** 
          * @brief Get the current name of the dynamic.
@@ -96,25 +126,63 @@ namespace vle { namespace vpz {
         inline const std::string& name() const { return m_name; }
 
         /** 
-         * @brief Get the XML dynamic. Can be empty.
-         * 
-         * @return an XML format.
-         */
-        inline const std::string& dynamic() const { return m_dynamic; }
-        
-        /** 
-         * @brief The simulation plugin's name.
-         * 
-         * @return a string representation of plugin.
-         */
-        inline const std::string& formalism() const { return m_formalism; }
-        
-        /** 
          * @brief The type of dynamic, Wrapping or Mapping.
          * 
          * @return a type of representation.
          */
         inline Dynamic::Type type() const { return m_type; }
+
+        /**
+         * @brief Return the library name of dynamics.
+         * 
+         * @return a string representation of library name.
+         */
+        inline const std::string& library() const { return m_library; }
+        
+        /** 
+         * @brief Return the content of the dynamics tag in vpz file.
+         *
+         * Example:@n
+         * <code>
+         * <dynamics>
+         *  <dynamics name="dynamicsname" library="dynamicslibraryname"
+         *            model="dynamicsclassname" language="python"
+         *            type="local">
+         *   a = 10
+         *   b = 20
+         *   c = 30
+         *  </dynamics>
+         * </dynamics>
+         *
+         * This function return the string into dynamics tags.
+         * </code>
+         * 
+         * @return an XML format.
+         */
+        inline const std::string& data() const { return m_data; }
+
+        /** 
+         * @brief Return the location of the dynamics. Be carefull, check the
+         * type() before use this function.
+         * 
+         * @return A reference to the location.
+         */
+        inline const std::string& location() const { return m_location; }
+
+        /** 
+         * @brief Return the model of the library.
+         * 
+         * @return A reference to the model.
+         */
+        inline const std::string& model() const { return m_model; }
+
+        /** 
+         * @brief Return the language of the dynamics models.
+         * 
+         * @return A reference to the model.
+         */
+        inline const std::string& language() const { return m_language; }
+
 
 
 
@@ -130,8 +198,11 @@ namespace vle { namespace vpz {
 
     private:
         std::string     m_name;
-        std::string     m_dynamic;
-        std::string     m_formalism;
+        std::string     m_data;
+        std::string     m_library;
+        std::string     m_model;
+        std::string     m_language;
+        std::string     m_location;
         Dynamic::Type   m_type;
     };
 

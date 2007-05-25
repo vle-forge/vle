@@ -86,10 +86,17 @@ void VpzStackSax::push_model(const xmlpp::SaxParser::AttributeList& att)
 
     graph::Model* gmdl = 0;
 
-    std::string type = VLESaxParser::get_attribute < std::string >(att, "type");
-    std::string name = VLESaxParser::get_attribute < std::string >(att, "name");
+    std::string type(VLESaxParser::get_attribute < std::string >(att, "type"));
+    std::string name(VLESaxParser::get_attribute < std::string >(att, "name"));
     if (type == "atomic") {
+        std::string cnd(VLESaxParser::get_attribute < std::string >(
+                att, "condition"));
+        std::string dyn(VLESaxParser::get_attribute < std::string >(
+                att, "dynamics"));
         gmdl = new graph::AtomicModel(parent);
+        vpz().project().model().atomicModels().insert(std::make_pair(
+                reinterpret_cast < graph::AtomicModel* >(gmdl),
+                AtomicModel(cnd, dyn)));
     } else if (type == "coupled") {
         gmdl = new graph::CoupledModel(parent);
     } else if (type == "novle") {

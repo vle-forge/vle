@@ -230,19 +230,9 @@ namespace vle { namespace devs {
                            const std::string& attributeValue,
                            const Time& currentTime) const;
 
-	long getIntegerParameter(const std::string& name,
-				 xmlpp::Element* dyn_elt);
-
-	double getDoubleParameter(const std::string& name,
-				  xmlpp::Element* dyn_elt);
-
-	bool getBooleanParameter(const std::string& name,
-				 xmlpp::Element* dyn_elt);
-
-	std::string getStringParameter(const std::string& name,
-				       xmlpp::Element* dyn_elt);
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 
 	/**
 	 * When the simulation of the atomic model is finished, the
@@ -278,11 +268,19 @@ namespace vle { namespace devs {
         { return Time::infinity; }
 
 	/**
-	 * Parse a XML tree which define the parameters of the model
+         * This function is call before the Dynamics::init(). The data buffer
+         * represents the XML cdata of the dynamics tags.
+         * @code
+         * <dynamics name="xxx" library="yyy">
+         *  <!-- free content -->
+         * </dynamics>
+         * @endcode
+         *
+         * @param data can store XML, text etc.
 	 *
 	 * @return true if the XML parsing is correct
 	 */
-        virtual bool parseXML(xmlpp::Element*)
+        virtual bool parse(const std::string& /* data */)
         { return true; }
 
         /**

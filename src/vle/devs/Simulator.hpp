@@ -177,7 +177,8 @@ namespace vle { namespace devs {
 	ExternalEventList* run();
 
     private:
-        vpz::Experiment                                  m_experiment;
+        vpz::Vpz                m_vpz;
+        vpz::Experiment         m_experiment;
 
 
 	// Index du simulateur dans la table des simulateurs

@@ -31,7 +31,8 @@ namespace vle { namespace vpz {
 
 using namespace vle::utils;
 
-Conditions::Conditions()
+Conditions::Conditions() :
+    Base()
 {
 }
 
@@ -40,31 +41,31 @@ void Conditions::write(std::ostream& out) const
     if (not m_conditions.empty()) {
         out << "<experimental_conditions>";
 
-        std::copy(m_conditions.begin(), m_conditions.end(),
-                  std::ostream_iterator < Condition >(out, "\n"));
+        for (const_iterator it = m_conditions.begin(); it != m_conditions.end();
+             ++it) {
+            out << it->second;
+        }
 
         out << "</experimental_conditions>";
     }
 }
 
-void Conditions::addConditions(const Conditions& c)
+void Conditions::addConditions(const Conditions& conditions)
 {
-    std::unique_copy(c.conditions().begin(), c.conditions().end(),
-                     m_conditions.begin());
+    const ConditionList& cdts(conditions.conditions());
+    for (const_iterator it = cdts.begin(); it != cdts.end(); ++it)
+        addCondition(it->second);
 }
 
-void Conditions::addCondition(const Condition& c)
+void Conditions::addCondition(const Condition& condition)
 {
-    ConditionList::const_iterator it =
-        std::find_if(m_conditions.begin(), m_conditions.end(),
-                     ConditionHasNames(c.modelname(), c.portname()));
+    const_iterator it = m_conditions.find(condition.name());
+    
+    Assert(utils::InternalError, it != m_conditions.end(),
+           boost::format("The condition %1% already exist") %
+           condition.name());
 
-    Assert(utils::InternalError, it == m_conditions.end(),
-           boost::format(
-               "Already defined condition model '%1%' on port '%2%'\n") %
-           c.modelname() % c.portname());
-
-    m_conditions.push_back(c);
+    m_conditions[condition.name()] = condition;
 }
 
 void Conditions::clear()
@@ -72,41 +73,20 @@ void Conditions::clear()
     m_conditions.clear();
 }
 
-void Conditions::delCondition(const std::string& modelname,
-                              const std::string& portname)
+void Conditions::delCondition(const std::string& condition)
 {
-    std::remove_if(m_conditions.begin(), m_conditions.end(),
-                   ConditionHasNames(modelname, portname));
+    m_conditions.erase(condition);
 }
 
-Condition& Conditions::find(const std::string& modelname,
-                            const std::string& portname)
+const Condition& Conditions::find(const std::string& condition) const
 {
-    ConditionList::iterator it =
-        std::find_if(m_conditions.begin(), m_conditions.end(),
-                     ConditionHasNames(modelname, portname));
+    const_iterator it = m_conditions.find(condition);
 
     Assert(utils::InternalError, it != m_conditions.end(),
-           boost::format(
-               "Unknow condition model name '%1%' on port '%2%'\n") % modelname
-           % portname);
+           boost::format("The condition %1% not exist") %
+           condition);
 
-    return *it;
-}
-
-const Condition& Conditions::find(const std::string& modelname,
-                                  const std::string& portname) const
-{
-    ConditionList::const_iterator it =
-        std::find_if(m_conditions.begin(), m_conditions.end(),
-                     ConditionHasNames(modelname, portname));
-
-    Assert(utils::InternalError, it != m_conditions.end(),
-           boost::format(
-               "Unknow condition model name '%1%' on port '%2%'\n") % modelname
-           % portname);
-
-    return *it;
+    return it->second;
 }
 
 }} // namespace vle vpz

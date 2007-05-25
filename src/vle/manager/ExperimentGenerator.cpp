@@ -23,8 +23,10 @@
  */
 
 #include <vle/manager/ExperimentGenerator.hpp>
+#include <vle/vpz/Conditions.hpp>
 #include <vle/utils/XML.hpp>
 #include <vle/utils/Tools.hpp>
+#include <vle/value/Set.hpp>
 #include <iostream>
 
 
@@ -53,15 +55,21 @@ void ExperimentGenerator::build_replicas_list()
 void ExperimentGenerator::build_conditions_list()
 {
     std::cerr << "Combinations: " << get_combination_number() << std::endl;
-    const std::list < vpz::Condition >& conds = 
-        mFile.project().experiment().conditions().conditions();
 
-    std::list < vpz::Condition >::const_iterator it = conds.begin();
-    while (it != conds.end()) {
-        mCondition.push_back(cond_t());
-        mCondition[mCondition.size() - 1].sz = (*it).value().size();
-        mCondition[mCondition.size() - 1].pos = 0;
-        ++it;
+    const vpz::Conditions::ConditionList& conds(
+        mFile.project().experiment().conditions().conditions());
+
+    for (vpz::Conditions::const_iterator it = conds.begin();
+         it != conds.end(); ++it) {
+
+        const vpz::Condition::ValueList& values(it->second.values());
+        for (vpz::Condition::const_iterator jt = values.begin();
+             jt != values.end(); ++jt) {
+
+            mCondition.push_back(cond_t());
+            mCondition[mCondition.size() - 1].sz = jt->second->size();
+            mCondition[mCondition.size() - 1].pos = 0;
+        }
     }
 }
 
@@ -80,26 +88,42 @@ void ExperimentGenerator::build_combinations_from_replicas(size_t cmbnumber)
     for (size_t irep = 0; irep < mReplicasTab.size(); ++irep) {
         mTmpfile.project().experiment().setSeed(mReplicasTab[irep]);
 
-        std::list < vpz::Condition >& dest = 
-            mTmpfile.project().experiment().conditions().conditions();
+        vpz::Conditions::ConditionList& dest(
+            mTmpfile.project().experiment().conditions().conditions());
+        vpz::Conditions::iterator itDest(dest.begin());
+        vpz::Condition::iterator itValueDest(itDest->second.values().begin());
 
-        const std::list < vpz::Condition >& orig =
-            mFile.project().experiment().conditions().conditions();
-
-        std::list < vpz::Condition >::iterator itDest = dest.begin();
-        std::list < vpz::Condition >::const_iterator itOrig = orig.begin();
+        const vpz::Conditions::ConditionList& orig(
+            mFile.project().experiment().conditions().conditions());
+        vpz::Conditions::const_iterator itOrig(orig.begin());
+        vpz::Condition::const_iterator
+            itValueOrig(itOrig->second.values().begin());
 
         Assert(utils::InternalError,
-               (dest.size() == orig.size()) and
-               (dest.size() == mCondition.size()),
+               dest.size() == orig.size(),
                boost::format("Error: %1% %2% %3%\n") % dest.size() %
                orig.size() % mCondition.size());
 
         for (size_t jcom = 0; jcom < mCondition.size(); ++jcom) {
-            (*itDest).clearValue();
-            (*itDest).addValue((*itOrig).nValue(mCondition[jcom].pos));
-            ++itDest;
-            ++itOrig;
+            itValueDest->second->clear();
+            itValueDest->second->addValue(
+                itValueOrig->second->getValue(mCondition[jcom].pos));
+            //(*itDest).addValue((*itOrig).nValue(mCondition[jcom].pos));
+
+            itValueDest++;
+            itValueOrig++;
+
+            if (itValueDest == itDest->second.values().end()) {
+                Assert(utils::InternalError, itValueOrig ==
+                       itOrig->second.values().end(),
+                       boost::format("Error: %1% %2%\n") %
+                       itDest->second.values().size() %
+                       itOrig->second.values().size());
+                itDest++;
+                itOrig++;
+                itValueDest = itDest->second.values().begin();
+                itValueOrig = itOrig->second.values().begin();
+            }
         }
         write_instance(cmbnumber, irep);
     }

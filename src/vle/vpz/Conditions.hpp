@@ -39,12 +39,28 @@ namespace vle { namespace vpz {
     class Conditions : public Base
     {
     public:
-        typedef std::list < Condition > ConditionList;
+        typedef std::map < std::string, Condition > ConditionList;
+        typedef ConditionList::const_iterator const_iterator;
+        typedef ConditionList::iterator iterator;
 
         Conditions();
 
-        virtual ~Conditions() { }
+        virtual ~Conditions()
+        { }
 
+        /** 
+         * @brief Add Conditions informations to the stream.
+         * @code
+         * <conditions>
+         *  <condition name="">
+         *  </condition>
+         *  <condition name="">
+         *  </condition>
+         * </conditions>
+         * @endcode
+         * 
+         * @param out 
+         */
         virtual void write(std::ostream& out) const;
 
         virtual Base::type getType() const
@@ -54,21 +70,21 @@ namespace vle { namespace vpz {
         /** 
          * @brief Add a list of Conditions to the list.
          * 
-         * @param c A Conditions object to add.
+         * @param conditions A Conditions object to add.
          *
          * @throw Exception::Internal if a Condition already exist.
          */
-        void addConditions(const Conditions& c);
+        void addConditions(const Conditions& conditions);
 
         /** 
          * @brief Add a condition into the conditions list.
          * 
-         * @param c the condition to add.
+         * @param condition the condition to add.
          *
          * @throw Exception::Internal if condition with same name and port
          * already exist.
          */
-        void addCondition(const Condition& c);
+        void addCondition(const Condition& condition);
 
         /** 
          * @brief Just clear the list of vpz::Condition.
@@ -81,58 +97,28 @@ namespace vle { namespace vpz {
          * @param modelname condition model name.
          * @param portname condition port name.
          */
-        void delCondition(const std::string& modelname,
-                          const std::string& portname);
+        void delCondition(const std::string& condition);
+
+
+        /** 
+         * @brief Get the specified condition from conditions list.
+         * 
+         * @param condition 
+         * 
+         * @return 
+         */
+        const Condition& find(const std::string& condition) const;
 
         /** 
          * @brief Get the list of conditions.
          * 
          * @return A reference to the list of conditions.
          */
-        ConditionList& conditions()
+        inline const ConditionList& conditions() const
         { return m_conditions; }
 
-        /** 
-         * @brief Get the list of conditions.
-         * 
-         * @return A reference to the list of conditions.
-         */
-        const ConditionList& conditions() const
+        inline ConditionList& conditions()
         { return m_conditions; }
-
-        /** 
-         * @brief This functor is a helper to find an condition by name in an
-         * ConditionList using the standard algorithm std::find_if,
-         * std::remove_if etc.
-         *
-         * Example:@n
-         * <code>
-         * Glib::ustring name = "a";@n
-         * ConditionList::const_iterator it;
-         * it = std::find_if(lst.begin(), lst.end(), ConditionHasName("a", "b");
-         * </code>
-         */
-        struct ConditionHasNames
-        {
-            const Glib::ustring& modelname;
-            const Glib::ustring& portname;
-
-            inline ConditionHasNames(const Glib::ustring& modelname,
-                                     const Glib::ustring& portname) :
-                modelname(modelname),
-                portname(portname)
-            { }
-
-            inline bool operator()(const Condition& condition) const
-            { return condition.modelname() == modelname and
-                condition.portname() == portname; }
-        };
-
-        Condition& find(const std::string& modelname,
-                        const std::string& portname);
-
-        const Condition& find(const std::string& modelname,
-                              const std::string& portname) const;
 
     private:
         ConditionList m_conditions;

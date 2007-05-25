@@ -31,16 +31,48 @@
 
 namespace vle { namespace vpz {
 
+
+    /** 
+     * @brief The AtomicModel class is used by the AtomicModelList to attach an
+     * atomic model to his condition and dynamics names.
+     */
+    class AtomicModel
+    {
+    public:
+        AtomicModel(const std::string& condition, const std::string& dynamics) :
+            m_condition(condition),
+            m_dynamics(dynamics)
+        { }
+
+        const std::string& condition() const
+        { return m_condition; }
+
+        const std::string& dynamics() const
+        { return m_dynamics; }
+
+    private:
+        AtomicModel() { }
+
+        std::string     m_condition;
+        std::string     m_dynamics;
+    };
+
+    /** 
+     * @brief The AtomicModelList class is a dictionary used to attach atomic
+     * model to condition and dynamics names.
+     */
+    class AtomicModelList : public std::map < graph::AtomicModel*, AtomicModel >
+    { };
+
     class Model : public Base
     {
     public:
-        Model();
+        Model() :
+            m_graph(0)
+        { }
 
-        Model(const Model& model);
-
-        Model& operator=(const Model& model);
-
-        virtual ~Model();
+        virtual ~Model()
+        { }
 
         /** 
          * @brief Write the devs hierachy of model.
@@ -106,7 +138,14 @@ namespace vle { namespace vpz {
          */
         graph::Model* model() const;
 
+        const AtomicModelList& atomicModels() const
+        { return m_atomicmodels; }
+
+        AtomicModelList& atomicModels()
+        { return m_atomicmodels; }
+
     private:
+        AtomicModelList     m_atomicmodels;
         graph::Model*       m_graph;
     };
 

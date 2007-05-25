@@ -144,38 +144,6 @@ ExternalEventList* Dynamics::buildEventWithAString(
     return v_eventList;
 }
 
-long Dynamics::getIntegerParameter(
-    const std::string & name,
-    xmlpp::Element* dyn_elt)
-{
-    xmlpp::Element* elt = utils::xml::get_children(dyn_elt,name);
-    return utils::to_int(utils::xml::get_attribute(elt,"VALUE"));
-}
-
-double Dynamics::getDoubleParameter(
-    const std::string & name,
-    xmlpp::Element* dyn_elt)
-{
-    xmlpp::Element* elt = utils::xml::get_children(dyn_elt,name);
-    return utils::to_double(utils::xml::get_attribute(elt,"VALUE"));
-}
-
-bool Dynamics::getBooleanParameter(
-    const std::string & name,
-    xmlpp::Element* dyn_elt)
-{
-    xmlpp::Element* elt = utils::xml::get_children(dyn_elt,name);
-    return utils::to_boolean(utils::xml::get_attribute(elt,"VALUE"));
-}
-
-std::string Dynamics::getStringParameter(
-    const std::string & name,
-    xmlpp::Element* dyn_elt)
-{
-    xmlpp::Element* elt = utils::xml::get_children(dyn_elt,name);
-    return utils::xml::get_attribute(elt,"VALUE");
-}
-
 ExternalEventList* Dynamics::getOutputFunction(const Time& /* time */)
 {
     return new ExternalEventList();

@@ -75,7 +75,7 @@ namespace vle { namespace devs {
 	 *
 	 * @return true if the XML parsing is correct
 	 */
-        virtual bool parseXML(xmlpp::Element*);
+        virtual bool parse(const std::string& data);
 
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
