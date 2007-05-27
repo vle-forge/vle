@@ -39,9 +39,7 @@ void print_help()
     std::cerr << "vlemodeltest modelname [xml dynamics files]" << std::endl;
 }
 
-void build_vpz(const std::string& modelname,
-               const std::string& xmlname,
-               vpz::Vpz& vpz)
+void build_vpz(const std::string& modelname, vpz::Vpz& vpz)
 {
     graph::CoupledModel* cpl = new graph::CoupledModel(0);
     cpl->setName("top model");
@@ -52,23 +50,18 @@ void build_vpz(const std::string& modelname,
     vpz.project().model().setModel(cpl);
 
     vpz::Dynamic dyn;
-    if (xmlname.empty()) {
-        dyn.setMappingDynamic(modelname, "");
-    } else {
-        dyn.setMappingDynamic(modelname, 
-                              Glib::file_get_contents(xmlname));
-    }
-    //vpz.project().dynamics().addDynamic("testing model", dyn); // FIXME
+    dyn.setModel(modelname);
+    dyn.setLibrary(modelname);
     vpz.project().experiment().setDuration(1);
     vpz.project().experiment().setName("testing");
 }
 
-bool run_model(const std::string& modelname, const std::string& xmlname)
+bool run_model(const std::string& modelname)
 {
     try {
         std::cout << "Building VPZ file .......... ";
         vpz::Vpz v;
-        build_vpz(modelname, xmlname, v);
+        build_vpz(modelname, v);
         std::string filename(utils::build_temp("vlemodeltest"));
         v.write(filename);
         std::cout << "ok\n";
@@ -108,11 +101,7 @@ int main(int argc, char* argv[])
         break;
 
     case 2:
-        success = run_model(argv[1], std::string());
-        break;
-
-    case 3:
-        success = run_model(argv[1], argv[2]);
+        success = run_model(argv[1]);
         break;
 
     default:
