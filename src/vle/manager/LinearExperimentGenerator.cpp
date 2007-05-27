@@ -23,6 +23,7 @@
  */
 
 #include <vle/manager/LinearExperimentGenerator.hpp>
+#include <vle/value/Set.hpp>
 
 
 namespace vle { namespace manager {
@@ -36,17 +37,30 @@ void LinearExperimentGenerator::build_combination(size_t& nb)
 
 size_t LinearExperimentGenerator::get_combination_number() const
 {
-    const std::list < vpz::Condition >& cnds =
-        mFile.project().experiment().conditions().conditions();
-    
-    std::list < vpz::Condition >::const_iterator it = cnds.begin();
-    size_t nb = (*it).value().size();
-    ++it;
-    while(it != cnds.end() and nb == (*it).value().size())
-	++it;
-    if(it == cnds.end())
-	return nb;
-    return 0;
+    const vpz::Conditions::ConditionList& cnds(
+        mFile.project().experiment().conditions().conditions());
+
+    Assert(utils::InternalError, not cnds.empty(),
+           "Build a linear experimental frame with empty value?");
+
+    const size_t nb = cnds.begin()->second.values().size();
+
+    for (vpz::Conditions::const_iterator it = cnds.begin();
+         it != cnds.end(); ++it) {
+
+        const vpz::Condition::ValueList& values(it->second.values());
+        for (vpz::Condition::const_iterator jt = values.begin();
+             jt != values.end(); ++jt) {
+
+            Assert(utils::InternalError, nb == jt->second->size(),
+                   boost::format("Build a linear experimental frame with bad"
+                                 " number value for condition %1% port %2%") %
+                   it->first % jt->first); 
+
+        }
+    }
+
+    return nb;
 }
 
 }} // namespace vle manager
