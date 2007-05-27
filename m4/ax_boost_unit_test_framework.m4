@@ -21,7 +21,7 @@
 #
 # LAST MODIFICATION
 #
-#   2006-06-15
+#   2006-12-28
 #
 # COPYLEFT
 #
@@ -76,9 +76,9 @@ AC_DEFUN([AX_BOOST_UNIT_TEST_FRAMEWORK],
             if test "x$ax_boost_user_unit_test_framework_lib" = "x"; then
          		saved_ldflags="${LDFLAGS}"
 		    	for ax_lib in $BN $BN-$CC $BN-$CC-mt $BN-$CC-mt-s $BN-$CC-s \
-                             lib$BN lib$BN-$CC lib$BN-$CC-mt lib$BN-$CC-mt-s lib$BN-$CC-s \
+                             lib$BN $BN-mt $BN-st lib$BN-$CC lib$BN-$CC-mt lib$BN-$CC-mt-s lib$BN-$CC-s \
                              $BN-mgw $BN-mgw $BN-mgw-mt $BN-mgw-mt-s $BN-mgw-s ; do
-                   LDFLAGS="${LDFLAGS} -l$ax_lib"
+  LDFLAGS="${LDFLAGS} -l$ax_lib"
     			   AC_CACHE_CHECK(Boost::UnitTestFramework library linkage,
 	      			    		   ax_cv_boost_unit_test_framework_link,
 						  [AC_LANG_PUSH([C++])
