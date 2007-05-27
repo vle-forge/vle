@@ -3,7 +3,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl ***************************************************************************
 
 AC_PREREQ(2.59)
-AC_INIT([vle],[0.4.0],[quesnel@users.sourceforge.net])
+AC_INIT([vle],[0.4.1],[quesnel@users.sourceforge.net])
 AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
 AC_CONFIG_SRCDIR(config.h.in)
