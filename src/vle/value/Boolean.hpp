@@ -33,19 +33,23 @@ namespace vle { namespace value {
     /**
      * @brief Boolean Value.
      */
-    class Boolean : public Value
+    class BooleanFactory : public ValueBase
     {
+    private:
+        BooleanFactory(bool value = false) :
+            m_value(value)
+        { }
+
     public:
-        Boolean(bool value = false) :
-            m_value(value) { }
+        virtual ~BooleanFactory()
+        { }
 
-        Boolean(xmlpp::Element* root);
+        static Boolean create(bool value = false);
 
-        virtual Value* clone() const
-        { return new Boolean(m_value); }
+        virtual Value clone() const;
 
-        virtual Value::type getType() const
-        { return Value::BOOLEAN; }
+        inline virtual ValueBase::type getType() const
+        { return ValueBase::BOOLEAN; }
 
         inline bool boolValue() const
         { return m_value; }

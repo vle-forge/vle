@@ -37,28 +37,7 @@ namespace vle { namespace vpz {
         NoVLEs()
         { }
 
-        virtual ~NoVLEs()
-        { }
-
-        /** 
-         * @brief initialise the NoVLEs structure with NoVLE information.
-         * @code
-         * <NO_VLES>
-         *  <NO_VLE MODEL_NAME="system" TRANSLATOR="lifegame-tr">
-         *   <SYSTEM NAME="c" LANGUAGE="c++">
-         *    <SIZE L="30" C="30" />
-         *    <TIME_STEP VALUE="1" />
-         *    <SEED VALUE="6352" />
-         *   </SYSTEM>
-         *  </NO_VLE>
-         * </NO_VLES>
-         * @endcode
-         * 
-         * @param elt A XML reference to the node NO_VLES.
-         *
-         * @throw Exception::Internal if elt is NULL or note on a NO_VLES tags.
-         */
-        virtual void init(xmlpp::Element* elt);
+        virtual ~NoVLEs() { }
 
         /** 
          * @brief Write the NoVLEs information under specified node.
@@ -73,7 +52,10 @@ namespace vle { namespace vpz {
          *
          * @throw Exception::Internal if elt is NULL.
          */
-        virtual void write(xmlpp::Element* elt) const;
+        virtual void write(std::ostream& out) const;
+
+        virtual Base::type getType() const
+        { return NOVLES; }
 
         /** 
          * @brief Add a new NoVLE into the list.
@@ -99,7 +81,6 @@ namespace vle { namespace vpz {
 
         void fusion(Model& model,
                     Dynamics& dynamics,
-                    Graphics& graphics,
                     Experiment& experiment);
 
         /** 

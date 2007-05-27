@@ -34,62 +34,59 @@ Measure::Measure()
 {
 }
 
-Measure::~Measure()
+//void Measure::init(xmlpp::Element* elt)
+//{
+//AssertI(elt);
+//AssertI(elt->get_name() == "MEASURE");
+//
+//m_observables.clear();
+//
+//Glib::ustring type(xml::get_attribute(elt, "TYPE"));
+//
+//if (type == "timed") {
+//setTimedMeasure(xml::get_double_attribute(elt, "TIME_STEP"),
+//xml::get_attribute(elt, "OUTPUT"));
+//} else if (type == "event") {
+//setEventMeasure(xml::get_attribute(elt, "OUTPUT"));
+//} else {
+//Throw(utils::InternalError,
+//boost::format("Unknow Measure type %1%\n") % type);
+//}
+//
+//xmlpp::Node::NodeList lst = elt->get_children("OBSERVABLE");
+//xmlpp::Node::NodeList::iterator it = lst.begin();
+//while (it != lst.end()) {
+//Observable o;
+//o.init((xmlpp::Element*)(*it));
+//addObservable(o);
+//++it;
+//}
+//}
+
+void Measure::write(std::ostream& out) const
 {
-}
-
-void Measure::init(xmlpp::Element* elt)
-{
-    AssertI(elt);
-    AssertI(elt->get_name() == "MEASURE");
-
-    m_observables.clear();
-
-    Glib::ustring type(xml::get_attribute(elt, "TYPE"));
-
-    if (type == "timed") {
-        setTimedMeasure(xml::get_double_attribute(elt, "TIME_STEP"),
-                        xml::get_attribute(elt, "OUTPUT"));
-    } else if (type == "event") {
-        setEventMeasure(xml::get_attribute(elt, "OUTPUT"));
-    } else {
-        Throw(utils::InternalError,
-              boost::format("Unknow Measure type %1%\n") % type);
-    }
-
-    xmlpp::Node::NodeList lst = elt->get_children("OBSERVABLE");
-    xmlpp::Node::NodeList::iterator it = lst.begin();
-    while (it != lst.end()) {
-        Observable o;
-        o.init((xmlpp::Element*)(*it));
-        addObservable(o);
-        ++it;
-    }
-}
-
-void Measure::write(xmlpp::Element* elt) const
-{
-    AssertI(elt);
-    AssertI(elt->get_name() == "MEASURE");
-
-    elt->set_attribute("OUTPUT", m_output);
+    out << "<measure "
+        << "output=\"" << m_output << "\" ";
 
     switch (m_type) {
     case Measure::EVENT:
-        elt->set_attribute("TYPE", "event");
+        out << "type=\"event\"";
         break;
 
     case Measure::TIMED:
-        elt->set_attribute("TYPE", "timed");
-        elt->set_attribute("TIME_STEP", utils::to_string(m_timestep));
+        out << "type=\"timed\" time_step=\"" << m_timestep << "\"";
         break;
     }
 
+    out << ">";
+
     std::list < Observable >::const_iterator it = m_observables.begin();
     while (it != m_observables.end()) {
-        (*it).write(elt);
+        (*it).write(out);
         ++it;
     }
+
+    out << "</measure>";
 }
 
 void Measure::setEventMeasure(const std::string& output)

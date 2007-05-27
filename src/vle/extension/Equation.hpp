@@ -56,7 +56,7 @@ namespace vle { namespace extension {
         virtual bool processConflict(const devs::InternalEvent& internal,
                                      const devs::ExternalEventList&
                                      extEventlist);
-        virtual value::Value* processStateEvent(devs::StateEvent* event) const;
+        virtual value::Value processStateEvent(devs::StateEvent* event) const;
 
     private:
         state m_state;

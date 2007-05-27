@@ -26,6 +26,7 @@
 #define VLE_VPZ_MEASURES_HPP
 
 #include <list>
+#include <vector>
 #include <vle/vpz/Outputs.hpp>
 #include <vle/vpz/Measure.hpp>
 #include <vle/vpz/EOV.hpp>
@@ -35,22 +36,16 @@ namespace vle { namespace vpz {
     class Measures : public Base
     {
     public:
+        typedef std::vector < Measure > MeasureList;
+
         Measures();
 
-        virtual ~Measures();
+        virtual ~Measures() { }
 
-        /** 
-         * @brief Parse a MEASURES tags, with OUTPUTS, MEASURE and EOVS tags. If
-         * EOVS tag is empty, and OUTPUTS containt EOV plugin, EOVS will build
-         * automatically.
-         * 
-         * @param elt A reference to the MEASURES tags.
-         *
-         * @throw Exception::Internal if elt not reference MEASURES tags.
-         */
-        virtual void init(xmlpp::Element* elt);
+        virtual void write(std::ostream& out) const;
 
-        virtual void write(xmlpp::Element* elt) const;
+        virtual Base::type getType() const
+        { return MEASURES; }
 
         void addTextStreamOutput(const std::string& name,
                                  const std::string& location = std::string());
@@ -83,7 +78,7 @@ namespace vle { namespace vpz {
 
         void addMeasures(const Measures& m);
 
-        const Measure& findMeasureFromOutput(const std::string& output,
+        const Measure& findMeasureFromOutput(const std::string& outputname,
                                              std::string& measure) const;
 
         const Measure& find(const std::string& name) const;
@@ -98,7 +93,7 @@ namespace vle { namespace vpz {
         Outputs& outputs()
         { return m_outputs; }
 
-        const std::map < std::string, Measure >& measures() const
+        const MeasureList& measures() const
         { return m_measures; }
 
         const EOVs& eovs() const
@@ -107,15 +102,63 @@ namespace vle { namespace vpz {
         EOVs& eovs()
         { return m_eovs; }
 
+
+        /** 
+         * @brief This functor is a helper to find a measure by name in an
+         * MeasureList using the standard algorithm std::find_if, std::remove_if
+         * etc.
+         *
+         * Example:@n
+         * <code>
+         * Glib::ustring name = "a";@n
+         * MeasureList::const_iterator it;
+         * it = std::find_if(lst.begin(), lst.end(), MeasureHasName("a"));
+         * </code>
+         */
+        struct MeasureHasName
+        {
+            const Glib::ustring& name;
+
+            inline MeasureHasName(const Glib::ustring& name) :
+                name(name)
+            { }
+
+            inline bool operator()(const Measure& measure) const
+            { return measure.name() == name; }
+        };
+
+        /** 
+         * @brief This functor is a helper to find a measure by output name in
+         * an MeasureList using the standard algorithm std::find_if,
+         * std::remove_if etc.
+         *
+         * Example:@n
+         * <code>
+         * Glib::ustring name = "a";@n
+         * MeasureList::const_iterator it;
+         * it = std::find_if(lst.begin(), lst.end(), MeasureHasOutput("a"));
+         * </code>
+         */
+        struct MeasureHasOutput
+        {
+            const Glib::ustring& name;
+
+            inline MeasureHasOutput(const Glib::ustring& name) :
+                name(name)
+            { }
+
+            inline bool operator()(const Measure& measure) const
+            { return measure.output() == name; }
+        };
+
     private:
-        Outputs                                 m_outputs;
-        EOVs                                    m_eovs;
-        std::map < std::string, Measure >       m_measures;
+        Outputs     m_outputs;
+        EOVs        m_eovs;
+        MeasureList m_measures;
         
         /** 
          * @brief Add a measure into the measures list.
          * 
-         * @param name the measure name of the measure to add.
          * @param m the measure to add
          *
          * @throw Exception::Internal if the measure already exist or if no
@@ -123,7 +166,7 @@ namespace vle { namespace vpz {
          *
          * @return A reference to the stored object.
          */
-        Measure& addMeasure(const std::string& name, const Measure& m);
+        Measure& addMeasure(const Measure& m);
 
         /** 
          * @brief Build EOV from EOV output when no EOV was defined.

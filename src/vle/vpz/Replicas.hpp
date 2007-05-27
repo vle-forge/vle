@@ -47,11 +47,12 @@ namespace vle { namespace vpz {
 
         Replicas();
 
-        virtual ~Replicas();
+        virtual ~Replicas() { }
 
-        virtual void init(xmlpp::Element* elt);
+        virtual void write(std::ostream& out) const;
 
-        virtual void write(xmlpp::Element* elt) const;
+        virtual Base::type getType() const
+        { return REPLICAS; }
 
         /** 
          * @brief Build a vector of seed randomly for a specified size.

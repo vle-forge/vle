@@ -62,6 +62,7 @@ using namespace xmlpp;
 namespace vle { namespace devs {
 
 Simulator::Simulator(long simulatorIndex, const vpz::Vpz& vp) :
+    m_vpz(vp),
     m_experiment(vp.project().experiment()),
     m_index(simulatorIndex),
     m_duration(0.0),
@@ -151,9 +152,9 @@ graph::Model* Simulator::createModels(graph::CoupledModel* parent,
     if (not xmlInit.empty())
         applyInits(lst, xmlInit);
 
-    xmlpp::Document doc;
-    xmlpp::Element* root = doc.create_root_node("test");
-    parent->writeXML(root);
+    //xmlpp::Document doc;
+    //xmlpp::Element* root = doc.create_root_node("test");
+    //parent->writeXML(root); FIXME FIXME FIXME
 
     return top;
 }
@@ -235,20 +236,26 @@ void Simulator::init()
 {
     utils::Rand::rand().set_seed(m_experiment.seed());
 
-    std::list < vpz::Condition >::const_iterator it;
-    for (it = m_experiment.conditions().conditions().begin();
-         it != m_experiment.conditions().conditions().end(); ++it) {
+    const vpz::AtomicModelList& atoms = m_vpz.project().model().atomicModels();
+    const vpz::Conditions& cnds(m_experiment.conditions());
 
-        sAtomicModel* satom = getModel((*it).modelname());
-        Assert(utils::InternalError, satom, boost::format(
-                "Unkwnom condition model name '%1%' port '%2%'\n") %
-                (*it).modelname() % (*it).portname());
+    for (vpz::AtomicModelList::const_iterator it = atoms.begin(); it !=
+         atoms.end(); ++it) {
 
-        InitEvent* evt =
-            new InitEvent(devs::Time(0), satom, (*it).portname());
-        evt->putAttribute((*it).portname(), (*it).firstValue());
-        satom->processInitEvent(evt);
-        delete evt;
+        const vpz::Condition& cnd = cnds.find(it->second.condition());
+        for (vpz::Condition::ValueList::const_iterator jt =
+             cnd.values().begin(); jt != cnd.values().end(); ++jt) {
+            (*it).first->addInitPort(jt->first);
+            sAtomicModel* satom = getModel(it->first);
+
+            Assert(utils::InternalError, satom, boost::format(
+                    "Unknow atomic model '%1%'") % it->first->getName());
+
+            InitEvent* ev = new InitEvent(devs::Time(0), satom, jt->first);
+            ev->putAttribute(jt->first, jt->second);
+            satom->processInitEvent(ev);
+            delete ev;
+        }
     }
 
     for (sAtomicModelMap::iterator satom = m_modelList.begin();
@@ -376,9 +383,10 @@ vector < graph::TargetPort* > Simulator::getTargetPortList(
     else return vector < graph::TargetPort* >();
 }
 
-void Simulator::applyDynamics(SAtomicModelList& lst,
-                              const std::string& xmlDynamics)
+void Simulator::applyDynamics(SAtomicModelList& /* lst */,
+                              const std::string& /* xmlDynamics */)
 {
+    /* FIXME que faire avec cette fonction
     xmlpp::DomParser dom;
     dom.parse_memory(xmlDynamics);
     xmlpp::Element* root = utils::xml::get_root_node(dom, "MODELS");
@@ -392,50 +400,52 @@ void Simulator::applyDynamics(SAtomicModelList& lst,
         for (SAtomicModelList::iterator jt = lst.begin(); jt != lst.end();
              ++jt) {
             if ((*jt)->getName() == name) {
-                (*jt)->parseXML(dynamics);
+                (*jt)->parse(dynamics);
                 break;
             }
         }
     }
+    */
 }
 
-void Simulator::applyInits(SAtomicModelList& lst,
-                           const std::string& xmlInits)
+void Simulator::applyInits(SAtomicModelList& /* lst */,
+                           const std::string& /* xmlInits */)
 {
-    xmlpp::DomParser dom;
-    dom.parse_memory(xmlInits);
-    xmlpp::Element* root =
-        utils::xml::get_root_node(dom, "EXPERIMENTAL_CONDITIONS");
-    xmlpp::Node::NodeList lt = root->get_children("CONDITION");
-    for (xmlpp::Node::NodeList::iterator it = lt.begin(); it != lt.end();
-         ++it) {
-        xmlpp::Element* cdt = (xmlpp::Element*)(*it);
-        Glib::ustring name = utils::xml::get_attribute(cdt, "MODEL_NAME");
-        Glib::ustring port = utils::xml::get_attribute(cdt, "PORT_NAME");
+    //xmlpp::DomParser dom;
+    //dom.parse_memory(xmlInits);
+    //xmlpp::Element* root =
+    //utils::xml::get_root_node(dom, "EXPERIMENTAL_CONDITIONS");
+    //xmlpp::Node::NodeList lt = root->get_children("CONDITION");
+    //for (xmlpp::Node::NodeList::iterator it = lt.begin(); it != lt.end();
+    //++it) {
+    //xmlpp::Element* cdt = (xmlpp::Element*)(*it);
+    //Glib::ustring name = utils::xml::get_attribute(cdt, "MODEL_NAME");
+    //Glib::ustring port = utils::xml::get_attribute(cdt, "PORT_NAME");
 
-        std::vector < value::Value* > result = value::Value::getValues(cdt);
-        vle::value::Value* init = 0;
-        if (not result.empty()) {
-            init = result.front();
-            std::vector < value::Value* >::iterator jt = result.begin();
-            ++jt;
-            for (;jt != result.end(); ++jt)
-                delete (*jt);
-        }
-
-        if (init) {
-            for (SAtomicModelList::iterator jt = lst.begin(); jt != lst.end();
-                 ++jt) {
-                if ((*jt)->getName() == name) {
-                    InitEvent* evt = new InitEvent(m_currentTime, (*jt), port);
-                    evt->putAttribute(port, init);
-                    (*jt)->processInitEvent(evt);
-                    delete evt;
-                    break;
-                }
-            }
-        }
-    }
+    //FIXME
+    //std::vector < value::Value > result = value::Value::getValues(cdt);
+    //vle::value::Value init;
+    //if (not result.empty()) {
+    //init = result.front();
+    //std::vector < value::Value* >::iterator jt = result.begin();
+    //++jt;
+    //for (;jt != result.end(); ++jt)
+    //delete (*jt);
+    //}
+    //
+    //if (init) {
+    //for (SAtomicModelList::iterator jt = lst.begin(); jt != lst.end();
+    //++jt) {
+    //if ((*jt)->getName() == name) {
+    //InitEvent* evt = new InitEvent(m_currentTime, (*jt), port);
+    //evt->putAttribute(port, init);
+    //(*jt)->processInitEvent(evt);
+    //delete evt;
+    //break;
+    //}
+    //}
+    //}
+    //}
 }
 
 void Simulator::startEOVStream()
@@ -448,7 +458,7 @@ void Simulator::startEOVStream()
 
         utils::net::explodeStringNet((*it).second.host(), host, port);
         DTRACE1(boost::format("startEOVStream '%1%' '%2%'.\n") % host % port);
-        
+
         if (host == "localhost") {
             std::string cmd("eov -p ");
             cmd += utils::to_string(port);
@@ -468,16 +478,16 @@ void Simulator::startEOVStream()
             DTRACE2(boost::format("recvEOV: %1%.\n") % tr);
             xmlpp::DomParser dom;
             dom.parse_memory(tr);
-            value::Value* v =
-                value::Value::getValue(dom.get_document()->get_root_node());
+            value::Value v =
+                value::ValueBase::getValue(dom.get_document()->get_root_node());
 
             if (v->isMap()) {
-                const value::Map::MapValue& mp = ((value::Map*)v)->getValue();
-                for (value::Map::MapValue::const_iterator it = mp.begin();
+                value::MapFactory::MapValue& mp = value::to_map(v)->getValue();
+                for (value::MapFactory::MapValue::const_iterator it = mp.begin();
                      it != mp.end(); ++it) {
                     if ((*it).second->isInteger()) {
                         std::string output = (*it).first;
-                        int port = ((value::Integer*)(*it).second)->intValue();
+                        int port = value::to_integer((*it).second)->intValue();
 
                         std::string outputhost = host + ":" + utils::to_string(port);
                         startNetStream(output, outputhost);
@@ -487,24 +497,24 @@ void Simulator::startEOVStream()
         } catch(const std::exception& e) {
             delete clt;
             std::string err((boost::format(
-                    "Error connecting on eov '%1%' host '%2%' port '%3%': %4%\n") %
-                (*it).first % host % port % e.what()).str());
+                        "Error connecting on eov '%1%' host '%2%' port '%3%': %4%\n") %
+                    (*it).first % host % port % e.what()).str());
             Throw(utils::InternalError, err);
         }
     }
-//    Glib::usleep(1000000); // FIXME pose obligatoire ?!?
+    Glib::usleep(1000000); // FIXME pose obligatoire ?!?
 }
 
 void Simulator::startNetStream()
 {
     const vpz::Measures& measures = m_experiment.measures();
-    std::map < std::string, vpz::Measure >::const_iterator it;
+    vpz::Measures::MeasureList::const_iterator it;
     for (it = measures.measures().begin(); it != measures.measures().end();
          ++it) {
-        const vpz::Output& o = measures.outputs().find((*it).second.output());
+        const vpz::Output& o = measures.outputs().find((*it).output());
 
         if (o.format() == vpz::Output::NET)
-	  startNetStream((*it).second.output(),o.location());
+	  startNetStream((*it).output(), o.location());
     }
 }
 
@@ -532,7 +542,7 @@ void Simulator::startNetStream(const std::string& output,
     std::list < vpz::Observable >::const_iterator it;
     for (it = observables.begin(); it != observables.end(); ++it) {
         obs->addObservable(getModel((*it).modelname()), (*it).portname(),
-                               (*it).group(), (*it).index());
+                           (*it).group(), (*it).index());
     }
     addObserver(obs);
 }
@@ -540,32 +550,32 @@ void Simulator::startNetStream(const std::string& output,
 void Simulator::startLocalStream()
 {
     const vpz::Measures& measures = m_experiment.measures();
-    std::map < std::string, vpz::Measure >::const_iterator it;
+    vpz::Measures::MeasureList::const_iterator it;
     for (it = measures.measures().begin(); it != measures.measures().end();
          ++it) {
         Stream* stream = 0;
-        const vpz::Output& o = measures.outputs().find((*it).second.output());
+        const vpz::Output& o = measures.outputs().find((*it).output());
 
         if (o.format() == vpz::Output::TEXT 
 	    or o.format() == vpz::Output::SDML) {
             std::string file(m_experiment.name());
             file += "_";
-            file += (*it).first;
-            
+            file += (*it).name();
+
             stream = getStreamPlugin(o);
             stream->init(o.plugin(), file, o.location(), o.xml());
 
             Observer* obs = 0;
-            if ((*it).second.type() == vpz::Measure::TIMED) {
-                obs = new devs::TimedObserver((*it).first, stream,
-                                              (*it).second.timestep());
-            } else if ((*it).second.type() == vpz::Measure::EVENT) {
-                obs = new devs::EventObserver((*it).first, stream);
+            if ((*it).type() == vpz::Measure::TIMED) {
+                obs = new devs::TimedObserver((*it).name(), stream,
+                                              (*it).timestep());
+            } else if ((*it).type() == vpz::Measure::EVENT) {
+                obs = new devs::EventObserver((*it).name(), stream);
             }
             stream->setObserver(obs);
 
             const std::list < vpz::Observable >& observables =
-                (*it).second.observables();
+                (*it).observables();
             std::list < vpz::Observable >::const_iterator jt;
             for (jt = observables.begin(); jt != observables.end(); ++jt) {
                 obs->addObservable(getModel((*jt).modelname()),
@@ -672,7 +682,7 @@ Event* Simulator::processConflict(EventBagModel& bag, sAtomicModel& mdl)
             } else {
                 Throw(utils::InternalError, boost::format(
                         "No internal and external events for model '%1%'\n") %
-                        mdl.getName());
+                    mdl.getName());
             }
         }
     }
@@ -754,7 +764,7 @@ vle::devs::Stream* Simulator::getStreamPlugin(const vpz::Output& o)
             o.streamformat());
 
     std::string file1(Glib::Module::build_path(
-        utils::Path::path().getDefaultStreamDir(), o.streamformat()));
+            utils::Path::path().getDefaultStreamDir(), o.streamformat()));
     Glib::Module* module = new Glib::Module(file1);
 
     if (not (*module)) {
@@ -762,7 +772,7 @@ vle::devs::Stream* Simulator::getStreamPlugin(const vpz::Output& o)
         delete module;
 
         std::string file2(Glib::Module::build_path(
-            utils::Path::path().getUserStreamDir(), o.streamformat()));
+                utils::Path::path().getUserStreamDir(), o.streamformat()));
         module = new Glib::Module(file2);
 
         if (not (*module)) {
@@ -789,7 +799,7 @@ vle::devs::Stream* Simulator::getStreamPlugin(const vpz::Output& o)
     Assert(utils::FileError, call, boost::format(
             "Error in module '%1%', function makeNewStream problem allocation "
             "a new plugin: %1%\n") % o.plugin() %
-            Glib::Module::get_last_error());
+        Glib::Module::get_last_error());
 
     return call;
 }

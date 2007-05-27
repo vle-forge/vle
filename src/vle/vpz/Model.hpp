@@ -31,31 +31,48 @@
 
 namespace vle { namespace vpz {
 
+
+    /** 
+     * @brief The AtomicModel class is used by the AtomicModelList to attach an
+     * atomic model to his condition and dynamics names.
+     */
+    class AtomicModel
+    {
+    public:
+        AtomicModel(const std::string& condition, const std::string& dynamics) :
+            m_condition(condition),
+            m_dynamics(dynamics)
+        { }
+
+        const std::string& condition() const
+        { return m_condition; }
+
+        const std::string& dynamics() const
+        { return m_dynamics; }
+
+    private:
+        AtomicModel() { }
+
+        std::string     m_condition;
+        std::string     m_dynamics;
+    };
+
+    /** 
+     * @brief The AtomicModelList class is a dictionary used to attach atomic
+     * model to condition and dynamics names.
+     */
+    class AtomicModelList : public std::map < graph::AtomicModel*, AtomicModel >
+    { };
+
     class Model : public Base
     {
     public:
-        Model();
+        Model() :
+            m_graph(0)
+        { }
 
-        Model(const Model& model);
-
-        Model& operator=(const Model& model);
-
-        virtual ~Model();
-
-        /** 
-         * @brief Initialise the devs hierachy of model.
-         * @code
-         * <STRUCTURES>
-         *  <MODEL NAME="toto">
-         *  </MODEL>
-         * </STRUCTURES>
-         * @endcode
-         * 
-         * @param elt a reference to the STRUCTURES tag.
-         *
-         * @throw Exception::Internal if elt is null or not on a STRUCTURES tag.
-         */
-        virtual void init(xmlpp::Element* elt);
+        virtual ~Model()
+        { }
 
         /** 
          * @brief Write the devs hierachy of model.
@@ -64,7 +81,10 @@ namespace vle { namespace vpz {
          *
          * @throw Exception::Internal if elt is null.
          */
-        virtual void write(xmlpp::Element* elt) const;
+        virtual void write(std::ostream& out) const;
+
+        virtual Base::type getType() const
+        { return MODEL; }
 
         /** 
          * @brief Initialise the devs hierachy of model.
@@ -91,42 +111,154 @@ namespace vle { namespace vpz {
          * @param modelname model name to change. Must be a graph::NoVLE.
          * @param m the new model or hierarchy to push.
          */
-        void addModel(const std::string& modelname, const Model& m);
+        //void addModel(const std::string& modelname, const Model& m);
 
         /** 
          * @brief Set a hierachy of graph::Model. If a previous hierarchy
-         * already exist, it is delete same if the new is empty. This function
-         * is just an affectation, no clone is build.
+         * already exist, it is not delete same if the new is empty. This
+         * function is just an affectation, no clone is build.
          * 
          * @param mdl the new graph::Model hierarchy to set.
          */
         void setModel(graph::Model* mdl);
         
         /** 
-         * @brief Build a new graph::Model hierarchy an return it.
+         * @brief Get a reference to the graph::Model hierarchy.
          * 
-         * @return A new hierarchy, don't forget to delete it when finish.
+         * @return A reference to the graph::Model, be carreful, you can damage
+         * graph::Vpz instance.
+         */
+        graph::Model* model();
+
+        /** 
+         * @brief Get a reference to the graph::Model hierarchy.
+         * 
+         * @return A reference to the graph::Model, be carreful, you can damage
+         * graph::Vpz instance.
          */
         graph::Model* model() const;
 
-        /** 
-         * @brief Get a reference to the graph::Model hierarchy.
-         * 
-         * @return A reference to the graph::Model, be carreful, you can damage
-         * graph::Vpz instance.
-         */
-        graph::Model* modelRef();
+        const AtomicModelList& atomicModels() const
+        { return m_atomicmodels; }
 
-        /** 
-         * @brief Get a reference to the graph::Model hierarchy.
-         * 
-         * @return A reference to the graph::Model, be carreful, you can damage
-         * graph::Vpz instance.
-         */
-        const graph::Model* modelRef() const;
+        AtomicModelList& atomicModels()
+        { return m_atomicmodels; }
 
     private:
+        AtomicModelList     m_atomicmodels;
         graph::Model*       m_graph;
+    };
+
+    class Submodels : public Base
+    {
+    public:
+        Submodels() { }
+
+        virtual ~Submodels() { }
+
+        virtual void write(std::ostream& /* out */) const
+        { }
+
+        virtual Base::type getType() const
+        { return SUBMODELS; }
+    };
+
+    class Connections : public Base
+    {
+    public:
+        Connections() { }
+
+        virtual ~Connections() { }
+
+        virtual void write(std::ostream& /* out */) const
+        { }
+
+        virtual Base::type getType() const
+        { return CONNECTIONS; }
+    };
+
+    class InternalConnection : public Base
+    {
+    public:
+        InternalConnection() { }
+
+        virtual ~InternalConnection() { }
+
+        virtual void write(std::ostream& /* out */) const
+        { }
+
+        virtual Base::type getType() const
+        { return INTERNAL_CONNECTION; }
+    };
+
+    class InputConnection : public Base
+    {
+    public:
+        InputConnection() { }
+
+        virtual ~InputConnection() { }
+
+        virtual void write(std::ostream& /* out */) const
+        { }
+
+        virtual Base::type getType() const
+        { return INPUT_CONNECTION; }
+    };
+
+    class OutputConnection : public Base
+    {
+    public:
+        OutputConnection() { }
+
+        virtual ~OutputConnection() { }
+
+        virtual void write(std::ostream& /* out */) const
+        { }
+
+        virtual Base::type getType() const
+        { return OUTPUT_CONNECTION; }
+    };
+
+    class Origin: public Base
+    {
+    public:
+        Origin(const Glib::ustring& model,
+                    const Glib::ustring& port) :
+            model(model),
+            port(port)
+        { }
+
+        virtual ~Origin() { }
+
+        virtual void write(std::ostream& /* out */) const
+        { }
+
+        virtual Base::type getType() const
+        { return ORIGIN; }
+
+        Glib::ustring model;
+        Glib::ustring port;
+    };
+
+    class Destination: public Base
+    {
+    public:
+        Destination(const Glib::ustring& model,
+                    const Glib::ustring& port) :
+            model(model),
+            port(port)
+        { }
+
+        virtual ~Destination() { }
+
+        virtual void write(std::ostream& /* out */) const
+        { }
+
+        virtual Base::type getType() const
+        { return DESTINATION; }
+        
+        Glib::ustring model;
+        Glib::ustring port;
     };
 
 }} // namespace vle vpz

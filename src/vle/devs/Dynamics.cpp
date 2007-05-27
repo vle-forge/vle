@@ -91,7 +91,7 @@ ExternalEventList* Dynamics::buildEventWithADouble(
 					       getModel());
 
     v_event->putAttribute(attributeName,
-                          new vle::value::Double(attributeValue));
+                          value::DoubleFactory::create(attributeValue));
     v_eventList->addEvent(v_event);
     return v_eventList;
 }
@@ -106,8 +106,8 @@ ExternalEventList* Dynamics::buildEventWithAInteger(
     ExternalEvent* v_event = new ExternalEvent(portName, currentTime,
 					       getModel());
 
-    v_event->putAttribute(attributeName, new
-                          vle::value::Integer(attributeValue));
+    v_event->putAttribute(attributeName,
+                          value::IntegerFactory::create(attributeValue));
     v_eventList->addEvent(v_event);
     return v_eventList;
 }
@@ -122,8 +122,8 @@ ExternalEventList* Dynamics::buildEventWithABoolean(
     ExternalEvent* v_event = new ExternalEvent(portName, currentTime,
 					       getModel());
 
-    v_event->putAttribute(attributeName, new
-                          vle::value::Boolean(attributeValue));
+    v_event->putAttribute(attributeName,
+                          value::BooleanFactory::create(attributeValue));
     v_eventList->addEvent(v_event);
     return v_eventList;
 }
@@ -138,81 +138,10 @@ ExternalEventList* Dynamics::buildEventWithAString(
     ExternalEvent* v_event = new ExternalEvent(portName, currentTime,
 					       getModel());
 
-    v_event->putAttribute(attributeName, new
-                          vle::value::String(attributeValue));
+    v_event->putAttribute(attributeName,
+                          value::StringFactory::create(attributeValue));
     v_eventList->addEvent(v_event);
     return v_eventList;
-}
-
-long Dynamics::getIntegerParameter(
-    const std::string & name,
-    xmlpp::Element* dyn_elt)
-{
-    xmlpp::Element* elt = utils::xml::get_children(dyn_elt,name);
-    return utils::to_int(utils::xml::get_attribute(elt,"VALUE"));
-}
-
-double Dynamics::getDoubleParameter(
-    const std::string & name,
-    xmlpp::Element* dyn_elt)
-{
-    xmlpp::Element* elt = utils::xml::get_children(dyn_elt,name);
-    return utils::to_double(utils::xml::get_attribute(elt,"VALUE"));
-}
-
-bool Dynamics::getBooleanParameter(
-    const std::string & name,
-    xmlpp::Element* dyn_elt)
-{
-    xmlpp::Element* elt = utils::xml::get_children(dyn_elt,name);
-    return utils::to_boolean(utils::xml::get_attribute(elt,"VALUE"));
-}
-
-std::string Dynamics::getStringParameter(
-    const std::string & name,
-    xmlpp::Element* dyn_elt)
-{
-    xmlpp::Element* elt = utils::xml::get_children(dyn_elt,name);
-    return utils::xml::get_attribute(elt,"VALUE");
-}
-
-long Dynamics::getIntegerAttributeValue(
-    Event* event,
-    const std::string & name) const
-{
-    return ((vle::value::Integer*)(event->getAttributeValue(name)))->intValue();
-}
-
-double Dynamics::getDoubleAttributeValue(
-    Event* event,
-    const std::string & name) const
-{
-    return
-        ((vle::value::Double*)(event->getAttributeValue(name)))->doubleValue();
-}
-
-bool Dynamics::getBooleanAttributeValue(
-    Event* event,
-    const std::string & name) const
-{
-    return
-        ((vle::value::Boolean*)(event->getAttributeValue(name)))->boolValue();
-}
-
-std::string Dynamics::getStringAttributeValue(
-    Event* event,
-    const std::string & name) const
-{
-    return ((vle::value::String*)(event->getAttributeValue(name)))->toString();
-}
-
-vle::value::Set* Dynamics::getSetAttributeValue(Event* event,
-				const std::string& name) const
-{
-    vle::value::Set* s = dynamic_cast< vle::value::Set* >(
-	event->getAttributeValue(name));
-    AssertI(s);
-    return s;
 }
 
 ExternalEventList* Dynamics::getOutputFunction(const Time& /* time */)
@@ -226,9 +155,9 @@ ExternalEventList* Dynamics::processInstantaneousEvent(
     return noEvent();
 }
 
-vle::value::Value* Dynamics::processStateEvent(StateEvent* /* event */) const
+vle::value::Value Dynamics::processStateEvent(StateEvent* /* event */) const
 {
-    return 0;
+    return value::ValueBase::empty;
 }
 
 void Dynamics::processInitEvent(InitEvent* /* event */)

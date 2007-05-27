@@ -42,9 +42,10 @@ namespace vle { namespace vpz {
         
         virtual ~Observable();
 
-        virtual void init(xmlpp::Element* elt);
-        
-        virtual void write(xmlpp::Element* elt) const;
+        virtual void write(std::ostream& out) const;
+
+        virtual Base::type getType() const
+        { return OBSERVABLE; }
 
         bool operator==(const Observable& o) const;
         

@@ -46,7 +46,7 @@ namespace vle { namespace devs {
     class Stream
     {
     public:
-	typedef std::vector < vle::devs::Observable > ObservableVector;
+	typedef std::vector < devs::Observable > ObservableVector;
 
 	///////////////////////////////////////////////////////////////////////
 
@@ -82,7 +82,7 @@ namespace vle { namespace devs {
          *
          * @return Observer attached or NULL if no attanchement.
          */
-        inline vle::devs::Observer* getObserver() const
+        inline devs::Observer* getObserver() const
         { return m_observer; }
 
         /**
@@ -90,26 +90,26 @@ namespace vle { namespace devs {
          *
          * @param observer the new observer to attach.
          */
-        inline void setObserver(vle::devs::Observer* observer)
+        inline void setObserver(devs::Observer* observer)
         { m_observer = observer; }
 
 	///////////////////////////////////////////////////////////////////////
 
         virtual void writeData() =0;
 
-        virtual void writeHead(const std::vector < vle::devs::Observable >&
+        virtual void writeHead(const std::vector < devs::Observable >&
 			       variableNameList) =0;
 
         virtual void writeTail() =0;
 
-        virtual void writeValue(const vle::devs::Time& time,
-                                vle::value::Value* value) =0;
+        virtual void writeValue(const devs::Time& time,
+                                value::Value value) =0;
 
-	virtual void writeValues(const vle::devs::Time& time,
-				 const vle::devs::StreamModelPortValue& valuelst,
+	virtual void writeValues(const devs::Time& time,
+				 const devs::StreamModelPortValue& valuelst,
 				 const ObservableVector& obslst) =0;
     private:
-        vle::devs::Observer*        m_observer;
+        devs::Observer*        m_observer;
     };
 
 }} // namespace vle devs

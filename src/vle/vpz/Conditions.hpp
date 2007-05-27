@@ -39,32 +39,52 @@ namespace vle { namespace vpz {
     class Conditions : public Base
     {
     public:
+        typedef std::map < std::string, Condition > ConditionList;
+        typedef ConditionList::const_iterator const_iterator;
+        typedef ConditionList::iterator iterator;
+
         Conditions();
 
-        virtual ~Conditions();
+        virtual ~Conditions()
+        { }
 
-        virtual void init(xmlpp::Element* elt);
+        /** 
+         * @brief Add Conditions informations to the stream.
+         * @code
+         * <conditions>
+         *  <condition name="">
+         *  </condition>
+         *  <condition name="">
+         *  </condition>
+         * </conditions>
+         * @endcode
+         * 
+         * @param out 
+         */
+        virtual void write(std::ostream& out) const;
 
-        virtual void write(xmlpp::Element* elt) const;
+        virtual Base::type getType() const
+        { return CONDITIONS; }
+
 
         /** 
          * @brief Add a list of Conditions to the list.
          * 
-         * @param c A Conditions object to add.
+         * @param conditions A Conditions object to add.
          *
          * @throw Exception::Internal if a Condition already exist.
          */
-        void addConditions(const Conditions& c);
+        void addConditions(const Conditions& conditions);
 
         /** 
          * @brief Add a condition into the conditions list.
          * 
-         * @param c the condition to add.
+         * @param condition the condition to add.
          *
          * @throw Exception::Internal if condition with same name and port
          * already exist.
          */
-        void addCondition(const Condition& c);
+        void addCondition(const Condition& condition);
 
         /** 
          * @brief Just clear the list of vpz::Condition.
@@ -77,27 +97,31 @@ namespace vle { namespace vpz {
          * @param modelname condition model name.
          * @param portname condition port name.
          */
-        void delCondition(const std::string& modelname,
-                          const std::string& portname);
+        void delCondition(const std::string& condition);
+
+
+        /** 
+         * @brief Get the specified condition from conditions list.
+         * 
+         * @param condition 
+         * 
+         * @return 
+         */
+        const Condition& find(const std::string& condition) const;
 
         /** 
          * @brief Get the list of conditions.
          * 
          * @return A reference to the list of conditions.
          */
-        const std::list < Condition >& conditions() const
+        inline const ConditionList& conditions() const
         { return m_conditions; }
 
-        /** 
-         * @brief Get the list of conditions.
-         * 
-         * @return A reference to the list of conditions.
-         */
-        std::list < Condition >& conditions()
+        inline ConditionList& conditions()
         { return m_conditions; }
 
     private:
-        std::list < Condition >     m_conditions;
+        ConditionList m_conditions;
     };
 
 }} // namespace vle vpz

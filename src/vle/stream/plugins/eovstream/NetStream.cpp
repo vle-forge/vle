@@ -131,7 +131,7 @@ void NetStream::writeTail()
 {
 }
 
-void NetStream::writeValue(const devs::Time&, value::Value* )
+void NetStream::writeValue(const devs::Time&, value::Value )
 {
 }
 

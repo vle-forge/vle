@@ -25,15 +25,10 @@
 #ifndef VLE_VPZ_CONDITION_HPP
 #define VLE_VPZ_CONDITION_HPP
 
-#include <vector>
 #include <string>
+#include <map>
 #include <vle/vpz/Base.hpp>
-
-namespace vle { namespace value {
-
-    class Value;
-
-}} // namespace vle value
+#include <vle/value/Value.hpp>
 
 namespace vle { namespace vpz {
 
@@ -44,74 +39,125 @@ namespace vle { namespace vpz {
     class Condition : public Base
     {
     public:
+        typedef std::map < std::string, value::Set > ValueList;
+        typedef ValueList::const_iterator const_iterator;
+        typedef ValueList::iterator iterator;
+
         Condition();
 
-        Condition(const Condition& cond);
-
-        Condition& operator=(const Condition& cond);
-
-        virtual ~Condition();
-
-        virtual void init(xmlpp::Element* elt);
-
-        virtual void write(xmlpp::Element* elt) const;
+        virtual ~Condition() 
+        { }
 
         /** 
-         * @brief Set the information for this Condition.
+         * @brief Add Condition informations to the stream.
+         * @code
+         * <condition name="">
+         *  <port name="">
+         *   <!-- vle::value XML representation. -->
+         *  </port>
+         * </condition>
+         * @endcode
          * 
-         * @param modelname a new model name.
-         * @param portname a new port name.
+         * @param out 
          */
-        void setCondition(const std::string& modelname,
-                          const std::string& portname);
+        virtual void write(std::ostream& out) const;
 
-        const std::string& modelname() const
-        { return m_modelname; }
+        inline virtual Base::type getType() const
+        { return CONDITION; }
 
-        const std::string& portname() const
-        { return m_portname; }
-
-        const std::vector < vle::value::Value* >& value() const
-        { return m_value; }
 
         /** 
-         * @brief Build a clone of the first condition from value list.
+         * @brief Add a port to the value list.
          * 
-         * @return a cloned Value.
+         * @param portname name of the port.
+         */
+        void addPort(const std::string& portname);
+
+        /** 
+         * @brief Remove a port of the value list.
+         * 
+         * @param portname name of the port.
+         */
+        void delPort(const std::string& portname);
+
+        /** 
+         * @brief Add a value to a specified port. If port does not exist, it
+         * will be create.
+         * 
+         * @param portname name of the port to add value. 
+         * @param value the value to push.
+         */
+        void addValueToPort(const std::string& portname,
+                            const value::Value& value);
+
+
+        /** 
+         * @brief Return the name of the condition.
+         * 
+         * @return 
+         */
+        inline const std::string& name() const
+        { return m_name; }
+
+        /** 
+         * @brief Return the port, values dictionary.
+         * 
+         * @return 
+         */
+        inline const ValueList& values() const
+        { return m_values; }
+
+
+        /** 
+         * @brief Return the port, values dictionary.
+         * 
+         * @return 
+         */
+        inline ValueList& values()
+        { return m_values; }
+
+
+        /** 
+         * @brief Get the value::Set attached to a port.
+         * 
+         * @param portname The name of the port.
+         * 
+         * @return A reference to a value::Set.
          *
-         * @throw Exception::Internal if value list is empty.
+         * @throw Exception::Internal if portname not exist.
          */
-        vle::value::Value* firstValue() const;
+        const value::Set& getSetValues(const std::string& portname) const;
+
 
         /** 
-         * @brief Build a clone of the nth condition from value list.
+         * @brief Return a reference to the first value::Value of the specified
+         * port.
          * 
-         * @param i the value to clone.
+         * @param portname the name of the port to test.
          * 
-         * @return a cloned Value.
+         * @return A reference to a value::Value.
          *
-         * @throw Exception::Internal if value list have no nth value.
+         * @throw Exception::Internal if portname not exist.
          */
-        vle::value::Value* nValue(size_t i) const;
+        const value::Value& firstValue(const std::string& portname) const;
+
+        /** 
+         * @brief Return a reference to the nth value::Value of the specified
+         * port.
+         * 
+         * @param portname the name of the specified port.
+         * @param i the value of the port.
+         * 
+         * @return A reference to a value::Value.
+         *
+         * @throw Exception::Internal if portname not exist or if value list
+         * have no nth value.
+         */
+        const value::Value& nValue(const std::string& portname, size_t i) const;
         
-        /** 
-         * @brief Add the value into the vector. Be carrefull, the value is not
-         * cloned.
-         * 
-         * @param val the value to add.
-         */
-        void addValue(vle::value::Value* val);
-
-        /** 
-         * @brief Delete all value from condition.
-         */
-        void clearValue();
-
-
     private:
-        std::string                         m_modelname;
-        std::string                         m_portname;
-        std::vector < vle::value::Value* >  m_value;
+        std::string             m_name;
+        ValueList               m_values;
     };
 
 }} // namespace vle vpz

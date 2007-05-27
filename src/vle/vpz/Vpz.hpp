@@ -30,7 +30,7 @@
 
 namespace vle { namespace vpz {
 
-    class Vpz
+    class Vpz : public Base
     {
     public:
         Vpz() :
@@ -39,8 +39,12 @@ namespace vle { namespace vpz {
 
         Vpz(const std::string& filename);
 
-        ~Vpz()
-        { }
+        virtual ~Vpz() { }
+
+        virtual void write(std::ostream& out) const;
+
+        virtual Base::type getType() const
+        { return VPZ; } 
 
         /** 
          * @brief Open a VPZ file project.
@@ -50,7 +54,7 @@ namespace vle { namespace vpz {
          * @throw Exception::VPZ on error.
          */
         void open(const std::string& filename);
-    
+
         /** 
          * @brief Write file into the current VPZ filename open.
          */
@@ -120,10 +124,11 @@ namespace vle { namespace vpz {
          * @param filename string to change if no extension exist.
          */
         static void fixExtension(std::string& filename);
+
     private:
-        std::string         m_filename;
-        Project             m_project;
         bool                m_isGzip;
+        std::string         m_filename;
+        vpz::Project        m_project;
     };
 
 }} // namespace vle vpz

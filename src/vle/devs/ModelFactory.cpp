@@ -71,7 +71,7 @@ graph::Model* ModelFactory::createModels(const std::string& classname,
 Glib::Module* ModelFactory::buildPlugin(const vpz::Dynamic& dyn)
 {
     std::string file1(Glib::Module::build_path(
-        utils::Path::path().getDefaultModelDir(), dyn.formalism()));
+        utils::Path::path().getDefaultModelDir(), dyn.library()));
     
     Glib::Module* module = new Glib::Module(file1);
     if (not (*module)) {
@@ -79,7 +79,7 @@ Glib::Module* ModelFactory::buildPlugin(const vpz::Dynamic& dyn)
         delete module;
 
         std::string file2(Glib::Module::build_path(
-            utils::Path::path().getUserModelDir(), dyn.formalism()));
+            utils::Path::path().getUserModelDir(), dyn.library()));
         
         module = new Glib::Module(file2);
         if (not (*module)) {
@@ -87,9 +87,9 @@ Glib::Module* ModelFactory::buildPlugin(const vpz::Dynamic& dyn)
             delete module;
 
             Glib::ustring er((boost::format(
-                        "error opening plugin '%1%' or '%2%' formalism "
+                        "error opening plugin '%1%' or '%2%' library "
                         "'%3%'\nwith error\n") % file1 % file2 %
-                    dyn.formalism()).str());
+                    dyn.library()).str());
             er += err1;
             er += " ";
             er += err2;
@@ -114,9 +114,11 @@ devs::SAtomicModelList ModelFactory::createModelsFromDynamics(
 
         const vpz::Dynamic& d = dyn.find((*it)->getName());
         switch(d.type()) {
-        case vpz::Dynamic::WRAPPING:
-        case vpz::Dynamic::MAPPING:
+        case vpz::Dynamic::LOCAL:
             attachDynamics(a, d, getPlugin((*it)->getName()));
+            break;
+        case vpz::Dynamic::DISTANT:
+            Throw(utils::InternalError, "Distant dynamics not yet implemented.");
             break;
         }
 
@@ -134,17 +136,14 @@ devs::SAtomicModelList ModelFactory::createModelsFromDynamics(
 
 Glib::Module* ModelFactory::getPlugin(const std::string& name)
 {
-    std::map < std::string, vpz::Dynamic >::const_iterator it;
-    it = mDynamics.dynamics().find(name);
-    if (it != mDynamics.dynamics().end()) {
-        return buildPlugin((*it).second);
+    if (mDynamics.exist(name)) {
+        return buildPlugin(mDynamics.find(name));
     } else {
-        std::map < std::string, vpz::Class >::const_iterator clit;
+        vpz::Classes::ClassList::const_iterator clit;
         for (clit = mClasses.classes().begin(); clit != mClasses.classes().end();
              ++clit) {
-            it = (*clit).second.dynamics().dynamics().find(name);
-            if (it != (*clit).second.dynamics().dynamics().end()) {
-                return buildPlugin((*it).second);
+            if ((*clit).second.dynamics().exist(name)) {
+                return buildPlugin((*clit).second.dynamics().find(name));
             }
         }
     }
@@ -171,18 +170,8 @@ void ModelFactory::attachDynamics(devs::sAtomicModel* atom,
             "problem allocation a new Dynamics '%2%'\n") %
         module->get_name() % Glib::Module::get_last_error());
     
-    xmlpp::DomParser* dom = 0;
-    if (not dyn.dynamic().empty()) {
-        try {
-            dom = new xmlpp::DomParser;
-            dom->parse_memory(dyn.dynamic());
-        } catch(const xmlpp::exception& e) {
-            Throw(utils::ParseError, boost::format(
-                    "Error parsing dynamics XML for dynamics '%1%', with "
-                    "error: %2%\n") % dyn.formalism() % e.what());
-        }
-        call->parseXML(dom->get_document()->get_root_node());
-        delete dom;
+    if (not dyn.data().empty()) {
+        call->parse(dyn.data());
     }
     atom->addDynamics(call);
     delete module;

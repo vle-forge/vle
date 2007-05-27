@@ -283,14 +283,14 @@ namespace vle { namespace graph {
 	 *
          * @param elt XML node parent.
          */
-        void writePortListXML(xmlpp::Element* elt );
+        void writePortListXML(std::ostream& out) const;
 
         /**
 	 * Write under XML node VLE structures.
 	 *
          * @param elt XML node parent.
          */
-	virtual void writeXML(xmlpp::Element* elt) = 0;
+	virtual void writeXML(std::ostream& out) const = 0;
 
         /**
 	 * return cast of a Model to an AtomicModel. If Model is not an

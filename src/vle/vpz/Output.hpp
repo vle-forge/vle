@@ -49,11 +49,12 @@ namespace vle { namespace vpz {
 
         Output();
 
-        virtual ~Output();
+        virtual ~Output() { }
 
-        virtual void init(xmlpp::Element* elt);
+        virtual void write(std::ostream& out) const;
 
-        virtual void write(xmlpp::Element* elt) const;
+        virtual Base::type getType() const
+        { return OUTPUT; }
 
         /** 
          * @brief Set the output with text stream information. The name is
@@ -146,8 +147,15 @@ namespace vle { namespace vpz {
         const std::string& xml() const
         { return m_xml; }
 
+        const std::string& name() const
+        { return m_name; }
+
+        void setName(const std::string& name)
+        { m_name.assign(name); }
+
     private:
         Format      m_format;
+        std::string m_name;
         std::string m_plugin;
         std::string m_location;
         std::string m_xml;

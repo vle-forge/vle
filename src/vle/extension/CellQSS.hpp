@@ -99,7 +99,7 @@ namespace vle { namespace extension {
 	virtual void processInternalEvent(devs::InternalEvent* event);
 	virtual void processExternalEvent(devs::ExternalEvent* event);
 	virtual void processPerturbation(devs::ExternalEvent* event);
-	virtual value::Value* processStateEvent(devs::StateEvent* event) const;
+	virtual value::Value processStateEvent(devs::StateEvent* event) const;
     };
 }} // namespace vle extension
 

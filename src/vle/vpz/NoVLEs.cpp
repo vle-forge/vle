@@ -30,35 +30,36 @@ namespace vle { namespace vpz {
 
 using namespace vle::utils;
 
-void NoVLEs::init(xmlpp::Element* elt)
+//void NoVLEs::init(xmlpp::Element* elt)
+//{
+//AssertI(elt);
+//AssertI(elt->get_name() == "NO_VLES");
+//
+//m_novles.clear();
+//
+//xmlpp::Node::NodeList lst = elt->get_children("NO_VLE");
+//xmlpp::Node::NodeList::iterator it;
+//for (it = lst.begin(); it != lst.end(); ++it) {
+//NoVLE novle;
+//novle.init((xmlpp::Element*)(*it));
+//addNoVLE(xml::get_attribute((xmlpp::Element*)(*it),
+//"MODEL_NAME"), novle);
+//}
+//}
+
+void NoVLEs::write(std::ostream& out) const
 {
-    AssertI(elt);
-    AssertI(elt->get_name() == "NO_VLES");
+    out << "<no_vles>";
 
-    m_novles.clear();
-
-    xmlpp::Node::NodeList lst = elt->get_children("NO_VLE");
-    xmlpp::Node::NodeList::iterator it;
-    for (it = lst.begin(); it != lst.end(); ++it) {
-        NoVLE novle;
-        novle.init((xmlpp::Element*)(*it));
-        addNoVLE(xml::get_attribute((xmlpp::Element*)(*it),
-                                           "MODEL_NAME"), novle);
-    }
-}
-
-void NoVLEs::write(xmlpp::Element* elt) const
-{
-    AssertI(elt);
-
-    xmlpp::Element* novles = elt->add_child("NO_VLES");
     std::map < std::string, NoVLE >::const_iterator it;
     for (it = m_novles.begin(); it != m_novles.end(); ++it) {
-        xmlpp::Element* novle = novles->add_child("NO_VLE");
-        novle->set_attribute("MODEL_NAME", (*it).first);
-
-        (*it).second.write(novle);
+        out << "<no_vle translator=\"" << (*it).second.translatorname() 
+            << "\" model_name=\"" << (*it).first << "\" >";
+        (*it).second.write(out);
+        out << "</no_vle>";
     }
+
+    out << "</no_vles>";
 }
 
 void NoVLEs::addNoVLE(const std::string& modelname, const NoVLE& novle)
@@ -81,22 +82,18 @@ void NoVLEs::delNoVLE(const std::string& modelname)
     }
 }
 
-void NoVLEs::fusion(Model& model, Dynamics& dynamics,
-                    Graphics& graphics, Experiment& experiment)
+void NoVLEs::fusion(Model& /* model */, Dynamics& dynamics,
+                    Experiment& experiment)
 {
     std::map < std::string, NoVLE >::iterator it;
     for (it = m_novles.begin(); it != m_novles.end(); ++it) {
         Model m;
         Dynamics d;
-        Graphics g;
         Experiment e;
 
-	e.addMeasures(experiment.measures());
-
-        (*it).second.callTranslator(m, d, g, e);          
-        model.addModel((*it).first, m);
+        (*it).second.callTranslator(m, d, e);          
+        //model.addModel((*it).first, m); // FIXME
         dynamics.addDynamics(d);
-        graphics.addGraphics(g);
         experiment.addMeasures(e.measures());
         experiment.addConditions(e.conditions());
     }

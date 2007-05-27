@@ -44,6 +44,9 @@ namespace vle { namespace vpz {
         virtual EOVchild* clone() const = 0;
 
         virtual ~EOVchild() { }
+        
+        virtual Base::type getType() const
+        { return EOVCHILD; }
     };
 
 
@@ -61,15 +64,7 @@ namespace vle { namespace vpz {
         virtual EOVchild* clone() const
         { return new EOVempty(*this); }
 
-        virtual ~EOVempty()
-        { }
-
-        /** 
-         * @brief Assert that elt is a empty eov child.
-         * 
-         * @param elt a node to the empty eov child.
-         */
-        virtual void init(xmlpp::Element* elt);
+        virtual ~EOVempty() { }
 
         /** 
          * @brief Add this XML tag under the node elt.
@@ -79,7 +74,7 @@ namespace vle { namespace vpz {
          * 
          * @param elt the parent node.
          */
-        virtual void write(xmlpp::Element* elt) const;
+        virtual void write(std::ostream& out) const;
     };
 
 
@@ -115,29 +110,12 @@ namespace vle { namespace vpz {
         virtual ~EOVcontainer();
 
         /** 
-         * @brief Load all child of the current tag. The current tag must be
-         * a container like HPaned, VPaned or EOV.
-         * @code
-         * <CHILD TYPE="hpaned" >
-         *  <CHILD TYPE="vpaned" >
-         *   <CHILD TYPE="empty" />
-         *   <CHILD TYPE="plugin" OUTPUT="x1" PLUGIN="plot" />
-         *  </CHILD>
-         *  <CHILD TYPE="empty" />
-         * </CHILD>
-         * @endcode
-         * 
-         * @param elt the container's node.
-         */
-        void init(xmlpp::Element* elt);
-    
-        /** 
          * @brief Write under the node elt all container. The elt element is
          * not modified, only child.
          * 
          * @param elt the container's node.
          */
-        void write(xmlpp::Element* elt) const;
+        virtual void write(std::ostream& out) const;
 
         /** 
          * @brief Delete all existing EOVchild and resize vector.
@@ -231,15 +209,12 @@ namespace vle { namespace vpz {
             EOVcontainer(2)
         { }
 
-        virtual ~EOVvpaned()
-        { }
+        virtual ~EOVvpaned() { }
 
         virtual EOVchild* clone() const
         { return new EOVvpaned(*this); }
 
-        virtual void init(xmlpp::Element* elt);
-        
-        virtual void write(xmlpp::Element* elt) const;
+        virtual void write(std::ostream& out) const;
 
         /** 
          * @brief Set an empty widget as left child.
@@ -302,16 +277,13 @@ namespace vle { namespace vpz {
             EOVcontainer(2)
         { }
 
-        virtual ~EOVhpaned()
-        { }
+        virtual ~EOVhpaned() { }
         
 
         virtual EOVchild* clone() const
         { return new EOVhpaned(*this); }
 
-        virtual void init(xmlpp::Element* elt);
-        
-        virtual void write(xmlpp::Element* elt) const;
+        virtual void write(std::ostream& out) const;
 
         /** 
          * @brief Set an empty widget as top child.
@@ -370,15 +342,12 @@ namespace vle { namespace vpz {
         EOVplugin() 
         { }
 
-        virtual ~EOVplugin()
-        { }
+        virtual ~EOVplugin() { }
 
         virtual EOVchild* clone() const
         { return new EOVplugin(*this); }
 
-        void init(xmlpp::Element* elt);
-
-        void write(xmlpp::Element* elt) const;
+        virtual void write(std::ostream& out) const;
 
         /** 
          * @brief Set information of a EOVplugin, ie, the output name and the
@@ -414,15 +383,12 @@ namespace vle { namespace vpz {
             EOVcontainer(1)
         { }
 
-        virtual ~EOV()
-        { }
+        virtual ~EOV() { }
         
         virtual EOVchild* clone() const
         { return new EOV(*this); }
 
-        virtual void init(xmlpp::Element* elt);
-
-        virtual void write(xmlpp::Element* elt) const;
+        virtual void write(std::ostream& out) const;
 
         /** 
          * @brief Set the EOV information, host using the syntax host:port.
@@ -500,9 +466,10 @@ namespace vle { namespace vpz {
 
         virtual ~EOVs() { }
 
-        virtual void init(xmlpp::Element* elt);
-        
-        virtual void write(xmlpp::Element* elt) const;
+        virtual void write(std::ostream& out) const;
+
+        virtual Base::type getType() const
+        { return EOVS; }
 
         /** 
          * @brief Attach a new EOV to the EOVs list.

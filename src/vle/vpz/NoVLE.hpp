@@ -28,7 +28,6 @@
 #include <vle/vpz/Base.hpp>
 #include <vle/vpz/Model.hpp>
 #include <vle/vpz/Dynamics.hpp>
-#include <vle/vpz/Graphics.hpp>
 #include <vle/vpz/Experiment.hpp>
 #include <glibmm/module.h>
 
@@ -40,26 +39,7 @@ namespace vle { namespace vpz {
         NoVLE()
         { }
 
-        virtual ~NoVLE()
-        { }
-
-        /** 
-         * @brief initialise the NoVLE structure.
-         * @code
-         *  <NO_VLE MODEL_NAME="system" TRANSLATOR="lifegame-tr">
-         *   <SYSTEM NAME="c" LANGUAGE="c++">
-         *    <SIZE L="30" C="30" />
-         *    <TIME_STEP VALUE="1" />
-         *    <SEED VALUE="6352" />
-         *   </SYSTEM>
-         *  </NO_VLE>
-         * @endcode
-         * 
-         * @param elt a xml reference to the NO_VLE node.
-         *
-         * @throw Exception::Internal if elt is null or not on NO_VLE node.
-         */
-        virtual void init(xmlpp::Element* elt);
+        virtual ~NoVLE() { }
 
         /** 
          * @brief Write the NoVLE information.
@@ -77,20 +57,21 @@ namespace vle { namespace vpz {
          *
          * @throw Exception::Internal if elt is null or not on NO_VLE node.
          */
-        virtual void write(xmlpp::Element* elt) const;
+        virtual void write(std::ostream& out) const;
+
+        virtual Base::type getType() const
+        { return NOVLE; }
 
         /** 
          * @brief Dynamically open translator library and call method to get
-         * Model, Dynamics, Graphics and Experiment if exist.
+         * Model, Dynamics and Experiment if exist.
          * 
          * @param model 
          * @param dynamics 
-         * @param graphics 
          * @param experiment 
          */
         void callTranslator(Model& model,
                             Dynamics& dynamics,
-                            Graphics& graphics,
                             Experiment& experiment);
 
         /** 

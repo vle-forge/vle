@@ -53,7 +53,7 @@ namespace vle { namespace graph {
 	virtual bool parseXML(xmlpp::Element* modelNode,
 			      CoupledModel* parent);
 
-	virtual void writeXML(xmlpp::Element* elt);
+	virtual void writeXML(std::ostream& out) const;
 
         virtual bool isAtomic() const
         { return true; }

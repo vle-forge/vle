@@ -158,7 +158,7 @@ namespace vle { namespace utils {
 }} // namespace vle utils
 
 #define TRACE(x) vle::utils::Trace::trace().push(x, vle::utils::Trace::ALWAYS)
-#define DTRACE(x) vle:utils::Trace::trace().push_date(x, vle::utils::Trace::ALWAYS)
+#define DTRACE(x) vle::utils::Trace::trace().push_date(x, vle::utils::Trace::ALWAYS)
 
 #ifndef NDEBUG
 #define TRACE1(x) vle::utils::Trace::trace().push(x, vle::utils::Trace::IMPORTANT)

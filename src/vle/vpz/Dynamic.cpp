@@ -30,68 +30,40 @@ namespace vle { namespace vpz {
     
 using namespace vle::utils;
 
-void Dynamic::init(xmlpp::Element* elt)
+void Dynamic::write(std::ostream& out) const
 {
-    AssertI(elt);
-    AssertI(elt->get_name() == "DYNAMICS");
+    out << "<dynamic "
+        << "name=\"" << m_name << "\" "
+        << "library=\"" << m_library << "\" "
+        << "model=\"" << m_model << "\" "
+        << "language=\"" << m_language << "\" ";
 
-    Glib::ustring type(xml::get_attribute(elt, "TYPE"));
-    if (type == "wrapping") {
-        if (xml::has_children(elt)) {
-            setWrappingDynamic(xml::get_attribute(elt, "FORMALISM"),
-                               xml::write_to_string(elt));
-        } else {
-            setWrappingDynamic(xml::get_attribute(elt, "FORMALISM"), "");
-        }
-    } else if (type == "mapping") {
-        if (xml::has_children(elt)) {
-            setMappingDynamic(xml::get_attribute(elt, "FORMALISM"),
-                              xml::write_to_string(elt));
-        } else {
-            setMappingDynamic(xml::get_attribute(elt, "FORMALISM"), "");
-        }
-    } else {
-        Throw(utils::InternalError, "Unknow type");
-    }
+    if (m_type == LOCAL)
+        out << " type=\"local\"";
+    else
+        out << " type=\"distant\" location=\"" << m_location << "\"";
+
+    if (m_data.empty())
+        out << " />";
+    else
+        out << ">"
+            << m_data
+            << "</dynamic>";
 }
 
-void Dynamic::write(xmlpp::Element* elt) const
+void Dynamic::setDistantDynamics(const std::string& host, int port)
 {
-    AssertI(elt);
-    AssertI(elt->get_name() == "MODEL");
+    AssertI(port > 0);
+    AssertI(port < 65535);
 
-    xmlpp::Element* dyn;
-
-    if (m_dynamic.empty()) {
-        dyn = elt->add_child("DYNAMICS");
-    } else {
-        xml::import_children_nodes(elt, m_dynamic);
-        dyn = xml::get_children(elt, "DYNAMICS");
-    }
-
-    dyn->set_attribute("FORMALISM", m_formalism);
-    dyn->set_attribute("TYPE", (m_type == Dynamic::WRAPPING) ?
-                       "wrapping" : "mapping");
+    m_location = (boost::format("%1%:%2%") % host % port).str();
+    m_type = DISTANT;
 }
 
-void Dynamic::setWrappingDynamic(const std::string& formalism,
-                                 const std::string& dynamic)
+void Dynamic::setLocalDynamics()
 {
-    AssertI(not formalism.empty());
-
-    m_dynamic.assign(dynamic);
-    m_formalism.assign(formalism);
-    m_type = Dynamic::WRAPPING;
-}
-
-void Dynamic::setMappingDynamic(const std::string& formalism,
-                                const std::string& dynamic)
-{
-    AssertI(not formalism.empty());
-
-    m_dynamic.assign(dynamic);
-    m_formalism.assign(formalism);
-    m_type = Dynamic::MAPPING;
+    m_location.clear();
+    m_type = LOCAL;
 }
 
 }} // namespace vle vpz

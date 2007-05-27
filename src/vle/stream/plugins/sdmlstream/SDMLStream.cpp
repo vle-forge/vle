@@ -114,11 +114,11 @@ void SDMLStream::writeTail()
 }
 
 void SDMLStream::writeValue(const devs::Time& p_time,
-                            value::Value* p_value)
+                            value::Value value)
 {
     size++;
     m_tmpStream << "      <e>" << p_time.getValue()
-		<< "</e><e>" << p_value->toString() << "</e>" << std::endl;
+		<< "</e><e>" << value->toString() << "</e>" << std::endl;
 }
 
 void SDMLStream::writeValues(const devs::Time& time,

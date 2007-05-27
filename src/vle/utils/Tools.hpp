@@ -34,6 +34,9 @@
 #include <sstream>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Debug.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string/trim.hpp>
 
 
 
@@ -135,11 +138,14 @@ namespace vle { namespace utils {
      */
     inline bool is_double(const std::string& str)
     {
-        std::istringstream in(str);
-        double d;
-        in >> d;
-        return !in.fail();
+        try {
+            boost::lexical_cast < double >(str);
+            return true;
+        } catch(const boost::bad_lexical_cast& e) {
+            return false;
+        }
     }
+
 
     /**
      * Return true if str can be translate into an integer.
@@ -149,11 +155,39 @@ namespace vle { namespace utils {
      */
     inline bool is_int(const std::string& str)
     {
-        std::istringstream in(str);
-        int i;
-        in >> i;
-        return !in.fail();
+        try {
+            boost::lexical_cast < int >(str);
+            return true;
+        } catch(const boost::bad_lexical_cast& e) {
+            return false;
+        }
     }
+    
+    /**
+     * Return conversion from string into boolean.
+     *
+     * @param str string to convert.
+     * @return true if str == TRUE or true, or a integer !0.
+     */
+    inline bool is_boolean(const std::string& str)
+    {
+        if (str == "true") {
+            return true;
+        } else if (str == "false") {
+            return false;
+        } else {
+            try {
+                return boost::lexical_cast < bool >(str);
+            } catch(const boost::bad_lexical_cast& e) {
+                //TRACE(e.what());
+                return false;
+            }
+        }
+    }
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
      * Transform an object of class C into a string
@@ -212,14 +246,29 @@ namespace vle { namespace utils {
      */
     inline double to_double(const std::string& str, double def = 0.0)
     {
-        std::istringstream in(str);
-        double d;
-        in >> d;
-
-        if (in.fail() == true) {
-            d = def;
+        try {
+            return boost::lexical_cast < double >(str);
+        } catch(const boost::bad_lexical_cast& e) {
+            //TRACE(e.what());
+            return def;
         }
-        return d;
+    }
+
+    /**
+     * Return conversion from string into long.
+     *
+     * @param str string to convert.
+     * @param def default value to return.
+     * @return result of convertion, default if error.
+     */
+    inline long to_long(const std::string& str, int def = 0l)
+    {
+        try {
+            return boost::lexical_cast < long >(str);
+        } catch(const boost::bad_lexical_cast& e) {
+            //TRACE(e.what());
+            return def;
+        }
     }
 
     /**
@@ -231,14 +280,12 @@ namespace vle { namespace utils {
      */
     inline int to_int(const std::string& str, int def = 0)
     {
-        std::istringstream in(str);
-        int i;
-        in >> i;
-
-        if (in.fail() == true) {
-            i = def;
+        try {
+            return boost::lexical_cast < int >(str);
+        } catch(const boost::bad_lexical_cast& e) {
+            //TRACE(e.what());
+            return def;
         }
-        return i;
     }
 
     /**
@@ -250,14 +297,12 @@ namespace vle { namespace utils {
      */
     inline unsigned int to_uint(const std::string& str, unsigned int def = 0)
     {
-        std::istringstream in(str);
-        unsigned int i;
-        in >> i;
-
-        if (in.fail() == true) {
-            i = def;
+        try {
+            return boost::lexical_cast < unsigned int >(str);
+        } catch(const boost::bad_lexical_cast& e) {
+            //TRACE(e.what());
+            return def;
         }
-        return i;
     }
 
     /**
@@ -269,31 +314,12 @@ namespace vle { namespace utils {
      */
     inline size_t to_size_t(const std::string& str, size_t def = 0)
     {
-        std::istringstream in(str);
-        size_t i;
-        in >> i;
-
-        if (in.fail() == true) {
-            i = def;
+        try {
+            return boost::lexical_cast < size_t >(str);
+        } catch(const boost::bad_lexical_cast& e) {
+            //TRACE(e.what());
+            return def;
         }
-        return i;
-    }
-
-    /**
-     * Return conversion from string into boolean.
-     *
-     * @param str string to convert.
-     * @return true if str == TRUE or true, or a integer !0.
-     */
-    inline bool is_boolean(const std::string& str)
-    {
-        if (is_int(str)) {
-            int i = to_int(str);
-            return i != 0;
-        } else if (str == "true" or str == "TRUE") {
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -305,13 +331,18 @@ namespace vle { namespace utils {
      */
     inline bool to_boolean(const std::string& str, bool def = false)
     {
-        if (is_int(str)) {
-            int i = to_int(str);
-            return i != 0;
-        } else if (str == "true" or str == "TRUE") {
+        if (str == "true") {
             return true;
+        } else if (str == "false") {
+            return false;
+        } else {
+            try {
+                return boost::lexical_cast < bool >(str);
+            } catch(const boost::bad_lexical_cast& e) {
+                //TRACE(e.what());
+                return def;
+            }
         }
-        return def;
     }
 
     /**
@@ -391,6 +422,9 @@ namespace vle { namespace utils {
      */
     inline std::string clean_int(const std::string& str)
     {
+        std::string val(str);
+        boost::algorithm::trim(val);
+
         std::istringstream in(str);
         int i;
         in >> i;

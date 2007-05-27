@@ -2,7 +2,7 @@
 #
 # SYNOPSIS
 #
-#   AX_BOOST([MINIMUM-VERSION])
+#   AX_BOOST_BASE([MINIMUM-VERSION])
 #
 # DESCRIPTION
 #
@@ -23,11 +23,11 @@
 #
 # LAST MODIFICATION
 #
-#   2006-06-15
+#   2007-03-15
 #
 # COPYLEFT
 #
-#   Copyright (c) 2006 Thomas Porschberg <thomas@randspringer.de>
+#   Copyright (c) 2007 Thomas Porschberg <thomas@randspringer.de>
 #
 #   Copying and distribution of this file, with or without
 #   modification, are permitted in any medium without royalty provided
@@ -35,8 +35,20 @@
 
 AC_DEFUN([AX_BOOST_BASE],
 [
-want_boost="yes"
-ac_boost_path=""
+AC_ARG_WITH([boost],
+	AS_HELP_STRING([--with-boost@<:@=DIR@:>@], [use boost (default is yes) - it is possible to specify the root directory for boost (optional)]),
+	[
+    if test "$withval" = "no"; then
+		want_boost="no"
+    elif test "$withval" = "yes"; then
+        want_boost="yes"
+        ac_boost_path=""
+    else
+	    want_boost="yes"
+        ac_boost_path="$withval"
+	fi
+    ],
+    [want_boost="yes"])
 
 if test "x$want_boost" = "xyes"; then
 	boost_lib_version_req=ifelse([$1], ,1.20.0,$1)

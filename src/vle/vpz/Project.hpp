@@ -27,7 +27,6 @@
 #include <vle/vpz/Base.hpp>
 #include <vle/vpz/Model.hpp>
 #include <vle/vpz/Dynamics.hpp>
-#include <vle/vpz/Graphics.hpp>
 #include <vle/vpz/Experiment.hpp>
 #include <vle/vpz/Classes.hpp>
 #include <vle/vpz/NoVLEs.hpp>
@@ -43,9 +42,10 @@ namespace vle { namespace vpz {
 
         void setProject(const std::string& name, const std::string& date);
 
-        virtual void init(xmlpp::Element* elt);
+        virtual void write(std::ostream& out ) const;
 
-        virtual void write(xmlpp::Element* elt) const;
+        virtual Base::type getType() const
+        { return PROJECT; }
 
         void clear();
 
@@ -65,10 +65,6 @@ namespace vle { namespace vpz {
         
         Dynamics& dynamics() { return m_dynamics; }
         
-        const Graphics& graphics() const { return m_graphics; }
-        
-        Graphics& graphics() { return m_graphics; }
-        
         const Experiment& experiment() const { return m_experiment; }
         
         Experiment& experiment() { return m_experiment; }
@@ -81,24 +77,31 @@ namespace vle { namespace vpz {
 
         NoVLEs& novles() { return m_novles; }
 
-        void setName(const std::string& name);
+        void setAuthor(const std::string& name);
 
-        inline const std::string& name() const
-        { return m_name; }
+        inline const std::string& author() const
+        { return m_author; }
 
         void setDate(const std::string& date);
 
+        inline float version() const
+        { return m_version; }
+
         void setCurrentDate();
+
+        inline void setVersion(float f)
+        { if (f >= 0) m_version = f; }
 
         inline const std::string& date() const
         { return m_date; }
 
     private:
-        std::string     m_name;
+        std::string     m_author;
         std::string     m_date;
+        float           m_version;
+
         Model           m_model;
         Dynamics        m_dynamics;
-        Graphics        m_graphics;
         Experiment      m_experiment;
         Classes         m_classes;
         NoVLEs          m_novles;

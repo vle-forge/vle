@@ -26,6 +26,7 @@
 #include <vle/utils/Debug.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/vpz/Condition.hpp>
+#include <vle/value/Set.hpp>
 
 namespace vle { namespace vpz {
 
@@ -36,105 +37,67 @@ Condition::Condition() :
 {
 }
 
-Condition::Condition(const Condition& cond) :
-    Base(cond),
-    m_modelname(cond.modelname()),
-    m_portname(cond.portname())
+void Condition::write(std::ostream& out) const
 {
-    std::vector < value::Value* >::const_iterator it;
-    for (it = cond.value().begin(); it != cond.value().end(); ++it) {
-        m_value.push_back((*it)->clone());
+    out << "<condition name=\"" << m_name << "\" >";
+
+    for (const_iterator it = m_values.begin(); it != m_values.end(); ++it) {
+        out << " <port "
+            << "name=\"" << it->first << "\" "
+            << ">"
+            << it->second->toXML()
+            << "</port>";
+    }
+
+    out << "</condition>";
+}
+
+void Condition::addPort(const std::string& portname)
+{
+    if (m_values.find(portname) == m_values.end()) {
+        m_values[portname] = value::Set();
     }
 }
 
-Condition& Condition::operator=(const Condition& cond)
+void Condition::delPort(const std::string& portname)
 {
-    if (this != &cond) {
-        clearValue();
-        m_modelname.assign(cond.modelname());
-        m_portname.assign(cond.portname());
-
-        std::vector < value::Value* >::const_iterator it;
-        for (it = cond.value().begin(); it != cond.value().end(); ++it) {
-            m_value.push_back((*it)->clone());
-        }
-    }
-    return *this;
+    m_values.erase(portname);
 }
 
-Condition::~Condition()
+void Condition::addValueToPort(const std::string& portname,
+                               const value::Value& value)
 {
-    clearValue();
-}
+    iterator it = m_values.find(portname);
 
-void Condition::init(xmlpp::Element* elt)
-{
-    AssertI(elt);
-    AssertI(elt->get_name() == "CONDITION");
-
-    clearValue();
-    m_modelname.assign(xml::get_attribute(elt, "MODEL_NAME"));
-    m_portname.assign(xml::get_attribute(elt, "PORT_NAME"));
-    m_value = value::Value::getValues(elt);
-}
-
-void Condition::write(xmlpp::Element* elt) const
-{
-    AssertI(elt);
-
-    xmlpp::Element* condition = elt->add_child("CONDITION");
-    condition->set_attribute("MODEL_NAME", m_modelname);
-    condition->set_attribute("PORT_NAME", m_portname);
-
-    std::vector < value::Value* >::const_iterator it = m_value.begin();
-    while (it != m_value.end()) {
-        std::string xml((*it)->toXML());
-        xml::import_children_nodes(condition, xml);
-        ++it;
+    if (it == m_values.end()) {
+        value::Set newset;
+        newset->addValue(value);
+        m_values[portname] = newset;
+    } else {
+        it->second->addValue(value);
     }
 }
 
-void Condition::setCondition(const std::string& modelname,
-                             const std::string& portname)
+const value::Set& Condition::getSetValues(const std::string& portname) const
 {
-    AssertI(not modelname.empty());
-    AssertI(not portname.empty());
+    const_iterator it = m_values.find(portname);
 
-    m_modelname.assign(modelname);
-    m_portname.assign(portname);
+    Assert(utils::InternalError, it != m_values.end(),
+           boost::format("Condition %1% have no port %2%") %
+           m_name % portname);
+
+    return it->second;
 }
 
-void Condition::addValue(value::Value* val)
+const value::Value& Condition::firstValue(const std::string& portname) const
 {
-    m_value.push_back(val);
+    return getSetValues(portname)->getValue(0);
 }
 
-void Condition::clearValue()
+const value::Value& Condition::nValue(const std::string& portname,
+                                      size_t i) const
 {
-    for (std::vector < value::Value* >::iterator it = m_value.begin();
-         it != m_value.end(); ++it) {
-        delete (*it);
-        (*it) = 0;
-    }
-    m_value.clear();
-}
-
-value::Value* Condition::firstValue() const
-{
-    Assert(utils::InternalError, not m_value.empty(),
-           boost::format("Condition %1% %2% have no firstValue.\n") %
-           m_modelname % m_portname);
-
-    return m_value[0]->clone();
-}
-
-value::Value* Condition::nValue(size_t i) const
-{
-    Assert(utils::InternalError, i < m_value.size(),
-           boost::format("Condition %1% %2% have only %3% and no %4% Value\n") %
-           m_modelname % m_portname % m_value.size() % i);
-
-    return m_value[i]->clone();
+    return getSetValues(portname)->getValue(i);
 }
 
 }} // namespace vle vpz

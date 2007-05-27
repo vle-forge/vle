@@ -32,27 +32,23 @@ namespace vle { namespace vpz {
     
 using namespace vle::utils;
 
-void NoVLE::init(xmlpp::Element* elt)
+//void NoVLE::init(xmlpp::Element* elt)
+//{
+//AssertI(elt);
+//AssertI(elt->get_name() == "NO_VLE");
+//
+//if (xml::has_children(elt)) {
+//setNoVLE(xml::get_attribute(elt, "TRANSLATOR"),
+//xml::write_to_string(elt));
+//} else {
+//setNoVLE(xml::get_attribute(elt, "TRANSLATOR"),
+//"");
+//}
+//}
+
+void NoVLE::write(std::ostream& out) const
 {
-    AssertI(elt);
-    AssertI(elt->get_name() == "NO_VLE");
-
-    if (xml::has_children(elt)) {
-        setNoVLE(xml::get_attribute(elt, "TRANSLATOR"),
-                 xml::write_to_string(elt));
-    } else {
-        setNoVLE(xml::get_attribute(elt, "TRANSLATOR"),
-                 "");
-    }
-}
-
-void NoVLE::write(xmlpp::Element* elt) const
-{
-    AssertI(elt);
-    AssertI(elt->get_name() == "NO_VLE");
-
-    elt->set_attribute("TRANSLATOR", m_translator);
-    xml::import_children_nodes_without_parent(elt, m_xml);
+    out << m_xml;
 }
 
 void NoVLE::setNoVLE(const std::string& translator, const Glib::ustring& xml)
@@ -65,7 +61,7 @@ void NoVLE::setNoVLE(const std::string& translator, const Glib::ustring& xml)
 }
 
 void NoVLE::callTranslator(Model& model, Dynamics& dynamics,
-                           Graphics& graphics, Experiment& experiment)
+                           Experiment& experiment)
 {
     xmlpp::DomParser* dom = new xmlpp::DomParser;
     try {
@@ -97,9 +93,6 @@ void NoVLE::callTranslator(Model& model, Dynamics& dynamics,
     call->translate();
     model.initFromModel(call->getStructure()->get_root_node());
     dynamics.initFromModels(call->getDynamics()->get_root_node());
-
-    if (call->getGraphics())
-        graphics.initFromModels(call->getGraphics()->get_root_node());
 
     if (call->getExperiment())
         experiment.initFromExperiment(call->getExperiment()->get_root_node());

@@ -572,12 +572,12 @@ void qss2::processExternalEvent(devs::ExternalEvent* event)
 //     }
 }
 
-value::Value* qss2::processStateEvent(devs::StateEvent* event) const
+value::Value qss2::processStateEvent(devs::StateEvent* event) const
 {
   //  unsigned int i = to_int(event->getPortName());
   unsigned int i = m_variableIndex.find(event->getPortName())->second;
   double e = (event->getTime()-m_lastTime[i]).getValue();
   double x = m_value[i]+m_derivative[i]*e+m_derivative2[i]/2*e*e;
 
-  return buildDouble(x);
+  return value::DoubleFactory::create(x);
 }

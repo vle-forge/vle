@@ -151,18 +151,17 @@ namespace vle { namespace devs {
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-        void putAttribute(vle::value::Map* map);
+        void putAttribute(vle::value::Map map);
 
         /**
          * Put an attribute on this Event.
          *
          * @param name std::string name of Value to add.
-         *
-         * @param value Value to add.
+         * @param value Value to add, not clone.
          */
         inline void putAttribute(const std::string& name,
-                                 vle::value::Value* value)
-        { m_attributes.addValue(name, value); }
+                                 value::Value value)
+        { m_attributes->addValue(name, value); }
 
         /**
          * Put an attribute on an event. The goal is to simplify building event.
@@ -213,7 +212,7 @@ namespace vle { namespace devs {
          * @return true if Value exist, false otherwise.
          */
         inline bool existAttributeValue(const std::string& name) const
-        { return m_attributes.existValue(name); }
+        { return m_attributes->existValue(name); }
 
         /**
          * Get an attribute from this Event.
@@ -222,19 +221,9 @@ namespace vle { namespace devs {
          *
          * @return a reference to Value.
          */
-        inline vle::value::Value* getAttributeValue(
+        inline vle::value::Value getAttributeValue(
             const std::string& name) const
-        { return m_attributes.getValue(name); }
-
-        /**
-         * Get a const pointer attribute from this Event.
-         *
-         * @param name std::string name of const pointer to get.
-         *
-         * @return a const void *
-         */
-        const void* getConstPointerAttributeValue(
-            const std::string& name) const;
+        { return m_attributes->getValue(name); }
 
         /**
          * Get a double attribute from this Event.
@@ -243,7 +232,8 @@ namespace vle { namespace devs {
          *
          * @return a double.
          */
-        double getDoubleAttributeValue(const std::string& name) const;
+        inline double getDoubleAttributeValue(const std::string& name) const
+        { return m_attributes->getDoubleValue(name); }
 
         /**
          * Get an integer attribute from this Event.
@@ -252,7 +242,18 @@ namespace vle { namespace devs {
          *
          * @return an integer.
          */
-        long getIntegerAttributeValue(const std::string& name) const;
+        inline int getIntegerAttributeValue(const std::string& name) const
+        { return m_attributes->getIntValue(name); }
+
+        /**
+         * Get an long attribute from this Event.
+         *
+         * @param name std::string name of integer to get.
+         *
+         * @return an integer.
+         */
+        inline int getLongAttributeValue(const std::string& name) const
+        { return m_attributes->getLongValue(name); }
 
         /**
          * Get a boolean attribute from this Event.
@@ -261,7 +262,8 @@ namespace vle { namespace devs {
          *
          * @return a boolean.
          */
-        bool getBooleanAttributeValue(const std::string& name) const;
+        bool getBooleanAttributeValue(const std::string& name) const
+        { return m_attributes->getBooleanValue(name); }
 
         /**
          * Get a string attribute from this Event.
@@ -270,8 +272,29 @@ namespace vle { namespace devs {
          *
          * @return a string.
          */
-        const std::string& getStringAttributeValue(
-                    const std::string& name) const;
+        inline const std::string& getStringAttributeValue(
+                    const std::string& name) const
+        { return m_attributes->getStringValue(name); }
+
+        /** 
+         * @brief Get a Set attribute from this event.
+         * 
+         * @param name std::string name of Set to get.
+         *
+         * @return a Set
+         */
+        inline value::Set getSetAttributeValue(const std::string& name) const
+        { return m_attributes->getSetValue(name); }
+
+        /** 
+         * @brief Get a Map attribute from this event.
+         * 
+         * @param name std::string name of Map to get.
+         * 
+         * @return a Map.
+         */
+        inline value::Map getMapAttributeValue(const std::string& name) const
+        { return m_attributes->getMapValue(name); }
 
         /**
          * Return the map attached to the event.

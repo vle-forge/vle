@@ -194,11 +194,80 @@ void CoupledModel::addInternalConnection(Model* src, const std::string&
 	new Connection(src, psrc, dst, pdst));
 }
 
+void CoupledModel::addInputConnection(const std::string& src,
+                                      const std::string& portSrc,
+                                      const std::string& dst,
+                                      const std::string& portDst)
+{
+    AssertI(src == getName());
+    Model* msrc = this;
+    Model* mdst = getModel(dst);
+    Port* psrc = msrc->getInPort(portSrc);
+    Port* pdst = mdst->getInPort(portDst);
+
+    AssertI(msrc);
+    AssertI(mdst);
+    AssertI(psrc);
+    AssertI(pdst);
+
+    m_inputConnectionList.push_back(
+	new Connection(msrc, psrc, mdst, pdst));
+}
+
+void CoupledModel::addOutputConnection(const std::string& src,
+                                       const std::string& portSrc,
+                                       const std::string& dst,
+                                       const std::string& portDst)
+{
+    AssertI(dst == getName());
+    Model* msrc = getModel(src);
+    Model* mdst = this;
+    Port* psrc = msrc->getOutPort(portSrc);
+    Port* pdst = mdst->getOutPort(portDst);
+
+    AssertI(msrc);
+    AssertI(mdst);
+    AssertI(psrc);
+    AssertI(pdst);
+
+    m_outputConnectionList.push_back(
+	new Connection(msrc, psrc, mdst, pdst));
+}
+
+void CoupledModel::addInternalConnection(const std::string& src,
+                                         const std::string& portSrc,
+                                         const std::string& dst,
+                                         const std::string& portDst)
+{
+    Model* msrc = getModel(src);
+    Model* mdst = getModel(dst);
+    Port* psrc = msrc->getOutPort(portSrc);
+    Port* pdst = mdst->getInPort(portDst);
+
+    AssertI(msrc);
+    AssertI(mdst);
+    AssertI(psrc);
+    AssertI(pdst);
+    
+    m_internalConnectionList.push_back(
+	new Connection(msrc, psrc, mdst, pdst));
+}
+
+
+Connection* CoupledModel::getInputConnection(const std::string& portSrc,
+                                             const std::string& dst,
+                                             const std::string& portDst)
+{
+    Model* mdst = getModel(dst);
+    AssertI(mdst);
+
+    return getInputConnection(this, portSrc, mdst, portDst);
+}
 
 
 Connection *
 CoupledModel::getInputConnection(Model * src, const std::string & portSrc,
-				 Model * dst, const std::string & portDst)
+                                 Model * dst, const std::string & portDst)
 {
     AssertI(src and src);
 
@@ -221,6 +290,15 @@ CoupledModel::getInputConnection(Model * src, const std::string & portSrc,
 }
 
 
+Connection* CoupledModel::getOutputConnection(const std::string& src,
+                                              const std::string& portSrc,
+                                              const std::string& portDst)
+{
+    Model* msrc = getModel(src);
+    AssertI(msrc);
+
+    return getOutputConnection(msrc, portSrc, this, portDst);
+}
 
 Connection *
 CoupledModel::getOutputConnection(Model * src, const std::string & portSrc,
@@ -246,7 +324,18 @@ CoupledModel::getOutputConnection(Model * src, const std::string & portSrc,
     return 0;
 }
 
+Connection* CoupledModel::getInternalConnection(const std::string& src,
+                                                const std::string& portSrc,
+                                                const std::string& dst,
+                                                const std::string& portDst)
+{
+    Model* msrc = getModel(src);
+    Model* mdst = getModel(dst);
+    AssertI(msrc);
+    AssertI(mdst);
 
+    return getInternalConnection(msrc, portSrc, mdst, portDst);
+}
 
 Connection *
 CoupledModel::getInternalConnection(Model * src, const std::string & portSrc,
@@ -1106,73 +1195,67 @@ bool CoupledModel::parseXML(xmlpp::Element* p_modelNode,
 
 
 
-void CoupledModel::writeXML(xmlpp::Element * elt)
+void CoupledModel::writeXML(std::ostream& out) const
 {
-    elt->set_attribute( "NAME", getName() );
-    elt->set_attribute( "TYPE", "coupled" );
-    writePortListXML( elt );
-    xmlpp::Element * cp = elt->add_child( "SUBMODELS" );
+    out << "<model name=\"" << getName() << "\" " << " type=\"coupled\" >";
+    writePortListXML(out);
+    out << "<submodels>";
 
     const size_t szModel = m_modelList.size();
     const size_t szInConnection = m_inputConnectionList.size();
     const size_t szOutConnection = m_outputConnectionList.size();
     const size_t szInternalConnection = m_internalConnectionList.size();
 
-    for ( size_t i = 0 ; i < szModel ; ++ i)
-    {
-	xmlpp::Element * model = cp->add_child( "MODEL" );
-	m_modelList[i]->writeXML( model );
+    for (size_t i = 0; i < szModel; ++i) {
+        m_modelList[i]->writeXML(out);
     }
 
-    xmlpp::Element * connection = elt->add_child( "CONNECTIONS" );
-
-    for ( size_t i = 0 ; i < szInConnection ; ++ i)
-    {
-	xmlpp::Element * in = connection->add_child("CONNECTION");
-	in->set_attribute( "TYPE", "input" );
-	xmlpp::Element * orig = in->add_child("ORIGIN");
-	orig->set_attribute( "MODEL", m_inputConnectionList[i]->
-			     getOriginModel()->getName() );
-	orig->set_attribute( "PORT", m_inputConnectionList[i]->
-			     getOriginPort()->getName() );
-	xmlpp::Element * dst = in->add_child("DESTINATION");
-	dst->set_attribute( "MODEL", m_inputConnectionList[i]->
-			    getDestinationModel()->getName() );
-	dst->set_attribute( "PORT", m_inputConnectionList[i]->
-			    getDestinationPort()->getName() );
+    out << "<connections>";
+    for (size_t i = 0; i < szInConnection; ++i) {
+        out << "<connection type=\"input\">"
+            << " <origin model=\""
+            << m_inputConnectionList[i]->getOriginModel()->getName()
+            << "\" port=\""
+            << m_inputConnectionList[i]->getOriginPort()->getName()
+            << "\" />"
+            << " <destination model=\""
+            << m_inputConnectionList[i]->getDestinationModel()->getName()
+            << "\" port=\""
+            << m_inputConnectionList[i]->getDestinationPort()->getName()
+            << "\" />"
+            << "</connection>";
     }
 
-    for ( size_t i = 0 ; i < szOutConnection ; ++ i)
-    {
-	xmlpp::Element * out = connection->add_child("CONNECTION");
-	out->set_attribute( "TYPE", "output" );
-	xmlpp::Element * orig = out->add_child("ORIGIN");
-	orig->set_attribute( "MODEL", m_outputConnectionList[i]->
-			     getOriginModel()->getName() );
-	orig->set_attribute( "PORT", m_outputConnectionList[i]->
-			     getOriginPort()->getName() );
-	xmlpp::Element * dst = out->add_child("DESTINATION");
-	dst->set_attribute( "MODEL", m_outputConnectionList[i]->
-			    getDestinationModel()->getName() );
-	dst->set_attribute( "PORT", m_outputConnectionList[i]->
-			    getDestinationPort()->getName() );
+    for (size_t i = 0; i < szOutConnection; ++i) {
+        out << "<connection type=\"output\">"
+            << " <origin model=\""
+            << m_outputConnectionList[i]->getOriginModel()->getName()
+            << "\" port=\""
+            << m_outputConnectionList[i]->getOriginPort()->getName()
+            << "\" />"
+            << " <destination model=\""
+            << m_outputConnectionList[i]->getDestinationModel()->getName()
+            << "\" port=\""
+            << m_outputConnectionList[i]->getDestinationPort()->getName()
+            << "\" />"
+            << "</connection>";
     }
 
-    for ( size_t i = 0 ; i < szInternalConnection; ++ i)
-    {
-	xmlpp::Element * internal = connection->add_child("CONNECTION");
-	internal->set_attribute( "TYPE", "internal" );
-	xmlpp::Element * orig = internal->add_child("ORIGIN");
-	orig->set_attribute( "MODEL", m_internalConnectionList[i]->
-			     getOriginModel()->getName() );
-	orig->set_attribute( "PORT", m_internalConnectionList[i]->
-			     getOriginPort()->getName() );
-	xmlpp::Element * dst = internal->add_child("DESTINATION");
-	dst->set_attribute( "MODEL", m_internalConnectionList[i]->
-			    getDestinationModel()->getName() );
-	dst->set_attribute( "PORT", m_internalConnectionList[i]->
-			    getDestinationPort()->getName() );
+    for (size_t i = 0; i < szInternalConnection; ++i) {
+        out << "<connection type=\"internal\">"
+            << " <origin model=\""
+            << m_internalConnectionList[i]->getOriginModel()->getName()
+            << "\" port=\""
+            << m_internalConnectionList[i]->getOriginPort()->getName()
+            << "\" />"
+            << " <destination model=\""
+            << m_internalConnectionList[i]->getDestinationModel()->getName()
+            << "\" port=\""
+            << m_internalConnectionList[i]->getDestinationPort()->getName()
+            << "\" />"
+            << "</connection>";
     }
+    out << "</connections>";
 }
 
 Model* CoupledModel::find(const std::string& name) const

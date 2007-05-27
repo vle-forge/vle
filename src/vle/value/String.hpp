@@ -33,19 +33,20 @@ namespace vle { namespace value {
     /**
      * @brief A string Value.
      */
-    class String : public Value
+    class StringFactory : public ValueBase
     {
+    private:
+        StringFactory(const std::string& value) :
+            m_value(value)
+        { }
+
     public:
-        String(const std::string& value) :
-            m_value(value) { }
+        static String create(const std::string& value = std::string());
 
-        String(xmlpp::Element* Value);
+        virtual Value clone() const;
 
-        virtual Value* clone() const
-        { return new String(m_value); }
-
-        virtual Value::type getType() const
-        { return Value::STRING; }
+        virtual ValueBase::type getType() const
+        { return ValueBase::STRING; }
 
         inline const std::string& stringValue() const
         { return m_value; }

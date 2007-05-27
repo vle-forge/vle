@@ -34,17 +34,16 @@ namespace vle { namespace vpz {
 
 using namespace vle::utils;
 
-void EOVempty::init(xmlpp::Element* elt)
-{
-    AssertI(elt);
-    AssertI(elt->get_name() == "WIDGET");
-    AssertI(xml::get_attribute(elt, "TYPE") == "empty");
-}
+////void EOVempty::init(xmlpp::Element* elt)
+//{
+//AssertI(elt);
+//AssertI(elt->get_name() == "WIDGET");
+//AssertI(xml::get_attribute(elt, "TYPE") == "empty");
+//}
 
-void EOVempty::write(xmlpp::Element* elt) const
+void EOVempty::write(std::ostream& out) const
 {
-    xmlpp::Element* empty = elt->add_child("WIDGET");
-    empty->set_attribute("TYPE", "empty");
+    out << "<widget type=\"empty\" />";
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -101,48 +100,47 @@ EOVcontainer::~EOVcontainer()
     }
 }
 
-void EOVcontainer::init(xmlpp::Element* elt)
-{
-    AssertI(elt);
-    AssertI(elt->get_name() == "CHILD");
+//void EOVcontainer::init(xmlpp::Element* elt)
+//{
+//AssertI(elt);
+//AssertI(elt->get_name() == "CHILD");
+//
+//m_lst.clear();
+//
+//xmlpp::Node::NodeList lst = elt->get_children("CHILD");
+//setContainerSize(lst.size());
+//size_t i = 0;
+//
+//xmlpp::Node::NodeList::iterator it = lst.begin();
+//while (it != lst.end()) {
+//xmlpp::Element* widget =
+//xml::get_children((xmlpp::Element*)(*it), "WIDGET");
+//Glib::ustring type(xml::get_attribute(widget, "TYPE"));
+//if (type == "empty") {
+//setEmptyChild(i);
+//} else if (type == "vpaned") {
+//setVPanedChild(i);
+//m_lst[i]->init(widget);
+//} else if (type == "hpaned") {
+//setHPanedChild(i);
+//m_lst[i]->init(widget);
+//} else if (type == "plugin") {
+//setPluginChild(i);
+//m_lst[i]->init(widget);
+//} else {
+//Throw(utils::ParseError,
+//boost::format("Unknow type %1% for EOV root node\n") %
+//type);
+//}
+//++i;
+//}
+//}
 
-    m_lst.clear();
-
-    xmlpp::Node::NodeList lst = elt->get_children("CHILD");
-    setContainerSize(lst.size());
-    size_t i = 0;
-
-    xmlpp::Node::NodeList::iterator it = lst.begin();
-    while (it != lst.end()) {
-        xmlpp::Element* widget =
-            xml::get_children((xmlpp::Element*)(*it), "WIDGET");
-        Glib::ustring type(xml::get_attribute(widget, "TYPE"));
-        if (type == "empty") {
-            setEmptyChild(i);
-        } else if (type == "vpaned") {
-            setVPanedChild(i);
-            m_lst[i]->init(widget);
-        } else if (type == "hpaned") {
-            setHPanedChild(i);
-            m_lst[i]->init(widget);
-        } else if (type == "plugin") {
-            setPluginChild(i);
-            m_lst[i]->init(widget);
-        } else {
-            Throw(utils::ParseError,
-                  boost::format("Unknow type %1% for EOV root node\n") %
-                  type);
-        }
-        ++i;
-    }
-}
-
-void EOVcontainer::write(xmlpp::Element* elt) const
+void EOVcontainer::write(std::ostream& out) const
 {
     std::vector < EOVchild* >::const_iterator it = m_lst.begin();
     while (it != m_lst.end()) {
-        xmlpp::Element* child = elt->add_child("CHILD");
-        (*it)->write(child);
+        out << "<child>" << *(*it) << "</child>";
         ++it;
     }
 }
@@ -222,42 +220,40 @@ const EOVchild& EOVcontainer::getChild(size_t number) const
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-void EOVvpaned::init(xmlpp::Element* elt)
+//void EOVvpaned::init(xmlpp::Element* elt)
+//{
+//AssertI(elt);
+//AssertI(elt->get_name() == "WIDGET");
+//AssertI(xml::get_attribute(elt, "TYPE") == "vpaned");
+//
+//EOVcontainer::init(elt);
+//}
+
+void EOVvpaned::write(std::ostream& out) const
 {
-    AssertI(elt);
-    AssertI(elt->get_name() == "WIDGET");
-    AssertI(xml::get_attribute(elt, "TYPE") == "vpaned");
-
-    EOVcontainer::init(elt);
-}
-
-void EOVvpaned::write(xmlpp::Element* elt) const
-{
-    xmlpp::Element* vpaned = elt->add_child("WIDGET");
-    vpaned->set_attribute("TYPE", "vpaned");
-
-    EOVcontainer::write(vpaned);
+    out << "<widget type=\"vpaned\">";
+    EOVcontainer::write(out);
+    out << "</widget>";
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-void EOVhpaned::init(xmlpp::Element* elt)
+//void EOVhpaned::init(xmlpp::Element* elt)
+//{
+//AssertI(elt);
+//AssertI(elt->get_name() == "WIDGET");
+//AssertI(xml::get_attribute(elt, "TYPE") == "hpaned");
+//
+//EOVcontainer::init(elt);
+//}
+
+void EOVhpaned::write(std::ostream& out) const
 {
-    AssertI(elt);
-    AssertI(elt->get_name() == "WIDGET");
-    AssertI(xml::get_attribute(elt, "TYPE") == "hpaned");
-
-    EOVcontainer::init(elt);
-}
-
-void EOVhpaned::write(xmlpp::Element* elt) const
-{
-    xmlpp::Element* hpaned = elt->add_child("WIDGET");
-    hpaned->set_attribute("TYPE", "hpaned");
-
-    EOVcontainer::write(hpaned);
+    out << "<widget type=\"hpaned\">";
+    EOVcontainer::write(out);
+    out << "</widget>";
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -274,49 +270,50 @@ void EOVplugin::setEOVplugin(const std::string& output,
     m_plugin.assign(plugin);
 }
 
-void EOVplugin::init(xmlpp::Element* elt)
-{
-    AssertI(elt);
-    AssertI(elt->get_name() == "WIDGET");
-    AssertI(xml::get_attribute(elt, "TYPE") == "plugin");
+//void EOVplugin::init(xmlpp::Element* elt)
+//{
+//AssertI(elt);
+//AssertI(elt->get_name() == "WIDGET");
+//AssertI(xml::get_attribute(elt, "TYPE") == "plugin");
+//
+//setEOVplugin(xml::get_attribute(elt, "OUTPUT"),
+//xml::get_attribute(elt, "PLUGIN"));
+//}
 
-    setEOVplugin(xml::get_attribute(elt, "OUTPUT"),
-                 xml::get_attribute(elt, "PLUGIN"));
-}
-
-void EOVplugin::write(xmlpp::Element* elt) const
+void EOVplugin::write(std::ostream& out) const
 {
-    xmlpp::Element* empty = elt->add_child("WIDGET");
-    empty->set_attribute("TYPE", "plugin");
-    empty->set_attribute("OUTPUT", m_output);
-    empty->set_attribute("PLUGIN", m_plugin);
+    out << "<widget "
+        << "type=\"plugin\" "
+        << "output=\"" << m_output << "\" "
+        << "plugin=\"" << m_plugin << "\" />";
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-void EOV::init(xmlpp::Element* elt)
+//void EOV::init(xmlpp::Element* elt)
+//{
+//AssertI(elt);
+//AssertI(elt->get_name() == "EOV");
+//
+//m_host.assign(xml::get_attribute(elt, "HOST"));
+//
+//xmlpp::Element* display = xml::get_children(elt, "DISPLAY");
+//EOVcontainer::init(display);
+//}
+
+void EOV::write(std::ostream& out) const
 {
-    AssertI(elt);
-    AssertI(elt->get_name() == "EOV");
+    out << "<eov host=\"" << m_host << "\">"
+        << "<display>"
+        << "<child>";
 
-    m_host.assign(xml::get_attribute(elt, "HOST"));
+    getChild(0).write(out);
 
-    xmlpp::Element* display = xml::get_children(elt, "DISPLAY");
-    EOVcontainer::init(display);
-}
-
-void EOV::write(xmlpp::Element* elt) const
-{
-    AssertI(elt);
-
-    xmlpp::Element* eov = elt->add_child("EOV");
-    eov->set_attribute("HOST", m_host);
-
-    xmlpp::Element* display = eov->add_child("DISPLAY");
-    xmlpp::Element* child = display->add_child("CHILD");
-    getChild(0).write(child);
+    out << "</child>"
+        << "</display>"
+        << "</eov>\n";
 }
 
 void EOV::setEOV(const std::string& host)
@@ -355,46 +352,45 @@ std::list < const EOVplugin* > EOV::plugins() const
 
 std::string EOV::xml() const
 {
-    xmlpp::Document doc;
-    xmlpp::Element* root = doc.create_root_node("EOV");
-    xmlpp::Element* display = root->add_child("DISPLAY");
-    xmlpp::Element* child = display->add_child("CHILD");
-    getChild(0).write(child);
-    return doc.write_to_string_formatted();
+    std::ostringstream out;
+
+    out << "<?xml version=\"1.0\"?>\n<eov><display><child>";
+    getChild(0).write(out);
+    out << "</child></display></eov>";
+
+    return out.str();
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-void EOVs::init(xmlpp::Element* elt)
+//void EOVs::init(xmlpp::Element* elt)
+//{
+//AssertI(elt);
+//AssertI(elt->get_name() == "EOVS");
+//
+//m_lst.clear();
+//xmlpp::Node::NodeList lst = elt->get_children("EOV");
+//xmlpp::Node::NodeList::iterator it;
+//for (it = lst.begin(); it != lst.end(); ++it) {
+//EOV eov;
+//eov.init((xmlpp::Element*)(*it));
+//addEOV(xml::get_attribute((xmlpp::Element*)(*it), "NAME"),
+//eov);
+//}
+//}
+
+void EOVs::write(std::ostream& out) const
 {
-    AssertI(elt);
-    AssertI(elt->get_name() == "EOVS");
-
-    m_lst.clear();
-    xmlpp::Node::NodeList lst = elt->get_children("EOV");
-    xmlpp::Node::NodeList::iterator it;
-    for (it = lst.begin(); it != lst.end(); ++it) {
-        EOV eov;
-        eov.init((xmlpp::Element*)(*it));
-        addEOV(xml::get_attribute((xmlpp::Element*)(*it), "NAME"),
-               eov);
-    }
-}
-
-void EOVs::write(xmlpp::Element* elt) const
-{
-    AssertI(elt);
-
     if (not m_lst.empty()) {
-        xmlpp::Element* eovs = elt->add_child("EOVS");
+        out << "<eovs>";
 
         std::map < std::string, EOV >::const_iterator it;
         for (it = m_lst.begin(); it != m_lst.end(); ++it) {
-            xmlpp::Element* eov = eovs->add_child("EOV");
-            eov->set_attribute("NAME", (*it).first);
-            (*it).second.write(eov);
+            out << "<eov name=\"" << (*it).first << "\">";
+            (*it).second.write(out);
+            out << "</eov>";
         }
     }
 }

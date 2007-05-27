@@ -38,24 +38,12 @@ namespace vle { namespace vpz {
     class Outputs : public Base
     {
     public:
+        typedef std::list < Output > OutputList;
+
         Outputs()
         { }
 
-        virtual ~Outputs()
-        { }
-
-        /** 
-         * @brief Fill outputs information from elt the element XML.
-         * @code
-         * <OUTPUTS>
-         *  <OUTPUT NAME="output1" FORMAT="text" LOCATION="" />
-         *  ...
-         * </OUTPUTS>
-         * @endcode
-         * 
-         * @param elt A node on OUTPUTS tags.
-         */
-        virtual void init(xmlpp::Element* elt);
+        virtual ~Outputs() { }
 
         /** 
          * @brief Write under the element XML the tags the XML code. If not
@@ -69,7 +57,10 @@ namespace vle { namespace vpz {
          * 
          * @param elt A node to the parent of OUTPUTS tags. 
          */
-        virtual void write(xmlpp::Element* elt) const;
+        virtual void write(std::ostream& out) const;
+
+        virtual Base::type getType() const
+        { return OUTPUTS; }
         
         /** 
          * @brief Add an output with text stream information. The name is
@@ -174,11 +165,36 @@ namespace vle { namespace vpz {
          * 
          * @return A reference to a constant outputs list.
          */
-        const std::map < std::string, Output >& outputs() const
+        const OutputList& outputs() const
         { return m_outputs; }
 
+
+        /** 
+         * @brief This functor is a helper to find an output by name in an
+         * OutputList using the standard algorithm std::find_if, std::remove_if
+         * etc.
+         *
+         * Example:@n
+         * <code>
+         * Glib::ustring name = "a";@n
+         * OutputList::const_iterator it;
+         * it = std::find_if(lst.begin(), lst.end(), OutputHasName("a"));
+         * </code>
+         */
+        struct OutputHasName
+        {
+            const Glib::ustring& name;
+
+            inline OutputHasName(const Glib::ustring& name) :
+                name(name)
+            { }
+
+            inline bool operator()(const Output& output) const
+            { return output.name() == name; }
+        };
+
     private:
-        std::map < std::string, Output >   m_outputs;
+        OutputList m_outputs;
         
         /** 
          * @brief Add an output into the outputs list. 
@@ -188,7 +204,7 @@ namespace vle { namespace vpz {
          *
          * @throw Exception::Internal if the output already exist.
          */
-        void addOutput(const std::string& name, const Output& o);
+        void addOutput(const Output& o);
     };
 
 }} // namespace vle vpz

@@ -23,6 +23,7 @@
  */
 
 #include <vle/manager/TotalExperimentGenerator.hpp>
+#include <vle/value/Set.hpp>
 
 
 
@@ -53,12 +54,17 @@ void TotalExperimentGenerator::build_combination(size_t& nb)
 size_t TotalExperimentGenerator::get_combination_number() const
 {
     size_t nb = 1;
-    const std::list < vpz::Condition >& cnds =
-        mFile.project().experiment().conditions().conditions();
+    const vpz::Conditions::ConditionList& conds(
+        mFile.project().experiment().conditions().conditions());
 
-    for (std::list < vpz::Condition >::const_iterator it = cnds.begin();
-         it != cnds.end(); ++it) {
-        nb *= (*it).value().size();
+    for (vpz::Conditions::const_iterator it = conds.begin();
+         it != conds.end(); ++it) {
+
+        const vpz::Condition::ValueList& values(it->second.values());
+        for (vpz::Condition::const_iterator jt = values.begin();
+             jt != values.end(); ++jt) {
+            nb *= jt->second->size();
+        }
     }
 
     return nb;

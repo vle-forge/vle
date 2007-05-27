@@ -44,13 +44,12 @@ const std::string& Port::getModelName() const
     return m_model->getName();
 }
 
-void Port::setStructure(const vle::value::Value* val)
+void Port::setStructure(const value::Value val)
 {
-    delete m_structure;
-    m_structure = (val == 0) ? 0 : val->clone();
+    m_structure = val;
 }
-    
-bool Port::isValidWithStructure(const vle::value::Value* val)
+
+bool Port::isValidWithStructure(const value::Value& val)
 {
     return val == m_structure; // FIXME test de map.
 }

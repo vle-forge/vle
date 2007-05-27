@@ -75,7 +75,7 @@ namespace vle { namespace stream {
 	virtual void writeTail();
 
         virtual void writeValue(const devs::Time& time,
-                                value::Value* value);
+                                value::Value value);
 
 	virtual void writeValues(const devs::Time& time,
 				 const devs::StreamModelPortValue& valuelst,

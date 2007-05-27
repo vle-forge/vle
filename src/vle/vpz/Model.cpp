@@ -31,55 +31,26 @@ namespace vle { namespace vpz {
 
 using namespace vle::utils;
 
-Model::Model() :
-    m_graph(0)
+//void Model::init(xmlpp::Element* elt)
+//{
+//AssertI(elt);
+//AssertI(elt->get_name() == "STRUCTURES");
+//
+//delete m_graph;
+//m_graph = 0;
+//
+//if (not xml::exist_children(elt, "MODEL"))
+//return;
+//
+//xmlpp::Element* model = xml::get_children(elt, "MODEL");
+//m_graph = graph::Model::parseXMLmodel(model, 0);
+//}
+
+void Model::write(std::ostream& out) const
 {
-}
-
-Model::Model(const Model& model) :
-    Base(model),
-    m_graph(model.model())
-{
-}
-
-Model& Model::operator=(const Model& model)
-{
-    if (this != &model) {
-        delete m_graph;
-        m_graph = model.model();
-    }
-    return *this;
-}
-
-Model::~Model()
-{
-    delete m_graph;
-}
-
-void Model::init(xmlpp::Element* elt)
-{
-    AssertI(elt);
-    AssertI(elt->get_name() == "STRUCTURES");
-
-    delete m_graph;
-    m_graph = 0;
-
-    if (not xml::exist_children(elt, "MODEL"))
-        return;
-
-    xmlpp::Element* model = xml::get_children(elt, "MODEL");
-    m_graph = graph::Model::parseXMLmodel(model, 0);
-}
-
-void Model::write(xmlpp::Element* elt) const
-{
-    AssertI(elt);
-
-    if (m_graph) {
-        xmlpp::Element* structures = elt->add_child("STRUCTURES");
-        xmlpp::Element* model = structures->add_child("MODEL");
-        m_graph->writeXML(model);
-    }
+    out << "<structures><model>";
+    m_graph->writeXML(out);
+    out << "</model></structures>";
 }
 
 void Model::initFromModel(xmlpp::Element* elt)
@@ -99,40 +70,34 @@ void Model::clear()
     m_graph = 0;
 }
 
-void Model::addModel(const std::string& modelname, const Model& m)
-{
-    graph::Model* mdl = m_graph->findModel(modelname);
-    Assert(utils::InternalError, mdl,
-           boost::format("Model '%1%' not found\n") % modelname);
-    Assert(utils::InternalError, mdl->isNoVLE(),
-           boost::format("Model '%1%' is not a NoVLE model\n") % modelname);
-
-    graph::CoupledModel* parent = mdl->getParent();
-    if (parent == 0) {
-        delete mdl;
-        m_graph = m.model();
-    } else {
-        parent->replace(mdl, m.model());
-    }
-}
+//void Model::addModel(const std::string& modelname, const Model& m)
+//{
+//graph::Model* mdl = m_graph->findModel(modelname);
+//Assert(utils::InternalError, mdl,
+//boost::format("Model '%1%' not found\n") % modelname);
+//Assert(utils::InternalError, mdl->isNoVLE(),
+//boost::format("Model '%1%' is not a NoVLE model\n") % modelname);
+//
+//graph::CoupledModel* parent = mdl->getParent();
+//if (parent == 0) {
+//delete mdl;
+//m_graph = m.model();
+//} else {
+//parent->replace(mdl, m.model());
+//}
+//}
 
 void Model::setModel(graph::Model* mdl)
 {
-    delete m_graph;
     m_graph = mdl;
 }
 
-graph::Model* Model::model() const
-{
-    return (m_graph == 0) ? 0 : m_graph->clone();
-}
-
-graph::Model* Model::modelRef()
+graph::Model* Model::model()
 {
     return m_graph;
 }
 
-const graph::Model* Model::modelRef() const
+graph::Model* Model::model() const
 {
     return m_graph;
 }
