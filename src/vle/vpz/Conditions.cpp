@@ -89,4 +89,15 @@ const Condition& Conditions::find(const std::string& condition) const
     return it->second;
 }
 
+Condition& Conditions::find(const std::string& condition)
+{
+    iterator it = m_conditions.find(condition);
+
+    Assert(utils::InternalError, it != m_conditions.end(),
+           boost::format("The condition %1% not exist") %
+           condition);
+
+    return it->second;
+}
+
 }} // namespace vle vpz

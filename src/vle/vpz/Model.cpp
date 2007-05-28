@@ -48,7 +48,7 @@ using namespace vle::utils;
 //}
 
 
-const AtomicModel& AtomicModelList::get(const graph::AtomicModel* atom) const
+const AtomicModel& AtomicModelList::get(graph::AtomicModel* atom) const
 {
     AtomicModelList::const_iterator it = find(atom);
     if (it == end()) {
@@ -59,7 +59,7 @@ const AtomicModel& AtomicModelList::get(const graph::AtomicModel* atom) const
     return it->second;
 }
 
-AtomicModel& AtomicModelList::get(const graph::AtomicModel* atom)
+AtomicModel& AtomicModelList::get(graph::AtomicModel* atom)
 {
     iterator it = find(atom);
     if (it == end()) {

@@ -99,7 +99,6 @@ namespace vle { namespace vpz {
          */
         void delCondition(const std::string& condition);
 
-
         /** 
          * @brief Get the specified condition from conditions list.
          * 
@@ -108,6 +107,15 @@ namespace vle { namespace vpz {
          * @return 
          */
         const Condition& find(const std::string& condition) const;
+
+        /** 
+         * @brief Get the specified condition from conditions list.
+         * 
+         * @param condition 
+         * 
+         * @return 
+         */
+        Condition& find(const std::string& condition);
 
         /** 
          * @brief Get the list of conditions.

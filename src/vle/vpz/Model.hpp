@@ -62,7 +62,7 @@ namespace vle { namespace vpz {
      * @brief The AtomicModelList class is a dictionary used to attach atomic
      * model to conditions and dynamics names.
      */
-    class AtomicModelList : public std::map < const graph::AtomicModel*,
+    class AtomicModelList : public std::map < graph::AtomicModel*,
                                               AtomicModel >
     {
     public:
@@ -72,7 +72,7 @@ namespace vle { namespace vpz {
          * @throw utils::InternalError if atom have no dynamics.
          * @return A constant reference to the vpz::AtomicModel.
          */
-        const AtomicModel& get(const graph::AtomicModel* atom) const;
+        const AtomicModel& get(graph::AtomicModel* atom) const;
 
         /** 
          * @brief Get an vpz::AtomicModel by his structural reference.
@@ -80,7 +80,7 @@ namespace vle { namespace vpz {
          * @throw utils::InternalError if atom have no dynamics.
          * @return A constant reference to the vpz::AtomicModel.
          */
-        AtomicModel& get(const graph::AtomicModel* atom);
+        AtomicModel& get(graph::AtomicModel* atom);
     };
 
 

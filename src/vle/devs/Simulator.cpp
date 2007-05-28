@@ -236,16 +236,16 @@ void Simulator::init()
 {
     utils::Rand::rand().set_seed(m_experiment.seed());
 
-    const vpz::AtomicModelList& atoms = m_vpz.project().model().atomicModels();
-    const vpz::Conditions& cnds(m_experiment.conditions());
+    vpz::AtomicModelList& atoms = m_vpz.project().model().atomicModels();
+    vpz::Conditions& cnds(m_experiment.conditions());
 
-    for (vpz::AtomicModelList::const_iterator it = atoms.begin(); it !=
+    for (vpz::AtomicModelList::iterator it = atoms.begin(); it !=
          atoms.end(); ++it) {
 
-        const vpz::Condition& cnd = cnds.find(it->second.condition());
-        for (vpz::Condition::ValueList::const_iterator jt =
+        vpz::Condition& cnd(cnds.find(it->second.conditions()));
+        for (vpz::Condition::ValueList::iterator jt =
              cnd.values().begin(); jt != cnd.values().end(); ++jt) {
-            (*it).first->addInitPort(jt->first);
+            it->first->addInitPort(jt->first);
             sAtomicModel* satom = getModel(it->first);
 
             Assert(utils::InternalError, satom, boost::format(
