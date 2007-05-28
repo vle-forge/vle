@@ -26,6 +26,7 @@
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/XML.hpp>
 #include <vle/graph/CoupledModel.hpp>
+#include <vle/graph/AtomicModel.hpp>
 
 namespace vle { namespace vpz {
 
@@ -45,6 +46,29 @@ using namespace vle::utils;
 //xmlpp::Element* model = xml::get_children(elt, "MODEL");
 //m_graph = graph::Model::parseXMLmodel(model, 0);
 //}
+
+
+const AtomicModel& AtomicModelList::get(const graph::AtomicModel* atom) const
+{
+    AtomicModelList::const_iterator it = find(atom);
+    if (it == end()) {
+        Throw(utils::InternalError, boost::format(
+                "The atomic model %s have not dynamics?") %
+            atom->getName());
+    }
+    return it->second;
+}
+
+AtomicModel& AtomicModelList::get(const graph::AtomicModel* atom)
+{
+    iterator it = find(atom);
+    if (it == end()) {
+        Throw(utils::InternalError, boost::format(
+                "The atomic model %s have not dynamics?") %
+                    atom->getName());
+    }
+    return it->second;
+}
 
 void Model::write(std::ostream& out) const
 {

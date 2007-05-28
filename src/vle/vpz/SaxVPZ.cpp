@@ -29,6 +29,7 @@
 #include <vle/vpz/Port.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Trace.hpp>
+#include <vle/utils/Socket.hpp>
 #include <vle/value/Map.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/value/Tuple.hpp>
@@ -63,6 +64,7 @@ void VpzStackSax::push_structure()
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
     AssertS(utils::SaxParserError, m_vpz);
+    AssertS(utils::SaxParserError, m_stack.top()->isVpz());
 
     vpz::Structures* structure = new vpz::Structures();
     m_stack.push(structure);
@@ -86,13 +88,11 @@ void VpzStackSax::push_model(const xmlpp::SaxParser::AttributeList& att)
 
     graph::Model* gmdl = 0;
 
-    std::string type(VLESaxParser::get_attribute < std::string >(att, "type"));
-    std::string name(VLESaxParser::get_attribute < std::string >(att, "name"));
+    std::string type(get_attribute < std::string >(att, "type"));
+    std::string name(get_attribute < std::string >(att, "name"));
     if (type == "atomic") {
-        std::string cnd(VLESaxParser::get_attribute < std::string >(
-                att, "condition"));
-        std::string dyn(VLESaxParser::get_attribute < std::string >(
-                att, "dynamics"));
+        std::string cnd(get_attribute < std::string >(att, "conditions"));
+        std::string dyn(get_attribute < std::string >(att, "dynamics"));
         gmdl = new graph::AtomicModel(parent);
         vpz().project().model().atomicModels().insert(std::make_pair(
                 reinterpret_cast < graph::AtomicModel* >(gmdl),
@@ -136,7 +136,7 @@ void VpzStackSax::push_port(const xmlpp::SaxParser::AttributeList& att)
     vpz::Model* mdl = static_cast < vpz::Model* >(m_stack.top());
     graph::Model* gmdl = mdl->model();
     
-    std::string name = VLESaxParser::get_attribute < std::string >(att, "name");
+    std::string name(get_attribute < std::string >(att, "name"));
 
     if (type->isIn()) {
         gmdl->addInputPort(name);
@@ -198,7 +198,7 @@ void VpzStackSax::push_connection(const xmlpp::SaxParser::AttributeList& att)
     AssertS(utils::SaxParserError, m_vpz);
     AssertS(utils::SaxParserError, m_stack.top()->isConnections());
 
-    std::string type = VLESaxParser::get_attribute < std::string >(att, "type");
+    std::string type(get_attribute < std::string >(att, "type"));
     vpz::Base* cnt = 0;
     
     if (type == "internal") {
@@ -222,8 +222,8 @@ void VpzStackSax::push_origin(const xmlpp::SaxParser::AttributeList& att)
             m_stack.top()->isInputConnection() or
             m_stack.top()->isOutputConnection());
 
-    std::string mdl = VLESaxParser::get_attribute < std::string >(att, "model");
-    std::string port = VLESaxParser::get_attribute < std::string >(att, "port");
+    std::string mdl(get_attribute < std::string >(att, "model"));
+    std::string port(get_attribute < std::string >(att, "port"));
 
     vpz::Base* orig = new vpz::Origin(mdl, port);
     m_stack.push(orig);
@@ -235,8 +235,8 @@ void VpzStackSax::push_destination(const xmlpp::SaxParser::AttributeList& att)
     AssertS(utils::SaxParserError, m_vpz);
     AssertS(utils::SaxParserError, m_stack.top()->isOrigin());
 
-    std::string mdl = VLESaxParser::get_attribute < std::string >(att, "model");
-    std::string port = VLESaxParser::get_attribute < std::string >(att, "port");
+    std::string mdl(get_attribute < std::string >(att, "model"));
+    std::string port(get_attribute < std::string >(att, "port"));
 
     vpz::Base* dest = new vpz::Destination(mdl, port);
     m_stack.push(dest);
@@ -286,10 +286,50 @@ void VpzStackSax::build_connection()
 
 void VpzStackSax::push_dynamics()
 {
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_vpz);
+    AssertS(utils::SaxParserError, m_stack.top()->isVpz());
+
+    m_stack.push(&m_vpz->project().dynamics());
 }
 
-void VpzStackSax::push_dynamic(const xmlpp::SaxParser::AttributeList& /*att*/)
-{
+void VpzStackSax::push_dynamic(const xmlpp::SaxParser::AttributeList& att)
+{ 
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_vpz);
+    AssertS(utils::SaxParserError, m_stack.top()->isDynamics());
+
+    vpz::Dynamic dyn;
+    dyn.setName(get_attribute < std::string >(att, "name"));
+    dyn.setModel(get_attribute < std::string >(att, "model"));
+
+    if (exist_attribute(att, "library"))
+        dyn.setLibrary(get_attribute < std::string >(att, "library"));
+    else
+        dyn.setLibrary(dyn.model());
+
+    if (exist_attribute(att, "language"))
+        dyn.setLanguage(get_attribute < std::string >(att, "library"));
+    else
+        dyn.setLanguage("");
+
+    if (exist_attribute(att, "type")) {
+        std::string type(get_attribute < std::string >(att, "type"));
+        if (type == "local") {
+            dyn.setLocalDynamics();
+        } else {
+            std::string loc(get_attribute < std::string >(att, "location"));
+            std::string ip;
+            int port;
+            utils::net::explodeStringNet(loc, ip, port);
+            dyn.setDistantDynamics(ip, port);
+        }
+    } else {
+        dyn.setLocalDynamics();
+    }
+
+    vpz::Dynamics& dyns(m_vpz->project().dynamics());
+    dyns.addDynamic(dyn);
 }
 
 vpz::Base* VpzStackSax::pop()
@@ -494,6 +534,15 @@ void VLESaxParser::clearLastCharactersStored()
 void VLESaxParser::addToCharacters(const Glib::ustring& characters)
 {
     m_lastCharacters.append(characters);
+}
+
+bool exist_attribute(const xmlpp::SaxParser::AttributeList& lst,
+                     const Glib::ustring& name)
+{
+    xmlpp::SaxParser::AttributeList::const_iterator it;
+    it = std::find_if(lst.begin(), lst.end(),
+                      xmlpp::SaxParser::AttributeHasName(name));
+    return it != lst.end();
 }
 
 }} // namespace vle vpz

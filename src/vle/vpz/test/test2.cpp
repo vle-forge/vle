@@ -41,7 +41,7 @@ void test_atomicmodel_vpz()
         "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
         " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
         " <structures>\n"
-        "  <model name=\"test1\" type=\"atomic\">\n"
+        "  <model name=\"test1\" type=\"atomic\" conditions=\"\" dynamics=\"\" >\n"
         "   <init>\n"
         "    <port name=\"init1\" />\n"
         "    <port name=\"init2\" />\n"
@@ -97,11 +97,13 @@ void test_coupledmodel_vpz()
         "   <in><port name=\"i\"/></in>\n"
         "   <out><port name=\"o\"/></out>\n"
         "   <submodels>\n"
-        "    <model name=\"atom1\" type=\"atomic\">\n"
+        "    <model name=\"atom1\" type=\"atomic\""
+        "           conditions=\"\" dynamics=\"\">\n"
         "     <in><port name=\"in\"/></in>\n"
         "     <out><port name=\"out\"/></out>\n"
         "    </model>\n"
-        "    <model name=\"atom2\" type=\"atomic\">\n"
+        "    <model name=\"atom2\" type=\"atomic\""
+        "           conditions=\"\" dynamics=\"\">\n"
         "     <in><port name=\"in\"/></in>\n"
         "     <out><port name=\"out\"/></out>\n"
         "    </model>\n"
@@ -161,11 +163,14 @@ void test_dynamic_vpz()
         "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
         " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
         " <structures>\n"
-        "  <model name=\"test1\" type=\"atomic\" dynamics=\"dyn1\" />\n"
-        " </structure>\n"
+        "  <model name=\"test1\" type=\"atomic\""
+        "         dynamics=\"dyn1\" conditions=\"cnd1\" />\n"
+        " </structures>\n"
         " <dynamics>\n"
-        "  <dynamic name=\"dyn1\" library=\"celldevs\" type=\"local\" />\n"
-        " </dynamic>\n"
+        "  <dynamic name=\"dyn1\" library=\"celldevs\""
+        "           model=\"celldevs\""
+        "           type=\"local\" />\n"
+        " </dynamics>\n"
         "</vle_project>\n";
 
     vpz::VLESaxParser sax;
@@ -175,65 +180,21 @@ void test_dynamic_vpz()
     BOOST_REQUIRE(mdl.model() != 0);
     BOOST_REQUIRE_EQUAL(mdl.model()->isAtomic(), true);
 
-    const vpz::Dynamic& dyn = mdl.getDynamic(mdl.model()->getName());
-    BOOST_REQUIRE_EQUAL(dyn.name(), "dyn1");
-    BOOST_REQUIRE_EQUAL(dyn.formalism(), "celldevs");
-    BOOST_REQUIRE_EQUAL(dyn.data(), "");
-}
+    const graph::AtomicModel* atom(
+        reinterpret_cast < graph::AtomicModel* >(mdl.model()));
 
-void test_xml_dynamic_vpz()
-{
-    const char* xml =
-        "<?xml version=\"1.0\"?>\n"
-        "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
-        " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
-        " <structures>\n"
-        "  <model name=\"test1\" type=\"atomic\">\n"
-        " </structure>\n"
-        " <dynamics>\n"
-        "  <dynamic name=\"dyn1\" library=\"celldevs\" type=\"local\" />\n"
-        "   <node name=\"noeud0\">\n"
-        "    <test tutu=\"sdf\" toto=\"fds\" />\n"
-        "    <test tutu=\"sdf\" toto=\"fds\" />\n"
-        "   </node>\n"
-        " </dynamic>\n"
-        "</vle_project>\n";
+    const vpz::AtomicModel& vatom = mdl.atomicModels().get(atom);
+    BOOST_REQUIRE_EQUAL(vatom.dynamics(), "dyn1");
+    BOOST_REQUIRE_EQUAL(vatom.conditions(), "cnd1");
 
-    vpz::VLESaxParser::Sax;
-    sax.parse_memory(xml);
-
-    const vpz::Model& mdl = sax.vpz().project().model();
-    BOOST_REQUIRE(mdl.model() != 0);
-    BOOST_REQUIRE_EQUAL(mdl.model()->isAtomic(), true);
-
-    const vpz::Model& mdl = sax.vpz().project().model();
-    const vpz::Dynamic& dyn = mdl.getDynamic(mdl.model()->getName());
+    const vpz::Dynamics& dyns = sax.vpz().project().dynamics();
+    const vpz::Dynamic& dyn = dyns.find(vatom.dynamics());
 
     BOOST_REQUIRE_EQUAL(dyn.name(), "dyn1");
-    BOOST_REQUIRE_EQUAL(dyn.formalism(), "celldevs");
-
-    xmlpp::DomParser dom;
-    dom.parse_memory(dyn.xml());
-    xmlpp::Document* doc = dom.get_document();
-    BOOST_REQUIRE(doc);
-    xmlpp::Element* root = doc->get_root_node();
-    BOOST_REQUIRE(root);
-
-    BOOST_REQUIRE_EQUAL(root->get_name(), "node");
-    xmlpp::Node::NodeList lst = root->get_child("test");
-    xmlpp::Node::NodeList::iterator it = lst.begin();
-    for (it = lst.begin(); it != lst.end(); ++it) {
-        xmlpp::Element* elt = dynamic_cast < xml::Element* >(*it);
-        BOOST_REQUIRE(elt);
-    
-        xmlpp::Attribute* att1 = elt->get_attribute("tutu");
-        xmlpp::Attribute* att2 = elt->get_attribute("toto");
-
-        BOOST_REQUIRE(att1 and att2);
-
-        BOOST_REQUIRE_EQUAL(att1->get_value(), "sdf");
-        BOOST_REQUIRE_EQUAL(att2->get_value(), "fds");
-    }
+    BOOST_REQUIRE_EQUAL(dyn.library(), "celldevs");
+    BOOST_REQUIRE_EQUAL(dyn.model(), "celldevs");
+    BOOST_REQUIRE_EQUAL(dyn.type(), vpz::Dynamic::LOCAL);
+    BOOST_REQUIRE_EQUAL(dyn.language(), "");
 }
 
 boost::unit_test_framework::test_suite*

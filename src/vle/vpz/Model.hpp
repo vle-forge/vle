@@ -34,18 +34,18 @@ namespace vle { namespace vpz {
 
     /** 
      * @brief The AtomicModel class is used by the AtomicModelList to attach an
-     * atomic model to his condition and dynamics names.
+     * atomic model to his conditions and dynamics names.
      */
     class AtomicModel
     {
     public:
-        AtomicModel(const std::string& condition, const std::string& dynamics) :
-            m_condition(condition),
+        AtomicModel(const std::string& conditions, const std::string& dynamics) :
+            m_conditions(conditions),
             m_dynamics(dynamics)
         { }
 
-        const std::string& condition() const
-        { return m_condition; }
+        const std::string& conditions() const
+        { return m_conditions; }
 
         const std::string& dynamics() const
         { return m_dynamics; }
@@ -53,16 +53,36 @@ namespace vle { namespace vpz {
     private:
         AtomicModel() { }
 
-        std::string     m_condition;
+        std::string     m_conditions;
         std::string     m_dynamics;
     };
 
+
     /** 
      * @brief The AtomicModelList class is a dictionary used to attach atomic
-     * model to condition and dynamics names.
+     * model to conditions and dynamics names.
      */
-    class AtomicModelList : public std::map < graph::AtomicModel*, AtomicModel >
-    { };
+    class AtomicModelList : public std::map < const graph::AtomicModel*,
+                                              AtomicModel >
+    {
+    public:
+        /** 
+         * @brief Get an vpz::AtomicModel by his structural reference.
+         * @param atom the reference to the structure.
+         * @throw utils::InternalError if atom have no dynamics.
+         * @return A constant reference to the vpz::AtomicModel.
+         */
+        const AtomicModel& get(const graph::AtomicModel* atom) const;
+
+        /** 
+         * @brief Get an vpz::AtomicModel by his structural reference.
+         * @param atom the reference to the structure.
+         * @throw utils::InternalError if atom have no dynamics.
+         * @return A constant reference to the vpz::AtomicModel.
+         */
+        AtomicModel& get(const graph::AtomicModel* atom);
+    };
+
 
     class Model : public Base
     {
@@ -138,9 +158,19 @@ namespace vle { namespace vpz {
          */
         graph::Model* model() const;
 
+        /** 
+         * @brief Return a constant reference to the vpz::AtomicModelList.
+         * 
+         * @return 
+         */
         const AtomicModelList& atomicModels() const
         { return m_atomicmodels; }
 
+        /** 
+         * @brief Return a reference to the vpz::AtomicModelList.
+         * 
+         * @return 
+         */
         AtomicModelList& atomicModels()
         { return m_atomicmodels; }
 
@@ -148,6 +178,8 @@ namespace vle { namespace vpz {
         AtomicModelList     m_atomicmodels;
         graph::Model*       m_graph;
     };
+
+
 
     class Submodels : public Base
     {

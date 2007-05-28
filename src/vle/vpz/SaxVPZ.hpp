@@ -123,10 +123,6 @@ namespace vle { namespace vpz {
 
         const value::Value& get_value(const size_t pos) const;
 
-        template < typename T >
-        static T get_attribute(const xmlpp::SaxParser::AttributeList& lst,
-                                const Glib::ustring& name);
-
         const vpz::Vpz& vpz() const
         {
             Assert(utils::SaxParserError, m_vpz, "No VPZ was read");
@@ -164,16 +160,15 @@ namespace vle { namespace vpz {
         bool                            m_isTrame;
     };
     
-    template < typename T >
-        T VLESaxParser::get_attribute(
-            const xmlpp::SaxParser::AttributeList& lst,
-            const Glib::ustring& name)
+    template < typename T > T
+        get_attribute(const xmlpp::SaxParser::AttributeList& lst,
+                      const Glib::ustring& name)
         {
             xmlpp::SaxParser::AttributeList::const_iterator it;
             it = std::find_if(lst.begin(), lst.end(),
                               xmlpp::SaxParser::AttributeHasName(name));
             Assert(utils::SaxParserError, it != lst.end(),
-                    (boost::format("Unknow attribute '%1%'") % name).str());
+                   (boost::format("Unknow attribute '%1%'") % name).str());
 
             T result;
             try {
@@ -185,6 +180,9 @@ namespace vle { namespace vpz {
             }
             return result;
         }
+
+    bool exist_attribute(const xmlpp::SaxParser::AttributeList& lst,
+                         const Glib::ustring& name);
 
 }} // namespace vle vpz
 

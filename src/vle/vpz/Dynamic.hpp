@@ -101,7 +101,7 @@ namespace vle { namespace vpz {
          * @param name new language of the dynamics.
          */
         void setLanguage(const std::string& name)
-        { m_model.assign(name); }
+        { m_language.assign(name); }
 
 
         /** 
