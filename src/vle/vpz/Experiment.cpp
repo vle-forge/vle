@@ -25,7 +25,6 @@
 #include <vle/vpz/Experiment.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/XML.hpp>
-#include <glibmm/date.h>
 
 namespace vle { namespace vpz {
 
@@ -73,7 +72,6 @@ void Experiment::write(std::ostream& out) const
     out << "<experiment "
         << "name=\"" << m_name << "\" "
         << "duration=\"" << m_duration << "\" "
-        << "date=\"" << m_date << "\" "
         << "seed=\"" << m_seed << "\" >";
 
     m_replicas.write(out);
@@ -106,7 +104,6 @@ void Experiment::clear()
     m_name.clear();
     m_duration = 0;
     m_seed = 1;
-    m_date.clear();
 
     m_replicas.clear();
     m_conditions.clear();
@@ -137,24 +134,6 @@ void Experiment::setDuration(double duration)
     m_duration = duration;
 }
 
-void Experiment::setDate(const std::string& date)
-{
-    if (not date.empty()) {
-        Glib::Date d;
-        d.set_parse(date);
-        if (d.valid()) {
-            m_date = d.format_string("%a, %d %b %Y %H:%M:%S %z");
-            return;
-        }
-    }
-    setCurrentDate();
-}
-
-void Experiment::setCurrentDate()
-{
-    m_date = utils::get_current_date();
-}
-    
 void Experiment::setCombination(const std::string& name)
 {
     AssertI(name == "linear" or name == "total");

@@ -61,6 +61,7 @@ namespace vle { namespace vpz {
         void build_connection();
         void push_dynamics();
         void push_dynamic(const xmlpp::SaxParser::AttributeList& att);
+        void push_experiment(const xmlpp::SaxParser::AttributeList& att);
         vpz::Base* pop();
 
         vpz::Vpz& vpz();

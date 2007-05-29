@@ -332,6 +332,20 @@ void VpzStackSax::push_dynamic(const xmlpp::SaxParser::AttributeList& att)
     dyns.addDynamic(dyn);
 }
 
+void VpzStackSax::push_experiment(const xmlpp::SaxParser::AttributeList& att)
+{
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_vpz);
+    AssertS(utils::SaxParserError, m_stack.top()->isVpz());
+
+    vpz::Experiment& exp(m_vpz->project().experiment());
+    m_stack.push(&exp);
+
+    exp.setName(get_attribute < std::string >(att, "name"));
+    exp.setDuration(get_attribute < double >(att, "duration"));
+    exp.setSeed(get_attribute < guint32 >(att, "seed"));
+}
+
 vpz::Base* VpzStackSax::pop()
 {
     vpz::Base* top = m_stack.top();
@@ -434,6 +448,8 @@ void VLESaxParser::on_start_element(
         m_vpzstack.push_dynamics();
     } else if (name == "dynamic") {
         m_vpzstack.push_dynamic(att);
+    } else if (name == "experiment") {
+        m_vpzstack.push_experiment(att);
     } else {
         Throw(utils::SaxParserError,
               (boost::format("Unknow element %1%") % name));

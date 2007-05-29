@@ -197,6 +197,28 @@ void test_dynamic_vpz()
     BOOST_REQUIRE_EQUAL(dyn.language(), "");
 }
 
+void test_experiment_vpz()
+{
+    const char* xml=
+        "<?xml version=\"1.0\"?>\n"
+        "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
+        " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
+        " <experiment name=\"test1\" duration=\"0.33\" seed=\"987654321\">\n"
+        " </experiment>\n"
+        "</vle_project>\n";
+    
+    vpz::VLESaxParser sax;
+    sax.parse_memory(xml);
+
+    const vpz::Vpz& vpz(sax.vpz());
+    const vpz::Project& project(vpz.project());
+    const vpz::Experiment& experiment(project.experiment());
+
+    BOOST_REQUIRE_EQUAL(experiment.name(), "test1");
+    BOOST_REQUIRE_EQUAL(experiment.duration(), 0.33);
+    BOOST_REQUIRE_EQUAL(experiment.seed(), (guint32)987654321);
+}
+
 boost::unit_test_framework::test_suite*
 init_unit_test_suite(int, char* [])
 {
@@ -206,5 +228,6 @@ init_unit_test_suite(int, char* [])
     test->add(BOOST_TEST_CASE(&test_atomicmodel_vpz));
     test->add(BOOST_TEST_CASE(&test_coupledmodel_vpz));
     test->add(BOOST_TEST_CASE(&test_dynamic_vpz));
+    test->add(BOOST_TEST_CASE(&test_experiment_vpz));
     return test;
 }

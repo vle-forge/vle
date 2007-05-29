@@ -46,16 +46,11 @@ namespace vle { namespace vpz {
          * @brief Write Experiment information under specified root node
          * including Replicas, ExperimentalCondition and Measures.
          * @code
-         * <EXPERIMENTS>
-         *  <EXPERIMENT NAME="exp1" DURATION="10.0" DATE="" >
+         * <experiment name="exp1" duration="0.33" seed="65431">
          *   [...]
-         *  </EXPERIMENT>
-         * </EXPERIMENTS>
+         * </experiment>
          * @endcode
-         * 
-         * @param elt a xml element to the parent of EXPERIMENTS.
          *
-         * @throw Exception::Internal if elt is NULL.
          */
         virtual void write(std::ostream& out) const;
 
@@ -66,9 +61,9 @@ namespace vle { namespace vpz {
          * @brief Initialise Experiment information from XML including,
          * Replicas, ExperimentalCondition and Measures.
          * @code
-         * <EXPERIMENT NAME="exp1" DURATION="10.0" DATE="" >
-         *  [...]
-         * </EXPERIMENT>
+         * <experiment name="exp1" duration="0.33" seed="65431">
+         *   [...]
+         * </experiment>
          * @endcode
          * 
          * @param elt a xml element on the tag EXPERIMENT.
@@ -165,26 +160,6 @@ namespace vle { namespace vpz {
         { return m_seed; }
 
         /** 
-         * @brief Set the specified date to the Experiment file.
-         * 
-         * @param date A string representation of date.
-         */
-        void setDate(const std::string& date);
-
-        /** 
-         * @brief Set the current date to the Experiment file.
-         */
-        void setCurrentDate();
-
-        /** 
-         * @brief Get the current date of Experiment file.
-         * 
-         * @return A string representation of date in RFC 822.
-         */
-        const std::string& date() const
-        { return m_date; }
-
-        /** 
          * @brief Set the experimental design combination.
          * 
          * @param name The new name of experimental design combination.
@@ -203,7 +178,6 @@ namespace vle { namespace vpz {
         std::string         m_name;
         double              m_duration;
         guint32             m_seed;
-        std::string         m_date;
         std::string         m_combination;
         Replicas            m_replicas;
         Conditions          m_conditions;
