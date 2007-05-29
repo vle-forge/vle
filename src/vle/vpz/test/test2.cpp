@@ -180,7 +180,7 @@ void test_dynamic_vpz()
     BOOST_REQUIRE(mdl.model() != 0);
     BOOST_REQUIRE_EQUAL(mdl.model()->isAtomic(), true);
 
-    const graph::AtomicModel* atom(
+    graph::AtomicModel* atom(
         reinterpret_cast < graph::AtomicModel* >(mdl.model()));
 
     const vpz::AtomicModel& vatom = mdl.atomicModels().get(atom);
