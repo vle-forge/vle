@@ -50,7 +50,7 @@ void ExperimentGenerator::build()
 
 void ExperimentGenerator::build_replicas_list()
 {
-    mReplicasTab = mFile.project().experiment().replicas().getNewList();
+    mReplicasTab = mFile.project().experiment().replicas().getList();
     std::cerr << "Replicas: " << mReplicasTab.size() << std::endl;
 }
 

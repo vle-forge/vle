@@ -346,6 +346,17 @@ void VpzStackSax::push_experiment(const xmlpp::SaxParser::AttributeList& att)
     exp.setSeed(get_attribute < guint32 >(att, "seed"));
 }
 
+void VpzStackSax::push_replicas(const xmlpp::SaxParser::AttributeList& att)
+{
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_vpz);
+    AssertS(utils::SaxParserError, m_stack.top()->isExperiment());
+
+    vpz::Replicas& rep(m_vpz->project().experiment().replicas());
+    rep.setSeed(get_attribute < guint32 >(att, "seed"));
+    rep.setNumber(get_attribute < size_t >(att, "number"));
+}
+
 vpz::Base* VpzStackSax::pop()
 {
     vpz::Base* top = m_stack.top();
@@ -450,6 +461,8 @@ void VLESaxParser::on_start_element(
         m_vpzstack.push_dynamic(att);
     } else if (name == "experiment") {
         m_vpzstack.push_experiment(att);
+    } else if (name == "replicas") {
+        m_vpzstack.push_replicas(att);
     } else {
         Throw(utils::SaxParserError,
               (boost::format("Unknow element %1%") % name));

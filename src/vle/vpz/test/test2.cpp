@@ -203,7 +203,8 @@ void test_experiment_vpz()
         "<?xml version=\"1.0\"?>\n"
         "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
         " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
-        " <experiment name=\"test1\" duration=\"0.33\" seed=\"987654321\">\n"
+        " <experiment name=\"test1\" duration=\"0.33\" seed=\"987\">\n"
+        "  <replicas seed=\"987456\" number=\"5\" />\n"
         " </experiment>\n"
         "</vle_project>\n";
     
@@ -213,10 +214,14 @@ void test_experiment_vpz()
     const vpz::Vpz& vpz(sax.vpz());
     const vpz::Project& project(vpz.project());
     const vpz::Experiment& experiment(project.experiment());
+    const vpz::Replicas& replicas(project.experiment().replicas());
 
     BOOST_REQUIRE_EQUAL(experiment.name(), "test1");
     BOOST_REQUIRE_EQUAL(experiment.duration(), 0.33);
-    BOOST_REQUIRE_EQUAL(experiment.seed(), (guint32)987654321);
+    BOOST_REQUIRE_EQUAL(experiment.seed(), (guint32)987);
+
+    BOOST_REQUIRE_EQUAL(replicas.seed(), (guint32)987456);
+    BOOST_REQUIRE_EQUAL(replicas.number(), (size_t)5);
 }
 
 boost::unit_test_framework::test_suite*
