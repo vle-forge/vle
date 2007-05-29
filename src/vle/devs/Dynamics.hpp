@@ -267,22 +267,6 @@ namespace vle { namespace devs {
         virtual Time init()
         { return Time::infinity; }
 
-	/**
-         * This function is call before the Dynamics::init(). The data buffer
-         * represents the XML cdata of the dynamics tags.
-         * @code
-         * <dynamics name="xxx" library="yyy">
-         *  <!-- free content -->
-         * </dynamics>
-         * @endcode
-         *
-         * @param data can store XML, text etc.
-	 *
-	 * @return true if the XML parsing is correct
-	 */
-        virtual bool parse(const std::string& /* data */)
-        { return true; }
-
         /**
          * Compute the selected event when an external event, instantaneous
          * event and an internal event occurs at the same time. Default, take

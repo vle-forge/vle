@@ -70,14 +70,6 @@ namespace vle { namespace devs {
 	virtual Time getTimeAdvance();
 	virtual InternalEvent *init();
 
-	/**
-	 * Parse a XML tree which define the parameters of the model
-	 *
-	 * @return true if the XML parsing is correct
-	 */
-        virtual bool parse(const std::string& data);
-
-
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
         /**

@@ -153,7 +153,7 @@ Glib::Module* ModelFactory::getPlugin(const std::string& name)
 }
 
 void ModelFactory::attachDynamics(devs::sAtomicModel* atom,
-                                  const vpz::Dynamic& dyn,
+                                  const vpz::Dynamic& /* dyn */,
                                   Glib::Module* module)
 {
     devs::Dynamics* call = 0;
@@ -170,9 +170,6 @@ void ModelFactory::attachDynamics(devs::sAtomicModel* atom,
             "problem allocation a new Dynamics '%2%'\n") %
         module->get_name() % Glib::Module::get_last_error());
     
-    if (not dyn.data().empty()) {
-        call->parse(dyn.data());
-    }
     atom->addDynamics(call);
     delete module;
 }

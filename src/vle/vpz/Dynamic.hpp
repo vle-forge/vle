@@ -41,10 +41,9 @@ namespace vle { namespace vpz {
      *           library="yyyy"  <!-- name of the library used by simulator -->
      *           type="distant|local" <!-- distant need attribut location,
      *                                      default is local -->
-     *           location="xxx:yyy"> <!-- the location of the distant library
-     *                                    used by simulator -->
+     *           location="xxx:yyy" /> <!-- the location of the distant library
+     *                                      used by simulator -->
      *
-     * </dynamics>
      * </code>
      */
     class Dynamic : public Base
@@ -140,28 +139,6 @@ namespace vle { namespace vpz {
         inline const std::string& library() const { return m_library; }
         
         /** 
-         * @brief Return the content of the dynamics tag in vpz file.
-         *
-         * Example:@n
-         * <code>
-         * <dynamics>
-         *  <dynamics name="dynamicsname" library="dynamicslibraryname"
-         *            model="dynamicsclassname" language="python"
-         *            type="local">
-         *   a = 10
-         *   b = 20
-         *   c = 30
-         *  </dynamics>
-         * </dynamics>
-         *
-         * This function return the string into dynamics tags.
-         * </code>
-         * 
-         * @return an XML format.
-         */
-        inline const std::string& data() const { return m_data; }
-
-        /** 
          * @brief Return the location of the dynamics. Be carefull, check the
          * type() before use this function.
          * 
@@ -198,7 +175,6 @@ namespace vle { namespace vpz {
 
     private:
         std::string     m_name;
-        std::string     m_data;
         std::string     m_library;
         std::string     m_model;
         std::string     m_language;

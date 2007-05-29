@@ -43,12 +43,7 @@ void Dynamic::write(std::ostream& out) const
     else
         out << " type=\"distant\" location=\"" << m_location << "\"";
 
-    if (m_data.empty())
-        out << " />";
-    else
-        out << ">"
-            << m_data
-            << "</dynamic>";
+    out << " />";
 }
 
 void Dynamic::setDistantDynamics(const std::string& host, int port)

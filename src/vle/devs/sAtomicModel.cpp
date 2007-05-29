@@ -139,11 +139,6 @@ InternalEvent* sAtomicModel::init()
     return new InternalEvent(m_dynamics->init(), this);
 }
 
-bool sAtomicModel::parse(const std::string& data)
-{
-    return m_dynamics->parse(data);
-}
-
 Event::EventType sAtomicModel::processConflict(
                             const InternalEvent& internal,
                             const ExternalEventList& extEventlist,
