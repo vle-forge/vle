@@ -29,6 +29,9 @@
 #include <vle/vpz/Vpz.hpp>
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/graph/CoupledModel.hpp>
+#include <vle/value/Set.hpp>
+#include <vle/value/Integer.hpp>
+#include <vle/value/Double.hpp>
 #include <limits>
 #include <fstream>
 
@@ -205,6 +208,24 @@ void test_experiment_vpz()
         " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
         " <experiment name=\"test1\" duration=\"0.33\" seed=\"987\">\n"
         "  <replicas seed=\"987456\" number=\"5\" />\n"
+        "  <conditions>"
+        "   <condition name=\"cond1\" >"
+        "    <port name=\"init1\" >"
+        "     <double>123.</double><integer>1</integer>"
+        "    </port>"
+        "    <port name=\"init2\" >"
+        "     <double>456.</double><integer>2</integer>"
+        "    </port>"
+        "   </condition>"
+        "   <condition name=\"cond2\" >"
+        "    <port name=\"init3\" >"
+        "     <double>.123</double><integer>-1</integer>"
+        "    </port>"
+        "    <port name=\"init4\" >"
+        "     <double>.456</double><integer>-2</integer>"
+        "    </port>"
+        "   </condition>"
+        "  </conditions>"
         " </experiment>\n"
         "</vle_project>\n";
     
@@ -215,6 +236,7 @@ void test_experiment_vpz()
     const vpz::Project& project(vpz.project());
     const vpz::Experiment& experiment(project.experiment());
     const vpz::Replicas& replicas(project.experiment().replicas());
+    const vpz::Conditions& cnds(project.experiment().conditions());
 
     BOOST_REQUIRE_EQUAL(experiment.name(), "test1");
     BOOST_REQUIRE_EQUAL(experiment.duration(), 0.33);
@@ -222,6 +244,36 @@ void test_experiment_vpz()
 
     BOOST_REQUIRE_EQUAL(replicas.seed(), (guint32)987456);
     BOOST_REQUIRE_EQUAL(replicas.number(), (size_t)5);
+
+    value::Set set;
+    value::Double real;
+    value::Integer integer;
+    
+    const vpz::Condition& cnd1(cnds.find("cond1"));
+    set = cnd1.getSetValues("init1");
+    real = value::to_double(set->getValue(0));
+    BOOST_REQUIRE_EQUAL(real->doubleValue(), 123.);
+    integer = value::to_integer(set->getValue(1));
+    BOOST_REQUIRE_EQUAL(integer->intValue(), 1);
+
+    set = cnd1.getSetValues("init2");
+    real = value::to_double(set->getValue(0));
+    BOOST_REQUIRE_EQUAL(real->doubleValue(), 456.);
+    integer = value::to_integer(set->getValue(1));
+    BOOST_REQUIRE_EQUAL(integer->intValue(), 2);
+
+    const vpz::Condition& cnd2(cnds.find("cond2"));
+    set = cnd2.getSetValues("init3");
+    real = value::to_double(set->getValue(0));
+    BOOST_REQUIRE_EQUAL(real->doubleValue(), .123);
+    integer = value::to_integer(set->getValue(1));
+    BOOST_REQUIRE_EQUAL(integer->intValue(), -1);
+    
+    set = cnd2.getSetValues("init4");
+    real = value::to_double(set->getValue(0));
+    BOOST_REQUIRE_EQUAL(real->doubleValue(), .456);
+    integer = value::to_integer(set->getValue(1));
+    BOOST_REQUIRE_EQUAL(integer->intValue(), -2);
 }
 
 boost::unit_test_framework::test_suite*

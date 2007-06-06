@@ -37,6 +37,12 @@ Condition::Condition() :
 {
 }
 
+Condition::Condition(const std::string& name) :
+    Base(),
+    m_name(name)
+{
+}
+
 void Condition::write(std::ostream& out) const
 {
     out << "<condition name=\"" << m_name << "\" >";
@@ -55,8 +61,9 @@ void Condition::write(std::ostream& out) const
 void Condition::addPort(const std::string& portname)
 {
     if (m_values.find(portname) == m_values.end()) {
-        m_values[portname] = value::Set();
+        m_values[portname] = value::SetFactory::create();
     }
+    m_last_port.assign(portname);
 }
 
 void Condition::delPort(const std::string& portname)
@@ -73,6 +80,7 @@ void Condition::addValueToPort(const std::string& portname,
         value::Set newset;
         newset->addValue(value);
         m_values[portname] = newset;
+        m_last_port.assign(portname);
     } else {
         it->second->addValue(value);
     }
@@ -98,6 +106,17 @@ const value::Value& Condition::nValue(const std::string& portname,
                                       size_t i) const
 {
     return getSetValues(portname)->getValue(i);
+}
+
+value::Set& Condition::last_added_port()
+{
+    iterator it = m_values.find(m_last_port);
+
+    Assert(utils::InternalError, it != m_values.end(),
+           boost::format("Condition %1% have no port %2%") %
+           m_name % m_last_port);
+
+    return it->second;
 }
 
 }} // namespace vle vpz

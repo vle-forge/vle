@@ -125,29 +125,34 @@ void VpzStackSax::push_port(const xmlpp::SaxParser::AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
     AssertS(utils::SaxParserError, m_vpz);
-    AssertS(utils::SaxParserError, m_stack.top()->isIn() or
-            m_stack.top()->isOut() or m_stack.top()->isState() or
-            m_stack.top()->isInit());
 
-    vpz::Base* type = pop();
+    if (m_stack.top()->isCondition()) {
+        push_condition_port(att);
+    } else {
+        AssertS(utils::SaxParserError, m_stack.top()->isIn() or
+                m_stack.top()->isOut() or m_stack.top()->isState() or
+                m_stack.top()->isInit());
 
-    AssertS(utils::SaxParserError, m_stack.top()->isModel());
+        vpz::Base* type = pop();
 
-    vpz::Model* mdl = static_cast < vpz::Model* >(m_stack.top());
-    graph::Model* gmdl = mdl->model();
-    
-    std::string name(get_attribute < std::string >(att, "name"));
+        AssertS(utils::SaxParserError, m_stack.top()->isModel());
 
-    if (type->isIn()) {
-        gmdl->addInputPort(name);
-    } else if (type->isOut()) {
-        gmdl->addOutputPort(name);
-    } else if (type->isState()) {
-        gmdl->addStatePort(name);
-    } else if (type->isInit()) {
-        gmdl->addInitPort(name);
+        vpz::Model* mdl = static_cast < vpz::Model* >(m_stack.top());
+        graph::Model* gmdl = mdl->model();
+
+        std::string name(get_attribute < std::string >(att, "name"));
+
+        if (type->isIn()) {
+            gmdl->addInputPort(name);
+        } else if (type->isOut()) {
+            gmdl->addOutputPort(name);
+        } else if (type->isState()) {
+            gmdl->addStatePort(name);
+        } else if (type->isInit()) {
+            gmdl->addInitPort(name);
+        }
+        m_stack.push(type);
     }
-    m_stack.push(type);
 }
 
 void VpzStackSax::push_porttype(const Glib::ustring& name)
@@ -357,11 +362,69 @@ void VpzStackSax::push_replicas(const xmlpp::SaxParser::AttributeList& att)
     rep.setNumber(get_attribute < size_t >(att, "number"));
 }
 
+void VpzStackSax::push_conditions()
+{
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_vpz);
+    AssertS(utils::SaxParserError, m_stack.top()->isExperiment());
+
+    m_stack.push(&m_vpz->project().experiment().conditions());
+}
+
+void VpzStackSax::push_condition(const xmlpp::SaxParser::AttributeList& att)
+{
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_vpz);
+    AssertS(utils::SaxParserError, m_stack.top()->isConditions());
+
+    vpz::Conditions& cnds(m_vpz->project().experiment().conditions());
+    std::string name(get_attribute < std::string >(att, "name"));
+
+    vpz::Condition newcondition(name);
+    cnds.addCondition(newcondition);
+
+    vpz::Condition& cnd(cnds.find(name));
+    m_stack.push(&cnd);
+}
+
+void VpzStackSax::push_condition_port(const xmlpp::SaxParser::AttributeList& att)
+{
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_vpz);
+    AssertS(utils::SaxParserError, m_stack.top()->isCondition());
+
+    std::string name(get_attribute < std::string >(att, "name"));
+
+    vpz::Condition* cnd(static_cast < vpz::Condition* >(m_stack.top()));
+    cnd->addPort(name);
+
+    // FIXME se mettre dans un mode pour lire les values et les attachées au
+    // port venant d'être créé.
+}
+
+value::Set& VpzStackSax::pop_condition_port()
+{
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_vpz);
+    AssertS(utils::SaxParserError, m_stack.top()->isCondition());
+
+    vpz::Condition* cnd(static_cast < vpz::Condition* >(m_stack.top()));
+    value::Set& vals(cnd->last_added_port());
+
+    return vals;
+}
+
 vpz::Base* VpzStackSax::pop()
 {
     vpz::Base* top = m_stack.top();
     m_stack.pop();
     return top;
+}
+
+const vpz::Base* VpzStackSax::top() const
+{
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    return m_stack.top();
 }
 
 vpz::Vpz& VpzStackSax::vpz()
@@ -463,6 +526,10 @@ void VLESaxParser::on_start_element(
         m_vpzstack.push_experiment(att);
     } else if (name == "replicas") {
         m_vpzstack.push_replicas(att);
+    } else if (name == "conditions") {
+        m_vpzstack.push_conditions();
+    } else if (name == "condition") {
+        m_vpzstack.push_condition(att);
     } else {
         Throw(utils::SaxParserError,
               (boost::format("Unknow element %1%") % name));
@@ -499,9 +566,18 @@ void VLESaxParser::on_end_element(const Glib::ustring& name)
         value::Table table = value::to_table(m_valuestack.top_value());
         table->fill(lastCharactersStored());
         m_valuestack.pop_value();
+    } else if (name == "port" and m_vpzstack.top()->isCondition()) {
+        value::Set& vals(m_vpzstack.pop_condition_port());
+        std::vector < value::Value >& lst(get_values());
+        for (std::vector < value::Value >::iterator it =
+             lst.begin(); it != lst.end(); ++it) {
+            vals->addValue(*it);
+        }
+        m_valuestack.clear();
     } else if (name == "in" or name == "out" or name == "state" or name ==
                "init" or name == "structures" or name == "model" or name ==
-               "submodels" or name == "vle_project" or name == "connections") {
+               "submodels" or name == "vle_project" or name == "connections"
+               or name == "conditions" or name == "condition") {
         m_vpzstack.pop();
     } else if (name == "destination") {
         m_vpzstack.build_connection();
@@ -541,6 +617,11 @@ void VLESaxParser::on_cdata_block(const Glib::ustring& /* text */)
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 const std::vector < value::Value >& VLESaxParser::get_values() const
+{
+    return m_valuestack.get_results();
+}
+
+std::vector < value::Value >& VLESaxParser::get_values()
 {
     return m_valuestack.get_results();
 }

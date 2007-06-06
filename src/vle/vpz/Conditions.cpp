@@ -61,7 +61,7 @@ void Conditions::addCondition(const Condition& condition)
 {
     const_iterator it = m_conditions.find(condition.name());
     
-    Assert(utils::InternalError, it != m_conditions.end(),
+    Assert(utils::InternalError, it == m_conditions.end(),
            boost::format("The condition %1% already exist") %
            condition.name());
 

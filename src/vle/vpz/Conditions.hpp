@@ -79,7 +79,8 @@ namespace vle { namespace vpz {
         /** 
          * @brief Add a condition into the conditions list.
          * 
-         * @param condition the condition to add.
+         * @param condition the condition to add into the map. Condition is
+         * copied.
          *
          * @throw Exception::Internal if condition with same name and port
          * already exist.

@@ -48,7 +48,7 @@ namespace vle { namespace vpz {
         ~VpzStackSax() { }
 
         vpz::Vpz* push_vpz(const std::string& author, float version,
-                      const std::string& date);
+                           const std::string& date);
         void push_structure();
         void push_model(const xmlpp::SaxParser::AttributeList& att);
         void push_port(const xmlpp::SaxParser::AttributeList& att);
@@ -63,7 +63,12 @@ namespace vle { namespace vpz {
         void push_dynamic(const xmlpp::SaxParser::AttributeList& att);
         void push_experiment(const xmlpp::SaxParser::AttributeList& att);
         void push_replicas(const xmlpp::SaxParser::AttributeList& att);
+        void push_conditions();
+        void push_condition(const xmlpp::SaxParser::AttributeList& att);
+        void push_condition_port(const xmlpp::SaxParser::AttributeList& att);
+        value::Set& pop_condition_port();
         vpz::Base* pop();
+        const vpz::Base* top() const;
 
         vpz::Vpz& vpz();
 
@@ -122,6 +127,7 @@ namespace vle { namespace vpz {
         { return m_isTrame; }
 
         const std::vector < value::Value >& get_values() const;
+        std::vector < value::Value >& get_values();
 
         const value::Value& get_value(const size_t pos) const;
 

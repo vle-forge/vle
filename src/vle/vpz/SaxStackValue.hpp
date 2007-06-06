@@ -107,6 +107,9 @@ class ValueStackSax
         const std::vector < value::Value >& get_results() const
         { return m_result; }
 
+        std::vector < value::Value >& get_results()
+        { return m_result; }
+
     private:
         /** 
          * @brief Test if top of values stack are a composite like map, set,

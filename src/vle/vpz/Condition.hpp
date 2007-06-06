@@ -45,6 +45,8 @@ namespace vle { namespace vpz {
 
         Condition();
 
+        Condition(const std::string& name);
+
         virtual ~Condition() 
         { }
 
@@ -99,6 +101,9 @@ namespace vle { namespace vpz {
         inline const std::string& name() const
         { return m_name; }
 
+        inline void setName(const std::string& name)
+        { m_name.assign(name); }
+
         /** 
          * @brief Return the port, values dictionary.
          * 
@@ -116,7 +121,6 @@ namespace vle { namespace vpz {
         inline ValueList& values()
         { return m_values; }
 
-
         /** 
          * @brief Get the value::Set attached to a port.
          * 
@@ -127,7 +131,6 @@ namespace vle { namespace vpz {
          * @throw Exception::Internal if portname not exist.
          */
         const value::Set& getSetValues(const std::string& portname) const;
-
 
         /** 
          * @brief Return a reference to the first value::Value of the specified
@@ -154,10 +157,21 @@ namespace vle { namespace vpz {
          * have no nth value.
          */
         const value::Value& nValue(const std::string& portname, size_t i) const;
+
+        /** 
+         * @brief Return a reference to the value::Set of the latest added port.
+         * This function is principaly used in Sax parser.
+         * 
+         * @return A reference to the value::Set of the port.
+         *
+         * @throw Exception::Internal if port does not exist.
+         */
+        value::Set& last_added_port();
         
     private:
-        std::string             m_name;
-        ValueList               m_values;
+        std::string             m_name;         /* name of the condition. */
+        std::string             m_last_port;    /* latest added port. */
+        ValueList               m_values;       /* dic < portname, value >. */
     };
 
 }} // namespace vle vpz
