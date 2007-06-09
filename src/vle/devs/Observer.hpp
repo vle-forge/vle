@@ -1,7 +1,7 @@
 /**
  * @file devs/Observer.hpp
  * @author The VLE Development Team.
- * @brief Represent an observer on a devs::sAtomicModel and a port name.
+ * @brief Represent an observer on a devs::Simulator and a port name.
  */
 
 /*
@@ -43,12 +43,12 @@ namespace vle { namespace devs {
     class Observable
     {
     public:
-	sAtomicModel* model;
+	Simulator* model;
 	std::string portName;
 	std::string group;
 	int index;
 
-        Observable(sAtomicModel* p_model,
+        Observable(Simulator* p_model,
 		   const std::string& p_portName,
 		   const std::string& p_group,
 		   size_t p_index) :
@@ -61,7 +61,7 @@ namespace vle { namespace devs {
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief Represent an observer on a devs::sAtomicModel and a port name.
+     * @brief Represent an observer on a devs::Simulator and a port name.
      *
      */
     class Observer
@@ -71,7 +71,7 @@ namespace vle { namespace devs {
 
         virtual ~Observer();
 
-        void addObservable(sAtomicModel* p_model,
+        void addObservable(Simulator* p_model,
 			   const std::string& p_portName,
 			   const std::string& p_group,
 			   size_t p_index);
@@ -84,7 +84,7 @@ namespace vle { namespace devs {
 	 *
 	 * @return a reference to the first observable.
 	 */
-        inline sAtomicModel* getFirstModel() const {
+        inline Simulator* getFirstModel() const {
 	    return m_observableList.front().model;
 	}
 
@@ -115,12 +115,12 @@ namespace vle { namespace devs {
             devs::StateEvent* p_event) =0;
 
 	/**
-	 * Delete an observable for a specified sAtomicModel. Linear work.
+	 * Delete an observable for a specified Simulator. Linear work.
 	 *
 	 * @param model delete observable attached to the specified
-	 * sAtomicModel.
+	 * Simulator.
 	 */
-	void removeObservable(sAtomicModel* model);
+	void removeObservable(Simulator* model);
 
 	/**
 	 * Delete an observable for a specified AtomicModel. Linear work.

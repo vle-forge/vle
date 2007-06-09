@@ -46,13 +46,13 @@
 
 
 #define DECLARE_DYNAMICS(x) \
-extern "C" { vle::devs::Dynamics* makeNewDynamics(vle::devs::sAtomicModel* model) \
+extern "C" { vle::devs::Dynamics* makeNewDynamics(vle::devs::Simulator* model) \
 { return new x(model); } }
 
 namespace vle { namespace devs {
 
-    class sAtomicModel;
     class Simulator;
+    class Coordinator;
 
     /**
      * @brief Dynamics class represent a part of the DEVS simulator. This class
@@ -67,7 +67,7 @@ namespace vle { namespace devs {
 	 *
 	 * @param model the atomic model to which belongs the dynamics
 	 */
-        Dynamics(sAtomicModel* model) : 
+        Dynamics(const graph::AtomicModel& model) : 
             m_model(model)
         { }
 
@@ -86,7 +86,7 @@ namespace vle { namespace devs {
 	 *
 	 * @return pointer on the atomic model
 	 */
-        inline sAtomicModel* getModel() const
+        inline const graph::AtomicModel& getModel() const
         { return m_model; }
 
 	/**
@@ -95,7 +95,7 @@ namespace vle { namespace devs {
 	 * @return name of the atomic model
 	 */
         inline const std::string& getModelName() const 
-        { return m_model->getName(); }
+        { return m_model.getName(); }
 
 	/**
 	 * Build a Double object from a double value
@@ -150,13 +150,10 @@ namespace vle { namespace devs {
 	 * a specified time
 	 *
 	 * @param portName the name of port where the event will post
-	 * @param currentTime the time of the occurrence of the event
 	 *
 	 * @return the event list with the event
 	 */
-        ExternalEventList* buildEvent(
-                           const std::string& portName,
-                           const Time& currentTime) const;
+        ExternalEventList* buildEvent(const std::string& portName) const;
 
 	/**
 	 * Build an event list with a single event which is attached a
@@ -166,15 +163,13 @@ namespace vle { namespace devs {
 	 * @param attributeName the name of the attribute attached to
 	 * the event
 	 * @param attributeValue the double value given to the attribute
-	 * @param currentTime the time of the occurrence of the event
 	 *
 	 * @return the event list with the event
 	 */
         ExternalEventList* buildEventWithADouble(
                            const std::string& portName,
                            const std::string& attributeName,
-                           double attributeValue,
-                           const Time& currentTime) const;
+                           double attributeValue) const;
 
 	/**
 	 * Build an event list with a single event which is attached a
@@ -184,15 +179,13 @@ namespace vle { namespace devs {
 	 * @param attributeName the name of the attribute attached to
 	 * the event
 	 * @param attributeValue the long value given to the attribute
-	 * @param currentTime the time of the occurrence of the event
 	 *
 	 * @return the event list with the event
 	 */
         ExternalEventList* buildEventWithAInteger(
                             const std::string& portName,
                             const std::string& attributeName,
-                            long attributeValue,
-                            const Time& currentTime) const;
+                            long attributeValue) const;
 
 	/**
 	 * Build an event list with a single event which is attached a
@@ -202,15 +195,13 @@ namespace vle { namespace devs {
 	 * @param attributeName the name of the attribute attached to
 	 * the event
 	 * @param attributeValue the bool value given to the attribute
-	 * @param currentTime the time of the occurrence of the event
 	 *
 	 * @return the event list with the event
 	 */
         ExternalEventList* buildEventWithABoolean(
                            const std::string& portName,
                            const std::string& attributeName,
-                           bool attributeValue,
-                           const Time& currentTime) const;
+                           bool attributeValue) const;
 
 	/**
 	 * Build an event list with a single event which is attached a
@@ -220,18 +211,18 @@ namespace vle { namespace devs {
 	 * @param attributeName the name of the attribute attached to
 	 * the event
 	 * @param attributeValue the string value given to the attribute
-	 * @param currentTime the time of the occurrence of the event
 	 *
 	 * @return the event list with the event
 	 */
         ExternalEventList* buildEventWithAString(
                            const std::string& portName,
                            const std::string& attributeName,
-                           const std::string& attributeValue,
-                           const Time& currentTime) const;
+                           const std::string& attributeValue) const;
 
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ 	  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
 	/**
@@ -249,7 +240,10 @@ namespace vle { namespace devs {
 	 *
 	 * @return the event list
 	 */
-        virtual ExternalEventList* getOutputFunction(const Time& time);
+        virtual ExternalEventList* getOutputFunction(
+            const Time& /* time */)
+        { return new ExternalEventList(); }
+
 
 	/**
 	 * Time advance function: compute the duration of state
@@ -282,60 +276,9 @@ namespace vle { namespace devs {
          * to Instantaneous event.
          */
         virtual Event::EventType processConflict(
-                                const InternalEvent& internal,
-                                const ExternalEventList& extEventlist,
-                                const InstantaneousEventList& instEventlist);
-
-        /**
-         * Compute the selected event when an internal event and external events
-         * occurs at the same time. Default take internal.
-         * 
-         * @param internal the internal event.
-         * @param extEventlist the external events list.
-         *
-         * @return true if priority to Internal Event, false to External events.
-         */
-        virtual bool  processConflict(const InternalEvent& internal,
-                                      const ExternalEventList& extEventlist);
-
-        /**
-         * Compute the selected event when an internal event and
-         * Instantaneous events occurs at the same time. Default take internal.
-         * 
-         * @param internal the internal event.
-         * @param instEventlist the instantaneous events list.
-         *
-         * @return true if priority to Internal Event, false to
-         * Instantaneous events.
-         */
-        virtual bool processConflict(
-                            const InternalEvent& internal,
-                            const InstantaneousEventList& instEventlist);
-
-        /**
-         * Compute the selected event when an external event and instantaneous
-         * events occurs at the same time. Default take external.
-         * 
-         * @param extEventlist the external events list.
-         * @param instEventlist the instantaneous event list.
-         *
-         * @return true if priority to External Event, false to
-         * Instantaneous events.
-         */
-        virtual bool processConflict(
-                            const ExternalEventList& extEventlist,
-                            const InstantaneousEventList& instEventlist);
-
-	/**
-	 * Ask to modeller to make a choice between all external event list.
-         * Simulator want a valid index.  Default return the first
-         * ExternalEvent.
-	 *
-	 * @param eventlist the list of external events.
-	 *
-	 * @return the index of element to get.
-	 */
-	virtual size_t processConflict(const ExternalEventList& eventlist);
+            const InternalEvent& /* internal */,
+            const ExternalEventList& /* extEventlist */) const
+        { return Event::INTERNAL; }
 
 	/**
 	 * Process the init events ; these events occurs only at the
@@ -343,7 +286,9 @@ namespace vle { namespace devs {
 	 *
 	 * @param event the init event with of the port
 	 */
-	virtual void processInitEvent(InitEvent* event);
+        virtual void processInitEvents(
+            const InitEventList& /* event */)
+        { }
 
 	/**
 	 * Compute the new state of the model with the internal
@@ -351,7 +296,9 @@ namespace vle { namespace devs {
 	 *
 	 * @param event the internal event with of the port
 	 */
-        virtual void processInternalEvent(InternalEvent* event);
+        virtual void processInternalEvent(
+            const InternalEvent& /* event */)
+        { }
 
 	/**
 	 * Compute the new state of the model when an external event
@@ -359,7 +306,10 @@ namespace vle { namespace devs {
 	 *
 	 * @param event the external event with of the port
 	 */
-        virtual void processExternalEvent(ExternalEvent* event);
+        virtual void processExternalEvents(
+            const ExternalEventList& /* event */,
+            const Time& /* time */)
+        { }
 
         /**
          * Process an instantaneous event ; these models occurs when an
@@ -372,7 +322,9 @@ namespace vle { namespace devs {
          * Instantaneous event.
          */
         virtual ExternalEventList* processInstantaneousEvent(
-                                                InstantaneousEvent* evt) const;
+            const InstantaneousEvent& /* event */,
+            const Time& /* time */) const
+        { return noEvent(); }
 
 	/**
 	 * Compute the current state of the model at a specified time and
@@ -383,10 +335,12 @@ namespace vle { namespace devs {
 	 *
 	 * @return the value of state variable
 	 */
-        virtual vle::value::Value processStateEvent(StateEvent* event) const;
+        virtual value::Value processStateEvent(
+            const StateEvent& /* event */) const
+        { return value::ValueBase::empty; }
 
     private:
-        sAtomicModel* m_model;
+        const graph::AtomicModel&   m_model;
     };
 
 }} // namespace vle devs

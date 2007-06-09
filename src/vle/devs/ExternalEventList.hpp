@@ -28,10 +28,12 @@
 
 #include <vle/devs/EventList.hpp>
 #include <vle/devs/ExternalEvent.hpp>
+#include <vle/vpz/Condition.hpp>
 
 namespace vle { namespace devs {
 
     typedef EventList < ExternalEvent* > ExternalEventList;
+    typedef vpz::Condition::ValueList    InitEventList;
     
 }} // namespace vle devs
 

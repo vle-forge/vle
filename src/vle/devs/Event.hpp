@@ -35,7 +35,7 @@
 
 namespace vle { namespace devs {
 
-    class sAtomicModel;
+    class Simulator;
 
     /**
      * @brief The Event base class. Define the base for internal,
@@ -47,15 +47,16 @@ namespace vle { namespace devs {
     public:
         /** Define an enumeration to type event in conflict function.
          */
-        enum EventType { INTERNAL, EXTERNAL, INSTANTANEOUS };
+        enum EventType { INTERNAL, EXTERNAL };
         
+        Event();
+
         /**
 	 * Generate a new Event with and model source name.
 	 *
-         * @param time arrived time.
          * @param model model source name.
          */
-        Event(const Time& time, sAtomicModel* model);
+        Event(Simulator* model);
 
         /**
 	 * Copy constructor.
@@ -70,10 +71,10 @@ namespace vle { namespace devs {
 	/**
 	 * Get the source model for internal, state and external events.
 	 *
-	 *
 	 * @return a reference to the model.
 	 */
-	inline sAtomicModel* getModel() { return m_source; }
+        inline Simulator* getModel()
+        { return m_source; }
 
         /**
 	 * Get the name of source model.
@@ -81,12 +82,6 @@ namespace vle { namespace devs {
 	 * @return model source name.
 	 */
         const std::string& getSourceModelName() const;
-
-        /**
-	 * @return arrived time.
-	 */
-        inline const Time& getTime() const
-        { return m_time; }
 
         /**
 	 * Invalidate Event, don't use it.
@@ -120,36 +115,9 @@ namespace vle { namespace devs {
          */
         virtual bool isState() const = 0;
 
-        /**
-	 * Inferior comparator use Time as key.
-         *
-	 * @param event Event to test, no test on validity.
-         * @return true if this Event is inferior to event.
-         */
-        inline virtual bool operator<(const Event * event) const
-        { return m_time < event->m_time; }
-
-        /**
-         * Superior comparator use Time as key.
-         *
-         * @param event Event to test, no test on validity.
-         *
-         * @return true if this Event is superior to event.
-         */
-        inline virtual bool operator>(const Event * event) const
-        { return m_time > event->m_time; }
-
-        /**
-         * Equality comparator use Time as key.
-         *
-         * @param event Event to test, no test on validity.
-         *
-         * @return true if this Event is equal to  event.
-         */
-        inline virtual bool operator==(const Event * event) const
-        { return m_time == event->m_time; }
-
-        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
         void putAttribute(vle::value::Map map);
 
@@ -159,8 +127,7 @@ namespace vle { namespace devs {
          * @param name std::string name of Value to add.
          * @param value Value to add, not clone.
          */
-        inline void putAttribute(const std::string& name,
-                                 value::Value value)
+        inline void putAttribute(const std::string& name, value::Value value)
         { m_attributes->addValue(name, value); }
 
         /**
@@ -305,10 +272,9 @@ namespace vle { namespace devs {
         { return m_attributes; }
 
     private:
-        Time            m_time;
-        sAtomicModel*   m_source;
+        Simulator*      m_source;
         bool            m_valid;
-        vle::value::Map m_attributes;
+        value::Map      m_attributes;
     };
 
 }} // namespace vle devs

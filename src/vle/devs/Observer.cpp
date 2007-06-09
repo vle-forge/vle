@@ -1,7 +1,7 @@
 /**
  * @file devs/Observer.cpp
  * @author The VLE Development Team.
- * @brief Represent an observer on a devs::sAtomicModel and a port name.
+ * @brief Represent an observer on a devs::Simulator and a port name.
  */
 
 /*
@@ -24,7 +24,7 @@
  */
 
 #include <vle/devs/Observer.hpp>
-#include <vle/devs/sAtomicModel.hpp>
+#include <vle/devs/Simulator.hpp>
 #include <vle/devs/Stream.hpp>
 
 namespace vle { namespace devs {
@@ -41,7 +41,7 @@ Observer::~Observer()
     delete m_stream;
 }
 
-void Observer::addObservable(sAtomicModel* p_model,
+void Observer::addObservable(Simulator* p_model,
                              const std::string & p_portName,
                              const std::string & p_group,
                              size_t p_index)
@@ -88,7 +88,7 @@ const std::string & Observer::getFirstGroup() const
     return m_observableList.front().group;
 }
 
-void Observer::removeObservable(sAtomicModel* model)
+void Observer::removeObservable(Simulator* model)
 {
     std::vector < Observable >::iterator it;
 

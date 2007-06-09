@@ -40,27 +40,29 @@ namespace vle { namespace devs {
     {
     public:
 	StateEvent(const Time& time,
-		   sAtomicModel* model,
+		   Simulator* model,
 		   const std::string& observerName,
 		   const std::string& portName) :
-	    Event(time, model),
+            Event(model),
+            m_time(time),
 	    m_observerName(observerName),
 	    m_portName(portName)
-	    { }
+	{ }
 
 	StateEvent(const StateEvent& event) :
 	    Event(event),
 	    m_observerName(event.m_observerName),
 	    m_portName(event.m_portName)
-	    { }
+	{ }
 
-	virtual ~StateEvent()  { }
+        virtual ~StateEvent()
+        { }
 
 	inline const std::string& getObserverName() const
-	    { return m_observerName; }
+        { return m_observerName; }
 
 	inline const std::string& getPortName() const
-	    { return m_portName; }
+        { return m_portName; }
 
 	virtual bool isExternal() const;
 
@@ -71,9 +73,45 @@ namespace vle { namespace devs {
 	virtual bool isState() const;
 
 	inline bool onPort(std::string const& portName) const
-	    { return m_portName == portName; }
+        { return m_portName == portName; }
+
+        /**
+	 * @return arrived time.
+	 */
+        inline const Time& getTime() const
+        { return m_time; }
+
+        /**
+	 * Inferior comparator use Time as key.
+         *
+	 * @param event Event to test, no test on validity.
+         * @return true if this Event is inferior to event.
+         */
+        inline virtual bool operator<(const StateEvent* event) const
+        { return m_time < event->m_time; }
+
+        /**
+         * Superior comparator use Time as key.
+         *
+         * @param event Event to test, no test on validity.
+         *
+         * @return true if this Event is superior to event.
+         */
+        inline virtual bool operator>(const StateEvent* event) const
+        { return m_time > event->m_time; }
+
+        /**
+         * Equality comparator use Time as key.
+         *
+         * @param event Event to test, no test on validity.
+         *
+         * @return true if this Event is equal to  event.
+         */
+        inline virtual bool operator==(const StateEvent * event) const
+        { return m_time == event->m_time; }
 
     private:
+        Time        m_time;
 	std::string m_observerName;
 	std::string m_portName;
     };

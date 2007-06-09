@@ -25,7 +25,7 @@
  */
 
 #include <vle/devs/Event.hpp>
-#include <vle/devs/sAtomicModel.hpp>
+#include <vle/devs/Simulator.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
 #include <vle/value/Boolean.hpp>
@@ -37,8 +37,14 @@
 
 namespace vle { namespace devs {
 
-Event::Event(const Time& time, sAtomicModel* model) :
-    m_time(time),
+Event::Event() :
+    m_source(0),
+    m_valid(true),
+    m_attributes(value::MapFactory::create())
+{ 
+}
+
+Event::Event(Simulator* model) :
     m_source(model),
     m_valid(true),
     m_attributes(value::MapFactory::create())
@@ -46,7 +52,6 @@ Event::Event(const Time& time, sAtomicModel* model) :
 }
 
 Event::Event(const Event& event) :
-    m_time(event.m_time),
     m_source(event.m_source),
     m_valid(event.m_valid),
     m_attributes(event.m_attributes)
