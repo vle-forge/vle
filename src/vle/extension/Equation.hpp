@@ -27,7 +27,7 @@
 
 #include <libxml++/libxml++.h>
 
-#include <vle/devs/sAtomicModel.hpp>
+#include <vle/devs/Simulator.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/value/Value.hpp>
 
@@ -39,7 +39,7 @@ namespace vle { namespace extension {
         enum state { INIT, NEXT, RUN };
 
     public:
-        Equation(devs::sAtomicModel* p_model):devs::Dynamics(p_model) { }
+        Equation(devs::Simulator* p_model):devs::Dynamics(p_model) { }
         virtual ~Equation() { }
 
         // XML loading method

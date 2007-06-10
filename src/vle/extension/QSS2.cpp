@@ -140,7 +140,7 @@ Couple mfi::ext(const devs::Time& p_time, unsigned int i,const Couple & input)
   return ret;
 }
 
-qss2::qss2(devs::sAtomicModel* p_model) :
+qss2::qss2(devs::Simulator* p_model) :
   Dynamics(p_model),m_value(0),
   m_derivative(0),m_derivative2(0),m_index(0),m_index2(0),
   m_sigma(0),m_lastTime(0),m_mfi(0)

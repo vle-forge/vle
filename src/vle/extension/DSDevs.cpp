@@ -37,7 +37,7 @@
 
 namespace vle { namespace extension {
 
-DSDevs::DSDevs(devs::sAtomicModel* model) :
+DSDevs::DSDevs(devs::Simulator* model) :
     devs::Dynamics(model),
     m_state(IDLE),
     m_response(false),

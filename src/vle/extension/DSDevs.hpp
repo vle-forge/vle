@@ -30,7 +30,7 @@
 #include <libxml++/libxml++.h>
 #include <list>
 
-#include <vle/devs/sAtomicModel.hpp>
+#include <vle/devs/Simulator.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/value/Value.hpp>
@@ -124,7 +124,7 @@ namespace vle { namespace extension {
             ADD_CONNECTION, REMOVE_CONNECTION, CHANGE_CONNECTION, ADD_INPUTPORT,
             REMOVE_INPUTPORT, ADD_OUTPUTPORT, REMOVE_OUTPUTPORT, BAG };
 
-	DSDevs(devs::sAtomicModel* model);
+	DSDevs(devs::Simulator* model);
 
 	virtual ~DSDevs() { }
 

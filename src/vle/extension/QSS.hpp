@@ -37,7 +37,7 @@ namespace vle { namespace extension {
     public:
         enum state { INIT, RUN };
 
-        qss(devs::sAtomicModel* p_model);
+        qss(devs::Simulator* p_model);
         virtual ~qss() { }
 
         // XML loading method

@@ -45,7 +45,7 @@ using namespace devs;
 using namespace utils::xml;
 using namespace utils;
 
-CellQSS::CellQSS(devs::sAtomicModel* p_model):CellDevs(p_model),
+CellQSS::CellQSS(devs::Simulator* p_model):CellDevs(p_model),
 					      m_gradient(0),m_index(0),
 					      m_sigma(0),
 					      m_lastTime(0),

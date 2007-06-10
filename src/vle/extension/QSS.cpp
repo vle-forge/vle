@@ -32,7 +32,7 @@ using namespace extension;
 using namespace utils;
 using namespace utils::xml;
 
-qss::qss(devs::sAtomicModel* p_model) :
+qss::qss(devs::Simulator* p_model) :
   Dynamics(p_model),
   m_gradient(0),m_index(0),
   m_value(0),m_sigma(0),m_lastTime(0),

@@ -25,7 +25,7 @@
 
 #include "SDMLStream.hpp"
 #include <vle/value/Value.hpp>
-#include <vle/devs/sAtomicModel.hpp>
+#include <vle/devs/Simulator.hpp>
 
 
 namespace vle { namespace stream {
