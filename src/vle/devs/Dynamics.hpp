@@ -234,46 +234,45 @@ namespace vle { namespace devs {
         { }
 
 	/**
-	 * Compute the output function
+	 * Compute the output function.
 	 *
-	 * @param time the time of the occurrence of output function
+         * @param time the time of the occurrence of output function.
+         * @param output the list of external events (output parameter).
 	 *
-	 * @return the event list
 	 */
-        virtual ExternalEventList* getOutputFunction(
-            const Time& /* time */)
-        { return new ExternalEventList(); }
+        virtual void getOutputFunction(
+            const Time& /* time */,
+            ExternalEventList& /* output */)
+        { }
 
 
 	/**
-	 * Time advance function: compute the duration of state
+	 * Time advance function: compute the duration of the current state.
 	 *
-	 * @return duration of the current state
+	 * @return duration of the current state.
 	 */
         virtual Time getTimeAdvance()
         { return Time::infinity; }
 
 	/**
-	 * Initialize the model: compute the initial state
+	 * Initialize the model by initializing the initial state and return
+         * the date of the first time advance.
 	 *
-	 * @return duration of the initial state
+	 * @return duration of the initial state.
 	 */
         virtual Time init()
         { return Time::infinity; }
 
         /**
-         * Compute the selected event when an external event, instantaneous
-         * event and an internal event occurs at the same time. Default, take
-         * Internal event Ask modeller to make a choice between the internal
-         * event or external event list. 
+         * Compute the selected event when an external event and an internal
+         * event occurs at the same time. By default, the internal event
+         * is process. This function  ask modeller to make a choice between the
+         * internal event or external event list. 
          *
          * @param internal the internal event.
          * @param extEventlist the external events list.
-         * @param instEventlist the instantaneous events list.
          *
-         * @return Event::INTERNAL if internal is priority, Event::EXTERNAL if
-         * external event is priority or Event::INSTANTANEOUS if the priority is
-         * to Instantaneous event.
+         * @return Event::INTERNAL if internal is priority or Event::EXTERNAL.
          */
         virtual Event::EventType processConflict(
             const InternalEvent& /* internal */,
@@ -281,18 +280,18 @@ namespace vle { namespace devs {
         { return Event::INTERNAL; }
 
 	/**
-	 * Process the init events ; these events occurs only at the
-	 * beginning of the simulation and initialize the state of the model.
+         * Process the init events: these events occurs only at the beginning
+         * of the simulation and initialize the state of the model.
 	 *
-	 * @param event the init event with of the port
+	 * @param event the init event list.
 	 */
         virtual void processInitEvents(
             const InitEventList& /* event */)
         { }
 
 	/**
-	 * Compute the new state of the model with the internal
-	 * transition function.
+         * Compute the new state of the model with the internal transition
+         * function.
 	 *
 	 * @param event the internal event with of the port
 	 */
@@ -301,10 +300,10 @@ namespace vle { namespace devs {
         { }
 
 	/**
-	 * Compute the new state of the model when an external event
-	 * occurs.
+         * Compute the new state of the model when an external event occurs.
 	 *
-	 * @param event the external event with of the port
+         * @param event the external event with of the port.
+         * @param time the date of occurrence of this event.
 	 */
         virtual void processExternalEvents(
             const ExternalEventList& /* event */,
@@ -312,19 +311,22 @@ namespace vle { namespace devs {
         { }
 
         /**
-         * Process an instantaneous event ; these models occurs when an
-         * IntantaneousEvent is push into ExternalEventList by OutputFunction or
-         * by processInstantaneousEvent.
+         * Process an instantaneous event: these functions occurs when an
+         * IntantaneousEvent is push into an ExternalEventList by
+         * OutputFunction or by processInstantaneousEvent.
          *
-         * @param evt InstantaneousEvent to compute
+         * @param evt InstantaneousEvent to process.
+         * @param time the date of occurrence of this event.
+         * @param output the list of external events (output parameter).
          *
          * @return a response to the model. This bag can include External and
          * Instantaneous event.
          */
-        virtual ExternalEventList* processInstantaneousEvent(
+        virtual void processInstantaneousEvent(
             const InstantaneousEvent& /* event */,
-            const Time& /* time */) const
-        { return noEvent(); }
+            const Time& /* time */,
+            ExternalEventList& /* output */) const
+        { }
 
 	/**
 	 * Compute the current state of the model at a specified time and

@@ -67,7 +67,9 @@ namespace vle { namespace devs {
 
 	void finish();
 
-        ExternalEventList* getOutputFunction(const Time& currentTime);
+        void getOutputFunction(
+            const Time& currentTime,
+            ExternalEventList& output);
 
         Time getTimeAdvance();
 
@@ -87,9 +89,10 @@ namespace vle { namespace devs {
             const ExternalEventList& event,
             const Time& time);
         
-        ExternalEventList* processInstantaneousEvent(
+        void processInstantaneousEvent(
             const InstantaneousEvent& event,
-            const Time& time);
+            const Time& time,
+            ExternalEventList& output);
 
         StateEvent* processStateEvent(
             const StateEvent& event) const;

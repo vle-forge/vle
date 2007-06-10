@@ -208,7 +208,7 @@ namespace vle { namespace devs {
          * @param eventList the external event list to treat.
          * @param bags output parameter to add Instantaneous events.
          */
-        void dispatchExternalEvent(ExternalEventList* eventList,
+        void dispatchExternalEvent(ExternalEventList& eventList,
                                    CompleteEventBagModel& bags);
 
 	void dispatchInternalEvent(InternalEvent * event);

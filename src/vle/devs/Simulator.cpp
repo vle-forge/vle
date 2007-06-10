@@ -109,9 +109,10 @@ void Simulator::finish()
     m_dynamics->finish();
 }
 
-ExternalEventList* Simulator::getOutputFunction(const Time& currentTime)
+void Simulator::getOutputFunction(const Time& currentTime,
+                                  ExternalEventList& output)
 {
-    return m_dynamics->getOutputFunction(currentTime);
+    m_dynamics->getOutputFunction(currentTime, output);
 }
 
 Time Simulator::getTimeAdvance()
@@ -150,11 +151,12 @@ InternalEvent* Simulator::processExternalEvents(
     return buildInternalEvent(time);
 }
 
-ExternalEventList* Simulator::processInstantaneousEvent(
+void Simulator::processInstantaneousEvent(
     const InstantaneousEvent& event,
-    const Time& time)
+    const Time& time,
+    ExternalEventList& output)
 {
-    return m_dynamics->processInstantaneousEvent(event, time);
+    m_dynamics->processInstantaneousEvent(event, time, output);
 }
 
 StateEvent* Simulator::processStateEvent(const StateEvent& event) const

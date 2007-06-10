@@ -261,42 +261,40 @@ void Coordinator::init()
     }
 }
 
-void Coordinator::dispatchExternalEvent(ExternalEventList* eventList,
+void Coordinator::dispatchExternalEvent(ExternalEventList& eventList,
                                         CompleteEventBagModel& bags)
 {
-    if (eventList) {
-        const size_t sz = eventList->size();
-        size_t i = 0;
+    const size_t sz = eventList.size();
+    size_t i = 0;
 
-        while (i < sz) {
-            ExternalEvent* event = eventList->at(i);
+    while (i < sz) {
+        ExternalEvent* event = eventList.at(i);
 
-            vector < graph::TargetPort* > v_targetPortList =
-                getTargetPortList(event->getModel()->getStructure(),
-                                  event->getPortName());
+        vector < graph::TargetPort* > v_targetPortList =
+            getTargetPortList(event->getModel()->getStructure(),
+                              event->getPortName());
 
-            vector < graph::TargetPort* >::iterator it2 =
-                v_targetPortList.begin();
+        vector < graph::TargetPort* >::iterator it2 =
+            v_targetPortList.begin();
 
-            while (it2 != v_targetPortList.end()) {
-                graph::TargetPort *v_port = *it2;
-                Simulator* dst = m_modelList[v_port->getModel()];
+        while (it2 != v_targetPortList.end()) {
+            graph::TargetPort *v_port = *it2;
+            Simulator* dst = m_modelList[v_port->getModel()];
 
-                if (event->isInstantaneous()) {
-                    bags.addInstantaneous(dst,
-                        new InstantaneousEvent(event, dst,
-                                               v_port->getPortName()));
-                } else {
-                    m_eventTable.putExternalEvent(
-                        new ExternalEvent(event, dst, v_port->getPortName()));
-                }
-                delete *it2;
-                ++it2;
+            if (event->isInstantaneous()) {
+                bags.addInstantaneous(
+                    dst, new InstantaneousEvent(event, dst,
+                                                v_port->getPortName()));
+            } else {
+                m_eventTable.putExternalEvent(
+                    new ExternalEvent(event, dst, v_port->getPortName()));
             }
-            ++i;
+            delete *it2;
+            ++it2;
         }
-        eventList->clear(true);
+        ++i;
     }
+    eventList.clear(true);
 }
 
 void Coordinator::dispatchInternalEvent(InternalEvent* event)
@@ -628,9 +626,9 @@ void Coordinator::processInternalEvent(
     modelbag.delInternal();
 
     {
-        ExternalEventList* result(sim->getOutputFunction(m_currentTime));
+        ExternalEventList result;
+        sim->getOutputFunction(m_currentTime, result);
         dispatchExternalEvent(result, bag);
-        delete result;
     }
 
     {
@@ -671,12 +669,12 @@ void Coordinator::processInstantaneousEvents(
     InstantaneousEventList& lst(modelbag.instantaneous());
     modelbag.delInstantaneous();
 
+    ExternalEventList result;
     for (InstantaneousEventList::iterator it = lst.begin(); it != lst.end();
          ++it) {
-        ExternalEventList* result(sim->processInstantaneousEvent(
-                **it, m_currentTime));
+        sim->processInstantaneousEvent(**it, m_currentTime, result);
         dispatchExternalEvent(result, bag);
-        delete result;
+        result.clear();
     }
 }
 
