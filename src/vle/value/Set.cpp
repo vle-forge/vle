@@ -83,14 +83,14 @@ std::string SetFactory::toString() const
 
 std::string SetFactory::toXML() const
 {
-    std::string s="<SET>";
+    std::string s="<set>";
     VectorValueConstIt it = m_value.begin();
 
     while (it != m_value.end()) {
 	s += (*it)->toXML();
 	++it;
     }
-    s += "</SET>";
+    s += "</set>";
     return s;
 }
 
