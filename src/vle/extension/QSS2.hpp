@@ -68,7 +68,7 @@ namespace vle { namespace extension {
         friend class mfi;
 
     public:
-        qss2(devs::sAtomicModel* p_model);
+        qss2(devs::Simulator* p_model);
         virtual ~qss2() { }
 
         // XML loading method

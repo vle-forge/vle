@@ -30,7 +30,7 @@
 #include <vle/devs/InternalEvent.hpp>
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/devs/StateEvent.hpp>
-#include <vle/devs/sAtomicModel.hpp>
+#include <vle/devs/Simulator.hpp>
 #include <vle/devs/DevsTypes.hpp>
 #include <vle/devs/EventList.hpp>
 #include <string>
@@ -42,13 +42,25 @@
 namespace vle { namespace devs {
 
     /**
-     * Compare two events with Time like comparator.
+     * Compare two internals events with devs::Time like comparator.
      *
-     * @param e1 first event to compare
-     * @param e2 second event to compare
-     * @return true if Time e1 is more recent than Time e2.
+     * @param e1 first event to compare.
+     * @param e2 second event to compare.
+     * @return true if devs::Time e1 is more recent than devs::Time e2.
      */
-    inline bool timeLessThan(const Event* e1, const Event* e2)
+    inline bool internalLessThan(const InternalEvent* e1,
+                                 const InternalEvent* e2)
+    { return (e1->getTime() > e2->getTime()); }
+
+    /**
+     * Compare two states events with devs::Time like comparator.
+     *
+     * @param e1 first event to compare.
+     * @param e2 second event to compare.
+     * @return true if devs::Time e1 is more recent than devs::Time e2.
+     */
+    inline bool stateLessThan(const StateEvent* e1,
+                              const StateEvent* e2)
     { return (e1->getTime() > e2->getTime()); }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -85,6 +97,9 @@ namespace vle { namespace devs {
         inline void delExternal(size_t i)
         { _extev.erase(i); }
 
+        inline void delExternals()
+        { _extev.clear(); }
+
 
         inline void addInstantaneous(const InstantaneousEventList& evs)
         { _instev = evs; }
@@ -95,8 +110,8 @@ namespace vle { namespace devs {
         inline InstantaneousEventList& instantaneous()
         { return _instev; }
 
-        inline void delInstantaneous(size_t i)
-        { _instev.erase(i); }
+        inline void delInstantaneous()
+        { _instev.clear(); }
 
 
         inline bool empty() const
@@ -149,20 +164,20 @@ namespace vle { namespace devs {
 	 *
 	 * @return a reference to the a bag or a new bag.
 	 */
-	inline EventBagModel& getBag(sAtomicModel* m)
+	inline EventBagModel& getBag(Simulator* m)
         { return _bags[m]; }
 
-        inline void addInternal(sAtomicModel* m, InternalEvent* ev)
+        inline void addInternal(Simulator* m, InternalEvent* ev)
         { getBag(m).addInternal(ev); }
 
-        inline void addExternal(sAtomicModel* m, const ExternalEventList& lst)
+        inline void addExternal(Simulator* m, const ExternalEventList& lst)
         { getBag(m).addExternal(lst); }
 
-        inline void addInstantaneous(sAtomicModel* m,
+        inline void addInstantaneous(Simulator* m,
                                      const InstantaneousEventList& lst)
         { getBag(m).addInstantaneous(lst); }
         
-        inline void addInstantaneous(sAtomicModel* m,
+        inline void addInstantaneous(Simulator* m,
                                      InstantaneousEvent* evt)
         { getBag(m).addInstantaneous(evt); }
 
@@ -184,7 +199,7 @@ namespace vle { namespace devs {
         inline EventBagModel& topBag()
         { return (*_bags.begin()).second; }
 
-        inline sAtomicModel* topBagModel()
+        inline Simulator* topBagModel()
         { return (*_bags.begin()).first; }
 
         inline StateEvent* topStateEvent()
@@ -203,7 +218,7 @@ namespace vle { namespace devs {
         inline void popStates()
         { _states.clear(); }
 
-        void delModel(sAtomicModel*);
+        void delModel(Simulator*);
 
         friend std::ostream& operator<<(std::ostream& o,
                                         CompleteEventBagModel& c)
@@ -213,8 +228,8 @@ namespace vle { namespace devs {
         }
 
     private:
-        std::map < sAtomicModel*, EventBagModel > _bags;
-        std::deque < StateEvent* >                _states;
+        std::map < Simulator*, EventBagModel >  _bags;
+        std::deque < StateEvent* >              _states;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -296,15 +311,15 @@ namespace vle { namespace devs {
         { return mCurrentTime; }
 
         /** 
-         * @brief Delete all event from sAtomicModel.
+         * @brief Delete all event from Simulator.
          * 
          * @param mdl the model to delete events. 
          */
-        void delModelEvents(sAtomicModel* mdl);
+        void delModelEvents(Simulator* mdl);
 
     private:
-        typedef std::map < sAtomicModel*, InternalEvent* > InternalEventModel;
-        typedef std::map < sAtomicModel*, ExternalEventList >
+        typedef std::map < Simulator*, InternalEvent* > InternalEventModel;
+        typedef std::map < Simulator*, ExternalEventList >
             ExternalEventModel;
         
 	/**

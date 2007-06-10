@@ -39,11 +39,11 @@ namespace vle { namespace devs {
     class ExternalEvent;
     class InternalEvent;
     class InstantaneousEvent;
-    class sAtomicModel;
+    class Simulator;
 
     typedef std::deque < StateEvent* >    StateEventList;
     typedef std::vector < InternalEvent* > InternalEventList;
-    typedef std::pair < sAtomicModel*, std::string > StreamModelPort;
+    typedef std::pair < Simulator*, std::string > StreamModelPort;
     typedef std::map < StreamModelPort, vle::value::Value > StreamModelPortValue;
 
 }} // namespace vle devs

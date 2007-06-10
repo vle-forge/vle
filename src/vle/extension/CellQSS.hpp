@@ -84,7 +84,7 @@ namespace vle { namespace extension {
 	void setValue(unsigned int i,double p_value);
 
     public:
-	CellQSS(devs::sAtomicModel* p_model);
+	CellQSS(devs::Simulator* p_model);
 	virtual ~CellQSS() { }
 
 	// XML loading method

@@ -37,9 +37,9 @@
 
 namespace vle { namespace devs {
 
-void CompleteEventBagModel::delModel(sAtomicModel* mdl)
+void CompleteEventBagModel::delModel(Simulator* mdl)
 {
-    std::map < sAtomicModel*, EventBagModel >::iterator it = _bags.find(mdl);
+    std::map < Simulator*, EventBagModel >::iterator it = _bags.find(mdl);
     if (it != _bags.end())
         _bags.erase(it);
 
@@ -100,7 +100,7 @@ void EventTable::cleanInternalEventList()
 	   not mInternalEventList[0]->isValid()) {
 	delete mInternalEventList[0];
         std::pop_heap(mInternalEventList.begin(), mInternalEventList.end(),
-                      timeLessThan);
+                      internalLessThan);
         mInternalEventList.pop_back();
     }
 
@@ -112,7 +112,7 @@ void EventTable::cleanStateEventList()
            not mStateEventList[0]->isValid()) {
         delete mStateEventList[0];
         std::pop_heap(mStateEventList.begin(), mStateEventList.end(),
-                      timeLessThan);
+                      stateLessThan);
         mStateEventList.pop_back();
     }
 }
@@ -154,7 +154,7 @@ CompleteEventBagModel& EventTable::popEvent()
 	while (not mInternalEventList.empty() and
                mInternalEventList[0]->getTime() == mCurrentTime) {
             if (mInternalEventList[0]->isValid()) {
-                sAtomicModel* mdl = mInternalEventList[0]->getModel();
+                Simulator* mdl = mInternalEventList[0]->getModel();
                 EventBagModel& bagmodel = mCompleteEventBagModel.getBag(mdl);
                 bagmodel.addInternal(mInternalEventList[0]);
             }
@@ -162,7 +162,7 @@ CompleteEventBagModel& EventTable::popEvent()
 	}
 
 	while (not mExternalEventModel.empty()) {
-	    sAtomicModel* mdl = (*mExternalEventModel.begin()).first;
+	    Simulator* mdl = (*mExternalEventModel.begin()).first;
 	    mCompleteEventBagModel.getBag(mdl).addExternal(
 		(*mExternalEventModel.begin()).second);
 	    mExternalEventModel.erase(mExternalEventModel.begin());
@@ -182,7 +182,7 @@ bool EventTable::putInternalEvent(InternalEvent* event)
 {
     mInternalEventList.push_back(event);
     std::push_heap(mInternalEventList.begin(), mInternalEventList.end(),
-                   timeLessThan);
+                   internalLessThan);
 
     Assert(utils::InternalError, event->getModel(), "Put internal event.");
 
@@ -195,13 +195,13 @@ bool EventTable::putInternalEvent(InternalEvent* event)
 
 bool EventTable::putExternalEvent(ExternalEvent* event)
 {
-    sAtomicModel* mdl = event->getTarget();
+    Simulator* mdl = event->getTarget();
     Assert(utils::InternalError, mdl, "Put external event.");
 
     mExternalEventModel[mdl].addEvent(event);
     InternalEventModel::iterator it = mInternalEventModel.find(mdl);
-    if (it != mInternalEventModel.end() and
-	(*it).second and (*it).second->getTime() > event->getTime()) {
+    if (it != mInternalEventModel.end() and (*it).second and
+        (*it).second->getTime() > getCurrentTime()) {
 	(*it).second->invalidate();
 	(*it).second = 0;
     }
@@ -212,7 +212,7 @@ bool EventTable::putStateEvent(StateEvent* event)
 {
     mStateEventList.push_back(event);
     std::push_heap(mStateEventList.begin(), mStateEventList.end(),
-                   timeLessThan);
+                   stateLessThan);
 
     return true;
 }
@@ -222,7 +222,7 @@ void EventTable::popInternalEvent()
     if (not mInternalEventList.empty()) {
         InternalEvent* evt = mInternalEventList[0];
         std::pop_heap(mInternalEventList.begin(), mInternalEventList.end(),
-                      timeLessThan);
+                      internalLessThan);
         mInternalEventList.pop_back();
 	if (evt->isValid()) {
 	    mInternalEventModel[evt->getModel()] = 0;
@@ -236,12 +236,12 @@ void EventTable::popStateEvent()
 {
     if (not mStateEventList.empty()) {
         std::pop_heap(mStateEventList.begin(), mStateEventList.end(),
-                      timeLessThan);
+                      stateLessThan);
         mStateEventList.pop_back();
     }
 }
 
-void EventTable::delModelEvents(sAtomicModel* mdl)
+void EventTable::delModelEvents(Simulator* mdl)
 {
     {
         InternalEventModel::iterator it = mInternalEventModel.find(mdl);

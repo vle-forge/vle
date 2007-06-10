@@ -39,9 +39,9 @@ namespace vle { namespace devs {
     class InitEvent : public Event
     {
     public:
-	InitEvent(const Time& time, sAtomicModel* model,
+	InitEvent(Simulator* model,
 		  const std::string& portName) :
-            Event(time, model),
+            Event(model),
             m_portName(portName)
         { }
 

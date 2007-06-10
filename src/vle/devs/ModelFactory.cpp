@@ -23,8 +23,7 @@
  */
 
 #include <vle/devs/ModelFactory.hpp>
-#include <vle/devs/sModel.hpp>
-#include <vle/devs/sAtomicModel.hpp>
+#include <vle/devs/Simulator.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/graph/Model.hpp>
 #include <vle/graph/AtomicModel.hpp>
@@ -37,26 +36,26 @@
 
 namespace vle { namespace devs {
 
-ModelFactory::ModelFactory(Simulator& sim,
+ModelFactory::ModelFactory(Coordinator& coordinator,
                            const vpz::Dynamics& dyn,
                            const vpz::Classes& cls) :
-    mSimulator(sim),
+    mCoordinator(coordinator),
     mIndex(0),
     mDynamics(dyn),
     mClasses(cls)
 {
 }
 
-devs::SAtomicModelList ModelFactory::createModels(
+devs::SimulatorList ModelFactory::createModels(
                 const graph::AtomicModelVector& lst,
-                Simulator::sAtomicModelMap& result)
+                SimulatorMap& result)
 {
     return createModelsFromDynamics(lst, result, mDynamics);
 }
 
 graph::Model* ModelFactory::createModels(const std::string& classname,
-                                         devs::SAtomicModelList& lst,
-                                         Simulator::sAtomicModelMap& result)
+                                         devs::SimulatorList& lst,
+                                         SimulatorMap& result)
 {
     const vpz::Class& cl = mClasses.getClass(classname);
     graph::Model* clone = cl.model().model();
@@ -100,16 +99,15 @@ Glib::Module* ModelFactory::buildPlugin(const vpz::Dynamic& dyn)
     return module;
 }
 
-devs::SAtomicModelList ModelFactory::createModelsFromDynamics(
+devs::SimulatorList ModelFactory::createModelsFromDynamics(
                 const graph::AtomicModelVector& lst,
-                Simulator::sAtomicModelMap& result,
+                SimulatorMap& result,
                 const vpz::Dynamics& dyn)
 {
-    devs::SAtomicModelList newsatom;
+    devs::SimulatorList newsatom;
     graph::AtomicModelVector::const_iterator it;
     for (it = lst.begin(); it != lst.end(); ++it) {
-        sAtomicModel* a = new sAtomicModel((graph::AtomicModel*)(*it),
-                                           &mSimulator);
+        Simulator* a = new Simulator((graph::AtomicModel*)(*it));
         a->setIndex(mIndex++);
 
         const vpz::Dynamic& d = dyn.find((*it)->getName());
@@ -124,7 +122,7 @@ devs::SAtomicModelList ModelFactory::createModelsFromDynamics(
 
         Assert(utils::ParseError,
                result.find((graph::AtomicModel*)(*it)) == result.end(),
-               boost::format("Already existing sAtomicModel '%1%' name '%2%'\n") %
+               boost::format("Already existing Simulator '%1%' name '%2%'\n") %
                *it % (*it)->getName());
 
         newsatom.push_back(a);
@@ -152,7 +150,7 @@ Glib::Module* ModelFactory::getPlugin(const std::string& name)
             "Dynamics plugin '%1%' not found in model factory\n") % name);
 }
 
-void ModelFactory::attachDynamics(devs::sAtomicModel* atom,
+void ModelFactory::attachDynamics(devs::Simulator* atom,
                                   const vpz::Dynamic& /* dyn */,
                                   Glib::Module* module)
 {
@@ -164,7 +162,7 @@ void ModelFactory::attachDynamics(devs::sAtomicModel* atom,
             "Error in '%1%', function 'makeNewDynamics' not found '%2%'\n") %
         module->get_name() % Glib::Module::get_last_error());
 
-    call = ((Dynamics*(*)(sAtomicModel*))(makeNewDynamics))(atom);
+    call = ((Dynamics*(*)(Simulator*))(makeNewDynamics))(atom);
     Assert(utils::ParseError, call, boost::format(
             "Error in '%1%', function 'makeNewDynamics':"
             "problem allocation a new Dynamics '%2%'\n") %

@@ -116,6 +116,7 @@ namespace vle { namespace devs {
     inline Attribute attribute(const std::string& name,
                                value::Set value)
     { return Attribute(name, value); }
+
 }} // namespace vle devs
     
 #endif

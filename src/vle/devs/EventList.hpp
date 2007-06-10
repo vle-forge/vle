@@ -40,6 +40,9 @@ namespace vle { namespace devs {
     class EventList
     {   
     public:
+        typedef typename std::deque < Class >::iterator iterator;
+        typedef typename std::deque < Class >::const_iterator const_iterator;
+
 	EventList() { }
 
 	EventList(Class event)
@@ -59,6 +62,18 @@ namespace vle { namespace devs {
 
         inline Class front()
         { return m_eventList[0]; }
+
+        inline const_iterator begin() const
+        { return m_eventList.begin(); }
+
+        inline const_iterator end() const
+        { return m_eventList.end(); }
+
+        inline iterator begin()
+        { return m_eventList.begin(); }
+
+        inline iterator end()
+        { return m_eventList.end(); }
 
         inline void erase(size_t i)
         { m_eventList.erase(m_eventList.begin() + i); }

@@ -31,17 +31,18 @@
 
 namespace vle { namespace devs {
 
-    class sAtomicModel;
+    class Simulator;
 
     class InternalEvent : public Event
     {
     public:
-	InternalEvent(const Time& time, sAtomicModel* model) :
-	    Event(time, model)
-	    { }
+	InternalEvent(const Time& time, Simulator* model) :
+            Event(model),
+            m_time(time)
+	{ }
 
 	virtual ~ InternalEvent()
-	    { }
+	{ }
 
 	virtual bool isExternal() const;
 
@@ -50,6 +51,44 @@ namespace vle { namespace devs {
 	virtual bool isInternal() const;
 
 	virtual bool isState() const;
+
+        /**
+	 * @return arrived time.
+	 */
+        inline const Time& getTime() const
+        { return m_time; }
+
+        /**
+	 * Inferior comparator use Time as key.
+         *
+	 * @param event Event to test, no test on validity.
+         * @return true if this Event is inferior to event.
+         */
+        inline virtual bool operator<(const InternalEvent* event) const
+        { return m_time < event->m_time; }
+
+        /**
+         * Superior comparator use Time as key.
+         *
+         * @param event Event to test, no test on validity.
+         *
+         * @return true if this Event is superior to event.
+         */
+        inline virtual bool operator>(const InternalEvent * event) const
+        { return m_time > event->m_time; }
+
+        /**
+         * Equality comparator use Time as key.
+         *
+         * @param event Event to test, no test on validity.
+         *
+         * @return true if this Event is equal to  event.
+         */
+        inline virtual bool operator==(const InternalEvent * event) const
+        { return m_time == event->m_time; }
+
+    private:
+        Time        m_time;
     };
 
 }} // namespace vle devs

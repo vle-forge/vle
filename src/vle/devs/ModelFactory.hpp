@@ -26,6 +26,7 @@
 #define DEVS_MODELFACTORY_HPP
 
 #include <vle/devs/Simulator.hpp>
+#include <vle/devs/Coordinator.hpp>
 #include <vle/graph/Model.hpp>
 #include <vle/vpz/Dynamics.hpp>
 #include <vle/vpz/Classes.hpp>
@@ -34,8 +35,6 @@
 #include <glibmm/module.h>
 
 namespace vle { namespace devs {
-
-    class sModel;
 
     /**
      * @brief Read simulations plugin from models directories and manage models
@@ -51,7 +50,7 @@ namespace vle { namespace devs {
          * @param dyn the root dynamics of vpz::Dynamics to load.
          * @param cls the vpz::classes to parse vpz::Dynamics to load.
          */
-        ModelFactory(Simulator& sim,
+        ModelFactory(Coordinator& coordinator,
                      const vpz::Dynamics& dyn,
                      const vpz::Classes& cls);
 
@@ -62,23 +61,23 @@ namespace vle { namespace devs {
         { }
 
 	/**
-         * @brief Return sAtomicModel list to result map from Atomic Models
+         * @brief Return Simulator list to result map from Atomic Models
          * list.
 	 *
 	 * @param lst atomics models list.
-	 * @param result output parameter to fill with sAtomicModel.
+	 * @param result output parameter to fill with Simulator.
          *
-         * @return a list of newly sAtomicModel build.
+         * @return a list of newly Simulator build.
 	 */
-        devs::SAtomicModelList createModels(
+        devs::SimulatorList createModels(
                             const graph::AtomicModelVector& lst,
-                            Simulator::sAtomicModelMap& result);
+                            SimulatorMap& result);
 
         /** 
          * @brief Build a clone of stored class.
          * 
          * @param classname the classe name to clone.
-         * @param lst a reference to a list for the new sAtomicModel build.
+         * @param lst a reference to a list for the new Simulator build.
          * @param result a reference to add
          * 
          * @return a devs::Hierarchy of models.
@@ -86,31 +85,31 @@ namespace vle { namespace devs {
          * @throw Exception::BadArgument if classname does not exist.
          */
 	graph::Model* createModels(const std::string& classname,
-                                   SAtomicModelList& lst,
-                                   Simulator::sAtomicModelMap& result);
+                                   SimulatorList& lst,
+                                   SimulatorMap& result);
 
     private:
-	Simulator&          mSimulator;
+	Coordinator&        mCoordinator;
 	int                 mIndex;
         vpz::Dynamics       mDynamics;
         vpz::Classes        mClasses;
 
 
         /** 
-         * @brief Return a sAtomicModel list to result map from Atomic Models
+         * @brief Return a Simulator list to result map from Atomic Models
          * list.
          * 
          * @param lst the atomic model list.
          * @param result the associated graph::AtomicModel to
-         * devs::sAtomicModel. Output parameter.
+         * devs::Simulator. Output parameter.
          * @param dyn the dynamics stock of dynamic. Can be the VPZ or a
          * classes.
          * 
          * @return 
          */
-        devs::SAtomicModelList createModelsFromDynamics(
+        devs::SimulatorList createModelsFromDynamics(
                             const graph::AtomicModelVector& lst,
-                            Simulator::sAtomicModelMap& result,
+                            SimulatorMap& result,
                             const vpz::Dynamics& dyn);
 
 
@@ -141,16 +140,16 @@ namespace vle { namespace devs {
         Glib::Module* getPlugin(const std::string& dynamicname);
 
         /** 
-         * @brief Attach to the specified devs::sAtomicModel reference a
+         * @brief Attach to the specified devs::Simulator reference a
          * devs::Dynamics structures load from a new Glib::Module.
          * 
-         * @param atom the devs::sAtomicModel to attach devs::Dynamic.
+         * @param atom the devs::Simulator to attach devs::Dynamic.
          * @param dyn the io::Dynamic to initialise devs::Dynamic.
          * @param module the simulation dynamic library plugin.
          *
          * @throw Exception::Internal if XML cannot be parse.
          */
-        void attachDynamics(devs::sAtomicModel* atom, const vpz::Dynamic& dyn,
+        void attachDynamics(devs::Simulator* atom, const vpz::Dynamic& dyn,
                             Glib::Module* module);
     };
 

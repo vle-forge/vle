@@ -27,7 +27,7 @@
 
 #include <libxml++/libxml++.h>
 
-#include <vle/devs/sAtomicModel.hpp>
+#include <vle/devs/Simulator.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/value/Value.hpp>
 
@@ -58,7 +58,7 @@ namespace vle { namespace extension {
     std::vector < std::string > m_neighbourPortList;
 
   public:
-    CellDevs(devs::sAtomicModel* p_model):devs::Dynamics(p_model),
+    CellDevs(devs::Simulator* p_model):devs::Dynamics(p_model),
 					  m_modified(false) { }
     virtual ~CellDevs();
 

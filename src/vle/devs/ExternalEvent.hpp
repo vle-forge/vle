@@ -32,7 +32,7 @@
 
 namespace vle { namespace devs {
 
-    class sAtomicModel;
+    class Simulator;
 
     /**
      * @brief External event based on the devs::Event class and are build by
@@ -42,21 +42,26 @@ namespace vle { namespace devs {
     class ExternalEvent : public Event
     {
     public:
-	ExternalEvent(const std::string& sourcePortName,
-		      const Time& time,
-		      sAtomicModel* source) :
-	    Event(time, source),
+        ExternalEvent(const std::string& sourcePortName) :
+            Event(0),
             m_portName(sourcePortName),
             m_target(0)
-	    { }
+        { }
+
+	ExternalEvent(const std::string& sourcePortName,
+		      Simulator* source) :
+	    Event(source),
+            m_portName(sourcePortName),
+            m_target(0)
+	{ }
 
 	ExternalEvent(ExternalEvent* event,
-		      sAtomicModel* target,
+		      Simulator* target,
 		      const std::string& targetPortName) :
 	    Event(*event),
 	    m_portName(targetPortName),
 	    m_target(target)
-	    { }
+	{ }
 
 	virtual ~ExternalEvent()
         { }
@@ -64,7 +69,7 @@ namespace vle { namespace devs {
 	inline const std::string& getPortName() const
         { return m_portName; }
 
-	inline sAtomicModel* getTarget()
+	inline Simulator* getTarget()
         { return m_target; }
 
         const std::string& getTargetModelName() const;
@@ -92,7 +97,7 @@ namespace vle { namespace devs {
 
     protected:
 	std::string   m_portName;
-	sAtomicModel* m_target;
+	Simulator*    m_target;
     };
 
 }} // namespace vle devs

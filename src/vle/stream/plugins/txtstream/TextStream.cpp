@@ -22,7 +22,6 @@
  */
 
 #include "TextStream.hpp"
-#include <vle/devs/sAtomicModel.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/utils/Debug.hpp>
 

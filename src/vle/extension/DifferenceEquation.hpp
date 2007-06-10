@@ -28,7 +28,7 @@
 
 #include <vle/devs/Dynamics.hpp>
 #include <vle/graph/Port.hpp>
-#include <vle/devs/sAtomicModel.hpp>
+#include <vle/devs/Simulator.hpp>
 #include <vle/utils/Tools.hpp>
 
 #include <list>
@@ -69,7 +69,7 @@ namespace vle { namespace extension {
         bool master;
 
     public:
-        DifferenceEquation( devs::sAtomicModel * p_model, bool m = false):
+        DifferenceEquation( devs::Simulator * p_model, bool m = false):
             devs::Dynamics(p_model), m_delay(1.), m_state(_S_PARAMS), m_result(0.0), 
             master(m) { }
         virtual ~DifferenceEquation() { }
