@@ -28,7 +28,6 @@
 #include <vle/graph/Port.hpp>
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/utils/XML.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/utils/Exception.hpp>
 #include <cmath>
@@ -42,170 +41,145 @@ using std::vector;
 namespace vle { namespace extension {
     
 using namespace devs;
-using namespace utils::xml;
-using namespace utils;
+using namespace vle::value;
 
-CellQSS::CellQSS(devs::Simulator* p_model):CellDevs(p_model),
-					      m_gradient(0),m_index(0),
-					      m_sigma(0),
-					      m_lastTime(0),
-					      m_currentTime(0),
-					      m_state(0)
+CellQSS::CellQSS(const vle::graph::AtomicModel& p_model):CellDevs(p_model),
+							 m_gradient(0),m_index(0),
+							 m_sigma(0),
+							 m_lastTime(0),
+							 m_currentTime(0),
+							 m_state(0)
 {
 }
 
+// bool
+// CellQSS::parseXML(xmlpp::Element* p_dynamicsNode)
+// {
+//     if (CellDevs::parseXML(p_dynamicsNode))
+//     {
+// 	// PARAMETER node
+// 	xmlpp::Element* v_parameterNode = get_children(p_dynamicsNode,
+// 						       "PARAMETER");
 
-bool
-CellQSS::parseXML(xmlpp::Element* p_dynamicsNode)
-{
-    if (CellDevs::parseXML(p_dynamicsNode))
-    {
-	// PARAMETER node
-	xmlpp::Element* v_parameterNode = get_children(p_dynamicsNode,
-						       "PARAMETER");
+// 	if (!v_parameterNode)
+// 	    throw utils::ParseError("Excepted PARAMETER tag.");
 
-	if (!v_parameterNode)
-	    throw utils::ParseError("Excepted PARAMETER tag.");
+// 	string v_precision = get_attribute(v_parameterNode,
+// 					   "PRECISION");
 
-	string v_precision = get_attribute(v_parameterNode,
-					   "PRECISION");
+// 	if (v_precision == "")
+// 	    throw utils::ParseError("Excepted PRECISION attribute in"
+// 				   "PARAMETER tag.");
 
-	if (v_precision == "")
-	    throw utils::ParseError("Excepted PRECISION attribute in"
-				   "PARAMETER tag.");
+// 	m_precision = atof(v_precision.data());
+// 	m_epsilon = m_precision;
 
-	m_precision = atof(v_precision.data());
-	m_epsilon = m_precision;
+// 	xmlpp::Element* v_variablesNode = get_children(p_dynamicsNode,
+// 						       "VARIABLES");
+// 	xmlpp::Node::NodeList lst = v_variablesNode->get_children("VARIABLE");
+// 	xmlpp::Node::NodeList::iterator it = lst.begin();
 
-	xmlpp::Element* v_variablesNode = get_children(p_dynamicsNode,
-						       "VARIABLES");
-	xmlpp::Node::NodeList lst = v_variablesNode->get_children("VARIABLE");
-	xmlpp::Node::NodeList::iterator it = lst.begin();
+// 	m_functionNumber = 0;
+// 	while ( it != lst.end() )
+// 	{
+// 	    xmlpp::Element * elt = ( xmlpp::Element* )( *it );
+// 	    string v_name = get_attribute(elt,"NAME");
+// 	    unsigned int v_index = to_int(get_attribute(elt,"INDEX"));
 
-	m_functionNumber = 0;
-	while ( it != lst.end() )
-	{
-	    xmlpp::Element * elt = ( xmlpp::Element* )( *it );
-	    string v_name = get_attribute(elt,"NAME");
-	    unsigned int v_index = to_int(get_attribute(elt,"INDEX"));
+// 	    m_variableName[v_index] = v_name;
+// 	    m_variableIndex[v_name] = v_index;
+// 	    ++it;
+// 	    m_functionNumber++;
+// 	}
 
-	    m_variableName[v_index] = v_name;
-	    m_variableIndex[v_name] = v_index;
-	    ++it;
-	    m_functionNumber++;
-	}
+// 	m_gradient = new double[m_functionNumber];
+// 	m_index = new long[m_functionNumber];
+// 	m_sigma = new Time[m_functionNumber];
+// 	m_lastTime = new Time[m_functionNumber];
+// 	m_currentTime = new Time[m_functionNumber];
+// 	m_state = new state[m_functionNumber];
 
-	m_gradient = new double[m_functionNumber];
-	m_index = new long[m_functionNumber];
-	m_sigma = new Time[m_functionNumber];
-	m_lastTime = new Time[m_functionNumber];
-	m_currentTime = new Time[m_functionNumber];
-	m_state = new state[m_functionNumber];
+// 	return true;
+//     }
+//     return false;
+// }
 
-	return true;
-    }
-    return false;
-}
-
-double
-CellQSS::d(long p_index)
+double CellQSS::d(long p_index)
 {
     return p_index * m_precision;
 }
 
-double
-CellQSS::getGradient(unsigned int i) const
+double CellQSS::getGradient(unsigned int i) const
 {
     return m_gradient[i];
 }
 
-long
-CellQSS::getIndex(unsigned int i) const
+long CellQSS::getIndex(unsigned int i) const
 {
     return m_index[i];
 }
 
-const Time &
-CellQSS::getCurrentTime(unsigned int i) const
+const Time & CellQSS::getCurrentTime(unsigned int i) const
 {
     return m_currentTime[i];
 }
 
-const Time &
-CellQSS::getLastTime(unsigned int i) const
+const Time & CellQSS::getLastTime(unsigned int i) const
 {
     return m_lastTime[i];
 }
 
-const Time &
-CellQSS::getSigma(unsigned int i) const
+const Time & CellQSS::getSigma(unsigned int i) const
 {
     return m_sigma[i];
 }
 
-CellQSS::state
-CellQSS::getState(unsigned int i) const
+CellQSS::state CellQSS::getState(unsigned int i) const
 {
     return m_state[i];
 }
 
-double
-CellQSS::getValue(unsigned int i) const
+double CellQSS::getValue(unsigned int i) const
 {
     return getDoubleState(m_variableName.find(i)->second);
 }
 
-void
-CellQSS::setIndex(unsigned int i,long p_index)
+void CellQSS::setIndex(unsigned int i,long p_index)
 {
     m_index[i] = p_index;
 }
 
-
-void
-CellQSS::setGradient(unsigned int i,double p_gradient)
+void CellQSS::setGradient(unsigned int i,double p_gradient)
 {
     m_gradient[i] = p_gradient;
 }
 
-
-void
-CellQSS::setLastTime(unsigned int i,const devs::Time & p_time)
+void CellQSS::setLastTime(unsigned int i,const devs::Time & p_time)
 {
     m_lastTime[i] = p_time;
 }
 
-
-void
-CellQSS::setCurrentTime(unsigned int i,const devs::Time & p_time)
+void CellQSS::setCurrentTime(unsigned int i,const devs::Time & p_time)
 {
     m_currentTime[i] = p_time;
 }
 
-
-
-void
-CellQSS::setState(unsigned int i,state p_state)
+void CellQSS::setState(unsigned int i,state p_state)
 {
     m_state[i] = p_state;
 }
 
-
-void
-CellQSS::setSigma(unsigned int i,const devs::Time & p_time)
+void CellQSS::setSigma(unsigned int i,const devs::Time & p_time)
 {
     m_sigma[i] = p_time;
 }
 
-
-void
-CellQSS::setValue(unsigned int i,double p_value)
+void CellQSS::setValue(unsigned int i,double p_value)
 {
     setDoubleState(m_variableName[i],p_value);
 }
 
-void
-CellQSS::updateSigma(unsigned int i)
+void CellQSS::updateSigma(unsigned int i)
 {
 // Mise à jour de tous les sigma
     for (unsigned int j = 0;j < m_functionNumber;j++)
@@ -243,144 +217,126 @@ CellQSS::updateSigma(unsigned int i)
 
 }
 
-
 // DEVS Methods
-
-void
-CellQSS::finish()
+void CellQSS::finish()
 {
-    delete[] m_gradient;
-    delete[] m_index;
-    delete[] m_sigma;
-    delete[] m_currentTime;
-    delete[] m_lastTime;
-    delete[] m_state;
+  delete[] m_gradient;
+  delete[] m_index;
+  delete[] m_sigma;
+  delete[] m_currentTime;
+  delete[] m_lastTime;
+  delete[] m_state;
 }
 
-
-devs::Time
-CellQSS::init()
+devs::Time CellQSS::init()
 {
-    vector < pair < unsigned int , double > >::const_iterator it =
-	m_initialValueList.begin();
-
-    while (it != m_initialValueList.end())
-    {
-	initDoubleNeighbourhood(m_variableName[it->first],0.0);
-	initDoubleState(m_variableName[it->first],it->second);
-	++it;
-    }
-
-    for(unsigned int i = 0;i < m_functionNumber;i++)
-    {
-	m_gradient[i] = 0.0;
-	m_index[i] = (long)(floor(getValue(i)/m_precision));
-	setSigma(i,Time(0));
-	setCurrentTime(i,Time(0));
-	setLastTime(i,Time(0));
-	setState(i,INIT);
-    }
-    m_currentModel = 0;
-    return Time(0);
+  vector < pair < unsigned int , double > >::const_iterator it =
+    m_initialValueList.begin();
+  
+  while (it != m_initialValueList.end()) {
+    initDoubleNeighbourhood(m_variableName[it->first],0.0);
+    initDoubleState(m_variableName[it->first],it->second);
+    ++it;
+  }
+  
+  for(unsigned int i = 0;i < m_functionNumber;i++) {
+    m_gradient[i] = 0.0;
+    m_index[i] = (long)(floor(getValue(i)/m_precision));
+    setSigma(i,Time(0));
+    setCurrentTime(i,Time(0));
+    setLastTime(i,Time(0));
+    setState(i,INIT);
+  }
+  m_currentModel = 0;
+  return Time(0);
 }
 
+// void CellQSS::processInitEvents(const InitEventList& event)
+// {
+//   string v_name = event->getPortName();
+//   unsigned int i = m_variableIndex[v_name];
+//   double v = event->getDoubleAttributeValue(event->getPortName());
+  
+//   m_initialValueList.push_back(pair < unsigned int , double >(i,v));
+// }
 
-void
-CellQSS::processInitEvent(devs::InitEvent* event)
+void CellQSS::processInternalEvent(const InternalEvent& event)
 {
-    string v_name = event->getPortName();
-    unsigned int i = m_variableIndex[v_name];
-    double v = event->getDoubleAttributeValue(event->getPortName());
-
-    m_initialValueList.push_back(pair < unsigned int , double >(i,v));
-}
-
-
-void
-CellQSS::processInternalEvent(devs::InternalEvent* event)
-{
-    unsigned int i = m_currentModel;
+  unsigned int i = m_currentModel;
 
 //    std::cout << event->getTime().getValue() << std::endl;
 
-    setCurrentTime(i,event->getTime());
-    switch (getState(i))
-    {
-    case INIT:
-    {
-	setState(i,INIT2);
-	setSigma(i,Time(0.00001));
-	CellDevs::setSigma(Time(0.00001));
-	break;
-    }
-    case INIT2: // init du gradient
-    {
-	setState(i,RUN);
-	setDelay(0.0);
-	setGradient(i,compute(i));
-	updateSigma(i);
-	break;
-    }
-    case RUN:
-    {
-// Mise à jour de l'index
-	if (getGradient(i) > 0) setIndex(i,getIndex(i)+1);
-	else setIndex(i,getIndex(i)-1);
-// Mise à jour de x
-	setValue(i,d(getIndex(i)));
-// Mise à jour du gradient
-	setGradient(i,compute(i));
-// Mise à jour de sigma
-	updateSigma(i);
-    }
-    }
-    setLastTime(i,event->getTime());
+  setCurrentTime(i,event.getTime());
+  switch (getState(i)) {
+  case INIT:
+    setState(i,INIT2);
+    setSigma(i,Time(0.00001));
+    CellDevs::setSigma(Time(0.00001));
+    break;
+  case INIT2: // init du gradient
+    setState(i,RUN);
+    setDelay(0.0);
+    setGradient(i,compute(i));
+    updateSigma(i);
+    break;
+  case RUN:
+    // Mise à jour de l'index
+    if (getGradient(i) > 0) setIndex(i,getIndex(i)+1);
+    else setIndex(i,getIndex(i)-1);
+    // Mise à jour de x
+    setValue(i,d(getIndex(i)));
+    // Mise à jour du gradient
+    setGradient(i,compute(i));
+    // Mise à jour de sigma
+    updateSigma(i);
+  }
+  setLastTime(i,event.getTime());
 }
 
-void
-CellQSS::processExternalEvent(devs::ExternalEvent* event)
+void CellQSS::processExternalEvents(const ExternalEventList& event,
+				    const Time& time)
 {
-    CellDevs::processExternalEvent(event);
+  CellDevs::processExternalEvents(event,time);
+
+  ExternalEventList::const_iterator it = event.begin();
+
+  while (it != event.end()) {
     if (getState(0) == RUN)
-	for (unsigned int i = 0; i < m_functionNumber ; i++)
-	{
-	    double e = event->getTime().getValue() -
-		getLastTime(i).getValue();
+      for (unsigned int i = 0; i < m_functionNumber ; i++) {
+	double e = time.getValue() -
+	  getLastTime(i).getValue();
 
-	    setCurrentTime(i,event->getTime());
-// Mise à jour de la valeur de la fonction
-	    if (e > 0)
-		setValue(i,getValue(i)+e*getGradient(i));
-// Mise à jour du gradient
-	    setGradient(i,compute(i));
-// Mise à jour de sigma
-	    updateSigma(i);
-
-	    if (getSigma(i) < 0)
-		setSigma(i,Time(0));
-	    setLastTime(i,event->getTime());
-	}
+	setCurrentTime(i,time);
+	// Mise à jour de la valeur de la fonction
+	if (e > 0)
+	  setValue(i,getValue(i)+e*getGradient(i));
+	// Mise à jour du gradient
+	setGradient(i,compute(i));
+	// Mise à jour de sigma
+	updateSigma(i);
+	
+	if (getSigma(i) < 0)
+	  setSigma(i,Time(0));
+	setLastTime(i,time);
+      }
+    ++it;
+  }
+}
+   
+void CellQSS::processPerturbation(const ExternalEvent& /* event */)
+{
+  for (unsigned int i = 0; i < m_functionNumber ; i++) {
+    m_gradient[i] = 0.0;
+    m_index[i] = (long)(floor(getValue(i)/m_precision));
+    setSigma(i,Time(0));
+    setState(i,INIT);
+  }
+  CellDevs::setSigma(0);
 }
 
-
-void
-CellQSS::processPerturbation(devs::ExternalEvent*)
+Value CellQSS::processStateEvent(const StateEvent& event) const
 {
-    for (unsigned int i = 0; i < m_functionNumber ; i++)
-    {
-	m_gradient[i] = 0.0;
-	m_index[i] = (long)(floor(getValue(i)/m_precision));
-	setSigma(i,Time(0));
-	setState(i,INIT);
-    }
-    CellDevs::setSigma(0);
-}
-
-
-value::Value
-CellQSS::processStateEvent(devs::StateEvent* event) const
-{
-    return value::DoubleFactory::create(getDoubleState(event->getPortName()));
+  return value::DoubleFactory::create(getDoubleState(event.getPortName()));
 }
 
 }} // namespace vle extension

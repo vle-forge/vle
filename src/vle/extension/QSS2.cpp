@@ -23,14 +23,12 @@
  */
 
 #include <vle/extension/QSS2.hpp>
-#include <vle/utils/Tools.hpp>
-#include <vle/utils/XML.hpp>
 #include <cmath>
 
-using namespace vle;
-using namespace extension;
-using namespace utils;
-using namespace utils::xml;
+using namespace vle::devs;
+using namespace vle::extension;
+using namespace vle::graph;
+using namespace vle::value;
 
 mfi::mfi(qss2* qss,unsigned int i,unsigned int n):m_qss(qss),index(i),m_functionNumber(n)
 {
@@ -60,23 +58,21 @@ Couple mfi::init()
   for(unsigned int j = 0;j < m_functionNumber;j++) 
     mz[j] =  m_qss->compute(j);
   fiz = mz[index];
-  for(unsigned int j = 0;j < m_functionNumber;j++) 
-    {
-      for(unsigned int k = 0;k < m_functionNumber;k++) 
-	xt[k] = z[k];
-      xt[j] += m_qss->m_precision;
-
-      for(unsigned int k = 0;k < m_functionNumber;k++) 
-	{
-	  sav[k] = m_qss->getValue(k);
-	  m_qss->setValue(k,xt[k]);
-	}
-      for(unsigned int k = 0;k < m_functionNumber;k++) 
-	  yt[k] = m_qss->compute(k);
-      for(unsigned int k = 0;k < m_functionNumber;k++) 
-	  m_qss->setValue(k,sav[k]);
-      c[j] = (yt[index] - fiz)/m_qss->m_precision;
+  for(unsigned int j = 0;j < m_functionNumber;j++)  {
+    for(unsigned int k = 0;k < m_functionNumber;k++) 
+      xt[k] = z[k];
+    xt[j] += m_qss->m_precision;
+    
+    for(unsigned int k = 0;k < m_functionNumber;k++) {
+      sav[k] = m_qss->getValue(k);
+      m_qss->setValue(k,xt[k]);
     }
+    for(unsigned int k = 0;k < m_functionNumber;k++) 
+      yt[k] = m_qss->compute(k);
+    for(unsigned int k = 0;k < m_functionNumber;k++) 
+      m_qss->setValue(k,sav[k]);
+    c[j] = (yt[index] - fiz)/m_qss->m_precision;
+  }
   ret.value = mz[index];
   ret.derivative = 0;
   for(unsigned int j = 0;j < m_functionNumber;j++) 
@@ -98,40 +94,36 @@ Couple mfi::ext(const devs::Time& p_time, unsigned int i,const Couple & input)
   for(unsigned int j = 0;j < m_functionNumber;j++) 
     zz[j] = z[j]+mz[j]*e;
   for(unsigned int j = 0;j < m_functionNumber;j++) 
-    if (j==i)
-      {
-	z[j]=input.value;
-	mz[j]=input.derivative;
-      }
+    if (j==i) {
+      z[j]=input.value;
+      mz[j]=input.derivative;
+    }
     else z[j]+=mz[j]*e;
   /*  for(unsigned int k = 0;k < m_functionNumber;k++) 
-    yt[k] = m_qss->compute(k);
-    ret.value = yt[index]; */
-
-  for(unsigned int j = 0;j < m_functionNumber;j++) 
-    {
-      sav[j] = m_qss->getValue(j);
-      m_qss->setValue(j,z[j]);
-    }
+      yt[k] = m_qss->compute(k);
+      ret.value = yt[index]; */
+  
+  for(unsigned int j = 0;j < m_functionNumber;j++) {
+    sav[j] = m_qss->getValue(j);
+    m_qss->setValue(j,z[j]);
+  }
   ret.value = m_qss->compute(index);
   for(unsigned int j = 0;j < m_functionNumber;j++) 
     m_qss->setValue(j,sav[j]);
 
-  if (fabs(normal - z[i]) >= m_qss->m_threshold)
-    {
-      for(unsigned int j = 0;j < m_functionNumber;j++) 
-	{
-	  sav[j] = m_qss->getValue(j);
-	  m_qss->setValue(j,zz[j]);
-	}
-
-      double w = m_qss->compute(index);
-
-      for(unsigned int j = 0;j < m_functionNumber;j++) 
-	m_qss->setValue(j,sav[j]);
-      c[i] = (w-ret.value)/(normal-z[i]);
+  if (fabs(normal - z[i]) >= m_qss->m_threshold) {
+    for(unsigned int j = 0;j < m_functionNumber;j++) {
+      sav[j] = m_qss->getValue(j);
+      m_qss->setValue(j,zz[j]);
     }
-
+    
+    double w = m_qss->compute(index);
+    
+    for(unsigned int j = 0;j < m_functionNumber;j++) 
+      m_qss->setValue(j,sav[j]);
+    c[i] = (w-ret.value)/(normal-z[i]);
+  }
+  
   ret.derivative = 0;
   for(unsigned int j = 0;j < m_functionNumber;j++) 
     ret.derivative+=c[j]*mz[j];
@@ -140,14 +132,14 @@ Couple mfi::ext(const devs::Time& p_time, unsigned int i,const Couple & input)
   return ret;
 }
 
-qss2::qss2(devs::Simulator* p_model) :
+qss2::qss2(const AtomicModel& p_model) :
   Dynamics(p_model),m_value(0),
   m_derivative(0),m_derivative2(0),m_index(0),m_index2(0),
   m_sigma(0),m_lastTime(0),m_mfi(0)
 {
 }
 
-bool qss2::parseXML(xmlpp::Element* p_dynamicsNode)
+/*bool qss2::parseXML(xmlpp::Element* p_dynamicsNode)
 {
   // PARAMETER node
   xmlpp::Element* v_parameterNode = get_children(p_dynamicsNode, "PARAMETER");
@@ -205,7 +197,7 @@ bool qss2::parseXML(xmlpp::Element* p_dynamicsNode)
   for(unsigned int i = 0;i < m_functionNumber;i++)
     m_mfi[i] = new mfi(this,i,m_functionNumber);
   return true;
-}
+} 
 
 double qss2::parseParameter(const std::string & p_name, 
 			   xmlpp::Element* p_dynamicsNode)
@@ -217,7 +209,7 @@ double qss2::parseParameter(const std::string & p_name,
     return utils::to_double(utils::xml::get_attribute(v_node,"VALUE"));
   else
     return 0;
-}
+} */
 
 double qss2::getDerivative(unsigned int i) const
 {
@@ -239,12 +231,12 @@ double qss2::getIndex2(unsigned int i) const
   return m_index2[i];
 }
 
-const devs::Time & qss2::getLastTime(unsigned int i) const
+const Time & qss2::getLastTime(unsigned int i) const
 {
   return m_lastTime[i];
 }
 
-const devs::Time & qss2::getSigma(unsigned int i) const
+const Time & qss2::getSigma(unsigned int i) const
 {
   return m_sigma[i];
 }
@@ -269,12 +261,12 @@ void qss2::setDerivative2(unsigned int i,double p_derivative)
   m_derivative2[i] = p_derivative;
 }
 
-void qss2::setLastTime(unsigned int i,const devs::Time & p_time)
+void qss2::setLastTime(unsigned int i,const Time & p_time)
 {
   m_lastTime[i] = p_time;
 }
 
-void qss2::setSigma(unsigned int i,const devs::Time & p_time)
+void qss2::setSigma(unsigned int i,const Time & p_time)
 {
   m_sigma[i] = p_time;
 }
@@ -422,60 +414,55 @@ void qss2::init2()
   minSigma();
 }
 
-devs::Time qss2::init()
+Time qss2::init()
 {
   std::vector < std::pair < unsigned int , double > >::const_iterator it =
     m_initialValueList.begin();
-
-  while (it != m_initialValueList.end())
-    {
-      setValue(it->first,it->second);
-      ++it;
-    }
+  
+  while (it != m_initialValueList.end()) {
+    setValue(it->first,it->second);
+    ++it;
+  }
   init2();
   return getSigma(m_currentModel);
 }
 
-
-devs::ExternalEventList* qss2::getOutputFunction(devs::Time const & time)
+void qss2::getOutputFunction(const Time& /* time */,
+			     ExternalEventList& output) 
 {
-  if (m_active)
-    {
-      devs::ExternalEvent* ee = new devs::ExternalEvent("out",
-							time,
-							getModel());
+  if (m_active) {
+    devs::ExternalEvent* ee = new devs::ExternalEvent("out");
       
-      for (unsigned int i = 0; i < m_functionNumber ; i++)
-	ee << devs::attribute(m_variableName[i], getValue(i));
-      return  new devs::ExternalEventList(ee);
-    }
-  else return noEvent();
+    for (unsigned int i = 0; i < m_functionNumber ; i++)
+      ee << devs::attribute(m_variableName[i], getValue(i));
+    output.addEvent(ee);
+  }
 }
 
-devs::Time qss2::getTimeAdvance()
+Time qss2::getTimeAdvance()
 {
   return getSigma(m_currentModel);
 }
 
-bool qss2::processConflict(const devs::InternalEvent& /*internal*/,
-			  const devs::ExternalEventList& /*extEventlist*/)
+Event::EventType qss2::processConflict(const InternalEvent& /* internal */,
+				       const ExternalEventList& /* extEventlist */) const
 {
-  return false;
+  return Event::EXTERNAL;
 }
 
-void qss2::processInitEvent(devs::InitEvent* event)
-{
-  unsigned int i = m_variableIndex.find(event->getPortName())->second;  
-  double v = event->getDoubleAttributeValue(event->getPortName());
+// void qss2::processInitEvent(devs::InitEvent* event)
+// {
+//   unsigned int i = m_variableIndex.find(event->getPortName())->second;  
+//   double v = event->getDoubleAttributeValue(event->getPortName());
 
-  m_initialValueList.push_back(std::pair < unsigned int , double >(i,v));
-}
+//   m_initialValueList.push_back(std::pair < unsigned int , double >(i,v));
+// }
 
-void qss2::processInternalEvent(devs::InternalEvent* event)
+void qss2::processInternalEvent(const InternalEvent& event)
 {
   unsigned int i = m_currentModel;
   Couple input;
-
+  
   //  std::cout << "[" << i << "] int at " 
   //	    << event->getTime().getValue() << std::endl;
 
@@ -500,56 +487,57 @@ void qss2::processInternalEvent(devs::InternalEvent* event)
   m_derivative[i]+=m_derivative2[i]*m_sigma[i].getValue();
   
   if (fabs(m_derivative2[i]) < m_threshold)
-    m_sigma[i] = devs::Time::infinity;
-  else m_sigma[i] = devs::Time(sqrt(2*m_precision/fabs(m_derivative2[i])));
-  setLastTime(i,event->getTime());
+    m_sigma[i] = Time::infinity;
+  else m_sigma[i] = Time(sqrt(2*m_precision/fabs(m_derivative2[i])));
+  setLastTime(i,event.getTime());
 
   // Mise à jour des autres équations    
-  for (unsigned int j = 0;j < m_functionNumber;j++)
-    {
-      double e = (event->getTime() - getLastTime(j)).getValue();
-
-      if (e==0) m_mfi[j]->ext(event->getTime(),i,input);
-      else
-	{
-	  setLastTime(j,event->getTime());
-	  
-	  Couple ret = m_mfi[j]->ext(event->getTime(),i,input);
-	  
-	  m_value[j]+=m_derivative[j]*e+(m_derivative2[j]/2)*e*e;
-	  m_index[j]+=m_index2[j]*e;
-	  
-	  m_derivative[j] = ret.value;
-	  m_derivative2[j] = ret.derivative;
-	  
-	  double a = m_derivative2[j]/2;
-	  double b = m_derivative[j] - m_index2[j];
-	  double c = m_value[j] - m_index[j] + m_precision;
-	  double cp = m_value[j] - m_index[j] - m_precision;
-	  double s;
-	  
-	  if (intermediaire(a,b,c,cp,s)) m_sigma[j] = devs::Time(s);
-	  else m_sigma[j] = devs::Time::infinity;
-	}
-
-      //      std::cout << " -> [" << j << "] = " << m_sigma[j].getValue() << std::endl;
-
+  for (unsigned int j = 0;j < m_functionNumber;j++) {
+    double e = (event.getTime() - getLastTime(j)).getValue();
+    
+    if (e==0) m_mfi[j]->ext(event.getTime(),i,input);
+    else {
+      setLastTime(j,event.getTime());
+      
+      Couple ret = m_mfi[j]->ext(event.getTime(),i,input);
+      
+      m_value[j]+=m_derivative[j]*e+(m_derivative2[j]/2)*e*e;
+      m_index[j]+=m_index2[j]*e;
+      
+      m_derivative[j] = ret.value;
+      m_derivative2[j] = ret.derivative;
+      
+      double a = m_derivative2[j]/2;
+      double b = m_derivative[j] - m_index2[j];
+      double c = m_value[j] - m_index[j] + m_precision;
+      double cp = m_value[j] - m_index[j] - m_precision;
+      double s;
+      
+      if (intermediaire(a,b,c,cp,s)) m_sigma[j] = Time(s);
+      else m_sigma[j] = Time::infinity;
     }
+    
+    //      std::cout << " -> [" << j << "] = " << m_sigma[j].getValue() << std::endl;
+    
+  }
   minSigma();
 }
-
-void qss2::processExternalEvent(devs::ExternalEvent* event)
+ 
+void qss2::processExternalEvents(const ExternalEventList& event,
+				 const Time& /* time */)
 {
-   if (event->onPort("parameter"))
-     {
-       std::string v_name = event->getStringAttributeValue("name");
-       double v_value = event->getDoubleAttributeValue("value");
+  ExternalEventList::const_iterator it = event.begin();
 
-       processPerturbation(v_name,v_value);
-
-       init2();
-     }
-//   else
+  while (it != event.end()) {
+    if ((*it)->onPort("parameter")) {
+      std::string v_name = (*it)->getStringAttributeValue("name");
+      double v_value = (*it)->getDoubleAttributeValue("value");
+      
+      processPerturbation(v_name,v_value);
+      
+      init2();
+    }
+    //   else
 //     {
 //       unsigned int i = (unsigned int)event->getIntegerAttributeValue("index");
       
@@ -569,14 +557,15 @@ void qss2::processExternalEvent(devs::ExternalEvent* event)
 // 	  }
 // 	minSigma();
 //       }
-//     }
+    ++it;
+  }
 }
 
-value::Value qss2::processStateEvent(devs::StateEvent* event) const
+Value qss2::processStateEvent(const StateEvent& event) const
 {
   //  unsigned int i = to_int(event->getPortName());
-  unsigned int i = m_variableIndex.find(event->getPortName())->second;
-  double e = (event->getTime()-m_lastTime[i]).getValue();
+  unsigned int i = m_variableIndex.find(event.getPortName())->second;
+  double e = (event.getTime()-m_lastTime[i]).getValue();
   double x = m_value[i]+m_derivative[i]*e+m_derivative2[i]/2*e*e;
 
   return value::DoubleFactory::create(x);

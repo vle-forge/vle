@@ -25,8 +25,6 @@
 #ifndef __CELL_DEVS_HPP
 #define __CELL_DEVS_HPP
 
-#include <libxml++/libxml++.h>
-
 #include <vle/devs/Simulator.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/value/Value.hpp>
@@ -58,8 +56,8 @@ namespace vle { namespace extension {
     std::vector < std::string > m_neighbourPortList;
 
   public:
-    CellDevs(devs::Simulator* p_model):devs::Dynamics(p_model),
-					  m_modified(false) { }
+    CellDevs(const vle::graph::AtomicModel& p_model):devs::Dynamics(p_model),
+						     m_modified(false) { }
     virtual ~CellDevs();
 
     // get and set sigma
@@ -174,17 +172,18 @@ namespace vle { namespace extension {
     inline void resetNeighbourModified()
     { m_neighbourModified = false; }
 
-    // XML loading method
-    virtual bool parseXML(xmlpp::Element* p_dynamicsNode);
-
     // DEVS Methods
-    virtual devs::Time getTimeAdvance();
-    virtual devs::ExternalEventList* getOutputFunction(devs::Time const & time);
-    virtual devs::Time init();
-    virtual void processExternalEvent(devs::ExternalEvent* event);
-    virtual void processInitEvent(devs::InitEvent* event);
-    virtual void processPerturbation(devs::ExternalEvent* event) =0;
-    virtual value::Value processStateEvent(devs::StateEvent* event) const;
+    virtual vle::devs::Time init();
+    virtual void getOutputFunction(const vle::devs::Time& /* time */,
+				   vle::devs::ExternalEventList& /* output */);
+    virtual vle::devs::Time getTimeAdvance();
+    virtual vle::devs::Event::EventType processConflict(const vle::devs::InternalEvent& /* internal */,
+							const vle::devs::ExternalEventList& /* extEventlist */) const;
+    virtual void processExternalEvents(const vle::devs::ExternalEventList& /* event */,
+				       const vle::devs::Time& /* time */);
+    virtual vle::value::Value processStateEvent(const vle::devs::StateEvent& /* event */) const;
+    
+    virtual void processPerturbation(const vle::devs::ExternalEvent& event) =0;
   };
 
 }} // namespace vle extension

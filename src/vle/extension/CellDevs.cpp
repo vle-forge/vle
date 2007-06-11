@@ -31,7 +31,6 @@
 #include <vle/value/Boolean.hpp>
 #include <vle/value/String.hpp>
 #include <vle/utils/Exception.hpp>
-#include <vle/utils/XML.hpp>
 
 #include <cassert>
 
@@ -42,8 +41,8 @@ using std::vector;
 
 namespace vle { namespace extension {
 
-using namespace devs;
-using namespace utils::xml;
+using namespace vle::devs;
+using namespace vle::value;
 
 CellDevs::~CellDevs()
 {
@@ -61,29 +60,28 @@ CellDevs::~CellDevs()
 //
 /***********************************************************************/
 
-bool
-CellDevs::parseXML(xmlpp::Element* p_dynamicsNode)
-{
-    // PARAMETER node
-    xmlpp::Element* v_neighbourhoodNode = get_children(p_dynamicsNode,
-						       "NEIGHBOURHOOD");
+// bool CellDevs::parseXML(xmlpp::Element* p_dynamicsNode)
+// {
+//     // PARAMETER node
+//     xmlpp::Element* v_neighbourhoodNode = get_children(p_dynamicsNode,
+// 						       "NEIGHBOURHOOD");
 
-    if (!v_neighbourhoodNode)
-	throw utils::ParseError("Excepted NEIGHBOURHOOD tag.");
+//     if (!v_neighbourhoodNode)
+// 	throw utils::ParseError("Excepted NEIGHBOURHOOD tag.");
 
-    xmlpp::Node::NodeList lst = v_neighbourhoodNode->get_children("PORT");
-    xmlpp::Node::NodeList::iterator it = lst.begin();
+//     xmlpp::Node::NodeList lst = v_neighbourhoodNode->get_children("PORT");
+//     xmlpp::Node::NodeList::iterator it = lst.begin();
 
-    while ( it != lst.end() )
-    {
-	xmlpp::Element * elt = ( xmlpp::Element* )( *it );
-	string v_name = get_attribute(elt,"NAME");
+//     while ( it != lst.end() )
+//     {
+// 	xmlpp::Element * elt = ( xmlpp::Element* )( *it );
+// 	string v_name = get_attribute(elt,"NAME");
 
-	m_neighbourPortList.push_back(v_name);
-	++it;
-    }
-    return true;
-}
+// 	m_neighbourPortList.push_back(v_name);
+// 	++it;
+//     }
+//     return true;
+// }
 
 Time const &
 CellDevs::getSigma() const
@@ -509,103 +507,90 @@ CellDevs::setNeighbourState(std::string const & p_neighbourName,
 //***********************************************************************
 //***********************************************************************
 
-devs::Time
-CellDevs::init()
+Time CellDevs::init()
 {
   setLastTime(Time(0));
   m_neighbourModified = false;
   return Time::infinity;
 }
 
-devs::Time
-CellDevs::getTimeAdvance()
+void CellDevs::getOutputFunction(const Time& /* time */,
+				 ExternalEventList& output) 
 {
-    return m_sigma;
-}
-
-
-ExternalEventList*
-CellDevs::getOutputFunction(devs::Time const & time)
-{
-    if (m_modified)
-    {
+  if (m_modified) {
 
 //	std::cout << time.getValue() << " - [out] : " << getModelName() << std::endl;
 
-	ExternalEventList* v_eventList=new ExternalEventList();
-	ExternalEvent* e=new ExternalEvent("out",
-					   time,
-					   getModel());
-	map < string , pair < value::Value , bool > >::const_iterator it =
-	    m_state.begin();
+    ExternalEvent* e = new ExternalEvent("out");
+    map < string , pair < value::Value , bool > >::const_iterator it =
+      m_state.begin();
 
-	while (it != m_state.end())
-	{
-	    if (it->second.second)
-	      e->putAttribute(it->first,it->second.first->clone());
-	    //	      e << attribute(it->first,it->second.first->clone());
-	    ++it;
-	}
-	v_eventList->addEvent(e);
-	m_modified = false;
-	return v_eventList;
+    while (it != m_state.end()) {
+      if (it->second.second)
+	e->putAttribute(it->first,it->second.first->clone());
+      ++it;
     }
-    else return noEvent();
+    output.addEvent(e);
+    m_modified = false;
+  }
 }
 
-
-void
-CellDevs::processExternalEvent(devs::ExternalEvent* event)
+Time CellDevs::getTimeAdvance()
 {
-    string v_portName = event->getPortName();
+  return m_sigma;
+}
+
+// void CellDevs::processInitEvents(const vle::devs::InitEventList& event);
+// {
+//     string v_name = event->getPortName();
+//     value::Value v_value = event->getAttributeValue(v_name);
+
+// //     cout << "init[" << getModelName() << ":" << v_name
+// //	 << "] = " << v_value->toString() << endl;
+
+//     initState(v_name,v_value->clone());
+// }
+
+void CellDevs::processExternalEvents(const ExternalEventList& event,
+				     const Time& /* time */)
+{
+  ExternalEventList::const_iterator it = event.begin();
+
+  while (it != event.end()) {
+    string v_portName = (*it)->getPortName();
 
 //     std::cout << event->getTime().getValue() << " " << getModelName()
 //	      << ":" << v_portName<< " -> ext" << std::endl;
 
-    if (existNeighbourState(v_portName))
-    {
+    if (existNeighbourState(v_portName)) {
 
 //	std::cout << "ok" << std::endl;
 
-	map < string , value::Value >::const_iterator it =
-	    m_neighbourState[v_portName].begin();
-
-	while (it != m_neighbourState[v_portName].end())
-	{
-	    string v_name = it->first;
-	    value::Value v_value = event->getAttributeValue(v_name)->clone();
-
+      map < string , value::Value >::const_iterator it2 =
+	m_neighbourState[v_portName].begin();
+    
+      while (it2 != m_neighbourState[v_portName].end()) {
+	string v_name = it2->first;
+	value::Value v_value = (*it)->getAttributeValue(v_name)->clone();
+      
 //	    std::cout << "ext : " << event->getTime().getValue()
 //		      << " " << getModelName() << ":" << v_portName
 //		      << " = " << v_value->toString()
 //		      << std::endl;
 
-	    setNeighbourState(v_portName,v_name,v_value);
-	    ++it;
-	}
-	m_neighbourModified = true;
-	updateSigma(event);
+	setNeighbourState(v_portName,v_name,v_value);
+	++it2;
+      }
+      m_neighbourModified = true;
+      updateSigma(*it);
     }
     else // c'est une perturbation
-	processPerturbation(event);
+      processPerturbation(**it);
+    ++it;
+  }
 }
 
-
-void
-CellDevs::processInitEvent(devs::InitEvent* event)
-{
-    string v_name = event->getPortName();
-    value::Value v_value = event->getAttributeValue(v_name);
-
-//     cout << "init[" << getModelName() << ":" << v_name
-//	 << "] = " << v_value->toString() << endl;
-
-    initState(v_name,v_value->clone());
-}
-
-
-value::Value
-CellDevs::processStateEvent(devs::StateEvent* event) const
+Value CellDevs::processStateEvent(const StateEvent& event) const
 {
 
 //     cout << event->getTime().getValue() << ":" << getModelName()
@@ -613,8 +598,8 @@ CellDevs::processStateEvent(devs::StateEvent* event) const
 //	 << getState(event->getPortName())->toString()
 //	  << endl;
 
-    if (existState(event->getPortName()))
-	return getState(event->getPortName())->clone();
+    if (existState(event.getPortName()))
+	return getState(event.getPortName())->clone();
     else 
         return value::ValueBase::empty;
 }

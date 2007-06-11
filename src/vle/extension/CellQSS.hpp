@@ -25,8 +25,6 @@
 #ifndef __CELL_QSS_HPP
 #define __CELL_QSS_HPP
 
-#include <libxml++/libxml++.h>
-
 #include <vle/extension/CellDevs.hpp>
 #include <vle/devs/Dynamics.hpp>
 
@@ -84,22 +82,19 @@ namespace vle { namespace extension {
 	void setValue(unsigned int i,double p_value);
 
     public:
-	CellQSS(devs::Simulator* p_model);
-	virtual ~CellQSS() { }
+      CellQSS(const vle::graph::AtomicModel& p_model);
+      virtual ~CellQSS() { }
 
-	// XML loading method
-	virtual bool parseXML(xmlpp::Element* p_dynamicsNode);
+      // DEVS Methods
+      virtual void finish();
+      virtual vle::devs::Time init();
+      virtual void processInitEvents(const vle::devs::InitEventList& /* event */);
+      virtual void processInternalEvent(const vle::devs::InternalEvent& /* event */);
+      virtual void processExternalEvents(const vle::devs::ExternalEventList& /* event */,
+					 const vle::devs::Time& /* time */);
+      virtual vle::value::Value processStateEvent(const vle::devs::StateEvent& /* event */) const;
 
-	// DEVS Methods
-	virtual void finish();
-	virtual devs::Time init();
-//	virtual devs::ExternalEventList* getOutputFunction(const Time& p_currentTime);
-//	virtual Time getTimeAdvance();
-	virtual void processInitEvent(devs::InitEvent* event);
-	virtual void processInternalEvent(devs::InternalEvent* event);
-	virtual void processExternalEvent(devs::ExternalEvent* event);
-	virtual void processPerturbation(devs::ExternalEvent* event);
-	virtual value::Value processStateEvent(devs::StateEvent* event) const;
+      virtual void processPerturbation(const vle::devs::ExternalEvent& event);
     };
 }} // namespace vle extension
 

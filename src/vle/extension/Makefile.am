@@ -1,9 +1,9 @@
 AM_CPPFLAGS = -I$(top_srcdir)/src @VLE_CFLAGS@ @XML_CFLAGS@
 
-libextension_coresources = DifferenceEquation.cpp Equation.cpp QSS.cpp \
+libextension_coresources = QSS.cpp \
 			   QSS2.cpp CellDevs.cpp CellQSS.cpp DSDevs.cpp
 
-libextension_coreheaders = DifferenceEquation.hpp Equation.hpp QSS.hpp \
+libextension_coreheaders = QSS.hpp \
 			   QSS2.hpp CellQSS.hpp CellDevs.hpp DSDevs.hpp
 
 libvle_LTLIBRARIES = libextension.la

@@ -27,14 +27,12 @@
 #ifndef EXTENSION_DSDEVS_HPP
 #define EXTENSION_DSDEVS_HPP
 
-#include <libxml++/libxml++.h>
-#include <list>
-
 #include <vle/devs/Simulator.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/value/Value.hpp>
 
+#include <list>
 
 namespace vle { namespace extension {
 
@@ -120,33 +118,25 @@ namespace vle { namespace extension {
     class DSDevs : public devs::Dynamics
     {
     public:
-        enum state { IDLE, ADD_MODEL, REMOVE_MODEL, CHANGE_MODEL, BUILD_MODEL,
-            ADD_CONNECTION, REMOVE_CONNECTION, CHANGE_CONNECTION, ADD_INPUTPORT,
-            REMOVE_INPUTPORT, ADD_OUTPUTPORT, REMOVE_OUTPUTPORT, BAG };
+      enum state { IDLE, ADD_MODEL, REMOVE_MODEL, CHANGE_MODEL, BUILD_MODEL,
+		   ADD_CONNECTION, REMOVE_CONNECTION, CHANGE_CONNECTION, ADD_INPUTPORT,
+		   REMOVE_INPUTPORT, ADD_OUTPUTPORT, REMOVE_OUTPUTPORT, BAG };
 
-	DSDevs(devs::Simulator* model);
+      DSDevs(const vle::graph::AtomicModel& model);
 
-	virtual ~DSDevs() { }
+      virtual ~DSDevs() { }
 
-	virtual bool parseXML(xmlpp::Element* dynamicsNode);
-
-	virtual devs::Time init();
-        
-        virtual devs::ExternalEventList* getOutputFunction(
-                                    const devs::Time& time);
-        
-	virtual devs::Time getTimeAdvance();
-        
-        virtual bool processConflict(const devs::InternalEvent& internal,
-                        const devs::ExternalEventList& extEventlist);
-        
-        virtual void processExternalEvent(devs::ExternalEvent* event);
-        
-        virtual void processInitEvent(devs::InitEvent* event);
-        
-        virtual void processInternalEvent(devs::InternalEvent* event);
-        
-        virtual value::Value processStateEvent(devs::StateEvent* event) const;
+        // DEVS Methods
+      virtual vle::devs::Time init();
+      virtual void getOutputFunction(const vle::devs::Time& /* time */,
+				     vle::devs::ExternalEventList& /* output */);
+      virtual vle::devs::Time getTimeAdvance();
+      virtual vle::devs::Event::EventType processConflict(const vle::devs::InternalEvent& /* internal */,
+							  const vle::devs::ExternalEventList& /* extEventlist */) const;
+      virtual void processInternalEvent(const vle::devs::InternalEvent& /* event */);
+      virtual void processExternalEvents(const vle::devs::ExternalEventList& /* event */,
+					 const vle::devs::Time& /* time */);
+      virtual vle::value::Value processStateEvent(const vle::devs::StateEvent& /* event */) const;
 
         /*
          * 
