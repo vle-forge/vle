@@ -276,6 +276,41 @@ void test_experiment_vpz()
     BOOST_REQUIRE_EQUAL(integer->intValue(), -2);
 }
 
+void test_experiment_measures_vpz()
+{
+    const char* xml=
+        "<?xml version=\"1.0\"?>\n"
+        "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
+        " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
+        " <experiment name=\"test1\" duration=\"0.33\" seed=\"987\">\n"
+        "  <replicas seed=\"987456\" number=\"5\" />\n"
+        "  <measures>\n"
+        "   <outputs>\n"
+        "    <output name=\"x\" type=\"local\" format=\"text\" />\n"
+        "    <output name=\"y\" format=\"sdml\" />\n"
+        "    <output name=\"z\" format=\"eov\""
+        "            plugin=\"xxx\" location=\"127.0.0.1:8888\" />\n"
+        "    <output name=\"a\" format=\"net\" plugin=\"zzz\" />\n"
+        "   </outputs>\n"
+        "   <measure name=\"x\" type=\"timed\" time_step=\".05\""
+        "            output=\"x\" >\n"
+        "    <observable name=\"oo\" modelname=\"toto\" port=\"x1\" />\n"
+        "    <observable name=\"xx\" modelname=\"toto\" port=\"x2\" />\n"
+        "   </measure>\n"
+        "  </measures>\n"
+        " <experiment>\n"
+        " </experiment>\n"
+        "</vle_project>\n";
+    
+    vpz::VLESaxParser sax;
+    sax.parse_memory(xml);
+
+    const vpz::Vpz& vpz(sax.vpz());
+    const vpz::Project& project(vpz.project());
+    const vpz::Experiment& experiment(project.experiment());
+}
+
+
 boost::unit_test_framework::test_suite*
 init_unit_test_suite(int, char* [])
 {

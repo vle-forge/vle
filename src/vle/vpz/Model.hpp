@@ -34,14 +34,17 @@ namespace vle { namespace vpz {
 
     /** 
      * @brief The AtomicModel class is used by the AtomicModelList to attach an
-     * atomic model to his conditions and dynamics names.
+     * atomic model to his conditions, observables and dynamics names.
      */
     class AtomicModel
     {
     public:
-        AtomicModel(const std::string& conditions, const std::string& dynamics) :
+        AtomicModel(const std::string& conditions,
+                    const std::string& dynamics,
+                    const std::string& observables) :
             m_conditions(conditions),
-            m_dynamics(dynamics)
+            m_dynamics(dynamics),
+            m_observables(observables)
         { }
 
         const std::string& conditions() const
@@ -50,11 +53,15 @@ namespace vle { namespace vpz {
         const std::string& dynamics() const
         { return m_dynamics; }
 
+        const std::string& observables() const
+        { return m_observables; }
+
     private:
         AtomicModel() { }
 
         std::string     m_conditions;
         std::string     m_dynamics;
+        std::string     m_observables;
     };
 
 

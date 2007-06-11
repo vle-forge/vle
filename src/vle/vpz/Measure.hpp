@@ -39,6 +39,11 @@ namespace vle { namespace vpz {
     class Measure : public Base
     {
     public:
+        typedef std::map < std::string, Observable > ObservableList;
+        typedef ObservableList::const_iterator const_iterator;
+        typedef ObservableList::iterator iterator;
+
+
         enum Type { TIMED, EVENT };
 
         Measure();
@@ -77,69 +82,50 @@ namespace vle { namespace vpz {
          * @brief Add an observable to the Measure.
          * 
          * @param o the observable to add.
+         * @return a reference to the newly created observable.
          *
          * @throw Exception::Internal if observable already exist.
          */
-        void addObservable(const Observable& o);
+        Observable& addObservable(const Observable& o);
 
         /** 
          * @brief Add an observable to the Measure.
          * 
-         * @param modelname model name to observe.
-         * @param portname port name to observe.
+         * @param name of the observable.
          * @param group if define, the group where observation is store.
          * @param index if define, the index of the group.
+         * @return a reference to the newly created observable.
          */
-        void addObservable(const std::string& modelname,
-                           const std::string& portname,
-                           const std::string& group = std::string(),
-                           int index = -1);
+        Observable& addObservable(const std::string& name,
+                                  const std::string& group = std::string(),
+                                  int index = -1);
 
         /** 
          * @brief Delete an observable from the list.
          * 
-         * @param modelname model name to observe.
-         * @param portname port name to observe.
-         * @param group if define, the group where observation is store.
-         * @param index if define, the index of the group.
+         * @param name model name to observe.
          */
-        void delObservable(const std::string& modelname,
-                           const std::string& portname,
-                           const std::string& group = std::string(),
-                           int index = -1);
+        void delObservable(const std::string& name);
 
         /** 
          * @brief Get a reference to an Observable.
          * 
-         * @param modelname model name to observe.
-         * @param portname port name to observe.
-         * @param group if define, the group where observation is store.
-         * @param index if define, the index of the group.
+         * @param name name of the Observable.
          *
          * @throw Exception::Internal if Observable not found
          *
          * @return A reference to the founded Observable.
          */
-        const Observable& getObservable(
-            const std::string& modelname,
-            const std::string& portname,
-            const std::string& group = std::string(),
-            int index = -1) const;
+        const Observable& getObservable(const std::string& name) const;
 
         /** 
          * @brief Test if an observable exist in list.
          * 
-         * @param modelname model name to observe.
-         * @param portname port name to observe.
-         * @param group if define, the group where observation is store.
-         * @param index if define, the index of the group.
+         * @param name name of the Observable.
          *
          * @return true if found, false otherwise.
          */
-        bool existObservable(const std::string& modelname,
-                             const std::string& portname,
-                             const std::string& group = std::string(),
-                             int index = -1) const;
+        bool existObservable(const std::string& name) const;
 
         void setName(const std::string& name) 
         { m_name.assign(name); }
@@ -164,7 +150,7 @@ namespace vle { namespace vpz {
          * 
          * @return A constant reference to the list of Observable.
          */
-        const std::list < Observable >& observables() const
+        const ObservableList& observables() const
         { return m_observables; }
 
         /** 
@@ -173,7 +159,7 @@ namespace vle { namespace vpz {
          * 
          * @return A reference to the list of Observable.
          */
-        std::list < Observable >& observables()
+        ObservableList& observables()
         { return m_observables; }
 
         inline bool operator<(const Measure& measure)
@@ -184,11 +170,11 @@ namespace vle { namespace vpz {
 
 
     private:
-        std::string m_name;
-        Type        m_type;
-        double      m_timestep;
-        std::string m_output;
-        std::list < Observable > m_observables;
+        std::string     m_name;
+        Type            m_type;
+        double          m_timestep;
+        std::string     m_output;
+        ObservableList  m_observables;
     };
 
 }} // namespace vle vpz

@@ -81,8 +81,8 @@ void Output::write(std::ostream& out) const
         break;
     }
 
-    if (not m_xml.empty()) {
-        out << ">" << m_xml << "</output>";
+    if (not m_data.empty()) {
+        out << ">" << m_data << "</output>";
     } else {
 
     }
@@ -120,9 +120,9 @@ void Output::setNetStream(const std::string& plugin,
     m_plugin.assign(plugin);
 }
 
-void Output::setXML(const std::string& xml)
+void Output::setData(const std::string& data)
 {
-    m_xml.assign(xml);
+    m_data.assign(data);
 }
 
 }} // namespace vle vpz

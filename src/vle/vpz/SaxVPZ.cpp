@@ -93,10 +93,11 @@ void VpzStackSax::push_model(const xmlpp::SaxParser::AttributeList& att)
     if (type == "atomic") {
         std::string cnd(get_attribute < std::string >(att, "conditions"));
         std::string dyn(get_attribute < std::string >(att, "dynamics"));
+        std::string obs(get_attribute < std::string >(att, "observables"));
         gmdl = new graph::AtomicModel(parent);
         vpz().project().model().atomicModels().insert(std::make_pair(
                 reinterpret_cast < graph::AtomicModel* >(gmdl),
-                AtomicModel(cnd, dyn)));
+                AtomicModel(cnd, dyn, obs)));
     } else if (type == "coupled") {
         gmdl = new graph::CoupledModel(parent);
     } else if (type == "novle") {
@@ -397,9 +398,6 @@ void VpzStackSax::push_condition_port(const xmlpp::SaxParser::AttributeList& att
 
     vpz::Condition* cnd(static_cast < vpz::Condition* >(m_stack.top()));
     cnd->addPort(name);
-
-    // FIXME se mettre dans un mode pour lire les values et les attachées au
-    // port venant d'être créé.
 }
 
 value::Set& VpzStackSax::pop_condition_port()
@@ -412,6 +410,111 @@ value::Set& VpzStackSax::pop_condition_port()
     value::Set& vals(cnd->last_added_port());
 
     return vals;
+}
+
+void VpzStackSax::push_measures()
+{
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_vpz);
+    AssertS(utils::SaxParserError, m_stack.top()->isExperiment());
+
+    m_stack.push(&m_vpz->project().experiment().measures());
+}
+
+void VpzStackSax::push_outputs()
+{
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_vpz);
+    AssertS(utils::SaxParserError, m_stack.top()->isMeasures());
+
+    m_stack.push(&m_vpz->project().experiment().measures().outputs());
+}
+
+void VpzStackSax::push_output(const xmlpp::SaxParser::AttributeList& att)
+{
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_vpz);
+    AssertS(utils::SaxParserError, m_stack.top()->isOutputs());
+
+    std::string name(get_attribute < std::string >(att, "name"));
+    std::string format(get_attribute < std::string >(att, "format"));
+    std::string location, plugin;
+
+    if (exist_attribute(att, "location")) {
+        location.assign(get_attribute < std::string >(att, "location"));
+    }
+
+    Outputs& outs(m_vpz->project().experiment().measures().outputs());
+    if (format == "text") {
+        outs.addTextStream(name, location);
+    } else if (format == "sdml") {
+        outs.addSdmlStream(name, location);
+    } else if (format == "eov") {
+        Assert(utils::SaxParserError, exist_attribute(att, "plugin"),
+               (boost::format("Outputs %1% is an eov outputs without plugin") %
+                name));
+        std::string plugin(get_attribute < std::string >(att, "plugin"));
+        outs.addEovStream(name, plugin, location);
+    } else if (format == "net") {
+        Assert(utils::SaxParserError, exist_attribute(att, "plugin"),
+               (boost::format("Outputs %1% is a net outputs without plugin") %
+                name));
+        std::string plugin(get_attribute < std::string >(att, "plugin"));
+        outs.addEovStream(name, plugin, location);
+    } else {
+        Throw(utils::SaxParserError, (boost::format(
+                    "Unknow format '%1%' for the output %2%") % format % name));
+    }
+}
+
+void VpzStackSax::push_measure(const xmlpp::SaxParser::AttributeList& att)
+{
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_vpz);
+    AssertS(utils::SaxParserError, m_stack.top()->isMeasures());
+
+    std::string name(get_attribute< std::string >(att, "name")); 
+    std::string type(get_attribute< std::string >(att, "type")); 
+    std::string output(get_attribute< std::string >(att, "output")); 
+    
+    Measures& measures(m_vpz->project().experiment().measures());
+
+    if (type == "timed") {
+        Assert(utils::SaxParserError, exist_attribute(att, "timestep"),
+               (boost::format("Measure %1% have no timestep attribute.") %
+                name));
+
+        double ts(get_attribute < double >(att, "timestep"));
+        Measure& nm(measures.addTimedMeasure(name, ts, output));
+        m_stack.push(&nm);
+    } else if (type == "event") {
+        Measure& nm(measures.addEventMeasure(name, output));
+        m_stack.push(&nm);
+    } else {
+        Throw(utils::SaxParserError, (boost::format(
+                    "Unknow type '%1%' for the measure %1%") % type % name));
+    }
+}
+
+void VpzStackSax::push_observable(const xmlpp::SaxParser::AttributeList& att)
+{
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_vpz);
+    AssertS(utils::SaxParserError, m_stack.top()->isMeasure());
+
+    Measure* measure(static_cast < Measure* >(m_stack.top()));
+
+    std::string name(get_attribute < std::string >(att, "name"));
+    std::string group;
+    int index = -1;
+
+    if (exist_attribute(att, "group"))
+        group.assign(get_attribute < std::string >(att, "group"));
+    if (exist_attribute(att, "index"))
+        index = get_attribute < int >(att, "index");
+
+    Observable& obs(measure->addObservable(name, group, index));
+    m_stack.push(&obs);
 }
 
 vpz::Base* VpzStackSax::pop()
@@ -530,6 +633,16 @@ void VLESaxParser::on_start_element(
         m_vpzstack.push_conditions();
     } else if (name == "condition") {
         m_vpzstack.push_condition(att);
+    } else if (name == "measures") {
+        m_vpzstack.push_measures();
+    } else if (name == "outputs") {
+        m_vpzstack.push_outputs();
+    } else if (name == "output") {
+        m_vpzstack.push_output(att);
+    } else if (name == "measure") {
+        m_vpzstack.push_measure(att);
+    } else if (name == "observable") {
+        m_vpzstack.push_observable(att);
     } else {
         Throw(utils::SaxParserError,
               (boost::format("Unknow element %1%") % name));

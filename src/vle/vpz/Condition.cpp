@@ -86,6 +86,23 @@ void Condition::addValueToPort(const std::string& portname,
     }
 }
 
+Condition::ValueList Condition::firstValues() const
+{
+    Condition::ValueList result;
+
+    for (const_iterator it = m_values.begin(); it != m_values.end(); ++it) {
+        if (it->second->size() > 0) {
+            result[it->first] = it->second->getValue(0);
+        } else {
+            Throw(utils::SaxParserError, (boost::format(
+                        "Build a empty first values for condition %1%.") %
+                    m_name));
+        }
+    }
+
+    return result;
+}
+
 const value::Set& Condition::getSetValues(const std::string& portname) const
 {
     const_iterator it = m_values.find(portname);

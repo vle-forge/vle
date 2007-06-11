@@ -34,35 +34,6 @@ Measure::Measure()
 {
 }
 
-//void Measure::init(xmlpp::Element* elt)
-//{
-//AssertI(elt);
-//AssertI(elt->get_name() == "MEASURE");
-//
-//m_observables.clear();
-//
-//Glib::ustring type(xml::get_attribute(elt, "TYPE"));
-//
-//if (type == "timed") {
-//setTimedMeasure(xml::get_double_attribute(elt, "TIME_STEP"),
-//xml::get_attribute(elt, "OUTPUT"));
-//} else if (type == "event") {
-//setEventMeasure(xml::get_attribute(elt, "OUTPUT"));
-//} else {
-//Throw(utils::InternalError,
-//boost::format("Unknow Measure type %1%\n") % type);
-//}
-//
-//xmlpp::Node::NodeList lst = elt->get_children("OBSERVABLE");
-//xmlpp::Node::NodeList::iterator it = lst.begin();
-//while (it != lst.end()) {
-//Observable o;
-//o.init((xmlpp::Element*)(*it));
-//addObservable(o);
-//++it;
-//}
-//}
-
 void Measure::write(std::ostream& out) const
 {
     out << "<measure "
@@ -80,10 +51,10 @@ void Measure::write(std::ostream& out) const
 
     out << ">";
 
-    std::list < Observable >::const_iterator it = m_observables.begin();
-    while (it != m_observables.end()) {
-        (*it).write(out);
-        ++it;
+
+    for (const_iterator it = m_observables.begin(); it != m_observables.end();
+         ++it) {
+        it->second.write(out);
     }
 
     out << "</measure>";
@@ -108,79 +79,45 @@ void Measure::setTimedMeasure(double timestep,
     m_timestep = timestep;
 }
 
-void Measure::addObservable(const Observable& o)
+Observable& Measure::addObservable(const Observable& o)
 {
-    std::list < Observable >::const_iterator it = m_observables.begin();
-    while (it != m_observables.end()) {
-        if ((*it).modelname() == o.modelname() and
-            (*it).portname() == o.portname()) {
-            Throw(utils::InternalError,
-                  boost::format("Add already existing Observable %1% %2%\n") %
-                  o.modelname() % o.portname());
-        }
+    const_iterator it = m_observables.find(o.name());
+    Assert(utils::SaxParserError, it == m_observables.end(),
+           (boost::format("Add an already existing observable %1% in %2%") %
+            o.name(), m_name));
 
-
-        ++it;
-    }
-    m_observables.push_back(o);
+    return (m_observables[o.name()] = o);
 }
 
-void Measure::addObservable(const std::string& modelname,
-                            const std::string& portname,
-                            const std::string& group,
-                            int index)
+Observable& Measure::addObservable(const std::string& name,
+                                   const std::string& group,
+                                   int index)
 {
     vpz::Observable o;
-    o.setObservable(modelname, portname, group, index);
-    addObservable(o);
+    o.setObservable(name, group, index);
+    return addObservable(o);
 }
 
-void Measure::delObservable(const std::string& modelname,
-                            const std::string& portname,
-                            const std::string& group,
-                            int index)
+void Measure::delObservable(const std::string& name)
 {
-    Observable o;
-    o.setObservable(modelname, portname, group, index);
-
-    std::list < Observable >::iterator it;
-    it = std::find(m_observables.begin(), m_observables.end(), o);
-
+    iterator it = m_observables.find(name);
     if (it != m_observables.end()) {
         m_observables.erase(it);
     }
 }
 
-const Observable& Measure::getObservable(const std::string& modelname,
-                                         const std::string& portname,
-                                         const std::string& group,
-                                         int index) const
+const Observable& Measure::getObservable(const std::string& name) const
 {
-    Observable o;
-    o.setObservable(modelname, portname, group, index);
-
-    std::list < Observable >::const_iterator it;
-    it = std::find(m_observables.begin(), m_observables.end(), o);
-
+    const_iterator it = m_observables.find(name);
     Assert(utils::InternalError, it != m_observables.end(),
-           boost::format("Observable not found, name %1%, port %2%\n") %
-           modelname % portname);
+           (boost::format("Observable %1% not found") % name));
 
-    return *it;
+    return it->second;
 }
 
-bool Measure::existObservable(const std::string& modelname,
-                              const std::string& portname,
-                              const std::string& group,
-                              int index) const
+bool Measure::existObservable(const std::string& name) const
 {
-    Observable o;
-    o.setObservable(modelname, portname, group, index);
-
-    std::list < Observable >::const_iterator it;
-    it = std::find(m_observables.begin(), m_observables.end(), o);
-
-    return it != m_observables.end();
+    return m_observables.find(name) != m_observables.end();
 }
 
 }} // namespace vle vpz

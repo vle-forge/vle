@@ -36,7 +36,9 @@ namespace vle { namespace vpz {
     class Measures : public Base
     {
     public:
-        typedef std::vector < Measure > MeasureList;
+        typedef std::map < std::string, Measure > MeasureList;
+        typedef MeasureList::const_iterator const_iterator;
+        typedef MeasureList::iterator iterator;
 
         Measures();
 
@@ -71,8 +73,7 @@ namespace vle { namespace vpz {
         void delMeasure(const std::string& name);
 
         void addObservableToMeasure(const std::string& measurename,
-                                    const std::string& modelname,
-                                    const std::string& portname,
+                                    const std::string& name,
                                     const std::string& group = std::string(),
                                     int index = -1);
 
@@ -101,55 +102,6 @@ namespace vle { namespace vpz {
 
         EOVs& eovs()
         { return m_eovs; }
-
-
-        /** 
-         * @brief This functor is a helper to find a measure by name in an
-         * MeasureList using the standard algorithm std::find_if, std::remove_if
-         * etc.
-         *
-         * Example:@n
-         * <code>
-         * Glib::ustring name = "a";@n
-         * MeasureList::const_iterator it;
-         * it = std::find_if(lst.begin(), lst.end(), MeasureHasName("a"));
-         * </code>
-         */
-        struct MeasureHasName
-        {
-            const Glib::ustring& name;
-
-            inline MeasureHasName(const Glib::ustring& name) :
-                name(name)
-            { }
-
-            inline bool operator()(const Measure& measure) const
-            { return measure.name() == name; }
-        };
-
-        /** 
-         * @brief This functor is a helper to find a measure by output name in
-         * an MeasureList using the standard algorithm std::find_if,
-         * std::remove_if etc.
-         *
-         * Example:@n
-         * <code>
-         * Glib::ustring name = "a";@n
-         * MeasureList::const_iterator it;
-         * it = std::find_if(lst.begin(), lst.end(), MeasureHasOutput("a"));
-         * </code>
-         */
-        struct MeasureHasOutput
-        {
-            const Glib::ustring& name;
-
-            inline MeasureHasOutput(const Glib::ustring& name) :
-                name(name)
-            { }
-
-            inline bool operator()(const Measure& measure) const
-            { return measure.output() == name; }
-        };
 
     private:
         Outputs     m_outputs;

@@ -238,7 +238,7 @@ void Coordinator::init()
 
         Simulator* satom(getModel(it->first));
         vpz::Condition& cnd(cnds.find(it->second.conditions()));
-        satom->processInitEvents(cnd.values());
+        satom->processInitEvents(cnd.firstValues());
     }
 
     for (SimulatorMap::iterator satom = m_modelList.begin();
@@ -432,6 +432,7 @@ void Coordinator::applyInits(SimulatorList& /* lst */,
 
 void Coordinator::startEOVStream()
 {
+    /*
     const vpz::EOVs eovs = m_experiment.measures().eovs();
     std::map < std::string, vpz::EOV >::const_iterator it;
     for (it = eovs.eovs().begin(); it != eovs.eovs().end(); ++it) {
@@ -485,32 +486,41 @@ void Coordinator::startEOVStream()
         }
     }
     Glib::usleep(1000000); // FIXME pose obligatoire ?!?
+    */
 }
 
 void Coordinator::startNetStream()
 {
+    /*
     const vpz::Measures& measures = m_experiment.measures();
-    vpz::Measures::MeasureList::const_iterator it;
-    for (it = measures.measures().begin(); it != measures.measures().end();
-         ++it) {
-        const vpz::Output& o = measures.outputs().find((*it).output());
+    const vpz::Outputs& outs = measures.outputs();
 
-        if (o.format() == vpz::Output::NET)
-	  startNetStream((*it).output(), o.location());
-    }
+    for (vpz::Outputs::OutputList::const_iterator it = outs.outputs().begin();
+         it != outs.outputs().end(); ++it) {
+        if (it->second.format() == vpz::Output::NET) {
+
+            for (vpz::Measures::MeasureList::const_iterator jt = measures.begin();
+                 jt != measures.end(); ++jt) {
+
+                if (jt->second.output() == it->second.name()) {
+                    startNetStream(it->second, jt->second);
+                }
+            }
+        }
+        }
+        */
 }
 
-void Coordinator::startNetStream(const std::string& output,
-                               const std::string& outputhost)
+void Coordinator::startNetStream(const vpz::Measure& /* measure */,
+                                 const vpz::Output& /* output */)
 {
-    std::string measurename;
-    const vpz::Output& o = m_experiment.measures().outputs().find(output);
-    const vpz::Measure& m =
-        m_experiment.measures().findMeasureFromOutput(output, measurename);
-    Stream* stream = getStreamPlugin(o);
-    stream->init(o.plugin(), m_experiment.name(), outputhost, o.xml());
+    /*
 
-    DTRACE1(boost::format("measurename : %1%.\n") % measurename);
+    Stream* stream(getStreamPlugin(output));
+    stream->init(ouput.plugin(), m_experiment.name(), output.location(),
+                 o.data());
+
+    DTRACE1(boost::format("measurename : %1%.\n") % measure.name());
 
     Observer* obs = 0;
     if (m.type() == vpz::Measure::TIMED) {
@@ -520,17 +530,33 @@ void Coordinator::startNetStream(const std::string& output,
     }
     stream->setObserver(obs);
 
-    const std::list < vpz::Observable >& observables = m.observables();
-    std::list < vpz::Observable >::const_iterator it;
-    for (it = observables.begin(); it != observables.end(); ++it) {
+    const vpz::Measure::ObservableList& lst(measure.observable());
+    const vpz::AtomicModelList& atoms(m_vpz.project().model().atomicModels());
+
+    for (vpz::Measure::ObservableList::const_iterator it = lst.begin();
+         it != lst.end(); ++it) {
+        for (vpz::AtomicModelList::const_iterator jt = atoms.begin(); 
+             jt != atoms.end(); ++jt) {
+            if (it->second.name() == (*jt).observables()) {
+                const vpz::ObservablePort& ports(jt->
+                for (vpz::ObservableList::const_iterator kt = 
+                obs->addObservable(jt->first,
+                                   (
+
+    const vpz::Measure::ObservableList& obslst(m.observables());
+    for (vpz::Measure::ObservableList::const_iterator it = obslst.begin(); 
+         it != obslst.end(); ++it) {
         obs->addObservable(getModel((*it).modelname()), (*it).portname(),
-                           (*it).group(), (*it).index());
+                           (*it).group(), (*it).());
     }
     addObserver(obs);
+
+    */
 }
 
 void Coordinator::startLocalStream()
 {
+    /* 
     const vpz::Measures& measures = m_experiment.measures();
     vpz::Measures::MeasureList::const_iterator it;
     for (it = measures.measures().begin(); it != measures.measures().end();
@@ -566,7 +592,8 @@ void Coordinator::startLocalStream()
             }
             addObserver(obs);
         }
-    }
+        }
+        */
 }
 
 void Coordinator::parseExperiment()

@@ -39,9 +39,10 @@ namespace vle { namespace vpz {
     class Condition : public Base
     {
     public:
-        typedef std::map < std::string, value::Set > ValueList;
-        typedef ValueList::const_iterator const_iterator;
-        typedef ValueList::iterator iterator;
+        typedef std::map < std::string, value::Value > ValueList;
+        typedef std::map < std::string, value::Set > SetList;
+        typedef SetList::const_iterator const_iterator;
+        typedef SetList::iterator iterator;
 
         Condition();
 
@@ -109,7 +110,7 @@ namespace vle { namespace vpz {
          * 
          * @return 
          */
-        inline const ValueList& values() const
+        inline const SetList& values() const
         { return m_values; }
 
 
@@ -118,8 +119,17 @@ namespace vle { namespace vpz {
          * 
          * @return 
          */
-        inline ValueList& values()
+        inline SetList& values()
         { return m_values; }
+
+
+        /** 
+         * @brief Build a new ValueList based on the SetList with only the
+         * first value for each Set.
+         * 
+         * @return A cloned ValueList based on the SetList.
+         */
+        Condition::ValueList firstValues() const;
 
         /** 
          * @brief Get the value::Set attached to a port.
@@ -171,7 +181,7 @@ namespace vle { namespace vpz {
     private:
         std::string             m_name;         /* name of the condition. */
         std::string             m_last_port;    /* latest added port. */
-        ValueList               m_values;       /* dic < portname, value >. */
+        SetList                 m_values;       /* dic < portname, value >. */
     };
 
 }} // namespace vle vpz

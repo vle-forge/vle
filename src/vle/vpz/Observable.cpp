@@ -38,26 +38,9 @@ Observable::~Observable()
 {
 }
 
-//void Observable::init(xmlpp::Element* elt)
-//{
-//AssertI(elt);
-//AssertI(elt->get_name() == "OBSERVABLE");
-//
-//if (xml::exist_attribute(elt, "GROUP")) {
-//setObservable(xml::get_attribute(elt, "MODEL_NAME"),
-//xml::get_attribute(elt, "PORT_NAME"),
-//xml::get_attribute(elt, "GROUP"),
-//xml::get_int_attribute(elt, "INDEX"));
-//} else {
-//setObservable(xml::get_attribute(elt, "MODEL_NAME"),
-//xml::get_attribute(elt, "PORT_NAME"));
-//}
-//}
-
 void Observable::write(std::ostream& out) const
 {
-    out << "<observable model_name=\"" << m_modelname << "\" "
-        << "port_name=\"" << m_portname << "\" ";
+    out << "<observable name=\"" << m_name << "\" ";
 
     if (not m_group.empty()) {
         out << "group=\"" << m_group << "\" "
@@ -67,24 +50,13 @@ void Observable::write(std::ostream& out) const
     out << "/ >";
 } 
 
-bool Observable::operator==(const Observable& o) const
-{
-    return m_modelname == o.modelname() and
-        m_portname == o.portname() and
-        m_group == o.group() and
-        m_index == o.index();
-}
-
-void Observable::setObservable(const std::string& modelname,
-                               const std::string& portname,
+void Observable::setObservable(const std::string& name,
                                const std::string& group,
                                int index)
 {
-    AssertI(not modelname.empty() and not portname.empty());
+    AssertI(not name.empty());
 
-    m_modelname.assign(modelname);
-    m_portname.assign(portname);
-
+    m_name.assign(name);
     m_group.assign(group);
     m_index = index;
 }

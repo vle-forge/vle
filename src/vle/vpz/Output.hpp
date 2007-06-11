@@ -103,12 +103,12 @@ namespace vle { namespace vpz {
                           const std::string& location = std::string());
 
         /** 
-         * @brief Set the output XML to initialise the plugin. The XML have the
-         * OUTPUT tag.
+         * @brief Set the output data to initialise the plugin. The data is
+         * the children of output tag.
          * 
-         * @param xml the string representation of the XML.
+         * @param data the string representation of the data.
          */
-        void setXML(const std::string& xml);
+        void setData(const std::string& data);
 
         /** 
          * @brief Get the format of this Output.
@@ -140,12 +140,12 @@ namespace vle { namespace vpz {
         { return m_location; }
 
         /** 
-         * @brief Get the XML of this Output.
+         * @brief Get the data of this Output.
          * 
-         * @return a string representation of the XML.
+         * @return a string representation of the data.
          */
-        const std::string& xml() const
-        { return m_xml; }
+        const std::string& data() const
+        { return m_data; }
 
         const std::string& name() const
         { return m_name; }
@@ -158,7 +158,7 @@ namespace vle { namespace vpz {
         std::string m_name;
         std::string m_plugin;
         std::string m_location;
-        std::string m_xml;
+        std::string m_data;
     };
 
 }} // namespace vle vpz

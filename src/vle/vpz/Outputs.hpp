@@ -38,7 +38,10 @@ namespace vle { namespace vpz {
     class Outputs : public Base
     {
     public:
-        typedef std::list < Output > OutputList;
+        typedef std::map < std::string, Output > OutputList;
+        typedef OutputList::const_iterator const_iterator;
+        typedef OutputList::iterator iterator;
+
 
         Outputs()
         { }
@@ -167,31 +170,6 @@ namespace vle { namespace vpz {
          */
         const OutputList& outputs() const
         { return m_outputs; }
-
-
-        /** 
-         * @brief This functor is a helper to find an output by name in an
-         * OutputList using the standard algorithm std::find_if, std::remove_if
-         * etc.
-         *
-         * Example:@n
-         * <code>
-         * Glib::ustring name = "a";@n
-         * OutputList::const_iterator it;
-         * it = std::find_if(lst.begin(), lst.end(), OutputHasName("a"));
-         * </code>
-         */
-        struct OutputHasName
-        {
-            const Glib::ustring& name;
-
-            inline OutputHasName(const Glib::ustring& name) :
-                name(name)
-            { }
-
-            inline bool operator()(const Output& output) const
-            { return output.name() == name; }
-        };
 
     private:
         OutputList m_outputs;

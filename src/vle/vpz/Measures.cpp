@@ -35,50 +35,22 @@ Measures::Measures()
 {
 }
 
-////void Measures::init(xmlpp::Element* elt)
-//{
-//AssertI(elt);
-//AssertI(elt->get_name() == "MEASURES");
-//
-//if (xml::exist_children(elt, "OUTPUTS")) {
-//xmlpp::Element* outputs = xml::get_children(elt, "OUTPUTS");
-//m_outputs.init(outputs);
-//}
-//
-//xmlpp::Node::NodeList lst = elt->get_children("MEASURE");
-//xmlpp::Node::NodeList::iterator it;
-//for (it = lst.begin(); it != lst.end(); ++it) {
-//Measure m;
-//m.init((xmlpp::Element*)(*it));
-//Glib::ustring name(xml::get_attribute((*it), "NAME"));
-//
-//addMeasure(name, m);
-//}
-//
-//if (xml::exist_children(elt, "EOVS")) {
-//xmlpp::Element* eovs = xml::get_children(elt, "EOVS");
-//m_eovs.init(eovs);
-//} else {
-//buildEOV();
-//}
-//}
-
 void Measures::buildEOV()
 {
     if (m_eovs.eovs().empty()) {
-        std::list < Output >::const_iterator it;
+        Outputs::const_iterator it;
         for (it = m_outputs.outputs().begin(); it !=
              m_outputs.outputs().end(); ++it) {
-            if ((*it).format() == Output::EOV) {
+            if ((it->second).format() == Output::EOV) {
                 EOV tmp;
                 tmp.setPluginChild();
-                tmp.host((*it).location());
-                ((EOVplugin&)tmp.child()).setEOVplugin((*it).name(),
-                                                       (*it).plugin());
+                tmp.host((it->second).location());
+                ((EOVplugin&)tmp.child()).setEOVplugin(it->second.name(),
+                                                       it->second.plugin());
 
                 TRACE1(boost::format("libvpz: buildEOV %1% %2%\n") %
-                       (*it).name() % (*it).plugin());
-                m_eovs.addEOV((*it).name(), tmp);
+                       it->second.name() % it->second.plugin());
+                m_eovs.addEOV(it->second.name(), tmp);
             }
         }
     }
@@ -90,13 +62,12 @@ void Measures::write(std::ostream& out) const
         out << "<measures>";
         m_outputs.write(out);
 
-        std::copy(m_measures.begin(), m_measures.end(),
-                  std::ostream_iterator < Measure >(out, "\n"));
+        for (const_iterator it = m_measures.begin(); it != m_measures.end();
+             ++it) {
+            it->second.write(out);
+        }
 
         out << "</measures>";
-
-        //m_eovs.write(xmlmeasures);
-        //FIXME FIXME FIXME 
     }
 }
 
@@ -156,36 +127,33 @@ Measure& Measures::addTimedMeasure(const std::string& name,
 
 void Measures::delMeasure(const std::string& name)
 {
-    std::remove_if(m_measures.begin(), m_measures.end(), MeasureHasName(name));
+    iterator it = m_measures.find(name);
+    if (it != m_measures.end()) {
+        m_measures.erase(it);
+    }
 }
 
 void Measures::addObservableToMeasure(const std::string& measurename,
-                                      const std::string& modelname,
-                                      const std::string& portname,
+                                      const std::string& name,
                                       const std::string& group,
                                       int index)
 {
-    MeasureList::iterator it;
-    it = std::find_if(m_measures.begin(), m_measures.end(),
-                      MeasureHasName(measurename));
+    iterator it = m_measures.find(measurename);
+    Assert(utils::SaxParserError, it != m_measures.end(),
+           (boost::format("Measures %1% does not exist.") % measurename));
 
-    Assert(utils::ParseError, it != m_measures.end(),
-           boost::format("Measure '%1%' unknow to add observable '%2%'\n") %
-                           measurename % (modelname + portname));
     Observable o;
-    o.setObservable(modelname, portname, group, index);
-    (*it).addObservable(o);
+    o.setObservable(name, group, index);
+    it->second.addObservable(o);
 }
 
 void Measures::addMeasures(const Measures& m)
 {
     m_outputs.addOutputs(m.outputs());
 
-    // FIXME add les eovs.
-
-    MeasureList::const_iterator it;
-    for (it = m.measures().begin(); it != m.measures().end(); ++it) {
-        addMeasure(*it);
+    for (const_iterator it = m.measures().begin(); it != m.measures().end();
+         ++it) {
+        addMeasure(it->second);
     }
 
     if (m_eovs.eovs().empty()) {
@@ -195,69 +163,54 @@ void Measures::addMeasures(const Measures& m)
 
 Measure& Measures::addMeasure(const Measure& m)
 {
-    MeasureList::iterator it;
-    it = std::find_if(m_measures.begin(), m_measures.end(),
-                      MeasureHasName(m.name()));
-
-    Assert(utils::InternalError, it == m_measures.end(),
+    const_iterator it = m_measures.find(m.name());
+    Assert(utils::SaxParserError, it == m_measures.end(),
            boost::format("A Measure have already this name '%1%'\n") %
            m.name());
 
-    Assert(utils::InternalError, m_outputs.exist(m.output()),
+    Assert(utils::SaxParserError, m_outputs.exist(m.output()),
            boost::format("Unknow output name '%1%' for measure '%2%'\n") %
            m.output() % m.name());
     
-    m_measures.push_back(m);
-    return *m_measures.rbegin();
+    return (m_measures[m.name()] = m);
 }
 
 const Measure& Measures::findMeasureFromOutput(const std::string& outputname,
                                                std::string& measure) const
 {
-    MeasureList::const_iterator it;
-    std::find_if(m_measures.begin(), m_measures.end(),
-                 MeasureHasOutput(outputname));
+    for (const_iterator it = m_measures.begin(); it != m_measures.end(); ++it) {
+        if (it->second.existObservable(outputname)) {
+            measure.assign(it->second.name());
+            return it->second;
+        }
+    }
 
-    Assert(utils::InternalError, it != m_measures.end(),
-          boost::format("Failed to find measure attached to the output '%1%'\n")
-          % outputname);
-    
-    measure = (*it).name();
-
-    return *it;
+    Throw(utils::SaxParserError, 
+          (boost::format("Failed to find measure attached to the output '%1%'\n")
+          % outputname));
 }
 
 const Measure& Measures::find(const std::string& name) const
 {
-    MeasureList::const_iterator it = std::find_if(m_measures.begin(),
-                                                  m_measures.end(),
-                                                  MeasureHasName(name));
-
-    Assert(utils::InternalError, it != m_measures.end(),
+    const_iterator it = m_measures.find(name);
+    Assert(utils::SaxParserError, it != m_measures.end(),
            boost::format("Unknow measure '%1%'\n") % name);
 
-    return (*it);
+    return it->second;
 }
 
 Measure& Measures::find(const std::string& name)
 {
-    MeasureList::iterator it = std::find_if(m_measures.begin(),
-                                            m_measures.end(),
-                                            MeasureHasName(name));
-
-    Assert(utils::InternalError, it != m_measures.end(),
+    iterator it = m_measures.find(name);
+    Assert(utils::SaxParserError, it != m_measures.end(),
            boost::format("Unknow measure '%1%'\n") % name);
 
-    return (*it);
+    return it->second;
 }
 
 bool Measures::exist(const std::string& name) const
 {
-    MeasureList::const_iterator it = std::find_if(m_measures.begin(),
-                                                  m_measures.end(),
-                                                  MeasureHasName(name));
-
-    return it != m_measures.end();
+    return m_measures.find(name) != m_measures.end();
 }
 
 }} // namespace vle vpz

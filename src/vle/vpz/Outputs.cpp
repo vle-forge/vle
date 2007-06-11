@@ -31,31 +31,15 @@ namespace vle { namespace vpz {
 
 using namespace vle::utils;
 
-//void Outputs::init(xmlpp::Element* elt)
-//{
-//AssertI(elt);
-//AssertI(elt->get_name() == "OUTPUTS");
-//
-//m_outputs.clear();
-//
-//xmlpp::Node::NodeList lst = elt->get_children("OUTPUT");
-//xmlpp::Node::NodeList::iterator it = lst.begin();
-//while (it != lst.end()) {
-//std::string name(xml::get_attribute((xmlpp::Element*)(*it), "NAME"));
-//Output o;
-//o.init((xmlpp::Element*)(*it));
-//addOutput(name, o);
-//++it;
-//}
-//}
-
 void Outputs::write(std::ostream& out) const
 {
     if (not m_outputs.empty()) {
         out << "<ouputs>";
 
-        std::copy(m_outputs.begin(), m_outputs.end(),
-                  std::ostream_iterator< Output >(out, "\n"));
+        for (const_iterator it = m_outputs.begin(); it != m_outputs.end();
+             ++it) {
+            it->second.write(out);
+        }
 
         out << "</outputs>";
     }
@@ -97,14 +81,18 @@ void Outputs::clear()
 
 void Outputs::delOutput(const std::string& name)
 {
-    std::remove_if(m_outputs.begin(), m_outputs.end(), OutputHasName(name));
+    iterator it = m_outputs.find(name);
+
+    if (it != m_outputs.end()) {
+        m_outputs.erase(it);
+    }
 }
 
 void Outputs::addOutputs(const Outputs& o)
 {
     for (OutputList::const_iterator it = o.outputs().begin();
          it != o.outputs().end(); ++it) {
-        addOutput(*it);
+        addOutput(it->second);
     }
 }
 
@@ -114,27 +102,25 @@ void Outputs::addOutput(const Output& o)
            boost::format("An output have already this name '%1%'\n") %
            o.name());
 
-    m_outputs.push_back(o);
+    m_outputs[o.name()] = o;
 }
 
 Output& Outputs::find(const std::string& name)
 {
-    OutputList::iterator it;
-    it = std::find_if(m_outputs.begin(), m_outputs.end(), OutputHasName(name));
+    OutputList::iterator it = m_outputs.find(name);
     Assert(utils::InternalError, it != m_outputs.end(),
            boost::format("Unknow output '%1%'\n") % name);
 
-    return (*it);
+    return it->second;
 }
 
 const Output& Outputs::find(const std::string& name) const
 {
-    OutputList::const_iterator it;
-    it = std::find_if(m_outputs.begin(), m_outputs.end(), OutputHasName(name));
+    OutputList::const_iterator it = m_outputs.find(name);
     Assert(utils::InternalError, it != m_outputs.end(),
            boost::format("Unknow output '%1%'\n") % name);
 
-    return (*it);
+    return it->second;
 }
 
 std::list < std::string > Outputs::outputsname() const
@@ -143,17 +129,14 @@ std::list < std::string > Outputs::outputsname() const
 
     OutputList::const_iterator it;
     for (it = m_outputs.begin(); it != m_outputs.end(); ++it) {
-        result.push_back((*it).name());
+        result.push_back(it->second.name());
     }
     return result;
 }
 
 bool Outputs::exist(const std::string& name) const
 {
-    OutputList::const_iterator it = std::find_if(m_outputs.begin(),
-                                                 m_outputs.end(),
-                                                 OutputHasName(name));
-    return it != m_outputs.end();
+    return m_outputs.find(name) != m_outputs.end();
 }
 
 }} // namespace vle vpz

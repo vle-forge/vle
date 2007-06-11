@@ -249,10 +249,24 @@ namespace vle { namespace devs {
 
         void startEOVStream();
 
+        /* - * - * - * - * - * - * - * - * - * - * - * - * - * - * - * - * - */
+
+        /** 
+         * @brief Search all measures when outputs is in a ouput::Net format.
+         */
         void startNetStream();
 
-        void startNetStream(const std::string& output,
-                            const std::string& outputhost);
+        /** 
+         * @brief Build the devs::Stream object and attach devs::Observer to the
+         * output::Net using the vpz::Observable information.
+         * 
+         * @param measure the measure who push data to the stream.
+         * @param output the concerned output.
+         */
+        void startNetStream(const vpz::Measure& measure,
+                            const vpz::Output& output);
+        
+        /* - * - * - * - * - * - * - * - * - * - * - * - * - * - * - * - * - */
 
         void startLocalStream();
 

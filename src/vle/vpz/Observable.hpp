@@ -25,10 +25,24 @@
 #ifndef VLE_VPZ_OBSERVABLE_HPP
 #define VLE_VPZ_OBSERVABLE_HPP
 
+#include <set>
 #include <string>
 #include <vle/vpz/Base.hpp>
 
 namespace vle { namespace vpz {
+
+    /** 
+     * @brief ObservablePort represents the list of ports of an Observable.
+     * ObservablePort is a std::set of std::string where std::string is the port
+     * name.
+     */
+    class ObservablePort : public std::set < std::string >
+    {
+    public:
+        virtual ~ObservablePort()
+        { }
+    };
+
 
     /** 
      * @brief An observable is a observation on state of a model. It is defines
@@ -47,8 +61,6 @@ namespace vle { namespace vpz {
         virtual Base::type getType() const
         { return OBSERVABLE; }
 
-        bool operator==(const Observable& o) const;
-        
         /** 
          * @brief Set the observable information with model name or port name
          * to observe and the couple group, index if define, to sort multiple
@@ -62,30 +74,32 @@ namespace vle { namespace vpz {
          * @throw Exception::Internal if modelname or portname is empty or if
          * group is define but not the index.
          */
-        void setObservable(const std::string& modelname,
-                           const std::string& portname,
+        void setObservable(const std::string& name,
                            const std::string& group = std::string(),
                            int index = -1);
 
         /* * * * * * * * * * * * */
 
-        const std::string& modelname() const
-        { return m_modelname; }
+        inline const std::string& name() const
+        { return m_name; }
 
-        const std::string& portname() const
-        { return m_portname; }
-
-        const std::string& group() const
+        inline const std::string& group() const
         { return m_group; }
 
-        int index() const
+        inline int index() const
         { return m_index; }
+
+        inline  const ObservablePort& ports() const
+        { return m_ports; }
+
+        inline ObservablePort& ports()
+        { return m_ports; }
         
     private:
-        std::string m_modelname;
-        std::string m_portname;
-        std::string m_group;
-        int         m_index;
+        std::string         m_name;
+        std::string         m_group;
+        int                 m_index;
+        ObservablePort      m_ports;
     };
 
 }} // namespace vle vpz

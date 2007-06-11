@@ -66,6 +66,12 @@ namespace vle { namespace vpz {
         void push_conditions();
         void push_condition(const xmlpp::SaxParser::AttributeList& att);
         void push_condition_port(const xmlpp::SaxParser::AttributeList& att);
+        void push_measures();
+        void push_outputs();
+        void push_output(const xmlpp::SaxParser::AttributeList& att);
+        void push_measure(const xmlpp::SaxParser::AttributeList& att);
+        void push_observable(const xmlpp::SaxParser::AttributeList& att);
+
         value::Set& pop_condition_port();
         vpz::Base* pop();
         const vpz::Base* top() const;
