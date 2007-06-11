@@ -59,10 +59,9 @@ using namespace xmlpp;
 
 namespace vle { namespace devs {
 
-Coordinator::Coordinator(long CoordinatorIndex, const vpz::Vpz& vp) :
+    Coordinator::Coordinator(const vpz::Vpz& vp) :
     m_vpz(vp),
     m_experiment(vp.project().experiment()),
-    m_index(CoordinatorIndex),
     m_duration(0.0),
     m_currentTime(0)
 {

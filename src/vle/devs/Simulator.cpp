@@ -37,7 +37,6 @@
 namespace vle { namespace devs {
 
 Simulator::Simulator(graph::AtomicModel* a) :
-    m_modelIndex(-1),
     m_lastTime(0),
     m_dynamics(0),
     m_atomicModel(a)
@@ -53,11 +52,6 @@ void Simulator::addDynamics(Dynamics* dynamics)
 {
     if (m_dynamics) delete m_dynamics;
     m_dynamics = dynamics;
-}
-
-long Simulator::getModelIndex() const
-{
-    return m_modelIndex;
 }
 
 const std::string& Simulator::getName() const
@@ -81,11 +75,6 @@ Model * Simulator::findModel(const std::string & name) const
 	return (Model *)m_atomicModel;
     else
 	return 0;
-}
-
-void Simulator::setIndex(long index)
-{
-    m_modelIndex = index;
 }
 
 void Simulator::setLastTime(const Time& time)

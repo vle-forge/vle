@@ -88,7 +88,6 @@ namespace vle { namespace extension {
       // DEVS Methods
       virtual void finish();
       virtual vle::devs::Time init();
-      virtual void processInitEvents(const vle::devs::InitEventList& /* event */);
       virtual void processInternalEvent(const vle::devs::InternalEvent& /* event */);
       virtual void processExternalEvents(const vle::devs::ExternalEventList& /* event */,
 					 const vle::devs::Time& /* time */);

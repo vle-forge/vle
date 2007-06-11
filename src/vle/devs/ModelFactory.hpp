@@ -90,7 +90,6 @@ namespace vle { namespace devs {
 
     private:
 	Coordinator&        mCoordinator;
-	int                 mIndex;
         vpz::Dynamics       mDynamics;
         vpz::Classes        mClasses;
 

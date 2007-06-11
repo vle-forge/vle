@@ -56,7 +56,7 @@ namespace vle { namespace devs {
     class Coordinator
     {
     public:
-	Coordinator(long coordinatorIndex, const vpz::Vpz& io);
+      Coordinator(/*long coordinatorIndex, */const vpz::Vpz& io);
 
 	~Coordinator();
 
@@ -99,7 +99,7 @@ namespace vle { namespace devs {
 
 	inline Time getCurrentTime()const { return m_currentTime; }
 
-	inline long getIndex() const { return m_index; }
+      //inline long getIndex() const { return m_index; }
 
 	/**
 	 * Return the Simulator with a specified AtomicModel.
@@ -145,7 +145,7 @@ namespace vle { namespace devs {
 
 	// Index du simulateur dans la table des simulateurs
 	// genere par le coordinateur
-	long m_index;
+	// long m_index;
 
 	// Duree de la simulation
 	double m_duration;

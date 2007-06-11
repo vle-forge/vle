@@ -40,7 +40,6 @@ ModelFactory::ModelFactory(Coordinator& coordinator,
                            const vpz::Dynamics& dyn,
                            const vpz::Classes& cls) :
     mCoordinator(coordinator),
-    mIndex(0),
     mDynamics(dyn),
     mClasses(cls)
 {
@@ -108,7 +107,6 @@ devs::SimulatorList ModelFactory::createModelsFromDynamics(
     graph::AtomicModelVector::const_iterator it;
     for (it = lst.begin(); it != lst.end(); ++it) {
         Simulator* a = new Simulator((graph::AtomicModel*)(*it));
-        a->setIndex(mIndex++);
 
         const vpz::Dynamic& d = dyn.find((*it)->getName());
         switch(d.type()) {

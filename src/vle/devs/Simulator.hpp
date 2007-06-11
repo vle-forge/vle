@@ -55,12 +55,10 @@ namespace vle { namespace devs {
 	~Simulator();
 
 	void addDynamics(Dynamics* dynamics);
-	long getModelIndex() const;
 	const std::string & getName() const;
 	Time getLastTime() const;
 	graph::AtomicModel* getStructure() const;
 	Model* findModel(const std::string & name) const;
-	void setIndex(long index);
 	void setLastTime(const Time& time);
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -101,7 +99,6 @@ namespace vle { namespace devs {
 	InternalEvent* buildInternalEvent(const Time& currentTime);
 
     private:
-	long                    m_modelIndex;
 	Time                    m_lastTime;
 	Dynamics*               m_dynamics;
 	graph::AtomicModel*     m_atomicModel;

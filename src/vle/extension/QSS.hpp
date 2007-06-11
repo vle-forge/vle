@@ -48,7 +48,7 @@ namespace vle { namespace extension {
       virtual vle::devs::Time getTimeAdvance();
       virtual vle::devs::Event::EventType processConflict(const vle::devs::InternalEvent& /* internal */,
 					       const vle::devs::ExternalEventList& /* extEventlist */) const;
-      virtual void processInitEvents(const vle::devs::InitEventList& /* event */);
+      //      virtual void processInitEvents(const vle::devs::InitEventList& /* event */);
       virtual void processInternalEvent(const vle::devs::InternalEvent& /* event */);
       virtual void processExternalEvents(const vle::devs::ExternalEventList& /* event */,
 					 const vle::devs::Time& /* time */);

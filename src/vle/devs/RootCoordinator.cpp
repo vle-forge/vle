@@ -49,7 +49,7 @@ RootCoordinator::~RootCoordinator()
 
 void RootCoordinator::load(const vpz::Vpz& io)
 {
-    Coordinator* coor = new Coordinator(0, io);
+    Coordinator* coor = new Coordinator(io);
     m_coordinatorList.push_back(coor);
 }
 

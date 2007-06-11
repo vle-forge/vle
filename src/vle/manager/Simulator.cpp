@@ -27,7 +27,7 @@
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/vpz/Vpz.hpp>
-#include <vle/devs/Coordinator.hpp>
+#include <vle/devs/RootCoordinator.hpp>
 #include <sstream>
 #include <iostream>
 #include <glibmm/spawn.h>
@@ -185,7 +185,7 @@ bool Simulator::run(const std::string& filename)
         }
 
         std::cerr << " - Coordinator building .........: ";
-        devs::Coordinator coordinator;
+        devs::RootCoordinator coordinator;
         std::cerr << "ok\n";
 
         std::cerr << " - Coordinator load models ......: ";

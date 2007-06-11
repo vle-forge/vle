@@ -177,8 +177,6 @@ namespace vle { namespace extension {
     virtual void getOutputFunction(const vle::devs::Time& /* time */,
 				   vle::devs::ExternalEventList& /* output */);
     virtual vle::devs::Time getTimeAdvance();
-    virtual vle::devs::Event::EventType processConflict(const vle::devs::InternalEvent& /* internal */,
-							const vle::devs::ExternalEventList& /* extEventlist */) const;
     virtual void processExternalEvents(const vle::devs::ExternalEventList& /* event */,
 				       const vle::devs::Time& /* time */);
     virtual vle::value::Value processStateEvent(const vle::devs::StateEvent& /* event */) const;
