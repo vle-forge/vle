@@ -48,7 +48,7 @@ size_t LinearExperimentGenerator::get_combination_number() const
     for (vpz::Conditions::const_iterator it = cnds.begin();
          it != cnds.end(); ++it) {
 
-        const vpz::Condition::ValueList& values(it->second.values());
+        const vpz::Condition::SetList& values(it->second.values());
         for (vpz::Condition::const_iterator jt = values.begin();
              jt != values.end(); ++jt) {
 
