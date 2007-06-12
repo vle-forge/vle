@@ -105,13 +105,13 @@ AC_SUBST(gladedir)
 libvledir="\$(libdir)/vle"
 AC_SUBST(libvledir)
 
-vleincludedir="\$(includedir)/vle-0.4"
+vleincludedir="\$(includedir)/vle-0.5"
 AC_SUBST(vleincludedir)
-gvleincludedir="\$(includedir)/gvle-0.4"
+gvleincludedir="\$(includedir)/gvle-0.5"
 AC_SUBST(gvleincludedir)
-avleincludedir="\$(includedir)/avle-0.4"
+avleincludedir="\$(includedir)/avle-0.5"
 AC_SUBST(avleincludedir)
-eovincludedir="\$(includedir)/eov-0.4"
+eovincludedir="\$(includedir)/eov-0.5"
 AC_SUBST(eovincludedir)
 
 vleexampledir="\$(datadir)/vle/examples"
@@ -251,7 +251,7 @@ AC_SUBST(PLUGINS_PLUGIN_LDFLAGS)
 OBSERVER_PLUGIN_LDFLAGS="-module -no-undefined -avoid-version"
 AC_SUBST(OBSERVER_PLUGIN_LDFLAGS)
 
-SHARED_LIBRARY_LDFLAGS="-no-undefined -version-info 0:4:0"
+SHARED_LIBRARY_LDFLAGS="-no-undefined -version-info 0:5:0"
 AC_SUBST(SHARED_LIBRARY_LDFLAGS)
 
 BINARY_LDFLAGS="-export-dynamic -no-undefined"
