@@ -31,7 +31,7 @@
 
 namespace vle { namespace vpz {
 
-    class NoVLEs : public Base
+    class NoVLEs : public Base, public std::map < std::string, NoVLE >
     {
     public:
         NoVLEs()
@@ -59,25 +59,17 @@ namespace vle { namespace vpz {
 
         /** 
          * @brief Add a new NoVLE into the list.
-         * 
-         * @param modelname the name of the NoVLE model.
          * @param novle the NoVLE information.
-         *
+         * @return a reference to the newly NoVLE builded.
          * @throw Exception::Internal if modelname already exist.
          */
-        void addNoVLE(const std::string& modelname, const NoVLE& novle);
-
-        /** 
-         * @brief Just delete all the vpz::NoVLE.
-         */
-        void clear();
+        NoVLE& add(const NoVLE& novle);
 
         /** 
          * @brief Del the specified model.
-         * 
          * @param modelname the name of the NoVLE model.
          */
-        void delNoVLE(const std::string& modelname);
+        void del(const std::string& modelname);
 
         void fusion(Model& model,
                     Dynamics& dynamics,
@@ -91,7 +83,15 @@ namespace vle { namespace vpz {
          * @return true if NoVLE is found, false otherwise.
          */
         bool exist(const std::string& novle) const
-        { return m_novles.find(novle) != m_novles.end(); }
+        { return find(novle) != end(); }
+
+        /** 
+         * @brief Return a NoVLE with the specified name.
+         * @param novle name to find.
+         * @return A reference to a NoVLE.
+         * @throw Exception::Internal model not found.
+         */
+        const NoVLE& get(const std::string& novle) const;
 
         /** 
          * @brief Return a NoVLE with the specified name.
@@ -102,29 +102,7 @@ namespace vle { namespace vpz {
          *
          * @throw Exception::Internal model not found.
          */
-        const NoVLE& find(const std::string& novle) const;
-
-        /** 
-         * @brief Return a NoVLE with the specified name.
-         * 
-         * @param novle name to find.
-         * 
-         * @return A reference to a NoVLE.
-         *
-         * @throw Exception::Internal model not found.
-         */
-        NoVLE& find(const std::string& novle);
-
-        /** 
-         * @brief Get a constant reference to the NoVLE list.
-         * 
-         * @return A constant reference.
-         */
-        const std::map < std::string, NoVLE >& noVLEs() const
-        { return m_novles; }
-
-    private:
-        std::map < std::string, NoVLE > m_novles;
+        NoVLE& get(const std::string& novle);
     };
 
 }} // namespace vle vpz

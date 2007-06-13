@@ -38,6 +38,8 @@ namespace vle { namespace vpz {
 
     class Vpz;
 
+    typedef xmlpp::SaxParser::AttributeList AttributeList;
+
     class VpzStackSax
     {
     public:
@@ -50,28 +52,31 @@ namespace vle { namespace vpz {
         vpz::Vpz* push_vpz(const std::string& author, float version,
                            const std::string& date);
         void push_structure();
-        void push_model(const xmlpp::SaxParser::AttributeList& att);
-        void push_port(const xmlpp::SaxParser::AttributeList& att);
+        void push_model(const AttributeList& att);
+        void push_port(const AttributeList& att);
         void push_porttype(const Glib::ustring& name);
         void push_submodels();
         void push_connections();
-        void push_connection(const xmlpp::SaxParser::AttributeList& att);
-        void push_origin(const xmlpp::SaxParser::AttributeList& att);
-        void push_destination(const xmlpp::SaxParser::AttributeList& att);
+        void push_connection(const AttributeList& att);
+        void push_origin(const AttributeList& att);
+        void push_destination(const AttributeList& att);
         void build_connection();
         void push_dynamics();
-        void push_dynamic(const xmlpp::SaxParser::AttributeList& att);
-        void push_experiment(const xmlpp::SaxParser::AttributeList& att);
-        void push_replicas(const xmlpp::SaxParser::AttributeList& att);
+        void push_dynamic(const AttributeList& att);
+        void push_experiment(const AttributeList& att);
+        void push_replicas(const AttributeList& att);
         void push_conditions();
-        void push_condition(const xmlpp::SaxParser::AttributeList& att);
-        void push_condition_port(const xmlpp::SaxParser::AttributeList& att);
+        void push_condition(const AttributeList& att);
+        void push_condition_port(const AttributeList& att);
         void push_measures();
         void push_outputs();
-        void push_output(const xmlpp::SaxParser::AttributeList& att);
-        void push_measure(const xmlpp::SaxParser::AttributeList& att);
-        void push_observable(const xmlpp::SaxParser::AttributeList& att);
-        void push_observable_port(const xmlpp::SaxParser::AttributeList& att);
+        void push_output(const AttributeList& att);
+        void push_measure(const AttributeList& att);
+        void push_observable(const AttributeList& att);
+        void push_observable_port(const AttributeList& att);
+        void push_translators();
+        void push_translator(const AttributeList& att);
+        void pop_translator(const std::string& cdata);
 
         value::Set& pop_condition_port();
         vpz::Base* pop();
@@ -106,7 +111,7 @@ namespace vle { namespace vpz {
 
         virtual void on_start_element(
             const Glib::ustring& name,
-            const xmlpp::SaxParser::AttributeList& attributes);
+            const AttributeList& attributes);
 
         virtual void on_end_element(const Glib::ustring& name);
 
@@ -171,6 +176,7 @@ namespace vle { namespace vpz {
         VpzStackSax                     m_vpzstack;
         ValueStackSax                   m_valuestack;
         Glib::ustring                   m_lastCharacters;
+        Glib::ustring                   m_cdata;
         vpz::Vpz*                       m_vpz;
 
         bool                            m_isValue;
@@ -179,10 +185,10 @@ namespace vle { namespace vpz {
     };
     
     template < typename T > T
-        get_attribute(const xmlpp::SaxParser::AttributeList& lst,
+        get_attribute(const AttributeList& lst,
                       const Glib::ustring& name)
         {
-            xmlpp::SaxParser::AttributeList::const_iterator it;
+            AttributeList::const_iterator it;
             it = std::find_if(lst.begin(), lst.end(),
                               xmlpp::SaxParser::AttributeHasName(name));
             Assert(utils::SaxParserError, it != lst.end(),
@@ -199,7 +205,7 @@ namespace vle { namespace vpz {
             return result;
         }
 
-    bool exist_attribute(const xmlpp::SaxParser::AttributeList& lst,
+    bool exist_attribute(const AttributeList& lst,
                          const Glib::ustring& name);
 
 }} // namespace vle vpz

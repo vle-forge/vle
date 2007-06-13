@@ -36,7 +36,8 @@ namespace vle { namespace vpz {
     class NoVLE : public Base
     {
     public:
-        NoVLE()
+        NoVLE(const std::string& name) :
+            m_name(name)
         { }
 
         virtual ~NoVLE() { }
@@ -76,23 +77,35 @@ namespace vle { namespace vpz {
 
         /** 
          * @brief Set new information to the NoVLE.
-         * 
-         * @param translator the library name.
-         * @param xml the content to initialise NoVLE.
-         *
-         * @throw Exception::Internal if xml or translator if empty.
+         * @param library the library use by the novle model.
+         * @param data the data to library.
          */
-        void setNoVLE(const std::string& translator, const Glib::ustring& xml);
+        void setNoVLE(const std::string& library,
+                      const std::string& data);
 
-        const Glib::ustring& xml() const
-        { return m_xml; }
+        /** 
+         * @brief Set cdata parameters to the novle models.
+         * @param cdata the content of the cdata xml element.
+         */
+        void setData(const std::string& cdata)
+        { m_data.assign(cdata); }
 
-        const std::string& translatorname() const
-        { return m_translator; }
+        const std::string& name() const
+        { return m_name; }
+
+        const std::string& data() const
+        { return m_data; }
+
+        const std::string& library() const
+        { return m_library; }
 
     private:
-        Glib::ustring           m_xml;
-        std::string             m_translator;
+        NoVLE() 
+        { }
+
+        std::string             m_name;
+        std::string             m_data;
+        std::string             m_library;
         
         /** 
          * @brief Dynamically load the translator library.

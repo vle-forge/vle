@@ -96,7 +96,7 @@ void Project::expandTranslator()
 
 bool Project::hasNoVLE() const
 {
-    return not m_novles.noVLEs().empty();
+    return not m_novles.empty();
 }
 
 void Project::setAuthor(const std::string& name)

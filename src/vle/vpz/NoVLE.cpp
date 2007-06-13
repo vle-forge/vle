@@ -32,32 +32,19 @@ namespace vle { namespace vpz {
     
 using namespace vle::utils;
 
-//void NoVLE::init(xmlpp::Element* elt)
-//{
-//AssertI(elt);
-//AssertI(elt->get_name() == "NO_VLE");
-//
-//if (xml::has_children(elt)) {
-//setNoVLE(xml::get_attribute(elt, "TRANSLATOR"),
-//xml::write_to_string(elt));
-//} else {
-//setNoVLE(xml::get_attribute(elt, "TRANSLATOR"),
-//"");
-//}
-//}
-
 void NoVLE::write(std::ostream& out) const
 {
-    out << m_xml;
+    out << "<translator name=\"" << m_name << "\" "
+        << "library=\"" << m_library << "\">"
+        << m_data
+        << "</translator>";
 }
 
-void NoVLE::setNoVLE(const std::string& translator, const Glib::ustring& xml)
+void NoVLE::setNoVLE(const std::string& library,
+                     const std::string& data)
 {
-    AssertI(not xml.empty());
-    AssertI(not translator.empty());
-
-    m_xml.assign(xml);
-    m_translator.assign(translator);
+    m_data.assign(data);
+    m_library.assign(library);
 }
 
 void NoVLE::callTranslator(Model& model, Dynamics& dynamics,
@@ -65,20 +52,20 @@ void NoVLE::callTranslator(Model& model, Dynamics& dynamics,
 {
     xmlpp::DomParser* dom = new xmlpp::DomParser;
     try {
-        dom->parse_memory(m_xml);
+        dom->parse_memory(m_data);
     } catch (const xmlpp::exception& e) {
-        Throw(utils::ParseError,
+        Throw(utils::SaxParserError,
               boost::format("Translator XML for '%1%' problem: %2%\n") %
-              m_translator % e.what());
+              m_name % e.what());
     }
 
     Glib::Module* module = translator();
     void* makeNewTranslator;
 
     bool symb = module->get_symbol("makeNewTranslator", makeNewTranslator);
-    Assert(utils::ParseError, symb,
+    Assert(utils::SaxParserError, symb,
            boost::format("Error in '%1%', function 'makeNewTranslator' not "
-                         "found '%2%'") % m_translator %
+                         "found '%2%'") % m_name%
            Glib::Module::get_last_error());
 
     Translator* call;
@@ -88,7 +75,7 @@ void NoVLE::callTranslator(Model& model, Dynamics& dynamics,
     Assert(utils::ParseError, call,
            boost::format("Error in '%1%', function 'makeNewTranslator': "
                            "problem allocation a new Translator '%2%'") %
-                           m_translator % Glib::Module::get_last_error());
+                           m_name % Glib::Module::get_last_error());
 
     call->translate();
     model.initFromModel(call->getStructure()->get_root_node());
@@ -105,7 +92,7 @@ void NoVLE::callTranslator(Model& model, Dynamics& dynamics,
 Glib::Module* NoVLE::translator()
 {
     std::string file = Glib::Module::build_path(
-        utils::Path::path().getDefaultTranslatorDir(), m_translator);
+        utils::Path::path().getDefaultTranslatorDir(), m_library);
 
     Glib::Module* module = new Glib::Module(file);
     if (not (*module)) {
@@ -113,7 +100,7 @@ Glib::Module* NoVLE::translator()
         delete module;
 
         std::string ufile = Glib::Module::build_path(
-                utils::Path::path().getUserTranslatorDir(), m_translator);
+                utils::Path::path().getUserTranslatorDir(), m_library);
         
         module = new Glib::Module(ufile);
         if (not (*module)) {
@@ -122,7 +109,7 @@ Glib::Module* NoVLE::translator()
 
             Glib::ustring error((boost::format(
                         "Error opening plugin %1% or %2% translator %3% "
-                        "with error:") % file % ufile % m_translator).str());
+                        "with error:") % file % ufile % m_library).str());
 
             error += "\n";
             error += err;

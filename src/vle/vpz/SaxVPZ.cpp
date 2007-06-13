@@ -86,7 +86,7 @@ void VpzStackSax::push_structure()
     m_stack.push(structure);
 }
 
-void VpzStackSax::push_model(const xmlpp::SaxParser::AttributeList& att)
+void VpzStackSax::push_model(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
     AssertS(utils::SaxParserError, m_vpz);
@@ -138,7 +138,7 @@ void VpzStackSax::push_model(const xmlpp::SaxParser::AttributeList& att)
     m_stack.push(mdl);
 }
 
-void VpzStackSax::push_port(const xmlpp::SaxParser::AttributeList& att)
+void VpzStackSax::push_port(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
     AssertS(utils::SaxParserError, m_vpz);
@@ -216,7 +216,7 @@ void VpzStackSax::push_connections()
     m_stack.push(cnts);
 }
 
-void VpzStackSax::push_connection(const xmlpp::SaxParser::AttributeList& att)
+void VpzStackSax::push_connection(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
     AssertS(utils::SaxParserError, m_vpz);
@@ -238,7 +238,7 @@ void VpzStackSax::push_connection(const xmlpp::SaxParser::AttributeList& att)
     m_stack.push(cnt);
 }
 
-void VpzStackSax::push_origin(const xmlpp::SaxParser::AttributeList& att)
+void VpzStackSax::push_origin(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
     AssertS(utils::SaxParserError, m_vpz);
@@ -253,7 +253,7 @@ void VpzStackSax::push_origin(const xmlpp::SaxParser::AttributeList& att)
     m_stack.push(orig);
 }
 
-void VpzStackSax::push_destination(const xmlpp::SaxParser::AttributeList& att)
+void VpzStackSax::push_destination(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
     AssertS(utils::SaxParserError, m_vpz);
@@ -317,7 +317,7 @@ void VpzStackSax::push_dynamics()
     m_stack.push(&m_vpz->project().dynamics());
 }
 
-void VpzStackSax::push_dynamic(const xmlpp::SaxParser::AttributeList& att)
+void VpzStackSax::push_dynamic(const AttributeList& att)
 { 
     AssertS(utils::SaxParserError, not m_stack.empty());
     AssertS(utils::SaxParserError, m_vpz);
@@ -356,7 +356,7 @@ void VpzStackSax::push_dynamic(const xmlpp::SaxParser::AttributeList& att)
     dyns.addDynamic(dyn);
 }
 
-void VpzStackSax::push_experiment(const xmlpp::SaxParser::AttributeList& att)
+void VpzStackSax::push_experiment(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
     AssertS(utils::SaxParserError, m_vpz);
@@ -370,7 +370,7 @@ void VpzStackSax::push_experiment(const xmlpp::SaxParser::AttributeList& att)
     exp.setSeed(get_attribute < guint32 >(att, "seed"));
 }
 
-void VpzStackSax::push_replicas(const xmlpp::SaxParser::AttributeList& att)
+void VpzStackSax::push_replicas(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
     AssertS(utils::SaxParserError, m_vpz);
@@ -390,7 +390,7 @@ void VpzStackSax::push_conditions()
     m_stack.push(&m_vpz->project().experiment().conditions());
 }
 
-void VpzStackSax::push_condition(const xmlpp::SaxParser::AttributeList& att)
+void VpzStackSax::push_condition(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
     AssertS(utils::SaxParserError, m_vpz);
@@ -406,7 +406,7 @@ void VpzStackSax::push_condition(const xmlpp::SaxParser::AttributeList& att)
     m_stack.push(&cnd);
 }
 
-void VpzStackSax::push_condition_port(const xmlpp::SaxParser::AttributeList& att)
+void VpzStackSax::push_condition_port(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
     AssertS(utils::SaxParserError, m_vpz);
@@ -448,7 +448,7 @@ void VpzStackSax::push_outputs()
     m_stack.push(&m_vpz->project().experiment().measures().outputs());
 }
 
-void VpzStackSax::push_output(const xmlpp::SaxParser::AttributeList& att)
+void VpzStackSax::push_output(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
     AssertS(utils::SaxParserError, m_vpz);
@@ -485,7 +485,7 @@ void VpzStackSax::push_output(const xmlpp::SaxParser::AttributeList& att)
     }
 }
 
-void VpzStackSax::push_measure(const xmlpp::SaxParser::AttributeList& att)
+void VpzStackSax::push_measure(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
     AssertS(utils::SaxParserError, m_vpz);
@@ -514,7 +514,7 @@ void VpzStackSax::push_measure(const xmlpp::SaxParser::AttributeList& att)
     }
 }
 
-void VpzStackSax::push_observable(const xmlpp::SaxParser::AttributeList& att)
+void VpzStackSax::push_observable(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
     AssertS(utils::SaxParserError, m_vpz);
@@ -535,8 +535,7 @@ void VpzStackSax::push_observable(const xmlpp::SaxParser::AttributeList& att)
     m_stack.push(&obs);
 }
 
-void VpzStackSax::push_observable_port(
-    const xmlpp::SaxParser::AttributeList& att)
+void VpzStackSax::push_observable_port(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
     AssertS(utils::SaxParserError, m_vpz);
@@ -546,6 +545,41 @@ void VpzStackSax::push_observable_port(
 
     vpz::Observable* out(static_cast < vpz::Observable* >(m_stack.top()));
     out->add(name);
+}
+
+void VpzStackSax::push_translators()
+{
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_vpz);
+    AssertS(utils::SaxParserError, m_stack.top()->isVpz());
+
+    vpz::NoVLEs& novles(m_vpz->project().novles());
+    m_stack.push(&novles);
+}
+
+void VpzStackSax::push_translator(const AttributeList& att)
+{
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_vpz);
+    AssertS(utils::SaxParserError, m_stack.top()->isNoVLES());
+
+    std::string name(get_attribute < std::string >(att, "name"));
+    std::string lib(get_attribute < std::string >(att, "library"));
+
+    vpz::NoVLE novle(name);
+    novle.setNoVLE(lib, "");
+    vpz::NoVLE& newvle(m_vpz->project().novles().add(novle));
+    m_stack.push(&newvle);
+}
+
+void VpzStackSax::pop_translator(const std::string& cdata)
+{
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_vpz);
+    AssertS(utils::SaxParserError, m_stack.top()->isNoVLE());
+
+    vpz::NoVLE* novle(static_cast < vpz::NoVLE* >(m_stack.top()));
+    novle->setData(cdata);
 }
 
 vpz::Base* VpzStackSax::pop()
@@ -602,7 +636,7 @@ void VLESaxParser::on_end_document()
 
 void VLESaxParser::on_start_element(
     const Glib::ustring& name,
-    const xmlpp::SaxParser::AttributeList& att)
+    const AttributeList& att)
 {
     clearLastCharactersStored();
     if (name == "boolean") {
@@ -674,6 +708,10 @@ void VLESaxParser::on_start_element(
         m_vpzstack.push_measure(att);
     } else if (name == "observable") {
         m_vpzstack.push_observable(att);
+    } else if (name == "translators") {
+        m_vpzstack.push_translators();
+    } else if (name == "translator") {
+        m_vpzstack.push_translator(att);
     } else {
         Throw(utils::SaxParserError,
               (boost::format("Unknow element %1%") % name));
@@ -710,6 +748,10 @@ void VLESaxParser::on_end_element(const Glib::ustring& name)
         value::Table table = value::to_table(m_valuestack.top_value());
         table->fill(lastCharactersStored());
         m_valuestack.pop_value();
+    } else if (name == "translator") {
+        m_vpzstack.pop_translator(m_cdata);
+        m_cdata.clear();
+        m_vpzstack.pop();
     } else if (name == "port" and m_vpzstack.top()->isCondition()) {
         value::Set& vals(m_vpzstack.pop_condition_port());
         std::vector < value::Value >& lst(get_values());
@@ -725,7 +767,7 @@ void VLESaxParser::on_end_element(const Glib::ustring& name)
                name == "condition" or name == "outputs" or
                name == "measure" or name ==" measures" or
                name == "observable" or name == "experiment" or
-               name == "vle_project") {
+               name == "translators" or name == "vle_project") {
         m_vpzstack.pop();
     } else if (name == "destination") {
         m_vpzstack.build_connection();
@@ -756,8 +798,9 @@ void VLESaxParser::on_fatal_error(const Glib::ustring& text)
     Throw(utils::SaxParserError, text);
 }
 
-void VLESaxParser::on_cdata_block(const Glib::ustring& /* text */)
+void VLESaxParser::on_cdata_block(const Glib::ustring& text)
 {
+    m_cdata.assign(text);
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -794,10 +837,10 @@ void VLESaxParser::addToCharacters(const Glib::ustring& characters)
     m_lastCharacters.append(characters);
 }
 
-bool exist_attribute(const xmlpp::SaxParser::AttributeList& lst,
+bool exist_attribute(const AttributeList& lst,
                      const Glib::ustring& name)
 {
-    xmlpp::SaxParser::AttributeList::const_iterator it;
+    AttributeList::const_iterator it;
     it = std::find_if(lst.begin(), lst.end(),
                       xmlpp::SaxParser::AttributeHasName(name));
     return it != lst.end();

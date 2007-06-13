@@ -25,68 +25,45 @@
 #include <vle/vpz/NoVLEs.hpp>
 #include <vle/utils/XML.hpp>
 #include <vle/utils/Debug.hpp>
+#include <utility>
 
 namespace vle { namespace vpz {
 
 using namespace vle::utils;
 
-//void NoVLEs::init(xmlpp::Element* elt)
-//{
-//AssertI(elt);
-//AssertI(elt->get_name() == "NO_VLES");
-//
-//m_novles.clear();
-//
-//xmlpp::Node::NodeList lst = elt->get_children("NO_VLE");
-//xmlpp::Node::NodeList::iterator it;
-//for (it = lst.begin(); it != lst.end(); ++it) {
-//NoVLE novle;
-//novle.init((xmlpp::Element*)(*it));
-//addNoVLE(xml::get_attribute((xmlpp::Element*)(*it),
-//"MODEL_NAME"), novle);
-//}
-//}
-
 void NoVLEs::write(std::ostream& out) const
 {
-    out << "<no_vles>";
+    out << "<translators>";
 
-    std::map < std::string, NoVLE >::const_iterator it;
-    for (it = m_novles.begin(); it != m_novles.end(); ++it) {
-        out << "<no_vle translator=\"" << (*it).second.translatorname() 
-            << "\" model_name=\"" << (*it).first << "\" >";
-        (*it).second.write(out);
-        out << "</no_vle>";
+    for (const_iterator it = begin(); it != end(); ++it) {
+        out << it->second;
     }
 
-    out << "</no_vles>";
+    out << "</translators>";
 }
 
-void NoVLEs::addNoVLE(const std::string& modelname, const NoVLE& novle)
+NoVLE& NoVLEs::add(const NoVLE& novle)
 {
-    AssertI(m_novles.find(modelname) == m_novles.end());
+    const_iterator it = find(novle.name());
+    Assert(utils::SaxParserError, it == end(),
+           (boost::format("NoVLE %1% already exist") % novle.name()));
 
-    m_novles[modelname] = novle;
+    return (*insert(std::make_pair < std::string, NoVLE >(
+            novle.name(), novle)).first).second;
 }
 
-void NoVLEs::clear()
+void NoVLEs::del(const std::string& modelname)
 {
-    m_novles.clear();
-}
-
-void NoVLEs::delNoVLE(const std::string& modelname)
-{
-    std::map < std::string, NoVLE >::iterator it;
-    if ((it = m_novles.find(modelname)) != m_novles.end()) {
-        m_novles.erase(it);
+    iterator it = find(modelname);
+    if (it != end()) {
+        erase(it);
     }
 }
 
 void NoVLEs::fusion(Model& /* model */, Dynamics& dynamics,
                     Experiment& experiment)
 {
-    std::map < std::string, NoVLE >::iterator it;
-    for (it = m_novles.begin(); it != m_novles.end(); ++it) {
+    for (iterator it = begin(); it != end(); ++it) {
         Model m;
         Dynamics d;
         Experiment e;
@@ -99,18 +76,20 @@ void NoVLEs::fusion(Model& /* model */, Dynamics& dynamics,
     }
 }
 
-const NoVLE& NoVLEs::find(const std::string& novle) const
+const NoVLE& NoVLEs::get(const std::string& novle) const
 {
-    std::map < std::string, NoVLE >::const_iterator it = m_novles.find(novle);
-    AssertI(it != m_novles.end());
-    return (*it).second;
+    const_iterator it = find(novle);
+    Assert(utils::SaxParserError, it != end(),
+           (boost::format("The NoVLE %1% not exist.") % novle));
+    return it->second;
 }
 
-NoVLE& NoVLEs::find(const std::string& novle)
+NoVLE& NoVLEs::get(const std::string& novle)
 {
-    std::map < std::string, NoVLE >::iterator it = m_novles.find(novle);
-    AssertI(it != m_novles.end());
-    return (*it).second;
+    iterator it = find(novle);
+    Assert(utils::SaxParserError, it != end(),
+           (boost::format("The NoVLE %1% not exist.") % novle));
+    return it->second;
 }
 
 }} // namespace vle vpz

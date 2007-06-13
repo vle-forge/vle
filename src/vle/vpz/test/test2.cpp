@@ -390,6 +390,49 @@ void test_experiment_measures_vpz()
     }
 }
 
+void test_translator()
+{
+    const char* xml=
+        "<?xml version=\"1.0\"?>\n"
+        "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
+        " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
+        " <structures>\n"
+        "  <model name=\"test1\" type=\"novle\" conditions=\"\""
+        "         translator=\"xxx\" observables=\"\" >\n"
+        "   <in>\n"
+        "    <port name=\"in1\" />\n"
+        "    <port name=\"in2\" />\n"
+        "   </in>\n"
+        "   <out>\n"
+        "    <port name=\"out1\" />\n"
+        "    <port name=\"out2\" />\n"
+        "   </out>\n"
+        "  </model>\n"
+        " </structures>\n"
+        " <translators>\n"
+        "  <translator name=\"tr1\" library=\"trlib\">\n"
+        "   <![CDATA["
+        "<?xml version=\"1.0\"?>
+        " ]]>"
+        "  </translator>\n"
+        " </translators>\n"
+        "</vle_project>\n";
+    
+    vpz::VLESaxParser sax;
+    sax.parse_memory(xml);
+
+    const vpz::Vpz& vpz(sax.vpz());
+    const vpz::Project& project(vpz.project());
+    const vpz::NoVLES& novles(vpz.project().novles());
+
+    BOOST_REQUIRE(novles.exist("tr1"));
+    const vpz::NoVLE& novle(novles.get("tr1"));
+
+    BOOST_REQUIRE_EQUAL(novle.name(), "tr1");
+    BOOST_REQUIRE_EQUAL(novle.library(), "trlib");
+    BOOST_REQUIRE_EQUAL(novle.data(), "<?xml version=\"1.0\"?>");
+}
+
 
 boost::unit_test_framework::test_suite*
 init_unit_test_suite(int, char* [])
@@ -402,5 +445,6 @@ init_unit_test_suite(int, char* [])
     test->add(BOOST_TEST_CASE(&test_dynamic_vpz));
     test->add(BOOST_TEST_CASE(&test_experiment_vpz));
     test->add(BOOST_TEST_CASE(&test_experiment_measures_vpz));
+    test->add(BOOST_TEST_CASE(&test_translator));
     return test;
 }
