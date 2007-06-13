@@ -31,18 +31,14 @@
 #include <vle/vpz/Output.hpp>
 
 namespace vle { namespace vpz {
-    
+
+
     /** 
      * @brief This class stores a list of Output.
      */
-    class Outputs : public Base
+    class Outputs : public Base, public std::map < std::string, Output >
     {
     public:
-        typedef std::map < std::string, Output > OutputList;
-        typedef OutputList::const_iterator const_iterator;
-        typedef OutputList::iterator iterator;
-
-
         Outputs()
         { }
 
@@ -105,84 +101,55 @@ namespace vle { namespace vpz {
                           const std::string& location = std::string());
 
         /** 
-         * @brief Just delete the list of vpz::Output.
-         */
-        void clear();
-
-        /** 
          * @brief Delete the specified output.
-         * 
          * @param name the name of the output to delete.
          */
-        void delOutput(const std::string& name);
+        void del(const std::string& name);
 
         /** 
          * @brief Add a list of outputs into the current list.
-         * 
          * @param o the list of outputs to add.
-         *
          * @throw Exception::Internal if name or plugin already exist.
          */
-        void addOutputs(const Outputs& o);
+        void add(const Outputs& o);
 
         /** 
          * @brief Find an Output reference from list.
-         * 
          * @param name Output name.
-         * 
          * @return A reference to the output.
-         *
          * @throw Exception::Internal if Output does not exist.
          */
-        Output& find(const std::string& name);
+        Output& get(const std::string& name);
 
         /** 
          * @brief Find a const Output reference from list.
-         * 
          * @param name Output name.
-         * 
          * @return A reference to the output.
-         *
          * @throw Exception::Internal if Output does not exist.
          */
-        const Output& find(const std::string& name) const;
+        const Output& get(const std::string& name) const;
 
         /** 
          * @brief Get the list of all output name.
-         * 
          * @return the list of output name.
          */
         std::list < std::string > outputsname() const;
 
         /** 
          * @brief Test if an Output exist with the specified name.
-         * 
          * @param name Output name to test.
-         * 
          * @return true if Output exist, false otherwise.
          */
         bool exist(const std::string& name) const;
         
-        /** 
-         * @brief Get the outputs list.
-         * 
-         * @return A reference to a constant outputs list.
-         */
-        const OutputList& outputs() const
-        { return m_outputs; }
-
     private:
-        OutputList m_outputs;
-        
         /** 
          * @brief Add an output into the outputs list. 
-         * 
          * @param name the name of the output to add.
          * @param o the output to add.
-         *
          * @throw Exception::Internal if the output already exist.
          */
-        void addOutput(const Output& o);
+        void add(const Output& o);
     };
 
 }} // namespace vle vpz

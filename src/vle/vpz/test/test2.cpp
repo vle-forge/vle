@@ -294,8 +294,18 @@ void test_experiment_measures_vpz()
         "   </outputs>\n"
         "   <measure name=\"x\" type=\"timed\" time_step=\".05\""
         "            output=\"x\" >\n"
-        "    <observable name=\"oo\" modelname=\"toto\" port=\"x1\" />\n"
-        "    <observable name=\"xx\" modelname=\"toto\" port=\"x2\" />\n"
+        "    <observable name=\"oo\" group=\"a\" index=\"1\" />\n"
+        "     <ports>"
+        "      <port name=\"x1\" />"
+        "      <port name=\"x2\" />"
+        "      <port name=\"x3\" />"
+        "     </ports>\n"
+        "    <observable name=\"xx\" group=\"b\" index=\"2\" />\n"
+        "     <ports>"
+        "      <port name=\"x4\" />"
+        "      <port name=\"x5\" />"
+        "      <port name=\"x6\" />"
+        "     </ports>"
         "   </measure>\n"
         "  </measures>\n"
         " <experiment>\n"
@@ -308,6 +318,78 @@ void test_experiment_measures_vpz()
     const vpz::Vpz& vpz(sax.vpz());
     const vpz::Project& project(vpz.project());
     const vpz::Experiment& experiment(project.experiment());
+    const vpz::Measures& measures(experiment.measures());
+    
+    const vpz::Outputs& outputs(measures.outputs());
+    BOOST_REQUIRE(outputs.size() == 4);
+
+    BOOST_REQUIRE(outputs.find("x") != outputs.end());
+    {
+        const vpz::Output& out(outputs.find("x")->second);
+        BOOST_REQUIRE_EQUAL(out.name(), "x");
+        BOOST_REQUIRE_EQUAL(out.format(), vpz::Output::TEXT);
+    }
+    BOOST_REQUIRE(outputs.find("y") != outputs.end());
+    {
+        const vpz::Output& out(outputs.find("y")->second);
+        BOOST_REQUIRE_EQUAL(out.name(), "y");
+        BOOST_REQUIRE_EQUAL(out.format(), vpz::Output::SDML);
+    }
+    BOOST_REQUIRE(outputs.find("z") != outputs.end());
+    {
+        const vpz::Output& out(outputs.find("z")->second);
+        BOOST_REQUIRE_EQUAL(out.name(), "z");
+        BOOST_REQUIRE_EQUAL(out.format(), vpz::Output::EOV);
+        BOOST_REQUIRE_EQUAL(out.plugin(), "xxx");
+        BOOST_REQUIRE_EQUAL(out.location(), "127.0.0.1:8888");
+    }
+    BOOST_REQUIRE(outputs.find("a") != outputs.end());
+    {
+        const vpz::Output& out(outputs.find("a")->second);
+        BOOST_REQUIRE_EQUAL(out.name(), "a");
+        BOOST_REQUIRE_EQUAL(out.format(), vpz::Output::NET);
+        BOOST_REQUIRE_EQUAL(out.plugin(), "zzz");
+    }
+
+
+    const vpz::MeasureList& lst(measures.measures());
+    BOOST_REQUIRE(not lst.empty());
+    BOOST_REQUIRE((*lst.begin()).first == (*lst.begin()).second.name());
+
+    const vpz::Measure& measure(lst.begin()->second);
+    BOOST_REQUIRE_EQUAL(measure.name(), "x");
+    BOOST_REQUIRE_EQUAL(measure.streamtype(), "timed");
+    BOOST_REQUIRE_EQUAL(measure.timestep(), .05);
+    BOOST_REQUIRE_EQUAL(measure.output(), "x");
+
+    const vpz::ObservableList& obs(measure.observables());
+    BOOST_REQUIRE(obs.size() == 2);
+
+    BOOST_REQUIRE(obs.find("oo") != obs.end());
+    {
+        const vpz::Observable& ob = obs.find("oo")->second;
+        BOOST_REQUIRE_EQUAL(ob.name(), "oo");
+        BOOST_REQUIRE_EQUAL(ob.group(), "a");
+        BOOST_REQUIRE_EQUAL(ob.index(), 1);
+        const vpz::ObservablePort& ports(ob.ports());
+        BOOST_REQUIRE_EQUAL(ports.size(), (vpz::ObservablePort::size_type)3);
+        BOOST_REQUIRE(ports.find("x1") != ports.end());
+        BOOST_REQUIRE(ports.find("x2") != ports.end());
+        BOOST_REQUIRE(ports.find("x3") != ports.end());
+    }
+
+    BOOST_REQUIRE(obs.find("xx") != obs.end());
+    {
+        const vpz::Observable& ob = obs.find("xx")->second;
+        BOOST_REQUIRE_EQUAL(ob.name(), "xx");
+        BOOST_REQUIRE_EQUAL(ob.group(), "b");
+        BOOST_REQUIRE_EQUAL(ob.index(), 2);
+        const vpz::ObservablePort& ports(ob.ports());
+        BOOST_REQUIRE_EQUAL(ports.size(), (vpz::ObservablePort::size_type)3);
+        BOOST_REQUIRE(ports.find("x4") != ports.end());
+        BOOST_REQUIRE(ports.find("x5") != ports.end());
+        BOOST_REQUIRE(ports.find("x6") != ports.end());
+    }
 }
 
 

@@ -39,8 +39,7 @@ void Measures::buildEOV()
 {
     if (m_eovs.eovs().empty()) {
         Outputs::const_iterator it;
-        for (it = m_outputs.outputs().begin(); it !=
-             m_outputs.outputs().end(); ++it) {
+        for (it = m_outputs.begin(); it != m_outputs.end(); ++it) {
             if ((it->second).format() == Output::EOV) {
                 EOV tmp;
                 tmp.setPluginChild();
@@ -58,12 +57,12 @@ void Measures::buildEOV()
 
 void Measures::write(std::ostream& out) const
 {
-    if (not m_outputs.outputs().empty() and not m_measures.empty()) {
+    if (not m_outputs.empty() and not m_measures.empty()) {
         out << "<measures>";
         m_outputs.write(out);
 
-        for (const_iterator it = m_measures.begin(); it != m_measures.end();
-             ++it) {
+        for (MeasureList::const_iterator it = m_measures.begin(); it !=
+             m_measures.end(); ++it) {
             it->second.write(out);
         }
 
@@ -99,7 +98,7 @@ void Measures::clear()
 
 void Measures::delOutput(const std::string& name)
 {
-    m_outputs.delOutput(name);
+    m_outputs.del(name);
 }
 
 Measure& Measures::addEventMeasure(const std::string& name,
@@ -127,7 +126,7 @@ Measure& Measures::addTimedMeasure(const std::string& name,
 
 void Measures::delMeasure(const std::string& name)
 {
-    iterator it = m_measures.find(name);
+    MeasureList::iterator it = m_measures.find(name);
     if (it != m_measures.end()) {
         m_measures.erase(it);
     }
@@ -138,7 +137,7 @@ void Measures::addObservableToMeasure(const std::string& measurename,
                                       const std::string& group,
                                       int index)
 {
-    iterator it = m_measures.find(measurename);
+    MeasureList::iterator it = m_measures.find(measurename);
     Assert(utils::SaxParserError, it != m_measures.end(),
            (boost::format("Measures %1% does not exist.") % measurename));
 
@@ -149,10 +148,10 @@ void Measures::addObservableToMeasure(const std::string& measurename,
 
 void Measures::addMeasures(const Measures& m)
 {
-    m_outputs.addOutputs(m.outputs());
+    m_outputs.add(m.outputs());
 
-    for (const_iterator it = m.measures().begin(); it != m.measures().end();
-         ++it) {
+    for (MeasureList::const_iterator it = m.measures().begin(); it !=
+         m.measures().end(); ++it) {
         addMeasure(it->second);
     }
 
@@ -163,7 +162,7 @@ void Measures::addMeasures(const Measures& m)
 
 Measure& Measures::addMeasure(const Measure& m)
 {
-    const_iterator it = m_measures.find(m.name());
+    MeasureList::const_iterator it = m_measures.find(m.name());
     Assert(utils::SaxParserError, it == m_measures.end(),
            boost::format("A Measure have already this name '%1%'\n") %
            m.name());
@@ -178,7 +177,8 @@ Measure& Measures::addMeasure(const Measure& m)
 const Measure& Measures::findMeasureFromOutput(const std::string& outputname,
                                                std::string& measure) const
 {
-    for (const_iterator it = m_measures.begin(); it != m_measures.end(); ++it) {
+    for (MeasureList::const_iterator it = m_measures.begin(); it !=
+         m_measures.end(); ++it) {
         if (it->second.existObservable(outputname)) {
             measure.assign(it->second.name());
             return it->second;
@@ -192,7 +192,7 @@ const Measure& Measures::findMeasureFromOutput(const std::string& outputname,
 
 const Measure& Measures::find(const std::string& name) const
 {
-    const_iterator it = m_measures.find(name);
+    MeasureList::const_iterator it = m_measures.find(name);
     Assert(utils::SaxParserError, it != m_measures.end(),
            boost::format("Unknow measure '%1%'\n") % name);
 
@@ -201,7 +201,7 @@ const Measure& Measures::find(const std::string& name) const
 
 Measure& Measures::find(const std::string& name)
 {
-    iterator it = m_measures.find(name);
+    MeasureList::iterator it = m_measures.find(name);
     Assert(utils::SaxParserError, it != m_measures.end(),
            boost::format("Unknow measure '%1%'\n") % name);
 

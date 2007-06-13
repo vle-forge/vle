@@ -52,8 +52,8 @@ void Measure::write(std::ostream& out) const
     out << ">";
 
 
-    for (const_iterator it = m_observables.begin(); it != m_observables.end();
-         ++it) {
+    for (ObservableList::const_iterator it = m_observables.begin(); it !=
+         m_observables.end(); ++it) {
         it->second.write(out);
     }
 
@@ -81,7 +81,7 @@ void Measure::setTimedMeasure(double timestep,
 
 Observable& Measure::addObservable(const Observable& o)
 {
-    const_iterator it = m_observables.find(o.name());
+    ObservableList::const_iterator it = m_observables.find(o.name());
     Assert(utils::SaxParserError, it == m_observables.end(),
            (boost::format("Add an already existing observable %1% in %2%") %
             o.name(), m_name));
@@ -100,7 +100,7 @@ Observable& Measure::addObservable(const std::string& name,
 
 void Measure::delObservable(const std::string& name)
 {
-    iterator it = m_observables.find(name);
+    ObservableList::iterator it = m_observables.find(name);
     if (it != m_observables.end()) {
         m_observables.erase(it);
     }
@@ -108,7 +108,7 @@ void Measure::delObservable(const std::string& name)
 
 const Observable& Measure::getObservable(const std::string& name) const
 {
-    const_iterator it = m_observables.find(name);
+    ObservableList::const_iterator it = m_observables.find(name);
     Assert(utils::InternalError, it != m_observables.end(),
            (boost::format("Observable %1% not found") % name));
 

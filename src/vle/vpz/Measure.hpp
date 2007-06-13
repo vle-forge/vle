@@ -32,6 +32,11 @@
 
 namespace vle { namespace vpz {
 
+
+    class ObservableList : public std::map < std::string, Observable >
+    {
+    };
+
     /** 
      * @brief A measure made a link between a list of observation and an outut
      * plugin. This measure can be timed by a timestep  or completely event.
@@ -39,11 +44,6 @@ namespace vle { namespace vpz {
     class Measure : public Base
     {
     public:
-        typedef std::map < std::string, Observable > ObservableList;
-        typedef ObservableList::const_iterator const_iterator;
-        typedef ObservableList::iterator iterator;
-
-
         enum Type { TIMED, EVENT };
 
         Measure();

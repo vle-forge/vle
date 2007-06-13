@@ -33,13 +33,14 @@
 
 namespace vle { namespace vpz {
 
+
+    class MeasureList : public std::map < std::string, Measure >
+    {
+    };
+
     class Measures : public Base
     {
     public:
-        typedef std::map < std::string, Measure > MeasureList;
-        typedef MeasureList::const_iterator const_iterator;
-        typedef MeasureList::iterator iterator;
-
         Measures();
 
         virtual ~Measures() { }

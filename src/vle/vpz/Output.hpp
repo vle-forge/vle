@@ -45,7 +45,7 @@ namespace vle { namespace vpz {
          * - EOV: values are writing into the stream with a EOV format.
          * - NET: values are writing into the stream with a NET format.
          */
-      enum Format { TEXT, SDML, EOV, NET };
+        enum Format { TEXT, SDML, EOV, NET };
 
         Output();
 
