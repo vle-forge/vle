@@ -73,6 +73,16 @@ void Outputs::addEovStream(const std::string& name,
     add(o);
 }
 
+void Outputs::addNetStream(const std::string& name,
+                           const std::string& plugin,
+                           const std::string& location)
+{
+    Output o;
+    o.setName(name);
+    o.setNetStream(plugin, location);
+    add(o);
+}
+
 void Outputs::del(const std::string& name)
 {
     iterator it = find(name);

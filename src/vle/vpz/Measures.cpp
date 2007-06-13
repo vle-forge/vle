@@ -31,6 +31,11 @@ namespace vle { namespace vpz {
 
 using namespace vle::utils;
 
+bool MeasureList::exist(const std::string& name) const
+{
+    return find(name) != end();
+}
+
 Measures::Measures()
 {
 }
@@ -104,7 +109,7 @@ void Measures::delOutput(const std::string& name)
 Measure& Measures::addEventMeasure(const std::string& name,
         const std::string& output)
 {
-    AssertI(not m_outputs.exist(output));
+    AssertI(not m_measures.exist(output));
 
     Measure m;
     m.setName(name);
@@ -116,7 +121,7 @@ Measure& Measures::addTimedMeasure(const std::string& name,
         double timestep,
         const std::string& output)
 {
-    AssertI(not m_outputs.exist(output));
+    AssertI(not m_measures.exist(output));
 
     Measure m;
     m.setName(name);

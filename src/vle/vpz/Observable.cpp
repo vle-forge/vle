@@ -61,4 +61,9 @@ void Observable::setObservable(const std::string& name,
     m_index = index;
 }
 
+void Observable::add(const std::string& portname)
+{
+    m_ports.insert(portname);
+}
+
 }} // namespace vle vpz

@@ -36,7 +36,11 @@ namespace vle { namespace vpz {
 
     class MeasureList : public std::map < std::string, Measure >
     {
+    public:
+        bool exist(const std::string& name) const;
     };
+
+
 
     class Measures : public Base
     {

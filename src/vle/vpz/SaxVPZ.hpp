@@ -71,12 +71,16 @@ namespace vle { namespace vpz {
         void push_output(const xmlpp::SaxParser::AttributeList& att);
         void push_measure(const xmlpp::SaxParser::AttributeList& att);
         void push_observable(const xmlpp::SaxParser::AttributeList& att);
+        void push_observable_port(const xmlpp::SaxParser::AttributeList& att);
 
         value::Set& pop_condition_port();
         vpz::Base* pop();
         const vpz::Base* top() const;
 
         vpz::Vpz& vpz();
+
+        friend std::ostream& operator<<(std::ostream& out,
+                                        const VpzStackSax& stack);
 
     private:
         std::stack < vpz::Base* >       m_stack;

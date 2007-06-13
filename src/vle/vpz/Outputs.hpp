@@ -101,6 +101,22 @@ namespace vle { namespace vpz {
                           const std::string& location = std::string());
 
         /** 
+         * @brief Add an output with the eov stream information. The name and
+         * the plugin are obligatory,  the location defines host with syntax:
+         * host:port.
+         * 
+         * @param name the output name.
+         * @param plugin the plugin's name.
+         * @param location the host:port definition.
+         *
+         * @throw Exception::Internal if name or plugin are empty.
+         */
+        void addNetStream(const std::string& name,
+                          const std::string& plugin,
+                          const std::string& location = std::string());
+
+
+        /** 
          * @brief Delete the specified output.
          * @param name the name of the output to delete.
          */

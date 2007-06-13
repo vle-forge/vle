@@ -45,6 +45,22 @@
 
 namespace vle { namespace vpz {
 
+
+std::ostream& operator<<(std::ostream& out, const VpzStackSax& stack)
+{
+    VpzStackSax nv(stack);
+
+    out << "VpzStackSax:\n";
+    while (not nv.m_stack.empty()) {
+        out << "type " << nv.m_stack.top()->getType() << "\n";
+        nv.pop();
+    }
+
+    out << "Xml:\n" << *nv.m_vpz << "\n";
+    return out;
+}
+
+
 vpz::Vpz* VpzStackSax::push_vpz(const std::string& author, float version,
                            const std::string& date)
 {
@@ -129,6 +145,8 @@ void VpzStackSax::push_port(const xmlpp::SaxParser::AttributeList& att)
 
     if (m_stack.top()->isCondition()) {
         push_condition_port(att);
+    } else if (m_stack.top()->isObservable()) {
+        push_observable_port(att);
     } else {
         AssertS(utils::SaxParserError, m_stack.top()->isIn() or
                 m_stack.top()->isOut() or m_stack.top()->isState() or
@@ -460,7 +478,7 @@ void VpzStackSax::push_output(const xmlpp::SaxParser::AttributeList& att)
                (boost::format("Outputs %1% is a net outputs without plugin") %
                 name));
         std::string plugin(get_attribute < std::string >(att, "plugin"));
-        outs.addEovStream(name, plugin, location);
+        outs.addNetStream(name, plugin, location);
     } else {
         Throw(utils::SaxParserError, (boost::format(
                     "Unknow format '%1%' for the output %2%") % format % name));
@@ -515,6 +533,19 @@ void VpzStackSax::push_observable(const xmlpp::SaxParser::AttributeList& att)
 
     Observable& obs(measure->addObservable(name, group, index));
     m_stack.push(&obs);
+}
+
+void VpzStackSax::push_observable_port(
+    const xmlpp::SaxParser::AttributeList& att)
+{
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_vpz);
+    AssertS(utils::SaxParserError, m_stack.top()->isObservable());
+
+    std::string name(get_attribute < std::string >(att, "name"));
+
+    vpz::Observable* out(static_cast < vpz::Observable* >(m_stack.top()));
+    out->add(name);
 }
 
 vpz::Base* VpzStackSax::pop()
@@ -687,10 +718,14 @@ void VLESaxParser::on_end_element(const Glib::ustring& name)
             vals->addValue(*it);
         }
         m_valuestack.clear();
-    } else if (name == "in" or name == "out" or name == "state" or name ==
-               "init" or name == "structures" or name == "model" or name ==
-               "submodels" or name == "vle_project" or name == "connections"
-               or name == "conditions" or name == "condition") {
+    } else if (name == "in" or name == "out" or name == "state" or
+               name == "init" or name == "structures" or name == "model" or
+               name == "submodels" or name == "vle_project" or
+               name == "connections" or name == "conditions" or
+               name == "condition" or name == "outputs" or
+               name == "measure" or name ==" measures" or
+               name == "observable" or name == "experiment" or
+               name == "vle_project") {
         m_vpzstack.pop();
     } else if (name == "destination") {
         m_vpzstack.build_connection();

@@ -78,6 +78,14 @@ namespace vle { namespace vpz {
                            const std::string& group = std::string(),
                            int index = -1);
 
+
+        /** 
+         * @brief Insert into the observables ports list a new port.
+         * 
+         * @param portname the port to push.
+         */
+        void add(const std::string& portname);
+
         /* * * * * * * * * * * * */
 
         inline const std::string& name() const
