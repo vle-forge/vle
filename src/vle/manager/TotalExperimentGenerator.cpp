@@ -54,11 +54,10 @@ void TotalExperimentGenerator::build_combination(size_t& nb)
 size_t TotalExperimentGenerator::get_combination_number() const
 {
     size_t nb = 1;
-    const vpz::Conditions::ConditionList& conds(
-        mFile.project().experiment().conditions().conditions());
+    const vpz::Conditions& cnds(mFile.project().experiment().conditions());
 
-    for (vpz::Conditions::const_iterator it = conds.begin();
-         it != conds.end(); ++it) {
+    for (vpz::Conditions::const_iterator it = cnds.begin();
+         it != cnds.end(); ++it) {
 
         const vpz::Condition::SetList& values(it->second.values());
         for (vpz::Condition::const_iterator jt = values.begin();

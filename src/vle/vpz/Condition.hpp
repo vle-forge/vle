@@ -44,8 +44,6 @@ namespace vle { namespace vpz {
         typedef SetList::const_iterator const_iterator;
         typedef SetList::iterator iterator;
 
-        Condition();
-
         Condition(const std::string& name);
 
         virtual ~Condition() 
@@ -101,9 +99,6 @@ namespace vle { namespace vpz {
          */
         inline const std::string& name() const
         { return m_name; }
-
-        inline void setName(const std::string& name)
-        { m_name.assign(name); }
 
         /** 
          * @brief Return the port, values dictionary.
@@ -179,6 +174,8 @@ namespace vle { namespace vpz {
         value::Set& last_added_port();
         
     private:
+        Condition();
+
         std::string             m_name;         /* name of the condition. */
         std::string             m_last_port;    /* latest added port. */
         SetList                 m_values;       /* dic < portname, value >. */

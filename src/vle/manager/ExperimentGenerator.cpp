@@ -58,11 +58,9 @@ void ExperimentGenerator::build_conditions_list()
 {
     std::cerr << "Combinations: " << get_combination_number() << std::endl;
 
-    const vpz::Conditions::ConditionList& conds(
-        mFile.project().experiment().conditions().conditions());
-
-    for (vpz::Conditions::const_iterator it = conds.begin();
-         it != conds.end(); ++it) {
+    const vpz::Conditions& cnds(mFile.project().experiment().conditions());
+    for (vpz::Conditions::const_iterator it = cnds.begin();
+         it != cnds.end(); ++it) {
 
         const vpz::Condition::SetList& values(it->second.values());
         for (vpz::Condition::const_iterator jt = values.begin();
@@ -90,13 +88,12 @@ void ExperimentGenerator::build_combinations_from_replicas(size_t cmbnumber)
     for (size_t irep = 0; irep < mReplicasTab.size(); ++irep) {
         mTmpfile.project().experiment().setSeed(mReplicasTab[irep]);
 
-        vpz::Conditions::ConditionList& dest(
-            mTmpfile.project().experiment().conditions().conditions());
+        vpz::Conditions& dest(mTmpfile.project().experiment().conditions());
         vpz::Conditions::iterator itDest(dest.begin());
         vpz::Condition::iterator itValueDest(itDest->second.values().begin());
 
-        const vpz::Conditions::ConditionList& orig(
-            mFile.project().experiment().conditions().conditions());
+        const vpz::Conditions& orig(
+            mFile.project().experiment().conditions());
         vpz::Conditions::const_iterator itOrig(orig.begin());
         vpz::Condition::const_iterator
             itValueOrig(itOrig->second.values().begin());

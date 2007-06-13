@@ -112,7 +112,7 @@ void Experiment::clear()
 
 void Experiment::addConditions(const Conditions& c)
 {
-    m_conditions.addConditions(c);
+    m_conditions.add(c);
 }
 
 void Experiment::addMeasures(const Measures& m)

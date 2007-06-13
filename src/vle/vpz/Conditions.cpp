@@ -38,11 +38,10 @@ Conditions::Conditions() :
 
 void Conditions::write(std::ostream& out) const
 {
-    if (not m_conditions.empty()) {
+    if (not empty()) {
         out << "<experimental_conditions>";
 
-        for (const_iterator it = m_conditions.begin(); it != m_conditions.end();
-             ++it) {
+        for (const_iterator it = begin(); it != end(); ++it) {
             out << it->second;
         }
 
@@ -50,50 +49,43 @@ void Conditions::write(std::ostream& out) const
     }
 }
 
-void Conditions::addConditions(const Conditions& conditions)
+void Conditions::add(const Conditions& cdts)
 {
-    const ConditionList& cdts(conditions.conditions());
     for (const_iterator it = cdts.begin(); it != cdts.end(); ++it)
-        addCondition(it->second);
+        add(it->second);
 }
 
-void Conditions::addCondition(const Condition& condition)
+Condition& Conditions::add(const Condition& condition)
 {
-    const_iterator it = m_conditions.find(condition.name());
-    
-    Assert(utils::InternalError, it == m_conditions.end(),
+    const_iterator it = find(condition.name());
+    Assert(utils::InternalError, it == end(),
            boost::format("The condition %1% already exist") %
            condition.name());
 
-    m_conditions[condition.name()] = condition;
+    return (*insert(
+            std::make_pair < std::string, Condition >(
+                condition.name(), condition)).first).second;
 }
 
-void Conditions::clear()
+void Conditions::del(const std::string& condition)
 {
-    m_conditions.clear();
+    erase(condition);
 }
 
-void Conditions::delCondition(const std::string& condition)
+const Condition& Conditions::get(const std::string& condition) const
 {
-    m_conditions.erase(condition);
-}
-
-const Condition& Conditions::find(const std::string& condition) const
-{
-    const_iterator it = m_conditions.find(condition);
-
-    Assert(utils::InternalError, it != m_conditions.end(),
+    const_iterator it = find(condition);
+    Assert(utils::InternalError, it != end(),
            boost::format("The condition %1% not exist") %
            condition);
 
     return it->second;
 }
 
-Condition& Conditions::find(const std::string& condition)
+Condition& Conditions::get(const std::string& condition)
 {
-    iterator it = m_conditions.find(condition);
-
-    Assert(utils::InternalError, it != m_conditions.end(),
+    iterator it = find(condition);
+    Assert(utils::InternalError, it != end(),
            boost::format("The condition %1% not exist") %
            condition);
 

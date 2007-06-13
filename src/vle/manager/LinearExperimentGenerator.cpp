@@ -37,8 +37,7 @@ void LinearExperimentGenerator::build_combination(size_t& nb)
 
 size_t LinearExperimentGenerator::get_combination_number() const
 {
-    const vpz::Conditions::ConditionList& cnds(
-        mFile.project().experiment().conditions().conditions());
+    const vpz::Conditions& cnds(mFile.project().experiment().conditions());
 
     Assert(utils::InternalError, not cnds.empty(),
            "Build a linear experimental frame with empty value?");

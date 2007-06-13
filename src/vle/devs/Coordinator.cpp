@@ -230,13 +230,13 @@ void Coordinator::init()
     utils::Rand::rand().set_seed(m_experiment.seed());
 
     vpz::AtomicModelList& atoms = m_vpz.project().model().atomicModels();
-    vpz::Conditions& cnds(m_experiment.conditions());
+    const vpz::Conditions& cnds(m_experiment.conditions());
 
     for (vpz::AtomicModelList::iterator it = atoms.begin(); it !=
          atoms.end(); ++it) {
 
         Simulator* satom(getModel(it->first));
-        vpz::Condition& cnd(cnds.find(it->second.conditions()));
+        const vpz::Condition& cnd(cnds.get(it->second.conditions()));
         satom->processInitEvents(cnd.firstValues());
     }
 

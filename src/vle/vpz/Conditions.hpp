@@ -36,13 +36,9 @@ namespace vle { namespace vpz {
      * @brief This class describe a list of condition and allow loading and
      * writing a conditions and condition tags.
      */
-    class Conditions : public Base
+    class Conditions : public Base, public std::map < std::string, Condition >
     {
     public:
-        typedef std::map < std::string, Condition > ConditionList;
-        typedef ConditionList::const_iterator const_iterator;
-        typedef ConditionList::iterator iterator;
-
         Conditions();
 
         virtual ~Conditions()
@@ -74,23 +70,19 @@ namespace vle { namespace vpz {
          *
          * @throw Exception::Internal if a Condition already exist.
          */
-        void addConditions(const Conditions& conditions);
+        void add(const Conditions& conditions);
 
         /** 
          * @brief Add a condition into the conditions list.
          * 
          * @param condition the condition to add into the map. Condition is
          * copied.
+         * @return the newly created Condition.
          *
          * @throw Exception::Internal if condition with same name and port
          * already exist.
          */
-        void addCondition(const Condition& condition);
-
-        /** 
-         * @brief Just clear the list of vpz::Condition.
-         */
-        void clear();
+        Condition& add(const Condition& condition);
 
         /** 
          * @brief Delete the specified condition from the conditions list.
@@ -98,7 +90,7 @@ namespace vle { namespace vpz {
          * @param modelname condition model name.
          * @param portname condition port name.
          */
-        void delCondition(const std::string& condition);
+        void del(const std::string& condition);
 
         /** 
          * @brief Get the specified condition from conditions list.
@@ -107,7 +99,7 @@ namespace vle { namespace vpz {
          * 
          * @return 
          */
-        const Condition& find(const std::string& condition) const;
+        const Condition& get(const std::string& condition) const;
 
         /** 
          * @brief Get the specified condition from conditions list.
@@ -116,21 +108,7 @@ namespace vle { namespace vpz {
          * 
          * @return 
          */
-        Condition& find(const std::string& condition);
-
-        /** 
-         * @brief Get the list of conditions.
-         * 
-         * @return A reference to the list of conditions.
-         */
-        inline const ConditionList& conditions() const
-        { return m_conditions; }
-
-        inline ConditionList& conditions()
-        { return m_conditions; }
-
-    private:
-        ConditionList m_conditions;
+        Condition& get(const std::string& condition);
     };
 
 }} // namespace vle vpz

@@ -400,9 +400,7 @@ void VpzStackSax::push_condition(const AttributeList& att)
     std::string name(get_attribute < std::string >(att, "name"));
 
     vpz::Condition newcondition(name);
-    cnds.addCondition(newcondition);
-
-    vpz::Condition& cnd(cnds.find(name));
+    vpz::Condition& cnd(cnds.add(newcondition));
     m_stack.push(&cnd);
 }
 
