@@ -36,13 +36,10 @@ namespace vle { namespace vpz {
      * @brief A condition define a couple model name, port name and a Value.
      * This class allow loading and writing a condition.
      */
-    class Condition : public Base
+    class Condition : public Base, public std::map < std::string, value::Set >
     {
     public:
         typedef std::map < std::string, value::Value > ValueList;
-        typedef std::map < std::string, value::Set > SetList;
-        typedef SetList::const_iterator const_iterator;
-        typedef SetList::iterator iterator;
 
         Condition(const std::string& name);
 
@@ -72,14 +69,14 @@ namespace vle { namespace vpz {
          * 
          * @param portname name of the port.
          */
-        void addPort(const std::string& portname);
+        void add(const std::string& portname);
 
         /** 
          * @brief Remove a port of the value list.
          * 
          * @param portname name of the port.
          */
-        void delPort(const std::string& portname);
+        void del(const std::string& portname);
 
         /** 
          * @brief Add a value to a specified port. If port does not exist, it
@@ -99,24 +96,6 @@ namespace vle { namespace vpz {
          */
         inline const std::string& name() const
         { return m_name; }
-
-        /** 
-         * @brief Return the port, values dictionary.
-         * 
-         * @return 
-         */
-        inline const SetList& values() const
-        { return m_values; }
-
-
-        /** 
-         * @brief Return the port, values dictionary.
-         * 
-         * @return 
-         */
-        inline SetList& values()
-        { return m_values; }
-
 
         /** 
          * @brief Build a new ValueList based on the SetList with only the
@@ -178,7 +157,6 @@ namespace vle { namespace vpz {
 
         std::string             m_name;         /* name of the condition. */
         std::string             m_last_port;    /* latest added port. */
-        SetList                 m_values;       /* dic < portname, value >. */
     };
 
 }} // namespace vle vpz

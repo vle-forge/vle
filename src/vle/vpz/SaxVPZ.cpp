@@ -413,7 +413,7 @@ void VpzStackSax::push_condition_port(const AttributeList& att)
     std::string name(get_attribute < std::string >(att, "name"));
 
     vpz::Condition* cnd(static_cast < vpz::Condition* >(m_stack.top()));
-    cnd->addPort(name);
+    cnd->add(name);
 }
 
 value::Set& VpzStackSax::pop_condition_port()

@@ -42,12 +42,12 @@ size_t LinearExperimentGenerator::get_combination_number() const
     Assert(utils::InternalError, not cnds.empty(),
            "Build a linear experimental frame with empty value?");
 
-    const size_t nb = cnds.begin()->second.values().size();
+    const size_t nb = cnds.begin()->second.size();
 
     for (vpz::Conditions::const_iterator it = cnds.begin();
          it != cnds.end(); ++it) {
 
-        const vpz::Condition::SetList& values(it->second.values());
+        const vpz::Condition& values(it->second);
         for (vpz::Condition::const_iterator jt = values.begin();
              jt != values.end(); ++jt) {
 

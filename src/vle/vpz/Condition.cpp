@@ -47,7 +47,7 @@ void Condition::write(std::ostream& out) const
 {
     out << "<condition name=\"" << m_name << "\" >";
 
-    for (const_iterator it = m_values.begin(); it != m_values.end(); ++it) {
+    for (const_iterator it = begin(); it != end(); ++it) {
         out << " <port "
             << "name=\"" << it->first << "\" "
             << ">"
@@ -58,28 +58,31 @@ void Condition::write(std::ostream& out) const
     out << "</condition>";
 }
 
-void Condition::addPort(const std::string& portname)
+void Condition::add(const std::string& portname)
 {
-    if (m_values.find(portname) == m_values.end()) {
-        m_values[portname] = value::SetFactory::create();
+    if (find(portname) == end()) {
+        insert(std::make_pair < std::string, value::Set >(
+                portname, value::SetFactory::create()));
     }
     m_last_port.assign(portname);
 }
 
-void Condition::delPort(const std::string& portname)
+void Condition::del(const std::string& portname)
 {
-    m_values.erase(portname);
+    erase(portname);
 }
 
 void Condition::addValueToPort(const std::string& portname,
                                const value::Value& value)
 {
-    iterator it = m_values.find(portname);
+    iterator it = find(portname);
 
-    if (it == m_values.end()) {
+    if (it == end()) {
         value::Set newset;
         newset->addValue(value);
-        m_values[portname] = newset;
+
+        insert(std::make_pair < std::string, value::Set >(
+                portname, newset));
         m_last_port.assign(portname);
     } else {
         it->second->addValue(value);
@@ -90,7 +93,7 @@ Condition::ValueList Condition::firstValues() const
 {
     Condition::ValueList result;
 
-    for (const_iterator it = m_values.begin(); it != m_values.end(); ++it) {
+    for (const_iterator it = begin(); it != end(); ++it) {
         if (it->second->size() > 0) {
             result[it->first] = it->second->getValue(0);
         } else {
@@ -105,9 +108,9 @@ Condition::ValueList Condition::firstValues() const
 
 const value::Set& Condition::getSetValues(const std::string& portname) const
 {
-    const_iterator it = m_values.find(portname);
+    const_iterator it = find(portname);
 
-    Assert(utils::InternalError, it != m_values.end(),
+    Assert(utils::InternalError, it != end(),
            boost::format("Condition %1% have no port %2%") %
            m_name % portname);
 
@@ -127,9 +130,9 @@ const value::Value& Condition::nValue(const std::string& portname,
 
 value::Set& Condition::last_added_port()
 {
-    iterator it = m_values.find(m_last_port);
+    iterator it = find(m_last_port);
 
-    Assert(utils::InternalError, it != m_values.end(),
+    Assert(utils::InternalError, it != end(),
            boost::format("Condition %1% have no port %2%") %
            m_name % m_last_port);
 

@@ -62,7 +62,7 @@ void ExperimentGenerator::build_conditions_list()
     for (vpz::Conditions::const_iterator it = cnds.begin();
          it != cnds.end(); ++it) {
 
-        const vpz::Condition::SetList& values(it->second.values());
+        const vpz::Condition& values(it->second);
         for (vpz::Condition::const_iterator jt = values.begin();
              jt != values.end(); ++jt) {
 
@@ -90,13 +90,13 @@ void ExperimentGenerator::build_combinations_from_replicas(size_t cmbnumber)
 
         vpz::Conditions& dest(mTmpfile.project().experiment().conditions());
         vpz::Conditions::iterator itDest(dest.begin());
-        vpz::Condition::iterator itValueDest(itDest->second.values().begin());
+        vpz::Condition::iterator itValueDest(itDest->second.begin());
 
         const vpz::Conditions& orig(
             mFile.project().experiment().conditions());
         vpz::Conditions::const_iterator itOrig(orig.begin());
         vpz::Condition::const_iterator
-            itValueOrig(itOrig->second.values().begin());
+            itValueOrig(itOrig->second.begin());
 
         Assert(utils::InternalError,
                dest.size() == orig.size(),
@@ -112,16 +112,16 @@ void ExperimentGenerator::build_combinations_from_replicas(size_t cmbnumber)
             itValueDest++;
             itValueOrig++;
 
-            if (itValueDest == itDest->second.values().end()) {
+            if (itValueDest == itDest->second.end()) {
                 Assert(utils::InternalError, itValueOrig ==
-                       itOrig->second.values().end(),
+                       itOrig->second.end(),
                        boost::format("Error: %1% %2%\n") %
-                       itDest->second.values().size() %
-                       itOrig->second.values().size());
+                       itDest->second.size() %
+                       itOrig->second.size());
                 itDest++;
                 itOrig++;
-                itValueDest = itDest->second.values().begin();
-                itValueOrig = itOrig->second.values().begin();
+                itValueDest = itDest->second.begin();
+                itValueOrig = itOrig->second.begin();
             }
         }
         write_instance(cmbnumber, irep);

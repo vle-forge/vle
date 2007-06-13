@@ -59,7 +59,7 @@ size_t TotalExperimentGenerator::get_combination_number() const
     for (vpz::Conditions::const_iterator it = cnds.begin();
          it != cnds.end(); ++it) {
 
-        const vpz::Condition::SetList& values(it->second.values());
+        const vpz::Condition& values(it->second);
         for (vpz::Condition::const_iterator jt = values.begin();
              jt != values.end(); ++jt) {
             nb *= jt->second->size();
