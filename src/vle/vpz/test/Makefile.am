@@ -32,6 +32,10 @@ test2_LDADD = @BOOST_UNIT_TEST_FRAMEWORK_LIB@ \
 	      $(top_srcdir)/src/vle/extension/libextension.la \
 	      $(top_srcdir)/src/vle/manager/libmanager.la
 
+vletranslator_LTLIBRARIES = libtr1.la
+libtr1_la_LDFLAGS = @MODEL_PLUGIN_LDFLAGS@
+libtr1_la_SOURCES = tr1.hpp tr1.cpp
+
 TESTS = test1 test2
 endif
 
