@@ -71,9 +71,11 @@ namespace vle { namespace vpz {
          */
         void del(const std::string& modelname);
 
-        void fusion(Model& model,
+        void fusion(const Project& prj,
+                    Model& model,
                     Dynamics& dynamics,
-                    Experiment& experiment);
+                    Conditions& conditions,
+                    Measures& measures);
 
         /** 
          * @brief Return true if a NoVLE exist with the novle string.

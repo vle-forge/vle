@@ -60,19 +60,14 @@ void NoVLEs::del(const std::string& modelname)
     }
 }
 
-void NoVLEs::fusion(Model& /* model */, Dynamics& dynamics,
-                    Experiment& experiment)
+void NoVLEs::fusion(const Project& prj,
+                    Model& model,
+                    Dynamics& dynamics,
+                    Conditions& conditions,
+                    Measures& measures)
 {
     for (iterator it = begin(); it != end(); ++it) {
-        Model m;
-        Dynamics d;
-        Experiment e;
-
-        (*it).second.callTranslator(m, d, e);          
-        //model.addModel((*it).first, m); // FIXME
-        dynamics.addDynamics(d);
-        experiment.addMeasures(e.measures());
-        experiment.addConditions(e.conditions());
+        (*it).second.callTranslator(prj, model, dynamics, conditions, measures);
     }
 }
 

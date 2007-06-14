@@ -90,7 +90,8 @@ void Project::clear()
 
 void Project::expandTranslator()
 {
-    m_novles.fusion(m_model, m_dynamics, m_experiment);
+    m_novles.fusion(*this, m_model, m_dynamics, m_experiment.conditions(),
+                    m_experiment.measures());
     m_novles.clear();
 }
 

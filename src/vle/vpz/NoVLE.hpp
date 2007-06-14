@@ -26,12 +26,15 @@
 #define VLE_VPZ_NOVLE_HPP
 
 #include <vle/vpz/Base.hpp>
-#include <vle/vpz/Model.hpp>
-#include <vle/vpz/Dynamics.hpp>
-#include <vle/vpz/Experiment.hpp>
 #include <glibmm/module.h>
 
 namespace vle { namespace vpz {
+
+    class Project;
+    class Model;
+    class Dynamics;
+    class Conditions;
+    class Measures; 
 
     class NoVLE : public Base
     {
@@ -71,17 +74,18 @@ namespace vle { namespace vpz {
          * @param dynamics 
          * @param experiment 
          */
-        void callTranslator(Model& model,
+        void callTranslator(const Project& prj,
+                            Model& model,
                             Dynamics& dynamics,
-                            Experiment& experiment);
+                            Conditions& conditions,
+                            Measures& measures);
 
         /** 
          * @brief Set new information to the NoVLE.
          * @param library the library use by the novle model.
          * @param data the data to library.
          */
-        void setNoVLE(const std::string& library,
-                      const std::string& data);
+        void setNoVLE(const std::string& library, const std::string& data);
 
         /** 
          * @brief Set cdata parameters to the novle models.
@@ -106,7 +110,7 @@ namespace vle { namespace vpz {
         std::string             m_name;
         std::string             m_data;
         std::string             m_library;
-        
+
         /** 
          * @brief Dynamically load the translator library.
          * 
@@ -114,7 +118,7 @@ namespace vle { namespace vpz {
          */
         Glib::Module* translator();
     };
-    
+
 }} // namespace vle vpz
 
 #endif

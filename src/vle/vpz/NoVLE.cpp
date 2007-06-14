@@ -23,6 +23,10 @@
  */
 
 #include <vle/vpz/NoVLE.hpp>
+#include <vle/vpz/Model.hpp>
+#include <vle/vpz/Dynamics.hpp>
+#include <vle/vpz/Experiment.hpp>
+#include <vle/vpz/Project.hpp>
 #include <vle/vpz/Translator.hpp>
 #include <vle/utils/XML.hpp>
 #include <vle/utils/Debug.hpp>
@@ -47,18 +51,12 @@ void NoVLE::setNoVLE(const std::string& library,
     m_library.assign(library);
 }
 
-void NoVLE::callTranslator(Model& model, Dynamics& dynamics,
-                           Experiment& experiment)
+void NoVLE::callTranslator(const Project& prj,
+                           Model& /* model */,
+                           Dynamics& dynamics,
+                           Conditions& conditions,
+                           Measures& measures)
 {
-    xmlpp::DomParser* dom = new xmlpp::DomParser;
-    try {
-        dom->parse_memory(m_data);
-    } catch (const xmlpp::exception& e) {
-        Throw(utils::SaxParserError,
-              boost::format("Translator XML for '%1%' problem: %2%\n") %
-              m_name % e.what());
-    }
-
     Glib::Module* module = translator();
     void* makeNewTranslator;
 
@@ -69,24 +67,20 @@ void NoVLE::callTranslator(Model& model, Dynamics& dynamics,
            Glib::Module::get_last_error());
 
     Translator* call;
-    call = ((Translator*(*)(xmlpp::Element*))(makeNewTranslator))
-        (dom->get_document()->get_root_node());
+    call = ((Translator*(*)(const Project&))(makeNewTranslator))(prj);
 
     Assert(utils::ParseError, call,
            boost::format("Error in '%1%', function 'makeNewTranslator': "
                            "problem allocation a new Translator '%2%'") %
                            m_name % Glib::Module::get_last_error());
 
-    call->translate();
-    model.initFromModel(call->getStructure()->get_root_node());
-    dynamics.initFromModels(call->getDynamics()->get_root_node());
-
-    if (call->getExperiment())
-        experiment.initFromExperiment(call->getExperiment()->get_root_node());
+    // model.addModel(call->model()); // FIXME
+    dynamics.addDynamics(call->dynamics());
+    conditions.add(call->conditions());
+    measures.addMeasures(call->measures());
 
     delete call;
     delete module;
-    delete dom;
 }
 
 Glib::Module* NoVLE::translator()
