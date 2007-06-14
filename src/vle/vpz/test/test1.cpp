@@ -25,6 +25,7 @@
 #include <boost/test/floating_point_comparison.hpp>
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
+#include <vle/vpz/Vpz.hpp>
 #include <vle/vpz/SaxVPZ.hpp>
 #include <vle/value/Boolean.hpp>
 #include <vle/value/Integer.hpp>
@@ -55,23 +56,19 @@ void test_value_bool()
     const char* t2 = "<?xml version=\"1.0\"?>\n<boolean>false</boolean>";
     const char* t3 = "<?xml version=\"1.0\"?>\n<boolean>1</boolean>";
     const char* t4 = "<?xml version=\"1.0\"?>\n<boolean>0</boolean>";
-    vpz::VLESaxParser sax;
-    value::Value v;
 
-    sax.parse_memory(t1);
-    v = sax.get_value(0);
+    value::Value v;
+    
+    v = vpz::Vpz::parse_value(t1);
     BOOST_CHECK(value::to_boolean(v)->boolValue() == true);
 
-    sax.parse_memory(t2);
-    v = sax.get_value(0);
+    v = vpz::Vpz::parse_value(t2);
     BOOST_CHECK(value::to_boolean(v)->boolValue() == false);
 
-    sax.parse_memory(t3);
-    v = sax.get_value(0);
+    v = vpz::Vpz::parse_value(t3);
     BOOST_CHECK(value::to_boolean(v)->boolValue() == true);
 
-    sax.parse_memory(t4);
-    v = sax.get_value(0);
+    v = vpz::Vpz::parse_value(t4);
     BOOST_CHECK(value::to_boolean(v)->boolValue() == false);
 }
 
@@ -87,24 +84,22 @@ void test_value_integer()
     sprintf(t4, "<?xml version=\"1.0\"?>\n<integer>%s</integer>",
             utils::to_string(std::numeric_limits< long >::min()).c_str());
 
-    vpz::VLESaxParser sax;
+    
     value::Value v;
 
-    sax.parse_memory(t1);
-    v = sax.get_value(0);
+    v = vpz::Vpz::parse_value(t1);
     BOOST_CHECK(value::to_integer(v)->intValue() == 100);
 
-    sax.parse_memory(t2);
-    v = sax.get_value(0);
+    v = vpz::Vpz::parse_value(t2);
     BOOST_CHECK(value::to_integer(v)->intValue() == -100);
 
-    sax.parse_memory(t3);
-    v = sax.get_value(0);
-    BOOST_CHECK(value::to_integer(v)->longValue() == std::numeric_limits < long >::max());
+    v = vpz::Vpz::parse_value(t3);
+    BOOST_CHECK(value::to_integer(v)->longValue() == std::numeric_limits < long
+                >::max());
 
-    sax.parse_memory(t4);
-    v = sax.get_value(0);
-    BOOST_CHECK(value::to_integer(v)->longValue() == std::numeric_limits < long >::min());
+    v = vpz::Vpz::parse_value(t4);
+    BOOST_CHECK(value::to_integer(v)->longValue() == std::numeric_limits < long
+                >::min());
 }
 
 void test_value_double()
@@ -112,15 +107,12 @@ void test_value_double()
     const char* t1 = "<?xml version=\"1.0\"?>\n<double>100.5</double>";
     const char* t2 = "<?xml version=\"1.0\"?>\n<double>-100.5</double>";
 
-    vpz::VLESaxParser sax;
     value::Value v;
 
-    sax.parse_memory(t1);
-    v = sax.get_value(0);
+    v = vpz::Vpz::parse_value(t1);
     BOOST_CHECK_CLOSE(value::to_double(v)->doubleValue(), 100.5, 1);
 
-    sax.parse_memory(t2);
-    v = sax.get_value(0);
+    v = vpz::Vpz::parse_value(t2);
     BOOST_CHECK_CLOSE(value::to_double(v)->doubleValue(), -100.5, 1);
 }
 
@@ -129,15 +121,12 @@ void test_value_string()
     const char* t1 = "<?xml version=\"1.0\"?>\n<string>a b c d e f g h i j</string>";
     const char* t2 = "<?xml version=\"1.0\"?>\n<string>a\nb\tc\n</string>";
 
-    vpz::VLESaxParser sax;
     value::Value v;
 
-    sax.parse_memory(t1);
-    v = sax.get_value(0);
+    v = vpz::Vpz::parse_value(t1);
     BOOST_CHECK(value::to_string(v)->stringValue() == "a b c d e f g h i j");
 
-    sax.parse_memory(t2);
-    v = sax.get_value(0);
+    v = vpz::Vpz::parse_value(t2);
     BOOST_CHECK(value::to_string(v)->stringValue() == "a\nb\tc\n");
 }
 
@@ -157,16 +146,13 @@ void test_value_set()
         "  </set>\n"
         "</set>";
     
-    vpz::VLESaxParser sax;
     value::Set v;
     
-    sax.parse_memory(t1);
-    v = value::to_set(sax.get_value(0));
+    v = value::to_set(vpz::Vpz::parse_value(t1));
     BOOST_CHECK(value::to_string(v->getValue(1))->stringValue() == "test");
     BOOST_CHECK(value::to_integer(v->getValue(0))->intValue() == 1);
 
-    sax.parse_memory(t2);
-    v = value::to_set(sax.get_value(0));
+    v = value::to_set(vpz::Vpz::parse_value(t2));
     BOOST_CHECK(value::to_integer(v->getValue(0))->intValue() == 1);
     value::Set v2 = value::to_set(v->getValue(1));
     BOOST_CHECK(value::to_string(v2->getValue(0))->stringValue() == "test");
@@ -191,15 +177,12 @@ void test_value_map()
         " </key>\n"
         "</map>\n";
 
-    vpz::VLESaxParser sax;
     value::Map v;
     
-    sax.parse_memory(t1);
-    v = value::to_map(sax.get_value(0));
+    v = value::to_map(vpz::Vpz::parse_value(t1));
     BOOST_CHECK(value::to_integer(v->getValue("a"))->intValue() == 10);
 
-    sax.parse_memory(t2);
-    v = value::to_map(sax.get_value(0));
+    v = value::to_map(vpz::Vpz::parse_value(t2));
     value::Set s;
 
     s = value::to_set(v->getValue("a"));
@@ -214,11 +197,9 @@ void test_value_tuple()
         "2 "
         "3</tuple>\n";
 
-    vpz::VLESaxParser sax;
     value::Tuple v;
     
-    sax.parse_memory(t1);
-    v = value::to_tuple(sax.get_value(0));
+    v = value::to_tuple(vpz::Vpz::parse_value(t1));
     BOOST_REQUIRE_EQUAL(v->size(), (size_t)3);
     BOOST_CHECK_CLOSE(v->operator[](0), 1.0, 0.1);
     BOOST_CHECK_CLOSE(v->operator[](1), 2.0, 0.1);
@@ -232,11 +213,9 @@ void test_value_table()
         "1 2 3 4 5 6"
         "</table>\n";
 
-    vpz::VLESaxParser sax;
     value::Table v;
     
-    sax.parse_memory(t1);
-    v = value::to_table(sax.get_value(0));
+    v = value::to_table(vpz::Vpz::parse_value(t1));
     BOOST_REQUIRE_EQUAL(v->width(), (value::TableFactory::index)2);
     BOOST_REQUIRE_EQUAL(v->height(), (value::TableFactory::index)3);
     BOOST_CHECK_CLOSE(v->get(0, 0), 1.0, 0.1);

@@ -56,7 +56,7 @@ std::ostream& operator<<(std::ostream& out, const VpzStackSax& stack)
         nv.pop();
     }
 
-    out << "Xml:\n" << *nv.m_vpz << "\n";
+    out << "Xml:\n" << nv.m_vpz << "\n";
     return out;
 }
 
@@ -65,21 +65,18 @@ vpz::Vpz* VpzStackSax::push_vpz(const std::string& author, float version,
                            const std::string& date)
 {
     AssertS(utils::SaxParserError, m_stack.empty());
-    AssertS(utils::SaxParserError, not m_vpz);
 
-    m_vpz = new vpz::Vpz();
-    m_vpz->project().setAuthor(author);
-    m_vpz->project().setVersion(version);
-    m_vpz->project().setDate(date);
-    m_stack.push(m_vpz);
+    m_vpz.project().setAuthor(author);
+    m_vpz.project().setVersion(version);
+    m_vpz.project().setDate(date);
+    m_stack.push(&m_vpz);
 
-    return m_vpz;
+    return &m_vpz;
 }
 
 void VpzStackSax::push_structure()
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_vpz);
     AssertS(utils::SaxParserError, m_stack.top()->isVpz());
 
     vpz::Structures* structure = new vpz::Structures();
@@ -89,7 +86,6 @@ void VpzStackSax::push_structure()
 void VpzStackSax::push_model(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_vpz);
     AssertS(utils::SaxParserError, m_stack.top()->isStructures() or
             m_stack.top()->isSubmodels());
 
@@ -141,7 +137,6 @@ void VpzStackSax::push_model(const AttributeList& att)
 void VpzStackSax::push_port(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_vpz);
 
     if (m_stack.top()->isCondition()) {
         push_condition_port(att);
@@ -177,7 +172,6 @@ void VpzStackSax::push_port(const AttributeList& att)
 void VpzStackSax::push_porttype(const Glib::ustring& name)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_vpz);
     AssertS(utils::SaxParserError, m_stack.top()->isModel());
 
     vpz::Base* prt = 0;
@@ -199,7 +193,6 @@ void VpzStackSax::push_porttype(const Glib::ustring& name)
 void VpzStackSax::push_submodels()
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_vpz);
     AssertS(utils::SaxParserError, m_stack.top()->isModel());
 
     vpz::Submodels* sub = new vpz::Submodels();
@@ -209,7 +202,6 @@ void VpzStackSax::push_submodels()
 void VpzStackSax::push_connections()
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_vpz);
     AssertS(utils::SaxParserError, m_stack.top()->isModel());
 
     vpz::Connections* cnts = new vpz::Connections();
@@ -219,7 +211,6 @@ void VpzStackSax::push_connections()
 void VpzStackSax::push_connection(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_vpz);
     AssertS(utils::SaxParserError, m_stack.top()->isConnections());
 
     std::string type(get_attribute < std::string >(att, "type"));
@@ -241,7 +232,6 @@ void VpzStackSax::push_connection(const AttributeList& att)
 void VpzStackSax::push_origin(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_vpz);
     AssertS(utils::SaxParserError, m_stack.top()->isInternalConnection() or
             m_stack.top()->isInputConnection() or
             m_stack.top()->isOutputConnection());
@@ -256,7 +246,6 @@ void VpzStackSax::push_origin(const AttributeList& att)
 void VpzStackSax::push_destination(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_vpz);
     AssertS(utils::SaxParserError, m_stack.top()->isOrigin());
 
     std::string mdl(get_attribute < std::string >(att, "model"));
@@ -269,7 +258,6 @@ void VpzStackSax::push_destination(const AttributeList& att)
 void VpzStackSax::build_connection()
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_vpz);
 
     AssertS(utils::SaxParserError, m_stack.top()->isDestination());
     vpz::Destination* dest = static_cast < vpz::Destination* >(pop());
@@ -311,16 +299,14 @@ void VpzStackSax::build_connection()
 void VpzStackSax::push_dynamics()
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_vpz);
     AssertS(utils::SaxParserError, m_stack.top()->isVpz());
 
-    m_stack.push(&m_vpz->project().dynamics());
+    m_stack.push(&m_vpz.project().dynamics());
 }
 
 void VpzStackSax::push_dynamic(const AttributeList& att)
 { 
     AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_vpz);
     AssertS(utils::SaxParserError, m_stack.top()->isDynamics());
 
     vpz::Dynamic dyn;
@@ -352,17 +338,16 @@ void VpzStackSax::push_dynamic(const AttributeList& att)
         dyn.setLocalDynamics();
     }
 
-    vpz::Dynamics& dyns(m_vpz->project().dynamics());
+    vpz::Dynamics& dyns(m_vpz.project().dynamics());
     dyns.addDynamic(dyn);
 }
 
 void VpzStackSax::push_experiment(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_vpz);
     AssertS(utils::SaxParserError, m_stack.top()->isVpz());
 
-    vpz::Experiment& exp(m_vpz->project().experiment());
+    vpz::Experiment& exp(m_vpz.project().experiment());
     m_stack.push(&exp);
 
     exp.setName(get_attribute < std::string >(att, "name"));
@@ -373,10 +358,9 @@ void VpzStackSax::push_experiment(const AttributeList& att)
 void VpzStackSax::push_replicas(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_vpz);
     AssertS(utils::SaxParserError, m_stack.top()->isExperiment());
 
-    vpz::Replicas& rep(m_vpz->project().experiment().replicas());
+    vpz::Replicas& rep(m_vpz.project().experiment().replicas());
     rep.setSeed(get_attribute < guint32 >(att, "seed"));
     rep.setNumber(get_attribute < size_t >(att, "number"));
 }
@@ -384,19 +368,17 @@ void VpzStackSax::push_replicas(const AttributeList& att)
 void VpzStackSax::push_conditions()
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_vpz);
     AssertS(utils::SaxParserError, m_stack.top()->isExperiment());
 
-    m_stack.push(&m_vpz->project().experiment().conditions());
+    m_stack.push(&m_vpz.project().experiment().conditions());
 }
 
 void VpzStackSax::push_condition(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_vpz);
     AssertS(utils::SaxParserError, m_stack.top()->isConditions());
 
-    vpz::Conditions& cnds(m_vpz->project().experiment().conditions());
+    vpz::Conditions& cnds(m_vpz.project().experiment().conditions());
     std::string name(get_attribute < std::string >(att, "name"));
 
     vpz::Condition newcondition(name);
@@ -407,7 +389,6 @@ void VpzStackSax::push_condition(const AttributeList& att)
 void VpzStackSax::push_condition_port(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_vpz);
     AssertS(utils::SaxParserError, m_stack.top()->isCondition());
 
     std::string name(get_attribute < std::string >(att, "name"));
@@ -419,7 +400,6 @@ void VpzStackSax::push_condition_port(const AttributeList& att)
 value::Set& VpzStackSax::pop_condition_port()
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_vpz);
     AssertS(utils::SaxParserError, m_stack.top()->isCondition());
 
     vpz::Condition* cnd(static_cast < vpz::Condition* >(m_stack.top()));
@@ -431,25 +411,22 @@ value::Set& VpzStackSax::pop_condition_port()
 void VpzStackSax::push_measures()
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_vpz);
     AssertS(utils::SaxParserError, m_stack.top()->isExperiment());
 
-    m_stack.push(&m_vpz->project().experiment().measures());
+    m_stack.push(&m_vpz.project().experiment().measures());
 }
 
 void VpzStackSax::push_outputs()
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_vpz);
     AssertS(utils::SaxParserError, m_stack.top()->isMeasures());
 
-    m_stack.push(&m_vpz->project().experiment().measures().outputs());
+    m_stack.push(&m_vpz.project().experiment().measures().outputs());
 }
 
 void VpzStackSax::push_output(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_vpz);
     AssertS(utils::SaxParserError, m_stack.top()->isOutputs());
 
     std::string name(get_attribute < std::string >(att, "name"));
@@ -460,7 +437,7 @@ void VpzStackSax::push_output(const AttributeList& att)
         location.assign(get_attribute < std::string >(att, "location"));
     }
 
-    Outputs& outs(m_vpz->project().experiment().measures().outputs());
+    Outputs& outs(m_vpz.project().experiment().measures().outputs());
     if (format == "text") {
         outs.addTextStream(name, location);
     } else if (format == "sdml") {
@@ -486,14 +463,13 @@ void VpzStackSax::push_output(const AttributeList& att)
 void VpzStackSax::push_measure(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_vpz);
     AssertS(utils::SaxParserError, m_stack.top()->isMeasures());
 
     std::string name(get_attribute< std::string >(att, "name")); 
     std::string type(get_attribute< std::string >(att, "type")); 
     std::string output(get_attribute< std::string >(att, "output")); 
     
-    Measures& measures(m_vpz->project().experiment().measures());
+    Measures& measures(m_vpz.project().experiment().measures());
 
     if (type == "timed") {
         Assert(utils::SaxParserError, exist_attribute(att, "timestep"),
@@ -515,7 +491,6 @@ void VpzStackSax::push_measure(const AttributeList& att)
 void VpzStackSax::push_observable(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_vpz);
     AssertS(utils::SaxParserError, m_stack.top()->isMeasure());
 
     Measure* measure(static_cast < Measure* >(m_stack.top()));
@@ -536,7 +511,6 @@ void VpzStackSax::push_observable(const AttributeList& att)
 void VpzStackSax::push_observable_port(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_vpz);
     AssertS(utils::SaxParserError, m_stack.top()->isObservable());
 
     std::string name(get_attribute < std::string >(att, "name"));
@@ -548,17 +522,15 @@ void VpzStackSax::push_observable_port(const AttributeList& att)
 void VpzStackSax::push_translators()
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_vpz);
     AssertS(utils::SaxParserError, m_stack.top()->isVpz());
 
-    vpz::NoVLEs& novles(m_vpz->project().novles());
+    vpz::NoVLEs& novles(m_vpz.project().novles());
     m_stack.push(&novles);
 }
 
 void VpzStackSax::push_translator(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_vpz);
     AssertS(utils::SaxParserError, m_stack.top()->isNoVLES());
 
     std::string name(get_attribute < std::string >(att, "name"));
@@ -566,14 +538,13 @@ void VpzStackSax::push_translator(const AttributeList& att)
 
     vpz::NoVLE novle(name);
     novle.setNoVLE(lib, "");
-    vpz::NoVLE& newvle(m_vpz->project().novles().add(novle));
+    vpz::NoVLE& newvle(m_vpz.project().novles().add(novle));
     m_stack.push(&newvle);
 }
 
 void VpzStackSax::pop_translator(const std::string& cdata)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_vpz);
     AssertS(utils::SaxParserError, m_stack.top()->isNoVLE());
 
     vpz::NoVLE* novle(static_cast < vpz::NoVLE* >(m_stack.top()));
@@ -593,18 +564,13 @@ const vpz::Base* VpzStackSax::top() const
     return m_stack.top();
 }
 
-vpz::Vpz& VpzStackSax::vpz()
-{
-    Assert(utils::InternalError, m_vpz, "VPZ stack sax have empty VPZ object");
-    return *m_vpz;
-}
-
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-VLESaxParser::VLESaxParser() :
-    m_vpz(0),
+VLESaxParser::VLESaxParser(Vpz& vpz) :
+    m_vpzstack(vpz),
+    m_vpz(vpz),
     m_isValue(false),
     m_isVPZ(false)
 {
@@ -630,6 +596,11 @@ void VLESaxParser::on_start_document()
 
 void VLESaxParser::on_end_document()
 {
+    if (m_isVPZ == false) {
+        if (not m_valuestack.get_results().empty()) {
+            m_isValue = true;
+        }
+    }
 }
 
 void VLESaxParser::on_start_element(
@@ -660,10 +631,9 @@ void VLESaxParser::on_start_element(
     } else if (name == "vle_project") {
         AssertS(utils::SaxParserError, not m_isValue and not m_isTrame);
         m_isVPZ = true;
-        m_vpz = m_vpzstack.push_vpz(
-            get_attribute < std::string >(att, "author"),
-            get_attribute < float >(att, "version"),
-            get_attribute < std::string >(att, "date"));
+        m_vpzstack.push_vpz(get_attribute < std::string >(att, "author"),
+                            get_attribute < float >(att, "version"),
+                            get_attribute < std::string >(att, "date"));
 
     } else if (name == "structures") {
         m_vpzstack.push_structure();

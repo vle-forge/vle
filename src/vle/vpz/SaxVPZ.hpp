@@ -43,8 +43,8 @@ namespace vle { namespace vpz {
     class VpzStackSax
     {
     public:
-        VpzStackSax() :
-            m_vpz(0)
+        VpzStackSax(Vpz& vpz) :
+            m_vpz(vpz)
         { }
 
         ~VpzStackSax() { }
@@ -82,14 +82,15 @@ namespace vle { namespace vpz {
         vpz::Base* pop();
         const vpz::Base* top() const;
 
-        vpz::Vpz& vpz();
+        inline vpz::Vpz& vpz()
+        { return m_vpz; }
 
         friend std::ostream& operator<<(std::ostream& out,
                                         const VpzStackSax& stack);
 
     private:
         std::stack < vpz::Base* >       m_stack;
-        vpz::Vpz*                       m_vpz;
+        vpz::Vpz&                       m_vpz;
     };
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -99,7 +100,7 @@ namespace vle { namespace vpz {
     class VLESaxParser : public xmlpp::SaxParser
     {
     public:
-        VLESaxParser();
+        VLESaxParser(Vpz& vpz);
 
         virtual ~VLESaxParser();
 
@@ -146,11 +147,8 @@ namespace vle { namespace vpz {
 
         const value::Value& get_value(const size_t pos) const;
 
-        const vpz::Vpz& vpz() const
-        {
-            Assert(utils::SaxParserError, m_vpz, "No VPZ was read");
-            return *m_vpz;
-        }
+        inline const vpz::Vpz& vpz() const
+        { return m_vpz; }
 
     private:
         /** 
@@ -177,7 +175,7 @@ namespace vle { namespace vpz {
         ValueStackSax                   m_valuestack;
         Glib::ustring                   m_lastCharacters;
         Glib::ustring                   m_cdata;
-        vpz::Vpz*                       m_vpz;
+        vpz::Vpz&                       m_vpz;
 
         bool                            m_isValue;
         bool                            m_isVPZ;

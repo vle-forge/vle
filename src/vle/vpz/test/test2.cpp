@@ -25,7 +25,6 @@
 #include <boost/test/floating_point_comparison.hpp>
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
-#include <vle/vpz/SaxVPZ.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/vpz/Translator.hpp>
 #include <vle/graph/AtomicModel.hpp>
@@ -66,15 +65,15 @@ void test_atomicmodel_vpz()
         "  </model>\n"
         " </structures>\n"
         "</vle_project>\n";
-    vpz::VLESaxParser sax;
-    sax.parse_memory(xml);
 
-    const vpz::Vpz& vpz = sax.vpz();
+    vpz::Vpz vpz;
+    vpz.parse_memory(xml);
+
     BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
     BOOST_REQUIRE_CLOSE(vpz.project().version(), 0.5f, 0.01);
     BOOST_REQUIRE_EQUAL(vpz.project().date(), "Mon, 12 Feb 2007 23:40:31 +0100");
 
-    const vpz::Model& mdl = sax.vpz().project().model();
+    const vpz::Model& mdl = vpz.project().model();
     BOOST_REQUIRE(mdl.model() != 0);
     BOOST_REQUIRE_EQUAL(mdl.model()->isAtomic(), true);
     BOOST_REQUIRE_EQUAL(mdl.model()->getInitPortNumber(), 2);
@@ -130,14 +129,16 @@ void test_coupledmodel_vpz()
         "  </model>\n"
         " </structures>\n"
         "</vle_project>\n";
-    vpz::VLESaxParser sax;
-    sax.parse_memory(xml);
+    
+    vpz::Vpz vpz;
+    vpz.parse_memory(xml);
 
-    const vpz::Model& mdl = sax.vpz().project().model();
+    const vpz::Model& mdl(vpz.project().model());
     BOOST_REQUIRE(mdl.model() != 0);
     BOOST_REQUIRE_EQUAL(mdl.model()->isCoupled(), true);
 
-    graph::CoupledModel* cpl = dynamic_cast < graph::CoupledModel* >(mdl.model());
+    graph::CoupledModel* cpl = dynamic_cast < graph::CoupledModel*
+        >(mdl.model());
     BOOST_REQUIRE(cpl != 0);
     BOOST_REQUIRE(cpl->getOutPort("o") != 0);
     BOOST_REQUIRE(cpl->getInPort("i") != 0);
@@ -178,10 +179,10 @@ void test_dynamic_vpz()
         " </dynamics>\n"
         "</vle_project>\n";
 
-    vpz::VLESaxParser sax;
-    sax.parse_memory(xml);
+    vpz::Vpz vpz;
+    vpz.parse_memory(xml);
 
-    const vpz::Model& mdl = sax.vpz().project().model();
+    const vpz::Model& mdl(vpz.project().model());
     BOOST_REQUIRE(mdl.model() != 0);
     BOOST_REQUIRE_EQUAL(mdl.model()->isAtomic(), true);
 
@@ -192,7 +193,7 @@ void test_dynamic_vpz()
     BOOST_REQUIRE_EQUAL(vatom.dynamics(), "dyn1");
     BOOST_REQUIRE_EQUAL(vatom.conditions(), "cnd1");
 
-    const vpz::Dynamics& dyns = sax.vpz().project().dynamics();
+    const vpz::Dynamics& dyns = vpz.project().dynamics();
     const vpz::Dynamic& dyn = dyns.find(vatom.dynamics());
 
     BOOST_REQUIRE_EQUAL(dyn.name(), "dyn1");
@@ -231,10 +232,9 @@ void test_experiment_vpz()
         " </experiment>\n"
         "</vle_project>\n";
     
-    vpz::VLESaxParser sax;
-    sax.parse_memory(xml);
+    vpz::Vpz vpz;
+    vpz.parse_memory(xml);
 
-    const vpz::Vpz& vpz(sax.vpz());
     const vpz::Project& project(vpz.project());
     const vpz::Experiment& experiment(project.experiment());
     const vpz::Replicas& replicas(project.experiment().replicas());
@@ -311,10 +311,9 @@ void test_experiment_measures_vpz()
         " </experiment>\n"
         "</vle_project>\n";
     
-    vpz::VLESaxParser sax;
-    sax.parse_memory(xml);
+    vpz::Vpz vpz;
+    vpz.parse_memory(xml);
 
-    const vpz::Vpz& vpz(sax.vpz());
     const vpz::Project& project(vpz.project());
     const vpz::Experiment& experiment(project.experiment());
     const vpz::Measures& measures(experiment.measures());
@@ -419,10 +418,9 @@ void test_translator()
         " </translators>\n"
         "</vle_project>\n";
     
-    vpz::VLESaxParser sax;
-    sax.parse_memory(xml);
+    vpz::Vpz vpz;
+    vpz.parse_memory(xml);
 
-    const vpz::Vpz& vpz(sax.vpz());
     const vpz::Project& project(vpz.project());
     const vpz::NoVLEs& novles(project.novles());
 

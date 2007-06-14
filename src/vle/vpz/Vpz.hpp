@@ -26,6 +26,7 @@
 #define VLE_VPZ_VPZ_HPP
 
 #include <vle/vpz/Project.hpp>
+#include <vle/vpz/SaxVPZ.hpp>
 #include <string>
 
 namespace vle { namespace vpz {
@@ -39,6 +40,8 @@ namespace vle { namespace vpz {
 
         Vpz(const std::string& filename);
 
+        Vpz(const Vpz& vpz);
+
         virtual ~Vpz() { }
 
         virtual void write(std::ostream& out) const;
@@ -48,12 +51,21 @@ namespace vle { namespace vpz {
 
         /** 
          * @brief Open a VPZ file project.
-         * 
+         *
          * @param filename file to read.
          *
          * @throw Exception::VPZ on error.
          */
-        void open(const std::string& filename);
+        void parse_file(const std::string& filename);
+
+        /** 
+         * @brief Open a VPZ from a buffer.
+         *
+         * @param buffer the buffer to parse XML.
+         *
+         * @throw Exception::VPZ on error.
+         */
+        void parse_memory(const std::string& buffer);
 
         /** 
          * @brief Write file into the current VPZ filename open.
@@ -98,6 +110,29 @@ namespace vle { namespace vpz {
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
           * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+        /** 
+         * @brief Parse the buffer to find a value.
+         * 
+         * @param buffer the buffer to translate.
+         *
+         * @throw utils::SaxParserError if buffer is not a value.
+         * 
+         * @return value read from buffer.
+         */
+        static value::Value parse_value(const std::string& buffer);
+        
+        /** 
+         * @brief Parse the buffer to find a list of values.
+         * 
+         * @param buffer the buffer to translate.
+         *
+         * @throw utils::SaxParserError if buffer is not a value.
+         * 
+         * @return a vector of values read from buffer.
+         */
+        static std::vector < value::Value > parse_values(
+            const std::string& buffer);
 
         inline void setFilename(const std::string& filename)
         { m_filename.assign(filename); }

@@ -35,25 +35,35 @@ using namespace vle::utils;
 Vpz::Vpz(const std::string& filename) :
     m_filename(filename)
 {
-    open(filename);
+    parse_memory(filename);
+}
+
+Vpz::Vpz(const Vpz& vpz) :
+    Base(vpz),
+    m_isGzip(vpz.m_isGzip),
+    m_filename(vpz.m_filename),
+    m_project(vpz.m_project)
+{
 }
 
 void Vpz::write(std::ostream& /* out */) const
 {
 }
 
-void Vpz::open(const std::string& /* filename */)
+void Vpz::parse_file(const std::string& filename)
 {
-    //m_filename.assign(filename);
-    //
-    //std::string xml = get_gzip_content(filename);
-    //xmlpp::DomParser dom;
-    //dom.parse_memory(xml);
-    //
-    //xmlpp::Element* root = xml::get_root_node(dom, "VLE_PROJECT");
-    //m_project.init(root);
-    //
-    //FIXME FIXME FIXME
+    m_filename.assign(filename);
+
+    vpz::VLESaxParser sax(*this);
+    sax.parse_file(filename);
+}
+
+void Vpz::parse_memory(const std::string& buffer)
+{
+    m_filename.clear();
+
+    vpz::VLESaxParser sax(*this);
+    sax.parse_memory(buffer);
 }
 
 void Vpz::expandTranslator()
@@ -66,15 +76,39 @@ bool Vpz::hasNoVLE() const
     return m_project.hasNoVLE();
 }
 
+value::Value Vpz::parse_value(const std::string& buffer)
+{
+    Vpz vpz;
+    VLESaxParser sax(vpz);
+    sax.parse_memory(buffer);
+    
+    Assert(utils::InternalError, sax.is_value(),
+           boost::format("The buffer [%1%] is not a value.") % buffer);
+
+    return sax.get_value(0);
+}
+
+std::vector < value::Value > Vpz::parse_values(const std::string& buffer)
+{
+    Vpz vpz;
+    VLESaxParser sax(vpz);
+    sax.parse_memory(buffer);
+    
+    Assert(utils::InternalError, sax.is_value(),
+           boost::format("The buffer [%1%] is not a value.") % buffer);
+
+    return sax.get_values();
+}
+
 void Vpz::write()
 {
-    //xmlpp::Document doc;
-    //doc.create_root_node("VLE_PROJECT");
-    //m_project.write(doc.get_root_node());
-    //
-    //doc.write_to_file_formatted(m_filename);
-    //
-    //FIXME FIXME FIXME
+    std::ofstream out(m_filename.c_str());
+    if (out.fail() or out.bad()) {
+        Throw(utils::SaxParserError,
+              (boost::format("Cannot open file %1% for writing.") %
+               m_filename));
+    }
+    out << *this;
 }
 
 void Vpz::write(const std::string& filename)
@@ -92,13 +126,9 @@ void Vpz::clear()
 
 std::string Vpz::writeToString()
 {
-    //xmlpp::Document doc;
-    //doc.create_root_node("VLE_PROJECT");
-    //m_project.write(doc.get_root_node());
-    //
-    //return doc.write_to_string_formatted();
-    //FIXME FIXME FIXME
-    return "";
+    std::ostringstream out;
+    out << *this;
+    return out.str();
 }
 
 std::string Vpz::get_gzip_content(const std::string& filename)
