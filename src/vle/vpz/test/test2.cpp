@@ -27,6 +27,7 @@
 #include <stdexcept>
 #include <vle/vpz/SaxVPZ.hpp>
 #include <vle/vpz/Vpz.hpp>
+#include <vle/vpz/Translator.hpp>
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/value/Set.hpp>
@@ -250,7 +251,7 @@ void test_experiment_vpz()
     value::Double real;
     value::Integer integer;
     
-    const vpz::Condition& cnd1(cnds.find("cond1"));
+    const vpz::Condition& cnd1(cnds.get("cond1"));
     set = cnd1.getSetValues("init1");
     real = value::to_double(set->getValue(0));
     BOOST_REQUIRE_EQUAL(real->doubleValue(), 123.);
@@ -263,7 +264,7 @@ void test_experiment_vpz()
     integer = value::to_integer(set->getValue(1));
     BOOST_REQUIRE_EQUAL(integer->intValue(), 2);
 
-    const vpz::Condition& cnd2(cnds.find("cond2"));
+    const vpz::Condition& cnd2(cnds.get("cond2"));
     set = cnd2.getSetValues("init3");
     real = value::to_double(set->getValue(0));
     BOOST_REQUIRE_EQUAL(real->doubleValue(), .123);
@@ -412,8 +413,8 @@ void test_translator()
         " <translators>\n"
         "  <translator name=\"tr1\" library=\"trlib\">\n"
         "   <![CDATA["
-        "<?xml version=\"1.0\"?>
-        " ]]>"
+        "<?xml version=\"1.0\"?>"
+        "]]>"
         "  </translator>\n"
         " </translators>\n"
         "</vle_project>\n";
@@ -423,7 +424,7 @@ void test_translator()
 
     const vpz::Vpz& vpz(sax.vpz());
     const vpz::Project& project(vpz.project());
-    const vpz::NoVLES& novles(vpz.project().novles());
+    const vpz::NoVLEs& novles(project.novles());
 
     BOOST_REQUIRE(novles.exist("tr1"));
     const vpz::NoVLE& novle(novles.get("tr1"));
