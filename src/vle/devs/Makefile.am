@@ -26,3 +26,7 @@ libdevs_la_LIBADD = @VLE_LIBS@ @XML_LIBS@ \
 		    $(top_srcdir)/src/vle/utils/libutils.la \
 		    $(top_srcdir)/src/vle/graph/libgraph.la \
 		    $(top_srcdir)/src/vle/vpz/libvpz.la
+
+if USE_TEST
+SUBDIRS = test
+endif

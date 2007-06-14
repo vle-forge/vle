@@ -273,6 +273,7 @@ AC_CONFIG_FILES([Makefile
 		 src/vle/vpz/Makefile
 		 src/vle/vpz/test/Makefile
 		 src/vle/devs/Makefile
+		 src/vle/devs/test/Makefile
 		 src/vle/stream/Makefile
 		 src/vle/stream/plugins/eovstream/Makefile
 		 src/vle/stream/plugins/Makefile
