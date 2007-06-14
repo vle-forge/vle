@@ -193,8 +193,8 @@ void test_dynamic_vpz()
     BOOST_REQUIRE_EQUAL(vatom.dynamics(), "dyn1");
     BOOST_REQUIRE_EQUAL(vatom.conditions(), "cnd1");
 
-    const vpz::Dynamics& dyns = vpz.project().dynamics();
-    const vpz::Dynamic& dyn = dyns.find(vatom.dynamics());
+    const vpz::Dynamics& dyns(vpz.project().dynamics());
+    const vpz::Dynamic& dyn(dyns.get(vatom.dynamics()));
 
     BOOST_REQUIRE_EQUAL(dyn.name(), "dyn1");
     BOOST_REQUIRE_EQUAL(dyn.library(), "celldevs");

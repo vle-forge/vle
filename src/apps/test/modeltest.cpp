@@ -49,8 +49,7 @@ void build_vpz(const std::string& modelname, vpz::Vpz& vpz)
     cpl->addModel(mdl);
     vpz.project().model().setModel(cpl);
 
-    vpz::Dynamic dyn;
-    dyn.setModel(modelname);
+    vpz::Dynamic dyn(modelname);
     dyn.setLibrary(modelname);
     vpz.project().experiment().setDuration(1);
     vpz.project().experiment().setName("testing");

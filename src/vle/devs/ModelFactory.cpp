@@ -108,7 +108,7 @@ devs::SimulatorList ModelFactory::createModelsFromDynamics(
     for (it = lst.begin(); it != lst.end(); ++it) {
         Simulator* a = new Simulator((graph::AtomicModel*)(*it));
 
-        const vpz::Dynamic& d = dyn.find((*it)->getName());
+        const vpz::Dynamic& d(dyn.get((*it)->getName()));
         switch(d.type()) {
         case vpz::Dynamic::LOCAL:
             attachDynamics(a, d, getPlugin((*it)->getName()));
@@ -133,12 +133,12 @@ devs::SimulatorList ModelFactory::createModelsFromDynamics(
 Glib::Module* ModelFactory::getPlugin(const std::string& name)
 {
     if (mDynamics.exist(name)) {
-        return buildPlugin(mDynamics.find(name));
+        return buildPlugin(mDynamics.get(name));
     } else {
         vpz::Classes::const_iterator clit;
         for (clit = mClasses.begin(); clit != mClasses.end(); ++clit) {
             if ((*clit).second.dynamics().exist(name)) {
-                return buildPlugin((*clit).second.dynamics().find(name));
+                return buildPlugin((*clit).second.dynamics().get(name));
             }
         }
     }

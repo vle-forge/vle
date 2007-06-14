@@ -315,8 +315,7 @@ void VpzStackSax::push_dynamic(const AttributeList& att)
     AssertS(utils::SaxParserError, not m_stack.empty());
     AssertS(utils::SaxParserError, m_stack.top()->isDynamics());
 
-    vpz::Dynamic dyn;
-    dyn.setName(get_attribute < std::string >(att, "name"));
+    vpz::Dynamic dyn(get_attribute < std::string >(att, "name"));
     dyn.setModel(get_attribute < std::string >(att, "model"));
 
     if (exist_attribute(att, "library"))
@@ -345,7 +344,7 @@ void VpzStackSax::push_dynamic(const AttributeList& att)
     }
 
     vpz::Dynamics& dyns(m_vpz.project().dynamics());
-    dyns.addDynamic(dyn);
+    dyns.add(dyn);
 }
 
 void VpzStackSax::push_experiment(const AttributeList& att)

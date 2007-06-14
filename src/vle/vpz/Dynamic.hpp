@@ -51,10 +51,6 @@ namespace vle { namespace vpz {
     public:
         enum Type { LOCAL, DISTANT };
         
-        Dynamic() :
-            m_type(LOCAL)
-        { }
-
         Dynamic(const std::string& name) :
             m_name(name),
             m_type(LOCAL)
@@ -67,16 +63,6 @@ namespace vle { namespace vpz {
 
         virtual Base::type getType() const
         { return DYNAMIC; }
-
-
-
-        /** 
-         * @brief Assign a new name to the dynamics.
-         * 
-         * @param name new name of the dynamic.
-         */
-        void setName(const std::string& name)
-        { m_name.assign(name); }
 
         /** 
          * @brief Assign a new library name to the dynamics.
@@ -102,7 +88,6 @@ namespace vle { namespace vpz {
         void setLanguage(const std::string& name)
         { m_language.assign(name); }
 
-
         /** 
          * @brief Assign a location to the dynamics.
          * 
@@ -116,27 +101,29 @@ namespace vle { namespace vpz {
          */
         void setLocalDynamics();
 
-
         /** 
          * @brief Get the current name of the dynamic.
          * 
          * @return the name of the dynamic.
          */
-        inline const std::string& name() const { return m_name; }
+        inline const std::string& name() const
+        { return m_name; }
 
         /** 
          * @brief The type of dynamic, Wrapping or Mapping.
          * 
          * @return a type of representation.
          */
-        inline Dynamic::Type type() const { return m_type; }
+        inline Dynamic::Type type() const
+        { return m_type; }
 
         /**
          * @brief Return the library name of dynamics.
          * 
          * @return a string representation of library name.
          */
-        inline const std::string& library() const { return m_library; }
+        inline const std::string& library() const
+        { return m_library; }
         
         /** 
          * @brief Return the location of the dynamics. Be carefull, check the
@@ -144,24 +131,24 @@ namespace vle { namespace vpz {
          * 
          * @return A reference to the location.
          */
-        inline const std::string& location() const { return m_location; }
+        inline const std::string& location() const
+        { return m_location; }
 
         /** 
          * @brief Return the model of the library.
          * 
          * @return A reference to the model.
          */
-        inline const std::string& model() const { return m_model; }
+        inline const std::string& model() const
+        { return m_model; }
 
         /** 
          * @brief Return the language of the dynamics models.
          * 
          * @return A reference to the model.
          */
-        inline const std::string& language() const { return m_language; }
-
-
-
+        inline const std::string& language() const
+        { return m_language; }
 
         /** 
          * @brief An operator to the std::set container.
@@ -174,6 +161,10 @@ namespace vle { namespace vpz {
         { return m_name < dynamic.m_name; }
 
     private:
+        Dynamic() :
+            m_type(LOCAL)
+        { }
+
         std::string     m_name;
         std::string     m_library;
         std::string     m_model;

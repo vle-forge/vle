@@ -30,13 +30,9 @@
 
 namespace vle { namespace vpz {
 
-    class Dynamics : public Base
+    class Dynamics : public Base, public std::map < std::string, Dynamic >
     {
     public:
-        typedef std::map < std::string, Dynamic > DynamicList;
-        typedef DynamicList::const_iterator const_iterator;
-        typedef DynamicList::iterator iterator;
-
         Dynamics()
         { }
        
@@ -85,29 +81,26 @@ namespace vle { namespace vpz {
          *
          * @throw Exception::Internal if a Dynamic already exist.
          */
-        void addDynamics(const Dynamics& dyns);
+        void add(const Dynamics& dyns);
 
         /** 
          * @brief Add a Dynamic to the list.
          * 
          * @param dyn the Dynamic to add.
          *
+         * @return a reference to the newly created dynamics.
+         *
          * @throw Exception::Internal if a dynamic with the same model name
          * already exist.
          */
-        void addDynamic(const Dynamic& dyn);
-
-        /** 
-         * @brief Just delete the complete list of vpz::Dynamic.
-         */
-        void clear();
+        Dynamic add(const Dynamic& dyn);
 
         /** 
          * @brief Delete the dynamic for a specific model name.
          * 
          * @param name the name of the model.
          */
-        void delDynamic(const std::string& name);
+        void del(const std::string& name);
 
         /** 
          * @brief Search a Dynamic with the specified name.
@@ -118,7 +111,18 @@ namespace vle { namespace vpz {
          *
          * @throw Exception::Internal if no Dynamic find.
          */
-        const Dynamic& find(const std::string& name) const;
+        const Dynamic& get(const std::string& name) const;
+
+        /** 
+         * @brief Search a Dynamic with the specified name.
+         * 
+         * @param name Dynamic name to find.
+         * 
+         * @return A constant reference to the Dynamic find.
+         *
+         * @throw Exception::Internal if no Dynamic find.
+         */
+        Dynamic& get(const std::string& name);
 
         /** 
          * @brief Search a Dynamic with the specified name.
@@ -128,18 +132,6 @@ namespace vle { namespace vpz {
          * @return true if founded, false otherwise.
          */
         bool exist(const std::string& name) const;
-
-        /** 
-         * @brief Get the list of model's dynamic.
-         * 
-         * @return A reference to a constant set.
-         */
-        inline const DynamicList& dynamics() const
-        { return m_lst; }
-
-
-    private:
-        DynamicList     m_lst;
     };
 
 }} // namespace vle vpz

@@ -75,7 +75,7 @@ void NoVLE::callTranslator(const Project& prj,
                            m_name % Glib::Module::get_last_error());
 
     // model.addModel(call->model()); // FIXME
-    dynamics.addDynamics(call->dynamics());
+    dynamics.add(call->dynamics());
     conditions.add(call->conditions());
     measures.addMeasures(call->measures());
 

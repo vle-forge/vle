@@ -32,10 +32,10 @@ using namespace vle::utils;
 
 void Dynamics::write(std::ostream& out) const
 {
-    if (not m_lst.empty()) {
+    if (not empty()) {
         out << "<dynamics>\n";
 
-        for (const_iterator it = m_lst.begin(); it != m_lst.end(); ++it)
+        for (const_iterator it = begin(); it != end(); ++it)
             out << it->second;
 
         out << "</dynamics>\n";
@@ -47,7 +47,7 @@ void Dynamics::initFromModels(xmlpp::Element* elt)
     AssertI(elt);
     AssertI(elt->get_name() == "MODELS");
 
-    m_lst.clear();
+    clear();
 
     xmlpp::Node::NodeList lst = elt->get_children("MODEL");
     xmlpp::Node::NodeList::iterator it;
@@ -63,38 +63,47 @@ void Dynamics::initFromModels(xmlpp::Element* elt)
     }
 }
 
-void Dynamics::addDynamics(const Dynamics& dyns)
+void Dynamics::add(const Dynamics& dyns)
 {
-    const DynamicList& lst = dyns.dynamics();
-    for (const_iterator it = lst.begin(); it != lst.end(); ++it)
-        addDynamic(it->second);
+    for (const_iterator it = dyns.begin(); it != dyns.end(); ++it)
+        add(it->second);
 }
 
-void Dynamics::addDynamic(const Dynamic& dynamic)
+Dynamic Dynamics::add(const Dynamic& dynamic)
 {
-    AssertI(not exist(dynamic.name())); 
-    m_lst.insert(std::make_pair(dynamic.name(), dynamic));
+    const_iterator it = find(dynamic.name());
+    Assert(utils::SaxParserError, it == end(),
+           (boost::format("The dynamics %1% already exist") % dynamic.name()));
+
+    return (*insert(std::make_pair < std::string, Dynamic >(
+                dynamic.name(), dynamic)).first).second;
 }
 
-void Dynamics::clear()
+void Dynamics::del(const std::string& name)
 {
-    m_lst.clear();
+    erase(name);
 }
 
-void Dynamics::delDynamic(const std::string& name)
+const Dynamic& Dynamics::get(const std::string& name) const
 {
-    m_lst.erase(name);
+    const_iterator it = find(name);
+    Assert(utils::SaxParserError, it != end(),
+           (boost::format("The dynamics %1% does not exist") % name));
+    return it->second;
 }
 
-const Dynamic& Dynamics::find(const std::string& name) const
+Dynamic& Dynamics::get(const std::string& name)
 {
-    const_iterator it = m_lst.find(name);
+    iterator it = find(name);
+    Assert(utils::SaxParserError, it != end(),
+           (boost::format("The dynamics %1% does not exist") % name));
+
     return it->second;
 }
 
 bool Dynamics::exist(const std::string& name) const
 {
-    return m_lst.find(name) != m_lst.end();
+    return find(name) != end();
 }
 
 }} // namespace vle vpz
