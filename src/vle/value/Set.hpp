@@ -69,6 +69,18 @@ namespace vle { namespace value {
         inline VectorValue& getValue()
         { return m_value; }
 
+        inline VectorValueIt begin()
+        { return m_value.begin(); }
+
+        inline VectorValueConstIt begin() const
+        { return m_value.begin(); }
+
+        inline VectorValueIt end()
+        { return m_value.begin(); }
+
+        inline VectorValueConstIt end() const
+        { return m_value.end(); }
+
         inline const VectorValue& getValue() const
         { return m_value; }
 
