@@ -35,37 +35,44 @@ namespace vle { namespace vpz {
     class Class : public Base
     {
     public:
-        Class()
+        Class(const std::string& name) :
+            m_name(name)
         { }
 
-        virtual ~Class() { }
+        virtual ~Class()
+        { }
 
         virtual void write(std::ostream& out) const;
 
         virtual Base::type getType() const 
         { return CLASS; }
 
+        inline const std::string& name() const
+        { return m_name; }
 
-
-        const Model& model() const
+        inline const Model& model() const
         { return m_model; }
 
-        Model& model()
+        inline Model& model()
         { return m_model; }
 
-        const Dynamics& dynamics() const
+        inline const Dynamics& dynamics() const
         { return m_dynamics; }
 
-        Dynamics& dynamics()
+        inline Dynamics& dynamics()
         { return m_dynamics; }
 
-        const Experiment& experiments() const
+        inline const Experiment& experiments() const
         { return m_experiement; }
 
-        Experiment& experiments()
+        inline Experiment& experiments()
         { return m_experiement; }
 
     private:
+        Class()
+        { }
+
+        std::string     m_name;
         Model           m_model;
         Dynamics        m_dynamics;
         Experiment      m_experiement;

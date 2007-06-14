@@ -59,7 +59,7 @@ using namespace xmlpp;
 
 namespace vle { namespace devs {
 
-    Coordinator::Coordinator(const vpz::Vpz& vp) :
+Coordinator::Coordinator(const vpz::Vpz& vp) :
     m_vpz(vp),
     m_experiment(vp.project().experiment()),
     m_duration(0.0),
@@ -229,10 +229,10 @@ void Coordinator::init()
 {
     utils::Rand::rand().set_seed(m_experiment.seed());
 
-    vpz::AtomicModelList& atoms = m_vpz.project().model().atomicModels();
+    const vpz::AtomicModelList& atoms(m_vpz.project().model().atomicModels());
     const vpz::Conditions& cnds(m_experiment.conditions());
 
-    for (vpz::AtomicModelList::iterator it = atoms.begin(); it !=
+    for (vpz::AtomicModelList::const_iterator it = atoms.begin(); it !=
          atoms.end(); ++it) {
 
         Simulator* satom(getModel(it->first));

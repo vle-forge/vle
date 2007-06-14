@@ -31,11 +31,9 @@
 
 namespace vle { namespace vpz {
 
-    class Classes : public Base
+    class Classes : public Base, public std::map < std::string, Class >
     {
     public:
-        typedef std::map < std::string, Class > ClassList;
-
         Classes() { }
 
         virtual ~Classes() { }
@@ -45,30 +43,13 @@ namespace vle { namespace vpz {
         virtual Base::type getType() const
         { return CLASSES; }
 
-        
+        Class& add(const Class& c);
 
-        void addClass(const std::string& name,
-                      const Class& c);
+        void del(const std::string& name);
 
-        void setClass(const std::string& name,
-                      const Class& c);
+        const Class& get(const std::string& name) const;
 
-        /** 
-         * @brief Just delete all vpz::class from list.
-         */
-        void clear();
-        
-        void delClass(const std::string& name);
-
-        const Class& getClass(const std::string& name) const;
-
-        Class& getClass(const std::string& name);
-
-        inline const ClassList& classes() const
-        { return m_classes; }
-
-    private:
-        ClassList m_classes;
+        Class& get(const std::string& name);
     };
 
 }} // namespace vle vpz

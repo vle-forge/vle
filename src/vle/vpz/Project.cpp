@@ -31,38 +31,6 @@ namespace vle { namespace vpz {
 
 using namespace vle::utils;
 
-//void Project::init(xmlpp::Element* elt)
-//{
-//AssertI(elt);
-//AssertI(elt->get_name() == "VLE_PROJECT");
-//
-//xmlpp::Element* str = xml::get_children(elt, "STRUCTURES");
-//xmlpp::Element* dyn = xml::get_children(elt, "DYNAMICS");
-//
-//m_model.init(str);
-//m_dynamics.init(dyn);
-//
-//if (xml::exist_children(elt, "GRAPHICS")) {
-//xmlpp::Element* grp = xml::get_children(elt, "GRAPHICS");
-//m_graphics.init(grp);
-//}
-//
-//if (xml::exist_children(elt, "EXPERIMENTS")) {
-//xmlpp::Element* exp = xml::get_children(elt, "EXPERIMENTS");
-//m_experiment.init(exp);
-//}
-//
-//if (xml::exist_children(elt, "CLASSES")) {
-//xmlpp::Element* cls = xml::get_children(elt, "CLASSES");
-//m_classes.init(cls);
-//}
-//
-//if (xml::exist_children(elt, "NO_VLES")) {
-//xmlpp::Element* nov = xml::get_children(elt, "NO_VLES");
-//m_novles.init(nov);
-//}
-//}
-
 void Project::write(std::ostream& out) const
 {
     out << "<vle_project"

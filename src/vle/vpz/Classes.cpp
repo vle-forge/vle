@@ -30,95 +30,52 @@ namespace vle { namespace vpz {
     
 using namespace vle::utils;
 
-//void Classes::init(xmlpp::Element* elt)
-//{
-    //AssertI(elt);
-    //AssertI(elt->get_name() == "CLASSES");
-
-    //m_classes.clear();
-
-    //xmlpp::Node::NodeList lst = elt->get_children("CLASS");
-    //xmlpp::Node::NodeList::iterator it;
-    //for (it = lst.begin(); it != lst.end(); ++it) {
-        //Class c;
-        //c.init((xmlpp::Element*)(*it));
-        //addClass(xml::get_attribute((xmlpp::Element*)(*it), "NAME"), c);
-    //}
-//}
-
-//void Classes::write(xmlpp::Element* elt) const
-//{
-    //AssertI(elt);
-
-    //if (not m_classes.empty()) {
-        //xmlpp::Element* classes = elt->add_child("CLASSES");
-        //std::map < std::string, Class >::const_iterator it;
-        //for (it = m_classes.begin(); it != m_classes.end(); ++it) {
-            //xmlpp::Element* clas = classes->add_child("CLASS");
-            //clas->set_attribute("NAME", (*it).first);
-            //(*it).second.write(clas);
-        //}
-    //}
-//}
-
 void Classes::write(std::ostream& out) const
 {
-    if (not m_classes.empty()) {
+    if (not empty()) {
         out << "<classes>\n";
-        std::map < std::string, Class >::const_iterator it;
-        for (it = m_classes.begin(); it != m_classes.end(); ++it) {
+        for (const_iterator it = begin(); it != end(); ++it) {
             out << "<class name=\""
                 << (*it).first
                 << "\" >"
                 << (*it).second
                 << "</class>";
         }
+        out << "</classes>\n";
     }
 }
 
-void Classes::addClass(const std::string& name, const Class& c)
+Class& Classes::add(const Class& c)
 {
-    AssertI(m_classes.find(name) == m_classes.end());
-    m_classes[name] = c;
+    const_iterator it = find(c.name());
+    Assert(utils::SaxParserError, it != end(),
+           (boost::format("Class %1% already exist") % c.name()));
+
+    return (*insert(std::make_pair < std::string, Class >(
+                c.name(), c)).first).second;
 }
 
-void Classes::setClass(const std::string& name, const Class& c)
+void Classes::del(const std::string& name)
 {
-    AssertI(m_classes.find(name) != m_classes.end());
-    m_classes[name] = c;
+    erase(name);
 }
 
-void Classes::clear()
+const Class& Classes::get(const std::string& name) const
 {
-    m_classes.clear();
+    const_iterator it = find(name);
+    Assert(utils::SaxParserError, it != end(),
+           (boost::format("Unknow class '%1%'") % name));
+
+    return it->second;
 }
 
-void Classes::delClass(const std::string& name)
+Class& Classes::get(const std::string& name)
 {
-    std::map < std::string, Class >::iterator it = m_classes.find(name);
-    if (it != m_classes.end()) {
-        m_classes.erase(it);
-    }
-}
+    iterator it = find(name);
+    Assert(utils::SaxParserError, it != end(),
+           (boost::format("Unknow class '%1%'") % name));
 
-const Class& Classes::getClass(const std::string& name) const
-{
-    std::map < std::string, Class >::const_iterator it = m_classes.find(name);
-
-    Assert(utils::InternalError, it != m_classes.end(),
-           boost::format("Unknow class '%1%'\n") % name);
-
-    return (*it).second;
-}
-
-Class& Classes::getClass(const std::string& name)
-{
-    std::map < std::string, Class >::iterator it = m_classes.find(name);
-
-    Assert(utils::InternalError, it != m_classes.end(),
-           boost::format("Unknow class '%1%'\n") % name);
-
-    return (*it).second;
+    return it->second;
 }
 
 }} // namespace vle vpz

@@ -56,7 +56,7 @@ graph::Model* ModelFactory::createModels(const std::string& classname,
                                          devs::SimulatorList& lst,
                                          SimulatorMap& result)
 {
-    const vpz::Class& cl = mClasses.getClass(classname);
+    const vpz::Class& cl(mClasses.get(classname));
     graph::Model* clone = cl.model().model();
 
     graph::AtomicModelVector vt;
@@ -135,9 +135,8 @@ Glib::Module* ModelFactory::getPlugin(const std::string& name)
     if (mDynamics.exist(name)) {
         return buildPlugin(mDynamics.find(name));
     } else {
-        vpz::Classes::ClassList::const_iterator clit;
-        for (clit = mClasses.classes().begin(); clit != mClasses.classes().end();
-             ++clit) {
+        vpz::Classes::const_iterator clit;
+        for (clit = mClasses.begin(); clit != mClasses.end(); ++clit) {
             if ((*clit).second.dynamics().exist(name)) {
                 return buildPlugin((*clit).second.dynamics().find(name));
             }

@@ -121,7 +121,7 @@ void Manager::run_daemon(int port)
             server->accept_client("client");
             gint32 sz = server->recv_int("client");
             std::string file(server->recv_buffer("client", sz));
-            mFile.open(utils::write_to_temp("vleman", file));
+            mFile.parse_file(utils::write_to_temp("vleman", file));
 	    if (mFile.hasNoVLE()) {
 		mFile.expandTranslator();
 	    }

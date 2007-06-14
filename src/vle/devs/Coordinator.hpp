@@ -56,7 +56,7 @@ namespace vle { namespace devs {
     class Coordinator
     {
     public:
-      Coordinator(/*long coordinatorIndex, */const vpz::Vpz& io);
+        Coordinator(const vpz::Vpz& io);
 
 	~Coordinator();
 
@@ -139,7 +139,7 @@ namespace vle { namespace devs {
 	ExternalEventList* run();
 
     private:
-        vpz::Vpz                m_vpz;
+        const vpz::Vpz&         m_vpz;
         vpz::Experiment         m_experiment;
 
 
