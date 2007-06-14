@@ -46,7 +46,7 @@
 
 
 #define DECLARE_DYNAMICS(x) \
-extern "C" { vle::devs::Dynamics* makeNewDynamics(vle::devs::Simulator* model) \
+  extern "C" { vle::devs::Dynamics* makeNewDynamics(const vle::graph::AtomicModel& model) \
 { return new x(model); } }
 
 namespace vle { namespace devs {
