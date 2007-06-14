@@ -41,20 +41,25 @@ namespace vle { namespace vpz {
     public:
         AtomicModel(const std::string& conditions,
                     const std::string& dynamics,
-                    const std::string& observables) :
+                    const std::string& observables,
+                    const std::string& translator) :
             m_conditions(conditions),
             m_dynamics(dynamics),
-            m_observables(observables)
+            m_observables(observables),
+            m_translator(translator)
         { }
 
-        const std::string& conditions() const
+        inline const std::string& conditions() const
         { return m_conditions; }
 
-        const std::string& dynamics() const
+        inline const std::string& dynamics() const
         { return m_dynamics; }
 
-        const std::string& observables() const
+        inline const std::string& observables() const
         { return m_observables; }
+
+        inline const std::string& translator() const
+        { return m_translator; }
 
     private:
         AtomicModel() { }
@@ -62,6 +67,7 @@ namespace vle { namespace vpz {
         std::string     m_conditions;
         std::string     m_dynamics;
         std::string     m_observables;
+        std::string     m_translator;
     };
 
 
@@ -69,25 +75,24 @@ namespace vle { namespace vpz {
      * @brief The AtomicModelList class is a dictionary used to attach atomic
      * model to conditions and dynamics names.
      */
-    class AtomicModelList : public std::map < graph::AtomicModel*,
-                                              AtomicModel >
+    class AtomicModelList : public std::map < graph::Model*, AtomicModel >
     {
     public:
         /** 
-         * @brief Get an vpz::AtomicModel by his structural reference.
+         * @brief Get an vpz::Model by his structural reference.
          * @param atom the reference to the structure.
          * @throw utils::InternalError if atom have no dynamics.
-         * @return A constant reference to the vpz::AtomicModel.
+         * @return A constant reference to the vpz::Model.
          */
-        const AtomicModel& get(graph::AtomicModel* atom) const;
+        const AtomicModel& get(graph::Model* atom) const;
 
         /** 
-         * @brief Get an vpz::AtomicModel by his structural reference.
+         * @brief Get an vpz::Model by his structural reference.
          * @param atom the reference to the structure.
          * @throw utils::InternalError if atom have no dynamics.
-         * @return A constant reference to the vpz::AtomicModel.
+         * @return A constant reference to the vpz::Model.
          */
-        AtomicModel& get(graph::AtomicModel* atom);
+        AtomicModel& get(graph::Model* atom);
     };
 
 

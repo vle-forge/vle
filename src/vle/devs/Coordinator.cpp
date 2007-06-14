@@ -235,9 +235,12 @@ void Coordinator::init()
     for (vpz::AtomicModelList::const_iterator it = atoms.begin(); it !=
          atoms.end(); ++it) {
 
-        Simulator* satom(getModel(it->first));
-        const vpz::Condition& cnd(cnds.get(it->second.conditions()));
-        satom->processInitEvents(cnd.firstValues());
+        if (it->first->isAtomic()) {
+            graph::AtomicModel* atom(graph::Model::toAtomic(it->first));
+            Simulator* satom(getModel(atom));
+            const vpz::Condition& cnd(cnds.get(it->second.conditions()));
+            satom->processInitEvents(cnd.firstValues());
+        }
     }
 
     for (SimulatorMap::iterator satom = m_modelList.begin();

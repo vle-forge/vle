@@ -397,8 +397,7 @@ void test_translator()
         "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
         " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
         " <structures>\n"
-        "  <model name=\"test1\" type=\"novle\" conditions=\"\""
-        "         translator=\"xxx\" observables=\"\" >\n"
+        "  <model name=\"test1\" type=\"novle\" translator=\"xxx\" >\n"
         "   <in>\n"
         "    <port name=\"in1\" />\n"
         "    <port name=\"in2\" />\n"
@@ -430,6 +429,10 @@ void test_translator()
     BOOST_REQUIRE_EQUAL(novle.name(), "tr1");
     BOOST_REQUIRE_EQUAL(novle.library(), "trlib");
     BOOST_REQUIRE_EQUAL(novle.data(), "<?xml version=\"1.0\"?>");
+    
+    const vpz::Model& mdl = vpz.project().model();
+    BOOST_REQUIRE(mdl.model() != 0);
+    BOOST_REQUIRE_EQUAL(mdl.model()->isNoVLE(), true);
 }
 
 

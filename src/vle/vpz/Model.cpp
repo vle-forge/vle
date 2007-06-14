@@ -32,23 +32,7 @@ namespace vle { namespace vpz {
 
 using namespace vle::utils;
 
-//void Model::init(xmlpp::Element* elt)
-//{
-//AssertI(elt);
-//AssertI(elt->get_name() == "STRUCTURES");
-//
-//delete m_graph;
-//m_graph = 0;
-//
-//if (not xml::exist_children(elt, "MODEL"))
-//return;
-//
-//xmlpp::Element* model = xml::get_children(elt, "MODEL");
-//m_graph = graph::Model::parseXMLmodel(model, 0);
-//}
-
-
-const AtomicModel& AtomicModelList::get(graph::AtomicModel* atom) const
+const AtomicModel& AtomicModelList::get(graph::Model* atom) const
 {
     AtomicModelList::const_iterator it = find(atom);
     if (it == end()) {
@@ -59,7 +43,7 @@ const AtomicModel& AtomicModelList::get(graph::AtomicModel* atom) const
     return it->second;
 }
 
-AtomicModel& AtomicModelList::get(graph::AtomicModel* atom)
+AtomicModel& AtomicModelList::get(graph::Model* atom)
 {
     iterator it = find(atom);
     if (it == end()) {
