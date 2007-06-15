@@ -23,10 +23,11 @@
 
 
 #define BOOST_TEST_MAIN
+#define BOOST_AUTO_TEST_MAIN
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE translator_complete_test
-
+#define BOOST_TEST_MODULE atomicdynamics_test
 #include <boost/test/unit_test.hpp>
+#include <boost/test/auto_unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
