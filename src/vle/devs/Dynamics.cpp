@@ -40,66 +40,56 @@
 
 namespace vle { namespace devs {
 
-ExternalEventList* Dynamics::buildEvent(const std::string& portName) const
+ExternalEvent* Dynamics::buildEvent(const std::string& portName) const
 {
-    ExternalEventList* eventList = new ExternalEventList();
-    eventList->addEvent(new ExternalEvent(portName));
-    return eventList;
+  return new ExternalEvent(portName);
 }
 
-ExternalEventList* Dynamics::buildEventWithADouble(
+ExternalEvent* Dynamics::buildEventWithADouble(
     const std::string & portName,
     const std::string & attributeName,
     double attributeValue) const
 {
-    ExternalEventList* eventList = new ExternalEventList();
     ExternalEvent* event = new ExternalEvent(portName);
     event->putAttribute(attributeName,
                         value::DoubleFactory::create(attributeValue));
-    eventList->addEvent(event);
-    return eventList;
+    return event;
 }
 
-ExternalEventList* Dynamics::buildEventWithAInteger(
+ExternalEvent* Dynamics::buildEventWithAInteger(
     const std::string & portName,
     const std::string & attributeName,
     long attributeValue) const
 {
-    ExternalEventList* eventList = new ExternalEventList();
     ExternalEvent* event = new ExternalEvent(portName);
 
     event->putAttribute(attributeName,
                           value::IntegerFactory::create(attributeValue));
-    eventList->addEvent(event);
-    return eventList;
+    return event;
 }
 
-ExternalEventList* Dynamics::buildEventWithABoolean(
+ExternalEvent* Dynamics::buildEventWithABoolean(
     const std::string & portName,
     const std::string & attributeName,
     bool attributeValue) const
 {
-    ExternalEventList* eventList = new ExternalEventList();
     ExternalEvent* event = new ExternalEvent(portName);
    
     event->putAttribute(attributeName,
                         value::BooleanFactory::create(attributeValue));
-    eventList->addEvent(event);
-    return eventList;
+    return event;
 }
 
-ExternalEventList* Dynamics::buildEventWithAString(
+ExternalEvent* Dynamics::buildEventWithAString(
     const std::string & portName,
     const std::string & attributeName,
     const std::string & attributeValue) const
 {
-    ExternalEventList* eventList = new ExternalEventList();
     ExternalEvent* event = new ExternalEvent(portName);
 
     event->putAttribute(attributeName,
                         value::StringFactory::create(attributeValue));
-    eventList->addEvent(event);
-    return eventList;
+    return event;
 }
 
 }} // namespace vle devs

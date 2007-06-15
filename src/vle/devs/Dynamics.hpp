@@ -153,7 +153,7 @@ namespace vle { namespace devs {
 	 *
 	 * @return the event list with the event
 	 */
-        ExternalEventList* buildEvent(const std::string& portName) const;
+        ExternalEvent* buildEvent(const std::string& portName) const;
 
 	/**
 	 * Build an event list with a single event which is attached a
@@ -166,7 +166,7 @@ namespace vle { namespace devs {
 	 *
 	 * @return the event list with the event
 	 */
-        ExternalEventList* buildEventWithADouble(
+        ExternalEvent* buildEventWithADouble(
                            const std::string& portName,
                            const std::string& attributeName,
                            double attributeValue) const;
@@ -182,7 +182,7 @@ namespace vle { namespace devs {
 	 *
 	 * @return the event list with the event
 	 */
-        ExternalEventList* buildEventWithAInteger(
+        ExternalEvent* buildEventWithAInteger(
                             const std::string& portName,
                             const std::string& attributeName,
                             long attributeValue) const;
@@ -198,7 +198,7 @@ namespace vle { namespace devs {
 	 *
 	 * @return the event list with the event
 	 */
-        ExternalEventList* buildEventWithABoolean(
+        ExternalEvent* buildEventWithABoolean(
                            const std::string& portName,
                            const std::string& attributeName,
                            bool attributeValue) const;
@@ -214,7 +214,7 @@ namespace vle { namespace devs {
 	 *
 	 * @return the event list with the event
 	 */
-        ExternalEventList* buildEventWithAString(
+        ExternalEvent* buildEventWithAString(
                            const std::string& portName,
                            const std::string& attributeName,
                            const std::string& attributeValue) const;
