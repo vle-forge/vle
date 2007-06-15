@@ -74,6 +74,7 @@ void NoVLE::callTranslator(const Project& prj,
                            "problem allocation a new Translator '%2%'") %
                            m_name % Glib::Module::get_last_error());
 
+    call->translate(m_data);
     // model.addModel(call->model()); // FIXME
     dynamics.add(call->dynamics());
     conditions.add(call->conditions());

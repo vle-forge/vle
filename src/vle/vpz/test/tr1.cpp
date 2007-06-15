@@ -23,10 +23,11 @@
  */
 
 #include <vle/vpz/test/tr1.hpp>
+#include <iostream>
 
 namespace vle { namespace vpz { namespace testunit {
 
-void tr1::translate(const std::string& /* buffer */)
+void tr1::translate(const std::string& buffer)
 {
     m_dynamics.add(Dynamic("dyn1"));
     m_conditions.add(Condition("cond1"));
