@@ -2,15 +2,15 @@ AM_CPPFLAGS = -I$(top_srcdir)/src @VLE_CFLAGS@ @XML_CFLAGS@
 
 libvpz_coreheaders = Base.hpp Classes.hpp Class.hpp Condition.hpp \
 		     Conditions.hpp Dynamic.hpp Dynamics.hpp EOV.hpp \
-		     Experiment.hpp Measure.hpp Observables.hpp \
-		     Measures.hpp Model.hpp NoVLE.hpp NoVLEs.hpp \
+		     Experiment.hpp View.hpp Observables.hpp \
+		     Views.hpp Model.hpp NoVLE.hpp NoVLEs.hpp \
 		     Observable.hpp Output.hpp Outputs.hpp Port.hpp \
 		     Project.hpp SaxStackValue.hpp SaxVPZ.hpp Replicas.hpp \
 		     Translator.hpp Structures.hpp Vpz.hpp
 
 libvpz_coresources = Class.cpp Classes.cpp Condition.cpp Conditions.cpp \
 		     Dynamic.cpp Dynamics.cpp EOV.cpp Experiment.cpp \
-		     Measure.cpp Measures.cpp Observables.cpp \
+		     View.cpp Views.cpp Observables.cpp \
 		     Model.cpp NoVLE.cpp NoVLEs.cpp Observable.cpp Output.cpp \
 		     Outputs.cpp Project.cpp SaxStackValue.cpp SaxVPZ.cpp \
 		     Translator.cpp Replicas.cpp Vpz.cpp

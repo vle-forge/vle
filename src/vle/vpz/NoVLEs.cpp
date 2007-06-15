@@ -64,10 +64,10 @@ void NoVLEs::fusion(const Project& prj,
                     Model& model,
                     Dynamics& dynamics,
                     Conditions& conditions,
-                    Measures& measures)
+                    Views& views)
 {
     for (iterator it = begin(); it != end(); ++it) {
-        (*it).second.callTranslator(prj, model, dynamics, conditions, measures);
+        (*it).second.callTranslator(prj, model, dynamics, conditions, views);
     }
 }
 

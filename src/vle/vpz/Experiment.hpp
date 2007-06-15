@@ -28,7 +28,7 @@
 #include <vle/vpz/Base.hpp>
 #include <vle/vpz/Replicas.hpp>
 #include <vle/vpz/Conditions.hpp>
-#include <vle/vpz/Measures.hpp>
+#include <vle/vpz/Views.hpp>
 
 namespace vle { namespace vpz {
 
@@ -44,7 +44,7 @@ namespace vle { namespace vpz {
 
         /** 
          * @brief Write Experiment information under specified root node
-         * including Replicas, ExperimentalCondition and Measures.
+         * including Replicas, ExperimentalCondition and Views.
          * @code
          * <experiment name="exp1" duration="0.33" seed="65431">
          *   [...]
@@ -59,7 +59,7 @@ namespace vle { namespace vpz {
 
         /** 
          * @brief Initialise Experiment information from XML including,
-         * Replicas, ExperimentalCondition and Measures.
+         * Replicas, ExperimentalCondition and Views.
          * @code
          * <experiment name="exp1" duration="0.33" seed="65431">
          *   [...]
@@ -95,15 +95,15 @@ namespace vle { namespace vpz {
         Conditions& conditions()
         { return m_conditions; }
 
-        const Measures& measures() const
-        { return m_measures; }
+        const Views& views() const
+        { return m_views; }
 
-        Measures& measures()
-        { return m_measures; }
+        Views& views()
+        { return m_views; }
 
         void addConditions(const Conditions& c);
 
-        void addMeasures(const Measures& m);
+        void addViews(const Views& m);
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
           * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
@@ -181,7 +181,7 @@ namespace vle { namespace vpz {
         std::string         m_combination;
         Replicas            m_replicas;
         Conditions          m_conditions;
-        Measures            m_measures;
+        Views               m_views;
     };
 
 }} // namespace vle vpz

@@ -28,7 +28,7 @@
 #include <vle/vpz/Model.hpp>
 #include <vle/vpz/Dynamics.hpp>
 #include <vle/vpz/Conditions.hpp>
-#include <vle/vpz/Measures.hpp>
+#include <vle/vpz/Views.hpp>
 #include <vle/vpz/Project.hpp>
 
 #define DECLARE_TRANSLATOR(x) \
@@ -65,15 +65,15 @@ namespace vle { namespace vpz {
         const Conditions& conditions() const
         { return m_conditions; }
 
-        const Measures& measures() const
-        { return m_measures; }
+        const Views& views() const
+        { return m_views; }
 
     protected:
         const Project&  m_project;
         Model           m_model;
         Dynamics        m_dynamics;
         Conditions      m_conditions;
-        Measures        m_measures;
+        Views           m_views;
     };
 
 }} // namespace vle vpz

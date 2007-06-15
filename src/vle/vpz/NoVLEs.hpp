@@ -75,7 +75,7 @@ namespace vle { namespace vpz {
                     Model& model,
                     Dynamics& dynamics,
                     Conditions& conditions,
-                    Measures& measures);
+                    Views& views);
 
         /** 
          * @brief Return true if a NoVLE exist with the novle string.

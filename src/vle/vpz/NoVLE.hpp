@@ -34,7 +34,7 @@ namespace vle { namespace vpz {
     class Model;
     class Dynamics;
     class Conditions;
-    class Measures; 
+    class Views; 
 
     class NoVLE : public Base
     {
@@ -78,7 +78,7 @@ namespace vle { namespace vpz {
                             Model& model,
                             Dynamics& dynamics,
                             Conditions& conditions,
-                            Measures& measures);
+                            Views& Views);
 
         /** 
          * @brief Set new information to the NoVLE.

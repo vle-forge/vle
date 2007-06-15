@@ -30,73 +30,22 @@ namespace vle { namespace vpz {
 
 using namespace vle::utils;
 
-//void Experiment::init(xmlpp::Element* elt)
-//{
-//AssertI(elt);
-//AssertI(elt->get_name() == "EXPERIMENTS");
-//
-//if (not xml::exist_children(elt, "EXPERIMENT"))
-//return;
-//
-//xmlpp::Element* exp = xml::get_children(elt, "EXPERIMENT");
-//setName(xml::get_attribute(exp, "NAME"));
-//setDuration(xml::get_double_attribute(exp, "DURATION"));
-//setDate(xml::get_attribute(exp, "DATE"));
-//
-//if (xml::exist_attribute(exp, "SEED")) {
-//setSeed(utils::translate < guint32 >(
-//xml::get_attribute(exp, "SEED")));
-//} else {
-//setSeed(0);
-//}
-//
-//if (xml::exist_children(exp, "REPLICAS")) {
-//xmlpp::Element* rep = xml::get_children(exp, "REPLICAS");
-//m_replicas.init(rep);
-//}
-//
-//if (xml::exist_children(exp, "EXPERIMENTAL_CONDITIONS")) {
-//xmlpp::Element* rep = 
-//xml::get_children(exp, "EXPERIMENTAL_CONDITIONS");
-//m_conditions.init(rep);
-//}
-//
-//if (xml::exist_children(exp, "MEASURES")) {
-//xmlpp::Element* rep = xml::get_children(exp, "MEASURES");
-//m_measures.init(rep);
-//}
-//}
-
 void Experiment::write(std::ostream& out) const
 {
     out << "<experiment "
         << "name=\"" << m_name << "\" "
         << "duration=\"" << m_duration << "\" "
-        << "seed=\"" << m_seed << "\" >";
+        << "seed=\"" << m_seed << "\" >\n";
 
     m_replicas.write(out);
     m_conditions.write(out);
-    m_measures.write(out);
+    m_views.write(out);
 
-    out << "</experiment>";
+    out << "</experiment>\n";
 }
 
 void Experiment::initFromExperiment(xmlpp::Element* /* elt */)
 {
-    //FIXME
-    //AssertI(elt);
-    //AssertI(elt->get_name() == "EXPERIMENT");
-    //
-    //if (xml::exist_children(elt, "EXPERIMENTAL_CONDITIONS")) {
-    //xmlpp::Element* rep = 
-    //xml::get_children(elt, "EXPERIMENTAL_CONDITIONS");
-    //m_conditions.init(rep);
-    //}
-    //
-    //if (xml::exist_children(elt, "MEASURES")) {
-    //xmlpp::Element* rep = xml::get_children(elt, "MEASURES");
-    //m_measures.init(rep);
-    //}
 }
 
 void Experiment::clear()
@@ -107,7 +56,7 @@ void Experiment::clear()
 
     m_replicas.clear();
     m_conditions.clear();
-    m_measures.clear();
+    m_views.clear();
 }
 
 void Experiment::addConditions(const Conditions& c)
@@ -115,9 +64,9 @@ void Experiment::addConditions(const Conditions& c)
     m_conditions.add(c);
 }
 
-void Experiment::addMeasures(const Measures& m)
+void Experiment::addViews(const Views& m)
 {
-    m_measures.addMeasures(m);
+    m_views.add(m);
 }
 
 void Experiment::setName(const std::string& name)

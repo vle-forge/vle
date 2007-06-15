@@ -413,20 +413,20 @@ value::Set& VpzStackSax::pop_condition_port()
     return vals;
 }
 
-void VpzStackSax::push_measures()
+void VpzStackSax::push_views()
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
     AssertS(utils::SaxParserError, m_stack.top()->isExperiment());
 
-    m_stack.push(&m_vpz.project().experiment().measures());
+    m_stack.push(&m_vpz.project().experiment()views());
 }
 
 void VpzStackSax::push_outputs()
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_stack.top()->isMeasures());
+    AssertS(utils::SaxParserError, m_stack.top()->isViews());
 
-    m_stack.push(&m_vpz.project().experiment().measures().outputs());
+    m_stack.push(&m_vpz.project().experiment().views().outputs());
 }
 
 void VpzStackSax::push_output(const AttributeList& att)
@@ -442,7 +442,7 @@ void VpzStackSax::push_output(const AttributeList& att)
         location.assign(get_attribute < std::string >(att, "location"));
     }
 
-    Outputs& outs(m_vpz.project().experiment().measures().outputs());
+    Outputs& outs(m_vpz.project().experiment().views().outputs());
     if (format == "text") {
         outs.addTextStream(name, location);
     } else if (format == "sdml") {
@@ -465,40 +465,40 @@ void VpzStackSax::push_output(const AttributeList& att)
     }
 }
 
-void VpzStackSax::push_measure(const AttributeList& att)
+void VpzStackSax::push_view(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_stack.top()->isMeasures());
+    AssertS(utils::SaxParserError, m_stack.top()->isViews());
 
     std::string name(get_attribute< std::string >(att, "name")); 
     std::string type(get_attribute< std::string >(att, "type")); 
     std::string output(get_attribute< std::string >(att, "output")); 
     
-    Measures& measures(m_vpz.project().experiment().measures());
+    Views& views(m_vpz.project().experiment().views());
 
     if (type == "timed") {
         Assert(utils::SaxParserError, exist_attribute(att, "timestep"),
-               (boost::format("Measure %1% have no timestep attribute.") %
+               (boost::format("View %1% have no timestep attribute.") %
                 name));
 
         double ts(get_attribute < double >(att, "timestep"));
-        Measure& nm(measures.addTimedMeasure(name, ts, output));
+        View& nm(views.addTimedView(name, ts, output));
         m_stack.push(&nm);
     } else if (type == "event") {
-        Measure& nm(measures.addEventMeasure(name, output));
+        View& nm(views.addEventView(name, output));
         m_stack.push(&nm);
     } else {
         Throw(utils::SaxParserError, (boost::format(
-                    "Unknow type '%1%' for the measure %1%") % type % name));
+                    "Unknow type '%1%' for the view %1%") % type % name));
     }
 }
 
 void VpzStackSax::push_observable(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_stack.top()->isMeasure());
+    AssertS(utils::SaxParserError, m_stack.top()->isViews());
 
-    Measure* measure(static_cast < Measure* >(m_stack.top()));
+    Views& views(m_vpz.project().experiment().views());
 
     std::string name(get_attribute < std::string >(att, "name"));
     std::string group;
@@ -509,7 +509,7 @@ void VpzStackSax::push_observable(const AttributeList& att)
     if (exist_attribute(att, "index"))
         index = get_attribute < int >(att, "index");
 
-    Observable& obs(measure->addObservable(name, group, index));
+    Observable& obs(views->addObservable(name, group, index));
     m_stack.push(&obs);
 }
 
@@ -671,14 +671,14 @@ void VLESaxParser::on_start_element(
         m_vpzstack.push_conditions();
     } else if (name == "condition") {
         m_vpzstack.push_condition(att);
-    } else if (name == "measures") {
-        m_vpzstack.push_measures();
+    } else if (name == "views") {
+        m_vpzstack.push_views();
     } else if (name == "outputs") {
         m_vpzstack.push_outputs();
     } else if (name == "output") {
         m_vpzstack.push_output(att);
-    } else if (name == "measure") {
-        m_vpzstack.push_measure(att);
+    } else if (name == "view") {
+        m_vpzstack.push_view(att);
     } else if (name == "observable") {
         m_vpzstack.push_observable(att);
     } else if (name == "translators") {
@@ -738,7 +738,7 @@ void VLESaxParser::on_end_element(const Glib::ustring& name)
                name == "submodels" or name == "vle_project" or
                name == "connections" or name == "conditions" or
                name == "condition" or name == "outputs" or
-               name == "measure" or name ==" measures" or
+               name == "views" or name == "view" or
                name == "observable" or name == "experiment" or
                name == "translators" or name == "vle_project") {
         m_vpzstack.pop();

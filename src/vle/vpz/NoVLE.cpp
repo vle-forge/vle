@@ -55,7 +55,7 @@ void NoVLE::callTranslator(const Project& prj,
                            Model& /* model */,
                            Dynamics& dynamics,
                            Conditions& conditions,
-                           Measures& measures)
+                           Views& views)
 {
     Glib::Module* module = translator();
     void* makeNewTranslator;
@@ -78,7 +78,7 @@ void NoVLE::callTranslator(const Project& prj,
     // model.addModel(call->model()); // FIXME
     dynamics.add(call->dynamics());
     conditions.add(call->conditions());
-    measures.addMeasures(call->measures());
+    views.add(call->views());
 
     delete call;
     delete module;
