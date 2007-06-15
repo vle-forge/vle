@@ -21,6 +21,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+#define BOOST_TEST_MAIN
+#define BOOST_TEST_DYN_LINK
+#define BOOST_TEST_MODULE translator_complete_test
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 #include <boost/lexical_cast.hpp>
@@ -37,7 +40,7 @@
 
 using namespace vle;
 
-void test_atomicmodel_vpz()
+BOOST_AUTO_TEST_CASE(atomicmodel_vpz)
 {
     const char* xml =
         "<?xml version=\"1.0\"?>\n"
@@ -90,7 +93,7 @@ void test_atomicmodel_vpz()
     BOOST_REQUIRE(mdl.model()->getOutPort("out2") != 0);
 }
 
-void test_coupledmodel_vpz()
+BOOST_AUTO_TEST_CASE(coupledmodel_vpz)
 {
     const char* xml =
         "<?xml version=\"1.0\"?>\n"
@@ -162,7 +165,7 @@ void test_coupledmodel_vpz()
     BOOST_REQUIRE(cpl->getInternalConnection("atom1", "out", "atom2", "in") != 0);
 }
 
-void test_dynamic_vpz()
+BOOST_AUTO_TEST_CASE(dynamic_vpz)
 {
     const char* xml =
         "<?xml version=\"1.0\"?>\n"
@@ -203,7 +206,7 @@ void test_dynamic_vpz()
     BOOST_REQUIRE_EQUAL(dyn.language(), "");
 }
 
-void test_experiment_vpz()
+BOOST_AUTO_TEST_CASE(experiment_vpz)
 {
     const char* xml=
         "<?xml version=\"1.0\"?>\n"
@@ -278,7 +281,7 @@ void test_experiment_vpz()
     BOOST_REQUIRE_EQUAL(integer->intValue(), -2);
 }
 
-void test_experiment_measures_vpz()
+BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
 {
     const char* xml=
         "<?xml version=\"1.0\"?>\n"
@@ -390,7 +393,7 @@ void test_experiment_measures_vpz()
     }
 }
 
-void test_translator()
+BOOST_AUTO_TEST_CASE(translator_vpz)
 {
     const char* xml=
         "<?xml version=\"1.0\"?>\n"
@@ -433,20 +436,4 @@ void test_translator()
     const vpz::Model& mdl = vpz.project().model();
     BOOST_REQUIRE(mdl.model() != 0);
     BOOST_REQUIRE_EQUAL(mdl.model()->isNoVLE(), true);
-}
-
-
-boost::unit_test_framework::test_suite*
-init_unit_test_suite(int, char* [])
-{
-    boost::unit_test_framework::test_suite* test;
-
-    test = BOOST_TEST_SUITE("vpz test");
-    test->add(BOOST_TEST_CASE(&test_atomicmodel_vpz));
-    test->add(BOOST_TEST_CASE(&test_coupledmodel_vpz));
-    test->add(BOOST_TEST_CASE(&test_dynamic_vpz));
-    test->add(BOOST_TEST_CASE(&test_experiment_vpz));
-    test->add(BOOST_TEST_CASE(&test_experiment_measures_vpz));
-    test->add(BOOST_TEST_CASE(&test_translator));
-    return test;
 }

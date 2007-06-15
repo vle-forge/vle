@@ -1,6 +1,6 @@
 /** 
- * @file test1.cpp
- * @brief Test unit of the sax value parser.
+ * @file test3.cpp
+ * @brief Test unit of the vpz parser.
  * @author The vle Development Team
  */
 
@@ -21,22 +21,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-
 #define BOOST_TEST_MAIN
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE translator_complete_test
-
 #include <boost/test/unit_test.hpp>
-#include <boost/test/floating_point_comparison.hpp>
-#include <boost/lexical_cast.hpp>
-#include <stdexcept>
-#include <limits>
-#include <fstream>
-#include <vle/devs/Simulator.hpp>
+#include <boost/test/output_test_stream.hpp>
+#include <vle/vpz/Translator.hpp>
 
-using namespace vle;
-
-
-BOOST_AUTO_TEST_CASE(test_model)
+BOOST_AUTO_TEST_CASE(test_translator)
 {
 }

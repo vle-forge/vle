@@ -21,6 +21,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+#define BOOST_TEST_MAIN
+#define BOOST_TEST_DYN_LINK
+#define BOOST_TEST_MODULE translator_complete_test
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 #include <boost/lexical_cast.hpp>
@@ -41,7 +44,7 @@
 
 using namespace vle;
 
-void test_build()
+BOOST_AUTO_TEST_CASE(build)
 {
     //vpz::VLESaxParser sax;
     //sax.parse_memory("<?xml version=\"1.0\"?>\n<trame></trame>");
@@ -50,7 +53,7 @@ void test_build()
     //BOOST_CHECK(sax.get_values().empty() == true);
 }
 
-void test_value_bool()
+BOOST_AUTO_TEST_CASE(value_bool)
 {
     const char* t1 = "<?xml version=\"1.0\"?>\n<boolean>true</boolean>";
     const char* t2 = "<?xml version=\"1.0\"?>\n<boolean>false</boolean>";
@@ -72,7 +75,7 @@ void test_value_bool()
     BOOST_CHECK(value::to_boolean(v)->boolValue() == false);
 }
 
-void test_value_integer()
+BOOST_AUTO_TEST_CASE(value_integer)
 {
     const char* t1 = "<?xml version=\"1.0\"?>\n<integer>100</integer>";
     const char* t2 = "<?xml version=\"1.0\"?>\n<integer>-100</integer>";
@@ -102,7 +105,7 @@ void test_value_integer()
                 >::min());
 }
 
-void test_value_double()
+BOOST_AUTO_TEST_CASE(value_double)
 {
     const char* t1 = "<?xml version=\"1.0\"?>\n<double>100.5</double>";
     const char* t2 = "<?xml version=\"1.0\"?>\n<double>-100.5</double>";
@@ -116,7 +119,7 @@ void test_value_double()
     BOOST_CHECK_CLOSE(value::to_double(v)->doubleValue(), -100.5, 1);
 }
 
-void test_value_string()
+BOOST_AUTO_TEST_CASE(value_string)
 {
     const char* t1 = "<?xml version=\"1.0\"?>\n<string>a b c d e f g h i j</string>";
     const char* t2 = "<?xml version=\"1.0\"?>\n<string>a\nb\tc\n</string>";
@@ -130,7 +133,7 @@ void test_value_string()
     BOOST_CHECK(value::to_string(v)->stringValue() == "a\nb\tc\n");
 }
 
-void test_value_set()
+BOOST_AUTO_TEST_CASE(value_set)
 {
     const char* t1 = "<?xml version=\"1.0\"?>\n"
         "<set>\n"
@@ -158,7 +161,7 @@ void test_value_set()
     BOOST_CHECK(value::to_string(v2->getValue(0))->stringValue() == "test");
 }
 
-void test_value_map()
+BOOST_AUTO_TEST_CASE(value_map)
 {
     const char* t1 = "<?xml version=\"1.0\"?>\n"
         "<map>\n"
@@ -190,7 +193,7 @@ void test_value_map()
     BOOST_CHECK(value::to_string(s->getValue(1))->stringValue() == "test");
 }
 
-void test_value_tuple()
+BOOST_AUTO_TEST_CASE(value_tuple)
 {
     const char* t1 = "<?xml version=\"1.0\"?>\n"
         "<tuple>1\n"
@@ -206,7 +209,7 @@ void test_value_tuple()
     BOOST_CHECK_CLOSE(v->operator[](2), 3.0, 0.1);
 }
 
-void test_value_table()
+BOOST_AUTO_TEST_CASE(value_table)
 {
     const char* t1 = "<?xml version=\"1.0\"?>\n"
         "<table width=\"2\" height=\"3\">\n"
@@ -224,22 +227,4 @@ void test_value_table()
     BOOST_CHECK_CLOSE(v->get(1, 0), 4.0, 0.1);
     BOOST_CHECK_CLOSE(v->get(1, 1), 5.0, 0.1);
     BOOST_CHECK_CLOSE(v->get(1, 2), 6.0, 0.1);
-}
-
-boost::unit_test_framework::test_suite*
-init_unit_test_suite(int, char* [])
-{
-    boost::unit_test_framework::test_suite* test;
-
-    test = BOOST_TEST_SUITE("vpz test");
-    test->add(BOOST_TEST_CASE(&test_build));
-    test->add(BOOST_TEST_CASE(&test_value_bool));
-    test->add(BOOST_TEST_CASE(&test_value_integer));
-    test->add(BOOST_TEST_CASE(&test_value_double));
-    test->add(BOOST_TEST_CASE(&test_value_string));
-    test->add(BOOST_TEST_CASE(&test_value_set));
-    test->add(BOOST_TEST_CASE(&test_value_map));
-    test->add(BOOST_TEST_CASE(&test_value_tuple));
-    test->add(BOOST_TEST_CASE(&test_value_table));
-    return test;
 }
