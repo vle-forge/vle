@@ -45,42 +45,42 @@ void Outputs::write(std::ostream& out) const
 
 }
 
-void Outputs::addTextStream(const std::string& name,
+Output& Outputs::addTextStream(const std::string& name,
                             const std::string& location)
 {
     Output o;
     o.setName(name);
     o.setTextStream(location);
-    add(o);
+    return add(o);
 }
 
-void Outputs::addSdmlStream(const std::string& name,
+Output& Outputs::addSdmlStream(const std::string& name,
                             const std::string& location)
 {
     Output o;
     o.setName(name);
     o.setSdmlStream(location);
-    add(o);
+    return add(o);
 }
 
-void Outputs::addEovStream(const std::string& name,
+Output& Outputs::addEovStream(const std::string& name,
                            const std::string& plugin,
                            const std::string& location)
 {
     Output o;
     o.setName(name);
     o.setEovStream(plugin, location);
-    add(o);
+    return add(o);
 }
 
-void Outputs::addNetStream(const std::string& name,
+Output& Outputs::addNetStream(const std::string& name,
                            const std::string& plugin,
                            const std::string& location)
 {
     Output o;
     o.setName(name);
     o.setNetStream(plugin, location);
-    add(o);
+    return add(o);
 }
 
 void Outputs::del(const std::string& name)
@@ -99,13 +99,13 @@ void Outputs::add(const Outputs& o)
     }
 }
 
-void Outputs::add(const Output& o)
+Output& Outputs::add(const Output& o)
 {
     Assert(utils::InternalError, exist(o.name()) == false,
            boost::format("An output have already this name '%1%'\n") %
            o.name());
 
-    insert(std::make_pair < std::string, Output >(o.name(), o));
+    return (*insert(std::make_pair < std::string, Output >(o.name(), o)).first).second;
 }
 
 Output& Outputs::get(const std::string& name)

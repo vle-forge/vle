@@ -69,15 +69,35 @@ namespace vle { namespace value {
         inline VectorValue& getValue()
         { return m_value; }
 
+        /** 
+         * @brief Get the first constant iterator from Vector.
+         * 
+         * @return the first iterator.
+         */
         inline VectorValueIt begin()
         { return m_value.begin(); }
 
+        /** 
+         * @brief Get the first iterator from Vector.
+         * 
+         * @return the first iterator.
+         */
         inline VectorValueConstIt begin() const
         { return m_value.begin(); }
 
+        /** 
+         * @brief Get the last iterator from Vector.
+         * 
+         * @return the last iterator.
+         */
         inline VectorValueIt end()
         { return m_value.begin(); }
 
+        /** 
+         * @brief Get the last constant iterator from Vector.
+         * 
+         * @return the last iterator.
+         */
         inline VectorValueConstIt end() const
         { return m_value.end(); }
 

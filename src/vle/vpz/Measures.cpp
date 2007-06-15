@@ -75,23 +75,23 @@ void Measures::write(std::ostream& out) const
     }
 }
 
-void Measures::addTextStreamOutput(const std::string& name,
+Output& Measures::addTextStreamOutput(const std::string& name,
                                    const std::string& location)
 {
-    m_outputs.addTextStream(name, location);
+    return m_outputs.addTextStream(name, location);
 }
 
-void Measures::addSdmlStreamOutput(const std::string& name,
+Output& Measures::addSdmlStreamOutput(const std::string& name,
                                    const std::string& location)
 {
-    m_outputs.addSdmlStream(name, location);
+    return m_outputs.addSdmlStream(name, location);
 }
 
-void Measures::addEovStreamOutput(const std::string& name,
+Output& Measures::addEovStreamOutput(const std::string& name,
                                   const std::string& plugin,
                                   const std::string& location)
 {
-    m_outputs.addEovStream(name, plugin, location);
+    return m_outputs.addEovStream(name, plugin, location);
 }
 
 void Measures::clear()

@@ -54,15 +54,15 @@ namespace vle { namespace vpz {
         virtual Base::type getType() const
         { return MEASURES; }
 
-        void addTextStreamOutput(const std::string& name,
-                                 const std::string& location = std::string());
+        Output& addTextStreamOutput(const std::string& name,
+				    const std::string& location = std::string());
 
-        void addSdmlStreamOutput(const std::string& name,
-                                 const std::string& location = std::string());
+        Output& addSdmlStreamOutput(const std::string& name,
+				    const std::string& location = std::string());
 
-        void addEovStreamOutput(const std::string& name,
-                                const std::string& plugin,
-                                const std::string& location = std::string());
+        Output& addEovStreamOutput(const std::string& name,
+				   const std::string& plugin,
+				   const std::string& location = std::string());
 
         void clear();
 

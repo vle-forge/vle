@@ -70,7 +70,7 @@ namespace vle { namespace vpz {
          *
          * @throw Exception::Internal if name is empty.
          */
-        void addTextStream(const std::string& name,
+        Output& addTextStream(const std::string& name,
                            const std::string& location = std::string());
 
         /** 
@@ -82,7 +82,7 @@ namespace vle { namespace vpz {
          *
          * @throw Exception::Internal if name is empty.
          */
-        void addSdmlStream(const std::string& name,
+        Output& addSdmlStream(const std::string& name,
                            const std::string& location = std::string());
 
         /** 
@@ -96,7 +96,7 @@ namespace vle { namespace vpz {
          *
          * @throw Exception::Internal if name or plugin are empty.
          */
-        void addEovStream(const std::string& name,
+        Output& addEovStream(const std::string& name,
                           const std::string& plugin,
                           const std::string& location = std::string());
 
@@ -111,7 +111,7 @@ namespace vle { namespace vpz {
          *
          * @throw Exception::Internal if name or plugin are empty.
          */
-        void addNetStream(const std::string& name,
+        Output& addNetStream(const std::string& name,
                           const std::string& plugin,
                           const std::string& location = std::string());
 
@@ -165,7 +165,7 @@ namespace vle { namespace vpz {
          * @param o the output to add.
          * @throw Exception::Internal if the output already exist.
          */
-        void add(const Output& o);
+        Output& add(const Output& o);
     };
 
 }} // namespace vle vpz
