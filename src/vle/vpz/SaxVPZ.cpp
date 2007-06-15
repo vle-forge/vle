@@ -131,10 +131,10 @@ void VpzStackSax::push_model(const AttributeList& att)
     }
 
     vpz::Model* mdl = new vpz::Model();
-    mdl->setModel(gmdl);
+    mdl->set_model(gmdl);
 
     if (m_stack.top()->isStructures()) {
-        vpz().project().model().setModel(gmdl);
+        vpz().project().model().set_model(gmdl);
     }
 
     m_stack.push(mdl);

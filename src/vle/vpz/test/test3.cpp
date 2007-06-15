@@ -59,6 +59,9 @@ BOOST_AUTO_TEST_CASE(test_translator)
         "  <translator name=\"tr1\" library=\"tr1\">\n"
         "   <![CDATA["
         "<?xml version=\"1.0\"?>"
+        "<test>"
+        " <models number=\"2\" />
+        "</test>"
         "]]>"
         "  </translator>\n"
         " </translators>\n"

@@ -45,6 +45,8 @@ namespace vle { namespace graph {
 	AtomicModel(CoupledModel* parent);
 
 	AtomicModel(const AtomicModel& model);
+        
+        AtomicModel(const std::string& name, CoupledModel* parent);
 
 	virtual ~AtomicModel();
 

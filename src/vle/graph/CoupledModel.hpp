@@ -50,6 +50,8 @@ namespace vle { namespace graph {
     public:
         CoupledModel(CoupledModel* parent);
 
+        CoupledModel(const std::string& name, CoupledModel* parent);
+
 	CoupledModel(const CoupledModel& model);
 
 	virtual ~CoupledModel();
@@ -66,6 +68,45 @@ namespace vle { namespace graph {
          * hierarchy.
          */
         void addModel(Model* model);
+
+        /** 
+         * @brief add a new atomic model to the list. Parent is set to this
+         * coupled model.
+         * 
+         * @param name atomic model name to add.
+         * 
+         * @return The AtomicModel builded by this function.
+         *
+         * @throw Exception::Internal if name already exist in this
+         * coupledmodel.
+         */
+        AtomicModel* addAtomicModel(const std::string& name);
+
+        /** 
+         * @brief add a new novle model to the list. Parent is set to this
+         * coupled model.
+         * 
+         * @param name novle model name to add.
+         * 
+         * @return The NoVLE builded by this function.
+         *
+         * @throw Exception::Internal if name already exist in this
+         * coupledmodel.
+         */
+        NoVLEModel* addNoVLEModel(const std::string& name);
+        
+        /** 
+         * @brief add a new coupled model to the list. Parent is set to this
+         * coupled model.
+         * 
+         * @param name coupled model name to add.
+         * 
+         * @return The CoupledModel builded by this function.
+         *
+         * @throw Exception::Internal if name already exist in this
+         * coupledmodel.
+         */
+        CoupledModel* addCoupledModel(const std::string& name);
 
         /**
          * Delete a model of model list. If connection with this model exist,
@@ -382,6 +423,16 @@ namespace vle { namespace graph {
          * @return a new model name.
          */
         std::string buildNewName(const std::string& prefix) const;
+
+
+        /** 
+         * @brief Test if the name already exist in model list.
+         * 
+         * @param name the model name to test.
+         * 
+         * @return true if model name exist, false otherwise.
+         */
+        bool exist(const std::string& name) const;
 
     private:
 	VectorModel      m_modelList;

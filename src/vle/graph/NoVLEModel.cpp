@@ -33,6 +33,11 @@ NoVLEModel::NoVLEModel(CoupledModel* parent) :
 {
 }
 
+NoVLEModel::NoVLEModel(const std::string& name, CoupledModel* parent) :
+    Model(name, parent)
+{
+}
+
 NoVLEModel::NoVLEModel(const NoVLEModel& model) :
     Model(model)
 {

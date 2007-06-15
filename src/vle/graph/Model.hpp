@@ -73,6 +73,14 @@ namespace vle { namespace graph {
         Model(const Model& model);
 
         /** 
+         * @brief Constructor to intialize parent, position (0,0), size (0,0)
+         * and name.
+         * 
+         * @param name 
+         */
+        Model(const std::string& name, CoupledModel* parent);
+
+        /** 
          * @brief Affect operator. Be carefull to modify the parent.
          * 
          * @param mdl model to copy.

@@ -39,6 +39,8 @@ namespace vle { namespace graph {
     public:
         NoVLEModel(CoupledModel* parent);
 
+        NoVLEModel(const std::string& name, CoupledModel* parent);
+
         NoVLEModel(const NoVLEModel& model);
 
         virtual ~NoVLEModel() { }

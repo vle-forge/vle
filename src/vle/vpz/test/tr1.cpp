@@ -23,12 +23,41 @@
  */
 
 #include <vle/vpz/test/tr1.hpp>
+#include <vle/graph/CoupledModel.hpp>
+#include <vle/graph/Model.hpp>
+#include <vle/graph/AtomicModel.hpp>
+#include <vle/graph/NoVLEModel.hpp>
+#include <vle/utils/Tools.hpp>
 #include <iostream>
 
 namespace vle { namespace vpz { namespace testunit {
 
 void tr1::translate(const std::string& buffer)
 {
+    xmlpp::DomParser dom;
+    dom.parse_memory(buffer);
+    xmlpp::Document* doc(dom.get_document());
+    xmlpp::Element* root(doc->get_root_node());
+
+    xmlpp::Node::NodeList lst = root->get_children("models");
+    xmlpp::Element* xmlmdls(dynamic_cast < xmlpp::Element* >(lst.front()));
+    xmlpp::Attribute* att(xmlmdls->get_attribute("number"));
+    const int nbModels(utils::to_int(att->get_value()));
+    if (nbModels != 2) {
+        throw(std::exception());
+    }
+
+    graph::CoupledModel* top(new graph::CoupledModel("toto", 0));
+    graph::AtomicModel* atom1(top->addAtomicModel("tutu"));
+    atom1->addOutputPort("out");
+    graph::AtomicModel* atom2(top->addAtomicModel("tata"));
+    atom2->addInputPort("in");
+    top->addInternalConnection("tutu", "out", "tata", "in");
+    m_model.set_model(top);
+
+    m_model.atomicModels().add(atom1, AtomicModel("cond1", "dyn1", "", ""));
+    m_model.atomicModels().add(atom2, AtomicModel("cond1", "dyn1", "", ""));
+
     m_dynamics.add(Dynamic("dyn1"));
     m_conditions.add(Condition("cond1"));
     m_measures.addTextStreamOutput("output1");

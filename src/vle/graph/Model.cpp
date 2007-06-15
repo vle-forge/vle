@@ -58,6 +58,16 @@ Model::Model(CoupledModel* parent) :
 {
 }
 
+Model::Model(const std::string& name, CoupledModel* parent) :
+    m_name(name),
+    m_parent(parent),
+    m_x(0),
+    m_y(0),
+    m_width(0),
+    m_height(0)
+{
+}
+
 Model::Model(const Model& mdl) :
     m_name(mdl.getName()),
     m_description(mdl.getDescription()),

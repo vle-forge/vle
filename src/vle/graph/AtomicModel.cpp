@@ -36,6 +36,11 @@ AtomicModel::AtomicModel(CoupledModel* parent) :
 {
 }
 
+AtomicModel::AtomicModel(const std::string& name, CoupledModel* parent) :
+    Model(name, parent)
+{
+}
+
 AtomicModel::AtomicModel(const AtomicModel& model) :
     Model(model)
 {

@@ -24,6 +24,7 @@
 
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/graph/AtomicModel.hpp>
+#include <vle/graph/NoVLEModel.hpp>
 #include <vle/graph/Model.hpp>
 #include <vle/graph/Port.hpp>
 #include <vle/graph/TargetPort.hpp>
@@ -44,6 +45,11 @@ namespace vle { namespace graph {
 
 CoupledModel::CoupledModel(CoupledModel* parent) :
     Model(parent)
+{
+}
+
+CoupledModel::CoupledModel(const std::string& name, CoupledModel* parent) :
+    Model(name, parent)
 {
 }
 
@@ -937,6 +943,30 @@ void CoupledModel::addModel(Model * model)
     m_modelList.push_back(model);
 }
 
+AtomicModel* CoupledModel::addAtomicModel(const std::string& name)
+{
+    AssertI(not exist(name));
+    AtomicModel* x = new AtomicModel(name, this);
+    m_modelList.push_back(x);
+    return x;
+}
+
+NoVLEModel* CoupledModel::addNoVLEModel(const std::string& name)
+{
+    AssertI(not exist(name));
+    NoVLEModel* x = new NoVLEModel(name, this);
+    m_modelList.push_back(x);
+    return x;
+}
+
+CoupledModel* CoupledModel::addCoupledModel(const std::string& name)
+{
+    AssertI(not exist(name));
+    CoupledModel* x = new CoupledModel(name, this);
+    m_modelList.push_back(x);
+    return x;
+}
+
 void CoupledModel::delModel(Model* model)
 {
     AssertI(model);
@@ -1304,6 +1334,17 @@ std::string CoupledModel::buildNewName(const std::string& prefix) const
     } while (names.find(newname) != names.end());
 
     return newname;
+}
+
+bool CoupledModel::exist(const std::string& name) const
+{
+    for (VectorModel::const_iterator it = m_modelList.begin();
+         it != m_modelList.end(); ++it) {
+        if ((*it)->getName() == name) {
+            return true;
+        }
+    }
+    return false;
 }
 
 }} // namespace vle graph

@@ -32,6 +32,17 @@ namespace vle { namespace vpz {
 
 using namespace vle::utils;
 
+AtomicModel& AtomicModelList::add(graph::Model* mdl, const AtomicModel& atom)
+{
+    const_iterator it = find(mdl);
+    Assert(utils::InternalError, it == end(),
+           (boost::format("The model %1% already have external information")
+            % mdl->getName()));
+
+    return (*insert(std::make_pair < graph::Model*, AtomicModel >(
+                mdl, atom)).first).second;
+}
+
 const AtomicModel& AtomicModelList::get(graph::Model* atom) const
 {
     AtomicModelList::const_iterator it = find(atom);
@@ -95,7 +106,7 @@ void Model::clear()
 //}
 //}
 
-void Model::setModel(graph::Model* mdl)
+void Model::set_model(graph::Model* mdl)
 {
     m_graph = mdl;
 }

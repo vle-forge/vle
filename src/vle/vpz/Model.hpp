@@ -78,6 +78,16 @@ namespace vle { namespace vpz {
     class AtomicModelList : public std::map < graph::Model*, AtomicModel >
     {
     public:
+        
+        /** 
+         * @brief Add a new atomicmodel information to a graph::Model.
+         * @param mdl the graph::Model to attach atomic model information.
+         * @param atom the vpz::AtomicModel information.
+         * @return a reference to the builded atomicmodel.
+         * @throw utils::InternalError if mdl already exist.
+         */
+        AtomicModel& add(graph::Model* mdl, const AtomicModel& atom);
+
         /** 
          * @brief Get an vpz::Model by his structural reference.
          * @param atom the reference to the structure.
@@ -152,7 +162,7 @@ namespace vle { namespace vpz {
          * 
          * @param mdl the new graph::Model hierarchy to set.
          */
-        void setModel(graph::Model* mdl);
+        void set_model(graph::Model* mdl);
         
         /** 
          * @brief Get a reference to the graph::Model hierarchy.

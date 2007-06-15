@@ -47,7 +47,7 @@ void build_vpz(const std::string& modelname, vpz::Vpz& vpz)
     graph::AtomicModel* mdl = new graph::AtomicModel(cpl);
     mdl->setName("testing model");
     cpl->addModel(mdl);
-    vpz.project().model().setModel(cpl);
+    vpz.project().model().set_model(cpl);
 
     vpz::Dynamic dyn(modelname);
     dyn.setLibrary(modelname);
