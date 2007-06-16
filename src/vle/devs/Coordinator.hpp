@@ -263,7 +263,7 @@ namespace vle { namespace devs {
          * @param measure the measure who push data to the stream.
          * @param output the concerned output.
          */
-        void startNetStream(const vpz::Measure& measure,
+        void startNetStream(const vpz::View& view,
                             const vpz::Output& output);
         
         /* - * - * - * - * - * - * - * - * - * - * - * - * - * - * - * - * - */

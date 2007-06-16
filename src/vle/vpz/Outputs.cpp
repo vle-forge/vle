@@ -46,7 +46,7 @@ void Outputs::write(std::ostream& out) const
 }
 
 Output& Outputs::addTextStream(const std::string& name,
-                            const std::string& location)
+                               const std::string& location)
 {
     Output o;
     o.setName(name);
@@ -55,7 +55,7 @@ Output& Outputs::addTextStream(const std::string& name,
 }
 
 Output& Outputs::addSdmlStream(const std::string& name,
-                            const std::string& location)
+                               const std::string& location)
 {
     Output o;
     o.setName(name);
@@ -64,8 +64,8 @@ Output& Outputs::addSdmlStream(const std::string& name,
 }
 
 Output& Outputs::addEovStream(const std::string& name,
-                           const std::string& plugin,
-                           const std::string& location)
+                              const std::string& plugin,
+                              const std::string& location)
 {
     Output o;
     o.setName(name);
@@ -74,8 +74,8 @@ Output& Outputs::addEovStream(const std::string& name,
 }
 
 Output& Outputs::addNetStream(const std::string& name,
-                           const std::string& plugin,
-                           const std::string& location)
+                              const std::string& plugin,
+                              const std::string& location)
 {
     Output o;
     o.setName(name);

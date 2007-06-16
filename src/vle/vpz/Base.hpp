@@ -40,8 +40,8 @@ namespace vle { namespace vpz {
         enum type { STRUCTURES, MODEL, SUBMODELS, CONNECTIONS,
             INTERNAL_CONNECTION, INPUT_CONNECTION, OUTPUT_CONNECTION, ORIGIN,
             DESTINATION, IN, OUT, INIT, STATE, PORT, DYNAMICS, DYNAMIC,
-            EXPERIMENT, PROJECT, VIEWS, OBSERVABLES, OBSERVABLE, OUTPUTS,
-            OUTPUT, VIEW, NOVLES, NOVLE, CONDITIONS, CONDITION, EOVS,
+            EXPERIMENT, PROJECT, VIEWS, OBSERVABLES, OBSERVABLE, OBSERVABLEPORT,
+            OUTPUTS, OUTPUT, VIEW, NOVLES, NOVLE, CONDITIONS, CONDITION, EOVS,
             EOVCHILD, CLASSES, CLASS, REPLICAS, VPZ };
 
         Base() { }
@@ -99,6 +99,8 @@ namespace vle { namespace vpz {
         inline bool isView() const { return getType() == VIEW; }
         inline bool isObservables() const { return getType() == OBSERVABLES; }
         inline bool isObservable() const { return getType() == OBSERVABLE; }
+        inline bool isObservablePort() const { return getType() ==
+            OBSERVABLEPORT; }
         inline bool isOutputs() const { return getType() == OUTPUTS; }
         inline bool isOutput() const { return getType() == OUTPUT; }
         inline bool isNoVLES() const { return getType() == NOVLES; }

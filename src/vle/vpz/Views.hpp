@@ -28,7 +28,8 @@
 #include <list>
 #include <vector>
 #include <vle/vpz/Outputs.hpp>
-#include <vle/vpz/Views.hpp>
+#include <vle/vpz/Observables.hpp>
+#include <vle/vpz/View.hpp>
 
 namespace vle { namespace vpz {
 
@@ -54,17 +55,18 @@ namespace vle { namespace vpz {
         //
 
         Output& addTextStreamOutput(const std::string& name,
-                                    const std::string& location,
-                                    const std::string& data);
+                                    const std::string& location);
 
         Output& addSdmlStreamOutput(const std::string& name,
-                                    const std::string& location,
-                                    const std::string& data);
+                                    const std::string& location);
 
         Output& addEovStreamOutput(const std::string& name,
                                    const std::string& plugin,
-                                   const std::string& location,
-                                   const std::string& data);
+                                   const std::string& location);
+        
+        Output& addNetStreamOutput(const std::string& name,
+                                   const std::string& plugin,
+                                   const std::string& location);
         
         void delOutput(const std::string& name);
         
@@ -76,7 +78,25 @@ namespace vle { namespace vpz {
 
         //
         ///
-        //// Manages views objets.
+        //// Manage observables objects.
+        ///
+        //
+
+        Observable& addObservable(const Observable& obs);
+
+        Observable& addObservable(const std::string& name);
+
+        void delObservable(const std::string& name);
+
+        inline const Observables& observables() const
+        { return m_observables; }
+
+        inline Observables& observables()
+        { return m_observables; }
+
+        //
+        ///
+        //// Manage views objects.
         ///
         //
         
@@ -88,14 +108,12 @@ namespace vle { namespace vpz {
 
         View& addEventView(const std::string& name,
                            const std::string& output,
-                           const std::string& library,
-                           const std::string& data);
+                           const std::string& library);
 
         View& addTimedView(const std::string& name,
                            double timestep,
                            const std::string& output,
-                           const std::string& library,
-                           const std::string& data);
+                           const std::string& library);
 
         void del(const std::string& name);
 
@@ -107,7 +125,8 @@ namespace vle { namespace vpz {
         { return find(name) != end(); }
 
     private:
-        Outputs     m_outputs;
+        Outputs         m_outputs;
+        Observables     m_observables;
     };
 
 }} // namespace vle vpz

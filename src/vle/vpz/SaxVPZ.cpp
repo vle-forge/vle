@@ -418,7 +418,7 @@ void VpzStackSax::push_views()
     AssertS(utils::SaxParserError, not m_stack.empty());
     AssertS(utils::SaxParserError, m_stack.top()->isExperiment());
 
-    m_stack.push(&m_vpz.project().experiment()views());
+    m_stack.push(&m_vpz.project().experiment().views());
 }
 
 void VpzStackSax::push_outputs()
@@ -468,48 +468,54 @@ void VpzStackSax::push_output(const AttributeList& att)
 void VpzStackSax::push_view(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
+
+    if (m_stack.top()->isViews()) {
+        std::string name(get_attribute< std::string >(att, "name")); 
+        std::string type(get_attribute< std::string >(att, "type")); 
+        std::string lib(get_attribute< std::string >(att, "library")); 
+        std::string out(get_attribute< std::string >(att, "output")); 
+
+        Views& views(m_vpz.project().experiment().views());
+
+        if (type == "timed") {
+            Assert(utils::SaxParserError, exist_attribute(att, "timestep"),
+                   (boost::format("View %1% have no timestep attribute.") %
+                    name));
+
+            double ts(get_attribute < double >(att, "timestep"));
+            View& nm(views.addTimedView(name, ts, out, lib));
+            m_stack.push(&nm);
+        } else if (type == "event") {
+            View& nm(views.addEventView(name, out, lib));
+            m_stack.push(&nm);
+        } else {
+            Throw(utils::SaxParserError, (boost::format(
+                        "Unknow type '%1%' for the view %1%") % type % name));
+        }
+    } else {
+        AssertS(utils::SaxParserError, m_stack.top()->isObservablePort());
+        push_observable_port_on_view(att);
+    }
+}
+
+void VpzStackSax::push_observables()
+{
+    AssertS(utils::SaxParserError, not m_stack.empty());
     AssertS(utils::SaxParserError, m_stack.top()->isViews());
 
-    std::string name(get_attribute< std::string >(att, "name")); 
-    std::string type(get_attribute< std::string >(att, "type")); 
-    std::string output(get_attribute< std::string >(att, "output")); 
-    
-    Views& views(m_vpz.project().experiment().views());
-
-    if (type == "timed") {
-        Assert(utils::SaxParserError, exist_attribute(att, "timestep"),
-               (boost::format("View %1% have no timestep attribute.") %
-                name));
-
-        double ts(get_attribute < double >(att, "timestep"));
-        View& nm(views.addTimedView(name, ts, output));
-        m_stack.push(&nm);
-    } else if (type == "event") {
-        View& nm(views.addEventView(name, output));
-        m_stack.push(&nm);
-    } else {
-        Throw(utils::SaxParserError, (boost::format(
-                    "Unknow type '%1%' for the view %1%") % type % name));
-    }
+    Observables& obs(m_vpz.project().experiment().views().observables());
+    m_stack.push(&obs);
 }
 
 void VpzStackSax::push_observable(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_stack.top()->isViews());
+    AssertS(utils::SaxParserError, m_stack.top()->isObservables());
 
     Views& views(m_vpz.project().experiment().views());
 
     std::string name(get_attribute < std::string >(att, "name"));
-    std::string group;
-    int index = -1;
-
-    if (exist_attribute(att, "group"))
-        group.assign(get_attribute < std::string >(att, "group"));
-    if (exist_attribute(att, "index"))
-        index = get_attribute < int >(att, "index");
-
-    Observable& obs(views->addObservable(name, group, index));
+    Observable& obs(views.addObservable(name));
     m_stack.push(&obs);
 }
 
@@ -521,7 +527,20 @@ void VpzStackSax::push_observable_port(const AttributeList& att)
     std::string name(get_attribute < std::string >(att, "name"));
 
     vpz::Observable* out(static_cast < vpz::Observable* >(m_stack.top()));
-    out->add(name);
+    vpz::ObservablePort& ports(out->add(name));
+    m_stack.push(&ports);
+}
+
+void VpzStackSax::push_observable_port_on_view(const AttributeList& att)
+{
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_stack.top()->isObservablePort());
+    
+    std::string name(get_attribute < std::string >(att, "name"));
+
+    vpz::ObservablePort* port(static_cast < vpz::ObservablePort* >(
+            m_stack.top()));
+    port->add(name);
 }
 
 void VpzStackSax::push_translators()
@@ -639,7 +658,6 @@ void VLESaxParser::on_start_element(
         m_vpzstack.push_vpz(get_attribute < std::string >(att, "author"),
                             get_attribute < float >(att, "version"),
                             get_attribute < std::string >(att, "date"));
-
     } else if (name == "structures") {
         m_vpzstack.push_structure();
     } else if (name == "model") {
@@ -679,6 +697,8 @@ void VLESaxParser::on_start_element(
         m_vpzstack.push_output(att);
     } else if (name == "view") {
         m_vpzstack.push_view(att);
+    } else if (name == "observables") {
+        m_vpzstack.push_observables();
     } else if (name == "observable") {
         m_vpzstack.push_observable(att);
     } else if (name == "translators") {
@@ -733,17 +753,23 @@ void VLESaxParser::on_end_element(const Glib::ustring& name)
             vals->addValue(*it);
         }
         m_valuestack.clear();
+    } else if (name == "port" and m_vpzstack.top()->isObservablePort()) {
+        m_vpzstack.pop();
     } else if (name == "in" or name == "out" or name == "state" or
                name == "init" or name == "structures" or name == "model" or
                name == "submodels" or name == "vle_project" or
                name == "connections" or name == "conditions" or
                name == "condition" or name == "outputs" or
-               name == "views" or name == "view" or
+               name == "views" or name == "observables" or
                name == "observable" or name == "experiment" or
                name == "translators" or name == "vle_project") {
         m_vpzstack.pop();
     } else if (name == "destination") {
         m_vpzstack.build_connection();
+    } else if (name == "view") {
+        if (m_vpzstack.top()->isView()) {
+            m_vpzstack.pop();
+        }
     }
 }
 

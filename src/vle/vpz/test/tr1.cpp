@@ -60,9 +60,9 @@ void tr1::translate(const std::string& buffer)
 
     m_dynamics.add(Dynamic("dyn1"));
     m_conditions.add(Condition("cond1"));
-    m_measures.addTextStreamOutput("output1");
-    m_measures.addEventMeasure("measure1", "output1");
-    m_measures.addObservableToMeasure("measure1", "obs1");
+    m_views.addTextStreamOutput("output1", "");
+    m_views.addEventView("view1", "output1", "default");
+    m_views.addObservable("obs1");
 }
 
 }}} // namespace vle vpz testunit

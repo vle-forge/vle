@@ -30,40 +30,118 @@ namespace vle { namespace vpz {
 
 using namespace vle::utils;
 
-Observable::Observable()
+//
+///
+//// ObservablePort class.
+///
+//
+
+ObservablePort::ObservablePort(const std::string& portname) :
+    m_name(portname)
 {
 }
 
-Observable::~Observable()
+void ObservablePort::write(std::ostream& out) const
+{
+    if (empty()) {
+        out << "<port name=\"" << m_name << "\" />\n";
+    } else {
+        out << "<port name=\"" << m_name << "\" >\n";
+        for (const_iterator it = begin(); it != end(); ++it) {
+            out << " <view name=\"" << *it << "\" />\n";
+        }
+        out << "</port>\n";
+    }
+}
+
+void ObservablePort::add(const std::string& portname)
+{
+    Assert(utils::SaxParserError, not exist(portname),
+           (boost::format("The port %1% have already a view %2%") %
+            m_name % portname));
+
+    push_back(portname);
+}
+
+void ObservablePort::del(const std::string& portname)
+{
+    for (iterator it = begin(); it != end(); ++it) {
+        if ((*it) == portname) {
+            erase(it);
+            return;
+        }
+    }
+}
+
+bool ObservablePort::exist(const std::string& portname) const
+{
+    for (const_iterator it = begin(); it != end(); ++it) {
+        if ((*it) == portname) {
+            return true;
+        }
+    }
+    return false;
+}
+
+//
+///
+//// Observable class.
+///
+//
+
+Observable::Observable(const std::string& name) :
+    m_name(name)
 {
 }
 
 void Observable::write(std::ostream& out) const
 {
-    out << "<observable name=\"" << m_name << "\" ";
-
-    if (not m_group.empty()) {
-        out << "group=\"" << m_group << "\" "
-            << "index=\"" << m_index << "\" ";
+    if (not empty()) {
+        out << "<observable name=\"" << m_name << "\" >";
+        for (const_iterator it = begin(); it != end(); ++it) {
+            it->second.write(out);
+        }
+    } else {
+        out << "<observable name=\"" << m_name << "\" />";
     }
-
-    out << "/ >";
-} 
-
-void Observable::setObservable(const std::string& name,
-                               const std::string& group,
-                               int index)
-{
-    AssertI(not name.empty());
-
-    m_name.assign(name);
-    m_group.assign(group);
-    m_index = index;
 }
 
-void Observable::add(const std::string& portname)
+ObservablePort& Observable::add(const std::string& portname)
 {
-    m_ports.insert(portname);
+    Assert(utils::SaxParserError, not exist(portname),
+           (boost::format("The observable %1% have already a port %2%") %
+            m_name, portname));
+
+    return (*insert(std::make_pair < std::string, ObservablePort >(
+                portname, ObservablePort(portname))).first).second;
+}
+
+ObservablePort& Observable::add(const ObservablePort& obs)
+{
+    Assert(utils::SaxParserError, not exist(obs.name()),
+           (boost::format("The observable %1% have already a port %2%") %
+            m_name, obs.name()));
+
+    return (*insert(std::make_pair < std::string, ObservablePort >(
+                obs.name(), obs)).first).second;
+}
+
+ObservablePort& Observable::get(const std::string& portname)
+{
+    iterator it = find(portname);
+    Assert(utils::SaxParserError, it != end(),
+           (boost::format("The observable %1% have not port %2%") %
+            m_name, portname));
+    return it->second;
+}
+
+const ObservablePort& Observable::get(const std::string& portname) const
+{
+    const_iterator it = find(portname);
+    Assert(utils::SaxParserError, it != end(),
+           (boost::format("The observable %1% have not port %2%") %
+            m_name, portname));
+    return it->second;
 }
 
 }} // namespace vle vpz

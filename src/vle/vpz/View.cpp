@@ -30,10 +30,6 @@ namespace vle { namespace vpz {
 
 using namespace vle::utils;
 
-View::View()
-{
-}
-
 void View::write(std::ostream& out) const
 {
     out << "<view "
@@ -63,27 +59,31 @@ void View::write(std::ostream& out) const
     }
 }
 
-void View::setEventView(Type type,
-                        const std::string& output,
-                        const std::string& library
-                        const std::string& data)
+void View::setEventView(const std::string& output,
+                        const std::string& library)
 {
-    set_type(type);
+    set_type(EVENT);
     set_output(output);
     set_library(library);
-    set_data(data);
 }
 
-void View::setTimedView(Type type,
-                        double timestep,
+void View::setTimedView(double timestep,
                         const std::string& output,
-                        const std::string& library,
-                        const std::string& data)
+                        const std::string& library)
 {
-    set_type(type);
+    set_type(TIMED);
+    set_timestep(timestep);
     set_output(output);
     set_library(library);
-    set_data(data);
+}
+
+void View::set_timestep(double time)
+{
+    Assert(utils::SaxParserError, time > 0.0,
+           (boost::format("Bad time step %1% for view %2%")
+            % time % m_name));
+
+    m_timestep = time;
 }
 
 }} // namespace vle vpz

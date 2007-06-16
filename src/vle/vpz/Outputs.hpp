@@ -71,7 +71,7 @@ namespace vle { namespace vpz {
          * @throw Exception::Internal if name is empty.
          */
         Output& addTextStream(const std::string& name,
-                           const std::string& location = std::string());
+                              const std::string& location);
 
         /** 
          * @brief Add an output with the sdml stream information. The name is
@@ -83,7 +83,7 @@ namespace vle { namespace vpz {
          * @throw Exception::Internal if name is empty.
          */
         Output& addSdmlStream(const std::string& name,
-                           const std::string& location = std::string());
+                              const std::string& location);
 
         /** 
          * @brief Add an output with the eov stream information. The name and
@@ -97,8 +97,8 @@ namespace vle { namespace vpz {
          * @throw Exception::Internal if name or plugin are empty.
          */
         Output& addEovStream(const std::string& name,
-                          const std::string& plugin,
-                          const std::string& location = std::string());
+                             const std::string& plugin,
+                             const std::string& location);
 
         /** 
          * @brief Add an output with the eov stream information. The name and
@@ -112,9 +112,8 @@ namespace vle { namespace vpz {
          * @throw Exception::Internal if name or plugin are empty.
          */
         Output& addNetStream(const std::string& name,
-                          const std::string& plugin,
-                          const std::string& location = std::string());
-
+                             const std::string& plugin,
+                             const std::string& location);
 
         /** 
          * @brief Delete the specified output.

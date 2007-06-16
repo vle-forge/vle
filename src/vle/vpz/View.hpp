@@ -42,7 +42,11 @@ namespace vle { namespace vpz {
     public:
         enum Type { TIMED, EVENT };
 
-        View(const std::string& name);
+        View(const std::string& name) :
+            m_name(name),
+            m_type(EVENT),
+            m_timestep(0.0)
+        { }
 
         virtual ~View() { }
 
@@ -60,8 +64,7 @@ namespace vle { namespace vpz {
          * @throw Exception::Internal if name or output are empty.
          */
         void setEventView(const std::string& output,
-                          const std::string& library
-                          const std::string& data = std::string());
+                          const std::string& library);
 
         /** 
          * @brief Set the View with Timed type and the specified name, output
@@ -75,8 +78,7 @@ namespace vle { namespace vpz {
          */
         void setTimedView(double timestep,
                           const std::string& output,
-                          const std::string& library,
-                          const std::string& data = std::string());
+                          const std::string& library);
 
         inline const std::string& name() const
         { return m_name; }
@@ -84,11 +86,13 @@ namespace vle { namespace vpz {
         inline const Type& type() const
         { return m_type; }
 
+        inline void set_type(Type type)
+        { m_type = type; }
+
         inline std::string streamtype() const
         { return (m_type == TIMED ? "timed" : "event"); }
 
-        inline void set_timestep(double time)
-        { m_timestep = time; }
+        inline void set_timestep(double time);
 
         inline double timestep() const
         { return m_timestep; }

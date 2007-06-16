@@ -53,6 +53,9 @@ namespace vle { namespace vpz {
 
         const Observable& get(const std::string& name) const;
 
+        inline void del(const std::string& name)
+        { erase(name); }
+
         inline bool exist(const std::string& name)
         { return find(name) != end(); }
     };

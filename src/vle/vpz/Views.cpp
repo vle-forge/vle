@@ -39,7 +39,7 @@ void Views::write(std::ostream& out) const
         m_outputs.write(out);
     }
 
-    if (not emmpty()) {
+    if (not empty()) {
         for (const_iterator it = begin(); it != end(); ++it) {
             it->second.write(out);
         }
@@ -49,30 +49,49 @@ void Views::write(std::ostream& out) const
 }
 
 Output& Views::addTextStreamOutput(const std::string& name,
-                                   const std::string& location,
-                                   const std::string& output)
+                                   const std::string& location)
 {
-    return m_outputs.addTextStream(name, location, output);
+    return m_outputs.addTextStream(name, location);
 }
 
 Output& Views::addSdmlStreamOutput(const std::string& name,
-                                   const std::string& location,
-                                   const std::string& output)
+                                   const std::string& location)
 {
-    return m_outputs.addSdmlStream(name, location, output);
+    return m_outputs.addSdmlStream(name, location);
 }
 
 Output& Views::addEovStreamOutput(const std::string& name,
                                   const std::string& plugin,
-                                  const std::string& location,
-                                  const std::string& output)
+                                  const std::string& location)
 {
-    return m_outputs.addEovStream(name, plugin, location, output);
+    return m_outputs.addEovStream(name, plugin, location);
+}
+
+Output& Views::addNetStreamOutput(const std::string& name,
+                                  const std::string& plugin,
+                                  const std::string& location)
+{
+    return m_outputs.addNetStream(name, plugin, location);
 }
 
 void Views::delOutput(const std::string& name)
 {
     m_outputs.del(name);
+}
+
+Observable& Views::addObservable(const Observable& obs)
+{
+    return m_observables.add(obs);
+}
+
+Observable& Views::addObservable(const std::string& name)
+{
+    return m_observables.add(name);
+}
+
+void Views::delObservable(const std::string& name)
+{
+    m_observables.del(name);
 }
 
 void Views::clear()
@@ -86,6 +105,9 @@ void Views::add(const Views& views)
     for (const_iterator it = views.begin(); it != views.end(); ++it) {
         add(it->second);
     }
+
+    m_outputs.add(views.outputs());
+    m_observables.add(views.observables());
 }
 
 View& Views::add(const View& view)
@@ -99,29 +121,27 @@ View& Views::add(const View& view)
 
 View& Views::addEventView(const std::string& name,
                           const std::string& output,
-                          const std::string& library,
-                          const std::string& data)
+                          const std::string& library)
 {
     Assert(utils::SaxParserError, not exist(name),
            (boost::format("View %1% already exist") % name));
 
     View m(name);
-    m.setEventView(output, library, data);
-    return addView(m);
+    m.setEventView(output, library);
+    return add(m);
 }
 
 View& Views::addTimedView(const std::string& name,
                           double timestep,
                           const std::string& output,
-                          const std::string& library,
-                          const std::string& data)
+                          const std::string& library)
 {
     Assert(utils::SaxParserError, not exist(name),
            (boost::format("View %1% already exist") % name));
 
     View m(name);
-    m.setTimedView(timestep, output, library, data);
-    return addView(m);
+    m.setTimedView(timestep, output, library);
+    return add(m);
 }
 
 void Views::del(const std::string& name)

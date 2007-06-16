@@ -513,7 +513,7 @@ void Coordinator::startNetStream()
         */
 }
 
-void Coordinator::startNetStream(const vpz::Measure& /* measure */,
+void Coordinator::startNetStream(const vpz::View& /* measure */,
                                  const vpz::Output& /* output */)
 {
     /*

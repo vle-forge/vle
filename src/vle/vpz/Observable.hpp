@@ -32,29 +32,90 @@
 namespace vle { namespace vpz {
 
     /** 
-     * @brief ObservablePort represents the list of ports of an Observable.
-     * ObservablePort is a std::set of std::string where std::string is the port
-     * name.
+     * @brief ObservablePort represents the list of views names that an
+     * observale port can containt.
+     * @code
+     * <port name="y">
+     *  <view name="viewA" />
+     *  <view name="viewB" />
+     * </port>
+     * @endcode
      */
-    class ObservablePort : public std::set < std::string >
+    class ObservablePort : public Base, public std::list < std::string >
     {
     public:
+        ObservablePort(const std::string& portname);
+
         virtual ~ObservablePort()
         { }
+
+        virtual void write(std::ostream& out) const;
+
+        virtual Base::type getType() const
+        { return OBSERVABLEPORT; }
+
+        /** 
+         * @brief Add a new view name to the ObservablePort.
+         * @param view the view to insert.
+         * @throw utils::SaxParserError if view name already exist.
+         */
+        void add(const std::string& view);
+
+        /** 
+         * @brief Remove a existing views of the ObservablePort.
+         * @param view the view to insert.
+         */
+        void del(const std::string& view);
+
+        /** 
+         * @brief Return true if views of the ObservablePort.
+         * @param view the view name to test.
+         * @return true if view exist, false otherwise.
+         */
+        bool exist(const std::string& view) const;
+
+        //
+        ///
+        //// Get/Set functions
+        ///
+        //
+
+        /** 
+         * @brief Return the name of the ObservablePort.
+         * @return name of the ObservablePort.
+         */
+        inline const std::string& name() const
+        { return m_name; }
+
+    private:
+        ObservablePort()
+        { }
+
+        std::string     m_name;
     };
 
 
     /** 
-     * @brief An observable is a observation on state of a model. It is defines
-     * by a couple model name and port name. To allow grouping and sorting data
-     * we use two attributes, group and index.
+     * @brief An Observable is a definition of states ports. Each state port is
+     * defined by an ObservablePort.
+     * @code
+     * <observable name="obsB">
+     *  <port name="x" />
+     *  <port name="y">
+     *   <view name="measureA" />
+     *  </port>
+     *  <port name="z" />
+     * </observable>
+     * @endcode
      */
-    class Observable : public Base
+    class Observable : public Base, public std::map < std::string,
+                                                      ObservablePort >
     {
     public:
-        Observable();
+        Observable(const std::string& name);
         
-        virtual ~Observable();
+        virtual ~Observable()
+        { }
 
         virtual void write(std::ostream& out) const;
 
@@ -62,52 +123,63 @@ namespace vle { namespace vpz {
         { return OBSERVABLE; }
 
         /** 
-         * @brief Set the observable information with model name or port name
-         * to observe and the couple group, index if define, to sort multiple
-         * observations.
-         * 
-         * @param modelname model name to observe.
-         * @param portname port name to observe.
-         * @param group if define, the group where observation is store.
-         * @param index if define, the index of the group.
-         *
-         * @throw Exception::Internal if modelname or portname is empty or if
-         * group is define but not the index.
+         * @brief Add a new ObservablePort with only a name.
+         * @param portname the name of the ObservablePort.
+         * @throw utils::SaxParserError if an ObservablePort already exist.
+         * @return the newly ObservablePort.
          */
-        void setObservable(const std::string& name,
-                           const std::string& group = std::string(),
-                           int index = -1);
-
+        ObservablePort& add(const std::string& portname);
 
         /** 
-         * @brief Insert into the observables ports list a new port.
-         * 
-         * @param portname the port to push.
+         * @brief Add a new ObservablePort.
+         * @param portname the name of the ObservablePort.
+         * @throw utils::SaxParserError if an ObservablePort already exist.
+         * @return the newly ObservablePort.
          */
-        void add(const std::string& portname);
+        ObservablePort& add(const ObservablePort& obs);
 
-        /* * * * * * * * * * * * */
+        /** 
+         * @brief Get a constant ObservablePort.
+         * @param portname the name of the ObservablePort to find.
+         * @throw utils::SaxParserError if no ObservablePort exist.
+         * @return the ObservablePort finded.
+         */
+        ObservablePort& get(const std::string& portname);
+        
+        /** 
+         * @brief Get a ObservablePort.
+         * @param portname the name of the ObservablePort to find.
+         * @throw utils::SaxParserError if no ObservablePort exist.
+         * @return the ObservablePort finded.
+         */
+        const ObservablePort& get(const std::string& portname) const;
 
+        /** 
+         * @brief Test if an ObservablePort exist.
+         * @param portname the name of the ObservablePort.
+         * @return true if ObservablePort exist, false otherwise.
+         */
+        inline bool exist(const std::string& portname) const
+        { return find(portname) != end(); }
+
+        //
+        ///
+        //// Get/Set functions.
+        ///
+        //
+
+        /** 
+         * @brief Return the name of the Observable.
+         * @return name of the ObservablePort.
+         */
         inline const std::string& name() const
         { return m_name; }
 
-        inline const std::string& group() const
-        { return m_group; }
-
-        inline int index() const
-        { return m_index; }
-
-        inline  const ObservablePort& ports() const
-        { return m_ports; }
-
-        inline ObservablePort& ports()
-        { return m_ports; }
-        
     private:
+        Observable()
+        { }
+
         std::string         m_name;
-        std::string         m_group;
-        int                 m_index;
-        ObservablePort      m_ports;
     };
 
 }} // namespace vle vpz

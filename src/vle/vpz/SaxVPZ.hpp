@@ -68,12 +68,14 @@ namespace vle { namespace vpz {
         void push_conditions();
         void push_condition(const AttributeList& att);
         void push_condition_port(const AttributeList& att);
-        void push_measures();
+        void push_views();
         void push_outputs();
         void push_output(const AttributeList& att);
-        void push_measure(const AttributeList& att);
+        void push_view(const AttributeList& att);
+        void push_observables();
         void push_observable(const AttributeList& att);
         void push_observable_port(const AttributeList& att);
+        void push_observable_port_on_view(const AttributeList& att);
         void push_translators();
         void push_translator(const AttributeList& att);
         void pop_translator(const std::string& cdata);
