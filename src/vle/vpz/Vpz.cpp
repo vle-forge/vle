@@ -35,7 +35,7 @@ using namespace vle::utils;
 Vpz::Vpz(const std::string& filename) :
     m_filename(filename)
 {
-    parse_memory(filename);
+    parse_file(filename);
 }
 
 Vpz::Vpz(const Vpz& vpz) :

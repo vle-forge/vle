@@ -784,17 +784,20 @@ void VLESaxParser::on_comment(const Glib::ustring& /* text */)
 
 void VLESaxParser::on_warning(const Glib::ustring& text)
 {
-    DTRACE(text);
+    Throw(utils::SaxParserError,
+          (boost::format("XML warning: %1%") % text));
 }
 
 void VLESaxParser::on_error(const Glib::ustring& text)
 {
-    Throw(utils::SaxParserError, text);
+    Throw(utils::SaxParserError,
+         (boost::format("XML Error: %1%") % text));
 }
 
 void VLESaxParser::on_fatal_error(const Glib::ustring& text)
 {
-    Throw(utils::SaxParserError, text);
+    Throw(utils::SaxParserError,
+         (boost::format("XML Fatal error: %1%") % text));
 }
 
 void VLESaxParser::on_cdata_block(const Glib::ustring& text)
