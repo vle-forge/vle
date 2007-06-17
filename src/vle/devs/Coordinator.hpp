@@ -56,7 +56,7 @@ namespace vle { namespace devs {
     class Coordinator
     {
     public:
-        Coordinator(const vpz::Vpz& io);
+        Coordinator(const vpz::Vpz& io, vpz::Model& mdls);
 
 	~Coordinator();
 
@@ -64,7 +64,7 @@ namespace vle { namespace devs {
 			  const std::string& portName,
 			  value::Value* value);
 
-	void addModels(const vpz::Model& model);
+	void addModels(vpz::Model& model);
 
 	void addObserver(devs::Observer* observer);
 
@@ -139,7 +139,6 @@ namespace vle { namespace devs {
 	ExternalEventList* run();
 
     private:
-        const vpz::Vpz&         m_vpz;
         vpz::Experiment         m_experiment;
 
 

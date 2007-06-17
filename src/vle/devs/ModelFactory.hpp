@@ -54,6 +54,7 @@ namespace vle { namespace devs {
         ModelFactory(Coordinator& coordinator,
                      const vpz::Dynamics& dyn,
                      const vpz::Classes& cls,
+                     const vpz::Conditions& conds,
                      const vpz::AtomicModelList& atom);
 
         /** 
@@ -90,10 +91,27 @@ namespace vle { namespace devs {
                                    SimulatorList& lst,
                                    SimulatorMap& result);
 
+        /** 
+         * @brief Return the list of atomics models information ie. the 4-uples
+         * of graph::Model*, dynamics, conditions, observables and translators.
+         * @return A constant reference to the vpz::AtomicModelList.
+         */
+        const vpz::AtomicModelList& atomics() const
+        { return mAtomics; }
+
+        /** 
+         * @brief Return the reference to the list of initiale conditions for
+         * each models.
+         * @return A constant reference to the vpz::Condition.
+         */
+        const vpz::Conditions& conditions() const
+        { return mConditions; }
+
     private:
 	Coordinator&            mCoordinator;
         vpz::Dynamics           mDynamics;
         vpz::Classes            mClasses;
+        vpz::Conditions         mConditions;
         vpz::AtomicModelList    mAtomics;
 
 

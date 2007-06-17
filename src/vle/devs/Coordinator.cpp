@@ -59,17 +59,18 @@ using namespace xmlpp;
 
 namespace vle { namespace devs {
 
-Coordinator::Coordinator(const vpz::Vpz& vp) :
-    m_vpz(vp),
-    m_experiment(vp.project().experiment()),
+Coordinator::Coordinator(const vpz::Vpz& vpz, vpz::Model& mdls) :
+    m_experiment(vpz.project().experiment()),
     m_duration(0.0),
     m_currentTime(0)
 {
-    m_modelFactory = new ModelFactory(*this, vp.project().dynamics(),
-                                      vp.project().classes(),
-                                      vp.project().model().atomicModels());
+    m_modelFactory = new ModelFactory(*this,
+                                      vpz.project().dynamics(),
+                                      vpz.project().classes(),
+                                      vpz.project().experiment().conditions(),
+                                      vpz.project().model().atomicModels());
 
-    addModels(vp.project().model());
+    addModels(mdls);
     parseExperiment();
 }
 
@@ -92,10 +93,11 @@ Coordinator::~Coordinator()
     }
 }
 
-void Coordinator::addModels(const vpz::Model& model)
+void Coordinator::addModels(vpz::Model& model)
 {
     graph::AtomicModelVector atomicmodellist;
     graph::Model* mdl = model.model();
+    model.set_model(0);
 
     if (mdl->isAtomic()) {
         atomicmodellist.push_back((graph::AtomicModel*)mdl);
@@ -103,8 +105,7 @@ void Coordinator::addModels(const vpz::Model& model)
         graph::Model::getAtomicModelList(mdl, atomicmodellist);
     }
 
-    m_modelFactory->createModels(atomicmodellist,
-                                 m_modelList);
+    m_modelFactory->createModels(atomicmodellist, m_modelList);
 }
 
 void Coordinator::addCondition(const std::string& modelName,
@@ -231,8 +232,8 @@ void Coordinator::init()
 {
     utils::Rand::rand().set_seed(m_experiment.seed());
 
-    const vpz::AtomicModelList& atoms(m_vpz.project().model().atomicModels());
-    const vpz::Conditions& cnds(m_experiment.conditions());
+    const vpz::AtomicModelList& atoms(m_modelFactory->atomics());
+    const vpz::Conditions& cnds(m_modelFactory->conditions());
 
     for (vpz::AtomicModelList::const_iterator it = atoms.begin(); it !=
          atoms.end(); ++it) {
@@ -240,8 +241,10 @@ void Coordinator::init()
         if (it->first->isAtomic()) {
             graph::AtomicModel* atom(graph::Model::toAtomic(it->first));
             Simulator* satom(getModel(atom));
-            const vpz::Condition& cnd(cnds.get(it->second.conditions()));
-            satom->processInitEvents(cnd.firstValues());
+            if (not it->second.conditions().empty()) {
+                const vpz::Condition& cnd(cnds.get(it->second.conditions()));
+                satom->processInitEvents(cnd.firstValues());
+            }
         }
     }
 

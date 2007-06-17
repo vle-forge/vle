@@ -55,7 +55,7 @@ namespace vle { namespace devs {
          * 
          * @param vp a reference to a structure.
          */
-        void load(const vpz::Vpz& vp);
+        void load(vpz::Vpz& vp);
 
         /** 
          * @brief Initialise Coordinator.

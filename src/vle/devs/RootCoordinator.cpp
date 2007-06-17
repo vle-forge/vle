@@ -47,9 +47,9 @@ RootCoordinator::~RootCoordinator()
 	delete *it++;
 }
 
-void RootCoordinator::load(const vpz::Vpz& io)
+void RootCoordinator::load(vpz::Vpz& io)
 {
-    Coordinator* coor = new Coordinator(io);
+    Coordinator* coor = new Coordinator(io, io.project().model());
     m_coordinatorList.push_back(coor);
 }
 
