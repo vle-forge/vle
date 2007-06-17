@@ -759,7 +759,7 @@ void VLESaxParser::on_end_element(const Glib::ustring& name)
                name == "init" or name == "structures" or name == "model" or
                name == "submodels" or name == "vle_project" or
                name == "connections" or name == "conditions" or
-               name == "condition" or name == "outputs" or
+               name == "condition" or name == "outputs" or name == "dynamics" or
                name == "views" or name == "observables" or
                name == "observable" or name == "experiment" or
                name == "translators" or name == "vle_project") {
