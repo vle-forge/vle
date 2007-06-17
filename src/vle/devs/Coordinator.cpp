@@ -66,7 +66,8 @@ Coordinator::Coordinator(const vpz::Vpz& vp) :
     m_currentTime(0)
 {
     m_modelFactory = new ModelFactory(*this, vp.project().dynamics(),
-                                      vp.project().classes());
+                                      vp.project().classes(),
+                                      vp.project().model().atomicModels());
 
     addModels(vp.project().model());
     parseExperiment();
@@ -102,7 +103,8 @@ void Coordinator::addModels(const vpz::Model& model)
         graph::Model::getAtomicModelList(mdl, atomicmodellist);
     }
 
-    m_modelFactory->createModels(atomicmodellist, m_modelList);
+    m_modelFactory->createModels(atomicmodellist,
+                                 m_modelList);
 }
 
 void Coordinator::addCondition(const std::string& modelName,
@@ -130,8 +132,8 @@ graph::Model* Coordinator::createModels(graph::CoupledModel* parent,
 {
     SimulatorList lst;
 
-    graph::Model* top = m_modelFactory->createModels(className, lst,
-                                                     m_modelList);
+    graph::Model* top = m_modelFactory->createModels(
+        className, lst, m_modelList);
     parent->addModel(top);
     top->setParent(parent);
 

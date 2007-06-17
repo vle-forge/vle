@@ -30,6 +30,7 @@
 #include <vle/graph/Model.hpp>
 #include <vle/vpz/Dynamics.hpp>
 #include <vle/vpz/Classes.hpp>
+#include <vle/vpz/Model.hpp>
 #include <map>
 #include <glibmm/ustring.h>
 #include <glibmm/module.h>
@@ -52,7 +53,8 @@ namespace vle { namespace devs {
          */
         ModelFactory(Coordinator& coordinator,
                      const vpz::Dynamics& dyn,
-                     const vpz::Classes& cls);
+                     const vpz::Classes& cls,
+                     const vpz::AtomicModelList& atom);
 
         /** 
          * @brief To delete all Glib::Module and class.
@@ -89,9 +91,10 @@ namespace vle { namespace devs {
                                    SimulatorMap& result);
 
     private:
-	Coordinator&        mCoordinator;
-        vpz::Dynamics       mDynamics;
-        vpz::Classes        mClasses;
+	Coordinator&            mCoordinator;
+        vpz::Dynamics           mDynamics;
+        vpz::Classes            mClasses;
+        vpz::AtomicModelList    mAtomics;
 
 
         /** 
@@ -107,9 +110,9 @@ namespace vle { namespace devs {
          * @return 
          */
         devs::SimulatorList createModelsFromDynamics(
-                            const graph::AtomicModelVector& lst,
-                            SimulatorMap& result,
-                            const vpz::Dynamics& dyn);
+            const graph::AtomicModelVector& lst,
+            SimulatorMap& result,
+            const vpz::Dynamics& dyn);
 
 
         /** 

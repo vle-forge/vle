@@ -61,6 +61,14 @@ namespace vle { namespace vpz {
         inline const std::string& translator() const
         { return m_translator; }
 
+        friend std::ostream& operator<<(std::ostream& out, const AtomicModel& a)
+        {
+            return out << "  conditions  : " << a.m_conditions << "\n"
+                       << "  dynamics    : " << a.m_dynamics << "\n"
+                       << "  observables : " << a.m_observables << "\n"
+                       << "  translator  : " << a.m_translator << "\n";
+        }
+
     private:
         AtomicModel() { }
 
@@ -103,6 +111,19 @@ namespace vle { namespace vpz {
          * @return A constant reference to the vpz::Model.
          */
         AtomicModel& get(graph::Model* atom);
+        
+        friend std::ostream& operator<<(std::ostream& out,
+                                        const AtomicModelList& a)
+        {
+            out << "AtomicModelList:\n";
+            for (const_iterator it = a.begin(); it != a.end(); ++it) {
+                out << "Model [" << it->first << "] " << it->first->getName()
+                    << "\n"
+                    << it->second;
+            }
+            return out;
+        }
+
     };
 
 

@@ -38,16 +38,18 @@ namespace vle { namespace devs {
 
 ModelFactory::ModelFactory(Coordinator& coordinator,
                            const vpz::Dynamics& dyn,
-                           const vpz::Classes& cls) :
+                           const vpz::Classes& cls,
+                           const vpz::AtomicModelList& atoms) :
     mCoordinator(coordinator),
     mDynamics(dyn),
-    mClasses(cls)
+    mClasses(cls),
+    mAtomics(atoms)
 {
 }
 
 devs::SimulatorList ModelFactory::createModels(
-                const graph::AtomicModelVector& lst,
-                SimulatorMap& result)
+    const graph::AtomicModelVector& lst,
+    SimulatorMap& result)
 {
     return createModelsFromDynamics(lst, result, mDynamics);
 }
@@ -99,19 +101,20 @@ Glib::Module* ModelFactory::buildPlugin(const vpz::Dynamic& dyn)
 }
 
 devs::SimulatorList ModelFactory::createModelsFromDynamics(
-                const graph::AtomicModelVector& lst,
-                SimulatorMap& result,
-                const vpz::Dynamics& dyn)
+    const graph::AtomicModelVector& lst,
+    SimulatorMap& result,
+    const vpz::Dynamics& dyn)
 {
     devs::SimulatorList newsatom;
     graph::AtomicModelVector::const_iterator it;
     for (it = lst.begin(); it != lst.end(); ++it) {
         Simulator* a = new Simulator((graph::AtomicModel*)(*it));
+        const vpz::AtomicModel& atom(mAtomics.get(*it));
+        const vpz::Dynamic& d(dyn.get(atom.dynamics()));
 
-        const vpz::Dynamic& d(dyn.get((*it)->getName()));
         switch(d.type()) {
         case vpz::Dynamic::LOCAL:
-            attachDynamics(a, d, getPlugin((*it)->getName()));
+            attachDynamics(a, d, getPlugin(atom.dynamics()));
             break;
         case vpz::Dynamic::DISTANT:
             Throw(utils::InternalError, "Distant dynamics not yet implemented.");
