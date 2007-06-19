@@ -23,6 +23,7 @@
  */
 
 #include <vle/vpz/NoVLEs.hpp>
+#include <vle/vpz/Model.hpp>
 #include <vle/utils/XML.hpp>
 #include <vle/utils/Debug.hpp>
 #include <utility>
@@ -66,8 +67,19 @@ void NoVLEs::fusion(const Project& prj,
                     Conditions& conditions,
                     Views& views)
 {
-    for (iterator it = begin(); it != end(); ++it) {
-        (*it).second.callTranslator(prj, model, dynamics, conditions, views);
+    AtomicModelList::iterator it = model.atomicModels().begin();
+    while (it != model.atomicModels().end()) {
+       if (not it->second.translator().empty()) {
+           graph::Model* mdl(it->first);
+           const std::string& trl(it->second.translator());
+           NoVLE& novle(get(trl));
+           novle.callTranslator(prj, mdl, model, dynamics, conditions, views);
+           AtomicModelList::iterator todel = it;
+           ++it;
+           model.atomicModels().erase(todel);
+       } else {
+           ++it;
+       }
     }
 }
 

@@ -26,5 +26,9 @@
 
 namespace vle { namespace vpz {
 
+void Translator::clear()
+{
+    m_model.set_model(0);
+}
 
 }} // namespace vle vpz

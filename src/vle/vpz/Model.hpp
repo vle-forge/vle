@@ -87,6 +87,13 @@ namespace vle { namespace vpz {
     {
     public:
         /** 
+         * @brief Add a list of atomicmodels information.
+         * @param atoms list of atomicmodels.
+         * @throw utils::InternalError if an model already exist.
+         */
+        void add(const AtomicModelList& atoms);
+
+        /** 
          * @brief Add a new atomicmodel information to a graph::Model.
          * @param mdl the graph::Model to attach atomic model information.
          * @param atom the vpz::AtomicModel information.

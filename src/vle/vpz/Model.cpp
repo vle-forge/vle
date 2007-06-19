@@ -32,6 +32,13 @@ namespace vle { namespace vpz {
 
 using namespace vle::utils;
 
+void AtomicModelList::add(const AtomicModelList& atoms)
+{
+    for (const_iterator it = atoms.begin(); it != atoms.end(); ++it) {
+        add(it->first, it->second);
+    }
+}
+
 AtomicModel& AtomicModelList::add(graph::Model* mdl, const AtomicModel& atom)
 {
     const_iterator it = find(mdl);

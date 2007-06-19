@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(test_translator)
         "  </model>\n"
         " </structures>\n"
         " <translators>\n"
-        "  <translator name=\"tr1\" library=\"tr1\">\n"
+        "  <translator name=\"xxx\" library=\"tr1\">\n"
         "   <![CDATA["
         "<?xml version=\"1.0\"?>"
         "<test>"
@@ -88,4 +88,18 @@ BOOST_AUTO_TEST_CASE(test_translator)
 
     const vpz::Conditions& conditions(exp.conditions());
     BOOST_REQUIRE_EQUAL(conditions.size(), (vpz::Conditions::size_type)1);
+
+    const vpz::Model& model(vpz.project().model());
+    BOOST_REQUIRE(model.model());
+    BOOST_REQUIRE(model.model()->isCoupled());
+
+    graph::CoupledModel* cpled((graph::CoupledModel*)model.model());
+    BOOST_REQUIRE_EQUAL(cpled->getName(), "toto");
+    BOOST_REQUIRE(cpled->exist("tutu"));
+    BOOST_REQUIRE(cpled->exist("tata"));
+
+    graph::Connection* cnx(
+        cpled->getInternalConnection(std::string("tutu"), "out",
+                                     std::string("tata"), "in"));
+    BOOST_REQUIRE(cnx);
 }

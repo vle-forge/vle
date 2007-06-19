@@ -28,6 +28,7 @@
 #include <vle/vpz/Experiment.hpp>
 #include <vle/vpz/Project.hpp>
 #include <vle/vpz/Translator.hpp>
+#include <vle/graph/CoupledModel.hpp>
 #include <vle/utils/XML.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Path.hpp>
@@ -52,7 +53,8 @@ void NoVLE::setNoVLE(const std::string& library,
 }
 
 void NoVLE::callTranslator(const Project& prj,
-                           Model& /* model */,
+                           graph::Model* mdl,
+                           Model& model,
                            Dynamics& dynamics,
                            Conditions& conditions,
                            Views& views)
@@ -75,10 +77,19 @@ void NoVLE::callTranslator(const Project& prj,
                            m_name % Glib::Module::get_last_error());
 
     call->translate(m_data);
-    // model.addModel(call->model()); // FIXME
+    model.atomicModels().add(call->model().atomicModels());
     dynamics.add(call->dynamics());
     conditions.add(call->conditions());
     views.add(call->views());
+
+    graph::CoupledModel* parent = mdl->getParent();
+    if (parent == 0) {
+        delete mdl;
+        model.set_model(call->model().model());
+    } else {
+        parent->replace(mdl, call->model().model());
+    }
+    call->clear();
 
     delete call;
     delete module;

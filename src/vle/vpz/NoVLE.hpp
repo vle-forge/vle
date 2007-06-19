@@ -28,6 +28,13 @@
 #include <vle/vpz/Base.hpp>
 #include <glibmm/module.h>
 
+namespace vle { namespace graph {
+
+    class Model;
+
+}} // namespace vle graph
+   
+   
 namespace vle { namespace vpz {
 
     class Project;
@@ -75,6 +82,7 @@ namespace vle { namespace vpz {
          * @param experiment 
          */
         void callTranslator(const Project& prj,
+                            graph::Model* mdl,
                             Model& model,
                             Dynamics& dynamics,
                             Conditions& conditions,

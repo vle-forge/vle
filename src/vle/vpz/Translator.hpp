@@ -56,6 +56,8 @@ namespace vle { namespace vpz {
 
         virtual void translate(const std::string& buffer) = 0;
 
+        void clear();
+
         const Model& model() const
         { return m_model; }
 
