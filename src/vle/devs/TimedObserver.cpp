@@ -30,52 +30,43 @@ using std::string;
 
 namespace vle { namespace devs {
 
-TimedObserver::TimedObserver(const std::string& p_name,
-			     Stream* p_stream,
-			     double p_timeStep) :
-    Observer(p_name,p_stream),
-    m_timeStep(p_timeStep),
+TimedObserver::TimedObserver(const std::string& name,
+			     Stream* stream,
+			     double timeStep) :
+    Observer(name,stream),
+    m_timeStep(timeStep),
     m_counter(0)
 {
 }
 
 StateEventList TimedObserver::init()
 {
-    m_counter=0;
+    m_counter = 0;
     m_valueList.clear();
     return Observer::init();
 }
 
 StateEvent*
-TimedObserver::processStateEvent(StateEvent* p_event)
+TimedObserver::processStateEvent(StateEvent* event)
 {
-    value::Value v_value = p_event->getAttributeValue(p_event->getPortName());
+    value::Value value = event->getAttributeValue(event->getPortName());
 
-    if (v_value) {
-	m_valueList[StreamModelPort(p_event->getModel(),
-				    p_event->getPortName())] =
-	    v_value->clone();
-	m_counter++;
+    if (value) {
+        m_valueList[StreamModelPort(
+            event->getModel(), event->getPortName())] = value;
+        m_counter++;
         if (m_counter == m_size) {
-	    m_stream->writeValues(p_event->getTime(),
+	    m_stream->writeValues(event->getTime(),
 				  m_valueList,getObservableList());
 	    m_counter = 0;
-
-
-            //FIXME
-            //StreamModelPortValue::iterator it = m_valueList.begin();
-            //while (it != m_valueList.end()) {
-                //delete (*it).second;
-                //++it;
-                //}
 	    m_valueList.clear();
 	}
     }
 
-    return new StateEvent(p_event->getTime()+m_timeStep,
-			  p_event->getModel(),
+    return new StateEvent(event->getTime() + m_timeStep,
+                          event->getModel(),
 			  getName(),
-			  p_event->getPortName());
+			  event->getPortName());
 }
 
 }} // namespace vle devs

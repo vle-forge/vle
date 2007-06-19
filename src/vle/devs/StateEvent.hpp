@@ -50,7 +50,8 @@ namespace vle { namespace devs {
 	{ }
 
 	StateEvent(const StateEvent& event) :
-	    Event(event),
+            Event(event),
+            m_time(event.m_time),
 	    m_observerName(event.m_observerName),
 	    m_portName(event.m_portName)
 	{ }
