@@ -268,6 +268,8 @@ namespace vle { namespace devs {
         /* - * - * - * - * - * - * - * - * - * - * - * - * - * - * - * - * - */
 
         void startLocalStream();
+        
+        void attachModelToObserver(Observer* obs, const std::string& viewname);
 
         /** 
          * @brief parse the xmlDynamics XML, and affect the dynamics to the

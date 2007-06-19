@@ -144,4 +144,27 @@ const ObservablePort& Observable::get(const std::string& portname) const
     return it->second;
 }
 
+bool Observable::has_view(const std::string& name) const
+{
+    for (const_iterator it = begin(); it != end(); ++it) {
+        if (it->second.exist(name)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+Observable::PortnameList
+Observable::get_portname(const std::string& name) const
+{
+    PortnameList lst;
+
+    for (const_iterator it = begin(); it != end(); ++it) {
+        if (it->second.exist(name)) {
+            lst.push_back(it->first);
+        }
+    }
+    return lst;
+}
+
 }} // namespace vle vpz

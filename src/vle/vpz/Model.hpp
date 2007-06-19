@@ -86,7 +86,6 @@ namespace vle { namespace vpz {
     class AtomicModelList : public std::map < graph::Model*, AtomicModel >
     {
     public:
-        
         /** 
          * @brief Add a new atomicmodel information to a graph::Model.
          * @param mdl the graph::Model to attach atomic model information.

@@ -67,7 +67,7 @@ Coordinator::Coordinator(const vpz::Vpz& vpz, vpz::Model& mdls) :
     m_modelFactory = new ModelFactory(*this,
                                       vpz.project().dynamics(),
                                       vpz.project().classes(),
-                                      vpz.project().experiment().conditions(),
+                                      vpz.project().experiment(),
                                       vpz.project().model().atomicModels());
 
     addModels(mdls);
@@ -109,8 +109,8 @@ void Coordinator::addModels(vpz::Model& model)
 }
 
 void Coordinator::addCondition(const std::string& modelName,
-                             const std::string& portName,
-                             value::Value* value)
+                               const std::string& portName,
+                               value::Value* value)
 {
     m_conditionList[modelName].
         push_back(pair < string , value::Value* >(portName, value));
@@ -127,9 +127,9 @@ void Coordinator::addObserver(Observer* p_observer)
 }
 
 graph::Model* Coordinator::createModels(graph::CoupledModel* parent,
-                                      const std::string& className,
-                                      const std::string& xmlDynamics,
-                                      const std::string& xmlInit)
+                                        const std::string& className,
+                                        const std::string& xmlDynamics,
+                                        const std::string& xmlInit)
 {
     SimulatorList lst;
 
@@ -145,18 +145,15 @@ graph::Model* Coordinator::createModels(graph::CoupledModel* parent,
         dispatchInternalEvent((*it)->init());
     }
 
-    if (not xmlInit.empty())
+    if (not xmlInit.empty()) {
         applyInits(lst, xmlInit);
-
-    //xmlpp::Document doc;
-    //xmlpp::Element* root = doc.create_root_node("test");
-    //parent->writeXML(root); FIXME FIXME FIXME
+    }
 
     return top;
 }
 
 void Coordinator::delAtomicModel(graph::CoupledModel* parent,
-                               graph::AtomicModel* atom)
+                                 graph::AtomicModel* atom)
 {
     if (parent and atom) {
         SimulatorMap::iterator it = m_modelList.find(atom);
@@ -179,7 +176,7 @@ void Coordinator::delAtomicModel(graph::CoupledModel* parent,
 }
 
 void Coordinator::delCoupledModel(graph::CoupledModel* parent,
-                                graph::CoupledModel* mdl)
+                                  graph::CoupledModel* mdl)
 {
     if (parent and mdl) {
         graph::VectorModel& lst = mdl->getModelList();
@@ -197,7 +194,7 @@ void Coordinator::delCoupledModel(graph::CoupledModel* parent,
 }
 
 bool Coordinator::delModel(graph::CoupledModel* parent,
-                         const std::string& modelname)
+                           const std::string& modelname)
 {
     graph::Model* mdl = parent->find(modelname);
     if (mdl) {
@@ -356,13 +353,13 @@ vector < graph::TargetPort* > Coordinator::getTargetPortList(
     //if (m_model != NULL) { FIXME pas d'influence ?
     //return m_model->getStructure()->getTargetPortList(port);
     //} else {
-        return vector < graph::TargetPort* > ();
-        //}
+    return vector < graph::TargetPort* > ();
+    //}
 }
 
 vector < graph::TargetPort* > Coordinator::getTargetPortList(
-                    graph::AtomicModel* model,
-                    const std::string & portName)
+    graph::AtomicModel* model,
+    const std::string & portName)
 {
     Simulator* smodel = getModel(model);
     if (model) {
@@ -373,32 +370,32 @@ vector < graph::TargetPort* > Coordinator::getTargetPortList(
 }
 
 void Coordinator::applyDynamics(SimulatorList& /* lst */,
-                              const std::string& /* xmlDynamics */)
+                                const std::string& /* xmlDynamics */)
 {
     /* FIXME que faire avec cette fonction
-    xmlpp::DomParser dom;
-    dom.parse_memory(xmlDynamics);
-    xmlpp::Element* root = utils::xml::get_root_node(dom, "MODELS");
-    xmlpp::Node::NodeList lt = root->get_children("MODEL");
-    for (xmlpp::Node::NodeList::iterator it = lt.begin(); it != lt.end();
-         ++it) {
-        xmlpp::Element* mdl = (xmlpp::Element*)(*it);
-        Glib::ustring name = utils::xml::get_attribute(mdl, "NAME");
-        xmlpp::Element* dynamics = utils::xml::get_children(mdl, "DYNAMICS");
+       xmlpp::DomParser dom;
+       dom.parse_memory(xmlDynamics);
+       xmlpp::Element* root = utils::xml::get_root_node(dom, "MODELS");
+       xmlpp::Node::NodeList lt = root->get_children("MODEL");
+       for (xmlpp::Node::NodeList::iterator it = lt.begin(); it != lt.end();
+       ++it) {
+       xmlpp::Element* mdl = (xmlpp::Element*)(*it);
+       Glib::ustring name = utils::xml::get_attribute(mdl, "NAME");
+       xmlpp::Element* dynamics = utils::xml::get_children(mdl, "DYNAMICS");
 
-        for (SimulatorList::iterator jt = lst.begin(); jt != lst.end();
-             ++jt) {
-            if ((*jt)->getName() == name) {
-                (*jt)->parse(dynamics);
-                break;
-            }
-        }
-    }
-    */
+       for (SimulatorList::iterator jt = lst.begin(); jt != lst.end();
+       ++jt) {
+       if ((*jt)->getName() == name) {
+       (*jt)->parse(dynamics);
+       break;
+       }
+       }
+       }
+       */
 }
 
 void Coordinator::applyInits(SimulatorList& /* lst */,
-                           const std::string& /* xmlInits */)
+                             const std::string& /* xmlInits */)
 {
     //xmlpp::DomParser dom;
     //dom.parse_memory(xmlInits);
@@ -440,82 +437,82 @@ void Coordinator::applyInits(SimulatorList& /* lst */,
 void Coordinator::startEOVStream()
 {
     /*
-    const vpz::EOVs eovs = m_experiment.measures().eovs();
-    std::map < std::string, vpz::EOV >::const_iterator it;
-    for (it = eovs.eovs().begin(); it != eovs.eovs().end(); ++it) {
-        std::string host;
-        int port;
+       const vpz::EOVs eovs = m_experiment.measures().eovs();
+       std::map < std::string, vpz::EOV >::const_iterator it;
+       for (it = eovs.eovs().begin(); it != eovs.eovs().end(); ++it) {
+       std::string host;
+       int port;
 
-        utils::net::explodeStringNet((*it).second.host(), host, port);
-        DTRACE1(boost::format("startEOVStream '%1%' '%2%'.\n") % host % port);
+       utils::net::explodeStringNet((*it).second.host(), host, port);
+       DTRACE1(boost::format("startEOVStream '%1%' '%2%'.\n") % host % port);
 
-        if (host == "localhost") {
-            std::string cmd("eov -p ");
-            cmd += utils::to_string(port);
-            Glib::spawn_command_line_async(cmd);
-            Glib::usleep(1000000); // FIXME pose obligatoire ?!?
-        }
+       if (host == "localhost") {
+       std::string cmd("eov -p ");
+       cmd += utils::to_string(port);
+       Glib::spawn_command_line_async(cmd);
+       Glib::usleep(1000000); // FIXME pose obligatoire ?!?
+       }
 
-        utils::net::Client* clt = 0;
-        try {
-            clt = new utils::net::Client(host, port);
-            DTRACE1(boost::format("sendEOV: %1%.\n") % (*it).second.xml());
-            clt->send_buffer((*it).second.xml());
-            Glib::ustring tr(clt->recv_string());
-            clt->close();
-            delete clt;
+       utils::net::Client* clt = 0;
+       try {
+       clt = new utils::net::Client(host, port);
+       DTRACE1(boost::format("sendEOV: %1%.\n") % (*it).second.xml());
+       clt->send_buffer((*it).second.xml());
+       Glib::ustring tr(clt->recv_string());
+       clt->close();
+       delete clt;
 
-            DTRACE2(boost::format("recvEOV: %1%.\n") % tr);
-            xmlpp::DomParser dom;
-            dom.parse_memory(tr);
-            value::Value v =
-                value::ValueBase::getValue(dom.get_document()->get_root_node());
+       DTRACE2(boost::format("recvEOV: %1%.\n") % tr);
+       xmlpp::DomParser dom;
+       dom.parse_memory(tr);
+       value::Value v =
+       value::ValueBase::getValue(dom.get_document()->get_root_node());
 
-            if (v->isMap()) {
-                value::MapFactory::MapValue& mp = value::to_map(v)->getValue();
-                for (value::MapFactory::MapValue::const_iterator it = mp.begin();
-                     it != mp.end(); ++it) {
-                    if ((*it).second->isInteger()) {
-                        std::string output = (*it).first;
-                        int port = value::to_integer((*it).second)->intValue();
+       if (v->isMap()) {
+       value::MapFactory::MapValue& mp = value::to_map(v)->getValue();
+       for (value::MapFactory::MapValue::const_iterator it = mp.begin();
+       it != mp.end(); ++it) {
+       if ((*it).second->isInteger()) {
+       std::string output = (*it).first;
+       int port = value::to_integer((*it).second)->intValue();
 
-                        std::string outputhost = host + ":" + utils::to_string(port);
-                        startNetStream(output, outputhost);
-                    }
-                }
-            }
-        } catch(const std::exception& e) {
-            delete clt;
-            std::string err((boost::format(
-                        "Error connecting on eov '%1%' host '%2%' port '%3%': %4%\n") %
-                    (*it).first % host % port % e.what()).str());
-            Throw(utils::InternalError, err);
-        }
-    }
-    Glib::usleep(1000000); // FIXME pose obligatoire ?!?
-    */
+       std::string outputhost = host + ":" + utils::to_string(port);
+       startNetStream(output, outputhost);
+       }
+       }
+       }
+       } catch(const std::exception& e) {
+       delete clt;
+       std::string err((boost::format(
+       "Error connecting on eov '%1%' host '%2%' port '%3%': %4%\n") %
+       (*it).first % host % port % e.what()).str());
+       Throw(utils::InternalError, err);
+       }
+       }
+       Glib::usleep(1000000); // FIXME pose obligatoire ?!?
+       */
 }
 
 void Coordinator::startNetStream()
 {
     /*
-    const vpz::Measures& measures = m_experiment.measures();
-    const vpz::Outputs& outs = measures.outputs();
+       const vpz::Measures& measures = m_experiment.measures();
+       const vpz::Outputs& outs = measures.outputs();
 
-    for (vpz::Outputs::OutputList::const_iterator it = outs.outputs().begin();
-         it != outs.outputs().end(); ++it) {
-        if (it->second.format() == vpz::Output::NET) {
+       for (vpz::Outputs::OutputList::const_iterator it = outs.outputs().begin();
+       it != outs.outputs().end(); ++it) {
+       if (it->second.format() == vpz::Output::NET) {
 
-            for (vpz::Measures::MeasureList::const_iterator jt = measures.begin();
-                 jt != measures.end(); ++jt) {
+       for (vpz::Measures::MeasureList::const_iterator jt = measures.begin();
+       jt != measures.end(); ++jt) {
 
-                if (jt->second.output() == it->second.name()) {
-                    startNetStream(it->second, jt->second);
-                }
-            }
-        }
-        }
-        */
+       if (jt->second.output() == it->second.name()) {
+       startNetStream(it->second, jt->second);
+       }
+       }
+       }
+       }
+       */
 }
 
 void Coordinator::startNetStream(const vpz::View& /* measure */,
@@ -523,84 +520,101 @@ void Coordinator::startNetStream(const vpz::View& /* measure */,
 {
     /*
 
-    Stream* stream(getStreamPlugin(output));
-    stream->init(ouput.plugin(), m_experiment.name(), output.location(),
-                 o.data());
+       Stream* stream(getStreamPlugin(output));
+       stream->init(ouput.plugin(), m_experiment.name(), output.location(),
+       o.data());
 
-    DTRACE1(boost::format("measurename : %1%.\n") % measure.name());
+       DTRACE1(boost::format("measurename : %1%.\n") % measure.name());
 
-    Observer* obs = 0;
-    if (m.type() == vpz::Measure::TIMED) {
-        obs = new devs::TimedObserver(measurename, stream, m.timestep());
-    } else if (m.type() == vpz::Measure::EVENT) {
-        obs = new devs::EventObserver(measurename, stream);
-    }
-    stream->setObserver(obs);
+       Observer* obs = 0;
+       if (m.type() == vpz::Measure::TIMED) {
+       obs = new devs::TimedObserver(measurename, stream, m.timestep());
+       } else if (m.type() == vpz::Measure::EVENT) {
+       obs = new devs::EventObserver(measurename, stream);
+       }
+       stream->setObserver(obs);
 
-    const vpz::Measure::ObservableList& lst(measure.observable());
-    const vpz::AtomicModelList& atoms(m_vpz.project().model().atomicModels());
+       const vpz::Measure::ObservableList& lst(measure.observable());
+       const vpz::AtomicModelList& atoms(m_vpz.project().model().atomicModels());
 
-    for (vpz::Measure::ObservableList::const_iterator it = lst.begin();
-         it != lst.end(); ++it) {
-        for (vpz::AtomicModelList::const_iterator jt = atoms.begin(); 
-             jt != atoms.end(); ++jt) {
-            if (it->second.name() == (*jt).observables()) {
-                const vpz::ObservablePort& ports(jt->
-                for (vpz::ObservableList::const_iterator kt = 
-                obs->addObservable(jt->first,
-                                   (
+       for (vpz::Measure::ObservableList::const_iterator it = lst.begin();
+       it != lst.end(); ++it) {
+       for (vpz::AtomicModelList::const_iterator jt = atoms.begin(); 
+       jt != atoms.end(); ++jt) {
+       if (it->second.name() == (*jt).observables()) {
+       const vpz::ObservablePort& ports(jt->
+       for (vpz::ObservableList::const_iterator kt = 
+       obs->addObservable(jt->first,
+       (
 
-    const vpz::Measure::ObservableList& obslst(m.observables());
-    for (vpz::Measure::ObservableList::const_iterator it = obslst.begin(); 
-         it != obslst.end(); ++it) {
-        obs->addObservable(getModel((*it).modelname()), (*it).portname(),
-                           (*it).group(), (*it).());
-    }
-    addObserver(obs);
+       const vpz::Measure::ObservableList& obslst(m.observables());
+       for (vpz::Measure::ObservableList::const_iterator it = obslst.begin(); 
+       it != obslst.end(); ++it) {
+       obs->addObservable(getModel((*it).modelname()), (*it).portname(),
+       (*it).group(), (*it).());
+       }
+       addObserver(obs);
 
-    */
+*/
 }
 
 void Coordinator::startLocalStream()
 {
-    /* 
-    const vpz::Measures& measures = m_experiment.measures();
-    vpz::Measures::MeasureList::const_iterator it;
-    for (it = measures.measures().begin(); it != measures.measures().end();
-         ++it) {
+    const vpz::Views& views(m_modelFactory->views());
+    vpz::Views::const_iterator it;
+    for (it = views.begin(); it != views.end(); ++it) {
         Stream* stream = 0;
-        const vpz::Output& o = measures.outputs().find((*it).output());
+        const vpz::Output& o(views.outputs().get(it->second.output()));
 
         if (o.format() == vpz::Output::TEXT 
-	    or o.format() == vpz::Output::SDML) {
-            std::string file(m_experiment.name());
-            file += "_";
-            file += (*it).name();
+            or o.format() == vpz::Output::SDML) {
+            std::string file((boost::format("%1%_%2%") % m_experiment.name() %
+                             it->second.name()).str());
 
             stream = getStreamPlugin(o);
-            stream->init(o.plugin(), file, o.location(), o.xml());
+            stream->init(o.plugin(), file, o.location(), o.data());
 
             Observer* obs = 0;
-            if ((*it).type() == vpz::Measure::TIMED) {
-                obs = new devs::TimedObserver((*it).name(), stream,
-                                              (*it).timestep());
-            } else if ((*it).type() == vpz::Measure::EVENT) {
-                obs = new devs::EventObserver((*it).name(), stream);
+            if (it->second.type() == vpz::View::TIMED) {
+                obs = new devs::TimedObserver(
+                    it->second.name(), stream, it->second.timestep());
+            } else if (it->second.type() == vpz::View::EVENT) {
+                obs = new devs::EventObserver(it->second.name(), stream);
             }
             stream->setObserver(obs);
 
-            const std::list < vpz::Observable >& observables =
-                (*it).observables();
-            std::list < vpz::Observable >::const_iterator jt;
-            for (jt = observables.begin(); jt != observables.end(); ++jt) {
-                obs->addObservable(getModel((*jt).modelname()),
-                                   (*jt).portname(),
-                                   (*jt).group(), (*jt).index());
+            attachModelToObserver(obs, it->first);
+        }
+    }
+}
+
+void
+Coordinator::attachModelToObserver(
+    Observer* obs,
+    const std::string& viewname)
+{
+    const vpz::Observables& vobs(m_experiment.views().observables());
+    for (vpz::Observables::const_iterator it = vobs.begin();
+         it != vobs.end(); ++it) {
+
+        const vpz::Observable::PortnameList& lst(
+            it->second.get_portname(viewname));
+        for (vpz::Observable::PortnameList::const_iterator jt = lst.begin();
+             jt != lst.end(); ++jt) {
+
+            const vpz::AtomicModelList& atoms(m_modelFactory->atomics());
+            for (vpz::AtomicModelList::const_iterator kt = atoms.begin();
+                 kt != atoms.end(); ++kt) {
+
+                if (kt->second.observables() == it->first) {
+                    obs->addObservable(getModel(
+                            static_cast < graph::AtomicModel* >(kt->first)),
+                        (*jt));
+                }
             }
             addObserver(obs);
         }
-        }
-        */
+    }
 }
 
 void Coordinator::parseExperiment()
@@ -632,8 +646,8 @@ void Coordinator::processEventObserver(Simulator* p_model, Event* p_event)
                 if (p_event->isInternal()) {
                     event3 = new
                         StateEvent(((InternalEvent*)p_event)->getTime(),
-                                            p_model, (*it)->getName(),
-                                            (*it2).portName);
+                                   p_model, (*it)->getName(),
+                                   (*it2).portName);
                 } else {
                     event3 = new StateEvent(m_currentTime,
                                             p_model,
@@ -732,31 +746,31 @@ void Coordinator::processStateEvents(CompleteEventBagModel& bag)
 }
 
 /*
-Event* Coordinator::processConflict(EventBagModel& bag, Simulator& mdl)
-{
-    if (not bag.emptyInternal()) {
-        if (not bag.emptyExternal()) {
-            switch (mdl.processConflict(*bag.internal(), bag.externals())) {
-            case Event::INTERNAL:
-                return popInternal(bag);
-            case Event::EXTERNAL:
-                return popExternal(bag, mdl);
-            }
-        } else {
-            return popInternal(bag);
-        }
-    } else {
-        if (not bag.emptyExternal()) {
-            return popExternal(bag, mdl);
-        } else {
-            Assert(utils::InternalError, not bag.emptyInstantaneous(),
-                   boost::format("No internal, external or instantaneous "
-                                 "event for model '%1%'\n") % mdl.getName());
-            return popInstantaneous(bag);
-        }
-    }
-    return 0;
-}*/
+   Event* Coordinator::processConflict(EventBagModel& bag, Simulator& mdl)
+   {
+   if (not bag.emptyInternal()) {
+   if (not bag.emptyExternal()) {
+   switch (mdl.processConflict(*bag.internal(), bag.externals())) {
+   case Event::INTERNAL:
+   return popInternal(bag);
+   case Event::EXTERNAL:
+   return popExternal(bag, mdl);
+   }
+   } else {
+   return popInternal(bag);
+   }
+   } else {
+   if (not bag.emptyExternal()) {
+   return popExternal(bag, mdl);
+   } else {
+   Assert(utils::InternalError, not bag.emptyInstantaneous(),
+   boost::format("No internal, external or instantaneous "
+   "event for model '%1%'\n") % mdl.getName());
+   return popInstantaneous(bag);
+   }
+   }
+   return 0;
+   }*/
 
 ExternalEventList* Coordinator::run()
 {
@@ -777,7 +791,7 @@ ExternalEventList* Coordinator::run()
                     case Event::INTERNAL:
                         processInternalEvent(mdl, bag, nextEvent);
                         break;
-                        
+
                     case Event::EXTERNAL:
                         processExternalEvents(mdl, bag, nextEvent);
                         break;

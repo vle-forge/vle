@@ -41,14 +41,12 @@ Observer::~Observer()
     delete m_stream;
 }
 
-void Observer::addObservable(Simulator* p_model,
-                             const std::string & p_portName,
-                             const std::string & p_group,
-                             size_t p_index)
+void Observer::addObservable(Simulator* model,
+                             const std::string& portName)
 {
-    Observable v_observable(p_model, p_portName, p_group, p_index);
+    Observable observable(model, portName);
     m_size++;
-    m_observableList.push_back(v_observable);
+    m_observableList.push_back(observable);
 }
 
 const std::vector < Observable >& Observer::getObservableList() const
@@ -81,11 +79,6 @@ void Observer::finish()
 const std::string & Observer::getFirstPortName() const
 {
     return m_observableList.front().portName;
-}
-
-const std::string & Observer::getFirstGroup() const
-{
-    return m_observableList.front().group;
 }
 
 void Observer::removeObservable(Simulator* model)

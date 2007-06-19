@@ -92,24 +92,6 @@ void NetStream::writeHead(
     std::vector < devs::Observable >::const_iterator it;
     it = observableList.begin();
 
-    while (it != observableList.end()) {
-	std::string groupName = it->group;
-        if (not groupName.empty()) {
-            std::vector < std::string >::const_iterator it2;
-            it2 = m_groupList.begin();
-	    bool found = false;
-
-            while (not found and it2 != m_groupList.end()) {
-		found = *it2 == groupName;
-		++it2;
-	    }
-	    if (not found) {
-                m_groupList.push_back(groupName);
-            }
-	}
-	++it;
-    }
-
     m_root = m_document.create_root_node("TRAME");
     m_root->set_attribute("TYPE", "parameters");
     if (utils::xml::has_children(m_parameterRoot)) {
@@ -165,35 +147,6 @@ void NetStream::writeValues(const devs::Time& time,
         while (it2 != m_groupList.end()) {
 	    std::vector < devs::Observable >::const_iterator it =
 		obslst.begin();
-	    int index = -2;
-
-            vle::devs::StreamModelPort index2;
-            while (it != obslst.end()) {
-                if (it->group == *it2) {
-		    index2.first = it->model;
-		    index2.second = it->portName;
-
-		    if (index != it->index) {
-			if (index != -2) {
-			    msg += "/>";
-			}
-			msg += "<";
-			msg += *it2;
-			index = it->index;
-		    }
-		    msg += "  ";
-		    msg += it->portName;
-		    msg += "=\"";
-
-		    vle::devs::StreamModelPortValue::const_iterator jt;
-		    jt = valuelst.find(index2);
-		    if (jt != valuelst.end()) {
-			msg += (*jt).second->toString();
-			msg += "\" ";
-		    }
-		}
-		++it;
-	    }
 	    msg += "/>";
 	    ++it2;
 	}

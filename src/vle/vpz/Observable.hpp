@@ -112,6 +112,8 @@ namespace vle { namespace vpz {
                                                       ObservablePort >
     {
     public:
+        typedef std::list < std::string > PortnameList;
+
         Observable(const std::string& name);
         
         virtual ~Observable()
@@ -161,6 +163,10 @@ namespace vle { namespace vpz {
          */
         inline bool exist(const std::string& portname) const
         { return find(portname) != end(); }
+
+        bool has_view(const std::string& name) const;
+
+        PortnameList get_portname(const std::string& view) const;
 
         //
         ///

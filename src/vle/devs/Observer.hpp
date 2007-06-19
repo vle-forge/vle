@@ -45,17 +45,17 @@ namespace vle { namespace devs {
     public:
 	Simulator* model;
 	std::string portName;
-	std::string group;
-	int index;
 
-        Observable(Simulator* p_model,
-		   const std::string& p_portName,
-		   const std::string& p_group,
-		   size_t p_index) :
-            model(p_model),
-            portName(p_portName),
-            group(p_group),
-            index(p_index) { }
+        Observable(Simulator* model,
+		   const std::string& portName) :
+            model(model),
+            portName(portName)
+        { }
+
+    private:
+        Observable() :
+            model(0)
+        { }
     };
 
     //////////////////////////////////////////////////////////////////////////
@@ -72,9 +72,7 @@ namespace vle { namespace devs {
         virtual ~Observer();
 
         void addObservable(Simulator* p_model,
-			   const std::string& p_portName,
-			   const std::string& p_group,
-			   size_t p_index);
+			   const std::string& p_portName);
 
         void finish();
 
@@ -89,8 +87,6 @@ namespace vle { namespace devs {
 	}
 
         const std::string& getFirstPortName() const;
-
-        const std::string& getFirstGroup() const;
 
 	inline const std::string& getName() const {
 	    return m_name;

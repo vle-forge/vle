@@ -54,7 +54,7 @@ namespace vle { namespace devs {
         ModelFactory(Coordinator& coordinator,
                      const vpz::Dynamics& dyn,
                      const vpz::Classes& cls,
-                     const vpz::Conditions& conds,
+                     const vpz::Experiment& experiment,
                      const vpz::AtomicModelList& atom);
 
         /** 
@@ -102,16 +102,23 @@ namespace vle { namespace devs {
         /** 
          * @brief Return the reference to the list of initiale conditions for
          * each models.
-         * @return A constant reference to the vpz::Condition.
+         * @return A constant reference to the vpz::Conditions.
          */
         const vpz::Conditions& conditions() const
-        { return mConditions; }
+        { return mExperiment.conditions(); }
+
+        /** 
+         * @brief Return the reference to the list of views.
+         * @return A constant reference to the vpz::Views.
+         */
+        const vpz::Views& views() const
+        { return mExperiment.views(); }
 
     private:
 	Coordinator&            mCoordinator;
         vpz::Dynamics           mDynamics;
         vpz::Classes            mClasses;
-        vpz::Conditions         mConditions;
+        vpz::Experiment         mExperiment;
         vpz::AtomicModelList    mAtomics;
 
 

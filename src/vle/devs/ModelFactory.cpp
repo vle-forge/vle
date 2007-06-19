@@ -39,12 +39,12 @@ namespace vle { namespace devs {
 ModelFactory::ModelFactory(Coordinator& coordinator,
                            const vpz::Dynamics& dyn,
                            const vpz::Classes& cls,
-                           const vpz::Conditions& conds,
+                           const vpz::Experiment& exp,
                            const vpz::AtomicModelList& atoms) :
     mCoordinator(coordinator),
     mDynamics(dyn),
     mClasses(cls),
-    mConditions(conds),
+    mExperiment(exp),
     mAtomics(atoms)
 {
 }
