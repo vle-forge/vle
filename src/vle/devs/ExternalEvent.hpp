@@ -48,12 +48,12 @@ namespace vle { namespace devs {
             m_target(0)
         { }
 
-	ExternalEvent(const std::string& sourcePortName,
-		      Simulator* source) :
-	    Event(source),
+        ExternalEvent(const std::string& sourcePortName,
+                      Simulator* source) :
+            Event(source),
             m_portName(sourcePortName),
             m_target(0)
-	{ }
+        { }
 
 	ExternalEvent(ExternalEvent* event,
 		      Simulator* target,

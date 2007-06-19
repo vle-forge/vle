@@ -110,6 +110,8 @@ devs::SimulatorList ModelFactory::createModelsFromDynamics(
     devs::SimulatorList newsatom;
     graph::AtomicModelVector::const_iterator it;
     for (it = lst.begin(); it != lst.end(); ++it) {
+        AssertI(*it);
+        AssertI((*it)->isAtomic());
         Simulator* a = new Simulator((graph::AtomicModel*)(*it));
         const vpz::AtomicModel& atom(mAtomics.get(*it));
         const vpz::Dynamic& d(dyn.get(atom.dynamics()));

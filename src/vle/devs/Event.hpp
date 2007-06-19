@@ -49,8 +49,6 @@ namespace vle { namespace devs {
          */
         enum EventType { INTERNAL, EXTERNAL };
         
-        Event();
-
         /**
 	 * Generate a new Event with and model source name.
 	 *
@@ -272,6 +270,8 @@ namespace vle { namespace devs {
         { return m_attributes; }
 
     private:
+        Event();
+
         Simulator*      m_source;
         bool            m_valid;
         value::Map      m_attributes;

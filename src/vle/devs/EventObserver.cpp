@@ -57,7 +57,7 @@ StateEvent* EventObserver::processStateEvent(StateEvent* event)
 {
     value::Value val = event->getAttributeValue(event->getPortName());
 
-    if (val) {
+    if (val.get()) {
 	if (m_lastTime < event->getTime()) {
 	    m_stream->writeValues(event->getTime(),
 				  m_valueList, getObservableList());

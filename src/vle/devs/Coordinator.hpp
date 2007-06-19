@@ -206,9 +206,11 @@ namespace vle { namespace devs {
          *
          * @param eventList the external event list to treat.
          * @param bags output parameter to add Instantaneous events.
+         * @param sim the simulator that dispatch external events.
          */
         void dispatchExternalEvent(ExternalEventList& eventList,
-                                   CompleteEventBagModel& bags);
+                                   CompleteEventBagModel& bags,
+                                   Simulator* sim);
 
 	void dispatchInternalEvent(InternalEvent * event);
 
@@ -236,9 +238,6 @@ namespace vle { namespace devs {
          */
         void delCoupledModel(graph::CoupledModel* parent,
                              graph::CoupledModel* mdl);
-
-        std::vector < graph::TargetPort* > getTargetPortList(
-                graph::Port* port);
 
         std::vector < graph::TargetPort* > getTargetPortList(
                 graph::AtomicModel* model, const std::string& portName);
@@ -291,7 +290,7 @@ namespace vle { namespace devs {
         void applyInits(SimulatorList& lst,
                         const std::string& xmlInits);
 
-        void processEventObserver(Simulator* model, Event* event);
+        void processEventObserver(Simulator& model, Event* event = 0);
 
         /**
          * Set a new date to the Coordinator.

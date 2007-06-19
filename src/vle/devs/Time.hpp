@@ -28,6 +28,7 @@
 #define DEVS_TIME_HPP
 
 #include <limits>
+#include <ostream>
 
 namespace vle { namespace devs {
 
@@ -151,6 +152,11 @@ namespace vle { namespace devs {
 	}
 
 	static const Time infinity;
+
+        inline friend std::ostream& operator<<(std::ostream& out, const Time& t)
+        {
+            return out << t.m_value;
+        }
 
     private:
 	double m_value;

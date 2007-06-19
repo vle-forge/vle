@@ -31,16 +31,19 @@
 #include <vle/devs/Dynamics.hpp>
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/graph/CoupledModel.hpp>
-
+#include <vle/utils/Debug.hpp>
+#include <vle/utils/Trace.hpp>
 
 
 namespace vle { namespace devs {
 
-Simulator::Simulator(graph::AtomicModel* a) :
+Simulator::Simulator(graph::AtomicModel* atomic) :
     m_lastTime(0),
     m_dynamics(0),
-    m_atomicModel(a)
+    m_atomicModel(atomic)
 {
+    Assert(utils::InternalError, atomic,
+           (boost::format("Simulator if not connected to an atomic model.")));
 }
 
 Simulator::~Simulator()
@@ -151,12 +154,17 @@ void Simulator::processInstantaneousEvent(
 StateEvent* Simulator::processStateEvent(const StateEvent& event) const
 {
     value::Value val = m_dynamics->processStateEvent(event);
-    StateEvent* nevent = new StateEvent(event);
 
-    if (val) {
+    if (val.get()) {
+        StateEvent* nevent = new StateEvent(event);
         nevent->putAttribute(event.getPortName(), val);
+        return nevent;
+    } else {
+        TRACE((boost::format(
+                    "Simulator %1% return an empty value on port %2%") %
+                m_dynamics->getModel().getName() % event.getPortName()).str());
     }
-    return nevent;
+    return 0;
 }
 
 }} // namespace vle devs

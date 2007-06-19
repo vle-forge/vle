@@ -51,7 +51,7 @@ TimedObserver::processStateEvent(StateEvent* event)
 {
     value::Value value = event->getAttributeValue(event->getPortName());
 
-    if (value) {
+    if (value.get()) {
         m_valueList[StreamModelPort(
             event->getModel(), event->getPortName())] = value;
         m_counter++;

@@ -266,7 +266,8 @@ void Coordinator::init()
 }
 
 void Coordinator::dispatchExternalEvent(ExternalEventList& eventList,
-                                        CompleteEventBagModel& bags)
+                                        CompleteEventBagModel& bags,
+                                        Simulator* sim)
 {
     const size_t sz = eventList.size();
     size_t i = 0;
@@ -275,7 +276,7 @@ void Coordinator::dispatchExternalEvent(ExternalEventList& eventList,
         ExternalEvent* event = eventList.at(i);
 
         vector < graph::TargetPort* > v_targetPortList =
-            getTargetPortList(event->getModel()->getStructure(),
+            getTargetPortList(sim->getStructure(),
                               event->getPortName());
 
         vector < graph::TargetPort* >::iterator it2 =
@@ -345,16 +346,6 @@ Observer* Coordinator::getObserver(const std::string& p_name) const
         m_observerList.find(p_name);
 
     return (it == m_observerList.end())?NULL:it->second;
-}
-
-vector < graph::TargetPort* > Coordinator::getTargetPortList(
-    graph::Port* /* port */)
-{
-    //if (m_model != NULL) { FIXME pas d'influence ?
-    //return m_model->getStructure()->getTargetPortList(port);
-    //} else {
-    return vector < graph::TargetPort* > ();
-    //}
 }
 
 vector < graph::TargetPort* > Coordinator::getTargetPortList(
@@ -625,36 +616,32 @@ void Coordinator::parseExperiment()
     startLocalStream();
 }
 
-void Coordinator::processEventObserver(Simulator* p_model, Event* p_event)
+void Coordinator::processEventObserver(Simulator& model, Event* event)
 {
-    Assert(utils::InternalError, p_model and p_event, "processEventObserver");
-    // S'il existe des eventObservers pour le modele
-    if (m_eventObserverList.find(p_model->getName()) !=
+    if (m_eventObserverList.find(model.getName()) !=
         m_eventObserverList.end()) {
         vector < EventObserver* > v_list =
-            m_eventObserverList[p_model->getName()];
+            m_eventObserverList[model.getName()];
         vector < EventObserver* >::iterator it =
             v_list.begin();
 
         while (it != v_list.end()) {
-            std::vector < Observable > const &
-                v_list2 = (*it)->getObservableList();
+            const std::vector < Observable >& v_list2(
+                (*it)->getObservableList());
             std::vector < Observable >::const_iterator it2 = v_list2.begin();
 
             while (it2 != v_list2.end()) {
                 StateEvent* event3 = 0;
-                if (p_event->isInternal()) {
-                    event3 = new
-                        StateEvent(((InternalEvent*)p_event)->getTime(),
-                                   p_model, (*it)->getName(),
-                                   (*it2).portName);
-                } else {
-                    event3 = new StateEvent(m_currentTime,
-                                            p_model,
+                if (event == 0 or not event->isInternal()) {
+                    event3 = new StateEvent(m_currentTime, &model,
                                             (*it)->getName(),
                                             (*it2).portName);
+                } else if (event and event->isInternal()) {
+                    event3 = new StateEvent(((InternalEvent*)event)->getTime(),
+                                            &model, (*it)->getName(),
+                                            (*it2).portName);
                 }
-                StateEvent* v_event = p_model->processStateEvent(*event3);
+                StateEvent* v_event = model.processStateEvent(*event3);
 
                 delete event3;
                 (*it)->processStateEvent(v_event);
@@ -676,7 +663,7 @@ void Coordinator::processInternalEvent(
     {
         ExternalEventList result;
         sim->getOutputFunction(m_currentTime, result);
-        dispatchExternalEvent(result, bag);
+        dispatchExternalEvent(result, bag, sim);
     }
 
     {
@@ -686,7 +673,7 @@ void Coordinator::processInternalEvent(
         }
     }
 
-    processEventObserver(sim, ev);
+    processEventObserver(*sim, ev);
     delete ev;
 }
 
@@ -695,8 +682,8 @@ void Coordinator::processExternalEvents(
     EventBagModel& modelbag,
     CompleteEventBagModel& /* bag */)
 {
-    ExternalEventList& lst(modelbag.externals());
-    modelbag.delInternal();
+    ExternalEventList lst(modelbag.externals());
+    modelbag.delExternals();
 
     {
         InternalEvent* internal(sim->processExternalEvents(lst, m_currentTime));
@@ -705,8 +692,7 @@ void Coordinator::processExternalEvents(
         }
     }
 
-    //processEventObserver(simulator, ev); FIXME
-    //delete ev;
+    processEventObserver(*sim, 0);
 }
 
 void Coordinator::processInstantaneousEvents(
@@ -721,7 +707,7 @@ void Coordinator::processInstantaneousEvents(
     for (InstantaneousEventList::iterator it = lst.begin(); it != lst.end();
          ++it) {
         sim->processInstantaneousEvent(**it, m_currentTime, result);
-        dispatchExternalEvent(result, bag);
+        dispatchExternalEvent(result, bag, sim);
         result.clear();
     }
 }
@@ -732,14 +718,15 @@ void Coordinator::processStateEvents(CompleteEventBagModel& bag)
         Simulator* model(bag.topStateEvent()->getModel());
         StateEvent* event(model->processStateEvent(*bag.topStateEvent()));
 
-        Observer* observer(getObserver(event->getObserverName()));
-        StateEvent* event2(observer->processStateEvent(event));
-        delete event;
+        if (event) {
+            Observer* observer(getObserver(event->getObserverName()));
+            StateEvent* event2(observer->processStateEvent(event));
+            delete event;
 
-        if (event2) {
-            m_eventTable.putStateEvent(event2);
+            if (event2) {
+                m_eventTable.putStateEvent(event2);
+            }
         }
-
         delete bag.topStateEvent();
         bag.popState();
     }
