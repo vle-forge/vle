@@ -78,7 +78,7 @@ void Condition::addValueToPort(const std::string& portname,
     iterator it = find(portname);
 
     if (it == end()) {
-        value::Set newset;
+        value::Set newset = value::SetFactory::create();
         newset->addValue(value);
 
         insert(std::make_pair < std::string, value::Set >(
