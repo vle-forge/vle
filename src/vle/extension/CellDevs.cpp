@@ -472,13 +472,13 @@ void CellDevs::processInitEvents(const InitEventList& event)
       setDelay(value::to_double(value)->doubleValue());
     if (name == "Neighbourhood") {
       value::Set set = value::to_set(value);
-      value::SetFactory::VectorValueConstIt it = set->begin();
+      value::SetFactory::VectorValueConstIt it2 = set->begin();
 
-      while (it != set->end()) {
-	std::string neighbour = vle::value::to_string(*it)->stringValue();
+      while (it2 != set->end()) {
+	std::string neighbour = vle::value::to_string(*it2)->stringValue();
 
  	m_neighbourPortList.push_back(neighbour);
-	++it;
+	++it2;
       }
     }
     else 
