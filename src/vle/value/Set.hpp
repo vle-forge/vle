@@ -91,7 +91,7 @@ namespace vle { namespace value {
          * @return the last iterator.
          */
         inline VectorValueIt end()
-        { return m_value.begin(); }
+        { return m_value.end(); }
 
         /** 
          * @brief Get the last constant iterator from Vector.
