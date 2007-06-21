@@ -90,11 +90,14 @@ bool AtomicModel::parseXML(xmlpp::Element* modelNode, CoupledModel *)
 
 void AtomicModel::writeXML(std::ostream& out) const
 {
-    out << "<model>"
+    out << "<model"
         << " name=\"" << getName() << "\""
-        << " type=\"atomic\"";
+        << " type=\"atomic\""
+        << ">\n";
 
     writePortListXML(out);
+
+    out << "</model>\n";
 }
 
 }} // namespace vle graph

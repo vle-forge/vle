@@ -49,13 +49,13 @@ void View::write(std::ostream& out) const
     }
 
     if (m_data.empty()) {
-        out << " />";
+        out << " />\n";
     } else {
         out << ">"
             << "<![CDATA[\n"
             << m_data
             << "]]>\n"
-            << "</view>";
+            << "</view>\n";
     }
 }
 

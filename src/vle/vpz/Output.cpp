@@ -82,9 +82,9 @@ void Output::write(std::ostream& out) const
     }
 
     if (not m_data.empty()) {
-        out << ">" << m_data << "</output>";
+        out << ">" << m_data << "</output>\n";
     } else {
-
+        out << "/>\n";
     }
 }
 

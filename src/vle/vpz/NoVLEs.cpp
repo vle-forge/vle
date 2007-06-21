@@ -34,13 +34,13 @@ using namespace vle::utils;
 
 void NoVLEs::write(std::ostream& out) const
 {
-    out << "<translators>";
-
-    for (const_iterator it = begin(); it != end(); ++it) {
-        out << it->second;
+    if (not empty()) {
+        out << "<translators>\n";
+        for (const_iterator it = begin(); it != end(); ++it) {
+            out << it->second;
+        }
+        out << "</translators>\n";
     }
-
-    out << "</translators>";
 }
 
 NoVLE& NoVLEs::add(const NoVLE& novle)

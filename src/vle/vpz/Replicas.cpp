@@ -41,7 +41,7 @@ void Replicas::write(std::ostream& out) const
     out << "<replicas"
         << " seed=\"" << m_seed << "\""
         << " number=\"" << m_number << "\""
-        << " />";
+        << " />\n";
 }
 
 void Replicas::buildList()

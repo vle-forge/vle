@@ -656,39 +656,39 @@ bool Model::parseXMLtime(xmlpp::Element*, xmlpp::Element*)
 void Model::writePortListXML(std::ostream& out) const
 {
     if (not m_initPortList.empty()) {
-        out << "<init>";
+    out << "<init>\n";
 	MapStringPort::const_iterator it = m_initPortList.begin();
         for (;it != m_initPortList.end(); ++it) {
-            out << "<port name=\"" << (*it).first << "\" />";
+            out << " <port name=\"" << (*it).first << "\" />\n";
         }
-        out << "</init>";
+        out << "</init>\n";
     }
 
     if (not m_inPortList.empty()) {
-        out << "<in>";
+        out << "<in>\n";
         MapStringPort::const_iterator it = m_inPortList.begin();
         for (;it != m_inPortList.end(); ++it) {
-            out << "<port name=\"" << (*it).first << "\" />";
+            out << "<port name=\"" << (*it).first << "\" />\n";
         }
-        out << "</in>";
+        out << "</in>\n";
     }
 
     if (not m_outPortList.empty()) {
-        out << "<out>";
+        out << "<out>\n";
 	MapStringPort::const_iterator it = m_outPortList.begin();
         for(; it != m_outPortList.end(); ++it) {
-            out << "<port name=\"" << (*it).first << "\" />";
+            out << "<port name=\"" << (*it).first << "\" />\n";
 	}
-        out << "</out>";
+        out << "</out>\n";
     }
 
     if (not m_statePortList.empty()) {
-        out << "<state>";
+        out << "<state>\n";
 	MapStringPort::const_iterator it = m_statePortList.begin();
         for (; it != m_statePortList.end(); ++it) {
-            out << "<port name=\"" << (*it).first << "\" />";
+            out << "<port name=\"" << (*it).first << "\" />\n";
 	}
-        out << "</state>";
+        out << "</state>\n";
     }
 }
 

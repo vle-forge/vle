@@ -36,14 +36,13 @@ void Project::write(std::ostream& out) const
     out << "<vle_project"
         << " version=\"" << m_version << "\""
         << " date=\"" << m_date << "\""
-        << " author=\"" << m_author << "\""
-        << ">"
+        << " author=\"" << m_author << "\" >\n"
         << m_model
         << m_dynamics
         << m_experiment
         << m_classes
         << m_novles
-        << "</vle_project>";
+        << "</vle_project>\n";
 }
 
 void Project::clear()

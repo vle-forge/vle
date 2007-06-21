@@ -39,6 +39,10 @@ void Views::write(std::ostream& out) const
         m_outputs.write(out);
     }
 
+    if (not m_observables.empty()) {
+        m_observables.write(out);
+    }
+
     if (not empty()) {
         for (const_iterator it = begin(); it != end(); ++it) {
             it->second.write(out);

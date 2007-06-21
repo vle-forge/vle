@@ -1227,9 +1227,9 @@ bool CoupledModel::parseXML(xmlpp::Element* p_modelNode,
 
 void CoupledModel::writeXML(std::ostream& out) const
 {
-    out << "<model name=\"" << getName() << "\" " << " type=\"coupled\" >";
+    out << "<model name=\"" << getName() << "\" " << " type=\"coupled\" >\n";
     writePortListXML(out);
-    out << "<submodels>";
+    out << "<submodels>\n";
 
     const size_t szModel = m_modelList.size();
     const size_t szInConnection = m_inputConnectionList.size();
@@ -1240,20 +1240,20 @@ void CoupledModel::writeXML(std::ostream& out) const
         m_modelList[i]->writeXML(out);
     }
 
-    out << "<connections>";
+    out << "<connections>\n";
     for (size_t i = 0; i < szInConnection; ++i) {
-        out << "<connection type=\"input\">"
+        out << "<connection type=\"input\">\n"
             << " <origin model=\""
             << m_inputConnectionList[i]->getOriginModel()->getName()
             << "\" port=\""
             << m_inputConnectionList[i]->getOriginPort()->getName()
-            << "\" />"
+            << "\" />\n"
             << " <destination model=\""
             << m_inputConnectionList[i]->getDestinationModel()->getName()
             << "\" port=\""
             << m_inputConnectionList[i]->getDestinationPort()->getName()
-            << "\" />"
-            << "</connection>";
+            << "\" />\n"
+            << "</connection>\n";
     }
 
     for (size_t i = 0; i < szOutConnection; ++i) {
@@ -1262,13 +1262,13 @@ void CoupledModel::writeXML(std::ostream& out) const
             << m_outputConnectionList[i]->getOriginModel()->getName()
             << "\" port=\""
             << m_outputConnectionList[i]->getOriginPort()->getName()
-            << "\" />"
+            << "\" />\n"
             << " <destination model=\""
             << m_outputConnectionList[i]->getDestinationModel()->getName()
             << "\" port=\""
             << m_outputConnectionList[i]->getDestinationPort()->getName()
-            << "\" />"
-            << "</connection>";
+            << "\" />\n"
+            << "</connection>\n";
     }
 
     for (size_t i = 0; i < szInternalConnection; ++i) {
@@ -1277,15 +1277,15 @@ void CoupledModel::writeXML(std::ostream& out) const
             << m_internalConnectionList[i]->getOriginModel()->getName()
             << "\" port=\""
             << m_internalConnectionList[i]->getOriginPort()->getName()
-            << "\" />"
+            << "\" />\n"
             << " <destination model=\""
             << m_internalConnectionList[i]->getDestinationModel()->getName()
             << "\" port=\""
             << m_internalConnectionList[i]->getDestinationPort()->getName()
-            << "\" />"
-            << "</connection>";
+            << "\" />\n"
+            << "</connection>\n";
     }
-    out << "</connections>";
+    out << "</connections>\n";
 }
 
 Model* CoupledModel::find(const std::string& name) const

@@ -52,10 +52,10 @@ namespace vle { namespace stream {
 
 	virtual void close();
         
-        virtual void writeData();
-        
         virtual void writeHead(
                 const std::vector < devs::Observable >& variableNameList);
+
+        virtual void writeData();
         
         virtual void writeTail();
 
@@ -65,11 +65,10 @@ namespace vle { namespace stream {
 	virtual void writeValues(const devs::Time& time,
 				 const devs::StreamModelPortValue& valuelst,
                                  const devs::Stream::ObservableVector& obslst);
+
     private:
 	std::string     m_fileName;
 	std::ofstream   m_stream;
-	std::fstream    m_tmpStream;
-	unsigned int    size;
   };
 
 }} // namespace vle stream

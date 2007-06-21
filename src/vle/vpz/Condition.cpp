@@ -45,17 +45,17 @@ Condition::Condition(const std::string& name) :
 
 void Condition::write(std::ostream& out) const
 {
-    out << "<condition name=\"" << m_name << "\" >";
+    out << "<condition name=\"" << m_name << "\" >\n";
 
     for (const_iterator it = begin(); it != end(); ++it) {
         out << " <port "
             << "name=\"" << it->first << "\" "
-            << ">"
+            << ">\n"
             << it->second->toXML()
-            << "</port>";
+            << "</port>\n";
     }
 
-    out << "</condition>";
+    out << "</condition>\n";
 }
 
 void Condition::add(const std::string& portname)

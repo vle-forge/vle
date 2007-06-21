@@ -46,8 +46,11 @@ Vpz::Vpz(const Vpz& vpz) :
 {
 }
 
-void Vpz::write(std::ostream& /* out */) const
+void Vpz::write(std::ostream& out) const
 {
+    out << "<?xml version=\"1.0\" ?>\n";
+    m_project.write(out);
+    out << std::endl;
 }
 
 void Vpz::parse_file(const std::string& filename)

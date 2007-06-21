@@ -39,13 +39,13 @@ Conditions::Conditions() :
 void Conditions::write(std::ostream& out) const
 {
     if (not empty()) {
-        out << "<experimental_conditions>";
+        out << "<experimental_conditions>\n";
 
         for (const_iterator it = begin(); it != end(); ++it) {
             out << it->second;
         }
 
-        out << "</experimental_conditions>";
+        out << "</experimental_conditions>\n";
     }
 }
 

@@ -74,9 +74,9 @@ AtomicModel& AtomicModelList::get(graph::Model* atom)
 
 void Model::write(std::ostream& out) const
 {
-    out << "<structures><model>";
+    out << "<structures>\n";
     m_graph->writeXML(out);
-    out << "</model></structures>";
+    out << "</structures>\n";
 }
 
 void Model::initFromModel(xmlpp::Element* elt)

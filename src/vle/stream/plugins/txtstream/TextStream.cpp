@@ -42,17 +42,6 @@ void TextStream::init(const std::string& /* outputPlugin */,
 
     Assert(utils::FileError, m_stream.is_open(),
            boost::format("Cannot open file '%1%'\n") % m_fileName);
-
-    m_tmpStream.open(
-        Glib::build_filename(Glib::get_tmp_dir(), outputType + ".dat").c_str(),
-        std::fstream::in | std::fstream::out |
-        std::fstream::trunc);
-
-    Assert(utils::FileError, m_tmpStream.is_open(),
-           boost::format("Cannot open file '%1%'\n") %
-            Glib::build_filename(Glib::get_tmp_dir(), m_fileName));
-
-    size = 0;
 }
 
 void TextStream::close()
@@ -62,20 +51,9 @@ void TextStream::close()
 
 void TextStream::writeData()
 {
-    m_tmpStream.seekp(0, std::ios_base::beg);
-    char* buf = new char[4096];
-    buf[4095] = '\0';
-
-    while (not m_tmpStream.eof()) {
-	m_tmpStream.getline(buf, 4095);
-	m_stream << buf;
-	m_stream << std::endl;
-    }
-    delete[] buf;
-    m_tmpStream.close();
 }
 
-void TextStream::writeHead(std::vector < devs::Observable > const &)
+void TextStream::writeHead(const std::vector < devs::Observable >& /* obs */)
 {
 }
 
@@ -83,11 +61,9 @@ void TextStream::writeTail()
 {
 }
 
-void TextStream::writeValue(const devs::Time& time,
-                            value::Value value)
+void TextStream::writeValue(const devs::Time& time, value::Value value)
 {
-    size++;
-    m_tmpStream << time.getValue() << "\t" << value->toString() << std::endl;
+    m_stream << time << "\t" << value->toString() << "\n";
 }
 
 void TextStream::writeValues(const devs::Time& time,
@@ -95,23 +71,20 @@ void TextStream::writeValues(const devs::Time& time,
                              const devs::Stream::ObservableVector& obslst)
 {
     std::vector < devs::Observable >::const_iterator it = obslst.begin();
-
-    size++;
-    m_tmpStream << time.getValue();
+    m_stream << time.getValue();
 
     while (it != obslst.end()) {
 	devs::StreamModelPortValue::const_iterator val;
-        val = valuelst.find(devs::StreamModelPort(
-                (*it).model, (*it).portName));
+        val = valuelst.find(devs::StreamModelPort(it->model, it->portName));
 
 	if (val != valuelst.end()) {
-	    m_tmpStream << "\t";
-	    m_tmpStream << (*val).second->toFile();
+	    m_stream << "\t";
+	    m_stream << val->second->toFile();
 	}
 	++it;
     }
 
-    m_tmpStream << std::endl;
+    m_stream << std::endl;
 }
 
 }} // namespace vle stream
