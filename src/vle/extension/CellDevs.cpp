@@ -470,20 +470,21 @@ void CellDevs::processInitEvents(const InitEventList& event)
 
     if (name == "Delay")
       setDelay(value::to_double(value)->doubleValue());
-    if (name == "Neighbourhood") {
-      value::Set set = value::to_set(value);
-      value::SetFactory::VectorValueConstIt it2 = set->begin();
-
-      while (it2 != set->end()) {
-	std::string neighbour = vle::value::to_string(*it2)->stringValue();
-
- 	m_neighbourPortList.push_back(neighbour);
-	++it2;
+    else
+      if (name == "Neighbourhood") {
+	value::Set set = value::to_set(value);
+	value::SetFactory::VectorValueConstIt it2 = set->begin();
+	
+	while (it2 != set->end()) {
+	  std::string neighbour = vle::value::to_string(*it2)->stringValue();
+	  
+	  m_neighbourPortList.push_back(neighbour);
+	  ++it2;
+	}
       }
-    }
-    else 
-      if (m_state.find(name) != m_state.end()) initState(name,value);
-      else processParameters(name, value);
+      else 
+	if (m_state.find(name) != m_state.end()) initState(name,value);
+	else processParameters(name, value);
     ++it;
   }
 }
