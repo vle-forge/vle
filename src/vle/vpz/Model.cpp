@@ -27,6 +27,9 @@
 #include <vle/utils/XML.hpp>
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/graph/AtomicModel.hpp>
+#include <vle/graph/NoVLEModel.hpp>
+#include <vle/graph/Port.hpp>
+#include <stack>
 
 namespace vle { namespace vpz {
 
@@ -39,7 +42,8 @@ void AtomicModelList::add(const AtomicModelList& atoms)
     }
 }
 
-AtomicModel& AtomicModelList::add(graph::Model* mdl, const AtomicModel& atom)
+AtomicModel& AtomicModelList::add(graph::Model* mdl,
+                                  const AtomicModel& atom)
 {
     const_iterator it = find(mdl);
     Assert(utils::InternalError, it == end(),
@@ -52,7 +56,7 @@ AtomicModel& AtomicModelList::add(graph::Model* mdl, const AtomicModel& atom)
 
 const AtomicModel& AtomicModelList::get(graph::Model* atom) const
 {
-    AtomicModelList::const_iterator it = find(atom);
+    const_iterator it = find(atom);
     if (it == end()) {
         Throw(utils::InternalError, boost::format(
                 "The atomic model %s have not dynamics?") %
@@ -72,10 +76,32 @@ AtomicModel& AtomicModelList::get(graph::Model* atom)
     return it->second;
 }
 
+const AtomicModel& AtomicModelList::get(const graph::Model* atom) const
+{
+    const_iterator it = find(const_cast < graph::Model* >(atom));
+    if (it == end()) {
+        Throw(utils::InternalError, boost::format(
+                "The atomic model %s have not dynamics?") %
+            atom->getName());
+    }
+    return it->second;
+}
+
+AtomicModel& AtomicModelList::get(const graph::Model* atom)
+{
+    iterator it = find(const_cast < graph::Model* >(atom));
+    if (it == end()) {
+        Throw(utils::InternalError, boost::format(
+                "The atomic model %s have not dynamics?") %
+                    atom->getName());
+    }
+    return it->second;
+}
+
 void Model::write(std::ostream& out) const
 {
     out << "<structures>\n";
-    m_graph->writeXML(out);
+    write_model(out);
     out << "</structures>\n";
 }
 
@@ -96,23 +122,6 @@ void Model::clear()
     m_graph = 0;
 }
 
-//void Model::addModel(const std::string& modelname, const Model& m)
-//{
-//graph::Model* mdl = m_graph->findModel(modelname);
-//Assert(utils::InternalError, mdl,
-//boost::format("Model '%1%' not found\n") % modelname);
-//Assert(utils::InternalError, mdl->isNoVLE(),
-//boost::format("Model '%1%' is not a NoVLE model\n") % modelname);
-//
-//graph::CoupledModel* parent = mdl->getParent();
-//if (parent == 0) {
-//delete mdl;
-//m_graph = m.model();
-//} else {
-//parent->replace(mdl, m.model());
-//}
-//}
-
 void Model::set_model(graph::Model* mdl)
 {
     m_graph = mdl;
@@ -126,6 +135,172 @@ graph::Model* Model::model()
 graph::Model* Model::model() const
 {
     return m_graph;
+}
+
+//
+///
+//// Write graph information to stream.
+///
+//
+
+void Model::write_model(std::ostream& out) const
+{
+    if (m_graph) {
+        if (m_graph->isAtomic()) {
+            write_atomic(out,
+                         static_cast < const graph::AtomicModel* >(m_graph));
+        } else if (m_graph->isCoupled()) {
+            write_coupled(out,
+                          static_cast < const graph::CoupledModel* >
+                          (m_graph));
+        } else {
+            write_novle(out,
+                        static_cast < const graph::NoVLEModel* > (m_graph));
+        }
+    }
+}
+
+void Model::write_coupled(std::ostream& out, const graph::CoupledModel* mdl) const
+{
+    std::stack < const graph::CoupledModel* > stack;
+    stack.push(mdl);
+
+    while (not stack.empty()) {
+        const graph::CoupledModel* top(stack.top());
+        stack.pop();
+        bool coupledadded = false;
+
+        out << "<model name=\"" << top->getName() << "\" "
+            << "type=\"coupled\" >\n";
+        write_port(out, top);
+
+        out << " <submodels>\n";
+        const graph::VectorModel& childs(top->getModelList());
+        for (graph::VectorModel::const_iterator it = childs.begin(); 
+             it != childs.end(); ++it) {
+            if ((*it)->isCoupled()) {
+                stack.push(static_cast < graph::CoupledModel* >(*it));
+                coupledadded = true;
+            } else if ((*it)->isAtomic()) {
+                write_atomic(out, static_cast < graph::AtomicModel* >(*it));
+            } else if ((*it)->isNoVLE()) {
+                write_novle(out, static_cast < graph::NoVLEModel* >(*it));
+            }
+        }
+
+        if (not coupledadded) {
+            out << " </submodels>\n";
+            write_connection(out, top);
+            out << "</model>\n";
+        }
+    }
+}
+
+void Model::write_atomic(std::ostream& out, const graph::AtomicModel* mdl) const
+{
+    const AtomicModel& vpzatom(atomicModels().get(mdl));
+
+    out << "<model name=\"" << mdl->getName() << "\" "
+        << "type=\"atomic\" "
+        << "conditions=\"" << vpzatom.conditions() << "\" "
+        << "dynamics=\"" << vpzatom.dynamics() << "\" "
+        << "observables=\"" << vpzatom.observables() << "\" >\n";
+
+    write_port(out, mdl);
+
+    out << "</model>\n";
+}
+
+void Model::write_novle(std::ostream& out, const graph::NoVLEModel* mdl) const
+{
+    const AtomicModel& vpzatom(atomicModels().get(mdl));
+
+    out << "<model name=\"" << mdl->getName() << "\" "
+        << "type=\"novle\" "
+        << "translator=\"" << vpzatom.translator() << "\" >\n";
+
+    write_port(out, mdl);
+
+    out << "</model>\n";
+}
+
+void Model::write_port(std::ostream& out, const graph::Model* mdl) const
+{
+    const graph::MapStringPort& ins(mdl->getInputPortList());
+    if (not ins.empty()) {
+        out << "<in>\n";
+        for (graph::MapStringPort::const_iterator it = ins.begin(); 
+             it != ins.end(); ++it) {
+            out << " <port name=\"" << it->first << "\" />\n";
+        }
+        out << "</in>\n";
+    }
+    
+    const graph::MapStringPort& outs(mdl->getOutputPortList());
+    if (not outs.empty()) {
+        out << "<out>\n";
+        for (graph::MapStringPort::const_iterator it = outs.begin(); 
+             it != outs.end(); ++it) {
+            out << " <port name=\"" << it->first << "\" />\n";
+        }
+        out << "</out>\n";
+    }
+
+}
+
+void Model::write_connection(std::ostream& out, const graph::CoupledModel* mdl) const
+{
+    out << "<connections>\n";
+    graph::VectorConnection::const_iterator it;
+
+    const graph::VectorConnection& ins(mdl->getInputConnectionList());
+    for (it = ins.begin(); it != ins.end(); ++it) {
+        out << "<connection type=\"input\">\n"
+            << " <origin model=\""
+            << (*it)->getOriginModel()->getName()
+            << "\" port=\""
+            << (*it)->getOriginPort()->getName()
+            << "\" />\n"
+            << " <destination model=\""
+            << (*it)->getDestinationModel()->getName()
+            << "\" port=\""
+            << (*it)->getDestinationPort()->getName()
+            << "\" />\n"
+            << "</connection>\n";
+    }
+
+    const graph::VectorConnection& outs(mdl->getOutputConnectionList());
+    for (it = outs.begin(); it != outs.end(); ++it) {
+        out << "<connection type=\"output\">\n"
+            << " <origin model=\""
+            << (*it)->getOriginModel()->getName()
+            << "\" port=\""
+            << (*it)->getOriginPort()->getName()
+            << "\" />\n"
+            << " <destination model=\""
+            << (*it)->getDestinationModel()->getName()
+            << "\" port=\""
+            << (*it)->getDestinationPort()->getName()
+            << "\" />\n"
+            << "</connection>\n";
+    }
+
+    const graph::VectorConnection& intern(mdl->getInternalConnectionList());
+    for (it = intern.begin(); it != intern.end(); ++it) {
+        out << "<connection type=\"internal\">\n"
+            << " <origin model=\""
+            << (*it)->getOriginModel()->getName()
+            << "\" port=\""
+            << (*it)->getOriginPort()->getName()
+            << "\" />\n"
+            << " <destination model=\""
+            << (*it)->getDestinationModel()->getName()
+            << "\" port=\""
+            << (*it)->getDestinationPort()->getName()
+            << "\" />\n"
+            << "</connection>\n";
+    }
+    out << "</connections>\n";
 }
 
 }} // namespace vle vpz

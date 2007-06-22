@@ -97,12 +97,13 @@ Observable::Observable(const std::string& name) :
 void Observable::write(std::ostream& out) const
 {
     if (not empty()) {
-        out << "<observable name=\"" << m_name << "\" >";
+        out << "<observable name=\"" << m_name << "\" >\n";
         for (const_iterator it = begin(); it != end(); ++it) {
             it->second.write(out);
         }
+        out << "</observable>\n";
     } else {
-        out << "<observable name=\"" << m_name << "\" />";
+        out << "<observable name=\"" << m_name << "\" />\n";
     }
 }
 

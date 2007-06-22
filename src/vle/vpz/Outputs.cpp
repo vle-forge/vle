@@ -34,7 +34,7 @@ using namespace vle::utils;
 void Outputs::write(std::ostream& out) const
 {
     if (not empty()) {
-        out << "<ouputs>\n";
+        out << "<outputs>\n";
 
         for (const_iterator it = begin(); it != end(); ++it) {
             it->second.write(out);

@@ -117,6 +117,22 @@ namespace vle { namespace vpz {
          * @return A constant reference to the vpz::Model.
          */
         AtomicModel& get(graph::Model* atom);
+
+        /** 
+         * @brief Get an vpz::Model by his structural reference.
+         * @param atom the reference to the structure.
+         * @throw utils::InternalError if atom have no dynamics.
+         * @return A constant reference to the vpz::Model.
+         */
+        const AtomicModel& get(const graph::Model* atom) const;
+
+        /** 
+         * @brief Get an vpz::Model by his structural reference.
+         * @param atom the reference to the structure.
+         * @throw utils::InternalError if atom have no dynamics.
+         * @return A constant reference to the vpz::Model.
+         */
+        AtomicModel& get(const graph::Model* atom);
         
         friend std::ostream& operator<<(std::ostream& out,
                                         const AtomicModelList& a)
@@ -224,6 +240,17 @@ namespace vle { namespace vpz {
         { return m_atomicmodels; }
 
     private:
+        void write_model(std::ostream& out) const;
+        void write_atomic(std::ostream& out,
+                          const graph::AtomicModel* mdl) const;
+        void write_coupled(std::ostream& out,
+                           const graph::CoupledModel* mdl) const;
+        void write_novle(std::ostream& out,
+                         const graph::NoVLEModel* mdl) const;
+        void write_port(std::ostream& out, const graph::Model* mdl) const;
+        void write_connection(std::ostream& out,
+                              const graph::CoupledModel* mdl) const;
+
         AtomicModelList     m_atomicmodels;
         graph::Model*       m_graph;
     };

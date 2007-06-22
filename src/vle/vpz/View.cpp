@@ -44,14 +44,14 @@ void View::write(std::ostream& out) const
 
     case View::TIMED:
         out << "type=\"timed\" "
-            << "time_step=\"" << m_timestep << "\"";
+            << "timestep=\"" << m_timestep << "\"";
         break;
     }
 
     if (m_data.empty()) {
         out << " />\n";
     } else {
-        out << ">"
+        out << ">\n"
             << "<![CDATA[\n"
             << m_data
             << "]]>\n"
