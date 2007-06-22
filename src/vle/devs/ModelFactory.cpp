@@ -166,7 +166,7 @@ void ModelFactory::attachDynamics(devs::Simulator* atom,
             "Error in '%1%', function 'makeNewDynamics' not found '%2%'\n") %
         module->get_name() % Glib::Module::get_last_error());
 
-    call = ((Dynamics*(*)(Simulator*))(makeNewDynamics))(atom);
+    call = ((Dynamics*(*)(const graph::Model&))(makeNewDynamics))(*atom->getStructure());
     Assert(utils::ParseError, call, boost::format(
             "Error in '%1%', function 'makeNewDynamics':"
             "problem allocation a new Dynamics '%2%'\n") %
