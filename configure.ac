@@ -281,6 +281,7 @@ AC_CONFIG_FILES([Makefile
 		 src/vle/stream/plugins/sdmlstream/Makefile
 		 src/vle/extension/Makefile
 		 src/vle/manager/Makefile
+		 src/vle/translator/Makefile
 		 src/scripts/Makefile
 		 src/scripts/python/Makefile
 		 src/scripts/python/vlepython.pc
