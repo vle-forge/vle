@@ -61,7 +61,6 @@ namespace vle { namespace devs {
 
 Coordinator::Coordinator(const vpz::Vpz& vpz, vpz::Model& mdls) :
     m_experiment(vpz.project().experiment()),
-    m_duration(0.0),
     m_currentTime(0)
 {
     m_modelFactory = new ModelFactory(*this,
@@ -334,9 +333,6 @@ Simulator* Coordinator::getModel(const std::string& name) const
 
 const Time& Coordinator::getNextTime()
 {
-    if (m_duration < m_currentTime.getValue())
-        return Time::infinity;
-
     return m_eventTable.topEvent();
 }
 
@@ -610,7 +606,6 @@ Coordinator::attachModelToObserver(
 
 void Coordinator::parseExperiment()
 {
-    m_duration = m_experiment.duration();
     startEOVStream();
     startNetStream();
     startLocalStream();

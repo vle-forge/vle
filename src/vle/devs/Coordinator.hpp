@@ -146,9 +146,6 @@ namespace vle { namespace devs {
 	// genere par le coordinateur
 	// long m_index;
 
-	// Duree de la simulation
-	double m_duration;
-
 	// Date courante
 	Time m_currentTime;
 

@@ -51,43 +51,41 @@ namespace vle { namespace devs {
 
         /** 
          * @brief initialiase a new Coordinator with the specified vpz::Vpz
-         * reference.
-         * 
+         * reference and intitialise the simulation time.
          * @param vp a reference to a structure.
          */
         void load(vpz::Vpz& vp);
 
         /** 
-         * @brief Initialise Coordinator.
-         * 
-         * @return true if all is ok.
+         * @brief Initialise RootCoordinator and his Coordinator: initiale time
+         * is define, coordinator init function is call.
          */
-	bool init();
+	void init();
 
         /** 
-         * @brief Run a events bags.
-         * 
-         * @return false when simulation is finished.
+         * @brief Call the coordinator run function and test if current time is
+         * the end of the simulation.
+         * @return false when simulation is finished, true otherwise.
          */
 	bool run();
 
+        /** 
+         * @brief Call the coordinator finish function and delete the
+         * coordinator and all attached data.
+         */
 	void finish();
 
+        /** 
+         * @brief Return the current time of the simulation.
+         * @return A constant reference to the current time.
+         */
         inline const Time& getCurrentTime()
         { return m_currentTime; }
 
-	std::vector < TargetPort* >
-	getTargetPortList(const std::string& portName,
-			  const std::string& modelName);
-
-        
-        void addCoordinator(Coordinator* Coordinator);
-
     private:
-	devs::Time                      m_currentTime;
-	std::vector < Coordinator* >    m_coordinatorList;
-
-	void dispatchExternalEvent(ExternalEvent* event);
+	devs::Time      m_currentTime;
+        devs::Time      m_duration;
+	Coordinator*    m_coordinator;
     };
 
 }} // namespace vle devs

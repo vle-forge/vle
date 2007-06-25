@@ -36,98 +36,49 @@
 namespace vle { namespace devs {
 
 RootCoordinator::RootCoordinator() :
-    m_currentTime(0)
+    m_currentTime(0),
+    m_coordinator(0)
 {
 }
 
 RootCoordinator::~RootCoordinator()
 {
-    std::vector < Coordinator* >::iterator it = m_coordinatorList.begin();
-    while (it != m_coordinatorList.end())
-	delete *it++;
+    delete m_coordinator;
 }
 
 void RootCoordinator::load(vpz::Vpz& io)
 {
-    Coordinator* coor = new Coordinator(io, io.project().model());
-    m_coordinatorList.push_back(coor);
+    if (m_coordinator) {
+        delete m_coordinator;
+    }
+
+    m_duration = io.project().experiment().duration();
+    m_coordinator = new Coordinator(io, io.project().model());
 }
 
-bool RootCoordinator::init()
+void RootCoordinator::init()
 {
     m_currentTime = devs::Time(0);
-
-    for (std::vector < Coordinator* >::iterator its = m_coordinatorList.begin();
-         its != m_coordinatorList.end(); ++its) {
-        (*its)->init();
-    }
-    return true;
+    m_coordinator->init();
 }
 
 bool RootCoordinator::run()
 {
-    Time min(Time::infinity);
-    int index = -1;
-
-    std::vector < Coordinator* >::iterator it = m_coordinatorList.begin();
-    int i = 0;
-
-    while (it != m_coordinatorList.end()) {
-        const Time& time = (*it++)->getNextTime();
-
-        if (time >= 0) {
-            if (min > time) {
-		min = time;
-		index = i;
-	    }
-	}
-	++i;
+    const Time& time(m_coordinator->getNextTime());
+    if (time == Time::infinity) {
+        return false;
+    } else if (time > m_duration) {
+        return false;
     }
-    if (index != -1) {
-	ExternalEventList *eventList;
-	const Time& time = m_coordinatorList[index]->getNextTime();
-
-	m_currentTime = time;
-	eventList = m_coordinatorList[index]->run();
-	if (eventList) {
-	    while (not eventList->empty()) {
-		ExternalEvent* ev = eventList->front();
-		dispatchExternalEvent(ev);
-		eventList->erase(0);
-	    }
-	    delete eventList;
-	}
-	return true;
-    }
-    return false;
+    m_coordinator->run();
+    return true;
 }
 
 void RootCoordinator::finish()
 {
-    std::vector < Coordinator* >::iterator its = m_coordinatorList.begin();
-
-    while (its != m_coordinatorList.end()) {
-	(*its)->finish();
-	delete *its;
-	++its;
-    }
-    m_coordinatorList.clear();
-}
-
-std::vector < TargetPort* > RootCoordinator::getTargetPortList(
-                    const std::string&,
-                    const std::string&)
-{
-    return std::vector < TargetPort* > ();
-}
-
-void RootCoordinator::addCoordinator(Coordinator* Coordinator)
-{
-    m_coordinatorList.push_back(Coordinator);
-}
-
-void RootCoordinator::dispatchExternalEvent(ExternalEvent *)
-{
+    m_coordinator->finish();
+    delete m_coordinator;
+    m_coordinator = 0;
 }
 
 }} // namespace vle devs
