@@ -173,13 +173,13 @@ void MatrixTranslator::translateStructures()
 				       "cell", "", ""));
 	  
 	  if (i != 1) atomicModel->addInputPort("N");
-	  if (j != 1) atomicModel->addInputPort("O");
+	  if (j != 1) atomicModel->addInputPort("W");
 	  if (i != m_size[0]) atomicModel->addInputPort("S");
 	  if (j != m_size[1]) atomicModel->addInputPort("E");
 	  if (m_connectivity == VON_NEUMANN) {
-	    if (i != 1 and j != 1) atomicModel->addInputPort("NO");
+	    if (i != 1 and j != 1) atomicModel->addInputPort("NW");
 	    if (i != 1 and j != m_size[1]) atomicModel->addInputPort("NE");
-	    if (i != m_size[0] and j != 1) atomicModel->addInputPort("SO");
+	    if (i != m_size[0] and j != 1) atomicModel->addInputPort("SW");
 	    if (i != m_size[0] and j != m_size[1]) atomicModel->addInputPort("SE");
 	  }
 	  
@@ -204,18 +204,18 @@ void MatrixTranslator::translateStructures()
 	  if (i != 1) 
 	    root->addInternalConnection(getName(i,j),"out",getName(i-1,j),"S");
 	  if (j != m_size[1])
-	    root->addInternalConnection(getName(i,j),"out",getName(i,j+1),"O");
+	    root->addInternalConnection(getName(i,j),"out",getName(i,j+1),"W");
 	  if (i != m_size[0])
 	    root->addInternalConnection(getName(i,j),"out",getName(i+1,j),"N");
 	  if (m_connectivity == VON_NEUMANN) {
 	    if (j != 1 and i != 1) 
 	      root->addInternalConnection(getName(i,j),"out",getName(i-1,j-1),"SE");		
 	    if (j != m_size[1] and i != 1) 
-	      root->addInternalConnection(getName(i,j),"out",getName(i-1,j+1),"SO");		
+	      root->addInternalConnection(getName(i,j),"out",getName(i-1,j+1),"SW");		
 	    if (j != 1 and i != m_size[0]) 
 	      root->addInternalConnection(getName(i,j),"out",getName(i+1,j-1),"NE");		
 	    if (j != m_size[1] and i != m_size[0]) 
-	      root->addInternalConnection(getName(i,j),"out",getName(i+1,j+1),"NO");		
+	      root->addInternalConnection(getName(i,j),"out",getName(i+1,j+1),"NW");		
 	  }
 	}
       }
@@ -259,14 +259,14 @@ void MatrixTranslator::translateConditions()
 	  if (i != m_size[0]) 
 	    neighbourhood->addValue(vle::value::StringFactory::create("S"));
 	  if (j != 1) 
-	    neighbourhood->addValue(vle::value::StringFactory::create("O"));
+	    neighbourhood->addValue(vle::value::StringFactory::create("W"));
 	  if (m_connectivity == VON_NEUMANN) {
 	    if (i != 1 and j != 1) 
-	      neighbourhood->addValue(vle::value::StringFactory::create("NO"));
+	      neighbourhood->addValue(vle::value::StringFactory::create("NW"));
 	    if (i != 1 and j != m_size[1]) 
 	      neighbourhood->addValue(vle::value::StringFactory::create("NE"));
 	    if (i != m_size[0] and j != 1) 
-	      neighbourhood->addValue(vle::value::StringFactory::create("SO"));
+	      neighbourhood->addValue(vle::value::StringFactory::create("SW"));
 	    if (i != m_size[0] and j != m_size[1]) 
 	      neighbourhood->addValue(vle::value::StringFactory::create("SE"));
 	  }
