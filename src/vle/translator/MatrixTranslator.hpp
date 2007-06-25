@@ -41,6 +41,8 @@ namespace vle { namespace translator {
     virtual void translate(const std::string& buffer);
     
   protected:
+    bool existModel(unsigned int i, unsigned int j = 0);
+    std::string getDynamics(unsigned int i, unsigned int j = 0);
     std::string getName(unsigned int i, unsigned int j = 0) const;
 
     virtual void parseXML(const std::string& buffer);
@@ -57,9 +59,11 @@ namespace vle { namespace translator {
     unsigned int m_dimension;
     std::map < unsigned int, unsigned int > m_size;
     connectivity_type m_connectivity;
+    bool m_multipleLibrary;
     std::string m_library;
+    std::map < unsigned int , std::string > m_libraries;
     std::string m_prefix;
-    std::string m_init;
+    unsigned int* m_init;
     std::map < std::string , vle::vpz::AtomicModel* > m_models;
   };
   
