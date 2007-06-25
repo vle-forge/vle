@@ -61,6 +61,9 @@ namespace vle { namespace vpz {
         inline const std::string& translator() const
         { return m_translator; }
 
+        inline void setObservables(const std::string& str)
+        { m_observables = str; }
+
         friend std::ostream& operator<<(std::ostream& out, const AtomicModel& a)
         {
             return out << "  conditions  : " << a.m_conditions << "\n"

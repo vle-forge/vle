@@ -1,10 +1,10 @@
 /**
  * @file   MatrixTranslator.hpp
  * @author The VLE Development Team.
- * @date   jeudi 15 avril 2004
+ * @date   vendredi 22 juin 2007
  *
  * @brief	 Virtual Laboratory Environment - VLE Project
- * Copyright (C) 2004 LIL Laboratoire d'Informatique du Littoral
+ * Copyright (C) 2004-2007 LIL Laboratoire d'Informatique du Littoral
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,6 +26,7 @@
 #define TRANSLATOR_MATRIXTRANSLATOR_HPP
 
 #include <vle/vpz/Translator.hpp>
+#include <vle/utils/XML.hpp>
 #include <string>
 #include <vector>
 
@@ -40,11 +41,26 @@ namespace vle { namespace translator {
     virtual void translate(const std::string& buffer);
     
   protected:
+    std::string getName(unsigned int i, unsigned int j = 0) const;
+
+    virtual void parseXML(const std::string& buffer);
     virtual void translateStructures();
     virtual void translateDynamics();
     virtual void translateTranslators() { }
     virtual void translateConditions();
     virtual void translateViews() { }
+
+    typedef enum { VON_NEUMANN, MOORE, LINEAR } connectivity_type;
+
+    xmlpp::DomParser m_parser;
+    xmlpp::Element* m_root;
+    unsigned int m_dimension;
+    std::map < unsigned int, unsigned int > m_size;
+    connectivity_type m_connectivity;
+    std::string m_library;
+    std::string m_prefix;
+    std::string m_init;
+    std::map < std::string , vle::vpz::AtomicModel* > m_models;
   };
   
 }}
