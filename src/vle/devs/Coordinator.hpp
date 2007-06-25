@@ -46,7 +46,6 @@ namespace vle { namespace devs {
     typedef std::vector < Simulator* > SimulatorList;
     typedef std::map < graph::AtomicModel*, devs::Simulator* > SimulatorMap;
 
-
     /**
      * @brief Represent the DEVS Coordinator class. This class provide a non
      * hierarchical DEVS Coordinator ie. all models are in the same coupled
@@ -99,8 +98,6 @@ namespace vle { namespace devs {
 
 	inline Time getCurrentTime()const { return m_currentTime; }
 
-      //inline long getIndex() const { return m_index; }
-
 	/**
 	 * Return the Simulator with a specified AtomicModel.
 	 *
@@ -140,13 +137,6 @@ namespace vle { namespace devs {
 
     private:
         vpz::Experiment         m_experiment;
-
-
-	// Index du simulateur dans la table des simulateurs
-	// genere par le coordinateur
-	// long m_index;
-
-	// Date courante
 	Time m_currentTime;
 
 	// Liste des modeles atomiques geres par le simulateur
@@ -239,9 +229,6 @@ namespace vle { namespace devs {
         std::vector < graph::TargetPort* > getTargetPortList(
                 graph::AtomicModel* model, const std::string& portName);
 
-	value::Value* parseSimpleValue(xmlpp::Element* node);
-
-
         void startEOVStream();
 
         /* - * - * - * - * - * - * - * - * - * - * - * - * - * - * - * - * - */
@@ -307,7 +294,6 @@ namespace vle { namespace devs {
          * @throw Exception::File if problem loading file.
          */
         vle::devs::Stream* getStreamPlugin(const vpz::Output& o);
-
     };
 
 }} // namespace vle devs
