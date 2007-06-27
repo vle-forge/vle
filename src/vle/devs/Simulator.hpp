@@ -71,7 +71,14 @@ namespace vle { namespace devs {
 
         Time getTimeAdvance();
 
-	InternalEvent* init();
+        /** 
+         * @brief Call the init function of the Dynamics plugin and add the time
+         * parameter to the value returned by the init() function of Dynamics
+         * plugin.
+         * @param time the time to add to Dynamics plugin init() function.
+         * @return a new InternalEvent.
+         */
+	InternalEvent* init(const Time& time);
 
         Event::EventType processConflict(
             const InternalEvent& internal,

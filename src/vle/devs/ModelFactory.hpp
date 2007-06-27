@@ -91,6 +91,20 @@ namespace vle { namespace devs {
                                    SimulatorList& lst,
                                    SimulatorMap& result);
 
+
+        /** 
+         * @brief Build a Simulator based on graph::AtomicModel and is
+         * vpz::AtomicModel information.
+         * 
+         * @param model the model to attach a new dynamics. Be carefull, don't
+         * delete this object. It will be use by the Kernel.
+         * @param SimulatorMap Coordinator simulator information to update.
+         * 
+         * @return A new Simulator builded.
+         */
+        Simulator* createModel(graph::AtomicModel* model,
+                               SimulatorMap& result);
+
         /** 
          * @brief Return the list of atomics models information ie. the 4-uples
          * of graph::Model*, dynamics, conditions, observables and translators.
@@ -114,6 +128,21 @@ namespace vle { namespace devs {
         const vpz::Views& views() const
         { return mExperiment.views(); }
 
+
+        /** 
+         * @brief Add to the list of atomics models informations a new 4-uples
+         * of graph::Model*, dynamics, conditions, observables and translators.
+         * @param mdl the model to add.
+         * @param dyn the dynamics of the model to add.
+         * @param cond the conditions of the model to add.
+         * @param view the views of the model to add.
+         */
+        const vpz::AtomicModel& update_atomicmodellist(
+                                        graph::AtomicModel* mdl,
+                                        const vpz::Dynamic& dyn,
+                                        const vpz::Condition& cond,
+                                        const vpz::Observable& obs);
+
     private:
 	Coordinator&            mCoordinator;
         vpz::Dynamics           mDynamics;
@@ -136,8 +165,7 @@ namespace vle { namespace devs {
          */
         devs::SimulatorList createModelsFromDynamics(
             const graph::AtomicModelVector& lst,
-            SimulatorMap& result,
-            const vpz::Dynamics& dyn);
+            SimulatorMap& result);
 
 
         /** 

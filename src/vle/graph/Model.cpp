@@ -66,6 +66,9 @@ Model::Model(const std::string& name, CoupledModel* parent) :
     m_width(0),
     m_height(0)
 {
+    if (parent) {
+        parent->addModel(this);
+    }
 }
 
 Model::Model(const Model& mdl) :
