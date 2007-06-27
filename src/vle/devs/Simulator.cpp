@@ -112,9 +112,9 @@ Time Simulator::getTimeAdvance()
     return m_dynamics->getTimeAdvance();
 }
 
-InternalEvent* Simulator::init()
+InternalEvent* Simulator::init(const Time& time)
 {
-    return new InternalEvent(m_dynamics->init(), this);
+    return new InternalEvent(m_dynamics->init() + time, this);
 }
 
 Event::EventType Simulator::processConflict(

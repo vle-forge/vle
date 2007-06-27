@@ -125,30 +125,55 @@ void Coordinator::addObserver(Observer* p_observer)
             push_back((EventObserver*)p_observer);
 }
 
-graph::Model* Coordinator::createModels(graph::CoupledModel* parent,
-                                        const std::string& className,
-                                        const std::string& xmlDynamics,
-                                        const std::string& xmlInit)
+SimulatorList Coordinator::createModelFromClass(graph::CoupledModel* parent,
+                                                const std::string& classname)
 {
     SimulatorList lst;
 
-    graph::Model* top = m_modelFactory->createModels(
-        className, lst, m_modelList);
+    graph::Model* top(m_modelFactory->createModels(classname, lst,
+                                                   m_modelList));
     parent->addModel(top);
     top->setParent(parent);
+    
+    const vpz::AtomicModelList& atoms(m_modelFactory->atomics());
+    const vpz::Conditions& cnds(m_modelFactory->conditions());
+    for (SimulatorList::iterator it = lst.begin(); it != lst.end(); ++it) {
+        const vpz::AtomicModel& mdl(atoms.get((*it)->getStructure()));
 
-    if (not xmlDynamics.empty())
-        applyDynamics(lst, xmlDynamics);
+        if (not mdl.conditions().empty()) {
+            const vpz::Condition& cnd(cnds.get(mdl.conditions()));
+            (*it)->processInitEvents(cnd.firstValues());
+        }
+    }
+
 
     for (SimulatorList::iterator it = lst.begin(); it != lst.end(); ++it) {
-        dispatchInternalEvent((*it)->init());
+        dispatchInternalEvent((*it)->init(m_currentTime));
     }
 
-    if (not xmlInit.empty()) {
-        applyInits(lst, xmlInit);
+    return lst;
+}
+    
+Simulator* Coordinator::createModel(graph::AtomicModel* model,
+                                    const vpz::Dynamic& dyn,
+                                    const vpz::Condition& cond,
+                                    const vpz::Observable& obs)
+{
+    m_modelFactory->update_atomicmodellist(model, dyn, cond, obs);
+    Simulator* sim(m_modelFactory->createModel(model, m_modelList));
+
+    const vpz::AtomicModelList& atoms(m_modelFactory->atomics());
+    const vpz::Conditions& cnds(m_modelFactory->conditions());
+
+    const vpz::AtomicModel& mdl(atoms.get(sim->getStructure()));
+    if (not mdl.conditions().empty()) {
+        const vpz::Condition& cnd(cnds.get(mdl.conditions()));
+        sim->processInitEvents(cnd.firstValues());
     }
 
-    return top;
+    dispatchInternalEvent(sim->init(m_currentTime));
+
+    return sim;
 }
 
 void Coordinator::delAtomicModel(graph::CoupledModel* parent,
@@ -246,7 +271,7 @@ void Coordinator::init()
 
     for (SimulatorMap::iterator satom = m_modelList.begin();
          satom != m_modelList.end(); ++satom) {
-        dispatchInternalEvent((*satom).second->init());
+        dispatchInternalEvent((*satom).second->init(m_currentTime));
     }
 
     std::map < std::string , devs::Observer* >::iterator it3 =
@@ -677,8 +702,7 @@ void Coordinator::processExternalEvents(
     EventBagModel& modelbag,
     CompleteEventBagModel& /* bag */)
 {
-    ExternalEventList lst(modelbag.externals());
-    modelbag.delExternals();
+    ExternalEventList& lst(modelbag.externals());
 
     {
         InternalEvent* internal(sim->processExternalEvents(lst, m_currentTime));
@@ -686,7 +710,8 @@ void Coordinator::processExternalEvents(
             m_eventTable.putInternalEvent(internal);
         }
     }
-
+    
+    modelbag.delExternals();
     processEventObserver(*sim, 0);
 }
 
@@ -696,7 +721,6 @@ void Coordinator::processInstantaneousEvents(
     CompleteEventBagModel& bag)
 {
     InstantaneousEventList& lst(modelbag.instantaneous());
-    modelbag.delInstantaneous();
 
     ExternalEventList result;
     for (InstantaneousEventList::iterator it = lst.begin(); it != lst.end();
@@ -705,6 +729,8 @@ void Coordinator::processInstantaneousEvents(
         dispatchExternalEvent(result, bag, sim);
         result.clear();
     }
+    
+    modelbag.delInstantaneous();
 }
 
 void Coordinator::processStateEvents(CompleteEventBagModel& bag)
@@ -726,33 +752,6 @@ void Coordinator::processStateEvents(CompleteEventBagModel& bag)
         bag.popState();
     }
 }
-
-/*
-   Event* Coordinator::processConflict(EventBagModel& bag, Simulator& mdl)
-   {
-   if (not bag.emptyInternal()) {
-   if (not bag.emptyExternal()) {
-   switch (mdl.processConflict(*bag.internal(), bag.externals())) {
-   case Event::INTERNAL:
-   return popInternal(bag);
-   case Event::EXTERNAL:
-   return popExternal(bag, mdl);
-   }
-   } else {
-   return popInternal(bag);
-   }
-   } else {
-   if (not bag.emptyExternal()) {
-   return popExternal(bag, mdl);
-   } else {
-   Assert(utils::InternalError, not bag.emptyInstantaneous(),
-   boost::format("No internal, external or instantaneous "
-   "event for model '%1%'\n") % mdl.getName());
-   return popInstantaneous(bag);
-   }
-   }
-   return 0;
-   }*/
 
 ExternalEventList* Coordinator::run()
 {
@@ -789,7 +788,7 @@ ExternalEventList* Coordinator::run()
                 }
             }
         }
-        if (mdl == nextEvent.topBagModel()) // FIXME encore utile ?
+        if (mdl == nextEvent.topBagModel())
             nextEvent.popBag();
     }
 

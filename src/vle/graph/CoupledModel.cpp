@@ -227,12 +227,11 @@ void CoupledModel::addOutputConnection(const std::string& src,
 {
     AssertI(dst == getName());
     Model* msrc = getModel(src);
+    AssertI(msrc);
     Model* mdst = this;
+    AssertI(mdst);
     Port* psrc = msrc->getOutPort(portSrc);
     Port* pdst = mdst->getOutPort(portDst);
-
-    AssertI(msrc);
-    AssertI(mdst);
     AssertI(psrc);
     AssertI(pdst);
 
@@ -247,11 +246,11 @@ void CoupledModel::addInternalConnection(const std::string& src,
 {
     Model* msrc = getModel(src);
     Model* mdst = getModel(dst);
-    Port* psrc = msrc->getOutPort(portSrc);
-    Port* pdst = mdst->getInPort(portDst);
-
     AssertI(msrc);
     AssertI(mdst);
+
+    Port* psrc = msrc->getOutPort(portSrc);
+    Port* pdst = mdst->getInPort(portDst);
     AssertI(psrc);
     AssertI(pdst);
     

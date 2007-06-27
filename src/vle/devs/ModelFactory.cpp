@@ -25,6 +25,7 @@
 #include <vle/devs/ModelFactory.hpp>
 #include <vle/devs/Simulator.hpp>
 #include <vle/devs/Dynamics.hpp>
+#include <vle/devs/Executive.hpp>
 #include <vle/graph/Model.hpp>
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/graph/CoupledModel.hpp>
@@ -53,7 +54,7 @@ devs::SimulatorList ModelFactory::createModels(
     const graph::AtomicModelVector& lst,
     SimulatorMap& result)
 {
-    return createModelsFromDynamics(lst, result, mDynamics);
+    return createModelsFromDynamics(lst, result);
 }
 
 graph::Model* ModelFactory::createModels(const std::string& classname,
@@ -66,8 +67,41 @@ graph::Model* ModelFactory::createModels(const std::string& classname,
     graph::AtomicModelVector vt;
     graph::CoupledModel::getAtomicModelList(clone, vt);
 
-    lst = createModelsFromDynamics(vt, result, cl.dynamics());
+    lst = createModelsFromDynamics(vt, result);
     return clone;
+}
+
+Simulator* ModelFactory::createModel(graph::AtomicModel* model,
+                                     SimulatorMap& result)
+{
+    graph::AtomicModelVector vt;
+    vt.push_back(model);
+    devs::SimulatorList lst(createModelsFromDynamics(vt, result));
+
+    Assert(utils::InternalError, not lst.empty(), (boost::format(
+                "Model factory: the simulator of %1% was not builded.") %
+            model->getName()));
+
+    return lst.front();
+}
+
+const vpz::AtomicModel& ModelFactory::update_atomicmodellist(
+                        graph::AtomicModel* mdl,
+                        const vpz::Dynamic& dyn,
+                        const vpz::Condition& cond,
+                        const vpz::Observable& obs)
+{
+    try {
+        mDynamics.add(dyn);
+        mExperiment.conditions().add(cond);
+        mExperiment.views().observables().add(obs);
+        vpz::AtomicModel nmdl(cond.name(), dyn.name(), obs.name(), "");
+        return mAtomics.add(mdl, nmdl);
+    } catch(const std::exception& e) {
+        Throw(utils::InternalError, (boost::format(
+                    "Cannot add the atomic model %1% information to the model "
+                    "factory.") % mdl->getName()));
+    }
 }
 
 Glib::Module* ModelFactory::buildPlugin(const vpz::Dynamic& dyn)
@@ -104,8 +138,7 @@ Glib::Module* ModelFactory::buildPlugin(const vpz::Dynamic& dyn)
 
 devs::SimulatorList ModelFactory::createModelsFromDynamics(
     const graph::AtomicModelVector& lst,
-    SimulatorMap& result,
-    const vpz::Dynamics& dyn)
+    SimulatorMap& result)
 {
     devs::SimulatorList newsatom;
     graph::AtomicModelVector::const_iterator it;
@@ -114,7 +147,7 @@ devs::SimulatorList ModelFactory::createModelsFromDynamics(
         AssertI((*it)->isAtomic());
         Simulator* a = new Simulator((graph::AtomicModel*)(*it));
         const vpz::AtomicModel& atom(mAtomics.get(*it));
-        const vpz::Dynamic& d(dyn.get(atom.dynamics()));
+        const vpz::Dynamic& d(mDynamics.get(atom.dynamics()));
 
         switch(d.type()) {
         case vpz::Dynamic::LOCAL:
@@ -171,6 +204,10 @@ void ModelFactory::attachDynamics(devs::Simulator* atom,
             "Error in '%1%', function 'makeNewDynamics':"
             "problem allocation a new Dynamics '%2%'\n") %
         module->get_name() % Glib::Module::get_last_error());
+
+    if (call->is_executive()) {
+        (dynamic_cast < Executive* >(call))->set_coordinator(&mCoordinator);
+    }
     
     atom->addDynamics(call);
     delete module;

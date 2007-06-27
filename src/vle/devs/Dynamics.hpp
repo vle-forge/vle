@@ -79,6 +79,17 @@ namespace vle { namespace devs {
         virtual ~Dynamics()
         { }
 
+        /** 
+         * @brief If this function return true, then a cast to an Executive
+         * object is produce and the set_coordinator function is call. Executive
+         * permit to manipulate graph::CoupledModel and devs::Coordinator at
+         * runtime of the simulation.
+         * 
+         * @return false if Dynamics is not an Executive.
+         */
+        inline virtual bool is_executive() const
+        { return false; }
+
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 	/**

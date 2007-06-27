@@ -28,415 +28,418 @@
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/graph/Model.hpp>
 #include <vle/graph/Port.hpp>
-#include <vle/devs/Simulator.hpp>
+#include <vle/devs/Coordinator.hpp>
 #include <vle/devs/StateEvent.hpp>
 #include <vle/value/Map.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/value/String.hpp>
 #include <vle/utils/Exception.hpp>
 
-using namespace vle::devs;
-using namespace vle::extension;
-using namespace vle::graph;
-using namespace vle::value;
+namespace vle { namespace extension {
 
-DSDevs::DSDevs(const vle::graph::AtomicModel& model) :
-  devs::Dynamics(model),
-  m_state(IDLE),
-  m_response(false),
-  m_coupledModel(0)
+
+
+DSDevs::DSDevs(const graph::AtomicModel& model) :
+    devs::Executive(model),
+    m_state(IDLE),
+    m_response(false),
+    m_coupledModel(0)
 {
-  Assert(utils::InternalError, model.getParent(),
-	 "The DSDEVS is not in an coupled model.");
-  
-  m_coupledModel = model.getParent();
-}
-    
-Time DSDevs::init()
-{
-  m_state = IDLE;
-  return Time::infinity;
+    Assert(utils::InternalError, model.getParent(),
+           "The DSDEVS is not in an coupled model.");
+
+    m_coupledModel = model.getParent();
 }
 
-void DSDevs::getOutputFunction(const Time& /* time */,
-			       ExternalEventList& output) 
+devs::Time DSDevs::init()
 {
-  ExternalEvent* ev;
-
-  if (m_state != DSDevs::IDLE) {
-    AssertI(m_nameList.size() == m_response.size());
-
-    while (not m_nameList.empty()) {
-      ev = new ExternalEvent("ok");
-      ev << attribute("name", m_nameList.front());
-      ev << attribute("ok", m_response.front());
-      output.addEvent(ev);
-      
-      m_nameList.pop_front();
-      m_response.pop_front();
-    }
-    
-    if (not m_newName.empty()) {
-      Set eeset = SetFactory::create();
-      for (std::list < std::string >::const_iterator it =
-	     m_newName.begin(); it != m_newName.end(); ++it) {
-	eeset->addValue(StringFactory::create(*it));
-      }
-      ev = new ExternalEvent("name");
-      ev << attribute("name", eeset);
-      output.addEvent(ev);
-      m_newName.clear();
-    }
-  }
-}
-
-Time DSDevs::getTimeAdvance()
-{
-  return (m_state != IDLE) ? 0 : Time::infinity;
-}
-
-Event::EventType DSDevs::processConflict(const InternalEvent& /* internal */,
-					 const ExternalEventList& /* extEventlist */) const
-{
-  return Event::EXTERNAL;
-}
-
-void DSDevs::processExternalEvents(const ExternalEventList& event,
-				   const Time& /* time */)
-{
-  ExternalEventList::const_iterator it = event.begin();
-
-  while (it != event.end()) {
-    m_nameList.push_back((*it)->getSourceModelName());
-    const std::string& portname((*it)->getPortName());
-
-    m_response.push_back(processSwitch(portname, (*it)->getAttributes()->getMapValue(portname)));
-    ++it;
-  }
-}
-
-void DSDevs::processInternalEvent(const InternalEvent& /* event */)
-{
-  if (m_state != IDLE)
     m_state = IDLE;
+    return devs::Time::infinity;
 }
 
-Value DSDevs::processStateEvent(const StateEvent& /* event */) const
+void DSDevs::getOutputFunction(const devs::Time& /* time */,
+                               devs::ExternalEventList& output) 
 {
-  xmlpp::Document doc;
-    //FIXME
-    //xmlpp::Element* root = doc.create_root_node("STATE");
-    //if (evt->getPortName() == "coupled") {
-    //m_coupledModel->writeXML(root);
-    //} else if (evt->getPortName() == "hierarchy") {
-    //m_coupledModel->writeXML(root);
-    //} else if (evt->getPortName() == "complete") {
-    //m_coupledModel->writeXML(root);
-    //}
+    devs::ExternalEvent* ev = 0;
 
-  return buildString(doc.write_to_string_formatted());
+    if (m_state != DSDevs::IDLE) {
+        AssertI(m_nameList.size() == m_response.size());
+
+        while (not m_nameList.empty()) {
+            ev = new devs::ExternalEvent("ok");
+            ev << devs::attribute("name", m_nameList.front());
+            ev << devs::attribute("ok", m_response.front());
+            output.addEvent(ev);
+
+            m_nameList.pop_front();
+            m_response.pop_front();
+        }
+
+        if (not m_newName.empty()) {
+            value::Set eeset = value::SetFactory::create();
+            for (std::list < std::string >::const_iterator it =
+                 m_newName.begin(); it != m_newName.end(); ++it) {
+                eeset->addValue(value::StringFactory::create(*it));
+            }
+            ev = new devs::ExternalEvent("name");
+            ev << devs::attribute("name", eeset);
+            output.addEvent(ev);
+            m_newName.clear();
+        }
+    }
+}
+
+devs::Time DSDevs::getTimeAdvance()
+{
+    return (m_state != IDLE) ? 0 : devs::Time::infinity;
+}
+
+devs::Event::EventType DSDevs::processConflict(
+    const devs::InternalEvent& /* internal */,
+    const devs::ExternalEventList& /* extEventlist */) const
+{
+    return devs::Event::EXTERNAL;
+}
+
+void DSDevs::processExternalEvents(const devs::ExternalEventList& event,
+                                   const devs::Time& /* time */)
+{
+    devs::ExternalEventList::const_iterator it = event.begin();
+
+    while (it != event.end()) {
+        m_nameList.push_back((*it)->getSourceModelName());
+        const std::string& portname((*it)->getPortName());
+
+        m_response.push_back(
+            processSwitch(portname,
+                          (*it)->getAttributes()->getMapValue(portname)));
+        ++it;
+    }
+}
+
+void DSDevs::processInternalEvent(const devs::InternalEvent& /* event */)
+{
+    if (m_state != IDLE) {
+        m_state = IDLE;
+    }
+}
+
+value::Value DSDevs::processStateEvent(const devs::StateEvent& event) const
+{
+    std::ostringstream out;
+
+    if (event.onPort("coupled")) {
+        m_coupledModel->writeXML(out);
+    } else if (event.onPort("hierarchy")) {
+        m_coupledModel->writeXML(out);
+    } else if (event.onPort("complete")) {
+        m_coupledModel->writeXML(out);
+    }
+
+    return buildString(out.str());
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-Map DSDevs::buildMessageAddConnection(const std::string& srcModelName,
-				      const std::string& srcPortName,
-				      const std::string& dstModelName,
-				      const std::string& dstPortName)
+value::Map DSDevs::buildMessageAddConnection(const std::string& srcModelName,
+                                             const std::string& srcPortName,
+                                             const std::string& dstModelName,
+                                             const std::string& dstPortName)
 {
-    Map lst = MapFactory::create();
-    lst->addValue("srcModelName", StringFactory::create(srcModelName));
-    lst->addValue("srcPortName", StringFactory::create(srcPortName));
-    lst->addValue("dstModelName", StringFactory::create(dstModelName));
-    lst->addValue("dstPortName", StringFactory::create(dstPortName));
+    value::Map lst =value::MapFactory::create();
+    lst->addValue("srcModelName", value::StringFactory::create(srcModelName));
+    lst->addValue("srcPortName", value::StringFactory::create(srcPortName));
+    lst->addValue("dstModelName", value::StringFactory::create(dstModelName));
+    lst->addValue("dstPortName", value::StringFactory::create(dstPortName));
     return lst;
 }
 
-Map DSDevs::buildMessageChangeConnection(const std::string& srcModelName,
-                                    const std::string& srcPortName,
-                                    const std::string& oldDstModelName,
-                                    const std::string& oldDstPortName,
-                                    const std::string& newDstModelName,
-                                    const std::string& newDstPortName)
+value::Map DSDevs::buildMessageChangeConnection(
+    const std::string& srcModelName,
+    const std::string& srcPortName,
+    const std::string& oldDstModelName,
+    const std::string& oldDstPortName,
+    const std::string& newDstModelName,
+    const std::string& newDstPortName)
 {
-    Map lst = MapFactory::create();
-    lst->addValue("srcModelName", StringFactory::create(srcModelName));
-    lst->addValue("srcPortName", StringFactory::create(srcPortName));
+    value::Map lst =value::MapFactory::create();
+    lst->addValue("srcModelName", value::StringFactory::create(srcModelName));
+    lst->addValue("srcPortName", value::StringFactory::create(srcPortName));
     lst->addValue("oldDstModelName",
-                  StringFactory::create(oldDstModelName));
+                  value::StringFactory::create(oldDstModelName));
     lst->addValue("oldDstPortName",
-                  StringFactory::create(oldDstPortName));
+                  value::StringFactory::create(oldDstPortName));
     lst->addValue("newDstModelName",
-                  StringFactory::create(newDstModelName));
+                  value::StringFactory::create(newDstModelName));
     lst->addValue("newDstPortName",
-                  StringFactory::create(newDstPortName));
+                  value::StringFactory::create(newDstPortName));
     return lst;
 }
 
-Map DSDevs::buildMessageRemoveConnection(
-                                    const std::string& srcModelName,
-                                    const std::string& srcPortName,
-                                    const std::string& dstModelName,
-                                    const std::string& dstPortName)
+value::Map DSDevs::buildMessageRemoveConnection(
+    const std::string& srcModelName,
+    const std::string& srcPortName,
+    const std::string& dstModelName,
+    const std::string& dstPortName)
 {
-    Map lst = MapFactory::create();
+    value::Map lst =value::MapFactory::create();
     lst->addValue("srcModelName",
-                  StringFactory::create(srcModelName));
-    lst->addValue("srcPortName", StringFactory::create(srcPortName));
+                  value::StringFactory::create(srcModelName));
+    lst->addValue("srcPortName", value::StringFactory::create(srcPortName));
     lst->addValue("dstModelName",
-                  StringFactory::create(dstModelName));
-    lst->addValue("dstPortName", StringFactory::create(dstPortName));
+                  value::StringFactory::create(dstModelName));
+    lst->addValue("dstPortName", value::StringFactory::create(dstPortName));
     return lst;
 }
 
-Map DSDevs::buildMessageAddModel(const std::string& prefixModelName,
-                           const std::string& className,
-                           const std::string& xmlDynamics,
-                           const std::string& xmlInits,
-                           Set connection)
+value::Map DSDevs::buildMessageAddModel(const std::string& prefixModelName,
+                                        const std::string& className,
+                                        const std::string& xmlDynamics,
+                                        const std::string& xmlInits,
+                                        value::Set connection)
 {
-    Map lst = MapFactory::create();
-    lst->addValue("prefixModelName", StringFactory::create(prefixModelName));
-    lst->addValue("className", StringFactory::create(className));
-    lst->addValue("xmlDynamics", StringFactory::create(xmlDynamics));
-    lst->addValue("xmlInits", StringFactory::create(xmlInits));
+    value::Map lst =value::MapFactory::create();
+    lst->addValue("prefixModelName", value::StringFactory::create(prefixModelName));
+    lst->addValue("className", value::StringFactory::create(className));
+    lst->addValue("xmlDynamics", value::StringFactory::create(xmlDynamics));
+    lst->addValue("xmlInits", value::StringFactory::create(xmlInits));
     lst->addValue("addConnection", connection);
     return lst;
 }
 
-Map DSDevs::buildMessageRemoveModel(const std::string& modelName)
+value::Map DSDevs::buildMessageRemoveModel(const std::string& modelName)
 {
-    Map lst = MapFactory::create();
-    lst->addValue("modelName", StringFactory::create(modelName));
+    value::Map lst =value::MapFactory::create();
+    lst->addValue("modelName", value::StringFactory::create(modelName));
     return lst;
 }
 
-Map DSDevs::buildMessageChangeModel(const std::string& modelName,
-                              const std::string& className,
-                              const std::string& newClassName)
+value::Map DSDevs::buildMessageChangeModel(const std::string& modelName,
+                                           const std::string& className,
+                                           const std::string& newClassName)
 {
-    Map lst = MapFactory::create();
-    lst->addValue("modelName", StringFactory::create(modelName));
-    lst->addValue("className", StringFactory::create(className));
-    lst->addValue("newClassName", StringFactory::create(newClassName));
+    value::Map lst =value::MapFactory::create();
+    lst->addValue("modelName", value::StringFactory::create(modelName));
+    lst->addValue("className", value::StringFactory::create(className));
+    lst->addValue("newClassName", value::StringFactory::create(newClassName));
     return lst;
 }
 
-Map DSDevs::buildMessageBuildModel(const std::string& prefixModelName,
-                             const std::string& className,
-                             const std::string& xmlCode,
-                             const std::string& xmlDynamics,
-                             const std::string& xmlInits)
+value::Map DSDevs::buildMessageBuildModel(const std::string& prefixModelName,
+                                          const std::string& className,
+                                          const std::string& xmlCode,
+                                          const std::string& xmlDynamics,
+                                          const std::string& xmlInits)
 {
-    Map lst = MapFactory::create();
-    lst->addValue("prefixModelName", StringFactory::create(prefixModelName));
-    lst->addValue("className", StringFactory::create(className));
-    lst->addValue("xmlCode", StringFactory::create(xmlCode));
-    lst->addValue("xmlDynamics", StringFactory::create(xmlDynamics));
-    lst->addValue("xmlInits", StringFactory::create(xmlInits));
+    value::Map lst =value::MapFactory::create();
+    lst->addValue("prefixModelName", value::StringFactory::create(prefixModelName));
+    lst->addValue("className", value::StringFactory::create(className));
+    lst->addValue("xmlCode", value::StringFactory::create(xmlCode));
+    lst->addValue("xmlDynamics", value::StringFactory::create(xmlDynamics));
+    lst->addValue("xmlInits", value::StringFactory::create(xmlInits));
     return lst;
 }
 
-Map DSDevs::buildMessageAddInputPort(const std::string& modelName,
-                               const std::string& portName)
+value::Map DSDevs::buildMessageAddInputPort(const std::string& modelName,
+                                            const std::string& portName)
 {
-    Map lst = MapFactory::create();
-    lst->addValue("modelName",  StringFactory::create(modelName));
-    lst->addValue("portName",  StringFactory::create(portName));
+    value::Map lst =value::MapFactory::create();
+    lst->addValue("modelName",  value::StringFactory::create(modelName));
+    lst->addValue("portName",  value::StringFactory::create(portName));
     return lst;
 }
 
-Map DSDevs::buildMessageAddOutputPort(const std::string& modelName,
-                           const std::string& portName)
+value::Map DSDevs::buildMessageAddOutputPort(const std::string& modelName,
+                                             const std::string& portName)
 {
-    Map lst = MapFactory::create();
-    lst->addValue("modelName",  StringFactory::create(modelName));
-    lst->addValue("portName",  StringFactory::create(portName));
+    value::Map lst =value::MapFactory::create();
+    lst->addValue("modelName",  value::StringFactory::create(modelName));
+    lst->addValue("portName",  value::StringFactory::create(portName));
     return lst;
 }
 
-Map DSDevs::buildMessageRemoveInputPort(const std::string& modelName,
-                             const std::string& portName)
+value::Map DSDevs::buildMessageRemoveInputPort(const std::string& modelName,
+                                               const std::string& portName)
 {
-    Map lst = MapFactory::create();
-    lst->addValue("modelName",  StringFactory::create(modelName));
-    lst->addValue("portName",  StringFactory::create(portName));
+    value::Map lst =value::MapFactory::create();
+    lst->addValue("modelName",  value::StringFactory::create(modelName));
+    lst->addValue("portName",  value::StringFactory::create(portName));
     return lst;
 }
 
-Map DSDevs::buildMessageRemoveOutputPort(const std::string& modelName,
-                                   const std::string& portName)
+value::Map DSDevs::buildMessageRemoveOutputPort(const std::string& modelName,
+                                                const std::string& portName)
 {
-    Map lst = MapFactory::create();
-    lst->addValue("modelName",  StringFactory::create(modelName));
-    lst->addValue("portName",  StringFactory::create(portName));
+    value::Map lst =value::MapFactory::create();
+    lst->addValue("modelName",  value::StringFactory::create(modelName));
+    lst->addValue("portName",  value::StringFactory::create(portName));
     return lst;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-Set DSDevs::addToBagAddConnection(const std::string& srcModelName,
-                              const std::string& srcPortName,
-                              const std::string& dstModelName,
-                              const std::string& dstPortName,
-                              Set currentbag)
+value::Set DSDevs::addToBagAddConnection(const std::string& srcModelName,
+                                         const std::string& srcPortName,
+                                         const std::string& dstModelName,
+                                         const std::string& dstPortName,
+                                         value::Set currentbag)
 {
-    Map mp = buildMessageAddConnection(srcModelName, srcPortName,
-                                               dstModelName, dstPortName);
-    mp->addValue("action", StringFactory::create("addConnection"));
-    
+    value::Map mp = buildMessageAddConnection(srcModelName, srcPortName,
+                                              dstModelName, dstPortName);
+    mp->addValue("action", value::StringFactory::create("addConnection"));
+
     if (currentbag.get() == 0) {
-        currentbag = SetFactory::create();
+        currentbag = value::SetFactory::create();
     }
     currentbag->addValue(mp);
     return currentbag;
 }
 
-Set DSDevs::addToBagChangeConnection(const std::string& srcModelName,
-                                 const std::string& srcPortName,
-                                 const std::string& oldDstModelName,
-                                 const std::string& oldDstPortName,
-                                 const std::string& newDstModelName,
-                                 const std::string& newDstPortName,
-                                 Set currentbag)
+value::Set DSDevs::addToBagChangeConnection(const std::string& srcModelName,
+                                            const std::string& srcPortName,
+                                            const std::string& oldDstModelName,
+                                            const std::string& oldDstPortName,
+                                            const std::string& newDstModelName,
+                                            const std::string& newDstPortName,
+                                            value::Set currentbag)
 {
-    Map mp = buildMessageChangeConnection(
-            srcModelName, srcPortName, oldDstModelName, oldDstPortName,
-            newDstModelName, newDstPortName);
-    mp->addValue("action", StringFactory::create("changeConnection"));
+    value::Map mp = buildMessageChangeConnection(
+        srcModelName, srcPortName, oldDstModelName, oldDstPortName,
+        newDstModelName, newDstPortName);
+    mp->addValue("action", value::StringFactory::create("changeConnection"));
     if (currentbag.get() == 0) {
-        currentbag = SetFactory::create();
-    }
-    currentbag->addValue(mp);
-    return currentbag;
-}
-
-
-Set DSDevs::addToBagRemoveConnection(const std::string& srcModelName,
-                                 const std::string& srcPortName,
-                                 const std::string& dstModelName,
-                                 const std::string& dstPortName,
-                                 Set currentbag)
-{
-    Map mp = buildMessageRemoveConnection(srcModelName, srcPortName,
-                                           dstModelName, dstPortName);
-    mp->addValue("action", StringFactory::create("removeConnection"));
-    if (currentbag.get() == 0) {
-        currentbag = SetFactory::create();
-    }
-    currentbag->addValue(mp);
-    return currentbag;
-}
-
-Set DSDevs::addToBagAddModel(const std::string& prefixModelName,
-                         const std::string& className,
-                         const std::string& xmlDynamics,
-                         const std::string& xmlInits,
-                         Set connection,
-                         Set currentbag)
-{
-    Map mp = buildMessageAddModel(prefixModelName, className, xmlDynamics,
-                                   xmlInits, connection);
-    mp->addValue("action", StringFactory::create("addModel"));
-    if (currentbag.get() == 0) {
-        currentbag = SetFactory::create();
+        currentbag = value::SetFactory::create();
     }
     currentbag->addValue(mp);
     return currentbag;
 }
 
 
-Set DSDevs::addToBagRemoveModel(const std::string& modelName,
-                            Set currentbag)
+value::Set DSDevs::addToBagRemoveConnection(const std::string& srcModelName,
+                                            const std::string& srcPortName,
+                                            const std::string& dstModelName,
+                                            const std::string& dstPortName,
+                                            value::Set currentbag)
 {
-    Map mp = buildMessageRemoveModel(modelName);
-    mp->addValue("action", StringFactory::create("removeModel"));
+    value::Map mp = buildMessageRemoveConnection(srcModelName, srcPortName,
+                                                 dstModelName, dstPortName);
+    mp->addValue("action", value::StringFactory::create("removeConnection"));
     if (currentbag.get() == 0) {
-        currentbag = SetFactory::create();
+        currentbag = value::SetFactory::create();
+    }
+    currentbag->addValue(mp);
+    return currentbag;
+}
+
+value::Set DSDevs::addToBagAddModel(const std::string& prefixModelName,
+                                    const std::string& className,
+                                    const std::string& xmlDynamics,
+                                    const std::string& xmlInits,
+                                    value::Set connection,
+                                    value::Set currentbag)
+{
+    value::Map mp = buildMessageAddModel(prefixModelName, className, xmlDynamics,
+                                         xmlInits, connection);
+    mp->addValue("action", value::StringFactory::create("addModel"));
+    if (currentbag.get() == 0) {
+        currentbag = value::SetFactory::create();
     }
     currentbag->addValue(mp);
     return currentbag;
 }
 
 
-Set DSDevs::addToBagChangeModel(const std::string& modelName,
-                            const std::string& className,
-                            const std::string& newClassName,
-                            Set currentbag)
+value::Set DSDevs::addToBagRemoveModel(const std::string& modelName,
+                                       value::Set currentbag)
 {
-    Map mp = buildMessageChangeModel(modelName, className, newClassName);
-    mp->addValue("action", StringFactory::create("changeModel"));
+    value::Map mp = buildMessageRemoveModel(modelName);
+    mp->addValue("action", value::StringFactory::create("removeModel"));
     if (currentbag.get() == 0) {
-        currentbag = SetFactory::create();
+        currentbag = value::SetFactory::create();
     }
     currentbag->addValue(mp);
     return currentbag;
 }
 
-Set DSDevs::addToBagBuildModel(const std::string& prefixModelName,
-                           const std::string& className,
-                           const std::string& xmlCode,
-                           const std::string& xmlDynamics,
-                           const std::string& xmlInits,
-                           Set currentbag)
+
+value::Set DSDevs::addToBagChangeModel(const std::string& modelName,
+                                       const std::string& className,
+                                       const std::string& newClassName,
+                                       value::Set currentbag)
 {
-    Map mp = buildMessageBuildModel(prefixModelName, className, xmlCode,
-                                     xmlDynamics, xmlInits);
-    mp->addValue("action", StringFactory::create("buildModel"));
+    value::Map mp = buildMessageChangeModel(modelName, className, newClassName);
+    mp->addValue("action", value::StringFactory::create("changeModel"));
     if (currentbag.get() == 0) {
-        currentbag = SetFactory::create();
+        currentbag = value::SetFactory::create();
     }
     currentbag->addValue(mp);
     return currentbag;
 }
 
-Set DSDevs::addToBagAddInputPort(const std::string& modelName,
-                             const std::string& portName,
-                             Set currentbag)
+value::Set DSDevs::addToBagBuildModel(const std::string& prefixModelName,
+                                      const std::string& className,
+                                      const std::string& xmlCode,
+                                      const std::string& xmlDynamics,
+                                      const std::string& xmlInits,
+                                      value::Set currentbag)
 {
-    Map mp = buildMessageAddInputPort(modelName, portName);
-    mp->addValue("action", StringFactory::create("addInputPort"));
+    value::Map mp = buildMessageBuildModel(prefixModelName, className, xmlCode,
+                                           xmlDynamics, xmlInits);
+    mp->addValue("action", value::StringFactory::create("buildModel"));
     if (currentbag.get() == 0) {
-        currentbag = SetFactory::create();
+        currentbag = value::SetFactory::create();
     }
     currentbag->addValue(mp);
     return currentbag;
 }
 
-Set DSDevs::addToBagAddOutputPort(const std::string& modelName,
-                              const std::string& portName,
-                              Set currentbag)
+value::Set DSDevs::addToBagAddInputPort(const std::string& modelName,
+                                        const std::string& portName,
+                                        value::Set currentbag)
 {
-    Map mp = buildMessageAddOutputPort(modelName, portName);
-    mp->addValue("action", StringFactory::create("addOutputPort"));
+    value::Map mp = buildMessageAddInputPort(modelName, portName);
+    mp->addValue("action", value::StringFactory::create("addInputPort"));
     if (currentbag.get() == 0) {
-        currentbag = SetFactory::create();
+        currentbag = value::SetFactory::create();
     }
     currentbag->addValue(mp);
     return currentbag;
 }
 
-Set DSDevs::addToBagRemoveInputPort(const std::string& modelName,
-                                const std::string& portName,
-                                Set currentbag)
+value::Set DSDevs::addToBagAddOutputPort(const std::string& modelName,
+                                         const std::string& portName,
+                                         value::Set currentbag)
 {
-    Map mp = buildMessageRemoveInputPort(modelName, portName);
-    mp->addValue("action", StringFactory::create("removeInputPort"));
+    value::Map mp = buildMessageAddOutputPort(modelName, portName);
+    mp->addValue("action", value::StringFactory::create("addOutputPort"));
     if (currentbag.get() == 0) {
-        currentbag = SetFactory::create();
+        currentbag = value::SetFactory::create();
     }
     currentbag->addValue(mp);
     return currentbag;
 }
 
-Set DSDevs::addToBagRemoveOutputPort(const std::string& modelName,
-                                 const std::string& portName,
-                                 Set currentbag)
+value::Set DSDevs::addToBagRemoveInputPort(const std::string& modelName,
+                                           const std::string& portName,
+                                           value::Set currentbag)
 {
-    Map mp = buildMessageRemoveOutputPort(modelName, portName);
-    mp->addValue("action", StringFactory::create("removeOutputPort"));
+    value::Map mp = buildMessageRemoveInputPort(modelName, portName);
+    mp->addValue("action", value::StringFactory::create("removeInputPort"));
     if (currentbag.get() == 0) {
-        currentbag = SetFactory::create();
+        currentbag = value::SetFactory::create();
+    }
+    currentbag->addValue(mp);
+    return currentbag;
+}
+
+value::Set DSDevs::addToBagRemoveOutputPort(const std::string& modelName,
+                                            const std::string& portName,
+                                            value::Set currentbag)
+{
+    value::Map mp = buildMessageRemoveOutputPort(modelName, portName);
+    mp->addValue("action", value::StringFactory::create("removeOutputPort"));
+    if (currentbag.get() == 0) {
+        currentbag = value::SetFactory::create();
     }
     currentbag->addValue(mp);
     return currentbag;
@@ -444,7 +447,7 @@ Set DSDevs::addToBagRemoveOutputPort(const std::string& modelName,
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-bool DSDevs::processSwitch(const std::string& action, const Map& val)
+bool DSDevs::processSwitch(const std::string& action, const value::Map& val)
 {
     if (action == "addModel") {
         return processAddModel(val);
@@ -476,12 +479,12 @@ bool DSDevs::processSwitch(const std::string& action, const Map& val)
     }
 }
 
-bool DSDevs::processAddModel(const Map& val)
+bool DSDevs::processAddModel(const value::Map& val)
 {
     const std::string& pre(val->getStringValue("prefixModelName"));
     const std::string& cls(val->getStringValue("className"));
     std::string xmld, xmli;
-    Set cnt;
+    value::Set cnt;
 
     if (val->existValue("xmlDynamics"))
         xmld.assign(val->getStringValue("xmlDynamics"));
@@ -493,17 +496,17 @@ bool DSDevs::processAddModel(const Map& val)
         cnt = val->getSetValue("addConnection");
 
     m_state = ADD_MODEL;
-    return addModel(pre, cls, xmld, xmli, cnt);
+    return addModel(pre, cls, cnt);
 }
 
-bool DSDevs::processRemoveModel(const Map& val)
+bool DSDevs::processRemoveModel(const value::Map& val)
 {
     const std::string& nam(val->getStringValue("modelName"));
     m_state = REMOVE_MODEL;
     return removeModel(nam);
 }
 
-bool DSDevs::processChangeModel(const Map& val)
+bool DSDevs::processChangeModel(const value::Map& val)
 {
     const std::string& nam(val->getStringValue("modelName"));
     const std::string& oldc(val->getStringValue("className"));
@@ -512,7 +515,7 @@ bool DSDevs::processChangeModel(const Map& val)
     return changeModel(nam, oldc, newc);
 }
 
-bool DSDevs::processBuildModel(const Map& val)
+bool DSDevs::processBuildModel(const value::Map& val)
 {
     const std::string& pre(val->getStringValue("prefixModelName"));
     const std::string& cls(val->getStringValue("className"));
@@ -523,7 +526,7 @@ bool DSDevs::processBuildModel(const Map& val)
     return buildModel(pre, cls, cod, xmld, xmli);
 }
 
-bool DSDevs::processAddInputPort(const Map& val)
+bool DSDevs::processAddInputPort(const value::Map& val)
 {
     const std::string& mdl(val->getStringValue("modelName"));
     const std::string& prt(val->getStringValue("portName"));
@@ -531,7 +534,7 @@ bool DSDevs::processAddInputPort(const Map& val)
     return addInputPort(mdl, prt);
 }
 
-bool DSDevs::processRemoveInputPort(const Map& val)
+bool DSDevs::processRemoveInputPort(const value::Map& val)
 {
     const std::string& mdl(val->getStringValue("modelName"));
     const std::string& prt(val->getStringValue("portName"));
@@ -539,7 +542,7 @@ bool DSDevs::processRemoveInputPort(const Map& val)
     return removeInputPort(mdl, prt);
 }
 
-bool DSDevs::processAddOutputPort(const Map& val)
+bool DSDevs::processAddOutputPort(const value::Map& val)
 {
     const std::string& mdl(val->getStringValue("modelName"));
     const std::string& prt(val->getStringValue("portName"));
@@ -547,7 +550,7 @@ bool DSDevs::processAddOutputPort(const Map& val)
     return addOutputPort(mdl, prt);
 }
 
-bool DSDevs::processRemoveOutputPort(const Map& val)
+bool DSDevs::processRemoveOutputPort(const value::Map& val)
 {
     const std::string& mdl(val->getStringValue("modelName"));
     const std::string& prt(val->getStringValue("portName"));
@@ -555,7 +558,7 @@ bool DSDevs::processRemoveOutputPort(const Map& val)
     return removeOutputPort(mdl, prt);
 }
 
-bool DSDevs::processAddConnection(const Map& val)
+bool DSDevs::processAddConnection(const value::Map& val)
 {
     const std::string& srcmn(val->getStringValue("srcModelName"));
     const std::string& srcpn(val->getStringValue("srcPortName"));
@@ -565,7 +568,7 @@ bool DSDevs::processAddConnection(const Map& val)
     return addConnection(srcmn, srcpn, dstmn, dstpn);
 }
 
-bool DSDevs::processRemoveConnection(const Map& val)
+bool DSDevs::processRemoveConnection(const value::Map& val)
 {
     const std::string& srcmn(val->getStringValue("srcModelName"));
     const std::string& srcpn(val->getStringValue("srcPortName"));
@@ -575,7 +578,7 @@ bool DSDevs::processRemoveConnection(const Map& val)
     return removeConnection(srcmn, srcpn, dstmn, dstpn);
 }
 
-bool DSDevs::processChangeConnection(const Map& val)
+bool DSDevs::processChangeConnection(const value::Map& val)
 {
     const std::string& srcmn(val->getStringValue("srcModelName"));
     const std::string& srcpn(val->getStringValue("srcPortName"));
@@ -587,18 +590,18 @@ bool DSDevs::processChangeConnection(const Map& val)
     return changeConnection(srcmn, srcpn, oldm, oldp, newm, newp);
 }
 
-bool DSDevs::processBag(const Map& val)
+bool DSDevs::processBag(const value::Map& val)
 {
-    Value valuebag(val->getValue("bag"));
-    Set bag = to_set(valuebag);
+    value::Value valuebag(val->getValue("bag"));
+    value::Set bag = value::to_set(valuebag);
     bool result = true;
 
-    SetFactory::VectorValue& vv(bag->getValue());
-    for (SetFactory::VectorValueIt it = vv.begin();
+    value::SetFactory::VectorValue& vv(bag->getValue());
+    for (value::SetFactory::VectorValueIt it = vv.begin();
          it != vv.end(); ++it) {
-        Map msg = to_map(*it);
-        Value msgaction = msg->getValue("action");
-        String straction = to_string(msgaction);
+        value::Map msg = to_map(*it);
+        value::Value msgaction = msg->getValue("action");
+        value::String straction = value::to_string(msgaction);
 
         Assert(utils::InternalError, straction, "No correct action message.");
 
@@ -667,14 +670,14 @@ bool DSDevs::changeConnection(const std::string& srcModelName,
         } else {
             if (modelName == oldDstModelName) {
                 m_coupledModel->delOutputConnection(
-                        srcModel, srcPortName, oldDstModel, oldDstPortName);
+                    srcModel, srcPortName, oldDstModel, oldDstPortName);
                 m_coupledModel->addOutputConnection(
-                        srcModel, srcPortName, newDstModel, newDstPortName);
+                    srcModel, srcPortName, newDstModel, newDstPortName);
             } else {
                 m_coupledModel->delInternalConnection(
-                        srcModel, srcPortName, oldDstModel, oldDstPortName);
+                    srcModel, srcPortName, oldDstModel, oldDstPortName);
                 m_coupledModel->addInternalConnection(
-                        srcModel, srcPortName, newDstModel, newDstPortName);
+                    srcModel, srcPortName, newDstModel, newDstPortName);
             }
         }
         return true;
@@ -712,64 +715,63 @@ bool DSDevs::removeConnection(const std::string& srcModelName,
     return false;
 }
 
-bool DSDevs::addModel(const std::string& /* prefixModelName */,
-                      const std::string& /* className */,
-                      const std::string& /* xmlDynamics */,
-                      const std::string& /* xmlInits */,
-                      Set /* connection */)
+bool DSDevs::addModel(const std::string& prefixModelName,
+                      const std::string& className,
+                      value::Set connection)
 {
-  // FIX ME
-//     std::string newname(m_coupledModel->buildNewName(prefixModelName));
-//     m_newName.push_back(newname);
+    std::string newname(m_coupledModel->buildNewName(prefixModelName));
+    m_newName.push_back(newname);
 
-//     try {
-//       Model* mdl = getModel()->getSimulator()->createModels(m_coupledModel, className, xmlDynamics, xmlInits);
-//         mdl->setName(newname);
-//     } catch (const std::exception& e) {
-//         std::cerr << boost::format(
-//             "Warning: Unable to dynamic add model, with prefixname '%1%' "
-//             "class name '%2%'. Error reported is: '%3%\n'") %
-//             prefixModelName % className % e.what();
-//         return false;
-//     }
+    try {
+        vpz::Dynamic dyn("FIXME");
+        vpz::Condition cond("FIXME");
+        vpz::Observable obs("FIXME");
+        coordinator().createModelFromClass(m_coupledModel, className);
+    } catch (const std::exception& e) {
+        std::cerr << boost::format(
+            "Warning: Unable to dynamic add model, with prefixname '%1%' "
+            "class name '%2%'. Error reported is: '%3%\n'") %
+            prefixModelName % className % e.what();
+        return false;
+    }
 
-//     if (connection) {
-//         for (SetFactory::VectorValueIt it =
-//              connection->getValue().begin(); it !=
-//              connection->getValue().end(); ++it) {
-	    
-//             if ((*it)->isMap()) {
-//                 Map mp = to_map(*it);
-//                 std::string srcm, srcp, dstm, dstp;
-		
-//                 if (mp->existValue("srcModelName")) {
-//                     srcm.assign(mp->getStringValue("srcModelName"));
-//                     if (srcm.empty())
-//                         srcm.assign(newname);
-//                 } else
-//                     srcm.assign(newname);
-                    
-//                 if (mp->existValue("dstModelName")) {
-//                     dstm.assign(mp->getStringValue("dstModelName"));
-//                     if (dstm.empty())
-//                         dstm.assign(newname);
-//                 } else
-//                     dstm.assign(newname);
-            
-//                 srcp = mp->getStringValue("srcPortName");
-//                 dstp = mp->getStringValue("dstPortName");
-//                 addConnection(srcm, srcp, dstm, dstp);
-//             }
-//         }
-//     }
+    if (connection) {
+        for (value::SetFactory::VectorValueIt it =
+             connection->getValue().begin(); it !=
+             connection->getValue().end(); ++it) {
+
+            if ((*it)->isMap()) {
+                value::Map mp = value::to_map(*it);
+                std::string srcm, srcp, dstm, dstp;
+
+                if (mp->existValue("srcModelName")) {
+                    srcm.assign(mp->getStringValue("srcModelName"));
+                    if (srcm.empty())
+                        srcm.assign(newname);
+                } else
+                    srcm.assign(newname);
+
+                if (mp->existValue("dstModelName")) {
+                    dstm.assign(mp->getStringValue("dstModelName"));
+                    if (dstm.empty())
+                        dstm.assign(newname);
+                } else
+                    dstm.assign(newname);
+
+                srcp = mp->getStringValue("srcPortName");
+                dstp = mp->getStringValue("dstPortName");
+                addConnection(srcm, srcp, dstm, dstp);
+                 }
+             }
+         }
 
     return true;
 }
 
 bool DSDevs::removeModel(const std::string& /* modelName */)
 {
-  // FIX ME
-  //    getModel().getSimulator()->delModel(m_coupledModel, modelName);
+    // FIX ME
+    //    getModel().getSimulator()->delModel(m_coupledModel, modelName);
     return true;
 }
 
@@ -855,7 +857,9 @@ bool DSDevs::removeOutputPort(const std::string& modelName,
     return false;
 }
 
-std::vector < vle::graph::Model* >& DSDevs::getModelList() const
+std::vector < graph::Model* >& DSDevs::getModelList() const
 {
     return  m_coupledModel->getModelList();
 }
+
+}} // namespace vle extension

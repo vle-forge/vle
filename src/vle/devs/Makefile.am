@@ -2,7 +2,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/src @VLE_CFLAGS@ @XML_CFLAGS@
 
 libdevs_coreheaders = Attribute.hpp Dynamics.hpp Event.hpp EventList.hpp \
 		      EventObserver.hpp EventTable.hpp ExternalEvent.hpp \
-		      ExternalEventList.hpp InitEvent.hpp \
+		      ExternalEventList.hpp Executive.hpp InitEvent.hpp \
 		      InstantaneousEvent.hpp InstantaneousEventList.hpp \
 		      InternalEvent.hpp Measure.hpp ModelFactory.hpp \
 		      Observer.hpp Simulator.hpp StateEvent.hpp Coordinator.hpp \

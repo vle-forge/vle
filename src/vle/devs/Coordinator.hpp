@@ -66,7 +66,13 @@ namespace vle { namespace devs {
 	void addModels(vpz::Model& model);
 
 	void addObserver(devs::Observer* observer);
-
+    
+        //
+        ///
+        //// Functions use by Executive models to manage DsDevs simulation.
+        ///
+        //
+        
         /** 
          * @brief Build new models using ClassModel or Dynamic depends of
          * classNamed parameter that define ClassModel name or Dynamic name.
@@ -78,11 +84,19 @@ namespace vle { namespace devs {
          * 
          * @return A reference to the top node of build model.
          */
-        graph::Model* createModels(graph::CoupledModel* model,
-                                   const std::string& className,
-                                   const std::string& xmlDynamics,
-                                   const std::string& xmlInit);
+        SimulatorList createModelFromClass(graph::CoupledModel* parent,
+                                           const std::string& classname);
 
+
+        Simulator* createModel(graph::AtomicModel* model,
+                               const vpz::Dynamic& dyn,
+                               const vpz::Condition& cond,
+                               const vpz::Observable& obs);
+
+        SimulatorList* createModels(graph::CoupledModel* model,
+                                    const vpz::Dynamics& dyns,
+                                    const vpz::Conditions& conds,
+                                    const vpz::Observables& views);
         /** 
          * @brief Delete the specified model from coupled model. All
          * connection are deleted, Simulator are deleted and all events are
