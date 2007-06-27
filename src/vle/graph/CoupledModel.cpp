@@ -43,11 +43,6 @@ using namespace vle::utils::xml;
 
 namespace vle { namespace graph {
 
-CoupledModel::CoupledModel(CoupledModel* parent) :
-    Model(parent)
-{
-}
-
 CoupledModel::CoupledModel(const std::string& name, CoupledModel* parent) :
     Model(name, parent)
 {

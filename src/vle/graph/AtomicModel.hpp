@@ -42,8 +42,6 @@ namespace vle { namespace graph {
     class AtomicModel : public Model
     {
     public:
-	AtomicModel(CoupledModel* parent);
-
 	AtomicModel(const AtomicModel& model);
         
         AtomicModel(const std::string& name, CoupledModel* parent);
@@ -63,7 +61,7 @@ namespace vle { namespace graph {
         virtual bool isNoVLE() const
         { return false; }
 
-	virtual Model* findModel(const std::string & name) const;
+        virtual Model* findModel(const std::string & name) const;
     };
 
 }} // namespace vle graph

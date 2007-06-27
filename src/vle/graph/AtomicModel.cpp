@@ -31,11 +31,6 @@
 
 namespace vle { namespace graph {
 
-AtomicModel::AtomicModel(CoupledModel* parent) :
-    Model(parent)
-{
-}
-
 AtomicModel::AtomicModel(const std::string& name, CoupledModel* parent) :
     Model(name, parent)
 {

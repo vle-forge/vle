@@ -37,8 +37,6 @@ namespace vle { namespace graph {
     class NoVLEModel : public Model
     {
     public:
-        NoVLEModel(CoupledModel* parent);
-
         NoVLEModel(const std::string& name, CoupledModel* parent);
 
         NoVLEModel(const NoVLEModel& model);

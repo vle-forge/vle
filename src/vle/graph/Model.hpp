@@ -52,20 +52,6 @@ namespace vle { namespace graph {
     {
     public:
         /** 
-         * @brief Default constructor, position (0,0) size (0,0) and parent to
-         * null.
-         */
-        Model();
-
-        /** 
-         * @brief Constructor to initialize parent, position (0,0), size (0,0)
-         * and parent to parameter parent.
-         * 
-         * @param parent 
-         */
-        Model(CoupledModel* parent);
-
-        /** 
          * @brief Copy constructuor. Be carefull to modify the parent.
          * 
          * @param model copy constructor.
@@ -124,16 +110,10 @@ namespace vle { namespace graph {
          *
          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-        inline const std::string& getDescription() const
-        { return m_description; }
-
-        inline void setDescription(const std::string& dest)
-        { m_description.assign(dest); }
-
         inline const std::string& getName() const
         { return m_name; }
 
-        inline CoupledModel * getParent() const
+        inline CoupledModel* getParent() const
         { return m_parent; }
 
         inline void setParent(CoupledModel* cp)
@@ -398,8 +378,6 @@ namespace vle { namespace graph {
         { setWidth(width); setHeight(height); }
 
     protected:
-	std::string     m_name;
-	std::string     m_description;
 	CoupledModel*   m_parent;
 	MapStringPort   m_initPortList;
 	MapStringPort   m_inPortList;
@@ -410,6 +388,16 @@ namespace vle { namespace graph {
         int             m_y;
         int             m_width;
         int             m_height;
+
+    private:
+        /** 
+         * @brief Default constructor, position (0,0) size (0,0) and parent to
+         * null.
+         */
+        Model()
+        { }
+
+	std::string     m_name;
     };
 
 }} // namespace vle graph

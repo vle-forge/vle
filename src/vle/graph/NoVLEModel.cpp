@@ -28,11 +28,6 @@
 
 namespace vle { namespace graph {
 
-NoVLEModel::NoVLEModel(CoupledModel* parent) :
-    Model(parent)
-{
-}
-
 NoVLEModel::NoVLEModel(const std::string& name, CoupledModel* parent) :
     Model(name, parent)
 {

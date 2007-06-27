@@ -40,34 +40,13 @@ using namespace vle::utils::xml;
 
 namespace vle { namespace graph {
 
-Model::Model() :
-    m_parent(0),
-    m_x(0),
-    m_y(0),
-    m_width(0),
-    m_height(0)
-{
-}
-
-Model::Model(CoupledModel* parent) :
-    m_parent(parent),
-    m_x(0),
-    m_y(0),
-    m_width(0),
-    m_height(0)
-{
-    if (parent) {
-        parent->addModel(this);
-    }
-}
-
 Model::Model(const std::string& name, CoupledModel* parent) :
-    m_name(name),
     m_parent(parent),
     m_x(0),
     m_y(0),
     m_width(0),
-    m_height(0)
+    m_height(0),
+    m_name(name)
 {
     if (parent) {
         parent->addModel(this);
@@ -75,13 +54,12 @@ Model::Model(const std::string& name, CoupledModel* parent) :
 }
 
 Model::Model(const Model& mdl) :
-    m_name(mdl.getName()),
-    m_description(mdl.getDescription()),
     m_parent(mdl.getParent()),
     m_x(mdl.x()),
     m_y(mdl.y()),
     m_width(mdl.width()),
-    m_height(mdl.height())
+    m_height(mdl.height()),
+    m_name(mdl.getName())
 {
     for (MapStringPort::const_iterator it = mdl.m_initPortList.begin();
 	 it != mdl.m_initPortList.end();++it)
@@ -104,7 +82,6 @@ Model& Model::operator=(const Model& mdl)
 {
     if (this != &mdl) {
         m_name = mdl.getName();
-        m_description = mdl.getDescription();
         m_parent = mdl.getParent();
 
         clearStatePort();
