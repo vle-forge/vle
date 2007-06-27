@@ -64,7 +64,7 @@ namespace vle { namespace devs {
 	 * @param event Event to test, no test on validity.
          * @return true if this Event is inferior to event.
          */
-        inline virtual bool operator<(const InternalEvent* event) const
+        inline bool operator<(const InternalEvent* event) const
         { return m_time < event->m_time; }
 
         /**
@@ -74,7 +74,7 @@ namespace vle { namespace devs {
          *
          * @return true if this Event is superior to event.
          */
-        inline virtual bool operator>(const InternalEvent * event) const
+        inline bool operator>(const InternalEvent * event) const
         { return m_time > event->m_time; }
 
         /**
@@ -84,7 +84,7 @@ namespace vle { namespace devs {
          *
          * @return true if this Event is equal to  event.
          */
-        inline virtual bool operator==(const InternalEvent * event) const
+        inline bool operator==(const InternalEvent * event) const
         { return m_time == event->m_time; }
 
     private:
