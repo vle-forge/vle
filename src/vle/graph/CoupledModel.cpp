@@ -151,7 +151,7 @@ void CoupledModel::addInputConnection(Model * src, const std::string & portSrc,
     Port * pdst = dst->getInPort(portDst);
 
     AssertI(psrc and pdst);
-    AssertI(src == this and getModel(dst) != 0);
+    AssertI(src == this and exist(dst->getName()));
     AssertI(existInputPort(portSrc) and dst->existInputPort(portDst));
 
     m_inputConnectionList.push_back(
@@ -168,7 +168,7 @@ void CoupledModel::addOutputConnection(Model * src, const std::string & portSrc,
     Port * pdst = dst->getOutPort(portDst);
 
     AssertI(psrc and pdst);
-    AssertI(getModel(src) != 0 and dst == this);
+    AssertI(exist(src->getName()) and dst == this);
     AssertI(src->existOutputPort(portSrc) and
 	   existOutputPort(portDst) == true);
 
@@ -187,7 +187,7 @@ void CoupledModel::addInternalConnection(Model* src, const std::string&
     Port * pdst = dst->getInPort(portDst);
 
     AssertI(psrc and pdst);
-    AssertI(getModel(src) != 0 and getModel(dst) != 0);
+    AssertI(exist(src->getName()) and exist(dst->getName()));
     AssertI(src->existOutputPort(portSrc) == true and
 	   dst->existInputPort(portDst) == true);
 
@@ -896,17 +896,6 @@ Model* CoupledModel::getModel(const std::string& modelname)
     } else {
         return findModel(modelname);
     }
-}
-
-Model* CoupledModel::getModel(Model* model)
-{
-    for (VectorModel::iterator it = m_modelList.begin(); it !=
-         m_modelList.end(); ++it) {
-        if (model == (*it).second)
-	    return model;
-    }
-
-    return 0;
 }
 
 void CoupledModel::addModel(Model* model)

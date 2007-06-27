@@ -156,15 +156,6 @@ namespace vle { namespace graph {
 
         Model* getModel(const std::string& modelName);
 
-        /**
-         * @brief Return pointer to model if model found into childrens models.
-         *
-         * @param model to find into childrens models
-         *
-         * @return pointer to model if found into childrens models
-         */
-        Model* getModel(Model* model);
-
         inline const VectorModel& getModelList() const
         { return m_modelList; }
         
