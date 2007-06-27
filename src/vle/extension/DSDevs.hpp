@@ -332,7 +332,7 @@ namespace vle { namespace extension {
         bool removeOutputPort(const std::string& modelName,
                               const std::string& portName);
 
-        std::vector < graph::Model* >& getModelList() const;
+        graph::VectorModel& getModelList() const;
 
         state                       m_state;
         std::list < std::string >   m_nameList;

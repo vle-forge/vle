@@ -52,9 +52,6 @@ namespace vle { namespace graph {
 
 	virtual Model* clone() const;
 
-	virtual bool parseXML(xmlpp::Element* modelNode,
-			      CoupledModel* parent);
-
 	virtual void writeXML(std::ostream& out) const;
 
         virtual bool isAtomic() const

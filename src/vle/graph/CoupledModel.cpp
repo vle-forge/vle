@@ -58,7 +58,7 @@ CoupledModel::CoupledModel(const CoupledModel& model) :
 {
     for (VectorModel::const_iterator it = model.m_modelList.begin();
          it != model.m_modelList.end();++it) {
-        graph::Model* cloned = (*it)->clone();
+        graph::Model* cloned = (*it).second->clone();
         cloned->setParent(this);
         addModel(cloned);
     }
@@ -100,7 +100,7 @@ CoupledModel::~CoupledModel()
 
     for (VectorModel::iterator it = m_modelList.begin(); it !=
          m_modelList.end(); ++it) {
-        delete (*it);
+        delete (*it).second;
     }
 }
 
@@ -806,7 +806,7 @@ vector < TargetPort* > CoupledModel::getTargetPortList(Port* p_port)
     while (it3 != m_internalConnectionList.end()) {
 	Connection* c = *it3;
 	if (c->getOriginPort() == p_port) {
-	    PModel m = c->getDestinationModel();
+	    Model* m = c->getDestinationModel();
 
 	    if (m != this) {
 		if (m->isAtomic()) {
@@ -831,7 +831,7 @@ vector < TargetPort* > CoupledModel::getTargetPortList(Port* p_port)
 	Connection* c = *it1;
 
 	if (c->getOriginPort() == p_port) {
-	    PModel m = c->getDestinationModel();
+	    Model* m = c->getDestinationModel();
 
 	    if (m != this) {
 		if (m->isAtomic()) {
@@ -884,69 +884,49 @@ bool CoupledModel::isNoVLE() const
     return false;
 }
 
-Model* CoupledModel::findModel(const std::string & name) const
+Model* CoupledModel::findModel(const std::string& name) const
 {
-    VectorModel::const_iterator it = m_modelList.begin();
-
-    if (getName() == name) {
-	return (Model *)this;
+    VectorModel::const_iterator it = m_modelList.find(name);
+    if (it == m_modelList.end()) {
+        return 0;
     } else {
-	while (it != m_modelList.end()) {
-	    Model * found = (*it)->findModel(name);
-	    if (found != 0)
-		return found;
-	    ++it;
-	}
+        return it->second;
     }
-    return 0;
 }
 
-Model* CoupledModel::getModel(const std::string& p_modelName)
+Model* CoupledModel::getModel(const std::string& modelname)
 {
-    if (getName() == p_modelName)
+    if (getName() == modelname) {
 	return this;
-    else {
-	Model * m = NULL;
-	vector < Model* >::iterator it = m_modelList.begin();
-	bool v_found = false;
-
-	while (it != m_modelList.end() && !v_found) {
-	    m = (*it);
-	    v_found = m->getName() == p_modelName;
-	    ++it;
-	}
-	if (v_found)
-	    return m;
-	else
-	    return NULL;
+    } else {
+        return findModel(modelname);
     }
 }
 
-Model * CoupledModel::getModel(Model * model)
+Model* CoupledModel::getModel(Model* model)
 {
-    vector < Model * >::iterator it = m_modelList.begin();
-    while (it != m_modelList.end()) {
-	if (model == (*it))
+    for (VectorModel::iterator it = m_modelList.begin(); it !=
+         m_modelList.end(); ++it) {
+        if (model == (*it).second)
 	    return model;
-	++it;
     }
 
     return 0;
 }
 
-void CoupledModel::addModel(Model * model)
+void CoupledModel::addModel(Model* model)
 {
-    AssertI(model and getModel(model) == 0);
+    AssertI(not exist(model->getName()));
 
     model->setParent(this);
-    m_modelList.push_back(model);
+    m_modelList[model->getName()] = model;
 }
 
 AtomicModel* CoupledModel::addAtomicModel(const std::string& name)
 {
     AssertI(not exist(name));
     AtomicModel* x = new AtomicModel(name, this);
-    m_modelList.push_back(x);
+    m_modelList[name] = x;
     return x;
 }
 
@@ -954,7 +934,7 @@ NoVLEModel* CoupledModel::addNoVLEModel(const std::string& name)
 {
     AssertI(not exist(name));
     NoVLEModel* x = new NoVLEModel(name, this);
-    m_modelList.push_back(x);
+    m_modelList[name] = x;
     return x;
 }
 
@@ -962,112 +942,66 @@ CoupledModel* CoupledModel::addCoupledModel(const std::string& name)
 {
     AssertI(not exist(name));
     CoupledModel* x = new CoupledModel(name, this);
-    m_modelList.push_back(x);
+    m_modelList[name] = x;
     return x;
 }
 
 void CoupledModel::delModel(Model* model)
 {
-    AssertI(model);
-
-    delAllConnection(model);
-
-    VectorModel::iterator it = m_modelList.begin();
-    while (it != m_modelList.end()) {
-        if ((*it) == model) {
-	    m_modelList.erase(it);
-	    delete model;
-	    break;
-	}
-	++it;
+    VectorModel::iterator it = m_modelList.find(model->getName());
+    if (it != m_modelList.end()) {
+        delAllConnection(model);
+        m_modelList.erase(it);
+        delete model;
     }
 }
 
 void CoupledModel::delAllModel()
 {
-    VectorModel::iterator it = m_modelList.begin();
-    while (it != m_modelList.end()) {
-        delModel(*it);
-	++it;
+    for (VectorModel::iterator it = m_modelList.begin(); it !=
+         m_modelList.end(); ++it) {
+        delModel(it->second);
+        ++it;
     }
 }
 
-
-
 void CoupledModel::attachModel(Model* model)
 {
-    AssertI(model);
+    AssertI(not exist(model->getName()));
 
     if (model->getParent()) {
         model->getParent()->detachModel(model);
     }
 
-    m_modelList.push_back(model);
+    m_modelList[model->getName()] = model;
     model->setParent(this);
 }
 
 void CoupledModel::attachModels(VectorModel& models)
 {
     for (VectorModel::iterator it = models.begin(); it != models.end(); ++it) {
-        attachModel(*it);
+        attachModel(it->second);
     }
 }
 
-void CoupledModel::detachModel(Model * model)
+void CoupledModel::detachModel(Model* model)
 {
-    AssertI(model and getModel(model) != 0);
-
-    VectorModel::iterator it = m_modelList.begin();
-    while (it != m_modelList.end()) {
-        if ((*it) == model) {
-	    (*it)->setParent(0);
-	    m_modelList.erase(it);
-	    break;
-	}
-	++it;
+    VectorModel::iterator it = m_modelList.find(model->getName());
+    if (it != m_modelList.end()) {
+        it->second->setParent(0);
+        m_modelList.erase(it);
+    } else {
+        Throw(utils::InternalError, (boost::format(
+                    "Model %1% is not attached to the coupled model %2%") %
+                model->getName() % getName()));
     }
 }
 
 void CoupledModel::detachModels(const VectorModel& models)
 {
-    VectorModel::const_iterator lst = models.begin();
-    while (lst != models.end()) {
-	detachModel(*lst);
-	++lst;
-    }
-}
-
-void CoupledModel::detachInternalConnection(const VectorModel& lst,
-                                            std::list < Connection *> & lc)
-{
-    lc.clear();
-
-    VectorModel::const_iterator it = lst.begin();
-    while (it != lst.end()) {
-	VectorConnection::iterator internal = m_internalConnectionList.begin();
-        while (internal != m_internalConnectionList.end()) {
-            if ((*internal)->getOriginModel() == (*it) and
-                (std::find(lst.begin(), lst.end(),
-                      (*internal)->getDestinationModel()) != lst.end())) {
-		VectorConnection::iterator del = internal;
-		++internal;
-		lc.push_back(*del);
-		m_internalConnectionList.erase(del);
-		break;
-            } else if ((*internal)->getDestinationModel() == (*it) and
-                       (std::find(lst.begin(), lst.end(),
-                                  (*internal)->getOriginModel()) != lst.end()))
-            {
-		VectorConnection::iterator del = internal;
-		++internal;
-		lc.push_back(*del);
-		m_internalConnectionList.erase(del);
-		break;
-	    }
-	    else
-		++internal;
-	}
-	++it;
+    for (VectorModel::const_iterator it = models.begin(); it != models.end();
+         ++it) {
+	detachModel(it->second);
     }
 }
 
@@ -1085,158 +1019,19 @@ void CoupledModel::attachInternalConnection(
     }
 }
 
-
-
-/***************************/
-/* XML syntax of model     */
-/***************************/
-/*
-  <MODEL NAME="Copepod" TYPE="atomic|coupled" USEALONE="yes|no"
-  URL="location" PROTOCOL="JavaClass|JavaRMI|DynamicLibrary|SOAP|...">
-  <INIT> .. </INIT>
-  <IN> ... </IN>
-  <OUT> ... </OUT>
-  <STATE> ... </STATE>
-  <SUBMODELS TYPE="extension|comprehension">
-  <MODEL NAME="A" TYPE="atomic|coupled" GENERIC="yes|no"
-  MULTIPLICITY="*|n|n..m|n..*|*,*|n,n|n..m,n..m|..."> ... </MODEL>
-  <MODEL NAME="B" TYPE="atomic|coupled"> ... </MODEL>
-  </SUBMODELS>
-  <CONNECTIONS TYPE="extension|comprehension">\\
-  <CONNECTION TYPE="internal|input|output">
-  <ORIGIN MODEL="A" PORT="out">
-  <DESTINATION MODEL="B" PORT="in">
-  </CONNECTION>
-  </CONNECTIONS>\\
-  </MODEL>
-
-  par defaut, les sous-modeles et les connexions sont exprimes en extension
-  les attributs TYPE ne sont alors pas specifies.
-
-  l'attribut GENERIC est par defaut egal a "no" si absent.
-  si l'attribut GENERIC est egal a "yes" alors le modele est un type de
-  modeles => l'attribut MULTIPLICITY est alors present
-  * : plusieurs
-  n : un nombre donné et fixe
-  n..m : un nombre entre les constantes n et m
-  n..* : au moins n
-  plusieurs elements de multiplicite peuvent apparaitre separes par des
-  virgules ; chaque element qualifie une dimension
-  la notion de dimension permet de definir de maniere generique les
-  connexions entre les modeles generiques
-
-  le nommage des modeles repose sur l'expression de la multiplicite.
-  si la multiplicite est par exemple 2,2 et que le modele generique se
-  nomme A alors les modeles auront pour nom A_1_1, A_1_2, A_2_1 et A_2_2.
-
-  si la multiplicite n'est pas consistante alors l'instance d'experiences
-  doivent preciser la multiplicite.
-
-  Expression des connexions generiques
-  ------------------------------------
-
-  les connexions de type "input" ou "output" sont simples.
-
-  les connexions internes ("internal").
-
-  * structure reguliere :
-  - ligne :
-  <CONNECTION TYPE="internal">
-  <ORIGIN MODEL="A" SET="in(1..n-1)" PORT="out">
-  <DESTINATION MODEL="A" SET="i+1" PORT="L">
-  </CONNECTION>
-  <CONNECTION TYPE="internal">
-  <ORIGIN MODEL="A" SET="in(2..n)" PORT="out">
-  <DESTINATION MODEL="A" SET="i-1" PORT="R">
-  </CONNECTION>
-
-
-*/
-/*************************/
-
-bool CoupledModel::parseXML(xmlpp::Element* p_modelNode,
-			    CoupledModel*)
-{
-    parseXMLports(p_modelNode);
-
-    xmlpp::Element* v_submodels = get_children(p_modelNode, "SUBMODELS");
-    xmlpp::Node::NodeList lst = v_submodels->get_children("MODEL");
-    xmlpp::Node::NodeList::iterator it = lst.begin();
-    while (it != lst.end()) {
-	xmlpp::Element * v_modelNode = (xmlpp::Element*)(*it);
-	PModel v_model = Model::parseXMLmodel(v_modelNode, this);
-	if (v_model) m_modelList.push_back(v_model);
-	++it;
-    }
-
-    xmlpp::Element* v_connections = get_children(p_modelNode, "CONNECTIONS");
-    xmlpp::Node::NodeList lst2 = v_connections->get_children("CONNECTION");
-    xmlpp::Node::NodeList::iterator it2 = lst2.begin();
-    while (it2 != lst2.end()) {
-	xmlpp::Element * connection = (xmlpp::Element*)(*it2);
-	string v_type = get_attribute(connection,"TYPE");
-	xmlpp::Element* origin = get_children(connection,"ORIGIN");
-	string v_originModelName = get_attribute(origin,"MODEL");
-	string v_originPortName = get_attribute(origin,"PORT");
-	PModel v_originModel = getModel(v_originModelName);
-	xmlpp::Element* destination = get_children(connection,"DESTINATION");
-	string v_destinationModelName = get_attribute(destination,"MODEL");
-	string v_destinationPortName = get_attribute(destination,"PORT");
-	PModel v_destinationModel = getModel(v_destinationModelName);
-	Connection* v_connection;
-
-        try {
-            if (v_type == "internal") {
-                v_connection =
-                    new Connection(v_originModel,
-                                   v_originModel->getOutPort(v_originPortName),
-                                   v_destinationModel,
-                                   v_destinationModel->
-                                   getInPort(v_destinationPortName));
-                m_internalConnectionList.push_back(v_connection);
-            }
-            else if (v_type == "input") {
-                v_connection =
-                    new Connection(v_originModel,
-                                   v_originModel->getInPort(v_originPortName),
-                                   v_destinationModel,
-                                   v_destinationModel->
-                                   getInPort(v_destinationPortName));
-                m_inputConnectionList.push_back(v_connection);
-            } else if (v_type == "output") {
-                v_connection =
-                    new Connection(v_originModel,
-                                   v_originModel->getOutPort(v_originPortName),
-                                   v_destinationModel,
-                                   v_destinationModel->
-                                   getOutPort(v_destinationPortName));
-                m_outputConnectionList.push_back(v_connection);
-            }
-        } catch(const std::exception& e) {
-            Assert(vle::utils::ParseError, false, boost::format(
-                    "Error occured during coupled model '%1%' allocation with "
-                    "message : %2%\n") % getName() % e.what());
-        }
-	++it2;
-    }
-    return true;
-}
-
-
-
 void CoupledModel::writeXML(std::ostream& out) const
 {
     out << "<model name=\"" << getName() << "\" " << " type=\"coupled\" >\n";
     writePortListXML(out);
     out << "<submodels>\n";
 
-    const size_t szModel = m_modelList.size();
     const size_t szInConnection = m_inputConnectionList.size();
     const size_t szOutConnection = m_outputConnectionList.size();
     const size_t szInternalConnection = m_internalConnectionList.size();
 
-    for (size_t i = 0; i < szModel; ++i) {
-        m_modelList[i]->writeXML(out);
+    for (VectorModel::const_iterator it = m_modelList.begin(); it !=
+         m_modelList.end(); ++it) {
+        it->second->writeXML(out);
     }
 
     out << "<connections>\n";
@@ -1256,7 +1051,7 @@ void CoupledModel::writeXML(std::ostream& out) const
     }
 
     for (size_t i = 0; i < szOutConnection; ++i) {
-        out << "<connection type=\"output\">"
+        out << "<connection type=\"output\">\n"
             << " <origin model=\""
             << m_outputConnectionList[i]->getOriginModel()->getName()
             << "\" port=\""
@@ -1271,7 +1066,7 @@ void CoupledModel::writeXML(std::ostream& out) const
     }
 
     for (size_t i = 0; i < szInternalConnection; ++i) {
-        out << "<connection type=\"internal\">"
+        out << "<connection type=\"internal\">\n"
             << " <origin model=\""
             << m_internalConnectionList[i]->getOriginModel()->getName()
             << "\" port=\""
@@ -1289,22 +1084,21 @@ void CoupledModel::writeXML(std::ostream& out) const
 
 Model* CoupledModel::find(const std::string& name) const
 {
-    VectorModel::const_iterator it;
-    for (it = m_modelList.begin(); it != m_modelList.end(); ++it) {
-        if ((*it)->getName() == name) {
-            return (*it);
-        }
+    VectorModel::const_iterator it = m_modelList.find(name);
+    if (it == m_modelList.end()) {
+        return 0;
+    } else {
+        return it->second;
     }
-    return 0;
 }
 
 Model* CoupledModel::find(int x, int y) const
 {
     VectorModel::const_iterator it;
     for (it = m_modelList.begin(); it != m_modelList.end(); ++it) {
-        if ((*it)->x() <= x and x <= (*it)->x() + (*it)->width() and
-            (*it)->y() <= y and y <= (*it)->y() + (*it)->height()) {
-            return (*it);
+        if ((*it).second->x() <= x and x <= (*it).second->x() + (*it).second->width() and
+            (*it).second->y() <= y and y <= (*it).second->y() + (*it).second->height()) {
+            return (*it).second;
         }
     }
     return 0;
@@ -1312,38 +1106,21 @@ Model* CoupledModel::find(int x, int y) const
 
 std::string CoupledModel::buildNewName(const std::string& prefix) const
 {
-    std::set < std::string > names;
-    std::string name, newname;
-
-    for (VectorModel::const_iterator it = m_modelList.begin();
-         it != m_modelList.end(); ++it)
-        names.insert((*it)->getName());
-
-    if (prefix.empty())
+    std::string name;
+    if (prefix.empty()) {
         name.assign("runtimebuilding");
-    else
+    } else {
         name.assign(prefix);
+    }
 
     int i = 0;
+    std::string newname;
     do {
-        newname.assign(name);
-        newname += '-';
-        newname += utils::to_string(i);
+        newname.assign((boost::format("%1%-%2%") % name % i).str());
         ++i;
-    } while (names.find(newname) != names.end());
+    } while (exist(name));
 
     return newname;
-}
-
-bool CoupledModel::exist(const std::string& name) const
-{
-    for (VectorModel::const_iterator it = m_modelList.begin();
-         it != m_modelList.end(); ++it) {
-        if ((*it)->getName() == name) {
-            return true;
-        }
-    }
-    return false;
 }
 
 }} // namespace vle graph

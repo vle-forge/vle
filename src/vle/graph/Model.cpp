@@ -563,99 +563,6 @@ void Model::mergePort(std::list < std::string >& inlist,
         addInitPort(*jt);
 }
 
-Model* Model::parseXMLmodel(xmlpp::Element* modelNode,
-                             CoupledModel* parent)
-{
-    Model *model = 0;
-    string name = get_attribute(modelNode,"NAME");
-    string type = get_attribute(modelNode,"TYPE");
-
-    if (type == "atomic") {
-	model = new AtomicModel(parent);
-    } else if (type == "coupled") {
-	model = new CoupledModel(parent);
-    } else if (type == "no-vle") {
-	model = new NoVLEModel(parent);
-    } else {
-        Throw(vle::utils::ParseError, boost::format(
-                    "Unknow type tag [%1%] for model %2%\n") % type % name);
-    }
-
-    model->m_name = name;
-    model->parseXML(modelNode, parent);
-
-    return model;
-}
-
-bool Model::parseXMLports(xmlpp::Element* p_modelNode)
-{
-    xmlpp::Element* init = exist_children(p_modelNode,"INIT") ?
-        get_children(p_modelNode,"INIT") : 0;
-
-    if (init)
-	parseXMLport(p_modelNode, init, m_initPortList);
-
-    xmlpp::Element* in = exist_children(p_modelNode,"IN") ?
-	get_children(p_modelNode,"IN") : 0;
-
-    if (in)
-	parseXMLport(p_modelNode, in, m_inPortList);
-
-    xmlpp::Element* out = exist_children(p_modelNode,"OUT") ?
-	get_children(p_modelNode,"OUT") : 0;
-
-    if (out)
-	parseXMLport(p_modelNode, out, m_outPortList);
-
-    xmlpp::Element* state =exist_children(p_modelNode,"STATE") ?
-	get_children(p_modelNode,"STATE") : 0;
-
-    if (state)
-	parseXMLport(p_modelNode, state, m_statePortList);
-
-    return true;
-}
-
-/*
- XML syntax of port
-
-  <PORT NAME="">
-  <DATA NAME="">
-  <METADATA>...</METADATA>
-  <UNIT ... />
-  <TYPE ... />
-  <CONTENT>...</CONTENT>
-  </DATA>
-  </PORT>
-*/
-
-bool Model::parseXMLport(xmlpp::Element*,
-			 xmlpp::Element* p_portNode,
-			 std::map < std::string , Port* > &p_portList)
-{
-    xmlpp::Node::NodeList lst = p_portNode->get_children("PORT");
-    xmlpp::Node::NodeList::iterator it = lst.begin();
-
-    while ( it != lst.end() ) {
-	xmlpp::Element * portNode = ( xmlpp::Element* )( *it );
-	string name = get_attribute(portNode,"NAME");
-
-	p_portList[name] = new Port(this, name);
-	++it;
-    }
-    return true;
-}
-
-bool Model::parseXMLspace(xmlpp::Element*, xmlpp::Element*)
-{
-    return true;
-}
-
-bool Model::parseXMLtime(xmlpp::Element*, xmlpp::Element*)
-{
-    return true;
-}
-
 void Model::writePortListXML(std::ostream& out) const
 {
     if (not m_initPortList.empty()) {
@@ -719,24 +626,25 @@ NoVLEModel* Model::toNoVLE(Model* model)
     return NULL;
 }
 
-void Model::getAtomicModelList(Model* p_model,
-                               std::vector < AtomicModel* >& p_list)
+void Model::getAtomicModelList(Model* model,
+                               std::vector < AtomicModel* >& list)
 {
-    if (p_model->isAtomic()) {
-        p_list.push_back((AtomicModel*)p_model);
+    if (model->isAtomic()) {
+        list.push_back((AtomicModel*)model);
     } else {
 	vector < CoupledModel* > coupledModelList;
-	coupledModelList.push_back((CoupledModel*)p_model);
+	coupledModelList.push_back((CoupledModel*)model);
         while (!coupledModelList.empty()) {
-	    CoupledModel* m = coupledModelList.front();
-	    vector < Model* > v = m->getModelList();
-	    vector < Model* >::iterator it = v.begin();
+            CoupledModel* m = coupledModelList.front();
+            VectorModel& v(m->getModelList());
 
-            while (it != v.end()) {
-		PModel n = *it;
-		if (n->isAtomic()) p_list.push_back((AtomicModel*)n);
-		else coupledModelList.push_back((CoupledModel*)n);
-		++it;
+            for (VectorModel::iterator it = v.begin(); it != v.end(); ++it) {
+		Model* n = it->second;
+                if (n->isAtomic()) {
+                    list.push_back(static_cast < AtomicModel*>(n));
+                } else {
+                    coupledModelList.push_back(static_cast < CoupledModel*>(n));
+                }
 	    }
 	    coupledModelList.erase(coupledModelList.begin());
 	}
@@ -745,7 +653,7 @@ void Model::getAtomicModelList(Model* p_model,
 
 bool Model::isInList(const VectorModel& lst, graph::Model* m)
 {
-    return std::find(lst.begin(), lst.end(), m) != lst.end();
+    return lst.find(m->getName()) != lst.end();
 }
 
 }} // namespace vle graph

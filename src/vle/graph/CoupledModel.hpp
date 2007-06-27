@@ -298,17 +298,6 @@ namespace vle { namespace graph {
 	void delInternalConnection(Connection * connect);
 	void delConnection(Connection * connect);
         
-        /**
-         * @brief delete nodes in Internal Connection list where internal
-         * connection in lst list exist. Connections are not deleted, only node
-         * is delete.
-         *
-         * @param lst list to detect internal connection
-         * @param lc list of connection found, clear in beginning
-         */
-	void detachInternalConnection(const VectorModel& lst,
-				      std::list < Connection *> & lc);
-
 	void attachInternalConnection(const std::list < Connection * > & c);
         
         /**
@@ -388,9 +377,6 @@ namespace vle { namespace graph {
          */
         virtual Model* findModel(const std::string& name) const;
 
-	virtual bool parseXML(xmlpp::Element* modelNode,
-                              CoupledModel* parent);
-
         void writeXML(std::ostream& out) const;
 
         /** 
@@ -432,7 +418,8 @@ namespace vle { namespace graph {
          * 
          * @return true if model name exist, false otherwise.
          */
-        bool exist(const std::string& name) const;
+        inline bool exist(const std::string& name) const
+        { return m_modelList.find(name) != m_modelList.end(); }
 
     private:
 	VectorModel      m_modelList;

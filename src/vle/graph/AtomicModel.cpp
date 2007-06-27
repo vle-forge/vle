@@ -55,37 +55,12 @@ Model* AtomicModel::clone() const
     return new AtomicModel(*this);
 }
 
-Model* AtomicModel::findModel(const std::string & name) const
+Model* AtomicModel::findModel(const std::string& name) const
 {
     if (getName() == name)
-	return (Model *)this;
+	return (Model*)this;
     else
 	return 0;
-}
-
-bool AtomicModel::parseXML(xmlpp::Element* modelNode, CoupledModel *)
-{
-    xmlpp::Element* space =
-	vle::utils::xml::exist_children(modelNode,"SPACE") ?
-	vle::utils::xml::get_children(modelNode, "SPACE") :
-	0;
-
-    if (space) {
-	parseXMLspace(modelNode, space);
-    }
-
-    xmlpp::Element* time =
-	vle::utils::xml::exist_children(modelNode,"TIME") ?
-	vle::utils::xml::get_children(modelNode, "TIME") :
-	0;
-
-    if (time) {
-	parseXMLtime(modelNode, time);
-    }
-
-    parseXMLports(modelNode);
-
-    return true;
 }
 
 void AtomicModel::writeXML(std::ostream& out) const

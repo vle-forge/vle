@@ -175,19 +175,6 @@ namespace vle { namespace vpz {
         { return MODEL; }
 
         /** 
-         * @brief Initialise the devs hierachy of model.
-         * @code
-         * <MODEL NAME="toto">
-         * </MODEL>
-         * @endcode
-         * 
-         * @param elt a reference to the MODEL tag.
-         *
-         * @throw Exception::Internal if elt is null or not on a MODEL tag.
-         */
-        void initFromModel(xmlpp::Element* elt);
-
-        /** 
          * @brief Just delete the complete list of graph::Model.
          */
         void clear();

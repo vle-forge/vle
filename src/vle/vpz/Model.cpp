@@ -105,17 +105,6 @@ void Model::write(std::ostream& out) const
     out << "</structures>\n";
 }
 
-void Model::initFromModel(xmlpp::Element* elt)
-{
-    AssertI(elt);
-    AssertI(elt->get_name() == "MODEL");
-
-    delete m_graph;
-    m_graph = 0;
-
-    m_graph = graph::Model::parseXMLmodel(elt, 0);
-}
-
 void Model::clear()
 {
     delete m_graph;
@@ -178,13 +167,13 @@ void Model::write_coupled(std::ostream& out, const graph::CoupledModel* mdl) con
         const graph::VectorModel& childs(top->getModelList());
         for (graph::VectorModel::const_iterator it = childs.begin(); 
              it != childs.end(); ++it) {
-            if ((*it)->isCoupled()) {
-                stack.push(static_cast < graph::CoupledModel* >(*it));
+            if (it->second->isCoupled()) {
+                stack.push(static_cast < graph::CoupledModel* >(it->second));
                 coupledadded = true;
-            } else if ((*it)->isAtomic()) {
-                write_atomic(out, static_cast < graph::AtomicModel* >(*it));
-            } else if ((*it)->isNoVLE()) {
-                write_novle(out, static_cast < graph::NoVLEModel* >(*it));
+            } else if (it->second->isAtomic()) {
+                write_atomic(out, static_cast < graph::AtomicModel* >(it->second));
+            } else if (it->second->isNoVLE()) {
+                write_novle(out, static_cast < graph::NoVLEModel* >(it->second));
             }
         }
 

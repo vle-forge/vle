@@ -42,7 +42,7 @@ namespace vle { namespace graph {
 
     typedef std::map < std::string, Port * > MapStringPort;
     typedef std::vector < AtomicModel * > AtomicModelVector;
-    typedef std::vector < Model* > VectorModel;
+    typedef std::map < std::string, Model* > VectorModel;
     
     /**
      * @brief The DEVS model base class.
@@ -265,28 +265,6 @@ namespace vle { namespace graph {
          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
         /**
-	 * Parse XML element structure who represent VLE model and attach it to
-         * the coupledmodel parent.
-	 *
-         * @param modelNode XML element structure.
-         * @param parent CoupledModel parent of XML element structure.
-	 *
-         * @return graph::Model read.
-         */
-        static Model* parseXMLmodel(xmlpp::Element* modelNode,
-                                    CoupledModel* parent = 0);
-
-        /**
-	 * Parse XML element structure
-	 *
-         * @param modelNode XML element structure.
-         * @param parent parent of XML element structure.
-         * @return true if reading is ok, false otherwise.
-         */
-	virtual bool parseXML(xmlpp::Element* modelNode,
-			      CoupledModel* parent) = 0;
-
-        /**
 	 * Write under XML node VLE structures ports.
 	 *
          * @param elt XML node parent.
@@ -423,15 +401,6 @@ namespace vle { namespace graph {
         { setWidth(width); setHeight(height); }
 
     protected:
-        bool parseXMLports(xmlpp::Element* modelNode);
-        bool parseXMLport(xmlpp::Element* modelNode,
-			  xmlpp::Element* portNode,
-			  std::map < std::string, Port * > &portList);
-        bool parseXMLspace(xmlpp::Element* modelNode,
-			   xmlpp::Element* spaceNode);
-        bool parseXMLtime(xmlpp::Element* modelNode,
-			  xmlpp::Element* timeNode);
-
 	std::string     m_name;
 	std::string     m_description;
 	CoupledModel*   m_parent;
@@ -445,8 +414,6 @@ namespace vle { namespace graph {
         int             m_width;
         int             m_height;
     };
-
-    typedef Model * PModel;
 
 }} // namespace vle graph
 

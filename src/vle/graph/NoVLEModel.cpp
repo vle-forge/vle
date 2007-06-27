@@ -48,11 +48,6 @@ Model* NoVLEModel::clone() const
     return new NoVLEModel(*this);
 }
 
-bool NoVLEModel::parseXML(xmlpp::Element*, CoupledModel*)
-{
-    return true;
-}
-
 void NoVLEModel::writeXML(std::ostream& out) const
 {
     out << "<model name=\"" << getName() << "\" type=\"novle\" />";

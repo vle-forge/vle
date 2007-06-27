@@ -206,10 +206,10 @@ void Coordinator::delCoupledModel(graph::CoupledModel* parent,
         graph::VectorModel& lst = mdl->getModelList();
         for (graph::VectorModel::iterator it = lst.begin(); it != lst.end();
              ++it) {
-            if ((*it)->isAtomic()) {
-                delAtomicModel(mdl, (graph::AtomicModel*)(*it));
-            } else if ((*it)->isCoupled()) {
-                delCoupledModel(mdl, (graph::CoupledModel*)(*it));
+            if (it->second->isAtomic()) {
+                delAtomicModel(mdl, (graph::AtomicModel*)(it->second));
+            } else if (it->second->isCoupled()) {
+                delCoupledModel(mdl, (graph::CoupledModel*)(it->second));
             }
         }
         parent->delAllConnection(mdl);

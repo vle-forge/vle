@@ -857,7 +857,7 @@ bool DSDevs::removeOutputPort(const std::string& modelName,
     return false;
 }
 
-std::vector < graph::Model* >& DSDevs::getModelList() const
+graph::VectorModel& DSDevs::getModelList() const
 {
     return  m_coupledModel->getModelList();
 }
