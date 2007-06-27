@@ -41,11 +41,9 @@ void print_help()
 
 void build_vpz(const std::string& modelname, vpz::Vpz& vpz)
 {
-    graph::CoupledModel* cpl = new graph::CoupledModel(0);
-    cpl->setName("top model");
+    graph::CoupledModel* cpl = new graph::CoupledModel("top model", 0);
 
-    graph::AtomicModel* mdl = new graph::AtomicModel(cpl);
-    mdl->setName("testing model");
+    graph::AtomicModel* mdl = new graph::AtomicModel("testing model", cpl);
     cpl->addModel(mdl);
     vpz.project().model().set_model(cpl);
 

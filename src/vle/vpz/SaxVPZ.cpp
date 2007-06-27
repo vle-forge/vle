@@ -107,16 +107,16 @@ void VpzStackSax::push_model(const AttributeList& att)
         std::string dyn(get_attribute < std::string >(att, "dynamics"));
         std::string obs(get_attribute < std::string >(att, "observables"));
         
-        gmdl = new graph::AtomicModel(parent);
+        gmdl = new graph::AtomicModel(name, parent);
         vpz().project().model().atomicModels().insert(std::make_pair(
                 reinterpret_cast < graph::Model* >(gmdl),
                 AtomicModel(cnd, dyn, obs, "")));
     } else if (type == "coupled") {
-        gmdl = new graph::CoupledModel(parent);
+        gmdl = new graph::CoupledModel(name, parent);
     } else if (type == "novle") {
         std::string trs(get_attribute < std::string >(att, "translator"));
 
-        gmdl = new graph::NoVLEModel(parent);
+        gmdl = new graph::NoVLEModel(name, parent);
         vpz().project().model().atomicModels().insert(std::make_pair(
                 reinterpret_cast < graph::Model* >(gmdl),
                 AtomicModel("", "", "", trs)));
@@ -124,12 +124,7 @@ void VpzStackSax::push_model(const AttributeList& att)
         Throw(utils::InternalError, (boost::format(
                         "Unknow model type %1%") % type));
     }
-    gmdl->setName(name);
-
-    if (parent) {
-        parent->addModel(gmdl);
-    }
-
+    
     vpz::Model* mdl = new vpz::Model();
     mdl->set_model(gmdl);
 

@@ -133,9 +133,6 @@ namespace vle { namespace graph {
         inline const std::string& getName() const
         { return m_name; }
 
-        inline void setName(const std::string& name)
-        { m_name.assign(name); }
-
         inline CoupledModel * getParent() const
         { return m_parent; }
 
