@@ -26,6 +26,7 @@
 #define VLE_GRAPH_PORT_HPP
 
 #include <vle/value/Value.hpp>
+#include <vle/graph/Connection.hpp>
 #include <string>
 
 namespace vle { namespace graph {
@@ -79,21 +80,6 @@ namespace vle { namespace graph {
         { return m_name; }
 
         /** 
-         * @brief get structure of value
-         * 
-         * @return the structure affected, can be null.
-         */
-        const value::Value& getStructure() const
-        { return m_structure; }
-
-        /** 
-         * @brief Delete previous structure.
-         * 
-         * @param val the value to clone affected, can be null.
-         */
-        void setStructure(value::Value val);
-
-        /** 
          * @brief Valid the value parameter with the value structure.
          * 
          * @param val the value to test.
@@ -102,10 +88,25 @@ namespace vle { namespace graph {
          */
         bool isValidWithStructure(const value::Value& val);
 
+
+        void addConnection(Model* model, Port* port);
+
+        bool existConnection() const;
+
+        inline VectorConnection* connections()
+        { return m_connection; }
+
+        void delConnection(Model* model, Port* port);
+
+        void delConnection(Model* model);
+
+        void delConnections();
+
     private:
         graph::Model*   m_model;
         std::string     m_name;
-        value::Value    m_structure;
+
+        VectorConnection* m_connection;
     };
 
 }} // namespace vle graph

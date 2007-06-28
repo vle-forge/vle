@@ -43,8 +43,6 @@ namespace vle { namespace graph {
 
         virtual ~NoVLEModel() { }
 
-        virtual Model* clone() const;
-
         virtual void writeXML(std::ostream& out) const;
 
         virtual bool isAtomic() const;

@@ -34,7 +34,7 @@ namespace vle { namespace graph {
     class Model;
     class Port;
     class Connection;
-
+    
     typedef std::vector < Connection* > VectorConnection;
 
     /**

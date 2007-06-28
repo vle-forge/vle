@@ -33,16 +33,6 @@ NoVLEModel::NoVLEModel(const std::string& name, CoupledModel* parent) :
 {
 }
 
-NoVLEModel::NoVLEModel(const NoVLEModel& model) :
-    Model(model)
-{
-}
-
-Model* NoVLEModel::clone() const
-{
-    return new NoVLEModel(*this);
-}
-
 void NoVLEModel::writeXML(std::ostream& out) const
 {
     out << "<model name=\"" << getName() << "\" type=\"novle\" />";

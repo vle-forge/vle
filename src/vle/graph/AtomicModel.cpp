@@ -36,18 +36,8 @@ AtomicModel::AtomicModel(const std::string& name, CoupledModel* parent) :
 {
 }
 
-AtomicModel::AtomicModel(const AtomicModel& model) :
-    Model(model)
-{
-}
-
 AtomicModel::~AtomicModel()
 {
-}
-
-Model* AtomicModel::clone() const
-{
-    return new AtomicModel(*this);
 }
 
 Model* AtomicModel::findModel(const std::string& name) const

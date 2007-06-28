@@ -24,12 +24,11 @@
 #ifndef VLE_GRAPH_MODEL_HPP
 #define VLE_GRAPH_MODEL_HPP
 
-#include <libxml++/libxml++.h>
 #include <map>
 #include <string>
 #include <list>
 #include <vector>
-
+#include <boost/noncopyable.hpp>
 
 
 namespace vle { namespace graph {
@@ -48,16 +47,9 @@ namespace vle { namespace graph {
      * @brief The DEVS model base class.
      *
      */
-    class Model
+    class Model : public boost::noncopyable
     {
     public:
-        /** 
-         * @brief Copy constructuor. Be carefull to modify the parent.
-         * 
-         * @param model copy constructor.
-         */
-        Model(const Model& model);
-
         /** 
          * @brief Constructor to intialize parent, position (0,0), size (0,0)
          * and name.
@@ -82,9 +74,6 @@ namespace vle { namespace graph {
          * Base class define
          *
          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-        /** @return clone of class. */
-        virtual Model* clone() const = 0;
 
         /** @return true if Model is atomic, false otherwise. */
         virtual bool isAtomic() const = 0;

@@ -33,9 +33,10 @@ namespace vle { namespace graph {
 
 Port::Port(Model* model, const std::string& name) :
     m_model(model),
-    m_name(name)
+    m_name(name),
+    m_connection(0)
 {
-    Assert(vle::utils::InternalError, model, boost::format(
+    Assert(utils::InternalError, model, boost::format(
             "Bad model address while building port %1%\n") % name);
 }
 
@@ -44,14 +45,84 @@ const std::string& Port::getModelName() const
     return m_model->getName();
 }
 
-void Port::setStructure(const value::Value val)
+void Port::addConnection(Model* model, Port* port)
 {
-    m_structure = val;
+    Assert(utils::InternalError, model and port, boost::format(
+            "Bad model or port adresse while building connection on port "
+            "%1%\n") % m_name); 
+
+    if (m_connection == 0) {
+        m_connection = new VectorConnection;
+    }
+
+    Connection* cnt = new Connection(m_model, this, model, port);
+    m_connection->push_back(cnt);
 }
 
-bool Port::isValidWithStructure(const value::Value& val)
+bool Port::existConnection() const
 {
-    return val == m_structure; // FIXME test de map.
+    if (m_connection == 0 or m_connection->size() == 0)
+        return false;
+
+    return true;
+}
+
+void Port::delConnection(Model* model, Port* port)
+{
+    Assert(utils::InternalError, m_connection, boost::format(
+            "Remove a connection without existence in port %1%\n") % m_name);
+    Assert(utils::InternalError, model and port, boost::format(
+            "Bad model or port adresse while building connection on port "
+            "%1%\n") % m_name);
+
+    VectorConnection::iterator previous = m_connection->begin();
+    for (VectorConnection::iterator it = m_connection->begin();
+         it != m_connection->end(); ++it) {
+
+        if ((*it)->getDestinationModel() == model and
+            (*it)->getDestinationPort() == port) {
+            delete (*it);
+            m_connection->erase(it);
+            it = previous;
+        } else {
+            previous = it;
+        }
+    }
+}
+
+void Port::delConnection(Model* model)
+{
+    Assert(utils::InternalError, m_connection, boost::format(
+            "Remove a connection without existence in port %1%\n") % m_name);
+    Assert(utils::InternalError, model, boost::format(
+            "Bad model adresse while building connection on port "
+            "%1%\n") % m_name);
+
+    VectorConnection::iterator previous = m_connection->begin();
+    for (VectorConnection::iterator it = m_connection->begin();
+         it != m_connection->end(); ++it) {
+
+        if ((*it)->getDestinationModel() == model) {
+            delete (*it);
+            m_connection->erase(it);
+            it = previous;
+        } else {
+            previous = it;
+        }
+    }
+}
+
+void Port::delConnections()
+{
+    if (m_connection) {
+        for (VectorConnection::iterator it = m_connection->begin(); 
+             it != m_connection->end(); ++it) {
+            delete *it;
+        }
+        m_connection->clear();
+        delete m_connection;
+        m_connection = 0;
+    }
 }
 
 }} // namespace vle graph

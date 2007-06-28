@@ -50,11 +50,7 @@ namespace vle { namespace graph {
     public:
         CoupledModel(const std::string& name, CoupledModel* parent);
 
-	CoupledModel(const CoupledModel& model);
-
 	virtual ~CoupledModel();
-
-	virtual Model* clone() const;
 
         /**
          * @brief add a model into model list. Parent is set to this coupled

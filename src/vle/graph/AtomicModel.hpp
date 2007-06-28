@@ -42,13 +42,9 @@ namespace vle { namespace graph {
     class AtomicModel : public Model
     {
     public:
-	AtomicModel(const AtomicModel& model);
-        
         AtomicModel(const std::string& name, CoupledModel* parent);
 
 	virtual ~AtomicModel();
-
-	virtual Model* clone() const;
 
 	virtual void writeXML(std::ostream& out) const;
 

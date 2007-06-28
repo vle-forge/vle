@@ -53,31 +53,6 @@ Model::Model(const std::string& name, CoupledModel* parent) :
     }
 }
 
-Model::Model(const Model& mdl) :
-    m_parent(mdl.getParent()),
-    m_x(mdl.x()),
-    m_y(mdl.y()),
-    m_width(mdl.width()),
-    m_height(mdl.height()),
-    m_name(mdl.getName())
-{
-    for (MapStringPort::const_iterator it = mdl.m_initPortList.begin();
-	 it != mdl.m_initPortList.end();++it)
-	m_initPortList[it->first] = new Port(*it->second);
-
-    for (MapStringPort::const_iterator it = mdl.m_inPortList.begin();
-	 it != mdl.m_inPortList.end();++it)
-	m_inPortList[it->first] = new Port(*it->second);
-
-    for (MapStringPort::const_iterator it = mdl.m_outPortList.begin();
-	 it != mdl.m_outPortList.end();++it)
-	m_outPortList[it->first] = new Port(*it->second);
-    
-    for (MapStringPort::const_iterator it = mdl.m_statePortList.begin();
-	 it != mdl.m_statePortList.end();++it)
-	m_statePortList[it->first] = new Port(*it->second);
-}
-
 Model& Model::operator=(const Model& mdl)
 {
     if (this != &mdl) {

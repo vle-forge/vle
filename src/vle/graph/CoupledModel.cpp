@@ -48,47 +48,6 @@ CoupledModel::CoupledModel(const std::string& name, CoupledModel* parent) :
 {
 }
 
-CoupledModel::CoupledModel(const CoupledModel& model) :
-    Model(model)
-{
-    for (VectorModel::const_iterator it = model.m_modelList.begin();
-         it != model.m_modelList.end();++it) {
-        graph::Model* cloned = (*it).second->clone();
-        cloned->setParent(this);
-        addModel(cloned);
-    }
-
-    vector < Connection* >::const_iterator it;
-    for (it = model.m_internalConnectionList.begin(); it !=
-         model.m_internalConnectionList.end(); ++it) {
-        Model* v_originModel = getModel((*it)->getOriginModel()->getName());
-        Model* v_destinationModel =
-            getModel((*it)->getDestinationModel()->getName());
-
-        addInternalConnection(v_originModel,(*it)->getOriginPort()->getName(),
-                              v_destinationModel,
-                              (*it)->getDestinationPort()->getName());
-    }
-
-    for (it = model.m_inputConnectionList.begin(); it !=
-         model.m_inputConnectionList.end(); ++it) {
-        Model* v_destinationModel =
-            getModel((*it)->getDestinationModel()->getName());
-
-        addInputConnection(this,(*it)->getOriginPort()->getName(),
-                           v_destinationModel,
-                           (*it)->getDestinationPort()->getName());
-    }
-    
-    for (it = model.m_outputConnectionList.begin(); it !=
-         model.m_outputConnectionList.end(); ++it) {
-        Model* v_originModel = getModel((*it)->getOriginModel()->getName());
-
-	addOutputConnection(v_originModel,(*it)->getOriginPort()->getName(),
-                            this,(*it)->getDestinationPort()->getName());
-    }
-}
-
 CoupledModel::~CoupledModel()
 {
     delAllConnection();
@@ -97,11 +56,6 @@ CoupledModel::~CoupledModel()
          m_modelList.end(); ++it) {
         delete (*it).second;
     }
-}
-
-Model* CoupledModel::clone() const
-{
-    return new CoupledModel(*this);
 }
 
 
