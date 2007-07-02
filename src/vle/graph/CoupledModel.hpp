@@ -37,7 +37,6 @@
 namespace vle { namespace graph {
 
     class Connection;
-    class TargetPort;
     class CoupledModel;
 
     /**
@@ -164,23 +163,21 @@ namespace vle { namespace graph {
 
         const VectorConnection& getInternalConnectionList() const;
 
-	void addInputConnection(Model* src, const std::string& portSrc,
+	void addInputConnection(const std::string& portSrc,
                                 Model* dst, const std::string& portDst);
 
 	void addOutputConnection(Model* src, const std::string& portSrc,
-                                 Model* dst, const std::string& portDst);
+                                 const std::string& portDst);
 
 	void addInternalConnection(Model* src, const std::string& portSrc,
                                    Model* dst, const std::string& portDst);
 
-        void addInputConnection(const std::string& src,
-                                const std::string& portSrc,
+        void addInputConnection(const std::string& portSrc,
                                 const std::string& dst,
                                 const std::string& portDst);
 
         void addOutputConnection(const std::string& src,
                                  const std::string& portSrc,
-                                 const std::string& dst,
                                  const std::string& portDst);
 
         void addInternalConnection(const std::string& src,
@@ -188,94 +185,10 @@ namespace vle { namespace graph {
                                    const std::string& dst,
                                    const std::string& portDst);
 
-        /**
-         * return a pointer to input connection with parameter srcModel
-         * srcPort dstModel and dstPort
-         *
-         * @param src
-         * @param portSrc
-         * @param dst
-         * @param portDst
-         *
-         * @return pointer to input connection or 0 if not found
-         */
-        Connection* getInputConnection(Model* src, const std::string& portSrc,
-                                       Model* dst, const std::string& portDst);
-
-        /** 
-         * @brief Convenient function to get a input connection between to models.
-         * 
-         * @param portSrc name of the input port of coupled model.
-         * @param dst name of the output model.
-         * @param portDst name of the output port.
-         * 
-         * @return A reference to the connection or 0 otherwise.
-         */
-        Connection* getInputConnection(const std::string& portSrc,
-                                       const std::string& dst,
-                                       const std::string& portDst);
-
-        /** 
-         * @brief Convenient function to get a output connection between to models.
-         * 
-         * @param src name of the input model.
-         * @param portSrc name of the input port.
-         * @param portDst name of the output port of coupled model.
-         * 
-         * @return A reference to the connection or 0 otherwise.
-         */
-        Connection* getOutputConnection(const std::string& src,
-                                        const std::string& portSrc,
-                                        const std::string& portDst);
-
-        /** 
-         * @brief Convenient function to get a internal connection between to
-         * models.
-         * 
-         * @param src name of the input model.
-         * @param portSrc name of the input port.
-         * @param dst name of the output model.
-         * @param portDst name of the output port.
-         * 
-         * @return A reference to the connection or 0 otherwise.
-         */
-        Connection* getInternalConnection(const std::string& src,
-                                          const std::string& portSrc,
-                                          const std::string& dst,
-                                          const std::string& portDst);
-        /**
-         * return a pointer to output connection with parameter srcModel
-         * srcPort dstModel and dstPort
-         *
-         * @param src
-         * @param portSrc
-         * @param dst
-         * @param portDst
-         *
-         * @return pointer to ouput connection or 0 if not found
-         */
-        Connection* getOutputConnection(Model* src, const std::string& portSrc,
-                                        Model* dst, const std::string& portDst);
-
-        /**
-         * return a pointer to internal connection with parameter srcModel
-         * srcPort dstModel and dstPort
-         *
-         * @param src
-         * @param portSrc
-         * @param dst
-         * @param portDst
-         *
-         * @return pointer to internal connection or 0 if not found
-         */
-        Connection* getInternalConnection(Model* src, const std::string&
-                                          portSrc, Model* dst, const
-                                          std::string& portDst);
-
-	void delInputConnection(Model * src, const std::string & portSrc,
+	void delInputConnection(const std::string & portSrc,
 				Model * dst, const std::string & portDst);
 	void delOutputConnection(Model * src, const std::string & portSrc,
-				 Model * dst, const std::string & portDst);
+				 const std::string & portDst);
 	void delInternalConnection(Model * src, const std::string & portSrc,
 				   Model * dst, const std::string & portDst);
 	void delInputConnection(Connection * connect);
@@ -344,8 +257,6 @@ namespace vle { namespace graph {
          */
         bool hasConnectionProblem(const VectorModel& lst) const;
 
-	std::vector < TargetPort* > getTargetPortList(Port* port);
-
         virtual bool isAtomic() const;
 
         virtual bool isCoupled() const;
@@ -407,6 +318,13 @@ namespace vle { namespace graph {
         { return m_modelList.find(name) != m_modelList.end(); }
 
     private:
+        void addConnection(Model* src, const std::string& portSrc,
+                           Model* dst, const std::string& portDst);
+        
+        void delConnection(Model* src, const std::string& portSrc,
+                           Model* dst, const std::string& portDst);
+
+
 	VectorModel      m_modelList;
 	VectorConnection m_inputConnectionList;
 	VectorConnection m_outputConnectionList;

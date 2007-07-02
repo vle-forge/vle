@@ -284,11 +284,9 @@ void VpzStackSax::build_connection()
         cpl->addInternalConnection(orig->model, orig->port, dest->model,
                                    dest->port);
     } else if (cnt->isInputConnection()) {
-        cpl->addInputConnection(orig->model, orig->port, dest->model,
-                                dest->port);
+        cpl->addInputConnection(orig->port, dest->model, dest->port);
     } else if (cnt->isOutputConnection()) {
-        cpl->addOutputConnection(orig->model, orig->port, dest->model,
-                                 dest->port);
+        cpl->addOutputConnection(orig->model, orig->port, dest->port);
     }
 
     m_stack.push(cntx);

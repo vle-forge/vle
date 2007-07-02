@@ -24,11 +24,12 @@
 #ifndef VLE_GRAPH_MODEL_HPP
 #define VLE_GRAPH_MODEL_HPP
 
-#include <map>
-#include <string>
-#include <list>
-#include <vector>
+#include <vle/graph/ModelPortList.hpp>
 #include <boost/noncopyable.hpp>
+#include <map>
+#include <list>
+#include <set>
+
 
 
 namespace vle { namespace graph {
@@ -37,11 +38,12 @@ namespace vle { namespace graph {
     class AtomicModel;
     class CoupledModel;
     class NoVLEModel;
-    class Port;
 
-    typedef std::map < std::string, Port * > MapStringPort;
+    typedef std::map < std::string, ModelPortList > MapStringPort;
+    typedef std::set < std::string > PortList;
     typedef std::vector < AtomicModel * > AtomicModelVector;
     typedef std::map < std::string, Model* > VectorModel;
+    typedef std::list < std::pair < Model*, const std::string& name > > TargetPortList;
     
     /**
      * @brief The DEVS model base class.
@@ -57,15 +59,6 @@ namespace vle { namespace graph {
          * @param name 
          */
         Model(const std::string& name, CoupledModel* parent);
-
-        /** 
-         * @brief Affect operator. Be carefull to modify the parent.
-         * 
-         * @param mdl model to copy.
-         * 
-         * @return a reference to the current model.
-         */
-        Model& operator=(const Model& mdl);
 
 	virtual ~Model();
 
@@ -114,23 +107,25 @@ namespace vle { namespace graph {
          *
          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-	int getInitPortNumber() const;
-	int getInPortNumber() const;
-	int getOutPortNumber() const;
-	int getStatePortNumber() const;
-	Port * getPort(const std::string & name) const;
-	Port * getInitPort(const std::string & name) const;
-	Port * getInPort(const std::string & name) const;
-	Port * getOutPort(const std::string & name) const;
-	Port * getStatePort(const std::string & name) const;
-	int getInitPortIndex(const std::string & name) const;
-	int getInputPortIndex(const std::string & name) const;
-	int getOutputPortIndex(const std::string & name) const;
-	int getStatePortIndex(const std::string & name) const;
-	void addInitPort(const std::string & name);
-	void addInputPort(const std::string & name);
-	void addOutputPort(const std::string & name);
-	void addStatePort(const std::string & name);
+        // FIXME general :)
+        //const PortList& getInitPort(const std::string& name) const;
+        //const PortList& getStatePort(const std::string& name) const;
+        //PortList& getInitPort(const std::string& name) const;
+        //PortList& getStatePort(const std::string& name) const;
+
+        const ModelPortList& getInPort(const std::string& name) const;
+        const ModelPortList& getOutPort(const std::string& name) const;
+        ModelPortList& getInPort(const std::string& name);
+        ModelPortList& getOutPort(const std::string& name);
+
+        //int getInitPortIndex(const std::string & name) const;
+        //int getInputPortIndex(const std::string & name) const;
+        //int getOutputPortIndex(const std::string & name) const;
+        //int getStatePortIndex(const std::string & name) const;
+        void addInitPort(const std::string& name);
+        ModelPortList& addInputPort(const std::string& name);
+        ModelPortList& addOutputPort(const std::string& name);
+        void addStatePort(const std::string& name);
 
         /**
 	 * Delete an init port with specified name.
@@ -199,14 +194,34 @@ namespace vle { namespace graph {
 	bool existInputPort(const std::string & name);
 	bool existOutputPort(const std::string & name);
 	bool existStatePort(const std::string & name);
-	void clearInitPort();
-	void clearInputPort();
-	void clearOutputPort();
-	void clearStatePort();
-	const MapStringPort& getInitPortList() const;
-	const MapStringPort& getInputPortList() const;
-	const MapStringPort& getOutputPortList() const;
-	const MapStringPort& getStatePortList() const;
+        //void clearInitPort();
+        //void clearInputPort();
+        //void clearOutputPort();
+        //void clearStatePort();
+
+        inline const PortList& getInitPortList() const
+        { return m_initPortList; }
+
+        inline const MapStringPort& getInputPortList() const
+        { return m_inPortList; }
+
+        inline const MapStringPort& getOutputPortList() const
+        { return m_outPortList; }
+
+        inline const PortList& getStatePortList() const
+        { return m_statePortList; }
+
+        inline PortList& getInitPortList()
+        { return m_initPortList; }
+
+        inline MapStringPort& getInputPortList()
+        { return m_inPortList; }
+
+        inline MapStringPort& getOutputPortList()
+        { return m_outPortList; }
+
+        inline PortList& getStatePortList()
+        { return m_statePortList; }
 
         /**
 	 * Merge define port of this model with input, output, state and init
@@ -219,10 +234,10 @@ namespace vle { namespace graph {
          * @param statelist state list port name.
          * @param initlist init list port name.
          */
-        void mergePort(std::list < std::string >& inlist,
-                       std::list < std::string >& outlist,
-                       std::list < std::string >& statelist,
-                       std::list < std::string >& initlist);
+        //void mergePort(std::list < std::string >& inlist,
+        //std::list < std::string >& outlist,
+        //std::list < std::string >& statelist,
+        //std::list < std::string >& initlist);
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
@@ -368,10 +383,11 @@ namespace vle { namespace graph {
 
     protected:
 	CoupledModel*   m_parent;
-	MapStringPort   m_initPortList;
 	MapStringPort   m_inPortList;
 	MapStringPort   m_outPortList;
-	MapStringPort   m_statePortList;
+        
+        PortList        m_initPortList;
+	PortList        m_statePortList;
 
         int             m_x;
         int             m_y;

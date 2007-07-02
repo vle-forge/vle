@@ -24,7 +24,6 @@
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/graph/NoVLEModel.hpp>
-#include <vle/graph/Port.hpp>
 #include <vle/graph/Model.hpp>
 #include <vle/utils/XML.hpp>
 #include <vle/utils/Debug.hpp>
@@ -53,270 +52,12 @@ Model::Model(const std::string& name, CoupledModel* parent) :
     }
 }
 
-Model& Model::operator=(const Model& mdl)
-{
-    if (this != &mdl) {
-        m_name = mdl.getName();
-        m_parent = mdl.getParent();
-
-        clearStatePort();
-        clearOutputPort();
-        clearInputPort();
-        clearInitPort();
-
-        for (MapStringPort::const_iterator it = mdl.m_initPortList.begin();
-             it != mdl.m_initPortList.end();++it)
-            m_initPortList[it->first] = new Port(*it->second);
-
-        for (MapStringPort::const_iterator it = mdl.m_inPortList.begin();
-             it != mdl.m_inPortList.end();++it)
-            m_inPortList[it->first] = new Port(*it->second);
-
-        for (MapStringPort::const_iterator it = mdl.m_outPortList.begin();
-             it != mdl.m_outPortList.end();++it)
-            m_outPortList[it->first] = new Port(*it->second);
-
-        for (MapStringPort::const_iterator it = mdl.m_statePortList.begin();
-             it != mdl.m_statePortList.end();++it)
-            m_statePortList[it->first] = new Port(*it->second);
-    }
-    return *this;
-}
-
 Model::~Model()
 {
-    clearStatePort();
-    clearOutputPort();
-    clearInputPort();
-    clearInitPort();
-}
-
-int Model::getInitPortNumber() const
-{
-    return m_initPortList.size();
-}
-
-int Model::getInPortNumber() const
-{
-    return m_inPortList.size();
-}
-
-int Model::getOutPortNumber() const
-{
-    return m_outPortList.size();
-}
-
-int Model::getStatePortNumber() const
-{
-    return m_statePortList.size();
-}
-
-Port* Model::getPort(const std::string & p_name) const
-{
-    Port * port = getInitPort(p_name);
-
-    if (port != NULL) return port;
-    port = getInPort(p_name);
-    if (port != NULL) return port;
-    port = getOutPort(p_name);
-    if (port != NULL) return port;
-    port = getStatePort(p_name);
-    if (port != NULL) return port;
-
-    return NULL;
-}
-
-Port* Model::getInitPort(const std::string & p_name) const
-{
-    map<string,Port*>::const_iterator it = m_initPortList.find(p_name);
-    return (it == m_initPortList.end()) ? NULL : (*it).second;
-}
-
-Port* Model::getInPort(const std::string & p_name) const
-{
-    map<string,Port*>::const_iterator it = m_inPortList.find(p_name);
-    return (it == m_inPortList.end()) ? NULL : (*it).second;
-}
-
-Port* Model::getOutPort(const std::string & p_name) const
-{
-    map<string,Port*>::const_iterator it = m_outPortList.find(p_name);
-    return (it == m_outPortList.end()) ? NULL : (*it).second;
-}
-
-Port* Model::getStatePort(const std::string & p_name) const
-{
-    map<string,Port*>::const_iterator it = m_statePortList.find(p_name);
-    return (it == m_statePortList.end()) ? NULL : (*it).second;
-}
-
-int Model::getInitPortIndex(const std::string & name) const
-{
-    MapStringPort::const_iterator it = m_initPortList.begin();
-    int r = 0;
-
-    while (it != m_initPortList.end()) {
-	if ((*it).first == name) {
-            return r;
-        }
-	++it;
-	++r;
-    }
-
-    AssertI(false);
-    return -1;
-}
-
-int Model::getInputPortIndex(const std::string & name) const
-{
-    MapStringPort::const_iterator it = m_inPortList.begin();
-    int r = 0;
-
-    while (it != m_inPortList.end()) {
-        if ((*it).first == name) {
-            return r;
-        }
-	++it;
-	++r;
-    }
-    AssertI(false);
-    return -1;
-}
-
-int Model::getOutputPortIndex(const std::string & name) const
-{
-    MapStringPort::const_iterator it = m_outPortList.begin();
-    int r = 0;
-
-    while (it != m_outPortList.end()) {
-	if ((*it).first == name) {
-	    return r;
-        }
-        ++it;
-	++r;
-    }
-    AssertI(false);
-    return -1;
-}
-
-int Model::getStatePortIndex(const std::string & name) const
-{
-    MapStringPort::const_iterator it = m_statePortList.begin();
-    int r = 0;
-
-    while (it != m_statePortList.end()) {
-	if ((*it).first == name) {
-            return r;
-        }
-	++it;
-	++r;
-    }
-    AssertI(false);
-    return -1;
-}
-
-void Model::addInitPort(const std::string & name)
-{
-    m_initPortList[name] = new Port(this, name);
-}
-
-void Model::addInputPort(const std::string & name)
-{
-    m_inPortList[name] = new Port(this, name);
-}
-
-void Model::addOutputPort(const std::string & name)
-{
-    m_outPortList[name] = new Port(this, name);
-}
-
-void Model::addStatePort(const std::string & name)
-{
-    m_statePortList[name] = new Port(this, name);
-}
-
-bool Model::delInitPort(const std::string& name)
-{
-    MapStringPort::iterator it = m_initPortList.find(name);
-    if (it != m_initPortList.end()) {
-        delete (*it).second;
-        m_initPortList.erase(it);
-        return true;
-    }
-    return false;
-}
-
-bool Model::delInputPort(const std::string& name)
-{
-    graph::CoupledModel* parent = (m_parent) ? toCoupled(m_parent) : NULL;
-    graph::CoupledModel* cpled = (isCoupled() ? Model::toCoupled(this) : NULL);
-
-    if (parent == NULL) {
-        if ((cpled and cpled->hasConnection(this, name) == false) or
-            isAtomic()) {
-            MapStringPort::iterator it = m_inPortList.find(name);
-            if (it != m_inPortList.end()) {
-                delete (*it).second;
-                m_inPortList.erase(it);
-                return true;
-            }
-        }
-    } else {
-        if (parent->hasConnection(this, name) == false) {
-            if ((cpled and cpled->hasConnection(this, name) == false) or
-                isAtomic()) {
-                MapStringPort::iterator it = m_inPortList.find(name);
-                if (it != m_inPortList.end()) {
-                    delete (*it).second;
-                    m_inPortList.erase(it);
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
-}
-
-bool Model::delOutputPort(const std::string& name)
-{
-    graph::CoupledModel* parent = (m_parent) ? toCoupled(m_parent) : NULL;
-    graph::CoupledModel* cpled = (isCoupled() ? Model::toCoupled(this) : NULL);
-
-    if (parent == NULL) {
-        if ((cpled and cpled->hasConnection(this, name) == false) or
-            isAtomic()) {
-            MapStringPort::iterator it = m_outPortList.find(name);
-            if (it != m_outPortList.end()) {
-                delete (*it).second;
-                m_outPortList.erase(it);
-                return true;
-            }
-        }
-    } else {
-        if (parent->hasConnection(this, name) == false) {
-            if ((cpled and cpled->hasConnection(this, name) == false) or
-                isAtomic()) {
-                MapStringPort::iterator it = m_outPortList.find(name);
-                if (it != m_outPortList.end()) {
-                    delete (*it).second;
-                    m_outPortList.erase(it);
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
-}
-
-bool Model::delStatePort(const std::string& name)
-{
-    MapStringPort::iterator it = m_statePortList.find(name);
-    if (it != m_statePortList.end()) {
-        delete (*it).second;
-        m_statePortList.erase(it);
-        return true;
-    }
-    return false;
+    //clearStatePort();
+    //clearOutputPort();
+    //clearInputPort();
+    //clearInitPort();
 }
 
 void Model::delConnectionOnPort(const std::string& name)
@@ -349,6 +90,40 @@ void Model::delOutputPortAndConnection(const std::string& name)
 {
     delConnectionOnPort(name);
     delOutputPort(name);
+}
+
+ModelPortList& Model::addInputPort(const std::string& name)
+{
+    MapStringPort::iterator it(m_inPortList.find(name));
+    if (it == m_inPortList.end()) {
+        return (*m_inPortList.insert(
+                std::make_pair < std::string, ModelPortList >(
+                    name, ModelPortList())).first).second;
+    } else {
+        return it->second;
+    }
+}
+
+ModelPortList& Model::addOutputPort(const std::string& name)
+{
+    MapStringPort::iterator it(m_outPortList.find(name));
+    if (it == m_outPortList.end()) {
+        return (*m_outPortList.insert(
+                std::make_pair < std::string, ModelPortList >(
+                    name, ModelPortList())).first).second;
+    } else {
+        return it->second;
+    }
+}
+
+void Model::addInitPort(const std::string& name)
+{
+    m_initPortList.insert(name);
+}
+
+void Model::addStatePort(const std::string& name)
+{
+    m_statePortList.insert(name);
 }
 
 void Model::addInitPort(const std::list < std::string > & lst)
@@ -387,6 +162,50 @@ void Model::addStatePort(const std::list < std::string > & lst)
     }
 }
 
+const ModelPortList& Model::getInPort(const std::string& name) const
+{
+    MapStringPort::const_iterator it = m_inPortList.find(name);
+    if (it == m_inPortList.end()) {
+        Throw(utils::InternalError, boost::format(
+                "Coupled model %1% have no input port %2%") % getName() % name);
+    }
+
+    return it->second;
+}
+
+const ModelPortList& Model::getOutPort(const std::string& name) const
+{
+    MapStringPort::const_iterator it = m_outPortList.find(name);
+    if (it == m_outPortList.end()) {
+        Throw(utils::InternalError, boost::format(
+                "Coupled model %1% have no input port %2%") % getName() % name);
+    }
+
+    return it->second;
+}
+
+ModelPortList& Model::getInPort(const std::string& name)
+{
+    MapStringPort::iterator it = m_inPortList.find(name);
+    if (it == m_inPortList.end()) {
+        Throw(utils::InternalError, boost::format(
+                "Coupled model %1% have no output port %2%") % getName() % name);
+    }
+
+    return it->second;
+}
+
+ModelPortList& Model::getOutPort(const std::string& name)
+{
+    MapStringPort::iterator it = m_outPortList.find(name);
+    if (it == m_outPortList.end()) {
+        Throw(utils::InternalError, boost::format(
+                "Coupled model %1% have no output port %2%") % getName() % name);
+    }
+
+    return it->second;
+}
+
 bool Model::existInitPort(const std::string & name)
 {
     return m_initPortList.find(name) != m_initPortList.end();
@@ -407,124 +226,104 @@ bool Model::existStatePort(const std::string & name)
     return m_statePortList.find(name) != m_statePortList.end();
 }
 
-void Model::clearInitPort()
-{
-    map < string, Port* >::iterator it1 = m_initPortList.begin();
+//void Model::clearInitPort()
+//{
+//map < string, Port* >::iterator it1 = m_initPortList.begin();
+//
+//while (it1 != m_initPortList.end()) {
+//delete(it1++)->second;
+//}
+//
+//m_initPortList.clear();
+//}
+//
+//void Model::clearInputPort()
+//{
+//map < string, Port* >::iterator it2 = m_inPortList.begin();
+//
+//while (it2 != m_inPortList.end()) {
+//delete(it2++)->second;
+//}
+//
+//m_inPortList.clear();
+//}
+//
+//void Model::clearOutputPort()
+//{
+//map < string, Port* >::iterator it3 = m_outPortList.begin();
+//
+//while (it3 != m_outPortList.end()) {
+//delete(it3++)->second;
+//}
+//
+//m_outPortList.clear();
+//}
+//
+//void Model::clearStatePort()
+//{
+//map < string, Port* >::iterator it4 = m_statePortList.begin();
+//
+//while (it4 != m_statePortList.end()) {
+//delete(it4++)->second;
+//}
+//
+//m_statePortList.clear();
+//}
 
-    while (it1 != m_initPortList.end()) {
-        delete(it1++)->second;
-    }
-
-    m_initPortList.clear();
-}
-
-void Model::clearInputPort()
-{
-    map < string, Port* >::iterator it2 = m_inPortList.begin();
-
-    while (it2 != m_inPortList.end()) {
-        delete(it2++)->second;
-    }
-
-    m_inPortList.clear();
-}
-
-void Model::clearOutputPort()
-{
-    map < string, Port* >::iterator it3 = m_outPortList.begin();
-
-    while (it3 != m_outPortList.end()) {
-        delete(it3++)->second;
-    }
-
-    m_outPortList.clear();
-}
-
-void Model::clearStatePort()
-{
-    map < string, Port* >::iterator it4 = m_statePortList.begin();
-
-    while (it4 != m_statePortList.end()) {
-        delete(it4++)->second;
-    }
-
-    m_statePortList.clear();
-}
-
-const MapStringPort & Model::getInitPortList() const
-{
-    return m_initPortList;
-}
-
-const MapStringPort & Model::getInputPortList() const
-{
-    return m_inPortList;
-}
-
-const MapStringPort & Model::getOutputPortList() const
-{
-    return m_outPortList;
-}
-
-const MapStringPort & Model::getStatePortList() const
-{
-    return m_statePortList;
-}
-
-void Model::mergePort(std::list < std::string >& inlist,
-                      std::list < std::string >& outlist,
-                      std::list < std::string >& statelist,
-                      std::list < std::string >& initlist)
-{
-    MapStringPort::iterator it;
-    std::list < std::string >::iterator jt;
-
-    for (it = m_inPortList.begin(); it != m_inPortList.end(); ++it) {
-        jt = std::find(inlist.begin(), inlist.end(), (*it).first);
-        if (jt == inlist.end()) delInputPortAndConnection((*it).first);
-        inlist.erase(jt);
-    }
-    for (jt = inlist.begin(); jt != inlist.end(); ++jt)
-        addInputPort(*jt);
-
-    for (it = m_outPortList.begin(); it != m_outPortList.end(); ++it) {
-        jt = std::find(outlist.begin(), outlist.end(), (*it).first);
-        if (jt == outlist.end())
-            delOutputPortAndConnection((*it).first);
-        else
-            outlist.erase(jt);
-    }
-    for (jt = outlist.begin(); jt != outlist.end(); ++jt)
-        addOutputPort(*jt);
-
-    for (it = m_statePortList.begin(); it != m_statePortList.end(); ++it) {
-        jt = std::find(statelist.begin(), statelist.end(), (*it).first);
-        if (jt == statelist.end())
-            delStatePort((*it).first);
-        else
-            statelist.erase(jt);
-    }
-    for (jt = statelist.begin(); jt != statelist.end(); ++jt)
-        addStatePort(*jt);
-
-    for (it = m_initPortList.begin(); it != m_initPortList.end(); ++it) {
-        jt = std::find(initlist.begin(), initlist.end(), (*it).first);
-        if (jt == initlist.end())
-            delInitPort((*it).first);
-        else
-            initlist.erase(jt);
-    }
-    for (jt = initlist.begin(); jt != initlist.end(); ++jt)
-        addInitPort(*jt);
-}
-
+//void Model::mergePort(std::list < std::string >& inlist,
+//std::list < std::string >& outlist,
+//std::list < std::string >& statelist,
+//std::list < std::string >& initlist)
+//{
+//MapStringPort::iterator it;
+//std::list < std::string >::iterator jt;
+//
+//for (it = m_inPortList.begin(); it != m_inPortList.end(); ++it) {
+//jt = std::find(inlist.begin(), inlist.end(), (*it).first);
+//if (jt == inlist.end()) delInputPortAndConnection((*it).first);
+//inlist.erase(jt);
+//}
+//for (jt = inlist.begin(); jt != inlist.end(); ++jt)
+//addInputPort(*jt);
+//
+//for (it = m_outPortList.begin(); it != m_outPortList.end(); ++it) {
+//jt = std::find(outlist.begin(), outlist.end(), (*it).first);
+//if (jt == outlist.end())
+//delOutputPortAndConnection((*it).first);
+//else
+//outlist.erase(jt);
+//}
+//for (jt = outlist.begin(); jt != outlist.end(); ++jt)
+//addOutputPort(*jt);
+//
+//for (it = m_statePortList.begin(); it != m_statePortList.end(); ++it) {
+//jt = std::find(statelist.begin(), statelist.end(), (*it).first);
+//if (jt == statelist.end())
+//delStatePort((*it).first);
+//else
+//statelist.erase(jt);
+//}
+//for (jt = statelist.begin(); jt != statelist.end(); ++jt)
+//addStatePort(*jt);
+//
+//for (it = m_initPortList.begin(); it != m_initPortList.end(); ++it) {
+//jt = std::find(initlist.begin(), initlist.end(), (*it).first);
+//if (jt == initlist.end())
+//delInitPort((*it).first);
+//else
+//initlist.erase(jt);
+//}
+//for (jt = initlist.begin(); jt != initlist.end(); ++jt)
+//addInitPort(*jt);
+//}
+//
 void Model::writePortListXML(std::ostream& out) const
 {
     if (not m_initPortList.empty()) {
     out << "<init>\n";
-	MapStringPort::const_iterator it = m_initPortList.begin();
+	PortList::const_iterator it = m_initPortList.begin();
         for (;it != m_initPortList.end(); ++it) {
-            out << " <port name=\"" << (*it).first << "\" />\n";
+            out << " <port name=\"" << (*it) << "\" />\n";
         }
         out << "</init>\n";
     }
@@ -549,9 +348,9 @@ void Model::writePortListXML(std::ostream& out) const
 
     if (not m_statePortList.empty()) {
         out << "<state>\n";
-	MapStringPort::const_iterator it = m_statePortList.begin();
+	PortList::const_iterator it = m_statePortList.begin();
         for (; it != m_statePortList.end(); ++it) {
-            out << "<port name=\"" << (*it).first << "\" />\n";
+            out << "<port name=\"" << (*it) << "\" />\n";
 	}
         out << "</state>\n";
     }

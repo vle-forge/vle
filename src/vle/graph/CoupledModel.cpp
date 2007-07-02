@@ -95,97 +95,58 @@ const VectorConnection & CoupledModel::getInternalConnectionList() const
  *************************************************************/
 
 
+void CoupledModel::addConnection(Model* src, const std::string& portSrc,
+                                 Model* dst, const std::string& portDst)
+{
+    AssertI(dst);
 
-void CoupledModel::addInputConnection(Model * src, const std::string & portSrc,
-				      Model * dst, const std::string & portDst)
+    ModelPortList& outs(src->getOutPort(portSrc));
+    outs.add(dst, portDst);
+
+    ModelPortList& ins(dst->getOutPort(portDst));
+    ins.add(src, portSrc);
+}
+
+void CoupledModel::addInputConnection(const std::string & portSrc,
+				      Model* dst, const std::string& portDst)
+{
+    AssertI(dst);
+    AssertI(dst != this);
+    addConnection(this, portSrc, dst, portDst);
+}
+
+
+void CoupledModel::addOutputConnection(Model* src, const std::string& portSrc,
+				       const std::string& portDst)
+{
+    AssertI(src);
+    AssertI(src != this);
+    addConnection(src, portSrc, this, portDst);
+}
+
+void CoupledModel::addInternalConnection(Model* src,
+                                         const std::string& portSrc,
+                                         Model* dst,
+                                         const
+                                         std::string& portDst)
 {
     AssertI(src and dst);
-
-    Port * psrc = src->getInPort(portSrc);
-    Port * pdst = dst->getInPort(portDst);
-
-    AssertI(psrc and pdst);
-    AssertI(src == this and exist(dst->getName()));
-    AssertI(existInputPort(portSrc) and dst->existInputPort(portDst));
-
-    m_inputConnectionList.push_back(
-	new Connection(src, psrc, dst, pdst));
+    AssertI(src != this and dst != this);
+    addConnection(src, portSrc, dst, portDst);
 }
 
-
-void CoupledModel::addOutputConnection(Model * src, const std::string & portSrc,
-				       Model * dst, const std::string & portDst)
-{
-    AssertI(src and dst);
-
-    Port * psrc = src->getOutPort(portSrc);
-    Port * pdst = dst->getOutPort(portDst);
-
-    AssertI(psrc and pdst);
-    AssertI(exist(src->getName()) and dst == this);
-    AssertI(src->existOutputPort(portSrc) and
-	   existOutputPort(portDst) == true);
-
-    m_outputConnectionList.push_back(
-	new Connection(src, psrc, dst, pdst));
-}
-
-
-
-void CoupledModel::addInternalConnection(Model* src, const std::string&
-                                         portSrc, Model* dst, const
-                                         std::string& portDst) {
-    AssertI(src and dst);
-
-    Port * psrc = src->getOutPort(portSrc);
-    Port * pdst = dst->getInPort(portDst);
-
-    AssertI(psrc and pdst);
-    AssertI(exist(src->getName()) and exist(dst->getName()));
-    AssertI(src->existOutputPort(portSrc) == true and
-	   dst->existInputPort(portDst) == true);
-
-    m_internalConnectionList.push_back(
-	new Connection(src, psrc, dst, pdst));
-}
-
-void CoupledModel::addInputConnection(const std::string& src,
-                                      const std::string& portSrc,
+void CoupledModel::addInputConnection(const std::string& portSrc,
                                       const std::string& dst,
                                       const std::string& portDst)
 {
-    AssertI(src == getName());
-    Model* msrc = this;
-    Model* mdst = getModel(dst);
-    Port* psrc = msrc->getInPort(portSrc);
-    Port* pdst = mdst->getInPort(portDst);
-
-    AssertI(msrc);
-    AssertI(mdst);
-    AssertI(psrc);
-    AssertI(pdst);
-
-    m_inputConnectionList.push_back(
-	new Connection(msrc, psrc, mdst, pdst));
+    addConnection(this, portSrc, getModel(dst), portDst);
 }
 
 void CoupledModel::addOutputConnection(const std::string& src,
                                        const std::string& portSrc,
-                                       const std::string& dst,
                                        const std::string& portDst)
 {
-    AssertI(dst == getName());
-    Model* msrc = getModel(src);
-    AssertI(msrc);
-    Model* mdst = this;
-    AssertI(mdst);
-    Port* psrc = msrc->getOutPort(portSrc);
-    Port* pdst = mdst->getOutPort(portDst);
-    AssertI(psrc);
-    AssertI(pdst);
-
-    m_outputConnectionList.push_back(
-	new Connection(msrc, psrc, mdst, pdst));
+    addConnection(getModel(src), portSrc, this, portDst);
 }
 
 void CoupledModel::addInternalConnection(const std::string& src,
@@ -193,213 +154,48 @@ void CoupledModel::addInternalConnection(const std::string& src,
                                          const std::string& dst,
                                          const std::string& portDst)
 {
-    Model* msrc = getModel(src);
-    Model* mdst = getModel(dst);
-    AssertI(msrc);
-    AssertI(mdst);
-
-    Port* psrc = msrc->getOutPort(portSrc);
-    Port* pdst = mdst->getInPort(portDst);
-    AssertI(psrc);
-    AssertI(pdst);
-    
-    m_internalConnectionList.push_back(
-	new Connection(msrc, psrc, mdst, pdst));
+    addConnection(getModel(src), portSrc, getModel(dst), portDst);
 }
 
 
-Connection* CoupledModel::getInputConnection(const std::string& portSrc,
-                                             const std::string& dst,
-                                             const std::string& portDst)
+void CoupledModel::delConnection(Model* src, const std::string& portSrc,
+                                 Model* dst, const std::string& portDst)
 {
-    Model* mdst = getModel(dst);
-    AssertI(mdst);
+    AssertI(dst);
 
-    return getInputConnection(this, portSrc, mdst, portDst);
+    ModelPortList& outs(src->getOutPort(portSrc));
+    outs.remove(dst, portDst);
+
+    ModelPortList& ins(dst->getOutPort(portDst));
+    ins.remove(src, portSrc);
 }
 
-
-Connection *
-CoupledModel::getInputConnection(Model * src, const std::string & portSrc,
-                                 Model * dst, const std::string & portDst)
+void CoupledModel::delInputConnection(const std::string& portSrc,
+                                      Model* dst, const std::string& portDst)
 {
-    AssertI(src and src);
+    AssertI(dst);
 
-    Port * psrc = src->getInPort(portSrc);
-    Port * pdst = dst->getInPort(portDst);
-
-    AssertI(psrc and pdst);
-
-    VectorConnection::iterator it = m_inputConnectionList.begin();
-    while (it != m_inputConnectionList.end())
-    {
-	if ((*it)->getOriginModel() == src and
-	    (*it)->getOriginPort() == psrc and
-	    (*it)->getDestinationModel() == dst and
-	    (*it)->getDestinationPort() == pdst)
-	    return (*it);
-	it++;
-    }
-    return 0;
+    delConnection(this, portSrc, dst, portDst);
 }
 
 
-Connection* CoupledModel::getOutputConnection(const std::string& src,
-                                              const std::string& portSrc,
-                                              const std::string& portDst)
+
+void CoupledModel::delOutputConnection(Model* src, const std::string & portSrc,
+                                       const std::string & portDst)
 {
-    Model* msrc = getModel(src);
-    AssertI(msrc);
+    AssertI(src);
 
-    return getOutputConnection(msrc, portSrc, this, portDst);
+    delConnection(src, portSrc, this, portDst);
 }
 
-Connection *
-CoupledModel::getOutputConnection(Model * src, const std::string & portSrc,
-				  Model * dst, const std::string & portDst)
+
+
+void CoupledModel::delInternalConnection(Model* src, const std::string& portSrc,
+                                         Model* dst, const std::string& portDst)
 {
     AssertI(src and dst);
 
-    Port * psrc = src->getOutPort(portSrc);
-    Port * pdst = dst->getOutPort(portDst);
-
-    AssertI(psrc and pdst);
-
-    VectorConnection::iterator it = m_outputConnectionList.begin();
-    while (it != m_outputConnectionList.end())
-    {
-	if ((*it)->getOriginModel() == src and
-	    (*it)->getOriginPort() == psrc and
-	    (*it)->getDestinationModel() == dst and
-	    (*it)->getDestinationPort() == pdst)
-	    return (*it);
-	it++;
-    }
-    return 0;
-}
-
-Connection* CoupledModel::getInternalConnection(const std::string& src,
-                                                const std::string& portSrc,
-                                                const std::string& dst,
-                                                const std::string& portDst)
-{
-    Model* msrc = getModel(src);
-    Model* mdst = getModel(dst);
-    AssertI(msrc);
-    AssertI(mdst);
-
-    return getInternalConnection(msrc, portSrc, mdst, portDst);
-}
-
-Connection *
-CoupledModel::getInternalConnection(Model * src, const std::string & portSrc,
-				    Model * dst, const std::string & portDst)
-{
-    AssertI(src and dst);
-
-    Port * psrc = src->getOutPort(portSrc);
-    Port * pdst = dst->getInPort(portDst);
-
-    AssertI(psrc and pdst);
-
-    VectorConnection::iterator it = m_internalConnectionList.begin();
-    while (it != m_internalConnectionList.end())
-    {
-	if ((*it)->getOriginModel() == src and
-	    (*it)->getOriginPort() == psrc and
-	    (*it)->getDestinationModel() == dst and
-	    (*it)->getDestinationPort() == pdst)
-	    return (*it);
-	it++;
-    }
-    return 0;
-}
-
-
-
-void CoupledModel::delInputConnection(Model * src, const std::string & portSrc,
-                                      Model * dst, const std::string & portDst)
-{
-    AssertI(src and dst);
-    AssertI(src == this and dst != this);
-
-    Port * psrc = src->getInPort(portSrc);
-    Port * pdst = dst->getInPort(portDst);
-
-    AssertI(psrc and pdst);
-
-    VectorConnection::iterator it = m_inputConnectionList.begin();
-    while (it != m_inputConnectionList.end())
-    {
-	if ((*it)->getOriginModel() == src and
-	    (*it)->getOriginPort() == psrc and
-	    (*it)->getOriginModel() == dst and
-	    (*it)->getOriginPort() == pdst)
-	{
-	    delete (*it);
-	    m_inputConnectionList.erase(it);
-	    return;
-	}
-	++it;
-    }
-}
-
-
-
-void CoupledModel::delOutputConnection(Model * src, const std::string & portSrc,
-                                       Model * dst, const std::string & portDst)
-{
-    AssertI(src and dst);
-    AssertI(dst == this and src != this);
-
-    Port * psrc = src->getOutPort(portSrc);
-    Port * pdst = dst->getOutPort(portDst);
-
-    AssertI(psrc and pdst);
-
-    VectorConnection::iterator it = m_outputConnectionList.begin();
-    while (it != m_outputConnectionList.end())
-    {
-	if ((*it)->getDestinationModel() == src and
-	    (*it)->getDestinationPort() == psrc and
-	    (*it)->getDestinationModel() == dst and
-	    (*it)->getDestinationPort() == pdst)
-	{
-	    delete (*it);
-	    m_outputConnectionList.erase(it);
-	    return;
-	}
-	++it;
-    }
-}
-
-
-
-void CoupledModel::delInternalConnection(Model * src, const std::string & portSrc,
-                                         Model * dst, const std::string & portDst)
-{
-    AssertI(src and dst);
-    AssertI(dst != this and src != this);
-
-    Port * psrc = src->getOutPort(portSrc);
-    Port * pdst = dst->getInPort(portDst);
-
-    AssertI(psrc and pdst);
-
-    VectorConnection::iterator it = m_internalConnectionList.begin();
-    while (it != m_internalConnectionList.end())
-    {
-	if ((*it)->getOriginModel() == src and
-	    (*it)->getOriginPort() == psrc and
-	    (*it)->getDestinationModel() == dst and
-	    (*it)->getDestinationPort() == pdst)
-	{
-	    delete (*it);
-	    m_internalConnectionList.erase(it);
-	    return;
-	}
-	++it;
-    }
+    delConnection(src, portSrc, dst, portDst);
 }
 
 
@@ -569,47 +365,31 @@ void CoupledModel::delAllConnection()
                                    m_internalConnectionList.end());
 }
 
-void CoupledModel::replace(Model* old, Model* mdl)
+void CoupledModel::replace(Model* oldmodel, Model* newmodel)
 {
-    Assert(vle::utils::InternalError, old, "Replace a null model ?");
-    Assert(vle::utils::InternalError, mdl, "Replace a model by null ?");
+    Assert(vle::utils::InternalError, oldmodel, "Replace a null model ?");
+    Assert(vle::utils::InternalError, newmodel, "Replace a model by null ?");
 
-    VectorConnection::iterator it;
-
-    for (it = m_inputConnectionList.begin(); it != m_inputConnectionList.end();
-         ++it) {
-        if ((*it)->getDestinationModel() == old) {
-            (*it)->setDestinationModel(mdl);
-            (*it)->setDestinationPort(
-                mdl->getInPort((*it)->getDestinationPort()->getName()));
+    {
+        MapStringPort& source(oldmodel->getInputPortList());
+        for (MapStringPort::iterator it = source.begin(); it != source.end();
+             ++it) {
+            ModelPortList& lst(newmodel->addInputPort(it->first));
+            lst.merge(it->second);
         }
     }
 
-    for (it = m_outputConnectionList.begin();
-         it != m_outputConnectionList.end(); ++it) {
-        if ((*it)->getOriginModel() == old) {
-            (*it)->setOriginModel(mdl);
-            (*it)->setOriginPort(
-                mdl->getInPort((*it)->getOriginPort()->getName()));
+    {
+        MapStringPort& source(oldmodel->getOutputPortList());
+        for (MapStringPort::iterator it = source.begin(); it != source.end();
+             ++it) {
+            ModelPortList& lst(newmodel->addOutputPort(it->first));
+            lst.merge(it->second);
         }
     }
 
-    for (it = m_internalConnectionList.begin();
-         it != m_internalConnectionList.end(); ++it) {
-        if ((*it)->getDestinationModel() == old) {
-            (*it)->setDestinationModel(mdl);
-            (*it)->setDestinationPort(
-                mdl->getInPort((*it)->getDestinationPort()->getName()));
-        }
-        if ((*it)->getOriginModel() == old) {
-            (*it)->setOriginModel(mdl);
-            (*it)->setOriginPort(
-                mdl->getInPort((*it)->getOriginPort()->getName()));
-        }
-    }
-
-    delModel(old);
-    addModel(mdl);
+    delModel(oldmodel);
+    addModel(newmodel);
 }
 
 bool CoupledModel::hasConnection(Model* model, const std::string& name) const
@@ -741,81 +521,6 @@ bool CoupledModel::hasConnectionProblem(const VectorModel& lst) const
     }
 
     return false;
-}
-
-
-vector < TargetPort* > CoupledModel::getTargetPortList(Port* p_port)
-{
-    vector < TargetPort* > v_list;
-
-    // Internal connections
-    vector < Connection* >::iterator it3 =
-	m_internalConnectionList.begin();
-
-    while (it3 != m_internalConnectionList.end()) {
-	Connection* c = *it3;
-	if (c->getOriginPort() == p_port) {
-	    Model* m = c->getDestinationModel();
-
-	    if (m != this) {
-		if (m->isAtomic()) {
-		    v_list.push_back(
-			new TargetPort(c->getDestinationPort()->getName(),
-				       (AtomicModel*)m));
-		} else {
-		    vector < TargetPort* > v =
-			((CoupledModel*)m)->getTargetPortList(
-			    c->getDestinationPort());
-		    v_list.insert(v_list.end(), v.begin(), v.end());
-		}
-	    }
-	}
-	++it3;
-    }
-
-    // Input connections
-    vector < Connection* >::iterator it1 = m_inputConnectionList.begin();
-
-    while (it1 != m_inputConnectionList.end()) {
-	Connection* c = *it1;
-
-	if (c->getOriginPort() == p_port) {
-	    Model* m = c->getDestinationModel();
-
-	    if (m != this) {
-		if (m->isAtomic()) {
-		    v_list.push_back(
-			new TargetPort(c->getDestinationPort()->getName(),
-				       (AtomicModel*)m));
-		} else {
-		    vector < TargetPort* > v =
-			((CoupledModel*) m)->getTargetPortList(
-			    c->getDestinationPort());
-		    v_list.insert(v_list.end(), v.begin(), v.end());
-		}
-	    }
-	}
-	++it1;
-    }
-
-    // Output connections
-    vector < Connection* >::iterator it2 = m_outputConnectionList.begin();
-    while (it2 != m_outputConnectionList.end()) {
-	Connection* c = *it2;
-
-	if (c->getOriginPort() == p_port) {
-	    if (getParent() != NULL) {
-		vector < TargetPort* > v =
-		    getParent()->getTargetPortList(
-			c->getDestinationPort());
-
-		v_list.insert(v_list.end(), v.begin(), v.end());
-	    }
-	}
-	++it2;
-    }
-
-    return v_list;
 }
 
 bool CoupledModel::isAtomic() const

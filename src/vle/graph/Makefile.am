@@ -1,11 +1,13 @@
 AM_CPPFLAGS = -I$(top_srcdir)/src @VLE_CFLAGS@ @XML_CFLAGS@
 
-libgraph_coreheaders = AtomicModel.hpp Connection.hpp CoupledModel.hpp \
-			 graph.hpp Model.hpp NoVLEModel.hpp Port.hpp \
-			 TargetPort.hpp
+libgraph_coreheaders = AtomicModel.hpp CoupledModel.hpp \
+		       graph.hpp Model.hpp NoVLEModel.hpp \
+		       ModelPort.hpp ModelPortList.hpp
+			 
 
-libgraph_coresources = AtomicModel.cpp Connection.cpp CoupledModel.cpp \
-		       Model.cpp NoVLEModel.cpp Port.cpp TargetPort.cpp
+libgraph_coresources = AtomicModel.cpp CoupledModel.cpp \
+		       Model.cpp NoVLEModel.cpp Port.cpp \
+		       ModelPort.cpp ModelPortList.hpp
 
 libvle_LTLIBRARIES = libgraph.la
 libgraph_la_LDFLAGS = @SHARED_LIBRARY_LDFLAGS@
