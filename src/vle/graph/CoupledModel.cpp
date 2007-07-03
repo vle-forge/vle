@@ -112,6 +112,89 @@ void CoupledModel::addInternalConnection(Model* src,
     addConnection(src, portSrc, dst, portDst);
 }
 
+bool CoupledModel::existInputConnection(const std::string& portsrc,
+                                        const std::string& dst,
+                                        const std::string& portdst) const
+{
+    Model* mdst = findModel(dst);
+
+    if (mdst == 0)
+        return false;
+
+    if (not mdst->existInputPort(portdst))
+        return false;
+
+    if (not existInternalInputPort(portsrc))
+        return false;
+
+    const ModelPortList& mp_src = getInternalInPort(portsrc);
+    const ModelPortList& mp_dst = mdst->getInPort(portdst);
+
+    if (not mp_src.exist(mdst, portdst))
+        return false;
+
+    if (not mp_dst.exist(this, portsrc))
+        return false;
+
+    return true;
+}
+
+bool CoupledModel::existOutputConnection(const std::string& src,
+                                         const std::string& portsrc,
+                                         const std::string& portdst) const
+{
+    Model* msrc = findModel(src);
+
+    if (msrc == 0)
+        return false;
+
+    if (not msrc->existOutputPort(portsrc))
+        return false;
+
+    if (not existInternalOutputPort(portdst))
+        return false;
+
+    const ModelPortList& mp_src = msrc->getOutPort(portsrc);
+    const ModelPortList& mp_dst = getInternalOutPort(portdst);
+
+    if (not mp_src.exist(this, portdst))
+        return false;
+
+    if (not mp_dst.exist(msrc, portsrc))
+        return false;
+
+    return true;
+}
+
+bool CoupledModel::existInternalConnection(const std::string& src,
+                                           const std::string& portsrc,
+                                           const std::string& dst,
+                                           const std::string& portdst) const
+{
+    Model* msrc = findModel(src);
+    Model* mdst = findModel(dst);
+
+    if (msrc == 0 or mdst == 0)
+        return false;
+
+    if (not msrc->existOutputPort(portsrc))
+        return false;
+    
+    if (not mdst->existInputPort(portdst))
+        return false;
+
+    const ModelPortList& mp_src = msrc->getOutPort(portsrc);
+    const ModelPortList& mp_dst = mdst->getInPort(portdst);
+
+    if (not mp_src.exist(mdst, portdst))
+        return false;
+
+    if (not mp_dst.exist(msrc, portsrc))
+        return false;
+
+    return true;
+}
+
 void CoupledModel::addInputConnection(const std::string& portSrc,
                                       const std::string& dst,
                                       const std::string& portDst)

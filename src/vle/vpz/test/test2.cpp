@@ -83,16 +83,16 @@ BOOST_AUTO_TEST_CASE(atomicmodel_vpz)
     BOOST_REQUIRE_EQUAL(mdl.model()->isAtomic(), true);
     BOOST_REQUIRE_EQUAL(mdl.model()->getInitPortNumber(), 2);
     BOOST_REQUIRE_EQUAL(mdl.model()->getStatePortNumber(), 2);
-    BOOST_REQUIRE_EQUAL(mdl.model()->getInPortNumber(), 2);
-    BOOST_REQUIRE_EQUAL(mdl.model()->getOutPortNumber(), 2);
-    BOOST_REQUIRE(mdl.model()->getInitPort("init1") != 0);
-    BOOST_REQUIRE(mdl.model()->getInitPort("init2") != 0);
-    BOOST_REQUIRE(mdl.model()->getStatePort("state1") != 0);
-    BOOST_REQUIRE(mdl.model()->getStatePort("state2") != 0);
-    BOOST_REQUIRE(mdl.model()->getInPort("in1") != 0);
-    BOOST_REQUIRE(mdl.model()->getInPort("in2") != 0);
-    BOOST_REQUIRE(mdl.model()->getOutPort("out1") != 0);
-    BOOST_REQUIRE(mdl.model()->getOutPort("out2") != 0);
+    BOOST_REQUIRE_EQUAL(mdl.model()->getInputPortNumber(), 2);
+    BOOST_REQUIRE_EQUAL(mdl.model()->getOutputPortNumber(), 2);
+    BOOST_REQUIRE(mdl.model()->existInitPort("init1") != 0);
+    BOOST_REQUIRE(mdl.model()->existInitPort("init2") != 0);
+    BOOST_REQUIRE(mdl.model()->existStatePort("state1") != 0);
+    BOOST_REQUIRE(mdl.model()->existStatePort("state2") != 0);
+    BOOST_REQUIRE(mdl.model()->existInputPort("in1") != 0);
+    BOOST_REQUIRE(mdl.model()->existInputPort("in2") != 0);
+    BOOST_REQUIRE(mdl.model()->existOutputPort("out1") != 0);
+    BOOST_REQUIRE(mdl.model()->existOutputPort("out2") != 0);
 }
 
 BOOST_AUTO_TEST_CASE(coupledmodel_vpz)
@@ -145,8 +145,8 @@ BOOST_AUTO_TEST_CASE(coupledmodel_vpz)
     graph::CoupledModel* cpl = dynamic_cast < graph::CoupledModel*
         >(mdl.model());
     BOOST_REQUIRE(cpl != 0);
-    BOOST_REQUIRE(cpl->getOutPort("o") != 0);
-    BOOST_REQUIRE(cpl->getInPort("i") != 0);
+    BOOST_REQUIRE(cpl->existOutputPort("o") != 0);
+    BOOST_REQUIRE(cpl->existInputPort("i") != 0);
 
     graph::Model* mdl1 = cpl->find("atom1");
     graph::Model* mdl2 = cpl->find("atom2");
@@ -156,15 +156,15 @@ BOOST_AUTO_TEST_CASE(coupledmodel_vpz)
     graph::AtomicModel* atom1 = dynamic_cast < graph::AtomicModel* >(mdl1);
     graph::AtomicModel* atom2 = dynamic_cast < graph::AtomicModel* >(mdl2);
     BOOST_REQUIRE(atom1 != 0);
-    BOOST_REQUIRE(atom1->getOutPort("out") != 0);
-    BOOST_REQUIRE(atom1->getInPort("in") != 0);
+    BOOST_REQUIRE(atom1->existOutputPort("out") != 0);
+    BOOST_REQUIRE(atom1->existInputPort("in") != 0);
     BOOST_REQUIRE(atom2 != 0);
-    BOOST_REQUIRE(atom2->getInPort("in") != 0);
-    BOOST_REQUIRE(atom2->getOutPort("out") != 0);
+    BOOST_REQUIRE(atom2->existInputPort("in") != 0);
+    BOOST_REQUIRE(atom2->existOutputPort("out") != 0);
 
-    BOOST_REQUIRE(cpl->getInputConnection("i", "atom1", "in") != 0);
-    BOOST_REQUIRE(cpl->getOutputConnection("atom2", "out", "o") != 0);
-    BOOST_REQUIRE(cpl->getInternalConnection("atom1", "out", "atom2", "in") != 0);
+    BOOST_REQUIRE(cpl->existInputConnection("i", "atom1", "in") != 0);
+    BOOST_REQUIRE(cpl->existOutputConnection("atom2", "out", "o") != 0);
+    BOOST_REQUIRE(cpl->existInternalConnection("atom1", "out", "atom2", "in") != 0);
 }
 
 BOOST_AUTO_TEST_CASE(dynamic_vpz)

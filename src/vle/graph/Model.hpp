@@ -110,21 +110,35 @@ namespace vle { namespace graph {
          *
          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-        // FIXME general :)
-        //const PortList& getInitPort(const std::string& name) const;
-        //const PortList& getStatePort(const std::string& name) const;
-        //PortList& getInitPort(const std::string& name) const;
-        //PortList& getStatePort(const std::string& name) const;
+        bool existInitPort(const std::string& name) const
+        { return m_initPortList.find(name) != m_initPortList.end(); }
+
+        bool existStatePort(const std::string& name) const
+        { return m_statePortList.find(name) != m_statePortList.end(); }
+
+        bool existInputPort(const std::string& name) const
+        { return m_inPortList.find(name) != m_inPortList.end(); }
+
+        bool existOutputPort(const std::string& name) const
+        { return m_outPortList.find(name) != m_outPortList.end(); }
 
         const ModelPortList& getInPort(const std::string& name) const;
         const ModelPortList& getOutPort(const std::string& name) const;
         ModelPortList& getInPort(const std::string& name);
         ModelPortList& getOutPort(const std::string& name);
 
-        //int getInitPortIndex(const std::string & name) const;
-        //int getInputPortIndex(const std::string & name) const;
-        //int getOutputPortIndex(const std::string & name) const;
-        //int getStatePortIndex(const std::string & name) const;
+        int getInitPortNumber() const
+        { return m_initPortList.size(); }
+        
+        int getInputPortNumber() const
+        { return m_inPortList.size(); }
+        
+        int getOutputPortNumber() const
+        { return m_outPortList.size(); }
+        
+        int getStatePortNumber() const
+        { return m_statePortList.size(); }
+
         void addInitPort(const std::string& name);
         ModelPortList& addInputPort(const std::string& name);
         ModelPortList& addOutputPort(const std::string& name);

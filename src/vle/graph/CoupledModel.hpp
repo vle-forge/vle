@@ -176,8 +176,27 @@ namespace vle { namespace graph {
 	void delOutputConnection(Model * src, const std::string & portSrc,
 				 const std::string & portDst);
 	void delInternalConnection(Model * src, const std::string & portSrc,
-				   Model * dst, const std::string & portDst);
-        
+                                   Model * dst, const std::string & portDst);
+
+        bool existInputConnection(const std::string& portsrc,
+                                  const std::string& dst,
+                                  const std::string& portdst) const;
+
+        bool existOutputConnection(const std::string& src,
+                                   const std::string& portsrc,
+                                   const std::string& portdst) const;
+
+        bool existInternalConnection(const std::string& src,
+                                     const std::string& portsrc,
+                                     const std::string& dst,
+                                     const std::string& portdst) const;
+
+        bool existInternalInputPort(const std::string& name) const
+        { return m_internalInputList.find(name) != m_internalInputList.end(); }
+
+        bool existInternalOutputPort(const std::string& name) const
+        { return m_internalOutputList.find(name) != m_internalOutputList.end(); }
+
         /**
          * @brief Delete all connection around model m.
          *
