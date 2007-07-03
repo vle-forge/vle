@@ -131,7 +131,7 @@ namespace vle { namespace graph {
          * 
          * @param models a list of models.
          */
-        void attachModels(VectorModel& models);
+        void attachModels(ModelList& models);
 
         /**
          * @brief Detach a model (not delete !) of model list, and parent is
@@ -147,15 +147,9 @@ namespace vle { namespace graph {
          * 
          * @param models a list of model.
          */
-        void detachModels(const VectorModel& models);
+        void detachModels(const ModelList& models);
 
         Model* getModel(const std::string& modelName);
-
-        inline const VectorModel& getModelList() const
-        { return m_modelList; }
-        
-        inline VectorModel& getModelList()
-        { return m_modelList; }
 
         const VectorConnection& getInputConnectionList() const;
 
@@ -196,7 +190,8 @@ namespace vle { namespace graph {
 	void delInternalConnection(Connection * connect);
 	void delConnection(Connection * connect);
         
-	void attachInternalConnection(const std::list < Connection * > & c);
+        void getTargetPortList(Model* mdl, const std::string& portname,
+                               TargetModelList& out);
         
         /**
          * @brief Delete all connection around model m.
@@ -232,17 +227,6 @@ namespace vle { namespace graph {
          * @param model graph::model to test port connection.
          * @param name port name of model to test.
          *
-         * @return true if connection exist, false otherwise.
-         */
-        Connection* hasConnection(Model* model, const std::string& name);
-
-        /**
-         * Test if model has a connection with port name in input, output or
-         * internal with anoter model.
-         *
-         * @param model graph::model to test port connection.
-         * @param name port name of model to test.
-         *
          * @return Connection found or NULL if no connection found.
          */
         bool hasConnection(Model* model, const std::string& name) const;
@@ -255,7 +239,7 @@ namespace vle { namespace graph {
          *
          * @return true if model is found, else false
          */
-        bool hasConnectionProblem(const VectorModel& lst) const;
+        bool hasConnectionProblem(const ModelList& lst) const;
 
         virtual bool isAtomic() const;
 
@@ -306,7 +290,6 @@ namespace vle { namespace graph {
          */
         std::string buildNewName(const std::string& prefix) const;
 
-
         /** 
          * @brief Test if the name already exist in model list.
          * 
@@ -317,6 +300,16 @@ namespace vle { namespace graph {
         inline bool exist(const std::string& name) const
         { return m_modelList.find(name) != m_modelList.end(); }
 
+        //
+        /// Get functions.
+        //
+
+        inline const ModelList& getModelList() const
+        { return m_modelList; }
+        
+        inline ModelList& getModelList()
+        { return m_modelList; }
+
     private:
         void addConnection(Model* src, const std::string& portSrc,
                            Model* dst, const std::string& portDst);
@@ -324,11 +317,30 @@ namespace vle { namespace graph {
         void delConnection(Model* src, const std::string& portSrc,
                            Model* dst, const std::string& portDst);
 
+        inline const ConnectionList& getInternalInputPortList() const
+        { return m_internalInputList; }
 
-	VectorModel      m_modelList;
-	VectorConnection m_inputConnectionList;
-	VectorConnection m_outputConnectionList;
-	VectorConnection m_internalConnectionList;
+        inline const ConnectionList& getInternalOuputPortList() const
+        { return m_internalOutputList; }
+
+        inline ConnectionList& getInternalInputPortList()
+        { return m_internalInputList; }
+
+        inline ConnectionList& getInternalOuputPortList()
+        { return m_internalOutputList; }
+
+        ModelPortList& getInternalInPort(const std::string& name);
+        
+        const ModelPortList& getInternalInPort(const std::string& name) const;
+        
+        ModelPortList& getInternalOutPort(const std::string& name);
+
+        const ModelPortList& getInternalOutPort(const std::string& name) const;
+
+
+	ModelList       m_modelList;
+        ConnectionList  m_internalInputList;
+        ConnectionList  m_internalOutputList;
     };
 
 }} // namespace vle graph

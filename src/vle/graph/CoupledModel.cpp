@@ -52,38 +52,10 @@ CoupledModel::~CoupledModel()
 {
     delAllConnection();
 
-    for (VectorModel::iterator it = m_modelList.begin(); it !=
+    for (ModelList::iterator it = m_modelList.begin(); it !=
          m_modelList.end(); ++it) {
         delete (*it).second;
     }
-}
-
-
-
-/********************************************************************
- *
- * GET FUNCTIONS
- *
- ********************************************************************/
-
-
-
-const VectorConnection & CoupledModel::getInputConnectionList() const
-{
-    return m_inputConnectionList;
-}
-
-
-
-const VectorConnection & CoupledModel::getOutputConnectionList() const
-{
-    return m_outputConnectionList;
-}
-
-
-const VectorConnection & CoupledModel::getInternalConnectionList() const
-{
-    return m_internalConnectionList;
 }
 
 
@@ -112,7 +84,7 @@ void CoupledModel::addInputConnection(const std::string & portSrc,
 {
     AssertI(dst);
     AssertI(dst != this);
-    addConnection(this, portSrc, dst, portDst);
+
 }
 
 
@@ -121,7 +93,12 @@ void CoupledModel::addOutputConnection(Model* src, const std::string& portSrc,
 {
     AssertI(src);
     AssertI(src != this);
-    addConnection(src, portSrc, this, portDst);
+    AssertI(existOutputPort(portDst));
+    ModelPortList& outs(getInternalOutPort(portDst));
+    outs.add(this, portDst);
+
+    ModelPortList& ins(dst->getOutPort(portDst));
+    ins.add(src, portSrc);
 }
 
 void CoupledModel::addInternalConnection(Model* src,
@@ -178,8 +155,6 @@ void CoupledModel::delInputConnection(const std::string& portSrc,
     delConnection(this, portSrc, dst, portDst);
 }
 
-
-
 void CoupledModel::delOutputConnection(Model* src, const std::string & portSrc,
                                        const std::string & portDst)
 {
@@ -187,8 +162,6 @@ void CoupledModel::delOutputConnection(Model* src, const std::string & portSrc,
 
     delConnection(src, portSrc, this, portDst);
 }
-
-
 
 void CoupledModel::delInternalConnection(Model* src, const std::string& portSrc,
                                          Model* dst, const std::string& portDst)
@@ -198,171 +171,15 @@ void CoupledModel::delInternalConnection(Model* src, const std::string& portSrc,
     delConnection(src, portSrc, dst, portDst);
 }
 
-
-
-/**
- * delete input connection connect from input connection list
- *
- * @param connect connection to delete
- */
-void CoupledModel::delInputConnection(Connection * connect)
-{
-    AssertI(connect and connect->getOriginModel() == this);
-
-    VectorConnection::iterator it = m_inputConnectionList.begin();
-    while (it != m_inputConnectionList.end())
-    {
-	if ((*it) == connect)
-	{
-	    delete (*it);
-	    m_inputConnectionList.erase(it);
-	    return;
-	}
-	++it;
-    }
-
-    AssertI(false);
-}
-
-
-
-/**
- * delete output connection connect from output connection list
- *
- * @param connect connection to delete
- */
-void CoupledModel::delOutputConnection(Connection * connect)
-{
-    AssertI(connect and connect->getDestinationModel() == this);
-
-    VectorConnection::iterator it = m_outputConnectionList.begin();
-    while (it != m_outputConnectionList.end())
-    {
-	if ((*it) == connect)
-	{
-	    delete (*it);
-	    m_outputConnectionList.erase(it);
-	    return;
-	}
-	++it;
-    }
-
-    AssertI(false);
-}
-
-
-
-/**
- * delete internal connection connect from internal connection list
- *
- * @param connect connection to delete
- */
-void CoupledModel::delInternalConnection(Connection * connect)
-{
-    AssertI(connect);
-    AssertI(connect->getDestinationModel() != this);
-    AssertI(connect->getOriginModel() != this);
-
-    VectorConnection::iterator it = m_internalConnectionList.begin();
-    while (it != m_internalConnectionList.end())
-    {
-	if ((*it) == connect)
-	{
-	    delete (*it);
-	    m_internalConnectionList.erase(it);
-	    return;
-	}
-	++it;
-    }
-
-    AssertI(false);
-}
-
-
-
-/**
- * delete connection connect. Input, output and internal connection are tested
- * to find connect and destroy them.
- *
- * @param connect connection to delete
- */
-void CoupledModel::delConnection(Connection * connect)
-{
-    if (connect->getOriginModel() == this)
-	delInputConnection(connect);
-    else if (connect->getDestinationModel() == this)
-	delOutputConnection(connect);
-    else
-	delInternalConnection(connect);
-}
-
 void CoupledModel::delAllConnection(Model* m)
 {
-    VectorConnection::iterator it;
-
-    it = m_inputConnectionList.begin();
-    while (it != m_inputConnectionList.end()) {
-        if ((*it)->getDestinationModel() == m) {
-	    delete (*it);
-	    m_inputConnectionList.erase(it);
-	    it = m_inputConnectionList.begin();
-        } else {
-            ++it;
-        }
-    }
-
-    it = m_outputConnectionList.begin();
-    while (it != m_outputConnectionList.end()) {
-        if ((*it)->getOriginModel() == m) {
-	    delete (*it);
-	    m_outputConnectionList.erase(it);
-	    it = m_outputConnectionList.begin();
-        } else {
-            ++it;
-        }
-    }
-
-    it = m_internalConnectionList.begin();
-    while (it != m_internalConnectionList.end()) {
-        if (((*it)->getOriginModel() == m) or 
-            ((*it)->getDestinationModel() == m)) {
-	    delete (*it);
-	    m_internalConnectionList.erase(it);
-	    it = m_internalConnectionList.begin();
-        } else {
-            ++it;
-        }
-    }
+    AssertI(m);
+    // FIXME
 }
 
 void CoupledModel::delAllConnection()
 {
-    VectorConnection::iterator it;
-
-    it = m_inputConnectionList.begin();
-    while (it != m_inputConnectionList.end()) {
-        delete (*it);
-        ++it;
-    }
-
-    it = m_outputConnectionList.begin();
-    while (it != m_outputConnectionList.end()) {
-        delete (*it);
-        ++it;
-    }
-
-    it = m_internalConnectionList.begin();
-    while (it != m_internalConnectionList.end()) {
-        delete (*it);
-        ++it;
-    }
-
-    m_inputConnectionList.erase(m_inputConnectionList.begin(),
-                                m_inputConnectionList.end());
-    m_outputConnectionList.erase(m_outputConnectionList.begin(),
-                                 m_outputConnectionList.end());
-    m_internalConnectionList.erase(m_internalConnectionList.begin(),
-                                   m_internalConnectionList.end());
+    AssertI(false);
 }
 
 void CoupledModel::replace(Model* oldmodel, Model* newmodel)
@@ -371,8 +188,8 @@ void CoupledModel::replace(Model* oldmodel, Model* newmodel)
     Assert(vle::utils::InternalError, newmodel, "Replace a model by null ?");
 
     {
-        MapStringPort& source(oldmodel->getInputPortList());
-        for (MapStringPort::iterator it = source.begin(); it != source.end();
+        ConnectionList& source(oldmodel->getInputPortList());
+        for (ConnectionList::iterator it = source.begin(); it != source.end();
              ++it) {
             ModelPortList& lst(newmodel->addInputPort(it->first));
             lst.merge(it->second);
@@ -380,8 +197,8 @@ void CoupledModel::replace(Model* oldmodel, Model* newmodel)
     }
 
     {
-        MapStringPort& source(oldmodel->getOutputPortList());
-        for (MapStringPort::iterator it = source.begin(); it != source.end();
+        ConnectionList& source(oldmodel->getOutputPortList());
+        for (ConnectionList::iterator it = source.begin(); it != source.end();
              ++it) {
             ModelPortList& lst(newmodel->addOutputPort(it->first));
             lst.merge(it->second);
@@ -392,134 +209,15 @@ void CoupledModel::replace(Model* oldmodel, Model* newmodel)
     addModel(newmodel);
 }
 
-bool CoupledModel::hasConnection(Model* model, const std::string& name) const
+bool CoupledModel::hasConnection(Model* /* model */,
+                                 const std::string& /* name */) const
 {
-    VectorConnection::const_iterator it;
-
-    for (it = m_inputConnectionList.begin(); it !=
-         m_inputConnectionList.end(); ++it) {
-        const Connection* cnx = (*it);
-        if (cnx->getOriginModel() == model and
-            cnx->getOriginPort()->getName() == name) {
-            return true;
-        }
-        if (cnx->getDestinationModel()  == model and
-            cnx->getDestinationPort()->getName() == name) {
-            return true;
-        }
-    }
-    for (it = m_outputConnectionList.begin(); it !=
-         m_outputConnectionList.end(); ++it) {
-        const Connection* cnx = (*it);
-        if (cnx->getOriginModel() == model and
-            cnx->getOriginPort()->getName() == name) {
-            return true;
-        }
-        if (cnx->getDestinationModel() == model and
-            cnx->getDestinationPort()->getName() == name) {
-            return true;
-        }
-    }
-    for (it = m_internalConnectionList.begin(); it !=
-         m_internalConnectionList.end(); ++it) {
-        const Connection* cnx = (*it);
-        if (cnx->getOriginModel() == model and
-            cnx->getOriginPort()->getName() == name) {
-            return true;
-        }
-        if (cnx->getDestinationModel() == model and
-            cnx->getDestinationPort()->getName() == name) {
-            return true;
-        }
-    }
+    // FIXME
     return false;
 }
 
-Connection* CoupledModel::hasConnection(Model* model, const std::string& name)
+bool CoupledModel::hasConnectionProblem(const ModelList& /* lst */) const
 {
-    VectorConnection::const_iterator it;
-
-    for (it = m_inputConnectionList.begin(); it !=
-         m_inputConnectionList.end(); ++it) {
-        Connection* cnx = (*it);
-        if (cnx->getOriginModel() == model and
-            cnx->getOriginPort()->getName() == name) {
-            return cnx;
-        }
-        if (cnx->getDestinationModel()  == model and
-            cnx->getDestinationPort()->getName() == name) {
-            return cnx;
-        }
-    }
-    for (it = m_outputConnectionList.begin(); it !=
-         m_outputConnectionList.end(); ++it) {
-        Connection* cnx = (*it);
-        if (cnx->getOriginModel() == model and
-            cnx->getOriginPort()->getName() == name) {
-            return cnx;
-        }
-        if (cnx->getDestinationModel() == model and
-            cnx->getDestinationPort()->getName() == name) {
-            return cnx;
-        }
-    }
-    for (it = m_internalConnectionList.begin(); it !=
-         m_internalConnectionList.end(); ++it) {
-        Connection* cnx = (*it);
-        if (cnx->getOriginModel() == model and
-            cnx->getOriginPort()->getName() == name) {
-            return cnx;
-        }
-        if (cnx->getDestinationModel() == model and
-            cnx->getDestinationPort()->getName() == name) {
-            return cnx;
-        }
-    }
-    return 0;
-}
-
-bool CoupledModel::hasConnectionProblem(const VectorModel& lst) const
-{
-    const graph::VectorConnection& in = getInputConnectionList();
-    const graph::VectorConnection& out = getOutputConnectionList();
-    const graph::VectorConnection& inter = getInternalConnectionList();
-
-    graph::VectorConnection::const_iterator it = in.begin();
-    while(it != in.end()) {
-        graph::Model* org =(*it)->getOriginModel();
-        graph::Model* dst =(*it)->getDestinationModel();
-        AssertI(org == this);
-
-        if(isInList(lst, dst) == true)
-            return true;
-
-        ++it;
-    }
-
-    it = out.begin();
-    while(it != out.end()){
-        graph::Model* org =(*it)->getOriginModel();
-        graph::Model* dst =(*it)->getDestinationModel();
-        AssertI(dst == this);
-
-        if(isInList(lst, org) == true)
-            return true;
-
-        ++it;
-    }
-
-    it = inter.begin();
-    while(it != inter.end()) {
-        graph::Model* org =(*it)->getOriginModel();
-        graph::Model* dst =(*it)->getDestinationModel();
-
-        if((isInList(lst, org) == true and isInList(lst, dst) == false) or
-           (isInList(lst, org) == false and isInList(lst, dst) == true))
-            return true;
-
-        ++it;
-    }
-
     return false;
 }
 
@@ -540,7 +238,7 @@ bool CoupledModel::isNoVLE() const
 
 Model* CoupledModel::findModel(const std::string& name) const
 {
-    VectorModel::const_iterator it = m_modelList.find(name);
+    ModelList::const_iterator it = m_modelList.find(name);
     if (it == m_modelList.end()) {
         return 0;
     } else {
@@ -591,7 +289,7 @@ CoupledModel* CoupledModel::addCoupledModel(const std::string& name)
 
 void CoupledModel::delModel(Model* model)
 {
-    VectorModel::iterator it = m_modelList.find(model->getName());
+    ModelList::iterator it = m_modelList.find(model->getName());
     if (it != m_modelList.end()) {
         delAllConnection(model);
         m_modelList.erase(it);
@@ -601,7 +299,7 @@ void CoupledModel::delModel(Model* model)
 
 void CoupledModel::delAllModel()
 {
-    for (VectorModel::iterator it = m_modelList.begin(); it !=
+    for (ModelList::iterator it = m_modelList.begin(); it !=
          m_modelList.end(); ++it) {
         delModel(it->second);
         ++it;
@@ -620,16 +318,16 @@ void CoupledModel::attachModel(Model* model)
     model->setParent(this);
 }
 
-void CoupledModel::attachModels(VectorModel& models)
+void CoupledModel::attachModels(ModelList& models)
 {
-    for (VectorModel::iterator it = models.begin(); it != models.end(); ++it) {
+    for (ModelList::iterator it = models.begin(); it != models.end(); ++it) {
         attachModel(it->second);
     }
 }
 
 void CoupledModel::detachModel(Model* model)
 {
-    VectorModel::iterator it = m_modelList.find(model->getName());
+    ModelList::iterator it = m_modelList.find(model->getName());
     if (it != m_modelList.end()) {
         it->second->setParent(0);
         m_modelList.erase(it);
@@ -640,26 +338,20 @@ void CoupledModel::detachModel(Model* model)
     }
 }
 
-void CoupledModel::detachModels(const VectorModel& models)
+void CoupledModel::detachModels(const ModelList& models)
 {
-    for (VectorModel::const_iterator it = models.begin(); it != models.end();
+    for (ModelList::const_iterator it = models.begin(); it != models.end();
          ++it) {
 	detachModel(it->second);
     }
 }
 
-void CoupledModel::attachInternalConnection(
-                const std::list < Connection * > & c)
+void CoupledModel::getTargetPortList(Model* model, const std::string& portname,
+                                     TargetModelList& out)
 {
-    std::list < Connection * >::const_iterator it;
-
-    it = c.begin();
-
-    while (it != c.end())
-    {
-	m_internalConnectionList.push_back(*it);
-	++it;
-    }
+    // FIXME
+    AssertI(false);
+    AssertI(model and portname.empty() and out.empty());
 }
 
 void CoupledModel::writeXML(std::ostream& out) const
@@ -668,66 +360,66 @@ void CoupledModel::writeXML(std::ostream& out) const
     writePortListXML(out);
     out << "<submodels>\n";
 
-    const size_t szInConnection = m_inputConnectionList.size();
-    const size_t szOutConnection = m_outputConnectionList.size();
-    const size_t szInternalConnection = m_internalConnectionList.size();
-
-    for (VectorModel::const_iterator it = m_modelList.begin(); it !=
-         m_modelList.end(); ++it) {
-        it->second->writeXML(out);
-    }
-
-    out << "<connections>\n";
-    for (size_t i = 0; i < szInConnection; ++i) {
-        out << "<connection type=\"input\">\n"
-            << " <origin model=\""
-            << m_inputConnectionList[i]->getOriginModel()->getName()
-            << "\" port=\""
-            << m_inputConnectionList[i]->getOriginPort()->getName()
-            << "\" />\n"
-            << " <destination model=\""
-            << m_inputConnectionList[i]->getDestinationModel()->getName()
-            << "\" port=\""
-            << m_inputConnectionList[i]->getDestinationPort()->getName()
-            << "\" />\n"
-            << "</connection>\n";
-    }
-
-    for (size_t i = 0; i < szOutConnection; ++i) {
-        out << "<connection type=\"output\">\n"
-            << " <origin model=\""
-            << m_outputConnectionList[i]->getOriginModel()->getName()
-            << "\" port=\""
-            << m_outputConnectionList[i]->getOriginPort()->getName()
-            << "\" />\n"
-            << " <destination model=\""
-            << m_outputConnectionList[i]->getDestinationModel()->getName()
-            << "\" port=\""
-            << m_outputConnectionList[i]->getDestinationPort()->getName()
-            << "\" />\n"
-            << "</connection>\n";
-    }
-
-    for (size_t i = 0; i < szInternalConnection; ++i) {
-        out << "<connection type=\"internal\">\n"
-            << " <origin model=\""
-            << m_internalConnectionList[i]->getOriginModel()->getName()
-            << "\" port=\""
-            << m_internalConnectionList[i]->getOriginPort()->getName()
-            << "\" />\n"
-            << " <destination model=\""
-            << m_internalConnectionList[i]->getDestinationModel()->getName()
-            << "\" port=\""
-            << m_internalConnectionList[i]->getDestinationPort()->getName()
-            << "\" />\n"
-            << "</connection>\n";
-    }
-    out << "</connections>\n";
+    //const size_t szInConnection = m_inputConnectionList.size();
+    //const size_t szOutConnection = m_outputConnectionList.size();
+    //const size_t szInternalConnection = m_internalConnectionList.size();
+    //
+    //for (ModelList::const_iterator it = m_modelList.begin(); it !=
+    //m_modelList.end(); ++it) {
+    //it->second->writeXML(out);
+    //}
+    //
+    //out << "<connections>\n";
+    //for (size_t i = 0; i < szInConnection; ++i) {
+    //out << "<connection type=\"input\">\n"
+    //<< " <origin model=\""
+    //<< m_inputConnectionList[i]->getOriginModel()->getName()
+    //<< "\" port=\""
+    //<< m_inputConnectionList[i]->getOriginPort()->getName()
+    //<< "\" />\n"
+    //<< " <destination model=\""
+    //<< m_inputConnectionList[i]->getDestinationModel()->getName()
+    //<< "\" port=\""
+    //<< m_inputConnectionList[i]->getDestinationPort()->getName()
+    //<< "\" />\n"
+    //<< "</connection>\n";
+    //}
+    //
+    //for (size_t i = 0; i < szOutConnection; ++i) {
+    //out << "<connection type=\"output\">\n"
+    //<< " <origin model=\""
+    //<< m_outputConnectionList[i]->getOriginModel()->getName()
+    //<< "\" port=\""
+    //<< m_outputConnectionList[i]->getOriginPort()->getName()
+    //<< "\" />\n"
+    //<< " <destination model=\""
+    //<< m_outputConnectionList[i]->getDestinationModel()->getName()
+    //<< "\" port=\""
+    //<< m_outputConnectionList[i]->getDestinationPort()->getName()
+    //<< "\" />\n"
+    //<< "</connection>\n";
+    //}
+    //
+    //for (size_t i = 0; i < szInternalConnection; ++i) {
+    //out << "<connection type=\"internal\">\n"
+    //<< " <origin model=\""
+    //<< m_internalConnectionList[i]->getOriginModel()->getName()
+    //<< "\" port=\""
+    //<< m_internalConnectionList[i]->getOriginPort()->getName()
+    //<< "\" />\n"
+    //<< " <destination model=\""
+    //<< m_internalConnectionList[i]->getDestinationModel()->getName()
+    //<< "\" port=\""
+    //<< m_internalConnectionList[i]->getDestinationPort()->getName()
+    //<< "\" />\n"
+    //<< "</connection>\n";
+    //}
+    //out << "</connections>\n";
 }
 
 Model* CoupledModel::find(const std::string& name) const
 {
-    VectorModel::const_iterator it = m_modelList.find(name);
+    ModelList::const_iterator it = m_modelList.find(name);
     if (it == m_modelList.end()) {
         return 0;
     } else {
@@ -737,7 +429,7 @@ Model* CoupledModel::find(const std::string& name) const
 
 Model* CoupledModel::find(int x, int y) const
 {
-    VectorModel::const_iterator it;
+    ModelList::const_iterator it;
     for (it = m_modelList.begin(); it != m_modelList.end(); ++it) {
         if ((*it).second->x() <= x and x <= (*it).second->x() + (*it).second->width() and
             (*it).second->y() <= y and y <= (*it).second->y() + (*it).second->height()) {
@@ -764,6 +456,52 @@ std::string CoupledModel::buildNewName(const std::string& prefix) const
     } while (exist(name));
 
     return newname;
+}
+
+ModelPortList& CoupledModel::getInternalInPort(const std::string& name)
+{
+    ConnectionList::iterator it = m_internalInputList.find(name);
+    if (it == m_internalInputList.end()) {
+        Throw(utils::InternalError, boost::format(
+                "Coupled model %1% have no input port %2%") % getName() % name);
+    }
+
+    return it->second;
+}
+
+const ModelPortList& CoupledModel::getInternalInPort(
+    const std::string& name) const
+{
+    ConnectionList::const_iterator it = m_internalInputList.find(name);
+    if (it == m_internalInputList.end()) {
+        Throw(utils::InternalError, boost::format(
+                "Coupled model %1% have no input port %2%") % getName() % name);
+    }
+
+    return it->second;
+}
+
+ModelPortList& CoupledModel::getInternalOutPort(const std::string& name)
+{
+    ConnectionList::const_iterator it = m_internalOutputList.find(name);
+    if (it == m_internalOutputList.end()) {
+        Throw(utils::InternalError, boost::format(
+                "Coupled model %1% have no input port %2%") % getName() % name);
+    }
+
+    return it->second;
+}
+
+const ModelPortList& CoupledModel::getInternalOutPort(
+    const std::string& name) const
+{
+    ConnectionList::const_iterator it = m_internalOutputList.find(name);
+    if (it == m_internalOutputList.end()) {
+        Throw(utils::InternalError, boost::format(
+                "Coupled model %1% have no input port %2%") % getName() % name);
+    }
+
+    return it->second;
 }
 
 }} // namespace vle graph

@@ -39,12 +39,12 @@ namespace vle { namespace graph {
     class CoupledModel;
     class NoVLEModel;
 
-    typedef std::map < std::string, ModelPortList > MapStringPort;
+    typedef std::map < std::string, ModelPortList > ConnectionList;
     typedef std::set < std::string > PortList;
     typedef std::vector < AtomicModel * > AtomicModelVector;
-    typedef std::map < std::string, Model* > VectorModel;
-    typedef std::list < std::pair < Model*, const std::string& name > > TargetPortList;
-    
+    typedef std::map < std::string, Model* > ModelList;
+    typedef std::list < ModelPort* > TargetModelList;
+ 
     /**
      * @brief The DEVS model base class.
      *
@@ -164,13 +164,6 @@ namespace vle { namespace graph {
 	bool delStatePort(const std::string & name);
 
         /**
-	 * Delete all connection on port name (input or output).
-         *
-	 * @param name port name to find connection and delete it.
-         */
-        void delConnectionOnPort(const std::string& name);
-
-        /**
 	 * Delete an input port with specified name and destroy input or
          * internal connections if exist.
          *
@@ -202,10 +195,10 @@ namespace vle { namespace graph {
         inline const PortList& getInitPortList() const
         { return m_initPortList; }
 
-        inline const MapStringPort& getInputPortList() const
+        inline const ConnectionList& getInputPortList() const
         { return m_inPortList; }
 
-        inline const MapStringPort& getOutputPortList() const
+        inline const ConnectionList& getOutputPortList() const
         { return m_outPortList; }
 
         inline const PortList& getStatePortList() const
@@ -214,10 +207,10 @@ namespace vle { namespace graph {
         inline PortList& getInitPortList()
         { return m_initPortList; }
 
-        inline MapStringPort& getInputPortList()
+        inline ConnectionList& getInputPortList()
         { return m_inPortList; }
 
-        inline MapStringPort& getOutputPortList()
+        inline ConnectionList& getOutputPortList()
         { return m_outPortList; }
 
         inline PortList& getStatePortList()
@@ -300,7 +293,7 @@ namespace vle { namespace graph {
          *
          * @return true if found, else false
          */
-        static bool isInList(const VectorModel& lst, graph::Model* m);
+        static bool isInList(const ModelList& lst, graph::Model* m);
 
         /*
          * 
@@ -383,8 +376,8 @@ namespace vle { namespace graph {
 
     protected:
 	CoupledModel*   m_parent;
-	MapStringPort   m_inPortList;
-	MapStringPort   m_outPortList;
+	ConnectionList  m_inPortList;
+	ConnectionList  m_outPortList;
         
         PortList        m_initPortList;
 	PortList        m_statePortList;

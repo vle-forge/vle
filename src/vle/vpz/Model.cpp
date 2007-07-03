@@ -164,8 +164,8 @@ void Model::write_coupled(std::ostream& out, const graph::CoupledModel* mdl) con
         write_port(out, top);
 
         out << " <submodels>\n";
-        const graph::VectorModel& childs(top->getModelList());
-        for (graph::VectorModel::const_iterator it = childs.begin(); 
+        const graph::ModelList& childs(top->getModelList());
+        for (graph::ModelList::const_iterator it = childs.begin(); 
              it != childs.end(); ++it) {
             if (it->second->isCoupled()) {
                 stack.push(static_cast < graph::CoupledModel* >(it->second));
@@ -215,20 +215,20 @@ void Model::write_novle(std::ostream& out, const graph::NoVLEModel* mdl) const
 
 void Model::write_port(std::ostream& out, const graph::Model* mdl) const
 {
-    const graph::MapStringPort& ins(mdl->getInputPortList());
+    const graph::ConnectionList& ins(mdl->getInputPortList());
     if (not ins.empty()) {
         out << "<in>\n";
-        for (graph::MapStringPort::const_iterator it = ins.begin(); 
+        for (graph::ConnectionList::const_iterator it = ins.begin(); 
              it != ins.end(); ++it) {
             out << " <port name=\"" << it->first << "\" />\n";
         }
         out << "</in>\n";
     }
     
-    const graph::MapStringPort& outs(mdl->getOutputPortList());
+    const graph::ConnectionList& outs(mdl->getOutputPortList());
     if (not outs.empty()) {
         out << "<out>\n";
-        for (graph::MapStringPort::const_iterator it = outs.begin(); 
+        for (graph::ConnectionList::const_iterator it = outs.begin(); 
              it != outs.end(); ++it) {
             out << " <port name=\"" << it->first << "\" />\n";
         }
