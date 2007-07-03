@@ -5,7 +5,7 @@
  */
 
 /*
- * Copyright (C) 2004, 05, 06 - The vle Development Team
+ * Copyright (C) 2004, 05, 06, 07 - The vle Development Team
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -54,31 +54,23 @@ Model::Model(const std::string& name, CoupledModel* parent) :
 
 Model::~Model()
 {
-    //clearStatePort();
-    //clearOutputPort();
-    //clearInputPort();
-    //clearInitPort();
 }
 
-void Model::getTargetPortList(const std::string& portname,
-                              TargetModelList& out)
+void Model::getTargetPortList(const std::string&  /* portname */,
+                              TargetModelList& /* out */)
 {
-    // FIXME
-    AssertI(false);
-    AssertI(portname.empty() and out.empty());
+    Throw(utils::NotYetImplented, "Model::getTargetPortList");
 }
 
 
-void Model::delInputPortAndConnection(const std::string& name)
+void Model::delInputPortAndConnection(const std::string& /* name */)
 {
-    //delConnectionOnPort(name); // FIXME
-    delInputPort(name);
+    Throw(utils::NotYetImplented, "Model::delInputPortAndConnection");
 }
 
-void Model::delOutputPortAndConnection(const std::string& name)
+void Model::delOutputPortAndConnection(const std::string& /* name */)
 {
-    //delConnectionOnPort(name); // FIXME
-    delOutputPort(name);
+    Throw(utils::NotYetImplented, "Model::delInputPortAndConnection");
 }
 
 ModelPortList& Model::addInputPort(const std::string& name)
@@ -112,13 +104,13 @@ void Model::delInitPort(const std::string & name)
 
 void Model::delInputPort(const std::string & name)
 {
-    Throw(utils::InternalError, boost::format(
+    Throw(utils::DevsGraphError, boost::format(
             "delInputPort %1% not yet implemented") % name);
 }
 
 void Model::delOutputPort(const std::string & name)
 {
-    Throw(utils::InternalError, boost::format(
+    Throw(utils::DevsGraphError, boost::format(
             "delOutputPort %1% not yet implemented") % name);
 }
 
@@ -177,7 +169,7 @@ const ModelPortList& Model::getInPort(const std::string& name) const
 {
     ConnectionList::const_iterator it = m_inPortList.find(name);
     if (it == m_inPortList.end()) {
-        Throw(utils::InternalError, boost::format(
+        Throw(utils::DevsGraphError, boost::format(
                 "Coupled model %1% have no input port %2%") % getName() % name);
     }
 
@@ -188,7 +180,7 @@ const ModelPortList& Model::getOutPort(const std::string& name) const
 {
     ConnectionList::const_iterator it = m_outPortList.find(name);
     if (it == m_outPortList.end()) {
-        Throw(utils::InternalError, boost::format(
+        Throw(utils::DevsGraphError, boost::format(
                 "Coupled model %1% have no input port %2%") % getName() % name);
     }
 
@@ -199,7 +191,7 @@ ModelPortList& Model::getInPort(const std::string& name)
 {
     ConnectionList::iterator it = m_inPortList.find(name);
     if (it == m_inPortList.end()) {
-        Throw(utils::InternalError, boost::format(
+        Throw(utils::DevsGraphError, boost::format(
                 "Coupled model %1% have no output port %2%") % getName() % name);
     }
 
@@ -210,7 +202,7 @@ ModelPortList& Model::getOutPort(const std::string& name)
 {
     ConnectionList::iterator it = m_outPortList.find(name);
     if (it == m_outPortList.end()) {
-        Throw(utils::InternalError, boost::format(
+        Throw(utils::DevsGraphError, boost::format(
                 "Coupled model %1% have no output port %2%") % getName() % name);
     }
 

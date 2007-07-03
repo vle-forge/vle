@@ -6,7 +6,7 @@
  */
 
 /*
- * Copyright (C) 2004, 05, 06 - The vle Development Team
+ * Copyright (C) 2004, 05, 06, 07 - The vle Development Team
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -34,8 +34,6 @@
 using std::vector;
 using std::string;
 using std::list;
-using namespace vle::utils::xml;
-
 
 
 namespace vle { namespace graph {
@@ -67,7 +65,7 @@ CoupledModel::~CoupledModel()
 void CoupledModel::addConnection(Model* src, const std::string& portSrc,
                                  Model* dst, const std::string& portDst)
 {
-    AssertI(dst);
+    AssertS(utils::DevsGraphError, dst);
 
     ModelPortList& outs(src->getOutPort(portSrc));
     outs.add(dst, portDst);
@@ -79,8 +77,8 @@ void CoupledModel::addConnection(Model* src, const std::string& portSrc,
 void CoupledModel::addInputConnection(const std::string & portSrc,
 				      Model* dst, const std::string& portDst)
 {
-    AssertI(dst);
-    AssertI(dst != this);
+    AssertS(utils::DevsGraphError, dst);
+    AssertS(utils::DevsGraphError, dst != this);
 
     ModelPortList& outs(getInternalOutPort(portSrc));
     outs.add(dst, portDst);
@@ -93,8 +91,8 @@ void CoupledModel::addInputConnection(const std::string & portSrc,
 void CoupledModel::addOutputConnection(Model* src, const std::string& portSrc,
 				       const std::string& portDst)
 {
-    AssertI(src);
-    AssertI(src != this);
+    AssertS(utils::DevsGraphError, src);
+    AssertS(utils::DevsGraphError, src != this);
     
     ModelPortList& outs(src->getOutPort(portSrc));
     outs.add(this, portDst);
@@ -109,8 +107,8 @@ void CoupledModel::addInternalConnection(Model* src,
                                          const
                                          std::string& portDst)
 {
-    AssertI(src and dst);
-    AssertI(src != this and dst != this);
+    AssertS(utils::DevsGraphError, src and dst);
+    AssertS(utils::DevsGraphError, src != this and dst != this);
     addConnection(src, portSrc, dst, portDst);
 }
 
@@ -140,7 +138,7 @@ void CoupledModel::addInternalConnection(const std::string& src,
 void CoupledModel::delConnection(Model* src, const std::string& portSrc,
                                  Model* dst, const std::string& portDst)
 {
-    AssertI(dst);
+    AssertS(utils::DevsGraphError, dst);
 
     ModelPortList& outs(src->getOutPort(portSrc));
     outs.remove(dst, portDst);
@@ -152,7 +150,7 @@ void CoupledModel::delConnection(Model* src, const std::string& portSrc,
 void CoupledModel::delInputConnection(const std::string& portSrc,
                                       Model* dst, const std::string& portDst)
 {
-    AssertI(dst);
+    AssertS(utils::DevsGraphError, dst);
 
     delConnection(this, portSrc, dst, portDst);
 }
@@ -160,7 +158,7 @@ void CoupledModel::delInputConnection(const std::string& portSrc,
 void CoupledModel::delOutputConnection(Model* src, const std::string & portSrc,
                                        const std::string & portDst)
 {
-    AssertI(src);
+    AssertS(utils::DevsGraphError, src);
 
     delConnection(src, portSrc, this, portDst);
 }
@@ -168,26 +166,26 @@ void CoupledModel::delOutputConnection(Model* src, const std::string & portSrc,
 void CoupledModel::delInternalConnection(Model* src, const std::string& portSrc,
                                          Model* dst, const std::string& portDst)
 {
-    AssertI(src and dst);
+    AssertS(utils::DevsGraphError, src and dst);
 
     delConnection(src, portSrc, dst, portDst);
 }
 
 void CoupledModel::delAllConnection(Model* m)
 {
-    AssertI(m);
-    // FIXME
+    AssertS(utils::DevsGraphError, m);
+    Throw(utils::NotYetImplented, "CoupledModel::delAllConnection");
 }
 
 void CoupledModel::delAllConnection()
 {
-    AssertI(false);
+    AssertS(utils::DevsGraphError, false);
 }
 
 void CoupledModel::replace(Model* oldmodel, Model* newmodel)
 {
-    Assert(vle::utils::InternalError, oldmodel, "Replace a null model ?");
-    Assert(vle::utils::InternalError, newmodel, "Replace a model by null ?");
+    Assert(utils::DevsGraphError, oldmodel, "Replace a null model ?");
+    Assert(utils::DevsGraphError, newmodel, "Replace a model by null ?");
 
     {
         ConnectionList& source(oldmodel->getInputPortList());
@@ -214,12 +212,13 @@ void CoupledModel::replace(Model* oldmodel, Model* newmodel)
 bool CoupledModel::hasConnection(Model* /* model */,
                                  const std::string& /* name */) const
 {
-    // FIXME
+    Throw(utils::NotYetImplented, "CoupledModel::hasConnection");
     return false;
 }
 
 bool CoupledModel::hasConnectionProblem(const ModelList& /* lst */) const
 {
+    Throw(utils::NotYetImplented, "CoupledModel::hasConnectionProblem");
     return false;
 }
 
@@ -259,7 +258,7 @@ Model* CoupledModel::getModel(const std::string& modelname)
 
 void CoupledModel::addModel(Model* model)
 {
-    AssertI(not exist(model->getName()));
+    AssertS(utils::DevsGraphError, not exist(model->getName()));
 
     model->setParent(this);
     m_modelList[model->getName()] = model;
@@ -267,7 +266,7 @@ void CoupledModel::addModel(Model* model)
 
 AtomicModel* CoupledModel::addAtomicModel(const std::string& name)
 {
-    AssertI(not exist(name));
+    AssertS(utils::DevsGraphError, not exist(name));
     AtomicModel* x = new AtomicModel(name, this);
     m_modelList[name] = x;
     return x;
@@ -275,7 +274,7 @@ AtomicModel* CoupledModel::addAtomicModel(const std::string& name)
 
 NoVLEModel* CoupledModel::addNoVLEModel(const std::string& name)
 {
-    AssertI(not exist(name));
+    AssertS(utils::DevsGraphError, not exist(name));
     NoVLEModel* x = new NoVLEModel(name, this);
     m_modelList[name] = x;
     return x;
@@ -283,7 +282,7 @@ NoVLEModel* CoupledModel::addNoVLEModel(const std::string& name)
 
 CoupledModel* CoupledModel::addCoupledModel(const std::string& name)
 {
-    AssertI(not exist(name));
+    AssertS(utils::DevsGraphError, not exist(name));
     CoupledModel* x = new CoupledModel(name, this);
     m_modelList[name] = x;
     return x;
@@ -310,7 +309,7 @@ void CoupledModel::delAllModel()
 
 void CoupledModel::attachModel(Model* model)
 {
-    AssertI(not exist(model->getName()));
+    AssertS(utils::DevsGraphError, not exist(model->getName()));
 
     if (model->getParent()) {
         model->getParent()->detachModel(model);
@@ -334,7 +333,7 @@ void CoupledModel::detachModel(Model* model)
         it->second->setParent(0);
         m_modelList.erase(it);
     } else {
-        Throw(utils::InternalError, (boost::format(
+        Throw(utils::DevsGraphError, (boost::format(
                     "Model %1% is not attached to the coupled model %2%") %
                 model->getName() % getName()));
     }
@@ -460,7 +459,7 @@ ModelPortList& CoupledModel::getInternalInPort(const std::string& name)
 {
     ConnectionList::iterator it = m_internalInputList.find(name);
     if (it == m_internalInputList.end()) {
-        Throw(utils::InternalError, boost::format(
+        Throw(utils::DevsGraphError, boost::format(
                 "Coupled model %1% have no input port %2%") % getName() % name);
     }
 
@@ -472,7 +471,7 @@ const ModelPortList& CoupledModel::getInternalInPort(
 {
     ConnectionList::const_iterator it = m_internalInputList.find(name);
     if (it == m_internalInputList.end()) {
-        Throw(utils::InternalError, boost::format(
+        Throw(utils::DevsGraphError, boost::format(
                 "Coupled model %1% have no input port %2%") % getName() % name);
     }
 
@@ -483,7 +482,7 @@ ModelPortList& CoupledModel::getInternalOutPort(const std::string& name)
 {
     ConnectionList::iterator it = m_internalOutputList.find(name);
     if (it == m_internalOutputList.end()) {
-        Throw(utils::InternalError, boost::format(
+        Throw(utils::DevsGraphError, boost::format(
                 "Coupled model %1% have no input port %2%") % getName() % name);
     }
 
@@ -495,7 +494,7 @@ const ModelPortList& CoupledModel::getInternalOutPort(
 {
     ConnectionList::const_iterator it = m_internalOutputList.find(name);
     if (it == m_internalOutputList.end()) {
-        Throw(utils::InternalError, boost::format(
+        Throw(utils::DevsGraphError, boost::format(
                 "Coupled model %1% have no input port %2%") % getName() % name);
     }
 

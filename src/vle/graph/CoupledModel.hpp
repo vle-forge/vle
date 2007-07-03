@@ -6,7 +6,7 @@
  */
 
 /*
- * Copyright (C) 2004, 05, 06 - The vle Development Team
+ * Copyright (C) 2004, 05, 06, 07 - The vle Development Team
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2

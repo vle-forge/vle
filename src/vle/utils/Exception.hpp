@@ -106,6 +106,28 @@ namespace vle { namespace utils {
     };
 
     /** 
+     * @brief Throw to report an unimplemted feature.
+     */
+    class NotYetImplented : public BaseError
+    {
+    public:
+        explicit NotYetImplented(const std::string& argv) :
+            BaseError(argv)
+        { }
+    };
+
+    /** 
+     * @brief Throw to report a DEVS graph library error.
+     */
+    class DevsGraphError : public BaseError
+    {
+    public:
+        explicit DevsGraphError(const std::string& argv) :
+            BaseError(argv)
+        { }
+    };
+
+    /** 
      * @brief Throw to report an error in SaxParser.
      */
     class SaxParserError : public BaseError
