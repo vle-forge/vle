@@ -26,7 +26,6 @@
 #define VLE_GRAPH_COUPLED_MODEL_HPP
 
 #include <vle/graph/Model.hpp>
-#include <vle/graph/Connection.hpp>
 #include <vector>
 #include <list>
 #include <libxml/xmlmemory.h>
@@ -36,7 +35,6 @@
 
 namespace vle { namespace graph {
 
-    class Connection;
     class CoupledModel;
 
     /**
@@ -151,12 +149,6 @@ namespace vle { namespace graph {
 
         Model* getModel(const std::string& modelName);
 
-        const VectorConnection& getInputConnectionList() const;
-
-        const VectorConnection& getOutputConnectionList() const;
-
-        const VectorConnection& getInternalConnectionList() const;
-
 	void addInputConnection(const std::string& portSrc,
                                 Model* dst, const std::string& portDst);
 
@@ -185,13 +177,6 @@ namespace vle { namespace graph {
 				 const std::string & portDst);
 	void delInternalConnection(Model * src, const std::string & portSrc,
 				   Model * dst, const std::string & portDst);
-	void delInputConnection(Connection * connect);
-	void delOutputConnection(Connection * connect);
-	void delInternalConnection(Connection * connect);
-	void delConnection(Connection * connect);
-        
-        void getTargetPortList(Model* mdl, const std::string& portname,
-                               TargetModelList& out);
         
         /**
          * @brief Delete all connection around model m.
@@ -258,6 +243,7 @@ namespace vle { namespace graph {
         virtual Model* findModel(const std::string& name) const;
 
         void writeXML(std::ostream& out) const;
+        void writeConnections(std::ostream& out) const;
 
         /** 
          * @brief Return a reference to the direct children model with

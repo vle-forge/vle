@@ -36,7 +36,7 @@ void ModelPortList::add(Model* model, const std::string& portname)
 
 void ModelPortList::remove(Model* model, const std::string& portname)
 {
-    for (const_iterator it = begin(); it != end(); ++it) {
+    for (iterator it = begin(); it != end(); ++it) {
         if ((*it)->model() == model and (*it)->port() == portname) {
             delete *it;
             erase(it);
@@ -48,7 +48,7 @@ void ModelPortList::remove(Model* model, const std::string& portname)
 void ModelPortList::merge(ModelPortList& lst)
 {
     for (iterator it = lst.begin(); it != lst.end(); ++it) {
-        push_back(new ModelPortList((*it)->first, (*it)->second));
+        push_back(new ModelPort((*it)->model(), (*it)->port()));
     }
 }
 

@@ -7,7 +7,7 @@ libgraph_coreheaders = AtomicModel.hpp CoupledModel.hpp \
 
 libgraph_coresources = AtomicModel.cpp CoupledModel.cpp \
 		       Model.cpp NoVLEModel.cpp Port.cpp \
-		       ModelPort.cpp ModelPortList.hpp
+		       ModelPort.cpp ModelPortList.cpp
 
 libvle_LTLIBRARIES = libgraph.la
 libgraph_la_LDFLAGS = @SHARED_LIBRARY_LDFLAGS@

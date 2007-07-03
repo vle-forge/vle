@@ -60,6 +60,15 @@ Model::~Model()
     //clearInitPort();
 }
 
+void Model::getTargetPortList(const std::string& portname,
+                              TargetModelList& out)
+{
+    // FIXME
+    AssertI(false);
+    AssertI(portname.empty() and out.empty());
+}
+
+
 void Model::delInputPortAndConnection(const std::string& name)
 {
     //delConnectionOnPort(name); // FIXME
@@ -94,6 +103,28 @@ ModelPortList& Model::addOutputPort(const std::string& name)
     } else {
         return it->second;
     }
+}
+
+void Model::delInitPort(const std::string & name)
+{
+    m_initPortList.erase(name);
+}
+
+void Model::delInputPort(const std::string & name)
+{
+    Throw(utils::InternalError, boost::format(
+            "delInputPort %1% not yet implemented") % name);
+}
+
+void Model::delOutputPort(const std::string & name)
+{
+    Throw(utils::InternalError, boost::format(
+            "delOutputPort %1% not yet implemented") % name);
+}
+
+void Model::delStatePort(const std::string & name)
+{
+    m_statePortList.erase(name);
 }
 
 void Model::addInitPort(const std::string& name)

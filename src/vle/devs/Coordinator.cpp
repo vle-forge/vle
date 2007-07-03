@@ -299,24 +299,22 @@ void Coordinator::dispatchExternalEvent(ExternalEventList& eventList,
     while (i < sz) {
         ExternalEvent* event = eventList.at(i);
 
-        vector < graph::TargetPort* > v_targetPortList =
-            getTargetPortList(sim->getStructure(),
-                              event->getPortName());
+        graph::TargetModelList out;
+        getTargetPortList(sim->getStructure(), event->getPortName(), out);
 
-        vector < graph::TargetPort* >::iterator it2 =
-            v_targetPortList.begin();
-
-        while (it2 != v_targetPortList.end()) {
-            graph::TargetPort *v_port = *it2;
-            Simulator* dst = m_modelList[v_port->getModel()];
+        graph::TargetModelList::iterator it2 = out.begin();
+        while (it2 != out.end()) {
+            AssertI((*it2)->model()->isAtomic());
+            Simulator* dst = getModel(
+                static_cast < graph::AtomicModel* >((*it2)->model()));
+            const std::string& port = (*it2)->port();
 
             if (event->isInstantaneous()) {
                 bags.addInstantaneous(
-                    dst, new InstantaneousEvent(event, dst,
-                                                v_port->getPortName()));
+                    dst, new InstantaneousEvent(event, dst, port));
             } else {
                 m_eventTable.putExternalEvent(
-                    new ExternalEvent(event, dst, v_port->getPortName()));
+                    new ExternalEvent(event, dst, port));
             }
             delete *it2;
             ++it2;
@@ -369,81 +367,14 @@ Observer* Coordinator::getObserver(const std::string& p_name) const
     return (it == m_observerList.end())?NULL:it->second;
 }
 
-vector < graph::TargetPort* > Coordinator::getTargetPortList(
+void Coordinator::getTargetPortList(
     graph::AtomicModel* model,
-    const std::string & portName)
+    const std::string& portName,
+    graph::TargetModelList& out)
 {
-    Simulator* smodel = getModel(model);
     if (model) {
-        graph::Port *port = smodel->getStructure()->getOutPort(portName);
-        return smodel->getStructure()->getParent()->getTargetPortList(port);
+        model->getTargetPortList(portName, out);
     }
-    else return vector < graph::TargetPort* >();
-}
-
-void Coordinator::applyDynamics(SimulatorList& /* lst */,
-                                const std::string& /* xmlDynamics */)
-{
-    /* FIXME que faire avec cette fonction
-       xmlpp::DomParser dom;
-       dom.parse_memory(xmlDynamics);
-       xmlpp::Element* root = utils::xml::get_root_node(dom, "MODELS");
-       xmlpp::Node::NodeList lt = root->get_children("MODEL");
-       for (xmlpp::Node::NodeList::iterator it = lt.begin(); it != lt.end();
-       ++it) {
-       xmlpp::Element* mdl = (xmlpp::Element*)(*it);
-       Glib::ustring name = utils::xml::get_attribute(mdl, "NAME");
-       xmlpp::Element* dynamics = utils::xml::get_children(mdl, "DYNAMICS");
-
-       for (SimulatorList::iterator jt = lst.begin(); jt != lst.end();
-       ++jt) {
-       if ((*jt)->getName() == name) {
-       (*jt)->parse(dynamics);
-       break;
-       }
-       }
-       }
-       */
-}
-
-void Coordinator::applyInits(SimulatorList& /* lst */,
-                             const std::string& /* xmlInits */)
-{
-    //xmlpp::DomParser dom;
-    //dom.parse_memory(xmlInits);
-    //xmlpp::Element* root =
-    //utils::xml::get_root_node(dom, "EXPERIMENTAL_CONDITIONS");
-    //xmlpp::Node::NodeList lt = root->get_children("CONDITION");
-    //for (xmlpp::Node::NodeList::iterator it = lt.begin(); it != lt.end();
-    //++it) {
-    //xmlpp::Element* cdt = (xmlpp::Element*)(*it);
-    //Glib::ustring name = utils::xml::get_attribute(cdt, "MODEL_NAME");
-    //Glib::ustring port = utils::xml::get_attribute(cdt, "PORT_NAME");
-
-    //FIXME
-    //std::vector < value::Value > result = value::Value::getValues(cdt);
-    //vle::value::Value init;
-    //if (not result.empty()) {
-    //init = result.front();
-    //std::vector < value::Value* >::iterator jt = result.begin();
-    //++jt;
-    //for (;jt != result.end(); ++jt)
-    //delete (*jt);
-    //}
-    //
-    //if (init) {
-    //for (SimulatorList::iterator jt = lst.begin(); jt != lst.end();
-    //++jt) {
-    //if ((*jt)->getName() == name) {
-    //InitEvent* evt = new InitEvent(m_currentTime, (*jt), port);
-    //evt->putAttribute(port, init);
-    //(*jt)->processInitEvent(evt);
-    //delete evt;
-    //break;
-    //}
-    //}
-    //}
-    //}
 }
 
 void Coordinator::startEOVStream()

@@ -35,6 +35,12 @@ namespace vle { namespace graph {
     class ModelPortList : public std::vector < ModelPort* >
     {
     public:
+        ModelPortList()
+        { }
+
+        virtual ~ModelPortList()
+        { }
+
 
         /** 
          * @brief Add a new graph::ModelPort to the vector. No check is
@@ -72,9 +78,6 @@ namespace vle { namespace graph {
          * otherwise.
          */
         bool exist(Model* model, const std::string& portname) const;
-
-        virtual ~ModelPortList()
-        { }
     };
 
 }} // namespace vle graph

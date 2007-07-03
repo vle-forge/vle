@@ -240,8 +240,9 @@ namespace vle { namespace devs {
         void delCoupledModel(graph::CoupledModel* parent,
                              graph::CoupledModel* mdl);
 
-        std::vector < graph::TargetPort* > getTargetPortList(
-                graph::AtomicModel* model, const std::string& portName);
+        void getTargetPortList(graph::AtomicModel* model,
+                               const std::string& portName,
+                               graph::TargetModelList& out);
 
         void startEOVStream();
 
@@ -267,26 +268,6 @@ namespace vle { namespace devs {
         void startLocalStream();
         
         void attachModelToObserver(Observer* obs, const std::string& viewname);
-
-        /** 
-         * @brief parse the xmlDynamics XML, and affect the dynamics to the
-         * sAtomic Models.
-         * 
-         * @param lst list of atomic models.
-         * @param xmlDynamics string representation of XML dynamics.
-         */
-        void applyDynamics(SimulatorList& lst,
-                           const std::string& xmlDynamics);
-
-        /** 
-         * @brief parse the xmlInits XML, and build the initialisation events
-         * to initialise the sAtomic Models.
-         * 
-         * @param lst list of atomic models.
-         * @param xmlInits string representation of XML initialisation.
-         */
-        void applyInits(SimulatorList& lst,
-                        const std::string& xmlInits);
 
         void processEventObserver(Simulator& model, Event* event = 0);
 

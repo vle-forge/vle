@@ -85,6 +85,11 @@ void CoupledModel::addInputConnection(const std::string & portSrc,
     AssertI(dst);
     AssertI(dst != this);
 
+    ModelPortList& outs(getInternalOutPort(portSrc));
+    outs.add(dst, portDst);
+
+    ModelPortList& ins(dst->getInPort(portDst));
+    ins.add(this, portSrc);
 }
 
 
@@ -93,11 +98,11 @@ void CoupledModel::addOutputConnection(Model* src, const std::string& portSrc,
 {
     AssertI(src);
     AssertI(src != this);
-    AssertI(existOutputPort(portDst));
-    ModelPortList& outs(getInternalOutPort(portDst));
+    
+    ModelPortList& outs(src->getOutPort(portSrc));
     outs.add(this, portDst);
 
-    ModelPortList& ins(dst->getOutPort(portDst));
+    ModelPortList& ins(getInternalInPort(portDst));
     ins.add(src, portSrc);
 }
 
@@ -346,75 +351,71 @@ void CoupledModel::detachModels(const ModelList& models)
     }
 }
 
-void CoupledModel::getTargetPortList(Model* model, const std::string& portname,
-                                     TargetModelList& out)
-{
-    // FIXME
-    AssertI(false);
-    AssertI(model and portname.empty() and out.empty());
-}
-
 void CoupledModel::writeXML(std::ostream& out) const
 {
     out << "<model name=\"" << getName() << "\" " << " type=\"coupled\" >\n";
     writePortListXML(out);
     out << "<submodels>\n";
 
-    //const size_t szInConnection = m_inputConnectionList.size();
-    //const size_t szOutConnection = m_outputConnectionList.size();
-    //const size_t szInternalConnection = m_internalConnectionList.size();
-    //
-    //for (ModelList::const_iterator it = m_modelList.begin(); it !=
-    //m_modelList.end(); ++it) {
-    //it->second->writeXML(out);
-    //}
-    //
-    //out << "<connections>\n";
-    //for (size_t i = 0; i < szInConnection; ++i) {
-    //out << "<connection type=\"input\">\n"
-    //<< " <origin model=\""
-    //<< m_inputConnectionList[i]->getOriginModel()->getName()
-    //<< "\" port=\""
-    //<< m_inputConnectionList[i]->getOriginPort()->getName()
-    //<< "\" />\n"
-    //<< " <destination model=\""
-    //<< m_inputConnectionList[i]->getDestinationModel()->getName()
-    //<< "\" port=\""
-    //<< m_inputConnectionList[i]->getDestinationPort()->getName()
-    //<< "\" />\n"
-    //<< "</connection>\n";
-    //}
-    //
-    //for (size_t i = 0; i < szOutConnection; ++i) {
-    //out << "<connection type=\"output\">\n"
-    //<< " <origin model=\""
-    //<< m_outputConnectionList[i]->getOriginModel()->getName()
-    //<< "\" port=\""
-    //<< m_outputConnectionList[i]->getOriginPort()->getName()
-    //<< "\" />\n"
-    //<< " <destination model=\""
-    //<< m_outputConnectionList[i]->getDestinationModel()->getName()
-    //<< "\" port=\""
-    //<< m_outputConnectionList[i]->getDestinationPort()->getName()
-    //<< "\" />\n"
-    //<< "</connection>\n";
-    //}
-    //
-    //for (size_t i = 0; i < szInternalConnection; ++i) {
-    //out << "<connection type=\"internal\">\n"
-    //<< " <origin model=\""
-    //<< m_internalConnectionList[i]->getOriginModel()->getName()
-    //<< "\" port=\""
-    //<< m_internalConnectionList[i]->getOriginPort()->getName()
-    //<< "\" />\n"
-    //<< " <destination model=\""
-    //<< m_internalConnectionList[i]->getDestinationModel()->getName()
-    //<< "\" port=\""
-    //<< m_internalConnectionList[i]->getDestinationPort()->getName()
-    //<< "\" />\n"
-    //<< "</connection>\n";
-    //}
-    //out << "</connections>\n";
+    for (ModelList::const_iterator it = m_modelList.begin(); it !=
+         m_modelList.end(); ++it) {
+        it->second->writeXML(out);
+    }
+
+    out << "<connections>\n";
+    writeConnections(out);
+    out << "<connections>\n";
+}
+
+void CoupledModel::writeConnections(std::ostream& out) const
+{
+    for (ConnectionList::const_iterator it = m_internalOutputList.begin();
+         it != m_internalOutputList.end(); ++it) {
+        const std::string& port(it->first);
+        const ModelPortList& lst(it->second);
+        for (ModelPortList::const_iterator jt = lst.begin(); jt != lst.end();
+             ++jt) {
+            out << "<connection type=\"input\">\n"
+                << " <origin model=\"" << getName() << "\" "
+                << "port=\"" << port << "\" />\n"
+                << " <destination model=\"" << (*jt)->model()->getName() << "\" "
+                << "port=\"" << (*jt)->port() << "\" />\n"
+                << "</connection>\n";
+        }
+    }
+
+    for (ConnectionList::const_iterator it = m_internalInputList.begin();
+         it != m_internalInputList.end(); ++it) {
+        const std::string& port(it->first);
+        const ModelPortList& lst(it->second);
+        for (ModelPortList::const_iterator jt = lst.begin(); jt != lst.end();
+             ++jt) {
+            out << "<connection type=\"output\">\n"
+                << " <origin model=\"" << (*jt)->model()->getName() << "\" "
+                << "port=\"" << (*jt)->port() << "\" />\n"
+                << " <destination model=\"" << getName() << "\" "
+                << "port=\"" << port << "\" />\n"
+                << "</connection>\n";
+        }
+    }
+
+    for (ModelList::const_iterator it = m_modelList.begin(); it !=
+         m_modelList.end(); ++it) {
+        const ConnectionList& cnts((*it).second->getOutputPortList());
+        for (ConnectionList::const_iterator jt = cnts.begin(); jt != cnts.end();
+             ++jt) {
+            for (ModelPortList::const_iterator kt = jt->second.begin();
+                 kt != jt->second.end(); ++kt) {
+                out << "<connection type=\"internal\">\n"
+                    << " <origin model=\"" << (*it).second->getName() << "\" "
+                    << "port=\"" << jt->first << "\" />\n"
+                    << " <destination model=\""  << (*kt)->model()->getName()
+                    << "\" port=\"" << (*kt)->port() << "\" />\n"
+                    << "</connection>\n";
+            }
+        }
+    }
+
 }
 
 Model* CoupledModel::find(const std::string& name) const
@@ -483,7 +484,7 @@ const ModelPortList& CoupledModel::getInternalInPort(
 
 ModelPortList& CoupledModel::getInternalOutPort(const std::string& name)
 {
-    ConnectionList::const_iterator it = m_internalOutputList.find(name);
+    ConnectionList::iterator it = m_internalOutputList.find(name);
     if (it == m_internalOutputList.end()) {
         Throw(utils::InternalError, boost::format(
                 "Coupled model %1% have no input port %2%") % getName() % name);

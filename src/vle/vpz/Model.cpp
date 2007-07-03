@@ -240,55 +240,7 @@ void Model::write_port(std::ostream& out, const graph::Model* mdl) const
 void Model::write_connection(std::ostream& out, const graph::CoupledModel* mdl) const
 {
     out << "<connections>\n";
-    graph::VectorConnection::const_iterator it;
-
-    const graph::VectorConnection& ins(mdl->getInputConnectionList());
-    for (it = ins.begin(); it != ins.end(); ++it) {
-        out << "<connection type=\"input\">\n"
-            << " <origin model=\""
-            << (*it)->getOriginModel()->getName()
-            << "\" port=\""
-            << (*it)->getOriginPort()->getName()
-            << "\" />\n"
-            << " <destination model=\""
-            << (*it)->getDestinationModel()->getName()
-            << "\" port=\""
-            << (*it)->getDestinationPort()->getName()
-            << "\" />\n"
-            << "</connection>\n";
-    }
-
-    const graph::VectorConnection& outs(mdl->getOutputConnectionList());
-    for (it = outs.begin(); it != outs.end(); ++it) {
-        out << "<connection type=\"output\">\n"
-            << " <origin model=\""
-            << (*it)->getOriginModel()->getName()
-            << "\" port=\""
-            << (*it)->getOriginPort()->getName()
-            << "\" />\n"
-            << " <destination model=\""
-            << (*it)->getDestinationModel()->getName()
-            << "\" port=\""
-            << (*it)->getDestinationPort()->getName()
-            << "\" />\n"
-            << "</connection>\n";
-    }
-
-    const graph::VectorConnection& intern(mdl->getInternalConnectionList());
-    for (it = intern.begin(); it != intern.end(); ++it) {
-        out << "<connection type=\"internal\">\n"
-            << " <origin model=\""
-            << (*it)->getOriginModel()->getName()
-            << "\" port=\""
-            << (*it)->getOriginPort()->getName()
-            << "\" />\n"
-            << " <destination model=\""
-            << (*it)->getDestinationModel()->getName()
-            << "\" port=\""
-            << (*it)->getDestinationPort()->getName()
-            << "\" />\n"
-            << "</connection>\n";
-    }
+    mdl->writeConnections(out);
     out << "</connections>\n";
 }
 

@@ -630,12 +630,12 @@ bool DSDevs::addConnection(const std::string& srcModelName,
 
     if (srcModel and dstModel) {
         if (modelName == srcModelName) {
-            m_coupledModel->addInputConnection(srcModel, srcPortName,
+            m_coupledModel->addInputConnection(srcPortName,
                                                dstModel, dstPortName);
         } else {
             if (modelName == dstModelName) {
                 m_coupledModel->addOutputConnection(srcModel, srcPortName,
-                                                    dstModel, dstPortName);
+                                                    dstPortName);
             } else {
                 m_coupledModel->addInternalConnection(srcModel, srcPortName,
                                                       dstModel, dstPortName);
@@ -663,16 +663,16 @@ bool DSDevs::changeConnection(const std::string& srcModelName,
 
     if (newDstModel) {
         if (modelName == srcModelName) {
-            m_coupledModel->delInputConnection(srcModel, srcPortName,
+            m_coupledModel->delInputConnection(srcPortName,
                                                oldDstModel, oldDstPortName);
-            m_coupledModel->addInputConnection(srcModel, srcPortName,
+            m_coupledModel->addInputConnection(srcPortName,
                                                newDstModel, newDstPortName);
         } else {
             if (modelName == oldDstModelName) {
                 m_coupledModel->delOutputConnection(
-                    srcModel, srcPortName, oldDstModel, oldDstPortName);
+                    srcModel, srcPortName, oldDstPortName);
                 m_coupledModel->addOutputConnection(
-                    srcModel, srcPortName, newDstModel, newDstPortName);
+                    srcModel, srcPortName, newDstPortName);
             } else {
                 m_coupledModel->delInternalConnection(
                     srcModel, srcPortName, oldDstModel, oldDstPortName);
@@ -699,12 +699,12 @@ bool DSDevs::removeConnection(const std::string& srcModelName,
 
     if (srcModel and dstModel) {
         if (modelName == srcModelName) {
-            m_coupledModel->delInputConnection(srcModel, srcPortName, dstModel,
+            m_coupledModel->delInputConnection(srcPortName, dstModel,
                                                dstPortName);
         } else {
             if (modelName == dstModelName) {
                 m_coupledModel->delOutputConnection(srcModel, srcPortName,
-                                                    dstModel, dstPortName);
+                                                    dstPortName);
             } else {
                 m_coupledModel->delInternalConnection(srcModel, srcPortName,
                                                       dstModel, dstPortName);
@@ -808,56 +808,35 @@ bool DSDevs::addInputPort(const std::string& modelName,
                           const std::string& portName)
 {
     graph::Model* mdl = m_coupledModel->find(modelName);
-
-    if (mdl) {
-        if (mdl->getInPort(portName) == 0) {
-            mdl->addInputPort(portName);
-            return true;
-        }
-    }
-    return false;
+    mdl->addInputPort(portName);
+    return true;
 }
 
 bool DSDevs::addOutputPort(const std::string& modelName,
                            const std::string& portName)
 {
     graph::Model* mdl = m_coupledModel->find(modelName);
-    if (mdl) {
-        if (mdl->getOutPort(portName) == 0) {
-            mdl->addOutputPort(portName);
-            return true;
-        }
-    }
-    return false;
+    mdl->addOutputPort(portName);
+    return true;
 }
 
 bool DSDevs::removeInputPort(const std::string& modelName,
                              const std::string& portName)
 {
     graph::Model* mdl = m_coupledModel->find(modelName);
-    if (mdl) {
-        if (mdl->getInPort(portName)) {
-            mdl->delInputPort(portName);
-            return true;
-        }
-    }
-    return false;
+    mdl->delInputPort(portName);
+    return true;
 }
 
 bool DSDevs::removeOutputPort(const std::string& modelName,
                               const std::string& portName)
 {
     graph::Model* mdl = m_coupledModel->find(modelName);
-    if (mdl and mdl->isAtomic()) {
-        if (mdl->getOutPort(portName)) {
-            mdl->delOutputPort(portName);
-            return true;
-        }
-    }
-    return false;
+    mdl->delOutputPort(portName);
+    return true;
 }
 
-graph::VectorModel& DSDevs::getModelList() const
+graph::ModelList& DSDevs::getModelList() const
 {
     return  m_coupledModel->getModelList();
 }

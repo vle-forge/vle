@@ -86,6 +86,9 @@ namespace vle { namespace graph {
          */
 	virtual Model* findModel(const std::string& name) const = 0;
 
+        void getTargetPortList(const std::string& portname,
+                               TargetModelList& out);
+        
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
          * Model base
@@ -134,7 +137,7 @@ namespace vle { namespace graph {
          *
 	 * @return true if success, otherwise false.
          */
-	bool delInitPort(const std::string & name);
+	void delInitPort(const std::string & name);
 
         /**
 	 * Delete an input port with specified name.
@@ -143,7 +146,7 @@ namespace vle { namespace graph {
          *
 	 * @return true if success, otherwise false if connection exist.
          */
-        bool delInputPort(const std::string & name);
+        void delInputPort(const std::string & name);
 
         /**
 	 * Delete an output port with specified name.
@@ -152,7 +155,7 @@ namespace vle { namespace graph {
          *
 	 * @return true if success, otherwise false if connection exist.
          */
-        bool delOutputPort(const std::string & name);
+        void delOutputPort(const std::string & name);
 
         /**
 	 * Delete a state port with specified name.
@@ -161,7 +164,7 @@ namespace vle { namespace graph {
          *
 	 * @return true if success, otherwise false.
          */
-	bool delStatePort(const std::string & name);
+	void delStatePort(const std::string & name);
 
         /**
 	 * Delete an input port with specified name and destroy input or
