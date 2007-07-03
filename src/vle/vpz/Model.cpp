@@ -28,7 +28,6 @@
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/graph/NoVLEModel.hpp>
-#include <vle/graph/Port.hpp>
 #include <stack>
 
 namespace vle { namespace vpz {

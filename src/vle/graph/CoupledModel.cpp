@@ -26,9 +26,6 @@
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/graph/NoVLEModel.hpp>
 #include <vle/graph/Model.hpp>
-#include <vle/graph/Port.hpp>
-#include <vle/graph/TargetPort.hpp>
-#include <vle/graph/Connection.hpp>
 #include <vle/utils/XML.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Tools.hpp>

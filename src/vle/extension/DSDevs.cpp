@@ -27,7 +27,6 @@
 #include <vle/extension/DSDevs.hpp>
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/graph/Model.hpp>
-#include <vle/graph/Port.hpp>
 #include <vle/devs/Coordinator.hpp>
 #include <vle/devs/StateEvent.hpp>
 #include <vle/value/Map.hpp>

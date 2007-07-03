@@ -25,7 +25,6 @@
 #include <vle/extension/CellQSS.hpp>
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/graph/Model.hpp>
-#include <vle/graph/Port.hpp>
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/value/Double.hpp>

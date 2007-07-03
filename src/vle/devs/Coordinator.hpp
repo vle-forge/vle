@@ -33,8 +33,6 @@
 #include <vle/devs/Observer.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/devs/TimedObserver.hpp>
-#include <vle/graph/Port.hpp>
-#include <vle/graph/TargetPort.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/utils/Socket.hpp>
 #include <libxml++/libxml++.h>
@@ -155,11 +153,6 @@ namespace vle { namespace devs {
 
 	// Liste des modeles atomiques geres par le simulateur
 	SimulatorMap m_modelList;
-
-	// Liste des ports d'entree connectes aux ports de sortie
-	//  des modeles atomiques geres par le simulateur
-	std::map < std::pair < std::string , std::string > ,
-		   std::vector < graph::TargetPort* > > m_targetPortMap;
 
 	// Modele couple racine
 

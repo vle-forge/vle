@@ -25,7 +25,6 @@
 #include <vle/extension/CellDevs.hpp>
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/graph/Model.hpp>
-#include <vle/graph/Port.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
 #include <vle/value/Boolean.hpp>

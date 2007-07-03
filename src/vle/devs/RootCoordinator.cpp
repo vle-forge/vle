@@ -29,7 +29,6 @@
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/graph/Model.hpp>
-#include <vle/graph/TargetPort.hpp>
 #include <vle/utils/XML.hpp>
 #include <libxml++/libxml++.h>
 
