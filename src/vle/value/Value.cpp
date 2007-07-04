@@ -32,6 +32,7 @@
 #include <vle/value/Map.hpp>
 #include <vle/value/Tuple.hpp>
 #include <vle/value/Table.hpp>
+#include <vle/value/XML.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/XML.hpp>
 
@@ -157,4 +158,12 @@ Table to_table(Value v)
            "Value is not a Table");
     return boost::static_pointer_cast < TableFactory >(v);
 }
+
+XML to_xml(Value v)
+{
+    Assert(utils::InternalError, v->getType() == ValueBase::XMLTYPE,
+           "Value is not a XML");
+    return boost::static_pointer_cast < XMLFactory >(v);
+}
+
 }} // namespace vle value

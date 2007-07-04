@@ -109,6 +109,13 @@ void ValueStackSax::push_table(const size_t width, const size_t height)
     push_on_vector_value(value::TableFactory::create(width, height));
 }
 
+void ValueStackSax::push_xml()
+{
+    if (not m_valuestack.empty()) {
+        AssertS(utils::SaxParserError, is_composite_parent());
+    }
+}
+
 void ValueStackSax::pop_value()
 {
     if (not m_valuestack.empty()) {

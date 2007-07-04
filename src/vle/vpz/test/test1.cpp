@@ -40,6 +40,7 @@
 #include <vle/value/Map.hpp>
 #include <vle/value/Tuple.hpp>
 #include <vle/value/Table.hpp>
+#include <vle/value/XML.hpp>
 #include <vle/utils/Tools.hpp>
 #include <limits>
 #include <fstream>
@@ -229,4 +230,17 @@ BOOST_AUTO_TEST_CASE(value_table)
     BOOST_CHECK_CLOSE(v->get(1, 0), 4.0, 0.1);
     BOOST_CHECK_CLOSE(v->get(1, 1), 5.0, 0.1);
     BOOST_CHECK_CLOSE(v->get(1, 2), 6.0, 0.1);
+}
+
+BOOST_AUTO_TEST_CASE(value_xml)
+{
+    const char* t1 = "<?xml version=\"1.0\"?>\n"
+        "<xml>"
+        "<![CDATA[test 1 2 1 2]]>\n"
+        "</xml>";
+
+    value::XML v;
+    
+    v = value::to_xml(vpz::Vpz::parse_value(t1));
+    BOOST_REQUIRE_EQUAL(v->stringValue(), "test 1 2 1 2");
 }

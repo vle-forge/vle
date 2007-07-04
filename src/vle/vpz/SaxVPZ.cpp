@@ -38,6 +38,7 @@
 #include <vle/value/Integer.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/String.hpp>
+#include <vle/value/XML.hpp>
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/graph/NoVLEModel.hpp>
@@ -645,6 +646,8 @@ void VLESaxParser::on_start_element(
         m_valuestack.push_table(
             get_attribute < value::TableFactory::index >(att, "width"),
             get_attribute < value::TableFactory::index >(att, "height"));
+    } else if (name == "xml") {
+        m_valuestack.push_xml();
     } else if (name == "vle_project") {
         AssertS(utils::SaxParserError, not m_isValue and not m_isTrame);
         m_isVPZ = true;
@@ -734,6 +737,10 @@ void VLESaxParser::on_end_element(const Glib::ustring& name)
         value::Table table = value::to_table(m_valuestack.top_value());
         table->fill(lastCharactersStored());
         m_valuestack.pop_value();
+    } else if (name == "xml") {
+        m_valuestack.push_on_vector_value(
+            value::XMLFactory::create(m_cdata));
+        m_cdata.clear();
     } else if (name == "translator") {
         m_vpzstack.pop_translator(m_cdata);
         m_cdata.clear();

@@ -57,6 +57,8 @@ class ValueStackSax
 
         void push_table(const size_t width, const size_t height);
 
+        void push_xml();
+
         void pop_value();
 
         const value::Value& top_value();

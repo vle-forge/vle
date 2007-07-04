@@ -1,10 +1,10 @@
 AM_CPPFLAGS = -I$(top_srcdir)/src @VLE_CFLAGS@ @XML_CFLAGS@
 
 libvalue_coreheaders = Boolean.hpp Double.hpp Integer.hpp Map.hpp Set.hpp \
-		       String.hpp Table.hpp Tuple.hpp Value.hpp
+		       String.hpp Table.hpp Tuple.hpp Value.hpp XML.hpp
 
 libvalue_coresources = Boolean.cpp Double.cpp Integer.cpp Map.cpp Set.cpp \
-		       String.cpp Table.cpp Tuple.cpp Value.cpp
+		       String.cpp Table.cpp Tuple.cpp Value.cpp XML.cpp
 
 libvle_LTLIBRARIES = libvalue.la
 libvalue_la_LDFLAGS = @SHARED_LIBRARY_LDFLAGS@
