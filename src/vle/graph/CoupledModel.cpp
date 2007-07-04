@@ -254,10 +254,10 @@ void CoupledModel::delAllConnection(Model* m)
          m->getInputPortList().end(); ++it) {
         ModelPortList& ins = it->second;
         for (ModelPortList::iterator jt = ins.begin(); jt != ins.end(); ++jt) {
-            if ((*jt)->model() == this) {
-                getInternalInPort((*jt)->port()).remove(m, it->first);
+            if (jt->first == this) {
+                getInternalInPort(jt->second).remove(m, it->first);
             } else {
-                (*jt)->model()->getOutPort((*jt)->port()).remove(m, it->first);
+                jt->first->getOutPort(jt->second).remove(m, it->first);
             }
         }
         ins.remove_all();
@@ -267,10 +267,10 @@ void CoupledModel::delAllConnection(Model* m)
          m->getOutputPortList().end(); ++it) {
         ModelPortList& ins = it->second;
         for (ModelPortList::iterator jt = ins.begin(); jt != ins.end(); ++jt) {
-            if ((*jt)->model() == this) {
-                getInternalOutPort((*jt)->port()).remove(m, it->first);
+            if (jt->first == this) {
+                getInternalOutPort(jt->second).remove(m, it->first);
             } else {
-                (*jt)->model()->getInPort((*jt)->port()).remove(m, it->first);
+                jt->first->getInPort(jt->second).remove(m, it->first);
             }
         }
         ins.remove_all();
@@ -474,8 +474,8 @@ void CoupledModel::writeConnections(std::ostream& out) const
             out << "<connection type=\"input\">\n"
                 << " <origin model=\"" << getName() << "\" "
                 << "port=\"" << port << "\" />\n"
-                << " <destination model=\"" << (*jt)->model()->getName() << "\" "
-                << "port=\"" << (*jt)->port() << "\" />\n"
+                << " <destination model=\"" << jt->first->getName() << "\" "
+                << "port=\"" << jt->second << "\" />\n"
                 << "</connection>\n";
         }
     }
@@ -487,8 +487,8 @@ void CoupledModel::writeConnections(std::ostream& out) const
         for (ModelPortList::const_iterator jt = lst.begin(); jt != lst.end();
              ++jt) {
             out << "<connection type=\"output\">\n"
-                << " <origin model=\"" << (*jt)->model()->getName() << "\" "
-                << "port=\"" << (*jt)->port() << "\" />\n"
+                << " <origin model=\"" << jt->first->getName() << "\" "
+                << "port=\"" << jt->second << "\" />\n"
                 << " <destination model=\"" << getName() << "\" "
                 << "port=\"" << port << "\" />\n"
                 << "</connection>\n";
@@ -505,8 +505,8 @@ void CoupledModel::writeConnections(std::ostream& out) const
                 out << "<connection type=\"internal\">\n"
                     << " <origin model=\"" << (*it).second->getName() << "\" "
                     << "port=\"" << jt->first << "\" />\n"
-                    << " <destination model=\""  << (*kt)->model()->getName()
-                    << "\" port=\"" << (*kt)->port() << "\" />\n"
+                    << " <destination model=\""  << kt->first->getName()
+                    << "\" port=\"" << kt->second << "\" />\n"
                     << "</connection>\n";
             }
         }

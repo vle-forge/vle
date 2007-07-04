@@ -304,10 +304,10 @@ void Coordinator::dispatchExternalEvent(ExternalEventList& eventList,
 
         graph::TargetModelList::iterator it2 = out.begin();
         while (it2 != out.end()) {
-            AssertI((*it2)->model()->isAtomic());
+            AssertI(it2->model()->isAtomic());
             Simulator* dst = getModel(
-                static_cast < graph::AtomicModel* >((*it2)->model()));
-            const std::string& port = (*it2)->port();
+                static_cast < graph::AtomicModel* >(it2->model()));
+            const std::string& port(it2->port());
 
             if (event->isInstantaneous()) {
                 bags.addInstantaneous(

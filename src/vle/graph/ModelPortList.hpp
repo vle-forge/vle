@@ -26,13 +26,13 @@
 #define VLE_GRAPH_MODELPORTLIST_HPP
 
 #include <vle/graph/ModelPort.hpp>
-#include <vector>
+#include <map>
 
 
 
 namespace vle { namespace graph {
 
-    class ModelPortList : public std::vector < ModelPort* >
+    class ModelPortList : public std::multimap < Model*, std::string >
     {
     public:
         ModelPortList()

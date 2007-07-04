@@ -66,14 +66,14 @@ void Model::getTargetPortList(const std::string& portname,
 
     ModelPortList& outs(getOutPort(portname));
     for (ModelPortList::iterator it = outs.begin(); it != outs.end(); ++it) {
-        if ((*it)->model()->isAtomic()) {
-            out.push_back(*it);
-        } else if ((*it)->model()->isCoupled()) {
-            CoupledModel* cpl = static_cast < CoupledModel* >((*it)->model());
-            if ((*it)->model() == getParent()) {
-                stk.push(DataTarget(cpl, (*it)->port(), false));
+        if (it->first->isAtomic()) {
+            out.push_back(ModelPort(it->first, it->second));
+        } else if (it->first->isCoupled()) {
+            CoupledModel* cpl = static_cast < CoupledModel* >(it->first);
+            if (it->first == getParent()) {
+                stk.push(DataTarget(cpl, it->second, false));
             } else {
-                stk.push(DataTarget(cpl, (*it)->port(), true));
+                stk.push(DataTarget(cpl, it->second, true));
             }
         }
     }
@@ -89,14 +89,14 @@ void Model::getTargetPortList(const std::string& portname,
             outs = &(tmp.get<0>()->getOutPort(tmp.get<1>()));
 
         for (ModelPortList::iterator it = outs->begin(); it != outs->end(); ++it) {
-            if ((*it)->model()->isAtomic()) {
-                out.push_back(*it);
-            } else if ((*it)->model()->isCoupled()) {
-                CoupledModel* cpl = static_cast < CoupledModel* >((*it)->model());
-                if ((*it)->model() == getParent()) {
-                    stk.push(DataTarget(cpl, (*it)->port(), false));
+            if (it->first->isAtomic()) {
+                out.push_back(ModelPort(it->first, it->second));
+            } else if (it->first->isCoupled()) {
+                CoupledModel* cpl = static_cast < CoupledModel* >(it->first);
+                if (it->first == getParent()) {
+                    stk.push(DataTarget(cpl, it->second, false));
                 } else {
-                    stk.push(DataTarget(cpl, (*it)->port(), true));
+                    stk.push(DataTarget(cpl, it->second, true));
                 }
             }
         }

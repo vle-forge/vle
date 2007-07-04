@@ -26,6 +26,7 @@
 
 #include <vle/graph/ModelPortList.hpp>
 #include <boost/noncopyable.hpp>
+#include <vector>
 #include <map>
 #include <list>
 #include <set>
@@ -43,7 +44,7 @@ namespace vle { namespace graph {
     typedef std::set < std::string > PortList;
     typedef std::vector < AtomicModel * > AtomicModelVector;
     typedef std::map < std::string, Model* > ModelList;
-    typedef std::list < ModelPort* > TargetModelList;
+    typedef std::list < ModelPort > TargetModelList;
  
     /**
      * @brief The DEVS model base class.

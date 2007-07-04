@@ -31,51 +31,44 @@ namespace vle { namespace graph {
 
 ModelPortList::~ModelPortList()
 {
-    for (iterator it = begin(); it != end(); ++it) {
-        delete *it;
-    }
 }
 
 void ModelPortList::add(Model* model, const std::string& portname)
 {
     AssertS(utils::DevsGraphError, model);
 
-    push_back(new ModelPort(model, portname));
+    insert(std::make_pair < Model*, std::string >(model, portname));
 }
 
 void ModelPortList::remove(Model* model, const std::string& portname)
 {
     AssertS(utils::DevsGraphError, model);
 
-    for (iterator it = begin(); it != end(); ++it) {
-        if ((*it)->model() == model and (*it)->port() == portname) {
-            delete *it;
+    std::pair < iterator, iterator > its = equal_range(model);
+    for (iterator it = its.first; it != its.second; ++it) {
+        if (it->second == portname) {
             erase(it);
-            return;
         }
     }
 }
 
 void ModelPortList::remove_all()
 {
-    for (iterator it = begin(); it != end(); ++it) {
-        delete *it;
-    }
     clear();
 }
 
 void ModelPortList::merge(ModelPortList& lst)
 {
     for (iterator it = lst.begin(); it != lst.end(); ++it) {
-        AssertS(utils::DevsGraphError, (*it)->model());
-        push_back(new ModelPort((*it)->model(), (*it)->port()));
+        insert(std::make_pair < Model*, std::string >(it->first, it->second));
     }
 }
 
 bool ModelPortList::exist(Model* model, const std::string& portname) const
 {
-    for (const_iterator it = begin(); it != end(); ++it) {
-        if ((*it)->model() == model and (*it)->port() == portname) {
+    std::pair < const_iterator, const_iterator > its = equal_range(model);
+    for (const_iterator it = its.first; it != its.second; ++it) {
+        if (it->second == portname) {
             return true;
         }
     }
@@ -84,8 +77,10 @@ bool ModelPortList::exist(Model* model, const std::string& portname) const
 
 bool ModelPortList::exist(const Model* model, const std::string& portname) const
 {
-    for (const_iterator it = begin(); it != end(); ++it) {
-        if ((*it)->model() == model and (*it)->port() == portname) {
+    std::pair < const_iterator, const_iterator > its;
+    its = equal_range(const_cast < Model* >(model));
+    for (const_iterator it = its.first; it != its.second; ++it) {
+        if (it->second == portname) {
             return true;
         }
     }
