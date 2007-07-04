@@ -27,6 +27,8 @@
 #include <vle/graph/Model.hpp>
 #include <vle/utils/XML.hpp>
 #include <vle/utils/Debug.hpp>
+#include <boost/tuple/tuple.hpp>
+#include <stack>
 
 using std::string;
 using std::map;
@@ -56,12 +58,50 @@ Model::~Model()
 {
 }
 
-void Model::getTargetPortList(const std::string&  /* portname */,
-                              TargetModelList& /* out */)
+void Model::getTargetPortList(const std::string& portname,
+                              TargetModelList& out)
 {
-    Throw(utils::NotYetImplented, "Model::getTargetPortList");
-}
+    typedef boost::tuple < CoupledModel*, string, bool > DataTarget;
+    std::stack < DataTarget > stk;
 
+    ModelPortList& outs(getOutPort(portname));
+    for (ModelPortList::iterator it = outs.begin(); it != outs.end(); ++it) {
+        if ((*it)->model()->isAtomic()) {
+            out.push_back(*it);
+        } else if ((*it)->model()->isCoupled()) {
+            CoupledModel* cpl = static_cast < CoupledModel* >((*it)->model());
+            if ((*it)->model() == getParent()) {
+                stk.push(DataTarget(cpl, (*it)->port(), false));
+            } else {
+                stk.push(DataTarget(cpl, (*it)->port(), true));
+            }
+        }
+    }
+
+    while (not stk.empty()) {
+        DataTarget tmp(stk.top());
+        stk.pop();
+        
+        ModelPortList* outs = 0;
+        if (tmp.get<2>()) 
+            outs = &(tmp.get<0>()->getInternalInPort(tmp.get<1>()));
+        else
+            outs = &(tmp.get<0>()->getOutPort(tmp.get<1>()));
+
+        for (ModelPortList::iterator it = outs->begin(); it != outs->end(); ++it) {
+            if ((*it)->model()->isAtomic()) {
+                out.push_back(*it);
+            } else if ((*it)->model()->isCoupled()) {
+                CoupledModel* cpl = static_cast < CoupledModel* >((*it)->model());
+                if ((*it)->model() == getParent()) {
+                    stk.push(DataTarget(cpl, (*it)->port(), false));
+                } else {
+                    stk.push(DataTarget(cpl, (*it)->port(), true));
+                }
+            }
+        }
+    }
+}
 
 void Model::delInputPortAndConnection(const std::string& /* name */)
 {

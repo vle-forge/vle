@@ -327,10 +327,6 @@ namespace vle { namespace graph {
         inline ConnectionList& getInternalOutputPortList()
         { return m_internalOutputList; }
 
-    private:
-        void delConnection(Model* src, const std::string& portSrc,
-                           Model* dst, const std::string& portDst);
-
         ModelPortList& getInternalInPort(const std::string& name);
         
         const ModelPortList& getInternalInPort(const std::string& name) const;
@@ -338,6 +334,11 @@ namespace vle { namespace graph {
         ModelPortList& getInternalOutPort(const std::string& name);
 
         const ModelPortList& getInternalOutPort(const std::string& name) const;
+
+    private:
+        void delConnection(Model* src, const std::string& portSrc,
+                           Model* dst, const std::string& portDst);
+
 
 
 	ModelList       m_modelList;

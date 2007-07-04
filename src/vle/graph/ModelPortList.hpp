@@ -38,9 +38,7 @@ namespace vle { namespace graph {
         ModelPortList()
         { }
 
-        virtual ~ModelPortList()
-        { }
-
+        virtual ~ModelPortList();
 
         /** 
          * @brief Add a new graph::ModelPort to the vector. No check is

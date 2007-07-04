@@ -23,19 +23,30 @@
  */
 
 #include <vle/graph/ModelPortList.hpp>
+#include <vle/utils/Debug.hpp>
 
 
 
 namespace vle { namespace graph {
 
+ModelPortList::~ModelPortList()
+{
+    for (iterator it = begin(); it != end(); ++it) {
+        delete *it;
+    }
+}
 
 void ModelPortList::add(Model* model, const std::string& portname)
 {
+    AssertS(utils::DevsGraphError, model);
+
     push_back(new ModelPort(model, portname));
 }
 
 void ModelPortList::remove(Model* model, const std::string& portname)
 {
+    AssertS(utils::DevsGraphError, model);
+
     for (iterator it = begin(); it != end(); ++it) {
         if ((*it)->model() == model and (*it)->port() == portname) {
             delete *it;
@@ -48,6 +59,7 @@ void ModelPortList::remove(Model* model, const std::string& portname)
 void ModelPortList::merge(ModelPortList& lst)
 {
     for (iterator it = lst.begin(); it != lst.end(); ++it) {
+        AssertS(utils::DevsGraphError, (*it)->model());
         push_back(new ModelPort((*it)->model(), (*it)->port()));
     }
 }

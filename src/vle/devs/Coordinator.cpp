@@ -316,7 +316,6 @@ void Coordinator::dispatchExternalEvent(ExternalEventList& eventList,
                 m_eventTable.putExternalEvent(
                     new ExternalEvent(event, dst, port));
             }
-            delete *it2;
             ++it2;
         }
         ++i;
