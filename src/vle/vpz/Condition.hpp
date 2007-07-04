@@ -39,7 +39,32 @@ namespace vle { namespace vpz {
     class Condition : public Base, public std::map < std::string, value::Set >
     {
     public:
-        typedef std::map < std::string, value::Value > ValueList;
+        class ValueList : public std::map < std::string, value::Value >
+        {
+        public:
+            virtual ~ValueList()
+            { }
+
+            const value::Value& get(const std::string& name) const
+            {
+                const_iterator it = find(name);
+                if (it == end()) {
+                    Throw(utils::InternalError, boost::format(
+                          "Unknow port %1% for condition") % name);
+                }
+                return it->second;
+            }
+
+            value::Value& get(const std::string& name)
+            {
+                iterator it = find(name);
+                if (it == end()) {
+                    Throw(utils::InternalError, boost::format(
+                          "Unknow port %1% for condition") % name);
+                }
+                return it->second;
+            }
+        };
 
         Condition(const std::string& name);
 
