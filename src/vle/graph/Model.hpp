@@ -204,10 +204,6 @@ namespace vle { namespace graph {
 	bool existInputPort(const std::string & name);
 	bool existOutputPort(const std::string & name);
 	bool existStatePort(const std::string & name);
-        //void clearInitPort();
-        //void clearInputPort();
-        //void clearOutputPort();
-        //void clearStatePort();
 
         inline const PortList& getInitPortList() const
         { return m_initPortList; }

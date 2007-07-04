@@ -102,7 +102,7 @@ BOOST_AUTO_TEST_CASE(coupledmodel_vpz)
         "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
         " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
         " <structures>\n"
-        "  <model name=\"test1\" type=\"coupled\">\n"
+        "  <model name=\"test2\" type=\"coupled\">\n"
         "   <in><port name=\"i\"/></in>\n"
         "   <out><port name=\"o\"/></out>\n"
         "   <submodels>\n"
@@ -123,12 +123,12 @@ BOOST_AUTO_TEST_CASE(coupledmodel_vpz)
         "     <destination model=\"atom2\" port=\"in\" />\n"
         "    </connection>\n"
         "    <connection type=\"input\">\n"
-        "     <origin model=\"test1\" port=\"i\" />\n"
+        "     <origin model=\"test2\" port=\"i\" />\n"
         "     <destination model=\"atom1\" port=\"in\" />\n"
         "    </connection>\n"
         "    <connection type=\"output\">"
         "     <origin model=\"atom2\" port=\"out\" />\n"
-        "     <destination model=\"test1\" port=\"o\" />\n"
+        "     <destination model=\"test2\" port=\"o\" />\n"
         "    </connection>\n"
         "   </connections>\n"
         "  </model>\n"
@@ -156,15 +156,15 @@ BOOST_AUTO_TEST_CASE(coupledmodel_vpz)
     graph::AtomicModel* atom1 = dynamic_cast < graph::AtomicModel* >(mdl1);
     graph::AtomicModel* atom2 = dynamic_cast < graph::AtomicModel* >(mdl2);
     BOOST_REQUIRE(atom1 != 0);
-    BOOST_REQUIRE(atom1->existOutputPort("out") != 0);
-    BOOST_REQUIRE(atom1->existInputPort("in") != 0);
+    BOOST_REQUIRE(atom1->existOutputPort("out"));
+    BOOST_REQUIRE(atom1->existInputPort("in"));
     BOOST_REQUIRE(atom2 != 0);
-    BOOST_REQUIRE(atom2->existInputPort("in") != 0);
-    BOOST_REQUIRE(atom2->existOutputPort("out") != 0);
+    BOOST_REQUIRE(atom2->existInputPort("in"));
+    BOOST_REQUIRE(atom2->existOutputPort("out"));
 
-    BOOST_REQUIRE(cpl->existInputConnection("i", "atom1", "in") != 0);
-    BOOST_REQUIRE(cpl->existOutputConnection("atom2", "out", "o") != 0);
-    BOOST_REQUIRE(cpl->existInternalConnection("atom1", "out", "atom2", "in") != 0);
+    BOOST_REQUIRE(cpl->existInputConnection("i", "atom1", "in"));
+    BOOST_REQUIRE(cpl->existOutputConnection("atom2", "out", "o"));
+    BOOST_REQUIRE(cpl->existInternalConnection("atom1", "out", "atom2", "in"));
 }
 
 BOOST_AUTO_TEST_CASE(dynamic_vpz)
@@ -174,7 +174,7 @@ BOOST_AUTO_TEST_CASE(dynamic_vpz)
         "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
         " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
         " <structures>\n"
-        "  <model name=\"test1\" type=\"atomic\""
+        "  <model name=\"test3\" type=\"atomic\""
         "         observables=\"\" dynamics=\"dyn1\" conditions=\"cnd1\" />\n"
         " </structures>\n"
         " <dynamics>\n"

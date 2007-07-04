@@ -62,5 +62,14 @@ bool ModelPortList::exist(Model* model, const std::string& portname) const
     return false;
 }
 
+bool ModelPortList::exist(const Model* model, const std::string& portname) const
+{
+    for (const_iterator it = begin(); it != end(); ++it) {
+        if ((*it)->model() == model and (*it)->port() == portname) {
+            return true;
+        }
+    }
+    return false;
+}
 
 }} // namespace vle graph

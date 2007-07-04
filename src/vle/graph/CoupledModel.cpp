@@ -62,25 +62,13 @@ CoupledModel::~CoupledModel()
  *************************************************************/
 
 
-void CoupledModel::addConnection(Model* src, const std::string& portSrc,
-                                 Model* dst, const std::string& portDst)
-{
-    AssertS(utils::DevsGraphError, dst);
-
-    ModelPortList& outs(src->getOutPort(portSrc));
-    outs.add(dst, portDst);
-
-    ModelPortList& ins(dst->getOutPort(portDst));
-    ins.add(src, portSrc);
-}
-
 void CoupledModel::addInputConnection(const std::string & portSrc,
 				      Model* dst, const std::string& portDst)
 {
     AssertS(utils::DevsGraphError, dst);
     AssertS(utils::DevsGraphError, dst != this);
 
-    ModelPortList& outs(getInternalOutPort(portSrc));
+    ModelPortList& outs(getInternalInPort(portSrc));
     outs.add(dst, portDst);
 
     ModelPortList& ins(dst->getInPort(portDst));
@@ -97,7 +85,7 @@ void CoupledModel::addOutputConnection(Model* src, const std::string& portSrc,
     ModelPortList& outs(src->getOutPort(portSrc));
     outs.add(this, portDst);
 
-    ModelPortList& ins(getInternalInPort(portDst));
+    ModelPortList& ins(getInternalOutPort(portDst));
     ins.add(src, portSrc);
 }
 
@@ -109,7 +97,12 @@ void CoupledModel::addInternalConnection(Model* src,
 {
     AssertS(utils::DevsGraphError, src and dst);
     AssertS(utils::DevsGraphError, src != this and dst != this);
-    addConnection(src, portSrc, dst, portDst);
+    
+    ModelPortList& outs(src->getOutPort(portSrc));
+    outs.add(dst, portDst);
+
+    ModelPortList& ins(dst->getInPort(portDst));
+    ins.add(src, portSrc);
 }
 
 bool CoupledModel::existInputConnection(const std::string& portsrc,
@@ -199,14 +192,14 @@ void CoupledModel::addInputConnection(const std::string& portSrc,
                                       const std::string& dst,
                                       const std::string& portDst)
 {
-    addConnection(this, portSrc, getModel(dst), portDst);
+    addInputConnection(portSrc, getModel(dst), portDst);
 }
 
 void CoupledModel::addOutputConnection(const std::string& src,
                                        const std::string& portSrc,
                                        const std::string& portDst)
 {
-    addConnection(getModel(src), portSrc, this, portDst);
+    addOutputConnection(getModel(src), portSrc, portDst);
 }
 
 void CoupledModel::addInternalConnection(const std::string& src,
@@ -214,9 +207,8 @@ void CoupledModel::addInternalConnection(const std::string& src,
                                          const std::string& dst,
                                          const std::string& portDst)
 {
-    addConnection(getModel(src), portSrc, getModel(dst), portDst);
+    addInternalConnection(getModel(src), portSrc, getModel(dst), portDst);
 }
-
 
 void CoupledModel::delConnection(Model* src, const std::string& portSrc,
                                  Model* dst, const std::string& portDst)
@@ -566,7 +558,7 @@ ModelPortList& CoupledModel::getInternalOutPort(const std::string& name)
     ConnectionList::iterator it = m_internalOutputList.find(name);
     if (it == m_internalOutputList.end()) {
         Throw(utils::DevsGraphError, boost::format(
-                "Coupled model %1% have no input port %2%") % getName() % name);
+                "Coupled model %1% have no output port %2%") % getName() % name);
     }
 
     return it->second;
@@ -578,7 +570,7 @@ const ModelPortList& CoupledModel::getInternalOutPort(
     ConnectionList::const_iterator it = m_internalOutputList.find(name);
     if (it == m_internalOutputList.end()) {
         Throw(utils::DevsGraphError, boost::format(
-                "Coupled model %1% have no input port %2%") % getName() % name);
+                "Coupled model %1% have no output port %2%") % getName() % name);
     }
 
     return it->second;

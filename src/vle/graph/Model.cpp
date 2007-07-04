@@ -77,6 +77,12 @@ ModelPortList& Model::addInputPort(const std::string& name)
 {
     ConnectionList::iterator it(m_inPortList.find(name));
     if (it == m_inPortList.end()) {
+        if (isCoupled()) {
+            CoupledModel* cpl = static_cast < CoupledModel* >(this);
+            cpl->getInternalInputPortList().insert(
+                std::make_pair < std::string, ModelPortList >(
+                    name, ModelPortList()));
+        }
         return (*m_inPortList.insert(
                 std::make_pair < std::string, ModelPortList >(
                     name, ModelPortList())).first).second;
@@ -89,6 +95,12 @@ ModelPortList& Model::addOutputPort(const std::string& name)
 {
     ConnectionList::iterator it(m_outPortList.find(name));
     if (it == m_outPortList.end()) {
+        if (isCoupled()) {
+            CoupledModel* cpl = static_cast < CoupledModel* >(this);
+            cpl->getInternalOutputPortList().insert(
+                std::make_pair < std::string, ModelPortList >(
+                    name, ModelPortList()));
+        }
         return (*m_outPortList.insert(
                 std::make_pair < std::string, ModelPortList >(
                     name, ModelPortList())).first).second;
@@ -181,7 +193,7 @@ const ModelPortList& Model::getOutPort(const std::string& name) const
     ConnectionList::const_iterator it = m_outPortList.find(name);
     if (it == m_outPortList.end()) {
         Throw(utils::DevsGraphError, boost::format(
-                "Coupled model %1% have no input port %2%") % getName() % name);
+                "Coupled model %1% have no output port %2%") % getName() % name);
     }
 
     return it->second;
@@ -192,7 +204,7 @@ ModelPortList& Model::getInPort(const std::string& name)
     ConnectionList::iterator it = m_inPortList.find(name);
     if (it == m_inPortList.end()) {
         Throw(utils::DevsGraphError, boost::format(
-                "Coupled model %1% have no output port %2%") % getName() % name);
+                "Model %1% have no input port %2%") % getName() % name);
     }
 
     return it->second;
@@ -203,7 +215,7 @@ ModelPortList& Model::getOutPort(const std::string& name)
     ConnectionList::iterator it = m_outPortList.find(name);
     if (it == m_outPortList.end()) {
         Throw(utils::DevsGraphError, boost::format(
-                "Coupled model %1% have no output port %2%") % getName() % name);
+                "Model %1% have no output port %2%") % getName() % name);
     }
 
     return it->second;

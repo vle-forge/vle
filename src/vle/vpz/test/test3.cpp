@@ -98,8 +98,6 @@ BOOST_AUTO_TEST_CASE(test_translator)
     BOOST_REQUIRE(cpled->exist("tutu"));
     BOOST_REQUIRE(cpled->exist("tata"));
 
-    graph::Connection* cnx(
-        cpled->getInternalConnection(std::string("tutu"), "out",
-                                     std::string("tata"), "in"));
-    BOOST_REQUIRE(cnx);
+    BOOST_REQUIRE(cpled->existInternalConnection(
+            std::string("tutu"), "out", std::string("tata"), "in"));
 }

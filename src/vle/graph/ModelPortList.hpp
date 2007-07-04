@@ -78,6 +78,18 @@ namespace vle { namespace graph {
          * otherwise.
          */
         bool exist(Model* model, const std::string& portname) const;
+
+        /** 
+         * @brief Check if a graph::ModelPort already exist in the vector.
+         * Linear complexity.
+         * 
+         * @param model The model to check.
+         * @param portname The port of the model to check.
+         * 
+         * @return True if the (model, portname) exist in vector, false
+         * otherwise.
+         */
+        bool exist(const Model* model, const std::string& portname) const;
     };
 
 }} // namespace vle graph
