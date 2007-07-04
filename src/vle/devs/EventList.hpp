@@ -58,6 +58,9 @@ namespace vle { namespace devs {
         { return m_eventList.size(); }
 
         inline Class at(size_t i) const
+        { return m_eventList.at(i); }
+
+        inline Class operator[](size_t i) const
         { return m_eventList[i]; }
 
         inline Class front()
