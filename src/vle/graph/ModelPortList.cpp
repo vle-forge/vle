@@ -56,6 +56,14 @@ void ModelPortList::remove(Model* model, const std::string& portname)
     }
 }
 
+void ModelPortList::remove_all()
+{
+    for (iterator it = begin(); it != end(); ++it) {
+        delete *it;
+    }
+    clear();
+}
+
 void ModelPortList::merge(ModelPortList& lst)
 {
     for (iterator it = lst.begin(); it != lst.end(); ++it) {

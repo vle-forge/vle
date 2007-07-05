@@ -249,7 +249,32 @@ void CoupledModel::delInternalConnection(Model* src, const std::string& portSrc,
 void CoupledModel::delAllConnection(Model* m)
 {
     AssertS(utils::DevsGraphError, m);
-    Throw(utils::NotYetImplented, "CoupledModel::delAllConnection");
+
+    for (ConnectionList::iterator it = m->getInputPortList().begin(); it !=
+         m->getInputPortList().end(); ++it) {
+        ModelPortList& ins = it->second;
+        for (ModelPortList::iterator jt = ins.begin(); jt != ins.end(); ++jt) {
+            if ((*jt)->model() == this) {
+                getInternalInPort((*jt)->port()).remove(m, it->first);
+            } else {
+                (*jt)->model()->getOutPort((*jt)->port()).remove(m, it->first);
+            }
+        }
+        ins.remove_all();
+    }
+
+    for (ConnectionList::iterator it = m->getOutputPortList().begin(); it !=
+         m->getOutputPortList().end(); ++it) {
+        ModelPortList& ins = it->second;
+        for (ModelPortList::iterator jt = ins.begin(); jt != ins.end(); ++jt) {
+            if ((*jt)->model() == this) {
+                getInternalOutPort((*jt)->port()).remove(m, it->first);
+            } else {
+                (*jt)->model()->getInPort((*jt)->port()).remove(m, it->first);
+            }
+        }
+        ins.remove_all();
+    }
 }
 
 void CoupledModel::delAllConnection()
