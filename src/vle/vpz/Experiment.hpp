@@ -164,7 +164,7 @@ namespace vle { namespace vpz {
          * 
          * @param name The new name of experimental design combination.
          */
-        inline void setCombination(const std::string& name);
+        void setCombination(const std::string& name);
 
         /** 
          * @brief Set the experimental design combination.

@@ -352,6 +352,7 @@ void VpzStackSax::push_experiment(const AttributeList& att)
     exp.setName(get_attribute < std::string >(att, "name"));
     exp.setDuration(get_attribute < double >(att, "duration"));
     exp.setSeed(get_attribute < guint32 >(att, "seed"));
+    exp.setCombination(get_attribute < std::string >(att, "combination"));
 }
 
 void VpzStackSax::push_replicas(const AttributeList& att)
