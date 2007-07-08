@@ -1,5 +1,5 @@
 prefix=${VLE_INSTALL_PREFIX}
-exec_prefix=${VLE_BIN_DIR}
+exec_prefix=${VLE_INSTALL_PREFIX}
 libdir=${VLE_LIBRARY_DIRS}
 includedir=${VLE_INCLUDE_DIRS}
 

@@ -1,5 +1,5 @@
 /** 
- * @file geometry/geometry.hpp
+ * @file geometry/geometry.cpp
  * @brief Generic classes for geometry.
  * @author The vle Development Team
  * @date ven, 27 oct 2006 16:56:48 +0200
@@ -22,9 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef VLE_GEOMETRY_GEOMETRY_HPP
-#define VLE_GEOMETRY_GEOMETRY_HPP
-
 #include <vle/geometry/Box.hpp>
 #include <vle/geometry/Point.hpp>
 #include <vle/geometry/Tuple.hpp>
@@ -42,5 +39,3 @@ namespace vle {
     } // namespace geometry
 
 } // namespace vle
-
-#endif
