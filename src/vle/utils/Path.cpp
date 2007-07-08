@@ -151,8 +151,8 @@ bool Path::init_path()
 {
     mTab[0] = build_prefix_path("bin");
     mTab[1] = build_user_path("bin");
-    mTab[2] = build_prefix_libraries_path("simulators");
-    mTab[3] = build_user_path("simulators");
+    mTab[2] = build_prefix_libraries_path("simulator");
+    mTab[3] = build_user_path("simulator");
     mTab[4] = build_prefix_libraries_path("modeling");
     mTab[5] = build_user_path("modeling");
     mTab[6] = build_prefix_libraries_path("observer");
