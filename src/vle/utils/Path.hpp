@@ -123,6 +123,10 @@ namespace vle { namespace utils {
         inline static void kill()
         { delete mPath; mPath = 0; }
 
+        std::string build_prefix_path(const char* buf);
+        std::string build_prefix_libraries_path(const char* name);
+        std::string build_prefix_share_path(const char* prg, const char* name);
+
         /**
          * Build a path using two string.
          *

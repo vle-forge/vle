@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#include "config.h"
 #include <vle/devs/Coordinator.hpp>
 #include <vle/manager/Simulator.hpp>
 #include <vle/manager/Manager.hpp>
@@ -122,8 +121,8 @@ bool VLE::justRun(const CmdArgs& args)
 void VLE::printInformations(std::ostream& out)
 {
     out <<
-        "Virtual Laboratory Environment - " << VERSION << "\n"
-        "Copyright (C) 2004, 05, 06 VLE Development Team.\n"
+        "Virtual Laboratory Environment - " << VLE_PACKAGE_VERSION << "\n"
+        "Copyright (C) 2004, 05, 06, 07 VLE Development Team.\n"
         "VLE comes with ABSOLUTELY NO WARRANTY.\n"
         "You may redistribute copies of VLE\n"
         "under the terms of the GNU General Public License.\n"
@@ -133,7 +132,7 @@ void VLE::printInformations(std::ostream& out)
 
 void VLE::printVersion(std::ostream& out)
 {
-    out << "VLE - " << VERSION << std::endl;
+    out << VLE_PACKAGE_NAME << " " << VLE_PACKAGE_VERSION << std::endl;
 }
 
 }} // namespace vle manager

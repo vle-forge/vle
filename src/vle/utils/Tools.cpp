@@ -30,11 +30,9 @@
 #include <glibmm/markup.h>
 #include <glibmm/stringutils.h>
 #include <glib/gstdio.h>
-#include <config.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
-#include "config.h"
 #include <cstring>
 #include <iomanip>
 

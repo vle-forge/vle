@@ -1,0 +1,28 @@
+INCLUDE_DIRECTORIES(
+	${VLE_SOURCE_DIR}/src
+	${GLIBMM_INCLUDE_DIRS}
+	${LIBXMLPP_INCLUDE_DIRS})
+
+ADD_DEFINITIONS(
+	-DVLE_PREFIX_DIR="\\"${CMAKE_INSTALL_PREFIX}\\""
+        -DVLE_LIBRARY_DIRS="\\"${VLE_LIBRARY_DIRS}\\""
+	-DVLE_PACKAGE_NAME="\\"${VLE_PACKAGE_NAME}\\""
+	-DVLE_PACKAGE_VERSION="\\"${VLE_PACKAGE_VERSION}\\""
+        -DVLE_SHARE_DIRS="\\"${VLE_SHARE_DIRS}\\"")
+
+LINK_DIRECTORIES(
+	${GLIBMM_LIBRARY_DIRS}
+	${LIBXMLPP_LIBRARY_DIR})
+
+SET(UTILS_CPP
+    Host.cpp Path.cpp Rand.cpp Simpson.cpp Socket.cpp Tools.cpp Trace.cpp
+    XML.cpp)
+
+SET(UTILS_HPP
+    Debug.hpp Exception.hpp Host.hpp Path.hpp Rand.hpp Simpson.hpp Socket.hpp
+    Tools.hpp Trace.hpp utils.hpp XML.hpp)
+
+ADD_LIBRARY(vleutils SHARED ${UTILS_CPP};${UTILS_HPP})
+
+INSTALL(TARGETS vleutils DESTINATION ${VLE_LIBRARY_DIR})
+INSTALL(FILES ${UTILS_HPP} DESTINATION ${VLE_INCLUDE_DIRS}/utils)

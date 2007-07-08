@@ -122,30 +122,55 @@ bool Path::init_path()
 
 #else // On Unix, its simple...
 
+std::string Path::build_prefix_path(const char* buf)
+{
+    std::list < std::string > lst;
+    lst.push_front(VLE_PREFIX_DIR);
+    lst.push_back(buf);
+    return Glib::build_path(G_DIR_SEPARATOR_S, lst);
+}
+
+std::string Path::build_prefix_libraries_path(const char* name)
+{
+    std::list < std::string > lst;
+    lst.push_back(VLE_LIBRARY_DIRS);
+    lst.push_back(name);
+    return Glib::build_path(G_DIR_SEPARATOR_S, lst);
+}
+
+std::string Path::build_prefix_share_path(const char* prg, const char* name)
+{
+    std::list < std::string > lst;
+    lst.push_front(VLE_SHARE_DIRS);
+    lst.push_back(prg);
+    lst.push_back(name);
+    return Glib::build_path(G_DIR_SEPARATOR_S, lst);
+}
+
 bool Path::init_path()
 {
-    mTab[0] = BINDIR;
+    mTab[0] = build_prefix_path("bin");
     mTab[1] = build_user_path("bin");
-    mTab[2] = VLEMODELDIR;
-    mTab[3] = build_user_path("models");
-    mTab[4] = GVLEPLUGINDIR;
-    mTab[5] = build_user_path("plugins");
-    mTab[6] = GVLEOBSERVERDIR;
+    mTab[2] = build_prefix_libraries_path("simulators");
+    mTab[3] = build_user_path("simulators");
+    mTab[4] = build_prefix_libraries_path("modeling");
+    mTab[5] = build_user_path("modeling");
+    mTab[6] = build_prefix_libraries_path("observer");
     mTab[7] = build_user_path("observers");
-    mTab[8] = IMGDIR;
-    mTab[9] = build_user_path("img");
-    mTab[10] = GLADEDIR;
-    mTab[11] = build_user_path("glade");
+    mTab[8] = build_prefix_share_path("vle", "images");
+    mTab[9] = build_user_path("images");
+    mTab[10] = VLE_SHARE_DIRS;
+    mTab[11] = build_prefix_share_path("gvle", "glade");
     mTab[12] = build_user_path();
-    mTab[13] = VLESTREAMDIR;
+    mTab[13] = build_prefix_libraries_path("stream");
     mTab[14] = build_user_path("stream");
-    mTab[15] = PYTHONDIR;
+    mTab[15] = build_prefix_libraries_path("python");
     mTab[16] = build_user_path("python");
-    mTab[17] = VLETRANSLATORDIR;
+    mTab[17] = build_prefix_libraries_path("translator");
     mTab[18] = build_user_path("translator");
-    mTab[19] = EOVPLUGINDIR;
+    mTab[19] = build_prefix_libraries_path("stream");
     mTab[20] = build_user_path("eovplugin");
-    mTab[21] = AVLEPLUGINDIR;
+    mTab[21] = build_prefix_libraries_path("analysis");
     mTab[22] = build_user_path("avleplugin");
     return true;
 }
