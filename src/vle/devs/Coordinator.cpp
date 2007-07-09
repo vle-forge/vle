@@ -107,14 +107,6 @@ void Coordinator::addModels(vpz::Model& model)
     m_modelFactory->createModels(atomicmodellist, m_modelList);
 }
 
-void Coordinator::addCondition(const std::string& modelName,
-                               const std::string& portName,
-                               value::Value* value)
-{
-    m_conditionList[modelName].
-        push_back(pair < string , value::Value* >(portName, value));
-}
-
 void Coordinator::addObserver(Observer* p_observer)
 {
     m_observerList[p_observer->getName()] = p_observer;
@@ -148,7 +140,10 @@ SimulatorList Coordinator::createModelFromClass(graph::CoupledModel* parent,
 
 
     for (SimulatorList::iterator it = lst.begin(); it != lst.end(); ++it) {
-        dispatchInternalEvent((*it)->init(m_currentTime));
+        InternalEvent* evt = (*it)->init(m_currentTime);
+        if (evt) {
+            m_eventTable.putInternalEvent(evt);
+        }
     }
 
     return lst;
@@ -171,8 +166,10 @@ Simulator* Coordinator::createModel(graph::AtomicModel* model,
         sim->processInitEvents(cnd.firstValues());
     }
 
-    dispatchInternalEvent(sim->init(m_currentTime));
-
+    InternalEvent* evt = sim->init(m_currentTime);
+    if (evt) {
+        m_eventTable.putInternalEvent(evt);
+    }
     return sim;
 }
 
@@ -271,7 +268,10 @@ void Coordinator::init()
 
     for (SimulatorMap::iterator satom = m_modelList.begin();
          satom != m_modelList.end(); ++satom) {
-        dispatchInternalEvent((*satom).second->init(m_currentTime));
+        InternalEvent* evt((*satom).second->init(m_currentTime));
+        if (evt) {
+            m_eventTable.putInternalEvent(evt);
+        }
     }
 
     std::map < std::string , devs::Observer* >::iterator it3 =
@@ -282,7 +282,9 @@ void Coordinator::init()
         StateEventList::iterator it4 = v_eventList.begin();
 
         while (it4 != v_eventList.end()) {
-            dispatchStateEvent(*it4);
+            if (*it4) {
+                m_eventTable.putStateEvent(*it4);
+            }
             ++it4;
         }
         ++it3;
@@ -321,18 +323,6 @@ void Coordinator::dispatchExternalEvent(ExternalEventList& eventList,
         ++i;
     }
     eventList.clear(true);
-}
-
-void Coordinator::dispatchInternalEvent(InternalEvent* event)
-{
-    if (event)
-        m_eventTable.putInternalEvent(event);
-}
-
-void Coordinator::dispatchStateEvent(StateEvent* event)
-{
-    if (event)
-        m_eventTable.putStateEvent(event);
 }
 
 Simulator* Coordinator::getModel(graph::AtomicModel* model) const

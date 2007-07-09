@@ -162,11 +162,6 @@ namespace vle { namespace devs {
 	// Echeancier
 	EventTable m_eventTable;
 
-	// Liste des conditions experimentales
-	std::map < std::string ,
-		   std::vector < std::pair < std::string ,
-					     value::Value* > > > m_conditionList;
-
 	// Liste des observateurs
 	std::map < std::string , devs::Observer* > m_observerList;
 
@@ -206,10 +201,6 @@ namespace vle { namespace devs {
                                    CompleteEventBagModel& bags,
                                    Simulator* sim);
 
-	void dispatchInternalEvent(InternalEvent * event);
-
-	void dispatchStateEvent(StateEvent * event);
-
         /** 
          * @brief Delete the atomic model from Devs::Graph, the Simulator 
          * from Coordinator and clean all events on devs::EventTable. Do not use
@@ -238,8 +229,6 @@ namespace vle { namespace devs {
                                graph::TargetModelList& out);
 
         void startEOVStream();
-
-        /* - * - * - * - * - * - * - * - * - * - * - * - * - * - * - * - * - */
 
         /** 
          * @brief Search all measures when outputs is in a ouput::Net format.
