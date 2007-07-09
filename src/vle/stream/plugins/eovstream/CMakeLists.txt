@@ -7,6 +7,19 @@ LINK_DIRECTORIES(
 	${GLIBMM_LIBRARY_DIRS}
 	${LIBXMLPP_LIBRARY_DIR})
 
-ADD_LIBRARY(eovstream MODULE NetStream.cpp NetStream.hpp)
+ADD_LIBRARY(eovstream SHARED NetStream.cpp NetStream.hpp)
+
+TARGET_LINK_LIBRARIES(eovstream
+	${GLIBMM_LIBRARIES}
+	${LIBXMLPP_LIBRARIES}
+	${GTHREAD_LIBRARIES}
+	vlegeometry
+	vleutils
+	vledata
+	vlevalue
+	vlegraph
+	vlevpz
+	vledevs
+	vleextension)
 
 INSTALL(TARGETS eovstream DESTINATION ${VLE_LIBRARY_DIRS}/stream)

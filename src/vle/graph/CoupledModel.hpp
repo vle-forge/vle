@@ -28,8 +28,6 @@
 #include <vle/graph/Model.hpp>
 #include <vector>
 #include <list>
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
 
 
 

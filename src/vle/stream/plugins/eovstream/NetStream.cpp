@@ -164,3 +164,10 @@ void NetStream::writeValues(const devs::Time& time,
 }} // namespace vle stream
 
 DECLARE_STREAM(vle::stream::NetStream);
+
+/*
+extern "C" __declspec(dllexport) vle::devs::Stream* makeNewStream(void) 
+{
+	return new vle::stream::NetStream();
+}
+*/

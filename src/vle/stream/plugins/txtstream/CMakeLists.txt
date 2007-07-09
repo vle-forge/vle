@@ -7,6 +7,19 @@ LINK_DIRECTORIES(
 	${GLIBMM_LIBRARY_DIRS}
 	${LIBXMLPP_LIBRARY_DIR})
 
-ADD_LIBRARY(textstream MODULE TextStream.cpp TextStream.hpp)
+ADD_LIBRARY(textstream SHARED TextStream.cpp TextStream.hpp)
+
+TARGET_LINK_LIBRARIES(textstream
+	${GLIBMM_LIBRARIES}
+	${LIBXMLPP_LIBRARIES}
+	${GTHREAD_LIBRARIES}
+	vlegeometry
+	vleutils
+	vledata
+	vlevalue
+	vlegraph
+	vlevpz
+	vledevs
+	vleextension)
 
 INSTALL(TARGETS textstream DESTINATION ${VLE_LIBRARY_DIRS}/stream)

@@ -13,7 +13,6 @@ TARGET_LINK_LIBRARIES(vle
 	${GLIBMM_LIBRARIES}
 	${LIBXMLPP_LIBRARIES}
 	${GTHREAD_LIBRARIES}
-	${LIBSQLXX}
 	vlegeometry
 	vleutils
 	vledata

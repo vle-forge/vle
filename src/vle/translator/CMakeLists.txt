@@ -15,5 +15,19 @@ SET(TRANSLATOR_CPP
 
 ADD_LIBRARY(vletranslator SHARED ${TRANSLATOR_HPP};${TRANSLATOR_CPP})
 
+TARGET_LINK_LIBRARIES(vletranslator
+	${GLIBMM_LIBRARIES}
+	${LIBXMLPP_LIBRARIES}
+	${GTHREAD_LIBRARIES}
+	vlegeometry
+	vleutils
+	vledata
+	vlevalue
+	vlegraph
+	vlevpz
+	vledevs
+	vleextension
+	vlemanager)
+
 INSTALL(TARGETS vletranslator DESTINATION ${VLE_LIBRARY_DIR})
 INSTALL(FILES ${TRANSLATOR_HPP} DESTINATION ${VLE_INCLUDE_DIRS}/translator)

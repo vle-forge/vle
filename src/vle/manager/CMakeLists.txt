@@ -22,5 +22,18 @@ SET(MANAGER_HPP
 
 ADD_LIBRARY(vlemanager SHARED ${MANAGER_CPP};${MANAGER_HPP})
 
+TARGET_LINK_LIBRARIES(vlemanager
+	${GLIBMM_LIBRARIES}
+	${LIBXMLPP_LIBRARIES}
+	${GTHREAD_LIBRARIES}
+	vlegeometry
+	vleutils
+	vledata
+	vlevalue
+	vlegraph
+	vlevpz
+	vledevs
+	vleextension)
+
 INSTALL(TARGETS vlemanager DESTINATION ${VLE_LIBRARY_DIR})
 INSTALL(FILES ${MANAGER_HPP} DESTINATION ${VLE_INCLUDE_DIRS}/manager)

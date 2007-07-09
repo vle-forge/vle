@@ -16,7 +16,6 @@ TARGET_LINK_LIBRARIES(vletranslatortest
 	${GLIBMM_LIBRARIES}
 	${LIBXMLPP_LIBRARIES}
 	${GTHREAD_LIBRARIES}
-	${LIBSQLXX}
 	vlegeometry
 	vleutils
 	vledata
@@ -32,7 +31,6 @@ TARGET_LINK_LIBRARIES(vlemodeltest
 	${GLIBMM_LIBRARIES}
 	${LIBXMLPP_LIBRARIES}
 	${GTHREAD_LIBRARIES}
-	${LIBSQLXX}
 	vlegeometry
 	vleutils
 	vledata

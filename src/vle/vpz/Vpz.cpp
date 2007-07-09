@@ -134,8 +134,9 @@ std::string Vpz::writeToString()
     return out.str();
 }
 
-std::string Vpz::get_gzip_content(const std::string& filename)
+std::string Vpz::get_gzip_content(const std::string& /* filename */)
 {
+	/*
     const size_t buffer_size = 4096;
     char* buffer = new char[buffer_size];
     int len;
@@ -156,12 +157,13 @@ std::string Vpz::get_gzip_content(const std::string& filename)
         result.append(buffer, len);
     }
     delete[] buffer;
-    gzclose(file);
-    return result;
+    gzclose(file); */
+    return std::string();
 }
 
-bool Vpz::is_gzip_file(const std::string& filename)
+bool Vpz::is_gzip_file(const std::string& /* filename */)
 {
+	/*
     size_t sizefile, sizeGzip;
 
     {
@@ -182,6 +184,8 @@ bool Vpz::is_gzip_file(const std::string& filename)
     }
 
     return sizeGzip < sizefile;
+    */
+    return true;
 }
 
 void Vpz::fixExtension(std::string& filename)

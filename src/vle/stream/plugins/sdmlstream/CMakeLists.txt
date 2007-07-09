@@ -7,6 +7,19 @@ LINK_DIRECTORIES(
 	${GLIBMM_LIBRARY_DIRS}
 	${LIBXMLPP_LIBRARY_DIR})
 
-ADD_LIBRARY(sdmlstream MODULE SDMLStream.cpp SDMLStream.hpp)
+ADD_LIBRARY(sdmlstream SHARED SDMLStream.cpp SDMLStream.hpp)
+
+TARGET_LINK_LIBRARIES(sdmlstream
+	${GLIBMM_LIBRARIES}
+	${LIBXMLPP_LIBRARIES}
+	${GTHREAD_LIBRARIES}
+	vlegeometry
+	vleutils
+	vledata
+	vlevalue
+	vlegraph
+	vlevpz
+	vledevs
+	vleextension)
 
 INSTALL(TARGETS sdmlstream DESTINATION ${VLE_LIBRARY_DIRS}/stream)
