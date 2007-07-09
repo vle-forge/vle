@@ -24,3 +24,8 @@ vlepython.pc
 src/apps/vle/vle
 src/apps/test/vlemodeltest
 src/apps/test/vletranslatortest
+*.cmake
+*.so
+CMakeFiles
+CMakeCache.txt
+install_manifest.txt
