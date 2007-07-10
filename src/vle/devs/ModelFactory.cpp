@@ -100,7 +100,7 @@ const vpz::AtomicModel& ModelFactory::update_atomicmodellist(
     } catch(const std::exception& e) {
         Throw(utils::InternalError, (boost::format(
                     "Cannot add the atomic model %1% information to the model "
-                    "factory.") % mdl->getName()));
+                    "factory. Error: %2%") % mdl->getName() % e.what()));
     }
 }
 
