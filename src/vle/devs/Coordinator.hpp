@@ -64,6 +64,11 @@ namespace vle { namespace devs {
 	void addModels(vpz::Model& model);
 
 	void addObserver(devs::Observer* observer);
+
+        void addObservableToView(Simulator* simulator,
+                                 const std::string& portname,
+                                 const std::string& view);
+
     
         //
         ///
@@ -117,7 +122,7 @@ namespace vle { namespace devs {
 	 *
 	 * @return
 	 */
-	Simulator* getModel(graph::AtomicModel* model) const;
+	Simulator* getModel(const graph::AtomicModel* model) const;
 
 	/**
 	 * Return the Simulator with a specified Atomic model name.
@@ -163,7 +168,8 @@ namespace vle { namespace devs {
 	EventTable m_eventTable;
 
 	// Liste des observateurs
-	std::map < std::string , devs::Observer* > m_observerList;
+        typedef std::map < std::string, devs::Observer* > ObserverList;
+	ObserverList m_observerList;
 
 	std::map < std::string ,
 		   std::vector < devs::EventObserver* > > m_eventObserverList;

@@ -1,5 +1,19 @@
 PROJECT(VLE CXX C)
 
+##
+## Modules
+##
+
+INCLUDE(CheckIncludeFileCXX)
+INCLUDE(CheckIncludeFile)
+INCLUDE(CheckLibraryExists)
+INCLUDE(CMakeDetermineCCompiler)
+INCLUDE(CPack)
+
+##
+## Set global variables.
+##
+
 SET(VLE_PACKAGE_VERSION_MAJOR 0)
 SET(VLE_PACKAGE_VERSION_MINOR 5)
 SET(VLE_PACKAGE_VERSION_PATCH 0)
@@ -19,13 +33,30 @@ SET(VLE_MANPAGE_PATH "${CMAKE_INSTALL_PREFIX}/share/man/man1")
 SET(VLE_SHARE_DIRS
     "${CMAKE_MODULE_PATH}/share/${VLE_PACKAGE_NAME}-${VLE_PACKAGE_VERSION}")
 
+##
+## Debug mode
+##
+
+OPTION(BUILD_DEBUG "Build the project in Debug mode [default=on]" ON)
+IF (BUILD_DEBUG)
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -W -Werror")
+	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -Wall -W -Werror")
+ENDIF (BUILD_DEBUG)
+
+##
+## Check libraries with pkgconfig
+##
+
 SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 FIND_PACKAGE(PkgConfig)
-INCLUDE(CheckIncludeFileCXX)
-INCLUDE(CheckIncludeFile)
-INCLUDE(CheckLibraryExists)
-INCLUDE(CMakeDetermineCCompiler)
-INCLUDE(CPack)
+
+PKG_CHECK_MODULES(GLIBMM glibmm-2.4)
+PKG_CHECK_MODULES(GTHREAD gthread-2.0)
+PKG_CHECK_MODULES(LIBXMLPP libxml++-2.6)
+
+##
+## Manage the Win32 port.
+##
 
 IF(WIN32)
 	SET(OS_SPECIFIC_LIBRARIES wsock32 netapi32)
@@ -33,9 +64,9 @@ ELSE(WIN32)
 	SET(OS_SPECIFIC_LIBRARIES)
 ENDIF(WIN32)
 
-PKG_CHECK_MODULES(GLIBMM glibmm-2.4)
-PKG_CHECK_MODULES(GTHREAD gthread-2.0)
-PKG_CHECK_MODULES(LIBXMLPP libxml++-2.6)
+##
+## Test the libsqlxx dependencies
+##
 
 OPTION(WITH_SQLXX "with libsqlxx for the odbc driver [default: on]" ON)
 IF (WITH_SQLXX)
@@ -48,3 +79,13 @@ IF (WITH_SQLXX)
 ENDIF (WITH_SQLXX)
 
 ADD_SUBDIRECTORY(src)
+
+
+
+MESSAGE(STATUS "- - - -")
+MESSAGE(STATUS "${VLE_PACKAGE_NAME} ${VLE_PACKAGE_VERSION} configured successfully.")
+MESSAGE(STATUS "Using ${VLE_INSTALL_PREFIX} for installation.")
+MESSAGE(STATUS "Using Building with ${CMAKE_C_FLAGS} for C compiler flags")
+MESSAGE(STATUS "Using Building with ${CMAKE_CXX_FLAGS} for C++ compiler flags")
+MESSAGE(STATUS "Build with SQL........: ${LIBSQLXX}")
+MESSAGE(STATUS "- - - -")

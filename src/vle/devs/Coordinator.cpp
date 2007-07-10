@@ -107,14 +107,39 @@ void Coordinator::addModels(vpz::Model& model)
     m_modelFactory->createModels(atomicmodellist, m_modelList);
 }
 
-void Coordinator::addObserver(Observer* p_observer)
+void Coordinator::addObserver(Observer* observer)
 {
-    m_observerList[p_observer->getName()] = p_observer;
-    if (p_observer->isTimed())
-        m_timedObserverList.push_back((TimedObserver*)p_observer);
-    else
-        m_eventObserverList[p_observer->getFirstModel()->getName()].
-            push_back((EventObserver*)p_observer);
+    Assert(utils::InternalError, observer, boost::format("Empty reference"));
+
+    ObserverList::iterator it = m_observerList.find(observer->getName());
+    Assert(utils::InternalError, it == m_observerList.end(), boost::format(
+            "The view %1% already exist") % observer->getName());
+
+    m_observerList[observer->getName()] = observer;
+
+    if (observer->isTimed()) {
+        m_timedObserverList.push_back(
+            reinterpret_cast < TimedObserver*>(observer));
+    } else {
+        m_eventObserverList[
+            observer->getFirstModel()->getName()].push_back(
+                reinterpret_cast < EventObserver* >(observer));
+    }
+}
+
+void Coordinator::addObservableToView(Simulator* simulator,
+                                      const std::string& portname,
+                                      const std::string& view)
+{
+    ObserverList::iterator it = m_observerList.find(view);
+    Assert(utils::InternalError, it != m_observerList.end(), boost::format(
+            "The view %1% is unknow of coordinator view list") % view);
+
+    Observer* obs = it->second;
+    obs->addObservable(simulator, portname);
+
+    StateEvent* evt = new StateEvent(m_currentTime, simulator, view, portname);
+    m_eventTable.putStateEvent(evt);
 }
 
 SimulatorList Coordinator::createModelFromClass(graph::CoupledModel* parent,
@@ -325,9 +350,10 @@ void Coordinator::dispatchExternalEvent(ExternalEventList& eventList,
     eventList.clear(true);
 }
 
-Simulator* Coordinator::getModel(graph::AtomicModel* model) const
+Simulator* Coordinator::getModel(const graph::AtomicModel* model) const
 {
-    SimulatorMap::const_iterator it = m_modelList.find(model);
+    SimulatorMap::const_iterator it = m_modelList.find(
+        const_cast < graph::AtomicModel* >(model));
     return (it == m_modelList.end()) ? 0 : it->second;
 }
 
