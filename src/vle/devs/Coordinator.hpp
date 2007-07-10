@@ -65,7 +65,7 @@ namespace vle { namespace devs {
 
 	void addObserver(devs::Observer* observer);
 
-        void addObservableToView(Simulator* simulator,
+        void addObservableToView(const std::string& modelname,
                                  const std::string& portname,
                                  const std::string& view);
 

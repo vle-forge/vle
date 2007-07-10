@@ -127,13 +127,15 @@ void Coordinator::addObserver(Observer* observer)
     }
 }
 
-void Coordinator::addObservableToView(Simulator* simulator,
+void Coordinator::addObservableToView(const std::string& modelname,
                                       const std::string& portname,
                                       const std::string& view)
 {
     ObserverList::iterator it = m_observerList.find(view);
     Assert(utils::InternalError, it != m_observerList.end(), boost::format(
             "The view %1% is unknow of coordinator view list") % view);
+
+    Simulator* simulator = getModel(modelname);
 
     Observer* obs = it->second;
     obs->addObservable(simulator, portname);
