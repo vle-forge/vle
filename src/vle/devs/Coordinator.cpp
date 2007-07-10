@@ -325,6 +325,7 @@ void Coordinator::dispatchExternalEvent(ExternalEventList& eventList,
 
     while (i < sz) {
         ExternalEvent* event = eventList.at(i);
+        event->setModel(sim);
 
         graph::TargetModelList out;
         getTargetPortList(sim->getStructure(), event->getPortName(), out);

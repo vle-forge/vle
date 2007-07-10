@@ -75,6 +75,14 @@ namespace vle { namespace devs {
         { return m_source; }
 
         /**
+         * Assign a simulator to the event.
+         *
+         * @param sim the simulator.
+         */
+        inline void setModel(Simulator* sim)
+        { m_source = sim; }
+
+        /**
 	 * Get the name of source model.
 	 *
 	 * @return model source name.
