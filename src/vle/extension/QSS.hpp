@@ -5,8 +5,7 @@
  */
 
 /*
- * Copyright (c) 2005 The VLE Development Team.
- *
+ * Copyright (C) 2006, 07 - The vle Development Team
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -19,8 +18,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
 #ifndef VLE_EXTENSION_QSS_HPP
@@ -32,27 +30,40 @@
 
 namespace vle { namespace extension {
     
-    class qss : public vle::devs::Dynamics
+    class qss : public devs::Dynamics
     {
     public:
       enum state { INIT, RUN };
       
-      qss(const vle::graph::AtomicModel& model);
+      qss(const graph::AtomicModel& model);
       virtual ~qss() { }
 
-      // DEVS Methods
       virtual void finish();
-      virtual vle::devs::Time init();
-      virtual void getOutputFunction(const vle::devs::Time& /* time */,
-				     vle::devs::ExternalEventList& /* output */);
-      virtual vle::devs::Time getTimeAdvance();
-      virtual vle::devs::Event::EventType processConflict(const vle::devs::InternalEvent& /* internal */,
-					       const vle::devs::ExternalEventList& /* extEventlist */) const;
-      //      virtual void processInitEvents(const vle::devs::InitEventList& /* event */);
-      virtual void processInternalEvent(const vle::devs::InternalEvent& /* event */);
-      virtual void processExternalEvents(const vle::devs::ExternalEventList& /* event */,
-					 const vle::devs::Time& /* time */);
-      virtual vle::value::Value processStateEvent(const vle::devs::StateEvent& /* event */) const;
+
+      virtual devs::Time init();
+
+      virtual void getOutputFunction(
+          const devs::Time& time,
+          devs::ExternalEventList& output);
+
+      virtual devs::Time getTimeAdvance();
+      
+      virtual devs::Event::EventType processConflict(
+          const devs::InternalEvent& internal,
+          const devs::ExternalEventList& extEventlist) const;
+
+      virtual void processInitEvents(
+          const devs::InitEventList& event);
+
+      virtual void processInternalEvent(
+          const devs::InternalEvent& event);
+
+      virtual void processExternalEvents(
+          const devs::ExternalEventList& event,
+          const devs::Time& time);
+
+      virtual value::Value processStateEvent(
+          const devs::StateEvent& event) const;
 
     private:
       bool m_active;
