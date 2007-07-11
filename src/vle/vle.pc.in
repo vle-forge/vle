@@ -1,6 +1,6 @@
 prefix=${VLE_INSTALL_PREFIX}
 exec_prefix=${VLE_INSTALL_PREFIX}
-libdir=${VLE_LIBRARY_DIRS}
+libdir=${VLE_LIBRARY_DIR}
 includedir=${VLE_INCLUDE_DIRS}
 
 Name: vle
