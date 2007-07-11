@@ -58,6 +58,8 @@ namespace vle { namespace vpz {
 
         inline bool exist(const std::string& name)
         { return find(name) != end(); }
+        
+        void clean_no_permanent();
     };
 
 }} // namespace vle vpz

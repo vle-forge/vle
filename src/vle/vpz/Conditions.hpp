@@ -109,6 +109,13 @@ namespace vle { namespace vpz {
          * @return 
          */
         Condition& get(const std::string& condition);
+        
+        /** 
+         * @brief Remove all no permanent value of the list. This function is
+         * use to clean not usefull data for the devs::ModelFactory. Linear
+         * function.
+         */
+        void clean_no_permanent();
     };
 
 }} // namespace vle vpz

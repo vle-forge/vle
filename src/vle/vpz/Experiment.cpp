@@ -76,6 +76,12 @@ void Experiment::setName(const std::string& name)
     m_name.assign(name);
 }
 
+void Experiment::clean_no_permanent()
+{
+    m_conditions.clean_no_permanent();
+    m_views.observables().clean_no_permanent();
+}
+
 void Experiment::setDuration(double duration)
 {
     AssertI(duration > 0);

@@ -105,6 +105,13 @@ namespace vle { namespace vpz {
 
         void addViews(const Views& m);
 
+        /** 
+         * @brief Remove all no permanent value of the Experiement ie.: all
+         * observable and condition that are no permanent. This function is use
+         * to clean not usefull data for the devs::ModelFactory.
+         */
+        void clean_no_permanent();
+
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
           * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

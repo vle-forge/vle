@@ -54,8 +54,6 @@ namespace vle { namespace vpz {
         virtual Base::type getType() const
         { return DYNAMICS; }
 
-
-
         /** 
          * @brief Initialise the Dynamics tag with XML information.
          * @code
@@ -132,6 +130,13 @@ namespace vle { namespace vpz {
          * @return true if founded, false otherwise.
          */
         bool exist(const std::string& name) const;
+
+        /** 
+         * @brief Remove all no permanent value of the list. This function is
+         * use to clean not usefull data for the devs::ModelFactory. Linear
+         * function.
+         */
+        void clean_no_permanent();
     };
 
 }} // namespace vle vpz

@@ -173,6 +173,23 @@ namespace vle { namespace vpz {
         //// Get/Set functions.
         ///
         //
+        
+        /** 
+         * @brief Return true if this observable is a permanent data for the
+         * devs::ModelFactory.
+         * 
+         * @return True if this dynamics is a permanent value.
+         */
+        inline bool is_permanent() const
+        { return m_ispermanent; }
+
+        /** 
+         * @brief Set the permanent value of this dynamics.
+         * 
+         * @param value True to conserve this dynamics in devs::ModelFactory.
+         */
+        inline void permanent(bool value = true)
+        { m_ispermanent = value; }
 
         /** 
          * @brief Return the name of the Observable.
@@ -186,6 +203,7 @@ namespace vle { namespace vpz {
         { }
 
         std::string         m_name;
+        bool                m_ispermanent;
     };
 
 }} // namespace vle vpz

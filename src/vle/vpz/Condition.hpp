@@ -176,12 +176,30 @@ namespace vle { namespace vpz {
          * @throw Exception::Internal if port does not exist.
          */
         value::Set& last_added_port();
-        
+
+        /** 
+         * @brief Return true if this condition is a permanent data for the
+         * devs::ModelFactory.
+         * 
+         * @return True if this condition is a permanent value.
+         */
+        inline bool is_permanent() const
+        { return m_ispermanent; }
+
+        /** 
+         * @brief Set the permanent value of this condition.
+         * 
+         * @param value True to conserve this condition in devs::ModelFactory.
+         */
+        inline void permanent(bool value = true)
+        { m_ispermanent = value; }
+
     private:
         Condition();
 
         std::string             m_name;         /* name of the condition. */
         std::string             m_last_port;    /* latest added port. */
+        bool                    m_ispermanent;
     };
 
 }} // namespace vle vpz

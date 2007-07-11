@@ -89,7 +89,43 @@ namespace vle { namespace devs {
          */
         SimulatorList createModelFromClass(graph::CoupledModel* parent,
                                            const std::string& classname);
+    
+        /** 
+         * @brief Add a permanent vpz::Dynamic into cache.
+         * @param dynamics The new vpz::Dynamic to push into cache.
+         * @throw utils::InternalError if dynamics already exist.
+         */
+        void addPermanent(const vpz::Dynamic& dynamics);
 
+        /** 
+         * @brief Add a permanent vpz::Condition into cache.
+         * @param condition The new vpz::Condition to push into cache.
+         * @throw utils::InternalError if condition already exist.
+         */
+        void addPermanent(const vpz::Condition& condition);
+        
+        /** 
+         * @brief Add a permanent vpz::Observable into cache.
+         * @param observable The new vpz::Observable to push into cache.
+         * @throw utils::InternalError if observable already exist.
+         */
+        void addPermanent(const vpz::Observable& observable);
+
+        /** 
+         * @brief Build a new devs::Simulator from the dynamics library. Attach
+         * to this model information of dynamics, condition and observable.
+         * @param model the graph::AtomicModel reference source of
+         * devs::Simulator.
+         * @param dynamics the name of the dynamics to attach.
+         * @param condition the name of the condition to attach.
+         * @param observable the name of the observable to attach.
+         * @return A reference on the new Simulator builded.
+         * @throw utils::InternalError if dynamics not exist.
+         */
+        Simulator* createModel(graph::AtomicModel* model,
+                               const std::string& dynamics,
+                               const std::string& condition,
+                               const std::string& observable);
 
         Simulator* createModel(graph::AtomicModel* model,
                                const vpz::Dynamic& dyn,
@@ -150,7 +186,17 @@ namespace vle { namespace devs {
 
         void parseExperiment();
 
-	ExternalEventList* run();
+        ExternalEventList* run();
+
+        //
+        // Get/Set function.
+        //
+
+        inline const EventTable& eventtable() const
+        { return m_eventTable; }
+
+        inline EventTable& eventtable()
+        { return m_eventTable; }
 
     private:
         vpz::Experiment         m_experiment;

@@ -91,5 +91,27 @@ Condition& Conditions::get(const std::string& condition)
 
     return it->second;
 }
+    
+void Conditions::clean_no_permanent()
+{
+    iterator prev = begin();
+    iterator it = begin();
+    
+    while (it != end()) {
+        if (not it->second.is_permanent()) {
+            if (prev == it) {
+                erase(it);
+                prev = begin();
+                it = begin();
+            } else {
+                erase(it);
+                it = prev;
+            }
+        } else {
+            ++prev;
+            ++it;
+        }
+    }
+}
 
 }} // namespace vle vpz

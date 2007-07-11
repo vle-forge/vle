@@ -151,6 +151,23 @@ namespace vle { namespace vpz {
         { return m_language; }
 
         /** 
+         * @brief Return true if this dynamics is a permanent data for the
+         * devs::ModelFactory.
+         * 
+         * @return True if this dynamics is a permanent value.
+         */
+        inline bool is_permanent() const
+        { return m_ispermanent; }
+
+        /** 
+         * @brief Set the permanent value of this dynamics.
+         * 
+         * @param value True to conserve this dynamics in devs::ModelFactory.
+         */
+        inline void permanent(bool value = true)
+        { m_ispermanent = value; }
+
+        /** 
          * @brief An operator to the std::set container.
          * 
          * @param dynamic The dynamic to search.
@@ -171,6 +188,7 @@ namespace vle { namespace vpz {
         std::string     m_language;
         std::string     m_location;
         Dynamic::Type   m_type;
+        bool            m_ispermanent;
     };
 
 }} // namespace vle vpz

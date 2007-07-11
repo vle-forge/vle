@@ -200,6 +200,30 @@ Simulator* Coordinator::createModel(graph::AtomicModel* model,
     return sim;
 }
 
+void Coordinator::addPermanent(const vpz::Dynamic& dynamics)
+{
+    m_modelFactory->addPermanent(dynamics);
+}
+
+void Coordinator::addPermanent(const vpz::Condition& condition)
+{
+    m_modelFactory->addPermanent(condition);
+}
+
+void Coordinator::addPermanent(const vpz::Observable& observable)
+{
+    m_modelFactory->addPermanent(observable);
+}
+
+Simulator* Coordinator::createModel(graph::AtomicModel* model,
+                                    const std::string& dynamics,
+                                    const std::string& condition,
+                                    const std::string& observable)
+{
+    return m_modelFactory->createModel(model, dynamics, condition, observable,
+                                       m_modelList);
+}
+
 void Coordinator::delAtomicModel(graph::CoupledModel* parent,
                                  graph::AtomicModel* atom)
 {

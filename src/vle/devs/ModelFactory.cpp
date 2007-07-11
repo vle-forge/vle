@@ -85,6 +85,105 @@ Simulator* ModelFactory::createModel(graph::AtomicModel* model,
     return lst.front();
 }
 
+//
+// Cache.
+//
+
+void ModelFactory::cleanCache()
+{
+    mDynamics.clean_no_permanent();
+    mExperiment.clean_no_permanent();
+}
+
+void ModelFactory::addPermanent(const vpz::Dynamic& dynamics)
+{
+    try {
+        mDynamics.add(dynamics);
+    } catch(const std::exception& e) {
+        Throw(utils::InternalError, boost::format(
+            "Model factory cannot add dynamics %1%: %2%") % dynamics.name() %
+            e.what());
+    }
+}
+
+void ModelFactory::addPermanent(const vpz::Condition& condition)
+{
+    try {
+        vpz::Conditions& conds(mExperiment.conditions());
+        conds.add(condition);
+    } catch(const std::exception& e) {
+        Throw(utils::InternalError, boost::format(
+                "Model factory cannot add condition %1%: %2%") %
+            condition.name() % e.what());
+    }
+}
+
+void ModelFactory::addPermanent(const vpz::Observable& observable)
+{
+    try {
+        vpz::Views& views(mExperiment.views());
+        views.addObservable(observable);
+    } catch(const std::exception& e) {
+        Throw(utils::InternalError, boost::format(
+                "Model factory cannot add observable %1%: %2%") %
+            observable.name() % e.what());
+    }
+}
+
+Simulator* ModelFactory::createModel(graph::AtomicModel* model,
+                                     const std::string& dynamics,
+                                     const std::string& condition,
+                                     const std::string& observable,
+                                     SimulatorMap& result)
+{
+    Simulator* sim = new Simulator(model);
+    Assert(utils::InternalError, result.find(model) == result.end(),
+           boost::format("The model %1% already exist in coordinator") %
+           model->getName());
+    result[model] = sim;
+
+    const vpz::Dynamic& dyn = mDynamics.get(dynamics);
+    switch(dyn.type()) {
+    case vpz::Dynamic::LOCAL:
+        attachDynamics(sim, dyn, getPlugin(dyn.name()));
+        break;
+    case vpz::Dynamic::DISTANT:
+        Throw(utils::NotYetImplented, "Distant dynamics is not supported");
+    }
+
+    if (not condition.empty()) {
+        const vpz::Condition& cnd(mExperiment.conditions().get(condition));
+        sim->processInitEvents(cnd.firstValues());
+    }
+
+    if (not observable.empty()) {
+        vpz::Observable& ob(mExperiment.views().observables().get(observable));
+        for (vpz::Observable::iterator it = ob.begin(); it != ob.end(); ++it) {
+            for (vpz::ObservablePort::iterator jt = it->second.begin();
+                 jt != it->second.end(); ++jt) {
+
+                Observer* observer = mCoordinator.getObserver(*jt);
+
+                Assert(utils::InternalError, observer, (boost::format(
+                        "The view %1% is unknow of coordinator view list") %
+                    *jt));
+
+                observer->addObservable(sim, it->first);
+                StateEvent* evt = new StateEvent(mCoordinator.getCurrentTime(),
+                                                 sim, *jt, it->first);
+                mCoordinator.eventtable().putStateEvent(evt);
+            }
+        }
+    }
+        
+
+    InternalEvent* evt = sim->init(mCoordinator.getCurrentTime());
+    if (evt) {
+        mCoordinator.eventtable().putInternalEvent(evt);
+    }
+    return sim;
+}
+
 const vpz::AtomicModel& ModelFactory::update_atomicmodellist(
                         graph::AtomicModel* mdl,
                         const vpz::Dynamic& dyn,

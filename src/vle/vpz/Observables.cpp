@@ -73,4 +73,26 @@ const Observable& Observables::get(const std::string& name) const
     return it->second;
 }
 
+void Observables::clean_no_permanent()
+{
+    iterator previous = begin();
+    iterator it = begin();
+    
+    while (it != end()) {
+        if (not it->second.is_permanent()) {
+            if (it == previous) {
+                erase(it);
+                previous = begin();
+                it = begin();
+            } else {
+                erase(it);
+                it = previous;
+            }
+        } else {
+            ++previous;
+            ++it;
+        }
+    }
+}
+
 }} // namespace vle vpz

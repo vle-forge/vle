@@ -106,4 +106,26 @@ bool Dynamics::exist(const std::string& name) const
     return find(name) != end();
 }
 
+void Dynamics::clean_no_permanent()
+{
+    iterator previous = begin();
+    iterator it = begin();
+    
+    while (it != end()) {
+        if (not it->second.is_permanent()) {
+            if (it == previous) {
+                erase(it);
+                previous = begin();
+                it = begin();
+            } else {
+                erase(it);
+                it = previous;
+            }
+        } else {
+            ++previous;
+            ++it;
+        }
+    }
+}
+
 }} // namespace vle vpz
