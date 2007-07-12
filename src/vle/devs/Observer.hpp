@@ -43,19 +43,24 @@ namespace vle { namespace devs {
     class Observable
     {
     public:
-	Simulator* model;
-	std::string portName;
-
-        Observable(Simulator* model,
-		   const std::string& portName) :
-            model(model),
-            portName(portName)
+        Observable(Simulator* model, const std::string& portname) :
+            m_model(model),
+            m_portname(portname)
         { }
+
+        inline Simulator* simulator() const
+        { return m_model; }
+
+        inline const std::string& portname() const
+        { return m_portname; }
 
     private:
         Observable() :
-            model(0)
+            m_model(0)
         { }
+        
+        Simulator*      m_model;
+	std::string     m_portname;
     };
 
     //////////////////////////////////////////////////////////////////////////
@@ -67,41 +72,39 @@ namespace vle { namespace devs {
     class Observer
     {
     public:
-        Observer(const std::string& name, Stream* p_stream);
+        typedef std::vector < Observable > ObservableList;
+
+        Observer(const std::string& name, Stream* stream);
 
         virtual ~Observer();
 
-        void addObservable(Simulator* p_model,
-			   const std::string& p_portName);
+        StateEvent* addObservable(Simulator* model,
+                                  const std::string& portName,
+                                  const Time& currenttime);
 
         void finish();
 
 	/**
 	 * Return the model of the first element of observable list.
 	 *
-	 *
 	 * @return a reference to the first observable.
 	 */
-        inline Simulator* getFirstModel() const {
-	    return m_observableList.front().model;
-	}
+        inline Simulator* getFirstModel() const
+        { return m_observableList.front().simulator(); }
 
         const std::string& getFirstPortName() const;
 
-	inline const std::string& getName() const {
-	    return m_name;
-	}
+        inline const std::string& getName() const
+        { return m_name; }
 
-        std::vector < Observable > const& getObservableList() const;
+        inline const ObservableList& getObservableList() const
+        { return m_observableList; }
 
-        inline unsigned int getSize() const {
-	    return m_size;
-	}
+        inline unsigned int getSize() const
+        { return m_size; }
 
         inline vle::devs::Stream * getStream() const
         { return m_stream; }
-
-        virtual StateEventList init();
 
         virtual bool isEvent() const =0;
 
@@ -124,13 +127,24 @@ namespace vle { namespace devs {
 	 * @param model delete observable attached to the specified
 	 * AtomicModel.
 	 */
-	void removeObservable(graph::AtomicModel* model);
+        void removeObservable(graph::AtomicModel* model);
+
+        /** 
+         * @brief Test if a simulator is already connected with the same port
+         * to the Observer.
+         * 
+         * @param simulator the simulator to observe.
+         * @param portname the port of the simulator to observe.
+         * 
+         * @return true if simulator is already connected with the same port.
+         */
+        bool exist(Simulator* simulator, const std::string& portname) const;
 
     protected:
-        std::vector < Observable > m_observableList;
-        std::string                m_name;
-        Stream*                     m_stream;
-        size_t                     m_size;
+        ObservableList      m_observableList;
+        std::string         m_name;
+        Stream*             m_stream;
+        size_t              m_size;
     };
 
 }} // namespace vle devs

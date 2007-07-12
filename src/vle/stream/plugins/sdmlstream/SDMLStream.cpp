@@ -94,8 +94,8 @@ void SDMLStream::writeHead(std::vector < devs::Observable > const &
     std::vector < devs::Observable >::const_iterator it = p_variableNameList.begin();
 
     while (it != p_variableNameList.end()) {
-	m_stream << "<e>" << (*it).model->getName() << ":"
-		 << (*it).portName << "</e>";
+	m_stream << "<e>" << (*it).simulator()->getName() << ":"
+		 << (*it).portname() << "</e>";
 	++it;
     }
 

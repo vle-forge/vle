@@ -134,12 +134,14 @@ void Coordinator::addObservableToView(const std::string& modelname,
             "The view %1% is unknow of coordinator view list") % view);
 
     Simulator* simulator = getModel(modelname);
+    Assert(utils::InternalError, simulator, boost::format(
+            "The simulator of the model %1% does not exist") % modelname);
 
     Observer* obs = it->second;
-    obs->addObservable(simulator, portname);
-
-    StateEvent* evt = new StateEvent(m_currentTime, simulator, view, portname);
-    m_eventTable.putStateEvent(evt);
+    StateEvent* evt = obs->addObservable(simulator, portname, m_currentTime);
+    if (evt != 0) {
+        m_eventTable.putStateEvent(evt);
+    }
 }
 
 SimulatorList Coordinator::createModelFromClass(graph::CoupledModel* parent,
@@ -174,30 +176,6 @@ SimulatorList Coordinator::createModelFromClass(graph::CoupledModel* parent,
     return lst;
 }
     
-Simulator* Coordinator::createModel(graph::AtomicModel* model,
-                                    const vpz::Dynamic& dyn,
-                                    const vpz::Condition& cond,
-                                    const vpz::Observable& obs)
-{
-    m_modelFactory->update_atomicmodellist(model, dyn, cond, obs);
-    Simulator* sim(m_modelFactory->createModel(model, m_modelList));
-
-    const vpz::AtomicModelList& atoms(m_modelFactory->atomics());
-    const vpz::Conditions& cnds(m_modelFactory->conditions());
-
-    const vpz::AtomicModel& mdl(atoms.get(sim->getStructure()));
-    if (not mdl.conditions().empty()) {
-        const vpz::Condition& cnd(cnds.get(mdl.conditions()));
-        sim->processInitEvents(cnd.firstValues());
-    }
-
-    InternalEvent* evt = sim->init(m_currentTime);
-    if (evt) {
-        m_eventTable.putInternalEvent(evt);
-    }
-    return sim;
-}
-
 void Coordinator::addPermanent(const vpz::Dynamic& dynamics)
 {
     m_modelFactory->addPermanent(dynamics);
@@ -321,20 +299,6 @@ void Coordinator::init()
         if (evt) {
             m_eventTable.putInternalEvent(evt);
         }
-    }
-
-    ObserverList::iterator it3 = m_observerList.begin();
-    while (it3 != m_observerList.end()) {
-        StateEventList v_eventList = it3->second->init();
-        StateEventList::iterator it4 = v_eventList.begin();
-
-        while (it4 != v_eventList.end()) {
-            if (*it4) {
-                m_eventTable.putStateEvent(*it4);
-            }
-            ++it4;
-        }
-        ++it3;
     }
 }
 
@@ -586,9 +550,12 @@ Coordinator::attachModelToObserver(
                  kt != atoms.end(); ++kt) {
 
                 if (kt->second.observables() == it->first) {
-                    obs->addObservable(getModel(
+                    StateEvent* evt = obs->addObservable(getModel(
                             static_cast < graph::AtomicModel* >(kt->first)),
-                        (*jt));
+                        (*jt), m_currentTime);
+                    if (evt) {
+                        m_eventTable.putStateEvent(evt);
+                    }
                 }
             }
             addObserver(obs);
@@ -622,11 +589,11 @@ void Coordinator::processEventObserver(Simulator& model, Event* event)
                 if (event == 0 or not event->isInternal()) {
                     event3 = new StateEvent(m_currentTime, &model,
                                             (*it)->getName(),
-                                            (*it2).portName);
+                                            (*it2).portname());
                 } else if (event and event->isInternal()) {
                     event3 = new StateEvent(((InternalEvent*)event)->getTime(),
                                             &model, (*it)->getName(),
-                                            (*it2).portName);
+                                            (*it2).portname());
                 }
                 StateEvent* v_event = model.processStateEvent(*event3);
 

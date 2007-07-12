@@ -41,15 +41,15 @@ StateEventList EventObserver::init()
 {
     m_lastTime = Time(0);
 
-    std::vector < Observable >::const_iterator it = getObservableList().begin();
+    Observer::ObservableList::const_iterator it = getObservableList().begin();
+    while (it != getObservableList().end()) {
+        m_valueList[StreamModelPort((*it).simulator(), (*it).portname())] =
+            value::DoubleFactory::create(0.0);
+        ++it;
+    }
 
-  while (it != getObservableList().end()) {
-      m_valueList[StreamModelPort((*it).model, (*it).portName)] =
-          value::DoubleFactory::create(0.0);
-      ++it;
-  }
-
-  return Observer::init();
+    return StateEventList();
+    //return Observer::init();
 }
 
 

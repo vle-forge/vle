@@ -156,6 +156,11 @@ Simulator* ModelFactory::createModel(graph::AtomicModel* model,
         sim->processInitEvents(cnd.firstValues());
     }
 
+    InternalEvent* evt = sim->init(mCoordinator.getCurrentTime());
+    if (evt) {
+        mCoordinator.eventtable().putInternalEvent(evt);
+    }
+
     if (not observable.empty()) {
         vpz::Observable& ob(mExperiment.views().observables().get(observable));
         for (vpz::Observable::iterator it = ob.begin(); it != ob.end(); ++it) {
@@ -168,19 +173,15 @@ Simulator* ModelFactory::createModel(graph::AtomicModel* model,
                         "The view %1% is unknow of coordinator view list") %
                     *jt));
 
-                observer->addObservable(sim, it->first);
-                StateEvent* evt = new StateEvent(mCoordinator.getCurrentTime(),
-                                                 sim, *jt, it->first);
-                mCoordinator.eventtable().putStateEvent(evt);
+                StateEvent* evt = observer->addObservable(
+                    sim, it->first, mCoordinator.getCurrentTime());
+                if (evt) {
+                    mCoordinator.eventtable().putStateEvent(evt);
+                }
             }
         }
     }
-        
 
-    InternalEvent* evt = sim->init(mCoordinator.getCurrentTime());
-    if (evt) {
-        mCoordinator.eventtable().putInternalEvent(evt);
-    }
     return sim;
 }
 

@@ -41,32 +41,19 @@ Observer::~Observer()
     delete m_stream;
 }
 
-void Observer::addObservable(Simulator* model,
-                             const std::string& portName)
+StateEvent* Observer::addObservable(Simulator* model,
+                                    const std::string& portname,
+                                    const Time& currenttime)
 {
-    Observable observable(model, portName);
-    m_size++;
-    m_observableList.push_back(observable);
-}
+    Assert(utils::InternalError, model, 
+           "Cannot add an empty simulator to observe");
 
-const std::vector < Observable >& Observer::getObservableList() const
-{
-    return m_observableList;
-}
-
-StateEventList Observer::init()
-{
-    m_stream->writeHead(m_observableList);
-
-    StateEventList v_eventList;
-    std::vector < Observable >::iterator it = m_observableList.begin();
-
-    while (it != m_observableList.end()) {
-        v_eventList.push_back(
-	    new StateEvent(Time(0), it->model, m_name, it->portName));
-        ++it;
+    if (not exist(model, portname)) {
+        m_size++;
+        m_observableList.push_back(Observable(model, portname));
+        return new StateEvent(currenttime, model, m_name, portname);
     }
-    return v_eventList;
+    return 0;
 }
 
 void Observer::finish()
@@ -78,16 +65,16 @@ void Observer::finish()
 
 const std::string & Observer::getFirstPortName() const
 {
-    return m_observableList.front().portName;
+    return m_observableList.front().portname();
 }
 
 void Observer::removeObservable(Simulator* model)
 {
-    std::vector < Observable >::iterator it;
+    ObservableList::iterator it;
 
     it = m_observableList.begin();
     while (it != m_observableList.end()) {
-        if (it->model == model) {
+        if (it->simulator() == model) {
 	    m_observableList.erase(it);
 	    --m_size;
 	    it = m_observableList.begin();
@@ -99,11 +86,11 @@ void Observer::removeObservable(Simulator* model)
 
 void Observer::removeObservable(graph::AtomicModel* model)
 {
-    std::vector < Observable >::iterator it;
+    ObservableList::iterator it;
 
     it = m_observableList.begin();
     while (it != m_observableList.end()) {
-        if ((*it).model->getStructure() == model) {
+        if ((*it).simulator()->getStructure() == model) {
 	    m_observableList.erase(it);
 	    --m_size;
 	    it = m_observableList.begin();
@@ -111,6 +98,17 @@ void Observer::removeObservable(graph::AtomicModel* model)
             ++it;
         }
     }
+}
+
+bool Observer::exist(Simulator* simulator, const std::string& portname) const
+{
+    for (ObservableList::const_iterator it = m_observableList.begin();
+         it != m_observableList.end(); ++it) {
+        if (it->simulator() == simulator and it->portname() == portname) {
+            return true;
+        }
+    }
+    return false;
 }
 
 }} // namespace vle devs

@@ -127,11 +127,6 @@ namespace vle { namespace devs {
                                const std::string& condition,
                                const std::string& observable);
 
-        Simulator* createModel(graph::AtomicModel* model,
-                               const vpz::Dynamic& dyn,
-                               const vpz::Condition& cond,
-                               const vpz::Observable& obs);
-
         SimulatorList* createModels(graph::CoupledModel* model,
                                     const vpz::Dynamics& dyns,
                                     const vpz::Conditions& conds,

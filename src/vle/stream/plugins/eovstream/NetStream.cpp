@@ -131,8 +131,8 @@ void NetStream::writeValues(const devs::Time& time,
 
         vle::devs::StreamModelPort index;
         while (it != obslst.end()) {
-	    index.first = it->model;
-	    index.second = it->portName;
+	    index.first = it->simulator();
+	    index.second = it->portname();
 	    vle::devs::StreamModelPortValue::const_iterator jt;
 	    jt = valuelst.find(index);
 	    if (jt != valuelst.end()) {

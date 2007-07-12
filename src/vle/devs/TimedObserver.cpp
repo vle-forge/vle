@@ -43,7 +43,7 @@ StateEventList TimedObserver::init()
 {
     m_counter = 0;
     m_valueList.clear();
-    return Observer::init();
+    return StateEventList();
 }
 
 StateEvent*
