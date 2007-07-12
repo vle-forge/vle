@@ -112,18 +112,16 @@ void Coordinator::addObserver(Observer* observer)
     Assert(utils::InternalError, observer, boost::format("Empty reference"));
 
     ObserverList::iterator it = m_observerList.find(observer->getName());
-    Assert(utils::InternalError, it == m_observerList.end(), boost::format(
-            "The view %1% already exist") % observer->getName());
-
-    m_observerList[observer->getName()] = observer;
-
-    if (observer->isTimed()) {
-        m_timedObserverList.push_back(
-            reinterpret_cast < TimedObserver*>(observer));
-    } else {
-        m_eventObserverList[
-            observer->getFirstModel()->getName()].push_back(
-                reinterpret_cast < EventObserver* >(observer));
+    if (it == m_observerList.end()) {
+        m_observerList[observer->getName()] = observer;
+        if (observer->isTimed()) {
+            m_timedObserverList.push_back(
+                reinterpret_cast < TimedObserver*>(observer));
+        } else {
+            m_eventObserverList[
+                observer->getFirstModel()->getName()].push_back(
+                    reinterpret_cast < EventObserver* >(observer));
+        }
     }
 }
 
@@ -290,7 +288,7 @@ void Coordinator::finish()
     }
 
     {
-        map < string , Observer* >::iterator it;
+        ObserverList::iterator it;
         for (it = m_observerList.begin(); it != m_observerList.end(); ++it) {
             (*it).second->finish();
         }
@@ -325,9 +323,7 @@ void Coordinator::init()
         }
     }
 
-    std::map < std::string , devs::Observer* >::iterator it3 =
-        m_observerList.begin();
-
+    ObserverList::iterator it3 = m_observerList.begin();
     while (it3 != m_observerList.end()) {
         StateEventList v_eventList = it3->second->init();
         StateEventList::iterator it4 = v_eventList.begin();
@@ -401,12 +397,10 @@ const Time& Coordinator::getNextTime()
     return m_eventTable.topEvent();
 }
 
-Observer* Coordinator::getObserver(const std::string& p_name) const
+Observer* Coordinator::getObserver(const std::string& name) const
 {
-    map < string , Observer* >::const_iterator it =
-        m_observerList.find(p_name);
-
-    return (it == m_observerList.end())?NULL:it->second;
+    ObserverList::const_iterator it = m_observerList.find(name);
+    return (it == m_observerList.end()) ? 0 : it->second;
 }
 
 void Coordinator::getTargetPortList(
