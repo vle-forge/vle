@@ -1,7 +1,7 @@
 /**
- * @file devs/EventObserver.hpp
+ * @file devs/EventView.hpp
  * @author The VLE Development Team.
- * @brief Define a Event observer base on devs::Observer class. This class
+ * @brief Define a Event View base on devs::View class. This class
  * build state event when event are push.
  */
 
@@ -24,29 +24,25 @@
  * 02111-1307, USA.
  */
 
-#ifndef DEVS_EVENT_OBSERVER_HPP
-#define DEVS_EVENT_OBSERVER_HPP
+#ifndef VLE_DEVS_EVENT_VIEW_HPP
+#define VLE_DEVS_EVENT_VIEW_HPP
 
-#include <vle/devs/Observer.hpp>
+#include <vle/devs/View.hpp>
 #include <vle/devs/StateEvent.hpp>
-#include <vle/devs/DevsTypes.hpp>
-#include <vle/devs/Stream.hpp>
 
 namespace vle { namespace devs {
 
     /**
-     * @brief Define a Event observer base on devs::Observer class. This class
+     * @brief Define a Event View base on devs::View class. This class
      * build state event when event are push.
      *
      */
-    class EventObserver : public Observer
+    class EventView : public View
     {
     public:
-        EventObserver(const std::string& name, Stream* stream);
+        EventView(const std::string& name, Stream* stream);
 
-        virtual ~EventObserver() { }
-
-        virtual StateEventList init();
+        virtual ~EventView() { }
 
         virtual bool isEvent() const { return true; }
 
@@ -55,9 +51,8 @@ namespace vle { namespace devs {
         virtual devs::StateEvent* processStateEvent(devs::StateEvent* event);
 
     private:
-        Time                 m_lastTime;
-	StreamModelPortValue m_valueList;
-
+        Time                    m_lastTime;
+	StreamModelPortValue    m_valueList;
     };
 
 }} // namespace vle devs

@@ -1,7 +1,7 @@
 /**
- * @file devs/TimedObserver.hpp
+ * @file devs/TimedView.hpp
  * @author The VLE Development Team.
- * @brief Define a Timed observer base on devs::Observer class. This class
+ * @brief Define a Timed View base on devs::View class. This class
  * build state event with timed clock.
  */
 
@@ -24,29 +24,25 @@
  * 02111-1307, USA.
  */
 
-#ifndef DEVS_TIMED_OBSERVER_HPP
-#define DEVS_TIMED_OBSERVER_HPP
+#ifndef VLE_DEVS_TIMED_VIEW_HPP
+#define VLE_DEVS_TIMED_VIEW_HPP
 
-#include <vle/devs/Observer.hpp>
+#include <vle/devs/View.hpp>
 #include <vle/devs/StateEvent.hpp>
-#include <vle/devs/DevsTypes.hpp>
-#include <vle/devs/Stream.hpp>
 
 namespace vle { namespace devs {
 
     /**
-     * @brief Define a Timed observer base on devs::Observer class. This class
+     * @brief Define a Timed View base on devs::View class. This class
      * build state event with timed clock.
      *
      */
-    class TimedObserver : public Observer
+    class TimedView : public View
     {
     public:
-	TimedObserver(const std::string& name, Stream* stream, double timeStep);
+	TimedView(const std::string& name, Stream* stream, double timeStep);
 
-	virtual ~TimedObserver() { }
-
-	virtual StateEventList init();
+	virtual ~TimedView() { }
 
 	virtual bool isEvent() const { return false; }
 
@@ -55,9 +51,9 @@ namespace vle { namespace devs {
 	virtual devs::StateEvent* processStateEvent(devs::StateEvent* event);
 
     private:
-	double               m_timeStep;
-	size_t               m_counter;
-	StreamModelPortValue m_valueList;
+	double                  m_timeStep;
+        size_t                  m_counter;
+	StreamModelPortValue    m_valueList;
     };
 
 }} // namespace vle devs

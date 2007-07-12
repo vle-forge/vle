@@ -28,7 +28,7 @@
 namespace vle { namespace devs {
 
 Stream::Stream() :
-    m_observer(0)
+    m_view(0)
 { }
 
 Stream::~Stream()

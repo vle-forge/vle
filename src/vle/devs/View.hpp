@@ -1,7 +1,7 @@
 /**
- * @file devs/Observer.hpp
+ * @file devs/View.hpp
  * @author The VLE Development Team.
- * @brief Represent an observer on a devs::Simulator and a port name.
+ * @brief Represent an View on a devs::Simulator and a port name.
  */
 
 /*
@@ -23,10 +23,11 @@
  * 02111-1307, USA.
  */
 
-#ifndef DEVS_OBSERVER_HPP
-#define DEVS_OBSERVER_HPP
+#ifndef VLE_DEVS_VIEW_HPP
+#define VLE_DEVS_VIEW_HPP
 
 #include <vle/devs/DevsTypes.hpp>
+#include <vle/devs/Observable.hpp>
 #include <vle/devs/StateEvent.hpp>
 #include <vle/devs/Stream.hpp>
 #include <vle/graph/AtomicModel.hpp>
@@ -38,45 +39,16 @@ namespace vle { namespace devs {
 
     class Stream;
 
-    //////////////////////////////////////////////////////////////////////////
-
-    class Observable
-    {
-    public:
-        Observable(Simulator* model, const std::string& portname) :
-            m_model(model),
-            m_portname(portname)
-        { }
-
-        inline Simulator* simulator() const
-        { return m_model; }
-
-        inline const std::string& portname() const
-        { return m_portname; }
-
-    private:
-        Observable() :
-            m_model(0)
-        { }
-        
-        Simulator*      m_model;
-	std::string     m_portname;
-    };
-
-    //////////////////////////////////////////////////////////////////////////
-
     /**
-     * @brief Represent an observer on a devs::Simulator and a port name.
+     * @brief Represent a View on a devs::Simulator and a port name.
      *
      */
-    class Observer
+    class View
     {
     public:
-        typedef std::vector < Observable > ObservableList;
+        View(const std::string& name, Stream* stream);
 
-        Observer(const std::string& name, Stream* stream);
-
-        virtual ~Observer();
+        virtual ~View();
 
         StateEvent* addObservable(Simulator* model,
                                   const std::string& portName,
@@ -86,13 +58,48 @@ namespace vle { namespace devs {
 
 	/**
 	 * Return the model of the first element of observable list.
-	 *
 	 * @return a reference to the first observable.
 	 */
         inline Simulator* getFirstModel() const
         { return m_observableList.front().simulator(); }
 
         const std::string& getFirstPortName() const;
+
+        virtual bool isEvent() const = 0;
+
+        virtual bool isTimed() const = 0;
+
+        virtual devs::StateEvent* processStateEvent(
+            devs::StateEvent* event) = 0;
+
+	/**
+	 * Delete an observable for a specified Simulator. Linear work.
+	 * @param model delete observable attached to the specified
+	 * Simulator.
+	 */
+	void removeObservable(Simulator* model);
+
+	/**
+	 * Delete an observable for a specified AtomicModel. Linear work.
+	 * @param model delete observable attached to the specified
+	 * AtomicModel.
+	 */
+        void removeObservable(graph::AtomicModel* model);
+
+        /** 
+         * @brief Test if a simulator is already connected with the same port
+         * to the View.
+         * @param simulator the simulator to observe.
+         * @param portname the port of the simulator to observe.
+         * @return true if simulator is already connected with the same port.
+         */
+        bool exist(Simulator* simulator, const std::string& portname) const;
+
+        //
+        //
+        // Get/Set functions
+        //
+        //
 
         inline const std::string& getName() const
         { return m_name; }
@@ -105,40 +112,6 @@ namespace vle { namespace devs {
 
         inline vle::devs::Stream * getStream() const
         { return m_stream; }
-
-        virtual bool isEvent() const =0;
-
-        virtual bool isTimed() const =0;
-
-        virtual devs::StateEvent* processStateEvent(
-            devs::StateEvent* p_event) =0;
-
-	/**
-	 * Delete an observable for a specified Simulator. Linear work.
-	 *
-	 * @param model delete observable attached to the specified
-	 * Simulator.
-	 */
-	void removeObservable(Simulator* model);
-
-	/**
-	 * Delete an observable for a specified AtomicModel. Linear work.
-	 *
-	 * @param model delete observable attached to the specified
-	 * AtomicModel.
-	 */
-        void removeObservable(graph::AtomicModel* model);
-
-        /** 
-         * @brief Test if a simulator is already connected with the same port
-         * to the Observer.
-         * 
-         * @param simulator the simulator to observe.
-         * @param portname the port of the simulator to observe.
-         * 
-         * @return true if simulator is already connected with the same port.
-         */
-        bool exist(Simulator* simulator, const std::string& portname) const;
 
     protected:
         ObservableList      m_observableList;

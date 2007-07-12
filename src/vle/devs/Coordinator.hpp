@@ -28,11 +28,11 @@
 #define DEVS_COORDINATOR_HPP
 
 #include <vle/devs/Simulator.hpp>
-#include <vle/devs/EventObserver.hpp>
+#include <vle/devs/EventView.hpp>
 #include <vle/devs/EventTable.hpp>
-#include <vle/devs/Observer.hpp>
+#include <vle/devs/View.hpp>
 #include <vle/devs/Time.hpp>
-#include <vle/devs/TimedObserver.hpp>
+#include <vle/devs/TimedView.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/utils/Socket.hpp>
 #include <libxml++/libxml++.h>
@@ -41,7 +41,7 @@ namespace vle { namespace devs {
 
     class ModelFactory;
     
-    typedef std::map < std::string, devs::Observer* > ObserverList;
+    typedef std::map < std::string, devs::View* > ViewList;
     typedef std::vector < Simulator* > SimulatorList;
     typedef std::map < graph::AtomicModel*, devs::Simulator* > SimulatorMap;
 
@@ -176,12 +176,12 @@ namespace vle { namespace devs {
 	Simulator* getModel(const std::string& model) const;
 
         /** 
-         * @brief Return the devs::Observer from a specified observer name.
+         * @brief Return the devs::View from a specified View name.
          * Complexity: log O(log(n)).
-         * @param name the name of the observer to search.
-         * @return A reference to the devs::Observer or 0 if not found.
+         * @param name the name of the View to search.
+         * @return A reference to the devs::View or 0 if not found.
          */
-	devs::Observer* getObserver(const std::string& name) const;
+	devs::View* getView(const std::string& name) const;
 
         //
         ///
@@ -199,21 +199,21 @@ namespace vle { namespace devs {
         { return m_eventTable; }
 
     private:
-        vpz::Experiment         m_experiment;
-	Time                    m_currentTime;
-	SimulatorMap            m_modelList;
-	ModelFactory*           m_modelFactory;
-	EventTable              m_eventTable;
-	ObserverList            m_observerList;
+        vpz::Experiment     m_experiment;
+	Time                m_currentTime;
+	SimulatorMap        m_modelList;
+	ModelFactory*       m_modelFactory;
+	EventTable          m_eventTable;
+	ViewList            m_viewList;
 
 	std::map < std::string ,
-		   std::vector < devs::EventObserver* > > m_eventObserverList;
+		   std::vector < devs::EventView* > > m_eventViewList;
 
-	std::vector < devs::TimedObserver* > m_timedObserverList;
+	std::vector < devs::TimedView* > m_timedViewList;
 
         void buildViews();
 
-	void addObserver(devs::Observer* observer);
+	void addView(devs::View* view);
 
         void processInternalEvent(Simulator* sim,
                                   EventBagModel& modelbag,
@@ -285,7 +285,7 @@ namespace vle { namespace devs {
         void startNetStream();
 
         /** 
-         * @brief Build the devs::Stream object and attach devs::Observer to the
+         * @brief Build the devs::Stream object and attach devs::View to the
          * output::Net using the vpz::Observable information.
          * 
          * @param measure the measure who push data to the stream.
@@ -298,7 +298,7 @@ namespace vle { namespace devs {
 
         void startLocalStream();
         
-        void processEventObserver(Simulator& model, Event* event = 0);
+        void processEventView(Simulator& model, Event* event = 0);
 
         /**
          * Set a new date to the Coordinator.
@@ -317,7 +317,7 @@ namespace vle { namespace devs {
          *
          * @throw Exception::File if problem loading file.
          */
-        vle::devs::Stream* getStreamPlugin(const vpz::Output& o);
+        Stream* getStreamPlugin(const vpz::Output& o);
     };
 
 }} // namespace vle devs

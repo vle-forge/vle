@@ -132,12 +132,12 @@ Simulator* ModelFactory::createModel(graph::AtomicModel* model,
             for (vpz::ObservablePort::iterator jt = it->second.begin();
                  jt != it->second.end(); ++jt) {
 
-                Observer* observer = mCoordinator.getObserver(*jt);
-                Assert(utils::InternalError, observer, (boost::format(
+                View* view = mCoordinator.getView(*jt);
+                Assert(utils::InternalError, view, (boost::format(
                         "The view %1% is unknow of coordinator view list") %
                         *jt));
 
-                StateEvent* evt = observer->addObservable(
+                StateEvent* evt = view->addObservable(
                     sim, it->first, mCoordinator.getCurrentTime());
                 if (evt) {
                     mCoordinator.eventtable().putStateEvent(evt);

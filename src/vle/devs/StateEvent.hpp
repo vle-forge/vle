@@ -2,7 +2,7 @@
  * @file devs/StateEvent.hpp
  * @author The VLE Development Team.
  * @brief State event use to get information from graph::Model using
- * TimedObserver or EventObserver.
+ * TimedView or EventView.
  */
 
 /*
@@ -33,7 +33,7 @@ namespace vle { namespace devs {
 
     /**
      * @brief State event use to get information from graph::Model using
-     * TimedObserver or EventObserver.
+     * TimedView or EventView.
      *
      */
     class StateEvent : public Event
@@ -41,26 +41,26 @@ namespace vle { namespace devs {
     public:
 	StateEvent(const Time& time,
 		   Simulator* model,
-		   const std::string& observerName,
+		   const std::string& viewname,
 		   const std::string& portName) :
             Event(model),
             m_time(time),
-	    m_observerName(observerName),
+	    m_viewName(viewname),
 	    m_portName(portName)
 	{ }
 
 	StateEvent(const StateEvent& event) :
             Event(event),
             m_time(event.m_time),
-	    m_observerName(event.m_observerName),
+	    m_viewName(event.m_viewName),
 	    m_portName(event.m_portName)
 	{ }
 
         virtual ~StateEvent()
         { }
 
-	inline const std::string& getObserverName() const
-        { return m_observerName; }
+	inline const std::string& getViewName() const
+        { return m_viewName; }
 
 	inline const std::string& getPortName() const
         { return m_portName; }
@@ -113,7 +113,7 @@ namespace vle { namespace devs {
 
     private:
         Time        m_time;
-	std::string m_observerName;
+	std::string m_viewName;
 	std::string m_portName;
     };
 

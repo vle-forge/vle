@@ -1,7 +1,7 @@
 /**
- * @file devs/TimedObserver.cpp
+ * @file devs/TimedView.cpp
  * @author The VLE Development Team.
- * @brief Define a Timed observer base on devs::Observer class. This class
+ * @brief Define a Timed View base on devs::View class. This class
  * build state event with timed clock.
  */
 
@@ -24,30 +24,20 @@
  * 02111-1307, USA.
  */
 
-#include <vle/devs/TimedObserver.hpp>
-
-using std::string;
+#include <vle/devs/TimedView.hpp>
 
 namespace vle { namespace devs {
 
-TimedObserver::TimedObserver(const std::string& name,
-			     Stream* stream,
-			     double timeStep) :
-    Observer(name,stream),
+TimedView::TimedView(const std::string& name,
+                     Stream* stream,
+                     double timeStep) :
+    View(name,stream),
     m_timeStep(timeStep),
     m_counter(0)
 {
 }
 
-StateEventList TimedObserver::init()
-{
-    m_counter = 0;
-    m_valueList.clear();
-    return StateEventList();
-}
-
-StateEvent*
-TimedObserver::processStateEvent(StateEvent* event)
+StateEvent* TimedView::processStateEvent(StateEvent* event)
 {
     value::Value value = event->getAttributeValue(event->getPortName());
 
@@ -56,17 +46,17 @@ TimedObserver::processStateEvent(StateEvent* event)
             event->getModel(), event->getPortName())] = value;
         m_counter++;
         if (m_counter == m_size) {
-	    m_stream->writeValues(event->getTime(),
-				  m_valueList,getObservableList());
-	    m_counter = 0;
-	    m_valueList.clear();
-	}
+            m_stream->writeValues(event->getTime(),
+                                  m_valueList,getObservableList());
+            m_counter = 0;
+            m_valueList.clear();
+        }
     }
 
     return new StateEvent(event->getTime() + m_timeStep,
                           event->getModel(),
-			  getName(),
-			  event->getPortName());
+                          getName(),
+                          event->getPortName());
 }
 
 }} // namespace vle devs

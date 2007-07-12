@@ -26,7 +26,7 @@
 #ifndef DEVS_STREAM_HPP
 #define DEVS_STREAM_HPP
 
-#include <vle/devs/Observer.hpp>
+#include <vle/devs/View.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/devs/DevsTypes.hpp>
 #include <vle/value/Value.hpp>
@@ -35,7 +35,7 @@
 
 namespace vle { namespace devs {
 
-    class Observer;
+    class View;
     class Observable;
 
     /**
@@ -46,10 +46,6 @@ namespace vle { namespace devs {
     class Stream
     {
     public:
-	typedef std::vector < devs::Observable > ObservableVector;
-
-	///////////////////////////////////////////////////////////////////////
-
         Stream();
 
         virtual ~Stream();
@@ -58,7 +54,6 @@ namespace vle { namespace devs {
 
         /**
          * Initialise plugin with specified information.
-         *
          * @param outputPlugin the name of the instance of plugin loaded like,
          * text, sdml or net.
          * @param outputType type of output like, local, ip.
@@ -78,20 +73,20 @@ namespace vle { namespace devs {
         virtual void close() =0;
 
         /**
-         * Get the current observer.
+         * Get the current View.
          *
-         * @return Observer attached or NULL if no attanchement.
+         * @return View attached or NULL if no attanchement.
          */
-        inline devs::Observer* getObserver() const
-        { return m_observer; }
+        inline devs::View* getView() const
+        { return m_view; }
 
         /**
-         * Set the current observer.
+         * Set the current View.
          *
-         * @param observer the new observer to attach.
+         * @param View the new View to attach.
          */
-        inline void setObserver(devs::Observer* observer)
-        { m_observer = observer; }
+        inline void setView(devs::View* View)
+        { m_view = View; }
 
 	///////////////////////////////////////////////////////////////////////
 
@@ -107,9 +102,9 @@ namespace vle { namespace devs {
 
 	virtual void writeValues(const devs::Time& time,
 				 const devs::StreamModelPortValue& valuelst,
-				 const ObservableVector& obslst) =0;
+				 const ObservableList& obslst) =0;
     private:
-        devs::Observer*        m_observer;
+        devs::View*        m_view;
     };
 
 }} // namespace vle devs

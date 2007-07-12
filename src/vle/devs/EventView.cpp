@@ -1,7 +1,7 @@
 /**
- * @file devs/EventObserver.cpp
+ * @file devs/EventView.cpp
  * @author The VLE Development Team.
- * @brief Define a Event observer base on devs::Observer class. This class
+ * @brief Define a Event View base on devs::View class. This class
  * build state event when event are push.
  */
 
@@ -24,7 +24,7 @@
  * 02111-1307, USA.
  */
 
-#include <vle/devs/EventObserver.hpp>
+#include <vle/devs/EventView.hpp>
 #include <vle/value/Double.hpp>
 #include <iostream>
 
@@ -32,44 +32,29 @@
 
 namespace vle { namespace devs {
 
-EventObserver::EventObserver(const std::string& name, Stream* p_stream) :
-    Observer(name, p_stream)
+EventView::EventView(const std::string& name, Stream* p_stream) :
+    View(name, p_stream)
 {
 }
 
-StateEventList EventObserver::init()
-{
-    m_lastTime = Time(0);
-
-    Observer::ObservableList::const_iterator it = getObservableList().begin();
-    while (it != getObservableList().end()) {
-        m_valueList[StreamModelPort((*it).simulator(), (*it).portname())] =
-            value::DoubleFactory::create(0.0);
-        ++it;
-    }
-
-    return StateEventList();
-    //return Observer::init();
-}
-
-
-StateEvent* EventObserver::processStateEvent(StateEvent* event)
+StateEvent* EventView::processStateEvent(StateEvent* event)
 {
     value::Value val = event->getAttributeValue(event->getPortName());
 
     if (val.get()) {
-	if (m_lastTime < event->getTime()) {
-	    m_stream->writeValues(event->getTime(),
-				  m_valueList, getObservableList());
-	    m_lastTime = event->getTime();
-	}
+        if (m_lastTime < event->getTime()) {
+            m_stream->writeValues(event->getTime(),
+                                  m_valueList,
+                                  getObservableList());
+            m_lastTime = event->getTime();
+        }
 
-	StreamModelPortValue::iterator it =
-	    m_valueList.find(StreamModelPort(event->getModel(),
-					     event->getPortName()));
+        StreamModelPortValue::iterator it =
+            m_valueList.find(StreamModelPort(event->getModel(),
+                                             event->getPortName()));
 
-	m_valueList[StreamModelPort(event->getModel(),
-				    event->getPortName())] = val;
+        m_valueList[StreamModelPort(event->getModel(),
+                                    event->getPortName())] = val;
     }
     return 0;
 }

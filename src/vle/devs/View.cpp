@@ -1,7 +1,7 @@
 /**
- * @file devs/Observer.cpp
+ * @file devs/View.cpp
  * @author The VLE Development Team.
- * @brief Represent an observer on a devs::Simulator and a port name.
+ * @brief Represent an View on a devs::Simulator and a port name.
  */
 
 /*
@@ -23,25 +23,25 @@
  * 02111-1307, USA.
  */
 
-#include <vle/devs/Observer.hpp>
+#include <vle/devs/View.hpp>
 #include <vle/devs/Simulator.hpp>
 #include <vle/devs/Stream.hpp>
 
 namespace vle { namespace devs {
 
-Observer::Observer(const std::string& name, Stream* p_stream) :
+View::View(const std::string& name, Stream* p_stream) :
     m_name(name),
     m_stream(p_stream),
     m_size(0)
 {
 }
 
-Observer::~Observer()
+View::~View()
 {
     delete m_stream;
 }
 
-StateEvent* Observer::addObservable(Simulator* model,
+StateEvent* View::addObservable(Simulator* model,
                                     const std::string& portname,
                                     const Time& currenttime)
 {
@@ -56,19 +56,19 @@ StateEvent* Observer::addObservable(Simulator* model,
     return 0;
 }
 
-void Observer::finish()
+void View::finish()
 {
     m_stream->writeData();
     m_stream->writeTail();
     m_stream->close();
 }
 
-const std::string & Observer::getFirstPortName() const
+const std::string & View::getFirstPortName() const
 {
     return m_observableList.front().portname();
 }
 
-void Observer::removeObservable(Simulator* model)
+void View::removeObservable(Simulator* model)
 {
     ObservableList::iterator it;
 
@@ -84,7 +84,7 @@ void Observer::removeObservable(Simulator* model)
     }
 }
 
-void Observer::removeObservable(graph::AtomicModel* model)
+void View::removeObservable(graph::AtomicModel* model)
 {
     ObservableList::iterator it;
 
@@ -100,7 +100,7 @@ void Observer::removeObservable(graph::AtomicModel* model)
     }
 }
 
-bool Observer::exist(Simulator* simulator, const std::string& portname) const
+bool View::exist(Simulator* simulator, const std::string& portname) const
 {
     for (ObservableList::const_iterator it = m_observableList.begin();
          it != m_observableList.end(); ++it) {
