@@ -41,6 +41,7 @@ namespace vle { namespace devs {
 
     class ModelFactory;
     
+    typedef std::map < std::string, devs::Observer* > ObserverList;
     typedef std::vector < Simulator* > SimulatorList;
     typedef std::map < graph::AtomicModel*, devs::Simulator* > SimulatorMap;
 
@@ -57,39 +58,42 @@ namespace vle { namespace devs {
 
 	~Coordinator();
 
-	void addCondition(const std::string& modelName,
-			  const std::string& portName,
-			  value::Value* value);
-
-	void addModels(vpz::Model& model);
-
-	void addObserver(devs::Observer* observer);
-
-        void addObservableToView(const std::string& modelname,
-                                 const std::string& portname,
-                                 const std::string& view);
-
+        /** 
+         * @brief Initialise Coordinator before running simulation. Rand is
+         * initialized, send to all Simulator the first init event found and
+         * call for each Simulator the processInitEvent. Before this,
+         * dispatchStateEvent is call for all StateEvent.
+         *
+         * @throw Exception::Internal if a condition have no model port name
+         * associed.
+         */
+        void init();
     
+        /** 
+         * @brief Return the top devs::Time of the devs::EventTable.
+         * @return A devs::Time.
+         */
+	const Time& getNextTime();
+
+        /** 
+         * @brief Pop the next devs::CompleteEventBagModel from the
+         * devs::EventTable and call devs::Simulator function.
+         * @return 0.
+         */
+        ExternalEventList* run();
+
+        /** 
+         * @brief Delete all devs::Simulator and all devs::View of this
+         * simulator.
+         */
+	void finish();
+
         //
         ///
         //// Functions use by Executive models to manage DsDevs simulation.
         ///
         //
-        
-        /** 
-         * @brief Build new models using ClassModel or Dynamic depends of
-         * classNamed parameter that define ClassModel name or Dynamic name.
-         * 
-         * @param model the coupled where to add new models. 
-         * @param className the ClassModel name or Dynamic name.
-         * @param xmlDynamics the dynamics of all atomic model build.
-         * @param xmlInit to initialise the models.
-         * 
-         * @return A reference to the top node of build model.
-         */
-        SimulatorList createModelFromClass(graph::CoupledModel* parent,
-                                           const std::string& classname);
-    
+
         /** 
          * @brief Add a permanent vpz::Dynamic into cache.
          * @param dynamics The new vpz::Dynamic to push into cache.
@@ -126,11 +130,18 @@ namespace vle { namespace devs {
                                const std::string& dynamics,
                                const std::string& condition,
                                const std::string& observable);
+        
+        /** 
+         * @brief Add an observable, ie. a reference and a model to the
+         * specified view.
+         * @param model the model to attach to the view.
+         * @param portname the port of the model to attach.
+         * @param view the view.
+         */
+        void addObservableToView(graph::AtomicModel* model,
+                                 const std::string& portname,
+                                 const std::string& view);
 
-        SimulatorList* createModels(graph::CoupledModel* model,
-                                    const vpz::Dynamics& dyns,
-                                    const vpz::Conditions& conds,
-                                    const vpz::Observables& views);
         /** 
          * @brief Delete the specified model from coupled model. All
          * connection are deleted, Simulator are deleted and all events are
@@ -142,50 +153,44 @@ namespace vle { namespace devs {
         bool delModel(graph::CoupledModel* parent,
                       const std::string& modelname);
 
-	void finish();
-
-	inline Time getCurrentTime()const { return m_currentTime; }
+        //
+        ///
+        //// Some usefull functions.
+        ///
+        //
 
 	/**
-	 * Return the Simulator with a specified AtomicModel.
-	 *
-	 * @param model the atomicmodel reference to search, O(N).
-	 *
-	 * @return
+	 * Return the devs::Simulator with a specified graph::AtomicModel.
+         * Complexity: log O(log(n)).
+	 * @param model the atomicmodel reference to search.
+	 * @return A reference to the devs::Simulator or 0 if not found.
 	 */
 	Simulator* getModel(const graph::AtomicModel* model) const;
 
 	/**
-	 * Return the Simulator with a specified Atomic model name.
-	 *
-	 * @param model the name of atomic model to search O(N).
-	 *
-	 * @return a reference to Simulator or 0.
+	 * Return the devs::Simulator with a specified atomic model name.
+         * Complexity: linear O(n).
+	 * @param model the name of atomic model to search.
+	 * @return a reference to the devs::Simulator or 0 if not found.
 	 */
 	Simulator* getModel(const std::string& model) const;
 
-	devs::Observer* getObserver(std::string const & name) const;
-
-	const Time& getNextTime();
-
         /** 
-         * @brief Initialise Coordinator before running simulation. Rand is
-         * initialized, send to all Simulator the first init event found and
-         * call for each Simulator the processInitEvent. Before this,
-         * dispatchStateEvent is call for all StateEvent.
-         *
-         * @throw Exception::Internal if a condition have no model port name
-         * associed.
+         * @brief Return the devs::Observer from a specified observer name.
+         * Complexity: log O(log(n)).
+         * @param name the name of the observer to search.
+         * @return A reference to the devs::Observer or 0 if not found.
          */
-        void init();
-
-        void parseExperiment();
-
-        ExternalEventList* run();
+	devs::Observer* getObserver(const std::string& name) const;
 
         //
-        // Get/Set function.
+        ///
+        //// Get/Set functions.
+        ///
         //
+        
+        inline Time getCurrentTime() const
+        { return m_currentTime; }
 
         inline const EventTable& eventtable() const
         { return m_eventTable; }
@@ -195,28 +200,20 @@ namespace vle { namespace devs {
 
     private:
         vpz::Experiment         m_experiment;
-	Time m_currentTime;
-
-	// Liste des modeles atomiques geres par le simulateur
-	SimulatorMap m_modelList;
-
-	// Modele couple racine
-
-	// La fabrique de modèles
-	ModelFactory* m_modelFactory;
-
-	// Echeancier
-	EventTable m_eventTable;
-
-	// Liste des observateurs
-        typedef std::map < std::string, devs::Observer* > ObserverList;
-	ObserverList m_observerList;
+	Time                    m_currentTime;
+	SimulatorMap            m_modelList;
+	ModelFactory*           m_modelFactory;
+	EventTable              m_eventTable;
+	ObserverList            m_observerList;
 
 	std::map < std::string ,
 		   std::vector < devs::EventObserver* > > m_eventObserverList;
 
 	std::vector < devs::TimedObserver* > m_timedObserverList;
 
+        void buildViews();
+
+	void addObserver(devs::Observer* observer);
 
         void processInternalEvent(Simulator* sim,
                                   EventBagModel& modelbag,
@@ -232,6 +229,11 @@ namespace vle { namespace devs {
 
         void processStateEvents(CompleteEventBagModel& bag);
 
+        /** 
+         * @brief build the simulator from the vpz::Model stock.
+         * @param model 
+         */
+        void addModels(vpz::Model& model);
 
         /**
          * Read all ExternalEventList including External and Instantaneous
@@ -296,8 +298,6 @@ namespace vle { namespace devs {
 
         void startLocalStream();
         
-        void attachModelToObserver(Observer* obs, const std::string& viewname);
-
         void processEventObserver(Simulator& model, Event* event = 0);
 
         /**

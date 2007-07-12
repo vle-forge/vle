@@ -50,41 +50,6 @@ ModelFactory::ModelFactory(Coordinator& coordinator,
 {
 }
 
-devs::SimulatorList ModelFactory::createModels(
-    const graph::AtomicModelVector& lst,
-    SimulatorMap& result)
-{
-    return createModelsFromDynamics(lst, result);
-}
-
-graph::Model* ModelFactory::createModels(const std::string& classname,
-                                         devs::SimulatorList& lst,
-                                         SimulatorMap& result)
-{
-    const vpz::Class& cl(mClasses.get(classname));
-    graph::Model* clone = cl.model().model();
-
-    graph::AtomicModelVector vt;
-    graph::CoupledModel::getAtomicModelList(clone, vt);
-
-    lst = createModelsFromDynamics(vt, result);
-    return clone;
-}
-
-Simulator* ModelFactory::createModel(graph::AtomicModel* model,
-                                     SimulatorMap& result)
-{
-    graph::AtomicModelVector vt;
-    vt.push_back(model);
-    devs::SimulatorList lst(createModelsFromDynamics(vt, result));
-
-    Assert(utils::InternalError, not lst.empty(), (boost::format(
-                "Model factory: the simulator of %1% was not builded.") %
-            model->getName()));
-
-    return lst.front();
-}
-
 //
 // Cache.
 //
@@ -168,10 +133,9 @@ Simulator* ModelFactory::createModel(graph::AtomicModel* model,
                  jt != it->second.end(); ++jt) {
 
                 Observer* observer = mCoordinator.getObserver(*jt);
-
                 Assert(utils::InternalError, observer, (boost::format(
                         "The view %1% is unknow of coordinator view list") %
-                    *jt));
+                        *jt));
 
                 StateEvent* evt = observer->addObservable(
                     sim, it->first, mCoordinator.getCurrentTime());
@@ -183,25 +147,6 @@ Simulator* ModelFactory::createModel(graph::AtomicModel* model,
     }
 
     return sim;
-}
-
-const vpz::AtomicModel& ModelFactory::update_atomicmodellist(
-                        graph::AtomicModel* mdl,
-                        const vpz::Dynamic& dyn,
-                        const vpz::Condition& cond,
-                        const vpz::Observable& obs)
-{
-    try {
-        mDynamics.add(dyn);
-        mExperiment.conditions().add(cond);
-        mExperiment.views().observables().add(obs);
-        vpz::AtomicModel nmdl(cond.name(), dyn.name(), obs.name(), "");
-        return mAtomics.add(mdl, nmdl);
-    } catch(const std::exception& e) {
-        Throw(utils::InternalError, (boost::format(
-                    "Cannot add the atomic model %1% information to the model "
-                    "factory. Error: %2%") % mdl->getName() % e.what()));
-    }
 }
 
 Glib::Module* ModelFactory::buildPlugin(const vpz::Dynamic& dyn)
@@ -235,40 +180,6 @@ Glib::Module* ModelFactory::buildPlugin(const vpz::Dynamic& dyn)
     module->make_resident();
     return module;
 }
-
-devs::SimulatorList ModelFactory::createModelsFromDynamics(
-    const graph::AtomicModelVector& lst,
-    SimulatorMap& result)
-{
-    devs::SimulatorList newsatom;
-    graph::AtomicModelVector::const_iterator it;
-    for (it = lst.begin(); it != lst.end(); ++it) {
-        AssertI(*it);
-        AssertI((*it)->isAtomic());
-        Simulator* a = new Simulator((graph::AtomicModel*)(*it));
-        const vpz::AtomicModel& atom(mAtomics.get(*it));
-        const vpz::Dynamic& d(mDynamics.get(atom.dynamics()));
-
-        switch(d.type()) {
-        case vpz::Dynamic::LOCAL:
-            attachDynamics(a, d, getPlugin(atom.dynamics()));
-            break;
-        case vpz::Dynamic::DISTANT:
-            Throw(utils::InternalError, "Distant dynamics not yet implemented.");
-            break;
-        }
-
-        Assert(utils::ParseError,
-               result.find((graph::AtomicModel*)(*it)) == result.end(),
-               boost::format("Already existing Simulator '%1%' name '%2%'\n") %
-               *it % (*it)->getName());
-
-        newsatom.push_back(a);
-        result[(graph::AtomicModel*)(*it)] = a;
-    }
-    return newsatom;
-}
-
 
 Glib::Module* ModelFactory::getPlugin(const std::string& name)
 {

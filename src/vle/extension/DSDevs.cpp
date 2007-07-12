@@ -714,57 +714,58 @@ bool DSDevs::removeConnection(const std::string& srcModelName,
     return false;
 }
 
-bool DSDevs::addModel(const std::string& prefixModelName,
-                      const std::string& className,
-                      value::Set connection)
+bool DSDevs::addModel(const std::string& /* prefixModelName */,
+                      const std::string& /* className */,
+                      value::Set /* connection */)
 {
-    std::string newname(m_coupledModel->buildNewName(prefixModelName));
-    m_newName.push_back(newname);
+    //std::string newname(m_coupledModel->buildNewName(prefixModelName));
+    //m_newName.push_back(newname);
 
-    try {
-        vpz::Dynamic dyn("FIXME");
-        vpz::Condition cond("FIXME");
-        vpz::Observable obs("FIXME");
-        coordinator().createModelFromClass(m_coupledModel, className);
-    } catch (const std::exception& e) {
-        std::cerr << boost::format(
-            "Warning: Unable to dynamic add model, with prefixname '%1%' "
-            "class name '%2%'. Error reported is: '%3%\n'") %
-            prefixModelName % className % e.what();
-        return false;
-    }
+    //try {
+        //vpz::Dynamic dyn("FIXME");
+        //vpz::Condition cond("FIXME");
+        //vpz::Observable obs("FIXME");
+        //coordinator().createModelFromClass(m_coupledModel, className);
+    //} catch (const std::exception& e) {
+        //std::cerr << boost::format(
+            //"Warning: Unable to dynamic add model, with prefixname '%1%' "
+            //"class name '%2%'. Error reported is: '%3%\n'") %
+            //prefixModelName % className % e.what();
+        //return false;
+    //}
 
-    if (connection) {
-        for (value::SetFactory::VectorValueIt it =
-             connection->getValue().begin(); it !=
-             connection->getValue().end(); ++it) {
+    //if (connection) {
+        //for (value::SetFactory::VectorValueIt it =
+             //connection->getValue().begin(); it !=
+             //connection->getValue().end(); ++it) {
 
-            if ((*it)->isMap()) {
-                value::Map mp = value::to_map(*it);
-                std::string srcm, srcp, dstm, dstp;
+            //if ((*it)->isMap()) {
+                //value::Map mp = value::to_map(*it);
+                //std::string srcm, srcp, dstm, dstp;
 
-                if (mp->existValue("srcModelName")) {
-                    srcm.assign(mp->getStringValue("srcModelName"));
-                    if (srcm.empty())
-                        srcm.assign(newname);
-                } else
-                    srcm.assign(newname);
+                //if (mp->existValue("srcModelName")) {
+                    //srcm.assign(mp->getStringValue("srcModelName"));
+                    //if (srcm.empty())
+                        //srcm.assign(newname);
+                //} else
+                    //srcm.assign(newname);
 
-                if (mp->existValue("dstModelName")) {
-                    dstm.assign(mp->getStringValue("dstModelName"));
-                    if (dstm.empty())
-                        dstm.assign(newname);
-                } else
-                    dstm.assign(newname);
+                //if (mp->existValue("dstModelName")) {
+                    //dstm.assign(mp->getStringValue("dstModelName"));
+                    //if (dstm.empty())
+                        //dstm.assign(newname);
+                //} else
+                    //dstm.assign(newname);
 
-                srcp = mp->getStringValue("srcPortName");
-                dstp = mp->getStringValue("dstPortName");
-                addConnection(srcm, srcp, dstm, dstp);
-                 }
-             }
-         }
+                //srcp = mp->getStringValue("srcPortName");
+                //dstp = mp->getStringValue("dstPortName");
+                //addConnection(srcm, srcp, dstm, dstp);
+                 //}
+             //}
+         //}
 
-    return true;
+    Throw(utils::NotYetImplented, "addModel from class not allowed");
+         //return true;
 }
 
 bool DSDevs::removeModel(const std::string& /* modelName */)

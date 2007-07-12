@@ -69,8 +69,8 @@ Coordinator::Coordinator(const vpz::Vpz& vpz, vpz::Model& mdls) :
                                       vpz.project().experiment(),
                                       vpz.project().model().atomicModels());
 
+    buildViews();
     addModels(mdls);
-    parseExperiment();
 }
 
 Coordinator::~Coordinator()
@@ -92,90 +92,83 @@ Coordinator::~Coordinator()
     }
 }
 
-void Coordinator::addModels(vpz::Model& model)
+void Coordinator::init()
 {
-    graph::AtomicModelVector atomicmodellist;
-    graph::Model* mdl = model.model();
-    model.set_model(0);
-
-    if (mdl->isAtomic()) {
-        atomicmodellist.push_back((graph::AtomicModel*)mdl);
-    } else {
-        graph::Model::getAtomicModelList(mdl, atomicmodellist);
-    }
-
-    m_modelFactory->createModels(atomicmodellist, m_modelList);
+    utils::Rand::rand().set_seed(m_experiment.seed());
 }
 
-void Coordinator::addObserver(Observer* observer)
+const Time& Coordinator::getNextTime()
 {
-    Assert(utils::InternalError, observer, boost::format("Empty reference"));
+    return m_eventTable.topEvent();
+}
 
-    ObserverList::iterator it = m_observerList.find(observer->getName());
-    if (it == m_observerList.end()) {
-        m_observerList[observer->getName()] = observer;
-        if (observer->isTimed()) {
-            m_timedObserverList.push_back(
-                reinterpret_cast < TimedObserver*>(observer));
-        } else {
-            m_eventObserverList[
-                observer->getFirstModel()->getName()].push_back(
-                    reinterpret_cast < EventObserver* >(observer));
+ExternalEventList* Coordinator::run()
+{
+    CompleteEventBagModel& nextEvent = m_eventTable.popEvent();
+    if (not nextEvent.empty()) {
+        updateCurrentTime(m_eventTable.getCurrentTime());
+    }
+
+    while (not nextEvent.emptyBag()) {
+        EventBagModel& bag(nextEvent.topBag());
+        Simulator* mdl(nextEvent.topBagModel());
+
+        while (not bag.empty()) {
+            if (not bag.emptyInternal()) {
+                if (not bag.emptyExternal()) {
+                    switch (mdl->processConflict(
+                            *bag.internal(), bag.externals())) {
+                    case Event::INTERNAL:
+                        processInternalEvent(mdl, bag, nextEvent);
+                        break;
+
+                    case Event::EXTERNAL:
+                        processExternalEvents(mdl, bag, nextEvent);
+                        break;
+                    }
+                } else {
+                    processInternalEvent(mdl, bag, nextEvent);
+                }
+            } else {
+                if (not bag.emptyExternal()) {
+                    processExternalEvents(mdl, bag, nextEvent);
+                } else {
+                    processInstantaneousEvents(mdl, bag, nextEvent);
+                }
+            }
+        }
+        if (mdl == nextEvent.topBagModel())
+            nextEvent.popBag();
+    }
+
+    processStateEvents(nextEvent);
+    AssertI(nextEvent.empty());
+    return 0;
+}
+
+void Coordinator::finish()
+{
+    {
+        SimulatorMap::iterator it;
+        for (it = m_modelList.begin(); it != m_modelList.end(); ++it) {
+            (*it).second->finish();
+        }
+    }
+
+    {
+        ObserverList::iterator it;
+        for (it = m_observerList.begin(); it != m_observerList.end(); ++it) {
+            (*it).second->finish();
         }
     }
 }
 
-void Coordinator::addObservableToView(const std::string& modelname,
-                                      const std::string& portname,
-                                      const std::string& view)
-{
-    ObserverList::iterator it = m_observerList.find(view);
-    Assert(utils::InternalError, it != m_observerList.end(), boost::format(
-            "The view %1% is unknow of coordinator view list") % view);
+//
+///
+//// Functions use by Executive models to manage DsDevs simulation.
+///
+//
 
-    Simulator* simulator = getModel(modelname);
-    Assert(utils::InternalError, simulator, boost::format(
-            "The simulator of the model %1% does not exist") % modelname);
-
-    Observer* obs = it->second;
-    StateEvent* evt = obs->addObservable(simulator, portname, m_currentTime);
-    if (evt != 0) {
-        m_eventTable.putStateEvent(evt);
-    }
-}
-
-SimulatorList Coordinator::createModelFromClass(graph::CoupledModel* parent,
-                                                const std::string& classname)
-{
-    SimulatorList lst;
-
-    graph::Model* top(m_modelFactory->createModels(classname, lst,
-                                                   m_modelList));
-    parent->addModel(top);
-    top->setParent(parent);
-    
-    const vpz::AtomicModelList& atoms(m_modelFactory->atomics());
-    const vpz::Conditions& cnds(m_modelFactory->conditions());
-    for (SimulatorList::iterator it = lst.begin(); it != lst.end(); ++it) {
-        const vpz::AtomicModel& mdl(atoms.get((*it)->getStructure()));
-
-        if (not mdl.conditions().empty()) {
-            const vpz::Condition& cnd(cnds.get(mdl.conditions()));
-            (*it)->processInitEvents(cnd.firstValues());
-        }
-    }
-
-
-    for (SimulatorList::iterator it = lst.begin(); it != lst.end(); ++it) {
-        InternalEvent* evt = (*it)->init(m_currentTime);
-        if (evt) {
-            m_eventTable.putInternalEvent(evt);
-        }
-    }
-
-    return lst;
-}
-    
 void Coordinator::addPermanent(const vpz::Dynamic& dynamics)
 {
     m_modelFactory->addPermanent(dynamics);
@@ -199,6 +192,80 @@ Simulator* Coordinator::createModel(graph::AtomicModel* model,
     return m_modelFactory->createModel(model, dynamics, condition, observable,
                                        m_modelList);
 }
+
+void Coordinator::addObservableToView(graph::AtomicModel* model,
+                                      const std::string& portname,
+                                      const std::string& view)
+{
+    ObserverList::iterator it = m_observerList.find(view);
+    Assert(utils::InternalError, it != m_observerList.end(), boost::format(
+            "The view %1% is unknow of coordinator view list") % view);
+
+    Simulator* simulator = getModel(model);
+    Assert(utils::InternalError, simulator, boost::format(
+            "The simulator of the model %1% does not exist") %
+        simulator->getStructure()->getName());
+
+    Observer* obs = it->second;
+    StateEvent* evt = obs->addObservable(simulator, portname, m_currentTime);
+    if (evt != 0) {
+        m_eventTable.putStateEvent(evt);
+    }
+}
+
+bool Coordinator::delModel(graph::CoupledModel* parent,
+                           const std::string& modelname)
+{
+    graph::Model* mdl = parent->find(modelname);
+    if (mdl) {
+        if (mdl->isCoupled()) {
+            delCoupledModel(parent, (graph::CoupledModel*)mdl);
+        } else {
+            delAtomicModel(parent, (graph::AtomicModel*)mdl);
+        }
+        return true;
+    }
+    return false;
+}
+
+
+//
+///
+//// Some usefull functions.
+///
+//
+
+
+Simulator* Coordinator::getModel(const graph::AtomicModel* model) const
+{
+    SimulatorMap::const_iterator it =
+        m_modelList.find( const_cast < graph::AtomicModel* >(model));
+    return (it == m_modelList.end()) ? 0 : it->second;
+}
+
+Simulator* Coordinator::getModel(const std::string& name) const
+{
+    SimulatorMap::const_iterator it = m_modelList.begin();
+    while (it != m_modelList.end()) {
+        if ((*it).first->getName() == name) {
+            return (*it).second;
+        }
+        ++it;
+    }
+    return 0;
+}
+
+Observer* Coordinator::getObserver(const std::string& name) const
+{
+    ObserverList::const_iterator it = m_observerList.find(name);
+    return (it == m_observerList.end()) ? 0 : it->second;
+}
+
+//
+///
+//// Private functions.
+///
+//
 
 void Coordinator::delAtomicModel(graph::CoupledModel* parent,
                                  graph::AtomicModel* atom)
@@ -241,63 +308,42 @@ void Coordinator::delCoupledModel(graph::CoupledModel* parent,
     }
 }
 
-bool Coordinator::delModel(graph::CoupledModel* parent,
-                           const std::string& modelname)
-{
-    graph::Model* mdl = parent->find(modelname);
-    if (mdl) {
-        if (mdl->isCoupled()) {
-            delCoupledModel(parent, (graph::CoupledModel*)mdl);
-        } else {
-            delAtomicModel(parent, (graph::AtomicModel*)mdl);
-        }
-        return true;
-    }
-    return false;
-}
 
-void Coordinator::finish()
+void Coordinator::addModels(vpz::Model& model)
 {
-    {
-        SimulatorMap::iterator it;
-        for (it = m_modelList.begin(); it != m_modelList.end(); ++it) {
-            (*it).second->finish();
-        }
-    }
+    graph::AtomicModelVector atomicmodellist;
+    graph::Model* mdl = model.model();
+    model.set_model(0);
 
-    {
-        ObserverList::iterator it;
-        for (it = m_observerList.begin(); it != m_observerList.end(); ++it) {
-            (*it).second->finish();
-        }
+    if (mdl->isAtomic()) {
+        atomicmodellist.push_back((graph::AtomicModel*)mdl);
+    } else {
+        graph::Model::getAtomicModelList(mdl, atomicmodellist);
     }
-}
-
-void Coordinator::init()
-{
-    utils::Rand::rand().set_seed(m_experiment.seed());
 
     const vpz::AtomicModelList& atoms(m_modelFactory->atomics());
-    const vpz::Conditions& cnds(m_modelFactory->conditions());
-
-    for (vpz::AtomicModelList::const_iterator it = atoms.begin(); it !=
-         atoms.end(); ++it) {
-
-        if (it->first->isAtomic()) {
-            graph::AtomicModel* atom(graph::Model::toAtomic(it->first));
-            Simulator* satom(getModel(atom));
-            if (not it->second.conditions().empty()) {
-                const vpz::Condition& cnd(cnds.get(it->second.conditions()));
-                satom->processInitEvents(cnd.firstValues());
-            }
-        }
+    for (graph::AtomicModelVector::iterator it = atomicmodellist.begin();
+         it != atomicmodellist.end(); ++it) {
+        const vpz::AtomicModel& atom(atoms.get(*it));
+        createModel(*it, atom.dynamics(), atom.conditions(),
+                    atom.observables());
     }
+}
 
-    for (SimulatorMap::iterator satom = m_modelList.begin();
-         satom != m_modelList.end(); ++satom) {
-        InternalEvent* evt((*satom).second->init(m_currentTime));
-        if (evt) {
-            m_eventTable.putInternalEvent(evt);
+void Coordinator::addObserver(Observer* observer)
+{
+    Assert(utils::InternalError, observer, boost::format("Empty reference"));
+
+    ObserverList::iterator it = m_observerList.find(observer->getName());
+    if (it == m_observerList.end()) {
+        m_observerList[observer->getName()] = observer;
+        if (observer->isTimed()) {
+            m_timedObserverList.push_back(
+                reinterpret_cast < TimedObserver*>(observer));
+        } else {
+            m_eventObserverList[
+                observer->getFirstModel()->getName()].push_back(
+                    reinterpret_cast < EventObserver* >(observer));
         }
     }
 }
@@ -335,36 +381,6 @@ void Coordinator::dispatchExternalEvent(ExternalEventList& eventList,
         ++i;
     }
     eventList.clear(true);
-}
-
-Simulator* Coordinator::getModel(const graph::AtomicModel* model) const
-{
-    SimulatorMap::const_iterator it = m_modelList.find(
-        const_cast < graph::AtomicModel* >(model));
-    return (it == m_modelList.end()) ? 0 : it->second;
-}
-
-Simulator* Coordinator::getModel(const std::string& name) const
-{
-    SimulatorMap::const_iterator it = m_modelList.begin();
-    while (it != m_modelList.end()) {
-        if ((*it).first->getName() == name) {
-            return (*it).second;
-        }
-        ++it;
-    }
-    return 0;
-}
-
-const Time& Coordinator::getNextTime()
-{
-    return m_eventTable.topEvent();
-}
-
-Observer* Coordinator::getObserver(const std::string& name) const
-{
-    ObserverList::const_iterator it = m_observerList.find(name);
-    return (it == m_observerList.end()) ? 0 : it->second;
 }
 
 void Coordinator::getTargetPortList(
@@ -525,45 +541,12 @@ void Coordinator::startLocalStream()
                 obs = new devs::EventObserver(it->second.name(), stream);
             }
             stream->setObserver(obs);
-
-            attachModelToObserver(obs, it->first);
-        }
-    }
-}
-
-void
-Coordinator::attachModelToObserver(
-    Observer* obs,
-    const std::string& viewname)
-{
-    const vpz::Observables& vobs(m_experiment.views().observables());
-    for (vpz::Observables::const_iterator it = vobs.begin();
-         it != vobs.end(); ++it) {
-
-        const vpz::Observable::PortnameList& lst(
-            it->second.get_portname(viewname));
-        for (vpz::Observable::PortnameList::const_iterator jt = lst.begin();
-             jt != lst.end(); ++jt) {
-
-            const vpz::AtomicModelList& atoms(m_modelFactory->atomics());
-            for (vpz::AtomicModelList::const_iterator kt = atoms.begin();
-                 kt != atoms.end(); ++kt) {
-
-                if (kt->second.observables() == it->first) {
-                    StateEvent* evt = obs->addObservable(getModel(
-                            static_cast < graph::AtomicModel* >(kt->first)),
-                        (*jt), m_currentTime);
-                    if (evt) {
-                        m_eventTable.putStateEvent(evt);
-                    }
-                }
-            }
             addObserver(obs);
         }
     }
 }
 
-void Coordinator::parseExperiment()
+void Coordinator::buildViews()
 {
     startEOVStream();
     startNetStream();
@@ -685,50 +668,6 @@ void Coordinator::processStateEvents(CompleteEventBagModel& bag)
         delete bag.topStateEvent();
         bag.popState();
     }
-}
-
-ExternalEventList* Coordinator::run()
-{
-    CompleteEventBagModel& nextEvent = m_eventTable.popEvent();
-    if (not nextEvent.empty()) {
-        updateCurrentTime(m_eventTable.getCurrentTime());
-    }
-
-    while (not nextEvent.emptyBag()) {
-        EventBagModel& bag(nextEvent.topBag());
-        Simulator* mdl(nextEvent.topBagModel());
-
-        while (not bag.empty()) {
-            if (not bag.emptyInternal()) {
-                if (not bag.emptyExternal()) {
-                    switch (mdl->processConflict(
-                            *bag.internal(), bag.externals())) {
-                    case Event::INTERNAL:
-                        processInternalEvent(mdl, bag, nextEvent);
-                        break;
-
-                    case Event::EXTERNAL:
-                        processExternalEvents(mdl, bag, nextEvent);
-                        break;
-                    }
-                } else {
-                    processInternalEvent(mdl, bag, nextEvent);
-                }
-            } else {
-                if (not bag.emptyExternal()) {
-                    processExternalEvents(mdl, bag, nextEvent);
-                } else {
-                    processInstantaneousEvents(mdl, bag, nextEvent);
-                }
-            }
-        }
-        if (mdl == nextEvent.topBagModel())
-            nextEvent.popBag();
-    }
-
-    processStateEvents(nextEvent);
-    AssertI(nextEvent.empty());
-    return 0;
 }
 
 vle::devs::Stream* Coordinator::getStreamPlugin(const vpz::Output& o)

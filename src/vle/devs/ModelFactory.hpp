@@ -25,14 +25,10 @@
 #ifndef DEVS_MODELFACTORY_HPP
 #define DEVS_MODELFACTORY_HPP
 
-#include <vle/devs/Simulator.hpp>
 #include <vle/devs/Coordinator.hpp>
 #include <vle/graph/Model.hpp>
-#include <vle/vpz/Dynamics.hpp>
 #include <vle/vpz/Classes.hpp>
 #include <vle/vpz/Model.hpp>
-#include <map>
-#include <glibmm/ustring.h>
 #include <glibmm/module.h>
 
 namespace vle { namespace devs {
@@ -63,54 +59,12 @@ namespace vle { namespace devs {
         ~ModelFactory()
         { }
 
-	/**
-         * @brief Return Simulator list to result map from Atomic Models
-         * list.
-	 *
-	 * @param lst atomics models list.
-	 * @param result output parameter to fill with Simulator.
-         *
-         * @return a list of newly Simulator build.
-	 */
-        devs::SimulatorList createModels(
-                            const graph::AtomicModelVector& lst,
-                            SimulatorMap& result);
-
-        /** 
-         * @brief Build a clone of stored class.
-         * 
-         * @param classname the classe name to clone.
-         * @param lst a reference to a list for the new Simulator build.
-         * @param result a reference to add
-         * 
-         * @return a devs::Hierarchy of models.
-         *
-         * @throw Exception::BadArgument if classname does not exist.
-         */
-	graph::Model* createModels(const std::string& classname,
-                                   SimulatorList& lst,
-                                   SimulatorMap& result);
-
-
-        /** 
-         * @brief Build a Simulator based on graph::AtomicModel and is
-         * vpz::AtomicModel information.
-         * 
-         * @param model the model to attach a new dynamics. Be carefull, don't
-         * delete this object. It will be use by the Kernel.
-         * @param SimulatorMap Coordinator simulator information to update.
-         * 
-         * @return A new Simulator builded.
-         */
-        Simulator* createModel(graph::AtomicModel* model,
-                               SimulatorMap& result);
-
         /** 
          * @brief Return the list of atomics models information ie. the 4-uples
          * of graph::Model*, dynamics, conditions, observables and translators.
          * @return A constant reference to the vpz::AtomicModelList.
          */
-        const vpz::AtomicModelList& atomics() const
+        inline const vpz::AtomicModelList& atomics() const
         { return mAtomics; }
 
         /** 
@@ -118,22 +72,22 @@ namespace vle { namespace devs {
          * each models.
          * @return A constant reference to the vpz::Conditions.
          */
-        const vpz::Conditions& conditions() const
+        inline const vpz::Conditions& conditions() const
         { return mExperiment.conditions(); }
 
         /** 
          * @brief Return the reference to the list of views.
          * @return A constant reference to the vpz::Views.
          */
-        const vpz::Views& views() const
+        inline const vpz::Views& views() const
         { return mExperiment.views(); }
 
-
         //
-        // Manage the ModelFactory cache ie. Atomic Model information of
-        // dynamics, conditions and observables value. 
+        ///
+        /// Manage the ModelFactory cache ie. Atomic Model information of
+        /// dynamics, conditions and observables value. 
+        ///
         //
-
 
         /** 
          * @brief Remove all atomic model information that have no the tag
@@ -179,20 +133,6 @@ namespace vle { namespace devs {
                                const std::string& observable,
                                SimulatorMap& result);
 
-        /** 
-         * @brief Add to the list of atomics models informations a new 4-uples
-         * of graph::Model*, dynamics, conditions, observables and translators.
-         * @param mdl the model to add.
-         * @param dyn the dynamics of the model to add.
-         * @param cond the conditions of the model to add.
-         * @param view the views of the model to add.
-         */
-        const vpz::AtomicModel& update_atomicmodellist(
-                                        graph::AtomicModel* mdl,
-                                        const vpz::Dynamic& dyn,
-                                        const vpz::Condition& cond,
-                                        const vpz::Observable& obs);
-
     private:
 	Coordinator&            mCoordinator;
         vpz::Dynamics           mDynamics;
@@ -200,32 +140,11 @@ namespace vle { namespace devs {
         vpz::Experiment         mExperiment;
         vpz::AtomicModelList    mAtomics;
 
-
-        /** 
-         * @brief Return a Simulator list to result map from Atomic Models
-         * list.
-         * 
-         * @param lst the atomic model list.
-         * @param result the associated graph::AtomicModel to
-         * devs::Simulator. Output parameter.
-         * @param dyn the dynamics stock of dynamic. Can be the VPZ or a
-         * classes.
-         * 
-         * @return 
-         */
-        devs::SimulatorList createModelsFromDynamics(
-            const graph::AtomicModelVector& lst,
-            SimulatorMap& result);
-
-
         /** 
          * @brief Load a new Glib::Module plugin from dynamic parameter in
          * default model dir or user model dir.
-         * 
          * @param dyn A reference to the dynamic to load.
-         *
          * @return a reference to a Glib::Module.
-         *
          * @throw Exception::Internal if file is not found.
          */
         Glib::Module* buildPlugin(const vpz::Dynamic& dyn);
@@ -234,11 +153,8 @@ namespace vle { namespace devs {
          * @brief Load a new Glib::Module plugin for the specified dynamicname.
          * If dynamicname is not found in mDynamics variable it will search into
          * classes dynamics.
-         * 
          * @param dynamicname the dynamic name to load.
-         * 
          * @return a reference to a Glib::Module.
-         *
          * @throw Exception::Internal if file is not found or if dynamicname is
          * not found.
          */
@@ -247,11 +163,9 @@ namespace vle { namespace devs {
         /** 
          * @brief Attach to the specified devs::Simulator reference a
          * devs::Dynamics structures load from a new Glib::Module.
-         * 
          * @param atom the devs::Simulator to attach devs::Dynamic.
          * @param dyn the io::Dynamic to initialise devs::Dynamic.
          * @param module the simulation dynamic library plugin.
-         *
          * @throw Exception::Internal if XML cannot be parse.
          */
         void attachDynamics(devs::Simulator* atom, const vpz::Dynamic& dyn,
