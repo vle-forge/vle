@@ -35,6 +35,7 @@
 #include <errno.h>
 #include <cstring>
 #include <iomanip>
+#include <config.h>
 
 #include <glib.h>
 #include <glib/gstdio.h>

@@ -80,12 +80,39 @@ ENDIF (WITH_SQLXX)
 
 ADD_SUBDIRECTORY(src)
 
+##
+## CXX ABI demangle
+##
 
+
+##
+## Generate the config.h
+##
+
+CHECK_INCLUDE_FILE_CXX(cxxabi.h HAVE_GCC_ABI_DEMANGLE)
+CHECK_INCLUDE_FILE_CXX(execinfo.h HAVE_EXECINFO_H)
+CHECK_INCLUDE_FILE_CXX(signal.h HAVE_SIGNAL_H)
+
+INCLUDE_DIRECTORIES(${VLE_BINARY_DIR})
+
+CONFIGURE_FILE(${VLE_SOURCE_DIR}/config.h.cmake ${VLE_BINARY_DIR}/config.h)
+MESSAGE(${CMAKE_CURRENT_BINARY_DIR})
+##
+## Status
+##
 
 MESSAGE(STATUS "- - - -")
-MESSAGE(STATUS "${VLE_PACKAGE_NAME} ${VLE_PACKAGE_VERSION} configured successfully.")
-MESSAGE(STATUS "Using ${VLE_INSTALL_PREFIX} for installation.")
-MESSAGE(STATUS "Using Building with ${CMAKE_C_FLAGS} for C compiler flags")
-MESSAGE(STATUS "Using Building with ${CMAKE_CXX_FLAGS} for C++ compiler flags")
-MESSAGE(STATUS "Build with SQL........: ${LIBSQLXX}")
+MESSAGE(STATUS "${VLE_PACKAGE_NAME} ${VLE_PACKAGE_VERSION} configured successfully")
+MESSAGE(STATUS "Using ${VLE_INSTALL_PREFIX} for installation")
+MESSAGE(STATUS "Using Building with ${CMAKE_C_FLAGS} for C flags")
+MESSAGE(STATUS "Using Building with ${CMAKE_CXX_FLAGS} for C++ flags")
+IF (HAVE_GCC_ABI_DEMANGLE)
+	MESSAGE(STATUS "Build with GCC ABI Demangle...: yes")
+ENDIF (HAVE_GCC_ABI_DEMANGLE)
+IF (HAVE_SQLXX)
+	MESSAGE(STATUS "Build with SQL................: yes")
+ENDIF (HAVE_SQLXX)
+IF (HAVE_EXECINFO_H)
+	MESSAGE(STATUS "Build with execinfo.h.........: yes")
+ENDIF (HAVE_EXECINFO_H)
 MESSAGE(STATUS "- - - -")
