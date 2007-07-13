@@ -119,7 +119,7 @@ void NetStream::writeValue(const devs::Time&, value::Value )
 
 void NetStream::writeValues(const devs::Time& time,
 			    const devs::StreamModelPortValue& valuelst,
-			    const devs::Stream::ObservableVector& obslst)
+			    const devs::ObservableList& obslst)
 {
     std::string msg("<TRAME DATE=\"");
     msg += utils::to_string(time.getValue());

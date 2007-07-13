@@ -68,9 +68,9 @@ void TextStream::writeValue(const devs::Time& time, value::Value value)
 
 void TextStream::writeValues(const devs::Time& time,
                              const devs::StreamModelPortValue& valuelst,
-                             const devs::Stream::ObservableVector& obslst)
+                             const devs::ObservableList& obslst)
 {
-    std::vector < devs::Observable >::const_iterator it = obslst.begin();
+    devs::ObservableList::const_iterator it = obslst.begin();
     m_stream << time.getValue();
 
     while (it != obslst.end()) {

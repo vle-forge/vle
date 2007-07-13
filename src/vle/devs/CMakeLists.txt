@@ -8,7 +8,7 @@ LINK_DIRECTORIES(
 	${LIBXMLPP_LIBRARY_DIR})
 
 SET(DEVS_CPP
-    Coordinator.cpp Dynamics.cpp Event.cpp EventTable.cpp EventView.hpp
+    Coordinator.cpp Dynamics.cpp Event.cpp EventTable.cpp EventView.cpp
     ExternalEvent.cpp InitEvent.cpp InstantaneousEvent.cpp InternalEvent.cpp
     ModelFactory.cpp Observable.cpp RootCoordinator.cpp Simulator.cpp
     StateEvent.cpp Stream.cpp Time.cpp TimedView.cpp View.cpp)

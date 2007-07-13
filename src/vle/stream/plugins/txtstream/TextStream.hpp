@@ -25,7 +25,7 @@
 #define OBSERVER_TEXT_STREAM_HPP
 
 #include <vle/devs/Stream.hpp>
-#include <vle/devs/Observer.hpp>
+#include <vle/devs/View.hpp>
 #include <vle/value/Value.hpp>
 #include <fstream>
 #include <string>
@@ -64,7 +64,7 @@ namespace vle { namespace stream {
 
 	virtual void writeValues(const devs::Time& time,
 				 const devs::StreamModelPortValue& valuelst,
-                                 const devs::Stream::ObservableVector& obslst);
+                                 const devs::ObservableList& obslst);
 
     private:
 	std::string     m_fileName;

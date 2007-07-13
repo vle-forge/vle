@@ -27,7 +27,7 @@
 #define OBSERVER_NET_STREAM_HPP
 
 #include <vle/devs/Stream.hpp>
-#include <vle/devs/Observer.hpp>
+#include <vle/devs/View.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/utils/Socket.hpp>
 #include <string>
@@ -79,7 +79,7 @@ namespace vle { namespace stream {
 
 	virtual void writeValues(const devs::Time& time,
 				 const devs::StreamModelPortValue& valuelst,
-				 const devs::Stream::ObservableVector& obslst);
+				 const devs::ObservableList& obslst);
     private:
 	xmlpp::DomParser            m_parser;
 	xmlpp::Element*             m_parameterRoot;

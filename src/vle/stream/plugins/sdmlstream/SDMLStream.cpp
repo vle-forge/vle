@@ -123,7 +123,7 @@ void SDMLStream::writeValue(const devs::Time& p_time,
 
 void SDMLStream::writeValues(const devs::Time& time,
 			     const devs::StreamModelPortValue& valuelst,
-			     const devs::Stream::ObservableVector& /*obslst*/)
+			     const devs::ObservableList& /*obslst*/)
 {
     devs::StreamModelPortValue::const_iterator it = valuelst.begin();
 

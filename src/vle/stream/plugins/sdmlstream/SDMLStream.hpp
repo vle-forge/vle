@@ -39,7 +39,7 @@ namespace vle { namespace stream {
      * Observer to store VLE output into a SDML stream.
      *
      */
-    class SDMLStream : public vle::devs::Stream
+    class SDMLStream : public devs::Stream
     {
     public:
 	SDMLStream();
@@ -60,7 +60,7 @@ namespace vle { namespace stream {
 
 	virtual void writeValues(const devs::Time& time,
 				 const devs::StreamModelPortValue& valuelst,
-				 const devs::Stream::ObservableVector& obslst);
+                                 const devs::ObservableList& obslst);
 
     private:
 	std::string m_fileName;

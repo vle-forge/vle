@@ -29,9 +29,9 @@
 
 namespace vle { namespace devs {
 
-View::View(const std::string& name, Stream* p_stream) :
+View::View(const std::string& name, Stream* stream) :
     m_name(name),
-    m_stream(p_stream),
+    m_stream(stream),
     m_size(0)
 {
 }
