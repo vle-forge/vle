@@ -39,12 +39,11 @@ namespace vle { namespace devs {
     class InstantaneousEvent : public ExternalEvent
     {
     public:
-	InstantaneousEvent(const std::string& sourcePortName,
-                           Simulator* source) :
-            ExternalEvent(sourcePortName, source)
+	InstantaneousEvent(const std::string& sourcePortName) :
+            ExternalEvent(sourcePortName)
         { }
             
-	InstantaneousEvent(ExternalEvent* event,
+	InstantaneousEvent(InstantaneousEvent* event,
                            Simulator* target,
                            const std::string& targetPortName) :
             ExternalEvent(event, target, targetPortName)

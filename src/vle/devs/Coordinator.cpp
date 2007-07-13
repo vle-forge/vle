@@ -368,7 +368,9 @@ void Coordinator::dispatchExternalEvent(ExternalEventList& eventList,
 
             if (event->isInstantaneous()) {
                 bags.addInstantaneous(
-                    dst, new InstantaneousEvent(event, dst, port));
+                    dst, new InstantaneousEvent(
+                        reinterpret_cast < InstantaneousEvent* >(event),
+                        dst, port));
             } else {
                 m_eventTable.putExternalEvent(
                     new ExternalEvent(event, dst, port));
