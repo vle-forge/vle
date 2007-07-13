@@ -25,15 +25,16 @@
  */
 
 #include <vle/devs/TimedView.hpp>
+#include <vle/devs/StreamWriter.hpp>
+
+
 
 namespace vle { namespace devs {
 
-TimedView::TimedView(const std::string& name,
-                     Stream* stream,
-                     double timeStep) :
-    View(name,stream),
-    m_timeStep(timeStep),
-    m_counter(0)
+TimedView::TimedView(const std::string& name, StreamWriter* stream,
+                     const Time& timeStep) :
+    View(name, stream),
+    m_timeStep(timeStep)
 {
 }
 
@@ -42,15 +43,7 @@ StateEvent* TimedView::processStateEvent(StateEvent* event)
     value::Value value = event->getAttributeValue(event->getPortName());
 
     if (value.get()) {
-        m_valueList[StreamModelPort(
-            event->getModel(), event->getPortName())] = value;
-        m_counter++;
-        if (m_counter == m_size) {
-            m_stream->writeValues(event->getTime(),
-                                  m_valueList,getObservableList());
-            m_counter = 0;
-            m_valueList.clear();
-        }
+        m_stream->process(*event);
     }
 
     return new StateEvent(event->getTime() + m_timeStep,

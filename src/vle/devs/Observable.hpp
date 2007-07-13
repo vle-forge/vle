@@ -25,37 +25,14 @@
 #ifndef VLE_DEVS_OBSERVABLE_HPP
 #define VLE_DEVS_OBSERVABLE_HPP
 
-#include <vector>
+#include <map>
 #include <string>
 
 namespace vle { namespace devs {
 
     class Simulator;
     
-    class Observable
-    {
-    public:
-        Observable(Simulator* model, const std::string& portname) :
-            m_model(model),
-            m_portname(portname)
-        { }
-
-        inline Simulator* simulator() const
-        { return m_model; }
-
-        inline const std::string& portname() const
-        { return m_portname; }
-
-    private:
-        Observable() :
-            m_model(0)
-        { }
-        
-        Simulator*      m_model;
-	std::string     m_portname;
-    };
-    
-    typedef std::vector < Observable > ObservableList;
+    typedef std::multimap < Simulator*, std::string > ObservableList;
 
 
 }} // namespace vle devs

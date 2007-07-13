@@ -40,7 +40,7 @@ namespace vle { namespace devs {
     class EventView : public View
     {
     public:
-        EventView(const std::string& name, Stream* stream);
+        EventView(const std::string& name, StreamWriter* stream);
 
         virtual ~EventView() { }
 
@@ -49,11 +49,9 @@ namespace vle { namespace devs {
         virtual bool isTimed() const { return false; }
 
         virtual devs::StateEvent* processStateEvent(devs::StateEvent* event);
-
-    private:
-        Time                    m_lastTime;
-	StreamModelPortValue    m_valueList;
     };
+
+    typedef std::map < std::string, devs::EventView* > EventViewList;
 
 }} // namespace vle devs
 

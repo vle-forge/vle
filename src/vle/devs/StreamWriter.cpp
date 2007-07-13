@@ -1,5 +1,5 @@
 /**
- * @file devs/Stream.cpp
+ * @file devs/StreamWriter.cpp
  * @author The VLE Development Team.
  * @brief Base class of net visualisation plugin.
  */
@@ -23,15 +23,9 @@
  * 02111-1307, USA.
  */
 
-#include <vle/devs/Stream.hpp>
+#include <vle/devs/StreamWriter.hpp>
 
 namespace vle { namespace devs {
 
-Stream::Stream() :
-    m_view(0)
-{ }
-
-Stream::~Stream()
-{ }
 
 }} // namespace vle devs

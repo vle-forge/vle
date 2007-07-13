@@ -26,10 +26,8 @@
 #ifndef VLE_DEVS_VIEW_HPP
 #define VLE_DEVS_VIEW_HPP
 
-#include <vle/devs/DevsTypes.hpp>
 #include <vle/devs/Observable.hpp>
 #include <vle/devs/StateEvent.hpp>
-#include <vle/devs/Stream.hpp>
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/utils/Tools.hpp>
 #include <string>
@@ -37,7 +35,7 @@
 
 namespace vle { namespace devs {
 
-    class Stream;
+    class StreamWriter;
 
     /**
      * @brief Represent a View on a devs::Simulator and a port name.
@@ -46,7 +44,7 @@ namespace vle { namespace devs {
     class View
     {
     public:
-        View(const std::string& name, Stream* stream);
+        View(const std::string& name, StreamWriter* stream);
 
         virtual ~View();
 
@@ -55,15 +53,6 @@ namespace vle { namespace devs {
                                   const Time& currenttime);
 
         void finish();
-
-	/**
-	 * Return the model of the first element of observable list.
-	 * @return a reference to the first observable.
-	 */
-        inline Simulator* getFirstModel() const
-        { return m_observableList.front().simulator(); }
-
-        const std::string& getFirstPortName() const;
 
         virtual bool isEvent() const = 0;
 
@@ -79,13 +68,6 @@ namespace vle { namespace devs {
 	 */
 	void removeObservable(Simulator* model);
 
-	/**
-	 * Delete an observable for a specified AtomicModel. Linear work.
-	 * @param model delete observable attached to the specified
-	 * AtomicModel.
-	 */
-        void removeObservable(graph::AtomicModel* model);
-
         /** 
          * @brief Test if a simulator is already connected with the same port
          * to the View.
@@ -94,6 +76,22 @@ namespace vle { namespace devs {
          * @return true if simulator is already connected with the same port.
          */
         bool exist(Simulator* simulator, const std::string& portname) const;
+
+
+        /** 
+         * @brief Test if a simulator is already connected to the View.
+         * @param simulator the simulator to search.
+         * @return true if simulator is already connected.
+         */
+        bool exist(Simulator* simulator) const;
+
+        /** 
+         * @brief Get the portnames of the Simulator.
+         * @param simulator the simulator to search.
+         * @return the list of portname of the value.
+         * @throw utils::InternalError if simulator does not exist.
+         */
+        std::list < std::string > get(Simulator* simulator);
 
         //
         //
@@ -110,13 +108,13 @@ namespace vle { namespace devs {
         inline unsigned int getSize() const
         { return m_size; }
 
-        inline vle::devs::Stream * getStream() const
+        inline vle::devs::StreamWriter * getStream() const
         { return m_stream; }
 
     protected:
         ObservableList      m_observableList;
         std::string         m_name;
-        Stream*             m_stream;
+        StreamWriter*       m_stream;
         size_t              m_size;
     };
 

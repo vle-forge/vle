@@ -205,11 +205,8 @@ namespace vle { namespace devs {
 	ModelFactory*       m_modelFactory;
 	EventTable          m_eventTable;
 	ViewList            m_viewList;
-
-	std::map < std::string ,
-		   std::vector < devs::EventView* > > m_eventViewList;
-
-	std::vector < devs::TimedView* > m_timedViewList;
+	EventViewList       m_eventViewList;
+	TimedViewList       m_timedViewList;
 
         void buildViews();
 
@@ -312,7 +309,7 @@ namespace vle { namespace devs {
          *
          * @throw Exception::File if problem loading file.
          */
-        Stream* getStreamPlugin(const vpz::Output& o);
+        StreamWriter* getStreamPlugin(const vpz::Output& o);
     };
 
 }} // namespace vle devs

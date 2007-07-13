@@ -23,7 +23,6 @@
  */
 
 #include <vle/devs/Observable.hpp>
-#include <vle/devs/Simulator.hpp>
 
 namespace vle { namespace  devs {
 

@@ -25,11 +25,11 @@
 
 #include <vle/devs/View.hpp>
 #include <vle/devs/Simulator.hpp>
-#include <vle/devs/Stream.hpp>
+#include <vle/devs/StreamWriter.hpp>
 
 namespace vle { namespace devs {
 
-View::View(const std::string& name, Stream* stream) :
+View::View(const std::string& name, StreamWriter* stream) :
     m_name(name),
     m_stream(stream),
     m_size(0)
@@ -49,8 +49,8 @@ StateEvent* View::addObservable(Simulator* model,
            "Cannot add an empty simulator to observe");
 
     if (not exist(model, portname)) {
-        m_size++;
-        m_observableList.push_back(Observable(model, portname));
+        m_observableList.insert(
+           std::make_pair < Simulator*, std::string >(model, portname));
         return new StateEvent(currenttime, model, m_name, portname);
     }
     return 0;
@@ -58,57 +58,48 @@ StateEvent* View::addObservable(Simulator* model,
 
 void View::finish()
 {
-    m_stream->writeData();
-    m_stream->writeTail();
     m_stream->close();
-}
-
-const std::string & View::getFirstPortName() const
-{
-    return m_observableList.front().portname();
 }
 
 void View::removeObservable(Simulator* model)
 {
-    ObservableList::iterator it;
-
-    it = m_observableList.begin();
-    while (it != m_observableList.end()) {
-        if (it->simulator() == model) {
-	    m_observableList.erase(it);
-	    --m_size;
-	    it = m_observableList.begin();
-        } else {
-            ++it;
-        }
-    }
-}
-
-void View::removeObservable(graph::AtomicModel* model)
-{
-    ObservableList::iterator it;
-
-    it = m_observableList.begin();
-    while (it != m_observableList.end()) {
-        if ((*it).simulator()->getStructure() == model) {
-	    m_observableList.erase(it);
-	    --m_size;
-	    it = m_observableList.begin();
-        } else {
-            ++it;
-        }
-    }
+    m_observableList.erase(model);
 }
 
 bool View::exist(Simulator* simulator, const std::string& portname) const
 {
-    for (ObservableList::const_iterator it = m_observableList.begin();
-         it != m_observableList.end(); ++it) {
-        if (it->simulator() == simulator and it->portname() == portname) {
+    std::pair < ObservableList::const_iterator,
+                ObservableList::const_iterator > result;
+
+    result = m_observableList.equal_range(simulator);
+    for (ObservableList::const_iterator jt = result.first;
+         jt != result.second; ++jt) {
+        if (jt->second == portname) {
             return true;
         }
     }
     return false;
+}
+
+bool View::exist(Simulator* simulator) const
+{
+    return m_observableList.count(simulator) > 0;
+}
+
+std::list < std::string > View::get(Simulator* simulator)
+{
+    std::pair < ObservableList::iterator,
+                ObservableList::iterator > result;
+
+    result = m_observableList.equal_range(simulator);
+
+    std::list < std::string > toreturn;
+
+    for (ObservableList::iterator it = result.first;
+         it != result.second; ++it) {
+        toreturn.push_back(it->second);
+    }
+    return toreturn;
 }
 
 }} // namespace vle devs

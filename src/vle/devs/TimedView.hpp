@@ -40,7 +40,8 @@ namespace vle { namespace devs {
     class TimedView : public View
     {
     public:
-	TimedView(const std::string& name, Stream* stream, double timeStep);
+        TimedView(const std::string& name, StreamWriter* stream,
+                  const Time& timeStep);
 
 	virtual ~TimedView() { }
 
@@ -51,10 +52,11 @@ namespace vle { namespace devs {
 	virtual devs::StateEvent* processStateEvent(devs::StateEvent* event);
 
     private:
-	double                  m_timeStep;
+	Time                    m_timeStep;
         size_t                  m_counter;
-	StreamModelPortValue    m_valueList;
     };
+
+    typedef std::map < std::string, devs::TimedView* > TimedViewList;
 
 }} // namespace vle devs
 

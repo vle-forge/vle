@@ -11,15 +11,15 @@ SET(DEVS_CPP
     Coordinator.cpp Dynamics.cpp Event.cpp EventTable.cpp EventView.cpp
     ExternalEvent.cpp InitEvent.cpp InstantaneousEvent.cpp InternalEvent.cpp
     ModelFactory.cpp Observable.cpp RootCoordinator.cpp Simulator.cpp
-    StateEvent.cpp Stream.cpp Time.cpp TimedView.cpp View.cpp)
+    StateEvent.cpp StreamWriter.cpp Time.cpp TimedView.cpp View.cpp)
 
 SET(DEVS_HPP
     Attribute.hpp Coordinator.hpp DevsTypes.hpp Dynamics.hpp Event.hpp
     EventList.hpp EventView.hpp EventTable.hpp Executive.hpp ExternalEvent.hpp
     ExternalEventList.hpp InitEvent.hpp InstantaneousEvent.hpp
     InstantaneousEventList.hpp InternalEvent.hpp ModelFactory.hpp
-    Observable.hpp RootCoordinator.hpp Simulator.hpp StateEvent.hpp Stream.hpp
-    TimedView.hpp Time.hpp View.hpp)
+    Observable.hpp RootCoordinator.hpp Simulator.hpp StateEvent.hpp
+    StreamWriter.hpp TimedView.hpp Time.hpp View.hpp)
 
 ADD_LIBRARY(vledevs SHARED ${DEVS_CPP};${DEVS_HPP})
 

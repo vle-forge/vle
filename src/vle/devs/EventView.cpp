@@ -25,15 +25,14 @@
  */
 
 #include <vle/devs/EventView.hpp>
-#include <vle/value/Double.hpp>
-#include <iostream>
+#include <vle/devs/StreamWriter.hpp>
 
 
 
 namespace vle { namespace devs {
 
-EventView::EventView(const std::string& name, Stream* p_stream) :
-    View(name, p_stream)
+EventView::EventView(const std::string& name, StreamWriter* stream) :
+    View(name, stream)
 {
 }
 
@@ -42,19 +41,7 @@ StateEvent* EventView::processStateEvent(StateEvent* event)
     value::Value val = event->getAttributeValue(event->getPortName());
 
     if (val.get()) {
-        if (m_lastTime < event->getTime()) {
-            m_stream->writeValues(event->getTime(),
-                                  m_valueList,
-                                  getObservableList());
-            m_lastTime = event->getTime();
-        }
-
-        StreamModelPortValue::iterator it =
-            m_valueList.find(StreamModelPort(event->getModel(),
-                                             event->getPortName()));
-
-        m_valueList[StreamModelPort(event->getModel(),
-                                    event->getPortName())] = val;
+        m_stream->process(*event);
     }
     return 0;
 }

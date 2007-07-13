@@ -31,7 +31,7 @@
 #include <vle/devs/ExternalEventList.hpp>
 #include <vle/devs/StateEvent.hpp>
 #include <vle/devs/ModelFactory.hpp>
-#include <vle/devs/Stream.hpp>
+#include <vle/devs/StreamWriter.hpp>
 #include <vle/graph/Model.hpp>
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/graph/CoupledModel.hpp>
@@ -331,14 +331,12 @@ void Coordinator::addView(View* view)
 
     ViewList::iterator it = m_viewList.find(view->getName());
     if (it == m_viewList.end()) {
-        m_viewList[view->getName()] = view;
+        const std::string& name = view->getName();
+        m_viewList[name] = view;
         if (view->isTimed()) {
-            m_timedViewList.push_back(
-                reinterpret_cast < TimedView*>(view));
+            m_timedViewList[name] = reinterpret_cast < TimedView*>(view);
         } else {
-            m_eventViewList[
-                view->getFirstModel()->getName()].push_back(
-                    reinterpret_cast < EventView* >(view));
+            m_eventViewList[name] = reinterpret_cast < EventView*>(view);
         }
     }
 }
@@ -518,7 +516,7 @@ void Coordinator::startLocalStream()
     const vpz::Views& views(m_modelFactory->views());
     vpz::Views::const_iterator it;
     for (it = views.begin(); it != views.end(); ++it) {
-        Stream* stream = 0;
+        StreamWriter* stream = 0;
         const vpz::Output& o(views.outputs().get(it->second.output()));
 
         if (o.format() == vpz::Output::TEXT 
@@ -527,7 +525,7 @@ void Coordinator::startLocalStream()
                              it->second.name()).str());
 
             stream = getStreamPlugin(o);
-            stream->init(o.plugin(), file, o.location(), o.data());
+            stream->open(o.plugin(), file, o.location(), o.data());
 
             View* obs = 0;
             if (it->second.type() == vpz::View::TIMED) {
@@ -551,36 +549,26 @@ void Coordinator::buildViews()
 
 void Coordinator::processEventView(Simulator& model, Event* event)
 {
-    if (m_eventViewList.find(model.getName()) !=
-        m_eventViewList.end()) {
-        vector < EventView* > v_list =
-            m_eventViewList[model.getName()];
-        vector < EventView* >::iterator it =
-            v_list.begin();
+    std::list < std::string > lst;
+    for (EventViewList::iterator it = m_eventViewList.begin();
+         it != m_eventViewList.end(); ++it) {
+        lst.clear();
+        lst = it->second->get(&model);
 
-        while (it != v_list.end()) {
-            const std::vector < Observable >& v_list2(
-                (*it)->getObservableList());
-            std::vector < Observable >::const_iterator it2 = v_list2.begin();
-
-            while (it2 != v_list2.end()) {
-                StateEvent* event3 = 0;
-                if (event == 0 or not event->isInternal()) {
-                    event3 = new StateEvent(m_currentTime, &model,
-                                            (*it)->getName(),
-                                            (*it2).portname());
-                } else if (event and event->isInternal()) {
-                    event3 = new StateEvent(((InternalEvent*)event)->getTime(),
-                                            &model, (*it)->getName(),
-                                            (*it2).portname());
-                }
-                StateEvent* v_event = model.processStateEvent(*event3);
-
-                delete event3;
-                (*it)->processStateEvent(v_event);
-                ++it2;
+        for (std::list < std::string >::iterator jt = lst.begin();
+             jt != lst.end(); ++jt) {
+            
+            StateEvent* newevent = 0;
+            if (event == 0 or not event->isInternal()) {
+                newevent = new StateEvent(m_currentTime, &model,
+                                          it->second->getName(), *jt);
+            } else if (event and event->isInternal()) {
+                newevent = new StateEvent(((InternalEvent*)event)->getTime(),
+                                          &model, it->second->getName(), *jt);
             }
-            ++it;
+            StateEvent* eventvalue = model.processStateEvent(*newevent);
+            delete newevent;
+            it->second->processStateEvent(eventvalue);
         }
     }
 }
@@ -663,7 +651,7 @@ void Coordinator::processStateEvents(CompleteEventBagModel& bag)
     }
 }
 
-vle::devs::Stream* Coordinator::getStreamPlugin(const vpz::Output& o)
+devs::StreamWriter* Coordinator::getStreamPlugin(const vpz::Output& o)
 {
     DTRACE1(boost::format("getStreamPlugin: '%1%' '%2%'\n") % o.plugin() %
             o.streamformat());
@@ -692,15 +680,16 @@ vle::devs::Stream* Coordinator::getStreamPlugin(const vpz::Output& o)
         }
     }
     module->make_resident();
-    vle::devs::Stream* call = 0;
-    void* makeNewStream = 0;
+    devs::StreamWriter* call = 0;
+    void* makeNewStreamWriter = 0;
 
-    bool getSymbol = module->get_symbol("makeNewStream", makeNewStream);
+    bool getSymbol = module->get_symbol("makeNewStreamWriter",
+                                        makeNewStreamWriter);
     Assert(utils::FileError, getSymbol, boost::format(
             "Error in module '%1%', function makeNewStream not found\n") %
         o.plugin());
 
-    call = ((vle::devs::Stream*(*)())(makeNewStream))();
+    call = ((devs::StreamWriter*(*)())(makeNewStreamWriter))();
     Assert(utils::FileError, call, boost::format(
             "Error in module '%1%', function makeNewStream problem allocation "
             "a new plugin: %1%\n") % o.plugin() %

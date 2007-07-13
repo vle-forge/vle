@@ -1,5 +1,5 @@
 /**
- * @file devs/Stream.hpp
+ * @file devs/StreamWriter.hpp
  * @author The VLE Development Team.
  * @brief Base class of net visualisation plugin.
  */
@@ -39,21 +39,29 @@ namespace vle { namespace devs {
     class Observable;
 
     /**
-     * Base class of output stream of VLE. This class is the base class of
-     * stream plugin declared with the function makeNewStream.
+     * Base class of the Stream Writer of the VLE DEVS simulator. This class is
+     * the base of the MemoryStreamWriter and NetStreamWriter deployed as
+     * plugins.
      *
      */
-    class Stream
+    class StreamWriter
     {
     public:
-        Stream();
+        StreamWriter() :
+            m_view(0)
+        { }
 
-        virtual ~Stream();
+        virtual ~StreamWriter()
+        { }
 
-	///////////////////////////////////////////////////////////////////////
+        //
+        ///
+        /// Virtual function to develop in plugins.
+        ///
+        //
 
         /**
-         * Initialise plugin with specified information.
+         * @brief Initialise plugin with specified information.
          * @param outputPlugin the name of the instance of plugin loaded like,
          * text, sdml or net.
          * @param outputType type of output like, local, ip.
@@ -61,48 +69,42 @@ namespace vle { namespace devs {
          * @param parameters a string representation of parameters the XML
          * parameters.
          */
-        virtual void init(const std::string& outputPlugin,
+        virtual void open(const std::string& outputPlugin,
                           const std::string& outputType,
                           const std::string& outputLocation,
-                          const std::string& parameters) =0;
+                          const std::string& parameters) = 0;
+
+        /** 
+         * @brief Process the devs::StateEvent and write it to the Stream.
+         * @param event the devs::StateEvent to write.
+         */
+        virtual void process(const StateEvent& event) const = 0;
 
         /**
          * Close the output stream.
-         *
          */
-        virtual void close() =0;
+        virtual void close() = 0;
+
+        //
+        ///
+        /// Get/Set functions
+        ///
+        //
 
         /**
-         * Get the current View.
-         *
+         * @brief Get the current View.
          * @return View attached or NULL if no attanchement.
          */
         inline devs::View* getView() const
         { return m_view; }
 
         /**
-         * Set the current View.
-         *
+         * @brief Set the current View.
          * @param View the new View to attach.
          */
         inline void setView(devs::View* View)
         { m_view = View; }
 
-	///////////////////////////////////////////////////////////////////////
-
-        virtual void writeData() =0;
-
-        virtual void writeHead(const std::vector < devs::Observable >&
-			       variableNameList) =0;
-
-        virtual void writeTail() =0;
-
-        virtual void writeValue(const devs::Time& time,
-                                value::Value value) =0;
-
-	virtual void writeValues(const devs::Time& time,
-				 const devs::StreamModelPortValue& valuelst,
-				 const ObservableList& obslst) =0;
     private:
         devs::View*        m_view;
     };
@@ -110,7 +112,7 @@ namespace vle { namespace devs {
 }} // namespace vle devs
 
 #define DECLARE_STREAM(x) \
-extern "C" { vle::devs::Stream* makeNewStream(void) \
+extern "C" { vle::devs::StreamWriter* makeNewStreamWriter(void) \
     { return new x(); } }
 
 #endif
