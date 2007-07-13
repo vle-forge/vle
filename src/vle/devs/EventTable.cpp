@@ -162,15 +162,10 @@ CompleteEventBagModel& EventTable::popEvent()
             popInternalEvent();
 	}
 
-	while (not mExternalEventModel.empty()) {
-	    Simulator* mdl = (*mExternalEventModel.begin()).first;
+        while (not mExternalEventModel.empty()) {
+            Simulator* mdl = (*mExternalEventModel.begin()).first;
 	    mCompleteEventBagModel.getBag(mdl).addExternal(
 		(*mExternalEventModel.begin()).second.first);
-	    mExternalEventModel.erase(mExternalEventModel.begin());
-	}
-        
-        while (not mExternalEventModel.empty()) {
-	    Simulator* mdl = (*mExternalEventModel.begin()).first;
 	    mCompleteEventBagModel.getBag(mdl).addInstantaneous(
 		(*mExternalEventModel.begin()).second.second);
 	    mExternalEventModel.erase(mExternalEventModel.begin());
