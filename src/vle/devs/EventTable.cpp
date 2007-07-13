@@ -77,7 +77,8 @@ EventTable::~EventTable()
     {
 	for (ExternalEventModel::iterator it = mExternalEventModel.begin();
 	     it != mExternalEventModel.end(); ++it) {
-	    (*it).second.clear(true);
+	    (*it).second.first.clear(true);
+	    (*it).second.second.clear(true);
 	}
     }
 }
@@ -88,7 +89,7 @@ size_t EventTable::getEventNumber() const
 
     for (ExternalEventModel::const_iterator it = mExternalEventModel.begin();
 	     it != mExternalEventModel.end(); ++it) {
-	sum += (*it).second.size();
+	sum += (*it).second.first.size() + (*it).second.second.size();
     }
 
     return sum;
@@ -164,7 +165,14 @@ CompleteEventBagModel& EventTable::popEvent()
 	while (not mExternalEventModel.empty()) {
 	    Simulator* mdl = (*mExternalEventModel.begin()).first;
 	    mCompleteEventBagModel.getBag(mdl).addExternal(
-		(*mExternalEventModel.begin()).second);
+		(*mExternalEventModel.begin()).second.first);
+	    mExternalEventModel.erase(mExternalEventModel.begin());
+	}
+        
+        while (not mExternalEventModel.empty()) {
+	    Simulator* mdl = (*mExternalEventModel.begin()).first;
+	    mCompleteEventBagModel.getBag(mdl).addInstantaneous(
+		(*mExternalEventModel.begin()).second.second);
 	    mExternalEventModel.erase(mExternalEventModel.begin());
 	}
 
@@ -198,13 +206,22 @@ bool EventTable::putExternalEvent(ExternalEvent* event)
     Simulator* mdl = event->getTarget();
     Assert(utils::InternalError, mdl, "Put external event.");
 
-    mExternalEventModel[mdl].addEvent(event);
+    mExternalEventModel[mdl].first.addEvent(event);
     InternalEventModel::iterator it = mInternalEventModel.find(mdl);
     if (it != mInternalEventModel.end() and (*it).second and
         (*it).second->getTime() > getCurrentTime()) {
 	(*it).second->invalidate();
 	(*it).second = 0;
     }
+    return true;
+}
+
+bool EventTable::putInstantaneousEvent(InstantaneousEvent* event)
+{
+    Simulator* mdl = event->getTarget();
+    Assert(utils::InternalError, mdl, "Put instantaneous event.");
+
+    mExternalEventModel[mdl].second.addEvent(event);
     return true;
 }
 
@@ -255,7 +272,8 @@ void EventTable::delModelEvents(Simulator* mdl)
     {
         ExternalEventModel::iterator it = mExternalEventModel.find(mdl);
         if (it != mExternalEventModel.end()) {
-            (*it).second.clear(true);
+            (*it).second.first.clear(true);
+            (*it).second.second.clear(true);
             mExternalEventModel.erase(it);
         }
     }

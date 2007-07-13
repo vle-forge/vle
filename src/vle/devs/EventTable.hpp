@@ -29,6 +29,7 @@
 #include <vle/devs/Event.hpp>
 #include <vle/devs/InternalEvent.hpp>
 #include <vle/devs/ExternalEvent.hpp>
+#include <vle/devs/InstantaneousEvent.hpp>
 #include <vle/devs/StateEvent.hpp>
 #include <vle/devs/Simulator.hpp>
 #include <vle/devs/DevsTypes.hpp>
@@ -287,13 +288,22 @@ namespace vle { namespace devs {
         bool putInternalEvent(InternalEvent* event);
 
         /**
-         * Put an internal event into vector heap. Delete Internal event from
+         * Put an external event into vector heap. Delete Internal event from
          * same model source if present in vector heap.
          *
          * @param event ExternalEvent to put into vector heap.
          * @return true.
          */
         bool putExternalEvent(ExternalEvent* event);
+        
+        /**
+         * Put an instantaneous event into vector heap. Delete Internal event
+         * from same model source if present in vector heap.
+         *
+         * @param event ExternalEvent to put into vector heap.
+         * @return true.
+         */
+        bool putInstantaneousEvent(InstantaneousEvent* event);
 
         /**
          * Put a state event into vector heap.
@@ -319,8 +329,9 @@ namespace vle { namespace devs {
 
     private:
         typedef std::map < Simulator*, InternalEvent* > InternalEventModel;
-        typedef std::map < Simulator*, ExternalEventList >
-            ExternalEventModel;
+        typedef std::map < Simulator*,
+                std::pair < ExternalEventList, InstantaneousEventList > >
+                    ExternalEventModel;
         
 	/**
 	 * Delete the first event in Internal heap.

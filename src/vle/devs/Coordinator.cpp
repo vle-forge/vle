@@ -116,21 +116,21 @@ ExternalEventList* Coordinator::run()
                     switch (mdl->processConflict(
                             *bag.internal(), bag.externals())) {
                     case Event::INTERNAL:
-                        processInternalEvent(mdl, bag, nextEvent);
+                        processInternalEvent(mdl, bag);
                         break;
 
                     case Event::EXTERNAL:
-                        processExternalEvents(mdl, bag, nextEvent);
+                        processExternalEvents(mdl, bag);
                         break;
                     }
                 } else {
-                    processInternalEvent(mdl, bag, nextEvent);
+                    processInternalEvent(mdl, bag);
                 }
             } else {
                 if (not bag.emptyExternal()) {
-                    processExternalEvents(mdl, bag, nextEvent);
+                    processExternalEvents(mdl, bag);
                 } else {
-                    processInstantaneousEvents(mdl, bag, nextEvent);
+                    processInstantaneousEvents(mdl, bag);
                 }
             }
         }
@@ -346,7 +346,6 @@ void Coordinator::addView(View* view)
 }
 
 void Coordinator::dispatchExternalEvent(ExternalEventList& eventList,
-                                        CompleteEventBagModel& bags,
                                         Simulator* sim)
 {
     const size_t sz = eventList.size();
@@ -367,8 +366,8 @@ void Coordinator::dispatchExternalEvent(ExternalEventList& eventList,
             const std::string& port(it2->port());
 
             if (event->isInstantaneous()) {
-                bags.addInstantaneous(
-                    dst, new InstantaneousEvent(
+                m_eventTable.putInstantaneousEvent(
+                    new InstantaneousEvent(
                         reinterpret_cast < InstantaneousEvent* >(event),
                         dst, port));
             } else {
@@ -590,8 +589,7 @@ void Coordinator::processEventView(Simulator& model, Event* event)
 
 void Coordinator::processInternalEvent(
     Simulator* sim,
-    EventBagModel& modelbag,
-    CompleteEventBagModel& bag)
+    EventBagModel& modelbag)
 {
     InternalEvent* ev = modelbag.internal();
     modelbag.delInternal();
@@ -599,7 +597,7 @@ void Coordinator::processInternalEvent(
     {
         ExternalEventList result;
         sim->getOutputFunction(m_currentTime, result);
-        dispatchExternalEvent(result, bag, sim);
+        dispatchExternalEvent(result, sim);
     }
 
     {
@@ -615,8 +613,7 @@ void Coordinator::processInternalEvent(
 
 void Coordinator::processExternalEvents(
     Simulator* sim,
-    EventBagModel& modelbag,
-    CompleteEventBagModel& /* bag */)
+    EventBagModel& modelbag)
 {
     ExternalEventList& lst(modelbag.externals());
 
@@ -633,8 +630,7 @@ void Coordinator::processExternalEvents(
 
 void Coordinator::processInstantaneousEvents(
     Simulator* sim,
-    EventBagModel& modelbag,
-    CompleteEventBagModel& bag)
+    EventBagModel& modelbag)
 {
     InstantaneousEventList& lst(modelbag.instantaneous());
 
@@ -642,7 +638,7 @@ void Coordinator::processInstantaneousEvents(
     for (InstantaneousEventList::iterator it = lst.begin(); it != lst.end();
          ++it) {
         sim->processInstantaneousEvent(**it, m_currentTime, result);
-        dispatchExternalEvent(result, bag, sim);
+        dispatchExternalEvent(result, sim);
         result.clear();
     }
     

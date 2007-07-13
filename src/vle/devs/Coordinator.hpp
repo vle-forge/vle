@@ -216,16 +216,13 @@ namespace vle { namespace devs {
 	void addView(devs::View* view);
 
         void processInternalEvent(Simulator* sim,
-                                  EventBagModel& modelbag,
-                                  CompleteEventBagModel& bag);
+                                  EventBagModel& modelbag);
 
         void processExternalEvents(Simulator* sim,
-                                   EventBagModel& modelbag,
-                                   CompleteEventBagModel& bag);
+                                   EventBagModel& modelbag);
 
         void processInstantaneousEvents(Simulator* sim,
-                                        EventBagModel& modelbag,
-                                        CompleteEventBagModel& bag);
+                                        EventBagModel& modelbag);
 
         void processStateEvents(CompleteEventBagModel& bag);
 
@@ -243,11 +240,9 @@ namespace vle { namespace devs {
          * push int the Schuduller.
          *
          * @param eventList the external event list to treat.
-         * @param bags output parameter to add Instantaneous events.
          * @param sim the simulator that dispatch external events.
          */
         void dispatchExternalEvent(ExternalEventList& eventList,
-                                   CompleteEventBagModel& bags,
                                    Simulator* sim);
 
         /** 
