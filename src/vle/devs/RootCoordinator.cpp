@@ -28,8 +28,9 @@
 #include <vle/devs/Dynamics.hpp>
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/devs/Time.hpp>
-#include <vle/graph/Model.hpp>
 #include <vle/utils/XML.hpp>
+#include <vle/utils/Rand.hpp>
+#include <vle/graph/Model.hpp>
 #include <libxml++/libxml++.h>
 
 namespace vle { namespace devs {
@@ -51,6 +52,7 @@ void RootCoordinator::load(vpz::Vpz& io)
         delete m_coordinator;
     }
 
+    utils::Rand::rand().set_seed(io.project().experiment().seed());
     m_duration = io.project().experiment().duration();
     m_coordinator = new Coordinator(io, io.project().model());
 }

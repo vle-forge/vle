@@ -40,7 +40,6 @@
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/XML.hpp>
 #include <vle/utils/Path.hpp>
-#include <vle/utils/Rand.hpp>
 #include <vle/value/Value.hpp>
 #include <libxml++/libxml++.h>
 #include <glibmm/spawn.h>
@@ -91,7 +90,6 @@ Coordinator::~Coordinator()
 
 void Coordinator::init()
 {
-    utils::Rand::rand().set_seed(m_experiment.seed());
 }
 
 const Time& Coordinator::getNextTime()
