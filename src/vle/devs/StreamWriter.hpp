@@ -56,7 +56,7 @@ namespace vle { namespace devs {
 
         //
         ///
-        /// Virtual function to develop in plugins.
+        /// Virtual function to develop stream writer plugins.
         ///
         //
 
@@ -73,6 +73,12 @@ namespace vle { namespace devs {
                           const std::string& outputType,
                           const std::string& outputLocation,
                           const std::string& parameters) = 0;
+
+        virtual void processNewObservable(Simulator* simulator,
+                                          const std::string& portname);
+
+        virtual void processRemoveObservable(Simulator* simulator,
+                                             const std::string& portname);
 
         /** 
          * @brief Process the devs::StateEvent and write it to the Stream.
@@ -111,7 +117,7 @@ namespace vle { namespace devs {
 
 }} // namespace vle devs
 
-#define DECLARE_STREAM(x) \
+#define DECLARE_STREAMWRITER(x) \
 extern "C" { vle::devs::StreamWriter* makeNewStreamWriter(void) \
     { return new x(); } }
 
