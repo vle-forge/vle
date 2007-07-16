@@ -9,6 +9,7 @@ INCLUDE(CheckIncludeFile)
 INCLUDE(CheckLibraryExists)
 INCLUDE(CMakeDetermineCCompiler)
 INCLUDE(CPack)
+ENABLE_TESTING()
 
 ##
 ## Set global variables.
@@ -81,9 +82,10 @@ ENDIF (WITH_SQLXX)
 ADD_SUBDIRECTORY(src)
 
 ##
-## CXX ABI demangle
+## Test Boost
 ##
 
+FIND_PACKAGE(Boost)
 
 ##
 ## Generate the config.h
@@ -115,4 +117,7 @@ ENDIF (HAVE_SQLXX)
 IF (HAVE_EXECINFO_H)
 	MESSAGE(STATUS "Build with execinfo.h.........: yes")
 ENDIF (HAVE_EXECINFO_H)
+IF (Boost_FOUND)
+	MESSAGE(STATUS "Build with boost..............: yes")
+ENDIF (Boost_FOUND)
 MESSAGE(STATUS "- - - -")

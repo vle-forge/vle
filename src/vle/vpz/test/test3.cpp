@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(test_translator)
         "  </model>\n"
         " </structures>\n"
         " <translators>\n"
-        "  <translator name=\"xxx\" library=\"tr1\">\n"
+        "  <translator name=\"xxx\" library=\"vletesttr1\">\n"
         "   <![CDATA["
         "<?xml version=\"1.0\"?>"
         "<test>"
