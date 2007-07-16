@@ -29,3 +29,6 @@ src/apps/test/vletranslatortest
 CMakeFiles
 CMakeCache.txt
 install_manifest.txt
+DartTestfile.txt
+/test/Testing
+/test/test*

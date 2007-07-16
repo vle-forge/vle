@@ -34,6 +34,7 @@ using namespace value;
 
 qss::qss(const AtomicModel& model) :
     Dynamics(model),
+    m_functionNumber(0),
     m_gradient(0),
     m_index(0),
     m_value(0),
@@ -59,6 +60,7 @@ void qss::processInitEvents(const InitEventList& event)
     const value::MapFactory::MapValue& lst = variables->getValue();
 
     m_functionNumber = lst.size();
+
     m_gradient = new double[m_functionNumber];
     m_value = new double[m_functionNumber];
     m_index = new long[m_functionNumber];
@@ -78,87 +80,6 @@ void qss::processInitEvents(const InitEventList& event)
                 index, init));
     }
 }
-
-
-    //InitEventList::const_iterator it = event.begin();
-
-//   while (it != event.end()) {
-//     unsigned int i = m_variableIndex.find(it->second->getPortName())->second;  
-//     double v = event->getDoubleAttributeValue(it->second->getPortName());
-
-//     m_initialValueList.push_back(std::pair < unsigned int , double >(i,v));
-//     ++it;
-//   }
-//}
-
-
-/*bool qss::parseXML(xmlpp::Element* p_dynamicsNode)
-  {
-// PARAMETER node
-xmlpp::Element* v_parameterNode = get_children(p_dynamicsNode, "PARAMETER");
-
-if (!v_parameterNode) throw utils::ParseError("Excepted PARAMETER tag.");
-
-std::string v_precision = get_attribute(v_parameterNode, "PRECISION");
-
-if (v_precision == "")
-throw utils::ParseError("Excepted PRECISION attribute in PARAMETER "
-"tag.");
-
-m_precision = to_double(v_precision);
-m_epsilon = m_precision;
-
-std::string v_threshold = get_attribute(v_parameterNode, "THRESHOLD");
-
-if (v_threshold == "")
-throw utils::ParseError("Excepted THRESHOLD attribute in PARAMETER tag.");
-
-m_threshold = to_double(v_threshold);
-
-std::string v_active = get_attribute(v_parameterNode, "ACTIVE");
-
-if (v_active == "true") m_active = true;
-else m_active = false;
-
-xmlpp::Element* v_variablesNode = get_children(p_dynamicsNode,
-"VARIABLES");
-xmlpp::Node::NodeList lst = v_variablesNode->get_children("VARIABLE");
-xmlpp::Node::NodeList::iterator it = lst.begin();
-
-m_functionNumber = 0;
-while ( it != lst.end() )
-{
-xmlpp::Element * elt = ( xmlpp::Element* )( *it );
-std::string v_name = get_attribute(elt,"NAME");
-unsigned int v_index = to_int(get_attribute(elt,"INDEX"));
-
-m_variableName[v_index] = v_name;
-m_variableIndex[v_name] = v_index;
-++it;
-m_functionNumber++;
-}
-
-m_gradient = new double[m_functionNumber];
-m_value = new double[m_functionNumber];
-m_index = new long[m_functionNumber];
-m_sigma = new devs::Time[m_functionNumber];
-m_lastTime = new devs::Time[m_functionNumber];
-m_state = new state[m_functionNumber];
-return true;
-}
-*/
-
-/*double qss::parseParameter(const std::string & p_name, 
-  xmlpp::Element* p_dynamicsNode)
-  {
-  xmlpp::Element* v_node;
-
-  v_node = utils::xml::get_children(p_dynamicsNode,p_name);
-  if (v_node) 
-  return utils::to_double(utils::xml::get_attribute(v_node,"VALUE"));
-  else
-  return 0;
-  }*/
 
 double qss::d(long p_index)
 {
