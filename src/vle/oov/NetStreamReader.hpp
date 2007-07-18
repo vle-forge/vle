@@ -1,8 +1,8 @@
 /** 
- * @file StreamReader.hpp
- * @brief Base class of the output stream reader.
+ * @file NetStreamReader.hpp
+ * @brief 
  * @author The vle Development Team
- * @date 2007-07-15
+ * @date 2007-07-16
  */
 
 /*
@@ -22,41 +22,39 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef VLE_DEVS_STREAMREADER_HPP
-#define VLE_DEVS_STREAMREADER_HPP
+#ifndef VLE_OOV_NETSTREAMREADER_HPP
+#define VLE_OOV_NETSTREAMREADER_HPP
+
+#include <vle/oov/StreamReader.hpp>
+
+
 
 namespace vle { namespace oov {
 
-    class Plugin;
-
-    class StreamReader
+    class NetStreamReader
     {
     public:
-        StreamReader()
-        { }
+        NetStreamReader();
 
-        virtual ~StreamReader()
-        { }
-
-        //
-        ///
-        /// Virtual function to develop stream reader plugins.
-        ///
-        //
+        virtual ~NetStreamReader();
 
 
-        //
-        ///
-        /// Get/Set functions
-        ///
-        //
+        void process()
+        {
+            while (buffer = resau.lecture()) {
+                vpz::SaxParser parser(buffer);
+                if (parser.isTrame()) {
+                    if (parser.isParameterTrame()) {
+                    } else if (parser.isNewObservableTrame()) {
+                    } else if (parser.isDelObservableTrame()) {
+                    } else if (parser.isValueTrame()) {
+                    } else if (parser.isEndTrame()) {
+                    }
+                }
+            }
+        }
 
-        Plugin* plugin() const
-        { return m_plugin; }
 
-    private:
-        Plugin*     m_plugin;
-    };
 
 }} // namespace vle oov
 

@@ -26,8 +26,7 @@ TARGET_LINK_LIBRARIES(vleoov
 	vledata
 	vlevalue
 	vlegraph
-	vlevpz
-	vledevs)
+	vlevpz)
 
 INSTALL(TARGETS vleoov DESTINATION ${VLE_LIBRARY_DIR})
 INSTALL(FILES ${OOV_HPP} DESTINATION ${VLE_INCLUDE_DIRS}/oov)

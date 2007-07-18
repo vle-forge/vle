@@ -103,6 +103,27 @@ void Model::getTargetPortList(const std::string& portname,
     }
 }
 
+std::string Model::getParentName() const
+{
+    std::list < std::string > lst;
+    CoupledModel* parent = m_parent;
+
+    while (parent) {
+        lst.push_front(parent->getName());
+        parent = parent->getParent();
+    }
+
+    std::string result;
+    while (not lst.empty()) {
+        result += lst.front();
+        lst.pop_front();
+        if (not result.empty()) {
+            result += ',';
+        }
+    }
+    return result;
+}
+
 void Model::delInputPortAndConnection(const std::string& /* name */)
 {
     Throw(utils::NotYetImplented, "Model::delInputPortAndConnection");

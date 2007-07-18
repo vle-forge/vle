@@ -23,6 +23,7 @@
  */
 
 #include <vle/oov/StreamReader.hpp>
+#include <vle/oov/Plugin.hpp>
 
 namespace vle { namespace oov {
 

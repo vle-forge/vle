@@ -74,17 +74,19 @@ namespace vle { namespace devs {
                           const std::string& outputLocation,
                           const std::string& parameters) = 0;
 
-        virtual void processNewObservable(Simulator* simulator,
-                                          const std::string& portname);
+        virtual void processNewObservable(const Time& time,
+                                          Simulator* simulator,
+                                          const std::string& portname) = 0;
 
-        virtual void processRemoveObservable(Simulator* simulator,
-                                             const std::string& portname);
+        virtual void processRemoveObservable(const Time& time,
+                                             Simulator* simulator,
+                                             const std::string& portname) = 0;
 
         /** 
          * @brief Process the devs::StateEvent and write it to the Stream.
          * @param event the devs::StateEvent to write.
          */
-        virtual void process(const StateEvent& event) const = 0;
+        virtual void process(const StateEvent& event) = 0;
 
         /**
          * Close the output stream.

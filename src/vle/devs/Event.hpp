@@ -74,6 +74,14 @@ namespace vle { namespace devs {
         inline Simulator* getModel()
         { return m_source; }
 
+	/**
+	 * Get the source model for internal, state and external events.
+	 *
+	 * @return a reference to the model.
+	 */
+        inline Simulator* getModel() const
+        { return m_source; }
+
         /**
          * Assign a simulator to the event.
          *

@@ -99,6 +99,18 @@ namespace vle { namespace graph {
         inline const std::string& getName() const
         { return m_name; }
 
+        /** 
+         * @brief Build a std::string based on the construction of the
+         * concatenation of all coupled model parent. Each parent name are
+         * separated by a comma.
+         * @code
+         * top model,coupled modela
+         * @endcode
+         * 
+         * @return 
+         */
+        std::string getParentName() const;
+
         inline CoupledModel* getParent() const
         { return m_parent; }
 
