@@ -24,6 +24,7 @@ TARGET_LINK_LIBRARIES(vleextension
 	vledata
 	vlevalue
 	vlegraph
+	vleoov
 	vlevpz
 	vledevs)
 

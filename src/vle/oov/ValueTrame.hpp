@@ -26,7 +26,6 @@
 #define VLE_OOV_VALUETRAME_HPP
 
 #include <vle/oov/Trame.hpp>
-#include <vle/devs/Time.hpp>
 #include <vle/value/Value.hpp>
 
 
@@ -76,7 +75,7 @@ namespace vle { namespace oov {
     class ValueTrame : public Trame
     {
     public:
-        ValueTrame(const devs::Time& time);
+        ValueTrame(const std::string& time);
 
         virtual ~ValueTrame()
         { }
@@ -95,14 +94,14 @@ namespace vle { namespace oov {
         ///
         //
 
-        const devs::Time& time() const
+        const std::string& time() const
         { return m_time; }
 
         const ModelTrameList& trames() const
         { return m_list; }
 
     private:
-        devs::Time      m_time;
+        std::string     m_time;
         ModelTrameList  m_list;
     };
 

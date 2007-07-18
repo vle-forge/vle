@@ -26,6 +26,7 @@ TARGET_LINK_LIBRARIES(vleoov
 	vledata
 	vlevalue
 	vlegraph
+	vleoov
 	vlevpz)
 
 INSTALL(TARGETS vleoov DESTINATION ${VLE_LIBRARY_DIR})

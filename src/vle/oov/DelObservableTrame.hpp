@@ -26,14 +26,13 @@
 #define VLE_OOV_DELOBSERVABLETRAME_HPP
 
 #include <vle/oov/Trame.hpp>
-#include <vle/devs/Time.hpp>
 
 namespace vle { namespace oov {
 
     class DelObservableTrame : public Trame
     {
     public:
-        DelObservableTrame(const devs::Time& time,
+        DelObservableTrame(const std::string& time,
                            const std::string& name,
                            const std::string& parent,
                            const std::string& port,
@@ -56,7 +55,7 @@ namespace vle { namespace oov {
         ///
         //
 
-        inline const devs::Time& time() const
+        inline const std::string& time() const
         { return m_time; }
 
         const std::string& name() const
@@ -72,7 +71,7 @@ namespace vle { namespace oov {
         { return m_view; }
 
     private:
-        devs::Time      m_time;
+        std::string     m_time;
         std::string     m_name;
         std::string     m_parent;
         std::string     m_port;

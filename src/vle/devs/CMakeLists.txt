@@ -33,6 +33,7 @@ TARGET_LINK_LIBRARIES(vledevs
 	vledata
 	vlevalue
 	vlegraph
+	vleoov
 	vlevpz)
 
 INSTALL(TARGETS vledevs DESTINATION ${VLE_LIBRARY_DIR})

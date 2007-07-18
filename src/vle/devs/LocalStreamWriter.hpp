@@ -53,6 +53,8 @@ namespace vle { namespace devs {
 
         virtual void close();
 
+    private:
+        oov::LocalStreamReader      m_reader;
     };
 
 }} // namespace vle devs

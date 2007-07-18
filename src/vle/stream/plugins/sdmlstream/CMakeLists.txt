@@ -18,6 +18,7 @@ TARGET_LINK_LIBRARIES(sdmlstream
 	vledata
 	vlevalue
 	vlegraph
+	vleoov
 	vlevpz
 	vledevs
 	vleextension)

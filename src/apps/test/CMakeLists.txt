@@ -21,6 +21,7 @@ TARGET_LINK_LIBRARIES(vletranslatortest
 	vledata
 	vlevalue
 	vlegraph
+	vleoov
 	vlevpz
 	vledevs
 	vleextension
@@ -36,6 +37,7 @@ TARGET_LINK_LIBRARIES(vlemodeltest
 	vledata
 	vlevalue
 	vlegraph
+	vleoov
 	vlevpz
 	vledevs
 	vleextension

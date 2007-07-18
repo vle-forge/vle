@@ -30,7 +30,8 @@ TARGET_LINK_LIBRARIES(vlevpz
 	vleutils
 	vledata
 	vlevalue
-	vlegraph)
+	vlegraph
+	vleoov)
 
 INSTALL(TARGETS vlevpz DESTINATION ${VLE_LIBRARY_DIR})
 INSTALL(FILES ${VPZ_HPP} DESTINATION ${VLE_INCLUDE_DIRS}/vpz)

@@ -31,6 +31,7 @@ TARGET_LINK_LIBRARIES(vlemanager
 	vledata
 	vlevalue
 	vlegraph
+	vleoov
 	vlevpz
 	vledevs
 	vleextension)
