@@ -81,11 +81,6 @@ ENDIF (WITH_SQLXX)
 
 ADD_SUBDIRECTORY(src)
 
-##
-## Test Boost
-##
-
-FIND_PACKAGE(Boost)
 
 ##
 ## Generate the config.h
@@ -98,7 +93,23 @@ CHECK_INCLUDE_FILE_CXX(signal.h HAVE_SIGNAL_H)
 INCLUDE_DIRECTORIES(${VLE_BINARY_DIR})
 
 CONFIGURE_FILE(${VLE_SOURCE_DIR}/config.h.cmake ${VLE_BINARY_DIR}/config.h)
-MESSAGE(${CMAKE_CURRENT_BINARY_DIR})
+
+##
+## Test Boost
+##
+
+FIND_PACKAGE(Boost)
+IF (Boost_FOUND)
+	FIND_LIBRARY(Boost_UNITTESTFRAMEWORK NAMES boost_unit_test_framework
+	boost_unit_test_framework-mt PATHS Boost_LIBRARY_DIRS)
+	IF (Boost_UNITTESTFRAMEWORK)
+		SET(HAVE_UNITTESTFRAMEWORK 1 CACHE INTERNAL "With Boost::test")
+	ELSE (Boost_UNITTESTFRAMEWORK)
+		MESSAGE(STATUS "Could not find boost unit test framework")
+		SET(HAVE_UNITTESTFRAMEWORK "" CACHE INTERNAL "Without Boost::test")
+	ENDIF (Boost_UNITTESTFRAMEWORK)
+ENDIF (Boost_FOUND)
+
 ##
 ## Status
 ##
@@ -120,4 +131,7 @@ ENDIF (HAVE_EXECINFO_H)
 IF (Boost_FOUND)
 	MESSAGE(STATUS "Build with boost..............: yes")
 ENDIF (Boost_FOUND)
+IF (HAVE_UNITTESTFRAMEWORK)
+	MESSAGE(STATUS "Build unit test...............: yes")
+ENDIF (HAVE_UNITTESTFRAMEWORK)
 MESSAGE(STATUS "- - - -")

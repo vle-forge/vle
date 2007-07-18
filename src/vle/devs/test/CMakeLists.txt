@@ -16,7 +16,7 @@ TARGET_LINK_LIBRARIES(test1
 	${GLIBMM_LIBRARIES}
 	${LIBXMLPP_LIBRARIES}
 	${GTHREAD_LIBRARIES}
-        boost_unit_test_framework
+	${Boost_UNITTESTFRAMEWORK}
 	vlegeometry
 	vleutils
 	vledata
