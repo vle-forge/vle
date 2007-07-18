@@ -169,12 +169,22 @@ namespace vle { namespace graph {
                                    const std::string& dst,
                                    const std::string& portDst);
 
-	void delInputConnection(const std::string & portSrc,
-				Model * dst, const std::string & portDst);
-	void delOutputConnection(Model * src, const std::string & portSrc,
-				 const std::string & portDst);
-	void delInternalConnection(Model * src, const std::string & portSrc,
-                                   Model * dst, const std::string & portDst);
+	void delInputConnection(const std::string& portSrc,
+				Model* dst, const std::string& portDst);
+	void delOutputConnection(Model* src, const std::string& portSrc,
+				 const std::string& portDst);
+	void delInternalConnection(Model* src, const std::string& portSrc,
+                                   Model* dst, const std::string& portDst);
+	void delInputConnection(const std::string& portSrc,
+                                const std::string& dst,
+                                const std::string& portDst);
+        void delOutputConnection(const std::string& src,
+                                 const std::string& portSrc,
+				 const std::string& portDst);
+        void delInternalConnection(const std::string& src,
+                                   const std::string& portSrc,
+                                   const std::string& Model,
+                                   const std::string& portDst);
 
         bool existInputConnection(const std::string& portsrc,
                                   const std::string& dst,

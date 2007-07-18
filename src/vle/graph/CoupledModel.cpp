@@ -226,24 +226,61 @@ void CoupledModel::delInputConnection(const std::string& portSrc,
                                       Model* dst, const std::string& portDst)
 {
     AssertS(utils::DevsGraphError, dst);
+    AssertS(utils::DevsGraphError, dst != this);
 
-    delConnection(this, portSrc, dst, portDst);
+    ModelPortList& outs(getInternalInPort(portSrc));
+    outs.remove(dst, portDst);
+
+    ModelPortList& ins(dst->getInPort(portDst));
+    ins.remove(this, portSrc);
 }
 
 void CoupledModel::delOutputConnection(Model* src, const std::string & portSrc,
                                        const std::string & portDst)
 {
     AssertS(utils::DevsGraphError, src);
+    AssertS(utils::DevsGraphError, src != this);
+    
+    ModelPortList& outs(src->getOutPort(portSrc));
+    outs.remove(this, portDst);
 
-    delConnection(src, portSrc, this, portDst);
+    ModelPortList& ins(getInternalOutPort(portDst));
+    ins.remove(src, portSrc);
 }
 
 void CoupledModel::delInternalConnection(Model* src, const std::string& portSrc,
                                          Model* dst, const std::string& portDst)
 {
     AssertS(utils::DevsGraphError, src and dst);
+    AssertS(utils::DevsGraphError, src != this and dst != this);
+    
+    ModelPortList& outs(src->getOutPort(portSrc));
+    outs.remove(dst, portDst);
 
-    delConnection(src, portSrc, dst, portDst);
+    ModelPortList& ins(dst->getInPort(portDst));
+    ins.remove(src, portSrc);
+}
+
+void CoupledModel::delInputConnection(const std::string& portSrc,
+                                      const std::string& dst,
+                                      const std::string& portDst)
+{
+    delInputConnection(portSrc, getModel(dst), portDst);
+}
+
+void CoupledModel::delOutputConnection(const std::string& src,
+                                       const std::string& portSrc,
+                                       const std::string& portDst)
+{
+    delOutputConnection(getModel(src), portSrc, portDst);
+}
+
+void CoupledModel::delInternalConnection(const std::string& src,
+                                         const std::string& portSrc,
+                                         const std::string& dst,
+                                         const std::string& portDst)
+{
+    delInternalConnection(getModel(src), portSrc, getModel(dst), portDst);
 }
 
 void CoupledModel::delAllConnection(Model* m)
