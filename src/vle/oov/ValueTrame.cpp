@@ -28,7 +28,6 @@
 
 namespace vle { namespace oov {
 
-
 void ValueTrame::add(const std::string& simulator,
                      const std::string& parent,
                      const std::string& port,

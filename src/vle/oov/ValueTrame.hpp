@@ -75,7 +75,9 @@ namespace vle { namespace oov {
     class ValueTrame : public Trame
     {
     public:
-        ValueTrame(const std::string& time);
+        ValueTrame(const std::string& time) :
+            m_time(time)
+        { }
 
         virtual ~ValueTrame()
         { }

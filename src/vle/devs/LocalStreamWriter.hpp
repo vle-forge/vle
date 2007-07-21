@@ -26,11 +26,16 @@
 #define VLE_DEVS_LOCALSTREAMWRITER_HPP
 
 #include <vle/devs/StreamWriter.hpp>
+#include <vle/oov/LocalStreamReader.hpp>
 
 
 
 namespace vle { namespace devs {
 
+    /** 
+     * @brief Use a local communication to observe. LocalStreamWriter are just
+     * a reference to the oov::LocalStreamReader.
+     */
     class LocalStreamWriter : public StreamWriter
     {
     public:
@@ -41,13 +46,18 @@ namespace vle { namespace devs {
         virtual void open(const std::string& outputPlugin,
                           const std::string& outputType,
                           const std::string& outputLocation,
-                          const std::string& parameters);
+                          const std::string& parameters,
+                          const devs::Time& time);
 
         virtual void processNewObservable(Simulator* simulator,
-                                          const std::string& portname);
+                                          const std::string& portname,
+                                          const devs::Time& time,
+                                          const std::string& view);
 
         virtual void processRemoveObservable(Simulator* simulator,
-                                             const std::string& portname);
+                                             const std::string& portname,
+                                             const devs::Time& time,
+                                             const std::string& view);
 
         virtual void process(const StateEvent& event);
 

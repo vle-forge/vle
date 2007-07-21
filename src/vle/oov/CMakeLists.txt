@@ -8,12 +8,13 @@ LINK_DIRECTORIES(
 	${LIBXMLPP_LIBRARY_DIR})
 
 SET(OOV_CPP
-    DelObservableTrame.cpp NewObservableTrame.cpp ParameterTrame.cpp Plugin.cpp
-    StreamReader.cpp Trame.cpp ValueTrame.cpp)
+    DelObservableTrame.cpp LocalStreamReader.cpp NewObservableTrame.cpp
+    ParameterTrame.cpp Plugin.cpp StreamReader.cpp Trame.cpp ValueTrame.cpp)
 
 SET(OOV_HPP
-    DelObservableTrame.hpp NewObservableTrame.hpp ParameterTrame.hpp
-    Plugin.hpp StreamReader.hpp Trame.hpp ValueTrame.hpp)
+    DelObservableTrame.hpp LocalStreamReader.hpp NetStreamReader.hpp
+    NewObservableTrame.hpp ParameterTrame.hpp Plugin.hpp StreamReader.hpp
+    Trame.hpp ValueTrame.hpp)
 
 ADD_LIBRARY(vleoov SHARED ${OOV_CPP};${OOV_HPP})
 
@@ -26,8 +27,7 @@ TARGET_LINK_LIBRARIES(vleoov
 	vledata
 	vlevalue
 	vlegraph
-	vleoov
-	vlevpz)
+	vleoov)
 
 INSTALL(TARGETS vleoov DESTINATION ${VLE_LIBRARY_DIR})
 INSTALL(FILES ${OOV_HPP} DESTINATION ${VLE_INCLUDE_DIRS}/oov)

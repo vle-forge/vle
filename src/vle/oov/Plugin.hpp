@@ -52,7 +52,8 @@ namespace vle { namespace oov {
     class Plugin
     {
     public:
-        Plugin()
+        Plugin(const std::string& location) :
+            m_location(location)
         { }
 
         virtual ~Plugin()
@@ -94,14 +95,15 @@ namespace vle { namespace oov {
          * @brief Call when the simulation is finished.
          */
         virtual void close() = 0;
+
+    private:
+        std::string         m_location;
     };
-    
 
 
 #define DECLARE_OOV_PLUGIN(x) \
     extern "C" { vle::oov::Plugin* makeNewOovPlugin() \
         { return new x(); } }
-
 
 }} // namespace vle oov
 

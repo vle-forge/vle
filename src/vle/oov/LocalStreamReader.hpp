@@ -1,8 +1,8 @@
 /** 
- * @file ParameterTrame.cpp
+ * @file LocalStreamReader.hpp
  * @brief 
  * @author The vle Development Team
- * @date 2007-07-15
+ * @date 2007-07-21
  */
 
 /*
@@ -22,19 +22,36 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#include <vle/oov/ParameterTrame.hpp>
+#ifndef VLE_OOV_LOCALSTREAMREADER_HPP
+#define VLE_OOV_LOCALSTREAMREADER_HPP
+
+#include <vle/oov/StreamReader.hpp>
+
+
 
 namespace vle { namespace oov {
 
-void ParameterTrame::print(std::ostream& out) const
-{
-    if (not m_data.empty()) {
-        out << "<trame type=\"parameter\" date=\"" << m_time << "\" >"
-            << "<![CDATA[" << m_data << "]]>"
-            << "</trame>";
-    } else {
-        out << "<trame type=\"parameter\" date=\"" << m_time << "\" />";
-    }
-}
+    class LocalStreamReader : public StreamReader
+    {
+    public:
+        LocalStreamReader();
+
+        virtual ~LocalStreamReader();
+
+        virtual void init(const std::string& plugin,
+                          const std::string& location);
+
+        virtual void onParameter(const ParameterTrame& trame);
+
+        virtual void onNewObservable(const NewObservableTrame& trame);
+
+        virtual void onDelObservable(const DelObservableTrame& trame);
+
+        virtual void onValue(const ValueTrame& trame);
+        
+        virtual void onClose();
+    };
 
 }} // namespace vle oov
+
+#endif

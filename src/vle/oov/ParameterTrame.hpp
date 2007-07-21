@@ -23,7 +23,6 @@
  */
 
 #include <vle/oov/Trame.hpp>
-#include <vle/value/Value.hpp>
 
 
 
@@ -33,7 +32,7 @@ namespace vle { namespace oov {
     {
     public:
         ParameterTrame(const std::string& time,
-                       const value::Value& data) :
+                       const std::string& data) :
             m_time(time),
             m_data(data)
         { }
@@ -52,12 +51,12 @@ namespace vle { namespace oov {
         inline const std::string& time() const
         { return m_time; }
 
-        inline const value::Value data() const
+        inline const std::string& data() const
         { return m_data; }
 
     private:
         std::string     m_time;
-        value::Value    m_data;
+        std::string     m_data;
     };
 
 }} // namespace vle oov
