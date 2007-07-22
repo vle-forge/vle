@@ -1,5 +1,5 @@
 /** 
- * @file ParameterTrame.cpp
+ * @file DelObservableTrame.cpp
  * @brief 
  * @author The vle Development Team
  * @date 2007-07-15
@@ -22,19 +22,18 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#include <vle/oov/ParameterTrame.hpp>
+#include <vle/vpz/DelObservableTrame.hpp>
 
-namespace vle { namespace oov {
+namespace vle { namespace vpz {
 
-void ParameterTrame::print(std::ostream& out) const
+void DelObservableTrame::write(std::ostream& out) const
 {
-    if (not m_data.empty()) {
-        out << "<trame type=\"parameter\" date=\"" << m_time << "\" >"
-            << "<![CDATA[" << m_data << "]]>"
-            << "</trame>";
-    } else {
-        out << "<trame type=\"parameter\" date=\"" << m_time << "\" />";
-    }
+    out << "<trame type=\"new"
+        << "\" date=\"" << m_time
+        << "\" name=\"" << m_name
+        << "\" parent=\"" << m_parent
+        << "\" port=\"" << m_port
+        << "\" view=\"" << m_view << "\" />";
 }
 
-}} // namespace vle oov
+}} // namespace vle vpz

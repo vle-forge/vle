@@ -42,7 +42,7 @@ namespace vle { namespace vpz {
             DESTINATION, IN, OUT, INIT, STATE, PORT, DYNAMICS, DYNAMIC,
             EXPERIMENT, PROJECT, VIEWS, OBSERVABLES, OBSERVABLE, OBSERVABLEPORT,
             OUTPUTS, OUTPUT, VIEW, NOVLES, NOVLE, CONDITIONS, CONDITION, EOVS,
-            EOVCHILD, CLASSES, CLASS, REPLICAS, VPZ };
+            EOVCHILD, CLASSES, CLASS, REPLICAS, VPZ, TRAME, MODELTRAME };
 
         Base() { }
 
@@ -113,6 +113,8 @@ namespace vle { namespace vpz {
         inline bool isClass() const { return getType() == CLASS; }
         inline bool isReplicas() const { return getType() == REPLICAS; }
         inline bool isVpz() const { return getType() == VPZ; }
+        inline bool isTrame() const { return getType() == TRAME; }
+        inline bool isModelTrame() const { return getType() == MODELTRAME; }
 
 
         //
@@ -120,12 +122,14 @@ namespace vle { namespace vpz {
         //
 
 
+        /** 
+         * @brief Operator << for std::stream to help building trame.
+         * @param out the output where data are writed.
+         * @param tr trame base class.
+         * @return the std::ostream.
+         */
         friend std::ostream& operator<<(std::ostream& out, const Base& obj)
-        {
-            obj.write(out);
-            out << '\n';
-            return out;
-        }
+        { obj.write(out); return out; }
 
     };
 

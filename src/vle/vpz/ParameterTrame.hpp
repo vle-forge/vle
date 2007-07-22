@@ -22,15 +22,22 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#include <vle/oov/Trame.hpp>
+#ifndef VLE_VPZ_PARAMETERTRAME_HPP
+#define VLE_VPZ_PARAMETERTRAME_HPP
+
+#include <vle/vpz/Trame.hpp>
 
 
 
-namespace vle { namespace oov {
+namespace vle { namespace vpz {
 
     class ParameterTrame : public Trame
     {
     public:
+        ParameterTrame(const std::string& time) :
+            m_time(time)
+        { }
+
         ParameterTrame(const std::string& time,
                        const std::string& data) :
             m_time(time),
@@ -40,13 +47,19 @@ namespace vle { namespace oov {
         virtual ~ParameterTrame()
         { }
 
-        virtual void print(std::ostream& out) const;
+        virtual Base::type getType() const
+        { return Base::TRAME; }
+
+        virtual void write(std::ostream& out) const;
         
         //
         ///
         /// Get/Set functions.
         ///
         //
+
+        inline void setData(const std::string& data)
+        { m_data.assign(data); }
 
         inline const std::string& time() const
         { return m_time; }
@@ -59,4 +72,6 @@ namespace vle { namespace oov {
         std::string     m_data;
     };
 
-}} // namespace vle oov
+}} // namespace vle vpz
+
+#endif

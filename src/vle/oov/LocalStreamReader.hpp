@@ -41,13 +41,13 @@ namespace vle { namespace oov {
         virtual void init(const std::string& plugin,
                           const std::string& location);
 
-        virtual void onParameter(const ParameterTrame& trame);
+        virtual void onParameter(const vpz::ParameterTrame& trame);
 
-        virtual void onNewObservable(const NewObservableTrame& trame);
+        virtual void onNewObservable(const vpz::NewObservableTrame& trame);
 
-        virtual void onDelObservable(const DelObservableTrame& trame);
+        virtual void onDelObservable(const vpz::DelObservableTrame& trame);
 
-        virtual void onValue(const ValueTrame& trame);
+        virtual void onValue(const vpz::ValueTrame& trame);
         
         virtual void onClose();
     };

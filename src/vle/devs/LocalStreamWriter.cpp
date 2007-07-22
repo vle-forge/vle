@@ -24,10 +24,10 @@
 
 #include <vle/devs/LocalStreamWriter.hpp>
 #include <vle/devs/Simulator.hpp>
-#include <vle/oov/ParameterTrame.hpp>
-#include <vle/oov/NewObservableTrame.hpp>
-#include <vle/oov/DelObservableTrame.hpp>
-#include <vle/oov/ValueTrame.hpp>
+#include <vle/vpz/ParameterTrame.hpp>
+#include <vle/vpz/NewObservableTrame.hpp>
+#include <vle/vpz/DelObservableTrame.hpp>
+#include <vle/vpz/ValueTrame.hpp>
 
 
 
@@ -48,7 +48,7 @@ void LocalStreamWriter::open(const std::string& plugin,
                              const devs::Time& time)
 {
     m_reader.init(plugin, location);
-    m_reader.onParameter(oov::ParameterTrame(utils::to_string(time),
+    m_reader.onParameter(vpz::ParameterTrame(utils::to_string(time),
                                              parameters));
 }
 
@@ -57,7 +57,7 @@ void LocalStreamWriter::processNewObservable(Simulator* simulator,
                                              const devs::Time& time,
                                              const std::string& view)
 {
-    m_reader.onNewObservable(oov::NewObservableTrame(
+    m_reader.onNewObservable(vpz::NewObservableTrame(
             utils::to_string(time),
             simulator->getStructure()->getName(),
             std::string(),
@@ -70,7 +70,7 @@ void LocalStreamWriter::processRemoveObservable(Simulator* simulator,
                                                 const devs::Time& time,
                                                 const std::string& view)
 {
-    m_reader.onDelObservable(oov::DelObservableTrame(
+    m_reader.onDelObservable(vpz::DelObservableTrame(
             utils::to_string(time),
             simulator->getStructure()->getName(),
             std::string(),
@@ -80,12 +80,12 @@ void LocalStreamWriter::processRemoveObservable(Simulator* simulator,
 
 void LocalStreamWriter::process(const StateEvent& event)
 {
-    oov::ValueTrame tr(utils::to_string(event.getTime()));
+    vpz::ValueTrame tr(utils::to_string(event.getTime()));
     tr.add(event.getModel()->getStructure()->getName(),
            std::string(),
            event.getPortName(),
-           event.getViewName(),
-           event.getAttributeValue(event.getPortName()));
+           event.getViewName());
+    tr.add(event.getAttributeValue(event.getPortName()));
     m_reader.onValue(tr);
 }
 

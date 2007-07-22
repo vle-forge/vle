@@ -50,22 +50,22 @@ void LocalStreamReader::init(const std::string& plugin,
     }
 }
 
-void LocalStreamReader::onParameter(const ParameterTrame& trame)
+void LocalStreamReader::onParameter(const vpz::ParameterTrame& trame)
 {
     plugin()->onParameter(trame);
 }
 
-void LocalStreamReader::onNewObservable(const NewObservableTrame& trame)
+void LocalStreamReader::onNewObservable(const vpz::NewObservableTrame& trame)
 {
    plugin()->onNewObservable(trame); 
 }
 
-void LocalStreamReader::onDelObservable(const DelObservableTrame& trame)
+void LocalStreamReader::onDelObservable(const vpz::DelObservableTrame& trame)
 {
    plugin()->onDelObservable(trame); 
 }
 
-void LocalStreamReader::onValue(const ValueTrame& trame)
+void LocalStreamReader::onValue(const vpz::ValueTrame& trame)
 {
     plugin()->onValue(trame);
 }

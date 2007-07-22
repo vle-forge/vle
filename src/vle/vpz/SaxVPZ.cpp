@@ -27,6 +27,10 @@
 #include <vle/vpz/Structures.hpp>
 #include <vle/vpz/Model.hpp>
 #include <vle/vpz/Port.hpp>
+#include <vle/vpz/ValueTrame.hpp>
+#include <vle/vpz/ParameterTrame.hpp>
+#include <vle/vpz/NewObservableTrame.hpp>
+#include <vle/vpz/DelObservableTrame.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Socket.hpp>
@@ -573,6 +577,60 @@ void VpzStackSax::pop_translator(const std::string& cdata)
     novle->setData(cdata);
 }
 
+void VpzStackSax::push_trame(const AttributeList& att)
+{
+    AssertS(utils::SaxParserError, m_stack.empty());
+
+    std::string type(get_attribute < std::string >(att, "type"));
+    if (type == "value") {
+        m_stack.push(new ValueTrame(
+                get_attribute < std::string >(att, "date")));
+    } else if (type == "new") {
+        m_stack.push(new NewObservableTrame(
+                get_attribute < std::string >(att, "date"),
+                get_attribute < std::string >(att, "name"),
+                get_attribute < std::string >(att, "parent"),
+                get_attribute < std::string >(att, "port"),
+                get_attribute < std::string >(att, "view")));
+    } else if (type == "del") {
+        m_stack.push(new DelObservableTrame(
+                get_attribute < std::string >(att, "date"),
+                get_attribute < std::string >(att, "name"),
+                get_attribute < std::string >(att, "parent"),
+                get_attribute < std::string >(att, "port"),
+                get_attribute < std::string >(att, "view")));
+    } else if (type == "parameter") {
+        m_stack.push(new ParameterTrame(
+                get_attribute < std::string >(att, "date")));
+    } else if (type == "value") {
+        m_stack.push(new ValueTrame(
+                get_attribute < std::string >(att, "date")));
+    } else {
+        Throw(utils::SaxParserError, boost::format(
+                "Unknow trame named %1%") % type);
+    }
+}
+
+void VpzStackSax::pop_trame()
+{
+    AssertS(utils::SaxParserError, m_stack.top()->isTrame() or
+            m_stack.top()->isModelTrame());
+
+    m_trame = reinterpret_cast < Trame* >(m_stack.top());
+}
+
+void VpzStackSax::push_modeltrame(const AttributeList& att)
+{
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_stack.top()->isModelTrame());
+
+    reinterpret_cast < ValueTrame* >(m_stack.top())->add(
+        get_attribute < std::string >(att, "name"),
+        get_attribute < std::string >(att, "parent"),
+        get_attribute < std::string >(att, "port"),
+        get_attribute < std::string >(att, "view"));
+}
+
 vpz::Base* VpzStackSax::pop()
 {
     vpz::Base* top = m_stack.top();
@@ -581,6 +639,12 @@ vpz::Base* VpzStackSax::pop()
 }
 
 const vpz::Base* VpzStackSax::top() const
+{
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    return m_stack.top();
+}
+
+vpz::Base* VpzStackSax::top()
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
     return m_stack.top();
@@ -619,8 +683,12 @@ void VLESaxParser::on_start_document()
 void VLESaxParser::on_end_document()
 {
     if (m_isVPZ == false) {
-        if (not m_valuestack.get_results().empty()) {
-            m_isValue = true;
+        if (m_vpzstack.trame()) {
+            m_isTrame = true; 
+        } else {
+            if (not m_valuestack.get_results().empty()) {
+                m_isValue = true;
+            }
         }
     }
 }
@@ -705,6 +773,10 @@ void VLESaxParser::on_start_element(
         m_vpzstack.push_translators();
     } else if (name == "translator") {
         m_vpzstack.push_translator(att);
+    } else if (name == "trame") {
+        m_vpzstack.push_trame(att);
+    } else if (name == "modeltrame") {
+        m_vpzstack.push_modeltrame(att);
     } else {
         Throw(utils::SaxParserError,
               (boost::format("Unknow element %1%") % name));
@@ -774,6 +846,21 @@ void VLESaxParser::on_end_element(const Glib::ustring& name)
         if (m_vpzstack.top()->isView()) {
             m_vpzstack.pop();
         }
+    } else if (name == "trame") {
+        m_vpzstack.pop_trame();
+        if (not m_cdata.empty()) {
+            ParameterTrame* pt;
+            pt  = dynamic_cast < ParameterTrame* >(m_vpzstack.top());
+            if (pt) {
+                pt->setData(m_cdata);
+                m_cdata.clear();
+            }
+        }
+        m_vpzstack.pop();
+    } else if (name == "modeltrame") {
+        AssertS(utils::SaxParserError, m_vpzstack.top()->isModelTrame());
+        ValueTrame* tr = reinterpret_cast < ValueTrame* >(m_vpzstack.top());
+        tr->add(get_value(0));
     }
 }
 

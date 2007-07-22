@@ -1,5 +1,5 @@
 /** 
- * @file Trame.cpp
+ * @file NewObservableTrame.cpp
  * @brief 
  * @author The vle Development Team
  * @date 2007-07-15
@@ -22,7 +22,18 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-namespace vle { namespace oov {
+#include <vle/vpz/NewObservableTrame.hpp>
 
+namespace vle { namespace vpz {
 
-}} // namespace vle oov
+void NewObservableTrame::write(std::ostream& out) const
+{
+    out << "<trame type=\"new"
+        << "\" date=\"" << m_time
+        << "\" name=\"" << m_name
+        << "\" parent=\"" << m_parent
+        << "\" port=\"" << m_port
+        << "\" view=\"" << m_view << "\" />";
+}
+
+}} // namespace vle vpz

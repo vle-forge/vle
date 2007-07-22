@@ -37,6 +37,7 @@
 namespace vle { namespace vpz {
 
     class Vpz;
+    class Trame;
 
     typedef xmlpp::SaxParser::AttributeList AttributeList;
 
@@ -44,7 +45,8 @@ namespace vle { namespace vpz {
     {
     public:
         VpzStackSax(Vpz& vpz) :
-            m_vpz(vpz)
+            m_vpz(vpz),
+            m_trame(0)
         { }
 
         ~VpzStackSax() { }
@@ -80,12 +82,21 @@ namespace vle { namespace vpz {
         void push_translator(const AttributeList& att);
         void pop_translator(const std::string& cdata);
 
+        void push_trame(const AttributeList& att);
+        void pop_trame();
+        void push_modeltrame(const AttributeList& att);
+        void pop_modeltrame();
+
         value::Set& pop_condition_port();
         vpz::Base* pop();
         const vpz::Base* top() const;
+        vpz::Base* top();
 
         inline vpz::Vpz& vpz()
         { return m_vpz; }
+
+        inline Trame* trame() const
+        { return m_trame; }
 
         friend std::ostream& operator<<(std::ostream& out,
                                         const VpzStackSax& stack);
@@ -93,6 +104,7 @@ namespace vle { namespace vpz {
     private:
         std::stack < vpz::Base* >       m_stack;
         vpz::Vpz&                       m_vpz;
+        Trame*                          m_trame;
     };
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -152,6 +164,9 @@ namespace vle { namespace vpz {
         inline const vpz::Vpz& vpz() const
         { return m_vpz; }
 
+        inline Trame* trame() const
+        { return m_vpzstack.trame(); }
+
     private:
         /** 
          * @brief Delete all information from Sax parser like stack, etc. Use it
@@ -177,7 +192,7 @@ namespace vle { namespace vpz {
         ValueStackSax                   m_valuestack;
         Glib::ustring                   m_lastCharacters;
         Glib::ustring                   m_cdata;
-        vpz::Vpz&                       m_vpz;
+        Vpz&                            m_vpz;
 
         bool                            m_isValue;
         bool                            m_isVPZ;

@@ -25,16 +25,13 @@
 #ifndef VLE_OOV_STREAMREADER_HPP
 #define VLE_OOV_STREAMREADER_HPP
 
+#include <vle/oov/Plugin.hpp>
 #include <glibmm/module.h>
 #include <string>
 
-namespace vle { namespace oov {
 
-    class Plugin;
-    class ParameterTrame;
-    class NewObservableTrame;
-    class DelObservableTrame;
-    class ValueTrame;
+
+namespace vle { namespace oov {
 
     class StreamReader
     {
@@ -54,13 +51,13 @@ namespace vle { namespace oov {
         virtual void init(const std::string& plugin,
                           const std::string& location) = 0;
 
-        virtual void onParameter(const ParameterTrame& trame) = 0;
+        virtual void onParameter(const vpz::ParameterTrame& trame) = 0;
 
-        virtual void onNewObservable(const NewObservableTrame& trame) = 0;
+        virtual void onNewObservable(const vpz::NewObservableTrame& trame) = 0;
 
-        virtual void onDelObservable(const DelObservableTrame& trame) = 0;
+        virtual void onDelObservable(const vpz::DelObservableTrame& trame) = 0;
 
-        virtual void onValue(const ValueTrame& trame) = 0;
+        virtual void onValue(const vpz::ValueTrame& trame) = 0;
         
         virtual void onClose() = 0;
 
@@ -70,7 +67,7 @@ namespace vle { namespace oov {
         ///
         //
 
-        Plugin* plugin() const
+        inline Plugin* plugin() const
         { return m_plugin; }
 
     protected:

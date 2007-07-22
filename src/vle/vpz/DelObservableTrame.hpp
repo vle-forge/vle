@@ -1,5 +1,5 @@
 /** 
- * @file NewObservableTrame.hpp
+ * @file DelObservableTrame.hpp
  * @brief 
  * @author The vle Development Team
  * @date 2007-07-15
@@ -22,17 +22,17 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef VLE_OOV_NEWOBSERVABLETRAME_HPP
-#define VLE_OOV_NEWOBSERVABLETRAME_HPP
+#ifndef VLE_VPZ_DELOBSERVABLETRAME_HPP
+#define VLE_VPZ_DELOBSERVABLETRAME_HPP
 
-#include <vle/oov/Trame.hpp>
+#include <vle/vpz/Trame.hpp>
 
-namespace vle { namespace oov {
+namespace vle { namespace vpz {
 
-    class NewObservableTrame : public Trame
+    class DelObservableTrame : public Trame
     {
     public:
-        NewObservableTrame(const std::string& time,
+        DelObservableTrame(const std::string& time,
                            const std::string& name,
                            const std::string& parent,
                            const std::string& port,
@@ -44,11 +44,13 @@ namespace vle { namespace oov {
             m_view(view)
         { }
 
-        virtual ~NewObservableTrame()
+        virtual ~DelObservableTrame()
         { }
 
-        virtual void print(std::ostream& out) const;
+        virtual void write(std::ostream& out) const;
 
+        virtual Base::type getType() const
+        { return Base::TRAME; }
         //
         ///
         /// Get/Set functions.
@@ -78,6 +80,6 @@ namespace vle { namespace oov {
         std::string     m_view;
     };
 
-}} // namespace vle oov
+}} // namespace vle vpz
 
 #endif

@@ -121,6 +121,18 @@ namespace vle { namespace vpz {
          * @return value read from buffer.
          */
         static value::Value parse_value(const std::string& buffer);
+
+        /** 
+         * @brief Parse the buffer to find a value.
+         * 
+         * @param buffer the buffer to translate
+         * 
+         * @throw utils::SaxParserError if buffer is not a valid trame.
+         *
+         * @return a reference to the Trame read. You must manage the memory of
+         * this trame.
+         */
+        static Trame* parse_trame(const std::string& buffer);
         
         /** 
          * @brief Parse the buffer to find a list of values.

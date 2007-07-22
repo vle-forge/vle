@@ -22,15 +22,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef VLE_OOV_VALUETRAME_HPP
-#define VLE_OOV_VALUETRAME_HPP
+#ifndef VLE_VPZ_VALUETRAME_HPP
+#define VLE_VPZ_VALUETRAME_HPP
 
-#include <vle/oov/Trame.hpp>
+#include <vle/vpz/Trame.hpp>
 #include <vle/value/Value.hpp>
 
 
 
-namespace vle { namespace oov {
+namespace vle { namespace vpz {
 
     class ModelTrame
     {
@@ -38,14 +38,15 @@ namespace vle { namespace oov {
         ModelTrame(const std::string& simulator,
                    const std::string& parent,
                    const std::string& port,
-                   const std::string& view,
-                   const value::Value& value) :
+                   const std::string& view) :
             m_simulator(simulator),
             m_parent(parent),
             m_port(port),
-            m_view(view),
-            m_value(value)
+            m_view(view)
         { }
+
+        void setValue(const value::Value& value)
+        { m_value = value; }
 
         inline const std::string& simulator() const
         { return m_simulator; }
@@ -85,10 +86,14 @@ namespace vle { namespace oov {
         void add(const std::string& simulator,
                  const std::string& parent,
                  const std::string& port,
-                 const std::string& view,
-                 const value::Value& value);
+                 const std::string& view);
 
-        virtual void print(std::ostream& out) const;
+        void add(const value::Value& value);
+
+        virtual void write(std::ostream& out) const;
+
+        virtual Base::type getType() const
+        { return Base::MODELTRAME; }
 
         //
         ///
@@ -107,6 +112,6 @@ namespace vle { namespace oov {
         ModelTrameList  m_list;
     };
 
-}} // namespace vle oov
+}} // namespace vle vpz
 
 #endif

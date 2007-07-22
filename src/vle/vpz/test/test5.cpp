@@ -32,6 +32,10 @@
 #include <stdexcept>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/vpz/SaxVPZ.hpp>
+#include <vle/vpz/ValueTrame.hpp>
+#include <vle/vpz/ParameterTrame.hpp>
+#include <vle/vpz/NewObservableTrame.hpp>
+#include <vle/vpz/DelObservableTrame.hpp>
 #include <vle/value/Boolean.hpp>
 #include <vle/value/Integer.hpp>
 #include <vle/value/Double.hpp>
@@ -55,33 +59,34 @@ BOOST_AUTO_TEST_CASE(trame_parameter)
         "<![CDATA["
         "empty"
         "]]>\n"
-        " <set>\n"
         "</trame>";
 
-    oov::Trame& tr = vpz::Vpz::parse_trame(xml);
-    BOOST_CHECK(tr->is_parameter());
+    vpz::Trame* tr = vpz::Vpz::parse_trame(xml);
+    BOOST_CHECK(tr);
 
-    oov::ParameterTrame& ptr = to_parametertrame(tr);
-    BOOST_REQUIRE_EQUAL(ptr.time(), .33);
-    BOOST_REQUIRE_EQUAL(ptr.data, "empty");
+    vpz::ParameterTrame* ptr = dynamic_cast < vpz::ParameterTrame* >(tr);
+    BOOST_CHECK(ptr);
+    BOOST_REQUIRE_EQUAL(ptr->time(), "0.33");
+    BOOST_REQUIRE_EQUAL(ptr->data(), "empty");
 }
 
 BOOST_AUTO_TEST_CASE(trame_addobservable)
 {
     const char* xml =
         "<?xml version=\"1.0\"?>\n"
-        "<trame type=\"add\" date=\".33\" name=\"mdl\" parent=\"\" port=\"x\""
+        "<trame type=\"new\" date=\".33\" name=\"mdl\" parent=\"\" port=\"x\""
         " view=\"view1\" />";
 
-    oov::Trame& tr = vpz::Vpz::parse_trame(xml);
-    BOOST_CHECK(tr->is_addobservable());
+    vpz::Trame* tr = vpz::Vpz::parse_trame(xml);
+    BOOST_CHECK(tr);
 
-    oov::ParameterTrame& ptr = to_addobservabletrame(tr);
-    BOOST_REQUIRE_EQUAL(ptr.time(), .33);
-    BOOST_REQUIRE_EQUAL(ptr.name(), "mdl");
-    BOOST_REQUIRE_EQUAL(ptr.parent(), "");
-    BOOST_REQUIRE_EQUAL(ptr.port(), "x");
-    BOOST_REQUIRE_EQUAL(ptr.view(), "view1");
+    vpz::NewObservableTrame* ptr = dynamic_cast < vpz::NewObservableTrame*>(tr);
+    BOOST_CHECK(ptr);
+    BOOST_REQUIRE_EQUAL(ptr->time(), ".33");
+    BOOST_REQUIRE_EQUAL(ptr->name(), "mdl");
+    BOOST_REQUIRE_EQUAL(ptr->parent(), "");
+    BOOST_REQUIRE_EQUAL(ptr->port(), "x");
+    BOOST_REQUIRE_EQUAL(ptr->view(), "view1");
 }
 
 BOOST_AUTO_TEST_CASE(trame_delobservable)
@@ -91,13 +96,52 @@ BOOST_AUTO_TEST_CASE(trame_delobservable)
         "<trame type=\"del\" date=\".33\" name=\"mdl\" parent=\"\" port=\"x\""
         " view=\"view1\" />";
 
-    oov::Trame& tr = vpz::Vpz::parse_trame(xml);
-    BOOST_CHECK(tr->is_newobservable());
+    vpz::Trame* tr = vpz::Vpz::parse_trame(xml);
+    BOOST_CHECK(tr);
 
-    oov::ParameterTrame& ptr = to_newobservabletrame(tr);
-    BOOST_REQUIRE_EQUAL(ptr.time(), .33);
-    BOOST_REQUIRE_EQUAL(ptr.name(), "mdl");
-    BOOST_REQUIRE_EQUAL(ptr.parent(), "");
-    BOOST_REQUIRE_EQUAL(ptr.port(), "x");
-    BOOST_REQUIRE_EQUAL(ptr.view(), "view1");
+    vpz::DelObservableTrame* ptr = dynamic_cast < vpz::DelObservableTrame* >(tr);
+    BOOST_CHECK(ptr);
+    BOOST_REQUIRE_EQUAL(ptr->time(), ".33");
+    BOOST_REQUIRE_EQUAL(ptr->name(), "mdl");
+    BOOST_REQUIRE_EQUAL(ptr->parent(), "");
+    BOOST_REQUIRE_EQUAL(ptr->port(), "x");
+    BOOST_REQUIRE_EQUAL(ptr->view(), "view1");
+}
+
+BOOST_AUTO_TEST_CASE(trame_value)
+{
+    const char* xml =
+        "<?xml version=\"1.0\"?>\n"
+        "<trame type=\"value\" date=\".33\" >"
+        " <modeltrame name=\"n1\" parent=\"p1\" port=\"port\" view=\"view1\" >"
+        "  <set>"
+        "   <integer>1</integer>"
+        "   <set>"
+        "    <integer>2</integer>"
+        "    <integer>3</integer>"
+        "    <integer>4</integer>"
+        "   </set>"
+        "  </set>"
+        " </modeltrame>"
+        "</trame>";
+
+    vpz::Trame* tr = vpz::Vpz::parse_trame(xml);
+    BOOST_CHECK(tr);
+
+    vpz::ValueTrame* ptr = dynamic_cast < vpz::ValueTrame* >(tr);
+    BOOST_CHECK(ptr);
+    BOOST_REQUIRE_EQUAL(ptr->time(), ".33");
+    BOOST_REQUIRE_EQUAL(ptr->trames().size(), (unsigned int)1);
+
+    const vpz::ModelTrame& r(ptr->trames().front());
+    BOOST_REQUIRE_EQUAL(r.simulator(), "n1");
+    BOOST_REQUIRE_EQUAL(r.parent(), "p1");
+    BOOST_REQUIRE_EQUAL(r.port(), "port");
+    BOOST_REQUIRE_EQUAL(r.view(), "view1");
+
+    value::Value v = r.value();
+    BOOST_CHECK(v->isSet());
+
+    value::Set s1 = value::to_set(v);
+    BOOST_REQUIRE_EQUAL(s1->size(), (unsigned int)2);
 }

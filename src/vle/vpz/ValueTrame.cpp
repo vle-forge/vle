@@ -22,23 +22,29 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#include <vle/oov/ValueTrame.hpp>
+#include <vle/vpz/ValueTrame.hpp>
 
 
 
-namespace vle { namespace oov {
+namespace vle { namespace vpz {
 
 void ValueTrame::add(const std::string& simulator,
                      const std::string& parent,
                      const std::string& port,
-                     const std::string& view,
-                     const value::Value& value)
+                     const std::string& view)
 {
-    ModelTrame mdl(simulator, parent, port, view, value);
+    ModelTrame mdl(simulator, parent, port, view);
     m_list.push_back(mdl);
 }
 
-void ValueTrame::print(std::ostream& out) const
+void ValueTrame::add(const value::Value& value)
+{
+    Assert(utils::SaxParserError, not m_list.empty(),
+           "ValueTrame have not model trame.");
+    m_list.back().setValue(value);
+}
+
+void ValueTrame::write(std::ostream& out) const
 {
     out << "<trame type=\"value\" date=\"" << m_time << "\" >";
 
@@ -58,4 +64,4 @@ void ValueTrame::print(std::ostream& out) const
     out << "</trame>";
 }
 
-}} // namespace vle oov
+}} // namespace vle vpz

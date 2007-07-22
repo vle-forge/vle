@@ -91,6 +91,18 @@ value::Value Vpz::parse_value(const std::string& buffer)
     return sax.get_value(0);
 }
 
+Trame* Vpz::parse_trame(const std::string& buffer)
+{
+    Vpz vpz;
+    VLESaxParser sax(vpz);
+    sax.parse_memory(buffer);
+    
+    Assert(utils::InternalError, sax.is_trame(),
+           boost::format("The buffer [%1%] is not a trame.") % buffer);
+
+    return sax.trame();
+}
+
 std::vector < value::Value > Vpz::parse_values(const std::string& buffer)
 {
     Vpz vpz;

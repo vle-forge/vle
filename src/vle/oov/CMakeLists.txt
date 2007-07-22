@@ -8,13 +8,10 @@ LINK_DIRECTORIES(
 	${LIBXMLPP_LIBRARY_DIR})
 
 SET(OOV_CPP
-    DelObservableTrame.cpp LocalStreamReader.cpp NewObservableTrame.cpp
-    ParameterTrame.cpp Plugin.cpp StreamReader.cpp Trame.cpp ValueTrame.cpp)
+    LocalStreamReader.cpp Plugin.cpp StreamReader.cpp)
 
 SET(OOV_HPP
-    DelObservableTrame.hpp LocalStreamReader.hpp NetStreamReader.hpp
-    NewObservableTrame.hpp ParameterTrame.hpp Plugin.hpp StreamReader.hpp
-    Trame.hpp ValueTrame.hpp)
+    LocalStreamReader.hpp NetStreamReader.hpp Plugin.hpp StreamReader.hpp)
 
 ADD_LIBRARY(vleoov SHARED ${OOV_CPP};${OOV_HPP})
 

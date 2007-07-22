@@ -1,5 +1,5 @@
 /** 
- * @file Trame.hpp
+ * @file Trame.cpp
  * @brief 
  * @author The vle Development Team
  * @date 2007-07-15
@@ -22,36 +22,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef VLE_OOV_TRAME_HPP
-#define VLE_OOV_TRAME_HPP
+namespace vle { namespace vpz {
 
-#include <ostream>
-#include <string>
 
-namespace vle { namespace oov {
-
-    class Trame
-    {
-    public:
-        Trame()
-        { }
-
-        virtual ~Trame()
-        { }
-
-        virtual void print(std::ostream& out) const = 0;
-
-        /** 
-         * @brief Operator << for std::stream to help building trame.
-         * @param out the output where data are writed.
-         * @param tr trame base class.
-         * @return the std::ostream.
-         */
-        friend std::ostream& operator<<(std::ostream& out, const Trame& tr)
-        { tr.print(out); return out; }
-
-    };
-
-}} // namespace vle oov
-
-#endif
+}} // namespace vle vpz

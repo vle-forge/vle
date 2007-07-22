@@ -22,21 +22,21 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef VLE_OOV_PLUGIN_HPP
-#define VLE_OOV_PLUGIN_HPP
+#ifndef VLE_VPZ_PLUGIN_HPP
+#define VLE_VPZ_PLUGIN_HPP
 
-#include <vle/oov/Trame.hpp>
-#include <vle/oov/ParameterTrame.hpp>
-#include <vle/oov/NewObservableTrame.hpp>
-#include <vle/oov/DelObservableTrame.hpp>
-#include <vle/oov/ValueTrame.hpp>
+#include <vle/vpz/Trame.hpp>
+#include <vle/vpz/ParameterTrame.hpp>
+#include <vle/vpz/NewObservableTrame.hpp>
+#include <vle/vpz/DelObservableTrame.hpp>
+#include <vle/vpz/ValueTrame.hpp>
 
 
 
 namespace vle { namespace oov {
 
     /** 
-     * @brief The vle::oov::Plugin is a class to develop output steam plugins.
+     * @brief The vle::vpz::Plugin is a class to develop output steam plugins.
      * For instance, an output stream text (for gnuplot or R) and cairo (for
      * building vectorial image or bitmap). This class define a plugin.
      * @code
@@ -46,7 +46,7 @@ namespace vle { namespace oov {
      *   //
      * };
      *
-     * DECLARE_OOV_PLUGIN(Gnuplot);
+     * DECLARE_vpz_PLUGIN(Gnuplot);
      * @endcode
      */
     class Plugin
@@ -66,7 +66,7 @@ namespace vle { namespace oov {
          * 
          * @param trame
          */
-        virtual void onParameter(const ParameterTrame& trame) = 0;
+        virtual void onParameter(const vpz::ParameterTrame& trame) = 0;
 
         /** 
          * @brief Call when a new observable (the devs::Simulator and port name)
@@ -74,7 +74,7 @@ namespace vle { namespace oov {
          * 
          * @param trame 
          */
-        virtual void onNewObservable(const NewObservableTrame& trame) = 0;
+        virtual void onNewObservable(const vpz::NewObservableTrame& trame) = 0;
 
         /** 
          * @brief Call whe a observable (the devs::Simulator and port name) is
@@ -82,14 +82,14 @@ namespace vle { namespace oov {
          * 
          * @param trame 
          */
-        virtual void onDelObservable(const DelObservableTrame& trame) = 0;
+        virtual void onDelObservable(const vpz::DelObservableTrame& trame) = 0;
 
         /** 
          * @brief Call when an external event is send to the view.
          * 
          * @param trame 
          */
-        virtual void onValue(const ValueTrame& trame) = 0;
+        virtual void onValue(const vpz::ValueTrame& trame) = 0;
 
         /** 
          * @brief Call when the simulation is finished.
@@ -101,8 +101,8 @@ namespace vle { namespace oov {
     };
 
 
-#define DECLARE_OOV_PLUGIN(x) \
-    extern "C" { vle::oov::Plugin* makeNewOovPlugin() \
+#define DECLARE_vpz_PLUGIN(x) \
+    extern "C" { vle::vpz::Plugin* makeNewvpzPlugin() \
         { return new x(); } }
 
 }} // namespace vle oov
