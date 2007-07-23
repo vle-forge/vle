@@ -67,11 +67,13 @@ namespace vle { namespace vpz {
          * 
          * @param name the output name.
          * @param location the file name.
+         * @param plugin to use in steam.
          *
          * @throw Exception::Internal if name is empty.
          */
-        Output& addTextStream(const std::string& name,
-                              const std::string& location);
+        Output& addLocalStream(const std::string& name,
+                               const std::string& location,
+                               const std::string& plugin);
 
         /** 
          * @brief Add an output with the sdml stream information. The name is
@@ -79,41 +81,13 @@ namespace vle { namespace vpz {
          * 
          * @param name the output name.
          * @param location the file name.
+         * @param plugin to use in steam.
          *
          * @throw Exception::Internal if name is empty.
          */
-        Output& addSdmlStream(const std::string& name,
-                              const std::string& location);
-
-        /** 
-         * @brief Add an output with the eov stream information. The name and
-         * the plugin are obligatory,  the location defines host with syntax:
-         * host:port.
-         * 
-         * @param name the output name.
-         * @param plugin the plugin's name.
-         * @param location the host:port definition.
-         *
-         * @throw Exception::Internal if name or plugin are empty.
-         */
-        Output& addEovStream(const std::string& name,
-                             const std::string& plugin,
-                             const std::string& location);
-
-        /** 
-         * @brief Add an output with the eov stream information. The name and
-         * the plugin are obligatory,  the location defines host with syntax:
-         * host:port.
-         * 
-         * @param name the output name.
-         * @param plugin the plugin's name.
-         * @param location the host:port definition.
-         *
-         * @throw Exception::Internal if name or plugin are empty.
-         */
-        Output& addNetStream(const std::string& name,
-                             const std::string& plugin,
-                             const std::string& location);
+        Output& addDistantStream(const std::string& name,
+                                 const std::string& location,
+                                 const std::string& plugin);
 
         /** 
          * @brief Delete the specified output.

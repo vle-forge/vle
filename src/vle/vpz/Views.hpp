@@ -54,20 +54,14 @@ namespace vle { namespace vpz {
         ///
         //
 
-        Output& addTextStreamOutput(const std::string& name,
-                                    const std::string& location);
+        Output& addLocalStreamOutput(const std::string& name,
+                                     const std::string& location,
+                                     const std::string& plugin);
 
-        Output& addSdmlStreamOutput(const std::string& name,
-                                    const std::string& location);
+        Output& addDistantStreamOutput(const std::string& name,
+                                       const std::string& location,
+                                       const std::string& plugin);
 
-        Output& addEovStreamOutput(const std::string& name,
-                                   const std::string& plugin,
-                                   const std::string& location);
-        
-        Output& addNetStreamOutput(const std::string& name,
-                                   const std::string& plugin,
-                                   const std::string& location);
-        
         void delOutput(const std::string& name);
         
         inline const Outputs& outputs() const

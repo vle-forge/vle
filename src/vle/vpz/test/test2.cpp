@@ -293,11 +293,9 @@ BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
         "  <replicas seed=\"987456\" number=\"5\" />\n"
         "  <views>\n"
         "   <outputs>\n"
-        "    <output name=\"x\" type=\"local\" format=\"text\" />\n"
-        "    <output name=\"y\" format=\"sdml\" />\n"
+        "    <output name=\"x\" type=\"local\" format=\"local\" />\n"
         "    <output name=\"z\" format=\"eov\""
         "            plugin=\"xxx\" location=\"127.0.0.1:8888\" />\n"
-        "    <output name=\"a\" format=\"net\" plugin=\"zzz\" />\n"
         "   </outputs>\n"
         "   <observables>\n"
         "    <observable name=\"oo\" >\n"
@@ -333,28 +331,15 @@ BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
     {
         const vpz::Output& out(outputs.find("x")->second);
         BOOST_REQUIRE_EQUAL(out.name(), "x");
-        BOOST_REQUIRE_EQUAL(out.format(), vpz::Output::TEXT);
-    }
-    BOOST_REQUIRE(outputs.find("y") != outputs.end());
-    {
-        const vpz::Output& out(outputs.find("y")->second);
-        BOOST_REQUIRE_EQUAL(out.name(), "y");
-        BOOST_REQUIRE_EQUAL(out.format(), vpz::Output::SDML);
+        BOOST_REQUIRE_EQUAL(out.format(), vpz::Output::LOCAL);
     }
     BOOST_REQUIRE(outputs.find("z") != outputs.end());
     {
         const vpz::Output& out(outputs.find("z")->second);
         BOOST_REQUIRE_EQUAL(out.name(), "z");
-        BOOST_REQUIRE_EQUAL(out.format(), vpz::Output::EOV);
+        BOOST_REQUIRE_EQUAL(out.format(), vpz::Output::DISTANT);
         BOOST_REQUIRE_EQUAL(out.plugin(), "xxx");
         BOOST_REQUIRE_EQUAL(out.location(), "127.0.0.1:8888");
-    }
-    BOOST_REQUIRE(outputs.find("a") != outputs.end());
-    {
-        const vpz::Output& out(outputs.find("a")->second);
-        BOOST_REQUIRE_EQUAL(out.name(), "a");
-        BOOST_REQUIRE_EQUAL(out.format(), vpz::Output::NET);
-        BOOST_REQUIRE_EQUAL(out.plugin(), "zzz");
     }
 
 

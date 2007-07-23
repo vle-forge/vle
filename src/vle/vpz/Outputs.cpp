@@ -45,41 +45,23 @@ void Outputs::write(std::ostream& out) const
 
 }
 
-Output& Outputs::addTextStream(const std::string& name,
-                               const std::string& location)
+Output& Outputs::addLocalStream(const std::string& name,
+                                const std::string& location,
+                                const std::string& plugin)
 {
     Output o;
     o.setName(name);
-    o.setTextStream(location);
+    o.setLocalStream(location, plugin);
     return add(o);
 }
 
-Output& Outputs::addSdmlStream(const std::string& name,
-                               const std::string& location)
+Output& Outputs::addDistantStream(const std::string& name,
+                                  const std::string& location,
+                                  const std::string& plugin)
 {
     Output o;
     o.setName(name);
-    o.setSdmlStream(location);
-    return add(o);
-}
-
-Output& Outputs::addEovStream(const std::string& name,
-                              const std::string& plugin,
-                              const std::string& location)
-{
-    Output o;
-    o.setName(name);
-    o.setEovStream(plugin, location);
-    return add(o);
-}
-
-Output& Outputs::addNetStream(const std::string& name,
-                              const std::string& plugin,
-                              const std::string& location)
-{
-    Output o;
-    o.setName(name);
-    o.setNetStream(plugin, location);
+    o.setDistantStream(location, plugin);
     return add(o);
 }
 

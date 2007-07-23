@@ -52,30 +52,18 @@ void Views::write(std::ostream& out) const
     out << "</views>\n";
 }
 
-Output& Views::addTextStreamOutput(const std::string& name,
-                                   const std::string& location)
+Output& Views::addLocalStreamOutput(const std::string& name,
+                                    const std::string& location,
+                                    const std::string& plugin)
 {
-    return m_outputs.addTextStream(name, location);
+    return m_outputs.addLocalStream(name, location, plugin);
 }
 
-Output& Views::addSdmlStreamOutput(const std::string& name,
-                                   const std::string& location)
+Output& Views::addDistantStreamOutput(const std::string& name,
+                                      const std::string& location,
+                                      const std::string& plugin)
 {
-    return m_outputs.addSdmlStream(name, location);
-}
-
-Output& Views::addEovStreamOutput(const std::string& name,
-                                  const std::string& plugin,
-                                  const std::string& location)
-{
-    return m_outputs.addEovStream(name, plugin, location);
-}
-
-Output& Views::addNetStreamOutput(const std::string& name,
-                                  const std::string& plugin,
-                                  const std::string& location)
-{
-    return m_outputs.addNetStream(name, plugin, location);
+    return m_outputs.addDistantStream(name, location, plugin);
 }
 
 void Views::delOutput(const std::string& name)

@@ -32,6 +32,7 @@
 #include <vle/devs/StateEvent.hpp>
 #include <vle/devs/ModelFactory.hpp>
 #include <vle/devs/StreamWriter.hpp>
+#include <vle/devs/LocalStreamWriter.hpp>
 #include <vle/graph/Model.hpp>
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/graph/CoupledModel.hpp>
@@ -513,6 +514,42 @@ void Coordinator::startNetStream(const vpz::View& /* measure */,
 
 void Coordinator::startLocalStream()
 {
+    std::map < std::string, StreamWriter* > result;
+
+    vpz::Outputs outs(m_modelFactory->outputs());
+    for (vpz::Outputs::iterator it = outs.begin(); it != outs.end(); ++it) {
+        StreamWriter* stream;
+        switch (it->second.format()) {
+        case vpz::Output::LOCAL:
+            stream = new LocalStreamWriter();
+            break;
+        case vpz::Output::DISTANT:
+            Throw(utils::NotYetImplented, "Coordinator::startdistant"); 
+            break;
+        }
+        stream->open(it->second.plugin(), "", it->second.location(), 
+                     it->second.data(), m_currentTime); 
+        result[it->first] = stream;
+    }
+
+    vpz::Views views(m_modelFactory->views());
+    for (vpz::Views::iterator it = views.begin(); it != views.end(); ++it) {
+        StreamWriter* stream = result[it->second.output()];
+        View* obs = 0;
+        if (it->second.type() == vpz::View::TIMED) {
+            obs = new devs::TimedView(
+                it->second.name(), stream, it->second.timestep());
+        } else if (it->second.type() == vpz::View::EVENT) {
+            obs = new devs::EventView(it->second.name(), stream);
+        }
+        stream->setView(obs);
+        addView(obs);
+    }
+
+    
+
+    /*
+        stream->open(o.plugin(), file, o.location(), o.data());
     const vpz::Views& views(m_modelFactory->views());
     vpz::Views::const_iterator it;
     for (it = views.begin(); it != views.end(); ++it) {
@@ -525,7 +562,7 @@ void Coordinator::startLocalStream()
                              it->second.name()).str());
 
             stream = getStreamPlugin(o);
-            stream->open(o.plugin(), file, o.location(), o.data());
+            stream->open(
 
             View* obs = 0;
             if (it->second.type() == vpz::View::TIMED) {
@@ -537,7 +574,7 @@ void Coordinator::startLocalStream()
             stream->setView(obs);
             addView(obs);
         }
-    }
+    }*/
 }
 
 void Coordinator::buildViews()

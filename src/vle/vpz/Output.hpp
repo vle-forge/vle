@@ -40,12 +40,10 @@ namespace vle { namespace vpz {
     public:
         /** 
          * @brief Define the output format of the plugin.
-         * - TEXT: values are writing into the stream with a text format.
-         * - SDML: values are writing into the stream with a SDML format.
-         * - EOV: values are writing into the stream with a EOV format.
-         * - NET: values are writing into the stream with a NET format.
+         * - LOCAL: use a local communication for observations.
+         * - DISTANT: use a distant communication for observations using trame.
          */
-        enum Format { TEXT, SDML, EOV, NET };
+        enum Format { LOCAL, DISTANT };
 
         Output();
 
@@ -61,46 +59,24 @@ namespace vle { namespace vpz {
          * obligatory, the location defines a filename.
          * 
          * @param location the file name.
+         * @param plugin to use in output stream.
          *
          * @throw Exception::Internal if name is empty.
          */
-        void setTextStream(const std::string& location = std::string());
+        void setLocalStream(const std::string& location,
+                            const std::string& plugin);
 
         /** 
          * @brief Set the output with the sdml stream information. The name is
          * obligatory, the location defines a filename.
          * 
          * @param location the file name.
+         * @param plugin to use in output stream.
          *
          * @throw Exception::Internal if name is empty.
          */
-        void setSdmlStream(const std::string& location = std::string());
-
-        /** 
-         * @brief Set the output with the Eov stream information. The name and
-         * the plugin are obligatory,  the location defines host with syntax:
-         * host:port. It location is empty, location is initialised by ":8000".
-         * 
-         * @param plugin the plugin's name.
-         * @param location the host:port definition.
-         *
-         * @throw Exception::Internal if plugin is empty.
-         */
-        void setEovStream(const std::string& plugin,
-                          const std::string& location = std::string());
-
-        /** 
-         * @brief Set the output with the Net stream information. The name and
-         * the plugin are obligatory,  the location defines host with syntax:
-         * host:port. It location is empty, location is initialised by ":8000".
-         * 
-         * @param plugin the plugin's name.
-         * @param location the host:port definition.
-         *
-         * @throw Exception::Internal if plugin is empty.
-         */
-        void setNetStream(const std::string& plugin,
-                          const std::string& location = std::string());
+        void setDistantStream(const std::string& location,
+                              const std::string& plugin);
 
         /** 
          * @brief Set the output data to initialise the plugin. The data is
@@ -119,8 +95,7 @@ namespace vle { namespace vpz {
         { return m_format; }
 
         std::string streamformat() const
-        { return (m_format == TEXT ? "textstream" : m_format == SDML ?
-                  "sdmlstream" : m_format == NET ? "netstream" : "eovstream"); }
+        { return (m_format == LOCAL ? "local" : "distant"); }
 
         /** 
          * @brief Get the plugin of this Output. If format is not Output::Eov,

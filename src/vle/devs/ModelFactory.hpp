@@ -82,6 +82,13 @@ namespace vle { namespace devs {
         inline const vpz::Views& views() const
         { return mExperiment.views(); }
 
+        /** 
+         * @brief Return the reference to the list of outputs.
+         * @return A constant reference to the vpz::Outputs.
+         */
+        inline const vpz::Outputs& outputs() const
+        { return mExperiment.views().outputs(); }
+
         //
         ///
         /// Manage the ModelFactory cache ie. Atomic Model information of

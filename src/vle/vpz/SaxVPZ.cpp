@@ -438,29 +438,15 @@ void VpzStackSax::push_output(const AttributeList& att)
 
     std::string name(get_attribute < std::string >(att, "name"));
     std::string format(get_attribute < std::string >(att, "format"));
-    std::string location, plugin;
+    std::string plugin(get_attribute < std::string >(att, "plugin"));
+    std::string location(get_attribute < std::string >(att, "location"));
 
-    if (exist_attribute(att, "location")) {
-        location.assign(get_attribute < std::string >(att, "location"));
-    }
 
     Outputs& outs(m_vpz.project().experiment().views().outputs());
-    if (format == "text") {
-        outs.addTextStream(name, location);
-    } else if (format == "sdml") {
-        outs.addSdmlStream(name, location);
-    } else if (format == "eov") {
-        Assert(utils::SaxParserError, exist_attribute(att, "plugin"),
-               (boost::format("Outputs %1% is an eov outputs without plugin") %
-                name));
-        std::string plugin(get_attribute < std::string >(att, "plugin"));
-        outs.addEovStream(name, plugin, location);
-    } else if (format == "net") {
-        Assert(utils::SaxParserError, exist_attribute(att, "plugin"),
-               (boost::format("Outputs %1% is a net outputs without plugin") %
-                name));
-        std::string plugin(get_attribute < std::string >(att, "plugin"));
-        outs.addNetStream(name, plugin, location);
+    if (format == "local") {
+        outs.addLocalStream(name, location, plugin);
+    } else if (format == "distant") {
+        outs.addDistantStream(name, plugin, location);
     } else {
         Throw(utils::SaxParserError, (boost::format(
                     "Unknow format '%1%' for the output %2%") % format % name));

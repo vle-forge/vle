@@ -32,34 +32,8 @@ using namespace vle::utils;
 
 Output::Output()
 {
-    setTextStream();
+    setLocalStream("", "");
 }
-
-//void Output::init(xmlpp::Element* elt)
-//{
-//AssertI(elt);
-//AssertI(elt->get_name() == "OUTPUT");
-//
-//Glib::ustring format(xml::get_attribute(elt, "FORMAT"));
-//
-//if (format == "text") {
-//setTextStream(xml::get_attribute(elt, "LOCATION"));
-//} else if (format == "sdml") {
-//setSdmlStream(xml::get_attribute(elt, "LOCATION"));
-//} else if (format == "eov") {
-//setEovStream(xml::get_attribute(elt, "PLUGIN"),
-//xml::get_attribute(elt, "LOCATION"));
-//} else if (format == "net") {
-//setNetStream(xml::get_attribute(elt, "PLUGIN"),
-//xml::get_attribute(elt, "LOCATION"));
-//} else {
-//Throw(utils::ParseError, "Unknow output format");
-//}
-//
-//if (xml::has_children(elt)) {
-//m_xml.assign(xml::write_to_string(elt));
-//}
-//}
 
 void Output::write(std::ostream& out) const
 {
@@ -67,19 +41,15 @@ void Output::write(std::ostream& out) const
         << "\" ";
     
     switch (m_format) {
-    case Output::TEXT:
-        out << "format=\"text\"";
+    case Output::LOCAL:
+        out << "format=\"local\"";
         break;
-    case Output::SDML:
-        out << "format=\"sdml\"";
-        break;
-    case Output::EOV:
-        out << "format=\"eov\" plugin=\"" << m_plugin << "\"";
-        break;
-    case Output::NET:
-        out << "format=\"net\" plugin=\"" << m_plugin << "\"";
+    case Output::DISTANT:
+        out << "format=\"distant\"";
         break;
     }
+
+    out << " plugin=\"" << m_plugin << "\" ";
 
     if (not m_data.empty()) {
         out << ">" << m_data << "</output>\n";
@@ -88,36 +58,22 @@ void Output::write(std::ostream& out) const
     }
 }
 
-void Output::setTextStream(const std::string& location)
-{
-    m_location.assign(location);
-    m_format = Output::TEXT;
-}
-
-void Output::setSdmlStream(const std::string& location)
-{
-    m_location.assign(location);
-    m_format = Output::SDML;
-}
-
-void Output::setEovStream(const std::string& plugin,
-                          const std::string& location)
+void Output::setLocalStream(const std::string& location,
+                            const std::string& plugin)
 {
     AssertI(not plugin.empty());
-
-    m_format = Output::EOV;
-    m_location = (location.empty()) ? "localhost:8000" : location;
+    m_location.assign(location);
     m_plugin.assign(plugin);
+    m_format = Output::LOCAL;
 }
 
-void Output::setNetStream(const std::string& plugin,
-                          const std::string& location)
+void Output::setDistantStream(const std::string& location,
+                              const std::string& plugin)
 {
     AssertI(not plugin.empty());
-
-    m_format = Output::NET;
-    m_location = (location.empty()) ? "localhost:8000" : location;
+    m_location.assign(location);
     m_plugin.assign(plugin);
+    m_format = Output::DISTANT;
 }
 
 void Output::setData(const std::string& data)
