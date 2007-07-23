@@ -528,7 +528,7 @@ void Coordinator::startLocalStream()
             break;
         }
         
-        std::string file((boost::format("%1%_%2%") % m_experiment.name() %
+        std::string file((boost::format("%1%_%2%.dat") % m_experiment.name() %
                           it->second.name()).str());
         stream->open(it->second.plugin(), it->second.location(), file, 
                      it->second.data(), m_currentTime); 

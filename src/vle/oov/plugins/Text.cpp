@@ -91,13 +91,19 @@ void Text::onValue(const vpz::ValueTrame& trame)
 
 void Text::close()
 {
-    m_file << "# ";
-    std::map < std::string, int >::iterator it = m_columns.begin();
-    while (it != m_columns.end()) {
-        m_file << it->first;
-        it++;
+    m_file << "#\ttime\t";
+    std::vector < std::string > array(m_columns.size());
 
-        if (it != m_columns.end()) {
+    std::map < std::string, int >::iterator it = m_columns.begin();
+    for (it = m_columns.begin(); it != m_columns.end(); ++it) {
+        array[it->second] = it->first;
+    } 
+
+    std::vector < std::string >::iterator jt;
+    for (jt = array.begin(); jt != array.end(); ++jt) {
+        m_file << *jt;
+
+        if (jt + 1 != array.end()) {
             m_file << '\t';
         }
     }
