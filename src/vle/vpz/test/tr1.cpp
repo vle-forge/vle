@@ -60,7 +60,7 @@ void tr1::translate(const std::string& buffer)
 
     m_dynamics.add(Dynamic("dyn1"));
     m_conditions.add(Condition("cond1"));
-    m_views.addLocalStreamOutput("output1", "", "");
+    m_views.addLocalStreamOutput("output1", "", "plugin");
     m_views.addEventView("view1", "output1", "default");
     m_views.addObservable("obs1");
 }

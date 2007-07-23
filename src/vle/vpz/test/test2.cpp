@@ -293,8 +293,9 @@ BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
         "  <replicas seed=\"987456\" number=\"5\" />\n"
         "  <views>\n"
         "   <outputs>\n"
-        "    <output name=\"x\" type=\"local\" format=\"local\" />\n"
-        "    <output name=\"z\" format=\"eov\""
+        "    <output name=\"x\" format=\"local\" "
+        "            plugin=\"yyy\" location=\"TEMP\" />\n"
+        "    <output name=\"z\" format=\"distant\" "
         "            plugin=\"xxx\" location=\"127.0.0.1:8888\" />\n"
         "   </outputs>\n"
         "   <observables>\n"
@@ -325,7 +326,7 @@ BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
     const vpz::Views& views(experiment.views());
     
     const vpz::Outputs& outputs(views.outputs());
-    BOOST_REQUIRE(outputs.size() == 4);
+    BOOST_REQUIRE(outputs.size() == 2);
 
     BOOST_REQUIRE(outputs.find("x") != outputs.end());
     {

@@ -32,7 +32,6 @@ using namespace vle::utils;
 
 Output::Output()
 {
-    setLocalStream("", "");
 }
 
 void Output::write(std::ostream& out) const

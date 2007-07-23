@@ -441,12 +441,11 @@ void VpzStackSax::push_output(const AttributeList& att)
     std::string plugin(get_attribute < std::string >(att, "plugin"));
     std::string location(get_attribute < std::string >(att, "location"));
 
-
     Outputs& outs(m_vpz.project().experiment().views().outputs());
     if (format == "local") {
         outs.addLocalStream(name, location, plugin);
     } else if (format == "distant") {
-        outs.addDistantStream(name, plugin, location);
+        outs.addDistantStream(name, location, plugin);
     } else {
         Throw(utils::SaxParserError, (boost::format(
                     "Unknow format '%1%' for the output %2%") % format % name));

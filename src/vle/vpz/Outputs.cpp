@@ -50,6 +50,7 @@ Output& Outputs::addLocalStream(const std::string& name,
                                 const std::string& plugin)
 {
     Output o;
+
     o.setName(name);
     o.setLocalStream(location, plugin);
     return add(o);
