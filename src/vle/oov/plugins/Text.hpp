@@ -56,6 +56,7 @@ namespace vle { namespace oov { namespace plugin {
         std::vector < value::Value >    m_buffer;
         double                          m_time;
         std::ofstream                   m_file;
+        bool                            m_isstart;
 
 
         void flush(double trame_time);

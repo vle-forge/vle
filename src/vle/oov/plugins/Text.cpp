@@ -29,12 +29,14 @@
 namespace vle { namespace oov { namespace plugin {
 
 Text::Text(const std::string& location) :
-    Plugin(location)
+    Plugin(location),
+    m_time(-1.0),
+    m_isstart(false)
 {
     m_file.open(location.c_str());
     if (not m_file.is_open()) {
-        Throw(utils::InternalError, boost::format(
-                "Cannot open file %1%") % location);
+        Throw(utils::InternalError, (boost::format(
+                    "Cannot open file '%1%'") % location));
     }
 }
 
@@ -49,8 +51,6 @@ void Text::onParameter(const vpz::ParameterTrame& /* trame */)
 
 void Text::onNewObservable(const vpz::NewObservableTrame& trame)
 {
-    flush(utils::to_double(trame.time()));
-
     Assert(utils::InternalError, m_columns.find(trame.name()) == m_columns.end(),
            boost::format("Observable %1% already exist") % trame.name());
 
@@ -58,14 +58,22 @@ void Text::onNewObservable(const vpz::NewObservableTrame& trame)
     m_buffer.push_back(value::Value());
 }
 
-void Text::onDelObservable(const vpz::DelObservableTrame& trame)
+void Text::onDelObservable(const vpz::DelObservableTrame& /* trame */)
 {
-    flush(utils::to_double(trame.time()));
 }
 
 void Text::onValue(const vpz::ValueTrame& trame)
 {
-    flush(utils::to_double(trame.time()));
+    if (m_isstart) {
+        flush(utils::to_double(trame.time()));
+    } else {
+        if (m_time < .0) {
+            m_time = utils::to_double(trame.time());
+        } else {
+            flush(utils::to_double(trame.time()));
+            m_isstart = true;
+        }
+    }
 
     for (vpz::ModelTrameList::const_iterator it = trame.trames().begin();
          it != trame.trames().end(); ++it) {
@@ -99,6 +107,7 @@ void Text::close()
 void Text::flush(double trame_time)
 {
     if (trame_time != m_time) {
+        m_file << trame_time << '\t';
         std::vector < value::Value >::iterator it;
         for (it = m_buffer.begin(); it != m_buffer.end(); ++it) {
             if ((*it).get()) {
@@ -113,8 +122,8 @@ void Text::flush(double trame_time)
             (*it).reset();
         }
         m_file << '\n' << std::flush;
+        m_time = trame_time;
     }
-    m_time = trame_time;
 }
 
 }}} // namespace vle oov plugin

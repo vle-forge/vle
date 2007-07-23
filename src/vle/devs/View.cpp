@@ -50,7 +50,9 @@ StateEvent* View::addObservable(Simulator* model,
 
     if (not exist(model, portname)) {
         m_observableList.insert(
-           std::make_pair < Simulator*, std::string >(model, portname));
+            std::make_pair < Simulator*, std::string >(model, portname));
+        m_stream->processNewObservable(model, portname, currenttime,
+                                       getName());
         return new StateEvent(currenttime, model, m_name, portname);
     }
     return 0;
@@ -64,6 +66,8 @@ void View::finish()
 void View::removeObservable(Simulator* model)
 {
     m_observableList.erase(model);
+    m_stream->processNewObservable(model, "", 0.0,
+                                   getName()); // FIXME correct value
 }
 
 bool View::exist(Simulator* simulator, const std::string& portname) const

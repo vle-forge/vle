@@ -36,7 +36,8 @@ namespace vle { namespace oov {
     class StreamReader
     {
     public:
-        StreamReader()
+	StreamReader() :
+	    m_plugin(0)
         { }
 
         virtual ~StreamReader()
@@ -67,8 +68,7 @@ namespace vle { namespace oov {
         ///
         //
 
-        inline Plugin* plugin() const
-        { return m_plugin; }
+        Plugin* plugin();
 
     protected:
         void init_plugin(const std::string& plugin,
@@ -77,9 +77,21 @@ namespace vle { namespace oov {
     private:
         Plugin*     m_plugin;
 
+	/**
+	 * @brief Plugin factory is use to build reference to the
+	 * Plugin load dynamically from the dynamics libraries.
+	 *
+	 */
         class PluginFactory
         {
         public:
+	    /**
+	     * @brief Constructor to load plugin from pathname.
+	     * @param plugin the name of the plugin to load.
+	     * @param pathname the name of the path where the plugin is.
+	     * @throw utils::InternalError if the plugin does not exist
+	     * in the pathname.
+	     */
             PluginFactory(const std::string& plugin,
                           const std::string& pathname);
 

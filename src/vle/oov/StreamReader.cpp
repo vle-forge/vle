@@ -28,33 +28,48 @@
 
 namespace vle { namespace oov {
 
+Plugin* StreamReader::plugin()
+{
+    Assert(utils::InternalError, m_plugin,
+            "Plugin are not loaded and cannot respond to the StreamReader");
+
+    return m_plugin;
+}
+
 void StreamReader::init_plugin(const std::string& plugin,
                                const std::string& location)
 {
+    std::string err;
     try {
         PluginFactory pfd(plugin, utils::Path::path().getDefaultStreamDir());
         m_plugin = pfd.build(location);
+        return;
     } catch (const std::exception& edefault) {
-        try {
-            PluginFactory pfl(plugin, utils::Path::path().getUserStreamDir());
-            m_plugin = pfl.build(location);
-        } catch(const std::exception& euser) {
-            Throw(utils::InternalError, boost::format(
-                    "Cannot open plugin %1%. Error reported:\n%1%\n%2%") %
-                plugin % edefault.what() % euser.what());
-        }
+        err.assign(edefault.what());
+    }
+
+    try {
+        PluginFactory pfl(plugin, utils::Path::path().getUserStreamDir());
+        m_plugin = pfl.build(location);
+        return;
+    } catch(const std::exception& euser) {
+        Throw(utils::InternalError, boost::format(
+                "Cannot open plugin %1%. Error reported:\n%2%\n%3%") %
+            plugin % err % euser.what());
     }
 }
 
 StreamReader::PluginFactory::PluginFactory(const std::string& plugin,
-                            const std::string& pathname) :
+                                           const std::string& pathname) :
+    module__(0),
     plugin__(plugin)
 {
-    module__ = new Glib::Module(Glib::Module::build_path( pathname, plugin));
+    module__ = new Glib::Module(Glib::Module::build_path(pathname, plugin));
     if (not (*module__)) {
         Throw(utils::InternalError, boost::format(
                 "Error when building plugin from pathname %1%") % pathname);
     }
+    module__->make_resident();
 }
 
 StreamReader::PluginFactory::~PluginFactory()

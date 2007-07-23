@@ -30,7 +30,8 @@
 
 namespace vle { namespace oov {
 
-LocalStreamReader::LocalStreamReader()
+LocalStreamReader::LocalStreamReader() :
+  StreamReader()
 {
 }
 

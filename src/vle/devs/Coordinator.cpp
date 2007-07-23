@@ -527,7 +527,10 @@ void Coordinator::startLocalStream()
             Throw(utils::NotYetImplented, "Coordinator::startdistant"); 
             break;
         }
-        stream->open(it->second.plugin(), "", it->second.location(), 
+        
+        std::string file((boost::format("%1%_%2%") % m_experiment.name() %
+                          it->second.name()).str());
+        stream->open(it->second.plugin(), it->second.location(), file, 
                      it->second.data(), m_currentTime); 
         result[it->first] = stream;
     }
@@ -545,36 +548,6 @@ void Coordinator::startLocalStream()
         stream->setView(obs);
         addView(obs);
     }
-
-    
-
-    /*
-        stream->open(o.plugin(), file, o.location(), o.data());
-    const vpz::Views& views(m_modelFactory->views());
-    vpz::Views::const_iterator it;
-    for (it = views.begin(); it != views.end(); ++it) {
-        StreamWriter* stream = 0;
-        const vpz::Output& o(views.outputs().get(it->second.output()));
-
-        if (o.format() == vpz::Output::TEXT 
-            or o.format() == vpz::Output::SDML) {
-            std::string file((boost::format("%1%_%2%") % m_experiment.name() %
-                             it->second.name()).str());
-
-            stream = getStreamPlugin(o);
-            stream->open(
-
-            View* obs = 0;
-            if (it->second.type() == vpz::View::TIMED) {
-                obs = new devs::TimedView(
-                    it->second.name(), stream, it->second.timestep());
-            } else if (it->second.type() == vpz::View::EVENT) {
-                obs = new devs::EventView(it->second.name(), stream);
-            }
-            stream->setView(obs);
-            addView(obs);
-        }
-    }*/
 }
 
 void Coordinator::buildViews()
