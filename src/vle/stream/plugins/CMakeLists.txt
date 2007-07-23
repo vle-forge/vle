@@ -1,3 +1,0 @@
-ADD_SUBDIRECTORY(eovstream)
-ADD_SUBDIRECTORY(sdmlstream)
-ADD_SUBDIRECTORY(txtstream) 

@@ -78,6 +78,7 @@ namespace vle { namespace vpz {
     public:
         ValueTrame(const std::string& time) :
             m_time(time)
+            
         { }
 
         virtual ~ValueTrame()

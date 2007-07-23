@@ -101,9 +101,9 @@ namespace vle { namespace oov {
     };
 
 
-#define DECLARE_vpz_PLUGIN(x) \
-    extern "C" { vle::vpz::Plugin* makeNewvpzPlugin() \
-        { return new x(); } }
+#define DECLARE_OOV_PLUGIN(x) \
+    extern "C" { vle::oov::Plugin* makeNewOovPlugin(const std::string& location) \
+        { return new x(location); } }
 
 }} // namespace vle oov
 

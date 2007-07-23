@@ -1,0 +1,24 @@
+INCLUDE_DIRECTORIES(
+	${VLE_SOURCE_DIR}/src
+	${GLIBMM_INCLUDE_DIRS}
+	${LIBXMLPP_INCLUDE_DIRS})
+
+LINK_DIRECTORIES(
+	${GLIBMM_LIBRARY_DIRS}
+	${LIBXMLPP_LIBRARY_DIR})
+
+ADD_LIBRARY(textstream SHARED Text.cpp Text.hpp)
+
+TARGET_LINK_LIBRARIES(textstream
+	${GLIBMM_LIBRARIES}
+	${LIBXMLPP_LIBRARIES}
+	${GTHREAD_LIBRARIES}
+	vlegeometry
+	vleutils
+	vledata
+	vlevalue
+        vlegraph
+        vlevpz
+	vleoov)
+
+INSTALL(TARGETS textstream DESTINATION "${VLE_LIBRARY_DIRS}/stream")
