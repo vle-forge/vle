@@ -8,6 +8,19 @@ LINK_DIRECTORIES(
 	${LIBXMLPP_LIBRARY_DIR})
 
 ADD_LIBRARY(text SHARED Text.cpp Text.hpp)
+ADD_LIBRARY(default SHARED Default.cpp Default.hpp)
+
+TARGET_LINK_LIBRARIES(default
+	${GLIBMM_LIBRARIES}
+	${LIBXMLPP_LIBRARIES}
+	${GTHREAD_LIBRARIES}
+	vlegeometry
+	vleutils
+	vledata
+	vlevalue
+        vlegraph
+        vlevpz
+	vleoov)
 
 TARGET_LINK_LIBRARIES(text
 	${GLIBMM_LIBRARIES}
@@ -21,4 +34,5 @@ TARGET_LINK_LIBRARIES(text
         vlevpz
 	vleoov)
 
+INSTALL(TARGETS default DESTINATION "${VLE_LIBRARY_DIRS}/stream")
 INSTALL(TARGETS text DESTINATION "${VLE_LIBRARY_DIRS}/stream")

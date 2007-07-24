@@ -30,6 +30,7 @@
 #include <vle/vpz/NewObservableTrame.hpp>
 #include <vle/vpz/DelObservableTrame.hpp>
 #include <vle/vpz/ValueTrame.hpp>
+#include <boost/shared_ptr.hpp>
 
 
 
@@ -42,16 +43,23 @@ namespace vle { namespace oov {
      * @code
      * class Gnuplot : public Plugin
      * {
+     *   //
      *   // virtual functions. 
      *   //
      * };
      *
-     * DECLARE_vpz_PLUGIN(Gnuplot);
+     * DECLARE_OOV_PLUGIN(Gnuplot);
      * @endcode
      */
     class Plugin
     {
     public:
+        /** 
+         * @brief Default constructor of the Plugin.
+         * @param location this string represents the name of the default
+         * directory for a devs::LocalStreamWriter or a host:port:directory for
+         * a devs::DistantStreamWriter.
+         */
         Plugin(const std::string& location) :
             m_location(location)
         { }
@@ -96,9 +104,25 @@ namespace vle { namespace oov {
          */
         virtual void close() = 0;
 
+        /** 
+         * @brief Get the location provide at the constructor of this Plugin.
+         * @return A constant string to the location provided a the Plugin
+         * constructor. This string represent a directory for a
+         * devs::LocalStreamWriter or a host:port:directory for a
+         * devs::DistantStreamWriter.
+         */
+        inline const std::string& location() const
+        { return m_location; }
+
     private:
         std::string         m_location;
     };
+
+    /** 
+     * @brief This typedef is used by the StreamReader build factory to
+     * automatically destroy plugin at the end of the simulation.
+     */
+    typedef boost::shared_ptr < Plugin > PluginPtr;
 
 
 #define DECLARE_OOV_PLUGIN(x) \

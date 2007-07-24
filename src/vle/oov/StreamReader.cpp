@@ -28,9 +28,9 @@
 
 namespace vle { namespace oov {
 
-Plugin* StreamReader::plugin()
+PluginPtr StreamReader::plugin()
 {
-    Assert(utils::InternalError, m_plugin,
+    Assert(utils::InternalError, m_plugin.get(),
             "Plugin are not loaded and cannot respond to the StreamReader");
 
     return m_plugin;
@@ -77,7 +77,7 @@ StreamReader::PluginFactory::~PluginFactory()
     delete module__;
 }
 
-Plugin* StreamReader::PluginFactory::build(const std::string& location)
+PluginPtr StreamReader::PluginFactory::build(const std::string& location)
 {
     Plugin* call = 0;
     void*   makeNewOovPlugin = 0;
@@ -95,7 +95,8 @@ Plugin* StreamReader::PluginFactory::build(const std::string& location)
             % plugin__);
     }
 
-    return call;
+    PluginPtr plugin(call);
+    return plugin;
 }
 
 }} // namespace vle oov

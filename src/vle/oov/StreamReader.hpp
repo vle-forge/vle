@@ -26,6 +26,7 @@
 #define VLE_OOV_STREAMREADER_HPP
 
 #include <vle/oov/Plugin.hpp>
+#include <boost/shared_ptr.hpp>
 #include <glibmm/module.h>
 #include <string>
 
@@ -36,8 +37,7 @@ namespace vle { namespace oov {
     class StreamReader
     {
     public:
-	StreamReader() :
-	    m_plugin(0)
+	StreamReader()
         { }
 
         virtual ~StreamReader()
@@ -68,14 +68,14 @@ namespace vle { namespace oov {
         ///
         //
 
-        Plugin* plugin();
+        PluginPtr plugin();
 
     protected:
         void init_plugin(const std::string& plugin,
                          const std::string& location);
 
     private:
-        Plugin*     m_plugin;
+        PluginPtr   m_plugin;
 
 	/**
 	 * @brief Plugin factory is use to build reference to the
@@ -97,7 +97,7 @@ namespace vle { namespace oov {
 
             ~PluginFactory();
 
-            Plugin* build(const std::string& location);
+            PluginPtr build(const std::string& location);
 
         private:
             Glib::Module*   module__;
