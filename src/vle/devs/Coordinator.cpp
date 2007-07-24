@@ -524,7 +524,7 @@ void Coordinator::startLocalStream()
             stream = new LocalStreamWriter();
             break;
         case vpz::Output::DISTANT:
-            Throw(utils::NotYetImplented, "Coordinator::startdistant"); 
+            Throw(utils::NotYetImplemented, "Coordinator::startdistant"); 
             break;
         }
         
@@ -659,53 +659,6 @@ void Coordinator::processStateEvents(CompleteEventBagModel& bag)
         delete bag.topStateEvent();
         bag.popState();
     }
-}
-
-devs::StreamWriter* Coordinator::getStreamPlugin(const vpz::Output& o)
-{
-    DTRACE1(boost::format("getStreamPlugin: '%1%' '%2%'\n") % o.plugin() %
-            o.streamformat());
-
-    std::string file1(Glib::Module::build_path(
-            utils::Path::path().getDefaultStreamDir(), o.streamformat()));
-    Glib::Module* module = new Glib::Module(file1);
-
-    if (not (*module)) {
-        std::string err1(Glib::Module::get_last_error());
-        delete module;
-
-        std::string file2(Glib::Module::build_path(
-                utils::Path::path().getUserStreamDir(), o.streamformat()));
-        module = new Glib::Module(file2);
-
-        if (not (*module)) {
-            std::string err2(Glib::Module::get_last_error());
-            delete module;
-
-            Throw(utils::FileError, (boost::format(
-                        "Error opening stream plugin '%1%'\n"
-                        "- from '%2%' with error: %3%\n"
-                        "- from '%4%' with error: %5%") % o.streamformat() %
-                    file1 % err1 % file2 % err2).str());
-        }
-    }
-    module->make_resident();
-    devs::StreamWriter* call = 0;
-    void* makeNewStreamWriter = 0;
-
-    bool getSymbol = module->get_symbol("makeNewStreamWriter",
-                                        makeNewStreamWriter);
-    Assert(utils::FileError, getSymbol, boost::format(
-            "Error in module '%1%', function makeNewStream not found\n") %
-        o.plugin());
-
-    call = ((devs::StreamWriter*(*)())(makeNewStreamWriter))();
-    Assert(utils::FileError, call, boost::format(
-            "Error in module '%1%', function makeNewStream problem allocation "
-            "a new plugin: %1%\n") % o.plugin() %
-        Glib::Module::get_last_error());
-
-    return call;
 }
 
 }} // namespace vle devs

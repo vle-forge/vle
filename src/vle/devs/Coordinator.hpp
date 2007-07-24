@@ -299,17 +299,6 @@ namespace vle { namespace devs {
          */
         inline void updateCurrentTime(const Time& time)
         { m_currentTime = time; }
-
-        /** 
-         * @brief Build a new Stream plugin using specified output value.
-         * 
-         * @param o the output to get a new Stream.
-         * 
-         * @return a reference to the loaded plugin.
-         *
-         * @throw Exception::File if problem loading file.
-         */
-        StreamWriter* getStreamPlugin(const vpz::Output& o);
     };
 
 }} // namespace vle devs

@@ -108,10 +108,10 @@ namespace vle { namespace utils {
     /** 
      * @brief Throw to report an unimplemted feature.
      */
-    class NotYetImplented : public BaseError
+    class NotYetImplemented : public BaseError
     {
     public:
-        explicit NotYetImplented(const std::string& argv) :
+        explicit NotYetImplemented(const std::string& argv) :
             BaseError(argv)
         { }
     };

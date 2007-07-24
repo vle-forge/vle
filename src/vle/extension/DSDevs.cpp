@@ -764,7 +764,7 @@ bool DSDevs::addModel(const std::string& /* prefixModelName */,
              //}
          //}
 
-    Throw(utils::NotYetImplented, "addModel from class not allowed");
+    Throw(utils::NotYetImplemented, "addModel from class not allowed");
          //return true;
 }
 

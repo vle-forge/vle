@@ -126,12 +126,12 @@ std::string Model::getParentName() const
 
 void Model::delInputPortAndConnection(const std::string& /* name */)
 {
-    Throw(utils::NotYetImplented, "Model::delInputPortAndConnection");
+    Throw(utils::NotYetImplemented, "Model::delInputPortAndConnection");
 }
 
 void Model::delOutputPortAndConnection(const std::string& /* name */)
 {
-    Throw(utils::NotYetImplented, "Model::delInputPortAndConnection");
+    Throw(utils::NotYetImplemented, "Model::delInputPortAndConnection");
 }
 
 ModelPortList& Model::addInputPort(const std::string& name)

@@ -349,13 +349,13 @@ void CoupledModel::replace(Model* oldmodel, Model* newmodel)
 bool CoupledModel::hasConnection(Model* /* model */,
                                  const std::string& /* name */) const
 {
-    Throw(utils::NotYetImplented, "CoupledModel::hasConnection");
+    Throw(utils::NotYetImplemented, "CoupledModel::hasConnection");
     return false;
 }
 
 bool CoupledModel::hasConnectionProblem(const ModelList& /* lst */) const
 {
-    Throw(utils::NotYetImplented, "CoupledModel::hasConnectionProblem");
+    Throw(utils::NotYetImplemented, "CoupledModel::hasConnectionProblem");
     return false;
 }
 

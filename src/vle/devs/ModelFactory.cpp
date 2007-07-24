@@ -113,7 +113,7 @@ Simulator* ModelFactory::createModel(graph::AtomicModel* model,
         attachDynamics(sim, dyn, getPlugin(dyn.name()));
         break;
     case vpz::Dynamic::DISTANT:
-        Throw(utils::NotYetImplented, "Distant dynamics is not supported");
+        Throw(utils::NotYetImplemented, "Distant dynamics is not supported");
     }
 
     if (not condition.empty()) {
