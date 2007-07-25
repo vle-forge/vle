@@ -135,9 +135,9 @@ void ValueStackSax::push_on_vector_value(const value::Value& val)
 {
     if (not m_valuestack.empty()) {
         if (m_valuestack.top()->isSet()) {
-            value::to_set(m_valuestack.top())->addValue(val);
+            value::toSetValue(m_valuestack.top())->addValue(val);
         } else if (m_valuestack.top()->isMap()) {
-            value::to_map(m_valuestack.top())->addValue(
+            value::toMapValue(m_valuestack.top())->addValue(
                 m_lastkey, val);
         }
     } else {

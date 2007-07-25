@@ -142,6 +142,6 @@ BOOST_AUTO_TEST_CASE(trame_value)
     value::Value v = r.value();
     BOOST_CHECK(v->isSet());
 
-    value::Set s1 = value::to_set(v);
+    value::Set s1 = value::toSetValue(v);
     BOOST_REQUIRE_EQUAL(s1->size(), (unsigned int)2);
 }

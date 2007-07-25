@@ -66,16 +66,16 @@ BOOST_AUTO_TEST_CASE(value_bool)
     value::Value v;
     
     v = vpz::Vpz::parse_value(t1);
-    BOOST_CHECK(value::to_boolean(v)->boolValue() == true);
+    BOOST_CHECK(value::toBoolean(v) == true);
 
     v = vpz::Vpz::parse_value(t2);
-    BOOST_CHECK(value::to_boolean(v)->boolValue() == false);
+    BOOST_CHECK(value::toBoolean(v) == false);
 
     v = vpz::Vpz::parse_value(t3);
-    BOOST_CHECK(value::to_boolean(v)->boolValue() == true);
+    BOOST_CHECK(value::toBoolean(v) == true);
 
     v = vpz::Vpz::parse_value(t4);
-    BOOST_CHECK(value::to_boolean(v)->boolValue() == false);
+    BOOST_CHECK(value::toBoolean(v) == false);
 }
 
 BOOST_AUTO_TEST_CASE(value_integer)
@@ -94,18 +94,18 @@ BOOST_AUTO_TEST_CASE(value_integer)
     value::Value v;
 
     v = vpz::Vpz::parse_value(t1);
-    BOOST_CHECK(value::to_integer(v)->intValue() == 100);
+    BOOST_CHECK(value::toInteger(v) == 100);
 
     v = vpz::Vpz::parse_value(t2);
-    BOOST_CHECK(value::to_integer(v)->intValue() == -100);
+    BOOST_CHECK(value::toInteger(v) == -100);
 
     v = vpz::Vpz::parse_value(t3);
-    BOOST_CHECK(value::to_integer(v)->longValue() == std::numeric_limits < long
-                >::max());
+    BOOST_CHECK(value::toLong(v) ==
+                std::numeric_limits < long >::max());
 
     v = vpz::Vpz::parse_value(t4);
-    BOOST_CHECK(value::to_integer(v)->longValue() == std::numeric_limits < long
-                >::min());
+    BOOST_CHECK(value::toLong(v) == 
+                std::numeric_limits < long >::min());
 }
 
 BOOST_AUTO_TEST_CASE(value_double)
@@ -116,10 +116,10 @@ BOOST_AUTO_TEST_CASE(value_double)
     value::Value v;
 
     v = vpz::Vpz::parse_value(t1);
-    BOOST_CHECK_CLOSE(value::to_double(v)->doubleValue(), 100.5, 1);
+    BOOST_CHECK_CLOSE(value::toDouble(v), 100.5, 1);
 
     v = vpz::Vpz::parse_value(t2);
-    BOOST_CHECK_CLOSE(value::to_double(v)->doubleValue(), -100.5, 1);
+    BOOST_CHECK_CLOSE(value::toDouble(v), -100.5, 1);
 }
 
 BOOST_AUTO_TEST_CASE(value_string)
@@ -130,10 +130,10 @@ BOOST_AUTO_TEST_CASE(value_string)
     value::Value v;
 
     v = vpz::Vpz::parse_value(t1);
-    BOOST_CHECK(value::to_string(v)->stringValue() == "a b c d e f g h i j");
+    BOOST_CHECK(value::toString(v) == "a b c d e f g h i j");
 
     v = vpz::Vpz::parse_value(t2);
-    BOOST_CHECK(value::to_string(v)->stringValue() == "a\nb\tc\n");
+    BOOST_CHECK(value::toString(v) == "a\nb\tc\n");
 }
 
 BOOST_AUTO_TEST_CASE(value_set)
@@ -154,14 +154,14 @@ BOOST_AUTO_TEST_CASE(value_set)
     
     value::Set v;
     
-    v = value::to_set(vpz::Vpz::parse_value(t1));
-    BOOST_CHECK(value::to_string(v->getValue(1))->stringValue() == "test");
-    BOOST_CHECK(value::to_integer(v->getValue(0))->intValue() == 1);
+    v = value::toSetValue(vpz::Vpz::parse_value(t1));
+    BOOST_CHECK(value::toString(v->getValue(1)) == "test");
+    BOOST_CHECK(value::toInteger(v->getValue(0)) == 1);
 
-    v = value::to_set(vpz::Vpz::parse_value(t2));
-    BOOST_CHECK(value::to_integer(v->getValue(0))->intValue() == 1);
-    value::Set v2 = value::to_set(v->getValue(1));
-    BOOST_CHECK(value::to_string(v2->getValue(0))->stringValue() == "test");
+    v = value::toSetValue(vpz::Vpz::parse_value(t2));
+    BOOST_CHECK(value::toInteger(v->getValue(0)) == 1);
+    value::Set v2 = value::toSetValue(v->getValue(1));
+    BOOST_CHECK(value::toString(v2->getValue(0)) == "test");
 }
 
 BOOST_AUTO_TEST_CASE(value_map)
@@ -185,15 +185,15 @@ BOOST_AUTO_TEST_CASE(value_map)
 
     value::Map v;
     
-    v = value::to_map(vpz::Vpz::parse_value(t1));
-    BOOST_CHECK(value::to_integer(v->getValue("a"))->intValue() == 10);
+    v = value::toMapValue(vpz::Vpz::parse_value(t1));
+    BOOST_CHECK(value::toInteger(v->getValue("a")) == 10);
 
-    v = value::to_map(vpz::Vpz::parse_value(t2));
+    v = value::toMapValue(vpz::Vpz::parse_value(t2));
     value::Set s;
 
-    s = value::to_set(v->getValue("a"));
-    BOOST_CHECK(value::to_integer(s->getValue(0))->intValue() == 1);
-    BOOST_CHECK(value::to_string(s->getValue(1))->stringValue() == "test");
+    s = value::toSetValue(v->getValue("a"));
+    BOOST_CHECK(value::toInteger(s->getValue(0)) == 1);
+    BOOST_CHECK(value::toString(s->getValue(1)) == "test");
 }
 
 BOOST_AUTO_TEST_CASE(value_tuple)
@@ -205,7 +205,7 @@ BOOST_AUTO_TEST_CASE(value_tuple)
 
     value::Tuple v;
     
-    v = value::to_tuple(vpz::Vpz::parse_value(t1));
+    v = value::toTupleValue(vpz::Vpz::parse_value(t1));
     BOOST_REQUIRE_EQUAL(v->size(), (size_t)3);
     BOOST_CHECK_CLOSE(v->operator[](0), 1.0, 0.1);
     BOOST_CHECK_CLOSE(v->operator[](1), 2.0, 0.1);
@@ -221,7 +221,7 @@ BOOST_AUTO_TEST_CASE(value_table)
 
     value::Table v;
     
-    v = value::to_table(vpz::Vpz::parse_value(t1));
+    v = value::toTableValue(vpz::Vpz::parse_value(t1));
     BOOST_REQUIRE_EQUAL(v->width(), (value::TableFactory::index)2);
     BOOST_REQUIRE_EQUAL(v->height(), (value::TableFactory::index)3);
     BOOST_CHECK_CLOSE(v->get(0, 0), 1.0, 0.1);
@@ -241,6 +241,5 @@ BOOST_AUTO_TEST_CASE(value_xml)
 
     value::XML v;
     
-    v = value::to_xml(vpz::Vpz::parse_value(t1));
-    BOOST_REQUIRE_EQUAL(v->stringValue(), "test 1 2 1 2");
+    BOOST_REQUIRE_EQUAL(value::toXml(vpz::Vpz::parse_value(t1)), "test 1 2 1 2");
 }

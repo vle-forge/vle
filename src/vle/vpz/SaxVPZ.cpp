@@ -791,11 +791,11 @@ void VLESaxParser::on_end_element(const Glib::ustring& name)
     } else if (name == "set" or name == "map") {
         m_valuestack.pop_value();
     } else if (name == "tuple") {
-        value::Tuple tuple = value::to_tuple(m_valuestack.top_value());
+        value::Tuple tuple = value::toTupleValue(m_valuestack.top_value());
         tuple->fill(lastCharactersStored());
         m_valuestack.pop_value();
     } else if (name == "table") {
-        value::Table table = value::to_table(m_valuestack.top_value());
+        value::Table table = value::toTableValue(m_valuestack.top_value());
         table->fill(lastCharactersStored());
         m_valuestack.pop_value();
     } else if (name == "xml") {

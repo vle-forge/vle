@@ -260,22 +260,22 @@ value::Value CellDevs::getState(std::string const & p_name) const
     
 double CellDevs::getDoubleState(std::string const & p_name) const
 {
-  return (value::to_double(getState(p_name)))->doubleValue();
+  return (value::toDouble(getState(p_name)));
 }
 
 long CellDevs::getIntegerState(std::string const & p_name) const
 {
-  return (value::to_integer(getState(p_name)))->longValue();
+  return (value::toInteger(getState(p_name)));
 }
 
 bool CellDevs::getBooleanState(std::string const & p_name) const
 {
-  return (value::to_boolean(getState(p_name)))->boolValue();
+  return (value::toBoolean(getState(p_name)));
 }
 
 string CellDevs::getStringState(std::string const & p_name) const
 {
-  return (value::to_string(getState(p_name)))->toString();
+  return (value::toString(getState(p_name)));
 }
 
 value::Value CellDevs::getNeighbourState(std::string const & p_neighbourName,
@@ -296,29 +296,25 @@ value::Value CellDevs::getNeighbourState(std::string const & p_neighbourName,
 double CellDevs::getDoubleNeighbourState(std::string const & p_neighbourName,
 					 std::string const & p_stateName) const
 {
-  return value::to_double(getNeighbourState(p_neighbourName,p_stateName))->
-    doubleValue();
+  return value::toDouble(getNeighbourState(p_neighbourName,p_stateName));
 }
 
 long CellDevs::getIntegerNeighbourState(std::string const & p_neighbourName,
 					std::string const & p_stateName) const
 {
-  return value::to_integer(getNeighbourState(p_neighbourName,p_stateName))->
-    longValue();
+  return value::toInteger(getNeighbourState(p_neighbourName,p_stateName));
 }
 
 bool CellDevs::getBooleanNeighbourState(std::string const & p_neighbourName,
 					std::string const & p_stateName) const
 {
-  return value::to_boolean(getNeighbourState(p_neighbourName,p_stateName))->
-    boolValue();
+  return value::toBoolean(getNeighbourState(p_neighbourName,p_stateName));
 }
 
 string CellDevs::getStringNeighbourState(std::string const & p_neighbourName,
 					 std::string const & p_stateName) const
 {
-  return value::to_string(getNeighbourState(p_neighbourName,p_stateName))->
-    toString();
+  return value::toString(getNeighbourState(p_neighbourName,p_stateName));
 }
 
 unsigned int CellDevs::getNeighbourStateNumber() const
@@ -339,7 +335,7 @@ unsigned int CellDevs::getBooleanNeighbourStateNumber(std::string const & p_stat
   while (it != m_neighbourState.end()) {
     value::Value v_value = it->second.find(p_stateName)->second;
     
-    if (value::to_boolean(v_value)->boolValue() == p_value)
+    if (value::toBoolean(v_value) == p_value)
       v_counter++;
     it++;
   }
@@ -359,7 +355,7 @@ unsigned int CellDevs::getIntegerNeighbourStateNumber(std::string const & p_stat
   while (it != m_neighbourState.end()) {
     value::Value v_value = it->second.find(p_stateName)->second;
     
-    if (value::to_integer(v_value)->longValue() == p_value)
+    if (value::toInteger(v_value) == p_value)
       v_counter++;
     it++;
   }
@@ -468,14 +464,14 @@ void CellDevs::processInitEvents(const InitEventList& event)
     value::Value value = it->second;
 
     if (name == "Delay")
-      setDelay(value::to_double(value)->doubleValue());
+      setDelay(value::toDouble(value));
     else
       if (name == "Neighbourhood") {
-	value::Set set = value::to_set(value);
+	value::Set set = value::toSetValue(value);
 	value::SetFactory::VectorValueConstIt it2 = set->begin();
 	
 	while (it2 != set->end()) {
-	  std::string neighbour = vle::value::to_string(*it2)->stringValue();
+	  std::string neighbour = vle::value::toString(*it2);
 	  
 	  m_neighbourPortList.push_back(neighbour);
 	  ++it2;

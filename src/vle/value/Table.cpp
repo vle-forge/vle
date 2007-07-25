@@ -5,8 +5,7 @@
  */
 
 /*
- * Copyright (c) 2004, 2005 The vle Development Team
- *
+ * Copyright (C) 2003-2007 - The vle Development Team
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -19,11 +18,12 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
 #include <vle/value/Table.hpp>
+
+
 
 namespace vle { namespace value {
 
@@ -137,6 +137,20 @@ std::string TableFactory::toXML() const
     }
     s += "</table>";
     return s;
+}
+
+Table toTableValue(const Value& value)
+{
+    Assert(utils::InternalError, value->getType() == ValueBase::TABLE,
+           "Value is not a Table");
+    return boost::static_pointer_cast < TableFactory >(value);
+}
+
+const TableFactory::TableValue& toTable(const Value& value)
+{
+    Assert(utils::InternalError, value->getType() == ValueBase::TABLE,
+           "Value is not a Table");
+    return boost::static_pointer_cast < TableFactory >(value)->getValue();
 }
 
 }} // namespace vle value

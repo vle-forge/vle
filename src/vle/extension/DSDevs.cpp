@@ -592,15 +592,15 @@ bool DSDevs::processChangeConnection(const value::Map& val)
 bool DSDevs::processBag(const value::Map& val)
 {
     value::Value valuebag(val->getValue("bag"));
-    value::Set bag = value::to_set(valuebag);
+    value::Set bag = value::toSetValue(valuebag);
     bool result = true;
 
     value::SetFactory::VectorValue& vv(bag->getValue());
     for (value::SetFactory::VectorValueIt it = vv.begin();
          it != vv.end(); ++it) {
-        value::Map msg = to_map(*it);
+        value::Map msg = value::toMapValue(*it);
         value::Value msgaction = msg->getValue("action");
-        value::String straction = value::to_string(msgaction);
+        value::String straction = value::toStringValue(msgaction);
 
         Assert(utils::InternalError, straction, "No correct action message.");
 

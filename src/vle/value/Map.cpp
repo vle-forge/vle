@@ -5,8 +5,7 @@
  */
 
 /*
- * Copyright (c) 2005 The vle Development Team
- *
+ * Copyright (C) 2003-2007 - The vle Development Team
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -19,8 +18,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
 #include <vle/value/Map.hpp>
@@ -29,6 +27,8 @@
 #include <vle/value/Integer.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Boolean.hpp>
+
+
 
 namespace vle { namespace value {
 
@@ -75,44 +75,37 @@ Value MapFactory::getValue(const std::string& name) const
 
 const std::string& MapFactory::getStringValue(const std::string& name) const
 {
-    Value val = getValue(name);
-    return to_string(val)->stringValue();
+    return value::toString(getValue(name));
 }
     
 bool MapFactory::getBooleanValue(const std::string& name) const
 {
-    Value val = getValue(name);
-    return to_boolean(val)->boolValue();
+    return value::toBoolean(getValue(name));
 }
     
 long MapFactory::getLongValue(const std::string& name) const
 {
-    Value val = getValue(name);
-    return to_integer(val)->longValue();
+    return value::toLong(getValue(name));
 }
 
 int MapFactory::getIntValue(const std::string& name) const
 {
-    Value val = getValue(name);
-    return to_integer(val)->intValue();
+    return value::toInteger(getValue(name));
 }
     
 double MapFactory::getDoubleValue(const std::string& name) const
 {
-    Value val = getValue(name);
-    return to_double(val)->doubleValue();
+    return value::toDouble(getValue(name));
 }
     
 Map MapFactory::getMapValue(const std::string& name) const
 {
-    Value val = getValue(name);
-    return to_map(val);
+    return value::toMapValue(getValue(name));
 }
     
 Set MapFactory::getSetValue(const std::string& name) const
 {
-    Value val = getValue(name);
-    return to_set(val);
+    return value::toSetValue(getValue(name));
 }
 
 void MapFactory::clear()
@@ -173,6 +166,20 @@ std::string MapFactory::toXML() const
     }
     s += "</map>";
     return s;
+}
+
+Map toMapValue(const Value& value)
+{
+    Assert(utils::InternalError, value->getType() == ValueBase::MAP,
+           "Value is not a Map");
+    return boost::static_pointer_cast < MapFactory >(value);
+}
+
+const MapFactory::MapValue& toMap(const Value& value)
+{
+    Assert(utils::InternalError, value->getType() == ValueBase::MAP,
+           "Value is not a Map");
+    return boost::static_pointer_cast < MapFactory >(value)->getValue();
 }
 
 }} // namespace vle value

@@ -5,8 +5,7 @@
  */
 
 /*
- * Copyright (c) 2004, 2005 The vle Development Team
- *
+ * Copyright (C) 2003-2007 - The vle Development Team
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -19,8 +18,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
 #ifndef UTILS_VALUE_TABLE_HPP
@@ -28,6 +26,8 @@
 
 #include <vle/value/Value.hpp>
 #include <boost/multi_array.hpp>
+
+
 
 namespace vle { namespace value {
 
@@ -103,6 +103,10 @@ namespace vle { namespace value {
         index           m_width;
         index           m_height;
     };
+
+    Table toTableValue(const Value& value);
+
+    const TableFactory::TableValue& toTable(const Value& value);
 
 }} // namespace vle value
 #endif

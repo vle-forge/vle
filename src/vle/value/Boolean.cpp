@@ -5,8 +5,7 @@
  */
 
 /*
- * Copyright (c) 2004, 2005 The vle Development Team
- *
+ * Copyright (C) 2003-2007 - The vle Development Team
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -19,11 +18,12 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
 #include <vle/value/Boolean.hpp>
+
+
 
 namespace vle { namespace value {
 
@@ -59,6 +59,20 @@ std::string BooleanFactory::toXML() const
 	return "<boolean>true</boolean>";
     else
 	return "<boolean>false</boolean>";
+}
+
+Boolean toBooleanValue(const Value& value)
+{
+    Assert(utils::InternalError, value->getType() == ValueBase::BOOLEAN,
+           "Value is not a Boolean");
+    return boost::static_pointer_cast < BooleanFactory >(value);
+}
+
+bool toBoolean(const Value& value)
+{
+    Assert(utils::InternalError, value->getType() == ValueBase::BOOLEAN,
+           "Value is not a Boolean");
+    return boost::static_pointer_cast < BooleanFactory >(value)->boolValue();
 }
 
 }} // namespace vle value

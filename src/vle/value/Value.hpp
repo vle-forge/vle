@@ -5,8 +5,7 @@
  */
 
 /*
- * Copyright (c) 2004, 2005 The vle Development Team
- *
+ * Copyright (C) 2003-2007 - The vle Development Team
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -19,8 +18,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
 #ifndef UTILS_VALUE_VALUE_HPP
@@ -31,6 +29,8 @@
 #include <boost/shared_ptr.hpp>
 #include <libxml++/libxml++.h>
 #include <vle/utils/Debug.hpp>
+
+
 
 namespace vle {
  
@@ -161,66 +161,7 @@ namespace vle {
             inline bool isXML() const
             { return getType() == ValueBase::XMLTYPE; }
 
-
-            //
-            //
-            // Statical Function to help develpment 
-            //
-            //
-
-            /**
-             * Build values in parsing root XML node. This function is recursive
-             * with the Set value. For example,
-             *
-             * @code
-             * <MY_TAG>
-             *  <DOUBLE VALUE="1.0" />
-             *  <DOUBLE VALUE="4.0" />
-             * </MY_TAG>
-             * @endcode
-             *
-             * @param root the parent node of elements to parse.
-             * @return 0 if error, a vector of new Value on success.
-             */
-            static std::vector < Value > getValues(xmlpp::Element* root);
-
-            /**
-             * Build a value in parsing root XML node. This function is
-             * recursive with the Set value. For example,
-             *
-             * @code
-             * <DOUBLE VALUE="1.0" />
-             * @endcode
-             *
-             * @param root the node element to parse.
-             * @return 0 if error, a new Value on success.
-             */
-            static Value getValue(xmlpp::Element* root);
-
-            /**
-             * Delete all the value contains in Vector.
-             *
-             * @param vals vector values to delete.
-             */
-            static void cleanValues(std::vector < Value >& vals);
-
-            /**
-             * @return true if the node is a complex value like Set, false if it
-             * simple value like String, Boolean, Integer, Double and if an
-             * error occured.
-             */
-            static bool isComplex(xmlpp::Element* root);
         };
-
-        Boolean to_boolean(Value v);
-        Integer to_integer(Value v);
-        String to_string(Value v);
-        Double to_double(Value v);
-        Map to_map(Value v);
-        Set to_set(Value v);
-        Tuple to_tuple(Value v);
-        Table to_table(Value v);
-        XML to_xml(Value v);
 
     } // namespace value
 

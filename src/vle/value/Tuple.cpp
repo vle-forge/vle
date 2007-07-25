@@ -5,8 +5,7 @@
  */
 
 /*
- * Copyright (c) 2004, 2005 The vle Development Team
- *
+ * Copyright (C) 2003-2007 - The vle Development Team
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -19,14 +18,15 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
 #include <vle/value/Tuple.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
+
+
 
 namespace vle { namespace value {
 
@@ -108,6 +108,20 @@ std::string TupleFactory::toXML() const
     }
     s += "</tuple>";
     return s;
+}
+
+Tuple toTupleValue(const Value& value)
+{
+    Assert(utils::InternalError, value->getType() == ValueBase::TUPLE,
+           "Value is not a Tuple");
+    return boost::static_pointer_cast < TupleFactory >(value);
+}
+
+const TupleFactory::TupleValue& toTuple(const Value& value)
+{
+    Assert(utils::InternalError, value->getType() == ValueBase::TUPLE,
+           "Value is not a Tuple");
+    return boost::static_pointer_cast < TupleFactory >(value)->getValue();
 }
 
 }} // namespace vle value

@@ -258,28 +258,28 @@ BOOST_AUTO_TEST_CASE(experiment_vpz)
     
     const vpz::Condition& cnd1(cnds.get("cond1"));
     set = cnd1.getSetValues("init1");
-    real = value::to_double(set->getValue(0));
+    real = value::toDoubleValue(set->getValue(0));
     BOOST_REQUIRE_EQUAL(real->doubleValue(), 123.);
-    integer = value::to_integer(set->getValue(1));
+    integer = value::toIntegerValue(set->getValue(1));
     BOOST_REQUIRE_EQUAL(integer->intValue(), 1);
 
     set = cnd1.getSetValues("init2");
-    real = value::to_double(set->getValue(0));
+    real = value::toDoubleValue(set->getValue(0));
     BOOST_REQUIRE_EQUAL(real->doubleValue(), 456.);
-    integer = value::to_integer(set->getValue(1));
+    integer = value::toIntegerValue(set->getValue(1));
     BOOST_REQUIRE_EQUAL(integer->intValue(), 2);
 
     const vpz::Condition& cnd2(cnds.get("cond2"));
     set = cnd2.getSetValues("init3");
-    real = value::to_double(set->getValue(0));
+    real = value::toDoubleValue(set->getValue(0));
     BOOST_REQUIRE_EQUAL(real->doubleValue(), .123);
-    integer = value::to_integer(set->getValue(1));
+    integer = value::toIntegerValue(set->getValue(1));
     BOOST_REQUIRE_EQUAL(integer->intValue(), -1);
     
     set = cnd2.getSetValues("init4");
-    real = value::to_double(set->getValue(0));
+    real = value::toDoubleValue(set->getValue(0));
     BOOST_REQUIRE_EQUAL(real->doubleValue(), .456);
-    integer = value::to_integer(set->getValue(1));
+    integer = value::toIntegerValue(set->getValue(1));
     BOOST_REQUIRE_EQUAL(integer->intValue(), -2);
 }
 

@@ -450,16 +450,16 @@ Time qss2::getTimeAdvance()
 void qss2::processInitEvents(const InitEventList& event)
 {
     const value::Value& precision = event.get("precision");
-    m_precision = (value::to_double(precision))->doubleValue();
+    m_precision = value::toDouble(precision);
     m_epsilon = m_precision;
 
     const value::Value& threshold = event.get("threshold");
-    m_threshold = (value::to_double(threshold))->doubleValue();
+    m_threshold = value::toDouble(threshold);
 
     const value::Value& active = event.get("active");
-    m_active = (value::to_boolean(active))->boolValue();
+    m_active = value::toBoolean(active);
 
-    const value::Map& variables = value::to_map(event.get("variables"));
+    const value::Map& variables = value::toMapValue(event.get("variables"));
     const value::MapFactory::MapValue& lst = variables->getValue();
 
     m_functionNumber = lst.size();
@@ -477,10 +477,10 @@ void qss2::processInitEvents(const InitEventList& event)
 
     for (value::MapFactory::MapValue::const_iterator it = lst.begin();
          it != lst.end(); ++it) {
-        const value::Set& tab(value::to_set(it->second));
+        const value::Set& tab(value::toSetValue(it->second));
 
-        unsigned int index = value::to_integer(tab->getValue(0))->intValue();
-        double init = value::to_double(tab->getValue(1))->doubleValue();
+        unsigned int index = value::toInteger(tab->getValue(0));
+        double init = value::toDouble(tab->getValue(1));
         m_variableIndex[it->first] = index;
         m_variableName[index] = it->first;
         m_initialValueList.push_back(std::pair < unsigned int, double >(
