@@ -50,9 +50,15 @@ void Condition::write(std::ostream& out) const
     for (const_iterator it = begin(); it != end(); ++it) {
         out << " <port "
             << "name=\"" << it->first << "\" "
-            << ">\n"
-            << it->second->toXML()
-            << "</port>\n";
+            << ">\n";
+
+        const value::SetFactory::VectorValue& val(value::toSet(it->second));
+        for (value::SetFactory::VectorValue::const_iterator jt = val.begin();
+             jt != val.end(); ++jt) {
+            out << (*jt)->toXML();
+        }
+
+        out << "</port>\n";
     }
 
     out << "</condition>\n";
