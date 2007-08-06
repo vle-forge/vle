@@ -51,10 +51,12 @@ void Text::onParameter(const vpz::ParameterTrame& /* trame */)
 
 void Text::onNewObservable(const vpz::NewObservableTrame& trame)
 {
-    Assert(utils::InternalError, m_columns.find(trame.name()) == m_columns.end(),
-           boost::format("Observable %1% already exist") % trame.name());
+    std::string name(buildname(trame.name(), trame.port()));
 
-    m_columns[trame.name()] = m_buffer.size();
+    Assert(utils::InternalError, m_columns.find(name) == m_columns.end(),
+           boost::format("Observable %1% already exist") % name);
+
+    m_columns[name] = m_buffer.size();
     m_buffer.push_back(value::Value());
 }
 
@@ -78,12 +80,13 @@ void Text::onValue(const vpz::ValueTrame& trame)
     for (vpz::ModelTrameList::const_iterator it = trame.trames().begin();
          it != trame.trames().end(); ++it) {
 
+        std::string name(buildname(it->simulator(), it->port()));
         std::map < std::string, int >::iterator jt;
-        jt = m_columns.find(it->simulator());
+        jt = m_columns.find(name);
 
         Assert(utils::InternalError, jt != m_columns.end(), boost::format(
                 "The columns %1% does not exist. No new Observable ?") % 
-            it->simulator());
+            name);
 
         m_buffer[jt->second] = it->value();
     }

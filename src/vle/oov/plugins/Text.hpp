@@ -60,7 +60,26 @@ namespace vle { namespace oov { namespace plugin {
 
 
         void flush(double trame_time);
+
+        /**
+         * @brief This function is use to build uniq name to each row of the
+         * text output.
+         * @param simulator the name of the devs::Model.
+         * @param port the name of the state port of the devs::Model.
+         * @return a representation of the uniq name.
+         */
+        inline std::string buildname(const std::string& simulator,
+                                     const std::string& port);
     };
+
+    std::string Text::buildname(const std::string& simulator,
+                                const std::string& port)
+    {
+        std::string result(simulator);
+        result += '_';
+        result += port;
+        return result;
+    }
 
 
     DECLARE_OOV_PLUGIN(vle::oov::plugin::Text);

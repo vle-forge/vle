@@ -65,10 +65,10 @@ void RootCoordinator::init()
 
 bool RootCoordinator::run()
 {
-    const Time& time(m_coordinator->getNextTime());
-    if (time == Time::infinity) {
+    m_currentTime = m_coordinator->getNextTime();
+    if (m_currentTime == Time::infinity) {
         return false;
-    } else if (time > m_duration) {
+    } else if (m_currentTime > m_duration) {
         return false;
     }
     m_coordinator->run();
