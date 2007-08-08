@@ -149,6 +149,7 @@ void Coordinator::finish()
         for (it = m_modelList.begin(); it != m_modelList.end(); ++it) {
             (*it).second->finish();
         }
+        m_modelList.clear();
     }
 
     {
@@ -156,6 +157,7 @@ void Coordinator::finish()
         for (it = m_viewList.begin(); it != m_viewList.end(); ++it) {
             (*it).second->finish();
         }
+        m_viewList.clear();
     }
 }
 

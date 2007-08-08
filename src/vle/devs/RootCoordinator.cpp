@@ -77,9 +77,11 @@ bool RootCoordinator::run()
 
 void RootCoordinator::finish()
 {
-    m_coordinator->finish();
-    delete m_coordinator;
-    m_coordinator = 0;
+    if (m_coordinator) {
+        m_coordinator->finish();
+        delete m_coordinator;
+        m_coordinator = 0;
+    }
 }
 
 }} // namespace vle devs
