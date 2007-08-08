@@ -81,66 +81,6 @@ void qss::processInitEvents(const InitEventList& event)
     }
 }
 
-double qss::d(long p_index)
-{
-    return p_index * m_precision;
-}
-
-double qss::getGradient(unsigned int i) const
-{
-    return m_gradient[i];
-}
-
-long qss::getIndex(unsigned int i) const
-{
-    return m_index[i];
-}
-
-const Time & qss::getLastTime(unsigned int i) const
-{
-    return m_lastTime[i];
-}
-
-const Time & qss::getSigma(unsigned int i) const
-{
-    return m_sigma[i];
-}
-
-qss::state qss::getState(unsigned int i) const
-{
-    return m_state[i];
-}
-
-void qss::setIndex(unsigned int i,long p_index)
-{
-    m_index[i] = p_index;
-}
-
-void qss::setGradient(unsigned int i,double p_gradient)
-{
-    m_gradient[i] = p_gradient;
-}
-
-void qss::setLastTime(unsigned int i,const Time & p_time)
-{
-    m_lastTime[i] = p_time;
-}
-
-void qss::setState(unsigned int i,state p_state)
-{
-    m_state[i] = p_state;
-}
-
-void qss::setSigma(unsigned int i,const Time & p_time)
-{
-    m_sigma[i] = p_time;
-}
-
-void qss::setValue(unsigned int i,double p_value)
-{  
-    m_value[i] = p_value;
-}
-
 void qss::updateSigma(unsigned int i)
 {
     // Calcul du sigma de la ième fonction
@@ -161,10 +101,8 @@ void qss::minSigma()
     unsigned int j_min = 0;
     double v_min = getSigma(0).getValue();
 
-    while (j < m_functionNumber)
-    {
-        if (v_min > getSigma(j).getValue())
-        {
+    while (j < m_functionNumber) {
+        if (v_min > getSigma(j).getValue()) {
             v_min = getSigma(j).getValue();
             j_min = j;
         }
@@ -191,7 +129,7 @@ Time qss::init()
         m_initialValueList.begin();
 
     while (it != m_initialValueList.end()) {
-        setValue(it->first,it->second);
+        setValue(it->first, it->second);
         ++it;
     }
 
@@ -273,10 +211,11 @@ void qss::processExternalEvents(const ExternalEventList& event,
 
     while (it != event.end()) {
         if ((*it)->onPort("parameter")) {
-            std::string v_name = (*it)->getStringAttributeValue("name");
-            double v_value = (*it)->getDoubleAttributeValue("value");
 
-            processPerturbation(v_name,v_value);
+            std::string name = (*it)->getStringAttributeValue("name");
+            double value = (*it)->getDoubleAttributeValue("value");
+            
+            processPerturbation(name, value);
 
             for (unsigned int j = 0;j < m_functionNumber;j++) {
                 double e = (time - getLastTime(j)).getValue();
@@ -321,6 +260,28 @@ Value qss::processStateEvent(const StateEvent& event) const
     unsigned int i = m_variableIndex.find(event.getPortName())->second;
 
     return value::DoubleFactory::create(getValue(i));
+}
+
+unsigned int qss::getVariable(const std::string& name) const
+{
+    std::map < std::string, unsigned int >::const_iterator it;
+    it = m_variableIndex.find(name);
+
+    Assert(utils::InternalError, it != m_variableIndex.end(), boost::format(
+            "Qss model, unknow variable %1%") % name);
+
+    return it->second;
+}
+
+const std::string& qss::getVariable(unsigned int index) const
+{
+    std::map < unsigned int, std::string >::const_iterator it;
+    it = m_variableName.find(index);
+
+    Assert(utils::InternalError, it != m_variableName.end(), boost::format(
+            "Qss model, unknow variable index %1%") % index);
+
+    return it->second;
 }
 
 }} // namespace vle extension
