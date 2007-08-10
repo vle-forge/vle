@@ -62,7 +62,9 @@ namespace vle { namespace devs {
             devs::StateEvent* event) = 0;
 
 	/**
-	 * Delete an observable for a specified Simulator. Linear work.
+	 * Delete an observable for a specified Simulator. If model does not
+         * exist, nothing is produce otherwise, the stream receives a message
+         * that a observable is dead.
 	 * @param model delete observable attached to the specified
 	 * Simulator.
 	 */
@@ -76,7 +78,6 @@ namespace vle { namespace devs {
          * @return true if simulator is already connected with the same port.
          */
         bool exist(Simulator* simulator, const std::string& portname) const;
-
 
         /** 
          * @brief Test if a simulator is already connected to the View.

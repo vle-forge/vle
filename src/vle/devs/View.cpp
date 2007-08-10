@@ -65,9 +65,11 @@ void View::finish()
 
 void View::removeObservable(Simulator* model)
 {
-    m_observableList.erase(model);
-    m_stream->processNewObservable(model, "", 0.0,
-                                   getName()); // FIXME correct value
+    ObservableList::iterator it = m_observableList.find(model);
+    if (it != m_observableList.end()) {
+        m_observableList.erase(model);
+        m_stream->processRemoveObservable(model, "", 0.0, getName());
+    }
 }
 
 bool View::exist(Simulator* simulator, const std::string& portname) const
