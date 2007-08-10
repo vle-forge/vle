@@ -90,6 +90,19 @@ namespace vle { namespace devs {
     inline Attribute attribute(const std::string& name,
                                const std::string& value)
     { return Attribute(name, value::StringFactory::create(value)); }
+
+    /** 
+     * @brief Build an attribute with a specified name and string value.
+     * 
+     * @param name the name of the attribute.
+     * @param value the string value.
+     * 
+     * @return a new Attribute.
+     */
+    inline Attribute attribute(const std::string& name,
+                               const char* value)
+    { return attribute(name,
+                       value::StringFactory::create(std::string(value))); }
     
     /**
      * Build an attribute with a specified name and set value. Be carreful, the
