@@ -60,6 +60,7 @@ namespace vle { namespace extension {
 //
 	double m_precision;
 	double m_epsilon;
+        bool m_active;
 
 	inline double d(long x);
 	virtual double compute(unsigned int i) =0;
@@ -88,6 +89,7 @@ namespace vle { namespace extension {
       // DEVS Methods
       virtual void finish();
       virtual vle::devs::Time init();
+      virtual void processInitEvents(const vle::devs::InitEventList& event);
       virtual void processInternalEvent(const vle::devs::InternalEvent& /* event */);
       virtual void processExternalEvents(const vle::devs::ExternalEventList& /* event */,
 					 const vle::devs::Time& /* time */);

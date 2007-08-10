@@ -204,8 +204,11 @@ void MatrixTranslator::translate(const std::string& buffer)
 
 void MatrixTranslator::translateStructures()
 {
-    graph::CoupledModel* root = new graph::CoupledModel(m_prefix,0);
-
+    graph::CoupledModel* parent = 0;
+    if (m_model.model()) {
+        parent = m_model.model()->getParent();
+    }
+    graph::CoupledModel* root = new graph::CoupledModel(m_prefix, parent);
     m_model.set_model(root);
 
     // Models + ports

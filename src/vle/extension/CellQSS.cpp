@@ -250,6 +250,43 @@ devs::Time CellQSS::init()
   return Time(0);
 }
 
+void CellQSS::processInitEvents(const InitEventList& event)
+{
+    const value::Value& precision = event.get("precision");
+    m_precision = value::toDouble(precision);
+    m_epsilon = m_precision;
+    
+    const value::Value& threshold = event.get("threshold");
+    m_epsilon = value::toDouble(threshold);
+
+    const value::Value& active = event.get("active");
+    m_active = value::toBoolean(active);
+
+    const value::Map& variables = value::toMapValue(event.get("variables"));
+    const value::MapFactory::MapValue& lst = variables->getValue();
+
+    m_functionNumber = lst.size();
+
+    m_gradient = new double[m_functionNumber];
+    m_index = new long[m_functionNumber];
+    m_sigma = new devs::Time[m_functionNumber];
+    m_lastTime = new devs::Time[m_functionNumber];
+    m_state = new state[m_functionNumber];
+    m_currentTime = new devs::Time[m_functionNumber];
+
+    for (value::MapFactory::MapValue::const_iterator it = lst.begin();
+         it != lst.end(); ++it) {
+        const value::Set& tab(value::toSetValue(it->second));
+        
+        unsigned int index = value::toInteger(tab->getValue(0));
+        double init = value::toDouble(tab->getValue(1));
+        m_variableIndex[it->first] = index;
+        m_variableName[index] = it->first;
+        m_initialValueList.push_back(std::pair < unsigned int, double >(
+                index, init));
+    }
+}
+
 // void CellQSS::processInitEvents(const InitEventList& event)
 // {
 //   string v_name = event->getPortName();
