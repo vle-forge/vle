@@ -29,15 +29,18 @@
 
 namespace vle { namespace data {
 
-    class DataReader {
+    class DataReader
+    {
     public:
-      DataReader() { }
-      virtual ~DataReader() { }
+        DataReader() { }
 
-      virtual void close() =0;
-      virtual Result* exec(const std::string&) =0;
+        virtual ~DataReader() { }
+
+        virtual void close() = 0;
+
+        virtual Result* exec(const std::string&) = 0;
     };
 
-}}
+}} // namespace vle data
 
 #endif
