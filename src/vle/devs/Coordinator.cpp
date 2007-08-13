@@ -539,7 +539,14 @@ void Coordinator::startLocalStream()
 
     vpz::Views views(m_modelFactory->views());
     for (vpz::Views::iterator it = views.begin(); it != views.end(); ++it) {
-        StreamWriter* stream = result[it->second.output()];
+        std::map < std::string, StreamWriter* >::iterator jt;
+        jt = result.find(it->second.output());
+
+        Assert(utils::InternalError, jt != result.end(), boost::format(
+                "The output %1% does not exist for view %2%") %
+            it->second.output() % it->first);
+
+        StreamWriter* stream = jt->second;
         View* obs = 0;
         if (it->second.type() == vpz::View::TIMED) {
             obs = new devs::TimedView(
