@@ -10,11 +10,11 @@ LINK_DIRECTORIES(
 IF (HAVE_SQLXX)
 	SET(DATA_CPP CSVReader.cpp CSVResult.cpp DataReader.cpp DataWriter.cpp
 SQLReader.cpp SQLResult.cpp SQLWriter.cpp)
-	SET(DATA_HPP CSVReader.hpp CSVResult.hpp DataReader.hpp DataWriter.hpp
+	SET(DATA_HPP data.hpp CSVReader.hpp CSVResult.hpp DataReader.hpp DataWriter.hpp
 Result.hpp SQLReader.hpp SQLResult.hpp SQLWriter.hpp)
 ELSE (HAVE_SQLXX)
 	SET(DATA_CPP CSVReader.cpp CSVResult.cpp DataReader.cpp DataWriter.cpp)
-	SET(DATA_HPP CSVReader.hpp CSVResult.hpp DataReader.hpp DataWriter.hpp
+	SET(DATA_HPP data.hpp CSVReader.hpp CSVResult.hpp DataReader.hpp DataWriter.hpp
 Result.hpp)
 ENDIF (HAVE_SQLXX)
 

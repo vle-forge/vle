@@ -17,8 +17,8 @@ SET(MANAGER_CPP
     Simulator.cpp TotalExperimentGenerator.cpp VLE.cpp)
 
 SET(MANAGER_HPP
-    ExperimentGenerator.hpp LinearExperimentGenerator.hpp Manager.hpp
-    Simulator.hpp TotalExperimentGenerator.hpp VLE.hpp)
+    manager.hpp ExperimentGenerator.hpp LinearExperimentGenerator.hpp
+    Manager.hpp Simulator.hpp TotalExperimentGenerator.hpp VLE.hpp)
 
 ADD_LIBRARY(vlemanager SHARED ${MANAGER_CPP};${MANAGER_HPP})
 

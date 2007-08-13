@@ -33,12 +33,6 @@
 
 
 
-/**
- * @brief A special namespace use to provide, to developper some debugging
- * function like Assert and Throw using a call to backtrace to show stack of
- * functions.
- *
- */
 namespace vle { namespace utils {
 
 /**
@@ -185,4 +179,5 @@ namespace vle { namespace utils {
 #endif // NDEBUG
 
 }} // namespace vle utils
+
 #endif

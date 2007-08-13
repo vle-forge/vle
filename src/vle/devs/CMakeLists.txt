@@ -15,7 +15,7 @@ SET(DEVS_CPP
     TimedView.cpp View.cpp)
 
 SET(DEVS_HPP
-    Attribute.hpp Coordinator.hpp DevsTypes.hpp Dynamics.hpp Event.hpp
+    devs.hpp Attribute.hpp Coordinator.hpp DevsTypes.hpp Dynamics.hpp Event.hpp
     EventList.hpp EventView.hpp EventTable.hpp Executive.hpp ExternalEvent.hpp
     ExternalEventList.hpp InitEvent.hpp InstantaneousEvent.hpp
     InstantaneousEventList.hpp InternalEvent.hpp LocalStreamWriter.hpp

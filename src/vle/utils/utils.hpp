@@ -40,14 +40,14 @@
 namespace vle {
 
     /**
-     * A complete library to provide tools like string utilities, dates, paths,
-     * XML parsing, VPZ and VPZi reading.
+     * @brief A complete library to provide tools like string utilities, dates,
+     * paths, XML parsing, debugging, exception, trace etc.
      *
      */
     namespace utils {
 
-    }
+    } // namespace utils
 
-} // namespace vle utils
+} // namespace vle
 
 #endif

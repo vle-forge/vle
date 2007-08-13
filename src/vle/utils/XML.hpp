@@ -31,7 +31,14 @@
 
 
 
-namespace vle { namespace utils { namespace xml {
+namespace vle { namespace utils {
+   
+   
+    /** 
+     * @brief This namespace provides some static function other the libxml++
+     * API for help developer to reduce his source code.
+     */
+    namespace xml {
 
     /**
      * return an attribute from an element node.

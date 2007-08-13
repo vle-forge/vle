@@ -32,7 +32,13 @@
 
 
 
-namespace vle { namespace utils { namespace net {
+namespace vle { namespace utils {
+   
+    /** 
+     * @brief This namespace provides two public classes of portable and object
+     * oriented unix socket API.
+     */
+    namespace net {
 
     /**
      * Parse the input string to find correct TCP/IP address and good port. For
