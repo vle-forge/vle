@@ -15,7 +15,7 @@ SET(VPZ_CPP
     Trame.cpp Translator.cpp ValueTrame.cpp View.cpp Views.cpp Vpz.cpp)
 
 SET(VPZ_HPP
-    Base.hpp Classes.hpp Class.hpp Condition.hpp Conditions.hpp
+    vpz.hpp Base.hpp Classes.hpp Class.hpp Condition.hpp Conditions.hpp
     DelObservableTrame.hpp Dynamic.hpp Dynamics.hpp Experiment.hpp Model.hpp
     NewObservableTrame.hpp NoVLE.hpp NoVLEs.hpp Observable.hpp Observables.hpp
     Output.hpp Outputs.hpp ParameterTrame.hpp Port.hpp Project.hpp Replicas.hpp
