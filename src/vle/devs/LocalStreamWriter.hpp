@@ -43,9 +43,9 @@ namespace vle { namespace devs {
 
         virtual ~LocalStreamWriter();
 
-        virtual void open(const std::string& outputPlugin,
-                          const std::string& outputType,
-                          const std::string& outputLocation,
+        virtual void open(const std::string& plugin,
+                          const std::string& location,
+                          const std::string& file,
                           const std::string& parameters,
                           const devs::Time& time);
 

@@ -42,12 +42,13 @@ LocalStreamWriter::~LocalStreamWriter()
 }
 
 void LocalStreamWriter::open(const std::string& plugin,
-                             const std::string& /* type */,
                              const std::string& location,
+                             const std::string& file,
                              const std::string& parameters,
                              const devs::Time& time)
 {
-    m_reader.init(plugin, location);
+    std::string filename(Glib::build_filename(location, file));
+    m_reader.init(plugin, filename);
     m_reader.onParameter(vpz::ParameterTrame(utils::to_string(time),
                                              parameters));
 }

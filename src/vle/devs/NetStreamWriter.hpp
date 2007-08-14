@@ -40,9 +40,9 @@ namespace vle { namespace devs {
         virtual ~NetStreamWriter();
 
         virtual void open(
-                    const std::string& outputPlugin,
-                    const std::string& outputType,
-                    const std::string& outputLocation,
+                    const std::string& plugin,
+                    const std::string& location,
+                    const std::string& file,
                     const std::string& parameters);
 
         virtual void processNewObservable(

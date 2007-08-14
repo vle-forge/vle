@@ -40,24 +40,24 @@ NetStreamWriter::~NetStreamWriter()
     delete m_client;
 }
 
-void NetStreamWriter::open(const std::string& /* outputPlugin */,
-                           const std::string& outputType,
-                           const std::string& outputLocation,
+void NetStreamWriter::open(const std::string& /* plugin */,
+                           const std::string& location,
+                           const std::string& file,
                            const std::string& /* parameters */)
 {
     std::string host;
     int port;
 
     try {
-        utils::net::explodeStringNet(outputLocation, host, port);
+        utils::net::explodeStringNet(location, host, port);
         m_client = new utils::net::Client(host, port);
         TRACE1(boost::format("NetStreamWriter init %1%:%2% %3%") % host % port %
-               outputType);
+               location);
     } catch(const std::exception& e) {
         Throw(utils::InternalError, boost::format(
                 "NetStreamWriter open: error opening the client connection "
                 "with the OOV plugin, hostname %1% type %2% port %3%. "
-                "Error reported: %4%") % host % outputType % outputLocation %
+                "Error reported: %4%") % host % location % file %
             e.what());
     }
 }

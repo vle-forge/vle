@@ -62,16 +62,16 @@ namespace vle { namespace devs {
 
         /**
          * @brief Initialise plugin with specified information.
-         * @param outputPlugin the name of the instance of plugin loaded like,
+         * @param plugin the name of the instance of plugin loaded like,
          * text, sdml or net.
-         * @param outputType type of output like, local, ip.
-         * @param outputLocation where the plugin is launch.
+         * @param location where the plugin write data.
+         * @param file name of the file.
          * @param parameters a string representation of parameters the XML
          * parameters.
          */
-        virtual void open(const std::string& outputPlugin,
-                          const std::string& outputType,
-                          const std::string& outputLocation,
+        virtual void open(const std::string& plugin,
+                          const std::string& location,
+                          const std::string& file,
                           const std::string& parameters,
                           const devs::Time& time) = 0;
 
