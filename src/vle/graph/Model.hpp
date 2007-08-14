@@ -218,6 +218,42 @@ namespace vle { namespace graph {
 	bool existOutputPort(const std::string & name);
 	bool existStatePort(const std::string & name);
 
+        /** 
+         * @brief Get the index position of the input port into the input port
+         * list.
+         * @param name The name of the input port to find.
+         * @return An integer greather than 0.
+         * @throw utils::DevsGraphError if output port not exit.
+         */
+        int getInputPortIndex(const std::string& name) const;
+
+        /** 
+         * @brief Get the index position of the output port into the output port
+         * list.
+         * @param name The name of the output port to find.
+         * @return A integer greather than 0.
+         * @throw utils::DevsGraphError if output port not exit.
+         */
+        int getOutputPortIndex(const std::string& name) const;
+
+        /** 
+         * @brief Get the index position of the init port into the init port
+         * list.
+         * @param name The name of the init port to find.
+         * @return A integer greather than 0.
+         * @throw utils::DevsGraphError if init port not exit.
+         */
+        int getInitPortIndex(const std::string& name) const;
+
+        /** 
+         * @brief Get the index position of the state port into the state port
+         * list.
+         * @param name The name of the state port to find.
+         * @return A integer greather than 0.
+         * @throw utils::DevsGraphError if state port not exit.
+         */
+        int getStatePortIndex(const std::string& name) const;
+
         inline const PortList& getInitPortList() const
         { return m_initPortList; }
 

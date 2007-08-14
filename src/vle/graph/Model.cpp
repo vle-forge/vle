@@ -302,6 +302,46 @@ bool Model::existStatePort(const std::string & name)
     return m_statePortList.find(name) != m_statePortList.end();
 }
 
+int Model::getInputPortIndex(const std::string& name) const
+{
+    ConnectionList::const_iterator it = m_inPortList.find(name);
+
+    Assert(utils::DevsGraphError, it != m_inPortList.end(), boost::format(
+            "Input port %1% not exist in model %2%") % name % getName());
+    
+    return std::distance(it, m_inPortList.begin());
+}
+
+int Model::getOutputPortIndex(const std::string& name) const
+{
+    ConnectionList::const_iterator it = m_outPortList.find(name);
+
+    Assert(utils::DevsGraphError, it != m_outPortList.end(), boost::format(
+            "Output port %1% not exist in model %2%") % name % getName());
+    
+    return std::distance(it, m_outPortList.begin());
+}
+
+int Model::getInitPortIndex(const std::string& name) const
+{
+    PortList::const_iterator it = m_initPortList.find(name);
+
+    Assert(utils::DevsGraphError, it != m_initPortList.end(), boost::format(
+            "Init port %1% not exist in model %2%") % name % getName());
+    
+    return std::distance(it, m_initPortList.begin());
+}
+
+int Model::getStatePortIndex(const std::string& name) const
+{
+    PortList::const_iterator it = m_statePortList.find(name);
+
+    Assert(utils::DevsGraphError, it != m_statePortList.end(), boost::format(
+            "State port %1% not exist in model %2%") % name % getName());
+    
+    return std::distance(it, m_statePortList.begin());
+}
+
 //void Model::clearInitPort()
 //{
 //map < string, Port* >::iterator it1 = m_initPortList.begin();
