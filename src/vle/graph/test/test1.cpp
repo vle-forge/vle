@@ -34,6 +34,7 @@
 #include <limits>
 #include <fstream>
 #include <vle/graph/graph.hpp>
+#include <vle/utils/utils.hpp>
 
 using namespace vle;
 
@@ -88,4 +89,70 @@ BOOST_AUTO_TEST_CASE(test_have_connection)
     top->addInternalConnection("c", "out", "a", "in");
 
     BOOST_REQUIRE(top->hasConnectionProblem(lst)); 
+}
+
+BOOST_AUTO_TEST_CASE(test_displace)
+{
+    graph::CoupledModel* top = new graph::CoupledModel("top", 0);
+
+    graph::AtomicModel* a(top->addAtomicModel("a"));
+    a->addInputPort("in");
+    a->addOutputPort("out");
+
+    graph::AtomicModel* b(top->addAtomicModel("b"));
+    b->addInputPort("in");
+    b->addOutputPort("out");
+
+    graph::AtomicModel* c(top->addAtomicModel("c"));
+    c->addInputPort("in");
+    c->addOutputPort("out");
+
+    top->addInternalConnection("a", "out", "b", "in");
+    top->addInternalConnection("b", "out", "a", "in");
+
+    graph::CoupledModel* newtop = new graph::CoupledModel("newtop", 0);
+
+    graph::ModelList lst;
+    lst["a"] = a;
+    lst["b"] = b;
+
+    top->displace(lst, newtop);
+
+    BOOST_REQUIRE_EQUAL(top->getModelList().size(),
+                        (graph::ModelList::size_type)1);
+    
+    BOOST_REQUIRE_EQUAL(newtop->getModelList().size(),
+                        (graph::ModelList::size_type)2);
+
+    BOOST_REQUIRE(newtop->existInternalConnection("a", "out", "b", "in"));
+    BOOST_REQUIRE(newtop->existInternalConnection("b", "out", "a", "in"));
+}
+
+BOOST_AUTO_TEST_CASE(test_prohibited_displace)
+{
+    graph::CoupledModel* top = new graph::CoupledModel("top", 0);
+
+    graph::AtomicModel* a(top->addAtomicModel("a"));
+    a->addInputPort("in");
+    a->addOutputPort("out");
+
+    graph::AtomicModel* b(top->addAtomicModel("b"));
+    b->addInputPort("in");
+    b->addOutputPort("out");
+
+    graph::AtomicModel* c(top->addAtomicModel("c"));
+    c->addInputPort("in");
+    c->addOutputPort("out");
+
+    top->addInternalConnection("a", "out", "b", "in");
+    top->addInternalConnection("b", "out", "a", "in");
+    top->addInternalConnection("a", "out", "c", "in");
+
+    graph::CoupledModel* newtop = new graph::CoupledModel("newtop", 0);
+
+    graph::ModelList lst;
+    lst["a"] = a;
+    lst["b"] = b;
+
+    BOOST_REQUIRE_THROW(top->displace(lst, newtop), utils::DevsGraphError);
 }

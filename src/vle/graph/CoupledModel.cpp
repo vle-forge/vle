@@ -349,6 +349,61 @@ void CoupledModel::replace(Model* oldmodel, Model* newmodel)
     addModel(newmodel);
 }
 
+std::vector < std::string > CoupledModel::getBasicConnections(
+                const ModelList& models) const
+{
+    std::vector < std::string > storecnts;
+
+    for (ModelList::const_iterator it = models.begin(); it != models.end();
+         ++it) {
+
+        Assert(utils::DevsGraphError, it->second->getParent() == this,
+               boost::format("The model %1% is not the child of %2%") %
+               it->second->getName() % getName());
+
+        const ConnectionList& cnts((*it).second->getOutputPortList());
+        for (ConnectionList::const_iterator jt = cnts.begin(); jt != cnts.end();
+             ++jt) {
+            for (ModelPortList::const_iterator kt = jt->second.begin();
+                 kt != jt->second.end(); ++kt) {
+                storecnts.push_back((*it).second->getName());
+                storecnts.push_back(jt->first);
+                storecnts.push_back(kt->first->getName());
+                storecnts.push_back(kt->second);
+            }
+        }
+    }
+
+    return storecnts;
+}
+
+void CoupledModel::setBasicConnections(const std::vector < std::string >& lst)
+{
+    Assert(utils::DevsGraphError, lst.size() % 4 == 0, 
+           "The basic connections list is malformed.");
+
+    for (std::vector < std::string >::const_iterator it = lst.begin();
+         it != lst.end(); it += 4) {
+        const std::string& source(*(it));
+        const std::string& portsource(*(it + 1));
+        const std::string& destination(*(it + 2));
+        const std::string& portdestination(*(it + 3));
+
+        addInternalConnection(source, portsource, destination, portdestination);
+    }
+}
+
+void CoupledModel::displace(ModelList& models, CoupledModel* destination)
+{
+    Assert(utils::DevsGraphError, not hasConnectionProblem(models),
+           "One or more models are connected to another model");
+
+    std::vector < std::string > cnts(getBasicConnections(models));
+    detachModels(models);
+    destination->attachModels(models);
+    destination->setBasicConnections(cnts);
+}
+
 bool CoupledModel::hasConnectionProblem(const ModelList& lst) const
 {
     for (ModelList::const_iterator it = lst.begin(); it != lst.end(); ++it) {

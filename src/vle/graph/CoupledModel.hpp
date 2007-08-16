@@ -27,7 +27,6 @@
 
 #include <vle/graph/Model.hpp>
 #include <vector>
-#include <list>
 
 
 
@@ -43,6 +42,8 @@ namespace vle { namespace graph {
     class CoupledModel : public Model
     {
     public:
+        typedef std::vector < std::string > StringList;
+
         CoupledModel(const std::string& name, CoupledModel* parent);
 
 	virtual ~CoupledModel();
@@ -232,6 +233,57 @@ namespace vle { namespace graph {
          */
         void replace(Model* old, Model* mdl);
 
+        /** 
+         * @brief Return a string representation of internal connection for the
+         * specified model list. Each connection is represented by 4-uples
+         * (modelsource, portsource, modeldestination, portdestination). For
+         * instance:
+         * @code
+         * AtomicModel* a = addAtomicModel("a");
+         * a->addOutputPort("out");
+         * AtomicModel* b = addAtomicModel("b");
+         * b->addOutputPort("in");
+         *
+         * ModelList lst;
+         * lst["a"] = a;
+         * lst["b"] = b;
+         *
+         * StringList lst;
+         * getBasicConnections(lst);
+         * // This function returns four strings: "a", "out", "b", "in";
+         * @endcode
+         * @param models The list of the models to get internal connections.
+         * @return the string representation of the internal connections.
+         * @throw graph::DevsGraphError if a model does not belong this coupled
+         * model.
+         */
+        StringList getBasicConnections(const ModelList& models) const;
+
+        /** 
+         * @brief Set a list of connection to this coupled model.Each connection
+         * is represented by 4-uples (modelsource, portsource, modeldestination,
+         * portdestination). For instance:
+         * @code
+         * AtomicModel* a = addAtomicModel("a");
+         * a->addOutputPort("out");
+         * AtomicModel* b = addAtomicModel("b");
+         * b->addOutputPort("in");
+         *
+         * StringList cnts;
+         * cnts.push_back("a");
+         * cnts.push_back("out");
+         * cnts.push_back("b");
+         * cnts.push_back("in");
+         * setBasicConnections(cnts);
+         * @endcode
+         * @param lst The list of 4-uples basics connections.
+         * @throw DevsGraphError if a model not exist, if a port of a model not
+         * exist or if a connection already exist.
+         */
+        void setBasicConnections(const StringList& lst);
+
+        void displace(ModelList& models, CoupledModel* destination);
+
         /**
          * @brief return true if the model list has no connection with another
          * model which are no part of the model list.
@@ -344,8 +396,6 @@ namespace vle { namespace graph {
     private:
         void delConnection(Model* src, const std::string& portSrc,
                            Model* dst, const std::string& portDst);
-
-
 
 	ModelList       m_modelList;
         ConnectionList  m_internalInputList;
