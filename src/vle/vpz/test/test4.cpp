@@ -58,9 +58,59 @@ BOOST_AUTO_TEST_CASE(test_translator)
     x->getTargetPortList("out", out);
 
     BOOST_REQUIRE_EQUAL(out.size(), (graph::TargetModelList::size_type)10);
+}
 
-    //for (graph::TargetModelList::iterator it = out.begin(); it != out.end(); ++it) {
-    //std::cout << "model: " << it->model()->getName() << " port: " <<
-    //it->port() << "\n";
-    //}
+
+BOOST_AUTO_TEST_CASE(test_translator_write)
+{
+    const char* xml=
+        "<?xml version=\"1.0\"?>\n"
+        "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
+        " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
+        " <structures>\n"
+        "  <model name=\"test1\" type=\"novle\" translator=\"xxx\" >\n"
+        "   <in>\n"
+        "    <port name=\"in1\" />\n"
+        "    <port name=\"in2\" />\n"
+        "   </in>\n"
+        "   <out>\n"
+        "    <port name=\"out1\" />\n"
+        "    <port name=\"out2\" />\n"
+        "   </out>\n"
+        "  </model>\n"
+        " </structures>\n"
+        " <translators>\n"
+        "  <translator name=\"xxx\" library=\"vletesttr1\">\n"
+        "   <![CDATA["
+        "<?xml version=\"1.0\"?>\n"
+        "<test>"
+        " <models number=\"2\" />"
+        "</test>"
+        "]]>"
+        "  </translator>\n"
+        " </translators>\n"
+        " <experiment name=\"exp\" duration=\"1\" seed=\"1\" />"
+        "</vle_project>\n";
+
+    vpz::Vpz vpz1;
+    vpz::Vpz vpz2;
+    std::string copyfilename(utils::build_temp("coupled2.vpz"));
+
+    vpz1.parse_memory(xml);
+    vpz1.write(copyfilename);
+    vpz2.parse_file(copyfilename);
+
+    const vpz::NoVLEs& novles1(vpz1.project().novles());
+    const vpz::NoVLEs& novles2(vpz2.project().novles());
+
+    BOOST_REQUIRE_EQUAL(novles1.size(), novles2.size());
+    BOOST_REQUIRE(novles1.exist("xxx"));
+    BOOST_REQUIRE(novles2.exist("xxx"));
+
+    const vpz::NoVLE& novle1(novles1.get("xxx"));
+    const vpz::NoVLE& novle2(novles2.get("xxx"));
+
+    BOOST_REQUIRE_EQUAL(novle1.name(), novle2.name());
+    BOOST_REQUIRE_EQUAL(novle1.data(), novle2.data());
+    BOOST_REQUIRE_EQUAL(novle1.library(), novle2.library());
 }

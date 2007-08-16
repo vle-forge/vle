@@ -40,8 +40,8 @@ using namespace vle::utils;
 void NoVLE::write(std::ostream& out) const
 {
     out << "<translator name=\"" << m_name << "\" "
-        << "library=\"" << m_library << "\">"
-        << m_data
+        << "library=\"" << m_library << "\">\n"
+        << "<![CDATA[" << m_data << "]]>\n"
         << "</translator>";
 }
 
