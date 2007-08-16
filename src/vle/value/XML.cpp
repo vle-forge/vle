@@ -39,9 +39,9 @@ Value XMLFactory::clone() const
 
 std::string XMLFactory::toXML() const
 {
-    std::string val("\n<![CDATA[\n");
+    std::string val("<xml>\n<![CDATA[\n");
     val += m_value;
-    val += "\n]]>\n";
+    val += "\n]]>\n</xml>";
     return val;
 }
 
