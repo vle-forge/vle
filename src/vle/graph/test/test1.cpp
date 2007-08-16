@@ -59,3 +59,33 @@ BOOST_AUTO_TEST_CASE(test_del_all_connection)
     BOOST_REQUIRE(not top->existInternalConnection("a", "out", "b", "in"));
     BOOST_REQUIRE(not top->existInternalConnection("b", "out", "a", "in"));
 }
+
+BOOST_AUTO_TEST_CASE(test_have_connection)
+{
+    graph::CoupledModel* top = new graph::CoupledModel("top", 0);
+
+    graph::AtomicModel* a(top->addAtomicModel("a"));
+    a->addInputPort("in");
+    a->addOutputPort("out");
+
+    graph::AtomicModel* b(top->addAtomicModel("b"));
+    b->addInputPort("in");
+    b->addOutputPort("out");
+
+    graph::AtomicModel* c(top->addAtomicModel("c"));
+    c->addInputPort("in");
+    c->addOutputPort("out");
+
+    top->addInternalConnection("a", "out", "b", "in");
+    top->addInternalConnection("b", "out", "a", "in");
+
+    graph::ModelList lst;
+    lst["a"] = a;
+    lst["b"] = b;
+
+    BOOST_REQUIRE(not top->hasConnectionProblem(lst));
+
+    top->addInternalConnection("c", "out", "a", "in");
+
+    BOOST_REQUIRE(top->hasConnectionProblem(lst)); 
+}

@@ -233,25 +233,23 @@ namespace vle { namespace graph {
         void replace(Model* old, Model* mdl);
 
         /**
-         * Test if model has a connection with port name in input, output or
-         * internal with anoter model.
-         *
-         * @param model graph::model to test port connection.
-         * @param name port name of model to test.
-         *
-         * @return Connection found or NULL if no connection found.
-         */
-        bool hasConnection(Model* model, const std::string& name) const;
-
-        /**
-         * return true if Model list has no conflict with other Model to make
-         * a CoupledModel
-         *
-         * @param lst list of gmodel to test
-         *
+         * @brief return true if the model list has no connection with another
+         * model which are no part of the model list.
+         * @param lst list of models to test
          * @return true if model is found, else false
          */
         bool hasConnectionProblem(const ModelList& lst) const;
+
+        /** 
+         * @brief Return true if the connection list have connection with models
+         * not added in model lists provided.
+         * @param cnts the list of connection to check.
+         * @param mdls the list of models.
+         * @return true if a connection with another model is founded,
+         * otherwise, return false.
+         */
+        bool haveConnectionWithOtherModel(const ConnectionList& cnts,
+                                          const ModelList& mdls) const;
 
         virtual bool isAtomic() const;
 

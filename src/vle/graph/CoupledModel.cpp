@@ -349,16 +349,34 @@ void CoupledModel::replace(Model* oldmodel, Model* newmodel)
     addModel(newmodel);
 }
 
-bool CoupledModel::hasConnection(Model* /* model */,
-                                 const std::string& /* name */) const
+bool CoupledModel::hasConnectionProblem(const ModelList& lst) const
 {
-    Throw(utils::NotYetImplemented, "CoupledModel::hasConnection");
+    for (ModelList::const_iterator it = lst.begin(); it != lst.end(); ++it) {
+        const ConnectionList& ins(it->second->getInputPortList());
+        if (haveConnectionWithOtherModel(ins, lst))
+            return true;
+
+        const ConnectionList& outs(it->second->getOutputPortList());
+        if (haveConnectionWithOtherModel(outs, lst))
+            return true;
+    }
     return false;
 }
 
-bool CoupledModel::hasConnectionProblem(const ModelList& /* lst */) const
+bool CoupledModel::haveConnectionWithOtherModel(const ConnectionList& cnts,
+                                                const ModelList& mdls) const
 {
-    Throw(utils::NotYetImplemented, "CoupledModel::hasConnectionProblem");
+    for (ConnectionList::const_iterator it = cnts.begin(); it != cnts.end();
+         ++it) {
+        const ModelPortList& lst(it->second);
+        for (ModelPortList::const_iterator jt = lst.begin(); jt != lst.end();
+             ++jt) {
+
+            if (mdls.count(jt->first->getName()) == 0) {
+                return true;
+            }
+        }
+    }
     return false;
 }
 
