@@ -316,7 +316,10 @@ void CoupledModel::delAllConnection(Model* m)
 
 void CoupledModel::delAllConnection()
 {
-    AssertS(utils::DevsGraphError, false);
+    for (ModelList::iterator it = m_modelList.begin(); it != m_modelList.end();
+         ++it) {
+        delAllConnection(it->second);
+    }
 }
 
 void CoupledModel::replace(Model* oldmodel, Model* newmodel)

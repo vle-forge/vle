@@ -29,12 +29,11 @@
 #define VLE_GRAPH_GRAPH_HPP
 
 #include <vle/graph/AtomicModel.hpp>
-#include <vle/graph/Connection.hpp>
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/graph/Model.hpp>
+#include <vle/graph/ModelPort.hpp>
+#include <vle/graph/ModelPortList.hpp>
 #include <vle/graph/NoVLEModel.hpp>
-#include <vle/graph/Port.hpp>
-#include <vle/graph/TargetPort.hpp>
 
 namespace vle {
 
