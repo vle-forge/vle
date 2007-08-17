@@ -13,17 +13,17 @@
         <port name="out" />
        </out>
       </model>
-      <model name="a" type="atomic" dynamics="" conditions="" observables="">
+      <model name="a" type="atomic" dynamics="" conditions="ca" observables="">
        <in>
         <port name="in" />
        </in>
       </model>
-      <model name="b" type="atomic" dynamics="" conditions="" observables="">
+      <model name="b" type="atomic" dynamics="" conditions="cb" observables="">
        <in>
         <port name="in" />
        </in>
       </model>
-      <model name="c" type="atomic" dynamics="" conditions="" observables="">
+      <model name="c" type="atomic" dynamics="" conditions="cc" observables="">
        <in>
         <port name="in1" />
         <port name="in2" />
@@ -97,7 +97,7 @@
       </connection>
      </connections>
     </model>
-    <model name="d" type="atomic" dynamics="" conditions="" observables="">
+    <model name="d" type="atomic" dynamics="" conditions="cd" observables="">
      <in>
       <port name="in" />
      </in>
@@ -133,5 +133,43 @@
    </connections>
   </model>
  </structures>
- <experiment name="graphtester" duration="100.0" seed="123" />
+ <experiment name="graphtester" duration="100.0" seed="123">
+  <conditions>
+   <condition name="ca">
+    <port name="x"><double>1.2</double></port>
+   </condition>
+   <condition name="cb">
+    <port name="x"><double>1.2</double></port>
+   </condition>
+   <condition name="cc">
+    <port name="x"><double>1.2</double></port>
+   </condition>
+   <condition name="cd">
+    <port name="x"><double>1.2</double></port>
+   </condition>
+  </conditions>
+  <views>
+   <outputs>
+    <output name="o" format="local" location="" plugin="text"/>
+    <output name="o2" format="local" location="" plugin="text" />
+   </outputs>
+   <observables>
+    <observable name="obs1">
+     <port name="c">
+      <view name="view1" />
+     </port>
+    </observable>
+    <observable name="obs2">
+     <port name="nbmodel">
+      <view name="view1" />
+     </port>
+     <port name="structure">
+      <view name="view2" />
+     </port>
+    </observable>
+   </observables>
+   <view name="view1" type="timed" library="default" timestep="1" output="o" />
+   <view name="view2" type="timed" library="default" timestep="1" output="o2" />
+  </views>
+ </experiment>
 </vle_project>

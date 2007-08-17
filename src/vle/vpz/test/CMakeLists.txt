@@ -25,6 +25,8 @@ TARGET_LINK_LIBRARIES(vletesttr1
         vlevpz)
 INSTALL(TARGETS vletesttr1 DESTINATION "${VLE_LIBRARY_DIRS}/translator")
 
+INSTALL(FILES coupled.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
+
 ADD_EXECUTABLE(test1 test1.cpp)
 ADD_TEST(vpztest1 test1)
 TARGET_LINK_LIBRARIES(test1

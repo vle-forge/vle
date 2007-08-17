@@ -89,8 +89,9 @@ void Views::delObservable(const std::string& name)
 
 void Views::clear()
 {
+    std::map < std::string, View >::clear();
     m_outputs.clear();
-    
+    m_observables.clear(); 
 }
 
 void Views::add(const Views& views)

@@ -28,17 +28,17 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/test/auto_unit_test.hpp>
 #include <boost/test/output_test_stream.hpp>
-#include <vle/vpz/Vpz.hpp>
-#include <vle/vpz/Translator.hpp>
-#include <vle/graph/AtomicModel.hpp>
-#include <vle/graph/CoupledModel.hpp>
+
+#include <vle/utils/utils.hpp>
+#include <vle/graph/graph.hpp>
+#include <vle/vpz/vpz.hpp>
 
 using namespace vle;
 
-BOOST_AUTO_TEST_CASE(test_translator)
+BOOST_AUTO_TEST_CASE(test_connection)
 {
     vpz::Vpz vpz;
-    vpz.parse_file("coupled.vpz");
+    vpz.parse_file(utils::Path::path().build_prefix_share_path("examples", "coupled.vpz"));
 
     const vpz::Model& model(vpz.project().model());
     BOOST_REQUIRE(model.model());
@@ -60,57 +60,10 @@ BOOST_AUTO_TEST_CASE(test_translator)
     BOOST_REQUIRE_EQUAL(out.size(), (graph::TargetModelList::size_type)10);
 }
 
-
-BOOST_AUTO_TEST_CASE(test_translator_write)
+BOOST_AUTO_TEST_CASE(test_read_write_read)
 {
-    const char* xml=
-        "<?xml version=\"1.0\"?>\n"
-        "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
-        " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
-        " <structures>\n"
-        "  <model name=\"test1\" type=\"novle\" translator=\"xxx\" >\n"
-        "   <in>\n"
-        "    <port name=\"in1\" />\n"
-        "    <port name=\"in2\" />\n"
-        "   </in>\n"
-        "   <out>\n"
-        "    <port name=\"out1\" />\n"
-        "    <port name=\"out2\" />\n"
-        "   </out>\n"
-        "  </model>\n"
-        " </structures>\n"
-        " <translators>\n"
-        "  <translator name=\"xxx\" library=\"vletesttr1\">\n"
-        "   <![CDATA["
-        "<?xml version=\"1.0\"?>\n"
-        "<test>"
-        " <models number=\"2\" />"
-        "</test>"
-        "]]>"
-        "  </translator>\n"
-        " </translators>\n"
-        " <experiment name=\"exp\" duration=\"1\" seed=\"1\" />"
-        "</vle_project>\n";
-
-    vpz::Vpz vpz1;
-    vpz::Vpz vpz2;
-    std::string copyfilename(utils::build_temp("coupled2.vpz"));
-
-    vpz1.parse_memory(xml);
-    vpz1.write(copyfilename);
-    vpz2.parse_file(copyfilename);
-
-    const vpz::NoVLEs& novles1(vpz1.project().novles());
-    const vpz::NoVLEs& novles2(vpz2.project().novles());
-
-    BOOST_REQUIRE_EQUAL(novles1.size(), novles2.size());
-    BOOST_REQUIRE(novles1.exist("xxx"));
-    BOOST_REQUIRE(novles2.exist("xxx"));
-
-    const vpz::NoVLE& novle1(novles1.get("xxx"));
-    const vpz::NoVLE& novle2(novles2.get("xxx"));
-
-    BOOST_REQUIRE_EQUAL(novle1.name(), novle2.name());
-    BOOST_REQUIRE_EQUAL(novle1.data(), novle2.data());
-    BOOST_REQUIRE_EQUAL(novle1.library(), novle2.library());
+    vpz::Vpz vpz;
+    vpz.parse_file(utils::Path::path().build_prefix_share_path("examples", "coupled.vpz"));
+    vpz.clear();
+    vpz.parse_file(utils::Path::path().build_prefix_share_path("examples", "coupled.vpz"));
 }

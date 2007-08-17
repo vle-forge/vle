@@ -22,8 +22,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef VLE_VPZ_VPZ_HPP
-#define VLE_VPZ_VPZ_HPP
+#ifndef VLE_COMMON_VPZ_VPZ_HPP
+#define VLE_COMMON_VPZ_VPZ_HPP
 
 #include <vle/vpz/Base.hpp>
 #include <vle/vpz/Classes.hpp>
