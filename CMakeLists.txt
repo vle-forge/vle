@@ -4,12 +4,12 @@ PROJECT(VLE CXX C)
 ## Modules
 ##
 
+ENABLE_TESTING()
+INCLUDE(CPack)
 INCLUDE(CheckIncludeFileCXX)
 INCLUDE(CheckIncludeFile)
 INCLUDE(CheckLibraryExists)
 INCLUDE(CMakeDetermineCCompiler)
-INCLUDE(CPack)
-ENABLE_TESTING()
 
 ##
 ## Set global variables.
@@ -79,8 +79,6 @@ IF (WITH_SQLXX)
 	ENDIF (HAVE_SQLXX)
 ENDIF (WITH_SQLXX)
 
-ADD_SUBDIRECTORY(src)
-
 
 ##
 ## Generate the config.h
@@ -103,12 +101,14 @@ IF (Boost_FOUND)
 	FIND_LIBRARY(Boost_UNITTESTFRAMEWORK NAMES boost_unit_test_framework
 	boost_unit_test_framework-mt PATHS Boost_LIBRARY_DIRS)
 	IF (Boost_UNITTESTFRAMEWORK)
-		SET(HAVE_UNITTESTFRAMEWORK 1 CACHE INTERNAL "With Boost::test")
+		SET(HAVE_UNITTESTFRAMEWORK 1 CACHE INTERNAL "" FORCE)
 	ELSE (Boost_UNITTESTFRAMEWORK)
-		MESSAGE(STATUS "Could not find boost unit test framework")
-		SET(HAVE_UNITTESTFRAMEWORK "" CACHE INTERNAL "Without Boost::test")
+		SET(HAVE_UNITTESTFRAMEWORK 0 CACHE INTERNAL "" FORCE)
 	ENDIF (Boost_UNITTESTFRAMEWORK)
 ENDIF (Boost_FOUND)
+
+ADD_SUBDIRECTORY(src)
+
 
 ##
 ## Status
