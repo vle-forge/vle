@@ -520,7 +520,7 @@ void Coordinator::startLocalStream()
 
     vpz::Outputs outs(m_modelFactory->outputs());
     for (vpz::Outputs::iterator it = outs.begin(); it != outs.end(); ++it) {
-        StreamWriter* stream;
+        StreamWriter* stream = 0;
         switch (it->second.format()) {
         case vpz::Output::LOCAL:
             stream = new LocalStreamWriter();

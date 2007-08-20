@@ -89,7 +89,7 @@ bool run_model(const std::string& modelname)
 
 int main(int argc, char* argv[])
 {
-    bool success;
+    bool success = true;
 
     switch(argc) {
     case 1:
