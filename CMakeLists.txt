@@ -38,11 +38,14 @@ SET(VLE_SHARE_DIRS
 ## Debug mode
 ##
 
-OPTION(BUILD_DEBUG "Build the project in Debug mode [default=on]" ON)
-IF (BUILD_DEBUG)
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -W -Werror")
-	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -Wall -W -Werror")
-ENDIF (BUILD_DEBUG)
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -W -Werror")
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -W -Werror")
+
+IF(NOT CMAKE_BUILD_TYPE)
+	SET(CMAKE_BUILD_TYPE Debug CACHE STRING
+	    "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
+            FORCE)
+ENDIF(NOT CMAKE_BUILD_TYPE)
 
 ##
 ## Check libraries with pkgconfig
@@ -117,8 +120,7 @@ ADD_SUBDIRECTORY(src)
 MESSAGE(STATUS "- - - -")
 MESSAGE(STATUS "${VLE_PACKAGE_NAME} ${VLE_PACKAGE_VERSION} configured successfully")
 MESSAGE(STATUS "Using ${VLE_INSTALL_PREFIX} for installation")
-MESSAGE(STATUS "Using Building with ${CMAKE_C_FLAGS} for C flags")
-MESSAGE(STATUS "Using Building with ${CMAKE_CXX_FLAGS} for C++ flags")
+MESSAGE(STATUS "Build type ${CMAKE_BUILD_TYPE}")
 IF (HAVE_GCC_ABI_DEMANGLE)
 	MESSAGE(STATUS "Build with GCC ABI Demangle...: yes")
 ENDIF (HAVE_GCC_ABI_DEMANGLE)
