@@ -199,22 +199,39 @@ Glib::Module* ModelFactory::getPlugin(const std::string& name)
 }
 
 void ModelFactory::attachDynamics(devs::Simulator* atom,
-                                  const vpz::Dynamic& /* dyn */,
+                                  const vpz::Dynamic& dyn,
                                   Glib::Module* module)
 {
     devs::Dynamics* call = 0;
     void* makeNewDynamics = 0;
 
-    bool getSymbol = module->get_symbol("makeNewDynamics", makeNewDynamics);
-    Assert(utils::ParseError, getSymbol, boost::format(
-            "Error in '%1%', function 'makeNewDynamics' not found '%2%'\n") %
-        module->get_name() % Glib::Module::get_last_error());
+    if (dyn.model().empty() or dyn.model() == dyn.library()) {
+        bool getSymbol = module->get_symbol("makeNewDynamics", makeNewDynamics);
+        Assert(utils::ParseError, getSymbol, boost::format(
+                "Error in '%1%', function 'makeNewDynamics' not found: '%2%'\n")
+            % module->get_name() % Glib::Module::get_last_error());
 
-    call = ((Dynamics*(*)(const graph::Model&))(makeNewDynamics))(*atom->getStructure());
-    Assert(utils::ParseError, call, boost::format(
-            "Error in '%1%', function 'makeNewDynamics':"
-            "problem allocation a new Dynamics '%2%'\n") %
-        module->get_name() % Glib::Module::get_last_error());
+        call = ((Dynamics*(*)(const
+                    graph::Model&))(makeNewDynamics))(*atom->getStructure());
+        Assert(utils::ParseError, call, boost::format(
+                "Error in '%1%', function 'makeNewDynamics':"
+                "problem allocation a new Dynamics: '%2%'\n") %
+            module->get_name() % Glib::Module::get_last_error());
+    } else {
+        std::string functionanme("makeNewDynamics");
+        functionanme += dyn.model();
+        bool getSymbol = module->get_symbol(functionanme , makeNewDynamics);
+        Assert(utils::ParseError, getSymbol, boost::format(
+                "Error in '%1%', function '%2%' not found: '%3%'\n")
+            % module->get_name() % functionanme % Glib::Module::get_last_error());
+
+        call = ((Dynamics*(*)(const
+                    graph::Model&))(makeNewDynamics))(*atom->getStructure());
+        Assert(utils::ParseError, call, boost::format(
+                "Error in '%1%', function '%2%':"
+                "problem allocation a new Dynamics: '%3%'\n") %
+            module->get_name() % functionanme % Glib::Module::get_last_error());
+    }
 
     if (call->is_executive()) {
         (dynamic_cast < Executive* >(call))->set_coordinator(&mCoordinator);

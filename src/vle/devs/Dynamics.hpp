@@ -45,9 +45,19 @@
 #include <string>
 
 
-#define DECLARE_DYNAMICS(x) \
-  extern "C" { vle::devs::Dynamics* makeNewDynamics(const vle::graph::AtomicModel& model) \
-{ return new x(model); } }
+#define DECLARE_DYNAMICS(mdl) \
+    extern "C" { \
+        vle::devs::Dynamics* \
+        makeNewDynamics(const vle::graph::AtomicModel& model) \
+        { return new mdl(model); } \
+    }
+
+#define DECLARE_NAMED_DYNAMICS(name, mdl) \
+    extern "C" { \
+        vle::devs::Dynamics* \
+        makeNewDynamics##name(const vle::graph::AtomicModel& model) \
+        { return new mdl(model); } \
+    }
 
 namespace vle { namespace devs {
 
