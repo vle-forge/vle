@@ -1,3 +1,0 @@
-SUBDIRS = src
-
-ACLOCAL_CFLAGS = -I m4
