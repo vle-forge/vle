@@ -459,7 +459,6 @@ void VpzStackSax::push_view(const AttributeList& att)
     if (m_stack.top()->isViews()) {
         std::string name(get_attribute< std::string >(att, "name")); 
         std::string type(get_attribute< std::string >(att, "type")); 
-        std::string lib(get_attribute< std::string >(att, "library")); 
         std::string out(get_attribute< std::string >(att, "output")); 
 
         Views& views(m_vpz.project().experiment().views());
@@ -470,10 +469,10 @@ void VpzStackSax::push_view(const AttributeList& att)
                     name));
 
             double ts(get_attribute < double >(att, "timestep"));
-            View& nm(views.addTimedView(name, ts, out, lib));
+            View& nm(views.addTimedView(name, ts, out));
             m_stack.push(&nm);
         } else if (type == "event") {
-            View& nm(views.addEventView(name, out, lib));
+            View& nm(views.addEventView(name, out));
             m_stack.push(&nm);
         } else {
             Throw(utils::SaxParserError, (boost::format(

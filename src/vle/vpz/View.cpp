@@ -34,8 +34,7 @@ void View::write(std::ostream& out) const
 {
     out << "<view "
         << "name=\"" << m_name << "\" "
-        << "output=\"" << m_output << "\" "
-        << "library=\"" << m_library << "\" ";
+        << "output=\"" << m_output << "\" ";
 
     switch (m_type) {
     case View::EVENT:
@@ -59,22 +58,17 @@ void View::write(std::ostream& out) const
     }
 }
 
-void View::setEventView(const std::string& output,
-                        const std::string& library)
+void View::setEventView(const std::string& output)
 {
     set_type(EVENT);
     set_output(output);
-    set_library(library);
 }
 
-void View::setTimedView(double timestep,
-                        const std::string& output,
-                        const std::string& library)
+void View::setTimedView(double timestep, const std::string& output)
 {
     set_type(TIMED);
     set_timestep(timestep);
     set_output(output);
-    set_library(library);
 }
 
 void View::set_timestep(double time)

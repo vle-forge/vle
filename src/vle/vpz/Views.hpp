@@ -101,13 +101,11 @@ namespace vle { namespace vpz {
         void clear();
 
         View& addEventView(const std::string& name,
-                           const std::string& output,
-                           const std::string& library);
+                           const std::string& output);
 
         View& addTimedView(const std::string& name,
                            double timestep,
-                           const std::string& output,
-                           const std::string& library);
+                           const std::string& output);
 
         void del(const std::string& name);
 

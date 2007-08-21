@@ -114,27 +114,25 @@ View& Views::add(const View& view)
 }
 
 View& Views::addEventView(const std::string& name,
-                          const std::string& output,
-                          const std::string& library)
+                          const std::string& output)
 {
     Assert(utils::SaxParserError, not exist(name),
            (boost::format("View %1% already exist") % name));
 
     View m(name);
-    m.setEventView(output, library);
+    m.setEventView(output);
     return add(m);
 }
 
 View& Views::addTimedView(const std::string& name,
                           double timestep,
-                          const std::string& output,
-                          const std::string& library)
+                          const std::string& output)
 {
     Assert(utils::SaxParserError, not exist(name),
            (boost::format("View %1% already exist") % name));
 
     View m(name);
-    m.setTimedView(timestep, output, library);
+    m.setTimedView(timestep, output);
     return add(m);
 }
 

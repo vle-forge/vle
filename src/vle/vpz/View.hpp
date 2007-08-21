@@ -63,8 +63,7 @@ namespace vle { namespace vpz {
          *
          * @throw Exception::Internal if name or output are empty.
          */
-        void setEventView(const std::string& output,
-                          const std::string& library);
+        void setEventView(const std::string& output);
 
         /** 
          * @brief Set the View with Timed type and the specified name, output
@@ -76,9 +75,7 @@ namespace vle { namespace vpz {
          * @throw Exception::Internal if name or output are empty of timestep <=
          * 0.
          */
-        void setTimedView(double timestep,
-                          const std::string& output,
-                          const std::string& library);
+        void setTimedView(double timestep, const std::string& output);
 
         inline const std::string& name() const
         { return m_name; }
@@ -103,12 +100,6 @@ namespace vle { namespace vpz {
         inline const std::string& output() const
         { return m_output; }
 
-        inline void set_library(const std::string& library)
-        { m_library = library; }
-
-        inline const std::string& library() const
-        { return m_library; }
-
         inline const std::string& data() const
         { return m_data; }
 
@@ -124,7 +115,6 @@ namespace vle { namespace vpz {
         Type            m_type;
         double          m_timestep;
         std::string     m_output;
-        std::string     m_library;
         std::string     m_data;
     };
 
