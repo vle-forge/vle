@@ -34,8 +34,13 @@ void Experiment::write(std::ostream& out) const
 {
     out << "<experiment "
         << "name=\"" << m_name << "\" "
-        << "duration=\"" << m_duration << "\" "
-        << "seed=\"" << m_seed << "\" >\n";
+        << "duration=\"" << m_duration << "\" ";
+
+    if (not m_combination.empty()) {
+        out << "combination=\"" << m_combination << "\" ";
+    }
+
+    out << "seed=\"" << m_seed << "\" >\n";
 
     m_replicas.write(out);
     m_conditions.write(out);
