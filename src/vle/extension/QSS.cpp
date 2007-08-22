@@ -211,41 +211,41 @@ void qss::processExternalEvents(const ExternalEventList& event,
 
     while (it != event.end()) {
         if ((*it)->onPort("parameter")) {
-
             std::string name = (*it)->getStringAttributeValue("name");
             double value = (*it)->getDoubleAttributeValue("value");
-            
             processPerturbation(name, value);
-
-            for (unsigned int j = 0;j < m_functionNumber;j++) {
-                double e = (time - getLastTime(j)).getValue();
-
-                setLastTime(j,time);
-                // Mise à jour de la valeur de la fonction
-                if (e > 0) setValue(j,getValue(j)+e*getGradient(j));
-                // Mise à jour du gradient
-                setGradient(j,compute(j));
-                // Mise à jour de sigma
-                updateSigma(j);
-                if (getSigma(j) < 0) setSigma(j,Time(0));
+            for (unsigned int i = 0; i < m_functionNumber; i++) {
+                m_gradient[i] = 0.0;
+                m_index[i] = (long)(std::floor(getValue(i) / m_precision));
+                setSigma(i, Time(0));
+                setState(i, INIT);
             }
             minSigma();
-        }
-        else {
-            unsigned int i = (unsigned int)(*it)->getIntegerAttributeValue("index");
+        } else {
+            size_t i = getVariable((*it)->getPortName());
+            double value = (*it)->getDoubleAttributeValue("value");
 
             if (getState(i) == RUN) {
                 double e = (time - getLastTime(i)).getValue();
 
                 for (unsigned int j = 0;j < m_functionNumber;j++) {
-                    setLastTime(j,time);
-                    // Mise à jour de la valeur de la fonction
-                    if (e > 0) setValue(j,getValue(j)+e*getGradient(j));
-                    // Mise à jour du gradient
-                    setGradient(j,compute(j));
-                    // Mise à jour de sigma
-                    updateSigma(j);
-                    if (getSigma(j) < 0) setSigma(j,Time(0));
+                    if (i == j) {
+                        setValue(i, value);
+                        m_gradient[i] = 0.0;
+                        m_index[i] = (long)(floor(getValue(i) / m_precision));
+                        setSigma(i, Time(0));
+                        setState(i, INIT);
+                    } else {
+                        setLastTime(j, time);
+                        if (e > 0) {
+                            setValue(j,getValue(j)+e*getGradient(j));
+                        }
+                        setGradient(j, compute(j));
+                        updateSigma(j);
+                        if (getSigma(j) < 0) {
+                            setSigma(j, Time(0));
+                        }
+                    }
                 }
                 minSigma();
             }
