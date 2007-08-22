@@ -1,24 +1,22 @@
 Requirements
 ============
 
-glibmm		2.4.0 http://www.gtkmm.org/
-libxml++	2.6.0 http://libxmlplusplus.sourceforge.net/
-libtool		1.5
-automake	1.4
-autoconf	2.50
+glibmm		2.4.0 http://www.gtkmm.org
+libxml++	2.6.0 http://libxmlplusplus.sourceforge.net
+boost		1.32  http://www.boost.org
+cmake		2.4.0 http://www.cmake.org
+
+
 
 Installation
 ============
 
-See documentation available on VLE wesite http://vle.univ-littoral.fr
+See documentation available on VLE website http://vle.univ-littoral.fr
 
-The fallowing commands compile et install VLE:
+The following commands configure, build and install VLE (build type: Debug):
 
-$ ./autogen.sh
-
-or
-
-$ autoreconf --force --install
-$ ./configure --prefix=/usr/local
+$ mkdir build
+$ cd build
+$ cmake -DCMAKE_INSTALL_PREFIX=/usr/local ..
 $ make
 $ make install
