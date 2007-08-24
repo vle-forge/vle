@@ -26,34 +26,79 @@
 #define VLE_OOV_NETSTREAMREADER_HPP
 
 #include <vle/oov/StreamReader.hpp>
+#include <vle/utils/Socket.hpp>
 
 
 
 namespace vle { namespace oov {
 
-    class NetStreamReader
+    class NetStreamReader : public StreamReader
     {
     public:
-        NetStreamReader();
+        /** 
+         * @brief Build a NetStreamReader based on a new socket server.
+         * @param port the port number [0 and 65535].
+         * @throw utils::InternalError if the building of the socket server
+         * fail.
+         */
+        NetStreamReader(int port);
 
         virtual ~NetStreamReader();
 
+        /** 
+         * @brief Build a socket server and wait connection from a
+         * devs::NetStreamWriter client.
+         */
+        void process();
 
-        void process()
-        {
-            while (buffer = resau.lecture()) {
-                vpz::SaxParser parser(buffer);
-                if (parser.isTrame()) {
-                    if (parser.isParameterTrame()) {
-                    } else if (parser.isNewObservableTrame()) {
-                    } else if (parser.isDelObservableTrame()) {
-                    } else if (parser.isValueTrame()) {
-                    } else if (parser.isEndTrame()) {
-                    }
-                }
-            }
-        }
+        /** 
+         * @brief Return the port used by the oov::NetStreamReader socket
+         * server.
+         * @return the port number [0 and 65535].
+         */
+        inline const int port() const;
 
+        /** 
+         * @brief Affect a new size to the buffer.
+         * @param buffer the new size of the buffer.
+         * @throw utils::InternalError if buffer equal 0 or greater than memory
+         * possibility.
+         */
+        void setBufferSize(size_t buffer);
+
+        /** 
+         * @brief Return the size of the buffer.
+         * @return The size of the buffer.
+         */
+        inline size_t bufferSize() const;
+
+        /** 
+         * @brief Return a reference to the buffer.
+         * @return A reference to the buffer.
+         */
+        inline const std::string& buffer() const;
+
+    private:
+        int                 m_port;
+        utils::net::Server  m_server;
+        std::string         m_buffer;
+
+        void waitConnection();
+        void readConnection();
+        bool dispatch(const vpz::Trame* trame);
+        void closeConnection();
+
+
+    };
+
+    inline const int NetStreamReader::port() const
+    { return m_port; }
+    
+    inline size_t NetStreamReader::bufferSize() const
+    { return m_buffer.size(); }
+
+    inline const std::string& NetStreamReader::buffer() const
+    { return m_buffer; }
 
 
 }} // namespace vle oov

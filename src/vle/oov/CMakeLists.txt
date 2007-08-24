@@ -3,15 +3,21 @@ INCLUDE_DIRECTORIES(
 	${GLIBMM_INCLUDE_DIRS}
 	${LIBXMLPP_INCLUDE_DIRS})
 
+ADD_DEFINITIONS(
+	-DVLE_PREFIX_DIR="\\"${CMAKE_INSTALL_PREFIX}\\""
+	-DVLE_PACKAGE_NAME="\\"${VLE_PACKAGE_NAME}\\""
+	-DVLE_PACKAGE_VERSION="\\"${VLE_PACKAGE_VERSION}\\"")
+
 LINK_DIRECTORIES(
 	${GLIBMM_LIBRARY_DIRS}
 	${LIBXMLPP_LIBRARY_DIR})
 
 SET(OOV_CPP
-    LocalStreamReader.cpp Plugin.cpp StreamReader.cpp)
+    LocalStreamReader.cpp NetStreamReader.cpp OOV.cpp Plugin.cpp
+    StreamReader.cpp)
 
 SET(OOV_HPP
-    oov.hpp LocalStreamReader.hpp NetStreamReader.hpp Plugin.hpp
+    oov.hpp LocalStreamReader.hpp NetStreamReader.hpp OOV.hpp Plugin.hpp
     StreamReader.hpp)
 
 ADD_LIBRARY(vleoov SHARED ${OOV_CPP};${OOV_HPP})

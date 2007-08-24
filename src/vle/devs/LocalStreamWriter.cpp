@@ -50,7 +50,7 @@ void LocalStreamWriter::open(const std::string& plugin,
     std::string filename(Glib::build_filename(location, file));
     m_reader.init(plugin, filename);
     m_reader.onParameter(vpz::ParameterTrame(utils::to_string(time),
-                                             parameters));
+                                             parameters, plugin, location));
 }
 
 void LocalStreamWriter::processNewObservable(Simulator* simulator,

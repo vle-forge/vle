@@ -31,6 +31,7 @@
 #include <vle/vpz/ParameterTrame.hpp>
 #include <vle/vpz/NewObservableTrame.hpp>
 #include <vle/vpz/DelObservableTrame.hpp>
+#include <vle/vpz/EndTrame.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Socket.hpp>
@@ -561,9 +562,16 @@ void VpzStackSax::pop_translator(const std::string& cdata)
     novle->setData(cdata);
 }
 
-void VpzStackSax::push_trame(const AttributeList& att)
+void VpzStackSax::push_vletrame()
 {
     AssertS(utils::SaxParserError, m_stack.empty());
+    m_stack.push(new VLETrame);
+}
+
+void VpzStackSax::push_trame(const AttributeList& att)
+{
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, dynamic_cast < VLETrame* >(m_stack.top()));
 
     std::string type(get_attribute < std::string >(att, "type"));
     if (type == "value") {
@@ -585,10 +593,14 @@ void VpzStackSax::push_trame(const AttributeList& att)
                 get_attribute < std::string >(att, "view")));
     } else if (type == "parameter") {
         m_stack.push(new ParameterTrame(
-                get_attribute < std::string >(att, "date")));
+                get_attribute < std::string >(att, "date"),
+                get_attribute < std::string >(att, "plugin"),
+                get_attribute < std::string >(att, "location")));
     } else if (type == "value") {
         m_stack.push(new ValueTrame(
                 get_attribute < std::string >(att, "date")));
+    } else if (type == "end") {
+        m_stack.push(new EndTrame);
     } else {
         Throw(utils::SaxParserError, boost::format(
                 "Unknow trame named %1%") % type);
@@ -600,7 +612,22 @@ void VpzStackSax::pop_trame()
     AssertS(utils::SaxParserError, m_stack.top()->isTrame() or
             m_stack.top()->isModelTrame());
 
-    m_trame = reinterpret_cast < Trame* >(m_stack.top());
+    m_trame.push_back(reinterpret_cast < Trame* >(m_stack.top()));
+}
+
+void VpzStackSax::pop_modeltrame(const value::Value& value)
+{
+    AssertS(utils::SaxParserError, m_stack.top()->isModelTrame());
+    ValueTrame* tr = reinterpret_cast < ValueTrame* >(m_stack.top());
+    tr->add(value);
+}
+
+void VpzStackSax::pop_vletrame()
+{
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, dynamic_cast < VLETrame* >(m_stack.top()));
+    delete m_stack.top();
+    m_stack.pop();
 }
 
 void VpzStackSax::push_modeltrame(const AttributeList& att)
@@ -642,7 +669,9 @@ VLESaxParser::VLESaxParser(Vpz& vpz) :
     m_vpzstack(vpz),
     m_vpz(vpz),
     m_isValue(false),
-    m_isVPZ(false)
+    m_isVPZ(false),
+    m_isTrame(false),
+    m_isEndTrame(false)
 {
 }
 
@@ -657,6 +686,7 @@ void VLESaxParser::clear_parser_state()
     m_isValue = false;
     m_isVPZ = false;
     m_isTrame = false;
+    m_isEndTrame = false;
 }
 
 void VLESaxParser::on_start_document()
@@ -667,8 +697,8 @@ void VLESaxParser::on_start_document()
 void VLESaxParser::on_end_document()
 {
     if (m_isVPZ == false) {
-        if (m_vpzstack.trame()) {
-            m_isTrame = true; 
+        if (not m_vpzstack.trame().empty()) {
+            m_isTrame = true;
         } else {
             if (not m_valuestack.get_results().empty()) {
                 m_isValue = true;
@@ -757,6 +787,9 @@ void VLESaxParser::on_start_element(
         m_vpzstack.push_translators();
     } else if (name == "translator") {
         m_vpzstack.push_translator(att);
+    } else if (name == "vle_trame") {
+        m_isEndTrame = false;
+        m_vpzstack.push_vletrame();
     } else if (name == "trame") {
         m_vpzstack.push_trame(att);
     } else if (name == "modeltrame") {
@@ -842,9 +875,10 @@ void VLESaxParser::on_end_element(const Glib::ustring& name)
         }
         m_vpzstack.pop();
     } else if (name == "modeltrame") {
-        AssertS(utils::SaxParserError, m_vpzstack.top()->isModelTrame());
-        ValueTrame* tr = reinterpret_cast < ValueTrame* >(m_vpzstack.top());
-        tr->add(get_value(0));
+        m_vpzstack.pop_modeltrame(get_value(0));
+    } else if (name == "vle_trame") {
+        m_vpzstack.pop_vletrame();
+        m_isEndTrame = true;
     }
 }
 

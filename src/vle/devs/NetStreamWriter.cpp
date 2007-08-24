@@ -40,19 +40,33 @@ NetStreamWriter::~NetStreamWriter()
     delete m_client;
 }
 
-void NetStreamWriter::open(const std::string& /* plugin */,
+void NetStreamWriter::open(const std::string& plugin,
                            const std::string& location,
                            const std::string& file,
-                           const std::string& /* parameters */)
+                           const std::string& parameters,
+                           const devs::Time& time)
 {
-    std::string host;
+    std::string host, directory;
     int port;
 
     try {
-        utils::net::explodeStringNet(location, host, port);
+        utils::net::explodeStringNet(location, host, port, directory);
         m_client = new utils::net::Client(host, port);
-        TRACE1(boost::format("NetStreamWriter init %1%:%2% %3%") % host % port %
-               location);
+        TRACE1(boost::format("NetStreamWriter init %1%:%2% %3% %4%") % host %
+               port % directory % file);
+        std::ostringstream out;
+        out << "<vle_trame>"
+            << "<trame type=\"parameter\""
+            << " date=\"" << time << "\""
+            << " plugin=\"" << plugin << "\""
+            << " location=\"" << Glib::build_filename(directory, file) << "\"";
+
+        if (not parameters.empty()) {
+            out << " ><![CDATA[" << parameters << "]]></trame>";
+        } else {
+            out << " />";
+        }
+        m_client->send_buffer(out.str());
     } catch(const std::exception& e) {
         Throw(utils::InternalError, boost::format(
                 "NetStreamWriter open: error opening the client connection "
@@ -62,14 +76,14 @@ void NetStreamWriter::open(const std::string& /* plugin */,
     }
 }
 
-void NetStreamWriter::processNewObservable(const Time& time,
-                                           Simulator* simulator,
+void NetStreamWriter::processNewObservable(Simulator* simulator,
                                            const std::string& portname,
+                                           const devs::Time& time,
                                            const std::string& view)
 {
     std::ostringstream out;
-    out << "<trame type=\"new\" "
-        << " data=\"" << time << "\""
+    out << "<trame type=\"new\""
+        << " date=\"" << time << "\""
         << " name=\"" << simulator->getStructure()->getName() << "\""
         << " parent=\"" << simulator->getStructure()->getParentName() << "\""
         << " port=\"" << portname << "\""
@@ -84,14 +98,14 @@ void NetStreamWriter::processNewObservable(const Time& time,
     }
 }
 
-void NetStreamWriter::processRemoveObservable(const Time& time,
-                                              Simulator* simulator,
+void NetStreamWriter::processRemoveObservable(Simulator* simulator,
                                               const std::string& portname,
+                                              const devs::Time& time,
                                               const std::string& view)
 {
     std::ostringstream out;
-    out << "<trame type=\"del\" "
-        << " data=\"" << time << "\""
+    out << "<trame type=\"del\""
+        << " date=\"" << time << "\""
         << " name=\"" << simulator->getStructure()->getName() << "\""
         << " parent=\"" << simulator->getStructure()->getParentName() << "\""
         << " port=\"" << portname << "\""
@@ -109,7 +123,7 @@ void NetStreamWriter::processRemoveObservable(const Time& time,
 void NetStreamWriter::process(const StateEvent& event)
 {
     std::ostringstream out;
-    out << "<trame type=\"value\" data=\"" << event.getTime() << "\" >"
+    out << "<trame type=\"value\" date=\"" << event.getTime() << "\" >"
         << "<modeltrame name=\"" << event.getSourceModelName()
         << "\" parent=\"" << event.getModel()->getStructure()->getParentName()
         << "\" port=\"" << event.getPortName()
@@ -130,7 +144,7 @@ void NetStreamWriter::process(const StateEvent& event)
 void NetStreamWriter::close()
 {
     try {
-        m_client->send_buffer("<trame type=\"end\"/>");
+        m_client->send_buffer("<trame type=\"end\"/></vle_trame>");
         m_client->close();
         delete m_client;
         m_client = 0;

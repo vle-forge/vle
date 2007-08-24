@@ -48,6 +48,8 @@
 #   include <errno.h>
 #endif
 
+#include <boost/algorithm/string/split.hpp>
+#include <boost/lexical_cast.hpp>
 
 
 namespace vle { namespace utils { namespace net {
@@ -76,6 +78,35 @@ void explodeStringNet(const std::string& input, std::string& ip, int& port)
             }
         }
     }
+}
+
+void explodeStringNet(const std::string& input, std::string& ip, int& port,
+                      std::string& directory)
+{
+    ip.assign("localhost");
+    port = 8000;
+
+    std::vector < std::string > lst;
+    boost::algorithm::split(lst, input, boost::is_any_of(":"));
+
+    Assert(utils::InternalError, lst.size() == 3, boost::format(
+            "Cannot find IP:port:directory from [%1%]") % input);
+
+    if (not lst[0].empty()) {
+        ip.assign(lst[0]);
+    }
+
+    try {
+        port = boost::lexical_cast < int >(lst[1]);
+    } catch(const boost::bad_lexical_cast& e) {
+        Throw(utils::InternalError, boost::format(
+                "Cannont convert [%1%] in TCP/IP port") % lst[1]);
+    }
+
+    Assert(utils::InternalError, port > 0 and port < 65535, boost::format(
+            "Bad TCP/IP port value: %1%") % port);
+
+    directory.assign(lst[2]);
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

@@ -34,10 +34,9 @@ Text::Text(const std::string& location) :
     m_isstart(false)
 {
     m_file.open(location.c_str());
-    if (not m_file.is_open()) {
-        Throw(utils::InternalError, (boost::format(
-                    "Cannot open file '%1%'") % location));
-    }
+
+    Assert(utils::InternalError, m_file.is_open(), boost::format(
+            "Cannot open file [%1%]") % location);
 }
 
 Text::~Text()

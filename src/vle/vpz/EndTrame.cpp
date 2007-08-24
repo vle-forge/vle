@@ -1,8 +1,8 @@
 /** 
- * @file ParameterTrame.cpp
+ * @file EndTrame.cpp
  * @brief 
  * @author The vle Development Team
- * @date 2007-07-15
+ * @date 2007-08-22
  */
 
 /*
@@ -22,20 +22,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#include <vle/vpz/ParameterTrame.hpp>
+#include <vle/vpz/EndTrame.hpp>
+
+
 
 namespace vle { namespace vpz {
 
-void ParameterTrame::write(std::ostream& out) const
+void EndTrame::write(std::ostream& out) const
 {
-    if (not m_data.empty()) {
-        out << "<trame type=\"parameter\" date=\"" << m_time << "\" plugin=\""
-            << m_plugin << "\" >" << "<![CDATA[" << m_data << "]]>"
-            << "</trame>";
-    } else {
-        out << "<trame type=\"parameter\" date=\"" << m_time << "\" plugin=\""
-           << m_plugin << "\" />";
-    }
+    out << "<trame type=\"end\" />";
 }
 
 }} // namespace vle vpz

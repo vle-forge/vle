@@ -1,8 +1,8 @@
 /** 
- * @file ParameterTrame.cpp
+ * @file OOV.hpp
  * @brief 
  * @author The vle Development Team
- * @date 2007-07-15
+ * @date 2007-08-23
  */
 
 /*
@@ -22,20 +22,31 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#include <vle/vpz/ParameterTrame.hpp>
+#ifndef VLE_OOV_OOV_HPP
+#define VLE_OOV_OOV_HPP
 
-namespace vle { namespace vpz {
+#include <ostream>
 
-void ParameterTrame::write(std::ostream& out) const
-{
-    if (not m_data.empty()) {
-        out << "<trame type=\"parameter\" date=\"" << m_time << "\" plugin=\""
-            << m_plugin << "\" >" << "<![CDATA[" << m_data << "]]>"
-            << "</trame>";
-    } else {
-        out << "<trame type=\"parameter\" date=\"" << m_time << "\" plugin=\""
-           << m_plugin << "\" />";
-    }
-}
+namespace vle { namespace oov {
 
-}} // namespace vle vpz
+    class OOV
+    {
+    public:
+        /** 
+         * @brief Print the informations of VLE framework.
+         * 
+         * @param out stream to put information.
+         */
+        static void printInformations(std::ostream& out);
+
+        /** 
+         * @brief Print the version of VLE framework.
+         * 
+         * @param out stream to put information.
+         */
+        static void printVersion(std::ostream& out);
+    };
+
+}} // namespace vle oov 
+
+#endif

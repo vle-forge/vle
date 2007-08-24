@@ -38,18 +38,17 @@ namespace vle { namespace oov {
 
         virtual ~LocalStreamReader();
 
-        virtual void init(const std::string& plugin,
-                          const std::string& location);
+        void init(const std::string& plugin, const std::string& location);
 
-        virtual void onParameter(const vpz::ParameterTrame& trame);
+        void onParameter(const vpz::ParameterTrame& trame);
 
-        virtual void onNewObservable(const vpz::NewObservableTrame& trame);
+        void onNewObservable(const vpz::NewObservableTrame& trame);
 
-        virtual void onDelObservable(const vpz::DelObservableTrame& trame);
+        void onDelObservable(const vpz::DelObservableTrame& trame);
 
-        virtual void onValue(const vpz::ValueTrame& trame);
+        void onValue(const vpz::ValueTrame& trame);
         
-        virtual void onClose();
+        void onClose();
     };
 
 }} // namespace vle oov

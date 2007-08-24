@@ -33,6 +33,7 @@
 #include <vle/devs/ModelFactory.hpp>
 #include <vle/devs/StreamWriter.hpp>
 #include <vle/devs/LocalStreamWriter.hpp>
+#include <vle/devs/NetStreamWriter.hpp>
 #include <vle/graph/Model.hpp>
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/graph/CoupledModel.hpp>
@@ -330,7 +331,7 @@ void Coordinator::addModels(vpz::Model& model)
 
 void Coordinator::addView(View* view)
 {
-    Assert(utils::InternalError, view, boost::format("Empty reference"));
+    Assert(utils::InternalError, view, "Empty reference");
 
     ViewList::iterator it = m_viewList.find(view->getName());
     if (it == m_viewList.end()) {
@@ -526,7 +527,7 @@ void Coordinator::startLocalStream()
             stream = new LocalStreamWriter();
             break;
         case vpz::Output::DISTANT:
-            Throw(utils::NotYetImplemented, "Coordinator::startdistant"); 
+            stream = new NetStreamWriter();
             break;
         }
         

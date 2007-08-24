@@ -64,7 +64,7 @@ namespace vle { namespace utils {
 #define Assert(type, test, debugstring) { \
     if (! (test)) { \
         throw type(boost::str(boost::format( \
-                "%1%\n") % debugstring)); }}
+                "%1%\n") % (debugstring))); }}
 #endif // NDEBUG
 
 /**
@@ -151,7 +151,7 @@ namespace vle { namespace utils {
 #else // NDEBUG
 #define Throw(type, debugstring) { \
     throw type(boost::str(boost::format( \
-        "%1%") % debugstring)); }
+        "%1%") % (debugstring))); }
 #endif
 
 /**

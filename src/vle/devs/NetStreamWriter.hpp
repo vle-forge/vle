@@ -43,18 +43,19 @@ namespace vle { namespace devs {
                     const std::string& plugin,
                     const std::string& location,
                     const std::string& file,
-                    const std::string& parameters);
+                    const std::string& parameters,
+                    const devs::Time& time);
 
         virtual void processNewObservable(
-                    const Time& time,
                     Simulator* simulator,
                     const std::string& portname,
+                    const devs::Time& time,
                     const std::string& view);
 
         virtual void processRemoveObservable(
-                    const Time& time,
                     Simulator* simulator,
                     const std::string& portname,
+                    const devs::Time& time,
                     const std::string& view);
 
         virtual void process(

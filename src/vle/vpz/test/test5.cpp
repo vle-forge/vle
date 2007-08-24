@@ -55,32 +55,38 @@ BOOST_AUTO_TEST_CASE(trame_parameter)
 {
     const char* xml = 
         "<?xml version=\"1.0\"?>\n"
-        "<trame type=\"parameter\" date=\"0.33\">\n"
+        "<vle_trame>\n"
+        "<trame type=\"parameter\" date=\"0.33\" plugin=\"text\" location=\"tutu\" >\n"
         "<![CDATA["
         "empty"
         "]]>\n"
-        "</trame>";
+        "</trame>"
+        "</vle_trame>";
 
-    vpz::Trame* tr = vpz::Vpz::parse_trame(xml);
-    BOOST_CHECK(tr);
+    vpz::TrameList tr = vpz::Vpz::parse_trame(xml);
+    BOOST_REQUIRE_EQUAL(tr.size(), (vpz::TrameList::size_type)1);
 
-    vpz::ParameterTrame* ptr = dynamic_cast < vpz::ParameterTrame* >(tr);
+    vpz::ParameterTrame* ptr = dynamic_cast < vpz::ParameterTrame* >(tr.front());
     BOOST_CHECK(ptr);
     BOOST_REQUIRE_EQUAL(ptr->time(), "0.33");
     BOOST_REQUIRE_EQUAL(ptr->data(), "empty");
+    BOOST_REQUIRE_EQUAL(ptr->plugin(), "text");
+    BOOST_REQUIRE_EQUAL(ptr->location(), "tutu");
 }
 
 BOOST_AUTO_TEST_CASE(trame_addobservable)
 {
     const char* xml =
         "<?xml version=\"1.0\"?>\n"
+        "<vle_trame>\n"
         "<trame type=\"new\" date=\".33\" name=\"mdl\" parent=\"\" port=\"x\""
-        " view=\"view1\" />";
+        " view=\"view1\" />"
+        "</vle_trame>";
 
-    vpz::Trame* tr = vpz::Vpz::parse_trame(xml);
-    BOOST_CHECK(tr);
+    vpz::TrameList tr = vpz::Vpz::parse_trame(xml);
+    BOOST_REQUIRE_EQUAL(tr.size(), (vpz::TrameList::size_type)1);
 
-    vpz::NewObservableTrame* ptr = dynamic_cast < vpz::NewObservableTrame*>(tr);
+    vpz::NewObservableTrame* ptr = dynamic_cast < vpz::NewObservableTrame*>(tr.front());
     BOOST_CHECK(ptr);
     BOOST_REQUIRE_EQUAL(ptr->time(), ".33");
     BOOST_REQUIRE_EQUAL(ptr->name(), "mdl");
@@ -93,13 +99,15 @@ BOOST_AUTO_TEST_CASE(trame_delobservable)
 {
     const char* xml =
         "<?xml version=\"1.0\"?>\n"
+        "<vle_trame>"
         "<trame type=\"del\" date=\".33\" name=\"mdl\" parent=\"\" port=\"x\""
-        " view=\"view1\" />";
+        " view=\"view1\" />"
+        "</vle_trame>";
 
-    vpz::Trame* tr = vpz::Vpz::parse_trame(xml);
-    BOOST_CHECK(tr);
+    vpz::TrameList tr = vpz::Vpz::parse_trame(xml);
+    BOOST_REQUIRE_EQUAL(tr.size(), (vpz::TrameList::size_type)1);
 
-    vpz::DelObservableTrame* ptr = dynamic_cast < vpz::DelObservableTrame* >(tr);
+    vpz::DelObservableTrame* ptr = dynamic_cast < vpz::DelObservableTrame* >(tr.front());
     BOOST_CHECK(ptr);
     BOOST_REQUIRE_EQUAL(ptr->time(), ".33");
     BOOST_REQUIRE_EQUAL(ptr->name(), "mdl");
@@ -112,6 +120,7 @@ BOOST_AUTO_TEST_CASE(trame_value)
 {
     const char* xml =
         "<?xml version=\"1.0\"?>\n"
+        "<vle_trame>\n"
         "<trame type=\"value\" date=\".33\" >"
         " <modeltrame name=\"n1\" parent=\"p1\" port=\"port\" view=\"view1\" >"
         "  <set>"
@@ -123,12 +132,13 @@ BOOST_AUTO_TEST_CASE(trame_value)
         "   </set>"
         "  </set>"
         " </modeltrame>"
-        "</trame>";
+        "</trame>"
+        "</vle_trame>";
 
-    vpz::Trame* tr = vpz::Vpz::parse_trame(xml);
-    BOOST_CHECK(tr);
+    vpz::TrameList tr = vpz::Vpz::parse_trame(xml);
+    BOOST_REQUIRE_EQUAL(tr.size(), (vpz::TrameList::size_type)1);
 
-    vpz::ValueTrame* ptr = dynamic_cast < vpz::ValueTrame* >(tr);
+    vpz::ValueTrame* ptr = dynamic_cast < vpz::ValueTrame* >(tr.front());
     BOOST_CHECK(ptr);
     BOOST_REQUIRE_EQUAL(ptr->time(), ".33");
     BOOST_REQUIRE_EQUAL(ptr->trames().size(), (unsigned int)1);

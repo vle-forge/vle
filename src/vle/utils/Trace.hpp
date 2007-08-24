@@ -157,16 +157,16 @@ namespace vle { namespace utils {
 
 }} // namespace vle utils
 
-#define TRACE(x) vle::utils::Trace::trace().push(x, vle::utils::Trace::ALWAYS)
-#define DTRACE(x) vle::utils::Trace::trace().push_date(x, vle::utils::Trace::ALWAYS)
+#define TRACE(x) vle::utils::Trace::trace().push((x), vle::utils::Trace::ALWAYS)
+#define DTRACE(x) vle::utils::Trace::trace().push_date((x), vle::utils::Trace::ALWAYS)
 
 #ifndef NDEBUG
-#define TRACE1(x) vle::utils::Trace::trace().push(x, vle::utils::Trace::IMPORTANT)
-#define DTRACE1(x) vle::utils::Trace::trace().push_date(x, vle::utils::Trace::IMPORTANT)
-#define TRACE2(x) vle::utils::Trace::trace().push(x, vle::utils::Trace::INFORMATION)
-#define DTRACE2(x) vle::utils::Trace::trace().push_date(x, vle::utils::Trace::INFORMATION)
-#define TRACE3(x) vle::utils::Trace::trace().push(x, vle::utils::Trace::DEBUG)
-#define DTRACE3(x) vle::utils::Trace::trace().push_date(x, vle::utils::Trace::DEBUG)
+#define TRACE1(x) vle::utils::Trace::trace().push((x), vle::utils::Trace::IMPORTANT)
+#define DTRACE1(x) vle::utils::Trace::trace().push_date((x), vle::utils::Trace::IMPORTANT)
+#define TRACE2(x) vle::utils::Trace::trace().push((x), vle::utils::Trace::INFORMATION)
+#define DTRACE2(x) vle::utils::Trace::trace().push_date((x), vle::utils::Trace::INFORMATION)
+#define TRACE3(x) vle::utils::Trace::trace().push((x), vle::utils::Trace::DEBUG)
+#define DTRACE3(x) vle::utils::Trace::trace().push_date((x), vle::utils::Trace::DEBUG)
 #else
 #define TRACE1(x)
 #define DTRACE1(x)

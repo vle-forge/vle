@@ -41,8 +41,8 @@ namespace vle { namespace utils {
     namespace net {
 
     /**
-     * Parse the input string to find correct TCP/IP address and good port. For
-     * instance:
+     * @brief Parse the input string to find correct TCP/IP address and good
+     * port. For instance:
      * @code
      * utils::net::explodeStringNet("localhost:8000"); // localhost and 8000
      * utils::net::explodeStringNet(":8000");          // localhost and 8000
@@ -60,6 +60,30 @@ namespace vle { namespace utils {
     void explodeStringNet(const std::string& input,
                           std::string& ip,
                           int& port);
+
+    /**
+     * @brief Parse the input string to find correct TCP/IP address, port and
+     * directory. For instance:
+     * @code
+     * utils::net::explodeStringNet("localhost:80:xxx"); // localhost, 80, "xxx"
+     * utils::net::explodeStringNet(":8000:");          // localhost, 80, ""
+     * utils::net::explodeStringNet("127.0.0.1:");     // 127.0.0.1 and 8000, ""
+     * utils::net::explodeStringNet("193.49.192.226:9999:");
+     *                             // 193.49.192.226:9999, ""
+     * utils::net::explodeStringNet("::");              // localhost and 9000
+     * @endcode
+     *
+     * @param input the string representation of StringNet. The string must
+     * containt two ':'.
+     * @param ip output parameter to receive IP address or server name. Default
+     * is localhost.
+     * @param port output parameter to receive TCP/IP port. Default is 8000.
+     * @param directory output parameter to receive directory. Default is empty.
+     */
+    void explodeStringNet(const std::string& input,
+                          std::string& ip,
+                          int& port,
+                          std::string& directory);
     
     /**
      * @brief Define base class of socket Client and Server.

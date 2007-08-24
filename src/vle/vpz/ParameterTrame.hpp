@@ -34,14 +34,22 @@ namespace vle { namespace vpz {
     class ParameterTrame : public Trame
     {
     public:
-        ParameterTrame(const std::string& time) :
-            m_time(time)
+        ParameterTrame(const std::string& time,
+                       const std::string& plugin,
+                       const std::string& location) :
+            m_time(time),
+            m_plugin(plugin),
+            m_location(location)
         { }
 
         ParameterTrame(const std::string& time,
-                       const std::string& data) :
+                       const std::string& data,
+                       const std::string& plugin,
+                       const std::string& location) :
             m_time(time),
-            m_data(data)
+            m_data(data),
+            m_plugin(plugin),
+            m_location(location)
         { }
 
         virtual ~ParameterTrame()
@@ -67,9 +75,17 @@ namespace vle { namespace vpz {
         inline const std::string& data() const
         { return m_data; }
 
+        inline const std::string& plugin() const
+        { return m_plugin; }
+
+        inline const std::string& location() const
+        { return m_location; }
+
     private:
         std::string     m_time;
         std::string     m_data;
+        std::string     m_plugin;
+        std::string     m_location;
     };
 
 }} // namespace vle vpz

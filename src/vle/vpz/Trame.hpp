@@ -47,6 +47,25 @@ namespace vle { namespace vpz {
         virtual void write(std::ostream& out) const = 0;
     };
 
+    class TrameList : public std::list < Trame* >
+    { };
+
+    class VLETrame : public Trame
+    {
+    public:
+        VLETrame()
+        { }
+
+        virtual ~VLETrame()
+        { }
+
+        virtual Base::type getType() const
+        { return Base::TRAME; }
+
+        virtual void write(std::ostream& /* out */) const
+        { }
+    };
+
 }} // namespace vle vpz
 
 #endif

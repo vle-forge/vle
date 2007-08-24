@@ -1,8 +1,8 @@
 /** 
- * @file ParameterTrame.cpp
+ * @file OOV.cpp
  * @brief 
  * @author The vle Development Team
- * @date 2007-07-15
+ * @date 2007-08-23
  */
 
 /*
@@ -22,20 +22,26 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#include <vle/vpz/ParameterTrame.hpp>
+#include <vle/oov/OOV.hpp>
 
-namespace vle { namespace vpz {
 
-void ParameterTrame::write(std::ostream& out) const
+namespace vle { namespace oov {
+
+void OOV::printInformations(std::ostream& out)
 {
-    if (not m_data.empty()) {
-        out << "<trame type=\"parameter\" date=\"" << m_time << "\" plugin=\""
-            << m_plugin << "\" >" << "<![CDATA[" << m_data << "]]>"
-            << "</trame>";
-    } else {
-        out << "<trame type=\"parameter\" date=\"" << m_time << "\" plugin=\""
-           << m_plugin << "\" />";
-    }
+    out <<
+        "Output of Virtual Laboratory Environment (oov) - " << VLE_PACKAGE_VERSION << "\n"
+        "Copyright (C) 2004, 05, 06, 07 VLE Development Team.\n"
+        "VLE comes with ABSOLUTELY NO WARRANTY.\n"
+        "You may redistribute copies of VLE\n"
+        "under the terms of the GNU General Public License.\n"
+        "For more information about these matters, see the file named COPYING."
+        << std::endl;
 }
 
-}} // namespace vle vpz
+void OOV::printVersion(std::ostream& out)
+{
+    out << "oov " << VLE_PACKAGE_VERSION << std::endl;
+}
+
+}} // vle oov

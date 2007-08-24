@@ -22,6 +22,7 @@ stamp-h1
 vle.pc
 vlepython.pc
 src/apps/vle/vle
+src/apps/oov/oov
 src/apps/test/vlemodeltest
 src/apps/test/vletranslatortest
 *.cmake

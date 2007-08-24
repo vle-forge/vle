@@ -45,25 +45,6 @@ namespace vle { namespace oov {
 
         //
         ///
-        /// Virtual function to develop stream reader plugins.
-        ///
-        //
-
-        virtual void init(const std::string& plugin,
-                          const std::string& location) = 0;
-
-        virtual void onParameter(const vpz::ParameterTrame& trame) = 0;
-
-        virtual void onNewObservable(const vpz::NewObservableTrame& trame) = 0;
-
-        virtual void onDelObservable(const vpz::DelObservableTrame& trame) = 0;
-
-        virtual void onValue(const vpz::ValueTrame& trame) = 0;
-        
-        virtual void onClose() = 0;
-
-        //
-        ///
         /// Get/Set functions
         ///
         //

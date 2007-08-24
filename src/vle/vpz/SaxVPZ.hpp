@@ -29,6 +29,7 @@
 #include <libxml++/libxml++.h>
 #include <vle/vpz/Base.hpp>
 #include <vle/vpz/SaxStackValue.hpp>
+#include <vle/vpz/Trame.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/value/Map.hpp>
@@ -45,8 +46,7 @@ namespace vle { namespace vpz {
     {
     public:
         VpzStackSax(Vpz& vpz) :
-            m_vpz(vpz),
-            m_trame(0)
+            m_vpz(vpz)
         { }
 
         ~VpzStackSax() { }
@@ -82,10 +82,12 @@ namespace vle { namespace vpz {
         void push_translator(const AttributeList& att);
         void pop_translator(const std::string& cdata);
 
+        void push_vletrame();
         void push_trame(const AttributeList& att);
         void pop_trame();
         void push_modeltrame(const AttributeList& att);
-        void pop_modeltrame();
+        void pop_modeltrame(const value::Value& value);
+        void pop_vletrame();
 
         value::Set& pop_condition_port();
         vpz::Base* pop();
@@ -95,7 +97,10 @@ namespace vle { namespace vpz {
         inline vpz::Vpz& vpz()
         { return m_vpz; }
 
-        inline Trame* trame() const
+        inline const TrameList& trame() const
+        { return m_trame; }
+        
+        inline TrameList& trame()
         { return m_trame; }
 
         friend std::ostream& operator<<(std::ostream& out,
@@ -104,7 +109,7 @@ namespace vle { namespace vpz {
     private:
         std::stack < vpz::Base* >       m_stack;
         vpz::Vpz&                       m_vpz;
-        Trame*                          m_trame;
+        TrameList                       m_trame;
     };
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -156,6 +161,9 @@ namespace vle { namespace vpz {
         inline bool is_trame() const
         { return m_isTrame; }
 
+        inline bool is_endtrame() const
+        { return m_isEndTrame; }
+
         const std::vector < value::Value >& get_values() const;
         std::vector < value::Value >& get_values();
 
@@ -164,7 +172,10 @@ namespace vle { namespace vpz {
         inline const vpz::Vpz& vpz() const
         { return m_vpz; }
 
-        inline Trame* trame() const
+        inline const TrameList& tramelist() const
+        { return m_vpzstack.trame(); }
+
+        inline TrameList& tramelist()
         { return m_vpzstack.trame(); }
 
     private:
@@ -197,6 +208,8 @@ namespace vle { namespace vpz {
         bool                            m_isValue;
         bool                            m_isVPZ;
         bool                            m_isTrame;
+
+        bool                            m_isEndTrame;
     };
     
     template < typename T > T

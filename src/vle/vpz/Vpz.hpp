@@ -132,7 +132,7 @@ namespace vle { namespace vpz {
          * @return a reference to the Trame read. You must manage the memory of
          * this trame.
          */
-        static Trame* parse_trame(const std::string& buffer);
+        static TrameList parse_trame(const std::string& buffer);
         
         /** 
          * @brief Parse the buffer to find a list of values.
