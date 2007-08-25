@@ -48,6 +48,15 @@ IF(NOT CMAKE_BUILD_TYPE)
 ENDIF(NOT CMAKE_BUILD_TYPE)
 
 ##
+## Check zlib
+##
+
+INCLUDE(FindZLIB)
+IF(NOT ZLIB_FOUND)
+	MESSAGE(FATAL_ERROR "Zlib library not found")
+ENDIF(NOT ZLIB_FOUND)
+
+##
 ## Check libraries with pkgconfig
 ##
 
