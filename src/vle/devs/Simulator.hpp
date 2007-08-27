@@ -40,7 +40,6 @@
 namespace vle { namespace devs {
 
     class Coordinator;
-    class Model;
     class Dynamics;
 
     /**
@@ -58,7 +57,7 @@ namespace vle { namespace devs {
 	const std::string & getName() const;
 	Time getLastTime() const;
 	graph::AtomicModel* getStructure() const;
-	Model* findModel(const std::string & name) const;
+        graph::Model* findModel(const std::string & name) const;
 	void setLastTime(const Time& time);
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

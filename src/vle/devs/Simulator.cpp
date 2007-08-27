@@ -72,10 +72,10 @@ graph::AtomicModel* Simulator::getStructure() const
     return m_atomicModel;
 }
 
-Model * Simulator::findModel(const std::string & name) const
+graph::Model * Simulator::findModel(const std::string & name) const
 {
     if (m_atomicModel->getName() == name)
-	return (Model *)m_atomicModel;
+        return (graph::Model *)m_atomicModel;
     else
 	return 0;
 }
