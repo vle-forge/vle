@@ -16,16 +16,21 @@ VLE \(em The simulator for VLE framework
 [\fB\-\-daemon\fP]
 [\fB\-\-allinlocal\fP]
 [\fB-o \fIint\fP\fR]
-[\fB\-\-process \fIint\fP\fR]
+[\fB\-\-process=\fIint\fP\fR]
 [\fB-i\fP]
 [\fB\-\-infos\fP]
 [\fB\-\-version\fP]
 [\fB-v\fP]
-[\fB\-\-verbose \fIint\fP\fR]
+[\fB\-\-verbose=\fIint\fP\fR]
 [\fB-m\fP]
 [\fB-s\fP]
 [\fB-j\fP]
 [\fB-p \fIint\fP\fR]
+[\fB--path=\fIdirname\fP\fR]
+[\fB--path-simulator=\fIdirname\fP\fR]
+[\fB--path-translator=\fIdirname\fP\fR]
+[\fB--path-stream=\fIdirname\fP\fR]
+[\fB--path-model=\fIdirname\fP\fR]
 [\fB\fIVPZ\fP or \fIVPZi\fP files...\fR]
 
 .SH "DESCRIPTION" 
@@ -91,7 +96,30 @@ is only available for the \fBsimulator\fP application.
 
 .IP "\fB-p\fI int\fR\fP, \fB\-\-port\fI int \fR\fP
 Define the listening port for vle application. Default is 8888. This option is
-only available for the mode \fBManager\fP and \fBSimulator\fP. 
+only available for the mode \fBManager\fP and \fBSimulator\fP.
+
+.IP "\fB--port=\fIdirname\fR\fP
+Add the \fBdirname\fP directory to the search path for all VLE plugins,
+simulators, stream, models, translators.
+
+.IP "\fB--port-simulator=\fIdirname\fR\fP
+Add the \fBdirname\fP directory to the search path for the simulators plugins.
+
+.IP "\fB--port-translator=\fIdirname\fR\fP
+Add the \fBdirname\fP directory to the search path for the translators plugins.
+
+.IP "\fB--port-model=\fIdirname\fR\fP
+Add the \fBdirname\fP directory to the search path for the modeling plugins.
+
+.IP "\fB--port-stream=\fIdirname\fR\fP
+Add the \fBdirname\fP directory to the search path for the stream plugins.
+
+.SH "EXAMPLES"
+.PP
+Run the simulator in just mode with the simulator and global plugins search
+path modified:
+.PP
+vle --path-simulator=$HOME/usr --path=$HOME/tmp file.vpz
 
 .SH "SEE ALSO" 
 .PP 
@@ -99,7 +127,7 @@ oov (1), gvle (1), eov (1), avle (1).
 
 .SH "AUTHOR" 
 .PP 
-Gauthier Quesnel \fBquesnel@lil.univ-littoral.fr\fP
+Gauthier Quesnel \fBquesnel@users.sourceforge.net\fP
 .PP
 Permission is granted to copy, distribute and/or modify this document under the
 terms of the GNU General Public License, Version 2 any later version published
