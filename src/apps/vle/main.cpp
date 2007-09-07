@@ -25,6 +25,7 @@
 #include <apps/vle/OptionGroup.hpp>
 #include <vle/manager/VLE.hpp>
 #include <vle/utils/Tools.hpp>
+#include <vle/utils/PathOptionGroup.hpp>
 #include <vle/utils/Trace.hpp>
 
 
@@ -37,11 +38,13 @@ int main(int argc, char* argv[])
     vle::apps::ManagerOptionGroup manag;
     vle::apps::SimulatorOptionGroup simu;
     vle::apps::GlobalOptionGroup global;
+    vle::utils::PathOptionGroup path;
 
     context.set_main_group(command);
     context.add_group(manag);
     context.add_group(simu);
     context.add_group(global);
+    context.add_group(path);
 
     try {
         context.parse(argc, argv);
@@ -50,6 +53,7 @@ int main(int argc, char* argv[])
         simu.check();
         global.check();
         vle::utils::Trace::trace().set_level(global.verbose());
+        path.assignToPath();
     } catch(const Glib::Error& e) {
         std::cerr << "Error parsing command line: " << e.what() << std::endl;
         return EXIT_FAILURE;

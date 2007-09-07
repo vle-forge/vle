@@ -27,7 +27,7 @@
 #define UTILS_PATH_HPP
 
 #include <string>
-
+#include <list>
 
 
 namespace vle { namespace utils {
@@ -46,130 +46,163 @@ namespace vle { namespace utils {
     class Path
     {
     public:
-        inline const std::string& getDefaultBinDir() const
-        { return mTab[0]; }
+        typedef std::list < std::string > PathList;
 
-        inline const std::string& getUserBinDir() const
-        { return mTab[1]; }
+        /** 
+         * @brief Return the prefix of the compilation on Unix or installation
+         * on Windows.
+         * @return A string path.
+         */
+        const std::string& getPrefixDir() const;
 
-        inline const std::string& getDefaultModelDir() const
-        { return mTab[2]; }
+        std::string getPixmapsDir() const;
 
-        inline const std::string& getUserModelDir() const
-        { return mTab[3]; }
+        std::string getGladeDir() const;
 
-        inline const std::string& getDefaultGUIPluginDir() const
-        { return mTab[4]; }
+        std::string getPixmapsFile(const std::string& file) const;
 
-        inline const std::string& getUserGUIPluginDir() const
-        { return mTab[5]; }
+        std::string getGladeFile(const std::string& file) const;
 
-        inline const std::string& getDefaultObserverPluginDir() const
-        { return mTab[6]; }
+        std::string getHomeDir() const;
 
-        inline const std::string& getUserObserverPluginDir() const
-        { return mTab[7]; }
+        inline const PathList& getSimulatorDirs() const
+        { return m_simulator; }
 
-        inline const std::string& getDefaultPixmapsDir() const
-        { return mTab[8]; }
+        inline const PathList& getTranslatorDirs() const
+        { return m_translator; }
 
-        inline const std::string& getUserPixmapsDir() const
-        { return mTab[9]; }
+        inline const PathList& getStreamDirs() const
+        { return m_stream; }
 
-        inline const std::string& getDefaultGladeDir() const
-        { return mTab[10]; }
+        inline const PathList& getModelDirs() const
+        { return m_model; }
 
-        inline const std::string& getUserGladeDir() const
-        { return mTab[11]; }
+        void addSimulatorDir(const std::string& dirname);
 
-        inline const std::string& getUserDir() const
-        { return mTab[12]; }
+        void addTranslatorDir(const std::string& dirname);
 
-        inline const std::string& getDefaultStreamDir() const
-        { return mTab[13]; }
+        void addStreamDir(const std::string& dirname);
 
-        inline const std::string& getUserStreamDir() const
-        { return mTab[14]; }    
+        void addModelDir(const std::string& dirname);
 
-        inline const std::string& getDefaultPythonDir() const
-        { return mTab[15]; }
+        void addPluginDir(const std::string& dirname);
 
-        inline const std::string& getUserPythonDir() const
-        { return mTab[16]; }
-
-        inline const std::string& getDefaultTranslatorDir() const
-        { return mTab[17]; }
-
-        inline const std::string& getUserTranslatorDir() const
-        { return mTab[18]; }
-
-        inline const std::string& getDefaultEOVPluginDir() const
-        { return mTab[19]; }
-
-        inline const std::string& getUserEOVPluginDir() const
-        { return mTab[20]; }
-
-        inline const std::string& getDefaultAVLEPluginDir() const
-        { return mTab[21]; }
-
-        inline const std::string& getUserAVLEPluginDir() const
-        { return mTab[22]; }
-
-        /** @return a Path object instantiate in singleton method. */
+        //
+        // singleton management
+        //
+        
+        /** 
+         * @brief Return a Path object instantiate in singleton method.
+         * @return A reference to the singleton object.
+         */
         inline static Path& path()
         { if (mPath == 0) mPath = new Path; return *mPath; }
 
-        /** Delete Path object instantiate from function path(). */
+        /** 
+         * @brief Delete Path object instantiate from function path().
+         */
         inline static void kill()
         { delete mPath; mPath = 0; }
 
-        std::string build_prefix_path(const char* buf);
-        std::string build_prefix_libraries_path(const char* name);
-        std::string build_prefix_share_path(const char* prg, const char* name);
+        //
+        // string path building
+        //
+
+        /** 
+         * @brief Build a string path based on the concatenation of install
+         * prefix and the provided buffer. For instance, if cmake was called
+         * with CMAKE_INSTALL_PREFIX=$HOME/usr on Unix, this function returns
+         * $HOME/usr/buffer.
+         * @param buf The buffer to concatenate to the install prefix.
+         * @return A string path.
+         */
+        static std::string buildPrefixPath(const std::string& buf);
+
+        /** 
+         * @brief Build a string path based on the concatenation of install
+         * prefix, library dir and provided buffer. For instance:
+         * @code
+         * buildPrefixLibrariesPath("/home/toto/usr", "simulator");
+         * // /home/toto/usr/lib/vle-0.5.0/simulator on Unix
+         * buildPrefixLibrariesPath("c:\\program files\vle", "simulator");
+         * // c:\program files\vle\lib\vle-0.5.0\simulator on Win32
+         * @endcode
+         * @param prefix the prefix of the path.
+         * @param buf the buffer to concatenate to the install prefix.
+         * @return A string path.
+         */
+        static std::string buildPrefixLibrariesPath(const std::string& prefix,
+                                                    const std::string& buf);
+
+        /** 
+         * @brief Build a string path based on the concatenation of install
+         * prefix, share prefix dir and provided program name and buffer. For
+         * instance:
+         * @code
+         * buildPrefixSharePath("/home/toto/usr", "vle", "pixmaps");
+         * // /home/toto/usr/share/vle-0.5.0/vle/pixmaps on Unix
+         * buildPrefixSharePath("c:\\program files\vle", "vle", "pixmaps");
+         * // c:\program files\vle\share\vle-0.5.0\vle\pixmaps on Win32
+         * @endcode
+         * @param prefix the prefix of the path.
+         * @param prg A buffer to concatenate.
+         * @param name A buffer to concatenante
+         * @return A string path.
+         */
+        static std::string buildPrefixSharePath(const std::string& prefix,
+                                                const std::string& prg,
+                                                const std::string& name = 
+                                                std::string());
 
         /**
-         * Build a path using two string.
-         *
+         * @brief Build a path using two string.
          * For instance:
          * @code
-         * std::string s = utils::Path::build_path("home", "vle");
+         * std::string s = utils::Path::buildPath("home", "vle");
+         * // Returns "home/vle" on Unix or "home\\vle" on Win32.
          * @endcode
-         *
-         * This example return "home/vle" on Unix or "home\\vle" on Win32.
-         *
          * @param left the string dirname.
          * @param right the string dirname.
          * @return the build path of left and right strings using the good
          * separator.
          */
-        static std::string build_path(const std::string& left,
-                                      const std::string& right);
+        static std::string buildPath(const std::string& left,
+                                     const std::string& right);
 
         /**
-         * Build a path from user home directory to specified dir. The fallowing
-         * example return the string "/home/<user>/.vle/model".
-         *
+         * @brief Build a path from user home directory to specified dir. The
+         * fallowing example return the string "/home/<user>/.vle/model".
          * @code
-         * std::string s = utils::Path::build_user_path("model");
+         * std::string s = utils::Path::buildUserPath("model");
          * // s == /home/gauthier/.vle/model on unix with my nickname.
-         * // s == c:\Documents and Settings\gauthier\Mes documents on win32.
+         * // s == c:\Documents and Settings\gauthier\My documents on win32.
          * @endcode
-         *
          * @param dir the directory to found into the user home dir.
-         *
          * @return a concatenation of user home dir and specified directory.
          */
-        static std::string build_user_path(const std::string& dir =
+        static std::string buildUserPath(const std::string& dir =
                                            std::string());
 
     private:
+        PathList    m_simulator;
+        PathList    m_translator;
+        PathList    m_stream;
+        PathList    m_model;
+        std::string m_prefix;
+
+        /** 
+         * @brief A default constructor that call the initPath member.
+         * @throw utils::InternalError if Initialisation of the class failed.
+         */
         Path();
 
-        ~Path() { }
+        /** 
+         * @brief Build the paths. This function exist in two part of the file,
+         * on for Unix/Linux another for Windows for registry access.
+         * @return true if success, false otherwise.
+         */
+        bool initPath();
 
-        bool init_path();
-
-        std::string  mTab[23];
         static Path* mPath; /// The static Path for singleton design pattern.
     };
 

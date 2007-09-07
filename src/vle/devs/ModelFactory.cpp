@@ -151,34 +151,26 @@ Simulator* ModelFactory::createModel(graph::AtomicModel* model,
 
 Glib::Module* ModelFactory::buildPlugin(const vpz::Dynamic& dyn)
 {
-    std::string file1(Glib::Module::build_path(
-        utils::Path::path().getDefaultModelDir(), dyn.library()));
-    
-    Glib::Module* module = new Glib::Module(file1);
-    if (not (*module)) {
-        std::string err1(Glib::Module::get_last_error());
-        delete module;
+    utils::Path::PathList lst(utils::Path::path().getSimulatorDirs());
+    utils::Path::PathList::const_iterator it;
 
-        std::string file2(Glib::Module::build_path(
-            utils::Path::path().getUserModelDir(), dyn.library()));
-        
-        module = new Glib::Module(file2);
+    std::string error((boost::format(
+                "Error opening simulator plugin '%1%' in:") %
+            dyn.library()).str());
+
+    for (it = lst.begin(); it != lst.end(); ++it) {
+        std::string file(Glib::Module::build_path(*it, dyn.library()));
+        Glib::Module* module = new Glib::Module(file);
         if (not (*module)) {
-            std::string err2(Glib::Module::get_last_error());
+            error += boost::str(boost::format(
+                    "\n[%1%]: %2%") % *it % Glib::Module::get_last_error());
             delete module;
-
-            Glib::ustring er((boost::format(
-                        "error opening plugin '%1%' or '%2%' library "
-                        "'%3%'\nwith error\n") % file1 % file2 %
-                    dyn.library()).str());
-            er += err1;
-            er += " ";
-            er += err2;
-            Throw(utils::InternalError, er);
+        } else {
+            module->make_resident();
+            return module;
         }
     }
-    module->make_resident();
-    return module;
+    Throw(utils::FileError, error);
 }
 
 Glib::Module* ModelFactory::getPlugin(const std::string& name)
@@ -205,7 +197,7 @@ void ModelFactory::attachDynamics(devs::Simulator* atom,
     devs::Dynamics* call = 0;
     void* makeNewDynamics = 0;
 
-    if (dyn.model().empty() or dyn.model() == dyn.library()) {
+    if (dyn.model().empty()) {
         bool getSymbol = module->get_symbol("makeNewDynamics", makeNewDynamics);
         Assert(utils::ParseError, getSymbol, boost::format(
                 "Error in '%1%', function 'makeNewDynamics' not found: '%2%'\n")
@@ -222,8 +214,8 @@ void ModelFactory::attachDynamics(devs::Simulator* atom,
         functionanme += dyn.model();
         bool getSymbol = module->get_symbol(functionanme , makeNewDynamics);
         Assert(utils::ParseError, getSymbol, boost::format(
-                "Error in '%1%', function '%2%' not found: '%3%'\n")
-            % module->get_name() % functionanme % Glib::Module::get_last_error());
+                "Error in '%1%', function '%2%' not found: '%3%'\n") %
+            module->get_name() % functionanme % Glib::Module::get_last_error());
 
         call = ((Dynamics*(*)(const
                     graph::Model&))(makeNewDynamics))(*atom->getStructure());

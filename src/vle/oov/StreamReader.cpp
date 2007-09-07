@@ -39,23 +39,20 @@ PluginPtr StreamReader::plugin()
 void StreamReader::init_plugin(const std::string& plugin,
                                const std::string& location)
 {
-    std::string err;
-    try {
-        PluginFactory pfd(plugin, utils::Path::path().getDefaultStreamDir());
-        m_plugin = pfd.build(location);
-        return;
-    } catch (const std::exception& edefault) {
-        err.assign(edefault.what());
-    }
+    utils::Path::PathList lst(utils::Path::path().getStreamDirs());
+    utils::Path::PathList::const_iterator it;
 
-    try {
-        PluginFactory pfl(plugin, utils::Path::path().getUserStreamDir());
-        m_plugin = pfl.build(location);
-        return;
-    } catch(const std::exception& euser) {
-        Throw(utils::InternalError, boost::format(
-                "Cannot open plugin %1%. Error reported:\n%2%\n%3%") %
-            plugin % err % euser.what());
+    std::string error((boost::format(
+                "Error opening oov plugin '%1%' in:") % plugin).str());
+
+    for (it = lst.begin(); it != lst.end(); ++it) {
+        try {
+            PluginFactory pfd(plugin, *it);
+            m_plugin = pfd.build(location);
+            return;
+        } catch (const std::exception& e) {
+            error += e.what();
+        }
     }
 }
 
@@ -64,10 +61,13 @@ StreamReader::PluginFactory::PluginFactory(const std::string& plugin,
     module__(0),
     plugin__(plugin)
 {
-    module__ = new Glib::Module(Glib::Module::build_path(pathname, plugin));
+    std::string file(Glib::Module::build_path(pathname, plugin));
+    module__ = new Glib::Module(file);
     if (not (*module__)) {
+        delete module__;
+        module__ = 0;
         Throw(utils::InternalError, boost::format(
-                "Error when building plugin from pathname %1%") % pathname);
+                "\n[%1%]: %2%") % pathname % Glib::Module::get_last_error());
     }
     module__->make_resident();
 }

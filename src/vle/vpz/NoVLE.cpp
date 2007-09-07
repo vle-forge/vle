@@ -97,35 +97,25 @@ void NoVLE::callTranslator(const Project& prj,
 
 Glib::Module* NoVLE::translator()
 {
-    std::string file = Glib::Module::build_path(
-        utils::Path::path().getDefaultTranslatorDir(), m_library);
+    utils::Path::PathList lst(utils::Path::path().getTranslatorDirs());
+    utils::Path::PathList::const_iterator it;
 
-    Glib::Module* module = new Glib::Module(file);
-    if (not (*module)) {
-        std::string err(Glib::Module::get_last_error());
-        delete module;
+    std::string error((boost::format(
+                "Error opening translator plugin '%1%' in:") %
+            m_library).str());
 
-        std::string ufile = Glib::Module::build_path(
-                utils::Path::path().getUserTranslatorDir(), m_library);
-        
-        module = new Glib::Module(ufile);
+    for (it = lst.begin(); it != lst.end(); ++it) {
+        std::string file = Glib::Module::build_path(*it, m_library);
+        Glib::Module* module = new Glib::Module(file);
         if (not (*module)) {
-            std::string err2(Glib::Module::get_last_error());
+            error += boost::str(boost::format(
+                    "\n[%1%]: %2%") % *it % Glib::Module::get_last_error());
             delete module;
-
-            Glib::ustring error((boost::format(
-                        "Error opening plugin %1% or %2% translator %3% "
-                        "with error:") % file % ufile % m_library).str());
-
-            error += "\n";
-            error += err;
-            error += "\n";
-            error += err2;
-
-            Throw(utils::FileError, error);
+        } else {
+            return module;
         }
     }
-    return module;
+    Throw(utils::FileError, error);
 }
 
 }} // namespace vle vpz

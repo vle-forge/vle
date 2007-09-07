@@ -78,7 +78,7 @@ namespace vle { namespace utils {
 
     std::string Trace::get_log_filename(const std::string& filename)
     {
-	return Glib::build_filename(utils::Path::path().getUserDir(), filename);
+	return Glib::build_filename(utils::Path::path().getHomeDir(), filename);
     }
 
 

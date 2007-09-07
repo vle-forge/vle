@@ -40,14 +40,129 @@ namespace vle { namespace utils {
 
 Path* Path::mPath = 0;
 
-Path::Path()
+const std::string& Path::getPrefixDir() const
 {
-    if (init_path() == false)
-	throw InternalError("Path initialization failed.");
+    return m_prefix;
 }
 
-std::string Path::build_path(const std::string& left,
-			     const std::string& right)
+std::string Path::getPixmapsDir() const
+{
+    return buildPrefixSharePath(m_prefix, std::string("pixmaps"));
+}
+
+std::string Path::getGladeDir() const
+{
+    return buildPrefixSharePath(m_prefix, "glade");
+}
+
+std::string Path::getPixmapsFile(const std::string& file) const
+{
+    return buildPrefixSharePath(m_prefix, "pixmaps", file);
+}
+
+std::string Path::getGladeFile(const std::string& file) const
+{
+    return buildPrefixSharePath(m_prefix, "glade", file);
+}
+
+
+std::string Path::getHomeDir() const
+{
+    std::list < std::string > arb;
+    arb.push_back(Glib::get_home_dir());
+#ifdef G_OS_WIN32
+    arb.push_back("vle");
+#else
+    arb.push_back(".vle");
+#endif
+    return Glib::build_path(G_DIR_SEPARATOR_S, arb);
+}
+
+void Path::addSimulatorDir(const std::string& dirname)
+{
+    m_simulator.push_back(dirname);
+}
+
+void Path::addTranslatorDir(const std::string& dirname)
+{
+    m_translator.push_back(dirname);
+}
+
+void Path::addStreamDir(const std::string& dirname)
+{
+    m_stream.push_back(dirname);
+}
+
+void Path::addModelDir(const std::string& dirname)
+{
+    m_model.push_back(dirname);
+}
+
+void Path::addPluginDir(const std::string& dirname)
+{
+    addSimulatorDir(dirname);
+    addTranslatorDir(dirname);
+    addStreamDir(dirname);
+    addModelDir(dirname);
+}
+
+std::string Path::buildPrefixPath(const std::string& buf)
+{
+    std::list < std::string > lst;
+    lst.push_front(VLE_PREFIX_DIR);
+    lst.push_back(buf);
+    return Glib::build_path(G_DIR_SEPARATOR_S, lst);
+}
+
+std::string Path::buildUserPath(const std::string& dir)
+{
+    if (dir.empty()) {
+        std::list < std::string > arb;
+        arb.push_back(Glib::get_home_dir());
+#ifdef G_OS_WIN32
+        arb.push_back("vle");
+#else
+        arb.push_back(".vle");
+#endif
+        return Glib::build_path(G_DIR_SEPARATOR_S, arb);
+    } else {
+        std::list < std::string > arb;
+        arb.push_back(Glib::get_home_dir());
+#ifdef G_OS_WIN32
+        arb.push_back("vle");
+#else
+        arb.push_back(".vle");
+#endif
+        arb.push_back(dir);
+        return Glib::build_path(G_DIR_SEPARATOR_S, arb);
+    }
+}
+
+std::string Path::buildPrefixLibrariesPath(const std::string& prefix,
+                                           const std::string& name)
+{
+    std::list < std::string > lst;
+    lst.push_back(prefix);
+    lst.push_back(VLE_LIBRARY_DIRS);
+    lst.push_back(name);
+    return Glib::build_path(G_DIR_SEPARATOR_S, lst);
+}
+
+std::string Path::buildPrefixSharePath(const std::string& prefix,
+                                       const std::string& prg,
+                                       const std::string& name)
+{
+    std::list < std::string > lst;
+    lst.push_front(prefix);
+    lst.push_front(VLE_SHARE_DIRS);
+    lst.push_back(prg);
+    if (not name.empty()) {
+        lst.push_back(name);
+    }
+    return Glib::build_path(G_DIR_SEPARATOR_S, lst);
+}
+
+std::string Path::buildPath(const std::string& left, const std::string& right)
 {
     std::list < std::string > lst;
     lst.push_front(left);
@@ -55,29 +170,11 @@ std::string Path::build_path(const std::string& left,
     return Glib::build_path(G_DIR_SEPARATOR_S, lst);
 }
 
-std::string Path::build_user_path(const std::string& dir)
-{
-    if (dir.empty()) {
-        std::list < std::string > arb;
-        arb.push_back(Glib::get_home_dir());
-        arb.push_back(".vle");
-        return Glib::build_path(G_DIR_SEPARATOR_S, arb);
-    } else {
-        std::list < std::string > arb;
-        arb.push_back(Glib::get_home_dir());
-        arb.push_back(".vle");
-        arb.push_back(dir);
-        return Glib::build_path(G_DIR_SEPARATOR_S, arb);
-    }
-}
-
 #ifdef G_OS_WIN32
-
-bool Path::init_path()
+bool Path::initPath()
 {
     LONG result;
     HKEY hkey;
-    std::string system;
 
     result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\VLE", 0,
 			  KEY_QUERY_VALUE, &hkey);
@@ -91,90 +188,59 @@ bool Path::init_path()
 	    delete[] buf;
 	    return false;
 	}
-	system.assign(buf);
+	m_prefix.assign(buf);
 	delete[] buf;
 
-	mTab[0] = build_path(buf, "bin");
-	mTab[1] = build_user_path("bin");
-	mTab[2] = build_path(buf, "models");
-	mTab[3] = build_user_path("models");
-	mTab[4] = build_path(buf, "plugins");
-	mTab[5] = build_user_path("plugins");
-	mTab[6] = build_path(buf, "observers");
-	mTab[7] = build_user_path("observers");
-	mTab[8] = build_path(buf, "img");
-	mTab[9] = build_user_path("img");
-	mTab[10] = build_path(buf, "glade");
-	mTab[11] = build_user_path("glade");
-        mTab[12] = build_user_path("vle");
-	mTab[13] = build_path(buf, "stream");
-	mTab[14] = build_user_path("stream");
-	mTab[15] = build_path(buf, "python");
-	mTab[16] = build_user_path("python");
-	mTab[17] = build_path(buf, "translator");
-	mTab[18] = build_user_path("translator");
-	mTab[19] = build_path(buf, "eovplugin");
-	mTab[20] = build_user_path("eovplugin");
+        addSimulatorDir(buildPrefixLibrariesPath(m_prefix, "simulator"));
+        addSimulatorDir(buildUserPath("simulator"));
+        addSimulatorDir(".");
+
+        addTranslatorDir(buildPrefixLibrariesPath(m_prefix, "translator"));
+        addTranslatorDir(buildUserPath("translator"));
+        addTranslatorDir(".");
+
+        addStreamDir(buildPrefixLibrariesPath(m_prefix, "stream"));
+        addStreamDir(buildUserPath("stream"));
+        addStreamDir(".");
+
+        addModeldir(buildPrefixLibrariesPath(m_prefix, "model"));
+        addModeldir(buildUserPath("model"));
+        addModeldir(".");
 	return true;
     }
     return false;
 }
-
-#else // On Unix, its simple...
-
-std::string Path::build_prefix_path(const char* buf)
+#else // On Unix platform
+bool Path::initPath()
 {
-    std::list < std::string > lst;
-    lst.push_front(VLE_PREFIX_DIR);
-    lst.push_back(buf);
-    return Glib::build_path(G_DIR_SEPARATOR_S, lst);
-}
+    m_prefix.assign(VLE_PREFIX_DIR);
 
-std::string Path::build_prefix_libraries_path(const char* name)
-{
-    std::list < std::string > lst;
-    lst.push_back(VLE_LIBRARY_DIRS);
-    lst.push_back(name);
-    return Glib::build_path(G_DIR_SEPARATOR_S, lst);
-}
+    addSimulatorDir(buildPrefixLibrariesPath(m_prefix, "simulator"));
+    addSimulatorDir(buildUserPath("simulator"));
+    addSimulatorDir(".");
 
-std::string Path::build_prefix_share_path(const char* prg, const char* name)
-{
-    std::list < std::string > lst;
-    lst.push_front(VLE_SHARE_DIRS);
-    lst.push_back(prg);
-    lst.push_back(name);
-    return Glib::build_path(G_DIR_SEPARATOR_S, lst);
-}
+    addTranslatorDir(buildPrefixLibrariesPath(m_prefix, "translator"));
+    addTranslatorDir(buildUserPath("translator"));
+    addTranslatorDir(".");
 
-bool Path::init_path()
-{
-    mTab[0] = build_prefix_path("bin");
-    mTab[1] = build_user_path("bin");
-    mTab[2] = build_prefix_libraries_path("simulator");
-    mTab[3] = build_user_path("simulator");
-    mTab[4] = build_prefix_libraries_path("modeling");
-    mTab[5] = build_user_path("modeling");
-    mTab[6] = build_prefix_libraries_path("observer");
-    mTab[7] = build_user_path("observers");
-    mTab[8] = build_prefix_share_path("vle", "images");
-    mTab[9] = build_user_path("images");
-    mTab[10] = VLE_SHARE_DIRS;
-    mTab[11] = build_prefix_share_path("gvle", "glade");
-    mTab[12] = build_user_path();
-    mTab[13] = build_prefix_libraries_path("stream");
-    mTab[14] = build_user_path("stream");
-    mTab[15] = build_prefix_libraries_path("python");
-    mTab[16] = build_user_path("python");
-    mTab[17] = build_prefix_libraries_path("translator");
-    mTab[18] = build_user_path("translator");
-    mTab[19] = build_prefix_libraries_path("stream");
-    mTab[20] = build_user_path("eovplugin");
-    mTab[21] = build_prefix_libraries_path("analysis");
-    mTab[22] = build_user_path("avleplugin");
+    addStreamDir(buildPrefixLibrariesPath(m_prefix, "stream"));
+    addStreamDir(buildUserPath("stream"));
+    addStreamDir(".");
+
+    addModelDir(buildPrefixLibrariesPath(m_prefix, "model"));
+    addModelDir(buildUserPath("model"));
+    addModelDir(".");
+
     return true;
 }
 
 #endif // Win32 specific needs.
+
+Path::Path()
+{
+    if (initPath() == false) {
+        throw InternalError("Path initialization failed.");
+    }
+}
 
 }} // namespace vle utils

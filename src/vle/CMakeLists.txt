@@ -9,5 +9,3 @@ ADD_SUBDIRECTORY(devs)
 ADD_SUBDIRECTORY(extension)
 ADD_SUBDIRECTORY(manager)
 ADD_SUBDIRECTORY(translator)
-
-CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/src/vle/vle.pc.in ${VLE_INSTALL_PREFIX}/lib/pkgconfig/vle.pc)

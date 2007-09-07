@@ -127,8 +127,7 @@ const Host& Hosts::get_host(const std::string& hostname) const
 Glib::ustring Hosts::get_hosts_filename()
 {
     return Glib::build_filename(
-        utils::Path::path().Path::getUserDir(),
-        "hosts.xml");
+        utils::Path::path().Path::getHomeDir(), "hosts.xml");
 }
 
 }} // namespace vle utils

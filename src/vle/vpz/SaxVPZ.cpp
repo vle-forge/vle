@@ -315,15 +315,15 @@ void VpzStackSax::push_dynamic(const AttributeList& att)
     AssertS(utils::SaxParserError, m_stack.top()->isDynamics());
 
     vpz::Dynamic dyn(get_attribute < std::string >(att, "name"));
-    dyn.setModel(get_attribute < std::string >(att, "model"));
+    dyn.setLibrary(get_attribute < std::string >(att, "library"));
 
-    if (exist_attribute(att, "library"))
-        dyn.setLibrary(get_attribute < std::string >(att, "library"));
+    if (exist_attribute(att, "model"))
+        dyn.setModel(get_attribute < std::string >(att, "model"));
     else
-        dyn.setLibrary(dyn.model());
+        dyn.setModel("");
 
     if (exist_attribute(att, "language"))
-        dyn.setLanguage(get_attribute < std::string >(att, "library"));
+        dyn.setLanguage(get_attribute < std::string >(att, "language"));
     else
         dyn.setLanguage("");
 
