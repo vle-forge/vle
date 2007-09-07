@@ -154,7 +154,7 @@ std::string Path::buildPrefixSharePath(const std::string& prefix,
 {
     std::list < std::string > lst;
     lst.push_front(prefix);
-    lst.push_front(VLE_SHARE_DIRS);
+    lst.push_back(VLE_SHARE_DIRS);
     lst.push_back(prg);
     if (not name.empty()) {
         lst.push_back(name);
