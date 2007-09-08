@@ -115,7 +115,7 @@ void Text::close()
 void Text::flush(double trame_time)
 {
     if (trame_time != m_time) {
-        m_file << trame_time << '\t';
+        m_file << m_time << '\t';
         std::vector < value::Value >::iterator it;
         for (it = m_buffer.begin(); it != m_buffer.end(); ++it) {
             if ((*it).get()) {
