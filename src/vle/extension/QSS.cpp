@@ -214,12 +214,18 @@ void qss::processExternalEvents(const ExternalEventList& event,
             std::string name = (*it)->getStringAttributeValue("name");
             double value = (*it)->getDoubleAttributeValue("value");
             processPerturbation(name, value);
-            for (unsigned int i = 0; i < m_functionNumber; i++) {
-                m_gradient[i] = 0.0;
-                m_index[i] = (long)(std::floor(getValue(i) / m_precision));
-                setSigma(i, Time(0));
-                setState(i, INIT);
-            }
+	    for (unsigned int j = 0;j < m_functionNumber;j++) {
+	      double e = (time - getLastTime(j)).getValue();
+		
+                setValue(j, getValue(j)+e*getGradient(j));
+	      }
+	    for (unsigned int j = 0;j < m_functionNumber;j++) {
+	      setLastTime(j, time);
+	      // Mise à jour du gradient
+	      setGradient(j, compute(j));
+	      // Mise à jour de sigma
+	      updateSigma(j);
+	    }
             minSigma();
         } else {
             size_t i = getVariable((*it)->getPortName());
