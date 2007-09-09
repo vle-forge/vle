@@ -33,7 +33,7 @@ namespace vle { namespace extension {
     class qss : public devs::Dynamics
     {
     public:
-        enum state { INIT, RUN };
+        enum state { INIT, RUN, POST, POST2, POST3 };
 
         qss(const graph::AtomicModel& model);
 
