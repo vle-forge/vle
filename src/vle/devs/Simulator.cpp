@@ -160,7 +160,7 @@ StateEvent* Simulator::processStateEvent(const StateEvent& event) const
         nevent->putAttribute(event.getPortName(), val);
         return nevent;
     } else {
-        TRACE((boost::format(
+        TraceDebug((boost::format(
                     "Simulator %1% return an empty value on port %2%") %
                 m_dynamics->getModel().getName() % event.getPortName()).str());
     }

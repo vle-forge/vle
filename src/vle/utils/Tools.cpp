@@ -60,7 +60,9 @@
 #include <unistd.h>
 #endif
 
-std::string vle::utils::write_to_temp(const std::string& prefix,
+namespace vle { namespace utils {
+
+std::string write_to_temp(const std::string& prefix,
                                  const std::string& buffer)
 {
     std::string filename;
@@ -94,7 +96,7 @@ std::string vle::utils::write_to_temp(const std::string& prefix,
     return filename;
 }
 
-std::string vle::utils::get_current_date()
+std::string get_current_date()
 {
     char ch[81];
     struct tm* pdh = 0;
@@ -107,7 +109,7 @@ std::string vle::utils::get_current_date()
     return ch;
 }
 
-bool vle::utils::is_vle_string(const Glib::ustring& str)
+bool is_vle_string(const Glib::ustring& str)
 {
     if (str.is_ascii() == false)
         return false;
@@ -123,11 +125,11 @@ bool vle::utils::is_vle_string(const Glib::ustring& str)
     return true;
 }
 
-Glib::ustring vle::utils::print_trace_report()
+Glib::ustring print_trace_report()
 {
     Glib::ustring msg;
 #ifdef HAVE_EXECINFO_H
-    if (utils::Trace::trace().get_level() >= 1) {
+    if (Trace::trace().isInLevel(Trace::IMPORTANT)) {
         const int size_buffer = 255;
         void* array[size_buffer];
         char** result = 0;
@@ -160,18 +162,18 @@ Glib::ustring vle::utils::print_trace_report()
 #endif
 }
 
-void vle::utils::print_trace_signals(int signal_number)
+void print_trace_signals(int signal_number)
 {
     std::cerr << "\n/!\\ " << Glib::get_prgname()
         << "  " << Glib::strsignal(signal_number) << " reported.\n";
-    if (utils::Trace::trace().get_level() >= 1) {
+    if (utils::Trace::trace().isInLevel(Trace::IMPORTANT)) {
         std::cerr << utils::print_trace_report();
     }
     std::cerr << std::endl;
     abort();
 }
 
-void vle::utils::install_signal()
+void install_signal()
 {
 #ifdef HAVE_SIGNAL_H
 #ifdef G_OS_UNIX
@@ -184,7 +186,7 @@ void vle::utils::install_signal()
 #endif
 }
 
-std::string vle::utils::demangle(const std::type_info& in) 
+std::string demangle(const std::type_info& in) 
 {
     std::string result;
 #ifdef HAVE_GCC_ABI_DEMANGLE
@@ -195,7 +197,7 @@ std::string vle::utils::demangle(const std::type_info& in)
     return result;
 }
 
-std::string vle::utils::demangle(const std::string& in)
+std::string demangle(const std::string& in)
 {
     std::string result;
 #ifdef HAVE_GCC_ABI_DEMANGLE
@@ -213,7 +215,7 @@ std::string vle::utils::demangle(const std::string& in)
     return result;
 }
 
-void vle::utils::initUserDirectory()
+void initUserDirectory()
 {
     buildDirectory(Glib::build_filename(getUserDirectory(), "plugins"));
     buildDirectory(Glib::build_filename(getUserDirectory(), "models"));
@@ -224,7 +226,7 @@ void vle::utils::initUserDirectory()
     buildDirectory(Glib::build_filename(getUserDirectory(), "eovplugin"));
 }
 
-bool vle::utils::buildDirectory(const std::string& dirname)
+bool buildDirectory(const std::string& dirname)
 {
     if (!Glib::file_test(dirname, Glib::FILE_TEST_IS_DIR |
                          Glib::FILE_TEST_EXISTS)) {
@@ -233,17 +235,19 @@ bool vle::utils::buildDirectory(const std::string& dirname)
 #else
         if (g_mkdir(dirname.c_str(), 0755) == -1) {
 #endif
-            TRACE1(boost::format("Building directory %1% failed\n") % dirname);
+            TraceImportant(boost::format(
+                    "Building directory %1% failed\n") % dirname);
             return false;
         } else {
-            TRACE1(boost::format("Make directory %1% success\n") % dirname);
+            TraceImportant(boost::format(
+                    "Make directory %1% success\n") % dirname);
             return true;
         }
     }
     return true;
 }
 
-std::string vle::utils::getUserDirectory()
+std::string getUserDirectory()
 {
     std::string home(Glib::build_filename(Glib::get_home_dir(), ".vle"));
 
@@ -254,14 +258,15 @@ std::string vle::utils::getUserDirectory()
 #else
         if (g_mkdir(home.c_str(), 0755) == -1) {
 #endif
-            TRACE1("Error mkdir $(home)/.vle directory user\n");
+            TraceImportant(boost::format(
+                    "Error mkdir %1% directory user\n") % home);
             return std::string();
         }
     }
     return home;
 }
 
-void vle::utils::buildDaemon()
+void buildDaemon()
 {
 #ifdef G_OS_WIN32
     g_chdir("c://");
@@ -279,3 +284,5 @@ void vle::utils::buildDaemon()
     for (int i = 0; i < FOPEN_MAX; ++i)
         ::close(i);
 }
+
+}} // namespace vle utils

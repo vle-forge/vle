@@ -161,7 +161,7 @@ void Simulator::run()
         }
 	std::cerr << boost::format("Simulation start on %1%.\n") % filename;
         Glib::spawn_command_line_sync((boost::format("vle -v %1% -j %2%\n") %
-                                       utils::Trace::trace().get_level() %
+                                       utils::Trace::trace().getLevel() %
                                        filename).str());
     }
 }
@@ -207,6 +207,13 @@ bool Simulator::run(const std::string& filename)
         std::cerr << " - Coordinator cleaning .........: ";
         coordinator.finish();
         std::cerr << "ok\n";
+
+        if (utils::Trace::trace().haveWarning()) {
+            std::cerr << boost::format(
+                "\n/!\\ Some warnings during simulation: See file %1%\n") %
+                utils::Trace::trace().getLogFile();
+        }
+
     } catch(const std::exception& e) {
         std::cerr << "\n/!\\ vle error reported: " <<
             utils::demangle(typeid(e)) << "\n" << e.what();

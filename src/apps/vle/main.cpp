@@ -52,7 +52,8 @@ int main(int argc, char* argv[])
         manag.check();
         simu.check();
         global.check();
-        vle::utils::Trace::trace().set_level(global.verbose());
+        vle::utils::Trace::trace().setLevel(
+            static_cast < vle::utils::Trace::Level >(global.verbose()));
         path.assignToPath();
     } catch(const Glib::Error& e) {
         std::cerr << "Error parsing command line: " << e.what() << std::endl;

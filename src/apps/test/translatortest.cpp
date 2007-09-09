@@ -59,7 +59,7 @@ void translate(const char* filename)
 
 int main(int argc, char* argv[])
 {
-    vle::utils::Trace::trace().set_level(3);
+    vle::utils::Trace::trace().setLevel(vle::utils::Trace::DEBUG);
 
     for (int i = 1; i < argc; ++i) {
         translate(argv[i]);

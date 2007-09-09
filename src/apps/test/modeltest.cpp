@@ -27,6 +27,7 @@
 #include <vle/vpz/Vpz.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Path.hpp>
+#include <vle/utils/Trace.hpp>
 #include <glibmm/fileutils.h>
 #include <glibmm/spawn.h>
 #include <iostream>
@@ -89,6 +90,8 @@ bool run_model(const std::string& modelname)
 
 int main(int argc, char* argv[])
 {
+    vle::utils::Trace::trace().setLevel(vle::utils::Trace::DEBUG);
+
     bool success = true;
 
     switch(argc) {

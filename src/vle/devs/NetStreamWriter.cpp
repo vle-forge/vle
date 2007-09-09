@@ -52,8 +52,8 @@ void NetStreamWriter::open(const std::string& plugin,
     try {
         utils::net::explodeStringNet(location, host, port, directory);
         m_client = new utils::net::Client(host, port);
-        TRACE1(boost::format("NetStreamWriter init %1%:%2% %3% %4%") % host %
-               port % directory % file);
+        TraceInformation(boost::format("NetStreamWriter init %1%:%2% %3% %4%")
+                         % host % port % directory % file);
         std::ostringstream out;
         out << "<vle_trame>"
             << "<trame type=\"parameter\""

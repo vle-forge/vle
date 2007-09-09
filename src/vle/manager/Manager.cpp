@@ -77,7 +77,7 @@ void Manager::run_all_in_localhost(const vpz::Vpz& vpz)
     while (lst.empty() == false) {
         std::cerr << " - Simulator start in another process\n";
         Glib::spawn_command_line_sync((boost::format("vle -v %1% %2%\n") %
-                                       utils::Trace::trace().get_level() %
+                                       utils::Trace::trace().getLevel() %
                                        lst.front()).str());
         if (std::remove(lst.front().c_str()) == -1) {
             std::cerr << boost::format("Delete file %1% error: %2%\n") % 

@@ -43,7 +43,7 @@ NetStreamReader::NetStreamReader(int port) :
     m_server(port)
 {
     setBufferSize(4096);
-    TRACE(boost::format("Build a NetStreamReader on port %1%") % port);
+    TraceAlways(boost::format("Build a NetStreamReader on port %1%") % port);
 }
 
 NetStreamReader::~NetStreamReader()
@@ -64,7 +64,8 @@ void NetStreamReader::process()
 void NetStreamReader::waitConnection()
 {
     m_server.accept_client("vle");
-    TRACE(boost::format("NetStreamReader connection with client %1%") % "vle");
+    TraceAlways(boost::format(
+            "NetStreamReader connection with client %1%") % "vle");
 }
 
 void NetStreamReader::readConnection()
@@ -95,7 +96,7 @@ bool NetStreamReader::dispatch(const vpz::Trame* trame)
     {
         const vpz::ParameterTrame* tr;
         if ((tr = dynamic_cast < const vpz::ParameterTrame* >(trame))) {
-            TRACE(boost::format(
+            TraceAlways(boost::format(
                     "NetStreamReader plugin: [%1%] and location [%2%]") %
                 tr->plugin() % tr->location());
             init_plugin(tr->plugin(), tr->location());
@@ -120,7 +121,7 @@ bool NetStreamReader::dispatch(const vpz::Trame* trame)
     {
         const vpz::EndTrame* tr;
         if ((tr = dynamic_cast < const vpz::EndTrame* >(trame))) {
-            TRACE("NetStreamReader close");
+            TraceAlways("NetStreamReader close");
             plugin()->close();
             return true;
         }

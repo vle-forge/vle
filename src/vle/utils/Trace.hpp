@@ -26,9 +26,7 @@
 #ifndef UTILS_TRACE_HPP
 #define UTILS_TRACE_HPP
 
-#include <glibmm/ustring.h>
 #include <fstream>
-#include <vle/utils/Tools.hpp>
 
 
 
@@ -40,140 +38,153 @@ namespace vle { namespace utils {
      * TRACE and DTRACE ie. ALWAYS message are streamed all other macros are
      * empty.
      *
-     *
      * @code
-     * Trace(utils::compose("Send event at time %1", time);
+     * Trace(utils::compose("Send event at time %1", time));
      * DTrace("Clear file");
      *
-     * Trace2(utils::compose("Send event at time %1", time);
+     * Trace2(utils::compose("Send event at time %1", time));
      * DTrace2("Clear file");
      * @endcode
      */
     class Trace
     {
     public:
-	enum { ALWAYS = 0, IMPORTANT = 1, INFORMATION = 2, DEBUG = 3 };
+	enum Level { ALWAYS, IMPORTANT, INFORMATION, DEBUG };
 
 	/**
-	 * Singleton method to return Trace object.
-	 *
+	 * @brief Singleton method to return Trace object.
 	 * @return a Trace object instantiate in singleton method.
 	 */
         static Trace& trace()
-	    { if (!_trace) _trace = new Trace; return *_trace; }
+        { if (not m_trace) m_trace = new Trace; return *m_trace; }
 
 	/**
-	 * Delete Trace object instiate from function trace().
-	 *
+	 * @brief Delete Trace object instiate from function trace().
 	 */
 	static void kill()
-	    { delete _trace; _trace = 0; }
+        { delete m_trace; m_trace = 0; }
 
 	/**
-	 * Get the current log filename.
-	 *
+	 * @brief Get the current log filename.
 	 * @return current log filename.
 	 */
-	inline const std::string& get_log_file() const
-	    { return _filename; }
+	inline const std::string& getLogFile() const
+        { return m_filename; }
 
 	/**
-	 * Set a new filename to the current log file.
-	 *
+	 * @brief Set a new filename to the current log file.
 	 * @param filename the new filename.
 	 */
-        void set_log_file(const std::string& filename);
+        void setLogFile(const std::string& filename);
 
 	/**
-	 * A template method to push information into the file.
-	 *
+	 * @brief A template method to push information into the file.
 	 * @param c a object to push into the stream.
          * @param level the level of this push.
 	 */
 	template < class C >
-        void push(const C& c, int level)
-	    { if (_file and level >= 0 and level <= _minlevel)
-		(*_file) << "---" << c << "\n" << std::flush; }
+        void push(const C& c, Level level)
+        {
+            if (m_file and level >= 0 and level <= m_minlevel) {
+                (*m_file) << "---" << c << "\n" << std::flush;
+                if (level != ALWAYS) m_warnings++;
+            }
+        }
 
 	/**
-	 * A template method to push information into the file. Each call put
-	 * the date into the file.
-	 *
-	 * @param c a object to push into the stream.
-         * @param level the level of this push.
-	 */
-	template < class C >
-        void push_date(const C& c, int level)
-	    { if (_file and level >= 0 and level <= _minlevel)
-                (*_file) << utils::get_current_date() << "---" << c << "\n"
-                    << std::flush; }
-
-	/**
-	 * Return the default log file position. $HOME/.vle/vle.log under Unix
-	 * system, $HOME/vle/vle.log under windows.
-	 *
+         * @brief Return the default log file position. $HOME/.vle/vle.log under
+         * Unix system, $HOME/vle/vle.log under windows.
 	 * @return the default log filename.
 	 */
-        static std::string get_default_log_filename();
+        static std::string getDefaultLogFilename();
 
 	/**
-	 * Return a specific log file position. $HOME/.vle/[filename].log under
-	 * Unix system, $HOME/vle/[filename].log under windows.
-	 *
+         * @brief Return a specific log file position. $HOME/.vle/[filename].log
+         * under Unix system, $HOME/vle/[filename].log under windows.
 	 * @param filename the filename witout extension.
-	 *
 	 * @return the default log filename.
 	 */
-        static std::string get_log_filename(const std::string& filename);
+        static std::string getLogFilename(const std::string& filename);
 
 	/**
-	 * Return the current level ([0 minlevel]).
-	 *
+	 * @brief Return the current level ([0 minlevel]).
 	 * @return current level.
 	 */
-	inline int get_level() const
-	    { return _minlevel; }
+	inline Trace::Level getLevel() const
+        { return m_minlevel; }
 
 	/**
-	 * Set the current level.
-	 *
+	 * @brief Set the current level.
 	 * @param level the new level to set, if level < 0 or > minlevel then
 	 * minlevel is affected.
 	 */
-	inline void set_level(int level)
-	    { _minlevel = (level < 0 or level > utils::Trace::DEBUG) ?
-		  utils::Trace::DEBUG : level; }
+	inline void setLevel(Trace::Level level)
+        {
+            m_minlevel = (level < 0 or level > utils::Trace::DEBUG) ?
+                utils::Trace::DEBUG : level;
+        }
+
+        /** 
+         * @brief Return true if the specified level is between [ALWAYS, level].
+         * @param level the specified level to test.
+         * @return true if the specified level is between ALWAYS and level,
+         * otherwise, false.
+         */
+        inline bool isInLevel(Level level)
+        { return ALWAYS <= level and level <= m_minlevel; }
+
+        /** 
+         * @brief Return true if warning are flushed in the stream. Warnigs are
+         * defined like not ALWAYS.
+         * @return true if one or more warning are flushed.
+         */
+        inline bool haveWarning() const
+        { return m_warnings > 0; }
+
+        /** 
+         * @brief Return the number of warnings.
+         * @return the number of warnings.
+         */
+        inline unsigned int warnings() const
+        { return m_warnings; }
 
     private:
         Trace();
 
         ~Trace();
 
-        std::ofstream* _file;
-	std::string    _filename;
-	int            _minlevel;
-        static Trace*  _trace;
+        std::ofstream*  m_file;
+	std::string     m_filename;
+	Level           m_minlevel;
+        static Trace*   m_trace;
+        unsigned int    m_warnings;
     };
 
 }} // namespace vle utils
 
-#define TRACE(x) vle::utils::Trace::trace().push((x), vle::utils::Trace::ALWAYS)
-#define DTRACE(x) vle::utils::Trace::trace().push_date((x), vle::utils::Trace::ALWAYS)
+#define TraceAlways(x) { \
+    vle::utils::Trace::trace().push((x), vle::utils::Trace::ALWAYS); }
+#define TraceImportant(x) { \
+    vle::utils::Trace::trace().push((x), vle::utils::Trace::IMPORTANT); }
+#define TraceInformation(x) { \
+    vle::utils::Trace::trace().push((x), vle::utils::Trace::INFORMATION); }
+#define TraceDebug(x) { \
+    vle::utils::Trace::trace().push((x), vle::utils::Trace::DEBUG); }
 
 #ifndef NDEBUG
-#define TRACE1(x) vle::utils::Trace::trace().push((x), vle::utils::Trace::IMPORTANT)
-#define DTRACE1(x) vle::utils::Trace::trace().push_date((x), vle::utils::Trace::IMPORTANT)
-#define TRACE2(x) vle::utils::Trace::trace().push((x), vle::utils::Trace::INFORMATION)
-#define DTRACE2(x) vle::utils::Trace::trace().push_date((x), vle::utils::Trace::INFORMATION)
-#define TRACE3(x) vle::utils::Trace::trace().push((x), vle::utils::Trace::DEBUG)
-#define DTRACE3(x) vle::utils::Trace::trace().push_date((x), vle::utils::Trace::DEBUG)
+#define DTraceAlways(x) { \
+    vle::utils::Trace::trace().push((x), vle::utils::Trace::ALWAYS); }
+#define DTraceImportant(x) { \
+    vle::utils::Trace::trace().push((x), vle::utils::Trace::IMPORTANT); }
+#define DTraceInformation(x) { \
+    vle::utils::Trace::trace().push((x), vle::utils::Trace::INFORMATION); }
+#define DTraceDebug(x) { \
+    vle::utils::Trace::trace().push((x), vle::utils::Trace::DEBUG); }
 #else
-#define TRACE1(x)
-#define DTRACE1(x)
-#define TRACE2(x)
-#define DTRACE2(x)
-#define TRACE3(x)
-#define DTRACE3(x)
+#define DTraceAlways(x) {}
+#define DTraceImportant(x) {}
+#define DTraceInformation(x) {}
+#define DTraceDebug(x) {}
 #endif
 
 #endif
