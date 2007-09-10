@@ -17,7 +17,7 @@ SET(OOV_CPP
     StreamReader.cpp)
 
 SET(OOV_HPP
-    oov.hpp LocalStreamReader.hpp NetStreamReader.hpp OOV.hpp Plugin.hpp
+    LocalStreamReader.hpp NetStreamReader.hpp OOV.hpp Plugin.hpp
     StreamReader.hpp)
 
 ADD_LIBRARY(vleoov SHARED ${OOV_CPP};${OOV_HPP})

@@ -21,7 +21,7 @@ SET(UTILS_CPP
 
 SET(UTILS_HPP
     Debug.hpp Exception.hpp Host.hpp Path.hpp PathOptionGroup.hpp Rand.hpp
-    Simpson.hpp Socket.hpp Tools.hpp Trace.hpp utils.hpp XML.hpp)
+    Simpson.hpp Socket.hpp Tools.hpp Trace.hpp XML.hpp)
 
 ADD_LIBRARY(vleutils SHARED ${UTILS_CPP};${UTILS_HPP})
 

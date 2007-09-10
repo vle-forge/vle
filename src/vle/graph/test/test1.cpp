@@ -33,8 +33,8 @@
 #include <stdexcept>
 #include <limits>
 #include <fstream>
-#include <vle/graph/graph.hpp>
-#include <vle/utils/utils.hpp>
+#include <vle/graph.hpp>
+#include <vle/utils.hpp>
 
 using namespace vle;
 

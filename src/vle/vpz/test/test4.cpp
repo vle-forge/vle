@@ -29,9 +29,9 @@
 #include <boost/test/auto_unit_test.hpp>
 #include <boost/test/output_test_stream.hpp>
 
-#include <vle/utils/utils.hpp>
-#include <vle/graph/graph.hpp>
-#include <vle/vpz/vpz.hpp>
+#include <vle/utils.hpp>
+#include <vle/graph.hpp>
+#include <vle/vpz.hpp>
 
 using namespace vle;
 

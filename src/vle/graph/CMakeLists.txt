@@ -12,7 +12,7 @@ SET(GRAPH_CPP
     NoVLEModel.cpp)
 
 SET(GRAPH_HPP
-    AtomicModel.hpp CoupledModel.hpp graph.hpp Model.hpp ModelPort.hpp
+    AtomicModel.hpp CoupledModel.hpp Model.hpp ModelPort.hpp
     ModelPortList.hpp NoVLEModel.hpp)
 
 ADD_LIBRARY(vlegraph SHARED ${GRAPH_CPP};${GRAPH_HPP})

@@ -8,7 +8,7 @@ LINK_DIRECTORIES(
 	${LIBXMLPP_LIBRARY_DIR})
 
 SET(TRANSLATOR_HPP
-    translator.hpp MatrixTranslator.hpp)
+    MatrixTranslator.hpp)
 
 SET(TRANSLATOR_CPP
     MatrixTranslator.cpp)

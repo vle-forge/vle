@@ -11,7 +11,7 @@ SET(GEOMETRY_CPP
     geometry.cpp)
 
 SET(GEOMETRY_HPP
-    Box.hpp geometry.hpp Point.hpp Tuple.hpp Vector.hpp)
+    Box.hpp Point.hpp Tuple.hpp Vector.hpp)
 
 ADD_LIBRARY(vlegeometry SHARED ${GEOMETRY_HPP};${GEOMETRY_CPP})
 

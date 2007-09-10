@@ -1,5 +1,5 @@
 /** 
- * @file devs.hpp
+ * @file translator/translator.hpp
  * @brief 
  * @author The vle Development Team
  * @date 2007-08-13
@@ -22,23 +22,21 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef VLE_DEVS_DEVS_HPP
-#define VLE_DEVS_DEVS_HPP
+#ifndef VLE_TRANSLATOR_TRANSLATOR_HPP
+#define VLE_TRANSLATOR_TRANSLATOR_HPP
+
+#include <vle/translator/MatrixTranslator.hpp>
 
 namespace vle {
 
     /** 
-     * @brief The devs namespace represents the DEVS Kernel simulator with B.P.
-     * Zeigler algorithm for Simulator, Coordinator, RootCoordinator. Some
-     * classes are provides like Time, Event to simplify the development of new
-     * models. To build new DEVS models, you must inherit of the devs::Dynamics
-     * or the devs::Executive (the F.Barros Dynamics Structures DEVS). If you
-     * want to use CellDEVS, QSS, QSS2, CellQSS and other, see the
-     * vle::extension namespace.
+     * @brief This namespace provides some useful translator classes. For
+     * instance the translator::MatrixTranslator allow to build cellular
+     * automata within a small xml description.
      */
-    namespace devs {
+    namespace translator {
 
-    } // namespace devs
+    } // namespace translator
 
 } // namespace vle
 

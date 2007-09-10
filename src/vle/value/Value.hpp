@@ -32,13 +32,7 @@
 
 
 
-namespace vle {
- 
-    /** 
-     * @brief The value transported by event. All class are manager using a
-     * reference counter from Boost.org: boost::shared_ptr < type >.
-     */
-    namespace value {
+namespace vle { namespace value {
 
         class ValueBase;
         class BooleanFactory;
