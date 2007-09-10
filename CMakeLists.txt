@@ -124,15 +124,6 @@ IF (WITH_SQLXX)
 ENDIF (WITH_SQLXX)
  
  #
-  # Check zlib
- #
- 
-INCLUDE(FindZLIB)
-IF(NOT ZLIB_FOUND)
-  MESSAGE(FATAL_ERROR "Zlib library not found")
-ENDIF(NOT ZLIB_FOUND)
- 
- #
   # Test the libboost header and libboost-text library.
  #
  

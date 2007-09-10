@@ -158,12 +158,6 @@ namespace vle { namespace vpz {
         inline Project& project()
         { return m_project; }
 
-        static std::string get_gzip_content(const std::string& filename);
-
-        static bool is_gzip_file(const std::string& filename);
-
-        static std::string gunzip_file(const std::string& filename);
-
         /**
          * Add the vpz extension to filename if does not exist, If correct
          * filename is passed, no modification is apply.

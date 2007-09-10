@@ -25,7 +25,6 @@
 #include <vle/vpz/Vpz.hpp>
 #include <vle/utils/XML.hpp>
 #include <vle/utils/Debug.hpp>
-#include <zlib.h>
 #include <fstream>
 
 namespace vle { namespace vpz {
@@ -144,60 +143,6 @@ std::string Vpz::writeToString()
     std::ostringstream out;
     out << *this;
     return out.str();
-}
-
-std::string Vpz::get_gzip_content(const std::string& /* filename */)
-{
-	/*
-    const size_t buffer_size = 4096;
-    char* buffer = new char[buffer_size];
-    int len;
-    std::string result;
-
-    gzFile file = gzopen(filename.c_str(), "rb");
-    Assert(utils::FileError, file ,
-           boost::format("Cannot read file '%1%'\n") % filename);
-
-    for (;;) {
-        len = gzread(file, buffer, buffer_size);
-        if (len < 0) {
-            delete[] buffer;
-            Assert(utils::FileError, len >= 0,
-                   boost::format("Read error file '%1%'\n") % filename);
-        }
-        if (len == 0) break;
-        result.append(buffer, len);
-    }
-    delete[] buffer;
-    gzclose(file); */
-    return std::string();
-}
-
-bool Vpz::is_gzip_file(const std::string& /* filename */)
-{
-	/*
-    size_t sizefile, sizeGzip;
-
-    {
-        std::ifstream f(filename.c_str());
-        Assert(utils::FileError, f.is_open(),
-               boost::format("Cannot open file '%1%'\n") % filename);
-
-        f.seekg(0, std::ios_base::end);
-        sizefile = f.tellg();
-        f.close();
-    }
-    {
-        gzFile file = gzopen(filename.c_str(), "rb");
-        Assert(utils::FileError, file ,
-               boost::format("Cannot read file '%1%'\n") % filename);
-        sizeGzip = gzseek(file, 0, SEEK_END);
-        gzclose(file);
-    }
-
-    return sizeGzip < sizefile;
-    */
-    return true;
 }
 
 void Vpz::fixExtension(std::string& filename)
