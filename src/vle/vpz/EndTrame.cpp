@@ -30,7 +30,7 @@ namespace vle { namespace vpz {
 
 void EndTrame::write(std::ostream& out) const
 {
-    out << "<trame type=\"end\" />";
+    out << "<trame type=\"end\" date=\"" << m_time << "\" />";
 }
 
 }} // namespace vle vpz

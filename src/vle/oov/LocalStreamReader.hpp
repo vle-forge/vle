@@ -48,7 +48,7 @@ namespace vle { namespace oov {
 
         void onValue(const vpz::ValueTrame& trame);
         
-        void onClose();
+        void onClose(const vpz::EndTrame& trame);
     };
 
 }} // namespace vle oov

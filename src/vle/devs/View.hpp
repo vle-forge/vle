@@ -52,7 +52,7 @@ namespace vle { namespace devs {
                                   const std::string& portName,
                                   const Time& currenttime);
 
-        void finish();
+        void finish(const Time& time);
 
         virtual bool isEvent() const = 0;
 

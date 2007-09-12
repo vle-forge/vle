@@ -58,9 +58,9 @@ StateEvent* View::addObservable(Simulator* model,
     return 0;
 }
 
-void View::finish()
+void View::finish(const Time& time)
 {
-    m_stream->close();
+    m_stream->close(time);
 }
 
 void View::removeObservable(Simulator* model)

@@ -141,10 +141,12 @@ void NetStreamWriter::process(const StateEvent& event)
     }
 }
 
-void NetStreamWriter::close()
+void NetStreamWriter::close(const devs::Time& time)
 {
+    std::ostringstream out;
+    out << "<trame type=\"end\" date=\"" << time << "\" /></vle_trame>";
     try {
-        m_client->send_buffer("<trame type=\"end\"/></vle_trame>");
+        m_client->send_buffer(out.str());
         m_client->close();
         delete m_client;
         m_client = 0;

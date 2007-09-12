@@ -47,7 +47,7 @@ namespace vle { namespace oov { namespace plugin {
 
         virtual void onValue(const vpz::ValueTrame& trame);
 
-        virtual void close();
+        virtual void close(const vpz::EndTrame& trame);
 
     private:
         std::ofstream                   m_file;

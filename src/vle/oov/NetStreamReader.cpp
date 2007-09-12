@@ -122,7 +122,7 @@ bool NetStreamReader::dispatch(const vpz::Trame* trame)
         const vpz::EndTrame* tr;
         if ((tr = dynamic_cast < const vpz::EndTrame* >(trame))) {
             TraceAlways("NetStreamReader close");
-            plugin()->close();
+            plugin()->close(*tr);
             return true;
         }
     }

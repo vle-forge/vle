@@ -33,7 +33,8 @@ namespace vle { namespace vpz {
     class EndTrame : public Trame
     {
     public:
-        EndTrame()
+        EndTrame(const std::string& time) :
+            m_time(time)
         { }
 
         virtual ~EndTrame()
@@ -43,6 +44,18 @@ namespace vle { namespace vpz {
         { return Base::TRAME; }
 
         virtual void write(std::ostream& out) const;
+
+        //
+        ///
+        /// Get function
+        ///
+        //
+
+        const std::string& time() const
+        { return m_time; }
+
+    private:
+        std::string     m_time;
     };
 
 }}// namespace vle vpz

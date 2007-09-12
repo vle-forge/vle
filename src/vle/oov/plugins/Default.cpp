@@ -39,7 +39,6 @@ Default::Default(const std::string& location) :
 
 Default::~Default()
 {
-    m_file.close();
 }
 
 void Default::onParameter(const vpz::ParameterTrame& trame)
@@ -62,8 +61,9 @@ void Default::onValue(const vpz::ValueTrame& trame)
     m_file << trame << "\n";
 }
 
-void Default::close()
+void Default::close(const vpz::EndTrame& trame)
 {
+    m_file << trame << "\n";
     m_file.flush();
 }
 

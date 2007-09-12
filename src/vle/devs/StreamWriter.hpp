@@ -94,7 +94,7 @@ namespace vle { namespace devs {
         /**
          * Close the output stream.
          */
-        virtual void close() = 0;
+        virtual void close(const devs::Time& time) = 0;
 
         //
         ///

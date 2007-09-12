@@ -600,7 +600,8 @@ void VpzStackSax::push_trame(const AttributeList& att)
         m_stack.push(new ValueTrame(
                 get_attribute < std::string >(att, "date")));
     } else if (type == "end") {
-        m_stack.push(new EndTrame);
+        m_stack.push(new EndTrame(
+                get_attribute < std::string >(att, "date")));
     } else {
         Throw(utils::SaxParserError, boost::format(
                 "Unknow trame named %1%") % type);

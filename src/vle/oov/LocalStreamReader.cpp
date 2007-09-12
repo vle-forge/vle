@@ -71,9 +71,9 @@ void LocalStreamReader::onValue(const vpz::ValueTrame& trame)
     plugin()->onValue(trame);
 }
         
-void LocalStreamReader::onClose()
+void LocalStreamReader::onClose(const vpz::EndTrame& trame)
 {
-    plugin()->close();
+    plugin()->close(trame);
 }
 
 }} // namespace vle oov

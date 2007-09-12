@@ -90,9 +90,9 @@ void LocalStreamWriter::process(const StateEvent& event)
     m_reader.onValue(tr);
 }
 
-void LocalStreamWriter::close()
+void LocalStreamWriter::close(const devs::Time& time)
 {
-    m_reader.onClose();
+    m_reader.onClose(vpz::EndTrame(utils::to_string(time)));
 }
 
 }} // namespace vle devs

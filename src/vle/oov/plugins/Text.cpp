@@ -91,8 +91,9 @@ void Text::onValue(const vpz::ValueTrame& trame)
     }
 }
 
-void Text::close()
+void Text::close(const vpz::EndTrame& trame)
 {
+    finalFlush(utils::to_double(trame.time()));
     m_file << "#\ttime\t";
     std::vector < std::string > array(m_columns.size());
 
@@ -131,6 +132,28 @@ void Text::flush(double trame_time)
         }
         m_file << '\n' << std::flush;
         m_time = trame_time;
+    }
+}
+
+void Text::finalFlush(double trame_time)
+{
+    flush(trame_time);
+    if (not m_buffer.empty()) {
+        m_file << trame_time << '\t';
+        std::vector < value::Value >::iterator it;
+        for (it = m_buffer.begin(); it != m_buffer.end(); ++it) {
+            if ((*it).get()) {
+                m_file << (*it)->toString();
+            } else {
+                m_file << "NA";
+            }
+
+            if (it + 1 != m_buffer.end()) {
+                m_file << '\t';
+            }
+            (*it).reset();
+        }
+        m_file << '\n' << std::flush;
     }
 }
 

@@ -61,7 +61,7 @@ namespace vle { namespace devs {
 
         virtual void process(const StateEvent& event);
 
-        virtual void close();
+        virtual void close(const devs::Time& time);
 
     private:
         oov::LocalStreamReader      m_reader;

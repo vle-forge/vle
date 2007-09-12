@@ -156,7 +156,7 @@ void Coordinator::finish()
     {
         ViewList::iterator it;
         for (it = m_viewList.begin(); it != m_viewList.end(); ++it) {
-            (*it).second->finish();
+            (*it).second->finish(m_currentTime);
         }
         m_viewList.clear();
     }

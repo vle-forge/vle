@@ -30,6 +30,7 @@
 #include <vle/vpz/NewObservableTrame.hpp>
 #include <vle/vpz/DelObservableTrame.hpp>
 #include <vle/vpz/ValueTrame.hpp>
+#include <vle/vpz/EndTrame.hpp>
 #include <boost/shared_ptr.hpp>
 
 
@@ -101,8 +102,10 @@ namespace vle { namespace oov {
 
         /** 
          * @brief Call when the simulation is finished.
+         *
+         * @param trame
          */
-        virtual void close() = 0;
+        virtual void close(const vpz::EndTrame& trame) = 0;
 
         /** 
          * @brief Get the location provide at the constructor of this Plugin.

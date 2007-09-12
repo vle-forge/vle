@@ -49,7 +49,7 @@ namespace vle { namespace oov { namespace plugin {
 
         virtual void onValue(const vpz::ValueTrame& trame);
 
-        virtual void close();
+        virtual void close(const vpz::EndTrame& trame);
 
     private:
         std::map < std::string, int >   m_columns;
@@ -60,6 +60,8 @@ namespace vle { namespace oov { namespace plugin {
 
 
         void flush(double trame_time);
+
+        void finalFlush(double trame_time);
 
         /**
          * @brief This function is use to build uniq name to each row of the
