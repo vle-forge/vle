@@ -67,14 +67,17 @@ std::ostream& operator<<(std::ostream& out, const VpzStackSax& stack)
 }
 
 
-vpz::Vpz* VpzStackSax::push_vpz(const std::string& author, float version,
-                           const std::string& date)
+vpz::Vpz* VpzStackSax::push_vpz(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, m_stack.empty());
 
-    m_vpz.project().setAuthor(author);
-    m_vpz.project().setVersion(version);
-    m_vpz.project().setDate(date);
+    if (exist_attribute(att, "date")) {
+        m_vpz.project().setDate(get_attribute < std::string >(att, "date"));
+    }
+
+    m_vpz.project().setAuthor(get_attribute < std::string >(att, "author")),
+    m_vpz.project().setVersion(get_attribute < float >(att, "version")),
+    
     m_stack.push(&m_vpz);
 
     return &m_vpz;
@@ -109,9 +112,15 @@ void VpzStackSax::push_model(const AttributeList& att)
     std::string type(get_attribute < std::string >(att, "type"));
     std::string name(get_attribute < std::string >(att, "name"));
     if (type == "atomic") {
-        std::string cnd(get_attribute < std::string >(att, "conditions"));
-        std::string dyn(get_attribute < std::string >(att, "dynamics"));
-        std::string obs(get_attribute < std::string >(att, "observables"));
+        std::string cnd, dyn, obs;
+        if (exist_attribute(att, "conditions"))
+            cnd = get_attribute < std::string >(att, "conditions");
+
+        if (exist_attribute(att, "dynamics"))
+            dyn = get_attribute < std::string >(att, "dynamics");
+
+        if (exist_attribute(att, "observables"))
+            obs = get_attribute < std::string >(att, "observables");
         
         gmdl = new graph::AtomicModel(name, parent);
         vpz().project().model().atomicModels().insert(std::make_pair(
@@ -440,7 +449,10 @@ void VpzStackSax::push_output(const AttributeList& att)
     std::string name(get_attribute < std::string >(att, "name"));
     std::string format(get_attribute < std::string >(att, "format"));
     std::string plugin(get_attribute < std::string >(att, "plugin"));
-    std::string location(get_attribute < std::string >(att, "location"));
+    
+    std::string location;
+    if (exist_attribute(att, "location")) 
+        location = get_attribute < std::string >(att, "location");
 
     Outputs& outs(m_vpz.project().experiment().views().outputs());
     if (format == "local") {
@@ -456,33 +468,35 @@ void VpzStackSax::push_output(const AttributeList& att)
 void VpzStackSax::push_view(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_stack.top()->isViews());
 
-    if (m_stack.top()->isViews()) {
-        std::string name(get_attribute< std::string >(att, "name")); 
-        std::string type(get_attribute< std::string >(att, "type")); 
-        std::string out(get_attribute< std::string >(att, "output")); 
+    std::string name(get_attribute< std::string >(att, "name")); 
+    std::string type(get_attribute< std::string >(att, "type")); 
+    std::string out(get_attribute< std::string >(att, "output")); 
 
-        Views& views(m_vpz.project().experiment().views());
+    Views& views(m_vpz.project().experiment().views());
 
-        if (type == "timed") {
-            Assert(utils::SaxParserError, exist_attribute(att, "timestep"),
-                   (boost::format("View %1% have no timestep attribute.") %
-                    name));
+    if (type == "timed") {
+        Assert(utils::SaxParserError, exist_attribute(att, "timestep"),
+               (boost::format("View %1% have no timestep attribute.") %
+                name));
 
-            double ts(get_attribute < double >(att, "timestep"));
-            View& nm(views.addTimedView(name, ts, out));
-            m_stack.push(&nm);
-        } else if (type == "event") {
-            View& nm(views.addEventView(name, out));
-            m_stack.push(&nm);
-        } else {
-            Throw(utils::SaxParserError, (boost::format(
-                        "Unknow type '%1%' for the view %1%") % type % name));
-        }
+        double ts(get_attribute < double >(att, "timestep"));
+        views.addTimedView(name, ts, out);
+    } else if (type == "event") {
+        views.addEventView(name, out);
     } else {
-        AssertS(utils::SaxParserError, m_stack.top()->isObservablePort());
-        push_observable_port_on_view(att);
+        Throw(utils::SaxParserError, (boost::format(
+                    "Unknow type '%1%' for the view %1%") % type % name));
     }
+}
+
+void VpzStackSax::push_attachedview(const AttributeList& att)
+{
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_stack.top()->isObservablePort());
+    
+    push_observable_port_on_view(att);
 }
 
 void VpzStackSax::push_observables()
@@ -738,9 +752,7 @@ void VLESaxParser::on_start_element(
     } else if (name == "vle_project") {
         AssertS(utils::SaxParserError, not m_isValue and not m_isTrame);
         m_isVPZ = true;
-        m_vpzstack.push_vpz(get_attribute < std::string >(att, "author"),
-                            get_attribute < float >(att, "version"),
-                            get_attribute < std::string >(att, "date"));
+        m_vpzstack.push_vpz(att);
     } else if (name == "structures") {
         m_vpzstack.push_structure();
     } else if (name == "model") {
@@ -784,6 +796,8 @@ void VLESaxParser::on_start_element(
         m_vpzstack.push_observables();
     } else if (name == "observable") {
         m_vpzstack.push_observable(att);
+    } else if (name == "attachedview") {
+        m_vpzstack.push_attachedview(att);
     } else if (name == "translators") {
         m_vpzstack.push_translators();
     } else if (name == "translator") {
@@ -860,10 +874,6 @@ void VLESaxParser::on_end_element(const Glib::ustring& name)
         m_vpzstack.pop();
     } else if (name == "destination") {
         m_vpzstack.build_connection();
-    } else if (name == "view") {
-        if (m_vpzstack.top()->isView()) {
-            m_vpzstack.pop();
-        }
     } else if (name == "trame") {
         m_vpzstack.pop_trame();
         if (not m_cdata.empty()) {

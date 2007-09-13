@@ -51,8 +51,7 @@ namespace vle { namespace vpz {
 
         ~VpzStackSax() { }
 
-        vpz::Vpz* push_vpz(const std::string& author, float version,
-                           const std::string& date);
+        vpz::Vpz* push_vpz(const AttributeList& name);
         void push_structure();
         void push_model(const AttributeList& att);
         void push_port(const AttributeList& att);
@@ -74,6 +73,7 @@ namespace vle { namespace vpz {
         void push_outputs();
         void push_output(const AttributeList& att);
         void push_view(const AttributeList& att);
+        void push_attachedview(const AttributeList& att);
         void push_observables();
         void push_observable(const AttributeList& att);
         void push_observable_port(const AttributeList& att);

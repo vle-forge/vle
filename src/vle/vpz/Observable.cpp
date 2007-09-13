@@ -48,7 +48,7 @@ void ObservablePort::write(std::ostream& out) const
     } else {
         out << "<port name=\"" << m_name << "\" >\n";
         for (const_iterator it = begin(); it != end(); ++it) {
-            out << " <view name=\"" << *it << "\" />\n";
+            out << " <attachedview name=\"" << *it << "\" />\n";
         }
         out << "</port>\n";
     }

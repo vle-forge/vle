@@ -1,11 +1,18 @@
 <?xml version="1.0" ?>
-<vle_project version="0.5" date="" author="Gauthier Quesnel">
+<!DOCTYPE vle_project SYSTEM "http://vle.univ-littoral.fr/vle-0.5.0.dtd">
+<vle_project version="0.5" author="Gauthier Quesnel">
  <structures>
   <model name="top" type="coupled">
    <submodels>
     <model name="top1" type="coupled">
+     <in>
+      <port name="in" />
+     </in>
+     <out>
+      <port name="out" />
+     </out>
      <submodels>
-      <model name="x" type="atomic" dynamics="" conditions="" observables="">
+      <model name="x" type="atomic" >
        <in>
         <port name="in" />
        </in>
@@ -13,29 +20,23 @@
         <port name="out" />
        </out>
       </model>
-      <model name="a" type="atomic" dynamics="" conditions="ca" observables="">
+      <model name="a" type="atomic" >
        <in>
         <port name="in" />
        </in>
       </model>
-      <model name="b" type="atomic" dynamics="" conditions="cb" observables="">
+      <model name="b" type="atomic" >
        <in>
         <port name="in" />
        </in>
       </model>
-      <model name="c" type="atomic" dynamics="" conditions="cc" observables="">
+      <model name="c" type="atomic" >
        <in>
         <port name="in1" />
         <port name="in2" />
        </in>
       </model>
      </submodels>
-     <in>
-      <port name="in" />
-     </in>
-     <out>
-      <port name="out" />
-     </out>
      <connections>
       <connection type="input">
        <origin model="top1" port="in" />
@@ -68,24 +69,24 @@
      </connections>
     </model>
     <model name="top2" type="coupled">
-     <submodels>
-      <model name="f" type="atomic" dynamics="" conditions="" observables="">
-       <in>
-        <port name="in" />
-       </in>
-      </model>
-      <model name="g" type="atomic" dynamics="" conditions="" observables="">
-       <in>
-        <port name="in" />
-       </in>
-      </model>
-     </submodels>
      <in>
       <port name="in" />
      </in>
      <out>
       <port name="out" />
      </out>
+     <submodels>
+      <model name="f" type="atomic" >
+       <in>
+        <port name="in" />
+       </in>
+      </model>
+      <model name="g" type="atomic" > 
+       <in>
+        <port name="in" />
+       </in>
+      </model>
+     </submodels>
      <connections>
       <connection type="input">
        <origin model="top2" port="in" />
@@ -97,12 +98,12 @@
       </connection>
      </connections>
     </model>
-    <model name="d" type="atomic" dynamics="" conditions="cd" observables="">
+    <model name="d" type="atomic" conditions="cd" >
      <in>
       <port name="in" />
      </in>
     </model>
-    <model name="e" type="atomic" dynamics="" conditions="" observables="">
+    <model name="e" type="atomic" >
      <in>
       <port name="in1" />
       <port name="in2" />
@@ -150,26 +151,26 @@
   </conditions>
   <views>
    <outputs>
-    <output name="o" format="local" location="" plugin="text"/>
-    <output name="o2" format="local" location="" plugin="text" />
+    <output name="o" format="local" plugin="text" />
+    <output name="o2" format="local" plugin="text" />
    </outputs>
    <observables>
     <observable name="obs1">
      <port name="c">
-      <view name="view1" />
+      <attachedview name="view1" />
      </port>
     </observable>
     <observable name="obs2">
      <port name="nbmodel">
-      <view name="view1" />
+      <attachedview name="view1" />
      </port>
      <port name="structure">
-      <view name="view2" />
+      <attachedview name="view2" />
      </port>
     </observable>
    </observables>
-   <view name="view1" type="timed" library="default" timestep="1" output="o" />
-   <view name="view2" type="timed" library="default" timestep="1" output="o2" />
+   <view name="view1" type="timed" timestep="1" output="o" />
+   <view name="view2" type="timed" timestep="1" output="o2" />
   </views>
  </experiment>
 </vle_project>
