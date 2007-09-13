@@ -150,25 +150,24 @@ Time qss::init()
 void qss::getOutputFunction(const Time& time,
                             ExternalEventList& output) 
 {
-    //  std::cout << "[" << getModelName() << "] " << "getOutputFunction at "
-    //  << time << std::endl;
-    if (getState(0) == POST3 or getState(0) == RUN) {
-        devs::ExternalEvent* ee = new devs::ExternalEvent("out");
+//   std::cout << "[" << getModelName() << "] " << "getOutputFunction at "
+// 	    << time << std::endl;
 
-        for (unsigned int i = 0; i < m_functionNumber ; i++) {
-            double e = (time - getLastTime(i)).getValue();
-
-            // 	    std::cout << "e = " << e << std::endl; std::cout <<
-            // 	    "gradient = " << getGradient(i) << std::endl; std::cout <<
-            // 	    "value = " << getValue(i)+e*getGradient(i) << std::endl;
-
-            //	    ee << devs::attribute(m_variableName[i],
-            //	    getValue(i)+e*getGradient(i));
-            ee << devs::attribute("name", m_variableName[i]);
-            ee << devs::attribute("value", getValue(i)+e*getGradient(i));
-        }
-        output.addEvent(ee);
+  if (getState(0) == POST3 or getState(0) == RUN) {
+    devs::ExternalEvent* ee = new devs::ExternalEvent("out");
+    
+    for (unsigned int i = 0; i < m_functionNumber ; i++) {
+      double e = (time - getLastTime(i)).getValue();
+      
+//       std::cout << "e = " << e << std::endl; 
+//       std::cout << "gradient = " << getGradient(i) << std::endl; 
+//       std::cout << "value = " << getValue(i)+e*getGradient(i) << std::endl;
+      
+      ee << devs::attribute("name", m_variableName[i]);
+      ee << devs::attribute("value", getValue(i)+e*getGradient(i));
     }
+    output.addEvent(ee);
+  }
 }
 
 Time qss::getTimeAdvance()
@@ -194,8 +193,8 @@ void qss::processInternalEvent(const InternalEvent& event)
         minSigma();
         break;
     case POST:
-        //       std::cout << "POST -> POST2 [" << getModelName() << "] " <<
-        //       "internal event at " << event.getTime() << std::endl;
+//       std::cout << "POST -> POST2 [" << getModelName() << "] " 
+// 		<< "internal event at " << event.getTime() << std::endl;
         for (unsigned int j = 0;j < m_functionNumber;j++) {
             setState(j, POST2);
             setSigma(j, Time(0));    
@@ -203,21 +202,22 @@ void qss::processInternalEvent(const InternalEvent& event)
         minSigma();
         break;
     case POST2:
-        //       std::cout << "POST2 -> RUN [" << getModelName() << "] " <<
-        //       "internal event at " << event.getTime() << std::endl;
+//       std::cout << "POST2 -> RUN [" << getModelName() << "] " 
+// 		<< "internal event at " << event.getTime() << std::endl;
+
         for (unsigned int j = 0;j < m_functionNumber;j++) {
             setState(j, RUN);
-            setLastTime(j,event.getTime());
-            // Mise à jour du gradient
-            setGradient(j,compute(j));
-            // Mise à jour de sigma
+            setLastTime(j, event.getTime());
+            // Mise a jour du gradient
+            setGradient(j, compute(j));
+            // Mise a jour de sigma
             updateSigma(j);
         }
         minSigma();
         break;
     case POST3:
-        //       std::cout << "POST3 -> RUN [" << getModelName() << "] " <<
-        //       "internal event at " << event.getTime() << std::endl;
+//               std::cout << "POST3 -> RUN [" << getModelName() << "] " <<
+//               "internal event at " << event.getTime() << std::endl;
         for (unsigned int j = 0;j < m_functionNumber;j++) {
             setState(j, RUN);
             setGradient(j,compute(j));
@@ -226,7 +226,7 @@ void qss::processInternalEvent(const InternalEvent& event)
         minSigma();
         break;
     case RUN:
-        // Mise à jour de l'index
+        // Mise a jour de l'index
 
         if (getGradient(i) >= 0) setIndex(i,getIndex(i)+1);
         else setIndex(i,getIndex(i)-1);
@@ -249,97 +249,108 @@ void qss::processInternalEvent(const InternalEvent& event)
             minSigma();
         }
 
-        // 	std::cout << "RUN -> POST [" << getModelName() << "] " <<
-        // 	"internal event at " << event.getTime() << " : " <<
-        // 	getVariable(i) << " = " << getValue(i) << std::endl;
-
-        minSigma();
+// 	std::cout << "RUN -> POST [" << getModelName() << "] " <<
+// 	  "internal event at " << event.getTime() << " : " <<
+// 	  getVariable(i) << " = " << getValue(i) << std::endl;
     }
+
+//     std::cout << "sigma = " 
+// 	      << getSigma(m_currentModel).getValue() 
+// 	      << " gradient = " << getGradient(m_currentModel)
+// 	      << std::endl;
+
 }
 
 void qss::processExternalEvents(const ExternalEventList& event,
                                 const Time& time)
 {
-    //   std::cout << "external event [" << getModelName() << "] at " << time
-    //   << std::endl;
+//   std::cout << "external event [" << getModelName() 
+// 	    << " - " << getState(0)
+// 	    << " ] at " << time
+// 	    << std::endl;
 
-    if (getState(0) == POST) {
-        ExternalEventList::const_iterator it = event.begin();
+  if (getState(0) == POST) {
+    ExternalEventList::const_iterator it = event.begin();
 
-        while (it != event.end()) {
-            if ((*it)->onPort("parameter")) {
-                std::string name = (*it)->getStringAttributeValue("name");
-                double value = (*it)->getDoubleAttributeValue("value");
-                // 	std::cout << "POST [" << getModelName() << "] " <<
-                // 	"perturbation at " << time <<  " : " << name << " , "
-                // 	<< value << std::endl;
-                processPerturbation(name, value);
-            }
-            ++it;
-        }
+    while (it != event.end()) {
+      std::string name = (*it)->getStringAttributeValue("name");
+      double value = (*it)->getDoubleAttributeValue("value");
+      int i = getVariable(name);
+      
+      if (i == -1) {
+// 	std::cout << "POST [" << getModelName() << "] " 
+// 		  << "perturbation at " << time <<  " : " << name << " , "
+// 		  << value << std::endl;
 
-        for (unsigned int j = 0;j < m_functionNumber;j++) {
-            setState(j, POST2);
-            setSigma(j, Time(0));    
-        }
-        minSigma();
-    } else {
-        if (getState(0) == RUN) {
-            ExternalEventList::const_iterator it = event.begin();
+	processPerturbation(name, value);
+      }
+      else {
+// 	std::cout << "EXT [" << getModelName() << "] " 
+// 		  << "perturbation at " << time <<  " : " 
+// 		  << name << " , " 
+// 		  << value << " , " << i << std::endl;
+	
+	setValue(i, value);
+	m_index[i] = (long)(floor(getValue(i)/m_precision));
+	setLastTime(i, time);
+	setGradient(i, compute(i));
+      }
+      ++it;
+    }
+    
+    for (unsigned int j = 0;j < m_functionNumber;j++) {
+      setState(j, POST2);
+      setSigma(j, Time(0));    
+    }
+    minSigma();
+  } else {
+    if (getState(0) == RUN) {
+      ExternalEventList::const_iterator it = event.begin();
 
-            while (it != event.end()) {
-                if ((*it)->onPort("parameter")) {
-                    std::string name = (*it)->getStringAttributeValue("name");
-                    double value = (*it)->getDoubleAttributeValue("value");
-                    // 	    std::cout << "RUN [" << getModelName() << "] " <<
-                    // 	    "perturbation at " << time <<  " : " << name << " ,
-                    // 	    " << value << std::endl;
-                    processPerturbation(name, value);
-                    for (unsigned int j = 0;j < m_functionNumber;j++) {
-                        double e = (time - getLastTime(j)).getValue();
+      while (it != event.end()) {
+	std::string name = (*it)->getStringAttributeValue("name");
+	double value = (*it)->getDoubleAttributeValue("value");
+	int i = getVariable(name);
 
-                        setValue(j, getValue(j)+e*getGradient(j));
-                    }
-                    for (unsigned int j = 0;j < m_functionNumber;j++) {
-                        setLastTime(j, time);
-                        setSigma(j, 0);
-                        setState(j, POST3);
-                    }
-                    minSigma();
-                } else {
-                    size_t i = getVariable((*it)->getPortName());
-                    double value = (*it)->getDoubleAttributeValue("value");
+	if (i == -1) {
+// 	  std::cout << "RUN [" << getModelName() 
+// 		    << "] " << "perturbation at " << time 
+// 		    <<  " : " << name 
+// 		    << " , " << value << std::endl;
 
-                    if (getState(i) == RUN) {
-                        double e = (time - getLastTime(i)).getValue();
+	  processPerturbation(name, value);
+	  for (unsigned int j = 0;j < m_functionNumber;j++) {
+	    double e = (time - getLastTime(j)).getValue();
 
-                        for (unsigned int j = 0;j < m_functionNumber;j++) {
-                            if (i == j) {
-                                setValue(i, value);
-                                m_gradient[i] = 0.0;
-                                m_index[i] = (long)(floor(getValue(i) /
-                                                          m_precision));
-                                setSigma(i, Time(0));
-                                setState(i, INIT);
-                            } else {
-                                setLastTime(j, time);
-                                if (e > 0) {
-                                    setValue(j,getValue(j)+e*getGradient(j));
-                                }
-                                setGradient(j, compute(j));
-                                updateSigma(j);
-                                if (getSigma(j) < 0) {
-                                    setSigma(j, Time(0));
-                                }
-                            }
-                        }
-                        minSigma();
-                    }
-                }
-                ++it;
-            }
-        }
-    } 
+	    setValue(j, getValue(j)+e*getGradient(j));
+	    m_index[j] = (long)(floor(getValue(j)/m_precision));
+	  }
+	  for (unsigned int j = 0;j < m_functionNumber;j++) {
+	    setLastTime(j, time);
+	    setSigma(j, 0);
+	    setState(j, POST3);
+	  }
+	} else {
+// 	  std::cout << "EXT [" << getModelName() << "] " 
+// 		    << "perturbation at " << time <<  " : " 
+// 		    << name << " , " 
+// 		    << value << std::endl;
+	  
+	  setValue(i, value);
+	  m_index[i] = (long)(floor(getValue(i)/m_precision));
+	  setLastTime(i, time);
+	  setGradient(i, compute(i));
+	  updateSigma(i);
+	}
+	++it;
+      }
+      minSigma();
+    }
+  } 
+
+//   std::cout << "sigma = " 
+// 	    << getSigma(m_currentModel).getValue() 
+// 	    << std::endl;
 }
 
 Value qss::processStateEvent(const StateEvent& event) const
@@ -350,15 +361,13 @@ Value qss::processStateEvent(const StateEvent& event) const
     return value::DoubleFactory::create(getValue(i)+e*getGradient(i));
 }
 
-unsigned int qss::getVariable(const std::string& name) const
+int qss::getVariable(const std::string& name) const
 {
     std::map < std::string, unsigned int >::const_iterator it;
+
     it = m_variableIndex.find(name);
-
-    Assert(utils::InternalError, it != m_variableIndex.end(), boost::format(
-            "Qss model, unknow variable %1%") % name);
-
-    return it->second;
+    if (it != m_variableIndex.end()) return it->second;
+    else return -1;
 }
 
 const std::string& qss::getVariable(unsigned int index) const

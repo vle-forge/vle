@@ -86,7 +86,7 @@ namespace vle { namespace extension {
          * @return the index of the specified variable name.
          * @throw utils::InternalError if name does not exist.
          */
-        unsigned int getVariable(const std::string& name) const;
+        int getVariable(const std::string& name) const;
 
         /**
          * @brief Get the name of the specified index.
