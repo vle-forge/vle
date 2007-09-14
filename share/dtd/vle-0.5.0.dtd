@@ -1,0 +1,114 @@
+<!ELEMENT vle_project (structures?, dynamics?, translators?, experiment) >
+<!ELEMENT structures (model?) >
+<!ELEMENT model (in?, out?, submodels?, connections?) >
+<!ELEMENT in (port*) >
+<!ELEMENT out (port*) >
+<!ELEMENT submodels (model*) >
+<!ELEMENT connections (connection*) >
+<!ELEMENT connection (origin, destination) >
+<!ELEMENT origin EMPTY >
+<!ELEMENT destination EMPTY >
+<!ELEMENT dynamics (dynamic*) >
+<!ELEMENT dynamic EMPTY >
+<!ELEMENT translators (translator*) >
+<!ELEMENT translator (#PCDATA) >
+<!ELEMENT experiment (replicas?, conditions?, views?) >
+<!ELEMENT conditions (condition*) >
+<!ELEMENT condition (port*) >
+<!ELEMENT port ((attachedview*)|(integer|double|boolean|string|table|tuple|set|map|xml)*) >
+<!ELEMENT views (outputs, observables, view*) >
+<!ELEMENT outputs (output*) >
+<!ELEMENT output (#PCDATA) >
+<!ELEMENT observables (observable*) >
+<!ELEMENT observable (port*) >
+<!ELEMENT attachedview EMPTY >
+<!ELEMENT view (#PCDATA) >
+<!ELEMENT integer (#PCDATA) >
+<!ELEMENT double (#PCDATA) >
+<!ELEMENT boolean (#PCDATA) >
+<!ELEMENT string (#PCDATA) >
+<!ELEMENT table (#PCDATA) >
+<!ELEMENT tuple (#PCDATA) >
+<!ELEMENT set (integer|double|boolean|string|table|tuple|set|map|xml)* >
+<!ELEMENT map (key) >
+<!ELEMENT key (integer|double|boolean|string|table|tuple|set|map|xml) >
+<!ELEMENT xml (#PCDATA) >
+
+<!ATTLIST vle_project
+  date CDATA #IMPLIED
+  version CDATA #REQUIRED
+  author CDATA #IMPLIED >
+
+<!ATTLIST model
+  name NMTOKEN #REQUIRED
+  type (atomic|coupled|novle) #REQUIRED
+  dynamics NMTOKEN #IMPLIED
+  conditions NMTOKEN #IMPLIED
+  observables NMTOKEN #IMPLIED
+  translator NMTOKEN #IMPLIED >
+
+<!ATTLIST port
+  name NMTOKEN #REQUIRED >
+
+<!ATTLIST connection
+  type (input|output|internal) #REQUIRED >
+
+<!ATTLIST origin
+  model NMTOKEN #REQUIRED
+  port NMTOKEN #REQUIRED >
+
+<!ATTLIST destination
+  model NMTOKEN #REQUIRED
+  port NMTOKEN #REQUIRED >
+
+<!ATTLIST dynamic
+  name NMTOKEN #REQUIRED
+  library NMTOKEN #REQUIRED
+  location NMTOKEN #IMPLIED
+  model NMTOKEN #IMPLIED >
+
+<!ATTLIST translator
+  name NMTOKEN #REQUIRED
+  library NMTOKEN #REQUIRED >
+
+<!ATTLIST experiment
+  name NMTOKEN #REQUIRED
+  duration NMTOKEN #REQUIRED
+  seed NMTOKEN #IMPLIED
+  combination (linear|total) #IMPLIED >
+
+<!ATTLIST replicas
+  seed NMTOKEN #REQUIRED
+  number NMTOKEN #REQUIRED >
+
+<!ATTLIST condition
+  name NMTOKEN #REQUIRED >
+
+<!ATTLIST output
+  name NMTOKEN #REQUIRED
+  format (local|distant) #REQUIRED
+  location NMTOKEN #IMPLIED
+  plugin (text|default) #REQUIRED >
+
+<!ATTLIST observable
+  name NMTOKEN #REQUIRED >
+
+<!ATTLIST attachedview
+  name NMTOKEN #REQUIRED >
+
+<!ATTLIST view
+  name NMTOKEN #REQUIRED
+  type (timed|event) #REQUIRED
+  output NMTOKEN #REQUIRED
+  timestep NMTOKEN #IMPLIED >
+
+<!ATTLIST table
+  width CDATA #REQUIRED
+  height CDATA #REQUIRED >
+
+<!ATTLIST key
+  name NMTOKEN #REQUIRED >
+
+<!--
+vim:ts=8:tw=160:sw=2:sts=2
+-->
