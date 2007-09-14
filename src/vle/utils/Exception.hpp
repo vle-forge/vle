@@ -29,6 +29,7 @@
 #include <string>
 #include <exception>
 #include <stdexcept>
+#include <libxml++/exceptions/exception.h>
 
 
 
@@ -130,12 +131,21 @@ namespace vle { namespace utils {
     /** 
      * @brief Throw to report an error in SaxParser.
      */
-    class SaxParserError : public BaseError
+    class SaxParserError : public xmlpp::exception
     {
     public:
-        explicit SaxParserError(const std::string& argv) :
-            BaseError(argv)
+        explicit SaxParserError(const Glib::ustring& argv) :
+            xmlpp::exception(argv)
         { }
+
+        virtual ~SaxParserError() throw()
+        { }
+
+        virtual void Raise() const
+        { throw *this; }
+
+        virtual xmlpp::exception* Clone() const
+        { return new SaxParserError(*this); }
     };
 
 }} // namespace vle utils

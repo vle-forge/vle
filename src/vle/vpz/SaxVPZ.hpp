@@ -147,10 +147,9 @@ namespace vle { namespace vpz {
 
         virtual void on_cdata_block(const Glib::ustring& text);
 
-        //virtual void on_internal_subset(
-        //const Glib::ustring& name,
-        //const Glib::ustring& publicId,
-        //const Glib::ustring& systemId);
+        virtual void on_validity_error(const Glib::ustring& text);
+
+        virtual void on_validity_warning(const Glib::ustring& text);
 
         inline bool is_value() const
         { return m_isValue; }

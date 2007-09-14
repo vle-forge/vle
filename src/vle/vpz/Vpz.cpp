@@ -57,7 +57,20 @@ void Vpz::parse_file(const std::string& filename)
     m_filename.assign(filename);
 
     vpz::VLESaxParser sax(*this);
-    sax.parse_file(filename);
+    try {
+        sax.parse_file(filename);
+    } catch(const std::exception& sax) {
+        try {
+            Vpz::validate_file(m_filename);
+        } catch(const std::exception& dom) {
+            Throw(utils::SaxParserError, boost::format(
+                    "Parse file '%1%':\n[--libxml--]\n%2%[--libvpz--]\n%3%") %
+                filename % dom.what() % sax.what());
+        }
+        Throw(utils::SaxParserError, boost::format(
+                "Parse file '%1%':\n[--libvpz--]\n%2%") % filename %
+            sax.what());
+    }
 }
 
 void Vpz::parse_memory(const std::string& buffer)
@@ -65,7 +78,19 @@ void Vpz::parse_memory(const std::string& buffer)
     m_filename.clear();
 
     vpz::VLESaxParser sax(*this);
-    sax.parse_memory(buffer);
+    try {
+        sax.parse_memory(buffer);
+    } catch(const std::exception& sax) {
+        try {
+            Vpz::validate_file(buffer);
+        } catch(const std::exception& dom) {
+            Throw(utils::SaxParserError, boost::format(
+                    "Parse memory:\n[--libxml--]\n%1%[--libvpz--]\n%2%") %
+                dom.what() % sax.what());
+        }
+        Throw(utils::SaxParserError, boost::format(
+                "Parse memory:\n[--libvpz--]\n%1%") % sax.what());
+    }
 }
 
 void Vpz::expandTranslator()
@@ -160,6 +185,20 @@ void Vpz::fixExtension(std::string& filename)
             filename += ".vpz";
         }
     }
+}
+
+void Vpz::validate_file(const std::string& filename)
+{
+    xmlpp::DomParser dom;
+    dom.set_validate(true);
+    dom.parse_file(filename);
+}
+
+void Vpz::validate_memory(const Glib::ustring& buffer)
+{
+    xmlpp::DomParser dom;
+    dom.set_validate(true);
+    dom.parse_memory(buffer);
 }
 
 }} // namespace vle vpz

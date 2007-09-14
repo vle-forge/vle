@@ -166,6 +166,22 @@ namespace vle { namespace vpz {
          */
         static void fixExtension(std::string& filename);
 
+        /** 
+         * @brief Use the libxml++ DOM parser to check the validation of the VPZ
+         * file.
+         * @param filename the file name to test.
+         * @throw std::exception on error.
+         */
+        static void validate_file(const std::string& filename);
+
+        /** 
+         * @brief Use the libxml++ DOM parser to check the validation of the VPZ
+         * buffer.
+         * @param buffer the content of the XML.
+         * @throw std::exception on error.
+         */
+        static void validate_memory(const Glib::ustring& buffer);
+
     private:
         bool                m_isGzip;
         std::string         m_filename;
