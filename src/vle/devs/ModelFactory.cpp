@@ -160,7 +160,12 @@ Glib::Module* ModelFactory::buildPlugin(const vpz::Dynamic& dyn)
             dyn.library()).str());
 
     for (it = lst.begin(); it != lst.end(); ++it) {
-        std::string file(Glib::Module::build_path(*it, dyn.library()));
+        std::string file;
+
+	if (dyn.language().empty()) file = (Glib::Module::build_path(*it, dyn.library()));
+	else
+	  if (dyn.language() == "python") file = (Glib::Module::build_path(*it, "pyvle"));
+
         Glib::Module* module = new Glib::Module(file);
         if (not (*module)) {
             error += boost::str(boost::format(
@@ -198,32 +203,32 @@ void ModelFactory::attachDynamics(devs::Simulator* atom,
     devs::Dynamics* call = 0;
     void* makeNewDynamics = 0;
 
-    if (dyn.model().empty()) {
+    if (dyn.model().empty() or !dyn.language().empty()) {
         bool getSymbol = module->get_symbol("makeNewDynamics", makeNewDynamics);
         Assert(utils::ParseError, getSymbol, boost::format(
-                "Error in '%1%', function 'makeNewDynamics' not found: '%2%'\n")
-            % module->get_name() % Glib::Module::get_last_error());
-
-        call = ((Dynamics*(*)(const
-                    graph::Model&))(makeNewDynamics))(*atom->getStructure());
-        Assert(utils::ParseError, call, boost::format(
-                "Error in '%1%', function 'makeNewDynamics':"
-                "problem allocation a new Dynamics: '%2%'\n") %
-            module->get_name() % Glib::Module::get_last_error());
+	       "Error in '%1%', function 'makeNewDynamics' not found: '%2%'\n")
+	       % module->get_name() % Glib::Module::get_last_error());
+      
+	call = ((Dynamics*(*)(const
+			      graph::Model&))(makeNewDynamics))(*atom->getStructure());
+	Assert(utils::ParseError, call, boost::format(
+	       "Error in '%1%', function 'makeNewDynamics':"
+	       "problem allocation a new Dynamics: '%2%'\n") %
+	       module->get_name() % Glib::Module::get_last_error());
     } else {
         std::string functionanme("makeNewDynamics");
-        functionanme += dyn.model();
-        bool getSymbol = module->get_symbol(functionanme , makeNewDynamics);
-        Assert(utils::ParseError, getSymbol, boost::format(
-                "Error in '%1%', function '%2%' not found: '%3%'\n") %
-            module->get_name() % functionanme % Glib::Module::get_last_error());
-
-        call = ((Dynamics*(*)(const
-                    graph::Model&))(makeNewDynamics))(*atom->getStructure());
-        Assert(utils::ParseError, call, boost::format(
-                "Error in '%1%', function '%2%':"
-                "problem allocation a new Dynamics: '%3%'\n") %
-            module->get_name() % functionanme % Glib::Module::get_last_error());
+	functionanme += dyn.model();
+	bool getSymbol = module->get_symbol(functionanme , makeNewDynamics);
+	Assert(utils::ParseError, getSymbol, boost::format(
+	       "Error in '%1%', function '%2%' not found: '%3%'\n") %
+	       module->get_name() % functionanme % Glib::Module::get_last_error());
+      
+	call = ((Dynamics*(*)(const
+			      graph::Model&))(makeNewDynamics))(*atom->getStructure());
+	Assert(utils::ParseError, call, boost::format(
+	       "Error in '%1%', function '%2%':"
+	       "problem allocation a new Dynamics: '%3%'\n") %
+	       module->get_name() % functionanme % Glib::Module::get_last_error());
     }
 
     if (call->is_executive()) {
