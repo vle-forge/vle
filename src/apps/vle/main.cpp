@@ -27,6 +27,7 @@
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/PathOptionGroup.hpp>
 #include <vle/utils/Trace.hpp>
+#include <vle/utils/Debug.hpp>
 
 
 

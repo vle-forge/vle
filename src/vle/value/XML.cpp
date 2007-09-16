@@ -22,6 +22,7 @@
  */
 
 #include <vle/value/XML.hpp>
+#include <vle/utils/Debug.hpp>
 
 
 

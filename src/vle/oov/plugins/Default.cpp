@@ -23,6 +23,7 @@
  */
 
 #include <vle/oov/plugins/Default.hpp>
+#include <vle/utils/Debug.hpp>
 
 
 namespace vle { namespace oov { namespace plugin {

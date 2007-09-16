@@ -26,6 +26,7 @@
 
 #include <vle/utils/Host.hpp>
 #include <vle/utils/Tools.hpp>
+#include <vle/utils/Debug.hpp>
 #include <vle/utils/XML.hpp>
 #include <boost/format.hpp>
 

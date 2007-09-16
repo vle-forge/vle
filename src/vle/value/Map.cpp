@@ -27,6 +27,7 @@
 #include <vle/value/Integer.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Boolean.hpp>
+#include <vle/utils/Debug.hpp>
 
 
 

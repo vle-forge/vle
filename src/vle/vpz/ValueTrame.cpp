@@ -23,6 +23,7 @@
  */
 
 #include <vle/vpz/ValueTrame.hpp>
+#include <vle/utils/Debug.hpp>
 
 
 

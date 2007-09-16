@@ -25,6 +25,7 @@
 #include <vle/devs/NetStreamWriter.hpp>
 #include <vle/devs/Simulator.hpp>
 #include <vle/utils/Trace.hpp>
+#include <vle/utils/Debug.hpp>
 
 
 

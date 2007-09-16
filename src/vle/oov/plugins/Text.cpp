@@ -23,6 +23,7 @@
  */
 
 #include <vle/oov/plugins/Text.hpp>
+#include <vle/utils/Debug.hpp>
 
 
 

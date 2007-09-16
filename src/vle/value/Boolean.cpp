@@ -22,6 +22,7 @@
  */
 
 #include <vle/value/Boolean.hpp>
+#include <vle/utils/Debug.hpp>
 
 
 

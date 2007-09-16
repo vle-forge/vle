@@ -25,6 +25,7 @@
 #include <vle/oov/StreamReader.hpp>
 #include <vle/oov/Plugin.hpp>
 #include <vle/utils/Path.hpp>
+#include <vle/utils/Debug.hpp>
 
 namespace vle { namespace oov {
 

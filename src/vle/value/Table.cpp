@@ -22,6 +22,7 @@
  */
 
 #include <vle/value/Table.hpp>
+#include <vle/utils/Debug.hpp>
 
 
 

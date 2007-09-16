@@ -22,6 +22,7 @@
  */
 
 #include <vle/value/Double.hpp>
+#include <vle/utils/Debug.hpp>
 
 
 

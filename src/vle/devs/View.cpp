@@ -26,6 +26,7 @@
 #include <vle/devs/View.hpp>
 #include <vle/devs/Simulator.hpp>
 #include <vle/devs/StreamWriter.hpp>
+#include <vle/utils/Debug.hpp>
 
 namespace vle { namespace devs {
 

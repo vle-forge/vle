@@ -22,6 +22,7 @@
  */
 
 #include <vle/value/Tuple.hpp>
+#include <vle/utils/Debug.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>

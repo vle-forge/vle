@@ -28,9 +28,6 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include <libxml++/libxml++.h>
-#include <vle/utils/Debug.hpp>
-
-
 
 namespace vle { namespace value {
 

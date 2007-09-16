@@ -22,6 +22,7 @@
  */
 
 #include <vle/value/Set.hpp>
+#include <vle/utils/Debug.hpp>
 
 
 

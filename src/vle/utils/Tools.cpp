@@ -25,6 +25,7 @@
 
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
+#include <vle/utils/Debug.hpp>
 
 #include <glibconfig.h>
 #include <glibmm/markup.h>

@@ -39,25 +39,8 @@ namespace vle { namespace vpz {
         virtual ~ValueList()
         { }
 
-        const vle::value::Value& get(const std::string& name) const
-        {
-	    const_iterator it = find(name);
-	    if (it == end()) {
-	      Throw(utils::InternalError, boost::format(
-		  "Unknow port %1% for condition") % name);
-	    } 
-	    return it->second;
-	}
-      
-        vle::value::Value& get(const std::string& name)
-        {
-	    iterator it = find(name);
-	    if (it == end()) {
-	        Throw(utils::InternalError, boost::format(
-		    "Unknow port %1% for condition") % name);
-	    }
-	    return it->second;
-	}
+        const vle::value::Value& get(const std::string& name) const;
+        vle::value::Value& get(const std::string& name);
     };
 
 

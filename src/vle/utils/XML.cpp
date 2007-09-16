@@ -25,13 +25,14 @@
 
 #include <vle/utils/XML.hpp>
 #include <vle/utils/Tools.hpp>
+#include <vle/utils/Debug.hpp>
 #include <vle/utils/Exception.hpp>
 
 
 namespace vle { namespace utils { namespace xml {
 
 Glib::ustring get_attribute(xmlpp::Element* elt,
-                                        const Glib::ustring& name)
+			    const Glib::ustring& name)
 {
     Assert(ParseError, elt != NULL, "xml node not found");
 
@@ -45,7 +46,7 @@ Glib::ustring get_attribute(xmlpp::Element* elt,
 }
 
 Glib::ustring get_attribute(xmlpp::Node* node,
-                                        const Glib::ustring& name)
+			    const Glib::ustring& name)
 {
     Assert(ParseError, node != NULL, "xml node not found");
 
