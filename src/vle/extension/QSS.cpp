@@ -362,6 +362,19 @@ Value qss::processStateEvent(const StateEvent& event) const
     return value::DoubleFactory::create(getValue(i)+e*getGradient(i));
 }
 
+void qss::processInstantaneousEvent(const InstantaneousEvent& event,
+				    const Time& time,
+				    ExternalEventList& output) const
+{
+    unsigned int i = m_variableIndex.find(event.getPortName())->second;
+    double e = (time - getLastTime(i)).getValue();
+    devs::ExternalEvent* ee = new devs::ExternalEvent("response");
+      
+    ee << devs::attribute("name", event.getPortName());
+    ee << devs::attribute("value", getValue(i)+e*getGradient(i));
+    output.addEvent(ee);
+}
+
 int qss::getVariable(const std::string& name) const
 {
     std::map < std::string, unsigned int >::const_iterator it;

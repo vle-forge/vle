@@ -66,6 +66,9 @@ namespace vle { namespace extension {
         virtual vle::value::Value processStateEvent(
 	    const vle::devs::StateEvent& event) const;
 
+	virtual void processInstantaneousEvent(const vle::devs::InstantaneousEvent& /* event */,
+					       const vle::devs::Time& /* time */,
+					       vle::devs::ExternalEventList& /* output */) const;
         /**
          * @brief Get the value of the variable specified by index. Be carefull,
          * no check on the variable i: 0 <= i < m_functionNumber.
