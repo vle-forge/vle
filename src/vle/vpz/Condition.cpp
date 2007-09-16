@@ -95,9 +95,9 @@ void Condition::addValueToPort(const std::string& portname,
     }
 }
 
-Condition::ValueList Condition::firstValues() const
+ValueList Condition::firstValues() const
 {
-    Condition::ValueList result;
+    ValueList result;
 
     for (const_iterator it = begin(); it != end(); ++it) {
         if (it->second->size() > 0) {

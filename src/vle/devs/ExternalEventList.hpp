@@ -33,7 +33,7 @@
 namespace vle { namespace devs {
 
     typedef EventList < ExternalEvent* > ExternalEventList;
-    typedef vpz::Condition::ValueList    InitEventList;
+    typedef vpz::ValueList InitEventList;
     
 }} // namespace vle devs
 

@@ -32,6 +32,35 @@
 
 namespace vle { namespace vpz {
 
+
+    class ValueList : public std::map < std::string, value::Value >
+    {
+    public:
+        virtual ~ValueList()
+        { }
+
+        const vle::value::Value& get(const std::string& name) const
+        {
+	    const_iterator it = find(name);
+	    if (it == end()) {
+	      Throw(utils::InternalError, boost::format(
+		  "Unknow port %1% for condition") % name);
+	    } 
+	    return it->second;
+	}
+      
+        vle::value::Value& get(const std::string& name)
+        {
+	    iterator it = find(name);
+	    if (it == end()) {
+	        Throw(utils::InternalError, boost::format(
+		    "Unknow port %1% for condition") % name);
+	    }
+	    return it->second;
+	}
+    };
+
+
     /** 
      * @brief A condition define a couple model name, port name and a Value.
      * This class allow loading and writing a condition.
@@ -39,33 +68,6 @@ namespace vle { namespace vpz {
     class Condition : public Base, public std::map < std::string, value::Set >
     {
     public:
-        class ValueList : public std::map < std::string, value::Value >
-        {
-        public:
-            virtual ~ValueList()
-            { }
-
-            const value::Value& get(const std::string& name) const
-            {
-                const_iterator it = find(name);
-                if (it == end()) {
-                    Throw(utils::InternalError, boost::format(
-                          "Unknow port %1% for condition") % name);
-                }
-                return it->second;
-            }
-
-            value::Value& get(const std::string& name)
-            {
-                iterator it = find(name);
-                if (it == end()) {
-                    Throw(utils::InternalError, boost::format(
-                          "Unknow port %1% for condition") % name);
-                }
-                return it->second;
-            }
-        };
-
         Condition(const std::string& name);
 
         virtual ~Condition() 
@@ -128,7 +130,7 @@ namespace vle { namespace vpz {
          * 
          * @return A cloned ValueList based on the SetList.
          */
-        Condition::ValueList firstValues() const;
+        ValueList firstValues() const;
 
         /** 
          * @brief Get the value::Set attached to a port.

@@ -30,41 +30,49 @@
 
 namespace vle { namespace extension {
     
-    class qss : public devs::Dynamics
+    class qss : public vle::devs::Dynamics
     {
     public:
         enum state { INIT, RUN, POST, POST2, POST3 };
 
-        qss(const graph::AtomicModel& model);
+        qss(const vle::graph::AtomicModel& model);
 
         virtual ~qss() { }
 
         virtual void finish();
 
-        virtual devs::Time init();
+        virtual vle::devs::Time init();
 
         virtual void getOutputFunction(
-            const devs::Time& time,
-            devs::ExternalEventList& output);
+	    const vle::devs::Time& time,
+            vle::devs::ExternalEventList& output);
 
-        virtual devs::Time getTimeAdvance();
+        virtual vle::devs::Time getTimeAdvance();
 
-        virtual devs::Event::EventType processConflict(
-            const devs::InternalEvent& internal,
-            const devs::ExternalEventList& extEventlist) const;
+        virtual vle::devs::Event::EventType processConflict(
+	    const vle::devs::InternalEvent& internal,
+            const vle::devs::ExternalEventList& extEventlist) const;
 
         virtual void processInitEvents(
-            const devs::InitEventList& event);
+	    const vle::devs::InitEventList& event);
 
         virtual void processInternalEvent(
-            const devs::InternalEvent& event);
+	    const vle::devs::InternalEvent& event);
 
         virtual void processExternalEvents(
-            const devs::ExternalEventList& event,
-            const devs::Time& time);
+	    const vle::devs::ExternalEventList& event,
+            const vle::devs::Time& time);
 
-        virtual value::Value processStateEvent(
-            const devs::StateEvent& event) const;
+        virtual vle::value::Value processStateEvent(
+	    const vle::devs::StateEvent& event) const;
+
+        /**
+         * @brief Get the value of the variable specified by index. Be carefull,
+         * no check on the variable i: 0 <= i < m_functionNumber.
+         * @param i index of the variable.
+         */
+        inline double getValue(unsigned int i) const
+        { return m_value[i]; }
 
     protected:
         /**
@@ -116,14 +124,6 @@ namespace vle { namespace extension {
          */
         inline void setValue(unsigned int i, double value)
         { m_value[i] = value; }
-
-        /**
-         * @brief Get the value of the variable specified by index. Be carefull,
-         * no check on the variable i: 0 <= i < m_functionNumber.
-         * @param i index of the variable.
-         */
-        inline double getValue(unsigned int i) const
-        { return m_value[i]; }
 
         bool m_active;
         /** Number of functions. */

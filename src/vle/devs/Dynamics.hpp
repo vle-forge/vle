@@ -77,7 +77,7 @@ namespace vle { namespace devs {
 	 *
 	 * @param model the atomic model to which belongs the dynamics
 	 */
-        Dynamics(const graph::AtomicModel& model) : 
+        Dynamics(const vle::graph::AtomicModel& model) : 
             m_model(model)
         { }
 
@@ -116,7 +116,7 @@ namespace vle { namespace devs {
 	 *
 	 * @return pointer on the atomic model
 	 */
-        inline const graph::AtomicModel& getModel() const
+        inline const vle::graph::AtomicModel& getModel() const
         { return m_model; }
 
 	/**
@@ -134,7 +134,7 @@ namespace vle { namespace devs {
 	 *
 	 * @return the Double object
 	 */
-        inline value::Value buildDouble(double value) const
+        inline vle::value::Value buildDouble(double value) const
         { return value::DoubleFactory::create(value); }
 
 	/**
@@ -144,7 +144,7 @@ namespace vle { namespace devs {
 	 *
 	 * @return the Integer object
 	 */
-        inline value::Value buildInteger(long value) const
+        inline vle::value::Value buildInteger(long value) const
         { return value::IntegerFactory::create(value); }
 
 	/**
@@ -154,7 +154,7 @@ namespace vle { namespace devs {
 	 *
 	 * @return the Boolean object
 	 */
-        inline value::Value buildBoolean(bool value) const 
+        inline vle::value::Value buildBoolean(bool value) const 
         { return value::BooleanFactory::create(value); }
 
 	/**
@@ -164,7 +164,7 @@ namespace vle { namespace devs {
 	 *
 	 * @return the String object
 	 */
-        inline value::Value buildString(const std::string& value) const
+        inline vle::value::Value buildString(const std::string& value) const
         { return value::StringFactory::create(value); }
 
 	/**
@@ -172,7 +172,7 @@ namespace vle { namespace devs {
 	 *
 	 * @return the empty event list
 	 */
-        ExternalEventList* noEvent() const 
+        vle::devs::ExternalEventList* noEvent() const 
         { return new ExternalEventList(); }
 
 	/**
@@ -183,7 +183,7 @@ namespace vle { namespace devs {
 	 *
 	 * @return the event list with the event
 	 */
-        ExternalEvent* buildEvent(const std::string& portName) const;
+        vle::devs::ExternalEvent* buildEvent(const std::string& portName) const;
 
 	/**
 	 * Build an event list with a single event which is attached a
@@ -196,7 +196,7 @@ namespace vle { namespace devs {
 	 *
 	 * @return the event list with the event
 	 */
-        ExternalEvent* buildEventWithADouble(
+        vle::devs::ExternalEvent* buildEventWithADouble(
                            const std::string& portName,
                            const std::string& attributeName,
                            double attributeValue) const;
@@ -212,7 +212,7 @@ namespace vle { namespace devs {
 	 *
 	 * @return the event list with the event
 	 */
-        ExternalEvent* buildEventWithAInteger(
+        vle::devs::ExternalEvent* buildEventWithAInteger(
                             const std::string& portName,
                             const std::string& attributeName,
                             long attributeValue) const;
@@ -228,7 +228,7 @@ namespace vle { namespace devs {
 	 *
 	 * @return the event list with the event
 	 */
-        ExternalEvent* buildEventWithABoolean(
+        vle::devs::ExternalEvent* buildEventWithABoolean(
                            const std::string& portName,
                            const std::string& attributeName,
                            bool attributeValue) const;
@@ -244,7 +244,7 @@ namespace vle { namespace devs {
 	 *
 	 * @return the event list with the event
 	 */
-        ExternalEvent* buildEventWithAString(
+        vle::devs::ExternalEvent* buildEventWithAString(
                            const std::string& portName,
                            const std::string& attributeName,
                            const std::string& attributeValue) const;
@@ -271,8 +271,8 @@ namespace vle { namespace devs {
 	 *
 	 */
         virtual void getOutputFunction(
-            const Time& /* time */,
-            ExternalEventList& /* output */)
+	    const vle::devs::Time& /* time */,
+            vle::devs::ExternalEventList& /* output */)
         { }
 
 
@@ -281,7 +281,7 @@ namespace vle { namespace devs {
 	 *
 	 * @return duration of the current state.
 	 */
-        virtual Time getTimeAdvance()
+        virtual vle::devs::Time getTimeAdvance()
         { return Time::infinity; }
 
 	/**
@@ -290,7 +290,7 @@ namespace vle { namespace devs {
 	 *
 	 * @return duration of the initial state.
 	 */
-        virtual Time init()
+        virtual vle::devs::Time init()
         { return Time::infinity; }
 
         /**
@@ -304,9 +304,9 @@ namespace vle { namespace devs {
          *
          * @return Event::INTERNAL if internal is priority or Event::EXTERNAL.
          */
-        virtual Event::EventType processConflict(
-            const InternalEvent& /* internal */,
-            const ExternalEventList& /* extEventlist */) const
+        virtual vle::devs::Event::EventType processConflict(
+	    const vle::devs::InternalEvent& /* internal */,
+            const vle::devs::ExternalEventList& /* extEventlist */) const
         { return Event::INTERNAL; }
 
 	/**
@@ -316,7 +316,7 @@ namespace vle { namespace devs {
 	 * @param event the init event list.
 	 */
         virtual void processInitEvents(
-            const InitEventList& /* event */)
+	    const vle::devs::InitEventList& /* event */)
         { }
 
 	/**
@@ -326,7 +326,7 @@ namespace vle { namespace devs {
 	 * @param event the internal event with of the port
 	 */
         virtual void processInternalEvent(
-            const InternalEvent& /* event */)
+	    const vle::devs::InternalEvent& /* event */)
         { }
 
 	/**
@@ -336,8 +336,8 @@ namespace vle { namespace devs {
          * @param time the date of occurrence of this event.
 	 */
         virtual void processExternalEvents(
-            const ExternalEventList& /* event */,
-            const Time& /* time */)
+	    const vle::devs::ExternalEventList& /* event */,
+            const vle::devs::Time& /* time */)
         { }
 
         /**
@@ -353,9 +353,9 @@ namespace vle { namespace devs {
          * Instantaneous event.
          */
         virtual void processInstantaneousEvent(
-            const InstantaneousEvent& /* event */,
-            const Time& /* time */,
-            ExternalEventList& /* output */) const
+	    const vle::devs::InstantaneousEvent& /* event */,
+            const vle::devs::Time& /* time */,
+            vle::devs::ExternalEventList& /* output */) const
         { }
 
 	/**
@@ -367,8 +367,8 @@ namespace vle { namespace devs {
 	 *
 	 * @return the value of state variable
 	 */
-        virtual value::Value processStateEvent(
-            const StateEvent& /* event */) const
+        virtual vle::value::Value processStateEvent(
+	    const vle::devs::StateEvent& /* event */) const
         { return value::ValueBase::empty; }
 
     private:
