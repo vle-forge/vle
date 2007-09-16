@@ -100,6 +100,15 @@ namespace vle { namespace devs {
         inline virtual bool is_executive() const
         { return false; }
 
+        /** 
+         * @brief If this function return true, then a cast to a DynamicsWrapper
+         * object is produce and the set_model and set_library function are call.
+         * 
+         * @return false if Dynamics is not a DynamicsWrapper.
+         */
+        inline virtual bool is_wrapper() const
+        { return false; }
+
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 	/**

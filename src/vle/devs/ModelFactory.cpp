@@ -25,6 +25,7 @@
 #include <vle/devs/ModelFactory.hpp>
 #include <vle/devs/Simulator.hpp>
 #include <vle/devs/Dynamics.hpp>
+#include <vle/devs/DynamicsWrapper.hpp>
 #include <vle/devs/Executive.hpp>
 #include <vle/graph/Model.hpp>
 #include <vle/graph/AtomicModel.hpp>
@@ -227,6 +228,11 @@ void ModelFactory::attachDynamics(devs::Simulator* atom,
 
     if (call->is_executive()) {
         (dynamic_cast < Executive* >(call))->set_coordinator(&mCoordinator);
+    }
+    
+    if (call->is_wrapper()) {
+        (dynamic_cast < DynamicsWrapper* >(call))->set_library(dyn.library());
+        (dynamic_cast < DynamicsWrapper* >(call))->set_model(dyn.model());
     }
     
     atom->addDynamics(call);
