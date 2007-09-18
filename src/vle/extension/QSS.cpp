@@ -366,11 +366,11 @@ void qss::processInstantaneousEvent(const InstantaneousEvent& event,
 				    const Time& time,
 				    ExternalEventList& output) const
 {
-    unsigned int i = m_variableIndex.find(event.getPortName())->second;
+    unsigned int i = m_variableIndex.find(event.getStringAttributeValue("name"))->second;
     double e = (time - getLastTime(i)).getValue();
     devs::ExternalEvent* ee = new devs::ExternalEvent("response");
       
-    ee << devs::attribute("name", event.getPortName());
+    ee << devs::attribute("name", event.getStringAttributeValue("name"));
     ee << devs::attribute("value", getValue(i)+e*getGradient(i));
     output.addEvent(ee);
 }
