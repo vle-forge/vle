@@ -1,13 +1,13 @@
-prefix=${CMAKE_INSTALL_PREFIX}
-exec_prefix=${CMAKE_INSTALL_PREFIX}
-libdir=${CMAKE_INSTALL_PREFIX}/${VLE_LIBRARY_DIR}
-includedir=${CMAKE_INSTALL_PREFIX}/${VLE_INCLUDE_DIRS}
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+libdir=${exec_prefix}/@VLE_LIBRARY_DIR@
+includedir=${prefix}/@VLE_INCLUDE_DIRS@
 
 Name: vle
 Description: VLE multimodelling and Simulation tools
 Requires: libxml++-2.6 glibmm-2.4
-Version: ${VLE_PACKAGE_VERSION}
-Libs:	-L${CMAKE_INSTALL_PREFIX}/${VLE_LIBRARY_DIR} -lvledata \
+Version: @VLE_PACKAGE_VERSION@
+Libs:	-L${libdir} -lvledata \
 	-lvledevs -lvleextension -lvlegeometry -lvlegraph -lvlemanager \
 	-lvleutils -lvleoov -lvlevalue -lvlevpz -lvletranslator
-Cflags: -I${CMAKE_INSTALL_PREFIX}/${VLE_INCLUDE_DIR}
+Cflags: -I${includedir}/@VLE_NAME_VERSION@

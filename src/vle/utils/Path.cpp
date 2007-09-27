@@ -176,14 +176,16 @@ bool Path::initPath()
     LONG result;
     HKEY hkey;
 
-    result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\VLE", 0,
-			  KEY_QUERY_VALUE, &hkey);
+    std::string key("SOFTWARE\\VLE Development Team\\VLE ");
+    key += VLE_VERSION;
 
+    result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, key.c_str(),
+		    0, KEY_QUERY_VALUE, &hkey);
     if (result == ERROR_SUCCESS) {
 	char* buf = new char[256];
 	DWORD sz = 256;
 
-	if (RegQueryValueEx(hkey, TEXT("system"), NULL, NULL,
+	if (RegQueryValueEx(hkey, NULL, NULL, NULL,
 			    (LPBYTE)buf, &sz) != ERROR_SUCCESS) {
 	    delete[] buf;
 	    return false;
@@ -203,9 +205,9 @@ bool Path::initPath()
         addStreamDir(buildUserPath("stream"));
         addStreamDir(".");
 
-        addModeldir(buildPrefixLibrariesPath(m_prefix, "model"));
-        addModeldir(buildUserPath("model"));
-        addModeldir(".");
+        addModelDir(buildPrefixLibrariesPath(m_prefix, "model"));
+        addModelDir(buildUserPath("model"));
+        addModelDir(".");
 	return true;
     }
     return false;
