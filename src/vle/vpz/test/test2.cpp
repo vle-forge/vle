@@ -293,7 +293,11 @@ BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
         "  <views>\n"
         "   <outputs>\n"
         "    <output name=\"x\" format=\"local\" "
-        "            plugin=\"yyy\" location=\"TEMP\" />\n"
+        "            plugin=\"yyy\" location=\"TEMP\">\n"
+        "   <![CDATA["
+        "test"
+        "]]>"
+        "    </output>\n"
         "    <output name=\"z\" format=\"distant\" "
         "            plugin=\"xxx\" location=\"127.0.0.1:8888\" />\n"
         "   </outputs>\n"
@@ -332,6 +336,7 @@ BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
         const vpz::Output& out(outputs.find("x")->second);
         BOOST_REQUIRE_EQUAL(out.name(), "x");
         BOOST_REQUIRE_EQUAL(out.format(), vpz::Output::LOCAL);
+        BOOST_REQUIRE_EQUAL(out.data(), "test");
     }
     BOOST_REQUIRE(outputs.find("z") != outputs.end());
     {

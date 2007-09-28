@@ -456,9 +456,9 @@ void VpzStackSax::push_output(const AttributeList& att)
 
     Outputs& outs(m_vpz.project().experiment().views().outputs());
     if (format == "local") {
-        outs.addLocalStream(name, location, plugin);
+        m_stack.push(&outs.addLocalStream(name, location, plugin));
     } else if (format == "distant") {
-        outs.addDistantStream(name, location, plugin);
+        m_stack.push(&outs.addDistantStream(name, location, plugin));
     } else {
         Throw(utils::SaxParserError, (boost::format(
                     "Unknow format '%1%' for the output %2%") % format % name));
@@ -874,6 +874,16 @@ void VLESaxParser::on_end_element(const Glib::ustring& name)
         m_vpzstack.pop();
     } else if (name == "destination") {
         m_vpzstack.build_connection();
+    } else if (name == "output") {
+        if (not m_cdata.empty()) {
+            Output* out;
+            out = dynamic_cast < Output* >(m_vpzstack.top());
+            if (out) {
+                out->setData(m_cdata);
+                m_cdata.clear();
+            }
+        }
+        m_vpzstack.pop(); 
     } else if (name == "trame") {
         m_vpzstack.pop_trame();
         if (not m_cdata.empty()) {
