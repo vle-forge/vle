@@ -132,6 +132,16 @@ BOOST_AUTO_TEST_CASE(trame_value)
         "   </set>"
         "  </set>"
         " </modeltrame>"
+        " <modeltrame name=\"n2\" parent=\"p1\" port=\"port\" view=\"view1\" >"
+        "  <set>"
+        "   <integer>5</integer>"
+        "   <set>"
+        "    <integer>6</integer>"
+        "    <integer>7</integer>"
+        "    <integer>8</integer>"
+        "   </set>"
+        "  </set>"
+        " </modeltrame>"
         "</trame>"
         "</vle_trame>";
 
@@ -141,17 +151,47 @@ BOOST_AUTO_TEST_CASE(trame_value)
     vpz::ValueTrame* ptr = dynamic_cast < vpz::ValueTrame* >(tr.front());
     BOOST_CHECK(ptr);
     BOOST_REQUIRE_EQUAL(ptr->time(), ".33");
-    BOOST_REQUIRE_EQUAL(ptr->trames().size(), (unsigned int)1);
+    BOOST_REQUIRE_EQUAL(ptr->trames().size(),
+                        (vpz::ModelTrameList::size_type)2);
 
-    const vpz::ModelTrame& r(ptr->trames().front());
-    BOOST_REQUIRE_EQUAL(r.simulator(), "n1");
-    BOOST_REQUIRE_EQUAL(r.parent(), "p1");
-    BOOST_REQUIRE_EQUAL(r.port(), "port");
-    BOOST_REQUIRE_EQUAL(r.view(), "view1");
+    vpz::ModelTrameList::const_iterator it = ptr->trames().begin();
+    {
+        const vpz::ModelTrame& r(*it);
+        BOOST_REQUIRE_EQUAL(r.simulator(), "n1");
+        BOOST_REQUIRE_EQUAL(r.parent(), "p1");
+        BOOST_REQUIRE_EQUAL(r.port(), "port");
+        BOOST_REQUIRE_EQUAL(r.view(), "view1");
 
-    value::Value v = r.value();
-    BOOST_CHECK(v->isSet());
+        value::Value v = r.value();
+        BOOST_CHECK(v->isSet());
+        value::Set s1 = value::toSetValue(v);
+        BOOST_REQUIRE_EQUAL(s1->size(), (unsigned int)2);
+        value::Value v1 = s1->getValue(0);
+        BOOST_CHECK(v1->isInteger());
+        BOOST_REQUIRE_EQUAL(value::toInteger(v1), 1);
+        value::Set s2 = value::toSetValue(s1->getValue(1));
+        BOOST_REQUIRE_EQUAL(value::toInteger(s2->getValue(0)), 2);
+        BOOST_REQUIRE_EQUAL(value::toInteger(s2->getValue(1)), 3);
+        BOOST_REQUIRE_EQUAL(value::toInteger(s2->getValue(2)), 4);
+    }
+    it++;
+    {
+        const vpz::ModelTrame& r(*it);
+        BOOST_REQUIRE_EQUAL(r.simulator(), "n2");
+        BOOST_REQUIRE_EQUAL(r.parent(), "p1");
+        BOOST_REQUIRE_EQUAL(r.port(), "port");
+        BOOST_REQUIRE_EQUAL(r.view(), "view1");
 
-    value::Set s1 = value::toSetValue(v);
-    BOOST_REQUIRE_EQUAL(s1->size(), (unsigned int)2);
+        value::Value v = r.value();
+        BOOST_CHECK(v->isSet());
+        value::Set s1 = value::toSetValue(v);
+        BOOST_REQUIRE_EQUAL(s1->size(), (unsigned int)2);
+        value::Value v1 = s1->getValue(0);
+        BOOST_CHECK(v1->isInteger());
+        BOOST_REQUIRE_EQUAL(value::toInteger(v1), 5);
+        value::Set s2 = value::toSetValue(s1->getValue(1));
+        BOOST_REQUIRE_EQUAL(value::toInteger(s2->getValue(0)), 6);
+        BOOST_REQUIRE_EQUAL(value::toInteger(s2->getValue(1)), 7);
+        BOOST_REQUIRE_EQUAL(value::toInteger(s2->getValue(2)), 8);
+    }
 }

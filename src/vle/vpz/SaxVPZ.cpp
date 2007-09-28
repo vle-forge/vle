@@ -897,6 +897,7 @@ void VLESaxParser::on_end_element(const Glib::ustring& name)
         m_vpzstack.pop();
     } else if (name == "modeltrame") {
         m_vpzstack.pop_modeltrame(get_value(0));
+        m_valuestack.clear();
     } else if (name == "vle_trame") {
         m_vpzstack.pop_vletrame();
         m_isEndTrame = true;
