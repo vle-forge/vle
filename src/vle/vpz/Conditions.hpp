@@ -116,6 +116,12 @@ namespace vle { namespace vpz {
          * function.
          */
         void clean_no_permanent();
+
+        /** 
+         * @brief This function initialise every, to each port, a new
+         * value::Set.
+         */
+        void rebuildValueSet();
     };
 
 }} // namespace vle vpz

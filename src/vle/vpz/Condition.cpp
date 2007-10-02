@@ -165,4 +165,11 @@ value::Set& Condition::last_added_port()
     return it->second;
 }
 
+void Condition::rebuildValueSet()
+{
+    for (iterator it = begin(); it != end(); ++it) {
+        it->second = value::SetFactory::create();
+    }
+}
+
 }} // namespace vle vpz

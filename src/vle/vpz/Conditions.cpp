@@ -114,4 +114,11 @@ void Conditions::clean_no_permanent()
     }
 }
 
+void Conditions::rebuildValueSet()
+{
+    for (iterator it = begin(); it != end(); ++it) {
+        it->second.rebuildValueSet();
+    }
+}
+
 }} // namespace vle vpz

@@ -120,6 +120,8 @@ namespace vle { namespace manager {
             size_t  pos;
         };
 
+        void cleanCondition(vpz::Vpz& file);
+
         const vpz::Vpz&             mFile;
         vpz::Vpz                    mTmpfile;
         std::vector < guint32 >     mReplicasTab;

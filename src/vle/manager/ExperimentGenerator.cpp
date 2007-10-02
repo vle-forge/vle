@@ -39,6 +39,7 @@ ExperimentGenerator::ExperimentGenerator(const vpz::Vpz& file) :
     mTmpfile(file),
     mSaveVpz(false)
 {
+    mTmpfile.project().experiment().conditions().rebuildValueSet();
 }
 
 void ExperimentGenerator::build()
@@ -50,27 +51,31 @@ void ExperimentGenerator::build()
 
 void ExperimentGenerator::build_replicas_list()
 {
+    std::cerr << "Replicas: ";
     mReplicasTab = mFile.project().experiment().replicas().getList();
-    std::cerr << "Replicas: " << mReplicasTab.size() << std::endl;
+    if (mReplicasTab.empty()) {
+        std::cerr << "/!\\ no defined (experiment seed is used): ";
+        mReplicasTab.push_back(mFile.project().experiment().seed());
+    }
+    std::cerr << mReplicasTab.size() << std::endl;
 }
 
 void ExperimentGenerator::build_conditions_list()
 {
-    std::cerr << "Combinations: " << get_combination_number() << std::endl;
-
     const vpz::Conditions& cnds(mFile.project().experiment().conditions());
-    for (vpz::Conditions::const_iterator it = cnds.begin();
-         it != cnds.end(); ++it) {
+    vpz::Conditions::const_iterator it;
 
-        const vpz::Condition& values(it->second);
-        for (vpz::Condition::const_iterator jt = values.begin();
-             jt != values.end(); ++jt) {
+    for (it = cnds.begin(); it != cnds.end(); ++it) {
+        const vpz::Condition& cnd(it->second);
+        vpz::Condition::const_iterator jt;
 
+        for (jt = cnd.begin(); jt != cnd.end(); ++jt) {
             mCondition.push_back(cond_t());
             mCondition[mCondition.size() - 1].sz = jt->second->size();
             mCondition[mCondition.size() - 1].pos = 0;
         }
     }
+    std::cerr << "Combinations: " << get_combination_number() << std::endl;
 }
 
 void ExperimentGenerator::build_combinations()
@@ -85,48 +90,43 @@ void ExperimentGenerator::build_combinations()
 
 void ExperimentGenerator::build_combinations_from_replicas(size_t cmbnumber)
 {
-    for (size_t irep = 0; irep < mReplicasTab.size(); ++irep) {
-        mTmpfile.project().experiment().setSeed(mReplicasTab[irep]);
+    vpz::Conditions& dest(mTmpfile.project().experiment().conditions());
+    vpz::Conditions::iterator itDest(dest.begin());
+    vpz::Condition::iterator itValueDest(itDest->second.begin());
 
-        vpz::Conditions& dest(mTmpfile.project().experiment().conditions());
-        vpz::Conditions::iterator itDest(dest.begin());
-        vpz::Condition::iterator itValueDest(itDest->second.begin());
+    const vpz::Conditions& orig(mFile.project().experiment().conditions());
+    vpz::Conditions::const_iterator itOrig(orig.begin());
+    vpz::Condition::const_iterator itValueOrig(itOrig->second.begin());
 
-        const vpz::Conditions& orig(
-            mFile.project().experiment().conditions());
-        vpz::Conditions::const_iterator itOrig(orig.begin());
-        vpz::Condition::const_iterator
-            itValueOrig(itOrig->second.begin());
+    Assert(utils::InternalError,
+           dest.size() == orig.size(),
+           boost::format("Error: %1% %2% %3%\n") % dest.size() %
+           orig.size() % mCondition.size());
 
-        Assert(utils::InternalError,
-               dest.size() == orig.size(),
-               boost::format("Error: %1% %2% %3%\n") % dest.size() %
-               orig.size() % mCondition.size());
+    for (size_t jcom = 0; jcom < mCondition.size(); ++jcom) {
+        size_t index = mCondition[jcom].pos;
+        value::Value val = itValueOrig->second->getValue(index);
+        itValueDest->second->clear();
+        itValueDest->second->addValue(val);
 
-        for (size_t jcom = 0; jcom < mCondition.size(); ++jcom) {
-            itValueDest->second->clear();
-            itValueDest->second->addValue(
-                itValueOrig->second->getValue(mCondition[jcom].pos));
-            //(*itDest).addValue((*itOrig).nValue(mCondition[jcom].pos));
+        itValueDest++;
+        itValueOrig++;
 
-            itValueDest++;
-            itValueOrig++;
-
-            if (itValueDest == itDest->second.end()) {
-                Assert(utils::InternalError, itValueOrig ==
-                       itOrig->second.end(),
-                       boost::format("Error: %1% %2%\n") %
-                       itDest->second.size() %
-                       itOrig->second.size());
-                itDest++;
-                itOrig++;
-                itValueDest = itDest->second.begin();
-                itValueOrig = itOrig->second.begin();
-            }
+        if (itValueDest == itDest->second.end()) {
+            Assert(utils::InternalError, itValueOrig == itOrig->second.end(),
+                   boost::format("Error: %1% %2%\n") % itDest->second.size() %
+                   itOrig->second.size());
+            itDest++;
+            itOrig++;
+            itValueDest = itDest->second.begin();
+            itValueOrig = itOrig->second.begin();
         }
-        write_instance(cmbnumber, irep);
     }
 
+    for (size_t irep = 0; irep < mReplicasTab.size(); ++irep) {
+        mTmpfile.project().experiment().setSeed(mReplicasTab[irep]);
+        write_instance(cmbnumber, irep);
+    }
 }
 
 void ExperimentGenerator::write_instance(size_t cmbnumber, size_t replnumber)
@@ -141,7 +141,8 @@ void ExperimentGenerator::write_instance(size_t cmbnumber, size_t replnumber)
 
     Glib::ustring filename(utils::write_to_temp("vleexp", buffer));
 
-    std::cerr << "Writing file: " << filename << " " << mSaveVpz << std::endl;
+    std::cerr << (boost::format(
+            "Writing file: %1% %2%/%3%\n") % filename % cmbnumber % replnumber);
     if (mSaveVpz) {
         expname += ".vpz";
         std::ofstream file(expname.c_str());

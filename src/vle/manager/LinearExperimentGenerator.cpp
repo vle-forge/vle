@@ -37,26 +37,18 @@ void LinearExperimentGenerator::build_combination(size_t& nb)
 
 size_t LinearExperimentGenerator::get_combination_number() const
 {
-    const vpz::Conditions& cnds(mFile.project().experiment().conditions());
-
-    Assert(utils::InternalError, not cnds.empty(),
+    Assert(utils::InternalError, not mCondition.empty(),
            "Build a linear experimental frame with empty value?");
 
-    const size_t nb = cnds.begin()->second.size();
+    const size_t nb = mCondition[0].sz;
+    size_t cndnb = 0;
 
-    for (vpz::Conditions::const_iterator it = cnds.begin();
-         it != cnds.end(); ++it) {
-
-        const vpz::Condition& values(it->second);
-        for (vpz::Condition::const_iterator jt = values.begin();
-             jt != values.end(); ++jt) {
-
-            Assert(utils::InternalError, nb == jt->second->size(),
-                   boost::format("Build a linear experimental frame with bad"
-                                 " number value for condition %1% port %2%") %
-                   it->first % jt->first); 
-
-        }
+    std::vector < cond_t >::const_iterator it;
+    for (it = mCondition.begin(); it != mCondition.end(); ++it) {
+        Assert(utils::InternalError, nb == it->sz,
+               boost::format("Build a linear experimental frame with bad"
+                             " number value for condition %1%") % cndnb);
+        cndnb++;
     }
 
     return nb;

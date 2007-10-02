@@ -179,6 +179,12 @@ namespace vle { namespace vpz {
         inline void permanent(bool value = true)
         { m_ispermanent = value; }
 
+        /** 
+         * @brief This function initialise every, to each port, a new
+         * value::Set.
+         */
+        void rebuildValueSet();
+
     private:
         Condition();
 
