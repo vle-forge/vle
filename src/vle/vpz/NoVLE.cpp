@@ -112,6 +112,7 @@ Glib::Module* NoVLE::translator()
                     "\n[%1%]: %2%") % *it % Glib::Module::get_last_error());
             delete module;
         } else {
+            module->make_resident();
             return module;
         }
     }

@@ -45,10 +45,23 @@ void ModelPortList::remove(Model* model, const std::string& portname)
     AssertS(utils::DevsGraphError, model);
 
     std::pair < iterator, iterator > its = equal_range(model);
-    for (iterator it = its.first; it != its.second; ++it) {
-        if (it->second == portname) {
-            erase(it);
-        }
+    iterator it = its.first;
+    iterator previous = its.first;
+
+    while (it != its.second) {
+	if (it->second == portname) {
+            if (it == previous) {
+                it++;
+    	        erase(previous);
+                previous = it;
+            } else {
+                erase(it);
+	        it = previous;
+	    }
+	} else {
+	    previous = it;
+	    it++;
+	}
     }
 }
 

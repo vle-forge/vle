@@ -284,7 +284,6 @@ void Coordinator::delAtomicModel(graph::CoupledModel* parent,
             m_eventTable.delModelEvents(satom);
             delete satom;
         }
-        parent->delAllConnection(atom);
         parent->delModel(atom);
     }
 }

@@ -218,13 +218,10 @@ std::string demangle(const std::string& in)
 
 void initUserDirectory()
 {
-    buildDirectory(Glib::build_filename(getUserDirectory(), "plugins"));
-    buildDirectory(Glib::build_filename(getUserDirectory(), "models"));
-    buildDirectory(Glib::build_filename(getUserDirectory(), "observers"));
-    buildDirectory(Glib::build_filename(getUserDirectory(), "bin"));
-    buildDirectory(Glib::build_filename(getUserDirectory(), "pixmaps"));
-    buildDirectory(Glib::build_filename(getUserDirectory(), "glade"));
-    buildDirectory(Glib::build_filename(getUserDirectory(), "eovplugin"));
+    buildDirectory(Glib::build_filename(getUserDirectory(), "simulator"));
+    buildDirectory(Glib::build_filename(getUserDirectory(), "translator"));
+    buildDirectory(Glib::build_filename(getUserDirectory(), "stream"));
+    buildDirectory(Glib::build_filename(getUserDirectory(), "model"));
 }
 
 bool buildDirectory(const std::string& dirname)
@@ -250,7 +247,11 @@ bool buildDirectory(const std::string& dirname)
 
 std::string getUserDirectory()
 {
+#ifdef G_OS_WIN32
+    std::string home(Glib::build_filename(Glib::get_home_dir(), "vle"));
+#else
     std::string home(Glib::build_filename(Glib::get_home_dir(), ".vle"));
+#endif
 
     if (!Glib::file_test(home, Glib::FILE_TEST_IS_DIR |
                          Glib::FILE_TEST_EXISTS)) {
