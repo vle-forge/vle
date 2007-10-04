@@ -128,15 +128,21 @@ ENDIF (WITH_SQLXX)
   # Test the libboost header and libboost-text library.
  #
  
+OPTION(WITH_TEST "use the libboost test unit library [default: on]" ON)
+
 FIND_PACKAGE(Boost)
 IF (Boost_FOUND)
-  FIND_LIBRARY(Boost_UNITTESTFRAMEWORK NAMES boost_unit_test_framework
-    boost_unit_test_framework-mt PATHS Boost_LIBRARY_DIRS)
-  IF (Boost_UNITTESTFRAMEWORK)
-    SET(HAVE_UNITTESTFRAMEWORK 1 CACHE INTERNAL "" FORCE)
-  ELSE (Boost_UNITTESTFRAMEWORK)
+  IF (WITH_TEST)
+    FIND_LIBRARY(Boost_UNITTESTFRAMEWORK NAMES boost_unit_test_framework
+      boost_unit_test_framework-mt PATHS Boost_LIBRARY_DIRS)
+    IF (Boost_UNITTESTFRAMEWORK)
+      SET(HAVE_UNITTESTFRAMEWORK 1 CACHE INTERNAL "" FORCE)
+    ELSE (Boost_UNITTESTFRAMEWORK)
+      SET(HAVE_UNITTESTFRAMEWORK 0 CACHE INTERNAL "" FORCE)
+    ENDIF (Boost_UNITTESTFRAMEWORK)
+  ELSE (WITH_TEST)
     SET(HAVE_UNITTESTFRAMEWORK 0 CACHE INTERNAL "" FORCE)
-  ENDIF (Boost_UNITTESTFRAMEWORK)
+  ENDIF (WITH_TEST)
 ENDIF (Boost_FOUND)
  
  #
