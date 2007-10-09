@@ -1,34 +1,36 @@
 INCLUDE_DIRECTORIES(
-	${VLE_SOURCE_DIR}/src
-	${GLIBMM_INCLUDE_DIRS}
-	${LIBXMLPP_INCLUDE_DIRS})
+  ${VLE_SOURCE_DIR}/src
+  ${GLIBMM_INCLUDE_DIRS}
+  ${LIBXMLPP_INCLUDE_DIRS})
 
 LINK_DIRECTORIES(
-	${GLIBMM_LIBRARY_DIRS}
-	${LIBXMLPP_LIBRARY_DIR})
+  ${GLIBMM_LIBRARY_DIRS}
+  ${LIBXMLPP_LIBRARY_DIR})
 
-SET(GRAPH_CPP
-    AtomicModel.cpp CoupledModel.cpp Model.cpp ModelPort.cpp ModelPortList.cpp
-    NoVLEModel.cpp)
+SET(GRAPH_CPP AtomicModel.cpp CoupledModel.cpp Model.cpp ModelPort.cpp
+  ModelPortList.cpp NoVLEModel.cpp)
 
-SET(GRAPH_HPP
-    AtomicModel.hpp CoupledModel.hpp Model.hpp ModelPort.hpp
-    ModelPortList.hpp NoVLEModel.hpp)
+SET(GRAPH_HPP AtomicModel.hpp CoupledModel.hpp Model.hpp ModelPort.hpp
+  ModelPortList.hpp NoVLEModel.hpp)
 
 ADD_LIBRARY(vlegraph SHARED ${GRAPH_CPP};${GRAPH_HPP})
 
 TARGET_LINK_LIBRARIES(vlegraph
-	${GLIBMM_LIBRARIES}
-	${LIBXMLPP_LIBRARIES}
-	${GTHREAD_LIBRARIES}
-	vlegeometry
-	vleutils
-	vledata
-	vlevalue)
+  ${GLIBMM_LIBRARIES}
+  ${LIBXMLPP_LIBRARIES}
+  ${GTHREAD_LIBRARIES}
+  vlegeometry
+  vleutils
+  vledata
+  vlevalue)
 
-INSTALL(TARGETS vlegraph DESTINATION ${VLE_LIBRARY_DIR})
+INSTALL(TARGETS vlegraph
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib)
+
 INSTALL(FILES ${GRAPH_HPP} DESTINATION ${VLE_INCLUDE_DIRS}/graph)
 
 IF (HAVE_UNITTESTFRAMEWORK)
-	ADD_SUBDIRECTORY(test)
+  ADD_SUBDIRECTORY(test)
 ENDIF (HAVE_UNITTESTFRAMEWORK)

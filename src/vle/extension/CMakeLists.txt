@@ -1,32 +1,34 @@
 INCLUDE_DIRECTORIES(
-	${VLE_SOURCE_DIR}/src
-	${GLIBMM_INCLUDE_DIRS}
-	${LIBXMLPP_INCLUDE_DIRS})
+  ${VLE_SOURCE_DIR}/src
+  ${GLIBMM_INCLUDE_DIRS}
+  ${LIBXMLPP_INCLUDE_DIRS})
 
 LINK_DIRECTORIES(
-	${GLIBMM_LIBRARY_DIRS}
-	${LIBXMLPP_LIBRARY_DIR})
+  ${GLIBMM_LIBRARY_DIRS}
+  ${LIBXMLPP_LIBRARY_DIR})
 
-SET(EXTENSION_CPP
-    CellDevs.cpp CellQSS.cpp DSDevs.cpp QSS2.cpp QSS.cpp)
+SET(EXTENSION_CPP CellDevs.cpp CellQSS.cpp DSDevs.cpp QSS2.cpp QSS.cpp)
 
-SET(EXTENSION_HPP
-    CellDevs.hpp CellQSS.hpp DSDevs.hpp QSS2.hpp QSS.hpp)
+SET(EXTENSION_HPP CellDevs.hpp CellQSS.hpp DSDevs.hpp QSS2.hpp QSS.hpp)
 
 ADD_LIBRARY(vleextension SHARED ${EXTENSION_HPP};${EXTENSION_CPP})
 
 TARGET_LINK_LIBRARIES(vleextension
-	${GLIBMM_LIBRARIES}
-	${LIBXMLPP_LIBRARIES}
-	${GTHREAD_LIBRARIES}
-	vlegeometry
-	vleutils
-	vledata
-	vlevalue
-	vlegraph
-	vleoov
-	vlevpz
-	vledevs)
+  ${GLIBMM_LIBRARIES}
+  ${LIBXMLPP_LIBRARIES}
+  ${GTHREAD_LIBRARIES}
+  vlegeometry
+  vleutils
+  vledata
+  vlevalue
+  vlegraph
+  vleoov
+  vlevpz
+  vledevs)
 
-INSTALL(TARGETS vleextension DESTINATION ${VLE_LIBRARY_DIR})
+INSTALL(TARGETS vleextension
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib)
+
 INSTALL(FILES ${EXTENSION_HPP} DESTINATION ${VLE_INCLUDE_DIRS}/extension)

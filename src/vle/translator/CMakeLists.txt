@@ -1,34 +1,36 @@
 INCLUDE_DIRECTORIES(
-	${VLE_SOURCE_DIR}/src
-	${GLIBMM_INCLUDE_DIRS}
-	${LIBXMLPP_INCLUDE_DIRS})
+  ${VLE_SOURCE_DIR}/src
+  ${GLIBMM_INCLUDE_DIRS}
+  ${LIBXMLPP_INCLUDE_DIRS})
 
 LINK_DIRECTORIES(
-	${GLIBMM_LIBRARY_DIRS}
-	${LIBXMLPP_LIBRARY_DIR})
+  ${GLIBMM_LIBRARY_DIRS}
+  ${LIBXMLPP_LIBRARY_DIR})
 
-SET(TRANSLATOR_HPP
-    MatrixTranslator.hpp)
+SET(TRANSLATOR_HPP MatrixTranslator.hpp)
 
-SET(TRANSLATOR_CPP
-    MatrixTranslator.cpp)
+SET(TRANSLATOR_CPP MatrixTranslator.cpp)
 
 ADD_LIBRARY(vletranslator SHARED ${TRANSLATOR_HPP};${TRANSLATOR_CPP})
 
 TARGET_LINK_LIBRARIES(vletranslator
-	${GLIBMM_LIBRARIES}
-	${LIBXMLPP_LIBRARIES}
-	${GTHREAD_LIBRARIES}
-	vlegeometry
-	vleutils
-	vledata
-	vlevalue
-	vlegraph
-	vleoov
-	vlevpz
-	vledevs
-	vleextension
-	vlemanager)
+  ${GLIBMM_LIBRARIES}
+  ${LIBXMLPP_LIBRARIES}
+  ${GTHREAD_LIBRARIES}
+  vlegeometry
+  vleutils
+  vledata
+  vlevalue
+  vlegraph
+  vleoov
+  vlevpz
+  vledevs
+  vleextension
+  vlemanager)
 
-INSTALL(TARGETS vletranslator DESTINATION ${VLE_LIBRARY_DIR})
+INSTALL(TARGETS vletranslator
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib) 
+
 INSTALL(FILES ${TRANSLATOR_HPP} DESTINATION ${VLE_INCLUDE_DIRS}/translator)

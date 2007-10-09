@@ -10,7 +10,6 @@ ADD_SUBDIRECTORY(extension)
 ADD_SUBDIRECTORY(manager)
 ADD_SUBDIRECTORY(translator)
 
-INSTALL(FILES 
-	data.hpp devs.hpp extension.hpp geometry.hpp graph.hpp manager.hpp
-	oov.hpp translator.hpp utils.hpp value.hpp vpz.hpp
-	DESTINATION ${VLE_INCLUDE_DIRS})
+INSTALL(FILES data.hpp devs.hpp extension.hpp geometry.hpp graph.hpp
+  manager.hpp oov.hpp translator.hpp utils.hpp value.hpp vpz.hpp DESTINATION
+  ${VLE_INCLUDE_DIRS})

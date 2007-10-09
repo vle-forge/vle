@@ -1,26 +1,27 @@
 INCLUDE_DIRECTORIES(
-	${VLE_SOURCE_DIR}/src
-	${GLIBMM_INCLUDE_DIRS}
-        ${LIBXMLPP_INCLUDE_DIRS}
-        ${Boost_INCLUDE_DIRS})
+  ${VLE_SOURCE_DIR}/src
+  ${GLIBMM_INCLUDE_DIRS}
+  ${LIBXMLPP_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS})
 
 LINK_DIRECTORIES(
-	${GLIBMM_LIBRARY_DIRS}
-	${LIBXMLPP_LIBRARY_DIR}
-        ${Boost_LIBRARY_DIRS})
-
+  ${GLIBMM_LIBRARY_DIRS}
+  ${LIBXMLPP_LIBRARY_DIR}
+  ${Boost_LIBRARY_DIRS})
 
 ADD_EXECUTABLE(test1 test1.cpp)
+
 ADD_TEST(devstest1 test1)
+
 TARGET_LINK_LIBRARIES(test1
-	${GLIBMM_LIBRARIES}
-	${LIBXMLPP_LIBRARIES}
-	${GTHREAD_LIBRARIES}
-	${Boost_UNITTESTFRAMEWORK}
-	vlegeometry
-	vleutils
-	vledata
-	vlevalue
-        vlegraph
-        vledevs
-        vlevpz)
+  ${GLIBMM_LIBRARIES}
+  ${LIBXMLPP_LIBRARIES}
+  ${GTHREAD_LIBRARIES}
+  ${Boost_UNITTESTFRAMEWORK}
+  vlegeometry
+  vleutils
+  vledata
+  vlevalue
+  vlegraph
+  vledevs
+  vlevpz)

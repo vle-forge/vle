@@ -1,36 +1,38 @@
 INCLUDE_DIRECTORIES(
-	${VLE_BINARY_DIR}
-	${VLE_SOURCE_DIR}/src
-	${GLIBMM_INCLUDE_DIRS}
-	${LIBXMLPP_INCLUDE_DIRS})
+  ${VLE_BINARY_DIR}
+  ${VLE_SOURCE_DIR}/src
+  ${GLIBMM_INCLUDE_DIRS}
+  ${LIBXMLPP_INCLUDE_DIRS})
 
 ADD_DEFINITIONS(
-	-DVLE_PREFIX_DIR="\\"${CMAKE_INSTALL_PREFIX}\\""
-        -DVLE_LIBRARY_DIRS="\\"${VLE_LIBRARY_DIRS}\\""
-	-DVLE_PACKAGE_NAME="\\"${VLE_NAME}\\""
-	-DVLE_PACKAGE_VERSION="\\"${VLE_NAME_VERSION}\\""
-	-DVLE_VERSION="\\"${VLE_VERSION}\\""
-        -DVLE_SHARE_DIRS="\\"${VLE_SHARE_DIRS}\\"")
+  -DVLE_PREFIX_DIR="\\"${CMAKE_INSTALL_PREFIX}\\""
+  -DVLE_LIBRARY_DIRS="\\"${VLE_LIBRARY_DIRS}\\""
+  -DVLE_PACKAGE_NAME="\\"${VLE_NAME}\\""
+  -DVLE_PACKAGE_VERSION="\\"${VLE_NAME_VERSION}\\""
+  -DVLE_VERSION="\\"${VLE_VERSION}\\""
+  -DVLE_SHARE_DIRS="\\"${VLE_SHARE_DIRS}\\"")
 
 LINK_DIRECTORIES(
-	${GLIBMM_LIBRARY_DIRS}
-	${LIBXMLPP_LIBRARY_DIR})
+  ${GLIBMM_LIBRARY_DIRS}
+  ${LIBXMLPP_LIBRARY_DIR})
 
-SET(UTILS_CPP
-    Host.cpp  Path.cpp PathOptionGroup.cpp Rand.cpp Simpson.cpp Socket.cpp
-    Tools.cpp Trace.cpp XML.cpp)
+SET(UTILS_CPP Host.cpp  Path.cpp PathOptionGroup.cpp Rand.cpp Simpson.cpp
+  Socket.cpp Tools.cpp Trace.cpp XML.cpp)
 
-SET(UTILS_HPP
-    Debug.hpp Exception.hpp Host.hpp Path.hpp PathOptionGroup.hpp Rand.hpp
-    Simpson.hpp Socket.hpp Tools.hpp Trace.hpp XML.hpp)
+SET(UTILS_HPP Debug.hpp Exception.hpp Host.hpp Path.hpp PathOptionGroup.hpp
+  Rand.hpp Simpson.hpp Socket.hpp Tools.hpp Trace.hpp XML.hpp)
 
 ADD_LIBRARY(vleutils SHARED ${UTILS_CPP};${UTILS_HPP})
 
 TARGET_LINK_LIBRARIES(vleutils
-	${GLIBMM_LIBRARIES}
-	${LIBXMLPP_LIBRARIES}
-	${GTHREAD_LIBRARIES}
-	${OS_SPECIFIC_LIBRARIES})
+  ${GLIBMM_LIBRARIES}
+  ${LIBXMLPP_LIBRARIES}
+  ${GTHREAD_LIBRARIES}
+  ${OS_SPECIFIC_LIBRARIES})
 
-INSTALL(TARGETS vleutils DESTINATION ${VLE_LIBRARY_DIR})
+INSTALL(TARGETS vleutils
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib)
+
 INSTALL(FILES ${UTILS_HPP} DESTINATION ${VLE_INCLUDE_DIRS}/utils)

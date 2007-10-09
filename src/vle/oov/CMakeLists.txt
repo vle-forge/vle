@@ -1,40 +1,42 @@
 INCLUDE_DIRECTORIES(
-	${VLE_SOURCE_DIR}/src
-	${GLIBMM_INCLUDE_DIRS}
-	${LIBXMLPP_INCLUDE_DIRS})
+  ${VLE_SOURCE_DIR}/src
+  ${GLIBMM_INCLUDE_DIRS}
+  ${LIBXMLPP_INCLUDE_DIRS})
 
 ADD_DEFINITIONS(
-	-DVLE_PREFIX_DIR="\\"${CMAKE_INSTALL_PREFIX}\\""
-	-DVLE_PACKAGE_NAME="\\"${VLE_PACKAGE_NAME}\\""
-	-DVLE_PACKAGE_VERSION="\\"${VLE_PACKAGE_VERSION}\\"")
+  -DVLE_PREFIX_DIR="\\"${CMAKE_INSTALL_PREFIX}\\""
+  -DVLE_PACKAGE_NAME="\\"${VLE_PACKAGE_NAME}\\""
+  -DVLE_PACKAGE_VERSION="\\"${VLE_PACKAGE_VERSION}\\"")
 
 LINK_DIRECTORIES(
-	${GLIBMM_LIBRARY_DIRS}
-	${LIBXMLPP_LIBRARY_DIR})
+  ${GLIBMM_LIBRARY_DIRS}
+  ${LIBXMLPP_LIBRARY_DIR})
 
-SET(OOV_CPP
-    LocalStreamReader.cpp NetStreamReader.cpp OOV.cpp Plugin.cpp
-    StreamReader.cpp)
+SET(OOV_CPP LocalStreamReader.cpp NetStreamReader.cpp OOV.cpp Plugin.cpp
+  StreamReader.cpp)
 
-SET(OOV_HPP
-    LocalStreamReader.hpp NetStreamReader.hpp OOV.hpp Plugin.hpp
-    StreamReader.hpp)
+SET(OOV_HPP LocalStreamReader.hpp NetStreamReader.hpp OOV.hpp Plugin.hpp
+  StreamReader.hpp)
 
 ADD_LIBRARY(vleoov SHARED ${OOV_CPP};${OOV_HPP})
 
 TARGET_LINK_LIBRARIES(vleoov
-	${GLIBMM_LIBRARIES}
-	${LIBXMLPP_LIBRARIES}
-	${GTHREAD_LIBRARIES}
-	vlegeometry
-	vleutils
-	vledata
-	vlevalue
-    	vlegraph
-        vlevpz
-	vleoov)
+  ${GLIBMM_LIBRARIES}
+  ${LIBXMLPP_LIBRARIES}
+  ${GTHREAD_LIBRARIES}
+  vlegeometry
+  vleutils
+  vledata
+  vlevalue
+  vlegraph
+  vlevpz
+  vleoov)
 
-INSTALL(TARGETS vleoov DESTINATION ${VLE_LIBRARY_DIR})
+INSTALL(TARGETS vleoov
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib)
+
 INSTALL(FILES ${OOV_HPP} DESTINATION ${VLE_INCLUDE_DIRS}/oov)
 
 ADD_SUBDIRECTORY(plugins)
