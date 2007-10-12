@@ -92,13 +92,13 @@ Condition& Conditions::get(const std::string& condition)
     return it->second;
 }
     
-void Conditions::clean_no_permanent()
+void Conditions::cleanNoPermanent()
 {
     iterator prev = begin();
     iterator it = begin();
     
     while (it != end()) {
-        if (not it->second.is_permanent()) {
+        if (not it->second.isPermanent()) {
             if (prev == it) {
                 erase(it);
                 prev = begin();

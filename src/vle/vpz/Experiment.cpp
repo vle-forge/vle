@@ -81,9 +81,9 @@ void Experiment::setName(const std::string& name)
     m_name.assign(name);
 }
 
-void Experiment::clean_no_permanent()
+void Experiment::cleanNoPermanent()
 {
-    m_conditions.clean_no_permanent();
+    m_conditions.cleanNoPermanent();
     m_views.observables().clean_no_permanent();
 }
 

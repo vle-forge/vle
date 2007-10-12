@@ -79,7 +79,7 @@ void Observables::clean_no_permanent()
     iterator it = begin();
     
     while (it != end()) {
-        if (not it->second.is_permanent()) {
+        if (not it->second.isPermanent()) {
             if (it == previous) {
                 erase(it);
                 previous = begin();

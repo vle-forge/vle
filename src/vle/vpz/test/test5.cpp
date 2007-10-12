@@ -31,7 +31,7 @@
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
 #include <vle/vpz/Vpz.hpp>
-#include <vle/vpz/SaxVPZ.hpp>
+#include <vle/vpz/SaxParser.hpp>
 #include <vle/vpz/ValueTrame.hpp>
 #include <vle/vpz/ParameterTrame.hpp>
 #include <vle/vpz/NewObservableTrame.hpp>
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(trame_parameter)
         "</trame>"
         "</vle_trame>";
 
-    vpz::TrameList tr = vpz::Vpz::parse_trame(xml);
+    vpz::TrameList tr = vpz::Vpz::parseTrame(xml);
     BOOST_REQUIRE_EQUAL(tr.size(), (vpz::TrameList::size_type)1);
 
     vpz::ParameterTrame* ptr = dynamic_cast < vpz::ParameterTrame* >(tr.front());
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(trame_addobservable)
         " view=\"view1\" />"
         "</vle_trame>";
 
-    vpz::TrameList tr = vpz::Vpz::parse_trame(xml);
+    vpz::TrameList tr = vpz::Vpz::parseTrame(xml);
     BOOST_REQUIRE_EQUAL(tr.size(), (vpz::TrameList::size_type)1);
 
     vpz::NewObservableTrame* ptr = dynamic_cast < vpz::NewObservableTrame*>(tr.front());
@@ -104,7 +104,7 @@ BOOST_AUTO_TEST_CASE(trame_delobservable)
         " view=\"view1\" />"
         "</vle_trame>";
 
-    vpz::TrameList tr = vpz::Vpz::parse_trame(xml);
+    vpz::TrameList tr = vpz::Vpz::parseTrame(xml);
     BOOST_REQUIRE_EQUAL(tr.size(), (vpz::TrameList::size_type)1);
 
     vpz::DelObservableTrame* ptr = dynamic_cast < vpz::DelObservableTrame* >(tr.front());
@@ -145,7 +145,7 @@ BOOST_AUTO_TEST_CASE(trame_value)
         "</trame>"
         "</vle_trame>";
 
-    vpz::TrameList tr = vpz::Vpz::parse_trame(xml);
+    vpz::TrameList tr = vpz::Vpz::parseTrame(xml);
     BOOST_REQUIRE_EQUAL(tr.size(), (vpz::TrameList::size_type)1);
 
     vpz::ValueTrame* ptr = dynamic_cast < vpz::ValueTrame* >(tr.front());

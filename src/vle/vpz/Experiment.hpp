@@ -110,7 +110,7 @@ namespace vle { namespace vpz {
          * observable and condition that are no permanent. This function is use
          * to clean not usefull data for the devs::ModelFactory.
          */
-        void clean_no_permanent();
+        void cleanNoPermanent();
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
           * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 

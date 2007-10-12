@@ -145,7 +145,7 @@ const ObservablePort& Observable::get(const std::string& portname) const
     return it->second;
 }
 
-bool Observable::has_view(const std::string& name) const
+bool Observable::hasView(const std::string& name) const
 {
     for (const_iterator it = begin(); it != end(); ++it) {
         if (it->second.exist(name)) {
@@ -156,7 +156,7 @@ bool Observable::has_view(const std::string& name) const
 }
 
 Observable::PortnameList
-Observable::get_portname(const std::string& name) const
+Observable::getPortname(const std::string& name) const
 {
     PortnameList lst;
 

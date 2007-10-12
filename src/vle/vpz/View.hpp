@@ -103,7 +103,7 @@ namespace vle { namespace vpz {
         inline const std::string& data() const
         { return m_data; }
 
-        inline void set_data(const std::string& data)
+        inline void setData(const std::string& data)
         { m_data = data; }
 
 

@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(atomicmodel_vpz)
         "</vle_project>\n";
 
     vpz::Vpz vpz;
-    vpz.parse_memory(xml);
+    vpz.parseMemory(xml);
 
     BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
     BOOST_REQUIRE_CLOSE(vpz.project().version(), 0.5f, 0.01);
@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE(coupledmodel_vpz)
         "</vle_project>\n";
     
     vpz::Vpz vpz;
-    vpz.parse_memory(xml);
+    vpz.parseMemory(xml);
 
     const vpz::Model& mdl(vpz.project().model());
     BOOST_REQUIRE(mdl.model() != 0);
@@ -184,7 +184,7 @@ BOOST_AUTO_TEST_CASE(dynamic_vpz)
         "</vle_project>\n";
 
     vpz::Vpz vpz;
-    vpz.parse_memory(xml);
+    vpz.parseMemory(xml);
 
     const vpz::Model& mdl(vpz.project().model());
     BOOST_REQUIRE(mdl.model() != 0);
@@ -237,7 +237,7 @@ BOOST_AUTO_TEST_CASE(experiment_vpz)
         "</vle_project>\n";
     
     vpz::Vpz vpz;
-    vpz.parse_memory(xml);
+    vpz.parseMemory(xml);
 
     const vpz::Project& project(vpz.project());
     const vpz::Experiment& experiment(project.experiment());
@@ -322,7 +322,7 @@ BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
         "</vle_project>\n";
     
     vpz::Vpz vpz;
-    vpz.parse_memory(xml);
+    vpz.parseMemory(xml);
 
     const vpz::Project& project(vpz.project());
     const vpz::Experiment& experiment(project.experiment());
@@ -414,7 +414,7 @@ BOOST_AUTO_TEST_CASE(translator_vpz)
         "</vle_project>\n";
     
     vpz::Vpz vpz;
-    vpz.parse_memory(xml);
+    vpz.parseMemory(xml);
 
     const vpz::Project& project(vpz.project());
     const vpz::NoVLEs& novles(project.novles());

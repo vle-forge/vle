@@ -38,7 +38,7 @@ using namespace vle;
 BOOST_AUTO_TEST_CASE(test_connection)
 {
     vpz::Vpz vpz;
-    vpz.parse_file(utils::Path::path().buildPrefixSharePath(
+    vpz.parseFile(utils::Path::path().buildPrefixSharePath(
             utils::Path::path().getPrefixDir(), "examples", "coupled.vpz"));
 
     const vpz::Model& model(vpz.project().model());
@@ -64,9 +64,9 @@ BOOST_AUTO_TEST_CASE(test_connection)
 BOOST_AUTO_TEST_CASE(test_read_write_read)
 {
     vpz::Vpz vpz;
-    vpz.parse_file(utils::Path::buildPrefixSharePath(
+    vpz.parseFile(utils::Path::buildPrefixSharePath(
             utils::Path::path().getPrefixDir(), "examples", "coupled.vpz"));
     vpz.clear();
-    vpz.parse_file(utils::Path::path().buildPrefixSharePath(
+    vpz.parseFile(utils::Path::path().buildPrefixSharePath(
             utils::Path::path().getPrefixDir(), "examples", "coupled.vpz"));
 }

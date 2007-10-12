@@ -47,7 +47,7 @@
 #include <vle/vpz/Project.hpp>
 #include <vle/vpz/Replicas.hpp>
 #include <vle/vpz/SaxStackValue.hpp>
-#include <vle/vpz/SaxVPZ.hpp>
+#include <vle/vpz/SaxParser.hpp>
 #include <vle/vpz/Structures.hpp>
 #include <vle/vpz/Trame.hpp>
 #include <vle/vpz/Translator.hpp>

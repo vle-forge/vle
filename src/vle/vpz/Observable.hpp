@@ -164,9 +164,9 @@ namespace vle { namespace vpz {
         inline bool exist(const std::string& portname) const
         { return find(portname) != end(); }
 
-        bool has_view(const std::string& name) const;
+        bool hasView(const std::string& name) const;
 
-        PortnameList get_portname(const std::string& view) const;
+        PortnameList getPortname(const std::string& view) const;
 
         //
         ///
@@ -180,7 +180,7 @@ namespace vle { namespace vpz {
          * 
          * @return True if this dynamics is a permanent value.
          */
-        inline bool is_permanent() const
+        inline bool isPermanent() const
         { return m_ispermanent; }
 
         /** 

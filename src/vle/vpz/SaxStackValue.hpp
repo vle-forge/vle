@@ -39,31 +39,31 @@ namespace vle { namespace vpz {
 class ValueStackSax
 {
     public:
-        void push_integer();
+        void pushInteger();
 
-        void push_boolean();
+        void pushBoolean();
 
-        void push_string();
+        void pushString();
 
-        void push_double();
+        void pushDouble();
 
-        void push_map();
+        void pushMap();
 
-        void push_map_key(const Glib::ustring& key);
+        void pushMapKey(const Glib::ustring& key);
 
-        void push_set();
+        void pushSet();
 
-        void push_tuple();
+        void pushTuple();
 
-        void push_table(const size_t width, const size_t height);
+        void pushTable(const size_t width, const size_t height);
 
-        void push_xml();
+        void pushXml();
 
-        void pop_value();
+        void popValue();
 
-        const value::Value& top_value();
+        const value::Value& topValue();
 
-        void push_on_vector_value(const value::Value& val);
+        void pushOnVectorValue(const value::Value& val);
 
         /** 
          * @brief Pop the current head. If stack is empty, do nothing.
@@ -86,10 +86,10 @@ class ValueStackSax
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-        inline void push_result(const value::Value& val)
+        inline void pushResult(const value::Value& val)
         { m_result.push_back(val); }
 
-        inline const value::Value& get_result(size_t i) const
+        inline const value::Value& getResult(size_t i) const
         {
             Assert(utils::SaxParserError, m_result.size() >= i,
                    (boost::format("Get result value with to big index %1%.") %
@@ -98,7 +98,7 @@ class ValueStackSax
             return m_result[i];
         }
 
-        inline const value::Value& get_last_result() const
+        inline const value::Value& getLastResult() const
         {
             Assert(utils::SaxParserError, not m_result.empty(),
                    "Get last result value with empty result vector");
@@ -106,10 +106,10 @@ class ValueStackSax
             return m_result[m_result.size() - 1];
         }
 
-        const std::vector < value::Value >& get_results() const
+        const std::vector < value::Value >& getResults() const
         { return m_result; }
 
-        std::vector < value::Value >& get_results()
+        std::vector < value::Value >& getResults()
         { return m_result; }
 
     private:
@@ -119,7 +119,7 @@ class ValueStackSax
          * 
          * @return 
          */
-        bool is_composite_parent() const;
+        bool isCompositeParent() const;
 
         /** 
          * @brief Store the value stack, usefull for composite value, set, map,

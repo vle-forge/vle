@@ -160,7 +160,7 @@ namespace vle { namespace vpz {
          *
          * @throw Exception::Internal if port does not exist.
          */
-        value::Set& last_added_port();
+        value::Set& lastAddedPort();
 
         /** 
          * @brief Return true if this condition is a permanent data for the
@@ -168,7 +168,7 @@ namespace vle { namespace vpz {
          * 
          * @return True if this condition is a permanent value.
          */
-        inline bool is_permanent() const
+        inline bool isPermanent() const
         { return m_ispermanent; }
 
         /** 

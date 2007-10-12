@@ -24,7 +24,7 @@
 
 #include <vle/oov/NetStreamReader.hpp>
 #include <vle/oov/Plugin.hpp>
-#include <vle/vpz/SaxVPZ.hpp>
+#include <vle/vpz/SaxParser.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/vpz/ParameterTrame.hpp>
 #include <vle/vpz/ValueTrame.hpp>
@@ -71,10 +71,10 @@ void NetStreamReader::waitConnection()
 void NetStreamReader::readConnection()
 {
     vpz::Vpz vpz;
-    vpz::VLESaxParser sax(vpz);
+    vpz::SaxParser sax(vpz);
     bool trameend = false;
 
-    while (not sax.is_endtrame()) {
+    while (not sax.isEndTrame()) {
         m_buffer = m_server.recv_string("vle");
         sax.parse_chunk(m_buffer);
         while (not sax.tramelist().empty()) {

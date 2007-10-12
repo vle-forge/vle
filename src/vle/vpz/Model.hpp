@@ -230,15 +230,15 @@ namespace vle { namespace vpz {
         { return m_atomicmodels; }
 
     private:
-        void write_model(std::ostream& out) const;
-        void write_atomic(std::ostream& out,
+        void writeModel(std::ostream& out) const;
+        void writeAtomic(std::ostream& out,
                           const graph::AtomicModel* mdl) const;
-        void write_coupled(std::ostream& out,
+        void writeCoupled(std::ostream& out,
                            const graph::CoupledModel* mdl) const;
-        void write_novle(std::ostream& out,
+        void writeNovle(std::ostream& out,
                          const graph::NoVLEModel* mdl) const;
-        void write_port(std::ostream& out, const graph::Model* mdl) const;
-        void write_connection(std::ostream& out,
+        void writePort(std::ostream& out, const graph::Model* mdl) const;
+        void writeConnection(std::ostream& out,
                               const graph::CoupledModel* mdl) const;
 
         AtomicModelList     m_atomicmodels;

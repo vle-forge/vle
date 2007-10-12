@@ -100,7 +100,7 @@ AtomicModel& AtomicModelList::get(const graph::Model* atom)
 void Model::write(std::ostream& out) const
 {
     out << "<structures>\n";
-    write_model(out);
+    writeModel(out);
     out << "</structures>\n";
 }
 
@@ -131,24 +131,23 @@ graph::Model* Model::model() const
 ///
 //
 
-void Model::write_model(std::ostream& out) const
+void Model::writeModel(std::ostream& out) const
 {
     if (m_graph) {
         if (m_graph->isAtomic()) {
-            write_atomic(out,
-                         static_cast < const graph::AtomicModel* >(m_graph));
+            writeAtomic(out, static_cast < const graph::AtomicModel*
+                        >(m_graph));
         } else if (m_graph->isCoupled()) {
-            write_coupled(out,
-                          static_cast < const graph::CoupledModel* >
-                          (m_graph));
+            writeCoupled(out, static_cast < const graph::CoupledModel* >
+                         (m_graph));
         } else {
-            write_novle(out,
-                        static_cast < const graph::NoVLEModel* > (m_graph));
+            writeNovle(out, static_cast < const graph::NoVLEModel* >
+                        (m_graph));
         }
     }
 }
 
-void Model::write_coupled(std::ostream& out, const graph::CoupledModel* mdl) const
+void Model::writeCoupled(std::ostream& out, const graph::CoupledModel* mdl) const
 {
     std::stack < const graph::CoupledModel* > stack;
     stack.push(mdl);
@@ -160,7 +159,7 @@ void Model::write_coupled(std::ostream& out, const graph::CoupledModel* mdl) con
 
         out << "<model name=\"" << top->getName() << "\" "
             << "type=\"coupled\" >\n";
-        write_port(out, top);
+        writePort(out, top);
 
         out << " <submodels>\n";
         const graph::ModelList& childs(top->getModelList());
@@ -170,21 +169,21 @@ void Model::write_coupled(std::ostream& out, const graph::CoupledModel* mdl) con
                 stack.push(static_cast < graph::CoupledModel* >(it->second));
                 coupledadded = true;
             } else if (it->second->isAtomic()) {
-                write_atomic(out, static_cast < graph::AtomicModel* >(it->second));
+                writeAtomic(out, static_cast < graph::AtomicModel* >(it->second));
             } else if (it->second->isNoVLE()) {
-                write_novle(out, static_cast < graph::NoVLEModel* >(it->second));
+                writeNovle(out, static_cast < graph::NoVLEModel* >(it->second));
             }
         }
 
         if (not coupledadded) {
             out << " </submodels>\n";
-            write_connection(out, top);
+            writeConnection(out, top);
             out << "</model>\n";
         }
     }
 }
 
-void Model::write_atomic(std::ostream& out, const graph::AtomicModel* mdl) const
+void Model::writeAtomic(std::ostream& out, const graph::AtomicModel* mdl) const
 {
     const AtomicModel& vpzatom(atomicModels().get(mdl));
 
@@ -194,12 +193,12 @@ void Model::write_atomic(std::ostream& out, const graph::AtomicModel* mdl) const
         << "dynamics=\"" << vpzatom.dynamics() << "\" "
         << "observables=\"" << vpzatom.observables() << "\" >\n";
 
-    write_port(out, mdl);
+    writePort(out, mdl);
 
     out << "</model>\n";
 }
 
-void Model::write_novle(std::ostream& out, const graph::NoVLEModel* mdl) const
+void Model::writeNovle(std::ostream& out, const graph::NoVLEModel* mdl) const
 {
     const AtomicModel& vpzatom(atomicModels().get(mdl));
 
@@ -207,12 +206,12 @@ void Model::write_novle(std::ostream& out, const graph::NoVLEModel* mdl) const
         << "type=\"novle\" "
         << "translator=\"" << vpzatom.translator() << "\" >\n";
 
-    write_port(out, mdl);
+    writePort(out, mdl);
 
     out << "</model>\n";
 }
 
-void Model::write_port(std::ostream& out, const graph::Model* mdl) const
+void Model::writePort(std::ostream& out, const graph::Model* mdl) const
 {
     const graph::ConnectionList& ins(mdl->getInputPortList());
     if (not ins.empty()) {
@@ -236,7 +235,7 @@ void Model::write_port(std::ostream& out, const graph::Model* mdl) const
 
 }
 
-void Model::write_connection(std::ostream& out, const graph::CoupledModel* mdl) const
+void Model::writeConnection(std::ostream& out, const graph::CoupledModel* mdl) const
 {
     out << "<connections>\n";
     mdl->writeConnections(out);

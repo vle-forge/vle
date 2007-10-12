@@ -156,7 +156,7 @@ namespace vle { namespace vpz {
          * 
          * @return True if this dynamics is a permanent value.
          */
-        inline bool is_permanent() const
+        inline bool isPermanent() const
         { return m_ispermanent; }
 
         /** 

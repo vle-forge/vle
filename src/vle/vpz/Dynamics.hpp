@@ -136,7 +136,7 @@ namespace vle { namespace vpz {
          * use to clean not usefull data for the devs::ModelFactory. Linear
          * function.
          */
-        void clean_no_permanent();
+        void cleanNoPermanent();
     };
 
 }} // namespace vle vpz

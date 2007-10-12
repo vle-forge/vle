@@ -154,7 +154,7 @@ const value::Value& Condition::nValue(const std::string& portname,
     return getSetValues(portname)->getValue(i);
 }
 
-value::Set& Condition::last_added_port()
+value::Set& Condition::lastAddedPort()
 {
     iterator it = find(m_last_port);
 

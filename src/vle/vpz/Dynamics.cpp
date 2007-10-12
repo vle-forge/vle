@@ -106,13 +106,13 @@ bool Dynamics::exist(const std::string& name) const
     return find(name) != end();
 }
 
-void Dynamics::clean_no_permanent()
+void Dynamics::cleanNoPermanent()
 {
     iterator previous = begin();
     iterator it = begin();
     
     while (it != end()) {
-        if (not it->second.is_permanent()) {
+        if (not it->second.isPermanent()) {
             if (it == previous) {
                 erase(it);
                 previous = begin();

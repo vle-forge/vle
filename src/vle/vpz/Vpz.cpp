@@ -34,7 +34,7 @@ using namespace vle::utils;
 Vpz::Vpz(const std::string& filename) :
     m_filename(filename)
 {
-    parse_file(filename);
+    parseFile(filename);
 }
 
 Vpz::Vpz(const Vpz& vpz) :
@@ -52,16 +52,16 @@ void Vpz::write(std::ostream& out) const
     out << std::endl;
 }
 
-void Vpz::parse_file(const std::string& filename)
+void Vpz::parseFile(const std::string& filename)
 {
     m_filename.assign(filename);
 
-    vpz::VLESaxParser sax(*this);
+    vpz::SaxParser sax(*this);
     try {
         sax.parse_file(filename);
     } catch(const std::exception& sax) {
         try {
-            Vpz::validate_file(m_filename);
+            Vpz::validateFile(m_filename);
         } catch(const std::exception& dom) {
             Throw(utils::SaxParserError, boost::format(
                     "Parse file '%1%':\n[--libxml--]\n%2%[--libvpz--]\n%3%") %
@@ -73,16 +73,16 @@ void Vpz::parse_file(const std::string& filename)
     }
 }
 
-void Vpz::parse_memory(const std::string& buffer)
+void Vpz::parseMemory(const std::string& buffer)
 {
     m_filename.clear();
 
-    vpz::VLESaxParser sax(*this);
+    vpz::SaxParser sax(*this);
     try {
         sax.parse_memory(buffer);
     } catch(const std::exception& sax) {
         try {
-            Vpz::validate_file(buffer);
+            Vpz::validateFile(buffer);
         } catch(const std::exception& dom) {
             Throw(utils::SaxParserError, boost::format(
                     "Parse memory:\n[--libxml--]\n%1%[--libvpz--]\n%2%") %
@@ -103,40 +103,40 @@ bool Vpz::hasNoVLE() const
     return m_project.hasNoVLE();
 }
 
-value::Value Vpz::parse_value(const std::string& buffer)
+value::Value Vpz::parseValue(const std::string& buffer)
 {
     Vpz vpz;
-    VLESaxParser sax(vpz);
+    SaxParser sax(vpz);
     sax.parse_memory(buffer);
     
-    Assert(utils::InternalError, sax.is_value(),
+    Assert(utils::InternalError, sax.isValue(),
            boost::format("The buffer [%1%] is not a value.") % buffer);
 
-    return sax.get_value(0);
+    return sax.getValue(0);
 }
 
-TrameList Vpz::parse_trame(const std::string& buffer)
+TrameList Vpz::parseTrame(const std::string& buffer)
 {
     Vpz vpz;
-    VLESaxParser sax(vpz);
+    SaxParser sax(vpz);
     sax.parse_memory(buffer);
     
-    Assert(utils::InternalError, sax.is_trame(),
+    Assert(utils::InternalError, sax.isTrame(),
            boost::format("The buffer [%1%] is not a trame.") % buffer);
 
     return sax.tramelist();
 }
 
-std::vector < value::Value > Vpz::parse_values(const std::string& buffer)
+std::vector < value::Value > Vpz::parseValues(const std::string& buffer)
 {
     Vpz vpz;
-    VLESaxParser sax(vpz);
+    SaxParser sax(vpz);
     sax.parse_memory(buffer);
     
-    Assert(utils::InternalError, sax.is_value(),
+    Assert(utils::InternalError, sax.isValue(),
            boost::format("The buffer [%1%] is not a value.") % buffer);
 
-    return sax.get_values();
+    return sax.getValues();
 }
 
 void Vpz::write()
@@ -187,14 +187,14 @@ void Vpz::fixExtension(std::string& filename)
     }
 }
 
-void Vpz::validate_file(const std::string& filename)
+void Vpz::validateFile(const std::string& filename)
 {
     xmlpp::DomParser dom;
     dom.set_validate(true);
     dom.parse_file(filename);
 }
 
-void Vpz::validate_memory(const Glib::ustring& buffer)
+void Vpz::validateMemory(const Glib::ustring& buffer)
 {
     xmlpp::DomParser dom;
     dom.set_validate(true);

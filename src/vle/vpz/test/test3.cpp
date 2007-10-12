@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(test_translator)
         "</vle_project>\n";
     
     vpz::Vpz vpz;
-    vpz.parse_memory(xml);
+    vpz.parseMemory(xml);
     vpz.expandTranslator();
 
     const vpz::Project& prj(vpz.project());
@@ -137,9 +137,9 @@ BOOST_AUTO_TEST_CASE(test_translator_write)
     vpz::Vpz vpz2;
     std::string copyfilename(utils::build_temp("coupled2.vpz"));
 
-    vpz1.parse_memory(xml);
+    vpz1.parseMemory(xml);
     vpz1.write(copyfilename);
-    vpz2.parse_file(copyfilename);
+    vpz2.parseFile(copyfilename);
 
     const vpz::NoVLEs& novles1(vpz1.project().novles());
     const vpz::NoVLEs& novles2(vpz2.project().novles());

@@ -26,7 +26,7 @@
 
 namespace vle { namespace vpz {
 
-bool ValueStackSax::is_composite_parent() const
+bool ValueStackSax::isCompositeParent() const
 {
     if (not m_valuestack.empty()) {
         const value::Value val = m_valuestack.top();
@@ -36,44 +36,44 @@ bool ValueStackSax::is_composite_parent() const
     return false;
 }
 
-void ValueStackSax::push_integer()
+void ValueStackSax::pushInteger()
 {
     if (not m_valuestack.empty()) {
-        AssertS(utils::SaxParserError, is_composite_parent());
+        AssertS(utils::SaxParserError, isCompositeParent());
     }
 }
 
-void ValueStackSax::push_boolean()
+void ValueStackSax::pushBoolean()
 {
     if (not m_valuestack.empty()) {
-        AssertS(utils::SaxParserError, is_composite_parent());
+        AssertS(utils::SaxParserError, isCompositeParent());
     }
 }
 
-void ValueStackSax::push_string()
+void ValueStackSax::pushString()
 {
     if (not m_valuestack.empty()) {
-        AssertS(utils::SaxParserError, is_composite_parent());
+        AssertS(utils::SaxParserError, isCompositeParent());
     }
 }
 
-void ValueStackSax::push_double()
+void ValueStackSax::pushDouble()
 {
     if (not m_valuestack.empty()) {
-        AssertS(utils::SaxParserError, is_composite_parent());
+        AssertS(utils::SaxParserError, isCompositeParent());
     }
 }
 
-void ValueStackSax::push_map()
+void ValueStackSax::pushMap()
 {
     if (not m_valuestack.empty()) {
-        AssertS(utils::SaxParserError, is_composite_parent());
+        AssertS(utils::SaxParserError, isCompositeParent());
     }
 
-    push_on_vector_value(value::MapFactory::create());
+    pushOnVectorValue(value::MapFactory::create());
 }
 
-void ValueStackSax::push_map_key(const Glib::ustring& key)
+void ValueStackSax::pushMapKey(const Glib::ustring& key)
 {
     if (not m_valuestack.empty()) {
         AssertS(utils::SaxParserError, m_valuestack.top()->isMap());
@@ -82,48 +82,48 @@ void ValueStackSax::push_map_key(const Glib::ustring& key)
     m_lastkey.assign(key);
 }
 
-void ValueStackSax::push_set()
+void ValueStackSax::pushSet()
 {
     if (not m_valuestack.empty()) {
-        AssertS(utils::SaxParserError, is_composite_parent());
+        AssertS(utils::SaxParserError, isCompositeParent());
     }
 
-    push_on_vector_value(value::SetFactory::create());
+    pushOnVectorValue(value::SetFactory::create());
 }
 
-void ValueStackSax::push_tuple()
+void ValueStackSax::pushTuple()
 {
     if (not m_valuestack.empty()) {
-        AssertS(utils::SaxParserError, is_composite_parent());
+        AssertS(utils::SaxParserError, isCompositeParent());
     }
 
-    push_on_vector_value(value::TupleFactory::create());
+    pushOnVectorValue(value::TupleFactory::create());
 }
 
-void ValueStackSax::push_table(const size_t width, const size_t height)
+void ValueStackSax::pushTable(const size_t width, const size_t height)
 {
     if (not m_valuestack.empty()) {
-        AssertS(utils::SaxParserError, is_composite_parent());
+        AssertS(utils::SaxParserError, isCompositeParent());
     }
 
-    push_on_vector_value(value::TableFactory::create(width, height));
+    pushOnVectorValue(value::TableFactory::create(width, height));
 }
 
-void ValueStackSax::push_xml()
+void ValueStackSax::pushXml()
 {
     if (not m_valuestack.empty()) {
-        AssertS(utils::SaxParserError, is_composite_parent());
+        AssertS(utils::SaxParserError, isCompositeParent());
     }
 }
 
-void ValueStackSax::pop_value()
+void ValueStackSax::popValue()
 {
     if (not m_valuestack.empty()) {
         m_valuestack.pop();
     }
 }
 
-const value::Value& ValueStackSax::top_value()
+const value::Value& ValueStackSax::topValue()
 {
     Assert(utils::SaxParserError, not m_valuestack.empty(),
            "Empty sax parser value stack for the top operation");
@@ -131,7 +131,7 @@ const value::Value& ValueStackSax::top_value()
     return m_valuestack.top();
 }
 
-void ValueStackSax::push_on_vector_value(const value::Value& val)
+void ValueStackSax::pushOnVectorValue(const value::Value& val)
 {
     if (not m_valuestack.empty()) {
         if (m_valuestack.top()->isSet()) {

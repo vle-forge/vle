@@ -26,7 +26,7 @@
 #define VLE_VPZ_VPZ_HPP
 
 #include <vle/vpz/Project.hpp>
-#include <vle/vpz/SaxVPZ.hpp>
+#include <vle/vpz/SaxParser.hpp>
 #include <string>
 
 namespace vle { namespace vpz {
@@ -51,21 +51,17 @@ namespace vle { namespace vpz {
 
         /** 
          * @brief Open a VPZ file project.
-         *
          * @param filename file to read.
-         *
-         * @throw Exception::VPZ on error.
+         * @throw utils::SaxParserError on error.
          */
-        void parse_file(const std::string& filename);
+        void parseFile(const std::string& filename);
 
         /** 
          * @brief Open a VPZ from a buffer.
-         *
          * @param buffer the buffer to parse XML.
-         *
-         * @throw Exception::VPZ on error.
+         * @throw utils::SaxParserError on error.
          */
-        void parse_memory(const std::string& buffer);
+        void parseMemory(const std::string& buffer);
 
         /** 
          * @brief Write file into the current VPZ filename open.
@@ -74,7 +70,6 @@ namespace vle { namespace vpz {
     
         /** 
          * @brief Write file into the specified filename open.
-         * 
          * @param filename file to write.
          */
         void write(const std::string& filename);
@@ -94,7 +89,6 @@ namespace vle { namespace vpz {
         
         /** 
          * @brief Return true if the file is compressed.
-         * 
          * @return true if the file is compressed, false otherwise.
          */
         inline bool isGzip() const
@@ -102,7 +96,6 @@ namespace vle { namespace vpz {
 
         /** 
          * @brief Return true if the file use a least one translator.
-         * 
          * @return true if use translator, false otherwise.
          */
         bool hasNoVLE() const;
@@ -113,37 +106,28 @@ namespace vle { namespace vpz {
 
         /** 
          * @brief Parse the buffer to find a value.
-         * 
          * @param buffer the buffer to translate.
-         *
          * @throw utils::SaxParserError if buffer is not a value.
-         * 
          * @return value read from buffer.
          */
-        static value::Value parse_value(const std::string& buffer);
+        static value::Value parseValue(const std::string& buffer);
 
         /** 
          * @brief Parse the buffer to find a value.
-         * 
          * @param buffer the buffer to translate
-         * 
          * @throw utils::SaxParserError if buffer is not a valid trame.
-         *
          * @return a reference to the Trame read. You must manage the memory of
          * this trame.
          */
-        static TrameList parse_trame(const std::string& buffer);
+        static TrameList parseTrame(const std::string& buffer);
         
         /** 
          * @brief Parse the buffer to find a list of values.
-         * 
          * @param buffer the buffer to translate.
-         *
          * @throw utils::SaxParserError if buffer is not a value.
-         * 
          * @return a vector of values read from buffer.
          */
-        static std::vector < value::Value > parse_values(
+        static std::vector < value::Value > parseValues(
             const std::string& buffer);
 
         inline void setFilename(const std::string& filename)
@@ -159,9 +143,8 @@ namespace vle { namespace vpz {
         { return m_project; }
 
         /**
-         * Add the vpz extension to filename if does not exist, If correct
-         * filename is passed, no modification is apply.
-         * 
+         * @brief Add the vpz extension to filename if does not exist, If
+         * correct filename is passed, no modification is apply.
          * @param filename string to change if no extension exist.
          */
         static void fixExtension(std::string& filename);
@@ -172,7 +155,7 @@ namespace vle { namespace vpz {
          * @param filename the file name to test.
          * @throw std::exception on error.
          */
-        static void validate_file(const std::string& filename);
+        static void validateFile(const std::string& filename);
 
         /** 
          * @brief Use the libxml++ DOM parser to check the validation of the VPZ
@@ -180,7 +163,7 @@ namespace vle { namespace vpz {
          * @param buffer the content of the XML.
          * @throw std::exception on error.
          */
-        static void validate_memory(const Glib::ustring& buffer);
+        static void validateMemory(const Glib::ustring& buffer);
 
     private:
         bool                m_isGzip;

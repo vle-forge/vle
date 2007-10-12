@@ -57,8 +57,8 @@ ModelFactory::ModelFactory(Coordinator& coordinator,
 
 void ModelFactory::cleanCache()
 {
-    mDynamics.clean_no_permanent();
-    mExperiment.clean_no_permanent();
+    mDynamics.cleanNoPermanent();
+    mExperiment.cleanNoPermanent();
 }
 
 void ModelFactory::addPermanent(const vpz::Dynamic& dynamics)
