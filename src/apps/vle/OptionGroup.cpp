@@ -93,7 +93,7 @@ void CommandOptionGroup::check()
 }
 
 ManagerOptionGroup::ManagerOptionGroup() :
-    VLEOptionGroup("mangourp",
+    VLEOptionGroup("mangroup",
                    "Manager options",
                    "Description of manager options"),
     mAllinlocal(false),
