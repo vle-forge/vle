@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
 
     try {
         oov::NetStreamReader net(command.port());
-        net.setBufferSize(30);
+        net.setBufferSize(4096);
         net.process();
     } catch(const std::exception& e) {
         std::cerr << "oov failure: " << utils::demangle(e.what()) << "\n";

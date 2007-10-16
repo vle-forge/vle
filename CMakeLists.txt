@@ -92,9 +92,17 @@ INCLUDE(CMakeDetermineCCompiler)
 SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 FIND_PACKAGE(PkgConfig)
 
-PKG_CHECK_MODULES(GLIBMM glibmm-2.4)
-PKG_CHECK_MODULES(GTHREAD gthread-2.0)
-PKG_CHECK_MODULES(LIBXMLPP libxml++-2.6)
+PKG_CHECK_MODULES(GLIBMM REQUIRED glibmm-2.4)
+PKG_CHECK_MODULES(GTHREAD REQUIRED gthread-2.0)
+PKG_CHECK_MODULES(LIBXMLPP REQUIRED libxml++-2.6)
+
+OPTION(WITH_CAIRO "use the cairomm to build output plugin [default: on]" ON)
+IF (WITH_CAIRO)
+  PKG_CHECK_MODULES(CAIROMM cairomm-1.0)
+  IF (CAIROMM_FOUND)
+    SET(HAVE_CAIRO 1 CACHE INTERNAL "" FORCE)
+  ENDIF (CAIROMM_FOUND)
+ENDIF (WITH_CAIRO)
  
  #
   # Test the libsqlxx dependencies
@@ -175,6 +183,9 @@ ENDIF (Boost_FOUND)
 IF (HAVE_UNITTESTFRAMEWORK)
   MESSAGE(STATUS "Build unit test...............: yes")
 ENDIF (HAVE_UNITTESTFRAMEWORK)
+IF (HAVE_CAIRO)
+  MESSAGE(STATUS "Build with cairo plugin.......: yes")
+ENDIF (HAVE_CAIRO)
 MESSAGE(STATUS "- - - -")
 
 # vim:ts=8:tw=80:sw=2:sts=2

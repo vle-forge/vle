@@ -99,7 +99,7 @@ bool NetStreamReader::dispatch(const vpz::Trame* trame)
             TraceAlways(boost::format(
                     "NetStreamReader plugin: [%1%] and location [%2%]") %
                 tr->plugin() % tr->location());
-            init_plugin(tr->plugin(), tr->location());
+            initPlugin(tr->plugin(), tr->location());
             plugin()->onParameter(*tr);
             return false;
         }

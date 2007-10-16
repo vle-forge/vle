@@ -69,6 +69,13 @@ namespace vle { namespace oov {
         { }
 
         /** 
+         * @brief By default, a plugin is not a cairo plugin.
+         * @return false.
+         */
+        virtual bool isCairo() const
+        { return false; }
+
+        /** 
          * @brief Call to initialise plugin. Just before the Plugin constructor.
          * This function is used to initialise the Plugin with parameter
          * provided by the Vpz class.

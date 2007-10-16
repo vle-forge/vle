@@ -37,8 +37,8 @@ PluginPtr StreamReader::plugin()
     return m_plugin;
 }
 
-void StreamReader::init_plugin(const std::string& plugin,
-                               const std::string& location)
+void StreamReader::initPlugin(const std::string& plugin,
+                              const std::string& location)
 {
     utils::Path::PathList lst(utils::Path::path().getStreamDirs());
     utils::Path::PathList::const_iterator it;
@@ -48,8 +48,8 @@ void StreamReader::init_plugin(const std::string& plugin,
 
     for (it = lst.begin(); it != lst.end(); ++it) {
         try {
-            PluginFactory pfd(plugin, *it);
-            m_plugin = pfd.build(location);
+            PluginFactory pf(plugin, *it);
+            m_plugin = pf.build(location);
             return;
         } catch (const std::exception& e) {
             error += e.what();
@@ -59,23 +59,23 @@ void StreamReader::init_plugin(const std::string& plugin,
 
 StreamReader::PluginFactory::PluginFactory(const std::string& plugin,
                                            const std::string& pathname) :
-    module__(0),
-    plugin__(plugin)
+    m_module(0),
+    m_plugin(plugin)
 {
     std::string file(Glib::Module::build_path(pathname, plugin));
-    module__ = new Glib::Module(file);
-    if (not (*module__)) {
-        delete module__;
-        module__ = 0;
+    m_module = new Glib::Module(file);
+    if (not (*m_module)) {
+        delete m_module;
+        m_module = 0;
         Throw(utils::InternalError, boost::format(
                 "\n[%1%]: %2%") % pathname % Glib::Module::get_last_error());
     }
-    module__->make_resident();
+    m_module->make_resident();
 }
 
 StreamReader::PluginFactory::~PluginFactory()
 {
-    delete module__;
+    delete m_module;
 }
 
 PluginPtr StreamReader::PluginFactory::build(const std::string& location)
@@ -83,17 +83,17 @@ PluginPtr StreamReader::PluginFactory::build(const std::string& location)
     Plugin* call = 0;
     void*   makeNewOovPlugin = 0;
 
-    if (not module__->get_symbol("makeNewOovPlugin", makeNewOovPlugin)) {
+    if (not m_module->get_symbol("makeNewOovPlugin", makeNewOovPlugin)) {
         Throw(utils::InternalError, boost::format(
                 "Error when searching makeNewOovPlugin function in plugin %1%")
-            % plugin__);
+            % m_plugin);
     }
 
     call = ((Plugin*(*)(const std::string&))(makeNewOovPlugin))(location);
     if (not call) {
         Throw(utils::InternalError, boost::format(
                 "Error when calling makeNewOovPlugin function in plugin %1%")
-            % plugin__);
+            % m_plugin);
     }
 
     PluginPtr plugin(call);

@@ -52,8 +52,13 @@ namespace vle { namespace oov {
         PluginPtr plugin();
 
     protected:
-        void init_plugin(const std::string& plugin,
-                         const std::string& location);
+        /** 
+         * @brief Load the specified output plugin from the StreamDirs location.
+         * @param plugin the name of the plugin.
+         * @param location the location of the plugin output.
+         * @throw utils::InternalError if the plugin was not found.
+         */
+        void initPlugin(const std::string& plugin, const std::string& location);
 
     private:
         PluginPtr   m_plugin;
@@ -81,8 +86,8 @@ namespace vle { namespace oov {
             PluginPtr build(const std::string& location);
 
         private:
-            Glib::Module*   module__;
-            std::string     plugin__;
+            Glib::Module*   m_module;
+            std::string     m_plugin;
 
         };
     };

@@ -43,7 +43,7 @@ void LocalStreamReader::init(const std::string& plugin,
                              const std::string& location)
 {
     try {
-        init_plugin(plugin, location);
+        initPlugin(plugin, location);
     } catch(const std::exception& e) {
         Throw(utils::InternalError, (boost::format(
                     "Local stream reader cannot open plugin %1%. "
