@@ -55,6 +55,8 @@ void StreamReader::initPlugin(const std::string& plugin,
             error += e.what();
         }
     }
+
+    Throw(utils::InternalError, error);
 }
 
 StreamReader::PluginFactory::PluginFactory(const std::string& plugin,

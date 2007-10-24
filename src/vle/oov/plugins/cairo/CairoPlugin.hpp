@@ -26,6 +26,7 @@
 #define VLE_OOV_CAIRO_PLUGIN_HPP
 
 #include <vle/oov/Plugin.hpp>
+#include <vle/value/Map.hpp>
 #include <cairomm/cairomm.h>
 
 
@@ -62,14 +63,34 @@ namespace vle { namespace oov {
         { return true; }
 
         /** 
+         * @brief Use to react to an external event for instance, from an
+         * graphical user interface. Example:
+         * @code
+         * onSignal("switchcolor", value::MapFactory::create());
+         * @endcode
+         * @param method the name of the method.
+         * @param params the value::Map of parameters.
+         */
+        virtual void onSignal(const std::string& /* method */,
+                              const value::Map& /* params */)
+        { }
+
+        /** 
          * @brief build a new context from the specified surface to the
          * CairoPlugin.
          * @param the surface to use with the context.
          */
-        inline void setContext(Cairo::RefPtr < Cairo::Surface > surf)
+        inline void setSurface(Cairo::RefPtr < Cairo::Surface > surf)
         { m_ctx = Cairo::Context::create(surf); }
 
         /** 
+         * @brief Set a context to the CairoPlugin.
+         * @param ctx the new context to use.
+         */
+        inline void setContext(Cairo::RefPtr < Cairo::Context > ctx)
+        { m_ctx = ctx; }
+
+        /**
          * @brief Retrieve the current context of the CairoPlugin.
          * @return the current context.
          */
@@ -79,6 +100,20 @@ namespace vle { namespace oov {
     private:
         Cairo::RefPtr < Cairo::Context > m_ctx;
     };
+
+    /**
+     * @brief This typedef is used by the StreamReader to automatically destroy
+     * CairoPlugin at the end of the simulation.
+     */
+    typedef boost::shared_ptr < CairoPlugin > CairoPluginPtr;
+
+    /** 
+     * @brief Convert a PluginPtr reference to a CairoPluginPtr reference.
+     * @param plg The PluginPtr to convert.
+     * @return The reference to the CairoPluginPtr or 0 if convert failed.
+     */
+    inline CairoPluginPtr toCairoPlugin(PluginPtr& plg)
+    { return boost::dynamic_pointer_cast < CairoPlugin >(plg); }
 
 }} // namespace vle oov
 

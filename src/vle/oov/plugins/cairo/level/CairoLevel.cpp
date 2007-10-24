@@ -77,8 +77,8 @@ void CairoLevel::onValue(const vpz::ValueTrame& trame)
         m_receive++;
     }
     draw();
-    m_img->write_to_png((boost::format(
-                "%1%_%2$05d.png") % location() % (int)m_time).str());
+    //m_img->write_to_png((boost::format(
+    //"%1%_%2$05d.png") % location() % (int)m_time).str());
 }
 
 void CairoLevel::onParameter(const vpz::ParameterTrame& trame)
@@ -107,7 +107,7 @@ void CairoLevel::onParameter(const vpz::ParameterTrame& trame)
         int height = m_maxY - m_minY;
         m_img = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, width,
                                             height);
-        setContext(m_img);
+        setSurface(m_img);
     }
 
     m_colorList[0] = std::vector<int>(3);

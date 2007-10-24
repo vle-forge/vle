@@ -58,7 +58,8 @@ namespace vle { namespace oov {
          * @param location the location of the plugin output.
          * @throw utils::InternalError if the plugin was not found.
          */
-        void initPlugin(const std::string& plugin, const std::string& location);
+        virtual void initPlugin(const std::string& plugin,
+                                const std::string& location);
 
     private:
         PluginPtr   m_plugin;
