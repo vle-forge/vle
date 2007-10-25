@@ -42,16 +42,26 @@ namespace vle { namespace oov {
 
         virtual ~StreamReader()
         { }
+        
+        virtual void onParameter(const vpz::ParameterTrame& trame);
 
-        //
+        virtual void onNewObservable(const vpz::NewObservableTrame& trame);
+
+        virtual void onDelObservable(const vpz::DelObservableTrame& trame);
+
+        virtual void onValue(const vpz::ValueTrame& trame);
+        
+        virtual void onClose(const vpz::EndTrame& trame);
+
         ///
         /// Get/Set functions
         ///
-        //
 
         PluginPtr plugin();
 
-    protected:
+    private:
+        PluginPtr   m_plugin;
+
         /** 
          * @brief Load the specified output plugin from the StreamDirs location.
          * @param plugin the name of the plugin.
@@ -60,9 +70,6 @@ namespace vle { namespace oov {
          */
         virtual void initPlugin(const std::string& plugin,
                                 const std::string& location);
-
-    private:
-        PluginPtr   m_plugin;
 
 	/**
 	 * @brief Plugin factory is use to build reference to the
@@ -89,7 +96,6 @@ namespace vle { namespace oov {
         private:
             Glib::Module*   m_module;
             std::string     m_plugin;
-
         };
     };
 

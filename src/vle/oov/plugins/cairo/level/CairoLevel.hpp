@@ -25,7 +25,7 @@
 #ifndef VLE_OOV_PLUGINS_CAIRO_LEVEL_HPP
 #define VLE_OOV_PLUGINS_CAIRO_LEVEL_HPP
 
-#include <vle/oov/plugins/cairo/CairoPlugin.hpp>
+#include <vle/oov/CairoPlugin.hpp>
 #include <map>
 #include <vector>
 

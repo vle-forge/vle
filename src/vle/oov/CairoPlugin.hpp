@@ -112,7 +112,7 @@ namespace vle { namespace oov {
      * @param plg The PluginPtr to convert.
      * @return The reference to the CairoPluginPtr or 0 if convert failed.
      */
-    inline CairoPluginPtr toCairoPlugin(PluginPtr& plg)
+    inline CairoPluginPtr toCairoPlugin(const PluginPtr& plg)
     { return boost::dynamic_pointer_cast < CairoPlugin >(plg); }
 
 }} // namespace vle oov

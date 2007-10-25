@@ -1,8 +1,8 @@
 /** 
- * @file LocalStreamReader.cpp
+ * @file OovLocalStreamReader.hpp
  * @brief 
  * @author The vle Development Team
- * @date 2007-07-21
+ * @date 2007-10-25
  */
 
 /*
@@ -22,21 +22,30 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+#ifndef VLE_OOV_OOVLOCALSTREAMREADER_HPP
+#define VLE_OOV_OOVLOCALSTREAMREADER_HPP
+
 #include <vle/oov/LocalStreamReader.hpp>
-#include <vle/oov/Plugin.hpp>
-#include <vle/utils/Debug.hpp>
-
-
 
 namespace vle { namespace oov {
 
-LocalStreamReader::LocalStreamReader() :
-  StreamReader()
-{
-}
+    class OovLocalStreamReader : public LocalStreamReader
+    {
+    public:
+        OovLocalStreamReader()
+        { }
 
-LocalStreamReader::~LocalStreamReader()
-{
-}
+        virtual ~OovLocalStreamReader()
+        { }
+        
+        /** 
+         * @brief Oov LocalStreamReader ask to the CairoPlugin to write a image
+         * when receive a value.
+         * @param trame 
+         */
+        virtual void onValue(const vpz::ValueTrame& trame);
+    };
 
 }} // namespace vle oov
+
+#endif

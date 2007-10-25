@@ -1,8 +1,8 @@
 /** 
- * @file LocalStreamReader.cpp
+ * @file OovLocalStreamReader.cpp
  * @brief 
  * @author The vle Development Team
- * @date 2007-07-21
+ * @date 2007-10-25
  */
 
 /*
@@ -22,21 +22,27 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#include <vle/oov/LocalStreamReader.hpp>
-#include <vle/oov/Plugin.hpp>
-#include <vle/utils/Debug.hpp>
+#include <vle/oov/OovLocalStreamReader.hpp>
+#include <boost/format.hpp>
+#include <config.h>
 
-
+#ifdef HAVE_CAIRO
+#   include <vle/oov/CairoPlugin.hpp>
+#endif
 
 namespace vle { namespace oov {
 
-LocalStreamReader::LocalStreamReader() :
-  StreamReader()
+void OovLocalStreamReader::onValue(const vpz::ValueTrame& trame)
 {
-}
+    LocalStreamReader::onValue(trame);
 
-LocalStreamReader::~LocalStreamReader()
-{
+#ifdef HAVE_CAIRO
+    if (plugin()->isCairo()) {
+        CairoPluginPtr plg = toCairoPlugin(plugin());
+        plg->context()->get_target()->write_to_png((boost::format(
+                "%1%_%2$05d.png") % plg->location() % trame.time()).str());
+    }
+#endif
 }
 
 }} // namespace vle oov

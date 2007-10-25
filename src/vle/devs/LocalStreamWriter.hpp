@@ -26,7 +26,7 @@
 #define VLE_DEVS_LOCALSTREAMWRITER_HPP
 
 #include <vle/devs/StreamWriter.hpp>
-#include <vle/oov/LocalStreamReader.hpp>
+#include <vle/oov/OovLocalStreamReader.hpp>
 
 
 
@@ -64,7 +64,7 @@ namespace vle { namespace devs {
         virtual void close(const devs::Time& time);
 
     private:
-        oov::LocalStreamReader      m_reader;
+        oov::OovLocalStreamReader      m_reader;
     };
 
 }} // namespace vle devs

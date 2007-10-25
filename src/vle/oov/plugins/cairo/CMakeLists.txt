@@ -1,3 +1,1 @@
-INSTALL(FILES CairoPlugin.hpp DESTINATION ${VLE_INCLUDE_DIRS}/oov/plugins/cairo)
-
 ADD_SUBDIRECTORY(level)

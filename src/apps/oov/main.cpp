@@ -28,7 +28,7 @@
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/oov/OOV.hpp>
-#include <vle/oov/NetStreamReader.hpp>
+#include <vle/oov/OovNetStreamReader.hpp>
 
 using namespace vle;
 
@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
     }
 
     try {
-        oov::NetStreamReader net(command.port());
+        oov::OovNetStreamReader net(command.port());
         net.setBufferSize(4096);
         net.process();
     } catch(const std::exception& e) {

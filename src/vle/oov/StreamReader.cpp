@@ -59,6 +59,32 @@ void StreamReader::initPlugin(const std::string& plugin,
     Throw(utils::InternalError, error);
 }
 
+void StreamReader::onParameter(const vpz::ParameterTrame& trame)
+{
+    initPlugin(trame.plugin(), trame.location());
+    plugin()->onParameter(trame);
+}
+
+void StreamReader::onNewObservable(const vpz::NewObservableTrame& trame)
+{
+   plugin()->onNewObservable(trame); 
+}
+
+void StreamReader::onDelObservable(const vpz::DelObservableTrame& trame)
+{
+   plugin()->onDelObservable(trame); 
+}
+
+void StreamReader::onValue(const vpz::ValueTrame& trame)
+{
+    plugin()->onValue(trame);
+}
+        
+void StreamReader::onClose(const vpz::EndTrame& trame)
+{
+    plugin()->close(trame);
+}
+
 StreamReader::PluginFactory::PluginFactory(const std::string& plugin,
                                            const std::string& pathname) :
     m_module(0),

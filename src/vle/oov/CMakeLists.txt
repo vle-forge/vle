@@ -1,6 +1,7 @@
 INCLUDE_DIRECTORIES(
   ${VLE_SOURCE_DIR}/src
   ${GLIBMM_INCLUDE_DIRS}
+  ${CAIROMM_INCLUDE_DIRS}
   ${LIBXMLPP_INCLUDE_DIRS})
 
 ADD_DEFINITIONS(
@@ -10,13 +11,18 @@ ADD_DEFINITIONS(
 
 LINK_DIRECTORIES(
   ${GLIBMM_LIBRARY_DIRS}
-  ${LIBXMLPP_LIBRARY_DIR})
+  ${LIBXMLPP_LIBRARY_DIR}
+  ${CAIROMM_LIBRARY_DIR})
 
-SET(OOV_CPP LocalStreamReader.cpp NetStreamReader.cpp OOV.cpp Plugin.cpp
-  StreamReader.cpp)
+SET(OOV_CPP LocalStreamReader.cpp NetStreamReader.cpp OOV.cpp
+  OovLocalStreamReader.cpp OovNetStreamReader.cpp Plugin.cpp StreamReader.cpp)
 
-SET(OOV_HPP LocalStreamReader.hpp NetStreamReader.hpp OOV.hpp Plugin.hpp
-  StreamReader.hpp)
+SET(OOV_HPP LocalStreamReader.hpp NetStreamReader.hpp OOV.hpp
+  OovLocalStreamReader.hpp OovNetStreamReader.hpp Plugin.hpp StreamReader.hpp)
+
+IF (HAVE_CAIRO)
+ SET(OOV_HPP ${OOV_HPP} CairoPlugin.hpp)
+ENDIF (HAVE_CAIRO)
 
 ADD_LIBRARY(vleoov SHARED ${OOV_CPP};${OOV_HPP})
 
@@ -24,6 +30,7 @@ TARGET_LINK_LIBRARIES(vleoov
   ${GLIBMM_LIBRARIES}
   ${LIBXMLPP_LIBRARIES}
   ${GTHREAD_LIBRARIES}
+  ${CAIROMM_LIBRARIES}
   vlegeometry
   vleutils
   vledata
