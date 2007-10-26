@@ -77,8 +77,6 @@ void CairoLevel::onValue(const vpz::ValueTrame& trame)
         m_receive++;
     }
     draw();
-    //m_img->write_to_png((boost::format(
-    //"%1%_%2$05d.png") % location() % (int)m_time).str());
 }
 
 void CairoLevel::onParameter(const vpz::ParameterTrame& trame)
