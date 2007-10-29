@@ -48,8 +48,7 @@ namespace vle { namespace oov { namespace plugin {
 
         virtual void close(const vpz::EndTrame& trame);
 
-        virtual bool isDrawable() const
-        { return m_receive == m_columns.size(); }
+        virtual void preferedSize(int& width, int& height);
 
     private:
         std::string buildname(const std::string& simulator,

@@ -76,6 +76,25 @@ namespace vle { namespace oov {
         { }
 
         /** 
+         * @brief Use to react to a modification of the external Cairo::Surface.
+         * @param width the new width of the Cairo::Surface.
+         * @param height the new height of the Cairo::Surface.
+         */
+        virtual void onSize(int /* width */, int /* height */)
+        { }
+
+        /** 
+         * @brief Use to define the prefered size of the CairoSurface of the
+         * CairoPlugin.
+         * @param width output parameter for the prefered width of the
+         * internal Cairo::Surface.
+         * @param height output parameter for the prefred height of the
+         * internal Cairo::Surface.
+         */
+        virtual void preferedSize(int& /* width */, int& /* height */)
+        { }
+
+        /** 
          * @brief build a new context from the specified surface to the
          * CairoPlugin.
          * @param the surface to use with the context.

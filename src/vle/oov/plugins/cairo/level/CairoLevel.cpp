@@ -129,6 +129,12 @@ void CairoLevel::close(const vpz::EndTrame& /*trame */)
 {
 }
 
+void CairoLevel::preferedSize(int& width, int& height)
+{
+    width = 105;
+    height = 305;
+}
+
 void CairoLevel::draw()
 {
     Assert(utils::InternalError, context(), "Cairo level drawing error");
