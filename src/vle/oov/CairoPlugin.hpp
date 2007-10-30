@@ -91,8 +91,7 @@ namespace vle { namespace oov {
          * @param height output parameter for the prefred height of the
          * internal Cairo::Surface.
          */
-        virtual void preferedSize(int& /* width */, int& /* height */)
-        { }
+        virtual void preferredSize(int& /* width */, int& /* height */) = 0;
 
         /** 
          * @brief build a new context from the specified surface to the

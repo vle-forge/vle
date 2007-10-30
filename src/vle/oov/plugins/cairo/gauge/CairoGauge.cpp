@@ -101,6 +101,12 @@ void CairoGauge::close(const vpz::EndTrame& /*trame */)
 {
 }
 
+void CairoGauge::preferredSize(int& width, int& height)
+{
+    width = mWindowWidth;
+    height = mWindowHeight;
+}
+
 void CairoGauge::draw()
 {
     Assert(utils::InternalError, context(), "Cairo gauge drawing error");

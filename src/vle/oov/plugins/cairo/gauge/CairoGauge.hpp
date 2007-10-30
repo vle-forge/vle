@@ -48,6 +48,8 @@ namespace vle { namespace oov { namespace plugin {
 
         virtual void close(const vpz::EndTrame& trame);
 
+        virtual void preferredSize(int& width, int& height);
+
     private:
         std::string buildname(const std::string& simulator,
                               const std::string& port)

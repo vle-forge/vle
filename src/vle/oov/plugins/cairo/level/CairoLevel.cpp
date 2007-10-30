@@ -139,7 +139,7 @@ void CairoLevel::close(const vpz::EndTrame& /*trame */)
 {
 }
 
-void CairoLevel::preferedSize(int& width, int& height)
+void CairoLevel::preferredSize(int& width, int& height)
 {
     width = 105;
     height = 305;

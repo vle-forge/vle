@@ -259,6 +259,12 @@ void CairoCAView::close(const vpz::EndTrame& /*trame */)
     delete mValues;
 }
 
+void CairoCAView::preferredSize(int& width, int& height)
+{
+    width = mWindowWidth;
+    height = mWindowHeight;
+}
+
 CairoCAView::cairo_color CairoCAView::build_color(const std::string & p_value)
 {
     CairoCAView::cairo_color v_color;

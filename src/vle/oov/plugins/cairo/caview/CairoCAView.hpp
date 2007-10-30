@@ -84,6 +84,8 @@ namespace vle { namespace oov { namespace plugin {
 
         virtual void close(const vpz::EndTrame& trame);
 
+        virtual void preferredSize(int& width, int& height);
+
     private:
 	cairo_color build_color(const std::string & p_value);
         void draw();
