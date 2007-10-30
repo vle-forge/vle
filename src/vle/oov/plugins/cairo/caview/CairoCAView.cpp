@@ -184,7 +184,7 @@ void CairoCAView::onParameter(const vpz::ParameterTrame& trame)
 	    double v_minValue = utils::to_double(utils::xml::get_attribute(v_valueNode, "min"));
 	    double v_maxValue = utils::to_double(utils::xml::get_attribute(v_valueNode, "max"));
 	    std::string v_color = utils::xml::get_attribute(v_valueNode, "color");
-	    RealColor::color_type v_type;
+	    RealColor::color_type v_type = RealColor::LINEAR;
 	    double v_coef = 0.;
 	    
 	    if (utils::xml::get_attribute(v_valueNode, "type") == "linear")
