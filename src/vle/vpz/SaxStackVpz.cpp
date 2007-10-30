@@ -576,35 +576,40 @@ void SaxStackVpz::pushTrame(const AttributeList& att)
     AssertS(utils::SaxParserError, not m_stack.empty());
     AssertS(utils::SaxParserError, dynamic_cast < VLETrame* >(m_stack.top()));
 
-    std::string type(getAttribute < std::string >(att, "type"));
+    std::string type, date, name, parent, port, view, plugin, location;
+    for (AttributeList::const_iterator it = att.begin();
+         it != att.end(); ++it) {
+        if (it->name == "type") {
+            type = it->value; 
+        } if (it->name == "date") {
+            date = it->value;
+        } else if (it->name == "name") {
+            name = it->value;
+        } else if (it->name == "parent") {
+            parent = it->value;
+        } else if (it->name == "port") {
+            port = it->value;
+        } else if (it->name == "view") {
+            view = it->value;
+        } else if (it->name == "plugin") {
+            plugin = it->value;
+        } else if (it->name == "location") {
+            location = it->value;
+        }
+    }
+
     if (type == "value") {
-        m_stack.push(new ValueTrame(
-                getAttribute < std::string >(att, "date")));
+        m_stack.push(new ValueTrame(date));
     } else if (type == "new") {
-        m_stack.push(new NewObservableTrame(
-                getAttribute < std::string >(att, "date"),
-                getAttribute < std::string >(att, "name"),
-                getAttribute < std::string >(att, "parent"),
-                getAttribute < std::string >(att, "port"),
-                getAttribute < std::string >(att, "view")));
+        m_stack.push(new NewObservableTrame(date, name, parent, port, view));
     } else if (type == "del") {
-        m_stack.push(new DelObservableTrame(
-                getAttribute < std::string >(att, "date"),
-                getAttribute < std::string >(att, "name"),
-                getAttribute < std::string >(att, "parent"),
-                getAttribute < std::string >(att, "port"),
-                getAttribute < std::string >(att, "view")));
+        m_stack.push(new DelObservableTrame(date, name, parent, port, view));
     } else if (type == "parameter") {
-        m_stack.push(new ParameterTrame(
-                getAttribute < std::string >(att, "date"),
-                getAttribute < std::string >(att, "plugin"),
-                getAttribute < std::string >(att, "location")));
+        m_stack.push(new ParameterTrame(date, plugin, location));
     } else if (type == "value") {
-        m_stack.push(new ValueTrame(
-                getAttribute < std::string >(att, "date")));
+        m_stack.push(new ValueTrame(date));
     } else if (type == "end") {
-        m_stack.push(new EndTrame(
-                getAttribute < std::string >(att, "date")));
+        m_stack.push(new EndTrame(date));
     } else {
         Throw(utils::SaxParserError, boost::format(
                 "Unknow trame named %1%") % type);
@@ -639,11 +644,21 @@ void SaxStackVpz::pushModelTrame(const AttributeList& att)
     AssertS(utils::SaxParserError, not m_stack.empty());
     AssertS(utils::SaxParserError, m_stack.top()->isModelTrame());
 
-    reinterpret_cast < ValueTrame* >(m_stack.top())->add(
-        getAttribute < std::string >(att, "name"),
-        getAttribute < std::string >(att, "parent"),
-        getAttribute < std::string >(att, "port"),
-        getAttribute < std::string >(att, "view"));
+    std::string name, parent, port, view;
+    for (AttributeList::const_iterator it = att.begin();
+         it != att.end(); ++it) {
+        if (it->name == "name") {
+            name = it->value;
+        } else if (it->name == "parent") {
+            parent = it->value;
+        } else if (it->name == "port") {
+            port = it->value;
+        } else if (it->name == "view") {
+            view = it->value;
+        }
+    }
+
+    reinterpret_cast < ValueTrame* >(m_stack.top())->add(name, parent, port, view);
 }
 
 vpz::Base* SaxStackVpz::pop()
