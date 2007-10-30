@@ -109,6 +109,13 @@ void SaxParser::on_start_element(
         m_valuestack.pushTable(
             getAttribute < value::TableFactory::index >(att, "width"),
             getAttribute < value::TableFactory::index >(att, "height"));
+    } else if (name == "vle_trame") {
+        m_isEndTrame = false;
+        m_vpzstack.pushVleTrame();
+    } else if (name == "trame") {
+        m_vpzstack.pushTrame(att);
+    } else if (name == "modeltrame") {
+        m_vpzstack.pushModelTrame(att);
     } else if (name == "xml") {
         m_valuestack.pushXml();
     } else if (name == "vle_project") {
@@ -164,13 +171,6 @@ void SaxParser::on_start_element(
         m_vpzstack.pushTranslators();
     } else if (name == "translator") {
         m_vpzstack.pushTranslator(att);
-    } else if (name == "vle_trame") {
-        m_isEndTrame = false;
-        m_vpzstack.pushVleTrame();
-    } else if (name == "trame") {
-        m_vpzstack.pushTrame(att);
-    } else if (name == "modeltrame") {
-        m_vpzstack.pushModelTrame(att);
     } else {
         Throw(utils::SaxParserError,
               (boost::format("Unknow element %1%") % name));
@@ -211,6 +211,23 @@ void SaxParser::on_end_element(const Glib::ustring& name)
         m_valuestack.pushOnVectorValue(
             value::XMLFactory::create(m_cdata));
         m_cdata.clear();
+    } else if (name == "trame") {
+        m_vpzstack.popTrame();
+        if (not m_cdata.empty()) {
+            ParameterTrame* pt;
+            pt  = dynamic_cast < ParameterTrame* >(m_vpzstack.top());
+            if (pt) {
+                pt->setData(m_cdata);
+                m_cdata.clear();
+            }
+        }
+        m_vpzstack.pop();
+    } else if (name == "modeltrame") {
+        m_vpzstack.popModelTrame(getValue(0));
+        m_valuestack.clear();
+    } else if (name == "vle_trame") {
+        m_vpzstack.popVleTrame();
+        m_isEndTrame = true;
     } else if (name == "translator") {
         m_vpzstack.popTranslator(m_cdata);
         m_cdata.clear();
@@ -246,23 +263,6 @@ void SaxParser::on_end_element(const Glib::ustring& name)
             }
         }
         m_vpzstack.pop(); 
-    } else if (name == "trame") {
-        m_vpzstack.popTrame();
-        if (not m_cdata.empty()) {
-            ParameterTrame* pt;
-            pt  = dynamic_cast < ParameterTrame* >(m_vpzstack.top());
-            if (pt) {
-                pt->setData(m_cdata);
-                m_cdata.clear();
-            }
-        }
-        m_vpzstack.pop();
-    } else if (name == "modeltrame") {
-        m_vpzstack.popModelTrame(getValue(0));
-        m_valuestack.clear();
-    } else if (name == "vle_trame") {
-        m_vpzstack.popVleTrame();
-        m_isEndTrame = true;
     }
 }
 
