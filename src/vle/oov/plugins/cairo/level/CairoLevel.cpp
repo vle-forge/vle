@@ -77,6 +77,8 @@ void CairoLevel::onValue(const vpz::ValueTrame& trame)
         m_receive++;
     }
     draw();
+    //m_img->write_to_png((boost::format(
+    //"%1%_%2$05d.png") % location() % (int)m_time).str());
 }
 
 void CairoLevel::onParameter(const vpz::ParameterTrame& trame)
@@ -89,14 +91,33 @@ void CairoLevel::onParameter(const vpz::ParameterTrame& trame)
     if (not trame.data().empty()) {
         xmlpp::DomParser parser;
         parser.parse_memory(trame.data());
-        xmlpp::Element* root = utils::xml::get_root_node(parser, "level");
+	
+	xmlpp::Element* root = utils::xml::get_root_node(parser, "parameters");  
+
         if (root) {
+	    xmlpp::Element* elt = utils::xml::get_children(root, "curves");
+	    xmlpp::Node::NodeList lst = elt->get_children("curve");
+	    xmlpp::Node::NodeList::iterator it = lst.begin();
+	    int i = 0;
+	    
+	    while (it != lst.end()) {
+		xmlpp::Element * elt2 = ( xmlpp::Element* )( *it );
+		std::string name = utils::xml::get_attribute(elt2,"name");
+		
+//		m_colorList[name] = Gdk::Color(utils::xml::get_attribute(elt2,"color"));
+		m_minList[i] = utils::to_double(utils::xml::get_attribute(elt2,"min"));
+		m_maxList[i] = utils::to_double(utils::xml::get_attribute(elt2,"max"));
+		++it;
+		++i;
+	    }
+	    
+	    elt = utils::xml::get_children(root, "size");
             using boost::lexical_cast;
             using utils::xml::get_attribute;
-            m_minX = lexical_cast < int >(get_attribute(root, "minx"));
-            m_minX = lexical_cast < int >(get_attribute(root, "maxx"));
-            m_minY = lexical_cast < int >(get_attribute(root, "miny"));
-            m_maxY = lexical_cast < int >(get_attribute(root, "maxy"));
+            m_minX = lexical_cast < int >(get_attribute(elt, "minx"));
+            m_maxX = lexical_cast < int >(get_attribute(elt, "maxx"));
+            m_minY = lexical_cast < int >(get_attribute(elt, "miny"));
+            m_maxY = lexical_cast < int >(get_attribute(elt, "maxy"));
         }
     }
 
@@ -112,17 +133,6 @@ void CairoLevel::onParameter(const vpz::ParameterTrame& trame)
     m_colorList[0][0] = 255;
     m_colorList[0][1] = 0;
     m_colorList[0][2] = 0;
-
-    m_colorList[1] = std::vector<int>(3);
-    m_colorList[1][0] = 0;
-    m_colorList[1][1] = 255;
-    m_colorList[1][2] = 0;
-
-    m_minList[0] = 0;
-    m_minList[1] = 0;
-
-    m_maxList[0] = 10000;
-    m_maxList[1] = 100;
 }
 
 void CairoLevel::close(const vpz::EndTrame& /*trame */)
