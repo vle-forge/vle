@@ -32,7 +32,7 @@
 #include <vle/vpz/ValueTrame.hpp>
 #include <vle/vpz/EndTrame.hpp>
 #include <boost/shared_ptr.hpp>
-
+#include <iostream>
 
 
 namespace vle { namespace oov {

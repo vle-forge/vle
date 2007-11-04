@@ -90,6 +90,7 @@ bool NetStreamReader::dispatch(const vpz::Trame* trame)
         const vpz::ValueTrame* tr;
         if ((tr = dynamic_cast < const vpz::ValueTrame* >(trame))) {
             onValue(*tr);
+            delete tr;
             return false;
         }
     }
@@ -100,6 +101,7 @@ bool NetStreamReader::dispatch(const vpz::Trame* trame)
                     "NetStreamReader plugin: [%1%] and location [%2%]") %
                 tr->plugin() % tr->location());
             onParameter(*tr);
+            delete tr;
             return false;
         }
     }
@@ -107,6 +109,7 @@ bool NetStreamReader::dispatch(const vpz::Trame* trame)
         const vpz::NewObservableTrame* tr;
         if ((tr = dynamic_cast < const vpz::NewObservableTrame* >(trame))) {
             onNewObservable(*tr);
+            delete tr;
             return false;
         }
     }
@@ -114,6 +117,7 @@ bool NetStreamReader::dispatch(const vpz::Trame* trame)
         const vpz::DelObservableTrame* tr;
         if ((tr = dynamic_cast < const vpz::DelObservableTrame* >(trame))) {
             onDelObservable(*tr);
+            delete tr;
             return false;
         }
     }
@@ -122,6 +126,7 @@ bool NetStreamReader::dispatch(const vpz::Trame* trame)
         if ((tr = dynamic_cast < const vpz::EndTrame* >(trame))) {
             TraceAlways("NetStreamReader close");
             onClose(*tr);
+            delete tr;
             return true;
         }
     }

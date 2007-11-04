@@ -269,27 +269,6 @@ namespace vle { namespace devs {
                                const std::string& portName,
                                graph::TargetModelList& out);
 
-        void startEOVStream();
-
-        /** 
-         * @brief Search all measures when outputs is in a ouput::Net format.
-         */
-        void startNetStream();
-
-        /** 
-         * @brief Build the devs::Stream object and attach devs::View to the
-         * output::Net using the vpz::Observable information.
-         * 
-         * @param measure the measure who push data to the stream.
-         * @param output the concerned output.
-         */
-        void startNetStream(const vpz::View& view,
-                            const vpz::Output& output);
-        
-        /* - * - * - * - * - * - * - * - * - * - * - * - * - * - * - * - * - */
-
-        void startLocalStream();
-        
         void processEventView(Simulator& model, Event* event = 0);
 
         /**
