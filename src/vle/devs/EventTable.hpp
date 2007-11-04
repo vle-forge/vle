@@ -95,9 +95,6 @@ namespace vle { namespace devs {
         inline ExternalEventList& externals()
         { return _extev; }
 
-        inline void delExternal(size_t i)
-        { _extev.erase(i); }
-
         inline void delExternals()
         { _extev.clear(); }
 

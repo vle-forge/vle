@@ -77,8 +77,8 @@ EventTable::~EventTable()
     {
 	for (ExternalEventModel::iterator it = mExternalEventModel.begin();
 	     it != mExternalEventModel.end(); ++it) {
-	    (*it).second.first.clear(true);
-	    (*it).second.second.clear(true);
+	    (*it).second.first.deleteAndClear();
+	    (*it).second.second.deleteAndClear();
 	}
     }
 }
@@ -267,8 +267,8 @@ void EventTable::delModelEvents(Simulator* mdl)
     {
         ExternalEventModel::iterator it = mExternalEventModel.find(mdl);
         if (it != mExternalEventModel.end()) {
-            (*it).second.first.clear(true);
-            (*it).second.second.clear(true);
+            (*it).second.first.deleteAndClear();
+            (*it).second.second.deleteAndClear();
             mExternalEventModel.erase(it);
         }
     }

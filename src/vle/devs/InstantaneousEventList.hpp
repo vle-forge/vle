@@ -31,7 +31,7 @@
 
 namespace vle { namespace devs {
 
-    typedef EventList < InstantaneousEvent* > InstantaneousEventList;
+    typedef EventList < InstantaneousEvent > InstantaneousEventList;
 
 }} // namespace vle devs
 

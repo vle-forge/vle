@@ -24,79 +24,61 @@
  * 02111-1307, USA.
  */
 
-#ifndef DEVS_EVENTLIST_HPP
-#define DEVS_EVENTLIST_HPP
+#ifndef VLE_DEVS_EVENTLIST_HPP
+#define VLE_DEVS_EVENTLIST_HPP
 
-#include <deque>
+#include <vector>
+#include <boost/checked_delete.hpp>
 
 namespace vle { namespace devs {
 
     /**
-     * @brief A std::vector container to store template of event. We define two
-     * class ExternalEventList and InstantaneousEventList.
+     * @brief A std::vector container to store template of External and
+     * Instantaneout event. We define two class devs::ExternalEventList and
+     * devs::InstantaneousEventList.
      *
      */
     template < class Class >
-    class EventList
+    class EventList : public std::vector < Class* >
     {   
     public:
-        typedef typename std::deque < Class >::iterator iterator;
-        typedef typename std::deque < Class >::const_iterator const_iterator;
-
+        /** 
+         * @brief Constructor to build and empty EventList.
+         */
 	EventList() { }
 
-	EventList(Class event)
-        { m_eventList.push_back(event); }
+        /** 
+         * @brief This constructor is an helper function to build an EventList
+         * and add a first event in it.
+         * @param event the event to push.
+         */
+        EventList(Class* event)
+        { addEvent(event); }
 
-        inline ~EventList()
-        { clear(false); }
-
-        inline void addEvent(Class event)
-        { m_eventList.push_back(event); }
-
-        inline size_t size() const
-        { return m_eventList.size(); }
-
-        inline Class at(size_t i) const
-        { return m_eventList.at(i); }
-
-        inline Class operator[](size_t i) const
-        { return m_eventList[i]; }
-
-        inline Class front()
-        { return m_eventList[0]; }
-
-        inline const_iterator begin() const
-        { return m_eventList.begin(); }
-
-        inline const_iterator end() const
-        { return m_eventList.end(); }
-
-        inline iterator begin()
-        { return m_eventList.begin(); }
-
-        inline iterator end()
-        { return m_eventList.end(); }
-
-        inline void erase(size_t i)
-        { m_eventList.erase(m_eventList.begin() + i); }
-
-        bool empty() const
-        { return m_eventList.empty(); }
-
-        void clear(bool erase = false)
+        /** 
+         * @brief Add an event to the EventList. This function check if the
+         * event is not null before add it.
+         * @param event the event to push to the EventList.
+         */
+        inline void addEvent(Class* event)
         {
-            if (erase) {
-                const size_t sz = m_eventList.size();
-                for (size_t i = 0; i < sz; ++i) {
-                    delete m_eventList[i];
-                }
+            if (event) {
+                push_back(event);
             }
-            m_eventList.clear();
         }
 
-    private:
-        std::deque < Class > m_eventList;
+        /** 
+         * @brief Delete all the event stored in the event list and clear the
+         * list after.
+         */
+        void deleteAndClear()
+        {
+            std::for_each(EventList < Class >::begin(),
+                          EventList < Class >::end(),
+                          boost::checked_deleter < Class >());
+
+            EventList < Class >::clear();
+        }
     };
 
 }} // namespace vle devs

@@ -377,7 +377,9 @@ void Coordinator::dispatchExternalEvent(ExternalEventList& eventList,
         }
         ++i;
     }
-    eventList.clear(true);
+
+    std::for_each(eventList.begin(), eventList.end(),
+                  boost::checked_deleter < ExternalEvent >());
 }
 
 void Coordinator::getTargetPortList(
