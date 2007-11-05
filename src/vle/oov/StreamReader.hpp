@@ -41,7 +41,7 @@ namespace vle { namespace oov {
         { }
 
         virtual ~StreamReader()
-        { }
+        { }
         
         virtual void onParameter(const vpz::ParameterTrame& trame);
 
