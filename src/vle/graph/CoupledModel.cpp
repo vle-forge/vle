@@ -584,11 +584,11 @@ void CoupledModel::writeConnections(std::ostream& out) const
         const ModelPortList& lst(it->second);
         for (ModelPortList::const_iterator jt = lst.begin(); jt != lst.end();
              ++jt) {
-            out << "<connection type=\"input\">\n"
-                << " <origin model=\"" << getName() << "\" "
-                << "port=\"" << port << "\" />\n"
-                << " <destination model=\"" << jt->first->getName() << "\" "
+            out << "<connection type=\"output\">\n"
+                << " <origin model=\"" << jt->first->getName() << "\" "
                 << "port=\"" << jt->second << "\" />\n"
+                << " <destination model=\"" << getName() << "\" "
+                << "port=\"" << port << "\" />\n"
                 << "</connection>\n";
         }
     }
@@ -599,11 +599,11 @@ void CoupledModel::writeConnections(std::ostream& out) const
         const ModelPortList& lst(it->second);
         for (ModelPortList::const_iterator jt = lst.begin(); jt != lst.end();
              ++jt) {
-            out << "<connection type=\"output\">\n"
-                << " <origin model=\"" << jt->first->getName() << "\" "
-                << "port=\"" << jt->second << "\" />\n"
-                << " <destination model=\"" << getName() << "\" "
+            out << "<connection type=\"input\">\n"
+                << " <origin model=\"" << getName() << "\" "
                 << "port=\"" << port << "\" />\n"
+                << " <destination model=\"" << jt->first->getName() << "\" "
+                << "port=\"" << jt->second << "\" />\n"
                 << "</connection>\n";
         }
     }
@@ -615,12 +615,14 @@ void CoupledModel::writeConnections(std::ostream& out) const
              ++jt) {
             for (ModelPortList::const_iterator kt = jt->second.begin();
                  kt != jt->second.end(); ++kt) {
-                out << "<connection type=\"internal\">\n"
-                    << " <origin model=\"" << (*it).second->getName() << "\" "
-                    << "port=\"" << jt->first << "\" />\n"
-                    << " <destination model=\""  << kt->first->getName()
-                    << "\" port=\"" << kt->second << "\" />\n"
-                    << "</connection>\n";
+                if (kt->first != this) {
+                    out << "<connection type=\"internal\">\n"
+                        << " <origin model=\"" << (*it).second->getName() << "\" "
+                        << "port=\"" << jt->first << "\" />\n"
+                        << " <destination model=\""  << kt->first->getName()
+                        << "\" port=\"" << kt->second << "\" />\n"
+                        << "</connection>\n";
+                }
             }
         }
     }
