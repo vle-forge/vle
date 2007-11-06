@@ -69,7 +69,7 @@ void Dynamics::add(const Dynamics& dyns)
         add(it->second);
 }
 
-Dynamic Dynamics::add(const Dynamic& dynamic)
+Dynamic& Dynamics::add(const Dynamic& dynamic)
 {
     const_iterator it = find(dynamic.name());
     Assert(utils::SaxParserError, it == end(),

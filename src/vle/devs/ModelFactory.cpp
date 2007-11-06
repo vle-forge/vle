@@ -23,6 +23,7 @@
  */
 
 #include <vle/devs/ModelFactory.hpp>
+#include <vle/devs/Coordinator.hpp>
 #include <vle/devs/Simulator.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/devs/DynamicsWrapper.hpp>
@@ -38,12 +39,10 @@
 
 namespace vle { namespace devs {
 
-ModelFactory::ModelFactory(Coordinator& coordinator,
-                           const vpz::Dynamics& dyn,
+ModelFactory::ModelFactory(const vpz::Dynamics& dyn,
                            const vpz::Classes& cls,
                            const vpz::Experiment& exp,
                            const vpz::AtomicModelList& atoms) :
-    mCoordinator(coordinator),
     mDynamics(dyn),
     mClasses(cls),
     mExperiment(exp),
@@ -96,22 +95,23 @@ void ModelFactory::addPermanent(const vpz::Observable& observable)
     }
 }
 
-Simulator* ModelFactory::createModel(graph::AtomicModel* model,
+Simulator* ModelFactory::createModel(Coordinator& coordinator,
+                                     graph::AtomicModel* model,
                                      const std::string& dynamics,
                                      const std::string& condition,
-                                     const std::string& observable,
-                                     SimulatorMap& result)
+                                     const std::string& observable)
 {
+    const SimulatorMap& result(coordinator.modellist()); 
     Simulator* sim = new Simulator(model);
     Assert(utils::InternalError, result.find(model) == result.end(),
            boost::format("The model %1% already exist in coordinator") %
            model->getName());
-    result[model] = sim;
+    coordinator.addModel(model, sim);
 
     const vpz::Dynamic& dyn = mDynamics.get(dynamics);
     switch(dyn.type()) {
     case vpz::Dynamic::LOCAL:
-        attachDynamics(sim, dyn, getPlugin(dyn.name()));
+        attachDynamics(coordinator, sim, dyn, getPlugin(dyn.name()));
         break;
     case vpz::Dynamic::DISTANT:
         Throw(utils::NotYetImplemented, "Distant dynamics is not supported");
@@ -122,9 +122,9 @@ Simulator* ModelFactory::createModel(graph::AtomicModel* model,
         sim->processInitEvents(cnd.firstValues());
     }
 
-    InternalEvent* evt = sim->init(mCoordinator.getCurrentTime());
+    InternalEvent* evt = sim->init(coordinator.getCurrentTime());
     if (evt) {
-        mCoordinator.eventtable().putInternalEvent(evt);
+        coordinator.eventtable().putInternalEvent(evt);
     }
 
     if (not observable.empty()) {
@@ -133,15 +133,15 @@ Simulator* ModelFactory::createModel(graph::AtomicModel* model,
             for (vpz::ObservablePort::iterator jt = it->second.begin();
                  jt != it->second.end(); ++jt) {
 
-                View* view = mCoordinator.getView(*jt);
+                View* view = coordinator.getView(*jt);
                 Assert(utils::InternalError, view, (boost::format(
                         "The view %1% is unknow of coordinator view list") %
                         *jt));
 
                 StateEvent* evt = view->addObservable(
-                    sim, it->first, mCoordinator.getCurrentTime());
+                    sim, it->first, coordinator.getCurrentTime());
                 if (evt) {
-                    mCoordinator.eventtable().putStateEvent(evt);
+                    coordinator.eventtable().putStateEvent(evt);
                 }
             }
         }
@@ -198,7 +198,8 @@ Glib::Module* ModelFactory::getPlugin(const std::string& name)
             "Dynamics plugin '%1%' not found in model factory\n") % name);
 }
 
-void ModelFactory::attachDynamics(devs::Simulator* atom,
+void ModelFactory::attachDynamics(Coordinator& coordinator,
+                                  devs::Simulator* atom,
                                   const vpz::Dynamic& dyn,
                                   Glib::Module* module)
 {
@@ -236,7 +237,7 @@ void ModelFactory::attachDynamics(devs::Simulator* atom,
     }
 
     if (call->is_executive()) {
-        (dynamic_cast < Executive* >(call))->set_coordinator(&mCoordinator);
+        (dynamic_cast < Executive* >(call))->set_coordinator(&coordinator);
     }
     
     if (call->is_wrapper()) {

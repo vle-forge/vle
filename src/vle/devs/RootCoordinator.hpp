@@ -26,16 +26,13 @@
 #ifndef DEVS_ROOTCOORDINATOR_HPP
 #define DEVS_ROOTCOORDINATOR_HPP
 
-#include <vle/devs/Event.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/vpz/Vpz.hpp>
 
 namespace vle { namespace devs {
 
-    class ExternalEvent;
     class Coordinator;
-    class TargetPort;
-    class ExperimentGenerator;
+    class ModelFactory;
 
     /**
      * @brief Define the DEVS root coordinator. Manage a lot of DEVS
@@ -86,6 +83,7 @@ namespace vle { namespace devs {
 	devs::Time      m_currentTime;
         devs::Time      m_duration;
 	Coordinator*    m_coordinator;
+	ModelFactory*   m_modelfactory;
     };
 
 }} // namespace vle devs

@@ -54,7 +54,7 @@ namespace vle { namespace devs {
     class Coordinator
     {
     public:
-        Coordinator(const vpz::Vpz& io, vpz::Model& mdls);
+        Coordinator(ModelFactory& modelfactory, vpz::Model& mdls);
 
 	~Coordinator();
 
@@ -158,6 +158,14 @@ namespace vle { namespace devs {
         //// Some usefull functions.
         ///
         //
+        
+        /** 
+         * @brief Attach the specified simulator to the graph::AtomicModel and
+         * install it on bus.
+         * @param model 
+         * @param simulator 
+         */
+        void addModel(graph::AtomicModel* model, Simulator* simulator);
 
 	/**
 	 * Return the devs::Simulator with a specified graph::AtomicModel.
@@ -198,15 +206,17 @@ namespace vle { namespace devs {
         inline EventTable& eventtable()
         { return m_eventTable; }
 
+        inline const SimulatorMap& modellist() const
+        { return m_modelList; }
+
     private:
-        vpz::Experiment     m_experiment;
 	Time                m_currentTime;
 	SimulatorMap        m_modelList;
-	ModelFactory*       m_modelFactory;
 	EventTable          m_eventTable;
 	ViewList            m_viewList;
 	EventViewList       m_eventViewList;
 	TimedViewList       m_timedViewList;
+        ModelFactory&       m_modelFactory;
 
         void buildViews();
 

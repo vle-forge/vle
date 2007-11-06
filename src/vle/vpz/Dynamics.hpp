@@ -91,7 +91,7 @@ namespace vle { namespace vpz {
          * @throw Exception::Internal if a dynamic with the same model name
          * already exist.
          */
-        Dynamic add(const Dynamic& dyn);
+        Dynamic& add(const Dynamic& dyn);
 
         /** 
          * @brief Delete the dynamic for a specific model name.

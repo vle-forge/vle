@@ -25,6 +25,7 @@
 
 #include <vle/devs/RootCoordinator.hpp>
 #include <vle/devs/Coordinator.hpp>
+#include <vle/devs/ModelFactory.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/devs/Time.hpp>
@@ -37,24 +38,33 @@ namespace vle { namespace devs {
 
 RootCoordinator::RootCoordinator() :
     m_currentTime(0),
-    m_coordinator(0)
+    m_coordinator(0),
+    m_modelfactory(0)
 {
 }
 
 RootCoordinator::~RootCoordinator()
 {
     delete m_coordinator;
+    delete m_modelfactory;
 }
 
 void RootCoordinator::load(vpz::Vpz& io)
 {
     if (m_coordinator) {
         delete m_coordinator;
+        delete m_modelfactory;
     }
 
     utils::Rand::rand().set_seed(io.project().experiment().seed());
     m_duration = io.project().experiment().duration();
-    m_coordinator = new Coordinator(io, io.project().model());
+
+    m_modelfactory = new ModelFactory(io.project().dynamics(),
+                                      io.project().classes(),
+                                      io.project().experiment(),
+                                      io.project().model().atomicModels());
+
+    m_coordinator = new Coordinator(*m_modelfactory, io.project().model());
 }
 
 void RootCoordinator::init()
@@ -81,6 +91,11 @@ void RootCoordinator::finish()
         m_coordinator->finish();
         delete m_coordinator;
         m_coordinator = 0;
+    }
+
+    if (m_modelfactory) {
+        delete m_modelfactory;
+        m_modelfactory = 0;
     }
 }
 

@@ -25,13 +25,15 @@
 #ifndef DEVS_MODELFACTORY_HPP
 #define DEVS_MODELFACTORY_HPP
 
-#include <vle/devs/Coordinator.hpp>
 #include <vle/graph/Model.hpp>
 #include <vle/vpz/Classes.hpp>
 #include <vle/vpz/Model.hpp>
 #include <glibmm/module.h>
 
 namespace vle { namespace devs {
+
+    class Coordinator;
+    class Simulator;
 
     /**
      * @brief Read simulations plugin from models directories and manage models
@@ -47,8 +49,7 @@ namespace vle { namespace devs {
          * @param dyn the root dynamics of vpz::Dynamics to load.
          * @param cls the vpz::classes to parse vpz::Dynamics to load.
          */
-        ModelFactory(Coordinator& coordinator,
-                     const vpz::Dynamics& dyn,
+        ModelFactory(const vpz::Dynamics& dyn,
                      const vpz::Classes& cls,
                      const vpz::Experiment& experiment,
                      const vpz::AtomicModelList& atom);
@@ -89,6 +90,13 @@ namespace vle { namespace devs {
         inline const vpz::Outputs& outputs() const
         { return mExperiment.views().outputs(); }
 
+        /** 
+         * @brief Return the reference to the experiment object.
+         * @return A constant reference to the vpz::Experiment.
+         */
+        inline const vpz::Experiment& experiment() const
+        { return mExperiment; }
+
         //
         ///
         /// Manage the ModelFactory cache ie. Atomic Model information of
@@ -128,20 +136,20 @@ namespace vle { namespace devs {
          * to this model information of dynamics, condition and observable.
          * @param model the graph::AtomicModel reference source of
          * devs::Simulator.
+         * @param coordinator the coordinator where attach the simulator.
          * @param dynamics the name of the dynamics to attach.
          * @param condition the name of the condition to attach.
          * @param observable the name of the observable to attach.
          * @return A reference on the new Simulator builded.
          * @throw utils::InternalError if dynamics not exist.
          */
-        Simulator* createModel(graph::AtomicModel* model,
+        Simulator* createModel(Coordinator& coordinator,
+                               graph::AtomicModel* model,
                                const std::string& dynamics,
                                const std::string& condition,
-                               const std::string& observable,
-                               SimulatorMap& result);
+                               const std::string& observable);
 
     private:
-	Coordinator&            mCoordinator;
         vpz::Dynamics           mDynamics;
         vpz::Classes            mClasses;
         vpz::Experiment         mExperiment;
@@ -170,12 +178,14 @@ namespace vle { namespace devs {
         /** 
          * @brief Attach to the specified devs::Simulator reference a
          * devs::Dynamics structures load from a new Glib::Module.
+         * @param coordinator the coordinator where attach the dynamics.
          * @param atom the devs::Simulator to attach devs::Dynamic.
          * @param dyn the io::Dynamic to initialise devs::Dynamic.
          * @param module the simulation dynamic library plugin.
          * @throw Exception::Internal if XML cannot be parse.
          */
-        void attachDynamics(devs::Simulator* atom, const vpz::Dynamic& dyn,
+        void attachDynamics(Coordinator& coordinator,
+                            devs::Simulator* atom, const vpz::Dynamic& dyn,
                             Glib::Module* module);
     };
 

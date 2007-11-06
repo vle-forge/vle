@@ -57,24 +57,17 @@ using namespace xmlpp;
 
 namespace vle { namespace devs {
 
-Coordinator::Coordinator(const vpz::Vpz& vpz, vpz::Model& mdls) :
-    m_experiment(vpz.project().experiment()),
-    m_currentTime(0)
+Coordinator::Coordinator(ModelFactory& modelfactory,
+                         vpz::Model& mdls) :
+    m_currentTime(0),
+    m_modelFactory(modelfactory)
 {
-    m_modelFactory = new ModelFactory(*this,
-                                      vpz.project().dynamics(),
-                                      vpz.project().classes(),
-                                      vpz.project().experiment(),
-                                      vpz.project().model().atomicModels());
-
     buildViews();
     addModels(mdls);
 }
 
 Coordinator::~Coordinator()
 {
-    delete m_modelFactory;
-
     {
         std::map < graph::AtomicModel*, Simulator* >::iterator it;
         for (it = m_modelList.begin(); it != m_modelList.end(); ++it) {
@@ -171,17 +164,17 @@ void Coordinator::finish()
 
 void Coordinator::addPermanent(const vpz::Dynamic& dynamics)
 {
-    m_modelFactory->addPermanent(dynamics);
+    m_modelFactory.addPermanent(dynamics);
 }
 
 void Coordinator::addPermanent(const vpz::Condition& condition)
 {
-    m_modelFactory->addPermanent(condition);
+    m_modelFactory.addPermanent(condition);
 }
 
 void Coordinator::addPermanent(const vpz::Observable& observable)
 {
-    m_modelFactory->addPermanent(observable);
+    m_modelFactory.addPermanent(observable);
 }
 
 Simulator* Coordinator::createModel(graph::AtomicModel* model,
@@ -189,8 +182,8 @@ Simulator* Coordinator::createModel(graph::AtomicModel* model,
                                     const std::string& condition,
                                     const std::string& observable)
 {
-    return m_modelFactory->createModel(model, dynamics, condition, observable,
-                                       m_modelList);
+    return m_modelFactory.createModel(*this, model, dynamics, condition,
+                                      observable);
 }
 
 void Coordinator::addObservableToView(graph::AtomicModel* model,
@@ -235,6 +228,14 @@ bool Coordinator::delModel(graph::CoupledModel* parent,
 ///
 //
 
+void Coordinator::addModel(graph::AtomicModel* model, Simulator* simulator)
+{
+    Assert(utils::InternalError, m_modelList.find(model) == m_modelList.end(),
+           boost::format("The Atomic model node '%1% have already a simulator")
+           % model->getName());
+
+    m_modelList[model] = simulator;
+}
 
 Simulator* Coordinator::getModel(const graph::AtomicModel* model) const
 {
@@ -320,7 +321,7 @@ void Coordinator::addModels(vpz::Model& model)
         graph::Model::getAtomicModelList(mdl, atomicmodellist);
     }
 
-    const vpz::AtomicModelList& atoms(m_modelFactory->atomics());
+    const vpz::AtomicModelList& atoms(m_modelFactory.atomics());
     for (graph::AtomicModelVector::iterator it = atomicmodellist.begin();
          it != atomicmodellist.end(); ++it) {
         const vpz::AtomicModel& atom(atoms.get(*it));
@@ -391,8 +392,9 @@ void Coordinator::buildViews()
 {
     std::map < std::string, StreamWriter* > result;
 
-    vpz::Outputs outs(m_modelFactory->outputs());
-    for (vpz::Outputs::iterator it = outs.begin(); it != outs.end(); ++it) {
+    const vpz::Outputs& outs(m_modelFactory.outputs());
+    for (vpz::Outputs::const_iterator it = outs.begin(); it != outs.end();
+         ++it) {
         StreamWriter* stream = 0;
         switch (it->second.format()) {
         case vpz::Output::LOCAL:
@@ -403,15 +405,17 @@ void Coordinator::buildViews()
             break;
         }
         
-        std::string file((boost::format("%1%_%2%.dat") % m_experiment.name() %
+        std::string file((boost::format("%1%_%2%.dat") % 
+                          m_modelFactory.experiment().name() %
                           it->second.name()).str());
         stream->open(it->second.plugin(), it->second.location(), file, 
                      it->second.data(), m_currentTime); 
         result[it->first] = stream;
     }
 
-    vpz::Views views(m_modelFactory->views());
-    for (vpz::Views::iterator it = views.begin(); it != views.end(); ++it) {
+    const vpz::Views& views(m_modelFactory.views());
+    for (vpz::Views::const_iterator it = views.begin(); it != views.end();
+         ++it) {
         std::map < std::string, StreamWriter* >::iterator jt;
         jt = result.find(it->second.output());
 
