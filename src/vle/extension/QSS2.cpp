@@ -23,6 +23,7 @@
  */
 
 #include <vle/extension/QSS2.hpp>
+#include <vle/value/Map.hpp>
 #include <cmath>
 
 using namespace vle::devs;
@@ -460,7 +461,7 @@ void qss2::processInitEvents(const InitEventList& event)
     m_active = value::toBoolean(active);
 
     const value::Map& variables = value::toMapValue(event.get("variables"));
-    const value::MapFactory::MapValue& lst = variables->getValue();
+    const value::MapValue& lst = variables->getValue();
 
     m_functionNumber = lst.size();
 
@@ -475,8 +476,8 @@ void qss2::processInitEvents(const InitEventList& event)
     for(unsigned int i = 0;i < m_functionNumber;i++)
         m_mfi[i] = new mfi(this,i,m_functionNumber);
 
-    for (value::MapFactory::MapValue::const_iterator it = lst.begin();
-         it != lst.end(); ++it) {
+    for (value::MapValue::const_iterator it = lst.begin(); it != lst.end();
+         ++it) {
         const value::Set& tab(value::toSetValue(it->second));
 
         unsigned int index = value::toInteger(tab->getValue(0));

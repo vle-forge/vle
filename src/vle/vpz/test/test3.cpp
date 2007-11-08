@@ -83,11 +83,14 @@ BOOST_AUTO_TEST_CASE(test_translator)
     
     const vpz::Experiment& exp(prj.experiment());
     const vpz::Views& views(exp.views());
-    BOOST_REQUIRE_EQUAL(views.outputs().size(), (vpz::Outputs::size_type)1);
-    BOOST_REQUIRE_EQUAL(views.size(), (vpz::Views::size_type)1);
+    BOOST_REQUIRE_EQUAL(views.outputs().outputlist().size(),
+                        (vpz::OutputList::size_type)1);
+    BOOST_REQUIRE_EQUAL(views.viewlist().size(),
+                        (vpz::ViewList::size_type)1);
 
     const vpz::Conditions& conditions(exp.conditions());
-    BOOST_REQUIRE_EQUAL(conditions.size(), (vpz::Conditions::size_type)1);
+    BOOST_REQUIRE_EQUAL(conditions.conditionlist().size(),
+                        (vpz::ConditionList::size_type)1);
 
     const vpz::Model& model(vpz.project().model());
     BOOST_REQUIRE(model.model());

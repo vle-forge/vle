@@ -22,36 +22,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#include <vle/utils/XML.hpp>
+#include <vle/vpz/Condition.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/value/Value.hpp>
-#include <vle/vpz/Condition.hpp>
 #include <vle/value/Set.hpp>
 
 namespace vle { namespace vpz {
 
-using namespace vle::utils;
-
-const value::Value& ValueList::get(const std::string& name) const
-{
-    const_iterator it = find(name);
-    if (it == end()) {
-	Throw(utils::InternalError, boost::format(
-		  "Unknow port %1% for condition") % name);
-    } 
-    return it->second;
-}
-
-value::Value& ValueList::get(const std::string& name)
-{
-    iterator it = find(name);
-    if (it == end()) {
-	Throw(utils::InternalError, boost::format(
-		  "Unknow port %1% for condition") % name);
-    }
-    return it->second;
-}
-	
 Condition::Condition() :
     Base()
 {
@@ -63,11 +40,33 @@ Condition::Condition(const std::string& name) :
 {
 }
 
+value::Value ValueList::get(const std::string& name)
+{
+    iterator it;
+    if ((it = find(name)) == end()) {
+        Throw(utils::InternalError, boost::format(
+                "Condition '%1%' does not exist") % name);
+    }
+    return it->second;
+}
+
+const value::Value& ValueList::get(const std::string& name) const
+{
+    const_iterator it;
+    if ((it = find(name)) == end()) {
+        Throw(utils::InternalError, boost::format(
+                "Condition '%1%' does not exist") % name);
+    }
+    return it->second;
+}
+
 void Condition::write(std::ostream& out) const
 {
     out << "<condition name=\"" << m_name << "\" >\n";
 
-    for (const_iterator it = begin(); it != end(); ++it) {
+    for (ConditionValues::const_iterator it = m_list.begin(); it !=
+         m_list.end();
+         ++it) {
         out << " <port "
             << "name=\"" << it->first << "\" "
             << ">\n";
@@ -86,8 +85,8 @@ void Condition::write(std::ostream& out) const
 
 void Condition::add(const std::string& portname)
 {
-    if (find(portname) == end()) {
-        insert(std::make_pair < std::string, value::Set >(
+    if (m_list.find(portname) == m_list.end()) {
+        m_list.insert(std::make_pair < std::string, value::Set >(
                 portname, value::SetFactory::create()));
     }
     m_last_port.assign(portname);
@@ -95,19 +94,19 @@ void Condition::add(const std::string& portname)
 
 void Condition::del(const std::string& portname)
 {
-    erase(portname);
+    m_list.erase(portname);
 }
 
 void Condition::addValueToPort(const std::string& portname,
                                const value::Value& value)
 {
-    iterator it = find(portname);
+    ConditionValues::iterator it = m_list.find(portname);
 
-    if (it == end()) {
+    if (it == m_list.end()) {
         value::Set newset = value::SetFactory::create();
         newset->addValue(value);
 
-        insert(std::make_pair < std::string, value::Set >(
+        m_list.insert(std::make_pair < std::string, value::Set >(
                 portname, newset));
         m_last_port.assign(portname);
     } else {
@@ -119,7 +118,9 @@ ValueList Condition::firstValues() const
 {
     ValueList result;
 
-    for (const_iterator it = begin(); it != end(); ++it) {
+    for (ConditionValues::const_iterator it = m_list.begin(); it !=
+         m_list.end();
+         ++it) {
         if (it->second->size() > 0) {
             result[it->first] = it->second->getValue(0);
         } else {
@@ -128,15 +129,14 @@ ValueList Condition::firstValues() const
                     m_name));
         }
     }
-
     return result;
 }
 
 const value::Set& Condition::getSetValues(const std::string& portname) const
 {
-    const_iterator it = find(portname);
+    ConditionValues::const_iterator it = m_list.find(portname);
 
-    Assert(utils::InternalError, it != end(),
+    Assert(utils::InternalError, it != m_list.end(),
            boost::format("Condition %1% have no port %2%") %
            m_name % portname);
 
@@ -156,9 +156,9 @@ const value::Value& Condition::nValue(const std::string& portname,
 
 value::Set& Condition::lastAddedPort()
 {
-    iterator it = find(m_last_port);
+    ConditionValues::iterator it = m_list.find(m_last_port);
 
-    Assert(utils::InternalError, it != end(),
+    Assert(utils::InternalError, it != m_list.end(),
            boost::format("Condition %1% have no port %2%") %
            m_name % m_last_port);
 
@@ -167,7 +167,8 @@ value::Set& Condition::lastAddedPort()
 
 void Condition::rebuildValueSet()
 {
-    for (iterator it = begin(); it != end(); ++it) {
+    for (ConditionValues::iterator it = m_list.begin(); it != m_list.end();
+         ++it) {
         it->second = value::SetFactory::create();
     }
 }

@@ -393,8 +393,8 @@ void Coordinator::buildViews()
     std::map < std::string, StreamWriter* > result;
 
     const vpz::Outputs& outs(m_modelFactory.outputs());
-    for (vpz::Outputs::const_iterator it = outs.begin(); it != outs.end();
-         ++it) {
+    for (vpz::OutputList::const_iterator it = outs.outputlist().begin();
+         it != outs.outputlist().end(); ++it) {
         StreamWriter* stream = 0;
         switch (it->second.format()) {
         case vpz::Output::LOCAL:
@@ -414,8 +414,10 @@ void Coordinator::buildViews()
     }
 
     const vpz::Views& views(m_modelFactory.views());
-    for (vpz::Views::const_iterator it = views.begin(); it != views.end();
-         ++it) {
+    const vpz::ViewList& viewlist(views.viewlist());
+
+    for (vpz::ViewList::const_iterator it = viewlist.begin();
+         it != viewlist.end(); ++it) {
         std::map < std::string, StreamWriter* >::iterator jt;
         jt = result.find(it->second.output());
 

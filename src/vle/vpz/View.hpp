@@ -32,7 +32,6 @@
 
 namespace vle { namespace vpz {
 
-
     /** 
      * @brief A View made a link between a list of observation and an outut
      * plugin. This View can be timed by a timestep  or completely event.
@@ -105,7 +104,6 @@ namespace vle { namespace vpz {
 
         inline void setData(const std::string& data)
         { m_data = data; }
-
 
     private:
         View()

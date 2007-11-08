@@ -28,27 +28,32 @@
 #include <string>
 #include <map>
 #include <vle/vpz/Base.hpp>
-#include <vle/value/Value.hpp>
+#include <vle/value/Map.hpp>
+#include <vle/value/Set.hpp>
 
 namespace vle { namespace vpz {
 
+    /** 
+     * @brief Define the ConditionValues like a dictionnary, (portname, values).
+     */
+    typedef std::map < std::string, value::Set > ConditionValues;
 
+    /** 
+     * @brief Define the ValueList to a vle::value::MapValue.
+     */
     class ValueList : public std::map < std::string, value::Value >
     {
     public:
-        virtual ~ValueList()
-        { }
+        value::Value get(const std::string& name);
 
-        const vle::value::Value& get(const std::string& name) const;
-        vle::value::Value& get(const std::string& name);
+        const value::Value& get(const std::string& name) const;
     };
-
 
     /** 
      * @brief A condition define a couple model name, port name and a Value.
      * This class allow loading and writing a condition.
      */
-    class Condition : public Base, public std::map < std::string, value::Set >
+    class Condition : public Base
     {
     public:
         Condition(const std::string& name);
@@ -73,17 +78,25 @@ namespace vle { namespace vpz {
         inline virtual Base::type getType() const
         { return CONDITION; }
 
+        ////
+        //// Manage the ConditionValues
+        ////
+
+        /** 
+         * @brief Get a reference to the ConditionValues.
+         * @return A constant reference to the ConditionValues.
+         */
+        inline const ConditionValues& conditionvalues() const
+        { return m_list; }
 
         /** 
          * @brief Add a port to the value list.
-         * 
          * @param portname name of the port.
          */
         void add(const std::string& portname);
 
         /** 
          * @brief Remove a port of the value list.
-         * 
          * @param portname name of the port.
          */
         void del(const std::string& portname);
@@ -91,17 +104,18 @@ namespace vle { namespace vpz {
         /** 
          * @brief Add a value to a specified port. If port does not exist, it
          * will be create.
-         * 
          * @param portname name of the port to add value. 
          * @param value the value to push.
          */
         void addValueToPort(const std::string& portname,
                             const value::Value& value);
 
+        ////
+        //// Get/Set function
+        ////
 
         /** 
          * @brief Return the name of the condition.
-         * 
          * @return 
          */
         inline const std::string& name() const
@@ -110,18 +124,14 @@ namespace vle { namespace vpz {
         /** 
          * @brief Build a new ValueList based on the SetList with only the
          * first value for each Set.
-         * 
          * @return A cloned ValueList based on the SetList.
          */
         ValueList firstValues() const;
 
         /** 
          * @brief Get the value::Set attached to a port.
-         * 
          * @param portname The name of the port.
-         * 
          * @return A reference to a value::Set.
-         *
          * @throw Exception::Internal if portname not exist.
          */
         const value::Set& getSetValues(const std::string& portname) const;
@@ -129,11 +139,8 @@ namespace vle { namespace vpz {
         /** 
          * @brief Return a reference to the first value::Value of the specified
          * port.
-         * 
          * @param portname the name of the port to test.
-         * 
          * @return A reference to a value::Value.
-         *
          * @throw Exception::Internal if portname not exist.
          */
         const value::Value& firstValue(const std::string& portname) const;
@@ -141,12 +148,9 @@ namespace vle { namespace vpz {
         /** 
          * @brief Return a reference to the nth value::Value of the specified
          * port.
-         * 
          * @param portname the name of the specified port.
          * @param i the value of the port.
-         * 
          * @return A reference to a value::Value.
-         *
          * @throw Exception::Internal if portname not exist or if value list
          * have no nth value.
          */
@@ -155,9 +159,7 @@ namespace vle { namespace vpz {
         /** 
          * @brief Return a reference to the value::Set of the latest added port.
          * This function is principaly used in Sax parser.
-         * 
          * @return A reference to the value::Set of the port.
-         *
          * @throw Exception::Internal if port does not exist.
          */
         value::Set& lastAddedPort();
@@ -165,7 +167,6 @@ namespace vle { namespace vpz {
         /** 
          * @brief Return true if this condition is a permanent data for the
          * devs::ModelFactory.
-         * 
          * @return True if this condition is a permanent value.
          */
         inline bool isPermanent() const
@@ -173,7 +174,6 @@ namespace vle { namespace vpz {
 
         /** 
          * @brief Set the permanent value of this condition.
-         * 
          * @param value True to conserve this condition in devs::ModelFactory.
          */
         inline void permanent(bool value = true)
@@ -188,6 +188,7 @@ namespace vle { namespace vpz {
     private:
         Condition();
 
+        ConditionValues         m_list;         /* list of port, values. */
         std::string             m_name;         /* name of the condition. */
         std::string             m_last_port;    /* latest added port. */
         bool                    m_ispermanent;

@@ -32,9 +32,18 @@
 #include <vle/vpz/View.hpp>
 
 namespace vle { namespace vpz {
+    
+    /** 
+     * @brief A list of View.
+     */
+    typedef std::map < std::string, View > ViewList;
 
-
-    class Views : public Base, public std::map < std::string, View >
+    /** 
+     * @brief Views is a container based on ViewList to build a list of View
+     * using the View's name as key. The Views class store Outputs and
+     * Observables objects too.
+     */
+    class Views : public Base
     {
     public:
         Views()
@@ -48,11 +57,9 @@ namespace vle { namespace vpz {
         virtual Base::type getType() const
         { return VIEWS; }
 
-        //
-        ///
-        //// Manage outputs objets.
-        ///
-        //
+        ////
+        //// Manage outputs objects.
+        ////
 
         Output& addLocalStreamOutput(const std::string& name,
                                      const std::string& location,
@@ -70,11 +77,9 @@ namespace vle { namespace vpz {
         inline Outputs& outputs()
         { return m_outputs; }
 
-        //
-        ///
+        ////
         //// Manage observables objects.
-        ///
-        //
+        ////
 
         Observable& addObservable(const Observable& obs);
 
@@ -88,11 +93,12 @@ namespace vle { namespace vpz {
         inline Observables& observables()
         { return m_observables; }
 
-        //
-        ///
+        ////
         //// Manage views objects.
-        ///
-        //
+        ////
+        
+        inline const ViewList& viewlist() const
+        { return m_list; }
         
         void add(const Views& views);
 
@@ -114,11 +120,25 @@ namespace vle { namespace vpz {
         View& get(const std::string& name);
         
         inline bool exist(const std::string& name) const
-        { return find(name) != end(); }
+        { return m_list.find(name) != m_list.end(); }
 
     private:
+        ViewList        m_list;
         Outputs         m_outputs;
         Observables     m_observables;
+
+
+        struct AddViews
+        {
+            inline AddViews(Views& views) :
+                m_views(views)
+            { }
+
+            inline void operator()(const ViewList::value_type& pair)
+            { m_views.add(pair.second); }
+
+            Views& m_views;
+        };
     };
 
 }} // namespace vle vpz

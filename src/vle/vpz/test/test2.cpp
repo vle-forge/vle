@@ -329,18 +329,18 @@ BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
     const vpz::Views& views(experiment.views());
     
     const vpz::Outputs& outputs(views.outputs());
-    BOOST_REQUIRE(outputs.size() == 2);
+    BOOST_REQUIRE(outputs.outputlist().size() == 2);
 
-    BOOST_REQUIRE(outputs.find("x") != outputs.end());
+    BOOST_REQUIRE(outputs.outputlist().find("x") != outputs.outputlist().end());
     {
-        const vpz::Output& out(outputs.find("x")->second);
+        const vpz::Output& out(outputs.outputlist().find("x")->second);
         BOOST_REQUIRE_EQUAL(out.name(), "x");
         BOOST_REQUIRE_EQUAL(out.format(), vpz::Output::LOCAL);
         BOOST_REQUIRE_EQUAL(out.data(), "test");
     }
-    BOOST_REQUIRE(outputs.find("z") != outputs.end());
+    BOOST_REQUIRE(outputs.outputlist().find("z") != outputs.outputlist().end());
     {
-        const vpz::Output& out(outputs.find("z")->second);
+        const vpz::Output& out(outputs.outputlist().find("z")->second);
         BOOST_REQUIRE_EQUAL(out.name(), "z");
         BOOST_REQUIRE_EQUAL(out.format(), vpz::Output::DISTANT);
         BOOST_REQUIRE_EQUAL(out.plugin(), "xxx");
@@ -348,23 +348,26 @@ BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
     }
 
 
-    BOOST_REQUIRE(not views.empty());
-    BOOST_REQUIRE((*views.begin()).first == (*views.begin()).second.name());
+    BOOST_REQUIRE(not views.viewlist().empty());
+    BOOST_REQUIRE((*views.viewlist().begin()).first
+                  == (*views.viewlist().begin()).second.name());
 
-    const vpz::View& view(views.begin()->second);
+    const vpz::View& view(views.viewlist().begin()->second);
     BOOST_REQUIRE_EQUAL(view.name(), "x");
     BOOST_REQUIRE_EQUAL(view.streamtype(), "timed");
     BOOST_REQUIRE_EQUAL(view.timestep(), .05);
     BOOST_REQUIRE_EQUAL(view.output(), "x");
 
     const vpz::Observables& obs(views.observables());
-    BOOST_REQUIRE(obs.size() == 2);
+    BOOST_REQUIRE(obs.observablelist().size() == 2);
 
-    BOOST_REQUIRE(obs.find("oo") != obs.end());
+    BOOST_REQUIRE(obs.observablelist().find("oo") !=
+                  obs.observablelist().end());
     {
-        const vpz::Observable& ob = obs.find("oo")->second;
+        const vpz::Observable& ob = obs.observablelist().find("oo")->second;
         BOOST_REQUIRE_EQUAL(ob.name(), "oo");
-        BOOST_REQUIRE_EQUAL(ob.size(), (vpz::Observable::size_type)3);
+        BOOST_REQUIRE_EQUAL(ob.observableportlist().size(),
+                            (vpz::ObservablePortList::size_type)3);
 
         BOOST_REQUIRE(ob.exist("x1"));
         BOOST_REQUIRE(ob.exist("x2"));
@@ -374,11 +377,13 @@ BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
         BOOST_REQUIRE(port.exist("x"));
     }
 
-    BOOST_REQUIRE(obs.find("xx") != obs.end());
+    BOOST_REQUIRE(obs.observablelist().find("xx") !=
+                  obs.observablelist().end());
     {
-        const vpz::Observable& ob = obs.find("xx")->second;
+        const vpz::Observable& ob = obs.observablelist().find("xx")->second;
         BOOST_REQUIRE_EQUAL(ob.name(), "xx");
-        BOOST_REQUIRE_EQUAL(ob.size(), (vpz::Observable::size_type)3);
+        BOOST_REQUIRE_EQUAL(ob.observableportlist().size(),
+                            (vpz::ObservablePortList::size_type)3);
 
         BOOST_REQUIRE(ob.exist("x4"));
         BOOST_REQUIRE(ob.exist("x5"));

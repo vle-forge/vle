@@ -33,10 +33,15 @@
 namespace vle { namespace vpz {
 
     /** 
+     * @brief Define a condition list like list of names, conditions.
+     */
+    typedef std::map < std::string, Condition > ConditionList;
+
+    /** 
      * @brief This class describe a list of condition and allow loading and
      * writing a conditions and condition tags.
      */
-    class Conditions : public Base, public std::map < std::string, Condition >
+    class Conditions : public Base
     {
     public:
         Conditions();
@@ -62,23 +67,29 @@ namespace vle { namespace vpz {
         virtual Base::type getType() const
         { return CONDITIONS; }
 
+        ////
+        //// Manage ConditionList
+        ////
+
+        /** 
+         * @brief Get a reference to the ConditionList.
+         * @return A constant reference to the ConditionList.
+         */
+        inline const ConditionList& conditionlist() const
+        { return m_list; }
 
         /** 
          * @brief Add a list of Conditions to the list.
-         * 
          * @param conditions A Conditions object to add.
-         *
          * @throw Exception::Internal if a Condition already exist.
          */
         void add(const Conditions& conditions);
 
         /** 
          * @brief Add a condition into the conditions list.
-         * 
          * @param condition the condition to add into the map. Condition is
          * copied.
          * @return the newly created Condition.
-         *
          * @throw Exception::Internal if condition with same name and port
          * already exist.
          */
@@ -86,26 +97,27 @@ namespace vle { namespace vpz {
 
         /** 
          * @brief Delete the specified condition from the conditions list.
-         * 
          * @param modelname condition model name.
          * @param portname condition port name.
          */
         void del(const std::string& condition);
 
         /** 
+         * @brief Clear the ConditionList object.
+         */
+        inline void clear()
+        { m_list.clear(); }
+
+        /** 
          * @brief Get the specified condition from conditions list.
-         * 
          * @param condition 
-         * 
          * @return 
          */
         const Condition& get(const std::string& condition) const;
 
         /** 
          * @brief Get the specified condition from conditions list.
-         * 
          * @param condition 
-         * 
          * @return 
          */
         Condition& get(const std::string& condition);
@@ -122,6 +134,27 @@ namespace vle { namespace vpz {
          * value::Set.
          */
         void rebuildValueSet();
+    
+    private:
+        ConditionList       m_list;
+
+        struct AddCondition
+        {
+            AddCondition(Conditions& conditions) :
+                m_conditions(conditions)
+            { }
+
+            void operator()(const ConditionList::value_type& pair)
+            { m_conditions.add(pair.second); }
+
+            Conditions& m_conditions;
+        };
+
+        struct RebuildValueSet
+        {
+            void operator()(ConditionList::value_type& pair)
+            { pair.second.rebuildValueSet(); }
+        };
     };
 
 }} // namespace vle vpz

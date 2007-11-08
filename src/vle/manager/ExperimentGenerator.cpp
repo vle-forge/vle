@@ -63,13 +63,15 @@ void ExperimentGenerator::build_replicas_list()
 void ExperimentGenerator::build_conditions_list()
 {
     const vpz::Conditions& cnds(mFile.project().experiment().conditions());
-    vpz::Conditions::const_iterator it;
+    vpz::ConditionList::const_iterator it;
 
-    for (it = cnds.begin(); it != cnds.end(); ++it) {
+    for (it = cnds.conditionlist().begin();
+         it != cnds.conditionlist().end(); ++it) {
         const vpz::Condition& cnd(it->second);
-        vpz::Condition::const_iterator jt;
+        vpz::ConditionValues::const_iterator jt;
 
-        for (jt = cnd.begin(); jt != cnd.end(); ++jt) {
+        for (jt = cnd.conditionvalues().begin();
+             jt != cnd.conditionvalues().end(); ++jt) {
             mCondition.push_back(cond_t());
             mCondition[mCondition.size() - 1].sz = jt->second->size();
             mCondition[mCondition.size() - 1].pos = 0;
@@ -91,17 +93,19 @@ void ExperimentGenerator::build_combinations()
 void ExperimentGenerator::build_combinations_from_replicas(size_t cmbnumber)
 {
     vpz::Conditions& dest(mTmpfile.project().experiment().conditions());
-    vpz::Conditions::iterator itDest(dest.begin());
-    vpz::Condition::iterator itValueDest(itDest->second.begin());
+    vpz::ConditionList::const_iterator itDest(dest.conditionlist().begin());
+    vpz::ConditionValues::const_iterator
+        itValueDest(itDest->second.conditionvalues().begin());
 
     const vpz::Conditions& orig(mFile.project().experiment().conditions());
-    vpz::Conditions::const_iterator itOrig(orig.begin());
-    vpz::Condition::const_iterator itValueOrig(itOrig->second.begin());
+    vpz::ConditionList::const_iterator itOrig(orig.conditionlist().begin());
+    vpz::ConditionValues::const_iterator
+        itValueOrig(itOrig->second.conditionvalues().begin());
 
     Assert(utils::InternalError,
-           dest.size() == orig.size(),
-           boost::format("Error: %1% %2% %3%\n") % dest.size() %
-           orig.size() % mCondition.size());
+           dest.conditionlist().size() == orig.conditionlist().size(),
+           boost::format("Error: %1% %2% %3%\n") % dest.conditionlist().size() %
+           orig.conditionlist().size() % mCondition.size());
 
     for (size_t jcom = 0; jcom < mCondition.size(); ++jcom) {
         size_t index = mCondition[jcom].pos;
@@ -112,14 +116,15 @@ void ExperimentGenerator::build_combinations_from_replicas(size_t cmbnumber)
         itValueDest++;
         itValueOrig++;
 
-        if (itValueDest == itDest->second.end()) {
-            Assert(utils::InternalError, itValueOrig == itOrig->second.end(),
-                   boost::format("Error: %1% %2%\n") % itDest->second.size() %
-                   itOrig->second.size());
+        if (itValueDest == itDest->second.conditionvalues().end()) {
+            Assert(utils::InternalError, itValueOrig ==
+                   itOrig->second.conditionvalues().end(),
+                   boost::format("Error: %1% %2%\n") % itDest->second.conditionvalues().size() %
+                   itOrig->second.conditionvalues().size());
             itDest++;
             itOrig++;
-            itValueDest = itDest->second.begin();
-            itValueOrig = itOrig->second.begin();
+            itValueDest = itDest->second.conditionvalues().begin();
+            itValueOrig = itOrig->second.conditionvalues().begin();
         }
     }
 

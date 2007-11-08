@@ -84,7 +84,7 @@ void Experiment::setName(const std::string& name)
 void Experiment::cleanNoPermanent()
 {
     m_conditions.cleanNoPermanent();
-    m_views.observables().clean_no_permanent();
+    m_views.observables().cleanNoPermanent();
 }
 
 void Experiment::setDuration(double duration)

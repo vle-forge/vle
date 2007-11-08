@@ -43,8 +43,9 @@ void Views::write(std::ostream& out) const
         m_observables.write(out);
     }
 
-    if (not empty()) {
-        for (const_iterator it = begin(); it != end(); ++it) {
+    if (not m_list.empty()) {
+        for (ViewList::const_iterator it = m_list.begin(); it !=
+             m_list.end(); ++it) {
             it->second.write(out);
         }
     }
@@ -84,21 +85,21 @@ Observable& Views::addObservable(const std::string& name)
 void Views::delObservable(const std::string& name)
 {
     m_observables.del(name);
-    std::map < std::string, View >::clear();
+    m_list.clear();
 }
 
 void Views::clear()
 {
-    std::map < std::string, View >::clear();
+    m_list.clear();
     m_outputs.clear();
     m_observables.clear(); 
 }
 
 void Views::add(const Views& views)
 {
-    for (const_iterator it = views.begin(); it != views.end(); ++it) {
-        add(it->second);
-    }
+    std::for_each(views.viewlist().begin(),
+                  views.viewlist().end(),
+                  Views::AddViews(*this));
 
     m_outputs.add(views.outputs());
     m_observables.add(views.observables());
@@ -109,7 +110,7 @@ View& Views::add(const View& view)
     Assert(utils::SaxParserError, not exist(view.name()),
            (boost::format("View %1% already exist") % view.name()));
 
-    return (*insert(std::make_pair < std::string, View >(
+    return (*m_list.insert(std::make_pair < std::string, View >(
                 view.name(), view)).first).second;
 }
 
@@ -138,13 +139,13 @@ View& Views::addTimedView(const std::string& name,
 
 void Views::del(const std::string& name)
 {
-    erase(name);
+    m_list.erase(name);
 }
 
 const View& Views::get(const std::string& name) const
 {
-    const_iterator it = find(name);
-    Assert(utils::SaxParserError, it != end(),
+    ViewList::const_iterator it = m_list.find(name);
+    Assert(utils::SaxParserError, it != m_list.end(),
            boost::format("Unknow view '%1%'\n") % name);
 
     return it->second;
@@ -152,8 +153,8 @@ const View& Views::get(const std::string& name) const
 
 View& Views::get(const std::string& name)
 {
-    iterator it = find(name);
-    Assert(utils::SaxParserError, it != end(),
+    ViewList::iterator it = m_list.find(name);
+    Assert(utils::SaxParserError, it != m_list.end(),
            boost::format("Unknow view '%1%'\n") % name);
 
     return it->second;

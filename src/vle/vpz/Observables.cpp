@@ -32,8 +32,9 @@ void Observables::write(std::ostream& out) const
 {
     if (not empty()) {
         out << "<observables>\n";
-        for (const_iterator it = begin(); it != end(); ++it) {
-            it->second.write(out);
+        for (ObservableList::const_iterator it = m_list.begin();
+             it != m_list.end(); ++it) {
+            out << it->second;
         }
         out << "</observables>\n";
     }
@@ -41,9 +42,9 @@ void Observables::write(std::ostream& out) const
 
 void Observables::add(const Observables& obs)
 {
-    for (const_iterator it = obs.begin(); it != obs.end(); ++it) {
-        add(it->second);
-    }
+    std::for_each(obs.observablelist().begin(),
+                  obs.observablelist().end(),
+                  AddObservable(*this));
 }
 
 Observable& Observables::add(const Observable& obs)
@@ -51,14 +52,14 @@ Observable& Observables::add(const Observable& obs)
     Assert(utils::SaxParserError, not exist(obs.name()),
            (boost::format("Observable %1% already exist") % obs.name()));
 
-    return (*insert(std::make_pair < std::string, Observable >(
+    return (*m_list.insert(std::make_pair < std::string, Observable >(
                 obs.name(), obs)).first).second;
 }
 
 Observable& Observables::get(const std::string& name)
 {
-    iterator it = find(name);
-    Assert(utils::SaxParserError, it != end(),
+    ObservableList::iterator it = m_list.find(name);
+    Assert(utils::SaxParserError, it != m_list.end(),
            (boost::format("Observable %1% does not exist") % name));
 
     return it->second;
@@ -66,26 +67,26 @@ Observable& Observables::get(const std::string& name)
 
 const Observable& Observables::get(const std::string& name) const
 {
-    const_iterator it = find(name);
-    Assert(utils::SaxParserError, it != end(),
+    ObservableList::const_iterator it = m_list.find(name);
+    Assert(utils::SaxParserError, it != m_list.end(),
            (boost::format("Observable %1% doest not exist") % name));
 
     return it->second;
 }
 
-void Observables::clean_no_permanent()
+void Observables::cleanNoPermanent()
 {
-    iterator previous = begin();
-    iterator it = begin();
+    ObservableList::iterator previous = m_list.begin();
+    ObservableList::iterator it = m_list.begin();
     
-    while (it != end()) {
+    while (it != m_list.end()) {
         if (not it->second.isPermanent()) {
             if (it == previous) {
-                erase(it);
-                previous = begin();
-                it = begin();
+                m_list.erase(it);
+                previous = m_list.begin();
+                it = m_list.begin();
             } else {
-                erase(it);
+                m_list.erase(it);
                 it = previous;
             }
         } else {

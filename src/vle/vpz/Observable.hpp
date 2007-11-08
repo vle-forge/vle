@@ -31,17 +31,28 @@
 
 namespace vle { namespace vpz {
 
+    /**
+     * @brief Define a list of string like a list of view name.
+     */
+    typedef std::list < std::string > ViewNameList;
+    
+    /** 
+     * @brief Define a list of string like a list of port name.
+     */
+    typedef std::list < std::string > PortNameList;
+
+    
     /** 
      * @brief ObservablePort represents the list of views names that an
      * observale port can containt.
      * @code
      * <port name="y">
-     *  <view name="viewA" />
-     *  <view name="viewB" />
+     *  <attachedview name="viewA" />
+     *  <attachedview name="viewB" />
      * </port>
      * @endcode
      */
-    class ObservablePort : public Base, public std::list < std::string >
+    class ObservablePort : public Base
     {
     public:
         ObservablePort(const std::string& portname);
@@ -74,11 +85,9 @@ namespace vle { namespace vpz {
          */
         bool exist(const std::string& view) const;
 
-        //
-        ///
+        ////
         //// Get/Set functions
-        ///
-        //
+        ////
 
         /** 
          * @brief Return the name of the ObservablePort.
@@ -87,13 +96,25 @@ namespace vle { namespace vpz {
         inline const std::string& name() const
         { return m_name; }
 
+        /** 
+         * @brief Get a constant reference to the ViewNameList.
+         * @return Return a constant reference to the ViewNameList.
+         */
+        inline const ViewNameList& viewnamelist() const
+        { return m_list; }
+
     private:
         ObservablePort()
         { }
 
+        ViewNameList    m_list;
         std::string     m_name;
     };
 
+    /** 
+     * @brief Define a list of ObservablePort.
+     */
+    typedef std::map < std::string, ObservablePort > ObservablePortList;
 
     /** 
      * @brief An Observable is a definition of states ports. Each state port is
@@ -108,12 +129,9 @@ namespace vle { namespace vpz {
      * </observable>
      * @endcode
      */
-    class Observable : public Base, public std::map < std::string,
-                                                      ObservablePort >
+    class Observable : public Base
     {
     public:
-        typedef std::list < std::string > PortnameList;
-
         Observable(const std::string& name);
         
         virtual ~Observable()
@@ -123,6 +141,13 @@ namespace vle { namespace vpz {
 
         virtual Base::type getType() const
         { return OBSERVABLE; }
+
+        /** 
+         * @brief Get a constant reference to the ObservablePortList.
+         * @return Return a constant reference to the ObservablePortList.
+         */
+        inline const ObservablePortList& observableportlist() const
+        { return m_list; }
 
         /** 
          * @brief Add a new ObservablePort with only a name.
@@ -162,17 +187,27 @@ namespace vle { namespace vpz {
          * @return true if ObservablePort exist, false otherwise.
          */
         inline bool exist(const std::string& portname) const
-        { return find(portname) != end(); }
+        { return m_list.find(portname) != m_list.end(); }
 
-        bool hasView(const std::string& name) const;
+        /** 
+         * @brief Return true if one ObservablePort have the specified attached
+         * view.
+         * @param viewname The name of the view to test.
+         * @return True if view is found in an ObservablePort, false otherwise.
+         */
+        bool hasView(const std::string& viewname) const;
 
-        PortnameList getPortname(const std::string& view) const;
+        /** 
+         * @brief Return a list of portname that are attached to the specified
+         * view.
+         * @param viewname The name of the view to get port name.
+         * @return a list of portname.
+         */
+        PortNameList getPortname(const std::string& view) const;
 
-        //
-        ///
+        ////
         //// Get/Set functions.
-        ///
-        //
+        ////
         
         /** 
          * @brief Return true if this observable is a permanent data for the
@@ -202,8 +237,40 @@ namespace vle { namespace vpz {
         Observable()
         { }
 
+        ObservablePortList  m_list;
         std::string         m_name;
         bool                m_ispermanent;
+
+        struct HasView
+        {
+            HasView(const std::string& name) :
+                m_name(name)
+            { }
+
+            inline bool operator()(const ObservablePortList::value_type& pair)
+            { return pair.second.exist(m_name); }
+            
+            const std::string& m_name;
+        };
+
+        struct AddAttachedViewPortname
+        {
+            AddAttachedViewPortname(PortNameList& lst,
+                                    const std::string& viewname) :
+                m_list(lst),
+                m_viewname(viewname)
+            { }
+
+            inline void operator()(const ObservablePortList::value_type& pair)
+            {
+                if (pair.second.exist(m_viewname)) {
+                    m_list.push_back(pair.first);
+                }
+            }
+
+            PortNameList&       m_list;
+            const std::string&  m_viewname;
+        };
     };
 
 }} // namespace vle vpz

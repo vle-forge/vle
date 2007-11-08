@@ -25,18 +25,23 @@
 #ifndef VLE_VPZ_OUTPUTS_HPP
 #define VLE_VPZ_OUTPUTS_HPP
 
-#include <list>
-#include <string>
 #include <vle/vpz/Base.hpp>
 #include <vle/vpz/Output.hpp>
+#include <map>
+#include <string>
 
 namespace vle { namespace vpz {
 
+    /** 
+     * @brief A list of Output.
+     */
+    typedef std::map < std::string, Output > OutputList;
 
     /** 
-     * @brief This class stores a list of Output.
+     * @brief Outputs is a container based on OutputList to build a list of
+     * Output using the Output's name as key.
      */
-    class Outputs : public Base, public std::map < std::string, Output >
+    class Outputs : public Base
     {
     public:
         Outputs()
@@ -48,27 +53,35 @@ namespace vle { namespace vpz {
          * @brief Write under the element XML the tags the XML code. If not
          * output are stored, no tag are build.
          * @code
-         * <OUTPUTS>
-         *  <OUTPUT NAME="output1" FORMAT="text" LOCATION="" />
+         * <outputs>
+         *  <output name="output1" format="local|distant" location="" />
          *  ...
-         * </OUTPUTS>
+         * </outputs>
          * @endcode
-         * 
          * @param elt A node to the parent of OUTPUTS tags. 
          */
         virtual void write(std::ostream& out) const;
 
         virtual Base::type getType() const
         { return OUTPUTS; }
+
+        ////
+        //// OutputList managment
+        ////
+
+        /** 
+         * @brief Return a constant reference to the OutputList.
+         * @return A constant reference.
+         */
+        inline const OutputList& outputlist() const
+        { return m_list; }
         
         /** 
          * @brief Add an output with text stream information. The name is
          * obligatory, the location defines a filename.
-         * 
          * @param name the output name.
          * @param location the file name.
          * @param plugin to use in steam.
-         *
          * @throw Exception::Internal if name is empty.
          */
         Output& addLocalStream(const std::string& name,
@@ -78,11 +91,9 @@ namespace vle { namespace vpz {
         /** 
          * @brief Add an output with the sdml stream information. The name is
          * obligatory, the location defines a filename.
-         * 
          * @param name the output name.
          * @param location the file name.
          * @param plugin to use in steam.
-         *
          * @throw Exception::Internal if name is empty.
          */
         Output& addDistantStream(const std::string& name,
@@ -90,17 +101,19 @@ namespace vle { namespace vpz {
                                  const std::string& plugin);
 
         /** 
-         * @brief Delete the specified output.
-         * @param name the name of the output to delete.
-         */
-        void del(const std::string& name);
-
-        /** 
          * @brief Add a list of outputs into the current list.
          * @param o the list of outputs to add.
          * @throw Exception::Internal if name or plugin already exist.
          */
         void add(const Outputs& o);
+
+        /** 
+         * @brief Add an output into the outputs list. 
+         * @param name the name of the output to add.
+         * @param o the output to add.
+         * @throw Exception::Internal if the output already exist.
+         */
+        Output& add(const Output& o);
 
         /** 
          * @brief Find an Output reference from list.
@@ -117,29 +130,87 @@ namespace vle { namespace vpz {
          * @throw Exception::Internal if Output does not exist.
          */
         const Output& get(const std::string& name) const;
+        
+        /** 
+         * @brief Delete the specified output.
+         * @param name the name of the output to delete.
+         */
+        void del(const std::string& name);
 
         /** 
-         * @brief Get the list of all output name.
-         * @return the list of output name.
+         * @brief Remove all Output from the OutputList.
          */
-        std::list < std::string > outputsname() const;
+        inline void clear();
 
         /** 
          * @brief Test if an Output exist with the specified name.
          * @param name Output name to test.
          * @return true if Output exist, false otherwise.
          */
-        bool exist(const std::string& name) const;
+        inline bool exist(const std::string& name) const;
+
+        /** 
+         * @brief Test if the OutputList is empty or not.
+         * @return true if OutputList is empty, false otherwise.
+         */
+        inline bool empty() const;
+
+        ////
+        //// Usefull functions.
+        ////
+
+        /** 
+         * @brief Get the list of all output name.
+         * @return the list of output name.
+         */
+        std::list < std::string > outputsname() const;
         
     private:
-        /** 
-         * @brief Add an output into the outputs list. 
-         * @param name the name of the output to add.
-         * @param o the output to add.
-         * @throw Exception::Internal if the output already exist.
-         */
-        Output& add(const Output& o);
+        OutputList  m_list;
+
+        struct AddOutput
+        {
+            inline AddOutput(Outputs& outputs) :
+                m_outputs(outputs)
+            { }
+
+            inline void operator()(const OutputList::value_type& pair)
+            { m_outputs.add(pair.second); }
+
+            Outputs& m_outputs;
+        };
+
+        struct AddOutputName
+        {
+            inline AddOutputName(std::list < std::string >& lst) :
+                m_list(lst)
+            { }
+
+            inline void operator()(const OutputList::value_type& pair)
+            { m_list.push_back(pair.first); }
+
+            std::list < std::string >& m_list;
+        };
     };
+
+    ////
+    //// Implementation
+    ////
+    
+    void Outputs::clear()
+    {
+        m_list.clear();
+    }
+
+    bool Outputs::exist(const std::string& name) const
+    {
+        return m_list.find(name) != m_list.end();
+    }
+
+    bool Outputs::empty() const
+    {
+        return m_list.empty();
+    }
 
 }} // namespace vle vpz
 

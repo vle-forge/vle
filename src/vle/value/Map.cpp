@@ -36,7 +36,7 @@ namespace vle { namespace value {
 MapFactory::MapFactory(const MapFactory& mapfactory) :
     ValueBase(mapfactory)
 {
-    for (MapValueConstIt it = mapfactory.m_value.begin();
+    for (MapValue::const_iterator it = mapfactory.m_value.begin();
          it != mapfactory.m_value.end(); ++it) {
         addValue((*it).first, (*it).second);
     }
@@ -54,7 +54,7 @@ Value MapFactory::clone() const
 
 void MapFactory::addValue(const std::string& name, Value value)
 {
-    MapValueIt it = m_value.find(name);
+    MapValue::iterator it = m_value.find(name);
     if (it == m_value.end()) {
         m_value[name] = value;
     } else {
@@ -64,7 +64,7 @@ void MapFactory::addValue(const std::string& name, Value value)
 
 Value MapFactory::getValue(const std::string& name) const
 {
-    MapValueConstIt it = m_value.find(name);
+    MapValue::const_iterator it = m_value.find(name);
 
     if (it == m_value.end()) {
         throw(std::runtime_error((boost::format(
@@ -117,7 +117,7 @@ void MapFactory::clear()
 std::string MapFactory::toFile() const
 {
     std::string s;
-    MapValueConstIt it = m_value.begin();
+    MapValue::const_iterator it = m_value.begin();
 
     while (it != m_value.end()) {
         s += "(";
@@ -136,7 +136,7 @@ std::string MapFactory::toFile() const
 std::string MapFactory::toString() const
 {
     std::string s;
-    MapValueConstIt it = m_value.begin();
+    MapValue::const_iterator it = m_value.begin();
 
     while (it != m_value.end()) {
         s += "(";
@@ -155,7 +155,7 @@ std::string MapFactory::toString() const
 std::string MapFactory::toXML() const
 {
     std::string s="<map>";
-    MapValueConstIt it = m_value.begin();
+    MapValue::const_iterator it = m_value.begin();
 
     while (it != m_value.end()) {
         s += "<key name=\"";
@@ -176,7 +176,7 @@ Map toMapValue(const Value& value)
     return boost::static_pointer_cast < MapFactory >(value);
 }
 
-const MapFactory::MapValue& toMap(const Value& value)
+const MapValue& toMap(const Value& value)
 {
     Assert(utils::InternalError, value->getType() == ValueBase::MAP,
            "Value is not a Map");

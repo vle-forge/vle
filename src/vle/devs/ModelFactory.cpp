@@ -129,9 +129,12 @@ Simulator* ModelFactory::createModel(Coordinator& coordinator,
 
     if (not observable.empty()) {
         vpz::Observable& ob(mExperiment.views().observables().get(observable));
-        for (vpz::Observable::iterator it = ob.begin(); it != ob.end(); ++it) {
-            for (vpz::ObservablePort::iterator jt = it->second.begin();
-                 jt != it->second.end(); ++jt) {
+        const vpz::ObservablePortList& lst(ob.observableportlist());
+        for (vpz::ObservablePortList::const_iterator it = lst.begin();
+             it != lst.end(); ++it) {
+            const vpz::ViewNameList& vnlst(it->second.viewnamelist());
+            for (vpz::ViewNameList::const_iterator jt = vnlst.begin();
+                 jt != vnlst.end(); ++jt) {
 
                 View* view = coordinator.getView(*jt);
                 Assert(utils::InternalError, view, (boost::format(

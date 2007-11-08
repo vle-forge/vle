@@ -30,25 +30,24 @@
 
 
 namespace vle { namespace value {
+    
+    /** 
+     * @brief Define a list of Value in a dictionnary.
+     */
+    typedef std::map < std::string, Value > MapValue;
 
     /**
      * @brief Map Value a container to a pair of (std::string,  Value class).
-     *
      */
     class MapFactory : public ValueBase
     {
     private:
-
         MapFactory()
         { }
 
         MapFactory(const MapFactory& mapfactory);
 
     public:
-        typedef std::map < std::string, Value > MapValue;
-        typedef std::map < std::string, Value >::iterator MapValueIt;
-        typedef std::map < std::string, Value >::const_iterator MapValueConstIt;
-
         virtual ~MapFactory()
         { }
 
@@ -65,14 +64,14 @@ namespace vle { namespace value {
 
         /**
          * @code
-         * <MAP>
-         *  <VALUE NAME="x">
-         *   <INTEGER VALUE="5" />
-         *  </VALUE>
-         *  <VALUE NAME="y">
-         *   <INTEGER VALUE="0" />
-         *  </VALUE>
-         * </MAP>
+         * <map>
+         *  <value name="x">
+         *   <integer value="5" />
+         *  </value>
+         *  <value name="y">
+         *   <integer value="0" />
+         *  </value>
+         * </map>
          * @endcode
          */
         virtual std::string toXML() const;
@@ -91,13 +90,36 @@ namespace vle { namespace value {
 
         /** 
          * @brief Test if the map have a Value with specified name.
-         * 
          * @param name the name to find into value.
-         * 
          * @return true if Value exist, false otherwise.
          */
         inline bool existValue(const std::string& name) const
         { return m_value.find(name) != m_value.end(); }
+
+        /** 
+         * @brief Get a Value from the map specified by his name. If name does
+         * not exist, a new value is build.
+         * @param name The name of the value.
+         * @return A reference to the specified value or a newly builded.
+         */
+        inline Value& operator[](const std::string& name)
+        { return m_value[name]; }
+
+        /** 
+         * @brief Get a Value from the map specified by his name.
+         * @param name The name of the value.
+         * @throw utils::InternalError if value name does not exist.
+         * @return A Value.
+         */
+        Value& get(const std::string& name);
+
+        /** 
+         * @brief Get a Value from the map specified by his name.
+         * @param name The name of the value.
+         * @throw utils::InternalError if value name does not exist.
+         * @return A constant Value reference.
+         */
+        const Value& get(const std::string& name) const;
 
         /** 
          * @brief Get an access to the std::map.
@@ -220,7 +242,7 @@ namespace vle { namespace value {
          * 
          * @return the first iterator.
          */
-        inline MapValueConstIt begin() const
+        inline MapValue::const_iterator begin() const
         { return m_value.begin(); }
 
         /** 
@@ -228,7 +250,7 @@ namespace vle { namespace value {
          * 
          * @return the last iterator.
          */
-        inline MapValueConstIt end() const
+        inline MapValue::const_iterator end() const
         { return m_value.end(); }
 
     private:
@@ -237,7 +259,7 @@ namespace vle { namespace value {
 
     Map toMapValue(const Value& value);
 
-    const MapFactory::MapValue& toMap(const Value& value);
+    const MapValue& toMap(const Value& value);
 
 }} // namespace vle value
 #endif

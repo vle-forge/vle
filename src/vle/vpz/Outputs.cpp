@@ -23,26 +23,22 @@
  */
 
 #include <vle/vpz/Outputs.hpp>
-#include <vle/utils/XML.hpp>
 #include <vle/utils/Debug.hpp>
-#include <vle/utils/Trace.hpp>
 
 namespace vle { namespace vpz {
 
-using namespace vle::utils;
-
 void Outputs::write(std::ostream& out) const
 {
-    if (not empty()) {
+    if (not m_list.empty()) {
         out << "<outputs>\n";
 
-        for (const_iterator it = begin(); it != end(); ++it) {
+        for (OutputList::const_iterator it = m_list.begin();
+             it != m_list.end(); ++it) {
             it->second.write(out);
         }
 
         out << "</outputs>\n";
     }
-
 }
 
 Output& Outputs::addLocalStream(const std::string& name,
@@ -50,7 +46,6 @@ Output& Outputs::addLocalStream(const std::string& name,
                                 const std::string& plugin)
 {
     Output o;
-
     o.setName(name);
     o.setLocalStream(location, plugin);
     return add(o);
@@ -68,33 +63,34 @@ Output& Outputs::addDistantStream(const std::string& name,
 
 void Outputs::del(const std::string& name)
 {
-    iterator it = find(name);
+    OutputList::iterator it = m_list.find(name);
 
-    if (it != end()) {
-        erase(it);
+    if (it != m_list.end()) {
+        m_list.erase(it);
     }
 }
 
 void Outputs::add(const Outputs& o)
 {
-    for (const_iterator it = o.begin(); it != o.end(); ++it) {
-        add(it->second);
-    }
+    std::for_each(o.outputlist().begin(),
+                  o.outputlist().end(),
+                  AddOutput(*this));
 }
 
 Output& Outputs::add(const Output& o)
 {
-    Assert(utils::InternalError, exist(o.name()) == false,
+    Assert(utils::InternalError, not exist(o.name()),
            boost::format("An output have already this name '%1%'\n") %
            o.name());
 
-    return (*insert(std::make_pair < std::string, Output >(o.name(), o)).first).second;
+    return (*m_list.insert(std::make_pair < std::string, Output >(
+                o.name(), o)).first).second;
 }
 
 Output& Outputs::get(const std::string& name)
 {
-    iterator it = find(name);
-    Assert(utils::InternalError, it != end(),
+    OutputList::iterator it = m_list.find(name);
+    Assert(utils::InternalError, it != m_list.end(),
            boost::format("Unknow output '%1%'\n") % name);
 
     return it->second;
@@ -102,8 +98,8 @@ Output& Outputs::get(const std::string& name)
 
 const Output& Outputs::get(const std::string& name) const
 {
-    const_iterator it = find(name);
-    Assert(utils::InternalError, it != end(),
+    OutputList::const_iterator it = m_list.find(name);
+    Assert(utils::InternalError, it != m_list.end(),
            boost::format("Unknow output '%1%'\n") % name);
 
     return it->second;
@@ -113,16 +109,9 @@ std::list < std::string > Outputs::outputsname() const
 {
     std::list < std::string > result;
 
-    const_iterator it;
-    for (it = begin(); it != end(); ++it) {
-        result.push_back(it->second.name());
-    }
-    return result;
-}
+    std::for_each(m_list.begin(), m_list.end(), AddOutputName(result));
 
-bool Outputs::exist(const std::string& name) const
-{
-    return find(name) != end();
+    return result;
 }
 
 }} // namespace vle vpz

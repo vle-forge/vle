@@ -69,7 +69,7 @@ const std::string& Event::getSourceModelName() const
 
 void Event::putAttribute(vle::value::Map mp)
 {
-    for (value::MapFactory::MapValueIt it = mp->getValue().begin();
+    for (value::MapValue::iterator it = mp->getValue().begin();
          it != mp->getValue().end(); ++it) {
         putAttribute((*it).first, (*it).second);
     }

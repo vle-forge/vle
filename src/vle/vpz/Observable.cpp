@@ -23,18 +23,13 @@
  */
 
 #include <vle/vpz/Observable.hpp>
-#include <vle/utils/XML.hpp>
 #include <vle/utils/Debug.hpp>
 
 namespace vle { namespace vpz {
 
-using namespace vle::utils;
-
-//
-///
+////
 //// ObservablePort class.
-///
-//
+////
 
 ObservablePort::ObservablePort(const std::string& portname) :
     m_name(portname)
@@ -43,11 +38,12 @@ ObservablePort::ObservablePort(const std::string& portname) :
 
 void ObservablePort::write(std::ostream& out) const
 {
-    if (empty()) {
+    if (m_list.empty()) {
         out << "<port name=\"" << m_name << "\" />\n";
     } else {
         out << "<port name=\"" << m_name << "\" >\n";
-        for (const_iterator it = begin(); it != end(); ++it) {
+        for (ViewNameList::const_iterator it = m_list.begin(); it !=
+             m_list.end(); ++it) {
             out << " <attachedview name=\"" << *it << "\" />\n";
         }
         out << "</port>\n";
@@ -60,34 +56,26 @@ void ObservablePort::add(const std::string& portname)
            (boost::format("The port %1% have already a view %2%") %
             m_name % portname));
 
-    push_back(portname);
+    m_list.push_back(portname);
 }
 
 void ObservablePort::del(const std::string& portname)
 {
-    for (iterator it = begin(); it != end(); ++it) {
-        if ((*it) == portname) {
-            erase(it);
-            return;
-        }
-    }
+    m_list.erase(std::remove_if(m_list.begin(), m_list.end(),
+                                std::bind2nd(std::equal_to < std::string >(),
+                                             portname)), m_list.end());;
 }
 
 bool ObservablePort::exist(const std::string& portname) const
 {
-    for (const_iterator it = begin(); it != end(); ++it) {
-        if ((*it) == portname) {
-            return true;
-        }
-    }
-    return false;
+    return std::find_if(m_list.begin(), m_list.end(), 
+                     std::bind2nd(std::equal_to < std::string >(), portname))
+        != m_list.end();
 }
 
-//
-///
+////
 //// Observable class.
-///
-//
+////
 
 Observable::Observable(const std::string& name) :
     m_name(name)
@@ -96,9 +84,10 @@ Observable::Observable(const std::string& name) :
 
 void Observable::write(std::ostream& out) const
 {
-    if (not empty()) {
+    if (not m_list.empty()) {
         out << "<observable name=\"" << m_name << "\" >\n";
-        for (const_iterator it = begin(); it != end(); ++it) {
+        for (ObservablePortList::const_iterator it = m_list.begin(); it !=
+             m_list.end(); ++it) {
             it->second.write(out);
         }
         out << "</observable>\n";
@@ -113,7 +102,7 @@ ObservablePort& Observable::add(const std::string& portname)
            (boost::format("The observable %1% have already a port %2%") %
             m_name, portname));
 
-    return (*insert(std::make_pair < std::string, ObservablePort >(
+    return (*m_list.insert(std::make_pair < std::string, ObservablePort >(
                 portname, ObservablePort(portname))).first).second;
 }
 
@@ -123,14 +112,14 @@ ObservablePort& Observable::add(const ObservablePort& obs)
            (boost::format("The observable %1% have already a port %2%") %
             m_name, obs.name()));
 
-    return (*insert(std::make_pair < std::string, ObservablePort >(
+    return (*m_list.insert(std::make_pair < std::string, ObservablePort >(
                 obs.name(), obs)).first).second;
 }
 
 ObservablePort& Observable::get(const std::string& portname)
 {
-    iterator it = find(portname);
-    Assert(utils::SaxParserError, it != end(),
+    ObservablePortList::iterator it = m_list.find(portname);
+    Assert(utils::SaxParserError, it != m_list.end(),
            (boost::format("The observable %1% have not port %2%") %
             m_name, portname));
     return it->second;
@@ -138,8 +127,8 @@ ObservablePort& Observable::get(const std::string& portname)
 
 const ObservablePort& Observable::get(const std::string& portname) const
 {
-    const_iterator it = find(portname);
-    Assert(utils::SaxParserError, it != end(),
+    ObservablePortList::const_iterator it = m_list.find(portname);
+    Assert(utils::SaxParserError, it != m_list.end(),
            (boost::format("The observable %1% have not port %2%") %
             m_name, portname));
     return it->second;
@@ -147,25 +136,18 @@ const ObservablePort& Observable::get(const std::string& portname) const
 
 bool Observable::hasView(const std::string& name) const
 {
-    for (const_iterator it = begin(); it != end(); ++it) {
-        if (it->second.exist(name)) {
-            return true;
-        }
-    }
-    return false;
+    return std::find_if(m_list.begin(), m_list.end(), HasView(name))
+        != m_list.end();
 }
 
-Observable::PortnameList
-Observable::getPortname(const std::string& name) const
+PortNameList Observable::getPortname(const std::string& name) const
 {
-    PortnameList lst;
+    std::list < std::string > result;
 
-    for (const_iterator it = begin(); it != end(); ++it) {
-        if (it->second.exist(name)) {
-            lst.push_back(it->first);
-        }
-    }
-    return lst;
+    std::for_each(m_list.begin(), m_list.end(), 
+                  AddAttachedViewPortname(result, name));
+
+    return result;
 }
 
 }} // namespace vle vpz

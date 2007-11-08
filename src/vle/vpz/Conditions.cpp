@@ -38,10 +38,11 @@ Conditions::Conditions() :
 
 void Conditions::write(std::ostream& out) const
 {
-    if (not empty()) {
+    if (not m_list.empty()) {
         out << "<conditions>\n";
 
-        for (const_iterator it = begin(); it != end(); ++it) {
+        for (ConditionList::const_iterator it = m_list.begin(); 
+             it != m_list.end(); ++it) {
             out << it->second;
         }
 
@@ -51,31 +52,31 @@ void Conditions::write(std::ostream& out) const
 
 void Conditions::add(const Conditions& cdts)
 {
-    for (const_iterator it = cdts.begin(); it != cdts.end(); ++it)
-        add(it->second);
+    std::for_each(cdts.conditionlist().begin(), cdts.conditionlist().end(),
+                  AddCondition(*this));
 }
 
 Condition& Conditions::add(const Condition& condition)
 {
-    const_iterator it = find(condition.name());
-    Assert(utils::InternalError, it == end(),
+    ConditionList::const_iterator it = m_list.find(condition.name());
+    Assert(utils::InternalError, it == m_list.end(),
            boost::format("The condition %1% already exist") %
            condition.name());
 
-    return (*insert(
+    return (*m_list.insert(
             std::make_pair < std::string, Condition >(
                 condition.name(), condition)).first).second;
 }
 
 void Conditions::del(const std::string& condition)
 {
-    erase(condition);
+    m_list.erase(condition);
 }
 
 const Condition& Conditions::get(const std::string& condition) const
 {
-    const_iterator it = find(condition);
-    Assert(utils::InternalError, it != end(),
+    ConditionList::const_iterator it = m_list.find(condition);
+    Assert(utils::InternalError, it != m_list.end(),
            boost::format("The condition %1% not exist") %
            condition);
 
@@ -84,8 +85,8 @@ const Condition& Conditions::get(const std::string& condition) const
 
 Condition& Conditions::get(const std::string& condition)
 {
-    iterator it = find(condition);
-    Assert(utils::InternalError, it != end(),
+    ConditionList::iterator it = m_list.find(condition);
+    Assert(utils::InternalError, it != m_list.end(),
            boost::format("The condition %1% not exist") %
            condition);
 
@@ -94,17 +95,17 @@ Condition& Conditions::get(const std::string& condition)
     
 void Conditions::cleanNoPermanent()
 {
-    iterator prev = begin();
-    iterator it = begin();
+    ConditionList::iterator prev = m_list.begin();
+    ConditionList::iterator it = m_list.begin();
     
-    while (it != end()) {
+    while (it != m_list.end()) {
         if (not it->second.isPermanent()) {
             if (prev == it) {
-                erase(it);
-                prev = begin();
-                it = begin();
+                m_list.erase(it);
+                prev = m_list.begin();
+                it = m_list.begin();
             } else {
-                erase(it);
+                m_list.erase(it);
                 it = prev;
             }
         } else {
@@ -116,9 +117,7 @@ void Conditions::cleanNoPermanent()
 
 void Conditions::rebuildValueSet()
 {
-    for (iterator it = begin(); it != end(); ++it) {
-        it->second.rebuildValueSet();
-    }
+    std::for_each(m_list.begin(), m_list.end(), RebuildValueSet());
 }
 
 }} // namespace vle vpz
