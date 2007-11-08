@@ -30,6 +30,11 @@
 
 
 namespace vle { namespace value {
+    
+    /** 
+     * @brief Define a std::Vector of value.
+     */
+    typedef std::vector < Value > VectorValue;
 
     /**
      * @brief Set Value a container to Value class.
@@ -44,10 +49,6 @@ namespace vle { namespace value {
         SetFactory(const SetFactory& setfactory);
 
     public:
-        typedef std::vector < Value > VectorValue;
-        typedef std::vector < Value >::iterator VectorValueIt;
-        typedef std::vector < Value >::const_iterator VectorValueConstIt;
-
         virtual ~SetFactory()
         { }
 
@@ -74,7 +75,7 @@ namespace vle { namespace value {
          * 
          * @return the first iterator.
          */
-        inline VectorValueIt begin()
+        inline VectorValue::iterator begin()
         { return m_value.begin(); }
 
         /** 
@@ -82,7 +83,7 @@ namespace vle { namespace value {
          * 
          * @return the first iterator.
          */
-        inline VectorValueConstIt begin() const
+        inline VectorValue::const_iterator begin() const
         { return m_value.begin(); }
 
         /** 
@@ -90,7 +91,7 @@ namespace vle { namespace value {
          * 
          * @return the last iterator.
          */
-        inline VectorValueIt end()
+        inline VectorValue::iterator end()
         { return m_value.end(); }
 
         /** 
@@ -98,7 +99,7 @@ namespace vle { namespace value {
          * 
          * @return the last iterator.
          */
-        inline VectorValueConstIt end() const
+        inline VectorValue::const_iterator end() const
         { return m_value.end(); }
 
         inline const VectorValue& getValue() const
@@ -125,7 +126,7 @@ namespace vle { namespace value {
     
     Set toSetValue(const Value& value);
     
-    const SetFactory::VectorValue& toSet(const Value& value);
+    const VectorValue& toSet(const Value& value);
 
 }} // namespace vle value
 #endif

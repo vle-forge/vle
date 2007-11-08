@@ -71,8 +71,8 @@ void Condition::write(std::ostream& out) const
             << "name=\"" << it->first << "\" "
             << ">\n";
 
-        const value::SetFactory::VectorValue& val(value::toSet(it->second));
-        for (value::SetFactory::VectorValue::const_iterator jt = val.begin();
+        const value::VectorValue& val(value::toSet(it->second));
+        for (value::VectorValue::const_iterator jt = val.begin();
              jt != val.end(); ++jt) {
             out << (*jt)->toXML();
         }

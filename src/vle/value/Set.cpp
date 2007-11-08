@@ -56,7 +56,7 @@ void SetFactory::addValue(Value value)
 std::string SetFactory::toFile() const
 {
     std::string s;
-    VectorValueConstIt it = m_value.begin();
+    VectorValue::const_iterator it = m_value.begin();
 
     while (it != m_value.end()) {
 	s += (*it)->toFile();
@@ -70,7 +70,7 @@ std::string SetFactory::toFile() const
 std::string SetFactory::toString() const
 {
     std::string s = "(";
-    VectorValueConstIt it = m_value.begin();
+    VectorValue::const_iterator it = m_value.begin();
 
     while (it != m_value.end()) {
 	s += (*it)->toString();
@@ -85,7 +85,7 @@ std::string SetFactory::toString() const
 std::string SetFactory::toXML() const
 {
     std::string s="<set>";
-    VectorValueConstIt it = m_value.begin();
+    VectorValue::const_iterator it = m_value.begin();
 
     while (it != m_value.end()) {
 	s += (*it)->toXML();
@@ -102,7 +102,7 @@ Set toSetValue(const Value& value)
     return boost::static_pointer_cast < SetFactory >(value);
 }
 
-const SetFactory::VectorValue& toSet(const Value& value)
+const VectorValue& toSet(const Value& value)
 {
     Assert(utils::InternalError, value->getType() == ValueBase::SET,
            "Value is not a Set");

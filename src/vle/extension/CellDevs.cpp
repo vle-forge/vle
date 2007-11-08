@@ -468,7 +468,7 @@ void CellDevs::processInitEvents(const InitEventList& event)
     else
       if (name == "Neighbourhood") {
 	value::Set set = value::toSetValue(value);
-	value::SetFactory::VectorValueConstIt it2 = set->begin();
+	value::VectorValue::const_iterator it2 = set->begin();
 	
 	while (it2 != set->end()) {
 	  std::string neighbour = vle::value::toString(*it2);

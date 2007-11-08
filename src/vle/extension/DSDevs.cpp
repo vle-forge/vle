@@ -595,8 +595,8 @@ bool DSDevs::processBag(const value::Map& val)
     value::Set bag = value::toSetValue(valuebag);
     bool result = true;
 
-    value::SetFactory::VectorValue& vv(bag->getValue());
-    for (value::SetFactory::VectorValueIt it = vv.begin();
+    value::VectorValue& vv(bag->getValue());
+    for (value::VectorValue::iterator it = vv.begin();
          it != vv.end(); ++it) {
         value::Map msg = value::toMapValue(*it);
         value::Value msgaction = msg->getValue("action");
