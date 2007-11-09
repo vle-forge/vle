@@ -47,6 +47,8 @@ namespace vle { namespace vpz {
         value::Value get(const std::string& name);
 
         const value::Value& get(const std::string& name) const;
+
+	bool exist(const std::string& name) const;
     };
 
     /** 

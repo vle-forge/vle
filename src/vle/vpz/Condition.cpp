@@ -50,6 +50,11 @@ value::Value ValueList::get(const std::string& name)
     return it->second;
 }
 
+bool ValueList::exist(const std::string& name) const
+{
+    return find(name) != end();
+}
+
 const value::Value& ValueList::get(const std::string& name) const
 {
     const_iterator it;
