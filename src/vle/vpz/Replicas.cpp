@@ -23,13 +23,10 @@
  */
 
 #include <vle/vpz/Replicas.hpp>
-#include <vle/utils/XML.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Rand.hpp>
 
 namespace vle { namespace vpz {
-
-using namespace vle::utils;
 
 Replicas::Replicas() :
     m_number(1),

@@ -76,10 +76,11 @@ BOOST_AUTO_TEST_CASE(test_translator)
     const vpz::Project& prj(vpz.project());
 
     const vpz::NoVLEs& novles(prj.novles());
-    BOOST_REQUIRE(novles.empty());
+    BOOST_REQUIRE(novles.novlelist().empty());
     
     const vpz::Dynamics& dyns(prj.dynamics());
-    BOOST_REQUIRE_EQUAL(dyns.size(), (vpz::Dynamics::size_type)1);
+    BOOST_REQUIRE_EQUAL(dyns.dynamiclist().size(),
+                        (vpz::DynamicList::size_type)1);
     
     const vpz::Experiment& exp(prj.experiment());
     const vpz::Views& views(exp.views());
@@ -147,7 +148,7 @@ BOOST_AUTO_TEST_CASE(test_translator_write)
     const vpz::NoVLEs& novles1(vpz1.project().novles());
     const vpz::NoVLEs& novles2(vpz2.project().novles());
 
-    BOOST_REQUIRE_EQUAL(novles1.size(), novles2.size());
+    BOOST_REQUIRE_EQUAL(novles1.novlelist().size(), novles2.novlelist().size());
     BOOST_REQUIRE(novles1.exist("xxx"));
     BOOST_REQUIRE(novles2.exist("xxx"));
 

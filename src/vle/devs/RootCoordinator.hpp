@@ -29,6 +29,12 @@
 #include <vle/devs/Time.hpp>
 #include <vle/vpz/Vpz.hpp>
 
+namespace vle { namespace graph {
+
+    class Model;
+
+}} // namespace vle graph
+
 namespace vle { namespace devs {
 
     class Coordinator;
@@ -80,10 +86,11 @@ namespace vle { namespace devs {
         { return m_currentTime; }
 
     private:
-	devs::Time      m_currentTime;
-        devs::Time      m_duration;
-	Coordinator*    m_coordinator;
-	ModelFactory*   m_modelfactory;
+	devs::Time          m_currentTime;
+        devs::Time          m_duration;
+	Coordinator*        m_coordinator;
+	ModelFactory*       m_modelfactory;
+        graph::Model*       m_root;
     };
 
 }} // namespace vle devs

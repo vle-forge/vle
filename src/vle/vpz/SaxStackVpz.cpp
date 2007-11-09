@@ -41,6 +41,11 @@
 
 namespace vle { namespace vpz {
 
+SaxStackVpz::~SaxStackVpz()
+{
+    Assert(utils::InternalError, m_stack.empty(), "SaxStackVpz not empty");
+}
+
 std::ostream& operator<<(std::ostream& out, const SaxStackVpz& stack)
 {
     SaxStackVpz nv(stack);

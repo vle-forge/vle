@@ -47,8 +47,7 @@ namespace vle { namespace vpz {
         virtual void write(std::ostream& out) const = 0;
     };
 
-    class TrameList : public std::list < Trame* >
-    { };
+    typedef std::list < Trame* > TrameList;
 
     class VLETrame : public Trame
     {

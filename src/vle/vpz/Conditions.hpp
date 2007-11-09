@@ -72,10 +72,17 @@ namespace vle { namespace vpz {
         ////
 
         /** 
-         * @brief Get a reference to the ConditionList.
+         * @brief Get a constant reference to the ConditionList.
          * @return A constant reference to the ConditionList.
          */
         inline const ConditionList& conditionlist() const
+        { return m_list; }
+
+        /** 
+         * @brief Get a reference to the ConditionList.
+         * @return A reference to the ConditionList.
+         */
+        inline ConditionList& conditionlist()
         { return m_list; }
 
         /** 

@@ -124,6 +124,10 @@ namespace vle { namespace devs {
         inline bool emptyInstantaneous() const
         { return _instev.empty(); }
 
+        inline void clear()
+        { delete _intev; _intev = 0;
+            _extev.deleteAndClear(); _extev.clear();
+            _instev.deleteAndClear(); _instev.clear(); }
 
 	friend std::ostream& operator<<(std::ostream& o, EventBagModel& e) {
 	    o << "[Internal: " << e._intev << "][Externals: ";

@@ -40,8 +40,10 @@ namespace vle { namespace devs {
 void CompleteEventBagModel::delModel(Simulator* mdl)
 {
     std::map < Simulator*, EventBagModel >::iterator it = _bags.find(mdl);
-    if (it != _bags.end())
+    if (it != _bags.end()) {
+        it->second.clear();
         _bags.erase(it);
+    }
 
     for (std::deque < StateEvent* >::iterator it = _states.begin();
          it != _states.end(); ++it) {

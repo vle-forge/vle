@@ -23,13 +23,10 @@
  */
 
 #include <vle/vpz/Project.hpp>
-#include <vle/utils/XML.hpp>
 #include <vle/utils/Debug.hpp>
 #include <glibmm/date.h>
 
 namespace vle { namespace vpz {
-
-using namespace vle::utils;
 
 void Project::write(std::ostream& out) const
 {
@@ -64,7 +61,7 @@ void Project::expandTranslator()
 
 bool Project::hasNoVLE() const
 {
-    return not m_novles.empty();
+    return not m_novles.novlelist().empty();
 }
 
 void Project::setAuthor(const std::string& name)

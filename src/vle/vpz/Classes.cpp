@@ -23,13 +23,10 @@
  */
 
 #include <vle/vpz/Classes.hpp>
-#include <vle/utils/XML.hpp>
 #include <vle/utils/Debug.hpp>
 
 namespace vle { namespace vpz {
     
-using namespace vle::utils;
-
 void Classes::write(std::ostream& out) const
 {
     if (not empty()) {

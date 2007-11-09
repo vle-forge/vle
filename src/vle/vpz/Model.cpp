@@ -24,15 +24,12 @@
 
 #include <vle/vpz/Model.hpp>
 #include <vle/utils/Debug.hpp>
-#include <vle/utils/XML.hpp>
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/graph/NoVLEModel.hpp>
 #include <stack>
 
 namespace vle { namespace vpz {
-
-using namespace vle::utils;
 
 void AtomicModelList::add(const AtomicModelList& atoms)
 {

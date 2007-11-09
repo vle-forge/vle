@@ -25,11 +25,8 @@
 #include <vle/vpz/Views.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Trace.hpp>
-#include <vle/utils/XML.hpp>
 
 namespace vle { namespace vpz {
-
-using namespace vle::utils;
 
 void Views::write(std::ostream& out) const
 {

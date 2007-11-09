@@ -31,7 +31,16 @@
 
 namespace vle { namespace vpz {
 
-    class NoVLEs : public Base, public std::map < std::string, NoVLE >
+    /** 
+     * @brief Define a list of NoVLE.
+     */
+    typedef std::map < std::string, NoVLE > NoVLEList;
+
+    /** 
+     * @brief NoVLEs is a container based on NoVLEList to build a list of NoVLE
+     * using the NoVLE's name as key.
+     */
+    class NoVLEs : public Base
     {
     public:
         NoVLEs()
@@ -42,20 +51,29 @@ namespace vle { namespace vpz {
         /** 
          * @brief Write the NoVLEs information under specified node.
          * @code
-         * <NO_VLES>
-         *  <NO_VLE MODEL_NAME="system" TRANSLATOR="lifegame-tr">
-         *  </NO_VLE>
-         * </NO_VLES>
+         * <novles>
+         *  <nvvle name="name" library="lifegame-tr">
+         *  </novle>
+         * </novles>
          * @endcode
-         * 
          * @param elt a reference to the NO_VLES parent's node.
-         *
          * @throw Exception::Internal if elt is NULL.
          */
         virtual void write(std::ostream& out) const;
 
         virtual Base::type getType() const
         { return NOVLES; }
+
+        ////
+        //// NoVLEList mangment
+        ////
+
+        /** 
+         * @brief Return a constant reference to the NoVLEList.
+         * @return A constant reference.
+         */
+        const NoVLEList& novlelist() const
+        { return m_list; }
 
         /** 
          * @brief Add a new NoVLE into the list.
@@ -66,11 +84,25 @@ namespace vle { namespace vpz {
         NoVLE& add(const NoVLE& novle);
 
         /** 
+         * @brief Remove all NoVLE from the NoVLEList.
+         */
+        inline void clear()
+        { m_list.clear(); }
+
+        /** 
          * @brief Del the specified model.
          * @param modelname the name of the NoVLE model.
          */
         void del(const std::string& modelname);
 
+        /** 
+         * @brief Merge this NoVLEs object to the specified objects.
+         * @param prj A reference to the project.
+         * @param model where to merge model.
+         * @param dynamics where to merge dynamics.
+         * @param conditions where to merge conditions.
+         * @param views where to merge views.
+         */
         void fusion(const Project& prj,
                     Model& model,
                     Dynamics& dynamics,
@@ -79,13 +111,11 @@ namespace vle { namespace vpz {
 
         /** 
          * @brief Return true if a NoVLE exist with the novle string.
-         * 
          * @param novle name to find.
-         * 
          * @return true if NoVLE is found, false otherwise.
          */
-        bool exist(const std::string& novle) const
-        { return find(novle) != end(); }
+        inline bool exist(const std::string& novle) const
+        { return m_list.find(novle) != m_list.end(); }
 
         /** 
          * @brief Return a NoVLE with the specified name.
@@ -97,14 +127,14 @@ namespace vle { namespace vpz {
 
         /** 
          * @brief Return a NoVLE with the specified name.
-         * 
          * @param novle name to find.
-         * 
          * @return A reference to a NoVLE.
-         *
          * @throw Exception::Internal model not found.
          */
         NoVLE& get(const std::string& novle);
+
+    private:
+        NoVLEList       m_list;
     };
 
 }} // namespace vle vpz

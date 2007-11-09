@@ -30,7 +30,12 @@
 
 namespace vle { namespace vpz {
 
-    class Dynamics : public Base, public std::map < std::string, Dynamic >
+    /** 
+     * @brief Define a list of Dynamcis.
+     */
+    typedef std::map < std::string, Dynamic > DynamicList;
+
+    class Dynamics : public Base
     {
     public:
         Dynamics()
@@ -54,40 +59,28 @@ namespace vle { namespace vpz {
         virtual Base::type getType() const
         { return DYNAMICS; }
 
+        ////
+        //// Manage the DynamicList
+        ////
+
         /** 
-         * @brief Initialise the Dynamics tag with XML information.
-         * @code
-         * <MODELS>
-         *  <MODEL NAME="name">
-         *   <DYNAMICS FORMALISM="f1" TYPE="mapping">
-         *    <INIT I="4" />
-         *   </DYNAMICS>
-         *  <MODEL>
-         * </MODELS>
-         * @endcode
-         * 
-         * @param elt An XML reference to the MODELS tag.
-         *
-         * @throw Exception::Internal if elt is null or not on MODELS tags.
+         * @brief Get a constant reference to the DynamicList.
+         * @return Get a constant reference to the DynamicList.
          */
-        void initFromModels(xmlpp::Element* elt);
+        inline const DynamicList& dynamiclist() const
+        { return m_list; }
 
         /** 
          * @brief Add a list of Dynamics to the list.
-         * 
          * @param dyns A Dynamics objet to add.
-         *
          * @throw Exception::Internal if a Dynamic already exist.
          */
         void add(const Dynamics& dyns);
 
         /** 
          * @brief Add a Dynamic to the list.
-         * 
          * @param dyn the Dynamic to add.
-         *
          * @return a reference to the newly created dynamics.
-         *
          * @throw Exception::Internal if a dynamic with the same model name
          * already exist.
          */
@@ -95,18 +88,20 @@ namespace vle { namespace vpz {
 
         /** 
          * @brief Delete the dynamic for a specific model name.
-         * 
          * @param name the name of the model.
          */
         void del(const std::string& name);
 
         /** 
+         * @brief Remove all Dynamic from the DynamicList.
+         */
+        inline void clear()
+        { m_list.clear(); }
+
+        /** 
          * @brief Search a Dynamic with the specified name.
-         * 
          * @param name Dynamic name to find.
-         * 
          * @return A constant reference to the Dynamic find.
-         *
          * @throw Exception::Internal if no Dynamic find.
          */
         const Dynamic& get(const std::string& name) const;
@@ -137,6 +132,21 @@ namespace vle { namespace vpz {
          * function.
          */
         void cleanNoPermanent();
+
+    private:
+        DynamicList     m_list;
+
+        struct AddDynamic
+        {
+            AddDynamic(Dynamics& dynamics) :
+                m_dynamics(dynamics)
+            { }
+
+            void operator()(const DynamicList::value_type& pair)
+            { m_dynamics.add(pair.second); }
+
+            Dynamics& m_dynamics;
+        };
     };
 
 }} // namespace vle vpz

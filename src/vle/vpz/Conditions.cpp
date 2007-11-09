@@ -23,13 +23,10 @@
  */
 
 #include <vle/vpz/Conditions.hpp>
-#include <vle/utils/XML.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/value/Value.hpp>
 
 namespace vle { namespace vpz {
-
-using namespace vle::utils;
 
 Conditions::Conditions() :
     Base()

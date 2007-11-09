@@ -38,8 +38,6 @@
 #include <vle/value/String.hpp>
 #include <vle/value/XML.hpp>
 
-
-
 namespace vle { namespace vpz {
 
 SaxParser::SaxParser(Vpz& vpz) :
@@ -243,13 +241,14 @@ void SaxParser::on_end_element(const Glib::ustring& name)
     } else if (name == "port" and m_vpzstack.top()->isObservablePort()) {
         m_vpzstack.pop();
     } else if (name == "in" or name == "out" or name == "state" or
-               name == "init" or name == "structures" or name == "model" or
-               name == "submodels" or name == "vle_project" or
-               name == "connections" or name == "conditions" or
-               name == "condition" or name == "outputs" or name == "dynamics" or
-               name == "views" or name == "observables" or
-               name == "observable" or name == "experiment" or
-               name == "translators" or name == "vle_project") {
+               name == "init" or name == "structures" or name == "submodels" or 
+               name == "model" or name == "connections") {
+        delete m_vpzstack.pop();
+    } else if (name == "vle_project" or name ==
+               "conditions" or name == "condition" or name == "outputs" or name
+               == "dynamics" or name == "views" or name == "observables" or name
+               == "observable" or name == "experiment" or name == "translators"
+               or name == "vle_project") {
         m_vpzstack.pop();
     } else if (name == "destination") {
         m_vpzstack.buildConnection();

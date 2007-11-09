@@ -143,7 +143,6 @@ void Coordinator::finish()
         for (it = m_modelList.begin(); it != m_modelList.end(); ++it) {
             (*it).second->finish();
         }
-        m_modelList.clear();
     }
 
     {
@@ -313,7 +312,6 @@ void Coordinator::addModels(vpz::Model& model)
 {
     graph::AtomicModelVector atomicmodellist;
     graph::Model* mdl = model.model();
-    model.set_model(0);
 
     if (mdl->isAtomic()) {
         atomicmodellist.push_back((graph::AtomicModel*)mdl);

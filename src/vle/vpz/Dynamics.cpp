@@ -24,78 +24,55 @@
 
 #include <vle/vpz/Dynamics.hpp>
 #include <vle/utils/Debug.hpp>
-#include <vle/utils/XML.hpp>
 
 namespace vle { namespace vpz {
 
-using namespace vle::utils;
-
 void Dynamics::write(std::ostream& out) const
 {
-    if (not empty()) {
+    if (not m_list.empty()) {
         out << "<dynamics>\n";
 
-        for (const_iterator it = begin(); it != end(); ++it)
+        for (DynamicList::const_iterator it = m_list.begin(); it !=
+             m_list.end(); ++it)
             out << it->second;
 
         out << "</dynamics>\n";
     }
 }
 
-void Dynamics::initFromModels(xmlpp::Element* elt)
-{
-    AssertI(elt);
-    AssertI(elt->get_name() == "MODELS");
-
-    clear();
-
-    xmlpp::Node::NodeList lst = elt->get_children("MODEL");
-    xmlpp::Node::NodeList::iterator it;
-    for (it = lst.begin(); it != lst.end(); ++it) {
-        //xmlpp::Element* dynamic = xml::get_children(
-        //(xmlpp::Element*)(*it),"DYNAMICS");
-        //Dynamic d;
-        //d.init(dynamic);
-        /* FIXME init */
-
-        //addDynamic(
-        //xml::get_attribute((xmlpp::Element*)(*it), "NAME"), d);
-    }
-}
-
 void Dynamics::add(const Dynamics& dyns)
 {
-    for (const_iterator it = dyns.begin(); it != dyns.end(); ++it)
-        add(it->second);
+    std::for_each(dyns.dynamiclist().begin(), dyns.dynamiclist().end(),
+                  AddDynamic(*this));
 }
 
 Dynamic& Dynamics::add(const Dynamic& dynamic)
 {
-    const_iterator it = find(dynamic.name());
-    Assert(utils::SaxParserError, it == end(),
+    DynamicList::const_iterator it = m_list.find(dynamic.name());
+    Assert(utils::SaxParserError, it == m_list.end(),
            (boost::format("The dynamics %1% already exist") % dynamic.name()));
 
-    return (*insert(std::make_pair < std::string, Dynamic >(
+    return (*m_list.insert(std::make_pair < std::string, Dynamic >(
                 dynamic.name(), dynamic)).first).second;
 }
 
 void Dynamics::del(const std::string& name)
 {
-    erase(name);
+    m_list.erase(name);
 }
 
 const Dynamic& Dynamics::get(const std::string& name) const
 {
-    const_iterator it = find(name);
-    Assert(utils::SaxParserError, it != end(),
+    DynamicList::const_iterator it = m_list.find(name);
+    Assert(utils::SaxParserError, it != m_list.end(),
            (boost::format("The dynamics %1% does not exist") % name));
     return it->second;
 }
 
 Dynamic& Dynamics::get(const std::string& name)
 {
-    iterator it = find(name);
-    Assert(utils::SaxParserError, it != end(),
+    DynamicList::iterator it = m_list.find(name);
+    Assert(utils::SaxParserError, it != m_list.end(),
            (boost::format("The dynamics %1% does not exist") % name));
 
     return it->second;
@@ -103,22 +80,22 @@ Dynamic& Dynamics::get(const std::string& name)
 
 bool Dynamics::exist(const std::string& name) const
 {
-    return find(name) != end();
+    return m_list.find(name) != m_list.end();
 }
 
 void Dynamics::cleanNoPermanent()
 {
-    iterator previous = begin();
-    iterator it = begin();
+    DynamicList::iterator previous = m_list.begin();
+    DynamicList::iterator it = m_list.begin();
     
-    while (it != end()) {
+    while (it != m_list.end()) {
         if (not it->second.isPermanent()) {
             if (it == previous) {
-                erase(it);
-                previous = begin();
-                it = begin();
+                m_list.erase(it);
+                previous = m_list.begin();
+                it = m_list.begin();
             } else {
-                erase(it);
+                m_list.erase(it);
                 it = previous;
             }
         } else {

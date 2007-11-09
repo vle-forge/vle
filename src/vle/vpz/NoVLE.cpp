@@ -29,14 +29,11 @@
 #include <vle/vpz/Project.hpp>
 #include <vle/vpz/Translator.hpp>
 #include <vle/graph/CoupledModel.hpp>
-#include <vle/utils/XML.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Path.hpp>
 
 namespace vle { namespace vpz {
     
-using namespace vle::utils;
-
 void NoVLE::write(std::ostream& out) const
 {
     out << "<translator name=\"" << m_name << "\" "

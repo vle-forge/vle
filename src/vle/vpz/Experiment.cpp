@@ -24,11 +24,8 @@
 
 #include <vle/vpz/Experiment.hpp>
 #include <vle/utils/Debug.hpp>
-#include <vle/utils/XML.hpp>
 
 namespace vle { namespace vpz {
-
-using namespace vle::utils;
 
 void Experiment::write(std::ostream& out) const
 {

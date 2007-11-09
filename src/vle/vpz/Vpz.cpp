@@ -23,13 +23,10 @@
  */
 
 #include <vle/vpz/Vpz.hpp>
-#include <vle/utils/XML.hpp>
 #include <vle/utils/Debug.hpp>
 #include <fstream>
 
 namespace vle { namespace vpz {
-
-using namespace vle::utils;
 
 Vpz::Vpz(const std::string& filename) :
     m_filename(filename)

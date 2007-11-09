@@ -24,12 +24,9 @@
 
 #include <vle/vpz/Dynamic.hpp>
 #include <vle/utils/Debug.hpp>
-#include <vle/utils/XML.hpp>
 
 namespace vle { namespace vpz {
     
-using namespace vle::utils;
-
 void Dynamic::write(std::ostream& out) const
 {
     out << "<dynamic "

@@ -24,19 +24,16 @@
 
 #include <vle/vpz/NoVLEs.hpp>
 #include <vle/vpz/Model.hpp>
-#include <vle/utils/XML.hpp>
 #include <vle/utils/Debug.hpp>
 #include <utility>
 
 namespace vle { namespace vpz {
 
-using namespace vle::utils;
-
 void NoVLEs::write(std::ostream& out) const
 {
-    if (not empty()) {
+    if (not m_list.empty()) {
         out << "<translators>\n";
-        for (const_iterator it = begin(); it != end(); ++it) {
+        for (NoVLEList::const_iterator it = m_list.begin(); it != m_list.end(); ++it) {
             out << it->second;
         }
         out << "</translators>\n";
@@ -45,19 +42,19 @@ void NoVLEs::write(std::ostream& out) const
 
 NoVLE& NoVLEs::add(const NoVLE& novle)
 {
-    const_iterator it = find(novle.name());
-    Assert(utils::SaxParserError, it == end(),
+    NoVLEList::const_iterator it = m_list.find(novle.name());
+    Assert(utils::SaxParserError, it == m_list.end(),
            (boost::format("NoVLE %1% already exist") % novle.name()));
 
-    return (*insert(std::make_pair < std::string, NoVLE >(
+    return (*m_list.insert(std::make_pair < std::string, NoVLE >(
             novle.name(), novle)).first).second;
 }
 
 void NoVLEs::del(const std::string& modelname)
 {
-    iterator it = find(modelname);
-    if (it != end()) {
-        erase(it);
+    NoVLEList::iterator it = m_list.find(modelname);
+    if (it != m_list.end()) {
+        m_list.erase(it);
     }
 }
 
@@ -85,16 +82,16 @@ void NoVLEs::fusion(const Project& prj,
 
 const NoVLE& NoVLEs::get(const std::string& novle) const
 {
-    const_iterator it = find(novle);
-    Assert(utils::SaxParserError, it != end(),
+    NoVLEList::const_iterator it = m_list.find(novle);
+    Assert(utils::SaxParserError, it != m_list.end(),
            (boost::format("The NoVLE %1% not exist.") % novle));
     return it->second;
 }
 
 NoVLE& NoVLEs::get(const std::string& novle)
 {
-    iterator it = find(novle);
-    Assert(utils::SaxParserError, it != end(),
+    NoVLEList::iterator it = m_list.find(novle);
+    Assert(utils::SaxParserError, it != m_list.end(),
            (boost::format("The NoVLE %1% not exist.") % novle));
     return it->second;
 }

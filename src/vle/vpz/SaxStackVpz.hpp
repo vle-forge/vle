@@ -32,7 +32,9 @@
 
 namespace vle { namespace vpz {
 
-    /** Typedef the libxml++ sax AttributList */
+    /**
+     *  Typedef the libxml++ sax AttributList
+     */
     typedef xmlpp::SaxParser::AttributeList AttributeList;
 
     class Vpz;
@@ -45,7 +47,7 @@ namespace vle { namespace vpz {
             m_vpz(vpz)
         { }
 
-        ~SaxStackVpz() { }
+        ~SaxStackVpz();
 
         vpz::Vpz* pushVpz(const AttributeList& name);
         void pushStructure();

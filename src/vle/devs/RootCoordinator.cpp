@@ -32,14 +32,14 @@
 #include <vle/utils/XML.hpp>
 #include <vle/utils/Rand.hpp>
 #include <vle/graph/Model.hpp>
-#include <libxml++/libxml++.h>
 
 namespace vle { namespace devs {
 
 RootCoordinator::RootCoordinator() :
     m_currentTime(0),
     m_coordinator(0),
-    m_modelfactory(0)
+    m_modelfactory(0),
+    m_root(0)
 {
 }
 
@@ -47,6 +47,7 @@ RootCoordinator::~RootCoordinator()
 {
     delete m_coordinator;
     delete m_modelfactory;
+    delete m_root;
 }
 
 void RootCoordinator::load(vpz::Vpz& io)
@@ -54,6 +55,7 @@ void RootCoordinator::load(vpz::Vpz& io)
     if (m_coordinator) {
         delete m_coordinator;
         delete m_modelfactory;
+        delete m_root;
     }
 
     utils::Rand::rand().set_seed(io.project().experiment().seed());
@@ -65,6 +67,8 @@ void RootCoordinator::load(vpz::Vpz& io)
                                       io.project().model().atomicModels());
 
     m_coordinator = new Coordinator(*m_modelfactory, io.project().model());
+
+    m_root = io.project().model().model();
 }
 
 void RootCoordinator::init()
@@ -96,6 +100,11 @@ void RootCoordinator::finish()
     if (m_modelfactory) {
         delete m_modelfactory;
         m_modelfactory = 0;
+    }
+
+    if (m_root) {
+        delete m_root;
+        m_root = 0;
     }
 }
 
