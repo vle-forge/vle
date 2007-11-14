@@ -32,21 +32,52 @@
 
 namespace vle { namespace graph {
 
-    class CoupledModel;
-
     /**
      * @brief Represent the DEVS coupled model. This class have a list of
      * children models, three list of input, output and state connections.
-     *
      */
     class CoupledModel : public Model
     {
     public:
         typedef std::vector < std::string > StringList;
 
+        /** 
+         * @brief Constructor to intialize parent, position (0,0), size (0,0)
+         * and name.
+         * @param name the new name of this coupled model.
+         * @param parent the parent of this coupled model, can be null if parent
+         * does not exist.
+         */
         CoupledModel(const std::string& name, CoupledModel* parent);
 
+        /** 
+         * @brief Delete his children.
+         */
 	virtual ~CoupledModel();
+
+        /**
+         * @brief Return true, CoupledModel is a coupled model.
+         * @return true.
+         */
+        virtual bool isCoupled() const { return true; }
+
+        /** 
+         * @brief Return the reference to the children which have this name.
+         * Recursive function on all his children.
+         * @param name The name of the model to find.
+         * @return a children if name is equal to the model's name, null otherwise.
+         */
+        virtual Model* findModel(const std::string& name) const;
+
+        /** 
+         * @brief Write the coupled model in the output stream.
+         * @param out output stream.
+         */
+        void writeXML(std::ostream& out) const;
+
+        ////
+        //// Specific functions.
+        ////
 
         /**
          * @brief add a model into model list. Parent is set to this coupled
@@ -115,17 +146,15 @@ namespace vle { namespace graph {
         void delAllModel();
 
         /**
-         * attach an existing model into this coupled model. Parent will be
+         * @brief Attach an existing model into this coupled model. Parent will be
          * informed and detached of this model.
-         *
-         * @param model a model to attach
+         * @param model a model to attach.
          */
         void attachModel(Model* model);
 
         /** 
          * @brief Attach a list of models into this coupled model. Parent will
          * be informed and detached of this model.
-         * 
          * @param models a list of models.
          */
         void attachModels(ModelList& models);
@@ -303,34 +332,8 @@ namespace vle { namespace graph {
         bool haveConnectionWithOtherModel(const ConnectionList& cnts,
                                           const ModelList& mdls) const;
 
-        virtual bool isAtomic() const;
 
-        virtual bool isCoupled() const;
-
-	virtual bool isNoVLE() const;
-
-        /** 
-         * @brief Recursive function to find the first model with the specified
-         * name.
-         * 
-         * @param name model name to find.
-         * 
-         * @return A reference to the founded model, or 0.
-         */
-        virtual Model* findModel(const std::string& name) const;
-
-        void writeXML(std::ostream& out) const;
         void writeConnections(std::ostream& out) const;
-
-        /** 
-         * @brief Return a reference to the direct children model with
-         * specified name.
-         * 
-         * @param name model name to find.
-         * 
-         * @return A reference to the founded model, or 0.
-         */
-        Model* find(const std::string& name) const;
 
         /** 
          * @brief Return a reference to the children graph::Model under the
@@ -392,6 +395,68 @@ namespace vle { namespace graph {
         ModelPortList& getInternalOutPort(const std::string& name);
 
         const ModelPortList& getInternalOutPort(const std::string& name) const;
+
+        ////
+        //// Functor
+        ////
+
+        /** 
+         * @brief A functor to easily attach ModelList::value_type. Use it with
+         * std::for_each.
+         */
+        struct AttachModel
+        {
+            AttachModel(CoupledModel* model) : model(model) { }
+
+            void operator()(const ModelList::value_type& value)
+            { model->attachModel(value.second); }
+
+            CoupledModel*   model;
+        };
+        
+        /** 
+         * @brief A functor to easily detach ModelList::value_type. Use it with
+         * std::for_each.
+         */
+        struct DetachModel
+        {
+            DetachModel(CoupledModel* model) : model(model) { }
+
+            void operator()(const ModelList::value_type& value)
+            { model->detachModel(value.second); }
+
+            CoupledModel*   model;
+        };
+
+        /** 
+         * @brief A functor to easily delete ModelList::value_type. Use it with
+         * std::for_each.
+         */
+        struct DeleteModel
+        {
+            DeleteModel(CoupledModel* model) : model(model) { }
+
+            void operator()(const ModelList::value_type& value)
+            { model->delModel(value.second); }
+
+            CoupledModel*   model;
+        };
+
+        /** 
+         * @brief A functor to easily test a position (x, y) in a range of a
+         * ModelList::value_type. Use it with std::find_if, etc.
+         */
+        struct IsInModelList
+        {
+            IsInModelList(int x, int y) : x(x), y(y) { }
+
+            bool operator()(const ModelList::value_type& value) const
+            { return value.second->x() <= x and x <= value.second->x() +
+                value.second->width() and value.second->y() <= y and y <=
+                    value.second->y() + value.second->height(); };
+
+            int x, y;
+        };
 
     private:
         void delConnection(Model* src, const std::string& portSrc,

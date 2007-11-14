@@ -26,6 +26,7 @@
 
 #include <vle/graph/ModelPortList.hpp>
 #include <boost/noncopyable.hpp>
+#include <ostream>
 #include <vector>
 #include <map>
 #include <list>
@@ -56,36 +57,52 @@ namespace vle { namespace graph {
         /** 
          * @brief Constructor to intialize parent, position (0,0), size (0,0)
          * and name.
-         * 
-         * @param name 
+         * @param name the new name of this model.
+         * @param parent the parent of this model, can be null if parent does
+         * not exist.
          */
         Model(const std::string& name, CoupledModel* parent);
 
 	virtual ~Model();
 
-        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-         *
-         * Base class define
-         *
-         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+        ////
+        //// Base class.
+        ////
 
-        /** @return true if Model is atomic, false otherwise. */
-        virtual bool isAtomic() const = 0;
+        /**
+         * @brief Return true if this is AtomicModel. Default is false.
+         * @return true if Model is atomic, false otherwise.
+         */
+        virtual bool isAtomic() const
+        { return false; }
 
-        /** @return true if Model is coupled, false otherwise. */
-        virtual bool isCoupled() const = 0;
+        /**
+         * @brief Return true if this is CoupledModel. Default is false.
+         * @return true if Model is coupled, false otherwise.
+         */
+        virtual bool isCoupled() const
+        { return false; }
 
-        /** @return true if Model is novle, false otherwise. */
-        virtual bool isNoVLE() const = 0;
+        /**
+         * @brief Return true if this is NoVLEModel. Default is false.
+         * @return true if Model is novle, false otherwise.
+         */
+        virtual bool isNoVLE() const
+        { return false; }
 
         /**
 	 * Find recursively a model, atomic or coupled, with a specified name.
-         *
 	 * @param name model name to search.
-         *
 	 * @return model founded, otherwise 0.
          */
 	virtual Model* findModel(const std::string& name) const = 0;
+
+        /**
+         * @brief Write the model in the output stream.
+         * @param out output stream.
+         */
+	virtual void writeXML(std::ostream& out) const = 0;
+
 
         void getTargetPortList(const std::string& portname,
                                TargetModelList& out);
@@ -158,53 +175,39 @@ namespace vle { namespace graph {
         void addStatePort(const std::string& name);
 
         /**
-	 * Delete an init port with specified name.
-         *
+	 * @brief Delete an init port with specified name.
 	 * @param name port name to delete.
-         *
-	 * @return true if success, otherwise false.
          */
 	void delInitPort(const std::string & name);
 
         /**
-	 * Delete an input port with specified name.
-         *
+	 * @brief Delete an input port with specified name.
 	 * @param name port name to delete.
-         *
-	 * @return true if success, otherwise false if connection exist.
          */
         void delInputPort(const std::string & name);
 
         /**
-	 * Delete an output port with specified name.
-         *
+	 * @brief Delete an output port with specified name.
 	 * @param name port name to delete.
-         *
-	 * @return true if success, otherwise false if connection exist.
          */
         void delOutputPort(const std::string & name);
 
         /**
-	 * Delete a state port with specified name.
-         *
+	 * @brief Delete a state port with specified name.
 	 * @param name port name to delete.
-         *
-	 * @return true if success, otherwise false.
          */
 	void delStatePort(const std::string & name);
 
         /**
-	 * Delete an input port with specified name and destroy input or
+         * @brief Delete an input port with specified name and destroy input or
          * internal connections if exist.
-         *
 	 * @param name port name to delete.
          */
         void delInputPortAndConnection(const std::string& name);
 
         /**
-	 * Delete an output port with specified name and destroy output
+         * @brief Delete an output port with specified name and destroy output
          * or internal connections if exist.
-         *
 	 * @param name port name to delete.
          */
         void delOutputPortAndConnection(const std::string& name);
@@ -300,19 +303,11 @@ namespace vle { namespace graph {
          *
          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-        /**
-	 * Write under XML node VLE structures ports.
-	 *
-         * @param elt XML node parent.
+        /** 
+         * @brief Write the port list in the output stream.
+         * @param out output stream.
          */
         void writePortListXML(std::ostream& out) const;
-
-        /**
-	 * Write under XML node VLE structures.
-	 *
-         * @param elt XML node parent.
-         */
-	virtual void writeXML(std::ostream& out) const = 0;
 
         /**
 	 * return cast of a Model to an AtomicModel. If Model is not an
@@ -357,83 +352,71 @@ namespace vle { namespace graph {
          */
         static bool isInList(const ModelList& lst, graph::Model* m);
 
-        /*
-         * 
-         * Graphics position to replace GModel declaration.
-         *
-         */
+        ////
+        //// Graphics position to replace GModel declaration.
+        ////
 
         /** 
          * @brief Get X position of model.
-         * 
          * @return a X position.
          */
-        int x() const { return m_x; }
+        inline int x() const { return m_x; }
 
         /** 
          * @brief Get Y position of model.
-         * 
          * @return a Y position.
          */
-        int y() const { return m_y; }
+        inline int y() const { return m_y; }
 
         /** 
          * @brief Get the width of model.
-         * 
          * @return a width.
          */
-        int width() const { return m_width; }
+        inline int width() const { return m_width; }
 
         /** 
          * @brief Get the height of model.
-         * 
          * @return a height.
          */
-        int height() const { return m_height; }
+        inline int height() const { return m_height; }
 
         /** 
          * @brief Set a new X position to model.
-         * 
          * @param x new X position.
          */
-        void setX(int x) { m_x = x; }
+        inline void setX(int x) { m_x = x; }
 
         /** 
          * @brief Set a new Y position to model.
-         * 
          * @param y new Y position.
          */
-        void setY(int y) { m_y = y; }
+        inline void setY(int y) { m_y = y; }
 
         /** 
          * @brief Set a new width to model.
-         * 
          * @param width new width.
          */
-        void setWidth(int width) { m_width = width; }
+        inline void setWidth(int width) { m_width = width; }
 
         /** 
          * @brief Set a new height to model.
-         * 
          * @param height new height.
          */
-        void setHeight(int height) { m_height = height; }
+        inline void setHeight(int height) { m_height = height; }
 
         /** 
          * @brief Set a new position to model.
-         * 
          * @param x new X position.
          * @param y new Y position.
          */
-        void setPosition(int x, int y) { setX(x); setY(y); }
+        inline void setPosition(int x, int y) { setX(x); setY(y); }
 
         /** 
          * @brief Set a new site to model.
-         * 
          * @param width a new width.
          * @param height a new height.
          */
-        void setSize(int width, int height)
+        inline void setSize(int width, int height)
         { setWidth(width); setHeight(height); }
 
     protected:

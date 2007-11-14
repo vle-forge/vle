@@ -208,7 +208,7 @@ void Coordinator::addObservableToView(graph::AtomicModel* model,
 bool Coordinator::delModel(graph::CoupledModel* parent,
                            const std::string& modelname)
 {
-    graph::Model* mdl = parent->find(modelname);
+    graph::Model* mdl = parent->findModel(modelname);
     if (mdl) {
         if (mdl->isCoupled()) {
             delCoupledModel(parent, (graph::CoupledModel*)mdl);

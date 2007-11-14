@@ -147,8 +147,8 @@ BOOST_AUTO_TEST_CASE(coupledmodel_vpz)
     BOOST_REQUIRE(cpl->existOutputPort("o") != 0);
     BOOST_REQUIRE(cpl->existInputPort("i") != 0);
 
-    graph::Model* mdl1 = cpl->find("atom1");
-    graph::Model* mdl2 = cpl->find("atom2");
+    graph::Model* mdl1 = cpl->findModel("atom1");
+    graph::Model* mdl2 = cpl->findModel("atom2");
     BOOST_REQUIRE(mdl1 != 0);
     BOOST_REQUIRE(mdl2 != 0);
 

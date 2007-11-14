@@ -807,7 +807,7 @@ bool DSDevs::buildModel(const std::string& prefixModelName,
 bool DSDevs::addInputPort(const std::string& modelName,
                           const std::string& portName)
 {
-    graph::Model* mdl = m_coupledModel->find(modelName);
+    graph::Model* mdl = m_coupledModel->findModel(modelName);
     mdl->addInputPort(portName);
     return true;
 }
@@ -815,7 +815,7 @@ bool DSDevs::addInputPort(const std::string& modelName,
 bool DSDevs::addOutputPort(const std::string& modelName,
                            const std::string& portName)
 {
-    graph::Model* mdl = m_coupledModel->find(modelName);
+    graph::Model* mdl = m_coupledModel->findModel(modelName);
     mdl->addOutputPort(portName);
     return true;
 }
@@ -823,7 +823,7 @@ bool DSDevs::addOutputPort(const std::string& modelName,
 bool DSDevs::removeInputPort(const std::string& modelName,
                              const std::string& portName)
 {
-    graph::Model* mdl = m_coupledModel->find(modelName);
+    graph::Model* mdl = m_coupledModel->findModel(modelName);
     mdl->delInputPort(portName);
     return true;
 }
@@ -831,7 +831,7 @@ bool DSDevs::removeInputPort(const std::string& modelName,
 bool DSDevs::removeOutputPort(const std::string& modelName,
                               const std::string& portName)
 {
-    graph::Model* mdl = m_coupledModel->find(modelName);
+    graph::Model* mdl = m_coupledModel->findModel(modelName);
     mdl->delOutputPort(portName);
     return true;
 }

@@ -35,35 +35,47 @@ namespace vle { namespace graph {
     class Model;
 
     /** 
-     * @brief Represent the relation between a Model and an input or output port
-     * specified by a constant string.
+     * @brief ModelPort represents the relation between a Model and an input or
+     * output port specified by a constant string.
      */
     class ModelPort
     {
     public:
-        ModelPort(Model* model, const std::string& portname) :
-            model__(model),
-            port__(portname)
-        { }
+        /** 
+         * @brief Build a ModelPort with the specific Model and portname.
+         * @param model the model name to connect.
+         * @param portname the input or output portname of this model.
+         * @throw utils::DevsGraphError if model is null or portname is empty or
+         * if the model does not have the portname.
+         */
+        ModelPort(Model* model, const std::string& portname);
 
+        ////
+        //// Get functions
+        ////
 
-        //
-        /// Get funtions
-        //
+        /** 
+         * @brief Get a reference to the Model.
+         * @return Get a reference to the Model.
+         */
+        inline Model* model() const { return m_model; }
 
-        inline Model* model() const
-        { return model__; }
-
-        inline const std::string& port() const
-        { return port__; }
+        /** 
+         * @brief Get a constant string to the Model portname.
+         * @return Get a constant string ot the Model portname.
+         */
+        inline const std::string& port() const { return m_port; }
 
     private:
+        /** 
+         * @brief No default constructor.
+         */
         ModelPort() :
-            model__(0)
+            m_model(0)
         { }
 
-        Model*      model__;
-        std::string port__;
+        Model*              m_model;
+        std::string         m_port;
     };
 
 }} // namespace vle graph

@@ -31,33 +31,46 @@
 
 namespace vle { namespace graph {
 
-    class CoupledModel;
-
     /**
      * @brief Represent the Atomic Model in DEVS formalism. This class just
      * represent the graph not the DEVS Simulator.
-     *
-     *
      */
     class AtomicModel : public Model
     {
     public:
+        /** 
+         * @brief Constructor to intialize parent, position (0,0), size (0,0)
+         * and name.
+         * @param name the new name of this atomic model.
+         * @param parent the parent of this atomic model, can be null if parent
+         * does not exist.
+         */
         AtomicModel(const std::string& name, CoupledModel* parent);
 
+        /** 
+         * @brief Nothing to delete.
+         */
 	virtual ~AtomicModel();
 
-	virtual void writeXML(std::ostream& out) const;
+        /** 
+         * @brief Return true, AtomicModel is an atomic model.
+         * @return true.
+         */
+        virtual bool isAtomic() const { return true; }
 
-        virtual bool isAtomic() const
-        { return true; }
-
-        virtual bool isCoupled() const
-        { return false; }
-
-        virtual bool isNoVLE() const
-        { return false; }
-
+        /** 
+         * @brief Return this if name is equal to the model's name. Recursive
+         * function.
+         * @param name The name of the model to find.
+         * @return this if name is equal to the model's name, null otherwise.
+         */
         virtual Model* findModel(const std::string & name) const;
+
+        /** 
+         * @brief Write the atomic model in the output stream.
+         * @param out output stream.
+         */
+	virtual void writeXML(std::ostream& out) const;
     };
 
 }} // namespace vle graph

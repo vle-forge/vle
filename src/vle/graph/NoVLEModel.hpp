@@ -31,27 +31,43 @@
 namespace vle { namespace graph {
 
     /**
-     * @brief Define no-vle model ie. model that use a different notation.
+     * @brief Represent the NoVLE Model of VLE framework. This class is use when
+     * hierarchy uses of translator.
      *
      */
     class NoVLEModel : public Model
     {
     public:
+        /** 
+         * @brief Constructor to intialize parent, position (0,0), size (0,0)
+         * and name.
+         * @param name the new name of this novle model.
+         * @param parent the parent of this novle  model, can be null if parent
+         * does not exist.
+         */
         NoVLEModel(const std::string& name, CoupledModel* parent);
-
-        NoVLEModel(const NoVLEModel& model);
 
         virtual ~NoVLEModel() { }
 
-        virtual void writeXML(std::ostream& out) const;
+        /** 
+         * @brief Return true, NoVLE is a novle model.
+         * @return true.
+         */
+        virtual bool isNoVLE() const { return false; }
 
-        virtual bool isAtomic() const;
-
-        virtual bool isCoupled() const;
-
-        virtual bool isNoVLE() const;
-
+        /** 
+         * @brief Return this if name is equal to the model's name. Recursive
+         * function.
+         * @param name The name of the model to find.
+         * @return this if name is equal to the model's name, null otherwise.
+         */
 	virtual Model* findModel(const std::string& name) const;
+
+        /** 
+         * @brief Write the novle model in the output stream.
+         * @param out output stream.
+         */
+        virtual void writeXML(std::ostream& out) const;
     };
 
 }} // namespace vle graph

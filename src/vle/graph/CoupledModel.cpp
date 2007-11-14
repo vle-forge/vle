@@ -46,13 +46,8 @@ CoupledModel::CoupledModel(const std::string& name, CoupledModel* parent) :
 CoupledModel::~CoupledModel()
 {
     delAllConnection();
-
-    for (ModelList::iterator it = m_modelList.begin(); it !=
-         m_modelList.end(); ++it) {
-        delete (*it).second;
-    }
+    delAllModel();
 }
-
 
 
 /**************************************************************
@@ -435,35 +430,17 @@ bool CoupledModel::haveConnectionWithOtherModel(const ConnectionList& cnts,
     return false;
 }
 
-bool CoupledModel::isAtomic() const
-{
-    return false;
-}
-
-bool CoupledModel::isCoupled() const
-{
-    return true;
-}
-
-bool CoupledModel::isNoVLE() const
-{
-    return false;
-}
-
 Model* CoupledModel::findModel(const std::string& name) const
 {
     ModelList::const_iterator it = m_modelList.find(name);
-    if (it == m_modelList.end()) {
-        return 0;
-    } else {
-        return it->second;
-    }
+    return (it == m_modelList.end()) ? 0 : it->second;
 }
 
 Model* CoupledModel::getModel(const std::string& modelname)
 {
     if (getName() == modelname) {
-	return this;
+        return const_cast < Model* >(
+            reinterpret_cast < const Model* >(this));
     } else {
         return findModel(modelname);
     }
@@ -513,11 +490,8 @@ void CoupledModel::delModel(Model* model)
 
 void CoupledModel::delAllModel()
 {
-    for (ModelList::iterator it = m_modelList.begin(); it !=
-         m_modelList.end(); ++it) {
-        delModel(it->second);
-        ++it;
-    }
+    std::for_each(m_modelList.begin(), m_modelList.end(), DeleteModel(this));
+    m_modelList.clear();
 }
 
 void CoupledModel::attachModel(Model* model)
@@ -534,9 +508,7 @@ void CoupledModel::attachModel(Model* model)
 
 void CoupledModel::attachModels(ModelList& models)
 {
-    for (ModelList::iterator it = models.begin(); it != models.end(); ++it) {
-        attachModel(it->second);
-    }
+    std::for_each(models.begin(), models.end(), AttachModel(this));
 }
 
 void CoupledModel::detachModel(Model* model)
@@ -554,10 +526,7 @@ void CoupledModel::detachModel(Model* model)
 
 void CoupledModel::detachModels(const ModelList& models)
 {
-    for (ModelList::const_iterator it = models.begin(); it != models.end();
-         ++it) {
-	detachModel(it->second);
-    }
+    std::for_each(models.begin(), models.end(), DetachModel(this));
 }
 
 void CoupledModel::writeXML(std::ostream& out) const
@@ -629,26 +598,11 @@ void CoupledModel::writeConnections(std::ostream& out) const
 
 }
 
-Model* CoupledModel::find(const std::string& name) const
-{
-    ModelList::const_iterator it = m_modelList.find(name);
-    if (it == m_modelList.end()) {
-        return 0;
-    } else {
-        return it->second;
-    }
-}
-
 Model* CoupledModel::find(int x, int y) const
 {
-    ModelList::const_iterator it;
-    for (it = m_modelList.begin(); it != m_modelList.end(); ++it) {
-        if ((*it).second->x() <= x and x <= (*it).second->x() + (*it).second->width() and
-            (*it).second->y() <= y and y <= (*it).second->y() + (*it).second->height()) {
-            return (*it).second;
-        }
-    }
-    return 0;
+    ModelList::const_iterator it = std::find_if(
+        m_modelList.begin(), m_modelList.end(), IsInModelList(x, y));
+    return (it == m_modelList.end()) ? 0 : it->second;
 }
 
 std::string CoupledModel::buildNewName(const std::string& prefix) const

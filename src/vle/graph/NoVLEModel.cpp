@@ -22,7 +22,6 @@
  */
 
 #include <vle/graph/NoVLEModel.hpp>
-#include <vle/utils/XML.hpp>
 
 
 
@@ -33,32 +32,16 @@ NoVLEModel::NoVLEModel(const std::string& name, CoupledModel* parent) :
 {
 }
 
+Model* NoVLEModel::findModel(const std::string& name) const
+{
+    return (getName() == name) ?
+        const_cast < Model* >(
+            reinterpret_cast < const Model* >(this)) : 0;
+}
+
 void NoVLEModel::writeXML(std::ostream& out) const
 {
     out << "<model name=\"" << getName() << "\" type=\"novle\" />";
-}
-
-bool NoVLEModel::isAtomic() const
-{
-    return false;
-}
-
-bool NoVLEModel::isCoupled() const
-{
-    return false;
-}
-
-bool NoVLEModel::isNoVLE() const
-{
-    return true;
-}
-
-Model* NoVLEModel::findModel(const std::string& name) const
-{
-    if (getName() == name)
-        return (Model*)this;
-    else
-        return 0;
 }
 
 }} // namespace vle graph

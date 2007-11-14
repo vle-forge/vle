@@ -23,9 +23,6 @@
  */
 
 #include <vle/graph/AtomicModel.hpp>
-#include <vle/graph/CoupledModel.hpp>
-#include <vle/graph/Model.hpp>
-#include <vle/utils/XML.hpp>
 
 
 
@@ -42,10 +39,9 @@ AtomicModel::~AtomicModel()
 
 Model* AtomicModel::findModel(const std::string& name) const
 {
-    if (getName() == name)
-	return (Model*)this;
-    else
-	return 0;
+    return (getName() == name) ?
+        const_cast < Model* >(
+            reinterpret_cast < const Model* >(this)) : 0;
 }
 
 void AtomicModel::writeXML(std::ostream& out) const
