@@ -58,7 +58,7 @@ using namespace xmlpp;
 namespace vle { namespace devs {
 
 Coordinator::Coordinator(ModelFactory& modelfactory,
-                         vpz::Model& mdls) :
+                         const vpz::Model& mdls) :
     m_currentTime(0),
     m_modelFactory(modelfactory)
 {
@@ -308,7 +308,7 @@ void Coordinator::delCoupledModel(graph::CoupledModel* parent,
 }
 
 
-void Coordinator::addModels(vpz::Model& model)
+void Coordinator::addModels(const vpz::Model& model)
 {
     graph::AtomicModelVector atomicmodellist;
     graph::Model* mdl = model.model();

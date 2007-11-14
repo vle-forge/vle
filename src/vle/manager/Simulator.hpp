@@ -31,6 +31,12 @@
 #include <vle/utils/Socket.hpp>
 
 
+namespace vle { namespace vpz {
+
+    class Vpz;
+
+}} // namespace vle vpz
+
 
 namespace vle { namespace manager {
 
@@ -65,10 +71,17 @@ public:
 
     /** 
      * @brief Run a simulation from specified VPZ file.
-     * 
-     * @param filename 
+     * @param filename The filename to simulate with his path.
+     * @param true if simulation is a success, false otherwise.
      */
     static bool run(const std::string& filename);
+
+    /** 
+     * @brief Run a simulation using the specified VPZ object.
+     * @param file The Vpz object to simulate.
+     * @param true if simulation is a success, false otherwise.
+     */
+    static bool run(const vpz::Vpz& file);
 
 private:
     void wait();

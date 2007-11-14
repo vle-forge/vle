@@ -54,7 +54,7 @@ namespace vle { namespace devs {
     class Coordinator
     {
     public:
-        Coordinator(ModelFactory& modelfactory, vpz::Model& mdls);
+        Coordinator(ModelFactory& modelfactory, const vpz::Model& mdls);
 
 	~Coordinator();
 
@@ -237,7 +237,7 @@ namespace vle { namespace devs {
          * @brief build the simulator from the vpz::Model stock.
          * @param model 
          */
-        void addModels(vpz::Model& model);
+        void addModels(const vpz::Model& model);
 
         /**
          * Read all ExternalEventList including External and Instantaneous

@@ -227,4 +227,50 @@ bool Simulator::run(const std::string& filename)
     return result;
 }
 
+bool Simulator::run(const vpz::Vpz& file)
+{
+    bool result = true;
+    try {
+        //std::cerr << "[" << file.filename() << "]\n";
+        //std::cerr << " - Already open project file ....: ok\n";
+
+        //std::cerr << " - Coordinator building .........: ";
+        devs::RootCoordinator coordinator;
+        //std::cerr << "ok\n";
+
+        //std::cerr << " - Coordinator load models ......: ";
+        coordinator.load(file);
+        //std::cerr << "ok\n";
+
+        //std::cerr << " - Coordinator initializing .....: "; 
+        coordinator.init();
+        //std::cerr << "ok\n";
+
+        //std::cerr << " - Simulation start .............: ";
+        while (coordinator.run());
+        //std::cerr << "ok\n";
+
+        //std::cerr << " - Coordinator cleaning .........: ";
+        coordinator.finish();
+        //std::cerr << "ok\n";
+
+        //if (utils::Trace::trace().haveWarning()) {
+        //std::cerr << boost::format(
+        //"\n/!\\ Some warnings during simulation: See file %1%\n") %
+        //utils::Trace::trace().getLogFile();
+        //}
+
+    } catch(const std::exception& /*e*/) {
+        //std::cerr << "\n/!\\ vle error reported: " <<
+        //utils::demangle(typeid(e)) << "\n" << e.what();
+        result = false;
+    } catch(const Glib::Exception& /*e*/) {
+        //std::cerr << "\n/!\\ vle Glib error reported: " <<
+        //utils::demangle(typeid(e)) << "\n" << e.what();
+        result = false;
+    }
+    std::cerr << std::endl;
+    return result;
+}
+
 }} // namespace vle manager

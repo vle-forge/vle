@@ -50,7 +50,7 @@ RootCoordinator::~RootCoordinator()
     delete m_root;
 }
 
-void RootCoordinator::load(vpz::Vpz& io)
+void RootCoordinator::load(const vpz::Vpz& io)
 {
     if (m_coordinator) {
         delete m_coordinator;
