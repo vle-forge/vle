@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE(test_connection)
 {
     vpz::Vpz vpz;
     vpz.parseFile(utils::Path::path().buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(), "examples", "coupled.vpz"));
+            utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
 
     const vpz::Model& model(vpz.project().model());
     BOOST_REQUIRE(model.model());
@@ -65,8 +65,8 @@ BOOST_AUTO_TEST_CASE(test_read_write_read)
 {
     vpz::Vpz vpz;
     vpz.parseFile(utils::Path::buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(), "examples", "coupled.vpz"));
+            utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
     vpz.clear();
     vpz.parseFile(utils::Path::path().buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(), "examples", "coupled.vpz"));
+            utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
 }

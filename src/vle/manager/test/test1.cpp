@@ -34,11 +34,15 @@
 #include <stdexcept>
 #include <vle/manager.hpp>
 #include <vle/vpz.hpp>
+#include <vle/utils.hpp>
 
 using namespace vle;
 
 BOOST_AUTO_TEST_CASE(trylaunch)
 {
-    vpz::Vpz* file = new vpz::Vpz("/home/gquesnel/usr/share/vle-0.5.0/examples/gens.vpz");
+    vpz::Vpz* file = new vpz::Vpz(
+        utils::Path::buildPrefixSharePath(utils::Path::path().getPrefixDir(),
+                                          "examples", "unittest.vpz"));
+                                  
     manager::Simulator::run(*file);
 }

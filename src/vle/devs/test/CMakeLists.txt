@@ -9,10 +9,25 @@ LINK_DIRECTORIES(
   ${LIBXMLPP_LIBRARY_DIR}
   ${Boost_LIBRARY_DIRS})
 
+ADD_LIBRARY(unittest SHARED models.cpp)
+TARGET_LINK_LIBRARIES(unittest
+  ${GLIBMM_LIBRARIES}
+  ${LIBXMLPP_LIBRARIES}
+  ${GTHREAD_LIBRARIES} 
+  ${Boost_UNITTESTFRAMEWORK}
+  vlegeometry
+  vleutils
+  vledata
+  vlevalue
+  vlegraph
+  vledevs)
+
+INSTALL(TARGETS unittest
+  RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/simulator"
+  LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/simulator")
+
 ADD_EXECUTABLE(test1 test1.cpp)
-
 ADD_TEST(devstest1 test1)
-
 TARGET_LINK_LIBRARIES(test1
   ${GLIBMM_LIBRARIES}
   ${LIBXMLPP_LIBRARIES}
