@@ -105,6 +105,9 @@ namespace vle { namespace extension {
 	inline void setExternalValue(const std::string& name, double value)
 	    { mExternalVariableValue[mExternalVariableIndex[name]] = value; }	
 
+	inline void setExternalGradient(const std::string& name, double gradient)
+	    { mExternalVariableGradient[mExternalVariableIndex[name]] = gradient; }	
+
         bool mActive;
         bool mDependance;
 /** Internal variables */
@@ -116,8 +119,13 @@ namespace vle { namespace extension {
         std::map < std::string , unsigned int > mVariableIndex;
 	unsigned int mVariableNumber;
 /** External variables */
+	unsigned int mExternalVariableNumber;
 	std::map < unsigned int , double > mExternalVariableValue;
+	std::map < unsigned int , double > mExternalVariableGradient;
+	std::map < unsigned int , bool > mIsGradient;
 	std::map < std::string , unsigned int > mExternalVariableIndex;
+	bool mExternalValues; // y-a-t-il des variables externes
+			      // sans gradient ? 
 /** State */
         long* mIndex;
         double* mGradient;

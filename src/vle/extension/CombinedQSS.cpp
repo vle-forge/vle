@@ -167,12 +167,15 @@ Time CombinedQss::init()
 void CombinedQss::getOutputFunction(const Time& time,
 				    ExternalEventList& output) 
 {
-    if (getState(mCurrentModel) == INIT or ((getState(mCurrentModel) == POST3 or getState(mCurrentModel) == RUN) 
-					    and mActive)) {
+    if (getState(mCurrentModel) == INIT or ((getState(mCurrentModel) == POST3 and mExternalValues) 
+					    or (getState(mCurrentModel) == RUN and mActive))) {
+//     if (getState(mCurrentModel) == INIT or ((getState(mCurrentModel) == POST3 or getState(mCurrentModel) == RUN) 
+// 					    and mActive)) {
 	devs::ExternalEvent* ee = new devs::ExternalEvent(mVariableName[mCurrentModel]);
 	double e = (time - getLastTime(mCurrentModel)).getValue();
 	
 	ee << devs::attribute("value", getValue(mCurrentModel)+e*getGradient(mCurrentModel));
+	ee << devs::attribute("gardient", getGradient(mCurrentModel));
 	output.addEvent(ee);
     }
 }
@@ -237,7 +240,7 @@ void CombinedQss::processInternalEvent(const InternalEvent& event)
 		setValue(mCurrentModel,d(mCurrentModel, getIndex(mCurrentModel)));
 
 	// Propagation ou non de la nouvelle valeur
-        if (mActive) {
+        if (mActive and mExternalValues) {
 	    // si oui alors on va attendre les valeurs
 	    // actualisées de toutes mes variables externes
             setState(mCurrentModel, POST);
@@ -267,6 +270,7 @@ void CombinedQss::processExternalEvents(const ExternalEventList& event,
     {
 	ExternalEventList::const_iterator it = event.begin();
 	unsigned int index = 0;
+	unsigned int linear = 0;
 
 	while (it != event.end()) {
 	    std::string name = (*it)->getStringAttributeValue("name");
@@ -274,9 +278,15 @@ void CombinedQss::processExternalEvents(const ExternalEventList& event,
 
 	    mExternalVariableIndex[name] = index;
 	    mExternalVariableValue[index] = value;
+	    if (mIsGradient[index] = (*it)->existAttributeValue("gradient")) {
+		mExternalVariableGradient[index] = (*it)->getDoubleAttributeValue("gradient");
+		++linear;
+	    }
 	    ++index;
 	    ++it;
 	}
+	mExternalValues = (linear < mExternalVariableIndex.size());
+	mExternalVariableNumber = linear;
 	for (unsigned int i = 0; i < mVariableNumber; i++) {
 	    setState(i, RUN);
 	    setGradient(i, compute(i));
@@ -292,22 +302,29 @@ void CombinedQss::processExternalEvents(const ExternalEventList& event,
 	    std::string name = (*it)->getStringAttributeValue("name");
 	    double value = (*it)->getDoubleAttributeValue("value");
 	    
-	    // c'est une variable externe QSS
+	    // c'est une variable externe numérique
 	    if ((*it)->onPort("update")) {
-// 		Assert(utils::InternalError, name != mVariableName,
-// 		       boost::format("Qss update, invalid variable name: %1%") % name);
+		Assert(utils::InternalError, mVariableIndex.find(name) != mVariableIndex.end(),
+		       boost::format("Combined Qss update, invalid variable name: %1%") % name);
 		
 		setExternalValue(name, value);		
+		if (mIsGradient[mExternalVariableIndex[name]])
+		    setExternalGradient(name, (*it)->getDoubleAttributeValue("gradient"));
 	    }	    
 	    // c'est une perturbation sur une variable interne
 	    if ((*it)->onPort("perturb")) {
-// 		Assert(utils::InternalError, name == mVariableName,
-// 		       boost::format("Qss perturbation, invalid variable name: %1%") % name);
+		Assert(utils::InternalError, mVariableIndex.find(name) != mVariableIndex.end(),
+		       boost::format("Combined Qss update, invalid variable name: %1%") % name);
 		
 		reset(time, mVariableIndex[name], value);
 		_reset = true;
 	    }
 	    ++it;
+	}
+	// Mise à jour des valeurs de variables externes
+	if (mExternalVariableNumber > 1) {
+	    for (unsigned int j = 0 ; j < mExternalVariableNumber ; j++)
+		mExternalVariableValue[j] += (time - getLastTime(0)).getValue()*mExternalVariableGradient[j];
 	}
 	for (unsigned int i = 0; i < mVariableNumber; i++) {
 	    if (getState(i) == POST) {
@@ -317,6 +334,7 @@ void CombinedQss::processExternalEvents(const ExternalEventList& event,
 	    else if (getState(i) == RUN) {
 		if (_reset) setSigma(i, 0);
 		else {
+		    // Mise à jour de la valeur
 		    setValue(i, getValue(i) + (time - mLastTime[i]).getValue()*getGradient(i));
 		    setLastTime(i, time);
 		    setGradient(i, compute(i));
