@@ -251,6 +251,18 @@ BOOST_AUTO_TEST_CASE(experiment_vpz)
     BOOST_REQUIRE_EQUAL(replicas.seed(), (guint32)987456);
     BOOST_REQUIRE_EQUAL(replicas.number(), (size_t)5);
 
+    std::list < std::string > lst;
+    cnds.conditionnames(lst);
+    BOOST_REQUIRE_EQUAL(lst.size(), (std::list < std::string >::size_type)2);
+    BOOST_REQUIRE_EQUAL(*lst.begin(), "cond1");
+    BOOST_REQUIRE_EQUAL(*lst.rbegin(), "cond2");
+    lst.clear();
+
+    cnds.portnames("cond1", lst);
+    BOOST_REQUIRE_EQUAL(lst.size(), (std::list < std::string >::size_type)2);
+    BOOST_REQUIRE_EQUAL(*lst.begin(), "init1");
+    BOOST_REQUIRE_EQUAL(*lst.rbegin(), "init2");
+
     value::Set set;
     value::Double real;
     value::Integer integer;

@@ -92,6 +92,12 @@ namespace vle { namespace vpz {
         { return m_list; }
 
         /** 
+         * @brief Build al ist of string that contains all port names.
+         * @param lst An output string list.
+         */
+        void portnames(std::list < std::string >& lst) const;
+
+        /** 
          * @brief Add a port to the value list.
          * @param portname name of the port.
          */
@@ -186,6 +192,32 @@ namespace vle { namespace vpz {
          * value::Set.
          */
         void rebuildValueSet();
+
+        ////
+        //// Functors
+        ////
+
+        /** 
+         * @brief Functor to get the name of a ConditionValues. To use with
+         * std::transform.
+         */
+        struct PortName
+        {
+            inline const std::string& operator()(
+                const ConditionValues::value_type& x) const
+            { return x.first; }
+        };
+
+        /** 
+         * @brief Functor to get the values of a ConditionValues. To use with
+         * std::transform.
+         */
+        struct PortValue
+        {
+            inline const value::Set& operator()(
+                const ConditionValues::value_type& x) const
+            { return x.second; }
+        };
 
     private:
         Condition();

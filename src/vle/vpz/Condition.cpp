@@ -88,6 +88,12 @@ void Condition::write(std::ostream& out) const
     out << "</condition>\n";
 }
 
+void Condition::portnames(std::list < std::string >& lst) const
+{
+    lst.resize(m_list.size());
+    std::transform(m_list.begin(), m_list.end(), lst.begin(), PortName());
+}
+
 void Condition::add(const std::string& portname)
 {
     if (m_list.find(portname) == m_list.end()) {

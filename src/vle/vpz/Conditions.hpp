@@ -86,6 +86,22 @@ namespace vle { namespace vpz {
         { return m_list; }
 
         /** 
+         * @brief Build a list of string that contains all condition names.
+         * @param lst An output string list.
+         */
+        void conditionnames(std::list < std::string >& lst) const;
+
+        /** 
+         * @brief Build a list of string that contains all port names for the
+         * specified condition.
+         * @param condition The condition to get port name.
+         * @param lst An output string list.
+         * @throw utils::InternalError if condition not exist.
+         */
+        void portnames(const std::string& condition,
+                       std::list < std::string >& lst) const;
+
+        /** 
          * @brief Add a list of Conditions to the list.
          * @param conditions A Conditions object to add.
          * @throw Exception::Internal if a Condition already exist.
@@ -142,9 +158,14 @@ namespace vle { namespace vpz {
          */
         void rebuildValueSet();
     
-    private:
-        ConditionList       m_list;
+        ////
+        //// Functor
+        ////
 
+        /** 
+         * @brief Functor to add condition to the ConditionList. To use with the
+         * std::for_each algorithm.
+         */
         struct AddCondition
         {
             AddCondition(Conditions& conditions) :
@@ -157,11 +178,41 @@ namespace vle { namespace vpz {
             Conditions& m_conditions;
         };
 
+        /** 
+         * @brief Functor to call the rebuildValueSet for a specified
+         * ConditionList. To use with the std::for_each algorithm.
+         */
         struct RebuildValueSet
         {
-            void operator()(ConditionList::value_type& pair)
+            inline void operator()(ConditionList::value_type& pair)
             { pair.second.rebuildValueSet(); }
         };
+
+        /** 
+         * @brief Functor to get the name of a Condition from the ConditionList.
+         * To use with the std::transform.
+         */
+        struct ConditionName
+        {
+            inline const std::string& operator()(
+                const ConditionList::value_type& x) const
+            { return x.first; }
+        };
+
+        /** 
+         * @brief Functor to get the Condition object from the ConditionList. To
+         * use with the std::transform.
+         */
+        struct ConditionValue
+        {
+            inline const Condition& operator()(
+                const ConditionList::value_type& x) const
+            { return x.second; }
+        };
+
+    private:
+        ConditionList       m_list;
+
     };
 
 }} // namespace vle vpz
