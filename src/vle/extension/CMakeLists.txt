@@ -7,9 +7,11 @@ LINK_DIRECTORIES(
   ${GLIBMM_LIBRARY_DIRS}
   ${LIBXMLPP_LIBRARY_DIR})
 
-SET(EXTENSION_CPP CellDevs.cpp CellQSS.cpp DSDevs.cpp QSS2.cpp QSS.cpp)
+SET(EXTENSION_CPP CellDevs.cpp CellQSS.cpp DSDevs.cpp QSS2.cpp QSS.cpp
+CombinedQSS.cpp)
 
-SET(EXTENSION_HPP CellDevs.hpp CellQSS.hpp DSDevs.hpp QSS2.hpp QSS.hpp)
+SET(EXTENSION_HPP CellDevs.hpp CellQSS.hpp DSDevs.hpp QSS2.hpp QSS.hpp
+CombinedQSS.hpp)
 
 ADD_LIBRARY(vleextension SHARED ${EXTENSION_HPP};${EXTENSION_CPP})
 
