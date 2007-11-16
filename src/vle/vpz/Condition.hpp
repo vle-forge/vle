@@ -118,6 +118,23 @@ namespace vle { namespace vpz {
         void addValueToPort(const std::string& portname,
                             const value::Value& value);
 
+        /** 
+         * @brief Set a value to a specified port. If port contains already
+         * value, these values are deleted.
+         * @param portname The name of the port to add value. 
+         * @param value the value to push.
+         * @throw utils::InternalError if portname does not exist.
+         */
+        void setValueToPort(const std::string& portname,
+                            const value::Value& value);
+
+        /** 
+         * @brief Clear the specified port.
+         * @param portname The name of the port to clear.
+         * @throw utils::InternalError if portname does not exist.
+         */
+        void clearValueOfPort(const std::string& portname);
+
         ////
         //// Get/Set function
         ////

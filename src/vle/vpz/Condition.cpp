@@ -125,6 +125,28 @@ void Condition::addValueToPort(const std::string& portname,
     }
 }
 
+void Condition::setValueToPort(const std::string& portname,
+                               const value::Value& value)
+{
+    ConditionValues::iterator it = m_list.find(portname);
+    Assert(utils::InternalError, it != m_list.end(),
+           boost::format("Condition %1% have no port %2%") %
+           m_name % portname);
+
+    it->second->clear();
+    it->second->addValue(value);
+}
+
+void Condition::clearValueOfPort(const std::string& portname)
+{
+    ConditionValues::iterator it = m_list.find(portname);
+    Assert(utils::InternalError, it != m_list.end(),
+           boost::format("Condition %1% have no port %2%") %
+           m_name % portname);
+
+    it->second->clear();
+}
+
 ValueList Condition::firstValues() const
 {
     ValueList result;
