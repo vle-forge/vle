@@ -65,7 +65,8 @@ namespace vle { namespace graph {
          * @brief Return the reference to the children which have this name.
          * Recursive function on all his children.
          * @param name The name of the model to find.
-         * @return a children if name is equal to the model's name, null otherwise.
+         * @return a children if name is equal to the model's name, null
+         * otherwise.
          */
         virtual Model* findModel(const std::string& name) const;
 

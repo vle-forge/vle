@@ -154,8 +154,7 @@ void SaxStackVpz::pushPort(const AttributeList& att)
         pushObservablePort(att);
     } else {
         AssertS(utils::SaxParserError, m_stack.top()->isIn() or
-                m_stack.top()->isOut() or m_stack.top()->isState() or
-                m_stack.top()->isInit());
+                m_stack.top()->isOut());
 
         vpz::Base* type = pop();
 
@@ -170,10 +169,6 @@ void SaxStackVpz::pushPort(const AttributeList& att)
             gmdl->addInputPort(name);
         } else if (type->isOut()) {
             gmdl->addOutputPort(name);
-        } else if (type->isState()) {
-            gmdl->addStatePort(name);
-        } else if (type->isInit()) {
-            gmdl->addInitPort(name);
         }
         m_stack.push(type);
     }

@@ -22,4 +22,10 @@ TARGET_LINK_LIBRARIES(test1
   vleutils
   vledata
   vlevalue
-  vlegraph)
+  vlegraph
+  vleoov
+  vlevpz
+  vledevs
+  vleextension
+  vlemanager
+  vletranslator)

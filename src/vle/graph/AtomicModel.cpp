@@ -33,10 +33,6 @@ AtomicModel::AtomicModel(const std::string& name, CoupledModel* parent) :
 {
 }
 
-AtomicModel::~AtomicModel()
-{
-}
-
 Model* AtomicModel::findModel(const std::string& name) const
 {
     return (getName() == name) ?

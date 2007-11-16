@@ -53,7 +53,7 @@ namespace vle { namespace graph {
          * @brief Return true, NoVLE is a novle model.
          * @return true.
          */
-        virtual bool isNoVLE() const { return false; }
+        virtual bool isNoVLE() const { return true; }
 
         /** 
          * @brief Return this if name is equal to the model's name. Recursive

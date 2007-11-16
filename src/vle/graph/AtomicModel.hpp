@@ -50,7 +50,7 @@ namespace vle { namespace graph {
         /** 
          * @brief Nothing to delete.
          */
-	virtual ~AtomicModel();
+	virtual ~AtomicModel() { }
 
         /** 
          * @brief Return true, AtomicModel is an atomic model.

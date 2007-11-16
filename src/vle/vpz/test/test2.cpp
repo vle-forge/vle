@@ -50,14 +50,6 @@ BOOST_AUTO_TEST_CASE(atomicmodel_vpz)
         " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
         " <structures>\n"
         "  <model name=\"test1\" type=\"atomic\" >\n"
-        "   <init>\n"
-        "    <port name=\"init1\" />\n"
-        "    <port name=\"init2\" />\n"
-        "   </init>\n"
-        "   <state>\n"
-        "    <port name=\"state1\" />\n"
-        "    <port name=\"state2\" />\n"
-        "   </state>\n"
         "   <in>\n"
         "    <port name=\"in1\" />\n"
         "    <port name=\"in2\" />\n"
@@ -80,14 +72,8 @@ BOOST_AUTO_TEST_CASE(atomicmodel_vpz)
     const vpz::Model& mdl = vpz.project().model();
     BOOST_REQUIRE(mdl.model() != 0);
     BOOST_REQUIRE_EQUAL(mdl.model()->isAtomic(), true);
-    BOOST_REQUIRE_EQUAL(mdl.model()->getInitPortNumber(), 2);
-    BOOST_REQUIRE_EQUAL(mdl.model()->getStatePortNumber(), 2);
     BOOST_REQUIRE_EQUAL(mdl.model()->getInputPortNumber(), 2);
     BOOST_REQUIRE_EQUAL(mdl.model()->getOutputPortNumber(), 2);
-    BOOST_REQUIRE(mdl.model()->existInitPort("init1") != 0);
-    BOOST_REQUIRE(mdl.model()->existInitPort("init2") != 0);
-    BOOST_REQUIRE(mdl.model()->existStatePort("state1") != 0);
-    BOOST_REQUIRE(mdl.model()->existStatePort("state2") != 0);
     BOOST_REQUIRE(mdl.model()->existInputPort("in1") != 0);
     BOOST_REQUIRE(mdl.model()->existInputPort("in2") != 0);
     BOOST_REQUIRE(mdl.model()->existOutputPort("out1") != 0);

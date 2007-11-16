@@ -35,6 +35,7 @@
 #include <fstream>
 #include <vle/graph.hpp>
 #include <vle/utils.hpp>
+#include <vle/vpz.hpp>
 
 using namespace vle;
 
@@ -155,4 +156,11 @@ BOOST_AUTO_TEST_CASE(test_prohibited_displace)
     lst["b"] = b;
 
     BOOST_REQUIRE_THROW(top->displace(lst, newtop), utils::DevsGraphError);
+}
+
+BOOST_AUTO_TEST_CASE(test_delinput_port)
+{
+    vpz::Vpz file(utils::Path::buildPrefixSharePath(
+            utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
+
 }

@@ -31,9 +31,6 @@
 #include <vle/utils/Tools.hpp>
 #include <set>
 
-using std::vector;
-using std::string;
-using std::list;
 
 
 namespace vle { namespace graph {

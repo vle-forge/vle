@@ -63,7 +63,7 @@ namespace vle { namespace graph {
          */
         Model(const std::string& name, CoupledModel* parent);
 
-	virtual ~Model();
+	virtual ~Model() { }
 
         ////
         //// Base class.
@@ -128,9 +128,18 @@ namespace vle { namespace graph {
          */
         std::string getParentName() const;
 
+        /** 
+         * @brief Get the parent node of this model. Can be null if parent does
+         * not exist.
+         * @return A reference to the parent node or null.
+         */
         inline CoupledModel* getParent() const
         { return m_parent; }
 
+        /** 
+         * @brief Set the parent node of this model. Can be null.
+         * @param cp The reference to the parent node or null.
+         */
         inline void setParent(CoupledModel* cp)
         { m_parent = cp; }
 
@@ -139,12 +148,6 @@ namespace vle { namespace graph {
          * Port managment.
          *
          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-        bool existInitPort(const std::string& name) const
-        { return m_initPortList.find(name) != m_initPortList.end(); }
-
-        bool existStatePort(const std::string& name) const
-        { return m_statePortList.find(name) != m_statePortList.end(); }
 
         bool existInputPort(const std::string& name) const
         { return m_inPortList.find(name) != m_inPortList.end(); }
@@ -157,69 +160,33 @@ namespace vle { namespace graph {
         ModelPortList& getInPort(const std::string& name);
         ModelPortList& getOutPort(const std::string& name);
 
-        int getInitPortNumber() const
-        { return m_initPortList.size(); }
-        
         int getInputPortNumber() const
         { return m_inPortList.size(); }
         
         int getOutputPortNumber() const
         { return m_outPortList.size(); }
         
-        int getStatePortNumber() const
-        { return m_statePortList.size(); }
-
-        void addInitPort(const std::string& name);
         ModelPortList& addInputPort(const std::string& name);
         ModelPortList& addOutputPort(const std::string& name);
-        void addStatePort(const std::string& name);
-
-        /**
-	 * @brief Delete an init port with specified name.
-	 * @param name port name to delete.
-         */
-	void delInitPort(const std::string & name);
-
-        /**
-	 * @brief Delete an input port with specified name.
-	 * @param name port name to delete.
-         */
-        void delInputPort(const std::string & name);
-
-        /**
-	 * @brief Delete an output port with specified name.
-	 * @param name port name to delete.
-         */
-        void delOutputPort(const std::string & name);
-
-        /**
-	 * @brief Delete a state port with specified name.
-	 * @param name port name to delete.
-         */
-	void delStatePort(const std::string & name);
 
         /**
          * @brief Delete an input port with specified name and destroy input or
          * internal connections if exist.
 	 * @param name port name to delete.
          */
-        void delInputPortAndConnection(const std::string& name);
+        void delInputPort(const std::string & name);
 
         /**
          * @brief Delete an output port with specified name and destroy output
          * or internal connections if exist.
 	 * @param name port name to delete.
          */
-        void delOutputPortAndConnection(const std::string& name);
+        void delOutputPort(const std::string & name);
 
-	void addInitPort(const std::list < std::string > & lst);
 	void addInputPort(const std::list < std::string > & lst);
 	void addOutputPort(const std::list < std::string > & lst);
-	void addStatePort(const std::list < std::string > & lst);
-	bool existInitPort(const std::string & name);
 	bool existInputPort(const std::string & name);
 	bool existOutputPort(const std::string & name);
-	bool existStatePort(const std::string & name);
 
         /** 
          * @brief Get the index position of the input port into the input port
@@ -239,47 +206,17 @@ namespace vle { namespace graph {
          */
         int getOutputPortIndex(const std::string& name) const;
 
-        /** 
-         * @brief Get the index position of the init port into the init port
-         * list.
-         * @param name The name of the init port to find.
-         * @return A integer greather than 0.
-         * @throw utils::DevsGraphError if init port not exit.
-         */
-        int getInitPortIndex(const std::string& name) const;
-
-        /** 
-         * @brief Get the index position of the state port into the state port
-         * list.
-         * @param name The name of the state port to find.
-         * @return A integer greather than 0.
-         * @throw utils::DevsGraphError if state port not exit.
-         */
-        int getStatePortIndex(const std::string& name) const;
-
-        inline const PortList& getInitPortList() const
-        { return m_initPortList; }
-
         inline const ConnectionList& getInputPortList() const
         { return m_inPortList; }
 
         inline const ConnectionList& getOutputPortList() const
         { return m_outPortList; }
 
-        inline const PortList& getStatePortList() const
-        { return m_statePortList; }
-
-        inline PortList& getInitPortList()
-        { return m_initPortList; }
-
         inline ConnectionList& getInputPortList()
         { return m_inPortList; }
 
         inline ConnectionList& getOutputPortList()
         { return m_outPortList; }
-
-        inline PortList& getStatePortList()
-        { return m_statePortList; }
 
         /**
 	 * Merge define port of this model with input, output, state and init
@@ -419,14 +356,35 @@ namespace vle { namespace graph {
         inline void setSize(int width, int height)
         { setWidth(width); setHeight(height); }
 
+        ////
+        //// Functor
+        ////
+
+        struct AddInputPort
+        {
+            AddInputPort(Model& mdl) : mdl(mdl) { }
+
+            inline void operator()(const std::string& name)
+            { mdl.addInputPort(name); }
+
+            Model& mdl;
+        };
+
+        struct AddOutputPort
+        {
+            AddOutputPort(Model& mdl) : mdl(mdl) { }
+
+            inline void operator()(const std::string& name)
+            { mdl.addOutputPort(name); }
+
+            Model& mdl;
+        };
+
     protected:
 	CoupledModel*   m_parent;
 	ConnectionList  m_inPortList;
 	ConnectionList  m_outPortList;
         
-        PortList        m_initPortList;
-	PortList        m_statePortList;
-
         int             m_x;
         int             m_y;
         int             m_width;
@@ -439,6 +397,18 @@ namespace vle { namespace graph {
          */
         Model()
         { }
+
+        /**
+         * @brief Delete an input port.
+	 * @param name port name to delete.
+         */
+        void delInputPort(ModelPortList& ins);
+        
+        /**
+         * @brief Delete an output port.
+	 * @param name port name to delete.
+         */
+        void delOutputPort(ModelPortList& ins);
 
 	std::string     m_name;
     };
