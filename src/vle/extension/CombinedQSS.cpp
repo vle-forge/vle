@@ -1,0 +1,374 @@
+/** 
+ * @file extension/CombinedQss.cpp
+ * @brief 
+ * @author The vle Development Team
+ * @date ven, 27 oct 2006 00:06:52 +0200
+ */
+
+/*
+ * Copyright (C) 2006, 07 - The vle Development Team
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+
+#include <vle/extension/CombinedQSS.hpp>
+#include <vle/value/Map.hpp>
+#include <vle/utils/Debug.hpp>
+#include <cmath>
+
+namespace vle { namespace extension {
+
+using namespace devs;
+using namespace graph;
+using namespace value;
+
+CombinedQss::CombinedQss(const AtomicModel& model) :
+    Dynamics(model),
+    mActive(true),
+    mDependance(true),
+    mValue(0),
+    mIndex(0),
+    mGradient(0),
+    mSigma(0),
+    mLastTime(0),
+    mState(0)
+{
+}
+
+void CombinedQss::processInitEvents(const InitEventList& event)
+{
+    const value::Value& threshold = event.get("threshold");
+    mThreshold = value::toDouble(threshold);
+
+    if (event.exist("active")) {
+	const value::Value& active = event.get("active");
+	mActive = value::toBoolean(active);
+    }
+
+    if (event.exist("dependance")) {
+	const value::Value& dependance = event.get("dependance");
+	mDependance = value::toBoolean(dependance);
+    }
+
+    const value::Map& variables = value::toMapValue(event.get("variables"));
+    const value::MapValue& lst = variables->getValue();
+    unsigned int index = 0;
+    
+    for (value::MapValue::const_iterator it = lst.begin(); it != lst.end();
+         ++it) {
+        const value::Set& tab(value::toSetValue(it->second));
+	double init = value::toDouble(tab->getValue(0));        
+	double precision = value::toDouble(tab->getValue(1));        
+
+        mVariableIndex[it->first] = index;
+        mVariableName[index] = it->first;
+        mVariablePrecision[index] = precision;
+        mVariableEpsilon[index] = precision;
+        mInitialValueList.push_back(std::pair < unsigned int, double >(
+					index, init));
+	++index;
+    }
+    mVariableNumber = index;
+    mValue = new double[index];
+    mIndex = new long[index];
+    mGradient = new double[index];
+    mSigma = new devs::Time[index];
+    mLastTime = new devs::Time[index];
+    mState = new state[index];
+}
+
+void CombinedQss::updateSigma(unsigned int i)
+{
+    if (std::abs(getGradient(i)) < mThreshold) {
+        setSigma(i,devs::Time::infinity);
+    } else {
+        if (getGradient(i) > 0) {
+            setSigma(i, devs::Time((d(i, getIndex(i) + 1)-getValue(i)) /
+                                   getGradient(i)));
+        } else {
+            setSigma(i,devs::Time(((d(i, getIndex(i))-getValue(i))-mVariableEpsilon[i]) /
+                                  getGradient(i)));
+        }
+    }
+}
+
+void CombinedQss::minSigma()
+{
+    // Recherche de la prochaine fonction à calculer
+    unsigned int j = 1;
+    unsigned int j_min = 0;
+    double min = getSigma(0).getValue();
+
+    while (j < mVariableNumber) {
+        if (min > getSigma(j).getValue()) {
+            min = getSigma(j).getValue();
+            j_min = j;
+        }
+        ++j;
+    }
+    mCurrentModel = j_min;
+}
+
+void CombinedQss::reset(const Time& time, unsigned int i, double value)
+{
+    setValue(i, value);
+    setIndex(i, (long)(floor(getValue(i)/mVariablePrecision[i])));
+    setLastTime(i, time);
+    setGradient(i, compute(i));
+    updateSigma(i);    
+}
+
+// DEVS Methods
+
+void CombinedQss::finish()
+{
+    delete[] mGradient;
+    delete[] mValue;
+    delete[] mIndex;
+    delete[] mSigma;
+    delete[] mLastTime;
+    delete[] mState;
+}
+
+Time CombinedQss::init()
+{
+// Initialisation des variables internes
+    std::vector < std::pair < unsigned int , double > >::const_iterator it =
+        mInitialValueList.begin();
+
+    while (it != mInitialValueList.end()) {
+        mValue[it->first] = it->second;
+        ++it;
+    }
+
+    for(unsigned int i = 0;i < mVariableNumber;i++) {
+        mGradient[i] = 0.0;
+        mIndex[i] = (long)(floor(getValue(i)/mVariablePrecision[i]));
+        setSigma(i, devs::Time(0));
+        setLastTime(i, devs::Time(0));
+        setState(i, INIT);
+    }
+    mCurrentModel = 0;
+    return devs::Time(0);
+}
+
+
+void CombinedQss::getOutputFunction(const Time& time,
+				    ExternalEventList& output) 
+{
+    if (getState(mCurrentModel) == INIT or ((getState(mCurrentModel) == POST3 or getState(mCurrentModel) == RUN) 
+					    and mActive)) {
+	devs::ExternalEvent* ee = new devs::ExternalEvent(mVariableName[mCurrentModel]);
+	double e = (time - getLastTime(mCurrentModel)).getValue();
+	
+	ee << devs::attribute("value", getValue(mCurrentModel)+e*getGradient(mCurrentModel));
+	output.addEvent(ee);
+    }
+}
+
+Time CombinedQss::getTimeAdvance()
+{
+    return getSigma(mCurrentModel);
+}
+
+Event::EventType CombinedQss::processConflict(const InternalEvent& /* internal */,
+					      const ExternalEventList& /* extEventlist */) const
+{
+    return Event::EXTERNAL;
+}
+
+void CombinedQss::processInternalEvent(const InternalEvent& event)
+{
+    switch (getState(mCurrentModel)) {
+    case INIT: // init du gradient
+	if (mDependance) {
+	    for (unsigned int i = 0; i < mVariableNumber; i++) {
+		setState(i, POST_INIT);
+		setSigma(i, Time::infinity);
+	    }
+	}
+	else {
+	    for (unsigned int i = 0; i < mVariableNumber; i++) {
+		setState(i, RUN);
+		setGradient(i, compute(i));
+		updateSigma(i);
+	    }
+	    minSigma();
+	}
+        break;
+    case POST2:
+	// mise à jour du gradient après reception des valeurs de
+	// mes variables externes
+	for (unsigned int i = 0; i < mVariableNumber; i++) {
+	    setState(i, RUN);
+	    setLastTime(i, event.getTime());
+	    setGradient(i, compute(i));
+	    updateSigma(i);
+	}
+        minSigma();
+        break;
+    case POST3:
+	// mise à jour du gradient après reception d'une nouvelle
+	// valeur pour l'une de mes variables externes
+	// et envoie de ma nouvelle valeur aux équations qui
+	// dépendent de moi si elles existent
+	setState(mCurrentModel, RUN);
+	updateSigma(mCurrentModel);
+        minSigma();
+        break;
+    case RUN:
+        if (getGradient(mCurrentModel) >= 0) incIndex(mCurrentModel);
+        else decIndex(mCurrentModel);
+	for (unsigned int i = 0; i < mVariableNumber; i++)
+	    if (i != mCurrentModel)
+		setValue(i, getValue(i) + (event.getTime() - getLastTime(i)).getValue()*getGradient(i));
+	    else 
+		setValue(mCurrentModel,d(mCurrentModel, getIndex(mCurrentModel)));
+
+	// Propagation ou non de la nouvelle valeur
+        if (mActive) {
+	    // si oui alors on va attendre les valeurs
+	    // actualisées de toutes mes variables externes
+            setState(mCurrentModel, POST);
+            setSigma(mCurrentModel, Time::infinity); 
+        } else {
+	    // sinon on passe au pas suivant
+
+	    for (unsigned int i = 0; i < mVariableNumber; i++) {
+		setState(i, RUN);
+		setLastTime(i, event.getTime());
+		setGradient(i, compute(i));
+		updateSigma(i);
+	    }
+	}
+	minSigma();
+	break;
+    case POST_INIT:
+    case POST:
+	break;
+    }
+}
+
+void CombinedQss::processExternalEvents(const ExternalEventList& event,
+					const Time& time)
+{
+    if (getState(0) == POST_INIT) // réception de la définition des variables externes
+    {
+	ExternalEventList::const_iterator it = event.begin();
+	unsigned int index = 0;
+
+	while (it != event.end()) {
+	    std::string name = (*it)->getStringAttributeValue("name");
+	    double value = (*it)->getDoubleAttributeValue("value");
+
+	    mExternalVariableIndex[name] = index;
+	    mExternalVariableValue[index] = value;
+	    ++index;
+	    ++it;
+	}
+	for (unsigned int i = 0; i < mVariableNumber; i++) {
+	    setState(i, RUN);
+	    setGradient(i, compute(i));
+	    updateSigma(i);
+	}
+	minSigma();
+    }
+    else {
+	ExternalEventList::const_iterator it = event.begin();
+	bool _reset = false;
+	
+	while (it != event.end()) {
+	    std::string name = (*it)->getStringAttributeValue("name");
+	    double value = (*it)->getDoubleAttributeValue("value");
+	    
+	    // c'est une variable externe QSS
+	    if ((*it)->onPort("update")) {
+// 		Assert(utils::InternalError, name != mVariableName,
+// 		       boost::format("Qss update, invalid variable name: %1%") % name);
+		
+		setExternalValue(name, value);		
+	    }	    
+	    // c'est une perturbation sur une variable interne
+	    if ((*it)->onPort("perturb")) {
+// 		Assert(utils::InternalError, name == mVariableName,
+// 		       boost::format("Qss perturbation, invalid variable name: %1%") % name);
+		
+		reset(time, mVariableIndex[name], value);
+		_reset = true;
+	    }
+	    ++it;
+	}
+	for (unsigned int i = 0; i < mVariableNumber; i++) {
+	    if (getState(i) == POST) {
+		setState(i, POST2);
+		setSigma(i, 0);
+	    }
+	    else if (getState(i) == RUN) {
+		if (_reset) setSigma(i, 0);
+		else {
+		    setValue(i, getValue(i) + (time - mLastTime[i]).getValue()*getGradient(i));
+		    setLastTime(i, time);
+		    setGradient(i, compute(i));
+		    
+		    setSigma(i, 0);
+		    setState(i, POST3);		
+		}
+	    }
+	}
+	minSigma();	
+    }
+}
+
+Value CombinedQss::processStateEvent(const StateEvent& event) const
+{
+    unsigned int i = mVariableIndex.find(event.getPortName())->second;
+    double e = (event.getTime() - getLastTime(i)).getValue();
+
+    return value::DoubleFactory::create(getValue(i)+e*getGradient(i));
+}
+
+void CombinedQss::processInstantaneousEvent(const InstantaneousEvent& event,
+					    const Time& time,
+					    ExternalEventList& output) const
+{
+    unsigned int i = mVariableIndex.find(event.getStringAttributeValue("name"))->second;
+    double e = (time - getLastTime(i)).getValue();
+    devs::ExternalEvent* ee = new devs::ExternalEvent("response");
+      
+    ee << devs::attribute("name", event.getStringAttributeValue("name"));
+    ee << devs::attribute("value", getValue(i)+e*getGradient(i));
+    output.addEvent(ee);
+}
+
+int CombinedQss::getVariable(const std::string& name) const
+{
+    std::map < std::string, unsigned int >::const_iterator it;
+
+    it = mVariableIndex.find(name);
+    if (it != mVariableIndex.end()) return it->second;
+    else return -1;
+}
+
+const std::string& CombinedQss::getVariable(unsigned int index) const
+{
+    std::map < unsigned int, std::string >::const_iterator it;
+    it = mVariableName.find(index);
+
+    Assert(utils::InternalError, it != mVariableName.end(), boost::format(
+	       "CombinedQss model, unknow variable index %1%") % index);
+
+    return it->second;
+}
+
+}} // namespace vle extension

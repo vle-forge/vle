@@ -1,0 +1,185 @@
+/**
+ * @file extension/CombinedQss.hpp
+ * @author The VLE Development Team.
+ * @brief
+ */
+
+/*
+ * Copyright (C) 2006, 07 - The vle Development Team
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+
+#ifndef VLE_EXTENSION_COMBINEDQSS_HPP
+#define VLE_EXTENSION_COMBINEDQSS_HPP
+
+#include <vle/devs/Dynamics.hpp>
+#include <vector>
+#include <map>
+
+namespace vle { namespace extension {
+    
+    class CombinedQss : public vle::devs::Dynamics
+    {
+    public:
+        enum state { INIT, POST_INIT, RUN, POST, POST2, POST3 };
+
+        CombinedQss(const vle::graph::AtomicModel& model);
+
+        virtual ~CombinedQss() { }
+
+        virtual void finish();
+
+        virtual vle::devs::Time init();
+
+        virtual void getOutputFunction(
+	    const vle::devs::Time& time,
+            vle::devs::ExternalEventList& output);
+
+        virtual vle::devs::Time getTimeAdvance();
+
+        virtual vle::devs::Event::EventType processConflict(
+	    const vle::devs::InternalEvent& internal,
+            const vle::devs::ExternalEventList& extEventlist) const;
+
+        virtual void processInitEvents(
+	    const vle::devs::InitEventList& event);
+
+        virtual void processInternalEvent(
+	    const vle::devs::InternalEvent& event);
+
+        virtual void processExternalEvents(
+	    const vle::devs::ExternalEventList& event,
+            const vle::devs::Time& time);
+
+        virtual vle::value::Value processStateEvent(
+	    const vle::devs::StateEvent& event) const;
+
+	virtual void processInstantaneousEvent(const vle::devs::InstantaneousEvent& /* event */,
+					       const vle::devs::Time& /* time */,
+					       vle::devs::ExternalEventList& /* output */) const;
+    protected:
+        /**
+         * @brief The function to develop mathemacial expression like:
+         * @code
+         * if (i == 0) { // the first variable
+         *   return a * getValue(0) - b * getValue(0) * getValue(1);
+         * } else {
+         *   return c * getValue(1) - d * getValue(1) * getValue(0);
+         * }
+         * @endcode
+         * @param i the index of the variable to compute.
+         */
+        virtual double compute(unsigned int i) = 0;
+
+        /**
+         * @brief Get the value of the variable specified by index. Be carefull,
+         * no check on the variable i: 0 <= i < m_functionNumber.
+         * @param i index of the variable.
+         */
+        inline double getValue(unsigned int i) const
+        { return mValue[i]; }
+
+        /**
+         * @brief Set the value of the variable specified by index. Be carefull,
+         * no check on the variable i: 0 <= i < m_functionNumber.
+         * @param i index of the variable.
+         */
+        inline void setValue(unsigned int i, double value)
+        { mValue[i] = value; }
+
+	inline double getExternalValue(const std::string& name) const
+	    { return mExternalVariableValue.find(mExternalVariableIndex.find(name)->second)->second; }	
+
+	inline void setExternalValue(const std::string& name, double value)
+	    { mExternalVariableValue[mExternalVariableIndex[name]] = value; }	
+
+        bool mActive;
+        bool mDependance;
+/** Internal variables */
+        std::vector < std::pair < unsigned int , double > > mInitialValueList;
+        std::map < unsigned int , std::string > mVariableName;
+	double* mValue;
+        std::map < unsigned int , double > mVariablePrecision;
+        std::map < unsigned int , double > mVariableEpsilon;
+        std::map < std::string , unsigned int > mVariableIndex;
+	unsigned int mVariableNumber;
+/** External variables */
+	std::map < unsigned int , double > mExternalVariableValue;
+	std::map < std::string , unsigned int > mExternalVariableIndex;
+/** State */
+        long* mIndex;
+        double* mGradient;
+        devs::Time* mSigma;
+        devs::Time* mLastTime;
+        state* mState;
+
+    private:
+/** Current model */
+        unsigned int mCurrentModel;
+        double mThreshold;
+
+        inline double d(unsigned int i, long x)
+        { return x * mVariablePrecision[i]; }
+
+        int getVariable(const std::string& name) const;
+
+        const std::string& getVariable(unsigned int index) const;
+
+        inline double getGradient(unsigned int i) const
+        { return mGradient[i]; }
+
+        inline long getIndex(unsigned int i) const
+        { return mIndex[i]; }
+
+        inline const devs::Time& getLastTime(unsigned int i) const
+        { return mLastTime[i]; }
+
+        inline const devs::Time& getSigma(unsigned int i) const
+        { return mSigma[i]; }
+
+        inline state getState(unsigned int i) const
+        { return mState[i]; }
+
+	inline void decIndex(unsigned int i)
+        { --mIndex[i]; }
+
+	inline void incIndex(unsigned int i)
+        { ++mIndex[i]; }
+
+        inline void setIndex(unsigned int i, long index)
+        { mIndex[i] = index; }
+
+        inline void setGradient(unsigned int i,double gradient)
+        { mGradient[i] = gradient; }
+
+        inline void setLastTime(unsigned int i,const devs::Time & time)
+        { mLastTime[i] = time; }
+
+        inline void setSigma(unsigned int i,const devs::Time & time)
+        { mSigma[i] = time; }
+
+        inline void setState(unsigned int i,state state)
+        { mState[i] = state; }
+
+        void updateSigma(unsigned int i);
+
+        void minSigma();
+
+	void reset(const vle::devs::Time& time, unsigned int i, double value);
+    };
+
+}} // namespace vle extension
+
+#endif
