@@ -32,7 +32,6 @@
 #include <vle/devs/Time.hpp>
 #include <vle/devs/EventList.hpp>
 #include <vle/devs/EventTable.hpp>
-#include <vle/devs/InitEvent.hpp>
 #include <vle/devs/InternalEvent.hpp>
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/devs/StateEvent.hpp>

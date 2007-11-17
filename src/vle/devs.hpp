@@ -37,7 +37,6 @@
 #include <vle/devs/Executive.hpp>
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/devs/ExternalEventList.hpp>
-#include <vle/devs/InitEvent.hpp>
 #include <vle/devs/InstantaneousEvent.hpp>
 #include <vle/devs/InstantaneousEventList.hpp>
 #include <vle/devs/InternalEvent.hpp>

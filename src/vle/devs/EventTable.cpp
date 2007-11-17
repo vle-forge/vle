@@ -30,7 +30,6 @@
 #include <vle/devs/ExternalEventList.hpp>
 #include <vle/devs/InstantaneousEventList.hpp>
 #include <vle/devs/StateEvent.hpp>
-#include <vle/devs/InitEvent.hpp>
 #include <vle/utils/Debug.hpp>
 
 
