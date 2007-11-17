@@ -1,5 +1,5 @@
 /** 
- * @file Text.hpp
+ * @file csv.cpp
  * @brief 
  * @author The vle Development Team
  * @date 2007-11-17
@@ -22,31 +22,42 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef VLE_OOV_PLUGINS_TEXT_HPP
-#define VLE_OOV_PLUGINS_TEXT_HPP
-
-#include <vle/oov/SimpleFile.hpp>
+#include <vle/oov/plugins/csv.hpp>
 
 namespace vle { namespace oov { namespace plugin {
 
-    class Text : public SimpleFile
-    {
-    public:
-        Text(const std::string& location);
+CSV::CSV(const std::string& location) :
+    SimpleFile(location)
+{
+}
 
-        virtual ~Text();
+CSV::~CSV()
+{
+}
 
-        virtual std::string extension() const;
+std::string CSV::extension() const
+{
+    return ".csv";
+}
 
-        virtual void writeSeparator(std::ostream& out);
+void CSV::writeSeparator(std::ostream& out)
+{
+    out << ';';
+}
 
-        virtual void writeHead(std::ostream& out,
-                               const std::vector < std::string >& heads);
+void CSV::writeHead(std::ostream& out, const std::vector < std::string >& heads)
+{
+    if (not heads.empty()) {
+        std::vector < std::string >::const_iterator it = heads.begin();
+        out << *it;
+        it++;
 
-    };
-
-    DECLARE_OOV_PLUGIN(vle::oov::plugin::Text);
+        while (it != heads.end()) {
+            out << ';' << *it;
+            ++it;
+        }
+    }
+    out << '\n';
+}
 
 }}} // namespace vle oov plugin
-
-#endif

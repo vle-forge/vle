@@ -403,7 +403,7 @@ void Coordinator::buildViews()
             break;
         }
         
-        std::string file((boost::format("%1%_%2%.dat") % 
+        std::string file((boost::format("%1%_%2%") % 
                           m_modelFactory.experiment().name() %
                           it->second.name()).str());
         stream->open(it->second.plugin(), it->second.location(), file, 

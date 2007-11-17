@@ -1,5 +1,5 @@
 /** 
- * @file Text.hpp
+ * @file cvs.hpp
  * @brief 
  * @author The vle Development Team
  * @date 2007-11-17
@@ -22,19 +22,19 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef VLE_OOV_PLUGINS_TEXT_HPP
-#define VLE_OOV_PLUGINS_TEXT_HPP
+#ifndef VLE_OOV_PLUGINS_CSV_HPP
+#define VLE_OOV_PLUGINS_CSV_HPP
 
 #include <vle/oov/SimpleFile.hpp>
 
 namespace vle { namespace oov { namespace plugin {
 
-    class Text : public SimpleFile
+    class CSV : public SimpleFile
     {
     public:
-        Text(const std::string& location);
+        CSV(const std::string& location);
 
-        virtual ~Text();
+        virtual ~CSV();
 
         virtual std::string extension() const;
 
@@ -45,7 +45,7 @@ namespace vle { namespace oov { namespace plugin {
 
     };
 
-    DECLARE_OOV_PLUGIN(vle::oov::plugin::Text);
+    DECLARE_OOV_PLUGIN(vle::oov::plugin::CSV);
 
 }}} // namespace vle oov plugin
 

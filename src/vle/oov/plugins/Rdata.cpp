@@ -1,5 +1,5 @@
 /** 
- * @file Text.hpp
+ * @file Rdata.cpp
  * @brief 
  * @author The vle Development Team
  * @date 2007-11-17
@@ -22,31 +22,37 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef VLE_OOV_PLUGINS_TEXT_HPP
-#define VLE_OOV_PLUGINS_TEXT_HPP
-
-#include <vle/oov/SimpleFile.hpp>
+#include <vle/oov/plugins/Rdata.hpp>
 
 namespace vle { namespace oov { namespace plugin {
 
-    class Text : public SimpleFile
-    {
-    public:
-        Text(const std::string& location);
+Rdata::Rdata(const std::string& location) :
+    SimpleFile(location)
+{
+}
 
-        virtual ~Text();
+Rdata::~Rdata()
+{
+}
 
-        virtual std::string extension() const;
+std::string Rdata::extension() const
+{
+    return ".dat";
+}
 
-        virtual void writeSeparator(std::ostream& out);
+void Rdata::writeSeparator(std::ostream& out)
+{
+    out << '\t';
+}
 
-        virtual void writeHead(std::ostream& out,
-                               const std::vector < std::string >& heads);
-
-    };
-
-    DECLARE_OOV_PLUGIN(vle::oov::plugin::Text);
+void Rdata::writeHead(std::ostream& out,
+                      const std::vector < std::string >& heads)
+{
+    for (std::vector < std::string >::const_iterator it = heads.begin();
+         it != heads.end(); ++it) {
+        out << *it << '\t';
+    }
+    out << '\n';
+}
 
 }}} // namespace vle oov plugin
-
-#endif

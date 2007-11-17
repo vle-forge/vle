@@ -7,9 +7,11 @@ LINK_DIRECTORIES(
   ${GLIBMM_LIBRARY_DIRS}
   ${LIBXMLPP_LIBRARY_DIR})
 
-ADD_LIBRARY(text SHARED Text.cpp Text.hpp)
-
 ADD_LIBRARY(default SHARED Default.cpp Default.hpp)
+ADD_LIBRARY(text SHARED Text.cpp Text.hpp)
+ADD_LIBRARY(rdata SHARED Rdata.cpp Rdata.hpp)
+ADD_LIBRARY(csv SHARED csv.cpp csv.hpp)
+
 
 TARGET_LINK_LIBRARIES(default
   ${GLIBMM_LIBRARIES}
@@ -35,11 +37,43 @@ TARGET_LINK_LIBRARIES(text
   vlevpz
   vleoov)
 
+TARGET_LINK_LIBRARIES(rdata
+  ${GLIBMM_LIBRARIES}
+  ${LIBXMLPP_LIBRARIES}
+  ${GTHREAD_LIBRARIES}
+  vlegeometry
+  vleutils
+  vledata
+  vlevalue
+  vlegraph
+  vlevpz
+  vleoov)
+
+TARGET_LINK_LIBRARIES(csv
+  ${GLIBMM_LIBRARIES}
+  ${LIBXMLPP_LIBRARIES}
+  ${GTHREAD_LIBRARIES}
+  vlegeometry
+  vleutils
+  vledata
+  vlevalue
+  vlegraph
+  vlevpz
+  vleoov)
+
 INSTALL(TARGETS default
   RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/stream"
   LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/stream")
 
-INSTALL(TARGETS text 
+INSTALL(TARGETS text
+  RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/stream"
+  LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/stream")
+
+INSTALL(TARGETS rdata 
+  RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/stream"
+  LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/stream")
+
+INSTALL(TARGETS csv
   RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/stream"
   LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/stream")
 
