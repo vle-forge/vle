@@ -79,7 +79,7 @@ void Condition::write(std::ostream& out) const
         const value::VectorValue& val(value::toSet(it->second));
         for (value::VectorValue::const_iterator jt = val.begin();
              jt != val.end(); ++jt) {
-            out << (*jt)->toXML();
+            out << (*jt)->toXML() << "\n";
         }
 
         out << "</port>\n";

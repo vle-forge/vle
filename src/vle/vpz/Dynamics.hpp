@@ -133,20 +133,45 @@ namespace vle { namespace vpz {
          */
         void cleanNoPermanent();
 
-    private:
-        DynamicList     m_list;
+        ////
+        //// Functors
+        ////
 
+        /** 
+         * @brief Functor to get the name of a Dynamic.
+         */
+        struct DynamicName
+        {
+            inline const std::string& operator()(
+                const DynamicList::value_type& x) const
+            { return x.first; }
+        };
+
+        /** 
+         * @brief Functor to get the value of a Dynamic.
+         */
+        struct DynamicValue
+        {
+            inline const Dynamic& operator()(
+                const DynamicList::value_type& x) const
+            { return x.second; }
+        };
+
+        /** 
+         * @brief Functor to add a dynamic to a dynamics.
+         */
         struct AddDynamic
         {
-            AddDynamic(Dynamics& dynamics) :
-                m_dynamics(dynamics)
-            { }
+            AddDynamic(Dynamics& dynamics) : m_dynamics(dynamics) { }
 
             void operator()(const DynamicList::value_type& pair)
             { m_dynamics.add(pair.second); }
 
             Dynamics& m_dynamics;
         };
+    private:
+        DynamicList     m_list;
+
     };
 
 }} // namespace vle vpz

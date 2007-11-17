@@ -44,7 +44,10 @@ Vpz::Vpz(const Vpz& vpz) :
 
 void Vpz::write(std::ostream& out) const
 {
-    out << "<?xml version=\"1.0\" ?>\n";
+    out << "<?xml version=\"1.0\" ?>\n"
+        << "<!DOCTYPE vle_project SYSTEM "
+        << "\"http://vle.univ-littoral.fr/vle-0.5.0.dtd\">";
+
     m_project.write(out);
     out << std::endl;
 }

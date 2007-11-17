@@ -32,9 +32,9 @@ void Dynamics::write(std::ostream& out) const
     if (not m_list.empty()) {
         out << "<dynamics>\n";
 
-        for (DynamicList::const_iterator it = m_list.begin(); it !=
-             m_list.end(); ++it)
-            out << it->second;
+        std::transform(m_list.begin(), m_list.end(), 
+                       std::ostream_iterator < Dynamic >(out, "\n"),
+                       DynamicValue());
 
         out << "</dynamics>\n";
     }
