@@ -38,6 +38,8 @@ CombinedQss::CombinedQss(const AtomicModel& model) :
     mActive(true),
     mDependance(true),
     mValue(0),
+    mExternalVariableNumber(0),
+    mExternalValues(false),
     mIndex(0),
     mGradient(0),
     mSigma(0),

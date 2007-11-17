@@ -36,7 +36,9 @@ using namespace value;
 qss::qss(const AtomicModel& model) :
     Dynamics(model),
     mActive(true),
-    mDependance(true)
+    mDependance(true),
+    mExternalVariableNumber(0),
+    mExternalValues(false)
 {
 }
 
