@@ -1,12 +1,10 @@
 /**
  * @file extension/DifferenceEquation.hpp
  * @author The VLE Development Team.
- * @date Mon Nov 12 10:39:07 CET 2007
- * @brief
  */
 
 /*
- * Copyright (C) 2006, 07 - The vle Development Team
+ * Copyright (C) 2007 - The vle Development Team
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -29,52 +27,54 @@
 
 namespace vle { namespace extension {
     
-    class DifferenceEquation : public vle::devs::Dynamics
+    class DifferenceEquation : public devs::Dynamics
     {
     public:
         enum state { INIT, POST_INIT, RUN, POST, POST2, POST3 };
 
-        DifferenceEquation(const vle::graph::AtomicModel& model);
+        DifferenceEquation(const graph::AtomicModel& model);
 
         virtual ~DifferenceEquation() { }
 
         virtual void finish();
 
-        virtual vle::devs::Time init();
+        virtual devs::Time init();
 
         virtual void getOutputFunction(
-	    const vle::devs::Time& time,
-            vle::devs::ExternalEventList& output);
+	    const devs::Time& time,
+            devs::ExternalEventList& output);
 
-        virtual vle::devs::Time getTimeAdvance();
+        virtual devs::Time getTimeAdvance();
 
-        virtual vle::devs::Event::EventType processConflict(
-	    const vle::devs::InternalEvent& internal,
-            const vle::devs::ExternalEventList& extEventlist) const;
+        virtual devs::Event::EventType processConflict(
+	    const devs::InternalEvent& internal,
+            const devs::ExternalEventList& extEventlist) const;
 
         virtual void processInitEvents(
-	    const vle::devs::InitEventList& event);
+	    const devs::InitEventList& event);
 
         virtual void processInternalEvent(
-	    const vle::devs::InternalEvent& event);
+	    const devs::InternalEvent& event);
 
         virtual void processExternalEvents(
-	    const vle::devs::ExternalEventList& event,
-            const vle::devs::Time& time);
+	    const devs::ExternalEventList& event,
+            const devs::Time& time);
 
-        virtual vle::value::Value processStateEvent(
-	    const vle::devs::StateEvent& event) const;
+        virtual value::Value processStateEvent(
+	    const devs::StateEvent& event) const;
 
-	virtual void processInstantaneousEvent(const vle::devs::InstantaneousEvent& /* event */,
-					       const vle::devs::Time& /* time */,
-					       vle::devs::ExternalEventList& /* output */) const;
+        virtual void processInstantaneousEvent(
+            const devs::InstantaneousEvent& /* event */,
+            const devs::Time& /* time */,
+            devs::ExternalEventList& /* output */) const;
 
     protected:
 	inline double getValue(const std::string& name) const
-	    { return mExternalVariableValue.find(mExternalVariableIndex.find(name)->second)->second; }	
+        { return mExternalVariableValue.find(
+                mExternalVariableIndex.find(name)->second)->second; }	
 
 	inline void setValue(const std::string& name, double value)
-	    { mExternalVariableValue[mExternalVariableIndex[name]] = value; }	
+        { mExternalVariableValue[mExternalVariableIndex[name]] = value; }	
 
         /**
          * @brief The function to develop mathemacial expression like:
@@ -87,20 +87,23 @@ namespace vle { namespace extension {
         bool mActive;
         bool mDependance;
         devs::Time mTimeStep;
-/** Internal variable */
+
+        /** Internal variable */
         double mInitialValue;
         std::string mVariableName;
         double mValue;
-/** External variables */
+
+        /** External variables */
 	std::map < unsigned int , double > mExternalVariableValue;
 	std::map < std::string , unsigned int > mExternalVariableIndex;
-/** State */
+
+        /** State */
         devs::Time mLastTime;
         state mState;
 	devs::Time mSigma;
 
     private:
-	void reset(const vle::devs::Time& time, double value);
+	void reset(const devs::Time& time, double value);
 };
 
 }} // namespace vle extension

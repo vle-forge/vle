@@ -1,12 +1,10 @@
 /** 
  * @file extension/DifferenceEquation.cpp
- * @brief 
  * @author The vle Development Team
- * @date Mon Nov 12 10:39:07 CET 2007
  */
 
 /*
- * Copyright (C) 2006, 07 - The vle Development Team
+ * Copyright (C) 2007 - The vle Development Team
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -101,8 +99,9 @@ Time DifferenceEquation::getTimeAdvance()
     return mSigma;
 }
 
-Event::EventType DifferenceEquation::processConflict(const InternalEvent& /* internal */,
-						     const ExternalEventList& /* extEventlist */) const
+Event::EventType DifferenceEquation::processConflict(
+    const InternalEvent& /* internal */,
+    const ExternalEventList& /* extEventlist */) const
 {
     return Event::EXTERNAL;
 }
@@ -159,8 +158,8 @@ void DifferenceEquation::processInternalEvent(const InternalEvent& event)
 void DifferenceEquation::processExternalEvents(const ExternalEventList& event,
 					       const Time& time)
 {
-    if (mState == POST_INIT) // réception de la définition des variables externes
-    {
+    if (mState == POST_INIT) { // reception de la definition des variables
+                               // externes.
 	ExternalEventList::const_iterator it = event.begin();
 	unsigned int index = 0;
 
@@ -175,8 +174,7 @@ void DifferenceEquation::processExternalEvents(const ExternalEventList& event,
 	}
 	mState = RUN;
 	mSigma = mTimeStep;
-    }
-    else {
+    } else {
 	ExternalEventList::const_iterator it = event.begin();
 	bool _reset = false;
 	
@@ -186,16 +184,19 @@ void DifferenceEquation::processExternalEvents(const ExternalEventList& event,
 	    
 	    // c'est une variable externe DifferenceEquation
 	    if ((*it)->onPort("update")) {
-		Assert(utils::InternalError, name != mVariableName,
-		       boost::format("DifferenceEquation update, invalid variable name: %1%") % name);
+                Assert(utils::InternalError, name != mVariableName,
+                       boost::format(
+                           "DifferenceEquation update, invalid variable name:" \
+                           "%1%") % name);
 
 		setValue(name, value);		
 	    }	    
 	    // c'est une perturbation sur une variable interne
 	    if ((*it)->onPort("perturb")) {
 		Assert(utils::InternalError, name == mVariableName,
-		       boost::format("DifferenceEquation perturbation, invalid variable name: %1%") % name);
-		
+                       boost::format("DifferenceEquation perturbation," \
+                                     " invalid variable name: %1%") % name);
+
 		reset(time, value);
 		_reset = true;
 	    }
@@ -206,8 +207,9 @@ void DifferenceEquation::processExternalEvents(const ExternalEventList& event,
 	    mSigma = devs::Time(0);
 	}
 	else if (mState == RUN) {
-	    if (_reset) mSigma = devs::Time(0);
-	    else {
+            if (_reset) {
+                mSigma = devs::Time(0);
+            } else {
 		mSigma = devs::Time(0);
 		mState = POST3;
 	    }
@@ -218,17 +220,21 @@ void DifferenceEquation::processExternalEvents(const ExternalEventList& event,
 Value DifferenceEquation::processStateEvent(const StateEvent& event) const
 {
     Assert(utils::InternalError, event.getPortName() == mVariableName,
-	   boost::format("DifferenceEquation model, invalid variable name: %1%") % event.getStringAttributeValue("name"));
+           boost::format("DifferenceEquation model, invalid variable name: %1%")
+           % event.getStringAttributeValue("name"));
 
     return value::DoubleFactory::create(mValue);
 }
 
-void DifferenceEquation::processInstantaneousEvent(const InstantaneousEvent& event,
-						   const Time& /*time*/,
-						   ExternalEventList& output) const
+void DifferenceEquation::processInstantaneousEvent(
+    const InstantaneousEvent& event,
+    const Time& /*time*/,
+    ExternalEventList& output) const
 {
-    Assert(utils::InternalError, event.getStringAttributeValue("name") == mVariableName,
-	   boost::format("DifferenceEquation model, invalid variable name: %1%") % event.getStringAttributeValue("name"));
+    Assert(utils::InternalError, event.getStringAttributeValue("name") ==
+           mVariableName, boost::format(
+               "DifferenceEquation model, invalid variable name: %1%") %
+           event.getStringAttributeValue("name"));
 
     devs::ExternalEvent* ee = new devs::ExternalEvent("response");
       
