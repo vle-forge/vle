@@ -12,7 +12,7 @@ ADD_LIBRARY(default SHARED Default.cpp Default.hpp)
 ADD_LIBRARY(text SHARED Text.cpp Text.hpp)
 ADD_LIBRARY(rdata SHARED Rdata.cpp Rdata.hpp)
 ADD_LIBRARY(csv SHARED csv.cpp csv.hpp)
-
+ADD_LIBRARY(storage SHARED Storage.cpp Storage.hpp)
 
 TARGET_LINK_LIBRARIES(default
   ${GLIBMM_LIBRARIES}
@@ -62,6 +62,18 @@ TARGET_LINK_LIBRARIES(csv
   vlevpz
   vleoov)
 
+TARGET_LINK_LIBRARIES(storage
+  ${GLIBMM_LIBRARIES}
+  ${LIBXMLPP_LIBRARIES}
+  ${GTHREAD_LIBRARIES}
+  vlegeometry
+  vleutils
+  vledata
+  vlevalue
+  vlegraph
+  vlevpz
+  vleoov)
+
 INSTALL(TARGETS default
   RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/stream"
   LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/stream")
@@ -77,6 +89,11 @@ INSTALL(TARGETS rdata
 INSTALL(TARGETS csv
   RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/stream"
   LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/stream")
+
+INSTALL(TARGETS storage
+  RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/stream"
+  LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/stream")
+
 
 IF (HAVE_CAIRO)
   ADD_SUBDIRECTORY(cairo)
