@@ -12,7 +12,7 @@
       <port name="out" />
      </out>
      <submodels>
-      <model name="x" type="atomic" >
+      <model name="x" type="atomic" dynamics="unittest" >
        <in>
         <port name="in" />
        </in>
@@ -20,17 +20,17 @@
         <port name="out" />
        </out>
       </model>
-      <model name="a" type="atomic" >
+      <model name="a" type="atomic" dynamics="unittest" >
        <in>
         <port name="in" />
        </in>
       </model>
-      <model name="b" type="atomic" >
+      <model name="b" type="atomic" dynamics="unittest" >
        <in>
         <port name="in" />
        </in>
       </model>
-      <model name="c" type="atomic" >
+      <model name="c" type="atomic" dynamics="unittest" >
        <in>
         <port name="in1" />
         <port name="in2" />
@@ -76,12 +76,12 @@
       <port name="out" />
      </out>
      <submodels>
-      <model name="f" type="atomic" >
+      <model name="f" type="atomic" dynamics="unittest" >
        <in>
         <port name="in" />
        </in>
       </model>
-      <model name="g" type="atomic" > 
+      <model name="g" type="atomic" dynamics="unittest" > 
        <in>
         <port name="in" />
        </in>
@@ -98,12 +98,12 @@
       </connection>
      </connections>
     </model>
-    <model name="d" type="atomic" conditions="cd" >
+    <model name="d" type="atomic" conditions="cd" dynamics="unittest" >
      <in>
       <port name="in" />
      </in>
     </model>
-    <model name="e" type="atomic" >
+    <model name="e" type="atomic" dynamics="unittest" >
      <in>
       <port name="in1" />
       <port name="in2" />
@@ -134,6 +134,9 @@
    </connections>
   </model>
  </structures>
+ <dynamics>
+  <dynamic name="unittest" library="unittest" model="transform" />
+ </dynamics>
  <experiment name="graphtester" duration="100.0" seed="123">
   <conditions>
    <condition name="ca">
