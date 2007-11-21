@@ -10,4 +10,4 @@ Version: @VLE_VERSION@
 Libs:	-L${libdir} -lvledata \
 	-lvledevs -lvleextension -lvlegeometry -lvlegraph -lvlemanager \
 	-lvleutils -lvleoov -lvlevalue -lvlevpz -lvletranslator
-Cflags: -I${includedir}/@VLE_NAME_VERSION@
+Cflags: -I${includedir}/@VLE_NAME_VERSION@ -I@Boost_INCLUDE_DIRS@

@@ -136,6 +136,8 @@ IF (Boost_FOUND)
   ELSE (WITH_TEST)
     SET(HAVE_UNITTESTFRAMEWORK 0 CACHE INTERNAL "" FORCE)
   ENDIF (WITH_TEST)
+ELSE (Boost_FOUND)
+  MESSAGE(ERROR "Boost include directory not found")
 ENDIF (Boost_FOUND)
  
  #
