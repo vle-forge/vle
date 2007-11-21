@@ -437,8 +437,11 @@ namespace vle { namespace graph {
         {
             DeleteModel(CoupledModel* model) : model(model) { }
 
-            void operator()(const ModelList::value_type& value)
-            { model->delModel(value.second); }
+            inline void operator()(const ModelList::value_type& value)
+            {
+		model->delAllConnection(value.second);
+		delete value.second;
+	    }
 
             CoupledModel*   model;
         };

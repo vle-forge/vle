@@ -42,7 +42,6 @@ CoupledModel::CoupledModel(const std::string& name, CoupledModel* parent) :
 
 CoupledModel::~CoupledModel()
 {
-    delAllConnection();
     delAllModel();
 }
 
