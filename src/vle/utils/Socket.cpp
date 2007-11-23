@@ -24,30 +24,11 @@
  */
 
 
+#include <vle/utils/Socket.hpp>
+#include <vle/utils/SocketImpl.h>
 #include <glib/gtypes.h>
-
-#ifdef G_OS_WIN32
-#   include <winsock2.h>
-#   include <vle/utils/Debug.hpp>
-#   include <vle/utils/Socket.hpp>
-#   include <glibmm/stringutils.h>
-#   include <iostream>
-#else
-#   include <vle/utils/Debug.hpp>
-#   include <vle/utils/Socket.hpp>
-#   include <glibmm/stringutils.h>
-#   include <iostream>
-#   include <sys/types.h>
-#   include <sys/socket.h>
-#   include <netdb.h>
-#   include <string.h>
-#   include <unistd.h>
-#   include <netinet/in.h>
-#   include <arpa/inet.h>
-#   include <netdb.h>
-#   include <errno.h>
-#endif
-
+#include <vle/utils/Debug.hpp>
+#include <glibmm/stringutils.h>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -119,31 +100,18 @@ Base::Base() :
     mRunning(false),
     mSocket(-1)
 {
-    int r = ::socket(PF_INET, SOCK_STREAM, 0);
+    int r = vleSocketOpen();
     Assert(InternalError, r != -1,
            boost::format("Error acquiring socket: %1%\n") %
-           Glib::strerror(errno));
+           Glib::strerror(vleSocketErrno()));
 
     mSocket = r;
-    struct linger l;
-    l.l_onoff = 1;
-    l.l_linger = 0;
 
-#ifdef G_OS_WIN32
-    r = ::setsockopt(mSocket, SOL_SOCKET, SO_LINGER, (const char*)&l,
-                     sizeof(l));
-#else
-    r = ::setsockopt(mSocket, SOL_SOCKET, SO_LINGER, &l, sizeof(l));
-#endif
-
-    if (r == -1) {
-#ifdef G_OS_WIN32
-	::closesocket(mSocket);
-#else
-        ::close(mSocket);
-#endif
+    if (vleSocketOptLinger(mSocket) == -1) {
+        vleSocketClose(mSocket);
         Throw(InternalError, boost::format(
-                "Error setsockopt socket: %1%\n") % Glib::strerror(errno));
+                "Error setsockopt socket: %1%\n") %
+            Glib::strerror(vleSocketErrno()));
     }
 
     mRunning = true;
@@ -152,13 +120,8 @@ Base::Base() :
 Base::~Base()
 {
     if (mRunning) {
-#ifdef G_OS_WIN32
-        ::shutdown(mSocket, SD_BOTH);
-        int r = ::closesocket(mSocket);
-#else
-        ::shutdown(mSocket, SHUT_RDWR);
-        int r = ::close(mSocket);
-#endif
+        vleSocketShutdown(mSocket);
+        int r = vleSocketClose(mSocket);
         Assert(InternalError, r == 0, "Cannot close socket properly.");
     }
 }
@@ -174,13 +137,13 @@ void Base::send(int dst, const void* buffer, ssize_t size)
 
     ssize_t position = 0;
     while (size > 0) {
-        ssize_t szcurrent = ::send(dst, (char*)buffer + position, size, 0);
+        ssize_t szcurrent = vleSocketSend(dst, (char*)buffer + position, size);
 	if (szcurrent == 0)
 	    break;
 
         Assert(InternalError, szcurrent != -1,
                boost::format("Cannot send message, %1%\n") %
-               Glib::strerror(errno));
+               Glib::strerror(vleSocketErrno()));
 
 	position += szcurrent;
 	size -= szcurrent;
@@ -189,20 +152,20 @@ void Base::send(int dst, const void* buffer, ssize_t size)
 
 void Base::send_string(int dst, const Glib::ustring& buffer)
 {
-    send(dst, buffer.c_str(), std::strlen(buffer.c_str()));
+    vleSocketSend(dst, buffer.c_str(), std::strlen(buffer.c_str()));
 }
 
 void Base::send_buffer(int dst, const std::string& buffer)
 {
-    send(dst, buffer.c_str(), buffer.size());
+    vleSocketSend(dst, buffer.c_str(), buffer.size());
 }
 
 void Base::send_int(int dst, gint32 buffer)
 {
-    send(dst, &buffer, sizeof(gint32));
+    vleSocketSend(dst, &buffer, sizeof(gint32));
 }
 
-ssize_t Base::recv(int src, void* buffer, size_t size)
+int  Base::recv(int src, void* buffer, size_t size)
 {
     Assert(InternalError, mRunning,
            "Client cannot receive message, socket is not initialised.");
@@ -211,15 +174,10 @@ ssize_t Base::recv(int src, void* buffer, size_t size)
     Assert(InternalError, size > 0,
            "Client cannot receive message, size equal to 0.");
 
-#ifdef G_OS_WIN32
-    ssize_t current = ::recv(src, (char*)buffer, size, 0);
-#else
-    ssize_t current = ::recv(src, buffer, size, 0);
-#endif
-
+    int current = vleSocketReceive(src, buffer, size);
     Assert(InternalError, current != -1,
            boost::format("Client cannot receive message, %1%\n") %
-           Glib::strerror(errno));
+           Glib::strerror(vleSocketErrno()));
 
     ((char*)buffer)[current] = '\0';
     return current;
@@ -233,13 +191,13 @@ Glib::ustring Base::recv_string(int src)
     char* buffer = new char[1024];
     Glib::ustring finished_buffer;
 
-    ssize_t size = recv(src, buffer, 1023);
+    int size = vleSocketReceive(src, buffer, 1023);
 
     if (size == -1) {
         delete[] buffer;
 	Throw(InternalError,
               boost::format("Client cannot receive message, %1%\n") %
-              Glib::strerror(errno));
+              Glib::strerror(vleSocketErrno()));
     }
 
     if (size == 1023)
@@ -262,10 +220,11 @@ std::string Base::recv_buffer(int src, size_t size)
 
     while (size > 0) {
         try {
-            if (size > 1024)
-                current = recv(src, buffer, 1024);
-            else
-                current = recv(src, buffer, size);
+            if (size > 1024) {
+                current = vleSocketReceive(src, buffer, 1024);
+            } else {
+                current = vleSocketReceive(src, buffer, size);
+            }
 	} catch(const InternalError& e) {
 	    delete[] buffer;
 	    throw e;
@@ -288,11 +247,11 @@ gint32 Base::recv_int(int src)
            "Socket cannot receive message, socket not initialised.");
 
     gint32 buffer;
-    ssize_t current = recv(src, &buffer, sizeof(gint32));
+    int current = vleSocketReceive(src, &buffer, sizeof(gint32));
 
     Assert(InternalError, current == sizeof(gint32),
            boost::format("Client cannot receive message, %1%\n") %
-                      Glib::strerror(errno));
+                      Glib::strerror(vleSocketErrno()));
 
     return buffer;
 }
@@ -306,27 +265,12 @@ gint32 Base::recv_int(int src)
 
 Client::Client(const std::string& server, int port)
 {
-    int r;
-
     Assert(InternalError, mRunning, "Cannot open server, socket failed.");
 
-    struct sockaddr_in host;
-    memset(&host, '\0', sizeof(host));
-    host.sin_family = AF_INET;
-    host.sin_port = htons(port);
-
-    struct hostent* hoste = gethostbyname(server.c_str());
-    if (hoste == NULL) {
-        host.sin_addr.s_addr = INADDR_ANY;
-    } else {
-        memcpy(&host.sin_addr, hoste->h_addr_list[0], hoste->h_length);
-    }
-
-    r = ::connect(mSocket, (struct sockaddr*)&host, sizeof(host));
-
+    int r = vleSocketConnect(mSocket, server.c_str(), port);
     Assert(InternalError, r == 0,
            boost::format("Error connection with server, %1%\n") %
-           Glib::strerror(errno));
+           Glib::strerror(vleSocketErrno()));
 
     mRunning = true;
 }
@@ -334,16 +278,11 @@ Client::Client(const std::string& server, int port)
 void Client::close()
 {
     if (mRunning) {
-#ifdef G_OS_WIN32
-	::shutdown(mSocket, SD_BOTH);
-        int r = ::closesocket(mSocket);
-#else
-	::shutdown(mSocket, SHUT_RDWR);
-        int r = ::close(mSocket);
-#endif
+        vleSocketShutdown(mSocket);
+        int r = vleSocketClose(mSocket);
         Assert(InternalError, r == 0, boost::format(
                 "Cannot close client socket properly, %1%\n") % 
-            Glib::strerror(errno));
+            Glib::strerror(vleSocketErrno()));
         mRunning = false;
     }
 }
@@ -359,35 +298,18 @@ Server::Server(int port)
 {
     Assert(InternalError, mRunning, "Cannot open server, socket failed");
 
-    struct sockaddr_in adr;
-    int reuse = 1;
     int r;
-
-    memset(&adr, 0, sizeof(sockaddr_in));
-    adr.sin_family = AF_INET;
-    adr.sin_port = htons(port);
-    adr.sin_addr.s_addr = INADDR_ANY;
-
-    r = ::bind(mSocket, (struct sockaddr*)&adr, sizeof(sockaddr_in));
-
+    r = vleSocketBind(mSocket, port);
     Assert(InternalError, r == 0,
-           boost::format("Bind error %1%\n") % Glib::strerror(errno));
+           boost::format("Bind error %1%\n") % Glib::strerror(vleSocketErrno()));
 
-#ifdef G_OS_WIN32
-    r = ::setsockopt(mSocket, SOL_SOCKET, SO_REUSEADDR, (char*) &reuse,
-                     sizeof(reuse));
-#else
-    r = ::setsockopt(mSocket, SOL_SOCKET, SO_REUSEADDR, (int*) &reuse,
-                     sizeof(reuse));
-#endif
+    r = vleSocketOptReuseAddr(mSocket);
+    Assert(InternalError, r == 0, boost::format("Setsockopt error %1%\n") %
+           Glib::strerror(vleSocketErrno()));
 
+    r = vleSocketListen(mSocket, 4);
     Assert(InternalError, r == 0,
-           boost::format("Setsockopt error %1%\n") % Glib::strerror(errno));
-
-    r = ::listen(mSocket, 4);
-
-    Assert(InternalError, r == 0,
-           boost::format("Listen error %1%\n") % Glib::strerror(errno));
+           boost::format("Listen error %1%\n") % Glib::strerror(vleSocketErrno()));
 }
 
 Server::~Server()
@@ -397,17 +319,11 @@ Server::~Server()
 
 	for (ClientsSocket::iterator it = mClientsSocket.begin();
 	     it != mClientsSocket.end(); ++it) {
-#ifdef G_OS_WIN32
-            ::shutdown(mSocket, SD_BOTH);
-            int r = ::closesocket(mSocket);
-#else
-            ::shutdown(mSocket, SHUT_RDWR);
-	    r = ::close((*it).second);
-#endif
-
+            vleSocketShutdown(mSocket);
+            r = vleSocketClose(mSocket);
             Assert(InternalError, r == 0, boost::format(
                     "Cannot close client socket properly, %1%\n") %
-                Glib::strerror(errno));
+                Glib::strerror(vleSocketErrno()));
 	}
     }
 }
@@ -418,19 +334,10 @@ int Server::accept_client(const Glib::ustring& name)
            mClientsSocket.find(name) == mClientsSocket.end(),
            "A client with this name already exist.");
 
-    struct sockaddr_in  adr;
-#ifdef G_OS_WIN32
-    int size = sizeof(adr);
-#else
-    socklen_t size = sizeof(adr);
-#endif
-    int r;
-
-    r = ::accept(mSocket, (struct sockaddr*)&adr, &size);
-
+    int r = vleSocketAccept(mSocket);
     Assert(InternalError, r != -1,
            boost::format("Bad accept client '%1%', %2%\n") % name %
-            Glib::strerror(errno));
+            Glib::strerror(vleSocketErrno()));
 
     mClientsSocket[name] = r;
 
@@ -455,12 +362,7 @@ void Server::close_client(const Glib::ustring& name)
         Assert(InternalError, it != mClientsSocket.end(),
                boost::format("Unknow client name '%1%'\n") % name);
 
-#ifdef G_OS_WIN32
-        ::closesocket((*it).second);
-#else
-        ::close((*it).second);
-#endif
-
+        vleSocketClose((*it).second);
         mClientsSocket.erase(it);
     }
 }

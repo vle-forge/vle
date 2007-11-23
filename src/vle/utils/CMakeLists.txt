@@ -18,10 +18,10 @@ LINK_DIRECTORIES(
   ${LIBXMLPP_LIBRARY_DIR})
 
 SET(UTILS_CPP Host.cpp  Path.cpp PathOptionGroup.cpp Rand.cpp Simpson.cpp
-  Socket.cpp Tools.cpp Trace.cpp XML.cpp)
+  Socket.cpp SocketImpl.c Tools.cpp Trace.cpp XML.cpp)
 
 SET(UTILS_HPP Debug.hpp Exception.hpp Host.hpp Path.hpp PathOptionGroup.hpp
-  Rand.hpp Simpson.hpp Socket.hpp Tools.hpp Trace.hpp XML.hpp)
+  Rand.hpp Simpson.hpp SocketImpl.h Socket.hpp Tools.hpp Trace.hpp XML.hpp)
 
 ADD_LIBRARY(vleutils SHARED ${UTILS_CPP};${UTILS_HPP})
 

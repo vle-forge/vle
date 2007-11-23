@@ -282,7 +282,7 @@ void SaxParser::on_warning(const Glib::ustring& text)
 void SaxParser::on_error(const Glib::ustring& text)
 {
     Throw(utils::SaxParserError,
-         (boost::format("XML Error: %1%") % text));
+         (boost::format("XML Error: %1%, stack: %2%") % text % m_vpzstack));
 }
 
 void SaxParser::on_fatal_error(const Glib::ustring& text)
