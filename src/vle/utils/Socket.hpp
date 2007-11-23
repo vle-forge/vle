@@ -96,6 +96,8 @@ namespace vle { namespace utils {
 
         virtual ~Base();
 
+	static void init();
+
         /**
          * Get state of socket.
          *

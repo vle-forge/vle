@@ -47,6 +47,7 @@ VLE::VLE(int port) :
 {
     utils::install_signal();
     utils::initUserDirectory();
+    utils::net::Base::init();
 }
 
 VLE::~VLE()
