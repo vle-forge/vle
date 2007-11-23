@@ -45,7 +45,7 @@ void vleSocketInit(void)
 #ifdef __WIN32__
         WSADATA wsa;
         if(WSAStartup(MAKEWORD(1, 1), &wsa)) {
-                fprintf(stderr, "WSAStartup failed.");
+                printf("WSAStartup failed.");
                 exit(0);
         }
 #endif

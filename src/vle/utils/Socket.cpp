@@ -126,7 +126,7 @@ Base::~Base()
     }
 }
 
-void Base::send(int dst, const void* buffer, ssize_t size)
+void Base::send(int dst, const void* buffer, int size)
 {
     Assert(InternalError, mRunning,
            "Cannot send message, socket is not initialised.");
@@ -135,9 +135,9 @@ void Base::send(int dst, const void* buffer, ssize_t size)
     Assert(InternalError, size > 0,
            "Cannot send message, size must be superior to 0.");
 
-    ssize_t position = 0;
+    int position = 0;
     while (size > 0) {
-        ssize_t szcurrent = vleSocketSend(dst, (char*)buffer + position, size);
+        int szcurrent = vleSocketSend(dst, (char*)buffer + position, size);
 	if (szcurrent == 0)
 	    break;
 
@@ -216,7 +216,7 @@ std::string Base::recv_buffer(int src, size_t size)
     std::string finished_buffer;
     char* buffer = new char[1024];
 
-    ssize_t current;
+    int current;
 
     while (size > 0) {
         try {

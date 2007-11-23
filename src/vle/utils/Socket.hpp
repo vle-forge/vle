@@ -119,7 +119,7 @@ namespace vle { namespace utils {
          * @throw Internal if socket is close, buffer is null or size equal 0
          * or network error.
          */
-        void send(int dst, const void* buffer, ssize_t size);
+        void send(int dst, const void* buffer, int size);
 
         /**
          * Send an UTF-8 string message to specified socket.
@@ -158,7 +158,7 @@ namespace vle { namespace utils {
          * @throw Internal if socket is close, buffer null, size is null or
          * network error.
          */
-        ssize_t recv(int src, void* buffer, size_t size);
+        int recv(int src, void* buffer, size_t size);
 
         /**
          * Receive an UTF-8 string from specified socket.
@@ -227,7 +227,7 @@ namespace vle { namespace utils {
          * @param size Size of buffer to send.
          * @throw Internal if socket is close, buffer is null or size equal 0.
          */
-        inline void send(const void* buffer, ssize_t size)
+        inline void send(const void* buffer, int size)
         { Base::send(mSocket, buffer, size); }
 
         /**
@@ -266,7 +266,7 @@ namespace vle { namespace utils {
          * @throw Internal if socket is close, buffer null, size is null or if
          * error during reception of data.
          */
-        ssize_t recv(void* buffer, size_t size)
+        int recv(void* buffer, size_t size)
         { return Base::recv(mSocket, buffer, size); }
 
         /**
@@ -372,7 +372,7 @@ namespace vle { namespace utils {
          * if client destination is unknow.
          */
         inline void send(const Glib::ustring& dest, const void* buffer,
-                         ssize_t size)
+                         int size)
         { Base::send(get_socket_client(dest), buffer, size); }
 
         /**
@@ -420,8 +420,7 @@ namespace vle { namespace utils {
          * @throw Internal if socket is close, buffer null, size is null or if
          * error during reception of data or if client destination if unknow.
          */
-        inline ssize_t recv(const Glib::ustring& src, void* buffer,
-                            size_t size)
+	inline int recv(const Glib::ustring& src, void* buffer, size_t size)
         { return Base::recv(get_socket_client(src), buffer, size); }
 
         /**
