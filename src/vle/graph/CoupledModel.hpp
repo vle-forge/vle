@@ -50,6 +50,13 @@ namespace vle { namespace graph {
          */
         CoupledModel(const std::string& name, CoupledModel* parent);
 
+        CoupledModel(const CoupledModel& mdl);
+
+        CoupledModel& operator=(const CoupledModel& mdl);
+
+        virtual Model* clone() const
+        { return new CoupledModel(*this); }
+
         /** 
          * @brief Delete his children.
          */
@@ -398,7 +405,7 @@ namespace vle { namespace graph {
         const ModelPortList& getInternalOutPort(const std::string& name) const;
 
         ////
-        //// Functor
+        //// Functors
         ////
 
         /** 
@@ -409,7 +416,7 @@ namespace vle { namespace graph {
         {
             AttachModel(CoupledModel* model) : model(model) { }
 
-            void operator()(const ModelList::value_type& value)
+            inline void operator()(const ModelList::value_type& value)
             { model->attachModel(value.second); }
 
             CoupledModel*   model;
@@ -423,7 +430,7 @@ namespace vle { namespace graph {
         {
             DetachModel(CoupledModel* model) : model(model) { }
 
-            void operator()(const ModelList::value_type& value)
+            inline void operator()(const ModelList::value_type& value)
             { model->detachModel(value.second); }
 
             CoupledModel*   model;
@@ -437,11 +444,13 @@ namespace vle { namespace graph {
         {
             DeleteModel(CoupledModel* model) : model(model) { }
 
-            inline void operator()(const ModelList::value_type& value)
+            void operator()(ModelList::value_type& value)
             {
-		model->delAllConnection(value.second);
-		delete value.second;
-	    }
+                model->delAllConnection(value.second);
+                delete value.second;
+                value.second = 0;
+                model->m_modelList.erase(value.first);
+            }
 
             CoupledModel*   model;
         };
@@ -454,7 +463,7 @@ namespace vle { namespace graph {
         {
             IsInModelList(int x, int y) : x(x), y(y) { }
 
-            bool operator()(const ModelList::value_type& value) const
+            inline bool operator()(const ModelList::value_type& value) const
             { return value.second->x() <= x and x <= value.second->x() +
                 value.second->width() and value.second->y() <= y and y <=
                     value.second->y() + value.second->height(); };
@@ -462,11 +471,41 @@ namespace vle { namespace graph {
             int x, y;
         };
 
+        /**
+         * @brief A functor to easily clone a ModelList. To use with the
+         * for_each algorith.
+         */
+        struct CloneModel 
+        {
+            CoupledModel* parent;
+
+            CloneModel(CoupledModel* parent) : parent(parent) { }
+
+            inline void operator()(ModelList::value_type& x) const
+            { x.second = x.second->clone(); x.second->setParent(parent); }
+        };
+
     private:
         void delConnection(Model* src, const std::string& portSrc,
                            Model* dst, const std::string& portDst);
 
-	ModelList       m_modelList;
+        /** 
+         * @brief Copy the connections list from the ConnectionList src to the
+         * dst.
+         * @param src The source of the copy.
+         * @param dst The destination of the copy.
+         */
+        void copyConnection(const ConnectionList& src, ConnectionList& dst);
+
+        /** 
+         * @brief Copy the connection from ModelPortList src to the
+         * ModelPortList dst.
+         * @param src The source of the copy.
+         * @param dst The destination of the copy.
+         */
+        void copyPort(const ModelPortList& src, ModelPortList& dst);
+
+        ModelList       m_modelList;
         ConnectionList  m_internalInputList;
         ConnectionList  m_internalOutputList;
     };

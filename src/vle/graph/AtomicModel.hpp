@@ -47,6 +47,13 @@ namespace vle { namespace graph {
          */
         AtomicModel(const std::string& name, CoupledModel* parent);
 
+        AtomicModel(const AtomicModel& mdl);
+
+        AtomicModel& operator=(const AtomicModel& mdl);
+
+        virtual Model* clone() const
+        { return new AtomicModel(*this); }
+
         /** 
          * @brief Nothing to delete.
          */

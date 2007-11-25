@@ -32,6 +32,18 @@ NoVLEModel::NoVLEModel(const std::string& name, CoupledModel* parent) :
 {
 }
 
+NoVLEModel::NoVLEModel(const NoVLEModel& mdl) :
+    Model(mdl)
+{
+}
+
+NoVLEModel& NoVLEModel::operator=(const NoVLEModel& mdl)
+{
+    NoVLEModel m(mdl);
+    swap(m);
+    return *this;
+}
+
 Model* NoVLEModel::findModel(const std::string& name) const
 {
     return (getName() == name) ?
@@ -41,7 +53,7 @@ Model* NoVLEModel::findModel(const std::string& name) const
 
 void NoVLEModel::writeXML(std::ostream& out) const
 {
-    out << "<model name=\"" << getName() << "\" type=\"novle\" />";
+    out << "<model name=\"" << getName() << "\" type=\"novle\" />\n";
 }
 
 }} // namespace vle graph

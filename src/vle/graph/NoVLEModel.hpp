@@ -47,6 +47,13 @@ namespace vle { namespace graph {
          */
         NoVLEModel(const std::string& name, CoupledModel* parent);
 
+        NoVLEModel(const NoVLEModel& mdl);
+
+        NoVLEModel& operator=(const NoVLEModel& mdl);
+
+        virtual Model* clone() const
+        { return new NoVLEModel(*this); }
+
         virtual ~NoVLEModel() { }
 
         /** 

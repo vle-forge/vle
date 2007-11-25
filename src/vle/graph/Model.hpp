@@ -25,7 +25,6 @@
 #define VLE_GRAPH_MODEL_HPP
 
 #include <vle/graph/ModelPortList.hpp>
-#include <boost/noncopyable.hpp>
 #include <ostream>
 #include <vector>
 #include <map>
@@ -51,7 +50,7 @@ namespace vle { namespace graph {
      * @brief The DEVS model base class.
      *
      */
-    class Model : public boost::noncopyable
+    class Model
     {
     public:
         /** 
@@ -62,6 +61,12 @@ namespace vle { namespace graph {
          * not exist.
          */
         Model(const std::string& name, CoupledModel* parent);
+
+        Model(const Model& mdl);
+
+        void swap(Model& mdl);
+
+        virtual Model* clone() const = 0;
 
 	virtual ~Model() { }
 
@@ -364,7 +369,7 @@ namespace vle { namespace graph {
         {
             AddInputPort(Model& mdl) : mdl(mdl) { }
 
-            inline void operator()(const std::string& name)
+            inline void operator()(const std::string& name) const
             { mdl.addInputPort(name); }
 
             Model& mdl;
@@ -374,10 +379,20 @@ namespace vle { namespace graph {
         {
             AddOutputPort(Model& mdl) : mdl(mdl) { }
 
-            inline void operator()(const std::string& name)
+            inline void operator()(const std::string& name) const
             { mdl.addOutputPort(name); }
 
             Model& mdl;
+        };
+
+        struct CopyWithoutConnection
+        {
+            CopyWithoutConnection(ConnectionList& cnt) : cnt(cnt) { }
+
+            inline void operator()(const ConnectionList::value_type& x) const
+            { cnt[x.first] = ModelPortList(); }
+            
+            ConnectionList& cnt;
         };
 
     protected:
@@ -395,8 +410,9 @@ namespace vle { namespace graph {
          * @brief Default constructor, position (0,0) size (0,0) and parent to
          * null.
          */
-        Model()
-        { }
+        Model();
+        
+        Model& operator=(const Model& mdl);
 
         /**
          * @brief Delete an input port.

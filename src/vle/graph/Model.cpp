@@ -44,6 +44,35 @@ Model::Model(const std::string& name, CoupledModel* parent) :
     }
 }
 
+Model::Model(const Model& mdl) :
+    m_parent(0),
+    m_inPortList(mdl.m_inPortList),
+    m_outPortList(mdl.m_outPortList),
+    m_x(mdl.m_x),
+    m_y(mdl.m_y),
+    m_width(mdl.m_width),
+    m_height(mdl.m_height),
+    m_name(mdl.m_name)
+{
+    std::for_each(mdl.m_inPortList.begin(), mdl.m_inPortList.end(),
+                  CopyWithoutConnection(m_inPortList));
+    
+    std::for_each(mdl.m_outPortList.begin(), mdl.m_outPortList.end(),
+                  CopyWithoutConnection(m_outPortList));
+}
+
+void Model::swap(Model& mdl)
+{
+    std::swap(m_parent, mdl.m_parent);
+    std::swap(m_inPortList, mdl.m_inPortList);
+    std::swap(m_outPortList, mdl.m_outPortList);
+    std::swap(m_x, mdl.m_x);
+    std::swap(m_y, mdl.m_y);
+    std::swap(m_width, mdl.m_width);
+    std::swap(m_height, mdl.m_height);
+    std::swap(m_name, mdl.m_name);
+}
+
 void Model::getTargetPortList(const std::string& portname,
                               TargetModelList& out)
 {
@@ -342,6 +371,21 @@ void Model::getAtomicModelList(Model* model,
 bool Model::isInList(const ModelList& lst, graph::Model* m)
 {
     return lst.find(m->getName()) != lst.end();
+}
+
+Model::Model() :
+    m_parent(0),
+    m_x(0),
+    m_y(0),
+    m_width(0),
+    m_height(0)
+{
+    Throw(utils::NotYetImplemented, "Model::Model not developed");
+}
+
+Model& Model::operator=(const Model& /* mdl */)
+{
+    Throw(utils::NotYetImplemented, "Model::operator= not developed");
 }
 
 }} // namespace vle graph

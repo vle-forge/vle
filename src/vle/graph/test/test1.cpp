@@ -38,17 +38,18 @@
 #include <vle/vpz.hpp>
 
 using namespace vle;
+using namespace graph;
 
 
 BOOST_AUTO_TEST_CASE(test_del_all_connection)
 {
-    graph::CoupledModel* top = new graph::CoupledModel("top", 0);
+    CoupledModel* top = new CoupledModel("top", 0);
 
-    graph::AtomicModel* a(top->addAtomicModel("a"));
+    AtomicModel* a(top->addAtomicModel("a"));
     a->addInputPort("in");
     a->addOutputPort("out");
 
-    graph::AtomicModel* b(top->addAtomicModel("b"));
+    AtomicModel* b(top->addAtomicModel("b"));
     b->addInputPort("in");
     b->addOutputPort("out");
 
@@ -64,24 +65,24 @@ BOOST_AUTO_TEST_CASE(test_del_all_connection)
 
 BOOST_AUTO_TEST_CASE(test_have_connection)
 {
-    graph::CoupledModel* top = new graph::CoupledModel("top", 0);
+    CoupledModel* top = new CoupledModel("top", 0);
 
-    graph::AtomicModel* a(top->addAtomicModel("a"));
+    AtomicModel* a(top->addAtomicModel("a"));
     a->addInputPort("in");
     a->addOutputPort("out");
 
-    graph::AtomicModel* b(top->addAtomicModel("b"));
+    AtomicModel* b(top->addAtomicModel("b"));
     b->addInputPort("in");
     b->addOutputPort("out");
 
-    graph::AtomicModel* c(top->addAtomicModel("c"));
+    AtomicModel* c(top->addAtomicModel("c"));
     c->addInputPort("in");
     c->addOutputPort("out");
 
     top->addInternalConnection("a", "out", "b", "in");
     top->addInternalConnection("b", "out", "a", "in");
 
-    graph::ModelList lst;
+    ModelList lst;
     lst["a"] = a;
     lst["b"] = b;
 
@@ -94,36 +95,36 @@ BOOST_AUTO_TEST_CASE(test_have_connection)
 
 BOOST_AUTO_TEST_CASE(test_displace)
 {
-    graph::CoupledModel* top = new graph::CoupledModel("top", 0);
+    CoupledModel* top = new CoupledModel("top", 0);
 
-    graph::AtomicModel* a(top->addAtomicModel("a"));
+    AtomicModel* a(top->addAtomicModel("a"));
     a->addInputPort("in");
     a->addOutputPort("out");
 
-    graph::AtomicModel* b(top->addAtomicModel("b"));
+    AtomicModel* b(top->addAtomicModel("b"));
     b->addInputPort("in");
     b->addOutputPort("out");
 
-    graph::AtomicModel* c(top->addAtomicModel("c"));
+    AtomicModel* c(top->addAtomicModel("c"));
     c->addInputPort("in");
     c->addOutputPort("out");
 
     top->addInternalConnection("a", "out", "b", "in");
     top->addInternalConnection("b", "out", "a", "in");
 
-    graph::CoupledModel* newtop = new graph::CoupledModel("newtop", 0);
+    CoupledModel* newtop = new CoupledModel("newtop", 0);
 
-    graph::ModelList lst;
+    ModelList lst;
     lst["a"] = a;
     lst["b"] = b;
 
     top->displace(lst, newtop);
 
     BOOST_REQUIRE_EQUAL(top->getModelList().size(),
-                        (graph::ModelList::size_type)1);
+                        (ModelList::size_type)1);
     
     BOOST_REQUIRE_EQUAL(newtop->getModelList().size(),
-                        (graph::ModelList::size_type)2);
+                        (ModelList::size_type)2);
 
     BOOST_REQUIRE(newtop->existInternalConnection("a", "out", "b", "in"));
     BOOST_REQUIRE(newtop->existInternalConnection("b", "out", "a", "in"));
@@ -131,17 +132,17 @@ BOOST_AUTO_TEST_CASE(test_displace)
 
 BOOST_AUTO_TEST_CASE(test_prohibited_displace)
 {
-    graph::CoupledModel* top = new graph::CoupledModel("top", 0);
+    CoupledModel* top = new CoupledModel("top", 0);
 
-    graph::AtomicModel* a(top->addAtomicModel("a"));
+    AtomicModel* a(top->addAtomicModel("a"));
     a->addInputPort("in");
     a->addOutputPort("out");
 
-    graph::AtomicModel* b(top->addAtomicModel("b"));
+    AtomicModel* b(top->addAtomicModel("b"));
     b->addInputPort("in");
     b->addOutputPort("out");
 
-    graph::AtomicModel* c(top->addAtomicModel("c"));
+    AtomicModel* c(top->addAtomicModel("c"));
     c->addInputPort("in");
     c->addOutputPort("out");
 
@@ -149,9 +150,9 @@ BOOST_AUTO_TEST_CASE(test_prohibited_displace)
     top->addInternalConnection("b", "out", "a", "in");
     top->addInternalConnection("a", "out", "c", "in");
 
-    graph::CoupledModel* newtop = new graph::CoupledModel("newtop", 0);
+    CoupledModel* newtop = new CoupledModel("newtop", 0);
 
-    graph::ModelList lst;
+    ModelList lst;
     lst["a"] = a;
     lst["b"] = b;
 
@@ -162,5 +163,63 @@ BOOST_AUTO_TEST_CASE(test_delinput_port)
 {
     vpz::Vpz file(utils::Path::buildPrefixSharePath(
             utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
+}
 
+BOOST_AUTO_TEST_CASE(test_clone1)
+{
+    CoupledModel* top = new CoupledModel("top", 0);
+
+    AtomicModel* a(top->addAtomicModel("a"));
+    a->addInputPort("in");
+    a->addOutputPort("out");
+
+    AtomicModel* b(top->addAtomicModel("b"));
+    b->addInputPort("in");
+    b->addOutputPort("out");
+
+    top->addInternalConnection("a", "out", "b", "in");
+    top->addInternalConnection("b", "out", "a", "in");
+
+    BOOST_REQUIRE(top->existInternalConnection("a", "out", "b", "in"));
+    BOOST_REQUIRE(top->existInternalConnection("b", "out", "a", "in"));
+
+    CoupledModel* newtop(
+        dynamic_cast < CoupledModel* >(top->clone()));
+    BOOST_REQUIRE(newtop != 0);
+    BOOST_REQUIRE(newtop->getModelList().size() == 2);
+
+    AtomicModel* newa = dynamic_cast < AtomicModel* >(newtop->findModel("a"));
+    BOOST_REQUIRE(newa != a);
+    AtomicModel* newb = dynamic_cast < AtomicModel* >(newtop->findModel("b"));
+    BOOST_REQUIRE(newb != b);
+    
+    BOOST_REQUIRE(newtop->existInternalConnection("a", "out", "b", "in"));
+    BOOST_REQUIRE(newtop->existInternalConnection("b", "out", "a", "in"));
+    newtop->delAllConnection();
+    BOOST_REQUIRE(not newtop->existInternalConnection("a", "out", "b", "in"));
+    BOOST_REQUIRE(not newtop->existInternalConnection("b", "out", "a", "in"));
+    BOOST_REQUIRE(top->existInternalConnection("a", "out", "b", "in"));
+    BOOST_REQUIRE(top->existInternalConnection("b", "out", "a", "in"));
+}
+
+BOOST_AUTO_TEST_CASE(test_clone2)
+{
+    vpz::Vpz file(utils::Path::buildPrefixSharePath(
+            utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
+
+    CoupledModel* oldtop = dynamic_cast < CoupledModel*
+        >(file.project().model().model());
+    BOOST_REQUIRE(oldtop);
+
+    CoupledModel* top = dynamic_cast < CoupledModel* >(oldtop->clone());
+    BOOST_REQUIRE(top);
+    CoupledModel* top1(dynamic_cast < CoupledModel* >(top->findModel("top1")));
+    BOOST_REQUIRE(top1);
+    CoupledModel* top2(dynamic_cast < CoupledModel* >(top->findModel("top2")));
+    BOOST_REQUIRE(top2);
+
+    AtomicModel* f(dynamic_cast < AtomicModel* >(top2->findModel("f")));
+    BOOST_REQUIRE(f);
+    AtomicModel* g(dynamic_cast < AtomicModel* >(top2->findModel("g")));
+    BOOST_REQUIRE(g);
 }

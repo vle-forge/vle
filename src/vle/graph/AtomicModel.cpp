@@ -33,6 +33,18 @@ AtomicModel::AtomicModel(const std::string& name, CoupledModel* parent) :
 {
 }
 
+AtomicModel::AtomicModel(const AtomicModel& mdl) :
+    Model(mdl)
+{
+}
+
+AtomicModel& AtomicModel::operator=(const AtomicModel& mdl)
+{
+    AtomicModel m(mdl);
+    swap(m);
+    return *this;
+}
+
 Model* AtomicModel::findModel(const std::string& name) const
 {
     return (getName() == name) ?
@@ -42,13 +54,8 @@ Model* AtomicModel::findModel(const std::string& name) const
 
 void AtomicModel::writeXML(std::ostream& out) const
 {
-    out << "<model"
-        << " name=\"" << getName() << "\""
-        << " type=\"atomic\""
-        << ">\n";
-
+    out << "<model name=\"" << getName() << "\" type=\"atomic\"" << ">\n";
     writePortListXML(out);
-
     out << "</model>\n";
 }
 

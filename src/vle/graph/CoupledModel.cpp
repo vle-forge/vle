@@ -40,6 +40,48 @@ CoupledModel::CoupledModel(const std::string& name, CoupledModel* parent) :
 {
 }
 
+CoupledModel::CoupledModel(const CoupledModel& mdl) :
+    Model(mdl),
+    m_modelList(mdl.m_modelList),
+    m_internalInputList(mdl.m_internalInputList),
+    m_internalOutputList(mdl.m_internalOutputList)
+{
+    assert(mdl.getModelList().size() == getModelList().size());
+
+    std::for_each(mdl.m_internalInputList.begin(),
+                  mdl.m_internalInputList.end(),
+                  CopyWithoutConnection(m_internalInputList));
+    
+    std::for_each(mdl.m_internalOutputList.begin(),
+                  mdl.m_internalOutputList.end(),
+                  CopyWithoutConnection(m_internalOutputList));
+
+    std::for_each(m_modelList.begin(), m_modelList.end(), CloneModel(this));
+
+    copyConnection(mdl.m_internalInputList, m_internalInputList);
+    copyConnection(mdl.m_internalOutputList, m_internalOutputList);
+
+    ModelList::const_iterator it = mdl.getModelList().begin();
+    ModelList::iterator jt = m_modelList.begin();
+    while (it != mdl.getModelList().end()) {
+        const Model* src = it->second;
+        Model* dst = jt->second;
+        copyConnection(src->getInputPortList(), dst->getInputPortList());
+        copyConnection(src->getOutputPortList(), dst->getOutputPortList());
+        ++it;
+        ++jt;
+    }
+}
+
+CoupledModel& CoupledModel::operator=(const CoupledModel& mdl)
+{
+    CoupledModel m(mdl);
+    swap(m);
+    std::swap(m_internalInputList, m.m_internalInputList);
+    std::swap(m_internalOutputList, m.m_internalOutputList);
+    return *this;
+}
+
 CoupledModel::~CoupledModel()
 {
     delAllModel();
@@ -660,10 +702,40 @@ const ModelPortList& CoupledModel::getInternalOutPort(
     ConnectionList::const_iterator it = m_internalOutputList.find(name);
     if (it == m_internalOutputList.end()) {
         Throw(utils::DevsGraphError, boost::format(
-                "Coupled model %1% have no output port %2%") % getName() % name);
+                "Coupled model %1% have no output port %2%") % getName() %
+            name);
     }
 
     return it->second;
+}
+
+void CoupledModel::copyConnection(const ConnectionList& src,
+                                  ConnectionList& dst)
+{
+    assert(src.size() == dst.size());
+
+    ConnectionList::const_iterator it = src.begin();
+    ConnectionList::iterator jt = dst.begin();
+
+    while (it != src.end()) {
+        copyPort(it->second, jt->second);
+        ++it;
+        ++jt;
+    }
+}
+
+void CoupledModel::copyPort(const ModelPortList& src, ModelPortList& dst)
+{
+    for (ModelPortList::const_iterator it = src.begin();
+         it != src.end(); ++it) {
+        const std::string& srcmodelname(it->first->getName());
+        Model* dstmodel(getModel(srcmodelname));
+
+        Assert(utils::DevsGraphError, dstmodel, boost::format(
+                "Destination model %1% not found in copy port") % srcmodelname);
+
+        dst.add(dstmodel, it->second);
+    }
 }
 
 }} // namespace vle graph
