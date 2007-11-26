@@ -69,4 +69,22 @@ BOOST_AUTO_TEST_CASE(test_read_write_read)
     vpz.clear();
     vpz.parseFile(utils::Path::path().buildPrefixSharePath(
             utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
+    vpz.clear();
+    vpz.parseFile(utils::Path::path().buildPrefixSharePath(
+            utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
+    vpz.clear();
+    vpz.parseFile(utils::Path::path().buildPrefixSharePath(
+            utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
+    vpz.clear();
+    vpz.parseFile(utils::Path::path().buildPrefixSharePath(
+            utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
+}
+
+BOOST_AUTO_TEST_CASE(test_read_write_read2)
+{
+    vpz::Vpz vpz;
+    vpz.parseFile(utils::Path::buildPrefixSharePath(
+            utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
+
+    vpz::Vpz vpz2(vpz);
 }

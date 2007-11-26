@@ -139,6 +139,51 @@ std::string Model::getParentName() const
     return result;
 }
 
+void Model::getParents(CoupledModelVector& parents) const
+{
+    CoupledModel* parent = m_parent;
+
+    while (parent) {
+        parents.push_back(parent);
+        parent = parent->getParent();
+    }
+}
+
+Model* Model::getModel(const CoupledModelVector& lst,
+                              const std::string& name)
+{
+    if (lst.empty()) {
+        return findModel(name);
+    } else {
+        Assert(utils::DevsGraphError, isCoupled(),
+               "Bad use of getModel from a list");
+        CoupledModelVector::const_reverse_iterator it = lst.rbegin();
+        CoupledModel* top = static_cast < CoupledModel* >(this);
+        CoupledModel* other = *it;
+        Model* tmp;
+
+        while (it != lst.rend()) {
+            other = *it;
+            tmp = top->getModel(other->getName());
+
+            Assert(utils::DevsGraphError, tmp, boost::format(
+                    "Model %1% not found") % other->getName());
+
+            Assert(utils::DevsGraphError, tmp->isCoupled(), boost::format(
+                    "Model %1% is not a coupled model") % other->getName());
+
+            Assert(utils::DevsGraphError, tmp->getName() == other->getName(),
+                   boost::format( "Model %1% have not the same parent") %
+                   other->getName());
+
+            top = static_cast < CoupledModel* >(tmp);
+            ++it;
+        }
+
+        return top->getModel(name);
+    }
+}
+
 ModelPortList& Model::addInputPort(const std::string& name)
 {
     ConnectionList::iterator it(m_inPortList.find(name));

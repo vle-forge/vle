@@ -43,6 +43,7 @@ namespace vle { namespace graph {
     typedef std::map < std::string, ModelPortList > ConnectionList;
     typedef std::set < std::string > PortList;
     typedef std::vector < AtomicModel * > AtomicModelVector;
+    typedef std::vector < CoupledModel* > CoupledModelVector;
     typedef std::map < std::string, Model* > ModelList;
     typedef std::list < ModelPort > TargetModelList;
  
@@ -132,6 +133,23 @@ namespace vle { namespace graph {
          * @return 
          */
         std::string getParentName() const;
+
+        /** 
+         * @brief Build a list of coupled model parents. The first model in the
+         * vector is the direct parent of model.
+         * @param parents A output vector.
+         */
+        void getParents(CoupledModelVector& parents) const;
+
+        /** 
+         * @brief Get the atomic models from a CoupledModelVector of an another
+         * devs graph hierarchy.
+         * @param lst the list of coupled model from the another devs graph.
+         * @param name the model to find.
+         * @return A reference to the AtomicModel found.
+         */
+        Model* getModel(const CoupledModelVector& lst,
+                        const std::string& name);
 
         /** 
          * @brief Get the parent node of this model. Can be null if parent does

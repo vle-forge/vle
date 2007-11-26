@@ -94,6 +94,18 @@ AtomicModel& AtomicModelList::get(const graph::Model* atom)
     return it->second;
 }
 
+Model::Model(const Model& mdl) :
+    Base(mdl)
+{
+    if (mdl.m_graph == 0) {
+        m_graph = 0;
+    } else {
+        m_graph = mdl.m_graph->clone();
+        std::for_each(mdl.m_atomicmodels.begin(), mdl.m_atomicmodels.end(),
+                      CopyAtomicModel(m_atomicmodels, *m_graph));
+    }
+}
+
 void Model::write(std::ostream& out) const
 {
     out << "<structures>\n";

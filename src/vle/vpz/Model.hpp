@@ -159,6 +159,8 @@ namespace vle { namespace vpz {
             m_graph(0)
         { }
 
+        Model(const Model& mdl);
+
         virtual ~Model()
         { }
 
@@ -230,16 +232,35 @@ namespace vle { namespace vpz {
         { return m_atomicmodels; }
 
     private:
+        struct CopyAtomicModel
+        {
+            AtomicModelList& lst;
+            graph::Model& top;
+
+            CopyAtomicModel(AtomicModelList& lst, graph::Model& top) :
+                lst(lst), top(top) { }
+
+            void operator()(const AtomicModelList::value_type& x)
+            {
+                graph::CoupledModelVector vec;
+                x.first->getParents(vec);
+                graph::Model* atom = top.getModel(vec, x.first->getName());
+
+                lst.insert(std::make_pair < graph::Model*, AtomicModel >(
+                        atom, x.second));
+            }
+        };
+
         void writeModel(std::ostream& out) const;
         void writeAtomic(std::ostream& out,
-                          const graph::AtomicModel* mdl) const;
+                         const graph::AtomicModel* mdl) const;
         void writeCoupled(std::ostream& out,
-                           const graph::CoupledModel* mdl) const;
+                          const graph::CoupledModel* mdl) const;
         void writeNovle(std::ostream& out,
-                         const graph::NoVLEModel* mdl) const;
+                        const graph::NoVLEModel* mdl) const;
         void writePort(std::ostream& out, const graph::Model* mdl) const;
         void writeConnection(std::ostream& out,
-                              const graph::CoupledModel* mdl) const;
+                             const graph::CoupledModel* mdl) const;
 
         AtomicModelList     m_atomicmodels;
         graph::Model*       m_graph;
