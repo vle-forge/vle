@@ -37,7 +37,7 @@ Rdata::~Rdata()
 
 std::string Rdata::extension() const
 {
-    return ".dat";
+    return ".rdata";
 }
 
 void Rdata::writeSeparator(std::ostream& out)
