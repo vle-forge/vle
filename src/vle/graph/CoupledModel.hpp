@@ -449,7 +449,6 @@ namespace vle { namespace graph {
                 model->delAllConnection(value.second);
                 delete value.second;
                 value.second = 0;
-                model->m_modelList.erase(value.first);
             }
 
             CoupledModel*   model;
