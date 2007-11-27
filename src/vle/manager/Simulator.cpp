@@ -171,29 +171,32 @@ bool Simulator::run(const std::string& filename)
     bool result = true;
     try {
         std::cerr << "[" << filename << "]\n";
-        std::cerr << " - Opening project file .........: ";
-        vpz::Vpz* file = new vpz::Vpz(filename);
-        std::cerr << "ok\n";
 
-        std::cerr << " - Project file has translator ..: ";
-        if (file->hasNoVLE()) {
-            std::cerr << "yes\n    = Build complete hierarchy ..: ";
-            file->expandTranslator();
-            std::cerr << "ok\n";
-        } else {
-            std::cerr << "no\n";
-        }
 
         std::cerr << " - Coordinator building .........: ";
         devs::RootCoordinator coordinator;
         std::cerr << "ok\n";
 
-        std::cerr << " - Coordinator load models ......: ";
-        coordinator.load(*file);
-        std::cerr << "ok\n";
+        std::cerr << " - Opening project file .........: ";
+        {
+            vpz::Vpz file(filename);
+            std::cerr << "ok\n";
 
-        std::cerr << " - Clean project file ...........: ";
-        delete file;
+            std::cerr << " - Project file has translator ..: ";
+            if (file.hasNoVLE()) {
+                std::cerr << "yes\n    = Build complete hierarchy ..: ";
+                file.expandTranslator();
+                std::cerr << "ok\n";
+            } else {
+                std::cerr << "no\n";
+            }
+
+            std::cerr << " - Coordinator load models ......: ";
+            coordinator.load(file);
+            std::cerr << "ok\n";
+
+            std::cerr << " - Clean project file ...........: ";
+        }
         std::cerr << "ok\n";
 
         std::cerr << " - Coordinator initializing .....: "; 
@@ -213,7 +216,6 @@ bool Simulator::run(const std::string& filename)
                 "\n/!\\ Some warnings during simulation: See file %1%\n") %
                 utils::Trace::trace().getLogFile();
         }
-
     } catch(const std::exception& e) {
         std::cerr << "\n/!\\ vle error reported: " <<
             utils::demangle(typeid(e)) << "\n" << e.what();
@@ -230,6 +232,7 @@ bool Simulator::run(const std::string& filename)
 bool Simulator::run(const vpz::Vpz& file)
 {
     bool result = true;
+
     try {
         devs::RootCoordinator coordinator;
 

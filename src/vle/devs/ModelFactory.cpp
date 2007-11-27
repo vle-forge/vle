@@ -39,6 +39,30 @@
 
 namespace vle { namespace devs {
 
+ModuleCache::~ModuleCache()
+{
+    std::for_each(m_lst.begin(), m_lst.end(), DeleteModule());
+}
+
+void ModuleCache::add(const std::string& library, Glib::Module* module)
+{
+    Assert(utils::InternalError, not exist(library), boost::format(
+            "The Module '%1%' already exist in cache") % library);
+
+    m_lst[library] = module;
+}
+
+bool ModuleCache::exist(const std::string& library) const
+{
+    return m_lst.find(library) != m_lst.end();
+}
+
+Glib::Module* ModuleCache::get(const std::string& library) const
+{
+    ModuleList::const_iterator it = m_lst.find(library);
+    return it == m_lst.end() ? 0 : it->second;
+}
+
 ModelFactory::ModelFactory(const vpz::Dynamics& dyn,
                            const vpz::Classes& cls,
                            const vpz::Experiment& exp,
@@ -50,9 +74,9 @@ ModelFactory::ModelFactory(const vpz::Dynamics& dyn,
 {
 }
 
-//
-// Cache.
-//
+ModelFactory::~ModelFactory()
+{
+}
 
 void ModelFactory::cleanCache()
 {
@@ -177,7 +201,7 @@ Glib::Module* ModelFactory::buildPlugin(const vpz::Dynamic& dyn)
                     "\n[%1%]: %2%") % *it % Glib::Module::get_last_error());
             delete module;
         } else {
-            module->make_resident();
+            mModule.add(dyn.library(), module);
             return module;
         }
     }
@@ -187,12 +211,16 @@ Glib::Module* ModelFactory::buildPlugin(const vpz::Dynamic& dyn)
 Glib::Module* ModelFactory::getPlugin(const std::string& name)
 {
     if (mDynamics.exist(name)) {
-        return buildPlugin(mDynamics.get(name));
+        const vpz::Dynamic& dyn(mDynamics.get(name));
+        Glib::Module* r = mModule.get(dyn.library());
+        return (r == 0) ? buildPlugin(dyn) : r;
     } else {
         vpz::Classes::const_iterator clit;
         for (clit = mClasses.begin(); clit != mClasses.end(); ++clit) {
             if ((*clit).second.dynamics().exist(name)) {
-                return buildPlugin((*clit).second.dynamics().get(name));
+                const vpz::Dynamic& dyn((*clit).second.dynamics().get(name));
+                Glib::Module* r = mModule.get(dyn.library());
+                return (r == 0) ? buildPlugin(dyn) : r;
             }
         }
     }
@@ -247,9 +275,8 @@ void ModelFactory::attachDynamics(Coordinator& coordinator,
         (dynamic_cast < DynamicsWrapper* >(call))->set_library(dyn.library());
         (dynamic_cast < DynamicsWrapper* >(call))->set_model(dyn.model());
     }
-    
+
     atom->addDynamics(call);
-    delete module;
 }
 
 }} // namespace vle devs

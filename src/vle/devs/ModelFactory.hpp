@@ -29,17 +29,77 @@
 #include <vle/vpz/Classes.hpp>
 #include <vle/vpz/Model.hpp>
 #include <glibmm/module.h>
+#include <boost/noncopyable.hpp>
 
 namespace vle { namespace devs {
 
     class Coordinator;
     class Simulator;
 
+    /** 
+     * @brief ModuleList is a cache for store the Glib::Module a get only
+     * reference to build new devs::Dynamics without loading the dynamic library
+     * if is was already loaded.
+     */
+    typedef std::map < std::string, Glib::Module* > ModuleList;
+
+
+    /** 
+     * @brief Module cache allow the store de Glib::Module of the ModelFactory.
+     * Usefull to only store unique Glib::Module when using multiples instances
+     * of a devs::Dynamics.
+     */
+    class ModuleCache
+    {
+    public:
+        /** 
+         * @brief Delete all the Glib::Module from the cache.
+         */
+        ~ModuleCache();
+
+        /** 
+         * @brief Add a new couple ModuleId, Glib::Module to the cache.
+         * @param library The name of the library.
+         * @param module The dynamic library.
+         * @throw utils::InternalError if Module already exist.
+         */
+        void add(const std::string& library, Glib::Module* module);
+
+        /** 
+         * @brief Check if a couple ModuleId, Glib::Module already exist into
+         * the cache.
+         * @param library The name of the library.
+         * @return true if the Module already exist, false otherwise.
+         */
+        bool exist(const std::string& library) const;
+
+        /** 
+         * @brief Get a reference to the loaded Glib::Module.
+         * @param library The name of the library.
+         * @return A reference to a loaded Glib::Module or 0 if the library is
+         * not in the cache.
+         */
+        Glib::Module* get(const std::string& library) const;
+
+    private:
+        ModuleList  m_lst;
+
+        /** 
+         * @brief A functor to delete all Glib::Module of
+         * ModuleList::value_type. To use with the for_each algorith.
+         */
+        struct DeleteModule
+        {
+            void operator()(ModuleList::value_type& x) const
+            { delete x.second; x.second = 0; }
+        };
+    };
+
     /**
      * @brief Read simulations plugin from models directories and manage models
      * classes.
      */
-    class ModelFactory
+    class ModelFactory : boost::noncopyable
     {
     public:
         /** 
@@ -57,8 +117,7 @@ namespace vle { namespace devs {
         /** 
          * @brief To delete all Glib::Module and class.
          */
-        ~ModelFactory()
-        { }
+        ~ModelFactory();
 
         /** 
          * @brief Return the list of atomics models information ie. the 4-uples
@@ -154,6 +213,7 @@ namespace vle { namespace devs {
         vpz::Classes            mClasses;
         vpz::Experiment         mExperiment;
         vpz::AtomicModelList    mAtomics;
+        ModuleCache             mModule;
 
         /** 
          * @brief Load a new Glib::Module plugin from dynamic parameter in
