@@ -67,6 +67,8 @@ namespace vle { namespace translator {
         std::string m_prefix;
         unsigned int* m_init;
         std::map < std::string , vpz::AtomicModel* > m_models;
+        bool        m_symmetricport;
+
     };
 
 }} // namespace vle translator

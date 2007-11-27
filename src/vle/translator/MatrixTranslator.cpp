@@ -38,7 +38,8 @@ namespace vle { namespace translator {
 MatrixTranslator::MatrixTranslator(const vpz::Project& prj) :
     Translator(prj),
     m_dimension(0),
-    m_init(0)
+    m_init(0),
+    m_symmetricport(false)
 {
 }
 
@@ -89,7 +90,7 @@ std::string MatrixTranslator::getName(unsigned int i, unsigned int j) const
   <dim axe="0" number="11" />
   <dim axe="1" number="7" />
   </grid>
-  <cells connectivity="neuman|moore" library="libcellule" >
+  <cells connectivity="neuman|moore" library="libcellule" symmetricport="true|false" >
   <libraries>
   <library index="1" name="lib1" />
   <library index="2" name="lib2" />
@@ -141,11 +142,17 @@ void MatrixTranslator::parseXML(const std::string& buffer)
     }
     else 
         m_connectivity = LINEAR;
+
+    if (utils::xml::exist_attribute(cells, "symmetricport")) {
+        m_symmetricport = utils::to_boolean(utils::xml::get_attribute(cells, "symmetricport"));
+    } else {
+        m_symmetricport = false;
+    }
+
     if (utils::xml::exist_attribute(cells , "library")) {
         m_library = utils::xml::get_attribute(cells , "library");
         m_multipleLibrary = false;
-    }
-    else {
+    } else {
         xmlpp::Element* libraries = utils::xml::get_children(cells, "libraries");
         xmlpp::Node::NodeList lst = libraries->get_children("library");
         xmlpp::Node::NodeList::iterator it;
@@ -226,7 +233,12 @@ void MatrixTranslator::translateStructures()
             if (i != 1) atomicModel->addInputPort("L");
             if (i != m_size[0]) atomicModel->addInputPort("R");
 
-            atomicModel->addOutputPort("out");
+            if (m_symmetricport) {
+                if (i != 1) atomicModel->addOutputPort("L");
+                if (i != m_size[0]) atomicModel->addOutputPort("R");
+            } else {
+                atomicModel->addOutputPort("out");
+            }
         }
     else
         if (m_dimension == 1)
@@ -254,7 +266,24 @@ void MatrixTranslator::translateStructures()
                                 atomicModel->addInputPort("SE");
                         }
 
-                        atomicModel->addOutputPort("out");
+                        if (m_symmetricport) {
+                        if (i != 1) atomicModel->addOutputPort("N");
+                        if (j != 1) atomicModel->addOutputPort("W");
+                        if (i != m_size[0]) atomicModel->addOutputPort("S");
+                        if (j != m_size[1]) atomicModel->addOutputPort("E");
+                        if (m_connectivity == VON_NEUMANN) {
+                            if (i != 1 and j != 1)
+                                atomicModel->addOutputPort("NW");
+                            if (i != 1 and j != m_size[1])
+                                atomicModel->addOutputPort("NE");
+                            if (i != m_size[0] and j != 1)
+                                atomicModel->addOutputPort("SW");
+                            if (i != m_size[0] and j != m_size[1])
+                                atomicModel->addOutputPort("SE");
+                        }
+                        } else {
+                            atomicModel->addOutputPort("out");
+                        }
                     }
                 }
             }
@@ -262,37 +291,75 @@ void MatrixTranslator::translateStructures()
     // Connections
     if (m_dimension == 0) 
         for (unsigned int i = 1 ; i <= m_size[0] ; i++) {
-            if (i != 1)
-                root->addInternalConnection(getName(i),"out",getName(i-1),"R");
-            if (i != m_size[0])
-                root->addInternalConnection(getName(i),"out",getName(i+1),"L");
+            if (m_symmetricport) {
+                if (i != 1)
+                    root->addInternalConnection(getName(i),"L",getName(i-1),"R");
+                if (i != m_size[0])
+                    root->addInternalConnection(getName(i),"R",getName(i+1),"L");
+            } else {
+                if (i != 1)
+                    root->addInternalConnection(getName(i),"out",getName(i-1),"R");
+                if (i != m_size[0])
+                    root->addInternalConnection(getName(i),"out",getName(i+1),"L");
+            }
         }
     else
         if (m_dimension == 1) {
-            for (unsigned int j = 1 ; j <= m_size[1] ; j++) {
-                for (unsigned int i = 1 ; i <= m_size[0] ; i++) {
-                    if (existModel(i,j)) {
-                        if (j != 1 and existModel(i,j-1))
-                            root->addInternalConnection(getName(i,j),"out",getName(i,j-1),"E");
-                        if (i != 1 and existModel(i-1,j)) 
-                            root->addInternalConnection(getName(i,j),"out",getName(i-1,j),"S");
-                        if (j != m_size[1] and existModel(i,j+1))
-                            root->addInternalConnection(getName(i,j),"out",getName(i,j+1),"W");
-                        if (i != m_size[0] and existModel(i+1,j))
-                            root->addInternalConnection(getName(i,j),"out",getName(i+1,j),"N");
-                        if (m_connectivity == VON_NEUMANN) {
-                            if (j != 1 and i != 1 and existModel(i-1,j-1)) 
-                                root->addInternalConnection(getName(i,j),"out",
-                                                            getName(i-1,j-1),"SE");		
-                            if (j != m_size[1] and i != 1 and existModel(i-1,j+1)) 
-                                root->addInternalConnection(getName(i,j),"out",
-                                                            getName(i-1,j+1),"SW");		
-                            if (j != 1 and i != m_size[0] and existModel(i+1,j-1)) 
-                                root->addInternalConnection(getName(i,j),"out",
-                                                            getName(i+1,j-1),"NE");		
-                            if (j != m_size[1] and i != m_size[0] and existModel(i+1,j+1)) 
-                                root->addInternalConnection(getName(i,j),"out",
-                                                            getName(i+1,j+1),"NW");		
+            if(m_symmetricport) {
+                for (unsigned int j = 1 ; j <= m_size[1] ; j++) {
+                    for (unsigned int i = 1 ; i <= m_size[0] ; i++) {
+                        if (existModel(i,j)) {
+                            if (j != 1 and existModel(i,j-1))
+                                root->addInternalConnection(getName(i,j),"W",getName(i,j-1),"E");
+                            if (i != 1 and existModel(i-1,j)) 
+                                root->addInternalConnection(getName(i,j),"N",getName(i-1,j),"S");
+                            if (j != m_size[1] and existModel(i,j+1))
+                                root->addInternalConnection(getName(i,j),"E",getName(i,j+1),"W");
+                            if (i != m_size[0] and existModel(i+1,j))
+                                root->addInternalConnection(getName(i,j),"S",getName(i+1,j),"N");
+                            if (m_connectivity == VON_NEUMANN) {
+                                if (j != 1 and i != 1 and existModel(i-1,j-1)) 
+                                    root->addInternalConnection(getName(i,j),"SW",
+                                                                getName(i-1,j-1),"SE");		
+                                if (j != m_size[1] and i != 1 and existModel(i-1,j+1)) 
+                                    root->addInternalConnection(getName(i,j),"SE",
+                                                                getName(i-1,j+1),"SW");		
+                                if (j != 1 and i != m_size[0] and existModel(i+1,j-1)) 
+                                    root->addInternalConnection(getName(i,j),"NW",
+                                                                getName(i+1,j-1),"NE");		
+                                if (j != m_size[1] and i != m_size[0] and existModel(i+1,j+1)) 
+                                    root->addInternalConnection(getName(i,j),"NE",
+                                                                getName(i+1,j+1),"NW");		
+                            }
+                        }
+                    }
+                }
+            } else {
+                for (unsigned int j = 1 ; j <= m_size[1] ; j++) {
+                    for (unsigned int i = 1 ; i <= m_size[0] ; i++) {
+                        if (existModel(i,j)) {
+                            if (j != 1 and existModel(i,j-1))
+                                root->addInternalConnection(getName(i,j),"out",getName(i,j-1),"E");
+                            if (i != 1 and existModel(i-1,j)) 
+                                root->addInternalConnection(getName(i,j),"out",getName(i-1,j),"S");
+                            if (j != m_size[1] and existModel(i,j+1))
+                                root->addInternalConnection(getName(i,j),"out",getName(i,j+1),"W");
+                            if (i != m_size[0] and existModel(i+1,j))
+                                root->addInternalConnection(getName(i,j),"out",getName(i+1,j),"N");
+                            if (m_connectivity == VON_NEUMANN) {
+                                if (j != 1 and i != 1 and existModel(i-1,j-1)) 
+                                    root->addInternalConnection(getName(i,j),"out",
+                                                                getName(i-1,j-1),"SE");		
+                                if (j != m_size[1] and i != 1 and existModel(i-1,j+1)) 
+                                    root->addInternalConnection(getName(i,j),"out",
+                                                                getName(i-1,j+1),"SW");		
+                                if (j != 1 and i != m_size[0] and existModel(i+1,j-1)) 
+                                    root->addInternalConnection(getName(i,j),"out",
+                                                                getName(i+1,j-1),"NE");		
+                                if (j != m_size[1] and i != m_size[0] and existModel(i+1,j+1)) 
+                                    root->addInternalConnection(getName(i,j),"out",
+                                                                getName(i+1,j+1),"NW");		
+                            }
                         }
                     }
                 }
