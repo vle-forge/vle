@@ -65,12 +65,10 @@ Glib::Module* ModuleCache::get(const std::string& library) const
 
 ModelFactory::ModelFactory(const vpz::Dynamics& dyn,
                            const vpz::Classes& cls,
-                           const vpz::Experiment& exp,
-                           const vpz::AtomicModelList& atoms) :
+                           const vpz::Experiment& exp) :
     mDynamics(dyn),
     mClasses(cls),
-    mExperiment(exp),
-    mAtomics(atoms)
+    mExperiment(exp)
 {
 }
 
@@ -144,11 +142,6 @@ Simulator* ModelFactory::createModel(Coordinator& coordinator,
     if (not condition.empty()) {
         const vpz::Condition& cnd(mExperiment.conditions().get(condition));
         sim->processInitEvents(cnd.firstValues());
-    }
-
-    InternalEvent* evt = sim->init(coordinator.getCurrentTime());
-    if (evt) {
-        coordinator.eventtable().putInternalEvent(evt);
     }
 
     if (not observable.empty()) {
@@ -268,12 +261,12 @@ void ModelFactory::attachDynamics(Coordinator& coordinator,
     }
 
     if (call->is_executive()) {
-        (dynamic_cast < Executive* >(call))->set_coordinator(&coordinator);
+        (reinterpret_cast < Executive* >(call))->set_coordinator(&coordinator);
     }
     
     if (call->is_wrapper()) {
-        (dynamic_cast < DynamicsWrapper* >(call))->set_library(dyn.library());
-        (dynamic_cast < DynamicsWrapper* >(call))->set_model(dyn.model());
+        (reinterpret_cast < DynamicsWrapper* >(call))->set_library(dyn.library());
+        (reinterpret_cast < DynamicsWrapper* >(call))->set_model(dyn.model());
     }
 
     atom->addDynamics(call);

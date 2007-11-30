@@ -85,6 +85,13 @@ Coordinator::~Coordinator()
 
 void Coordinator::init()
 {
+    for (SimulatorMap::iterator it = m_modelList.begin(); it !=
+         m_modelList.end(); ++it) {
+        InternalEvent* evt = it->second->init(getCurrentTime());
+        if (evt) {
+            m_eventTable.putInternalEvent(evt);
+        }
+    }
 }
 
 const Time& Coordinator::getNextTime()
@@ -319,7 +326,7 @@ void Coordinator::addModels(const vpz::Model& model)
         graph::Model::getAtomicModelList(mdl, atomicmodellist);
     }
 
-    const vpz::AtomicModelList& atoms(m_modelFactory.atomics());
+    const vpz::AtomicModelList& atoms(model.atomicModels());
     for (graph::AtomicModelVector::iterator it = atomicmodellist.begin();
          it != atomicmodellist.end(); ++it) {
         const vpz::AtomicModel& atom(atoms.get(*it));

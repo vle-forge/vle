@@ -111,21 +111,12 @@ namespace vle { namespace devs {
          */
         ModelFactory(const vpz::Dynamics& dyn,
                      const vpz::Classes& cls,
-                     const vpz::Experiment& experiment,
-                     const vpz::AtomicModelList& atom);
+                     const vpz::Experiment& experiment);
 
         /** 
          * @brief To delete all Glib::Module and class.
          */
         ~ModelFactory();
-
-        /** 
-         * @brief Return the list of atomics models information ie. the 4-uples
-         * of graph::Model*, dynamics, conditions, observables and translators.
-         * @return A constant reference to the vpz::AtomicModelList.
-         */
-        inline const vpz::AtomicModelList& atomics() const
-        { return mAtomics; }
 
         /** 
          * @brief Return the reference to the list of initiale conditions for
@@ -212,7 +203,6 @@ namespace vle { namespace devs {
         vpz::Dynamics           mDynamics;
         vpz::Classes            mClasses;
         vpz::Experiment         mExperiment;
-        vpz::AtomicModelList    mAtomics;
         ModuleCache             mModule;
 
         /** 

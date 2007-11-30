@@ -63,8 +63,7 @@ void RootCoordinator::load(const vpz::Vpz& io)
 
     m_modelfactory = new ModelFactory(io.project().dynamics(),
                                       io.project().classes(),
-                                      io.project().experiment(),
-                                      io.project().model().atomicModels());
+                                      io.project().experiment());
 
     m_coordinator = new Coordinator(*m_modelfactory, io.project().model());
 
