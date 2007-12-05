@@ -96,25 +96,43 @@ void Model::getTargetPortList(const std::string& portname,
     while (not stk.empty()) {
         DataTarget tmp(stk.top());
         stk.pop();
-        
+
         ModelPortList* outs = 0;
         if (tmp.get<2>()) 
             outs = &(tmp.get<0>()->getInternalInPort(tmp.get<1>()));
         else
             outs = &(tmp.get<0>()->getOutPort(tmp.get<1>()));
 
-        for (ModelPortList::iterator it = outs->begin(); it != outs->end(); ++it) {
+        for (ModelPortList::iterator it = outs->begin(); it != outs->end();
+             ++it) {
             if (it->first->isAtomic()) {
                 out.push_back(ModelPort(it->first, it->second));
             } else if (it->first->isCoupled()) {
                 CoupledModel* cpl = static_cast < CoupledModel* >(it->first);
-                if (it->first == getParent()) {
+                if (it->first == tmp.get<0>()->getParent()) {
                     stk.push(DataTarget(cpl, it->second, false));
                 } else {
                     stk.push(DataTarget(cpl, it->second, true));
                 }
             }
         }
+    }
+}
+
+void Model::rename(Model* mdl, const std::string& newname)
+{
+    AssertI(mdl);
+
+    CoupledModel* parent = mdl->getParent();
+    if (parent) {
+        ModelList::iterator it = parent->getModelList().find(mdl->getName());
+        AssertI(it != parent->getModelList().end());
+
+        mdl->m_name.assign(newname);
+        parent->getModelList().erase(it);
+        parent->addModel(mdl);
+    } else {
+        mdl->m_name.assign(newname);
     }
 }
 
@@ -160,11 +178,16 @@ Model* Model::getModel(const CoupledModelVector& lst,
         CoupledModelVector::const_reverse_iterator it = lst.rbegin();
         CoupledModel* top = static_cast < CoupledModel* >(this);
         CoupledModel* other = *it;
-        Model* tmp;
+
+        Assert(utils::DevsGraphError, other->getName() == top->getName(),
+               boost::format("Get model have not the same name '%1%' and '%2%'")
+               % top->getName() % other->getName());
+
+        it++;
 
         while (it != lst.rend()) {
             other = *it;
-            tmp = top->getModel(other->getName());
+            Model* tmp = top->findModel(other->getName());
 
             Assert(utils::DevsGraphError, tmp, boost::format(
                     "Model %1% not found") % other->getName());
@@ -180,7 +203,7 @@ Model* Model::getModel(const CoupledModelVector& lst,
             ++it;
         }
 
-        return top->getModel(name);
+        return top->findModel(name);
     }
 }
 
@@ -389,12 +412,12 @@ NoVLEModel* Model::toNoVLE(Model* model)
 }
 
 void Model::getAtomicModelList(Model* model,
-                               std::vector < AtomicModel* >& list)
+                               AtomicModelVector& list)
 {
     if (model->isAtomic()) {
         list.push_back((AtomicModel*)model);
     } else {
-	std::vector < CoupledModel* > coupledModelList;
+	std::list < CoupledModel* > coupledModelList;
 	coupledModelList.push_back((CoupledModel*)model);
         while (!coupledModelList.empty()) {
             CoupledModel* m = coupledModelList.front();
@@ -404,11 +427,15 @@ void Model::getAtomicModelList(Model* model,
 		Model* n = it->second;
                 if (n->isAtomic()) {
                     list.push_back(static_cast < AtomicModel*>(n));
-                } else {
+                } else if (n->isCoupled()) {
                     coupledModelList.push_back(static_cast < CoupledModel*>(n));
+                } else {
+                    Throw(utils::DevsGraphError, boost::format(
+                            "Cannot build a correct atomic model list with "
+                            "novle model '%1%'") % model->getName());
                 }
 	    }
-	    coupledModelList.erase(coupledModelList.begin());
+	    coupledModelList.pop_front();
 	}
     }
 }

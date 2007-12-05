@@ -79,6 +79,10 @@ namespace vle { namespace vpz {
         void pushTranslators();
         void pushTranslator(const AttributeList& att);
         void popTranslator(const std::string& cdata);
+        void pushClasses();
+        void pushClass(const AttributeList& att);
+        void popClasses();
+        void popClass();
 
         void pushVleTrame();
         void pushTrame(const AttributeList& att);

@@ -28,6 +28,8 @@
 #include <vle/graph/Model.hpp>
 #include <vle/vpz/Classes.hpp>
 #include <vle/vpz/Model.hpp>
+#include <vle/vpz/Dynamics.hpp>
+#include <vle/vpz/Experiment.hpp>
 #include <glibmm/module.h>
 #include <boost/noncopyable.hpp>
 
@@ -111,7 +113,8 @@ namespace vle { namespace devs {
          */
         ModelFactory(const vpz::Dynamics& dyn,
                      const vpz::Classes& cls,
-                     const vpz::Experiment& experiment);
+                     const vpz::Experiment& experiment,
+                     const vpz::AtomicModelList& atom);
 
         /** 
          * @brief To delete all Glib::Module and class.
@@ -190,19 +193,40 @@ namespace vle { namespace devs {
          * @param dynamics the name of the dynamics to attach.
          * @param condition the name of the condition to attach.
          * @param observable the name of the observable to attach.
-         * @return A reference on the new Simulator builded.
          * @throw utils::InternalError if dynamics not exist.
          */
-        Simulator* createModel(Coordinator& coordinator,
-                               graph::AtomicModel* model,
-                               const std::string& dynamics,
-                               const std::string& condition,
-                               const std::string& observable);
+        void createModel(Coordinator& coordinator,
+                         graph::AtomicModel* model,
+                         const std::string& dynamics,
+                         const std::string& condition,
+                         const std::string& observable);
+
+        /** 
+         * @brief Build a list of devs::Simulator from the dynamics library
+         * corresponding to the atomic models from the specified graph
+         * hierarchy.
+         * @param coordinator the coordinator where attach the simulator.
+         * @param model the hierachy of model (coupled model) or atomic model.
+         */
+        void createModels(Coordinator& coordinator, const vpz::Model& mdl);
+
+        /** 
+         * @brief Build a new devs::Simulator from the vpz::Classes information.
+         * @param classname the name of the class to clone.
+         * @param modelname the new name of the model.
+         * @throw utils::badArg if modelname already exist or if the classname
+         * doest not exist.
+         */
+        graph::Model* createModelFromClass(Coordinator& coordinator,
+                                           graph::CoupledModel* parent,
+                                           const std::string& classname,
+                                           const std::string& modelname);
 
     private:
         vpz::Dynamics           mDynamics;
         vpz::Classes            mClasses;
         vpz::Experiment         mExperiment;
+        vpz::AtomicModelList    mAtoms;
         ModuleCache             mModule;
 
         /** 

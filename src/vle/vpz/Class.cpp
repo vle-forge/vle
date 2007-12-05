@@ -23,17 +23,15 @@
  */
 
 #include <vle/vpz/Class.hpp>
-#include <vle/utils/Debug.hpp>
+
 
 namespace vle { namespace vpz {
 
 void Class::write(std::ostream& out) const
 {
-    out << "<class name=\"" << m_name << "\" >"
+    out << "<class name=\"" << m_name << "\" >\n"
         << m_model
-        << m_dynamics
-        << m_experiement
-        << "</class>";
+        << "</class>\n";
 }
 
 }} // namespace vle vpz

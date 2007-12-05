@@ -623,9 +623,9 @@ bool DSDevs::addConnection(const std::string& srcModelName,
 {
     const std::string& modelName = m_coupledModel->getName();
     graph::Model* srcModel = (modelName == srcModelName)?
-        m_coupledModel : m_coupledModel->getModel(srcModelName);
+        m_coupledModel : m_coupledModel->findModel(srcModelName);
     graph::Model* dstModel = (modelName == dstModelName)?
-        m_coupledModel:m_coupledModel->getModel(dstModelName);
+        m_coupledModel:m_coupledModel->findModel(dstModelName);
 
     if (srcModel and dstModel) {
         if (modelName == srcModelName) {
@@ -654,11 +654,11 @@ bool DSDevs::changeConnection(const std::string& srcModelName,
 {
     const std::string& modelName = m_coupledModel->getName();
     graph::Model* srcModel = (modelName == srcModelName)?
-        m_coupledModel : m_coupledModel->getModel(srcModelName);
+        m_coupledModel : m_coupledModel->findModel(srcModelName);
     graph::Model* oldDstModel = (modelName == oldDstModelName)?
-        m_coupledModel : m_coupledModel->getModel(oldDstModelName);
+        m_coupledModel : m_coupledModel->findModel(oldDstModelName);
     graph::Model* newDstModel = (modelName == newDstModelName)?
-        m_coupledModel : m_coupledModel->getModel(newDstModelName);
+        m_coupledModel : m_coupledModel->findModel(newDstModelName);
 
     if (newDstModel) {
         if (modelName == srcModelName) {
@@ -692,9 +692,9 @@ bool DSDevs::removeConnection(const std::string& srcModelName,
 {
     const std::string& modelName = m_coupledModel->getName();
     graph::Model* srcModel = (modelName == srcModelName)?
-        m_coupledModel : m_coupledModel->getModel(srcModelName);
+        m_coupledModel : m_coupledModel->findModel(srcModelName);
     graph::Model* dstModel = (modelName == dstModelName)?
-        m_coupledModel : m_coupledModel->getModel(dstModelName);
+        m_coupledModel : m_coupledModel->findModel(dstModelName);
 
     if (srcModel and dstModel) {
         if (modelName == srcModelName) {

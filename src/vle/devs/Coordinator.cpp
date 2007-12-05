@@ -85,13 +85,6 @@ Coordinator::~Coordinator()
 
 void Coordinator::init()
 {
-    for (SimulatorMap::iterator it = m_modelList.begin(); it !=
-         m_modelList.end(); ++it) {
-        InternalEvent* evt = it->second->init(getCurrentTime());
-        if (evt) {
-            m_eventTable.putInternalEvent(evt);
-        }
-    }
 }
 
 const Time& Coordinator::getNextTime()
@@ -183,13 +176,21 @@ void Coordinator::addPermanent(const vpz::Observable& observable)
     m_modelFactory.addPermanent(observable);
 }
 
-Simulator* Coordinator::createModel(graph::AtomicModel* model,
-                                    const std::string& dynamics,
-                                    const std::string& condition,
-                                    const std::string& observable)
+void Coordinator::createModel(graph::AtomicModel* model,
+                              const std::string& dynamics,
+                              const std::string& condition,
+                              const std::string& observable)
 {
-    return m_modelFactory.createModel(*this, model, dynamics, condition,
-                                      observable);
+    m_modelFactory.createModel(*this, model, dynamics, condition,
+                               observable);
+}
+
+graph::Model* Coordinator::createModelFromClass(const std::string& classname,
+                                                graph::CoupledModel* parent,
+                                                const std::string& modelname)
+{
+    return m_modelFactory.createModelFromClass(*this, parent,
+                                               classname, modelname);
 }
 
 void Coordinator::addObservableToView(graph::AtomicModel* model,
@@ -212,19 +213,18 @@ void Coordinator::addObservableToView(graph::AtomicModel* model,
     }
 }
 
-bool Coordinator::delModel(graph::CoupledModel* parent,
+void Coordinator::delModel(graph::CoupledModel* parent,
                            const std::string& modelname)
 {
     graph::Model* mdl = parent->findModel(modelname);
-    if (mdl) {
-        if (mdl->isCoupled()) {
-            delCoupledModel(parent, (graph::CoupledModel*)mdl);
-        } else {
-            delAtomicModel(parent, (graph::AtomicModel*)mdl);
-        }
-        return true;
+
+    AssertI(mdl);
+
+    if (mdl->isCoupled()) {
+        delCoupledModel(parent, (graph::CoupledModel*)mdl);
+    } else {
+        delAtomicModel(parent, (graph::AtomicModel*)mdl);
     }
-    return false;
 }
 
 
@@ -277,62 +277,46 @@ View* Coordinator::getView(const std::string& name) const
 void Coordinator::delAtomicModel(graph::CoupledModel* parent,
                                  graph::AtomicModel* atom)
 {
-    if (parent and atom) {
-        SimulatorMap::iterator it = m_modelList.find(atom);
-        if (it != m_modelList.end()) {
-            Simulator* satom = (*it).second;
-            m_modelList.erase(it);
+    AssertI(parent and atom);
+    SimulatorMap::iterator it = m_modelList.find(atom);
+    AssertI(it != m_modelList.end());
 
-            std::map < std::string , View* >::iterator it2;
-            for (it2 = m_viewList.begin(); it2 != m_viewList.end();
-                 ++it2) {
-                View* View = (*it2).second;
-                View->removeObservable(satom);
-            }
-            m_eventTable.delModelEvents(satom);
-            delete satom;
-        }
-        parent->delModel(atom);
+    Simulator* satom = (*it).second;
+    m_modelList.erase(it);
+
+    std::map < std::string , View* >::iterator it2;
+    for (it2 = m_viewList.begin(); it2 != m_viewList.end();
+         ++it2) {
+        View* View = (*it2).second;
+        View->removeObservable(satom);
     }
+    m_eventTable.delModelEvents(satom);
+    delete satom;
+    parent->delModel(atom);
 }
 
 void Coordinator::delCoupledModel(graph::CoupledModel* parent,
                                   graph::CoupledModel* mdl)
 {
-    if (parent and mdl) {
-        graph::ModelList& lst = mdl->getModelList();
-        for (graph::ModelList::iterator it = lst.begin(); it != lst.end();
-             ++it) {
-            if (it->second->isAtomic()) {
-                delAtomicModel(mdl, (graph::AtomicModel*)(it->second));
-            } else if (it->second->isCoupled()) {
-                delCoupledModel(mdl, (graph::CoupledModel*)(it->second));
-            }
+    AssertI(parent and mdl);
+
+    graph::ModelList& lst = mdl->getModelList();
+    for (graph::ModelList::iterator it = lst.begin(); it != lst.end();
+         ++it) {
+        if (it->second->isAtomic()) {
+            delAtomicModel(mdl, (graph::AtomicModel*)(it->second));
+        } else if (it->second->isCoupled()) {
+            delCoupledModel(mdl, (graph::CoupledModel*)(it->second));
         }
-        parent->delAllConnection(mdl);
-        parent->delModel(mdl);
     }
+    parent->delAllConnection(mdl);
+    parent->delModel(mdl);
 }
 
 
 void Coordinator::addModels(const vpz::Model& model)
 {
-    graph::AtomicModelVector atomicmodellist;
-    graph::Model* mdl = model.model();
-
-    if (mdl->isAtomic()) {
-        atomicmodellist.push_back((graph::AtomicModel*)mdl);
-    } else {
-        graph::Model::getAtomicModelList(mdl, atomicmodellist);
-    }
-
-    const vpz::AtomicModelList& atoms(model.atomicModels());
-    for (graph::AtomicModelVector::iterator it = atomicmodellist.begin();
-         it != atomicmodellist.end(); ++it) {
-        const vpz::AtomicModel& atom(atoms.get(*it));
-        createModel(*it, atom.dynamics(), atom.conditions(),
-                    atom.observables());
-    }
+    m_modelFactory.createModels(*this, model);
 }
 
 void Coordinator::addView(View* view)
@@ -359,7 +343,7 @@ void Coordinator::dispatchExternalEvent(ExternalEventList& eventList,
         (*it)->setModel(sim);
 
         graph::TargetModelList out;
-        getTargetPortList(sim->getStructure(), (*it)->getPortName(), out);
+        sim->getStructure()->getTargetPortList((*it)->getPortName(), out);
 
         for (graph::TargetModelList::iterator jt = out.begin();
              jt != out.end(); ++jt) {
@@ -381,16 +365,6 @@ void Coordinator::dispatchExternalEvent(ExternalEventList& eventList,
         delete (*it);
     }
     eventList.clear();
-}
-
-void Coordinator::getTargetPortList(
-    graph::AtomicModel* model,
-    const std::string& portName,
-    graph::TargetModelList& out)
-{
-    if (model) {
-        model->getTargetPortList(portName, out);
-    }
 }
 
 void Coordinator::buildViews()

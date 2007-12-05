@@ -25,41 +25,39 @@
 #include <vle/vpz/Classes.hpp>
 #include <vle/utils/Debug.hpp>
 
+
 namespace vle { namespace vpz {
     
 void Classes::write(std::ostream& out) const
 {
-    if (not empty()) {
+    if (not m_lst.empty()) {
         out << "<classes>\n";
-        for (const_iterator it = begin(); it != end(); ++it) {
-            out << "<class name=\""
-                << (*it).first
-                << "\" >"
-                << (*it).second
-                << "</class>";
-        }
+
+        std::transform(begin(), end(), 
+                       std::ostream_iterator < Class >(out),
+                       ClassValue());
+
         out << "</classes>\n";
     }
 }
 
-Class& Classes::add(const Class& c)
+Class& Classes::add(const std::string& name)
 {
-    const_iterator it = find(c.name());
-    Assert(utils::SaxParserError, it != end(),
-           (boost::format("Class %1% already exist") % c.name()));
+    Assert(utils::SaxParserError, not exist(name),
+           (boost::format("Class %1% already exist") % name));
 
-    return (*insert(std::make_pair < std::string, Class >(
-                c.name(), c)).first).second;
+    return (*m_lst.insert(std::make_pair < std::string, Class >(
+                name, Class(name))).first).second;
 }
 
 void Classes::del(const std::string& name)
 {
-    erase(name);
+    m_lst.erase(name);
 }
 
 const Class& Classes::get(const std::string& name) const
 {
-    const_iterator it = find(name);
+    const_iterator it = m_lst.find(name);
     Assert(utils::SaxParserError, it != end(),
            (boost::format("Unknow class '%1%'") % name));
 
@@ -68,7 +66,7 @@ const Class& Classes::get(const std::string& name) const
 
 Class& Classes::get(const std::string& name)
 {
-    iterator it = find(name);
+    iterator it = m_lst.find(name);
     Assert(utils::SaxParserError, it != end(),
            (boost::format("Unknow class '%1%'") % name));
 
@@ -76,3 +74,4 @@ Class& Classes::get(const std::string& name)
 }
 
 }} // namespace vle vpz
+

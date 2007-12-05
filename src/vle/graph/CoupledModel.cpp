@@ -225,14 +225,14 @@ void CoupledModel::addInputConnection(const std::string& portSrc,
                                       const std::string& dst,
                                       const std::string& portDst)
 {
-    addInputConnection(portSrc, getModel(dst), portDst);
+    addInputConnection(portSrc, findModel(dst), portDst);
 }
 
 void CoupledModel::addOutputConnection(const std::string& src,
                                        const std::string& portSrc,
                                        const std::string& portDst)
 {
-    addOutputConnection(getModel(src), portSrc, portDst);
+    addOutputConnection(findModel(src), portSrc, portDst);
 }
 
 void CoupledModel::addInternalConnection(const std::string& src,
@@ -240,7 +240,7 @@ void CoupledModel::addInternalConnection(const std::string& src,
                                          const std::string& dst,
                                          const std::string& portDst)
 {
-    addInternalConnection(getModel(src), portSrc, getModel(dst), portDst);
+    addInternalConnection(findModel(src), portSrc, findModel(dst), portDst);
 }
 
 void CoupledModel::delConnection(Model* src, const std::string& portSrc,
@@ -298,14 +298,14 @@ void CoupledModel::delInputConnection(const std::string& portSrc,
                                       const std::string& dst,
                                       const std::string& portDst)
 {
-    delInputConnection(portSrc, getModel(dst), portDst);
+    delInputConnection(portSrc, findModel(dst), portDst);
 }
 
 void CoupledModel::delOutputConnection(const std::string& src,
                                        const std::string& portSrc,
                                        const std::string& portDst)
 {
-    delOutputConnection(getModel(src), portSrc, portDst);
+    delOutputConnection(findModel(src), portSrc, portDst);
 }
 
 void CoupledModel::delInternalConnection(const std::string& src,
@@ -313,7 +313,7 @@ void CoupledModel::delInternalConnection(const std::string& src,
                                          const std::string& dst,
                                          const std::string& portDst)
 {
-    delInternalConnection(getModel(src), portSrc, getModel(dst), portDst);
+    delInternalConnection(findModel(src), portSrc, findModel(dst), portDst);
 }
 
 void CoupledModel::delAllConnection(Model* m)
@@ -474,7 +474,7 @@ Model* CoupledModel::findModel(const std::string& name) const
     return (it == m_modelList.end()) ? 0 : it->second;
 }
 
-Model* CoupledModel::getModel(const std::string& modelname)
+Model* CoupledModel::findModelRecursively(const std::string& modelname) const
 {
     if (getName() == modelname) {
         return const_cast < Model* >(
@@ -490,6 +490,14 @@ void CoupledModel::addModel(Model* model)
 
     model->setParent(this);
     m_modelList[model->getName()] = model;
+}
+
+void CoupledModel::addModel(Model* model, const std::string& name)
+{
+    AssertS(utils::DevsGraphError, not exist(name));
+    Model::rename(model, name);
+    model->setParent(this);
+    addModel(model);
 }
 
 AtomicModel* CoupledModel::addAtomicModel(const std::string& name)
@@ -577,10 +585,12 @@ void CoupledModel::writeXML(std::ostream& out) const
          m_modelList.end(); ++it) {
         it->second->writeXML(out);
     }
+    out << "</submodels>\n";
 
     out << "<connections>\n";
     writeConnections(out);
-    out << "<connections>\n";
+    out << "</connections>\n";
+    out << "</model>\n";
 }
 
 void CoupledModel::writeConnections(std::ostream& out) const
@@ -729,7 +739,12 @@ void CoupledModel::copyPort(const ModelPortList& src, ModelPortList& dst)
     for (ModelPortList::const_iterator it = src.begin();
          it != src.end(); ++it) {
         const std::string& srcmodelname(it->first->getName());
-        Model* dstmodel(getModel(srcmodelname));
+
+        Model* dstmodel(findModel(srcmodelname));
+
+        if (dstmodel == 0) {
+            dstmodel = this;
+        }
 
         Assert(utils::DevsGraphError, dstmodel, boost::format(
                 "Destination model %1% not found in copy port") % srcmodelname);

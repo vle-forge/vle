@@ -123,13 +123,23 @@ namespace vle { namespace devs {
          * @param dynamics the name of the dynamics to attach.
          * @param condition the name of the condition to attach.
          * @param observable the name of the observable to attach.
-         * @return A reference on the new Simulator builded.
          * @throw utils::InternalError if dynamics not exist.
          */
-        Simulator* createModel(graph::AtomicModel* model,
-                               const std::string& dynamics,
-                               const std::string& condition,
-                               const std::string& observable);
+        void createModel(graph::AtomicModel* model,
+                         const std::string& dynamics,
+                         const std::string& condition,
+                         const std::string& observable);
+
+        /** 
+         * @brief Build a new devs::Simulator from the vpz::Classes information.
+         * @param classname the name of the class to clone.
+         * @param parent the parent of the model.
+         * @param modelname the new name of the model.
+         * @throw utils::badArg if modelname already exist.
+         */
+        graph::Model* createModelFromClass(const std::string& classname,
+                                           graph::CoupledModel* parent,
+                                           const std::string& modelname);
         
         /** 
          * @brief Add an observable, ie. a reference and a model to the
@@ -146,11 +156,10 @@ namespace vle { namespace devs {
          * @brief Delete the specified model from coupled model. All
          * connection are deleted, Simulator are deleted and all events are
          * deleted from event table.
-         * 
          * @param parent the coupled model parent of model to delete.
          * @param modelname the name of model to delete.
          */
-        bool delModel(graph::CoupledModel* parent,
+        void delModel(graph::CoupledModel* parent,
                       const std::string& modelname);
 
         //
@@ -274,10 +283,6 @@ namespace vle { namespace devs {
          */
         void delCoupledModel(graph::CoupledModel* parent,
                              graph::CoupledModel* mdl);
-
-        void getTargetPortList(graph::AtomicModel* model,
-                               const std::string& portName,
-                               graph::TargetModelList& out);
 
         void processEventView(Simulator& model, Event* event = 0);
 

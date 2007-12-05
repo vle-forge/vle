@@ -90,7 +90,7 @@ void SaxStackVpz::pushModel(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
     AssertS(utils::SaxParserError, m_stack.top()->isStructures() or
-            m_stack.top()->isSubmodels());
+            m_stack.top()->isSubmodels() or m_stack.top()->isClass());
 
     graph::CoupledModel* parent = 0;
 
@@ -133,12 +133,14 @@ void SaxStackVpz::pushModel(const AttributeList& att)
         Throw(utils::InternalError, (boost::format(
                         "Unknow model type %1%") % type));
     }
-    
+ 
     vpz::Model* mdl = new vpz::Model();
     mdl->set_model(gmdl);
 
     if (m_stack.top()->isStructures()) {
         vpz().project().model().set_model(gmdl);
+    } else if (m_stack.top()->isClass()) {
+        reinterpret_cast < Class* >(m_stack.top())->setModel(gmdl);
     }
 
     m_stack.push(mdl);
@@ -636,6 +638,41 @@ void SaxStackVpz::popVleTrame()
     AssertS(utils::SaxParserError, not m_stack.empty());
     AssertS(utils::SaxParserError, dynamic_cast < VLETrame* >(m_stack.top()));
     delete m_stack.top();
+    m_stack.pop();
+}
+
+void SaxStackVpz::pushClasses()
+{
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_stack.top()->isVpz());
+
+    m_stack.push(&m_vpz.project().classes());
+}
+
+void SaxStackVpz::pushClass(const AttributeList& att)
+{
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_stack.top()->isClasses());
+
+    std::string name(getAttribute < std::string >(att, "name"));
+
+    Class& cls = m_vpz.project().classes().add(name);
+    m_stack.push(&cls);
+}
+
+void SaxStackVpz::popClasses()
+{
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_stack.top()->isClasses());
+
+    m_stack.pop();
+}
+
+void SaxStackVpz::popClass()
+{
+    AssertS(utils::SaxParserError, not m_stack.empty());
+    AssertS(utils::SaxParserError, m_stack.top()->isClass());
+
     m_stack.pop();
 }
 

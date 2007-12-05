@@ -65,10 +65,12 @@ Glib::Module* ModuleCache::get(const std::string& library) const
 
 ModelFactory::ModelFactory(const vpz::Dynamics& dyn,
                            const vpz::Classes& cls,
-                           const vpz::Experiment& exp) :
+                           const vpz::Experiment& exp,
+                           const vpz::AtomicModelList& atom) :
     mDynamics(dyn),
     mClasses(cls),
-    mExperiment(exp)
+    mExperiment(exp),
+    mAtoms(atom)
 {
 }
 
@@ -117,11 +119,11 @@ void ModelFactory::addPermanent(const vpz::Observable& observable)
     }
 }
 
-Simulator* ModelFactory::createModel(Coordinator& coordinator,
-                                     graph::AtomicModel* model,
-                                     const std::string& dynamics,
-                                     const std::string& condition,
-                                     const std::string& observable)
+void ModelFactory::createModel(Coordinator& coordinator,
+                               graph::AtomicModel* model,
+                               const std::string& dynamics,
+                               const std::string& condition,
+                               const std::string& observable)
 {
     const SimulatorMap& result(coordinator.modellist()); 
     Simulator* sim = new Simulator(model);
@@ -167,7 +169,61 @@ Simulator* ModelFactory::createModel(Coordinator& coordinator,
         }
     }
 
-    return sim;
+    if (InternalEvent* evt = sim->init(coordinator.getCurrentTime())) {
+        coordinator.eventtable().putInternalEvent(evt);
+    }
+}
+
+void ModelFactory::createModels(Coordinator& coordinator,
+                                const vpz::Model& model)
+{
+    graph::AtomicModelVector atomicmodellist;
+    graph::Model* mdl = model.model();
+
+    if (mdl->isAtomic()) {
+        atomicmodellist.push_back((graph::AtomicModel*)mdl);
+    } else {
+        graph::Model::getAtomicModelList(mdl, atomicmodellist);
+    }
+
+    const vpz::AtomicModelList& atoms(model.atomicModels());
+    for (graph::AtomicModelVector::iterator it = atomicmodellist.begin();
+         it != atomicmodellist.end(); ++it) {
+        const vpz::AtomicModel& atom(atoms.get(*it));
+        createModel(coordinator, *it, atom.dynamics(), atom.conditions(),
+                    atom.observables());
+    }
+
+}
+
+graph::Model* ModelFactory::createModelFromClass(Coordinator& coordinator,
+                                                 graph::CoupledModel* parent,
+                                                 const std::string& classname,
+                                                 const std::string& modelname)
+{
+    vpz::Class& classe(mClasses.get(classname));
+    graph::Model* mdl(classe.model()->clone());
+
+    graph::AtomicModelVector atomicmodellist;
+    graph::Model::getAtomicModelList(classe.model(), atomicmodellist);
+
+    for (graph::AtomicModelVector::iterator it = atomicmodellist.begin();
+         it != atomicmodellist.end(); ++it) {
+        graph::CoupledModelVector vec;
+        (*it)->getParents(vec);
+        graph::Model* atom = mdl->getModel(vec, (*it)->getName());
+        vpz::AtomicModel& atominfo(mAtoms.get(*it));
+
+        assert(atom->isAtomic());
+
+        createModel(coordinator, 
+                    static_cast < graph::AtomicModel* >(atom),
+                    atominfo.dynamics(),
+                    atominfo.conditions(), atominfo.observables());
+    }
+
+    parent->addModel(mdl, modelname);
+    return mdl;
 }
 
 Glib::Module* ModelFactory::buildPlugin(const vpz::Dynamic& dyn)
@@ -203,23 +259,14 @@ Glib::Module* ModelFactory::buildPlugin(const vpz::Dynamic& dyn)
 
 Glib::Module* ModelFactory::getPlugin(const std::string& name)
 {
-    if (mDynamics.exist(name)) {
-        const vpz::Dynamic& dyn(mDynamics.get(name));
-        Glib::Module* r = mModule.get(dyn.library());
-        return (r == 0) ? buildPlugin(dyn) : r;
-    } else {
-        vpz::Classes::const_iterator clit;
-        for (clit = mClasses.begin(); clit != mClasses.end(); ++clit) {
-            if ((*clit).second.dynamics().exist(name)) {
-                const vpz::Dynamic& dyn((*clit).second.dynamics().get(name));
-                Glib::Module* r = mModule.get(dyn.library());
-                return (r == 0) ? buildPlugin(dyn) : r;
-            }
-        }
-    }
+    const vpz::Dynamic& dyn(mDynamics.get(name));
+    Glib::Module* r = mModule.get(dyn.library());
 
-    Throw(utils::ArgError, boost::format(
-            "Dynamics plugin '%1%' not found in model factory\n") % name);
+    if (r == 0) {
+        return buildPlugin(dyn);
+    } else {
+        return r;
+    }
 }
 
 void ModelFactory::attachDynamics(Coordinator& coordinator,
@@ -265,7 +312,8 @@ void ModelFactory::attachDynamics(Coordinator& coordinator,
     }
     
     if (call->is_wrapper()) {
-        (reinterpret_cast < DynamicsWrapper* >(call))->set_library(dyn.library());
+        (reinterpret_cast < DynamicsWrapper*
+         >(call))->set_library(dyn.library());
         (reinterpret_cast < DynamicsWrapper* >(call))->set_model(dyn.model());
     }
 

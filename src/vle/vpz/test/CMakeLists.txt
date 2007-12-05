@@ -104,3 +104,18 @@ TARGET_LINK_LIBRARIES(test5
   vlegraph
   vledevs
   vlevpz)
+
+ADD_EXECUTABLE(test6 test6.cpp)
+ADD_TEST(vpztest6 test6)
+TARGET_LINK_LIBRARIES(test6
+  ${GLIBMM_LIBRARIES}
+  ${LIBXMLPP_LIBRARIES}
+  ${GTHREAD_LIBRARIES}
+  ${Boost_UNITTESTFRAMEWORK}
+  vlegeometry
+  vleutils
+  vledata
+  vlevalue
+  vlegraph
+  vledevs
+  vlevpz)

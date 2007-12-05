@@ -103,6 +103,19 @@ namespace vle { namespace graph {
          */
 	virtual Model* findModel(const std::string& name) const = 0;
 
+        /** 
+         * @brief A output stream operator for graph::Model hierarchy
+         * (AtomicModel, CoupledModel and NoVLEModel).
+         * @param out Output stream.
+         * @param mdl Model to write.
+         * @return A reference to the output stream.
+         */
+        //friend std::ostream& operator<<(std::ostream& out, const Model& mdl)
+        //{
+        //mdl.writeXML(out);
+        //return out;
+        //}
+
         /**
          * @brief Write the model in the output stream.
          * @param out output stream.
@@ -110,6 +123,12 @@ namespace vle { namespace graph {
 	virtual void writeXML(std::ostream& out) const = 0;
 
 
+        /** 
+         * @brief Return a list of couple (graph::AtomicModel, portname) where
+         * the current model is connected with his specified output port.
+         * @param portname The portname of the model.
+         * @param out An output parameter to push result.
+         */
         void getTargetPortList(const std::string& portname,
                                TargetModelList& out);
         
@@ -121,6 +140,14 @@ namespace vle { namespace graph {
 
         inline const std::string& getName() const
         { return m_name; }
+
+        /** 
+         * @brief Change the name of the specified model to the new name. If mdl
+         * have a parent, the this coupled model change is model list.
+         * @param mdl graph::Model to change.
+         * @param newmane the new name.
+         */
+        static void rename(Model* mdl, const std::string& newmane);
 
         /** 
          * @brief Build a std::string based on the construction of the

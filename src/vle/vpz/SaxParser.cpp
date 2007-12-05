@@ -169,6 +169,10 @@ void SaxParser::on_start_element(
         m_vpzstack.pushTranslators();
     } else if (name == "translator") {
         m_vpzstack.pushTranslator(att);
+    } else if (name == "classes") {
+        m_vpzstack.pushClasses();
+    } else if (name == "class") {
+        m_vpzstack.pushClass(att);
     } else {
         Throw(utils::SaxParserError,
               (boost::format("Unknow element %1%") % name));
@@ -262,6 +266,10 @@ void SaxParser::on_end_element(const Glib::ustring& name)
             }
         }
         m_vpzstack.pop(); 
+    } else if (name == "classes") {
+        m_vpzstack.popClasses();
+    } else if (name == "class") {
+        m_vpzstack.popClass();
     }
 }
 

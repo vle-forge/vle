@@ -69,15 +69,6 @@ namespace vle { namespace graph {
         virtual bool isCoupled() const { return true; }
 
         /** 
-         * @brief Return the reference to the children which have this name.
-         * Recursive function on all his children.
-         * @param name The name of the model to find.
-         * @return a children if name is equal to the model's name, null
-         * otherwise.
-         */
-        virtual Model* findModel(const std::string& name) const;
-
-        /** 
          * @brief Write the coupled model in the output stream.
          * @param out output stream.
          */
@@ -97,6 +88,14 @@ namespace vle { namespace graph {
          * hierarchy.
          */
         void addModel(Model* model);
+
+        /** 
+         * @brief Add a model into the model list. Parent is set to thie coupled
+         * model and the model name if changed.
+         * @param model The model to add.
+         * @param name The new name of the model.
+         */
+        void addModel(Model* model, const std::string& name);
 
         /** 
          * @brief add a new atomic model to the list. Parent is set to this
@@ -183,7 +182,9 @@ namespace vle { namespace graph {
          */
         void detachModels(const ModelList& models);
 
-        Model* getModel(const std::string& modelName);
+        Model* findModel(const std::string& modelname) const;
+
+        Model* findModelRecursively(const std::string& modelName) const;
 
 	void addInputConnection(const std::string& portSrc,
                                 Model* dst, const std::string& portDst);

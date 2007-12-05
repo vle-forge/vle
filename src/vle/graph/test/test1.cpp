@@ -223,3 +223,34 @@ BOOST_AUTO_TEST_CASE(test_clone2)
     AtomicModel* g(dynamic_cast < AtomicModel* >(top2->findModel("g")));
     BOOST_REQUIRE(g);
 }
+
+BOOST_AUTO_TEST_CASE(test_clone_different_atomic)
+{
+    vpz::Vpz file1(utils::Path::buildPrefixSharePath(
+            utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
+
+    vpz::Vpz file2(file1);
+
+    CoupledModel* top1 = dynamic_cast < CoupledModel*
+        >(file1.project().model().model());
+    CoupledModel* top2 = dynamic_cast < CoupledModel*
+        >(file2.project().model().model());
+
+    BOOST_REQUIRE(top1 and top2);
+    
+    AtomicModelVector lst1, lst2;
+
+    Model::getAtomicModelList(top1, lst1);
+    Model::getAtomicModelList(top2, lst2);
+
+    graph::AtomicModelVector intersection;
+
+    std::sort(lst1.begin(), lst1.end());
+    std::sort(lst2.begin(), lst2.end());
+
+    graph::AtomicModelVector::iterator it;
+
+    it = std::search(lst1.begin(), lst1.end(), lst2.begin(), lst2.end());
+
+    BOOST_REQUIRE(it == lst1.end());
+}
