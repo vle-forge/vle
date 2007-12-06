@@ -142,7 +142,7 @@ std::string MapFactory::toString() const
         s += "(";
         s += (*it).first;
         s += ", ";
-        s += (*it).second->toFile();
+        s += (*it).second->toString();
         s += ")";
         ++it;
         if (it != m_value.end()) {
