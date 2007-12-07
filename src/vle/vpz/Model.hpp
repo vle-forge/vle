@@ -31,6 +31,7 @@
 
 namespace vle { namespace vpz {
 
+    typedef std::vector < std::string > StringVector;
 
     /** 
      * @brief The AtomicModel class is used by the AtomicModelList to attach an
@@ -42,14 +43,9 @@ namespace vle { namespace vpz {
         AtomicModel(const std::string& conditions,
                     const std::string& dynamics,
                     const std::string& observables,
-                    const std::string& translator) :
-            m_conditions(conditions),
-            m_dynamics(dynamics),
-            m_observables(observables),
-            m_translator(translator)
-        { }
+                    const std::string& translator);
 
-        inline const std::string& conditions() const
+        inline const StringVector& conditions() const
         { return m_conditions; }
 
         inline const std::string& dynamics() const
@@ -66,7 +62,7 @@ namespace vle { namespace vpz {
 
         friend std::ostream& operator<<(std::ostream& out, const AtomicModel& a)
         {
-            return out << "  conditions  : " << a.m_conditions << "\n"
+            return out << "  conditions  : " << a.m_conditions.front() << "\n"
                        << "  dynamics    : " << a.m_dynamics << "\n"
                        << "  observables : " << a.m_observables << "\n"
                        << "  translator  : " << a.m_translator << "\n";
@@ -75,7 +71,7 @@ namespace vle { namespace vpz {
     private:
         AtomicModel() { }
 
-        std::string     m_conditions;
+	StringVector    m_conditions;
         std::string     m_dynamics;
         std::string     m_observables;
         std::string     m_translator;

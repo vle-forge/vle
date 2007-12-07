@@ -181,7 +181,7 @@ BOOST_AUTO_TEST_CASE(dynamic_vpz)
 
     const vpz::AtomicModel& vatom = mdl.atomicModels().get(atom);
     BOOST_REQUIRE_EQUAL(vatom.dynamics(), "dyn1");
-    BOOST_REQUIRE_EQUAL(vatom.conditions(), "cnd1");
+    BOOST_REQUIRE_EQUAL(vatom.conditions().front(), "cnd1");
 
     const vpz::Dynamics& dyns(vpz.project().dynamics());
     const vpz::Dynamic& dyn(dyns.get(vatom.dynamics()));

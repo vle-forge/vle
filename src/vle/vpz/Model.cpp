@@ -31,6 +31,23 @@
 
 namespace vle { namespace vpz {
 
+AtomicModel::AtomicModel(const std::string& conditions,
+			 const std::string& dynamics,
+			 const std::string& observables,
+			 const std::string& translator) :
+    m_dynamics(dynamics),
+    m_observables(observables),
+    m_translator(translator)
+{ 
+    std::string conditionList = conditions;
+    std::vector < std:: string > lst;
+
+    boost::trim(conditionList);
+    boost::split(m_conditions, conditionList, boost::is_any_of(","),
+		 boost::algorithm::token_compress_on);
+    if (m_conditions.front() == "") m_conditions.pop_back();
+}
+
 void AtomicModelList::add(const AtomicModelList& atoms)
 {
     for (const_iterator it = atoms.begin(); it != atoms.end(); ++it) {
@@ -224,8 +241,17 @@ void Model::writeAtomic(std::ostream& out, const graph::AtomicModel* mdl) const
 
     out << "<model name=\"" << mdl->getName() << "\" "
         << "type=\"atomic\" "
-        << "conditions=\"" << vpzatom.conditions() << "\" "
-        << "dynamics=\"" << vpzatom.dynamics() << "\" "
+	<< "conditions=\"";
+
+    for (StringVector::const_iterator it = vpzatom.conditions().begin();
+	 it != vpzatom.conditions().end();
+	 ++it) {
+	out << *it;
+	if (it != vpzatom.conditions().end())
+	    out << ",";
+    }
+    out << "\" "
+	<< "dynamics=\"" << vpzatom.dynamics() << "\" "
         << "observables=\"" << vpzatom.observables() << "\" >\n";
 
     writePort(out, mdl);

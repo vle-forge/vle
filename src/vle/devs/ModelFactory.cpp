@@ -119,11 +119,11 @@ void ModelFactory::addPermanent(const vpz::Observable& observable)
     }
 }
 
-void ModelFactory::createModel(Coordinator& coordinator,
-                               graph::AtomicModel* model,
-                               const std::string& dynamics,
-                               const std::string& condition,
-                               const std::string& observable)
+Simulator* ModelFactory::createModel(Coordinator& coordinator,
+				     graph::AtomicModel* model,
+				     const std::string& dynamics,
+				     const vpz::StringVector& conditions,
+				     const std::string& observable)
 {
     const SimulatorMap& result(coordinator.modellist()); 
     Simulator* sim = new Simulator(model);
@@ -141,9 +141,19 @@ void ModelFactory::createModel(Coordinator& coordinator,
         Throw(utils::NotYetImplemented, "Distant dynamics is not supported");
     }
 
-    if (not condition.empty()) {
-        const vpz::Condition& cnd(mExperiment.conditions().get(condition));
-        sim->processInitEvents(cnd.firstValues());
+    if (not conditions.empty()) {
+	vpz::ValueList initValues;
+
+	for (vpz::StringVector::const_iterator it = conditions.begin();
+	     it != conditions.end(); ++it) {
+	    const vpz::Condition& cnd(mExperiment.conditions().get(*it));
+	    vpz::ValueList vl = cnd.firstValues();
+
+	    for (vpz::ValueList::const_iterator itv = vl.begin();
+		 itv != vl.end(); ++itv)
+		initValues[itv->first] = itv->second;
+	}
+	sim->processInitEvents(initValues);
     }
 
     if (not observable.empty()) {
@@ -172,6 +182,8 @@ void ModelFactory::createModel(Coordinator& coordinator,
     if (InternalEvent* evt = sim->init(coordinator.getCurrentTime())) {
         coordinator.eventtable().putInternalEvent(evt);
     }
+
+    return sim;
 }
 
 void ModelFactory::createModels(Coordinator& coordinator,

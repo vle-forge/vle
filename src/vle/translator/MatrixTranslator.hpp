@@ -25,50 +25,51 @@
 #ifndef VLE_TRANSLATOR_MATRIXTRANSLATOR_HPP
 #define VLE_TRANSLATOR_MATRIXTRANSLATOR_HPP
 
-#include <vle/vpz/Translator.hpp>
+#include <vle/devs/Executive.hpp>
 #include <vle/utils/XML.hpp>
 #include <string>
 #include <vector>
 
 namespace vle { namespace translator {
 
-    class MatrixTranslator : public vpz::Translator
+    class MatrixTranslator
     {
     public:
-        MatrixTranslator(const vpz::Project& prj);
-
+        MatrixTranslator();
         virtual ~MatrixTranslator();
 
-        virtual void translate(const std::string& buffer);
-
-    protected:
-        bool existModel(unsigned int i, unsigned int j = 0);
-        std::string getDynamics(unsigned int i, unsigned int j = 0);
-        std::string getName(unsigned int i, unsigned int j = 0) const;
-
-        virtual void parseXML(const std::string& buffer);
-        virtual void translateStructures();
-        virtual void translateDynamics();
-        virtual void translateTranslators() { }
-        virtual void translateConditions();
-        virtual void translateViews() { }
-        virtual void translateFinish() { }
+        virtual void translate(const std::string& /* buffer */);
 
         typedef enum { VON_NEUMANN, MOORE, LINEAR } connectivity_type;
 
-        xmlpp::DomParser m_parser;
-        xmlpp::Element* m_root;
+	graph::CoupledModel* mCoupledModel;
+	devs::Coordinator* mCoordinator;
+
+        bool existModel(unsigned int i, unsigned int j = 0);
+	std::string getDynamics(unsigned int i, unsigned int j = 0);
+        std::string getName(unsigned int i, unsigned int j = 0) const;
+
         unsigned int m_dimension;
         std::map < unsigned int, unsigned int > m_size;
         connectivity_type m_connectivity;
         bool m_multipleLibrary;
         std::string m_library;
-        std::map < unsigned int , std::string > m_libraries;
+        std::string m_model;
+        std::map < unsigned int , std::pair < std::string, std::string > > m_libraries;
         std::string m_prefix;
         unsigned int* m_init;
-        std::map < std::string , vpz::AtomicModel* > m_models;
+        std::map < std::string , graph::AtomicModel* > m_models;
         bool        m_symmetricport;
+        xmlpp::Element* m_root;
 
+    private:
+        xmlpp::DomParser m_parser;
+
+        virtual void parseXML(const std::string& buffer);
+	void translateStructures();
+	void translateDynamics();
+	void translateConditions();
+	
     };
 
 }} // namespace vle translator
