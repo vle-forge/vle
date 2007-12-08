@@ -119,11 +119,11 @@ void ModelFactory::addPermanent(const vpz::Observable& observable)
     }
 }
 
-Simulator* ModelFactory::createModel(Coordinator& coordinator,
-				     graph::AtomicModel* model,
-				     const std::string& dynamics,
-				     const vpz::StringVector& conditions,
-				     const std::string& observable)
+void ModelFactory::createModel(Coordinator& coordinator,
+                               graph::AtomicModel* model,
+                               const std::string& dynamics,
+                               const vpz::StringVector& conditions,
+                               const std::string& observable)
 {
     const SimulatorMap& result(coordinator.modellist()); 
     Simulator* sim = new Simulator(model);
@@ -182,8 +182,6 @@ Simulator* ModelFactory::createModel(Coordinator& coordinator,
     if (InternalEvent* evt = sim->init(coordinator.getCurrentTime())) {
         coordinator.eventtable().putInternalEvent(evt);
     }
-
-    return sim;
 }
 
 void ModelFactory::createModels(Coordinator& coordinator,

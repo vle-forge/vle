@@ -40,12 +40,15 @@ AtomicModel::AtomicModel(const std::string& conditions,
     m_translator(translator)
 { 
     std::string conditionList = conditions;
-    std::vector < std:: string > lst;
+    StringVector lst;
 
     boost::trim(conditionList);
     boost::split(m_conditions, conditionList, boost::is_any_of(","),
 		 boost::algorithm::token_compress_on);
-    if (m_conditions.front() == "") m_conditions.pop_back();
+
+    if (m_conditions.front().empty()) {
+        m_conditions.pop_back();
+    }
 }
 
 void AtomicModelList::add(const AtomicModelList& atoms)
@@ -244,11 +247,11 @@ void Model::writeAtomic(std::ostream& out, const graph::AtomicModel* mdl) const
 	<< "conditions=\"";
 
     for (StringVector::const_iterator it = vpzatom.conditions().begin();
-	 it != vpzatom.conditions().end();
-	 ++it) {
+         it != vpzatom.conditions().end(); ++it) {
 	out << *it;
-	if (it != vpzatom.conditions().end())
-	    out << ",";
+	if (it != vpzatom.conditions().end()) {
+            out << ",";
+        }
     }
     out << "\" "
 	<< "dynamics=\"" << vpzatom.dynamics() << "\" "

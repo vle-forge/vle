@@ -176,13 +176,13 @@ void Coordinator::addPermanent(const vpz::Observable& observable)
     m_modelFactory.addPermanent(observable);
 }
 
-Simulator* Coordinator::createModel(graph::AtomicModel* model,
-				    const std::string& dynamics,
-				    const vpz::StringVector& conditions,
-				    const std::string& observable)
+void Coordinator::createModel(graph::AtomicModel* model,
+                              const std::string& dynamics,
+                              const vpz::StringVector& conditions,
+                              const std::string& observable)
 {
-    return m_modelFactory.createModel(*this, model, dynamics, conditions,
-				      observable);
+    m_modelFactory.createModel(*this, model, dynamics, conditions,
+                               observable);
 }
 
 graph::Model* Coordinator::createModelFromClass(const std::string& classname,

@@ -195,11 +195,11 @@ namespace vle { namespace devs {
          * @param observable the name of the observable to attach.
          * @throw utils::InternalError if dynamics not exist.
          */
-        Simulator* createModel(Coordinator& coordinator,
-			       graph::AtomicModel* model,
-			       const std::string& dynamics,
-			       const vpz::StringVector& conditions,
-			       const std::string& observable);
+        void createModel(Coordinator& coordinator,
+                         graph::AtomicModel* model,
+                         const std::string& dynamics,
+                         const vpz::StringVector& conditions,
+                         const std::string& observable);
 
         /** 
          * @brief Build a list of devs::Simulator from the dynamics library
