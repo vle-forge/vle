@@ -153,7 +153,14 @@ void SimpleFile::flush(double trame_time)
 void SimpleFile::finalFlush(double trame_time)
 {
     flush(trame_time);
-    if (not m_buffer.empty()) {
+    bool empty = true;
+
+    for (std::vector < value::Value >::iterator it = m_buffer.begin(); 
+	 it != m_buffer.end() and empty; ++it) {
+        empty = not (*it).get();
+    }
+
+    if (not empty) {
         m_file << trame_time;
         writeSeparator(m_file);
         std::vector < value::Value >::iterator it;
