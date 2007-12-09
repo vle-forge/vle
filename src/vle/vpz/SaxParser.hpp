@@ -145,6 +145,164 @@ namespace vle { namespace vpz {
         bool                            m_isTrame;
 
         bool                            m_isEndTrame;
+
+        typedef void (SaxParser::* startfunc)(const AttributeList&);
+        typedef void (SaxParser::* endfunc)();
+        typedef std::map < std::string, startfunc > StartFuncList;
+        typedef std::map < std::string, endfunc > EndFuncList;
+
+        StartFuncList   m_starts;
+        EndFuncList     m_ends;
+
+
+        void onBoolean(const AttributeList& att);
+        void onInteger(const AttributeList& att);
+        void onDouble(const AttributeList& att);
+        void onString(const AttributeList& att);
+        void onSet(const AttributeList& att);
+        void onMap(const AttributeList& att);
+        void onKey(const AttributeList& att);
+        void onTuple(const AttributeList& att);
+        void onTable(const AttributeList& att);
+        void onXML(const AttributeList& att);
+        void onVLETrame(const AttributeList& att);
+        void onTrame(const AttributeList& att);
+        void onModelTrame(const AttributeList& att);
+        void onVLEProject(const AttributeList& att);
+        void onStructures(const AttributeList& att);
+        void onModel(const AttributeList& att);
+        void onIn(const AttributeList& att);
+        void onOut(const AttributeList& att);
+        void onPort(const AttributeList& att);
+        void onSubModels(const AttributeList& att);
+        void onConnections(const AttributeList& att);
+        void onConnection(const AttributeList& att);
+        void onOrigin(const AttributeList& att);
+        void onDestination(const AttributeList& att);
+        void onDynamics(const AttributeList& att);
+        void onDynamic(const AttributeList& att);
+        void onExperiment(const AttributeList& att);
+        void onReplicas(const AttributeList& att);
+        void onConditions(const AttributeList& att);
+        void onCondition(const AttributeList& att);
+        void onViews(const AttributeList& att);
+        void onOutputs(const AttributeList& att);
+        void onOutput(const AttributeList& att);
+        void onView(const AttributeList& att);
+        void onObservables(const AttributeList& att);
+        void onObservable(const AttributeList& att);
+        void onAttachedView(const AttributeList& att);
+        void onTranslators(const AttributeList& att);
+        void onTranslator(const AttributeList& att);
+        void onClasses(const AttributeList& att);
+        void onClass(const AttributeList& att);
+
+        void onEndBoolean();
+        void onEndInteger();
+        void onEndDouble();
+        void onEndString();
+        void onEndSet();
+        void onEndMap();
+        void onEndKey();
+        void onEndTuple();
+        void onEndTable();
+        void onEndXML();
+        void onEndVLETrame();
+        void onEndTrame();
+        void onEndModelTrame();
+        void onEndVLEProject();
+        void onEndStructures();
+        void onEndModel();
+        void onEndIn();
+        void onEndOut();
+        void onEndPort();
+        void onEndSubModels();
+        void onEndConnections();
+        void onEndConnection();
+        void onEndOrigin();
+        void onEndDestination();
+        void onEndDynamics();
+        void onEndDynamic();
+        void onEndExperiment();
+        void onEndReplicas();
+        void onEndConditions();
+        void onEndCondition();
+        void onEndViews();
+        void onEndOutputs();
+        void onEndOutput();
+        void onEndView();
+        void onEndObservables();
+        void onEndObservable();
+        void onEndAttachedView();
+        void onEndTranslators();
+        void onEndTranslator();
+        void onEndClasses();
+        void onEndClass();
+
+        void add(const std::string& name, startfunc fct, endfunc efct)
+        {
+            m_starts[name] = fct;
+            m_ends[name] = efct;
+        }
+
+        void fillTagList()
+        {
+            add("boolean", &SaxParser::onBoolean, &SaxParser::onEndBoolean);
+            add("integer", &SaxParser::onInteger, &SaxParser::onEndInteger);
+            add("double", &SaxParser::onDouble, &SaxParser::onEndDouble);
+            add("string", &SaxParser::onString, &SaxParser::onEndString);
+            add("set", &SaxParser::onSet, &SaxParser::onEndSet);
+            add("map", &SaxParser::onMap, &SaxParser::onEndMap);
+            add("key", &SaxParser::onKey, &SaxParser::onEndKey);
+            add("tuple", &SaxParser::onTuple, &SaxParser::onEndTuple);
+            add("table", &SaxParser::onTable, &SaxParser::onEndTable);
+            add("xml", &SaxParser::onXML, &SaxParser::onEndXML);
+            add("vle_trame", &SaxParser::onVLETrame, &SaxParser::onEndVLETrame);
+            add("trame", &SaxParser::onTrame, &SaxParser::onEndTrame);
+            add("modeltrame", &SaxParser::onModelTrame,
+                &SaxParser::onEndModelTrame);
+            add("vle_project", &SaxParser::onVLEProject,
+                &SaxParser::onEndVLEProject);
+            add("structures", &SaxParser::onStructures,
+                &SaxParser::onEndStructures);
+            add("model", &SaxParser::onModel, &SaxParser::onEndModel);
+            add("in", &SaxParser::onIn, &SaxParser::onEndIn);
+            add("out", &SaxParser::onOut, &SaxParser::onEndOut);
+            add("port", &SaxParser::onPort, &SaxParser::onEndPort);
+            add("submodels", &SaxParser::onSubModels,
+                &SaxParser::onEndSubModels);
+            add("connections", &SaxParser::onConnections,
+                &SaxParser::onEndConnections);
+            add("connection", &SaxParser::onConnection,
+                &SaxParser::onEndConnection);
+            add("origin", &SaxParser::onOrigin, &SaxParser::onEndOrigin);
+            add("destination", &SaxParser::onDestination,
+                &SaxParser::onEndDestination);
+            add("dynamics", &SaxParser::onDynamics, &SaxParser::onEndDynamics);
+            add("dynamic", &SaxParser::onDynamic, &SaxParser::onEndDynamic);
+            add("experiment", &SaxParser::onExperiment,
+                &SaxParser::onEndExperiment);
+            add("replicas", &SaxParser::onReplicas, &SaxParser::onEndReplicas);
+            add("conditions", &SaxParser::onConditions,
+                &SaxParser::onEndConditions);
+            add("condition", &SaxParser::onCondition, &SaxParser::onEndCondition);
+            add("views", &SaxParser::onViews, &SaxParser::onEndViews);
+            add("outputs", &SaxParser::onOutputs, &SaxParser::onEndOutputs);
+            add("output", &SaxParser::onOutput, &SaxParser::onEndOutput);
+            add("view", &SaxParser::onView, &SaxParser::onEndView);
+            add("observables", &SaxParser::onObservables,
+                &SaxParser::onEndObservables);
+            add("observable", &SaxParser::onObservable,
+                &SaxParser::onEndObservable);
+            add("attachedview", &SaxParser::onAttachedView,
+                &SaxParser::onEndAttachedView);
+            add("translators", &SaxParser::onTranslators,
+                &SaxParser::onEndTranslators);
+            add("translator", &SaxParser::onTranslator,
+                &SaxParser::onEndTranslator);
+            add("classes", &SaxParser::onClasses, &SaxParser::onEndClasses);
+            add("class", &SaxParser::onClass, &SaxParser::onEndClass);
+        }
     };
 
     /** 

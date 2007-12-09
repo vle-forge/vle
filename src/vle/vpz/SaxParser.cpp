@@ -48,6 +48,7 @@ SaxParser::SaxParser(Vpz& vpz) :
     m_isTrame(false),
     m_isEndTrame(false)
 {
+    fillTagList();
 }
 
 SaxParser::~SaxParser()
@@ -87,154 +88,332 @@ void SaxParser::on_start_element(
     const AttributeList& att)
 {
     clearLastCharactersStored();
-    if (name == "boolean") {
-        m_valuestack.pushBoolean();
-    } else if (name == "integer") {
-        m_valuestack.pushInteger();
-    } else if (name == "double") {
-        m_valuestack.pushDouble();
-    } else if (name == "string") {
-        m_valuestack.pushString();
-    } else if (name == "set") {
-        m_valuestack.pushSet();
-    } else if (name == "map") {
-        m_valuestack.pushMap();
-    } else if (name == "key") {
-        m_valuestack.pushMapKey(getAttribute < Glib::ustring >(att, "name"));
-    } else if (name == "tuple") {
-        m_valuestack.pushTuple();
-    } else if (name == "table") {
-        m_valuestack.pushTable(
-            getAttribute < value::TableFactory::index >(att, "width"),
-            getAttribute < value::TableFactory::index >(att, "height"));
-    } else if (name == "vle_trame") {
-        m_isEndTrame = false;
-        m_vpzstack.pushVleTrame();
-    } else if (name == "trame") {
-        m_vpzstack.pushTrame(att);
-    } else if (name == "modeltrame") {
-        m_vpzstack.pushModelTrame(att);
-    } else if (name == "xml") {
-        m_valuestack.pushXml();
-    } else if (name == "vle_project") {
-        AssertS(utils::SaxParserError, not m_isValue and not m_isTrame);
-        m_isVPZ = true;
-        m_vpzstack.pushVpz(att);
-    } else if (name == "structures") {
-        m_vpzstack.pushStructure();
-    } else if (name == "model") {
-        m_vpzstack.pushModel(att);
-    } else if (name == "in" or name == "out" or name == "state" or
-               name == "init") {
-        m_vpzstack.pushPortType(name);
-    } else if (name == "port") {
-        m_vpzstack.pushPort(att);
-    } else if (name == "submodels") {
-        m_vpzstack.pushSubModels();
-    } else if (name == "connections") {
-        m_vpzstack.pushConnections();
-    } else if (name == "connection") {
-        m_vpzstack.pushConnection(att);
-    } else if (name == "origin") {
-        m_vpzstack.pushOrigin(att);
-    } else if (name == "destination") {
-        m_vpzstack.pushDestination(att);
-    } else if (name == "dynamics") {
-        m_vpzstack.pushDynamics();
-    } else if (name == "dynamic") {
-        m_vpzstack.pushDynamic(att);
-    } else if (name == "experiment") {
-        m_vpzstack.pushExperiment(att);
-    } else if (name == "replicas") {
-        m_vpzstack.pushReplicas(att);
-    } else if (name == "conditions") {
-        m_vpzstack.pushConditions();
-    } else if (name == "condition") {
-        m_vpzstack.pushCondition(att);
-    } else if (name == "views") {
-        m_vpzstack.pushViews();
-    } else if (name == "outputs") {
-        m_vpzstack.pushOutputs();
-    } else if (name == "output") {
-        m_vpzstack.pushOutput(att);
-    } else if (name == "view") {
-        m_vpzstack.pushView(att);
-    } else if (name == "observables") {
-        m_vpzstack.pushObservables();
-    } else if (name == "observable") {
-        m_vpzstack.pushObservable(att);
-    } else if (name == "attachedview") {
-        m_vpzstack.pushAttachedView(att);
-    } else if (name == "translators") {
-        m_vpzstack.pushTranslators();
-    } else if (name == "translator") {
-        m_vpzstack.pushTranslator(att);
-    } else if (name == "classes") {
-        m_vpzstack.pushClasses();
-    } else if (name == "class") {
-        m_vpzstack.pushClass(att);
-    } else {
-        Throw(utils::SaxParserError,
-              (boost::format("Unknow element %1%") % name));
-    }
+
+    StartFuncList::iterator it = m_starts.find(name);
+    Assert(utils::SaxParserError, it != m_starts.end(), boost::format(
+            "Unknow element %1%") % name);
+
+    (this->*(it->second))(att);
+}
+
+void SaxParser::onBoolean(const AttributeList&)
+{
+    m_valuestack.pushBoolean();
+}
+
+void SaxParser::onInteger(const AttributeList&)
+{
+    m_valuestack.pushInteger();
+}
+
+void SaxParser::onDouble(const AttributeList&)
+{
+    m_valuestack.pushDouble();
+}
+
+void SaxParser::onString(const AttributeList&)
+{
+    m_valuestack.pushString();
+}
+
+void SaxParser::onSet(const AttributeList&)
+{
+    m_valuestack.pushSet();
+}
+
+void SaxParser::onMap(const AttributeList&)
+{
+    m_valuestack.pushMap();
+}
+
+void SaxParser::onKey(const AttributeList& att)
+{
+    m_valuestack.pushMapKey(getAttribute < Glib::ustring >(att, "name"));
+}
+
+void SaxParser::onTuple(const AttributeList&)
+{
+    m_valuestack.pushTuple();
+}
+
+void SaxParser::onTable(const AttributeList& att)
+{
+    m_valuestack.pushTable(
+        getAttribute < value::TableFactory::index >(att, "width"),
+        getAttribute < value::TableFactory::index >(att, "height"));
+}
+
+void SaxParser::onXML(const AttributeList&)
+{
+    m_valuestack.pushXml();
+}
+
+void SaxParser::onVLETrame(const AttributeList&)
+{
+    m_isEndTrame = false;
+    m_vpzstack.pushVleTrame();
+}
+
+void SaxParser::onTrame(const AttributeList& att)
+{
+    m_vpzstack.pushTrame(att);
+}
+
+void SaxParser::onModelTrame(const AttributeList& att)
+{
+    m_vpzstack.pushModelTrame(att);
+}
+
+void SaxParser::onVLEProject(const AttributeList& att)
+{
+    AssertS(utils::SaxParserError, not m_isValue and not m_isTrame);
+    m_isVPZ = true;
+    m_vpzstack.pushVpz(att);
+}
+
+void SaxParser::onStructures(const AttributeList&)
+{
+    m_vpzstack.pushStructure();
+}
+
+void SaxParser::onModel(const AttributeList& att)
+{
+    m_vpzstack.pushModel(att);
+}
+
+void SaxParser::onIn(const AttributeList&)
+{
+    m_vpzstack.pushPortType("in");
+}
+
+void SaxParser::onOut(const AttributeList&)
+{
+    m_vpzstack.pushPortType("out");
+}
+
+void SaxParser::onPort(const AttributeList& att)
+{
+    m_vpzstack.pushPort(att);
+}
+
+void SaxParser::onSubModels(const AttributeList&)
+{
+    m_vpzstack.pushSubModels();
+}
+
+void SaxParser::onConnections(const AttributeList&)
+{
+    m_vpzstack.pushConnections();
+}
+
+void SaxParser::onConnection(const AttributeList& att)
+{
+    m_vpzstack.pushConnection(att);
+}
+
+void SaxParser::onOrigin(const AttributeList& att)
+{
+    m_vpzstack.pushOrigin(att);
+}
+
+void SaxParser::onDestination(const AttributeList& att)
+{
+    m_vpzstack.pushDestination(att);
+}
+
+void SaxParser::onDynamics(const AttributeList&)
+{
+    m_vpzstack.pushDynamics();
+}
+
+void SaxParser::onDynamic(const AttributeList& att)
+{
+    m_vpzstack.pushDynamic(att);
+}
+
+void SaxParser::onExperiment(const AttributeList& att)
+{
+    m_vpzstack.pushExperiment(att);
+}
+
+void SaxParser::onReplicas(const AttributeList& att)
+{
+    m_vpzstack.pushReplicas(att);
+}
+
+void SaxParser::onConditions(const AttributeList&)
+{
+    m_vpzstack.pushConditions();
+}
+
+void SaxParser::onCondition(const AttributeList& att)
+{
+    m_vpzstack.pushCondition(att);
+}
+
+void SaxParser::onViews(const AttributeList&)
+{
+    m_vpzstack.pushViews();
+}
+
+void SaxParser::onOutputs(const AttributeList&)
+{
+    m_vpzstack.pushOutputs();
+}
+
+void SaxParser::onOutput(const AttributeList& att)
+{
+    m_vpzstack.pushOutput(att);
+}
+
+void SaxParser::onView(const AttributeList& att)
+{
+    m_vpzstack.pushView(att);
+}
+
+void SaxParser::onObservables(const AttributeList&)
+{
+    m_vpzstack.pushObservables();
+}
+
+void SaxParser::onObservable(const AttributeList& att)
+{
+    m_vpzstack.pushObservable(att);
+}
+
+void SaxParser::onAttachedView(const AttributeList& att)
+{
+    m_vpzstack.pushAttachedView(att);
+}
+
+void SaxParser::onTranslators(const AttributeList&)
+{
+    m_vpzstack.pushTranslators();
+}
+
+void SaxParser::onTranslator(const AttributeList& att)
+{
+    m_vpzstack.pushTranslator(att);
+}
+
+void SaxParser::onClasses(const AttributeList&)
+{
+    m_vpzstack.pushClasses();
+}
+
+void SaxParser::onClass(const AttributeList& att)
+{
+    m_vpzstack.pushClass(att);
 }
 
 void SaxParser::on_end_element(const Glib::ustring& name)
 {
-    if (name == "boolean") {
-        m_valuestack.pushOnVectorValue(
-            value::BooleanFactory::create(
-                utils::to_boolean(lastCharactersStored())));
-    } else if (name == "integer") {
-        m_valuestack.pushOnVectorValue(
-            value::IntegerFactory::create(
-                utils::to_int(lastCharactersStored())));
-    } else if (name == "double") {
-        m_valuestack.pushOnVectorValue(
-            value::DoubleFactory::create(
-                utils::to_double(lastCharactersStored())));
-    } else if (name == "string") {
-        m_valuestack.pushOnVectorValue(
-            value::StringFactory::create(
-                utils::to_string(lastCharactersStored())));
-    } else if (name == "key") {
-        // FIXME delete test
-    } else if (name == "set" or name == "map") {
-        m_valuestack.popValue();
-    } else if (name == "tuple") {
-        value::Tuple tuple = value::toTupleValue(m_valuestack.topValue());
-        tuple->fill(lastCharactersStored());
-        m_valuestack.popValue();
-    } else if (name == "table") {
-        value::Table table = value::toTableValue(m_valuestack.topValue());
-        table->fill(lastCharactersStored());
-        m_valuestack.popValue();
-    } else if (name == "xml") {
-        m_valuestack.pushOnVectorValue(
-            value::XMLFactory::create(m_cdata));
-        m_cdata.clear();
-    } else if (name == "trame") {
-        m_vpzstack.popTrame();
-        if (not m_cdata.empty()) {
-            ParameterTrame* pt;
-            pt  = dynamic_cast < ParameterTrame* >(m_vpzstack.top());
-            if (pt) {
-                pt->setData(m_cdata);
-                m_cdata.clear();
-            }
+    EndFuncList::iterator it = m_ends.find(name);
+    Assert(utils::SaxParserError, it != m_ends.end(), boost::format(
+            "Unknow end element %1%") % name);
+
+    (this->*(it->second))();
+}
+
+void SaxParser::onEndBoolean()
+{
+    m_valuestack.pushOnVectorValue(
+        value::BooleanFactory::create(
+            utils::to_boolean(lastCharactersStored())));
+}
+
+void SaxParser::onEndInteger()
+{
+    m_valuestack.pushOnVectorValue(
+        value::IntegerFactory::create(
+            utils::to_int(lastCharactersStored())));
+}
+
+void SaxParser::onEndDouble()
+{
+    m_valuestack.pushOnVectorValue(
+        value::DoubleFactory::create(
+            utils::to_double(lastCharactersStored())));
+}
+
+void SaxParser::onEndString()
+{
+    m_valuestack.pushOnVectorValue(
+        value::StringFactory::create(
+            utils::to_string(lastCharactersStored())));
+}
+
+void SaxParser::onEndKey()
+{
+}
+
+void SaxParser::onEndSet()
+{
+    m_valuestack.popValue();
+}
+
+void SaxParser::onEndMap()
+{
+    m_valuestack.popValue();
+}
+
+void SaxParser::onEndTuple()
+{
+    value::Tuple tuple = value::toTupleValue(m_valuestack.topValue());
+    tuple->fill(lastCharactersStored());
+    m_valuestack.popValue();
+}
+
+void SaxParser::onEndTable()
+{
+    value::Table table = value::toTableValue(m_valuestack.topValue());
+    table->fill(lastCharactersStored());
+    m_valuestack.popValue();
+}
+
+void SaxParser::onEndXML()
+{
+    m_valuestack.pushOnVectorValue(
+        value::XMLFactory::create(m_cdata));
+    m_cdata.clear();
+}
+
+void SaxParser::onEndTrame()
+{
+    m_vpzstack.popTrame();
+    if (not m_cdata.empty()) {
+        ParameterTrame* pt;
+        pt  = dynamic_cast < ParameterTrame* >(m_vpzstack.top());
+        if (pt) {
+            pt->setData(m_cdata);
+            m_cdata.clear();
         }
-        m_vpzstack.pop();
-    } else if (name == "modeltrame") {
-        m_vpzstack.popModelTrame(getValue(0));
-        m_valuestack.clear();
-    } else if (name == "vle_trame") {
-        m_vpzstack.popVleTrame();
-        m_isEndTrame = true;
-    } else if (name == "translator") {
-        m_vpzstack.popTranslator(m_cdata);
-        m_cdata.clear();
-        m_vpzstack.pop();
-    } else if (name == "port" and m_vpzstack.top()->isCondition()) {
+    }
+    m_vpzstack.pop();
+}
+
+void SaxParser::onEndModelTrame()
+{
+    m_vpzstack.popModelTrame(getValue(0));
+    m_valuestack.clear();
+}
+
+void SaxParser::onEndVLETrame()
+{
+    m_vpzstack.popVleTrame();
+    m_isEndTrame = true;
+}
+
+void SaxParser::onEndTranslator()
+{
+    m_vpzstack.popTranslator(m_cdata);
+    m_cdata.clear();
+    m_vpzstack.pop();
+}
+
+void SaxParser::onEndPort()
+{
+    if (m_vpzstack.top()->isCondition()) {
         value::Set& vals(m_vpzstack.popConditionPort());
         std::vector < value::Value >& lst(getValues());
         for (std::vector < value::Value >::iterator it =
@@ -242,35 +421,141 @@ void SaxParser::on_end_element(const Glib::ustring& name)
             vals->addValue(*it);
         }
         m_valuestack.clear();
-    } else if (name == "port" and m_vpzstack.top()->isObservablePort()) {
+    } else if (m_vpzstack.top()->isObservablePort()) {
         m_vpzstack.pop();
-    } else if (name == "in" or name == "out" or name == "state" or
-               name == "init" or name == "structures" or name == "submodels" or 
-               name == "model" or name == "connections") {
-        delete m_vpzstack.pop();
-    } else if (name == "vle_project" or name ==
-               "conditions" or name == "condition" or name == "outputs" or name
-               == "dynamics" or name == "views" or name == "observables" or name
-               == "observable" or name == "experiment" or name == "translators"
-               or name == "vle_project") {
-        m_vpzstack.pop();
-    } else if (name == "destination") {
-        m_vpzstack.buildConnection();
-    } else if (name == "output") {
-        if (not m_cdata.empty()) {
-            Output* out;
-            out = dynamic_cast < Output* >(m_vpzstack.top());
-            if (out) {
-                out->setData(m_cdata);
-                m_cdata.clear();
-            }
-        }
-        m_vpzstack.pop(); 
-    } else if (name == "classes") {
-        m_vpzstack.popClasses();
-    } else if (name == "class") {
-        m_vpzstack.popClass();
     }
+}
+
+void SaxParser::onEndIn()
+{
+    delete m_vpzstack.pop();
+}
+
+void SaxParser::onEndOut()
+{
+    delete m_vpzstack.pop();
+}
+
+void SaxParser::onEndStructures()
+{
+    delete m_vpzstack.pop();
+}
+
+void SaxParser::onEndSubModels()
+{
+    delete m_vpzstack.pop();
+}
+
+void SaxParser::onEndModel()
+{
+    delete m_vpzstack.pop();
+}
+
+void SaxParser::onEndConnections()
+{
+    delete m_vpzstack.pop();
+}
+
+void SaxParser::onEndConnection()
+{
+}
+
+void SaxParser::onEndVLEProject()
+{
+    m_vpzstack.pop();
+}
+
+void SaxParser::onEndConditions()
+{
+    m_vpzstack.pop();
+}
+
+void SaxParser::onEndCondition()
+{
+    m_vpzstack.pop();
+}
+
+void SaxParser::onEndOutputs()
+{
+    m_vpzstack.pop();
+}
+
+void SaxParser::onEndDynamics()
+{
+    m_vpzstack.pop();
+}
+
+void SaxParser::onEndViews()
+{
+    m_vpzstack.pop();
+}
+
+void SaxParser::onEndObservables()
+{
+    m_vpzstack.pop();
+}
+
+void SaxParser::onEndObservable()
+{
+    m_vpzstack.pop();
+}
+
+void SaxParser::onEndExperiment()
+{
+    m_vpzstack.pop();
+}
+
+void SaxParser::onEndTranslators()
+{
+    m_vpzstack.pop();
+}
+
+void SaxParser::onEndDestination()
+{
+    m_vpzstack.buildConnection();
+}
+
+void SaxParser::onEndView()
+{
+}
+
+void SaxParser::onEndOrigin()
+{
+}
+
+void SaxParser::onEndReplicas()
+{
+}
+
+void SaxParser::onEndAttachedView()
+{
+}
+
+void SaxParser::onEndDynamic()
+{
+}
+
+void SaxParser::onEndOutput()
+{
+    if (not m_cdata.empty()) {
+        Output* out;
+        out = dynamic_cast < Output* >(m_vpzstack.top());
+        if (out) {
+            out->setData(m_cdata);
+            m_cdata.clear();
+        }
+    }
+    m_vpzstack.pop(); 
+}
+
+void SaxParser::onEndClasses()
+{
+    m_vpzstack.popClasses();
+}
+
+void SaxParser::onEndClass()
+{
+    m_vpzstack.popClass();
 }
 
 void SaxParser::on_characters(const Glib::ustring& characters)
@@ -290,13 +575,13 @@ void SaxParser::on_warning(const Glib::ustring& text)
 void SaxParser::on_error(const Glib::ustring& text)
 {
     Throw(utils::SaxParserError,
-         (boost::format("XML Error: %1%, stack: %2%") % text % m_vpzstack));
+          (boost::format("XML Error: %1%, stack: %2%") % text % m_vpzstack));
 }
 
 void SaxParser::on_fatal_error(const Glib::ustring& text)
 {
     Throw(utils::SaxParserError,
-         (boost::format("XML Fatal error: %1%") % text));
+          (boost::format("XML Fatal error: %1%") % text));
 }
 
 void SaxParser::on_cdata_block(const Glib::ustring& text)
