@@ -117,6 +117,12 @@ namespace vle { namespace devs {
 	std::string m_portName;
     };
 
+    inline std::ostream& operator<<(std::ostream& o, const StateEvent& evt)
+    {
+        return o << "from: '" << evt.getViewName()
+            << "' port: '" << evt.getPortName() << "'";
+    }
+
 }} // namespace vle devs
 
 #endif

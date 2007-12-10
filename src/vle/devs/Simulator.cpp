@@ -98,22 +98,34 @@ InternalEvent * Simulator::buildInternalEvent(const Time& currentTime)
 
 void Simulator::finish()
 {
+    DTraceDebug(boost::format("                     %1% finish") %
+                m_atomicModel->getName());
+
     m_dynamics->finish();
 }
 
 void Simulator::getOutputFunction(const Time& currentTime,
                                   ExternalEventList& output)
 {
+    DTraceDebug(boost::format("%1$20.10g %2% output") % currentTime %
+                m_atomicModel->getName());
+
     m_dynamics->getOutputFunction(currentTime, output);
 }
 
 Time Simulator::getTimeAdvance()
 {
+    DTraceDebug(boost::format("                     %1% ta") %
+                m_atomicModel->getName());
+
     return m_dynamics->getTimeAdvance();
 }
 
 InternalEvent* Simulator::init(const Time& time)
 {
+    DTraceDebug(boost::format("%1$20.10g %2% init") % time %
+                m_atomicModel->getName());
+
     return new InternalEvent(m_dynamics->init() + time, this);
 }
 
@@ -121,16 +133,25 @@ Event::EventType Simulator::processConflict(
     const InternalEvent& internal,
     const ExternalEventList& extEventlist) const
 {
+    DTraceDebug(boost::format("%1$20.10g %2% conf event: [%3%]") %
+                internal.getTime() % m_atomicModel->getName() % extEventlist);
+
     return m_dynamics->processConflict(internal, extEventlist);
 }
 
 void Simulator::processInitEvents(const InitEventList& event)
 {
+    DTraceDebug(boost::format("%1$20.10g init event") %
+                m_atomicModel->getName());
+
     m_dynamics->processInitEvents(event);
 }
 
 InternalEvent* Simulator::processInternalEvent(const InternalEvent& event)
 {
+    DTraceDebug(boost::format("%1$20.10g %2% int event") % event.getTime() %
+                m_atomicModel->getName());
+
     m_dynamics->processInternalEvent(event);
     return buildInternalEvent(event.getTime());
 }
@@ -139,6 +160,9 @@ InternalEvent* Simulator::processExternalEvents(
     const ExternalEventList& event,
     const Time& time)
 {
+    DTraceDebug(boost::format("%1$20.10g %2% ext event: %3%") % time %
+                m_atomicModel->getName() % event);
+
     m_dynamics->processExternalEvents(event, time);
     return buildInternalEvent(time);
 }
@@ -148,11 +172,18 @@ void Simulator::processInstantaneousEvent(
     const Time& time,
     ExternalEventList& output)
 {
+    DTraceDebug(boost::format("%1$20.10g %2% inst event: [%3%]") % time %
+                m_atomicModel->getName() % event);
+
     m_dynamics->processInstantaneousEvent(event, time, output);
 }
 
 StateEvent* Simulator::processStateEvent(const StateEvent& event) const
 {
+    DTraceDebug(boost::format("%1$20.10g %2% state event: [%3%]") %
+                event.getTime() % m_atomicModel->getName() %
+                event);
+
     value::Value val = m_dynamics->processStateEvent(event);
 
     if (val.get()) {

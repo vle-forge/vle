@@ -23,8 +23,8 @@
  * 02111-1307, USA.
  */
 
-#ifndef DEVS_EXTERNALEVENTLIST_HPP
-#define DEVS_EXTERNALEVENTLIST_HPP
+#ifndef VLE_DEVS_EXTERNALEVENTLIST_HPP
+#define VLE_DEVS_EXTERNALEVENTLIST_HPP
 
 #include <vle/devs/EventList.hpp>
 #include <vle/devs/ExternalEvent.hpp>
@@ -34,7 +34,17 @@ namespace vle { namespace devs {
 
     typedef EventList < ExternalEvent > ExternalEventList;
     typedef vpz::ValueList InitEventList;
-    
+
+    inline std::ostream& operator<<(std::ostream& o,
+                                    const ExternalEventList& evts)
+    {
+        for (ExternalEventList::const_iterator it = evts.begin();
+             it != evts.end(); ++it) {
+            o << " [" << *(*it) << "]";
+        }
+        return o;
+    }
+
 }} // namespace vle devs
 
 #endif

@@ -24,8 +24,8 @@
  * 02111-1307, USA.
  */
 
-#ifndef DEVS_EXTERNALEVENT_HPP
-#define DEVS_EXTERNALEVENT_HPP
+#ifndef VLE_DEVS_EXTERNALEVENT_HPP
+#define VLE_DEVS_EXTERNALEVENT_HPP
 
 #include <vle/devs/Event.hpp>
 #include <string>
@@ -99,6 +99,15 @@ namespace vle { namespace devs {
 	std::string   m_portName;
 	Simulator*    m_target;
     };
+
+    inline std::ostream& operator<<(std::ostream& o, const ExternalEvent& evt)
+    {
+        return o << "from: '" << evt.getSourceModelName()
+            << "' value: '" << evt.getAttributes()->toString()
+            << "' to port: '" << evt.getPortName()
+            << "'";
+    }
+
 
 }} // namespace vle devs
 

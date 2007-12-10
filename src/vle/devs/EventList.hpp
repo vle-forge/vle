@@ -79,6 +79,7 @@ namespace vle { namespace devs {
 
             EventList < Class >::clear();
         }
+
     };
 
 }} // namespace vle devs

@@ -46,7 +46,6 @@
 #include <libxml++/libxml++.h>
 #include <glibmm/spawn.h>
 #include <glibmm/timer.h>
-#include <iostream>
 
 using std::vector;
 using std::map;

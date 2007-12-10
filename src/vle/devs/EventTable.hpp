@@ -129,7 +129,8 @@ namespace vle { namespace devs {
             _extev.deleteAndClear(); _extev.clear();
             _instev.deleteAndClear(); _instev.clear(); }
 
-	friend std::ostream& operator<<(std::ostream& o, EventBagModel& e) {
+        friend std::ostream& operator<<(std::ostream& o, const EventBagModel& e)
+        {
 	    o << "[Internal: " << e._intev << "][Externals: ";
 	    for (size_t i = 0; i < e._extev.size(); ++i)
 		o << e._extev.at(i) << " ";
@@ -223,9 +224,10 @@ namespace vle { namespace devs {
         void delModel(Simulator*);
 
         friend std::ostream& operator<<(std::ostream& o,
-                                        CompleteEventBagModel& c)
-        { o << "Nb bags: " << c._bags.size() << " Nb states: " 
-            << c._states.size();
+                                        const CompleteEventBagModel& c)
+        {
+            o << "Nb bags: " << c._bags.size() << " Nb states: " 
+                << c._states.size();
             return o;
         }
 

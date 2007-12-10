@@ -31,7 +31,6 @@
 #include <vle/value/Boolean.hpp>
 #include <vle/value/String.hpp>
 #include <vle/utils/Debug.hpp>
-#include <iostream>
 
 
 
