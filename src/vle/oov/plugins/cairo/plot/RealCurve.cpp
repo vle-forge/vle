@@ -41,7 +41,8 @@ void RealCurve::add(double date, double value)
     m_valueList.push_back(std::pair<double,double>(date, value));
 }
 
-void RealCurve::draw(Cairo::RefPtr < Cairo::Context > ctx, Parameter & m_parameter)
+void RealCurve::draw(Cairo::RefPtr < Cairo::Context > ctx, 
+		     Parameter & m_parameter)
 {
     // dessine de droite  gauche
     int v_y, v_y2, v_x, v_x2;
@@ -58,10 +59,10 @@ void RealCurve::draw(Cairo::RefPtr < Cairo::Context > ctx, Parameter & m_paramet
     v_x = m_parameter.to_pixel_width(v_date);
 
     // change la couleur en la couleur de la courbe
-//    m_gc->set_rgb_fg_color(this->get_color());
     ctx->set_source_rgb(get_red_color()/65535., 
 			get_green_color()/65535.,
 			get_blue_color()/65535.);
+    ctx->set_line_width(1);
     
     for(int cpt = lastIndex - 2; cpt >= firstIndex; cpt--) {
         v_date2 = m_valueList[cpt].first; 
@@ -72,8 +73,6 @@ void RealCurve::draw(Cairo::RefPtr < Cairo::Context > ctx, Parameter & m_paramet
         v_y = m_parameter.to_pixel_height(v_value);
         v_y2 = m_parameter.to_pixel_height(v_value2);
 
-
-//        m_buffer->draw_line(m_gc, v_x, v_y, v_x2, v_y2);
 	ctx->begin_new_path();
 	ctx->move_to(v_x, v_y);
 	ctx->line_to(v_x2, v_y2);
@@ -94,14 +93,12 @@ void RealCurve::draw(Cairo::RefPtr < Cairo::Context > ctx, Parameter & m_paramet
             v_x2 = m_parameter.to_pixel_width(m_firstDate);
             v_y2 = m_parameter.to_pixel_height((v_date * v_value2 + v_date2 * v_value) /  (v_date + v_date2));
 
-//            m_buffer->draw_line(m_gc, v_x, v_y, v_x2, v_y2);
 	    ctx->begin_new_path();
 	    ctx->move_to(v_x, v_y);
 	    ctx->line_to(v_x2, v_y2);
 	    ctx->close_path();
 	    ctx->stroke();
-
-        }
+	}
     }
 }
 

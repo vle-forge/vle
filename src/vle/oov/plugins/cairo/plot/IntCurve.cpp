@@ -70,6 +70,7 @@ void IntCurve::draw(Cairo::RefPtr < Cairo::Context > ctx, Parameter& m_parameter
     firstIndex = m_parameter.get_min_draw_index();
     lastIndex = m_parameter.get_max_draw_index();
 
+    ctx->set_line_width(1);
     for(int cpt = lastIndex - 2; cpt >= firstIndex; cpt--)
     {
         draw_raccord = false;
@@ -101,8 +102,6 @@ void IntCurve::draw(Cairo::RefPtr < Cairo::Context > ctx, Parameter& m_parameter
             if(v_y_bottom > v_y_top) {
                 swap_int(v_y_bottom, v_y_top);
             }
-//            m_buffer->draw_rectangle(v_gc[v_triValue[k].second],
-//            false, v_x, v_y_bottom, v_x_next-v_x, v_y_top-v_y_bottom);
 	    ctx->set_source_rgb(v_colors[v_triValue[k].second].red, 
 				v_colors[v_triValue[k].second].green,
 				v_colors[v_triValue[k].second].blue);

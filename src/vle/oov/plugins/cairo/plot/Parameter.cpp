@@ -30,11 +30,12 @@ namespace vle { namespace oov { namespace plugin {
     
 /************************************/
 /* constructeur                     */
-/* recupere la hauteur d'un pango   */
+/* recupere la hauteur d'un text   */
 /************************************/
 Parameter::Parameter() : m_shift_top_default(5), m_shift_left(50), 
-			 m_shift_left_pango_width(5), m_axe_y0_show(false), 
-			 m_min_max_already_initialized(false) 
+			 m_shift_left_text_width(5), m_axe_y0_show(false), 
+			 m_min_already_initialized(false), 
+			 m_max_already_initialized(false) 
 {
     m_min_draw_index = 0;
     m_max_draw_index = 0;
@@ -63,7 +64,7 @@ void Parameter::printParameter()
     std::cout << "m_shift_bottom : " << m_shift_bottom << std::endl;
     std::cout << "m_shift_left : " << m_shift_left << std::endl;
     std::cout << "m_shift_right : " << m_shift_right << std::endl;
-    std::cout << "m_shift_left_pango_width : " << m_shift_left_pango_width << std::endl;
+    std::cout << "m_shift_left_text_width : " << m_shift_left_text_width << std::endl;
     std::cout << barre << std::endl;
     std::cout << "zone de dessin" << std::endl;
     std::cout << "m_number_drawn_date : " << m_number_drawn_date << std::endl;
@@ -78,8 +79,8 @@ void Parameter::printParameter()
     std::cout << "m_max_draw_date : " << m_max_draw_date << std::endl;
     std::cout << "m_min_draw_index : " << m_min_draw_index << std::endl;
     std::cout << "m_max_draw_index : " << m_max_draw_index << std::endl;
-    std::cout << "m_pango_height : " << m_pango_height << std::endl;
-    std::cout << "m_pango_height_value : " << m_pango_height_value << std::endl;
+    std::cout << "m_text_height : " << m_text_height << std::endl;
+    std::cout << "m_text_height_value : " << m_text_height_value << std::endl;
     std::cout << "m_y0 : " << m_y0 << std::endl;
     std::cout << barre << std::endl;
     std::cout << "gestion valeur minimum et maximum affiché" << std::endl;
@@ -121,13 +122,13 @@ void Parameter::update_unit_width()
 void Parameter::update_unit_height()
 {
     if (m_number_drawn_date != 0) {
-        m_unit_height = (m_da_height - m_shift_top_default - m_pango_height)  / (m_max_value - m_min_value);
+        m_unit_height = (m_da_height - m_shift_top_default - m_text_height)  / (m_max_value - m_min_value);
         m_graph_zone_height = (int)(m_unit_height * (m_max_value - m_min_value));
 
-        m_shift_bottom = m_da_height - m_pango_height;
+        m_shift_bottom = m_da_height - m_text_height;
         m_shift_top = m_shift_bottom - m_graph_zone_height;
 
-        update_pango_height_value();
+        update_text_height_value();
     }
 }
 
@@ -231,7 +232,7 @@ const int Parameter::get_shift_top()
 }
 
 /***************************************************************************/
-/* defini la hauteur necessaire a dessiner les pango de l'axe des abscisse */
+/* defini la hauteur necessaire a dessiner les text de l'axe des abscisse */
 /***************************************************************************/
 void Parameter::set_shift_bottom(int value)
 {
@@ -239,7 +240,7 @@ void Parameter::set_shift_bottom(int value)
 }
 
 /*****************************************************************************/
-/* retourne la hauteur necessaire a dessiner les pango de l'axe des abscisse */
+/* retourne la hauteur necessaire a dessiner les text de l'axe des abscisse */
 /*****************************************************************************/
 const int Parameter::get_shift_bottom()
 {
@@ -264,36 +265,36 @@ const int Parameter::get_number_drawn_date()
 }
 
 /*****************************************/
-/* defini la hauteur en pixel d'un pango */
+/* defini la hauteur en pixel d'un text */
 /*****************************************/
-void Parameter::set_pango_height(int height)
+void Parameter::set_text_height(int height)
 {
-    m_pango_height = height;
-    update_pango_height_value();
+    m_text_height = height;
+    update_text_height_value();
 }
 
 /**************************************/
-/* recalcul la valeur du pango_height */
+/* recalcul la valeur du text_height */
 /**************************************/
-void Parameter::update_pango_height_value()
+void Parameter::update_text_height_value()
 {
-    m_pango_height_value = (m_pango_height * (m_max_value - m_min_value)) / (double)m_graph_zone_height;
+    m_text_height_value = (m_text_height * (m_max_value - m_min_value)) / (double)m_graph_zone_height;
 }
 
 /*******************************************/
-/* retourne la hauteur en pixel d'un pango */
+/* retourne la hauteur en pixel d'un text */
 /*******************************************/
-const int Parameter::get_pango_height()
+const int Parameter::get_text_height()
 {
-    return m_pango_height;
+    return m_text_height;
 }
 
 /**********************************************************************/
-/* return la valeur dble correspondant a la hauteur en pixel du pango */
+/* return la valeur dble correspondant a la hauteur en pixel du text */
 /**********************************************************************/
-const double Parameter::get_pango_height_value()
+const double Parameter::get_text_height_value()
 {
-    return m_pango_height_value;
+    return m_text_height_value;
 }
 
 /****************************************************/
@@ -363,15 +364,17 @@ const double Parameter::get_max_draw_date()
 /**************************************/
 /* defini la valeur maximale affichée */
 /**************************************/
-void Parameter::set_max_value(double value)
+void Parameter::set_max_value(double value, bool absolute)
 {
+    m_max_already_initialized = true;
     m_max_value_not_increase = value;
-    m_max_value = value  + majoration_max * fabs(value);
+    if (absolute) m_max_value = value;
+    else m_max_value = value  + majoration_max * fabs(value);
 
     update_m_y0();
 
     update_unit_height();
-    update_pango_height_value();
+    update_text_height_value();
     update_axe_y0_show();
 }
 
@@ -386,17 +389,17 @@ const double Parameter::get_max_value()
 /**************************************/
 /* defini la valeur minimale affichée */
 /**************************************/
-void Parameter::set_min_value(double value)
+void Parameter::set_min_value(double value, bool absolute)
 {
+    m_min_already_initialized = true; 
     m_min_value_not_increase = value;
-    if (value != 0.0)
-        m_min_value = value - majoration_min * fabs(value);
-    else
-        m_min_value = -majoration_min; // evite le pb du zero car sino on recalcul toujours le min, 
-
+    if (absolute) m_min_value = value;
+    else if (value != 0.0) m_min_value = value - majoration_min * fabs(value);
+    else m_min_value = 0.0;
+ 
     update_m_y0();
     update_unit_height();
-    update_pango_height_value(); 
+    update_text_height_value(); 
     update_axe_y0_show();
 }
 
@@ -480,8 +483,8 @@ void Parameter::inc_max_draw_index()
 /**************************************/
 const bool Parameter::is_smaller(double value)
 {
-    if (!m_min_max_already_initialized) {
-        m_min_max_already_initialized = true;
+    if (!m_min_already_initialized) {
+        m_min_already_initialized = true;
         return true;
     } else {
         return (value < m_min_value);
@@ -493,8 +496,8 @@ const bool Parameter::is_smaller(double value)
 /**************************************/
 const bool Parameter::is_higher(double value)
 {
-    if (!m_min_max_already_initialized) {
-        m_min_max_already_initialized = true;
+    if (!m_max_already_initialized) {
+        m_max_already_initialized = true;
         return true;
     } else {
         return (value > m_max_value);

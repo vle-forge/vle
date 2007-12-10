@@ -63,10 +63,10 @@ private :
     /* zone libre autour de la zone de dessin */
     /******************************************/
     int m_shift_top, m_shift_top_default; /* largeur en haut pour une meilleure vision */
-    int m_shift_bottom; /* largeur en bas pour pouvoir afficher les pango */
-    int m_shift_left; /* largeur a gauche pour pouvoir afficher les pango */
+    int m_shift_bottom; /* largeur en bas pour pouvoir afficher les textes */
+    int m_shift_left; /* largeur a gauche pour pouvoir afficher les textes */
     int m_shift_right; /* largeur a droite pour pouvoir afficher rien du tout :D */
-    int m_shift_left_pango_width; /* espace entre la fin des pango et l'axe des ordonnées */
+    int m_shift_left_text_width; /* espace entre la fin des textes et l'axe des ordonnées */
     
     /******************/
     /* zone de dessin */
@@ -84,8 +84,8 @@ private :
     double m_max_draw_date; /* la date maximum affiché */
     int m_min_draw_index; /* indice de la premiere valeur affiché */
     int m_max_draw_index; /* indice de la derniere valeur affiché */
-    int m_pango_height;
-    double m_pango_height_value; /* conversion de la hauteur pixel --> valeur de l'axe des ordonn�es */
+    int m_text_height;
+    double m_text_height_value; /* conversion de la hauteur pixel --> valeur de l'axe des ordonn�es */
     int m_y0; /* axe y = 0 */
     
     /*********************************************/
@@ -104,12 +104,13 @@ private :
     /* permet de savoir si l'on a deja parse des données */
     /* pour calculer le min et le max                    */
     /*****************************************************/
-    bool m_min_max_already_initialized;
+    bool m_min_already_initialized;
+    bool m_max_already_initialized;
     
     /**************************************/
-    /* recalcul la valeur du pango_height */
+    /* recalcul la valeur du text_height */
     /**************************************/
-    void update_pango_height_value();
+    void update_text_height_value();
     
     /*************************************/
     /* recalcul si l'axe y=0 est visible */
@@ -142,8 +143,8 @@ public :
     const int get_shift_bottom();
     void set_number_drawn_date(int value);
     const int get_number_drawn_date();
-    void set_pango_height(int height);
-    const int get_pango_height();
+    void set_text_height(int height);
+    const int get_text_height();
     void set_graph_zone_height(int value);
     const int get_graph_zone_height();
     void set_graph_zone_width(int value);
@@ -152,10 +153,10 @@ public :
     const double get_min_draw_date();
     void set_max_draw_date(double value);
     const double get_max_draw_date();
-    void set_max_value(double value);
+    void set_max_value(double value, bool absolute = false);
     const double get_max_value();
     const double get_max_back_value();
-    void set_min_value(double value);
+    void set_min_value(double value, bool absolute = false);
     const double get_min_value();
     const double get_min_back_value();
     void set_scrolling(bool value);
@@ -170,7 +171,7 @@ public :
     const bool is_higher(double value);
     const bool is_smaller_back(double value);
     const bool is_higher_back(double value);
-    const double get_pango_height_value();
+    const double get_text_height_value();
     const bool get_axe_y0_show();
     const int to_pixel_height(double value);
     const int to_pixel_height(int value);
