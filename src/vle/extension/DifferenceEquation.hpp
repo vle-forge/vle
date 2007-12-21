@@ -29,14 +29,18 @@ namespace vle { namespace extension {
     
     class DifferenceEquation : public devs::Dynamics
     {
-    public:
-        enum state { INIT, POST_INIT, RUN, POST, POST2, POST3 };
+	typedef std::map < std::string, std::deque < std::pair < double, double > > > valueList;
 
+    public:
         DifferenceEquation(const graph::AtomicModel& model);
 
         virtual ~DifferenceEquation() { }
 
-        virtual void finish();
+	virtual double compute(const vle::devs::Time& /* time */) =0;
+	virtual double initValue() { return 0; }
+	double getTimeStep() const { return mTimeStep; }
+	double getValue(const char* name, int shift = 0);
+	double getValue(int shift = 0) const;
 
         virtual devs::Time init();
 
@@ -69,42 +73,37 @@ namespace vle { namespace extension {
             devs::ExternalEventList& /* output */) const;
 
     protected:
-	inline double getValue(const std::string& name) const
-        { return mExternalVariableValue.find(
-                mExternalVariableIndex.find(name)->second)->second; }	
-
-	inline void setValue(const std::string& name, double value)
-        { mExternalVariableValue[mExternalVariableIndex[name]] = value; }	
-
-        /**
-         * @brief The function to develop mathemacial expression like:
-         * @code
-         * return a * mValue - b * mValue * getValue("y");
-         * @endcode
-         */
-        virtual double compute() = 0;
-
-        bool mActive;
-        bool mDependance;
-        devs::Time mTimeStep;
-
-        /** Internal variable */
-        double mInitialValue;
-        std::string mVariableName;
-        double mValue;
-
-        /** External variables */
-	std::map < unsigned int , double > mExternalVariableValue;
-	std::map < std::string , unsigned int > mExternalVariableIndex;
-
-        /** State */
-        devs::Time mLastTime;
-        state mState;
-	devs::Time mSigma;
-
+	void displayValues();
+	
     private:
-	void reset(const devs::Time& time, double value);
-};
+	
+	void addValue(const std::string& /* name */,
+		      const vle::devs::Time& /* time */,
+		      double /* value */);
+	
+	enum state { PRE_INIT, PRE_INIT2, INIT, PRE, RUN, POST, POST2 }; 
+	
+	std::string mVariableName;
+	state mState;
+	double mTimeStep;
+	double mDelta;
+	unsigned int mMultiple;
+	std::deque < double > mValue;
+	valueList mValues;
+	std::map < std::string, unsigned int > mMultiples;
+	unsigned int mSyncs;
+	bool mActive;
+	bool mDependance;
+	int mSize;
+	unsigned int mReceive;
+	vle::devs::Time mSigma;
+	vle::devs::Time mSigma2;
+	vle::devs::Time mLastTime;
+	std::vector < std::string > mWait;
+	bool mInitValue;
+	double mInitialValue;
+	bool mInvalid;
+    };
 
 }} // namespace vle extension
 
