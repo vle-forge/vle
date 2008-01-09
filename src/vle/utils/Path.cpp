@@ -185,7 +185,7 @@ bool Path::initPath()
 	char* buf = new char[256];
 	DWORD sz = 256;
 
-	if (RegQueryValueEx(hkey, NULL, NULL, NULL,
+	if (RegQueryValueEx(hkey, (LPCTSTR)"Path", NULL, NULL,
 			    (LPBYTE)buf, &sz) != ERROR_SUCCESS) {
 	    delete[] buf;
 	    return false;
@@ -195,18 +195,22 @@ bool Path::initPath()
 
         addSimulatorDir(buildPrefixLibrariesPath(m_prefix, "simulator"));
         addSimulatorDir(buildUserPath("simulator"));
+        addSimulatorDir("..\\simulator");
         addSimulatorDir(".");
 
         addTranslatorDir(buildPrefixLibrariesPath(m_prefix, "translator"));
         addTranslatorDir(buildUserPath("translator"));
+        addTranslatorDir("..\\translator");
         addTranslatorDir(".");
 
         addStreamDir(buildPrefixLibrariesPath(m_prefix, "stream"));
         addStreamDir(buildUserPath("stream"));
+        addStreamDir("..\\stream");
         addStreamDir(".");
 
         addModelDir(buildPrefixLibrariesPath(m_prefix, "model"));
         addModelDir(buildUserPath("model"));
+        addModelDir("..\\model");
         addModelDir(".");
 	return true;
     }
@@ -219,18 +223,22 @@ bool Path::initPath()
 
     addSimulatorDir(buildPrefixLibrariesPath(m_prefix, "simulator"));
     addSimulatorDir(buildUserPath("simulator"));
+    addSimulatorDir("./simulator");
     addSimulatorDir(".");
 
     addTranslatorDir(buildPrefixLibrariesPath(m_prefix, "translator"));
     addTranslatorDir(buildUserPath("translator"));
+    addTranslatorDir("./translator");
     addTranslatorDir(".");
 
     addStreamDir(buildPrefixLibrariesPath(m_prefix, "stream"));
     addStreamDir(buildUserPath("stream"));
+    addStreamDir("./stream");
     addStreamDir(".");
 
     addModelDir(buildPrefixLibrariesPath(m_prefix, "model"));
     addModelDir(buildUserPath("model"));
+    addModelDir("./model");
     addModelDir(".");
 
     return true;
