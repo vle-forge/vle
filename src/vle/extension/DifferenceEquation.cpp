@@ -41,10 +41,11 @@ DifferenceEquation::DifferenceEquation(const AtomicModel& model) :
 }
 
 void DifferenceEquation::addValue(const std::string& name,
-				  const vle::devs::Time& time,
+				  const devs::Time& time,
 				  double value)
 {
-    mValues[name].push_front(std::pair < double, double >(time.getValue(), value));
+    mValues[name].push_front(std::pair < double, double >(time.getValue(),
+                                                          value));
     if (mSize != -1 and (int)mValues[name].size() > mSize)
 	mValues[name].pop_back();
 }
@@ -55,7 +56,8 @@ void DifferenceEquation::displayValues()
 
     while (it != mValues.end()) {
 	std::deque < std::pair < double, double > > list = it->second;
-	std::deque < std::pair < double, double > >::const_iterator it2 = list.begin();
+        std::deque < std::pair < double, double > >::const_iterator it2 =
+            list.begin();
 	
 	std::cout << it->first << ":";
 	while (it2 != list.end()) {
@@ -69,57 +71,84 @@ void DifferenceEquation::displayValues()
 
 double DifferenceEquation::getValue(int shift) const 
 { 
-    if (shift > 0) Throw(vle::utils::InternalError, "getValue - positive shift");
-    if (shift == 0) return mValue.front(); 
-    else {
+    if (shift > 0) {
+        Throw(utils::InternalError, "getValue - positive shift");
+    }
+
+    if (shift == 0) {
+        return mValue.front(); 
+    } else {
 	std::deque < double >::const_iterator it = mValue.begin();
 
-	if ((int)(mValue.size() - 1) >= -shift) return mValue[-shift];
-	else Throw(vle::utils::InternalError, 
-		   (boost::format("%1% - getValue - shift too large") % getModelName()).str());
+        if ((int)(mValue.size() - 1) >= -shift) {
+            return mValue[-shift];
+        } else {
+            Throw(utils::InternalError, 
+                   (boost::format("%1% - getValue - shift too large") %
+                    getModelName()).str());
+        }
     }
 }
 double DifferenceEquation::getValue(const char* name, int shift)
 {
-    if (mValues.find(name) == mValues.end())
-	Throw(vle::utils::InternalError, 
-	      (boost::format("%1% - getValue - invalid variable name: %2%") % getModelName() % name).str());
+    if (mValues.find(name) == mValues.end()) {
+        Throw(utils::InternalError, 
+              (boost::format("%1% - getValue - invalid variable name: %2%") %
+               getModelName() % name).str());
+    }
 
-    if (shift > 0) Throw(vle::utils::InternalError, "getValue - positive shift");
-    if (shift == 0) return mValues[name].front().second;
-    else {
+    if (shift > 0) {
+        Throw(utils::InternalError, "getValue - positive shift");
+    }
+
+    if (shift == 0) {
+        return mValues[name].front().second;
+    } else {
 	std::deque < std::pair < double, double > > list = mValues[name];
 
-	if ((int)(list.size() - 1) >= -shift) return list[-shift].second;
-	else Throw(vle::utils::InternalError, 
-		   (boost::format("%1% - getValue - shift too large") % getModelName()).str());
+        if ((int)(list.size() - 1) >= -shift) {
+            return list[-shift].second;
+        } else {
+            Throw(utils::InternalError, 
+                  (boost::format("%1% - getValue - shift too large") %
+                   getModelName()).str());
+        }
     }
 }
 
 void DifferenceEquation::processInitEvents(const InitEventList& event)
 {
-    if (event.exist("name")) mVariableName = vle::value::toString(event.get("name"));
-    else mVariableName = getModelName();
-    if (event.exist("size")) mSize = (int)vle::value::toInteger(event.get("size"));
-    else mSize = -1;
+    if (event.exist("name")) {
+        mVariableName = value::toString(event.get("name"));
+    } else {
+        mVariableName = getModelName();
+    }
+
+    if (event.exist("size")) {
+        mSize = (int)value::toInteger(event.get("size"));
+    } else {
+        mSize = -1;
+    }
+
     if (event.exist("value")) {
-	mInitialValue = vle::value::toDouble(event.get("value"));
+	mInitialValue = value::toDouble(event.get("value"));
 	mInitValue = true;
     }
+
     if (event.exist("delta")) {
-	mDelta = vle::value::toDouble(event.get("delta"));
-	if (event.exist("multiple")) mMultiple = vle::value::toInteger(event.get("multiple"));
-	else mMultiple = 1;
-    }
-    else {
+	mDelta = value::toDouble(event.get("delta"));
+        if (event.exist("multiple")) {
+            mMultiple = value::toInteger(event.get("multiple"));
+        } else {
+            mMultiple = 1;
+        }
+    } else {
 	mDelta = 0;
 	mMultiple = 0;
     }
 
     mTimeStep = mMultiple * mDelta;
 }
-
-// DEVS Methods
 
 Time DifferenceEquation::init()
 {
@@ -128,42 +157,46 @@ Time DifferenceEquation::init()
     mSyncs = 0;
     mReceive = 0;
     mLastTime = 0;
-    if (mInitValue) mValue.push_front(mInitialValue);
+    if (mInitValue) {
+        mValue.push_front(mInitialValue);
+    }
+
     // si la valeur n'est initialisée alors la valeur est invalide
     mInvalid = !mInitValue;
+    
     // dois-je envoyer mes caractéristiques ?
     if (mActive) {
 	mState = PRE_INIT;
 	mSigma = 0;
-	return vle::devs::Time(0);
-    }
-    // est-ce que j'attends les caractéristiques de quelqu'un ?
-    else if (mDependance) {
+	return devs::Time(0);
+    } else if (mDependance) { // est-ce que j'attends les caractéristiques de
+                              // quelqu'un ?
 	mState = INIT;
-	mSigma = vle::devs::Time::infinity;
-	return vle::devs::Time::infinity;
-    }
-    // j'attends rien !
-    else {
+	mSigma = devs::Time::infinity;
+	return devs::Time::infinity;
+    } else {                  // j'attends rien !
 	mState = RUN;
 	mSigma = mTimeStep;
-	return vle::devs::Time(mTimeStep);
+	return devs::Time(mTimeStep);
     }
 }
 
 void DifferenceEquation::getOutputFunction(const Time& /*time*/,
 					   ExternalEventList& output) 
 {
-    if (mActive and (mState == PRE_INIT or mState == PRE_INIT2 or mState == POST or mState == POST2)) {
-	vle::devs::ExternalEvent* ee = new vle::devs::ExternalEvent("update");
+    if (mActive and (mState == PRE_INIT or mState == PRE_INIT2 or mState == POST
+                     or mState == POST2)) {
+	ExternalEvent* ee = new ExternalEvent("update");
 
-	if (mState == PRE_INIT or mState == PRE_INIT2 or mState == POST or mState == POST2) {
-	    ee << vle::devs::attribute("name", mVariableName);
-	    ee << vle::devs::attribute("value", getValue());
+        if (mState == PRE_INIT or mState == PRE_INIT2 or mState == POST or
+            mState == POST2) {
+	    ee << devs::attribute("name", mVariableName);
+	    ee << devs::attribute("value", getValue());
 	}
+
 	if (mState == PRE_INIT or mState == PRE_INIT2) {
-	    ee << vle::devs::attribute("multiple", (int)mMultiple);
-	    ee << vle::devs::attribute("delta", mDelta);
+	    ee << devs::attribute("multiple", (int)mMultiple);
+	    ee << devs::attribute("delta", mDelta);
 	}
 	output.addEvent(ee);
     }
@@ -183,16 +216,13 @@ Event::EventType DifferenceEquation::processConflict(
 
 void DifferenceEquation::processInternalEvent(const InternalEvent& event)
 {
-    switch (mState) 
-    {
+    switch (mState) {
     case PRE_INIT:
 	// est-ce que j'attends les caractéristiques de quelqu'un ?
 	if (mDependance) {
 	    mState = INIT;
-	    mSigma = vle::devs::Time::infinity;
-	}
-	// j'attends rien !
-	else {
+	    mSigma = devs::Time::infinity;
+        } else { // j'attends rien !
 	    mState = RUN;
 	    mSigma = mTimeStep;
 	}
@@ -211,10 +241,10 @@ void DifferenceEquation::processInternalEvent(const InternalEvent& event)
 	// je calcule ma nouvelle valeur
 	mLastTime = event.getTime();
 	try {
-	    mValue.push_front(compute(vle::devs::Time(event.getTime().getValue())));
+	    mValue.push_front(compute(devs::Time(event.getTime().getValue())));
 	    mInvalid = false;
 	}
-	catch(vle::utils::InternalError) {
+	catch(utils::InternalError) {
 	    mInvalid = true;
 	}
 	// je vais propager ma nouvelle valeur à ceux qui
@@ -222,17 +252,23 @@ void DifferenceEquation::processInternalEvent(const InternalEvent& event)
 	if (mActive) {
 	    mState = POST;
 	    mSigma = 0;
-	}
-	else {
-	    if (mDependance) mState = PRE;
-	    else mState = RUN;
+        } else {
+            if (mDependance) {
+                mState = PRE;
+            } else {
+                mState = RUN;
+            }
 	    mSigma = mTimeStep;
 	}
 	break;
     case POST:
 	// ma nouvelle valeur est propagée
-	if (mDependance) mState = PRE;
-	else mState = RUN;
+        if (mDependance) {
+            mState = PRE;
+        } else {
+            mState = RUN;
+        }
+
 	mSigma = mTimeStep;
 	break;
     case POST2:
@@ -240,8 +276,11 @@ void DifferenceEquation::processInternalEvent(const InternalEvent& event)
 	// mise à jour d'une de mes dépendances non synchrones
 	// cette propagation est utile pour la compatibilité avec
 	// QSS
-	if (mDependance) mState = PRE;
-	else mState = RUN;
+        if (mDependance) { 
+            mState = PRE;
+        } else {
+            mState = RUN;
+        }
 	mSigma = mSigma2;
     }
 }
@@ -249,11 +288,11 @@ void DifferenceEquation::processInternalEvent(const InternalEvent& event)
 void DifferenceEquation::processExternalEvents(const ExternalEventList& event,
 					       const Time& time)
 {
-    vle::devs::Time e = time - mLastTime;
+    devs::Time e = time - mLastTime;
     // PROBLEMATIQUE !!!!!!! l'idéal serait : bool end = (e == mSigma);
-    bool end = fabs(e.getValue() - mSigma.getValue()) < 1e-10;
+    bool end = std::abs(e.getValue() - mSigma.getValue()) < 1e-10;
     bool begin = (e == 0);
-    vle::devs::ExternalEventList::const_iterator it = event.begin();
+    devs::ExternalEventList::const_iterator it = event.begin();
     double delta;
     bool reset = false;
       
@@ -266,7 +305,8 @@ void DifferenceEquation::processExternalEvents(const ExternalEventList& event,
 	    // est-ce que je connais ce modèle ? si non alors ...
 	    if (mValues.find(name) == mValues.end() and 
 		(*it)->existAttributeValue("multiple")) {
-		unsigned int multiple = (*it)->getIntegerAttributeValue("multiple");
+                unsigned int multiple =
+                    (*it)->getIntegerAttributeValue("multiple");
 		
 		// ma dépendance connait son pas de temps
 		if (multiple != 0) {
@@ -298,11 +338,15 @@ void DifferenceEquation::processExternalEvents(const ExternalEventList& event,
 		    // réception des valeurs de cette dépendance
 		    // se produiront en même temps que mes
 		    // changements de valeur
-		    if (mMultiple != 0)
-			if ((multiple > mMultiple and (multiple % mMultiple == 0)) or 
-			    (multiple < mMultiple and (mMultiple % multiple == 0)) or
-			    (multiple == mMultiple))
-			    ++mSyncs;
+		    if (mMultiple != 0) {
+                        if ((multiple > mMultiple and
+                             (multiple % mMultiple == 0)) or 
+                            (multiple < mMultiple and
+                             (mMultiple % multiple == 0)) or (multiple ==
+                                                              mMultiple)) {
+                            ++mSyncs;
+                        }
+                    }
 		}
 		// ma dépendance ne connait pas son pas de temps
 		else {
@@ -341,7 +385,8 @@ void DifferenceEquation::processExternalEvents(const ExternalEventList& event,
 	// ce pas de temps est égal au plus petit pas de temps
 	// des dépendances
 	if (mTimeStep == 0 and mWait.empty()) {
-	    std::map < std::string, unsigned int >::const_iterator it = mMultiples.begin();
+            std::map < std::string, unsigned int >::const_iterator it;
+            it  = mMultiples.begin();
 	    unsigned int min = it->second;
 
 	    while (it != mMultiples.end()) {
@@ -405,11 +450,12 @@ void DifferenceEquation::processExternalEvents(const ExternalEventList& event,
 
 Value DifferenceEquation::processStateEvent(const StateEvent& event) const
 {
-    if (mInvalid) return vle::value::Value();
-    else {
-	Assert(vle::utils::InternalError, event.getPortName() == mVariableName,
-	       boost::format("DifferenceEquation model, invalid variable name: %1%") % event.getPortName());
-
+    if (mInvalid) {
+        return value::Value();
+    } else {
+        Assert(utils::InternalError, event.getPortName() == mVariableName,
+               boost::format("DifferenceEquation model, invalid variable " \
+                             " name: %1%") % event.getPortName());
 	return buildDouble(getValue());
     }
 }
@@ -419,15 +465,15 @@ void DifferenceEquation::processInstantaneousEvent(
     const Time& /*time*/,
     ExternalEventList& output) const
 {
-    Assert(vle::utils::InternalError, event.getStringAttributeValue("name") ==
+    Assert(utils::InternalError, event.getStringAttributeValue("name") ==
            mVariableName, boost::format(
                "DifferenceEquation model, invalid variable name: %1%") %
            event.getStringAttributeValue("name"));
 
-    vle::devs::ExternalEvent* ee = new vle::devs::ExternalEvent("response");
+    devs::ExternalEvent* ee = new devs::ExternalEvent("response");
       
-    ee << vle::devs::attribute("name", event.getStringAttributeValue("name"));
-    ee << vle::devs::attribute("value", getValue());
+    ee << devs::attribute("name", event.getStringAttributeValue("name"));
+    ee << devs::attribute("value", getValue());
     output.addEvent(ee);
 }
 
