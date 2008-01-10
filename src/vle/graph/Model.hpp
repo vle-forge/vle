@@ -38,7 +38,6 @@ namespace vle { namespace graph {
     class Model;
     class AtomicModel;
     class CoupledModel;
-    class NoVLEModel;
 
     typedef std::map < std::string, ModelPortList > ConnectionList;
     typedef std::set < std::string > PortList;
@@ -90,13 +89,6 @@ namespace vle { namespace graph {
         { return false; }
 
         /**
-         * @brief Return true if this is NoVLEModel. Default is false.
-         * @return true if Model is novle, false otherwise.
-         */
-        virtual bool isNoVLE() const
-        { return false; }
-
-        /**
 	 * Find recursively a model, atomic or coupled, with a specified name.
 	 * @param name model name to search.
 	 * @return model founded, otherwise 0.
@@ -105,7 +97,7 @@ namespace vle { namespace graph {
 
         /** 
          * @brief A output stream operator for graph::Model hierarchy
-         * (AtomicModel, CoupledModel and NoVLEModel).
+         * (AtomicModel or CoupledModel).
          * @param out Output stream.
          * @param mdl Model to write.
          * @return A reference to the output stream.
@@ -316,15 +308,6 @@ namespace vle { namespace graph {
          */
         static CoupledModel* toCoupled(Model* m);
 
-        /**
-	 * return cast of a Model to a NoVLEModel. If Model is not a
-         * NoVLEModel, return NULL
-         *
-         * @param m Model to cast to NoVLEModel
-	 *
-         * @return a cast NoVLEModel or NULL if error
-         */
-        static NoVLEModel* toNoVLE(Model* m);
 
 	static void getAtomicModelList(Model* model,
 				       std::vector < AtomicModel* >& list);

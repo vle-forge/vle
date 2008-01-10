@@ -42,8 +42,7 @@ namespace vle { namespace vpz {
     public:
         AtomicModel(const std::string& conditions,
                     const std::string& dynamics,
-                    const std::string& observables,
-                    const std::string& translator);
+                    const std::string& observables);
 
         inline const StringVector& conditions() const
         { return m_conditions; }
@@ -54,9 +53,6 @@ namespace vle { namespace vpz {
         inline const std::string& observables() const
         { return m_observables; }
 
-        inline const std::string& translator() const
-        { return m_translator; }
-
         inline void setObservables(const std::string& str)
         { m_observables = str; }
 
@@ -64,8 +60,7 @@ namespace vle { namespace vpz {
         {
             return out << "  conditions  : " << a.m_conditions.front() << "\n"
                        << "  dynamics    : " << a.m_dynamics << "\n"
-                       << "  observables : " << a.m_observables << "\n"
-                       << "  translator  : " << a.m_translator << "\n";
+                       << "  observables : " << a.m_observables << "\n";
         }
 
     private:
@@ -74,7 +69,6 @@ namespace vle { namespace vpz {
 	StringVector    m_conditions;
         std::string     m_dynamics;
         std::string     m_observables;
-        std::string     m_translator;
     };
 
 
@@ -178,15 +172,6 @@ namespace vle { namespace vpz {
         void clear();
 
         /** 
-         * @brief Replace the model name modelname by the model provided in
-         * parameter.
-         * 
-         * @param modelname model name to change. Must be a graph::NoVLE.
-         * @param m the new model or hierarchy to push.
-         */
-        //void addModel(const std::string& modelname, const Model& m);
-
-        /** 
          * @brief Set a hierachy of graph::Model. If a previous hierarchy
          * already exist, it is not delete same if the new is empty. This
          * function is just an affectation, no clone is build.
@@ -252,8 +237,6 @@ namespace vle { namespace vpz {
                          const graph::AtomicModel* mdl) const;
         void writeCoupled(std::ostream& out,
                           const graph::CoupledModel* mdl) const;
-        void writeNovle(std::ostream& out,
-                        const graph::NoVLEModel* mdl) const;
         void writePort(std::ostream& out, const graph::Model* mdl) const;
         void writeConnection(std::ostream& out,
                              const graph::CoupledModel* mdl) const;

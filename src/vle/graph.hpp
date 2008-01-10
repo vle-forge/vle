@@ -1,9 +1,9 @@
 /** 
  * @file graph/graph.hpp
  * @brief This namespace defines all class and method to manager the hierarchy
- * of graph::Model: graph::CoupledModel, graph::AtomicModel and
- * graph::NoVLEModel. Connections between these models are stored into the
- * graph::Connection class and graph::Port.
+ * of graph::Model: graph::CoupledModel or graph::AtomicModel. Connections
+ * between these models are stored into the graph::Connection class and
+ * graph::Port.
  * @author The vle Development Team
  * @date lun, 27 fév 2006 11:55:05 +0100
  */
@@ -33,16 +33,14 @@
 #include <vle/graph/Model.hpp>
 #include <vle/graph/ModelPort.hpp>
 #include <vle/graph/ModelPortList.hpp>
-#include <vle/graph/NoVLEModel.hpp>
 
 namespace vle {
 
     /**
      * @brief This namespace defines all class and method to manage the devs
-     * hierarchy of graph::Model: graph::CoupledModel, graph::AtomicModel and
-     * graph::NoVLEModel. Connections between these models are stored into the
-     * graph::Connection class and graph::Port.
-     *
+     * hierarchy of graph::Model: graph::CoupledModel or graph::AtomicModel.
+     * Connections between these models are stored into the graph::Connection
+     * class and graph::Port.
      */
     namespace graph {
 

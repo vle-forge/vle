@@ -24,7 +24,6 @@
 
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/graph/AtomicModel.hpp>
-#include <vle/graph/NoVLEModel.hpp>
 #include <vle/graph/Model.hpp>
 #include <vle/utils/XML.hpp>
 #include <vle/utils/Debug.hpp>
@@ -504,14 +503,6 @@ AtomicModel* CoupledModel::addAtomicModel(const std::string& name)
 {
     AssertS(utils::DevsGraphError, not exist(name));
     AtomicModel* x = new AtomicModel(name, this);
-    m_modelList[name] = x;
-    return x;
-}
-
-NoVLEModel* CoupledModel::addNoVLEModel(const std::string& name)
-{
-    AssertS(utils::DevsGraphError, not exist(name));
-    NoVLEModel* x = new NoVLEModel(name, this);
     m_modelList[name] = x;
     return x;
 }

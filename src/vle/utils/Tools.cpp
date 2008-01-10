@@ -219,7 +219,6 @@ std::string demangle(const std::string& in)
 void initUserDirectory()
 {
     buildDirectory(Glib::build_filename(getUserDirectory(), "simulator"));
-    buildDirectory(Glib::build_filename(getUserDirectory(), "translator"));
     buildDirectory(Glib::build_filename(getUserDirectory(), "stream"));
     buildDirectory(Glib::build_filename(getUserDirectory(), "model"));
 }

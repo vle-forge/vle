@@ -41,8 +41,8 @@ namespace vle { namespace vpz {
             INTERNAL_CONNECTION, INPUT_CONNECTION, OUTPUT_CONNECTION, ORIGIN,
             DESTINATION, IN, OUT, INIT, STATE, PORT, DYNAMICS, DYNAMIC,
             EXPERIMENT, PROJECT, VIEWS, OBSERVABLES, OBSERVABLE, OBSERVABLEPORT,
-            OUTPUTS, OUTPUT, VIEW, NOVLES, NOVLE, CONDITIONS, CONDITION,
-            CLASSES, CLASS, REPLICAS, VPZ, TRAME, MODELTRAME };
+            OUTPUTS, OUTPUT, VIEW, CONDITIONS, CONDITION, CLASSES, CLASS,
+            REPLICAS, VPZ, TRAME, MODELTRAME };
 
         Base() { }
 
@@ -103,8 +103,6 @@ namespace vle { namespace vpz {
             OBSERVABLEPORT; }
         inline bool isOutputs() const { return getType() == OUTPUTS; }
         inline bool isOutput() const { return getType() == OUTPUT; }
-        inline bool isNoVLES() const { return getType() == NOVLES; }
-        inline bool isNoVLE() const { return getType() == NOVLE; }
         inline bool isConditions() const { return getType() == CONDITIONS; }
         inline bool isCondition() const { return getType() == CONDITION; }
         inline bool isClasses() const { return getType() == CLASSES; }

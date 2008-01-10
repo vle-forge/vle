@@ -9,10 +9,10 @@ LINK_DIRECTORIES(
   ${LIBXMLPP_LIBRARY_DIR})
 
 SET(GRAPH_CPP AtomicModel.cpp CoupledModel.cpp Model.cpp ModelPort.cpp
-  ModelPortList.cpp NoVLEModel.cpp)
+  ModelPortList.cpp)
 
 SET(GRAPH_HPP AtomicModel.hpp CoupledModel.hpp Model.hpp ModelPort.hpp
-  ModelPortList.hpp NoVLEModel.hpp)
+  ModelPortList.hpp)
 
 ADD_LIBRARY(vlegraph SHARED ${GRAPH_CPP};${GRAPH_HPP})
 

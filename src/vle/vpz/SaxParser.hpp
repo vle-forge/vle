@@ -192,8 +192,6 @@ namespace vle { namespace vpz {
         void onObservables(const AttributeList& att);
         void onObservable(const AttributeList& att);
         void onAttachedView(const AttributeList& att);
-        void onTranslators(const AttributeList& att);
-        void onTranslator(const AttributeList& att);
         void onClasses(const AttributeList& att);
         void onClass(const AttributeList& att);
 
@@ -234,8 +232,6 @@ namespace vle { namespace vpz {
         void onEndObservables();
         void onEndObservable();
         void onEndAttachedView();
-        void onEndTranslators();
-        void onEndTranslator();
         void onEndClasses();
         void onEndClass();
 
@@ -296,10 +292,6 @@ namespace vle { namespace vpz {
                 &SaxParser::onEndObservable);
             add("attachedview", &SaxParser::onAttachedView,
                 &SaxParser::onEndAttachedView);
-            add("translators", &SaxParser::onTranslators,
-                &SaxParser::onEndTranslators);
-            add("translator", &SaxParser::onTranslator,
-                &SaxParser::onEndTranslator);
             add("classes", &SaxParser::onClasses, &SaxParser::onEndClasses);
             add("class", &SaxParser::onClass, &SaxParser::onEndClass);
         }

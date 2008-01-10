@@ -10,24 +10,6 @@ LINK_DIRECTORIES(
   ${LIBXMLPP_LIBRARY_DIR}
   ${Boost_LIBRARY_DIRS})
 
-ADD_LIBRARY(unittest SHARED tr1.cpp tr1.hpp)
-TARGET_LINK_LIBRARIES(unittest
-  ${GLIBMM_LIBRARIES}
-  ${LIBXMLPP_LIBRARIES}
-  ${GTHREAD_LIBRARIES} 
-  ${Boost_UNITTESTFRAMEWORK}
-  vlegeometry
-  vleutils
-  vledata
-  vlevalue
-  vlegraph
-  vledevs
-  vlevpz)
-
-INSTALL(TARGETS unittest
-  RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/translator"
-  LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/translator")
-
 INSTALL(FILES unittest.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
 
 ADD_EXECUTABLE(test1 test1.cpp)

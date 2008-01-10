@@ -111,19 +111,6 @@ namespace vle { namespace graph {
         AtomicModel* addAtomicModel(const std::string& name);
 
         /** 
-         * @brief add a new novle model to the list. Parent is set to this
-         * coupled model.
-         * 
-         * @param name novle model name to add.
-         * 
-         * @return The NoVLE builded by this function.
-         *
-         * @throw Exception::Internal if name already exist in this
-         * coupledmodel.
-         */
-        NoVLEModel* addNoVLEModel(const std::string& name);
-        
-        /** 
          * @brief add a new coupled model to the list. Parent is set to this
          * coupled model.
          * 
@@ -259,9 +246,9 @@ namespace vle { namespace graph {
         void delAllConnection();
 
         /** 
-         * @brief Replace the old model (Atomic, Coupled or NoVLE) into the new
-         * model mdl (Atomic, Coupled or NoVLE). This function delete the model
-         * old and set the new mdl, no clone is build.
+         * @brief Replace the old model (Atomic or Coupled) into the new model
+         * mdl (Atomic or Coupled). This function delete the model old and set
+         * the new mdl, no clone is build.
          * 
          * @param old the model to delete from hierarchy.
          * @param mdl the new model to set.

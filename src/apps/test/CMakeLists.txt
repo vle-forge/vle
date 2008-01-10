@@ -11,24 +11,6 @@ LINK_DIRECTORIES(
 
 ADD_EXECUTABLE(vlemodeltest modeltest.cpp)
 
-ADD_EXECUTABLE(vletranslatortest translatortest.cpp)
-
-TARGET_LINK_LIBRARIES(vletranslatortest
-  ${GLIBMM_LIBRARIES}
-  ${LIBXMLPP_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  vlegeometry
-  vleutils
-  vledata
-  vlevalue
-  vlegraph
-  vleoov
-  vlevpz
-  vledevs
-  vleextension
-  vlemanager
-  vletranslator)
-
 TARGET_LINK_LIBRARIES(vlemodeltest
   ${GLIBMM_LIBRARIES}
   ${LIBXMLPP_LIBRARIES}
@@ -47,6 +29,3 @@ TARGET_LINK_LIBRARIES(vlemodeltest
 
 INSTALL(TARGETS vlemodeltest DESTINATION bin)
 INSTALL(FILES vlemodeltest.1 DESTINATION ${VLE_MANPAGE_PATH})
-
-INSTALL(TARGETS vletranslatortest DESTINATION bin)
-INSTALL(FILES vletranslatortest.1 DESTINATION ${VLE_MANPAGE_PATH})

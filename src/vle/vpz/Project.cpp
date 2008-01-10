@@ -38,7 +38,6 @@ void Project::write(std::ostream& out) const
         << m_dynamics
         << m_experiment
         << m_classes
-        << m_novles
         << "</vle_project>\n";
 }
 
@@ -49,19 +48,6 @@ void Project::clear()
     m_dynamics.clear();
     m_experiment.clear();
     m_classes.clear();
-    m_novles.clear();
-}
-
-void Project::expandTranslator()
-{
-    m_novles.fusion(*this, m_model, m_dynamics, m_experiment.conditions(),
-                    m_experiment.views());
-    m_novles.clear();
-}
-
-bool Project::hasNoVLE() const
-{
-    return not m_novles.novlelist().empty();
 }
 
 void Project::setAuthor(const std::string& name)

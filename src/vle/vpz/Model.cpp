@@ -26,18 +26,15 @@
 #include <vle/utils/Debug.hpp>
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/graph/AtomicModel.hpp>
-#include <vle/graph/NoVLEModel.hpp>
 #include <stack>
 
 namespace vle { namespace vpz {
 
 AtomicModel::AtomicModel(const std::string& conditions,
 			 const std::string& dynamics,
-			 const std::string& observables,
-			 const std::string& translator) :
+			 const std::string& observables) :
     m_dynamics(dynamics),
-    m_observables(observables),
-    m_translator(translator)
+    m_observables(observables)
 { 
     std::string conditionList = conditions;
     StringVector lst;
@@ -166,12 +163,9 @@ void Model::writeModel(std::ostream& out) const
         if (m_graph->isAtomic()) {
             writeAtomic(out, static_cast < const graph::AtomicModel*
                         >(m_graph));
-        } else if (m_graph->isCoupled()) {
+        } else {
             writeCoupled(out, static_cast < const graph::CoupledModel* >
                          (m_graph));
-        } else {
-            writeNovle(out, static_cast < const graph::NoVLEModel* >
-                        (m_graph));
         }
     }
 }
@@ -216,9 +210,6 @@ void Model::writeCoupled(std::ostream& out, const graph::CoupledModel* mdl) cons
                 } else if (it->second->isAtomic()) {
                     writeAtomic(out, static_cast < graph::AtomicModel* >
                                 (it->second));
-                } else if (it->second->isNoVLE()) {
-                    writeNovle(out, static_cast < graph::NoVLEModel* >
-                               (it->second));
                 }
             }
 
@@ -256,19 +247,6 @@ void Model::writeAtomic(std::ostream& out, const graph::AtomicModel* mdl) const
     out << "\" "
 	<< "dynamics=\"" << vpzatom.dynamics() << "\" "
         << "observables=\"" << vpzatom.observables() << "\" >\n";
-
-    writePort(out, mdl);
-
-    out << "</model>\n";
-}
-
-void Model::writeNovle(std::ostream& out, const graph::NoVLEModel* mdl) const
-{
-    const AtomicModel& vpzatom(atomicModels().get(mdl));
-
-    out << "<model name=\"" << mdl->getName() << "\" "
-        << "type=\"novle\" "
-        << "translator=\"" << vpzatom.translator() << "\" >\n";
 
     writePort(out, mdl);
 

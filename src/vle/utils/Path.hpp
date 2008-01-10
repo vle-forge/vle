@@ -68,9 +68,6 @@ namespace vle { namespace utils {
         inline const PathList& getSimulatorDirs() const
         { return m_simulator; }
 
-        inline const PathList& getTranslatorDirs() const
-        { return m_translator; }
-
         inline const PathList& getStreamDirs() const
         { return m_stream; }
 
@@ -78,8 +75,6 @@ namespace vle { namespace utils {
         { return m_model; }
 
         void addSimulatorDir(const std::string& dirname);
-
-        void addTranslatorDir(const std::string& dirname);
 
         void addStreamDir(const std::string& dirname);
 
@@ -185,7 +180,6 @@ namespace vle { namespace utils {
 
     private:
         PathList    m_simulator;
-        PathList    m_translator;
         PathList    m_stream;
         PathList    m_model;
         std::string m_prefix;

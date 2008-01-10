@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(single_class)
         "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
         " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
         " <structures>\n"
-        "  <model name=\"test1\" type=\"atomic\" translator=\"xxx\" >\n"
+        "  <model name=\"test1\" type=\"atomic\" >\n"
         "   <in>\n"
         "    <port name=\"in1\" />\n"
         "    <port name=\"in2\" />\n"

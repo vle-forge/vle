@@ -182,15 +182,6 @@ bool Simulator::run(const std::string& filename)
             vpz::Vpz file(filename);
             std::cerr << "ok\n";
 
-            std::cerr << " - Project file has translator ..: ";
-            if (file.hasNoVLE()) {
-                std::cerr << "yes\n    = Build complete hierarchy ..: ";
-                file.expandTranslator();
-                std::cerr << "ok\n";
-            } else {
-                std::cerr << "no\n";
-            }
-
             std::cerr << " - Coordinator load models ......: ";
             coordinator.load(file);
             std::cerr << "ok\n";
@@ -238,10 +229,6 @@ bool Simulator::run(const vpz::Vpz& file)
 
         {
             vpz::Vpz copy(file);
-            if (copy.hasNoVLE()) {
-                copy.expandTranslator();
-            }
-
             coordinator.load(copy);
         }
 

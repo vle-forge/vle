@@ -76,9 +76,6 @@ namespace vle { namespace vpz {
         void pushObservable(const AttributeList& att);
         void pushObservablePort(const AttributeList& att);
         void pushObservablePortOnView(const AttributeList& att);
-        void pushTranslators();
-        void pushTranslator(const AttributeList& att);
-        void popTranslator(const std::string& cdata);
         void pushClasses();
         void pushClass(const AttributeList& att);
         void popClasses();

@@ -29,7 +29,6 @@
 #include <vle/vpz/Dynamics.hpp>
 #include <vle/vpz/Experiment.hpp>
 #include <vle/vpz/Classes.hpp>
-#include <vle/vpz/NoVLEs.hpp>
 
 namespace vle { namespace vpz {
 
@@ -48,10 +47,6 @@ namespace vle { namespace vpz {
         { return PROJECT; }
 
         void clear();
-
-        void expandTranslator();
-
-        bool hasNoVLE() const;
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
           * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
@@ -72,10 +67,6 @@ namespace vle { namespace vpz {
         const Classes& classes() const { return m_classes; }
         
         Classes& classes() { return m_classes; }
-
-        const NoVLEs& novles() const { return m_novles; }
-
-        NoVLEs& novles() { return m_novles; }
 
         void setAuthor(const std::string& name);
 
@@ -104,7 +95,6 @@ namespace vle { namespace vpz {
         Dynamics        m_dynamics;
         Experiment      m_experiment;
         Classes         m_classes;
-        NoVLEs          m_novles;
     };
 
 }} // namespace vle vpz

@@ -286,16 +286,6 @@ void SaxParser::onAttachedView(const AttributeList& att)
     m_vpzstack.pushAttachedView(att);
 }
 
-void SaxParser::onTranslators(const AttributeList&)
-{
-    m_vpzstack.pushTranslators();
-}
-
-void SaxParser::onTranslator(const AttributeList& att)
-{
-    m_vpzstack.pushTranslator(att);
-}
-
 void SaxParser::onClasses(const AttributeList&)
 {
     m_vpzstack.pushClasses();
@@ -404,13 +394,6 @@ void SaxParser::onEndVLETrame()
     m_isEndTrame = true;
 }
 
-void SaxParser::onEndTranslator()
-{
-    m_vpzstack.popTranslator(m_cdata);
-    m_cdata.clear();
-    m_vpzstack.pop();
-}
-
 void SaxParser::onEndPort()
 {
     if (m_vpzstack.top()->isCondition()) {
@@ -501,11 +484,6 @@ void SaxParser::onEndObservable()
 }
 
 void SaxParser::onEndExperiment()
-{
-    m_vpzstack.pop();
-}
-
-void SaxParser::onEndTranslators()
 {
     m_vpzstack.pop();
 }

@@ -36,8 +36,6 @@
 #include <vle/vpz/Experiment.hpp>
 #include <vle/vpz/Model.hpp>
 #include <vle/vpz/NewObservableTrame.hpp>
-#include <vle/vpz/NoVLE.hpp>
-#include <vle/vpz/NoVLEs.hpp>
 #include <vle/vpz/Observable.hpp>
 #include <vle/vpz/Observables.hpp>
 #include <vle/vpz/Output.hpp>
@@ -50,7 +48,6 @@
 #include <vle/vpz/SaxParser.hpp>
 #include <vle/vpz/Structures.hpp>
 #include <vle/vpz/Trame.hpp>
-#include <vle/vpz/Translator.hpp>
 #include <vle/vpz/ValueTrame.hpp>
 #include <vle/vpz/View.hpp>
 #include <vle/vpz/Views.hpp>

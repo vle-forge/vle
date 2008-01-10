@@ -83,11 +83,6 @@ void Path::addSimulatorDir(const std::string& dirname)
     m_simulator.push_back(dirname);
 }
 
-void Path::addTranslatorDir(const std::string& dirname)
-{
-    m_translator.push_back(dirname);
-}
-
 void Path::addStreamDir(const std::string& dirname)
 {
     m_stream.push_back(dirname);
@@ -101,7 +96,6 @@ void Path::addModelDir(const std::string& dirname)
 void Path::addPluginDir(const std::string& dirname)
 {
     addSimulatorDir(dirname);
-    addTranslatorDir(dirname);
     addStreamDir(dirname);
     addModelDir(dirname);
 }
@@ -198,11 +192,6 @@ bool Path::initPath()
         addSimulatorDir("..\\simulator");
         addSimulatorDir(".");
 
-        addTranslatorDir(buildPrefixLibrariesPath(m_prefix, "translator"));
-        addTranslatorDir(buildUserPath("translator"));
-        addTranslatorDir("..\\translator");
-        addTranslatorDir(".");
-
         addStreamDir(buildPrefixLibrariesPath(m_prefix, "stream"));
         addStreamDir(buildUserPath("stream"));
         addStreamDir("..\\stream");
@@ -225,11 +214,6 @@ bool Path::initPath()
     addSimulatorDir(buildUserPath("simulator"));
     addSimulatorDir("./simulator");
     addSimulatorDir(".");
-
-    addTranslatorDir(buildPrefixLibrariesPath(m_prefix, "translator"));
-    addTranslatorDir(buildUserPath("translator"));
-    addTranslatorDir("./translator");
-    addTranslatorDir(".");
 
     addStreamDir(buildPrefixLibrariesPath(m_prefix, "stream"));
     addStreamDir(buildUserPath("stream"));

@@ -82,23 +82,12 @@ namespace vle { namespace vpz {
         std::string writeToString();
 
         /** 
-         * @brief All translator tags are parse, and the plugin was load to
-         * attach the new structures, dynamics, graphics and experiments.
-         */
-        void expandTranslator();
-        
-        /** 
          * @brief Return true if the file is compressed.
          * @return true if the file is compressed, false otherwise.
          */
         inline bool isGzip() const
         { return m_isGzip; }
 
-        /** 
-         * @brief Return true if the file use a least one translator.
-         * @return true if use translator, false otherwise.
-         */
-        bool hasNoVLE() const;
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
           * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 

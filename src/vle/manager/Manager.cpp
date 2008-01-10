@@ -61,10 +61,6 @@ void Manager::run_all_in_localhost(const std::string& filename)
 void Manager::run_all_in_localhost(const vpz::Vpz& vpz)
 {
     mFile = vpz;
-    if (mFile.hasNoVLE()) {
-	mFile.expandTranslator();
-    }    
-
 
     ExperimentGenerator* expgen = get_combination_plan();
     expgen->saveVPZinstance(mSaveVPZ);
@@ -97,10 +93,6 @@ void Manager::run_localhost(const std::string& filename)
 void Manager::run_localhost(const vpz::Vpz& file)
 {
     mFile = file;
-    if (mFile.hasNoVLE()) {
-	mFile.expandTranslator();
-    }
-
     scheduller();
 }
 
@@ -122,9 +114,6 @@ void Manager::run_daemon(int port)
             gint32 sz = server->recv_int("client");
             std::string file(server->recv_buffer("client", sz));
             mFile.parseFile(utils::write_to_temp("vleman", file));
-	    if (mFile.hasNoVLE()) {
-		mFile.expandTranslator();
-	    }
 
             scheduller();
 

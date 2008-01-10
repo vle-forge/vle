@@ -33,7 +33,6 @@
 #include <vle/vpz/EndTrame.hpp>
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/graph/AtomicModel.hpp>
-#include <vle/graph/NoVLEModel.hpp>
 #include <vle/utils/Socket.hpp>
 #include <vle/utils/Debug.hpp>
 
@@ -119,16 +118,9 @@ void SaxStackVpz::pushModel(const AttributeList& att)
         gmdl = new graph::AtomicModel(name, parent);
         vpz().project().model().atomicModels().insert(std::make_pair(
                 reinterpret_cast < graph::Model* >(gmdl),
-                AtomicModel(cnd, dyn, obs, "")));
+                AtomicModel(cnd, dyn, obs)));
     } else if (type == "coupled") {
         gmdl = new graph::CoupledModel(name, parent);
-    } else if (type == "novle") {
-        std::string trs(getAttribute < std::string >(att, "translator"));
-
-        gmdl = new graph::NoVLEModel(name, parent);
-        vpz().project().model().atomicModels().insert(std::make_pair(
-                reinterpret_cast < graph::Model* >(gmdl),
-                AtomicModel("", "", "", trs)));
     } else {
         Throw(utils::InternalError, (boost::format(
                         "Unknow model type %1%") % type));
@@ -533,38 +525,6 @@ void SaxStackVpz::pushObservablePortOnView(const AttributeList& att)
     vpz::ObservablePort* port(static_cast < vpz::ObservablePort* >(
             m_stack.top()));
     port->add(name);
-}
-
-void SaxStackVpz::pushTranslators()
-{
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_stack.top()->isVpz());
-
-    vpz::NoVLEs& novles(m_vpz.project().novles());
-    m_stack.push(&novles);
-}
-
-void SaxStackVpz::pushTranslator(const AttributeList& att)
-{
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_stack.top()->isNoVLES());
-
-    std::string name(getAttribute < std::string >(att, "name"));
-    std::string lib(getAttribute < std::string >(att, "library"));
-
-    vpz::NoVLE novle(name);
-    novle.setNoVLE(lib, "");
-    vpz::NoVLE& newvle(m_vpz.project().novles().add(novle));
-    m_stack.push(&newvle);
-}
-
-void SaxStackVpz::popTranslator(const std::string& cdata)
-{
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, m_stack.top()->isNoVLE());
-
-    vpz::NoVLE* novle(static_cast < vpz::NoVLE* >(m_stack.top()));
-    novle->setData(cdata);
 }
 
 void SaxStackVpz::pushVleTrame()

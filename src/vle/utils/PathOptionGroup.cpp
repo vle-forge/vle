@@ -54,12 +54,6 @@ PathOptionGroup::PathOptionGroup() :
     }
     {
         Glib::OptionEntry en;
-        en.set_long_name("path-translator");
-        en.set_description("Add pathname for translator plugins");
-        add_entry(en, m_translator);
-    }
-    {
-        Glib::OptionEntry en;
         en.set_long_name("path-model");
         en.set_description("Add pathname for model plugins");
         add_entry(en, m_model);
@@ -80,8 +74,6 @@ void PathOptionGroup::assignToPath()
         utils::Path::path().addSimulatorDir(*it);
     for (it = m_stream.begin(); it != m_stream.end(); ++it)
         utils::Path::path().addStreamDir(*it);
-    for (it = m_translator.begin(); it != m_translator.end(); ++it)
-        utils::Path::path().addTranslatorDir(*it);
     for (it = m_model.begin(); it != m_model.end(); ++it)
         utils::Path::path().addModelDir(*it);
 }

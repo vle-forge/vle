@@ -47,7 +47,6 @@ namespace vle { namespace utils {
         Glib::OptionGroup::vecustrings m_all;
         Glib::OptionGroup::vecustrings m_simulator;
         Glib::OptionGroup::vecustrings m_stream;
-        Glib::OptionGroup::vecustrings m_translator;
         Glib::OptionGroup::vecustrings m_model;
     };
 

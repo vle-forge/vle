@@ -23,7 +23,6 @@
 
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/graph/AtomicModel.hpp>
-#include <vle/graph/NoVLEModel.hpp>
 #include <vle/graph/Model.hpp>
 #include <vle/utils/Debug.hpp>
 #include <boost/tuple/tuple.hpp>
@@ -403,14 +402,6 @@ CoupledModel* Model::toCoupled(Model* model)
     return 0;
 }
 
-NoVLEModel* Model::toNoVLE(Model* model)
-{
-    if (model and model->isNoVLE()) {
-        return static_cast<NoVLEModel*>(model);
-    }
-    return 0;
-}
-
 void Model::getAtomicModelList(Model* model,
                                AtomicModelVector& list)
 {
@@ -427,12 +418,8 @@ void Model::getAtomicModelList(Model* model,
 		Model* n = it->second;
                 if (n->isAtomic()) {
                     list.push_back(static_cast < AtomicModel*>(n));
-                } else if (n->isCoupled()) {
-                    coupledModelList.push_back(static_cast < CoupledModel*>(n));
                 } else {
-                    Throw(utils::DevsGraphError, boost::format(
-                            "Cannot build a correct atomic model list with "
-                            "novle model '%1%'") % model->getName());
+                    coupledModelList.push_back(static_cast < CoupledModel*>(n));
                 }
 	    }
 	    coupledModelList.pop_front();

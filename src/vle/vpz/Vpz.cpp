@@ -93,16 +93,6 @@ void Vpz::parseMemory(const std::string& buffer)
     }
 }
 
-void Vpz::expandTranslator()
-{
-    m_project.expandTranslator();
-}
-
-bool Vpz::hasNoVLE() const
-{
-    return m_project.hasNoVLE();
-}
-
 value::Value Vpz::parseValue(const std::string& buffer)
 {
     Vpz vpz;
