@@ -1,4 +1,4 @@
-<!ELEMENT vle_project (structures?, dynamics?, translators?, classes?, experiment) >
+<!ELEMENT vle_project (structures?, dynamics?, classes?, experiment) >
 <!ELEMENT structures (model?) >
 <!ELEMENT model (in?, out?, submodels?, connections?) >
 <!ELEMENT in (port*) >
@@ -10,8 +10,6 @@
 <!ELEMENT destination EMPTY >
 <!ELEMENT dynamics (dynamic*) >
 <!ELEMENT dynamic EMPTY >
-<!ELEMENT translators (translator*) >
-<!ELEMENT translator (#PCDATA) >
 <!ELEMENT classes (class*) >
 <!ELEMENT class (model?) >
 <!ELEMENT experiment (replicas?, conditions?, views?) >
@@ -43,11 +41,10 @@
 
 <!ATTLIST model
   name NMTOKEN #REQUIRED
-  type (atomic|coupled|novle) #REQUIRED
+  type (atomic|coupled) #REQUIRED
   dynamics NMTOKEN #IMPLIED
   conditions NMTOKEN #IMPLIED
-  observables NMTOKEN #IMPLIED
-  translator NMTOKEN #IMPLIED >
+  observables NMTOKEN #IMPLIED >
 
 <!ATTLIST port
   name NMTOKEN #REQUIRED >
@@ -68,10 +65,6 @@
   library NMTOKEN #REQUIRED
   location NMTOKEN #IMPLIED
   model NMTOKEN #IMPLIED >
-
-<!ATTLIST translator
-  name NMTOKEN #REQUIRED
-  library NMTOKEN #REQUIRED >
 
 <!ATTLIST class
   name NMTOKEN #REQUIRED >
