@@ -23,7 +23,7 @@
  */
 
 #include <vle/extension/CombinedQSS.hpp>
-#include <vle/value/Map.hpp>
+#include <vle/value/Set.hpp>
 #include <vle/utils/Debug.hpp>
 #include <cmath>
 
@@ -60,23 +60,20 @@ CombinedQss::CombinedQss(const AtomicModel& model,
         mDependance = toBoolean(dependance);
     }
 
-    const Map& variables = toMapValue(events.get("variables"));
-    const MapValue& lst = variables->getValue();
-    unsigned int index = 0;
-
-    for (MapValue::const_iterator it = lst.begin(); it != lst.end();
-         ++it) {
-        const Set& tab(toSetValue(it->second));
-        double init = toDouble(tab->getValue(0));        
-        double precision = toDouble(tab->getValue(1));        
-
-        mVariableIndex[it->first] = index;
-        mVariableName[index] = it->first;
+    const value::Set& variables = value::toSetValue(events.get("variables"));
+    unsigned int index;
+    
+    for (index = 0; index < variables->size(); ++index) {
+        const value::Set& tab(value::toSetValue(variables->getValue(index)));
+	std::string name = value::toString(tab->getValue(0));
+	double init = value::toDouble(tab->getValue(1));        
+	double precision = value::toDouble(tab->getValue(2));        
+        mVariableIndex[name] = index;
+        mVariableName[index] = name;
         mVariablePrecision[index] = precision;
         mVariableEpsilon[index] = precision;
         mInitialValueList.push_back(std::pair < unsigned int, double >(
                 index, init));
-        ++index;
     }
     mVariableNumber = index;
     mValue = new double[index];
