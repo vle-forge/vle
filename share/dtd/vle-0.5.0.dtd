@@ -30,7 +30,7 @@
 <!ELEMENT table (#PCDATA) >
 <!ELEMENT tuple (#PCDATA) >
 <!ELEMENT set (integer|double|boolean|string|table|tuple|set|map|xml)* >
-<!ELEMENT map (key) >
+<!ELEMENT map (key*) >
 <!ELEMENT key (integer|double|boolean|string|table|tuple|set|map|xml) >
 <!ELEMENT xml (#PCDATA) >
 
@@ -40,72 +40,72 @@
   author CDATA #IMPLIED >
 
 <!ATTLIST model
-  name NMTOKEN #REQUIRED
+  name CDATA #REQUIRED
   type (atomic|coupled) #REQUIRED
-  dynamics NMTOKEN #IMPLIED
-  conditions NMTOKEN #IMPLIED
-  observables NMTOKEN #IMPLIED >
+  dynamics CDATA #IMPLIED
+  conditions CDATA #IMPLIED
+  observables CDATA #IMPLIED >
 
 <!ATTLIST port
-  name NMTOKEN #REQUIRED >
+  name CDATA #REQUIRED >
 
 <!ATTLIST connection
   type (input|output|internal) #REQUIRED >
 
 <!ATTLIST origin
-  model NMTOKEN #REQUIRED
-  port NMTOKEN #REQUIRED >
+  model CDATA #REQUIRED
+  port CDATA #REQUIRED >
 
 <!ATTLIST destination
-  model NMTOKEN #REQUIRED
-  port NMTOKEN #REQUIRED >
+  model CDATA #REQUIRED
+  port CDATA #REQUIRED >
 
 <!ATTLIST dynamic
-  name NMTOKEN #REQUIRED
-  library NMTOKEN #REQUIRED
-  location NMTOKEN #IMPLIED
-  model NMTOKEN #IMPLIED >
+  name CDATA #REQUIRED
+  library CDATA #REQUIRED
+  location CDATA #IMPLIED
+  model CDATA #IMPLIED >
 
 <!ATTLIST class
-  name NMTOKEN #REQUIRED >
+  name CDATA #REQUIRED >
 
 <!ATTLIST experiment
-  name NMTOKEN #REQUIRED
-  duration NMTOKEN #REQUIRED
-  seed NMTOKEN #IMPLIED
+  name CDATA #REQUIRED
+  duration CDATA #REQUIRED
+  seed CDATA #IMPLIED
   combination (linear|total) #IMPLIED >
 
 <!ATTLIST replicas
-  seed NMTOKEN #REQUIRED
-  number NMTOKEN #REQUIRED >
+  seed CDATA #REQUIRED
+  number CDATA #REQUIRED >
 
 <!ATTLIST condition
-  name NMTOKEN #REQUIRED >
+  name CDATA #REQUIRED >
 
 <!ATTLIST output
-  name NMTOKEN #REQUIRED
+  name CDATA #REQUIRED
   format (local|distant) #REQUIRED
-  location NMTOKEN #IMPLIED
-  plugin (text|default) #REQUIRED >
+  location CDATA #IMPLIED
+  plugin CDATA #REQUIRED >
 
 <!ATTLIST observable
-  name NMTOKEN #REQUIRED >
+  name CDATA #REQUIRED >
 
 <!ATTLIST attachedview
-  name NMTOKEN #REQUIRED >
+  name CDATA #REQUIRED >
 
 <!ATTLIST view
-  name NMTOKEN #REQUIRED
+  name CDATA #REQUIRED
   type (timed|event) #REQUIRED
-  output NMTOKEN #REQUIRED
-  timestep NMTOKEN #IMPLIED >
+  output CDATA #REQUIRED
+  timestep CDATA #IMPLIED >
 
 <!ATTLIST table
   width CDATA #REQUIRED
   height CDATA #REQUIRED >
 
 <!ATTLIST key
-  name NMTOKEN #REQUIRED >
+  name CDATA #REQUIRED >
 
 <!--
 vim:ts=8:tw=160:sw=2:sts=2
