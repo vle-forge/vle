@@ -54,9 +54,14 @@ namespace vle { namespace devs {
 
         void finish(const Time& time);
 
-        virtual bool isEvent() const = 0;
+        virtual bool isEvent() const
+        { return false; }
 
-        virtual bool isTimed() const = 0;
+        virtual bool isTimed() const
+        { return false; }
+
+        virtual bool isFinish() const
+        { return false; }
 
         virtual devs::StateEvent* processStateEvent(
             devs::StateEvent* event) = 0;

@@ -145,6 +145,22 @@ void Coordinator::finish()
     }
 
     {
+        FinishViewList::iterator it;
+        for (it = m_finishViewList.begin(); it != m_finishViewList.end(); ++it) {
+            ObservableList::const_iterator jt;
+            for (jt = it->second->getObservableList().begin();
+                 jt != it->second->getObservableList().end(); ++jt) {
+                StateEvent* evt = new StateEvent(m_currentTime, jt->first,
+                                                 it->first, jt->second);
+                StateEvent* out = jt->first->processStateEvent(*evt);
+                it->second->processStateEvent(out);
+                delete evt;
+                delete out;
+            }
+        }
+    }
+
+    {
         ViewList::iterator it;
         for (it = m_viewList.begin(); it != m_viewList.end(); ++it) {
             (*it).second->finish(m_currentTime);
@@ -327,9 +343,11 @@ void Coordinator::addView(View* view)
         const std::string& name = view->getName();
         m_viewList[name] = view;
         if (view->isTimed()) {
-            m_timedViewList[name] = reinterpret_cast < TimedView*>(view);
+            m_timedViewList[name] = reinterpret_cast < TimedView* >(view);
+        } else if (view->isEvent()) {
+            m_eventViewList[name] = reinterpret_cast < EventView* >(view);
         } else {
-            m_eventViewList[name] = reinterpret_cast < EventView*>(view);
+            m_finishViewList[name] = reinterpret_cast < FinishView* >(view);
         }
     }
 }
@@ -410,6 +428,8 @@ void Coordinator::buildViews()
                 it->second.name(), stream, it->second.timestep());
         } else if (it->second.type() == vpz::View::EVENT) {
             obs = new devs::EventView(it->second.name(), stream);
+        } else if (it->second.type() == vpz::View::FINISH) {
+            obs = new devs::FinishView(it->second.name(), stream);
         }
         stream->setView(obs);
         addView(obs);

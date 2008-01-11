@@ -33,9 +33,8 @@
 #include <vle/devs/View.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/devs/TimedView.hpp>
+#include <vle/devs/FinishView.hpp>
 #include <vle/vpz/Vpz.hpp>
-#include <vle/utils/Socket.hpp>
-#include <libxml++/libxml++.h>
 
 namespace vle { namespace devs {
 
@@ -225,6 +224,7 @@ namespace vle { namespace devs {
 	ViewList            m_viewList;
 	EventViewList       m_eventViewList;
 	TimedViewList       m_timedViewList;
+        FinishViewList      m_finishViewList;
         ModelFactory&       m_modelFactory;
 
         void buildViews();

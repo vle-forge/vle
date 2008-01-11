@@ -113,6 +113,9 @@ namespace vle { namespace vpz {
                            double timestep,
                            const std::string& output);
 
+        View& addFinishView(const std::string& name,
+                            const std::string& output);
+
         void del(const std::string& name);
 
         const View& get(const std::string& name) const;

@@ -468,6 +468,8 @@ void SaxStackVpz::pushView(const AttributeList& att)
         views.addTimedView(name, ts, out);
     } else if (type == "event") {
         views.addEventView(name, out);
+    } else if (type == "finish") {
+        views.addFinishView(name, out);
     } else {
         Throw(utils::SaxParserError, (boost::format(
                     "Unknow type '%1%' for the view %1%") % type % name));

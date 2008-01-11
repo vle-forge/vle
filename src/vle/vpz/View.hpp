@@ -39,7 +39,7 @@ namespace vle { namespace vpz {
     class View : public Base
     {
     public:
-        enum Type { TIMED, EVENT };
+        enum Type { TIMED, EVENT, FINISH };
 
         View(const std::string& name) :
             m_name(name),
@@ -55,26 +55,28 @@ namespace vle { namespace vpz {
         { return VIEW; }
 
         /** 
-         * @brief Set the View with Event type and the specified name and
-         * output.
-         * 
+         * @brief Set the View with Event type on the specified output.
          * @param output the output of the event View.
-         *
-         * @throw Exception::Internal if name or output are empty.
+         * @throw utils::InternalError if output is empty.
          */
         void setEventView(const std::string& output);
 
         /** 
-         * @brief Set the View with Timed type and the specified name, output
-         * and timestep.
-         * 
+         * @brief Set the View with Timed type on the specified output and
+         * timestep.
          * @param timestep the output of the timed View.
          * @param output the timestep of the timed View.
-         *
-         * @throw Exception::Internal if name or output are empty of timestep <=
-         * 0.
+         * @throw utils::InternalError if output is empty or timestep smaller
+         * than 0.
          */
         void setTimedView(double timestep, const std::string& output);
+
+        /** 
+         * @brief Set the View with the Finish type on the specified output.
+         * @param output the output of the Finish View.
+         * @throw utils::InternalError if output is empty.
+         */
+        void setFinishView(const std::string& output);
 
         inline const std::string& name() const
         { return m_name; }
@@ -82,19 +84,19 @@ namespace vle { namespace vpz {
         inline const Type& type() const
         { return m_type; }
 
-        inline void set_type(Type type)
+        inline void setType(Type type)
         { m_type = type; }
 
         inline std::string streamtype() const
-        { return (m_type == TIMED ? "timed" : "event"); }
+        { return m_type == TIMED ? "timed" : 
+                  m_type == EVENT ? "event" : "finish"; }
 
-        inline void set_timestep(double time);
+        inline void setTimestep(double time);
 
         inline double timestep() const
         { return m_timestep; }
 
-        inline void set_output(const std::string& output)
-        { m_output = output; }
+        void setOutput(const std::string& output);
 
         inline const std::string& output() const
         { return m_output; }

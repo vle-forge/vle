@@ -54,7 +54,9 @@ StateEvent* View::addObservable(Simulator* model,
             std::make_pair < Simulator*, std::string >(model, portname));
         m_stream->processNewObservable(model, portname, currenttime,
                                        getName());
-        return new StateEvent(currenttime, model, m_name, portname);
+        if (isTimed()) {
+            return new StateEvent(currenttime, model, m_name, portname);
+        }
     }
     return 0;
 }

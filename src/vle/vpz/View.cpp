@@ -37,10 +37,12 @@ void View::write(std::ostream& out) const
     case View::EVENT:
         out << "type=\"event\"";
         break;
-
     case View::TIMED:
         out << "type=\"timed\" "
             << "timestep=\"" << m_timestep << "\"";
+        break;
+    case View::FINISH:
+        out << "type=\"finish\"";
         break;
     }
 
@@ -57,24 +59,36 @@ void View::write(std::ostream& out) const
 
 void View::setEventView(const std::string& output)
 {
-    set_type(EVENT);
-    set_output(output);
+    setType(EVENT);
+    setOutput(output);
 }
 
 void View::setTimedView(double timestep, const std::string& output)
 {
-    set_type(TIMED);
-    set_timestep(timestep);
-    set_output(output);
+    setType(TIMED);
+    setTimestep(timestep);
+    setOutput(output);
 }
 
-void View::set_timestep(double time)
+void View::setFinishView(const std::string& output)
+{
+    setType(FINISH);
+    setOutput(output);
+}
+
+void View::setTimestep(double time)
 {
     Assert(utils::SaxParserError, time > 0.0,
            (boost::format("Bad time step %1% for view %2%")
             % time % m_name));
 
     m_timestep = time;
+}
+
+void View::setOutput(const std::string& output)
+{
+    AssertI(not output.empty());
+    m_output = output;
 }
 
 }} // namespace vle vpz

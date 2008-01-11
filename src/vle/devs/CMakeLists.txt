@@ -9,17 +9,18 @@ LINK_DIRECTORIES(
   ${LIBXMLPP_LIBRARY_DIR})
 
 SET(DEVS_CPP Coordinator.cpp Dynamics.cpp Event.cpp EventTable.cpp EventView.cpp
-  ExternalEvent.cpp InstantaneousEvent.cpp InternalEvent.cpp
+  ExternalEvent.cpp InstantaneousEvent.cpp FinishView.cpp InternalEvent.cpp
   LocalStreamWriter.cpp ModelFactory.cpp NetStreamWriter.cpp Observable.cpp
   RootCoordinator.cpp Simulator.cpp StateEvent.cpp StreamWriter.cpp Time.cpp
   TimedView.cpp View.cpp)
 
 SET(DEVS_HPP Attribute.hpp Coordinator.hpp DevsTypes.hpp Dynamics.hpp
   DynamicsWrapper.hpp Event.hpp EventList.hpp EventView.hpp EventTable.hpp
-  Executive.hpp ExternalEvent.hpp ExternalEventList.hpp InstantaneousEvent.hpp
-  InstantaneousEventList.hpp InternalEvent.hpp LocalStreamWriter.hpp
-  ModelFactory.hpp NetStreamWriter.hpp Observable.hpp RootCoordinator.hpp
-  Simulator.hpp StateEvent.hpp StreamWriter.hpp TimedView.hpp Time.hpp View.hpp)
+  Executive.hpp ExternalEvent.hpp ExternalEventList.hpp FinishView.hpp
+  InstantaneousEvent.hpp InstantaneousEventList.hpp InternalEvent.hpp
+  LocalStreamWriter.hpp ModelFactory.hpp NetStreamWriter.hpp Observable.hpp
+  RootCoordinator.hpp Simulator.hpp StateEvent.hpp StreamWriter.hpp
+  TimedView.hpp Time.hpp View.hpp)
 
 ADD_LIBRARY(vledevs SHARED ${DEVS_CPP};${DEVS_HPP})
 

@@ -134,6 +134,17 @@ View& Views::addTimedView(const std::string& name,
     return add(m);
 }
 
+View& Views::addFinishView(const std::string& name,
+                           const std::string& output)
+{
+    Assert(utils::SaxParserError, not exist(name),
+           (boost::format("View %1% already exist") % name));
+
+    View m(name);
+    m.setFinishView(output);
+    return add(m);
+}
+
 void Views::del(const std::string& name)
 {
     m_list.erase(name);

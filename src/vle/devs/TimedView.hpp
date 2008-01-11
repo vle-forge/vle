@@ -45,9 +45,8 @@ namespace vle { namespace devs {
 
 	virtual ~TimedView() { }
 
-	virtual bool isEvent() const { return false; }
-
-	virtual bool isTimed() const { return true; }
+        virtual bool isTimed() const
+        { return true; }
 
 	virtual devs::StateEvent* processStateEvent(devs::StateEvent* event);
 

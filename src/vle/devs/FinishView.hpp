@@ -1,13 +1,11 @@
-/**
- * @file devs/EventView.hpp
- * @author The VLE Development Team.
- * @brief Define a Event View base on devs::View class. This class
- * build state event when event are push.
+/** 
+ * @file FinishView.hpp
+ * @author The vle Development Team
+ * @date 2008-01-11
  */
 
 /*
- * Copyright (c) 2004, 2005 The VLE Development Team.
- *
+ * Copyright (C) 2008 - The vle Development Team
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -20,36 +18,35 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef VLE_DEVS_EVENT_VIEW_HPP
-#define VLE_DEVS_EVENT_VIEW_HPP
+#ifndef VLE_DEVS_FINISH_VIEW_HPP
+#define VLE_DEVS_FINISH_VIEW_HPP
 
 #include <vle/devs/View.hpp>
 #include <vle/devs/StateEvent.hpp>
 
 namespace vle { namespace devs {
 
-    /**
-     * @brief Define a Event View base on devs::View class. This class
-     * build state event when event are push.
+    /** 
+     * @brief Define a Finish view based on devs::View class. This class build
+     * state event only at the end of the simulation.
      */
-    class EventView : public View
+    class FinishView : public View
     {
     public:
-        EventView(const std::string& name, StreamWriter* stream);
+        FinishView(const std::string& name, StreamWriter* stream);
 
-        virtual ~EventView() { }
+        virtual ~FinishView() { }
 
-        virtual bool isEvent() const
+        virtual bool isFinish() const
         { return true; }
 
         virtual devs::StateEvent* processStateEvent(devs::StateEvent* event);
     };
 
-    typedef std::map < std::string, devs::EventView* > EventViewList;
+    typedef std::map < std::string, devs::FinishView* > FinishViewList;
 
 }} // namespace vle devs
 
