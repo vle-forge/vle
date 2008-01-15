@@ -35,13 +35,13 @@
 namespace vle { namespace devs {
 
     class Event;
-    class StateEvent;
+    class ObservationEvent;
     class ExternalEvent;
     class InternalEvent;
     class InstantaneousEvent;
     class Simulator;
 
-    typedef std::deque < StateEvent* >    StateEventList;
+    typedef std::deque < ObservationEvent* >    ObservationEventList;
     typedef std::vector < InternalEvent* > InternalEventList;
     typedef std::pair < Simulator*, std::string > StreamModelPort;
     typedef std::map < StreamModelPort, vle::value::Value > StreamModelPortValue;

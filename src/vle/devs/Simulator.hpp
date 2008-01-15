@@ -30,7 +30,7 @@
 #include <vle/devs/Time.hpp>
 #include <vle/devs/InternalEvent.hpp>
 #include <vle/devs/ExternalEventList.hpp>
-#include <vle/devs/InstantaneousEventList.hpp>
+#include <vle/devs/RequestEventList.hpp>
 #include <vle/devs/EventList.hpp>
 #include <vle/devs/EventTable.hpp>
 #include <vle/devs/DevsTypes.hpp>
@@ -53,21 +53,22 @@ namespace vle { namespace devs {
 	~Simulator();
 
 	void addDynamics(Dynamics* dynamics);
-	const std::string & getName() const;
+	const std::string getName() const;
 	Time getLastTime() const;
 	graph::AtomicModel* getStructure() const;
         graph::Model* findModel(const std::string & name) const;
 	void setLastTime(const Time& time);
 
+        void clear();
+
+        /** 
+         * @brief Return a constant reference to the devs::Dynamics.
+         * @return 
+         */
+        inline const Dynamics* dynamics() const
+        { return m_dynamics; }
+
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-	void finish();
-
-        void getOutputFunction(
-            const Time& currentTime,
-            ExternalEventList& output);
-
-        Time getTimeAdvance();
 
         /** 
          * @brief Call the init function of the Dynamics plugin and add the time
@@ -78,27 +79,26 @@ namespace vle { namespace devs {
          */
 	InternalEvent* init(const Time& time);
 
-        Event::EventType processConflict(
-            const InternalEvent& internal,
-            const ExternalEventList& extEventlist) const;
+        Time timeAdvance();
 
-        void processInitEvents(
-            const InitEventList& event);
-        
-        InternalEvent* processInternalEvent(
-            const InternalEvent& event);
-        
-        InternalEvent* processExternalEvents(
-            const ExternalEventList& event,
-            const Time& time);
-        
-        void processInstantaneousEvent(
-            const InstantaneousEvent& event,
-            const Time& time,
-            ExternalEventList& output);
+	void finish();
 
-        StateEvent* processStateEvent(
-            const StateEvent& event) const;
+        void output(const Time& currentTime, ExternalEventList& output);
+
+
+        Event::EventType confluentTransitions(const InternalEvent& ie,
+                                              const ExternalEventList& ees) const;
+
+        InternalEvent* internalTransition(const InternalEvent& event);
+        
+        InternalEvent* externalTransition(const ExternalEventList& event,
+                                          const Time& time);
+        
+        void request(const RequestEvent& event,
+                     const Time& time,
+                     ExternalEventList& output);
+
+        ObservationEvent* observation(const ObservationEvent& event) const;
 
     protected:
 	InternalEvent* buildInternalEvent(const Time& currentTime);

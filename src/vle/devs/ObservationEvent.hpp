@@ -1,5 +1,5 @@
 /**
- * @file devs/StateEvent.hpp
+ * @file devs/ObservationEvent.hpp
  * @author The VLE Development Team.
  * @brief State event use to get information from graph::Model using
  * TimedView or EventView.
@@ -24,8 +24,8 @@
  * 02111-1307, USA.
  */
 
-#ifndef DEVS_STATE_EVENT_HPP
-#define DEVS_STATE_EVENT_HPP
+#ifndef DEVS_OBSERVATION_EVENT_HPP
+#define DEVS_OBSERVATION_EVENT_HPP
 
 #include <vle/devs/Event.hpp>
 
@@ -36,10 +36,10 @@ namespace vle { namespace devs {
      * TimedView or EventView.
      *
      */
-    class StateEvent : public Event
+    class ObservationEvent : public Event
     {
     public:
-	StateEvent(const Time& time,
+	ObservationEvent(const Time& time,
 		   Simulator* model,
 		   const std::string& viewname,
 		   const std::string& portName) :
@@ -49,14 +49,14 @@ namespace vle { namespace devs {
 	    m_portName(portName)
 	{ }
 
-	StateEvent(const StateEvent& event) :
+	ObservationEvent(const ObservationEvent& event) :
             Event(event),
             m_time(event.m_time),
 	    m_viewName(event.m_viewName),
 	    m_portName(event.m_portName)
 	{ }
 
-        virtual ~StateEvent()
+        virtual ~ObservationEvent()
         { }
 
 	inline const std::string& getViewName() const
@@ -65,13 +65,8 @@ namespace vle { namespace devs {
 	inline const std::string& getPortName() const
         { return m_portName; }
 
-	virtual bool isExternal() const;
-
-	virtual bool isInit() const;
-
-	virtual bool isInternal() const;
-
-	virtual bool isState() const;
+        virtual bool isObservation() const
+        { return true; }
 
 	inline bool onPort(std::string const& portName) const
         { return m_portName == portName; }
@@ -88,7 +83,7 @@ namespace vle { namespace devs {
 	 * @param event Event to test, no test on validity.
          * @return true if this Event is inferior to event.
          */
-        inline bool operator<(const StateEvent* event) const
+        inline bool operator<(const ObservationEvent* event) const
         { return m_time < event->m_time; }
 
         /**
@@ -98,7 +93,7 @@ namespace vle { namespace devs {
          *
          * @return true if this Event is superior to event.
          */
-        inline bool operator>(const StateEvent* event) const
+        inline bool operator>(const ObservationEvent* event) const
         { return m_time > event->m_time; }
 
         /**
@@ -108,7 +103,7 @@ namespace vle { namespace devs {
          *
          * @return true if this Event is equal to  event.
          */
-        inline bool operator==(const StateEvent * event) const
+        inline bool operator==(const ObservationEvent * event) const
         { return m_time == event->m_time; }
 
     private:
@@ -117,7 +112,7 @@ namespace vle { namespace devs {
 	std::string m_portName;
     };
 
-    inline std::ostream& operator<<(std::ostream& o, const StateEvent& evt)
+    inline std::ostream& operator<<(std::ostream& o, const ObservationEvent& evt)
     {
         return o << "from: '" << evt.getViewName()
             << "' port: '" << evt.getPortName() << "'";

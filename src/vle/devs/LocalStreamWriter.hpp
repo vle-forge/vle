@@ -59,7 +59,7 @@ namespace vle { namespace devs {
                                              const devs::Time& time,
                                              const std::string& view);
 
-        virtual void process(const StateEvent& event);
+        virtual void process(const ObservationEvent& event);
 
         virtual void close(const devs::Time& time);
 

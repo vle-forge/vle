@@ -95,7 +95,7 @@ namespace vle { namespace devs {
 	 *
 	 * @return model source name.
 	 */
-        const std::string& getSourceModelName() const;
+        const std::string getSourceModelName() const;
 
         /**
 	 * Invalidate Event, don't use it.
@@ -112,22 +112,20 @@ namespace vle { namespace devs {
         /**
          * @return true if Event is an External event.
 	 */
-        virtual bool isExternal() const = 0;
-
-        /**
-	 * @return true if Event is an Init event.
-	 */
-        virtual bool isInit() const = 0;
+        virtual bool isExternal() const
+        { return false; }
 
         /**
          * @return true if Event is an Internal event.
          */
-        virtual bool isInternal() const = 0;
+        virtual bool isInternal() const
+        { return false; }
 
         /**
          * @return true if Event is an State event.
          */
-        virtual bool isState() const = 0;
+        virtual bool isObservation() const
+        { return false; }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
           * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

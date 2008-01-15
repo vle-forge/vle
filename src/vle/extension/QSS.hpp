@@ -28,56 +28,55 @@
 #include <vle/devs/Dynamics.hpp>
 
 namespace vle { namespace extension {
-    
+
     class qss : public vle::devs::Dynamics
     {
     public:
         enum state { INIT, POST_INIT, RUN, POST, POST2, POST3 };
 
-        qss(const vle::graph::AtomicModel& model);
+        qss(const vle::graph::AtomicModel& model,
+            const vle::devs::InitEventList& events);
 
         virtual ~qss() { }
 
         virtual void finish();
 
-        virtual vle::devs::Time init();
+        virtual vle::devs::Time init(const devs::Time& time);
 
-        virtual void getOutputFunction(
-	    const vle::devs::Time& time,
+        virtual void output(
+            const vle::devs::Time& time,
             vle::devs::ExternalEventList& output);
 
-        virtual vle::devs::Time getTimeAdvance();
+        virtual vle::devs::Time timeAdvance();
 
-        virtual vle::devs::Event::EventType processConflict(
-	    const vle::devs::InternalEvent& internal,
+        virtual vle::devs::Event::EventType confluentTransitions(
+            const vle::devs::Time& internal,
             const vle::devs::ExternalEventList& extEventlist) const;
 
-        virtual void processInitEvents(
-	    const vle::devs::InitEventList& event);
+        virtual void internalTransition(
+            const vle::devs::Time& event);
 
-        virtual void processInternalEvent(
-	    const vle::devs::InternalEvent& event);
-
-        virtual void processExternalEvents(
-	    const vle::devs::ExternalEventList& event,
+        virtual void externalTransition(
+            const vle::devs::ExternalEventList& event,
             const vle::devs::Time& time);
 
-        virtual vle::value::Value processStateEvent(
-	    const vle::devs::StateEvent& event) const;
+        virtual vle::value::Value observation(
+            const vle::devs::ObservationEvent& event) const;
 
-	virtual void processInstantaneousEvent(const vle::devs::InstantaneousEvent& /* event */,
-					       const vle::devs::Time& /* time */,
-					       vle::devs::ExternalEventList& /* output */) const;
+        virtual void request(const vle::devs::RequestEvent& /* event */,
+                             const vle::devs::Time& /* time */,
+                             vle::devs::ExternalEventList& /* output */) const;
 
     protected:
-	inline double getValue(const std::string& name) const
-	    { return mExternalVariableValue.find(mExternalVariableIndex.find(name)->second)->second; }	
+        inline double getValue(const std::string& name) const
+        { return mExternalVariableValue.find(
+                mExternalVariableIndex.find(name)->second)->second; }
 
-	inline void setValue(const std::string& name, double value)
-	    { mExternalVariableValue[mExternalVariableIndex[name]] = value; }	
+        inline void setValue(const std::string& name, double value)
+        { mExternalVariableValue[mExternalVariableIndex[name]] = value; }	
 
-	inline void setGradient(const std::string& name, double gradient)
-	    { mExternalVariableGradient[mExternalVariableIndex[name]] = gradient; }	
+        inline void setGradient(const std::string& name, double gradient)
+        { mExternalVariableGradient[mExternalVariableIndex[name]] = gradient; }	
 
         /**
          * @brief The function to develop mathemacial expression like:
@@ -89,25 +88,28 @@ namespace vle { namespace extension {
 
         bool mActive;
         bool mDependance;
-/** Internal variable */
+        
+        /** Internal variable */
         double mInitialValue;
         std::string mVariableName;
         double mValue;
-/** External variables */
-	unsigned int mExternalVariableNumber;
-	std::map < unsigned int , double > mExternalVariableValue;
-	std::map < unsigned int , double > mExternalVariableGradient;
-	std::map < unsigned int , bool > mIsGradient;
-	std::map < std::string , unsigned int > mExternalVariableIndex;
-	bool mExternalValues; // y-a-t-il des variables externes
-			      // sans gradient ? 
-/** State */
-	unsigned long mIndex;	
+
+        /** External variables */
+        unsigned int mExternalVariableNumber;
+        std::map < unsigned int , double > mExternalVariableValue;
+        std::map < unsigned int , double > mExternalVariableGradient;
+        std::map < unsigned int , bool > mIsGradient;
+        std::map < std::string , unsigned int > mExternalVariableIndex;
+        bool mExternalValues; // y-a-t-il des variables externes
+                              // sans gradient ? 
+        /** State */
+        unsigned long mIndex;	
         double mGradient;
         devs::Time mSigma;
         devs::Time mLastTime;
         state mState;
-/** Constantes */
+
+        /** Constantes */
         double mPrecision;
         double mEpsilon;
 
@@ -118,8 +120,8 @@ namespace vle { namespace extension {
         { return x * mPrecision; }
 
         void updateSigma();
-	void reset(const vle::devs::Time& time, double value);
-};
+        void reset(const vle::devs::Time& time, double value);
+    };
 
 }} // namespace vle extension
 

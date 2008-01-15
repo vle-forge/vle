@@ -28,13 +28,38 @@
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/devs/DevsTypes.hpp>
 #include <vle/devs/ExternalEventList.hpp>
-#include <vle/devs/InstantaneousEventList.hpp>
-#include <vle/devs/StateEvent.hpp>
+#include <vle/devs/RequestEventList.hpp>
+#include <vle/devs/ObservationEvent.hpp>
 #include <vle/utils/Debug.hpp>
 
 
 
 namespace vle { namespace devs {
+
+std::map < Simulator*, EventBagModel >::value_type&
+    CompleteEventBagModel::topBag()
+{
+    while (_itbags != _bags.end()) {
+        if ((*_itbags).first->dynamics()->isExecutive()) {
+            _exec.push_back(&(*_itbags));
+            _itexec = _exec.begin();
+            _itbags++;
+        } else {
+            std::map < Simulator*, EventBagModel >::iterator r = _itbags;
+            ++_itbags;
+            return *r;
+        }
+    }
+
+    while (_itexec != _exec.end()) {
+        std::list < std::map < Simulator*, EventBagModel >::value_type*
+            >::iterator r = _itexec;
+        ++_itexec;
+        return **r;
+    }
+
+    Throw(utils::InternalError, "Top bag problem");
+}
 
 void CompleteEventBagModel::delModel(Simulator* mdl)
 {
@@ -44,12 +69,15 @@ void CompleteEventBagModel::delModel(Simulator* mdl)
         _bags.erase(it);
     }
 
-    for (std::deque < StateEvent* >::iterator it = _states.begin();
+    for (std::deque < ObservationEvent* >::iterator it = _states.begin();
          it != _states.end(); ++it) {
         if ((*it)->getModel() == mdl) {
             _states.erase(it);
         }
     }
+
+    std::map < Simulator*, EventBagModel >::iterator    _itbags;
+        std::list < std::map < Simulator*, EventBagModel >::value_type* >::iterator _itexec;
 }
 
 EventTable::EventTable(size_t sz)
@@ -68,8 +96,8 @@ EventTable::~EventTable()
     }
 
     {
-	StateEventList::iterator it = mStateEventList.begin();
-	while (it != mStateEventList.end()) {
+	ObservationEventList::iterator it = mObservationEventList.begin();
+	while (it != mObservationEventList.end()) {
 	    delete (*it);
 	    ++it;
 	}
@@ -86,7 +114,7 @@ EventTable::~EventTable()
 
 size_t EventTable::getEventNumber() const
 {
-    size_t sum = mStateEventList.size() + mInternalEventList.size();
+    size_t sum = mObservationEventList.size() + mInternalEventList.size();
 
     for (ExternalEventModel::const_iterator it = mExternalEventModel.begin();
 	     it != mExternalEventModel.end(); ++it) {
@@ -108,14 +136,14 @@ void EventTable::cleanInternalEventList()
 
 }
 
-void EventTable::cleanStateEventList()
+void EventTable::cleanObservationEventList()
 {
-    while (not mStateEventList.empty() and
-           not mStateEventList[0]->isValid()) {
-        delete mStateEventList[0];
-        std::pop_heap(mStateEventList.begin(), mStateEventList.end(),
+    while (not mObservationEventList.empty() and
+           not mObservationEventList[0]->isValid()) {
+        delete mObservationEventList[0];
+        std::pop_heap(mObservationEventList.begin(), mObservationEventList.end(),
                       stateLessThan);
-        mStateEventList.pop_back();
+        mObservationEventList.pop_back();
     }
 }
 
@@ -126,21 +154,21 @@ const Time& EventTable::topEvent()
     } else {
         cleanInternalEventList();
         if (not mInternalEventList.empty()) {
-            cleanStateEventList();
-            if (not mStateEventList.empty()) {
+            cleanObservationEventList();
+            if (not mObservationEventList.empty()) {
                 if (mInternalEventList[0]->getTime() <=
-                    mStateEventList[0]->getTime()) {
+                    mObservationEventList[0]->getTime()) {
                     return mInternalEventList[0]->getTime();
                 } else {
-                    return mStateEventList[0]->getTime();
+                    return mObservationEventList[0]->getTime();
                 }
             } else {
                 return mInternalEventList[0]->getTime();
             }
         } else {
-            cleanStateEventList();
-            if (not mStateEventList.empty()) {
-                return mStateEventList[0]->getTime();
+            cleanObservationEventList();
+            if (not mObservationEventList.empty()) {
+                return mObservationEventList[0]->getTime();
             } else {
                 return Time::infinity;
             }
@@ -165,20 +193,20 @@ CompleteEventBagModel& EventTable::popEvent()
 
         while (not mExternalEventModel.empty()) {
             Simulator* mdl = (*mExternalEventModel.begin()).first;
-	    mCompleteEventBagModel.getBag(mdl).addExternal(
-		(*mExternalEventModel.begin()).second.first);
-	    mCompleteEventBagModel.getBag(mdl).addInstantaneous(
-		(*mExternalEventModel.begin()).second.second);
+            EventBagModel& bagmodel = mCompleteEventBagModel.getBag(mdl);
+            bagmodel.addExternal((*mExternalEventModel.begin()).second.first);
+            bagmodel.addRequest((*mExternalEventModel.begin()).second.second);
 	    mExternalEventModel.erase(mExternalEventModel.begin());
 	}
 
 	if (mCompleteEventBagModel.emptyBag())
-	  while (not mStateEventList.empty() and
-		 mStateEventList[0]->getTime() == mCurrentTime) {
-	    mCompleteEventBagModel.addState(mStateEventList[0]);
-	    popStateEvent();
+	  while (not mObservationEventList.empty() and
+		 mObservationEventList[0]->getTime() == mCurrentTime) {
+	    mCompleteEventBagModel.addState(mObservationEventList[0]);
+	    popObservationEvent();
 	  }
     }
+    mCompleteEventBagModel.init();
     return mCompleteEventBagModel;
 }
 
@@ -212,19 +240,19 @@ bool EventTable::putExternalEvent(ExternalEvent* event)
     return true;
 }
 
-bool EventTable::putInstantaneousEvent(InstantaneousEvent* event)
+bool EventTable::putRequestEvent(RequestEvent* event)
 {
     Simulator* mdl = event->getTarget();
-    Assert(utils::InternalError, mdl, "Put instantaneous event.");
+    Assert(utils::InternalError, mdl, "Put Request event.");
 
     mExternalEventModel[mdl].second.addEvent(event);
     return true;
 }
 
-bool EventTable::putStateEvent(StateEvent* event)
+bool EventTable::putObservationEvent(ObservationEvent* event)
 {
-    mStateEventList.push_back(event);
-    std::push_heap(mStateEventList.begin(), mStateEventList.end(),
+    mObservationEventList.push_back(event);
+    std::push_heap(mObservationEventList.begin(), mObservationEventList.end(),
                    stateLessThan);
 
     return true;
@@ -245,12 +273,12 @@ void EventTable::popInternalEvent()
     }
 }
 
-void EventTable::popStateEvent()
+void EventTable::popObservationEvent()
 {
-    if (not mStateEventList.empty()) {
-        std::pop_heap(mStateEventList.begin(), mStateEventList.end(),
+    if (not mObservationEventList.empty()) {
+        std::pop_heap(mObservationEventList.begin(), mObservationEventList.end(),
                       stateLessThan);
-        mStateEventList.pop_back();
+        mObservationEventList.pop_back();
     }
 }
 
@@ -275,8 +303,8 @@ void EventTable::delModelEvents(Simulator* mdl)
     }
 
     {
-        for (StateEventList::iterator it = mStateEventList.begin();
-             it != mStateEventList.end(); ++it) {
+        for (ObservationEventList::iterator it = mObservationEventList.begin();
+             it != mObservationEventList.end(); ++it) {
             if  ((*it)->getModel() == mdl) {
                 (*it)->invalidate();
             }

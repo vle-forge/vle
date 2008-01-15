@@ -24,8 +24,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef DEVS_EXECUTIVE_HPP
-#define DEVS_EXECUTIVE_HPP
+#ifndef VLE_DEVS_EXECUTIVE_HPP
+#define VLE_DEVS_EXECUTIVE_HPP
 
 #include <vle/devs/Dynamics.hpp>
 #include <vle/graph/CoupledModel.hpp>
@@ -45,46 +45,55 @@ namespace vle { namespace devs {
     {
     public:
 	/**
-	 * Constructor of the dynamics of an atomic model
-	 *
+	 * @brief Constructor of the Executive of an atomic model
 	 * @param model the atomic model to which belongs the dynamics
 	 */
-        Executive(const graph::AtomicModel& model) : 
-            Dynamics(model)
+        Executive(const graph::AtomicModel& model,
+                  const devs::InitEventList& events) : 
+            Dynamics(model, events),
+            m_coordinator(0)
         { }
 
 	/**
-	 * Destructor (nothing to do)
-	 *
+	 * @brief Destructor (nothing to do)
 	 * @return none
 	 */
         virtual ~Executive()
         { }
 
-
-        inline virtual bool is_executive() const
+        /** 
+         * @brief If this function return true, then a cast to an Executive
+         * object is produce and the set_coordinator function is call. Executive
+         * permit to manipulate graph::CoupledModel and devs::Coordinator at
+         * runtime of the simulation.
+         * @return false if Dynamics is not an Executive.
+         */
+        inline virtual bool isExecutive() const
         { return true; }
 
-        inline void set_coordinator(Coordinator* coordinator)
+        /** 
+         * @brief Assign a coordinator to the Executive model to give access to
+         * vle::graph, vle::devs and vle::vpz API.
+         * @param coordinator A reference to the coordinator.
+         */
+        inline void setCoordinator(Coordinator* coordinator)
         { m_coordinator = coordinator; }
 
     protected:
-        inline Coordinator& coordinator() const
-        { return *m_coordinator; }
+        Coordinator& coordinator() const;
 
-        inline graph::CoupledModel* coupledmodel() const
-        { return getModel().getParent(); }
+        graph::CoupledModel& coupledmodel() const;
 
-        inline Coordinator& coordinator()
-        { return *m_coordinator; }
+        Coordinator& coordinator();
 
-        inline graph::CoupledModel* coupledmodel()
-        { return getModel().getParent(); }
+        graph::CoupledModel& coupledmodel();
 
     private:
         Coordinator*    m_coordinator; /** Reference to the coordinator object
                                          to build, delete or construct new
                                          models at runtime. */
+
+        void isInitialized() const;
     };
 
 }} // namespace vle devs

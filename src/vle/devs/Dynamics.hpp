@@ -34,28 +34,31 @@
 #include <vle/devs/EventTable.hpp>
 #include <vle/devs/InternalEvent.hpp>
 #include <vle/devs/ExternalEvent.hpp>
-#include <vle/devs/StateEvent.hpp>
+#include <vle/devs/ExternalEventList.hpp>
+#include <vle/devs/ObservationEvent.hpp>
+#include <vle/graph/AtomicModel.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
 #include <vle/value/Boolean.hpp>
 #include <vle/value/String.hpp>
-#include <libxml++/libxml++.h>
 #include <string>
 
 
 #define DECLARE_DYNAMICS(mdl) \
     extern "C" { \
         vle::devs::Dynamics* \
-        makeNewDynamics(const vle::graph::AtomicModel& model) \
-        { return new mdl(model); } \
+        makeNewDynamics(const vle::graph::AtomicModel& model, \
+                        const vle::devs::InitEventList& events) \
+        { return new mdl(model, events); } \
     }
 
 #define DECLARE_NAMED_DYNAMICS(name, mdl) \
     extern "C" { \
         vle::devs::Dynamics* \
-        makeNewDynamics##name(const vle::graph::AtomicModel& model) \
-        { return new mdl(model); } \
+        makeNewDynamics##name(const vle::graph::AtomicModel& model, \
+                              const vle::devs::InitEventList& events) \
+        { return new mdl(model, events); } \
     }
 
 namespace vle { namespace devs {
@@ -72,47 +75,149 @@ namespace vle { namespace devs {
     {
     public:
 	/**
-	 * Constructor of the dynamics of an atomic model
-	 *
+         * @brief Constructor of the dynamics of an atomic model. Process the
+         * init events: these events occurs only at the beginning of the
+         * simulation and initialize the state of the model.
 	 * @param model the atomic model to which belongs the dynamics
+	 * @param event the init event list.
 	 */
-        Dynamics(const vle::graph::AtomicModel& model) : 
+        Dynamics(const vle::graph::AtomicModel& model,
+                 const vle::devs::InitEventList&  /* events */) : 
             m_model(model)
         { }
 
 	/**
-	 * Destructor (nothing to do)
-	 *
-	 * @return none
+	 * @brief Destructor (nothing to do)
 	 */
         virtual ~Dynamics()
         { }
+
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+	/**
+         * @brief Process the initialization of the model by initializing the
+         * initial state and return the duration (or timeAdvance) of the initial
+         * state.
+         * @param time the time of the creation of this model.
+	 * @return duration of the initial state.
+	 */
+        virtual vle::devs::Time init(const vle::devs::Time& /* time */)
+        { return Time::infinity; }
+
+	/**
+	 * @brief Process the output function: compute the output function.
+         * @param time the time of the occurrence of output function.
+         * @param output the list of external events (output parameter).
+	 */
+        virtual void output(const vle::devs::Time& /* time */,
+                            vle::devs::ExternalEventList& /* output */)
+        { }
+
+	/**
+         * @brief Process the time advance function: compute the duration of the
+         * current state.
+         * @return duration of the current state.
+	 */
+        virtual vle::devs::Time timeAdvance()
+        { return Time::infinity; }
+
+	/**
+         * @brief Process an internal transition: compute the new state of the
+         * model with the internal transition function.
+	 * @param time the date of occurence of this event.
+	 */
+        virtual void internalTransition(
+            const vle::devs::Time& /* time */)
+        { }
+
+	/**
+         * @brief Process an external transition: compute the new state of the
+         * model when an external event occurs.
+         * @param event the external event with of the port.
+         * @param time the date of occurrence of this event.
+	 */
+        virtual void externalTransition(
+	    const vle::devs::ExternalEventList& /* event */,
+            const vle::devs::Time& /* time */)
+        { }
+        
+        /**
+         * @brief Process the confluent transition: select the transition to
+         * call when an internal and one or more external event appear in the
+         * same time.
+         * @param internal the internal event.
+         * @param extEventlist the external events list.
+         * @return Event::INTERNAL if internal is priority or Event::EXTERNAL.
+         */
+        virtual vle::devs::Event::EventType confluentTransitions(
+	    const vle::devs::InternalEvent& /* internal */,
+            const vle::devs::ExternalEventList& /* extEventlist */) const
+        { return Event::INTERNAL; }
+
+        /**
+         * @brief Process a request event: these functions occurs when an
+         * RequestEvent is push into an ExternalEventList by the
+         * output function.
+         * @param event RequestEvent to process.
+         * @param time the date of occurrence of this event.
+         * @param output the list of external events (output parameter).
+         * @return a response to the model. This bag can include External and
+         * Request event.
+         */
+        virtual void request(
+	    const vle::devs::RequestEvent& /* event */,
+            const vle::devs::Time& /* time */,
+            vle::devs::ExternalEventList& /* output */) const
+        { }
+
+	/**
+         * @brief Process an observation event: compute the current state of the
+         * model at a specified time and for a specified port.
+	 * @param event the state event with of the port
+	 * @return the value of state variable
+	 */
+        virtual vle::value::Value observation(
+	    const vle::devs::ObservationEvent& /* event */) const
+        { return value::ValueBase::empty; }
+
+        /**
+         * @brief When the simulation of the atomic model is finished, the
+         * finish method is invoked.
+	 */
+        virtual void finish()
+        { }
+
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
         /** 
          * @brief If this function return true, then a cast to an Executive
          * object is produce and the set_coordinator function is call. Executive
          * permit to manipulate graph::CoupledModel and devs::Coordinator at
          * runtime of the simulation.
-         * 
          * @return false if Dynamics is not an Executive.
          */
-        inline virtual bool is_executive() const
+        inline virtual bool isExecutive() const
         { return false; }
 
         /** 
          * @brief If this function return true, then a cast to a DynamicsWrapper
          * object is produce and the set_model and set_library function are call.
-         * 
          * @return false if Dynamics is not a DynamicsWrapper.
          */
-        inline virtual bool is_wrapper() const
+        inline virtual bool isWrapper() const
         { return false; }
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 	/**
-	 * Return a reference of the atomic model to which belongs the dynamics
-	 *
+         * @brief Return a reference of the atomic model to which belongs the
+         * dynamics
 	 * @return pointer on the atomic model
 	 */
         inline const vle::graph::AtomicModel& getModel() const
@@ -247,128 +352,6 @@ namespace vle { namespace devs {
                            const std::string& portName,
                            const std::string& attributeName,
                            const std::string& attributeValue) const;
-
-
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- 	  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-
-	/**
-	 * When the simulation of the atomic model is finished, the
-	 * finish method is invoked.
-	 *
-	 */
-        virtual void finish()
-        { }
-
-	/**
-	 * Compute the output function.
-	 *
-         * @param time the time of the occurrence of output function.
-         * @param output the list of external events (output parameter).
-	 *
-	 */
-        virtual void getOutputFunction(
-	    const vle::devs::Time& /* time */,
-            vle::devs::ExternalEventList& /* output */)
-        { }
-
-
-	/**
-	 * Time advance function: compute the duration of the current state.
-	 *
-	 * @return duration of the current state.
-	 */
-        virtual vle::devs::Time getTimeAdvance()
-        { return Time::infinity; }
-
-	/**
-	 * Initialize the model by initializing the initial state and return
-         * the date of the first time advance.
-	 *
-	 * @return duration of the initial state.
-	 */
-        virtual vle::devs::Time init()
-        { return Time::infinity; }
-
-        /**
-         * Compute the selected event when an external event and an internal
-         * event occurs at the same time. By default, the internal event
-         * is process. This function  ask modeller to make a choice between the
-         * internal event or external event list. 
-         *
-         * @param internal the internal event.
-         * @param extEventlist the external events list.
-         *
-         * @return Event::INTERNAL if internal is priority or Event::EXTERNAL.
-         */
-        virtual vle::devs::Event::EventType processConflict(
-	    const vle::devs::InternalEvent& /* internal */,
-            const vle::devs::ExternalEventList& /* extEventlist */) const
-        { return Event::INTERNAL; }
-
-	/**
-         * Process the init events: these events occurs only at the beginning
-         * of the simulation and initialize the state of the model.
-	 *
-	 * @param event the init event list.
-	 */
-        virtual void processInitEvents(
-	    const vle::devs::InitEventList& /* event */)
-        { }
-
-	/**
-         * Compute the new state of the model with the internal transition
-         * function.
-	 *
-	 * @param event the internal event with of the port
-	 */
-        virtual void processInternalEvent(
-	    const vle::devs::InternalEvent& /* event */)
-        { }
-
-	/**
-         * Compute the new state of the model when an external event occurs.
-	 *
-         * @param event the external event with of the port.
-         * @param time the date of occurrence of this event.
-	 */
-        virtual void processExternalEvents(
-	    const vle::devs::ExternalEventList& /* event */,
-            const vle::devs::Time& /* time */)
-        { }
-
-        /**
-         * Process an instantaneous event: these functions occurs when an
-         * IntantaneousEvent is push into an ExternalEventList by
-         * OutputFunction or by processInstantaneousEvent.
-         *
-         * @param evt InstantaneousEvent to process.
-         * @param time the date of occurrence of this event.
-         * @param output the list of external events (output parameter).
-         *
-         * @return a response to the model. This bag can include External and
-         * Instantaneous event.
-         */
-        virtual void processInstantaneousEvent(
-	    const vle::devs::InstantaneousEvent& /* event */,
-            const vle::devs::Time& /* time */,
-            vle::devs::ExternalEventList& /* output */) const
-        { }
-
-	/**
-	 * Compute the current state of the model at a specified time and
-	 * for a specified port ; the name of port is the same of the
-	 * name of the state variable
-	 *
-	 * @param event the state event with of the port
-	 *
-	 * @return the value of state variable
-	 */
-        virtual vle::value::Value processStateEvent(
-	    const vle::devs::StateEvent& /* event */) const
-        { return value::ValueBase::empty; }
 
     private:
         const graph::AtomicModel&   m_model;

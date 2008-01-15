@@ -32,7 +32,8 @@ namespace vle { namespace extension {
 	typedef std::map < std::string, std::deque < std::pair < double, double > > > valueList;
 
     public:
-        DifferenceEquation(const graph::AtomicModel& model);
+        DifferenceEquation(const graph::AtomicModel& model,
+                           const devs::InitEventList& events);
 
         virtual ~DifferenceEquation() { }
 
@@ -42,33 +43,30 @@ namespace vle { namespace extension {
 	double getValue(const char* name, int shift = 0);
 	double getValue(int shift = 0) const;
 
-        virtual devs::Time init();
+        virtual devs::Time init(const devs::Time& time);
 
-        virtual void getOutputFunction(
+        virtual void output(
 	    const devs::Time& time,
             devs::ExternalEventList& output);
 
-        virtual devs::Time getTimeAdvance();
+        virtual devs::Time timeAdvance();
 
-        virtual devs::Event::EventType processConflict(
-	    const devs::InternalEvent& internal,
+        virtual devs::Event::EventType confluentTransitions(
+	    const devs::Time& internal,
             const devs::ExternalEventList& extEventlist) const;
 
-        virtual void processInitEvents(
-	    const devs::InitEventList& event);
+        virtual void internalTransition(
+	    const devs::Time& event);
 
-        virtual void processInternalEvent(
-	    const devs::InternalEvent& event);
-
-        virtual void processExternalEvents(
+        virtual void externalTransition(
 	    const devs::ExternalEventList& event,
             const devs::Time& time);
 
-        virtual value::Value processStateEvent(
-	    const devs::StateEvent& event) const;
+        virtual value::Value observation(
+	    const devs::ObservationEvent& event) const;
 
-        virtual void processInstantaneousEvent(
-            const devs::InstantaneousEvent& /* event */,
+        virtual void request(
+            const devs::RequestEvent& /* event */,
             const devs::Time& /* time */,
             devs::ExternalEventList& /* output */) const;
 

@@ -28,7 +28,7 @@
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/graph/Model.hpp>
 #include <vle/devs/Coordinator.hpp>
-#include <vle/devs/StateEvent.hpp>
+#include <vle/devs/ObservationEvent.hpp>
 #include <vle/value/Map.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/value/String.hpp>
@@ -38,8 +38,9 @@ namespace vle { namespace extension {
 
 
 
-DSDevs::DSDevs(const graph::AtomicModel& model) :
-    devs::Executive(model),
+DSDevs::DSDevs(const graph::AtomicModel& model,
+               const devs::InitEventList& events) :
+    devs::Executive(model, events),
     m_state(IDLE),
     m_response(false),
     m_coupledModel(0)
@@ -50,13 +51,13 @@ DSDevs::DSDevs(const graph::AtomicModel& model) :
     m_coupledModel = model.getParent();
 }
 
-devs::Time DSDevs::init()
+devs::Time DSDevs::init(const devs::Time& /* time */)
 {
     m_state = IDLE;
     return devs::Time::infinity;
 }
 
-void DSDevs::getOutputFunction(const devs::Time& /* time */,
+void DSDevs::output(const devs::Time& /* time */,
                                devs::ExternalEventList& output) 
 {
     devs::ExternalEvent* ev = 0;
@@ -88,19 +89,19 @@ void DSDevs::getOutputFunction(const devs::Time& /* time */,
     }
 }
 
-devs::Time DSDevs::getTimeAdvance()
+devs::Time DSDevs::timeAdvance()
 {
     return (m_state != IDLE) ? 0 : devs::Time::infinity;
 }
 
-devs::Event::EventType DSDevs::processConflict(
-    const devs::InternalEvent& /* internal */,
+devs::Event::EventType DSDevs::confluentTransitions(
+    const devs::Time& /* internal */,
     const devs::ExternalEventList& /* extEventlist */) const
 {
     return devs::Event::EXTERNAL;
 }
 
-void DSDevs::processExternalEvents(const devs::ExternalEventList& event,
+void DSDevs::externalTransition(const devs::ExternalEventList& event,
                                    const devs::Time& /* time */)
 {
     devs::ExternalEventList::const_iterator it = event.begin();
@@ -116,14 +117,14 @@ void DSDevs::processExternalEvents(const devs::ExternalEventList& event,
     }
 }
 
-void DSDevs::processInternalEvent(const devs::InternalEvent& /* event */)
+void DSDevs::internalTransition(const devs::Time& /* event */)
 {
     if (m_state != IDLE) {
         m_state = IDLE;
     }
 }
 
-value::Value DSDevs::processStateEvent(const devs::StateEvent& event) const
+value::Value DSDevs::observation(const devs::ObservationEvent& event) const
 {
     std::ostringstream out;
 

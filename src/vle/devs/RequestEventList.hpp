@@ -1,8 +1,7 @@
 /**
- * @file devs/InstantaneousEvent.cpp
+ * @file devs/RequestEventList.hpp
  * @author The VLE Development Team.
- * @brief Instantaneous event based on the devs::ExternalEvent class and are
- * build by graph::Model to precess Instantaneous event.
+ * @brief A EventList container to store devs::RequestEvent. 
  */
 
 /*
@@ -24,13 +23,16 @@
  * 02111-1307, USA.
  */
 
-#include <vle/devs/InstantaneousEvent.hpp>
+#ifndef DEVS_REQUESTEVENTLIST_HPP
+#define DEVS_REQUESTEVENTLIST_HPP
+
+#include <vle/devs/EventList.hpp>
+#include <vle/devs/RequestEvent.hpp>
 
 namespace vle { namespace devs {
 
-bool InstantaneousEvent::isInstantaneous() const
-{
-    return true;
-}
+    typedef EventList < RequestEvent > RequestEventList;
 
 }} // namespace vle devs
+
+#endif

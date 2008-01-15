@@ -42,7 +42,7 @@ View::~View()
     delete m_stream;
 }
 
-StateEvent* View::addObservable(Simulator* model,
+ObservationEvent* View::addObservable(Simulator* model,
                                     const std::string& portname,
                                     const Time& currenttime)
 {
@@ -55,7 +55,7 @@ StateEvent* View::addObservable(Simulator* model,
         m_stream->processNewObservable(model, portname, currenttime,
                                        getName());
         if (isTimed()) {
-            return new StateEvent(currenttime, model, m_name, portname);
+            return new ObservationEvent(currenttime, model, m_name, portname);
         }
     }
     return 0;

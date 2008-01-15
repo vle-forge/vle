@@ -29,24 +29,6 @@
 
 namespace vle { namespace devs {
 
-bool InternalEvent::isExternal() const
-{
-    return false;
-}
 
-bool InternalEvent::isInternal() const
-{
-    return true;
-}
-
-bool InternalEvent::isInit() const
-{
-    return false;
-}
-
-bool InternalEvent::isState() const
-{
-  return false;
-}
 
 }} // namespace vle devs

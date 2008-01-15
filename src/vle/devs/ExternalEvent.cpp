@@ -29,34 +29,9 @@
 
 namespace vle { namespace devs {
 
-const std::string& ExternalEvent::getTargetModelName() const
+const std::string ExternalEvent::getTargetModelName() const
 {
     return m_target->getName();
-}
-
-bool ExternalEvent::isExternal() const
-{
-    return true;
-}
-
-bool ExternalEvent::isInternal() const
-{
-    return false;
-}
-
-bool ExternalEvent::isInit() const
-{
-    return false;
-}
-
-bool ExternalEvent::isState() const
-{
-  return false;
-}
-
-bool ExternalEvent::isInstantaneous() const
-{
-    return false;
 }
 
 }} // namespace vle devs

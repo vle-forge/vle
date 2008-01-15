@@ -86,10 +86,10 @@ namespace vle { namespace devs {
                                              const std::string& view) = 0;
 
         /** 
-         * @brief Process the devs::StateEvent and write it to the Stream.
-         * @param event the devs::StateEvent to write.
+         * @brief Process the devs::ObservationEvent and write it to the Stream.
+         * @param event the devs::ObservationEvent to write.
          */
-        virtual void process(const StateEvent& event) = 0;
+        virtual void process(const ObservationEvent& event) = 0;
 
         /**
          * Close the output stream.

@@ -44,13 +44,8 @@ namespace vle { namespace devs {
 	virtual ~ InternalEvent()
 	{ }
 
-	virtual bool isExternal() const;
-
-	virtual bool isInit() const;
-
-	virtual bool isInternal() const;
-
-	virtual bool isState() const;
+        virtual bool isInternal() const
+        { return true; }
 
         /**
 	 * @return arrived time.

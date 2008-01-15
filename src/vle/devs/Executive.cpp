@@ -1,8 +1,7 @@
 /** 
- * @file FinishView.cpp
+ * @file Executive.cpp
  * @brief 
  * @author The vle Development Team
- * @date 2008-01-11
  */
 
 /*
@@ -22,26 +21,40 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#include <vle/devs/FinishView.hpp>
-#include <vle/devs/StreamWriter.hpp>
-
-
+#include <vle/devs/Executive.hpp>
+#include <vle/utils/Debug.hpp>
 
 namespace vle { namespace devs {
 
-FinishView::FinishView(const std::string& name, StreamWriter* stream) :
-    View(name, stream)
+Coordinator& Executive::coordinator() const
 {
+    isInitialized();
+    return *m_coordinator;
 }
 
-ObservationEvent* FinishView::processObservationEvent(ObservationEvent* event)
+graph::CoupledModel& Executive::coupledmodel() const
 {
-    value::Value val = event->getAttributeValue(event->getPortName());
+    isInitialized();
+    return *getModel().getParent();
+}
 
-    if (val.get()) {
-        m_stream->process(*event);
-    }
-    return 0;
+Coordinator& Executive::coordinator()
+{
+    isInitialized();
+    return *m_coordinator;
+}
+
+graph::CoupledModel& Executive::coupledmodel()
+{
+    isInitialized();
+    return *getModel().getParent();
+}
+
+void Executive::isInitialized() const
+{
+    Assert(utils::ModellingError, m_coordinator, boost::format(
+            "Executive model: do not use constructor to manage " \
+            "the DEVS graph (model '%1%')") % getModel().getName());
 }
 
 }} // namespace vle devs

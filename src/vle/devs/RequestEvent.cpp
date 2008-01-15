@@ -1,12 +1,12 @@
 /**
- * @file devs/StateEvent.cpp
+ * @file devs/RequestEvent.cpp
  * @author The VLE Development Team.
- * @brief State event use to get information from graph::Model using
- * devs::TimedView or devs::EventView.
+ * @brief Request event based on the devs::ExternalEvent class and are
+ * build by graph::Model to precess Request event.
  */
 
 /*
- * Copyright (c) 2004, 2005 The VLE Development Team.
+ * Copyright (c) 2005 The VLE Development Team.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,29 +24,10 @@
  * 02111-1307, USA.
  */
 
-#include <vle/devs/StateEvent.hpp>
-#include <string>
+#include <vle/devs/RequestEvent.hpp>
 
 namespace vle { namespace devs {
 
-bool StateEvent::isExternal() const
-{
-    return false;
-}
 
-bool StateEvent::isInternal() const
-{
-    return false;
-}
-
-bool StateEvent::isInit() const
-{
-    return false;
-}
-
-bool StateEvent::isState() const
-{
-  return true;
-}
 
 }} // namespace vle devs

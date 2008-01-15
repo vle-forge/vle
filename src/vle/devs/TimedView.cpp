@@ -38,7 +38,7 @@ TimedView::TimedView(const std::string& name, StreamWriter* stream,
 {
 }
 
-StateEvent* TimedView::processStateEvent(StateEvent* event)
+ObservationEvent* TimedView::processObservationEvent(ObservationEvent* event)
 {
     value::Value value = event->getAttributeValue(event->getPortName());
 
@@ -46,10 +46,10 @@ StateEvent* TimedView::processStateEvent(StateEvent* event)
         m_stream->process(*event);
     }
 
-    return new StateEvent(event->getTime() + m_timeStep,
-                          event->getModel(),
-                          getName(),
-                          event->getPortName());
+    return new ObservationEvent(event->getTime() + m_timeStep,
+                                event->getModel(),
+                                getName(),
+                                event->getPortName());
 }
 
 }} // namespace vle devs

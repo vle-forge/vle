@@ -66,7 +66,8 @@ void RootCoordinator::load(const vpz::Vpz& io)
                                       io.project().experiment(),
                                       io.project().model().atomicModels());
 
-    m_coordinator = new Coordinator(*m_modelfactory, io.project().model());
+    m_coordinator = new Coordinator(*m_modelfactory);
+    m_coordinator->init(io.project().model());
 
     m_root = io.project().model().model();
 }
@@ -74,7 +75,6 @@ void RootCoordinator::load(const vpz::Vpz& io)
 void RootCoordinator::init()
 {
     m_currentTime = devs::Time(0);
-    m_coordinator->init();
 }
 
 bool RootCoordinator::run()
@@ -85,6 +85,7 @@ bool RootCoordinator::run()
     } else if (m_currentTime > m_duration) {
         return false;
     }
+
     m_coordinator->run();
     return true;
 }

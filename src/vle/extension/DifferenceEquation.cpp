@@ -30,24 +30,56 @@ using namespace devs;
 using namespace graph;
 using namespace value;
 
-DifferenceEquation::DifferenceEquation(const AtomicModel& model) :
-    Dynamics(model), 
+DifferenceEquation::DifferenceEquation(const AtomicModel& model,
+                                       const InitEventList& events) :
+    Dynamics(model, events), 
     mTimeStep(0),
     mDelta(0), 
     mMultiple(0),
     mSize(-1),
     mInitValue(false)
 {
+
+    if (events.exist("name")) {
+        mVariableName = toString(events.get("name"));
+    } else {
+        mVariableName = getModelName();
+    }
+
+    if (events.exist("size")) {
+        mSize = (int)toInteger(events.get("size"));
+    } else {
+        mSize = -1;
+    }
+
+    if (events.exist("value")) {
+        mInitialValue = toDouble(events.get("value"));
+        mInitValue = true;
+    }
+
+    if (events.exist("delta")) {
+        mDelta = toDouble(events.get("delta"));
+        if (events.exist("multiple")) {
+            mMultiple = toInteger(events.get("multiple"));
+        } else {
+            mMultiple = 1;
+        }
+    } else {
+        mDelta = 0;
+        mMultiple = 0;
+    }
+
+    mTimeStep = mMultiple * mDelta;
 }
 
 void DifferenceEquation::addValue(const std::string& name,
-				  const devs::Time& time,
-				  double value)
+                                  const Time& time,
+                                  double value)
 {
     mValues[name].push_front(std::pair < double, double >(time.getValue(),
                                                           value));
     if (mSize != -1 and (int)mValues[name].size() > mSize)
-	mValues[name].pop_back();
+        mValues[name].pop_back();
 }
 
 void DifferenceEquation::displayValues()
@@ -55,17 +87,17 @@ void DifferenceEquation::displayValues()
     valueList::const_iterator it = mValues.begin();
 
     while (it != mValues.end()) {
-	std::deque < std::pair < double, double > > list = it->second;
+        std::deque < std::pair < double, double > > list = it->second;
         std::deque < std::pair < double, double > >::const_iterator it2 =
             list.begin();
-	
-	std::cout << it->first << ":";
-	while (it2 != list.end()) {
-	    std::cout << "(" << it2->first << "," << it2->second << ") ";
-	    ++it2;
-	}    
-	std::cout << std::endl;
-	++it;
+
+        std::cout << it->first << ":";
+        while (it2 != list.end()) {
+            std::cout << "(" << it2->first << "," << it2->second << ") ";
+            ++it2;
+        }    
+        std::cout << std::endl;
+        ++it;
     }
 }
 
@@ -78,14 +110,14 @@ double DifferenceEquation::getValue(int shift) const
     if (shift == 0) {
         return mValue.front(); 
     } else {
-	std::deque < double >::const_iterator it = mValue.begin();
+        std::deque < double >::const_iterator it = mValue.begin();
 
         if ((int)(mValue.size() - 1) >= -shift) {
             return mValue[-shift];
         } else {
             Throw(utils::InternalError, 
-                   (boost::format("%1% - getValue - shift too large") %
-                    getModelName()).str());
+                  (boost::format("%1% - getValue - shift too large") %
+                   getModelName()).str());
         }
     }
 }
@@ -104,7 +136,7 @@ double DifferenceEquation::getValue(const char* name, int shift)
     if (shift == 0) {
         return mValues[name].front().second;
     } else {
-	std::deque < std::pair < double, double > > list = mValues[name];
+        std::deque < std::pair < double, double > > list = mValues[name];
 
         if ((int)(list.size() - 1) >= -shift) {
             return list[-shift].second;
@@ -116,41 +148,7 @@ double DifferenceEquation::getValue(const char* name, int shift)
     }
 }
 
-void DifferenceEquation::processInitEvents(const InitEventList& event)
-{
-    if (event.exist("name")) {
-        mVariableName = value::toString(event.get("name"));
-    } else {
-        mVariableName = getModelName();
-    }
-
-    if (event.exist("size")) {
-        mSize = (int)value::toInteger(event.get("size"));
-    } else {
-        mSize = -1;
-    }
-
-    if (event.exist("value")) {
-	mInitialValue = value::toDouble(event.get("value"));
-	mInitValue = true;
-    }
-
-    if (event.exist("delta")) {
-	mDelta = value::toDouble(event.get("delta"));
-        if (event.exist("multiple")) {
-            mMultiple = value::toInteger(event.get("multiple"));
-        } else {
-            mMultiple = 1;
-        }
-    } else {
-	mDelta = 0;
-	mMultiple = 0;
-    }
-
-    mTimeStep = mMultiple * mDelta;
-}
-
-Time DifferenceEquation::init()
+Time DifferenceEquation::init(const devs::Time& /* time */)
 {
     mDependance = getModel().existInputPort("update");
     mActive = getModel().existOutputPort("update");
@@ -163,182 +161,181 @@ Time DifferenceEquation::init()
 
     // si la valeur n'est initialisée alors la valeur est invalide
     mInvalid = !mInitValue;
-    
+
     // dois-je envoyer mes caractéristiques ?
     if (mActive) {
-	mState = PRE_INIT;
-	mSigma = 0;
-	return devs::Time(0);
+        mState = PRE_INIT;
+        mSigma = 0;
+        return Time(0);
     } else if (mDependance) { // est-ce que j'attends les caractéristiques de
-                              // quelqu'un ?
-	mState = INIT;
-	mSigma = devs::Time::infinity;
-	return devs::Time::infinity;
+        // quelqu'un ?
+        mState = INIT;
+        mSigma = Time::infinity;
+        return Time::infinity;
     } else {                  // j'attends rien !
-	mState = RUN;
-	mSigma = mTimeStep;
-	return devs::Time(mTimeStep);
+        mState = RUN;
+        mSigma = mTimeStep;
+        return Time(mTimeStep);
     }
 }
 
-void DifferenceEquation::getOutputFunction(const Time& /*time*/,
-					   ExternalEventList& output) 
+void DifferenceEquation::output(const Time& /*time*/,
+                                ExternalEventList& output) 
 {
     if (mActive and (mState == PRE_INIT or mState == PRE_INIT2 or mState == POST
                      or mState == POST2)) {
-	ExternalEvent* ee = new ExternalEvent("update");
+        ExternalEvent* ee = new ExternalEvent("update");
 
         if (mState == PRE_INIT or mState == PRE_INIT2 or mState == POST or
             mState == POST2) {
-	    ee << devs::attribute("name", mVariableName);
-	    ee << devs::attribute("value", getValue());
-	}
+            ee << attribute("name", mVariableName);
+            ee << attribute("value", getValue());
+        }
 
-	if (mState == PRE_INIT or mState == PRE_INIT2) {
-	    ee << devs::attribute("multiple", (int)mMultiple);
-	    ee << devs::attribute("delta", mDelta);
-	}
-	output.addEvent(ee);
+        if (mState == PRE_INIT or mState == PRE_INIT2) {
+            ee << attribute("multiple", (int)mMultiple);
+            ee << attribute("delta", mDelta);
+        }
+        output.addEvent(ee);
     }
 }
 
-Time DifferenceEquation::getTimeAdvance()
+Time DifferenceEquation::timeAdvance()
 {
     return mSigma;
 }
 
-Event::EventType DifferenceEquation::processConflict(
-    const InternalEvent& /* internal */,
+Event::EventType DifferenceEquation::confluentTransitions(
+    const Time& /* internal */,
     const ExternalEventList& /* extEventlist */) const
 {
     return Event::EXTERNAL;
 }
 
-void DifferenceEquation::processInternalEvent(const InternalEvent& event)
+void DifferenceEquation::internalTransition(const Time& time)
 {
     switch (mState) {
     case PRE_INIT:
-	// est-ce que j'attends les caractéristiques de quelqu'un ?
-	if (mDependance) {
-	    mState = INIT;
-	    mSigma = devs::Time::infinity;
+        // est-ce que j'attends les caractéristiques de quelqu'un ?
+        if (mDependance) {
+            mState = INIT;
+            mSigma = Time::infinity;
         } else { // j'attends rien !
-	    mState = RUN;
-	    mSigma = mTimeStep;
-	}
-	break;
+            mState = RUN;
+            mSigma = mTimeStep;
+        }
+        break;
     case PRE_INIT2:
-	if (mDependance) mState = PRE;
-	else mState = RUN;
-	mSigma = mTimeStep;
-	break;
+        if (mDependance) mState = PRE;
+        else mState = RUN;
+        mSigma = mTimeStep;
+        break;
     case INIT:
-	break;
+        break;
     case PRE:
-// si pas de cycle alors
-	if (mSyncs != 0) break;
+        // si pas de cycle alors
+        if (mSyncs != 0) break;
     case RUN:
-	// je calcule ma nouvelle valeur
-	mLastTime = event.getTime();
-	try {
-	    mValue.push_front(compute(devs::Time(event.getTime().getValue())));
-	    mInvalid = false;
-	}
-	catch(utils::InternalError) {
-	    mInvalid = true;
-	}
-	// je vais propager ma nouvelle valeur à ceux qui
-	// dépendent de moi
-	if (mActive) {
-	    mState = POST;
-	    mSigma = 0;
+        // je calcule ma nouvelle valeur
+        mLastTime = time;
+        try {
+            mValue.push_front(compute(Time(time.getValue())));
+            mInvalid = false;
+        } catch(utils::InternalError) {
+            mInvalid = true;
+        }
+        // je vais propager ma nouvelle valeur à ceux qui
+        // dépendent de moi
+        if (mActive) {
+            mState = POST;
+            mSigma = 0;
         } else {
             if (mDependance) {
                 mState = PRE;
             } else {
                 mState = RUN;
             }
-	    mSigma = mTimeStep;
-	}
-	break;
+            mSigma = mTimeStep;
+        }
+        break;
     case POST:
-	// ma nouvelle valeur est propagée
+        // ma nouvelle valeur est propagée
         if (mDependance) {
             mState = PRE;
         } else {
             mState = RUN;
         }
 
-	mSigma = mTimeStep;
-	break;
+        mSigma = mTimeStep;
+        break;
     case POST2:
-	// ma valeur a été propagée suite à la reception d'une
-	// mise à jour d'une de mes dépendances non synchrones
-	// cette propagation est utile pour la compatibilité avec
-	// QSS
+        // ma valeur a été propagée suite à la reception d'une
+        // mise à jour d'une de mes dépendances non synchrones
+        // cette propagation est utile pour la compatibilité avec
+        // QSS
         if (mDependance) { 
             mState = PRE;
         } else {
             mState = RUN;
         }
-	mSigma = mSigma2;
+        mSigma = mSigma2;
     }
 }
 
-void DifferenceEquation::processExternalEvents(const ExternalEventList& event,
-					       const Time& time)
+void DifferenceEquation::externalTransition(const ExternalEventList& event,
+                                            const Time& time)
 {
-    devs::Time e = time - mLastTime;
+    Time e = time - mLastTime;
     // PROBLEMATIQUE !!!!!!! l'idéal serait : bool end = (e == mSigma);
     bool end = std::abs(e.getValue() - mSigma.getValue()) < 1e-10;
     bool begin = (e == 0);
-    devs::ExternalEventList::const_iterator it = event.begin();
+    ExternalEventList::const_iterator it = event.begin();
     double delta;
     bool reset = false;
-      
+
     while (it != event.end()) {
-	if ((*it)->onPort("update")) {
-	    std::string name = (*it)->getStringAttributeValue("name");
-	    double value = (*it)->getDoubleAttributeValue("value");
-	    bool ok = true;
-	    
-	    // est-ce que je connais ce modèle ? si non alors ...
-	    if (mValues.find(name) == mValues.end() and 
-		(*it)->existAttributeValue("multiple")) {
+        if ((*it)->onPort("update")) {
+            std::string name = (*it)->getStringAttributeValue("name");
+            double value = (*it)->getDoubleAttributeValue("value");
+            bool ok = true;
+
+            // est-ce que je connais ce modèle ? si non alors ...
+            if (mValues.find(name) == mValues.end() and 
+                (*it)->existAttributeValue("multiple")) {
                 unsigned int multiple =
                     (*it)->getIntegerAttributeValue("multiple");
-		
-		// ma dépendance connait son pas de temps
-		if (multiple != 0) {
-		    // est-ce que je suis en attente des
-		    // caractéristiques d'un modèle non défini ?
-		    // si oui alors recherche du modèle et
-		    // suppression de celui-ci de la liste des attentes
-		    if (!mWait.empty()) {
-			std::vector < std::string >::iterator itw = mWait.begin();
-			bool found = false;
-			
-			while (!found and itw != mWait.end()) {
-			    found = (*itw == name);
-			    ++itw;
-			}
-			if (found) mWait.erase(itw);
-		    }
-		    // création de la liste des valeurs reçues
-		    mValues[name] = std::deque < std::pair < double, double > >();
-		    // récupération du delta de ma dépendance,
-		    // c'est utilisé si delta n'a pas été initialisé
-		    delta = (*it)->getDoubleAttributeValue("delta");
-		    // initialisation du facteur multiplicateur
-		    // de ma dépendance
-		    mMultiples[name] = multiple;
-		    // si ma multiplicité est définie alors je
-		    // regarde si c'est un multiple de ma
-		    // multiplicité, si c'est le cas alors la
-		    // réception des valeurs de cette dépendance
-		    // se produiront en même temps que mes
-		    // changements de valeur
-		    if (mMultiple != 0) {
+
+                // ma dépendance connait son pas de temps
+                if (multiple != 0) {
+                    // est-ce que je suis en attente des
+                    // caractéristiques d'un modèle non défini ?
+                    // si oui alors recherche du modèle et
+                    // suppression de celui-ci de la liste des attentes
+                    if (!mWait.empty()) {
+                        std::vector < std::string >::iterator itw = mWait.begin();
+                        bool found = false;
+
+                        while (!found and itw != mWait.end()) {
+                            found = (*itw == name);
+                            ++itw;
+                        }
+                        if (found) mWait.erase(itw);
+                    }
+                    // création de la liste des valeurs reçues
+                    mValues[name] = std::deque < std::pair < double, double > >();
+                    // récupération du delta de ma dépendance,
+                    // c'est utilisé si delta n'a pas été initialisé
+                    delta = (*it)->getDoubleAttributeValue("delta");
+                    // initialisation du facteur multiplicateur
+                    // de ma dépendance
+                    mMultiples[name] = multiple;
+                    // si ma multiplicité est définie alors je
+                    // regarde si c'est un multiple de ma
+                    // multiplicité, si c'est le cas alors la
+                    // réception des valeurs de cette dépendance
+                    // se produiront en même temps que mes
+                    // changements de valeur
+                    if (mMultiple != 0) {
                         if ((multiple > mMultiple and
                              (multiple % mMultiple == 0)) or 
                             (multiple < mMultiple and
@@ -347,121 +344,121 @@ void DifferenceEquation::processExternalEvents(const ExternalEventList& event,
                             ++mSyncs;
                         }
                     }
-		}
-		// ma dépendance ne connait pas son pas de temps
-		else {
-		    mWait.push_back(name);
-		    ok = false;
-		}
-	    }
-	    // est-ce que je suis dans l'état de recevoir les
-	    // valeurs de mes dépendances
-	    if (ok) {
-		addValue(name, time.getValue(), value);
-		// si j'étais en attente de mes dépendances et
-		// que je suis au tout début de l'attente alors
-		// je comptabilise cette dépendance afin de
-		// vérifier que j'ai bien tout reçu et je
-		// pourrais alors lancer mon propre calcul
-		if (mState == PRE and end) 
-		    ++mReceive;
-	    }
-	}
-	// c'est une perturbation d'un modèle externe sur la
-	// variable du modèle
-	else if ((*it)->onPort("perturb")) {
-	    std::string name = (*it)->getStringAttributeValue("name");
-	    double value = (*it)->getDoubleAttributeValue("value");
+                }
+                // ma dépendance ne connait pas son pas de temps
+                else {
+                    mWait.push_back(name);
+                    ok = false;
+                }
+            }
+            // est-ce que je suis dans l'état de recevoir les
+            // valeurs de mes dépendances
+            if (ok) {
+                addValue(name, time.getValue(), value);
+                // si j'étais en attente de mes dépendances et
+                // que je suis au tout début de l'attente alors
+                // je comptabilise cette dépendance afin de
+                // vérifier que j'ai bien tout reçu et je
+                // pourrais alors lancer mon propre calcul
+                if (mState == PRE and end) 
+                    ++mReceive;
+            }
+        }
+        // c'est une perturbation d'un modèle externe sur la
+        // variable du modèle
+        else if ((*it)->onPort("perturb")) {
+            std::string name = (*it)->getStringAttributeValue("name");
+            double value = (*it)->getDoubleAttributeValue("value");
 
-	    mValue.push_front(value);
-	    reset = true;
-	}
-	++it;	
+            mValue.push_front(value);
+            reset = true;
+        }
+        ++it;	
     }
     // je suis en phase d'initialisation
     if (mState == INIT) {
-	// si le modèle se synchronise sur ses dépendances alors
-	// il faut calculer son pas de temps
-	// ce pas de temps est égal au plus petit pas de temps
-	// des dépendances
-	if (mTimeStep == 0 and mWait.empty()) {
+        // si le modèle se synchronise sur ses dépendances alors
+        // il faut calculer son pas de temps
+        // ce pas de temps est égal au plus petit pas de temps
+        // des dépendances
+        if (mTimeStep == 0 and mWait.empty()) {
             std::map < std::string, unsigned int >::const_iterator it;
             it  = mMultiples.begin();
-	    unsigned int min = it->second;
+            unsigned int min = it->second;
 
-	    while (it != mMultiples.end()) {
-		unsigned int multiple = it->second;
+            while (it != mMultiples.end()) {
+                unsigned int multiple = it->second;
 
-		if (min > multiple) min = multiple;
-		++it;
-	    }
-	    mMultiple = min;
-	    it = mMultiples.begin();
-	    while (it != mMultiples.end()) {
-		unsigned int multiple = it->second;
+                if (min > multiple) min = multiple;
+                ++it;
+            }
+            mMultiple = min;
+            it = mMultiples.begin();
+            while (it != mMultiples.end()) {
+                unsigned int multiple = it->second;
 
-		if ((multiple > mMultiple and (multiple % mMultiple == 0)) or 
-		    (multiple < mMultiple and (mMultiple % multiple == 0)) or
-		    (multiple == mMultiple))
-		    ++mSyncs;
-		++it;
-	    }
-	    // si le pas de temps n'est pas défini
-	    if (mDelta == 0) mDelta = delta;
+                if ((multiple > mMultiple and (multiple % mMultiple == 0)) or 
+                    (multiple < mMultiple and (mMultiple % multiple == 0)) or
+                    (multiple == mMultiple))
+                    ++mSyncs;
+                ++it;
+            }
+            // si le pas de temps n'est pas défini
+            if (mDelta == 0) mDelta = delta;
 
-	    mTimeStep = mMultiple * mDelta;
-	    
-	    // si ma valeur initiale n'est pas définie alors je
-	    // la calcule
-	    if (!mInitValue) {
-		mValue.push_front(initValue());
-		mInvalid = false;
-	    }
-	    // je propage mes caractéristiques si nécessaire
-	    mSigma = 0;
-	    mState = PRE_INIT2;
-	}
-	// est-ce que j'ai reçu les caractéristiques de toutes
-	// mes dépendances ? si oui, je calcule ma valeur initiale
-	else if (mWait.empty()) {
-	    if (!mInitValue) {
-		mValue.push_front(initValue());
-		mInvalid = false;
-	    }
-	    mSigma = mTimeStep;
-	    mState = PRE;
-	}
+            mTimeStep = mMultiple * mDelta;
+
+            // si ma valeur initiale n'est pas définie alors je
+            // la calcule
+            if (!mInitValue) {
+                mValue.push_front(initValue());
+                mInvalid = false;
+            }
+            // je propage mes caractéristiques si nécessaire
+            mSigma = 0;
+            mState = PRE_INIT2;
+        }
+        // est-ce que j'ai reçu les caractéristiques de toutes
+        // mes dépendances ? si oui, je calcule ma valeur initiale
+        else if (mWait.empty()) {
+            if (!mInitValue) {
+                mValue.push_front(initValue());
+                mInvalid = false;
+            }
+            mSigma = mTimeStep;
+            mState = PRE;
+        }
     }
     // j'ai tout reçu, je peux passer en mode calcul
     else if (mState == PRE and end and (mReceive == mSyncs or reset)) {
-	mState = RUN;
-	mSigma = 0;
-	mReceive = 0;
+        mState = RUN;
+        mSigma = 0;
+        mReceive = 0;
     }
     // je reçois la valeur d'autres modèles lorsque je ne suis
     // pas en phase de calcul
     else if ((mState == RUN or mState == PRE) and !end and !begin) {
-	mLastTime = time;
-	mState = POST2;
-	mSigma2 = mSigma - e;
-	mSigma = 0;
+        mLastTime = time;
+        mState = POST2;
+        mSigma2 = mSigma - e;
+        mSigma = 0;
     }
 }
 
-Value DifferenceEquation::processStateEvent(const StateEvent& event) const
+Value DifferenceEquation::observation(const ObservationEvent& event) const
 {
     if (mInvalid) {
-        return value::Value();
+        return Value();
     } else {
         Assert(utils::InternalError, event.getPortName() == mVariableName,
                boost::format("DifferenceEquation model, invalid variable " \
                              " name: %1%") % event.getPortName());
-	return buildDouble(getValue());
+        return buildDouble(getValue());
     }
 }
 
-void DifferenceEquation::processInstantaneousEvent(
-    const InstantaneousEvent& event,
+void DifferenceEquation::request(
+    const RequestEvent& event,
     const Time& /*time*/,
     ExternalEventList& output) const
 {
@@ -470,10 +467,10 @@ void DifferenceEquation::processInstantaneousEvent(
                "DifferenceEquation model, invalid variable name: %1%") %
            event.getStringAttributeValue("name"));
 
-    devs::ExternalEvent* ee = new devs::ExternalEvent("response");
-      
-    ee << devs::attribute("name", event.getStringAttributeValue("name"));
-    ee << devs::attribute("value", getValue());
+    ExternalEvent* ee = new ExternalEvent("response");
+
+    ee << attribute("name", event.getStringAttributeValue("name"));
+    ee << attribute("value", getValue());
     output.addEvent(ee);
 }
 

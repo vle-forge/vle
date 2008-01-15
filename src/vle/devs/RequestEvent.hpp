@@ -1,8 +1,8 @@
 /**
- * @file devs/InstantaneousEvent.hpp
+ * @file devs/RequestEvent.hpp
  * @author The VLE Development Team.
- * @brief Instantaneous event based on the devs::ExternalEvent class and are
- * build by graph::Model to precess Instantaneous event.
+ * @brief Request event based on the devs::ExternalEvent class and are
+ * build by graph::Model to precess Request event.
  */
 
 /*
@@ -24,37 +24,38 @@
  * 02111-1307, USA.
  */
 
-#ifndef DEVS_INSTANTANEOUSEVENT_HPP
-#define DEVS_INSTANTANEOUSEVENT_HPP
+#ifndef DEVS_REQUESTEVENT_HPP
+#define DEVS_REQUESTEVENT_HPP
 
 #include <vle/devs/ExternalEvent.hpp>
 
 namespace vle { namespace devs {
 
     /**
-     * @brief Instantaneous event based on the devs::ExternalEvent class and are
-     * build by graph::Model to precess Instantaneous event.
+     * @brief Request event based on the devs::ExternalEvent class and are
+     * build by graph::Model to precess Request event.
      *
      */
-    class InstantaneousEvent : public ExternalEvent
+    class RequestEvent : public ExternalEvent
     {
     public:
-	InstantaneousEvent(const std::string& sourcePortName) :
+	RequestEvent(const std::string& sourcePortName) :
             ExternalEvent(sourcePortName)
         { }
             
-	InstantaneousEvent(InstantaneousEvent* event,
+	RequestEvent(RequestEvent* event,
                            Simulator* target,
                            const std::string& targetPortName) :
             ExternalEvent(event, target, targetPortName)
         { }
 
-	virtual ~InstantaneousEvent()
+	virtual ~RequestEvent()
         { }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-        virtual bool isInstantaneous() const;
+        virtual bool isRequest() const
+        { return true; }
     };
 
 }} // namespace vle devs

@@ -33,25 +33,25 @@
 namespace vle { namespace devs {
 
     /**
-     * @brief DynamicsWrapper class represent a part of the DEVS simulator. This class
-     * must be inherits to build simulation components into another programming language.
+     * @brief DynamicsWrapper class represent a part of the DEVS simulator. This
+     * class must be inherits to build simulation components into another
+     * programming language.
      *
      */
     class DynamicsWrapper: public Dynamics
     {
     public:
 	/**
-	 * Constructor of the dynamics wrapper of an atomic model
-	 *
+	 * @brief Constructor of the dynamics wrapper of an atomic model
 	 * @param model the atomic model to which belongs the dynamics
 	 */
-        DynamicsWrapper(const graph::AtomicModel& model) : 
-            Dynamics(model)
+        DynamicsWrapper(const graph::AtomicModel& model,
+                        const devs::InitEventList& events) : 
+            Dynamics(model, events)
         { }
 
 	/**
-	 * Destructor (nothing to do)
-	 *
+	 * @brief Destructor (nothing to do).
 	 * @return none
 	 */
         virtual ~DynamicsWrapper()
@@ -59,23 +59,23 @@ namespace vle { namespace devs {
 
         /** 
          * @brief If this function return true, then a cast to a DynamicsWrapper
-         * object is produce and the set_model and set_library function are call.
-         * 
+         * object is produce and the set_model and set_library function are
+         * call.
          * @return false if Dynamics is not a DynamicsWrapper.
          */
-        inline virtual bool is_wrapper() const
+        inline virtual bool isWrapper() const
         { return true; }
 
         /** 
          * @brief Set the name of library
          */
-        inline virtual void set_library(const std::string& library)
+        inline virtual void setLibrary(const std::string& library)
         { m_library = library; }
 
         /** 
          * @brief Set the name of model
          */
-        inline virtual void set_model(const std::string& model)
+        inline virtual void setModel(const std::string& model)
         { m_model = model; }
 
     protected:

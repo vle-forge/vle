@@ -72,28 +72,23 @@ namespace vle { namespace devs {
 	inline Simulator* getTarget()
         { return m_target; }
 
-        const std::string& getTargetModelName() const;
+        const std::string getTargetModelName() const;
 
 	inline bool onPort(const std::string& portName) const
         { return m_portName == portName; }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
         
-	virtual bool isExternal() const;
-
-	virtual bool isInit() const;
-
-	virtual bool isInternal() const;
-
-	virtual bool isState() const;
+        virtual bool isExternal() const
+        { return true; }
 
         /**
-         * A new virtual function to specify if this event is an
+         * @brief A new virtual function to specify if this event is an
          * InstantaneousEvent or single ExternalEvent.
-         *
          * @return true if this event is ExternalEvent, other return false.
          */
-        virtual bool isInstantaneous() const;
+        virtual bool isRequest() const
+        { return false; }
 
     protected:
 	std::string   m_portName;

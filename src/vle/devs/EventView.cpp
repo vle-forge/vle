@@ -36,7 +36,7 @@ EventView::EventView(const std::string& name, StreamWriter* stream) :
 {
 }
 
-StateEvent* EventView::processStateEvent(StateEvent* event)
+ObservationEvent* EventView::processObservationEvent(ObservationEvent* event)
 {
     value::Value val = event->getAttributeValue(event->getPortName());
 

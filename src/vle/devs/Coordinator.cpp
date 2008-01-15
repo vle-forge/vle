@@ -29,7 +29,7 @@
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/devs/InternalEvent.hpp>
 #include <vle/devs/ExternalEventList.hpp>
-#include <vle/devs/StateEvent.hpp>
+#include <vle/devs/ObservationEvent.hpp>
 #include <vle/devs/ModelFactory.hpp>
 #include <vle/devs/StreamWriter.hpp>
 #include <vle/devs/LocalStreamWriter.hpp>
@@ -56,13 +56,11 @@ using namespace xmlpp;
 
 namespace vle { namespace devs {
 
-Coordinator::Coordinator(ModelFactory& modelfactory,
-                         const vpz::Model& mdls) :
+Coordinator::Coordinator(ModelFactory& modelfactory) :
     m_currentTime(0),
     m_modelFactory(modelfactory)
 {
     buildViews();
-    addModels(mdls);
 }
 
 Coordinator::~Coordinator()
@@ -82,8 +80,10 @@ Coordinator::~Coordinator()
     }
 }
 
-void Coordinator::init()
+void Coordinator::init(const vpz::Model& mdls)
 {
+    addModels(mdls);
+    m_toDelete = 0;
 }
 
 const Time& Coordinator::getNextTime()
@@ -93,45 +93,53 @@ const Time& Coordinator::getNextTime()
 
 ExternalEventList* Coordinator::run()
 {
-    CompleteEventBagModel& nextEvent = m_eventTable.popEvent();
-    if (not nextEvent.empty()) {
+    SimulatorList::size_type oldToDelete(m_toDelete);
+
+    CompleteEventBagModel& bags = m_eventTable.popEvent();
+    if (not bags.empty()) {
         updateCurrentTime(m_eventTable.getCurrentTime());
     }
 
-    while (not nextEvent.emptyBag()) {
-        EventBagModel& bag(nextEvent.topBag());
-        Simulator* mdl(nextEvent.topBagModel());
-
-        while (not bag.empty()) {
-            if (not bag.emptyInternal()) {
-                if (not bag.emptyExternal()) {
-                    switch (mdl->processConflict(
-                            *bag.internal(), bag.externals())) {
+    while (not bags.emptyBag()) {
+        std::map < Simulator*, EventBagModel >::value_type& bag(bags.topBag());
+        while (not bag.second.empty()) {
+            if (not bag.second.emptyInternal()) {
+                if (not bag.second.emptyExternal()) {
+                    switch (bag.first->confluentTransitions(
+                            *bag.second.internal(), bag.second.externals())) {
                     case Event::INTERNAL:
-                        processInternalEvent(mdl, bag);
+                        processInternalEvent(bag.first, bag.second);
                         break;
 
                     case Event::EXTERNAL:
-                        processExternalEvents(mdl, bag);
+                        processExternalEvents(bag.first, bag.second);
                         break;
                     }
                 } else {
-                    processInternalEvent(mdl, bag);
+                    processInternalEvent(bag.first, bag.second);
                 }
             } else {
-                if (not bag.emptyExternal()) {
-                    processExternalEvents(mdl, bag);
+                if (not bag.second.emptyExternal()) {
+                    processExternalEvents(bag.first, bag.second);
                 } else {
-                    processInstantaneousEvents(mdl, bag);
+                    processRequestEvents(bag.first, bag.second);
                 }
             }
         }
-        if (mdl == nextEvent.topBagModel())
-            nextEvent.popBag();
     }
 
-    processStateEvents(nextEvent);
-    AssertI(nextEvent.empty());
+    if (oldToDelete > 0) {
+        std::for_each(m_deletedSimulator.begin(),
+                      m_deletedSimulator.begin() + oldToDelete,
+                      boost::checked_deleter < Simulator >());
+    
+        m_deletedSimulator.erase(m_deletedSimulator.begin(),
+                                 m_deletedSimulator.begin() + oldToDelete);
+        m_toDelete = m_deletedSimulator.size();
+    }
+
+    processObservationEvents(bags);
+    bags.clear();
     return 0;
 }
 
@@ -150,10 +158,10 @@ void Coordinator::finish()
             ObservableList::const_iterator jt;
             for (jt = it->second->getObservableList().begin();
                  jt != it->second->getObservableList().end(); ++jt) {
-                StateEvent* evt = new StateEvent(m_currentTime, jt->first,
+                ObservationEvent* evt = new ObservationEvent(m_currentTime, jt->first,
                                                  it->first, jt->second);
-                StateEvent* out = jt->first->processStateEvent(*evt);
-                it->second->processStateEvent(out);
+                ObservationEvent* out = jt->first->observation(*evt);
+                it->second->processObservationEvent(out);
                 delete evt;
                 delete out;
             }
@@ -222,9 +230,9 @@ void Coordinator::addObservableToView(graph::AtomicModel* model,
         simulator->getStructure()->getName());
 
     View* obs = it->second;
-    StateEvent* evt = obs->addObservable(simulator, portname, m_currentTime);
+    ObservationEvent* evt = obs->addObservable(simulator, portname, m_currentTime);
     if (evt != 0) {
-        m_eventTable.putStateEvent(evt);
+        m_eventTable.putObservationEvent(evt);
     }
 }
 
@@ -306,7 +314,8 @@ void Coordinator::delAtomicModel(graph::CoupledModel* parent,
         View->removeObservable(satom);
     }
     m_eventTable.delModelEvents(satom);
-    delete satom;
+    satom->clear();
+    m_deletedSimulator.push_back(satom);
     parent->delModel(atom);
 }
 
@@ -369,10 +378,10 @@ void Coordinator::dispatchExternalEvent(ExternalEventList& eventList,
                 reinterpret_cast < graph::AtomicModel* >(jt->model()));
             const std::string& port(jt->port());
 
-            if ((*it)->isInstantaneous()) {
-                m_eventTable.putInstantaneousEvent(
-                    new InstantaneousEvent(
-                        reinterpret_cast < InstantaneousEvent* >((*it)),
+            if ((*it)->isRequest()) {
+                m_eventTable.putRequestEvent(
+                    new RequestEvent(
+                        reinterpret_cast < RequestEvent* >((*it)),
                         dst, port));
             } else {
                 m_eventTable.putExternalEvent(
@@ -447,17 +456,17 @@ void Coordinator::processEventView(Simulator& model, Event* event)
         for (std::list < std::string >::iterator jt = lst.begin();
              jt != lst.end(); ++jt) {
             
-            StateEvent* newevent = 0;
+            ObservationEvent* newevent = 0;
             if (event == 0 or not event->isInternal()) {
-                newevent = new StateEvent(m_currentTime, &model,
+                newevent = new ObservationEvent(m_currentTime, &model,
                                           it->second->getName(), *jt);
             } else if (event and event->isInternal()) {
-                newevent = new StateEvent(((InternalEvent*)event)->getTime(),
+                newevent = new ObservationEvent(((InternalEvent*)event)->getTime(),
                                           &model, it->second->getName(), *jt);
             }
-            StateEvent* eventvalue = model.processStateEvent(*newevent);
+            ObservationEvent* eventvalue = model.observation(*newevent);
             delete newevent;
-            it->second->processStateEvent(eventvalue);
+            it->second->processObservationEvent(eventvalue);
             delete eventvalue;
         }
     }
@@ -472,12 +481,12 @@ void Coordinator::processInternalEvent(
 
     {
         ExternalEventList result;
-        sim->getOutputFunction(m_currentTime, result);
+        sim->output(m_currentTime, result);
         dispatchExternalEvent(result, sim);
     }
 
     {
-        InternalEvent* internal(sim->processInternalEvent(*ev));
+        InternalEvent* internal(sim->internalTransition(*ev));
         if (internal) {
             m_eventTable.putInternalEvent(internal);
         }
@@ -494,7 +503,7 @@ void Coordinator::processExternalEvents(
     ExternalEventList& lst(modelbag.externals());
 
     {
-        InternalEvent* internal(sim->processExternalEvents(lst, m_currentTime));
+        InternalEvent* internal(sim->externalTransition(lst, m_currentTime));
         if (internal) {
             m_eventTable.putInternalEvent(internal);
         }
@@ -505,40 +514,40 @@ void Coordinator::processExternalEvents(
     processEventView(*sim, 0);
 }
 
-void Coordinator::processInstantaneousEvents(
+void Coordinator::processRequestEvents(
     Simulator* sim,
     EventBagModel& modelbag)
 {
-    InstantaneousEventList& lst(modelbag.instantaneous());
+    RequestEventList& lst(modelbag.Request());
 
     ExternalEventList result;
-    for (InstantaneousEventList::iterator it = lst.begin(); it != lst.end();
+    for (RequestEventList::iterator it = lst.begin(); it != lst.end();
          ++it) {
-        sim->processInstantaneousEvent(**it, m_currentTime, result);
+        sim->request(**it, m_currentTime, result);
         dispatchExternalEvent(result, sim);
         result.clear();
     }
     
     lst.deleteAndClear();
-    modelbag.delInstantaneous();
+    modelbag.delRequest();
 }
 
-void Coordinator::processStateEvents(CompleteEventBagModel& bag)
+void Coordinator::processObservationEvents(CompleteEventBagModel& bag)
 {
     while (not bag.emptyStates()) {
-        Simulator* model(bag.topStateEvent()->getModel());
-        StateEvent* event(model->processStateEvent(*bag.topStateEvent()));
+        Simulator* model(bag.topObservationEvent()->getModel());
+        ObservationEvent* event(model->observation(*bag.topObservationEvent()));
 
         if (event) {
             View* View(getView(event->getViewName()));
-            StateEvent* event2(View->processStateEvent(event));
+            ObservationEvent* event2(View->processObservationEvent(event));
             delete event;
 
             if (event2) {
-                m_eventTable.putStateEvent(event2);
+                m_eventTable.putObservationEvent(event2);
             }
         }
-        delete bag.topStateEvent();
+        delete bag.topObservationEvent();
         bag.popState();
     }
 }

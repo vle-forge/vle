@@ -25,7 +25,7 @@
 #define VLE_DEVS_FINISH_VIEW_HPP
 
 #include <vle/devs/View.hpp>
-#include <vle/devs/StateEvent.hpp>
+#include <vle/devs/ObservationEvent.hpp>
 
 namespace vle { namespace devs {
 
@@ -43,7 +43,8 @@ namespace vle { namespace devs {
         virtual bool isFinish() const
         { return true; }
 
-        virtual devs::StateEvent* processStateEvent(devs::StateEvent* event);
+        virtual devs::ObservationEvent*
+            processObservationEvent(devs::ObservationEvent* event);
     };
 
     typedef std::map < std::string, devs::FinishView* > FinishViewList;

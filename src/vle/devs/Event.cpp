@@ -61,7 +61,7 @@ Event::~Event()
 {
 }
 
-const std::string& Event::getSourceModelName() const
+const std::string Event::getSourceModelName() const
 {
     return m_source->getName();
 }

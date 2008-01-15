@@ -1,11 +1,12 @@
 /**
- * @file devs/InstantaneousEventList.hpp
+ * @file devs/ObservationEvent.cpp
  * @author The VLE Development Team.
- * @brief A EventList container to store devs::InstantaneousEvent. 
+ * @brief State event use to get information from graph::Model using
+ * devs::TimedView or devs::EventView.
  */
 
 /*
- * Copyright (c) 2005 The VLE Development Team.
+ * Copyright (c) 2004, 2005 The VLE Development Team.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -23,16 +24,11 @@
  * 02111-1307, USA.
  */
 
-#ifndef DEVS_INSTANTANEOUSEVENTLIST_HPP
-#define DEVS_INSTANTANEOUSEVENTLIST_HPP
-
-#include <vle/devs/EventList.hpp>
-#include <vle/devs/InstantaneousEvent.hpp>
+#include <vle/devs/ObservationEvent.hpp>
+#include <string>
 
 namespace vle { namespace devs {
 
-    typedef EventList < InstantaneousEvent > InstantaneousEventList;
+
 
 }} // namespace vle devs
-
-#endif

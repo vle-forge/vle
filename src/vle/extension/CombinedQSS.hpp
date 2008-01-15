@@ -30,45 +30,43 @@
 
 namespace vle { namespace extension {
     
-    class CombinedQss : public vle::devs::Dynamics
+    class CombinedQss : public devs::Dynamics
     {
     public:
         enum state { INIT, POST_INIT, RUN, POST, POST2, POST3 };
 
-        CombinedQss(const vle::graph::AtomicModel& model);
+        CombinedQss(const graph::AtomicModel& model,
+                    const devs::InitEventList& event);
 
         virtual ~CombinedQss() { }
 
         virtual void finish();
 
-        virtual vle::devs::Time init();
+        virtual devs::Time init(const devs::Time& /* time */);
 
-        virtual void getOutputFunction(
-	    const vle::devs::Time& time,
-            vle::devs::ExternalEventList& output);
+        virtual void output(
+            const devs::Time& time,
+            devs::ExternalEventList& output);
 
-        virtual vle::devs::Time getTimeAdvance();
+        virtual devs::Time timeAdvance();
 
-        virtual vle::devs::Event::EventType processConflict(
-	    const vle::devs::InternalEvent& internal,
-            const vle::devs::ExternalEventList& extEventlist) const;
+        virtual devs::Event::EventType confluentTransitions(
+            const devs::Time& internal,
+            const devs::ExternalEventList& extEventlist) const;
 
-        virtual void processInitEvents(
-	    const vle::devs::InitEventList& event);
+        virtual void internalTransition(
+            const devs::Time& event);
 
-        virtual void processInternalEvent(
-	    const vle::devs::InternalEvent& event);
+        virtual void externalTransition(
+            const devs::ExternalEventList& event,
+            const devs::Time& time);
 
-        virtual void processExternalEvents(
-	    const vle::devs::ExternalEventList& event,
-            const vle::devs::Time& time);
+        virtual value::Value observation(
+            const devs::ObservationEvent& event) const;
 
-        virtual vle::value::Value processStateEvent(
-	    const vle::devs::StateEvent& event) const;
-
-	virtual void processInstantaneousEvent(const vle::devs::InstantaneousEvent& /* event */,
-					       const vle::devs::Time& /* time */,
-					       vle::devs::ExternalEventList& /* output */) const;
+        virtual void request(const devs::RequestEvent& /* event */,
+                             const devs::Time& /* time */,
+                             devs::ExternalEventList& /* output */) const;
     protected:
         /**
          * @brief The function to develop mathemacial expression like:
@@ -99,34 +97,34 @@ namespace vle { namespace extension {
         inline void setValue(unsigned int i, double value)
         { mValue[i] = value; }
 
-	inline double getExternalValue(const std::string& name) const
-	    { return mExternalVariableValue.find(mExternalVariableIndex.find(name)->second)->second; }	
+        inline double getExternalValue(const std::string& name) const
+        { return mExternalVariableValue.find(mExternalVariableIndex.find(name)->second)->second; }	
 
-	inline void setExternalValue(const std::string& name, double value)
-	    { mExternalVariableValue[mExternalVariableIndex[name]] = value; }	
+        inline void setExternalValue(const std::string& name, double value)
+        { mExternalVariableValue[mExternalVariableIndex[name]] = value; }	
 
-	inline void setExternalGradient(const std::string& name, double gradient)
-	    { mExternalVariableGradient[mExternalVariableIndex[name]] = gradient; }	
+        inline void setExternalGradient(const std::string& name, double gradient)
+        { mExternalVariableGradient[mExternalVariableIndex[name]] = gradient; }	
 
         bool mActive;
         bool mDependance;
-/** Internal variables */
+        /** Internal variables */
         std::vector < std::pair < unsigned int , double > > mInitialValueList;
         std::map < unsigned int , std::string > mVariableName;
-	double* mValue;
+        double* mValue;
         std::map < unsigned int , double > mVariablePrecision;
         std::map < unsigned int , double > mVariableEpsilon;
         std::map < std::string , unsigned int > mVariableIndex;
-	unsigned int mVariableNumber;
-/** External variables */
-	unsigned int mExternalVariableNumber;
-	std::map < unsigned int , double > mExternalVariableValue;
-	std::map < unsigned int , double > mExternalVariableGradient;
-	std::map < unsigned int , bool > mIsGradient;
-	std::map < std::string , unsigned int > mExternalVariableIndex;
-	bool mExternalValues; // y-a-t-il des variables externes
-			      // sans gradient ? 
-/** State */
+        unsigned int mVariableNumber;
+        /** External variables */
+        unsigned int mExternalVariableNumber;
+        std::map < unsigned int , double > mExternalVariableValue;
+        std::map < unsigned int , double > mExternalVariableGradient;
+        std::map < unsigned int , bool > mIsGradient;
+        std::map < std::string , unsigned int > mExternalVariableIndex;
+        bool mExternalValues; // y-a-t-il des variables externes
+        // sans gradient ? 
+        /** State */
         long* mIndex;
         double* mGradient;
         devs::Time* mSigma;
@@ -134,7 +132,7 @@ namespace vle { namespace extension {
         state* mState;
 
     private:
-/** Current model */
+        /** Current model */
         unsigned int mCurrentModel;
         double mThreshold;
 
@@ -160,10 +158,10 @@ namespace vle { namespace extension {
         inline state getState(unsigned int i) const
         { return mState[i]; }
 
-	inline void decIndex(unsigned int i)
+        inline void decIndex(unsigned int i)
         { --mIndex[i]; }
 
-	inline void incIndex(unsigned int i)
+        inline void incIndex(unsigned int i)
         { ++mIndex[i]; }
 
         inline void setIndex(unsigned int i, long index)
@@ -185,7 +183,7 @@ namespace vle { namespace extension {
 
         void minSigma();
 
-	void reset(const vle::devs::Time& time, unsigned int i, double value);
+        void reset(const devs::Time& time, unsigned int i, double value);
     };
 
 }} // namespace vle extension

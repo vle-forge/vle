@@ -78,7 +78,7 @@ void LocalStreamWriter::processRemoveObservable(Simulator* simulator,
             view));
 }
 
-void LocalStreamWriter::process(const StateEvent& event)
+void LocalStreamWriter::process(const ObservationEvent& event)
 {
     vpz::ValueTrame tr(utils::to_string(event.getTime()));
     tr.add(event.getModel()->getStructure()->getName(),

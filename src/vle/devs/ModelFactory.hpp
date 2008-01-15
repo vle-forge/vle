@@ -30,6 +30,7 @@
 #include <vle/vpz/Model.hpp>
 #include <vle/vpz/Dynamics.hpp>
 #include <vle/vpz/Experiment.hpp>
+#include <vle/devs/ExternalEventList.hpp>
 #include <glibmm/module.h>
 #include <boost/noncopyable.hpp>
 
@@ -260,7 +261,8 @@ namespace vle { namespace devs {
          */
         void attachDynamics(Coordinator& coordinator,
                             devs::Simulator* atom, const vpz::Dynamic& dyn,
-                            Glib::Module* module);
+                            Glib::Module* module,
+                            const InitEventList& events);
     };
 
 }} // namespace vle devs

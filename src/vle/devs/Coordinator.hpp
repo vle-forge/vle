@@ -53,7 +53,7 @@ namespace vle { namespace devs {
     class Coordinator
     {
     public:
-        Coordinator(ModelFactory& modelfactory, const vpz::Model& mdls);
+        Coordinator(ModelFactory& modelfactory);
 
 	~Coordinator();
 
@@ -66,7 +66,7 @@ namespace vle { namespace devs {
          * @throw Exception::Internal if a condition have no model port name
          * associed.
          */
-        void init();
+        void init(const vpz::Model& mdls);
     
         /** 
          * @brief Return the top devs::Time of the devs::EventTable.
@@ -218,14 +218,16 @@ namespace vle { namespace devs {
         { return m_modelList; }
 
     private:
-	Time                m_currentTime;
-	SimulatorMap        m_modelList;
-	EventTable          m_eventTable;
-	ViewList            m_viewList;
-	EventViewList       m_eventViewList;
-	TimedViewList       m_timedViewList;
-        FinishViewList      m_finishViewList;
-        ModelFactory&       m_modelFactory;
+	Time                        m_currentTime;
+	SimulatorMap                m_modelList;
+	EventTable                  m_eventTable;
+	ViewList                    m_viewList;
+	EventViewList               m_eventViewList;
+	TimedViewList               m_timedViewList;
+        FinishViewList              m_finishViewList;
+        ModelFactory&               m_modelFactory;
+        SimulatorList               m_deletedSimulator;
+        SimulatorList::size_type    m_toDelete;
 
         void buildViews();
 
@@ -237,10 +239,10 @@ namespace vle { namespace devs {
         void processExternalEvents(Simulator* sim,
                                    EventBagModel& modelbag);
 
-        void processInstantaneousEvents(Simulator* sim,
+        void processRequestEvents(Simulator* sim,
                                         EventBagModel& modelbag);
 
-        void processStateEvents(CompleteEventBagModel& bag);
+        void processObservationEvents(CompleteEventBagModel& bag);
 
         /** 
          * @brief build the simulator from the vpz::Model stock.

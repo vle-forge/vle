@@ -122,30 +122,31 @@ namespace vle { namespace extension {
             ADD_CONNECTION, REMOVE_CONNECTION, CHANGE_CONNECTION, ADD_INPUTPORT,
             REMOVE_INPUTPORT, ADD_OUTPUTPORT, REMOVE_OUTPUTPORT, BAG };
 
-        DSDevs(const graph::AtomicModel& model);
+        DSDevs(const graph::AtomicModel& model,
+               const devs::InitEventList& events);
 
         virtual ~DSDevs() { }
 
-        virtual devs::Time init();
+        virtual devs::Time init(const devs::Time& time);
 
-        virtual void getOutputFunction(
+        virtual void output(
             const devs::Time& /* time */,
             devs::ExternalEventList& /* output */);
 
-        virtual devs::Time getTimeAdvance();
+        virtual devs::Time timeAdvance();
 
-        virtual devs::Event::EventType processConflict(
-            const devs::InternalEvent& /* internal */,
+        virtual devs::Event::EventType confluentTransitions(
+            const devs::Time& /* internal */,
             const devs::ExternalEventList& /* extEventlist */) const;
 
-        virtual void processInternalEvent(const devs::InternalEvent& /* event */);
+        virtual void internalTransition(const devs::Time& /* event */);
 
-        virtual void processExternalEvents(
+        virtual void externalTransition(
             const devs::ExternalEventList& /* event */,
             const devs::Time& /* time */);
 
-        virtual value::Value processStateEvent(
-            const devs::StateEvent& /* event */) const;
+        virtual value::Value observation(
+            const devs::ObservationEvent& /* event */) const;
 
         /*
          * 

@@ -121,7 +121,7 @@ void NetStreamWriter::processRemoveObservable(Simulator* simulator,
     }
 }
 
-void NetStreamWriter::process(const StateEvent& event)
+void NetStreamWriter::process(const ObservationEvent& event)
 {
     std::ostringstream out;
     out << "<trame type=\"value\" date=\"" << event.getTime() << "\" >"

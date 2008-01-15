@@ -132,28 +132,31 @@ void ModelFactory::createModel(Coordinator& coordinator,
            model->getName());
     coordinator.addModel(model, sim);
 
-    const vpz::Dynamic& dyn = mDynamics.get(dynamics);
-    switch(dyn.type()) {
-    case vpz::Dynamic::LOCAL:
-        attachDynamics(coordinator, sim, dyn, getPlugin(dyn.name()));
-        break;
-    case vpz::Dynamic::DISTANT:
-        Throw(utils::NotYetImplemented, "Distant dynamics is not supported");
-    }
-
+    vpz::ValueList initValues;
     if (not conditions.empty()) {
-	vpz::ValueList initValues;
-
 	for (vpz::StringVector::const_iterator it = conditions.begin();
 	     it != conditions.end(); ++it) {
 	    const vpz::Condition& cnd(mExperiment.conditions().get(*it));
 	    vpz::ValueList vl = cnd.firstValues();
 
 	    for (vpz::ValueList::const_iterator itv = vl.begin();
-		 itv != vl.end(); ++itv)
-		initValues[itv->first] = itv->second;
+		 itv != vl.end(); ++itv) {
+                Assert(utils::InternalError, initValues.find(itv->first) ==
+                       initValues.end(), boost::format(
+                           "Multiples condition with the same init port " \
+                           "name %1%") % itv->first);
+                initValues[itv->first] = itv->second;
+            }
 	}
-	sim->processInitEvents(initValues);
+    }
+
+    const vpz::Dynamic& dyn = mDynamics.get(dynamics);
+    switch(dyn.type()) {
+    case vpz::Dynamic::LOCAL:
+        attachDynamics(coordinator, sim, dyn, getPlugin(dyn.name()), initValues);
+        break;
+    case vpz::Dynamic::DISTANT:
+        Throw(utils::NotYetImplemented, "Distant dynamics is not supported");
     }
 
     if (not observable.empty()) {
@@ -170,10 +173,10 @@ void ModelFactory::createModel(Coordinator& coordinator,
                         "The view %1% is unknow of coordinator view list") %
                         *jt));
 
-                StateEvent* evt = view->addObservable(
+                ObservationEvent* evt = view->addObservable(
                     sim, it->first, coordinator.getCurrentTime());
                 if (evt) {
-                    coordinator.eventtable().putStateEvent(evt);
+                    coordinator.eventtable().putObservationEvent(evt);
                 }
             }
         }
@@ -282,7 +285,8 @@ Glib::Module* ModelFactory::getPlugin(const std::string& name)
 void ModelFactory::attachDynamics(Coordinator& coordinator,
                                   devs::Simulator* atom,
                                   const vpz::Dynamic& dyn,
-                                  Glib::Module* module)
+                                  Glib::Module* module,
+                                  const InitEventList& events)
 {
     devs::Dynamics* call = 0;
     void* makeNewDynamics = 0;
@@ -293,8 +297,8 @@ void ModelFactory::attachDynamics(Coordinator& coordinator,
                "Error in '%1%', function 'makeNewDynamics' not found: '%2%'\n")
 	       % module->get_name() % Glib::Module::get_last_error());
       
-        call = ((Dynamics*(*)(const graph::Model&))
-                (makeNewDynamics))(*atom->getStructure());
+        call = ((Dynamics*(*)(const graph::Model&, const InitEventList&))
+                (makeNewDynamics))(*atom->getStructure(), events);
         Assert(utils::ParseError, call, boost::format(
 	       "Error in '%1%', function 'makeNewDynamics':"
 	       "problem allocation a new Dynamics: '%2%'\n") %
@@ -308,8 +312,8 @@ void ModelFactory::attachDynamics(Coordinator& coordinator,
                module->get_name() % functionanme %
                Glib::Module::get_last_error());
       
-        call = ((Dynamics*(*)(const graph::Model&))
-                (makeNewDynamics))(*atom->getStructure());
+        call = ((Dynamics*(*)(const graph::Model&, const InitEventList&))
+                (makeNewDynamics))(*atom->getStructure(), events);
 	Assert(utils::ParseError, call, boost::format(
 	       "Error in '%1%', function '%2%':"
 	       "problem allocation a new Dynamics: '%3%'\n") %
@@ -317,14 +321,14 @@ void ModelFactory::attachDynamics(Coordinator& coordinator,
                Glib::Module::get_last_error());
     }
 
-    if (call->is_executive()) {
-        (reinterpret_cast < Executive* >(call))->set_coordinator(&coordinator);
+    if (call->isExecutive()) {
+        (reinterpret_cast < Executive* >(call))->setCoordinator(&coordinator);
     }
     
-    if (call->is_wrapper()) {
+    if (call->isWrapper()) {
         (reinterpret_cast < DynamicsWrapper*
-         >(call))->set_library(dyn.library());
-        (reinterpret_cast < DynamicsWrapper* >(call))->set_model(dyn.model());
+         >(call))->setLibrary(dyn.library());
+        (reinterpret_cast < DynamicsWrapper* >(call))->setModel(dyn.model());
     }
 
     atom->addDynamics(call);

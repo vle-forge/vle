@@ -32,8 +32,9 @@ namespace vle { namespace unittest {
     class Transform : public devs::Dynamics
     {
     public:
-        Transform(const graph::AtomicModel& atom) :
-            devs::Dynamics(atom)
+        Transform(const graph::AtomicModel& atom,
+                  const devs::InitEventList& events) :
+            devs::Dynamics(atom, events)
         { }
 
         virtual ~Transform()
@@ -45,27 +46,25 @@ namespace vle { namespace unittest {
             return 0.0;
         }
         
-        virtual devs::Time getTimeAdvance()
+        virtual devs::Time timeAdvance()
         {
             return devs::Time::infinity;
         }
 
-        virtual void processInternalEvents(
-                        const devs::InternalEvent& /* event */)
+        virtual void internalTransition(const devs::Time& /* time */)
         {
             m_counter = 0;
         }
 
-        virtual void processExternalEvents(
+        virtual void externalTransition(
                         const devs::ExternalEventList& events,
                         const devs::Time& /* time */)
         {
             m_counter = m_counter + events.size();
         }
 
-        virtual void getOutputFunction(
-                        const devs::Time& /* time */,
-                        devs::ExternalEventList& output)
+        virtual void output(const devs::Time& /* time */,
+                            devs::ExternalEventList& output)
         {
             for (int i = 0; i < m_counter; ++i) {
                 output.addEvent(buildEvent("out"));

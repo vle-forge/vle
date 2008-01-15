@@ -27,7 +27,7 @@
 #define VLE_DEVS_VIEW_HPP
 
 #include <vle/devs/Observable.hpp>
-#include <vle/devs/StateEvent.hpp>
+#include <vle/devs/ObservationEvent.hpp>
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/utils/Tools.hpp>
 #include <string>
@@ -48,7 +48,7 @@ namespace vle { namespace devs {
 
         virtual ~View();
 
-        StateEvent* addObservable(Simulator* model,
+        ObservationEvent* addObservable(Simulator* model,
                                   const std::string& portName,
                                   const Time& currenttime);
 
@@ -63,8 +63,8 @@ namespace vle { namespace devs {
         virtual bool isFinish() const
         { return false; }
 
-        virtual devs::StateEvent* processStateEvent(
-            devs::StateEvent* event) = 0;
+        virtual devs::ObservationEvent* processObservationEvent(
+            devs::ObservationEvent* event) = 0;
 
 	/**
 	 * Delete an observable for a specified Simulator. If model does not

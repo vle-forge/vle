@@ -37,22 +37,21 @@
 #include <vle/devs/Executive.hpp>
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/devs/ExternalEventList.hpp>
-#include <vle/devs/InstantaneousEvent.hpp>
-#include <vle/devs/InstantaneousEventList.hpp>
+#include <vle/devs/FinishView.hpp>
 #include <vle/devs/InternalEvent.hpp>
 #include <vle/devs/LocalStreamWriter.hpp>
 #include <vle/devs/ModelFactory.hpp>
 #include <vle/devs/NetStreamWriter.hpp>
 #include <vle/devs/Observable.hpp>
+#include <vle/devs/ObservationEvent.hpp>
+#include <vle/devs/RequestEvent.hpp>
+#include <vle/devs/RequestEventList.hpp>
 #include <vle/devs/RootCoordinator.hpp>
 #include <vle/devs/Simulator.hpp>
-#include <vle/devs/StateEvent.hpp>
 #include <vle/devs/StreamWriter.hpp>
 #include <vle/devs/TimedView.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/devs/View.hpp>
-
-
 
 namespace vle {
 

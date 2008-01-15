@@ -22,80 +22,81 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef __CELL_QSS_HPP
-#define __CELL_QSS_HPP
+#ifndef VLE_EXTENSION_CELLQSS_HPP
+#define VLE_EXTENSION_CELLQSS_HPP
 
 #include <vle/extension/CellDevs.hpp>
 #include <vle/devs/Dynamics.hpp>
 
 namespace vle { namespace extension {
-    class CellQSS:public CellDevs
+
+    class CellQSS : public CellDevs
     {
-	enum state
-	{
-	    INIT, INIT2, RUN
-	};
+    public:
+        CellQSS(const graph::AtomicModel& model,
+                const devs::InitEventList& event);
 
-    private:
-// Number of functions
-	unsigned int m_functionNumber;
+        virtual ~CellQSS() { }
 
-// Initial values
-	std::vector < std::pair < unsigned int ,
-				  double > > m_initialValueList;
+        virtual void finish();
+        virtual devs::Time init(const devs::Time& /* time */);
+        virtual void internalTransition(const devs::Time& event);
+        virtual void externalTransition(const devs::ExternalEventList& event,
+                                        const devs::Time& time);
+        virtual value::Value observation(const devs::ObservationEvent& event)
+            const;
 
-// State
-	double* m_gradient;
-	long* m_index;
-	std::map < unsigned int , std::string > m_variableName;
-	std::map < std::string , unsigned int > m_variableIndex;
-	devs::Time* m_sigma;
-	devs::Time* m_lastTime;
-	devs::Time* m_currentTime;
-	state* m_state;
-
-// Current model
-	unsigned int m_currentModel;
-
-//
-	double m_precision;
-	double m_epsilon;
-        bool m_active;
-
-	inline double d(long x);
-	virtual double compute(unsigned int i) =0;
-	inline double getGradient(unsigned int i) const;
-	inline long getIndex(unsigned int i) const;
-	inline const devs::Time & getSigma(unsigned int i) const;
-	inline state getState(unsigned int i) const;
-	inline void setIndex(unsigned int i,long p_index);
-	inline void setCurrentTime(unsigned int i,const devs::Time & p_time);
-	inline void setLastTime(unsigned int i,const devs::Time & p_time);
-	inline void setSigma(unsigned int i,const devs::Time & p_time);
-	inline void setState(unsigned int i,state p_state);
+        virtual void processPerturbation(const devs::ExternalEvent& event);
 
     protected:
-	const devs::Time & getCurrentTime(unsigned int i) const;
-	const devs::Time & getLastTime(unsigned int i) const;
-	void setGradient(unsigned int i,double p_gradient);
-	void updateSigma(unsigned int i);
-	double getValue(unsigned int i) const;
-	void setValue(unsigned int i,double p_value);
+        const devs::Time & getCurrentTime(unsigned int i) const;
+        const devs::Time & getLastTime(unsigned int i) const;
+        void setGradient(unsigned int i,double p_gradient);
+        void updateSigma(unsigned int i);
+        double getValue(unsigned int i) const;
+        void setValue(unsigned int i,double p_value);
 
-    public:
-      CellQSS(const vle::graph::AtomicModel& p_model);
-      virtual ~CellQSS() { }
+    private:
+        enum state {
+            INIT, INIT2, RUN
+        };
 
-      // DEVS Methods
-      virtual void finish();
-      virtual vle::devs::Time init();
-      virtual void processInitEvents(const vle::devs::InitEventList& event);
-      virtual void processInternalEvent(const vle::devs::InternalEvent& /* event */);
-      virtual void processExternalEvents(const vle::devs::ExternalEventList& /* event */,
-					 const vle::devs::Time& /* time */);
-      virtual vle::value::Value processStateEvent(const vle::devs::StateEvent& /* event */) const;
+        // Number of functions
+        unsigned int m_functionNumber;
 
-      virtual void processPerturbation(const vle::devs::ExternalEvent& event);
+        // Initial values
+        std::vector < std::pair < unsigned int , double > > m_initialValueList;
+
+        // State
+        double* m_gradient;
+        long* m_index;
+        std::map < unsigned int , std::string > m_variableName;
+        std::map < std::string , unsigned int > m_variableIndex;
+        devs::Time* m_sigma;
+        devs::Time* m_lastTime;
+        devs::Time* m_currentTime;
+        state* m_state;
+
+        // Current model
+        unsigned int m_currentModel;
+
+        //
+        double m_precision;
+        double m_epsilon;
+        bool m_active;
+
+        inline double d(long x);
+        virtual double compute(unsigned int i) =0;
+        inline double getGradient(unsigned int i) const;
+        inline long getIndex(unsigned int i) const;
+        inline const devs::Time & getSigma(unsigned int i) const;
+        inline state getState(unsigned int i) const;
+        inline void setIndex(unsigned int i,long p_index);
+        inline void setCurrentTime(unsigned int i,const devs::Time & p_time);
+        inline void setLastTime(unsigned int i,const devs::Time & p_time);
+        inline void setSigma(unsigned int i,const devs::Time & p_time);
+        inline void setState(unsigned int i,state p_state);
+
     };
 }} // namespace vle extension
 

@@ -28,7 +28,7 @@
 #define VLE_DEVS_TIMED_VIEW_HPP
 
 #include <vle/devs/View.hpp>
-#include <vle/devs/StateEvent.hpp>
+#include <vle/devs/ObservationEvent.hpp>
 
 namespace vle { namespace devs {
 
@@ -48,7 +48,7 @@ namespace vle { namespace devs {
         virtual bool isTimed() const
         { return true; }
 
-	virtual devs::StateEvent* processStateEvent(devs::StateEvent* event);
+	virtual devs::ObservationEvent* processObservationEvent(devs::ObservationEvent* event);
 
     private:
 	Time                    m_timeStep;
