@@ -50,12 +50,6 @@ SET(VLE_INCLUDE_DIR "include/${VLE_NAME_VERSION}")
 SET(VLE_MANPAGE_PATH "share/man/man1")
 SET(VLE_SHARE_DIRS "share/${VLE_NAME_VERSION}")
 
-IF(UNIX AND NOT WIN32)
-  SET(VLE_PKGCONFIG_PREFIXPATH "${CMAKE_INSTALL_PREFIX}")
-ELSE(UNIX AND NOT WIN32)
-  SET(VLE_PKGCONFIG_PREFIXPATH "/target")
-ENDIF(UNIX AND NOT WIN32)
- 
  #
   # Debug mode
  #
@@ -158,8 +152,20 @@ CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/config.h.cmake ${VLE_BINARY_DIR}/config.h)
  
  #
   # Generate the vle.pc pkg-config file.
+  # Build some variable to build a correct Win32 pkg config file with:
+  # prefix=/target to detect the DIRNAME
+  # cflag=-Iboost_1_34_1 for the directory
  #
- 
+
+IF(UNIX AND NOT WIN32)
+  SET(VLE_PKGCONFIG_PREFIXPATH "${CMAKE_INSTALL_PREFIX}")
+  SET(VLE_PKGCONFIG_BOOSTINCLUDE_DIRS "${Boost_INCLUDE_DIRS}")
+ELSE(UNIX AND NOT WIN32)
+  SET(VLE_PKGCONFIG_PREFIXPATH "/target")
+  GET_FILENAME_COMPONENT(BOOST_DIRNAME "${Boost_INCLUDE_DIRS}" NAME)
+  SET(VLE_PKGCONFIG_BOOSTINCLUDE_DIRS "\${includedir}/${BOOST_DIRNAME}")
+ENDIF(UNIX AND NOT WIN32)
+
 CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/src/vle/vle.pc.in ${VLE_BINARY_DIR}/vle.pc
   @ONLY)
 INSTALL(FILES ${VLE_BINARY_DIR}/vle.pc DESTINATION lib/pkgconfig)
