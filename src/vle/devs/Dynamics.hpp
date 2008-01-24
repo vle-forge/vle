@@ -112,7 +112,7 @@ namespace vle { namespace devs {
          * @param output the list of external events (output parameter).
 	 */
         virtual void output(const vle::devs::Time& /* time */,
-                            vle::devs::ExternalEventList& /* output */)
+                            vle::devs::ExternalEventList& /* output */) const
         { }
 
 	/**
@@ -120,7 +120,7 @@ namespace vle { namespace devs {
          * current state.
          * @return duration of the current state.
 	 */
-        virtual vle::devs::Time timeAdvance()
+        virtual vle::devs::Time timeAdvance() const
         { return Time::infinity; }
 
 	/**
@@ -152,7 +152,7 @@ namespace vle { namespace devs {
          * @return Event::INTERNAL if internal is priority or Event::EXTERNAL.
          */
         virtual vle::devs::Event::EventType confluentTransitions(
-	    const vle::devs::InternalEvent& /* internal */,
+	    const vle::devs::Time& /* time */,
             const vle::devs::ExternalEventList& /* extEventlist */) const
         { return Event::INTERNAL; }
 

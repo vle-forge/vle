@@ -45,12 +45,12 @@ namespace vle { namespace extension {
 
         virtual void output(
             const vle::devs::Time& time,
-            vle::devs::ExternalEventList& output);
+            vle::devs::ExternalEventList& output) const;
 
-        virtual vle::devs::Time timeAdvance();
+        virtual vle::devs::Time timeAdvance() const;
 
         virtual vle::devs::Event::EventType confluentTransitions(
-            const vle::devs::Time& internal,
+            const vle::devs::Time& time,
             const vle::devs::ExternalEventList& extEventlist) const;
 
         virtual void internalTransition(

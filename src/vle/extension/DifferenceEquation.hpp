@@ -45,11 +45,10 @@ namespace vle { namespace extension {
 
         virtual devs::Time init(const devs::Time& time);
 
-        virtual void output(
-	    const devs::Time& time,
-            devs::ExternalEventList& output);
+        virtual void output(const devs::Time& time,
+                            devs::ExternalEventList& output) const;
 
-        virtual devs::Time timeAdvance();
+        virtual devs::Time timeAdvance() const;
 
         virtual devs::Event::EventType confluentTransitions(
 	    const devs::Time& internal,

@@ -58,21 +58,22 @@ devs::Time DSDevs::init(const devs::Time& /* time */)
 }
 
 void DSDevs::output(const devs::Time& /* time */,
-                               devs::ExternalEventList& output) 
+                    devs::ExternalEventList& output) const
 {
     devs::ExternalEvent* ev = 0;
 
     if (m_state != DSDevs::IDLE) {
         AssertI(m_nameList.size() == m_response.size());
 
-        while (not m_nameList.empty()) {
+        std::list < std::string >::const_iterator it;
+        std::list < bool >::const_iterator jt;
+       
+        for (it = m_nameList.begin(), jt = m_response.begin(); it !=
+             m_nameList.end(); ++it, ++jt) {
             ev = new devs::ExternalEvent("ok");
-            ev << devs::attribute("name", m_nameList.front());
-            ev << devs::attribute("ok", m_response.front());
+            ev << devs::attribute("name", *it);
+            ev << devs::attribute("ok", *jt);
             output.addEvent(ev);
-
-            m_nameList.pop_front();
-            m_response.pop_front();
         }
 
         if (not m_newName.empty()) {
@@ -84,18 +85,17 @@ void DSDevs::output(const devs::Time& /* time */,
             ev = new devs::ExternalEvent("name");
             ev << devs::attribute("name", eeset);
             output.addEvent(ev);
-            m_newName.clear();
         }
     }
 }
 
-devs::Time DSDevs::timeAdvance()
+devs::Time DSDevs::timeAdvance() const
 {
     return (m_state != IDLE) ? 0 : devs::Time::infinity;
 }
 
 devs::Event::EventType DSDevs::confluentTransitions(
-    const devs::Time& /* internal */,
+    const devs::Time& /* time */,
     const devs::ExternalEventList& /* extEventlist */) const
 {
     return devs::Event::EXTERNAL;
@@ -119,6 +119,10 @@ void DSDevs::externalTransition(const devs::ExternalEventList& event,
 
 void DSDevs::internalTransition(const devs::Time& /* event */)
 {
+    m_nameList.clear();
+    m_response.clear();
+    m_newName.clear();
+
     if (m_state != IDLE) {
         m_state = IDLE;
     }

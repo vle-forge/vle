@@ -82,7 +82,7 @@ CellDevs::CellDevs(const vle::graph::AtomicModel& model,
             }
             else 
                 if (m_state.find(name) != m_state.end()) initState(name,value);
-                else processParameters(name, value);
+                else m_parameters[name] = value;
         ++it;
     }
 }
@@ -460,13 +460,9 @@ Time CellDevs::init(const Time& /* time */)
     return Time::infinity;
 }
 
-void CellDevs::output(const Time& /* time */,
-                      ExternalEventList& output) 
+void CellDevs::output(const Time& /* time */, ExternalEventList& output) const
 {
     if (m_modified) {
-
-        //	std::cout << time.getValue() << " - [out] : " << getModelName() << std::endl;
-
         ExternalEvent* e = new ExternalEvent("out");
         map < string , pair < value::Value , bool > >::const_iterator it =
             m_state.begin();
@@ -477,13 +473,18 @@ void CellDevs::output(const Time& /* time */,
             ++it;
         }
         output.addEvent(e);
-        m_modified = false;
     }
 }
 
-Time CellDevs::timeAdvance()
+Time CellDevs::timeAdvance() const
 {
     return m_sigma;
+}
+
+void CellDevs::internalTransition(const vle::devs::Time& /* time */)
+{
+    if (m_modified)
+        m_modified = false;
 }
 
 void CellDevs::externalTransition(const ExternalEventList& event,

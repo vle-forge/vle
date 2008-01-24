@@ -180,7 +180,7 @@ Time DifferenceEquation::init(const devs::Time& /* time */)
 }
 
 void DifferenceEquation::output(const Time& /*time*/,
-                                ExternalEventList& output) 
+                                ExternalEventList& output) const
 {
     if (mActive and (mState == PRE_INIT or mState == PRE_INIT2 or mState == POST
                      or mState == POST2)) {
@@ -200,7 +200,7 @@ void DifferenceEquation::output(const Time& /*time*/,
     }
 }
 
-Time DifferenceEquation::timeAdvance()
+Time DifferenceEquation::timeAdvance() const
 {
     return mSigma;
 }

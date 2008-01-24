@@ -146,7 +146,7 @@ Event::EventType Simulator::confluentTransitions(
     DTraceDebug(boost::format("%1$20.10g %2% conf event: [%3%]") %
                 internal.getTime() % getName() % extEventlist);
 
-    return m_dynamics->confluentTransitions(internal, extEventlist);
+    return m_dynamics->confluentTransitions(internal.getTime(), extEventlist);
 }
 
 InternalEvent* Simulator::internalTransition(const InternalEvent& event)

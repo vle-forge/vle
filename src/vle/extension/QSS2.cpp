@@ -24,6 +24,7 @@
 
 #include <vle/extension/QSS2.hpp>
 #include <vle/value/Map.hpp>
+#include <vle/utils/Debug.hpp>
 #include <cmath>
 
 namespace vle { namespace extension {
@@ -403,18 +404,22 @@ Time qss2::init(const devs::Time& /* time */)
 }
 
 void qss2::output(const Time& /* time */,
-                  ExternalEventList& output) 
+                  ExternalEventList& output) const
 {
     if (m_active) {
         ExternalEvent* ee = new ExternalEvent("out");
 
-        for (unsigned int i = 0; i < m_functionNumber ; i++)
-            ee << attribute(m_variableName[i], getValue(i));
+        for (unsigned int i = 0; i < m_functionNumber ; i++) {
+            std::map < unsigned int , std::string >::const_iterator it;
+            it = m_variableName.find(i);
+            AssertI(it != m_variableName.end());
+            ee << attribute(it->second, getValue(i));
+        }
         output.addEvent(ee);
     }
 }
 
-Time qss2::timeAdvance()
+Time qss2::timeAdvance() const
 {
     return getSigma(m_currentModel);
 }

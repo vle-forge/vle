@@ -55,6 +55,9 @@ namespace vle { namespace extension {
         // Liste des ports lies aux voisins
         std::vector < std::string > m_neighbourPortList;
 
+    protected:
+	std::map < std::string, value::Value > m_parameters;
+
     public:
         CellDevs(const vle::graph::AtomicModel& model,
                  const vle::devs::InitEventList& events);
@@ -176,15 +179,16 @@ namespace vle { namespace extension {
         // DEVS Methods
         virtual vle::devs::Time init(const vle::devs::Time& /* time */);
         virtual void output(const vle::devs::Time& /* time */,
-                            vle::devs::ExternalEventList& /* output */);
-        virtual vle::devs::Time timeAdvance();
+                            vle::devs::ExternalEventList& /* output */) const;
+        virtual vle::devs::Time timeAdvance() const;
         virtual void externalTransition(const vle::devs::ExternalEventList& /* event */,
                                         const vle::devs::Time& /* time */);
+        virtual void internalTransition(const vle::devs::Time& /* time */);
         virtual vle::value::Value observation(
             const vle::devs::ObservationEvent& /* event */) const;
 
         virtual void processPerturbation(const vle::devs::ExternalEvent& /* event */) =0;
-        virtual void processParameters(const std::string& /* name */, const vle::value::Value& /* value */) { }
+//        virtual void processParameters(const std::string& /* name */, const vle::value::Value& /* value */) { }
     };
 
 }} // namespace vle extension

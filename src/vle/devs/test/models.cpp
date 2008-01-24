@@ -40,13 +40,13 @@ namespace vle { namespace unittest {
         virtual ~Transform()
         { }
 
-        virtual devs::Time init()
+        virtual devs::Time init(const devs::Time& /* time */)
         {
             m_counter = 0;
             return 0.0;
         }
         
-        virtual devs::Time timeAdvance()
+        virtual devs::Time timeAdvance() const
         {
             return devs::Time::infinity;
         }
@@ -64,7 +64,7 @@ namespace vle { namespace unittest {
         }
 
         virtual void output(const devs::Time& /* time */,
-                            devs::ExternalEventList& output)
+                            devs::ExternalEventList& output) const
         {
             for (int i = 0; i < m_counter; ++i) {
                 output.addEvent(buildEvent("out"));

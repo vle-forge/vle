@@ -77,8 +77,8 @@ namespace vle { namespace extension {
         virtual void finish();
         virtual vle::devs::Time init(const devs::Time& time);
         virtual void output(const vle::devs::Time& /* time */,
-                            vle::devs::ExternalEventList& /* output */);
-        virtual vle::devs::Time timeAdvance();
+                            vle::devs::ExternalEventList& /* output */) const;
+        virtual vle::devs::Time timeAdvance() const;
         virtual vle::devs::Event::EventType confluentTransitions(const vle::devs::Time& /* internal */,
                                                                  const vle::devs::ExternalEventList& /* extEventlist */) const;
         virtual void internalTransition(const vle::devs::Time& /* event */);

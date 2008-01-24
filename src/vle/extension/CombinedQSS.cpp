@@ -160,14 +160,15 @@ Time CombinedQss::init(const Time& /* time */)
 }
 
 
-void CombinedQss::output(const Time& time,
-                         ExternalEventList& output) 
+void CombinedQss::output(const Time& time, ExternalEventList& output) const
 {
-    if (getState(mCurrentModel) == INIT or ((getState(mCurrentModel) == POST3
-                                             and mExternalValues) or
-                                            (getState(mCurrentModel) == RUN and
-                                             mActive))) {
-        ExternalEvent* ee = new ExternalEvent(mVariableName[mCurrentModel]);
+    if (getState(mCurrentModel) == INIT or
+        ((getState(mCurrentModel) == POST3 and mExternalValues) or
+         (getState(mCurrentModel) == RUN and mActive))) {
+        std::map < unsigned int , std::string >::const_iterator it;
+        it = mVariableName.find(mCurrentModel);
+        AssertI(it != mVariableName.end());
+        ExternalEvent* ee = new ExternalEvent(it->second);
         double e = (time - getLastTime(mCurrentModel)).getValue();
 
         ee << attribute("value", getValue(mCurrentModel) + e
@@ -177,7 +178,7 @@ void CombinedQss::output(const Time& time,
     }
 }
 
-Time CombinedQss::timeAdvance()
+Time CombinedQss::timeAdvance() const
 {
     return getSigma(mCurrentModel);
 }
