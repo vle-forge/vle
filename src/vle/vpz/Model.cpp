@@ -36,15 +36,17 @@ AtomicModel::AtomicModel(const std::string& conditions,
     m_dynamics(dynamics),
     m_observables(observables)
 { 
-    std::string conditionList = conditions;
-    StringVector lst;
+    std::string conditionList(conditions);
 
     boost::trim(conditionList);
-    boost::split(m_conditions, conditionList, boost::is_any_of(","),
-		 boost::algorithm::token_compress_on);
 
-    if (m_conditions.front().empty()) {
-        m_conditions.pop_back();
+    if (not conditionList.empty()) {
+        boost::split(m_conditions, conditionList, boost::is_any_of(","),
+                     boost::algorithm::token_compress_on);
+
+        if (m_conditions.front().empty()) {
+            m_conditions.pop_back();
+        }
     }
 }
 
@@ -234,19 +236,27 @@ void Model::writeAtomic(std::ostream& out, const graph::AtomicModel* mdl) const
     const AtomicModel& vpzatom(atomicModels().get(mdl));
 
     out << "<model name=\"" << mdl->getName() << "\" "
-        << "type=\"atomic\" "
-	<< "conditions=\"";
+        << "type=\"atomic\" ";
 
-    for (StringVector::const_iterator it = vpzatom.conditions().begin();
-         it != vpzatom.conditions().end(); ++it) {
-	out << *it;
-	if (it != vpzatom.conditions().end()) {
-            out << ",";
+    if (not vpzatom.conditions().empty()) {
+        out << "conditions=\"";
+
+        for (StringVector::const_iterator it = vpzatom.conditions().begin();
+             it != vpzatom.conditions().end(); ++it) {
+            out << *it;
+            if (it + 1 != vpzatom.conditions().end()) {
+                out << ",";
+            }
         }
+
+        out << "\" ";
     }
-    out << "\" "
-	<< "dynamics=\"" << vpzatom.dynamics() << "\" "
-        << "observables=\"" << vpzatom.observables() << "\" >\n";
+    out << "dynamics=\"" << vpzatom.dynamics() << "\" ";
+
+    if (not vpzatom.observables().empty()) {
+        out << "observables=\"" << vpzatom.observables() << "\" ";
+    }
+    out << ">\n";
 
     writePort(out, mdl);
 
