@@ -115,11 +115,13 @@ void SimpleFile::close(const vpz::EndTrame& trame)
         writeHead(m_file, tmp);
     }
 
-    std::ifstream tmpfile(m_filenametmp.c_str());
-    std::string tmpbuffer;
-    while (tmpfile) {
-        std::getline(tmpfile, tmpbuffer);
-        m_file << tmpbuffer << '\n';
+    {
+        std::ifstream tmpfile(m_filenametmp.c_str());
+        std::string tmpbuffer;
+        while (tmpfile) {
+            std::getline(tmpfile, tmpbuffer);
+            m_file << tmpbuffer << '\n';
+        }
     }
 
     m_file << '\n' << std::flush;
