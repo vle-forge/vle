@@ -11,16 +11,16 @@
 ; General
 ;
 Name "@VLE_NAME@"
-Caption "@VLE_NAME@ @VLE_VERSION@ Setup"
+Caption "@VLE_NAME_COMPLETE@ Setup"
 !define VLE_VERSION  	"@VLE_VERSION@"
-VIProductVersion	"${VLE_VERSION}.0"
+VIProductVersion	"@VLE_MAJOR@.@VLE_MINOR@.@VLE_PATCH@.0"
 VIAddVersionKey         "FileDescription"       "VLE Installer"
 VIAddVersionKey         "ProductName"           "@VLE_NAME@"
 VIAddVersionKey         "FileVersion"           "${VLE_VERSION}"
 VIAddVersionKey         "ProductVersion"        "${VLE_VERSION}"
 VIAddVersionKey         "LegalCopyright"        "(C) 2003-2008 The VLE Development Team"
 
-OutFile "VLE-Setup-${VLE_VERSION}.exe"
+OutFile "@VLE_NAME_COMPLETE@-@CMAKE_SYSTEM_NAME@-@CMAKE_SYSTEM_PROCESSOR@.exe"
 InstallDir "$PROGRAMFILES\VLE ${VLE_VERSION}"
 InstallDirRegKey HKLM "SOFTWARE\VLE Development Team\VLE ${VLE_VERSION}" "Path"
 
@@ -33,14 +33,15 @@ InstallDirRegKey HKLM "SOFTWARE\VLE Development Team\VLE ${VLE_VERSION}" "Path"
 !define MUI_FINISHPAGE_NOAUTOCLOSE
 !define MUI_UNFINISHPAGE_NOAUTOCLOSE
 
-!define MUI_WELCOMEPAGE_TITLE "Welcome to the VLE ${VLE_VERSION} Setup Wizard"
-!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of VLE (Virtual Laboratory Environment) ${VLE_VERSION}.\r\n\r\nReport bugs to quesnel@users.sourceforge.net or on the VLE website"
+!define MUI_WELCOMEPAGE_TITLE "Welcome to the VLE @VLE_NAME_COMPLETE@ Setup Wizard"
+!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the
+installation of VLE (Virtual Laboratory Environment) @VLE_NAME_COMPLETE@.\r\n\r\nReport bugs to quesnel@users.sourceforge.net or on the VLE website"
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_LICENSE "@PROJECT_SOURCE_DIR@/COPYING"
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
 
-!define MUI_FINISHPAGE_TITLE "VLE ${VLE_VERSION}"
+!define MUI_FINISHPAGE_TITLE "VLE @VLE_NAME_COMPLETE@"
 !define MUI_FINISHPAGE_LINK "Visit the VLE website for the latest news, FAQs and support"
 !define MUI_FINISHPAGE_LINK_LOCATION "http://vle.univ-littoral.fr"
 !define MUI_FINISHPAGE_NOREBOOTSUPPORT

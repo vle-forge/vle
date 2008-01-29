@@ -133,7 +133,7 @@ void VLE::printInformations(std::ostream& out)
 
 void VLE::printVersion(std::ostream& out)
 {
-    out << VLE_PACKAGE_NAME << " " << VLE_PACKAGE_VERSION << std::endl;
+    out << VLE_PACKAGE_VERSION << std::endl;
 }
 
 }} // namespace vle manager

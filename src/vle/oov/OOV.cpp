@@ -30,7 +30,9 @@ namespace vle { namespace oov {
 void OOV::printInformations(std::ostream& out)
 {
     out <<
-        "Output of Virtual Laboratory Environment (oov) - " << VLE_PACKAGE_VERSION << "\n"
+        "Output of Virtual Laboratory Environment (oov) - "
+        VLE_PACKAGE_VERSION
+        "\n"
         "Copyright (C) 2004, 05, 06, 07 VLE Development Team.\n"
         "VLE comes with ABSOLUTELY NO WARRANTY.\n"
         "You may redistribute copies of VLE\n"
@@ -41,7 +43,7 @@ void OOV::printInformations(std::ostream& out)
 
 void OOV::printVersion(std::ostream& out)
 {
-    out << "oov " << VLE_PACKAGE_VERSION << std::endl;
+    out << VLE_PACKAGE_VERSION << std::endl;
 }
 
 }} // vle oov
