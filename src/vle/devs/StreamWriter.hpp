@@ -30,6 +30,7 @@
 #include <vle/devs/Time.hpp>
 #include <vle/devs/DevsTypes.hpp>
 #include <vle/value/Value.hpp>
+#include <vle/oov/Plugin.hpp>
 #include <map>
 #include <vector>
 
@@ -95,6 +96,13 @@ namespace vle { namespace devs {
          * Close the output stream.
          */
         virtual void close(const devs::Time& time) = 0;
+
+        /** 
+         * @brief Return a reference to the oov::Plugin attached to this stream
+         * reader.
+         * @return A reference to the oov::Plugin.
+         */
+        virtual oov::PluginPtr plugin() const = 0;
 
         //
         ///

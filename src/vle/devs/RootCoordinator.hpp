@@ -26,8 +26,10 @@
 #ifndef DEVS_ROOTCOORDINATOR_HPP
 #define DEVS_ROOTCOORDINATOR_HPP
 
+#include <vle/utils/Rand.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/vpz/Vpz.hpp>
+#include <vle/oov/Plugin.hpp>
 
 namespace vle { namespace graph {
 
@@ -39,6 +41,7 @@ namespace vle { namespace devs {
 
     class Coordinator;
     class ModelFactory;
+    class Dynamics;
 
     /**
      * @brief Define the DEVS root coordinator. Manage a lot of DEVS
@@ -85,12 +88,30 @@ namespace vle { namespace devs {
         inline const Time& getCurrentTime()
         { return m_currentTime; }
 
+        /** 
+         * @brief Return a constant reference to the list of view plugins.
+         * @return  Return a constant reference to the list of view plugins.
+         */
+        inline const oov::PluginViewList& outputs() const
+        { return m_outputs; }
+
+        /** 
+         * @brief Return a reference to the list of view plugins.
+         * @return  Return a reference to the list of view plugins.
+         */
+        inline oov::PluginViewList& outputs()
+        { return m_outputs; }
+
+        void setRand(Dynamics& dynamics);
+
     private:
+        utils::Rand         m_rand;
 	devs::Time          m_currentTime;
         devs::Time          m_duration;
 	Coordinator*        m_coordinator;
 	ModelFactory*       m_modelfactory;
         graph::Model*       m_root;
+        oov::PluginViewList m_outputs;
     };
 
 }} // namespace vle devs

@@ -33,6 +33,7 @@
 #include <vle/vpz/DelObservableTrame.hpp>
 #include <vle/vpz/Dynamic.hpp>
 #include <vle/vpz/Dynamics.hpp>
+#include <vle/vpz/EndTrame.hpp>
 #include <vle/vpz/Experiment.hpp>
 #include <vle/vpz/Model.hpp>
 #include <vle/vpz/NewObservableTrame.hpp>
@@ -44,8 +45,9 @@
 #include <vle/vpz/Port.hpp>
 #include <vle/vpz/Project.hpp>
 #include <vle/vpz/Replicas.hpp>
-#include <vle/vpz/SaxStackValue.hpp>
 #include <vle/vpz/SaxParser.hpp>
+#include <vle/vpz/SaxStackValue.hpp>
+#include <vle/vpz/SaxStackVpz.hpp>
 #include <vle/vpz/Structures.hpp>
 #include <vle/vpz/Trame.hpp>
 #include <vle/vpz/ValueTrame.hpp>

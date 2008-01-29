@@ -26,13 +26,14 @@
 #define VLE_MANAGER_MANAGER_HPP
 
 #include <vle/manager/ExperimentGenerator.hpp>
+#include <vle/manager/JustRun.hpp>
 #include <vle/manager/LinearExperimentGenerator.hpp>
 #include <vle/manager/Manager.hpp>
-#include <vle/manager/Simulator.hpp>
+#include <vle/manager/Run.hpp>
+#include <vle/manager/SimulatorDistant.hpp>
 #include <vle/manager/TotalExperimentGenerator.hpp>
+#include <vle/manager/Types.hpp>
 #include <vle/manager/VLE.hpp>
-
-
 
 namespace vle {
 

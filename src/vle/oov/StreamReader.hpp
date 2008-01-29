@@ -57,7 +57,7 @@ namespace vle { namespace oov {
         /// Get/Set functions
         ///
 
-        PluginPtr plugin();
+        PluginPtr plugin() const;
 
     private:
         PluginPtr   m_plugin;
@@ -71,32 +71,6 @@ namespace vle { namespace oov {
         virtual void initPlugin(const std::string& plugin,
                                 const std::string& location);
 
-	/**
-	 * @brief Plugin factory is use to build reference to the
-	 * Plugin load dynamically from the dynamics libraries.
-	 *
-	 */
-        class PluginFactory
-        {
-        public:
-	    /**
-	     * @brief Constructor to load plugin from pathname.
-	     * @param plugin the name of the plugin to load.
-	     * @param pathname the name of the path where the plugin is.
-	     * @throw utils::InternalError if the plugin does not exist
-	     * in the pathname.
-	     */
-            PluginFactory(const std::string& plugin,
-                          const std::string& pathname);
-
-            ~PluginFactory();
-
-            PluginPtr build(const std::string& location);
-
-        private:
-            Glib::Module*   m_module;
-            std::string     m_plugin;
-        };
     };
 
 }} // namespace vle oov

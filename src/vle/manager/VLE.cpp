@@ -23,8 +23,10 @@
  */
 
 #include <vle/devs/Coordinator.hpp>
-#include <vle/manager/Simulator.hpp>
+#include <vle/manager/Run.hpp>
+#include <vle/manager/SimulatorDistant.hpp>
 #include <vle/manager/Manager.hpp>
+#include <vle/manager/JustRun.hpp>
 #include <vle/manager/VLE.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Tools.hpp>
@@ -34,6 +36,7 @@
 #include <vle/vpz/Vpz.hpp>
 
 #include <glibmm/optioncontext.h>
+#include <glibmm/thread.h>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -57,33 +60,33 @@ VLE::~VLE()
     utils::Trace::kill();
 }
 
-bool VLE::runManager(bool daemon, bool allInLocal, bool savevpz,
-                     const CmdArgs& args)
+bool VLE::runManager(bool allInLocal, bool savevpz, int nbProcessor, const
+                     CmdArgs& args)
 {
     CmdArgs::const_iterator it = args.begin();
 
     try {
-        Manager man(savevpz);
-
-        if (not daemon) {
-            if (allInLocal) {
-                std::cerr << "Manager localhost and all simulations in local\n";
-                for (; it != args.end(); ++it) {
-                    man.run_all_in_localhost(*it);
-                }
+        Glib::thread_init();
+        if (allInLocal) {
+            if (nbProcessor == 1) {
+                std::cerr << boost::format(
+                    "Manager all simulations in one thread\n");
+                ManagerRunMono r(std::cerr, savevpz);
+                r.start(args.front());
             } else {
-                std::cerr << "Manager localhost and distributed simulations\n";
-                for (; it != args.end(); ++it) {
-                    man.run_localhost(*it);
-                }
+                std::cerr << boost::format(
+                    "Manager all simulations in %1% processor\n") % nbProcessor;
+                ManagerRunThread r(std::cerr, savevpz, nbProcessor);
+                r.start(args.front());
             }
         } else {
-            std::cerr << "Manager - read host simulator\n";
-            std::cerr << "Manager - daemon mode\n";
-            man.run_daemon(mPort);
+            std::cerr << "Manager with distant simulator\n";
+            ManagerRunDistant r(std::cerr, savevpz);
+            r.start(args.front());
         }
     } catch(const std::exception& e) {
-        std::cerr << "Manager error: " << e.what() << std::endl;
+        std::cerr << "Manager error: "
+            << utils::demangle(e.what()) << std::endl;
         return false;
     }
     return true;
@@ -94,8 +97,12 @@ bool VLE::runSimulator(int process)
     try {
         std::cerr << "Simulator start in daemon mode\n";
         Glib::thread_init();
-        utils::buildDaemon();
-        Simulator sim(process, mPort);
+
+        if (utils::Trace::trace().getLevel() != utils::Trace::DEBUG) {
+            utils::buildDaemon();
+        }
+
+        SimulatorDistant sim(std::cerr, process, mPort);
         sim.start();
     } catch(const std::exception& e) {
         std::cerr << "Simulator error: " << e.what() << std::endl;
@@ -104,17 +111,25 @@ bool VLE::runSimulator(int process)
     return true;
 }
 
-bool VLE::justRun(const CmdArgs& args)
+bool VLE::justRun(int nbProcessor, const CmdArgs& args)
 {
-    CmdArgs::const_iterator it = args.begin();
-
-    try {
-        for (; it != args.end(); ++it) {
-            Simulator::run(*it);
+    if (nbProcessor == 1) {
+        try {
+            JustRunMono jrm(std::cerr);
+            jrm.operator()(args);
+        } catch(const std::exception& e) {
+            std::cerr << "Simulation error: " << e.what() << std::endl;
+            return false;
         }
-    } catch(const std::exception& e) {
-        std::cerr << "Simulation error: " << e.what() << std::endl;
-        return false;
+    } else {
+        try {
+            Glib::thread_init();
+            JustRunThread jrt(std::cerr, nbProcessor);
+            jrt.operator()(args);
+        } catch(const std::exception& e) {
+            std::cerr << "Simulation error: " << e.what() << std::endl;
+            return false;
+        }
     }
     return true;
 }

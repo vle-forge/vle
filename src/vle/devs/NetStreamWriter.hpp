@@ -64,6 +64,7 @@ namespace vle { namespace devs {
         virtual void close(
                     const devs::Time& time);
 
+        virtual oov::PluginPtr plugin() const;
 
     private:
         utils::net::Client*     m_client;

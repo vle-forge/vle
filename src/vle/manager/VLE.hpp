@@ -25,6 +25,8 @@
 #ifndef VLE_MANAGER_VLE_HPP
 #define VLE_MANAGER_VLE_HPP
 
+#include <vle/vpz/Vpz.hpp>
+#include <vle/manager/Types.hpp>
 #include <vector>
 
 
@@ -39,12 +41,6 @@ namespace vle { namespace manager {
     class VLE
     {
     public:
-        /** 
-         * @brief Define a list of filename from command line arguments argv and
-         * argc.
-         */
-        typedef std::vector < const char* > CmdArgs;
-
         /** 
          * @brief Initialise signal and user directory.
          */
@@ -62,19 +58,19 @@ namespace vle { namespace manager {
          * combinations and launch or connect to the vle::Simulator and send
          * experimental frame instance VPZi. vle::Manager can listening on
          * localhost port and wait for VPZ stream like a daemon.
-         * 
+         * @param nbProcessor number of processor.
          * @return true if manager is a success.
          */
-        bool runManager(bool daemon, bool allInLocal,
-                        bool savevpz, const CmdArgs& args);
+        bool runManager(bool allInLocal, bool savevpz, int nbProcessor,
+                        const CmdArgs& args);
 
         /** 
          * @brief vle::Simulator: manage a number of processor and launch
          * simulation on it. vle::Simulator run in localhost daemon.
-         * 
+         * @param nbProcessor number of processor.
          * @return true if simulator is a success.
          */
-        bool runSimulator(int process);
+        bool runSimulator(int nbProcessor);
 
         /** 
          * @brief vle::JustRun: start a simulation without analysis of the
@@ -83,7 +79,7 @@ namespace vle { namespace manager {
          * 
          * @return true if justRun simulation is a success.
          */
-        bool justRun(const CmdArgs& args);
+        bool justRun(int nbProcessor, const CmdArgs& args);
         
         /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
@@ -103,6 +99,16 @@ namespace vle { namespace manager {
 
     private:
         int             mPort;
+    };
+
+    /** 
+     * @brief A simple functor to produce a vpz::Vpz object from the std::string
+     * filename. To use with std::transform for example.
+     */
+    struct BuildVPZ
+    {
+        vpz::Vpz* operator()(const std::string& filename) const
+        { return new vpz::Vpz(filename); }
     };
 
 }} // namespace vle manager

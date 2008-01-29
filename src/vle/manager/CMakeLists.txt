@@ -11,11 +11,13 @@ LINK_DIRECTORIES(
   ${GLIBMM_LIBRARY_DIRS}
   ${LIBXMLPP_LIBRARY_DIR})
 
-SET(MANAGER_CPP ExperimentGenerator.cpp LinearExperimentGenerator.cpp
-  Manager.cpp Simulator.cpp TotalExperimentGenerator.cpp VLE.cpp)
+SET(MANAGER_CPP ExperimentGenerator.cpp JustRun.cpp
+  LinearExperimentGenerator.cpp Manager.cpp Run.cpp SimulatorDistant.cpp
+  TotalExperimentGenerator.cpp VLE.cpp)
 
-SET(MANAGER_HPP ExperimentGenerator.hpp LinearExperimentGenerator.hpp
-  Manager.hpp Simulator.hpp TotalExperimentGenerator.hpp VLE.hpp)
+SET(MANAGER_HPP ExperimentGenerator.hpp JustRun.hpp
+  LinearExperimentGenerator.hpp Manager.hpp Run.hpp SimulatorDistant.hpp
+  TotalExperimentGenerator.hpp Types.hpp VLE.hpp)
 
 ADD_LIBRARY(vlemanager SHARED ${MANAGER_CPP};${MANAGER_HPP})
 

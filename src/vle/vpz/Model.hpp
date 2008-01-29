@@ -167,7 +167,9 @@ namespace vle { namespace vpz {
         { return MODEL; }
 
         /** 
-         * @brief Just delete the complete list of graph::Model.
+         * @brief Just delete the complete list of graph::AtomicModelList and
+         * set to NULL the graph::Model hierarchy. Don't forget to delete it
+         * yourself.
          */
         void clear();
 

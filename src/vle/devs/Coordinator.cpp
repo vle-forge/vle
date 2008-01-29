@@ -25,6 +25,7 @@
 #include <vle/devs/Coordinator.hpp>
 #include <vle/devs/RootCoordinator.hpp>
 #include <vle/devs/Dynamics.hpp>
+#include <vle/devs/Executive.hpp>
 #include <vle/devs/Simulator.hpp>
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/devs/InternalEvent.hpp>
@@ -129,16 +130,21 @@ ExternalEventList* Coordinator::run()
     }
 
     if (oldToDelete > 0) {
-        std::for_each(m_deletedSimulator.begin(),
-                      m_deletedSimulator.begin() + oldToDelete,
-                      boost::checked_deleter < Simulator >());
-    
+        for (SimulatorList::iterator it = m_deletedSimulator.begin();
+             it != m_deletedSimulator.begin() + oldToDelete; ++it) {
+            m_eventTable.delModelEvents(*it);
+            delete *it;
+            *it = 0;
+        }
+
         m_deletedSimulator.erase(m_deletedSimulator.begin(),
                                  m_deletedSimulator.begin() + oldToDelete);
+
         m_toDelete = m_deletedSimulator.size();
     }
 
     processObservationEvents(bags);
+
     bags.clear();
     return 0;
 }
@@ -158,8 +164,8 @@ void Coordinator::finish()
             ObservableList::const_iterator jt;
             for (jt = it->second->getObservableList().begin();
                  jt != it->second->getObservableList().end(); ++jt) {
-                ObservationEvent* evt = new ObservationEvent(m_currentTime, jt->first,
-                                                 it->first, jt->second);
+                ObservationEvent* evt = new ObservationEvent(
+                    m_currentTime, jt->first, it->first, jt->second);
                 ObservationEvent* out = jt->first->observation(*evt);
                 it->second->processObservationEvent(out);
                 delete evt;
@@ -172,9 +178,7 @@ void Coordinator::finish()
         ViewList::iterator it;
         for (it = m_viewList.begin(); it != m_viewList.end(); ++it) {
             (*it).second->finish(m_currentTime);
-            delete (*it).second;
         }
-        m_viewList.clear();
     }
 }
 
@@ -245,8 +249,11 @@ void Coordinator::delModel(graph::CoupledModel* parent,
 
     if (mdl->isCoupled()) {
         delCoupledModel(parent, (graph::CoupledModel*)mdl);
+        parent->delAllConnection(mdl);
+        parent->delModel(mdl);
     } else {
         delAtomicModel(parent, (graph::AtomicModel*)mdl);
+        parent->delModel(mdl);
     }
 }
 
@@ -291,11 +298,19 @@ View* Coordinator::getView(const std::string& name) const
     return (it == m_viewList.end()) ? 0 : it->second;
 }
 
-//
+oov::PluginViewList Coordinator::outputs() const
+{
+    oov::PluginViewList lst;
+
+    std::for_each(m_viewList.begin(), m_viewList.end(),
+                  GetSerializablePlugins(lst));
+
+    return lst;
+}
+
 ///
-//// Private functions.
+/// Private functions.
 ///
-//
 
 void Coordinator::delAtomicModel(graph::CoupledModel* parent,
                                  graph::AtomicModel* atom)
@@ -313,10 +328,9 @@ void Coordinator::delAtomicModel(graph::CoupledModel* parent,
         View* View = (*it2).second;
         View->removeObservable(satom);
     }
-    m_eventTable.delModelEvents(satom);
+    m_eventTable.invalidateModel(satom);
     satom->clear();
     m_deletedSimulator.push_back(satom);
-    parent->delModel(atom);
 }
 
 void Coordinator::delCoupledModel(graph::CoupledModel* parent,
@@ -333,8 +347,6 @@ void Coordinator::delCoupledModel(graph::CoupledModel* parent,
             delCoupledModel(mdl, (graph::CoupledModel*)(it->second));
         }
     }
-    parent->delAllConnection(mdl);
-    parent->delModel(mdl);
 }
 
 
@@ -550,6 +562,11 @@ void Coordinator::processObservationEvents(CompleteEventBagModel& bag)
         delete bag.topObservationEvent();
         bag.popState();
     }
+}
+
+void Coordinator::setCoordinator(Executive& exe)
+{
+    exe.m_coordinator = this;
 }
 
 }} // namespace vle devs

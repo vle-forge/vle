@@ -41,6 +41,7 @@ namespace vle { namespace value {
         class TupleFactory;
         class TableFactory;
         class XMLFactory;
+        class NullFactory;
 
         typedef boost::shared_ptr < ValueBase > Value;
         typedef boost::shared_ptr < BooleanFactory > Boolean;
@@ -52,6 +53,7 @@ namespace vle { namespace value {
         typedef boost::shared_ptr < TupleFactory > Tuple;
         typedef boost::shared_ptr < TableFactory > Table;
         typedef boost::shared_ptr < XMLFactory > XML;
+        typedef boost::shared_ptr < NullFactory > Null;
         
 
         /**
@@ -61,7 +63,7 @@ namespace vle { namespace value {
         {
         public:
             enum type { BOOLEAN, INTEGER, DOUBLE, STRING, SET, MAP,
-                TUPLE, TABLE, XMLTYPE };
+                TUPLE, TABLE, XMLTYPE, NIL };
 
             /**
              * Defaut constructor. To use Values class, you must use the static
@@ -151,6 +153,9 @@ namespace vle { namespace value {
 
             inline bool isXML() const
             { return getType() == ValueBase::XMLTYPE; }
+
+            inline bool isNull() const
+            { return getType() == ValueBase::NIL; }
 
         };
 

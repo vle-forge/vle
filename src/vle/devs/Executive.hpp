@@ -27,13 +27,13 @@
 #ifndef VLE_DEVS_EXECUTIVE_HPP
 #define VLE_DEVS_EXECUTIVE_HPP
 
+#include <vle/devs/Coordinator.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/graph/CoupledModel.hpp>
 
 namespace vle { namespace devs {
 
     class Simulator;
-    class Coordinator;
 
     /**
      * @brief Dynamics class for the Barros DEVS extension. Provite graph
@@ -76,8 +76,7 @@ namespace vle { namespace devs {
          * vle::graph, vle::devs and vle::vpz API.
          * @param coordinator A reference to the coordinator.
          */
-        inline void setCoordinator(Coordinator* coordinator)
-        { m_coordinator = coordinator; }
+        friend void Coordinator::setCoordinator(Executive& exe);
 
     protected:
         Coordinator& coordinator() const;

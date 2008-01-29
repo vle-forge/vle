@@ -28,14 +28,14 @@
 
 namespace vle { namespace manager {
 
-void LinearExperimentGenerator::build_combination(size_t& nb)
+void LinearExperimentGenerator::buildCombination(size_t& nb)
 {
     for(size_t i=0; i < mCondition.size(); ++i)
 	mCondition[i].pos++;
     nb++;
 }
 
-size_t LinearExperimentGenerator::get_combination_number() const
+size_t LinearExperimentGenerator::getCombinationNumber() const
 {
     Assert(utils::InternalError, not mCondition.empty(),
            "Build a linear experimental frame with empty value?");

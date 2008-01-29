@@ -37,6 +37,7 @@
 #include <vle/value/Double.hpp>
 #include <vle/value/String.hpp>
 #include <vle/value/XML.hpp>
+#include <vle/value/Null.hpp>
 
 namespace vle { namespace vpz {
 
@@ -146,6 +147,11 @@ void SaxParser::onTable(const AttributeList& att)
 void SaxParser::onXML(const AttributeList&)
 {
     m_valuestack.pushXml();
+}
+
+void SaxParser::onNull(const AttributeList&)
+{
+    m_valuestack.pushNull();
 }
 
 void SaxParser::onVLETrame(const AttributeList&)
@@ -366,6 +372,11 @@ void SaxParser::onEndXML()
     m_valuestack.pushOnVectorValue(
         value::XMLFactory::create(m_cdata));
     m_cdata.clear();
+}
+
+void SaxParser::onEndNull()
+{
+    m_valuestack.pushOnVectorValue(value::NullFactory::create());
 }
 
 void SaxParser::onEndTrame()

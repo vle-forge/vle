@@ -34,33 +34,76 @@
 
 namespace vle { namespace manager {
 
-ExperimentGenerator::ExperimentGenerator(const vpz::Vpz& file) :
+ExperimentGenerator::ExperimentGenerator(const vpz::Vpz& file,
+                                         std::ostream& out) :
     mFile(file),
     mTmpfile(file),
-    mSaveVpz(false)
+    mOut(out),
+    mSaveVpz(false),
+    mMutex(0),
+    mProdcond(0)
 {
+    vpz::Conditions& dest(mTmpfile.project().experiment().conditions());
+    vpz::ConditionList::const_iterator itDest(dest.conditionlist().begin());
+    vpz::ConditionValues::const_iterator
+        itValueDest(itDest->second.conditionvalues().begin());
+
+    const vpz::Conditions& orig(mFile.project().experiment().conditions());
+    vpz::ConditionList::const_iterator itOrig(orig.conditionlist().begin());
+    vpz::ConditionValues::const_iterator
+        itValueOrig(itOrig->second.conditionvalues().begin());
+
     mTmpfile.project().experiment().conditions().rebuildValueSet();
 }
 
-void ExperimentGenerator::build()
+void ExperimentGenerator::build(OutputSimulationMatrix* matrix)
 {
-    build_replicas_list();
-    build_conditions_list();
-    build_combinations();
+    mMatrix = matrix;
+
+    buildReplicasList();
+    buildConditionsList();
+
+    OutputSimulationMatrix::extent_gen extent;
+
+    mOut << boost::format("Generator: build (%1%, %2%)\n") % mReplicasTab.size()
+        % getCombinationNumber();
+    mMatrix->resize(extent[mReplicasTab.size()][getCombinationNumber()]);
+
+    buildCombinations();
 }
 
-void ExperimentGenerator::build_replicas_list()
+void ExperimentGenerator::build(Glib::Mutex* mutex, Glib::Cond* prod,
+                                OutputSimulationMatrix* matrix)
 {
-    std::cerr << "Replicas: ";
+    mMutex = mutex;
+    mProdcond = prod;
+    mMatrix = matrix;
+
+    buildReplicasList();
+    buildConditionsList();
+
+    {
+        Glib::Mutex::Lock lock(*mMutex);
+        OutputSimulationMatrix::extent_gen extent;
+        mMatrix->resize(extent[mReplicasTab.size()][getCombinationNumber()]);
+        prod->signal();
+    }
+
+    buildCombinations();
+}
+
+void ExperimentGenerator::buildReplicasList()
+{
+    mOut << "Replicas: ";
     mReplicasTab = mFile.project().experiment().replicas().getList();
     if (mReplicasTab.empty()) {
         std::cerr << "/!\\ no defined (experiment seed is used): ";
         mReplicasTab.push_back(mFile.project().experiment().seed());
     }
-    std::cerr << mReplicasTab.size() << std::endl;
+    mOut << mReplicasTab.size() << std::endl;
 }
 
-void ExperimentGenerator::build_conditions_list()
+void ExperimentGenerator::buildConditionsList()
 {
     const vpz::Conditions& cnds(mFile.project().experiment().conditions());
     vpz::ConditionList::const_iterator it;
@@ -73,24 +116,25 @@ void ExperimentGenerator::build_conditions_list()
         for (jt = cnd.conditionvalues().begin();
              jt != cnd.conditionvalues().end(); ++jt) {
             mCondition.push_back(cond_t());
+
             mCondition[mCondition.size() - 1].sz = jt->second->size();
             mCondition[mCondition.size() - 1].pos = 0;
         }
     }
-    std::cerr << "Combinations: " << get_combination_number() << std::endl;
 }
 
-void ExperimentGenerator::build_combinations()
+void ExperimentGenerator::buildCombinations()
 {
     size_t nb = 0;
 
     do {
-        build_combinations_from_replicas(nb);
-        build_combination(nb);
-    } while (nb < get_combination_number()); 
+        mTmpfile.project().experiment().conditions().rebuildValueSet();
+        buildCombinationsFromReplicas(nb);
+        buildCombination(nb);
+    } while (nb < getCombinationNumber()); 
 }
 
-void ExperimentGenerator::build_combinations_from_replicas(size_t cmbnumber)
+void ExperimentGenerator::buildCombinationsFromReplicas(size_t cmbnumber)
 {
     vpz::Conditions& dest(mTmpfile.project().experiment().conditions());
     vpz::ConditionList::const_iterator itDest(dest.conditionlist().begin());
@@ -119,7 +163,8 @@ void ExperimentGenerator::build_combinations_from_replicas(size_t cmbnumber)
         if (itValueDest == itDest->second.conditionvalues().end()) {
             Assert(utils::InternalError, itValueOrig ==
                    itOrig->second.conditionvalues().end(),
-                   boost::format("Error: %1% %2%\n") % itDest->second.conditionvalues().size() %
+                   boost::format("Error: %1% %2%\n") %
+                   itDest->second.conditionvalues().size() %
                    itOrig->second.conditionvalues().size());
             itDest++;
             itOrig++;
@@ -128,36 +173,53 @@ void ExperimentGenerator::build_combinations_from_replicas(size_t cmbnumber)
         }
     }
 
-    for (size_t irep = 0; irep < mReplicasTab.size(); ++irep) {
-        mTmpfile.project().experiment().setSeed(mReplicasTab[irep]);
-        write_instance(cmbnumber, irep);
+    if (mMutex == 0) {
+        for (size_t irep = 0; irep < mReplicasTab.size(); ++irep) {
+            mTmpfile.project().experiment().setSeed(mReplicasTab[irep]);
+            writeInstance(cmbnumber, irep);
+        }
+    } else {
+        for (size_t irep = 0; irep < mReplicasTab.size(); ++irep) {
+            mTmpfile.project().experiment().setSeed(mReplicasTab[irep]);
+            writeInstanceThread(cmbnumber, irep);
+        }
     }
 }
 
-void ExperimentGenerator::write_instance(size_t cmbnumber, size_t replnumber)
+void ExperimentGenerator::writeInstance(size_t cmbnumber, size_t replnumber)
 {
     std::string expname(
         (boost::format("%1%-%2%-%3%") % mFile.project().experiment().
          name() % cmbnumber % replnumber).str());
 
     mTmpfile.project().experiment().setName(expname);
+    vpz::Vpz* newvpz = new vpz::Vpz(mTmpfile);
+    newvpz->project().setInstance(cmbnumber);
+    newvpz->project().setReplica(replnumber);
 
-    std::string buffer(mTmpfile.writeToString());
-
-    Glib::ustring filename(utils::write_to_temp("vleexp", buffer));
-
-    std::cerr << (boost::format(
-            "Writing file: %1% %2%/%3%\n") % filename % cmbnumber % replnumber);
-    if (mSaveVpz) {
-        expname += ".vpz";
-        std::ofstream file(expname.c_str());
-        file << buffer;
-    }
-
-    mFileList.push_back(filename);
+    mFileList.push_back(newvpz);
 }
 
-size_t ExperimentGenerator::get_replicas_number() const
+
+void ExperimentGenerator::writeInstanceThread(size_t cmbnumber, size_t replnumber)
+{
+    std::string expname(
+        (boost::format("%1%-%2%-%3%") % mFile.project().experiment().
+         name() % cmbnumber % replnumber).str());
+
+    mTmpfile.project().experiment().setName(expname);
+    vpz::Vpz* newvpz = new vpz::Vpz(mTmpfile);
+    newvpz->project().setInstance(cmbnumber);
+    newvpz->project().setReplica(replnumber);
+
+    {
+        Glib::Mutex::Lock lock(*mMutex);
+        mFileList.push_back(newvpz);
+        mProdcond->signal();
+    }
+}
+
+size_t ExperimentGenerator::getReplicasNumber() const
 {
     return mReplicasTab.size();
 }

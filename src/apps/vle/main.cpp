@@ -37,13 +37,11 @@ int main(int argc, char* argv[])
 
     vle::apps::CommandOptionGroup command;
     vle::apps::ManagerOptionGroup manag;
-    vle::apps::SimulatorOptionGroup simu;
     vle::apps::GlobalOptionGroup global;
     vle::utils::PathOptionGroup path;
 
     context.set_main_group(command);
     context.add_group(manag);
-    context.add_group(simu);
     context.add_group(global);
     context.add_group(path);
 
@@ -51,7 +49,6 @@ int main(int argc, char* argv[])
         context.parse(argc, argv);
         command.check();
         manag.check();
-        simu.check();
         global.check();
         vle::utils::Trace::trace().setLevel(
             static_cast < vle::utils::Trace::Level >(global.verbose()));
@@ -76,14 +73,14 @@ int main(int argc, char* argv[])
     bool result = true;
 
     if (command.manager()) {
-        result = vle.runManager(manag.daemon(), manag.allInLocal(),
-                                manag.savevpz(),
-                                vle::manager::VLE::CmdArgs(argv + 1, argv +
-                                                           argc));
+        result = vle.runManager(manag.allInLocal(), manag.savevpz(),
+                                command.processor(),
+                                vle::manager::CmdArgs(argv + 1, argv + argc));
     } else if (command.simulator()) {
-        result = vle.runSimulator(simu.process());
+        result = vle.runSimulator(command.processor());
     } else if (command.justRun()) {
-        result = vle.justRun(vle::manager::VLE::CmdArgs(argv + 1, argv + argc));
+        result = vle.justRun(command.processor(),
+                             vle::manager::CmdArgs(argv + 1, argv + argc));
     }
     return result ? EXIT_SUCCESS : EXIT_FAILURE;
 }

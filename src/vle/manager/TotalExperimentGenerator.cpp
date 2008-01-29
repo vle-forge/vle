@@ -29,7 +29,7 @@
 
 namespace vle { namespace manager {
 
-void TotalExperimentGenerator::build_combination(size_t& nb)
+void TotalExperimentGenerator::buildCombination(size_t& nb)
 {
     size_t sz = mCondition.size() - 1;
 
@@ -51,7 +51,7 @@ void TotalExperimentGenerator::build_combination(size_t& nb)
     nb++;
 }
 
-size_t TotalExperimentGenerator::get_combination_number() const
+size_t TotalExperimentGenerator::getCombinationNumber() const
 {
     size_t nb = 1;
 

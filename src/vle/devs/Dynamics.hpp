@@ -27,6 +27,7 @@
 #ifndef DEVS_DYNAMICS_HPP
 #define DEVS_DYNAMICS_HPP
 
+#include <vle/devs/RootCoordinator.hpp>
 #include <vle/devs/Event.hpp>
 #include <vle/devs/DevsTypes.hpp>
 #include <vle/devs/Time.hpp>
@@ -42,6 +43,7 @@
 #include <vle/value/Integer.hpp>
 #include <vle/value/Boolean.hpp>
 #include <vle/value/String.hpp>
+#include <vle/utils/Rand.hpp>
 #include <string>
 
 
@@ -63,8 +65,7 @@
 
 namespace vle { namespace devs {
 
-    class Simulator;
-    class Coordinator;
+    class RootCoordinator;
 
     /**
      * @brief Dynamics class represent a part of the DEVS simulator. This class
@@ -83,7 +84,8 @@ namespace vle { namespace devs {
 	 */
         Dynamics(const vle::graph::AtomicModel& model,
                  const vle::devs::InitEventList&  /* events */) : 
-            m_model(model)
+            m_model(model),
+            m_rand(0)
         { }
 
 	/**
@@ -353,8 +355,21 @@ namespace vle { namespace devs {
                            const std::string& attributeName,
                            const std::string& attributeValue) const;
 
+        /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
+        /** 
+         * @brief Return a reference to the RootCoordinator utils::Rand pseudo
+         * random generator.
+         * @return Return a reference to the utils::Rand object.
+         */
+        inline utils::Rand& rand() const
+        { return *m_rand; }
+
+        friend void RootCoordinator::setRand(Dynamics& dyn);
+
     private:
         const graph::AtomicModel&   m_model;
+        utils::Rand*                m_rand;
     };
 
 }} // namespace vle devs

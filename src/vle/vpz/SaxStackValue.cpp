@@ -116,6 +116,13 @@ void ValueStackSax::pushXml()
     }
 }
 
+void ValueStackSax::pushNull()
+{
+    if (not m_valuestack.empty()) {
+        AssertS(utils::SaxParserError, isCompositeParent());
+    }
+}
+
 void ValueStackSax::popValue()
 {
     if (not m_valuestack.empty()) {

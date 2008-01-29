@@ -61,6 +61,23 @@ std::map < Simulator*, EventBagModel >::value_type&
     Throw(utils::InternalError, "Top bag problem");
 }
 
+void CompleteEventBagModel::invalidateModel(Simulator* mdl)
+{
+    std::map < Simulator*, EventBagModel >::iterator it = _bags.find(mdl);
+    if (it != _bags.end()) {
+        it->second.clear();
+    }
+
+    for (std::deque < ObservationEvent* >::iterator it = _states.begin();
+         it != _states.end(); ++it) {
+        if ((*it)->getModel() == mdl) {
+            delete *it;
+            *it = 0;
+        }
+    }
+}
+
+
 void CompleteEventBagModel::delModel(Simulator* mdl)
 {
     std::map < Simulator*, EventBagModel >::iterator it = _bags.find(mdl);
@@ -75,9 +92,6 @@ void CompleteEventBagModel::delModel(Simulator* mdl)
             _states.erase(it);
         }
     }
-
-    std::map < Simulator*, EventBagModel >::iterator    _itbags;
-        std::list < std::map < Simulator*, EventBagModel >::value_type* >::iterator _itexec;
 }
 
 EventTable::EventTable(size_t sz)
@@ -280,6 +294,36 @@ void EventTable::popObservationEvent()
                       stateLessThan);
         mObservationEventList.pop_back();
     }
+}
+
+void EventTable::invalidateModel(Simulator* mdl)
+{
+    {
+        InternalEventModel::iterator it = mInternalEventModel.find(mdl);
+        if (it != mInternalEventModel.end()) {
+            if ((*it).second)
+                (*it).second->invalidate();
+        }
+    }
+
+    {
+        ExternalEventModel::iterator it = mExternalEventModel.find(mdl);
+        if (it != mExternalEventModel.end()) {
+            (*it).second.first.deleteAndClear();
+            (*it).second.second.deleteAndClear();
+        }
+    }
+
+    {
+        for (ObservationEventList::iterator it = mObservationEventList.begin();
+             it != mObservationEventList.end(); ++it) {
+            if  ((*it)->getModel() == mdl) {
+                (*it)->invalidate();
+            }
+        }
+    }
+
+    mCompleteEventBagModel.invalidateModel(mdl);
 }
 
 void EventTable::delModelEvents(Simulator* mdl)

@@ -111,4 +111,9 @@ std::list < std::string > View::get(Simulator* simulator)
     return toreturn;
 }
 
+oov::PluginPtr View::plugin() const
+{
+    return m_stream->plugin();
+}
+
 }} // namespace vle devs

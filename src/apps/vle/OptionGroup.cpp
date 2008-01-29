@@ -38,7 +38,8 @@ CommandOptionGroup::CommandOptionGroup() :
     mManager(false),
     mSimulator(false),
     mJustrun(false),
-    mPort(8000)
+    mPort(8000),
+    mProcess(1)
 {
     {
         Glib::OptionEntry en;
@@ -68,6 +69,13 @@ CommandOptionGroup::CommandOptionGroup() :
         en.set_description("Port to listening in manager or simulator mode.");
         add_entry(en, mPort);
     }
+    {
+        Glib::OptionEntry en;
+        en.set_long_name("process");
+        en.set_short_name('o');
+        en.set_description("Number of process to run VPZ.");
+        add_entry(en, mProcess);
+    }
 }
 
 void CommandOptionGroup::check()
@@ -90,6 +98,14 @@ void CommandOptionGroup::check()
                 "Invalid port %1%. Choose a correct port ie. [1 - 65535]\n") %
             mPort);
     }
+
+    if (mProcess == 0) {
+        mProcess = 1;
+    } else if (mProcess <= 0) {
+        Throw(utils::InternalError, boost::format(
+                "Invalid %1%. Choose a correct number of process ie. > 0\n") %
+            mProcess);
+    }
 }
 
 ManagerOptionGroup::ManagerOptionGroup() :
@@ -97,16 +113,8 @@ ManagerOptionGroup::ManagerOptionGroup() :
                    "Manager options",
                    "Description of manager options"),
     mAllinlocal(false),
-    mDaemon(false),
     mSaveVpz(false)
 {
-    {
-        Glib::OptionEntry en;
-        en.set_long_name("daemon");
-        en.set_short_name('d');
-        en.set_description("Run manager in daemon.");
-        add_entry(en, mDaemon);
-    }
     {
         Glib::OptionEntry en;
         en.set_long_name("allinlocal");
@@ -125,31 +133,6 @@ ManagerOptionGroup::ManagerOptionGroup() :
 
 void ManagerOptionGroup::check()
 {
-}
-
-SimulatorOptionGroup::SimulatorOptionGroup() :
-    VLEOptionGroup("simgroup", "Simulator options",
-                   "Description of simulator options"),
-    mProcess(1)
-{
-    {
-        Glib::OptionEntry en;
-        en.set_long_name("process");
-        en.set_short_name('o');
-        en.set_description("Number of process to run VPZ.");
-        add_entry(en, mProcess);
-    }
-}
-
-void SimulatorOptionGroup::check()
-{
-    if (mProcess == 0) {
-        mProcess = 1;
-    } else if (mProcess <= 0) {
-        Throw(utils::InternalError, boost::format(
-                "Invalid %1%. Choose a correct number of process ie. > 0\n") %
-            mProcess);
-    }
 }
 
 GlobalOptionGroup::GlobalOptionGroup() :

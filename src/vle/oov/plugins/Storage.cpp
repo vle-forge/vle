@@ -24,8 +24,12 @@
 
 #include <vle/oov/plugins/Storage.hpp>
 #include <vle/utils/Debug.hpp>
+#include <vle/value/Set.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
+#include <vle/value/String.hpp>
+#include <vle/value/Null.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 
 namespace vle { namespace oov { namespace plugin {
 
@@ -40,6 +44,110 @@ Storage::Storage(const std::string& location) :
 
 Storage::~Storage()
 {
+}
+
+bool Storage::isSerializable() const
+{
+    return true;
+}
+
+value::Value Storage::serialize() const
+{
+    value::Set result(value::SetFactory::create());
+    result->addValue(value::IntegerFactory::create(nb_col));
+    result->addValue(value::IntegerFactory::create(nb_row));
+    result->addValue(value::DoubleFactory::create(m_time));
+
+    value::Set id(value::SetFactory::create());
+    for (MapPairIndex::const_iterator it = col_access.begin();
+         it != col_access.end(); ++it) {
+        id->addValue(value::StringFactory::create(it->first.first));
+        id->addValue(value::StringFactory::create(it->first.second));
+        id->addValue(value::IntegerFactory::create(it->second));
+    }
+    result->addValue(id);
+
+    value::Set tab(value::SetFactory::create());
+    for (ArrayValue::index y = 0; y < nb_row; ++y) {
+        value::Set rowdata(value::SetFactory::create());
+        for (ArrayValue::index x = 0; x < nb_col; ++x) {
+            if (m_values[x][y].get()) {
+                rowdata->addValue(m_values[x][y]);
+            } else {
+                rowdata->addValue(value::NullFactory::create());
+            }
+        }
+        tab->addValue(rowdata);
+    }
+
+    result->addValue(tab);
+
+    return result;
+}
+
+void Storage::deserialize(value::Value& vals)
+{
+    col_access.clear();
+
+    value::Set result(value::toSetValue(vals));
+    Assert(utils::ArgError, result->size() == 5, "Bad Storage deserialize flows");
+
+    nb_col = value::toInteger(result->getValue(0));
+    nb_row = value::toInteger(result->getValue(1));
+    m_time = value::toDouble(result->getValue(2));
+
+    value::Set id(value::toSetValue(result->getValue(3)));
+    Assert(utils::ArgError,
+           id->size() == boost::numeric_cast < size_t >((nb_col - 1)  * 3),
+           (boost::format("Bad column (%1%) number for ids (%2%)") % id->size()
+            % ((nb_col - 1) * 3)));
+
+    {
+        value::VectorValue::const_iterator it = id->begin();
+        while (it != id->end()) {
+            value::VectorValue::const_iterator model(it);
+            value::VectorValue::const_iterator port(it + 1);
+            value::VectorValue::const_iterator value(it + 2);
+            PairString colref(value::toString(*model), value::toString(*port));
+            col_access[colref] = value::toInteger(*value);
+            it = it + 3;
+        }
+    }
+
+    value::Set tab(value::toSetValue(result->getValue(4)));
+    Assert(utils::ArgError,
+           tab->size() == boost::numeric_cast < size_t >(nb_row),
+           "Bad row number of tabs");
+
+    m_values.resize(extents[nb_col][nb_row]);
+
+    {
+        value::VectorValue::iterator jt = tab->begin();
+        for (ArrayValue::index y = 0; y < nb_row; ++y) {
+            value::Set rowdata(value::toSetValue(*jt));
+
+            Assert(utils::ArgError,
+                  rowdata->size() == boost::numeric_cast < size_t >(nb_col),
+                  (boost::format("Bad column number (%1%) for tab (%2%)") %
+                   rowdata->size() % nb_col));
+
+            value::VectorValue::iterator it = rowdata->begin();
+            for (ArrayValue::index x = 0; x < nb_col; ++x) {
+                if ((*it)->isNull()) {
+                    m_values[x][y] = value::Value();
+                } else {
+                    m_values[x][y] = *it;
+                }
+                ++it;
+            }
+            ++jt;
+        }
+    }
+}
+
+std::string Storage::name() const
+{
+    return std::string("storage");
 }
 
 void Storage::onParameter(const vpz::ParameterTrame& /* trame */)

@@ -58,13 +58,14 @@ void RootCoordinator::load(const vpz::Vpz& io)
         delete m_root;
     }
 
-    utils::Rand::rand().set_seed(io.project().experiment().seed());
+    m_rand.set_seed(io.project().experiment().seed());
     m_duration = io.project().experiment().duration();
 
     m_modelfactory = new ModelFactory(io.project().dynamics(),
                                       io.project().classes(),
                                       io.project().experiment(),
-                                      io.project().model().atomicModels());
+                                      io.project().model().atomicModels(),
+                                      *this);
 
     m_coordinator = new Coordinator(*m_modelfactory);
     m_coordinator->init(io.project().model());
@@ -94,6 +95,7 @@ void RootCoordinator::finish()
 {
     if (m_coordinator) {
         m_coordinator->finish();
+        m_outputs = m_coordinator->outputs();
         delete m_coordinator;
         m_coordinator = 0;
     }
@@ -107,6 +109,11 @@ void RootCoordinator::finish()
         delete m_root;
         m_root = 0;
     }
+}
+
+void RootCoordinator::setRand(Dynamics& dyn)
+{
+    dyn.m_rand = &m_rand;
 }
 
 }} // namespace vle devs

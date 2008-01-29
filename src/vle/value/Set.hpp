@@ -108,6 +108,9 @@ namespace vle { namespace value {
         inline const Value& getValue(const size_t i) const
         { return m_value.at(i); }
 
+        inline Value& getValue(const size_t i)
+        { return m_value.at(i); }
+
         inline size_t size() const
         { return m_value.size(); }
 

@@ -44,6 +44,10 @@ namespace vle { namespace utils {
     class Rand : public Glib::Rand
     {
     public:
+        Rand();
+
+        ~Rand();
+
         /**
          * Returns a random double uniformaly distributed over the range
          * [0..1].
@@ -107,10 +111,10 @@ namespace vle { namespace utils {
 	 *
          * @return A reference to a Rand object.
          */
-      inline static Rand& rand()
-      {
-	  return (mRand) ? *mRand : *(mRand = new Rand);
-      }
+        inline static Rand& rand()
+        {
+            return (mRand) ? *mRand : *(mRand = new Rand);
+        }
 
         /**
          * Destroy unique Random generator if it exist.
@@ -165,10 +169,6 @@ namespace vle { namespace utils {
 	double von_mises(double kappa, double mu);
     private:
         static Rand* mRand;
-
-        Rand();
-
-        ~Rand();
     };
 
 }} // namespace vle utils

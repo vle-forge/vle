@@ -70,6 +70,8 @@ namespace vle { namespace apps {
         inline bool justRun() const { return mJustrun; }
 
         inline int port() const { return mPort; }
+
+        inline int processor() const { return mProcess; }
         
         /** 
          * @brief Check if only on mode is active.
@@ -83,6 +85,7 @@ namespace vle { namespace apps {
         bool    mSimulator;
         bool    mJustrun;
         int     mPort;
+        int     mProcess;
     };
 
     /** 
@@ -98,40 +101,13 @@ namespace vle { namespace apps {
 
         inline bool allInLocal() const { return mAllinlocal; }
         
-        inline bool daemon() const { return mDaemon; }
-
         inline bool savevpz() const { return mSaveVpz; }
         
         virtual void check();
 
     private:
         bool    mAllinlocal;
-        bool    mDaemon;
         bool    mSaveVpz;
-    };
-
-    /** 
-     * @brief Options for simulator, ie. specify the number of processor.
-     */
-    class SimulatorOptionGroup : public VLEOptionGroup
-    {
-    public:
-        SimulatorOptionGroup();
-
-        virtual ~SimulatorOptionGroup() { }
-
-        inline int process() const { return mProcess; }
-        
-        /** 
-         * @brief Check if number of process is greather than 0.
-         *
-         * @throw Exception::Internal if number of process is incorrect.
-         */
-        virtual void check();
-
-    private:
-        int     mProcess;
-
     };
 
     /** 

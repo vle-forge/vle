@@ -45,6 +45,37 @@ namespace vle { namespace oov { namespace plugin {
 
         virtual ~Storage();
 
+        virtual bool isSerializable() const;
+
+        /** 
+         * @brief Serialize the storage plugin data's to and output values. The
+         * serialization is defined like:
+         * @code
+         * <set>
+         *  <integer>nbcolumns</integer> <!-- x number of columns -->
+         *  <integer>nbrow</integer>     <!-- y number of rows -->
+         *  <double>time</double>        <!-- double time -->
+         *  <set>                        <!-- x set to represents -->
+         *   <string>model</string>      <!-- model name -->
+         *   <string>port</string>       <!-- port name -->
+         *   <integer>index</integer>    <!-- index in the data array -->
+         *  </set>
+         *  [...] <!-- x number -->
+         *  <set>                        <!-- and now, the big array -->
+         *   <set>                       <!-- y row -->
+         *    [...]                      <!-- x columns -->
+         *  </set>
+         * </set>
+         * @endcode
+         * @param pluginname Name of this plugins
+         * @return The serialized Storage plugin data's.
+         */
+        virtual value::Value serialize() const;
+
+        virtual void deserialize(value::Value& vals);
+
+        virtual std::string name() const;
+
         virtual void onParameter(const vpz::ParameterTrame& trame);
 
         virtual void onNewObservable(const vpz::NewObservableTrame& trame);
@@ -80,7 +111,7 @@ namespace vle { namespace oov { namespace plugin {
 
         typedef std::map < std::string, VectorString > MapVectorString;
 
-        typedef  std::map < PairString, ArrayValue::index, pairCmp > MapPairIndex;
+        typedef std::map < PairString, ArrayValue::index, pairCmp > MapPairIndex;
 
         // to store the values
         ArrayValue m_values;
@@ -100,7 +131,7 @@ namespace vle { namespace oov { namespace plugin {
         MapPairIndex col_access;
 
         double                          m_time;
-        bool                            m_isstart;    
+        bool                            m_isstart;
 
         void nextTime(double trame_time);
     };

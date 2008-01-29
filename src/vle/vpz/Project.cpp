@@ -33,7 +33,17 @@ void Project::write(std::ostream& out) const
     out << "<vle_project"
         << " version=\"" << m_version << "\""
         << " date=\"" << m_date << "\""
-        << " author=\"" << m_author << "\" >\n"
+        << " author=\"" << m_author << "\"";
+
+    if (m_instance >= 0) {
+        out << " instance=\"" << m_instance << "\"";
+    }
+
+    if (m_replica >= 0) {
+        out << " replica=\"" << m_replica << "\"";
+    }
+
+    out << ">\n"
         << m_model
         << m_dynamics
         << m_experiment

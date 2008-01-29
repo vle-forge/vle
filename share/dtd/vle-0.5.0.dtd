@@ -15,7 +15,7 @@
 <!ELEMENT experiment (replicas?, conditions?, views?) >
 <!ELEMENT conditions (condition*) >
 <!ELEMENT condition (port*) >
-<!ELEMENT port ((attachedview*)|(integer|double|boolean|string|table|tuple|set|map|xml)*) >
+<!ELEMENT port ((attachedview*)|(integer|double|boolean|string|table|tuple|set|map|xml|null)*) >
 <!ELEMENT views (outputs, observables, view*) >
 <!ELEMENT outputs (output*) >
 <!ELEMENT output (#PCDATA) >
@@ -29,14 +29,16 @@
 <!ELEMENT string (#PCDATA) >
 <!ELEMENT table (#PCDATA) >
 <!ELEMENT tuple (#PCDATA) >
-<!ELEMENT set (integer|double|boolean|string|table|tuple|set|map|xml)* >
+<!ELEMENT set (integer|double|boolean|string|table|tuple|set|map|xml|null)* >
 <!ELEMENT map (key*) >
-<!ELEMENT key (integer|double|boolean|string|table|tuple|set|map|xml) >
+<!ELEMENT key (integer|double|boolean|string|table|tuple|set|map|xml|null) >
 <!ELEMENT xml (#PCDATA) >
 
 <!ATTLIST vle_project
   date CDATA #IMPLIED
   version CDATA #REQUIRED
+  instance CDATA #IMPLIED
+  replica CDATA #IMPLIED
   author CDATA #IMPLIED >
 
 <!ATTLIST model

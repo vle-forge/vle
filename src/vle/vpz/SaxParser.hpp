@@ -165,6 +165,7 @@ namespace vle { namespace vpz {
         void onTuple(const AttributeList& att);
         void onTable(const AttributeList& att);
         void onXML(const AttributeList& att);
+        void onNull(const AttributeList& att);
         void onVLETrame(const AttributeList& att);
         void onTrame(const AttributeList& att);
         void onModelTrame(const AttributeList& att);
@@ -205,6 +206,7 @@ namespace vle { namespace vpz {
         void onEndTuple();
         void onEndTable();
         void onEndXML();
+        void onEndNull();
         void onEndVLETrame();
         void onEndTrame();
         void onEndModelTrame();
@@ -253,6 +255,7 @@ namespace vle { namespace vpz {
             add("tuple", &SaxParser::onTuple, &SaxParser::onEndTuple);
             add("table", &SaxParser::onTable, &SaxParser::onEndTable);
             add("xml", &SaxParser::onXML, &SaxParser::onEndXML);
+            add("null", &SaxParser::onNull, &SaxParser::onEndNull);
             add("vle_trame", &SaxParser::onVLETrame, &SaxParser::onEndVLETrame);
             add("trame", &SaxParser::onTrame, &SaxParser::onEndTrame);
             add("modeltrame", &SaxParser::onModelTrame,

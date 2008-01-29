@@ -36,6 +36,7 @@
 
 namespace vle { namespace devs {
 
+    class RootCoordinator;
     class Coordinator;
     class Simulator;
 
@@ -115,7 +116,8 @@ namespace vle { namespace devs {
         ModelFactory(const vpz::Dynamics& dyn,
                      const vpz::Classes& cls,
                      const vpz::Experiment& experiment,
-                     const vpz::AtomicModelList& atom);
+                     const vpz::AtomicModelList& atom,
+                     RootCoordinator& root);
 
         /** 
          * @brief To delete all Glib::Module and class.
@@ -228,6 +230,7 @@ namespace vle { namespace devs {
         vpz::Classes            mClasses;
         vpz::Experiment         mExperiment;
         vpz::AtomicModelList    mAtoms;
+        RootCoordinator&        mRoot;
         ModuleCache             mModule;
 
         /** 

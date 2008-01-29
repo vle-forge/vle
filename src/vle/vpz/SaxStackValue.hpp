@@ -59,6 +59,8 @@ class ValueStackSax
 
         void pushXml();
 
+        void pushNull();
+
         void popValue();
 
         const value::Value& topValue();

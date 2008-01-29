@@ -27,135 +27,276 @@
 #include <cstdio>
 #include <glibmm/spawn.h>
 #include <vle/manager/Manager.hpp>
+#include <vle/manager/Run.hpp>
 #include <vle/manager/TotalExperimentGenerator.hpp>
 #include <vle/manager/LinearExperimentGenerator.hpp>
+#include <vle/oov/PluginFactory.hpp>
 #include <vle/utils/XML.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Socket.hpp>
 #include <vle/utils/Trace.hpp>
+#include <vle/value/String.hpp>
+#include <vle/value/Set.hpp>
+#include <vle/value/Integer.hpp>
 
 
 
 namespace vle { namespace manager {
 
-Manager::Manager(bool savevpz) :
-    mSaveVPZ(savevpz)
+ExperimentGenerator* ManagerRun::getCombinationPlan(
+    const vpz::Vpz& file, std::ostream& out)
+{
+    const vpz::Experiment& exp = file.project().experiment();
+    if (exp.combination() == "linear") {
+        return new LinearExperimentGenerator(file, out);
+    } else {
+        return new TotalExperimentGenerator(file, out);
+    }
+}
+
+void ManagerRunMono::operator()(const vpz::Vpz& file)
+{
+    m_out << "Manager: run experimental frames in one thread\n";
+    m_exp = getCombinationPlan(file, m_out);
+    m_exp->saveVPZinstance(m_writefile);
+    m_exp->build(&m_matrix);
+
+    std::ostringstream ostr;
+
+    while (not m_exp->vpzInstances().empty()) {
+        vpz::Vpz* file = m_exp->vpzInstances().front();
+        int instance = file->project().instance();
+        int replica = file->project().replica();
+        RunVerbose r(ostr);
+        r.start(file);
+
+        if (r.haveError()) {
+            m_out << ostr.str() << std::endl;
+        }
+
+        m_matrix[replica][instance] = r.outputs();
+        m_exp->vpzInstances().pop_front();
+    }
+}
+
+void ManagerRunMono::operator()(const std::string& filename)
+{
+    m_filename.assign(filename);
+    vpz::Vpz file(filename);
+    operator()(file);
+}
+
+void ManagerRunThread::operator()(const vpz::Vpz& file)
+{
+    m_out << boost::format(
+        "Manager: run experimental frames in %1% threads\n") % m_process;
+    
+    m_exp = getCombinationPlan(file, m_out);
+
+    Glib::Thread* prod(Glib::Thread::create(
+            sigc::mem_fun(*this, &ManagerRunThread::read), true));
+
+    for (unsigned int i = 0; i < m_process; ++i) {
+        m_pool.push(sigc::mem_fun(*this, &ManagerRunThread::run));
+    }
+
+    prod->join();
+    m_pool.shutdown();
+
+    if (utils::Trace::trace().haveWarning()) {
+        m_out << boost::format(
+            "\n/!\\ Some warnings during simulation: See file %1%\n") %
+            utils::Trace::trace().getLogFile();
+    }
+
+    m_out << std::endl;
+}
+
+void ManagerRunThread::operator()(const std::string& filename)
+{
+    m_filename.assign(filename);
+    vpz::Vpz file(filename);
+    operator()(file);
+}
+
+void ManagerRunThread::read()
+{
+    m_exp->saveVPZinstance(m_writefile);
+    m_exp->build(&m_mutex, &m_prodcond, &m_matrix);
+
+    {
+        Glib::Mutex::Lock lock(m_mutex);
+        m_finish = true;
+        m_prodcond.signal();
+    }
+}
+
+void ManagerRunThread::run()
+{
+    vpz::Vpz* file;
+    std::string filename;
+    std::ostringstream ostr;
+    int instance;
+    int replica;
+    oov::PluginViewList views;
+
+    for (;;) {
+        file = 0;
+        {
+            Glib::Mutex::Lock lock(m_mutex);
+
+            while (m_exp->vpzInstances().empty() and not m_finish) {
+                m_prodcond.wait(m_mutex);
+            }
+
+            if (not m_exp->vpzInstances().empty()) {
+                file = m_exp->vpzInstances().front();
+                m_exp->vpzInstances().pop_front();
+            }
+        }
+
+        if (file) {
+            filename.assign(file->filename());
+            ostr.str("");
+            instance = file->project().instance();
+            replica = file->project().replica();
+            RunVerbose r(ostr);
+            r.start(file);
+
+            if (r.haveError()) {
+                m_out << ostr.str() << std::endl;
+            }
+
+            views = r.outputs();
+        }
+            
+        {
+            Glib::Mutex::Lock lock(m_mutex);
+            if (file) {
+                m_matrix[replica][instance] = views;
+            }
+            if (m_finish and m_exp->vpzInstances().empty()) {
+                break;
+            }
+        }
+    }
+}
+
+ManagerRunDistant::ManagerRunDistant(std::ostream& out, bool writefile) :
+    ManagerRun(out, writefile)
 {
     try {
         mHost.read_file();
     } catch(const std::exception& e) {
-        std::cerr << "manager parsing host file error.\n";
+        m_out << boost::format("manager parsing host file error: %1%\n") 
+            % e.what();
     }
 }
 
-Manager::~Manager()
+vpz::Vpz* ManagerRunDistant::getVpz()
 {
-    close_connection_with_simulators();
-}
-
-void Manager::run_all_in_localhost(const std::string& filename)
-{
-    run_all_in_localhost(vpz::Vpz(filename));
-}
-
-void Manager::run_all_in_localhost(const vpz::Vpz& vpz)
-{
-    mFile = vpz;
-
-    ExperimentGenerator* expgen = get_combination_plan();
-    expgen->saveVPZinstance(mSaveVPZ);
-
-    expgen->build();
-
-    std::list < std::string > lst = expgen->get_instances_files();
-    std::list < std::string >::const_iterator it = lst.begin();
-
-    while (lst.empty() == false) {
-        std::cerr << " - Simulator start in another process\n";
-        Glib::spawn_command_line_sync((boost::format("vle -v %1% %2%\n") %
-                                       utils::Trace::trace().getLevel() %
-                                       lst.front()).str());
-        if (std::remove(lst.front().c_str()) == -1) {
-            std::cerr << boost::format("Delete file %1% error: %2%\n") % 
-                lst.front() % strerror(errno);
-        }
-        std::cerr << "\n";
-        lst.pop_front();
-    }
-    delete expgen;
-}
-
-void Manager::run_localhost(const std::string& filename)
-{
-    run_localhost(vpz::Vpz(filename));
-}
-
-void Manager::run_localhost(const vpz::Vpz& file)
-{
-    mFile = file;
-    scheduller();
-}
-
-void Manager::run_daemon(int port)
-{
-    utils::buildDaemon();
-
-    utils::net::Server* server = 0;
-    try {
-        server = new utils::net::Server(port);
-    } catch (const std::exception& e) {
-        std::cerr << boost::format("Error opening server: %1%\n") % e.what();
-        return;
-    }
+    vpz::Vpz* file;
 
     for (;;) {
-        try {
-            server->accept_client("client");
-            gint32 sz = server->recv_int("client");
-            std::string file(server->recv_buffer("client", sz));
-            mFile.parseFile(utils::write_to_temp("vleman", file));
+        file = 0;
+        {
+            Glib::Mutex::Lock lock(m_mutex);
 
-            scheduller();
+            while (m_exp->vpzInstances().empty() and not m_finish) {
+                m_prodcond.wait(m_mutex);
+            }
 
-            server->close_client("client");
-        } catch (const std::exception& e) {
-            std::cerr << boost::format("Error with client: %1%\n") % e.what();
+            if (not m_exp->vpzInstances().empty()) {
+                file  = m_exp->vpzInstances().front();
+                m_exp->vpzInstances().pop_front();
+                return file;
+            }
+        }
+
+        if (m_finish and m_exp->vpzInstances().empty()) {
+            break;
         }
     }
-    delete server;
+    return 0;
 }
 
-void Manager::scheduller()
+unsigned int ManagerRunDistant::getVpzNumber()
 {
-    open_connection_with_simulators();
+    {
+        Glib::Mutex::Lock lock(m_mutex);
+
+        return m_exp->vpzInstances().size();
+    }
+}
+
+void ManagerRunDistant::operator()(const std::string& filename)
+{
+    m_filename.assign(filename);
+    vpz::Vpz file(filename);
+    operator()(file);
+}
+
+void ManagerRunDistant::operator()(const vpz::Vpz& file)
+{
+    m_out << boost::format("Manager: run experimental frames in distant\n");
+    
+    m_exp = getCombinationPlan(file, m_out);
+
+    Glib::Thread* prod(Glib::Thread::create(
+            sigc::mem_fun(*this, &ManagerRunDistant::read), true));
+
+    Glib::Thread* cond(Glib::Thread::create(
+            sigc::mem_fun(*this, &ManagerRunDistant::send), true));
+
+    prod->join();
+    cond->join();
+    
+    if (utils::Trace::trace().haveWarning()) {
+        m_out << boost::format(
+            "\n/!\\ Some warnings during simulation: See file %1%\n") %
+            utils::Trace::trace().getLogFile();
+    }
+}
+
+void ManagerRunDistant::read()
+{
+    m_exp->saveVPZinstance(m_writefile);
+    m_exp->build(&m_mutex, &m_prodcond, &m_matrix);
+
+    {
+        Glib::Mutex::Lock lock(m_mutex);
+        m_finish = true;
+        m_prodcond.signal();
+    }
+}
+
+void ManagerRunDistant::send()
+{
+    openConnectionWithSimulators();
     Assert(utils::InternalError, not mClients.empty(),
            "Manager have no simulator connection.");
 
     const utils::Hosts::SetHosts hosts = mHost.hosts();
 
-    ExperimentGenerator* expgen = get_combination_plan();
-    expgen->saveVPZinstance(mSaveVPZ);
-    expgen->build();
-
-    std::list < std::string > lst = expgen->get_instances_files();
-    std::list < std::string >::const_iterator it = lst.begin();
-
-    std::cerr << "hosts number:" << hosts.size()
-        << "\nfiles number: " << lst.size()
-        << "\nclients: " << mClients.size() << "\n";
-
     utils::Hosts::SetHosts::const_iterator ithost = hosts.begin();
     std::list < utils::net::Client*>::iterator itclient = mClients.begin();
     ithost = hosts.begin();
     itclient = mClients.begin();
-    while (not lst.empty()) {
+
+    m_out << boost::format("Manager: use %1% distant simulator\n") %
+        mClients.size();
+
+    while (getVpzNumber() > 0) {
         if (ithost != hosts.end()) {
             int nbfiletosend = (*ithost).process() -
-                get_current_number_vpzi(*(*itclient));
+                getCurrentNumberVpzi(*(*itclient));
 
-            while (not lst.empty() and nbfiletosend > 0) {
-                send_vpzi(*(*itclient), lst.front());
-                lst.pop_front();
+            getResult(*(*itclient));
+
+            while (getVpzNumber() > 0 and nbfiletosend > 0) {
+                vpz::Vpz* file(getVpz());
+                sendVpzi(*(*itclient), file->writeToString());
+                delete file;
                 --nbfiletosend;
             }
             ++ithost;
@@ -165,89 +306,142 @@ void Manager::scheduller()
             itclient = mClients.begin();
         }
     }
-    delete expgen;
-    close_connection_with_simulators();
+
+    closeConnectionWithSimulators();
 }
 
-ExperimentGenerator* Manager::get_combination_plan() const
-{
-    ExperimentGenerator* result = 0;
-    const vpz::Experiment& exp = mFile.project().experiment();
-    if (exp.combination() == "linear") {
-        result = new LinearExperimentGenerator(mFile);
-    } else {
-        result = new TotalExperimentGenerator(mFile);
-    }
-    return result;
-}
-
-void Manager::open_connection_with_simulators()
+void ManagerRunDistant::openConnectionWithSimulators()
 {
     const utils::Hosts::SetHosts hosts = mHost.hosts();
     utils::Hosts::SetHosts::const_iterator ithost = hosts.begin();
 
+    m_out << boost::format(
+        "Manager: try to open connection with %1% simulators\n") %
+        mHost.hosts().size();
+
     while (ithost != hosts.end()) {
         utils::net::Client* client = 0;
         try {
+            m_out << boost::format("Manager: try to open %1% on %2%\n") %
+                (*ithost).hostname() % (*ithost).port();
+
             client = new utils::net::Client((*ithost).hostname(),
                                             (*ithost).port());
             mClients.push_back(client);
         } catch (const std::exception& e) {
-            std::cerr << boost::format(
-                "Error connection with the %1% simulator on port %2%: %3%\n") %
+            m_out << boost::format(
+                "Manager: Can not connect %1% simulator on port %2%: %3%\n") %
                 (*ithost).hostname() % (*ithost).port() % e.what();
         }
         ++ithost;
     }
 }
 
-void Manager::close_connection_with_simulators()
+void ManagerRunDistant::closeConnectionWithSimulators()
 {
     std::list < utils::net::Client* >::iterator it = mClients.begin();
     while (it != mClients.end()) {
-        (*it)->send("exit", 4);
+        (*it)->send_string("exit");
         delete (*it);
         ++it;
     }
     mClients.clear();
 }
 
-gint32 Manager::get_max_processor(utils::net::Client& cl)
+gint32 ManagerRunDistant::getMaxProcessor(utils::net::Client& cl)
 {
     gint32 maxprocess = 0;
     try {
-        cl.send("proc", 4);
+        cl.send_string("proc");
         maxprocess = cl.recv_int();
     } catch (const std::exception& e) {
-        std::cerr << boost::format(
-            "Error get max processor: %1%\n") % e.what();
+        m_out << boost::format(
+            "Manager: error get max processor: %1%\n") % e.what();
     }
     return maxprocess;
 }
 
-gint32 Manager::get_current_number_vpzi(utils::net::Client& cl)
+gint32 ManagerRunDistant::getCurrentNumberVpzi(utils::net::Client& cl)
 {
     gint32 current = 0;
     try {
-        cl.send("size", 4);
+        cl.send_string("size");
         current = cl.recv_int();
     } catch (const std::exception& e) {
-        std::cerr << boost::format(
-            "Error get current number of VPZi: %1%\n") % e.what();
+        m_out << boost::format(
+            "Manager: error get number vpz: %1%\n") % e.what();
     }
     return current;
 }
 
-void Manager::send_vpzi(utils::net::Client& cl, const Glib::ustring& filename)
+void ManagerRunDistant::getResult(utils::net::Client& cl)
 {
     try {
-        cl.send("file", 4);
-        std::string file = Glib::file_get_contents(filename);
+        cl.send_string("fini");
+        int nb = cl.recv_int();
+
+        for (int i = 0; i < nb; ++i) {
+            cl.send_string("ok");
+            int sz = cl.recv_int();
+            cl.send_string("ok");
+            std::string result = cl.recv_buffer(sz);
+            value::Set vals = value::toSetValue(vpz::Vpz::parseValue(result));
+            int nbview = value::toInteger(vals->getValue(0));
+            int instance = value::toInteger(vals->getValue(1));
+            int replica = value::toInteger(vals->getValue(2));
+            cl.send_string("ok");
+
+            for (int j = 0; j < nbview; ++j) {
+                int sz = cl.recv_int();
+                cl.send_string("ok");
+                result = cl.recv_buffer(sz);
+
+                vals = value::toSetValue(vpz::Vpz::parseValue(result));
+                cl.send_string("ok");
+
+                std::string view = value::toString(vals->getValue(0));
+                std::string name = value::toString(vals->getValue(1));
+
+                utils::Path::PathList lst(utils::Path::path().getStreamDirs());
+                utils::Path::PathList::const_iterator it;
+                oov::PluginPtr plugin;
+                std::string error;
+
+                for (it = lst.begin(); it != lst.end(); ++it) {
+                    try {
+                        oov::PluginFactory pf(name, *it);
+                        plugin = pf.build("");
+                    } catch(const std::exception& e) {
+                        error += e.what();
+                    }
+                }
+
+                Assert(utils::ArgError, plugin.get(), error);
+                plugin->deserialize(vals->getValue(2));
+
+                {
+                    Glib::Mutex::Lock lock(m_mutex);
+                    oov::PluginViewList& lst(m_matrix[replica][instance]);
+                    lst[view] = plugin;
+                }
+            }
+        }
+    } catch (const std::exception& e) {
+        m_out << boost::format("Manager: error get result: %1%") % e.what();
+    }
+}
+
+void ManagerRunDistant::sendVpzi(utils::net::Client& cl,
+                                 const Glib::ustring& file)
+{
+    try {
+        cl.send_string("file");
         cl.send_int(file.size());
+        std::string tmp = cl.recv_string();
         cl.send_buffer(file);
     } catch (const std::exception& e) {
-        std::cerr << boost::format("Error sendind VPZi %1%: %2%\n") %
-            filename.c_str() % e.what();
+        m_out << boost::format(
+            "Manager: error send vpz %1%: %2%\n") % file % e.what();
     }
 }
 

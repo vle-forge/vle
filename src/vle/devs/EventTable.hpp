@@ -227,6 +227,8 @@ namespace vle { namespace devs {
         inline void popStates()
         { _states.clear(); }
 
+        void invalidateModel(Simulator*);
+        
         void delModel(Simulator*);
 
         void clear()
@@ -339,6 +341,13 @@ namespace vle { namespace devs {
          */
         inline const Time& getCurrentTime() const
         { return mCurrentTime; }
+
+        /** 
+         * @brief Delete all event from Simulator.
+         * 
+         * @param mdl the model to delete events. 
+         */
+        void invalidateModel(Simulator* mdl);
 
         /** 
          * @brief Delete all event from Simulator.

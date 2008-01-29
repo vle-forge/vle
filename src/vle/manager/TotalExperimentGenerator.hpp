@@ -42,21 +42,21 @@ namespace vle { namespace manager {
          * generate all VPZ instance file.
          *
          */
-        TotalExperimentGenerator(const vpz::Vpz& file) :
-            ExperimentGenerator(file)
+        TotalExperimentGenerator(const vpz::Vpz& file, std::ostream& out) :
+            ExperimentGenerator(file, out)
         { }
 
         virtual ~TotalExperimentGenerator()
         { }
 
-        virtual void build_combination(size_t& nb);
+        virtual void buildCombination(size_t& nb);
 
         /** 
          * @brief Get the number of combination from vpz file.
          * 
          * @return A value greater than 0.
          */
-        virtual size_t get_combination_number() const;
+        virtual size_t getCombinationNumber() const;
     };
 
 }} // namespace vle manager

@@ -23,13 +23,14 @@
  */
 
 #include <vle/oov/StreamReader.hpp>
+#include <vle/oov/PluginFactory.hpp>
 #include <vle/oov/Plugin.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Debug.hpp>
 
 namespace vle { namespace oov {
 
-PluginPtr StreamReader::plugin()
+PluginPtr StreamReader::plugin() const
 {
     Assert(utils::InternalError, m_plugin.get(),
             "Plugin are not loaded and cannot respond to the StreamReader");
@@ -83,49 +84,6 @@ void StreamReader::onValue(const vpz::ValueTrame& trame)
 void StreamReader::onClose(const vpz::EndTrame& trame)
 {
     plugin()->close(trame);
-}
-
-StreamReader::PluginFactory::PluginFactory(const std::string& plugin,
-                                           const std::string& pathname) :
-    m_module(0),
-    m_plugin(plugin)
-{
-    std::string file(Glib::Module::build_path(pathname, plugin));
-    m_module = new Glib::Module(file);
-    if (not (*m_module)) {
-        delete m_module;
-        m_module = 0;
-        Throw(utils::InternalError, boost::format(
-                "\n[%1%]: %2%") % pathname % Glib::Module::get_last_error());
-    }
-    m_module->make_resident();
-}
-
-StreamReader::PluginFactory::~PluginFactory()
-{
-    delete m_module;
-}
-
-PluginPtr StreamReader::PluginFactory::build(const std::string& location)
-{
-    Plugin* call = 0;
-    void*   makeNewOovPlugin = 0;
-
-    if (not m_module->get_symbol("makeNewOovPlugin", makeNewOovPlugin)) {
-        Throw(utils::InternalError, boost::format(
-                "Error when searching makeNewOovPlugin function in plugin %1%")
-            % m_plugin);
-    }
-
-    call = ((Plugin*(*)(const std::string&))(makeNewOovPlugin))(location);
-    if (not call) {
-        Throw(utils::InternalError, boost::format(
-                "Error when calling makeNewOovPlugin function in plugin %1%")
-            % m_plugin);
-    }
-
-    PluginPtr plugin(call);
-    return plugin;
 }
 
 }} // namespace vle oov

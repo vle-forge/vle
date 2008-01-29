@@ -35,7 +35,11 @@ namespace vle { namespace vpz {
     class Project : public Base
     {
     public:
-        Project() { }
+        Project() :
+            m_version(0.5),
+            m_instance(-1),
+            m_replica(-1)
+        { }
 
         virtual ~Project() { }
 
@@ -78,6 +82,18 @@ namespace vle { namespace vpz {
         inline float version() const
         { return m_version; }
 
+        inline int instance() const
+        { return m_instance; }
+
+        inline void setInstance(int instance)
+        { m_instance = instance; }
+
+        inline void setReplica(int replica)
+        { m_replica = replica; }
+
+        inline int replica() const
+        { return m_replica; }
+
         void setCurrentDate();
 
         inline void setVersion(float f)
@@ -90,6 +106,8 @@ namespace vle { namespace vpz {
         std::string     m_author;
         std::string     m_date;
         float           m_version;
+        int             m_instance;
+        int             m_replica;
 
         Model           m_model;
         Dynamics        m_dynamics;

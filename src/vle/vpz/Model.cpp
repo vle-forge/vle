@@ -37,13 +37,11 @@ AtomicModel::AtomicModel(const std::string& conditions,
     m_observables(observables)
 { 
     std::string conditionList(conditions);
-
     boost::trim(conditionList);
 
     if (not conditionList.empty()) {
         boost::split(m_conditions, conditionList, boost::is_any_of(","),
                      boost::algorithm::token_compress_on);
-
         if (m_conditions.front().empty()) {
             m_conditions.pop_back();
         }
@@ -134,7 +132,7 @@ void Model::write(std::ostream& out) const
 
 void Model::clear()
 {
-    delete m_graph;
+    m_atomicmodels.clear();
     m_graph = 0;
 }
 
@@ -239,7 +237,7 @@ void Model::writeAtomic(std::ostream& out, const graph::AtomicModel* mdl) const
         << "type=\"atomic\" ";
 
     if (not vpzatom.conditions().empty()) {
-        out << "conditions=\"";
+	out << "conditions=\"";
 
         for (StringVector::const_iterator it = vpzatom.conditions().begin();
              it != vpzatom.conditions().end(); ++it) {

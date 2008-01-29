@@ -27,93 +27,338 @@
 
 #include <string>
 #include <vector>
+#include <glibmm/thread.h>
+#include <glibmm/threadpool.h>
+#include <vle/manager/Types.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/utils/Host.hpp>
 #include <vle/utils/Socket.hpp>
 #include <vle/manager/ExperimentGenerator.hpp>
-
-
+#include <boost/noncopyable.hpp>
 
 namespace vle { namespace manager {
 
-    /**
-     * @brief VLE manager provide two types: immediate or daemon execution.
-     * Manager parse the user hosts file to know Simulator position and lauch
-     * simulation on hosts in immediate mode. The daemon wait for client
-     * connections on socket and wait a stream.
+    /** 
+     * @brief ManagerRun is the base class for running simulation from a specified
+     * vpz file that containts and experimental frames. ManagerRun does not run
+     * simulation, see ManagerRunThread and ManagerRunDistant. ManagerRun
+     * provides and access to the oov::PluginPtr object of the simulation.
      */
-    class Manager
+    class ManagerRun : public boost::noncopyable
     {
     public:
-        /**
-         * Build a new Manager and read Hosts file from user home path.
-         *
-         * @param savevpz True if you want to save all VPZ instance.
+        /** 
+         * @brief Build a ManagerRun.
+         * @param out output to log error.
+         * @param writefile write all experimental frames file produced.
          */
-        Manager(bool savevpz);
+        ManagerRun(std::ostream& out, bool writefile);
 
-        ~Manager();
-
-        /**
-         * @brief Run manager on localhost to build VPZI file and call vle
-         * program with 'run' parameter to all VPZI. Use this mode to simulate
-         * all simulator on the localhost.
-         *
-         * @param filename VPZ file to simulate.
+        /** 
+         * @brief Get a reference to the oov::PluginPtr list of the simulation
+         * sort by filename.
+         * @return A reference to the oov::PluginPtr list.
          */
-        void run_all_in_localhost(const std::string& filename);
+        OutputSimulationMatrix& outputSimulationMatrix();
 
-        /**
-         * @brief Run manager on localhost to build VPZI file and call vle
-         * program with 'run' parameter to all VPZI. Use this mode to simulate
-         * all simulator on the localhost.
-         * 
-         * @param file an already vpz::Vpz file open.
+        /** 
+         * @brief Get a constant reference to the oov::PluginPtr list of the
+         * simulation sort by filename.
+         * @return A reference to the oov::PluginPtr list.
          */
-        void run_all_in_localhost(const vpz::Vpz& file);
+        const OutputSimulationMatrix& outputSimulationMatrix() const;
 
-        /**
-         * @brief Run manager on localhost and send the file to the hosts in
-         * hosts read in host XML file. If no simulator daemon are found, launch
-         * the simulator on localhost.
-         *
-         * @param filename VPZ file to simulate.
-         */
-        void run_localhost(const std::string& filename);
+    protected:
+        OutputSimulationMatrix  m_matrix;
+        std::ostream&           m_out;
+        bool                    m_writefile;
 
-        /**
-         * @brief Run manager on localhost and send the file to the hosts in
-         * hosts read in host XML file. If no simulator daemon are found, launch
-         * the simulator on localhost.
-         *
-         * @param file VPZ filename to simulate.
+        /** 
+         * @brief Build the ExperimentGenerator attached to the vpz::Vpz
+         * definition in experiments tags.
+         * @param file The vpz::Vpz file
+         * @return A reference to the newly build combination plan
          */
-        void run_localhost(const vpz::Vpz& file);
+        static ExperimentGenerator* getCombinationPlan(
+            const vpz::Vpz& file, std::ostream& out);
+    };
 
-        /**
-         * Run manager in daemon mode. It wait connection and VPZ file from
-         * specified port. If no simulator daemon are found, launch the
-         * simulator on localhost.
-         *
-         * @param port the port to listen.
+
+
+    /** 
+     * @brief ManagerRunThread is the class for running experimental frames onto
+     * the same host with a specific number of threads.
+     */
+    class ManagerRunMono : public ManagerRun
+    {
+    public:
+        /** 
+         * @brief Build a ManagerRunThread.
+         * @param out output to log error.
+         * @param writefile write all experimental frames file produced.
+         * @param process number of thread to use.
          */
-        void run_daemon(int port);
+        ManagerRunMono(std::ostream& out, bool writefile);
+
+        /** 
+         * @brief Read specified vpz files an start simulations on the number of
+         * processor specified in constructor.
+         * @param filename.
+         */
+        void operator()(const std::string& filename);
+
+        /** 
+         * @brief Read specified vpz files an start simulations on the number of
+         * processor specified in constructor.
+         * @param filename.
+         */
+        void start(const std::string& filename);
+
+        /** 
+         * @brief Read specified vpz files an start simulations on the number of
+         * processor specified in constructor.
+         * @param file.
+         */
+        void operator()(const vpz::Vpz& file);
+
+        /** 
+         * @brief Read specified vpz files an start simulations on the number of
+         * processor specified in constructor.
+         * @param filename.
+         */
+        void start(const vpz::Vpz& file);
+
+    private:
+        unsigned int                            m_process;
+        std::string                             m_filename;
+        bool                                    m_finish;
+
+        ExperimentGenerator*                    m_exp;
+    };
+
+
+
+    /** 
+     * @brief ManagerRunThread is the class for running experimental frames onto
+     * the same host with a specific number of threads.
+     */
+    class ManagerRunThread : public ManagerRun
+    {
+    public:
+        /** 
+         * @brief Build a ManagerRunThread.
+         * @param out output to log error.
+         * @param writefile write all experimental frames file produced.
+         * @param process number of thread to use.
+         */
+        ManagerRunThread(std::ostream& out, bool writefile, int process);
+
+        /** 
+         * @brief Read specified vpz files an start simulations on the number of
+         * processor specified in constructor.
+         * @param filename.
+         */
+        void operator()(const std::string& filename);
+
+        /** 
+         * @brief Read specified vpz files an start simulations on the number of
+         * processor specified in constructor.
+         * @param filename.
+         */
+        void start(const std::string& filename);
+
+        /** 
+         * @brief Read specified vpz files an start simulations on the number of
+         * processor specified in constructor.
+         * @param file.
+         */
+        void operator()(const vpz::Vpz& file);
+
+        /** 
+         * @brief Read specified vpz files an start simulations on the number of
+         * processor specified in constructor.
+         * @param filename.
+         */
+        void start(const vpz::Vpz& file);
+
+        /** 
+         * @brief A pool of threads to run simulation.
+         */
+        void run();
+
+        /** 
+         * @brief A thread to build plan.
+         */
+        void read();
+
+    private:
+        unsigned int                            m_process;
+        std::string                             m_filename;
+        bool                                    m_finish;
+
+        ExperimentGenerator*                    m_exp;
+       
+        /** simulation threads */
+        Glib::ThreadPool                        m_pool;
+        Glib::Mutex                             m_mutex;
+        Glib::Cond                              m_prodcond;
+        Glib::Cond                              m_conscond;
+    };
+
+
+    
+    /** 
+     * @brief ManagerRunDistant is the class for running experimental frames onto
+     * distant nodes. It parses the user hosts file to get Simulator position
+     * and lauch simulation on hosts in immediate mode.
+     */
+    class ManagerRunDistant : public ManagerRun
+    {
+    public:
+        /** 
+         * @brief Build a ManagerRunDistant.
+         * @param out output to log error.
+         * @param writefile write all experimental frames file produced.
+         */
+        ManagerRunDistant(std::ostream& out, bool writefile);
+
+        /** 
+         * @brief Read specified vpz files an start simulations on the number of
+         * processor specified in constructor.
+         * @param filename.
+         */
+        void operator()(const std::string& filename);
+
+        /** 
+         * @brief Read specified vpz files an start simulations on the number of
+         * processor specified in constructor.
+         * @param filename.
+         */
+        void start(const std::string& filename);
+
+        /** 
+         * @brief Read specified vpz files an start simulations on the number of
+         * processor specified in constructor.
+         * @param file.
+         */
+        void operator()(const vpz::Vpz& file);
+
+        /** 
+         * @brief Read specified vpz files an start simulations on the number of
+         * processor specified in constructor.
+         * @param filename.
+         */
+        void start(const vpz::Vpz& file);
+        
+        /** 
+         * @brief A thread to send vpz to simulators.
+         */
+        void send();
+
+        /** 
+         * @brief A thread to build plan.
+         */
+        void read();
 
     private:
         ExperimentGenerator* get_combination_plan() const;
-        void open_connection_with_simulators();
-        void close_connection_with_simulators();
+        void openConnectionWithSimulators();
+        void closeConnectionWithSimulators();
         void scheduller();
 
-        gint32 get_max_processor(utils::net::Client& cl);
-        gint32 get_current_number_vpzi(utils::net::Client& cl);
-        void send_vpzi(utils::net::Client& cl, const Glib::ustring& filename);
+        gint32 getMaxProcessor(utils::net::Client& cl);
+        gint32 getCurrentNumberVpzi(utils::net::Client& cl);
+        void sendVpzi(utils::net::Client& cl, const Glib::ustring& filename);
+        void getResult(utils::net::Client& cl);
 
-        vpz::Vpz                            mFile;
-        utils::Hosts                        mHost;
-        std::list < utils::net::Client* >   mClients;
-        bool                                mSaveVPZ;
+        utils::Hosts                                mHost;
+        std::list < utils::net::Client* >           mClients;
+        std::string                                 m_filename;
+        bool                                        m_finish;
+
+        Glib::Mutex                                 m_mutex;
+        Glib::Cond                                  m_prodcond;
+
+        ExperimentGenerator*                        m_exp;
+
+        /** 
+         * @brief A thread safe function to acces to the top of the vpz::Vpz
+         * reference from the ExperimentGenerator.
+         * @return A reference to the vpz::Vpz reference or null if empty.
+         */
+        vpz::Vpz* getVpz();
+
+        /** 
+         * @brief Return the number of vpz::Vpz file remaining in the
+         * ExperimentGenerator.
+         * @return A number of vpz::Vpz file to simulate;
+         */
+        unsigned int getVpzNumber();
     };
+
+    
+    /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
+    
+    inline ManagerRun::ManagerRun(std::ostream& out, bool writefile) :
+        m_out(out),
+        m_writefile(writefile)
+    {
+    }
+
+    inline OutputSimulationMatrix& ManagerRun::outputSimulationMatrix()
+    {
+        return m_matrix;
+    }
+
+    inline const OutputSimulationMatrix& ManagerRun::outputSimulationMatrix() const
+    {
+        return m_matrix;
+    }
+
+    inline ManagerRunMono::ManagerRunMono(std::ostream& out, bool writefile) :
+        ManagerRun(out, writefile)
+    {
+    }
+
+    inline void ManagerRunMono::start(const std::string& filename)
+    {
+        operator()(filename);
+    }
+
+    inline void ManagerRunMono::start(const vpz::Vpz& file)
+    {
+        operator()(file);
+    }
+    
+    inline ManagerRunThread::ManagerRunThread(std::ostream& out, bool writefile,
+                                              int process) :
+        ManagerRun(out, writefile),
+        m_process(process),
+        m_finish(false),
+        m_exp(0)
+    {
+    }
+
+    inline void ManagerRunThread::start(const std::string& filename)
+    {
+        operator()(filename);
+    }
+
+    inline void ManagerRunThread::start(const vpz::Vpz& file)
+    {
+        operator()(file);
+    }
+
+    inline void ManagerRunDistant::start(const std::string& filename)
+    {
+        operator()(filename);
+    }
+
+    inline void ManagerRunDistant::start(const vpz::Vpz& file)
+    {
+        operator()(file);
+    }
 
 }} // namespace vle manager
 

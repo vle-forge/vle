@@ -24,6 +24,7 @@
 
 #include <vle/devs/ModelFactory.hpp>
 #include <vle/devs/Coordinator.hpp>
+#include <vle/devs/RootCoordinator.hpp>
 #include <vle/devs/Simulator.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/devs/DynamicsWrapper.hpp>
@@ -66,11 +67,13 @@ Glib::Module* ModuleCache::get(const std::string& library) const
 ModelFactory::ModelFactory(const vpz::Dynamics& dyn,
                            const vpz::Classes& cls,
                            const vpz::Experiment& exp,
-                           const vpz::AtomicModelList& atom) :
+                           const vpz::AtomicModelList& atom,
+                           RootCoordinator& root) :
     mDynamics(dyn),
     mClasses(cls),
     mExperiment(exp),
-    mAtoms(atom)
+    mAtoms(atom),
+    mRoot(root)
 {
 }
 
@@ -321,8 +324,10 @@ void ModelFactory::attachDynamics(Coordinator& coordinator,
                Glib::Module::get_last_error());
     }
 
+    mRoot.setRand(*call);
+
     if (call->isExecutive()) {
-        (reinterpret_cast < Executive* >(call))->setCoordinator(&coordinator);
+        coordinator.setCoordinator(*(reinterpret_cast < Executive* >(call)));
     }
     
     if (call->isWrapper()) {

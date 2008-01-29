@@ -212,7 +212,6 @@ namespace vle { namespace vpz {
 
     private:
         ConditionList       m_list;
-
     };
 
 }} // namespace vle vpz

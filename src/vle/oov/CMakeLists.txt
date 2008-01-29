@@ -14,12 +14,12 @@ LINK_DIRECTORIES(
   ${CAIROMM_LIBRARY_DIR})
 
 SET(OOV_CPP LocalStreamReader.cpp NetStreamReader.cpp OOV.cpp
-  OovLocalStreamReader.cpp OovNetStreamReader.cpp Plugin.cpp SimpleFile.cpp
-  StreamReader.cpp)
+  OovLocalStreamReader.cpp OovNetStreamReader.cpp Plugin.cpp PluginFactory.cpp
+  SimpleFile.cpp StreamReader.cpp)
 
 SET(OOV_HPP LocalStreamReader.hpp NetStreamReader.hpp OOV.hpp
-  OovLocalStreamReader.hpp OovNetStreamReader.hpp Plugin.hpp SimpleFile.hpp
-  StreamReader.hpp)
+  OovLocalStreamReader.hpp OovNetStreamReader.hpp Plugin.hpp PluginFactory.hpp
+  SimpleFile.hpp StreamReader.hpp)
 
 IF (HAVE_CAIRO)
  SET(OOV_HPP ${OOV_HPP} CairoPlugin.hpp)

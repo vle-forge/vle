@@ -158,4 +158,9 @@ void NetStreamWriter::close(const devs::Time& time)
     }
 }
 
+oov::PluginPtr NetStreamWriter::plugin() const
+{
+    Throw(utils::NotYetImplemented, "oov::plugini from netstreamwriter");
+}
+
 }} // namespace vle devs

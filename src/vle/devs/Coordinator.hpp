@@ -35,12 +35,13 @@
 #include <vle/devs/TimedView.hpp>
 #include <vle/devs/FinishView.hpp>
 #include <vle/vpz/Vpz.hpp>
+#include <vle/oov/Plugin.hpp>
 
 namespace vle { namespace devs {
 
     class ModelFactory;
+    class Executive;
     
-    typedef std::map < std::string, devs::View* > ViewList;
     typedef std::vector < Simulator* > SimulatorList;
     typedef std::map < graph::AtomicModel*, devs::Simulator* > SimulatorMap;
 
@@ -217,6 +218,14 @@ namespace vle { namespace devs {
         inline const SimulatorMap& modellist() const
         { return m_modelList; }
 
+        oov::PluginViewList outputs() const;
+
+        /** 
+         * @brief Friend member to give Coordinator access to excutive model.
+         * @param exe The executive model.
+         */
+        void setCoordinator(Executive& exe);
+
     private:
 	Time                        m_currentTime;
 	SimulatorMap                m_modelList;
@@ -290,11 +299,27 @@ namespace vle { namespace devs {
 
         /**
          * Set a new date to the Coordinator.
-         *
          * @param time the new date to affect Coordinator.
          */
         inline void updateCurrentTime(const Time& time)
         { m_currentTime = time; }
+
+        /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+        
+        /** 
+         * @brief A functor to be use with std::for_each to facilitate
+         * transformation from an ViewList to the PluginViewList.
+         */
+        struct GetSerializablePlugins
+        {
+            oov::PluginViewList& lst;
+
+            GetSerializablePlugins(oov::PluginViewList& lst) : lst(lst) { }
+
+            inline void operator()(const ViewList::value_type& x)
+            { if (x.second->plugin()->isSerializable()) {
+                  lst.insert(std::make_pair(x.first, x.second->plugin())); }}
+        };
     };
 
 }} // namespace vle devs

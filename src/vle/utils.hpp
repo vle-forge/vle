@@ -30,12 +30,15 @@
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Host.hpp>
 #include <vle/utils/Path.hpp>
+#include <vle/utils/PathOptionGroup.hpp>
 #include <vle/utils/Rand.hpp>
 #include <vle/utils/Simpson.hpp>
 #include <vle/utils/Socket.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/XML.hpp>
+
+
 
 namespace vle {
 

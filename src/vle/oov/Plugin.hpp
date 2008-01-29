@@ -34,7 +34,6 @@
 #include <boost/shared_ptr.hpp>
 #include <iostream>
 
-
 namespace vle { namespace oov {
 
     /** 
@@ -67,6 +66,22 @@ namespace vle { namespace oov {
 
         virtual ~Plugin()
         { }
+
+        /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
+        virtual bool isSerializable() const
+        { return false; }
+
+        virtual value::Value serialize() const
+        { return value::Value(); }
+
+        virtual void deserialize(value::Value& /* vals */)
+        { }
+
+        virtual std::string name() const
+        { return std::string(); }
+
+        /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
         /** 
          * @brief By default, a plugin is not a cairo plugin.
@@ -134,7 +149,12 @@ namespace vle { namespace oov {
      */
     typedef boost::shared_ptr < Plugin > PluginPtr;
 
-
+    /** 
+     * @brief This typedef is used to defined the dictionnary of key view name
+     * and oov::PluginPtr.
+     */
+    typedef std::map < std::string, PluginPtr > PluginViewList;
+    
 #define DECLARE_OOV_PLUGIN(x) \
     extern "C" { vle::oov::Plugin* makeNewOovPlugin(const std::string& location) \
         { return new x(location); } }

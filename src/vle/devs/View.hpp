@@ -28,6 +28,7 @@
 
 #include <vle/devs/Observable.hpp>
 #include <vle/devs/ObservationEvent.hpp>
+#include <vle/oov/Plugin.hpp>
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/utils/Tools.hpp>
 #include <string>
@@ -36,6 +37,9 @@
 namespace vle { namespace devs {
 
     class StreamWriter;
+    class View;
+
+    typedef std::map < std::string, devs::View* > ViewList;
 
     /**
      * @brief Represent a View on a devs::Simulator and a port name.
@@ -100,9 +104,7 @@ namespace vle { namespace devs {
         std::list < std::string > get(Simulator* simulator);
 
         //
-        //
         // Get/Set functions
-        //
         //
 
         inline const std::string& getName() const
@@ -116,6 +118,15 @@ namespace vle { namespace devs {
 
         inline vle::devs::StreamWriter * getStream() const
         { return m_stream; }
+
+        oov::PluginPtr plugin() const;
+
+        struct GetOovPlugin
+        {
+            oov::PluginPtr operator()(const ViewList::value_type& x)
+            { return x.second->plugin(); }
+        };
+
 
     protected:
         ObservableList      m_observableList;

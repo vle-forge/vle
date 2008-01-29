@@ -68,8 +68,16 @@ vpz::Vpz* SaxStackVpz::pushVpz(const AttributeList& att)
         m_vpz.project().setDate(getAttribute < std::string >(att, "date"));
     }
 
-    m_vpz.project().setAuthor(getAttribute < std::string >(att, "author")),
-    m_vpz.project().setVersion(getAttribute < float >(att, "version")),
+    m_vpz.project().setAuthor(getAttribute < std::string >(att, "author"));
+    m_vpz.project().setVersion(getAttribute < float >(att, "version"));
+
+    if (existAttribute(att, "instance")) {
+        m_vpz.project().setInstance(getAttribute < int >(att, "instance"));
+    }
+
+    if (existAttribute(att, "replica")) {
+        m_vpz.project().setReplica(getAttribute < int >(att, "replica"));
+    }
     
     m_stack.push(&m_vpz);
 

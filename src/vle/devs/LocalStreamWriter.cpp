@@ -94,4 +94,9 @@ void LocalStreamWriter::close(const devs::Time& time)
     m_reader.onClose(vpz::EndTrame(utils::to_string(time)));
 }
 
+oov::PluginPtr LocalStreamWriter::plugin() const
+{
+    return m_reader.plugin();
+}
+
 }} // namespace vle devs

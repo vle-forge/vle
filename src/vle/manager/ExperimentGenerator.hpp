@@ -27,9 +27,11 @@
 
 #include <vle/value/Value.hpp>
 #include <vle/vpz/Vpz.hpp>
+#include <vle/manager/Types.hpp>
 #include <string>
 #include <vector>
 #include <list>
+#include <glibmm/thread.h>
 
 
 
@@ -46,21 +48,21 @@ namespace vle { namespace manager {
          * generate all VPZ instance file.
          *
          */
-        ExperimentGenerator(const vpz::Vpz& file);
+        ExperimentGenerator(const vpz::Vpz& file, std::ostream& out);
 
         virtual ~ExperimentGenerator() { }
-
-        /**
-         * @brief Build all instances function.
-         */
-        void build();
 
         /**
          * @brief Get the list of filename build after build.
          * @return the list of filename.
          */
-        const std::list < std::string >& get_instances_files() const
+        std::list < vpz::Vpz* >& vpzInstances()
         { return mFileList; }
+
+        void build(OutputSimulationMatrix* matrix);
+
+        void build(Glib::Mutex* mutex, Glib::Cond* prod,
+                   OutputSimulationMatrix* matrix);
 
         /** 
          * @brief Save the generated VPZ instance file.
@@ -71,41 +73,56 @@ namespace vle { namespace manager {
         void saveVPZinstance(bool save = false)
         { mSaveVpz = save; }
 
-    private:
+    protected:
+        /** 
+         * @brief Build just one condition based on information of VPZ file.
+         */
+        virtual void buildCombination(size_t& nb) = 0;
+
+        /** 
+         * @brief Get the number of combination from vpz file.
+         * @return A value greater than 0.
+         */
+        virtual size_t getCombinationNumber() const = 0;
+        
+        /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
         /** 
          * @brief Build a list of replicas based on information of VPZ file.
          */
-        void build_replicas_list();
+        void buildReplicasList();
 
         /** 
          * @brief Build a list of conditions based on information of VPZ file.
          */
-        void build_conditions_list();
+        void buildConditionsList();
+
+        void buildCombinations();
+
+        void buildCombinationsFromReplicas(size_t cmbnumber);
 
         /** 
-         * @brief Build just one condition based on information of VPZ file.
+         * @brief Build an instance of the current specified vpz file and push
+         * it into the output list. This function use the Glib::Mutex and
+         * Glib::Cond to protect the access to data.
+         * @param cmbnumber the index of the combination.
+         * @param replnumber the number of the replicas.
          */
-        virtual void build_combination(size_t& nb) = 0;
-
-        void build_combinations();
-
-        void build_combinations_from_replicas(size_t cmbnumber);
-
-        void write_instance(size_t cmbnumber, size_t replnumber);
-
+        void writeInstanceThread(size_t cmbnumber, size_t replnumber);
+        
         /** 
-         * @brief Get the number of combination from vpz file.
-         * 
-         * @return A value greater than 0.
+         * @brief Build an instance of the current specified vpz file and push
+         * it into the output list.
+         * @param cmbnumber the index of the combination.
+         * @param replnumber the number of the replicas.
          */
-        virtual size_t get_combination_number() const = 0;
+        void writeInstance(size_t cmbnumber, size_t replnumber);
 
         /** 
          * @brief Get the number of replicas from vpz file.
-         * 
          * @return A value greater than 0.
          */
-        size_t get_replicas_number() const;
+        size_t getReplicasNumber() const;
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -124,10 +141,14 @@ namespace vle { namespace manager {
 
         const vpz::Vpz&             mFile;
         vpz::Vpz                    mTmpfile;
+        std::ostream&               mOut;
         std::vector < guint32 >     mReplicasTab;
         std::vector < cond_t >      mCondition;
-        std::list < std::string >   mFileList;
+        std::list < vpz::Vpz* >     mFileList;
         bool                        mSaveVpz;
+        OutputSimulationMatrix*     mMatrix;
+        Glib::Mutex*                mMutex;
+        Glib::Cond*                 mProdcond;
     };
 
 }} // namespace vle manager
