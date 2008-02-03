@@ -143,7 +143,7 @@ Event::EventType Simulator::confluentTransitions(
     const InternalEvent& internal,
     const ExternalEventList& extEventlist) const
 {
-    DTraceDebug(boost::format("%1$20.10g %2% conf event: [%3%]") %
+    DTraceDebug(boost::format("%1$20.10g %2% confluent transition: [%3%]") %
                 internal.getTime() % getName() % extEventlist);
 
     return m_dynamics->confluentTransitions(internal.getTime(), extEventlist);
@@ -151,7 +151,7 @@ Event::EventType Simulator::confluentTransitions(
 
 InternalEvent* Simulator::internalTransition(const InternalEvent& event)
 {
-    DTraceDebug(boost::format("%1$20.10g %2% int event") % event.getTime() %
+    DTraceDebug(boost::format("%1$20.10g %2% internal transition") % event.getTime() %
                 getName());
 
     m_dynamics->internalTransition(event.getTime());
@@ -162,7 +162,7 @@ InternalEvent* Simulator::externalTransition(
     const ExternalEventList& event,
     const Time& time)
 {
-    DTraceDebug(boost::format("%1$20.10g %2% ext event: %3%") % time %
+    DTraceDebug(boost::format("%1$20.10g %2% external transition: [%3%]") % time %
                 getName() % event);
 
     m_dynamics->externalTransition(event, time);
@@ -172,7 +172,7 @@ InternalEvent* Simulator::externalTransition(
 void Simulator::request(const RequestEvent& event, const Time& time,
                         ExternalEventList& output)
 {
-    DTraceDebug(boost::format("%1$20.10g %2% inst event: [%3%]") % time %
+    DTraceDebug(boost::format("%1$20.10g %2% request: [%3%]") % time %
                 getName() % event);
 
     m_dynamics->request(event, time, output);
@@ -180,7 +180,7 @@ void Simulator::request(const RequestEvent& event, const Time& time,
 
 ObservationEvent* Simulator::observation(const ObservationEvent& event) const
 {
-    DTraceDebug(boost::format("%1$20.10g %2% state event: [%3%]") %
+    DTraceDebug(boost::format("%1$20.10g %2% observation: [%3%]") %
                 event.getTime() % getName() %
                 event);
 
