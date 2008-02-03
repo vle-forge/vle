@@ -34,8 +34,7 @@ InstallDirRegKey HKLM "SOFTWARE\VLE Development Team\VLE ${VLE_VERSION}" "Path"
 !define MUI_UNFINISHPAGE_NOAUTOCLOSE
 
 !define MUI_WELCOMEPAGE_TITLE "Welcome to the VLE @VLE_NAME_COMPLETE@ Setup Wizard"
-!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the
-installation of VLE (Virtual Laboratory Environment) @VLE_NAME_COMPLETE@.\r\n\r\nReport bugs to quesnel@users.sourceforge.net or on the VLE website"
+!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of VLE (Virtual Laboratory Environment) @VLE_NAME_COMPLETE@.\r\n\r\nReport bugs to quesnel@users.sourceforge.net or on the VLE website"
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_LICENSE "@PROJECT_SOURCE_DIR@/COPYING"
 !insertmacro MUI_PAGE_DIRECTORY

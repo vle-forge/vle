@@ -1,26 +1,27 @@
-/** 
- * @file CairoGauge.hpp
- * @brief 
- * @author The vle Development Team
- * @date Thu Sep 27 19:06:38 CEST 2007
+/**
+ * @file vle/oov/plugins/cairo/gauge/CairoGauge.cpp
+ * @author The VLE Development Team
  */
 
 /*
- * Copyright (C) 2007 - The vle Development Team
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License,or (at your option) any later version.
+ * VLE Environment - the multimodeling and simulation environment
+ * This file is a part of the VLE environment (http://vle.univ-littoral.fr)
+ * Copyright (C) 2003 - 2008 The VLE Development Team
  *
- * This program is distributed in the hope that it will be useful, 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not,write to the Free Software
- * Foundation,Inc.,59 Temple Place - Suite 330,Boston,MA02111-1307,USA.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 
 #include <vle/oov/plugins/cairo/gauge/CairoGauge.hpp>
 #include <vle/utils/Debug.hpp>
