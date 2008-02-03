@@ -12,8 +12,6 @@ VLE \(em The simulator for VLE framework
 [\fB\-\-help-mangroup\fP]
 [\fB\-\-help-simgroup\fP]
 [\fB\-\-help-globalgroup\fP]
-[\fB-d\fP]
-[\fB\-\-daemon\fP]
 [\fB\-\-allinlocal\fP]
 [\fB-o \fIint\fP\fR]
 [\fB\-\-process=\fIint\fP\fR]
@@ -81,11 +79,6 @@ Set the verbosity of application. Default is \fI0\fR, no trace and no long
 exception. \fI1\fR for small simulation trace and long exception. \fI2\fR for
 long simulation trace. 3 for all simulation trace. 
 
-.IP "\fB-d\fP, \fB\-\-daemon\fP
-Run the vle program in daemon mode. This option is only available for the
-\fBManager\fP application. This mode just \fBfork\fP the program to attach ppid
-to init process. 
-
 .IP "\fB-l\fP, \fB\-\-allinlocal\fP"
 Run all instances of the experimental frame on the same computer. This option
 is only available for the \fBManager\fP application. 
@@ -119,20 +112,51 @@ Add the \fBdirname\fP directory to the search path for the stream plugins.
 Run the simulator in just mode with the simulator and global plugins search
 path modified:
 .PP
-vle --path-simulator=$HOME/usr --path=$HOME/tmp file.vpz
+$ vle --path-simulator=$HOME/usr --path=$HOME/tmp file.vpz
+
+.PP
+Run the simulator with on vpz file:
+.PP
+$ vle file.vpz
+
+.PP
+Run the simulator with multiple vpz files:
+.PP
+$ vle file.vpz file2.vpz file3.vpz
+
+.PP
+Run the simulator with four threads for multiple vpz files:
+.PP
+$ vle -o 4 file.vpz file2.vpz file3.vpz file4.vpz file5.vpz file6.vpz
+
+.PP
+Run the manager to build experimental frames on localhost with one thread:
+.PP
+$ vle -m -l file.vpz
+
+.PP
+Run the manager to build experimental frames on localhost with four threads:
+$ vle -o 4 -m -l file.vpz
+
+.PP
+Run the manager to build experimental frames on distributed simulator. In this
+mode, the $HOME/.vle/hosts.xml is use to get distributed simulator:
+.PP
+$ vle -m file.vpz
 
 .SH "SEE ALSO" 
 .PP 
-oov (1), gvle (1), eov (1), avle (1). 
+oov (1), gvle (1), eov (1), avle (1), vlemodeltest (1). 
 
 .SH "AUTHOR" 
 .PP 
 Gauthier Quesnel \fBquesnel@users.sourceforge.net\fP
 .PP
-Permission is granted to copy, distribute and/or modify this document under the
-terms of the GNU General Public License, Version 2 any later version published
-by the Free Software Foundation. 
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
 .SH "COPYRIGHT" 
 .PP 
-Copyright (c) 2003, 2004, 2005, 2006, 2007 VLE devlopment team
+Copyright (c) 2003 - 2008 The VLE development team
