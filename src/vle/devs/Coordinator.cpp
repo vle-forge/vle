@@ -143,7 +143,7 @@ ExternalEventList* Coordinator::run()
         m_toDelete = m_deletedSimulator.size();
     }
 
-    processObservationEvents(bags);
+    processTimedObservationEvents(bags);
 
     bags.clear();
     return 0;
@@ -544,20 +544,18 @@ void Coordinator::processRequestEvents(
     modelbag.delRequest();
 }
 
-void Coordinator::processObservationEvents(CompleteEventBagModel& bag)
+void Coordinator::processTimedObservationEvents(CompleteEventBagModel& bag)
 {
     while (not bag.emptyStates()) {
         Simulator* model(bag.topObservationEvent()->getModel());
         ObservationEvent* event(model->observation(*bag.topObservationEvent()));
 
-        if (event) {
-            View* View(getView(event->getViewName()));
-            ObservationEvent* event2(View->processObservationEvent(event));
-            delete event;
+        View* View(getView(event->getViewName()));
+        ObservationEvent* event2(View->processObservationEvent(event));
+        delete event;
 
-            if (event2) {
-                m_eventTable.putObservationEvent(event2);
-            }
+        if (event2) {
+            m_eventTable.putObservationEvent(event2);
         }
         delete bag.topObservationEvent();
         bag.popState();

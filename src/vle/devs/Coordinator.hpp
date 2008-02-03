@@ -251,7 +251,7 @@ namespace vle { namespace devs {
         void processRequestEvents(Simulator* sim,
                                         EventBagModel& modelbag);
 
-        void processObservationEvents(CompleteEventBagModel& bag);
+        void processTimedObservationEvents(CompleteEventBagModel& bag);
 
         /** 
          * @brief build the simulator from the vpz::Model stock.

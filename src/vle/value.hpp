@@ -36,7 +36,7 @@
 #include <vle/value/Table.hpp>
 #include <vle/value/Tuple.hpp>
 #include <vle/value/Value.hpp>
-#include <value/XML.hpp>
+#include <vle/value/XML.hpp>
 
 
 

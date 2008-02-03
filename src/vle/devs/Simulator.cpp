@@ -185,17 +185,16 @@ ObservationEvent* Simulator::observation(const ObservationEvent& event) const
                 event);
 
     value::Value val = m_dynamics->observation(event);
+    ObservationEvent* nevent = new ObservationEvent(event);
+    nevent->putAttribute(event.getPortName(), val);
 
-    if (val.get()) {
-        ObservationEvent* nevent = new ObservationEvent(event);
-        nevent->putAttribute(event.getPortName(), val);
-        return nevent;
-    } else {
+    if (not val.get()) {
         TraceDebug((boost::format(
-                    "Simulator %1% return an empty value on port %2%") %
-                getName() % event.getPortName()).str());
+                    "Simulator %1% return an empty value on event %2%") %
+                getName() % event));
     }
-    return 0;
+
+    return nevent;
 }
 
 }} // namespace vle devs
