@@ -27,6 +27,8 @@
 #include <vle/devs/Simulator.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Debug.hpp>
+#include <vle/utils/Path.hpp>
+#include <vle/oov/PluginFactory.hpp>
 
 
 
@@ -143,15 +145,19 @@ void NetStreamWriter::process(const ObservationEvent& event)
     }
 }
 
-void NetStreamWriter::close(const devs::Time& time)
+oov::PluginPtr NetStreamWriter::close(const devs::Time& time)
 {
     std::ostringstream out;
     out << "<trame type=\"end\" date=\"" << time << "\" /></vle_trame>";
     try {
         m_client->send_buffer(out.str());
+
+        oov::PluginPtr plugin = getPlugin();
+
         m_client->close();
         delete m_client;
         m_client = 0;
+        return plugin;
     } catch(const std::exception& e) {
         Throw(utils::InternalError, boost::format(
                 "NetStreamWriter close: OOV does not respond. "
@@ -159,9 +165,41 @@ void NetStreamWriter::close(const devs::Time& time)
     }
 }
 
-oov::PluginPtr NetStreamWriter::plugin() const
+oov::PluginPtr NetStreamWriter::getPlugin() const
 {
-    Throw(utils::NotYetImplemented, "oov::plugini from netstreamwriter");
+    std::string result = m_client->recv_string();
+    if (result == "ok") {
+        m_client->send_buffer("ok");
+
+        int sz = m_client->recv_int();
+        m_client->send_buffer("ok");
+
+        result = m_client->recv_buffer(sz);
+        m_client->send_buffer("ok");
+
+        value::Set vals = value::toSetValue(vpz::Vpz::parseValue(result));
+        std::string name = value::toString(vals->getValue(0));
+                
+        utils::Path::PathList lst(utils::Path::path().getStreamDirs());
+        utils::Path::PathList::const_iterator it;
+        oov::PluginPtr plugin;
+        std::string error;
+
+        for (it = lst.begin(); it != lst.end(); ++it) {
+            try {
+                oov::PluginFactory pf(name, *it);
+                plugin = pf.build("");
+            } catch(const std::exception& e) {
+                error += e.what();
+            }
+        }
+        
+        Assert(utils::ArgError, plugin.get(), error);
+        plugin->deserialize(vals->getValue(1));
+
+        return plugin;
+    }
+    return oov::PluginPtr();
 }
 
 }} // namespace vle devs

@@ -63,7 +63,7 @@ ObservationEvent* View::addObservable(Simulator* model,
 
 void View::finish(const Time& time)
 {
-    m_stream->close(time);
+    m_plugin = m_stream->close(time);
 }
 
 void View::removeObservable(Simulator* model)
@@ -113,7 +113,7 @@ std::list < std::string > View::get(Simulator* simulator)
 
 oov::PluginPtr View::plugin() const
 {
-    return m_stream->plugin();
+    return m_plugin;
 }
 
 }} // namespace vle devs

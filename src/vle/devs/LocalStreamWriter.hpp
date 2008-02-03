@@ -62,10 +62,8 @@ namespace vle { namespace devs {
 
         virtual void process(const ObservationEvent& event);
 
-        virtual void close(const devs::Time& time);
+        virtual oov::PluginPtr close(const devs::Time& time);
         
-        virtual oov::PluginPtr plugin() const;
-
     private:
         oov::OovLocalStreamReader      m_reader;
     };

@@ -62,12 +62,12 @@ namespace vle { namespace devs {
         virtual void process(
                     const ObservationEvent& event);
 
-        virtual void close(
+        virtual oov::PluginPtr close(
                     const devs::Time& time);
 
-        virtual oov::PluginPtr plugin() const;
-
     private:
+        oov::PluginPtr getPlugin() const;
+
         utils::net::Client*     m_client;
     };
 

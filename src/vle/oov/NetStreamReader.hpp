@@ -88,6 +88,7 @@ namespace vle { namespace oov {
         void readConnection();
         bool dispatch(const vpz::Trame* trame);
         void closeConnection();
+        void serializePlugin();
     };
 
     inline const int NetStreamReader::port() const

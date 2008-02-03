@@ -316,7 +316,8 @@ namespace vle { namespace devs {
             GetSerializablePlugins(oov::PluginViewList& lst) : lst(lst) { }
 
             inline void operator()(const ViewList::value_type& x)
-            { if (x.second->plugin()->isSerializable()) {
+            { if (x.second->plugin().get() and
+                  x.second->plugin()->isSerializable()) {
                   lst.insert(std::make_pair(x.first, x.second->plugin())); }}
         };
     };

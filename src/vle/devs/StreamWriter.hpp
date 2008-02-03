@@ -94,15 +94,9 @@ namespace vle { namespace devs {
 
         /**
          * Close the output stream.
+         * @return A reference to the oov::Plugin if the plugin is serializable.
          */
-        virtual void close(const devs::Time& time) = 0;
-
-        /** 
-         * @brief Return a reference to the oov::Plugin attached to this stream
-         * reader.
-         * @return A reference to the oov::Plugin.
-         */
-        virtual oov::PluginPtr plugin() const = 0;
+        virtual oov::PluginPtr close(const devs::Time& time) = 0;
 
         //
         ///

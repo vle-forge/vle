@@ -90,13 +90,9 @@ void LocalStreamWriter::process(const ObservationEvent& event)
     m_reader.onValue(tr);
 }
 
-void LocalStreamWriter::close(const devs::Time& time)
+oov::PluginPtr LocalStreamWriter::close(const devs::Time& time)
 {
     m_reader.onClose(vpz::EndTrame(utils::to_string(time)));
-}
-
-oov::PluginPtr LocalStreamWriter::plugin() const
-{
     return m_reader.plugin();
 }
 

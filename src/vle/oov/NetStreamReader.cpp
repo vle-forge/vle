@@ -34,6 +34,8 @@
 #include <vle/vpz/EndTrame.hpp>
 #include <vle/utils/Socket.hpp>
 #include <vle/utils/Trace.hpp>
+#include <vle/value/String.hpp>
+#include <vle/value/Set.hpp>
 
 
 
@@ -126,6 +128,7 @@ bool NetStreamReader::dispatch(const vpz::Trame* trame)
         const vpz::EndTrame* tr;
         if ((tr = dynamic_cast < const vpz::EndTrame* >(trame))) {
             TraceAlways("NetStreamReader close");
+            serializePlugin();
             onClose(*tr);
             delete tr;
             return true;
@@ -138,6 +141,26 @@ bool NetStreamReader::dispatch(const vpz::Trame* trame)
 void NetStreamReader::closeConnection()
 {
     m_server.close_client("vle");
+}
+
+void NetStreamReader::serializePlugin()
+{
+    if (plugin()->isSerializable()) {
+        m_server.send_buffer("vle", "ok");
+        m_server.recv_string("vle");
+
+        value::Set vals = value::SetFactory::create();
+        vals->addValue(value::StringFactory::create(plugin()->name()));
+        vals->addValue(plugin()->serialize());
+
+        std::string result = vals->toXML();
+        m_server.send_int("vle", result.size());
+        m_server.recv_string("vle");
+        m_server.send_buffer("vle", result);
+        m_server.recv_string("vle");
+    } else {
+        m_server.send_buffer("vle", "no");
+    }
 }
 
 void NetStreamReader::setBufferSize(size_t buffer)

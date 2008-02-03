@@ -133,6 +133,7 @@ namespace vle { namespace devs {
         std::string         m_name;
         StreamWriter*       m_stream;
         size_t              m_size;
+        oov::PluginPtr      m_plugin;
     };
 
 }} // namespace vle devs
