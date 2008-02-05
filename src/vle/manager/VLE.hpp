@@ -1,5 +1,5 @@
 /**
- * @file vle/manager/VLE.hpp
+ * @file src/vle/manager/VLE.hpp
  * @author The VLE Development Team
  */
 
@@ -21,6 +21,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+
 
 
 #ifndef VLE_MANAGER_VLE_HPP

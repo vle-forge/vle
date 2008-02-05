@@ -1,5 +1,5 @@
 /**
- * @file vle/utils/XML.hpp
+ * @file src/vle/utils/XML.hpp
  * @author The VLE Development Team
  */
 
@@ -21,6 +21,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+
 
 
 #ifndef UTILS_XML_HPP

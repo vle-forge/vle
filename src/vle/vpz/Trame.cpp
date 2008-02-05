@@ -1,5 +1,5 @@
 /**
- * @file vle/vpz/Trame.cpp
+ * @file src/vle/vpz/Trame.cpp
  * @author The VLE Development Team
  */
 
@@ -21,6 +21,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+
 
 
 namespace vle { namespace vpz {
