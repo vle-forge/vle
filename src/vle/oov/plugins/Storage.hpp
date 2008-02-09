@@ -101,6 +101,30 @@ namespace vle { namespace oov { namespace plugin {
 
         const std::vector < value::Value >::size_type getVectorSize() const;
 
+        /** 
+         * @brief Return the Matrix of the values.
+         * @return A constant reference to the Matrix.
+         */
+        inline const ArrayValue& values() const
+        { return m_values; }
+
+        /** 
+         * @brief Return the Matrix of the values.
+         * @return A constant reference to the Matrix.
+         */
+        inline ArrayValue& values()
+        { return m_values; }
+
+        /** 
+         * @brief Return the index of the specified couple model port.
+         * @param model Name of the model.
+         * @param port Name of the port.
+         * @throw utils::ArgError if couple model port does not exist.
+         * @return A index.
+         */
+        ArrayValue::index column(const std::string& model,
+                                 const std::string& port) const;
+
     private:
         typedef std::pair < std::string, std::string > PairString;
 

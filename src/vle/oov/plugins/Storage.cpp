@@ -174,6 +174,22 @@ void Storage::onNewObservable(const vpz::NewObservableTrame& trame)
     nb_col++;
     m_values.resize(extents[nb_col][nb_row + 1]);
 }
+
+Storage::ArrayValue::index Storage::column(const std::string& model,
+                                  const std::string& port) const
+{
+    MapVectorString::const_iterator it = m_info.find(model);
+    Assert(utils::ArgError, it != m_info.end(), boost::format(
+            "Unkown model %1%") % model);
+
+    PairString colref(model, port);
+
+    MapPairIndex::const_iterator jt = col_access.find(colref);
+    Assert(utils::ArgError, jt != col_access.end(), boost::format(
+            "Unknow port %1% for model %2%") % port % model);
+
+    return jt->second;
+}
     
 void Storage::onDelObservable(const vpz::DelObservableTrame& /* trame */)
 {
