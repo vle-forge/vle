@@ -70,10 +70,9 @@ Value MapFactory::getValue(const std::string& name) const
 {
     MapValue::const_iterator it = m_value.find(name);
 
-    if (it == m_value.end()) {
-        throw(std::runtime_error((boost::format(
-                        "Map Value have no value name '%1%'\n") % name).str()));
-    }
+    Assert(utils::ArgError, it != m_value.end(),
+           boost::format("Map Value have no value name '%1%'\n") %
+           name);
 
     return (*it).second;
 }

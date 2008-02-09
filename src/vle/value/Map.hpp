@@ -110,22 +110,6 @@ namespace vle { namespace value {
         { return m_value[name]; }
 
         /** 
-         * @brief Get a Value from the map specified by his name.
-         * @param name The name of the value.
-         * @throw utils::InternalError if value name does not exist.
-         * @return A Value.
-         */
-        Value& get(const std::string& name);
-
-        /** 
-         * @brief Get a Value from the map specified by his name.
-         * @param name The name of the value.
-         * @throw utils::InternalError if value name does not exist.
-         * @return A constant Value reference.
-         */
-        const Value& get(const std::string& name) const;
-
-        /** 
          * @brief Get an access to the std::map.
          * 
          * @return a reference to the set::map.
