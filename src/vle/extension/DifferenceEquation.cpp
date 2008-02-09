@@ -126,9 +126,11 @@ double DifferenceEquation::getValue(int shift) const
         }
     }
 }
-double DifferenceEquation::getValue(const char* name, int shift)
+double DifferenceEquation::getValue(const char* name, int shift) const
 {
-    if (mValues.find(name) == mValues.end()) {
+    valueList::const_iterator it = mValues.find(name);
+
+    if (it == mValues.end()) {
         Throw(utils::InternalError, 
               (boost::format("%1% - getValue - invalid variable name: %2%") %
                getModelName() % name).str());
@@ -139,9 +141,9 @@ double DifferenceEquation::getValue(const char* name, int shift)
     }
 
     if (shift == 0) {
-        return mValues[name].front().second;
+        return it->second.front().second;
     } else {
-        std::deque < std::pair < double, double > > list = mValues[name];
+        std::deque < std::pair < double, double > > list = it->second;
 
         if ((int)(list.size() - 1) >= -shift) {
             return list[-shift].second;

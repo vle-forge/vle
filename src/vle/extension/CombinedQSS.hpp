@@ -82,7 +82,7 @@ namespace vle { namespace extension {
          * @endcode
          * @param i the index of the variable to compute.
          */
-        virtual double compute(unsigned int i) = 0;
+        virtual double compute(unsigned int i) const = 0;
 
         /**
          * @brief Get the value of the variable specified by index. Be carefull,
@@ -92,6 +92,7 @@ namespace vle { namespace extension {
         inline double getValue(unsigned int i) const
         { return mValue[i]; }
 
+    private:
         /**
          * @brief Set the value of the variable specified by index. Be carefull,
          * no check on the variable i: 0 <= i < m_functionNumber.
@@ -134,7 +135,6 @@ namespace vle { namespace extension {
         devs::Time* mLastTime;
         state* mState;
 
-    private:
         /** Current model */
         unsigned int mCurrentModel;
         double mThreshold;

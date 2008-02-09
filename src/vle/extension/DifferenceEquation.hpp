@@ -42,10 +42,10 @@ namespace vle { namespace extension {
 
         virtual ~DifferenceEquation() { }
 
-	virtual double compute(const vle::devs::Time& /* time */) =0;
-	virtual double initValue() { return 0; }
+	virtual double compute(const vle::devs::Time& /* time */) const =0;
+	virtual double initValue() const { return 0; }
 	double getTimeStep() const { return mTimeStep; }
-	double getValue(const char* name, int shift = 0);
+	double getValue(const char* name, int shift = 0) const;
 	double getValue(int shift = 0) const;
 
         virtual devs::Time init(const devs::Time& time);

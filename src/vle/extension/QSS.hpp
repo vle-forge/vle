@@ -71,23 +71,27 @@ namespace vle { namespace extension {
                              vle::devs::ExternalEventList& /* output */) const;
 
     protected:
+        inline double getValue() const
+        { return mValue; }
+
         inline double getValue(const std::string& name) const
         { return mExternalVariableValue.find(
                 mExternalVariableIndex.find(name)->second)->second; }
 
+        /**
+         * @brief The function to develop mathemacial expression like:
+         * @code
+         * return a * getValue() - b * getValue() * getValue("y");
+         * @endcode
+         */
+        virtual double compute() const = 0;
+
+    private:
         inline void setValue(const std::string& name, double value)
         { mExternalVariableValue[mExternalVariableIndex[name]] = value; }	
 
         inline void setGradient(const std::string& name, double gradient)
         { mExternalVariableGradient[mExternalVariableIndex[name]] = gradient; }	
-
-        /**
-         * @brief The function to develop mathemacial expression like:
-         * @code
-         * return a * getValue(0) - b * getValue(0) * getValue(1);
-         * @endcode
-         */
-        virtual double compute() = 0;
 
         bool mActive;
         bool mDependance;
@@ -116,7 +120,6 @@ namespace vle { namespace extension {
         double mPrecision;
         double mEpsilon;
 
-    private:
         double mThreshold;
 
         inline double d(unsigned long x)
