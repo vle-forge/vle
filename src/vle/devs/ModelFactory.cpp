@@ -269,6 +269,9 @@ Glib::Module* ModelFactory::buildPlugin(const vpz::Dynamic& dyn)
                     "\n[%1%]: %2%") % *it % Glib::Module::get_last_error());
             delete module;
         } else {
+#ifdef G_OS_WIN32
+            module->make_resident();
+#endif
             mModule.add(dyn.library(), module);
             return module;
         }
