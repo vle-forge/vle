@@ -70,7 +70,6 @@ namespace vle { namespace extension {
         virtual void request(const devs::RequestEvent& /* event */,
                              const devs::Time& /* time */,
                              devs::ExternalEventList& /* output */) const;
-    protected:
         /**
          * @brief The function to develop mathemacial expression like:
          * @code

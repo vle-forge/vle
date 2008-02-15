@@ -54,7 +54,7 @@ namespace vle { namespace graph {
 
         AtomicModel& operator=(const AtomicModel& mdl);
 
-        virtual Model* clone() const
+        virtual graph::Model* clone() const
         { return new AtomicModel(*this); }
 
         /** 
@@ -74,7 +74,7 @@ namespace vle { namespace graph {
          * @param name The name of the model to find.
          * @return this if name is equal to the model's name, null otherwise.
          */
-        virtual Model* findModel(const std::string & name) const;
+        virtual graph::Model* findModel(const std::string & name) const;
 
         /** 
          * @brief Write the atomic model in the output stream.

@@ -35,12 +35,27 @@ namespace vle { namespace extension {
     class qss : public vle::devs::Dynamics
     {
     public:
-        enum state { INIT, POST_INIT, RUN, POST, POST2, POST3 };
-
         qss(const vle::graph::AtomicModel& model,
             const vle::devs::InitEventList& events);
+ 
+	virtual ~qss() { }
 
-        virtual ~qss() { }
+        inline double getValue() const
+        { return mValue; }
+
+        inline double getValue(const std::string& name) const
+        { return mExternalVariableValue.find(
+                mExternalVariableIndex.find(name)->second)->second; }
+
+        /**
+         * @brief The function to develop mathemacial expression like:
+         * @code
+         * return a * getValue() - b * getValue() * getValue("y");
+         * @endcode
+         */
+        virtual double compute() const = 0;
+
+        enum state { INIT, POST_INIT, RUN, POST, POST2, POST3 };
 
         virtual void finish();
 
@@ -69,22 +84,6 @@ namespace vle { namespace extension {
         virtual void request(const vle::devs::RequestEvent& /* event */,
                              const vle::devs::Time& /* time */,
                              vle::devs::ExternalEventList& /* output */) const;
-
-    protected:
-        inline double getValue() const
-        { return mValue; }
-
-        inline double getValue(const std::string& name) const
-        { return mExternalVariableValue.find(
-                mExternalVariableIndex.find(name)->second)->second; }
-
-        /**
-         * @brief The function to develop mathemacial expression like:
-         * @code
-         * return a * getValue() - b * getValue() * getValue("y");
-         * @endcode
-         */
-        virtual double compute() const = 0;
 
     private:
         inline void setValue(const std::string& name, double value)

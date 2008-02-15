@@ -260,7 +260,7 @@ Glib::Module* ModelFactory::buildPlugin(const vpz::Dynamic& dyn)
         if (dyn.language().empty()) {
             file = Glib::Module::build_path(*it, dyn.library());
         } else if (dyn.language() == "python") {
-            file = Glib::Module::build_path(*it, "pyvle");
+            file = Glib::Module::build_path(*it, "pydynamics");
         }
 
         Glib::Module* module = new Glib::Module(file);
