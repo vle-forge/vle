@@ -35,11 +35,10 @@ namespace vle { namespace value {
 SetFactory::SetFactory(const SetFactory& setfactory) :
     ValueBase(setfactory)
 {
-    const size_t sz = setfactory.m_value.size();
-    for (size_t i = 0; i < sz; ++i) {
-        //addValue(setfactory.m_value[i]->clone());
-        addValue(setfactory.m_value[i]);
-    }
+    m_value.resize(setfactory.size());
+
+    std::transform(setfactory.begin(), setfactory.end(),
+                   m_value.begin(), CloneValue());
 }
 
 Set SetFactory::create()
@@ -55,6 +54,11 @@ Value SetFactory::clone() const
 void SetFactory::addValue(Value value)
 {
     m_value.push_back(value);
+}
+
+void SetFactory::addCloneValue(Value value)
+{
+    m_value.push_back(CloneValue()(value));
 }
 
 std::string SetFactory::toFile() const

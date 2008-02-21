@@ -163,6 +163,19 @@ namespace vle { namespace value {
 
         };
 
+        /** 
+         * @brief A functor to help to the clone of value to use with
+         * std::transform for instance
+         * @code
+         * std::transform(vec.begin(), vec.end(), out.begin(), CloneValue());
+         * @endcode
+         */
+        struct CloneValue
+        {
+            Value operator()(const Value& val) const 
+            { return val->clone(); }
+        };
+
     } // namespace value
 
 } // namespace vle

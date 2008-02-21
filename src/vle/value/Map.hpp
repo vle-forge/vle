@@ -90,7 +90,18 @@ namespace vle { namespace value {
          * @param name the name of Value to add.
          * @param value the Value to add.
          */
-        void addValue(const std::string& name, Value value);
+        void addValue(const std::string& name, Value value)
+        { m_value[name] = value; }
+
+        /**
+         * Add a value into the map. The data is clone. If a value already
+         * exist with the same name it will be replace.
+         *
+         * @param name the name of Value to add.
+         * @param value the Value to add.
+         */
+        void addCloneValue(const std::string& name, Value value)
+        { m_value[name] = CloneValue()(value); }
 
         /** 
          * @brief Test if the map have a Value with specified name.

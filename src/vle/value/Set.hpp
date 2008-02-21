@@ -71,6 +71,13 @@ namespace vle { namespace value {
          */
         void addValue(Value value);
 
+        /**
+         * Add a value into the set. The value is clone and store into the Set.
+         *
+         * @param value the Value to clone and add.
+         */
+        void addCloneValue(Value value);
+
         inline VectorValue& getValue()
         { return m_value; }
 

@@ -42,7 +42,7 @@ MapFactory::MapFactory(const MapFactory& mapfactory) :
 {
     for (MapValue::const_iterator it = mapfactory.m_value.begin();
          it != mapfactory.m_value.end(); ++it) {
-        addValue((*it).first, (*it).second);
+        m_value[(*it).first] = CloneValue()((*it).second);
     }
 }
 
@@ -54,16 +54,6 @@ Map MapFactory::create()
 Value MapFactory::clone() const
 {
     return Value(new MapFactory(*this));
-}
-
-void MapFactory::addValue(const std::string& name, Value value)
-{
-    MapValue::iterator it = m_value.find(name);
-    if (it == m_value.end()) {
-        m_value[name] = value;
-    } else {
-        (*it).second = value;
-    }
 }
 
 Value MapFactory::getValue(const std::string& name) const
