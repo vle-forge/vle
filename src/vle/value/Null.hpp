@@ -32,6 +32,10 @@
 
 namespace vle { namespace value {
 
+    /** 
+     * @brief A null Value. This class is use to build empty value into
+     * container. Can be usefull on Map, Set etc.
+     */
     class NullFactory : public ValueBase
     {
     private:
@@ -54,6 +58,12 @@ namespace vle { namespace value {
         virtual std::string toString() const;
 
         virtual std::string toXML() const;
+    };
+
+    struct IsNullValue
+    {
+        bool operator()(const value::Value& value) const
+        { return value.get() and value->getType() == ValueBase::NIL; }
     };
     
     Null toNullValue(const Value& value);

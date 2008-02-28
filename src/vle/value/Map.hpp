@@ -80,13 +80,12 @@ namespace vle { namespace value {
          */
         virtual std::string toXML() const;
 
-        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
         /**
-         * Add a value into the map. Be carrefull, the data are not clone, the
-         * use the pointer. Don't delete buffer. If a value already exist with
-         * the same name it will be replace.
-         *
+         * @brief Add a value into the map. Be carrefull, the data is not
+         * cloned. Don't delete buffer after. If a value already exist with the
+         * same name it will be replace.
          * @param name the name of Value to add.
          * @param value the Value to add.
          */
@@ -94,9 +93,8 @@ namespace vle { namespace value {
         { m_value[name] = value; }
 
         /**
-         * Add a value into the map. The data is clone. If a value already
-         * exist with the same name it will be replace.
-         *
+         * @brief Add a value into the map. The data is clone. If a value
+         * already exist with the same name it will be replace.
          * @param name the name of Value to add.
          * @param value the Value to add.
          */
@@ -104,7 +102,7 @@ namespace vle { namespace value {
         { m_value[name] = CloneValue()(value); }
 
         /** 
-         * @brief Test if the map have a Value with specified name.
+         * @brief Test if the map have already a Value with specified name.
          * @param name the name to find into value.
          * @return true if Value exist, false otherwise.
          */
@@ -113,7 +111,7 @@ namespace vle { namespace value {
 
         /** 
          * @brief Get a Value from the map specified by his name. If name does
-         * not exist, a new value is build.
+         * not exist, a new value::Value() is build.
          * @param name The name of the value.
          * @return A reference to the specified value or a newly builded.
          */
@@ -122,7 +120,6 @@ namespace vle { namespace value {
 
         /** 
          * @brief Get an access to the std::map.
-         * 
          * @return a reference to the set::map.
          */
         inline MapValue& getValue()
@@ -130,103 +127,135 @@ namespace vle { namespace value {
 
         /** 
          * @brief Get a constant access to the std::map.
-         * 
          * @return a reference to the const std::map.
          */
         inline const MapValue& getValue() const
         { return m_value; }
 
         /**
-         * Get the Value objet for specified name.
-         *
+         * @brief Get the Value objet for specified name.
          * @param name The name of the Value in the map.
-         *
          * @return a reference to the Value.
-         *
-         * @throw Exception::Internal if value don't exist.
+         * @throw utils::ArgError if value don't exist.
          */
         Value getValue(const std::string& name) const;
 
         /** 
          * @brief Get the String value objet from specified name.
-         * 
          * @param name The name of the Value in the map.
-         * 
          * @return a reference to the Value.
-         *
-         * @throw Exception::Internal if type is not Value::STRING or value do not
+         * @throw utils::ArgError if type is not Value::STRING or value do not
          * exist.
          */
         const std::string& getStringValue(const std::string& name) const;
 
         /** 
+         * @brief Set a string to the value of the specified key. If the key
+         * does not exist, it will be build.
+         * @param name The key of the map.
+         * @param value The value of the key.
+         */
+        void setStringValue(const std::string& name, const std::string& value);
+
+        /** 
          * @brief Get the String value objet from specified name.
-         * 
          * @param name The name of the Value in the map.
-         * 
          * @return a reference to the Value.
-         *
-         * @throw Exception::Internal if type is not Value::STRING or value do not
+         * @throw utils::ArgError if type is not Value::STRING or value do not
          * exist.
          */
         bool getBooleanValue(const std::string& name) const;
 
         /** 
-         * @brief Get the integer value objet from specified name.
-         * 
+         * @brief Set a boolean to the value of the specified key. If the key
+         * does not exist, it will be build.
+         * @param name The key of the map.
+         * @param value The value of the key.
+         */
+        void setBooleanValue(const std::string& name, bool value);
+
+        /** 
+         * @brief Get the long integer value objet from specified name.
          * @param name The name of the Value in the map.
-         * 
          * @return a reference to the Value.
-         *
-         * @throw Exception::Internal if type is not Value::INTEGER or value do not
+         * @throw utils::ArgError if type is not Value::INTEGER or value do not
          * exist.
          */
         long getLongValue(const std::string& name) const;
 
         /** 
+         * @brief Set a long integer to the value of the specified key. If the
+         * key does not exist, it will be build.
+         * @param name The key of the map.
+         * @param value The value of the key.
+         */
+        void setLongValue(const std::string& name, long value);
+
+        /** 
          * @brief Get the integer value objet from specified name.
-         * 
          * @param name The name of the Value in the map.
-         * 
          * @return a reference to the Value.
-         *
-         * @throw Exception::Internal if type is not Value::INTEGER or value do not
+         * @throw utils::ArgError if type is not Value::INTEGER or value do not
          * exist.
          */
         int getIntValue(const std::string& name) const;
 
         /** 
+         * @brief Set a integer to the value of the specified key. If the
+         * key does not exist, it will be build.
+         * @param name The key of the map.
+         * @param value The value of the key.
+         */
+        void setIntValue(const std::string& name, int value);
+
+        /** 
          * @brief Get the Double value objet from specified name.
-         * 
          * @param name The name of the Value in the map.
-         * 
          * @return a reference to the Value.
-         *
-         * @throw Exception::Internal if type is not Value::DOUBLE or value do not
+         * @throw utils::ArgError if type is not Value::DOUBLE or value do not
          * exist.
          */
         double getDoubleValue(const std::string& name) const;
 
         /** 
-         * @brief Get the Map value objet from specified name.
-         * 
+         * @brief Set a double to the value of the specified key. If the
+         * key does not exist, it will be build.
+         * @param name The key of the map.
+         * @param value The value of the key.
+         */
+        void setDoubleValue(const std::string& name, double value);
+
+        /** 
+         * @brief Get the XML value objet from specified name.
          * @param name The name of the Value in the map.
-         * 
          * @return a reference to the Value.
-         *
-         * @throw Exception::Internal if type is not Value::Map or value do not
+         * @throw utils::ArgError if type is not Value::STRING or value do not
+         * exist.
+         */
+        const std::string& getXMLValue(const std::string& name) const;
+
+        /** 
+         * @brief Set an XML to the value of the specified key. If the key
+         * does not exist, it will be build.
+         * @param name The key of the map.
+         * @param value The value of the key.
+         */
+        void setXMLValue(const std::string& name, const std::string& value);
+
+        /** 
+         * @brief Get the Map value objet from specified name.
+         * @param name The name of the Value in the map.
+         * @return a reference to the Value.
+         * @throw utils::ArgError if type is not Value::Map or value do not
          * exist.
          */
         Map getMapValue(const std::string& name) const;
 
         /** 
          * @brief Get the Set value objet from specified name.
-         * 
          * @param name The name of the Value in the map.
-         * 
          * @return a reference to the Value.
-         *
-         * @throw Exception::Internal if type is not Value::SET or value do not
+         * @throw utils::ArgError if type is not Value::SET or value do not
          * exist.
          */
         Set getSetValue(const std::string& name) const;
@@ -238,7 +267,6 @@ namespace vle { namespace value {
 
         /** 
          * @brief Get the first constant iterator from Map.
-         * 
          * @return the first iterator.
          */
         inline MapValue::const_iterator begin() const
@@ -246,7 +274,6 @@ namespace vle { namespace value {
 
         /** 
          * @brief Get the last constant iterator from Map.
-         * 
          * @return the last iterator.
          */
         inline MapValue::const_iterator end() const

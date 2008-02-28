@@ -38,9 +38,81 @@
 #include <limits>
 #include <fstream>
 #include <vle/value.hpp>
+#include <vle/utils.hpp>
 
 using namespace vle;
 
+BOOST_AUTO_TEST_CASE(check_simple_value)
+{
+    value::Boolean b = value::BooleanFactory::create(true);
+    BOOST_REQUIRE_EQUAL(b->boolValue(), true);
+    b->set(false);
+    BOOST_REQUIRE_EQUAL(b->boolValue(), false);
+
+    value::Double d = value::DoubleFactory::create(12.34);
+    BOOST_REQUIRE_CLOSE(d->doubleValue(), 12.34, 1e-10);
+    d->set(43.21);
+    BOOST_REQUIRE_CLOSE(d->doubleValue(), 43.21, 1e-10);
+
+    value::Integer i = value::IntegerFactory::create(1234);
+    BOOST_REQUIRE_EQUAL(i->intValue(), 1234);
+    i->set(4321);
+    BOOST_REQUIRE_EQUAL(i->intValue(), 4321);
+
+    value::String s = value::StringFactory::create("1234");
+    BOOST_REQUIRE_EQUAL(s->stringValue(), "1234");
+    s->set("4321");
+    BOOST_REQUIRE_EQUAL(s->stringValue(), "4321");
+
+    value::XML x = value::XMLFactory::create("test");
+    BOOST_REQUIRE_EQUAL(x->stringValue(), "test");
+    x->set("tset");
+    BOOST_REQUIRE_EQUAL(x->stringValue(), "tset");
+}
+
+BOOST_AUTO_TEST_CASE(check_map_value)
+{
+    value::Map mp = value::MapFactory::create();
+    mp->setBooleanValue("boolean", true);
+    mp->setIntValue("integer", 1234);
+    mp->setDoubleValue("double", 12.34);
+    mp->setStringValue("string", "test");
+    mp->setXMLValue("xml", "xml test");
+
+    BOOST_REQUIRE_EQUAL(mp->getBooleanValue("boolean"), true);
+    BOOST_REQUIRE_EQUAL(mp->getIntValue("integer"), 1234);
+    BOOST_REQUIRE_CLOSE(mp->getDoubleValue("double"), 12.34, 1e-10);
+    BOOST_REQUIRE_EQUAL(mp->getStringValue("string"), "test");
+    BOOST_REQUIRE_EQUAL(mp->getXMLValue("xml"), "xml test");
+
+    BOOST_REQUIRE_THROW(mp->getIntValue("boolean"), utils::ArgError);
+    BOOST_REQUIRE_NO_THROW(mp->getIntValue("integer"));
+    BOOST_REQUIRE_THROW(mp->getIntValue("double"), utils::ArgError);
+    BOOST_REQUIRE_THROW(mp->getIntValue("string"), utils::ArgError);
+    BOOST_REQUIRE_THROW(mp->getIntValue("xml"), utils::ArgError);
+}
+
+BOOST_AUTO_TEST_CASE(check_set_value)
+{
+    value::Set st = value::SetFactory::create();
+    st->addBooleanValue(true);
+    st->addIntValue(1234);
+    st->addDoubleValue(12.34);
+    st->addStringValue("test");
+    st->addXMLValue("xml test");
+
+    BOOST_REQUIRE_EQUAL(st->getBooleanValue(0), true);
+    BOOST_REQUIRE_EQUAL(st->getIntValue(1), 1234);
+    BOOST_REQUIRE_CLOSE(st->getDoubleValue(2), 12.34, 1e-10);
+    BOOST_REQUIRE_EQUAL(st->getStringValue(3), "test");
+    BOOST_REQUIRE_EQUAL(st->getXMLValue(4), "xml test");
+
+    BOOST_REQUIRE_THROW(st->getIntValue(0), utils::ArgError);
+    BOOST_REQUIRE_NO_THROW(st->getIntValue(1));
+    BOOST_REQUIRE_THROW(st->getIntValue(2), utils::ArgError);
+    BOOST_REQUIRE_THROW(st->getIntValue(3), utils::ArgError);
+    BOOST_REQUIRE_THROW(st->getIntValue(4), utils::ArgError);
+}
 
 BOOST_AUTO_TEST_CASE(check_clone)
 {
@@ -66,4 +138,29 @@ BOOST_AUTO_TEST_CASE(check_clone)
     BOOST_REQUIRE(st->getValue(0).get() != stclone->getValue(0).get());
     BOOST_REQUIRE(st->getValue(1).get() != stclone->getValue(1).get());
     BOOST_REQUIRE(st->getValue(2).get() != stclone->getValue(2).get());
+}
+
+BOOST_AUTO_TEST_CASE(check_null)
+{
+    value::Set st = value::SetFactory::create();
+    st->addStringValue("toto1");
+    st->addNullValue();
+    st->addStringValue("toto2");
+    st->addNullValue();
+    st->addStringValue("toto3");
+    st->addNullValue();
+    st->addStringValue("toto4");
+    st->addNullValue();
+    st->addStringValue("toto5");
+    st->addNullValue();
+
+    BOOST_REQUIRE_EQUAL(st->size(), (value::VectorValue::size_type) 10);
+
+    st->getValue().erase(
+        std::remove_if(st->getValue().begin(),
+                       st->getValue().end(),
+                       value::IsNullValue()),
+        st->getValue().end());
+
+    BOOST_REQUIRE_EQUAL(st->size(), (value::VectorValue::size_type) 5);
 }

@@ -45,9 +45,10 @@
 namespace vle {
 
     /** 
-     * @brief The value namespace are used to be share by external event or to
-     * develop state model. All class are manager using a reference counter from
-     * Boost.org: boost::shared_ptr < type >.
+     * @brief The value namespace is used to wrap datas (boolean, integer,
+     * real, string, xml, array, map and set) which are shared by external,
+     * initial and state event. All class are manager using a reference counter
+     * from Boost.org: boost::shared_ptr < type >.
      */
     namespace value {
 

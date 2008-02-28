@@ -117,14 +117,14 @@ std::string TupleFactory::toXML() const
 
 Tuple toTupleValue(const Value& value)
 {
-    Assert(utils::InternalError, value->getType() == ValueBase::TUPLE,
+    Assert(utils::ArgError, value->getType() == ValueBase::TUPLE,
            "Value is not a Tuple");
     return boost::static_pointer_cast < TupleFactory >(value);
 }
 
 const TupleFactory::TupleValue& toTuple(const Value& value)
 {
-    Assert(utils::InternalError, value->getType() == ValueBase::TUPLE,
+    Assert(utils::ArgError, value->getType() == ValueBase::TUPLE,
            "Value is not a Tuple");
     return boost::static_pointer_cast < TupleFactory >(value)->getValue();
 }

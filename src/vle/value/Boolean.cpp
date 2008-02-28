@@ -68,14 +68,14 @@ std::string BooleanFactory::toXML() const
 
 Boolean toBooleanValue(const Value& value)
 {
-    Assert(utils::InternalError, value->getType() == ValueBase::BOOLEAN,
+    Assert(utils::ArgError, value->getType() == ValueBase::BOOLEAN,
            "Value is not a Boolean");
     return boost::static_pointer_cast < BooleanFactory >(value);
 }
 
 bool toBoolean(const Value& value)
 {
-    Assert(utils::InternalError, value->getType() == ValueBase::BOOLEAN,
+    Assert(utils::ArgError, value->getType() == ValueBase::BOOLEAN,
            "Value is not a Boolean");
     return boost::static_pointer_cast < BooleanFactory >(value)->boolValue();
 }

@@ -31,6 +31,7 @@
 #include <vle/value/Integer.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Boolean.hpp>
+#include <vle/value/XML.hpp>
 #include <vle/utils/Debug.hpp>
 
 
@@ -71,10 +72,20 @@ const std::string& MapFactory::getStringValue(const std::string& name) const
 {
     return value::toString(getValue(name));
 }
+
+void MapFactory::setStringValue(const std::string& name, const std::string& value)
+{
+    m_value[name] = StringFactory::create(value);
+}
     
 bool MapFactory::getBooleanValue(const std::string& name) const
 {
     return value::toBoolean(getValue(name));
+}
+
+void MapFactory::setBooleanValue(const std::string& name, bool value)
+{
+    m_value[name] = BooleanFactory::create(value);
 }
     
 long MapFactory::getLongValue(const std::string& name) const
@@ -82,14 +93,39 @@ long MapFactory::getLongValue(const std::string& name) const
     return value::toLong(getValue(name));
 }
 
+void MapFactory::setLongValue(const std::string& name, long value)
+{
+    m_value[name] = IntegerFactory::create(value);
+}
+
 int MapFactory::getIntValue(const std::string& name) const
 {
     return value::toInteger(getValue(name));
+}
+
+void MapFactory::setIntValue(const std::string& name, int value)
+{
+    m_value[name] = IntegerFactory::create(value);
 }
     
 double MapFactory::getDoubleValue(const std::string& name) const
 {
     return value::toDouble(getValue(name));
+}
+
+void MapFactory::setDoubleValue(const std::string& name, double value)
+{
+    m_value[name] = DoubleFactory::create(value);
+}
+
+const std::string& MapFactory::getXMLValue(const std::string& name) const
+{
+    return value::toXml(getValue(name));
+}
+
+void MapFactory::setXMLValue(const std::string& name, const std::string& value)
+{
+    m_value[name] = XMLFactory::create(value);
 }
     
 Map MapFactory::getMapValue(const std::string& name) const
@@ -164,14 +200,14 @@ std::string MapFactory::toXML() const
 
 Map toMapValue(const Value& value)
 {
-    Assert(utils::InternalError, value->getType() == ValueBase::MAP,
+    Assert(utils::ArgError, value->getType() == ValueBase::MAP,
            "Value is not a Map");
     return boost::static_pointer_cast < MapFactory >(value);
 }
 
 const MapValue& toMap(const Value& value)
 {
-    Assert(utils::InternalError, value->getType() == ValueBase::MAP,
+    Assert(utils::ArgError, value->getType() == ValueBase::MAP,
            "Value is not a Map");
     return boost::static_pointer_cast < MapFactory >(value)->getValue();
 }

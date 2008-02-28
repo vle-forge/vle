@@ -58,6 +58,9 @@ namespace vle { namespace value {
         inline bool boolValue() const
         { return m_value; }
 
+        inline void set(bool value)
+        { m_value = value; }
+
         virtual std::string toFile() const;
 
         virtual std::string toString() const;

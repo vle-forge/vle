@@ -57,7 +57,7 @@ std::string NullFactory::toXML() const
 
 Null toNullValue(const Value& value)
 {
-    Assert(utils::InternalError, value->getType() == ValueBase::NIL,
+    Assert(utils::ArgError, value->getType() == ValueBase::NIL,
            "Value is not a Null");
     return boost::static_pointer_cast < NullFactory >(value);
 }

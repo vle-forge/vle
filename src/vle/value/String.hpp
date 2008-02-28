@@ -55,6 +55,9 @@ namespace vle { namespace value {
         inline const std::string& stringValue() const
         { return m_value; }
 
+        inline void set(const std::string& value)
+        { m_value.assign(value); }
+
         virtual std::string toFile() const
         { return m_value; }
 

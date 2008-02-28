@@ -62,14 +62,14 @@ std::string DoubleFactory::toXML() const
 
 Double toDoubleValue(const Value& value)
 {
-    Assert(utils::InternalError, value->getType() == ValueBase::DOUBLE,
+    Assert(utils::ArgError, value->getType() == ValueBase::DOUBLE,
            "Value is not a Double");
     return boost::static_pointer_cast < DoubleFactory >(value);
 }
 
 double toDouble(const Value& value)
 {
-    Assert(utils::InternalError, value->getType() == ValueBase::DOUBLE,
+    Assert(utils::ArgError, value->getType() == ValueBase::DOUBLE,
            "Value is not a Double");
     return boost::static_pointer_cast < DoubleFactory >(value)->doubleValue();
 }

@@ -29,9 +29,7 @@
 #define UTILS_VALUE_VALUE_HPP
 
 #include <string>
-#include <vector>
 #include <boost/shared_ptr.hpp>
-#include <libxml++/libxml++.h>
 
 namespace vle { namespace value {
 

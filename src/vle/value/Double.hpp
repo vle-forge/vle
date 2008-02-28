@@ -62,6 +62,9 @@ namespace vle { namespace value {
         inline double doubleValue() const
         { return m_value; }
 
+        inline void set(double value)
+        { m_value = value; }
+
         virtual std::string toFile() const;
 
         virtual std::string toString() const;

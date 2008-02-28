@@ -146,14 +146,14 @@ std::string TableFactory::toXML() const
 
 Table toTableValue(const Value& value)
 {
-    Assert(utils::InternalError, value->getType() == ValueBase::TABLE,
+    Assert(utils::ArgError, value->getType() == ValueBase::TABLE,
            "Value is not a Table");
     return boost::static_pointer_cast < TableFactory >(value);
 }
 
 const TableFactory::TableValue& toTable(const Value& value)
 {
-    Assert(utils::InternalError, value->getType() == ValueBase::TABLE,
+    Assert(utils::ArgError, value->getType() == ValueBase::TABLE,
            "Value is not a Table");
     return boost::static_pointer_cast < TableFactory >(value)->getValue();
 }

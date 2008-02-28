@@ -52,14 +52,14 @@ std::string XMLFactory::toXML() const
 
 XML toXmlValue(const Value& value)
 {
-    Assert(utils::InternalError, value->getType() == ValueBase::XMLTYPE,
+    Assert(utils::ArgError, value->getType() == ValueBase::XMLTYPE,
            "Value is not a XML");
     return boost::static_pointer_cast < XMLFactory >(value);
 }
 
 const std::string& toXml(const Value& value)
 {
-    Assert(utils::InternalError, value->getType() == ValueBase::XMLTYPE,
+    Assert(utils::ArgError, value->getType() == ValueBase::XMLTYPE,
            "Value is not a XML");
     return boost::static_pointer_cast < XMLFactory >(value)->stringValue();
 }

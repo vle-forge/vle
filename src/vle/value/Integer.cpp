@@ -62,21 +62,21 @@ std::string IntegerFactory::toXML() const
 
 Integer toIntegerValue(const Value& value)
 {
-    Assert(utils::InternalError, value->getType() == ValueBase::INTEGER,
+    Assert(utils::ArgError, value->getType() == ValueBase::INTEGER,
            "Value is not an Integer");
     return boost::static_pointer_cast < IntegerFactory >(value);
 }
 
 long toLong(const Value& value)
 {
-    Assert(utils::InternalError, value->getType() == ValueBase::INTEGER,
+    Assert(utils::ArgError, value->getType() == ValueBase::INTEGER,
            "Value is not an Integer");
     return boost::static_pointer_cast < IntegerFactory >(value)->longValue();
 }
 
 int toInteger(const Value& value)
 {
-    Assert(utils::InternalError, value->getType() == ValueBase::INTEGER,
+    Assert(utils::ArgError, value->getType() == ValueBase::INTEGER,
            "Value is not an Integer");
     return boost::static_pointer_cast < IntegerFactory >(value)->intValue();
 }

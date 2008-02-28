@@ -65,6 +65,9 @@ namespace vle { namespace value {
         inline long longValue() const
         { return m_value; }
 
+        inline void set(long value)
+        { m_value = value; }
+
         virtual std::string toFile() const;
 
         virtual std::string toString() const;

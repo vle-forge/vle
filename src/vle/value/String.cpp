@@ -52,14 +52,14 @@ std::string StringFactory::toXML() const
 
 String toStringValue(const Value& value)
 {
-    Assert(utils::InternalError, value->getType() == ValueBase::STRING,
+    Assert(utils::ArgError, value->getType() == ValueBase::STRING,
            "Value is not a String");
     return boost::static_pointer_cast < StringFactory >(value);
 }
 
 const std::string& toString(const Value& value)
 {
-    Assert(utils::InternalError, value->getType() == ValueBase::STRING,
+    Assert(utils::ArgError, value->getType() == ValueBase::STRING,
            "Value is not a String");
     return boost::static_pointer_cast < StringFactory >(value)->stringValue();
 }

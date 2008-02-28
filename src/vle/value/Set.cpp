@@ -26,6 +26,14 @@
 
 
 #include <vle/value/Set.hpp>
+#include <vle/value/Map.hpp>
+#include <vle/value/String.hpp>
+#include <vle/value/Set.hpp>
+#include <vle/value/Integer.hpp>
+#include <vle/value/Double.hpp>
+#include <vle/value/Boolean.hpp>
+#include <vle/value/XML.hpp>
+#include <vle/value/Null.hpp>
 #include <vle/utils/Debug.hpp>
 
 
@@ -51,14 +59,85 @@ Value SetFactory::clone() const
     return Value(new SetFactory(*this));
 }
 
-void SetFactory::addValue(Value value)
+void SetFactory::addNullValue()
 {
-    m_value.push_back(value);
+    m_value.push_back(NullFactory::create());
 }
 
-void SetFactory::addCloneValue(Value value)
+void SetFactory::addBooleanValue(bool value)
 {
-    m_value.push_back(CloneValue()(value));
+    m_value.push_back(BooleanFactory::create(value));
+}
+
+bool SetFactory::getBooleanValue(const size_t i) const
+{
+    return toBoolean(getValue(i));
+}
+
+void SetFactory::addDoubleValue(double value)
+{
+    m_value.push_back(DoubleFactory::create(value));
+}
+
+double SetFactory::getDoubleValue(const size_t i) const
+{
+    return toDouble(getValue(i));
+}
+
+void SetFactory::addIntValue(int value)
+{
+    m_value.push_back(IntegerFactory::create(value));
+}
+
+int SetFactory::getIntValue(const size_t i) const
+{
+    return toInteger(getValue(i));
+}
+
+void SetFactory::addLongValue(long value)
+{
+    m_value.push_back(IntegerFactory::create(value));
+}
+
+long SetFactory::getLongValue(const size_t i) const
+{
+    return toLong(getValue(i));
+}
+
+void SetFactory::addStringValue(const std::string& value)
+{
+    m_value.push_back(StringFactory::create(value));
+}
+
+const std::string& SetFactory::getStringValue(const size_t i) const
+{
+    return value::toString(getValue(i));
+}
+
+void SetFactory::addXMLValue(const std::string& value)
+{
+    m_value.push_back(XMLFactory::create(value));
+}
+
+const std::string& SetFactory::getXMLValue(const size_t i) const
+{
+    return value::toXml(getValue(i));
+}
+
+const Value& SetFactory::getValue(const size_t i) const
+{
+    Assert(utils::ArgError, i < size(), boost::format(
+            "The index '%1%' is to big for this Set (size='%2%')") % i % size());
+
+    return m_value[i];
+}
+
+Value& SetFactory::getValue(const size_t i)
+{
+    Assert(utils::ArgError, i < size(), boost::format(
+            "The index '%1%' is to big for this Set (size='%2%')") % i % size());
+
+    return m_value[i];
 }
 
 std::string SetFactory::toFile() const
@@ -105,14 +184,14 @@ std::string SetFactory::toXML() const
 
 Set toSetValue(const Value& value)
 {
-    Assert(utils::InternalError, value->getType() == ValueBase::SET,
+    Assert(utils::ArgError, value->getType() == ValueBase::SET,
            "Value is not a Set");
     return boost::static_pointer_cast < SetFactory >(value);
 }
 
 const VectorValue& toSet(const Value& value)
 {
-    Assert(utils::InternalError, value->getType() == ValueBase::SET,
+    Assert(utils::ArgError, value->getType() == ValueBase::SET,
            "Value is not a Set");
     return boost::static_pointer_cast < SetFactory >(value)->getValue();
 }
