@@ -129,7 +129,7 @@ void JustRunThread::run()
     vpz::Vpz* file;
     std::string filename;
     std::ostringstream ostr;
-    int instance;
+    int instance = 0;
     oov::PluginViewList views;
 
     for (;;) {

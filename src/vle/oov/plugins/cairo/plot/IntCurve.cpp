@@ -30,18 +30,15 @@
 namespace vle { namespace oov { namespace plugin {
 
 struct SortByNumber { 
-    bool operator ()(const std::pair < double, int > & p1, const std::pair < double, int
-		     > & p2) const 
-	{ 
-	    return p1.second < p2.second; 
-	} 
+    bool operator ()(const std::pair < double, int > & p1,
+                     const std::pair < double, int > & p2) const
+    { return p1.second < p2.second; } 
 };
 	    
 struct SortByNumberValue { 
-    bool operator ()(const std::pair < int, int > & p1, const std::pair < int, int > & p2) const 
-	{ 
-	    return p1.first > p2.first; 
-	} 
+    bool operator ()(const std::pair < int, int > & p1,
+                     const std::pair < int, int > & p2) const 
+        { return p1.first > p2.first; } 
 };
 
 void IntCurve::swap_int(int &value1, int &value2)
@@ -56,7 +53,7 @@ void IntCurve::draw(Cairo::RefPtr < Cairo::Context > ctx, Parameter& m_parameter
 		    std::list < IntCurve * > m_list)
 {
     std::vector < color > v_colors;
-    int index = 0, v_value, v_x, v_x_next, v_y_top, v_y_bottom;
+    int index = 0, v_value, v_x = 0, v_x_next = 0, v_y_top = 0, v_y_bottom = 0;
     double v_date, next_date, m_firstDate;
     bool draw_raccord = false;
     int lastIndex, firstIndex;

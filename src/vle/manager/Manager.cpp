@@ -139,8 +139,8 @@ void ManagerRunThread::run()
     vpz::Vpz* file;
     std::string filename;
     std::ostringstream ostr;
-    int instance;
-    int replica;
+    int instance = 0;
+    int replica = 0;
     oov::PluginViewList views;
 
     for (;;) {

@@ -297,7 +297,7 @@ void DifferenceEquation::externalTransition(const ExternalEventList& event,
     bool end = std::abs(e.getValue() - mSigma.getValue()) < 1e-10;
     bool begin = (e == 0);
     ExternalEventList::const_iterator it = event.begin();
-    double delta;
+    double delta = 0.0;
     bool reset = false;
 
     while (it != event.end()) {
