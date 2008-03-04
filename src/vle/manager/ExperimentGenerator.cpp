@@ -38,13 +38,15 @@
 namespace vle { namespace manager {
 
 ExperimentGenerator::ExperimentGenerator(const vpz::Vpz& file,
-                                         std::ostream& out) :
+                                         std::ostream& out,
+                                         RandPtr rnd) :
     mFile(file),
     mTmpfile(file),
     mOut(out),
     mSaveVpz(false),
     mMutex(0),
-    mProdcond(0)
+    mProdcond(0),
+    mRand(rnd)
 {
     vpz::Conditions& dest(mTmpfile.project().experiment().conditions());
     vpz::ConditionList::const_iterator itDest(dest.conditionlist().begin());
@@ -68,8 +70,8 @@ void ExperimentGenerator::build(OutputSimulationMatrix* matrix)
 
     OutputSimulationMatrix::extent_gen extent;
 
-    mOut << boost::format("Generator: build (%1%, %2%)\n") % mReplicasTab.size()
-        % getCombinationNumber();
+    mOut << boost::format("Generator: build (%1% rep. x %2% cmb.)\n") %
+        mReplicasTab.size() % getCombinationNumber();
     mMatrix->resize(extent[mReplicasTab.size()][getCombinationNumber()]);
 
     buildCombinations();
@@ -97,13 +99,14 @@ void ExperimentGenerator::build(Glib::Mutex* mutex, Glib::Cond* prod,
 
 void ExperimentGenerator::buildReplicasList()
 {
-    mOut << "Replicas: ";
-    mReplicasTab = mFile.project().experiment().replicas().getList();
-    if (mReplicasTab.empty()) {
-        std::cerr << "/!\\ no defined (experiment seed is used): ";
-        mReplicasTab.push_back(mFile.project().experiment().seed());
+    Assert(utils::ArgError, mFile.project().experiment().replicas().number() > 0,
+           "The replicas's tag is not defined in the vpz file");
+
+    mReplicasTab.resize(mFile.project().experiment().replicas().number());
+    for (std::vector < guint32 >::iterator it = mReplicasTab.begin();
+         it != mReplicasTab.end(); ++it) {
+        *it = mRand->get_int();
     }
-    mOut << mReplicasTab.size() << std::endl;
 }
 
 void ExperimentGenerator::buildConditionsList()

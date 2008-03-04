@@ -30,10 +30,16 @@
 
 #include <boost/multi_array.hpp>
 #include <vle/oov/Plugin.hpp>
+#include <vle/utils/Rand.hpp>
 #include <vector>
 #include <list>
 
 namespace vle { namespace manager  {
+    
+    /** 
+     * @brief A boost share_ptr around the vle::utils::Rand class.
+     */
+    typedef boost::shared_ptr < utils::Rand > RandPtr;
 
     /** 
      * @brief Define a list of filename from command line arguments argv and

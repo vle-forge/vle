@@ -59,7 +59,6 @@ void Experiment::clear()
     m_duration = 0;
     m_seed = 1;
 
-    m_replicas.clear();
     m_conditions.clear();
     m_views.clear();
 }

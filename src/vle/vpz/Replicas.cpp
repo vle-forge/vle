@@ -32,7 +32,7 @@
 namespace vle { namespace vpz {
 
 Replicas::Replicas() :
-    m_number(1),
+    m_number(0),
     m_seed(0)
 { }
 
@@ -44,21 +44,12 @@ void Replicas::write(std::ostream& out) const
         << " />\n";
 }
 
-void Replicas::buildList()
+void Replicas::setNumber(const size_t number)
 {
-    utils::Rand::rand().set_seed(m_seed);
-    m_list.resize(m_number);
+    Assert(utils::ArgError, number != 0,
+           "Cannot assign zero number of replica\n");
 
-    for (std::vector < guint32 >::iterator it = m_list.begin(); 
-         it != m_list.end(); ++it) {
-        *it = utils::Rand::rand().get_int();
-    }
-}
-
-
-void Replicas::clear()
-{
-    m_list.clear();
+    m_number = number;
 }
 
 }} // namespace vle vpz

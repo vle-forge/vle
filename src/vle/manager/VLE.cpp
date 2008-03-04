@@ -59,7 +59,6 @@ VLE::VLE(int port) :
 VLE::~VLE()
 {
     utils::Path::kill();
-    utils::Rand::kill();
     utils::Trace::kill();
 }
 
@@ -88,8 +87,8 @@ bool VLE::runManager(bool allInLocal, bool savevpz, int nbProcessor, const
             r.start(args.front());
         }
     } catch(const std::exception& e) {
-        std::cerr << "Manager error: "
-            << utils::demangle(e.what()) << std::endl;
+        std::cerr << "\n/!\\ vle manager error reported: "
+            << utils::demangle(typeid(e)) << "\n" << e.what();
         return false;
     }
     return true;
@@ -107,8 +106,9 @@ bool VLE::runSimulator(int process)
 
         SimulatorDistant sim(std::cerr, process, mPort);
         sim.start();
-    } catch(const std::exception& e) {
-        std::cerr << "Simulator error: " << e.what() << std::endl;
+        } catch(const std::exception& e) {
+            std::cerr << "\n/!\\ vle distant simulator error reported: "
+                << utils::demangle(typeid(e)) << "\n" << e.what();
         return false;
     }
     return true;
@@ -121,7 +121,8 @@ bool VLE::justRun(int nbProcessor, const CmdArgs& args)
             JustRunMono jrm(std::cerr);
             jrm.operator()(args);
         } catch(const std::exception& e) {
-            std::cerr << "Simulation error: " << e.what() << std::endl;
+            std::cerr << "\n/!\\ vle mono simulator error reported: "
+                << utils::demangle(typeid(e)) << "\n" << e.what();
             return false;
         }
     } else {
@@ -130,7 +131,8 @@ bool VLE::justRun(int nbProcessor, const CmdArgs& args)
             JustRunThread jrt(std::cerr, nbProcessor);
             jrt.operator()(args);
         } catch(const std::exception& e) {
-            std::cerr << "Simulation error: " << e.what() << std::endl;
+            std::cerr << "\n/!\\ vle thread simulator error reported: "
+                << utils::demangle(typeid(e)) << "\n" << e.what();
             return false;
         }
     }

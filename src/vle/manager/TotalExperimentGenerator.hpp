@@ -45,8 +45,9 @@ namespace vle { namespace manager {
          * generate all VPZ instance file.
          *
          */
-        TotalExperimentGenerator(const vpz::Vpz& file, std::ostream& out) :
-            ExperimentGenerator(file, out)
+        TotalExperimentGenerator(const vpz::Vpz& file, std::ostream& out,
+                                 RandPtr rnd) :
+            ExperimentGenerator(file, out, rnd)
         { }
 
         virtual ~TotalExperimentGenerator()

@@ -50,16 +50,19 @@ ExperimentGenerator* ManagerRun::getCombinationPlan(
     const vpz::Vpz& file, std::ostream& out)
 {
     const vpz::Experiment& exp = file.project().experiment();
+
     if (exp.combination() == "linear") {
-        return new LinearExperimentGenerator(file, out);
+        return new LinearExperimentGenerator(file, out, m_rand);
     } else {
-        return new TotalExperimentGenerator(file, out);
+        return new TotalExperimentGenerator(file, out, m_rand);
     }
 }
 
 void ManagerRunMono::operator()(const vpz::Vpz& file)
 {
     m_out << "Manager: run experimental frames in one thread\n";
+
+    initRandomGenerator(file);
     m_exp = getCombinationPlan(file, m_out);
     m_exp->saveVPZinstance(m_writefile);
     m_exp->build(&m_matrix);
@@ -94,6 +97,7 @@ void ManagerRunThread::operator()(const vpz::Vpz& file)
     m_out << boost::format(
         "Manager: run experimental frames in %1% threads\n") % m_process;
     
+    initRandomGenerator(file);
     m_exp = getCombinationPlan(file, m_out);
 
     Glib::Thread* prod(Glib::Thread::create(
@@ -185,8 +189,9 @@ void ManagerRunThread::run()
     }
 }
 
-ManagerRunDistant::ManagerRunDistant(std::ostream& out, bool writefile) :
-    ManagerRun(out, writefile)
+ManagerRunDistant::ManagerRunDistant(std::ostream& out, bool writefile,
+                                     RandPtr rnd) :
+    ManagerRun(out, writefile, rnd)
 {
     try {
         mHost.read_file();
@@ -242,6 +247,7 @@ void ManagerRunDistant::operator()(const std::string& filename)
 void ManagerRunDistant::operator()(const vpz::Vpz& file)
 {
     m_out << boost::format("Manager: run experimental frames in distant\n");
+    initRandomGenerator(file);
     
     m_exp = getCombinationPlan(file, m_out);
 
@@ -445,6 +451,20 @@ void ManagerRunDistant::sendVpzi(utils::net::Client& cl,
     } catch (const std::exception& e) {
         m_out << boost::format(
             "Manager: error send vpz %1%: %2%\n") % file % e.what();
+    }
+}
+
+void ManagerRun::initRandomGenerator(const vpz::Vpz& file)
+{
+    if (m_rand.get() == 0) {
+        m_out << "Use the seed from vpz::Vpz replicas tags\n";
+        m_rand = boost::shared_ptr < utils::Rand >(new utils::Rand());
+
+        Assert(utils::ArgError,
+               file.project().experiment().replicas().number() > 0,
+               boost::format("The replicas's tag does not defined"));
+
+        m_rand->set_seed(file.project().experiment().replicas().seed());
     }
 }
 

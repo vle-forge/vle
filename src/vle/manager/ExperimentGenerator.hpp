@@ -46,12 +46,16 @@ namespace vle { namespace manager {
     class ExperimentGenerator
     {
     public:
-        /**
-         * Just get a constant reference to VPZ. Use get_instances_files() to
-         * generate all VPZ instance file.
-         *
+        /** 
+         * @brief Build a experimental frame base on the const vpz::Vpz give in
+         * parameters. It allows to build a combination of value from this
+         * vpz::Vpz.
+         * @param file A constant reference to a VPZ.
+         * @param out Where to send output.
+         * @param rnd A reference random number generator.
          */
-        ExperimentGenerator(const vpz::Vpz& file, std::ostream& out);
+        ExperimentGenerator(const vpz::Vpz& file, std::ostream& out,
+                            RandPtr rnd);
 
         virtual ~ExperimentGenerator() { }
 
@@ -152,6 +156,7 @@ namespace vle { namespace manager {
         OutputSimulationMatrix*     mMatrix;
         Glib::Mutex*                mMutex;
         Glib::Cond*                 mProdcond;
+        RandPtr                     mRand;
     };
 
 }} // namespace vle manager

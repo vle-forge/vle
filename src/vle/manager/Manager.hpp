@@ -36,10 +36,12 @@
 #include <vle/vpz/Vpz.hpp>
 #include <vle/utils/Host.hpp>
 #include <vle/utils/Socket.hpp>
+#include <vle/utils/Rand.hpp>
 #include <vle/manager/ExperimentGenerator.hpp>
 #include <boost/noncopyable.hpp>
 
 namespace vle { namespace manager {
+
 
     /** 
      * @brief ManagerRun is the base class for running simulation from a specified
@@ -54,8 +56,11 @@ namespace vle { namespace manager {
          * @brief Build a ManagerRun.
          * @param out output to log error.
          * @param writefile write all experimental frames file produced.
+         * @param rnd a pseudo random generator build by the user, if rnd is
+         * empty then, a new random number generator will be build from the Vpz
+         * file.
          */
-        ManagerRun(std::ostream& out, bool writefile);
+        ManagerRun(std::ostream& out, bool writefile, RandPtr rnd = RandPtr());
 
         /** 
          * @brief Get a reference to the oov::PluginPtr list of the simulation
@@ -75,6 +80,7 @@ namespace vle { namespace manager {
         OutputSimulationMatrix  m_matrix;
         std::ostream&           m_out;
         bool                    m_writefile;
+        RandPtr                 m_rand;
 
         /** 
          * @brief Build the ExperimentGenerator attached to the vpz::Vpz
@@ -82,8 +88,17 @@ namespace vle { namespace manager {
          * @param file The vpz::Vpz file
          * @return A reference to the newly build combination plan
          */
-        static ExperimentGenerator* getCombinationPlan(
+        ExperimentGenerator* getCombinationPlan(
             const vpz::Vpz& file, std::ostream& out);
+
+        /** 
+         * @brief Initialize a random number generator if the user does not
+         * call the constructor with a valid RandomNumberGenerator. The seed is
+         * provided by the vpz::Vpz file instance in the replicas tags. If the
+         * seed is not provided, the std::time(0) or /dev/urandom is used.
+         * @param file The vpz::Vpz file where get the seed.
+         */
+        void initRandomGenerator(const vpz::Vpz& file);
     };
 
 
@@ -100,8 +115,12 @@ namespace vle { namespace manager {
          * @param out output to log error.
          * @param writefile write all experimental frames file produced.
          * @param process number of thread to use.
+         * @param rnd a pseudo random generator build by the user, if rnd is
+         * empty then, a new random number generator will be build from the Vpz
+         * file.
          */
-        ManagerRunMono(std::ostream& out, bool writefile);
+        ManagerRunMono(std::ostream& out, bool writefile,
+                       RandPtr ptr = RandPtr());
 
         /** 
          * @brief Read specified vpz files an start simulations on the number of
@@ -153,8 +172,12 @@ namespace vle { namespace manager {
          * @param out output to log error.
          * @param writefile write all experimental frames file produced.
          * @param process number of thread to use.
+         * @param rnd a pseudo random generator build by the user, if rnd is
+         * empty then, a new random number generator will be build from the Vpz
+         * file.
          */
-        ManagerRunThread(std::ostream& out, bool writefile, int process);
+        ManagerRunThread(std::ostream& out, bool writefile, int process,
+                         RandPtr rnd = RandPtr());
 
         /** 
          * @brief Read specified vpz files an start simulations on the number of
@@ -211,9 +234,9 @@ namespace vle { namespace manager {
 
     
     /** 
-     * @brief ManagerRunDistant is the class for running experimental frames onto
-     * distant nodes. It parses the user hosts file to get Simulator position
-     * and lauch simulation on hosts in immediate mode.
+     * @brief ManagerRunDistant is the class for running experimental frames
+     * onto distant nodes. It parses the user hosts file to get Simulator
+     * position and lauch simulation on hosts in immediate mode.
      */
     class ManagerRunDistant : public ManagerRun
     {
@@ -222,8 +245,12 @@ namespace vle { namespace manager {
          * @brief Build a ManagerRunDistant.
          * @param out output to log error.
          * @param writefile write all experimental frames file produced.
+         * @param rnd a pseudo random generator build by the user, if rnd is
+         * empty then, a new random number generator will be build from the Vpz
+         * file.
          */
-        ManagerRunDistant(std::ostream& out, bool writefile);
+        ManagerRunDistant(std::ostream& out, bool writefile,
+                          RandPtr rnd = RandPtr());
 
         /** 
          * @brief Read specified vpz files an start simulations on the number of
@@ -299,13 +326,15 @@ namespace vle { namespace manager {
         unsigned int getVpzNumber();
     };
 
-    
+
     /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-    
-    inline ManagerRun::ManagerRun(std::ostream& out, bool writefile) :
+
+    inline ManagerRun::ManagerRun(std::ostream& out, bool writefile,
+                                  RandPtr rnd) :
         m_out(out),
-        m_writefile(writefile)
+        m_writefile(writefile),
+        m_rand(rnd)
     {
     }
 
@@ -314,13 +343,15 @@ namespace vle { namespace manager {
         return m_matrix;
     }
 
-    inline const OutputSimulationMatrix& ManagerRun::outputSimulationMatrix() const
+    inline const 
+    OutputSimulationMatrix& ManagerRun::outputSimulationMatrix() const
     {
         return m_matrix;
     }
 
-    inline ManagerRunMono::ManagerRunMono(std::ostream& out, bool writefile) :
-        ManagerRun(out, writefile)
+    inline ManagerRunMono::ManagerRunMono(std::ostream& out, bool writefile,
+                                          RandPtr rnd) :
+        ManagerRun(out, writefile, rnd)
     {
     }
 
@@ -333,10 +364,10 @@ namespace vle { namespace manager {
     {
         operator()(file);
     }
-    
+
     inline ManagerRunThread::ManagerRunThread(std::ostream& out, bool writefile,
-                                              int process) :
-        ManagerRun(out, writefile),
+                                              int process, RandPtr rnd) :
+        ManagerRun(out, writefile, rnd),
         m_process(process),
         m_finish(false),
         m_exp(0)

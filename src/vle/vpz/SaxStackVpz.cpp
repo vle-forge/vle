@@ -372,8 +372,38 @@ void SaxStackVpz::pushReplicas(const AttributeList& att)
     AssertS(utils::SaxParserError, m_stack.top()->isExperiment());
 
     vpz::Replicas& rep(m_vpz.project().experiment().replicas());
-    rep.setSeed(getAttribute < guint32 >(att, "seed"));
-    rep.setNumber(getAttribute < size_t >(att, "number"));
+
+    bool haveseed = false;
+    bool havenumber = false;
+
+    for (AttributeList::const_iterator it = att.begin();
+         it != att.end(); ++it) {
+        if ((*it).name == "seed") {
+            try {
+                rep.setSeed(boost::lexical_cast < guint32 >((*it).value));
+                haveseed = true;
+            } catch(const boost::bad_lexical_cast& ) {
+                Throw(utils::ArgError, boost::format(
+                        "Cannot convert replicas's tag seed: '%1%'") %
+                    (*it).value);
+            }
+        } else if ((*it).name == "number") {
+            try {
+                rep.setNumber(boost::lexical_cast < size_t >((*it).value));
+                havenumber = true;
+            } catch(const boost::bad_lexical_cast& ) {
+                Throw(utils::ArgError, boost::format(
+                        "Cannot convert replicas's tag number: '%1%'") %
+                    (*it).value);
+            }
+        }
+    }
+
+    Assert(utils::ArgError, haveseed,
+           "The replicas's tag does not define a seed");
+
+    Assert(utils::ArgError, havenumber,
+           "The replica's tag does not define a number");
 }
 
 void SaxStackVpz::pushConditions()
