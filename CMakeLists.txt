@@ -178,6 +178,43 @@ IF(WIN32)
   INSTALL(FILES ${VLE_BINARY_DIR}/vle.nsi DESTINATION ${VLE_SHARE_DIRS})
 ENDIF(WIN32)
 
+ #
+  # Generating documentation with doxygen
+ #
+
+OPTION(WITH_DOXYGEN "build the documentation with doxygen [default: off]" OFF)
+IF (WITH_DOXYGEN)
+  FIND_PACKAGE(Doxygen)
+  IF(NOT DOXYGEN_EXECUTABLE)
+    MESSAGE(STATUS "WARNING: Doxygen not found so documentation not generated.")
+  ENDIF(NOT DOXYGEN_EXECUTABLE)
+
+  IF(DOXYGEN_EXECUTABLE AND UNIX)
+    FILE(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/share/doc)
+
+    ADD_CUSTOM_COMMAND(
+      OUTPUT ${CMAKE_SOURCE_DIR}/share/doc/doxygen/html/index.html
+      COMMAND rm -rf ${CMAKE_SOURCE_DIR}/share/doc/doxygen
+      COMMAND mkdir ${CMAKE_SOURCE_DIR}/share/doc/doxygen
+      COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_SOURCE_DIR}/share/Doxyfile
+      DEPENDS ${CMAKE_SOURCE_DIR}/share/Doxyfile
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+
+    ADD_CUSTOM_TARGET(
+      documentation
+      DEPENDS
+      ${CMAKE_SOURCE_DIR}/share/doc/doxygen/html/index.html)
+
+    IF(EXISTS ${CMAKE_SOURCE_DIR}/share/doc/doxygen)
+      INSTALL(DIRECTORY ${CMAKE_SOURCE_DIR}/share/doc/doxygen/ DESTINATION
+	"${VLE_SHARE_DIRS}/html")
+    ENDIF(EXISTS ${CMAKE_SOURCE_DIR}/share/doc/doxygen)
+  ENDIF(DOXYGEN_EXECUTABLE AND UNIX)
+ENDIF(WITH_DOXYGEN)
+
+ #
+  # Browse the subdirectory now
+ #
 
 ADD_SUBDIRECTORY(share)
 ADD_SUBDIRECTORY(src)
