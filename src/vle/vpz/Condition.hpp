@@ -63,6 +63,8 @@ namespace vle { namespace vpz {
     public:
         Condition(const std::string& name);
 
+        Condition(const Condition& cnd);
+
         virtual ~Condition() 
         { }
 

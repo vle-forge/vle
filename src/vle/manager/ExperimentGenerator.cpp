@@ -204,6 +204,13 @@ void ExperimentGenerator::writeInstance(size_t cmbnumber, size_t replnumber)
     newvpz->project().setInstance(cmbnumber);
     newvpz->project().setReplica(replnumber);
 
+    if (mSaveVpz) {
+        std::string filename(expname);
+        filename += ".vpz";
+        std::ofstream output(filename.c_str());
+        newvpz->write(output);
+    }
+
     mFileList.push_back(newvpz);
 }
 
@@ -218,6 +225,13 @@ void ExperimentGenerator::writeInstanceThread(size_t cmbnumber, size_t replnumbe
     vpz::Vpz* newvpz = new vpz::Vpz(mTmpfile);
     newvpz->project().setInstance(cmbnumber);
     newvpz->project().setReplica(replnumber);
+
+    if (mSaveVpz) {
+        std::string filename(expname);
+        filename += ".vpz";
+        std::ofstream output(filename.c_str());
+        newvpz->write(output);
+    }
 
     {
         Glib::Mutex::Lock lock(*mMutex);

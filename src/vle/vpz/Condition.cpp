@@ -43,6 +43,18 @@ Condition::Condition(const std::string& name) :
 {
 }
 
+Condition::Condition(const Condition& cnd) :
+    Base(cnd),
+    m_name(cnd.m_name),
+    m_last_port(cnd.m_last_port),
+    m_ispermanent(cnd.m_ispermanent)
+{
+    for (ConditionValues::const_iterator it = cnd.m_list.begin();
+         it != cnd.m_list.end(); ++it) {
+        m_list[it->first] = toSetValue(it->second->clone());
+    }
+}
+
 value::Value ValueList::get(const std::string& name)
 {
     iterator it;
