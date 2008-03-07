@@ -192,6 +192,9 @@ IF (WITH_DOXYGEN)
   IF(DOXYGEN_EXECUTABLE AND UNIX)
     FILE(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/share/doc)
 
+    CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/share/Doxyfile.in
+      ${CMAKE_SOURCE_DIR}/share/Doxyfile @ONLY)
+
     ADD_CUSTOM_COMMAND(
       OUTPUT ${CMAKE_SOURCE_DIR}/share/doc/doxygen/html/index.html
       COMMAND rm -rf ${CMAKE_SOURCE_DIR}/share/doc/doxygen
@@ -205,10 +208,10 @@ IF (WITH_DOXYGEN)
       DEPENDS
       ${CMAKE_SOURCE_DIR}/share/doc/doxygen/html/index.html)
 
-    IF(EXISTS ${CMAKE_SOURCE_DIR}/share/doc/doxygen)
+    IF(EXISTS ${CMAKE_SOURCE_DIR}/share/doc)
       INSTALL(DIRECTORY ${CMAKE_SOURCE_DIR}/share/doc/doxygen/ DESTINATION
-	"${VLE_SHARE_DIRS}/html")
-    ENDIF(EXISTS ${CMAKE_SOURCE_DIR}/share/doc/doxygen)
+	"${VLE_SHARE_DIRS}/doc")
+    ENDIF(EXISTS ${CMAKE_SOURCE_DIR}/share/doc)
   ENDIF(DOXYGEN_EXECUTABLE AND UNIX)
 ENDIF(WITH_DOXYGEN)
 

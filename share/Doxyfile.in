@@ -4,8 +4,8 @@
 # Project related configuration options
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
-PROJECT_NAME           = VLE
-PROJECT_NUMBER         = 0.5.0
+PROJECT_NAME           = @VLE_NAME@
+PROJECT_NUMBER         = @VLE_COMPLETE@
 OUTPUT_DIRECTORY       = share/doc/doxygen
 CREATE_SUBDIRS         = NO
 OUTPUT_LANGUAGE        = English
