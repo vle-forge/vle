@@ -28,7 +28,7 @@
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Tools.hpp>
-
+#include <vle/utils/Debug.hpp>
 
 
 namespace vle { namespace utils {
@@ -82,6 +82,17 @@ namespace vle { namespace utils {
     std::string Trace::getLogFilename(const std::string& filename)
     {
 	return Glib::build_filename(utils::Path::path().getHomeDir(), filename);
+    }
+
+    std::ostream& Trace::output()
+    {
+        Assert(utils::InternalError, m_file,
+               "Trace stream is empty");
+        Assert(utils::InternalError, m_file->is_open(),
+               "Trace stream is not opened");
+
+        return *m_file;
+
     }
 
 }} // namespace vle utils

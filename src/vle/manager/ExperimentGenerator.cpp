@@ -90,8 +90,9 @@ void ExperimentGenerator::build(Glib::Mutex* mutex, Glib::Cond* prod,
     {
         Glib::Mutex::Lock lock(*mMutex);
         OutputSimulationMatrix::extent_gen extent;
+        mOut << boost::format("Generator: build (%1% rep. x %2% cmb.)\n") %
+            mReplicasTab.size() % getCombinationNumber();
         mMatrix->resize(extent[mReplicasTab.size()][getCombinationNumber()]);
-        prod->signal();
     }
 
     buildCombinations();

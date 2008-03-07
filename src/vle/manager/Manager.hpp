@@ -104,14 +104,14 @@ namespace vle { namespace manager {
 
 
     /** 
-     * @brief ManagerRunThread is the class for running experimental frames onto
-     * the same host with a specific number of threads.
+     * @brief ManagerRunMono is the class for running experimental frames onto
+     * the same host with only one thread.
      */
     class ManagerRunMono : public ManagerRun
     {
     public:
         /** 
-         * @brief Build a ManagerRunThread.
+         * @brief Build a ManagerRunMono.
          * @param out output to log error.
          * @param writefile write all experimental frames file produced.
          * @param process number of thread to use.
@@ -364,7 +364,7 @@ namespace vle { namespace manager {
     {
         operator()(file);
     }
-
+    
     inline ManagerRunThread::ManagerRunThread(std::ostream& out, bool writefile,
                                               int process, RandPtr rnd) :
         ManagerRun(out, writefile, rnd),

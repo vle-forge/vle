@@ -99,6 +99,7 @@ void ManagerRunThread::operator()(const vpz::Vpz& file)
     
     initRandomGenerator(file);
     m_exp = getCombinationPlan(file, m_out);
+    m_exp->saveVPZinstance(m_writefile);
 
     Glib::Thread* prod(Glib::Thread::create(
             sigc::mem_fun(*this, &ManagerRunThread::read), true));

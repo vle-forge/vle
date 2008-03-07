@@ -440,12 +440,23 @@ namespace vle { namespace utils {
     }
 
     /**
-     * Write the current date and time conform to RFC 822.
-     *
+     * @brief Write the current date and time conform to RFC 822.
      *
      * @return string representation of date.
      */
     std::string get_current_date();
+
+
+    /** 
+     * @brief Write the current date and time in the format:
+     * @code
+     * std::cout << get_simple_current_date();
+     * // 20080306-1534
+     * @endcode
+     * 
+     * @return string representation of the date.
+     */
+    std::string get_simple_current_date();
 
     /**
      * Return true if unicode string str is an ascii string with only
@@ -523,6 +534,16 @@ namespace vle { namespace utils {
      * close all opened files.
      */
     void buildDaemon();
+
+    /** 
+     * @brief Initialize the VLE system by:
+     * - installling signal (segmentation fault etc.) to standard error
+     *   function.
+     * - initialize the user directory ($HOME/.vle/ etc.).
+     * - initialize the WinSock
+     * - initialize the thread system.
+     */
+    void init();
 
 }} // namespace vle utils
 

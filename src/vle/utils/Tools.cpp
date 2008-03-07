@@ -28,10 +28,12 @@
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Debug.hpp>
+#include <vle/utils/Socket.hpp>
 
 #include <glibconfig.h>
 #include <glibmm/markup.h>
 #include <glibmm/stringutils.h>
+#include <glibmm/thread.h>
 #include <glib/gstdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -101,15 +103,34 @@ std::string write_to_temp(const std::string& prefix,
 
 std::string get_current_date()
 {
-    char ch[81];
-    struct tm* pdh = 0;
-    time_t intps;
+    std::setlocale(LC_TIME, "");
 
-    intps = time(NULL);
-    pdh = localtime(&intps);
-    strftime(ch, 81, "%a, %d %b %Y %H:%M:%S %z", pdh);
+    const std::size_t buffer_size = 1024;
+    char buffer[ buffer_size ];
+    
+    const char* format = "%a, %d %b %Y %H:%M:%S %z";
+    std::time_t t = std::time(0);
 
-    return ch;
+    std::strftime(buffer, buffer_size,
+                  format, std::localtime( &t ) ); 
+
+    return std::string(buffer);
+}
+
+std::string get_simple_current_date()
+{
+    std::setlocale(LC_TIME, "");
+
+    const std::size_t buffer_size = 1024;
+    char buffer[ buffer_size ];
+
+    const char* format = "%Y%m%d-%H%M";
+    std::time_t t = std::time(0);
+
+    std::strftime(buffer, buffer_size,
+                  format, std::localtime(&t)); 
+
+    return std::string(buffer);
 }
 
 bool is_vle_string(const Glib::ustring& str)
@@ -286,6 +307,14 @@ void buildDaemon()
 #endif
     for (int i = 0; i < FOPEN_MAX; ++i)
         ::close(i);
+}
+
+void init()
+{
+    utils::install_signal();
+    utils::initUserDirectory();
+    utils::net::Base::init();
+    Glib::thread_init();
 }
 
 }} // namespace vle utils

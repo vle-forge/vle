@@ -54,22 +54,20 @@ namespace vle { namespace manager {
     {
     public:
         /**
-         * Run simulator on specified TCP/IP port and wait VPZi file.
-         *
+         * @brief Run simulator on specified TCP/IP port and wait VPZi file.
+         * @param out the output stream where send log information.
          * @param cpu number of CPU allowed to VLE simulators.
          * @param port TCP/IP port to listen VLE manager.
          */
         SimulatorDistant(std::ostream& out, size_t cpu, int port);
 
         /**
-         * Destroy TCP/IP connection, delete all process.
-         *
+         * @brief Destroy TCP/IP connection, delete all process.
          */
         ~SimulatorDistant();
 
         /**
-         * Start the daemon.
-         *
+         * @brief Start the daemon.
          */
         void start();
 

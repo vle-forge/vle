@@ -150,6 +150,13 @@ namespace vle { namespace utils {
         inline unsigned int warnings() const
         { return m_warnings; }
 
+        /** 
+         * @brief Get the current stream.
+         * @return The current stream where push data.
+         * @throw utils::InternalError if current stream is empty.
+         */
+        std::ostream& output();
+
     private:
         Trace();
 

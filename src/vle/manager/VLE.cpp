@@ -33,13 +33,11 @@
 #include <vle/manager/VLE.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/utils/Socket.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Rand.hpp>
 #include <vle/vpz/Vpz.hpp>
 
 #include <glibmm/optioncontext.h>
-#include <glibmm/thread.h>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -51,9 +49,7 @@ namespace vle { namespace manager {
 VLE::VLE(int port) :
     mPort(port)
 {
-    utils::install_signal();
-    utils::initUserDirectory();
-    utils::net::Base::init();
+    utils::init();
 }
 
 VLE::~VLE()
@@ -68,7 +64,6 @@ bool VLE::runManager(bool allInLocal, bool savevpz, int nbProcessor, const
     CmdArgs::const_iterator it = args.begin();
 
     try {
-        Glib::thread_init();
         if (allInLocal) {
             if (nbProcessor == 1) {
                 std::cerr << boost::format(
@@ -98,15 +93,18 @@ bool VLE::runSimulator(int process)
 {
     try {
         std::cerr << "Simulator start in daemon mode\n";
-        Glib::thread_init();
 
         if (utils::Trace::trace().getLevel() != utils::Trace::DEBUG) {
             utils::buildDaemon();
         }
+        
+        utils::Trace::trace().setLogFile(
+            utils::Trace::getLogFilename(boost::str(boost::format(
+                    "distant-%1%") % utils::get_simple_current_date())));
 
-        SimulatorDistant sim(std::cerr, process, mPort);
+        SimulatorDistant sim(utils::Trace::trace().output(), process, mPort);
         sim.start();
-        } catch(const std::exception& e) {
+    } catch(const std::exception& e) {
             std::cerr << "\n/!\\ vle distant simulator error reported: "
                 << utils::demangle(typeid(e)) << "\n" << e.what();
         return false;
@@ -127,7 +125,6 @@ bool VLE::justRun(int nbProcessor, const CmdArgs& args)
         }
     } else {
         try {
-            Glib::thread_init();
             JustRunThread jrt(std::cerr, nbProcessor);
             jrt.operator()(args);
         } catch(const std::exception& e) {

@@ -197,7 +197,7 @@ namespace vle { namespace manager {
         m_output(true)
     {
     }
-
+    
     inline JustRunThread::JustRunThread(std::ostream& out, int process) :
         JustRun(out),
         m_process(process),

@@ -200,11 +200,14 @@ void SimulatorDistant::run()
         vpz::Vpz* file = new vpz::Vpz(filename);
         instance = file->project().instance();
         replica = file->project().replica();
+
+        m_out << boost::format("Simulator: %1% %2% %3%\n") % filename
+            % instance % replica;
+
         r.start(file);
 
         if (r.haveError()) {
-            m_out << boost::format("Simulator: simulation error %1%") %
-                ostr.str();
+            m_out << boost::format("/!\\ Error %1%\n") % ostr.str();
         }
 
         views = r.outputs();

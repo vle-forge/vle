@@ -27,7 +27,6 @@
 
 #include <vle/vpz/Project.hpp>
 #include <vle/utils/Debug.hpp>
-#include <glibmm/date.h>
 
 namespace vle { namespace vpz {
 
@@ -71,10 +70,8 @@ void Project::setAuthor(const std::string& name)
 
 void Project::setDate(const std::string& date)
 {
-    Glib::Date d;
-    d.set_parse(date);
-    if (d.valid()) {
-        m_date = d.format_string("%a, %d %b %Y %H:%M:%S %z");
+    if (date.empty()) {
+        m_date.assign(utils::get_current_date());
     } else {
         m_date.assign(date);
     }
@@ -82,8 +79,7 @@ void Project::setDate(const std::string& date)
 
 void Project::setCurrentDate()
 {
-    Glib::Date d;
-    m_date = d.format_string("%a, %d %b %Y %H:%M:%S %z");
+    m_date = utils::get_current_date();
 }
 
 }} // namespace vle vpz
