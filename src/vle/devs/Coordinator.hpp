@@ -238,6 +238,7 @@ namespace vle { namespace devs {
         ModelFactory&               m_modelFactory;
         SimulatorList               m_deletedSimulator;
         SimulatorList::size_type    m_toDelete;
+        ObservationEventList        m_obsEventBuffer;
 
         void buildViews();
 
@@ -252,7 +253,14 @@ namespace vle { namespace devs {
         void processRequestEvents(Simulator* sim,
                                         EventBagModel& modelbag);
 
-        void processTimedObservationEvents(CompleteEventBagModel& bag);
+        /** 
+         * @brief Process for each ObservationEvent in the bag and observation
+         * for the specified model. All ObservationEvent are destroyed by this
+         * function and the bag is cleared.
+         * 
+         * @param bag The ObservationEventList to process and clear.
+         */
+        void processTimedObservationEvents(ObservationEventList& bag);
 
         /** 
          * @brief build the simulator from the vpz::Model stock.

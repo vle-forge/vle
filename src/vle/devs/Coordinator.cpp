@@ -146,7 +146,22 @@ ExternalEventList* Coordinator::run()
         m_toDelete = m_deletedSimulator.size();
     }
 
-    processTimedObservationEvents(bags);
+    if (not bags.emptyStates()) {
+        if (getNextTime() == bags.topObservationEvent()->getTime()) {
+            m_obsEventBuffer.insert(m_obsEventBuffer.begin(),
+                                    bags.states().begin(),
+                                    bags.states().end());
+            bags.popStates();
+        } else {
+            processTimedObservationEvents(bags.states());
+            processTimedObservationEvents(m_obsEventBuffer);
+        }
+    } else if (not m_obsEventBuffer.empty()) {
+        if (getNextTime() != m_obsEventBuffer.front()->getTime()) {
+            processTimedObservationEvents(m_obsEventBuffer);
+            m_obsEventBuffer.clear();
+        }
+    }
 
     bags.clear();
     return 0;
@@ -547,22 +562,25 @@ void Coordinator::processRequestEvents(
     modelbag.delRequest();
 }
 
-void Coordinator::processTimedObservationEvents(CompleteEventBagModel& bag)
+void Coordinator::processTimedObservationEvents(ObservationEventList& bag)
 {
-    while (not bag.emptyStates()) {
-        Simulator* model(bag.topObservationEvent()->getModel());
-        ObservationEvent* event(model->observation(*bag.topObservationEvent()));
+    for (ObservationEventList::iterator it = bag.begin();
+         it != bag.end(); ++it) {
+            if ((*it)->isValid()) {
+            Simulator* model((*it)->getModel());
+            ObservationEvent* event(model->observation(*(*it)));
 
-        View* View(getView(event->getViewName()));
-        ObservationEvent* event2(View->processObservationEvent(event));
-        delete event;
+            View* view(getView(event->getViewName()));
+            ObservationEvent* event2(view->processObservationEvent(event));
+            delete event;
 
-        if (event2) {
-            m_eventTable.putObservationEvent(event2);
+            if (event2) {
+                m_eventTable.putObservationEvent(event2);
+            }
         }
-        delete bag.topObservationEvent();
-        bag.popState();
+        delete *it;
     }
+    bag.clear();
 }
 
 void Coordinator::setCoordinator(Executive& exe)

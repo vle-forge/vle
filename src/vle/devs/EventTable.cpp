@@ -73,8 +73,7 @@ void CompleteEventBagModel::invalidateModel(Simulator* mdl)
     for (std::deque < ObservationEvent* >::iterator it = _states.begin();
          it != _states.end(); ++it) {
         if ((*it)->getModel() == mdl) {
-            delete *it;
-            *it = 0;
+            (*it)->invalidate();
         }
     }
 }
