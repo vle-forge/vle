@@ -30,6 +30,7 @@
 #include <list>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Exception.hpp>
+#include <boost/format.hpp>
 
 #ifdef G_OS_WIN32
 #	include <Windows.h>
@@ -177,6 +178,11 @@ bool Path::initPath()
 
     result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, key.c_str(),
 		    0, KEY_QUERY_VALUE, &hkey);
+    if (result != ERROR_SUCCESS) {
+        result = RegOpenKeyEx(HKEY_CURRENT_USER, key.c_str(),
+			0, KEY_QUERY_VALUE, &hkey);
+    }
+
     if (result == ERROR_SUCCESS) {
 	char* buf = new char[256];
 	DWORD sz = 256;
@@ -204,6 +210,10 @@ bool Path::initPath()
         addModelDir("..\\model");
         addModelDir(".");
 	return true;
+    } else {
+	throw utils::InternalError(boost::str(boost::format(
+		"Unable to open the Registry key in HKLM or HKCU '%1%'") %
+			key));
     }
     return false;
 }

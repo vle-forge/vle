@@ -1,145 +1,216 @@
 ; NSIS installer for VLE
 ; Copyright (c) 2008 The VLE Development Team
 ; Gauthier Quesnel <quesnel@users.sourceforge.net>
-;
 
-!include "MUI.nsh"
-!include "LogicLib.nsh"
+;--------------------------------
+; You must define these values
 
+!define PRODUCT_NAME "@VLE_NAME@"
+!define PRODUCT_VERSION "@VLE_VERSION@"
+!define PRODUCT_NAME_COMPLETE "@VLE_NAME_COMPLETE@"
+!define PRODUCT_INSTALL_DIRECTORY "@VLE_NAME@ @VLE_VERSION@"
+!define PRODUCT_OUT_FILE "@VLE_NAME_COMPLETE@-@CMAKE_SYSTEM_NAME@-@CMAKE_SYSTEM_PROCESSOR@.exe"
+!define PRODUCT_VENDOR "VLE Development Team"
+!define PRODUCT_WEB_SITE "http://vle.univ-littoral.fr"
+!define PRODUCT_EMAIL "quesnel@users.sourceforge.net"
+!define PRODUCT_INSTALL_REGISTRY "VLE @VLE_VERSION@"
+!define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\pkg-config.exe"
+!define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
+!define PRODUCT_UNINST_ROOT_KEY "HKLM"
+!define PRODUCT_SOURCE_DIR "@CMAKE_INSTALL_PREFIX@"
+!define PRODUCT_ICON "@PROJECT_SOURCE_DIR@/share/pixmaps/vle.ico"
+!define PRODUCT_LICENSE "COPYING"
 
-;
-; General
-;
-Name "@VLE_NAME@"
-Caption "@VLE_NAME_COMPLETE@ Setup"
-!define VLE_VERSION  	"@VLE_VERSION@"
-VIProductVersion	"@VLE_MAJOR@.@VLE_MINOR@.@VLE_PATCH@.0"
-VIAddVersionKey         "FileDescription"       "VLE Installer"
-VIAddVersionKey         "ProductName"           "@VLE_NAME@"
-VIAddVersionKey         "FileVersion"           "${VLE_VERSION}"
-VIAddVersionKey         "ProductVersion"        "${VLE_VERSION}"
-VIAddVersionKey         "LegalCopyright"        "(C) 2003-2008 The VLE Development Team"
-
-OutFile "@VLE_NAME_COMPLETE@-@CMAKE_SYSTEM_NAME@-@CMAKE_SYSTEM_PROCESSOR@.exe"
-InstallDir "$PROGRAMFILES\VLE ${VLE_VERSION}"
-InstallDirRegKey HKLM "SOFTWARE\VLE Development Team\VLE ${VLE_VERSION}" "Path"
-
-
-;
-; Modern UI Configuration
-;
-!define MUI_ABORTWARNING
-!define MUI_ICON                          "@PROJECT_SOURCE_DIR@/share/pixmaps/vle.ico"
-!define MUI_FINISHPAGE_NOAUTOCLOSE
-!define MUI_UNFINISHPAGE_NOAUTOCLOSE
-
-!define MUI_WELCOMEPAGE_TITLE "Welcome to the VLE @VLE_NAME_COMPLETE@ Setup Wizard"
-!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of VLE (Virtual Laboratory Environment) @VLE_NAME_COMPLETE@.\r\n\r\nReport bugs to quesnel@users.sourceforge.net or on the VLE website"
-!insertmacro MUI_PAGE_WELCOME
-!insertmacro MUI_PAGE_LICENSE "@PROJECT_SOURCE_DIR@/COPYING"
-!insertmacro MUI_PAGE_DIRECTORY
-!insertmacro MUI_PAGE_INSTFILES
-
-!define MUI_FINISHPAGE_TITLE "VLE @VLE_NAME_COMPLETE@"
-!define MUI_FINISHPAGE_LINK "Visit the VLE website for the latest news, FAQs and support"
-!define MUI_FINISHPAGE_LINK_LOCATION "http://vle.univ-littoral.fr"
-!define MUI_FINISHPAGE_NOREBOOTSUPPORT
-!insertmacro MUI_PAGE_FINISH
-
-!insertmacro MUI_UNPAGE_WELCOME
-!insertmacro MUI_UNPAGE_CONFIRM
-!insertmacro MUI_UNPAGE_INSTFILES
-!insertmacro MUI_UNPAGE_FINISH
-
-!insertmacro MUI_LANGUAGE "English"
+VIProductVersion "@VLE_MAJOR@.@VLE_MINOR@.@VLE_PATCH@.0"
+VIAddVersionKey  "FileDescription" "VLE Installer"
+VIAddVersionKey  "ProductName" "${PRODUCT_NAME}"
+VIAddVersionKey  "FileVersion" "${PRODUCT_NAME_COMPLETE}"
+VIAddVersionKey  "ProductVersion" "${PRODUCT_NAME_COMPLETE}"
+VIAddVersionKey  "LegalCopyright" "(C) 2003-2008 The VLE Development Team"
 
 
-;
-; Installer Sections
-;
-Section "VLE" SecDummy
+;--------------------------------
+;Variables
+
+  Var MUI_TEMP
+  Var STARTMENU_FOLDER
+  Var SV_ALLUSERS
+
+;--------------------------------
+;Include Modern UI
+
+  !include "MUI.nsh"
+
+  ;Default installation folder
+  InstallDir "$PROGRAMFILES\${PRODUCT_INSTALL_DIRECTORY}"  
+
+;--------------------------------
+;General
+
+  ;Name and file
+  Name "${PRODUCT_INSTALL_DIRECTORY}"
+  OutFile "${PRODUCT_OUT_FILE}"
+
+
+;--------------------------------
+;Interface Settings
+
+  !define MUI_HEADERIMAGE
+  !define MUI_ABORTWARNING
+
+;--------------------------------
+; path functions
+
+!verbose 3
+!addincludedir "@PROJECT_SOURCE_DIR@/share/"
+!include "RegManipulation.nsh"
+!verbose 4
+
+Function ConditionalAddToRegisty
+  Pop $0
+  Pop $1
+  StrCmp "$0" "" ConditionalAddToRegisty_EmptyString
+    WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_INSTALL_DIRECTORY}" \
+    "$1" "$0"
+    DetailPrint "Set install registry entry: '$1' to '$0'"
+  ConditionalAddToRegisty_EmptyString:
+FunctionEnd
+
+;--------------------------------
+; Define some macro setting for the gui
+
+  !define MUI_ICON                          "${PRODUCT_ICON}"
+  !define MUI_FINISHPAGE_NOAUTOCLOSE
+  !define MUI_UNFINISHPAGE_NOAUTOCLOSE
+
+
+;--------------------------------
+;Pages
+  !define MUI_WELCOMEPAGE_TITLE "Welcome to the VLE ${PRODUCT_NAME_COMPLETE} Setup Wizard"
+  !define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of VLE (Virtual Laboratory Environment) ${PRODUCT_NAME}.\r\n\r\nReport bugs to ${PRODUCT_EMAIL} or on the VLE website"
+  !insertmacro MUI_PAGE_WELCOME
+
+  !insertmacro MUI_PAGE_LICENSE "${PRODUCT_LICENSE}"
+  !insertmacro MUI_PAGE_DIRECTORY
+  
+  ;Start Menu Folder Page Configuration
+  !define MUI_STARTMENUPAGE_REGISTRY_ROOT "SHCTX" 
+  !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\${PRODUCT_VENDOR}\${PRODUCT_INSTALL_REGISTRY}" 
+  !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "Start Menu Folder"
+  !insertmacro MUI_PAGE_STARTMENU Application $STARTMENU_FOLDER
+
+  !insertmacro MUI_PAGE_INSTFILES
+  !insertmacro MUI_PAGE_FINISH
+
+  !insertmacro MUI_UNPAGE_CONFIRM
+  !insertmacro MUI_UNPAGE_INSTFILES
+  
+;--------------------------------
+;Languages
+ 
+  !insertmacro MUI_LANGUAGE "English"
+
+;--------------------------------
+;Installer Sections
+
+
+Section "Installer Section" InstSection
+
+  ; files to install.
   SetOutPath "$INSTDIR"
-  File /r "@CMAKE_INSTALL_PREFIX@\*.*"
-  File "@PROJECT_SOURCE_DIR@\share\pixmaps\vle.ico"
-  File "@PROJECT_SOURCE_DIR@\share\pixmaps\vle.ico"
-  File /r "@PROJECT_SOURCE_DIR@\COPYING"
+  File /r "${PRODUCT_SOURCE_DIR}\*.*"
 
-  ; Write the path key
-  WriteRegStr HKLM "SOFTWARE\VLE Development Team\VLE ${VLE_VERSION}" "Path" "$INSTDIR"
+  ;Store installation folder
+  WriteRegStr SHCTX "Software\${PRODUCT_VENDOR}\${PRODUCT_INSTALL_REGISTRY}" "" $INSTDIR
+  WriteRegStr SHCTX "Software\${PRODUCT_VENDOR}\${PRODUCT_INSTALL_REGISTRY}" "PATH" $INSTDIR
   
-  ; Write the uninstall keys for Windows
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\VLE ${VLE_VERSION}" "DisplayName" "VLE ${VLE_VERSION} (remove only)"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\VLE ${VLE_VERSION}" "UninstallString" '"$INSTDIR\uninstall.exe"'
-  WriteUninstaller "uninstall.exe"
+  ;Create uninstaller
+  WriteUninstaller "$INSTDIR\Uninstall.exe"
+  Push "DisplayName"
+  Push "${PRODUCT_NAME}"
+  Call ConditionalAddToRegisty
+  Push "DisplayVersion"
+  Push "${PRODUCT_VERSION}"
+  Call ConditionalAddToRegisty
+  Push "Publisher"
+  Push "${PRODUCT_VENDOR}"
+  Call ConditionalAddToRegisty
+  Push "UninstallString"
+  Push "$INSTDIR\Uninstall.exe"
+  Call ConditionalAddToRegisty
+  Push "URLInfoAbout"
+  Push "${PRODUCT_WEB_SITE}"
+  Call ConditionalAddToRegisty
+  Push "Contact"
+  Push "${PRODUCT_EMAIL}"
+  Call ConditionalAddToRegisty
 
-  ; Environment variables: PKG_CONFIG_PATH
-  ReadRegStr $0 HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "PKG_CONFIG_PATH"
+  ; Create shortcuts
+  !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
+  CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
+  CreateShortCut  "$SMPROGRAMS\$STARTMENU_FOLDER\vle.lnk" "$INSTDIR\bin\vle.exe" "" "$INSTDIR\bin\vle.exe" 0
+  CreateShortCut  "$SMPROGRAMS\$STARTMENU_FOLDER\oov.lnk" "$INSTDIR\bin\oov.exe" "" "$INSTDIR\bin\oov.exe" 0
+  CreateShortCut  "$SMPROGRAMS\$STARTMENU_FOLDER\eov.lnk" "$INSTDIR\bin\eov.exe" "" "$INSTDIR\bin\eov.exe" 0
+  CreateShortCut  "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
+  !insertmacro MUI_STARTMENU_WRITE_END
+
+  ; Write the PATH variable
+  Push "$INSTDIR\bin"
+  Call AddToPath
+
+  ; Write the variable PKG_CONFIG_PATH
   GetFullPathName /SHORT $1 "$INSTDIR"
-  WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "PKG_CONFIG_PATH" "$0;$1\lib\pkgconfig;"
+  Push "PKG_CONFIG_PATH"
+  Push "$1\lib\pkgconfig"
+  Call AddToEnv
 
-  ; Environment variables: PATH
-  ReadRegStr $0 HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "Path"
-  GetFullPathName $1 "$INSTDIR"
-  WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "Path" "$0;$1\bin;"
-
-  ; Associate files to vle
-  WriteRegStr HKCR "vle" "" "vle Files"
-  WriteRegStr HKCR "vle\DefaultIcon" "" "$INSTDIR\vle.ico"
-  ReadRegStr $R0 HKCR "vle\shell\open\command" ""
-  StrCmp $R0 "" 0 no_vleopen
-    WriteRegStr HKCR "vle\shell" "" "open"
-    WriteRegStr HKCR "vle\shell\open\command" "" '"$INSTDIR\bin\vle.exe" "%1"'
-  no_vleopen:
-  
-  ReadRegStr $R0 HKCR ".vpz" ""
-  Strcmp $R0 "vle" allready_vle no_vle
-  no_vle:
-    WriteRegStr HKCR ".vpz" "AM_OLD_VALUE" $R0
-    WriteRegStr HKCR ".vpz" "" "vle"
-  allready_vle:
-
-  ; Shortcuts
-  SetShellVarContext all
-  CreateDirectory "$SMPROGRAMS\VLE ${VLE_VERSION}"
-  CreateShortCut  "$SMPROGRAMS\VLE ${VLE_VERSION}\vle.lnk" "$INSTDIR\bin\vle.exe" "" "$INSTDIR\bin\vle.exe" 0
-  CreateShortCut  "$SMPROGRAMS\VLE ${VLE_VERSION}\oov.lnk" "$INSTDIR\bin\oov.exe" "" "$INSTDIR\bin\oov.exe" 0
-  CreateShortCut  "$SMPROGRAMS\VLE ${VLE_VERSION}\eov.lnk" "$INSTDIR\bin\eov.exe" "" "$INSTDIR\bin\eov.exe" 0
-  CreateShortCut  "$SMPROGRAMS\VLE ${VLE_VERSION}\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
+  ; Write file association
+  ${registerExtension} "$INSTDIR\bin\vle.exe" ".vpz" "VLE Project File"
 SectionEnd
 
 
-;
-; Descriptions
-;
-!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
- !insertmacro MUI_DESCRIPTION_TEXT ${SecDummy} "Install VLE program."
-!insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 
-;
-; Unistaller Sections
-;
+;--------------------------------
+;Uninstaller Section
+
 Section "Uninstall"
-  ; remove registry keys
-  SetShellVarContext all
-  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\VLE ${VLE_VERSION}"
-  DeleteRegValue HKLM "SOFTWARE\VLE Development Team\VLE ${VLE_VERSION}" "Path"
-  DeleteRegKey HKLM "SOFTWARE\VLE Development Team\VLE ${VLE_VERSION}"
-  DeleteRegKey /ifempty HKLM "SOFTWARE\VLE Development Team"
-  DeleteRegKey HKCR "vle"
-  RMDir /r "$SMPROGRAMS\VLE ${VLE_VERSION}"
+  ; Remove the application from PATH variable
+  Push "$INSTDIR\bin"
+  Call un.RemoveFromPath
+
+  ; Remove the variable PKG_CONFIG_PATH
+  GetFullPathName /SHORT $1 "$INSTDIR"
+  Push "PKG_CONFIG_PATH"
+  Push "$1\lib\pkgconfig"
+  Call un.RemoveFromEnv
+
+  ; Remove files we installed.
   RMDir /r "$INSTDIR\bin"
   RMDir /r "$INSTDIR\etc"
   RMDir /r "$INSTDIR\include"
   RMDir /r "$INSTDIR\lib"
   RMDir /r "$INSTDIR\share"
-  delete "$INSTDIR\uninstall.exe"
-  delete "$INSTDIR\COPYING"
-  delete "$INSTDIR\vle.ico"
+  Delete "$INSTDIR\uninstall.exe"
+  Delete "$INSTDIR\COPYING"
+  Delete "$INSTDIR\vle.ico"
   RMDir "$INSTDIR"
+ 
+  ; Remove the registry entries.
+  DeleteRegKey SHCTX "Software\${PRODUCT_VENDOR}\${PRODUCT_INSTALL_REGISTRY}"
 
-  ReadRegStr $R0 HKCR ".vpz" ""
-  StrCmp $R0 "vle" 0 +3
-  ReadRegStr $R0 HKCR ".vpz" "AM_OLD_VALUE"
-  WriteRegStr HKCR ".vpz" "" $R0
+  ; Remove the uninstaller itself.
+  DeleteRegKey SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_INSTALL_DIRECTORY}"
+
+  ; Remove the shortcuts.
+  !insertmacro MUI_STARTMENU_GETFOLDER Application $MUI_TEMP
+  Delete "$SMPROGRAMS\$MUI_TEMP\vle.lnk"
+  Delete "$SMPROGRAMS\$MUI_TEMP\oov.lnk"
+  Delete "$SMPROGRAMS\$MUI_TEMP\eov.lnk"
+  Delete "$SMPROGRAMS\$MUI_TEMP\Uninstall.lnk"
+  RMDir "$SMPROGRAMS\$MUI_TEMP"
+ 
+  ; Remove the file association registry. 
+  ${unregisterExtension} ".vpz" "VLE Project File"
 SectionEnd
+
