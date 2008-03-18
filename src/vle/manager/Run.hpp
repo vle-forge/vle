@@ -68,7 +68,8 @@ namespace vle { namespace manager {
         devs::RootCoordinator& rootCoordinator();
 
         /** 
-         * @brief Return a constant list of the dictionary viewname, oov::Plugin.
+         * @brief Return a constant list of the dictionary viewname,
+         * oov::Plugin.
          * @return Return a constant list of the dictionary viewname.
          */
         const oov::PluginViewList& outputs() const;
@@ -88,29 +89,40 @@ namespace vle { namespace manager {
 
     /** 
      * @brief RunVerbose is a specific Run class to launch simulation from
-     * specified vpz::Vpz object with verbose mode to standard error. This class
-     * is a functor to be use with std::for_each.
+     * specified vpz::Vpz object with verbose mode to standard error. This
+     * class is a functor to be use with std::for_each.
      */
     class RunVerbose : public Run
     {
     public:
         RunVerbose(std::ostream& out);
-
+        
         /** 
          * @brief Launch the simulation of the specified vpz::Vpz object. Be
          * carrefull, the object is destroyed in this function.
+         * @param vpz a reference to the vpz::Vpz to simulate. Be carreful,
+         * destroy by this function.
          */
         void operator()(vpz::Vpz* vpz);
 
         /** 
          * @brief Launch the simulation on the specified filename.
+         * @param filename the filename of the vpz::Vpz to simulate.
          */
         void operator()(const std::string& filename);
 
         /** 
+         * @brief Launch the simulation of the specified vpz::Vpz object. A
+         * clone of this vpz::Vpz is build to allow simulation.
+         * @param a reference to the vpz::vpz to simulate.
+         */
+        void operator()(const vpz::Vpz& vpz);
+        
+        /** 
          * @brief Launch the simulation of the specifieed vpz::Vpz object. Be
          * carrefull, the object is destroyed in this function.
-         * @param vpz A reference to a vpz::Vpz object.
+         * @param vpz a reference to the vpz::Vpz to simulate. Be carreful,
+         * destroy by this function.
          */
         void start(vpz::Vpz* vpz);
         
@@ -119,6 +131,13 @@ namespace vle { namespace manager {
          * @param filename The filename to simulate.
          */
         void start(const std::string& filename);
+
+        /** 
+         * @brief Launch the simulation of the specified vpz::Vpz object. A
+         * clone of this vpz::Vpz is build to allow simulation.
+         * @param a reference to the vpz::vpz to simulate.
+         */
+        void start(const vpz::Vpz& vpz);
 
     private:
         std::ostream&       m_out;
@@ -137,18 +156,29 @@ namespace vle { namespace manager {
         /** 
          * @brief Launch the simulation of the specified vpz::Vpz object. Be
          * carrefull, the object is destroyed in this function.
+         * @param vpz a reference to the vpz::Vpz to simulate. Be carreful,
+         * destroy by this function.
          */
         void operator()(vpz::Vpz* vpz);
 
         /** 
          * @brief Launch the simulation on the specified filename.
+         * @param filename the filename of the vpz::Vpz to simulate.
          */
         void operator()(const std::string& filename);
+
+        /** 
+         * @brief Launch the simulation of the specified vpz::Vpz object. A
+         * clone of this vpz::Vpz is build to allow simulation.
+         * @param a reference to the vpz::vpz to simulate.
+         */
+        void operator()(const vpz::Vpz& vpz);
         
         /** 
          * @brief Launch the simulation of the specifieed vpz::Vpz object. Be
          * carrefull, the object is destroyed in this function.
-         * @param vpz A reference to a vpz::Vpz object.
+         * @param vpz a reference to the vpz::Vpz to simulate. Be carreful,
+         * destroy by this function.
          */
         void start(vpz::Vpz* vpz);
         
@@ -157,6 +187,13 @@ namespace vle { namespace manager {
          * @param filename The filename to simulate.
          */
         void start(const std::string& filename);
+
+        /** 
+         * @brief Launch the simulation of the specified vpz::Vpz object. A
+         * clone of this vpz::Vpz is build to allow simulation.
+         * @param a reference to the vpz::vpz to simulate.
+         */
+        void start(const vpz::Vpz& vpz);
 
         /** 
          * @brief Return a string description of the error. use Run::haveError()
@@ -218,6 +255,11 @@ namespace vle { namespace manager {
     {
         operator()(filename);
     }
+
+    inline void RunVerbose::start(const vpz::Vpz& vpz)
+    {
+        operator()(vpz);
+    }
     
     /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
@@ -234,6 +276,11 @@ namespace vle { namespace manager {
     inline void RunQuiet::start(const std::string& filename)
     {
         operator()(filename);
+    }
+
+    inline void RunQuiet::start(const vpz::Vpz& vpz)
+    {
+        operator()(vpz);
     }
 
 }} // namespace vle manager

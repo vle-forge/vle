@@ -108,6 +108,45 @@ void RunVerbose::operator()(const std::string& filename)
     m_out << std::endl;
 }
 
+void RunVerbose::operator()(const vpz::Vpz& vpz)
+{
+    m_error = false;
+    try {
+        {
+            vpz::Vpz copy(vpz);
+            m_out << "[" << copy.filename() << "]\n";
+
+            m_out << " - Coordinator load models ......: ";
+            m_root.load(copy);
+            m_out << "ok\n";
+
+            m_out << " - Clean project file ...........: ";
+        }
+        m_out << "ok\n";
+
+        m_out << " - Coordinator initializing .....: "; 
+        m_root.init();
+        m_out << "ok\n";
+
+        m_out << " - Simulation run................: ";
+        while (m_root.run());
+        m_out << "ok\n";
+
+        m_out << " - Coordinator cleaning .........: ";
+        m_root.finish();
+        m_out << "ok\n";
+    } catch(const std::exception& e) {
+        m_out << "\n/!\\ vle error reported: " <<
+            utils::demangle(typeid(e)) << "\n" << e.what();
+        m_error = true;
+    } catch(const Glib::Exception& e) {
+        m_out << "\n/!\\ vle Glib error reported: " <<
+            utils::demangle(typeid(e)) << "\n" << e.what();
+        m_error = true;
+    }
+    m_out << std::endl;
+}
+
 void RunQuiet::operator()(vpz::Vpz* vpz)
 {
     m_error = false;
@@ -152,5 +191,29 @@ void RunQuiet::operator()(const std::string& filename)
         m_error = true;
     }
 }
+
+void RunQuiet::operator()(const vpz::Vpz& vpz)
+{
+    m_error = false;
+    try {
+        {
+            vpz::Vpz copy(vpz);
+            m_root.load(copy);
+        }
+
+        m_root.init();
+        while (m_root.run());
+        m_root.finish();
+    } catch(const std::exception& e) {
+        m_stringerror.assign(boost::str(boost::format(
+                "/!\\ vle error reported: %1%\n") % e.what()));
+        m_error = true;
+    } catch(const Glib::Exception& e) {
+        m_stringerror.assign(boost::str(boost::format(
+                "/!\\ vle Glib error reported: %1%\n") % e.what()));
+        m_error = true;
+    }
+}
+
 
 }} // namespace vle manager
