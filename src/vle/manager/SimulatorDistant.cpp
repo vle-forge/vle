@@ -35,6 +35,7 @@
 #include <sstream>
 #include <iostream>
 #include <glibmm/spawn.h>
+#include <glibmm/timer.h>
 #include <vle/value/String.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/value/Integer.hpp>
@@ -63,9 +64,6 @@ void SimulatorDistant::start()
 
     Glib::Thread* mWait = Glib::Thread::create(
         sigc::mem_fun(*this, &SimulatorDistant::wait), true);
-
-    for (size_t i = 0; i < mNbCPU; ++i)
-        mPool.push(sigc::mem_fun(*this, &SimulatorDistant::run));
 
     mWait->join();
     mPool.shutdown();
@@ -125,6 +123,7 @@ void SimulatorDistant::daemonRecvFile()
     {
         Glib::Mutex::Lock lock(mMutex);
         mFileNames.push(filename);
+        mPool.push(sigc::mem_fun(*this, &SimulatorDistant::run));
         mCondWait.signal();
     }
 }
@@ -152,13 +151,12 @@ void SimulatorDistant::sendResult()
             mServer->send_string("manager", result);
             result = mServer->recv_string("manager");
 
-            for (oov::PluginViewList::iterator jt = it->outputs.begin();
+            for (oov::OutputMatrixViewList::iterator jt = it->outputs.begin();
                  jt != it->outputs.end(); ++jt) {
 
                 vals = value::SetFactory::create();
                 vals->addValue(value::StringFactory::create(jt->first));
-                vals->addValue(value::StringFactory::create(jt->second->name()));
-                vals->addValue(jt->second->serialize());
+                vals->addValue(jt->second.serialize());
 
                 result = vals->toXML();
                 mServer->send_int("manager", result.size());
@@ -173,6 +171,19 @@ void SimulatorDistant::sendResult()
 
 void SimulatorDistant::daemonExit()
 {
+    for (;;) {
+        {
+            Glib::Mutex::Lock lock(mMutex);
+            if (mFileNames.empty() and
+                mPool.get_num_threads() == 0) {
+                break;
+            }
+        }
+        Glib::usleep(250000); // wait a 1/4 second to try if 
+                              // the simulations are finished.
+    }
+    sendResult();
+    mServer->send_string("manager", "closed");
     mServer->close_client("manager");
 }
 
@@ -181,41 +192,34 @@ void SimulatorDistant::run()
     std::string filename;
     int instance;
     int replica;
-    oov::PluginViewList views;
+    oov::OutputMatrixViewList views;
 
-    for(;;) {
-        {
-            Glib::Mutex::Lock lock (mMutex);
+    {
+        Glib::Mutex::Lock lock (mMutex);
+        filename = mFileNames.front();
+        mFileNames.pop();
+        mCondRun.signal();
+    }
 
-            while(mFileNames.empty())
-                mCondWait.wait(mMutex);
+    std::ostringstream ostr;
+    RunVerbose r(ostr);
+    vpz::Vpz* file = new vpz::Vpz(filename);
+    instance = file->project().instance();
+    replica = file->project().replica();
 
-            filename = mFileNames.front();
-            mFileNames.pop();
-            mCondRun.signal();
-        }
+    m_out << boost::format("Simulator: %1% %2% %3%\n") % filename
+        % instance % replica;
 
-        std::ostringstream ostr;
-        RunVerbose r(ostr);
-        vpz::Vpz* file = new vpz::Vpz(filename);
-        instance = file->project().instance();
-        replica = file->project().replica();
+    r.start(file);
 
-        m_out << boost::format("Simulator: %1% %2% %3%\n") % filename
-            % instance % replica;
+    if (r.haveError()) {
+        m_out << boost::format("/!\\ Error %1%\n") % ostr.str();
+    }
 
-        r.start(file);
-
-        if (r.haveError()) {
-            m_out << boost::format("/!\\ Error %1%\n") % ostr.str();
-        }
-
-        views = r.outputs();
-        {
-            Glib::Mutex::Lock lock (mMutex);
-            mOutputs.push_back(OutputSimulationDistant(instance, replica,
-                                                       views));
-        }
+    views = r.outputs();
+    {
+        Glib::Mutex::Lock lock (mMutex);
+        mOutputs.push_back(OutputSimulationDistant(instance, replica, views));
     }
 }
 

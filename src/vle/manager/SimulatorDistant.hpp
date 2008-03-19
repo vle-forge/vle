@@ -47,8 +47,8 @@ namespace vle { namespace manager {
     /**
      * @brief VLE simulator wait VLE manager from TCP/IP network, and launch
      * simulation on controlled processor. The message between manager and
-     * simulator daemon are, "proc" for max processor, "size" the number of vpzi to
-     * run, "file" to send a buffer size and "exit" to close connection.
+     * simulator daemon are, "proc" for max processor, "size" the number of vpzi
+     * to run, "file" to send a buffer size and "exit" to close connection.
      */
     class SimulatorDistant
     {

@@ -146,7 +146,7 @@ void ManagerRunThread::run()
     std::ostringstream ostr;
     int instance = 0;
     int replica = 0;
-    oov::PluginViewList views;
+    oov::OutputMatrixViewList views;
 
     for (;;) {
         file = 0;
@@ -177,7 +177,7 @@ void ManagerRunThread::run()
 
             views = r.outputs();
         }
-            
+
         {
             Glib::Mutex::Lock lock(m_mutex);
             if (file) {
@@ -352,6 +352,8 @@ void ManagerRunDistant::closeConnectionWithSimulators()
     std::list < utils::net::Client* >::iterator it = mClients.begin();
     while (it != mClients.end()) {
         (*it)->send_string("exit");
+        getResult(*(*it));
+        (*it)->recv_string();
         delete (*it);
         ++it;
     }
@@ -395,6 +397,7 @@ void ManagerRunDistant::getResult(utils::net::Client& cl)
             int sz = cl.recv_int();
             cl.send_string("ok");
             std::string result = cl.recv_buffer(sz);
+
             value::Set vals = value::toSetValue(vpz::Vpz::parseValue(result));
             int nbview = value::toInteger(vals->getValue(0));
             int instance = value::toInteger(vals->getValue(1));
@@ -410,29 +413,14 @@ void ManagerRunDistant::getResult(utils::net::Client& cl)
                 cl.send_string("ok");
 
                 std::string view = value::toString(vals->getValue(0));
-                std::string name = value::toString(vals->getValue(1));
 
-                utils::Path::PathList lst(utils::Path::path().getStreamDirs());
-                utils::Path::PathList::const_iterator it;
-                oov::PluginPtr plugin;
-                std::string error;
-
-                for (it = lst.begin(); it != lst.end(); ++it) {
-                    try {
-                        oov::PluginFactory pf(name, *it);
-                        plugin = pf.build("");
-                    } catch(const std::exception& e) {
-                        error += e.what();
-                    }
-                }
-
-                Assert(utils::ArgError, plugin.get(), error);
-                plugin->deserialize(vals->getValue(2));
+                oov::OutputMatrix m;
+                m.deserialize(vals->getValue(1));
 
                 {
                     Glib::Mutex::Lock lock(m_mutex);
-                    oov::PluginViewList& lst(m_matrix[replica][instance]);
-                    lst[view] = plugin;
+                    oov::OutputMatrixViewList& l(m_matrix[replica][instance]);
+                    l[view] = m;
                 }
             }
         }

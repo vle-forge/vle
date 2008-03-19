@@ -34,6 +34,7 @@
 #include <vle/vpz/DelObservableTrame.hpp>
 #include <vle/vpz/ValueTrame.hpp>
 #include <vle/vpz/EndTrame.hpp>
+#include <vle/oov/OutputMatrix.hpp>
 #include <boost/shared_ptr.hpp>
 #include <iostream>
 
@@ -72,15 +73,52 @@ namespace vle { namespace oov {
 
         /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
+        /** 
+         * @brief This plugin can be serialized into a value::Value stream.
+         * 
+         * @return true if this plugin is serializable, false otherwise. 
+         */
         virtual bool isSerializable() const
         { return false; }
 
+        /** 
+         * @brief Get a value::Value stream.
+         * 
+         * @return A value::Value.
+         */
         virtual value::Value serialize() const
         { return value::Value(); }
 
+        /** 
+         * @brief Initialize this plugin using the value::Value stream.
+         * 
+         * @param A value::Value.
+         */
         virtual void deserialize(value::Value& /* vals */)
         { }
 
+        /** 
+         * @brief This plugin use an OutputMatrix.
+         * 
+         * @return true if this plugin use and OutputMatrix, false otherwise.
+         */
+        virtual bool haveOutputMatrix() const
+        { return false; }
+
+        /** 
+         * @brief Get a reference to the OutputMatrix. If the Plugin do not use
+         * and OutputMatrix, an empty OutputMatrix is returned.
+         * 
+         * @return A reference to the OutputMatrix.
+         */
+        virtual oov::OutputMatrix outputMatrix() const
+        { return OutputMatrix(); }
+
+        /** 
+         * @brief Get the name of the Plugin class.
+         * 
+         * @return The name of the plugin class.
+         */
         virtual std::string name() const
         { return std::string(); }
 

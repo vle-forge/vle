@@ -34,7 +34,7 @@ bool ValueStackSax::isCompositeParent() const
     if (not m_valuestack.empty()) {
         const value::Value val = m_valuestack.top();
 
-        return val->isMap() or val->isSet();
+        return val->isMap() or val->isSet() or val->isMatrix();
     }
     return false;
 }
@@ -94,6 +94,21 @@ void ValueStackSax::pushSet()
     pushOnVectorValue(value::SetFactory::create());
 }
 
+void ValueStackSax::pushMatrix(value::MatrixFactory::index col,
+                               value::MatrixFactory::index row,
+                               value::MatrixFactory::index colmax,
+                               value::MatrixFactory::index rowmax,
+                               value::MatrixFactory::index colstep,
+                               value::MatrixFactory::index rowstep)
+{
+    if (not m_valuestack.empty()) {
+        AssertS(utils::SaxParserError, isCompositeParent());
+    }
+
+    pushOnVectorValue(value::MatrixFactory::create(col, row, colmax, rowmax,
+                                                   colstep, rowstep));
+}
+
 void ValueStackSax::pushTuple()
 {
     if (not m_valuestack.empty()) {
@@ -149,12 +164,17 @@ void ValueStackSax::pushOnVectorValue(const value::Value& val)
         } else if (m_valuestack.top()->isMap()) {
             value::toMapValue(m_valuestack.top())->addValue(
                 m_lastkey, val);
+        } else if (m_valuestack.top()->isMatrix()) {
+            value::Matrix mx = value::toMatrixValue(m_valuestack.top());
+            mx->addValueToLastCell(val);
+            mx->moveLastCell();
         }
     } else {
         m_result.push_back(val);
     }
 
-    if (val->isSet() or val->isMap() or val->isTuple() or val->isTable()) {
+    if (val->isSet() or val->isMap() or val->isTuple() or val->isTable() or
+        val->isMatrix()) {
         m_valuestack.push(val);
     }
 }

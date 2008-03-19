@@ -30,6 +30,7 @@
 
 #include <boost/multi_array.hpp>
 #include <vle/oov/Plugin.hpp>
+#include <vle/oov/OutputMatrix.hpp>
 #include <vle/utils/Rand.hpp>
 #include <vector>
 #include <list>
@@ -51,16 +52,16 @@ namespace vle { namespace manager  {
     // JustRun output types
 
     /** 
-     * @brief Define a list of oov::PluginViewList.
+     * @brief Define a list of oov::OutputMatrixViewList.
      */
-    typedef std::vector < oov::PluginViewList > OutputSimulationList;
+    typedef std::vector < oov::OutputMatrixViewList > OutputSimulationList;
 
     /** 
      * @brief Define a dictionary of key vpz filename and index. Index is the
      * index in the OutputSimulationList.
      */
     typedef std::map < std::string,
-            oov::PluginViewList::size_type > OutputSimulationNames;
+            oov::OutputMatrixViewList::size_type > OutputSimulationNames;
 
 
     //
@@ -73,7 +74,7 @@ namespace vle { namespace manager  {
     struct OutputSimulationDistant
     {
         OutputSimulationDistant(int instance, int replica,
-                                const oov::PluginViewList& outputs) :
+                                const oov::OutputMatrixViewList& outputs) :
             instance(instance),
             replica(replica),
             outputs(outputs)
@@ -82,7 +83,7 @@ namespace vle { namespace manager  {
 
         int instance;
         int replica;
-        oov::PluginViewList outputs;
+        oov::OutputMatrixViewList outputs;
     };
 
     /** 
@@ -98,7 +99,7 @@ namespace vle { namespace manager  {
      * @brief Define a two dimensional array of OutputSimulationList to store
      * result of a ManagerRun.
      */
-    typedef boost::multi_array < oov::PluginViewList, 2 > OutputSimulationMatrix;
+    typedef boost::multi_array < oov::OutputMatrixViewList, 2 > OutputSimulationMatrix;
 
 }} // namespace vle manager
 

@@ -8,11 +8,11 @@ LINK_DIRECTORIES(
   ${GLIBMM_LIBRARY_DIRS}
   ${LIBXMLPP_LIBRARY_DIR})
 
-SET(VALUE_HPP Boolean.hpp Double.hpp Integer.hpp Map.hpp Null.hpp Set.hpp
-    String.hpp Table.hpp Tuple.hpp Value.hpp XML.hpp)
+SET(VALUE_HPP Boolean.hpp Double.hpp Integer.hpp Map.hpp Matrix.hpp Null.hpp
+  Set.hpp String.hpp Table.hpp Tuple.hpp Value.hpp XML.hpp)
 
-SET(VALUE_CPP Boolean.cpp Double.cpp Integer.cpp Map.cpp Null.cpp Set.cpp
-    String.cpp Table.cpp Tuple.cpp Value.cpp XML.cpp)
+SET(VALUE_CPP Boolean.cpp Double.cpp Integer.cpp Map.cpp Matrix.cpp Null.cpp
+  Set.cpp String.cpp Table.cpp Tuple.cpp Value.cpp XML.cpp)
 
 ADD_LIBRARY(vlevalue SHARED ${VALUE_HPP};${VALUE_CPP})
 

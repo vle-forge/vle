@@ -42,6 +42,7 @@
 #include <vle/value/String.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/value/Map.hpp>
+#include <vle/value/Matrix.hpp>
 #include <vle/value/Tuple.hpp>
 #include <vle/value/Table.hpp>
 #include <vle/value/XML.hpp>
@@ -246,4 +247,86 @@ BOOST_AUTO_TEST_CASE(value_xml)
     value::XML v;
     
     BOOST_REQUIRE_EQUAL(value::toXml(vpz::Vpz::parseValue(t1)), "test 1 2 1 2");
+}
+
+BOOST_AUTO_TEST_CASE(value_matrix)
+{
+    const char* t1 = "<?xml version=\"1.0\"?>\n"
+        "<matrix rows=\"1\" columns=\"3\" columnmax=\"15\" "
+        "        rowmax=\"25\" columnstep=\"100\" rowstep=\"200\" >"
+        "<integer>1</integer>"
+        "<integer>2</integer>"
+        "<integer>3</integer>"
+        "</matrix>";
+
+    value::Value v = vpz::Vpz::parseValue(t1);
+    BOOST_REQUIRE_EQUAL(v->isMatrix(), true);
+
+    value::Matrix m = value::toMatrixValue(v);
+    value::MatrixFactory::MatrixView mv = value::toMatrix(v);
+
+    BOOST_REQUIRE_EQUAL(m->rows(), (value::MatrixFactory::size_type)1);
+    BOOST_REQUIRE_EQUAL(m->columns(), (value::MatrixFactory::size_type)3);
+
+    BOOST_REQUIRE_EQUAL(mv[0][0]->isInteger(), true);
+    BOOST_REQUIRE_EQUAL(mv[1][0]->isInteger(), true);
+    BOOST_REQUIRE_EQUAL(mv[2][0]->isInteger(), true);
+    
+    BOOST_REQUIRE_EQUAL(value::toInteger(mv[0][0]), 1);
+    BOOST_REQUIRE_EQUAL(value::toInteger(mv[1][0]), 2);
+    BOOST_REQUIRE_EQUAL(value::toInteger(mv[2][0]), 3);
+}
+
+
+BOOST_AUTO_TEST_CASE(value_matrix_of_matrix)
+{
+    const char* t1 = "<?xml version=\"1.0\"?>\n"
+        "<matrix rows=\"1\" columns=\"3\" columnmax=\"15\" "
+        "        rowmax=\"25\" columnstep=\"100\" rowstep=\"200\" >"
+        "<matrix rows=\"1\" columns=\"3\" columnmax=\"15\" "
+        "        rowmax=\"25\" columnstep=\"100\" rowstep=\"200\" >"
+        "<integer>1</integer>"
+        "<integer>2</integer>"
+        "<integer>3</integer>"
+        "</matrix>"
+        "<matrix rows=\"1\" columns=\"3\" columnmax=\"15\" "
+        "        rowmax=\"25\" columnstep=\"100\" rowstep=\"200\" >"
+        "<integer>4</integer>"
+        "<integer>5</integer>"
+        "<integer>6</integer>"
+        "</matrix>"
+        "<matrix rows=\"1\" columns=\"3\" columnmax=\"15\" "
+        "        rowmax=\"25\" columnstep=\"100\" rowstep=\"200\" >"
+        "<integer>7</integer>"
+        "<integer>8</integer>"
+        "<integer>9</integer>"
+        "</matrix>"
+        "</matrix>";
+
+    value::Value v = vpz::Vpz::parseValue(t1);
+    BOOST_REQUIRE_EQUAL(v->isMatrix(), true);
+
+    value::Matrix m = value::toMatrixValue(v);
+    value::MatrixFactory::MatrixView mv = value::toMatrix(v);
+
+    BOOST_REQUIRE_EQUAL(m->rows(), (value::MatrixFactory::size_type)1);
+    BOOST_REQUIRE_EQUAL(m->columns(), (value::MatrixFactory::size_type)3);
+
+    BOOST_REQUIRE_EQUAL(mv[0][0]->isMatrix(), true);
+    BOOST_REQUIRE_EQUAL(mv[1][0]->isMatrix(), true);
+    BOOST_REQUIRE_EQUAL(mv[2][0]->isMatrix(), true);
+
+    value::MatrixFactory::MatrixView m1 = value::toMatrix(mv[0][0]);
+    value::MatrixFactory::MatrixView m2 = value::toMatrix(mv[1][0]);
+    value::MatrixFactory::MatrixView m3 = value::toMatrix(mv[2][0]);
+    
+    BOOST_REQUIRE_EQUAL(value::toInteger(m1[0][0]), 1);
+    BOOST_REQUIRE_EQUAL(value::toInteger(m1[1][0]), 2);
+    BOOST_REQUIRE_EQUAL(value::toInteger(m1[2][0]), 3);
+    BOOST_REQUIRE_EQUAL(value::toInteger(m2[0][0]), 4);
+    BOOST_REQUIRE_EQUAL(value::toInteger(m2[1][0]), 5);
+    BOOST_REQUIRE_EQUAL(value::toInteger(m2[2][0]), 6);
+    BOOST_REQUIRE_EQUAL(value::toInteger(m3[0][0]), 7);
+    BOOST_REQUIRE_EQUAL(value::toInteger(m3[1][0]), 8);
+    BOOST_REQUIRE_EQUAL(value::toInteger(m3[2][0]), 9);
 }

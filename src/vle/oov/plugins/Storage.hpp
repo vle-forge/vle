@@ -28,8 +28,8 @@
 #ifndef VLE_OOV_PLUGINS_RPLUG_HPP
 #define VLE_OOV_PLUGINS_RPLUG_HPP
 
-#include <boost/multi_array.hpp>
 #include <vle/oov/Plugin.hpp>
+#include <vle/oov/OutputMatrix.hpp>
 #include <fstream>
 #include <map>
 #include <vector>
@@ -40,10 +40,6 @@ namespace vle { namespace oov { namespace plugin {
     class Storage : public Plugin
     {
     public:
-        typedef boost::multi_array<value::Value, 2> ArrayValue;
-        typedef ArrayValue::array_view<1>::type ArrayView;
-        typedef std::vector < std::string > VectorString;
-
         Storage(const std::string& location);
 
         virtual ~Storage();
@@ -77,6 +73,17 @@ namespace vle { namespace oov { namespace plugin {
 
         virtual void deserialize(value::Value& vals);
 
+        /*
+         * override the oov::OutputMatrix function to get the result of a
+         * simulation's view.
+         */
+
+        virtual bool haveOutputMatrix() const
+        { return true; }
+
+        virtual oov::OutputMatrix outputMatrix() const
+        { return m_matrix; }
+
         virtual std::string name() const;
 
         virtual void onParameter(const vpz::ParameterTrame& trame);
@@ -90,75 +97,38 @@ namespace vle { namespace oov { namespace plugin {
         virtual void close(const vpz::EndTrame& trame);
 
 
-        const VectorString& getModelList() const;
+        /** 
+         * @brief Return a constant reference to the oov::OutputMatrix.
+         * @return A constant reference.
+         */
+        inline const oov::OutputMatrix& outputmatrix() const
+        { return m_matrix; }
 
-        const VectorString& getPortList(const std::string& model) const;
-
-        Storage::ArrayView getTime();
-
-        Storage::ArrayView getValue(const std::string& model,
-                                    const std::string& ports);
-
-        const std::vector < value::Value >::size_type getVectorSize() const;
+        /** 
+         * @brief Return a view on the Time vector..
+         * @return A view on the Time vector.
+         */
+        value::MatrixFactory::VectorView getTime();
 
         /** 
          * @brief Return the Matrix of the values.
          * @return A constant reference to the Matrix.
          */
-        inline const ArrayValue& values() const
-        { return m_values; }
+        inline const OutputMatrix& values() const
+        { return m_matrix; }
 
         /** 
          * @brief Return the Matrix of the values.
          * @return A constant reference to the Matrix.
          */
-        inline ArrayValue& values()
-        { return m_values; }
-
-        /** 
-         * @brief Return the index of the specified couple model port.
-         * @param model Name of the model.
-         * @param port Name of the port.
-         * @throw utils::ArgError if couple model port does not exist.
-         * @return A index.
-         */
-        ArrayValue::index column(const std::string& model,
-                                 const std::string& port) const;
+        inline OutputMatrix& values()
+        { return m_matrix; }
 
     private:
-        typedef std::pair < std::string, std::string > PairString;
+        OutputMatrix       m_matrix;
+        double             m_time;
+        bool               m_isstart;
 
-        struct pairCmp {
-            bool operator()(const PairString& ps1, const PairString& ps2 ) const
-            { return (ps1.first + ps1.second < ps2.first + ps2.second); }
-        };
-
-        typedef ArrayValue::index_range Range;
-        typedef ArrayValue::extent_gen Extents;
-
-        typedef std::map < std::string, VectorString > MapVectorString;
-
-        typedef std::map < PairString, ArrayValue::index, pairCmp > MapPairIndex;
-
-        // to store the values
-        ArrayValue m_values;
-        ArrayValue::index nb_col;
-        ArrayValue::index nb_row;
-
-        // to extend step by step the storage
-        ArrayValue::extent_gen extents;
-
-        // to store for each model names of map
-        MapVectorString m_info;
-
-        // to store each model names
-        VectorString model_names;
-
-        // to provide a direct access to a column
-        MapPairIndex col_access;
-
-        double                          m_time;
-        bool                            m_isstart;
 
         void nextTime(double trame_time);
     };

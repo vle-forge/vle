@@ -125,6 +125,39 @@ void SaxParser::onSet(const AttributeList&)
     m_valuestack.pushSet();
 }
 
+void SaxParser::onMatrix(const AttributeList& lst)
+{
+    value::MatrixFactory::index row = 0, rowmax = 0, rowstep = 0;
+    value::MatrixFactory::index col = 0, colmax = 0, colstep = 0;
+    bool haverow = false;
+    bool havecol = false;
+
+    for (AttributeList::const_iterator it = lst.begin();
+         it != lst.end(); ++it) {
+        using boost::lexical_cast;;
+        if (it->name == "rows") {
+            haverow = true;
+            row = lexical_cast < value::MatrixFactory::index >(it->value);
+        } else if (it->name == "columns") {
+            havecol = true;
+            col = lexical_cast < value::MatrixFactory::index >(it->value);
+        } else if (it->name == "rowmax") {
+            rowmax = lexical_cast < value::MatrixFactory::index >(it->value);
+        } else if (it->name == "columnmax") {
+            colmax = lexical_cast < value::MatrixFactory::index >(it->value);
+        } else if (it->name == "columnstep") {
+            colstep = lexical_cast < value::MatrixFactory::index >(it->value);
+        } else if (it->name == "rowstep") {
+            rowstep = lexical_cast < value::MatrixFactory::index >(it->value);
+        }
+    }
+
+    Assert(utils::SaxParserError, haverow and havecol,
+            "Matrix value have no row or column attribute");
+
+    m_valuestack.pushMatrix(col, row, colmax, rowmax, colstep, rowstep);
+}
+
 void SaxParser::onMap(const AttributeList&)
 {
     m_valuestack.pushMap();
@@ -347,6 +380,11 @@ void SaxParser::onEndKey()
 }
 
 void SaxParser::onEndSet()
+{
+    m_valuestack.popValue();
+}
+
+void SaxParser::onEndMatrix()
 {
     m_valuestack.popValue();
 }

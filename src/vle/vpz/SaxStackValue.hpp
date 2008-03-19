@@ -33,6 +33,7 @@
 #include <vle/value/Value.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/value/Map.hpp>
+#include <vle/value/Matrix.hpp>
 #include <vle/value/Tuple.hpp>
 #include <vle/value/Table.hpp>
 #include <vle/utils/Debug.hpp>
@@ -55,6 +56,13 @@ class ValueStackSax
         void pushMapKey(const Glib::ustring& key);
 
         void pushSet();
+
+        void pushMatrix(value::MatrixFactory::index col,
+                        value::MatrixFactory::index row,
+                        value::MatrixFactory::index colmax,
+                        value::MatrixFactory::index rowmax,
+                        value::MatrixFactory::index colstep,
+                        value::MatrixFactory::index rowstep);
 
         void pushTuple();
 

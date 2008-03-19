@@ -163,6 +163,7 @@ namespace vle { namespace vpz {
         void onDouble(const AttributeList& att);
         void onString(const AttributeList& att);
         void onSet(const AttributeList& att);
+        void onMatrix(const AttributeList& att);
         void onMap(const AttributeList& att);
         void onKey(const AttributeList& att);
         void onTuple(const AttributeList& att);
@@ -204,6 +205,7 @@ namespace vle { namespace vpz {
         void onEndDouble();
         void onEndString();
         void onEndSet();
+        void onEndMatrix();
         void onEndMap();
         void onEndKey();
         void onEndTuple();
@@ -253,6 +255,7 @@ namespace vle { namespace vpz {
             add("double", &SaxParser::onDouble, &SaxParser::onEndDouble);
             add("string", &SaxParser::onString, &SaxParser::onEndString);
             add("set", &SaxParser::onSet, &SaxParser::onEndSet);
+            add("matrix", &SaxParser::onMatrix, &SaxParser::onEndMatrix);
             add("map", &SaxParser::onMap, &SaxParser::onEndMap);
             add("key", &SaxParser::onKey, &SaxParser::onEndKey);
             add("tuple", &SaxParser::onTuple, &SaxParser::onEndTuple);

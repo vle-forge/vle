@@ -32,6 +32,7 @@
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
 #include <vle/value/Map.hpp>
+#include <vle/value/Matrix.hpp>
 #include <vle/value/Null.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/value/String.hpp>

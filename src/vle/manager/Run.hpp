@@ -72,13 +72,13 @@ namespace vle { namespace manager {
          * oov::Plugin.
          * @return Return a constant list of the dictionary viewname.
          */
-        const oov::PluginViewList& outputs() const;
+        const oov::OutputMatrixViewList& outputs() const;
 
         /** 
          * @brief Return the list of the dictionary viewname, oov::Plugin.
          * @return Return the list of the dictionary viewname.
          */
-        oov::PluginViewList& outputs();
+        oov::OutputMatrixViewList& outputs();
 
     protected:
         bool                    m_error;
@@ -229,12 +229,12 @@ namespace vle { namespace manager {
         return m_root;
     }
 
-    inline const oov::PluginViewList& Run::outputs() const
+    inline const oov::OutputMatrixViewList& Run::outputs() const
     {
         return m_root.outputs();
     }
 
-    inline oov::PluginViewList& Run::outputs()
+    inline oov::OutputMatrixViewList& Run::outputs()
     {
         return m_root.outputs();
     }

@@ -316,12 +316,12 @@ View* Coordinator::getView(const std::string& name) const
     return (it == m_viewList.end()) ? 0 : it->second;
 }
 
-oov::PluginViewList Coordinator::outputs() const
+oov::OutputMatrixViewList Coordinator::outputs() const
 {
-    oov::PluginViewList lst;
+    oov::OutputMatrixViewList lst;
 
     std::for_each(m_viewList.begin(), m_viewList.end(),
-                  GetSerializablePlugins(lst));
+                  GetOutputMatrixView(lst));
 
     return lst;
 }

@@ -219,7 +219,7 @@ namespace vle { namespace devs {
         inline const SimulatorMap& modellist() const
         { return m_modelList; }
 
-        oov::PluginViewList outputs() const;
+        oov::OutputMatrixViewList outputs() const;
 
         /** 
          * @brief Friend member to give Coordinator access to excutive model.
@@ -317,18 +317,23 @@ namespace vle { namespace devs {
         
         /** 
          * @brief A functor to be use with std::for_each to facilitate
-         * transformation from an ViewList to the PluginViewList.
+         * transformation from an ViewList to the OutputMatrixViewList.
          */
-        struct GetSerializablePlugins
+        struct GetOutputMatrixView
         {
-            oov::PluginViewList& lst;
+            oov::OutputMatrixViewList& lst;
 
-            GetSerializablePlugins(oov::PluginViewList& lst) : lst(lst) { }
+            GetOutputMatrixView(oov::OutputMatrixViewList& lst) : lst(lst) { }
 
             inline void operator()(const ViewList::value_type& x)
-            { if (x.second->plugin().get() and
-                  x.second->plugin()->isSerializable()) {
-                  lst.insert(std::make_pair(x.first, x.second->plugin())); }}
+            {
+                if (x.second->plugin().get() and
+                    x.second->plugin()->haveOutputMatrix()) {
+                    lst.insert(
+                        std::make_pair(x.first,
+                                       x.second->plugin()->outputMatrix()));
+                }
+            }
         };
     };
 

@@ -164,3 +164,31 @@ BOOST_AUTO_TEST_CASE(check_null)
 
     BOOST_REQUIRE_EQUAL(st->size(), (value::VectorValue::size_type) 5);
 }
+
+BOOST_AUTO_TEST_CASE(check_matrix)
+{
+    value::Matrix mx = value::MatrixFactory::create(100, 100, 10, 10);
+    BOOST_REQUIRE_EQUAL(mx->rows(), (value::MatrixFactory::size_type)0);
+    BOOST_REQUIRE_EQUAL(mx->columns(), (value::MatrixFactory::size_type)0);
+
+    mx->addColumn();
+    BOOST_REQUIRE_EQUAL(mx->rows(), (value::MatrixFactory::size_type)0);
+    BOOST_REQUIRE_EQUAL(mx->columns(), (value::MatrixFactory::size_type)1);
+
+    mx->addRow();
+    BOOST_REQUIRE_EQUAL(mx->rows(), (value::MatrixFactory::size_type)1);
+    BOOST_REQUIRE_EQUAL(mx->columns(), (value::MatrixFactory::size_type)1);
+
+    mx->addValue(0, 0, value::IntegerFactory::create(10));
+    BOOST_REQUIRE_EQUAL(mx->getValue()[0][0]->isInteger(), true);
+    BOOST_REQUIRE_EQUAL(value::toInteger(mx->getValue()[0][0]), 10);
+
+    value::Matrix cpy = value::toMatrixValue(mx->clone());
+    BOOST_REQUIRE_EQUAL(cpy->getValue()[0][0]->isInteger(), true);
+    value::toIntegerValue(cpy->getValue()[0][0])->set(20);
+    BOOST_REQUIRE_EQUAL(value::toInteger(mx->getValue()[0][0]), 10);
+    BOOST_REQUIRE_EQUAL(value::toInteger(cpy->getValue()[0][0]), 20);
+
+
+
+}

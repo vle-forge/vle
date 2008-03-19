@@ -31,7 +31,7 @@
 #include <vle/utils/Rand.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/vpz/Vpz.hpp>
-#include <vle/oov/Plugin.hpp>
+#include <vle/oov/OutputMatrix.hpp>
 
 namespace vle { namespace graph {
 
@@ -94,14 +94,14 @@ namespace vle { namespace devs {
          * @brief Return a constant reference to the list of view plugins.
          * @return  Return a constant reference to the list of view plugins.
          */
-        inline const oov::PluginViewList& outputs() const
+        inline const oov::OutputMatrixViewList& outputs() const
         { return m_outputs; }
 
         /** 
          * @brief Return a reference to the list of view plugins.
          * @return  Return a reference to the list of view plugins.
          */
-        inline oov::PluginViewList& outputs()
+        inline oov::OutputMatrixViewList& outputs()
         { return m_outputs; }
 
         void setRand(Dynamics& dynamics);
@@ -113,7 +113,9 @@ namespace vle { namespace devs {
 	Coordinator*        m_coordinator;
 	ModelFactory*       m_modelfactory;
         graph::Model*       m_root;
-        oov::PluginViewList m_outputs;
+
+        ///! the output of the simulation if plugin are Storage.
+        oov::OutputMatrixViewList m_outputs;
     };
 
 }} // namespace vle devs

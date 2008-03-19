@@ -130,7 +130,7 @@ void JustRunThread::run()
     std::string filename;
     std::ostringstream ostr;
     int instance = 0;
-    oov::PluginViewList views;
+    oov::OutputMatrixViewList views;
 
     for (;;) {
         file = 0;

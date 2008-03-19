@@ -44,16 +44,18 @@ namespace vle { namespace manager {
 
 
     /** 
-     * @brief ManagerRun is the base class for running simulation from a specified
-     * vpz file that containts and experimental frames. ManagerRun does not run
-     * simulation, see ManagerRunThread and ManagerRunDistant. ManagerRun
-     * provides and access to the oov::PluginPtr object of the simulation.
+     * @brief ManagerRun is the base class for running simulation from a
+     * specified vpz file that containts and experimental frames. ManagerRun
+     * does not run simulation, see ManagerRunThread and ManagerRunDistant.
+     * ManagerRun provides and access to the oov::PluginPtr object of the
+     * simulation.
      */
     class ManagerRun : public boost::noncopyable
     {
     public:
         /** 
          * @brief Build a ManagerRun.
+         *
          * @param out output to log error.
          * @param writefile write all experimental frames file produced.
          * @param rnd a pseudo random generator build by the user, if rnd is
@@ -65,6 +67,7 @@ namespace vle { namespace manager {
         /** 
          * @brief Get a reference to the oov::PluginPtr list of the simulation
          * sort by filename.
+         *
          * @return A reference to the oov::PluginPtr list.
          */
         OutputSimulationMatrix& outputSimulationMatrix();
@@ -72,6 +75,7 @@ namespace vle { namespace manager {
         /** 
          * @brief Get a constant reference to the oov::PluginPtr list of the
          * simulation sort by filename.
+         *
          * @return A reference to the oov::PluginPtr list.
          */
         const OutputSimulationMatrix& outputSimulationMatrix() const;
@@ -85,6 +89,7 @@ namespace vle { namespace manager {
         /** 
          * @brief Build the ExperimentGenerator attached to the vpz::Vpz
          * definition in experiments tags.
+         *
          * @param file The vpz::Vpz file
          * @return A reference to the newly build combination plan
          */
@@ -96,6 +101,7 @@ namespace vle { namespace manager {
          * call the constructor with a valid RandomNumberGenerator. The seed is
          * provided by the vpz::Vpz file instance in the replicas tags. If the
          * seed is not provided, the std::time(0) or /dev/urandom is used.
+         *
          * @param file The vpz::Vpz file where get the seed.
          */
         void initRandomGenerator(const vpz::Vpz& file);
