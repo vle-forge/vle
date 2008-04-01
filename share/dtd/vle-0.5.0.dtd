@@ -15,7 +15,7 @@
 <!ELEMENT experiment (replicas?, conditions?, views?) >
 <!ELEMENT conditions (condition*) >
 <!ELEMENT condition (port*) >
-<!ELEMENT port ((attachedview*)|(integer|double|boolean|string|table|tuple|set|map|xml|null)*) >
+<!ELEMENT port ((attachedview*)|(integer|double|boolean|string|table|tuple|set|matrix|map|xml|null)*) >
 <!ELEMENT views (outputs, observables, view*) >
 <!ELEMENT outputs (output*) >
 <!ELEMENT output (#PCDATA) >
@@ -29,9 +29,10 @@
 <!ELEMENT string (#PCDATA) >
 <!ELEMENT table (#PCDATA) >
 <!ELEMENT tuple (#PCDATA) >
-<!ELEMENT set (integer|double|boolean|string|table|tuple|set|map|xml|null)* >
+<!ELEMENT set (integer|double|boolean|string|table|tuple|set|matrix|map|xml|null)* >
+<!ELEMENT matrix (integer|double|boolean|string|table|tuple|set|matrix|map|xml|null) >
 <!ELEMENT map (key*) >
-<!ELEMENT key (integer|double|boolean|string|table|tuple|set|map|xml|null) >
+<!ELEMENT key (integer|double|boolean|string|table|tuple|set|matrix|map|xml|null) >
 <!ELEMENT xml (#PCDATA) >
 
 <!ATTLIST vle_project
@@ -108,6 +109,14 @@
 
 <!ATTLIST key
   name CDATA #REQUIRED >
+
+<!ATTLIST matrix
+  rows CDATA #REQUIRED
+  columns CDATA #REQUIRED
+  rowmax CDATA #IMPLIED
+  columnmax CDATA #IMPLIED
+  rowstep CDATA #IMPLIED
+  columnstep CDATA #IMPLIED >
 
 <!--
 vim:ts=8:tw=160:sw=2:sts=2
