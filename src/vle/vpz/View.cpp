@@ -90,7 +90,9 @@ void View::setTimestep(double time)
 
 void View::setOutput(const std::string& output)
 {
-    AssertI(not output.empty());
+    Assert(utils::SaxParserError, not output.empty(), boost::format(
+                "Bad output '%1%' for the view '%2%'") % output % m_name);
+    
     m_output = output;
 }
 

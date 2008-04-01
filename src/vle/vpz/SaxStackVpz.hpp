@@ -50,6 +50,8 @@ namespace vle { namespace vpz {
             m_vpz(vpz)
         { }
 
+        void clear();
+
         ~SaxStackVpz();
 
         vpz::Vpz* pushVpz(const AttributeList& name);

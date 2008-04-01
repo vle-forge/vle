@@ -48,8 +48,9 @@ void Dynamic::write(std::ostream& out) const
 
 void Dynamic::setDistantDynamics(const std::string& host, int port)
 {
-    AssertI(port > 0);
-    AssertI(port < 65535);
+    Assert(utils::SaxParserError, port > 0 and port < 65535, boost::format(
+            "Error in TCP/IP port for Dynamics distant model %1% (%2%:%3%)") %
+            m_name % host % port);
 
     m_location = (boost::format("%1%:%2%") % host % port).str();
     m_type = DISTANT;

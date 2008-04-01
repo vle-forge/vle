@@ -59,33 +59,33 @@ void Vpz::parseFile(const std::string& filename)
 {
     m_filename.assign(filename);
 
-    vpz::SaxParser sax(*this);
+    vpz::SaxParser saxparser(*this);
     try {
-        sax.parse_file(filename);
+        saxparser.parse_file(filename);
     } catch(const std::exception& sax) {
         try {
             Vpz::validateFile(m_filename);
-        } catch(const std::exception& dom) {
+        } catch(const xmlpp::exception& dom) {
+            saxparser.clearParserState();
             Throw(utils::SaxParserError, boost::format(
                     "Parse file '%1%':\n[--libxml--]\n%2%[--libvpz--]\n%3%") %
                 filename % dom.what() % sax.what());
         }
-        Throw(utils::SaxParserError, boost::format(
-                "Parse file '%1%':\n[--libvpz--]\n%2%") % filename %
-            sax.what());
     }
 }
+
 
 void Vpz::parseMemory(const std::string& buffer)
 {
     m_filename.clear();
 
-    vpz::SaxParser sax(*this);
+    vpz::SaxParser saxparser(*this);
     try {
-        sax.parse_memory(buffer);
+        saxparser.parse_memory(buffer);
     } catch(const std::exception& sax) {
         try {
-            Vpz::validateFile(buffer);
+            saxparser.clearParserState();
+            Vpz::validateMemory(buffer);
         } catch(const std::exception& dom) {
             Throw(utils::SaxParserError, boost::format(
                     "Parse memory:\n[--libxml--]\n%1%[--libvpz--]\n%2%") %
@@ -102,7 +102,7 @@ value::Value Vpz::parseValue(const std::string& buffer)
     SaxParser sax(vpz);
     sax.parse_memory(buffer);
     
-    Assert(utils::InternalError, sax.isValue(),
+    Assert(utils::SaxParserError, sax.isValue(),
            boost::format("The buffer [%1%] is not a value.") % buffer);
 
     return sax.getValue(0);
@@ -114,7 +114,7 @@ TrameList Vpz::parseTrame(const std::string& buffer)
     SaxParser sax(vpz);
     sax.parse_memory(buffer);
     
-    Assert(utils::InternalError, sax.isTrame(),
+    Assert(utils::SaxParserError, sax.isTrame(),
            boost::format("The buffer [%1%] is not a trame.") % buffer);
 
     return sax.tramelist();
@@ -126,7 +126,7 @@ std::vector < value::Value > Vpz::parseValues(const std::string& buffer)
     SaxParser sax(vpz);
     sax.parse_memory(buffer);
     
-    Assert(utils::InternalError, sax.isValue(),
+    Assert(utils::SaxParserError, sax.isValue(),
            boost::format("The buffer [%1%] is not a value.") % buffer);
 
     return sax.getValues();

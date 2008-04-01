@@ -45,7 +45,7 @@ namespace vle { namespace vpz {
 
 SaxStackVpz::~SaxStackVpz()
 {
-    Assert(utils::InternalError, m_stack.empty(), "SaxStackVpz not empty");
+    Assert(utils::SaxParserError, m_stack.empty(), "SaxStackVpz not empty");
 }
 
 std::ostream& operator<<(std::ostream& out, const SaxStackVpz& stack)
@@ -62,6 +62,29 @@ std::ostream& operator<<(std::ostream& out, const SaxStackVpz& stack)
     return out;
 }
 
+void SaxStackVpz::clear()
+{
+    while (not m_stack.empty()) {
+        if (m_stack.top()->isStructures() or
+            m_stack.top()->isModel() or
+            m_stack.top()->isIn() or
+            m_stack.top()->isOut() or
+            m_stack.top()->isState() or
+            m_stack.top()->isInit() or
+            m_stack.top()->isSubmodels() or
+            m_stack.top()->isConnections() or
+            m_stack.top()->isInternalConnection() or
+            m_stack.top()->isInputConnection() or
+            m_stack.top()->isOutputConnection() or
+            m_stack.top()->isOrigin() or
+            m_stack.top()->isDestination() or
+            m_stack.top()->isTrame() or
+            m_stack.top()->isModelTrame()) {
+            delete m_stack.top();
+        }
+        m_stack.pop();
+    }
+}
 
 vpz::Vpz* SaxStackVpz::pushVpz(const AttributeList& att)
 {
@@ -125,15 +148,27 @@ void SaxStackVpz::pushModel(const AttributeList& att)
 
         if (existAttribute(att, "observables"))
             obs = getAttribute < std::string >(att, "observables");
-        
-        gmdl = new graph::AtomicModel(name, parent);
+
+        try {
+            gmdl = new graph::AtomicModel(name, parent);
+        } catch(const utils::DevsGraphError& e) {
+            Throw(utils::SaxParserError, boost::format(
+                    "Error build atomic model '%1%' with error: %2%") % name %
+                e.what());
+        }
         vpz().project().model().atomicModels().insert(std::make_pair(
                 reinterpret_cast < graph::Model* >(gmdl),
                 AtomicModel(cnd, dyn, obs)));
     } else if (type == "coupled") {
-        gmdl = new graph::CoupledModel(name, parent);
+        try {
+            gmdl = new graph::CoupledModel(name, parent);
+        } catch(const utils::DevsGraphError& e) {
+            Throw(utils::SaxParserError, boost::format(
+                    "Error build coupled model '%1%' with error: %2%") % name %
+                e.what());
+        }
     } else {
-        Throw(utils::InternalError, (boost::format(
+        Throw(utils::SaxParserError, (boost::format(
                         "Unknow model type %1%") % type));
     }
  
@@ -194,7 +229,7 @@ void SaxStackVpz::pushPortType(const Glib::ustring& name)
     } else if (name == "init") {
         prt = new vpz::Init();
     } else {
-        Throw(utils::InternalError, (boost::format("Unknow port type %1%.") %
+        Throw(utils::SaxParserError, (boost::format("Unknow port type %1%.") %
                                      name));
     }
     m_stack.push(prt);
@@ -233,7 +268,7 @@ void SaxStackVpz::pushConnection(const AttributeList& att)
     } else if (type == "output") {
         cnt = new vpz::OutputConnection();
     } else {
-        Throw(utils::InternalError, (boost::format("Unknow connection type %1%")
+        Throw(utils::SaxParserError, (boost::format("Unknow connection type %1%")
                                      % type));
     }
     m_stack.push(cnt);

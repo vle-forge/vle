@@ -60,7 +60,7 @@ namespace vle { namespace vpz {
         /** 
          * @brief Set the View with Event type on the specified output.
          * @param output the output of the event View.
-         * @throw utils::InternalError if output is empty.
+         * @throw utils::SaxParserError if output is empty.
          */
         void setEventView(const std::string& output);
 
@@ -69,7 +69,7 @@ namespace vle { namespace vpz {
          * timestep.
          * @param timestep the output of the timed View.
          * @param output the timestep of the timed View.
-         * @throw utils::InternalError if output is empty or timestep smaller
+         * @throw utils::SaxParserError if output is empty or timestep smaller
          * than 0.
          */
         void setTimedView(double timestep, const std::string& output);
@@ -77,7 +77,7 @@ namespace vle { namespace vpz {
         /** 
          * @brief Set the View with the Finish type on the specified output.
          * @param output the output of the Finish View.
-         * @throw utils::InternalError if output is empty.
+         * @throw utils::SaxParserError if output is empty.
          */
         void setFinishView(const std::string& output);
 

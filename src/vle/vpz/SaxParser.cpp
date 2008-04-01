@@ -61,6 +61,7 @@ SaxParser::~SaxParser()
 
 void SaxParser::clearParserState()
 {
+    m_vpzstack.clear();
     m_valuestack.clear();
     m_lastCharacters.clear();
     m_isValue = false;

@@ -75,7 +75,8 @@ void Experiment::addViews(const Views& m)
 
 void Experiment::setName(const std::string& name)
 {
-    AssertI(not name.empty());
+    Assert(utils::SaxParserError, not name.empty(),
+           "Empty experiment name");
 
     m_name.assign(name);
 }
@@ -88,14 +89,16 @@ void Experiment::cleanNoPermanent()
 
 void Experiment::setDuration(double duration)
 {
-    AssertI(duration > 0);
+    Assert(utils::SaxParserError, duration > 0, boost::format(
+            "Experiment duraction error: %1% (must be > 0") % duration);
 
     m_duration = duration;
 }
 
 void Experiment::setCombination(const std::string& name)
 {
-    AssertI(name == "linear" or name == "total");
+    Assert(utils::SaxParserError, name == "linear" or name == "total",
+           boost::format("Unknow combination '%1%'") % name);
 
     m_combination.assign(name);
 }

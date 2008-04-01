@@ -85,7 +85,7 @@ namespace vle { namespace vpz {
         /** 
          * @brief Add a list of atomicmodels information.
          * @param atoms list of atomicmodels.
-         * @throw utils::InternalError if an model already exist.
+         * @throw utils::SaxParserError if an model already exist.
          */
         void add(const AtomicModelList& atoms);
 
@@ -94,14 +94,14 @@ namespace vle { namespace vpz {
          * @param mdl the graph::Model to attach atomic model information.
          * @param atom the vpz::AtomicModel information.
          * @return a reference to the builded atomicmodel.
-         * @throw utils::InternalError if mdl already exist.
+         * @throw utils::SaxParserError if mdl already exist.
          */
         AtomicModel& add(graph::Model* mdl, const AtomicModel& atom);
 
         /** 
          * @brief Get an vpz::Model by his structural reference.
          * @param atom the reference to the structure.
-         * @throw utils::InternalError if atom have no dynamics.
+         * @throw utils::SaxParserError if atom have no dynamics.
          * @return A constant reference to the vpz::Model.
          */
         const AtomicModel& get(graph::Model* atom) const;
@@ -109,7 +109,7 @@ namespace vle { namespace vpz {
         /** 
          * @brief Get an vpz::Model by his structural reference.
          * @param atom the reference to the structure.
-         * @throw utils::InternalError if atom have no dynamics.
+         * @throw utils::SaxParserError if atom have no dynamics.
          * @return A constant reference to the vpz::Model.
          */
         AtomicModel& get(graph::Model* atom);
@@ -117,7 +117,7 @@ namespace vle { namespace vpz {
         /** 
          * @brief Get an vpz::Model by his structural reference.
          * @param atom the reference to the structure.
-         * @throw utils::InternalError if atom have no dynamics.
+         * @throw utils::SaxParserError if atom have no dynamics.
          * @return A constant reference to the vpz::Model.
          */
         const AtomicModel& get(const graph::Model* atom) const;
@@ -125,7 +125,7 @@ namespace vle { namespace vpz {
         /** 
          * @brief Get an vpz::Model by his structural reference.
          * @param atom the reference to the structure.
-         * @throw utils::InternalError if atom have no dynamics.
+         * @throw utils::SaxParserError if atom have no dynamics.
          * @return A constant reference to the vpz::Model.
          */
         AtomicModel& get(const graph::Model* atom);

@@ -82,7 +82,7 @@ void Outputs::add(const Outputs& o)
 
 Output& Outputs::add(const Output& o)
 {
-    Assert(utils::InternalError, not exist(o.name()),
+    Assert(utils::SaxParserError, not exist(o.name()),
            boost::format("An output have already this name '%1%'\n") %
            o.name());
 
@@ -93,7 +93,7 @@ Output& Outputs::add(const Output& o)
 Output& Outputs::get(const std::string& name)
 {
     OutputList::iterator it = m_list.find(name);
-    Assert(utils::InternalError, it != m_list.end(),
+    Assert(utils::SaxParserError, it != m_list.end(),
            boost::format("Unknow output '%1%'\n") % name);
 
     return it->second;
@@ -102,7 +102,7 @@ Output& Outputs::get(const std::string& name)
 const Output& Outputs::get(const std::string& name) const
 {
     OutputList::const_iterator it = m_list.find(name);
-    Assert(utils::InternalError, it != m_list.end(),
+    Assert(utils::SaxParserError, it != m_list.end(),
            boost::format("Unknow output '%1%'\n") % name);
 
     return it->second;

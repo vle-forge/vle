@@ -62,7 +62,7 @@ AtomicModel& AtomicModelList::add(graph::Model* mdl,
                                   const AtomicModel& atom)
 {
     const_iterator it = find(mdl);
-    Assert(utils::InternalError, it == end(),
+    Assert(utils::SaxParserError, it == end(),
            (boost::format("The model %1% already have external information")
             % mdl->getName()));
 
@@ -74,7 +74,7 @@ const AtomicModel& AtomicModelList::get(graph::Model* atom) const
 {
     const_iterator it = find(atom);
     if (it == end()) {
-        Throw(utils::InternalError, boost::format(
+        Throw(utils::SaxParserError, boost::format(
                 "The atomic model %s have not dynamics?") %
             atom->getName());
     }
@@ -85,7 +85,7 @@ AtomicModel& AtomicModelList::get(graph::Model* atom)
 {
     iterator it = find(atom);
     if (it == end()) {
-        Throw(utils::InternalError, boost::format(
+        Throw(utils::SaxParserError, boost::format(
                 "The atomic model %s have not dynamics?") %
                     atom->getName());
     }
@@ -96,7 +96,7 @@ const AtomicModel& AtomicModelList::get(const graph::Model* atom) const
 {
     const_iterator it = find(const_cast < graph::Model* >(atom));
     if (it == end()) {
-        Throw(utils::InternalError, boost::format(
+        Throw(utils::SaxParserError, boost::format(
                 "The atomic model %s have not dynamics?") %
             atom->getName());
     }
@@ -107,7 +107,7 @@ AtomicModel& AtomicModelList::get(const graph::Model* atom)
 {
     iterator it = find(const_cast < graph::Model* >(atom));
     if (it == end()) {
-        Throw(utils::InternalError, boost::format(
+        Throw(utils::SaxParserError, boost::format(
                 "The atomic model %s have not dynamics?") %
                     atom->getName());
     }

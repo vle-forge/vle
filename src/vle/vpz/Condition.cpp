@@ -59,7 +59,7 @@ value::Value ValueList::get(const std::string& name)
 {
     iterator it;
     if ((it = find(name)) == end()) {
-        Throw(utils::InternalError, boost::format(
+        Throw(utils::SaxParserError, boost::format(
                 "Condition '%1%' does not exist") % name);
     }
     return it->second;
@@ -74,7 +74,7 @@ const value::Value& ValueList::get(const std::string& name) const
 {
     const_iterator it;
     if ((it = find(name)) == end()) {
-        Throw(utils::InternalError, boost::format(
+        Throw(utils::SaxParserError, boost::format(
                 "Condition '%1%' does not exist") % name);
     }
     return it->second;
@@ -144,7 +144,7 @@ void Condition::setValueToPort(const std::string& portname,
                                const value::Value& value)
 {
     ConditionValues::iterator it = m_list.find(portname);
-    Assert(utils::InternalError, it != m_list.end(),
+    Assert(utils::SaxParserError, it != m_list.end(),
            boost::format("Condition %1% have no port %2%") %
            m_name % portname);
 
@@ -155,7 +155,7 @@ void Condition::setValueToPort(const std::string& portname,
 void Condition::clearValueOfPort(const std::string& portname)
 {
     ConditionValues::iterator it = m_list.find(portname);
-    Assert(utils::InternalError, it != m_list.end(),
+    Assert(utils::SaxParserError, it != m_list.end(),
            boost::format("Condition %1% have no port %2%") %
            m_name % portname);
 
@@ -184,7 +184,7 @@ const value::Set& Condition::getSetValues(const std::string& portname) const
 {
     ConditionValues::const_iterator it = m_list.find(portname);
 
-    Assert(utils::InternalError, it != m_list.end(),
+    Assert(utils::SaxParserError, it != m_list.end(),
            boost::format("Condition %1% have no port %2%") %
            m_name % portname);
 
@@ -206,7 +206,7 @@ value::Set& Condition::lastAddedPort()
 {
     ConditionValues::iterator it = m_list.find(m_last_port);
 
-    Assert(utils::InternalError, it != m_list.end(),
+    Assert(utils::SaxParserError, it != m_list.end(),
            boost::format("Condition %1% have no port %2%") %
            m_name % m_last_port);
 

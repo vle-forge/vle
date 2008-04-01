@@ -60,7 +60,9 @@ void Output::write(std::ostream& out) const
 void Output::setLocalStream(const std::string& location,
                             const std::string& plugin)
 {
-    AssertI(not plugin.empty());
+    Assert(utils::SaxParserError, not plugin.empty(), boost::format(
+            "Output '%1%' have not plugin defined") % m_name);
+
     m_location.assign(location);
     m_plugin.assign(plugin);
     m_format = Output::LOCAL;
@@ -69,7 +71,9 @@ void Output::setLocalStream(const std::string& location,
 void Output::setDistantStream(const std::string& location,
                               const std::string& plugin)
 {
-    AssertI(not plugin.empty());
+    Assert(utils::SaxParserError, not plugin.empty(), boost::format(
+            "Output '%1%' have not plugin defined") % m_name);
+
     m_location.assign(location);
     m_plugin.assign(plugin);
     m_format = Output::DISTANT;

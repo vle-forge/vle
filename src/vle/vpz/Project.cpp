@@ -64,7 +64,9 @@ void Project::clear()
 
 void Project::setAuthor(const std::string& name)
 {
-    AssertI(not name.empty());
+    Assert(utils::SaxParserError, not name.empty(),
+            "Project author unknow");
+;
     m_author.assign(name);
 }
 

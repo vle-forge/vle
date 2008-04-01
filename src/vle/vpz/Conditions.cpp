@@ -72,7 +72,7 @@ void Conditions::add(const Conditions& cdts)
 Condition& Conditions::add(const Condition& condition)
 {
     ConditionList::const_iterator it = m_list.find(condition.name());
-    Assert(utils::InternalError, it == m_list.end(),
+    Assert(utils::SaxParserError, it == m_list.end(),
            boost::format("The condition %1% already exist") %
            condition.name());
 
@@ -89,7 +89,7 @@ void Conditions::del(const std::string& condition)
 const Condition& Conditions::get(const std::string& condition) const
 {
     ConditionList::const_iterator it = m_list.find(condition);
-    Assert(utils::InternalError, it != m_list.end(),
+    Assert(utils::SaxParserError, it != m_list.end(),
            boost::format("The condition %1% not exist") %
            condition);
 
@@ -99,7 +99,7 @@ const Condition& Conditions::get(const std::string& condition) const
 Condition& Conditions::get(const std::string& condition)
 {
     ConditionList::iterator it = m_list.find(condition);
-    Assert(utils::InternalError, it != m_list.end(),
+    Assert(utils::SaxParserError, it != m_list.end(),
            boost::format("The condition %1% not exist") %
            condition);
 

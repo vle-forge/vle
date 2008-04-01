@@ -117,13 +117,13 @@ namespace vle { namespace vpz {
         inline TrameList& tramelist()
         { return m_vpzstack.trame(); }
 
-    private:
         /** 
          * @brief Delete all information from Sax parser like stack, etc. Use it
          * before restart a new parse.
          */
         void clearParserState();
 
+    private:
         /** 
          * @brief Get the last characters from internal buffer.
          * @return A characters buffer.

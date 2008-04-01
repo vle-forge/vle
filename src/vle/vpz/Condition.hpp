@@ -128,7 +128,7 @@ namespace vle { namespace vpz {
          * value, these values are deleted.
          * @param portname The name of the port to add value. 
          * @param value the value to push.
-         * @throw utils::InternalError if portname does not exist.
+         * @throw utils::SaxParserError if portname does not exist.
          */
         void setValueToPort(const std::string& portname,
                             const value::Value& value);
@@ -136,7 +136,7 @@ namespace vle { namespace vpz {
         /** 
          * @brief Clear the specified port.
          * @param portname The name of the port to clear.
-         * @throw utils::InternalError if portname does not exist.
+         * @throw utils::SaxParserError if portname does not exist.
          */
         void clearValueOfPort(const std::string& portname);
 
