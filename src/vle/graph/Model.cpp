@@ -355,8 +355,8 @@ int Model::getInputPortIndex(const std::string& name) const
     ConnectionList::const_iterator it = m_inPortList.find(name);
     Assert(utils::DevsGraphError, it != m_inPortList.end(), boost::format(
             "Input port %1% not exist in model %2%") % name % getName());
-    
-    return std::distance(it, m_inPortList.begin());
+
+    return std::distance(m_inPortList.begin(), it);
 }
 
 int Model::getOutputPortIndex(const std::string& name) const
@@ -364,8 +364,8 @@ int Model::getOutputPortIndex(const std::string& name) const
     ConnectionList::const_iterator it = m_outPortList.find(name);
     Assert(utils::DevsGraphError, it != m_outPortList.end(), boost::format(
             "Output port %1% not exist in model %2%") % name % getName());
-    
-    return std::distance(it, m_outPortList.begin());
+
+    return std::distance(m_outPortList.begin(), it);
 }
 
 void Model::writePortListXML(std::ostream& out) const

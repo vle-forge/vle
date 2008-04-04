@@ -258,3 +258,26 @@ BOOST_AUTO_TEST_CASE(test_clone_different_atomic)
 
     BOOST_REQUIRE(it == lst1.end());
 }
+
+BOOST_AUTO_TEST_CASE(test_get_port_index)
+{
+    vpz::Vpz file(utils::Path::buildPrefixSharePath(
+            utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
+
+    CoupledModel* top = dynamic_cast < CoupledModel*
+        >(file.project().model().model());
+
+    BOOST_REQUIRE(top);
+
+    BOOST_REQUIRE_EQUAL(top->getInputPortList().size(), 0);
+    BOOST_REQUIRE_EQUAL(top->getOutputPortList().size(), 0);
+
+    AtomicModel* e = dynamic_cast < AtomicModel*> (top->getModelList()["e"]);
+
+    BOOST_REQUIRE(e);
+
+    BOOST_REQUIRE_EQUAL(e->getInputPortList().size(), 2);
+    BOOST_REQUIRE_EQUAL(e->getInputPortIndex("in1"), 0);
+    BOOST_REQUIRE_EQUAL(e->getInputPortIndex("in2"), 1);
+    BOOST_REQUIRE_EQUAL(e->getOutputPortList().size(), 0);
+}
