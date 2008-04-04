@@ -52,6 +52,26 @@ namespace vle { namespace oov {
         ///! @brief define a dictionary model name, ports list.
         typedef std::map < std::string, StringList > MapStringList;
 
+        ///! @brief define a pair model, port names.
+        typedef std::pair < std::string, std::string > PairString;
+
+        /** 
+         * @brief A functor to test the difference between two couple model,
+         * port.
+         * To use with, find, compare etc.
+         */
+        struct pairCmp
+        {
+            inline bool
+                operator()(const PairString& ps1, const PairString& ps2) const
+                { return (ps1.first + ps1.second < ps2.first + ps2.second); }
+        };
+
+        ///! @brief define a dictionary model-port name to index in matrix.
+        typedef std::map < PairString,
+                value::MatrixFactory::MatrixValue::index, pairCmp > 
+                    MapPairIndex;
+
         /** 
          * @brief Build an empty matrix of value of size [colums][row].
          * 
@@ -181,6 +201,36 @@ namespace vle { namespace oov {
                                                   const std::string& port);
 
         /** 
+         * @brief Retrive the vector or column of a specific index.
+         * 
+         * @param idx the index of the vector.
+         * 
+         * @return A Vector View.
+         */
+        value::MatrixFactory::VectorView getValue(
+                        value::MatrixFactory::size_type idx);
+
+        /** 
+         * @brief Retrieve the constant vector of a couple model, port.
+         * @param model the model name.
+         * @param port the port name.
+         * @return A vector of value.
+         * @throw utils::ArgError if the model or if the port's model does not
+         * exist.
+         */
+        value::MatrixFactory::ConstVectorView getValue(
+                        const std::string& model,
+                        const std::string& port) const;
+
+        /** 
+         * @brief Retrive the constant vector or column of a specific index.
+         * @param idx the index of the vector.
+         * @return A Vector View.
+         */
+        value::MatrixFactory::ConstVectorView getValue(
+                        value::MatrixFactory::size_type idx) const;
+
+        /** 
          * @brief Return the size of a vector.
          * @return A integer.
          */
@@ -211,26 +261,15 @@ namespace vle { namespace oov {
         value::MatrixFactory::MatrixValue::index
             column(const std::string& model, const std::string& port) const;
 
-    private:
-        ///! @brief define a pair model, port names.
-        typedef std::pair < std::string, std::string > PairString;
-
         /** 
-         * @brief A functor to test the difference between two couple model,
-         * port.
-         * To use with, find, compare etc.
+         * @brief Return the index (model, port) to matrix index.
+         * 
+         * @return A constant reference to the index.
          */
-        struct pairCmp
-        {
-            inline bool
-                operator()(const PairString& ps1, const PairString& ps2) const
-                { return (ps1.first + ps1.second < ps2.first + ps2.second); }
-        };
+        inline const MapPairIndex& index() const
+        { return m_colAccess; }
 
-        ///! @brief define a dictionary model-port name to index in matrix.
-        typedef std::map < PairString,
-                value::MatrixFactory::MatrixValue::index, pairCmp > 
-                    MapPairIndex;
+    private:
 
 
         value::Matrix m_values; ///! the matrix.

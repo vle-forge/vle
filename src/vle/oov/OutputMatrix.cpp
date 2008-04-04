@@ -161,7 +161,7 @@ value::MatrixFactory::index OutputMatrix::column(const std::string& model,
 
     return jt->second;
 }
-    
+
 value::MatrixFactory::VectorView
 OutputMatrix::getValue(const std::string& model, const std::string& port)
 {
@@ -172,6 +172,38 @@ OutputMatrix::getValue(const std::string& model, const std::string& port)
             "Pair (model, port) (%1%,%2) does not exist.") % model % port);
 
     return m_values->column(it->second);
+}
+
+value::MatrixFactory::VectorView
+OutputMatrix::getValue(value::MatrixFactory::size_type idx)
+{
+    Assert(utils::ArgError, idx < m_values->columns(), boost::format(
+            "Too big index for the matrix: %1%/%2%") % idx
+        % m_values->columns());
+
+    return m_values->column(idx);
+}
+
+value::MatrixFactory::ConstVectorView
+OutputMatrix::getValue(const std::string& model, const std::string& port) const
+{
+    PairString colref(model,port);
+    MapPairIndex::const_iterator it = m_colAccess.find(colref);
+
+    Assert(utils::ArgError, it != m_colAccess.end(), boost::format(
+            "Pair (model, port) (%1%,%2) does not exist.") % model % port);
+
+    return m_values->column(it->second);
+}
+
+value::MatrixFactory::ConstVectorView
+OutputMatrix::getValue(value::MatrixFactory::size_type idx) const
+{
+    Assert(utils::ArgError, idx < m_values->columns(), boost::format(
+            "Too big index for the matrix: %1%/%2%") % idx
+        % m_values->columns());
+
+    return m_values->column(idx);
 }
 
 const OutputMatrix::StringList&
