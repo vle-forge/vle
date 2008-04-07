@@ -167,6 +167,23 @@ oov::PluginPtr NetStreamWriter::close(const devs::Time& time)
     }
 }
 
+oov::PluginPtr NetStreamWriter::refreshPlugin()
+{
+    std::string out("<trame type=\"refresh\" />");
+    try {
+        oov::PluginPtr plugin;
+        if (m_client) {
+            m_client->send_buffer(out);
+            plugin = getPlugin();
+        }
+        return plugin;
+    } catch(const std::exception& e) {
+        Throw(utils::InternalError, boost::format(
+                "NetStreamWriter refreshPlugin: OOV does not respond."
+                "Error reported: %1%") % e.what());
+    }
+}
+
 oov::PluginPtr NetStreamWriter::getPlugin() const
 {
     std::string result = m_client->recv_string();

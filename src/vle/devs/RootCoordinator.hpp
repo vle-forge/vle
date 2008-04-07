@@ -104,6 +104,12 @@ namespace vle { namespace devs {
         inline oov::OutputMatrixViewList& outputs()
         { return m_outputs; }
 
+        /** 
+         * @brief Update the output matrix of result in the RootCoordinator by
+         * getting from coordinator, all matrix of result.
+         */
+        void refreshOutputs();
+
         void setRand(Dynamics& dynamics);
 
     private:

@@ -98,4 +98,9 @@ oov::PluginPtr LocalStreamWriter::close(const devs::Time& time)
     return m_reader.plugin();
 }
 
+oov::PluginPtr LocalStreamWriter::refreshPlugin()
+{
+    return m_reader.plugin();
+}
+
 }} // namespace vle devs

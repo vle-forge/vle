@@ -100,6 +100,13 @@ namespace vle { namespace devs {
          */
         virtual oov::PluginPtr close(const devs::Time& time) = 0;
 
+        /** 
+         * @brief Refresh the output to get a oov::PluginPtr during the
+         * simulation.
+         * @return A reference to the oov::Plugin if the plugin is serializable.
+         */
+        virtual oov::PluginPtr refreshPlugin() = 0;
+
         //
         ///
         /// Get/Set functions

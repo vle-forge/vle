@@ -118,4 +118,13 @@ oov::PluginPtr View::plugin() const
     return m_plugin;
 }
 
+oov::PluginPtr View::updatePlugin()
+{
+    oov::PluginPtr out(m_stream->refreshPlugin());
+    if (out.get()) {
+        m_plugin = out;
+    }
+    return m_plugin;
+}
+
 }} // namespace vle devs

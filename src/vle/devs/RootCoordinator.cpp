@@ -113,6 +113,11 @@ void RootCoordinator::finish()
     }
 }
 
+void RootCoordinator::refreshOutputs()
+{
+    m_outputs = m_coordinator->outputs();
+}
+
 void RootCoordinator::setRand(Dynamics& dyn)
 {
     dyn.m_rand = &m_rand;

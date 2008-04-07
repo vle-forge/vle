@@ -34,6 +34,7 @@
 #include <vle/vpz/DelObservableTrame.hpp>
 #include <vle/vpz/NewObservableTrame.hpp>
 #include <vle/vpz/EndTrame.hpp>
+#include <vle/vpz/RefreshTrame.hpp>
 #include <vle/utils/Socket.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/value/String.hpp>
@@ -134,6 +135,13 @@ bool NetStreamReader::dispatch(const vpz::Trame* trame)
             onClose(*tr);
             delete tr;
             return true;
+        }
+    }
+    {
+        const vpz::RefreshTrame* tr;
+        if ((tr = dynamic_cast < const vpz::RefreshTrame* >(trame))) {
+            serializePlugin();
+            return false;
         }
     }
 

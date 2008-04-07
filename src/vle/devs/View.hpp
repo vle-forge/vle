@@ -121,14 +121,25 @@ namespace vle { namespace devs {
         inline vle::devs::StreamWriter * getStream() const
         { return m_stream; }
 
+        /** 
+         * @brief Get the current reference of the plugin.
+         * @return A reference to the plugin.
+         */
         oov::PluginPtr plugin() const;
+
+        /** 
+         * @brief Ask to the StreamWriter a new reference of the plugin and
+         * affect it to the local reference. If the plugin receive from the
+         * StreamWriter is null, then, the previous plugin is not modified.
+         * @return A reference ot the plugin.
+         */
+        oov::PluginPtr updatePlugin();
 
         struct GetOovPlugin
         {
             oov::PluginPtr operator()(const ViewList::value_type& x)
             { return x.second->plugin(); }
         };
-
 
     protected:
         ObservableList      m_observableList;

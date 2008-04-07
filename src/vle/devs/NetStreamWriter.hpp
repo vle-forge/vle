@@ -67,6 +67,8 @@ namespace vle { namespace devs {
         virtual oov::PluginPtr close(
                     const devs::Time& time);
 
+        virtual oov::PluginPtr refreshPlugin();
+
     private:
         oov::PluginPtr getPlugin() const;
 

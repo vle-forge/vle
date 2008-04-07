@@ -327,6 +327,7 @@ namespace vle { namespace devs {
 
             inline void operator()(const ViewList::value_type& x)
             {
+                x.second->updatePlugin();
                 if (x.second->plugin().get() and
                     x.second->plugin()->haveOutputMatrix()) {
                     lst.insert(

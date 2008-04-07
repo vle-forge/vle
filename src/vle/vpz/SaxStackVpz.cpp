@@ -34,6 +34,7 @@
 #include <vle/vpz/NewObservableTrame.hpp>
 #include <vle/vpz/DelObservableTrame.hpp>
 #include <vle/vpz/EndTrame.hpp>
+#include <vle/vpz/RefreshTrame.hpp>
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/utils/Socket.hpp>
@@ -650,6 +651,8 @@ void SaxStackVpz::pushTrame(const AttributeList& att)
         m_stack.push(new ValueTrame(date));
     } else if (type == "end") {
         m_stack.push(new EndTrame(date));
+    } else if (type == "refresh") {
+        m_stack.push(new RefreshTrame());
     } else {
         Throw(utils::SaxParserError, boost::format(
                 "Unknow trame named %1%") % type);
