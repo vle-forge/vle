@@ -269,15 +269,17 @@ BOOST_AUTO_TEST_CASE(test_get_port_index)
 
     BOOST_REQUIRE(top);
 
-    BOOST_REQUIRE_EQUAL(top->getInputPortList().size(), 0);
-    BOOST_REQUIRE_EQUAL(top->getOutputPortList().size(), 0);
+    BOOST_REQUIRE_EQUAL(top->getInputPortList().size(),
+                        (ConnectionList::size_type)0);
+    BOOST_REQUIRE_EQUAL(top->getOutputPortList().size(),
+                        (ConnectionList::size_type)0);
 
     AtomicModel* e = dynamic_cast < AtomicModel*> (top->getModelList()["e"]);
 
     BOOST_REQUIRE(e);
 
-    BOOST_REQUIRE_EQUAL(e->getInputPortList().size(), 2);
+    BOOST_REQUIRE_EQUAL(e->getInputPortList().size(), (ConnectionList::size_type)2);
     BOOST_REQUIRE_EQUAL(e->getInputPortIndex("in1"), 0);
     BOOST_REQUIRE_EQUAL(e->getInputPortIndex("in2"), 1);
-    BOOST_REQUIRE_EQUAL(e->getOutputPortList().size(), 0);
+    BOOST_REQUIRE_EQUAL(e->getOutputPortList().size(), (ConnectionList::size_type)0);
 }

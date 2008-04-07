@@ -25,8 +25,8 @@
 
 
 
-#ifndef VLE_MANAGER_MANAGER_HPP
-#define VLE_MANAGER_MANAGER_HPP
+#ifndef VLE_MANAGER_CLASS_MANAGER_HPP
+#define VLE_MANAGER_CLASS_MANAGER_HPP
 
 #include <string>
 #include <vector>
