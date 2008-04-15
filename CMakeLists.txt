@@ -180,6 +180,12 @@ IF(WIN32)
 ENDIF(WIN32)
 
  #
+  # Install the README
+ #
+
+INSTALL(FILES ${CMAKE_SOURCE_DIR}/README DESTINATION share/doc/${VLE_NAME_VERSION})
+
+ #
   # Generating documentation with doxygen
  #
 

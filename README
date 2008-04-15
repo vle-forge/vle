@@ -20,3 +20,26 @@ $ cd build
 $ cmake -DCMAKE_INSTALL_PREFIX=/usr/local ..
 $ make
 $ make install
+
+
+Usage
+=====
+
+VLE is a multi-modeling environment to build model, to simulate and analys
+them. To more information, see the VLE website (http://vle.univ-littoral.f
+
+- To start a simulation:
+$ vle file.vpz
+
+- To start n simulations:
+$ vle file1.vpz file2.vpz [...]
+
+- To start an experimental frame and run all simulations on the local host
+$ vle -m -l experimentalframe.vpz
+
+- To start an experimental frame and run all simulations on the local host
+  using four thread:
+$ vle -m -l -o 4 experimentalframe.vpz
+
+- To start an experimental frame and run all simulations on a grid computi
+$ vle -m experimentalframe.vpz
