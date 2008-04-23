@@ -7,6 +7,7 @@ SET(VLE_MINOR 5)
 SET(VLE_PATCH 0)
 SET(VLE_EXTRA "-rc3")
 SET(VLE_VERSION "${VLE_MAJOR}.${VLE_MINOR}.0")
+SET(VLE_SOVERSION "${VLE_MAJOR}.${VLE_MINOR}.0")
 SET(VLE_NAME "vle")
 SET(VLE_NAME_VERSION "${VLE_NAME}-${VLE_VERSION}")
 SET(VLE_COMPLETE "${VLE_MAJOR}.${VLE_MINOR}.${VLE_PATCH}${VLE_EXTRA}")
@@ -203,9 +204,8 @@ IF (WITH_DOXYGEN)
       ${CMAKE_SOURCE_DIR}/share/Doxyfile @ONLY)
 
     ADD_CUSTOM_COMMAND(
-      OUTPUT ${CMAKE_SOURCE_DIR}/share/doc/doxygen/html/index.html
-      COMMAND rm -rf ${CMAKE_SOURCE_DIR}/share/doc/doxygen
-      COMMAND mkdir ${CMAKE_SOURCE_DIR}/share/doc/doxygen
+      OUTPUT ${CMAKE_SOURCE_DIR}/share/doc/html/index.html
+      COMMAND rm -fr ${CMAKE_SOURCE_DIR}/share/doc/html
       COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_SOURCE_DIR}/share/Doxyfile
       DEPENDS ${CMAKE_SOURCE_DIR}/share/Doxyfile
       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
@@ -213,10 +213,10 @@ IF (WITH_DOXYGEN)
     ADD_CUSTOM_TARGET(
       documentation
       DEPENDS
-      ${CMAKE_SOURCE_DIR}/share/doc/doxygen/html/index.html)
+      ${CMAKE_SOURCE_DIR}/share/doc/html/index.html)
 
     IF(EXISTS ${CMAKE_SOURCE_DIR}/share/doc)
-      INSTALL(DIRECTORY ${CMAKE_SOURCE_DIR}/share/doc/doxygen/ DESTINATION
+      INSTALL(DIRECTORY ${CMAKE_SOURCE_DIR}/share/doc DESTINATION
 	"${VLE_SHARE_DIRS}/doc")
     ENDIF(EXISTS ${CMAKE_SOURCE_DIR}/share/doc)
   ENDIF(DOXYGEN_EXECUTABLE AND UNIX)
