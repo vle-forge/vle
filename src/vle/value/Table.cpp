@@ -85,16 +85,17 @@ void TableFactory::fill(const std::string& str)
                             (*it)).str()));
                 }
             }
+
             m_value[i][j] = result;
-            if (j + 1 >= m_height) {
-                j = 0;
-                if (i + 1 >= m_width) {
+            if (i + 1 >= m_width) {
+                i = 0;
+                if (j + 1 >= m_height) {
                     return;
                 } else {
-                    i++;
+                    j++;
                 }
             } else {
-                j++;
+                i++;
             }
         }
     }
@@ -104,8 +105,8 @@ std::string TableFactory::toFile() const
 {
     std::string s;
 
-    for (index i = 0; i < m_width; ++i) {
-        for (index j = 0; j < m_height; ++j) {
+    for (index j = 0; j < m_height; ++j) {
+        for (index i = 0; i < m_width; ++i) {
 	    s += boost::lexical_cast < std::string >(m_value[i][j]);
             s += " ";
         }
@@ -118,13 +119,19 @@ std::string TableFactory::toString() const
 {
     std::string s = "(";
     
-    for (index i = 0; i < m_width; ++i) {
+    for (index j = 0; j < m_height; ++j) {
         s += "(";
-        for (index j = 0; j < m_height; ++j) {
-	    s += boost::lexical_cast < std::string >(m_value[i][j]);
-            s += ",";
+        for (index i = 0; i < m_width; ++i) {
+            s += boost::lexical_cast < std::string >(m_value[i][j]);
+            if (i + 1 < m_width) {
+                s += ",";
+            }
         }
-        s += ")";
+        if (j + 1 < m_height) {
+            s += "),";
+        } else {
+            s += ")";
+        }
     }
     s += ")";
     return s;
@@ -132,10 +139,10 @@ std::string TableFactory::toString() const
 
 std::string TableFactory::toXML() const
 {
-    std::string s = (boost::format("<table width=\"%1%1\" heigth=\"%2%\">") %
+    std::string s = (boost::format("<table width=\"%1%\" height=\"%2%\">") %
                      m_width % m_height).str();
-    for (index i = 0; i < m_width; ++i) {
-        for (index j = 0; j < m_height; ++j) {
+    for (index j = 0; j < m_height; ++j) {
+        for (index i = 0; i < m_width; ++i) {
 	    s += boost::lexical_cast < std::string >(m_value[i][j]);
             s += " ";
         }

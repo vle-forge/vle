@@ -230,11 +230,26 @@ BOOST_AUTO_TEST_CASE(value_table)
     BOOST_REQUIRE_EQUAL(v->width(), (value::TableFactory::index)2);
     BOOST_REQUIRE_EQUAL(v->height(), (value::TableFactory::index)3);
     BOOST_CHECK_CLOSE(v->get(0, 0), 1.0, 0.1);
-    BOOST_CHECK_CLOSE(v->get(0, 1), 2.0, 0.1);
-    BOOST_CHECK_CLOSE(v->get(0, 2), 3.0, 0.1);
-    BOOST_CHECK_CLOSE(v->get(1, 0), 4.0, 0.1);
-    BOOST_CHECK_CLOSE(v->get(1, 1), 5.0, 0.1);
+    BOOST_CHECK_CLOSE(v->get(0, 1), 3.0, 0.1);
+    BOOST_CHECK_CLOSE(v->get(0, 2), 5.0, 0.1);
+    BOOST_CHECK_CLOSE(v->get(1, 0), 2.0, 0.1);
+    BOOST_CHECK_CLOSE(v->get(1, 1), 4.0, 0.1);
     BOOST_CHECK_CLOSE(v->get(1, 2), 6.0, 0.1);
+
+    BOOST_REQUIRE_EQUAL(v->toString(), "((1,2),(3,4),(5,6))");
+
+    std::string result("<?xml version=\"1.0\"?>\n");
+    result += v->toXML();
+    value::Table w;
+    w = value::toTableValue(vpz::Vpz::parseValue(result));
+    BOOST_REQUIRE_EQUAL(w->width(), (value::TableFactory::index)2);
+    BOOST_REQUIRE_EQUAL(w->height(), (value::TableFactory::index)3);
+    BOOST_CHECK_CLOSE(w->get(0, 0), 1.0, 0.1);
+    BOOST_CHECK_CLOSE(w->get(0, 1), 3.0, 0.1);
+    BOOST_CHECK_CLOSE(w->get(0, 2), 5.0, 0.1);
+    BOOST_CHECK_CLOSE(w->get(1, 0), 2.0, 0.1);
+    BOOST_CHECK_CLOSE(w->get(1, 1), 4.0, 0.1);
+    BOOST_CHECK_CLOSE(w->get(1, 2), 6.0, 0.1);
 }
 
 BOOST_AUTO_TEST_CASE(value_xml)
