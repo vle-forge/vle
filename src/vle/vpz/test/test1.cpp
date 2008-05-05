@@ -267,11 +267,14 @@ BOOST_AUTO_TEST_CASE(value_xml)
 BOOST_AUTO_TEST_CASE(value_matrix)
 {
     const char* t1 = "<?xml version=\"1.0\"?>\n"
-        "<matrix rows=\"1\" columns=\"3\" columnmax=\"15\" "
+        "<matrix rows=\"3\" columns=\"2\" columnmax=\"15\" "
         "        rowmax=\"25\" columnstep=\"100\" rowstep=\"200\" >"
         "<integer>1</integer>"
         "<integer>2</integer>"
         "<integer>3</integer>"
+        "<integer>4</integer>"
+        "<integer>5</integer>"
+        "<integer>6</integer>"
         "</matrix>";
 
     value::Value v = vpz::Vpz::parseValue(t1);
@@ -280,16 +283,46 @@ BOOST_AUTO_TEST_CASE(value_matrix)
     value::Matrix m = value::toMatrixValue(v);
     value::MatrixFactory::MatrixView mv = value::toMatrix(v);
 
-    BOOST_REQUIRE_EQUAL(m->rows(), (value::MatrixFactory::size_type)1);
-    BOOST_REQUIRE_EQUAL(m->columns(), (value::MatrixFactory::size_type)3);
+    BOOST_REQUIRE_EQUAL(m->rows(), (value::MatrixFactory::size_type)3);
+    BOOST_REQUIRE_EQUAL(m->columns(), (value::MatrixFactory::size_type)2);
 
     BOOST_REQUIRE_EQUAL(mv[0][0]->isInteger(), true);
+    BOOST_REQUIRE_EQUAL(mv[0][1]->isInteger(), true);
+    BOOST_REQUIRE_EQUAL(mv[0][2]->isInteger(), true);
     BOOST_REQUIRE_EQUAL(mv[1][0]->isInteger(), true);
-    BOOST_REQUIRE_EQUAL(mv[2][0]->isInteger(), true);
+    BOOST_REQUIRE_EQUAL(mv[1][1]->isInteger(), true);
+    BOOST_REQUIRE_EQUAL(mv[1][2]->isInteger(), true);
     
     BOOST_REQUIRE_EQUAL(value::toInteger(mv[0][0]), 1);
     BOOST_REQUIRE_EQUAL(value::toInteger(mv[1][0]), 2);
-    BOOST_REQUIRE_EQUAL(value::toInteger(mv[2][0]), 3);
+    BOOST_REQUIRE_EQUAL(value::toInteger(mv[0][1]), 3);
+    BOOST_REQUIRE_EQUAL(value::toInteger(mv[1][1]), 4);
+    BOOST_REQUIRE_EQUAL(value::toInteger(mv[0][2]), 5);
+    BOOST_REQUIRE_EQUAL(value::toInteger(mv[1][2]), 6);
+
+    std::string result("<?xml version=\"1.0\"?>\n");
+    result += v->toXML();
+    value::Value v2 = vpz::Vpz::parseValue(result);
+    BOOST_REQUIRE_EQUAL(v2->isMatrix(), true);
+    value::Matrix m2 = value::toMatrixValue(v2);
+    value::MatrixFactory::MatrixView mv2 = value::toMatrix(v2);
+
+    BOOST_REQUIRE_EQUAL(m2->rows(), (value::MatrixFactory::size_type)3);
+    BOOST_REQUIRE_EQUAL(m2->columns(), (value::MatrixFactory::size_type)2);
+
+    BOOST_REQUIRE_EQUAL(mv2[0][0]->isInteger(), true);
+    BOOST_REQUIRE_EQUAL(mv2[0][1]->isInteger(), true);
+    BOOST_REQUIRE_EQUAL(mv2[0][2]->isInteger(), true);
+    BOOST_REQUIRE_EQUAL(mv2[1][0]->isInteger(), true);
+    BOOST_REQUIRE_EQUAL(mv2[1][1]->isInteger(), true);
+    BOOST_REQUIRE_EQUAL(mv2[1][2]->isInteger(), true);
+
+    BOOST_REQUIRE_EQUAL(value::toInteger(mv2[0][0]), 1);
+    BOOST_REQUIRE_EQUAL(value::toInteger(mv2[1][0]), 2);
+    BOOST_REQUIRE_EQUAL(value::toInteger(mv2[0][1]), 3);
+    BOOST_REQUIRE_EQUAL(value::toInteger(mv2[1][1]), 4);
+    BOOST_REQUIRE_EQUAL(value::toInteger(mv2[0][2]), 5);
+    BOOST_REQUIRE_EQUAL(value::toInteger(mv2[1][2]), 6);
 }
 
 

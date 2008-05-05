@@ -65,8 +65,8 @@ std::string MatrixFactory::toFile() const
 {
     std::ostringstream o;
 
-    for (MatrixValue::size_type i = 0; i < m_nbcol; ++i) {
-        for (MatrixValue::size_type j = 0; j < m_nbrow; ++j) {
+    for (MatrixValue::size_type j = 0; j < m_nbrow; ++j) {
+        for (MatrixValue::size_type i = 0; i < m_nbcol; ++i) {
             if (m_matrix[i][j].get()) {
                 o << m_matrix[i][j]->toFile();
             } else {
@@ -86,8 +86,8 @@ std::string MatrixFactory::toString() const
 {
     std::ostringstream o;
 
-    for (MatrixValue::size_type i = 0; i < m_nbcol; ++i) {
-        for (MatrixValue::size_type j = 0; j < m_nbrow; ++j) {
+    for (MatrixValue::size_type j = 0; j < m_nbrow; ++j) {
+        for (MatrixValue::size_type i = 0; i < m_nbcol; ++i) {
             if (m_matrix[i][j].get()) {
                 o << m_matrix[i][j]->toString();
             } else {
@@ -97,9 +97,6 @@ std::string MatrixFactory::toString() const
         }
         o << "\n";
     }
-
-    o << "]";
-
     return o.str();
 }
 
@@ -115,8 +112,8 @@ std::string MatrixFactory::toXML() const
         << "columnstep=\"" << m_stepcol << "\" "
         << "rowstep=\"" << m_steprow << "\" >";
 
-    for (MatrixValue::size_type i = 0; i < m_nbcol; ++i) {
-        for (MatrixValue::size_type j = 0; j < m_nbrow; ++j) {
+    for (MatrixValue::size_type j = 0; j < m_nbrow; ++j) {
+        for (MatrixValue::size_type i = 0; i < m_nbcol; ++i) {
             if (m_matrix[i][j].get()) {
                 o << m_matrix[i][j]->toXML();
             } else {
