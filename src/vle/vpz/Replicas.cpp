@@ -38,10 +38,12 @@ Replicas::Replicas() :
 
 void Replicas::write(std::ostream& out) const
 {
-    out << "<replicas"
-        << " seed=\"" << m_seed << "\""
-        << " number=\"" << m_number << "\""
-        << " />\n";
+    if (m_seed) {
+        out << "<replicas"
+            << " seed=\"" << m_seed << "\""
+            << " number=\"" << m_number << "\""
+            << " />\n";
+    }
 }
 
 void Replicas::setNumber(const size_t number)
