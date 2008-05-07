@@ -123,7 +123,7 @@ void IntCurve::add(double date, int value)
     m_valueList.push_back(std::pair<double,int>(date, value));
 }
 
-const int IntCurve::get_last_value()
+int IntCurve::get_last_value()
 {
     if (m_valueList.size() == 0)
         return 0;
@@ -134,7 +134,7 @@ const int IntCurve::get_last_value()
 /********************************************************************************************/
 /* retourne la valeur minimum et maximum de la courbe sur les number_value derniere valeur */
 /********************************************************************************************/		
-const void IntCurve::get_min_max_value(int number_value, int & min, int & max, Parameter & m_parameter)
+void IntCurve::get_min_max_value(int number_value, int & min, int & max, Parameter & m_parameter)
 {
     min = get_min_value(number_value, m_parameter);
     max = get_max_value(number_value, m_parameter);
@@ -144,7 +144,7 @@ const void IntCurve::get_min_max_value(int number_value, int & min, int & max, P
 /* retourne la valeur minimum de la courbe sur les number_value derniere valeur */
 /* en fonction du dernier index affich�                                         */
 /********************************************************************************/		
-const int IntCurve::get_min_value(int number_value, Parameter & m_parameter)
+int IntCurve::get_min_value(int number_value, Parameter & m_parameter)
 {
     int index_data_end = m_parameter.get_max_draw_index(); // index de fin de recherche
     int vector_size = m_valueList.size();
@@ -170,7 +170,7 @@ const int IntCurve::get_min_value(int number_value, Parameter & m_parameter)
 /********************************************************************************/
 /* retourne la valeur maximum de la courbe sur les number_value derniere valeur */
 /********************************************************************************/		
-const int IntCurve::get_max_value(int number_value, Parameter & m_parameter)
+int IntCurve::get_max_value(int number_value, Parameter & m_parameter)
 {
     int index_data_end = m_parameter.get_max_draw_index(); // index de fin de recherche
     int vector_size = m_valueList.size();
@@ -197,7 +197,7 @@ const int IntCurve::get_max_value(int number_value, Parameter & m_parameter)
 /*********************************************/
 /* retourne le nombre de valeur de la courbe */
 /*********************************************/
-const int IntCurve::get_number_value()
+int IntCurve::get_number_value()
 {
     return m_valueList.size();
 }
@@ -205,7 +205,7 @@ const int IntCurve::get_number_value()
 /**************************/
 /* retourne la nieme date */
 /**************************/		
-const double IntCurve::get_date(int index)
+double IntCurve::get_date(int index)
 {
     return m_valueList.at(index).first;
 }
@@ -213,7 +213,7 @@ const double IntCurve::get_date(int index)
 /****************************/
 /* retourne la nieme valeur */
 /****************************/		
-const int IntCurve::get_value(int index)
+int IntCurve::get_value(int index)
 {
     return m_valueList.at(index).second;
 }
@@ -222,7 +222,7 @@ const int IntCurve::get_value(int index)
 /* retourne la valeur minimum et maximum de la courbe sur les number_value */
 /* précédente valeur l'indice passé en parametre                            */
 /****************************************************************************/
-const void IntCurve::get_min_max_value_prec_index(int indice, int number_value, int & min, int & max)
+void IntCurve::get_min_max_value_prec_index(int indice, int number_value, int & min, int & max)
 {
     min = get_min_value_prec_index(indice, number_value);
     max = get_max_value_prec_index(indice, number_value);
@@ -233,7 +233,7 @@ const void IntCurve::get_min_max_value_prec_index(int indice, int number_value, 
 /* retourne la valeur minimum de la courbe sur les number_value */
 /* précédente valeur l'indice passé en parametre             */
 /****************************************************************/
-const int IntCurve::get_min_value_prec_index(int indice, int number_value)
+int IntCurve::get_min_value_prec_index(int indice, int number_value)
 {
     int nb_inc = 0; // nbre de fois qu'il faut incrementer l'iterateur de debut
     std::vector < std::pair < double, int > > :: const_iterator it_deb, it_end, it_min;
@@ -255,7 +255,7 @@ const int IntCurve::get_min_value_prec_index(int indice, int number_value)
 /* retourne la valeur maximum de la courbe sur les number_value */
 /* précédente valeur l'indice passé en parametre             */
 /****************************************************************/
-const int IntCurve::get_max_value_prec_index(int indice, int number_value)
+int IntCurve::get_max_value_prec_index(int indice, int number_value)
 {
     int nb_inc = 0; // nbre de fois qu'il faut incrementer l'iterateur de debut
     std::vector < std::pair < double, int > > :: const_iterator it_deb, it_end, it_max;

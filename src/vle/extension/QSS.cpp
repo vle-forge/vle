@@ -203,7 +203,7 @@ void qss::externalTransition(const ExternalEventList& event,
 
             mExternalVariableIndex[name] = index;
             mExternalVariableValue[index] = value;
-            if (mIsGradient[index] = (*it)->existAttributeValue("gradient")) {
+            if ((mIsGradient[index] = (*it)->existAttributeValue("gradient"))) {
                 mExternalVariableGradient[index] = (*it)->getDoubleAttributeValue("gradient");
                 ++linear;
             }

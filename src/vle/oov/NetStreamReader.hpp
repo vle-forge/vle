@@ -59,7 +59,7 @@ namespace vle { namespace oov {
          * server.
          * @return the port number [0 and 65535].
          */
-        inline const int port() const;
+        inline int port() const;
 
         /** 
          * @brief Affect a new size to the buffer.
@@ -93,7 +93,7 @@ namespace vle { namespace oov {
         void serializePlugin();
     };
 
-    inline const int NetStreamReader::port() const
+    inline int NetStreamReader::port() const
     { return m_port; }
     
     inline size_t NetStreamReader::bufferSize() const

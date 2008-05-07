@@ -155,7 +155,7 @@ namespace vle { namespace utils {
         inline double get_double_range_excluded(double begin, double end)
         {
             double random;
-            while (begin == (random = get_double_range(begin, end)));
+            while (begin == (random = get_double_range(begin, end))) {}
             return random;
         }
 
@@ -168,7 +168,7 @@ namespace vle { namespace utils {
         inline gint32 get_int_range_excluded(gint32 begin, gint32 end)
         {
             gint32 random;
-            while (begin == (random = get_int_range(begin, end)));
+            while (begin == (random = get_int_range(begin, end))) {}
             return random;
         }
 

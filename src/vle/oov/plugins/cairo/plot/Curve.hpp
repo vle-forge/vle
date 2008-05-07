@@ -67,11 +67,11 @@ public :
     
     virtual bool is_double() { return false; }
     
-    virtual const int get_number_value() = 0;
+    virtual int get_number_value() = 0;
     
-    virtual const double get_date(int index) = 0;
+    virtual double get_date(int index) = 0;
     
-    virtual const int get_size() = 0;
+    virtual int get_size() = 0;
 };
 	    
 }}} // namespace vle oov plugin

@@ -58,27 +58,27 @@ public :
     
     bool is_double() { return true; }
     
-    const int get_size() { return m_valueList.size(); }
+    int get_size() { return m_valueList.size(); }
     
-    const void get_min_max_value(int number_value, double & min, double &
+    void get_min_max_value(int number_value, double & min, double &
 				 max, Parameter & m_parameter);
     
-    const double get_min_value(int number_value, Parameter & m_parameter);
+    double get_min_value(int number_value, Parameter & m_parameter);
     
-    const double get_max_value(int number_value, Parameter & m_parameter);
+    double get_max_value(int number_value, Parameter & m_parameter);
     
-    const int get_number_value();
+    int get_number_value();
     
-    const double get_date(int index);
+    double get_date(int index);
     
-    const double get_value(int index);
+    double get_value(int index);
     
-    const void get_min_max_value_prec_index(int indice, int number_value,
+    void get_min_max_value_prec_index(int indice, int number_value,
 					    double & min, double & max);
     
-    const double get_min_value_prec_index(int indice, int number_value);
+    double get_min_value_prec_index(int indice, int number_value);
     
-    const double get_max_value_prec_index(int indice, int number_value);
+    double get_max_value_prec_index(int indice, int number_value);
     
 };
 	    

@@ -155,7 +155,7 @@ void Parameter::set_screen_size(int width, int height)
 /************************************/
 /* retourne la taille de la fenetre */
 /************************************/
-const void Parameter::get_screen_size(int & width, int & height)
+void Parameter::get_screen_size(int & width, int & height)
 {
     width = m_screen_width;
     height = m_screen_height;
@@ -180,7 +180,7 @@ void Parameter::set_drawing_area_size(int width, int height)
 /**************************************/
 /* retourne la taille du drawing_area */
 /**************************************/
-const void Parameter::get_drawing_area_size(int & width, int & height)
+void Parameter::get_drawing_area_size(int & width, int & height)
 {
     width = m_da_width;
     height = m_da_height;
@@ -197,7 +197,7 @@ void Parameter::set_shift_left(int value)
 /*****************************************************************/
 /* retourne la largeur necessaire a dessiner l'axe des ordonnées */
 /*****************************************************************/
-const int Parameter::get_shift_left()
+int Parameter::get_shift_left()
 {
     return m_shift_left;
 }
@@ -213,7 +213,7 @@ void Parameter::set_shift_right(int value)
 /***********************************************************/
 /* retourne la largeur necessaire a droite pour rien faire */
 /***********************************************************/
-const int Parameter::get_shift_right()
+int Parameter::get_shift_right()
 {
     return m_shift_right;
 }
@@ -229,7 +229,7 @@ void Parameter::set_shift_top(int value)
 /*************************************************/
 /* retourne la hauteur necessaire pour la vision */
 /*************************************************/
-const int Parameter::get_shift_top()
+int Parameter::get_shift_top()
 {
     return m_shift_top;
 }
@@ -245,7 +245,7 @@ void Parameter::set_shift_bottom(int value)
 /*****************************************************************************/
 /* retourne la hauteur necessaire a dessiner les text de l'axe des abscisse */
 /*****************************************************************************/
-const int Parameter::get_shift_bottom()
+int Parameter::get_shift_bottom()
 {
     return m_shift_bottom;
 }
@@ -262,7 +262,7 @@ void Parameter::set_number_drawn_date(int value)
 /**************************************************/
 /* retourne le nombre de date affiché sur l'ecran */
 /**************************************************/
-const int Parameter::get_number_drawn_date()
+int Parameter::get_number_drawn_date()
 {
     return m_number_drawn_date;
 }
@@ -287,7 +287,7 @@ void Parameter::update_text_height_value()
 /*******************************************/
 /* retourne la hauteur en pixel d'un text */
 /*******************************************/
-const int Parameter::get_text_height()
+int Parameter::get_text_height()
 {
     return m_text_height;
 }
@@ -295,7 +295,7 @@ const int Parameter::get_text_height()
 /**********************************************************************/
 /* return la valeur dble correspondant a la hauteur en pixel du text */
 /**********************************************************************/
-const double Parameter::get_text_height_value()
+double Parameter::get_text_height_value()
 {
     return m_text_height_value;
 }
@@ -311,7 +311,7 @@ void Parameter::set_graph_zone_height(int value)
 /******************************************************/
 /* retourne la hauteur effective de la zone de dessin */
 /******************************************************/
-const int Parameter::get_graph_zone_height()
+int Parameter::get_graph_zone_height()
 {
     return m_graph_zone_height;
 }
@@ -327,7 +327,7 @@ void Parameter::set_graph_zone_width(int value)
 /******************************************************/
 /* retourne la largeur effective de la zone de dessin */
 /******************************************************/
-const int Parameter::get_graph_zone_width()
+int Parameter::get_graph_zone_width()
 {
     return m_graph_zone_width;
 }
@@ -343,7 +343,7 @@ void Parameter::set_min_draw_date(double value)
 /*************************************/
 /* retourne la date minimum affichée */
 /*************************************/
-const double Parameter::get_min_draw_date()
+double Parameter::get_min_draw_date()
 {
     return m_min_draw_date;
 }
@@ -359,7 +359,7 @@ void Parameter::set_max_draw_date(double value)
 /*************************************/
 /* retourne la date maximum affichée */
 /*************************************/
-const double Parameter::get_max_draw_date()
+double Parameter::get_max_draw_date()
 {
     return m_max_draw_date;
 }
@@ -384,7 +384,7 @@ void Parameter::set_max_value(double value, bool absolute)
 /****************************************/
 /* retourne la valeur maximale affichée */
 /****************************************/
-const double Parameter::get_max_value()
+double Parameter::get_max_value()
 {
     return m_max_value;
 }
@@ -409,7 +409,7 @@ void Parameter::set_min_value(double value, bool absolute)
 /****************************************/
 /* retourne la valeur minimale affichée */
 /****************************************/
-const double Parameter::get_min_value()
+double Parameter::get_min_value()
 {
     return m_min_value;
 }
@@ -425,7 +425,7 @@ void Parameter::set_scrolling(bool value)
 /************************************************/
 /* retourne la valeur du scroll : true ou false */
 /************************************************/
-const bool Parameter::get_scrolling()
+bool Parameter::get_scrolling()
 {
     return m_scrolling;
 }
@@ -450,7 +450,7 @@ void Parameter::set_min_draw_index(int index)
 /*************************************************/
 /* retourne la valeur de l'index minimum affiché */
 /*************************************************/
-const int Parameter::get_min_draw_index()
+int Parameter::get_min_draw_index()
 {
     return m_min_draw_index;
 }
@@ -466,7 +466,7 @@ void Parameter::set_max_draw_index(int index)
 /*************************************************/
 /* retourne la valeur de l'index maximum affiché */
 /*************************************************/
-const int Parameter::get_max_draw_index()
+int Parameter::get_max_draw_index()
 {
     return m_max_draw_index;
 }
@@ -484,7 +484,7 @@ void Parameter::inc_max_draw_index()
 /**************************************/
 /* return true if value < m_min_value */
 /**************************************/
-const bool Parameter::is_smaller(double value)
+bool Parameter::is_smaller(double value)
 {
     if (!m_min_already_initialized) {
         m_min_already_initialized = true;
@@ -497,7 +497,7 @@ const bool Parameter::is_smaller(double value)
 /**************************************/
 /* return true if value > m_max_value */
 /**************************************/
-const bool Parameter::is_higher(double value)
+bool Parameter::is_higher(double value)
 {
     if (!m_max_already_initialized) {
         m_max_already_initialized = true;
@@ -510,14 +510,14 @@ const bool Parameter::is_higher(double value)
 /*****************************************************************/
 /* return true if value < m_min_value pour les anciennes valeurs */
 /*****************************************************************/
-const bool Parameter::is_smaller_back(double value)
+bool Parameter::is_smaller_back(double value)
 {
     return ((value - majoration_min * fabs(value)) < m_min_value);
 }
 /*****************************************************************/
 /* return true if value > m_max_value pour les anciennes valeurs */
 /*****************************************************************/
-const bool Parameter::is_higher_back(double value)
+bool Parameter::is_higher_back(double value)
 {
     return ((value + majoration_max * fabs(value)) > m_max_value);
 }
@@ -526,7 +526,7 @@ const bool Parameter::is_higher_back(double value)
 /* return true si l'axe Y=0 est visible */
 /* false sinon                          */
 /****************************************/
-const bool Parameter::get_axe_y0_show()
+bool Parameter::get_axe_y0_show()
 {
     return m_axe_y0_show;
 }
@@ -534,7 +534,7 @@ const bool Parameter::get_axe_y0_show()
 /*************************************************/
 /* return la valeur pixel de la valeur numerique */
 /*************************************************/
-const int Parameter::to_pixel_height(double value)
+int Parameter::to_pixel_height(double value)
 {
     return round_nearest(m_shift_top + m_graph_zone_height - fabs(m_min_value - value) * m_unit_height);
 }
@@ -542,7 +542,7 @@ const int Parameter::to_pixel_height(double value)
 /*************************************************/
 /* return la valeur pixel de la valeur numerique */
 /*************************************************/
-const int Parameter::to_pixel_height(int value)
+int Parameter::to_pixel_height(int value)
 {
     return round_nearest(m_shift_bottom - fabs(m_min_value - value) * m_unit_height);
 }
@@ -551,7 +551,7 @@ const int Parameter::to_pixel_height(int value)
 /* return la valeur pixel de la valeur numerique */
 /* sert pour les dates                           */
 /*************************************************/
-const int Parameter::to_pixel_width(double date)
+int Parameter::to_pixel_width(double date)
 {
     return round_nearest(m_shift_left + (date - m_min_draw_date) * m_unit_width);
 }
@@ -560,7 +560,7 @@ const int Parameter::to_pixel_width(double date)
 /* return la valeur pixel de l'axe y=0 ou dans le cas  */
 /* ech�ant la valeur minimal si l'axe y=0 n'existe pas */
 /*******************************************************/
-const int Parameter::get_height_bottom_axe()
+int Parameter::get_height_bottom_axe()
 {
     if(m_axe_y0_show)
         return to_pixel_height(0.0f);
@@ -571,7 +571,7 @@ const int Parameter::get_height_bottom_axe()
 /***************************************************************/
 /* retourne la valeur minimale affichée mais ss la majoration */
 /***************************************************************/
-const double Parameter::get_min_back_value()
+double Parameter::get_min_back_value()
 {
     return m_min_value_not_increase;
 }
@@ -579,7 +579,7 @@ const double Parameter::get_min_back_value()
 /***************************************************************/
 /* retourne la valeur maximale affichée mais ss la majoration */
 /***************************************************************/
-const double Parameter::get_max_back_value()
+double Parameter::get_max_back_value()
 {
     return m_max_value_not_increase;
 
@@ -588,7 +588,7 @@ const double Parameter::get_max_back_value()
 /************************************************************/
 /* retourne la date equivalente au pixel pass� en parametre */
 /************************************************************/
-const double Parameter::pixel_to_date(int pixel)
+double Parameter::pixel_to_date(int pixel)
 {
     return (m_min_draw_date + (pixel - m_shift_left) / m_unit_width);
 }
@@ -596,7 +596,7 @@ const double Parameter::pixel_to_date(int pixel)
 /**************************************************************/
 /* retourne la valeur equivalente au pixel pass� en parametre */
 /**************************************************************/
-const double Parameter::pixel_to_value_height(int pixel)
+double Parameter::pixel_to_value_height(int pixel)
 {
     return ((m_shift_bottom - pixel) / m_unit_height + m_min_value);
 }
@@ -605,7 +605,7 @@ const double Parameter::pixel_to_value_height(int pixel)
 /************************************************************/
 /* retourne la valeur pixel de l'axe y=0 --> m_shift_bottom */
 /************************************************************/
-const int Parameter::get_y0_axe()
+int Parameter::get_y0_axe()
 {
     return m_y0;
 }
@@ -630,7 +630,7 @@ void Parameter::update_m_y0()
 /* en parametre est comprise         */
 /* entre le min et le max            */
 /*************************************/
-const bool Parameter::is_inside_min_max(double value)
+bool Parameter::is_inside_min_max(double value)
 {
     return (value >= m_min_value && value <= m_max_value);
 }

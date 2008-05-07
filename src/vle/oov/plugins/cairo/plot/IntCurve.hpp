@@ -64,33 +64,33 @@ public :
     void draw(Cairo::RefPtr < Cairo::Context > ctx, Parameter & m_parameter, 
 	      std::list < IntCurve * > m_list);
     
-    const int get_last_value();
+    int get_last_value();
     
     bool is_integer() { return true; }
     
-    const int get_size() { return m_valueList.size(); }
+    int get_size() { return m_valueList.size(); }
     
-    const void get_min_max_value(int number_value, int & min, int & max,
+    void get_min_max_value(int number_value, int & min, int & max,
 				 Parameter & m_parameter);
     
-    const int get_min_value(int number_value, 
+    int get_min_value(int number_value, 
 			    Parameter & m_parameter);
     
-    const int get_max_value(int number_value, 
+    int get_max_value(int number_value, 
 			    Parameter & m_parameter);
     
-    const int get_number_value();
+    int get_number_value();
     
-    const double get_date(int index);
+    double get_date(int index);
     
-    const int get_value(int index);
+    int get_value(int index);
     
-    const void get_min_max_value_prec_index(int indice, int number_value,
+    void get_min_max_value_prec_index(int indice, int number_value,
 					    int & min, int & max);
     
-    const int get_min_value_prec_index(int indice, int number_value);
+    int get_min_value_prec_index(int indice, int number_value);
     
-    const int get_max_value_prec_index(int indice, int number_value);
+    int get_max_value_prec_index(int indice, int number_value);
     
 private :
     std::vector < std::pair < double, int > > m_valueList;

@@ -116,7 +116,7 @@ double RealCurve::get_last_value() const
 /********************************************************************************************/
 /* retourne la valeur minimum et maximum de la courbe sur les number_value derniere valeur */
 /********************************************************************************************/		
-const void RealCurve::get_min_max_value(int number_value, double & min, double & max, Parameter & m_parameter)
+void RealCurve::get_min_max_value(int number_value, double & min, double & max, Parameter & m_parameter)
 {
     min = get_min_value(number_value, m_parameter);
     max = get_max_value(number_value, m_parameter);
@@ -125,7 +125,7 @@ const void RealCurve::get_min_max_value(int number_value, double & min, double &
 /********************************************************************************/
 /* retourne la valeur minimum de la courbe sur les number_value derniere valeur */
 /********************************************************************************/		
-const double RealCurve::get_min_value(int number_value, Parameter & m_parameter)
+double RealCurve::get_min_value(int number_value, Parameter & m_parameter)
 {
     int index_data_end = m_parameter.get_max_draw_index(); // index de fin de recherche
     int vector_size = m_valueList.size();
@@ -151,7 +151,7 @@ const double RealCurve::get_min_value(int number_value, Parameter & m_parameter)
 /********************************************************************************/
 /* retourne la valeur maximum de la courbe sur les number_value derniere valeur */
 /********************************************************************************/		
-const double RealCurve::get_max_value(int number_value, Parameter & m_parameter)
+double RealCurve::get_max_value(int number_value, Parameter & m_parameter)
 {
     int index_data_end = m_parameter.get_max_draw_index(); // index de fin de recherche
     int vector_size = m_valueList.size();
@@ -178,7 +178,7 @@ const double RealCurve::get_max_value(int number_value, Parameter & m_parameter)
 /*********************************************/
 /* retourne le nombre de valeur de la courbe */
 /*********************************************/
-const int RealCurve::get_number_value()
+int RealCurve::get_number_value()
 {
     return m_valueList.size();
 }
@@ -186,7 +186,7 @@ const int RealCurve::get_number_value()
 /**************************/
 /* retourne la nieme date */
 /**************************/		
-const double RealCurve::get_date(int index)
+double RealCurve::get_date(int index)
 {
     return m_valueList.at(index).first;
 }
@@ -194,7 +194,7 @@ const double RealCurve::get_date(int index)
 /****************************/
 /* retourne la nieme valeur */
 /****************************/		
-const double RealCurve::get_value(int index)
+double RealCurve::get_value(int index)
 {
     return m_valueList.at(index).second;
 }
@@ -203,7 +203,7 @@ const double RealCurve::get_value(int index)
 /* retourne la valeur minimum et maximum de la courbe sur les number_value */
 /* précédente valeur l'indice passé en parametre                            */
 /****************************************************************************/
-const void RealCurve::get_min_max_value_prec_index(int indice, int number_value, double & min, double & max)
+void RealCurve::get_min_max_value_prec_index(int indice, int number_value, double & min, double & max)
 {
     min = get_min_value_prec_index(indice, number_value);
     max = get_min_value_prec_index(indice, number_value);
@@ -213,7 +213,7 @@ const void RealCurve::get_min_max_value_prec_index(int indice, int number_value,
 /* retourne la valeur minimum de la courbe sur les number_value */
 /* précédente valeur l'indice passé en parametre             */
 /****************************************************************/
-const double RealCurve::get_min_value_prec_index(int indice, int number_value)
+double RealCurve::get_min_value_prec_index(int indice, int number_value)
 {
     int nb_inc = 0; // nbre de fois qu'il faut incrementer l'iterateur de debut
     std::vector < std::pair < double, double > > :: const_iterator it_deb, it_end, it_min;
@@ -235,7 +235,7 @@ const double RealCurve::get_min_value_prec_index(int indice, int number_value)
 /* retourne la valeur maximum de la courbe sur les number_value */
 /* précédente valeur l'indice passé en parametre             */
 /****************************************************************/
-const double RealCurve::get_max_value_prec_index(int indice, int number_value)
+double RealCurve::get_max_value_prec_index(int indice, int number_value)
 {
     int nb_inc = 0; // nbre de fois qu'il faut incrementer l'iterateur de debut
     std::vector < std::pair < double, double > > :: const_iterator it_deb, it_end, it_max;

@@ -49,7 +49,7 @@ void RunVerbose::operator()(vpz::Vpz* vpz)
         m_out << "ok\n";
 
         m_out << " - Simulation run................: ";
-        while (m_root.run());
+        while (m_root.run()) {}
         m_out << "ok\n";
 
         m_out << " - Coordinator cleaning .........: ";
@@ -90,7 +90,7 @@ void RunVerbose::operator()(const std::string& filename)
         m_out << "ok\n";
 
         m_out << " - Simulation run................: ";
-        while (m_root.run());
+        while (m_root.run()) {}
         m_out << "ok\n";
 
         m_out << " - Coordinator cleaning .........: ";
@@ -129,7 +129,7 @@ void RunVerbose::operator()(const vpz::Vpz& vpz)
         m_out << "ok\n";
 
         m_out << " - Simulation run................: ";
-        while (m_root.run());
+        while (m_root.run()) {}
         m_out << "ok\n";
 
         m_out << " - Coordinator cleaning .........: ";
@@ -156,7 +156,7 @@ void RunQuiet::operator()(vpz::Vpz* vpz)
         delete vpz;
 
         m_root.init();
-        while (m_root.run());
+        while (m_root.run()) {}
         m_root.finish();
     } catch(const std::exception& e) {
         m_stringerror.assign(boost::str(boost::format(
@@ -179,7 +179,7 @@ void RunQuiet::operator()(const std::string& filename)
         }
 
         m_root.init();
-        while (m_root.run());
+        while (m_root.run()) {}
         m_root.finish();
     } catch(const std::exception& e) {
         m_stringerror.assign(boost::str(boost::format(
@@ -202,7 +202,7 @@ void RunQuiet::operator()(const vpz::Vpz& vpz)
         }
 
         m_root.init();
-        while (m_root.run());
+        while (m_root.run()) {}
         m_root.finish();
     } catch(const std::exception& e) {
         m_stringerror.assign(boost::str(boost::format(
