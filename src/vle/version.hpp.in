@@ -1,0 +1,49 @@
+/**
+ * @file src/vle/version.hpp
+ * @author The VLE Development Team
+ */
+
+/*
+ * VLE Environment - the multimodeling and simulation environment
+ * This file is a part of the VLE environment (http://vle.univ-littoral.fr)
+ * Copyright (C) 2003 - 2008 The VLE Development Team
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+
+
+#ifndef VLE_MAIN_VERSION_HPP
+#define VLE_MAIN_VERSION_HPP
+
+/* compile time version */
+#define VLE_MAJOR_VERSION   (@VLE_MAJOR@)
+#define VLE_MINOR_VERSION   (@VLE_MINOR@)
+#define VLE_PATCH_VERSION   (@VLE_PATCH@)
+#define VLE_EXTRA_VERSION   ("@VLE_EXTRA@")
+#define VLE_NAME_COMPLETE   ("@VLE_NAME_COMPLETE@")
+
+/** 
+ * @brief Check whether a VLE version equal to or greather than major.mino.patch
+ * is present.
+ */
+#define VLE_CHECK_VERSION(major, minor, patch) \
+    (VLE_MAJOR_VERSION > (major) || \
+     (VLE_MAJOR_VERSION == (major) && VLE_MINOR_VERSION > (minor)) || \
+     (VLE_MAJOR_VERSION == (major) && VLE_MINOR_VERSION == (minor) && \
+     VLE_PATCH_VERSION >= (patch)))
+
+#endif
+
