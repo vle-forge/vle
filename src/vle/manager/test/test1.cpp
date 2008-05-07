@@ -37,6 +37,7 @@
 #include <stdexcept>
 #include <vle/manager.hpp>
 #include <vle/vpz.hpp>
+#include <vle/value.hpp>
 #include <vle/utils.hpp>
 
 using namespace vle;
@@ -49,4 +50,27 @@ BOOST_AUTO_TEST_CASE(trylaunch)
             "examples", "unittest.vpz"));
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
+}
+
+BOOST_AUTO_TEST_CASE(build_experimental_frames)
+{
+    vpz::Vpz file(utils::Path::buildPrefixSharePath(
+            utils::Path::path().getPrefixDir(),
+            "examples", "unittest.vpz"));
+
+    file.project().experiment().replicas().setSeed(123);
+    file.project().experiment().replicas().setNumber(4);
+
+    vpz::Conditions& cnds(file.project().experiment().conditions());
+    cnds.get("ca").addValueToPort("x", value::DoubleFactory::create(1.0));
+    cnds.get("ca").addValueToPort("x", value::DoubleFactory::create(2.0));
+
+    manager::ManagerRunMono r(std::cout, false);
+    r.start(file);
+
+    const manager::OutputSimulationMatrix& out(r.outputSimulationMatrix());
+    BOOST_REQUIRE_EQUAL(out.shape()[0],
+                        (manager::OutputSimulationMatrix::size_type)4);
+    BOOST_REQUIRE_EQUAL(out.shape()[1],
+                        (manager::OutputSimulationMatrix::size_type)3);
 }
