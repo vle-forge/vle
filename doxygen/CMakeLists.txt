@@ -3,13 +3,13 @@ SET(DOXYGEN_OUTPUT_DIR ${VLE_BINARY_DIR}/doxygen)
 CONFIGURE_FILE(doxygen.conf.in ${VLE_BINARY_DIR}/doxygen.conf)
 
 ADD_CUSTOM_COMMAND(
-  OUTPUT ${VLE_BINARY_DIR}/doxygen/html
+  OUTPUT ${VLE_BINARY_DIR}/doxygen/html/index.html
   DEPENDS ${VLE_BINARY_DIR}/doxygen.conf
   COMMAND ${DOXYGEN}
   ARGS ${VLE_BINARY_DIR}/doxygen.conf)
 
 ADD_CUSTOM_TARGET(doc ALL DEPENDS ${VLE_BINARY_DIR}/doxygen.conf
-  ${VLE_BINARY_DIR}/doxygen/html VERBATIM)
+  ${VLE_BINARY_DIR}/doxygen/html/index.html VERBATIM)
 
 FILE(MAKE_DIRECTORY ${VLE_BINARY_DIR}/doxygen/html)
 
