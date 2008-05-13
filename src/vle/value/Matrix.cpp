@@ -234,7 +234,11 @@ MatrixFactory::MatrixFactory(const MatrixFactory& m) :
 {
     for (MatrixValue::size_type i = 0; i < m_nbcol; ++i) {
         for (MatrixValue::size_type j = 0; j < m_nbrow; ++j) {
-            m_matrix[i][j] = m_matrix[i][j]->clone();
+            if( m_matrix[i][j].get() != 0) {
+                m_matrix[i][j] = m_matrix[i][j]->clone();
+            } else {
+                m_matrix[i][j] = Value();
+            }
         }
     }
 }
