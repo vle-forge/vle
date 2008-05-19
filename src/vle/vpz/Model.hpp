@@ -56,6 +56,12 @@ namespace vle { namespace vpz {
         inline const std::string& observables() const
         { return m_observables; }
 
+        inline void setConditions(const StringVector& vect)
+        { m_conditions = vect; }
+
+        inline void setDynamics(const std::string& str)
+        { m_dynamics = str; }
+
         inline void setObservables(const std::string& str)
         { m_observables = str; }
 
