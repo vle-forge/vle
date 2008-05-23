@@ -51,7 +51,7 @@ namespace vle { namespace unittest {
         
         virtual devs::Time timeAdvance() const
         {
-            return devs::Time::infinity;
+            return 1.0;
         }
 
         virtual void internalTransition(const devs::Time& /* time */)
@@ -72,6 +72,11 @@ namespace vle { namespace unittest {
             for (int i = 0; i < m_counter; ++i) {
                 output.addEvent(buildEvent("out"));
             }
+        }
+
+        virtual value::Value observation(const devs::ObservationEvent&) const
+        {
+            return value::IntegerFactory::create(m_counter);
         }
 
     private:

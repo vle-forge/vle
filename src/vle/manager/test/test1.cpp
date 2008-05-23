@@ -65,12 +65,38 @@ BOOST_AUTO_TEST_CASE(build_experimental_frames)
     cnds.get("ca").addValueToPort("x", value::DoubleFactory::create(1.0));
     cnds.get("ca").addValueToPort("x", value::DoubleFactory::create(2.0));
 
-    manager::ManagerRunMono r(std::cout, false);
+    using namespace manager;
+
+    ManagerRunMono r(std::cout, false);
     r.start(file);
 
-    const manager::OutputSimulationMatrix& out(r.outputSimulationMatrix());
+    const OutputSimulationMatrix& out(r.outputSimulationMatrix());
     BOOST_REQUIRE_EQUAL(out.shape()[0],
-                        (manager::OutputSimulationMatrix::size_type)4);
+                        (OutputSimulationMatrix::size_type)4);
     BOOST_REQUIRE_EQUAL(out.shape()[1],
-                        (manager::OutputSimulationMatrix::size_type)3);
+                        (OutputSimulationMatrix::size_type)3);
+
+    for (OutputSimulationMatrix::size_type x(0); x < out.shape()[0]; ++x) {
+        for (OutputSimulationMatrix::size_type y = 0; y < out.shape()[1]; ++y) {
+
+            BOOST_REQUIRE_EQUAL(out[x][y].size(),
+                                (oov::OutputMatrixViewList::size_type)2);
+
+            oov::OutputMatrixViewList::const_iterator it(out[x][y].begin());
+
+            BOOST_REQUIRE_EQUAL(it->second.values().shape()[0],
+                                (value::MatrixFactory::MatrixView::size_type)(5));
+
+            BOOST_REQUIRE_EQUAL(it->second.values().shape()[1],
+                                (value::MatrixFactory::MatrixView::size_type)(101));
+
+            ++it;
+
+            BOOST_REQUIRE_EQUAL(it->second.values().shape()[0],
+                                (value::MatrixFactory::MatrixView::size_type)(4));
+
+            BOOST_REQUIRE_EQUAL(it->second.values().shape()[1],
+                                (value::MatrixFactory::MatrixView::size_type)(101));
+        }
+    }
 }

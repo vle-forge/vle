@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(value_bool)
     const char* t4 = "<?xml version=\"1.0\"?>\n<boolean>0</boolean>";
 
     value::Value v;
-    
+
     v = vpz::Vpz::parseValue(t1);
     BOOST_CHECK(value::toBoolean(v) == true);
 
@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE(value_integer)
     sprintf(t4, "<?xml version=\"1.0\"?>\n<integer>%s</integer>",
             utils::to_string(std::numeric_limits< long >::min()).c_str());
 
-    
+
     value::Value v;
 
     v = vpz::Vpz::parseValue(t1);
@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(value_integer)
                 std::numeric_limits < long >::max());
 
     v = vpz::Vpz::parseValue(t4);
-    BOOST_CHECK(value::toLong(v) == 
+    BOOST_CHECK(value::toLong(v) ==
                 std::numeric_limits < long >::min());
 }
 
@@ -156,9 +156,9 @@ BOOST_AUTO_TEST_CASE(value_set)
         "    <string>test</string>\n"
         "  </set>\n"
         "</set>";
-    
+
     value::Set v;
-    
+
     v = value::toSetValue(vpz::Vpz::parseValue(t1));
     BOOST_CHECK(value::toString(v->getValue(1)) == "test");
     BOOST_CHECK(value::toInteger(v->getValue(0)) == 1);
@@ -189,7 +189,7 @@ BOOST_AUTO_TEST_CASE(value_map)
         "</map>\n";
 
     value::Map v;
-    
+
     v = value::toMapValue(vpz::Vpz::parseValue(t1));
     BOOST_CHECK(value::toInteger(v->getValue("a")) == 10);
 
@@ -204,17 +204,31 @@ BOOST_AUTO_TEST_CASE(value_map)
 BOOST_AUTO_TEST_CASE(value_tuple)
 {
     const char* t1 = "<?xml version=\"1.0\"?>\n"
-        "<tuple>1\n"
-        "2 "
-        "3</tuple>\n";
+        "<tuple>1 2 3</tuple>\n";
 
     value::Tuple v;
-    
+
     v = value::toTupleValue(vpz::Vpz::parseValue(t1));
     BOOST_REQUIRE_EQUAL(v->size(), (size_t)3);
     BOOST_CHECK_CLOSE(v->operator[](0), 1.0, 0.1);
     BOOST_CHECK_CLOSE(v->operator[](1), 2.0, 0.1);
     BOOST_CHECK_CLOSE(v->operator[](2), 3.0, 0.1);
+
+    const char* t2 = "<?xml version=\"1.0\"?>\n"
+        "<map>\n"
+        "   <key name=\"testtest\">\n"
+        "      <tuple>100 200 300</tuple>\n"
+        "   </key>\n"
+        "</map>\n";
+
+    value::Map m;
+    m = value::toMapValue(vpz::Vpz::parseValue(t2));
+
+    value::Value t = m->getValue("testtest");
+    v = toTupleValue(t);
+    BOOST_CHECK_CLOSE(v->operator[](0), 100.0, 0.1);
+    BOOST_CHECK_CLOSE(v->operator[](1), 200.0, 0.1);
+    BOOST_CHECK_CLOSE(v->operator[](2), 300.0, 0.1);
 }
 
 BOOST_AUTO_TEST_CASE(value_table)
@@ -225,7 +239,7 @@ BOOST_AUTO_TEST_CASE(value_table)
         "</table>\n";
 
     value::Table v;
-    
+
     v = value::toTableValue(vpz::Vpz::parseValue(t1));
     BOOST_REQUIRE_EQUAL(v->width(), (value::TableFactory::index)2);
     BOOST_REQUIRE_EQUAL(v->height(), (value::TableFactory::index)3);
@@ -260,7 +274,7 @@ BOOST_AUTO_TEST_CASE(value_xml)
         "</xml>";
 
     value::XML v;
-    
+
     BOOST_REQUIRE_EQUAL(value::toXml(vpz::Vpz::parseValue(t1)), "test 1 2 1 2");
 }
 
@@ -292,7 +306,7 @@ BOOST_AUTO_TEST_CASE(value_matrix)
     BOOST_REQUIRE_EQUAL(mv[1][0]->isInteger(), true);
     BOOST_REQUIRE_EQUAL(mv[1][1]->isInteger(), true);
     BOOST_REQUIRE_EQUAL(mv[1][2]->isInteger(), true);
-    
+
     BOOST_REQUIRE_EQUAL(value::toInteger(mv[0][0]), 1);
     BOOST_REQUIRE_EQUAL(value::toInteger(mv[1][0]), 2);
     BOOST_REQUIRE_EQUAL(value::toInteger(mv[0][1]), 3);
@@ -367,7 +381,6 @@ BOOST_AUTO_TEST_CASE(value_matrix_of_matrix)
     value::MatrixFactory::MatrixView m1 = value::toMatrix(mv[0][0]);
     value::MatrixFactory::MatrixView m2 = value::toMatrix(mv[1][0]);
     value::MatrixFactory::MatrixView m3 = value::toMatrix(mv[2][0]);
-    
     BOOST_REQUIRE_EQUAL(value::toInteger(m1[0][0]), 1);
     BOOST_REQUIRE_EQUAL(value::toInteger(m1[1][0]), 2);
     BOOST_REQUIRE_EQUAL(value::toInteger(m1[2][0]), 3);

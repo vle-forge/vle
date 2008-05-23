@@ -12,7 +12,7 @@
       <port name="out" />
      </out>
      <submodels>
-      <model name="x" type="atomic" dynamics="unittest" >
+      <model name="x" type="atomic" dynamics="unittest" observables="obs1" >
        <in>
         <port name="in" />
        </in>
@@ -20,17 +20,17 @@
         <port name="out" />
        </out>
       </model>
-      <model name="a" type="atomic" dynamics="unittest" >
+      <model name="a" type="atomic" dynamics="unittest" observables="obs2" >
        <in>
         <port name="in" />
        </in>
       </model>
-      <model name="b" type="atomic" dynamics="unittest" >
+      <model name="b" type="atomic" dynamics="unittest" observables="obs2" >
        <in>
         <port name="in" />
        </in>
       </model>
-      <model name="c" type="atomic" dynamics="unittest" >
+      <model name="c" type="atomic" dynamics="unittest" observables="obs2" >
        <in>
         <port name="in1" />
         <port name="in2" />
