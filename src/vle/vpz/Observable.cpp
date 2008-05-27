@@ -71,7 +71,7 @@ void ObservablePort::del(const std::string& portname)
 
 bool ObservablePort::exist(const std::string& portname) const
 {
-    return std::find_if(m_list.begin(), m_list.end(), 
+    return std::find_if(m_list.begin(), m_list.end(),
                      std::bind2nd(std::equal_to < std::string >(), portname))
         != m_list.end();
 }
@@ -137,6 +137,15 @@ const ObservablePort& Observable::get(const std::string& portname) const
     return it->second;
 }
 
+void Observable::del(const std::string& portname)
+{
+  ObservablePortList::iterator it = m_list.find(portname);
+  Assert(utils::SaxParserError, it != m_list.end(),
+	 (boost::format("The observable %1% have not port %2%") %
+	  m_name, portname));
+  m_list.erase(it);
+}
+
 bool Observable::hasView(const std::string& name) const
 {
     return std::find_if(m_list.begin(), m_list.end(), HasView(name))
@@ -147,7 +156,7 @@ PortNameList Observable::getPortname(const std::string& name) const
 {
     std::list < std::string > result;
 
-    std::for_each(m_list.begin(), m_list.end(), 
+    std::for_each(m_list.begin(), m_list.end(),
                   AddAttachedViewPortname(result, name));
 
     return result;

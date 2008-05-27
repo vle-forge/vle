@@ -16,6 +16,7 @@ src/vle/vpz/test/test3
 src/vle/vpz/test/test4
 src/vle/vpz/test/test5
 src/vle/vpz/test/test6
+src/vle/vpz/test/test7
 *.cmake
 *.so
 *.so.*
