@@ -35,12 +35,12 @@
 
 namespace vle { namespace vpz {
 
-    /** 
+    /**
      * @brief Define a condition list like list of names, conditions.
      */
     typedef std::map < std::string, Condition > ConditionList;
 
-    /** 
+    /**
      * @brief This class describe a list of condition and allow loading and
      * writing a conditions and condition tags.
      */
@@ -52,7 +52,7 @@ namespace vle { namespace vpz {
         virtual ~Conditions()
         { }
 
-        /** 
+        /**
          * @brief Add Conditions informations to the stream.
          * @code
          * <conditions>
@@ -62,8 +62,8 @@ namespace vle { namespace vpz {
          *  </condition>
          * </conditions>
          * @endcode
-         * 
-         * @param out 
+         *
+         * @param out
          */
         virtual void write(std::ostream& out) const;
 
@@ -74,27 +74,27 @@ namespace vle { namespace vpz {
         //// Manage ConditionList
         ////
 
-        /** 
+        /**
          * @brief Get a constant reference to the ConditionList.
          * @return A constant reference to the ConditionList.
          */
         inline const ConditionList& conditionlist() const
         { return m_list; }
 
-        /** 
+        /**
          * @brief Get a reference to the ConditionList.
          * @return A reference to the ConditionList.
          */
         inline ConditionList& conditionlist()
         { return m_list; }
 
-        /** 
+        /**
          * @brief Build a list of string that contains all condition names.
          * @param lst An output string list.
          */
         void conditionnames(std::list < std::string >& lst) const;
 
-        /** 
+        /**
          * @brief Build a list of string that contains all port names for the
          * specified condition.
          * @param condition The condition to get port name.
@@ -104,14 +104,14 @@ namespace vle { namespace vpz {
         void portnames(const std::string& condition,
                        std::list < std::string >& lst) const;
 
-        /** 
+        /**
          * @brief Add a list of Conditions to the list.
          * @param conditions A Conditions object to add.
          * @throw Exception::Internal if a Condition already exist.
          */
         void add(const Conditions& conditions);
 
-        /** 
+        /**
          * @brief Add a condition into the conditions list.
          * @param condition the condition to add into the map. Condition is
          * copied.
@@ -121,51 +121,59 @@ namespace vle { namespace vpz {
          */
         Condition& add(const Condition& condition);
 
-        /** 
+        /**
          * @brief Delete the specified condition from the conditions list.
          * @param modelname condition model name.
          * @param portname condition port name.
          */
         void del(const std::string& condition);
 
-        /** 
+        /**
          * @brief Clear the ConditionList object.
          */
         inline void clear()
         { m_list.clear(); }
 
-        /** 
+        /**
+         * @brief Return true if the name already exist in the ConditionList.
+         * @param name The name to check in ConditionList.
+         * @return True if the name exist, false otherwise.
+         */
+        inline bool exist(const std::string& name) const
+        { return m_list.find(name) != m_list.end(); }
+
+        /**
          * @brief Get the specified condition from conditions list.
-         * @param condition 
-         * @return 
+         * @param condition
+         * @return
          */
         const Condition& get(const std::string& condition) const;
 
-        /** 
+        /**
          * @brief Get the specified condition from conditions list.
-         * @param condition 
-         * @return 
+         * @param condition
+         * @return
          */
         Condition& get(const std::string& condition);
-        
-        /** 
+
+        /**
          * @brief Remove all no permanent value of the list. This function is
          * use to clean not usefull data for the devs::ModelFactory. Linear
          * function.
          */
         void cleanNoPermanent();
 
-        /** 
+        /**
          * @brief This function initialise every, to each port, a new
          * value::Set.
          */
         void rebuildValueSet();
-    
+
         ////
         //// Functor
         ////
 
-        /** 
+        /**
          * @brief Functor to add condition to the ConditionList. To use with the
          * std::for_each algorithm.
          */
@@ -181,7 +189,7 @@ namespace vle { namespace vpz {
             Conditions& m_conditions;
         };
 
-        /** 
+        /**
          * @brief Functor to call the rebuildValueSet for a specified
          * ConditionList. To use with the std::for_each algorithm.
          */
@@ -191,7 +199,7 @@ namespace vle { namespace vpz {
             { pair.second.rebuildValueSet(); }
         };
 
-        /** 
+        /**
          * @brief Functor to get the name of a Condition from the ConditionList.
          * To use with the std::transform.
          */
@@ -202,7 +210,7 @@ namespace vle { namespace vpz {
             { return x.first; }
         };
 
-        /** 
+        /**
          * @brief Functor to get the Condition object from the ConditionList. To
          * use with the std::transform.
          */
