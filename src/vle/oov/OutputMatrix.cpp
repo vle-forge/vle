@@ -141,9 +141,9 @@ void OutputMatrix::addValue(const std::string& model,
 
 void OutputMatrix::setLastTime(double value)
 {
-    m_values->addValue(0, m_values->rows(), 
-                       value::DoubleFactory::create(value));
+    value::MatrixFactory::MatrixValue::size_type row(m_values->rows());
     m_values->addRow();
+    m_values->addValue(0, row, value::DoubleFactory::create(value));
 }
 
 value::MatrixFactory::index OutputMatrix::column(const std::string& model,

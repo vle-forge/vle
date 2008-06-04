@@ -147,7 +147,7 @@ void MatrixFactory::addColumn()
 
 void MatrixFactory::addRow()
 {
-    if (m_nbrow - 1 >= m_matrix.shape()[1]) {
+    if (m_nbrow + 1 >= m_matrix.shape()[1]) {
         m_matrix.resize(
             m_extents[m_matrix.shape()[0]]
             [m_matrix.shape()[1] + m_steprow]);
