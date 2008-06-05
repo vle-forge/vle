@@ -1,5 +1,5 @@
 /**
- * @file src/vle/vpz/Trame.hpp
+ * @file src/vle/eov/plugins/default/GtkDefault.hpp
  * @author The VLE Development Team
  */
 
@@ -23,52 +23,42 @@
  */
 
 
+#ifndef VLE_EOV_PLUGINS_GTKDEFAULT_HPP
+#define VLE_EOV_PLUGINS_GTKDEFAULT_HPP
 
+#include <gtkmm/box.h>
+#include <gtkmm/label.h>
+#include <gtkmm/drawingarea.h>
+#include <vle/eov/Plugin.hpp>
+#include <vle/eov/NetStreamReader.hpp>
 
-#ifndef VLE_VPZ_TRAME_HPP
-#define VLE_VPZ_TRAME_HPP
+namespace vle { namespace eov {
 
-#include <vle/vpz/Base.hpp>
-#include <list>
-#include <ostream>
-#include <string>
-
-
-
-namespace vle { namespace vpz {
-
-    class Trame : public Base
+    class GtkDefault : public eov::Plugin
     {
     public:
-        Trame()
-        { }
+        GtkDefault(oov::CairoPluginPtr cairoplugin, NetStreamReader* net);
 
-        virtual ~Trame()
-        { }
+        virtual ~GtkDefault();
 
-        virtual Base::type getType() const = 0;
+        virtual Glib::RefPtr < Gdk::Window > drawingSurface();
+        
+        virtual Gtk::Widget& widget();
 
-        virtual void write(std::ostream& out) const = 0;
+        virtual int width();
+
+        virtual int height();
+
+    private:
+        Gtk::VBox           m_vbox;
+        Gtk::DrawingArea    m_da;
+        Gtk::Label          m_label;
+
+        bool on_expose_event(GdkEventExpose* event);
     };
 
-    typedef std::list < Trame* > TrameList;
+}} // namespace vle eov
 
-    class VLETrame : public Trame
-    {
-    public:
-        VLETrame()
-        { }
-
-        virtual ~VLETrame()
-        { }
-
-        virtual Base::type getType() const
-        { return Base::TRAME; }
-
-        virtual void write(std::ostream& /* out */) const
-        { }
-    };
-
-}} // namespace vle vpz
+DECLARE_EOV_PLUGIN(vle::eov::GtkDefault);
 
 #endif

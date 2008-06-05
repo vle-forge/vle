@@ -1,8 +1,9 @@
 Makefile
 config.h
-vle.pc
-vlepython.pc
+vle*.pc
+eov*.pc
 src/apps/vle/vle
+src/apps/eov/eov
 src/apps/oov/oov
 src/apps/test/vlemodeltest
 src/apps/test/vletranslatortest

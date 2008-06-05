@@ -1,5 +1,5 @@
 /**
- * @file src/vle/vpz/Trame.hpp
+ * @file src/vle/eov.hpp
  * @author The VLE Development Team
  */
 
@@ -25,50 +25,26 @@
 
 
 
-#ifndef VLE_VPZ_TRAME_HPP
-#define VLE_VPZ_TRAME_HPP
+#ifndef VLE_EOV_EOV_HPP
+#define VLE_EOV_EOV_HPP
 
-#include <vle/vpz/Base.hpp>
-#include <list>
-#include <ostream>
-#include <string>
-
+#include <vle/eov/NetStreamReader.hpp>
+#include <vle/eov/Plugin.hpp>
+#include <vle/eov/Window.hpp>
 
 
-namespace vle { namespace vpz {
 
-    class Trame : public Base
-    {
-    public:
-        Trame()
-        { }
+namespace vle {
 
-        virtual ~Trame()
-        { }
+    /** 
+     * @brief The EOV library is based on the OOV libary (output of VLE) and
+     * more particulary, on the Cairo plugin. EOV is a Gtk application to
+     * show the CairoPlugin into a Gtk frame.
+     */
+    namespace eov {
 
-        virtual Base::type getType() const = 0;
+    } // namespace eov
 
-        virtual void write(std::ostream& out) const = 0;
-    };
-
-    typedef std::list < Trame* > TrameList;
-
-    class VLETrame : public Trame
-    {
-    public:
-        VLETrame()
-        { }
-
-        virtual ~VLETrame()
-        { }
-
-        virtual Base::type getType() const
-        { return Base::TRAME; }
-
-        virtual void write(std::ostream& /* out */) const
-        { }
-    };
-
-}} // namespace vle vpz
+} // namespace vle
 
 #endif

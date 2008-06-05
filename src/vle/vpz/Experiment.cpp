@@ -49,10 +49,6 @@ void Experiment::write(std::ostream& out) const
     out << "</experiment>\n";
 }
 
-void Experiment::initFromExperiment(xmlpp::Element* /* elt */)
-{
-}
-
 void Experiment::clear()
 {
     m_name.clear();

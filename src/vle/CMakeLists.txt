@@ -17,3 +17,9 @@ INSTALL(FILES ${VLE_BINARY_DIR}/version.hpp DESTINATION ${VLE_INCLUDE_DIRS})
 INSTALL(FILES data.hpp devs.hpp extension.hpp geometry.hpp graph.hpp
   manager.hpp oov.hpp translator.hpp utils.hpp value.hpp vpz.hpp DESTINATION
   ${VLE_INCLUDE_DIRS})
+
+IF (HAVE_EOV)
+  ADD_SUBDIRECTORY(eov)
+  INSTALL(FILES eov.hpp DESTINATION ${VLE_INCLUDE_DIRS})
+ENDIF (HAVE_EOV)
+

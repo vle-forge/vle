@@ -61,22 +61,6 @@ namespace vle { namespace vpz {
         { return EXPERIMENT; }
 
         /** 
-         * @brief Initialise Experiment information from XML including,
-         * Replicas, ExperimentalCondition and Views.
-         * @code
-         * <experiment name="exp1" duration="0.33" seed="65431">
-         *   [...]
-         * </experiment>
-         * @endcode
-         * 
-         * @param elt a xml element on the tag EXPERIMENT.
-         *
-         * @throw Exception::Parse if elt is NULL or name not equal to
-         * EXPERIMENT tag.
-         */
-        void initFromExperiment(xmlpp::Element* elt);
-
-        /** 
          * @brief Just delete the complete list of information from
          * vpz::Experiment.
          */

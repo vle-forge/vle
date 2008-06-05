@@ -31,6 +31,7 @@
 #include <vle/vpz/Base.hpp>
 #include <vle/vpz/Output.hpp>
 #include <map>
+#include <list>
 #include <string>
 
 namespace vle { namespace vpz {

@@ -7,16 +7,17 @@ SET(VLE_MINOR 6)
 SET(VLE_PATCH 0)
 SET(VLE_EXTRA "-dev")
 SET(VLE_VERSION "${VLE_MAJOR}.${VLE_MINOR}.0")
+SET(VLE_VERSION2 "${VLE_MAJOR}.${VLE_MINOR}")
 SET(VLE_SOVERSION "0")
 SET(VLE_NAME "vle")
 SET(VLE_NAME_VERSION "${VLE_NAME}-${VLE_VERSION}")
 SET(VLE_COMPLETE "${VLE_MAJOR}.${VLE_MINOR}.${VLE_PATCH}${VLE_EXTRA}")
 SET(VLE_NAME_COMPLETE "${VLE_NAME}-${VLE_COMPLETE}")
- 
+
  #
   # CPack configuration
  #
- 
+
 IF(CMAKE_MAJOR_VERSION MATCHES "2" AND CMAKE_MINOR_VERSION MATCHES "4")
   SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "VLE - Virtual Laboraory Environment")
   SET(CPACK_PACKAGE_NAME "VLE")
@@ -38,11 +39,11 @@ IF(CMAKE_MAJOR_VERSION MATCHES "2" AND CMAKE_MINOR_VERSION MATCHES "4")
   SET(CPACK_SOURCE_IGNORE_FILES "/\\\\.git/;/\\\\.gitignore;/build/")
   INCLUDE(CPack)
 ENDIF(CMAKE_MAJOR_VERSION MATCHES "2" AND CMAKE_MINOR_VERSION MATCHES "4")
- 
+
  #
   # Installation variables
  #
- 
+
 SET(VLE_LIBRARY_DIRS "lib/${VLE_NAME_VERSION}")
 SET(VLE_INCLUDE_DIRS "include/${VLE_NAME_VERSION}/vle")
 SET(VLE_INCLUDE_DIR "include/${VLE_NAME_VERSION}")
@@ -52,7 +53,7 @@ SET(VLE_SHARE_DIRS "share/${VLE_NAME_VERSION}")
  #
   # Debug mode
  #
- 
+
 IF(UNIX AND NOT WIN32)
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -W -Werror")
   SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -W -Werror")
@@ -63,30 +64,30 @@ IF(NOT CMAKE_BUILD_TYPE)
     "Type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
     FORCE)
 ENDIF(NOT CMAKE_BUILD_TYPE)
- 
+
  #
   # Manage the Win32 port.
  #
- 
+
 IF(WIN32)
   SET(OS_SPECIFIC_LIBRARIES wsock32 netapi32 z intl iconv)
 ELSE(WIN32)
   SET(OS_SPECIFIC_LIBRARIES)
 ENDIF(WIN32)
- 
+
  #
   # Modules
  #
- 
+
 INCLUDE(CheckIncludeFileCXX)
 INCLUDE(CheckIncludeFile)
 INCLUDE(CheckLibraryExists)
 INCLUDE(CMakeDetermineCCompiler)
- 
+
  #
   # Check libraries with pkgconfig
  #
- 
+
 SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 FIND_PACKAGE(PkgConfig)
 
@@ -101,11 +102,24 @@ IF (WITH_CAIRO)
     SET(HAVE_CAIRO 1 CACHE INTERNAL "" FORCE)
   ENDIF (CAIROMM_FOUND)
 ENDIF (WITH_CAIRO)
- 
+
+OPTION(WITH_EOV "use the gtkmm and glademm to build eov [default: on]" ON)
+IF (WITH_EOV)
+  PKG_CHECK_MODULES(GLADEMM libglademm-2.4)
+  IF (GLADEMM_FOUND)
+    SET(HAVE_GLADE 1 CACHE INTERNAL "" FORCE)
+    PKG_CHECK_MODULES(GTKMM gtkmm-2.4)
+    IF (GTKMM_FOUND)
+      SET(HAVE_GTKMM 1 CACHE INTERNAL "" FORCE)
+      SET(HAVE_EOV 1 CACHE INTERNAL "" FORCE)
+    ENDIF (GTKMM_FOUND)
+  ENDIF (GLADEMM_FOUND)
+ENDIF (WITH_EOV)
+
  #
   # Test the libsqlxx dependencies
  #
- 
+
 OPTION(WITH_SQLXX "with libsqlxx for the odbc driver [default: on]" ON)
 IF (WITH_SQLXX)
   CHECK_INCLUDE_FILE_CXX(sqlxx.h HAVE_SQLXX)
@@ -115,11 +129,11 @@ IF (WITH_SQLXX)
     SET(LIBSQLXX_LIBRARIES)
   ENDIF (HAVE_SQLXX)
 ENDIF (WITH_SQLXX)
- 
+
  #
   # Test the libboost header and libboost-text library.
  #
- 
+
 OPTION(WITH_TEST "use the libboost test unit library [default: on]" ON)
 
 FIND_PACKAGE(Boost)
@@ -138,17 +152,17 @@ IF (Boost_FOUND)
 ELSE (Boost_FOUND)
   MESSAGE(ERROR "Boost include directory not found")
 ENDIF (Boost_FOUND)
- 
+
  #
   # Generate the config.h
  #
- 
+
 CHECK_INCLUDE_FILE_CXX(cxxabi.h HAVE_GCC_ABI_DEMANGLE)
 CHECK_INCLUDE_FILE_CXX(execinfo.h HAVE_EXECINFO_H)
 CHECK_INCLUDE_FILE_CXX(signal.h HAVE_SIGNAL_H)
 INCLUDE_DIRECTORIES(${VLE_BINARY_DIR})
 CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/config.h.in ${VLE_BINARY_DIR}/config.h)
- 
+
  #
   # Generate the vle.pc pkg-config file.
   # Build some variable to build a correct Win32 pkg config file with:
@@ -165,9 +179,17 @@ ELSE(UNIX AND NOT WIN32)
   SET(VLE_PKGCONFIG_BOOSTINCLUDE_DIRS "\${includedir}/${BOOST_DIRNAME}")
 ENDIF(UNIX AND NOT WIN32)
 
-CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/src/vle/vle.pc.in ${VLE_BINARY_DIR}/vle.pc
-  @ONLY)
-INSTALL(FILES ${VLE_BINARY_DIR}/vle.pc DESTINATION lib/pkgconfig)
+CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/src/vle/vle.pc.in
+  ${VLE_BINARY_DIR}/vle-${VLE_VERSION2}.pc @ONLY)
+INSTALL(FILES ${VLE_BINARY_DIR}/vle-${VLE_VERSION2}.pc DESTINATION
+  lib/pkgconfig)
+
+IF (HAVE_EOV)
+  CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/src/vle/eov.pc.in
+    ${VLE_BINARY_DIR}/eov-${VLE_VERSION2}.pc @ONLY)
+  INSTALL(FILES ${VLE_BINARY_DIR}/eov-${VLE_VERSION2}.pc DESTINATION
+    lib/pkgconfig)
+ENDIF (HAVE_EOV)
 
  #
   # Generate the vle.nsi script.
@@ -191,7 +213,7 @@ INSTALL(FILES ${CMAKE_SOURCE_DIR}/README DESTINATION ${VLE_SHARE_DIRS})
  #
 
 ADD_SUBDIRECTORY(share)
- 
+
  #
   # Generating documentation with doxygen
  #
@@ -235,9 +257,13 @@ ENDIF (Boost_FOUND)
 IF (HAVE_UNITTESTFRAMEWORK)
   MESSAGE(STATUS "Build unit test...............: yes")
 ENDIF (HAVE_UNITTESTFRAMEWORK)
+IF (HAVE_EOV)
+  MESSAGE(STATUS "Build with eov................: yes")
+ENDIF (HAVE_EOV)
 IF (HAVE_CAIRO)
   MESSAGE(STATUS "Build with cairo plugin.......: yes")
 ENDIF (HAVE_CAIRO)
 MESSAGE(STATUS "- - - -")
+
 
 # vim:ts=8:tw=80:sw=2:sts=2

@@ -29,7 +29,6 @@
 #define VLE_VPZ_BASE_HPP
 
 #include <ostream>
-#include <libxml++/libxml++.h>
 
 namespace vle { namespace vpz {
 

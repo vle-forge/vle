@@ -30,6 +30,7 @@
 
 #include <string>
 #include <map>
+#include <list>
 #include <vle/vpz/Base.hpp>
 #include <vle/value/Map.hpp>
 #include <vle/value/Set.hpp>

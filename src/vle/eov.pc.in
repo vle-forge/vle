@@ -1,0 +1,11 @@
+prefix=@VLE_PKGCONFIG_PREFIXPATH@
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: eov
+Description: EOV Eyes of VLE the multimodelling and Simulation tools
+Requires: libglademm-2.4 gtkmm-2.4 vle-@VLE_VERSION2@
+Version: @VLE_VERSION@
+Libs:	-L${libdir} -lvleeov
+Cflags: -I${includedir}/@VLE_NAME_VERSION@ -I@VLE_PKGCONFIG_BOOSTINCLUDE_DIRS@

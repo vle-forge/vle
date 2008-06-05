@@ -28,7 +28,8 @@
 #ifndef VLE_VPZ_OBSERVABLE_HPP
 #define VLE_VPZ_OBSERVABLE_HPP
 
-#include <set>
+#include <map>
+#include <list>
 #include <string>
 #include <vle/vpz/Base.hpp>
 

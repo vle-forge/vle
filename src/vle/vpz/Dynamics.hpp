@@ -28,7 +28,7 @@
 #ifndef VLE_VPZ_DYNAMICS_HPP
 #define VLE_VPZ_DYNAMICS_HPP
 
-#include <set>
+#include <map>
 #include <vle/vpz/Dynamic.hpp>
 
 namespace vle { namespace vpz {

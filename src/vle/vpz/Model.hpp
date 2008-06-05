@@ -29,6 +29,7 @@
 #define VLE_VPZ_MODEL_HPP
 
 #include <map>
+#include <glibmm/ustring.h>
 #include <vle/vpz/Base.hpp>
 #include <vle/graph/Model.hpp>
 
