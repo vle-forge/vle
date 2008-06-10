@@ -1,0 +1,149 @@
+<?xml version="1.0" ?>
+<!DOCTYPE vle_project PUBLIC "" "http://vle.univ-littoral.fr/vle-0.5.0.dtd" >
+<vle_project version="0.1" date="" author="PC" >
+  <structures>  
+    <model name="top" type="coupled">
+      <submodels>
+	<model name="smartgardener" type="atomic"
+		conditions="cond_smartgardener" dynamics="dyn_smartgardener" >
+	  <in>	
+	    <port name="xy" />
+	  </in>
+	  <out>	
+	    <port name="out_ladybird" />
+	    <port name="out_plantlouse" />
+	  </out>
+	</model>
+	<model name="bio" type="coupled">
+	  <in>	
+	    <port name="in_plantlouse" />
+	    <port name="in_ladybird" />
+	  </in>
+	  <out>	
+	    <port name="out_plantlouse" />
+	    <port name="out_ladybird" />
+	  </out>
+	  <submodels>
+	    <model name="plantlousepest" type="atomic" conditions="cond_plantlousepest" dynamics="dyn_plantlousepest" observables="obs_plantlousepest" >
+	      <in>	
+		<port name="update" />
+		<port name="perturb" />
+	      </in>
+	      <out>	
+		<port name="update" />
+	      </out>
+	    </model>
+	    <model name="ladybirdpest" type="atomic" conditions="cond_ladybirdpest" dynamics="dyn_ladybirdpest" observables="obs_ladybirdpest" >
+	      <in>	
+		<port name="update" />
+		<port name="perturb" />
+	      </in>
+	      <out>	
+		<port name="update" />
+	      </out>
+	    </model>
+	  </submodels>
+	  <connections>
+	    <connection type="input">
+	      <origin model="bio" port="in_plantlouse" />
+	      <destination model="plantlousepest" port="perturb" />
+	    </connection>
+	    <connection type="input">
+	      <origin model="bio" port="in_ladybird" />
+	      <destination model="ladybirdpest" port="perturb" />
+	    </connection> 
+	    <connection type="output">
+	      <origin model="plantlousepest" port="update" />
+	      <destination model="bio" port="out_plantlouse" />
+	    </connection>
+	    <connection type="output">
+	      <origin model="ladybirdpest" port="update" />
+	      <destination model="bio" port="out_ladybird" />
+	    </connection>
+	    <connection type="internal">
+	      <origin model="plantlousepest" port="update" />
+	      <destination model="ladybirdpest" port="update" />
+	    </connection>
+	    <connection type="internal">
+	      <origin model="ladybirdpest" port="update" />
+	      <destination model="plantlousepest" port="update" />
+	    </connection>
+	  </connections>
+	</model>
+      </submodels>
+       <connections>
+	<connection type="internal">
+	  <origin model="smartgardener" port="out_plantlouse" />
+	  <destination model="bio" port="in_plantlouse" />
+	</connection>
+	<connection type="internal">
+	  <origin model="smartgardener" port="out_ladybird" />
+	  <destination model="bio" port="in_ladybird" />
+	</connection>
+	<connection type="internal">
+	  <origin model="bio" port="out_plantlouse" />
+	  <destination model="smartgardener" port="xy" />
+	</connection>
+	<connection type="internal">
+	  <origin model="bio" port="out_ladybird" />
+	  <destination model="smartgardener" port="xy" />
+	</connection>
+      </connections>
+    </model>
+  </structures>
+  <dynamics>
+    <dynamic name="dyn_plantlousepest" library="ladybirdplantlouse" model="plantlouse" />
+    <dynamic name="dyn_ladybirdpest" library="ladybirdplantlouse" model="ladybird" />
+    <dynamic name="dyn_smartgardener" library="ladybirdplantlouse" model="smartgardener2" />
+  </dynamics>
+  <experiment name="exp7" duration="100" seed="123">
+    <conditions>
+      <condition name="cond_plantlousepest">
+	<port name="a"><double>.5</double></port>
+	<port name="b"><double>0.01</double></port>
+	<port name="precision"><double>1</double></port>
+	<port name="threshold"><double>1e-10</double></port>
+	<port name="name"><string>x</string></port>
+	<port name="value"><double>5000.0</double></port>
+      </condition>
+      <condition name="cond_ladybirdpest">
+	<port name="b"><double>0.01</double></port>
+	<port name="d"><double>0.01</double></port>
+	<port name="e"><double>0.2</double></port>
+	<port name="precision"><double>.1</double></port>
+	<port name="threshold"><double>1e-10</double></port>
+	<port name="name"><string>y</string></port>
+	<port name="value"><double>45.0</double></port>
+      </condition>
+      <condition name="cond_smartgardener">
+	<port name="s"><double>2000</double></port>	
+	<port name="p_p">
+	  <double>0.25</double>
+	  <double>0.5</double>
+	  <double>0.75</double>
+	  <double>1</double>
+	</port>	
+	<port name="p_l"><double>1</double></port>	
+	<port name="d"><double>5</double></port>	
+      </condition>
+    </conditions>
+    <views>
+      <outputs>
+	<output name="o" format="local" plugin="text" />
+      </outputs>
+      <observables>
+	<observable name="obs_plantlousepest">
+	  <port name="x">
+	    <attachedview name="lavue" />
+	  </port>
+	</observable>
+	<observable name="obs_ladybirdpest">
+	  <port name="y">	
+	    <attachedview name="lavue" />
+	  </port>	
+	</observable>
+      </observables>	
+      <view name="lavue" type="timed" timestep=".01" output="o" />
+    </views>
+  </experiment>
+</vle_project>

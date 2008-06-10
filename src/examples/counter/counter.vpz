@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!DOCTYPE vle_project SYSTEM "http://vle.univ-littoral.fr/vle-0.5.0.dtd">
+<vle_project version="0.5" date="" author="Eric Ramat, Gauthier Quesnel">
+ <structures>
+  <model name="m" type="coupled">
+   <submodels>
+    <model name="m1" type="atomic" conditions="m1" dynamics="m1" >
+     <out>
+      <port name="out"/>
+     </out>
+    </model>
+    <model name="m2" type="atomic" dynamics="m2" observables="obs1">
+     <in>
+      <port name="in"/>
+     </in>
+     <out>
+      <port name="out"/>
+     </out>
+    </model>
+   </submodels>
+   <connections>
+    <connection type="internal">
+     <origin model="m1" port="out"/>
+     <destination model="m2" port="in"/>
+    </connection>
+   </connections>
+  </model>
+ </structures>
+ <dynamics>
+  <dynamic name="m1" library="generator" />
+  <dynamic name="m2" library="counter" />
+ </dynamics>
+ <experiment name="experimentcounter" duration="1000" seed="123456789">
+  <conditions>
+   <condition name="m1">
+   <port name="formalism"><string>normal</string></port>
+   <port name="average"><double>.01</double></port>
+   <port name="stdvariation"><double>.5</double></port>
+   </condition>
+  </conditions>
+  <views>
+   <outputs>
+    <output name="o" format="local" plugin="text" />
+   </outputs>
+   <observables>
+    <observable name="obs1">
+     <port name="c">
+      <attachedview name="view1" />
+     </port>
+    </observable>
+   </observables>
+   <view name="view1" type="timed" timestep="1" output="o" />
+  </views>
+ </experiment>
+</vle_project>

@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<!DOCTYPE vle_project SYSTEM "http://vle.univ-littoral.fr/vle-0.5.0.dtd">
+<vle_project version="0.5" author="Eric" date="">
+  <structures>
+    <model name="system" type="coupled">
+      <submodels> 
+	<model name="executive" type="atomic" conditions="cond_executive"
+		dynamics="dyn_executive" >
+	</model>
+      </submodels>
+      <connections />
+    </model>
+  </structures>
+  <dynamics>
+    <dynamic name="dyn_executive" library="lifegame" model="executive" />    
+  </dynamics>
+  <experiment name="exp1" duration="100" seed="544">
+    <conditions>
+      <condition name="cond_executive">
+	<port name="translate">
+	  <xml>
+	    <![CDATA[
+	    <celldevs>
+	      <grid>
+		<dim axe="0" number="30" />
+		<dim axe="1" number="30" />
+	      </grid>
+	      <cells connectivity="von neumann" library="lifegame" model="cell">
+		<prefix>cell</prefix>
+<!--		<init>
+		  1 1 1 1 1 1 1 1 1 1
+		  1 1 1 1 1 1 1 1 1 1
+		  1 1 1 1 1 1 1 1 1 1
+		  1 1 1 1 1 1 1 1 1 1
+		  1 1 1 1 1 1 1 1 1 1
+		  1 1 1 1 1 1 1 1 1 1
+		  1 1 1 1 1 1 1 1 1 1
+		  1 1 1 1 1 1 1 1 1 1
+		  1 1 1 1 1 1 1 1 1 1
+		  1 1 1 1 1 1 1 1 1 1
+		</init> !-->
+	      </cells>
+	    </celldevs>
+	    ]]> 
+	  </xml>
+	</port>
+      </condition>
+      <condition name="cond_cell">
+	<port name="Delay"><double>0</double></port>
+	<port name="TimeStep"><double>1.0</double></port>
+      </condition>
+    </conditions>
+    <views>
+      <outputs>
+	<output name="o" format="distant" plugin="cairocaview"
+		location="localhost:8000:." >
+          <![CDATA[
+            <parameters>
+	      <size x="30" y="30" />
+	      <geometry type="square" />
+	      <cell name="cell" />
+	      <states type="boolean" name="state">
+		<state red_true="0" blue_true="65535" green_true="0" 
+		       red_false="65535" blue_false="65535" green_false="65535" />
+	      </states>
+	      <objects />
+	    </parameters>
+	    ]]>
+	</output>
+      </outputs>
+      <observables>
+	<observable name="obs_cell">
+	  <port name="s">
+	    <attachedview name="cell_view" />
+	  </port>
+	</observable>
+      </observables>
+      <view name="cell_view" type="timed" timestep="0.5" output="o" />
+    </views>
+  </experiment>
+</vle_project>

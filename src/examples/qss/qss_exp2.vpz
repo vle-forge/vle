@@ -1,0 +1,85 @@
+<?xml version="1.0" ?>
+<!DOCTYPE vle_project PUBLIC "" "http://vle.univ-littoral.fr/vle-0.5.0.dtd" >
+<vle_project version="0.1" date="" author="PC" >
+  <structures> 
+    <model name="ladybirdplantlouse" type="atomic" conditions="cond_ladybirdplantlouse"
+      dynamics="dyn_ladybirdplantlouse" observables="obs_ladybirdplantlouse" >
+      <out>
+	<port name="x" />
+	<port name="y" />
+      </out>
+    </model>
+  </structures>
+  <dynamics>
+    <dynamic name="dyn_ladybirdplantlouse" library="ladybirdplantlouse" model="ladybirdplantlouse" />
+  </dynamics>
+  <experiment name="exp2" duration="100" seed="123">
+    <conditions>
+      <condition name="cond_ladybirdplantlouse">
+        <port name="a"><double>0.5</double></port>
+	<port name="b"><double>0.01</double></port>
+	<port name="d"><double>0.01</double></port>
+        <port name="e"><double>.2</double></port>
+	<port name="threshold"><double>1e-10</double></port>
+	<port name="active"><boolean>false</boolean></port>
+	<port name="dependance"><boolean>false</boolean></port>
+	<port name="variables">
+	  <set>
+	    <set><string>x</string><double>5000.0</double><double>1</double></set>
+	    <set><string>y</string><double>45.0</double><double>.1</double></set>
+	  </set>
+	</port> 
+      </condition>
+    </conditions>
+    <views>
+      <outputs>
+	<output name="o1" format="distant" plugin="cairoplot"
+		location="localhost:8000:." >
+          <![CDATA[
+            <parameters>
+	      <curves>
+		<curve name="x" type="real" color_red="0"
+		       color_green="65535" color_blue="0" />
+	      </curves>
+	      <window size="20" />
+	      <scrolling value="true" />
+	      <limits>
+		<limit value="2000" color_red="65535"
+		       color_green="0" color_blue="0" />
+	      </limits>
+	    </parameters>
+	    ]]>
+	</output>
+	<output name="o2" format="distant" plugin="cairoplot"
+		location="localhost:8001:." >
+          <![CDATA[
+            <parameters>
+	      <curves>
+		<curve name="y" type="real" color_red="0"
+		       color_green="0" color_blue="65535" />
+	      </curves>
+	      <window size="20" />
+	      <scrolling value="true" />
+	      <limits>
+		<limit value="100" color_red="65535"
+		       color_green="0" color_blue="0" />
+	      </limits>
+	    </parameters>
+	    ]]>
+	</output>
+      </outputs>
+      <observables>
+	<observable name="obs_ladybirdplantlouse">
+	  <port name="x">
+	    <attachedview name="qssview1" />
+	  </port>
+          <port name="y">
+	    <attachedview name="qssview2" />
+	  </port>
+	</observable>
+      </observables>
+      <view name="qssview1" type="timed" timestep=".05" output="o1" />
+      <view name="qssview2" type="timed" timestep=".05" output="o2" />
+    </views>
+  </experiment>
+</vle_project>
