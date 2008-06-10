@@ -105,7 +105,7 @@ vpz::Vpz* SaxStackVpz::pushVpz(const AttributeList& att)
     if (existAttribute(att, "replica")) {
         m_vpz.project().setReplica(getAttribute < int >(att, "replica"));
     }
-    
+
     m_stack.push(&m_vpz);
 
     return &m_vpz;
@@ -136,20 +136,38 @@ void SaxStackVpz::pushModel(const AttributeList& att)
     }
 
     graph::Model* gmdl = 0;
+    std::string type, name, conditions, dynamics, observables;
+    std::string x, y, width, height;
 
-    std::string type(getAttribute < std::string >(att, "type"));
-    std::string name(getAttribute < std::string >(att, "name"));
+    for (AttributeList::const_iterator it = att.begin(); it != att.end();
+         ++it) {
+        if ((it->name) == "type") {
+            type = it->value;
+        } else if ((it->name) == "name") {
+            name = it->value;
+        } else if ((it->name) == "conditions") {
+            conditions = it->value;
+        } else if ((it->name) == "dynamics") {
+            dynamics = it->value;
+        } else if ((it->name) == "observables") {
+            observables = it->value;
+        } else if ((it->name) == "x") {
+            x = it->value;
+        } else if ((it->name) == "y") {
+            y = it->value;
+        } else if ((it->name) == "width") {
+            width = it->value;
+        } else if ((it->name) == "height") {
+            height = it->value;
+        }
+    }
+
+    Assert(utils::SaxParserError, not name.empty(),
+           "Attribute name not defined");
+    Assert(utils::SaxParserError, not type.empty(), boost::format(
+            "Attribute type not defined for model '%1%'") % name);
+
     if (type == "atomic") {
-        std::string cnd, dyn, obs;
-        if (existAttribute(att, "conditions"))
-            cnd = getAttribute < std::string >(att, "conditions");
-
-        if (existAttribute(att, "dynamics"))
-            dyn = getAttribute < std::string >(att, "dynamics");
-
-        if (existAttribute(att, "observables"))
-            obs = getAttribute < std::string >(att, "observables");
-
         try {
             gmdl = new graph::AtomicModel(name, parent);
         } catch(const utils::DevsGraphError& e) {
@@ -159,7 +177,7 @@ void SaxStackVpz::pushModel(const AttributeList& att)
         }
         vpz().project().model().atomicModels().insert(std::make_pair(
                 reinterpret_cast < graph::Model* >(gmdl),
-                AtomicModel(cnd, dyn, obs)));
+                AtomicModel(conditions, dynamics, observables)));
     } else if (type == "coupled") {
         try {
             gmdl = new graph::CoupledModel(name, parent);
@@ -172,9 +190,10 @@ void SaxStackVpz::pushModel(const AttributeList& att)
         Throw(utils::SaxParserError, (boost::format(
                         "Unknow model type %1%") % type));
     }
- 
+
     vpz::Model* mdl = new vpz::Model();
     mdl->set_model(gmdl);
+    buildModelGraphics(gmdl, x, y, width, height);
 
     if (m_stack.top()->isStructures()) {
         vpz().project().model().set_model(gmdl);
@@ -183,6 +202,35 @@ void SaxStackVpz::pushModel(const AttributeList& att)
     }
 
     m_stack.push(mdl);
+}
+
+void SaxStackVpz::buildModelGraphics(graph::Model* mdl,
+                                     const std::string& x,
+                                     const std::string& y,
+                                     const std::string& width,
+                                     const std::string& height)
+{
+    if (not x.empty() and not y.empty()) {
+        try {
+            mdl->setX(boost::lexical_cast < int >(x));
+            mdl->setY(boost::lexical_cast < int >(y));
+        } catch (boost::bad_lexical_cast& e) {
+            Throw(utils::SaxParserError, boost::format(
+                    "Cannot convert x or y position for model %1%") %
+                mdl->getName());
+        }
+    }
+
+    if (not width.empty() and not height.empty()) {
+        try {
+            mdl->setWidth(boost::lexical_cast < int >(width));
+            mdl->setHeight(boost::lexical_cast < int >(height));
+        } catch (boost::bad_lexical_cast& e) {
+            Throw(utils::SaxParserError, boost::format(
+                    "Cannot convert width or height for model %1%") %
+                mdl->getName());
+        }
+    }
 }
 
 void SaxStackVpz::pushPort(const AttributeList& att)
@@ -261,7 +309,7 @@ void SaxStackVpz::pushConnection(const AttributeList& att)
 
     std::string type(getAttribute < std::string >(att, "type"));
     vpz::Base* cnt = 0;
-    
+
     if (type == "internal") {
         cnt = new vpz::InternalConnection();
     } else if (type == "input") {
@@ -310,7 +358,7 @@ void SaxStackVpz::buildConnection()
 
     AssertS(utils::SaxParserError, m_stack.top()->isOrigin());
     vpz::Origin* orig = static_cast < vpz::Origin* >(pop());
-    
+
     AssertS(utils::SaxParserError, m_stack.top()->isInternalConnection() or
             m_stack.top()->isInputConnection() or
             m_stack.top()->isOutputConnection());
@@ -318,7 +366,7 @@ void SaxStackVpz::buildConnection()
 
     AssertS(utils::SaxParserError, m_stack.top()->isConnections());
     vpz::Base* cntx = pop();
-    
+
     AssertS(utils::SaxParserError, m_stack.top()->isModel());
     vpz::Model* model = static_cast < vpz::Model* >(m_stack.top());
 
@@ -349,7 +397,7 @@ void SaxStackVpz::pushDynamics()
 }
 
 void SaxStackVpz::pushDynamic(const AttributeList& att)
-{ 
+{
     AssertS(utils::SaxParserError, not m_stack.empty());
     AssertS(utils::SaxParserError, m_stack.top()->isDynamics());
 
@@ -509,9 +557,9 @@ void SaxStackVpz::pushOutput(const AttributeList& att)
     std::string name(getAttribute < std::string >(att, "name"));
     std::string format(getAttribute < std::string >(att, "format"));
     std::string plugin(getAttribute < std::string >(att, "plugin"));
-    
+
     std::string location;
-    if (existAttribute(att, "location")) 
+    if (existAttribute(att, "location"))
         location = getAttribute < std::string >(att, "location");
 
     Outputs& outs(m_vpz.project().experiment().views().outputs());
@@ -530,9 +578,9 @@ void SaxStackVpz::pushView(const AttributeList& att)
     AssertS(utils::SaxParserError, not m_stack.empty());
     AssertS(utils::SaxParserError, m_stack.top()->isViews());
 
-    std::string name(getAttribute< std::string >(att, "name")); 
-    std::string type(getAttribute< std::string >(att, "type")); 
-    std::string out(getAttribute< std::string >(att, "output")); 
+    std::string name(getAttribute< std::string >(att, "name"));
+    std::string type(getAttribute< std::string >(att, "type"));
+    std::string out(getAttribute< std::string >(att, "output"));
 
     Views& views(m_vpz.project().experiment().views());
 
@@ -557,7 +605,7 @@ void SaxStackVpz::pushAttachedView(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
     AssertS(utils::SaxParserError, m_stack.top()->isObservablePort());
-    
+
     pushObservablePortOnView(att);
 }
 
@@ -598,7 +646,7 @@ void SaxStackVpz::pushObservablePortOnView(const AttributeList& att)
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
     AssertS(utils::SaxParserError, m_stack.top()->isObservablePort());
-    
+
     std::string name(getAttribute < std::string >(att, "name"));
 
     vpz::ObservablePort* port(static_cast < vpz::ObservablePort* >(
@@ -621,7 +669,7 @@ void SaxStackVpz::pushTrame(const AttributeList& att)
     for (AttributeList::const_iterator it = att.begin();
          it != att.end(); ++it) {
         if (it->name == "type") {
-            type = it->value; 
+            type = it->value;
         } if (it->name == "date") {
             date = it->value;
         } else if (it->name == "name") {

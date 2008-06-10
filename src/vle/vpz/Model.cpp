@@ -194,7 +194,9 @@ void Model::writeCoupled(std::ostream& out, const graph::CoupledModel* mdl) cons
             current.pop_front();
 
             out << "<model name=\"" << top->getName() << "\" "
-                << "type=\"coupled\" >\n";
+                << "type=\"coupled\" ";
+            writeGraphics(out, mdl);
+            out << " >\n";
             writePort(out, top);
 
             out << " <submodels>\n";
@@ -257,11 +259,30 @@ void Model::writeAtomic(std::ostream& out, const graph::AtomicModel* mdl) const
     if (not vpzatom.observables().empty()) {
         out << "observables=\"" << vpzatom.observables() << "\" ";
     }
+
+    writeGraphics(out, mdl);
+
     out << ">\n";
 
     writePort(out, mdl);
 
     out << "</model>\n";
+}
+
+void Model::writeGraphics(std::ostream& out, const graph::Model* mdl) const
+{
+    if (mdl->x() >= 0) {
+        out << "x=\"" << mdl->x() << "\" ";
+    }
+    if (mdl->y() >= 0) {
+        out << "y=\"" << mdl->y() << "\" ";
+    }
+    if (mdl->width() >= 0) {
+        out << "width=\"" << mdl->width() << "\" ";
+    }
+    if (mdl->height() >= 0) {
+        out << "height=\"" << mdl->height() << "\" ";
+    }
 }
 
 void Model::writePort(std::ostream& out, const graph::Model* mdl) const

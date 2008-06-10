@@ -251,6 +251,7 @@ namespace vle { namespace vpz {
         void writePort(std::ostream& out, const graph::Model* mdl) const;
         void writeConnection(std::ostream& out,
                              const graph::CoupledModel* mdl) const;
+        void writeGraphics(std::ostream& out, const graph::Model* mdl) const;
 
         AtomicModelList     m_atomicmodels;
         graph::Model*       m_graph;
