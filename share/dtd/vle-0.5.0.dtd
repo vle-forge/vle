@@ -40,14 +40,18 @@
   version CDATA #REQUIRED
   instance CDATA #IMPLIED
   replica CDATA #IMPLIED
-  author CDATA #IMPLIED >
+  author CDATA #REQUIRED >
 
 <!ATTLIST model
   name CDATA #REQUIRED
   type (atomic|coupled) #REQUIRED
   dynamics CDATA #IMPLIED
   conditions CDATA #IMPLIED
-  observables CDATA #IMPLIED >
+  observables CDATA #IMPLIED
+  x CDATA #IMPLIED
+  y CDATA #IMPLIED
+  width CDATA #IMPLIED
+  height CDATA #IMPLIED >
 
 <!ATTLIST port
   name CDATA #REQUIRED >

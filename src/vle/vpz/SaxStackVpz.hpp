@@ -33,7 +33,15 @@
 #include <libxml++/libxml++.h>
 #include <stack>
 
-namespace vle { namespace vpz {
+namespace vle {
+
+    namespace graph {
+
+        class Model;
+
+    } // namespace graph
+
+    namespace vpz {
 
     /**
      *  Typedef the libxml++ sax AttributList
@@ -114,6 +122,23 @@ namespace vle { namespace vpz {
         std::stack < vpz::Base* >       m_stack;
         vpz::Vpz&                       m_vpz;
         TrameList                       m_trame;
+
+        /**
+         * @brief Assign the to graph::Model mdl the graphics information from
+         * the string x, y, width and height taken from the Vpz stream.
+         *
+         * @param mdl The graph::Model where assign (x, y) an or (width,
+         * height).
+         * @param x
+         * @param y
+         * @param width
+         * @param height
+         */
+        void buildModelGraphics(graph::Model* mdl,
+                                const std::string& x,
+                                const std::string& y,
+                                const std::string& width,
+                                const std::string& height);
     };
 
 }} // namespace vle vpz

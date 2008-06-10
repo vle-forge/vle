@@ -36,10 +36,10 @@ namespace vle { namespace graph {
 
 Model::Model(const std::string& name, CoupledModel* parent) :
     m_parent(parent),
-    m_x(0),
-    m_y(0),
-    m_width(0),
-    m_height(0),
+    m_x(-1),
+    m_y(-1),
+    m_width(-1),
+    m_height(-1),
     m_name(name)
 {
     if (parent) {
@@ -438,10 +438,10 @@ bool Model::isInList(const ModelList& lst, graph::Model* m)
 
 Model::Model() :
     m_parent(0),
-    m_x(0),
-    m_y(0),
-    m_width(0),
-    m_height(0)
+    m_x(-1),
+    m_y(-1),
+    m_width(-1),
+    m_height(-1)
 {
     Throw(utils::NotYetImplemented, "Model::Model not developed");
 }
