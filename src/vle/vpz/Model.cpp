@@ -175,62 +175,45 @@ void Model::writeModel(std::ostream& out) const
 
 void Model::writeCoupled(std::ostream& out, const graph::CoupledModel* mdl) const
 {
-    typedef std::list < const graph::CoupledModel* > CoupledModelList;
-    typedef std::list < CoupledModelList > StackList;
+    typedef std::stack < const graph::CoupledModel* > CoupledModelList;
+    typedef std::stack < bool > IsWritedCoupledModel;
 
-    StackList stack;
-    CoupledModelList toclosestack;
+    CoupledModelList cms;
+    IsWritedCoupledModel writed;
 
-    stack.push_front(CoupledModelList());
-    stack.front().push_back(mdl);
-    toclosestack.push_front(mdl);
+    cms.push(mdl);
+    writed.push(false);
 
-    while (not stack.empty()) {
-        CoupledModelList current(stack.front());
-        const graph::CoupledModel* top(current.front());
-        stack.pop_front();
-        while (not current.empty()) {
-            bool firstpush = true;
-            current.pop_front();
+    while (not cms.empty()) {
+        const graph::CoupledModel* top(cms.top());
 
+        if (not writed.top()) {
+            writed.top() = true;
             out << "<model name=\"" << top->getName() << "\" "
                 << "type=\"coupled\" ";
-            writeGraphics(out, mdl);
+            writeGraphics(out, top);
             out << " >\n";
             writePort(out, top);
+            out << "<submodels>\n";
 
-            out << " <submodels>\n";
             const graph::ModelList& childs(top->getModelList());
             for (graph::ModelList::const_iterator it = childs.begin(); 
                  it != childs.end(); ++it) {
                 if (it->second->isCoupled()) {
-                    if (firstpush) {
-                        stack.push_back(CoupledModelList());
-                        firstpush = false;
-                    }
-                    stack.back().push_back(
-                        static_cast < graph::CoupledModel* >(it->second));
-                    toclosestack.push_front(
-                        static_cast < graph::CoupledModel* >(it->second));
+                    cms.push(static_cast < graph::CoupledModel* >(it->second));
+                    writed.push(false);
                 } else if (it->second->isAtomic()) {
                     writeAtomic(out, static_cast < graph::AtomicModel* >
                                 (it->second));
                 }
             }
-
-            if (toclosestack.front() == top) {
-                out << " </submodels>\n";
-                writeConnection(out, top);
-                toclosestack.pop_front();
-                out << "</model>\n";
-            }
+        } else {
+            out << "</submodels>\n";
+            writeConnection(out, top);
+            cms.pop();
+            writed.pop();
+            out << "</model>\n";
         }
-    }
-    while (not toclosestack.empty()) {
-        out << " </submodels>\n";
-        writeConnection(out, toclosestack.front());
-        toclosestack.pop_front();
-        out << "</model>\n";
     }
 }
 
