@@ -39,9 +39,9 @@ Executive::Executive(const graph::AtomicModel& model,
 
 devs::Time Executive::init(const devs::Time& /* time */)
 {
-    translator::MatrixTranslator tr;
-    tr.mCoupledModel = &coupledmodel();
-    tr.mCoordinator = &coordinator();    
+    translator::MatrixTranslator tr(&coupledmodel(),
+				    &coordinator());
+
     tr.translate(m_buffer);
     m_buffer.clear();
 

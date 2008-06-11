@@ -22,9 +22,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #include <vle/translator/MatrixTranslator.hpp>
 #include <vle/devs/Coordinator.hpp>
 #include <vle/utils/Rand.hpp>
@@ -40,18 +37,21 @@
 
 namespace vle { namespace translator {
 
-MatrixTranslator::MatrixTranslator() :
-        mCoupledModel(0),
-        mCoordinator(0),
-        m_dimension(0),
-        m_init(0),
-        m_symmetricport(false)
+MatrixTranslator::MatrixTranslator(graph::CoupledModel* model,
+				   devs::Coordinator* coordinator) :
+    mCoupledModel(model),
+    mCoordinator(coordinator),
+    m_dimension(0),
+    m_init(0),
+    m_symmetricport(false)
 {
 }
 
 MatrixTranslator::~MatrixTranslator()
 {
-    if (m_init) delete[] m_init;
+    if (m_init) {
+        delete[] m_init;
+    }
 }
 
 bool MatrixTranslator::existModel(unsigned int i, unsigned int j)
@@ -60,7 +60,7 @@ bool MatrixTranslator::existModel(unsigned int i, unsigned int j)
         return true;
     else
         if (m_dimension == 1)
-            return (!m_init or m_init[i+(j-1)*m_size[0] - 1] != 0);
+            return (!m_init or m_init[i + (j - 1) * m_size[0] - 1] != 0);
         else
             return false;
 }
@@ -76,7 +76,8 @@ std::string MatrixTranslator::getDynamics(unsigned int i, unsigned int j)
                         % (m_init[i+(j-1)*m_size[0] - 1])).str();
             else
                 return "";
-    else return "cell";
+    else
+        return "cell";
 }
 
 std::string MatrixTranslator::getName(unsigned int i, unsigned int j) const
@@ -85,39 +86,10 @@ std::string MatrixTranslator::getName(unsigned int i, unsigned int j) const
         return (boost::format("%1%_%2%") % m_prefix % i).str();
     else
         if (m_dimension == 1) return
-                (boost::format("%1%_%2%_%3%") % m_prefix % i % j).str();
+            (boost::format("%1%_%2%_%3%") % m_prefix % i % j).str();
 
     return "";
 }
-
-/********************************
-  <?xml version="1.0" ?>
-  <celldevs>
-  <grid>
-  <dim axe="0" number="11" />
-  <dim axe="1" number="7" />
-  </grid>
-  <cells connectivity="neuman|moore" library="libcellule" symmetricport="true|false" >
-  <libraries>
-  <library index="1" name="lib1" />
-  <library index="2" name="lib2" />
-  </libraries>
-  <prefix>cell</prefix>
-  <init>
-  0 0 0 1 1 1 1 1 1 1 0
-  0 0 0 0 1 1 1 1 1 1 0
-  0 0 0 0 0 1 1 1 1 0 0
-  0 0 0 0 0 0 1 1 0 0 0
-  0 0 0 0 0 0 0 0 0 0 0
-  0 0 0 0 0 0 0 0 0 0 0
-  0 0 0 0 0 0 0 0 0 0 0
-  </init>
-  </cells>
-  </celldevs>
-
-  von neumann = 8
-  moore = 4
- *********************************/
 
 void MatrixTranslator::parseXML(const std::string& buffer)
 {
@@ -173,7 +145,7 @@ void MatrixTranslator::parseXML(const std::string& buffer)
         for (it = lst.begin(); it != lst.end(); ++it) {
             unsigned int index = boost::lexical_cast < unsigned int >(
                 (utils::xml::get_attribute((xmlpp::Element*)(*it)
-                                      , "index")));
+                                           , "index")));
             std::string name = utils::xml::get_attribute((xmlpp::Element*)(*it),
                                                          "name").c_str();
             std::string model;
@@ -198,7 +170,7 @@ void MatrixTranslator::parseXML(const std::string& buffer)
         else m_init = new unsigned int[m_size[0]*m_size[1]];
 
         std::string init = utils::xml::get_children(cells, "init")
-                           ->get_child_text()->get_content();
+            ->get_child_text()->get_content();
 
         std::vector < std:: string > lst;
 
@@ -232,12 +204,78 @@ void MatrixTranslator::translate(const std::string& buffer)
     translateStructures();
 }
 
+void MatrixTranslator::translateModel(unsigned int i,
+                                      unsigned int j)
+{
+    graph::AtomicModel* atomicModel = new
+        graph::AtomicModel(getName(i, j), mCoupledModel);
+    std::vector < std::string > conditions;
+
+    conditions.push_back("cond_cell");
+    conditions.push_back((boost::format("cond_%1%_%2%_%3%")
+                          % m_prefix % i % j).str());
+    m_models[getName(i,j)] = atomicModel;
+
+    mCoordinator->createModel(atomicModel,
+                              getDynamics(i, j),
+                              conditions,
+                              "obs_cell");
+
+    if (i != 1) atomicModel->addInputPort("N");
+
+    if (j != 1) atomicModel->addInputPort("W");
+
+    if (i != m_size[0]) atomicModel->addInputPort("S");
+
+    if (j != m_size[1]) atomicModel->addInputPort("E");
+
+    if (m_connectivity == VON_NEUMANN) {
+        if (i != 1 and j != 1)
+            atomicModel->addInputPort("NW");
+
+        if (i != 1 and j != m_size[1])
+            atomicModel->addInputPort("NE");
+
+        if (i != m_size[0] and j != 1)
+            atomicModel->addInputPort("SW");
+
+        if (i != m_size[0] and j != m_size[1])
+            atomicModel->addInputPort("SE");
+    }
+
+    if (m_symmetricport) {
+        if (i != 1) atomicModel->addOutputPort("N");
+
+        if (j != 1) atomicModel->addOutputPort("W");
+
+        if (i != m_size[0]) atomicModel->addOutputPort("S");
+
+        if (j != m_size[1]) atomicModel->addOutputPort("E");
+
+        if (m_connectivity == VON_NEUMANN) {
+            if (i != 1 and j != 1)
+                atomicModel->addOutputPort("NW");
+
+            if (i != 1 and j != m_size[1])
+                atomicModel->addOutputPort("NE");
+
+            if (i != m_size[0] and j != 1)
+                atomicModel->addOutputPort("SW");
+
+            if (i != m_size[0] and j != m_size[1])
+                atomicModel->addOutputPort("SE");
+        }
+    } else {
+        atomicModel->addOutputPort("out");
+    }
+}
+
 void MatrixTranslator::translateStructures()
 {
     if (m_dimension == 0)
         for (unsigned int i = 1 ; i <= m_size[0] ; i++) {
             graph::AtomicModel* atomicModel = new graph::AtomicModel(getName(i),
-                    mCoupledModel);
+                                                                     mCoupledModel);
             std::vector < std::string > conditions;
 
             conditions.push_back("cond_cell");
@@ -261,73 +299,10 @@ void MatrixTranslator::translateStructures()
         }
     else
         if (m_dimension == 1)
-            for (unsigned int j = 1 ; j <= m_size[1] ; j++) {
-                for (unsigned int i = 1 ; i <= m_size[0] ; i++) {
-                    if (existModel(i, j)) {
-                        graph::AtomicModel* atomicModel = new
-                            graph::AtomicModel(getName(i, j), mCoupledModel);
-                        std::vector < std::string > conditions;
-
-                        conditions.push_back("cond_cell");
-                        conditions.push_back((boost::format("cond_%1%_%2%_%3%")
-                                              % m_prefix % i % j).str());
-                        m_models[getName(i,j)] = atomicModel;
-
-                        mCoordinator->createModel(atomicModel,
-                                                  getDynamics(i, j),
-                                                  conditions,
-                                                  "obs_cell");
-
-                        if (i != 1) atomicModel->addInputPort("N");
-
-                        if (j != 1) atomicModel->addInputPort("W");
-
-                        if (i != m_size[0]) atomicModel->addInputPort("S");
-
-                        if (j != m_size[1]) atomicModel->addInputPort("E");
-
-                        if (m_connectivity == VON_NEUMANN) {
-                            if (i != 1 and j != 1)
-                                atomicModel->addInputPort("NW");
-
-                            if (i != 1 and j != m_size[1])
-                                atomicModel->addInputPort("NE");
-
-                            if (i != m_size[0] and j != 1)
-                                atomicModel->addInputPort("SW");
-
-                            if (i != m_size[0] and j != m_size[1])
-                                atomicModel->addInputPort("SE");
-                        }
-
-                        if (m_symmetricport) {
-                            if (i != 1) atomicModel->addOutputPort("N");
-
-                            if (j != 1) atomicModel->addOutputPort("W");
-
-                            if (i != m_size[0]) atomicModel->addOutputPort("S");
-
-                            if (j != m_size[1]) atomicModel->addOutputPort("E");
-
-                            if (m_connectivity == VON_NEUMANN) {
-                                if (i != 1 and j != 1)
-                                    atomicModel->addOutputPort("NW");
-
-                                if (i != 1 and j != m_size[1])
-                                    atomicModel->addOutputPort("NE");
-
-                                if (i != m_size[0] and j != 1)
-                                    atomicModel->addOutputPort("SW");
-
-                                if (i != m_size[0] and j != m_size[1])
-                                    atomicModel->addOutputPort("SE");
-                            }
-                        } else {
-                            atomicModel->addOutputPort("out");
-                        }
-                    }
-                }
-            }
+            for (unsigned int j = 1 ; j <= m_size[1] ; j++)
+                for (unsigned int i = 1 ; i <= m_size[0] ; i++)
+                    if (existModel(i, j))
+                        translateModel(i, j);
 
     // Connections
     if (m_dimension == 0)
@@ -351,93 +326,109 @@ void MatrixTranslator::translateStructures()
             }
         }
     else
-        if (m_dimension == 1) {
+        if (m_dimension == 1)
             if (m_symmetricport) {
                 for (unsigned int j = 1 ; j <= m_size[1] ; j++) {
                     for (unsigned int i = 1 ; i <= m_size[0] ; i++) {
-                        if (existModel(i, j)) {
-                            if (j != 1 and existModel(i, j - 1))
-                                mCoupledModel->addInternalConnection
-                                    (getName(i, j), "W", getName(i, j - 1),
-                                     "E");
-
-                            if (i != 1 and existModel(i - 1, j))
-                                mCoupledModel->addInternalConnection(getName(i, j), "N", getName(i - 1, j), "S");
-
-                            if (j != m_size[1] and existModel(i, j + 1))
-                                mCoupledModel->addInternalConnection(getName(i, j), "E", getName(i, j + 1), "W");
-
-                            if (i != m_size[0] and existModel(i + 1, j))
-                                mCoupledModel->addInternalConnection(getName(i, j), "S", getName(i + 1, j), "N");
-
-                            if (m_connectivity == VON_NEUMANN) {
-                                if (j != 1 and i != 1 and existModel(i - 1, j - 1))
-                                    mCoupledModel->addInternalConnection(getName(i, j), "SW",
-                                                                         getName(i - 1, j - 1), "SE");
-
-                                if (j != m_size[1] and i != 1 and existModel(i - 1, j + 1))
-                                    mCoupledModel->addInternalConnection(getName(i, j), "SE",
-                                                                         getName(i - 1, j + 1), "SW");
-
-                                if (j != 1 and i != m_size[0] and existModel(i + 1, j - 1))
-                                    mCoupledModel->addInternalConnection(getName(i, j), "NW",
-                                                                         getName(i + 1, j - 1), "NE");
-
-                                if (j != m_size[1] and i != m_size[0] and existModel(i + 1, j + 1))
-                                    mCoupledModel->addInternalConnection(getName(i, j), "NE",
-                                                                         getName(i + 1, j + 1), "NW");
-                            }
-                        }
-                    }
-                }
-            } else {
-                for (unsigned int j = 1 ; j <= m_size[1] ; j++) {
-                    for (unsigned int i = 1 ; i <= m_size[0] ; i++) {
-                        if (existModel(i, j)) {
-                            if (j != 1 and existModel(i, j - 1))
-                                mCoupledModel->addInternalConnection(getName(i, j), "out", getName(i, j - 1), "E");
-
-                            if (i != 1 and existModel(i - 1, j))
-                                mCoupledModel->addInternalConnection(getName(i, j), "out", getName(i - 1, j), "S");
-
-                            if (j != m_size[1] and existModel(i, j + 1))
-                                mCoupledModel->addInternalConnection(getName(i, j), "out", getName(i, j + 1), "W");
-
-                            if (i != m_size[0] and existModel(i + 1, j))
-                                mCoupledModel->addInternalConnection(getName(i, j), "out", getName(i + 1, j), "N");
-
-                            if (m_connectivity == VON_NEUMANN) {
-                                if (j != 1 and i != 1 and existModel(i - 1, j - 1))
-                                    mCoupledModel->addInternalConnection(getName(i, j), "out",
-                                                                         getName(i - 1, j - 1), "SE");
-
-                                if (j != m_size[1] and i != 1 and existModel(i - 1, j + 1))
-                                    mCoupledModel->addInternalConnection(getName(i, j), "out",
-                                                                         getName(i - 1, j + 1), "SW");
-
-                                if (j != 1 and i != m_size[0] and existModel(i + 1, j - 1))
-                                    mCoupledModel->addInternalConnection(getName(i, j), "out",
-                                                                         getName(i + 1, j - 1), "NE");
-
-                                if (j != m_size[1] and i != m_size[0] and existModel(i + 1, j + 1))
-                                    mCoupledModel->addInternalConnection(getName(i, j), "out",
-                                                                         getName(i + 1, j + 1), "NW");
-                            }
-                        }
+                        if (existModel(i, j))
+                            translateSymmetricConnection2D(i, j);
                     }
                 }
             }
-        }
+            else
+                for (unsigned int j = 1 ; j <= m_size[1] ; j++)
+                    for (unsigned int i = 1 ; i <= m_size[0] ; i++)
+                        if (existModel(i, j))
+                            translateConnection2D(i, j);
+}
+
+void MatrixTranslator::translateSymmetricConnection2D(unsigned int i,
+                                                      unsigned int j)
+{
+    if (j != 1 and existModel(i, j - 1))
+        mCoupledModel->addInternalConnection
+            (getName(i, j), "W", getName(i, j - 1),
+             "E");
+
+    if (i != 1 and existModel(i - 1, j))
+        mCoupledModel->addInternalConnection(getName(i, j), "N",
+                                             getName(i - 1, j), "S");
+
+    if (j != m_size[1] and existModel(i, j + 1))
+        mCoupledModel->addInternalConnection(getName(i, j), "E",
+                                             getName(i, j + 1), "W");
+
+    if (i != m_size[0] and existModel(i + 1, j))
+        mCoupledModel->addInternalConnection(getName(i, j), "S",
+                                             getName(i + 1, j), "N");
+
+    if (m_connectivity == VON_NEUMANN) {
+        if (j != 1 and i != 1 and existModel(i - 1, j - 1))
+            mCoupledModel->addInternalConnection(getName(i, j), "SW",
+                                                 getName(i - 1, j - 1), "SE");
+
+        if (j != m_size[1] and i != 1 and existModel(i - 1, j + 1))
+            mCoupledModel->addInternalConnection(getName(i, j), "SE",
+                                                 getName(i - 1, j + 1), "SW");
+
+        if (j != 1 and i != m_size[0] and existModel(i + 1, j - 1))
+            mCoupledModel->addInternalConnection(getName(i, j), "NW",
+                                                 getName(i + 1, j - 1), "NE");
+
+        if (j != m_size[1] and i != m_size[0] and existModel(i + 1, j + 1))
+            mCoupledModel->addInternalConnection(getName(i, j), "NE",
+                                                 getName(i + 1, j + 1), "NW");
+    }
+}
+
+void MatrixTranslator::translateConnection2D(unsigned int i,
+                                             unsigned int j)
+{
+    if (j != 1 and existModel(i, j - 1))
+        mCoupledModel->addInternalConnection(getName(i, j), "out",
+                                             getName(i, j - 1), "E");
+
+    if (i != 1 and existModel(i - 1, j))
+        mCoupledModel->addInternalConnection(getName(i, j), "out",
+                                             getName(i - 1, j), "S");
+
+    if (j != m_size[1] and existModel(i, j + 1))
+        mCoupledModel->addInternalConnection(getName(i, j), "out",
+                                             getName(i, j + 1), "W");
+
+    if (i != m_size[0] and existModel(i + 1, j))
+        mCoupledModel->addInternalConnection(getName(i, j), "out",
+                                             getName(i + 1, j), "N");
+
+    if (m_connectivity == VON_NEUMANN) {
+        if (j != 1 and i != 1 and existModel(i - 1, j - 1))
+            mCoupledModel->addInternalConnection(getName(i, j), "out",
+                                                 getName(i - 1, j - 1), "SE");
+
+        if (j != m_size[1] and i != 1 and existModel(i - 1, j + 1))
+            mCoupledModel->addInternalConnection(getName(i, j), "out",
+                                                 getName(i - 1, j + 1), "SW");
+
+        if (j != 1 and i != m_size[0] and existModel(i + 1, j - 1))
+            mCoupledModel->addInternalConnection(getName(i, j), "out",
+                                                 getName(i + 1, j - 1), "NE");
+
+        if (j != m_size[1] and i != m_size[0] and existModel(i + 1, j + 1))
+            mCoupledModel->addInternalConnection(getName(i, j), "out",
+                                                 getName(i + 1, j + 1), "NW");
+    }
 }
 
 void MatrixTranslator::translateDynamics()
 {
     if (m_multipleLibrary) {
-        std::map < unsigned int , std::pair < std::string, std::string > >::const_iterator it =
-            m_libraries.begin();
+        std::map < unsigned int ,
+            std::pair < std::string,
+            std::string > >::const_iterator it = m_libraries.begin();
 
         while (it != m_libraries.end()) {
-            vpz::Dynamic dynamics((boost::format("dyn_cell_%1%") % it->first).str());
+            vpz::Dynamic dynamics((boost::format("dyn_cell_%1%") %
+                                   it->first).str());
 
             dynamics.setLibrary(it->second.first);
 
@@ -458,70 +449,79 @@ void MatrixTranslator::translateDynamics()
     }
 }
 
+void MatrixTranslator::translateCondition1D(unsigned int i)
+{
+    std::string name = (boost::format("cond_%1%_%2%")
+                        % m_prefix % i).str();
+    vpz::Condition condition(name);
+    value::Set neighbourhood = value::SetFactory::create();
+
+    if (i != 1)
+        neighbourhood->addValue(value::StringFactory::create("L"));
+
+    if (i != m_size[0])
+        neighbourhood->addValue(value::StringFactory::create("R"));
+
+    condition.addValueToPort("Neighbourhood", neighbourhood);
+
+    condition.addValueToPort("_x", value::IntegerFactory::create(i));
+
+    mCoordinator->addPermanent(condition);
+}
+
+void MatrixTranslator::translateCondition2D(unsigned int i,
+                                            unsigned int j)
+{
+    std::string name = (boost::format("cond_%1%_%2%_%3%")
+                        % m_prefix % i % j).str();
+    vpz::Condition condition(name);
+    value::Set neighbourhood = value::SetFactory::create();
+
+    if (i != 1)
+        neighbourhood->addValue(value::StringFactory::create("N"));
+
+    if (j != m_size[1])
+        neighbourhood->addValue(value::StringFactory::create("E"));
+
+    if (i != m_size[0])
+        neighbourhood->addValue(value::StringFactory::create("S"));
+
+    if (j != 1)
+        neighbourhood->addValue(value::StringFactory::create("W"));
+
+    if (m_connectivity == VON_NEUMANN) {
+        if (i != 1 and j != 1)
+            neighbourhood->addValue(value::StringFactory::create("NW"));
+
+        if (i != 1 and j != m_size[1])
+            neighbourhood->addValue(value::StringFactory::create("NE"));
+
+        if (i != m_size[0] and j != 1)
+            neighbourhood->addValue(value::StringFactory::create("SW"));
+
+        if (i != m_size[0] and j != m_size[1])
+            neighbourhood->addValue(value::StringFactory::create("SE"));
+    }
+
+    condition.addValueToPort("Neighbourhood", neighbourhood);
+
+    condition.addValueToPort("_x", value::IntegerFactory::create(i));
+    condition.addValueToPort("_y", value::IntegerFactory::create(j));
+    mCoordinator->addPermanent(condition);
+}
+
 void MatrixTranslator::translateConditions()
 {
     if (m_dimension == 0) {
         for (unsigned int i = 1 ; i <= m_size[0] ; i++)
-            if (!m_init || m_init[i-1] != 0) {
-                std::string name = (boost::format("cond_%1%_%2%")
-                                    % m_prefix % i).str();
-                vpz::Condition condition(name);
-                value::Set neighbourhood = value::SetFactory::create();
-
-                if (i != 1)
-                    neighbourhood->addValue(value::StringFactory::create("L"));
-
-                if (i != m_size[0])
-                    neighbourhood->addValue(value::StringFactory::create("R"));
-
-                condition.addValueToPort("Neighbourhood", neighbourhood);
-
-                condition.addValueToPort("_x", value::IntegerFactory::create(i));
-
-                mCoordinator->addPermanent(condition);
-            }
+            if (!m_init || m_init[i-1] != 0)
+                translateCondition1D(i);
     } else
         if (m_dimension == 1) {
             for (unsigned int i = 1 ; i <= m_size[0] ; i++)
                 for (unsigned int j = 1 ; j <= m_size[1] ; j++)
-                    if (existModel(i, j)) {
-                        std::string name = (boost::format("cond_%1%_%2%_%3%")
-                                            % m_prefix % i % j).str();
-                        vpz::Condition condition(name);
-                        value::Set neighbourhood = value::SetFactory::create();
-
-                        if (i != 1)
-                            neighbourhood->addValue(value::StringFactory::create("N"));
-
-                        if (j != m_size[1])
-                            neighbourhood->addValue(value::StringFactory::create("E"));
-
-                        if (i != m_size[0])
-                            neighbourhood->addValue(value::StringFactory::create("S"));
-
-                        if (j != 1)
-                            neighbourhood->addValue(value::StringFactory::create("W"));
-
-                        if (m_connectivity == VON_NEUMANN) {
-                            if (i != 1 and j != 1)
-                                neighbourhood->addValue(value::StringFactory::create("NW"));
-
-                            if (i != 1 and j != m_size[1])
-                                neighbourhood->addValue(value::StringFactory::create("NE"));
-
-                            if (i != m_size[0] and j != 1)
-                                neighbourhood->addValue(value::StringFactory::create("SW"));
-
-                            if (i != m_size[0] and j != m_size[1])
-                                neighbourhood->addValue(value::StringFactory::create("SE"));
-                        }
-
-                        condition.addValueToPort("Neighbourhood", neighbourhood);
-
-                        condition.addValueToPort("_x", value::IntegerFactory::create(i));
-                        condition.addValueToPort("_y", value::IntegerFactory::create(j));
-                        mCoordinator->addPermanent(condition);
-                    }
+                    if (existModel(i, j))
+                        translateCondition2D(i, j);
         }
 }
 

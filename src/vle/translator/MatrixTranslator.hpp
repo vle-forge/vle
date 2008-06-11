@@ -35,22 +35,54 @@
 
 namespace vle { namespace translator {
 
+    /**
+     * @brief A translator to build Vector, Matrix 2D or 3D of Atomic model with
+     * specific libraries.
+     *
+     * @code
+     * <?xml version="1.0" ?>
+     * <celldevs>
+     *  <grid>
+     *   <dim axe="0" number="11" />
+     *   <dim axe="1" number="7" />
+     *  </grid>
+     *  <cells connectivity="neuman|moore" library="libcellule"
+     *         symmetricport="true|false" >
+     *   <libraries>
+     *    <library index="1" name="lib1" />
+     *    <library index="2" name="lib2" />
+     *   </libraries>
+     *   <prefix>cell</prefix>
+     *   <init>
+     *    0 0 0 1 1 1 1 1 1 1 0
+     *    0 0 0 0 1 1 1 1 1 1 0
+     *    0 0 0 0 0 1 1 1 1 0 0
+     *    0 0 0 0 0 0 1 1 0 0 0
+     *    0 0 0 0 0 0 0 0 0 0 0
+     *    0 0 0 0 0 0 0 0 0 0 0
+     *    0 0 0 0 0 0 0 0 0 0 0
+     *   </init>
+     *  </cells>
+     * </celldevs>
+     * Von neumann = 8
+     * Mmoore = 4
+     * @endcode
+     */
     class MatrixTranslator
     {
     public:
-        MatrixTranslator();
+        MatrixTranslator(graph::CoupledModel* model,
+                         devs::Coordinator* coordinator);
+
         virtual ~MatrixTranslator();
 
-        virtual void translate(const std::string& /* buffer */);
+        void translate(const std::string& buffer);
 
+    private:
         typedef enum { VON_NEUMANN, MOORE, LINEAR } connectivity_type;
 
-	graph::CoupledModel* mCoupledModel;
-	devs::Coordinator* mCoordinator;
-
-        bool existModel(unsigned int i, unsigned int j = 0);
-	std::string getDynamics(unsigned int i, unsigned int j = 0);
-        std::string getName(unsigned int i, unsigned int j = 0) const;
+        graph::CoupledModel* mCoupledModel;
+        devs::Coordinator* mCoordinator;
 
         unsigned int m_dimension;
         std::map < unsigned int, unsigned int > m_size;
@@ -58,21 +90,33 @@ namespace vle { namespace translator {
         bool m_multipleLibrary;
         std::string m_library;
         std::string m_model;
-        std::map < unsigned int , std::pair < std::string, std::string > > m_libraries;
+        std::map < unsigned int,
+            std::pair < std::string,
+            std::string > > m_libraries;
         std::string m_prefix;
         unsigned int* m_init;
         std::map < std::string , graph::AtomicModel* > m_models;
-        bool        m_symmetricport;
+        bool m_symmetricport;
         xmlpp::Element* m_root;
-
-    private:
         xmlpp::DomParser m_parser;
 
-        virtual void parseXML(const std::string& buffer);
-	void translateStructures();
-	void translateDynamics();
-	void translateConditions();
-	
+        bool existModel(unsigned int i, unsigned int j = 0);
+        std::string getDynamics(unsigned int i, unsigned int j = 0);
+        std::string getName(unsigned int i, unsigned int j = 0) const;
+
+        void parseXML(const std::string& buffer);
+        void translateModel(unsigned int i,
+                            unsigned int j);
+        void translateSymmetricConnection2D(unsigned int i,
+                                            unsigned int j);
+        void translateConnection2D(unsigned int i,
+                                   unsigned int j);	
+        void translateStructures();
+        void translateDynamics();
+        void translateCondition2D(unsigned int i,
+                                  unsigned int j);
+        void translateCondition1D(unsigned int i);	
+        void translateConditions();	
     };
 
 }} // namespace vle translator
