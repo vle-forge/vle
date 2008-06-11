@@ -47,12 +47,11 @@ Vpz::Vpz(const Vpz& vpz) :
 
 void Vpz::write(std::ostream& out) const
 {
-    out << "<?xml version=\"1.0\" ?>\n"
-        << "<!DOCTYPE vle_project SYSTEM "
-        << "\"http://vle.univ-littoral.fr/vle-0.5.0.dtd\">";
+    out << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
+        << "<!DOCTYPE vle_project PUBLIC \"-//VLE TEAM//DTD Strict//EN\" "
+        << "\"http://vle.univ-littoral.fr/vle-0.5.0.dtd\">\n";
 
     m_project.write(out);
-    out << std::endl;
 }
 
 void Vpz::parseFile(const std::string& filename)

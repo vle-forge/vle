@@ -35,13 +35,15 @@ void Dynamic::write(std::ostream& out) const
     out << "<dynamic "
         << "name=\"" << m_name << "\" "
         << "library=\"" << m_library << "\" "
-        << "model=\"" << m_model << "\" "
-        << "language=\"" << m_language << "\" ";
+        << "model=\"" << m_model << "\" ";
 
-    if (m_type == LOCAL)
-        out << " type=\"local\"";
-    else
-        out << " type=\"distant\" location=\"" << m_location << "\"";
+    if (not m_language.empty()) {
+        out << "language=\"" << m_language << "\" ";
+    }
+
+    if (m_type != LOCAL) {
+        out << " location=\"" << m_location << "\"";
+    }
 
     out << " />";
 }
