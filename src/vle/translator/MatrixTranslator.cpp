@@ -56,44 +56,50 @@ MatrixTranslator::~MatrixTranslator()
 
 bool MatrixTranslator::existModel(unsigned int i, unsigned int j)
 {
-    if (m_dimension == 0)
+    if (m_dimension == 0) {
         return true;
-    else
-        if (m_dimension == 1)
+    } else {
+        if (m_dimension == 1) {
             return (!m_init or m_init[i + (j - 1) * m_size[0] - 1] != 0);
-        else
+        } else {
             return false;
+        }
+    }
 }
 
 std::string MatrixTranslator::getDynamics(unsigned int i, unsigned int j)
 {
-    if (m_multipleLibrary)
-        if (m_dimension == 0)
+    if (m_multipleLibrary) {
+        if (m_dimension == 0) {
             return (boost::format("dyn_cell_%1%") % m_init[i]).str();
-        else
-            if (m_dimension == 1)
+        } else {
+            if (m_dimension == 1) {
                 return (boost::format("dyn_cell_%1%")
-                        % (m_init[i+(j-1)*m_size[0] - 1])).str();
-            else
-                return "";
-    else
+                        % (m_init[i + (j - 1) * m_size[0] - 1])).str();
+            } else {
+                return std::string();
+            }
+        }
+    } else {
         return "cell";
+    }
 }
 
 std::string MatrixTranslator::getName(unsigned int i, unsigned int j) const
 {
-    if (m_dimension == 0)
+    if (m_dimension == 0) {
         return (boost::format("%1%_%2%") % m_prefix % i).str();
-    else
-        if (m_dimension == 1) return
-            (boost::format("%1%_%2%_%3%") % m_prefix % i % j).str();
+    } else {
+        if (m_dimension == 1) {
+            return (boost::format("%1%_%2%_%3%") % m_prefix % i % j).str();
+        }
+    }
 
-    return "";
+    return std::string();
 }
 
 void MatrixTranslator::parseXML(const std::string& buffer)
 {
-    // XML parsing
     m_parser.parse_memory(buffer);
     m_root = utils::xml::get_root_node(m_parser, "celldevs");
 
@@ -117,8 +123,10 @@ void MatrixTranslator::parseXML(const std::string& buffer)
     if (utils::xml::exist_attribute(cells , "connectivity")) {
         std::string s = utils::xml::get_attribute(cells , "connectivity");
 
-        if (s == "von neumann") m_connectivity = VON_NEUMANN;
-        else if (s == "moore") m_connectivity = MOORE;
+        if (s == "von neumann")
+            m_connectivity = VON_NEUMANN;
+        else if (s == "moore")
+            m_connectivity = MOORE;
     } else
         m_connectivity = LINEAR;
 
@@ -146,13 +154,13 @@ void MatrixTranslator::parseXML(const std::string& buffer)
             unsigned int index = boost::lexical_cast < unsigned int >(
                 (utils::xml::get_attribute((xmlpp::Element*)(*it)
                                            , "index")));
-            std::string name = utils::xml::get_attribute((xmlpp::Element*)(*it),
-                                                         "name").c_str();
+            std::string name = utils::xml::get_attribute(
+                (xmlpp::Element*)(*it), "name").c_str();
             std::string model;
 
             if (utils::xml::exist_attribute((xmlpp::Element*)(*it), "model"))
-                model = utils::xml::get_attribute((xmlpp::Element*)(*it),
-                                                  "model").c_str();
+                model = utils::xml::get_attribute(
+                    (xmlpp::Element*)(*it), "model").c_str();
 
             m_libraries[index] = std::pair < std::string, std::string >(name,
                                                                         model);
@@ -188,17 +196,13 @@ void MatrixTranslator::parseXML(const std::string& buffer)
             ++it;
             ++i;
         }
-
-
     }
 }
 
 void MatrixTranslator::translate(const std::string& buffer)
 {
-    // XML parsing
     parseXML(buffer);
 
-    // translate
     translateDynamics();
     translateConditions();
     translateStructures();
@@ -221,49 +225,69 @@ void MatrixTranslator::translateModel(unsigned int i,
                               conditions,
                               "obs_cell");
 
-    if (i != 1) atomicModel->addInputPort("N");
+    if (i != 1)
+        atomicModel->addInputPort("N");
 
-    if (j != 1) atomicModel->addInputPort("W");
+    if (j != 1)
+        atomicModel->addInputPort("W");
 
-    if (i != m_size[0]) atomicModel->addInputPort("S");
+    if (i != m_size[0])
+        atomicModel->addInputPort("S");
 
-    if (j != m_size[1]) atomicModel->addInputPort("E");
+    if (j != m_size[1])
+        atomicModel->addInputPort("E");
 
     if (m_connectivity == VON_NEUMANN) {
-        if (i != 1 and j != 1)
+        if (i != 1 and j != 1) {
             atomicModel->addInputPort("NW");
+        }
 
-        if (i != 1 and j != m_size[1])
+        if (i != 1 and j != m_size[1]) {
             atomicModel->addInputPort("NE");
+        }
 
-        if (i != m_size[0] and j != 1)
+        if (i != m_size[0] and j != 1) {
             atomicModel->addInputPort("SW");
+        }
 
-        if (i != m_size[0] and j != m_size[1])
+        if (i != m_size[0] and j != m_size[1]) {
             atomicModel->addInputPort("SE");
+        }
     }
 
     if (m_symmetricport) {
-        if (i != 1) atomicModel->addOutputPort("N");
+        if (i != 1) {
+            atomicModel->addOutputPort("N");
+        }
 
-        if (j != 1) atomicModel->addOutputPort("W");
+        if (j != 1) {
+            atomicModel->addOutputPort("W");
+        }
 
-        if (i != m_size[0]) atomicModel->addOutputPort("S");
+        if (i != m_size[0]) {
+            atomicModel->addOutputPort("S");
+        }
 
-        if (j != m_size[1]) atomicModel->addOutputPort("E");
+        if (j != m_size[1]) {
+            atomicModel->addOutputPort("E");
+        }
 
         if (m_connectivity == VON_NEUMANN) {
-            if (i != 1 and j != 1)
+            if (i != 1 and j != 1) {
                 atomicModel->addOutputPort("NW");
+            }
 
-            if (i != 1 and j != m_size[1])
+            if (i != 1 and j != m_size[1]) {
                 atomicModel->addOutputPort("NE");
+            }
 
-            if (i != m_size[0] and j != 1)
+            if (i != m_size[0] and j != 1) {
                 atomicModel->addOutputPort("SW");
+            }
 
-            if (i != m_size[0] and j != m_size[1])
+            if (i != m_size[0] and j != m_size[1]) {
                 atomicModel->addOutputPort("SE");
+            }
         }
     } else {
         atomicModel->addOutputPort("out");
@@ -272,10 +296,10 @@ void MatrixTranslator::translateModel(unsigned int i,
 
 void MatrixTranslator::translateStructures()
 {
-    if (m_dimension == 0)
-        for (unsigned int i = 1 ; i <= m_size[0] ; i++) {
-            graph::AtomicModel* atomicModel = new graph::AtomicModel(getName(i),
-                                                                     mCoupledModel);
+    if (m_dimension == 0) {
+        for (unsigned int i = 1; i <= m_size[0]; i++) {
+            graph::AtomicModel* atomicModel =
+                new graph::AtomicModel(getName(i), mCoupledModel);
             std::vector < std::string > conditions;
 
             conditions.push_back("cond_cell");
@@ -285,61 +309,83 @@ void MatrixTranslator::translateStructures()
             mCoordinator->createModel(atomicModel, getDynamics(i), conditions,
                                       "obs_cell");
 
-            if (i != 1) atomicModel->addInputPort("L");
+            if (i != 1) {
+                atomicModel->addInputPort("L");
+            }
 
-            if (i != m_size[0]) atomicModel->addInputPort("R");
+            if (i != m_size[0]) {
+                atomicModel->addInputPort("R");
+            }
 
             if (m_symmetricport) {
-                if (i != 1) atomicModel->addOutputPort("L");
+                if (i != 1) {
+                    atomicModel->addOutputPort("L");
+                }
 
-                if (i != m_size[0]) atomicModel->addOutputPort("R");
+                if (i != m_size[0]) {
+                    atomicModel->addOutputPort("R");
+                }
             } else {
                 atomicModel->addOutputPort("out");
             }
         }
-    else
-        if (m_dimension == 1)
-            for (unsigned int j = 1 ; j <= m_size[1] ; j++)
-                for (unsigned int i = 1 ; i <= m_size[0] ; i++)
-                    if (existModel(i, j))
+    } else {
+        if (m_dimension == 1) {
+            for (unsigned int j = 1; j <= m_size[1]; j++) {
+                for (unsigned int i = 1; i <= m_size[0]; i++) {
+                    if (existModel(i, j)) {
                         translateModel(i, j);
-
-    // Connections
-    if (m_dimension == 0)
-        for (unsigned int i = 1 ; i <= m_size[0] ; i++) {
-            if (m_symmetricport) {
-                if (i != 1)
-                    mCoupledModel->addInternalConnection(getName(i), "L",
-                                                         getName(i - 1), "R");
-
-                if (i != m_size[0])
-                    mCoupledModel->addInternalConnection(getName(i), "R",
-                                                         getName(i + 1), "L");
-            } else {
-                if (i != 1)
-                    mCoupledModel->addInternalConnection(getName(i), "out",
-                                                         getName(i - 1), "R");
-
-                if (i != m_size[0])
-                    mCoupledModel->addInternalConnection(getName(i), "out",
-                                                         getName(i + 1), "L");
-            }
-        }
-    else
-        if (m_dimension == 1)
-            if (m_symmetricport) {
-                for (unsigned int j = 1 ; j <= m_size[1] ; j++) {
-                    for (unsigned int i = 1 ; i <= m_size[0] ; i++) {
-                        if (existModel(i, j))
-                            translateSymmetricConnection2D(i, j);
                     }
                 }
             }
-            else
-                for (unsigned int j = 1 ; j <= m_size[1] ; j++)
-                    for (unsigned int i = 1 ; i <= m_size[0] ; i++)
-                        if (existModel(i, j))
+        }
+    }
+
+    if (m_dimension == 0) {
+        for (unsigned int i = 1; i <= m_size[0]; i++) {
+            if (m_symmetricport) {
+                if (i != 1) {
+                    mCoupledModel->addInternalConnection(
+                        getName(i), "L", getName(i - 1), "R");
+                }
+
+                if (i != m_size[0]) {
+                    mCoupledModel->addInternalConnection(
+                        getName(i), "R", getName(i + 1), "L");
+                }
+            } else {
+                if (i != 1) {
+                    mCoupledModel->addInternalConnection(
+                        getName(i), "out", getName(i - 1), "R");
+                }
+
+                if (i != m_size[0]) {
+                    mCoupledModel->addInternalConnection(
+                        getName(i), "out", getName(i + 1), "L");
+                }
+            }
+        }
+    } else {
+        if (m_dimension == 1) {
+            if (m_symmetricport) {
+                for (unsigned int j = 1; j <= m_size[1]; j++) {
+                    for (unsigned int i = 1; i <= m_size[0]; i++) {
+                        if (existModel(i, j)) {
+                            translateSymmetricConnection2D(i, j);
+                        }
+                    }
+                }
+            } else {
+                for (unsigned int j = 1; j <= m_size[1]; j++) {
+                    for (unsigned int i = 1; i <= m_size[0]; i++) {
+                        if (existModel(i, j)) {
                             translateConnection2D(i, j);
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 void MatrixTranslator::translateSymmetricConnection2D(unsigned int i,
@@ -513,17 +559,23 @@ void MatrixTranslator::translateCondition2D(unsigned int i,
 void MatrixTranslator::translateConditions()
 {
     if (m_dimension == 0) {
-        for (unsigned int i = 1 ; i <= m_size[0] ; i++)
-            if (!m_init || m_init[i-1] != 0)
+        for (unsigned int i = 1; i <= m_size[0]; i++) {
+            if (!m_init || m_init[i-1] != 0) {
                 translateCondition1D(i);
-    } else
-        if (m_dimension == 1) {
-            for (unsigned int i = 1 ; i <= m_size[0] ; i++)
-                for (unsigned int j = 1 ; j <= m_size[1] ; j++)
-                    if (existModel(i, j))
-                        translateCondition2D(i, j);
+            }
         }
+    } else {
+        if (m_dimension == 1) {
+            for (unsigned int i = 1; i <= m_size[0]; i++) {
+                for (unsigned int j = 1; j <= m_size[1]; j++) {
+                    if (existModel(i, j)) {
+                        translateCondition2D(i, j);
+                    }
+                }
+            }
+        }
+    }
 }
 
-}
-} // namespace vle translator
+}} // namespace vle translator
+
