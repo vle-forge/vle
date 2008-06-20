@@ -161,7 +161,7 @@ namespace vle { namespace utils {
             return false;
         }
     }
-    
+
     /**
      * Return conversion from string into boolean.
      *
@@ -447,13 +447,13 @@ namespace vle { namespace utils {
     std::string get_current_date();
 
 
-    /** 
+    /**
      * @brief Write the current date and time in the format:
      * @code
      * std::cout << get_simple_current_date();
      * // 20080306-1534
      * @endcode
-     * 
+     *
      * @return string representation of the date.
      */
     std::string get_simple_current_date();
@@ -484,22 +484,22 @@ namespace vle { namespace utils {
     /** Connection signal to print_trace_signals. */
     void install_signal();
 
-    /** 
+    /**
      * @brief Demangle the input type info from C++ compiler.
      * http://gcc.gnu.org/onlinedocs/libstdc++/latest-doxygen/namespaceabi.html
-     * 
+     *
      * @param in the std::type_info to demangle.
-     * 
+     *
      * @return the demangled string or the same if libcwd is not linked.
      */
     std::string demangle(const std::type_info& in);
 
-    /** 
+    /**
      * @brief Demangle the input string from C++ compiler.
      * http://gcc.gnu.org/onlinedocs/libstdc++/latest-doxygen/namespaceabi.html
-     * 
+     *
      * @param in the string to demangle.
-     * 
+     *
      * @return the demangled string or the same if libcwd is not linked.
      */
     std::string demangle(const std::string& in);
@@ -511,31 +511,31 @@ namespace vle { namespace utils {
      */
     void initUserDirectory();
 
-    /** 
+    /**
      * @brief Make a new directory. All error are reported to log file.
-     * 
+     *
      * @param dirname The new directory.
-     * 
+     *
      * @return true if success, otherwise false.
      */
     bool buildDirectory(const std::string& dirname);
 
-    /** 
+    /**
      * @brief Get the user vle directory, $HOME/.vle and build it if necessary.
      * All error are reported to log file.
-     * 
+     *
      * @return The string $HOME/.vle or empty string if error.
      */
     std::string getUserDirectory();
 
-    /** 
+    /**
      * @brief Change the current process to daemon. Current path is reset to
      * '/' on Linux/Unix and 'c://' to Windows, adjust the session and
      * close all opened files.
      */
     void buildDaemon();
 
-    /** 
+    /**
      * @brief Initialize the VLE system by:
      * - installling signal (segmentation fault etc.) to standard error
      *   function.
@@ -544,6 +544,20 @@ namespace vle { namespace utils {
      * - initialize the thread system.
      */
     void init();
+
+    /**
+     * @brief Return the VLE version, copyright and the licences.
+     *
+     * @param out The stream where push the informations.
+     */
+    void printInformations(std::ostream& out);
+
+    /**
+     * @brief Return the VLE version
+     *
+     * @param out
+     */
+    void printVersion(std::ostream& out);
 
 }} // namespace vle utils
 

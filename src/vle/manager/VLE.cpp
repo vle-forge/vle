@@ -36,6 +36,7 @@
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Rand.hpp>
 #include <vle/vpz/Vpz.hpp>
+#include <config.h>
 
 #include <glibmm/optioncontext.h>
 #include <iostream>
@@ -138,19 +139,12 @@ bool VLE::justRun(int nbProcessor, const CmdArgs& args)
 
 void VLE::printInformations(std::ostream& out)
 {
-    out <<
-        "Virtual Laboratory Environment - " << VLE_PACKAGE_VERSION << "\n"
-        "Copyright (C) 2003 - 2008 The VLE Development Team.\n"
-        "VLE comes with ABSOLUTELY NO WARRANTY.\n"
-        "You may redistribute copies of VLE\n"
-        "under the terms of the GNU General Public License.\n"
-        "For more information about these matters, see the file named COPYING."
-        << std::endl;
+    utils::printInformations(out);
 }
 
 void VLE::printVersion(std::ostream& out)
 {
-    out << VLE_PACKAGE_VERSION << std::endl;
+    utils::printVersion(out);
 }
 
 }} // namespace vle manager

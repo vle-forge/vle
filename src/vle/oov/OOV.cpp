@@ -26,27 +26,21 @@
 
 
 #include <vle/oov/OOV.hpp>
+#include <vle/utils/Tools.hpp>
+#include <boost/format.hpp>
 
 
 namespace vle { namespace oov {
 
 void OOV::printInformations(std::ostream& out)
 {
-    out <<
-        "Output of Virtual Laboratory Environment (oov) - "
-        VLE_PACKAGE_VERSION
-        "\n"
-        "Copyright (C) 2004, 05, 06, 07 VLE Development Team.\n"
-        "VLE comes with ABSOLUTELY NO WARRANTY.\n"
-        "You may redistribute copies of VLE\n"
-        "under the terms of the GNU General Public License.\n"
-        "For more information about these matters, see the file named COPYING."
-        << std::endl;
+    out << "Oov - Output of VLE\n";
+    utils::printInformations(out);
 }
 
 void OOV::printVersion(std::ostream& out)
 {
-    out << VLE_PACKAGE_VERSION << std::endl;
+    utils::printVersion(out);
 }
 
 }} // vle oov

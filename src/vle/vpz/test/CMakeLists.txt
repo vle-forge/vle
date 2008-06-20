@@ -12,9 +12,8 @@ LINK_DIRECTORIES(
 
 INSTALL(FILES unittest.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
 
-ADD_EXECUTABLE(test1 test1.cpp)
-ADD_TEST(vpztest1 test1)
-TARGET_LINK_LIBRARIES(test1
+ADD_EXECUTABLE(test_vpz_values test1.cpp)
+TARGET_LINK_LIBRARIES(test_vpz_values
   ${GLIBMM_LIBRARIES}
   ${LIBXMLPP_LIBRARIES}
   ${GTHREAD_LIBRARIES}
@@ -27,9 +26,8 @@ TARGET_LINK_LIBRARIES(test1
   vledevs
   vlevpz)
 
-ADD_EXECUTABLE(test2 test2.cpp)
-ADD_TEST(vpztest2 test2)
-TARGET_LINK_LIBRARIES(test2
+ADD_EXECUTABLE(test_vpz_project test2.cpp)
+TARGET_LINK_LIBRARIES(test_vpz_project
   ${GLIBMM_LIBRARIES}
   ${LIBXMLPP_LIBRARIES}
   ${GTHREAD_LIBRARIES}
@@ -42,9 +40,8 @@ TARGET_LINK_LIBRARIES(test2
   vledevs
   vlevpz)
 
-ADD_EXECUTABLE(test3 test3.cpp)
-ADD_TEST(vpztest3 test3)
-TARGET_LINK_LIBRARIES(test3
+ADD_EXECUTABLE(test_vpz_translator test3.cpp)
+TARGET_LINK_LIBRARIES(test_vpz_translator
   ${GLIBMM_LIBRARIES}
   ${LIBXMLPP_LIBRARIES}
   ${GTHREAD_LIBRARIES}
@@ -57,9 +54,8 @@ TARGET_LINK_LIBRARIES(test3
   vledevs
   vlevpz)
 
-ADD_EXECUTABLE(test4 test4.cpp)
-ADD_TEST(vpztest4 test4)
-TARGET_LINK_LIBRARIES(test4
+ADD_EXECUTABLE(test_vpz_io test4.cpp)
+TARGET_LINK_LIBRARIES(test_vpz_io
   ${GLIBMM_LIBRARIES}
   ${LIBXMLPP_LIBRARIES}
   ${GTHREAD_LIBRARIES}
@@ -72,9 +68,8 @@ TARGET_LINK_LIBRARIES(test4
   vledevs
   vlevpz)
 
-ADD_EXECUTABLE(test5 test5.cpp)
-ADD_TEST(vpztest5 test5)
-TARGET_LINK_LIBRARIES(test5
+ADD_EXECUTABLE(test_vpz_oov test5.cpp)
+TARGET_LINK_LIBRARIES(test_vpz_oov
   ${GLIBMM_LIBRARIES}
   ${LIBXMLPP_LIBRARIES}
   ${GTHREAD_LIBRARIES}
@@ -87,9 +82,8 @@ TARGET_LINK_LIBRARIES(test5
   vledevs
   vlevpz)
 
-ADD_EXECUTABLE(test6 test6.cpp)
-ADD_TEST(vpztest6 test6)
-TARGET_LINK_LIBRARIES(test6
+ADD_EXECUTABLE(test_vpz_classes test6.cpp)
+TARGET_LINK_LIBRARIES(test_vpz_classes
   ${GLIBMM_LIBRARIES}
   ${LIBXMLPP_LIBRARIES}
   ${GTHREAD_LIBRARIES}
@@ -102,9 +96,8 @@ TARGET_LINK_LIBRARIES(test6
   vledevs
   vlevpz)
 
-ADD_EXECUTABLE(test7 test7.cpp)
-ADD_TEST(vpztest7 test7)
-TARGET_LINK_LIBRARIES(test7
+ADD_EXECUTABLE(test_vpz_graph test7.cpp)
+TARGET_LINK_LIBRARIES(test_vpz_graph
   ${GLIBMM_LIBRARIES}
   ${LIBXMLPP_LIBRARIES}
   ${GTHREAD_LIBRARIES}
@@ -116,3 +109,6 @@ TARGET_LINK_LIBRARIES(test7
   vlegraph
   vledevs
   vlevpz)
+
+ADD_TEST(vpztest test_vpz_values test_vpz_project test_vpz_translator test_vpz_io
+  test_vpz_oov test_vpz_classes test_vpz_graph)

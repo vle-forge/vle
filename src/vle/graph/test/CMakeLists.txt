@@ -10,11 +10,8 @@ LINK_DIRECTORIES(
   ${LIBXMLPP_LIBRARY_DIR}
   ${Boost_LIBRARY_DIRS})
 
-ADD_EXECUTABLE(test1 test1.cpp)
-
-ADD_TEST(graphtest1 test1)
-
-TARGET_LINK_LIBRARIES(test1
+ADD_EXECUTABLE(test_graph test1.cpp)
+TARGET_LINK_LIBRARIES(test_graph
   ${GLIBMM_LIBRARIES}
   ${LIBXMLPP_LIBRARIES}
   ${GTHREAD_LIBRARIES}
@@ -30,3 +27,5 @@ TARGET_LINK_LIBRARIES(test1
   vleextension
   vlemanager
   vletranslator)
+
+ADD_TEST(graphtest test_graph)
