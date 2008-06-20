@@ -10,11 +10,8 @@ LINK_DIRECTORIES(
   ${LIBXMLPP_LIBRARY_DIR}
   ${Boost_LIBRARY_DIRS})
 
-ADD_EXECUTABLE(test1 test1.cpp)
-
-ADD_TEST(valuetest1 test1)
-
-TARGET_LINK_LIBRARIES(test1
+ADD_EXECUTABLE(test_values test1.cpp)
+TARGET_LINK_LIBRARIES(test_values
   ${GLIBMM_LIBRARIES}
   ${LIBXMLPP_LIBRARIES}
   ${GTHREAD_LIBRARIES}
@@ -23,3 +20,6 @@ TARGET_LINK_LIBRARIES(test1
   vleutils
   vledata
   vlevalue)
+
+ADD_TEST(valuetest test_values)
+

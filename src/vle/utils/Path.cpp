@@ -28,8 +28,11 @@
 #include <glibmm/fileutils.h>
 #include <glibmm/miscutils.h>
 #include <list>
+
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Exception.hpp>
+#include <config.h>
+
 #include <boost/format.hpp>
 
 #ifdef G_OS_WIN32

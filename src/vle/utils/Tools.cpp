@@ -29,6 +29,7 @@
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Socket.hpp>
+#include <config.h>
 
 #include <glibconfig.h>
 #include <glibmm/markup.h>
@@ -40,7 +41,6 @@
 #include <errno.h>
 #include <cstring>
 #include <iomanip>
-#include <config.h>
 
 #include <glib.h>
 #include <glib/gstdio.h>
@@ -315,6 +315,30 @@ void init()
     utils::initUserDirectory();
     utils::net::Base::init();
     Glib::thread_init();
+}
+
+void printInformations(std::ostream& out)
+{
+    std::string extra(VLE_EXTRA_VERSION);
+    if (not extra.empty()) {
+        extra = "(" + extra + ")";
+    }
+
+    out << boost::format(
+        "Virtual Laboratory Environment - "
+        "%1%.%2%.%3% %4%\n"
+        "Copyright (C) 2003 - 2008 The VLE Development Team.\n"
+        "VLE comes with ABSOLUTELY NO WARRANTY.\n"
+        "You may redistribute copies of VLE\n"
+        "under the terms of the GNU General Public License.\n"
+        "For more information about these matters, see the file named COPYING.")
+        % VLE_MAJOR_VERSION % VLE_MINOR_VERSION % VLE_PATCH_VERSION % extra
+        << std::endl;
+}
+
+void printVersion(std::ostream& out)
+{
+    out << VLE_NAME_COMPLETE << "\n";
 }
 
 }} // namespace vle utils
