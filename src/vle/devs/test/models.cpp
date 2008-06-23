@@ -56,7 +56,7 @@ namespace vle { namespace unittest {
 
         virtual void internalTransition(const devs::Time& /* time */)
         {
-            m_counter = 0;
+            m_counter = 1;
         }
 
         virtual void externalTransition(
