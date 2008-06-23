@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_CASE(test_have_connection)
 
     top->addInternalConnection("c", "out", "a", "in");
 
-    BOOST_REQUIRE(top->hasConnectionProblem(lst)); 
+    BOOST_REQUIRE(top->hasConnectionProblem(lst));
 }
 
 BOOST_AUTO_TEST_CASE(test_displace)
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE(test_displace)
 
     BOOST_REQUIRE_EQUAL(top->getModelList().size(),
                         (ModelList::size_type)1);
-    
+
     BOOST_REQUIRE_EQUAL(newtop->getModelList().size(),
                         (ModelList::size_type)2);
 
@@ -196,7 +196,7 @@ BOOST_AUTO_TEST_CASE(test_clone1)
     BOOST_REQUIRE(newa != a);
     AtomicModel* newb = dynamic_cast < AtomicModel* >(newtop->findModel("b"));
     BOOST_REQUIRE(newb != b);
-    
+
     BOOST_REQUIRE(newtop->existInternalConnection("a", "out", "b", "in"));
     BOOST_REQUIRE(newtop->existInternalConnection("b", "out", "a", "in"));
     newtop->delAllConnection();
@@ -241,7 +241,7 @@ BOOST_AUTO_TEST_CASE(test_clone_different_atomic)
         >(file2.project().model().model());
 
     BOOST_REQUIRE(top1 and top2);
-    
+
     AtomicModelVector lst1, lst2;
 
     Model::getAtomicModelList(top1, lst1);
@@ -281,5 +281,6 @@ BOOST_AUTO_TEST_CASE(test_get_port_index)
     BOOST_REQUIRE_EQUAL(e->getInputPortList().size(), (ConnectionList::size_type)2);
     BOOST_REQUIRE_EQUAL(e->getInputPortIndex("in1"), 0);
     BOOST_REQUIRE_EQUAL(e->getInputPortIndex("in2"), 1);
-    BOOST_REQUIRE_EQUAL(e->getOutputPortList().size(), (ConnectionList::size_type)0);
+    BOOST_REQUIRE_EQUAL(e->getOutputPortList().size(),
+                        (ConnectionList::size_type)1);
 }

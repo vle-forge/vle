@@ -24,17 +24,26 @@
        <in>
         <port name="in" />
        </in>
+       <out>
+        <port name="out" />
+       </out>
       </model>
       <model name="b" type="atomic" dynamics="unittest" observables="obs2" >
        <in>
         <port name="in" />
        </in>
+       <out>
+        <port name="out" />
+       </out>
       </model>
       <model name="c" type="atomic" dynamics="unittest" observables="obs2" >
        <in>
         <port name="in1" />
         <port name="in2" />
        </in>
+       <out>
+        <port name="out" />
+       </out>
       </model>
      </submodels>
      <connections>
@@ -80,11 +89,17 @@
        <in>
         <port name="in" />
        </in>
+       <out>
+        <port name="out" />
+       </out>
       </model>
-      <model name="g" type="atomic" dynamics="unittest" > 
+      <model name="g" type="atomic" dynamics="unittest" >
        <in>
         <port name="in" />
        </in>
+       <out>
+        <port name="out" />
+       </out>
       </model>
      </submodels>
      <connections>
@@ -102,12 +117,18 @@
      <in>
       <port name="in" />
      </in>
+     <out>
+      <port name="out" />
+     </out>
     </model>
     <model name="e" type="atomic" dynamics="unittest" >
      <in>
       <port name="in1" />
       <port name="in2" />
      </in>
+     <out>
+      <port name="out" />
+     </out>
     </model>
    </submodels>
    <connections>
