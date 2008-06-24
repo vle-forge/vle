@@ -64,6 +64,8 @@ namespace vle { namespace manager {
          */
         ManagerRun(std::ostream& out, bool writefile, RandPtr rnd = RandPtr());
 
+        virtual ~ManagerRun();
+
         /** 
          * @brief Get a reference to the oov::PluginPtr list of the simulation
          * sort by filename.
@@ -85,6 +87,7 @@ namespace vle { namespace manager {
         std::ostream&           m_out;
         bool                    m_writefile;
         RandPtr                 m_rand;
+        ExperimentGenerator*    m_exp;
 
         /** 
          * @brief Build the ExperimentGenerator attached to the vpz::Vpz
@@ -128,6 +131,9 @@ namespace vle { namespace manager {
         ManagerRunMono(std::ostream& out, bool writefile,
                        RandPtr ptr = RandPtr());
 
+        virtual ~ManagerRunMono()
+        { }
+
         /** 
          * @brief Read specified vpz files an start simulations on the number of
          * processor specified in constructor.
@@ -160,8 +166,6 @@ namespace vle { namespace manager {
         unsigned int                            m_process;
         std::string                             m_filename;
         bool                                    m_finish;
-
-        ExperimentGenerator*                    m_exp;
     };
 
 
@@ -184,6 +188,9 @@ namespace vle { namespace manager {
          */
         ManagerRunThread(std::ostream& out, bool writefile, int process,
                          RandPtr rnd = RandPtr());
+
+        virtual ~ManagerRunThread()
+        { }
 
         /** 
          * @brief Read specified vpz files an start simulations on the number of
@@ -228,8 +235,6 @@ namespace vle { namespace manager {
         std::string                             m_filename;
         bool                                    m_finish;
 
-        ExperimentGenerator*                    m_exp;
-       
         /** simulation threads */
         Glib::ThreadPool                        m_pool;
         Glib::Mutex                             m_mutex;
@@ -257,6 +262,9 @@ namespace vle { namespace manager {
          */
         ManagerRunDistant(std::ostream& out, bool writefile,
                           RandPtr rnd = RandPtr());
+
+        virtual ~ManagerRunDistant()
+        { }
 
         /** 
          * @brief Read specified vpz files an start simulations on the number of
@@ -297,7 +305,6 @@ namespace vle { namespace manager {
         void read();
 
     private:
-        ExperimentGenerator* get_combination_plan() const;
         void openConnectionWithSimulators();
         void closeConnectionWithSimulators();
         void scheduller();
@@ -314,8 +321,6 @@ namespace vle { namespace manager {
 
         Glib::Mutex                                 m_mutex;
         Glib::Cond                                  m_prodcond;
-
-        ExperimentGenerator*                        m_exp;
 
         /** 
          * @brief A thread safe function to acces to the top of the vpz::Vpz
@@ -340,7 +345,8 @@ namespace vle { namespace manager {
                                   RandPtr rnd) :
         m_out(out),
         m_writefile(writefile),
-        m_rand(rnd)
+        m_rand(rnd),
+        m_exp(0)
     {
     }
 
@@ -375,8 +381,7 @@ namespace vle { namespace manager {
                                               int process, RandPtr rnd) :
         ManagerRun(out, writefile, rnd),
         m_process(process),
-        m_finish(false),
-        m_exp(0)
+        m_finish(false)
     {
     }
 

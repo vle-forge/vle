@@ -46,6 +46,11 @@
 
 namespace vle { namespace manager {
 
+ManagerRun::~ManagerRun()
+{
+    delete m_exp;
+}
+
 ExperimentGenerator* ManagerRun::getCombinationPlan(
     const vpz::Vpz& file, std::ostream& out)
 {
