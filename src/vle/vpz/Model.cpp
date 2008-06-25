@@ -33,87 +33,6 @@
 
 namespace vle { namespace vpz {
 
-AtomicModel::AtomicModel(const std::string& conditions,
-			 const std::string& dynamics,
-			 const std::string& observables) :
-    m_dynamics(dynamics),
-    m_observables(observables)
-{ 
-    std::string conditionList(conditions);
-    boost::trim(conditionList);
-
-    if (not conditionList.empty()) {
-        boost::split(m_conditions, conditionList, boost::is_any_of(","),
-                     boost::algorithm::token_compress_on);
-        if (m_conditions.front().empty()) {
-            m_conditions.pop_back();
-        }
-    }
-}
-
-void AtomicModelList::add(const AtomicModelList& atoms)
-{
-    for (const_iterator it = atoms.begin(); it != atoms.end(); ++it) {
-        add(it->first, it->second);
-    }
-}
-
-AtomicModel& AtomicModelList::add(graph::Model* mdl,
-                                  const AtomicModel& atom)
-{
-    const_iterator it = find(mdl);
-    Assert(utils::SaxParserError, it == end(),
-           (boost::format("The model %1% already have external information")
-            % mdl->getName()));
-
-    return (*insert(std::make_pair < graph::Model*, AtomicModel >(
-                mdl, atom)).first).second;
-}
-
-const AtomicModel& AtomicModelList::get(graph::Model* atom) const
-{
-    const_iterator it = find(atom);
-    if (it == end()) {
-        Throw(utils::SaxParserError, boost::format(
-                "The atomic model %s have not dynamics?") %
-            atom->getName());
-    }
-    return it->second;
-}
-
-AtomicModel& AtomicModelList::get(graph::Model* atom)
-{
-    iterator it = find(atom);
-    if (it == end()) {
-        Throw(utils::SaxParserError, boost::format(
-                "The atomic model %s have not dynamics?") %
-                    atom->getName());
-    }
-    return it->second;
-}
-
-const AtomicModel& AtomicModelList::get(const graph::Model* atom) const
-{
-    const_iterator it = find(const_cast < graph::Model* >(atom));
-    if (it == end()) {
-        Throw(utils::SaxParserError, boost::format(
-                "The atomic model %s have not dynamics?") %
-            atom->getName());
-    }
-    return it->second;
-}
-
-AtomicModel& AtomicModelList::get(const graph::Model* atom)
-{
-    iterator it = find(const_cast < graph::Model* >(atom));
-    if (it == end()) {
-        Throw(utils::SaxParserError, boost::format(
-                "The atomic model %s have not dynamics?") %
-                    atom->getName());
-    }
-    return it->second;
-}
-
 Model::Model(const Model& mdl) :
     Base(mdl)
 {
@@ -139,7 +58,7 @@ void Model::clear()
     m_graph = 0;
 }
 
-void Model::set_model(graph::Model* mdl)
+void Model::setModel(graph::Model* mdl)
 {
     m_graph = mdl;
 }

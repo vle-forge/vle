@@ -139,7 +139,7 @@ void GenExecutive::del_first_model()
 
 int GenExecutive::get_nb_model() const
 {
-    return boost::numeric_cast < int >(coupledmodel().getModelList().size());
+    return boost::numeric_cast < int >(coupledmodel().getModelList().size()) - 1;
 }
 
 }} // namespace examples gens

@@ -31,127 +31,14 @@
 #include <map>
 #include <glibmm/ustring.h>
 #include <vle/vpz/Base.hpp>
+#include <vle/vpz/AtomicModels.hpp>
 #include <vle/graph/Model.hpp>
 
 namespace vle { namespace vpz {
 
-    typedef std::vector < std::string > StringVector;
-
-    /** 
-     * @brief The AtomicModel class is used by the AtomicModelList to attach an
-     * atomic model to his conditions, observables and dynamics names.
+    /**
+     * @brief The vpz::Model is use to store the graph::Model hierarchy.
      */
-    class AtomicModel
-    {
-    public:
-        AtomicModel(const std::string& conditions,
-                    const std::string& dynamics,
-                    const std::string& observables);
-
-        inline const StringVector& conditions() const
-        { return m_conditions; }
-
-        inline const std::string& dynamics() const
-        { return m_dynamics; }
-
-        inline const std::string& observables() const
-        { return m_observables; }
-
-        inline void setConditions(const StringVector& vect)
-        { m_conditions = vect; }
-
-        inline void setDynamics(const std::string& str)
-        { m_dynamics = str; }
-
-        inline void setObservables(const std::string& str)
-        { m_observables = str; }
-
-        friend std::ostream& operator<<(std::ostream& out, const AtomicModel& a)
-        {
-            return out << "  conditions  : " << a.m_conditions.front() << "\n"
-                       << "  dynamics    : " << a.m_dynamics << "\n"
-                       << "  observables : " << a.m_observables << "\n";
-        }
-
-    private:
-        AtomicModel() { }
-
-	StringVector    m_conditions;
-        std::string     m_dynamics;
-        std::string     m_observables;
-    };
-
-
-    /** 
-     * @brief The AtomicModelList class is a dictionary used to attach atomic
-     * model to conditions and dynamics names.
-     */
-    class AtomicModelList : public std::map < graph::Model*, AtomicModel >
-    {
-    public:
-        /** 
-         * @brief Add a list of atomicmodels information.
-         * @param atoms list of atomicmodels.
-         * @throw utils::SaxParserError if an model already exist.
-         */
-        void add(const AtomicModelList& atoms);
-
-        /** 
-         * @brief Add a new atomicmodel information to a graph::Model.
-         * @param mdl the graph::Model to attach atomic model information.
-         * @param atom the vpz::AtomicModel information.
-         * @return a reference to the builded atomicmodel.
-         * @throw utils::SaxParserError if mdl already exist.
-         */
-        AtomicModel& add(graph::Model* mdl, const AtomicModel& atom);
-
-        /** 
-         * @brief Get an vpz::Model by his structural reference.
-         * @param atom the reference to the structure.
-         * @throw utils::SaxParserError if atom have no dynamics.
-         * @return A constant reference to the vpz::Model.
-         */
-        const AtomicModel& get(graph::Model* atom) const;
-
-        /** 
-         * @brief Get an vpz::Model by his structural reference.
-         * @param atom the reference to the structure.
-         * @throw utils::SaxParserError if atom have no dynamics.
-         * @return A constant reference to the vpz::Model.
-         */
-        AtomicModel& get(graph::Model* atom);
-
-        /** 
-         * @brief Get an vpz::Model by his structural reference.
-         * @param atom the reference to the structure.
-         * @throw utils::SaxParserError if atom have no dynamics.
-         * @return A constant reference to the vpz::Model.
-         */
-        const AtomicModel& get(const graph::Model* atom) const;
-
-        /** 
-         * @brief Get an vpz::Model by his structural reference.
-         * @param atom the reference to the structure.
-         * @throw utils::SaxParserError if atom have no dynamics.
-         * @return A constant reference to the vpz::Model.
-         */
-        AtomicModel& get(const graph::Model* atom);
-        
-        friend std::ostream& operator<<(std::ostream& out,
-                                        const AtomicModelList& a)
-        {
-            out << "AtomicModelList:\n";
-            for (const_iterator it = a.begin(); it != a.end(); ++it) {
-                out << "Model [" << it->first << "] " << it->first->getName()
-                    << "\n"
-                    << it->second;
-            }
-            return out;
-        }
-
-    };
-
-
     class Model : public Base
     {
     public:
@@ -164,11 +51,9 @@ namespace vle { namespace vpz {
         virtual ~Model()
         { }
 
-        /** 
+        /**
          * @brief Write the devs hierachy of model.
-         * 
          * @param elt a reference to the parent STRUCTURES tag.
-         *
          * @throw Exception::Internal if elt is null.
          */
         virtual void write(std::ostream& out) const;
@@ -176,74 +61,50 @@ namespace vle { namespace vpz {
         virtual Base::type getType() const
         { return MODEL; }
 
-        /** 
+        /**
          * @brief Just delete the complete list of graph::AtomicModelList and
          * set to NULL the graph::Model hierarchy. Don't forget to delete it
          * yourself.
          */
         void clear();
 
-        /** 
+        /**
          * @brief Set a hierachy of graph::Model. If a previous hierarchy
          * already exist, it is not delete same if the new is empty. This
          * function is just an affectation, no clone is build.
-         * 
          * @param mdl the new graph::Model hierarchy to set.
          */
-        void set_model(graph::Model* mdl);
-        
-        /** 
+        void setModel(graph::Model* mdl);
+
+        /**
          * @brief Get a reference to the graph::Model hierarchy.
-         * 
          * @return A reference to the graph::Model, be carreful, you can damage
          * graph::Vpz instance.
          */
         graph::Model* model();
 
-        /** 
+        /**
          * @brief Get a reference to the graph::Model hierarchy.
-         * 
          * @return A reference to the graph::Model, be carreful, you can damage
          * graph::Vpz instance.
          */
         graph::Model* model() const;
 
-        /** 
+        /**
          * @brief Return a constant reference to the vpz::AtomicModelList.
-         * 
-         * @return 
+         * @return a constant reference to the vpz::AtomicModelList.
          */
         const AtomicModelList& atomicModels() const
         { return m_atomicmodels; }
 
-        /** 
+        /**
          * @brief Return a reference to the vpz::AtomicModelList.
-         * 
-         * @return 
+         * @return a reference to the vpz::AtomicModelList.
          */
         AtomicModelList& atomicModels()
         { return m_atomicmodels; }
 
     private:
-        struct CopyAtomicModel
-        {
-            AtomicModelList& lst;
-            graph::Model& top;
-
-            CopyAtomicModel(AtomicModelList& lst, graph::Model& top) :
-                lst(lst), top(top) { }
-
-            void operator()(const AtomicModelList::value_type& x)
-            {
-                graph::CoupledModelVector vec;
-                x.first->getParents(vec);
-                graph::Model* atom = top.getModel(vec, x.first->getName());
-
-                lst.insert(std::make_pair < graph::Model*, AtomicModel >(
-                        atom, x.second));
-            }
-        };
-
         void writeModel(std::ostream& out) const;
         void writeAtomic(std::ostream& out,
                          const graph::AtomicModel* mdl) const;
@@ -367,7 +228,7 @@ namespace vle { namespace vpz {
 
         virtual Base::type getType() const
         { return DESTINATION; }
-        
+
         Glib::ustring model;
         Glib::ustring port;
     };

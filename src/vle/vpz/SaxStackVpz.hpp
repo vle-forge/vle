@@ -31,7 +31,7 @@
 #include <vle/value/Value.hpp>
 #include <vle/vpz/Trame.hpp>
 #include <libxml++/libxml++.h>
-#include <stack>
+#include <list>
 
 namespace vle {
 
@@ -50,6 +50,7 @@ namespace vle {
 
     class Vpz;
     class Trame;
+    class Class;
 
     class SaxStackVpz
     {
@@ -102,8 +103,11 @@ namespace vle {
         void popVleTrame();
 
         value::Set& popConditionPort();
+
         vpz::Base* pop();
+
         const vpz::Base* top() const;
+
         vpz::Base* top();
 
         inline vpz::Vpz& vpz()
@@ -119,7 +123,31 @@ namespace vle {
             std::ostream& out, const SaxStackVpz& stack);
 
     private:
-        std::stack < vpz::Base* >       m_stack;
+        inline void push(vpz::Base* base)
+        { m_stack.push_front(base); }
+
+        inline bool haveParent()
+        { return not m_stack.empty(); }
+
+        inline bool haveGrandParent()
+        { return m_stack.size() > 1; }
+
+        inline vpz::Base* parent()
+        { return m_stack.front(); }
+
+        inline vpz::Base* grandparent()
+        { return *m_stack.begin()++; }
+
+        inline const vpz::Base* parent() const
+        { return m_stack.front(); }
+
+        inline const vpz::Base* grandparent() const
+        { return *m_stack.begin()++; }
+
+        inline bool empty() const
+        { return m_stack.empty(); }
+
+        std::list < vpz::Base* >        m_stack;
         vpz::Vpz&                       m_vpz;
         TrameList                       m_trame;
 
@@ -139,6 +167,14 @@ namespace vle {
                                 const std::string& y,
                                 const std::string& width,
                                 const std::string& height);
+
+        /**
+         * @brief Get the latest vpz::Class pushed in the list from the top of
+         * the stack.
+         * @return A reference to the class founded or 0 if no class in the
+         * stack.
+         */
+        vpz::Class* getLastClass() const;
     };
 
 }} // namespace vle vpz

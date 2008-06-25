@@ -28,6 +28,7 @@
 #ifndef VLE_COMMON_VPZ_VPZ_HPP
 #define VLE_COMMON_VPZ_VPZ_HPP
 
+#include <vle/vpz/AtomicModels.hpp>
 #include <vle/vpz/Base.hpp>
 #include <vle/vpz/Classes.hpp>
 #include <vle/vpz/Class.hpp>

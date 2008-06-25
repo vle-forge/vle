@@ -129,6 +129,10 @@ namespace vle { namespace vpz {
         friend std::ostream& operator<<(std::ostream& out, const Base& obj)
         { obj.write(out); return out; }
 
+        struct IsClass {
+            inline bool operator()(vpz::Base* base) const
+            { return base != 0 and base->getType() == CLASS; }
+        };
     };
 
 }} // namespace vle vpz

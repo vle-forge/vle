@@ -30,6 +30,18 @@
 
 namespace vle { namespace vpz {
 
+Class::Class(const Class& cls) :
+    Base(cls)
+{
+    if (cls.m_model == 0) {
+        m_model = 0;
+    } else {
+        m_model = cls.m_model->clone();
+        std::for_each(cls.m_atomicmodels.begin(), cls.m_atomicmodels.end(),
+                      CopyAtomicModel(m_atomicmodels, *m_model));
+    }
+}
+
 void Class::write(std::ostream& out) const
 {
     out << "<class name=\"" << m_name << "\" >\n"

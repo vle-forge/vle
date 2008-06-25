@@ -222,21 +222,19 @@ graph::Model* ModelFactory::createModelFromClass(Coordinator& coordinator,
 {
     vpz::Class& classe(mClasses.get(classname));
     graph::Model* mdl(classe.model()->clone());
+    vpz::AtomicModelList outlist;
+
+    std::for_each(classe.atomicModels().begin(), classe.atomicModels().end(),
+                  vpz::CopyAtomicModel(outlist, *mdl));
 
     graph::AtomicModelVector atomicmodellist;
-    graph::Model::getAtomicModelList(classe.model(), atomicmodellist);
+    graph::Model::getAtomicModelList(mdl, atomicmodellist);
 
     for (graph::AtomicModelVector::iterator it = atomicmodellist.begin();
          it != atomicmodellist.end(); ++it) {
-        graph::CoupledModelVector vec;
-        (*it)->getParents(vec);
-        graph::Model* atom = mdl->getModel(vec, (*it)->getName());
-        vpz::AtomicModel& atominfo(mAtoms.get(*it));
-
-        assert(atom->isAtomic());
-
-        createModel(coordinator, 
-                    static_cast < graph::AtomicModel* >(atom),
+        vpz::AtomicModel& atominfo(outlist.get(*it));
+        createModel(coordinator,
+                    static_cast < graph::AtomicModel* >(*it),
                     atominfo.dynamics(),
                     atominfo.conditions(), atominfo.observables());
     }

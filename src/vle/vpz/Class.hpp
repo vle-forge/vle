@@ -29,12 +29,12 @@
 #define VLE_VPZ_CLASS_HPP
 
 #include <vle/vpz/Base.hpp>
-#include <vle/vpz/Model.hpp>
+#include <vle/vpz/AtomicModels.hpp>
 
 
 namespace vle { namespace vpz {
 
-    /** 
+    /**
      * @brief The class Class is build on the vpz::Model structure. It store a
      * new graph::Model hierarchy and a vpz::AtomicModels class to build easily
      * new structure of models.
@@ -43,12 +43,15 @@ namespace vle { namespace vpz {
     {
     public:
         Class(const std::string& name) :
-            m_name(name)
+            m_name(name),
+            m_model(0)
         { }
+
+        Class(const Class& cls);
 
         virtual ~Class() { }
 
-        /** 
+        /**
          * @brief Write the class xml representation into the output stream.
          * @code
          * <class name="xxxx">
@@ -59,29 +62,29 @@ namespace vle { namespace vpz {
          *  </structure>
          * </class>
          * @endcode
-         * 
-         * @param out 
+         *
+         * @param out
          */
         virtual void write(std::ostream& out) const;
 
-        virtual Base::type getType() const 
+        virtual Base::type getType() const
         { return CLASS; }
 
-        /** 
+        /**
          * @brief Get a constant reference to the stored Model.
          * @return Get a constant reference to the stored Model.
          */
         inline const graph::Model* model() const
         { return m_model; }
 
-        /** 
+        /**
          * @brief Get a reference to the stored Model.
          * @return Get a reference to the stored Model.
          */
         inline graph::Model* model()
         { return m_model; }
 
-        /** 
+        /**
          * @brief Set the current graph::model hierarchy by a new one. Be
          * carreful, the old one are not destroyed.
          * @param mdl The reference to the new model to set.
@@ -89,10 +92,32 @@ namespace vle { namespace vpz {
         inline void setModel(graph::Model* mdl)
         { m_model = mdl; }
 
+        /**
+         * @brief Return a constant reference to the vpz::AtomicModelList.
+         * @return a constant reference to the vpz::AtomicModelList.
+         */
+        const AtomicModelList& atomicModels() const
+        { return m_atomicmodels; }
+
+        /**
+         * @brief Return a reference to the vpz::AtomicModelList.
+         * @return a reference to the vpz::AtomicModelList.
+         */
+        AtomicModelList& atomicModels()
+        { return m_atomicmodels; }
+
+        /**
+         * @brief Return a constant reference to the name of this Class.
+         * @return A constant reference to the name of this Class.
+         */
+        const std::string& name() const
+        { return m_name; }
+
     private:
         Class()
         { }
 
+        AtomicModelList m_atomicmodels;
         std::string     m_name;
         graph::Model*   m_model;
     };
