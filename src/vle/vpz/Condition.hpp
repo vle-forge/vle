@@ -45,14 +45,35 @@ namespace vle { namespace vpz {
     /** 
      * @brief Define the ValueList to a vle::value::MapValue.
      */
-    class ValueList : public std::map < std::string, value::Value >
+    class ValueList
     {
     public:
+        typedef std::map < std::string, value::Value > value_type;
+        typedef value_type::iterator iterator;
+        typedef value_type::const_iterator const_iterator;
+
+        iterator begin()
+        { return m_lst.begin(); }
+
+        const_iterator begin() const
+        { return m_lst.begin(); }
+
+        iterator end()
+        { return m_lst.end(); }
+
+        const_iterator end() const
+        { return m_lst.end(); }
+
+        void add(const std::string& key, const value::Value& val);
+
         value::Value get(const std::string& name);
 
         const value::Value& get(const std::string& name) const;
 
 	bool exist(const std::string& name) const;
+
+    private:
+        value_type m_lst;
     };
 
     /** 

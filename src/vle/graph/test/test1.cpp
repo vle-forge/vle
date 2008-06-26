@@ -65,6 +65,10 @@ BOOST_AUTO_TEST_CASE(test_del_all_connection)
     top->delAllConnection();
     BOOST_REQUIRE(not top->existInternalConnection("a", "out", "b", "in"));
     BOOST_REQUIRE(not top->existInternalConnection("b", "out", "a", "in"));
+
+    delete top;
+    utils::Trace::kill();
+    utils::Path::kill();
 }
 
 BOOST_AUTO_TEST_CASE(test_have_connection)
@@ -95,6 +99,10 @@ BOOST_AUTO_TEST_CASE(test_have_connection)
     top->addInternalConnection("c", "out", "a", "in");
 
     BOOST_REQUIRE(top->hasConnectionProblem(lst));
+
+    delete top;
+    utils::Trace::kill();
+    utils::Path::kill();
 }
 
 BOOST_AUTO_TEST_CASE(test_displace)
@@ -132,6 +140,11 @@ BOOST_AUTO_TEST_CASE(test_displace)
 
     BOOST_REQUIRE(newtop->existInternalConnection("a", "out", "b", "in"));
     BOOST_REQUIRE(newtop->existInternalConnection("b", "out", "a", "in"));
+
+    delete top;
+    delete newtop;
+    utils::Trace::kill();
+    utils::Path::kill();
 }
 
 BOOST_AUTO_TEST_CASE(test_prohibited_displace)
@@ -154,6 +167,9 @@ BOOST_AUTO_TEST_CASE(test_prohibited_displace)
     top->addInternalConnection("b", "out", "a", "in");
     top->addInternalConnection("a", "out", "c", "in");
 
+    BOOST_REQUIRE_EQUAL(top->getModelList().size(),
+                        (ModelList::size_type)3);
+
     CoupledModel* newtop = new CoupledModel("newtop", 0);
 
     ModelList lst;
@@ -161,12 +177,53 @@ BOOST_AUTO_TEST_CASE(test_prohibited_displace)
     lst["b"] = b;
 
     BOOST_REQUIRE_THROW(top->displace(lst, newtop), utils::DevsGraphError);
+
+    BOOST_REQUIRE_EQUAL(top->getModelList().size(),
+                        (ModelList::size_type)3);
+    BOOST_REQUIRE_EQUAL(newtop->getModelList().size(),
+                        (ModelList::size_type)0);
+
+    delete top;
+    delete newtop;
+    utils::Trace::kill();
+    utils::Path::kill();
 }
 
 BOOST_AUTO_TEST_CASE(test_delinput_port)
 {
-    vpz::Vpz file(utils::Path::buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
+    CoupledModel* top = new CoupledModel("top", 0);
+
+    AtomicModel* a(top->addAtomicModel("a"));
+    a->addInputPort("in");
+    a->addOutputPort("out");
+
+    AtomicModel* b(top->addAtomicModel("b"));
+    b->addInputPort("in");
+    b->addOutputPort("out");
+
+    AtomicModel* c(top->addAtomicModel("c"));
+    c->addInputPort("in");
+    c->addOutputPort("out");
+
+    top->addInternalConnection("a", "out", "b", "in");
+    top->addInternalConnection("b", "out", "a", "in");
+    top->addInternalConnection("a", "out", "c", "in");
+
+    BOOST_REQUIRE_EQUAL(top->existInternalConnection("a", "out", "b", "in"),
+                        true);
+    BOOST_REQUIRE_EQUAL(top->existInternalConnection("b", "out", "a", "in"),
+                        true);
+    BOOST_REQUIRE_EQUAL(top->existInternalConnection("a", "out", "c", "in"),
+                        true);
+    c->delInputPort("in");
+
+    BOOST_REQUIRE_EQUAL(top->existInputPort("in"), false);
+    BOOST_REQUIRE_EQUAL(top->existInternalConnection("a", "out", "c", "in"),
+                        false);
+
+    delete top;
+    utils::Trace::kill();
+    utils::Path::kill();
 }
 
 BOOST_AUTO_TEST_CASE(test_clone1)
@@ -204,6 +261,11 @@ BOOST_AUTO_TEST_CASE(test_clone1)
     BOOST_REQUIRE(not newtop->existInternalConnection("b", "out", "a", "in"));
     BOOST_REQUIRE(top->existInternalConnection("a", "out", "b", "in"));
     BOOST_REQUIRE(top->existInternalConnection("b", "out", "a", "in"));
+
+    delete newtop;
+    delete top;
+    utils::Path::kill();
+    utils::Trace::kill();
 }
 
 BOOST_AUTO_TEST_CASE(test_clone2)
@@ -211,8 +273,8 @@ BOOST_AUTO_TEST_CASE(test_clone2)
     vpz::Vpz file(utils::Path::buildPrefixSharePath(
             utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
 
-    CoupledModel* oldtop = dynamic_cast < CoupledModel*
-        >(file.project().model().model());
+    CoupledModel* oldtop = dynamic_cast < CoupledModel* >(
+        file.project().model().model());
     BOOST_REQUIRE(oldtop);
 
     CoupledModel* top = dynamic_cast < CoupledModel* >(oldtop->clone());
@@ -226,6 +288,11 @@ BOOST_AUTO_TEST_CASE(test_clone2)
     BOOST_REQUIRE(f);
     AtomicModel* g(dynamic_cast < AtomicModel* >(top2->findModel("g")));
     BOOST_REQUIRE(g);
+
+    delete top;
+    delete file.project().model().model();
+    utils::Path::kill();
+    utils::Trace::kill();
 }
 
 BOOST_AUTO_TEST_CASE(test_clone_different_atomic)
@@ -241,6 +308,7 @@ BOOST_AUTO_TEST_CASE(test_clone_different_atomic)
         >(file2.project().model().model());
 
     BOOST_REQUIRE(top1 and top2);
+    BOOST_REQUIRE(top1 != top2);
 
     AtomicModelVector lst1, lst2;
 
@@ -257,6 +325,11 @@ BOOST_AUTO_TEST_CASE(test_clone_different_atomic)
     it = std::search(lst1.begin(), lst1.end(), lst2.begin(), lst2.end());
 
     BOOST_REQUIRE(it == lst1.end());
+
+    delete file1.project().model().model();
+    delete file2.project().model().model();
+    utils::Trace::kill();
+    utils::Path::kill();
 }
 
 BOOST_AUTO_TEST_CASE(test_get_port_index)
@@ -264,8 +337,8 @@ BOOST_AUTO_TEST_CASE(test_get_port_index)
     vpz::Vpz file(utils::Path::buildPrefixSharePath(
             utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
 
-    CoupledModel* top = dynamic_cast < CoupledModel*
-        >(file.project().model().model());
+    CoupledModel* top = dynamic_cast < CoupledModel* >(
+        file.project().model().model());
 
     BOOST_REQUIRE(top);
 
@@ -278,9 +351,14 @@ BOOST_AUTO_TEST_CASE(test_get_port_index)
 
     BOOST_REQUIRE(e);
 
-    BOOST_REQUIRE_EQUAL(e->getInputPortList().size(), (ConnectionList::size_type)2);
+    BOOST_REQUIRE_EQUAL(e->getInputPortList().size(),
+                        (ConnectionList::size_type)2);
     BOOST_REQUIRE_EQUAL(e->getInputPortIndex("in1"), 0);
     BOOST_REQUIRE_EQUAL(e->getInputPortIndex("in2"), 1);
     BOOST_REQUIRE_EQUAL(e->getOutputPortList().size(),
                         (ConnectionList::size_type)1);
+
+    delete file.project().model().model();
+    utils::Trace::kill();
+    utils::Path::kill();
 }

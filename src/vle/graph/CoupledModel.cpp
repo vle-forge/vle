@@ -424,7 +424,18 @@ void CoupledModel::setBasicConnections(const std::vector < std::string >& lst)
         const std::string& destination(*(it + 2));
         const std::string& portdestination(*(it + 3));
 
-        addInternalConnection(source, portsource, destination, portdestination);
+        try {
+            addInternalConnection(source, portsource, destination,
+                                  portdestination);
+        } catch(const utils::DevsGraphError& e) {
+            for (std::vector < std::string >::const_iterator jt = lst.begin();
+                 jt != it; jt += 4) {
+                delInternalConnection(*jt, *(jt + 1), *(jt + 2), *(jt + 3));
+            }
+            Throw(utils::DevsGraphError, boost::format(
+                    "Cannot displace the connection %1% %2% to %3% %4%") %
+                source % portsource % destination % portdestination);
+        }
     }
 }
 

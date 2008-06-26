@@ -49,7 +49,8 @@ namespace vle { namespace vpz {
 
         Class(const Class& cls);
 
-        virtual ~Class() { }
+        virtual ~Class()
+        { delete m_model; }
 
         /**
          * @brief Write the class xml representation into the output stream.

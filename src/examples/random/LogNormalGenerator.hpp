@@ -28,7 +28,7 @@
 
 #include <RandomGenerator.hpp>
 
-namespace examples { 
+namespace vle { namespace examples { namespace generator {
 
     class LogNormalGenerator : public RandomGenerator
     {
@@ -49,6 +49,6 @@ namespace examples {
         double m_standardDeviation;
     };
 
-}
+}}} // namespace vle examples generator
 
 #endif

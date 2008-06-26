@@ -42,15 +42,18 @@
 
 using namespace vle;
 
-BOOST_AUTO_TEST_CASE(trylaunch)
-{
-    manager::RunQuiet r;
-    r.start(utils::Path::buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(),
-            "examples", "unittest.vpz"));
+//BOOST_AUTO_TEST_CASE(trylaunch)
+//{
+//manager::RunQuiet r;
+//r.start(utils::Path::buildPrefixSharePath(
+//utils::Path::path().getPrefixDir(),
+//"examples", "unittest.vpz"));
 
-    BOOST_REQUIRE_EQUAL(r.haveError(), false);
-}
+//BOOST_REQUIRE_EQUAL(r.haveError(), false);
+
+//utils::Path::kill();
+//utils::Trace::kill();
+//}
 
 BOOST_AUTO_TEST_CASE(build_experimental_frames)
 {
@@ -99,6 +102,8 @@ BOOST_AUTO_TEST_CASE(build_experimental_frames)
             BOOST_REQUIRE_EQUAL(j, (tmp_type)(101));
         }
     }
+
+    delete file.project().model().model();
 }
 
 BOOST_AUTO_TEST_CASE(build_linear_combination_size)

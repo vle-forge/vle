@@ -28,9 +28,7 @@
 
 #include <vle/devs.hpp>
 
-namespace examples { namespace gens {
-
-    using namespace vle;
+namespace vle { namespace examples { namespace gens {
 
     class Counter : public devs::Dynamics
     {
@@ -60,8 +58,8 @@ namespace examples { namespace gens {
         bool m_active;
     };
 
-}} // namespace examples gens
+}}} // namespace vle examples gens
 
-DECLARE_NAMED_DYNAMICS(counter, examples::gens::Counter);
+DECLARE_NAMED_DYNAMICS(counter, vle::examples::gens::Counter);
 
 #endif

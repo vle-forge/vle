@@ -26,6 +26,7 @@
 
 
 #include <vle/vpz/Class.hpp>
+#include <algorithm>
 
 
 namespace vle { namespace vpz {

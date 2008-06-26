@@ -28,7 +28,7 @@
 
 #include <Generator.hpp>
 
-namespace examples { 
+namespace vle { namespace examples { namespace generator {
 
     class RandomGenerator : public Generator
     {
@@ -40,6 +40,6 @@ namespace examples {
         virtual double generate() = 0;
     };
 
-}
+}}} // namespace vle examples generator
 
 #endif

@@ -28,7 +28,7 @@
 
 #include <RandomGenerator.hpp>
 
-namespace examples { 
+namespace vle { namespace examples { namespace generator {
 
     class UniformGenerator : public RandomGenerator
     {
@@ -48,6 +48,6 @@ namespace examples {
         double m_max;
     };
 
-}
+}}} // namesapce vle examples generator
 
 #endif

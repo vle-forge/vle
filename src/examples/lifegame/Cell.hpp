@@ -29,7 +29,7 @@
 #include <vle/devs.hpp>
 #include <vle/extension.hpp>
 
-namespace model { namespace lifegame {
+namespace vle { namespace examples { namespace lifegame {
 
 class Cell : public vle::extension::CellDevs
 {
@@ -55,8 +55,8 @@ private:
     virtual void updateSigma(vle::devs::Event*) { setSigma(0); };
 };
 
-}}
+}}} // namespace vle examples lifegame
 
-DECLARE_NAMED_DYNAMICS(cell, model::lifegame::Cell);
+DECLARE_NAMED_DYNAMICS(cell, vle::examples::lifegame::Cell);
 
 #endif

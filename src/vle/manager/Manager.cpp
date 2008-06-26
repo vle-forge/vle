@@ -74,6 +74,8 @@ void ManagerRunMono::operator()(const vpz::Vpz& file)
 
     std::ostringstream ostr;
 
+    std::cout << "ManagerRunMono::operator(): start simulation\n" << std::endl;
+
     while (not m_exp->vpzInstances().empty()) {
         vpz::Vpz* file = m_exp->vpzInstances().front();
         int instance = file->project().instance();

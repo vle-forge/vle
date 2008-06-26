@@ -27,9 +27,7 @@
 #include <vle/utils/Debug.hpp>
 #include <cmath>
 
-using namespace vle;
-
-namespace tutorial_0 {
+namespace vle { namespace examples { namespace qss {
 
 Ladybirdplantlouse::Ladybirdplantlouse(const graph::AtomicModel& model,
                                        const devs::InitEventList& events) :
@@ -58,7 +56,7 @@ double Ladybirdplantlouse::compute(unsigned int i) const
     } 
 }
 
-} // namespace tutorial_0
+}}} // namespace vle examples qss
 
-DECLARE_NAMED_DYNAMICS(ladybirdplantlouse, tutorial_0::Ladybirdplantlouse)
+DECLARE_NAMED_DYNAMICS(ladybirdplantlouse, vle::examples::qss::Ladybirdplantlouse)
 

@@ -28,9 +28,7 @@
 
 #include <vle/extension/QSS.hpp>
 
-using namespace vle;
-
-namespace tutorial_0 {
+namespace vle { namespace examples { namespace qss {
 
     class Ladybird : public extension::qss
     {
@@ -48,5 +46,6 @@ namespace tutorial_0 {
         double e; 
     };
 
-} // namespace tutorial_0
+}}} // namespace vle examples qss
+
 #endif

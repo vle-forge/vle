@@ -26,7 +26,7 @@
 #include <Executive.hpp>
 #include <vle/value/XML.hpp>
 
-namespace model { namespace lifegame {
+namespace vle { namespace examples { namespace lifegame {
 
 using namespace vle;
 
@@ -48,4 +48,4 @@ devs::Time Executive::init(const devs::Time& /* time */)
     return devs::Time::infinity;
 }
 
-}}
+}}} // namespace vle examples lifegame

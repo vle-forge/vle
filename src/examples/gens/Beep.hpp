@@ -28,18 +28,18 @@
 
 #include <vle/devs.hpp>
 
-namespace examples { namespace gens {
+namespace vle { namespace examples { namespace gens {
 
-    using namespace vle;
-
-    class Beep:public devs::Dynamics
+    class Beep : public devs::Dynamics
     {
     public:
         Beep(const graph::AtomicModel& model,
              const devs::InitEventList& events) :
-            devs::Dynamics(model, events) { }
+            devs::Dynamics(model, events)
+        { }
 
-        virtual ~Beep() { }
+        virtual ~Beep()
+        { }
 
         virtual devs::Time init(const devs::Time& /* time */);
 
@@ -49,8 +49,8 @@ namespace examples { namespace gens {
                             devs::ExternalEventList& /* output */) const;
     };
 
-}} // namespace examples gens
+}}} // namespace vle examples gens
 
-DECLARE_NAMED_DYNAMICS(beep, examples::gens::Beep);
+DECLARE_NAMED_DYNAMICS(beep, vle::examples::gens::Beep);
 
 #endif

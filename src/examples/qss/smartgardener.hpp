@@ -28,9 +28,7 @@
 
 #include <vle/devs/Dynamics.hpp>
 
-using namespace vle;
-
-namespace tutorial_0 {
+namespace vle { namespace examples { namespace qss {
 
     class Smartgardener : public devs::Dynamics
     {
@@ -68,6 +66,7 @@ namespace tutorial_0 {
         double ladybirdamount;    
     };
 
-} // namespace tutorial_0
+}}} // namespace vle examples qss
+
 #endif
 

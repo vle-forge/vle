@@ -66,10 +66,12 @@ namespace vle { namespace oov {
          */
         Plugin(const std::string& location) :
             m_location(location)
-        { }
+        {
+        }
 
         virtual ~Plugin()
-        { }
+        {
+        }
 
         /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 

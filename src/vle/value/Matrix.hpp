@@ -29,6 +29,7 @@
 
 #include <vle/value/Value.hpp>
 #include <boost/multi_array.hpp>
+#include <iostream>
 
 namespace vle { namespace value {
 
@@ -75,7 +76,8 @@ namespace vle { namespace value {
          * @brief Delete all data.
          */
         virtual ~MatrixFactory()
-        { }
+        {
+        }
 
         /** 
          * @brief Build a new Matrix.

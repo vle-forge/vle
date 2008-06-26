@@ -32,9 +32,7 @@
 #include <RegularGenerator.hpp>
 #include <UniformGenerator.hpp>
 
-using namespace vle;
-
-namespace examples {
+namespace vle { namespace examples { namespace generator {
 
 GeneratorWrapper::GeneratorWrapper(const graph::AtomicModel& model,
                                    const devs::InitEventList& events) :
@@ -99,4 +97,4 @@ void GeneratorWrapper::internalTransition(const devs::Time& /* event */)
     m_timeStep = m_generator->generate();
 }
 
-}
+}}} // namespace vle examples generator

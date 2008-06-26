@@ -245,4 +245,3 @@ MatrixFactory::MatrixFactory(const MatrixFactory& m) :
 
 }} // namespace vle value
 
-

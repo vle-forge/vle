@@ -26,12 +26,13 @@
 #ifndef EXAMPLES_RANDOM_REGULAR_GENERATOR_HPP
 #define EXAMPLES_RANDOM_REGULAR_GENERATOR_HPP
 
-namespace examples { 
 
-    class RegularGenerator:public Generator
+namespace vle { namespace examples { namespace generator {
+
+    class RegularGenerator : public Generator
     {
     public:
-        RegularGenerator(vle::utils::Rand& rnd, double data) :
+        RegularGenerator(utils::Rand& rnd, double data) :
             Generator(rnd),
             m_data(data)
         { }
@@ -40,13 +41,13 @@ namespace examples {
 
         virtual double generate() { return m_data; }
 
-        void init(const vle::devs::Time& /* time */) { }
+        void init(const devs::Time& /* time */) { }
 
     private:
         double m_data;
 
     };
 
-}
+}}} // namespace vle examples generator
 
 #endif

@@ -30,7 +30,7 @@
 #include <vle/value.hpp>
 #include <Generator.hpp>
 
-namespace examples {
+namespace vle { namespace examples { namespace generator {
 
     class GeneratorWrapper : public vle::devs::Dynamics
     {
@@ -57,8 +57,8 @@ namespace examples {
         double      m_time;
     };
 
-}
+}}} // namespace vle examples generator
 
-DECLARE_DYNAMICS(examples::GeneratorWrapper);
+DECLARE_DYNAMICS(vle::examples::generator::GeneratorWrapper);
 
 #endif

@@ -27,7 +27,8 @@
 #include <vle/utils.hpp>
 #include <cmath>
 
-namespace examples { 
+
+namespace vle { namespace examples { namespace generator {
 
 double LogNormalGenerator::generate()
 {
@@ -45,4 +46,4 @@ double LogNormalGenerator::generate()
     return z;
 }
 
-}
+}}} // namespace vle examples generator

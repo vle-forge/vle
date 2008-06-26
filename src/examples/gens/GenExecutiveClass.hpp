@@ -29,9 +29,7 @@
 #include <vle/devs.hpp>
 #include <stack>
 
-namespace examples { namespace gens {
-
-    using namespace vle;
+namespace vle { namespace examples { namespace gens {
 
     class GenExecutiveClass : public devs::Executive
     {
@@ -63,8 +61,8 @@ namespace examples { namespace gens {
         int get_nb_model() const;
     };
 
-}} // namespace examples gens
+}}} // namespace vle examples gens
 
-DECLARE_NAMED_DYNAMICS(executiveclass, examples::gens::GenExecutiveClass);
+DECLARE_NAMED_DYNAMICS(executiveclass, vle::examples::gens::GenExecutiveClass);
 
 #endif

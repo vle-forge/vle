@@ -29,7 +29,7 @@
 using namespace vle::devs;
 using namespace vle::extension;
 
-namespace model { namespace lifegame {
+namespace vle { namespace examples { namespace lifegame {
 
 //***********************************************************************
 //***********************************************************************
@@ -101,4 +101,5 @@ void Cell::internalTransition(const Time& time)
     }
 }
 
-}}
+}}} // namespace vle examples lifegame
+

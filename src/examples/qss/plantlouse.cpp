@@ -27,7 +27,7 @@
 #include <vle/utils/Debug.hpp>
 #include <cmath>
 
-namespace tutorial_0 {
+namespace vle { namespace examples { namespace qss {
 
 Plantlouse::Plantlouse(const graph::AtomicModel& model,
                        const devs::InitEventList& events) :
@@ -45,6 +45,6 @@ double Plantlouse::compute() const
 {    
     return a * getValue() - b * getValue("y") * getValue();
 }
-} // namespace tutorial_0
+}}} // namespace vle examples qss
 
-DECLARE_NAMED_DYNAMICS(plantlouse, tutorial_0::Plantlouse)
+DECLARE_NAMED_DYNAMICS(plantlouse, vle::examples::qss::Plantlouse)

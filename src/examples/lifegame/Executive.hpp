@@ -31,7 +31,7 @@
 #include <string>
 #include <vector>
 
-namespace model { namespace lifegame {
+namespace vle { namespace examples { namespace lifegame {
 
     class Executive : public vle::devs::Executive
     {
@@ -47,8 +47,8 @@ namespace model { namespace lifegame {
         std::string m_buffer;
     };
 
-}}
+}}} // namespace vle examples lifegame
 
-DECLARE_NAMED_DYNAMICS(executive, model::lifegame::Executive);
+DECLARE_NAMED_DYNAMICS(executive, vle::examples::lifegame::Executive);
 
 #endif

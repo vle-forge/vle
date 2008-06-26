@@ -25,7 +25,7 @@
 
 #include <Beep.hpp>
 
-namespace examples { namespace gens {
+namespace vle { namespace examples { namespace gens {
 
 devs::Time Beep::init(const devs::Time& /* time */)
 {
@@ -43,4 +43,4 @@ void Beep::output(const devs::Time& /* time */,
     output.addEvent(buildEvent("out"));
 }
 
-}} // namespace examples gens
+}}} // namespace vle examples gens

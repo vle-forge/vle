@@ -147,11 +147,11 @@ void ModelFactory::createModel(Coordinator& coordinator,
 
 	    for (vpz::ValueList::const_iterator itv = vl.begin();
 		 itv != vl.end(); ++itv) {
-                Assert(utils::InternalError, initValues.find(itv->first) ==
-                       initValues.end(), boost::format(
+                Assert(utils::InternalError, not initValues.exist(itv->first),
+                       boost::format(
                            "Multiples condition with the same init port " \
                            "name %1%") % itv->first);
-                initValues[itv->first] = itv->second;
+                initValues.add(itv->first, itv->second);
             }
 	}
     }

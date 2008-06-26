@@ -28,7 +28,7 @@
 
 #include <vle/utils/Rand.hpp>
 
-namespace examples {
+namespace vle { namespace examples { namespace generator {
 
     class Generator
     {
@@ -47,6 +47,6 @@ namespace examples {
         vle::utils::Rand& m_rand;
     };
 
-} // namespace formalism generator
+}}} // namespace vle examples generator
 
 #endif

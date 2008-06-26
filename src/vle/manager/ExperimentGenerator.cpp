@@ -61,6 +61,13 @@ ExperimentGenerator::ExperimentGenerator(const vpz::Vpz& file,
     mTmpfile.project().experiment().conditions().rebuildValueSet();
 }
 
+ExperimentGenerator::~ExperimentGenerator()
+{
+    if (mTmpfile.project().model().model()) {
+        delete mTmpfile.project().model().model();
+    }
+}
+
 void ExperimentGenerator::build(OutputSimulationMatrix* matrix)
 {
     mMatrix = matrix;

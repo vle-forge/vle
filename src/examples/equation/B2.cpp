@@ -24,7 +24,7 @@
 
 #include <examples/equation/B2.hpp>
 
-namespace examples { namespace equation2 {
+namespace vle { namespace examples { namespace equation {
 
 // B(t)=A(t)+C(t-1)+1
 B2::B2(const vle::graph::AtomicModel& model,
@@ -39,5 +39,5 @@ double B2::compute(const vle::devs::Time& /* time */) const
     return getValue("a") + getValue("c", -1) + 1;
 }
 
-} } // namespace examples equation2
+}}} // namespace vle examples equation
 

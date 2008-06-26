@@ -27,9 +27,7 @@
 #include <vle/utils/Debug.hpp>
 #include <cmath>
 
-using namespace vle;
-
-namespace tutorial_0 {
+namespace vle { namespace examples { namespace qss {
 
 Ladybird::Ladybird(const graph::AtomicModel& model,
                    const devs::InitEventList& events):
@@ -49,6 +47,6 @@ double Ladybird::compute() const
     return b * d * getValue("x") * getValue() - e * getValue();
 } 
 
-} // namespace tutorial_0
+}}} // namespace vle examples qss
 
-DECLARE_NAMED_DYNAMICS(ladybird, tutorial_0::Ladybird)
+DECLARE_NAMED_DYNAMICS(ladybird, vle::examples::qss::Ladybird)

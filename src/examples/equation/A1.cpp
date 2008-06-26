@@ -24,7 +24,7 @@
 
 #include <examples/equation/A1.hpp>
 
-namespace examples { namespace equation1 {
+namespace vle { namespace examples { namespace equation {
 
 double A1::compute(const vle::devs::Time& /* time */) const
 {
@@ -36,5 +36,5 @@ double A1::initValue() const
     return 0;
 }
 
-} } // namespace examples equation1
+}}} // namespace vle examples equation
 

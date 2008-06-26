@@ -26,9 +26,7 @@
 #include "plantlouse2.hpp"
 #include <vle/utils/Debug.hpp>
 
-using namespace vle;
-
-namespace tutorial_0 {
+namespace vle { namespace examples { namespace qss {
 
 Plantlouse2::Plantlouse2(const graph::AtomicModel& model,
                          const devs::InitEventList& events) :
@@ -48,6 +46,6 @@ double Plantlouse2::compute(const vle::devs::Time& /* time */) const
 					 getValue());
 } 
 
-} // namespace tutorial_0
+}}} // namespace vle examples qss
 
-DECLARE_NAMED_DYNAMICS(plantlouse2, tutorial_0::Plantlouse2)
+DECLARE_NAMED_DYNAMICS(plantlouse2, vle::examples::qss::Plantlouse2)

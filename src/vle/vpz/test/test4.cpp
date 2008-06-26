@@ -63,6 +63,8 @@ BOOST_AUTO_TEST_CASE(test_connection)
     x->getTargetPortList("out", out);
 
     BOOST_REQUIRE_EQUAL(out.size(), (graph::TargetModelList::size_type)10);
+
+    delete vpz.project().model().model();
 }
 
 BOOST_AUTO_TEST_CASE(test_read_write_read)
@@ -70,18 +72,23 @@ BOOST_AUTO_TEST_CASE(test_read_write_read)
     vpz::Vpz vpz;
     vpz.parseFile(utils::Path::buildPrefixSharePath(
             utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
+    delete vpz.project().model().model();
     vpz.clear();
     vpz.parseFile(utils::Path::path().buildPrefixSharePath(
             utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
+    delete vpz.project().model().model();
     vpz.clear();
     vpz.parseFile(utils::Path::path().buildPrefixSharePath(
             utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
+    delete vpz.project().model().model();
     vpz.clear();
     vpz.parseFile(utils::Path::path().buildPrefixSharePath(
             utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
+    delete vpz.project().model().model();
     vpz.clear();
     vpz.parseFile(utils::Path::path().buildPrefixSharePath(
             utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
+    delete vpz.project().model().model();
 }
 
 BOOST_AUTO_TEST_CASE(test_read_write_read2)
@@ -89,6 +96,7 @@ BOOST_AUTO_TEST_CASE(test_read_write_read2)
     vpz::Vpz vpz;
     vpz.parseFile(utils::Path::buildPrefixSharePath(
             utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
-
     vpz::Vpz vpz2(vpz);
+    delete vpz.project().model().model();
+    delete vpz2.project().model().model();
 }

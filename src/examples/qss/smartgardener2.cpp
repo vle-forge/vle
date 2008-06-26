@@ -26,9 +26,7 @@
 #include "smartgardener2.hpp"
 #include <vle/utils/Debug.hpp>
 
-using namespace vle;
-
-namespace tutorial_0 {
+namespace vle { namespace examples { namespace qss {
   
 Smartgardener2::Smartgardener2(const graph::AtomicModel& model,
                                const devs::InitEventList& events) :
@@ -156,5 +154,6 @@ void Smartgardener2::externalTransition(const devs::ExternalEventList&
     }
 }
 
-} // namespace tutorial_0
-DECLARE_NAMED_DYNAMICS(smartgardener2, tutorial_0::Smartgardener2)
+}}} // namespace vle examples qss
+
+DECLARE_NAMED_DYNAMICS(smartgardener2, vle::examples::qss::Smartgardener2)

@@ -29,7 +29,7 @@
 
 #include <vle/extension/DifferenceEquation.hpp>
 
-namespace tutorial_0 {
+namespace vle { namespace examples { namespace qss {
 
     class Ladybird2 : public vle::extension::DifferenceEquation
     {
@@ -47,5 +47,5 @@ namespace tutorial_0 {
         double e;
     };
 
-} // namespace tutorial_0
+}}} // namespace vle examples qss
 #endif

@@ -212,4 +212,5 @@ BOOST_AUTO_TEST_CASE(single_class)
     BOOST_REQUIRE(cpl);
 
 
+    delete vpz.project().model().model();
 }

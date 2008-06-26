@@ -28,9 +28,7 @@
 
 #include <vle/extension/CombinedQSS.hpp>
 
-using namespace vle;
-
-namespace tutorial_0 {
+namespace vle { namespace examples { namespace qss {
 
     class Ladybirdplantlouse : public extension::CombinedQss
     {
@@ -50,5 +48,5 @@ namespace tutorial_0 {
 
     };
 
-} // namespace tutorial_0
+}}} // namespace vle examples qss
 #endif

@@ -29,9 +29,7 @@
 #include <vle/vpz.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
-using namespace vle;
-
-namespace examples { namespace gens {
+namespace vle { namespace examples { namespace gens {
 
 GenExecutive::GenExecutive(const graph::AtomicModel& mdl,
                            const devs::InitEventList& events) :
@@ -142,4 +140,4 @@ int GenExecutive::get_nb_model() const
     return boost::numeric_cast < int >(coupledmodel().getModelList().size()) - 1;
 }
 
-}} // namespace examples gens
+}}} // namespace vle examples gens

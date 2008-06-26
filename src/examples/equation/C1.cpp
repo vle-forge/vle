@@ -24,7 +24,7 @@
 
 #include <examples/equation/C1.hpp>
 
-namespace examples { namespace equation1 {
+namespace vle { namespace examples { namespace equation {
 
 C1::C1(const vle::graph::AtomicModel& model,
        const vle::devs::InitEventList& events) :
@@ -37,5 +37,5 @@ double C1::compute(const vle::devs::Time& /* time */) const
   return getValue() + getValue("b", -1) + 1;
 }
 
-} } // namespace examples equation1
+}}} // namespace vle examples equation
 

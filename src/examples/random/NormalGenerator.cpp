@@ -28,7 +28,7 @@
 #include <glib/gtypes.h>
 #include <cmath>
 
-namespace examples {
+namespace vle { namespace examples { namespace generator {
 
 double NormalGenerator::generate()
 {
@@ -44,4 +44,4 @@ double NormalGenerator::generate()
     return z;
 }
 
-}
+}}} // namespace vle examples generator

@@ -25,9 +25,7 @@
 
 #include <Counter.hpp>
 
-namespace examples {
-
-using namespace vle;
+namespace vle { namespace examples { namespace counter {
 
 void Counter::output(const devs::Time& /* time */,
                      devs::ExternalEventList& output) const
@@ -66,4 +64,4 @@ value::Value Counter::observation(const devs::ObservationEvent& event) const
     return value::Value();
 }
 
-}
+}}} // namespace vle examples counter

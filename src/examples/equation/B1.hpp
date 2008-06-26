@@ -28,7 +28,7 @@
 
 #include <vle/extension/DifferenceEquation.hpp>
 
-namespace examples { namespace equation1 {
+namespace vle { namespace examples { namespace equation {
 
     class B1 : public vle::extension::DifferenceEquation
     {
@@ -43,8 +43,8 @@ namespace examples { namespace equation1 {
         virtual double initValue() const;
     };
 
-} } // namespace examples equation1
+}}} // namespace vle examples equation
 
-DECLARE_NAMED_DYNAMICS(B1, examples::equation1::B1);
+DECLARE_NAMED_DYNAMICS(B1, vle::examples::equation::B1);
 
 #endif

@@ -24,7 +24,7 @@
 
 #include <examples/equation/D1.hpp>
 
-namespace examples { namespace equation1 {
+namespace vle { namespace examples { namespace equation {
 
 D1::D1(const vle::graph::AtomicModel& model,
        const vle::devs::InitEventList& events) :
@@ -44,5 +44,5 @@ double D1::initValue() const
     return getValue("a") + getValue("c");
 }
 
-} } // namespace examples equation1
+}}} // namespace vle examples equation
 

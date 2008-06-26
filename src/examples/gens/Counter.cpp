@@ -26,9 +26,7 @@
 #include <Counter.hpp>
 #include <iomanip>
 
-namespace examples { namespace gens {
-
-using namespace vle;
+namespace vle { namespace examples { namespace gens {
 
 Counter::Counter(const graph::AtomicModel& model,
                  const devs::InitEventList& events) :
@@ -81,4 +79,4 @@ value::Value Counter::observation(const devs::ObservationEvent& /* event */) con
     }
 }
 
-}} // namespace examples gens
+}}} // namespace vle examples gens

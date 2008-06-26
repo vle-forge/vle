@@ -57,7 +57,7 @@ namespace vle { namespace manager {
         ExperimentGenerator(const vpz::Vpz& file, std::ostream& out,
                             RandPtr rnd);
 
-        virtual ~ExperimentGenerator() { }
+        virtual ~ExperimentGenerator();
 
         /**
          * @brief Get the list of filename build after build.

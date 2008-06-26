@@ -58,22 +58,30 @@ Condition::Condition(const Condition& cnd) :
 value::Value ValueList::get(const std::string& name)
 {
     iterator it;
-    if ((it = find(name)) == end()) {
+    if ((it = m_lst.find(name)) == end()) {
         Throw(utils::SaxParserError, boost::format(
                 "Condition '%1%' does not exist") % name);
     }
     return it->second;
 }
 
+void ValueList::add(const std::string& key, const value::Value& val)
+{
+    Assert(utils::SaxParserError, m_lst.find(key) == end(),
+           boost::format("Condition '%1%' already exist") % key);
+
+    m_lst.insert(std::make_pair < std::string, value::Value >(key, val));
+}
+
 bool ValueList::exist(const std::string& name) const
 {
-    return find(name) != end();
+    return m_lst.find(name) != end();
 }
 
 const value::Value& ValueList::get(const std::string& name) const
 {
     const_iterator it;
-    if ((it = find(name)) == end()) {
+    if ((it = m_lst.find(name)) == end()) {
         Throw(utils::SaxParserError, boost::format(
                 "Condition '%1%' does not exist") % name);
     }
@@ -170,7 +178,7 @@ ValueList Condition::firstValues() const
          m_list.end();
          ++it) {
         if (it->second->size() > 0) {
-            result[it->first] = it->second->getValue(0);
+            result.add(it->first, it->second->getValue(0));
         } else {
             Throw(utils::SaxParserError, (boost::format(
                         "Build a empty first values for condition %1%.") %

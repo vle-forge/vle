@@ -32,12 +32,15 @@
 #include <vle/value/Integer.hpp>
 #include <vle/value/String.hpp>
 #include <vle/value/Null.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/trim.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
 namespace vle { namespace oov { namespace plugin {
 
 Storage::Storage(const std::string& location) :
     Plugin(location),
+    m_matrix(2, 2, 1, 1),
     m_time(-1.0),
     m_isstart(false)    
 {
@@ -67,8 +70,25 @@ std::string Storage::name() const
     return std::string("storage");
 }
 
-void Storage::onParameter(const vpz::ParameterTrame& /* trame */)
+void Storage::onParameter(const vpz::ParameterTrame& trame)
 {
+    std::istringstream param(trame.data());
+    int columns = -1, rows = -1, rzcolumns = -1, rzrows = -1;
+
+    if (param) {
+        param >> columns;
+        if (param) {
+            param >> rows;
+            if (param) {
+                param >> rzcolumns;
+                if (param) {
+                    param >> rzrows;
+                }
+            }
+        }
+    }
+    m_matrix.resize(columns > 1 ? columns : 10, rows > 1 ? rows : 10);
+    m_matrix.updateStep(rzcolumns > 0 ? rzcolumns : 1, rzrows > 0 ? rzrows : 1);
 }
 
 void Storage::onNewObservable(const vpz::NewObservableTrame& trame)

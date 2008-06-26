@@ -90,7 +90,8 @@ namespace vle { namespace oov {
          * @brief Destroy
          */
         virtual ~OutputMatrix()
-        { }
+        {
+        }
 
         /** 
          * @brief Serialize the data's to an output of value::Value object. Be
@@ -270,8 +271,6 @@ namespace vle { namespace oov {
         { return m_colAccess; }
 
     private:
-
-
         value::Matrix m_values; ///! the matrix.
         MapStringList m_info; ///! store for each model, list of port.
         StringList m_modelNames; ///! store the list of model's name.

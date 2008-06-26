@@ -30,7 +30,7 @@
 
 using namespace vle;
 
-namespace tutorial_0 {
+namespace vle { namespace examples { namespace qss {
 
     class Plantlouse : public extension::qss
     {
@@ -47,5 +47,6 @@ namespace tutorial_0 {
         double b; 
     };
 
-} // namespace tutorial_0
+}}} // namespace vle examples qss
+
 #endif
