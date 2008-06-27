@@ -138,12 +138,12 @@ bool DifferenceEquation::initExternalVariable(const std::string& name,
 {
     bool ok = true;
 
-    if (mSynchros.find(name) == mSynchros.end())
+    if (mSynchros.find(name) == mSynchros.end()) {
         if (mAllSynchro) {
-            mSynchros[name] = true;
+            mSynchros.insert(name);
             ++mSyncs;
         }
-        else mSynchros[name] = false;
+    }
     else ++mSyncs;
 
     // est-ce que cette variable externe possède une
@@ -224,9 +224,9 @@ double DifferenceEquation::getValue(const char* name,
 
         return it->second.front().second;
     } else {
-        std::map < std::string, bool >::const_iterator its = mSynchros.find(name);
+        std::set < std::string >::const_iterator its = mSynchros.find(name);
 
-        if (!its->second) ++shift;
+        if (its == mSynchros.end()) ++shift;
 
         Assert(utils::InternalError, shift <= 0, (boost::format(
                     "[%1%] DifferenceEquation::getValue - wrong shift on %2%") %
@@ -260,7 +260,7 @@ void DifferenceEquation::setSize(const std::string& name,
 void DifferenceEquation::setSynchronizedVariable(const std::string& name) 
 { 
     mSynchro = true;
-    mSynchros[name] = true; 
+    mSynchros.insert(name); 
     ++mWaiting; 
 }
 
@@ -442,7 +442,7 @@ void DifferenceEquation::externalTransition(const ExternalEventList& event,
                 // je comptabilise cette dépendance afin de
                 // vérifier que j'ai bien tout reçu et je
                 // pourrais alors lancer mon propre calcul
-                if (mState == PRE and end) ++mReceive;
+                if (mState == PRE and end and mSynchros.find(name) != mSynchros.end()) ++mReceive;
             }
         }
         // c'est une perturbation d'un modèle externe sur la

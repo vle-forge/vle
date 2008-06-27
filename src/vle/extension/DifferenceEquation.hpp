@@ -26,6 +26,7 @@
 #define VLE_EXTENSION_DIFFERENCE_EQUATION_HPP
 
 #include <vle/devs/Dynamics.hpp>
+#include <set>
 
 namespace vle { namespace extension {
 
@@ -173,7 +174,7 @@ namespace vle { namespace extension {
         valueList mValues;
 
         bool mSynchro;
-        std::map < std::string, bool > mSynchros;
+        std::set < std::string > mSynchros;
         unsigned int mSyncs;
         bool mAllSynchro;
 
