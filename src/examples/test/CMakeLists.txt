@@ -25,4 +25,20 @@ TARGET_LINK_LIBRARIES(test_gens
   vlevpz
   vlemanager)
 
-ADD_TEST(modelgens test_gens)
+ADD_EXECUTABLE(test_petrinet testpetrinet.cpp)
+TARGET_LINK_LIBRARIES(test_petrinet
+  ${GLIBMM_LIBRARIES}
+  ${LIBXMLPP_LIBRARIES}
+  ${GTHREAD_LIBRARIES}
+  ${Boost_UNITTESTFRAMEWORK}
+  vlegeometry
+  vleutils
+  vledata
+  vlevalue
+  vlegraph
+  vledevs
+  vlevpz
+  vlemanager)
+
+ADD_TEST(exemples_generator test_gens)
+ADD_TEST(examples_petrinet test_petrinet)
