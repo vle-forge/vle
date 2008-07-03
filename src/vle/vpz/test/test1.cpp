@@ -391,3 +391,60 @@ BOOST_AUTO_TEST_CASE(value_matrix_of_matrix)
     BOOST_REQUIRE_EQUAL(value::toInteger(m3[1][0]), 8);
     BOOST_REQUIRE_EQUAL(value::toInteger(m3[2][0]), 9);
 }
+
+BOOST_AUTO_TEST_CASE(value_matrix_of_matrix_io)
+{
+    const char* t1 = "<?xml version=\"1.0\"?>\n"
+        "<matrix rows=\"1\" columns=\"3\" columnmax=\"15\" "
+        "        rowmax=\"25\" columnstep=\"100\" rowstep=\"200\" >"
+        "<matrix rows=\"1\" columns=\"3\" columnmax=\"15\" "
+        "        rowmax=\"25\" columnstep=\"100\" rowstep=\"200\" >"
+        "<null />"
+        "<integer>2</integer>"
+        "<integer>3</integer>"
+        "</matrix>"
+        "<matrix rows=\"1\" columns=\"3\" columnmax=\"15\" "
+        "        rowmax=\"25\" columnstep=\"100\" rowstep=\"200\" >"
+        "<integer>4</integer>"
+        "<integer>5</integer>"
+        "<null />"
+        "</matrix>"
+        "<matrix rows=\"1\" columns=\"3\" columnmax=\"15\" "
+        "        rowmax=\"25\" columnstep=\"100\" rowstep=\"200\" >"
+        "<integer>7</integer>"
+        "<null />"
+        "<integer>9</integer>"
+        "</matrix>"
+        "</matrix>";
+
+    value::Value v = vpz::Vpz::parseValue(t1);
+
+    std::string str(v->toXML());
+    str = "<?xml version=\"1.0\"?>\n" + str;
+
+    value::Value v2 = vpz::Vpz::parseValue(str);
+    BOOST_REQUIRE_EQUAL(v2->isMatrix(), true);
+
+    value::Matrix m = value::toMatrixValue(v2);
+    value::MatrixFactory::MatrixView mv = value::toMatrix(v2);
+
+    BOOST_REQUIRE_EQUAL(m->rows(), (value::MatrixFactory::size_type)1);
+    BOOST_REQUIRE_EQUAL(m->columns(), (value::MatrixFactory::size_type)3);
+
+    BOOST_REQUIRE_EQUAL(mv[0][0]->isMatrix(), true);
+    BOOST_REQUIRE_EQUAL(mv[1][0]->isMatrix(), true);
+    BOOST_REQUIRE_EQUAL(mv[2][0]->isMatrix(), true);
+
+    value::MatrixFactory::MatrixView m1 = value::toMatrix(mv[0][0]);
+    value::MatrixFactory::MatrixView m2 = value::toMatrix(mv[1][0]);
+    value::MatrixFactory::MatrixView m3 = value::toMatrix(mv[2][0]);
+    BOOST_REQUIRE_EQUAL(m1[0][0].get(), (value::ValueBase*)0);
+    BOOST_REQUIRE_EQUAL(value::toInteger(m1[1][0]), 2);
+    BOOST_REQUIRE_EQUAL(value::toInteger(m1[2][0]), 3);
+    BOOST_REQUIRE_EQUAL(value::toInteger(m2[0][0]), 4);
+    BOOST_REQUIRE_EQUAL(value::toInteger(m2[1][0]), 5);
+    BOOST_REQUIRE_EQUAL(m2[2][0].get(), (value::ValueBase*)0);
+    BOOST_REQUIRE_EQUAL(value::toInteger(m3[0][0]), 7);
+    BOOST_REQUIRE_EQUAL(m3[1][0].get(), (value::ValueBase*)0);
+    BOOST_REQUIRE_EQUAL(value::toInteger(m3[2][0]), 9);
+}

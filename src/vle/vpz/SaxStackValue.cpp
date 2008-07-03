@@ -166,7 +166,11 @@ void ValueStackSax::pushOnVectorValue(const value::Value& val)
                 m_lastkey, val);
         } else if (m_valuestack.top()->isMatrix()) {
             value::Matrix mx = value::toMatrixValue(m_valuestack.top());
-            mx->addValueToLastCell(val);
+            if (val->isNull()) {
+                mx->addValueToLastCell(value::Value());
+            } else {
+                mx->addValueToLastCell(val);
+            }
             mx->moveLastCell();
         }
     } else {
