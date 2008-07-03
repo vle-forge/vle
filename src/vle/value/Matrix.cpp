@@ -117,7 +117,7 @@ std::string MatrixFactory::toXML() const
             if (m_matrix[i][j].get()) {
                 o << m_matrix[i][j]->toXML();
             } else {
-                o << "</ null>";
+                o << "<null />";
             }
             o << " ";
         }
