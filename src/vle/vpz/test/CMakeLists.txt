@@ -110,5 +110,10 @@ TARGET_LINK_LIBRARIES(test_vpz_graph
   vledevs
   vlevpz)
 
-ADD_TEST(vpztest test_vpz_values test_vpz_project test_vpz_translator test_vpz_io
-  test_vpz_oov test_vpz_classes test_vpz_graph)
+ADD_TEST(vpztest_values test_vpz_values)
+ADD_TEST(vpztest_project test_vpz_project)
+ADD_TEST(vpztest_translator test_vpz_translator)
+ADD_TEST(vpztest_io test_vpz_io)
+ADD_TEST(vpztest_oov test_vpz_oov)
+ADD_TEST(vpztest_classes test_vpz_classes)
+ADD_TEST(vpztest_structures test_vpz_graph)

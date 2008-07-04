@@ -92,7 +92,7 @@ void Views::clear()
 {
     m_list.clear();
     m_outputs.clear();
-    m_observables.clear(); 
+    m_observables.clear();
 }
 
 void Views::add(const Views& views)
@@ -120,9 +120,11 @@ View& Views::addEventView(const std::string& name,
     Assert(utils::SaxParserError, not exist(name),
            (boost::format("View %1% already exist") % name));
 
-    View m(name);
-    m.setEventView(output);
-    return add(m);
+    Assert(utils::SaxParserError, not isUsedOutput(output),
+           boost::format("Output '%1%' of view '%2%' is already used") %
+           output % name);
+
+    return add(View(name, View::EVENT, output));
 }
 
 View& Views::addTimedView(const std::string& name,
@@ -132,9 +134,11 @@ View& Views::addTimedView(const std::string& name,
     Assert(utils::SaxParserError, not exist(name),
            (boost::format("View %1% already exist") % name));
 
-    View m(name);
-    m.setTimedView(timestep, output);
-    return add(m);
+    Assert(utils::SaxParserError, not isUsedOutput(output),
+           boost::format("Output '%1%' of view '%2%' is already used") %
+           output % name);
+
+    return add(View(name, View::TIMED, output, timestep));
 }
 
 View& Views::addFinishView(const std::string& name,
@@ -143,9 +147,11 @@ View& Views::addFinishView(const std::string& name,
     Assert(utils::SaxParserError, not exist(name),
            (boost::format("View %1% already exist") % name));
 
-    View m(name);
-    m.setFinishView(output);
-    return add(m);
+    Assert(utils::SaxParserError, not isUsedOutput(output),
+           boost::format("Output '%1%' of view '%2%' is already used") %
+           output % name);
+
+    return add(View(name, View::FINISH, output));
 }
 
 void Views::del(const std::string& name)
@@ -169,6 +175,15 @@ View& Views::get(const std::string& name)
            boost::format("Unknow view '%1%'\n") % name);
 
     return it->second;
+}
+
+bool Views::isUsedOutput(const std::string& name) const
+{
+    ViewList::const_iterator it(
+        std::find_if(m_list.begin(), m_list.end(),
+                     UseOutput(name)));
+
+    return it != m_list.end();
 }
 
 }} // namespace vle vpz

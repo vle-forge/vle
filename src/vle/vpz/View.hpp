@@ -35,7 +35,7 @@
 
 namespace vle { namespace vpz {
 
-    /** 
+    /**
      * @brief A View made a link between a list of observation and an outut
      * plugin. This View can be timed by a timestep  or completely event.
      */
@@ -44,11 +44,30 @@ namespace vle { namespace vpz {
     public:
         enum Type { TIMED, EVENT, FINISH };
 
+        /**
+         * @brief Build a new event view with a specific name.
+         *
+         * @param name The name of the View.
+         * @param parent A constant reference to the parent
+         */
         View(const std::string& name) :
             m_name(name),
             m_type(EVENT),
             m_timestep(0.0)
         { }
+
+        /** 
+         * @brief Build a new View with a specific name, type and reference.
+         * 
+         * @param name The name of the View.
+         * @param type The type of this View.
+         * @param output The name of the Output.
+         * @param timestep A timestep, necessary for type TIMED.
+         */
+        View(const std::string& name,
+             View::Type type,
+             const std::string& output,
+             double timestep = 0.0);
 
         virtual ~View() { }
 
@@ -57,14 +76,14 @@ namespace vle { namespace vpz {
         virtual Base::type getType() const
         { return VIEW; }
 
-        /** 
+        /**
          * @brief Set the View with Event type on the specified output.
          * @param output the output of the event View.
          * @throw utils::SaxParserError if output is empty.
          */
         void setEventView(const std::string& output);
 
-        /** 
+        /**
          * @brief Set the View with Timed type on the specified output and
          * timestep.
          * @param timestep the output of the timed View.
@@ -74,7 +93,7 @@ namespace vle { namespace vpz {
          */
         void setTimedView(double timestep, const std::string& output);
 
-        /** 
+        /**
          * @brief Set the View with the Finish type on the specified output.
          * @param output the output of the Finish View.
          * @throw utils::SaxParserError if output is empty.
@@ -91,7 +110,7 @@ namespace vle { namespace vpz {
         { m_type = type; }
 
         inline std::string streamtype() const
-        { return m_type == TIMED ? "timed" : 
+        { return m_type == TIMED ? "timed" :
                   m_type == EVENT ? "event" : "finish"; }
 
         inline void setTimestep(double time);
@@ -111,13 +130,10 @@ namespace vle { namespace vpz {
         { m_data = data; }
 
     private:
-        View()
-        { }
-
         std::string     m_name;
         Type            m_type;
-        double          m_timestep;
         std::string     m_output;
+        double          m_timestep;
         std::string     m_data;
     };
 
