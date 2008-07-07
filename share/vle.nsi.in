@@ -4,7 +4,7 @@
 
 ;--------------------------------
 ; You must define these values
-
+;
 !define PRODUCT_NAME "@VLE_NAME@"
 !define PRODUCT_VERSION "@VLE_VERSION@"
 !define PRODUCT_NAME_COMPLETE "@VLE_NAME_COMPLETE@"
@@ -30,37 +30,33 @@ VIAddVersionKey  "LegalCopyright" "(C) 2003-2008 The VLE Development Team"
 
 
 ;--------------------------------
-;Variables
-
-  Var MUI_TEMP
-  Var STARTMENU_FOLDER
-  Var SV_ALLUSERS
-
-;--------------------------------
-;Include Modern UI
-
-  !include "MUI.nsh"
-
-  ;Default installation folder
-  InstallDir "$PROGRAMFILES\${PRODUCT_INSTALL_DIRECTORY}"  
+; Variables
+;
+Var MUI_TEMP
+Var STARTMENU_FOLDER
+Var SV_ALLUSERS
 
 ;--------------------------------
-;General
-
-  ;Name and file
-  Name "${PRODUCT_INSTALL_DIRECTORY}"
-  OutFile "${PRODUCT_OUT_FILE}"
-
+; Include Modern UI
+;
+!include "MUI.nsh"
+InstallDir "$PROGRAMFILES\${PRODUCT_INSTALL_DIRECTORY}"
 
 ;--------------------------------
-;Interface Settings
+; General
+;
+Name "${PRODUCT_INSTALL_DIRECTORY}"
+OutFile "${PRODUCT_OUT_FILE}"
 
-  !define MUI_HEADERIMAGE
-  !define MUI_ABORTWARNING
+;--------------------------------
+; Interface Settings
+;
+!define MUI_HEADERIMAGE
+!define MUI_ABORTWARNING
 
 ;--------------------------------
 ; path functions
-
+;
 !verbose 3
 !addincludedir "@PROJECT_SOURCE_DIR@/share/"
 !include "RegManipulation.nsh"
@@ -78,24 +74,24 @@ FunctionEnd
 
 ;--------------------------------
 ; Define some macro setting for the gui
-
+;
   !define MUI_ICON                          "${PRODUCT_ICON}"
   !define MUI_FINISHPAGE_NOAUTOCLOSE
   !define MUI_UNFINISHPAGE_NOAUTOCLOSE
 
-
 ;--------------------------------
-;Pages
+; Pages
+;
   !define MUI_WELCOMEPAGE_TITLE "Welcome to the VLE ${PRODUCT_NAME_COMPLETE} Setup Wizard"
   !define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of VLE (Virtual Laboratory Environment) ${PRODUCT_NAME}.\r\n\r\nReport bugs to ${PRODUCT_EMAIL} or on the VLE website"
   !insertmacro MUI_PAGE_WELCOME
 
   !insertmacro MUI_PAGE_LICENSE "${PRODUCT_LICENSE}"
   !insertmacro MUI_PAGE_DIRECTORY
-  
+
   ;Start Menu Folder Page Configuration
-  !define MUI_STARTMENUPAGE_REGISTRY_ROOT "SHCTX" 
-  !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\${PRODUCT_VENDOR}\${PRODUCT_INSTALL_REGISTRY}" 
+  !define MUI_STARTMENUPAGE_REGISTRY_ROOT "SHCTX"
+  !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\${PRODUCT_VENDOR}\${PRODUCT_INSTALL_REGISTRY}"
   !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "Start Menu Folder"
   !insertmacro MUI_PAGE_STARTMENU Application $STARTMENU_FOLDER
 
@@ -104,16 +100,16 @@ FunctionEnd
 
   !insertmacro MUI_UNPAGE_CONFIRM
   !insertmacro MUI_UNPAGE_INSTFILES
-  
+
 ;--------------------------------
-;Languages
- 
+; Languages
+;
+
   !insertmacro MUI_LANGUAGE "English"
 
 ;--------------------------------
 ;Installer Sections
-
-
+;
 Section "Installer Section" InstSection
 
   ; files to install.
@@ -123,7 +119,7 @@ Section "Installer Section" InstSection
   ;Store installation folder
   WriteRegStr SHCTX "Software\${PRODUCT_VENDOR}\${PRODUCT_INSTALL_REGISTRY}" "" $INSTDIR
   WriteRegStr SHCTX "Software\${PRODUCT_VENDOR}\${PRODUCT_INSTALL_REGISTRY}" "PATH" $INSTDIR
-  
+
   ;Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
   Push "DisplayName"
@@ -151,6 +147,7 @@ Section "Installer Section" InstSection
   CreateShortCut  "$SMPROGRAMS\$STARTMENU_FOLDER\vle.lnk" "$INSTDIR\bin\vle.exe" "" "$INSTDIR\bin\vle.exe" 0
   CreateShortCut  "$SMPROGRAMS\$STARTMENU_FOLDER\oov.lnk" "$INSTDIR\bin\oov.exe" "" "$INSTDIR\bin\oov.exe" 0
   CreateShortCut  "$SMPROGRAMS\$STARTMENU_FOLDER\eov.lnk" "$INSTDIR\bin\eov.exe" "" "$INSTDIR\bin\eov.exe" 0
+  CreateShortCut  "$SMPROGRAMS\$STARTMENU_FOLDER\gvle.lnk" "$INSTDIR\bin\gvle.exe" "" "$INSTDIR\bin\gvle.exe" 0
   CreateShortCut  "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
   !insertmacro MUI_STARTMENU_WRITE_END
 
@@ -168,12 +165,9 @@ Section "Installer Section" InstSection
   ${registerExtension} "$INSTDIR\bin\vle.exe" ".vpz" "VLE Project File"
 SectionEnd
 
-
-
-
 ;--------------------------------
-;Uninstaller Section
-
+; Uninstaller Section
+;
 Section "Uninstall"
   ; Remove the application from PATH variable
   Push "$INSTDIR\bin"
@@ -195,7 +189,7 @@ Section "Uninstall"
   Delete "$INSTDIR\COPYING"
   Delete "$INSTDIR\vle.ico"
   RMDir "$INSTDIR"
- 
+
   ; Remove the registry entries.
   DeleteRegKey SHCTX "Software\${PRODUCT_VENDOR}\${PRODUCT_INSTALL_REGISTRY}"
 
@@ -207,10 +201,11 @@ Section "Uninstall"
   Delete "$SMPROGRAMS\$MUI_TEMP\vle.lnk"
   Delete "$SMPROGRAMS\$MUI_TEMP\oov.lnk"
   Delete "$SMPROGRAMS\$MUI_TEMP\eov.lnk"
+  Delete "$SMPROGRAMS\$MUI_TEMP\gvle.lnk"
   Delete "$SMPROGRAMS\$MUI_TEMP\Uninstall.lnk"
   RMDir "$SMPROGRAMS\$MUI_TEMP"
- 
-  ; Remove the file association registry. 
+
+  ; Remove the file association registry.
   ${unregisterExtension} ".vpz" "VLE Project File"
 SectionEnd
 
