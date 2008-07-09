@@ -50,7 +50,7 @@
   <dynamic name="petri" library="petrinet" model="Ordinary"  />
   <dynamic name="counter" library="petrinet" model="Counter"  />
  </dynamics>
- <experiment name="PetriNetOr" duration="1" seed="123" >
+ <experiment name="PetriNetNand2" duration="1" seed="123" >
   <conditions>
    <condition name="beepa" >
     <port name="start" >
@@ -98,9 +98,6 @@
       <set>
        <string>t3</string>
       </set>
-      <set>
-       <string>t4</string>
-      </set>
      </set>
     </port>
     <port name="arcs">
@@ -119,14 +116,11 @@
       </set>
       <set>
        <string>p2</string>
-       <string>t4</string>
+       <string>t3</string>
+       <integer>0</integer>
       </set>
       <set>
        <string>t3</string>
-       <string>p3</string>
-      </set>
-      <set>
-       <string>t4</string>
        <string>p3</string>
       </set>
      </set>
@@ -175,4 +169,3 @@
   </views>
  </experiment>
 </vle_project>
-

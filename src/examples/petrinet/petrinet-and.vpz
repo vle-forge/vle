@@ -69,9 +69,6 @@
     </port>
    </condition>
    <condition name="petrinet" >
-    <port name="dynamics" >
-     <string>WhileAlive</string>
-    </port>
     <port name="places" >
      <set>
       <set>

@@ -34,7 +34,6 @@
 #include <vle/extension/DifferenceEquation.hpp>
 #include <vle/extension/DSDevs.hpp>
 #include <vle/extension/PetriNet.hpp>
-#include <vle/extension/TimedPetriNet.hpp>
 #include <vle/extension/QSS2.hpp>
 #include <vle/extension/QSS.hpp>
 

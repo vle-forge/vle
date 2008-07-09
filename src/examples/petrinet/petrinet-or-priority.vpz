@@ -7,18 +7,13 @@
     <model name="PetriNet" type="atomic" conditions="petrinet" dynamics="petri" observables="petri" x="272" y="149" width="100" height="75" >
      <in>
       <port name="t1" />
-      <port name="t2" />
      </in>
      <out>
+      <port name="p2" />
       <port name="p3" />
      </out>
     </model>
-    <model name="beepA" type="atomic" conditions="beepa" dynamics="beep" x="108" y="116" width="100" height="45" >
-     <out>
-      <port name="out" />
-     </out>
-    </model>
-    <model name="beepB" type="atomic" conditions="beepb" dynamics="beep" x="92" y="261" width="100" height="45" >
+    <model name="beep" type="atomic" conditions="beepa" dynamics="beep" x="108" y="116" width="100" height="45" >
      <out>
       <port name="out" />
      </out>
@@ -31,18 +26,18 @@
    </submodels>
    <connections>
     <connection type="internal">
-     <origin model="beepA" port="out" />
+     <origin model="beep" port="out" />
      <destination model="PetriNet" port="t1" />
     </connection>
     <connection type="internal">
-     <origin model="beepB" port="out" />
-     <destination model="PetriNet" port="t2" />
+     <origin model="PetriNet" port="p2" />
+     <destination model="counter" port="in" />
     </connection>
     <connection type="internal">
      <origin model="PetriNet" port="p3" />
      <destination model="counter" port="in" />
     </connection>
-   </connections>
+ </connections>
   </model>
  </structures>
  <dynamics>
@@ -50,22 +45,22 @@
   <dynamic name="petri" library="petrinet" model="Ordinary"  />
   <dynamic name="counter" library="petrinet" model="Counter"  />
  </dynamics>
- <experiment name="PetriNetOr" duration="1" seed="123" >
+ <experiment name="PetriNetOr-priority" duration="1" seed="123" >
   <conditions>
    <condition name="beepa" >
     <port name="start" >
      <double>0.5</double>
     </port>
     <port name="timestep" >
-     <double>1.0</double>
+     <double>0.1</double>
     </port>
    </condition>
    <condition name="beepb" >
     <port name="start" >
-     <double>0.75</double>
+     <double>0.5</double>
     </port>
     <port name="timestep" >
-     <double>1.0</double>
+     <double>0.1</double>
     </port>
    </condition>
    <condition name="petrinet" >
@@ -75,6 +70,7 @@
        <string>p1</string>
       </set>
       <set>
+       <string>p2</string>
        <string>p2</string>
       </set>
       <set>
@@ -92,14 +88,17 @@
       </set>
       <set>
        <string>t2</string>
-       <string>input</string>
-       <string>t2</string>
+       <integer>1</integer>
       </set>
       <set>
        <string>t3</string>
+       <integer>2</integer>
       </set>
       <set>
-       <string>t4</string>
+	<string>t4</string>
+      </set>
+      <set>
+	<string>t5</string>
       </set>
      </set>
     </port>
@@ -110,42 +109,33 @@
        <string>p1</string>
       </set>
       <set>
+       <string>p1</string>
+       <string>t2</string>
+      </set>
+      <set>
+       <string>p1</string>
+       <string>t3</string>
+      </set>
+      <set>
        <string>t2</string>
        <string>p2</string>
       </set>
       <set>
-       <string>p1</string>
        <string>t3</string>
+       <string>p3</string>
       </set>
       <set>
        <string>p2</string>
        <string>t4</string>
       </set>
       <set>
-       <string>t3</string>
        <string>p3</string>
-      </set>
-      <set>
-       <string>t4</string>
-       <string>p3</string>
+       <string>t5</string>
       </set>
      </set>
     </port>
     <port name="initialMarkings" >
-     <set>
-      <set>
-       <string>p1</string>
-       <integer>0</integer>
-      </set>
-      <set>
-       <string>p2</string>
-       <integer>0</integer>
-      </set>
-      <set>
-       <string>p3</string>
-       <integer>0</integer>
-      </set>
-     </set>
+     <set />
     </port>
    </condition>
   </conditions>

@@ -35,17 +35,12 @@ namespace vle { namespace extension {
      * @brief
      * @code
      * <condition>
-     *  <port name="dynamics">
-     *   <string>
-     *    StepByStep | PhaseByPhase | WhileAlive | TransitionTimed
-     *   </string></port>
      *  <port name="places">
      *   <set>
      *    <set>
      *     <string>name</string>
-     *     <string>input|output|internal</string>
-     *     <string>portName</string>
-     *     <integer>tokenNumber</string>
+     *     [<string>portName</string>]
+     *     [<double>delay</double>]
      *    </set>
      *   </set>
      *  </port>
@@ -53,18 +48,19 @@ namespace vle { namespace extension {
      *   <set>
      *    <set>
      *     <string>name</string>
-     *     <string>input|output|internal</string>
-     *     <string>portName</string>
+     *     [<string>input|output</string>]
+     *     [<string>portName</string>]
+     *     [<double>delay</double>]
+     *     [<integer>priority</integer>]
      *    </set>
      *   </set>
      *  </port>
      *  <port name="arcs">
      *   <set>
      *    <set>
-     *     <string>placeName</string>
-     *     <string>transitionName</string>
-     *     <string>input|output</string>
-     *     <integer>tokenNumber</integer>
+     *     <string>placeName or transitionName</string>
+     *     <string>transitionName or placeName</string>
+     *     [<integer>tokenNumber</integer>]
      *    </set>
      *   <set>
      * </port>
@@ -81,9 +77,9 @@ namespace vle { namespace extension {
     class PetriNet : public devs::Dynamics
     {
     protected:
+        class Transition;
         class Input;
         class Output;
-        class Transition;
         class Marking;
         class Place;
         class Token;
@@ -95,33 +91,42 @@ namespace vle { namespace extension {
         typedef std::map < std::string, Marking* > MarkingList;
         typedef std::map < std::string, std::pair < std::string,
                 unsigned int > > devsPlaceMarkingList;	
-        typedef std::map < std::string, std::string > devsInTransitionMarkingList;	
+        typedef std::map < std::string,
+                std::string > devsInTransitionMarkingList;	
         typedef std::map < std::string,
                 std::pair < std::string,
                 bool > > devsOutTransitionMarkingList;	
-        typedef std::map < std::string, unsigned int > initialMarkingList;	
+        typedef std::map < std::string, unsigned int >
+            initialMarkingList;	
         typedef std::map < std::string, Place* > PlaceList;
         typedef std::vector < Token* > TokenList;
 
-        typedef enum { STEP_BY_STEP, PHASE_BY_PHASE, WHILE_ALIVE,
-            TRANSITION_TIMED } dynamicsType;
-
-        typedef enum { OUT, RUN } phase;
+        typedef enum { WAITING, OUT, RUN } phase;
 
         class Token
         {
         public:
-            Token()
+            Token(const devs::Time& time) : mTime(time)
             { }
 
             virtual ~Token()
             { }
+
+            const devs::Time& getTime() const
+            { return mTime; }
+
+        private:
+            devs::Time mTime;
         };
 
         class Transition
         {
         public:
-            Transition(const std::string& name) : mName(name)
+            Transition(const std::string& name,
+                       double delay = 0.0,
+                       unsigned int priority = 0) : mName(name),
+            mDelay(delay),
+            mPriority(priority)
             { }
 
             virtual ~Transition()
@@ -133,8 +138,14 @@ namespace vle { namespace extension {
             void addOutput(Output* output)
             { mOutputs.push_back(output); }
 
+            double getDelay() const
+            { return mDelay; }
+
             const std::string& getName() const
             { return mName; }
+
+            unsigned int getPriority() const
+            { return mPriority; }
 
             const InputList& inputs() const
             { return mInputs; }
@@ -146,6 +157,8 @@ namespace vle { namespace extension {
             std::string mName;
             InputList mInputs;
             OutputList mOutputs;
+            double mDelay;
+            unsigned int mPriority;
         };
 
         class Input
@@ -186,7 +199,6 @@ namespace vle { namespace extension {
                 mPlace(place),
                 mProducedTokenNumber(producedTokenNumber)
             { }
-
             virtual ~Output()
             { }
 
@@ -208,9 +220,9 @@ namespace vle { namespace extension {
         class Place
         {
         public:
-            Place(const std::string& name) : mName(name)
+            Place(const std::string& name,
+                  double delay) : mName(name), mDelay(delay)
             { }
-
             virtual ~Place()
             { }
 
@@ -220,11 +232,15 @@ namespace vle { namespace extension {
             void addOutput(Output* output)
             { mOutputs.push_back(output); }
 
+            double getDelay() const
+            { return mDelay; }
+
             const std::string& getName() const
             { return mName; }
 
         private:
             std::string mName;
+            double mDelay;
             InputList mInputs;
             OutputList mOutputs;
         };
@@ -250,18 +266,19 @@ namespace vle { namespace extension {
             TokenList& getTokens()
             { return mTokens; }
 
-            bool removeTokens(unsigned int number);
-
         private:
             Place* mPlace;
             TokenList mTokens;
         };
 
     public:
+        typedef std::pair < devs::Time, Transition* > pairTimeTransition;
+
         PetriNet(const graph::AtomicModel& model,
                  const devs::InitEventList& events);
-
         virtual ~PetriNet();
+
+        virtual void build();
 
         virtual void finish()
         { }
@@ -285,46 +302,48 @@ namespace vle { namespace extension {
         virtual value::Value observation(
             const devs::ObservationEvent& event) const;
 
-    protected:
-        virtual void initArcs(const value::VectorValue& arcs);
+        // petrinet construction methods
+        void addArc(const std::string first,
+                    const std::string second,
+                    unsigned int tokenNumber = 1);
+        void addInitialMarking(const std::string placeName,
+                               unsigned int tokenNumber);
+        void addInputTransition(const std::string transitionName,
+                                const std::string portName,
+                                double delay = 0.0);
+        void addOutputPlace(const std::string placeName,
+                            const std::string portName);
+        void addOutputTransition(const std::string transitionName,
+                                 const std::string portName,
+                                 unsigned int priority = 0);
+        void addPlace(const std::string placeName,
+                      double delay = 0.0);
+        void addTransition(const std::string transitionName,
+                           double delay = 0.0,
+                           unsigned int priority = 0);
 
-        virtual void initInitialMarking(
-            const value::VectorValue& initialMarkings,
-            const devs::Time& time);
-
-        virtual void initParameters();
-
-        virtual void initPlaces(const value::VectorValue& places);
-
-        virtual void initTransitions(const value::VectorValue& transitions);
-
-        virtual devs::Time start(const devs::Time& time);
-
-        virtual void run(const devs::Time& time);
+    private:
+        // parsing methods
+        void initArcs(const value::VectorValue& arcs);
+        void initInitialMarking(
+            const value::VectorValue& initialMarkings);
+        void initPlaces(const value::VectorValue& places);
+        void initTransitions(const value::VectorValue& transitions);
 
         void addEnabledTransition(Transition* transition);
-
-        virtual void computeEnabledTransition(const devs::Time& time);
-
+        void buildInitialMarking(const devs::Time& time);
+        void computeEnabledTransition(const devs::Time& time);
         void fire(const devs::Time& time);
-
         bool goInTransition(Transition* transition);
-
         void goOutTransition(Transition* transition, const devs::Time& time);
-
-        bool isEnabled(Transition* transition);
-
-        bool isAlive() const;
-
+        devs::Time getNextValid(Marking* marking,
+                                unsigned int tokenNumber);
+        devs::Time getValidTime(Transition* transition);
         void putTokens(Transition* transition, const devs::Time& time);
-
-        virtual void putToken(Marking* marking, const devs::Time& /* time */)
-        { marking->addToken(new Token()); }	
-
-        virtual bool removeTokens(Marking* marking, unsigned int tokenNumber);
-
-        virtual void updateSigma(const devs::Time& time);
-
+        void putToken(Marking* marking, const devs::Time& time);
+        bool removeTokens(Marking* marking, unsigned int tokenNumber);
+        void run(const devs::Time& time);
+        Transition* selectTransition();
 
         inline bool existPlace(const std::string& name) const
         { return mPlaces.find(name) != mPlaces.end(); }
@@ -350,13 +369,20 @@ namespace vle { namespace extension {
         MarkingList mMarkings;
         enabledTransitionList mEnabledTransitions;
 
+        // transition
+        std::list < pairTimeTransition > mWaitingTransitions;
+
         int mTokenNumber;
-        dynamicsType mDynamics;
 
         phase mPhase;
-        devs::Time mLastTime;
         devs::Time mSigma;
+
+        friend bool operator<(const pairTimeTransition& x,
+                              const pairTimeTransition& y);
     };
+
+    bool operator<(const PetriNet::pairTimeTransition& x,
+                   const PetriNet::pairTimeTransition& y);
 
 }} // namespace vle extension
 

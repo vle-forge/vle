@@ -45,14 +45,15 @@ using namespace vle;
 BOOST_AUTO_TEST_CASE(test_petrinet_and)
 {
     vpz::Vpz file(utils::Path::buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(), "examples", "petrinet-and.vpz"));
-    
+            utils::Path::path().getPrefixDir(), "examples",
+            "petrinet-and.vpz"));
+
     vpz::Output& o(file.project().experiment().views().outputs().get("out"));
     o.setLocalStream("", "storage");
 
     manager::RunQuiet r;
     r.start(file);
-    
+
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
     oov::OutputMatrixViewList out(r.outputs());
     BOOST_REQUIRE_EQUAL(out.size(), 1);
@@ -71,13 +72,13 @@ BOOST_AUTO_TEST_CASE(test_petrinet_or)
 {
     vpz::Vpz file(utils::Path::buildPrefixSharePath(
             utils::Path::path().getPrefixDir(), "examples", "petrinet-or.vpz"));
-    
+
     vpz::Output& o(file.project().experiment().views().outputs().get("out"));
     o.setLocalStream("", "storage");
 
     manager::RunQuiet r;
     r.start(file);
-    
+
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
     oov::OutputMatrixViewList out(r.outputs());
     BOOST_REQUIRE_EQUAL(out.size(), 1);
@@ -92,4 +93,132 @@ BOOST_AUTO_TEST_CASE(test_petrinet_or)
     BOOST_REQUIRE_CLOSE(value::toDouble(result[4][10]), 2.0, 10e-5);
 }
 
+BOOST_AUTO_TEST_CASE(test_petrinet_nand1)
+{
+    vpz::Vpz file(utils::Path::buildPrefixSharePath(
+            utils::Path::path().getPrefixDir(), "examples",
+	    "petrinet-nand1.vpz"));
 
+    vpz::Output& o(file.project().experiment().views().outputs().get("out"));
+    o.setLocalStream("", "storage");
+
+    manager::RunQuiet r;
+    r.start(file);
+
+    BOOST_REQUIRE_EQUAL(r.haveError(), false);
+    oov::OutputMatrixViewList out(r.outputs());
+    BOOST_REQUIRE_EQUAL(out.size(), 1);
+
+    oov::OutputMatrix& view(out["view"]);
+    value::MatrixFactory::MatrixView result(view.values());
+
+    BOOST_REQUIRE_EQUAL(result.shape()[0], 5);
+    BOOST_REQUIRE_EQUAL(result.shape()[1], 11);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][10]), 0., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][10]), 0., 10e-5);
+}
+
+BOOST_AUTO_TEST_CASE(test_petrinet_nand2)
+{
+    vpz::Vpz file(utils::Path::buildPrefixSharePath(
+            utils::Path::path().getPrefixDir(), "examples",
+	    "petrinet-nand2.vpz"));
+
+    vpz::Output& o(file.project().experiment().views().outputs().get("out"));
+    o.setLocalStream("", "storage");
+
+    manager::RunQuiet r;
+    r.start(file);
+
+    BOOST_REQUIRE_EQUAL(r.haveError(), false);
+    oov::OutputMatrixViewList out(r.outputs());
+    BOOST_REQUIRE_EQUAL(out.size(), 1);
+
+    oov::OutputMatrix& view(out["view"]);
+    value::MatrixFactory::MatrixView result(view.values());
+
+    BOOST_REQUIRE_EQUAL(result.shape()[0], 5);
+    BOOST_REQUIRE_EQUAL(result.shape()[1], 11);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][10]), 0.5, 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][10]), 1., 10e-5);
+}
+
+BOOST_AUTO_TEST_CASE(test_petrinet_and_timed)
+{
+    vpz::Vpz file(utils::Path::buildPrefixSharePath(
+            utils::Path::path().getPrefixDir(), "examples",
+	    "petrinet-and-timed.vpz"));
+
+    vpz::Output& o(file.project().experiment().views().outputs().get("out"));
+    o.setLocalStream("", "storage");
+
+    manager::RunQuiet r;
+    r.start(file);
+
+    BOOST_REQUIRE_EQUAL(r.haveError(), false);
+    oov::OutputMatrixViewList out(r.outputs());
+    BOOST_REQUIRE_EQUAL(out.size(), 1);
+
+    oov::OutputMatrix& view(out["view"]);
+    value::MatrixFactory::MatrixView result(view.values());
+
+    BOOST_REQUIRE_EQUAL(result.shape()[0], 5);
+    BOOST_REQUIRE_EQUAL(result.shape()[1], 20);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][19]), 1.7, 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][19]), 3., 10e-5);
+}
+
+BOOST_AUTO_TEST_CASE(test_petrinet_or_priority)
+{
+    vpz::Vpz file(utils::Path::buildPrefixSharePath(
+            utils::Path::path().getPrefixDir(), "examples",
+	    "petrinet-or-priority.vpz"));
+
+    vpz::Output& o(file.project().experiment().views().outputs().get("out"));
+    o.setLocalStream("", "storage");
+
+    manager::RunQuiet r;
+    r.start(file);
+
+    BOOST_REQUIRE_EQUAL(r.haveError(), false);
+    oov::OutputMatrixViewList out(r.outputs());
+    BOOST_REQUIRE_EQUAL(out.size(), 1);
+
+    oov::OutputMatrix& view(out["view"]);
+    value::MatrixFactory::MatrixView result(view.values());
+
+    BOOST_REQUIRE_EQUAL(result.shape()[0], 5);
+    BOOST_REQUIRE_EQUAL(result.shape()[1], 11);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][10]), 1., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][10]), 6., 10e-5);
+}
+
+BOOST_AUTO_TEST_CASE(test_petrinet_meteo)
+{
+    vpz::Vpz file(utils::Path::buildPrefixSharePath(
+            utils::Path::path().getPrefixDir(), "examples",
+	    "petrinet-meteo.vpz"));
+
+    vpz::Output& o(file.project().experiment().views().outputs().get("out"));
+    o.setLocalStream("", "storage");
+
+    manager::RunQuiet r;
+    r.start(file);
+
+    BOOST_REQUIRE_EQUAL(r.haveError(), false);
+    oov::OutputMatrixViewList out(r.outputs());
+    BOOST_REQUIRE_EQUAL(out.size(), 1);
+
+    oov::OutputMatrix& view(out["view"]);
+    value::MatrixFactory::MatrixView result(view.values());
+
+    BOOST_REQUIRE_EQUAL(result.shape()[0], 6);
+    BOOST_REQUIRE_EQUAL(result.shape()[1], 31);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][30]), 25., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[5][30]), 4., 10e-5);
+}

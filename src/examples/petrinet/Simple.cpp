@@ -47,7 +47,7 @@ namespace vle { namespace examples { namespace petrinet {
         virtual ~PetrinetBeep()
         { }
 
-        virtual devs::Time init(const vle::devs::Time& /* time */)
+        virtual devs::Time init(const devs::Time& /* time */)
         { return mStartTime; }
 
         virtual void output(const devs::Time& /* time */,
@@ -62,7 +62,7 @@ namespace vle { namespace examples { namespace petrinet {
         devs::Time mTimeStep;
     };
 
-    /** 
+    /**
      * @brief A DEVS counter which store the date of the latest event.
      */
     class PetrinetCounter : public devs::Dynamics
@@ -108,8 +108,144 @@ namespace vle { namespace examples { namespace petrinet {
 
     };
 
+    /**
+     * @brief A DEVS model which simulate a Meteo. Each time step, it build an
+     * event with true or false.
+     */
+    class Meteo : public devs::Dynamics
+    {
+    public:
+        Meteo(const graph::AtomicModel& model,
+              const devs::InitEventList& events) :
+            devs::Dynamics(model, events)
+        {
+            mInit = value::toBoolean(events.get("init"));
+            mMin = value::toInteger(events.get("min"));
+            mMax = value::toInteger(events.get("max"));
+        }
+
+        virtual ~Meteo()
+        { }
+
+        virtual void output(const devs::Time& /* time */,
+                            devs::ExternalEventList& output) const
+        {
+            if (mActive) {
+                output.addEvent(buildEvent("yes"));
+            } else {
+                output.addEvent(buildEvent("no"));
+            }
+        }
+
+        virtual devs::Time timeAdvance() const
+        {
+            return devs::Time(1);
+        }
+
+        virtual devs::Time init(const devs::Time& /* time */)
+        {
+            mActive = mInit;
+            mNextTime = rand().get_int_range(mMin, mMax);
+            return devs::Time(0);
+        }
+
+        virtual void internalTransition(const devs::Time& /* event */)
+        {
+            if (mNextTime == 0) {
+                mActive = not mActive;
+                mNextTime = rand().get_int_range(mMin, mMax);
+            } else {
+                --mNextTime;
+            }
+        }
+
+        virtual value::Value observation(
+            const devs::ObservationEvent& event) const
+        {
+            if (event.onPort("state")) {
+                return buildBoolean(mActive);
+            }
+            return value::Value();
+        }
+
+    private:
+	bool mInit;
+        unsigned int mMin;
+        unsigned int mMax;
+	unsigned int mNextTime;
+        bool mActive;
+    };
+
+    /**
+     * @brief Build an Petri Net model which build an output when it receives
+     * mDayNumber of event.
+     */
+    class Trigger : public extension::PetriNet
+    {
+    public:
+        Trigger(const graph::AtomicModel& model,
+                const devs::InitEventList& events) :
+            extension::PetriNet(model, events)
+        {
+            mDayNumber = value::toInteger(events.get("day"));
+        }
+
+        virtual ~Trigger()
+        { }
+
+        virtual void build()
+        {
+            addPlace("P1");
+            addPlace("P2");
+            addPlace("P3");
+            addPlace("P4");
+            addPlace("P5");
+            addOutputPlace("P6", "out");
+
+            addInputTransition("T1", "yes");
+            addInputTransition("T2", "no");
+            addTransition("T3");
+            addTransition("T4");
+            addTransition("T5");
+            addTransition("T6");
+            addTransition("T7");
+            addTransition("T8");
+
+            addArc("T1", "P1");
+            addArc("P1", "T3");
+            addArc("P1", "T4");
+            addArc("T3", "P3");
+            addArc("P3", "T3");
+            addArc("T4", "P3");
+            addArc("P3", "T7");
+            addArc("T7", "P3");
+            addArc("P3", "T5");
+
+            addArc("T2", "P2");
+            addArc("P2", "T5");
+            addArc("P2", "T6");
+            addArc("T6", "P4");
+            addArc("P4", "T6");
+            addArc("P4", "T4");
+            addArc("T5", "P4");
+
+            addArc("T5", "P5");
+            addArc("T6", "P5");
+            addArc("P5", "T7");
+            addArc("P5", "T8", mDayNumber);
+            addArc("T8", "P6");
+
+            addInitialMarking("P4", 1);
+        }
+
+    private:
+        unsigned int mDayNumber;
+    };
+
 }}} // namespace vle examples petrinet
 
 DECLARE_NAMED_DYNAMICS(Beep, vle::examples::petrinet::PetrinetBeep)
 DECLARE_NAMED_DYNAMICS(Ordinary, vle::examples::petrinet::PetrinetOrdinary)
 DECLARE_NAMED_DYNAMICS(Counter, vle::examples::petrinet::PetrinetCounter)
+DECLARE_NAMED_DYNAMICS(Meteo, vle::examples::petrinet::Meteo)
+DECLARE_NAMED_DYNAMICS(Trigger, vle::examples::petrinet::Trigger)
