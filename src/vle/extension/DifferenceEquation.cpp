@@ -356,7 +356,7 @@ void DifferenceEquation::internalTransition(const Time& time)
         break;
     case PRE_INIT2:
         //        if (mDependance) mState = PRE;
-        if (mSynchro) mState = PRE;
+        if (mSynchro or mAllSynchro) mState = PRE;
         else mState = RUN;
         mSigma = mTimeStep;
         break;
@@ -364,7 +364,7 @@ void DifferenceEquation::internalTransition(const Time& time)
         break;
     case PRE:
         // si pas de cycle alors
-        if (mSyncs != 0 and mSynchro) break;
+        if (mSyncs != 0 and (mSynchro or mAllSynchro)) break;
     case RUN:
         // je calcule ma nouvelle valeur
         mLastTime = time;
@@ -392,7 +392,7 @@ void DifferenceEquation::internalTransition(const Time& time)
         // ma nouvelle valeur est propagée
 
         // est-ce que je suis synchronisé ?
-        if (mSynchro) mState = PRE;
+        if (mSynchro or mAllSynchro) mState = PRE;
         else {
             TraceDebug(boost::format("%1% %2%: fin") % time % getModelName());
             mState = RUN;
