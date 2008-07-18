@@ -69,7 +69,7 @@ namespace vle { namespace graph {
          * @brief Remove all graph::ModelPort from the vector. Linear
          * complexity.
          */
-        void remove_all();
+        void removeAll();
 
         /**
          * @brief Merge the vector from graph::ModelPort vector. Linera
@@ -102,6 +102,14 @@ namespace vle { namespace graph {
          * otherwise.
          */
         bool exist(const Model* model, const std::string& portname) const;
+
+        /**
+         * @brief Remove the specified model.
+         *
+         * @param model Model to be removed.
+         */
+        void erase(Model* model)
+        { m_lst.erase(model); }
 
         inline iterator begin()
         { return m_lst.begin(); }

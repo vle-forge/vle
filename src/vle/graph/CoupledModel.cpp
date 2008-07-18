@@ -332,7 +332,7 @@ void CoupledModel::delAllConnection(Model* m)
                 jt->first->getOutPort(jt->second).remove(m, it->first);
             }
         }
-        ins.remove_all();
+        ins.removeAll();
     }
 
     for (ConnectionList::iterator it = m->getOutputPortList().begin(); it !=
@@ -345,7 +345,7 @@ void CoupledModel::delAllConnection(Model* m)
                 jt->first->getInPort(jt->second).remove(m, it->first);
             }
         }
-        ins.remove_all();
+        ins.removeAll();
     }
 }
 

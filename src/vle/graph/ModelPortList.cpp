@@ -68,7 +68,7 @@ void ModelPortList::remove(Model* model, const std::string& portname)
     }
 }
 
-void ModelPortList::remove_all()
+void ModelPortList::removeAll()
 {
     m_lst.clear();
 }

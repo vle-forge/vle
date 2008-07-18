@@ -49,7 +49,7 @@ namespace vle { namespace graph {
     typedef std::vector < CoupledModel* > CoupledModelVector;
     typedef std::map < std::string, Model* > ModelList;
     typedef std::list < ModelPort > TargetModelList;
- 
+
     /**
      * @brief The DEVS model base class.
      *
@@ -57,7 +57,7 @@ namespace vle { namespace graph {
     class Model
     {
     public:
-        /** 
+        /**
          * @brief Constructor to intialize parent, position (0,0), size (0,0)
          * and name.
          * @param name the new name of this model.
@@ -72,7 +72,7 @@ namespace vle { namespace graph {
 
         virtual Model* clone() const = 0;
 
-	virtual ~Model() { }
+        virtual ~Model() { }
 
         ////
         //// Base class.
@@ -93,13 +93,13 @@ namespace vle { namespace graph {
         { return false; }
 
         /**
-	 * Find recursively a model, atomic or coupled, with a specified name.
-	 * @param name model name to search.
-	 * @return model founded, otherwise 0.
+         * Find recursively a model, atomic or coupled, with a specified name.
+         * @param name model name to search.
+         * @return model founded, otherwise 0.
          */
-	virtual Model* findModel(const std::string& name) const = 0;
+        virtual Model* findModel(const std::string& name) const = 0;
 
-        /** 
+        /**
          * @brief A output stream operator for graph::Model hierarchy
          * (AtomicModel or CoupledModel).
          * @param out Output stream.
@@ -116,10 +116,10 @@ namespace vle { namespace graph {
          * @brief Write the model in the output stream.
          * @param out output stream.
          */
-	virtual void writeXML(std::ostream& out) const = 0;
+        virtual void writeXML(std::ostream& out) const = 0;
 
 
-        /** 
+        /**
          * @brief Return a list of couple (graph::AtomicModel, portname) where
          * the current model is connected with his specified output port.
          * @param portname The portname of the model.
@@ -127,7 +127,7 @@ namespace vle { namespace graph {
          */
         void getTargetPortList(const std::string& portname,
                                TargetModelList& out);
-        
+
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
          * Model base
@@ -137,7 +137,7 @@ namespace vle { namespace graph {
         inline const std::string& getName() const
         { return m_name; }
 
-        /** 
+        /**
          * @brief Change the name of the specified model to the new name. If mdl
          * have a parent, the this coupled model change is model list.
          * @param mdl graph::Model to change.
@@ -145,26 +145,26 @@ namespace vle { namespace graph {
          */
         static void rename(Model* mdl, const std::string& newmane);
 
-        /** 
+        /**
          * @brief Build a std::string based on the construction of the
          * concatenation of all coupled model parent. Each parent name are
          * separated by a comma.
          * @code
          * top model,coupled modela
          * @endcode
-         * 
-         * @return 
+         *
+         * @return
          */
         std::string getParentName() const;
 
-        /** 
+        /**
          * @brief Build a list of coupled model parents. The first model in the
          * vector is the direct parent of model.
          * @param parents A output vector.
          */
         void getParents(CoupledModelVector& parents) const;
 
-        /** 
+        /**
          * @brief Get the atomic models from a CoupledModelVector of an another
          * devs graph hierarchy.
          * @param lst the list of coupled model from the another devs graph.
@@ -174,7 +174,7 @@ namespace vle { namespace graph {
         Model* getModel(const CoupledModelVector& lst,
                         const std::string& name);
 
-        /** 
+        /**
          * @brief Get the parent node of this model. Can be null if parent does
          * not exist.
          * @return A reference to the parent node or null.
@@ -182,7 +182,7 @@ namespace vle { namespace graph {
         inline CoupledModel* getParent() const
         { return m_parent; }
 
-        /** 
+        /**
          * @brief Set the parent node of this model. Can be null.
          * @param cp The reference to the parent node or null.
          */
@@ -208,33 +208,33 @@ namespace vle { namespace graph {
 
         int getInputPortNumber() const
         { return m_inPortList.size(); }
-        
+
         int getOutputPortNumber() const
         { return m_outPortList.size(); }
-        
+
         ModelPortList& addInputPort(const std::string& name);
         ModelPortList& addOutputPort(const std::string& name);
 
         /**
          * @brief Delete an input port with specified name and destroy input or
          * internal connections if exist.
-	 * @param name port name to delete.
+         * @param name port name to delete.
          */
         void delInputPort(const std::string & name);
 
         /**
          * @brief Delete an output port with specified name and destroy output
          * or internal connections if exist.
-	 * @param name port name to delete.
+         * @param name port name to delete.
          */
         void delOutputPort(const std::string & name);
 
-	void addInputPort(const std::list < std::string > & lst);
-	void addOutputPort(const std::list < std::string > & lst);
-	bool existInputPort(const std::string & name);
-	bool existOutputPort(const std::string & name);
+        void addInputPort(const std::list < std::string > & lst);
+        void addOutputPort(const std::list < std::string > & lst);
+        bool existInputPort(const std::string & name);
+        bool existOutputPort(const std::string & name);
 
-        /** 
+        /**
          * @brief Get the index position of the input port into the input port
          * list.
          * @param name The name of the input port to find.
@@ -243,7 +243,7 @@ namespace vle { namespace graph {
          */
         int getInputPortIndex(const std::string& name) const;
 
-        /** 
+        /**
          * @brief Get the index position of the output port into the output port
          * list.
          * @param name The name of the output port to find.
@@ -265,11 +265,11 @@ namespace vle { namespace graph {
         { return m_outPortList; }
 
         /**
-	 * Merge define port of this model with input, output, state and init
+         * Merge define port of this model with input, output, state and init
          * lists. If two port have same name be nothing, if port not in
          * parameter list port delete, if port not in this model add this port.
          * If connection exist with a deleted port, connection is delete.
-	 *
+         *
          * @param inlist input list port name.
          * @param outlist ouput list port name.
          * @param statelist state list port name.
@@ -286,35 +286,35 @@ namespace vle { namespace graph {
          *
          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-        /** 
+        /**
          * @brief Write the port list in the output stream.
          * @param out output stream.
          */
         void writePortListXML(std::ostream& out) const;
 
         /**
-	 * return cast of a Model to an AtomicModel. If Model is not an
+         * return cast of a Model to an AtomicModel. If Model is not an
          * AtomicModel, return NULL
          *
          * @param m Model to cast to AtomicModel
-	 *
+         *
          * @return a cast AtomicModel or NULL if error
          */
         static AtomicModel* toAtomic(Model* m);
 
         /**
-	 * return cast of a Model to a CoupledModel. If Model is not a
+         * return cast of a Model to a CoupledModel. If Model is not a
          * CoupledModel, return NULL
          *
          * @param m Model to cast to CoupledModel
-	 *
+         *
          * @return a cast CoupledModel or NULL if error
          */
         static CoupledModel* toCoupled(Model* m);
 
 
-	static void getAtomicModelList(Model* model,
-				       std::vector < AtomicModel* >& list);
+        static void getAtomicModelList(Model* model,
+                                       std::vector < AtomicModel* >& list);
 
         /**
          * return true if model m is present in Model List
@@ -330,62 +330,62 @@ namespace vle { namespace graph {
         //// Graphics position to replace GModel declaration.
         ////
 
-        /** 
+        /**
          * @brief Get X position of model.
          * @return a X position.
          */
         inline int x() const { return m_x; }
 
-        /** 
+        /**
          * @brief Get Y position of model.
          * @return a Y position.
          */
         inline int y() const { return m_y; }
 
-        /** 
+        /**
          * @brief Get the width of model.
          * @return a width.
          */
         inline int width() const { return m_width; }
 
-        /** 
+        /**
          * @brief Get the height of model.
          * @return a height.
          */
         inline int height() const { return m_height; }
 
-        /** 
+        /**
          * @brief Set a new X position to model.
          * @param x new X position.
          */
         inline void setX(int x) { m_x = x; }
 
-        /** 
+        /**
          * @brief Set a new Y position to model.
          * @param y new Y position.
          */
         inline void setY(int y) { m_y = y; }
 
-        /** 
+        /**
          * @brief Set a new width to model.
          * @param width new width.
          */
         inline void setWidth(int width) { m_width = width; }
 
-        /** 
+        /**
          * @brief Set a new height to model.
          * @param height new height.
          */
         inline void setHeight(int height) { m_height = height; }
 
-        /** 
+        /**
          * @brief Set a new position to model.
          * @param x new X position.
          * @param y new Y position.
          */
         inline void setPosition(int x, int y) { setX(x); setY(y); }
 
-        /** 
+        /**
          * @brief Set a new site to model.
          * @param width a new width.
          * @param height a new height.
@@ -423,42 +423,30 @@ namespace vle { namespace graph {
 
             inline void operator()(const ConnectionList::value_type& x) const
             { cnt[x.first] = ModelPortList(); }
-            
+
             ConnectionList& cnt;
         };
 
     protected:
-	CoupledModel*   m_parent;
-	ConnectionList  m_inPortList;
-	ConnectionList  m_outPortList;
-        
+        CoupledModel*   m_parent;
+        ConnectionList  m_inPortList;
+        ConnectionList  m_outPortList;
+
         int             m_x;
         int             m_y;
         int             m_width;
         int             m_height;
 
     private:
-        /** 
+        /**
          * @brief Default constructor, position (0,0) size (0,0) and parent to
          * null.
          */
         Model();
-        
+
         Model& operator=(const Model& mdl);
 
-        /**
-         * @brief Delete an input port.
-	 * @param name port name to delete.
-         */
-        void delInputPort(ModelPortList& ins);
-        
-        /**
-         * @brief Delete an output port.
-	 * @param name port name to delete.
-         */
-        void delOutputPort(ModelPortList& ins);
-
-	std::string     m_name;
+        std::string     m_name;
     };
 
 }} // namespace vle graph
