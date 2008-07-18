@@ -59,7 +59,7 @@ Model::Model(const Model& mdl) :
 {
     std::for_each(mdl.m_inPortList.begin(), mdl.m_inPortList.end(),
                   CopyWithoutConnection(m_inPortList));
-    
+
     std::for_each(mdl.m_outPortList.begin(), mdl.m_outPortList.end(),
                   CopyWithoutConnection(m_outPortList));
 }
@@ -101,7 +101,7 @@ void Model::getTargetPortList(const std::string& portname,
         stk.pop();
 
         ModelPortList* outs = 0;
-        if (tmp.get<2>()) 
+        if (tmp.get<2>())
             outs = &(tmp.get<0>()->getInternalInPort(tmp.get<1>()));
         else
             outs = &(tmp.get<0>()->getOutPort(tmp.get<1>()));
@@ -246,44 +246,58 @@ ModelPortList& Model::addOutputPort(const std::string& name)
     }
 }
 
-void Model::delInputPort(ModelPortList& ins)
+void Model::delInputPort(const std::string& name)
 {
-    for (ModelPortList::iterator jt = ins.begin(); jt != ins.end(); ++jt) {
-        if (jt->first == this) {
-            if (isCoupled()) {
-                CoupledModel* tmp = toCoupled(this);
-                tmp->getInternalInPort(jt->second).remove(this, getName());
-            }
+    ModelPortList& lst(getInPort(name));
+    for (ModelPortList::iterator it = lst.begin(); it != lst.end(); ++it) {
+        if (it->first != m_parent) {
+            ModelPortList& toclean(it->first->getOutPort(it->second));
+            toclean.erase(this);
         } else {
-            jt->first->getOutPort(jt->second).remove(this, getName());
+            ModelPortList& toclean(m_parent->getInternalInPort(it->second));
+            toclean.erase(this);
+        }
+
+        if (isCoupled()) {
+            CoupledModel* tmp(toCoupled(this));
+            ModelPortList& intern(tmp->getInternalInPort(name));
+            ModelPortList::iterator jt = intern.begin();
+            while(jt != intern.end()) {
+                jt->first->getInPort(jt->second).erase(this);
+                ++jt;
+            }
+            intern.clear();
         }
     }
-    ins.remove_all();
-}
-
-void Model::delInputPort(const std::string & name)
-{
-    delInputPort(getInPort(name));
-}
-
-void Model::delOutputPort(ModelPortList& ins)
-{
-    for (ModelPortList::iterator jt = ins.begin(); jt != ins.end(); ++jt) {
-        if (jt->first == this) {
-            if (isCoupled()) {
-                CoupledModel* tmp = toCoupled(this);
-                tmp->getInternalOutPort(jt->second).remove(this, getName());
-            }
-        } else {
-            jt->first->getInPort(jt->second).remove(this, getName());
-        }
-    }
-    ins.remove_all();
+    lst.remove_all();
+    m_inPortList.erase(name);
 }
 
 void Model::delOutputPort(const std::string & name)
 {
-    delOutputPort(getOutPort(name));
+    ModelPortList& lst(getOutPort(name));
+    for(ModelPortList::iterator it = lst.begin(); it != lst.end(); ++it) {
+        if (it->first != m_parent) {
+            ModelPortList& toclean(it->first->getInPort(it->second));
+            toclean.erase(this);
+        } else {
+            ModelPortList& toclean(m_parent->getInternalOutPort(it->second));
+            toclean.erase(this);
+        }
+
+        if (isCoupled()) {
+            CoupledModel* tmp(toCoupled(this));
+            ModelPortList& intern(tmp->getInternalOutPort(name));
+            ModelPortList::iterator jt = intern.begin();
+            while(jt != intern.end()) {
+                jt->first->getOutPort(jt->second).erase(this);
+                ++jt;
+            }
+            intern.clear();
+        }
+    }
+    lst.remove_all();
+    m_outPortList.erase(name);
 }
 
 void Model::addInputPort(const std::list < std::string > & lst)
