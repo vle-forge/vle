@@ -9,11 +9,12 @@ LINK_DIRECTORIES(
   ${GLIBMM_LIBRARY_DIRS}
   ${LIBXMLPP_LIBRARY_DIR})
 
-SET(UTILS_CPP Host.cpp  Path.cpp PathOptionGroup.cpp Rand.cpp Simpson.cpp
+SET(UTILS_CPP Host.cpp Path.cpp PathOptionGroup.cpp Rand.cpp Simpson.cpp
   Socket.cpp SocketImpl.c Tools.cpp Trace.cpp XML.cpp)
 
-SET(UTILS_HPP Debug.hpp Exception.hpp Host.hpp Path.hpp PathOptionGroup.hpp
-  Rand.hpp Simpson.hpp SocketImpl.h Socket.hpp Tools.hpp Trace.hpp XML.hpp)
+SET(UTILS_HPP Algo.hpp Debug.hpp Exception.hpp Host.hpp Path.hpp
+  PathOptionGroup.hpp Rand.hpp Simpson.hpp SocketImpl.h Socket.hpp Tools.hpp
+  Trace.hpp XML.hpp)
 
 ADD_LIBRARY(vleutils SHARED ${UTILS_CPP};${UTILS_HPP})
 
@@ -32,3 +33,7 @@ INSTALL(TARGETS vleutils
   ARCHIVE DESTINATION lib)
 
 INSTALL(FILES ${UTILS_HPP} DESTINATION ${VLE_INCLUDE_DIRS}/utils)
+
+IF (HAVE_UNITTESTFRAMEWORK)
+  ADD_SUBDIRECTORY(test)
+ENDIF (HAVE_UNITTESTFRAMEWORK)

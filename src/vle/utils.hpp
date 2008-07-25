@@ -28,6 +28,7 @@
 #ifndef UTILS_UTILS_HPP
 #define UTILS_UTILS_HPP
 
+#include <vle/utils/Algo.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Host.hpp>
