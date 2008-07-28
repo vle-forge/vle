@@ -22,12 +22,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #include <vle/vpz/Views.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Trace.hpp>
+#include <vle/utils/Algo.hpp>
 
 namespace vle { namespace vpz {
 
@@ -44,10 +42,9 @@ void Views::write(std::ostream& out) const
     }
 
     if (not m_list.empty()) {
-        for (ViewList::const_iterator it = m_list.begin(); it !=
-             m_list.end(); ++it) {
-            it->second.write(out);
-        }
+        std::transform(begin(), end(),
+                       std::ostream_iterator < View >(out, "\n"),
+                       utils::select2nd < ViewList::value_type >());
     }
 
     out << "</views>\n";
@@ -97,8 +94,7 @@ void Views::clear()
 
 void Views::add(const Views& views)
 {
-    std::for_each(views.viewlist().begin(),
-                  views.viewlist().end(),
+    std::for_each(views.viewlist().begin(), views.viewlist().end(),
                   Views::AddViews(*this));
 
     m_outputs.add(views.outputs());
@@ -107,20 +103,19 @@ void Views::add(const Views& views)
 
 View& Views::add(const View& view)
 {
-    Assert(utils::SaxParserError, not exist(view.name()),
-           (boost::format("View %1% already exist") % view.name()));
+    std::pair < iterator, bool > x;
+    x = m_list.insert(std::make_pair < std::string, View >(view.name(), view));
 
-    return (*m_list.insert(std::make_pair < std::string, View >(
-                view.name(), view)).first).second;
+    Assert(utils::ArgError, x.second, boost::format(
+            "View '%1%' already exist") % view.name());
+
+    return x.first->second;
 }
 
 View& Views::addEventView(const std::string& name,
                           const std::string& output)
 {
-    Assert(utils::SaxParserError, not exist(name),
-           (boost::format("View %1% already exist") % name));
-
-    Assert(utils::SaxParserError, not isUsedOutput(output),
+    Assert(utils::ArgError, not isUsedOutput(output),
            boost::format("Output '%1%' of view '%2%' is already used") %
            output % name);
 
@@ -131,10 +126,7 @@ View& Views::addTimedView(const std::string& name,
                           double timestep,
                           const std::string& output)
 {
-    Assert(utils::SaxParserError, not exist(name),
-           (boost::format("View %1% already exist") % name));
-
-    Assert(utils::SaxParserError, not isUsedOutput(output),
+    Assert(utils::ArgError, not isUsedOutput(output),
            boost::format("Output '%1%' of view '%2%' is already used") %
            output % name);
 
@@ -144,10 +136,7 @@ View& Views::addTimedView(const std::string& name,
 View& Views::addFinishView(const std::string& name,
                            const std::string& output)
 {
-    Assert(utils::SaxParserError, not exist(name),
-           (boost::format("View %1% already exist") % name));
-
-    Assert(utils::SaxParserError, not isUsedOutput(output),
+    Assert(utils::ArgError, not isUsedOutput(output),
            boost::format("Output '%1%' of view '%2%' is already used") %
            output % name);
 
@@ -162,7 +151,7 @@ void Views::del(const std::string& name)
 const View& Views::get(const std::string& name) const
 {
     ViewList::const_iterator it = m_list.find(name);
-    Assert(utils::SaxParserError, it != m_list.end(),
+    Assert(utils::ArgError, it != end(),
            boost::format("Unknow view '%1%'\n") % name);
 
     return it->second;
@@ -171,7 +160,7 @@ const View& Views::get(const std::string& name) const
 View& Views::get(const std::string& name)
 {
     ViewList::iterator it = m_list.find(name);
-    Assert(utils::SaxParserError, it != m_list.end(),
+    Assert(utils::ArgError, it != end(),
            boost::format("Unknow view '%1%'\n") % name);
 
     return it->second;
@@ -179,11 +168,8 @@ View& Views::get(const std::string& name)
 
 bool Views::isUsedOutput(const std::string& name) const
 {
-    ViewList::const_iterator it(
-        std::find_if(m_list.begin(), m_list.end(),
-                     UseOutput(name)));
-
-    return it != m_list.end();
+    ViewList::const_iterator it(std::find_if(begin(), end(), UseOutput(name)));
+    return it != end();
 }
 
 }} // namespace vle vpz

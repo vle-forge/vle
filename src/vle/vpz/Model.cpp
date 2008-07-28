@@ -22,9 +22,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #include <vle/vpz/Model.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/graph/CoupledModel.hpp>
@@ -116,7 +113,7 @@ void Model::writeCoupled(std::ostream& out, const graph::CoupledModel* mdl) cons
             out << "<submodels>\n";
 
             const graph::ModelList& childs(top->getModelList());
-            for (graph::ModelList::const_iterator it = childs.begin(); 
+            for (graph::ModelList::const_iterator it = childs.begin();
                  it != childs.end(); ++it) {
                 if (it->second->isCoupled()) {
                     cms.push(static_cast < graph::CoupledModel* >(it->second));
@@ -146,10 +143,11 @@ void Model::writeAtomic(std::ostream& out, const graph::AtomicModel* mdl) const
     if (not vpzatom.conditions().empty()) {
 	out << "conditions=\"";
 
-        for (StringVector::const_iterator it = vpzatom.conditions().begin();
-             it != vpzatom.conditions().end(); ++it) {
+        Strings::const_iterator it = vpzatom.conditions().begin();
+        while (it != vpzatom.conditions().end()) {
             out << *it;
-            if (it + 1 != vpzatom.conditions().end()) {
+            ++it;
+            if (it != vpzatom.conditions().end()) {
                 out << ",";
             }
         }
@@ -192,17 +190,17 @@ void Model::writePort(std::ostream& out, const graph::Model* mdl) const
     const graph::ConnectionList& ins(mdl->getInputPortList());
     if (not ins.empty()) {
         out << "<in>\n";
-        for (graph::ConnectionList::const_iterator it = ins.begin(); 
+        for (graph::ConnectionList::const_iterator it = ins.begin();
              it != ins.end(); ++it) {
             out << " <port name=\"" << it->first << "\" />\n";
         }
         out << "</in>\n";
     }
-    
+ 
     const graph::ConnectionList& outs(mdl->getOutputPortList());
     if (not outs.empty()) {
         out << "<out>\n";
-        for (graph::ConnectionList::const_iterator it = outs.begin(); 
+        for (graph::ConnectionList::const_iterator it = outs.begin();
              it != outs.end(); ++it) {
             out << " <port name=\"" << it->first << "\" />\n";
         }

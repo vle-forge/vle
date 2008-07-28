@@ -119,7 +119,7 @@ void GenExecutive::add_new_model()
     atom->addOutputPort("out");
     coupledmodel().addInternalConnection(name, "out", "counter", "in");
 
-    coordinator().createModel(atom, "gensbeep", vpz::StringVector(), "");
+    coordinator().createModel(atom, "gensbeep", vpz::Strings(), "");
     m_stacknames.push(name);
 }
 

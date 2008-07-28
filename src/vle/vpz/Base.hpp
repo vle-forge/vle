@@ -22,9 +22,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #ifndef VLE_VPZ_BASE_HPP
 #define VLE_VPZ_BASE_HPP
 
@@ -32,13 +29,17 @@
 
 namespace vle { namespace vpz {
 
-    /** 
+    /**
      * @brief A base to class to force all inheritance classes to load and
      * write from an XML reference.
      */
     class Base
     {
     public:
+        /**
+         * @brief The list of available sub classes of vpz::Base. Use in the
+         * vpz::SaxStackVpz class to sort the type of class.
+         */
         enum type { STRUCTURES, MODEL, SUBMODELS, CONNECTIONS,
             INTERNAL_CONNECTION, INPUT_CONNECTION, OUTPUT_CONNECTION, ORIGIN,
             DESTINATION, IN, OUT, INIT, STATE, PORT, DYNAMICS, DYNAMIC,
@@ -46,92 +47,281 @@ namespace vle { namespace vpz {
             OUTPUTS, OUTPUT, VIEW, CONDITIONS, CONDITION, CLASSES, CLASS,
             REPLICAS, VPZ, TRAME, MODELTRAME };
 
-        Base() { }
+        /**
+         * @brief Default constructor.
+         */
+        Base()
+        {}
 
-        virtual ~Base() { }
+        /**
+         * @brief Nothing to delete.
+         */
+        virtual ~Base()
+        {}
 
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Pure virtual functions.
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-        //
-        // virtuals functions 
-        //
-
-
-        /** 
+        /**
          * @brief write object information into the stream.
-         * 
          * @param out an output stream to write xml.
          */
         virtual void write(std::ostream& out) const = 0;
 
-        /** 
+        /**
          * @brief Return the Base::type of the Vpz object.
-         * 
          * @return the Base::type of the object.
          */
         virtual Base::type getType() const = 0;
 
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Inline.
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-        //
-        // inlines functions
-        //
+        /**
+         * @return True if type is STRUCTURES.
+         */
+        inline bool isStructures() const
+        { return getType() == STRUCTURES; }
 
+        /**
+         * @return True if type is MODEL.
+         */
+        inline bool isModel() const
+        { return getType() == MODEL; }
 
-        inline bool isStructures() const { return getType() == STRUCTURES; }
-        inline bool isModel() const { return getType() == MODEL; }
-        inline bool isSubmodels() const { return getType() == SUBMODELS; }
-        inline bool isConnections() const { return getType() == CONNECTIONS; }
-        inline bool isInternalConnection() const { return getType() ==
-            INTERNAL_CONNECTION; }
-        inline bool isInputConnection() const { return getType() ==
-            INPUT_CONNECTION; }
-        inline bool isOutputConnection() const { return getType() ==
-            OUTPUT_CONNECTION; }
-        inline bool isOrigin() const { return getType() == ORIGIN; }
-        inline bool isDestination() const { return getType() == DESTINATION; }
-        inline bool isIn() const { return getType() == IN; }
-        inline bool isOut() const { return getType() == OUT; }
-        inline bool isInit() const { return getType() == INIT; }
-        inline bool isState() const { return getType() == STATE; }
-        inline bool isPort() const { return getType() == PORT; }
-        inline bool isDynamics() const { return getType() == DYNAMICS; }
-        inline bool isDynamic() const { return getType() == DYNAMIC; }
-        inline bool isExperiment() const { return getType() == EXPERIMENT; }
-        inline bool isProject() const { return getType() == PROJECT; }
-        inline bool isViews() const { return getType() == VIEWS; }
-        inline bool isView() const { return getType() == VIEW; }
-        inline bool isObservables() const { return getType() == OBSERVABLES; }
-        inline bool isObservable() const { return getType() == OBSERVABLE; }
-        inline bool isObservablePort() const { return getType() ==
-            OBSERVABLEPORT; }
-        inline bool isOutputs() const { return getType() == OUTPUTS; }
-        inline bool isOutput() const { return getType() == OUTPUT; }
-        inline bool isConditions() const { return getType() == CONDITIONS; }
-        inline bool isCondition() const { return getType() == CONDITION; }
-        inline bool isClasses() const { return getType() == CLASSES; }
-        inline bool isClass() const { return getType() == CLASS; }
-        inline bool isReplicas() const { return getType() == REPLICAS; }
-        inline bool isVpz() const { return getType() == VPZ; }
-        inline bool isTrame() const { return getType() == TRAME; }
-        inline bool isModelTrame() const { return getType() == MODELTRAME; }
+        /**
+         * @return True if type is SUBMODELS.
+         */
+        inline bool isSubmodels() const
+        { return getType() == SUBMODELS; }
 
+        /**
+         * @return True if type is CONNECTIONS.
+         */
+        inline bool isConnections() const
+        { return getType() == CONNECTIONS; }
 
-        //
-        // friend stream
-        //
+        /**
+         * @return True if type is INTERNAL_CONNECTION.
+         */
+        inline bool isInternalConnection() const
+        { return getType() == INTERNAL_CONNECTION; }
 
+        /**
+         * @return True if type is INPUT_CONNECTION.
+         */
+        inline bool isInputConnection() const
+        { return getType() == INPUT_CONNECTION; }
 
-        /** 
-         * @brief Operator << for std::stream to help building trame.
+        /**
+         * @return True if type is OUTPUT_CONNECTION.
+         */
+        inline bool isOutputConnection() const
+        { return getType() == OUTPUT_CONNECTION; }
+
+        /**
+         * @return True if type is ORIGIN.
+         */
+        inline bool isOrigin() const
+        { return getType() == ORIGIN; }
+
+        /**
+         * @return True if type is DESTINATION.
+         */
+        inline bool isDestination() const
+        { return getType() == DESTINATION; }
+
+        /**
+         * @return True if type is IN.
+         */
+        inline bool isIn() const
+        { return getType() == IN; }
+
+        /**
+         * @return True if type is OUT.
+         */
+        inline bool isOut() const
+        { return getType() == OUT; }
+
+        /**
+         * @return True if type is INIT.
+         */
+        inline bool isInit() const
+        { return getType() == INIT; }
+
+        /**
+         * @return True if type is STATE.
+         */
+        inline bool isState() const
+        { return getType() == STATE; }
+
+        /**
+         * @return True if type is PORT.
+         */
+        inline bool isPort() const
+        { return getType() == PORT; }
+
+        /**
+         * @return True if type is DYNAMICS.
+         */
+        inline bool isDynamics() const
+        { return getType() == DYNAMICS; }
+
+        /**
+         * @return True if type is DYNAMIC.
+         */
+        inline bool isDynamic() const
+        { return getType() == DYNAMIC; }
+
+        /**
+         * @return True if type is EXPERIMENT.
+         */
+        inline bool isExperiment() const
+        { return getType() == EXPERIMENT; }
+
+        /**
+         * @return True if type is PROJECT.
+         */
+        inline bool isProject() const
+        { return getType() == PROJECT; }
+
+        /**
+         * @return True if type is VIEWS.
+         */
+        inline bool isViews() const
+        { return getType() == VIEWS; }
+
+        /**
+         * @return True if type is VIEW.
+         */
+        inline bool isView() const
+        { return getType() == VIEW; }
+
+        /**
+         * @return True if type is OBSERVABLES.
+         */
+        inline bool isObservables() const
+        { return getType() == OBSERVABLES; }
+
+        /**
+         * @return True if type is OBSERVABLE.
+         */
+        inline bool isObservable() const
+        { return getType() == OBSERVABLE; }
+
+        /**
+         * @return True if type is OBSERVABLEPORT.
+         */
+        inline bool isObservablePort() const
+        { return getType() == OBSERVABLEPORT; }
+
+        /**
+         * @return True if type is OUTPUTS.
+         */
+        inline bool isOutputs() const
+        { return getType() == OUTPUTS; }
+
+        /**
+         * @return True if type is OUTPUT.
+         */
+        inline bool isOutput() const
+        { return getType() == OUTPUT; }
+
+        /**
+         * @return True if type is CONDITIONS.
+         */
+        inline bool isConditions() const
+        { return getType() == CONDITIONS; }
+
+        /**
+         * @return True if type is CONDITION.
+         */
+        inline bool isCondition() const
+        { return getType() == CONDITION; }
+
+        /**
+         * @return True if type is CLASSES.
+         */
+        inline bool isClasses() const
+        { return getType() == CLASSES; }
+
+        /**
+         * @return True if type is CLASS.
+         */
+        inline bool isClass() const
+        { return getType() == CLASS; }
+
+        /**
+         * @return True if type is REPLICAS.
+         */
+        inline bool isReplicas() const
+        { return getType() == REPLICAS; }
+
+        /**
+         * @return True if type is VPZ.
+         */
+        inline bool isVpz() const
+        { return getType() == VPZ; }
+
+        /**
+         * @return True if type is TRAME.
+         */
+        inline bool isTrame() const
+        { return getType() == TRAME; }
+
+        /**
+         * @return True if type is MODELTRAME.
+         */
+        inline bool isModelTrame() const
+        { return getType() == MODELTRAME; }
+
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Output stream.
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+        /**
+         * @brief Stream operator for std::stream to help building trame.
          * @param out the output where data are writed.
-         * @param tr trame base class.
+         * @param obj the sub class to write.
          * @return the std::ostream.
          */
         friend std::ostream& operator<<(std::ostream& out, const Base& obj)
         { obj.write(out); return out; }
 
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Functors.
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+        /**
+         * @brief Predicate functor. Check if the specified vpz::Base object is
+         * a class.
+         */
         struct IsClass {
-            inline bool operator()(vpz::Base* base) const
+            /**
+             * @brief Check if the pointer is a Class.
+             * @param base the pointer to check.
+             * @return true if pointer is not null and is a Class.
+             */
+            inline bool operator()(const vpz::Base* base) const
             { return base != 0 and base->getType() == CLASS; }
+
+            /**
+             * @brief Check if the reference is a Class.
+             * @param base the reference to check.
+             * @return true if pointer if a Class.
+             */
+            inline bool operator()(const vpz::Base& base) const
+            { return base.getType() == CLASS; }
         };
     };
 

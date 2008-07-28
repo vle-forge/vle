@@ -22,9 +22,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #include <vle/vpz/SaxStackVpz.hpp>
 #include <vle/vpz/Structures.hpp>
 #include <vle/vpz/Port.hpp>
@@ -40,14 +37,7 @@
 #include <vle/utils/Socket.hpp>
 #include <vle/utils/Debug.hpp>
 
-
-
 namespace vle { namespace vpz {
-
-SaxStackVpz::~SaxStackVpz()
-{
-    Assert(utils::SaxParserError, m_stack.empty(), "SaxStackVpz not empty");
-}
 
 std::ostream& operator<<(std::ostream& out, const SaxStackVpz& stack)
 {
@@ -96,7 +86,7 @@ vpz::Vpz* SaxStackVpz::pushVpz(const AttributeList& att)
     }
 
     m_vpz.project().setAuthor(getAttribute < std::string >(att, "author"));
-    m_vpz.project().setVersion(getAttribute < float >(att, "version"));
+    m_vpz.project().setVersion(getAttribute < std::string >(att, "version"));
 
     if (existAttribute(att, "instance")) {
         m_vpz.project().setInstance(getAttribute < int >(att, "instance"));
@@ -177,13 +167,13 @@ void SaxStackVpz::pushModel(const AttributeList& att)
 
         Class* clsparent(getLastClass());
         if (clsparent == 0) {
-            vpz().project().model().atomicModels().insert(std::make_pair(
-                    reinterpret_cast < graph::Model* >(gmdl),
-                    AtomicModel(conditions, dynamics, observables)));
+            vpz().project().model().atomicModels().add(
+                reinterpret_cast < graph::Model* >(gmdl),
+                AtomicModel(conditions, dynamics, observables));
         } else {
-            clsparent->atomicModels().insert(std::make_pair(
-                    reinterpret_cast < graph::Model* >(gmdl),
-                    AtomicModel(conditions, dynamics, observables)));
+            clsparent->atomicModels().add(
+                reinterpret_cast < graph::Model* >(gmdl),
+                AtomicModel(conditions, dynamics, observables));
         }
     } else if (type == "coupled") {
         try {

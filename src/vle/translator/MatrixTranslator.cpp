@@ -213,17 +213,15 @@ void MatrixTranslator::translateModel(unsigned int i,
 {
     graph::AtomicModel* atomicModel = new
         graph::AtomicModel(getName(i, j), mCoupledModel);
-    std::vector < std::string > conditions;
+    vpz::Strings conditions;
 
     conditions.push_back("cond_cell");
     conditions.push_back((boost::format("cond_%1%_%2%_%3%")
                           % m_prefix % i % j).str());
     m_models[getName(i,j)] = atomicModel;
 
-    mCoordinator->createModel(atomicModel,
-                              getDynamics(i, j),
-                              conditions,
-                              "obs_cell");
+    mCoordinator->createModel(atomicModel, getDynamics(i, j),
+                              conditions, "obs_cell");
 
     if (i != 1)
         atomicModel->addInputPort("N");
@@ -300,7 +298,7 @@ void MatrixTranslator::translateStructures()
         for (unsigned int i = 1; i <= m_size[0]; i++) {
             graph::AtomicModel* atomicModel =
                 new graph::AtomicModel(getName(i), mCoupledModel);
-            std::vector < std::string > conditions;
+            vpz::Strings conditions;
 
             conditions.push_back("cond_cell");
             conditions.push_back((boost::format("cond_%1%_%2%") % m_prefix %

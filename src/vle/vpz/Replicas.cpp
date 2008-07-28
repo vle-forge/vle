@@ -22,19 +22,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #include <vle/vpz/Replicas.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Rand.hpp>
 
 namespace vle { namespace vpz {
-
-Replicas::Replicas() :
-    m_number(0),
-    m_seed(0)
-{ }
 
 void Replicas::write(std::ostream& out) const
 {

@@ -22,66 +22,81 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #ifndef VLE_VPZ_REPLICAS_HPP
 #define VLE_VPZ_REPLICAS_HPP
 
-#include <vector>
 #include <glib/gtypes.h>
 #include <vle/vpz/Base.hpp>
-#include <vle/utils/Rand.hpp>
 
 namespace vle { namespace vpz {
 
-    /** 
+    /**
      * @brief This class allow load and writing REPLICAS tag into project file
      * VPZ.
      */
     class Replicas : public Base
     {
     public:
-        Replicas();
+        /**
+         * @brief Build a new Replicas with number an seed equal to zero.
+         */
+        Replicas() :
+            m_number(0),
+            m_seed(0)
+        {}
 
-        virtual ~Replicas() { }
+        /**
+         * @brief Nothing to delete.
+         */
+        virtual ~Replicas()
+        {}
 
+        /**
+         * @brief Write the XML representation of this class.
+         * @code
+         * <replicas seed="123123" number="123" />
+         * @endcode
+         * @param out Output parameter.
+         */
         virtual void write(std::ostream& out) const;
 
+        /**
+         * @brief Get the type of this class.
+         * @return REPLICAS.
+         */
         virtual Base::type getType() const
         { return REPLICAS; }
 
-        /** 
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Get/Set functions
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+        /**
          * @brief Get the current seed system.
-         * 
          * @return Seed.
          */
         inline guint32 seed() const
         { return m_seed; }
 
-        /** 
+        /**
          * @brief Set he current seed system.
-         * 
-         * @param seed 
-         * 
-         * @return 
+         * @param seed The new seed.
          */
         inline void setSeed(const guint32 seed)
         { m_seed = seed; }
 
-        /** 
+        /**
          * @brief Get the number of replicas.
-         * 
          * @return Number of replicas.
          */
         inline size_t number() const
         { return m_number; }
 
-        /** 
+        /**
          * @brief Set the number of replicas.
-         * 
          * @param number of replicas.
-         *
          * @throw utils::ArgError if the number of replicas equal 0.
          */
         void setNumber(const size_t number);

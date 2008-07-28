@@ -22,9 +22,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #ifndef VLE_VPZ_STRUCTURES_HPP
 #define VLE_VPZ_STRUCTURES_HPP
 
@@ -32,35 +29,36 @@
 
 namespace vle { namespace vpz {
 
+    /**
+     * @brief The Structure, only used by the SaxParser.
+     */
     class Structures: public Base
     {
     public:
+        /**
+         * @brief Build a new Structures.
+         */
         Structures()
-        { }
+        {}
 
-        Structures(const Structures& structures) :
-            Base(structures)
-        { }
+        /**
+         * @brief Nothing to output.
+         */
+        virtual void write(std::ostream& /* out */) const
+        {}
 
-        Structures& operator=(const Structures& structures) 
-        {
-            if (this != &structures) {
-                return *this;
-            }
-            return *this;
-        }
+        /**
+         * @brief Nothing to delete.
+         */
+        virtual ~Structures()
+        {}
 
-        virtual void write(std::ostream& out) const
-        {
-            out << "<structures>\n"
-                << "</structures>\n";
-        }
-
-        virtual ~Structures() { }
-
+        /**
+         * @brief Get the type of this class.
+         * @return STRUCTURES.
+         */
         virtual Base::type getType() const
         { return STRUCTURES; }
-    
     };
 
 }} // namespace vle vpz

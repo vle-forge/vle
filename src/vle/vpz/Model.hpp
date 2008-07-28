@@ -22,17 +22,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #ifndef VLE_VPZ_MODEL_HPP
 #define VLE_VPZ_MODEL_HPP
 
-#include <map>
-#include <glibmm/ustring.h>
 #include <vle/vpz/Base.hpp>
 #include <vle/vpz/AtomicModels.hpp>
 #include <vle/graph/Model.hpp>
+#include <string>
 
 namespace vle { namespace vpz {
 
@@ -42,24 +38,48 @@ namespace vle { namespace vpz {
     class Model : public Base
     {
     public:
+        /**
+         * @brief Build an empty Model.
+         */
         Model() :
             m_graph(0)
-        { }
-
-        Model(const Model& mdl);
-
-        virtual ~Model()
-        { }
+        {}
 
         /**
-         * @brief Write the devs hierachy of model.
-         * @param elt a reference to the parent STRUCTURES tag.
-         * @throw Exception::Internal if elt is null.
+         * @brief Copy constructor. The hierarchy of graph::Model is cloned.
+         * @param mdl The model to copy.
+         */
+        Model(const Model& mdl);
+
+        /**
+         * @brief Nothing to delete. Be carefull, you must delete the graph.
+         */
+        virtual ~Model()
+        {}
+
+        /**
+         * @brief Write the XML representation of this class.
+         * @code
+         * <structures>
+         *  [...]
+         * </structures>
+         * @endcode
+         * @param out an output stream.
          */
         virtual void write(std::ostream& out) const;
 
+        /**
+         * @brief Get the type of this class.
+         * @return MODEL.
+         */
         virtual Base::type getType() const
         { return MODEL; }
+
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Manage the graph.
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
         /**
          * @brief Just delete the complete list of graph::AtomicModelList and
@@ -119,118 +139,244 @@ namespace vle { namespace vpz {
         graph::Model*       m_graph;
     };
 
-
-
+    /**
+     * @brief The Submodels, only used by the SaxParser.
+     */
     class Submodels : public Base
     {
     public:
-        Submodels() { }
+        /**
+         * @brief Build a Submodels.
+         */
+        Submodels()
+        {}
 
-        virtual ~Submodels() { }
+        /**
+         * @brief Nothing to delete.
+         */
+        virtual ~Submodels()
+        {}
 
+        /**
+         * @brief Nothing to output.
+         */
         virtual void write(std::ostream& /* out */) const
-        { }
+        {}
 
+        /**
+         * @brief Get the type of this class.
+         * @return SUBMODELS.
+         */
         virtual Base::type getType() const
         { return SUBMODELS; }
     };
 
+    /**
+     * @brief The Connections, only used by the SaxParser.
+     */
     class Connections : public Base
     {
     public:
-        Connections() { }
+        /**
+         * @brief Build a Connections.
+         */
+        Connections()
+        {}
 
-        virtual ~Connections() { }
+        /**
+         * @brief Nothing to delete.
+         */
+        virtual ~Connections()
+        {}
 
+        /**
+         * @brief Nothing to output.
+         */
         virtual void write(std::ostream& /* out */) const
-        { }
+        {}
 
+        /**
+         * @brief Get the type of this class.
+         * @return CONNECTIONS.
+         */
         virtual Base::type getType() const
         { return CONNECTIONS; }
     };
 
+    /**
+     * @brief The InternalConnection, only used by the SaxParser.
+     */
     class InternalConnection : public Base
     {
     public:
-        InternalConnection() { }
+        /**
+         * @brief Build an InternalConnection.
+         */
+        InternalConnection()
+        {}
 
-        virtual ~InternalConnection() { }
+        /**
+         * @brief Nothing to delete.
+         */
+        virtual ~InternalConnection()
+        {}
 
+        /**
+         * @brief Nothing to output.
+         */
         virtual void write(std::ostream& /* out */) const
-        { }
+        {}
 
+        /**
+         * @brief Get the type of this class.
+         * @return INTERNAL_CONNECTION.
+         */
         virtual Base::type getType() const
         { return INTERNAL_CONNECTION; }
     };
 
+    /**
+     * @brief The InputConnection, only used by the SaxParser.
+     */
     class InputConnection : public Base
     {
     public:
-        InputConnection() { }
+        /**
+         * @brief Build an InputConnection.
+         */
+        InputConnection()
+        {}
 
-        virtual ~InputConnection() { }
+        /**
+         * @brief Nothing to delete.
+         */
+        virtual ~InputConnection()
+        {}
 
+        /**
+         * @brief Nothing to output.
+         */
         virtual void write(std::ostream& /* out */) const
-        { }
+        {}
 
+        /**
+         * @brief Get the type of this class.
+         * @return INPUT_CONNECTION.
+         */
         virtual Base::type getType() const
         { return INPUT_CONNECTION; }
     };
 
+    /**
+     * @brief The OutputConnection, only used by the SaxParser.
+     */
     class OutputConnection : public Base
     {
     public:
-        OutputConnection() { }
+        /**
+         * @brief Build an OutputConnection.
+         */
+        OutputConnection()
+        {}
 
-        virtual ~OutputConnection() { }
+        /**
+         * @brief Nothing to delete.
+         */
+        virtual ~OutputConnection()
+        {}
 
+        /**
+         * @brief Nothing to output.
+         */
         virtual void write(std::ostream& /* out */) const
-        { }
+        {}
 
+        /**
+         * @brief Get the type of this class.
+         * @return OUTPUT_CONNECTION.
+         */
         virtual Base::type getType() const
         { return OUTPUT_CONNECTION; }
     };
 
+    /**
+     * @brief The Origin, only used by the SaxParser.
+     */
     class Origin: public Base
     {
     public:
-        Origin(const Glib::ustring& model,
-                    const Glib::ustring& port) :
+        /**
+         * @brief Build an Origin with specific model source.
+         * @param model the name of the model source.
+         * @param port the name of the port source.
+         */
+        Origin(const std::string& model,
+               const std::string& port) :
             model(model),
             port(port)
-        { }
+        {}
 
-        virtual ~Origin() { }
+        /**
+         * @brief Nothing to delete.
+         */
+        virtual ~Origin()
+        {}
 
+        /**
+         * @brief Nothing to output.
+         */
         virtual void write(std::ostream& /* out */) const
-        { }
+        {}
 
+        /**
+         * @brief Get the type of this class.
+         * @return ORIGIN.
+         */
         virtual Base::type getType() const
         { return ORIGIN; }
 
-        Glib::ustring model;
-        Glib::ustring port;
+        std::string model; //!< the name of the model.
+        std::string port; //!< the name of the In port.
     };
 
+    /**
+     * @brief The Destination, only used by the SaxParser.
+     */
     class Destination: public Base
     {
     public:
-        Destination(const Glib::ustring& model,
-                    const Glib::ustring& port) :
+        /**
+         * @brief Build a Destination with specific model destination.
+         * @param model the name of the destination model.
+         * @param port the name of the destination port.
+         */
+        Destination(const std::string& model,
+                    const std::string& port) :
             model(model),
             port(port)
-        { }
+        {}
 
-        virtual ~Destination() { }
+        /**
+         * @brief Nothing to delete.
+         */
+        virtual ~Destination()
+        {}
 
+        /**
+         * @brief Nothing to output.
+         */
         virtual void write(std::ostream& /* out */) const
-        { }
+        {}
 
+        /**
+         * @brief Get the type of this class.
+         * @return DESTINATION.
+         */
         virtual Base::type getType() const
         { return DESTINATION; }
 
-        Glib::ustring model;
-        Glib::ustring port;
+        std::string model; //!< the name of the model.
+        std::string port; //!< the name of the Out port.
     };
 
 }} // namespace vle vpz

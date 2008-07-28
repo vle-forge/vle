@@ -22,54 +22,70 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #ifndef VLE_VPZ_CLASS_HPP
 #define VLE_VPZ_CLASS_HPP
 
 #include <vle/vpz/Base.hpp>
 #include <vle/vpz/AtomicModels.hpp>
 
-
 namespace vle { namespace vpz {
 
     /**
-     * @brief The class Class is build on the vpz::Model structure. It store a
+     * @brief The class Class is build on the vpz::Model structure. It stores a
      * new graph::Model hierarchy and a vpz::AtomicModels class to build easily
      * new structure of models.
      */
     class Class : public Base
     {
     public:
+        /**
+         * @brief Build a new Class with a name but without graph::Model
+         * hierarchy.
+         * @param name The name of this Class.
+         */
         Class(const std::string& name) :
             m_name(name),
             m_model(0)
-        { }
+        {}
 
+        /**
+         * @brief Build a new Class by copying the parameter. The graph::Model
+         * hierarchy is clone in this function.
+         * @param cls The class to copy.
+         */
         Class(const Class& cls);
 
+        /**
+         * @brief Delete the graph::Model hierarchy.
+         */
         virtual ~Class()
         { delete m_model; }
 
         /**
-         * @brief Write the class xml representation into the output stream.
+         * @brief Write the class XML representation into the output stream.
          * @code
          * <class name="xxxx">
-         *  <structure>
-         *   <model type="coupled">
+         *  <model type="coupled">
          *    ...
-         *   </model>
-         *  </structure>
+         *  </model>
          * </class>
          * @endcode
-         *
-         * @param out
+         * @param out The output stream.
          */
         virtual void write(std::ostream& out) const;
 
+        /**
+         * @brief Get the type of this class.
+         * @return CLASS.
+         */
         virtual Base::type getType() const
         { return CLASS; }
+
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Manage the graph::Model hierarchy
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
         /**
          * @brief Get a constant reference to the stored Model.
@@ -93,6 +109,12 @@ namespace vle { namespace vpz {
         inline void setModel(graph::Model* mdl)
         { m_model = mdl; }
 
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Manage the AtomicModelList informations.
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
         /**
          * @brief Return a constant reference to the vpz::AtomicModelList.
          * @return a constant reference to the vpz::AtomicModelList.
@@ -107,6 +129,12 @@ namespace vle { namespace vpz {
         AtomicModelList& atomicModels()
         { return m_atomicmodels; }
 
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Get/Set functons.
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
         /**
          * @brief Return a constant reference to the name of this Class.
          * @return A constant reference to the name of this Class.
@@ -115,9 +143,6 @@ namespace vle { namespace vpz {
         { return m_name; }
 
     private:
-        Class()
-        { }
-
         AtomicModelList m_atomicmodels;
         std::string     m_name;
         graph::Model*   m_model;

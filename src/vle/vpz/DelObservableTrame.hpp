@@ -22,9 +22,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #ifndef VLE_VPZ_DELOBSERVABLETRAME_HPP
 #define VLE_VPZ_DELOBSERVABLETRAME_HPP
 
@@ -32,9 +29,21 @@
 
 namespace vle { namespace vpz {
 
+    /**
+     * @brief The DelObservableTrame is send when a model is deleted from the
+     * simulation to the server oov.
+     */
     class DelObservableTrame : public Trame
     {
     public:
+        /**
+         * @brief Build a new DelObservableTrame.
+         * @param time the time of this event.
+         * @param name the name of the model.
+         * @param parent the parent of the model.
+         * @param port the name of the port.
+         * @param view the name of the view.
+         */
         DelObservableTrame(const std::string& time,
                            const std::string& name,
                            const std::string& parent,
@@ -45,33 +54,68 @@ namespace vle { namespace vpz {
             m_parent(parent),
             m_port(port),
             m_view(view)
-        { }
+        {}
 
+        /**
+         * @brief Nothing to delete.
+         */
         virtual ~DelObservableTrame()
-        { }
+        {}
 
+        /**
+         * @brief Write the XML representation of this class.
+         * @code
+         * <trame type="del" date="" name="" parent="" port="" view="" />
+         * @endcode
+         * @param out output stream.
+         */
         virtual void write(std::ostream& out) const;
 
+        /**
+         * @brief Get the type of this class.
+         * @return TRAME.
+         */
         virtual Base::type getType() const
         { return Base::TRAME; }
-        //
-        ///
-        /// Get/Set functions.
-        ///
-        //
 
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Get/Set functions
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+        /**
+         * @brief The date of this event.
+         * @return A date.
+         */
         inline const std::string& time() const
         { return m_time; }
 
+        /**
+         * @brief The name of the simulator.
+         * @return The simulator.
+         */
         const std::string& name() const
         { return m_name; }
 
+        /**
+         * @brief The parent of the simulator.
+         * @return The simulator.
+         */
         const std::string& parent() const
         { return m_parent; }
 
+        /**
+         * @brief The port of the observation.
+         * @return The name of the port.
+         */
         const std::string& port() const
         { return m_port; }
 
+        /**
+         * @brief The view of the observation.
+         * @return The name of the view.
+         */
         const std::string& view() const
         { return m_view; }
 

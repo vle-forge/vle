@@ -22,38 +22,60 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #ifndef VLE_VPZ_ENDTRAME_HPP
 #define VLE_VPZ_ENDTRAME_HPP
 
 #include <vle/vpz/Trame.hpp>
 
-
 namespace vle { namespace vpz {
 
+    /**
+     * @brief The EndTrame is send to close the communication between client and
+     * server oov.
+     */
     class EndTrame : public Trame
     {
     public:
-        EndTrame(const std::string& time) :
-            m_time(time)
-        { }
+        /**
+         * @brief Build a new EndTrame with the specific time.
+         * @param time The time of this EndTrame.
+         */
+        EndTrame(const std::string& time)
+            : m_time(time)
+        {}
 
+        /**
+         * @brief Nothing to delete.
+         */
         virtual ~EndTrame()
-        { }
+        {}
 
+        /**
+         * @brief Get the type of this class.
+         * @return TRAME.
+         */
         virtual Base::type getType() const
         { return Base::TRAME; }
 
+        /**
+         * @brief Write the XML representation of this class.
+         * @code
+         * <trame type="end" date="654.123" />
+         * @endcode
+         * @param out output stream.
+         */
         virtual void write(std::ostream& out) const;
 
-        //
-        ///
-        /// Get function
-        ///
-        //
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Get/Set functions
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+        /**
+         * @brief Get the time of this trame.
+         * @return The time.
+         */
         const std::string& time() const
         { return m_time; }
 

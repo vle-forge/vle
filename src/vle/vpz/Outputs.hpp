@@ -22,199 +22,244 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #ifndef VLE_VPZ_OUTPUTS_HPP
 #define VLE_VPZ_OUTPUTS_HPP
 
 #include <vle/vpz/Base.hpp>
 #include <vle/vpz/Output.hpp>
 #include <map>
-#include <list>
+#include <vector>
 #include <string>
 
 namespace vle { namespace vpz {
 
-    /** 
+    /**
      * @brief A list of Output.
      */
     typedef std::map < std::string, Output > OutputList;
 
-    /** 
+    /**
      * @brief Outputs is a container based on OutputList to build a list of
      * Output using the Output's name as key.
      */
     class Outputs : public Base
     {
     public:
+        /**
+         * @brief Define an iterator to the OutputList.
+         */
+        typedef OutputList::iterator iterator;
+
+        /**
+         * @brief Define a constant iterator to the OutputList.
+         */
+        typedef OutputList::const_iterator const_iterator;
+
+        /**
+         * @brief Build an empty Outputs.
+         */
         Outputs()
-        { }
+        {}
 
-        virtual ~Outputs() { }
+        /**
+         * @brief Nothing to delete.
+         */
+        virtual ~Outputs()
+        {}
 
-        /** 
-         * @brief Write under the element XML the tags the XML code. If not
-         * output are stored, no tag are build.
+        /**
+         * @brief Write the XML representation of this class.
          * @code
          * <outputs>
          *  <output name="output1" format="local|distant" location="" />
          *  ...
          * </outputs>
          * @endcode
-         * @param elt A node to the parent of OUTPUTS tags. 
+         * @param out an output stream.
          */
         virtual void write(std::ostream& out) const;
 
+        /**
+         * @brief Return the type of this class.
+         * @return OUTPUTS.
+         */
         virtual Base::type getType() const
         { return OUTPUTS; }
 
-        ////
-        //// OutputList managment
-        ////
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Manage the OutputList
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-        /** 
-         * @brief Return a constant reference to the OutputList.
-         * @return A constant reference.
-         */
-        inline const OutputList& outputlist() const
-        { return m_list; }
-        
-        /** 
+        /**
          * @brief Add an output with text stream information. The name is
          * obligatory, the location defines a filename.
          * @param name the output name.
          * @param location the file name.
          * @param plugin to use in steam.
-         * @throw Exception::Internal if name is empty.
+         * @throw utils::ArgError if name is empty.
          */
         Output& addLocalStream(const std::string& name,
                                const std::string& location,
                                const std::string& plugin);
 
-        /** 
+        /**
          * @brief Add an output with the sdml stream information. The name is
          * obligatory, the location defines a filename.
          * @param name the output name.
          * @param location the file name.
          * @param plugin to use in steam.
-         * @throw Exception::Internal if name is empty.
+         * @throw utils::ArgError if name is empty.
          */
         Output& addDistantStream(const std::string& name,
                                  const std::string& location,
                                  const std::string& plugin);
 
-        /** 
+        /**
          * @brief Add a list of outputs into the current list.
          * @param o the list of outputs to add.
-         * @throw Exception::Internal if name or plugin already exist.
+         * @throw utils::ArgError if name or plugin already exist.
          */
         void add(const Outputs& o);
 
-        /** 
-         * @brief Add an output into the outputs list. 
-         * @param name the name of the output to add.
+        /**
+         * @brief Add an output into the outputs list.
          * @param o the output to add.
-         * @throw Exception::Internal if the output already exist.
+         * @throw utils::ArgError if the output already exist.
          */
         Output& add(const Output& o);
 
-        /** 
+        /**
          * @brief Find an Output reference from list.
          * @param name Output name.
          * @return A reference to the output.
-         * @throw Exception::Internal if Output does not exist.
+         * @throw utils::ArgError if Output does not exist.
          */
         Output& get(const std::string& name);
 
-        /** 
+        /**
          * @brief Find a const Output reference from list.
          * @param name Output name.
          * @return A reference to the output.
-         * @throw Exception::Internal if Output does not exist.
+         * @throw utils::ArgError if Output does not exist.
          */
         const Output& get(const std::string& name) const;
-        
-        /** 
+
+        /**
          * @brief Delete the specified output.
          * @param name the name of the output to delete.
          */
         void del(const std::string& name);
 
-        /** 
+        /**
          * @brief Remove all Output from the OutputList.
          */
-        inline void clear();
+        inline void clear()
+        { m_list.clear(); }
 
-        /** 
+        /**
          * @brief Test if an Output exist with the specified name.
          * @param name Output name to test.
          * @return true if Output exist, false otherwise.
          */
-        inline bool exist(const std::string& name) const;
+        inline bool exist(const std::string& name) const
+        { return m_list.find(name) != end(); }
 
-        /** 
+        /**
          * @brief Test if the OutputList is empty or not.
          * @return true if OutputList is empty, false otherwise.
          */
-        inline bool empty() const;
+        inline bool empty() const
+        { return m_list.empty(); }
 
-        ////
-        //// Usefull functions.
-        ////
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Get/Set functions.
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-        /** 
+        /**
+         * @brief Return a constant reference to the OutputList.
+         * @return A constant reference.
+         */
+        inline const OutputList& outputlist() const
+        { return m_list; }
+
+        /**
+         * @brief Return a constant reference to the OutputList.
+         * @return A constant reference.
+         */
+        inline OutputList& outputlist()
+        { return m_list; }
+
+        /**
+         * @brief Get a iterator the begin of the OutputList.
+         * @return Get a iterator the begin of the OutputList.
+         */
+        iterator begin()
+        { return m_list.begin(); }
+
+        /**
+         * @brief Get a iterator the end of the OutputList.
+         * @return Get a iterator the end of the OutputList.
+         */
+        iterator end()
+        { return m_list.end(); }
+
+        /**
+         * @brief Get a constant iterator the begin of the OutputList.
+         * @return Get a constant iterator the begin of the
+         * OutputList.
+         */
+        const_iterator begin() const
+        { return m_list.begin(); }
+
+        /**
+         * @brief Get a constant iterator the end of the OutputList.
+         * @return Get a constant iterator the end of the OutputList.
+         */
+        const_iterator end() const
+        { return m_list.end(); }
+
+        /**
          * @brief Get the list of all output name.
          * @return the list of output name.
          */
-        std::list < std::string > outputsname() const;
-        
-    private:
-        OutputList  m_list;
+        std::vector < std::string > outputsname() const;
 
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Functors.
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+        /**
+         * @brief Use to add Output to an OutputList. To use with std::for_each.
+         */
         struct AddOutput
         {
-            inline AddOutput(Outputs& outputs) :
-                m_outputs(outputs)
-            { }
+            /**
+             * @brief Add Output to Outputs.
+             * @param outputs The output parameter to store Output.
+             */
+            inline AddOutput(Outputs& outputs)
+                : m_outputs(outputs)
+            {}
 
+            /**
+             * @brief Add the Output to the Outputs.
+             * @param pair the Output to add.
+             */
             inline void operator()(const OutputList::value_type& pair)
             { m_outputs.add(pair.second); }
 
-            Outputs& m_outputs;
+            Outputs& m_outputs; //!< the output parameters.
         };
 
-        struct AddOutputName
-        {
-            inline AddOutputName(std::list < std::string >& lst) :
-                m_list(lst)
-            { }
-
-            inline void operator()(const OutputList::value_type& pair)
-            { m_list.push_back(pair.first); }
-
-            std::list < std::string >& m_list;
-        };
+    private:
+        OutputList  m_list;
     };
-
-    ////
-    //// Implementation
-    ////
-    
-    void Outputs::clear()
-    {
-        m_list.clear();
-    }
-
-    bool Outputs::exist(const std::string& name) const
-    {
-        return m_list.find(name) != m_list.end();
-    }
-
-    bool Outputs::empty() const
-    {
-        return m_list.empty();
-    }
 
 }} // namespace vle vpz
 

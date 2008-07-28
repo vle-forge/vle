@@ -22,9 +22,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #include <vle/vpz/SaxParser.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/vpz/Model.hpp>
@@ -53,10 +50,6 @@ SaxParser::SaxParser(Vpz& vpz) :
     m_isEndTrame(false)
 {
     fillTagList();
-}
-
-SaxParser::~SaxParser()
-{
 }
 
 void SaxParser::clearParserState()
@@ -576,7 +569,7 @@ void SaxParser::onEndOutput()
             m_cdata.clear();
         }
     }
-    m_vpzstack.pop(); 
+    m_vpzstack.pop();
 }
 
 void SaxParser::onEndClasses()

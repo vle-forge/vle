@@ -22,12 +22,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #include <vle/vpz/Vpz.hpp>
 #include <vle/utils/Debug.hpp>
 #include <fstream>
+#include <config.h>
 
 namespace vle { namespace vpz {
 
@@ -49,7 +47,8 @@ void Vpz::write(std::ostream& out) const
 {
     out << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
         << "<!DOCTYPE vle_project PUBLIC \"-//VLE TEAM//DTD Strict//EN\" "
-        << "\"http://vle.univ-littoral.fr/vle-0.5.0.dtd\">\n";
+        << "\"http://vle.univ-littoral.fr/vle-"
+        << VLE_MAJOR_VERSION << "." << VLE_MINOR_VERSION << "0.dtd\">\n";
 
     m_project.write(out);
 }
@@ -66,7 +65,7 @@ void Vpz::parseFile(const std::string& filename)
             Vpz::validateFile(m_filename);
         } catch(const xmlpp::exception& dom) {
             saxparser.clearParserState();
-            Throw(utils::SaxParserError, boost::format(
+            Throw(utils::ArgError, boost::format(
                     "Parse file '%1%':\n[--libxml--]\n%2%[--libvpz--]\n%3%") %
                 filename % dom.what() % sax.what());
         }
@@ -86,11 +85,11 @@ void Vpz::parseMemory(const std::string& buffer)
             saxparser.clearParserState();
             Vpz::validateMemory(buffer);
         } catch(const std::exception& dom) {
-            Throw(utils::SaxParserError, boost::format(
+            Throw(utils::ArgError, boost::format(
                     "Parse memory:\n[--libxml--]\n%1%[--libvpz--]\n%2%") %
                 dom.what() % sax.what());
         }
-        Throw(utils::SaxParserError, boost::format(
+        Throw(utils::ArgError, boost::format(
                 "Parse memory:\n[--libvpz--]\n%1%") % sax.what());
     }
 }
@@ -100,8 +99,8 @@ value::Value Vpz::parseValue(const std::string& buffer)
     Vpz vpz;
     SaxParser sax(vpz);
     sax.parse_memory(buffer);
-    
-    Assert(utils::SaxParserError, sax.isValue(),
+
+    Assert(utils::ArgError, sax.isValue(),
            boost::format("The buffer [%1%] is not a value.") % buffer);
 
     return sax.getValue(0);
@@ -112,8 +111,8 @@ TrameList Vpz::parseTrame(const std::string& buffer)
     Vpz vpz;
     SaxParser sax(vpz);
     sax.parse_memory(buffer);
-    
-    Assert(utils::SaxParserError, sax.isTrame(),
+
+    Assert(utils::ArgError, sax.isTrame(),
            boost::format("The buffer [%1%] is not a trame.") % buffer);
 
     return sax.tramelist();
@@ -124,8 +123,8 @@ std::vector < value::Value > Vpz::parseValues(const std::string& buffer)
     Vpz vpz;
     SaxParser sax(vpz);
     sax.parse_memory(buffer);
-    
-    Assert(utils::SaxParserError, sax.isValue(),
+
+    Assert(utils::ArgError, sax.isValue(),
            boost::format("The buffer [%1%] is not a value.") % buffer);
 
     return sax.getValues();
@@ -135,7 +134,7 @@ void Vpz::write()
 {
     std::ofstream out(m_filename.c_str());
     if (out.fail() or out.bad()) {
-        Throw(utils::SaxParserError,
+        Throw(utils::ArgError,
               (boost::format("Cannot open file %1% for writing.") %
                m_filename));
     }
@@ -148,18 +147,18 @@ void Vpz::write(const std::string& filename)
     write();
 }
 
+std::string Vpz::writeToString() const
+{
+    std::ostringstream out;
+    out << *this;
+    return out.str();
+}
+
 void Vpz::clear()
 {
     m_filename.clear();
     m_project.clear();
     m_isGzip = false;
-}
-
-std::string Vpz::writeToString()
-{
-    std::ostringstream out;
-    out << *this;
-    return out.str();
 }
 
 void Vpz::fixExtension(std::string& filename)

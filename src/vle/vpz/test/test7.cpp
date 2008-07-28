@@ -42,10 +42,10 @@ BOOST_AUTO_TEST_CASE(vpz_obs_port)
 {
     Observable obs("Obs");
     BOOST_REQUIRE_EQUAL(obs.exist("port"), false);
-    BOOST_REQUIRE_THROW(obs.get("port"), utils::SaxParserError);
-    BOOST_REQUIRE_THROW(obs.del("port"), utils::SaxParserError);
+    BOOST_REQUIRE_THROW(obs.get("port"), utils::ArgError);
+    BOOST_REQUIRE_NO_THROW(obs.del("port"));
     BOOST_REQUIRE_NO_THROW(obs.add("port"));
-    BOOST_REQUIRE_THROW(obs.add("port"), utils::SaxParserError);
+    BOOST_REQUIRE_THROW(obs.add("port"), utils::ArgError);
     BOOST_REQUIRE_EQUAL(obs.exist("port"), true);
     BOOST_REQUIRE_NO_THROW(obs.get("port"));
     BOOST_REQUIRE_NO_THROW(obs.del("port"));
@@ -65,10 +65,9 @@ BOOST_AUTO_TEST_CASE(vpz_add_output)
 
     BOOST_REQUIRE_NO_THROW(views.addTimedView("view3", 1.0, "out3"));
     BOOST_REQUIRE_THROW(views.addTimedView("view3", 1.0, "out1"),
-                        utils::SaxParserError);
+                        utils::ArgError);
     BOOST_REQUIRE_THROW(views.addTimedView("view4", 0.5, "out4"),
-                        utils::SaxParserError);
-
+                        utils::ArgError);
     BOOST_REQUIRE_THROW(views.addTimedView("view4", 0.0, "out2"),
-                        utils::SaxParserError);
+                        utils::ArgError);
 }

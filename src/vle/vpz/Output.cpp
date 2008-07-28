@@ -22,23 +22,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #include <vle/vpz/Output.hpp>
 #include <vle/utils/Debug.hpp>
 
 namespace vle { namespace vpz {
 
-Output::Output()
-{
-}
-
 void Output::write(std::ostream& out) const
 {
     out << "<output name=\"" << m_name << "\" " << "location=\"" << m_location
         << "\" ";
-    
+
     switch (m_format) {
     case Output::LOCAL:
         out << "format=\"local\"";
@@ -51,7 +44,7 @@ void Output::write(std::ostream& out) const
     out << " plugin=\"" << m_plugin << "\" ";
 
     if (not m_data.empty()) {
-        out << ">\n<![CDATA[" << m_data << "]]>\n</output>\n";
+        out << ">\n<![CDATA[\n" << m_data << "\n]]>\n</output>\n";
     } else {
         out << "/>\n";
     }
@@ -60,7 +53,7 @@ void Output::write(std::ostream& out) const
 void Output::setLocalStream(const std::string& location,
                             const std::string& plugin)
 {
-    Assert(utils::SaxParserError, not plugin.empty(), boost::format(
+    Assert(utils::ArgError, not plugin.empty(), boost::format(
             "Output '%1%' have not plugin defined") % m_name);
 
     m_location.assign(location);
@@ -71,7 +64,7 @@ void Output::setLocalStream(const std::string& location,
 void Output::setDistantStream(const std::string& location,
                               const std::string& plugin)
 {
-    Assert(utils::SaxParserError, not plugin.empty(), boost::format(
+    Assert(utils::ArgError, not plugin.empty(), boost::format(
             "Output '%1%' have not plugin defined") % m_name);
 
     m_location.assign(location);

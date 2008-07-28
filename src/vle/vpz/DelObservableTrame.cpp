@@ -22,16 +22,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #include <vle/vpz/DelObservableTrame.hpp>
 
 namespace vle { namespace vpz {
 
 void DelObservableTrame::write(std::ostream& out) const
 {
-    out << "<trame type=\"new"
+    out << "<trame type=\"del"
         << "\" date=\"" << m_time
         << "\" name=\"" << m_name
         << "\" parent=\"" << m_parent

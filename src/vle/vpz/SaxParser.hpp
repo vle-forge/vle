@@ -22,11 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
-#ifndef VLE_VPZ_SaxParser_HPP
-#define VLE_VPZ_SaxParser_HPP
+#ifndef VLE_VPZ_SAXPARSER_HPP
+#define VLE_VPZ_SAXPARSER_HPP
 
 #include <stack>
 #include <libxml++/libxml++.h>
@@ -43,94 +40,187 @@ namespace vle { namespace vpz {
     class Vpz;
     class Trame;
 
+    /**
+     * @brief The SaxParser inherits from the xmlpp::SaxParser class of the
+     * libxml++ library which implements a SAX2 parser.
+     */
     class SaxParser : public xmlpp::SaxParser
     {
     public:
+        /**
+         * @brief Build a new SaxParser to fill the specific Vpz class.
+         * @param vpz The Vpz class to fill when reading.
+         */
         SaxParser(Vpz& vpz);
 
-        virtual ~SaxParser();
+        /**
+         * @brief Nothing to delete.
+         */
+        virtual ~SaxParser()
+        {}
+      
+        /**
+         * @brief Delete all information from Sax parser like stack, etc. Use it
+         * before restart a new parse.
+         */
+        void clearParserState();
 
+        /**
+         * @brief When read a start document tag.
+         */
         virtual void on_start_document();
 
+        /**
+         * @brief When read a end document tag.
+         */
         virtual void on_end_document();
 
+        /**
+         * @brief When read a start element.
+         * @param name the name of the element.
+         * @param attributes the list of attributes.
+         */
         virtual void on_start_element(const Glib::ustring& name,
                                       const AttributeList& attributes);
 
+        /**
+         * @brief When read an end element.
+         * @param name the name if the element.
+         */
         virtual void on_end_element(const Glib::ustring& name);
 
+        /**
+         * @brief When read characters in an element.
+         * @param characters all data in characters.
+         */
         virtual void on_characters(const Glib::ustring& characters);
 
+        /**
+         * @brief When read a comment.
+         * @param text the comment.
+         */
         virtual void on_comment(const Glib::ustring& text);
 
+        /**
+         * @brief When a warning appear in Sax parser.
+         * @param text the comment.
+         */
         virtual void on_warning(const Glib::ustring& text);
 
+        /**
+         * @brief When an error appear in Sax parser.
+         * @param text the comment.
+         */
         virtual void on_error(const Glib::ustring& text);
 
+        /**
+         * @brief When an fatal error appear in Sax parser.
+         * @param text the comment.
+         */
         virtual void on_fatal_error(const Glib::ustring& text);
 
+        /**
+         * @brief When a cdata is readed.
+         * @param text the comment.
+         */
         virtual void on_cdata_block(const Glib::ustring& text);
 
+        /**
+         * @brief When a validity error appear in Sax parser.
+         * @param text the comment.
+         */
         virtual void on_validity_error(const Glib::ustring& text);
 
+        /**
+         * @brief When an validity warning appear in Sax parser.
+         * @param text the comment.
+         */
         virtual void on_validity_warning(const Glib::ustring& text);
 
-        /** 
+        /**
          * @brief Return true if the SaxParser have read a value.
          * @return true if the parser have read a value, false otherwise.
          */
         inline bool isValue() const
         { return m_isValue; }
 
-        /** 
+        /**
          * @brief Return true if the SaxParser have read a vpz file.
          * @return true if the parser have read a vpz file, false otherwise.
          */
         inline bool isVpz() const
         { return m_isVPZ; }
 
-        /** 
+        /**
          * @brief Return true if the SaxParser have read a trame.
          * @return true if the parser have read a trame, false otherwise.
          */
         inline bool isTrame() const
         { return m_isTrame; }
 
-        /** 
+        /**
          * @brief Return true if the SaxParser have read an end trame.
          * @return true if the parser have read an end trame, false otherwise.
          */
         inline bool isEndTrame() const
         { return m_isEndTrame; }
+      
 
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Get/Set functions.
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+        /**
+         * @brief Get the content of the SaxStackValue.
+         * @return A constant reference to the vector of value::Value.
+         */
         const std::vector < value::Value >& getValues() const;
+
+        /**
+         * @brief Get the content of the SaxParserError.
+         * @return A reference to the vector of value::Value.
+         */
         std::vector < value::Value >& getValues();
 
+        /**
+         * @brief Get the content of a specific cells of the SaxStackValue.
+         * @param pos The index of the value::Value.
+         * @throw utils::SaxParserError if i is greater that size of the vector.
+         * @return A constant reference to the value.
+         */
         const value::Value& getValue(const size_t pos) const;
 
+        /**
+         * @brief Get a constant reference to the Vpz.
+         * @return A constant reference to the Vpz.
+         */
         inline const vpz::Vpz& vpz() const
         { return m_vpz; }
 
+        /**
+         * @brief Get a constant reference to the TrameList.
+         * @return A constant reference to the TrameList.
+         */
         inline const TrameList& tramelist() const
         { return m_vpzstack.trame(); }
 
+        /**
+         * @brief Get a reference to the TrameList.
+         * @return A reference to the TrameList.
+         */
         inline TrameList& tramelist()
         { return m_vpzstack.trame(); }
 
-        /** 
-         * @brief Delete all information from Sax parser like stack, etc. Use it
-         * before restart a new parse.
-         */
-        void clearParserState();
-
     private:
-        /** 
+        /**
          * @brief Get the last characters from internal buffer.
          * @return A characters buffer.
          */
         const Glib::ustring& lastCharactersStored() const;
 
-        /** 
+        /**
          * @brief Clear the internal buffer for last characters.
          */
         void clearLastCharactersStored();
@@ -306,7 +396,7 @@ namespace vle { namespace vpz {
         }
     };
 
-    /** 
+    /**
      * @brief A template function de get a value of an attribute from an
      * attribute list. The value of the attribute found is casted in template by
      * the boost::lexical_cast function.
@@ -336,7 +426,7 @@ namespace vle { namespace vpz {
         return result;
     }
 
-    /** 
+    /**
      * @brief Search an attribute in an attribute list.
      * @param lst the list of attribute to search an attribute.
      * @param name the attribute to search in attribute list.

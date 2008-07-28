@@ -22,13 +22,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #include <vle/vpz/Project.hpp>
 #include <vle/utils/Debug.hpp>
+#include <config.h>
 
 namespace vle { namespace vpz {
+
+Project::Project() :
+    m_version(VLE_VERSION),
+    m_instance(-1),
+    m_replica(-1)
+{
+}
 
 void Project::write(std::ostream& out) const
 {
@@ -48,8 +53,8 @@ void Project::write(std::ostream& out) const
     out << ">\n"
         << m_model
         << m_dynamics
-        << m_experiment
         << m_classes
+        << m_experiment
         << "</vle_project>\n";
 }
 
@@ -64,7 +69,7 @@ void Project::clear()
 
 void Project::setAuthor(const std::string& name)
 {
-    Assert(utils::SaxParserError, not name.empty(),
+    Assert(utils::ArgError, not name.empty(),
             "Project author unknow");
 ;
     m_author.assign(name);
@@ -77,11 +82,6 @@ void Project::setDate(const std::string& date)
     } else {
         m_date.assign(date);
     }
-}
-
-void Project::setCurrentDate()
-{
-    m_date = utils::get_current_date();
 }
 
 }} // namespace vle vpz

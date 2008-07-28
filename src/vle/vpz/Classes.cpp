@@ -22,35 +22,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #include <vle/vpz/Classes.hpp>
 #include <vle/utils/Debug.hpp>
-
+#include <vle/utils/Algo.hpp>
 
 namespace vle { namespace vpz {
-    
+
 void Classes::write(std::ostream& out) const
 {
     if (not m_lst.empty()) {
         out << "<classes>\n";
-
-        std::transform(begin(), end(), 
+        std::transform(begin(), end(),
                        std::ostream_iterator < Class >(out),
-                       ClassValue());
-
+                       utils::select2nd < ClassList::value_type >());
         out << "</classes>\n";
     }
 }
 
 Class& Classes::add(const std::string& name)
 {
-    Assert(utils::SaxParserError, not exist(name),
-           (boost::format("Class %1% already exist") % name));
+    std::pair < iterator, bool > x;
+    x = m_lst.insert(std::make_pair < std::string, Class >(
+            name, Class(name)));
 
-    return (*m_lst.insert(std::make_pair < std::string, Class >(
-                name, Class(name))).first).second;
+    Assert(utils::ArgError, x.second, boost::format(
+            "Class '%1%' already exist") % name);
+
+    return x.first->second;
 }
 
 void Classes::del(const std::string& name)
@@ -61,8 +59,8 @@ void Classes::del(const std::string& name)
 const Class& Classes::get(const std::string& name) const
 {
     const_iterator it = m_lst.find(name);
-    Assert(utils::SaxParserError, it != end(),
-           (boost::format("Unknow class '%1%'") % name));
+    Assert(utils::ArgError, it != end(),
+           boost::format("Unknow class '%1%'") % name);
 
     return it->second;
 }
@@ -70,8 +68,8 @@ const Class& Classes::get(const std::string& name) const
 Class& Classes::get(const std::string& name)
 {
     iterator it = m_lst.find(name);
-    Assert(utils::SaxParserError, it != end(),
-           (boost::format("Unknow class '%1%'") % name));
+    Assert(utils::ArgError, it != end(),
+           boost::format("Unknow class '%1%'") % name);
 
     return it->second;
 }

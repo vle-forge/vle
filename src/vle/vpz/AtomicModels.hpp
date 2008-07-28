@@ -22,19 +22,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #ifndef VLE_VPZ_ATOMICMODELS_HPP
 #define VLE_VPZ_ATOMICMODELS_HPP
 
 #include <vle/graph/Model.hpp>
+#include <iterator>
 #include <string>
-#include <vector>
+#include <list>
 
 namespace vle { namespace vpz {
 
-    typedef std::vector < std::string > StringVector;
+    /**
+     * @brief Define a list of string for the list of conditions.
+     */
+    typedef std::list < std::string > Strings;
 
     /**
      * @brief The AtomicModel class is used by the AtomicModelList to attach an
@@ -43,55 +44,116 @@ namespace vle { namespace vpz {
     class AtomicModel
     {
     public:
-        AtomicModel(const std::string& conditions,
-                    const std::string& dynamics,
-                    const std::string& observables);
+        /**
+         * @brief Build a new AtomicModel from specific conditions, dynamics and
+         * observables.
+         * @param condition The condition to attach.
+         * @param dynamic The dynamics to attach.
+         * @param observable The observable to attach.
+         */
+        AtomicModel(const std::string& condition,
+                    const std::string& dynamic,
+                    const std::string& observable);
 
-        inline const StringVector& conditions() const
+        /**
+         * @brief Get the list of conditions.
+         * @return List of conditions.
+         */
+        inline const Strings& conditions() const
         { return m_conditions; }
 
+        /**
+         * @brief Get the dynamic.
+         * @return The dynamic.
+         */
         inline const std::string& dynamics() const
         { return m_dynamics; }
 
+        /**
+         * @brief Get the observable.
+         * @return The observable.
+         */
         inline const std::string& observables() const
         { return m_observables; }
 
-        inline void setConditions(const StringVector& vect)
+        /**
+         * @brief Assign a list of condition.
+         * @param vect A list of condition.
+         */
+        inline void setConditions(const Strings& vect)
         { m_conditions = vect; }
 
+        /**
+         * @brief Add a new condition.
+         * @param str The new condition to add.
+         */
+        inline void addCondition(const std::string& str)
+        { m_conditions.push_back(str); }
+
+        /**
+         * @brief Assign the dynamic.
+         * @param str The dynamic.
+         */
         inline void setDynamics(const std::string& str)
         { m_dynamics = str; }
 
+        /**
+         * @brief Assign an observable.
+         * @param str The observable.
+         */
         inline void setObservables(const std::string& str)
         { m_observables = str; }
 
+        /**
+         * @brief Output the AtomicModel informations into a std::ostream.
+         * @param out Output paramter.
+         * @param a An AtomicModel.
+         * @return the out parameter.
+         */
         friend std::ostream& operator<<(std::ostream& out, const AtomicModel& a)
         {
-            return out << "  conditions  : " << a.m_conditions.front() << "\n"
-                       << "  dynamics    : " << a.m_dynamics << "\n"
-                       << "  observables : " << a.m_observables << "\n";
+            out << "conditions: ";
+            std::copy(a.m_conditions.begin(), a.m_conditions.end(),
+                      std::ostream_iterator < std::string >(out, " "));
+            return out << "\ndynamics: " << a.m_dynamics << "\nobservables: "
+                << a.m_observables << "\n";
         }
 
     private:
-        AtomicModel() { }
+        AtomicModel() {}
 
-	StringVector    m_conditions;
-        std::string     m_dynamics;
-        std::string     m_observables;
+	Strings     m_conditions;
+        std::string m_dynamics;
+        std::string m_observables;
     };
 
+    /**
+     * @brief Define a dictionary between a graph::Model* from the hierarchy of
+     * models or from the classes.
+     */
+    typedef std::map < graph::Model*, AtomicModel > AtomicModels;
 
     /**
      * @brief The AtomicModelList class is a dictionary used to attach atomic
      * model to conditions and dynamics names.
      */
-    class AtomicModelList : public std::map < graph::Model*, AtomicModel >
+    class AtomicModelList
     {
     public:
         /**
-         * @brief Add a list of atomicmodels information.
-         * @param atoms list of atomicmodels.
-         * @throw utils::SaxParserError if an model already exist.
+         * @brief A iterator for the atomicmodels.
+         */
+        typedef AtomicModels::iterator iterator;
+
+        /**
+         * @brief A constant iterator for the AtomicModels.
+         */
+        typedef AtomicModels::const_iterator const_iterator;
+
+        /**
+         * @brief Add a list of atomicmodel information.
+         * @param atoms list of atomicmodel.
+         * @throw utils::ArgError if an model already exist.
          */
         void add(const AtomicModelList& atoms);
 
@@ -100,14 +162,14 @@ namespace vle { namespace vpz {
          * @param mdl the graph::Model to attach atomic model information.
          * @param atom the vpz::AtomicModel information.
          * @return a reference to the builded atomicmodel.
-         * @throw utils::SaxParserError if mdl already exist.
+         * @throw utils::ArgError if mdl already exist.
          */
         AtomicModel& add(graph::Model* mdl, const AtomicModel& atom);
 
         /**
          * @brief Get an vpz::Model by his structural reference.
          * @param atom the reference to the structure.
-         * @throw utils::SaxParserError if atom have no dynamics.
+         * @throw utils::ArgError if atom have no dynamics.
          * @return A constant reference to the vpz::Model.
          */
         const AtomicModel& get(graph::Model* atom) const;
@@ -115,7 +177,7 @@ namespace vle { namespace vpz {
         /**
          * @brief Get an vpz::Model by his structural reference.
          * @param atom the reference to the structure.
-         * @throw utils::SaxParserError if atom have no dynamics.
+         * @throw utils::ArgError if atom have no dynamics.
          * @return A constant reference to the vpz::Model.
          */
         AtomicModel& get(graph::Model* atom);
@@ -123,7 +185,7 @@ namespace vle { namespace vpz {
         /**
          * @brief Get an vpz::Model by his structural reference.
          * @param atom the reference to the structure.
-         * @throw utils::SaxParserError if atom have no dynamics.
+         * @throw utils::ArgError if atom have no dynamics.
          * @return A constant reference to the vpz::Model.
          */
         const AtomicModel& get(const graph::Model* atom) const;
@@ -131,23 +193,58 @@ namespace vle { namespace vpz {
         /**
          * @brief Get an vpz::Model by his structural reference.
          * @param atom the reference to the structure.
-         * @throw utils::SaxParserError if atom have no dynamics.
+         * @throw utils::ArgError if atom have no dynamics.
          * @return A constant reference to the vpz::Model.
          */
         AtomicModel& get(const graph::Model* atom);
 
+        /**
+         * @brief Remove all reference into the AtomicModels.
+         */
+        void clear()
+        { m_lst.clear(); }
+
+        /**
+         * @brief Output the AtomicModelList into an output stream.
+         * @param out The output stream.
+         * @param a An AtomicModelList.
+         * @return The output stream.
+         */
         friend std::ostream& operator<<(std::ostream& out,
                                         const AtomicModelList& a)
         {
-            out << "AtomicModelList:\n";
-            for (const_iterator it = a.begin(); it != a.end(); ++it) {
+            out << "AtomicModelList:";
+            for (const_iterator it = a.m_lst.begin(); it != a.m_lst. end();
+                 ++it) {
                 out << "Model [" << it->first << "] " << it->first->getName()
-                    << "\n"
-                    << it->second;
+                    << "\n" << it->second;
             }
             return out;
         }
 
+        /**
+         * @brief Get the AtomicModels.
+         * @return A constant reference to the AtomicModels.
+         */
+        const AtomicModels& atomicmodels() const
+        { return m_lst; }
+
+        /**
+         * @brief Get the begin of the AtomicModels.
+         * @return A constant reference to the begin of the AtomicModels.
+         */
+        const_iterator begin() const
+        { return m_lst.begin(); }
+
+        /**
+         * @brief Get the end of the AtomicModels.
+         * @return A constant reference to the end of the AtomicModels.
+         */
+        const_iterator end() const
+        { return m_lst.end(); }
+
+    private:
+        AtomicModels m_lst;
     };
 
     /**
@@ -165,23 +262,31 @@ namespace vle { namespace vpz {
      */
     struct CopyAtomicModel
     {
-        AtomicModelList& lst;
-        graph::Model& top;
-
+        /**
+         * @brief The constructor.
+         * @param lst The AtomicModelList to add new models.
+         * @param top the hierarchy of models.
+         */
         CopyAtomicModel(AtomicModelList& lst, graph::Model& top) :
-            lst(lst), top(top) { }
+            lst(lst), top(top)
+        {}
 
-        void operator()(const AtomicModelList::value_type& x)
+        /**
+         * @brief Copy the AtomicModels into the AtomicModelList.
+         * @param x the AtomicModel to add.
+         */
+        void operator()(const AtomicModels::value_type& x)
         {
             graph::CoupledModelVector vec;
             x.first->getParents(vec);
             graph::Model* atom = top.getModel(vec, x.first->getName());
 
-            lst.insert(std::make_pair < graph::Model*, AtomicModel >(
-                    atom, x.second));
+            lst.add(atom, x.second);
         }
+    
+        AtomicModelList& lst; //!< the output of this functor.
+        graph::Model& top; //!< the hierarchy of graph::Model.
     };
-
 
 }} // namespace vle vpz
 

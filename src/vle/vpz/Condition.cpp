@@ -22,19 +22,42 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #include <vle/vpz/Condition.hpp>
 #include <vle/utils/Debug.hpp>
+#include <vle/utils/Algo.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/value/Set.hpp>
 
 namespace vle { namespace vpz {
 
-Condition::Condition() :
-    Base()
+value::Value ValueList::get(const std::string& name)
 {
+    iterator it;
+    if ((it = m_lst.find(name)) == end()) {
+        Throw(utils::ArgError, boost::format(
+                "Condition '%1%' does not exist") % name);
+    }
+    return it->second;
+}
+
+void ValueList::add(const std::string& key, const value::Value& val)
+{
+    std::pair < iterator, bool > x;
+
+    x = m_lst.insert(std::make_pair < std::string, value::Value >(key, val));
+
+    Assert(utils::ArgError, x.second, boost::format(
+            "Condition '%1%' already exist") % key);
+}
+
+const value::Value& ValueList::get(const std::string& name) const
+{
+    const_iterator it;
+    if ((it = m_lst.find(name)) == end()) {
+        Throw(utils::ArgError, boost::format(
+                "Condition '%1%' does not exist") % name);
+    }
+    return it->second;
 }
 
 Condition::Condition(const std::string& name) :
@@ -53,39 +76,6 @@ Condition::Condition(const Condition& cnd) :
          it != cnd.m_list.end(); ++it) {
         m_list[it->first] = toSetValue(it->second->clone());
     }
-}
-
-value::Value ValueList::get(const std::string& name)
-{
-    iterator it;
-    if ((it = m_lst.find(name)) == end()) {
-        Throw(utils::SaxParserError, boost::format(
-                "Condition '%1%' does not exist") % name);
-    }
-    return it->second;
-}
-
-void ValueList::add(const std::string& key, const value::Value& val)
-{
-    Assert(utils::SaxParserError, m_lst.find(key) == end(),
-           boost::format("Condition '%1%' already exist") % key);
-
-    m_lst.insert(std::make_pair < std::string, value::Value >(key, val));
-}
-
-bool ValueList::exist(const std::string& name) const
-{
-    return m_lst.find(name) != end();
-}
-
-const value::Value& ValueList::get(const std::string& name) const
-{
-    const_iterator it;
-    if ((it = m_lst.find(name)) == end()) {
-        Throw(utils::SaxParserError, boost::format(
-                "Condition '%1%' does not exist") % name);
-    }
-    return it->second;
 }
 
 void Condition::write(std::ostream& out) const
@@ -114,15 +104,14 @@ void Condition::write(std::ostream& out) const
 void Condition::portnames(std::list < std::string >& lst) const
 {
     lst.resize(m_list.size());
-    std::transform(m_list.begin(), m_list.end(), lst.begin(), PortName());
+    std::transform(m_list.begin(), m_list.end(), lst.begin(),
+                   utils::select1st < ConditionValues::value_type >());
 }
 
 void Condition::add(const std::string& portname)
 {
-    if (m_list.find(portname) == m_list.end()) {
-        m_list.insert(std::make_pair < std::string, value::Set >(
-                portname, value::SetFactory::create()));
-    }
+    m_list.insert(std::make_pair < std::string, value::Set >(
+            portname, value::SetFactory::create()));
     m_last_port.assign(portname);
 }
 
@@ -152,7 +141,7 @@ void Condition::setValueToPort(const std::string& portname,
                                const value::Value& value)
 {
     ConditionValues::iterator it = m_list.find(portname);
-    Assert(utils::SaxParserError, it != m_list.end(),
+    Assert(utils::ArgError, it != m_list.end(),
            boost::format("Condition %1% have no port %2%") %
            m_name % portname);
 
@@ -163,7 +152,7 @@ void Condition::setValueToPort(const std::string& portname,
 void Condition::clearValueOfPort(const std::string& portname)
 {
     ConditionValues::iterator it = m_list.find(portname);
-    Assert(utils::SaxParserError, it != m_list.end(),
+    Assert(utils::ArgError, it != m_list.end(),
            boost::format("Condition %1% have no port %2%") %
            m_name % portname);
 
@@ -180,7 +169,7 @@ ValueList Condition::firstValues() const
         if (it->second->size() > 0) {
             result.add(it->first, it->second->getValue(0));
         } else {
-            Throw(utils::SaxParserError, (boost::format(
+            Throw(utils::ArgError, (boost::format(
                         "Build a empty first values for condition %1%.") %
                     m_name));
         }
@@ -192,7 +181,7 @@ const value::Set& Condition::getSetValues(const std::string& portname) const
 {
     ConditionValues::const_iterator it = m_list.find(portname);
 
-    Assert(utils::SaxParserError, it != m_list.end(),
+    Assert(utils::ArgError, it != m_list.end(),
            boost::format("Condition %1% have no port %2%") %
            m_name % portname);
 
@@ -214,7 +203,7 @@ value::Set& Condition::lastAddedPort()
 {
     ConditionValues::iterator it = m_list.find(m_last_port);
 
-    Assert(utils::SaxParserError, it != m_list.end(),
+    Assert(utils::ArgError, it != m_list.end(),
            boost::format("Condition %1% have no port %2%") %
            m_name % m_last_port);
 

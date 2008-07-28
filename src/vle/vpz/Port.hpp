@@ -22,9 +22,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #ifndef VLE_VPZ_PORT_HPP
 #define VLE_VPZ_PORT_HPP
 
@@ -32,72 +29,162 @@
 
 namespace vle { namespace vpz {
 
+    /**
+     * @brief The In port, only used by the SaxParser.
+     */
     class In : public Base
     {
     public:
-        In() { }
+        /**
+         * @brief Build a new In.
+         */
+        In()
+        {}
 
-        virtual ~In() { }
+        /**
+         * @brief Nothing to delete.
+         */
+        virtual ~In()
+        {}
 
+        /**
+         * @brief Nothing to output.
+         */
         virtual void write(std::ostream& /* out */) const
-        { }
+        {}
 
+        /**
+         * @brief Get the type of this class.
+         * @return IN.
+         */
         virtual Base::type getType() const
         { return IN; }
     };
 
+    /**
+     * @brief The Out port, only used by the SaxParser.
+     */
     class Out : public Base
     {
     public:
-        Out() { }
+        /**
+         * @brief Build a new Out.
+         */
+        Out()
+        {}
 
-        virtual ~Out() { }
+        /**
+         * @brief Nothing to delete.
+         */
+        virtual ~Out()
+        {}
 
+        /**
+         * @brief Nothing to output.
+         */
         virtual void write(std::ostream& /* out */) const
-        { }
+        {}
 
+        /**
+         * @brief Get the type of this class.
+         * @return OUT.
+         */
         virtual Base::type getType() const
         { return OUT; }
     };
 
+    /**
+     * @brief The Init port, only used by the SaxParser.
+     */
     class Init : public Base
     {
     public:
-        Init() { }
+        /**
+         * @brief Build a new Init.
+         */
+        Init()
+        {}
 
-        virtual ~Init() { }
+        /**
+         * @brief Nothing to delete.
+         */
+        virtual ~Init()
+        {}
 
+        /**
+         * @brief Nothing to output.
+         */
         virtual void write(std::ostream& /* out */) const
-        { }
+        {}
 
+        /**
+         * @brief Get the type of this class.
+         * @return INIT.
+         */
         virtual Base::type getType() const
         { return INIT; }
     };
 
+    /**
+     * @brief The State port, only used by the SaxParser.
+     */
     class State : public Base
     {
     public:
-        State() { }
+        /**
+         * @brief Build a new State.
+         */
+        State()
+        {}
 
-        virtual ~State() { }
+        /**
+         * @brief Nothing to delete.
+         */
+        virtual ~State()
+        {}
 
+        /**
+         * @brief Nothing to output.
+         */
         virtual void write(std::ostream& /* out */) const
-        { }
+        {}
 
+        /**
+         * @brief Get the type of this class.
+         * @return STATE.
+         */
         virtual Base::type getType() const
         { return STATE; }
     };
 
+    /**
+     * @brief The Port, only used by the SaxParser.
+     */
     class Port : public Base
     {
     public:
-        Port() { }
+        /**
+         * @brief Build a new Port.
+         */
+        Port()
+        {}
 
-        virtual ~Port() { }
+        /**
+         * @brief Nothing to delete.
+         */
+        virtual ~Port()
+        {}
 
+        /**
+         * @brief Nothing to output.
+         */
         virtual void write(std::ostream& /* out */) const
-        { }
+        {}
 
+        /**
+         * @brief Get the type of this class.
+         * @return PORT.
+         */
         virtual Base::type getType() const
         { return PORT; }
     };

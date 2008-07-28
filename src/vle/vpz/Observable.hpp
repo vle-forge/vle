@@ -22,16 +22,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #ifndef VLE_VPZ_OBSERVABLE_HPP
 #define VLE_VPZ_OBSERVABLE_HPP
 
+#include <vle/vpz/Base.hpp>
 #include <map>
 #include <list>
 #include <string>
-#include <vle/vpz/Base.hpp>
 
 namespace vle { namespace vpz {
 
@@ -58,20 +55,59 @@ namespace vle { namespace vpz {
     class ObservablePort : public Base
     {
     public:
-        ObservablePort(const std::string& portname);
+        /**
+         * @brief Define an iterator to ViewNameList.
+         */
+        typedef ViewNameList::iterator iterator;
 
+        /**
+         * @brief Define a constant iterator to ViewNameList.
+         */
+        typedef ViewNameList::const_iterator const_iterator;
+
+        /**
+         * @brief Build a new ObservablePort with a specific name.
+         * @param portname The name of the port.
+         */
+        ObservablePort(const std::string& portname)
+            : m_name(portname)
+        {}
+
+        /**
+         * @brief Nothing to delete.
+         */
         virtual ~ObservablePort()
-        { }
+        {}
 
+        /**
+         * @brief Write the XML representation of this class.
+         * @code
+         * <port name="name" />
+         * <port name="name2">
+         *  <attachedview name="a" />
+         * </port>
+         * @endcode
+         * @param out
+         */
         virtual void write(std::ostream& out) const;
 
+        /**
+         * @brief Get the type of this class.
+         * @return OBSERVABLEPORT.
+         */
         virtual Base::type getType() const
         { return OBSERVABLEPORT; }
+
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Manage ObservablePort.
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
         /**
          * @brief Add a new view name to the ObservablePort.
          * @param view the view to insert.
-         * @throw utils::SaxParserError if view name already exist.
+         * @throw utils::ArgError if view name already exist.
          */
         void add(const std::string& view);
 
@@ -88,9 +124,11 @@ namespace vle { namespace vpz {
          */
         bool exist(const std::string& view) const;
 
-        ////
-        //// Get/Set functions
-        ////
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Get/Set functions.
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
         /**
          * @brief Return the name of the ObservablePort.
@@ -106,10 +144,43 @@ namespace vle { namespace vpz {
         inline const ViewNameList& viewnamelist() const
         { return m_list; }
 
-    private:
-        ObservablePort()
-        { }
+        /**
+         * @brief Get a constant reference to the ViewNameList.
+         * @return Return a constant reference to the ViewNameList.
+         */
+        inline ViewNameList& viewnamelist()
+        { return m_list; }
 
+        /**
+         * @brief Get a iterator the begin of the ViewNameList.
+         * @return Get a iterator the begin of the ViewNameList.
+         */
+        iterator begin()
+        { return m_list.begin(); }
+
+        /**
+         * @brief Get a iterator the end of the ViewNameList.
+         * @return Get a iterator the end of the ViewNameList.
+         */
+        iterator end()
+        { return m_list.end(); }
+
+        /**
+         * @brief Get a constant iterator the begin of the ViewNameList.
+         * @return Get a constant iterator the begin of the
+         * ViewNameList.
+         */
+        const_iterator begin() const
+        { return m_list.begin(); }
+
+        /**
+         * @brief Get a constant iterator the end of the ViewNameList.
+         * @return Get a constant iterator the end of the ViewNameList.
+         */
+        const_iterator end() const
+        { return m_list.end(); }
+
+    private:
         ViewNameList    m_list;
         std::string     m_name;
     };
@@ -135,35 +206,66 @@ namespace vle { namespace vpz {
     class Observable : public Base
     {
     public:
-        Observable(const std::string& name);
-
-        virtual ~Observable()
-        { }
-
-        virtual void write(std::ostream& out) const;
-
-        virtual Base::type getType() const
-        { return OBSERVABLE; }
+        /**
+         * @brief Define an iterator to ObservablePortList.
+         */
+        typedef ObservablePortList::iterator iterator;
 
         /**
-         * @brief Get a constant reference to the ObservablePortList.
-         * @return Return a constant reference to the ObservablePortList.
+         * @brief Define a constant iterator to ObservablePortList.
          */
-        inline const ObservablePortList& observableportlist() const
-        { return m_list; }
+        typedef ObservablePortList::const_iterator const_iterator;
+
+        /**
+         * @brief Build a new Observable with specified name.
+         * @param name The name of this Observable.
+         */
+        Observable(const std::string& name)
+            : m_name(name)
+        {}
+
+        /**
+         * @brief Nothing to delete.
+         */
+        virtual ~Observable()
+        {}
+
+        /**
+         * @brief Write the XML representation of this class.
+         * @code
+         * <observable name="name">
+         *  [...]
+         * </observable>
+         * @endcode
+         * @param out The output stream parameter.
+         */
+        virtual void write(std::ostream& out) const;
+
+        /**
+         * @brief Get the type of this class.
+         * @return OBSERVABLE.
+         */
+        virtual Base::type getType() const
+        { return OBSERVABLE; }
+     
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Manage the ObservablePortList.
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
         /**
          * @brief Add a new ObservablePort with only a name.
          * @param portname the name of the ObservablePort.
-         * @throw utils::SaxParserError if an ObservablePort already exist.
+         * @throw utils::ArgError if an ObservablePort already exist.
          * @return the newly ObservablePort.
          */
         ObservablePort& add(const std::string& portname);
 
         /**
          * @brief Add a new ObservablePort.
-         * @param portname the name of the ObservablePort.
-         * @throw utils::SaxParserError if an ObservablePort already exist.
+         * @param obs the observable to add.
+         * @throw utils::ArgError if an ObservablePort already exist.
          * @return the newly ObservablePort.
          */
         ObservablePort& add(const ObservablePort& obs);
@@ -171,7 +273,7 @@ namespace vle { namespace vpz {
         /**
          * @brief Get a constant ObservablePort.
          * @param portname the name of the ObservablePort to find.
-         * @throw utils::SaxParserError if no ObservablePort exist.
+         * @throw utils::ArgError if no ObservablePort exist.
          * @return the ObservablePort finded.
          */
         ObservablePort& get(const std::string& portname);
@@ -179,7 +281,7 @@ namespace vle { namespace vpz {
         /**
          * @brief Get a ObservablePort.
          * @param portname the name of the ObservablePort to find.
-         * @throw utils::SaxParserError if no ObservablePort exist.
+         * @throw utils::ArgError if no ObservablePort exist.
          * @return the ObservablePort finded.
          */
         const ObservablePort& get(const std::string& portname) const;
@@ -195,7 +297,7 @@ namespace vle { namespace vpz {
          /**
          * @brief Delete an ObservablePort.
          * @param portname the name of the ObservablePort to delete.
-         * @throw utils::SaxParserError if the ObservablePort doesn't exist.
+         * @throw utils::ArgError if the ObservablePort doesn't exist.
          */
         void del(const std::string& portname);
 
@@ -210,14 +312,30 @@ namespace vle { namespace vpz {
         /**
          * @brief Return a list of portname that are attached to the specified
          * view.
-         * @param viewname The name of the view to get port name.
+         * @param view The name of the view to get port name.
          * @return a list of portname.
          */
         PortNameList getPortname(const std::string& view) const;
 
-        ////
-        //// Get/Set functions.
-        ////
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Get/Set function.
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+     
+        /**
+         * @brief Get a constant reference to the ObservablePortList.
+         * @return Return a constant reference to the ObservablePortList.
+         */
+        inline const ObservablePortList& observableportlist() const
+        { return m_list; }
+
+        /**
+         * @brief Get a constant reference to the ObservablePortList.
+         * @return Return a constant reference to the ObservablePortList.
+         */
+        inline ObservablePortList& observableportlist()
+        { return m_list; }
 
         /**
          * @brief Return true if this observable is a permanent data for the
@@ -230,7 +348,6 @@ namespace vle { namespace vpz {
 
         /**
          * @brief Set the permanent value of this dynamics.
-         *
          * @param value True to conserve this dynamics in devs::ModelFactory.
          */
         inline void permanent(bool value = true)
@@ -242,35 +359,102 @@ namespace vle { namespace vpz {
          */
         inline const std::string& name() const
         { return m_name; }
+     
+        /**
+         * @brief Get a iterator the begin of the ObservablePortList.
+         * @return Get a iterator the begin of the ObservablePortList.
+         */
+        iterator begin()
+        { return m_list.begin(); }
 
-    private:
-        Observable()
-        { }
+        /**
+         * @brief Get a iterator the end of the ObservablePortList.
+         * @return Get a iterator the end of the ObservablePortList.
+         */
+        iterator end()
+        { return m_list.end(); }
 
-        ObservablePortList  m_list;
-        std::string         m_name;
-        bool                m_ispermanent;
+        /**
+         * @brief Get a constant iterator the begin of the ObservablePortList.
+         * @return Get a constant iterator the begin of the
+         * ObservablePortList.
+         */
+        const_iterator begin() const
+        { return m_list.begin(); }
 
-        struct HasView
+        /**
+         * @brief Get a constant iterator the end of the ObservablePortList.
+         * @return Get a constant iterator the end of the ObservablePortList.
+         */
+        const_iterator end() const
+        { return m_list.end(); }
+
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Functors
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+        /**
+         * @brief Predicate functor to check if an Observable is permanent.
+         */
+        struct IsPermanent
         {
-            HasView(const std::string& name) :
-                m_name(name)
-            { }
-
-            inline bool operator()(const ObservablePortList::value_type& pair)
-            { return pair.second.exist(m_name); }
-
-            const std::string& m_name;
+            /**
+             * @brief Check if the Observable is permanent.
+             * @param x The Observable to check.
+             * @return true if Observable is permanent.
+             */
+            inline bool operator()(const Observable& x) const
+            { return x.isPermanent(); }
         };
 
+        /**
+         * @brief Predicate functor to check if an ObservablePort have an View.
+         */
+        struct HasView
+        {
+            /**
+             * @brief Constructor.
+             * @param name The name of the View.
+             */
+            HasView(const std::string& name)
+                : m_name(name)
+            {}
+
+            /**
+             * @brief Check if the specified ObservablePort have the View
+             * m_name.
+             * @param x the ObservablePort to check.
+             * @return True if the ObservablePort have the View.
+             */
+            inline bool operator()(const ObservablePort& x) const
+            { return x.exist(m_name); }
+
+            const std::string& m_name; //!< The name of the View to check.
+        };
+
+        /**
+         * @brief Functor to add view to an ObservablePort.
+         */
         struct AddAttachedViewPortname
         {
+            /**
+             * @brief Constructor to add ObservablePort to the specified
+             * PortNameList.
+             * @param lst The list where attach the ObservablePort.
+             * @param viewname The name of the view.
+             */
             AddAttachedViewPortname(PortNameList& lst,
                                     const std::string& viewname) :
                 m_list(lst),
                 m_viewname(viewname)
-            { }
+            {}
 
+            /**
+             * @brief Add the ObservablePort to the PortNameList if the
+             * ObservablePort is connected to the View m_viewname.
+             */
             inline void operator()(const ObservablePortList::value_type& pair)
             {
                 if (pair.second.exist(m_viewname)) {
@@ -278,9 +462,14 @@ namespace vle { namespace vpz {
                 }
             }
 
-            PortNameList&       m_list;
-            const std::string&  m_viewname;
+            PortNameList& m_list; //!< Output parameter of this functor.
+            const std::string& m_viewname; //!< The name of the View.
         };
+    private:
+        ObservablePortList  m_list;
+        std::string         m_name;
+        bool                m_ispermanent;
+
     };
 
 }} // namespace vle vpz

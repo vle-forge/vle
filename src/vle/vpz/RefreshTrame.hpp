@@ -22,32 +22,48 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #ifndef VLE_VPZ_REFRESHTRAME_HPP
 #define VLE_VPZ_REFRESHTRAME_HPP
 
 #include <vle/vpz/Trame.hpp>
 
-
 namespace vle { namespace vpz {
 
+    /**
+     * @brief The RefreshTrame is send when the need of flush the result.
+     */
     class RefreshTrame : public Trame
     {
     public:
+        /**
+         * @brief Build an empty RefreshTrame.
+         */
         RefreshTrame()
-        { }
+        {}
 
+        /**
+         * @brief Nothing to delete.
+         */
         virtual ~RefreshTrame()
         { }
 
+        /**
+         * @brief Write an XML representation of this class.
+         * @code
+         * <trame type="refresh" />
+         * @endcode
+         * @param out the output stream.
+         */
+        virtual void write(std::ostream& out) const;
+
+        /**
+         * @brief Get the type of this class.
+         * @return TRAME.
+         */
         virtual Base::type getType() const
         { return Base::TRAME; }
-
-        virtual void write(std::ostream& out) const;
     };
 
-}}// namespace vle vpz
+}} // namespace vle vpz
 
 #endif

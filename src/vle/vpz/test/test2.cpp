@@ -22,9 +22,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #define BOOST_TEST_MAIN
 #define BOOST_AUTO_TEST_MAIN
 #define BOOST_TEST_DYN_LINK
@@ -69,7 +66,7 @@ BOOST_AUTO_TEST_CASE(atomicmodel_vpz)
     vpz.parseMemory(xml);
 
     BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
-    BOOST_REQUIRE_CLOSE(vpz.project().version(), 0.5f, 0.01);
+    BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.5");
     BOOST_REQUIRE_EQUAL(vpz.project().date(), "Mon, 12 Feb 2007 23:40:31 +0100");
 
     const vpz::Model& mdl = vpz.project().model();

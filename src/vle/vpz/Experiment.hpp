@@ -22,9 +22,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #ifndef VLE_VPZ_EXPERIMENT_HPP
 #define VLE_VPZ_EXPERIMENT_HPP
 
@@ -35,134 +32,175 @@
 
 namespace vle { namespace vpz {
 
+    /**
+     * @brief The experiment class stores information about experimental
+     * conditions (initials values), observations, replicas, etc.
+     */
     class Experiment : public Base
     {
     public:
+        /**
+         * @brief Build an empty experiment with null duration and seed to 1.
+         */
         Experiment() :
             m_duration(0),
             m_seed(1)
-        { }
+        {}
 
-        virtual ~Experiment() { }
+        /**
+         * @brief Nothing to delete.
+         */
+        virtual ~Experiment()
+        {}
 
-        /** 
+        /**
          * @brief Write Experiment information under specified root node
          * including Replicas, ExperimentalCondition and Views.
+         * @param out Output stream.
          * @code
          * <experiment name="exp1" duration="0.33" seed="65431">
          *   [...]
          * </experiment>
          * @endcode
-         *
          */
         virtual void write(std::ostream& out) const;
 
+        /**
+         * @brief Get the type of this class.
+         * @return The Base::EXPERIMENT.
+         */
         virtual Base::type getType() const
         { return EXPERIMENT; }
 
-        /** 
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Conditions, Views functions
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+     
+        /**
          * @brief Just delete the complete list of information from
          * vpz::Experiment.
          */
         void clear();
 
-        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
-          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
-         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-        const Replicas& replicas() const
-        { return m_replicas; }
-
-        Replicas& replicas()
-        { return m_replicas; }
-
-        const Conditions& conditions() const
-        { return m_conditions; }
-
-        Conditions& conditions()
-        { return m_conditions; }
-
-        const Views& views() const
-        { return m_views; }
-
-        Views& views()
-        { return m_views; }
-
-        void addConditions(const Conditions& c);
-
-        void addViews(const Views& m);
-
-        /** 
+        /**
          * @brief Remove all no permanent value of the Experiement ie.: all
          * observable and condition that are no permanent. This function is use
          * to clean not usefull data for the devs::ModelFactory.
          */
         void cleanNoPermanent();
 
-        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
-          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+        /**
+         * @brief Add the specific Conditions into this Experiment.
+         * @param c The Conditions to add.
+         */
+        void addConditions(const Conditions& c);
+
+        /**
+         * @brief Add the specific Views into this Experiment.
+         * @param m The Views to add.
+         */
+        void addViews(const Views& m);
+
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Get/Set functions
+         *
          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-        /** 
+        /**
+         * @brief Get a constant reference to the Replicas.
+         * @return Get a constant reference to the Replicas.
+         */
+        const Replicas& replicas() const
+        { return m_replicas; }
+
+        /**
+         * @brief Get a reference to the Replicas.
+         * @return Get a reference to the Replicas.
+         */
+        Replicas& replicas()
+        { return m_replicas; }
+
+        /**
+         * @brief Get a constant reference to the Conditions.
+         * @return Get a constant reference to the Conditions.
+         */
+        const Conditions& conditions() const
+        { return m_conditions; }
+
+        /**
+         * @brief Get a reference to the Conditions.
+         * @return Get a reference to the Conditions.
+         */
+        Conditions& conditions()
+        { return m_conditions; }
+
+        /**
+         * @brief Get a constant reference to the Views.
+         * @return Get a constant reference to the Views.
+         */
+        const Views& views() const
+        { return m_views; }
+
+        /**
+         * @brief Get a reference to the Views.
+         * @return Get a reference to the Views.
+         */
+        Views& views()
+        { return m_views; }
+
+        /**
          * @brief Set the Experiment name.
-         * 
          * @param name the Experiment name.
-         *
-         * @throw Exception::Internal if name is empty.
+         * @throw utils::ArgError if name is empty.
          */
         void setName(const std::string& name);
 
-        /** 
+        /**
          * @brief Get the Experiment name.
-         * 
          * @return the Experiment name.
          */
         const std::string& name() const
         { return m_name; }
 
-        /** 
+        /**
          * @brief Set the duration of the Experiment file.
-         * 
          * @param duration The duration to set Experiment file.
-         *
-         * @throw Exception::Internal if duration is <= 0.
+         * @throw utils::ArgError if duration is <= 0.
          */
         void setDuration(double duration);
 
-        /** 
+        /**
          * @brief Get the duration of the Experiment file.
-         * 
          * @return The duration.
          */
         double duration() const
         { return m_duration; }
 
-        /** 
+        /**
          * @brief Set the seed of the Experiment file.
-         * 
          * @param seed The new seed to initialise the random generator.
          */
         void setSeed(guint32 seed)
         { m_seed = seed; }
 
-        /** 
+        /**
          * @brief Get the seed of the Experiment file.
-         * 
          * @return The seed to initialise to random generator.
          */
         guint32 seed() const
         { return m_seed; }
 
-        /** 
+        /**
          * @brief Set the experimental design combination.
-         * 
          * @param name The new name of experimental design combination.
          */
         void setCombination(const std::string& name);
 
-        /** 
+        /**
          * @brief Set the experimental design combination.
-         * 
          * @return the current name of experimental design combination.
          */
         const std::string& combination() const

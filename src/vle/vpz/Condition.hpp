@@ -22,9 +22,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #ifndef VLE_VPZ_CONDITION_HPP
 #define VLE_VPZ_CONDITION_HPP
 
@@ -37,60 +34,139 @@
 
 namespace vle { namespace vpz {
 
-    /** 
+    /**
      * @brief Define the ConditionValues like a dictionnary, (portname, values).
      */
     typedef std::map < std::string, value::Set > ConditionValues;
 
-    /** 
-     * @brief Define the ValueList to a vle::value::MapValue.
+    /**
+     * @brief Define the ConditionValue like a dictionary, (portname, value).
+     */
+    typedef std::map < std::string, value::Value > ConditionValue;
+
+    /**
+     * @brief Define the ValueList, a wrapper to the ConditionValue which
+     * represents the (portname, value) list.
      */
     class ValueList
     {
     public:
-        typedef std::map < std::string, value::Value > value_type;
-        typedef value_type::iterator iterator;
-        typedef value_type::const_iterator const_iterator;
+        /**
+         * @brief Define an iterator to the ConditionValue.
+         */
+        typedef ConditionValue::iterator iterator;
 
+        /**
+         * @brief Define a constant iterator to the ConditionValue.
+         */
+        typedef ConditionValue::const_iterator const_iterator;
+
+        /**
+         * @brief Add a new pair portname, values to the dictionary.
+         * @param key The name of the port.
+         * @param val The value to attach.
+         * @throw utils::ArgError if name already exists.
+         */
+        void add(const std::string& key, const value::Value& val);
+
+        /**
+         * @brief Get a constant reference to the specified Value.
+         * @param name The name of the port to get Value.
+         * @return A constant reference to the Value.
+         * @throw utils::ArgError if name does not exist.
+         */
+        value::Value get(const std::string& name);
+
+        /**
+         * @brief Get a constant reference to the specified Value.
+         * @param name The name of the port to get Value.
+         * @return A constant reference to the Value.
+         * @throw utils::ArgError if name does not exist.
+         */
+        const value::Value& get(const std::string& name) const;
+
+        /**
+         * @brief Check if the port exists.
+         * @param name The name of the port.
+         * @return True if exists, false otherwise.
+         */
+        bool exist(const std::string& name) const
+        { return m_lst.find(name) != end(); }
+
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Get/Set functions.
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+        /**
+         * @brief Get a iterator the begin of the ConditionValue.
+         * @return Get a iterator the begin of the ConditionValue.
+         */
         iterator begin()
         { return m_lst.begin(); }
 
+        /**
+         * @brief Get a constant iterator the begin of the ConditionValue.
+         * @return Get a constant iterator the begin of the ConditionValue.
+         */
         const_iterator begin() const
         { return m_lst.begin(); }
 
+        /**
+         * @brief Get a iterator the end of the ConditionValue.
+         * @return Get a iterator the end of the ConditionValue.
+         */
         iterator end()
         { return m_lst.end(); }
 
+        /**
+         * @brief Get a constant iterator the end of the ConditionValue.
+         * @return Get a constant iterator the end of the ConditionValue.
+         */
         const_iterator end() const
         { return m_lst.end(); }
 
-        void add(const std::string& key, const value::Value& val);
-
-        value::Value get(const std::string& name);
-
-        const value::Value& get(const std::string& name) const;
-
-	bool exist(const std::string& name) const;
-
     private:
-        value_type m_lst;
+        ConditionValue m_lst;
     };
 
-    /** 
+    /**
      * @brief A condition define a couple model name, port name and a Value.
      * This class allow loading and writing a condition.
      */
     class Condition : public Base
     {
     public:
+        /**
+         * @brief Define an iterator to the ConditionValues.
+         */
+        typedef ConditionValues::iterator iterator;
+
+        /**
+         * @brief Define a constant iterator to the ConditionValues.
+         */
+        typedef ConditionValues::const_iterator const_iterator;
+
+        /**
+         * @brief Build a new Condition with only a name.
+         * @param name The name of the condition.
+         */
         Condition(const std::string& name);
 
+        /**
+         * @brief Copy constructor. All values are cloned.
+         * @param cnd The Condition to copy.
+         */
         Condition(const Condition& cnd);
 
-        virtual ~Condition() 
-        { }
+        /**
+         * @brief Nothing to delete.
+         */
+        virtual ~Condition()
+        {}
 
-        /** 
+        /**
          * @brief Add Condition informations to the stream.
          * @code
          * <condition name="">
@@ -99,124 +175,138 @@ namespace vle { namespace vpz {
          *  </port>
          * </condition>
          * @endcode
-         * 
-         * @param out 
+         *
+         * @param out
          */
         virtual void write(std::ostream& out) const;
 
+        /**
+         * @brief Get the type of this class.
+         * @return CONDITION.
+         */
         inline virtual Base::type getType() const
         { return CONDITION; }
 
-        ////
-        //// Manage the ConditionValues
-        ////
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Manage the ConditionValues
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-        /** 
-         * @brief Get a reference to the ConditionValues.
-         * @return A constant reference to the ConditionValues.
-         */
-        inline const ConditionValues& conditionvalues() const
-        { return m_list; }
-
-        /** 
+        /**
          * @brief Build al ist of string that contains all port names.
          * @param lst An output string list.
          */
         void portnames(std::list < std::string >& lst) const;
 
-        /** 
+        /**
          * @brief Add a port to the value list.
          * @param portname name of the port.
          */
         void add(const std::string& portname);
 
-        /** 
+        /**
          * @brief Remove a port of the value list.
          * @param portname name of the port.
          */
         void del(const std::string& portname);
 
-        /** 
+        /**
          * @brief Add a value to a specified port. If port does not exist, it
          * will be create.
-         * @param portname name of the port to add value. 
+         * @param portname name of the port to add value.
          * @param value the value to push.
          */
         void addValueToPort(const std::string& portname,
                             const value::Value& value);
 
-        /** 
+        /**
          * @brief Set a value to a specified port. If port contains already
          * value, these values are deleted.
-         * @param portname The name of the port to add value. 
+         * @param portname The name of the port to add value.
          * @param value the value to push.
-         * @throw utils::SaxParserError if portname does not exist.
+         * @throw utils::ArgError if portname does not exist.
          */
         void setValueToPort(const std::string& portname,
                             const value::Value& value);
 
-        /** 
+        /**
          * @brief Clear the specified port.
          * @param portname The name of the port to clear.
-         * @throw utils::SaxParserError if portname does not exist.
+         * @throw utils::ArgError if portname does not exist.
          */
         void clearValueOfPort(const std::string& portname);
 
-        ////
-        //// Get/Set function
-        ////
-
-        /** 
-         * @brief Return the name of the condition.
-         * @return 
-         */
-        inline const std::string& name() const
-        { return m_name; }
-
-        /** 
+        /**
          * @brief Build a new ValueList based on the SetList with only the
          * first value for each Set.
          * @return A cloned ValueList based on the SetList.
          */
         ValueList firstValues() const;
 
-        /** 
+        /**
          * @brief Get the value::Set attached to a port.
          * @param portname The name of the port.
          * @return A reference to a value::Set.
-         * @throw Exception::Internal if portname not exist.
+         * @throw utils::ArgError if portname not exist.
          */
         const value::Set& getSetValues(const std::string& portname) const;
 
-        /** 
+        /**
          * @brief Return a reference to the first value::Value of the specified
          * port.
          * @param portname the name of the port to test.
          * @return A reference to a value::Value.
-         * @throw Exception::Internal if portname not exist.
+         * @throw utils::ArgError if portname not exist.
          */
         const value::Value& firstValue(const std::string& portname) const;
 
-        /** 
+        /**
          * @brief Return a reference to the nth value::Value of the specified
          * port.
          * @param portname the name of the specified port.
          * @param i the value of the port.
          * @return A reference to a value::Value.
-         * @throw Exception::Internal if portname not exist or if value list
+         * @throw utils::ArgError if portname not exist or if value list
          * have no nth value.
          */
         const value::Value& nValue(const std::string& portname, size_t i) const;
 
-        /** 
+        /**
          * @brief Return a reference to the value::Set of the latest added port.
          * This function is principaly used in Sax parser.
          * @return A reference to the value::Set of the port.
-         * @throw Exception::Internal if port does not exist.
+         * @throw utils::ArgError if port does not exist.
          */
         value::Set& lastAddedPort();
 
-        /** 
+        /**
+         * @brief This function initialise every, to each port, a new
+         * value::Set.
+         */
+        void rebuildValueSet();
+
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Get/Set functions.
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+        /**
+         * @brief Get a reference to the ConditionValues.
+         * @return A constant reference to the ConditionValues.
+         */
+        inline const ConditionValues& conditionvalues() const
+        { return m_list; }
+
+        /**
+         * @brief Return the name of the condition.
+         * @return
+         */
+        inline const std::string& name() const
+        { return m_name; }
+
+        /**
          * @brief Return true if this condition is a permanent data for the
          * devs::ModelFactory.
          * @return True if this condition is a permanent value.
@@ -224,43 +314,53 @@ namespace vle { namespace vpz {
         inline bool isPermanent() const
         { return m_ispermanent; }
 
-        /** 
+        /**
          * @brief Set the permanent value of this condition.
          * @param value True to conserve this condition in devs::ModelFactory.
          */
         inline void permanent(bool value = true)
         { m_ispermanent = value; }
 
-        /** 
-         * @brief This function initialise every, to each port, a new
-         * value::Set.
-         */
-        void rebuildValueSet();
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Functors
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-        ////
-        //// Functors
-        ////
-
-        /** 
-         * @brief Functor to get the name of a ConditionValues. To use with
-         * std::transform.
+        /**
+         * @brief Predicate functor to check if this condition is permanet or
+         * not. To use with std::find_if:
+         * Example:
+         * @code
+         * std::vector < Condition > v;
+         * [...]
+         * std::vector < Condition >::iterator it =
+         *    std::find_if(v.beging(), v.end(), Condition::IsPermanent());
+         * @endcode
          */
-        struct PortName
+        struct IsPermanent
         {
-            inline const std::string& operator()(
-                const ConditionValues::value_type& x) const
-            { return x.first; }
+            /**
+             * @brief Check if the Condition is permanent.
+             * @param x the Condition to check.
+             * @return True if the Condition is permanent.
+             */
+            bool operator()(const Condition& x) const
+            { return x.isPermanent(); }
         };
 
-        /** 
-         * @brief Functor to get the values of a ConditionValues. To use with
-         * std::transform.
+        /**
+         * @brief Unary function to rebuild the value set (ie. restore all Set
+         * with empty vector). To use with std::for_each or vle::for_each.
          */
-        struct PortValue
+        struct RebuildValueSet
         {
-            inline const value::Set& operator()(
-                const ConditionValues::value_type& x) const
-            { return x.second; }
+            /**
+             * @brief Rebuild the Value of the specified Condition.
+             * @param x the Condition to rebuild the Value.
+             */
+            void operator()(Condition& x) const
+            { x.rebuildValueSet(); }
         };
 
     private:

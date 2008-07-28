@@ -22,9 +22,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #ifndef VLE_VPZ_DYNAMICS_HPP
 #define VLE_VPZ_DYNAMICS_HPP
 
@@ -33,144 +30,199 @@
 
 namespace vle { namespace vpz {
 
-    /** 
+    /**
      * @brief Define a list of Dynamcis.
      */
     typedef std::map < std::string, Dynamic > DynamicList;
 
+    /**
+     * @brief The vpz::Dynamics class wrap the DynamicList and provides
+     * functions to access it.
+     */
     class Dynamics : public Base
     {
     public:
-        Dynamics()
-        { }
-       
-        virtual ~Dynamics()
-        { }
+        /**
+         * @brief A iterator to DynamicList.
+         */
+        typedef DynamicList::iterator iterator;
 
-        /** 
+        /**
+         * @brief A constant iterator to DynamicList.
+         */
+        typedef DynamicList::const_iterator const_iterator;
+
+        /**
+         * @brief Build a new Dynamics.
+         */
+        Dynamics()
+        {}
+
+        /**
+         * @brief Nothing to delete.
+         */
+        virtual ~Dynamics()
+        {}
+
+        /**
          * @brief Write the Dynamics information into stream
-         * @code.
+         * @code
          * <dynamics>
          *  [...]
          * </dynamics>
          * @endcode
-         * 
-         * @param out, the output stream.
+         * @param out the output stream.
          */
-        virtual void write(std::ostream&  out) const;
+        virtual void write(std::ostream& out) const;
 
+        /**
+         * @brief Get the type of this class.
+         * @return DYNAMICS.
+         */
         virtual Base::type getType() const
         { return DYNAMICS; }
 
-        ////
-        //// Manage the DynamicList
-        ////
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Manage the DynamicList
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-        /** 
-         * @brief Get a constant reference to the DynamicList.
-         * @return Get a constant reference to the DynamicList.
-         */
-        inline const DynamicList& dynamiclist() const
-        { return m_list; }
-
-        /** 
+        /**
          * @brief Add a list of Dynamics to the list.
          * @param dyns A Dynamics objet to add.
-         * @throw Exception::Internal if a Dynamic already exist.
+         * @throw utils::ArgError if a Dynamic already exist.
          */
         void add(const Dynamics& dyns);
 
-        /** 
+        /**
          * @brief Add a Dynamic to the list.
          * @param dyn the Dynamic to add.
          * @return a reference to the newly created dynamics.
-         * @throw Exception::Internal if a dynamic with the same model name
-         * already exist.
+         * @throw utils::ArgError if a dynamic with the same model name already
+         * exist.
          */
         Dynamic& add(const Dynamic& dyn);
 
-        /** 
+        /**
          * @brief Delete the dynamic for a specific model name.
          * @param name the name of the model.
          */
         void del(const std::string& name);
 
-        /** 
+        /**
          * @brief Remove all Dynamic from the DynamicList.
          */
         inline void clear()
         { m_list.clear(); }
 
-        /** 
+        /**
          * @brief Search a Dynamic with the specified name.
          * @param name Dynamic name to find.
          * @return A constant reference to the Dynamic find.
-         * @throw Exception::Internal if no Dynamic find.
+         * @throw utils::ArgError if no Dynamic find.
          */
         const Dynamic& get(const std::string& name) const;
 
-        /** 
+        /**
          * @brief Search a Dynamic with the specified name.
-         * 
          * @param name Dynamic name to find.
-         * 
          * @return A constant reference to the Dynamic find.
-         *
-         * @throw Exception::Internal if no Dynamic find.
+         * @throw utils::ArgError if no Dynamic find.
          */
         Dynamic& get(const std::string& name);
 
-        /** 
+        /**
          * @brief Search a Dynamic with the specified name.
-         * 
          * @param name Dynamic name to find.
-         * 
-         * @return true if founded, false otherwise.
+         * @throw utils::ArgError if no Dynamic find.
          */
-        bool exist(const std::string& name) const;
+        bool exist(const std::string& name) const
+        { return m_list.find(name) != end(); }
 
-        /** 
+        /**
          * @brief Remove all no permanent value of the list. This function is
          * use to clean not usefull data for the devs::ModelFactory. Linear
          * function.
          */
         void cleanNoPermanent();
 
-        ////
-        //// Functors
-        ////
-
-        /** 
-         * @brief Functor to get the name of a Dynamic.
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Get/Set
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+    
+        /**
+         * @brief Get a constant reference to the vpz::DynamicList.
+         * @return Get a constant reference to the vpz::DynamicList.
          */
-        struct DynamicName
-        {
-            inline const std::string& operator()(
-                const DynamicList::value_type& x) const
-            { return x.first; }
-        };
+        inline const DynamicList& dynamiclist() const
+        { return m_list; }
 
-        /** 
-         * @brief Functor to get the value of a Dynamic.
+        /**
+         * @brief Get a reference to the vpz::DynamicList.
+         * @return Get a reference to the vpz::DynamicList.
          */
-        struct DynamicValue
-        {
-            inline const Dynamic& operator()(
-                const DynamicList::value_type& x) const
-            { return x.second; }
-        };
+        inline DynamicList& dynamiclist()
+        { return m_list; }
+    
+        /**
+         * @brief Get a iterator the begin of the vpz::DynamicList.
+         * @return Get a iterator the begin of the vpz::DynamicList.
+         */
+        iterator begin()
+        { return m_list.begin(); }
 
-        /** 
-         * @brief Functor to add a dynamic to a dynamics.
+        /**
+         * @brief Get a iterator the end of the vpz::DynamicList.
+         * @return Get a iterator the end of the vpz::DynamicList.
+         */
+        iterator end()
+        { return m_list.end(); }
+
+        /**
+         * @brief Get a constant iterator the begin of the vpz::DynamicList.
+         * @return Get a constant iterator the begin of the
+         * vpz::DynamicList.
+         */
+        const_iterator begin() const
+        { return m_list.begin(); }
+
+        /**
+         * @brief Get a constant iterator the end of the vpz::DynamicList.
+         * @return Get a constant iterator the end of the vpz::DynamicList.
+         */
+        const_iterator end() const
+        { return m_list.end(); }
+
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Functors
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+        /**
+         * @brief Functor to add a Dynamic to a DynamicList.
          */
         struct AddDynamic
         {
-            AddDynamic(Dynamics& dynamics) : m_dynamics(dynamics) { }
+            /**
+             * @brief Constructor to add a Dynamic to a Dynamics.
+             * @param dynamics The Dynamics that stores new Dynamic.
+             */
+            AddDynamic(Dynamics& dynamics)
+                : m_dynamics(dynamics)
+            {}
 
+            /**
+             * @brief Add the DynamicList to the Dynamics.
+             * @param pair the DynamicList to add.
+             */
             void operator()(const DynamicList::value_type& pair)
             { m_dynamics.add(pair.second); }
 
-            Dynamics& m_dynamics;
+            Dynamics& m_dynamics; //!< the output parameter.
         };
     private:
         DynamicList     m_list;

@@ -22,12 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #include <vle/vpz/Class.hpp>
 #include <algorithm>
-
 
 namespace vle { namespace vpz {
 
@@ -45,9 +41,9 @@ Class::Class(const Class& cls) :
 
 void Class::write(std::ostream& out) const
 {
-    out << "<class name=\"" << m_name << "\" >\n"
-        << m_model
-        << "</class>\n";
+    out << "<class name=\"" << m_name << "\" >\n";
+    m_model->writeXML(out);
+    out << "</class>\n";
 }
 
 }} // namespace vle vpz

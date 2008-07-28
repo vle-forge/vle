@@ -128,7 +128,7 @@ void ModelFactory::addPermanent(const vpz::Observable& observable)
 void ModelFactory::createModel(Coordinator& coordinator,
                                graph::AtomicModel* model,
                                const std::string& dynamics,
-                               const vpz::StringVector& conditions,
+                               const vpz::Strings& conditions,
                                const std::string& observable)
 {
     const SimulatorMap& result(coordinator.modellist()); 
@@ -140,7 +140,7 @@ void ModelFactory::createModel(Coordinator& coordinator,
 
     vpz::ValueList initValues;
     if (not conditions.empty()) {
-	for (vpz::StringVector::const_iterator it = conditions.begin();
+	for (vpz::Strings::const_iterator it = conditions.begin();
 	     it != conditions.end(); ++it) {
 	    const vpz::Condition& cnd(mExperiment.conditions().get(*it));
 	    vpz::ValueList vl = cnd.firstValues();

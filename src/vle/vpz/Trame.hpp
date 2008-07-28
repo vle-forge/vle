@@ -22,9 +22,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #ifndef VLE_VPZ_TRAME_HPP
 #define VLE_VPZ_TRAME_HPP
 
@@ -33,40 +30,82 @@
 #include <ostream>
 #include <string>
 
-
-
 namespace vle { namespace vpz {
 
+    /**
+     * @brief Trame inherits from Base class and build a hierarchy of Trame
+     * (EndTrame, VLETrame, ValueTrame, DelObservableTrame,
+     * NewObservableTrame). Trame is a virtual class.
+     */
     class Trame : public Base
     {
     public:
+        /**
+         * @brief Build a new Trame.
+         */
         Trame()
-        { }
+        {}
 
+        /**
+         * @brief Nothing to delete.
+         */
         virtual ~Trame()
-        { }
+        {}
 
+        /**
+         * @brief Get the type of this class.
+         * @return Nothing, pure virtual function.
+         */
         virtual Base::type getType() const = 0;
 
+        /**
+         * @brief Write the XML representation of this class.
+         * @param out The output stream.
+         */
         virtual void write(std::ostream& out) const = 0;
     };
 
+    /**
+     * @brief Define a list of trame.
+     */
     typedef std::list < Trame* > TrameList;
 
+    /**
+     * @brief VLETrame inherits of Trame and is used to wrap all other Trame
+     * into the OOV protocol.
+     * @code
+     * <vle_trame>
+     *  [...] // other trame.
+     * </vle_trame>
+     * @endcode
+     */
     class VLETrame : public Trame
     {
     public:
+        /**
+         * @brief Bulid an empty VLETrame.
+         */
         VLETrame()
-        { }
+        {}
 
+        /**
+         * @brief Nothing to delete.
+         */
         virtual ~VLETrame()
-        { }
+        {}
 
+        /**
+         * @brief Get the type of this class.
+         * @return TRAME.
+         */
         virtual Base::type getType() const
         { return Base::TRAME; }
 
+        /**
+         * @brief Write the XML representation of this class.
+         */
         virtual void write(std::ostream& /* out */) const
-        { }
+        {}
     };
 
 }} // namespace vle vpz

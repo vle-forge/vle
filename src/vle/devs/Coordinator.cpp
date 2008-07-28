@@ -223,7 +223,7 @@ void Coordinator::addPermanent(const vpz::Observable& observable)
 
 void Coordinator::createModel(graph::AtomicModel* model,
                               const std::string& dynamics,
-                              const vpz::StringVector& conditions,
+                              const vpz::Strings& conditions,
                               const std::string& observable)
 {
     m_modelFactory.createModel(*this, model, dynamics, conditions,

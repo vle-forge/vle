@@ -22,11 +22,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #include <vle/vpz/Outputs.hpp>
 #include <vle/utils/Debug.hpp>
+#include <vle/utils/Algo.hpp>
 
 namespace vle { namespace vpz {
 
@@ -34,12 +32,9 @@ void Outputs::write(std::ostream& out) const
 {
     if (not m_list.empty()) {
         out << "<outputs>\n";
-
-        for (OutputList::const_iterator it = m_list.begin();
-             it != m_list.end(); ++it) {
-            it->second.write(out);
-        }
-
+        std::transform(begin(), end(),
+                       std::ostream_iterator < Output >(out, "\n"),
+                       utils::select2nd < OutputList::value_type >());
         out << "</outputs>\n";
     }
 }
@@ -66,34 +61,35 @@ Output& Outputs::addDistantStream(const std::string& name,
 
 void Outputs::del(const std::string& name)
 {
-    OutputList::iterator it = m_list.find(name);
+    iterator it = m_list.find(name);
 
-    if (it != m_list.end()) {
+    if (it != end()) {
         m_list.erase(it);
     }
 }
 
 void Outputs::add(const Outputs& o)
 {
-    std::for_each(o.outputlist().begin(),
-                  o.outputlist().end(),
-                  AddOutput(*this));
+    std::for_each(o.begin(), o.end(), AddOutput(*this));
 }
 
 Output& Outputs::add(const Output& o)
 {
-    Assert(utils::SaxParserError, not exist(o.name()),
-           boost::format("An output have already this name '%1%'\n") %
-           o.name());
+    std::pair < iterator, bool > x;
 
-    return (*m_list.insert(std::make_pair < std::string, Output >(
-                o.name(), o)).first).second;
+    x = m_list.insert(std::make_pair < std::string, Output >( o.name(), o));
+
+    Assert(utils::ArgError, x.second, boost::format(
+            "An output have already this name '%1%'\n") %
+        o.name());
+
+    return x.first->second;
 }
 
 Output& Outputs::get(const std::string& name)
 {
-    OutputList::iterator it = m_list.find(name);
-    Assert(utils::SaxParserError, it != m_list.end(),
+    iterator it = m_list.find(name);
+    Assert(utils::ArgError, it != end(),
            boost::format("Unknow output '%1%'\n") % name);
 
     return it->second;
@@ -101,18 +97,19 @@ Output& Outputs::get(const std::string& name)
 
 const Output& Outputs::get(const std::string& name) const
 {
-    OutputList::const_iterator it = m_list.find(name);
-    Assert(utils::SaxParserError, it != m_list.end(),
+    const_iterator it = m_list.find(name);
+    Assert(utils::ArgError, it != end(),
            boost::format("Unknow output '%1%'\n") % name);
 
     return it->second;
 }
 
-std::list < std::string > Outputs::outputsname() const
+std::vector < std::string > Outputs::outputsname() const
 {
-    std::list < std::string > result;
+    std::vector < std::string > result(m_list.size());
 
-    std::for_each(m_list.begin(), m_list.end(), AddOutputName(result));
+    std::transform(begin(), end(), result.begin(),
+                   utils::select1st < OutputList::value_type >());
 
     return result;
 }

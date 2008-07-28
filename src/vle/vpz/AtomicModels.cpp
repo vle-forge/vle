@@ -22,20 +22,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #include <vle/vpz/AtomicModels.hpp>
 #include <vle/utils/Debug.hpp>
 
 namespace vle { namespace vpz {
-    
+
 AtomicModel::AtomicModel(const std::string& conditions,
 			 const std::string& dynamics,
 			 const std::string& observables) :
     m_dynamics(dynamics),
     m_observables(observables)
-{ 
+{
     std::string conditionList(conditions);
     boost::trim(conditionList);
 
@@ -50,7 +47,8 @@ AtomicModel::AtomicModel(const std::string& conditions,
 
 void AtomicModelList::add(const AtomicModelList& atoms)
 {
-    for (const_iterator it = atoms.begin(); it != atoms.end(); ++it) {
+    for (const_iterator it = atoms.atomicmodels().begin();
+         it != atoms.atomicmodels().end(); ++it) {
         add(it->first, it->second);
     }
 }
@@ -58,20 +56,20 @@ void AtomicModelList::add(const AtomicModelList& atoms)
 AtomicModel& AtomicModelList::add(graph::Model* mdl,
                                   const AtomicModel& atom)
 {
-    const_iterator it = find(mdl);
-    Assert(utils::SaxParserError, it == end(),
-           (boost::format("The model %1% already have external information")
-            % mdl->getName()));
+    const_iterator it = m_lst.find(mdl);
+    Assert(utils::ArgError, it == end(), boost::format(
+            "The model [%1%] already have external information")
+            % mdl->getName());
 
-    return (*insert(std::make_pair < graph::Model*, AtomicModel >(
+    return (*m_lst.insert(std::make_pair < graph::Model*, AtomicModel >(
                 mdl, atom)).first).second;
 }
 
 const AtomicModel& AtomicModelList::get(graph::Model* atom) const
 {
-    const_iterator it = find(atom);
+    const_iterator it = m_lst.find(atom);
     if (it == end()) {
-        Throw(utils::SaxParserError, boost::format(
+        Throw(utils::ArgError, boost::format(
                 "The information about atomic model [%1%] does not exist") %
             atom->getName());
     }
@@ -80,9 +78,9 @@ const AtomicModel& AtomicModelList::get(graph::Model* atom) const
 
 AtomicModel& AtomicModelList::get(graph::Model* atom)
 {
-    iterator it = find(atom);
+    iterator it = m_lst.find(atom);
     if (it == end()) {
-        Throw(utils::SaxParserError, boost::format(
+        Throw(utils::ArgError, boost::format(
                 "The information about atomic model [%1%] does not exist") %
                     atom->getName());
     }
@@ -91,9 +89,9 @@ AtomicModel& AtomicModelList::get(graph::Model* atom)
 
 const AtomicModel& AtomicModelList::get(const graph::Model* atom) const
 {
-    const_iterator it = find(const_cast < graph::Model* >(atom));
+    const_iterator it = m_lst.find(const_cast < graph::Model* >(atom));
     if (it == end()) {
-        Throw(utils::SaxParserError, boost::format(
+        Throw(utils::ArgError, boost::format(
                 "The information about atomic model [%1%] does not exist") %
             atom->getName());
     }
@@ -102,9 +100,9 @@ const AtomicModel& AtomicModelList::get(const graph::Model* atom) const
 
 AtomicModel& AtomicModelList::get(const graph::Model* atom)
 {
-    iterator it = find(const_cast < graph::Model* >(atom));
+    iterator it = m_lst.find(const_cast < graph::Model* >(atom));
     if (it == end()) {
-        Throw(utils::SaxParserError, boost::format(
+        Throw(utils::ArgError, boost::format(
                 "The information about atomic model [%1%] does not exist") %
                     atom->getName());
     }

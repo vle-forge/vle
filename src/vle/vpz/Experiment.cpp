@@ -22,9 +22,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #include <vle/vpz/Experiment.hpp>
 #include <vle/utils/Debug.hpp>
 
@@ -71,7 +68,7 @@ void Experiment::addViews(const Views& m)
 
 void Experiment::setName(const std::string& name)
 {
-    Assert(utils::SaxParserError, not name.empty(),
+    Assert(utils::ArgError, not name.empty(),
            "Empty experiment name");
 
     m_name.assign(name);
@@ -85,7 +82,7 @@ void Experiment::cleanNoPermanent()
 
 void Experiment::setDuration(double duration)
 {
-    Assert(utils::SaxParserError, duration > 0, boost::format(
+    Assert(utils::ArgError, duration > 0, boost::format(
             "Experiment duraction error: %1% (must be > 0") % duration);
 
     m_duration = duration;
@@ -93,7 +90,7 @@ void Experiment::setDuration(double duration)
 
 void Experiment::setCombination(const std::string& name)
 {
-    Assert(utils::SaxParserError, name == "linear" or name == "total",
+    Assert(utils::ArgError, name == "linear" or name == "total",
            boost::format("Unknow combination '%1%'") % name);
 
     m_combination.assign(name);

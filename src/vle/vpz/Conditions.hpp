@@ -22,9 +22,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #ifndef VLE_VPZ_CONDITIONS_HPP
 #define VLE_VPZ_CONDITIONS_HPP
 
@@ -47,10 +44,27 @@ namespace vle { namespace vpz {
     class Conditions : public Base
     {
     public:
-        Conditions();
+        /**
+         * @brief Define an iterator to the vpz::ConditionList.
+         */
+        typedef ConditionList::iterator iterator;
 
+        /**
+         * @brief Define a constant iterator to the vpz::ConditionList.
+         */
+        typedef ConditionList::const_iterator const_iterator;
+
+        /**
+         * @brief Build a new vpz::Conditions.
+         */
+        Conditions()
+        {}
+
+        /**
+         * @brief Nothing to delete.
+         */
         virtual ~Conditions()
-        { }
+        {}
 
         /**
          * @brief Add Conditions informations to the stream.
@@ -62,31 +76,22 @@ namespace vle { namespace vpz {
          *  </condition>
          * </conditions>
          * @endcode
-         *
-         * @param out
+         * @param out a output stream where write the classes tags.
          */
         virtual void write(std::ostream& out) const;
 
+        /**
+         * @brief Get the type of this class.
+         * @return CONDITIONS.
+         */
         virtual Base::type getType() const
         { return CONDITIONS; }
 
-        ////
-        //// Manage ConditionList
-        ////
-
-        /**
-         * @brief Get a constant reference to the ConditionList.
-         * @return A constant reference to the ConditionList.
-         */
-        inline const ConditionList& conditionlist() const
-        { return m_list; }
-
-        /**
-         * @brief Get a reference to the ConditionList.
-         * @return A reference to the ConditionList.
-         */
-        inline ConditionList& conditionlist()
-        { return m_list; }
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Manage ConditionList
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
         /**
          * @brief Build a list of string that contains all condition names.
@@ -99,7 +104,7 @@ namespace vle { namespace vpz {
          * specified condition.
          * @param condition The condition to get port name.
          * @param lst An output string list.
-         * @throw utils::InternalError if condition not exist.
+         * @throw utils::ArgError if condition not exist.
          */
         void portnames(const std::string& condition,
                        std::list < std::string >& lst) const;
@@ -107,7 +112,7 @@ namespace vle { namespace vpz {
         /**
          * @brief Add a list of Conditions to the list.
          * @param conditions A Conditions object to add.
-         * @throw Exception::Internal if a Condition already exist.
+         * @throw utils::ArgError if a Condition already exist.
          */
         void add(const Conditions& conditions);
 
@@ -116,15 +121,14 @@ namespace vle { namespace vpz {
          * @param condition the condition to add into the map. Condition is
          * copied.
          * @return the newly created Condition.
-         * @throw Exception::Internal if condition with same name and port
-         * already exist.
+         * @throw utils::ArgError if condition with same name and port already
+         * exist.
          */
         Condition& add(const Condition& condition);
 
         /**
-         * @brief Delete the specified condition from the conditions list.
-         * @param modelname condition model name.
-         * @param portname condition port name.
+         * @brief Delete the specified condition from the condition list.
+         * @param condition The name of the condition.
          */
         void del(const std::string& condition);
 
@@ -169,9 +173,60 @@ namespace vle { namespace vpz {
          */
         void rebuildValueSet();
 
-        ////
-        //// Functor
-        ////
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Get/Set
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+        /**
+         * @brief Get a constant reference to the ConditionList.
+         * @return A constant reference to the ConditionList.
+         */
+        inline const ConditionList& conditionlist() const
+        { return m_list; }
+
+        /**
+         * @brief Get a reference to the ConditionList.
+         * @return A reference to the ConditionList.
+         */
+        inline ConditionList& conditionlist()
+        { return m_list; }
+
+        /**
+         * @brief Get a iterator the begin of the vpz::ConditionList.
+         * @return Get a iterator the begin of the vpz::ConditionList.
+         */
+        iterator begin()
+        { return m_list.begin(); }
+
+        /**
+         * @brief Get a iterator the end of the vpz::ConditionList.
+         * @return Get a iterator the end of the vpz::ConditionList.
+         */
+        iterator end()
+        { return m_list.end(); }
+
+        /**
+         * @brief Get a constant iterator the begin of the vpz::ConditionList.
+         * @return Get a constant iterator the begin of the
+         * vpz::ConditionList.
+         */
+        const_iterator begin() const
+        { return m_list.begin(); }
+
+        /**
+         * @brief Get a constant iterator the end of the vpz::ConditionList.
+         * @return Get a constant iterator the end of the vpz::ConditionList.
+         */
+        const_iterator end() const
+        { return m_list.end(); }
+
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Functors
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
         /**
          * @brief Functor to add condition to the ConditionList. To use with the
@@ -179,46 +234,22 @@ namespace vle { namespace vpz {
          */
         struct AddCondition
         {
-            AddCondition(Conditions& conditions) :
-                m_conditions(conditions)
-            { }
+            /**
+             * @brief A constructor to add Condition the the Conditions.
+             * @param conditions The Conditions that sotres Condition.
+             */
+            AddCondition(Conditions& conditions)
+                : m_conditions(conditions)
+            {}
 
+            /**
+             * @brief Add the ConditionList to the Conditions.
+             * @param pair the ConditionList to add.
+             */
             void operator()(const ConditionList::value_type& pair)
             { m_conditions.add(pair.second); }
 
-            Conditions& m_conditions;
-        };
-
-        /**
-         * @brief Functor to call the rebuildValueSet for a specified
-         * ConditionList. To use with the std::for_each algorithm.
-         */
-        struct RebuildValueSet
-        {
-            inline void operator()(ConditionList::value_type& pair)
-            { pair.second.rebuildValueSet(); }
-        };
-
-        /**
-         * @brief Functor to get the name of a Condition from the ConditionList.
-         * To use with the std::transform.
-         */
-        struct ConditionName
-        {
-            inline const std::string& operator()(
-                const ConditionList::value_type& x) const
-            { return x.first; }
-        };
-
-        /**
-         * @brief Functor to get the Condition object from the ConditionList. To
-         * use with the std::transform.
-         */
-        struct ConditionValue
-        {
-            inline const Condition& operator()(
-                const ConditionList::value_type& x) const
-            { return x.second; }
+            Conditions& m_conditions; //!< Output of this functor.
         };
 
     private:

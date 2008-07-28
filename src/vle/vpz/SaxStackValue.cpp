@@ -22,9 +22,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #include <vle/vpz/SaxStackValue.hpp>
 
 namespace vle { namespace vpz {
@@ -76,7 +73,7 @@ void ValueStackSax::pushMap()
     pushOnVectorValue(value::MapFactory::create());
 }
 
-void ValueStackSax::pushMapKey(const Glib::ustring& key)
+void ValueStackSax::pushMapKey(const std::string& key)
 {
     if (not m_valuestack.empty()) {
         AssertS(utils::SaxParserError, m_valuestack.top()->isMap());
@@ -190,6 +187,5 @@ void ValueStackSax::clear()
 
     m_result.clear();
 }
-
 
 }} // namespace vle vpz

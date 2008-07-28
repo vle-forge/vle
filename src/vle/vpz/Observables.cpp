@@ -22,12 +22,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #include <vle/vpz/Observables.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Debug.hpp>
+#include <vle/utils/Algo.hpp>
+#include <iterator>
+#include <algorithm>
 
 namespace vle { namespace vpz {
 
@@ -35,67 +35,57 @@ void Observables::write(std::ostream& out) const
 {
     if (not empty()) {
         out << "<observables>\n";
-        for (ObservableList::const_iterator it = m_list.begin();
-             it != m_list.end(); ++it) {
-            out << it->second;
-        }
+        std::transform(begin(), end(),
+                       std::ostream_iterator < Observable >(out, "\n"),
+                       utils::select2nd < ObservableList::value_type >());
         out << "</observables>\n";
     }
 }
 
 void Observables::add(const Observables& obs)
 {
-    std::for_each(obs.observablelist().begin(),
-                  obs.observablelist().end(),
-                  AddObservable(*this));
+    std::for_each(obs.begin(), obs.end(), AddObservable(*this));
 }
 
 Observable& Observables::add(const Observable& obs)
 {
-    Assert(utils::SaxParserError, not exist(obs.name()),
-           (boost::format("Observable %1% already exist") % obs.name()));
+    std::pair < iterator, bool > x;
 
-    return (*m_list.insert(std::make_pair < std::string, Observable >(
-                obs.name(), obs)).first).second;
+    x = m_list.insert(std::make_pair < std::string, Observable >(
+            obs.name(), obs));
+
+    Assert(utils::ArgError, x.second, boost::format(
+            "Observable %1% already exist") % obs.name());
+
+    return x.first->second;
 }
 
 Observable& Observables::get(const std::string& name)
 {
-    ObservableList::iterator it = m_list.find(name);
-    Assert(utils::SaxParserError, it != m_list.end(),
-           (boost::format("Observable %1% does not exist") % name));
+    iterator it = m_list.find(name);
+    Assert(utils::ArgError, it != m_list.end(), boost::format(
+            "Observable %1% does not exist") % name);
 
     return it->second;
 }
 
 const Observable& Observables::get(const std::string& name) const
 {
-    ObservableList::const_iterator it = m_list.find(name);
-    Assert(utils::SaxParserError, it != m_list.end(),
-           (boost::format("Observable %1% doest not exist") % name));
+    const_iterator it = m_list.find(name);
+    Assert(utils::ArgError, it != m_list.end(), boost::format(
+            "Observable %1% doest not exist") % name);
 
     return it->second;
 }
 
 void Observables::cleanNoPermanent()
 {
-    ObservableList::iterator previous = m_list.begin();
-    ObservableList::iterator it = m_list.begin();
-    
-    while (it != m_list.end()) {
-        if (not it->second.isPermanent()) {
-            if (it == previous) {
-                m_list.erase(it);
-                previous = m_list.begin();
-                it = m_list.begin();
-            } else {
-                m_list.erase(it);
-                it = previous;
-            }
-        } else {
-            ++previous;
-            ++it;
-        }
+    iterator it = m_list.begin();
+
+    while ((it = utils::find_if(it, end(),
+                                Observable::IsPermanent())) != end()) {
+        iterator del = it++;
+        m_list.erase(del);
     }
 }
 

@@ -22,13 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #include <vle/vpz/ValueTrame.hpp>
 #include <vle/utils/Debug.hpp>
-
-
 
 namespace vle { namespace vpz {
 
@@ -37,13 +32,12 @@ void ValueTrame::add(const std::string& simulator,
                      const std::string& port,
                      const std::string& view)
 {
-    ModelTrame mdl(simulator, parent, port, view);
-    m_list.push_back(mdl);
+    m_list.push_back(ModelTrame(simulator, parent, port, view));
 }
 
 void ValueTrame::add(const value::Value& value)
 {
-    Assert(utils::SaxParserError, not m_list.empty(),
+    Assert(utils::ArgError, not m_list.empty(),
            "ValueTrame have not model trame.");
     m_list.back().setValue(value);
 }
@@ -52,19 +46,9 @@ void ValueTrame::write(std::ostream& out) const
 {
     out << "<trame type=\"value\" date=\"" << m_time << "\" >";
 
-    for (ModelTrameList::const_iterator it = m_list.begin();
-         it != m_list.end(); ++it) {
-        out << "<modeltrame"
-            << " name=\"" << it->simulator() << "\" "
-            << " parent=\"" << it->parent() << "\" "
-            << " port=\"" << it->port() << "\" "
-            << " view=\"" << it->view() << "\" >";
+    std::copy(m_list.begin(), m_list.end(),
+              std::ostream_iterator < ModelTrame >(out, "\n"));
 
-        out << it->value()->toXML();
-
-        out << "</modeltrame>";
-    }
-    
     out << "</trame>";
 }
 

@@ -22,11 +22,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #include <vle/vpz/View.hpp>
-#include <vle/vpz/Views.hpp>
 #include <vle/utils/Debug.hpp>
 
 namespace vle { namespace vpz {
@@ -41,7 +37,7 @@ View::View(const std::string& name,
     m_timestep(timestep)
 {
     if (m_type == View::TIMED) {
-        Assert(utils::SaxParserError, m_timestep > 0.0, boost::format(
+        Assert(utils::ArgError, m_timestep > 0.0, boost::format(
                 "Cannont define the View '%1%' with a timestep '%2%'") % m_name
             % m_timestep);
     }
@@ -79,9 +75,8 @@ void View::write(std::ostream& out) const
 
 void View::setTimestep(double time)
 {
-    Assert(utils::SaxParserError, time > 0.0,
-           (boost::format("Bad time step %1% for view %2%")
-            % time % m_name));
+    Assert(utils::ArgError, time > 0.0, boost::format(
+            "Bad time step %1% for view %2%") % time % m_name);
 
     m_timestep = time;
 }

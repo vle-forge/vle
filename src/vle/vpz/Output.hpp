@@ -22,9 +22,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #ifndef VLE_VPZ_OUTPUT_HPP
 #define VLE_VPZ_OUTPUT_HPP
 
@@ -33,7 +30,7 @@
 
 namespace vle { namespace vpz {
 
-    /** 
+    /**
      * @brief This class defines an output information and store the type of
      * output, text stream, sdml stream or Eov stream. For text and sdml, it
      * store the location filename and for Eov stream, the host.
@@ -41,93 +38,133 @@ namespace vle { namespace vpz {
     class Output : public Base
     {
     public:
-        /** 
+        /**
          * @brief Define the output format of the plugin.
          * - LOCAL: use a local communication for observations.
          * - DISTANT: use a distant communication for observations using trame.
          */
         enum Format { LOCAL, DISTANT };
 
-        Output();
+        /**
+         * @brief Build a empty local output.
+         */
+        Output()
+            : m_format(LOCAL)
+        {}
 
-        virtual ~Output() { }
+        /**
+         * @brief Nothing to delete.
+         */
+        virtual ~Output()
+        {}
 
+        /**
+         * @brief Write the XML representation of the Output.
+         * @code
+         * <output name="name" location="/tmp" format="local" plugin="text" />
+         * <output name="name" location="192.168.1.1:12:/tmp" format="distant"
+         *         plugin="text" />
+         * <output name="name" location="/tmp" plugin="text" />
+         *  <![CDATA[ bla bla bla ]]>
+         * </output>
+         * @endcode
+         * @param out The output stream.
+         */
         virtual void write(std::ostream& out) const;
 
+        /**
+         * @brief Get the type of this class.
+         * @return OUTPUT.
+         */
         virtual Base::type getType() const
         { return OUTPUT; }
 
-        /** 
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Manage Output object.
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+        /**
          * @brief Set the output with text stream information. The name is
          * obligatory, the location defines a filename.
-         * 
          * @param location the file name.
          * @param plugin to use in output stream.
-         *
-         * @throw Exception::Internal if name is empty.
+         * @throw utils::ArgError if name is empty.
          */
         void setLocalStream(const std::string& location,
                             const std::string& plugin);
 
-        /** 
+        /**
          * @brief Set the output with the sdml stream information. The name is
          * obligatory, the location defines a filename.
-         * 
          * @param location the file name.
          * @param plugin to use in output stream.
-         *
-         * @throw Exception::Internal if name is empty.
+         * @throw utils::ArgError if name is empty.
          */
         void setDistantStream(const std::string& location,
                               const std::string& plugin);
 
-        /** 
+        /**
          * @brief Set the output data to initialise the plugin. The data is
          * the children of output tag.
-         * 
          * @param data the string representation of the data.
          */
         void setData(const std::string& data);
 
-        /** 
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Get/Set functions.
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+        /**
          * @brief Get the format of this Output.
-         * 
          * @return the Format of the plugin.
          */
         Format format() const
         { return m_format; }
 
+        /**
+         * @brief Get the string representation of the format.
+         * @return "local" or "distant".
+         */
         std::string streamformat() const
         { return (m_format == LOCAL ? "local" : "distant"); }
 
-        /** 
+        /**
          * @brief Get the plugin of this Output. If format is not Output::Eov,
          * this string is not cleared.
-         * 
          * @return a string representation of plugin.
          */
         const std::string& plugin() const
         { return m_plugin; }
 
-        /** 
+        /**
          * @brief Get the location of this Output.
-         * 
          * @return a string representation of location.
          */
         const std::string& location() const
         { return m_location; }
 
-        /** 
+        /**
          * @brief Get the data of this Output.
-         * 
          * @return a string representation of the data.
          */
         const std::string& data() const
         { return m_data; }
 
+        /**
+         * @brief Get the name of this output.
+         * @return The name of this output.
+         */
         const std::string& name() const
         { return m_name; }
 
+        /**
+         * @brief Set the name of this output.
+         * @param name The name of this output.
+         */
         void setName(const std::string& name)
         { m_name.assign(name); }
 
