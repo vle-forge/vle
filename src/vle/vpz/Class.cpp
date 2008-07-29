@@ -32,9 +32,9 @@ namespace vle { namespace vpz {
 
 void Class::write(std::ostream& out) const
 {
-    out << "<class name=\"" << m_name << "\" >\n"
-        << m_model
-        << "</class>\n";
+  out << "<class name=\"" << m_name << "\" >\n";
+  m_model->writeXML(out);
+  out  << "</class>\n";
 }
 
 }} // namespace vle vpz

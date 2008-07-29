@@ -48,8 +48,8 @@ void Project::write(std::ostream& out) const
     out << ">\n"
         << m_model
         << m_dynamics
-        << m_experiment
         << m_classes
+        << m_experiment
         << "</vle_project>\n";
 }
 
