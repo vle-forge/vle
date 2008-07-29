@@ -51,7 +51,7 @@ void Output::write(std::ostream& out) const
     out << " plugin=\"" << m_plugin << "\" ";
 
     if (not m_data.empty()) {
-        out << ">" << m_data << "</output>\n";
+        out << ">\n<![CDATA[\n" << m_data << "\n]]>\n</output>\n";
     } else {
         out << "/>\n";
     }
