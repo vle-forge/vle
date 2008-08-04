@@ -38,8 +38,10 @@ void Dynamic::write(std::ostream& out) const
         out << "language=\"" << m_language << "\" ";
     }
 
-    if (m_type != LOCAL) {
-        out << " location=\"" << m_location << "\"";
+    if (m_type == LOCAL) {
+        out << "type=\"local\" ";
+    } else {
+        out << "type=\"distant\"  location=\"" << m_location << "\"";
     }
 
     out << " />";

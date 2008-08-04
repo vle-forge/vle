@@ -157,6 +157,9 @@
  </structures>
  <dynamics>
   <dynamic name="unittest" library="unittest" model="transform" />
+  <dynamic name="b" library="libu" model="libub" language="python" />
+  <dynamic name="a" library="liba" model="libua" language="python"
+  type="distant" location="192.168.1.1:324" />
  </dynamics>
  <classes>
   <class name="beepbeep">
@@ -282,18 +285,22 @@
     <port name="x"><double>1.2</double></port>
    </condition>
    <condition name="cb">
-    <port name="x"><double>1.2</double></port>
+    <port name="x"><double>1.3</double></port>
    </condition>
    <condition name="cc">
-    <port name="x"><double>1.2</double></port>
+    <port name="x"><double>1.4</double></port>
    </condition>
    <condition name="cd">
-    <port name="x"><double>1.2</double></port>
+    <port name="x"><double>1.5</double></port>
    </condition>
   </conditions>
   <views>
    <outputs>
-    <output name="o" format="local" plugin="storage" />
+    <output name="o" format="local" plugin="storage" >
+<![CDATA[
+10 10 1 1
+]]>
+    </output>
     <output name="o2" format="local" plugin="storage" />
    </outputs>
    <observables>
