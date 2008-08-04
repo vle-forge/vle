@@ -28,7 +28,8 @@
 namespace vle { namespace vpz {
 
 Class::Class(const Class& cls) :
-    Base(cls)
+    Base(cls),
+    m_name(cls.m_name)
 {
     if (cls.m_model == 0) {
         m_model = 0;

@@ -82,13 +82,15 @@ BOOST_AUTO_TEST_CASE(test_read_write_read)
             utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
     delete vpz.project().model().model();
     vpz.clear();
+
     vpz.parseFile(utils::Path::path().buildPrefixSharePath(
             utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
+
+    std::string str(vpz.writeToString());
     delete vpz.project().model().model();
     vpz.clear();
-    vpz.parseFile(utils::Path::path().buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
-    delete vpz.project().model().model();
+
+    vpz.parseMemory(str);
 }
 
 BOOST_AUTO_TEST_CASE(test_read_write_read2)

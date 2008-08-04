@@ -158,6 +158,124 @@
  <dynamics>
   <dynamic name="unittest" library="unittest" model="transform" />
  </dynamics>
+ <classes>
+  <class name="beepbeep">
+   <model name="top" type="coupled">
+    <out>
+     <port name="out" />
+    </out>
+    <submodels>
+     <model name="a" type="atomic" dynamics="gensbeep">
+      <out>
+       <port name="out" />
+      </out>
+     </model>
+     <model name="b" type="atomic" dynamics="gensbeep">
+      <out>
+       <port name="out" />
+      </out>
+     </model>
+     <model name="c" type="atomic" dynamics="gensbeep">
+      <out>
+       <port name="out" />
+      </out>
+     </model>
+    </submodels>
+    <connections>
+     <connection type="output">
+      <origin model="a" port="out" />
+      <destination model="top" port="out" />
+     </connection>
+     <connection type="output">
+      <origin model="b" port="out" />
+      <destination model="top" port="out" />
+     </connection>
+     <connection type="output">
+      <origin model="c" port="out" />
+      <destination model="top" port="out" />
+     </connection>
+    </connections>
+   </model>
+  </class>
+  <class name="beepbeepbeep">
+   <model name="top" type="coupled">
+    <out>
+     <port name="out" />
+    </out>
+    <submodels>
+     <model name="a" type="atomic" dynamics="gensbeep">
+      <out>
+       <port name="out" />
+      </out>
+     </model>
+     <model name="b" type="atomic" dynamics="gensbeep">
+      <out>
+       <port name="out" />
+      </out>
+     </model>
+     <model name="c" type="atomic" dynamics="gensbeep">
+      <out>
+       <port name="out" />
+      </out>
+     </model>
+     <model name="d" type="coupled">
+      <out>
+       <port name="out" />
+      </out>
+      <submodels>
+       <model name="a" type="atomic" dynamics="gensbeep">
+	<out>
+	 <port name="out" />
+	</out>
+       </model>
+       <model name="b" type="atomic" dynamics="gensbeep">
+	<out>
+	 <port name="out" />
+	</out>
+       </model>
+       <model name="c" type="atomic" dynamics="gensbeep">
+	<out>
+	 <port name="out" />
+	</out>
+       </model>
+      </submodels>
+      <connections>
+       <connection type="output">
+	<origin model="a" port="out" />
+	<destination model="d" port="out" />
+       </connection>
+       <connection type="output">
+	<origin model="b" port="out" />
+	<destination model="d" port="out" />
+       </connection>
+       <connection type="output">
+	<origin model="c" port="out" />
+	<destination model="d" port="out" />
+       </connection>
+      </connections>
+     </model>
+    </submodels>
+    <connections>
+     <connection type="output">
+      <origin model="a" port="out" />
+      <destination model="top" port="out" />
+     </connection>
+     <connection type="output">
+      <origin model="b" port="out" />
+      <destination model="top" port="out" />
+     </connection>
+     <connection type="output">
+      <origin model="c" port="out" />
+      <destination model="top" port="out" />
+     </connection>
+     <connection type="output">
+      <origin model="d" port="out" />
+      <destination model="top" port="out" />
+     </connection>
+    </connections>
+   </model>
+  </class>
+ </classes>
  <experiment name="graphtester" duration="100.0" seed="123">
   <conditions>
    <condition name="ca">
