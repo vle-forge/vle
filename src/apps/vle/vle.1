@@ -144,6 +144,21 @@ mode, the $HOME/.vle/hosts.xml is use to get distributed simulator:
 .PP
 $ vle -m file.vpz
 
+.SH "ENVIRONMENTS"
+.IP VLE_SIMULATOR_PATH
+A colon-separated list of directories in which to search the simulators (VLE
+DEVS atomic plug-ins) libraries at execution-time. Similar to the PATH
+environment variable.
+
+.IP VLE_OOV_PATH
+A colon-separated list of directories in which to search the simulators (OOV
+output stream plug-ins) libraries at execution-time. Similar to the PATH
+environment variable.
+
+.IP VLE_MODEL_PATH
+A colon-separated list of directories in which to search the models (GVLE
+plug-ins) libraries at execution-time. Similar to the PATH environment variable.
+
 .SH "SEE ALSO" 
 .PP 
 oov (1), gvle (1), eov (1), avle (1), vlemodeltest (1). 

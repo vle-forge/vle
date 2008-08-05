@@ -34,6 +34,7 @@
 #include <config.h>
 
 #include <boost/format.hpp>
+#include <boost/algorithm/string.hpp>
 
 #ifdef G_OS_WIN32
 #	include <Windows.h>
@@ -86,17 +87,23 @@ std::string Path::getHomeDir() const
 
 void Path::addSimulatorDir(const std::string& dirname)
 {
-    m_simulator.push_back(dirname);
+    if (isDirectory(dirname)) {
+        m_simulator.push_back(dirname);
+    }
 }
 
 void Path::addStreamDir(const std::string& dirname)
 {
-    m_stream.push_back(dirname);
+    if (isDirectory(dirname)) {
+        m_stream.push_back(dirname);
+    }
 }
 
 void Path::addModelDir(const std::string& dirname)
 {
-    m_model.push_back(dirname);
+    if (isDirectory(dirname)) {
+        m_model.push_back(dirname);
+    }
 }
 
 void Path::addPluginDir(const std::string& dirname)
@@ -198,16 +205,19 @@ bool Path::initPath()
 	m_prefix.assign(buf);
 	delete[] buf;
 
+        readEnv("VLE_SIMULATOR_PATH", m_simulator);
         addSimulatorDir(buildPrefixLibrariesPath(m_prefix, "simulator"));
         addSimulatorDir(buildUserPath("simulator"));
         addSimulatorDir("..\\simulator");
         addSimulatorDir(".");
 
+        readEnv("VLE_OOV_PATH", m_stream);
         addStreamDir(buildPrefixLibrariesPath(m_prefix, "stream"));
         addStreamDir(buildUserPath("stream"));
         addStreamDir("..\\stream");
         addStreamDir(".");
 
+        readEnv("VLE_MODEL_PATH", m_model);
         addModelDir(buildPrefixLibrariesPath(m_prefix, "model"));
         addModelDir(buildUserPath("model"));
         addModelDir("..\\model");
@@ -225,16 +235,19 @@ bool Path::initPath()
 {
     m_prefix.assign(VLE_PREFIX_DIR);
 
+    readEnv("VLE_SIMULATOR_PATH", m_simulator);
     addSimulatorDir(buildPrefixLibrariesPath(m_prefix, "simulator"));
     addSimulatorDir(buildUserPath("simulator"));
     addSimulatorDir("./simulator");
     addSimulatorDir(".");
 
+    readEnv("VLE_OOV_PATH", m_stream);
     addStreamDir(buildPrefixLibrariesPath(m_prefix, "stream"));
     addStreamDir(buildUserPath("stream"));
     addStreamDir("./stream");
     addStreamDir(".");
 
+    readEnv("VLE_MODEL_PATH", m_model);
     addModelDir(buildPrefixLibrariesPath(m_prefix, "model"));
     addModelDir(buildUserPath("model"));
     addModelDir("./model");
@@ -244,6 +257,26 @@ bool Path::initPath()
 }
 
 #endif // Win32 specific needs.
+
+bool Path::readEnv(const std::string& variable, PathList& out)
+{
+    std::string path(Glib::getenv(variable));
+    if (not path.empty()) {
+        PathList result;
+        boost::algorithm::split(result, path, boost::is_any_of(":"),
+                                boost::algorithm::token_compress_on);
+
+        PathList::iterator it(std::remove_if(
+                result.begin(), result.end(),
+                std::not1(IsDirectory())));
+
+        result.erase(it, result.end());
+
+        std::copy(result.begin(), result.end(), std::back_inserter(out));
+        return true;
+    }
+    return false;
+}
 
 Path::Path()
 {
