@@ -139,7 +139,7 @@ namespace vle { namespace oov { namespace plugin {
         Cairo::RefPtr < Cairo::ImageSurface > mImageSurface;
     };
     
-    DECLARE_OOV_PLUGIN(oov::plugin::CairoCAView);
+    DECLARE_OOV_PLUGIN(oov::plugin::CairoCAView)
 
 }}} // namespace vle oov plugin
 

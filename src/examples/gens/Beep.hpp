@@ -51,6 +51,6 @@ namespace vle { namespace examples { namespace gens {
 
 }}} // namespace vle examples gens
 
-DECLARE_NAMED_DYNAMICS(beep, vle::examples::gens::Beep);
+DECLARE_NAMED_DYNAMICS(beep, vle::examples::gens::Beep)
 
 #endif

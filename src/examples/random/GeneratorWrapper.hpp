@@ -59,6 +59,6 @@ namespace vle { namespace examples { namespace generator {
 
 }}} // namespace vle examples generator
 
-DECLARE_DYNAMICS(vle::examples::generator::GeneratorWrapper);
+DECLARE_DYNAMICS(vle::examples::generator::GeneratorWrapper)
 
 #endif

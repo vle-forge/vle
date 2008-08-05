@@ -57,6 +57,6 @@ private:
 
 }}} // namespace vle examples lifegame
 
-DECLARE_NAMED_DYNAMICS(cell, vle::examples::lifegame::Cell);
+DECLARE_NAMED_DYNAMICS(cell, vle::examples::lifegame::Cell)
 
 #endif

@@ -232,6 +232,38 @@ namespace vle { namespace utils {
         { return x.second; }
     };
 
+    /**
+     * @brief A function uses to convert a pointer to fonction ie. to convert
+     * void* to void(*)() which is not defined in iso C++. (ISO C++ forbids
+     * casting between pointer-to-function and pointer-to-object)
+     * @code
+     * typedef void* PV;
+     * typedef void (*pf)() PF;
+     *
+     * PV x;
+     * PF y;
+     *
+     * y = (PF)x;  // Error.
+     * y = reinterpret_cast < PF >(x); // Error.
+     * y = vle::utils::pointer_to_function(x); // Ok.
+     * @endcode
+     * @param x The void* to cast.
+     * @return The pointer to fonction.
+     */
+    template < typename __v_result >
+        __v_result pointer_to_function(void* x)
+        {
+            union __vle_pointer_to_function
+            {
+                __v_result f;
+                void* r;
+            };
+
+            __vle_pointer_to_function tmp;
+            tmp.r = x;
+            return tmp.f;
+        }
+
 }} // namespace vle utils
 
 #endif

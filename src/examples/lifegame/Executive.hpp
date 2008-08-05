@@ -49,6 +49,6 @@ namespace vle { namespace examples { namespace lifegame {
 
 }}} // namespace vle examples lifegame
 
-DECLARE_NAMED_DYNAMICS(executive, vle::examples::lifegame::Executive);
+DECLARE_NAMED_DYNAMICS(executive, vle::examples::lifegame::Executive)
 
 #endif

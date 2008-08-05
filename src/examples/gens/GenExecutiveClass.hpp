@@ -63,6 +63,6 @@ namespace vle { namespace examples { namespace gens {
 
 }}} // namespace vle examples gens
 
-DECLARE_NAMED_DYNAMICS(executiveclass, vle::examples::gens::GenExecutiveClass);
+DECLARE_NAMED_DYNAMICS(executiveclass, vle::examples::gens::GenExecutiveClass)
 
 #endif

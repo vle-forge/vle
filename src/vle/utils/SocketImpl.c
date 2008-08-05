@@ -94,11 +94,13 @@ int vleSocketListen(int fd, int nb)
 int vleSocketConnect(int fd, const char* str, int port)
 {
         struct sockaddr_in host;
+        struct hostent* hoste;
+
         memset(&host, '\0', sizeof(host));
         host.sin_family = AF_INET;
         host.sin_port = htons(port);
 
-        struct hostent* hoste = gethostbyname(str);
+        hoste = gethostbyname(str);
         if (hoste == NULL) {
                 host.sin_addr.s_addr = INADDR_ANY;
         } else {
@@ -168,7 +170,7 @@ int vleSocketReceive(int fd, void* buffer, int size)
         } else if (r >= 0 && r < size) {
                 ((char*)buffer)[r] = '\0';
         }
-        
+
         return r;
 }
 

@@ -59,6 +59,6 @@ namespace vle { namespace eov {
 
 }} // namespace vle eov
 
-DECLARE_EOV_PLUGIN(vle::eov::GtkDefault);
+DECLARE_EOV_PLUGIN(vle::eov::GtkDefault)
 
 #endif

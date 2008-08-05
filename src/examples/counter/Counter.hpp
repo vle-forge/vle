@@ -63,6 +63,6 @@ namespace vle { namespace examples { namespace counter {
 
 }}} // namespace vle examples counter
 
-DECLARE_DYNAMICS(vle::examples::counter::Counter);
+DECLARE_DYNAMICS(vle::examples::counter::Counter)
 
 #endif

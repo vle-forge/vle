@@ -82,7 +82,7 @@ namespace vle { namespace oov { namespace plugin {
         Cairo::RefPtr < Cairo::ImageSurface > m_img;
     };
     
-    DECLARE_OOV_PLUGIN(oov::plugin::CairoLevel);
+    DECLARE_OOV_PLUGIN(oov::plugin::CairoLevel)
 
 }}} // namespace vle oov plugin
 

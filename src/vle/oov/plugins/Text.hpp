@@ -48,7 +48,7 @@ namespace vle { namespace oov { namespace plugin {
 
     };
 
-    DECLARE_OOV_PLUGIN(vle::oov::plugin::Text);
+    DECLARE_OOV_PLUGIN(vle::oov::plugin::Text)
 
 }}} // namespace vle oov plugin
 

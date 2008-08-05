@@ -27,6 +27,7 @@
 
 #include <vle/oov/PluginFactory.hpp>
 #include <vle/utils/Debug.hpp>
+#include <vle/utils/Algo.hpp>
 
 
 namespace vle { namespace oov {
@@ -54,6 +55,11 @@ PluginFactory::~PluginFactory()
 
 PluginPtr PluginFactory::build(const std::string& location)
 {
+    /*
+     * Define the pointer to fonction of the oov::Plugin plug-in.
+     */
+    typedef Plugin* (*function)(const std::string&);
+
     Plugin* call = 0;
     void*   makeNewOovPlugin = 0;
 
@@ -63,7 +69,9 @@ PluginPtr PluginFactory::build(const std::string& location)
             % m_plugin);
     }
 
-    call = ((Plugin*(*)(const std::string&))(makeNewOovPlugin))(location);
+    function fct(utils::pointer_to_function < function >(makeNewOovPlugin));
+    call = fct(location);
+
     if (not call) {
         Throw(utils::InternalError, boost::format(
                 "Error when calling makeNewOovPlugin function in plugin %1%")

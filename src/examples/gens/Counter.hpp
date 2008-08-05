@@ -60,6 +60,6 @@ namespace vle { namespace examples { namespace gens {
 
 }}} // namespace vle examples gens
 
-DECLARE_NAMED_DYNAMICS(counter, vle::examples::gens::Counter);
+DECLARE_NAMED_DYNAMICS(counter, vle::examples::gens::Counter)
 
 #endif

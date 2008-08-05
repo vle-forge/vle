@@ -26,6 +26,7 @@
 #include <vle/eov/NetStreamReader.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Path.hpp>
+#include <vle/utils/Algo.hpp>
 #include <gtkmm/main.h>
 #include <gdkmm/drawable.h>
 #include <gdkmm/gc.h>
@@ -199,6 +200,11 @@ NetStreamReader::PluginFactory::~PluginFactory()
 PluginPtr NetStreamReader::PluginFactory::build(oov::PluginPtr oovplugin,
                                                 NetStreamReader* net)
 {
+    /*
+     * Define the pointer to the fonction of the eov::Plugin plug-in.
+     */
+    typedef Plugin* (*function)(oov::PluginPtr&, NetStreamReader*);
+
     Plugin* call = 0;
     void*   makeNewEovPlugin = 0;
 
@@ -208,7 +214,9 @@ PluginPtr NetStreamReader::PluginFactory::build(oov::PluginPtr oovplugin,
             % m_plugin);
     }
 
-    call = ((Plugin*(*)(oov::PluginPtr&, NetStreamReader*))(makeNewEovPlugin))(oovplugin, net);
+    function fct(utils::pointer_to_function < function >(makeNewEovPlugin));
+    call = fct(oovplugin, net);
+
     if (not call) {
         Throw(utils::InternalError, boost::format(
                 "Error when calling makeNewEovPlugin function in plugin %1%")

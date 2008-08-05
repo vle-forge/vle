@@ -133,7 +133,7 @@ namespace vle { namespace oov { namespace plugin {
         void nextTime(double trame_time);
     };
 
-    DECLARE_OOV_PLUGIN(vle::oov::plugin::Storage);
+    DECLARE_OOV_PLUGIN(vle::oov::plugin::Storage)
 
 }}} // namespace vle oov plugin
 

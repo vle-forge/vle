@@ -83,5 +83,5 @@ namespace vle { namespace unittest {
         int m_counter;
     };
 
-    DECLARE_NAMED_DYNAMICS(transform, vle::unittest::Transform);
+    DECLARE_NAMED_DYNAMICS(transform, vle::unittest::Transform)
 }}

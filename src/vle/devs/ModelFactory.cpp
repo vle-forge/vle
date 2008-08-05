@@ -40,6 +40,7 @@
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Trace.hpp>
+#include <vle/utils/Algo.hpp>
 
 namespace vle { namespace devs {
 
@@ -295,6 +296,12 @@ void ModelFactory::attachDynamics(Coordinator& coordinator,
                                   Glib::Module* module,
                                   const InitEventList& events)
 {
+    /*
+     * Define the pointer to fonction of the devs::Dynamics plug-in.
+     */
+    typedef  Dynamics* (*function) (
+        const graph::Model&, const InitEventList&);
+
     devs::Dynamics* call = 0;
     void* makeNewDynamics = 0;
 
@@ -303,9 +310,9 @@ void ModelFactory::attachDynamics(Coordinator& coordinator,
         Assert(utils::ParseError, getSymbol, boost::format(
                "Error in '%1%', function 'makeNewDynamics' not found: '%2%'\n")
 	       % module->get_name() % Glib::Module::get_last_error());
-      
-        call = ((Dynamics*(*)(const graph::Model&, const InitEventList&))
-                (makeNewDynamics))(*atom->getStructure(), events);
+
+        function fct(utils::pointer_to_function < function >(makeNewDynamics));
+        call = fct(*atom->getStructure(), events);
         Assert(utils::ParseError, call, boost::format(
 	       "Error in '%1%', function 'makeNewDynamics':"
 	       "problem allocation a new Dynamics: '%2%'\n") %
@@ -319,8 +326,9 @@ void ModelFactory::attachDynamics(Coordinator& coordinator,
                module->get_name() % functionanme %
                Glib::Module::get_last_error());
       
-        call = ((Dynamics*(*)(const graph::Model&, const InitEventList&))
-                (makeNewDynamics))(*atom->getStructure(), events);
+        function fct(utils::pointer_to_function < function >(makeNewDynamics));
+        call = fct(*atom->getStructure(), events);
+
 	Assert(utils::ParseError, call, boost::format(
 	       "Error in '%1%', function '%2%':"
 	       "problem allocation a new Dynamics: '%3%'\n") %

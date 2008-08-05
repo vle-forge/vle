@@ -114,6 +114,6 @@ private:
 	    
 }}} // namespace vle oov plugin
 
-DECLARE_OOV_PLUGIN(vle::oov::plugin::Plot);
+DECLARE_OOV_PLUGIN(vle::oov::plugin::Plot)
 
 #endif
