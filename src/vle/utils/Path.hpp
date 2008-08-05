@@ -25,32 +25,37 @@
 
 
 
-#ifndef UTILS_PATH_HPP
-#define UTILS_PATH_HPP
+#ifndef VLE_UTILS_PATH_HPP
+#define VLE_UTILS_PATH_HPP
 
 #include <string>
 #include <list>
+#include <glibmm/fileutils.h>
 
 
 namespace vle { namespace utils {
 
     /**
-     * @brief Portable way, i.e. Linux/Unix/Windows to get VLE paths.  Linux
-     * and Unix versions use compiled paths introduced by autotools and
-     * Makefile, Windows version use Registry to store his paths. This class is
-     * a singleton.
+     * @brief Portable way, i.e. Linux/Unix/Windows to get VLE paths. Linux
+     * and Unix versions use compiled paths introduced by installer, Windows
+     * version use Registry to store his paths. This class is a singleton.
+     * Three environment variables are used to store another paths.
+     * VLE_SIMULATOR_PATH, VLE_OOV_PATH and VLE_MODEL_PATH.
      *
      * To use it:
      * @code
-     * std::string binpath = utils::Path::path()->getDefaultBinDir();
+     * std::string binpath(utils::Path::path()->getDefaultBinDir());
      * @endcode
      */
     class Path
     {
     public:
+        /**
+         * @brief Define a list of directories.
+         */
         typedef std::list < std::string > PathList;
 
-        /** 
+        /**
          * @brief Return the prefix of the compilation on Unix or installation
          * on Windows.
          * @return A string path.
@@ -67,12 +72,24 @@ namespace vle { namespace utils {
 
         std::string getHomeDir() const;
 
+        /**
+         * @brief Get the list of simulator's directories.
+         * @return A list of directory name.
+         */
         inline const PathList& getSimulatorDirs() const
         { return m_simulator; }
 
+        /**
+         * @brief Get the list of stream's directories.
+         * @return A list of directory name.
+         */
         inline const PathList& getStreamDirs() const
         { return m_stream; }
 
+        /**
+         * @brief Get the list of model's directories.
+         * @return A list of directory name.
+         */
         inline const PathList& getModelDirs() const
         { return m_model; }
 
@@ -84,28 +101,32 @@ namespace vle { namespace utils {
 
         void addPluginDir(const std::string& dirname);
 
-        //
-        // singleton management
-        //
-        
-        /** 
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Manage singleton
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+        /**
          * @brief Return a Path object instantiate in singleton method.
          * @return A reference to the singleton object.
          */
         inline static Path& path()
         { if (mPath == 0) mPath = new Path; return *mPath; }
 
-        /** 
+        /**
          * @brief Delete Path object instantiate from function path().
          */
         inline static void kill()
         { delete mPath; mPath = 0; }
 
-        //
-        // string path building
-        //
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Static function to easily use the utils::Path class.
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-        /** 
+        /**
          * @brief Build a string path based on the concatenation of install
          * prefix and the provided buffer. For instance, if cmake was called
          * with CMAKE_INSTALL_PREFIX=$HOME/usr on Unix, this function returns
@@ -115,7 +136,7 @@ namespace vle { namespace utils {
          */
         static std::string buildPrefixPath(const std::string& buf);
 
-        /** 
+        /**
          * @brief Build a string path based on the concatenation of install
          * prefix, library dir and provided buffer. For instance:
          * @code
@@ -131,7 +152,7 @@ namespace vle { namespace utils {
         static std::string buildPrefixLibrariesPath(const std::string& prefix,
                                                     const std::string& buf);
 
-        /** 
+        /**
          * @brief Build a string path based on the concatenation of install
          * prefix, share prefix dir and provided program name and buffer. For
          * instance:
@@ -148,7 +169,7 @@ namespace vle { namespace utils {
          */
         static std::string buildPrefixSharePath(const std::string& prefix,
                                                 const std::string& prg,
-                                                const std::string& name = 
+                                                const std::string& name =
                                                 std::string());
 
         /**
@@ -180,24 +201,67 @@ namespace vle { namespace utils {
         static std::string buildUserPath(const std::string& dir =
                                            std::string());
 
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Functor
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+        /**
+         * @brief Predicate functor to test the existence of a directory.
+         */
+        struct IsDirectory
+            : public std::unary_function < std::string, bool >
+        {
+            /**
+             * @brief Check if the directory exits.
+             * @param the string to check.
+             * @return true if the directory exists, false otherwise.
+             */
+            bool operator()(const std::string& dirname) const
+            {
+                return Glib::file_test(dirname, Glib::FILE_TEST_EXISTS |
+                                       Glib::FILE_TEST_IS_DIR);
+            }
+        };
+
+        /**
+         * @brief Check if the directory exists.
+         * @param dirname the directory to check.
+         * @return true if str is a directory.
+         */
+        bool static isDirectory(const std::string& dirname)
+        {
+            return Glib::file_test(dirname, Glib::FILE_TEST_EXISTS |
+                                   Glib::FILE_TEST_IS_DIR);
+        }
+
     private:
         PathList    m_simulator;
         PathList    m_stream;
         PathList    m_model;
         std::string m_prefix;
 
-        /** 
+        /**
          * @brief A default constructor that call the initPath member.
          * @throw utils::InternalError if Initialisation of the class failed.
          */
         Path();
 
-        /** 
+        /**
          * @brief Build the paths. This function exist in two part of the file,
          * on for Unix/Linux another for Windows for registry access.
          * @return true if success, false otherwise.
          */
         bool initPath();
+
+        /**
+         * @brief Build the paths from environment variables.
+         * @param variable The name of the variable to read.
+         * @param out The output parameter to store valid path.
+         * @return true if success, false if variable does not exist.
+         */
+        bool readEnv(const std::string& variable, PathList& out);
 
         static Path* mPath; /// The static Path for singleton design pattern.
     };
