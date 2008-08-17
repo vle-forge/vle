@@ -9,8 +9,14 @@ LINK_DIRECTORIES(
   ${GLIBMM_LIBRARY_DIRS}
   ${LIBXMLPP_LIBRARY_DIR})
 
+IF(WIN32 AND NOT UNIX)
+  SET(OS_SPECIFIC_PATH_IMPL PathWin32.cpp)
+ELSE(WIN32 AND NOT UNIX)
+  SET(OS_SPECIFIC_PATH_IMPL PathUnix.cpp)
+ENDIF(WIN32 AND NOT UNIX)
+
 SET(UTILS_CPP Host.cpp Path.cpp PathOptionGroup.cpp Rand.cpp Simpson.cpp
-  Socket.cpp SocketImpl.c Tools.cpp Trace.cpp XML.cpp)
+  Socket.cpp SocketImpl.c Tools.cpp Trace.cpp XML.cpp ${OS_SPECIFIC_PATH_IMPL})
 
 SET(UTILS_HPP Algo.hpp Debug.hpp Exception.hpp Host.hpp Path.hpp
   PathOptionGroup.hpp Rand.hpp Simpson.hpp SocketImpl.h Socket.hpp Tools.hpp

@@ -22,9 +22,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
 #include <glibmm/fileutils.h>
 #include <glibmm/miscutils.h>
 #include <list>
@@ -35,13 +32,6 @@
 
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
-
-#ifdef G_OS_WIN32
-#	include <Windows.h>
-#	include <winreg.h>
-#endif
-
-
 
 namespace vle { namespace utils {
 
@@ -70,19 +60,6 @@ std::string Path::getPixmapsFile(const std::string& file) const
 std::string Path::getGladeFile(const std::string& file) const
 {
     return buildPrefixSharePath(m_prefix, "glade", file);
-}
-
-
-std::string Path::getHomeDir() const
-{
-    std::list < std::string > arb;
-    arb.push_back(Glib::get_home_dir());
-#ifdef G_OS_WIN32
-    arb.push_back("vle");
-#else
-    arb.push_back(".vle");
-#endif
-    return Glib::build_path(G_DIR_SEPARATOR_S, arb);
 }
 
 void Path::addSimulatorDir(const std::string& dirname)
@@ -121,30 +98,6 @@ std::string Path::buildPrefixPath(const std::string& buf)
     return Glib::build_path(G_DIR_SEPARATOR_S, lst);
 }
 
-std::string Path::buildUserPath(const std::string& dir)
-{
-    if (dir.empty()) {
-        std::list < std::string > arb;
-        arb.push_back(Glib::get_home_dir());
-#ifdef G_OS_WIN32
-        arb.push_back("vle");
-#else
-        arb.push_back(".vle");
-#endif
-        return Glib::build_path(G_DIR_SEPARATOR_S, arb);
-    } else {
-        std::list < std::string > arb;
-        arb.push_back(Glib::get_home_dir());
-#ifdef G_OS_WIN32
-        arb.push_back("vle");
-#else
-        arb.push_back(".vle");
-#endif
-        arb.push_back(dir);
-        return Glib::build_path(G_DIR_SEPARATOR_S, arb);
-    }
-}
-
 std::string Path::buildPrefixLibrariesPath(const std::string& prefix,
                                            const std::string& name)
 {
@@ -176,87 +129,6 @@ std::string Path::buildPath(const std::string& left, const std::string& right)
     lst.push_back(right);
     return Glib::build_path(G_DIR_SEPARATOR_S, lst);
 }
-
-#ifdef G_OS_WIN32
-bool Path::initPath()
-{
-    LONG result;
-    HKEY hkey;
-
-    std::string key("SOFTWARE\\VLE Development Team\\VLE ");
-    key += VLE_VERSION;
-
-    result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, key.c_str(),
-		    0, KEY_QUERY_VALUE, &hkey);
-    if (result != ERROR_SUCCESS) {
-        result = RegOpenKeyEx(HKEY_CURRENT_USER, key.c_str(),
-			0, KEY_QUERY_VALUE, &hkey);
-    }
-
-    if (result == ERROR_SUCCESS) {
-	char* buf = new char[256];
-	DWORD sz = 256;
-
-	if (RegQueryValueEx(hkey, (LPCTSTR)"Path", NULL, NULL,
-			    (LPBYTE)buf, &sz) != ERROR_SUCCESS) {
-	    delete[] buf;
-	    return false;
-	}
-	m_prefix.assign(buf);
-	delete[] buf;
-
-        readEnv("VLE_SIMULATOR_PATH", m_simulator);
-        addSimulatorDir(buildPrefixLibrariesPath(m_prefix, "simulator"));
-        addSimulatorDir(buildUserPath("simulator"));
-        addSimulatorDir("..\\simulator");
-        addSimulatorDir(".");
-
-        readEnv("VLE_OOV_PATH", m_stream);
-        addStreamDir(buildPrefixLibrariesPath(m_prefix, "stream"));
-        addStreamDir(buildUserPath("stream"));
-        addStreamDir("..\\stream");
-        addStreamDir(".");
-
-        readEnv("VLE_MODEL_PATH", m_model);
-        addModelDir(buildPrefixLibrariesPath(m_prefix, "model"));
-        addModelDir(buildUserPath("model"));
-        addModelDir("..\\model");
-        addModelDir(".");
-	return true;
-    } else {
-	throw utils::InternalError(boost::str(boost::format(
-		"Unable to open the Registry key in HKLM or HKCU '%1%'") %
-			key));
-    }
-    return false;
-}
-#else // On Unix platform
-bool Path::initPath()
-{
-    m_prefix.assign(VLE_PREFIX_DIR);
-
-    readEnv("VLE_SIMULATOR_PATH", m_simulator);
-    addSimulatorDir(buildPrefixLibrariesPath(m_prefix, "simulator"));
-    addSimulatorDir(buildUserPath("simulator"));
-    addSimulatorDir("./simulator");
-    addSimulatorDir(".");
-
-    readEnv("VLE_OOV_PATH", m_stream);
-    addStreamDir(buildPrefixLibrariesPath(m_prefix, "stream"));
-    addStreamDir(buildUserPath("stream"));
-    addStreamDir("./stream");
-    addStreamDir(".");
-
-    readEnv("VLE_MODEL_PATH", m_model);
-    addModelDir(buildPrefixLibrariesPath(m_prefix, "model"));
-    addModelDir(buildUserPath("model"));
-    addModelDir("./model");
-    addModelDir(".");
-
-    return true;
-}
-
-#endif // Win32 specific needs.
 
 bool Path::readEnv(const std::string& variable, PathList& out)
 {
