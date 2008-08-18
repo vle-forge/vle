@@ -14,6 +14,15 @@ SET(VLE_NAME_VERSION "${VLE_NAME}-${VLE_VERSION}")
 SET(VLE_COMPLETE "${VLE_MAJOR}.${VLE_MINOR}.${VLE_PATCH}${VLE_EXTRA}")
 SET(VLE_NAME_COMPLETE "${VLE_NAME}-${VLE_COMPLETE}")
 
+#
+ # Append the library version information to the library target
+ # properties.
+#
+
+SET (VLE_LIBRARY_PROPERTIES ${VLE_LIBRARY_PROPERTIES}
+  VERSION "${VLE_MAJOR}.${VLE_MINOR}.${VLE_PATCH}"
+  SOVERSION "${VLE_MAJOR}.${VLE_MINOR}")
+
  #
   # CPack configuration
  #
