@@ -63,8 +63,9 @@ bool Path::initPath()
     LONG result;
     HKEY hkey;
 
-    std::string key("SOFTWARE\\VLE Development Team\\VLE ");
-    key += VLE_VERSION;
+    std::string key(boost::str(boost::format("%1% %2%.%3%.0") % 
+                               "SOFTWARE\\VLE Development Team\\VLE" %
+                               VLE_MAJOR_VERSION % VLE_MINOR_VERSION));
 
     result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, key.c_str(),
 		    0, KEY_QUERY_VALUE, &hkey);

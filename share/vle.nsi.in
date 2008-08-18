@@ -13,7 +13,7 @@
 !define PRODUCT_VENDOR "VLE Development Team"
 !define PRODUCT_WEB_SITE "http://vle.univ-littoral.fr"
 !define PRODUCT_EMAIL "quesnel@users.sourceforge.net"
-!define PRODUCT_INSTALL_REGISTRY "VLE @VLE_VERSION@"
+!define PRODUCT_INSTALL_REGISTRY "VLE @VLE_VERSION_SHORT@.0"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\pkg-config.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
