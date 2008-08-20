@@ -17,7 +17,7 @@ TARGET_LINK_LIBRARIES(test_vpz_values
   ${GLIBMM_LIBRARIES}
   ${LIBXMLPP_LIBRARIES}
   ${GTHREAD_LIBRARIES}
-  ${Boost_UNITTESTFRAMEWORK}
+  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
   vlegeometry
   vleutils
   vledata
@@ -31,7 +31,7 @@ TARGET_LINK_LIBRARIES(test_vpz_project
   ${GLIBMM_LIBRARIES}
   ${LIBXMLPP_LIBRARIES}
   ${GTHREAD_LIBRARIES}
-  ${Boost_UNITTESTFRAMEWORK}
+  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
   vlegeometry
   vleutils
   vledata
@@ -45,7 +45,7 @@ TARGET_LINK_LIBRARIES(test_vpz_translator
   ${GLIBMM_LIBRARIES}
   ${LIBXMLPP_LIBRARIES}
   ${GTHREAD_LIBRARIES}
-  ${Boost_UNITTESTFRAMEWORK}
+  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
   vlegeometry
   vleutils
   vledata
@@ -59,7 +59,7 @@ TARGET_LINK_LIBRARIES(test_vpz_io
   ${GLIBMM_LIBRARIES}
   ${LIBXMLPP_LIBRARIES}
   ${GTHREAD_LIBRARIES}
-  ${Boost_UNITTESTFRAMEWORK}
+  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
   vlegeometry
   vleutils
   vledata
@@ -73,7 +73,7 @@ TARGET_LINK_LIBRARIES(test_vpz_oov
   ${GLIBMM_LIBRARIES}
   ${LIBXMLPP_LIBRARIES}
   ${GTHREAD_LIBRARIES}
-  ${Boost_UNITTESTFRAMEWORK}
+  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
   vlegeometry
   vleutils
   vledata
@@ -87,7 +87,7 @@ TARGET_LINK_LIBRARIES(test_vpz_classes
   ${GLIBMM_LIBRARIES}
   ${LIBXMLPP_LIBRARIES}
   ${GTHREAD_LIBRARIES}
-  ${Boost_UNITTESTFRAMEWORK}
+  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
   vlegeometry
   vleutils
   vledata
@@ -101,7 +101,7 @@ TARGET_LINK_LIBRARIES(test_vpz_graph
   ${GLIBMM_LIBRARIES}
   ${LIBXMLPP_LIBRARIES}
   ${GTHREAD_LIBRARIES}
-  ${Boost_UNITTESTFRAMEWORK}
+  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
   vlegeometry
   vleutils
   vledata
