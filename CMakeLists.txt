@@ -87,7 +87,7 @@ INCLUDE(CMakeDetermineCCompiler)
   # Check libraries with pkgconfig
  #
 
-FIND_PACKAGE(PkgConfig)
+FIND_PACKAGE(PkgConfig QUIET)
 IF (NOT PkgConfig_FOUND)
   SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
   FIND_PACKAGE(PkgConfig REQUIRED)
