@@ -1,5 +1,5 @@
 /**
- * @file src/vle/utils/Socket.cpp
+ * @file vle/utils/Socket.cpp
  * @author The VLE Development Team
  */
 
@@ -21,9 +21,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
-
 
 
 #include <vle/utils/Socket.hpp>

@@ -1,10 +1,10 @@
-.TH "VLE" "1" 
+.TH "VLE" "1"
 
-.SH "NAME" 
+.SH "NAME"
 vle \(em The simulator for VLE framework
 
-.SH "SYNOPSIS" 
-.PP 
+.SH "SYNOPSIS"
+.PP
 \fBvle\fR
 [\fB-?\fP]
 [\fB\-\-help\fP]
@@ -31,9 +31,9 @@ vle \(em The simulator for VLE framework
 [\fB--path-model=\fIdirname\fP\fR]
 [\fB\fIVPZ\fP or \fIVPZi\fP files...\fR]
 
-.SH "DESCRIPTION" 
-.PP 
-This manual page documents briefly the \fBVLE\fR command. 
+.SH "DESCRIPTION"
+.PP
+This manual page documents briefly the \fBVLE\fR command.
 .PP
 \fBVLE\fR is a part of a multi-modelling and simulation framework call
 \fBVLE\fR. It addresses the reliability issue using recent developments in the
@@ -42,50 +42,50 @@ software. \fBVLE\fR is composed of five applications: \fIVLE\fR the simulator,
 \fIGVLE\fR the modelling tool, \fIAVLE\fR the analysis tools post-simulation
 and \fIEOV\fR a real time application to make observation and \fIOOV\fR the output
 stream manager.
-.PP 
+.PP
 \fBVLE\fR is a program that simulate the VPZ files. \fBVLE\fR use three modes:
 \fBmanager\fP, \fBsimulator\fP or just to run simulation. \fBManager\fP run
 experimentals frames to build VPZ instances files. \fBSimulator\fP is use to
 run VPZ or VPZi simulations in parallel. \fBJustRun\fP is the mode to run a VPZ
 or VPZi directly. This command is used by \fBSimulator\fP.
 
-.SH "OPTIONS" 
-.PP 
+.SH "OPTIONS"
+.PP
 These programs follow the usual GNU command line syntax, with long options
-starting with two dashes (`\-'). A summary of options is included below. 
+starting with two dashes (`\-'). A summary of options is included below.
 
-.IP "\fB-?\fP, \fB\-\-help\fP" 10 
-Show summary of options. 
+.IP "\fB-?\fP, \fB\-\-help\fP" 10
+Show summary of options.
 
-.IP "\fB-i\fP, \fB\-\-info\fP" 10 
-Show somes informations for vle framework. 
+.IP "\fB-i\fP, \fB\-\-info\fP" 10
+Show somes informations for vle framework.
 
-.IP "\fB\-\-version\fP" 10 
-Show version of program. 
+.IP "\fB\-\-version\fP" 10
+Show version of program.
 
-.IP "\fB-m\fP" 10 
-Run \fBVLE\fP in 
-\fBmanager\fP mode. 
+.IP "\fB-m\fP" 10
+Run \fBVLE\fP in
+\fBmanager\fP mode.
 
-.IP "\fB-s\fP" 10 
-Run \fBVLE\fP in 
-\fBsimulator\fP mode. 
+.IP "\fB-s\fP" 10
+Run \fBVLE\fP in
+\fBsimulator\fP mode.
 
-.IP "\fB-j\fP" 10 
+.IP "\fB-j\fP" 10
 Run \fBVLE\fP directly on all specified files (default mode).
 
 .IP "\fB-v\fI int\fR\fP, \fB\-\-verbose\fI int \fR\fP"
 Set the verbosity of application. Default is \fI0\fR, no trace and no long
 exception. \fI1\fR for small simulation trace and long exception. \fI2\fR for
-long simulation trace. 3 for all simulation trace. 
+long simulation trace. 3 for all simulation trace.
 
 .IP "\fB-l\fP, \fB\-\-allinlocal\fP"
 Run all instances of the experimental frame on the same computer. This option
-is only available for the \fBManager\fP application. 
+is only available for the \fBManager\fP application.
 
 .IP "\fB-o\fI int\fR\fP, \fB\-\-process\fI int \fR\fP
 Number of process available for this computer. Default is only one. This option
-is only available for the \fBsimulator\fP application. 
+is only available for the \fBsimulator\fP application.
 
 .IP "\fB-p\fI int\fR\fP, \fB\-\-port\fI int \fR\fP
 Define the listening port for vle application. Default is 8888. This option is
@@ -159,12 +159,12 @@ environment variable.
 A colon-separated list of directories in which to search the models (GVLE
 plug-ins) libraries at execution-time. Similar to the PATH environment variable.
 
-.SH "SEE ALSO" 
-.PP 
-oov (1), gvle (1), eov (1), avle (1), vlemodeltest (1). 
+.SH "SEE ALSO"
+.PP
+oov (1), gvle (1), eov (1), avle (1), vlemodeltest (1).
 
-.SH "AUTHOR" 
-.PP 
+.SH "AUTHOR"
+.PP
 Gauthier Quesnel \fBquesnel@users.sourceforge.net\fP
 .PP
 This program is free software: you can redistribute it and/or modify
@@ -172,6 +172,6 @@ it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-.SH "COPYRIGHT" 
-.PP 
+.SH "COPYRIGHT"
+.PP
 Copyright (c) 2003 - 2008 The VLE development team

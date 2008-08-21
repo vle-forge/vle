@@ -1,5 +1,5 @@
 /**
- * @file src/vle/data/SQLWriter.hpp
+ * @file vle/data/SQLWriter.hpp
  * @author The VLE Development Team
  */
 

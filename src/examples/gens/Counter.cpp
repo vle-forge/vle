@@ -1,5 +1,5 @@
 /**
- * @file src/examples/gens/Counter.cpp
+ * @file examples/gens/Counter.cpp
  * @author The VLE Development Team
  */
 

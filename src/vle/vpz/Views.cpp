@@ -1,5 +1,5 @@
 /**
- * @file src/vle/vpz/Views.cpp
+ * @file vle/vpz/Views.cpp
  * @author The VLE Development Team
  */
 
@@ -21,6 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 
 #include <vle/vpz/Views.hpp>
 #include <vle/utils/Debug.hpp>
@@ -164,6 +165,30 @@ View& Views::get(const std::string& name)
            boost::format("Unknow view '%1%'\n") % name);
 
     return it->second;
+}
+
+void Views::renameOutput(const std::string& oldname,
+                         const std::string& newname)
+{
+    for (iterator it = begin(); it != end(); ++it) {
+        if (it->second.output() == oldname) {
+            vpz::View copy(get(it->first));
+            del(it->first);
+
+            switch (copy.type()) {
+            case vpz::View::TIMED:
+                addTimedView(copy.name(), copy.timestep(), newname);
+                break;
+            case vpz::View::EVENT:
+                addEventView(copy.name(), newname);
+                break;
+            case vpz::View::FINISH:
+                addFinishView(copy.name(), newname);
+                break;
+            }
+        }
+        ++it;
+    }
 }
 
 bool Views::isUsedOutput(const std::string& name) const

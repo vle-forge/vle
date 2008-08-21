@@ -15,7 +15,7 @@ TARGET_LINK_LIBRARIES(unittest
   ${GLIBMM_LIBRARIES}
   ${LIBXMLPP_LIBRARIES}
   ${GTHREAD_LIBRARIES} 
-  ${Boost_UNITTESTFRAMEWORK}
+  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
   vlegeometry
   vleutils
   vledata
@@ -32,7 +32,7 @@ TARGET_LINK_LIBRARIES(test_devsmodel
   ${GLIBMM_LIBRARIES}
   ${LIBXMLPP_LIBRARIES}
   ${GTHREAD_LIBRARIES}
-  ${Boost_UNITTESTFRAMEWORK}
+  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
   vlegeometry
   vleutils
   vledata

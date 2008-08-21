@@ -1,5 +1,5 @@
 /**
- * @file src/examples/gens/Beep.hpp
+ * @file examples/gens/Beep.hpp
  * @author The VLE Development Team
  */
 

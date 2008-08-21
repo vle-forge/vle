@@ -1,5 +1,5 @@
 /**
- * @file src/apps/eov/OptionGroup.hpp
+ * @file apps/eov/OptionGroup.hpp
  * @author The VLE Development Team
  */
 

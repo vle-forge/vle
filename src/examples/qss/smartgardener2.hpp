@@ -1,5 +1,5 @@
 /**
- * @file src/examples/qss/smartgardener2.hpp
+ * @file examples/qss/smartgardener2.hpp
  * @author The VLE Development Team
  */
 

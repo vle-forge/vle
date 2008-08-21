@@ -1,5 +1,5 @@
 /**
- * @file src/vle/vpz/Views.hpp
+ * @file vle/vpz/Views.hpp
  * @author The VLE Development Team
  */
 
@@ -21,6 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 
 #ifndef VLE_VPZ_VIEWS_HPP
 #define VLE_VPZ_VIEWS_HPP
@@ -240,6 +241,15 @@ namespace vle { namespace vpz {
          */
         bool exist(const std::string& name) const
         { return m_list.find(name) != m_list.end(); }
+
+        /**
+         * @brief For each vpz::View that vpz::Output name equal oldname are
+         * remove and a copy with a new name if push.
+         * @param oldname The old name of the vpz::Output.
+         * @param newname The new name of the vpz::Output.
+         */
+        void renameOutput(const std::string& oldname,
+                          const std::string& newname);
 
         /**
          * @brief Check if a View of the ViewList use the specific output.

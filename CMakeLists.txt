@@ -14,87 +14,8 @@ SET(VLE_COMPLETE "${VLE_MAJOR}.${VLE_MINOR}.${VLE_PATCH}${VLE_EXTRA}")
 SET(VLE_NAME_COMPLETE "${VLE_NAME}-${VLE_COMPLETE}")
 
 #
- # Append the library version information to the library target
- # properties.
+ # Installation variables
 #
-
-SET (VLE_LIBRARY_PROPERTIES ${VLE_LIBRARY_PROPERTIES}
-  VERSION "${VLE_VERSION}"
-  SOVERSION "${VLE_MAJOR}.${VLE_MINOR}")
-
-SET (VLE_APP_PROPERTIES ${VLE_APP_PROPERTIES}
-  VERSION "${VLE_VERSION}")
-
- #
-  # CPack configuration
- #
-
-IF(CMAKE_MAJOR_VERSION MATCHES "2" AND CMAKE_MINOR_VERSION MATCHES "6")
-  SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "VLE - Virtual Laboraory Environment")
-  SET(CPACK_PACKAGE_NAME "VLE")
-  SET(CPACK_PACKAGE_VENDOR "VLE Development Team")
-  SET(CPACK_PACKAGE_CONTACT "Gauthier Quesnel <quesnel@users.sourceforge.net>")
-  SET(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/README")
-  SET(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/COPYING")
-  SET(CPACK_PACKAGE_FILE_NAME "${VLE_NAME_COMPLETE}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}")
-  SET(CPACK_PACKAGE_VERSION ${VLE_NAME_COMPLETE})
-  SET(CPACK_PACKAGE_VERSION_MAJOR ${VLE_MAJOR})
-  SET(CPACK_PACKAGE_VERSION_MINOR ${VLE_MINOR})
-  SET(CPACK_PACKAGE_VERSION_PATCH ${VLE_PATCH})
-  SET(CPACK_PACKAGE_INSTALL_DIRECTORY ${VLE_NAME_COMPLETE})
-  SET(CPACK_PACKAGE_EXECUTABLES "vle" "vle" "oov" "oov")
-  SET(CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/share/pixmaps/vle.ico")
-
-  IF (UNIX AND NOT WIN32)
-    SET(CPACK_GENERATOR "TBZ2;TGZ;DEB;RPM")
-
-    # CPack source configuration
-    SET(CPACK_SOURCE_GENERATOR "TBZ2;TGZ;ZIP")
-    SET(CPACK_SOURCE_PACKAGE_FILE_NAME ${VLE_NAME_COMPLETE}-sources)
-    SET(CPACK_SOURCE_IGNORE_FILES "/\\\\.git/;/\\\\.gitignore;/build/")
-
-    # CPack DEB configuration
-    SET(CPACK_DEBIAN_PACKAGE_NAME ${VLE_NAME})
-    SET(CPACK_DEBIAN_PACKAGE_VERSION ${VLE_COMPLETE})
-    SET(CPACK_DEBIAN_PACKAGE_ARCHITECTURE i386)
-    SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libsigc++-2.0-0c2a, libglibmm-2.4-1c2a,
-    libxml++2.6-2, libcairomm-1.0-1")
-    SET(CPACK_DEBIAN_PACKAGE_BUILDS_DEPENDS "debhelper (>= 5.0.0), cmake (>=
-    2.4), gcc (>= 4:3.2.2-0), g++ (>= 4:3.2.2-0), libsigc++-2.0-dev,
-    libglibmm-2.4-dev, libxml++2.6-dev, libcairomm-1.0-dev, libboost-dev,
-    pkg-config")
-    SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Gauthier Quesnel <quesnel@users.sourceforge.net>")
-    SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION "VLE, an environment of modeling and simulation")
-    SET(CPACK_DEBIAN_PACKAGE_SECTION "libs")
-    SET(CPACK_DEBIAN_PACKAGE_PRIORITY "extra")
-
-    # CPack RPM configuration
-    SET(CPACK_RPM_PACKAGE_SUMMARY "VLE, an environment of modeling and simulation")
-    SET(CPACK_RPM_PACKAGE_NAME ${VLE_NAME})
-    SET(CPACK_RPM_PACKAGE_VERSION ${VLE_MAJOR}.${VLE_MINOR}.${VLE_PATCH})
-    SET(CPACK_RPM_PACKAGE_ARCHITECTURE i386)
-    SET(CPACK_RPM_PACKAGE_RELEASE "1")
-    SET(CPACK_RPM_PACKAGE_VENDOR "VLE Development Team")
-    SET(CPACK_RPM_PACKAGE_LICENSE "GNU General Public License (GPL)")
-    SET(CPACK_RPM_PACKAGE_DESCRIPTION "VLE, an environment of modeling and simulation")
-  ELSE (UNIX AND NOT WIN32)
-    SET(CPACK_GENERATOR "ZIP;NSIS")
-
-    SET(CPACK_PACKAGE_ICON ${CMAKE_SOURCE_DIR}/share/vle.ico)
-    SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\vle.exe")
-    SET(CPACK_NSIS_DISPLAY_NAME "VLE - Virtual Laboraory Environment")
-    SET(CPACK_NSIS_HELP_LINK "http:\\\\\\\\vle.univ-littoral.fr")
-    SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\vle.univ-littoral.fr")
-    SET(CPACK_NSIS_CONTACT "Gauthier Quesnel <quesnel@users.sourceforge.net>")
-    SET(CPACK_NSIS_MODIFY_PATH ON)
-  ENDIF (UNIX AND NOT WIN32)
-
-  INCLUDE(CPack)
-ENDIF(CMAKE_MAJOR_VERSION MATCHES "2" AND CMAKE_MINOR_VERSION MATCHES "6")
-
- #
-  # Installation variables
- #
 
 SET(VLE_LIBRARY_DIRS "lib/${VLE_NAME_VERSION}")
 SET(VLE_INCLUDE_DIRS "include/${VLE_NAME_VERSION}/vle")
@@ -102,22 +23,109 @@ SET(VLE_INCLUDE_DIR "include/${VLE_NAME_VERSION}")
 SET(VLE_MANPAGE_PATH "share/man/man1")
 SET(VLE_SHARE_DIRS "share/${VLE_NAME_VERSION}")
 
- #
-  # Debug mode
- #
+#
+ # Append the library version information to the library target
+ # properties.
+#
+
+SET (VLE_LIBRARY_PROPERTIES ${VLE_LIBRARY_PROPERTIES} VERSION "${VLE_VERSION}" SOVERSION "${VLE_MAJOR}.${VLE_MINOR}")
+SET (VLE_APP_PROPERTIES ${VLE_APP_PROPERTIES} VERSION "${VLE_VERSION}")
+
+#
+ # CPack configuration
+#
+
+IF(CMAKE_MAJOR_VERSION MATCHES "2" AND CMAKE_MINOR_VERSION MATCHES "6")
+  IF (WIN32)
+    SET(CPACK_GENERATOR "NSIS")
+    SET(CPACK_SOURCE_GENERATOR "ZIP")
+  ENDIF (WIN32)
+
+  IF (UNIX)
+    SET(CPACK_GENERATOR "STGZ;TGZ;TBZ2;TZ;DEB;RPM")
+    SET(CPACK_SOURCE_GENERATOR "TGZ;TBZ2;TGZ;TZ")
+  ENDIF (UNIX)
+
+  IF (APPLE)
+    SET(CPACK_GENERATOR "OSXX11")
+  ENDIF (APPLE)
+
+  SET(CPACK_PACKAGE_NAME "VLE")
+  SET(CPACK_PACKAGE_VENDOR "VLE Development Team")
+  SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "VLE - Virtual Laboraory Environment")
+  SET(CPACK_PACKAGE_CONTACT "Gauthier Quesnel <quesnel@users.sourceforge.net>")
+  SET(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/README")
+  SET(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/COPYING")
+  SET(CPACK_PACKAGE_FILE_NAME "${VLE_NAME_COMPLETE}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}")
+  SET(CPACK_PACKAGE_VERSION_MAJOR "${VLE_MAJOR}")
+  SET(CPACK_PACKAGE_VERSION_MINOR "${VLE_MINOR}")
+  IF (${VLE_EXTRA} STREQUAL "")
+    SET(CPACK_PACKAGE_VERSION_PATCH "${VLE_PATCH}")
+  ELSE (${VLE_EXTRA} STREQUAL "")
+    SET(CPACK_PACKAGE_VERSION_PATCH "${VLE_PATCH}${VLE_EXTRA}")
+  ENDIF (${VLE_EXTRA} STREQUAL "")
+  SET(CPACK_PACKAGE_INSTALL_DIRECTORY ${VLE_NAME_COMPLETE})
+  SET(CPACK_PACKAGE_EXECUTABLES "vle" "VLE" "oov" "OOV" "eov" "EOV" "gvle" "GVLE")
+
+  # CPack source configuration
+  SET(CPACK_SOURCE_PACKAGE_FILE_NAME ${VLE_NAME_COMPLETE}-sources)
+  SET(CPACK_SOURCE_IGNORE_FILES "\\\\.swp$;/\\\\.gitignore;/build/;/\\\\.git/")
+
+  # CPack DEB configuration
+  SET(CPACK_DEBIAN_PACKAGE_NAME ${VLE_NAME})
+  SET(CPACK_DEBIAN_PACKAGE_VERSION ${VLE_COMPLETE})
+  SET(CPACK_DEBIAN_PACKAGE_ARCHITECTURE i386)
+  SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libsigc++-2.0-0c2a, libglibmm-2.4-1c2a, libxml++2.6-2, libcairomm-1.0-1")
+  SET(CPACK_DEBIAN_PACKAGE_BUILDS_DEPENDS "debhelper (>= 5.0.0), cmake (>= 2.4), gcc (>= 4:3.2.2-0), g++ (>= 4:3.2.2-0), libsigc++-2.0-dev, libglibmm-2.4-dev, libxml++2.6-dev, libcairomm-1.0-dev, libboost-dev, pkg-config")
+  SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Gauthier Quesnel <quesnel@users.sourceforge.net>")
+  SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION "VLE, an environment of modeling and simulation")
+  SET(CPACK_DEBIAN_PACKAGE_SECTION "libs")
+  SET(CPACK_DEBIAN_PACKAGE_PRIORITY "extra")
+
+  # CPack RPM configuration
+  SET(CPACK_RPM_PACKAGE_SUMMARY "VLE, an environment of modeling and simulation")
+  SET(CPACK_RPM_PACKAGE_NAME ${VLE_NAME})
+  SET(CPACK_RPM_PACKAGE_VERSION ${VLE_MAJOR}.${VLE_MINOR}.${VLE_PATCH})
+  SET(CPACK_RPM_PACKAGE_ARCHITECTURE i386)
+  SET(CPACK_RPM_PACKAGE_RELEASE "1")
+  SET(CPACK_RPM_PACKAGE_VENDOR "VLE Development Team")
+  SET(CPACK_RPM_PACKAGE_LICENSE "GNU General Public License (GPL)")
+  SET(CPACK_RPM_PACKAGE_DESCRIPTION "VLE, an environment of modeling and simulation")
+
+  # CPack NSIS configuration
+  IF (CPACK_GENERATOR MATCHES "NSIS")
+    SET(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/share/pixmaps\\vle.ico")
+    SET(CPACK_NSIS_MUI_UNIICON "${CMAKE_SOURCE_DIR}/share/pixmaps\\vle.ico")
+    SET(CPACK_PACKAGE_ICON "${CMAKE_MAJOR_VERSION}/share/pixmaps\\logo.bmp")
+    SET(CPACK_NSIS_MENU_LINKS
+      "${VLE_SHARE_DIRS}/doc/html/index.html" "VLE API"
+      "http://vle.univ-littoral.fr" "VLE Web Site")
+    SET(CPACK_CREATE_DESKTOP_LINKS "GVLE" "VLE")
+    SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\vle.exe")
+    SET(CPACK_NSIS_DISPLAY_NAME "VLE - Virtual Laboraory Environment")
+    SET(CPACK_NSIS_HELP_LINK "http:\\\\\\\\vle.univ-littoral.fr")
+    SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\vle.univ-littoral.fr")
+    SET(CPACK_NSIS_CONTACT "Gauthier Quesnel <quesnel@users.sourceforge.net>")
+    SET(CPACK_NSIS_MODIFY_PATH ON)
+  ENDIF (CPACK_GENERATOR MATCHES "NSIS")
+
+  INCLUDE(CPack)
+ENDIF(CMAKE_MAJOR_VERSION MATCHES "2" AND CMAKE_MINOR_VERSION MATCHES "6")
+
+#
+ # Debug mode
+#
 
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -W -pedantic")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_C_FLAGS}")
 
 IF(NOT CMAKE_BUILD_TYPE)
-  SET(CMAKE_BUILD_TYPE Debug CACHE STRING
-    "Type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
-    FORCE)
+  SET(CMAKE_BUILD_TYPE Debug CACHE STRING "Type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
 ENDIF(NOT CMAKE_BUILD_TYPE)
 
- #
-  # Manage the Win32 port.
- #
+#
+ # Manage the Win32 port.
+#
 
 IF(WIN32)
   SET(OS_SPECIFIC_LIBRARIES wsock32 netapi32 z intl iconv)
@@ -125,18 +133,18 @@ ELSE(WIN32)
   SET(OS_SPECIFIC_LIBRARIES)
 ENDIF(WIN32)
 
- #
-  # Modules
- #
+#
+ # Modules
+#
 
 INCLUDE(CheckIncludeFileCXX)
 INCLUDE(CheckIncludeFile)
 INCLUDE(CheckLibraryExists)
 INCLUDE(CMakeDetermineCCompiler)
 
- #
-  # Check libraries with pkgconfig
- #
+#
+ # Check libraries with pkgconfig
+#
 
 FIND_PACKAGE(PkgConfig)
 IF (NOT PkgConfig_FOUND)
@@ -152,31 +160,30 @@ ENDIF (COMMAND CMAKE_POLICY)
 PKG_CHECK_MODULES(GLIBMM REQUIRED glibmm-2.4)
 PKG_CHECK_MODULES(GTHREAD REQUIRED gthread-2.0)
 PKG_CHECK_MODULES(LIBXMLPP REQUIRED libxml++-2.6)
+PKG_CHECK_MODULES(CAIROMM cairomm-1.0>=1.2)
+PKG_CHECK_MODULES(GLADEMM libglademm-2.4)
+PKG_CHECK_MODULES(GTKMM gtkmm-2.4)
 
 OPTION(WITH_CAIRO "use the cairomm to build output plugin [default: on]" ON)
 IF (WITH_CAIRO)
-  PKG_CHECK_MODULES(CAIROMM cairomm-1.0)
   IF (CAIROMM_FOUND)
     SET(HAVE_CAIRO 1 CACHE INTERNAL "" FORCE)
   ENDIF (CAIROMM_FOUND)
 ENDIF (WITH_CAIRO)
 
 OPTION(WITH_EOV "use the gtkmm and glademm to build eov [default: on]" ON)
-IF (WITH_EOV)
-  PKG_CHECK_MODULES(GLADEMM libglademm-2.4)
-  IF (GLADEMM_FOUND)
-    SET(HAVE_GLADE 1 CACHE INTERNAL "" FORCE)
-    PKG_CHECK_MODULES(GTKMM gtkmm-2.4)
-    IF (GTKMM_FOUND)
-      SET(HAVE_GTKMM 1 CACHE INTERNAL "" FORCE)
-      SET(HAVE_EOV 1 CACHE INTERNAL "" FORCE)
-    ENDIF (GTKMM_FOUND)
-  ENDIF (GLADEMM_FOUND)
-ENDIF (WITH_EOV)
+IF (WITH_EOV AND GLADEMM_FOUND AND GTKMM_FOUND)
+  SET(HAVE_EOV 1 CACHE INTERNAL "" FORCE)
+ENDIF (WITH_EOV AND GLADEMM_FOUND AND GTKMM_FOUND)
 
- #
-  # Test the libsqlxx dependencies
- #
+OPTION(WITH_GVLE "use the gtkmm and glademm to build gvle [default: on]" ON)
+IF (WITH_GVLE AND GLADEMM_FOUND AND GTKMM_FOUND)
+  SET(HAVE_GVLE 1 CACHE INTERNAL "" FORCE)
+ENDIF (WITH_GVLE AND GLADEMM_FOUND AND GTKMM_FOUND)
+
+#
+ # Test the libsqlxx dependencies
+#
 
 OPTION(WITH_SQLXX "with libsqlxx for the odbc driver [default: on]" ON)
 IF (WITH_SQLXX)
@@ -188,32 +195,43 @@ IF (WITH_SQLXX)
   ENDIF (HAVE_SQLXX)
 ENDIF (WITH_SQLXX)
 
- #
-  # Test the libboost header and libboost-text library.
- #
+#
+ # Test the libboost header and libboost-text library.
+#
 
 OPTION(WITH_TEST "use the libboost test unit library [default: on]" ON)
-
-FIND_PACKAGE(Boost)
-IF (Boost_FOUND)
+IF(CMAKE_MAJOR_VERSION MATCHES "2" AND CMAKE_MINOR_VERSION MATCHES "6")
+  SET(Boost_USE_STATIC_LIBS OFF)
+  SET(Boost_USE_MULTITHREAD ON)
   IF (WITH_TEST)
-    FIND_LIBRARY(Boost_UNITTESTFRAMEWORK NAMES boost_unit_test_framework
-      boost_unit_test_framework-mt PATHS Boost_LIBRARY_DIRS)
-    IF (Boost_UNITTESTFRAMEWORK)
+    FIND_PACKAGE(Boost COMPONENTS unit_test_framework)
+    IF (Boost_UNIT_TEST_FRAMEWORK_FOUND)
       SET(HAVE_UNITTESTFRAMEWORK 1 CACHE INTERNAL "" FORCE)
-    ELSE (Boost_UNITTESTFRAMEWORK)
-      SET(HAVE_UNITTESTFRAMEWORK 0 CACHE INTERNAL "" FORCE)
-    ENDIF (Boost_UNITTESTFRAMEWORK)
+    ENDIF (Boost_UNIT_TEST_FRAMEWORK_FOUND)
   ELSE (WITH_TEST)
-    SET(HAVE_UNITTESTFRAMEWORK 0 CACHE INTERNAL "" FORCE)
+    FIND_PACKAGE(Boost)
   ENDIF (WITH_TEST)
-ELSE (Boost_FOUND)
-  MESSAGE(ERROR "Boost include directory not found")
-ENDIF (Boost_FOUND)
+ELSE(CMAKE_MAJOR_VERSION MATCHES "2" AND CMAKE_MINOR_VERSION MATCHES "6")
+  FIND_PACKAGE(Boost)
+  IF (Boost_FOUND)
+    IF (WITH_TEST)
+      FIND_LIBRARY(Boost_UNIT_TEST_FRAMEWORK_LIBRARY NAMES
+        boost_unit_test_framework boost_unit_test_framework-mt PATHS
+        Boost_LIBRARY_DIRS)
+      IF (Boost_UNIT_TEST_FRAMEWORK_LIBRARY)
+        SET(HAVE_UNITTESTFRAMEWORK 1 CACHE INTERNAL "" FORCE)
+      ELSE (Boost_UNIT_TEST_FRAMEWORK_LIBRARY)
+        SET(HAVE_UNITTESTFRAMEWORK 0 CACHE INTERNAL "" FORCE)
+      ENDIF (Boost_UNIT_TEST_FRAMEWORK_LIBRARY)
+    ELSE (WITH_TEST)
+      SET(HAVE_UNITTESTFRAMEWORK 0 CACHE INTERNAL "" FORCE)
+    ENDIF (WITH_TEST)
+  ENDIF (Boost_FOUND)
+ENDIF (CMAKE_MAJOR_VERSION MATCHES "2" AND CMAKE_MINOR_VERSION MATCHES "6")
 
- #
-  # Generate the config.h
- #
+#
+ # Generate the config.h
+#
 
 CHECK_INCLUDE_FILE_CXX(cxxabi.h HAVE_GCC_ABI_DEMANGLE)
 CHECK_INCLUDE_FILE_CXX(execinfo.h HAVE_EXECINFO_H)
@@ -221,12 +239,12 @@ CHECK_INCLUDE_FILE_CXX(signal.h HAVE_SIGNAL_H)
 INCLUDE_DIRECTORIES(${VLE_BINARY_DIR})
 CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/config.h.in ${VLE_BINARY_DIR}/config.h)
 
- #
-  # Generate the vle.pc pkg-config file.
-  # Build some variable to build a correct Win32 pkg config file with:
-  # prefix=/target to detect the DIRNAME
-  # cflag=-Iboost_1_34_1 for the directory
- #
+#
+ # Generate the vle.pc pkg-config file.
+ # Build some variable to build a correct Win32 pkg config file with:
+ # prefix=/target to detect the DIRNAME
+ # cflag=-Iboost_1_34_1 for the directory
+#
 
 IF(UNIX AND NOT WIN32)
   SET(VLE_PKGCONFIG_PREFIXPATH "${CMAKE_INSTALL_PREFIX}")
@@ -237,21 +255,17 @@ ELSE(UNIX AND NOT WIN32)
   SET(VLE_PKGCONFIG_BOOSTINCLUDE_DIRS "\${includedir}/${BOOST_DIRNAME}")
 ENDIF(UNIX AND NOT WIN32)
 
-CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/src/vle/vle.pc.in
-  ${VLE_BINARY_DIR}/vle-${VLE_VERSION_SHORT}.pc @ONLY)
-INSTALL(FILES ${VLE_BINARY_DIR}/vle-${VLE_VERSION_SHORT}.pc DESTINATION
-  lib/pkgconfig)
+CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/src/vle/vle.pc.in ${VLE_BINARY_DIR}/vle-${VLE_VERSION_SHORT}.pc @ONLY)
+INSTALL(FILES ${VLE_BINARY_DIR}/vle-${VLE_VERSION_SHORT}.pc DESTINATION lib/pkgconfig)
 
 IF (HAVE_EOV)
-  CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/src/vle/eov.pc.in
-    ${VLE_BINARY_DIR}/eov-${VLE_VERSION_SHORT}.pc @ONLY)
-  INSTALL(FILES ${VLE_BINARY_DIR}/eov-${VLE_VERSION_SHORT}.pc DESTINATION
-    lib/pkgconfig)
+  CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/src/vle/eov.pc.in ${VLE_BINARY_DIR}/eov-${VLE_VERSION_SHORT}.pc @ONLY)
+  INSTALL(FILES ${VLE_BINARY_DIR}/eov-${VLE_VERSION_SHORT}.pc DESTINATION lib/pkgconfig)
 ENDIF (HAVE_EOV)
 
- #
-  # Generate the vle.nsi script.
- #
+#
+ # Generate the vle.nsi script.
+#
 
 IF(WIN32)
   CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/share/vle.nsi.in ${VLE_BINARY_DIR}/vle.nsi
@@ -260,21 +274,21 @@ IF(WIN32)
   INSTALL(FILES COPYING DESTINATION ${VLE_SHARE_DIRS})
 ENDIF(WIN32)
 
- #
-  # Install the README
- #
+#
+ # Install the README
+#
 
 INSTALL(FILES ${CMAKE_SOURCE_DIR}/README DESTINATION ${VLE_SHARE_DIRS})
 
- #
-  # Browse the share subdirectory
- #
+#
+ # Browse the share subdirectory
+#
 
 ADD_SUBDIRECTORY(share)
 
- #
-  # Generating documentation with doxygen
- #
+#
+ # Generating documentation with doxygen
+#
 
 OPTION(WITH_DOXYGEN "build the documentation with doxygen [default: off]" OFF)
 IF (WITH_DOXYGEN)
@@ -286,15 +300,15 @@ IF (WITH_DOXYGEN)
   ENDIF (DOXYGEN)
 ENDIF(WITH_DOXYGEN)
 
- #
-  # Browse the src subdirectory
- #
+#
+ # Browse the src subdirectory
+#
 
 ADD_SUBDIRECTORY(src)
 
- #
-  # Status
- #
+#
+ # Status
+#
 
 MESSAGE(STATUS "- - - -")
 MESSAGE(STATUS "${VLE_NAME_COMPLETE} configured successfully")
@@ -321,7 +335,9 @@ ENDIF (HAVE_EOV)
 IF (HAVE_CAIRO)
   MESSAGE(STATUS "Build with cairo plugin.......: yes")
 ENDIF (HAVE_CAIRO)
+IF (HAVE_GVLE)
+  MESSAGE(STATUS "Build with gvle...............: yes")
+ENDIF (HAVE_GVLE)
 MESSAGE(STATUS "- - - -")
 
-
-# vim:ts=8:tw=0:sw=2:sts=2
+# vim:tw=0:ts=8:tw=0:sw=2:sts=2

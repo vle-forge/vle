@@ -1,5 +1,5 @@
 /**
- * @file src/vle/extension/PetriNet.cpp
+ * @file vle/extension/PetriNet.cpp
  * @author The VLE Development Team
  */
 

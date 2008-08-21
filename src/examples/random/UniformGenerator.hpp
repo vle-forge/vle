@@ -1,5 +1,5 @@
 /**
- * @file src/examples/random/UniformGenerator.hpp
+ * @file examples/random/UniformGenerator.hpp
  * @author The VLE Development Team
  */
 

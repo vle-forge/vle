@@ -1,5 +1,5 @@
 /**
- * @file src/vle/vpz/RefreshTrame.cpp
+ * @file vle/vpz/RefreshTrame.cpp
  * @author The VLE Development Team
  */
 
@@ -21,6 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 
 #include <vle/vpz/RefreshTrame.hpp>
 

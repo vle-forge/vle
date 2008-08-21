@@ -1,5 +1,5 @@
 /**
- * @file src/vle/utils/Path.cpp
+ * @file vle/utils/PathUnix.cpp
  * @author The VLE Development Team
  */
 
@@ -21,6 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 
 #include <glibmm/fileutils.h>
 #include <glibmm/miscutils.h>

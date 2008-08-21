@@ -1,5 +1,5 @@
 /**
- * @file src/vle/vpz/Structures.hpp
+ * @file vle/vpz/Structures.hpp
  * @author The VLE Development Team
  */
 
@@ -21,6 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 
 #ifndef VLE_VPZ_STRUCTURES_HPP
 #define VLE_VPZ_STRUCTURES_HPP

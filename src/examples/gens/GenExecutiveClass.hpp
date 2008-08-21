@@ -1,5 +1,5 @@
 /**
- * @file src/examples/gens/GenExecutiveClass.hpp
+ * @file examples/gens/GenExecutiveClass.hpp
  * @author The VLE Development Team
  */
 

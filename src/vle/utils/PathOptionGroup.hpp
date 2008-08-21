@@ -1,5 +1,5 @@
 /**
- * @file src/vle/utils/PathOptionGroup.hpp
+ * @file vle/utils/PathOptionGroup.hpp
  * @author The VLE Development Team
  */
 
@@ -21,8 +21,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 
 
 #ifndef VLE_UTILS_PATH_OPTION_GROUP_HPP

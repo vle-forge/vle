@@ -1,5 +1,5 @@
 /**
- * @file src/vle/eov/plugins/default/GtkDefault.cpp
+ * @file vle/eov/plugins/default/GtkDefault.cpp
  * @author The VLE Development Team
  */
 

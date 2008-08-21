@@ -1,5 +1,5 @@
 /**
- * @file src/vle/eov/Plugin.cpp
+ * @file vle/eov/Plugin.cpp
  * @author The VLE Development Team
  */
 

@@ -1,5 +1,5 @@
 /**
- * @file src/vle/vpz/AtomicModels.cpp
+ * @file vle/vpz/AtomicModels.cpp
  * @author The VLE Development Team
  */
 
@@ -21,6 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 
 #include <vle/vpz/AtomicModels.hpp>
 #include <vle/utils/Debug.hpp>
@@ -63,6 +64,16 @@ AtomicModel& AtomicModelList::add(graph::Model* mdl,
 
     return (*m_lst.insert(std::make_pair < graph::Model*, AtomicModel >(
                 mdl, atom)).first).second;
+}
+
+void AtomicModelList::del(graph::Model* mdl)
+{
+    iterator it = m_lst.find(mdl);
+    Assert(utils::ArgError, it != end(), boost::format(
+            "The model [%1%] have not external information")
+        % mdl->getName());
+
+    m_lst.erase(it);
 }
 
 const AtomicModel& AtomicModelList::get(graph::Model* atom) const

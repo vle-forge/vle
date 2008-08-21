@@ -1,5 +1,5 @@
 /**
- * @file src/examples/qss/ladybird.cpp
+ * @file examples/qss/ladybird.cpp
  * @author The VLE Development Team
  */
 

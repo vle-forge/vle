@@ -1,5 +1,5 @@
 /**
- * @file src/examples/random/RandomGenerator.hpp
+ * @file examples/random/RandomGenerator.hpp
  * @author The VLE Development Team
  */
 

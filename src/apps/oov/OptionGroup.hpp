@@ -1,5 +1,5 @@
 /**
- * @file src/apps/oov/OptionGroup.hpp
+ * @file apps/oov/OptionGroup.hpp
  * @author The VLE Development Team
  */
 
@@ -21,8 +21,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 
 
 #ifndef OOV_OPTIONGROUP_HPP

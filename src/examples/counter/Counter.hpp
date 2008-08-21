@@ -1,5 +1,5 @@
 /**
- * @file src/examples/counter/Counter.hpp
+ * @file examples/counter/Counter.hpp
  * @author The VLE Development Team
  */
 

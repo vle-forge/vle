@@ -1,5 +1,5 @@
 /**
- * @file src/examples/examples/random/GeneratorWrapper.hpp
+ * @file examples/random/GeneratorWrapper.hpp
  * @author The VLE Development Team
  */
 

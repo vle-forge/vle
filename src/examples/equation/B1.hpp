@@ -1,5 +1,5 @@
 /**
- * @file src/examples/equation/B1.hpp
+ * @file examples/equation/B1.hpp
  * @author The VLE Development Team
  */
 

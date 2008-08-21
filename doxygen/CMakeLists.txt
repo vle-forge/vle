@@ -1,19 +1,17 @@
-SET(DOXYGEN_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
-SET(DOXYGEN_OUTPUT_DIR ${VLE_BINARY_DIR}/doxygen)
-CONFIGURE_FILE(doxygen.conf.in ${VLE_BINARY_DIR}/doxygen.conf)
+SET(DOXYGEN_SOURCE_DIR "${CMAKE_SOURCE_DIR}/src")
+SET(DOXYGEN_OUTPUT_DIR "${VLE_BINARY_DIR}/doxygen")
+CONFIGURE_FILE(doxygen.conf.in "${VLE_BINARY_DIR}/doxygen.conf")
+
+FILE(MAKE_DIRECTORY "${VLE_BINARY_DIR}/doxygen/html")
 
 ADD_CUSTOM_COMMAND(
-  OUTPUT ${VLE_BINARY_DIR}/doxygen/html/index.html
-  DEPENDS ${VLE_BINARY_DIR}/doxygen.conf
-  COMMAND ${DOXYGEN}
-  ARGS ${VLE_BINARY_DIR}/doxygen.conf)
+  OUTPUT "${VLE_BINARY_DIR}/doxygen/html/index.html"
+  DEPENDS "${VLE_BINARY_DIR}/doxygen.conf"
+  COMMAND "${DOXYGEN}"
+  ARGS "${VLE_BINARY_DIR}/doxygen.conf")
 
-ADD_CUSTOM_TARGET(doc ALL DEPENDS ${VLE_BINARY_DIR}/doxygen.conf
-  ${VLE_BINARY_DIR}/doxygen/html/index.html VERBATIM)
+ADD_CUSTOM_TARGET(doc ALL DEPENDS "${VLE_BINARY_DIR}/doxygen.conf"
+  "${VLE_BINARY_DIR}/doxygen/html/index.html" VERBATIM)
 
-FILE(MAKE_DIRECTORY ${VLE_BINARY_DIR}/doxygen/html)
-
-INSTALL(DIRECTORY ${VLE_BINARY_DIR}/doxygen/html
-  DESTINATION ${VLE_SHARE_DIRS}/doc
-  PATTERN "CMakeFiles" EXCLUDE
-  PATTERN "html")
+INSTALL(DIRECTORY "${VLE_BINARY_DIR}/doxygen/html"
+  DESTINATION "${VLE_SHARE_DIRS}/doc")

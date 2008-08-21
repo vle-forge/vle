@@ -1,5 +1,5 @@
 /**
- * @file src/examples/random/GeneratorWrapper.cpp
+ * @file examples/random/GeneratorWrapper.cpp
  * @author The VLE Development Team
  */
 

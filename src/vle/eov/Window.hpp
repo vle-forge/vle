@@ -1,5 +1,5 @@
 /**
- * @file src/vle/eov/Window.hpp
+ * @file vle/eov/Window.hpp
  * @author The VLE Development Team
  */
 

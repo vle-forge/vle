@@ -1,5 +1,5 @@
 /**
- * @file src/examples/gens/Beep.cpp
+ * @file examples/gens/Beep.cpp
  * @author The VLE Development Team
  */
 

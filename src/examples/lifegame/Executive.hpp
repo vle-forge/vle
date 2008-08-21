@@ -1,5 +1,5 @@
 /**
- * @file src/examples/lifegame/Executive.hpp
+ * @file examples/lifegame/Executive.hpp
  * @author The VLE Development Team
  */
 

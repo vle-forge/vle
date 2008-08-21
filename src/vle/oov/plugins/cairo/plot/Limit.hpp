@@ -1,5 +1,5 @@
 /**
- * @file src/vle/oov/plugins/cairo/plot/Limit.hpp
+ * @file vle/oov/plugins/cairo/plot/Limit.hpp
  * @author The VLE Development Team
  */
 
@@ -21,8 +21,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 
 
 #ifndef VLE_OOV_PLUGINS_CAIRO_PLOT_LIMIT_HPP

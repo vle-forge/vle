@@ -1,5 +1,5 @@
 /**
- * @file src/vle/oov/plugins/cairo/caview/CairoCAView.cpp
+ * @file vle/oov/plugins/cairo/caview/CairoCAView.cpp
  * @author The VLE Development Team
  */
 
@@ -21,8 +21,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 
 
 #include <vle/oov/plugins/cairo/caview/CairoCAView.hpp>

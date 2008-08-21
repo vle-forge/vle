@@ -1,5 +1,5 @@
 /**
- * @file src/examples/random/LogNormalGenerator.cpp
+ * @file examples/random/LogNormalGenerator.cpp
  * @author The VLE Development Team
  */
 

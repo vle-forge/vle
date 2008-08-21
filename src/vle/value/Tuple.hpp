@@ -1,5 +1,5 @@
 /**
- * @file src/vle/value/Tuple.hpp
+ * @file vle/value/Tuple.hpp
  * @author The VLE Development Team
  */
 
@@ -21,8 +21,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 
 
 #ifndef UTILS_VALUE_TUPLE_HPP

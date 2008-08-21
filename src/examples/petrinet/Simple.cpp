@@ -1,5 +1,5 @@
 /**
- * @file src/examples/petrinet/Logical.cpp
+ * @file examples/petrinet/Simple.cpp
  * @author The VLE Development Team
  */
 

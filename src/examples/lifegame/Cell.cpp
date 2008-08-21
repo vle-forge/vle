@@ -1,5 +1,5 @@
 /**
- * @file src/examples/lifegame/Cell.cpp
+ * @file examples/lifegame/Cell.cpp
  * @author The VLE Development Team
  */
 

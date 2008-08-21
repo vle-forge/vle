@@ -1,5 +1,5 @@
 /**
- * @file src/examples/examples/random/LogNormalGenerator.hpp
+ * @file examples/random/LogNormalGenerator.hpp
  * @author The VLE Development Team
  */
 

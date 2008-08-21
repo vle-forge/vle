@@ -1,5 +1,5 @@
 /**
- * @file src/vle/vpz/AtomicModels.hpp
+ * @file vle/vpz/AtomicModels.hpp
  * @author The VLE Development Team
  */
 
@@ -21,6 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 
 #ifndef VLE_VPZ_ATOMICMODELS_HPP
 #define VLE_VPZ_ATOMICMODELS_HPP
@@ -167,6 +168,13 @@ namespace vle { namespace vpz {
         AtomicModel& add(graph::Model* mdl, const AtomicModel& atom);
 
         /**
+         * @brief Delete the specified AtomicModel.
+         * @param mdl The graph::Model to find and delete.
+         * @throw utils::ArgError if mdl already exist.
+         */
+        void del(graph::Model* mdl);
+
+        /**
          * @brief Get an vpz::Model by his structural reference.
          * @param atom the reference to the structure.
          * @throw utils::ArgError if atom have no dynamics.
@@ -197,6 +205,15 @@ namespace vle { namespace vpz {
          * @return A constant reference to the vpz::Model.
          */
         AtomicModel& get(const graph::Model* atom);
+
+        /**
+         * @brief Check if the graph::AtomicModel exist into the
+         * AtomicModelList.
+         * @param atom The graph::AtomicModel to check.
+         * @return true if found, false otherwise.
+         */
+        bool exist(graph::Model* atom) const
+        { return m_lst.find(atom) != m_lst.end(); }
 
         /**
          * @brief Remove all reference into the AtomicModels.
@@ -231,6 +248,13 @@ namespace vle { namespace vpz {
 
         /**
          * @brief Get the begin of the AtomicModels.
+         * @return A reference to the begin of the AtomicModels.
+         */
+        iterator begin()
+        { return m_lst.begin(); }
+
+        /**
+         * @brief Get the begin of the AtomicModels.
          * @return A constant reference to the begin of the AtomicModels.
          */
         const_iterator begin() const
@@ -239,6 +263,13 @@ namespace vle { namespace vpz {
         /**
          * @brief Get the end of the AtomicModels.
          * @return A constant reference to the end of the AtomicModels.
+         */
+        iterator end()
+        { return m_lst.end(); }
+
+        /**
+         * @brief Get the end of the AtomicModels.
+         * @return A reference to the end of the AtomicModels.
          */
         const_iterator end() const
         { return m_lst.end(); }
@@ -283,7 +314,7 @@ namespace vle { namespace vpz {
 
             lst.add(atom, x.second);
         }
-    
+
         AtomicModelList& lst; //!< the output of this functor.
         graph::Model& top; //!< the hierarchy of graph::Model.
     };

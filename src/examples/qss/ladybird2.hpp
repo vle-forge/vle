@@ -1,5 +1,5 @@
 /**
- * @file src/examples/qss/ladybird2.hpp
+ * @file examples/qss/ladybird2.hpp
  * @author The VLE Development Team
  */
 
@@ -21,7 +21,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 
 
 #ifndef VLE_TUTORIAL_0_LADYBIRD_HPP

@@ -1,5 +1,5 @@
 /**
- * @file src/vle/extension/CombinedQSS.hpp
+ * @file vle/extension/CombinedQSS.hpp
  * @author The VLE Development Team
  */
 
@@ -21,8 +21,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 
 
 #ifndef VLE_EXTENSION_COMBINEDQSS_HPP

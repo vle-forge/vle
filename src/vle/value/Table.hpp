@@ -1,5 +1,5 @@
 /**
- * @file src/vle/value/Table.hpp
+ * @file vle/value/Table.hpp
  * @author The VLE Development Team
  */
 
@@ -21,8 +21,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 
 
 #ifndef UTILS_VALUE_TABLE_HPP

@@ -1,5 +1,5 @@
 /**
- * @file src/examples/qss/ladybirdplantlouse.hpp
+ * @file examples/qss/ladybirdplantlouse.hpp
  * @author The VLE Development Team
  */
 

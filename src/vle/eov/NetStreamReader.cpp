@@ -1,5 +1,5 @@
 /**
- * @file src/vle/eov/NetStreamReader.cpp
+ * @file vle/eov/NetStreamReader.cpp
  * @author The VLE Development Team
  */
 
