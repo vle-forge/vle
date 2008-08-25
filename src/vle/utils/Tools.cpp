@@ -316,6 +316,12 @@ void init()
     Glib::thread_init();
 }
 
+void finalize()
+{
+    utils::Path::kill();
+    utils::Trace::kill();
+}
+
 void printInformations(std::ostream& out)
 {
     utils::printVersion(out);

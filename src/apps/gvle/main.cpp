@@ -30,8 +30,6 @@
 #include <glibmm/optioncontext.h>
 #include <glibmm/thread.h>
 #include <iostream>
-#include <fstream>
-#include <string>
 
 namespace vle { namespace gvle {
 
@@ -46,7 +44,7 @@ public:
 	mLevel(0)
     {
         Glib::OptionEntry entry1;
-        entry1.set_long_name("info");
+        entry1.set_long_name("infos");
         entry1.set_short_name('i');
         entry1.set_description("Information on GVLE.");
         add_entry(entry1, mInfo);
@@ -86,9 +84,11 @@ int main(int argc, char** argv)
         context.parse(argc, argv);
     } catch (const Glib::Error& e) {
         std::cerr << "Error parsing command line: " << e.what() << std::endl;
+        vle::utils::finalize();
         return EXIT_FAILURE;
     } catch (const std::exception& e) {
         std::cerr << "Error parsing command line: " << e.what() << std::endl;
+        vle::utils::finalize();
         return EXIT_FAILURE;
     }
 
@@ -97,6 +97,7 @@ int main(int argc, char** argv)
     vle::utils::Trace::trace().setLevel(
         static_cast < vle::utils::Trace::Level >(group.mLevel));
 
+    bool result = true;
     if (group.mInfo) {
         std::cerr << "GVLE - the Gui of VLE\n";
         vle::utils::printInformations(std::cerr);
@@ -113,15 +114,16 @@ int main(int argc, char** argv)
 	    application.run(*g);
 	    delete g;
         } catch(const Glib::Exception& e) {
+            result = false;
             std::cerr << "\n/!\\ eov Glib error reported: " <<
                 vle::utils::demangle(typeid(e)) << "\n" << e.what();
-            return EXIT_FAILURE;
         } catch(const std::exception& e) {
+            result = false;
             std::cerr << "\n/!\\ eov exception reported: " <<
                 vle::utils::demangle(typeid(e)) << "\n" << e.what();
-            return EXIT_FAILURE;
         }
     }
 
-    return EXIT_SUCCESS;
+    vle::utils::finalize();
+    return result ? EXIT_SUCCESS : EXIT_FAILURE;
 }

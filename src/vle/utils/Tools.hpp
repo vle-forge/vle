@@ -544,6 +544,11 @@ namespace vle { namespace utils {
     void init();
 
     /**
+     * @brief Destroy all singleton and close systems.
+     */
+    void finalize();
+
+    /**
      * @brief Return the VLE version, copyright and the licences.
      *
      * @param out The stream where push the informations.

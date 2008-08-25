@@ -51,43 +51,43 @@ int main(int argc, char* argv[])
             static_cast < utils::Trace::Level >(command.verbose()));
     } catch(const Glib::Error& e) {
         std::cerr << "Error parsing command line: " << e.what() << std::endl;
+        utils::finalize();
         return EXIT_FAILURE;
     } catch(const std::exception& e) {
         std::cerr << "Command line error: " << e.what() << std::endl;
+        utils::finalize();
         return EXIT_FAILURE;
-    }
-
-    if (command.infos()) {
-        std::cerr << "EOV - the Eyes of VLE\n";
-        utils::printInformations(std::cerr);
-        return EXIT_SUCCESS;
-    } else if (command.version()) {
-        std::cerr << "EOV - the Eyes of VLE\n";
-        utils::printVersion(std::cerr);
-        return EXIT_SUCCESS;
     }
 
     if (command.isDaemon()) {
         utils::buildDaemon();
     }
 
-    try {
-        Gtk::Main app(argc, argv);
+    bool result = true;
+    if (command.infos()) {
+        std::cerr << "EOV - the Eyes of VLE\n";
+        utils::printInformations(std::cerr);
+    } else if (command.version()) {
+        std::cerr << "EOV - the Eyes of VLE\n";
+        utils::printVersion(std::cerr);
+    } else {
+        try {
+            Gtk::Main app(argc, argv);
 
-        eov::NetStreamReader net(command.port(), app);
-        net.process();
-
-	return EXIT_FAILURE;
-    } catch(const Glib::Exception& e) {
-	std::cerr << "\n/!\\ eov Glib error reported: " <<
-	    vle::utils::demangle(typeid(e)) << "\n" << e.what();
-	return EXIT_FAILURE;
-    } catch(const std::exception& e) {
-        std::cerr << "\n/!\\ eov exception reported: " <<
-            vle::utils::demangle(typeid(e)) << "\n" << e.what();
-        return EXIT_FAILURE;
+            eov::NetStreamReader net(command.port(), app);
+            net.process();
+        } catch(const Glib::Exception& e) {
+            result = false;
+            std::cerr << "\n/!\\ eov Glib error reported: " <<
+                vle::utils::demangle(typeid(e)) << "\n" << e.what();
+        } catch(const std::exception& e) {
+            result = false;
+            std::cerr << "\n/!\\ eov exception reported: " <<
+                vle::utils::demangle(typeid(e)) << "\n" << e.what();
+        }
     }
 
-    return EXIT_SUCCESS;
+    utils::finalize();
+    return result ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 

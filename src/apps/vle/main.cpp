@@ -30,8 +30,6 @@
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Debug.hpp>
 
-
-
 int main(int argc, char* argv[])
 {
     Glib::OptionContext context;
@@ -56,33 +54,36 @@ int main(int argc, char* argv[])
         path.assignToPath();
     } catch(const Glib::Error& e) {
         std::cerr << "Error parsing command line: " << e.what() << std::endl;
+        vle::utils::finalize();
         return EXIT_FAILURE;
     } catch(const std::exception& e) {
         std::cerr << "Command line error: " << e.what() << std::endl;
+        vle::utils::finalize();
         return EXIT_FAILURE;
     }
 
+    bool result = true;
     if (global.infos()) {
         vle::utils::printInformations(std::cerr);
-        return EXIT_SUCCESS;
     } else if (global.version()) {
         vle::utils::printVersion(std::cerr);
-        return EXIT_SUCCESS;
+    } else {
+        vle::manager::VLE vle(command.port());
+
+        if (command.manager()) {
+            result = vle.runManager(manag.allInLocal(), manag.savevpz(),
+                                    command.processor(),
+                                    vle::manager::CmdArgs(argv + 1, argv +
+                                                          argc));
+        } else if (command.simulator()) {
+            result = vle.runSimulator(command.processor());
+        } else if (command.justRun()) {
+            result = vle.justRun(command.processor(),
+                                 vle::manager::CmdArgs(argv + 1, argv + argc));
+        }
     }
 
-    vle::manager::VLE vle(command.port());
-    bool result = true;
-
-    if (command.manager()) {
-        result = vle.runManager(manag.allInLocal(), manag.savevpz(),
-                                command.processor(),
-                                vle::manager::CmdArgs(argv + 1, argv + argc));
-    } else if (command.simulator()) {
-        result = vle.runSimulator(command.processor());
-    } else if (command.justRun()) {
-        result = vle.justRun(command.processor(),
-                             vle::manager::CmdArgs(argv + 1, argv + argc));
-    }
+    vle::utils::finalize();
     return result ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
