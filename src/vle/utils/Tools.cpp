@@ -27,6 +27,7 @@
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Socket.hpp>
+#include <vle/utils/Path.hpp>
 #include <config.h>
 
 #include <glibconfig.h>
@@ -317,6 +318,33 @@ void init()
 
 void printInformations(std::ostream& out)
 {
+    utils::printVersion(out);
+
+    {
+        out << "* Simulator paths:\n";
+        const Path::PathList& paths(Path::path().getSimulatorDirs());
+        std::copy(paths.begin(), paths.end(), std::ostream_iterator <
+                Path::PathList::value_type >(out, ";"));
+        out << "\n";
+    }
+    {
+        out << "* Stream paths:\n";
+        const Path::PathList& paths(Path::path().getStreamDirs());
+        std::copy(paths.begin(), paths.end(), std::ostream_iterator <
+                Path::PathList::value_type >(out, ";"));
+        out << "\n";
+    }
+    {
+        out << "* Model paths:\n";
+        const Path::PathList& paths(Path::path().getModelDirs());
+        std::copy(paths.begin(), paths.end(), std::ostream_iterator <
+                Path::PathList::value_type >(out, ";"));
+        out << "\n";
+    }
+}
+
+void printVersion(std::ostream& out)
+{
     std::string extra(VLE_EXTRA_VERSION);
     if (not extra.empty()) {
         extra = "(" + extra + ")";
@@ -332,11 +360,6 @@ void printInformations(std::ostream& out)
         "For more information about these matters, see the file named COPYING.")
         % VLE_MAJOR_VERSION % VLE_MINOR_VERSION % VLE_PATCH_VERSION % extra
         << std::endl;
-}
-
-void printVersion(std::ostream& out)
-{
-    out << VLE_NAME_COMPLETE << "\n";
 }
 
 }} // namespace vle utils

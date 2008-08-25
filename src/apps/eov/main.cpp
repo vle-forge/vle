@@ -28,7 +28,6 @@
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Socket.hpp>
 #include <vle/eov/Plugin.hpp>
-#include <vle/manager/VLE.hpp>
 #include <vle/eov/NetStreamReader.hpp>
 #include <apps/eov/OptionGroup.hpp>
 #include <gtkmm/main.h>
@@ -59,10 +58,12 @@ int main(int argc, char* argv[])
     }
 
     if (command.infos()) {
-        manager::VLE::printInformations(std::cerr);
+        std::cerr << "EOV - the Eyes of VLE\n";
+        utils::printInformations(std::cerr);
         return EXIT_SUCCESS;
     } else if (command.version()) {
-        manager::VLE::printVersion(std::cerr);
+        std::cerr << "EOV - the Eyes of VLE\n";
+        utils::printVersion(std::cerr);
         return EXIT_SUCCESS;
     }
 
@@ -81,6 +82,10 @@ int main(int argc, char* argv[])
 	std::cerr << "\n/!\\ eov Glib error reported: " <<
 	    vle::utils::demangle(typeid(e)) << "\n" << e.what();
 	return EXIT_FAILURE;
+    } catch(const std::exception& e) {
+        std::cerr << "\n/!\\ eov exception reported: " <<
+            vle::utils::demangle(typeid(e)) << "\n" << e.what();
+        return EXIT_FAILURE;
     }
 
     return EXIT_SUCCESS;

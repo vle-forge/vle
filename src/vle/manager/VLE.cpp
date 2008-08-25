@@ -34,7 +34,6 @@
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Rand.hpp>
 #include <vle/vpz/Vpz.hpp>
-#include <config.h>
 
 #include <glibmm/optioncontext.h>
 #include <iostream>
@@ -133,16 +132,6 @@ bool VLE::justRun(int nbProcessor, const CmdArgs& args)
         }
     }
     return true;
-}
-
-void VLE::printInformations(std::ostream& out)
-{
-    utils::printInformations(out);
-}
-
-void VLE::printVersion(std::ostream& out)
-{
-    utils::printVersion(out);
 }
 
 }} // namespace vle manager

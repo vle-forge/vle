@@ -24,7 +24,6 @@
 
 
 #include <apps/oov/OptionGroup.hpp>
-#include <vle/manager/VLE.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Debug.hpp>
@@ -56,10 +55,12 @@ int main(int argc, char* argv[])
     }
 
     if (command.infos()) {
-        manager::VLE::printInformations(std::cerr);
+        std::cerr << "Oov - the Output of VLE\n";
+        utils::printInformations(std::cerr);
         return EXIT_SUCCESS;
     } else if (command.version()) {
-        manager::VLE::printVersion(std::cerr);
+        std::cerr << "Oov - the Output of VLE\n";
+        utils::printVersion(std::cerr);
         return EXIT_SUCCESS;
     }
 
@@ -71,8 +72,13 @@ int main(int argc, char* argv[])
         oov::OovNetStreamReader net(command.port());
         net.setBufferSize(4096);
         net.process();
+    } catch(const Glib::Exception& e) {
+	std::cerr << "\n/!\\ oov Glib error reported: " <<
+	    vle::utils::demangle(typeid(e)) << "\n" << e.what();
+	return EXIT_FAILURE;
     } catch(const std::exception& e) {
-        std::cerr << "oov failure: " << utils::demangle(e.what()) << "\n";
+        std::cerr << "\n/!\\ oov exception reported: " <<
+            vle::utils::demangle(typeid(e)) << "\n" << e.what();
         return EXIT_FAILURE;
     }
 

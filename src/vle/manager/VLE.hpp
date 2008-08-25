@@ -82,22 +82,6 @@ namespace vle { namespace manager {
          */
         bool justRun(int nbProcessor, const CmdArgs& args);
         
-        /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
-
-        /** 
-         * @brief Print the informations of VLE framework.
-         * 
-         * @param out stream to put information.
-         */
-        static void printInformations(std::ostream& out);
-
-        /** 
-         * @brief Print the version of VLE framework.
-         * 
-         * @param out stream to put information.
-         */
-        static void printVersion(std::ostream& out);
-
     private:
         int             mPort;
     };

@@ -32,7 +32,6 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include "config.h"
 
 namespace vle { namespace gvle {
 
@@ -70,39 +69,6 @@ public:
     int mLevel;    /// verbose level
 };
 
-/**
- * Show information of GVLE and VLE project.
- *
- */
-void print_version()
-{
-#ifndef NDEBUG
-    std::cout << boost::format("GVLE version %1% - %2%\nMode debug enabled\n")
-        % VLE_VERSION % __DATE__;
-#else
-    std::cout << boost::format("GVLE version %1% - %2%\n") %
-        VLE_VERSION % __DATE__;
-#endif
-}
-
-/**
- * Show all information on GVLE and VLE project.
- *
- */
-void print_help()
-{
-    print_version();
-
-    std::cout << boost::format(
-	"A GUI for Virtual Laboratory Environment\n"
-	"Framework for Multi-Modeling and Simulation of "
-	"Complex Systems.\n\n"
-	"Compiled with:\n"
-	" Gtkmm version %1%.%2%.%3%\n\n"
-	"Report bugs to quesnel@users.sourceforge.net\n\n") %
-	GTKMM_MAJOR_VERSION % GTKMM_MINOR_VERSION % GTKMM_MICRO_VERSION;
-}
-
 }} // namespace vle gvle
 
 int main(int argc, char** argv)
@@ -132,9 +98,11 @@ int main(int argc, char** argv)
         static_cast < vle::utils::Trace::Level >(group.mLevel));
 
     if (group.mInfo) {
-	vle::gvle::print_help();
+        std::cerr << "GVLE - the Gui of VLE\n";
+        vle::utils::printInformations(std::cerr);
     } else if (group.mVersion) {
-	vle::gvle::print_version();
+        std::cerr << "GVLE - the Gui of VLE\n";
+	vle::utils::printVersion(std::cerr);
     } else {
 	try {
 	    vle::gvle::GVLE* g = 0;
@@ -144,13 +112,16 @@ int main(int argc, char** argv)
 		g = new vle::gvle::GVLE;
 	    application.run(*g);
 	    delete g;
-	} catch(const std::exception& e) {
-	    std::cerr << "Error: " << e.what();
-	}
+        } catch(const Glib::Exception& e) {
+            std::cerr << "\n/!\\ eov Glib error reported: " <<
+                vle::utils::demangle(typeid(e)) << "\n" << e.what();
+            return EXIT_FAILURE;
+        } catch(const std::exception& e) {
+            std::cerr << "\n/!\\ eov exception reported: " <<
+                vle::utils::demangle(typeid(e)) << "\n" << e.what();
+            return EXIT_FAILURE;
+        }
     }
 
-    vle::utils::Path::kill();
-    vle::utils::Trace::kill();
-
-    return 0;
+    return EXIT_SUCCESS;
 }

@@ -63,10 +63,10 @@ int main(int argc, char* argv[])
     }
 
     if (global.infos()) {
-        vle::manager::VLE::printInformations(std::cerr);
+        vle::utils::printInformations(std::cerr);
         return EXIT_SUCCESS;
     } else if (global.version()) {
-        vle::manager::VLE::printVersion(std::cerr);
+        vle::utils::printVersion(std::cerr);
         return EXIT_SUCCESS;
     }
 
