@@ -61,56 +61,61 @@ std::string Path::buildUserPath(const std::string& dir)
 
 bool Path::initPath()
 {
-    LONG result;
-    HKEY hkey;
+    readEnv("VLE_SIMULATOR_PATH", m_simulator);
+    readEnv("VLE_OOV_PATH", m_stream);
+    readEnv("VLE_MODEL_PATH", m_model);
 
-    std::string key(boost::str(boost::format("%1% %2%.%3%.0") % 
-                               "SOFTWARE\\VLE Development Team\\VLE" %
-                               VLE_MAJOR_VERSION % VLE_MINOR_VERSION));
+    {
+        LONG result;
+        HKEY hkey;
+        std::string key(boost::str(boost::format("%1% %2%.%3%.0") %
+                    "SOFTWARE\\VLE Development Team\\VLE" %
+                    VLE_MAJOR_VERSION % VLE_MINOR_VERSION));
 
-    result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, key.c_str(),
-		    0, KEY_QUERY_VALUE, &hkey);
-    if (result != ERROR_SUCCESS) {
-        result = RegOpenKeyEx(HKEY_CURRENT_USER, key.c_str(),
-			0, KEY_QUERY_VALUE, &hkey);
+        if ((result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, key.c_str(), 0,
+                        KEY_QUERY_VALUE, &hkey)) != ERROR_SUCCESS) {
+            result = RegOpenKeyEx(HKEY_CURRENT_USER, key.c_str(),
+                    0, KEY_QUERY_VALUE, &hkey);
+        }
+
+        if (result == ERROR_SUCCESS) {
+            DWORD sz = 256;
+            char* buf = new char[sz];
+
+            if (RegQueryValueEx(hkey, (LPCTSTR)"", NULL, NULL,
+                        (LPBYTE)buf, &sz) == ERROR_SUCCESS) {
+                m_prefix.assign(buf);
+                addSimulatorDir(buildPrefixLibrariesPath(m_prefix, "simulator"));
+                addStreamDir(buildPrefixLibrariesPath(m_prefix, "stream"));
+                addModelDir(buildPrefixLibrariesPath(m_prefix, "model"));
+            } else {
+                sz = 256;
+                if (RegQueryValueEx(hkey, (LPCTSTR)"Path", NULL, NULL,
+                            (LPBYTE)buf, &sz) == ERROR_SUCCESS) {
+                    m_prefix.assign(buf);
+                    addSimulatorDir(buildPrefixLibrariesPath(m_prefix,
+                                "simulator"));
+                    addStreamDir(buildPrefixLibrariesPath(m_prefix, "stream"));
+                    addModelDir(buildPrefixLibrariesPath(m_prefix, "model"));
+                }
+            }
+            delete[] buf;
+        }
     }
 
-    if (result == ERROR_SUCCESS) {
-	char* buf = new char[256];
-	DWORD sz = 256;
+    addSimulatorDir(buildUserPath("simulator"));
+    addSimulatorDir("..\\simulator");
+    addSimulatorDir(".");
 
-	if (RegQueryValueEx(hkey, (LPCTSTR)"Path", NULL, NULL,
-			    (LPBYTE)buf, &sz) != ERROR_SUCCESS) {
-	    delete[] buf;
-	    return false;
-	}
-	m_prefix.assign(buf);
-	delete[] buf;
+    addStreamDir(buildUserPath("stream"));
+    addStreamDir("..\\stream");
+    addStreamDir(".");
 
-        readEnv("VLE_SIMULATOR_PATH", m_simulator);
-        addSimulatorDir(buildPrefixLibrariesPath(m_prefix, "simulator"));
-        addSimulatorDir(buildUserPath("simulator"));
-        addSimulatorDir("..\\simulator");
-        addSimulatorDir(".");
+    addModelDir(buildUserPath("model"));
+    addModelDir("..\\model");
+    addModelDir(".");
 
-        readEnv("VLE_OOV_PATH", m_stream);
-        addStreamDir(buildPrefixLibrariesPath(m_prefix, "stream"));
-        addStreamDir(buildUserPath("stream"));
-        addStreamDir("..\\stream");
-        addStreamDir(".");
-
-        readEnv("VLE_MODEL_PATH", m_model);
-        addModelDir(buildPrefixLibrariesPath(m_prefix, "model"));
-        addModelDir(buildUserPath("model"));
-        addModelDir("..\\model");
-        addModelDir(".");
-	return true;
-    } else {
-	throw utils::InternalError(boost::str(boost::format(
-		"Unable to open the Registry key in HKLM or HKCU '%1%'") %
-			key));
-    }
-    return false;
+    return true;
 }
 
 }} // namespace vle utils

@@ -65,18 +65,19 @@ bool Path::initPath()
     m_prefix.assign(VLE_PREFIX_DIR);
 
     readEnv("VLE_SIMULATOR_PATH", m_simulator);
+    readEnv("VLE_OOV_PATH", m_stream);
+    readEnv("VLE_MODEL_PATH", m_model);
+
     addSimulatorDir(buildPrefixLibrariesPath(m_prefix, "simulator"));
     addSimulatorDir(buildUserPath("simulator"));
     addSimulatorDir("./simulator");
     addSimulatorDir(".");
 
-    readEnv("VLE_OOV_PATH", m_stream);
     addStreamDir(buildPrefixLibrariesPath(m_prefix, "stream"));
     addStreamDir(buildUserPath("stream"));
     addStreamDir("./stream");
     addStreamDir(".");
 
-    readEnv("VLE_MODEL_PATH", m_model);
     addModelDir(buildPrefixLibrariesPath(m_prefix, "model"));
     addModelDir(buildUserPath("model"));
     addModelDir("./model");
