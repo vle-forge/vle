@@ -26,10 +26,10 @@
 #ifndef VLE_EOV_EOV_HPP
 #define VLE_EOV_EOV_HPP
 
+#include <vle/eov/MainWindow.hpp>
 #include <vle/eov/NetStreamReader.hpp>
 #include <vle/eov/Plugin.hpp>
 #include <vle/eov/Window.hpp>
-
 
 
 namespace vle {

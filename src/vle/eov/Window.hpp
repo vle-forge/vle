@@ -36,7 +36,7 @@ namespace vle { namespace eov {
     class Window : public Gtk::Window
     {
     public:
-        Window(PluginPtr plg);
+        Window(PluginPtr plg, Glib::Mutex& mutex);
 
         virtual ~Window();
 
@@ -59,6 +59,7 @@ namespace vle { namespace eov {
 
         bool runTimeout();
 
+        Glib::Mutex&                m_mutex;
         Gtk::VBox                   m_rootBox;
         PluginPtr                   m_plugin;
         sigc::connection            m_connection;

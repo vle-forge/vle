@@ -1,0 +1,210 @@
+/**
+ * @file vle/eov/MainWindow.cpp
+ * @author The VLE Development Team
+ */
+
+/*
+ * VLE Environment - the multimodeling and simulation environment
+ * This file is a part of the VLE environment (http://vle.univ-littoral.fr)
+ * Copyright (C) 2003 - 2008 The VLE Development Team
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+#include <vle/eov/MainWindow.hpp>
+#include <vle/eov/Window.hpp>
+#include <vle/eov/NetStreamReader.hpp>
+#include <vle/utils/Exception.hpp>
+#include <vle/utils/Tools.hpp>
+#include <gtkmm/menuitem.h>
+#include <gtkmm/textbuffer.h>
+#include <gtkmm/messagedialog.h>
+#include <boost/format.hpp>
+#include <config.h>
+
+namespace vle { namespace eov {
+
+MainWindow::MainWindow(Glib::RefPtr < Gnome::Glade::Xml > refXml, int port)
+    : mPort(port), mRefresh(10), mMenuNew(0), mMenuQuit(0), mMenuAbout(0),
+    mWindow(0), mPref(0), mAbout(0), mSpinPort(0), mSpinRefresh(0),
+    mTextview(0), mRefXml(refXml), mNet(0), mThread(0)
+{
+    mRefXml->get_widget("imagemenuitem_new", mMenuNew);
+    mRefXml->get_widget("imagemenuitem_quit", mMenuQuit);
+    mRefXml->get_widget("imagemenuitem_about", mMenuAbout);
+    mRefXml->get_widget("window_eov", mWindow);
+    mRefXml->get_widget("spinbutton_port", mSpinPort);
+    mRefXml->get_widget("spinbutton_refresh", mSpinRefresh);
+    mRefXml->get_widget("textview", mTextview);
+    mRefXml->get_widget("dialog_pref_eov", mPref);
+
+    mPref->signal_response().connect(
+        sigc::mem_fun(*this, &MainWindow::onPrefButton));
+
+    mMenuNew->signal_activate().connect(
+        sigc::mem_fun(*this, &MainWindow::onNew));
+    mMenuQuit->signal_activate().connect(
+        sigc::mem_fun(*this, &MainWindow::onQuit));
+    mMenuAbout->signal_activate().connect(
+        sigc::mem_fun(*this, &MainWindow::onAbout));
+}
+
+Gtk::Window& MainWindow::window()
+{
+    if (mWindow == 0) {
+        throw(utils::InternalError("EOV main window is not initialized"));
+    }
+    return *mWindow;
+}
+
+void MainWindow::addWindow(PluginPtr plugin)
+{
+    Window* wnd = new Window(plugin, mMutex);
+
+    wnd->signal_delete_event().connect(sigc::mem_fun(*this,
+		&MainWindow::onDeleteEventWindow));
+
+    mBufferedStream[wnd] = mNet;
+    wnd->show_all();
+}
+
+bool MainWindow::onDeleteEventWindow(GdkEventAny* event)
+{
+    std::map < Gtk::Window*, NetStreamReader* >::iterator it;
+    it = std::find_if(mBufferedStream.begin(),
+	    mBufferedStream.end(),
+	    haveSameGdkWindow(event->window));
+
+    if (it != mBufferedStream.end()) {
+	it->first->hide();
+	delete it->first;
+	delete it->second;
+	mBufferedStream.erase(it);
+    }
+
+    return true;
+}
+
+void MainWindow::onNew()
+{
+    mSpinPort->set_value(mPort);
+    mSpinRefresh->set_value(mRefresh);
+    if (mPref->run() ==  Gtk::RESPONSE_APPLY) {
+        try {
+            mNet = new NetStreamReader(mPort, mRefresh, *this);
+	    mThread = Glib::Thread::create(
+			    sigc::mem_fun(*mNet,
+				    &eov::NetStreamReader::process), true);
+	    mConnection = Glib::signal_timeout().connect(
+			    sigc::mem_fun(*this,
+				    &MainWindow::isStreamReaderFinish), 500);
+	    hideMenu();
+        } catch(const std::exception& e) {
+            Gtk::MessageDialog a("Cannot open an Eov stream", false,
+                                 Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+            a.run();
+            return;
+        }
+
+        Glib::RefPtr < Gtk::TextBuffer > buffer = mTextview->get_buffer();
+        buffer->insert(buffer->begin(), (boost::format(
+                    "%1%: Eov Stream listen on port %2% at %3%ms\n") %
+		   utils::get_current_date() % mPort % mRefresh).str());
+        mTextview->set_editable(false);
+        mTextview->show_all();
+    }
+}
+
+void MainWindow::onAbout()
+{
+    if (not mAbout) {
+        mRefXml->get_widget("aboutdialog_eov", mAbout);
+        if (not mAbout) {
+            throw(utils::InternalError("EOV Glade file have problem"));
+        }
+        std::string extra(VLE_EXTRA_VERSION);
+        if (extra.empty()) {
+            mAbout->set_version(VLE_VERSION);
+        } else {
+            std::string version(VLE_VERSION);
+            version += "-" + extra;
+            mAbout->set_version(VLE_VERSION);
+            mAbout->signal_response().connect(
+                sigc::mem_fun(*this, &MainWindow::onAboutClose));
+        }
+    }
+    mAbout->run();
+}
+
+void MainWindow::onQuit()
+{
+    if (mThread) {
+	mThread->join();
+    }
+
+    if (mNet) {
+	delete mNet;
+    }
+    mWindow->hide();
+}
+
+void MainWindow::onAboutClose(int /* response */)
+{
+    mAbout->hide();
+}
+
+void MainWindow::onPrefButton(int response)
+{
+    if (response == Gtk::RESPONSE_APPLY) {
+        mPort = mSpinPort->get_value();
+        mRefresh = mSpinRefresh->get_value();
+    }
+    mPref->hide();
+}
+
+void MainWindow::hideMenu()
+{
+    mMenuNew->set_sensitive(false);
+    mMenuQuit->set_sensitive(false);
+}
+
+void MainWindow::showMenu()
+{
+    mMenuNew->set_sensitive(true);
+    mMenuQuit->set_sensitive(true);
+}
+
+bool MainWindow::isStreamReaderFinish()
+{
+    if (mNet and mNet->isFinish()) {
+	mThread = 0;
+
+	Glib::RefPtr < Gtk::TextBuffer > buffer = mTextview->get_buffer();
+	if (not mNet->finishError().empty()) {
+	    buffer->insert(buffer->begin(), (boost::format(
+			    "/!\\ Error: %1%\n") %
+		mNet->finishError()).str());
+	}
+
+	buffer->insert(buffer->begin(), (boost::format(
+			"%1%: Eov Stream close\n") %
+		    utils::get_current_date()).str());
+	showMenu();
+	return false;
+    }
+    return true;
+}
+
+}} // namespace vle eov

@@ -14,9 +14,9 @@ LINK_DIRECTORIES(
   ${GTKMM_LIBRARY_DIRS}
   ${GTHREAD_LIBRARY_DIRS})
 
-SET(EOV_CPP NetStreamReader.cpp Plugin.cpp Window.cpp)
+SET(EOV_CPP NetStreamReader.cpp Plugin.cpp Window.cpp MainWindow.cpp)
 
-SET(EOV_HPP NetStreamReader.hpp Plugin.hpp Window.hpp)
+SET(EOV_HPP NetStreamReader.hpp Plugin.hpp Window.hpp MainWindow.hpp)
 
 ADD_LIBRARY(vleeov SHARED ${EOV_CPP};${EOV_HPP})
 
@@ -43,5 +43,6 @@ INSTALL(TARGETS vleeov
   ARCHIVE DESTINATION lib)
 
 INSTALL(FILES ${EOV_HPP} DESTINATION ${VLE_INCLUDE_DIRS}/eov)
+INSTALL(FILES eov.glade DESTINATION ${VLE_SHARE_DIRS}/glade)
 
 ADD_SUBDIRECTORY(plugins)

@@ -24,6 +24,7 @@
 
 
 #include <vle/eov/NetStreamReader.hpp>
+#include <vle/eov/MainWindow.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Algo.hpp>
@@ -34,42 +35,50 @@
 
 namespace vle { namespace eov {
 
-NetStreamReader::NetStreamReader(int port, Gtk::Main& app) :
+NetStreamReader::NetStreamReader(int port, int time, MainWindow& main) :
     oov::NetStreamReader(port),
-    m_thread(0),
-    m_app(app),
-    m_window(0)
+    m_main(main),
+    m_time(time),
+    m_finish(false)
 {
 }
 
 NetStreamReader::~NetStreamReader()
 {
-    if (m_thread) {
-        m_thread->join();
+}
+
+void NetStreamReader::process()
+{
+    try {
+	waitConnection();
+	readConnection();
+	closeConnection();
+    } catch (std::exception& e) {
+	m_finisherror.assign(e.what());
+    } catch (...) {
+	m_finisherror.assign("unknown error");
     }
+    try {
+	close();
+    } catch (std::exception& e) {
+	m_finisherror += "\n";
+	m_finisherror += e.what();
+    } catch (...) {
+    }
+    m_finish = true;
 }
 
 void NetStreamReader::onParameter(const vpz::ParameterTrame& trame)
 {
-    Glib::Mutex::Lock lock(m_mutex);
-
-    oov::NetStreamReader::onParameter(trame);
-
-    if (m_thread) {
-        if (m_window) {
-            m_window->hide();
-        }
-        m_thread->join();
-        m_thread = 0;
+    {
+	Glib::Mutex::Lock lock(m_mutex);
+	oov::NetStreamReader::onParameter(trame);
+	oov::PluginPtr poov = plugin();
+	Assert(utils::InternalError, poov->isCairo(), boost::format(
+		    "Plugin '%1%' is not a oov::CairoPlugin") % trame.plugin());
     }
 
-    oov::PluginPtr poov = plugin();
-
-    Assert(utils::InternalError, poov->isCairo(), boost::format(
-            "Plugin '%1%' is not a oov::CairoPlugin") % trame.plugin());
-
-    m_thread = Glib::Thread::create(
-        sigc::mem_fun(this, &NetStreamReader::runWindow), true);
+    runWindow();
 
     m_newpluginname = trame.plugin();
 }
@@ -77,24 +86,21 @@ void NetStreamReader::onParameter(const vpz::ParameterTrame& trame)
 void NetStreamReader::onNewObservable(const vpz::NewObservableTrame& trame)
 {
     Glib::Mutex::Lock lock(m_mutex);
-
     oov::NetStreamReader::onNewObservable(trame);
 }
 
 void NetStreamReader::onDelObservable(const vpz::DelObservableTrame& trame)
 {
     Glib::Mutex::Lock lock(m_mutex);
-
     oov::NetStreamReader::onDelObservable(trame);
 }
 
 void NetStreamReader::onValue(const vpz::ValueTrame& trame)
 {
     Glib::Mutex::Lock lock(m_mutex);
-
     oov::NetStreamReader::onValue(trame);
 }
-        
+
 void NetStreamReader::onClose(const vpz::EndTrame& trame)
 {
     Glib::Mutex::Lock lock(m_mutex);
@@ -108,7 +114,7 @@ void NetStreamReader::getGtkPlugin(const std::string& pluginname)
 
     std::string error((boost::format(
                 "Error opening eov plugin '%1%' in:") % pluginname).str());
- 
+
     std::string newfilename(pluginname);
 
     Assert(utils::InternalError, pluginname.size() > 6 and
@@ -134,7 +140,7 @@ void NetStreamReader::getDefaultPlugin()
 {
     utils::Path::PathList lst(utils::Path::path().getStreamDirs());
     utils::Path::PathList::const_iterator it;
-    
+
     std::string error((boost::format(
                 "Error opening eov default plugin:")).str());
 
@@ -156,7 +162,7 @@ void NetStreamReader::runWindow()
     oov::CairoPluginPtr coov = oov::toCairoPlugin(plugin());
 
     std::string error;
-    
+
     try {
         getGtkPlugin(m_newpluginname);
     } catch (const std::exception& e) {
@@ -170,10 +176,7 @@ void NetStreamReader::runWindow()
         Throw(utils::InternalError, error);
     }
 
-    Window mainwindow(m_plugin);
-    m_window = &mainwindow;
-    m_app.run(mainwindow);
-    m_window = 0;
+    m_main.addWindow(m_plugin);
 }
 
 NetStreamReader::PluginFactory::PluginFactory(const std::string& plugin,
@@ -190,7 +193,7 @@ NetStreamReader::PluginFactory::PluginFactory(const std::string& plugin,
                 "\n[%1%]: %2%") % pathname % Glib::Module::get_last_error());
     }
     m_module->make_resident();
-}   
+}
 
 NetStreamReader::PluginFactory::~PluginFactory()
 {

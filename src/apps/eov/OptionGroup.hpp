@@ -30,7 +30,7 @@
 
 namespace vle { namespace eov {
 
-    /** 
+    /**
      * @brief Manage the command option, manager, simulator and justrun
      * simulator.
      */
@@ -41,17 +41,15 @@ namespace vle { namespace eov {
 
         virtual ~CommandOptionGroup() { }
 
-        inline bool isDaemon() const { return mDaemon; }
-
         inline int port() const { return mPort; }
-        
+
         inline bool infos() const { return mInfos; }
 
         inline bool version() const { return mVersion; }
 
         inline int verbose() const { return mVerbose; }
 
-        /** 
+        /**
          * @brief Check if only on mode is active.
          *
          * @throw Exception::Internal two or three modes are actives.
@@ -59,7 +57,6 @@ namespace vle { namespace eov {
         virtual void check();
 
     private:
-        bool    mDaemon;
         int     mPort;
         bool    mInfos;
         bool    mVersion;

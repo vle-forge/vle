@@ -125,8 +125,7 @@ Base::~Base()
 {
     if (mRunning) {
         vleSocketShutdown(mSocket);
-        int r = vleSocketClose(mSocket);
-        Assert(InternalError, r == 0, "Cannot close socket properly.");
+        vleSocketClose(mSocket);
     }
 }
 

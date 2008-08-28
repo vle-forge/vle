@@ -44,7 +44,7 @@ namespace vle { namespace oov {
 
 NetStreamReader::NetStreamReader(int port) :
     m_port(port),
-    m_server(port)
+    m_server(new utils::net::Server(port))
 {
     setBufferSize(4096);
     TraceAlways(boost::format("Build a NetStreamReader on port %1%") % port);
@@ -52,6 +52,9 @@ NetStreamReader::NetStreamReader(int port) :
 
 NetStreamReader::~NetStreamReader()
 {
+    if (m_server) {
+        delete m_server;
+    }
 }
 
 void NetStreamReader::process()
@@ -67,7 +70,7 @@ void NetStreamReader::process()
 
 void NetStreamReader::waitConnection()
 {
-    m_server.accept_client("vle");
+    m_server->accept_client("vle");
     TraceAlways(boost::format(
             "NetStreamReader connection with client %1%") % "vle");
 }
@@ -79,7 +82,7 @@ void NetStreamReader::readConnection()
     bool trameend = false;
 
     while (not sax.isEndTrame()) {
-        m_buffer = m_server.recv_string("vle");
+        m_buffer = m_server->recv_string("vle");
         sax.parse_chunk(m_buffer);
         while (not sax.tramelist().empty()) {
             trameend = dispatch(sax.tramelist().front());
@@ -148,26 +151,32 @@ bool NetStreamReader::dispatch(const vpz::Trame* trame)
 
 void NetStreamReader::closeConnection()
 {
-    m_server.close_client("vle");
+    m_server->close_client("vle");
+}
+
+void NetStreamReader::close()
+{
+    delete m_server;
+    m_server = 0;
 }
 
 void NetStreamReader::serializePlugin()
 {
     if (plugin()->isSerializable()) {
-        m_server.send_buffer("vle", "ok");
-        m_server.recv_string("vle");
+        m_server->send_buffer("vle", "ok");
+        m_server->recv_string("vle");
 
         value::Set vals = value::SetFactory::create();
         vals->addValue(value::StringFactory::create(plugin()->name()));
         vals->addValue(plugin()->serialize());
 
         std::string result = vals->toXML();
-        m_server.send_int("vle", result.size());
-        m_server.recv_string("vle");
-        m_server.send_buffer("vle", result);
-        m_server.recv_string("vle");
+        m_server->send_int("vle", result.size());
+        m_server->recv_string("vle");
+        m_server->send_buffer("vle", result);
+        m_server->recv_string("vle");
     } else {
-        m_server.send_buffer("vle", "no");
+        m_server->send_buffer("vle", "no");
     }
 }
 

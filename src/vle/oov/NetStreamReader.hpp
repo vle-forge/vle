@@ -79,15 +79,17 @@ namespace vle { namespace oov {
          */
         inline const std::string& buffer() const;
 
-    private:
-        int                 m_port;
-        utils::net::Server  m_server;
-        std::string         m_buffer;
-
         void waitConnection();
         void readConnection();
-        bool dispatch(const vpz::Trame* trame);
         void closeConnection();
+	void close();
+
+    private:
+        int                 m_port;
+        utils::net::Server* m_server;
+        std::string         m_buffer;
+
+        bool dispatch(const vpz::Trame* trame);
         void serializePlugin();
     };
 

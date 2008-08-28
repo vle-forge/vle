@@ -28,32 +28,54 @@
 
 #include <vle/oov/NetStreamReader.hpp>
 #include <vle/eov/Plugin.hpp>
-#include <vle/eov/Window.hpp>
 #include <glibmm/thread.h>
 #include <gtkmm/main.h>
 
 
 namespace vle { namespace eov {
 
+    class MainWindow;
+
     class NetStreamReader : public oov::NetStreamReader
     {
     public:
-        NetStreamReader(int port, Gtk::Main& app);
+        NetStreamReader(int port, int time, MainWindow& main);
 
         virtual ~NetStreamReader();
 
         inline Glib::Mutex& mutex()
         { return m_mutex; }
 
+	/**
+	 * @brief Call the oov::NetStreamReader::process function. Close the
+	 * stream if the oov::NetStreamReader throws error.
+	 */
+	void process();
+
+	/**
+	 * @brief Return true if the NetStreamReader is closed by vle.
+	 * @return true if the connection is closed, false otherwise.
+	 */
+	bool isFinish() const
+	{ return m_finish; }
+
+	/**
+	 * @brief Return the error statement if the oov::NetStreamReader throws
+	 * error.
+	 * @return The statement error or an empty string.
+	 */
+	const std::string& finishError() const
+	{ return m_finisherror; }
+
     private:
         virtual void onParameter(const vpz::ParameterTrame& trame);
-        
+
         virtual void onNewObservable(const vpz::NewObservableTrame& trame);
 
         virtual void onDelObservable(const vpz::DelObservableTrame& trame);
 
         virtual void onValue(const vpz::ValueTrame& trame);
-        
+
         virtual void onClose(const vpz::EndTrame& trame);
 
         void getGtkPlugin(const std::string& name);
@@ -62,13 +84,13 @@ namespace vle { namespace eov {
 
         void runWindow();
 
-
+        MainWindow&         m_main;
         PluginPtr           m_plugin;
         Glib::Mutex         m_mutex;
-        Glib::Thread*       m_thread;
         std::string         m_newpluginname;
-        Gtk::Main&          m_app;
-        Window*             m_window;
+        int                 m_time;
+	bool		    m_finish;
+	std::string         m_finisherror;
 
         /**
          * @brief Plugin factory is use to build reference to the
@@ -79,7 +101,7 @@ namespace vle { namespace eov {
         {
         public:
             /**
-             * @brief Constructor to load plugin from pathname. 
+             * @brief Constructor to load plugin from pathname.
              * @param plugin the name of the plugin to load.
              * @param pathname the name of the path where the plugin is.
              * @throw utils::InternalError if the plugin does not exist

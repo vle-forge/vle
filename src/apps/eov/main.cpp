@@ -27,12 +27,25 @@
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Socket.hpp>
+#include <vle/utils/Path.hpp>
 #include <vle/eov/Plugin.hpp>
 #include <vle/eov/NetStreamReader.hpp>
+#include <vle/eov/MainWindow.hpp>
 #include <apps/eov/OptionGroup.hpp>
 #include <gtkmm/main.h>
+#include <gtkmm/messagedialog.h>
+#include <libglademm.h>
 
 using namespace vle;
+
+void eov_on_error(const std::string& type, const std::string& what)
+{
+    Gtk::MessageDialog box(
+        (boost::format("eov reported: %1% (%2%)") % what % type).str(), false,
+        Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+
+    box.run();
+}
 
 int main(int argc, char* argv[])
 {
@@ -59,10 +72,6 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    if (command.isDaemon()) {
-        utils::buildDaemon();
-    }
-
     bool result = true;
     if (command.infos()) {
         std::cerr << "EOV - the Eyes of VLE\n";
@@ -73,17 +82,17 @@ int main(int argc, char* argv[])
     } else {
         try {
             Gtk::Main app(argc, argv);
-
-            eov::NetStreamReader net(command.port(), app);
-            net.process();
+            Glib::RefPtr < Gnome::Glade::Xml > xml(
+                Gnome::Glade::Xml::create(
+                    utils::Path::path().getGladeFile("eov.glade")));
+            eov::MainWindow main(xml, command.port());
+            app.run(main.window());
         } catch(const Glib::Exception& e) {
             result = false;
-            std::cerr << "\n/!\\ eov Glib error reported: " <<
-                vle::utils::demangle(typeid(e)) << "\n" << e.what();
+            eov_on_error(vle::utils::demangle(typeid(e)), e.what());
         } catch(const std::exception& e) {
             result = false;
-            std::cerr << "\n/!\\ eov exception reported: " <<
-                vle::utils::demangle(typeid(e)) << "\n" << e.what();
+            eov_on_error(vle::utils::demangle(typeid(e)), e.what());
         }
     }
 

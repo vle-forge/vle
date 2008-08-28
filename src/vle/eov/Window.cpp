@@ -29,13 +29,13 @@
 
 namespace vle { namespace eov {
 
-Window::Window(PluginPtr plg) :
+Window::Window(PluginPtr plg, Glib::Mutex& mutex) :
     Gtk::Window(Gtk::WINDOW_TOPLEVEL),
+    m_mutex(mutex),
     m_rootBox(true, 5),
     m_plugin(plg),
     m_timeout(100)
 {
-    //set_size_request(400, 300);
     set_title("eov - the Eyes of VLE");
     set_border_width(0);
     set_position(Gtk::WIN_POS_CENTER);
@@ -53,6 +53,7 @@ Window::~Window()
 
 void Window::on_realize()
 {
+    Glib::Mutex::Lock lock(m_mutex);
     Gtk::Window::on_realize();
 
     m_connection = Glib::signal_timeout().connect(
@@ -61,6 +62,7 @@ void Window::on_realize()
 
 bool Window::on_expose_event(GdkEventExpose* event)
 {
+    Glib::Mutex::Lock lock(m_mutex);
     bool r = Gtk::Window::on_expose_event(event);
 
     if (m_plugin and is_realized()) {
@@ -72,6 +74,7 @@ bool Window::on_expose_event(GdkEventExpose* event)
 
 bool Window::on_configure_event(GdkEventConfigure* event)
 {
+    Glib::Mutex::Lock lock(m_mutex);
     bool r = Gtk::Window::on_configure_event(event);
 
     if (m_plugin and is_realized()) {
@@ -83,6 +86,7 @@ bool Window::on_configure_event(GdkEventConfigure* event)
 
 bool Window::runTimeout()
 {
+    Glib::Mutex::Lock lock(m_mutex);
     if (m_plugin and is_realized()) {
         m_plugin->redraw();
     }

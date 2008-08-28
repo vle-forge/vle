@@ -36,19 +36,11 @@ namespace vle { namespace eov {
 CommandOptionGroup::CommandOptionGroup() :
     Glib::OptionGroup("commandgroup", "Commands of EOV",
                       "Description of commands"),
-    mDaemon(false),
     mPort(8000),
     mInfos(false),
     mVersion(false),
     mVerbose(0)
 {
-    {
-        Glib::OptionEntry en;
-        en.set_long_name("daemon");
-        en.set_short_name('d');
-        en.set_description("Run in daemon mode.");
-        add_entry(en, mDaemon);
-    }
     {
         Glib::OptionEntry en;
         en.set_long_name("port");
