@@ -269,7 +269,9 @@ Glib::Module* ModelFactory::buildPlugin(const vpz::Dynamic& dyn)
 #ifdef G_OS_WIN32
             module->make_resident();
 #endif
-            mModule.add(dyn.library(), module);
+            mModule.add(
+                dyn.language() == "python" ? "pydynamics" : dyn.library(),
+                module);
             return module;
         }
     }
@@ -279,7 +281,8 @@ Glib::Module* ModelFactory::buildPlugin(const vpz::Dynamic& dyn)
 Glib::Module* ModelFactory::getPlugin(const std::string& name)
 {
     const vpz::Dynamic& dyn(mDynamics.get(name));
-    Glib::Module* r = mModule.get(dyn.library());
+    Glib::Module* r = mModule.get(
+        dyn.language() == "python" ? "pydynamics" : dyn.library());
 
     if (r == 0) {
         return buildPlugin(dyn);
