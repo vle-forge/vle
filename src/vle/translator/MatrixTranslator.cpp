@@ -55,6 +55,21 @@ MatrixTranslator::~MatrixTranslator()
     }
 }
 
+graph::AtomicModel* MatrixTranslator::getModel(const std::string& name) const
+{
+    return m_models.at(name);
+}
+
+unsigned int MatrixTranslator::getSize(unsigned int i) const
+{
+    return m_size.at(i);
+}
+
+xmlpp::Element* MatrixTranslator::getRoot() const
+{
+    return m_root;
+}
+
 bool MatrixTranslator::existModel(unsigned int i, unsigned int j)
 {
     if (m_dimension == 0) {

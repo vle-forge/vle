@@ -74,6 +74,10 @@ namespace vle { namespace translator {
 
         virtual ~MatrixTranslator();
 
+	std::string getName(unsigned int i, unsigned int j = 0) const;
+	graph::AtomicModel* getModel(const std::string& name) const;
+	unsigned int getSize(unsigned int i) const;
+	xmlpp::Element* getRoot() const;
         void translate(const std::string& buffer);
 
     private:
@@ -100,7 +104,6 @@ namespace vle { namespace translator {
 
         bool existModel(unsigned int i, unsigned int j = 0);
         std::string getDynamics(unsigned int i, unsigned int j = 0);
-        std::string getName(unsigned int i, unsigned int j = 0) const;
 
         void parseXML(const std::string& buffer);
         void translateModel(unsigned int i,
