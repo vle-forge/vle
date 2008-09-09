@@ -1,5 +1,5 @@
 /**
- * @file examples/qss/ladybird.cpp
+ * @file src/examples/qss/ladybird.cpp
  * @author The VLE Development Team
  */
 
@@ -31,7 +31,7 @@ namespace vle { namespace examples { namespace qss {
 
 Ladybird::Ladybird(const graph::AtomicModel& model,
                    const devs::InitEventList& events):
-    extension::qss(model, events)
+    extension::DESS(model, events)
 {
     b = value::toDouble(events.get("b"));
     d = value::toDouble(events.get("d"));
@@ -42,7 +42,7 @@ Ladybird::~Ladybird()
 {
 }
 
-double Ladybird::compute() const
+double Ladybird::compute(const vle::devs::Time& /* time */) const
 {    
     return b * d * getValue("x") * getValue() - e * getValue();
 } 

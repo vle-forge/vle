@@ -1,5 +1,5 @@
 /**
- * @file examples/qss/ladybird.hpp
+ * @file src/examples/qss/ladybird.hpp
  * @author The VLE Development Team
  */
 
@@ -26,11 +26,11 @@
 #ifndef VLE_TUTORIAL_0_LADYBIRD_HPP
 #define VLE_TUTORIAL_0_LADYBIRD_HPP
 
-#include <vle/extension/QSS.hpp>
+#include <vle/extension/DESS.hpp>
 
 namespace vle { namespace examples { namespace qss {
 
-    class Ladybird : public extension::qss
+    class Ladybird : public extension::DESS
     {
     public:
         Ladybird(const graph::AtomicModel& model,
@@ -38,7 +38,7 @@ namespace vle { namespace examples { namespace qss {
 
         virtual ~Ladybird();
 
-        virtual double compute() const;
+        virtual double compute(const devs::Time& time) const;
 
     private:
         double b;

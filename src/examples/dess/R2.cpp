@@ -1,5 +1,5 @@
 /**
- * @file src/examples/qss/plantlouse.hpp
+ * @file src/examples/dess/R2.cpp
  * @author The VLE Development Team
  */
 
@@ -22,31 +22,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "R2.hpp"
+#include <vle/utils/Debug.hpp>
+#include <cmath>
 
-#ifndef VLE_TUTORIAL_0_PLANTLOUSE_HPP
-#define VLE_TUTORIAL_0_PLANTLOUSE_HPP
+namespace vle { namespace examples { namespace dess {
 
-#include <vle/extension/QSS.hpp>
+R2::R2(const graph::AtomicModel& model,
+       const devs::InitEventList& evList):
+    extension::DESS(model, evList)
+{
+    // birth and death rate
+    m = value::toDouble(evList.get("m"));
+    // rate at which infected individuals (I) recover (R)
+    g = value::toDouble(evList.get("g"));
+}
 
-using namespace vle;
+double R2::compute(const vle::devs::Time& /* time */) const
+{    
+    return g * getValue("I") - m * getValue();
+} 
 
-namespace vle { namespace examples { namespace qss {
+DECLARE_NAMED_DYNAMICS(R2, R2)
 
-    class Plantlouse : public extension::qss
-    {
-    public:
-        Plantlouse(const graph::AtomicModel& model,
-                   const devs::InitEventList& events);
-
-        virtual ~Plantlouse();
-
-        virtual double compute(const devs::Time& time) const;
-
-    private:   
-        double a;
-        double b; 
-    };
-
-}}} // namespace vle examples qss
-
-#endif
+}}} // namespace vle examples dess

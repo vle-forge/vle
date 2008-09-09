@@ -1,5 +1,5 @@
 /**
- * @file src/examples/qss/plantlouse.hpp
+ * @file src/examples/dess/sir.cpp
  * @author The VLE Development Team
  */
 
@@ -22,31 +22,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "sir.hpp"
+#include <vle/value/Double.hpp>
+#include <vle/utils/Debug.hpp>
 
-#ifndef VLE_TUTORIAL_0_PLANTLOUSE_HPP
-#define VLE_TUTORIAL_0_PLANTLOUSE_HPP
+namespace vle { namespace examples { namespace dess {
 
-#include <vle/extension/QSS.hpp>
-
-using namespace vle;
-
-namespace vle { namespace examples { namespace qss {
-
-    class Plantlouse : public extension::qss
-    {
-    public:
-        Plantlouse(const graph::AtomicModel& model,
-                   const devs::InitEventList& events);
-
-        virtual ~Plantlouse();
-
-        virtual double compute(const devs::Time& time) const;
-
-    private:   
-        double a;
-        double b; 
-    };
-
-}}} // namespace vle examples qss
-
-#endif
+sir::sir(const graph::AtomicModel& model,
+	 const devs::InitEventList &evList) :
+    extension::CombinedQss(model,evList)
+{
+    r = value::toDouble(evList.get("r"));
+    a = value::toDouble(evList.get("a"));
+}
+	    
+double sir::compute(unsigned int i, const devs::Time& /* time */) const
+{
+    switch(i){
+    case 0: // S
+	return -r * getValue(0) * getValue(1);
+    case 1: // I
+	return r * getValue(0) * getValue(1) - a * getValue(1);
+    case 2: // R
+	return a * getValue(1);
+    default:
+	Throw(utils::InternalError, boost::format(
+		  "Compute problem with sir model, i == %1%") % i );
+    }
+}
+	    
+DECLARE_NAMED_DYNAMICS(sir, sir)
+	
+}}} // namespace vle examples dess

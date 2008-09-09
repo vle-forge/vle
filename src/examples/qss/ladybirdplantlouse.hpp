@@ -1,5 +1,5 @@
 /**
- * @file examples/qss/ladybirdplantlouse.hpp
+ * @file src/examples/qss/ladybirdplantlouse.hpp
  * @author The VLE Development Team
  */
 
@@ -38,7 +38,7 @@ namespace vle { namespace examples { namespace qss {
 
         virtual ~Ladybirdplantlouse();
 
-        virtual double compute(unsigned int i) const;
+        virtual double compute(unsigned int i, const devs::Time& time) const;
 
     private:
         double a; 

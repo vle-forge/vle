@@ -1,5 +1,5 @@
 /**
- * @file vle/extension/QSS.hpp
+ * @file src/vle/extension/QSS.hpp
  * @author The VLE Development Team
  */
 
@@ -22,108 +22,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_EXTENSION_QSS_HPP
 #define VLE_EXTENSION_QSS_HPP
 
-#include <vle/devs/Dynamics.hpp>
+#include <vle/extension/DifferentialEquation.hpp>
 
 namespace vle { namespace extension {
 
-    class qss : public vle::devs::Dynamics
+    class qss : public vle::extension::DifferentialEquation
     {
     public:
         qss(const vle::graph::AtomicModel& model,
             const vle::devs::InitEventList& events);
- 
 	virtual ~qss() { }
 
-        inline double getValue() const
-        { return mValue; }
-
-        inline double getValue(const std::string& name) const
-        { return mExternalVariableValue.find(
-                mExternalVariableIndex.find(name)->second)->second; }
-
-        /**
-         * @brief The function to develop mathemacial expression like:
-         * @code
-         * return a * getValue() - b * getValue() * getValue("y");
-         * @endcode
-         */
-        virtual double compute() const = 0;
-
-        enum state { INIT, POST_INIT, RUN, POST, POST2, POST3 };
-
-        virtual void finish();
+	virtual double getEstimatedValue(double e) const;
 
         virtual vle::devs::Time init(const devs::Time& time);
 
-        virtual void output(
-            const vle::devs::Time& time,
-            vle::devs::ExternalEventList& output) const;
-
-        virtual vle::devs::Time timeAdvance() const;
-
-        virtual vle::devs::Event::EventType confluentTransitions(
-            const vle::devs::Time& time,
-            const vle::devs::ExternalEventList& extEventlist) const;
-
-        virtual void internalTransition(
-            const vle::devs::Time& event);
-
-        virtual void externalTransition(
-            const vle::devs::ExternalEventList& event,
-            const vle::devs::Time& time);
-
-        virtual vle::value::Value observation(
-            const vle::devs::ObservationEvent& event) const;
-
-        virtual void request(const vle::devs::RequestEvent& /* event */,
-                             const vle::devs::Time& /* time */,
-                             vle::devs::ExternalEventList& /* output */) const;
-
     private:
-        inline void setValue(const std::string& name, double value)
-        { mExternalVariableValue[mExternalVariableIndex[name]] = value; }	
+        virtual void reset(const vle::devs::Time& /* time */, 
+			   double /* value */);
+	virtual void updateGradient(bool external, const vle::devs::Time& time);
+        virtual void updateSigma(const vle::devs::Time& time);
+        virtual void updateValue(bool external, const vle::devs::Time& time);
 
-        inline void setGradient(const std::string& name, double gradient)
-        { mExternalVariableGradient[mExternalVariableIndex[name]] = gradient; }	
-
-        bool mActive;
-        bool mDependance;
-        
-        /** Internal variable */
-        double mInitialValue;
-        std::string mVariableName;
-        double mValue;
-
-        /** External variables */
-        unsigned int mExternalVariableNumber;
-        std::map < unsigned int , double > mExternalVariableValue;
-        std::map < unsigned int , double > mExternalVariableGradient;
-        std::map < unsigned int , bool > mIsGradient;
-        std::map < std::string , unsigned int > mExternalVariableIndex;
-        bool mExternalValues; // y-a-t-il des variables externes
-                              // sans gradient ? 
-        /** State */
         unsigned long mIndex;	
-        double mGradient;
-        devs::Time mSigma;
-        devs::Time mLastTime;
-        state mState;
-
         /** Constantes */
         double mPrecision;
         double mEpsilon;
-
         double mThreshold;
 
         inline double d(unsigned long x)
         { return x * mPrecision; }
-
-        void updateSigma();
-        void reset(const vle::devs::Time& time, double value);
     };
 
 }} // namespace vle extension

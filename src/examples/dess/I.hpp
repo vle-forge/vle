@@ -1,5 +1,5 @@
 /**
- * @file src/examples/qss/plantlouse.hpp
+ * @file src/examples/dess/I.hpp
  * @author The VLE Development Team
  */
 
@@ -22,31 +22,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef VLE_EXAMPLES_I_HPP
+#define VLE_EXAMPLES_I_HPP
 
-#ifndef VLE_TUTORIAL_0_PLANTLOUSE_HPP
-#define VLE_TUTORIAL_0_PLANTLOUSE_HPP
+#include <vle/extension/DESS.hpp>
 
-#include <vle/extension/QSS.hpp>
+namespace vle { namespace examples { namespace dess {
 
-using namespace vle;
-
-namespace vle { namespace examples { namespace qss {
-
-    class Plantlouse : public extension::qss
+    class I : public extension::DESS
     {
     public:
-        Plantlouse(const graph::AtomicModel& model,
-                   const devs::InitEventList& events);
-
-        virtual ~Plantlouse();
+        I(const graph::AtomicModel& model,
+	  const devs::InitEventList& events);
+	virtual ~I()
+        { }
 
         virtual double compute(const devs::Time& time) const;
 
-    private:   
+    private:
         double a;
-        double b; 
+        double r;
     };
 
-}}} // namespace vle examples qss
+}}} // namespace vle examples dess
 
 #endif

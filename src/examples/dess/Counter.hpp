@@ -1,5 +1,5 @@
 /**
- * @file src/examples/qss/plantlouse.hpp
+ * @file src/examples/dess/Counter.hpp
  * @author The VLE Development Team
  */
 
@@ -23,30 +23,37 @@
  */
 
 
-#ifndef VLE_TUTORIAL_0_PLANTLOUSE_HPP
-#define VLE_TUTORIAL_0_PLANTLOUSE_HPP
+#include <vle/extension.hpp>
+#include <vle/devs.hpp>
 
-#include <vle/extension/QSS.hpp>
+namespace vle { namespace examples { namespace dess {
 
-using namespace vle;
-
-namespace vle { namespace examples { namespace qss {
-
-    class Plantlouse : public extension::qss
+    /** 
+     * @brief A DEVS counter which store the date of the latest event.
+     */
+    class Counter : public devs::Dynamics
     {
     public:
-        Plantlouse(const graph::AtomicModel& model,
-                   const devs::InitEventList& events);
+        Counter(const graph::AtomicModel& model,
+		const devs::InitEventList& events) :
+            devs::Dynamics(model, events),
+            mDate(0),
+            mNumber(0)
+        { }
 
-        virtual ~Plantlouse();
+        virtual ~Counter()
+        { }
 
-        virtual double compute(const devs::Time& time) const;
+        virtual void externalTransition(const devs::ExternalEventList& evts,
+                                        const devs::Time& time);
 
-    private:   
-        double a;
-        double b; 
+        virtual value::Value observation(const devs::ObservationEvent& e) const;
+
+    private:
+        devs::Time mDate;
+        int mNumber;
     };
 
-}}} // namespace vle examples qss
+}}} // namespace vle examples dess
 
-#endif
+DECLARE_NAMED_DYNAMICS(Counter, vle::examples::dess::Counter)

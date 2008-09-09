@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!DOCTYPE vle_project PUBLIC "" "http://vle.univ-littoral.fr/vle-0.5.0.dtd">
+<vle_project version="0.5" date="" author="VLE team" >
+  <structures>
+    <model name="sir" type="atomic" conditions="cond_sir"
+           dynamics="dyn_sir" observables="obs_sir" >
+      <out>
+	<port name="S" />
+        <port name="I" />
+        <port name="R" />
+      </out>
+    </model>
+  </structures>
+  <dynamics>
+    <dynamic name="dyn_sir" library="sir" model="sir" />
+  </dynamics>
+  <experiment name="exp" duration="20" seed="12379843">
+    <conditions>
+      <condition name="cond_sir">
+        <port name="r"><double>0.005</double></port>
+        <port name="a"><double>0.5</double></port>
+	<port name="threshold"><double>1e-10</double></port>
+	<port name="active"><boolean>false</boolean></port>
+	<port name="dependance"><boolean>false</boolean></port>
+        <port name="variables">
+	  <set>
+	    <set>
+	      <string>S</string>
+              <double>500.</double>
+	      <double>0.1</double>
+      	    </set>
+      	    <set>
+	      <string>I</string>
+	      <double>1.</double>
+	      <double>0.01</double>
+      	    </set>
+	    <set>
+	      <string>R</string>
+	      <double>0.</double>
+	      <double>0.01</double>
+      	    </set>
+	  </set>
+	</port>
+      </condition>
+    </conditions>
+    <views>
+      <observables>
+	<observable name="obs_sir">
+	  <port name="S">
+	    <attachedview name="sirview" />
+	  </port>
+          <port name="I">
+	    <attachedview name="sirview" />
+          </port>
+          <port name="R">
+	    <attachedview name="sirview" />
+	  </port>
+	</observable>
+      </observables>
+      <view name="sirview" type="timed" library="default" 
+	    timestep=".01" output="o1" />
+      <outputs>
+        <output name="o1" format="local" plugin="text" location="">
+	</output>
+      </outputs>
+    </views>
+  </experiment>
+</vle_project>

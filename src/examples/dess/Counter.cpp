@@ -1,5 +1,5 @@
 /**
- * @file src/examples/qss/plantlouse.hpp
+ * @file src/examples/dess/Counter.cpp
  * @author The VLE Development Team
  */
 
@@ -22,31 +22,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Counter.hpp"
 
-#ifndef VLE_TUTORIAL_0_PLANTLOUSE_HPP
-#define VLE_TUTORIAL_0_PLANTLOUSE_HPP
+namespace vle { namespace examples { namespace dess {
 
-#include <vle/extension/QSS.hpp>
+void Counter::externalTransition(const devs::ExternalEventList& evts,
+				 const devs::Time& time)
+{ 
+    mDate = time; 
+    mNumber += evts.size(); 
+}
 
-using namespace vle;
+value::Value Counter::observation(const devs::ObservationEvent& e) const
+{ 
+    return e.onPort("date") ?
+	value::DoubleFactory::create(mDate.getValue()) :
+	value::DoubleFactory::create(mNumber); 
+}
 
-namespace vle { namespace examples { namespace qss {
-
-    class Plantlouse : public extension::qss
-    {
-    public:
-        Plantlouse(const graph::AtomicModel& model,
-                   const devs::InitEventList& events);
-
-        virtual ~Plantlouse();
-
-        virtual double compute(const devs::Time& time) const;
-
-    private:   
-        double a;
-        double b; 
-    };
-
-}}} // namespace vle examples qss
-
-#endif
+}}} // namespace vle examples dess

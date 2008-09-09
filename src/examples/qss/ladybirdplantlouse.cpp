@@ -1,5 +1,5 @@
 /**
- * @file examples/qss/ladybirdplantlouse.cpp
+ * @file src/examples/qss/ladybirdplantlouse.cpp
  * @author The VLE Development Team
  */
 
@@ -43,7 +43,8 @@ Ladybirdplantlouse::~Ladybirdplantlouse()
 {
 }
 
-double Ladybirdplantlouse::compute(unsigned int i) const
+double Ladybirdplantlouse::compute(unsigned int i, 
+				   const devs::Time& /* time */) const
 {        
     switch (i) {
     case 0:
@@ -58,5 +59,6 @@ double Ladybirdplantlouse::compute(unsigned int i) const
 
 }}} // namespace vle examples qss
 
-DECLARE_NAMED_DYNAMICS(ladybirdplantlouse, vle::examples::qss::Ladybirdplantlouse)
+DECLARE_NAMED_DYNAMICS(ladybirdplantlouse, 
+		       vle::examples::qss::Ladybirdplantlouse)
 

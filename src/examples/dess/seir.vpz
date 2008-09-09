@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<!DOCTYPE vle_project PUBLIC "" "http://vle.univ-littoral.fr/vle-0.5.0.dtd">
+<vle_project version="0.5" date="" author="VLE team" >
+  <structures>
+    <model name="seir" type="atomic" conditions="cond_seir"
+           dynamics="dyn_seir" observables="obs_seir" >
+      <out>
+	<port name="S" />
+        <port name="E" />
+        <port name="I" />
+        <port name="R" />
+      </out>
+    </model>
+  </structures>
+  <dynamics>
+    <dynamic name="dyn_seir" library="sir" model="seir" />
+  </dynamics>
+  <experiment name="exp" duration="100" seed="12379843">
+    <conditions>
+      <condition name="cond_seir">
+        <port name="m"><double>0.02</double></port>
+        <port name="g"><double>55</double></port>
+        <port name="a"><double>50</double></port>
+	<port name="b0"><double>0.001</double></port>
+	<port name="b1"><double>0.28</double></port>
+	<port name="N"><double>100000</double></port>
+	<port name="threshold"><double>1e-10</double></port>
+	<port name="active"><boolean>false</boolean></port>
+	<port name="dependance"><boolean>false</boolean></port>
+        <port name="variables">
+	  <set>
+	    <set>
+	      <string>S</string>
+              <double>50000.</double>
+	      <double>10</double>
+            </set>
+            <set>
+	      <string>E</string>
+              <double>0.</double>
+	      <double>10</double>
+            </set>
+      	    <set>
+	      <string>I</string>
+	      <double>1.</double>
+	      <double>10</double>
+      	    </set>
+	    <set>
+	      <string>R</string>
+	      <double>0.</double>
+	      <double>10</double>
+      	    </set>
+	  </set>
+	</port>
+      </condition>
+    </conditions>
+    <views>
+      <observables>
+	<observable name="obs_seir">
+	  <port name="S">
+	    <attachedview name="seirview" />
+          </port>
+	  <port name="E">
+	    <attachedview name="seirview" />
+          </port>
+          <port name="I">
+	    <attachedview name="seirview" />
+          </port>
+          <port name="R">
+	    <attachedview name="seirview" />
+	  </port>
+	</observable>
+      </observables>
+      <view name="seirview" type="timed" library="default" 
+	    timestep=".01" output="o2" />
+      <outputs>
+        <output name="o2" format="local" plugin="text" location="">
+	</output>
+      </outputs>
+    </views>
+  </experiment>
+</vle_project>

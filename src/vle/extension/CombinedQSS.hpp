@@ -1,5 +1,5 @@
 /**
- * @file vle/extension/CombinedQSS.hpp
+ * @file src/vle/extension/CombinedQSS.hpp
  * @author The VLE Development Team
  */
 
@@ -21,6 +21,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+
 
 
 #ifndef VLE_EXTENSION_COMBINEDQSS_HPP
@@ -78,8 +80,10 @@ namespace vle { namespace extension {
          * }
          * @endcode
          * @param i the index of the variable to compute.
+         * @param time the time of the computation.
          */
-        virtual double compute(unsigned int i) const = 0;
+        virtual double compute(unsigned int i, 
+			       const devs::Time& time) const = 0;
 
         /**
          * @brief Get the value of the variable specified by index. Be carefull,

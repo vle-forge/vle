@@ -1,5 +1,5 @@
 /**
- * @file vle/extension/CombinedQSS.cpp
+ * @file src/vle/extension/CombinedQSS.cpp
  * @author The VLE Development Team
  */
 
@@ -21,6 +21,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+
 
 
 #include <vle/extension/CombinedQSS.hpp>
@@ -122,7 +124,7 @@ void CombinedQss::reset(const Time& time, unsigned int i, double value)
     setValue(i, value);
     setIndex(i, (long)(floor(getValue(i)/mVariablePrecision[i])));
     setLastTime(i, time);
-    setGradient(i, compute(i));
+    setGradient(i, compute(i, time));
     updateSigma(i);    
 }
 
@@ -204,7 +206,7 @@ void CombinedQss::internalTransition(const Time& time)
         else {
             for (unsigned int i = 0; i < mVariableNumber; i++) {
                 setState(i, RUN);
-                setGradient(i, compute(i));
+                setGradient(i, compute(i, time));
                 updateSigma(i);
             }
             minSigma();
@@ -216,7 +218,7 @@ void CombinedQss::internalTransition(const Time& time)
         for (unsigned int i = 0; i < mVariableNumber; i++) {
             setState(i, RUN);
             setLastTime(i, time);
-            setGradient(i, compute(i));
+            setGradient(i, compute(i, time));
             updateSigma(i);
         }
         minSigma();
@@ -254,7 +256,7 @@ void CombinedQss::internalTransition(const Time& time)
             for (unsigned int i = 0; i < mVariableNumber; i++) {
                 setState(i, RUN);
                 setLastTime(i, time);
-                setGradient(i, compute(i));
+                setGradient(i, compute(i, time));
                 updateSigma(i);
             }
         }
@@ -293,7 +295,7 @@ void CombinedQss::externalTransition(const ExternalEventList& event,
         mExternalVariableNumber = linear;
         for (unsigned int i = 0; i < mVariableNumber; i++) {
             setState(i, RUN);
-            setGradient(i, compute(i));
+            setGradient(i, compute(i, time));
             updateSigma(i);
         }
         minSigma();
@@ -345,7 +347,7 @@ void CombinedQss::externalTransition(const ExternalEventList& event,
                     // Mise à jour de la valeur
                     setValue(i, getValue(i) + (time - mLastTime[i]).getValue()*getGradient(i));
                     setLastTime(i, time);
-                    setGradient(i, compute(i));
+                    setGradient(i, compute(i, time));
 
                     setSigma(i, 0);
                     setState(i, POST3);		

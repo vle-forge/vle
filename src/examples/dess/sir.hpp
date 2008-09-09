@@ -1,5 +1,5 @@
 /**
- * @file src/examples/qss/plantlouse.hpp
+ * @file src/examples/dess/sir.hpp
  * @author The VLE Development Team
  */
 
@@ -23,30 +23,29 @@
  */
 
 
-#ifndef VLE_TUTORIAL_0_PLANTLOUSE_HPP
-#define VLE_TUTORIAL_0_PLANTLOUSE_HPP
+#ifndef VLE_EXAMPLES_SIR_HPP
+#define VLE_EXAMPLES_SIR_HPP
 
-#include <vle/extension/QSS.hpp>
+#include <vle/extension/CombinedQSS.hpp>
 
-using namespace vle;
+namespace vle { namespace examples { namespace dess {
 
-namespace vle { namespace examples { namespace qss {
+class sir : public vle::extension::CombinedQss
+{
+private:
+    double r;
+    double a;
+    
+public:
+    sir(const graph::AtomicModel&,
+	const devs::InitEventList&);
+    virtual ~sir(){}
+    
+    virtual double compute(unsigned int i, 
+			   const devs::Time& time) const;
+};
 
-    class Plantlouse : public extension::qss
-    {
-    public:
-        Plantlouse(const graph::AtomicModel& model,
-                   const devs::InitEventList& events);
-
-        virtual ~Plantlouse();
-
-        virtual double compute(const devs::Time& time) const;
-
-    private:   
-        double a;
-        double b; 
-    };
-
-}}} // namespace vle examples qss
+}}} // namespace vle examples dess
 
 #endif
+

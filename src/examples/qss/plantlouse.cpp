@@ -1,5 +1,5 @@
 /**
- * @file examples/qss/plantlouse.cpp
+ * @file src/examples/qss/plantlouse.cpp
  * @author The VLE Development Team
  */
 
@@ -41,7 +41,7 @@ Plantlouse::~Plantlouse()
 {
 }
 
-double Plantlouse::compute() const
+double Plantlouse::compute(const vle::devs::Time& /* time */) const
 {    
     return a * getValue() - b * getValue("y") * getValue();
 }

@@ -1,0 +1,139 @@
+<?xml version="1.0" ?>
+<!DOCTYPE vle_project PUBLIC "" "http://vle.univ-littoral.fr/vle-0.5.0.dtd" >
+<vle_project version="0.1" date="14/7/2008" author="VLE team" >
+  <structures>
+    <model name="top" type="coupled">
+      <submodels> 
+	<model name="S" type="atomic" conditions="cond_S"
+	  dynamics="dyn_S" observables="obs_S" >
+	  <in>
+	    <port name="update" />
+	  </in>
+	  <out>
+	    <port name="update" />
+	  </out>
+	</model>
+	<model name="I" type="atomic" conditions="cond_I"
+	  dynamics="dyn_I" observables="obs_I" >
+	  <in>
+	    <port name="update" />
+	  </in>
+	  <out>
+	    <port name="update" />
+	    <port name="out" />
+	  </out>
+	</model>
+	<model name="R" type="atomic" conditions="cond_R"
+	  dynamics="dyn_R" observables="obs_R" >
+	  <in>
+	    <port name="update" />
+	  </in>
+	</model>
+	<model name="counter" type="atomic" dynamics="counter" 
+	       observables="cnt" >
+	  <in>
+	    <port name="in" />
+	  </in>
+	</model>
+      </submodels>
+      <connections>
+	<connection type="internal">
+	  <origin model="I" port="update" />
+	  <destination model="S" port="update" />
+	</connection>
+	<connection type="internal">
+	  <origin model="S" port="update" />
+	  <destination model="I" port="update" />
+	</connection>
+	<connection type="internal">
+	  <origin model="I" port="update" />
+	  <destination model="R" port="update" />
+	</connection>
+	<connection type="internal">
+	  <origin model="I" port="out" />
+	  <destination model="counter" port="in" />
+	</connection>
+      </connections>
+    </model>
+  </structures>
+  <dynamics>
+    <dynamic name="dyn_S" library="sir" model="S3" />
+    <dynamic name="dyn_I" library="sir" model="I3" />
+    <dynamic name="dyn_R" library="sir" model="R3" />
+    <dynamic name="counter" library="sir" model="Counter" />
+  </dynamics>
+  <experiment name="exp" duration="20" seed="12379843">
+    <conditions>
+      <condition name="cond_S">
+	<port name="r"><double>.005</double></port>
+	<port name="precision"><double>.1</double></port>
+	<port name="threshold"><double>1e-10</double></port>
+	<port name="name"><string>S</string></port>
+	<port name="value"><double>500.</double></port>
+      </condition>
+      <condition name="cond_I">
+	<port name="a"><double>.5</double></port>
+	<port name="r"><double>.005</double></port>
+	<port name="precision"><double>.1</double></port>
+	<port name="threshold"><double>1e-10</double></port>
+	<port name="name"><string>I</string></port>
+	<port name="value"><double>1.</double></port>
+	<port name="thresholds">
+	  <map>
+	    <key name="t1">
+	      <set>
+		<double>200</double>
+		<string>up</string>
+	      </set>
+	    </key>
+	    <key name="t2">
+	      <set>
+		<double>200</double>
+		<string>down</string>
+	      </set>
+	    </key>
+	  </map>
+	</port>
+      </condition>
+      <condition name="cond_R">
+	<port name="a"><double>.5</double></port>
+	<port name="precision"><double>.1</double></port>
+	<port name="threshold"><double>1e-10</double></port>
+	<port name="name"><string>R</string></port>
+	<port name="value"><double>0.</double></port>
+	<port name="active"><boolean>false</boolean></port>
+      </condition>
+    </conditions>
+    <views>
+      <outputs>
+	<output name="o5" format="local" plugin="text" />
+      </outputs>
+      <observables>
+	<observable name="obs_S">
+	  <port name="S">
+	    <attachedview name="dessview" />
+	  </port>
+	</observable>
+	<observable name="obs_I">
+	  <port name="I">
+	    <attachedview name="dessview" />
+	  </port>
+	</observable>
+	<observable name="obs_R">
+	  <port name="R">
+	    <attachedview name="dessview" />
+	  </port>
+	</observable>
+	<observable name="cnt" >
+	  <port name="number" >
+	    <attachedview name="dessview" />
+	  </port>
+	  <port name="date" >
+	    <attachedview name="dessview" />
+	  </port>
+	</observable>
+      </observables>
+      <view name="dessview" type="timed" timestep=".01" output="o5" />
+    </views>
+  </experiment>
+</vle_project>
