@@ -41,7 +41,7 @@ Ladybird2::~Ladybird2()
 {
 }
 
-double Ladybird2::compute(const vle::devs::Time& /*time*/) const
+double Ladybird2::compute(const vle::devs::Time& /*time*/)
 {   
     return getValue() + getTimeStep() * (b * d * getValue("x") * getValue() - e *
 					 getValue());

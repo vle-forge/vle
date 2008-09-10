@@ -35,7 +35,7 @@ D2::D2(const vle::graph::AtomicModel& model,
     setSynchronizedVariable("b");
 }
 
-double D2::compute(const vle::devs::Time& /* time */) const
+double D2::compute(const vle::devs::Time& /* time */)
 {
     return getValue("b") + 1;
 }

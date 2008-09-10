@@ -34,7 +34,7 @@ A2::A2(const vle::graph::AtomicModel& model,
 {
 }
 
-double A2::compute(const vle::devs::Time& /* time */) const
+double A2::compute(const vle::devs::Time& /* time */)
 {
     return getValue("b", -1) + 1;
 }

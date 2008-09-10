@@ -40,7 +40,7 @@ Plantlouse2::~Plantlouse2()
 {
 }
 
-double Plantlouse2::compute(const vle::devs::Time& /* time */) const
+double Plantlouse2::compute(const vle::devs::Time& /* time */)
 {    
     return getValue() + getTimeStep() * (a * getValue() - b * getValue("y") *
 					 getValue());

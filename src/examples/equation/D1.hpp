@@ -38,7 +38,7 @@ namespace vle { namespace examples { namespace equation {
 
         virtual ~D1() { }
 
-        virtual double compute(const vle::devs::Time& time) const;
+        virtual double compute(const vle::devs::Time& time);
 
         virtual double initValue() const;
     };

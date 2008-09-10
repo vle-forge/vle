@@ -33,7 +33,7 @@ B1::B1(const vle::graph::AtomicModel& model,
 {
 }
 
-double B1::compute(const vle::devs::Time& /* time */) const
+double B1::compute(const vle::devs::Time& /* time */)
 {
     return getValue() + getValue("a", -1) + 1;
 }

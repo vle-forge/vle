@@ -58,7 +58,7 @@ namespace vle { namespace extension {
          * @param time the time of the computation.
          * @return the new value of internal variable.
          */
-        virtual double compute(const vle::devs::Time& /* time */) const =0;
+        virtual double compute(const vle::devs::Time& /* time */) =0;
 
         /**
          * @brief Initialize the value of internal variable. This

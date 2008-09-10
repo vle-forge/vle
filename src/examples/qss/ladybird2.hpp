@@ -38,7 +38,7 @@ namespace vle { namespace examples { namespace qss {
 
         virtual ~Ladybird2();
 
-        virtual double compute(const vle::devs::Time& /* time */) const;
+        virtual double compute(const vle::devs::Time& /* time */);
 
     private:
         double b;

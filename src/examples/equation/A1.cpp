@@ -27,7 +27,7 @@
 
 namespace vle { namespace examples { namespace equation {
 
-double A1::compute(const vle::devs::Time& /* time */) const
+double A1::compute(const vle::devs::Time& /* time */)
 {
     return getValue() + 1;
 }

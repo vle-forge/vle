@@ -40,7 +40,7 @@ namespace vle { namespace examples { namespace qss {
 
         virtual ~Plantlouse2();
 
-        virtual double compute(const vle::devs::Time& /* time */) const;
+        virtual double compute(const vle::devs::Time& /* time */);
 
     private:
 
