@@ -36,7 +36,7 @@ using namespace value;
 
 DifferenceEquation::DifferenceEquation(const AtomicModel& model,
                                        const InitEventList& events) :
-    Dynamics(model, events), 
+    Dynamics(model, events),
     mTimeStep(0),
     mSynchro(false),
     mAllSynchro(false),
@@ -110,19 +110,19 @@ void DifferenceEquation::displayValues()
         while (it2 != list.end()) {
             std::cout << "(" << it2->first << "," << it2->second << ") ";
             ++it2;
-        }    
+        }
         std::cout << std::endl;
         ++it;
     }
 }
 
-double DifferenceEquation::getValue(int shift) const 
-{ 
+double DifferenceEquation::getValue(int shift) const
+{
     Assert(utils::InternalError, shift <= 0, (boost::format(
                 "[%1%] DifferenceEquation::getValue - positive shift") %
             getModelName()).str());
 
-    if (shift == 0) return mValue.front(); 
+    if (shift == 0) return mValue.front();
     else {
 
         Assert(utils::InternalError, (int)(mValue.size() - 1) >= -shift,
@@ -150,7 +150,7 @@ bool DifferenceEquation::initExternalVariable(const std::string& name,
     // est-ce que cette variable externe possède une
     // limite de buffer ? si non alors ...
     if (mSize.find(name) == mSize.end())
-        mSize[name] = -1;
+        mSize[name] = 2;
 
     // est-ce que je connais ce modèle ? si non alors ...
     if (mValues.find(name) == mValues.end()) {
@@ -205,7 +205,7 @@ std::string DifferenceEquation::name() const
     return namesIt->first;
 }
 
-double DifferenceEquation::getValue(const char* name, 
+double DifferenceEquation::getValue(const char* name,
                                     int shift) const
 {
     valueList::const_iterator it = mValues.find(name);
@@ -258,22 +258,22 @@ void DifferenceEquation::setSize(const std::string& name,
     mSize[name] = size;
 }
 
-void DifferenceEquation::setSynchronizedVariable(const std::string& name) 
-{ 
+void DifferenceEquation::setSynchronizedVariable(const std::string& name)
+{
     mSynchro = true;
-    mSynchros.insert(name); 
-    ++mWaiting; 
+    mSynchros.insert(name);
+    ++mWaiting;
 }
 
-void DifferenceEquation::allSynchronizedVariable() 
-{ 
+void DifferenceEquation::allSynchronizedVariable()
+{
     mAllSynchro = true;
 }
 
 Time DifferenceEquation::init(const devs::Time& /* time */)
 {
     if (mMode == NAME) mDependance = getModel().existInputPort("update");
-    else mDependance = (getModel().getInputPortNumber() - 
+    else mDependance = (getModel().getInputPortNumber() -
                         getModel().existInputPort("perturb")?1:0 -
                         getModel().existInputPort("request")?1:0) > 0;
 
@@ -282,11 +282,11 @@ Time DifferenceEquation::init(const devs::Time& /* time */)
     mReceive = 0;
     mLastTime = 0;
     if (mInitValue) {
-        mValue.push_front(mInitialValue);    
+        mValue.push_front(mInitialValue);
     }
     else if (!mDependance /*or !mSynchro*/) {
         mState = INIT;
-        mValue.push_front(initValue());    
+        mValue.push_front(initValue());
         mInitValue = true;
     }
 
@@ -405,7 +405,7 @@ void DifferenceEquation::internalTransition(const Time& time)
         // mise à jour d'une de mes dépendances non synchrones
         // cette propagation est utile pour la compatibilité avec
         // QSS
-        if (mDependance) { 
+        if (mDependance) {
             mState = PRE;
         } else {
             mState = RUN;
@@ -431,7 +431,7 @@ void DifferenceEquation::externalTransition(const ExternalEventList& event,
             double value = (*it)->getDoubleAttributeValue("value");
             bool ok = true;
 
-            if (mState == INIT) 
+            if (mState == INIT)
                 ok = initExternalVariable(name, **it, timeStep);
 
             // est-ce que je suis dans l'état de recevoir les
@@ -443,7 +443,9 @@ void DifferenceEquation::externalTransition(const ExternalEventList& event,
                 // je comptabilise cette dépendance afin de
                 // vérifier que j'ai bien tout reçu et je
                 // pourrais alors lancer mon propre calcul
-                if (mState == PRE and end and mSynchros.find(name) != mSynchros.end()) ++mReceive;
+                if (mState == PRE and end
+		    and mSynchros.find(name) != mSynchros.end())
+		    ++mReceive;
             }
         }
         // c'est une perturbation d'un modèle externe sur la
@@ -465,7 +467,7 @@ void DifferenceEquation::externalTransition(const ExternalEventList& event,
             double value = (*it)->getDoubleAttributeValue("value");
             bool ok = true;
 
-            if (mState == INIT) 
+            if (mState == INIT)
                 ok = initExternalVariable(name, **it, timeStep);
 
             // est-ce que je suis dans l'état de recevoir les
@@ -478,7 +480,7 @@ void DifferenceEquation::externalTransition(const ExternalEventList& event,
                 // vérifier que j'ai bien tout reçu et je
                 // pourrais alors lancer mon propre calcul
                 if (mState == PRE and end) ++mReceive;
-            }	    
+            }	
         }
         ++it;	
     }
@@ -551,8 +553,8 @@ void DifferenceEquation::request(const RequestEvent& event,
                                  const Time& /*time*/,
                                  ExternalEventList& output) const
 {
-    Assert(utils::InternalError, 
-           event.getStringAttributeValue("name") == mVariableName, 
+    Assert(utils::InternalError,
+           event.getStringAttributeValue("name") == mVariableName,
            boost::format(
                "DifferenceEquation model, invalid variable name: %1%") %
            event.getStringAttributeValue("name"));
