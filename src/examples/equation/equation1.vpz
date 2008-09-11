@@ -84,31 +84,31 @@
     </conditions>
     <views>
       <outputs>
-	<output name="o" format="local" plugin="text" />
+	<output name="o" format="local" plugin="storage" />
       </outputs>
       <observables>
 	<observable name="obsA">
 	  <port name="a">
-	    <attachedview name="view1" />
+	    <attachedview name="view" />
 	  </port>
 	</observable>
 	<observable name="obsB">
 	  <port name="b">
-	    <attachedview name="view1" />
+	    <attachedview name="view" />
 	  </port>
 	</observable>
 	<observable name="obsC">
 	  <port name="c">
-	    <attachedview name="view1" />
+	    <attachedview name="view" />
 	  </port>
 	</observable>
 	<observable name="obsD">
 	  <port name="d">
-	    <attachedview name="view1" />
+	    <attachedview name="view" />
 	  </port>
 	</observable>
       </observables>
-      <view name="view1" type="timed" timestep=".1" output="o" />
+      <view name="view" type="timed" timestep=".1" output="o" />
     </views>
   </experiment>
 </vle_project>

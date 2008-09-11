@@ -42,7 +42,7 @@ namespace vle { namespace examples { namespace equation {
 
         virtual double compute(const vle::devs::Time& time);
 
-        virtual double initValue() const;
+        virtual double initValue();
     };
 
 }}} // namespace vle examples equation

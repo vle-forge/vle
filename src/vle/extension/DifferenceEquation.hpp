@@ -66,7 +66,7 @@ namespace vle { namespace extension {
          * no initialization event provide an initial value.
          * @return the initial value of internal variable.
          */
-        virtual double initValue() const { return 0.0; }
+        virtual double initValue() { return 0.0; }
 
         /**
          * @brief Return the time step of equation.

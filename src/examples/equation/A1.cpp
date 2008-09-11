@@ -32,7 +32,7 @@ double A1::compute(const vle::devs::Time& /* time */)
     return getValue() + 1;
 }
 
-double A1::initValue() const
+double A1::initValue()
 {
     return 0;
 }

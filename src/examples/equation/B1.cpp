@@ -38,7 +38,7 @@ double B1::compute(const vle::devs::Time& /* time */)
     return getValue() + getValue("a", -1) + 1;
 }
 
-double B1::initValue() const
+double B1::initValue()
 {
     return getValue("a") - 3;
 }

@@ -40,5 +40,10 @@ double D2::compute(const vle::devs::Time& /* time */)
     return getValue("b") + 1;
 }
 
+double D2::initValue()
+{
+    return compute(0);
+}
+
 }}} // namespace vle examples equation
 
