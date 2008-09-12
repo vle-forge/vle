@@ -1,5 +1,5 @@
 /**
- * @file src/vle/extension/DESS.cpp
+ * @file vle/extension/DESS.cpp
  * @author The VLE Development Team
  */
 

@@ -57,12 +57,24 @@ MatrixTranslator::~MatrixTranslator()
 
 graph::AtomicModel* MatrixTranslator::getModel(const std::string& name) const
 {
-    return m_models.at(name);
+    std::map < std::string, graph::AtomicModel* >::const_iterator it(
+        m_models.find(name));
+
+    Assert(utils::InternalError, it != m_models.end(), boost::format(
+            "MatrixTranslator: unknow model '%1%'") % name);
+
+    return it->second;
 }
 
 unsigned int MatrixTranslator::getSize(unsigned int i) const
 {
-    return m_size.at(i);
+    std::map < unsigned int, unsigned int >::const_iterator it(
+        m_size.find(i));
+
+    Assert(utils::InternalError, it != m_size.end(), boost::format(
+            "MatrixTranslator: unknow size '%1%'") % i);
+
+    return it->second;
 }
 
 xmlpp::Element* MatrixTranslator::getRoot() const

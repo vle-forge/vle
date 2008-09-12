@@ -8,11 +8,13 @@ LINK_DIRECTORIES(
   ${GLIBMM_LIBRARY_DIRS}
   ${LIBXMLPP_LIBRARY_DIR})
 
-SET(EXTENSION_CPP CellDevs.cpp CellQSS.cpp DSDevs.cpp QSS2.cpp QSS.cpp
-  CombinedQSS.cpp DifferenceEquation.cpp PetriNet.cpp DESS.cpp DifferentialEquation.cpp)
+SET(EXTENSION_CPP CellDevs.cpp CellQSS.cpp CombinedQSS.cpp DESS.cpp
+  DifferenceEquation.cpp DifferentialEquation.cpp DSDevs.cpp PetriNet.cpp
+  QSS2.cpp QSS.cpp)
 
-SET(EXTENSION_HPP CellDevs.hpp CellQSS.hpp DSDevs.hpp QSS2.hpp QSS.hpp
-CombinedQSS.hpp DifferenceEquation.hpp PetriNet.hpp DESS.hpp DifferentialEquation.hpp)
+SET(EXTENSION_HPP CellDevs.hpp CellQSS.hpp CombinedQSS.hpp DESS.hpp
+  DifferenceEquation.hpp DifferentialEquation.hpp DSDevs.hpp PetriNet.hpp
+  QSS2.hpp QSS.hpp)
 
 ADD_LIBRARY(vleextension SHARED ${EXTENSION_HPP};${EXTENSION_CPP})
 

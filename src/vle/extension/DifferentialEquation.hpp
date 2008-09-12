@@ -1,5 +1,5 @@
 /**
- * @file src/vle/extension/DifferentialEquation.hpp
+ * @file vle/extension/DifferentialEquation.hpp
  * @author The VLE Development Team
  */
 
@@ -34,7 +34,7 @@ namespace vle { namespace extension {
     public:
         DifferentialEquation(const vle::graph::AtomicModel& model,
 			     const vle::devs::InitEventList& events);
- 
+
 	virtual ~DifferentialEquation() { }
 
         inline double getValue() const
@@ -42,8 +42,7 @@ namespace vle { namespace extension {
 
 	double getValue(const vle::devs::Time& time, double delay) const;
 
-        inline double getValue(const std::string& name) const
-        { return mExternalVariableValue.at(name); }
+        double getValue(const std::string& name) const;
 
 	double getValue(const std::string& name,
 			const vle::devs::Time& time, double delay) const;
@@ -82,21 +81,26 @@ namespace vle { namespace extension {
         virtual vle::value::Value observation(
             const vle::devs::ObservationEvent& event) const;
 
-        virtual void request(const vle::devs::RequestEvent& /* event */,
-                             const vle::devs::Time& /* time */,
-                             vle::devs::ExternalEventList& /* output */) const;
+        virtual void request(const vle::devs::RequestEvent& event,
+                             const vle::devs::Time& time,
+                             vle::devs::ExternalEventList& output) const;
 
     private:
 	void updateExternalVariable(const vle::devs::Time& time);
 	
     protected:
+        enum thresholdType { UP, DOWN };
+        typedef std::map < std::string, std::pair < double, thresholdType > >
+            threshold;
+	typedef std::deque < std::pair < devs::Time, double > > valueBuffer;
+
 	void pushValue(const vle::devs::Time& time,
 		       double value);
 	void pushExternalValue(const std::string& name,
 			       const vle::devs::Time& time,
 			       double value);
         virtual void reset(const vle::devs::Time& time, double value) =0;
-	virtual void updateGradient(bool external, 
+	virtual void updateGradient(bool external,
 				    const vle::devs::Time& time) =0;
         virtual void updateSigma(const vle::devs::Time& time) =0;
         virtual void updateValue(bool external, const vle::devs::Time& time) =0;
@@ -107,7 +111,10 @@ namespace vle { namespace extension {
 	bool mUseGradient;
         bool mActive;
         bool mDependance;
-        
+
+        const valueBuffer& externalValueBuffer(const std::string& name) const;
+        valueBuffer& externalValueBuffer(const std::string& name);
+
         /** Internal variable */
         double mInitialValue;
         std::string mVariableName;
@@ -121,10 +128,6 @@ namespace vle { namespace extension {
         bool mExternalValues;
 
 	/** Thresholds **/
-        enum thresholdType { UP, DOWN };
-	typedef std::map < std::string, 
-			   std::pair < double, thresholdType > > threshold;
-
 	double mPreviousValue;
 	threshold mThresholds;
 
@@ -133,7 +136,6 @@ namespace vle { namespace extension {
 	devs::Time mStartTime;
 	double mDelay;
 	int mSize;
-	typedef std::deque < std::pair < devs::Time, double > > valueBuffer;
 	valueBuffer mValueBuffer;
 	std::map < std::string, valueBuffer > mExternalValueBuffer;
 	

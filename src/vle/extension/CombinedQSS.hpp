@@ -1,5 +1,5 @@
 /**
- * @file src/vle/extension/CombinedQSS.hpp
+ * @file vle/extension/CombinedQSS.hpp
  * @author The VLE Development Team
  */
 
