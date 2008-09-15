@@ -29,7 +29,9 @@
 #include <vle/extension/CellDevs.hpp>
 #include <vle/extension/CellQSS.hpp>
 #include <vle/extension/CombinedQSS.hpp>
+#include <vle/extension/DESS.hpp>
 #include <vle/extension/DifferenceEquation.hpp>
+#include <vle/extension/DifferentialEquation.hpp>
 #include <vle/extension/DSDevs.hpp>
 #include <vle/extension/PetriNet.hpp>
 #include <vle/extension/QSS2.hpp>
@@ -39,7 +41,7 @@
 
 namespace vle {
 
-    /** 
+    /**
      * @brief The extension namespace represents the DEVS extensions provides
      * by the VLE framework. We provide CellDEVS (cellular automata), CellQSS
      * (cellular automata with QSS integration), QSS and QSS2 ordinary
