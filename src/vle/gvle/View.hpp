@@ -310,12 +310,14 @@ public:
      */
     void makeConnection(graph::Model* src, graph::Model* dst);
 
-    /** To flash window, to inform user of this selected window.
+    /**
+     * To flash window, to inform user of this selected window.
      */
     void selectedWindow();
 
-    /** To update the adjustment
-            */
+    /**
+     * To update the adjustment.
+     */
     void updateAdjustment(double h, double v);
 
 private:

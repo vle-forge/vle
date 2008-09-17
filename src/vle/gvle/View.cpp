@@ -548,7 +548,7 @@ void View::makeConnection(graph::Model* src, graph::Model* dst)
 
 void View::selectedWindow()
 {
-    mDrawing->get_window()->clear();
+    present();
     mDrawing->show();
 }
 
