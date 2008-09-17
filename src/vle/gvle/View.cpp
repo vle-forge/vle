@@ -386,6 +386,8 @@ void View::addCoupledModel(int x, int y)
         graph::CoupledModel* new_gc =
             mModeling->newCoupledModel(mCurrent, box->getName(),
                                        "", x, y);
+        new_gc->setSize(ViewDrawingArea::MODEL_WIDTH,
+                        ViewDrawingArea::MODEL_HEIGHT);
         mCurrent->displace(mSelectedModels, new_gc);
         mModeling->redrawModelTreeBox();
         mSelectedModels.clear();
