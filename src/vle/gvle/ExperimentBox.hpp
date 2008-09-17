@@ -58,33 +58,33 @@ public:
 
 private:
     Modeling*           mModeling;
-    Gtk::Dialog*                    mDialog;
+    Gtk::Dialog*        mDialog;
 
-    Gtk::Entry*                      mEntryName;
+    Gtk::Entry*         mEntryName;
 
-    Gtk::Entry*                      mEntryDuration;
+    Gtk::SpinButton*    mSpinDuration;
 
-    Gtk::RadioButton*          mRadioSimu;
-    Gtk::HBox*                 mHboxSimu;
+    Gtk::RadioButton*   mRadioSimu;
+    Gtk::HBox*          mHboxSimu;
 
-    Gtk::Entry*                 mEntrySimuSeed;
-    Gtk::Button*                mButtonSimuSeed;
+    Gtk::Entry*         mEntrySimuSeed;
+    Gtk::Button*        mButtonSimuSeed;
 
-    Gtk::RadioButton*          mRadioPlan;
-    Gtk::HBox*                 mHboxPlan;
+    Gtk::RadioButton*   mRadioPlan;
+    Gtk::HBox*          mHboxPlan;
 
-    Gtk::HBox*                   mHboxCombi;
-    Gtk::ComboBoxText*               mComboCombi;
+    Gtk::HBox*          mHboxCombi;
+    Gtk::ComboBoxText*  mComboCombi;
 
-    Gtk::Entry*                 mEntryPlanSeed;
-    Gtk::Button*                mButtonPlanSeed;
+    Gtk::Entry*         mEntryPlanSeed;
+    Gtk::Button*        mButtonPlanSeed;
 
-    Gtk::SpinButton*            mButtonNumber;
+    Gtk::SpinButton*    mButtonNumber;
 
-    Gtk::Button*                    mButtonApply;
-    Gtk::Button*                    mButtonCancel;
+    Gtk::Button*        mButtonApply;
+    Gtk::Button*        mButtonCancel;
 
-    utils::Rand                    mRand;
+    utils::Rand         mRand;
 
     void on_simu();
     void on_plan();

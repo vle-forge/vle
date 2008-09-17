@@ -31,6 +31,7 @@
 #include <vle/utils/Tools.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/lexical_cast.hpp>
+#include <limits>
 
 using namespace vle;
 
@@ -48,7 +49,8 @@ ExperimentBox::ExperimentBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* mode
 
     xml->get_widget("EntryName", mEntryName);
 
-    xml->get_widget("EntryDuration", mEntryDuration);
+    xml->get_widget("SpinButtonDuration", mSpinDuration);
+    mSpinDuration->set_range(0.0, std::numeric_limits < double >::max());
 
     xml->get_widget("RadioSimulation", mRadioSimu);
     mRadioSimu->signal_pressed().connect(sigc::mem_fun
@@ -103,7 +105,7 @@ ExperimentBox::~ExperimentBox()
 void ExperimentBox::show()
 {
     mEntryName->set_text(mModeling->experiment().name());
-    mEntryDuration->set_text(utils::to_string(mModeling->experiment().duration()));
+    mSpinDuration->set_value(mModeling->experiment().duration());
     mEntrySimuSeed->set_text(utils::to_string(mModeling->experiment().seed()));
     mComboCombi->set_active_text(mModeling->experiment().combination());
     mEntryPlanSeed->set_text(utils::to_string(mModeling->experiment().replicas().seed()));
@@ -143,17 +145,8 @@ void ExperimentBox::on_apply()
 {
 
     std::string error = "";
-    if (mEntryName->get_text() == "")
+    if (mEntryName->get_text() == "") {
         error += "Set a name to this experiment";
-
-    if (mEntryDuration->get_text() == "")
-        error += "Set a duration to this experiment\n";
-    else {
-        if ((!utils::is_double(mEntryDuration->get_text()))) {
-            error += "Set a CORRECT duration to this experiment\n";
-        } else if (utils::to_double(mEntryDuration->get_text()) <= 0) {
-            error += "Set a CORRECT duration to this experiment\n";
-        }
     }
 
     if (mRadioSimu->get_active()) {
@@ -197,7 +190,7 @@ void ExperimentBox::on_apply()
         vpz::Replicas& rep = exp.replicas();
 
         exp.setName(mEntryName->get_text());
-        exp.setDuration(utils::to_double(mEntryDuration->get_text()));
+        exp.setDuration(mSpinDuration->get_value());
         if (mRadioSimu->get_active()) {
             //Simulation
             exp.setSeed(utils::to_int(mEntrySimuSeed->get_text()));
