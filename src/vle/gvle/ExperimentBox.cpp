@@ -39,18 +39,21 @@ namespace vle
 {
 namespace gvle {
 
-ExperimentBox::ExperimentBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* modeling) :
-        mModeling(modeling),
-        mDialog(0),
-        mButtonApply(0),
-        mButtonCancel(0)
+ExperimentBox::ExperimentBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
+                             Modeling* modeling) :
+    mModeling(modeling),
+    mDialog(0),
+    mButtonApply(0),
+    mButtonCancel(0)
 {
     xml->get_widget("DialogExperiment", mDialog);
 
     xml->get_widget("EntryName", mEntryName);
 
     xml->get_widget("SpinButtonDuration", mSpinDuration);
-    mSpinDuration->set_range(0.0, std::numeric_limits < double >::max());
+    mSpinDuration->set_range(
+        std::numeric_limits < double >::epsilon(),
+        std::numeric_limits < double >::max());
 
     xml->get_widget("RadioSimulation", mRadioSimu);
     mRadioSimu->signal_pressed().connect(sigc::mem_fun
@@ -59,12 +62,16 @@ ExperimentBox::ExperimentBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* mode
     mRadioPlan->signal_pressed().connect(sigc::mem_fun
                                          (*this, &ExperimentBox::on_plan));
 
-    if ((modeling->experiment().replicas().seed() == 0) && (modeling->experiment().replicas().seed() == 0))
+    if ((modeling->experiment().replicas().seed() == 0) &&
+        (modeling->experiment().replicas().seed() == 0))
         mRadioSimu->toggled();
 
     xml->get_widget("HBoxSimu", mHboxSimu);
 
-    xml->get_widget("EntrySimuSeed", mEntrySimuSeed);
+    xml->get_widget("SpinSimuSeed", mSpinSimuSeed);
+    mSpinSimuSeed->set_range(0, std::numeric_limits < guint32 >::max());
+    on_random_simu();
+
     xml->get_widget("ButtonSimuSeed", mButtonSimuSeed);
     mButtonSimuSeed->signal_clicked().connect(sigc::mem_fun
             (*this, &ExperimentBox::on_random_simu));
@@ -77,14 +84,17 @@ ExperimentBox::ExperimentBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* mode
     mComboCombi->append_text("total");
     mHboxCombi->pack_start(*mComboCombi);
 
-    xml->get_widget("EntryPlanSeed", mEntryPlanSeed);
+    xml->get_widget("SpinPlanSeed", mSpinPlanSeed);
+    mSpinPlanSeed->set_range(0, std::numeric_limits < guint32 >::max());
+    on_random_plan();
+
     xml->get_widget("ButtonPlanSeed", mButtonPlanSeed);
     if (mButtonPlanSeed)
         mButtonPlanSeed->signal_clicked().connect(sigc::mem_fun
                 (*this, &ExperimentBox::on_random_plan));
 
     xml->get_widget("SpinButtonNumber", mButtonNumber);
-    mButtonNumber->set_range(1, UINT_MAX);
+    mButtonNumber->set_range(1, std::numeric_limits < guint32 >::max());
 
     xml->get_widget("ButtonApply", mButtonApply);
     if (mButtonApply)
@@ -106,9 +116,9 @@ void ExperimentBox::show()
 {
     mEntryName->set_text(mModeling->experiment().name());
     mSpinDuration->set_value(mModeling->experiment().duration());
-    mEntrySimuSeed->set_text(utils::to_string(mModeling->experiment().seed()));
+    mSpinSimuSeed->set_value(mModeling->experiment().seed());
     mComboCombi->set_active_text(mModeling->experiment().combination());
-    mEntryPlanSeed->set_text(utils::to_string(mModeling->experiment().replicas().seed()));
+    mSpinPlanSeed->set_value(mModeling->experiment().replicas().seed());
 
     mDialog->show_all();
     if (mRadioSimu->get_active())
@@ -133,53 +143,24 @@ void ExperimentBox::on_plan()
 
 void ExperimentBox::on_random_simu()
 {
-    mEntrySimuSeed->set_text(utils::to_string(mRand.get_int()));
+    mSpinSimuSeed->set_value(mRand.get_int());
 }
 
 void ExperimentBox::on_random_plan()
 {
-    mEntryPlanSeed->set_text(utils::to_string(mRand.get_int()));
+    mSpinPlanSeed->set_value(mRand.get_int());
 }
 
 void ExperimentBox::on_apply()
 {
-
     std::string error = "";
     if (mEntryName->get_text() == "") {
         error += "Set a name to this experiment";
     }
 
-    if (mRadioSimu->get_active()) {
-        //Simulation
-        bool is_uint = true;
-        try {
-            boost::lexical_cast<long>(mEntrySimuSeed->get_text());
-        } catch (boost::bad_lexical_cast) {
-            is_uint = false;
-        }
-
-        if (!is_uint)  {
-            error += "Set a CORRECT seed to this experiment\n";
-        } else if (utils::to_long(mEntrySimuSeed->get_text()) < 0) {
-            error += "Set a CORRECT seed to this experiment\n";
-        }
-    } else {
-        //Plan
-        bool is_uint = true;
-
+    if (!mRadioSimu->get_active()) {
         if (mComboCombi->get_active_text() == "")
             error += "Set a Combination to this experiment\n";
-
-        try {
-            boost::lexical_cast<long>(mEntryPlanSeed->get_text());
-        } catch (boost::bad_lexical_cast) {
-            is_uint = false;
-        }
-        if (!is_uint)  {
-            error += "Set a CORRECT seed to this experiment\n";
-        } else if (utils::to_long(mEntryPlanSeed->get_text()) < 0) {
-            error += "Set a CORRECT seed to this experiment\n";
-        }
     }
 
     if (error != "") {
@@ -193,12 +174,12 @@ void ExperimentBox::on_apply()
         exp.setDuration(mSpinDuration->get_value());
         if (mRadioSimu->get_active()) {
             //Simulation
-            exp.setSeed(utils::to_int(mEntrySimuSeed->get_text()));
+            exp.setSeed(mSpinSimuSeed->get_value());
         } else {
             //Plan
             exp.setCombination(mComboCombi->get_active_text());
-            rep.setSeed(utils::to_int(mEntryPlanSeed->get_text()));
-            rep.setNumber(utils::to_int(mEntrySimuSeed->get_text()));
+            rep.setSeed(mSpinPlanSeed->get_value());
+            rep.setNumber(mButtonNumber->get_value());
         }
 
         if (mDialog)

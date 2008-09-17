@@ -1182,9 +1182,11 @@
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkEntry" id="EntrySimuSeed">
+                  <widget class="GtkSpinButton" id="SpinSimuSeed">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="adjustment">0 0 100 1 10 10</property>
+                    <property name="numeric">True</property>
                   </widget>
                   <packing>
                     <property name="position">1</property>
@@ -1267,9 +1269,11 @@
                           </packing>
                         </child>
                         <child>
-                          <widget class="GtkEntry" id="EntryPlanSeed">
+                          <widget class="GtkSpinButton" id="SpinPlanSeed">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
+                            <property name="adjustment">0 0 100 1 10 10</property>
+                            <property name="numeric">True</property>
                           </widget>
                           <packing>
                             <property name="position">1</property>

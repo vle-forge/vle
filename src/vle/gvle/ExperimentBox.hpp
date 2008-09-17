@@ -67,7 +67,7 @@ private:
     Gtk::RadioButton*   mRadioSimu;
     Gtk::HBox*          mHboxSimu;
 
-    Gtk::Entry*         mEntrySimuSeed;
+    Gtk::SpinButton*    mSpinSimuSeed;
     Gtk::Button*        mButtonSimuSeed;
 
     Gtk::RadioButton*   mRadioPlan;
@@ -76,7 +76,7 @@ private:
     Gtk::HBox*          mHboxCombi;
     Gtk::ComboBoxText*  mComboCombi;
 
-    Gtk::Entry*         mEntryPlanSeed;
+    Gtk::SpinButton*    mSpinPlanSeed;
     Gtk::Button*        mButtonPlanSeed;
 
     Gtk::SpinButton*    mButtonNumber;
