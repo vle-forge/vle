@@ -36,7 +36,7 @@ using namespace vle;
 namespace vle
 {
 namespace gvle {
-    
+
 const guint ViewDrawingArea::MODEL_WIDTH = 40;
 const guint ViewDrawingArea::MODEL_DECAL = 20;
 const guint ViewDrawingArea::MODEL_PORT  = 10;
@@ -409,19 +409,21 @@ void ViewDrawingArea::drawLink()
             mView->isEmptySelectedModels() == false) {
         graph::Model* src = mView->getFirstSelectedModels();
         if (src == mCurrent) {
-            mBuffer->draw_line(mBlack, (int)(MODEL_PORT * mZoom), (int)(mZoom *
-                               mHeight
-                               / 2),
+            mBuffer->draw_line(mBlack,
+                               (int)(MODEL_PORT * mZoom),
+                               (int)(mZoom * mHeight / 2),
                                (int)(mMouse.get_x() * mZoom),
                                (int)(mZoom * mMouse.get_y()));
         } else {
-            int w = src->height();
-            int h = src->width();
+            int w = src->width();
+            int h = src->height();
             int x = src->x();
             int y = src->y();
 
-            mBuffer->draw_line(mBlack, (int)(mZoom * (x + w / 2)),
-                               (int)(mZoom * (y + h / 2)), (int)(mMouse.get_x() * mZoom),
+            mBuffer->draw_line(mBlack,
+                               (int)(mZoom * (x + w / 2)),
+                               (int)(mZoom * (y + h / 2)),
+                               (int)(mMouse.get_x() * mZoom),
                                (int)(mMouse.get_y() * mZoom));
         }
     }
