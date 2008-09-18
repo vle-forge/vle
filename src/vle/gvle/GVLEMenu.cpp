@@ -92,8 +92,26 @@ void GVLEMenu::makeMenuView(GVLE* gvle)
                        sigc::mem_fun(gvle, &GVLE::onShowModelTreeView)));
 
     menulist.push_back(Gtk::Menu_Helpers::MenuElem("_Class models",
-                       Gtk::AccelKey(GDK_D, Gdk::CONTROL_MASK),
+                       Gtk::AccelKey(GDK_M, Gdk::CONTROL_MASK),
                        sigc::mem_fun(gvle, &GVLE::onShowClassModelTreeView)));
+
+    menulist.push_back(Gtk::Menu_Helpers::SeparatorElem());
+
+    menulist.push_back(
+        Gtk::Menu_Helpers::MenuElem("_Iconify all views",
+                                    Gtk::AccelKey(GDK_H, Gdk::CONTROL_MASK),
+            sigc::mem_fun(gvle, &GVLE::onIconifyAllViews)));
+
+    menulist.push_back(
+        Gtk::Menu_Helpers::MenuElem("_Deiconify all views",
+                                    Gtk::AccelKey(GDK_D, Gdk::CONTROL_MASK),
+            sigc::mem_fun(gvle, &GVLE::onDeiconifyAllViews)));
+
+    menulist.push_back(
+        Gtk::Menu_Helpers::MenuElem("_Close all views",
+                                    Gtk::AccelKey(GDK_W, Gdk::CONTROL_MASK),
+            sigc::mem_fun(gvle, &GVLE::onCloseAllViews)));
+
 
 }
 

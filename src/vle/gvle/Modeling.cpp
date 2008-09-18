@@ -42,6 +42,7 @@
 #include <vle/graph/CoupledModel.hpp>
 #include <libxml++/libxml++.h>
 #include <gtkmm/stock.h>
+#include <boost/foreach.hpp>
 
 using std::string;
 
@@ -95,7 +96,7 @@ Modeling::Modeling(GVLE* gvle, const string& filename) :
 Modeling::~Modeling()
 {
     delete mModelTreeBox;
-    delView();
+    delViews();
     if (mAtomicBox)
         delete mAtomicBox;
     if (mImportBox)
@@ -112,7 +113,7 @@ void Modeling::clearModeling()
     mIsSaved = false;
     mFileName.clear();
     mVpz.clear();
-    delView();
+    delViews();
     mTop = 0;
 }
 
@@ -414,11 +415,31 @@ void Modeling::delViewOnModel(const graph::CoupledModel* cm)
     }
 }
 
-void Modeling::delView()
+void Modeling::delViews()
 {
     const size_t sz = mListView.size();
     for (size_t i = 0; i < sz; ++i)
         delViewIndex(i);
+}
+
+void Modeling::iconifyViews()
+{
+    for (ListView::const_iterator it = mListView.begin();
+         it != mListView.end(); ++it) {
+        if (*it) {
+            (*it)->iconify();
+        }
+    }
+}
+
+void Modeling::deiconifyViews()
+{
+    for (ListView::const_iterator it = mListView.begin();
+         it != mListView.end(); ++it) {
+        if (*it) {
+            (*it)->deiconify();
+        }
+    }
 }
 
 void Modeling::refreshViews()

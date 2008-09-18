@@ -279,7 +279,17 @@ public:
      * delete all view of modeling.
      *
      */
-    void delView();
+    void delViews();
+
+    /**
+     * @brief Iconify all gvle::View attached.
+     */
+    void iconifyViews();
+
+    /**
+     * @brief Deiconify all gvle::View attached.
+     */
+    void deiconifyViews();
 
     void refreshViews();
 

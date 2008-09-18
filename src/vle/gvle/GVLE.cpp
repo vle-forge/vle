@@ -578,6 +578,21 @@ void GVLE::onShowClassModelTreeView()
     m_modeling->toggleClassModelTreeBox();
 }
 
+void GVLE::onCloseAllViews()
+{
+    m_modeling->delViews();
+}
+
+void GVLE::onIconifyAllViews()
+{
+    m_modeling->iconifyViews();
+}
+
+void GVLE::onDeiconifyAllViews()
+{
+    m_modeling->deiconifyViews();
+}
+
 void GVLE::onSimulationBox()
 {
     if (m_modeling->isSaved()) {

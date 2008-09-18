@@ -305,6 +305,20 @@ public:
      */
     void onShowClassModelTreeView();
 
+    /**
+     * @brief Delete all gvle::View from the gvle::Modeling object.
+     */
+    void onCloseAllViews();
+
+    /**
+     * @brief Iconify all gvle::View from the gvle::Modeling object.
+     */
+    void onIconifyAllViews();
+
+    /**
+     * @brief Deiconify all gvle::View from the gvle::Modeling object.
+     */
+    void onDeiconifyAllViews();
 
     /*********************************************************************
      *
