@@ -136,6 +136,7 @@ IF(CMAKE_MAJOR_VERSION MATCHES "2" AND CMAKE_MINOR_VERSION MATCHES "6")
     INSTALL(FILES "${GTK_BASE}/bin\\\\iconv.dll" DESTINATION bin)
     INSTALL(FILES "${GTK_BASE}/bin\\\\intl.dll" DESTINATION bin)
     INSTALL(FILES "${GTK_BASE}/bin\\\\libpng12.dll" DESTINATION bin)
+    INSTALL(FILES "${GTK_BASE}/bin\\\\libpng12-0.dll" DESTINATION bin)
     INSTALL(FILES "${GTK_BASE}/bin\\\\libxml++-2.6-2.dll" DESTINATION bin)
 
     INSTALL(FILES "${GTK_BASE}/include\\\\iconv.h" DESTINATION include)
@@ -220,6 +221,8 @@ IF(CMAKE_MAJOR_VERSION MATCHES "2" AND CMAKE_MINOR_VERSION MATCHES "6")
     INSTALL(DIRECTORY "${GTK_BASE}/etc\\\\fonts" DESTINATION etc)
     INSTALL(DIRECTORY "${GTK_BASE}/etc\\\\gtk-2.0" DESTINATION etc)
     INSTALL(DIRECTORY "${GTK_BASE}/etc\\\\pango" DESTINATION etc)
+
+    INSTALL(DIRECTORY "${GTK_BASE}/share\\\\themes" DESTINATION share)
 
     SET(CPACK_NSIS_MUI_ICON "${PROJECT_SOURCE_DIR}/share/pixmaps\\\\vle.ico")
     SET(CPACK_NSIS_MUI_UNIICON "${PROJECT_SOURCE_DIR}/share/pixmaps\\\\vle.ico")
