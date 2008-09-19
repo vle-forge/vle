@@ -84,6 +84,11 @@ bool Window::on_configure_event(GdkEventConfigure* event)
     return r;
 }
 
+bool Window::on_delete_event(GdkEventAny* /* event */)
+{
+    return true;
+}
+
 bool Window::runTimeout()
 {
     Glib::Mutex::Lock lock(m_mutex);

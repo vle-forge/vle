@@ -40,7 +40,7 @@ namespace vle { namespace eov {
 
         virtual ~Window();
 
-        /** 
+        /**
          * @brief Set the time between two redraw.
          * @param timeout A time in millisecond.
          */
@@ -48,7 +48,7 @@ namespace vle { namespace eov {
         { m_timeout = timeout; }
 
     private:
-        /** 
+        /**
          * @brief When we can draw on widget.
          */
         virtual void on_realize();
@@ -56,6 +56,14 @@ namespace vle { namespace eov {
         virtual bool on_expose_event(GdkEventExpose* event);
 
         virtual bool on_configure_event(GdkEventConfigure* event);
+
+        /**
+         * @brief Change the default behaviour: do not hide the Gtk::Window, for
+         * the use to delete from the eov::MainWindow.
+         * @param event Not use.
+         * @return True.
+         */
+        virtual bool on_delete_event(GdkEventAny* event);
 
         bool runTimeout();
 
@@ -68,4 +76,4 @@ namespace vle { namespace eov {
 
 }} // namespace vle eov
 
-#endif 
+#endif
