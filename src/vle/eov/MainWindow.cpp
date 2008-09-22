@@ -134,15 +134,16 @@ void MainWindow::onAbout()
         if (not mAbout) {
             throw(utils::InternalError("EOV Glade file have problem"));
         }
+        mAbout->signal_response().connect(
+            sigc::mem_fun(*this, &MainWindow::onAboutClose));
+
         std::string extra(VLE_EXTRA_VERSION);
         if (extra.empty()) {
             mAbout->set_version(VLE_VERSION);
         } else {
             std::string version(VLE_VERSION);
-            version += "-" + extra;
-            mAbout->set_version(VLE_VERSION);
-            mAbout->signal_response().connect(
-                sigc::mem_fun(*this, &MainWindow::onAboutClose));
+            version += extra;
+            mAbout->set_version(version);
         }
     }
     mAbout->run();
