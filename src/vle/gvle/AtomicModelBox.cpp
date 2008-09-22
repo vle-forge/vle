@@ -22,8 +22,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include <iostream>
 #include <vle/gvle/AtomicModelBox.hpp>
 #include <vle/gvle/ConditionBox.hpp>
 #include <vle/gvle/ObservableBox.hpp>
@@ -33,56 +31,379 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
-using namespace vle;
+namespace vle { namespace gvle {
 
-namespace vle
+// InputPortTreeView
+
+AtomicModelBox::InputPortTreeView::InputPortTreeView(
+    BaseObjectType* cobject,
+    const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/) :
+    Gtk::TreeView(cobject)
 {
-namespace gvle {
+    mRefTreeModelInputPort = Gtk::ListStore::create(mColumnsInputPort);
+    set_model(mRefTreeModelInputPort);
+    append_column("Name", mColumnsInputPort.m_col_name);
 
-AtomicModelBox::AtomicModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m):
-        mXml(xml),
-        mModeling(m),
-        mAtom(0),
-        mDyn(0),
-        mObs(0),
-        mViews(0),
-        mCond(0),
-        mAtom_backup(0),
-        mDyn_backup(0),
-        mObs_backup(0),
-        mViews_backup(0),
-        mCond_backup(0),
-        mOutputs_backup(0),
-        mConnection_in_backup(0),
-        mConnection_out_backup(0),
-        mDynamicBox(xml),
-        mObsAndViewBox(new ObsAndViewBox(xml))
+    //Fill popup menu:
+    {
+	Gtk::Menu::MenuList& menulist = mMenuPopup.items();
+
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		"_Add",
+		sigc::mem_fun(
+		    *this,
+		    &AtomicModelBox::InputPortTreeView::on_add)));
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		"_Remove",
+		sigc::mem_fun(
+		    *this,
+		    &AtomicModelBox::InputPortTreeView::on_remove)));
+    }
+    mMenuPopup.accelerate(*this);
+}
+
+AtomicModelBox::InputPortTreeView::~InputPortTreeView()
+{
+}
+
+bool AtomicModelBox::InputPortTreeView::on_button_press_event(
+    GdkEventButton* event)
+{
+  //Call base class, to allow normal handling,
+  //such as allowing the row to be selected by the right-click:
+  bool return_value = TreeView::on_button_press_event(event);
+
+  //Then do our custom stuff:
+  if( (event->type == GDK_BUTTON_PRESS) && (event->button == 3) )
+  {
+    mMenuPopup.popup(event->button, event->time);
+  }
+
+  return return_value;
+}
+
+void AtomicModelBox::InputPortTreeView::build()
+{
+    AssertI(mModel);
+    using namespace graph;
+
+    mRefTreeModelInputPort->clear();
+
+    ConnectionList list = mModel->getInputPortList();
+    ConnectionList::const_iterator it = list.begin();
+    while (it != list.end()) {
+        Gtk::TreeModel::Row row = *(mRefTreeModelInputPort->append());
+        row[mColumnsInputPort.m_col_name] = it->first;
+
+        ++it;
+    }
+}
+
+void AtomicModelBox::InputPortTreeView::on_add()
+{
+    SimpleTypeBox box("name ?");
+    graph::ConnectionList& list = mModel->getInputPortList();
+    std::string name;
+
+    do {
+        name = box.run();
+        boost::trim(name);
+    } while (name == ""  || (list.find(name) != list.end()));
+    mModel->addInputPort(name);
+    build();
+}
+
+void AtomicModelBox::InputPortTreeView::on_remove()
+{
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+
+    if (refSelection) {
+	Gtk::TreeModel::iterator iter = refSelection->get_selected();
+
+	if (iter) {
+            Gtk::TreeModel::Row row = *iter;
+	    std::string name = row.get_value(mColumnsInputPort.m_col_name);
+
+            if (mModel->existInputPort(name)) {
+                mModel->delInputPort(name);
+            }
+            build();
+        }
+    }
+}
+
+// OutputPortTreeView
+
+AtomicModelBox::OutputPortTreeView::OutputPortTreeView(
+    BaseObjectType* cobject,
+    const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/) :
+    Gtk::TreeView(cobject)
+{
+    mRefTreeModelOutputPort = Gtk::ListStore::create(mColumnsOutputPort);
+    set_model(mRefTreeModelOutputPort);
+    append_column("Name", mColumnsOutputPort.m_col_name);
+
+    //Fill popup menu:
+    {
+	Gtk::Menu::MenuList& menulist = mMenuPopup.items();
+
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		"_Add",
+		sigc::mem_fun(
+		    *this,
+		    &AtomicModelBox::OutputPortTreeView::on_add)));
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		"_Remove",
+		sigc::mem_fun(
+		    *this,
+		    &AtomicModelBox::OutputPortTreeView::on_remove)));
+    }
+    mMenuPopup.accelerate(*this);
+}
+
+AtomicModelBox::OutputPortTreeView::~OutputPortTreeView()
+{
+}
+
+bool AtomicModelBox::OutputPortTreeView::on_button_press_event(
+    GdkEventButton* event)
+{
+  //Call base class, to allow normal handling,
+  //such as allowing the row to be selected by the right-click:
+  bool return_value = TreeView::on_button_press_event(event);
+
+  //Then do our custom stuff:
+  if( (event->type == GDK_BUTTON_PRESS) && (event->button == 3) )
+  {
+    mMenuPopup.popup(event->button, event->time);
+  }
+
+  return return_value;
+}
+
+void AtomicModelBox::OutputPortTreeView::build()
+{
+    AssertI(mModel);
+    using namespace graph;
+
+    mRefTreeModelOutputPort->clear();
+
+    ConnectionList list = mModel->getOutputPortList();
+    ConnectionList::const_iterator it = list.begin();
+    while (it != list.end()) {
+        Gtk::TreeModel::Row row = *(mRefTreeModelOutputPort->append());
+        row[mColumnsOutputPort.m_col_name] = it->first;
+
+        ++it;
+    }
+}
+
+void AtomicModelBox::OutputPortTreeView::on_add()
+{
+    SimpleTypeBox box("name ?");
+    graph::ConnectionList& list = mModel->getOutputPortList();
+    std::string name;
+
+    do {
+        name = box.run();
+        boost::trim(name);
+    } while (name == ""  || (list.find(name) != list.end()));
+    mModel->addOutputPort(name);
+    build();
+}
+
+void AtomicModelBox::OutputPortTreeView::on_remove()
+{
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+
+    if (refSelection) {
+	Gtk::TreeModel::iterator iter = refSelection->get_selected();
+
+	if (iter) {
+            Gtk::TreeModel::Row row = *iter;
+	    std::string name = row.get_value(mColumnsOutputPort.m_col_name);
+
+            if (mModel->existOutputPort(name)) {
+                mModel->delOutputPort(name);
+            }
+            build();
+        }
+    }
+}
+
+// ConditionTreeView
+
+AtomicModelBox::ConditionTreeView::ConditionTreeView(
+    BaseObjectType* cobject,
+    const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/) :
+    Gtk::TreeView(cobject)
+{
+    mRefTreeModel = Gtk::ListStore::create(mColumns);
+    set_model(mRefTreeModel);
+    append_column("Name", mColumns.m_col_name);
+    append_column_editable("In", mColumns.m_col_activ);
+    signal_row_activated().connect(
+	sigc::mem_fun(*this,
+		      &AtomicModelBox::ConditionTreeView::on_activated));
+
+    //Fill popup menu:
+    {
+	Gtk::Menu::MenuList& menulist = mMenuPopup.items();
+
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		"_Add",
+		sigc::mem_fun(
+		    *this,
+		    &AtomicModelBox::ConditionTreeView::on_add)));
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		"_Remove",
+		sigc::mem_fun(
+		    *this,
+		    &AtomicModelBox::ConditionTreeView::on_remove)));
+    }
+    mMenuPopup.accelerate(*this);
+}
+
+AtomicModelBox::ConditionTreeView::~ConditionTreeView()
+{
+}
+
+bool AtomicModelBox::ConditionTreeView::on_button_press_event(
+    GdkEventButton* event)
+{
+  //Call base class, to allow normal handling,
+  //such as allowing the row to be selected by the right-click:
+  bool return_value = TreeView::on_button_press_event(event);
+
+  //Then do our custom stuff:
+  if( (event->type == GDK_BUTTON_PRESS) && (event->button == 3) )
+  {
+    mMenuPopup.popup(event->button, event->time);
+  }
+
+  return return_value;
+}
+
+void AtomicModelBox::ConditionTreeView::build()
+{
+    mRefTreeModel->clear();
+
+    const vpz::Strings& cond = mModel->conditions();
+    vpz::Strings::const_iterator f;
+    vpz::ConditionList list = mConditions->conditionlist();
+    vpz::ConditionList::iterator it = list.begin();
+
+    while (it != list.end()) {
+        Gtk::TreeModel::Row row = *(mRefTreeModel->append());
+
+        row[mColumns.m_col_name] = it->first;
+        f = std::find(cond.begin(), cond.end(), it->first);
+        if (f != cond.end())
+            row[mColumns.m_col_activ] = true;
+        else
+            row[mColumns.m_col_activ] = false;
+        it++;
+    }
+}
+
+vpz::Strings AtomicModelBox::ConditionTreeView::getConditions()
+{
+    vpz::Strings vec;
+    typedef Gtk::TreeModel::Children type_children;
+    type_children children = mRefTreeModel->children();
+
+    for (type_children::iterator iter = children.begin();
+	 iter != children.end(); ++iter) {
+	Gtk::TreeModel::Row row = *iter;
+
+	if (row.get_value(mColumns.m_col_activ) == true) {
+	    vec.push_back(row.get_value(mColumns.m_col_name));
+	}
+    }
+    return vec;
+}
+
+void AtomicModelBox::ConditionTreeView::on_add()
+{
+    SimpleTypeBox box("name ?");
+    std::string name;
+
+    do {
+        name = box.run();
+        boost::trim(name);
+    } while (name == ""  || mConditions->exist(name));
+    mConditions->add(vpz::Condition(name));
+    build();
+}
+
+void AtomicModelBox::ConditionTreeView::on_remove()
+{
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+
+    if (refSelection) {
+	Gtk::TreeModel::iterator iter = refSelection->get_selected();
+
+	if (iter) {
+            Gtk::TreeModel::Row row = *iter;
+	    std::string name = row.get_value(mColumns.m_col_name);
+
+	    mConditions->del(row.get_value(mColumns.m_col_name));
+            build();
+        }
+    }
+}
+
+void AtomicModelBox::ConditionTreeView::on_activated(
+    const Gtk::TreeModel::Path& path,
+    Gtk::TreeViewColumn* /* column */)
+{
+    Gtk::TreeModel::iterator iter = mRefTreeModel->get_iter(path);
+
+    if (iter) {
+        Gtk::TreeModel::Row row = *iter;
+        Glib::ustring s = row[mColumns.m_col_name];
+        vpz::Condition& cond = mConditions->get(s);
+        ConditionBox cb(&cond);
+
+        cb.run();
+    }
+}
+
+// AtomicModelBox
+
+AtomicModelBox::AtomicModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
+			       Modeling* m):
+    mXml(xml),
+    mModeling(m),
+    mAtom(0),
+    mDyn(0),
+    mObs(0),
+    mViews(0),
+    mCond(0),
+    mAtom_backup(0),
+    mDyn_backup(0),
+    mObs_backup(0),
+    mViews_backup(0),
+    mCond_backup(0),
+    mOutputs_backup(0),
+    mConnection_in_backup(0),
+    mConnection_out_backup(0),
+    mDynamicBox(xml),
+    mObsAndViewBox(new ObsAndViewBox(xml))
 {
     xml->get_widget("DialogAtomicModel", mDialog);
 
     //Input Ports
-    xml->get_widget("TreeViewInputPorts", mInputPorts);
-    mRefTreeModelInputPort = Gtk::ListStore::create(m_ColumnsInputPort);
-    mInputPorts->set_model(mRefTreeModelInputPort);
-    mInputPorts->append_column("Name", m_ColumnsInputPort.m_col_name);
-    xml->get_widget("AtomicAddInputPort", mAddInputPort);
-    mAddInputPort->signal_clicked().connect(
-        sigc::mem_fun(*this, &AtomicModelBox::add_input_port));
-    xml->get_widget("AtomicDelInputPort", mDelInputPort);
-    mDelInputPort->signal_clicked().connect(
-        sigc::mem_fun(*this, &AtomicModelBox::del_input_port));
+    xml->get_widget_derived("TreeViewInputPorts", mInputPorts);
 
     //Output Ports
-    xml->get_widget("TreeViewOutputPorts", mOutputPorts);
-    mRefTreeModelOutputPort = Gtk::ListStore::create(m_ColumnsOutputPort);
-    mOutputPorts->set_model(mRefTreeModelOutputPort);
-    mOutputPorts->append_column("Name", m_ColumnsOutputPort.m_col_name);
-    xml->get_widget("AtomicAddOutputPort", mAddOutputPort);
-    mAddOutputPort->signal_clicked().connect(
-        sigc::mem_fun(*this, &AtomicModelBox::add_output_port));
-    xml->get_widget("AtomicDelOutputPort", mDelOutputPort);
-    mDelOutputPort->signal_clicked().connect(
-        sigc::mem_fun(*this, &AtomicModelBox::del_output_port));
+    xml->get_widget_derived("TreeViewOutputPorts", mOutputPorts);
 
     //Dynamic
     xml->get_widget("ComboBoxDynamic", mComboDyn);
@@ -116,19 +437,7 @@ AtomicModelBox::AtomicModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m)
         sigc::mem_fun(*this, &AtomicModelBox::del_observable));
 
     //Conditions
-    xml->get_widget("TreeViewConditions", mTreeViewCond);
-    mRefTreeModel = Gtk::ListStore::create(mColumnsCond);
-    mTreeViewCond->set_model(mRefTreeModel);
-    mTreeViewCond->append_column("Name", mColumnsCond.m_col_name);
-    mTreeViewCond->append_column_editable("In", mColumnsCond.m_col_activ);
-    mTreeViewCond->signal_row_activated().connect(sigc::mem_fun(*this,
-            &AtomicModelBox::on_cond_activated));
-    xml->get_widget("AtomicAddCondition", mAddCond);
-    mAddCond->signal_clicked().connect(
-        sigc::mem_fun(*this, &AtomicModelBox::add_condition));
-    xml->get_widget("AtomicDelCondition", mDelCond);
-    mDelCond->signal_clicked().connect(
-        sigc::mem_fun(*this, &AtomicModelBox::del_condition));
+    xml->get_widget_derived("TreeViewConditions", mConditions);
 
     //Buttons
     xml->get_widget("ButtonAtomicApply", mButtonApply);
@@ -204,45 +513,21 @@ void AtomicModelBox::show(vpz::AtomicModel& atom,  graph::AtomicModel& model)
         delete mConnection_out_backup;
     mConnection_out_backup = new graph::ConnectionList(model.getOutputPortList());
 
-    makeInputPorts();
-    makeOutputPorts();
+    mInputPorts->setModel(&model);
+    mInputPorts->build();
+
+    mOutputPorts->setModel(&model);
+    mOutputPorts->build();
+
     makeDynamicsCombo();
     makeObsCombo();
-    makeCondTreeview();
+
+    mConditions->setModel(&atom);
+    mConditions->setConditions(&mModeling->conditions());
+    mConditions->build();
 
     mDialog->show_all();
     mDialog->run();
-}
-
-void AtomicModelBox::makeInputPorts()
-{
-    AssertI(mGraph_atom);
-    using namespace graph;
-
-    mRefTreeModelInputPort->clear();
-    ConnectionList list = mGraph_atom->getInputPortList();
-    ConnectionList::const_iterator it = list.begin();
-    while (it != list.end()) {
-        Gtk::TreeModel::Row row = *(mRefTreeModelInputPort->append());
-        row[m_ColumnsInputPort.m_col_name] = it->first;
-
-        ++it;
-    }
-}
-
-void AtomicModelBox::makeOutputPorts()
-{
-    using namespace graph;
-
-    mRefTreeModelOutputPort->clear();
-    ConnectionList list = mGraph_atom->getOutputPortList();
-    ConnectionList::const_iterator it = list.begin();
-    while (it != list.end()) {
-        Gtk::TreeModel::Row row = *(mRefTreeModelOutputPort->append());
-        row[m_ColumnsOutputPort.m_col_name] = it->first;
-
-        ++it;
-    }
 }
 
 void AtomicModelBox::makeDynamicsCombo()
@@ -292,84 +577,6 @@ void AtomicModelBox::makeObsCombo()
             mComboObs->set_active(it_child);
 
         ++it_child;
-    }
-}
-
-void AtomicModelBox::makeCondTreeview()
-{
-    mRefTreeModel->clear();
-
-    const vpz::Strings& cond = mAtom->conditions();
-    vpz::Strings::const_iterator f;
-    vpz::ConditionList list = mCond->conditionlist();
-    vpz::ConditionList::iterator it = list.begin();
-
-    while (it != list.end()) {
-        Gtk::TreeModel::Row row = *(mRefTreeModel->append());
-        row[mColumnsCond.m_col_name] = it->first;
-        f = std::find(cond.begin(), cond.end(), it->first);
-        if (f != cond.end())
-            row[mColumnsCond.m_col_activ] = true;
-        else
-            row[mColumnsCond.m_col_activ] = false;
-
-        it++;
-    }
-}
-
-void AtomicModelBox::add_input_port()
-{
-    SimpleTypeBox box("name ?");
-    graph::ConnectionList& list = mGraph_atom->getInputPortList();
-    std::string name;
-    do {
-        name = box.run();
-        boost::trim(name);
-    } while (name == ""  || (list.find(name) != list.end()));
-    mGraph_atom->addInputPort(name);
-    makeInputPorts();
-}
-
-void AtomicModelBox::del_input_port()
-{
-    Glib::RefPtr<Gtk::TreeView::Selection> refSelection =  mInputPorts->get_selection();
-    if (refSelection) {
-        Gtk::TreeModel::iterator iter = refSelection->get_selected();
-        if (iter) {
-            Gtk::TreeModel::Row row = *iter;
-            if (mGraph_atom->existInputPort(row.get_value(m_ColumnsInputPort.m_col_name))) {
-                mGraph_atom->delInputPort(row.get_value(m_ColumnsInputPort.m_col_name));
-            }
-            makeInputPorts();
-        }
-    }
-}
-
-void AtomicModelBox::add_output_port()
-{
-    SimpleTypeBox box("name ?");
-    graph::ConnectionList& list = mGraph_atom->getOutputPortList();
-    std::string name;
-    do {
-        name = box.run();
-        boost::trim(name);
-    } while (name == ""  || (list.find(name) != list.end()));
-    mGraph_atom->addOutputPort(name);
-    makeOutputPorts();
-}
-
-void AtomicModelBox::del_output_port()
-{
-    Glib::RefPtr<Gtk::TreeView::Selection> refSelection =  mOutputPorts->get_selection();
-    if (refSelection) {
-        Gtk::TreeModel::iterator iter = refSelection->get_selected();
-        if (iter) {
-            Gtk::TreeModel::Row row = *iter;
-            if (mGraph_atom->existOutputPort(row.get_value(m_ColumnsOutputPort.m_col_name))) {
-                mGraph_atom->delOutputPort(row.get_value(m_ColumnsOutputPort.m_col_name));
-            }
-            makeOutputPorts();
-        }
     }
 }
 
@@ -471,65 +678,17 @@ void AtomicModelBox::del_observable()
     }
 }
 
-void AtomicModelBox::add_condition()
-{
-    SimpleTypeBox box("name ?");
-    std::string name;
-    do {
-        name = box.run();
-        boost::trim(name);
-    } while (name == ""  || mCond->exist(name));
-    mCond->add(vpz::Condition(name));
-    makeCondTreeview();
-}
-
-void AtomicModelBox::del_condition()
-{
-    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = mTreeViewCond->get_selection();
-    if (refSelection) {
-        Gtk::TreeModel::iterator iter = refSelection->get_selected();
-        if (iter) {
-            Gtk::TreeModel::Row row = *iter;
-            mCond->del(row.get_value(mColumnsCond.m_col_name));
-            makeCondTreeview();
-        }
-    }
-}
-
-void AtomicModelBox::on_cond_activated(const Gtk::TreeModel::Path& path,
-                                       Gtk::TreeViewColumn* /*column*/)
-{
-    Gtk::TreeModel::iterator iter = mRefTreeModel->get_iter(path);
-    if (iter) {
-        Gtk::TreeModel::Row row = *iter;
-        Glib::ustring s = row[mColumnsCond.m_col_name];
-        vpz::Condition& cond = mCond->get(s);
-        ConditionBox cb(&cond);
-        cb.run();
-    }
-}
-
-
 void AtomicModelBox::on_apply()
 {
     if (mComboDyn->get_active() == 0) {
         WarningBox box("You Have to assign a dynamic.");
         box.run();
     } else {
-        mAtom->setDynamics(mComboDyn->get_active()->get_value(m_ColumnsDyn.m_name));
-        mAtom->setObservables(mComboObs->get_active()->get_value(m_ColumnsObs.m_col_name));
-
-        vpz::Strings vec;
-        typedef Gtk::TreeModel::Children type_children;
-        type_children children = mRefTreeModel->children();
-        for (type_children::iterator iter = children.begin();
-                iter != children.end(); ++iter) {
-            Gtk::TreeModel::Row row = *iter;
-            if (row.get_value(mColumnsCond.m_col_activ) == true) {
-                vec.push_back(row.get_value(mColumnsCond.m_col_name));
-            }
-        }
-        mAtom->setConditions(vec);
+        mAtom->setDynamics(mComboDyn->get_active()->get_value(
+			       m_ColumnsDyn.m_name));
+        mAtom->setObservables(mComboObs->get_active()->get_value(
+				  m_ColumnsObs.m_col_name));
+        mAtom->setConditions(mConditions->getConditions());
         mDialog->hide_all();
     }
 }
@@ -654,5 +813,4 @@ void AtomicModelBox::on_cancel()
     mDialog->hide_all();
 }
 
-}
-} // namespace vle gvle
+} } // namespace vle gvle

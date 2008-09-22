@@ -88,6 +88,94 @@ class ModelColumnsCond : public Gtk::TreeModel::ColumnRecord
     };
 
 private:
+
+    class InputPortTreeView : public Gtk::TreeView
+    {
+    public:
+	InputPortTreeView(BaseObjectType* cobject,
+			  const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
+	virtual ~InputPortTreeView();
+
+	void build();
+	void setModel(graph::AtomicModel* model)
+	    { mModel = model; }
+
+    protected:
+	// Override Signal handler:
+	// Alternatively, use signal_button_press_event().connect_notify()
+	virtual bool on_button_press_event(GdkEventButton *ev);
+
+	//Signal handler for popup menu items:
+	virtual void on_add();
+	virtual void on_remove();
+
+    private:
+	graph::AtomicModel* mModel;
+	Gtk::Menu mMenuPopup;
+	ModelColumnsPort mColumnsInputPort;
+	Glib::RefPtr<Gtk::ListStore> mRefTreeModelInputPort;
+    };
+
+    class OutputPortTreeView : public Gtk::TreeView
+    {
+    public:
+	OutputPortTreeView(BaseObjectType* cobject,
+			   const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
+	virtual ~OutputPortTreeView();
+
+	void build();
+	void setModel(graph::AtomicModel* model)
+	    { mModel = model; }
+
+    protected:
+	// Override Signal handler:
+	// Alternatively, use signal_button_press_event().connect_notify()
+	virtual bool on_button_press_event(GdkEventButton *ev);
+
+	//Signal handler for popup menu items:
+	virtual void on_add();
+	virtual void on_remove();
+
+    private:
+	graph::AtomicModel* mModel;
+	Gtk::Menu mMenuPopup;
+	ModelColumnsPort mColumnsOutputPort;
+	Glib::RefPtr<Gtk::ListStore> mRefTreeModelOutputPort;
+    };
+
+    class ConditionTreeView : public Gtk::TreeView
+    {
+    public:
+	ConditionTreeView(BaseObjectType* cobject,
+			  const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
+	virtual ~ConditionTreeView();
+
+	void build();
+	vpz::Strings getConditions();
+	void setConditions(vpz::Conditions* conditions)
+	    { mConditions = conditions; }
+	void setModel(vpz::AtomicModel* model)
+	    { mModel = model; }
+
+    protected:
+	// Override Signal handler:
+	// Alternatively, use signal_button_press_event().connect_notify()
+	virtual bool on_button_press_event(GdkEventButton *ev);
+
+	//Signal handler for popup menu items:
+	virtual void on_add();
+	virtual void on_remove();
+	virtual void on_activated(const Gtk::TreeModel::Path& path,
+				  Gtk::TreeViewColumn* column);
+
+    private:
+	vpz::AtomicModel* mModel;
+	vpz::Conditions* mConditions;
+	Gtk::Menu mMenuPopup;
+	ModelColumnsCond mColumns;
+	Glib::RefPtr < Gtk::ListStore > mRefTreeModel;
+    };
+
     Glib::RefPtr<Gnome::Glade::Xml>      mXml;
     Modeling*                            mModeling;
 
@@ -113,18 +201,10 @@ private:
     graph::ConnectionList*               mConnection_out_backup;
 
     //Input Ports
-    Gtk::TreeView*                       mInputPorts;
-    ModelColumnsPort                     m_ColumnsInputPort;
-    Glib::RefPtr<Gtk::ListStore>         mRefTreeModelInputPort;
-    Gtk::Button*                         mAddInputPort;
-    Gtk::Button*                         mDelInputPort;
+    InputPortTreeView*                   mInputPorts;
 
     //Output Ports
-    Gtk::TreeView*                       mOutputPorts;
-    ModelColumnsPort                     m_ColumnsOutputPort;
-    Glib::RefPtr<Gtk::ListStore>         mRefTreeModelOutputPort;
-    Gtk::Button*                         mAddOutputPort;
-    Gtk::Button*                         mDelOutputPort;
+    OutputPortTreeView*                  mOutputPorts;
 
     //Dynamics
     Gtk::ComboBox*                       mComboDyn;
@@ -143,11 +223,7 @@ private:
     Gtk::Button*                         mDelObs;
 
     //Conditions
-    Gtk::TreeView*                       mTreeViewCond;
-    ModelColumnsCond                     mColumnsCond;
-    Glib::RefPtr<Gtk::ListStore>         mRefTreeModel;
-    Gtk::Button*                         mAddCond;
-    Gtk::Button*                         mDelCond;
+    ConditionTreeView*                   mConditions;
 
     //Buttons
     Gtk::Button*                         mButtonApply;
@@ -157,17 +233,11 @@ private:
     DynamicBox                           mDynamicBox;
     ObsAndViewBox*                       mObsAndViewBox;
 
-    void makeInputPorts();
-    void makeOutputPorts();
+    Gtk::Menu m_Menu_Popup;
+
     void makeDynamicsCombo();
     void makeObsCombo();
     void makeCondTreeview();
-
-    void add_input_port();
-    void del_input_port();
-
-    void add_output_port();
-    void del_output_port();
 
     void add_dynamic();
     void edit_dynamic();
@@ -177,17 +247,10 @@ private:
     void edit_observable();
     void del_observable();
 
-    void add_condition();
-    void del_condition();
-
-    void on_cond_activated(const Gtk::TreeModel::Path& path,
-                           Gtk::TreeViewColumn* column);
-
     void on_apply();
     void on_cancel();
 };
 
-}
-} // namespace vle gvle
+} } // namespace vle gvle
 
 #endif
