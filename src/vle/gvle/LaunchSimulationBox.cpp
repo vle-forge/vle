@@ -237,8 +237,10 @@ void LaunchSimulationBox::run_local_simu()
                 root_coordinator.finish();
                 m_gvle_time = m_vle_time;
                 m_cond_set_stop.wait(m_mutex_stop);
-            } else
+            } else {
+                root_coordinator.finish();
                 m_gvle_time = duration;
+            }
             m_stop = true;
         }
         m_cond_set_time.signal();
