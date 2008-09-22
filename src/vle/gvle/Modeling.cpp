@@ -243,44 +243,7 @@ void Modeling::setTopModel(graph::CoupledModel* cp)
 
 void Modeling::showDynamics(const std::string& /* name */)
 {
-    Throw(utils::NotYetImplemented, "Modeling::showDynamics");
-    //graph::Model* mdl = mTop->find(name);
-    //if (mdl) {
-    //xmlpp::DomParser dom;
-    //
-    //if (mdl->isAtomic()) {
-    //const vpz::Dynamic& dyn = mVpz.project().dynamics().get(name);
-    //result = dyn.dynamic();
-    //} else if (mdl->isNoVLE()) {
-    //const vpz::NoVLE& dyn = mVpz.project().novles().find(name);
-    //result = dyn.xml();
-    //} else if (mdl->isCoupled()) {
-    //graph::CoupledModel* cp = (graph::CoupledModel*)(mdl);
-    //if (cp) {
-    //xmlpp::Element* root;
-    //root = dom.get_document()->create_root_node("MODEL");
-    //cp->writeXML(root);
-    //}
-    //result = dom.get_document()->write_to_string_formatted();
-    //}
-    //Gtk::Dialog* wnd = new Gtk::Dialog(name, true, true);
-    //Gtk::Button* ok = wnd->add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
-    //ok->set_flags(Gtk::CAN_DEFAULT);
-    //ok->grab_default();
-    //Glib::RefPtr <Gtk::TextBuffer> buffer = Gtk::TextBuffer::create();
-    //buffer->set_text(result);
-    //Gtk::TextView* txt = new Gtk::TextView(buffer);
-    //Gtk::ScrolledWindow* scrl = new Gtk::ScrolledWindow();
-    //scrl->set_border_width(8);
-    //scrl->add(*txt);
-    //wnd->get_vbox()->pack_start(*scrl, true, true);
-    //wnd->set_size_request(400, 600);
-    //wnd->show_all();
-    //wnd->run();
-    //delete txt;
-    //delete scrl;
-    //delete wnd;
-    //}
+    Error("This function is not yet implemented");
 }
 
 /*void Modeling::addView(const string& name)
