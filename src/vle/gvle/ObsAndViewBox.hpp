@@ -99,6 +99,8 @@ private:
     Gtk::Button*                          mButtonApply;
     Gtk::Button*                          mButtonCancel;
 
+    bool                                  mSelected;
+
     void on_apply();
     void on_cancel();
 

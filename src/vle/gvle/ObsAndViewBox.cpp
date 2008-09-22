@@ -35,7 +35,8 @@ namespace gvle {
 ObsAndViewBox::ObsAndViewBox(Glib::RefPtr<Gnome::Glade::Xml> xml):
         mXml(xml),
         mAll_Obs_backup(0),
-        mViews_backup(0)
+        mViews_backup(0),
+	mSelected(false)
 {
     xml->get_widget("DialogObsAndView", mDialog);
 
@@ -144,20 +145,25 @@ void ObsAndViewBox::on_drag_end(const Glib::RefPtr<Gdk::DragContext >&)
 
     int x,y;
     mTreeViewObs->get_pointer(x,y);
-    if (((0 <= x) && (x <= mTreeViewObs->get_width())) && ((0 <= y) && (y <= mTreeViewObs->get_height()))) {
+    if (mSelected and (0 <= x and x <= mTreeViewObs->get_width())
+	and (0 <= y and y <= mTreeViewObs->get_height())) {
         //Sources
-        Glib::RefPtr<TreeSelection> refTreeSelection = mTreeViewViews->get_selection();
+        Glib::RefPtr<TreeSelection> refTreeSelection =
+	    mTreeViewViews->get_selection();
         TreeModel::iterator iter = refTreeSelection->get_selected();
         TreeModel::Row row_source = *iter;
 
         //Destination
-        Glib::RefPtr<TreeSelection> refObsSelection = mTreeViewObs->get_selection();
+        Glib::RefPtr<TreeSelection> refObsSelection =
+	    mTreeViewObs->get_selection();
         refObsSelection->set_mode(Gtk::SELECTION_SINGLE);
         TreeModel::iterator iter2 = refObsSelection->get_selected();
         TreeModel::Row row_dest = *iter2;
 
-        ObservablePort& port = mObs->get(row_dest.get_value(mColumnsObs.m_col_name));
+        ObservablePort& port =
+	    mObs->get(row_dest.get_value(mColumnsObs.m_col_name));
         std::string view = row_source.get_value(mColumnsViews.m_col_name);
+
         if (!port.exist(view)) {
             port.add(view);
             makeObs();
@@ -166,23 +172,32 @@ void ObsAndViewBox::on_drag_end(const Glib::RefPtr<Gdk::DragContext >&)
     }
 }
 
-void ObsAndViewBox::on_data_received(const Glib::RefPtr<Gdk::DragContext>&, int, int,
+void ObsAndViewBox::on_data_received(const Glib::RefPtr<Gdk::DragContext>&,
+				     int, int,
                                      const Gtk::SelectionData&, guint, guint)
 {
     using namespace Gtk;
 
     int x,y;
     mTreeViewObs->get_pointer(x,y);
+
     TreeModel::Path path;
     TreeViewDropPosition pos;
+
     mTreeViewObs->get_dest_row_at_pos(x, y, path, pos);
-    Gtk::TreeModel::iterator it =  mRefTreeObs->get_iter(path);
-    Gtk::TreeModel::Row row = *it;
-    TreeIter parent = row.parent();
-    if (parent) {
-        row = *parent;
+    if (!path.empty()) {
+	Gtk::TreeModel::iterator it =  mRefTreeObs->get_iter(path);
+	Gtk::TreeModel::Row row = *it;
+	TreeIter parent = row.parent();
+
+	if (parent) {
+	    row = *parent;
+	}
+	mSelected = true;
+	mTreeViewObs->set_cursor(TreePath(row));
+    } else  {
+	mSelected = false;
     }
-    mTreeViewObs->set_cursor(TreePath(row));
 }
 
 void ObsAndViewBox::on_view_activated(const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn*)
