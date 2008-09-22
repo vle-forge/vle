@@ -24,39 +24,44 @@
 
 
 #include <vle/gvle/DynamicBox.hpp>
-#include <vle/gvle/WarningBox.hpp>
+#include <vle/gvle/Message.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Tools.hpp>
+#include <vle/utils/Socket.hpp>
 
-#include <iostream>
+namespace vle { namespace gvle {
 
-using namespace vle;
-
-namespace vle
-{
-namespace gvle {
-DynamicBox::DynamicBox(Glib::RefPtr<Gnome::Glade::Xml> xml):
-        mXml(xml)
+DynamicBox::DynamicBox(Glib::RefPtr<Gnome::Glade::Xml> xml) :
+    mXml(xml)
 {
     xml->get_widget("DialogDynamic", mDialog);
 
-    xml->get_widget("HBoxDynamicLibrary", mHboxCombo);
-
-    mCombo = new Gtk::ComboBoxText();
-    mHboxCombo->pack_start(*mCombo);
+    {
+        Gtk::HBox* box;
+        xml->get_widget("HBoxDynamicLibrary", box);
+        mCombo = new Gtk::ComboBoxText();
+        box->pack_start(*mCombo);
+    }
 
     xml->get_widget("EntryDynamicLocationHost", mLocationHost);
-    xml->get_widget("EntryDynamicLocationPort", mLocationPort);
-
+    xml->get_widget("SpinbuttonDynamicLocationPort", mLocationPort);
     xml->get_widget("EntryDynamicModel", mModel);
 
-    xml->get_widget("EntryDynamicLanguage", mLanguage);
+    {
+        Gtk::HBox* box;
+        xml->get_widget("HboxDynamicLanguage", box);
+        mLanguage = new Gtk::ComboBoxText();
+        box->pack_start(*mLanguage);
+
+        mLanguage->append_text("c++");
+        mLanguage->append_text("python");
+    }
 
     xml->get_widget("ButtonDynamicApply", mButtonApply);
+    xml->get_widget("ButtonDynamicCancel", mButtonCancel);
+
     mButtonApply->signal_clicked().connect(
         sigc::mem_fun(*this, &DynamicBox::on_apply));
-
-    xml->get_widget("ButtonDynamicCancel", mButtonCancel);
     mButtonCancel->signal_clicked().connect(
         sigc::mem_fun(*this, &DynamicBox::on_cancel));
 }
@@ -64,23 +69,36 @@ DynamicBox::DynamicBox(Glib::RefPtr<Gnome::Glade::Xml> xml):
 DynamicBox::~DynamicBox()
 {
     delete mCombo;
+    delete mLanguage;
 }
 
 void DynamicBox::show(vpz::Dynamic* dyn)
 {
     mDyn = dyn;
-    mDialog->set_title("Dynamic " + dyn->name());
+
+    mDialog->set_title((boost::format("Dynamics: %1%") % dyn->name()).str());
     makeCombo();
-    if (mDyn->location() != "") {
-        int pos = dyn->location().find_last_of(":");
-        mLocationHost->set_text(dyn->location().substr(0, pos));
-        mLocationPort->set_text(dyn->location().substr(pos+1));
+
+    if (not mDyn->location().empty()) {
+        std::string ip;
+        int port;
+
+        utils::net::explodeStringNet(dyn->location(), ip, port);
+
+        mLocationHost->set_text(ip);
+        mLocationPort->set_value(port);
     } else {
         mLocationHost->set_text("");
-        mLocationPort->set_text("");
+        mLocationPort->set_value(0);
     }
+
     mModel->set_text(dyn->model());
-    mLanguage->set_text(dyn->language());
+
+    if (dyn->language().empty()) {
+        mLanguage->set_active_text("c++");
+    } else {
+        mLanguage->set_active_text(dyn->language());
+    }
 
     mDialog->show_all();
     mDialog->run();
@@ -99,11 +117,13 @@ void DynamicBox::makeCombo()
             Glib::DirIterator in = rep.begin();
             while (in != rep.end()) {
 #ifdef G_OS_WIN32
-                if (((*in).find("lib") == 0) && ((*in).rfind(".dll") == (*in).size() - 4)) {
+                if (((*in).find("lib") == 0) &&
+                    ((*in).rfind(".dll") == (*in).size() - 4)) {
                     mCombo->append_text((*in).substr(3, (*in).size() - 7));
                 }
 #else
-                if (((*in).find("lib") == 0) && ((*in).rfind(".so") == (*in).size() - 3)) {
+                if (((*in).find("lib") == 0) &&
+                    ((*in).rfind(".so") == (*in).size() - 3)) {
                     mCombo->append_text((*in).substr(3, (*in).size() - 6));
                 }
 #endif
@@ -117,33 +137,23 @@ void DynamicBox::makeCombo()
 
 void DynamicBox::on_apply()
 {
-    std::string error = "";
-    if (mCombo->get_active_text() == "") {
-        error += "Set a library to this Dynamic.\n";
+    if (mCombo->get_active_text().empty()) {
+        Error("Set a library to this Dynamic");
+        return;
     }
 
-    if ((mLocationHost->get_text()=="") xor(mLocationPort->get_text()=="")) {
-        error += "Set a CORRECT and COMPLETE location.\n";
-    }
+    mDyn->setLibrary(mCombo->get_active_text());
 
-    if ((mLocationPort->get_text()!="") && (!utils::is_int(mLocationPort->get_text()))) {
-        error += "Set a CORRECT port.\n";
-    }
-
-    if (error != "") {
-        WarningBox box(error);
-        box.run();
+    if (mLocationHost->get_text().empty()) {
+        mDyn->setLocalDynamics();
     } else {
-        mDyn->setLibrary(mCombo->get_active_text());
-        if (mLocationHost->get_text() != "") {
-            mDyn->setDistantDynamics(mLocationHost->get_text(), utils::to_int(mLocationPort->get_text()));
-        } else {
-            mDyn->setLocalDynamics();
-        }
-        mDyn->setModel(mModel->get_text());
-        mDyn->setLanguage(mLanguage->get_text());
-        mDialog->hide();
+        mDyn->setDistantDynamics(mLocationHost->get_text(),
+                                 mLocationPort->get_value());
     }
+
+    mDyn->setModel(mModel->get_text());
+    mDyn->setLanguage(mLanguage->get_active_text());
+    mDialog->hide();
 }
 
 void DynamicBox::on_cancel()
@@ -151,5 +161,4 @@ void DynamicBox::on_cancel()
     mDialog->hide();
 }
 
-}
-} // namespace vle gvle
+}} // namespace vle gvle

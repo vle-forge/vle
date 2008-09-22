@@ -23,49 +23,44 @@
  */
 
 
-#ifndef GUI_DYNAMICBOX_HPP
-#define GUI_DYNAMICBOX_HPP
+#ifndef VLE_GVLE_DYNAMICBOX_HPP
+#define VLE_GVLE_DYNAMICBOX_HPP
 
-#include <gtkmm.h>
 #include <libglademm.h>
+#include <gtkmm/dialog.h>
+#include <gtkmm/box.h>
+#include <gtkmm/comboboxtext.h>
+#include <gtkmm/spinbutton.h>
+#include <gtkmm/entry.h>
 #include <vle/vpz/Dynamic.hpp>
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
-class DynamicBox
-{
-public:
-    DynamicBox(Glib::RefPtr<Gnome::Glade::Xml> xml);
-    ~DynamicBox();
+    class DynamicBox : public sigc::trackable
+    {
+    public:
+        DynamicBox(Glib::RefPtr < Gnome::Glade::Xml > xml);
 
-    void show(vpz::Dynamic* dyn);
-private:
-    //Gtk::Frame* mFrame;
+        ~DynamicBox();
 
-    //std::string mName;
+        void show(vpz::Dynamic* dyn);
+    private:
+        Glib::RefPtr < Gnome::Glade::Xml >  mXml;
+        Gtk::Dialog*                        mDialog;
+        Gtk::ComboBoxText*                  mCombo;
+        Gtk::Entry*                         mLocationHost;
+        Gtk::SpinButton*                    mLocationPort;
+        Gtk::Entry*                         mModel;
+        Gtk::ComboBoxText*                  mLanguage;
+        Gtk::Button*                        mButtonApply;
+        Gtk::Button*                        mButtonCancel;
+        vpz::Dynamic*                       mDyn;
 
-    Gtk::Dialog*                       mDialog;
-    Gtk::HBox*                         mHboxCombo;
-    Gtk::ComboBoxText*                 mCombo;
-    Gtk::Entry*                        mLocationHost;
-    Gtk::Entry*                        mLocationPort;
-    Gtk::Entry*                        mModel;
-    Gtk::Entry*                        mLanguage;
-    Gtk::Button*                       mButtonApply;
-    Gtk::Button*                       mButtonCancel;
+        void makeCombo();
+        void on_apply();
+        void on_cancel();
+    };
 
-    Glib::RefPtr<Gnome::Glade::Xml>    mXml;
-    vpz::Dynamic*                      mDyn;
-
-    void makeCombo();
-
-    void on_apply();
-    void on_cancel();
-};
-
-}
-} // namespace vle gvle
+}} // namespace vle gvle
 
 #endif
