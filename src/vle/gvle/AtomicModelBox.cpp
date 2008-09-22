@@ -438,6 +438,16 @@ void AtomicModelBox::add_observable()
     } while (name=="" || mObs->exist(name));
     mObs->add(vpz::Observable(name));
     makeObsCombo();
+
+    const Gtk::TreeModel::Children& child = mRefComboObs->children();
+    Gtk::TreeModel::Children::const_iterator it_child = child.begin();
+    while (it_child != child.end()) {
+        if (it_child->get_value(m_ColumnsObs.m_col_name) == name) {
+            mComboObs->set_active(it_child);
+            break;
+        }
+        ++it_child;
+    }
 }
 
 void AtomicModelBox::edit_observable()
