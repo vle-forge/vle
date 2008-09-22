@@ -376,16 +376,17 @@ void AtomicModelBox::del_output_port()
 void AtomicModelBox::add_dynamic()
 {
     const vpz::DynamicList& list = mDyn->dynamiclist();
-    std::string name = "";
-    SimpleTypeBox box2("name of the Dynamic ?");
+    std::string name;
+    SimpleTypeBox box("name of the Dynamic ?");
     do {
-        name = boost::trim_copy(box2.run());
+        name = boost::trim_copy(box.run());
     } while (name == "" || (list.find(name) != list.end()));
 
     vpz::Dynamic* dyn = new vpz::Dynamic(name);
     mDynamicBox.show(dyn);
     mDyn->add(*dyn);
     makeDynamicsCombo();
+
     const Gtk::TreeModel::Children& child = mRefComboDyn->children();
     Gtk::TreeModel::Children::const_iterator it_child = child.begin();
     while (it_child != child.end()) {
@@ -401,9 +402,19 @@ void AtomicModelBox::edit_dynamic()
 {
     std::string dyn = mComboDyn->get_active()->get_value(m_ColumnsDyn.m_name);
 
-    if (dyn != "") {
+    if (!dyn.empty()) {
         mDynamicBox.show(&(mDyn->get(dyn)));
         makeDynamicsCombo();
+
+	const Gtk::TreeModel::Children& child = mRefComboDyn->children();
+	Gtk::TreeModel::Children::const_iterator it_child = child.begin();
+	while (it_child != child.end()) {
+	    if (it_child->get_value(m_ColumnsDyn.m_name) == dyn) {
+		mComboDyn->set_active(it_child);
+		break;
+	    }
+	    ++it_child;
+	}
     }
 }
 
@@ -431,7 +442,9 @@ void AtomicModelBox::add_observable()
 
 void AtomicModelBox::edit_observable()
 {
-    std::string obs = mComboObs->get_active()->get_value(m_ColumnsObs.m_col_name);
+    std::string obs = mComboObs->get_active()
+	->get_value(m_ColumnsObs.m_col_name);
+
     if (obs != "") {
         //ObservableBox box( mObs->get(obs), *mViews );
         //box.run();
