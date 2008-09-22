@@ -24,8 +24,8 @@
 
 
 #include <vle/gvle/ExperimentBox.hpp>
+#include <vle/gvle/Message.hpp>
 #include <vle/gvle/Modeling.hpp>
-#include <vle/gvle/WarningBox.hpp>
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/graph/Model.hpp>
 #include <vle/utils/Tools.hpp>
@@ -164,8 +164,7 @@ void ExperimentBox::on_apply()
     }
 
     if (error != "") {
-        WarningBox box(error);
-        box.run();
+        Error(error);
     } else {
         vpz::Experiment& exp = mModeling->experiment();
         vpz::Replicas& rep = exp.replicas();

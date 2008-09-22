@@ -23,8 +23,8 @@
  */
 
 
+#include <vle/gvle/Message.hpp>
 #include <vle/gvle/ProjectBox.hpp>
-#include <vle/gvle/WarningBox.hpp>
 #include <vle/utils/Tools.hpp>
 
 #include <iostream>
@@ -106,8 +106,7 @@ void ProjectBox::on_apply()
         mProject->setDate(mEntryDate->get_text());
         mProject->setVersion(mEntryVersion->get_text());
     } else {
-        WarningBox box(error);
-        box.run();
+        Error(error);
     }
 }
 

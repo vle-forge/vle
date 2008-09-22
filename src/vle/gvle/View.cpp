@@ -34,7 +34,6 @@
 #include <vle/gvle/View.hpp>
 #include <vle/gvle/ViewDrawingArea.hpp>
 #include <vle/gvle/ViewMenu.hpp>
-#include <vle/gvle/WarningBox.hpp>
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Debug.hpp>
@@ -200,8 +199,7 @@ void View::exportCurrentModel()
 {
     vpz::Experiment& experiment = mModeling->vpz().project().experiment();
     if (experiment.name().empty() || experiment.duration() == 0) {
-        WarningBox box("Fix a Value to the name and the duration of the experiment before exportation.");
-        box.run();
+        Error("Fix a Value to the name and the duration of the experiment before exportation.");
         return;
     }
 

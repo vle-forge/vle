@@ -28,7 +28,6 @@
 #include <vle/gvle/GVLE.hpp>
 #include <vle/gvle/View.hpp>
 #include <vle/gvle/AtomicModelBox.hpp>
-#include <vle/gvle/WarningBox.hpp>
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/ModelDescriptionBox.hpp>
 #include <vle/gvle/DialogString.hpp>
@@ -37,7 +36,6 @@
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/graph/CoupledModel.hpp>
-//#include <vle/graph/AtomicModel.hpp>
 #include <vle/graph/Model.hpp>
 #include <vle/graph/CoupledModel.hpp>
 #include <libxml++/libxml++.h>

@@ -24,9 +24,9 @@
 
 #include <vle/gvle/AtomicModelBox.hpp>
 #include <vle/gvle/ConditionBox.hpp>
+#include <vle/gvle/Message.hpp>
 #include <vle/gvle/ObservableBox.hpp>
 #include <vle/gvle/SimpleTypeBox.hpp>
-#include <vle/gvle/WarningBox.hpp>
 #include <vle/utils/Path.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -681,8 +681,7 @@ void AtomicModelBox::del_observable()
 void AtomicModelBox::on_apply()
 {
     if (mComboDyn->get_active() == 0) {
-        WarningBox box("You Have to assign a dynamic.");
-        box.run();
+        Error("You Have to assign a dynamic.");
     } else {
         mAtom->setDynamics(mComboDyn->get_active()->get_value(
 			       m_ColumnsDyn.m_name));

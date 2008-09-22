@@ -24,10 +24,10 @@
 
 
 #include <iostream>
+#include <vle/gvle/Message.hpp>
 #include <vle/gvle/OutputBox.hpp>
 #include <vle/gvle/SimpleTypeBox.hpp>
 #include <vle/gvle/ViewBox.hpp>
-#include <vle/gvle/WarningBox.hpp>
 #include <vle/utils/Tools.hpp>
 
 using namespace vle;
@@ -131,8 +131,7 @@ void ViewBox::run()
         if (mOutput->get_active_text() != "" || rep == Gtk::RESPONSE_CANCEL)
             break;
         else {
-            WarningBox box("Please link an Output to this View");
-            box.run();
+            Error("Please link an Output to this View");
         }
     }
 

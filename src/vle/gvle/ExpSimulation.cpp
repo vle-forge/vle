@@ -25,16 +25,13 @@
 
 #include <vle/gvle/ExpSimulation.hpp>
 #include <vle/gvle/Modeling.hpp>
-#include <vle/gvle/WarningBox.hpp>
 #include <vle/gvle/Message.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/devs/Coordinator.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Socket.hpp>
-//#include <vle/manager/Run.hpp>
 #include <vle/manager/JustRun.hpp>
-//#include <vle/manager/Manager.hpp>
 #include <gtkmm/filechooserdialog.h>
 #include <gtkmm/stock.h>
 

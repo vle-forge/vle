@@ -33,7 +33,6 @@
 #include <vle/gvle/PluginTable.hpp>
 #include <vle/gvle/GVLEMenu.hpp>
 #include <vle/gvle/PluginPlus.hpp>
-#include <vle/gvle/WarningBox.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Debug.hpp>
@@ -519,8 +518,7 @@ void GVLE::onMenuSave()
 
             ++it;
         }
-        WarningBox box(error);
-        box.run();
+        Error(error);
     }
 }
 
@@ -538,9 +536,7 @@ void GVLE::onMenuSaveAs()
 
             ++it;
         }
-        WarningBox box(error);
-        box.run();
-
+        Error(error);
         return;
     }
 

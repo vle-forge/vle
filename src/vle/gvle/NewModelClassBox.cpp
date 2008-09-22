@@ -23,9 +23,9 @@
  */
 
 
+#include <vle/gvle/Message.hpp>
 #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/NewModelClassBox.hpp>
-#include <vle/gvle/WarningBox.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
 namespace vle
@@ -78,15 +78,13 @@ void NewModelClassBox::on_apply()
     boost::trim(class_name);
 
     if (class_name.empty() || classes.exist(class_name)) {
-        WarningBox box("Enter a VALID class name.");
-        box.run();
+        Error("Enter a VALID class name.");
         return;
     }
 
     Gtk::TreeModel::iterator iter = mComboTypeModel->get_active();
     if (not iter) {
-        WarningBox box("Choose a model type.");
-        box.run();
+        Error("Choose a model type.");
         return;
     }
     std::string model_type = iter->get_value(mColumns.m_col_type);
@@ -94,8 +92,7 @@ void NewModelClassBox::on_apply()
     std::string model_name = mEntryModelName->get_text();
     boost::trim(model_name);
     if (model_name.empty()) {
-        WarningBox box("Enter a model name.");
-        box.run();
+        Error("Enter a model name.");
         return;
     }
 
