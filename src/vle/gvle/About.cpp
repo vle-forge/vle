@@ -24,50 +24,35 @@
 
 
 #include <vle/gvle/About.hpp>
-#include <vle/utils/Debug.hpp>
-#include <gtkmm/label.h>
-#include <gtkmm/stock.h>
 #include "config.h"
 
-namespace vle
+namespace vle { namespace gvle {
+
+About::About(Glib::RefPtr < Gnome::Glade::Xml > refXml) :
+    mRefXml(refXml)
 {
-namespace gvle {
+    mRefXml->get_widget("DialogAbout", mAbout);
+    std::string extra(VLE_EXTRA_VERSION);
+    if (extra.empty()) {
+        mAbout->set_version(VLE_VERSION);
+    } else {
+        std::string version(VLE_VERSION);
+        version += extra;
+        mAbout->set_version(version);
+    }
 
-About::About() :
-        Gtk::Dialog("About", true, true)
-{
-    set_position(Gtk::WIN_POS_MOUSE);
-    Gtk::Label* label = Gtk::manage(
-                            new Gtk::Label("", Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER, true));
-    label->set_line_wrap(true);
-    label->set_justify(Gtk::JUSTIFY_CENTER);
-
-    label->set_markup((boost::format(
-                           "<big><big><big><b>GVLE %1%%2% "
-                           "</b></big></big></big>\n"
-                           "\n<b>A Modelling application to VLE</b>\n"
-                           "<b>Virtual Laboritory Environment</b>"
-                           "\n\nCopyright (C) 2004, 2005, 2006 The vle "
-                           "Development Team\n\n"
-                           "LIL - Laboratoire d'Informatique du Littoral\n"
-                           "Université du Littoral Cote d'Opale\n\n"
-                           ": <u>Web</u> :\n"
-                           "http://vle.univ-littoral.fr\n"
-                           "http://sourceforge.net/projects/vle/\n\n"
-                           ": <u>Authors</u> :\n"
-                           "Gauthier Quesnel quesnel@users.sourceforge.net\n"
-                           "Eric Ramat eramat@users.sourceforge.net\n\n"
-                           ": <u>Copying</u> :\n"
-                           "Free software under GNU GPL license") %
-            VLE_VERSION % VLE_EXTRA_VERSION).str());
-
-    Gtk::Button* mm = add_button(Gtk::Stock::OK, 0);
-    mm->signal_clicked().connect(sigc::mem_fun(*this, &Gtk::Dialog::hide));
-
-    get_vbox()->add(*label);
-    set_border_width(8);
-    show_all();
+    mAbout->signal_response().connect(
+        sigc::mem_fun(*this, &About::onAboutClose));
 }
 
+void About::run()
+{
+    mAbout->run();
 }
-} // namespace vle gvle
+
+void About::onAboutClose(int /* response */)
+{
+    mAbout->hide();
+}
+
+}} // namespace vle gvle

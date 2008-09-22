@@ -636,9 +636,8 @@ void GVLE::onProjectBox()
 
 void GVLE::onShowAbout()
 {
-    About* box = new About;
-    box->run();
-    delete box;
+    About box(mRefXML);
+    box.run();
 }
 
 std::string valuetype_to_string(value::ValueBase::type type)
