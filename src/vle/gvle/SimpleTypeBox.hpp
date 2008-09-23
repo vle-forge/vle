@@ -23,8 +23,8 @@
  */
 
 
-#ifndef GUI_SIMPLETYPEBOX_HPP
-#define GUI_SIMPLETYPEBOX_HPP
+#ifndef VLE_GVLE_SIMPLETYPEBOX_HPP
+#define VLE_GVLE_SIMPLETYPEBOX_HPP
 
 #include <gtkmm.h>
 #include <vle/value/Value.hpp>
@@ -33,27 +33,34 @@
 #include <vle/value/String.hpp>
 #include <vle/value/Tuple.hpp>
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
-class SimpleTypeBox : public Gtk::Dialog
-{
-public:
-    SimpleTypeBox(value::ValueBase* base);
-    SimpleTypeBox(std::string title);
+    class SimpleTypeBox : public Gtk::Dialog
+    {
+    public:
+        SimpleTypeBox(value::ValueBase* base);
+        SimpleTypeBox(const std::string& title);
 
-    virtual ~SimpleTypeBox();
+        virtual ~SimpleTypeBox();
 
-    std::string run();
-private:
-    value::ValueBase* mBase;
-    Gtk::Entry* mEntry;
+        std::string run();
 
-    void makeDialog();
-};
+        /**
+         * @brief Return true if the user have selected the Gtk::Button valid.
+         * False otherwise.
+         *
+         * @return true if Gtk::Dialog is true, false otherwise.
+         */
+        bool valid() const { return mValid; }
 
-}
-} // namespace vle gvle
+    private:
+        value::ValueBase* mBase;
+        Gtk::Entry* mEntry;
+        bool mValid;
+
+        void makeDialog();
+    };
+
+}} // namespace vle gvle
 
 #endif

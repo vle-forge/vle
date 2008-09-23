@@ -209,17 +209,16 @@ void ViewBox::display_timestep()
 
 void ViewBox::add_output()
 {
-    SimpleTypeBox box("name ?");
-    std::string name;
-    do {
-        name = box.run();
-        boost::trim(name);
-    } while (name == "" || mOutputs->exist(name));
-    vpz::Output out;
-    out.setName(name);
-    out.setLocalStream("", "default");
-    mOutputs->add(out);
-    makeOutputs();
+    SimpleTypeBox box("Name of the output ?");
+    std::string name = boost::trim_copy(box.run());
+
+    if (box.valid() and not name.empty()) {
+        vpz::Output out;
+        out.setName(name);
+        out.setLocalStream("", "default");
+        mOutputs->add(out);
+        makeOutputs();
+    }
 }
 
 void ViewBox::edit_output()

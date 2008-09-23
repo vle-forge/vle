@@ -137,8 +137,10 @@ void DynamicBox::makeCombo()
 
 void DynamicBox::on_apply()
 {
+    mValid = true;
     if (mCombo->get_active_text().empty()) {
         Error("Set a library to this Dynamic");
+        mValid = false;
         return;
     }
 
@@ -158,6 +160,7 @@ void DynamicBox::on_apply()
 
 void DynamicBox::on_cancel()
 {
+    mValid = false;
     mDialog->hide();
 }
 

@@ -103,16 +103,14 @@ void AtomicModelBox::InputPortTreeView::build()
 
 void AtomicModelBox::InputPortTreeView::on_add()
 {
-    SimpleTypeBox box("name ?");
+    SimpleTypeBox box("Name of the Input port ?");
     graph::ConnectionList& list = mModel->getInputPortList();
-    std::string name;
+    std::string name = boost::trim_copy(box.run());
 
-    do {
-        name = box.run();
-        boost::trim(name);
-    } while (name == ""  || (list.find(name) != list.end()));
-    mModel->addInputPort(name);
-    build();
+    if (box.valid() and not name.empty() and list.find(name) == list.end()) {
+        mModel->addInputPort(name);
+        build();
+    }
 }
 
 void AtomicModelBox::InputPortTreeView::on_remove()
@@ -204,16 +202,14 @@ void AtomicModelBox::OutputPortTreeView::build()
 
 void AtomicModelBox::OutputPortTreeView::on_add()
 {
-    SimpleTypeBox box("name ?");
+    SimpleTypeBox box("Name of the output port ?");
     graph::ConnectionList& list = mModel->getOutputPortList();
-    std::string name;
+    std::string name = boost::trim_copy(box.run());
 
-    do {
-        name = box.run();
-        boost::trim(name);
-    } while (name == ""  || (list.find(name) != list.end()));
-    mModel->addOutputPort(name);
-    build();
+    if (box.valid() and not name.empty() and list.find(name) == list.end()) {
+        mModel->addOutputPort(name);
+        build();
+    }
 }
 
 void AtomicModelBox::OutputPortTreeView::on_remove()
@@ -331,15 +327,13 @@ vpz::Strings AtomicModelBox::ConditionTreeView::getConditions()
 
 void AtomicModelBox::ConditionTreeView::on_add()
 {
-    SimpleTypeBox box("name ?");
-    std::string name;
+    SimpleTypeBox box("Name of the Condition ?");
+    std::string name = boost::trim_copy(box.run());
 
-    do {
-        name = box.run();
-        boost::trim(name);
-    } while (name == ""  || mConditions->exist(name));
-    mConditions->add(vpz::Condition(name));
-    build();
+    if (box.valid() and not name.empty()) {
+        mConditions->add(vpz::Condition(name));
+        build();
+    }
 }
 
 void AtomicModelBox::ConditionTreeView::on_remove()
@@ -582,26 +576,32 @@ void AtomicModelBox::makeObsCombo()
 
 void AtomicModelBox::add_dynamic()
 {
-    const vpz::DynamicList& list = mDyn->dynamiclist();
-    std::string name;
-    SimpleTypeBox box("name of the Dynamic ?");
-    do {
-        name = boost::trim_copy(box.run());
-    } while (name == "" || (list.find(name) != list.end()));
+    SimpleTypeBox box("Name of the Dynamic ?");
 
-    vpz::Dynamic* dyn = new vpz::Dynamic(name);
-    mDynamicBox.show(dyn);
-    mDyn->add(*dyn);
-    makeDynamicsCombo();
+    std::string name = box.run();
+    if (box.valid()) {
+        name = boost::trim_copy(name);
+        if (mDyn->exist(name)) {
+            Error(boost::str(boost::format(
+                        "The Dynamics '%1%' already exists") % name));
+        } else {
+            vpz::Dynamic* dyn = new vpz::Dynamic(name);
+            mDynamicBox.show(dyn);
+            if (mDynamicBox.valid()) {
+                mDyn->add(*dyn);
+                makeDynamicsCombo();
 
-    const Gtk::TreeModel::Children& child = mRefComboDyn->children();
-    Gtk::TreeModel::Children::const_iterator it_child = child.begin();
-    while (it_child != child.end()) {
-        if (it_child->get_value(m_ColumnsDyn.m_name) == dyn->name()) {
-            mComboDyn->set_active(it_child);
-            break;
+                const Gtk::TreeModel::Children& child(mRefComboDyn->children());
+                Gtk::TreeModel::Children::const_iterator it = child.begin();
+                while (it != child.end()) {
+                    if (it->get_value(m_ColumnsDyn.m_name) == dyn->name()) {
+                        mComboDyn->set_active(it);
+                        break;
+                    }
+                    ++it;
+                }
+            }
         }
-        ++it_child;
     }
 }
 
@@ -637,23 +637,28 @@ void AtomicModelBox::del_dynamic()
 
 void AtomicModelBox::add_observable()
 {
-    SimpleTypeBox box("name ?");
-    std::string name;
-    do {
-        name = box.run();
-        boost::trim(name);
-    } while (name=="" || mObs->exist(name));
-    mObs->add(vpz::Observable(name));
-    makeObsCombo();
+    SimpleTypeBox box("Name of the Observable ?");
 
-    const Gtk::TreeModel::Children& child = mRefComboObs->children();
-    Gtk::TreeModel::Children::const_iterator it_child = child.begin();
-    while (it_child != child.end()) {
-        if (it_child->get_value(m_ColumnsObs.m_col_name) == name) {
-            mComboObs->set_active(it_child);
-            break;
+    std::string name = box.run();
+    if (box.valid()) {
+        name = boost::trim_copy(name);
+        if (mObs->exist(name)) {
+            Error(boost::str(boost::format(
+                        "The observable '%1%' already exists") % name));
+        } else {
+            mObs->add(vpz::Observable(name));
+            makeObsCombo();
+
+            const Gtk::TreeModel::Children& child = mRefComboObs->children();
+            Gtk::TreeModel::Children::const_iterator it_child = child.begin();
+            while (it_child != child.end()) {
+                if (it_child->get_value(m_ColumnsObs.m_col_name) == name) {
+                    mComboObs->set_active(it_child);
+                    break;
+                }
+                ++it_child;
+            }
         }
-        ++it_child;
     }
 }
 

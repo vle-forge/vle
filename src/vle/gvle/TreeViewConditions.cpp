@@ -117,14 +117,13 @@ void TreeViewConditions::makeTreeView()
 
 void TreeViewConditions::on_menu_insert()
 {
-    SimpleTypeBox box("name ?");
-    std::string name;
-    do {
-        name = box.run();
-        boost::trim(name);
-    } while (name == ""  || mCond->exist(name));
-    mCond->add(vpz::Condition(name));
-    makeTreeView();
+    SimpleTypeBox box("Name of the port ?");
+    std::string name = boost::trim_copy(box.run());
+
+    if (box.valid() and not name.empty()) {
+        mCond->add(vpz::Condition(name));
+        makeTreeView();
+    }
 }
 
 void TreeViewConditions::on_menu_remove()

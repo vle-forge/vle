@@ -81,14 +81,14 @@ void TreeViewPort::on_menu_insert()
     std::list< std::string > list;
     mCond->portnames(list);
 
-    std::string name;
     SimpleTypeBox box("name ?");
-    do {
-        name = box.run();
-        boost::trim(name);
-    } while (name  == "" || (std::find(list.begin(), list.end(), name) != list.end()));
-    mCond->add(name);
-    refresh();
+    std::string name = boost::trim_copy(box.run());
+
+    if (box.valid()  and not name.empty() and
+        std::find(list.begin(), list.end(), name) == list.end()) {
+        mCond->add(name);
+        refresh();
+    }
 }
 
 void TreeViewPort::on_menu_remove()

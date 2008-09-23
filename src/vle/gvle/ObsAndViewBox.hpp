@@ -23,8 +23,8 @@
  */
 
 
-#ifndef GUI_OBSANDVIEWBOX_HPP
-#define GUI_OBSANDVIEWBOX_HPP
+#ifndef VLE_GVLE_OBSANDVIEWBOX_HPP
+#define VLE_GVLE_OBSANDVIEWBOX_HPP
 
 #include <vle/gvle/ObsAndViewBox.hpp>
 #include <vle/gvle/TreeViewObservable.hpp>
@@ -33,95 +33,104 @@
 #include <gtkmm.h>
 #include <libglademm.h>
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
-class Modeling;
+    class Modeling;
 
-class ObsAndViewBox
-{
-public:
-    ObsAndViewBox(Glib::RefPtr<Gnome::Glade::Xml> xml);
-    ~ObsAndViewBox();
-
-    void show(vpz::Observables& obs, std::string name, vpz::Views& views);
-
-protected:
-class ModelColumnsObs : public Gtk::TreeModel::ColumnRecord
+    class ObsAndViewBox
     {
     public:
-        ModelColumnsObs() {
-            add(m_col_name);
-            add(m_col_type);
-        }
-        Gtk::TreeModelColumn<Glib::ustring>      m_col_name;
-        Gtk::TreeModelColumn<vpz::Base::type>    m_col_type;
+        ObsAndViewBox(Glib::RefPtr<Gnome::Glade::Xml> xml);
+
+        ~ObsAndViewBox();
+
+        void show(vpz::Observables& obs, std::string name, vpz::Views& views);
+
+        /**
+         * @brief Return true if the user select the Gtk::REPONSE_OK, false
+         * otherwise.
+         * @return
+         */
+        bool valid() const { return mValid; }
+
+    protected:
+        class ModelColumnsObs : public Gtk::TreeModel::ColumnRecord
+        {
+        public:
+            ModelColumnsObs()
+            {
+                add(m_col_name);
+                add(m_col_type);
+            }
+            Gtk::TreeModelColumn<Glib::ustring>      m_col_name;
+            Gtk::TreeModelColumn<vpz::Base::type>    m_col_type;
+        };
+
+        class ModelColumnsView : public Gtk::TreeModel::ColumnRecord
+        {
+        public:
+            ModelColumnsView()
+            {
+                add(m_col_name);
+            }
+            Gtk::TreeModelColumn<Glib::ustring>      m_col_name;
+        };
+
+    private:
+        Glib::RefPtr<Gnome::Glade::Xml>       mXml;
+        Gtk::Dialog*                          mDialog;
+
+        //Data
+        vpz::Observables*                     mAll_Obs;
+        vpz::Observable*                      mObs;
+        vpz::Views*                           mViews;
+
+        //Backup
+        vpz::Observables*                     mAll_Obs_backup;
+        vpz::Views*                           mViews_backup;
+
+        //Observable
+        Gtk::TreeView*                        mTreeViewObs;
+        Glib::RefPtr<Gtk::TreeStore>          mRefTreeObs;
+        ModelColumnsObs                       mColumnsObs;
+        Gtk::Button*                          mButton_Add_Obs;
+        Gtk::Button*                          mButton_Del_Obs;
+
+        //Views
+        Gtk::TreeView*                        mTreeViewViews;
+        Glib::RefPtr<Gtk::TreeStore>          mRefTreeViews;
+        ModelColumnsView                      mColumnsViews;
+        Gtk::Button*                          mButton_Add_View;
+        Gtk::Button*                          mButton_Del_View;
+
+        //Buttons
+        Gtk::Button*                          mButtonApply;
+        Gtk::Button*                          mButtonCancel;
+
+        bool                                  mSelected;
+        bool                                  mValid;
+
+        void on_apply();
+        void on_cancel();
+
+        void on_drag_end(const Glib::RefPtr<Gdk::DragContext >&);
+
+        void on_data_received(const Glib::RefPtr<Gdk::DragContext>&, int,
+                              int, const Gtk::SelectionData&,
+                              guint, guint);
+        void on_view_activated(const Gtk::TreeModel::Path&,
+                               Gtk::TreeViewColumn*);
+
+        void makeObs();
+        void makeViews();
+
+        void on_add_port();
+        void on_del_port();
+
+        void on_add_view();
+        void on_del_view();
     };
 
-class ModelColumnsView : public Gtk::TreeModel::ColumnRecord
-    {
-    public:
-        ModelColumnsView() {
-            add(m_col_name);
-        }
-        Gtk::TreeModelColumn<Glib::ustring>      m_col_name;
-    };
-
-private:
-    Glib::RefPtr<Gnome::Glade::Xml>       mXml;
-    Gtk::Dialog*                          mDialog;
-
-    //Data
-    vpz::Observables*                     mAll_Obs;
-    vpz::Observable*                      mObs;
-    vpz::Views*                           mViews;
-
-    //Backup
-    vpz::Observables*                     mAll_Obs_backup;
-    vpz::Views*                           mViews_backup;
-
-    //Observable
-    Gtk::TreeView*                        mTreeViewObs;
-    Glib::RefPtr<Gtk::TreeStore>          mRefTreeObs;
-    ModelColumnsObs                       mColumnsObs;
-    Gtk::Button*                          mButton_Add_Obs;
-    Gtk::Button*                          mButton_Del_Obs;
-
-    //Views
-    Gtk::TreeView*                        mTreeViewViews;
-    Glib::RefPtr<Gtk::TreeStore>          mRefTreeViews;
-    ModelColumnsView                      mColumnsViews;
-    Gtk::Button*                          mButton_Add_View;
-    Gtk::Button*                          mButton_Del_View;
-
-    //Buttons
-    Gtk::Button*                          mButtonApply;
-    Gtk::Button*                          mButtonCancel;
-
-    bool                                  mSelected;
-
-    void on_apply();
-    void on_cancel();
-
-    void on_drag_end(const Glib::RefPtr<Gdk::DragContext >&);
-
-    void on_data_received(const Glib::RefPtr<Gdk::DragContext>&, int,
-                          int, const Gtk::SelectionData&,
-                          guint, guint);
-    void on_view_activated(const Gtk::TreeModel::Path&, Gtk::TreeViewColumn*);
-
-    void makeObs();
-    void makeViews();
-
-    void on_add_port();
-    void on_del_port();
-
-    void on_add_view();
-    void on_del_view();
-};
-
-}
-} // namespace vle gvle
+}} // namespace vle gvle
 
 #endif

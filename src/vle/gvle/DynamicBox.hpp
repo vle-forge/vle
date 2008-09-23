@@ -44,6 +44,14 @@ namespace vle { namespace gvle {
         ~DynamicBox();
 
         void show(vpz::Dynamic* dyn);
+
+        /**
+         * @brief Return true if the user select the Gtk::REPONSE_OK, false
+         * otherwise.
+         * @return
+         */
+        bool valid() const { return mValid; }
+
     private:
         Glib::RefPtr < Gnome::Glade::Xml >  mXml;
         Gtk::Dialog*                        mDialog;
@@ -55,6 +63,7 @@ namespace vle { namespace gvle {
         Gtk::Button*                        mButtonApply;
         Gtk::Button*                        mButtonCancel;
         vpz::Dynamic*                       mDyn;
+        bool                                mValid;
 
         void makeCombo();
         void on_apply();

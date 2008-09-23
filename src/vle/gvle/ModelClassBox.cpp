@@ -25,9 +25,7 @@
 
 #include <vle/gvle/ModelClassBox.hpp>
 #include <vle/gvle/Modeling.hpp>
-#include <vle/gvle/SimpleTypeBox.hpp>
 #include <boost/algorithm/string/detail/trim.hpp>
-
 #include <vle/gvle/View.hpp>
 
 namespace vle

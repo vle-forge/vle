@@ -119,6 +119,7 @@ void ObsAndViewBox::show(vpz::Observables& obs, std::string name, vpz::Views& vi
 
 void ObsAndViewBox::on_apply()
 {
+    mValid = true;
     mDialog->hide_all();
     delete mAll_Obs_backup;
     delete mViews_backup;
@@ -126,6 +127,7 @@ void ObsAndViewBox::on_apply()
 
 void ObsAndViewBox::on_cancel()
 {
+    mValid = false;
     mDialog->hide_all();
 
     mAll_Obs->clear();
@@ -251,14 +253,13 @@ void ObsAndViewBox::makeViews()
 
 void ObsAndViewBox::on_add_port()
 {
-    SimpleTypeBox box("Name ?");
-    std::string name;
-    do {
-        name = box.run();
-        boost::trim(name);
-    } while (name == "" || mObs->exist(name));
-    mObs->add(name);
-    makeObs();
+    SimpleTypeBox box("Name of the Observable port ?");
+    std::string name = boost::trim_copy(box.run());
+
+    if (box.valid() and not name.empty()) {
+        mObs->add(name);
+        makeObs();
+    }
 }
 
 void ObsAndViewBox::on_del_port()
@@ -294,15 +295,13 @@ void ObsAndViewBox::on_del_port()
 
 void ObsAndViewBox::on_add_view()
 {
-    SimpleTypeBox box("Name ?");
-    std::string name;
-    do {
-        name = box.run();
-        boost::trim(name);
-    } while (name == "" || mViews->exist(name));
+    SimpleTypeBox box("Name of the View ?");
+    std::string name = boost::trim_copy(box.run());
 
-    mViews->add(vpz::View(name));
-    makeViews();
+    if (box.valid() and not name.empty()) {
+        mViews->add(vpz::View(name));
+        makeViews();
+    }
 }
 
 void ObsAndViewBox::on_del_view()

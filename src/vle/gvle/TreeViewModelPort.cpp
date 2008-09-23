@@ -79,14 +79,13 @@ void TreeViewModelPort::makeTreeView()
 void TreeViewModelPort::on_menu_insert()
 {
     SimpleTypeBox box("name ?");
-    std::string name;
-    do {
-        name = box.run();
-        boost::trim(name);
-    } while (name == ""  || (mList->find(name) != mList->end()));
-    mList->insert(std::make_pair< std::string, graph::ModelPortList >(
-                      name, graph::ModelPortList()));
-    makeTreeView();
+    std::string name = boost::trim_copy(box.run());
+
+    if (box.valid() and not name.empty() and mList->find(name) == mList->end()) {
+        mList->insert(std::make_pair< std::string, graph::ModelPortList >(
+                name, graph::ModelPortList()));
+        makeTreeView();
+    }
 }
 
 void TreeViewModelPort::on_menu_remove()

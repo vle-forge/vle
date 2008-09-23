@@ -26,38 +26,39 @@
 #include <vle/gvle/SimpleTypeBox.hpp>
 #include <vle/utils.hpp>
 
-using namespace vle;
+namespace vle { namespace gvle {
 
-namespace vle
-{
-namespace gvle {
 SimpleTypeBox::SimpleTypeBox(value::ValueBase* b):
-        Gtk::Dialog("?",true,true),
-        mBase(b)
+    Gtk::Dialog("?",true,true),
+    mBase(b),
+    mValid(false)
 {
-    add_button(Gtk::Stock::APPLY, Gtk::RESPONSE_APPLY);
     add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-    set_default_response(Gtk::RESPONSE_APPLY);
+    add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+    set_default_response(Gtk::RESPONSE_OK);
     makeDialog();
 
-    if (b->isInteger())
+    if (b->isInteger()) {
         set_title("Integer");
-    else if (b->isDouble())
+    } else if (b->isDouble()) {
         set_title("Double");
-    else if (b->isString())
+    } else if (b->isString()) {
         set_title("String");
-    else if (b->isTuple())
+    } else if (b->isTuple()) {
         set_title("Tuple");
+    }
 
     show_all();
 }
 
-SimpleTypeBox::SimpleTypeBox(std::string title):
-        Gtk::Dialog(title,true,true),
-        mBase(0)
+SimpleTypeBox::SimpleTypeBox(const std::string& title):
+    Gtk::Dialog(title,true,true),
+    mBase(0),
+    mValid(false)
 {
-    add_button(Gtk::Stock::APPLY, Gtk::RESPONSE_APPLY);
-    set_default_response(Gtk::RESPONSE_APPLY);
+    add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+    add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+    set_default_response(Gtk::RESPONSE_OK);
     makeDialog();
     show_all();
 }
@@ -73,46 +74,57 @@ void SimpleTypeBox::makeDialog()
     mEntry = new Gtk::Entry();
     mEntry->set_editable(true);
     mEntry->set_activates_default(true);
-    if (mBase)
+    if (mBase) {
         mEntry->set_text(mBase->toFile());
+    }
     get_vbox()->pack_start(*mEntry);
 }
 
 std::string SimpleTypeBox::run()
 {
-    int ret = Gtk::Dialog::run();
-    if (ret == Gtk::RESPONSE_APPLY && mBase) {
-        switch (mBase->getType()) {
-        case(value::ValueBase::INTEGER): {
-            dynamic_cast<value::IntegerFactory*>(mBase)->set(utils::to_long(mEntry->get_text()));
+    mValid = Gtk::Dialog::run() == Gtk::RESPONSE_OK;
+
+    if (mValid) {
+        if (mBase) {
+            switch (mBase->getType()) {
+            case(value::ValueBase::INTEGER):
+                {
+                    dynamic_cast < value::IntegerFactory* > (mBase)
+                        ->set(utils::to_long(mEntry->get_text()));
+                    return mEntry->get_text();
+                }
+                break;
+            case(value::ValueBase::DOUBLE):
+                {
+                    dynamic_cast < value::DoubleFactory* > (mBase)
+                        ->set(utils::to_double(mEntry->get_text()));
+                    return mEntry->get_text();
+                }
+                break;
+            case(value::ValueBase::STRING):
+                {
+                    dynamic_cast < value::StringFactory* > (mBase)
+                        ->set(mEntry->get_text());
+                    return mEntry->get_text();
+                }
+                break;
+            case(value::ValueBase::TUPLE):
+                {
+                    value::TupleFactory* tuple =
+                        dynamic_cast<value::TupleFactory*>(mBase);
+                    tuple->getValue().clear();
+                    tuple->fill(mEntry->get_text());
+                    return mEntry->get_text();
+                }
+                break;
+            default:
+                break;
+            }
+        } else {
             return mEntry->get_text();
         }
-        break;
-        case(value::ValueBase::DOUBLE): {
-            dynamic_cast<value::DoubleFactory*>(mBase)->set(utils::to_double(mEntry->get_text()));
-            return mEntry->get_text();
-        }
-        break;
-        case(value::ValueBase::STRING): {
-            dynamic_cast<value::StringFactory*>(mBase)->set(mEntry->get_text());
-            return mEntry->get_text();
-        }
-        break;
-        case(value::ValueBase::TUPLE): {
-            value::TupleFactory* tuple = dynamic_cast<value::TupleFactory*>(mBase);
-            tuple->getValue().clear();
-            tuple->fill(mEntry->get_text());
-            return mEntry->get_text();
-        }
-        break;
-        default:
-            break;
-        }
-    } else {
-        return mEntry->get_text();
     }
-    return "";
+    return std::string();
 }
 
-}
-} // namespace vle gvle
+}} // namespace vle gvle
