@@ -56,17 +56,12 @@ ExperimentBox::ExperimentBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
         std::numeric_limits < double >::max());
 
     xml->get_widget("RadioSimulation", mRadioSimu);
-    mRadioSimu->signal_pressed().connect(sigc::mem_fun
-                                         (*this, &ExperimentBox::on_simu));
     xml->get_widget("RadioPlan", mRadioPlan);
-    mRadioPlan->signal_pressed().connect(sigc::mem_fun
-                                         (*this, &ExperimentBox::on_plan));
-
     if ((modeling->experiment().replicas().seed() == 0) &&
         (modeling->experiment().replicas().seed() == 0))
         mRadioSimu->toggled();
 
-    xml->get_widget("HBoxSimu", mHboxSimu);
+    xml->get_widget("frameExperimentSimulation", mHboxSimu);
 
     xml->get_widget("SpinSimuSeed", mSpinSimuSeed);
     mSpinSimuSeed->set_range(0, std::numeric_limits < guint32 >::max());
@@ -76,13 +71,13 @@ ExperimentBox::ExperimentBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
     mButtonSimuSeed->signal_clicked().connect(sigc::mem_fun
             (*this, &ExperimentBox::on_random_simu));
 
-    xml->get_widget("HBoxPlan", mHboxPlan);
+    xml->get_widget("frameExperimentPlan", mHboxPlan);
 
     xml->get_widget("HBoxCombi", mHboxCombi);
     mComboCombi = new Gtk::ComboBoxText();
     mComboCombi->append_text("linear");
     mComboCombi->append_text("total");
-    mHboxCombi->pack_start(*mComboCombi);
+    mHboxCombi->pack_start(*mComboCombi, Gtk::PACK_SHRINK, 5);
 
     xml->get_widget("SpinPlanSeed", mSpinPlanSeed);
     mSpinPlanSeed->set_range(0, std::numeric_limits < guint32 >::max());
@@ -102,9 +97,15 @@ ExperimentBox::ExperimentBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
                                                (*this, &ExperimentBox::on_apply));
 
     xml->get_widget("ButtonCancel", mButtonCancel);
-    if (mButtonCancel)
-        mButtonCancel->signal_clicked().connect(sigc::mem_fun
-                                                (*this, &ExperimentBox::on_cancel));
+    if (mButtonCancel) {
+        mButtonCancel->signal_clicked().connect(
+            sigc::mem_fun (*this, &ExperimentBox::on_cancel));
+    }
+
+    mRadioPlan->signal_toggled().connect(
+        sigc::mem_fun (*this, &ExperimentBox::on_plan));
+    mRadioSimu->signal_toggled().connect(
+        sigc::mem_fun (*this, &ExperimentBox::on_simu));
 }
 
 ExperimentBox::~ExperimentBox()
@@ -131,14 +132,18 @@ void ExperimentBox::show()
 
 void ExperimentBox::on_simu()
 {
-    mHboxSimu->show_all();
-    mHboxPlan->hide_all();
+    if (mRadioSimu->get_active()) {
+        mHboxSimu->show_all();
+        mHboxPlan->hide_all();
+    }
 }
 
 void ExperimentBox::on_plan()
 {
-    mHboxSimu->hide_all();
-    mHboxPlan->show_all();
+    if (mRadioPlan->get_active()) {
+        mHboxSimu->hide_all();
+        mHboxPlan->show_all();
+    }
 }
 
 void ExperimentBox::on_random_simu()

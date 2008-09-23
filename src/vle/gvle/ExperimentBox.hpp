@@ -23,77 +23,70 @@
  */
 
 
-#ifndef GUI_EXPERIMENTBOX_HPP
-#define GUI_EXPERIMENTBOX_HPP
+#ifndef VLE_GVLE_EXPERIMENTBOX_HPP
+#define VLE_GVLE_EXPERIMENTBOX_HPP
 
 #include <vle/utils/Rand.hpp>
-#include <gtkmm.h>
+#include <gtkmm/dialog.h>
+#include <gtkmm/spinbutton.h>
+#include <gtkmm/button.h>
+#include <gtkmm/frame.h>
+#include <gtkmm/box.h>
+#include <gtkmm/comboboxtext.h>
 #include <libglademm.h>
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
-class Modeling;
+    class Modeling;
 
-class ExperimentBox
-{
-public:
-    /**
-     * Create a new ExperimentBox with children class ExpConditions,
-     * ExpMeasures and ExpSimulation. Parameters modeling and current is to
-     * intialise class with for experiment information
-     *
-     * @throw Internal if modeling is bad
-     * @param modeling to get information
-     * @param current, current model to show. If current equal NULL then,
-     * the modeling top GCoupledModel is used.
-     */
-    ExperimentBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* modeling);
+    class ExperimentBox
+    {
+    public:
+        /**
+         * Create a new ExperimentBox with children class ExpConditions,
+         * ExpMeasures and ExpSimulation. Parameters modeling and current is to
+         * intialise class with for experiment information
+         *
+         * @throw Internal if modeling is bad
+         * @param modeling to get information
+         * @param current, current model to show. If current equal NULL then,
+         * the modeling top GCoupledModel is used.
+         */
+        ExperimentBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* modeling);
 
-    ~ExperimentBox();
+        ~ExperimentBox();
 
-    void show();
+        void show();
 
-private:
-    Modeling*           mModeling;
-    Gtk::Dialog*        mDialog;
+    private:
+        Modeling*           mModeling;
+        Gtk::Dialog*        mDialog;
+        Gtk::Entry*         mEntryName;
+        Gtk::SpinButton*    mSpinDuration;
+        Gtk::RadioButton*   mRadioSimu;
+        Gtk::Frame*         mHboxSimu;
+        Gtk::SpinButton*    mSpinSimuSeed;
+        Gtk::Button*        mButtonSimuSeed;
+        Gtk::RadioButton*   mRadioPlan;
+        Gtk::Frame*         mHboxPlan;
+        Gtk::HBox*          mHboxCombi;
+        Gtk::ComboBoxText*  mComboCombi;
+        Gtk::SpinButton*    mSpinPlanSeed;
+        Gtk::Button*        mButtonPlanSeed;
+        Gtk::SpinButton*    mButtonNumber;
+        Gtk::Button*        mButtonApply;
+        Gtk::Button*        mButtonCancel;
+        utils::Rand         mRand;
 
-    Gtk::Entry*         mEntryName;
+        void on_simu();
+        void on_plan();
 
-    Gtk::SpinButton*    mSpinDuration;
+        void on_random_simu();
+        void on_random_plan();
 
-    Gtk::RadioButton*   mRadioSimu;
-    Gtk::HBox*          mHboxSimu;
-
-    Gtk::SpinButton*    mSpinSimuSeed;
-    Gtk::Button*        mButtonSimuSeed;
-
-    Gtk::RadioButton*   mRadioPlan;
-    Gtk::HBox*          mHboxPlan;
-
-    Gtk::HBox*          mHboxCombi;
-    Gtk::ComboBoxText*  mComboCombi;
-
-    Gtk::SpinButton*    mSpinPlanSeed;
-    Gtk::Button*        mButtonPlanSeed;
-
-    Gtk::SpinButton*    mButtonNumber;
-
-    Gtk::Button*        mButtonApply;
-    Gtk::Button*        mButtonCancel;
-
-    utils::Rand         mRand;
-
-    void on_simu();
-    void on_plan();
-
-    void on_random_simu();
-    void on_random_plan();
-
-    void on_apply();
-    void on_cancel();
-};
+        void on_apply();
+        void on_cancel();
+    };
 
 }
 } // namespace vle gvle
