@@ -23,7 +23,6 @@
  */
 
 
-#include <iostream>
 #include <vle/gvle/ModelClassBox.hpp>
 #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/SimpleTypeBox.hpp>

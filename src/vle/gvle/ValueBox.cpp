@@ -23,7 +23,6 @@
  */
 
 
-#include <iostream>
 #include <vle/gvle/ValueBox.hpp>
 
 using namespace vle;

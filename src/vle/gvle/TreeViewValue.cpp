@@ -33,8 +33,6 @@
 #include <vle/utils.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
-#include <iostream>
-
 using namespace vle;
 
 namespace vle

@@ -27,7 +27,6 @@
 #define GUI_OUTPUTBOX_HPP
 
 #include <gtkmm.h>
-#include <iostream>
 #include <vle/vpz/Output.hpp>
 
 using namespace vle;

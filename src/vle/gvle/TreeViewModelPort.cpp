@@ -26,7 +26,6 @@
 #include <boost/algorithm/string/trim.hpp>
 #include <vle/gvle/SimpleTypeBox.hpp>
 #include <vle/gvle/TreeViewModelPort.hpp>
-#include <iostream>
 
 using namespace vle;
 

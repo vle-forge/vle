@@ -24,7 +24,6 @@
 
 
 #include <vle/gvle/PluginSelection.hpp>
-#include <iostream>
 
 using std::vector;
 using std::pair;

@@ -23,7 +23,6 @@
  */
 
 
-#include <iostream>
 #include <vle/gvle/ConditionBox.hpp>
 #include <vle/gvle/GVLE.hpp>
 

@@ -23,7 +23,6 @@
  */
 
 
-#include <iostream>
 #include <vle/gvle/OutputBox.hpp>
 #include <vle/gvle/XmlTypeBox.hpp>
 #include <vle/utils/Path.hpp>

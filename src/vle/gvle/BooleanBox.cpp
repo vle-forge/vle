@@ -23,7 +23,6 @@
  */
 
 
-#include <iostream>
 #include <vle/gvle/BooleanBox.hpp>
 
 using namespace vle;

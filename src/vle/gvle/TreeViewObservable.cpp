@@ -23,7 +23,6 @@
  */
 
 
-#include <iostream>
 #include <vle/gvle/SimpleTypeBox.hpp>
 #include <vle/gvle/TreeViewObservable.hpp>
 #include <vle/gvle/ViewBox.hpp>
@@ -67,14 +66,14 @@ TreeViewObservable::TreeViewObservable()
     show_all_children();
 }
 
-void TreeViewObservable::on_row_activated(const Gtk::TreeModel::Path& path,
+void TreeViewObservable::on_row_activated(const Gtk::TreeModel::Path& /* path */,
         Gtk::TreeViewColumn* /*column*/)
 {
-    Gtk::TreeModel::iterator iter = m_refTreeModel->get_iter(path);
-    if (iter) {
-        Gtk::TreeModel::Row row = *iter;
-        vpz::ObservablePort* parent = row.get_value(m_Columns.m_col_parent);
-        std::cout << "parent = " << parent->name() << "\n";
+    //Gtk::TreeModel::iterator iter = m_refTreeModel->get_iter(path);
+    //if (iter) {
+    //Gtk::TreeModel::Row row = *iter;
+    //vpz::ObservablePort* parent = row.get_value(m_Columns.m_col_parent);
+    //std::cout << "parent = " << parent->name() << "\n";
 
 
         //Gtk::TreeModel::Row row = *iter;
@@ -84,10 +83,10 @@ void TreeViewObservable::on_row_activated(const Gtk::TreeModel::Path& path,
           vpz::View* view = dynamic_cast<vpz::View*>(row.get_value(m_Columns.m_col_value));
           ViewBox box(view, &mViews->outputs());
           box.run();
-          
+
           }
         */
-    }
+    //}
 }
 
 /*

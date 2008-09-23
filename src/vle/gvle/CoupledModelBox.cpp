@@ -30,8 +30,6 @@
 #include <vle/utils/Tools.hpp>
 #include <gtkmm/stock.h>
 
-#include <iostream>
-
 using namespace vle;
 
 namespace vle

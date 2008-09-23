@@ -28,8 +28,6 @@
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Debug.hpp>
 
-#include <iostream>
-
 namespace vle
 {
 namespace gvle {

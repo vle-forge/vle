@@ -26,7 +26,6 @@
 #include <vle/gvle/NewTypeBox.hpp>
 #include <vle/gvle/SimpleTypeBox.hpp>
 #include <vle/utils.hpp>
-#include <iostream>
 
 using namespace vle;
 

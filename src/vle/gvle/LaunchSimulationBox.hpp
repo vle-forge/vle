@@ -28,7 +28,6 @@
 
 #include <gtkmm.h>
 #include <libglademm.h>
-#include <iostream>
 #include <vle/vpz/Vpz.hpp>
 
 namespace vle

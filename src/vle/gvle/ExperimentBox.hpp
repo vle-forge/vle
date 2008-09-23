@@ -29,7 +29,6 @@
 #include <vle/utils/Rand.hpp>
 #include <gtkmm.h>
 #include <libglademm.h>
-#include <iostream>
 
 namespace vle
 {

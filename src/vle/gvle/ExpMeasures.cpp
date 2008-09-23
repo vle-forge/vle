@@ -29,13 +29,11 @@
 #include <vle/gvle/ObserverPlugin.hpp>
 #include <vle/utils/XML.hpp>
 #include <vle/utils/Debug.hpp>
-#include <iostream>
 
 using std::cout;
 using std::endl;
 using std::string;
 using std::list;
-using namespace vle;
 
 namespace vle
 {

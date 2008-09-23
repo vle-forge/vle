@@ -35,21 +35,15 @@
 #include <gtkmm/stock.h>
 #include <gtkmm/fileselection.h>
 
-#include <iostream>
-using std::cout;
-
 using std::string;
 using std::list;
-using namespace vle;
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
 ExecutionBox::ExecutionBox(const std::string & projectFilename) :
         mProjectFileName(projectFilename)
 {
-    cout << "New ExecutionBox\n";/*
+    /*
     mLabelName = Gtk::manage(new class Gtk::Label("Project path"));
     mEntryName = Gtk::manage(new class Gtk::Entry());
 

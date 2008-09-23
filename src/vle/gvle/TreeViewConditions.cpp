@@ -26,7 +26,6 @@
 #include <vle/gvle/ConditionBox.hpp>
 #include <vle/gvle/TreeViewConditions.hpp>
 #include <vle/gvle/SimpleTypeBox.hpp>
-#include <iostream>
 
 using namespace vle;
 

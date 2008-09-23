@@ -27,8 +27,6 @@
 #include <vle/gvle/ProjectBox.hpp>
 #include <vle/utils/Tools.hpp>
 
-#include <iostream>
-
 namespace vle
 {
 namespace gvle {

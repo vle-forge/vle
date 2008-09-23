@@ -23,7 +23,6 @@
  */
 
 
-#include <iostream>
 #include <vle/gvle/ObservableBox.hpp>
 
 using namespace vle;

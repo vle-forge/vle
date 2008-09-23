@@ -24,7 +24,6 @@
 
 
 #include <vle/gvle/XmlTypeBox.hpp>
-#include <iostream>
 
 using namespace vle;
 

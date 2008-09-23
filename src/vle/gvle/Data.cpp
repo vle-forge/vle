@@ -27,15 +27,12 @@
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/XML.hpp>
 #include <gtkmm/stock.h>
-#include <iostream>
 
 using std::string;
-using namespace vle;
-using namespace utils;
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
+
+using namespace utils;
 
 TypeDialog::TypeDialog(const std::string & type, const std::string & value) :
         Gtk::Dialog("Define a data type", true, true),

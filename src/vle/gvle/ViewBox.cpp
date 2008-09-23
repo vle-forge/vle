@@ -23,7 +23,6 @@
  */
 
 
-#include <iostream>
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/OutputBox.hpp>
 #include <vle/gvle/SimpleTypeBox.hpp>
