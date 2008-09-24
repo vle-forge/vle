@@ -33,6 +33,7 @@
 #include <vle/gvle/PluginTable.hpp>
 #include <vle/gvle/GVLEMenu.hpp>
 #include <vle/gvle/PluginPlus.hpp>
+#include <vle/gvle/ViewOutputBox.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Debug.hpp>
@@ -635,6 +636,12 @@ void GVLE::onHelpBox()
 void GVLE::onProjectBox()
 {
     mProjectBox->show();
+}
+
+void GVLE::onViewOutputBox()
+{
+    ViewOutputBox box(mRefXML, m_modeling->measures());
+    box.run();
 }
 
 void GVLE::onShowAbout()

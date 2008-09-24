@@ -365,6 +365,11 @@ public:
        */
     void onProjectBox();
 
+    /**
+     * @brief When user select the gvle::ViewOutputBox.
+     */
+    void onViewOutputBox();
+
     /*********************************************************************
        *
        * MENU HELP
