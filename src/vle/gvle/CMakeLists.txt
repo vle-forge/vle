@@ -14,7 +14,8 @@ LINK_DIRECTORIES(
   ${LIBXMLPP_LIBRARY_DIR})
 
 SET(GVLE_HPP About.hpp AtomicModelBox.hpp BooleanBox.hpp CalendarBox.hpp
-  ClassModelTreeBox.hpp ComboboxString.hpp ConditionBox.hpp ConnectionBox.hpp
+  ClassModelTreeBox.hpp ComboboxString.hpp ConditionBox.hpp
+  ConditionsBox.hpp ConnectionBox.hpp
   CoupledModelBox.hpp CutCopyPaste.hpp Data.hpp DialogString.hpp DynamicBox.hpp
   ExecutionBox.hpp ExpConditions.hpp ExpMeasures.hpp ExpSimulation.hpp
   ExperimentBox.hpp GVLE.hpp GVLEMenu.hpp HelpBox.hpp HostsBox.hpp
@@ -26,11 +27,13 @@ SET(GVLE_HPP About.hpp AtomicModelBox.hpp BooleanBox.hpp CalendarBox.hpp
   PluginTable.hpp PortDialog.hpp ProjectBox.hpp ReplicasBox.hpp
   SimpleTypeBox.hpp TableBox.hpp TreeViewConditions.hpp TreeViewDoubleString.hpp
   TreeViewModelPort.hpp TreeViewObservable.hpp TreeViewPort.hpp
-  TreeViewSingleString.hpp TreeViewValue.hpp UndoRedo.hpp ValueBox.hpp View.hpp
+  TreeViewSingleString.hpp TreeViewValue.hpp UndoRedo.hpp ValueBox.hpp
+  ValuesTreeView.hpp View.hpp
   ViewBox.hpp ViewDrawingArea.hpp ViewMenu.hpp XmlTypeBox.hpp)
 
 SET(GVLE_CPP About.cpp AtomicModelBox.cpp BooleanBox.cpp CalendarBox.cpp
-  ClassModelTreeBox.cpp ConditionBox.cpp ConnectionBox.cpp CoupledModelBox.cpp
+  ClassModelTreeBox.cpp ConditionBox.cpp ConditionsBox.cpp
+  ConnectionBox.cpp CoupledModelBox.cpp
   CutCopyPaste.cpp Data.cpp DialogString.cpp DynamicBox.cpp ExecutionBox.cpp
   ExpConditions.cpp ExpMeasures.cpp ExpSimulation.cpp ExperimentBox.cpp GVLE.cpp
   GVLEMenu.cpp HelpBox.cpp HostsBox.cpp ImportModelBox.cpp
@@ -41,7 +44,8 @@ SET(GVLE_CPP About.cpp AtomicModelBox.cpp BooleanBox.cpp CalendarBox.cpp
   PortDialog.cpp ProjectBox.cpp ReplicasBox.cpp SimpleTypeBox.cpp TableBox.cpp
   TreeViewConditions.cpp TreeViewDoubleString.cpp TreeViewModelPort.cpp
   TreeViewObservable.cpp TreeViewPort.cpp TreeViewSingleString.cpp
-  TreeViewValue.cpp UndoRedo.cpp ValueBox.cpp View.cpp ViewBox.cpp
+  TreeViewValue.cpp UndoRedo.cpp ValueBox.cpp
+  ValuesTreeView.cpp View.cpp ViewBox.cpp
   ViewDrawingArea.cpp ViewMenu.cpp XmlTypeBox.cpp)
 
 ADD_LIBRARY(vlegvle SHARED ${GVLE_CPP};${GVLE_HPP})
@@ -66,7 +70,7 @@ TARGET_LINK_LIBRARIES(vlegvle
   vlemanager
   vletranslator)
 
-INSTALL(TARGETS vlegvle DESTINATION 
+INSTALL(TARGETS vlegvle DESTINATION
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)

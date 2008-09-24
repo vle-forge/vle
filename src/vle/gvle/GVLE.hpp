@@ -27,6 +27,7 @@
 #define GUI_GVLE_HH
 
 #include <vle/gvle/ExperimentBox.hpp>
+#include <vle/gvle/ConditionsBox.hpp>
 #include <vle/gvle/HelpBox.hpp>
 #include <vle/gvle/LaunchSimulationBox.hpp>
 #include <vle/gvle/ObserverPlugin.hpp>
@@ -340,6 +341,13 @@ public:
     void onParameterExecutionBox();
 
     /**
+     * When click on conditions box to define initial conditions
+     * of experiments
+     *
+     */
+    void onConditionsBox();
+
+    /**
      * When click on experiment box to define init, state etc.
      *
      */
@@ -411,6 +419,7 @@ private:
 
     //Menu
     ExperimentBox*        mExpBox;
+    ConditionsBox*        mConditionsBox;
     ProjectBox*           mProjectBox;
     LaunchSimulationBox*  mSimulationBox;
 };

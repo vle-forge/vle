@@ -70,6 +70,7 @@ GVLE::GVLE(const std::string& filename) :
     m_modeling->setGlade(mRefXML);
 
     mExpBox = new ExperimentBox(mRefXML, m_modeling);
+    mConditionsBox = new ConditionsBox(mRefXML, m_modeling);
     mProjectBox = new ProjectBox(mRefXML, &m_modeling->vpz().project());
     mSimulationBox = new LaunchSimulationBox(mRefXML, m_modeling);
 
@@ -116,6 +117,7 @@ GVLE::~GVLE()
     delete m_modeling;
 
     delete mExpBox;
+    delete mConditionsBox;
     delete mProjectBox;
     delete mSimulationBox;
 }
@@ -608,6 +610,11 @@ void GVLE::onParameterExecutionBox()
 void GVLE::onExperimentsBox()
 {
     mExpBox->show();
+}
+
+void GVLE::onConditionsBox()
+{
+    mConditionsBox->show();
 }
 
 void GVLE::onHostsBox()

@@ -119,23 +119,36 @@ void GVLEMenu::makeMenuSimulation(GVLE* gvle)
 {
     Gtk::Menu::MenuList& menulist = mMenuSimulation.items();
 
-    menulist.push_back(Gtk::Menu_Helpers::MenuElem("_Experiments",
-                       Gtk::AccelKey(GDK_E, Gdk::CONTROL_MASK),
-                       sigc::mem_fun(gvle, &GVLE::onExperimentsBox)));
+    menulist.push_back(
+	Gtk::Menu_Helpers::MenuElem("_Simulation",
+				    Gtk::AccelKey(GDK_S, Gdk::CONTROL_MASK
+						  | Gdk::SHIFT_MASK),
+				    sigc::mem_fun(gvle,
+						  &GVLE::onExperimentsBox)));
 
-    menulist.push_back(Gtk::Menu_Helpers::MenuElem("_Project",
-                       Gtk::AccelKey(GDK_P, Gdk::CONTROL_MASK),
-                       sigc::mem_fun(gvle, &GVLE::onProjectBox)));
+    menulist.push_back(
+	Gtk::Menu_Helpers::MenuElem("_Conditions",
+				    Gtk::AccelKey(GDK_C, Gdk::CONTROL_MASK),
+				    sigc::mem_fun(gvle,
+						  &GVLE::onConditionsBox)));
 
-    menulist.push_back(Gtk::Menu_Helpers::MenuElem("H_osts",
-                       Gtk::AccelKey(GDK_H, Gdk::CONTROL_MASK),
-                       sigc::mem_fun(gvle, &GVLE::onHostsBox)));
+    menulist.push_back(
+	Gtk::Menu_Helpers::MenuElem("_Project",
+				    Gtk::AccelKey(GDK_P, Gdk::CONTROL_MASK),
+				    sigc::mem_fun(gvle, &GVLE::onProjectBox)));
+
+    menulist.push_back(
+	Gtk::Menu_Helpers::MenuElem("H_osts",
+				    Gtk::AccelKey(GDK_H, Gdk::CONTROL_MASK),
+				    sigc::mem_fun(gvle, &GVLE::onHostsBox)));
 
     menulist.push_back(Gtk::Menu_Helpers::SeparatorElem());
 
-    menulist.push_back(Gtk::Menu_Helpers::MenuElem("_Launch Simulation",
-                       Gtk::AccelKey(GDK_L, Gdk::CONTROL_MASK),
-                       sigc::mem_fun(gvle, &GVLE::onSimulationBox)));
+    menulist.push_back(
+	Gtk::Menu_Helpers::MenuElem("_Launch Simulation",
+				    Gtk::AccelKey(GDK_L, Gdk::CONTROL_MASK),
+				    sigc::mem_fun(gvle,
+						  &GVLE::onSimulationBox)));
 }
 
 void GVLEMenu::makeMenuHelp(GVLE* gvle)
