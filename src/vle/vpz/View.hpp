@@ -131,7 +131,7 @@ namespace vle { namespace vpz {
          * @param time The new time.
          * @throw utils::ArgError if time is not greater thant 0.0.
          */
-        inline void setTimestep(double time);
+        void setTimestep(double time);
 
         /**
          * @brief Get the time step.
