@@ -31,6 +31,7 @@ B1::B1(const vle::graph::AtomicModel& model,
        const vle::devs::InitEventList& events) :
     vle::extension::DifferenceEquation(model, events)
 {
+    setSynchronizedVariable("a");
 }
 
 double B1::compute(const vle::devs::Time& /* time */)

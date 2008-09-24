@@ -284,7 +284,7 @@ Time DifferenceEquation::init(const devs::Time& /* time */)
     if (mInitValue) {
         mValue.push_front(mInitialValue);
     }
-    else if (!mDependance /*or !mSynchro*/) {
+    else if (!mDependance or !mSynchro) {
         mState = INIT;
         mValue.push_front(initValue());
         mInitValue = true;
