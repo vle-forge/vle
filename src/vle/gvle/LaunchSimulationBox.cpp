@@ -28,75 +28,48 @@
 #include <vle/manager/JustRun.hpp>
 #include <vle/utils/Tools.hpp>
 
-using namespace vle;
+namespace vle { namespace gvle {
 
-namespace vle
-{
-namespace gvle {
-
-LaunchSimulationBox::LaunchSimulationBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* modeling) :
-        mModeling(modeling),
-        mDialog(0)
+LaunchSimulationBox::LaunchSimulationBox(Glib::RefPtr < Gnome::Glade::Xml > xml,
+                                         Modeling* modeling) :
+    mModeling(modeling),
+    mDialog(0),
+    m_vpzfile(&modeling->vpz())
 {
     xml->get_widget("DialogSimulation", mDialog);
-
     xml->get_widget("RadioSimuMono", mMono);
-    //mMono->signal_toggled().connect(sigc::mem_fun
-    //         (*this, &LaunchSimulationBox::on_mono));
-
     xml->get_widget("RadioSimuMulti", mMulti);
-    //mMulti->signal_toggled().connect(sigc::mem_fun
-    //          (*this, &LaunchSimulationBox::on_multi));
-
     xml->get_widget("SpinSimuProcess", mNbProcess);
-
     xml->get_widget("RadioSimuDistant", mDistant);
-    //mDistant->signal_toggled().connect(sigc::mem_fun
-    //     (*this, &LaunchSimulationBox::on_distant));
-
     xml->get_widget("simuPlay", mPlay);
-    mPlay->signal_pressed().connect(sigc::mem_fun
-                                    (*this, &LaunchSimulationBox::on_play));
-
     xml->get_widget("simuPause", mPause);
-    mPause->signal_pressed().connect(sigc::mem_fun
-                                     (*this, &LaunchSimulationBox::on_pause));
-
     xml->get_widget("simuStop", mStop);
-    mStop->signal_pressed().connect(sigc::mem_fun
-                                    (*this, &LaunchSimulationBox::on_stop));
-
     xml->get_widget("simuProgressBar", mProgressBar);
-
     xml->get_widget("simuCurrentTime", mCurrentTime);
 
-    xml->get_widget("ButtonSimuClose", mClose);
-    mClose->signal_pressed().connect(sigc::mem_fun
-                                     (*this, &LaunchSimulationBox::on_close));
+    mPlay->signal_clicked().connect(
+        sigc::mem_fun (*this, &LaunchSimulationBox::on_play));
+
+    mPause->signal_clicked().connect(
+        sigc::mem_fun (*this, &LaunchSimulationBox::on_pause));
+
+    mStop->signal_clicked().connect(
+        sigc::mem_fun (*this, &LaunchSimulationBox::on_stop));
 
     mMono->set_active();
+    mMulti->set_sensitive(false);
+    mDistant->set_sensitive(false);
 
-    m_vpzfile = &mModeling->vpz();
+    mPlay->set_sensitive(true);
+    mPause->set_sensitive(false);
+    mStop->set_sensitive(false);
 }
 
 void LaunchSimulationBox::show()
 {
     mDialog->show_all();
     mDialog->run();
-}
-
-//void LaunchSimulationBox::on_mono() {
-//}
-
-//void LaunchSimulationBox::on_multi() {
-//}
-
-//void LaunchSimulationBox::on_distant() {
-//}
-
-void LaunchSimulationBox::on_close()
-{
-    mDialog->hide_all();
+    mDialog->hide();
 }
 
 void LaunchSimulationBox::on_play()
@@ -121,48 +94,41 @@ void LaunchSimulationBox::on_play()
             file = new vle::vpz::Vpz(tmpFile);
             m_max_time = file->project().experiment().duration();
 
-            Glib::Thread::create(sigc::mem_fun(*this,&LaunchSimulationBox::run_local_simu),false);
-            Glib::signal_timeout().connect(sigc::mem_fun(*this,&LaunchSimulationBox::timer), 200);
+            Glib::Thread::create(sigc::mem_fun(
+                    *this,&LaunchSimulationBox::run_local_simu),false);
+            Glib::signal_timeout().connect(sigc::mem_fun(
+                    *this,&LaunchSimulationBox::timer), 200);
         } else {
             Glib::Mutex::Lock lock(m_mutex_pause);
             m_pause = false;
         }
-    } else {
-        std::cout << "Not Implemented Yet\n";
+        mPlay->set_sensitive(false);
+        mPause->set_sensitive(true);
+        mStop->set_sensitive(true);
     }
-
 }
 
 void LaunchSimulationBox::on_pause()
 {
     Glib::Mutex::Lock lock(m_mutex_pause);
     m_pause = true;
+    mPlay->set_sensitive(true);
+    mPause->set_sensitive(false);
+    mStop->set_sensitive(false);
 }
 
 void LaunchSimulationBox::on_stop()
 {
     Glib::Mutex::Lock lock(m_mutex_stop);
     m_stop = true;
+    mPlay->set_sensitive(true);
+    mPause->set_sensitive(false);
+    mStop->set_sensitive(false);
     m_cond_set_stop.signal();
 }
 
 void LaunchSimulationBox::run_local_simu()
 {
-    /*
-    using namespace manager;
-    int process = utils::to_int( mNbProcess->get_text() );
-    if (process == 1) {
-    JustRunMono mono(std::cout);
-    CmdArgs args;
-    args.push_back(mModeling->vpz().filename().c_str());
-    mono(args);
-    } else {
-    JustRunThread multi(std::cout, process);
-    CmdArgs args;
-    args.push_back(mModeling->vpz().filename().c_str());
-    multi(args);
-    }
-    */
     double duration = m_max_time;
     vle::devs::RootCoordinator root_coordinator;
     try {
@@ -247,10 +213,6 @@ void LaunchSimulationBox::run_local_simu()
     }
 }
 
-//void LaunchSimulationBox::run_local_manager() {
-//
-//}
-
 bool LaunchSimulationBox::timer()
 {
     {
@@ -282,7 +244,7 @@ bool LaunchSimulationBox::timer()
 
     if (stop and(m_gvle_time < m_max_time)) {
         mProgressBar->set_fraction(0);
-        mProgressBar->set_text("Simulation stoped");
+        mProgressBar->set_text("Simulation stopped");
         return false;
     }
     if (not stop) {
@@ -298,6 +260,9 @@ bool LaunchSimulationBox::timer()
 
     updateProgressBar();
     updateCurrentTime();
+    mPlay->set_sensitive(true);
+    mPause->set_sensitive(false);
+    mStop->set_sensitive(false);
     return false;
 }
 
@@ -321,5 +286,4 @@ void LaunchSimulationBox::updateProgressBar()
     mProgressBar->set_text((boost::format("%1$.0f %%")%(p*100.)).str());
 }
 
-}
-} // namespace vle gvle
+}} // namespace vle gvle

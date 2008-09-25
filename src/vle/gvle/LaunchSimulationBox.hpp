@@ -23,78 +23,73 @@
  */
 
 
-#ifndef GUI_LAUNCHSIMULATIONBOX_HPP
-#define GUI_LAUNCHSIMULATIONBOX_HPP
+#ifndef VLE_GVLE_LAUNCHSIMULATIONBOX_HPP
+#define VLE_GVLE_LAUNCHSIMULATIONBOX_HPP
 
-#include <gtkmm.h>
 #include <libglademm.h>
+#include <gtkmm/dialog.h>
+#include <gtkmm/radiobutton.h>
+#include <gtkmm/spinbutton.h>
+#include <gtkmm/button.h>
+#include <gtkmm/progressbar.h>
+#include <gtkmm/label.h>
 #include <vle/vpz/Vpz.hpp>
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
-class Modeling;
+    class Modeling;
 
-class LaunchSimulationBox
-{
-public:
-    LaunchSimulationBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* modeling);
-    ~LaunchSimulationBox() { };
-    void show();
+    class LaunchSimulationBox
+    {
+    public:
+        LaunchSimulationBox(Glib::RefPtr < Gnome::Glade::Xml > xml,
+                            Modeling* modeling);
 
-private:
-    Modeling*                         mModeling;
+        void show();
 
-    Gtk::Dialog*                      mDialog;
-    Gtk::RadioButton*                 mMono;
-    Gtk::RadioButton*                 mMulti;
-    Gtk::SpinButton*                  mNbProcess;
-    Gtk::RadioButton*                 mDistant;
-    Gtk::Button*                      mPlay;
-    Gtk::Button*                      mPause;
-    Gtk::Button*                      mStop;
+    private:
+        Modeling*                         mModeling;
 
-    Gtk::ProgressBar*                 mProgressBar;
-    Gtk::Label*                       mCurrentTime;
+        Gtk::Dialog*                      mDialog;
+        Gtk::RadioButton*                 mMono;
+        Gtk::RadioButton*                 mMulti;
+        Gtk::SpinButton*                  mNbProcess;
+        Gtk::RadioButton*                 mDistant;
+        Gtk::Button*                      mPlay;
+        Gtk::Button*                      mPause;
+        Gtk::Button*                      mStop;
+        Gtk::ProgressBar*                 mProgressBar;
+        Gtk::Label*                       mCurrentTime;
 
-    Gtk::Button*                      mClose;
+        double                            m_vle_time, m_gvle_time;
+        double                            m_max_time;
 
-    double                            m_vle_time, m_gvle_time;
-    double                            m_max_time;
+        bool                              m_stop, m_pause, m_vle_error;
 
-    bool                              m_stop, m_pause, m_vle_error;
+        vle::vpz::Vpz                     *file;
+        vle::vpz::Vpz                     *m_vpzfile;
 
-    vle::vpz::Vpz                     *file;
-    vle::vpz::Vpz                     *m_vpzfile;
+        Glib::Mutex                       m_mutex;
+        Glib::Cond                        m_cond_set_time;
+        Glib::Mutex                       m_mutex_stop;
+        Glib::Cond                        m_cond_set_stop;
+        Glib::Mutex                       m_mutex_pause;
+        Glib::Cond                        m_cond_set_pause;
+        Glib::Mutex                       m_mutex_exception;
+        Glib::Cond                        m_cond_set_exception;
+        std::string                       m_exception;
 
-    Glib::Mutex                       m_mutex;
-    Glib::Cond                        m_cond_set_time;
-    Glib::Mutex                       m_mutex_stop;
-    Glib::Cond                        m_cond_set_stop;
-    Glib::Mutex                       m_mutex_pause;
-    Glib::Cond                        m_cond_set_pause;
-    Glib::Mutex                       m_mutex_exception;
-    Glib::Cond                        m_cond_set_exception;
-    std::string                       m_exception;
+        void catch_vle_exception();
+        void updateCurrentTime();
+        void updateProgressBar();
 
-    void catch_vle_exception();
-    void updateCurrentTime();
-    void updateProgressBar();
+        void on_play();
+        void on_pause();
+        void on_stop();
+        void run_local_simu();
+        bool timer();
+    };
 
-    //void on_mono();
-    //void on_multi();
-    //void on_distant();
-    void on_close();
-    void on_play();
-    void on_pause();
-    void on_stop();
-    void run_local_simu();
-    //void run_local_manager();
-    bool timer();
-};
-
-}
-} // namespace vle gvle
+}} // namespace vle gvle
 
 #endif
