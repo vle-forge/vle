@@ -23,7 +23,6 @@
  */
 
 #include <vle/gvle/AtomicModelBox.hpp>
-#include <vle/gvle/ConditionBox.hpp>
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/ObservableBox.hpp>
 #include <vle/gvle/SimpleTypeBox.hpp>
@@ -242,48 +241,10 @@ AtomicModelBox::ConditionTreeView::ConditionTreeView(
     set_model(mRefTreeModel);
     append_column("Name", mColumns.m_col_name);
     append_column_editable("In", mColumns.m_col_activ);
-    signal_row_activated().connect(
-	sigc::mem_fun(*this,
-		      &AtomicModelBox::ConditionTreeView::on_activated));
-
-    //Fill popup menu:
-    {
-	Gtk::Menu::MenuList& menulist = mMenuPopup.items();
-
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		"_Add",
-		sigc::mem_fun(
-		    *this,
-		    &AtomicModelBox::ConditionTreeView::on_add)));
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		"_Remove",
-		sigc::mem_fun(
-		    *this,
-		    &AtomicModelBox::ConditionTreeView::on_remove)));
-    }
-    mMenuPopup.accelerate(*this);
 }
 
 AtomicModelBox::ConditionTreeView::~ConditionTreeView()
 {
-}
-
-bool AtomicModelBox::ConditionTreeView::on_button_press_event(
-    GdkEventButton* event)
-{
-  //Call base class, to allow normal handling,
-  //such as allowing the row to be selected by the right-click:
-  bool return_value = TreeView::on_button_press_event(event);
-
-  //Then do our custom stuff:
-  if( (event->type == GDK_BUTTON_PRESS) && (event->button == 3) )
-  {
-    mMenuPopup.popup(event->button, event->time);
-  }
-
-  return return_value;
 }
 
 void AtomicModelBox::ConditionTreeView::build()
@@ -323,50 +284,6 @@ vpz::Strings AtomicModelBox::ConditionTreeView::getConditions()
 	}
     }
     return vec;
-}
-
-void AtomicModelBox::ConditionTreeView::on_add()
-{
-    SimpleTypeBox box("Name of the Condition ?");
-    std::string name = boost::trim_copy(box.run());
-
-    if (box.valid() and not name.empty()) {
-        mConditions->add(vpz::Condition(name));
-        build();
-    }
-}
-
-void AtomicModelBox::ConditionTreeView::on_remove()
-{
-    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
-
-    if (refSelection) {
-	Gtk::TreeModel::iterator iter = refSelection->get_selected();
-
-	if (iter) {
-            Gtk::TreeModel::Row row = *iter;
-	    std::string name = row.get_value(mColumns.m_col_name);
-
-	    mConditions->del(row.get_value(mColumns.m_col_name));
-            build();
-        }
-    }
-}
-
-void AtomicModelBox::ConditionTreeView::on_activated(
-    const Gtk::TreeModel::Path& path,
-    Gtk::TreeViewColumn* /* column */)
-{
-    Gtk::TreeModel::iterator iter = mRefTreeModel->get_iter(path);
-
-    if (iter) {
-        Gtk::TreeModel::Row row = *iter;
-        Glib::ustring s = row[mColumns.m_col_name];
-        vpz::Condition& cond = mConditions->get(s);
-        ConditionBox cb(&cond);
-
-        cb.run();
-    }
 }
 
 // AtomicModelBox

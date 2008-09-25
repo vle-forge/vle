@@ -157,17 +157,6 @@ private:
 	void setModel(vpz::AtomicModel* model)
 	    { mModel = model; }
 
-    protected:
-	// Override Signal handler:
-	// Alternatively, use signal_button_press_event().connect_notify()
-	virtual bool on_button_press_event(GdkEventButton *ev);
-
-	//Signal handler for popup menu items:
-	virtual void on_add();
-	virtual void on_remove();
-	virtual void on_activated(const Gtk::TreeModel::Path& path,
-				  Gtk::TreeViewColumn* column);
-
     private:
 	vpz::AtomicModel* mModel;
 	vpz::Conditions* mConditions;

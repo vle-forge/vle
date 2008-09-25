@@ -23,7 +23,6 @@
  */
 
 
-#include <vle/gvle/ConditionBox.hpp>
 #include <vle/gvle/TreeViewConditions.hpp>
 #include <vle/gvle/SimpleTypeBox.hpp>
 
@@ -58,17 +57,10 @@ TreeViewConditions::~TreeViewConditions()
 {
 }
 
-void TreeViewConditions::on_row_activated(const Gtk::TreeModel::Path& path,
-        Gtk::TreeViewColumn* /*column*/)
+void TreeViewConditions::on_row_activated(
+    const Gtk::TreeModel::Path& /* path */,
+    Gtk::TreeViewColumn* /*column*/)
 {
-    Gtk::TreeModel::iterator iter = m_refTreeModel->get_iter(path);
-    if (iter) {
-        Gtk::TreeModel::Row row = *iter;
-        Glib::ustring s = row[m_Columns.m_col_name];
-        vpz::Condition& cond = mCond->get(s);
-        ConditionBox cb(&cond);
-        cb.run();
-    }
 }
 
 bool TreeViewConditions::on_button_press_event(GdkEventButton* event)
