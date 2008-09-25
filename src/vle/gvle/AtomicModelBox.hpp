@@ -32,7 +32,6 @@
 #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/ObsAndViewBox.hpp>
 #include <vle/gvle/TreeViewConditions.hpp>
-#include <vle/gvle/TreeViewModelPort.hpp>
 
 namespace vle
 {

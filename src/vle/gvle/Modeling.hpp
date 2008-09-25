@@ -28,12 +28,10 @@
 
 #include <vle/gvle/GVLE.hpp>
 #include <vle/gvle/ModelTreeBox.hpp>
-//#include <vle/gvle/ClassModelTreeBox.hpp>
 #include <vle/gvle/ModelClassBox.hpp>
 #include <vle/gvle/CoupledModelBox.hpp>
 #include <vle/gvle/CutCopyPaste.hpp>
 #include <vle/gvle/ImportModelBox.hpp>
-#include <vle/gvle/Measures.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/graph/Model.hpp>
 #include <vle/graph/AtomicModel.hpp>
