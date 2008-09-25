@@ -175,7 +175,10 @@ void ExperimentBox::on_apply()
         vpz::Replicas& rep = exp.replicas();
 
         exp.setName(mEntryName->get_text());
-        exp.setDuration(mSpinDuration->get_value());
+        exp.setDuration(mSpinDuration->get_value() <= 0.0 ?
+                        std::numeric_limits < double >::epsilon() :
+                        mSpinDuration->get_value());
+
         if (mRadioSimu->get_active()) {
             //Simulation
             exp.setSeed(mSpinSimuSeed->get_value());
