@@ -79,7 +79,7 @@ bool ConditionsBox::ConditionsTreeView::on_button_press_event(
     bool return_value = TreeView::on_button_press_event(event);
 
     //Then do our custom stuff:
-    if( (event->type == GDK_BUTTON_PRESS) && (event->button == 3) )
+    if (mConditions and event->type == GDK_BUTTON_PRESS and event->button == 3)
     {
 	mMenuPopup.popup(event->button, event->time);
     }
@@ -188,7 +188,7 @@ bool ConditionsBox::PortsTreeView::on_button_press_event(
     bool return_value = TreeView::on_button_press_event(event);
 
     //Then do our custom stuff:
-    if( (event->type == GDK_BUTTON_PRESS) && (event->button == 3) )
+    if (mCondition and event->type == GDK_BUTTON_PRESS and event->button == 3)
     {
 	mMenuPopup.popup(event->button, event->time);
     }
@@ -231,7 +231,7 @@ void ConditionsBox::PortsTreeView::on_select()
 
 void ConditionsBox::PortsTreeView::on_add()
 {
-    SimpleTypeBox box("Name of the port ?");
+    SimpleTypeBox box("Name of the parameter ?");
     std::list < std::string > list;
 
     mCondition->portnames(list);
@@ -305,6 +305,8 @@ void ConditionsBox::buildTreeConditions()
     m_treePorts->clear();
     m_treeValues->clear();
     m_treeConditions->setConditions(mConditions);
+    m_treePorts->setCondition(0);
+    m_treeValues->setCondition(0);
     m_treeConditions->build();
 }
 
@@ -312,6 +314,7 @@ void ConditionsBox::buildTreePorts(const std::string& conditionName)
 {
     m_treeValues->clear();
     m_treePorts->setCondition(&mConditions->get(conditionName));
+    m_treeValues->setCondition(0);
     m_treePorts->build();
 }
 

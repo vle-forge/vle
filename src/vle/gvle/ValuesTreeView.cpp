@@ -254,7 +254,7 @@ void ValuesTreeView::makeTreeView(value::MapFactory& map)
 
 bool ValuesTreeView::on_button_press_event(GdkEventButton* event)
 {
-    if ((event->type == GDK_BUTTON_PRESS) && (event->button == 3)) {
+    if (mCondition and event->type == GDK_BUTTON_PRESS and event->button == 3) {
         mMenu.popup(event->button, event->time);
     }
     return TreeView::on_button_press_event(event);
