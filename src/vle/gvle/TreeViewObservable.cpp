@@ -25,7 +25,6 @@
 
 #include <vle/gvle/SimpleTypeBox.hpp>
 #include <vle/gvle/TreeViewObservable.hpp>
-#include <vle/gvle/ViewBox.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
 using namespace vle;

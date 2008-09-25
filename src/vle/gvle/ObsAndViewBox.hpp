@@ -100,8 +100,6 @@ namespace vle { namespace gvle {
         Gtk::TreeView*                        mTreeViewViews;
         Glib::RefPtr<Gtk::TreeStore>          mRefTreeViews;
         ModelColumnsView                      mColumnsViews;
-        Gtk::Button*                          mButton_Add_View;
-        Gtk::Button*                          mButton_Del_View;
 
         //Buttons
         Gtk::Button*                          mButtonApply;
@@ -118,8 +116,6 @@ namespace vle { namespace gvle {
         void on_data_received(const Glib::RefPtr<Gdk::DragContext>&, int,
                               int, const Gtk::SelectionData&,
                               guint, guint);
-        void on_view_activated(const Gtk::TreeModel::Path&,
-                               Gtk::TreeViewColumn*);
 
         void makeObs();
         void makeViews();
@@ -127,7 +123,6 @@ namespace vle { namespace gvle {
         void on_add_port();
         void on_del_port();
 
-        void on_add_view();
         void on_del_view();
     };
 
