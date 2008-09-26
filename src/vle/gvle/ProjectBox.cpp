@@ -27,9 +27,7 @@
 #include <vle/gvle/ProjectBox.hpp>
 #include <vle/utils/Tools.hpp>
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
 ProjectBox::ProjectBox(Glib::RefPtr<Gnome::Glade::Xml> xml, vpz::Project* project):
         mXml(xml),
@@ -65,7 +63,17 @@ void ProjectBox::show()
 {
     mBackupDate = mProject->date();
 
-    mEntryAuthor->set_text(mProject->author());
+    {
+        std::string name(mProject->author());
+        if (name.empty()) {
+            name = Glib::get_real_name();
+            if (name.empty()) {
+                name = Glib::get_user_name();
+            }
+        }
+        mEntryAuthor->set_text(name);
+    }
+
     mEntryDate->set_text(mProject->date());
     mEntryVersion->set_text(utils::to_string(mProject->version()));
 
@@ -114,5 +122,4 @@ void ProjectBox::on_cancel()
     mDialog->hide();
 }
 
-}
-} // namespace vle gvle
+}} // namespace vle gvle
