@@ -31,11 +31,7 @@
 #include <vector>
 #include <cmath>
 
-using namespace vle;
-
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
 const guint ViewDrawingArea::MODEL_WIDTH = 40;
 const guint ViewDrawingArea::MODEL_DECAL = 20;
@@ -189,28 +185,144 @@ void ViewDrawingArea::drawCurrentModelPorts()
     desc.set_style(Pango::STYLE_NORMAL);
 }
 
+std::vector < ViewDrawingArea::Line >
+ViewDrawingArea::computeConnection(int xs, int ys,
+                                   int xd, int yd,
+                                   int ytm, int ybm)
+{
+    std::vector < Line > list;
+
+    int x1 = xs + 10;
+    int x2 = xd - 10;
+    int y1 = ytm - 25;
+    int y2 = ybm + 25;
+    int y3, y4;
+
+    Point inpt(xd, yd);
+
+    if (mInPts.find(inpt) == mInPts.end()) {
+        mInPts[inpt] = std::pair < int, int >(0, 0);
+    }
+    if (ys > yd) {
+        int p = ++(mInPts[inpt].first);
+
+        y3 = yd + 10;
+        if (p > 1) {
+            y3 += p * 5;
+        }
+    } else {
+        int p = ++(mInPts[inpt].second);
+
+        y3 = yd - 10;
+        if (p > 1) {
+            y3 -= p * 5;
+        }
+    }
+
+    Point outpt(xs, ys);
+
+    if (mOutPts.find(outpt) == mOutPts.end()) {
+        mOutPts[outpt] = std::pair < int, int >(0, 0);
+    }
+    if (ys >= yd) {
+        int p = ++(mOutPts[outpt].first);
+
+        y4 = ys - 10;
+        if (p > 1) {
+            x1 += p * 5;
+        }
+        if (ys > yd) {
+            if (p > 1)  {
+                y1 += p * 5;
+            }
+        } else {
+            if (p > 1) {
+                y2 += p * 5;
+            }
+        }
+    } else {
+        int p = ++(mOutPts[outpt].second);
+
+        y4 = ys + 10;
+        if (p > 1) {
+            x1 += p * 5;
+        }
+        if (ys > yd) {
+            if (p > 1) {
+                y1 += p * 5;
+            }
+        } else {
+            if (p > 1) {
+                y2 += p * 5;
+            }
+        }
+    }
+
+    list.push_back(Line((int)((xs + MODEL_SPACING_PORT) * mZoom),
+                        (int)(ys * mZoom), (int)(x1 * mZoom),
+                        (int)(y4 * mZoom)));
+    if (x2 >= x1) {
+        list.push_back(Line((int)(x1 * mZoom), (int)(y4 * mZoom),
+                            (int)(x1 * mZoom), (int)(y3 * mZoom)));
+        if (x2 > x1) {
+            list.push_back(Line((int)(x1 * mZoom), (int)(y3 * mZoom),
+                                (int)(x2 * mZoom), (int)(y3 * mZoom)));
+        }
+    } else {
+        if (ys > yd) {
+            list.push_back(Line((int)(x1 * mZoom), (int)(y4 * mZoom),
+                                (int)(x1 * mZoom), (int)(y1 * mZoom)));
+            list.push_back(Line((int)(x1 * mZoom), (int)(y1 * mZoom),
+                                (int)(x2 * mZoom), (int)(y1 * mZoom)));
+            list.push_back(Line((int)(x2 * mZoom), (int)(y1 * mZoom),
+                                (int)(x2 * mZoom), (int)(y3 * mZoom)));
+        } else {
+            list.push_back(Line((int)(x1 * mZoom), (int)(y4 * mZoom),
+                                (int)(x1 * mZoom), (int)(y2 * mZoom)));
+            list.push_back(Line((int)(x1 * mZoom), (int)(y2 * mZoom),
+                                (int)(x2 * mZoom), (int)(y2 * mZoom)));
+            list.push_back(Line((int)(x2 * mZoom), (int)(y2 * mZoom),
+                                (int)(x2 * mZoom), (int)(y3 * mZoom)));
+        }
+    }
+    list.push_back(Line((int)(x2 * mZoom), (int)(y3 * mZoom),
+                        (int)(xd * mZoom), (int)(yd * mZoom)));
+    return list;
+}
+
+void ViewDrawingArea::drawConnection(int xs, int ys, int xd, int yd,
+                                     int ytm, int ybm)
+{
+    std::vector < Line > list = computeConnection(xs, ys, xd, yd, ytm, ybm);
+    std::vector < Line >::const_iterator it = list.begin();
+
+    while (it != list.end()) {
+        mBuffer->draw_line(mBlack, it->xs, it->ys, it->xd, it->yd);
+        ++it;
+    }
+}
+
 void ViewDrawingArea::drawConnection(graph::Model* src,
                                      const std::string& portsrc,
                                      graph::Model* dst,
                                      const std::string& portdst)
 {
     int xs, ys, xd, yd;
+    int ytm = src->y();
+    int ybm = src->y() + src->height();
 
     if (src == mCurrent) {
         getCurrentModelInPosition(portsrc, xs, ys);
         getModelInPosition(dst, portdst, xd, yd);
-        mBuffer->draw_line(mBlack, (int)(xs * mZoom), (int)(ys * mZoom),
-                           (int)(xd * mZoom), (int)(yd * mZoom));
+        drawConnection(xs, ys, xd, yd, ytm, ybm);
     } else if (dst == mCurrent) {
         getModelOutPosition(src, portsrc, xs, ys);
         getCurrentModelOutPosition(portdst, xd, yd);
-        mBuffer->draw_line(mBlack, (int)(xs * mZoom), (int)(ys * mZoom),
-                           (int)(xd * mZoom), (int)(yd * mZoom));
+        drawConnection(xs, ys, xd, yd, ytm, ybm);
     } else {
         getModelOutPosition(src, portsrc, xs, ys);
         getModelInPosition(dst, portdst, xd, yd);
-        mBuffer->draw_line(mBlack, (int)(xs * mZoom), (int)(ys * mZoom),
-                           (int)(xd * mZoom), (int)(yd * mZoom));
+        drawConnection(xs, ys, xd, yd, ytm, ybm);
     }
 }
 
@@ -235,6 +347,8 @@ void ViewDrawingArea::drawConnection()
         const ModelList& children(mCurrent->getModelList());
         ModelList::const_iterator it;
 
+        mInPts.clear();
+        mOutPts.clear();
         for (it = children.begin(); it != children.end(); ++it) {
             const ConnectionList& outs(it->second->getOutputPortList());
             ConnectionList::const_iterator jt;
@@ -244,7 +358,8 @@ void ViewDrawingArea::drawConnection()
                 ModelPortList::const_iterator kt;
 
                 for (kt = ports.begin(); kt != ports.end(); ++kt) {
-                    drawConnection(it->second, jt->first, kt->first, kt->second);
+                    drawConnection(it->second, jt->first,
+                                   kt->first, kt->second);
                 }
             }
         }
@@ -269,7 +384,7 @@ void ViewDrawingArea::drawChildrenModels()
         ++it;
     }
     if (mView->getDestinationModel() != NULL and mView->getDestinationModel() !=
-            mCurrent) {
+        mCurrent) {
         drawChildrenModel(mView->getDestinationModel(), mBlue);
     }
 }
@@ -278,10 +393,12 @@ void ViewDrawingArea::drawChildrenModel(graph::Model* model,
                                         Glib::RefPtr < Gdk::GC > color)
 {
     mBuffer->draw_rectangle(mBlack, false, (int)(mZoom * model->x()),
-                            (int)(mZoom * model->y()), (int)(mZoom * model->width()),
+                            (int)(mZoom * model->y()),
+                            (int)(mZoom * model->width()),
                             (int)(mZoom * model->height()));
     mBuffer->draw_rectangle(color, false, (int)(mZoom * model->x()),
-                            (int)(mZoom * model->y()), (int)(mZoom * model->width()),
+                            (int)(mZoom * model->y()),
+                            (int)(mZoom * model->width()),
                             (int)(mZoom * model->height()));
     model->setWidth(100);
     //if (model->isAtomic()) {
@@ -380,7 +497,8 @@ void ViewDrawingArea::drawChildrenPorts(graph::Model* model,
         // to draw the label of the port
         mPango->set_markup(itl->first);
         mBuffer->draw_layout(color,
-                             (int)(mZoom * (mX + model->width()+ PORT_SPACING_LABEL)),
+                             (int)(mZoom * (mX + model->width()+
+                                            PORT_SPACING_LABEL)),
                              (int)(mZoom * (mY + stepOutput * (i + 1))),
                              mPango);
 
@@ -398,15 +516,15 @@ void ViewDrawingArea::drawChildrenPorts(graph::Model* model,
     mPango->set_markup(model->getName());
     mBuffer->draw_layout(color,
                          (int)((model->x() + (model->width() / 2)) * mZoom),
-                         (int)((model->y() + model->height() + MODEL_SPACING_PORT) *
-                               mZoom),
+                         (int)((model->y() + model->height() +
+                                MODEL_SPACING_PORT) * mZoom),
                          mPango);
 }
 
 void ViewDrawingArea::drawLink()
 {
     if (mView->getCurrentButton() == GVLE::ADDLINK and
-            mView->isEmptySelectedModels() == false) {
+        mView->isEmptySelectedModels() == false) {
         graph::Model* src = mView->getFirstSelectedModels();
         if (src == mCurrent) {
             mBuffer->draw_line(mBlack,
@@ -432,7 +550,7 @@ void ViewDrawingArea::drawLink()
 void ViewDrawingArea::drawZoomFrame()
 {
     if (mView->getCurrentButton() == GVLE::ZOOM and mPrecMouse.get_x() != -1
-            and mPrecMouse.get_y() != -1) {
+        and mPrecMouse.get_y() != -1) {
         int xmin = std::min(mMouse.get_x(), mPrecMouse.get_x());
         int xmax = std::max(mMouse.get_x(), mPrecMouse.get_x());
         int ymin = std::min(mMouse.get_y(), mPrecMouse.get_y());
@@ -452,7 +570,7 @@ bool ViewDrawingArea::on_button_press_event(GdkEventButton* event)
     mMouse.set_x((int)(event->x / mZoom));
     mMouse.set_y((int)(event->y / mZoom));
     bool shiftOrControl = (event->state & GDK_SHIFT_MASK) or(event->state &
-                          GDK_CONTROL_MASK);
+                                                             GDK_CONTROL_MASK);
     graph::Model* model = mCurrent->find(mMouse.get_x(), mMouse.get_y());
 
     switch (currentbutton) {
@@ -527,9 +645,9 @@ bool ViewDrawingArea::on_button_release_event(GdkEventButton* event)
         if (event->button == 1) {
             // to not zoom in case of very small selection.
             if (std::max(mMouse.get_x(), mPrecMouse.get_x()) -
-                    std::min(mMouse.get_x(), mPrecMouse.get_x()) > 5 &&
-                    std::max(mMouse.get_y(), mPrecMouse.get_y()) -
-                    std::min(mMouse.get_y(), mPrecMouse.get_y()) > 5) {
+                std::min(mMouse.get_x(), mPrecMouse.get_x()) > 5 &&
+                std::max(mMouse.get_y(), mPrecMouse.get_y()) -
+                std::min(mMouse.get_y(), mPrecMouse.get_y()) > 5) {
                 selectZoom(std::min(mMouse.get_x(), mPrecMouse.get_x()),
                            std::min(mMouse.get_y(), mPrecMouse.get_y()),
                            std::max(mMouse.get_x(), mPrecMouse.get_x()),
@@ -662,7 +780,7 @@ void ViewDrawingArea::on_realize()
 }
 
 void ViewDrawingArea::on_gvlepointer_button_1(graph::Model* mdl,
-        bool state)
+                                              bool state)
 {
     if (mdl) {
         if (mView->existInSelectedModels(mdl) == false) {
@@ -694,7 +812,7 @@ void ViewDrawingArea::delUnderMouse(int x, int y)
 }
 
 void ViewDrawingArea::getCurrentModelInPosition(const std::string& port, int& x,
-        int& y)
+                                                int& y)
 {
     x = 2 * MODEL_PORT;
 
@@ -704,7 +822,7 @@ void ViewDrawingArea::getCurrentModelInPosition(const std::string& port, int& x,
 }
 
 void ViewDrawingArea::getCurrentModelOutPosition(const std::string& port, int&
-        x, int& y)
+                                                 x, int& y)
 {
     x = (int)mWidth - MODEL_PORT;
 
@@ -713,8 +831,8 @@ void ViewDrawingArea::getCurrentModelOutPosition(const std::string& port, int&
 }
 
 void ViewDrawingArea::getModelInPosition(graph::Model* model,
-        const std::string& port,
-        int& x, int& y)
+                                         const std::string& port,
+                                         int& x, int& y)
 {
     x = model->x();
     y = model->y() + (model->height() / (model->getInputPortNumber() + 1)) *
@@ -722,8 +840,8 @@ void ViewDrawingArea::getModelInPosition(graph::Model* model,
 }
 
 void ViewDrawingArea::getModelOutPosition(graph::Model* model,
-        const std::string& port,
-        int& x, int& y)
+                                          const std::string& port,
+                                          int& x, int& y)
 {
     x = model->x() + model->width();
     y = model->y() + (model->height() / (model->getOutputPortNumber() + 1)) *
@@ -833,7 +951,7 @@ void ViewDrawingArea::delConnection(int x, int y)
                 for (kt = ports.begin(); kt != ports.end(); ++kt) {
                     h = distanceConnection(it->second, jt->first, kt->first,
                                            kt->second, x, y);
-                    if ((h > 0 and height == -1) or(h > 0 and h < height)) {
+                    if ((h > 0 and height == -1) or (h > 0 and h < height)) {
                         src = it->second;
                         portsrc = jt->first;
                         dst = kt->first;
@@ -864,6 +982,8 @@ int ViewDrawingArea::distanceConnection(graph::Model* src,
                                         int x, int y)
 {
     int xs, ys, xd, yd;
+    int ytm = src->y();
+    int ybm = src->y() + src->height();
 
     if (src == mCurrent) {
         getCurrentModelInPosition(portsrc, xs, ys);
@@ -875,20 +995,40 @@ int ViewDrawingArea::distanceConnection(graph::Model* src,
         getModelOutPosition(src, portsrc, xs, ys);
         getModelInPosition(dst, portdst, xd, yd);
     }
-    return distance(xs, ys, xd, yd, x, y);
+    return distance(xs, ys, xd, yd, ytm, ybm, x, y);
 }
 
-int ViewDrawingArea::distance(int x1, int y1, int x2, int y2, int mx, int my)
+int ViewDrawingArea::distance(int x1, int y1, int x2, int y2,
+                              int ytm, int ybm, int mx, int my)
 {
-    double h = -1;
-    if (std::min(x1, x2) <= mx and mx <= std::max(x1, x2) and std::min(y1, y2)
-            <= my and my <= std::max(y1, y2)) {
-        const double a = (y1 - y2) / (double)(x1 - x2);
-        const double b = y1 - a * x1;
-        h = std::abs((my - (a * mx) - b) / std::sqrt(1 + a * a));
-        if (h <= 10) {
-            return static_cast < int >(h);
+    std::vector < Line > list = computeConnection(x1, y1, x2, y2, ytm, ybm);
+    std::vector < Line >::iterator it = list.begin();
+
+    mx += 10;
+    while (it != list.end()) {
+        if (it->xs == it->xd) {
+            it->xs -= 5;
+            it->xd += 5;
         }
+
+        if (it->ys == it->yd) {
+            it->ys -= 5;
+            it->yd += 5;
+        }
+
+        double h = -1;
+        if (std::min(it->xs, it->xd) <= mx
+            and mx <= std::max(it->xs, it->xd)
+            and std::min(it->ys, it->yd)
+            <= my and my <= std::max(it->ys, it->yd)) {
+            const double a = (it->ys - it->yd) / (double)(it->xs - it->xd);
+            const double b = it->ys - a * it->xs;
+            h = std::abs((my - (a * mx) - b) / std::sqrt(1 + a * a));
+            if (h <= 5) {
+                return static_cast < int >(h);
+            }
+        }
+        ++it;
     }
     return -1;
 }
@@ -963,8 +1103,6 @@ void ViewDrawingArea::selectZoom(int xmin, int ymin, int xmax, int ymax)
     newSize();
 
     mView->updateAdjustment(xmin * mZoom, ymin * mZoom);
-
 }
 
-}
-} // namespace vle gvle
+}} // namespace vle gvle

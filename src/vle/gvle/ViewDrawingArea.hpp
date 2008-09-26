@@ -74,11 +74,27 @@ public:
     static const double ZOOM_MAX;
 
 private:
+    struct Line
+    {
+    public:
+	int xs;
+	int ys;
+	int xd;
+	int yd;
+
+	Line(int xs, int ys, int xd, int yd) : xs(xs), ys(ys), xd(xd), yd(yd)
+	    { }
+    };
+
     void drawCurrentCoupledModel();
     void drawCurrentModelPorts();
+    std::vector < ViewDrawingArea::Line > computeConnection(int xs, int ys,
+							    int xd, int yd,
+							    int ytm, int ybm);
     void drawConnection();
     void drawConnection(graph::Model* src, const std::string& srcport,
                         graph::Model* dst, const std::string& dstport);
+    void drawConnection(int xs, int ys, int xd, int yd, int ytm, int ybm);
     void drawChildrenModels();
     void drawChildrenModel(graph::Model* model,
                            Glib::RefPtr < Gdk::GC > color);
@@ -131,12 +147,15 @@ private:
      * @param y1 y position of origin model
      * @param x2 x position of destination model
      * @param y2 y position of destination model
+     * @param ytm y position of top origin model
+     * @param ybm y position of bottom origin model
      * @param mx x position of mouse cursor
      * @param my y position of mouse cursor
      * @return height between connection and mouse position. A negative
      * value if position are too far.
      */
-    int distance(int x1, int y1, int x2, int y2, int mx, int my);
+    int distance(int x1, int y1, int x2, int y2, int ytm, int ybm,
+		 int mx, int my);
 
     /**
      * Return nearest connection between all connection and mouse position
@@ -231,6 +250,11 @@ private:
     Glib::RefPtr < Gdk::GC >        mBlue;
     Glib::RefPtr < Pango::Layout>   mPango;
     bool                            mIsRealized;
+
+    typedef std::pair < int, int > Point;
+
+    std::map < Point, Point > mInPts;
+    std::map < Point, Point > mOutPts;
 };
 
 }
