@@ -42,6 +42,9 @@ ObsAndViewBox::ObsAndViewBox(Glib::RefPtr<Gnome::Glade::Xml> xml):
     mRefTreeObs = Gtk::TreeStore::create(mColumnsObs);
     mTreeViewObs->set_model(mRefTreeObs);
     mTreeViewObs->append_column("ObservablePorts", mColumnsObs.m_col_name);
+    
+    mTreeViewObs->signal_button_press_event().connect_notify(
+        sigc::mem_fun(*this, &ObsAndViewBox::on_button_press));
 
     Glib::RefPtr<Gtk::TreeSelection> refTreeSelection =
         mTreeViewObs->get_selection();
@@ -50,13 +53,6 @@ ObsAndViewBox::ObsAndViewBox(Glib::RefPtr<Gnome::Glade::Xml> xml):
 
     mTreeViewObs->signal_drag_data_received().connect(
         sigc::mem_fun(*this, &ObsAndViewBox::on_data_received));
-
-    xml->get_widget("ObservableAdd", mButton_Add_Obs);
-    mButton_Add_Obs->signal_clicked().connect(
-        sigc::mem_fun(*this, &ObsAndViewBox::on_add_port));
-    xml->get_widget("ObservableDel", mButton_Del_Obs);
-    mButton_Del_Obs->signal_clicked().connect(
-        sigc::mem_fun(*this, &ObsAndViewBox::on_del_port));
 
     //Views
     xml->get_widget("TreeViewViews", mTreeViewViews);
@@ -78,6 +74,19 @@ ObsAndViewBox::ObsAndViewBox(Glib::RefPtr<Gnome::Glade::Xml> xml):
     xml->get_widget("ButtonObsAndViewCancel", mButtonCancel);
     mButtonCancel->signal_clicked().connect(
         sigc::mem_fun(*this, &ObsAndViewBox::on_cancel));
+
+    //Fill popup menu:
+    {
+	Gtk::Menu::MenuList& menulist = mMenuPopup.items();
+
+        menulist.push_back(Gtk::Menu_Helpers::MenuElem(
+                "_Add", sigc::mem_fun(
+                    *this, &ObsAndViewBox::on_add_port)));
+        menulist.push_back(Gtk::Menu_Helpers::MenuElem(
+                "_Remove", sigc::mem_fun(
+                    *this, &ObsAndViewBox::on_del_port)));
+    }
+    mMenuPopup.accelerate(*mTreeViewObs);
 }
 
 ObsAndViewBox::~ObsAndViewBox()
@@ -125,6 +134,13 @@ void ObsAndViewBox::on_cancel()
 
     delete mAll_Obs_backup;
     delete mViews_backup;
+}
+
+void ObsAndViewBox::on_button_press(GdkEventButton* event)
+{
+    if (event->type == GDK_BUTTON_PRESS and event->button == 3) {
+        mMenuPopup.popup(event->button, event->time);
+    }
 }
 
 void ObsAndViewBox::on_drag_end(const Glib::RefPtr<Gdk::DragContext >&)
@@ -236,7 +252,7 @@ void ObsAndViewBox::on_add_port()
     SimpleTypeBox box("Name of the Observable port ?");
     std::string name = boost::trim_copy(box.run());
 
-    if (box.valid() and not name.empty()) {
+    if (box.valid() and not name.empty() and not mObs->exist(name)) {
         mObs->add(name);
         makeObs();
     }

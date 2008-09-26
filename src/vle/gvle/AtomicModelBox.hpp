@@ -230,10 +230,12 @@ private:
     void add_dynamic();
     void edit_dynamic();
     void del_dynamic();
+    void changed_dynamic();
 
     void add_observable();
     void edit_observable();
     void del_observable();
+    void changed_observable();
 
     void on_apply();
     void on_cancel();

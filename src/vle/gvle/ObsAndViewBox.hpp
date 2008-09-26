@@ -93,8 +93,7 @@ namespace vle { namespace gvle {
         Gtk::TreeView*                        mTreeViewObs;
         Glib::RefPtr<Gtk::TreeStore>          mRefTreeObs;
         ModelColumnsObs                       mColumnsObs;
-        Gtk::Button*                          mButton_Add_Obs;
-        Gtk::Button*                          mButton_Del_Obs;
+	Gtk::Menu                             mMenuPopup;
 
         //Views
         Gtk::TreeView*                        mTreeViewViews;
@@ -110,6 +109,7 @@ namespace vle { namespace gvle {
 
         void on_apply();
         void on_cancel();
+        void on_button_press(GdkEventButton* event);
 
         void on_drag_end(const Glib::RefPtr<Gdk::DragContext >&);
 

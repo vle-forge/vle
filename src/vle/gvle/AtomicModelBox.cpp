@@ -322,6 +322,8 @@ AtomicModelBox::AtomicModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
     mComboDyn->set_model(mRefComboDyn);
     mComboDyn->pack_start(m_ColumnsDyn.m_name);
     mComboDyn->pack_start(m_ColumnsDyn.m_dyn);
+    mComboDyn->signal_changed().connect(
+        sigc::mem_fun(*this, &AtomicModelBox::changed_dynamic));
     xml->get_widget("AddDynamic", mAddDyn);
     mAddDyn->signal_clicked().connect(
         sigc::mem_fun(*this, &AtomicModelBox::add_dynamic));
@@ -337,6 +339,8 @@ AtomicModelBox::AtomicModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
     mRefComboObs = Gtk::ListStore::create(m_ColumnsObs);
     mComboObs->set_model(mRefComboObs);
     mComboObs->pack_start(m_ColumnsObs.m_col_name);
+    mComboObs->signal_changed().connect(
+        sigc::mem_fun(*this, &AtomicModelBox::changed_observable));
     xml->get_widget("AddObservable", mAddObs);
     mAddObs->signal_clicked().connect(
         sigc::mem_fun(*this, &AtomicModelBox::add_observable));
@@ -358,6 +362,10 @@ AtomicModelBox::AtomicModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
     xml->get_widget("ButtonAtomicCancel", mButtonCancel);
     mButtonCancel->signal_clicked().connect(
         sigc::mem_fun(*this, &AtomicModelBox::on_cancel));
+
+    mAddDyn->set_sensitive(true);
+    mEditDyn->set_sensitive(false);
+    mDelDyn->set_sensitive(false);
 }
 
 AtomicModelBox::~AtomicModelBox()
@@ -552,6 +560,22 @@ void AtomicModelBox::del_dynamic()
     }
 }
 
+void AtomicModelBox::changed_dynamic()
+{
+    if (mComboDyn->get_active()) {
+        if (not mComboDyn->get_active()->get_value(
+                m_ColumnsDyn.m_name).empty()) {
+            mAddDyn->set_sensitive(true);
+            mEditDyn->set_sensitive(true);
+            mDelDyn->set_sensitive(true);
+            return;
+        }
+    }
+    mAddDyn->set_sensitive(true);
+    mEditDyn->set_sensitive(false);
+    mDelDyn->set_sensitive(false);
+}
+
 void AtomicModelBox::add_observable()
 {
     SimpleTypeBox box("Name of the Observable ?");
@@ -599,6 +623,23 @@ void AtomicModelBox::del_observable()
         makeObsCombo();
     }
 }
+
+void AtomicModelBox::changed_observable()
+{
+    if (mComboObs->get_active()) {
+        if (not mComboObs->get_active()->get_value(
+                m_ColumnsObs.m_col_name).empty()) {
+            mAddObs->set_sensitive(true);
+            mEditObs->set_sensitive(true);
+            mDelObs->set_sensitive(true);
+            return;
+        }
+    }
+    mAddObs->set_sensitive(true);
+    mEditObs->set_sensitive(false);
+    mDelObs->set_sensitive(false);
+}
+
 
 void AtomicModelBox::on_apply()
 {
