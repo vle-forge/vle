@@ -31,6 +31,7 @@
 #include <vle/utils/Tools.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/lexical_cast.hpp>
+#include <glibmm/miscutils.h>
 #include <limits>
 
 using namespace vle;
@@ -47,8 +48,9 @@ ExperimentBox::ExperimentBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
     mButtonCancel(0)
 {
     xml->get_widget("DialogExperiment", mDialog);
-
     xml->get_widget("EntryName", mEntryName);
+    xml->get_widget("frameExperimentSimulation", mHboxSimu);
+    xml->get_widget("frameExperimentPlan", mHboxPlan);
 
     xml->get_widget("SpinButtonDuration", mSpinDuration);
     mSpinDuration->set_range(
@@ -58,10 +60,9 @@ ExperimentBox::ExperimentBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
     xml->get_widget("RadioSimulation", mRadioSimu);
     xml->get_widget("RadioPlan", mRadioPlan);
     if ((modeling->experiment().replicas().seed() == 0) &&
-        (modeling->experiment().replicas().seed() == 0))
+        (modeling->experiment().replicas().seed() == 0)) {
         mRadioSimu->toggled();
-
-    xml->get_widget("frameExperimentSimulation", mHboxSimu);
+    }
 
     xml->get_widget("SpinSimuSeed", mSpinSimuSeed);
     mSpinSimuSeed->set_range(0, std::numeric_limits < guint32 >::max());
@@ -71,36 +72,22 @@ ExperimentBox::ExperimentBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
     mButtonSimuSeed->signal_clicked().connect(sigc::mem_fun
             (*this, &ExperimentBox::on_random_simu));
 
-    xml->get_widget("frameExperimentPlan", mHboxPlan);
-
     xml->get_widget("HBoxCombi", mHboxCombi);
     mComboCombi = new Gtk::ComboBoxText();
     mComboCombi->append_text("linear");
     mComboCombi->append_text("total");
-    mHboxCombi->pack_start(*mComboCombi, Gtk::PACK_SHRINK, 5);
+    mHboxCombi->pack_start(*mComboCombi, true, true, 5);
 
     xml->get_widget("SpinPlanSeed", mSpinPlanSeed);
     mSpinPlanSeed->set_range(0, std::numeric_limits < guint32 >::max());
     on_random_plan();
 
     xml->get_widget("ButtonPlanSeed", mButtonPlanSeed);
-    if (mButtonPlanSeed)
-        mButtonPlanSeed->signal_clicked().connect(sigc::mem_fun
-                (*this, &ExperimentBox::on_random_plan));
+    mButtonPlanSeed->signal_clicked().connect(
+        sigc::mem_fun (*this, &ExperimentBox::on_random_plan));
 
     xml->get_widget("SpinButtonNumber", mButtonNumber);
     mButtonNumber->set_range(1, std::numeric_limits < guint32 >::max());
-
-    xml->get_widget("ButtonApply", mButtonApply);
-    if (mButtonApply)
-        mButtonApply->signal_clicked().connect(sigc::mem_fun
-                                               (*this, &ExperimentBox::on_apply));
-
-    xml->get_widget("ButtonCancel", mButtonCancel);
-    if (mButtonCancel) {
-        mButtonCancel->signal_clicked().connect(
-            sigc::mem_fun (*this, &ExperimentBox::on_cancel));
-    }
 
     mRadioPlan->signal_toggled().connect(
         sigc::mem_fun (*this, &ExperimentBox::on_plan));
@@ -118,31 +105,46 @@ void ExperimentBox::show()
     mEntryName->set_text(mModeling->experiment().name());
     mSpinDuration->set_value(mModeling->experiment().duration());
     mSpinSimuSeed->set_value(mModeling->experiment().seed());
+
+    if (mModeling->experiment().combination().empty()) {
+        mModeling->experiment().setCombination("linear");
+    }
     mComboCombi->set_active_text(mModeling->experiment().combination());
     mSpinPlanSeed->set_value(mModeling->experiment().replicas().seed());
 
     mDialog->show_all();
-    if (mRadioSimu->get_active())
+    if (mRadioSimu->get_active()) {
         on_simu();
-    else
+    } else {
         on_plan();
+    }
 
-    mDialog->run();
+    int ret = mDialog->run();
+    while (ret == Gtk::RESPONSE_OK) {
+        if (mEntryName->get_text().empty()) {
+            Error("Set a name to this experiment");
+            ret = mDialog->run();
+        } else {
+            apply();
+            break;
+        }
+    }
+    mDialog->hide();
 }
 
 void ExperimentBox::on_simu()
 {
     if (mRadioSimu->get_active()) {
-        mHboxSimu->show_all();
-        mHboxPlan->hide_all();
+        mHboxSimu->set_sensitive(true);
+        mHboxPlan->set_sensitive(false);
     }
 }
 
 void ExperimentBox::on_plan()
 {
     if (mRadioPlan->get_active()) {
-        mHboxSimu->hide_all();
-        mHboxPlan->show_all();
+        mHboxSimu->set_sensitive(false);
+        mHboxPlan->set_sensitive(true);
     }
 }
 
@@ -156,49 +158,23 @@ void ExperimentBox::on_random_plan()
     mSpinPlanSeed->set_value(mRand.get_int());
 }
 
-void ExperimentBox::on_apply()
+void ExperimentBox::apply()
 {
-    std::string error = "";
-    if (mEntryName->get_text() == "") {
-        error += "Set a name to this experiment";
-    }
+    vpz::Experiment& exp = mModeling->experiment();
+    vpz::Replicas& rep = exp.replicas();
 
-    if (!mRadioSimu->get_active()) {
-        if (mComboCombi->get_active_text() == "")
-            error += "Set a Combination to this experiment\n";
-    }
+    exp.setName(mEntryName->get_text());
+    exp.setDuration(mSpinDuration->get_value() <= 0.0 ?
+                    std::numeric_limits < double >::epsilon() :
+                    mSpinDuration->get_value());
 
-    if (error != "") {
-        Error(error);
+    exp.setCombination(mComboCombi->get_active_text());
+    if (mRadioSimu->get_active()) {
+        exp.setSeed(mSpinSimuSeed->get_value());
     } else {
-        vpz::Experiment& exp = mModeling->experiment();
-        vpz::Replicas& rep = exp.replicas();
-
-        exp.setName(mEntryName->get_text());
-        exp.setDuration(mSpinDuration->get_value() <= 0.0 ?
-                        std::numeric_limits < double >::epsilon() :
-                        mSpinDuration->get_value());
-
-        if (mRadioSimu->get_active()) {
-            //Simulation
-            exp.setSeed(mSpinSimuSeed->get_value());
-        } else {
-            //Plan
-            exp.setCombination(mComboCombi->get_active_text());
-            rep.setSeed(mSpinPlanSeed->get_value());
-            rep.setNumber(mButtonNumber->get_value());
-        }
-
-        if (mDialog)
-            mDialog->hide();
+        rep.setSeed(mSpinPlanSeed->get_value());
+        rep.setNumber(mButtonNumber->get_value());
     }
 }
 
-void ExperimentBox::on_cancel()
-{
-    if (mDialog)
-        mDialog->hide();
-}
-
-}
-} // namespace vle gvle
+}} // namespace vle gvle

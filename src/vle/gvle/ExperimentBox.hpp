@@ -84,11 +84,9 @@ namespace vle { namespace gvle {
         void on_random_simu();
         void on_random_plan();
 
-        void on_apply();
-        void on_cancel();
+        void apply();
     };
 
-}
-} // namespace vle gvle
+}} // namespace vle gvle
 
 #endif
