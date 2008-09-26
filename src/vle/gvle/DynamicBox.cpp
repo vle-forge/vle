@@ -154,7 +154,11 @@ void DynamicBox::on_apply()
     }
 
     mDyn->setModel(mModel->get_text());
-    mDyn->setLanguage(mLanguage->get_active_text());
+    if (mLanguage->get_active_text() == "c++") {
+        mDyn->setLanguage("");
+    } else {
+        mDyn->setLanguage(mLanguage->get_active_text());
+    }
     mDialog->hide();
 }
 
