@@ -40,7 +40,6 @@
 #include <vle/graph/CoupledModel.hpp>
 #include <libxml++/libxml++.h>
 #include <gtkmm/stock.h>
-#include <boost/foreach.hpp>
 
 using std::string;
 

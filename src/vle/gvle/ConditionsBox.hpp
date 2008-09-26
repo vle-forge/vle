@@ -28,7 +28,6 @@
 #include <vle/vpz.hpp>
 #include <gtkmm.h>
 #include <libglademm.h>
-#include <iostream>
 #include <vle/gvle/ValuesTreeView.hpp>
 
 namespace vle { namespace gvle {

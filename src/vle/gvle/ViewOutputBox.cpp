@@ -30,7 +30,6 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 #include <limits>
-#include <iostream>
 
 namespace vle { namespace gvle {
 
