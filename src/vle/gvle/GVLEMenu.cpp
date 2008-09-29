@@ -28,11 +28,7 @@
 #include <vle/utils/Debug.hpp>
 #include <gtkmm/stock.h>
 
-using namespace vle;
-
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
 GVLEMenu::GVLEMenu(GVLE* gvle)
 {
@@ -131,9 +127,8 @@ void GVLEMenu::makeMenuSimulation(GVLE* gvle)
     menulist.push_back(Gtk::Menu_Helpers::SeparatorElem());
 
     menulist.push_back(Gtk::Menu_Helpers::MenuElem(
-            "_ViewsOutputs", Gtk::AccelKey(GDK_Z, Gdk::CONTROL_MASK),
+            "_Views", Gtk::AccelKey(GDK_Z, Gdk::CONTROL_MASK),
             sigc::mem_fun(gvle, &GVLE::onViewOutputBox)));
-
 
     menulist.push_back(Gtk::Menu_Helpers::MenuElem
         ("_Conditions", Gtk::AccelKey(GDK_C, Gdk::CONTROL_MASK),
@@ -141,8 +136,7 @@ void GVLEMenu::makeMenuSimulation(GVLE* gvle)
 
     menulist.push_back(Gtk::Menu_Helpers::SeparatorElem());
 
-    menulist.push_back(Gtk::Menu_Helpers::MenuElem(
-            "H_osts", Gtk::AccelKey(GDK_H, Gdk::CONTROL_MASK),
+    menulist.push_back(Gtk::Menu_Helpers::MenuElem("H_osts",
             sigc::mem_fun(gvle, &GVLE::onHostsBox)));
 
     menulist.push_back(Gtk::Menu_Helpers::MenuElem(
@@ -154,14 +148,8 @@ void GVLEMenu::makeMenuHelp(GVLE* gvle)
 {
     Gtk::Menu::MenuList& menulist = mMenuHelp.items();
 
-    menulist.push_back(Gtk::Menu_Helpers::StockMenuElem(Gtk::Stock::HELP,
-                       Gtk::AccelKey(GDK_H, Gdk::CONTROL_MASK),
-                       sigc::mem_fun(gvle, &GVLE::onHelpBox)));
-
     menulist.push_back(Gtk::Menu_Helpers::MenuElem("About",
-                       Gtk::AccelKey(GDK_A, Gdk::CONTROL_MASK),
                        sigc::mem_fun(gvle, &GVLE::onShowAbout)));
 }
 
-}
-} // namespace vle gvle
+}} // namespace vle gvle
