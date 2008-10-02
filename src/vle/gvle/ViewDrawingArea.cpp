@@ -585,22 +585,22 @@ bool ViewDrawingArea::on_button_press_event(GdkEventButton* event)
             //std::cout << "Pointer 3\n";
             mView->showModel(model);
         }
-        queue_draw();
+        queueRedraw();
         break;
     case GVLE::ADDMODEL:
         mView->addAtomicModel(mMouse.get_x(), mMouse.get_y());
-        queue_draw();
+        queueRedraw();
         break;
     case GVLE::ADDLINK:
         if (event->button == 1) {
             addLinkOnButtonPress(mMouse.get_x(), mMouse.get_y());
             mPrecMouse = mMouse;
-            queue_draw();
+            queueRedraw();
         }
         break;
     case GVLE::DELETE:
         delUnderMouse(mMouse.get_x(), mMouse.get_y());
-        queue_draw();
+        queueRedraw();
         break;
     case GVLE::QUESTION:
         mModeling->showDynamics((model) ? model->getName() :
@@ -609,13 +609,13 @@ bool ViewDrawingArea::on_button_press_event(GdkEventButton* event)
     case GVLE::ZOOM:
         if (event->button == 1) {
             mPrecMouse = mMouse;
-            queue_draw();
+            queueRedraw();
         }
-        queue_draw();
+        queueRedraw();
         break;
     case GVLE::PLUGINMODEL:
         mView->addPluginModel(mMouse.get_x(), mMouse.get_y());
-        queue_draw();
+        queueRedraw();
         break;
     case GVLE::ADDCOUPLED:
         if (event->button == 1) {
@@ -623,7 +623,7 @@ bool ViewDrawingArea::on_button_press_event(GdkEventButton* event)
         } else if (event->button == 2) {
             mView->addCoupledModel(mMouse.get_x(), mMouse.get_y());
         }
-        queue_draw();
+        queueRedraw();
         break;
     default:
         break;
@@ -639,7 +639,7 @@ bool ViewDrawingArea::on_button_release_event(GdkEventButton* event)
     switch (mView->getCurrentButton()) {
     case GVLE::ADDLINK:
         addLinkOnButtonRelease(mMouse.get_x(), mMouse.get_y());
-        queue_draw();
+        queueRedraw();
         break;
     case GVLE::ZOOM:
         if (event->button == 1) {
@@ -652,7 +652,7 @@ bool ViewDrawingArea::on_button_release_event(GdkEventButton* event)
                            std::min(mMouse.get_y(), mPrecMouse.get_y()),
                            std::max(mMouse.get_x(), mPrecMouse.get_x()),
                            std::max(mMouse.get_y(), mPrecMouse.get_y()));
-                queue_draw();
+                queueRedraw();
             }
             mPrecMouse.set_x(-1);
             mPrecMouse.set_y(-1);
@@ -687,7 +687,7 @@ bool ViewDrawingArea::on_configure_event(GdkEventConfigure* event)
         set_size_request((int)(mWidth * mZoom), (int)(mHeight * mZoom));
         mBuffer = Gdk::Pixmap::create(mWin, (int)(mWidth * mZoom),
                                       (int)(mHeight * mZoom), -1);
-        queue_draw();
+        queueRedraw();
     }
     return true;
 }
@@ -700,7 +700,10 @@ bool ViewDrawingArea::on_expose_event(GdkEventExpose*)
                                           (int)(mHeight * mZoom), -1);
         }
         if (mBuffer) {
-            draw();
+            if (mNeedRedraw) {
+                draw();
+                mNeedRedraw = false;
+            }
             mWin->draw_drawable(mWingc, mBuffer, 0, 0, 0, 0, -1, -1);
         }
     }
@@ -726,19 +729,19 @@ bool ViewDrawingArea::on_motion_notify_event(GdkEventMotion* event)
         if (button == 1) {
             mView->displaceModel(mPrecMouse.get_x(), mPrecMouse.get_y(),
                                  mMouse.get_x(), mMouse.get_y());
-            queue_draw();
+            queueRedraw();
         }
         mPrecMouse = mMouse;
         break;
     case GVLE::ZOOM:
         if (button == 1) {
-            queue_draw();
+            queueRedraw();
         }
         break;
     case GVLE::ADDLINK :
         if (button == 1) {
             addLinkOnMotion(mMouse.get_x(), mMouse.get_y());
-            queue_draw();
+            queueRedraw();
         }
         mPrecMouse = mMouse;
         break;
@@ -776,7 +779,7 @@ void ViewDrawingArea::on_realize()
     mPango = create_pango_layout("");
     mPango->set_font_description(desc);
     mIsRealized = true;
-    queue_draw();
+    queueRedraw();
 }
 
 void ViewDrawingArea::on_gvlepointer_button_1(graph::Model* mdl,
@@ -796,7 +799,7 @@ void ViewDrawingArea::on_gvlepointer_button_1(graph::Model* mdl,
             mView->clearSelectedModels();
         }
     }
-    queue_draw();
+    queueRedraw();
 }
 
 void ViewDrawingArea::delUnderMouse(int x, int y)
@@ -808,7 +811,7 @@ void ViewDrawingArea::delUnderMouse(int x, int y)
         delConnection(x, y);
     }
 
-    queue_draw();
+    queueRedraw();
 }
 
 void ViewDrawingArea::getCurrentModelInPosition(const std::string& port, int& x,
@@ -867,7 +870,7 @@ void ViewDrawingArea::addLinkOnButtonPress(int x, int y)
     } else {
         mView->addModelToSelectedModels(mCurrent);
     }
-    queue_draw();
+    queueRedraw();
 }
 
 void ViewDrawingArea::addLinkOnMotion(int x, int y)
@@ -887,7 +890,7 @@ void ViewDrawingArea::addLinkOnMotion(int x, int y)
             mMouse.set_y(mdl->y() + mdl->height() / 2);
             mView->addDestinationModel(mdl);
         }
-        queue_draw();
+        queueRedraw();
     }
 }
 
@@ -902,7 +905,7 @@ void ViewDrawingArea::addLinkOnButtonRelease(int x, int y)
     }
     mView->clearSelectedModels();
     mView->addDestinationModel(NULL);
-    queue_draw();
+    queueRedraw();
 }
 
 
@@ -1039,7 +1042,7 @@ void ViewDrawingArea::newSize()
     int tHeight = (int)(mHeight * mZoom);
     set_size_request(tWidth, tHeight);
     mBuffer = Gdk::Pixmap::create(mWin, tWidth, tHeight, -1);
-    queue_draw();
+    queueRedraw();
 }
 
 void ViewDrawingArea::onZoom(int button)
