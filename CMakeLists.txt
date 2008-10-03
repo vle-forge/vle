@@ -230,7 +230,7 @@ IF(CMAKE_MAJOR_VERSION MATCHES "2" AND CMAKE_MINOR_VERSION MATCHES "6")
     SET(CPACK_NSIS_MENU_LINKS
       "${VLE_SHARE_DIRS}/doc/html/index.html" "VLE API"
       "http://vle.univ-littoral.fr" "VLE Web Site")
-    SET(CPACK_CREATE_DESKTOP_LINKS "GVLE" "VLE")
+    SET(CPACK_CREATE_DESKTOP_LINKS gvle)
     SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\vle.exe")
     SET(CPACK_NSIS_DISPLAY_NAME "VLE - Virtual Laboraory Environment")
     SET(CPACK_NSIS_HELP_LINK "http://vle.univ-littoral.fr")
