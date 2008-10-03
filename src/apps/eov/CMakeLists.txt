@@ -15,7 +15,11 @@ LINK_DIRECTORIES(
   ${GTKMM_LIBRARY_DIRS}
   ${GTHREAD_INCLUDE_DIRS})
 
-ADD_EXECUTABLE(eov main.cpp OptionGroup.cpp OptionGroup.hpp)
+IF (WIN32)
+  ADD_EXECUTABLE(eov WIN32 main.cpp OptionGroup.cpp OptionGroup.hpp)
+ELSE (WIN32)
+  ADD_EXECUTABLE(eov main.cpp OptionGroup.cpp OptionGroup.hpp)
+ENDIF (WIN32)
 
 SET_TARGET_PROPERTIES(eov PROPERTIES ${VLE_APP_PROPERTIES})
 
