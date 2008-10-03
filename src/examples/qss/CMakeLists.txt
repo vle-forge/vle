@@ -36,6 +36,7 @@ INSTALL(TARGETS ladybirdplantlouse
   RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/simulator"
   LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/simulator")
 
-INSTALL(FILES qss_exp1_txt.vpz qss_exp1.vpz qss_exp2_txt.vpz qss_exp2.vpz
-  qss_exp3_txt.vpz qss_exp3.vpz qss_exp4_txt.vpz qss_exp4.vpz qss_exp5.vpz
+INSTALL(FILES qss_exp1_txt.vpz qss_exp1_test.vpz qss_exp1.vpz
+  qss_exp2_txt.vpz qss_exp2.vpz qss_exp3_txt.vpz qss_exp3_test.vpz
+   qss_exp3.vpz qss_exp4_txt.vpz qss_exp4.vpz qss_exp5.vpz
   qss_exp6.vpz qss_exp7.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")

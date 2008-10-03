@@ -1,15 +1,15 @@
 <?xml version="1.0" ?>
 <!DOCTYPE vle_project PUBLIC "" "http://vle.univ-littoral.fr/vle-0.5.0.dtd" >
 <vle_project version="0.1" date="" author="PC" >
-  <structures>  
+  <structures>
     <model name="top" type="coupled">
       <submodels>
 	<model name="smartgardener" type="atomic"
 		conditions="cond_smartgardener" dynamics="dyn_smartgardener" >
-	  <in>	
+	  <in>
 	    <port name="xy" />
 	  </in>
-	  <out>	
+	  <out>
 	    <port name="out_ladybird" />
 	    <port name="out_plantlouse" />
 	    <port name="inst_labybird" />
@@ -17,34 +17,34 @@
 	  </out>
 	</model>
 	<model name="bio" type="coupled">
-	  <in>	
+	  <in>
 	    <port name="in_plantlouse" />
 	    <port name="in_ladybird" />
 	    <port name="inst_plantlouse" />
 	    <port name="inst_labybird" />
 	  </in>
-	  <out>	
+	  <out>
 	    <port name="response" />
 	  </out>
 	  <submodels>
 	    <model name="plantlousepest" type="atomic" conditions="cond_plantlousepest" dynamics="dyn_plantlousepest" observables="obs_plantlousepest" >
-	      <in>	
+	      <in>
 		<port name="update" />
 		<port name="request" />
 		<port name="perturb" />
 	      </in>
-	      <out>	
+	      <out>
 		<port name="update" />
 		<port name="response" />
 	      </out>
 	    </model>
 	    <model name="ladybirdpest" type="atomic" conditions="cond_ladybirdpest" dynamics="dyn_ladybirdpest" observables="obs_ladybirdpest" >
-	      <in>	
+	      <in>
 		<port name="update" />
 		<port name="request" />
 		<port name="perturb" />
 	      </in>
-	      <out>	
+	      <out>
 		<port name="update" />
 		<port name="response" />
 	      </out>
@@ -58,7 +58,7 @@
 	    <connection type="input">
 	      <origin model="bio" port="in_ladybird" />
 	      <destination model="ladybirdpest" port="perturb" />
-	    </connection> 
+	    </connection>
 	    <connection type="input">
 	      <origin model="bio" port="inst_plantlouse" />
 	      <destination model="plantlousepest" port="request" />
@@ -120,7 +120,7 @@
       <condition name="cond_plantlousepest">
 	<port name="a"><double>.5</double></port>
 	<port name="b"><double>0.01</double></port>
-	<port name="delta"><double>0.1</double></port>
+	<port name="time-step"><double>0.1</double></port>
 	<port name="multiple"><integer>1</integer></port>
 	<port name="name"><string>x</string></port>
 	<port name="value"><double>5000.0</double></port>
@@ -135,12 +135,12 @@
 	<port name="value"><double>45.0</double></port>
       </condition>
       <condition name="cond_smartgardener">
-	<port name="s"><double>2000</double></port>	
+	<port name="s"><double>2000</double></port>
 	<port name="p_p">
 	  <double>0.25</double>
-	</port>	
-	<port name="p_l"><double>1</double></port>	
-	<port name="d"><double>5</double></port>	
+	</port>
+	<port name="p_l"><double>1</double></port>
+	<port name="d"><double>5</double></port>
       </condition>
     </conditions>
     <views>
@@ -154,11 +154,11 @@
 	  </port>
 	</observable>
 	<observable name="obs_ladybirdpest">
-	  <port name="y">	
+	  <port name="y">
 	    <attachedview name="lavue" />
-	  </port>	
+	  </port>
 	</observable>
-      </observables>	
+      </observables>
       <view name="lavue" type="timed" timestep=".01" output="o" />
     </views>
   </experiment>

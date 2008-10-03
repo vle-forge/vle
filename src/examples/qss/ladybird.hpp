@@ -26,11 +26,11 @@
 #ifndef VLE_TUTORIAL_0_LADYBIRD_HPP
 #define VLE_TUTORIAL_0_LADYBIRD_HPP
 
-#include <vle/extension/DESS.hpp>
+#include <vle/extension/QSS.hpp>
 
 namespace vle { namespace examples { namespace qss {
 
-    class Ladybird : public extension::DESS
+    class Ladybird : public extension::qss
     {
     public:
         Ladybird(const graph::AtomicModel& model,
@@ -43,7 +43,7 @@ namespace vle { namespace examples { namespace qss {
     private:
         double b;
         double d;
-        double e; 
+        double e;
     };
 
 }}} // namespace vle examples qss

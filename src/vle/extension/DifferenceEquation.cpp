@@ -175,7 +175,8 @@ bool DifferenceEquation::initExternalVariable(const std::string& name,
         mValues[name] = std::deque < std::pair < double, double > >();
         // récupération du delta de ma dépendance,
         // c'est utilisé si delta n'a pas été initialisé
-        timeStep = event.getDoubleAttributeValue("time-step");
+	if (event.existAttributeValue("time-step"))
+	    timeStep = event.getDoubleAttributeValue("time-step");
     }
     // ma dépendance ne connait pas son pas de temps
     else {
@@ -480,9 +481,9 @@ void DifferenceEquation::externalTransition(const ExternalEventList& event,
                 // vérifier que j'ai bien tout reçu et je
                 // pourrais alors lancer mon propre calcul
                 if (mState == PRE and end) ++mReceive;
-            }	
+            }
         }
-        ++it;	
+        ++it;
     }
     // je suis en phase d'initialisation
     if (mState == INIT) {
