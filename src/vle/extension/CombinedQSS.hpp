@@ -42,9 +42,7 @@ namespace vle { namespace extension {
         CombinedQss(const graph::AtomicModel& model,
                     const devs::InitEventList& event);
 
-        virtual ~CombinedQss() { }
-
-        virtual void finish();
+        virtual ~CombinedQss();
 
         virtual devs::Time init(const devs::Time& /* time */);
 

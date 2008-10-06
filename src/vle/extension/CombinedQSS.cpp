@@ -65,12 +65,12 @@ CombinedQss::CombinedQss(const AtomicModel& model,
 
     const value::Set& variables = value::toSetValue(events.get("variables"));
     unsigned int index;
-    
+
     for (index = 0; index < variables->size(); ++index) {
         const value::Set& tab(value::toSetValue(variables->getValue(index)));
 	std::string name = value::toString(tab->getValue(0));
-	double init = value::toDouble(tab->getValue(1));        
-	double precision = value::toDouble(tab->getValue(2));        
+	double init = value::toDouble(tab->getValue(1));
+	double precision = value::toDouble(tab->getValue(2));
         mVariableIndex[name] = index;
         mVariableName[index] = name;
         mVariablePrecision[index] = precision;
@@ -85,6 +85,16 @@ CombinedQss::CombinedQss(const AtomicModel& model,
     mSigma = new Time[index];
     mLastTime = new Time[index];
     mState = new state[index];
+}
+
+CombinedQss::~CombinedQss()
+{
+    delete[] mGradient;
+    delete[] mValue;
+    delete[] mIndex;
+    delete[] mSigma;
+    delete[] mLastTime;
+    delete[] mState;
 }
 
 void CombinedQss::updateSigma(unsigned int i)
@@ -125,20 +135,10 @@ void CombinedQss::reset(const Time& time, unsigned int i, double value)
     setIndex(i, (long)(floor(getValue(i)/mVariablePrecision[i])));
     setLastTime(i, time);
     setGradient(i, compute(i, time));
-    updateSigma(i);    
+    updateSigma(i);
 }
 
 // DEVS Methods
-
-void CombinedQss::finish()
-{
-    delete[] mGradient;
-    delete[] mValue;
-    delete[] mIndex;
-    delete[] mSigma;
-    delete[] mLastTime;
-    delete[] mState;
-}
 
 Time CombinedQss::init(const Time& /* time */)
 {
@@ -240,8 +240,8 @@ void CombinedQss::internalTransition(const Time& time)
                 setValue(i, getValue(i) + (time -
                                            getLastTime(i)).getValue() *
                          getGradient(i));
-            else 
-                setValue(mCurrentModel, d(mCurrentModel, 
+            else
+                setValue(mCurrentModel, d(mCurrentModel,
                                          getIndex(mCurrentModel)));
 
         // Propagation ou non de la nouvelle valeur
@@ -249,7 +249,7 @@ void CombinedQss::internalTransition(const Time& time)
             // si oui alors on va attendre les valeurs
             // actualisées de toutes mes variables externes
             setState(mCurrentModel, POST);
-            setSigma(mCurrentModel, Time::infinity); 
+            setSigma(mCurrentModel, Time::infinity);
         } else {
             // sinon on passe au pas suivant
 
@@ -314,11 +314,11 @@ void CombinedQss::externalTransition(const ExternalEventList& event,
                        mVariableIndex.end(), boost::format(
                            "Combined Qss update, invalid variable name: %1%") %
                        name);
-                setExternalValue(name, value);		
+                setExternalValue(name, value);
                 if (mIsGradient[mExternalVariableIndex[name]])
                     setExternalGradient(name,
                                         (*it)->getDoubleAttributeValue("gradient"));
-            }	    
+            }
             // c'est une perturbation sur une variable interne
             if ((*it)->onPort("perturb")) {
                 Assert(utils::InternalError, mVariableIndex.find(name) !=
@@ -350,11 +350,11 @@ void CombinedQss::externalTransition(const ExternalEventList& event,
                     setGradient(i, compute(i, time));
 
                     setSigma(i, 0);
-                    setState(i, POST3);		
+                    setState(i, POST3);
                 }
             }
         }
-        minSigma();	
+        minSigma();
     }
 }
 
