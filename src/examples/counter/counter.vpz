@@ -1,10 +1,10 @@
-<?xml version="1.0"?>
-<!DOCTYPE vle_project SYSTEM "http://vle.univ-littoral.fr/vle-0.5.0.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://vle.univ-littoral.fr/vle-0.6.0.dtd">
 <vle_project version="0.5" date="" author="Eric Ramat, Gauthier Quesnel">
  <structures>
   <model name="m" type="coupled">
    <submodels>
-    <model name="m1" type="atomic" conditions="m1" dynamics="m1" >
+    <model name="m1" type="atomic" conditions="m1" dynamics="m1">
      <out>
       <port name="out"/>
      </out>
@@ -27,29 +27,35 @@
   </model>
  </structures>
  <dynamics>
-  <dynamic name="m1" library="generator" />
-  <dynamic name="m2" library="counter" />
+  <dynamic name="m1" library="generator"/>
+  <dynamic name="m2" library="counter"/>
  </dynamics>
  <experiment name="experimentcounter" duration="1000" seed="123456789">
   <conditions>
    <condition name="m1">
-   <port name="formalism"><string>normal</string></port>
-   <port name="average"><double>.01</double></port>
-   <port name="stdvariation"><double>.5</double></port>
+    <port name="formalism">
+     <string>normal</string>
+    </port>
+    <port name="average">
+     <double>.01</double>
+    </port>
+    <port name="stdvariation">
+     <double>.5</double>
+    </port>
    </condition>
   </conditions>
   <views>
    <outputs>
-    <output name="o" format="local" plugin="text" />
+    <output name="o" format="local" plugin="text"/>
    </outputs>
    <observables>
     <observable name="obs1">
      <port name="c">
-      <attachedview name="view1" />
+      <attachedview name="view1"/>
      </port>
     </observable>
    </observables>
-   <view name="view1" type="timed" timestep="1" output="o" />
+   <view name="view1" type="timed" timestep="1" output="o"/>
   </views>
  </experiment>
 </vle_project>

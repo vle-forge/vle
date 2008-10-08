@@ -71,7 +71,9 @@
   name CDATA #REQUIRED
   library CDATA #REQUIRED
   location CDATA #IMPLIED
-  model CDATA #IMPLIED >
+  model CDATA #IMPLIED
+  type CDATA #IMPLIED
+  language CDATA #IMPLIED >
 
 <!ATTLIST class
   name CDATA #REQUIRED >

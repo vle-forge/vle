@@ -1,75 +1,75 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://vle.univ-littoral.fr/vle-0.5.0.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://vle.univ-littoral.fr/vle-0.6.0.dtd">
 <vle_project version="0.5" date="lun, 30 jun 2008 15:36:03 +0200" author="Gauthier Quesnel">
  <structures>
-  <model name="top" type="coupled" width="589" height="432"  >
+  <model name="top" type="coupled" width="589" height="432">
    <submodels>
-    <model name="PetriNet" type="atomic" conditions="petrinet" dynamics="petri" observables="petri" x="272" y="149" width="100" height="75" >
+    <model name="PetriNet" type="atomic" conditions="petrinet" dynamics="petri" observables="petri" x="272" y="149" width="100" height="75">
      <in>
-      <port name="t1" />
-      <port name="t2" />
+      <port name="t1"/>
+      <port name="t2"/>
      </in>
      <out>
-      <port name="p3" />
+      <port name="p3"/>
      </out>
     </model>
-    <model name="beepA" type="atomic" conditions="beepa" dynamics="beep" x="108" y="116" width="100" height="45" >
+    <model name="beepA" type="atomic" conditions="beepa" dynamics="beep" x="108" y="116" width="100" height="45">
      <out>
-      <port name="out" />
+      <port name="out"/>
      </out>
     </model>
-    <model name="beepB" type="atomic" conditions="beepb" dynamics="beep" x="92" y="261" width="100" height="45" >
+    <model name="beepB" type="atomic" conditions="beepb" dynamics="beep" x="92" y="261" width="100" height="45">
      <out>
-      <port name="out" />
+      <port name="out"/>
      </out>
     </model>
-    <model name="counter" type="atomic" dynamics="counter" observables="cnt" >
+    <model name="counter" type="atomic" dynamics="counter" observables="cnt">
      <in>
-      <port name="in" />
+      <port name="in"/>
      </in>
     </model>
    </submodels>
    <connections>
     <connection type="internal">
-     <origin model="beepA" port="out" />
-     <destination model="PetriNet" port="t1" />
+     <origin model="beepA" port="out"/>
+     <destination model="PetriNet" port="t1"/>
     </connection>
     <connection type="internal">
-     <origin model="beepB" port="out" />
-     <destination model="PetriNet" port="t2" />
+     <origin model="beepB" port="out"/>
+     <destination model="PetriNet" port="t2"/>
     </connection>
     <connection type="internal">
-     <origin model="PetriNet" port="p3" />
-     <destination model="counter" port="in" />
+     <origin model="PetriNet" port="p3"/>
+     <destination model="counter" port="in"/>
     </connection>
    </connections>
   </model>
  </structures>
  <dynamics>
-  <dynamic name="beep" library="petrinet" model="Beep"  />
-  <dynamic name="petri" library="petrinet" model="Ordinary"  />
-  <dynamic name="counter" library="petrinet" model="Counter"  />
+  <dynamic name="beep" library="petrinet" model="Beep"/>
+  <dynamic name="petri" library="petrinet" model="Ordinary"/>
+  <dynamic name="counter" library="petrinet" model="Counter"/>
  </dynamics>
- <experiment name="PetriNetNand1" duration="1" seed="123" >
+ <experiment name="PetriNetNand1" duration="1" seed="123">
   <conditions>
-   <condition name="beepa" >
-    <port name="start" >
+   <condition name="beepa">
+    <port name="start">
      <double>0.5</double>
     </port>
-    <port name="timestep" >
+    <port name="timestep">
      <double>1.0</double>
     </port>
    </condition>
-   <condition name="beepb" >
-    <port name="start" >
+   <condition name="beepb">
+    <port name="start">
      <double>0.75</double>
     </port>
-    <port name="timestep" >
+    <port name="timestep">
      <double>1.0</double>
     </port>
    </condition>
-   <condition name="petrinet" >
-    <port name="places" >
+   <condition name="petrinet">
+    <port name="places">
      <set>
       <set>
        <string>p1</string>
@@ -83,7 +83,7 @@
       </set>
      </set>
     </port>
-    <port name="transitions" >
+    <port name="transitions">
      <set>
       <set>
        <string>t1</string>
@@ -125,7 +125,7 @@
       </set>
      </set>
     </port>
-    <port name="initialMarkings" >
+    <port name="initialMarkings">
      <set>
       <set>
        <string>p1</string>
@@ -145,27 +145,27 @@
   </conditions>
   <views>
    <outputs>
-    <output name="out" location="" format="local" plugin="text" />
+    <output name="out" location="" format="local" plugin="text"/>
    </outputs>
    <observables>
-    <observable name="cnt" >
-     <port name="number" >
-      <attachedview name="view" />
+    <observable name="cnt">
+     <port name="number">
+      <attachedview name="view"/>
      </port>
-     <port name="date" >
-      <attachedview name="view" />
+     <port name="date">
+      <attachedview name="view"/>
      </port>
     </observable>
-    <observable name="petri" >
-     <port name="marking" >
-      <attachedview name="view" />
+    <observable name="petri">
+     <port name="marking">
+      <attachedview name="view"/>
      </port>
-     <port name="token" >
-      <attachedview name="view" />
+     <port name="token">
+      <attachedview name="view"/>
      </port>
     </observable>
    </observables>
-   <view name="view" output="out" type="timed" timestep="0.1" />
+   <view name="view" output="out" type="timed" timestep="0.1"/>
   </views>
  </experiment>
 </vle_project>

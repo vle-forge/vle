@@ -1,50 +1,48 @@
-<?xml version="1.0"?>
-<!DOCTYPE vle_project SYSTEM "http://vle.univ-littoral.fr/vle-0.5.0.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://vle.univ-littoral.fr/vle-0.6.0.dtd">
 <vle_project version="0.5" date="" author="Gauthier Quesnel">
  <structures>
   <model name="top" type="coupled">
    <submodels>
-    <model name="executive" type="atomic" dynamics="executive"
-           observables="obs2" />
-    <model name="counter" type="atomic" dynamics="counter"
-           observables="obs1">
+    <model name="executive" type="atomic" dynamics="executive" observables="obs2"/>
+    <model name="counter" type="atomic" dynamics="counter" observables="obs1">
      <in>
-      <port name="in" />
+      <port name="in"/>
      </in>
      <out>
-      <port name="out" />
+      <port name="out"/>
      </out>
     </model>
    </submodels>
   </model>
  </structures>
  <dynamics>
-  <dynamic name="executive" library="gens" model="executive" />
-  <dynamic name="counter" library="gens" model="counter" />
+  <dynamic name="executive" library="gens" model="executive"/>
+  <dynamic name="counter" library="gens" model="counter"/>
  </dynamics>
  <experiment name="generatorexecutive" duration="100.0" seed="123">
   <views>
    <outputs>
     <output name="o" format="local" plugin="text"/>
-    <output name="o2" format="local" plugin="text" />
+    <output name="o2" format="local" plugin="text"/>
    </outputs>
    <observables>
     <observable name="obs1">
      <port name="c">
-      <attachedview name="view1" />
+      <attachedview name="view1"/>
      </port>
     </observable>
     <observable name="obs2">
      <port name="nbmodel">
-      <attachedview name="view1" />
+      <attachedview name="view1"/>
      </port>
      <port name="structure">
-      <attachedview name="view2" />
+      <attachedview name="view2"/>
      </port>
     </observable>
    </observables>
-   <view name="view1" type="timed" timestep="1" output="o" />
-   <view name="view2" type="timed" timestep="1" output="o2" />
+   <view name="view1" type="timed" timestep="1" output="o"/>
+   <view name="view2" type="timed" timestep="1" output="o2"/>
   </views>
  </experiment>
 </vle_project>

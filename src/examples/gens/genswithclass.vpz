@@ -1,63 +1,61 @@
-<?xml version="1.0"?>
-<!DOCTYPE vle_project SYSTEM "http://vle.univ-littoral.fr/vle-0.5.0.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://vle.univ-littoral.fr/vle-0.6.0.dtd">
 <vle_project version="0.5" date="" author="Gauthier Quesnel">
  <structures>
   <model name="top" type="coupled">
    <submodels>
-    <model name="executive" type="atomic" dynamics="executive"
-     observables="obs2" />
-    <model name="counter" type="atomic" dynamics="counter"
-     observables="obs1">
+    <model name="executive" type="atomic" dynamics="executive" observables="obs2"/>
+    <model name="counter" type="atomic" dynamics="counter" observables="obs1">
      <in>
-      <port name="in" />
+      <port name="in"/>
      </in>
      <out>
-      <port name="out" />
+      <port name="out"/>
      </out>
     </model>
    </submodels>
   </model>
  </structures>
  <dynamics>
-  <dynamic name="executive" library="gens" model="executiveclass" />
-  <dynamic name="counter" library="gens" model="counter" />
-  <dynamic name="gensbeep" library="gens" model="beep" />
+  <dynamic name="executive" library="gens" model="executiveclass"/>
+  <dynamic name="counter" library="gens" model="counter"/>
+  <dynamic name="gensbeep" library="gens" model="beep"/>
  </dynamics>
  <classes>
   <class name="beepbeep">
    <model name="top" type="coupled">
     <out>
-     <port name="out" />
+     <port name="out"/>
     </out>
     <submodels>
      <model name="a" type="atomic" dynamics="gensbeep">
       <out>
-       <port name="out" />
+       <port name="out"/>
       </out>
      </model>
      <model name="b" type="atomic" dynamics="gensbeep">
       <out>
-       <port name="out" />
+       <port name="out"/>
       </out>
      </model>
      <model name="c" type="atomic" dynamics="gensbeep">
       <out>
-       <port name="out" />
+       <port name="out"/>
       </out>
      </model>
     </submodels>
     <connections>
      <connection type="output">
-      <origin model="a" port="out" />
-      <destination model="top" port="out" />
+      <origin model="a" port="out"/>
+      <destination model="top" port="out"/>
      </connection>
      <connection type="output">
-      <origin model="b" port="out" />
-      <destination model="top" port="out" />
+      <origin model="b" port="out"/>
+      <destination model="top" port="out"/>
      </connection>
      <connection type="output">
-      <origin model="c" port="out" />
-      <destination model="top" port="out" />
+      <origin model="c" port="out"/>
+      <destination model="top" port="out"/>
      </connection>
     </connections>
    </model>
@@ -65,77 +63,77 @@
   <class name="beepbeepbeep">
    <model name="top" type="coupled">
     <out>
-     <port name="out" />
+     <port name="out"/>
     </out>
     <submodels>
      <model name="a" type="atomic" dynamics="gensbeep">
       <out>
-       <port name="out" />
+       <port name="out"/>
       </out>
      </model>
      <model name="b" type="atomic" dynamics="gensbeep">
       <out>
-       <port name="out" />
+       <port name="out"/>
       </out>
      </model>
      <model name="c" type="atomic" dynamics="gensbeep">
       <out>
-       <port name="out" />
+       <port name="out"/>
       </out>
      </model>
      <model name="d" type="coupled">
       <out>
-       <port name="out" />
+       <port name="out"/>
       </out>
       <submodels>
        <model name="a" type="atomic" dynamics="gensbeep">
-	<out>
-	 <port name="out" />
-	</out>
+        <out>
+         <port name="out"/>
+        </out>
        </model>
        <model name="b" type="atomic" dynamics="gensbeep">
-	<out>
-	 <port name="out" />
-	</out>
+        <out>
+         <port name="out"/>
+        </out>
        </model>
        <model name="c" type="atomic" dynamics="gensbeep">
-	<out>
-	 <port name="out" />
-	</out>
+        <out>
+         <port name="out"/>
+        </out>
        </model>
       </submodels>
       <connections>
        <connection type="output">
-	<origin model="a" port="out" />
-	<destination model="d" port="out" />
+        <origin model="a" port="out"/>
+        <destination model="d" port="out"/>
        </connection>
        <connection type="output">
-	<origin model="b" port="out" />
-	<destination model="d" port="out" />
+        <origin model="b" port="out"/>
+        <destination model="d" port="out"/>
        </connection>
        <connection type="output">
-	<origin model="c" port="out" />
-	<destination model="d" port="out" />
+        <origin model="c" port="out"/>
+        <destination model="d" port="out"/>
        </connection>
       </connections>
      </model>
     </submodels>
     <connections>
      <connection type="output">
-      <origin model="a" port="out" />
-      <destination model="top" port="out" />
+      <origin model="a" port="out"/>
+      <destination model="top" port="out"/>
      </connection>
      <connection type="output">
-      <origin model="b" port="out" />
-      <destination model="top" port="out" />
+      <origin model="b" port="out"/>
+      <destination model="top" port="out"/>
      </connection>
      <connection type="output">
-      <origin model="c" port="out" />
-      <destination model="top" port="out" />
+      <origin model="c" port="out"/>
+      <destination model="top" port="out"/>
      </connection>
      <connection type="output">
-      <origin model="d" port="out" />
-      <destination model="top" port="out" />
+      <origin model="d" port="out"/>
+      <destination model="top" port="out"/>
      </connection>
     </connections>
    </model>
@@ -145,25 +143,25 @@
   <views>
    <outputs>
     <output name="o" format="local" plugin="text"/>
-    <output name="o2" format="local" plugin="text" />
+    <output name="o2" format="local" plugin="text"/>
    </outputs>
    <observables>
     <observable name="obs1">
      <port name="c">
-      <attachedview name="view1" />
+      <attachedview name="view1"/>
      </port>
     </observable>
     <observable name="obs2">
      <port name="nbmodel">
-      <attachedview name="view1" />
+      <attachedview name="view1"/>
      </port>
      <port name="structure">
-      <attachedview name="view2" />
+      <attachedview name="view2"/>
      </port>
     </observable>
    </observables>
-   <view name="view1" type="timed" timestep="1" output="o" />
-   <view name="view2" type="timed" timestep="1" output="o2" />
+   <view name="view1" type="timed" timestep="1" output="o"/>
+   <view name="view2" type="timed" timestep="1" output="o2"/>
   </views>
  </experiment>
 </vle_project>

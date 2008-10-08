@@ -272,7 +272,7 @@ void check_classes_unittest_vpz(const vpz::Classes& cls)
 void check_unittest_vpz(const vpz::Vpz& file)
 {
     BOOST_REQUIRE_EQUAL(file.project().author(), "Gauthier Quesnel");
-    BOOST_REQUIRE_EQUAL(file.project().version(), "0.5");
+    BOOST_REQUIRE_EQUAL(file.project().version(), "0.6");
 
     const vpz::Model& model(file.project().model());
     check_model_unittest_vpz(model);

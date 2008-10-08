@@ -1,68 +1,91 @@
-<?xml version="1.0" ?>
-<!DOCTYPE vle_project PUBLIC "" "http://vle.univ-littoral.fr/vle-0.5.0.dtd" >
-<vle_project version="0.1" date="" author="PC" >
-  <structures>
-    <model name="top" type="coupled">
-      <submodels> 
-	<model name="ladybird" type="atomic" conditions="cond_ladybird"
-	  dynamics="dyn_ladybird" observables="obs_ladybird" >
-	  <in>
-	    <port name="update" />
-	  </in>
-	  <out>
-	    <port name="update" />
-	  </out>
-	</model>
-	<model name="plantlouse" type="atomic" conditions="cond_plantlouse"
-	  dynamics="dyn_plantlouse" observables="obs_plantlouse" >
-	  <in>
-	    <port name="update" />
-	  </in>
-	  <out>
-	    <port name="update" />
-	  </out>
-	</model>
-      </submodels>
-      <connections>
-	<connection type="internal">
-	  <origin model="ladybird" port="update" />
-	  <destination model="plantlouse" port="update" />
-	</connection>
-	<connection type="internal">
-	  <origin model="plantlouse" port="update" />
-	  <destination model="ladybird" port="update" />
-	</connection>
-      </connections>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://vle.univ-littoral.fr/vle-0.6.0.dtd">
+<vle_project version="0.1" date="" author="PC">
+ <structures>
+  <model name="top" type="coupled">
+   <submodels>
+    <model name="ladybird" type="atomic" conditions="cond_ladybird" dynamics="dyn_ladybird" observables="obs_ladybird">
+     <in>
+      <port name="update"/>
+     </in>
+     <out>
+      <port name="update"/>
+     </out>
     </model>
-  </structures>
-  <dynamics>
-    <dynamic name="dyn_ladybird" library="ladybirdplantlouse" model="ladybird" />
-    <dynamic name="dyn_plantlouse" library="ladybirdplantlouse" model="plantlouse" />
-  </dynamics>
-  <experiment name="exp1" duration="100" seed="123">
-    <conditions>
-      <condition name="cond_plantlouse">
-	<port name="a"><double>.5</double></port>
-	<port name="b"><double>0.01</double></port>
-	<port name="precision"><double>1</double></port>
-	<port name="threshold"><double>1e-10</double></port>
-	<port name="name"><string>x</string></port>
-	<port name="value"><double>5000.0</double></port>
-      </condition>
-      <condition name="cond_ladybird">
-	<port name="b"><double>0.01</double></port>
-	<port name="d"><double>0.01</double></port>
-	<port name="e"><double>0.2</double></port>
-	<port name="precision"><double>.1</double></port>
-	<port name="threshold"><double>1e-10</double></port>
-	<port name="name"><string>y</string></port>
-	<port name="value"><double>45.0</double></port>
-      </condition>
-    </conditions>
-    <views>
-      <outputs>
-	<output name="o1" format="distant" plugin="cairoplot"
-		location="localhost:8000:." >
+    <model name="plantlouse" type="atomic" conditions="cond_plantlouse" dynamics="dyn_plantlouse" observables="obs_plantlouse">
+     <in>
+      <port name="update"/>
+     </in>
+     <out>
+      <port name="update"/>
+     </out>
+    </model>
+   </submodels>
+   <connections>
+    <connection type="internal">
+     <origin model="ladybird" port="update"/>
+     <destination model="plantlouse" port="update"/>
+    </connection>
+    <connection type="internal">
+     <origin model="plantlouse" port="update"/>
+     <destination model="ladybird" port="update"/>
+    </connection>
+   </connections>
+  </model>
+ </structures>
+ <dynamics>
+  <dynamic name="dyn_ladybird" library="ladybirdplantlouse" model="ladybird"/>
+  <dynamic name="dyn_plantlouse" library="ladybirdplantlouse" model="plantlouse"/>
+ </dynamics>
+ <experiment name="exp1" duration="100" seed="123">
+  <conditions>
+   <condition name="cond_plantlouse">
+    <port name="a">
+     <double>.5</double>
+    </port>
+    <port name="b">
+     <double>0.01</double>
+    </port>
+    <port name="precision">
+     <double>1</double>
+    </port>
+    <port name="threshold">
+     <double>1e-10</double>
+    </port>
+    <port name="name">
+     <string>x</string>
+    </port>
+    <port name="value">
+     <double>5000.0</double>
+    </port>
+   </condition>
+   <condition name="cond_ladybird">
+    <port name="b">
+     <double>0.01</double>
+    </port>
+    <port name="d">
+     <double>0.01</double>
+    </port>
+    <port name="e">
+     <double>0.2</double>
+    </port>
+    <port name="precision">
+     <double>.1</double>
+    </port>
+    <port name="threshold">
+     <double>1e-10</double>
+    </port>
+    <port name="name">
+     <string>y</string>
+    </port>
+    <port name="value">
+     <double>45.0</double>
+    </port>
+   </condition>
+  </conditions>
+  <views>
+   <outputs>
+    <output name="o1" format="distant" plugin="cairoplot" location="localhost:8000:.">
           <![CDATA[
             <parameters>
 	      <curves>
@@ -78,8 +101,7 @@
 	    </parameters>
 	    ]]>
 	</output>
-	<output name="o2" format="distant" plugin="cairoplot"
-		location="localhost:8001:." >
+    <output name="o2" format="distant" plugin="cairoplot" location="localhost:8001:.">
           <![CDATA[
             <parameters>
 	      <curves>
@@ -95,21 +117,21 @@
 	    </parameters>
 	    ]]>
 	</output>
-      </outputs>
-      <observables>
-	<observable name="obs_plantlouse">
-	  <port name="x">
-	    <attachedview name="qssview1" />
-	  </port>
-	</observable>
-	<observable name="obs_ladybird">
-	  <port name="y">
-	    <attachedview name="qssview2" />
-	  </port>
-	</observable>
-      </observables>
-      <view name="qssview1" type="timed" timestep=".05" output="o1" />
-      <view name="qssview2" type="timed" timestep=".05" output="o2" />
-    </views>
-  </experiment>
+   </outputs>
+   <observables>
+    <observable name="obs_plantlouse">
+     <port name="x">
+      <attachedview name="qssview1"/>
+     </port>
+    </observable>
+    <observable name="obs_ladybird">
+     <port name="y">
+      <attachedview name="qssview2"/>
+     </port>
+    </observable>
+   </observables>
+   <view name="qssview1" type="timed" timestep=".05" output="o1"/>
+   <view name="qssview2" type="timed" timestep=".05" output="o2"/>
+  </views>
+ </experiment>
 </vle_project>
