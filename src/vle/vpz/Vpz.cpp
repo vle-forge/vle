@@ -49,7 +49,7 @@ void Vpz::write(std::ostream& out) const
     out << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
         << "<!DOCTYPE vle_project PUBLIC \"-//VLE TEAM//DTD Strict//EN\" "
         << "\"http://vle.univ-littoral.fr/vle-"
-        << VLE_MAJOR_VERSION << "." << VLE_MINOR_VERSION << "0.dtd\">\n";
+	<< VLE_MAJOR_VERSION << "." << VLE_MINOR_VERSION << ".0.dtd\">\n";
 
     m_project.write(out);
 }
