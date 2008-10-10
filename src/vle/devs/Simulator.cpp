@@ -59,7 +59,9 @@ void Simulator::clear()
 
 void Simulator::addDynamics(Dynamics* dynamics)
 {
-    if (m_dynamics) delete m_dynamics;
+    if (m_dynamics) {
+        delete m_dynamics;
+    }
     m_dynamics = dynamics;
 }
 
@@ -84,10 +86,11 @@ graph::AtomicModel* Simulator::getStructure() const
 
 graph::Model * Simulator::findModel(const std::string & name) const
 {
-    if (m_atomicModel and m_atomicModel->getName() == name)
+    if (m_atomicModel and m_atomicModel->getName() == name) {
         return (graph::Model *)m_atomicModel;
-    else
-	return 0;
+    } else {
+        return 0;
+    }
 }
 
 void Simulator::setLastTime(const Time& time)

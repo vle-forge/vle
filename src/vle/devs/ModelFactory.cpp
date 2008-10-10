@@ -130,7 +130,7 @@ void ModelFactory::createModel(Coordinator& coordinator,
                                const vpz::Strings& conditions,
                                const std::string& observable)
 {
-    const SimulatorMap& result(coordinator.modellist()); 
+    const SimulatorMap& result(coordinator.modellist());
     Simulator* sim = new Simulator(model);
     Assert(utils::InternalError, result.find(model) == result.end(),
            boost::format("The model %1% already exist in coordinator") %
@@ -313,7 +313,13 @@ void ModelFactory::attachDynamics(Coordinator& coordinator,
 	       % module->get_name() % Glib::Module::get_last_error());
 
         function fct(utils::pointer_to_function < function >(makeNewDynamics));
-        call = fct(*atom->getStructure(), events);
+        try {
+            call = fct(*atom->getStructure(), events);
+        } catch(const std::exception& e) {
+            Throw(utils::ModellingError,
+                    (boost::format("%1%: %2%") % atom->getName() %
+                     e.what()).str());
+        }
         Assert(utils::ParseError, call, boost::format(
 	       "Error in '%1%', function 'makeNewDynamics':"
 	       "problem allocation a new Dynamics: '%2%'\n") %
@@ -326,9 +332,15 @@ void ModelFactory::attachDynamics(Coordinator& coordinator,
 	       "Error in '%1%', function '%2%' not found: '%3%'\n") %
                module->get_name() % functionanme %
                Glib::Module::get_last_error());
-      
+
         function fct(utils::pointer_to_function < function >(makeNewDynamics));
-        call = fct(*atom->getStructure(), events);
+        try {
+            call = fct(*atom->getStructure(), events);
+        } catch(const std::exception& e) {
+            Throw(utils::ModellingError,
+                  (boost::format("%1%: %2%") % atom->getName() %
+                   e.what()).str());
+        }
 
 	Assert(utils::ParseError, call, boost::format(
 	       "Error in '%1%', function '%2%':"
@@ -342,7 +354,7 @@ void ModelFactory::attachDynamics(Coordinator& coordinator,
     if (call->isExecutive()) {
         coordinator.setCoordinator(*(reinterpret_cast < Executive* >(call)));
     }
-    
+
     if (call->isWrapper()) {
         (reinterpret_cast < DynamicsWrapper*
          >(call))->setLibrary(dyn.library());

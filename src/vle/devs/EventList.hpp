@@ -39,14 +39,14 @@ namespace vle { namespace devs {
      */
     template < class Class >
     class EventList : public std::vector < Class* >
-    {   
+    {
     public:
-        /** 
+        /**
          * @brief Constructor to build and empty EventList.
          */
 	EventList() { }
 
-        /** 
+        /**
          * @brief This constructor is an helper function to build an EventList
          * and add a first event in it.
          * @param event the event to push.
@@ -54,7 +54,7 @@ namespace vle { namespace devs {
         EventList(Class* event)
         { addEvent(event); }
 
-        /** 
+        /**
          * @brief Add an event to the EventList. This function check if the
          * event is not null before add it.
          * @param event the event to push to the EventList.
@@ -66,7 +66,7 @@ namespace vle { namespace devs {
             }
         }
 
-        /** 
+        /**
          * @brief Delete all the event stored in the event list and clear the
          * list after.
          */

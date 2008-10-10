@@ -41,7 +41,7 @@ namespace vle { namespace devs {
     class Coordinator;
     class Simulator;
 
-    /** 
+    /**
      * @brief ModuleList is a cache for store the Glib::Module a get only
      * reference to build new devs::Dynamics without loading the dynamic library
      * if is was already loaded.
@@ -49,7 +49,7 @@ namespace vle { namespace devs {
     typedef std::map < std::string, Glib::Module* > ModuleList;
 
 
-    /** 
+    /**
      * @brief Module cache allow the store de Glib::Module of the ModelFactory.
      * Usefull to only store unique Glib::Module when using multiples instances
      * of a devs::Dynamics.
@@ -57,12 +57,12 @@ namespace vle { namespace devs {
     class ModuleCache
     {
     public:
-        /** 
+        /**
          * @brief Delete all the Glib::Module from the cache.
          */
         ~ModuleCache();
 
-        /** 
+        /**
          * @brief Add a new couple ModuleId, Glib::Module to the cache.
          * @param library The name of the library.
          * @param module The dynamic library.
@@ -70,7 +70,7 @@ namespace vle { namespace devs {
          */
         void add(const std::string& library, Glib::Module* module);
 
-        /** 
+        /**
          * @brief Check if a couple ModuleId, Glib::Module already exist into
          * the cache.
          * @param library The name of the library.
@@ -78,7 +78,7 @@ namespace vle { namespace devs {
          */
         bool exist(const std::string& library) const;
 
-        /** 
+        /**
          * @brief Get a reference to the loaded Glib::Module.
          * @param library The name of the library.
          * @return A reference to a loaded Glib::Module or 0 if the library is
@@ -89,7 +89,7 @@ namespace vle { namespace devs {
     private:
         ModuleList  m_lst;
 
-        /** 
+        /**
          * @brief A functor to delete all Glib::Module of
          * ModuleList::value_type. To use with the for_each algorith.
          */
@@ -107,9 +107,9 @@ namespace vle { namespace devs {
     class ModelFactory : boost::noncopyable
     {
     public:
-        /** 
+        /**
          * @brief Build a new ModelFactory using specified dynamics.
-         * 
+         *
          * @param sim the simulator attached to this ModelFactory.
          * @param dyn the root dynamics of vpz::Dynamics to load.
          * @param cls the vpz::classes to parse vpz::Dynamics to load.
@@ -120,12 +120,12 @@ namespace vle { namespace devs {
                      const vpz::AtomicModelList& atom,
                      RootCoordinator& root);
 
-        /** 
+        /**
          * @brief To delete all Glib::Module and class.
          */
         ~ModelFactory();
 
-        /** 
+        /**
          * @brief Return the reference to the list of initiale conditions for
          * each models.
          * @return A constant reference to the vpz::Conditions.
@@ -133,21 +133,21 @@ namespace vle { namespace devs {
         inline const vpz::Conditions& conditions() const
         { return mExperiment.conditions(); }
 
-        /** 
+        /**
          * @brief Return the reference to the list of views.
          * @return A constant reference to the vpz::Views.
          */
         inline const vpz::Views& views() const
         { return mExperiment.views(); }
 
-        /** 
+        /**
          * @brief Return the reference to the list of outputs.
          * @return A constant reference to the vpz::Outputs.
          */
         inline const vpz::Outputs& outputs() const
         { return mExperiment.views().outputs(); }
 
-        /** 
+        /**
          * @brief Return the reference to the experiment object.
          * @return A constant reference to the vpz::Experiment.
          */
@@ -157,38 +157,38 @@ namespace vle { namespace devs {
         //
         ///
         /// Manage the ModelFactory cache ie. Atomic Model information of
-        /// dynamics, conditions and observables value. 
+        /// dynamics, conditions and observables value.
         ///
         //
 
-        /** 
+        /**
          * @brief Remove all atomic model information that have no the tag
          * permantent in the VPZ format.
          */
         void cleanCache();
 
-        /** 
+        /**
          * @brief Add a permanent vpz::Dynamic into cache.
          * @param dynamics The new vpz::Dynamic to push into cache.
          * @throw utils::InternalError if dynamics already exist.
          */
         void addPermanent(const vpz::Dynamic& dynamics);
 
-        /** 
+        /**
          * @brief Add a permanent vpz::Condition into cache.
          * @param condition The new vpz::Condition to push into cache.
          * @throw utils::InternalError if condition already exist.
          */
         void addPermanent(const vpz::Condition& condition);
-        
-        /** 
+
+        /**
          * @brief Add a permanent vpz::Observable into cache.
          * @param observable The new vpz::Observable to push into cache.
          * @throw utils::InternalError if observable already exist.
          */
         void addPermanent(const vpz::Observable& observable);
 
-        /** 
+        /**
          * @brief Build a new devs::Simulator from the dynamics library. Attach
          * to this model information of dynamics, condition and observable.
          * @param model the graph::AtomicModel reference source of
@@ -205,7 +205,7 @@ namespace vle { namespace devs {
                          const vpz::Strings& conditions,
                          const std::string& observable);
 
-        /** 
+        /**
          * @brief Build a list of devs::Simulator from the dynamics library
          * corresponding to the atomic models from the specified graph
          * hierarchy.
@@ -214,7 +214,7 @@ namespace vle { namespace devs {
          */
         void createModels(Coordinator& coordinator, const vpz::Model& mdl);
 
-        /** 
+        /**
          * @brief Build a new devs::Simulator from the vpz::Classes information.
          * @param classname the name of the class to clone.
          * @param modelname the new name of the model.
@@ -234,7 +234,7 @@ namespace vle { namespace devs {
         RootCoordinator&        mRoot;
         ModuleCache             mModule;
 
-        /** 
+        /**
          * @brief Load a new Glib::Module plugin from dynamic parameter in
          * default model dir or user model dir.
          * @param dyn A reference to the dynamic to load.
@@ -243,7 +243,7 @@ namespace vle { namespace devs {
          */
         Glib::Module* buildPlugin(const vpz::Dynamic& dyn);
 
-        /** 
+        /**
          * @brief Load a new Glib::Module plugin for the specified dynamicname.
          * If dynamicname is not found in mDynamics variable it will search into
          * classes dynamics.
@@ -254,7 +254,7 @@ namespace vle { namespace devs {
          */
         Glib::Module* getPlugin(const std::string& dynamicname);
 
-        /** 
+        /**
          * @brief Attach to the specified devs::Simulator reference a
          * devs::Dynamics structures load from a new Glib::Module.
          * @param coordinator the coordinator where attach the dynamics.

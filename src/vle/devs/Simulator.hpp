@@ -60,16 +60,16 @@ namespace vle { namespace devs {
 
         void clear();
 
-        /** 
+        /**
          * @brief Return a constant reference to the devs::Dynamics.
-         * @return 
+         * @return
          */
         inline const Dynamics* dynamics() const
         { return m_dynamics; }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-        /** 
+        /**
          * @brief Call the init function of the Dynamics plugin and add the time
          * parameter to the value returned by the init() function of Dynamics
          * plugin.
@@ -89,10 +89,10 @@ namespace vle { namespace devs {
                                               const ExternalEventList& ees) const;
 
         InternalEvent* internalTransition(const InternalEvent& event);
-        
+
         InternalEvent* externalTransition(const ExternalEventList& event,
                                           const Time& time);
-        
+
         void request(const RequestEvent& event,
                      const Time& time,
                      ExternalEventList& output);

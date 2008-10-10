@@ -82,7 +82,7 @@ namespace vle { namespace devs {
 	 * @param event the init event list.
 	 */
         Dynamics(const vle::graph::AtomicModel& model,
-                 const vle::devs::InitEventList&  /* events */) : 
+                 const vle::devs::InitEventList&  /* events */) :
             m_model(model),
             m_rand(0)
         { }
@@ -143,7 +143,7 @@ namespace vle { namespace devs {
 	    const vle::devs::ExternalEventList& /* event */,
             const vle::devs::Time& /* time */)
         { }
-        
+
         /**
          * @brief Process the confluent transition: select the transition to
          * call when an internal and one or more external event appear in the
@@ -194,7 +194,7 @@ namespace vle { namespace devs {
 	  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-        /** 
+        /**
          * @brief If this function return true, then a cast to an Executive
          * object is produce and the set_coordinator function is call. Executive
          * permit to manipulate graph::CoupledModel and devs::Coordinator at
@@ -204,7 +204,7 @@ namespace vle { namespace devs {
         inline virtual bool isExecutive() const
         { return false; }
 
-        /** 
+        /**
          * @brief If this function return true, then a cast to a DynamicsWrapper
          * object is produce and the set_model and set_library function are call.
          * @return false if Dynamics is not a DynamicsWrapper.
@@ -229,7 +229,7 @@ namespace vle { namespace devs {
 	 *
 	 * @return name of the atomic model
 	 */
-        inline const std::string& getModelName() const 
+        inline const std::string& getModelName() const
         { return m_model.getName(); }
 
 	/**
@@ -259,7 +259,7 @@ namespace vle { namespace devs {
 	 *
 	 * @return the Boolean object
 	 */
-        inline vle::value::Value buildBoolean(bool value) const 
+        inline vle::value::Value buildBoolean(bool value) const
         { return value::BooleanFactory::create(value); }
 
 	/**
@@ -277,7 +277,7 @@ namespace vle { namespace devs {
 	 *
 	 * @return the empty event list
 	 */
-        vle::devs::ExternalEventList* noEvent() const 
+        vle::devs::ExternalEventList* noEvent() const
         { return new ExternalEventList(); }
 
 	/**
@@ -356,7 +356,7 @@ namespace vle { namespace devs {
 
         /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-        /** 
+        /**
          * @brief Return a reference to the RootCoordinator utils::Rand pseudo
          * random generator.
          * @return Return a reference to the utils::Rand object.

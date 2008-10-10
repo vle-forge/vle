@@ -36,7 +36,7 @@ value::Value ValueList::get(const std::string& name)
     iterator it;
     if ((it = m_lst.find(name)) == end()) {
         Throw(utils::ArgError, boost::format(
-                "Condition '%1%' does not exist") % name);
+                "Initialization port '%1%' does not exist") % name);
     }
     return it->second;
 }
@@ -48,7 +48,7 @@ void ValueList::add(const std::string& key, const value::Value& val)
     x = m_lst.insert(std::make_pair < std::string, value::Value >(key, val));
 
     Assert(utils::ArgError, x.second, boost::format(
-            "Condition '%1%' already exist") % key);
+            "Initialization port '%1%' already exist") % key);
 }
 
 const value::Value& ValueList::get(const std::string& name) const
@@ -56,7 +56,7 @@ const value::Value& ValueList::get(const std::string& name) const
     const_iterator it;
     if ((it = m_lst.find(name)) == end()) {
         Throw(utils::ArgError, boost::format(
-                "Condition '%1%' does not exist") % name);
+                "Initilization port '%1%' does not exist") % name);
     }
     return it->second;
 }

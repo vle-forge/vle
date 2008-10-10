@@ -45,7 +45,7 @@ namespace vle { namespace devs {
 	 * @param model the atomic model to which belongs the dynamics
 	 */
         DynamicsWrapper(const graph::AtomicModel& model,
-                        const devs::InitEventList& events) : 
+                        const devs::InitEventList& events) :
             Dynamics(model, events)
         { }
 
@@ -56,7 +56,7 @@ namespace vle { namespace devs {
         virtual ~DynamicsWrapper()
         { }
 
-        /** 
+        /**
          * @brief If this function return true, then a cast to a DynamicsWrapper
          * object is produce and the set_model and set_library function are
          * call.
@@ -65,13 +65,13 @@ namespace vle { namespace devs {
         inline virtual bool isWrapper() const
         { return true; }
 
-        /** 
+        /**
          * @brief Set the name of library
          */
         inline virtual void setLibrary(const std::string& library)
         { m_library = library; }
 
-        /** 
+        /**
          * @brief Set the name of model
          */
         inline virtual void setModel(const std::string& model)

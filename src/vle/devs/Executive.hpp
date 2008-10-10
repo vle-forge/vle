@@ -48,7 +48,7 @@ namespace vle { namespace devs {
 	 * @param model the atomic model to which belongs the dynamics
 	 */
         Executive(const graph::AtomicModel& model,
-                  const devs::InitEventList& events) : 
+                  const devs::InitEventList& events) :
             Dynamics(model, events),
             m_coordinator(0)
         { }
@@ -60,7 +60,7 @@ namespace vle { namespace devs {
         virtual ~Executive()
         { }
 
-        /** 
+        /**
          * @brief If this function return true, then a cast to an Executive
          * object is produce and the set_coordinator function is call. Executive
          * permit to manipulate graph::CoupledModel and devs::Coordinator at
@@ -70,7 +70,7 @@ namespace vle { namespace devs {
         inline virtual bool isExecutive() const
         { return true; }
 
-        /** 
+        /**
          * @brief Assign a coordinator to the Executive model to give access to
          * vle::graph, vle::devs and vle::vpz API.
          * @param coordinator A reference to the coordinator.
