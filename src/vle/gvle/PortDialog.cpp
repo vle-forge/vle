@@ -41,7 +41,7 @@ PortDialog::PortDialog(graph::Model* model, PortDialog::PortType type) :
         mModel(model),
         mPortType(type)
 {
-    AssertI(model);
+    assert(model);
 
     add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     Gtk::Button* ok = add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);

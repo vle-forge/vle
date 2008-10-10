@@ -55,7 +55,7 @@ ViewDrawingArea::ViewDrawingArea(View* view) :
         mZoom(1.0),
         mIsRealized(false)
 {
-    AssertI(view);
+    assert(view);
 
     set_events(Gdk::POINTER_MOTION_MASK | Gdk::BUTTON_MOTION_MASK |
                Gdk::BUTTON1_MOTION_MASK | Gdk::BUTTON2_MOTION_MASK |
@@ -755,7 +755,7 @@ void ViewDrawingArea::on_realize()
 {
     Gtk::DrawingArea::on_realize();
     mWin = get_window();
-    AssertI(mWin);
+    assert(mWin);
     mWingc = Gdk::GC::create(mWin);
     mBlack = get_style()->get_black_gc();
     mWhite = get_style()->get_white_gc();

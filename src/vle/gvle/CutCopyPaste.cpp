@@ -27,6 +27,7 @@
 #include <vle/gvle/Message.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Debug.hpp>
+#include <iostream>
 
 namespace vle
 {

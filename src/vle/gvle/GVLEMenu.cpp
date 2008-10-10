@@ -32,7 +32,7 @@ namespace vle { namespace gvle {
 
 GVLEMenu::GVLEMenu(GVLE* gvle)
 {
-    AssertI(gvle);
+    assert(gvle);
 
     makeMenuFile(gvle);
     makeMenuView(gvle);

@@ -37,7 +37,7 @@ namespace gvle {
 ModelTreeBox::ModelTreeBox(Modeling* m) :
         m_modeling(m)
 {
-    AssertI(m);
+    assert(m);
 
     set_title("Models tree");
     set_border_width(5);
@@ -62,7 +62,7 @@ ModelTreeBox::ModelTreeBox(Modeling* m) :
 
 void ModelTreeBox::parseModel(graph::Model* top)
 {
-    AssertI(top);
+    assert(top);
 
     m_refTreeModel->clear();
 

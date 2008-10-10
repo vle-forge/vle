@@ -85,7 +85,7 @@ bool AtomicModelBox::InputPortTreeView::on_button_press_event(
 
 void AtomicModelBox::InputPortTreeView::build()
 {
-    AssertI(mModel);
+    assert(mModel);
     using namespace graph;
 
     mRefTreeModelInputPort->clear();
@@ -184,7 +184,7 @@ bool AtomicModelBox::OutputPortTreeView::on_button_press_event(
 
 void AtomicModelBox::OutputPortTreeView::build()
 {
-    AssertI(mModel);
+    assert(mModel);
     using namespace graph;
 
     mRefTreeModelOutputPort->clear();

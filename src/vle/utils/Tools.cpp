@@ -40,6 +40,7 @@
 #include <errno.h>
 #include <cstring>
 #include <iomanip>
+#include <iostream>
 
 #include <glib.h>
 #include <glib/gstdio.h>

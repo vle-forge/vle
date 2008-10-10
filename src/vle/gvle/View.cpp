@@ -62,8 +62,8 @@ View::View(Modeling* m, graph::CoupledModel* c, size_t index) :
         mScrolledWindow(),
         mDestinationModel(NULL)
 {
-    AssertI(m);
-    AssertI(c);
+    assert(m);
+    assert(c);
 
     mMenuBar = new ViewMenu(this);
     mDrawing = new ViewDrawingArea(this);
@@ -474,7 +474,7 @@ void View::displaceModel(int oldx, int oldy, int x, int y)
 void View::makeConnection(graph::Model* src, graph::Model* dst)
 {
     mModeling->setModified(true);
-    AssertI(src and dst);
+    assert(src and dst);
 
     if (src == mCurrent && dst == mCurrent)
         return;

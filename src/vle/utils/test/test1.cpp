@@ -38,6 +38,7 @@
 #include <map>
 #include <string>
 #include <vle/utils.hpp>
+#include <iostream>
 
 using namespace vle;
 

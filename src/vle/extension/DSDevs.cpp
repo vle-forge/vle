@@ -62,11 +62,11 @@ void DSDevs::output(const devs::Time& /* time */,
     devs::ExternalEvent* ev = 0;
 
     if (m_state != DSDevs::IDLE) {
-        AssertI(m_nameList.size() == m_response.size());
+        assert(m_nameList.size() == m_response.size());
 
         std::list < std::string >::const_iterator it;
         std::list < bool >::const_iterator jt;
-       
+
         for (it = m_nameList.begin(), jt = m_response.begin(); it !=
              m_nameList.end(); ++it, ++jt) {
             ev = new devs::ExternalEvent("ok");
@@ -802,7 +802,7 @@ bool DSDevs::buildModel(const std::string& prefixModelName,
     // 4 - Installe le plugin.
     // addModel(prefixModelName, className, xmlDynamics, xmlInits);
     std::cerr << "BuildModel Not yet implemented " << prefixModelName
-        << " " << className << " " << " " << xmlCode << " " 
+        << " " << className << " " << " " << xmlCode << " "
         << xmlDynamics << " " << xmlInits << "\n";
 
     return false;

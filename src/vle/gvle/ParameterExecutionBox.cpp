@@ -41,7 +41,7 @@ ParameterExecutionBox::ParameterExecutionBox(Modeling* modeling) :
         Gtk::Dialog("Execution box", true, true),
         mModeling(modeling)
 {
-    AssertI(modeling);
+    assert(modeling);
     add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     Gtk::Button* okButton = add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
     okButton->set_flags(Gtk::CAN_DEFAULT);

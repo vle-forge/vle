@@ -122,12 +122,14 @@ void Model::getTargetPortList(const std::string& portname,
 
 void Model::rename(Model* mdl, const std::string& newname)
 {
-    AssertI(mdl);
+    Assert(utils::DevsGraphError, mdl, boost::format(
+            "Cannot rename empty model with '%1%'") % newname);
 
     CoupledModel* parent = mdl->getParent();
     if (parent) {
         ModelList::iterator it = parent->getModelList().find(mdl->getName());
-        AssertI(it != parent->getModelList().end());
+        Assert(utils::DevsGraphError, it != parent->getModelList().end(),
+               "Cannot rename a model without parent");
 
         mdl->m_name.assign(newname);
         parent->getModelList().erase(it);

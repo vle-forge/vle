@@ -34,7 +34,7 @@ namespace gvle {
 
 ViewMenu::ViewMenu(View* v)
 {
-    AssertI(v);
+    assert(v);
 
     makeMenuFile(v);
     makeMenuEdit(v);

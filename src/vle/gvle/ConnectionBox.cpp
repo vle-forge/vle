@@ -32,9 +32,7 @@ using std::list;
 using std::string;
 using namespace vle;
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
 ConnectionBox::ConnectionBox(graph::CoupledModel* parent,
                              graph::Model* src,
@@ -47,7 +45,7 @@ ConnectionBox::ConnectionBox(graph::CoupledModel* parent,
         m_right("Destination model"),
         m_right2(false)
 {
-    AssertI(parent and src and dst);
+    assert(parent and src and dst);
 
     m_label.set_markup("<big><b>Connection</b></big>");
     m_labelInput.set_markup(src->getName());

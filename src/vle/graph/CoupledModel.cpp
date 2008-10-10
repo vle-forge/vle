@@ -51,7 +51,7 @@ CoupledModel::CoupledModel(const CoupledModel& mdl) :
     std::for_each(mdl.m_internalInputList.begin(),
                   mdl.m_internalInputList.end(),
                   CopyWithoutConnection(m_internalInputList));
-    
+
     std::for_each(mdl.m_internalOutputList.begin(),
                   mdl.m_internalOutputList.end(),
                   CopyWithoutConnection(m_internalOutputList));
@@ -98,8 +98,10 @@ CoupledModel::~CoupledModel()
 void CoupledModel::addInputConnection(const std::string & portSrc,
 				      Model* dst, const std::string& portDst)
 {
-    AssertS(utils::DevsGraphError, dst);
-    AssertS(utils::DevsGraphError, dst != this);
+    Assert(utils::DevsGraphError, dst,
+           "Can not add input connection with unknown destination");
+    Assert(utils::DevsGraphError, dst != this,
+           "Can not add input connection if destination is this coupled model");
 
     ModelPortList& outs(getInternalInPort(portSrc));
     outs.add(dst, portDst);
@@ -112,9 +114,11 @@ void CoupledModel::addInputConnection(const std::string & portSrc,
 void CoupledModel::addOutputConnection(Model* src, const std::string& portSrc,
 				       const std::string& portDst)
 {
-    AssertS(utils::DevsGraphError, src);
-    AssertS(utils::DevsGraphError, src != this);
-    
+    Assert(utils::DevsGraphError, src,
+           "Can not add output connection with unknown origin");
+    Assert(utils::DevsGraphError, src != this,
+           "Can not add output connection if source is this coupled model");
+
     ModelPortList& outs(src->getOutPort(portSrc));
     outs.add(this, portDst);
 
@@ -128,9 +132,15 @@ void CoupledModel::addInternalConnection(Model* src,
                                          const
                                          std::string& portDst)
 {
-    AssertS(utils::DevsGraphError, src and dst);
-    AssertS(utils::DevsGraphError, src != this and dst != this);
-    
+    Assert(utils::DevsGraphError, src,
+           "Cannot add internal connection with unknown origin");
+    Assert(utils::DevsGraphError, src,
+           "Cannot add internal connection with unknown destination");
+    Assert(utils::DevsGraphError, src != this,
+           "Cannot add internal connection if source is this coupled model");
+    Assert(utils::DevsGraphError, dst != this,
+           "Cannot add internal connection if destination is this coupled model");
+
     ModelPortList& outs(src->getOutPort(portSrc));
     outs.add(dst, portDst);
 
@@ -205,7 +215,7 @@ bool CoupledModel::existInternalConnection(const std::string& src,
 
     if (not msrc->existOutputPort(portsrc))
         return false;
-    
+
     if (not mdst->existInputPort(portdst))
         return false;
 
@@ -246,7 +256,8 @@ void CoupledModel::addInternalConnection(const std::string& src,
 void CoupledModel::delConnection(Model* src, const std::string& portSrc,
                                  Model* dst, const std::string& portDst)
 {
-    AssertS(utils::DevsGraphError, dst);
+    Assert(utils::DevsGraphError, dst,
+           "Cannot delete connection with unknown destination");
 
     ModelPortList& outs(src->getOutPort(portSrc));
     outs.remove(dst, portDst);
@@ -258,8 +269,11 @@ void CoupledModel::delConnection(Model* src, const std::string& portSrc,
 void CoupledModel::delInputConnection(const std::string& portSrc,
                                       Model* dst, const std::string& portDst)
 {
-    AssertS(utils::DevsGraphError, dst);
-    AssertS(utils::DevsGraphError, dst != this);
+    Assert(utils::DevsGraphError, dst,
+           "Cannot delete input connection with unknown destination");
+
+    Assert(utils::DevsGraphError, dst != this,
+           "Cannot delete input connection if destination is coupled model");
 
     ModelPortList& outs(getInternalInPort(portSrc));
     outs.remove(dst, portDst);
@@ -271,9 +285,12 @@ void CoupledModel::delInputConnection(const std::string& portSrc,
 void CoupledModel::delOutputConnection(Model* src, const std::string & portSrc,
                                        const std::string & portDst)
 {
-    AssertS(utils::DevsGraphError, src);
-    AssertS(utils::DevsGraphError, src != this);
-    
+    Assert(utils::DevsGraphError, src,
+           "Cannot delete output connection with unknown source");
+
+    Assert(utils::DevsGraphError, src != this,
+           "Cannot delete output connection if source is coupled model");
+
     ModelPortList& outs(src->getOutPort(portSrc));
     outs.remove(this, portDst);
 
@@ -284,9 +301,18 @@ void CoupledModel::delOutputConnection(Model* src, const std::string & portSrc,
 void CoupledModel::delInternalConnection(Model* src, const std::string& portSrc,
                                          Model* dst, const std::string& portDst)
 {
-    AssertS(utils::DevsGraphError, src and dst);
-    AssertS(utils::DevsGraphError, src != this and dst != this);
-    
+    Assert(utils::DevsGraphError, src,
+           "Cannot delete internal connection with unknown source");
+
+    Assert(utils::DevsGraphError, src != this,
+           "Cannot delete internal connection if source is coupled model");
+
+    Assert(utils::DevsGraphError, dst,
+           "Cannot delete internal connection with unknown destination");
+
+    Assert(utils::DevsGraphError, dst != this,
+           "Cannot delete internal connection if destination is coupled model");
+
     ModelPortList& outs(src->getOutPort(portSrc));
     outs.remove(dst, portDst);
 
@@ -318,7 +344,8 @@ void CoupledModel::delInternalConnection(const std::string& src,
 
 void CoupledModel::delAllConnection(Model* m)
 {
-    AssertS(utils::DevsGraphError, m);
+    Assert(utils::DevsGraphError, m,
+           "Cannot delete all connection with an unknown model source");
 
     for (ConnectionList::iterator it = m->getInputPortList().begin(); it !=
          m->getInputPortList().end(); ++it) {
@@ -412,7 +439,7 @@ std::vector < std::string > CoupledModel::getBasicConnections(
 
 void CoupledModel::setBasicConnections(const std::vector < std::string >& lst)
 {
-    Assert(utils::DevsGraphError, lst.size() % 4 == 0, 
+    Assert(utils::DevsGraphError, lst.size() % 4 == 0,
            "The basic connections list is malformed.");
 
     for (std::vector < std::string >::const_iterator it = lst.begin();
@@ -497,7 +524,8 @@ Model* CoupledModel::findModelRecursively(const std::string& modelname) const
 
 void CoupledModel::addModel(Model* model)
 {
-    AssertS(utils::DevsGraphError, not exist(model->getName()));
+    Assert(utils::DevsGraphError, not exist(model->getName()),
+           "Cannot add an empty model in the coupled model");
 
     model->setParent(this);
     m_modelList[model->getName()] = model;
@@ -505,7 +533,9 @@ void CoupledModel::addModel(Model* model)
 
 void CoupledModel::addModel(Model* model, const std::string& name)
 {
-    AssertS(utils::DevsGraphError, not exist(name));
+    Assert(utils::DevsGraphError, not exist(name),
+           "Cannot add an empty model in the coupled model");
+
     Model::rename(model, name);
     model->setParent(this);
     addModel(model);
@@ -513,7 +543,9 @@ void CoupledModel::addModel(Model* model, const std::string& name)
 
 AtomicModel* CoupledModel::addAtomicModel(const std::string& name)
 {
-    AssertS(utils::DevsGraphError, not exist(name));
+    Assert(utils::DevsGraphError, not exist(name),
+           "Cannot add an atomic model with an existing name");
+
     AtomicModel* x = new AtomicModel(name, this);
     m_modelList[name] = x;
     return x;
@@ -521,7 +553,9 @@ AtomicModel* CoupledModel::addAtomicModel(const std::string& name)
 
 CoupledModel* CoupledModel::addCoupledModel(const std::string& name)
 {
-    AssertS(utils::DevsGraphError, not exist(name));
+    Assert(utils::DevsGraphError, not exist(name),
+           "Cannot add a coupled model with an existing name");
+
     CoupledModel* x = new CoupledModel(name, this);
     m_modelList[name] = x;
     return x;
@@ -545,7 +579,8 @@ void CoupledModel::delAllModel()
 
 void CoupledModel::attachModel(Model* model)
 {
-    AssertS(utils::DevsGraphError, not exist(model->getName()));
+    Assert(utils::DevsGraphError, not exist(model->getName()),
+           "Cannot attach an already attached model");
 
     if (model->getParent()) {
         model->getParent()->detachModel(model);

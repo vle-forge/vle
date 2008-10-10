@@ -170,7 +170,8 @@ void CombinedQss::output(const Time& time, ExternalEventList& output) const
          (getState(mCurrentModel) == RUN and mActive))) {
         std::map < unsigned int , std::string >::const_iterator it;
         it = mVariableName.find(mCurrentModel);
-        AssertI(it != mVariableName.end());
+        Assert(utils::ModellingError, it != mVariableName.end(), (boost::format(
+                    "CombinedQss: unknown variable: %1%") % it->second));
         ExternalEvent* ee = new ExternalEvent(it->second);
         double e = (time - getLastTime(mCurrentModel)).getValue();
 

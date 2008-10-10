@@ -36,14 +36,16 @@ ModelPortList::~ModelPortList()
 
 void ModelPortList::add(Model* model, const std::string& portname)
 {
-    AssertS(utils::DevsGraphError, model);
+    Assert(utils::DevsGraphError, model, (boost::format(
+                "Cannot add model port %1% in an empty model") % portname));
 
     m_lst.insert(std::make_pair < Model*, std::string >(model, portname));
 }
 
 void ModelPortList::remove(Model* model, const std::string& portname)
 {
-    AssertS(utils::DevsGraphError, model);
+    Assert(utils::DevsGraphError, model, (boost::format(
+                "Cannot remove model port %1% in an empty model") % portname));
 
     std::pair < iterator, iterator > its = m_lst.equal_range(model);
     iterator it = its.first;

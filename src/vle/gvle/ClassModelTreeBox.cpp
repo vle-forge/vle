@@ -42,7 +42,7 @@ ClassModelTreeBox::ClassModelTreeBox(Modeling* modeling) :
         mButtonDel("del"),
         mModeling(modeling)
 {
-    AssertI(modeling);
+    assert(modeling);
 
     mRefTreeModel = Gtk::ListStore::create(mColumns);
     mTreeView.set_model(mRefTreeModel);

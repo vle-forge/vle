@@ -89,7 +89,7 @@ bool ConditionsBox::ConditionsTreeView::on_button_press_event(
 
 void ConditionsBox::ConditionsTreeView::build()
 {
-    AssertI(mConditions);
+    assert(mConditions);
 
     mRefTreeModel->clear();
 

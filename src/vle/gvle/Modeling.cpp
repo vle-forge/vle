@@ -60,7 +60,7 @@ Modeling::Modeling(GVLE* gvle, const string& filename) :
         mImportBox(0),
         mCoupledBox(0)
 {
-    AssertI(gvle);
+    assert(gvle);
 
     if (filename.empty() == false) {
         mVpz.parseFile(filename);
@@ -125,7 +125,7 @@ void Modeling::setGlade(Glib::RefPtr < Gnome::Glade::Xml > xml)
 
 Glib::RefPtr < Gnome::Glade::Xml > Modeling::getGlade() const
 {
-    AssertI(mRefXML);
+    assert(mRefXML);
     return mRefXML;
 }
 
@@ -257,7 +257,7 @@ void Modeling::showDynamics(const std::string& /* name */)
 
 void Modeling::addView(graph::Model* model)
 {
-    AssertI(model);
+    assert(model);
     if (model->isCoupled()) {
         graph::CoupledModel* m = (graph::CoupledModel*)(model);
         addView(m);
@@ -335,7 +335,7 @@ void Modeling::addView(graph::CoupledModel* model)
 
 bool Modeling::existView(graph::CoupledModel* model)
 {
-    AssertI(model);
+    assert(model);
     ListView::const_iterator it = mListView.begin();
     while (it != mListView.end()) {
         if ((*it) && (*it)->getGCoupledModel() == model)
@@ -347,7 +347,7 @@ bool Modeling::existView(graph::CoupledModel* model)
 
 View* Modeling::findView(graph::CoupledModel* model)
 {
-    AssertI(model);
+    assert(model);
     ListView::const_iterator it = mListView.begin();
     while (it != mListView.end()) {
         if ((*it) && (*it)->getGCoupledModel() == model) {
@@ -360,14 +360,14 @@ View* Modeling::findView(graph::CoupledModel* model)
 
 void Modeling::delViewIndex(size_t index)
 {
-    AssertI(index < mListView.size());
+    assert(index < mListView.size());
     delete mListView[index];
     mListView[index] = NULL;
 }
 
 void Modeling::delViewOnModel(const graph::CoupledModel* cm)
 {
-    AssertI(cm);
+    assert(cm);
     const size_t sz = mListView.size();
     for (size_t i = 0; i < sz; ++i) {
         if (mListView[i] != 0 and mListView[i]->getGCoupledModel() == cm)
@@ -456,13 +456,13 @@ void Modeling::refreshViews()
 
 void Modeling::EditCoupledModel(graph::CoupledModel* model)
 {
-    AssertI(model);
+    assert(model);
     mCoupledBox->show(model);
 }
 
 void Modeling::redrawModelTreeBox()
 {
-    AssertI(mTop);
+    assert(mTop);
     mModelTreeBox->parseModel(mTop);
 }
 
@@ -660,8 +660,8 @@ void Modeling::export_coupled_model(vpz::Vpz* dst, graph::CoupledModel* model)
 void Modeling::importCoupledModel(graph::CoupledModel* parent, vpz::Vpz* src)
 {
     using namespace vpz;
-    AssertI(parent);
-    AssertI(src);
+    assert(parent);
+    assert(src);
 
     if (mImportBox && mImportBox->show(src)) {
         graph::Model* import = src->project().model().model();
@@ -800,7 +800,7 @@ const Modeling::SetString& Modeling::getNames() const
 }
 /*
   vpz::Observable* Modeling::get_observables(graph::AtomicModel* atom){
-  AssertI(atom);
+  assert(atom);
   
   vpz::AtomicModel a = mVpz.project().model().atomicModels().get(atom);
   if (a.observables() != "") {
@@ -822,7 +822,7 @@ const Modeling::SetString& Modeling::getNames() const
 
 const vpz::Strings* Modeling::get_conditions(graph::AtomicModel* atom)
 {
-    AssertI(atom);
+    assert(atom);
 
     vle::vpz::AtomicModelList& list = mVpz.project().model().atomicModels();
     vle::vpz::AtomicModel& a = list.get(atom);
@@ -863,9 +863,9 @@ graph::Model* Modeling::newPluginModel(graph::CoupledModel* /*parent*/,
                                        int /*x*/, int /*y*/)
 {
     Throw(utils::NotYetImplemented, "Modeling::newPluginModel");
-    ////AssertI(parent);
-    //AssertI(not name.empty());
-    //AssertI(getPlugin());
+    ////assert(parent);
+    //assert(not name.empty());
+    //assert(getPlugin());
     //
     //graph::Model* new_plugin = 0;
     //
@@ -885,7 +885,7 @@ graph::Model* Modeling::newPluginModel(graph::CoupledModel* /*parent*/,
     //dom.get_document()->get_root_node(), xmlstructure);
     //xmlpp::Element* root = dom.get_document()->get_root_node();
     //xmlpp::Element* model = utils::xml::get_children(root, "MODEL");
-    //AssertI(model);
+    //assert(model);
     //model->set_attribute("NAME", name);
     //mdl.init(utils::xml::get_root_node(dom, "STRUCTURES"));
     //}
@@ -897,7 +897,7 @@ graph::Model* Modeling::newPluginModel(graph::CoupledModel* /*parent*/,
     //root = root->add_child("MODELS");
     //utils::xml::import_children_nodes(root, xmldynamics);
     //xmlpp::Element* model = utils::xml::get_children(root, "MODEL");
-    //AssertI(model);
+    //assert(model);
     //model->set_attribute("NAME", name);
     //dyn.init(utils::xml::get_root_node(dom, "DYNAMICS"));
     //}

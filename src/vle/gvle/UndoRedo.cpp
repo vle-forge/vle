@@ -50,7 +50,7 @@ UndoRedo::~UndoRedo()
 
 void UndoRedo::addModel(const graph::Model* m)
 {
-    AssertI(m);
+    assert(m);
     //mList.push_back(m->clone());
 
     Throw(utils::NotYetImplemented, "UndoRedo::addModel");

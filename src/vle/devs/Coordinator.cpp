@@ -261,7 +261,7 @@ void Coordinator::delModel(graph::CoupledModel* parent,
 {
     graph::Model* mdl = parent->findModel(modelname);
 
-    AssertI(mdl);
+    Assert(utils::DevsGraphError, mdl, "Cannt delete an unknow model");
 
     if (mdl->isCoupled()) {
         delCoupledModel(parent, (graph::CoupledModel*)mdl);
@@ -331,9 +331,12 @@ oov::OutputMatrixViewList Coordinator::outputs() const
 void Coordinator::delAtomicModel(graph::CoupledModel* parent,
                                  graph::AtomicModel* atom)
 {
-    AssertI(parent and atom);
+    Assert(utils::DevsGraphError, parent and atom,
+           "Cannot delete an atomic model without parent");
+
     SimulatorMap::iterator it = m_modelList.find(atom);
-    AssertI(it != m_modelList.end());
+    Assert(utils::ModellingError, it != m_modelList.end(),
+           "Cannot delete an unknow atomic model");
 
     Simulator* satom = (*it).second;
     m_modelList.erase(it);
@@ -352,7 +355,8 @@ void Coordinator::delAtomicModel(graph::CoupledModel* parent,
 void Coordinator::delCoupledModel(graph::CoupledModel* parent,
                                   graph::CoupledModel* mdl)
 {
-    AssertI(parent and mdl);
+    Assert(utils::DevsGraphError, parent and mdl,
+           "Cannot delete an atomic model without parent");
 
     graph::ModelList& lst = mdl->getModelList();
     for (graph::ModelList::iterator it = lst.begin(); it != lst.end();
@@ -401,7 +405,7 @@ void Coordinator::dispatchExternalEvent(ExternalEventList& eventList,
 
         for (graph::TargetModelList::iterator jt = out.begin();
              jt != out.end(); ++jt) {
-            AssertI(jt->model()->isAtomic());
+            assert(jt->model()->isAtomic());
             Simulator* dst = getModel(
                 reinterpret_cast < graph::AtomicModel* >(jt->model()));
             const std::string& port(jt->port());

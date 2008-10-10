@@ -26,9 +26,9 @@
 #ifndef UTILS_DEBUG_HPP
 #define UTILS_DEBUG_HPP
 
-#include <iostream>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Tools.hpp>
+#include <vle/utils/Trace.hpp>
 #include <boost/format.hpp>
 
 
@@ -53,77 +53,55 @@ namespace vle { namespace utils {
 #ifndef NDEBUG
 #define Assert(type, test, debugstring) { \
     if (! (test)) { \
-        std::string _vleerr__( \
-            boost::str(boost::format( \
+        if (vle::utils::Trace::trace().isInLevel( \
+            vle::utils::Trace::IMPORTANT)) { \
+            std::string _vleerr__( \
+                boost::str(boost::format( \
                 "%5%\nAssertion '%1%' failed in file %2%: line " \
-                                      "%3%\n'%4%'\n%6%\n") % \
-                #test % __FILE__ % __LINE__ % __PRETTY_FUNCTION__ % \
-		(debugstring) % vle::utils::print_trace_report())); \
-        throw type(_vleerr__); }}
+                "%3%\n'%4%'\n%6%\n") % \
+                           #test % __FILE__ % __LINE__ % __PRETTY_FUNCTION__ % \
+                           (debugstring) % vle::utils::print_trace_report())); \
+                throw type(_vleerr__); \
+        } else { \
+            std::string _vleerr__( \
+                boost::str(boost::format("%1%") % (debugstring))); \
+            throw type(_vleerr__); \
+        } \
+    } \
+}
 #else // NDEBUG
 #define Assert(type, test, debugstring) { \
     if (! (test)) { \
-        throw type(boost::str(boost::format( \
-                "%1%\n") % (debugstring))); }}
+        std::string _vleerr__( \
+            boost::str(boost::format("%1%") % (debugstring))); \
+        throw type(_vleerr__); \
+    } \
+}
 #endif // NDEBUG
 
-/**
- * A assert macro to throw exception when assertion failed. This macro
- * show compilation information like current file, line, function when
- * NDEBUG is not defined.
- *
- * To use:
- * @code
- * AssertS(file_exception, f->isopen());
- * @endcode
- *
- * @param type exception class to throw
- * @param test represent test to perform
- * @throw an exception define by type
- */
 #ifndef NDEBUG
 #define AssertS(type, test) { \
     if (! (test)) { \
-        std::string _vleerr__( \
-            boost::str(boost::format( \
+        if (vle::utils::Trace::trace().isInLevel( \
+            vle::utils::Trace::IMPORTANT)) { \
+            std::string _vleerr__( \
+                boost::str(boost::format( \
                 "Assertion '%1%' failed in file %2%: line %3%\n'%4%'\n%5%\n") % \
-                             #test % __FILE__ % __LINE__ % __PRETTY_FUNCTION__ % \
-                             vle::utils::print_trace_report())); \
-        throw type(_vleerr__); }}
+                           #test % __FILE__ % __LINE__ % __PRETTY_FUNCTION__ % \
+                           vle::utils::print_trace_report())); \
+                throw type(_vleerr__); \
+        } else { \
+	    throw type(""); \
+        } \
+    } \
+}
 #else // NDEBUG
 #define AssertS(type, test) { \
     if (! (test)) { \
-        throw type(""); }}
+        throw type(""); \
+    } \
+}
 #endif // NDEBUG
-
-/**
- * A assert macro to throw Internal exception when assertion failed. This
- * macro show compilation information like current file, line, function when
- * NDEBUG is not defined.
- *
- * To use:
- * @code
- * AssertI(ptr_tab != NULL);
- * @endcode
- *
- * @param test represent test to perform
- * @throw an Internal exception
- */
-#ifndef NDEBUG
-#define AssertI(test) { \
-    if (! (test)) { \
-        std::string _vleerr__( \
-            boost::str(boost::format( \
-                "Assertion '%1%' failed in file %2%: line %3%\n'%4%'\n%5%\n") % \
-                       #test % __FILE__ % __LINE__ % __PRETTY_FUNCTION__ % \
-                       vle::utils::print_trace_report())); \
-        throw vle::utils::InternalError(_vleerr__); }}
-#else // NDEBUG
-#define AssertI(test) { \
-    if (! (test)) { \
-        throw vle::utils::InternalError(""); }}
-#endif // NDEBUG
-
 
 /**
  * A function to throw an specified Exception. This marco show compilation
@@ -139,44 +117,29 @@ namespace vle { namespace utils {
  *
  * @throw the specified argument.
  */
-
 #ifndef NDEBUG
 #define Throw(type, debugstring) { \
-    std::string _vleerr__( \
-        boost::str(boost::format( \
-        "%4%\nThrow exception failed in file %1%: line %2%\n'%3%'\n%5%\n") % \
-                   __FILE__ % __LINE__ % __PRETTY_FUNCTION__ % \
-		(debugstring) % vle::utils::print_trace_report())); \
-        throw type(_vleerr__); }
+    if (vle::utils::Trace::trace().isInLevel( \
+            vle::utils::Trace::IMPORTANT)) { \
+        std::string _vleerr__( \
+            boost::str(boost::format( \
+            "%4%\nThrow exception failed in file %1%: line %2%\n'%3%'\n%5%\n") % \
+                       __FILE__ % __LINE__ % __PRETTY_FUNCTION__ % \
+                       (debugstring) % vle::utils::print_trace_report())); \
+            throw type(_vleerr__); \
+    } else { \
+        std::string _vleerr__( \
+            boost::str(boost::format("%1%") % (debugstring))); \
+	throw type(_vleerr__); \
+    } \
+}
 #else // NDEBUG
 #define Throw(type, debugstring) { \
-    throw type(boost::str(boost::format( \
-        "%1%") % (debugstring))); }
+    std::string _vleerr__( \
+        boost::str(boost::format("%1%") % (debugstring))); \
+    throw type(_vleerr__); \
+}
 #endif
-
-/**
- * A function to throw an Internal Exception. This marco show compilation
- * information like current file, line, function when NDEBUG is not defined.
- *
- * To use:
- * @code
- * ThrowInternal();
- * @endcode
- *
- * @throw Exception::Internal
- */
-#ifndef NDEBUG
-#define ThrowInternal() { \
-    std::string _vleerr__( \
-        boost::str(boost::format( \
-                "Throw Internal error in file %1% : line %2%\n'%3%'\n%4%\n") % \
-            __FILE__ % __LINE__ % __PRETTY_FUNCTION__ % \
-                         vle::utils::print_trace_report())); \
-    throw vle::utils::InternalError(_vleerr__); }
-#else // NDEBUG
-#define ThrowInternal() { \
-    throw vle::utils::InternalError(""); }
-#endif // NDEBUG
 
 }} // namespace vle utils
 
