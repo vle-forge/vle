@@ -505,6 +505,7 @@ void AtomicModelBox::add_dynamic()
 
     std::string name = box.run();
     if (box.valid()) {
+	box.hide_all();
         name = boost::trim_copy(name);
         if (mDyn->exist(name)) {
             Error(boost::str(boost::format(
