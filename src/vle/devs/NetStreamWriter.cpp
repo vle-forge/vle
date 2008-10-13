@@ -88,8 +88,8 @@ void NetStreamWriter::processNewObservable(Simulator* simulator,
     std::ostringstream out;
     out << "<trame type=\"new\""
         << " date=\"" << time << "\""
-        << " name=\"" << simulator->getStructure()->getName() << "\""
-        << " parent=\"" << simulator->getStructure()->getParentName() << "\""
+        << " name=\"" << simulator->getName() << "\""
+        << " parent=\"" << simulator->getParent() << "\""
         << " port=\"" << portname << "\""
         << " view=\"" << view << "\" />";
 
@@ -110,8 +110,8 @@ void NetStreamWriter::processRemoveObservable(Simulator* simulator,
     std::ostringstream out;
     out << "<trame type=\"del\""
         << " date=\"" << time << "\""
-        << " name=\"" << simulator->getStructure()->getName() << "\""
-        << " parent=\"" << simulator->getStructure()->getParentName() << "\""
+        << " name=\"" << simulator->getName() << "\""
+        << " parent=\"" << simulator->getParent() << "\""
         << " port=\"" << portname << "\""
         << " view=\"" << view << "\" />";
 
@@ -128,8 +128,8 @@ void NetStreamWriter::process(const ObservationEvent& event)
 {
     std::ostringstream out;
     out << "<trame type=\"value\" date=\"" << event.getTime() << "\" >"
-        << "<modeltrame name=\"" << event.getSourceModelName()
-        << "\" parent=\"" << event.getModel()->getStructure()->getParentName()
+        << "<modeltrame name=\"" << event.getModel()->getName()
+        << "\" parent=\"" << event.getModel()->getParent()
         << "\" port=\"" << event.getPortName()
         << "\" view=\"" << event.getViewName()
         << "\" >"

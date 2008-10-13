@@ -54,7 +54,7 @@ void CSV::writeHead(std::ostream& out, const std::vector < std::string >& heads)
         it++;
 
         while (it != heads.end()) {
-            out << ';' << *it;
+            out << ";\"" << *it << "\"";
             ++it;
         }
     }

@@ -91,7 +91,9 @@ void Storage::onParameter(const vpz::ParameterTrame& trame)
 
 void Storage::onNewObservable(const vpz::NewObservableTrame& trame)
 {
-    m_matrix.addModel(trame.name(), trame.port());
+    std::string name(trame.parent());
+    name += trame.name();
+    m_matrix.addModel(name, trame.port());
 }
 
 void Storage::onDelObservable(const vpz::DelObservableTrame& /* trame */)
@@ -113,8 +115,9 @@ void Storage::onValue(const vpz::ValueTrame& trame)
     
     for (vpz::ModelTrameList::const_iterator it = trame.trames().begin();
          it != trame.trames().end(); ++it) {
-        m_matrix.addValue(it->simulator(), it->port(),
-                          it->value());
+        std::string name(it->parent());
+        name += it->simulator();
+        m_matrix.addValue(name, it->port(), it->value());
     }
 }
     

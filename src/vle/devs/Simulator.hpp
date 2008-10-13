@@ -48,11 +48,36 @@ namespace vle { namespace devs {
     class Simulator
     {
     public:
+        /**
+         * @brief Build a new devs::Simulator with an empty devs::Dynamics, a
+         * null last time but a graph::AtomicModel node.
+         * @param a The atomic model.
+         * @throw utils::InternalError if the atomic model does not exist.
+         */
 	Simulator(graph::AtomicModel* a);
+
+        /**
+         * @brief Delete the attached devs::Dynamics user's model.
+         */
 	~Simulator();
 
 	void addDynamics(Dynamics* dynamics);
-	const std::string getName() const;
+
+        /**
+         * @brief Get the name of the graph::AtomicModel node.
+         * @return the name of the graph::AtomicModel.
+         * @throw utils::InternalEvent if the model is destroyed.
+         */
+        const std::string& getName() const;
+
+        /**
+         * @brief Get a std::string which concatenate the names of the hierarchy
+         * of graph::CoupledModel parent. Use the function
+         * graph::Model::getParentName().
+         * @return The concatenated names of the parents or "Deleted model" if
+         * the model is destroy before observed.
+         */
+        const std::string& getParent();
 	Time getLastTime() const;
 	graph::AtomicModel* getStructure() const;
         graph::Model* findModel(const std::string & name) const;
@@ -85,8 +110,9 @@ namespace vle { namespace devs {
         void output(const Time& currentTime, ExternalEventList& output);
 
 
-        Event::EventType confluentTransitions(const InternalEvent& ie,
-                                              const ExternalEventList& ees) const;
+        Event::EventType confluentTransitions(
+            const InternalEvent& ie,
+            const ExternalEventList& ees) const;
 
         InternalEvent* internalTransition(const InternalEvent& event);
 
@@ -105,7 +131,8 @@ namespace vle { namespace devs {
     private:
 	Time                    m_lastTime;
 	Dynamics*               m_dynamics;
-	graph::AtomicModel*     m_atomicModel;
+        graph::AtomicModel*     m_atomicModel;
+        std::string             m_parents;
     };
 
 }} // namespace vle devs

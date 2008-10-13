@@ -32,7 +32,6 @@
 #include <vector>
 
 
-
 namespace vle { namespace oov { namespace plugin {
 
     class SimpleFile : public Plugin
@@ -61,7 +60,10 @@ namespace vle { namespace oov { namespace plugin {
 
 
     private:
-        std::map < std::string, int >   m_columns;
+        /** Define a dictionary (model's name, index) */
+        typedef std::map < std::string, int > Columns;
+
+        Columns                         m_columns;
         std::vector < value::Value >    m_buffer;
         double                          m_time;
         std::ofstream                   m_file;
@@ -77,22 +79,23 @@ namespace vle { namespace oov { namespace plugin {
         /**
          * @brief This function is use to build uniq name to each row of the
          * text output.
+         * @param parent the hierarchy of coupled model.
          * @param simulator the name of the devs::Model.
          * @param port the name of the state port of the devs::Model.
          * @return a representation of the uniq name.
          */
-        inline std::string buildname(const std::string& simulator,
-                                     const std::string& port);
+        inline std::string buildname(const std::string& parent,
+                                     const std::string& simulator,
+                                     const std::string& port)
+        {
+            std::string r(parent);
+            r += ':';
+            r += simulator;
+            r += '_';
+            r += port;
+            return r;
+        }
     };
-
-    std::string SimpleFile::buildname(const std::string& simulator,
-                                      const std::string& port)
-    {
-        std::string result(simulator);
-        result += '_';
-        result += port;
-        return result;
-    }
 
 }}} // namespace vle oov plugin
 

@@ -69,19 +69,19 @@ void StreamReader::onParameter(const vpz::ParameterTrame& trame)
 
 void StreamReader::onNewObservable(const vpz::NewObservableTrame& trame)
 {
-   plugin()->onNewObservable(trame); 
+   plugin()->onNewObservable(trame);
 }
 
 void StreamReader::onDelObservable(const vpz::DelObservableTrame& trame)
 {
-   plugin()->onDelObservable(trame); 
+   plugin()->onDelObservable(trame);
 }
 
 void StreamReader::onValue(const vpz::ValueTrame& trame)
 {
     plugin()->onValue(trame);
 }
-        
+
 void StreamReader::onClose(const vpz::EndTrame& trame)
 {
     plugin()->close(trame);

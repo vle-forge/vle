@@ -51,7 +51,7 @@ void Rdata::writeHead(std::ostream& out,
 {
     for (std::vector < std::string >::const_iterator it = heads.begin();
          it != heads.end(); ++it) {
-        out << *it << '\t';
+        out << "\"" << *it << "\"\t";
     }
     out << '\n';
 }

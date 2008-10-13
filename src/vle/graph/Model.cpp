@@ -153,7 +153,7 @@ std::string Model::getParentName() const
     while (not lst.empty()) {
         result += lst.front();
         lst.pop_front();
-        if (not result.empty()) {
+        if (not lst.empty()) {
             result += ',';
         }
     }

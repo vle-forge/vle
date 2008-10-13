@@ -565,16 +565,18 @@ void Coordinator::processTimedObservationEvents(ObservationEventList& bag)
 {
     for (ObservationEventList::iterator it = bag.begin();
          it != bag.end(); ++it) {
-            if ((*it)->isValid()) {
+        if ((*it)->isValid()) {
             Simulator* model((*it)->getModel());
             ObservationEvent* event(model->observation(*(*it)));
 
-            View* view(getView(event->getViewName()));
-            ObservationEvent* event2(view->processObservationEvent(event));
-            delete event;
+            if (event) {
+                View* view(getView(event->getViewName()));
+                ObservationEvent* event2(view->processObservationEvent(event));
+                delete event;
 
-            if (event2) {
-                m_eventTable.putObservationEvent(event2);
+                if (event2 and model->getStructure()) {
+                    m_eventTable.putObservationEvent(event2);
+                }
             }
         }
         delete *it;

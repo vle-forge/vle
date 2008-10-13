@@ -55,7 +55,7 @@ void SimpleFile::onParameter(const vpz::ParameterTrame& /* trame */)
 
 void SimpleFile::onNewObservable(const vpz::NewObservableTrame& trame)
 {
-    std::string name(buildname(trame.name(), trame.port()));
+    std::string name(buildname(trame.parent(), trame.name(), trame.port()));
 
     Assert(utils::InternalError, m_columns.find(name) == m_columns.end(),
            boost::format("Observable %1% already exist") % name);
@@ -84,9 +84,8 @@ void SimpleFile::onValue(const vpz::ValueTrame& trame)
     for (vpz::ModelTrameList::const_iterator it = trame.trames().begin();
          it != trame.trames().end(); ++it) {
 
-        std::string name(buildname(it->simulator(), it->port()));
-        std::map < std::string, int >::iterator jt;
-        jt = m_columns.find(name);
+        std::string name(buildname(it->parent(), it->simulator(), it->port()));
+        Columns::iterator jt = m_columns.find(name);
 
         Assert(utils::InternalError, jt != m_columns.end(), boost::format(
                 "The columns %1% does not exist. No new Observable ?") % 
@@ -101,7 +100,7 @@ void SimpleFile::close(const vpz::EndTrame& trame)
     finalFlush(utils::to_double(trame.time()));
     std::vector < std::string > array(m_columns.size());
 
-    std::map < std::string, int >::iterator it = m_columns.begin();
+    Columns::iterator it = m_columns.begin();
     for (it = m_columns.begin(); it != m_columns.end(); ++it) {
         array[it->second] = it->first;
     } 

@@ -60,8 +60,8 @@ void LocalStreamWriter::processNewObservable(Simulator* simulator,
 {
     m_reader.onNewObservable(vpz::NewObservableTrame(
             utils::to_string(time),
-            simulator->getStructure()->getName(),
-            std::string(),
+            simulator->getName(),
+            simulator->getParent(),
             portname,
             view));
 }
@@ -73,8 +73,8 @@ void LocalStreamWriter::processRemoveObservable(Simulator* simulator,
 {
     m_reader.onDelObservable(vpz::DelObservableTrame(
             utils::to_string(time),
-            simulator->getStructure()->getName(),
-            std::string(),
+            simulator->getName(),
+            simulator->getParent(),
             portname,
             view));
 }
@@ -82,8 +82,8 @@ void LocalStreamWriter::processRemoveObservable(Simulator* simulator,
 void LocalStreamWriter::process(const ObservationEvent& event)
 {
     vpz::ValueTrame tr(utils::to_string(event.getTime()));
-    tr.add(event.getModel()->getStructure()->getName(),
-           std::string(),
+    tr.add(event.getModel()->getName(),
+           event.getModel()->getParent(),
            event.getPortName(),
            event.getViewName());
     tr.add(event.getAttributeValue(event.getPortName()));
