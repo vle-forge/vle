@@ -427,42 +427,16 @@ void Coordinator::dispatchExternalEvent(ExternalEventList& eventList,
 
 void Coordinator::buildViews()
 {
-    std::map < std::string, StreamWriter* > result;
-
     const vpz::Outputs& outs(m_modelFactory.outputs());
-    for (vpz::OutputList::const_iterator it = outs.outputlist().begin();
-         it != outs.outputlist().end(); ++it) {
-        StreamWriter* stream = 0;
-        switch (it->second.format()) {
-        case vpz::Output::LOCAL:
-            stream = new LocalStreamWriter();
-            break;
-        case vpz::Output::DISTANT:
-            stream = new NetStreamWriter();
-            break;
-        }
-        
-        std::string file((boost::format("%1%_%2%") % 
-                          m_modelFactory.experiment().name() %
-                          it->second.name()).str());
-        stream->open(it->second.plugin(), it->second.location(), file, 
-                     it->second.data(), m_currentTime); 
-        result[it->first] = stream;
-    }
-
     const vpz::Views& views(m_modelFactory.views());
     const vpz::ViewList& viewlist(views.viewlist());
 
     for (vpz::ViewList::const_iterator it = viewlist.begin();
          it != viewlist.end(); ++it) {
-        std::map < std::string, StreamWriter* >::iterator jt;
-        jt = result.find(it->second.output());
 
-        Assert(utils::InternalError, jt != result.end(), boost::format(
-                "The output %1% does not exist for view %2%") %
-            it->second.output() % it->first);
+        StreamWriter* stream = buildOutput(
+            it->second, outs.get(it->second.output()));
 
-        StreamWriter* stream = jt->second;
         View* obs = 0;
         if (it->second.type() == vpz::View::TIMED) {
             obs = new devs::TimedView(
@@ -477,6 +451,29 @@ void Coordinator::buildViews()
     }
 }
 
+StreamWriter* Coordinator::buildOutput(const vpz::View& view,
+                                       const vpz::Output& output)
+{
+    StreamWriter* stream = 0;
+
+    switch (output.format()) {
+    case vpz::Output::LOCAL:
+        stream = new LocalStreamWriter();
+        break;
+    case vpz::Output::DISTANT:
+        stream = new NetStreamWriter();
+        break;
+    }
+
+    std::string file((boost::format("%1%_%2%") %
+                      m_modelFactory.experiment().name() %
+                      view.name()).str());
+    stream->open(output.plugin(), output.location(), file,
+                 output.data(), m_currentTime);
+
+    return stream;
+}
+
 void Coordinator::processEventView(Simulator& model, Event* event)
 {
     std::list < std::string > lst;
@@ -487,7 +484,7 @@ void Coordinator::processEventView(Simulator& model, Event* event)
 
         for (std::list < std::string >::iterator jt = lst.begin();
              jt != lst.end(); ++jt) {
-            
+
             ObservationEvent* newevent = 0;
             if (event == 0 or not event->isInternal()) {
                 newevent = new ObservationEvent(m_currentTime, &model,
@@ -540,7 +537,7 @@ void Coordinator::processExternalEvents(
             m_eventTable.putInternalEvent(internal);
         }
     }
-    
+
     lst.deleteAndClear();
     modelbag.delExternals();
     processEventView(*sim, 0);
@@ -559,7 +556,7 @@ void Coordinator::processRequestEvents(
         dispatchExternalEvent(result, sim);
         result.clear();
     }
-    
+
     lst.deleteAndClear();
     modelbag.delRequest();
 }
