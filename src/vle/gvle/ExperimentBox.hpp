@@ -27,6 +27,7 @@
 #define VLE_GVLE_EXPERIMENTBOX_HPP
 
 #include <vle/utils/Rand.hpp>
+#include <vle/gvle/CalendarBox.hpp>
 #include <gtkmm/dialog.h>
 #include <gtkmm/spinbutton.h>
 #include <gtkmm/button.h>
@@ -52,39 +53,45 @@ namespace vle { namespace gvle {
          * @param current, current model to show. If current equal NULL then,
          * the modeling top GCoupledModel is used.
          */
-        ExperimentBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* modeling);
+        ExperimentBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
+		      Modeling* modeling);
 
         ~ExperimentBox();
 
-        void show();
+        void run();
 
     private:
         Modeling*           mModeling;
+
+	CalendarBox         mCalendar;
+	Gtk::Entry*         mEntryAuthor;
+	Gtk::Entry*         mEntryDate;
+	Gtk::Button*        mButtonNow;
+	Gtk::Button*        mButtonCalendar;
+	Gtk::Entry*         mEntryVersion;
+	std::string         mBackupDate;
+
         Gtk::Dialog*        mDialog;
         Gtk::Entry*         mEntryName;
         Gtk::SpinButton*    mSpinDuration;
-        Gtk::RadioButton*   mRadioSimu;
-        Gtk::Frame*         mHboxSimu;
         Gtk::SpinButton*    mSpinSimuSeed;
         Gtk::Button*        mButtonSimuSeed;
-        Gtk::RadioButton*   mRadioPlan;
-        Gtk::Frame*         mHboxPlan;
         Gtk::HBox*          mHboxCombi;
         Gtk::ComboBoxText*  mComboCombi;
         Gtk::SpinButton*    mSpinPlanSeed;
         Gtk::Button*        mButtonPlanSeed;
         Gtk::SpinButton*    mButtonNumber;
-        Gtk::Button*        mButtonApply;
-        Gtk::Button*        mButtonCancel;
+
         utils::Rand         mRand;
 
-        void on_simu();
-        void on_plan();
+        bool apply();
+	void initExperiment();
+
+	void on_calendar();
+	void on_now();
 
         void on_random_simu();
         void on_random_plan();
-
-        void apply();
     };
 
 }} // namespace vle gvle

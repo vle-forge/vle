@@ -34,65 +34,41 @@
 #include <glibmm/miscutils.h>
 #include <limits>
 
-using namespace vle;
-
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
 ExperimentBox::ExperimentBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
                              Modeling* modeling) :
     mModeling(modeling),
-    mDialog(0),
-    mButtonApply(0),
-    mButtonCancel(0)
+    mCalendar(xml),
+    mDialog(0)
 {
     xml->get_widget("DialogExperiment", mDialog);
+    xml->get_widget("EntryAuthor", mEntryAuthor);
+    xml->get_widget("EntryDate", mEntryDate);
+    xml->get_widget("ButtonCalendar", mButtonCalendar);
+    xml->get_widget("ButtonNow", mButtonNow);
+    xml->get_widget("EntryVersion", mEntryVersion);
     xml->get_widget("EntryName", mEntryName);
-    xml->get_widget("frameExperimentSimulation", mHboxSimu);
-    xml->get_widget("frameExperimentPlan", mHboxPlan);
-
     xml->get_widget("SpinButtonDuration", mSpinDuration);
-    mSpinDuration->set_range(
-        std::numeric_limits < double >::epsilon(),
-        std::numeric_limits < double >::max());
-
-    xml->get_widget("RadioSimulation", mRadioSimu);
-    xml->get_widget("RadioPlan", mRadioPlan);
-    if ((modeling->experiment().replicas().seed() == 0) &&
-        (modeling->experiment().replicas().seed() == 0)) {
-        mRadioSimu->toggled();
-    }
-
     xml->get_widget("SpinSimuSeed", mSpinSimuSeed);
-    mSpinSimuSeed->set_range(0, std::numeric_limits < guint32 >::max());
-    on_random_simu();
-
     xml->get_widget("ButtonSimuSeed", mButtonSimuSeed);
+    xml->get_widget("HBoxCombi", mHboxCombi);
+    xml->get_widget("SpinPlanSeed", mSpinPlanSeed);
+    xml->get_widget("ButtonPlanSeed", mButtonPlanSeed);
+    xml->get_widget("SpinButtonNumber", mButtonNumber);
+
+    initExperiment();
+
+    mButtonCalendar->signal_clicked().connect(
+        sigc::mem_fun(*this, &ExperimentBox::on_calendar));
+    mButtonNow->signal_clicked().connect(
+        sigc::mem_fun(*this, &ExperimentBox::on_now));
     mButtonSimuSeed->signal_clicked().connect(sigc::mem_fun
             (*this, &ExperimentBox::on_random_simu));
-
-    xml->get_widget("HBoxCombi", mHboxCombi);
-    mComboCombi = new Gtk::ComboBoxText();
-    mComboCombi->append_text("linear");
-    mComboCombi->append_text("total");
-    mHboxCombi->pack_start(*mComboCombi, true, true, 5);
-
-    xml->get_widget("SpinPlanSeed", mSpinPlanSeed);
-    mSpinPlanSeed->set_range(0, std::numeric_limits < guint32 >::max());
-    on_random_plan();
-
-    xml->get_widget("ButtonPlanSeed", mButtonPlanSeed);
     mButtonPlanSeed->signal_clicked().connect(
         sigc::mem_fun (*this, &ExperimentBox::on_random_plan));
 
-    xml->get_widget("SpinButtonNumber", mButtonNumber);
-    mButtonNumber->set_range(1, std::numeric_limits < guint32 >::max());
-
-    mRadioPlan->signal_toggled().connect(
-        sigc::mem_fun (*this, &ExperimentBox::on_plan));
-    mRadioSimu->signal_toggled().connect(
-        sigc::mem_fun (*this, &ExperimentBox::on_simu));
+    mDialog->show_all();
 }
 
 ExperimentBox::~ExperimentBox()
@@ -100,52 +76,143 @@ ExperimentBox::~ExperimentBox()
     delete mComboCombi;
 }
 
-void ExperimentBox::show()
+void ExperimentBox::initExperiment()
 {
-    mEntryName->set_text(mModeling->experiment().name());
-    mSpinDuration->set_value(mModeling->experiment().duration());
-    mSpinSimuSeed->set_value(mModeling->experiment().seed());
+    // Project frame
+    {
+        std::string name(mModeling->vpz().project().author());
 
-    if (mModeling->experiment().combination().empty()) {
-        mModeling->experiment().setCombination("linear");
-    }
-    mComboCombi->set_active_text(mModeling->experiment().combination());
-    mSpinPlanSeed->set_value(mModeling->experiment().replicas().seed());
-
-    mDialog->show_all();
-    if (mRadioSimu->get_active()) {
-        on_simu();
-    } else {
-        on_plan();
-    }
-
-    int ret = mDialog->run();
-    while (ret == Gtk::RESPONSE_OK) {
-        if (mEntryName->get_text().empty()) {
-            Error("Set a name to this experiment");
-            ret = mDialog->run();
-        } else {
-            apply();
-            break;
+        if (name.empty()) {
+            name = Glib::get_real_name();
+            if (name.empty()) {
+                name = Glib::get_user_name();
+            }
         }
+        mEntryAuthor->set_text(name);
+
+	if (mModeling->vpz().project().date().empty()) {
+	    on_now();
+	} else {
+	    mEntryDate->set_text(mModeling->vpz().project().date());
+	}
+
+	mEntryVersion->set_text(utils::to_string(
+				    mModeling->vpz().project().version()));
+    }
+
+    // Experiment frame
+    {
+	if (mModeling->experiment().name().empty()) {
+	    mEntryName->set_text("exp");
+	} else {
+	    mEntryName->set_text(mModeling->experiment().name());
+	}
+
+	mSpinDuration->set_range(
+	    std::numeric_limits < double >::epsilon(),
+	    std::numeric_limits < double >::max());
+	mSpinDuration->set_value(mModeling->experiment().duration());
+    }
+
+    // Simulation frame
+    {
+	mSpinSimuSeed->set_range(0, std::numeric_limits < guint32 >::max());
+	if (mModeling->experiment().seed() != 1) {
+	    mSpinSimuSeed->set_value(mModeling->experiment().seed());
+	} else {
+	    on_random_simu();
+	}
+    }
+
+    // Plan frame
+    {
+	mComboCombi = new Gtk::ComboBoxText();
+	mComboCombi->append_text("linear");
+	mComboCombi->append_text("total");
+	mHboxCombi->pack_start(*mComboCombi, true, true, 5);
+	if (mModeling->experiment().combination().empty()) {
+	    mModeling->experiment().setCombination("linear");
+	}
+	mComboCombi->set_active_text(mModeling->experiment().combination());
+
+	mSpinPlanSeed->set_range(0, std::numeric_limits < guint32 >::max());
+	if (mModeling->experiment().replicas().seed() != 0) {
+	    mSpinPlanSeed->set_value(mModeling->experiment().replicas().seed());
+	} else {
+	    on_random_plan();
+	}
+
+	mButtonNumber->set_range(1, std::numeric_limits < guint32 >::max());
+	mButtonNumber->set_value(mModeling->experiment().replicas().number());
+    }
+}
+
+void ExperimentBox::run()
+{
+    bool ok = false;
+
+    while (!ok) {
+	if (mDialog->run() == Gtk::RESPONSE_OK) {
+	    ok = apply();
+	} else {
+	    ok = true;
+	}
     }
     mDialog->hide();
 }
 
-void ExperimentBox::on_simu()
+bool ExperimentBox::apply()
 {
-    if (mRadioSimu->get_active()) {
-        mHboxSimu->set_sensitive(true);
-        mHboxPlan->set_sensitive(false);
-    }
-}
+    // Project frame
+    {
+	std::string error;
 
-void ExperimentBox::on_plan()
-{
-    if (mRadioPlan->get_active()) {
-        mHboxSimu->set_sensitive(false);
-        mHboxPlan->set_sensitive(true);
+	if (mEntryAuthor->get_text().empty()) {
+	    error += "Set an author for this project.\n";
+	}
+
+	if (mEntryVersion->get_text().empty()) {
+	    error += "Set an number of version for this project.\n";
+	}
+
+	if (mEntryName->get_text().empty()) {
+	    error += "Set a name for this experiment.\n";
+	}
+
+	if (error.empty()) {
+	    mModeling->vpz().project().setAuthor(mEntryAuthor->get_text());
+	    mModeling->vpz().project().setDate(mEntryDate->get_text());
+	    mModeling->vpz().project().setVersion(mEntryVersion->get_text());
+	} else {
+	    Error(error);
+	    return false;
+	}
     }
+
+    vpz::Experiment& exp = mModeling->experiment();
+    vpz::Replicas& rep = exp.replicas();
+
+    // Experiment frame
+    {
+	exp.setName(mEntryName->get_text());
+
+	exp.setDuration(mSpinDuration->get_value() <= 0.0 ?
+			std::numeric_limits < double >::epsilon() :
+			mSpinDuration->get_value());
+    }
+
+    // Simulation frame
+    {
+	exp.setSeed(mSpinSimuSeed->get_value());
+    }
+
+    // Plan frame
+    {
+	exp.setCombination(mComboCombi->get_active_text());
+	rep.setSeed(mSpinPlanSeed->get_value());
+	rep.setNumber(mButtonNumber->get_value());
+    }
+    return true;
 }
 
 void ExperimentBox::on_random_simu()
@@ -158,23 +225,17 @@ void ExperimentBox::on_random_plan()
     mSpinPlanSeed->set_value(mRand.get_int());
 }
 
-void ExperimentBox::apply()
+void ExperimentBox::on_calendar()
 {
-    vpz::Experiment& exp = mModeling->experiment();
-    vpz::Replicas& rep = exp.replicas();
+    std::string date;
 
-    exp.setName(mEntryName->get_text());
-    exp.setDuration(mSpinDuration->get_value() <= 0.0 ?
-                    std::numeric_limits < double >::epsilon() :
-                    mSpinDuration->get_value());
+    mCalendar.get_date(date);
+    mEntryDate->set_text(date);
+}
 
-    exp.setCombination(mComboCombi->get_active_text());
-    if (mRadioSimu->get_active()) {
-        exp.setSeed(mSpinSimuSeed->get_value());
-    } else {
-        rep.setSeed(mSpinPlanSeed->get_value());
-        rep.setNumber(mButtonNumber->get_value());
-    }
+void ExperimentBox::on_now()
+{
+    mEntryDate->set_text(utils::get_current_date());
 }
 
 }} // namespace vle gvle

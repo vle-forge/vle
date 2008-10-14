@@ -32,8 +32,6 @@ namespace vle { namespace gvle {
 
 GVLEMenu::GVLEMenu(GVLE* gvle)
 {
-    assert(gvle);
-
     makeMenuFile(gvle);
     makeMenuView(gvle);
     makeMenuSimulation(gvle);
@@ -75,7 +73,8 @@ void GVLEMenu::makeMenuFile(GVLE* gvle)
 
     menulist.push_back(Gtk::Menu_Helpers::StockMenuElem(
                            Gtk::Stock::QUIT,
-                           Gtk::AccelKey(GDK_Q, Gdk::CONTROL_MASK | Gdk::SHIFT_MASK),
+                           Gtk::AccelKey(GDK_Q, Gdk::CONTROL_MASK |
+					 Gdk::SHIFT_MASK),
                            sigc::mem_fun(gvle, &Gtk::Window::hide)));
 }
 
@@ -107,49 +106,46 @@ void GVLEMenu::makeMenuView(GVLE* gvle)
         Gtk::Menu_Helpers::MenuElem("_Close all views",
                                     Gtk::AccelKey(GDK_W, Gdk::CONTROL_MASK),
             sigc::mem_fun(gvle, &GVLE::onCloseAllViews)));
-
-
 }
 
 void GVLEMenu::makeMenuSimulation(GVLE* gvle)
 {
     Gtk::Menu::MenuList& menulist = mMenuSimulation.items();
 
-    menulist.push_back(Gtk::Menu_Helpers::MenuElem(
-            "_Simulation", Gtk::AccelKey(GDK_S, Gdk::CONTROL_MASK |
-                                         Gdk::SHIFT_MASK),
-            sigc::mem_fun(gvle, &GVLE::onExperimentsBox)));
+    menulist.push_back(
+	Gtk::Menu_Helpers::MenuElem("_Project",
+				    Gtk::AccelKey(GDK_P,
+						  Gdk::CONTROL_MASK),
+				    sigc::mem_fun(gvle,
+						  &GVLE::onExperimentsBox)));
 
     menulist.push_back(Gtk::Menu_Helpers::MenuElem(
-            "_Project", Gtk::AccelKey(GDK_P, Gdk::CONTROL_MASK),
-            sigc::mem_fun(gvle, &GVLE::onProjectBox)));
-
-    menulist.push_back(Gtk::Menu_Helpers::SeparatorElem());
-
-    menulist.push_back(Gtk::Menu_Helpers::MenuElem(
-            "_Views", Gtk::AccelKey(GDK_Z, Gdk::CONTROL_MASK),
-            sigc::mem_fun(gvle, &GVLE::onViewOutputBox)));
+			   "_Views", Gtk::AccelKey(GDK_Z, Gdk::CONTROL_MASK),
+			   sigc::mem_fun(gvle, &GVLE::onViewOutputBox)));
 
     menulist.push_back(Gtk::Menu_Helpers::MenuElem
-        ("_Conditions", Gtk::AccelKey(GDK_C, Gdk::CONTROL_MASK),
-         sigc::mem_fun(gvle, &GVLE::onConditionsBox)));
+		       ("_Conditions", Gtk::AccelKey(GDK_C, Gdk::CONTROL_MASK),
+			sigc::mem_fun(gvle, &GVLE::onConditionsBox)));
 
     menulist.push_back(Gtk::Menu_Helpers::SeparatorElem());
 
-    menulist.push_back(Gtk::Menu_Helpers::MenuElem("H_osts",
-            sigc::mem_fun(gvle, &GVLE::onHostsBox)));
+    menulist.push_back(
+	Gtk::Menu_Helpers::MenuElem("H_osts",
+				    sigc::mem_fun(gvle, &GVLE::onHostsBox)));
 
-    menulist.push_back(Gtk::Menu_Helpers::MenuElem(
-            "_Launch Simulation", Gtk::AccelKey(GDK_L, Gdk::CONTROL_MASK),
-            sigc::mem_fun(gvle, &GVLE::onSimulationBox)));
+    menulist.push_back(
+	Gtk::Menu_Helpers::MenuElem(
+	    "_Launch Simulation", Gtk::AccelKey(GDK_L, Gdk::CONTROL_MASK),
+	    sigc::mem_fun(gvle, &GVLE::onSimulationBox)));
 }
 
 void GVLEMenu::makeMenuHelp(GVLE* gvle)
 {
     Gtk::Menu::MenuList& menulist = mMenuHelp.items();
 
-    menulist.push_back(Gtk::Menu_Helpers::MenuElem("About",
-                       sigc::mem_fun(gvle, &GVLE::onShowAbout)));
+    menulist.push_back(
+	Gtk::Menu_Helpers::MenuElem("About",
+				    sigc::mem_fun(gvle, &GVLE::onShowAbout)));
 }
 
-}} // namespace vle gvle
+} } // namespace vle gvle

@@ -26,14 +26,12 @@
 #ifndef GUI_GVLE_HH
 #define GUI_GVLE_HH
 
-#include <vle/gvle/ExperimentBox.hpp>
 #include <vle/gvle/ConditionsBox.hpp>
 #include <vle/gvle/HelpBox.hpp>
 #include <vle/gvle/LaunchSimulationBox.hpp>
 #include <vle/gvle/ObserverPlugin.hpp>
 #include <vle/gvle/ParameterExecutionBox.hpp>
 #include <vle/gvle/Plugin.hpp>
-#include <vle/gvle/ProjectBox.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/gvle/ComboboxString.hpp>
 #include <vle/utils/Path.hpp>
@@ -360,12 +358,6 @@ public:
     void onHostsBox();
 
     /**
-       * When click on Project box to define the VLE project data.
-       *
-       */
-    void onProjectBox();
-
-    /**
      * @brief When user select the gvle::ViewOutputBox.
      */
     void onViewOutputBox();
@@ -423,9 +415,7 @@ private:
     Glib::RefPtr < Gnome::Glade::Xml >  mRefXML;
 
     //Menu
-    ExperimentBox*        mExpBox;
     ConditionsBox*        mConditionsBox;
-    ProjectBox*           mProjectBox;
     LaunchSimulationBox*  mSimulationBox;
 };
 

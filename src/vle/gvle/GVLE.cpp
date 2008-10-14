@@ -27,6 +27,7 @@
 #include <vle/gvle/About.hpp>
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/ExecutionBox.hpp>
+#include <vle/gvle/ExperimentBox.hpp>
 #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/ExperimentBox.hpp>
 #include <vle/gvle/HostsBox.hpp>
@@ -70,9 +71,7 @@ GVLE::GVLE(const std::string& filename) :
 
     m_modeling->setGlade(mRefXML);
 
-    mExpBox = new ExperimentBox(mRefXML, m_modeling);
     mConditionsBox = new ConditionsBox(mRefXML, m_modeling);
-    mProjectBox = new ProjectBox(mRefXML, &m_modeling->vpz().project());
     mSimulationBox = new LaunchSimulationBox(mRefXML, m_modeling);
 
     //loadObserverPlugins(utils::Path::path().getDefaultObserverPluginDir());
@@ -117,9 +116,7 @@ GVLE::~GVLE()
     //delete m_pluginTable;
     delete m_modeling;
 
-    delete mExpBox;
     delete mConditionsBox;
-    delete mProjectBox;
     delete mSimulationBox;
 }
 /*
@@ -610,7 +607,8 @@ void GVLE::onParameterExecutionBox()
 
 void GVLE::onExperimentsBox()
 {
-    mExpBox->show();
+    ExperimentBox box(mRefXML, m_modeling);
+    box.run();
 }
 
 void GVLE::onConditionsBox()
@@ -631,11 +629,6 @@ void GVLE::onHelpBox()
         m_helpbox = new HelpBox;
 
     m_helpbox->show_all();
-}
-
-void GVLE::onProjectBox()
-{
-    mProjectBox->show();
 }
 
 void GVLE::onViewOutputBox()

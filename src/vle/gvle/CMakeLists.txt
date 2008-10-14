@@ -22,7 +22,7 @@ SET(GVLE_HPP About.hpp AtomicModelBox.hpp BooleanBox.hpp CalendarBox.hpp
   Modeling.hpp NewModelClassBox.hpp NewTypeBox.hpp ObsAndViewBox.hpp
   ObservableBox.hpp ObserverPlugin.hpp Paned.hpp ParameterExecutionBox.hpp
   Plugin.hpp PluginPlus.hpp PluginSelection.hpp PluginTable.hpp PortDialog.hpp
-  ProjectBox.hpp ReplicasBox.hpp SimpleTypeBox.hpp TableBox.hpp
+  ReplicasBox.hpp SimpleTypeBox.hpp TableBox.hpp
   TreeViewConditions.hpp TreeViewObservable.hpp TreeViewValue.hpp UndoRedo.hpp
   ValueBox.hpp ValuesTreeView.hpp View.hpp ViewDrawingArea.hpp ViewMenu.hpp
   ViewOutputBox.hpp XmlTypeBox.hpp)
@@ -35,7 +35,7 @@ SET(GVLE_CPP About.cpp AtomicModelBox.cpp BooleanBox.cpp CalendarBox.cpp
   ModelClassBox.cpp ModelDescriptionBox.cpp ModelTreeBox.cpp Modeling.cpp
   NewModelClassBox.cpp NewTypeBox.cpp ObsAndViewBox.cpp ObservableBox.cpp
   ParameterExecutionBox.cpp PluginSelection.cpp PluginTable.cpp PortDialog.cpp
-  ProjectBox.cpp ReplicasBox.cpp SimpleTypeBox.cpp TableBox.cpp
+  ReplicasBox.cpp SimpleTypeBox.cpp TableBox.cpp
   TreeViewConditions.cpp TreeViewObservable.cpp TreeViewValue.cpp UndoRedo.cpp
   ValueBox.cpp ValuesTreeView.cpp View.cpp ViewDrawingArea.cpp ViewMenu.cpp
   ViewOutputBox.cpp XmlTypeBox.cpp)
