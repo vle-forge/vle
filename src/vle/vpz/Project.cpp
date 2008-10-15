@@ -39,9 +39,9 @@ Project::Project() :
 void Project::write(std::ostream& out) const
 {
     out << "<vle_project"
-        << " version=\"" << m_version << "\""
-        << " date=\"" << m_date << "\""
-        << " author=\"" << m_author << "\"";
+        << " version=\"" << m_version.c_str() << "\""
+        << " date=\"" << m_date.c_str() << "\""
+        << " author=\"" << m_author.c_str() << "\"";
 
     if (m_instance >= 0) {
         out << " instance=\"" << m_instance << "\"";

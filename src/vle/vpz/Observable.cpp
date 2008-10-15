@@ -32,11 +32,11 @@ namespace vle { namespace vpz {
 void ObservablePort::write(std::ostream& out) const
 {
     if (m_list.empty()) {
-        out << "<port name=\"" << m_name << "\" />\n";
+        out << "<port name=\"" << m_name.c_str() << "\" />\n";
     } else {
-        out << "<port name=\"" << m_name << "\" >\n";
+        out << "<port name=\"" << m_name.c_str() << "\" >\n";
         for (const_iterator it = begin(); it != end(); ++it) {
-            out << " <attachedview name=\"" << *it << "\" />\n";
+            out << " <attachedview name=\"" << it->c_str() << "\" />\n";
         }
         out << "</port>\n";
     }
@@ -68,13 +68,13 @@ bool ObservablePort::exist(const std::string& portname) const
 void Observable::write(std::ostream& out) const
 {
     if (not m_list.empty()) {
-        out << "<observable name=\"" << m_name << "\" >\n";
+        out << "<observable name=\"" << m_name.c_str() << "\" >\n";
         std::transform(begin(), end(),
                        std::ostream_iterator < ObservablePort >(out, "\n"),
                        utils::select2nd < ObservablePortList::value_type >());
         out << "</observable>\n";
     } else {
-        out << "<observable name=\"" << m_name << "\" />\n";
+        out << "<observable name=\"" << m_name.c_str() << "\" />\n";
     }
 }
 

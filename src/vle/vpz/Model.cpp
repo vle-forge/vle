@@ -106,7 +106,7 @@ void Model::writeCoupled(std::ostream& out, const graph::CoupledModel* mdl) cons
 
         if (not writed.top()) {
             writed.top() = true;
-            out << "<model name=\"" << top->getName() << "\" "
+            out << "<model name=\"" << top->getName().c_str() << "\" "
                 << "type=\"coupled\" ";
             writeGraphics(out, top);
             out << " >\n";
@@ -138,7 +138,7 @@ void Model::writeAtomic(std::ostream& out, const graph::AtomicModel* mdl) const
 {
     const AtomicModel& vpzatom(atomicModels().get(mdl));
 
-    out << "<model name=\"" << mdl->getName() << "\" "
+    out << "<model name=\"" << mdl->getName().c_str() << "\" "
         << "type=\"atomic\" ";
 
     if (not vpzatom.conditions().empty()) {
@@ -146,7 +146,7 @@ void Model::writeAtomic(std::ostream& out, const graph::AtomicModel* mdl) const
 
         Strings::const_iterator it = vpzatom.conditions().begin();
         while (it != vpzatom.conditions().end()) {
-            out << *it;
+            out << it->c_str();
             ++it;
             if (it != vpzatom.conditions().end()) {
                 out << ",";
@@ -155,10 +155,10 @@ void Model::writeAtomic(std::ostream& out, const graph::AtomicModel* mdl) const
 
         out << "\" ";
     }
-    out << "dynamics=\"" << vpzatom.dynamics() << "\" ";
+    out << "dynamics=\"" << vpzatom.dynamics().c_str() << "\" ";
 
     if (not vpzatom.observables().empty()) {
-        out << "observables=\"" << vpzatom.observables() << "\" ";
+        out << "observables=\"" << vpzatom.observables().c_str() << "\" ";
     }
 
     writeGraphics(out, mdl);
@@ -193,7 +193,7 @@ void Model::writePort(std::ostream& out, const graph::Model* mdl) const
         out << "<in>\n";
         for (graph::ConnectionList::const_iterator it = ins.begin();
              it != ins.end(); ++it) {
-            out << " <port name=\"" << it->first << "\" />\n";
+            out << " <port name=\"" << it->first.c_str() << "\" />\n";
         }
         out << "</in>\n";
     }
@@ -203,7 +203,7 @@ void Model::writePort(std::ostream& out, const graph::Model* mdl) const
         out << "<out>\n";
         for (graph::ConnectionList::const_iterator it = outs.begin();
              it != outs.end(); ++it) {
-            out << " <port name=\"" << it->first << "\" />\n";
+            out << " <port name=\"" << it->first.c_str() << "\" />\n";
         }
         out << "</out>\n";
     }

@@ -34,6 +34,7 @@
 #include <glibmm/markup.h>
 #include <glibmm/stringutils.h>
 #include <glibmm/thread.h>
+#include <glibmm/date.h>
 #include <glib/gstdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -103,34 +104,16 @@ std::string write_to_temp(const std::string& prefix,
 
 std::string get_current_date()
 {
-    std::setlocale(LC_TIME, "");
-
-    const std::size_t buffer_size = 1024;
-    char buffer[ buffer_size ];
-    
-    const char* format = "%a, %d %b %Y %H:%M:%S %z";
-    std::time_t t = std::time(0);
-
-    std::strftime(buffer, buffer_size,
-                  format, std::localtime( &t ) ); 
-
-    return std::string(buffer);
+    Glib::Date date;
+    date.set_time_current();
+    return date.format_string("%a, %d %b %Y");
 }
 
 std::string get_simple_current_date()
 {
-    std::setlocale(LC_TIME, "");
-
-    const std::size_t buffer_size = 1024;
-    char buffer[ buffer_size ];
-
-    const char* format = "%Y%m%d-%H%M";
-    std::time_t t = std::time(0);
-
-    std::strftime(buffer, buffer_size,
-                  format, std::localtime(&t)); 
-
-    return std::string(buffer);
+    Glib::Date date;
+    date.set_time_current();
+    return date.format_string("%a, %d %b %Y");
 }
 
 bool is_vle_string(const Glib::ustring& str)

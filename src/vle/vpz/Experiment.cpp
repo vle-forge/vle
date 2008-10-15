@@ -31,11 +31,12 @@ namespace vle { namespace vpz {
 void Experiment::write(std::ostream& out) const
 {
     out << "<experiment "
-        << "name=\"" << m_name << "\" "
+        << "name=\"" << m_name.c_str() << "\" "
         << "duration=\"" << m_duration << "\" ";
 
     if (not m_combination.empty()) {
-        out << "combination=\"" << m_combination << "\" ";
+        out << "combination=\"" << m_combination.c_str()
+            << "\" ";
     }
 
     out << "seed=\"" << m_seed << "\" >\n";

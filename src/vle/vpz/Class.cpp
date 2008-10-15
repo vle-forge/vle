@@ -43,7 +43,7 @@ Class::Class(const Class& cls) :
 
 void Class::write(std::ostream& out) const
 {
-    out << "<class name=\"" << m_name << "\" >\n";
+    out << "<class name=\"" << m_name.c_str() << "\" >\n";
     m_model->writeXML(out);
     out << "</class>\n";
 }

@@ -30,12 +30,12 @@ namespace vle { namespace vpz {
 void ParameterTrame::write(std::ostream& out) const
 {
     if (not m_data.empty()) {
-        out << "<trame type=\"parameter\" date=\"" << m_time << "\" plugin=\""
-            << m_plugin << "\" >" << "<![CDATA[" << m_data << "]]>"
+        out << "<trame type=\"parameter\" date=\"" << m_time.c_str() << "\" plugin=\""
+            << m_plugin.c_str() << "\" >" << "<![CDATA[" << m_data.c_str() << "]]>"
             << "</trame>";
     } else {
-        out << "<trame type=\"parameter\" date=\"" << m_time << "\" plugin=\""
-           << m_plugin << "\" />";
+        out << "<trame type=\"parameter\" date=\"" << m_time.c_str() << "\" plugin=\""
+           << m_plugin.c_str() << "\" />";
     }
 }
 

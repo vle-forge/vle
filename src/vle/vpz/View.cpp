@@ -47,8 +47,8 @@ View::View(const std::string& name,
 void View::write(std::ostream& out) const
 {
     out << "<view "
-        << "name=\"" << m_name << "\" "
-        << "output=\"" << m_output << "\" ";
+        << "name=\"" << m_name.c_str() << "\" "
+        << "output=\"" << m_output.c_str() << "\" ";
 
     switch (m_type) {
     case View::EVENT:
@@ -68,7 +68,7 @@ void View::write(std::ostream& out) const
     } else {
         out << ">\n"
             << "<![CDATA[\n"
-            << m_data
+            << m_data.c_str()
             << "]]>\n"
             << "</view>\n";
     }

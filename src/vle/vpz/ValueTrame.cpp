@@ -45,7 +45,7 @@ void ValueTrame::add(const value::Value& value)
 
 void ValueTrame::write(std::ostream& out) const
 {
-    out << "<trame type=\"value\" date=\"" << m_time << "\" >";
+    out << "<trame type=\"value\" date=\"" << m_time.c_str() << "\" >";
 
     std::copy(m_list.begin(), m_list.end(),
               std::ostream_iterator < ModelTrame >(out, "\n"));

@@ -30,11 +30,11 @@ namespace vle { namespace vpz {
 void NewObservableTrame::write(std::ostream& out) const
 {
     out << "<trame type=\"new"
-        << "\" date=\"" << m_time
-        << "\" name=\"" << m_name
-        << "\" parent=\"" << m_parent
-        << "\" port=\"" << m_port
-        << "\" view=\"" << m_view << "\" />";
+        << "\" date=\"" << m_time.c_str()
+        << "\" name=\"" << m_name.c_str()
+        << "\" parent=\"" << m_parent.c_str()
+        << "\" port=\"" << m_port.c_str()
+        << "\" view=\"" << m_view.c_str() << "\" />";
 }
 
 }} // namespace vle vpz

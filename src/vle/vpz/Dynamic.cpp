@@ -31,18 +31,18 @@ namespace vle { namespace vpz {
 void Dynamic::write(std::ostream& out) const
 {
     out << "<dynamic "
-        << "name=\"" << m_name << "\" "
-        << "library=\"" << m_library << "\" "
-        << "model=\"" << m_model << "\" ";
+        << "name=\"" << m_name.c_str() << "\" "
+        << "library=\"" << m_library.c_str() << "\" "
+        << "model=\"" << m_model.c_str() << "\" ";
 
     if (not m_language.empty()) {
-        out << "language=\"" << m_language << "\" ";
+        out << "language=\"" << m_language.c_str() << "\" ";
     }
 
     if (m_type == LOCAL) {
         out << "type=\"local\" ";
     } else {
-        out << "type=\"distant\"  location=\"" << m_location << "\"";
+        out << "type=\"distant\"  location=\"" << m_location.c_str() << "\"";
     }
 
     out << " />";

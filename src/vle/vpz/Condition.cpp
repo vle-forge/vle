@@ -81,24 +81,22 @@ Condition::Condition(const Condition& cnd) :
 
 void Condition::write(std::ostream& out) const
 {
-    out << "<condition name=\"" << m_name << "\" >\n";
+    out << "<condition name=\"" << m_name.c_str() << "\" >\n";
 
     for (ConditionValues::const_iterator it = m_list.begin(); it !=
          m_list.end();
          ++it) {
         out << " <port "
-            << "name=\"" << it->first << "\" "
+            << "name=\"" << it->first.c_str() << "\" "
             << ">\n";
 
         const value::VectorValue& val(value::toSet(it->second));
         for (value::VectorValue::const_iterator jt = val.begin();
              jt != val.end(); ++jt) {
-            out << (*jt)->toXML() << "\n";
+            out << (*jt)->toXML().c_str() << "\n";
         }
-
         out << "</port>\n";
     }
-
     out << "</condition>\n";
 }
 

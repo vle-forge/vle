@@ -389,7 +389,7 @@ void Model::writePortListXML(std::ostream& out) const
 
         ConnectionList::const_iterator it = m_inPortList.begin();
         for (;it != m_inPortList.end(); ++it) {
-            out << "<port name=\"" << (*it).first << "\" />\n";
+            out << "<port name=\"" << (*it).first.c_str() << "\" />\n";
         }
         out << "</in>\n";
     }
@@ -398,7 +398,7 @@ void Model::writePortListXML(std::ostream& out) const
         out << "<out>\n";
 	ConnectionList::const_iterator it = m_outPortList.begin();
         for(; it != m_outPortList.end(); ++it) {
-            out << "<port name=\"" << (*it).first << "\" />\n";
+            out << "<port name=\"" << (*it).first.c_str() << "\" />\n";
 	}
         out << "</out>\n";
     }

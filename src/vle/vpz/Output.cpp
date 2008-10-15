@@ -30,7 +30,8 @@ namespace vle { namespace vpz {
 
 void Output::write(std::ostream& out) const
 {
-    out << "<output name=\"" << m_name << "\" " << "location=\"" << m_location
+    out << "<output name=\"" << m_name.c_str() << "\" "
+        << "location=\"" << m_location.c_str()
         << "\" ";
 
     switch (m_format) {
@@ -42,10 +43,10 @@ void Output::write(std::ostream& out) const
         break;
     }
 
-    out << " plugin=\"" << m_plugin << "\" ";
+    out << " plugin=\"" << m_plugin.c_str() << "\" ";
 
     if (not m_data.empty()) {
-        out << ">\n<![CDATA[\n" << m_data << "\n]]>\n</output>\n";
+        out << ">\n<![CDATA[\n" << m_data.c_str() << "\n]]>\n</output>\n";
     } else {
         out << "/>\n";
     }

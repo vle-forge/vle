@@ -168,6 +168,12 @@ void Modeling::parseXML(const string& filename)
     } catch (const utils::FileError& f) {
         gvle::Error((boost::format("Error opening file, %1%") %
                      f.what()).str());
+    } catch (const Glib::Error& e) {
+        gvle::Error((boost::format("Error opening file, %1%") %
+                     e.what()).str());
+    } catch (const std::exception& e) {
+        gvle::Error((boost::format("Error opening file, %1%") %
+                     e.what()).str());
     }
 }
 

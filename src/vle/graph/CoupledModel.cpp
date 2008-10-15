@@ -615,7 +615,7 @@ void CoupledModel::detachModels(const ModelList& models)
 
 void CoupledModel::writeXML(std::ostream& out) const
 {
-    out << "<model name=\"" << getName() << "\" " << " type=\"coupled\" >\n";
+    out << "<model name=\"" << getName().c_str() << "\" " << " type=\"coupled\" >\n";
     writePortListXML(out);
     out << "<submodels>\n";
 
@@ -640,10 +640,10 @@ void CoupledModel::writeConnections(std::ostream& out) const
         for (ModelPortList::const_iterator jt = lst.begin(); jt != lst.end();
              ++jt) {
             out << "<connection type=\"output\">\n"
-                << " <origin model=\"" << jt->first->getName() << "\" "
-                << "port=\"" << jt->second << "\" />\n"
-                << " <destination model=\"" << getName() << "\" "
-                << "port=\"" << port << "\" />\n"
+                << " <origin model=\"" << jt->first->getName().c_str() << "\" "
+                << "port=\"" << jt->second.c_str() << "\" />\n"
+                << " <destination model=\"" << getName().c_str() << "\" "
+                << "port=\"" << port.c_str() << "\" />\n"
                 << "</connection>\n";
         }
     }
@@ -655,10 +655,10 @@ void CoupledModel::writeConnections(std::ostream& out) const
         for (ModelPortList::const_iterator jt = lst.begin(); jt != lst.end();
              ++jt) {
             out << "<connection type=\"input\">\n"
-                << " <origin model=\"" << getName() << "\" "
-                << "port=\"" << port << "\" />\n"
-                << " <destination model=\"" << jt->first->getName() << "\" "
-                << "port=\"" << jt->second << "\" />\n"
+                << " <origin model=\"" << getName().c_str() << "\" "
+                << "port=\"" << port.c_str() << "\" />\n"
+                << " <destination model=\"" << jt->first->getName().c_str() << "\" "
+                << "port=\"" << jt->second.c_str() << "\" />\n"
                 << "</connection>\n";
         }
     }
@@ -672,10 +672,10 @@ void CoupledModel::writeConnections(std::ostream& out) const
                  kt != jt->second.end(); ++kt) {
                 if (kt->first != this) {
                     out << "<connection type=\"internal\">\n"
-                        << " <origin model=\"" << (*it).second->getName() << "\" "
-                        << "port=\"" << jt->first << "\" />\n"
-                        << " <destination model=\""  << kt->first->getName()
-                        << "\" port=\"" << kt->second << "\" />\n"
+                        << " <origin model=\"" << (*it).second->getName().c_str() << "\" "
+                        << "port=\"" << jt->first.c_str() << "\" />\n"
+                        << " <destination model=\""  << kt->first->getName().c_str()
+                        << "\" port=\"" << kt->second.c_str() << "\" />\n"
                         << "</connection>\n";
                 }
             }
