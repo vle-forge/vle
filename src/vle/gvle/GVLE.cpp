@@ -43,13 +43,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
-#include <gtkmm/filechooserwidget.h>
+#include <gtkmm/filechooserdialog.h>
 
-using namespace vle;
-
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
 GVLE::GVLE(const std::string& filename) :
         m_vbox(false, 2),
@@ -480,8 +476,8 @@ void GVLE::onMenuLoad()
     if (m_modeling->isModified() == false or
             gvle::Question("Do you really want load a new Model ?\n"
                            "Current model will be destroy and not save")) {
-        Gtk::FileChooserDialog file(*this, "VPZ file",
-                                    Gtk::FILE_CHOOSER_ACTION_OPEN);
+        Gtk::FileChooserDialog file("VPZ file", Gtk::FILE_CHOOSER_ACTION_OPEN);
+        file.set_transient_for(*this);
         file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
         file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
         Gtk::FileFilter filter;
@@ -540,25 +536,17 @@ void GVLE::onMenuSaveAs()
         return;
     }
 
-    Gtk::FileChooserWidget filechooser(Gtk::FILE_CHOOSER_ACTION_SAVE);
+    Gtk::FileChooserDialog file("VPZ file", Gtk::FILE_CHOOSER_ACTION_SAVE);
+    file.set_transient_for(*this);
+    file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+    file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
     Gtk::FileFilter filter;
     filter.set_name("Vle Project gZipped");
     filter.add_pattern("*.vpz");
-    filechooser.add_filter(filter);
+    file.add_filter(filter);
 
-    Gtk::CheckButton button("compress vpz with gzip");
-    Gtk::Dialog dialog("Save as...");
-    dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-    dialog.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
-
-    Gtk::VBox* vbox = dialog.get_vbox();
-    vbox->pack_start(filechooser, true, true);
-    vbox->pack_start(button, false, false);
-
-    dialog.show_all();
-
-    if (dialog.run() == Gtk::RESPONSE_OK) {
-        std::string filename(filechooser.get_filename());
+    if (file.run() == Gtk::RESPONSE_OK) {
+        std::string filename(file.get_filename());
         vpz::Vpz::fixExtension(filename);
         m_modeling->saveXML(filename);
     }
@@ -647,42 +635,42 @@ std::string valuetype_to_string(value::ValueBase::type type)
 {
     switch (type) {
     case(value::ValueBase::BOOLEAN):
-                    return "boolean";
+        return "boolean";
         break;
     case(value::ValueBase::INTEGER):
-                    return "integer";
+        return "integer";
         break;
     case(value::ValueBase::DOUBLE):
-                    return "double";
+        return "double";
         break;
     case(value::ValueBase::STRING):
-                    return "string";
+        return "string";
         break;
     case(value::ValueBase::SET):
-                    return "set";
+        return "set";
         break;
     case(value::ValueBase::MAP):
-                    return "map";
+        return "map";
         break;
     case(value::ValueBase::TUPLE):
-                    return "tuple";
+        return "tuple";
         break;
     case(value::ValueBase::TABLE):
-                    return "table";
+        return "table";
         break;
     case(value::ValueBase::XMLTYPE):
-                    return "xml";
+        return "xml";
         break;
     case(value::ValueBase::NIL):
-                    return "null";
+        return "null";
         break;
     case(value::ValueBase::MATRIX):
-                    return "matrix";
+        return "matrix";
         break;
     default:
         return "(no value)";
         break;
     }
 }
-}
-} // namespace vle gvle
+
+}} // namespace vle gvle

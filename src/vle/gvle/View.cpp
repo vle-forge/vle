@@ -23,7 +23,6 @@
  */
 
 
-//#include <vle/gvle/CoupledModelBox.hpp>
 #include <vle/gvle/ConnectionBox.hpp>
 #include <vle/gvle/GVLE.hpp>
 #include <vle/gvle/Message.hpp>
@@ -40,16 +39,11 @@
 #include <gtkmm/filechooserdialog.h>
 #include <gdkmm/cursor.h>
 
-using std::max;
-using std::min;
 using std::string;
 using std::list;
 using std::vector;
-using namespace vle;
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
 View::View(Modeling* m, graph::CoupledModel* c, size_t index) :
         mModeling(m),
@@ -203,23 +197,17 @@ void View::exportCurrentModel()
         return;
     }
 
-    Gtk::FileChooserWidget filechooser(Gtk::FILE_CHOOSER_ACTION_SAVE);
+    Gtk::FileChooserDialog file("VPZ file", Gtk::FILE_CHOOSER_ACTION_SAVE);
+    file.set_transient_for(*this);
+    file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+    file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
     Gtk::FileFilter filter;
     filter.set_name("Vle Project gZipped");
     filter.add_pattern("*.vpz");
-    filechooser.add_filter(filter);
+    file.add_filter(filter);
 
-    Gtk::Dialog dialog("Save as...");
-    dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-    dialog.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
-
-    Gtk::VBox* vbox = dialog.get_vbox();
-    vbox->pack_start(filechooser, true, true);
-
-    dialog.show_all();
-
-    if (dialog.run() == Gtk::RESPONSE_OK) {
-        std::string filename(filechooser.get_filename());
+    if (file.run() == Gtk::RESPONSE_OK) {
+        std::string filename(file.get_filename());
         vpz::Vpz::fixExtension(filename);
 
         vpz::Vpz* save = new vpz::Vpz();
@@ -235,23 +223,17 @@ void View::exportCurrentModel()
 
 void View::importModel()
 {
-    Gtk::FileChooserWidget filechooser(Gtk::FILE_CHOOSER_ACTION_OPEN);
+    Gtk::FileChooserDialog file("VPZ file", Gtk::FILE_CHOOSER_ACTION_OPEN);
+    file.set_transient_for(*this);
+    file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+    file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
     Gtk::FileFilter filter;
     filter.set_name("Vle Project gZipped");
     filter.add_pattern("*.vpz");
-    filechooser.add_filter(filter);
+    file.add_filter(filter);
 
-    Gtk::Dialog dialog("Import...");
-    dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-    dialog.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
-
-    Gtk::VBox* vbox = dialog.get_vbox();
-    vbox->pack_start(filechooser, true, true);
-
-    dialog.show_all();
-
-    if (dialog.run() == Gtk::RESPONSE_OK) {
-        string project_file = filechooser.get_filename();
+    if (file.run() == Gtk::RESPONSE_OK) {
+        string project_file = file.get_filename();
         try {
             vpz::Vpz* import = new vpz::Vpz(project_file);
 
@@ -261,38 +243,6 @@ void View::importModel()
         } catch (std::exception& E) {
             std::cout << "Exception :\n" << E.what() << "\n";
         }
-        /*
-          GModel* m = mModeling->parseXML(project_file);
-          
-          if (m) {
-          MapStringModel previous = mModeling->buidMapString(
-          mModeling->getTopModel()->getModel());
-          MapStringModel next = mModeling->buidMapString(m->getModel());
-          list < string > intersection;
-          
-          for (MapStringModel::iterator itp = previous.begin(); itp !=
-          previous.end(); itp++) {
-          for (MapStringModel::iterator itn = next.begin(); itn !=
-          next.end(); itn++) {
-          if ((*itp).first == (*itn).first)
-          intersection.push_back((*itn).first);
-          }
-          }
-          
-          if (intersection.empty() == false) {
-          string s("Model(s) have same name :\n");
-          for (list<string>::iterator it = intersection.begin(); it !=
-          intersection.end(); ++it) {
-          s += "\"" + (*it) + "\" ";
-          }
-          gvle::Error(s.c_str());
-          delete m;
-          } else {
-          mCurrent->attachChildrenModel(m);
-          mModeling->redrawModelTreeBox();
-          }
-          }
-        */
     }
 }
 
@@ -337,24 +287,9 @@ void View::addAtomicModel(int x, int y)
                 mModeling->vpz().project().model().atomicModels().add(
                     new_atom, vpz::AtomicModel("", "", ""));
                 mDrawing->draw();
-            } catch (utils::SaxParserError& E) {
-
+            } catch (utils::SaxParserError& e) {
+                Error(e.what());
             }
-            /*DynamicsBox dyn_box(vpz_am, *new_atom, mModeling->dynamics(),
-            mModeling->observables(), mModeling->measures(), mModeling->conditions());
-            std::cout << "&\n";
-            dyn_box.run();
-            */
-
-            //AtomicModelBox box(mModeling->getGlade(), new_atom);
-            //box.run();
-
-            //AtomicModelBox* atom_box = new AtomicModelBox(new_atom);
-            //list < string > lstInit, lstInput, lstOutput, lstState;
-            //if (atom_box->run() == Gtk::RESPONSE_OK) {
-            //atom_box->adoptModification(mModeling);
-            //}
-            //delete atom_box;
         }
     }
     delete box;
@@ -363,20 +298,10 @@ void View::addAtomicModel(int x, int y)
 
 void View::addPluginModel(int /*x*/, int /*y*/)
 {
-    /*mModeling->setModified(true);
-      ModelDescriptionBox*    box = NULL;
-      box = new ModelDescriptionBox(mModeling->getNames());
-      if (box->run()) {
-          mModeling->newPluginModel(mCurrent, box->getName(), "", x, y);
-      }
-      delete box;*/
 }
 
 void View::addCoupledModel(int x, int y)
 {
-    //std::cout << "addCoupledModel x : " << x << " , y : " << y
-    //    << "  on : '" << mCurrent->getName() << "'\n";
-
     mModeling->setModified(true);
     ModelDescriptionBox* box;
     box = new ModelDescriptionBox(mModeling->getNames());
@@ -391,42 +316,13 @@ void View::addCoupledModel(int x, int y)
         mSelectedModels.clear();
     }
     delete box;
-
-    /*
-    mModeling->setModified(true);
-    if (mCurrent->hasConnectionProblem(mSelectedModels)) {
-      std::cout << "if\n";
-      gvle::Error("Selected model list have connection with external"
-       "model.");
-      mSelectedModels.clear();
-    } else if (not mSelectedModels.empty()) {
-      std::cout << "else if\n";
-      ModelDescriptionBox* box;
-      box = new ModelDescriptionBox(mModeling->getNames());
-      if (box->run()) {
-      graph::CoupledModel* new_gc =
-      mModeling->newCoupledModel(mCurrent, box->getName(),
-      "", x, y);
-      mCurrent->displace(mSelectedModels, new_gc);
-    mModeling->redrawModelTreeBox();
-    mSelectedModels.clear();
-
-      }
-      delete box;
-    }
-    */
 }
 
 void View::showModel(graph::Model* model)
 {
     if (not model) {
-        //CoupledModelBox* box = new CoupledModelBox(mCurrent);
-        //box->run();
-        //delete box;
-        //std::cout << "TODO: show CoupledModelBox\n";
         mModeling->EditCoupledModel(mCurrent);
     } else {
-        //std::cout << "showModel else\n";
         mModeling->addView(model);
     }
 }
@@ -439,23 +335,12 @@ void View::delModel(graph::Model* model)
             if (model->isCoupled()) {
                 mModeling->delViewOnModel((graph::CoupledModel*)model);
             }
-            //mModeling->delName(model->getName());
             mModeling->delModel(model);
             mCurrent->delModel(model);
             mModeling->redrawModelTreeBox();
         }
     }
 }
-
-//void View::delConnection(graph::Connection* connect)
-//{
-//mModeling->setModified(true);
-//if (connect) {
-//if (gvle::Question("Do you really want destroy this connection ?")) {
-//mCurrent->delConnection(connect);
-//}
-//}
-//}
 
 void View::displaceModel(int oldx, int oldy, int x, int y)
 {
@@ -520,7 +405,6 @@ void View::makeConnection(graph::Model* src, graph::Model* dst)
         }
     }
 
-
     ConnectionBox a(mCurrent, src, dst);
     if (a.run() == Gtk::RESPONSE_OK) {
         string srcPort, dstPort;
@@ -559,5 +443,4 @@ void  View::updateAdjustment(double h, double v)
     mViewport.get_vadjustment()->value_changed();
 }
 
-}
-} // namespace vle gvle
+}} // namespace vle gvle
