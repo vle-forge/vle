@@ -25,75 +25,72 @@
 
 #include <vle/eov/Window.hpp>
 #include <vle/utils/Debug.hpp>
-#include <iostream>
+#include <cassert>
 
 namespace vle { namespace eov {
 
-Window::Window(PluginPtr plg, Glib::Mutex& mutex) :
+Window::Window(Glib::Mutex& mutex, int timer) :
     Gtk::Window(Gtk::WINDOW_TOPLEVEL),
     m_mutex(mutex),
     m_rootBox(true, 5),
-    m_plugin(plg),
-    m_timeout(100)
+    m_isinit(false),
+    m_timeout(timer)
 {
     set_title("eov - the Eyes of VLE");
     set_border_width(0);
     set_position(Gtk::WIN_POS_CENTER);
 
-    m_rootBox.pack_start(m_plugin->widget(), true, true);
-    add(m_rootBox);
-
-    resize_children();
     show_all();
+
+    Glib::signal_timeout().connect(
+        sigc::mem_fun(*this, &Window::checkPluginTimer), 200);
 }
 
-Window::~Window()
-{
-}
-
-void Window::on_realize()
-{
-    Glib::Mutex::Lock lock(m_mutex);
-    Gtk::Window::on_realize();
-
-    m_connection = Glib::signal_timeout().connect(
-        sigc::mem_fun(*this, &Window::runTimeout), m_timeout);
-}
-
-bool Window::on_expose_event(GdkEventExpose* event)
+void Window::setPlugin(PluginPtr plg)
 {
     Glib::Mutex::Lock lock(m_mutex);
-    bool r = Gtk::Window::on_expose_event(event);
 
-    if (m_plugin and is_realized()) {
-        m_plugin->redraw();
+    assert(not m_isinit);
+    assert(plg);
+
+    m_plugin = plg;
+}
+
+void Window::killClock()
+{
+    Glib::Mutex::Lock lock(m_mutex);
+
+    m_connection.disconnect();
+}
+
+bool Window::checkPluginTimer()
+{
+    Glib::Mutex::Lock lock(m_mutex);
+
+    if (m_plugin) {
+        m_isinit = true;
+
+	m_plugin->drawingWidget().signal_expose_event().connect_notify(
+	    sigc::mem_fun(*m_plugin.get(), &Plugin::onExposeEvent));
+
+        m_rootBox.pack_start(m_plugin->widget(), true, true);
+	add(m_rootBox);
+	resize_children();
+	show_all();
+
+        m_connection = Glib::signal_timeout().connect(
+            sigc::mem_fun(*this, &Window::redrawTimer), m_timeout);
     }
 
-    return r;
+    return not m_isinit;
 }
 
-bool Window::on_configure_event(GdkEventConfigure* event)
+bool Window::redrawTimer()
 {
-    Glib::Mutex::Lock lock(m_mutex);
-    bool r = Gtk::Window::on_configure_event(event);
+    assert(m_plugin);
 
-    if (m_plugin and is_realized()) {
-        m_plugin->resize();
-    }
-
-    return r;
-}
-
-bool Window::on_delete_event(GdkEventAny* /* event */)
-{
-    return true;
-}
-
-bool Window::runTimeout()
-{
-    Glib::Mutex::Lock lock(m_mutex);
-    if (m_plugin and is_realized()) {
-        m_plugin->redraw();
+    if (is_realized()) {
+	m_plugin->drawingWidget().queue_draw();
     }
 
     return true;

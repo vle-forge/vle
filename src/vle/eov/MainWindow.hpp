@@ -73,7 +73,7 @@ namespace vle { namespace eov {
          * @brief Add a new eov::Window.
          * @param plugin The plugin to attach to the eov::Window.
          */
-        void addWindow(PluginPtr plugin);
+        void addWindow();
 
         /**
          * @brief Get a reference to the current mutex.

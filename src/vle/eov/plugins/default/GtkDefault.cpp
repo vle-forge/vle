@@ -59,6 +59,11 @@ Glib::RefPtr < Gdk::Window > GtkDefault::drawingSurface()
     return m_da.get_window();
 }
 
+Gtk::Widget& GtkDefault::drawingWidget()
+{
+    return m_da;
+}
+
 Gtk::Widget& GtkDefault::widget()
 {
     return m_vbox;

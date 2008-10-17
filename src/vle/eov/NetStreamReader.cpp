@@ -24,7 +24,7 @@
 
 
 #include <vle/eov/NetStreamReader.hpp>
-#include <vle/eov/MainWindow.hpp>
+#include <vle/eov/Window.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Algo.hpp>
@@ -34,18 +34,6 @@
 
 
 namespace vle { namespace eov {
-
-NetStreamReader::NetStreamReader(int port, int time, MainWindow& main) :
-    oov::NetStreamReader(port),
-    m_main(main),
-    m_time(time),
-    m_finish(false)
-{
-}
-
-NetStreamReader::~NetStreamReader()
-{
-}
 
 void NetStreamReader::process()
 {
@@ -70,41 +58,38 @@ void NetStreamReader::process()
 
 void NetStreamReader::onParameter(const vpz::ParameterTrame& trame)
 {
-    {
-	Glib::Mutex::Lock lock(m_mutex);
-	oov::NetStreamReader::onParameter(trame);
-	oov::PluginPtr poov = plugin();
-	Assert(utils::InternalError, poov->isCairo(), boost::format(
-		    "Plugin '%1%' is not a oov::CairoPlugin") % trame.plugin());
-    }
+    oov::NetStreamReader::onParameter(trame);
+    oov::PluginPtr poov = plugin();
+    Assert(utils::InternalError, poov->isCairo(), boost::format(
+         "Plugin '%1%' is not a oov::CairoPlugin") % trame.plugin());
 
     runWindow();
-
     m_newpluginname = trame.plugin();
 }
 
 void NetStreamReader::onNewObservable(const vpz::NewObservableTrame& trame)
 {
-    Glib::Mutex::Lock lock(m_mutex);
     oov::NetStreamReader::onNewObservable(trame);
 }
 
 void NetStreamReader::onDelObservable(const vpz::DelObservableTrame& trame)
 {
-    Glib::Mutex::Lock lock(m_mutex);
     oov::NetStreamReader::onDelObservable(trame);
 }
 
 void NetStreamReader::onValue(const vpz::ValueTrame& trame)
 {
-    Glib::Mutex::Lock lock(m_mutex);
     oov::NetStreamReader::onValue(trame);
 }
 
 void NetStreamReader::onClose(const vpz::EndTrame& trame)
 {
-    Glib::Mutex::Lock lock(m_mutex);
     oov::NetStreamReader::onClose(trame);
+
+    {
+        Glib::Mutex::Lock lock(m_mutex);
+        m_main.killClock();
+    }
 }
 
 void NetStreamReader::getGtkPlugin(const std::string& pluginname)
@@ -159,8 +144,6 @@ void NetStreamReader::getDefaultPlugin()
 
 void NetStreamReader::runWindow()
 {
-    oov::CairoPluginPtr coov = oov::toCairoPlugin(plugin());
-
     std::string error;
 
     try {
@@ -176,7 +159,7 @@ void NetStreamReader::runWindow()
         Throw(utils::InternalError, error);
     }
 
-    m_main.addWindow(m_plugin);
+    m_main.setPlugin(m_plugin);
 }
 
 NetStreamReader::PluginFactory::PluginFactory(const std::string& plugin,

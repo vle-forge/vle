@@ -37,7 +37,7 @@
 namespace vle { namespace eov {
 
 MainWindow::MainWindow(Glib::RefPtr < Gnome::Glade::Xml > refXml, int port)
-    : mPort(port), mRefresh(10), mMenuNew(0), mMenuQuit(0), mMenuAbout(0),
+    : mPort(port), mRefresh(100), mMenuNew(0), mMenuQuit(0), mMenuAbout(0),
     mWindow(0), mPref(0), mAbout(0), mSpinPort(0), mSpinRefresh(0),
     mTextview(0), mRefXml(refXml), mNet(0), mThread(0)
 {
@@ -69,9 +69,10 @@ Gtk::Window& MainWindow::window()
     return *mWindow;
 }
 
-void MainWindow::addWindow(PluginPtr plugin)
+void MainWindow::addWindow()
 {
-    Window* wnd = new Window(plugin, mMutex);
+    Window* wnd = new Window(mMutex, mRefresh);
+    mNet = new NetStreamReader(mPort, *wnd);
 
     wnd->signal_delete_event().connect(sigc::mem_fun(*this,
 		&MainWindow::onDeleteEventWindow));
@@ -88,10 +89,12 @@ bool MainWindow::onDeleteEventWindow(GdkEventAny* event)
 	    haveSameGdkWindow(event->window));
 
     if (it != mBufferedStream.end()) {
-	it->first->hide();
-	delete it->first;
-	delete it->second;
-	mBufferedStream.erase(it);
+	if (it->second->isFinish()) {
+	    it->first->hide();
+	    delete it->first;
+	    delete it->second;
+	    mBufferedStream.erase(it);
+	}
     }
 
     return true;
@@ -103,7 +106,14 @@ void MainWindow::onNew()
     mSpinRefresh->set_value(mRefresh);
     if (mPref->run() ==  Gtk::RESPONSE_APPLY) {
         try {
-            mNet = new NetStreamReader(mPort, mRefresh, *this);
+            /*
+	     * 10 ms is the minimum between refresh the Gtk::DrawinArea widget.
+             */
+	    mRefresh = (int)std::max(
+			 std::floor(std::abs(mSpinRefresh->get_value())),
+                         10.);
+            addWindow();
+
 	    mThread = Glib::Thread::create(
 			    sigc::mem_fun(*mNet,
 				    &eov::NetStreamReader::process), true);

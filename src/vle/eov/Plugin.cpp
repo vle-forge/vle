@@ -25,49 +25,39 @@
 
 #include <vle/eov/Plugin.hpp>
 #include <vle/eov/NetStreamReader.hpp>
-#include <iostream>
+#include <vle/utils/Tools.hpp>
 
 namespace vle { namespace eov {
 
-void Plugin::resize()
+void Plugin::onExposeEvent(GdkEventExpose* /* event */)
 {
-    Glib::Mutex::Lock lock(m_net->mutex());
+    if (drawingSurface() and drawingWidget().is_realized() and m_cairoplugin) {
+	int width, height;
+	m_cairoplugin->preferredSize(width, height);
 
-    if (drawingSurface() and m_cairoplugin) {
-        int width, height;
-        drawingSurface()->get_size(width, height);
-        m_cairoplugin->onSize(width, height);
-
-        int preferredwidth, preferredheight;
-        m_cairoplugin->preferredSize(preferredwidth, preferredheight);
-        if (width != preferredwidth or height != preferredheight) {
-            m_ctx.clear();
-            m_buffer.clear();
-            m_gc.clear();
-        }
-    }
-}
-
-void Plugin::redraw()
-{
-    Glib::Mutex::Lock lock(m_net->mutex());
-
-    if (drawingSurface() and m_cairoplugin) {
-        int width, height;
-        m_cairoplugin->preferredSize(width, height);
-
-        if (not m_ctx) {
+        if (not m_buffer) {
             m_buffer = Gdk::Pixmap::create(drawingSurface(), width, height);
-            m_gc = Gdk::GC::create(m_buffer);
-            m_ctx = m_buffer->create_cairo_context();
         }
 
-        m_ctx->save();
-        m_ctx->set_source(m_cairoplugin->context()->get_target(), 0.0, 0.0);
-        m_ctx->paint();
-        m_ctx->restore();
+	if (m_buffer) {
+	    if (not m_ctx) {
+		m_ctx = m_buffer->create_cairo_context();
+	    }
 
-        drawingSurface()->draw_drawable(m_gc, m_buffer, 0, 0, 0, 0, width, height);
+	    if (m_ctx) {
+		Glib::Mutex::Lock lock(m_net->mutex());
+
+		m_ctx->save();
+		m_ctx->set_source(m_cairoplugin->context()->get_target(), 0.0,
+                                  0.0);
+		m_ctx->paint();
+		m_ctx->restore();
+
+		drawingSurface()->draw_drawable(
+			Gdk::GC::create(drawingSurface()), m_buffer, 0, 0, 0,
+					0, width, height);
+	    }
+	}
     }
 }
 

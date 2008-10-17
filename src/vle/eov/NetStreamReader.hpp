@@ -34,14 +34,18 @@
 
 namespace vle { namespace eov {
 
-    class MainWindow;
+    class Window;
 
     class NetStreamReader : public oov::NetStreamReader
     {
     public:
-        NetStreamReader(int port, int time, MainWindow& main);
+        NetStreamReader(int port, Window& main) :
+            oov::NetStreamReader(port),
+            m_main(main),
+            m_finish(false)
+        {}
 
-        virtual ~NetStreamReader();
+        virtual ~NetStreamReader() {}
 
         inline Glib::Mutex& mutex()
         { return m_mutex; }
@@ -84,11 +88,10 @@ namespace vle { namespace eov {
 
         void runWindow();
 
-        MainWindow&         m_main;
+        Window&             m_main;
         PluginPtr           m_plugin;
         Glib::Mutex         m_mutex;
         std::string         m_newpluginname;
-        int                 m_time;
 	bool		    m_finish;
 	std::string         m_finisherror;
 

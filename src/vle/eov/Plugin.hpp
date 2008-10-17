@@ -36,7 +36,7 @@ namespace vle { namespace eov {
 
     class NetStreamReader;
 
-    /** 
+    /**
      * @brief The vle::eov::Plugin is a class to develop graphical user
      * interface around a vle::oov::CairoPlugin. Use the DECLARE_EOV_PLUGIN
      * macro to develop a plugin.
@@ -44,56 +44,54 @@ namespace vle { namespace eov {
     class Plugin : public sigc::trackable
     {
     public:
-        /** 
+        /**
          * @brief Default constructor of the eov plugin.
          * @param cairoplugin A reference to the loaded oov::Plugin.
          */
         Plugin(oov::CairoPluginPtr cairoplugin, NetStreamReader* net) :
             m_cairoplugin(cairoplugin),
-            m_net(net)
-        { }
+            m_net(net) {}
 
-        virtual ~Plugin()
-        { }
+        virtual ~Plugin() {}
 
-        /** 
+        /**
          * @brief Get the drawing surface from a component of the Gtk widget
          * where the CairoPlugin must draw.
          * @return A reference to the drawing surface.
          */
         virtual Glib::RefPtr < Gdk::Window > drawingSurface() = 0;
 
-        /** 
+	/**
+	 * @brief Get the drawing widget.
+	 * @return A reference to the drawingWidget.
+	 */
+	virtual Gtk::Widget& drawingWidget() = 0;
+
+        /**
          * @brief Get the widget of the plugin.
          * @return A reference to the main widget, a container for instance.
          */
         virtual Gtk::Widget& widget() = 0;
 
-        /** 
+        /**
          * @brief Return the width of the drawing surface.
          * @return the width.
          */
         virtual int width() = 0;
 
-        /** 
+        /**
          * @brief Return the height of the drawing surface.
          * @return the height.
          */
         virtual int height() = 0;
 
-        /** 
-         * @brief When the window is resize, call the oov::CairoPlugin to make
-         * a choice.
-         * @param width the width of the main window of eov.
-         * @param height the height of the main window of eov.
-         */
-        void resize();
-
-        /** 
+        /**
          * @brief Copy the Surface from the oov::CairoPlugin to the drawing
-         * surface of the eov::Plugin.
+         * surface of the eov::Plugin. Use as slot function for expose event
+         * signal.
+         * @brief event A reference to the expose event structure.
          */
-        void redraw();
+        void onExposeEvent(GdkEventExpose* event);
 
     protected:
         oov::CairoPluginPtr                 m_cairoplugin;

@@ -36,40 +36,40 @@ namespace vle { namespace eov {
     class Window : public Gtk::Window
     {
     public:
-        Window(PluginPtr plg, Glib::Mutex& mutex);
+        Window(Glib::Mutex& mutex, int time);
 
-        virtual ~Window();
+        virtual ~Window() {}
 
         /**
-         * @brief Set the time between two redraw.
-         * @param timeout A time in millisecond.
+         * @brief Assign a plugin to the Window.
+         * @param plg the PluginPtr to assign.
          */
-        void setTimeout(unsigned int timeout)
-        { m_timeout = timeout; }
+        void setPlugin(PluginPtr plg);
+
+        /**
+         * @brief Kiill the redraw timer.
+         */
+        void killClock();
 
     private:
         /**
-         * @brief When we can draw on widget.
+         * @brief Check if a plugin was set with the setPlugin function every
+         * 200ms. Delete this timer if a plugin was set.
+         * @return false to kill the timer.
          */
-        virtual void on_realize();
-
-        virtual bool on_expose_event(GdkEventExpose* event);
-
-        virtual bool on_configure_event(GdkEventConfigure* event);
+	bool checkPluginTimer();
 
         /**
-         * @brief Change the default behaviour: do not hide the Gtk::Window, for
-         * the use to delete from the eov::MainWindow.
-         * @param event Not use.
-         * @return True.
+         * @brief Event m_timeout ms, the plugin expose event function was call
+         * to redraw the Plugin drawing area widget.
+         * @return false to kill the timer.
          */
-        virtual bool on_delete_event(GdkEventAny* event);
-
-        bool runTimeout();
+        bool redrawTimer();
 
         Glib::Mutex&                m_mutex;
         Gtk::VBox                   m_rootBox;
         PluginPtr                   m_plugin;
+	bool                        m_isinit;
         sigc::connection            m_connection;
         unsigned int                m_timeout;
     };
