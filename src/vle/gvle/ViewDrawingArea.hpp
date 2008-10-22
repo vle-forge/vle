@@ -61,6 +61,9 @@ namespace vle { namespace gvle {
         static const double ZOOM_FACTOR_INF;
         static const double ZOOM_MIN;
         static const double ZOOM_MAX;
+        static const guint SPACING_MODEL;
+        static const guint SPACING_LINE;
+        static const guint SPACING_MODEL_PORT;
 
         ViewDrawingArea(View* view);
 
@@ -120,29 +123,49 @@ namespace vle { namespace gvle {
 
 
     private:
-        struct Line
-        {
-            int xs, ys, xd, yd;
+        typedef std::vector < Gdk::Point > StraightLine;
 
-            Line(int xs, int ys, int xd, int yd)
-                : xs(xs), ys(ys), xd(xd), yd(yd)
+        class Connection
+        {
+        public:
+            int xs, ys, xd, yd, x1, x2, y1, y3, y4;
+            bool top;
+
+            Connection(int xs, int ys, int xd, int yd,
+                       int x1, int x2, int y1, int y3, int y4) :
+                xs(xs), ys(ys), xd(xd), yd(yd), x1(x1), x2(x2),
+                y1(y1), y3(y3), y4(y4), top(false)
             {}
         };
 
         void drawCurrentCoupledModel();
         void drawCurrentModelPorts();
-        std::vector < ViewDrawingArea::Line > computeConnection(
-            int xs, int ys, int xd, int yd, int ytm, int ybm);
+
+        void preComputeConnection(int xs, int ys, int xd, int yd,
+                                  int ytms, int ybms);
+        void preComputeConnection(graph::Model* src,
+                                  const std::string& srcport,
+                                  graph::Model* dst,
+                                  const std::string& dstport);
+        void preComputeConnection();
+
+        StraightLine computeConnection(int xs, int ys, int xd, int yd,
+                                       int index);
+        void computeConnection(graph::Model* src, const std::string& srcport,
+                               graph::Model* dst, const std::string& dstport,
+                               int index);
+        void computeConnection();
+
+        void highlightLine(int mx, int my);
 
         void drawConnection();
-        void drawConnection(graph::Model* src, const std::string& srcport,
-                            graph::Model* dst, const std::string& dstport);
-        void drawConnection(int xs, int ys, int xd, int yd, int ytm, int ybm);
+        void drawHighlightConnection();
         void drawChildrenModels();
         void drawChildrenModel(graph::Model* model,
                                Glib::RefPtr < Gdk::GC > color);
         void drawChildrenPorts(graph::Model* model,
                                Glib::RefPtr < Gdk::GC > color);
+        void drawLines();
         void drawLink();
         void drawZoomFrame();
 
@@ -166,49 +189,11 @@ namespace vle { namespace gvle {
         void addLinkOnMotion(int x, int y);
         void addLinkOnButtonRelease(int x, int y);
 
-        /**
-         * Return heigth between segment (x1,y1) and (x2,y2) and mouse
-         * position. If mouse position is not include in rectangle (min(x1,x2),
-         * min(y1,y2) and max(x1,x2), max(y1,y2) then return negative value.
-         *
-         * @param x1 x position of origin model
-         * @param y1 y position of origin model
-         * @param x2 x position of destination model
-         * @param y2 y position of destination model
-         * @param ytm y position of top origin model
-         * @param ybm y position of bottom origin model
-         * @param mx x position of mouse cursor
-         * @param my y position of mouse cursor
-         * @return height between connection and mouse position. A negative
-         * value if position are too far.
-         */
-        int distance(int x1, int y1, int x2, int y2, int ytm, int ybm,
-                     int mx, int my);
 
         /**
          * Return nearest connection between all connection and mouse position
-         *
-         * @param x x position of mouse cursor
-         * @param y y position of mouse cursor
-         * @return nearest connection, otherwise 0
          */
-        void delConnection(int x, int y);
-
-        /**
-         * @brief Return the distance between the connection provided by the
-         * fourth function parameters and the user position x, y.
-         * @param src model source of the connection.
-         * @param portsrc port of the model source.
-         * @param dst destination of the connection.
-         * @param portdst port of the model destination.
-         * @param x position of the mouse.
-         * @param y position of the mouse.
-         * @return an number of pixel greather than zero or a negative value if
-         * error.
-         */
-        int distanceConnection(graph::Model* src, const std::string& portsrc,
-                               graph::Model* dst, const std::string& portdst,
-                               int x, int y);
+        void delConnection();
 
         /**
          * @brief Add to the Gdk stack a call to expose event function with the
@@ -246,8 +231,13 @@ namespace vle { namespace gvle {
 
         typedef std::pair < int, int > Point;
 
-        std::map < Point, Point > mInPts;
-        std::map < Point, Point > mOutPts;
+        std::map < int, Point > mInPts;
+        std::map < int, Point > mOutPts;
+        std::vector < Connection > mConnections;
+        std::map < Point, bool > mDirect;
+        std::vector < StraightLine > mLines;
+        std::vector < std::string > mText;
+        int mHighlightLine;
     };
 
 }} // namespace vle gvle
