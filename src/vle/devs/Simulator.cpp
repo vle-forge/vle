@@ -180,6 +180,24 @@ InternalEvent* Simulator::externalTransition(
     return buildInternalEvent(time);
 }
 
+InternalEvent* Simulator::internalTransitionConflict(
+    const InternalEvent& event,
+    const ExternalEventList& events)
+{
+    m_dynamics->internalTransition(event.getTime());
+    m_dynamics->externalTransition(events, event.getTime());
+    return buildInternalEvent(event.getTime());
+}
+
+InternalEvent* Simulator::externalTransitionConflit(
+    const InternalEvent& event,
+    const ExternalEventList& events)
+{
+    m_dynamics->externalTransition(events, event.getTime());
+    m_dynamics->internalTransition(event.getTime());
+    return buildInternalEvent(event.getTime());
+}
+
 void Simulator::request(const RequestEvent& event, const Time& time,
                         ExternalEventList& output)
 {

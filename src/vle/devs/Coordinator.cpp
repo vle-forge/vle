@@ -107,16 +107,7 @@ ExternalEventList* Coordinator::run()
         while (not bag.second.empty()) {
             if (not bag.second.emptyInternal()) {
                 if (not bag.second.emptyExternal()) {
-                    switch (bag.first->confluentTransitions(
-                            *bag.second.internal(), bag.second.externals())) {
-                    case Event::INTERNAL:
-                        processInternalEvent(bag.first, bag.second);
-                        break;
-
-                    case Event::EXTERNAL:
-                        processExternalEvents(bag.first, bag.second);
-                        break;
-                    }
+                    processConflictEvents(bag.first, bag.second);
                 } else {
                     processInternalEvent(bag.first, bag.second);
                 }
@@ -541,6 +532,31 @@ void Coordinator::processExternalEvents(
     lst.deleteAndClear();
     modelbag.delExternals();
     processEventView(*sim, 0);
+}
+
+void Coordinator::processConflictEvents(
+    Simulator* sim,
+    EventBagModel& modelbag)
+{
+    InternalEvent* internal;
+
+    if (sim->confluentTransitions(*modelbag.internal(), modelbag.externals())
+        == Event::INTERNAL) {
+        internal = sim->externalTransitionConflit(
+            *modelbag.internal(), modelbag.externals());
+    } else {
+        internal = sim->externalTransitionConflit(
+            *modelbag.internal(), modelbag.externals());
+    }
+
+    modelbag.delInternal();
+    modelbag.externals().deleteAndClear();
+    modelbag.delExternals();
+    processEventView(*sim, 0);
+
+    if (internal) {
+        m_eventTable.putInternalEvent(internal);
+    }
 }
 
 void Coordinator::processRequestEvents(

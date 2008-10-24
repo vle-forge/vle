@@ -261,6 +261,9 @@ namespace vle { namespace devs {
         void processExternalEvents(Simulator* sim,
                                    EventBagModel& modelbag);
 
+        void processConflictEvents(Simulator* sim,
+                                   EventBagModel& modelbag);
+
         void processRequestEvents(Simulator* sim,
                                         EventBagModel& modelbag);
 
