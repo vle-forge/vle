@@ -48,11 +48,8 @@ UndoRedo::~UndoRedo()
     }
 }
 
-void UndoRedo::addModel(const graph::Model* m)
+void UndoRedo::addModel(const graph::Model* /* m */)
 {
-    assert(m);
-    //mList.push_back(m->clone());
-
     Throw(utils::NotYetImplemented, "UndoRedo::addModel");
 }
 

@@ -928,7 +928,7 @@ bool ViewDrawingArea::on_motion_notify_event(GdkEventMotion* event)
                                  mMouse.get_x(), mMouse.get_y());
             queueRedraw();
         } else {
-            highlightLine(event->x, event->y);
+            highlightLine((int)event->x, (int)event->y);
         }
         mPrecMouse = mMouse;
         break;
@@ -939,13 +939,13 @@ bool ViewDrawingArea::on_motion_notify_event(GdkEventMotion* event)
         break;
     case GVLE::ADDLINK :
         if (button == 1) {
-            addLinkOnMotion(mMouse.get_x(), mMouse.get_y());
+            addLinkOnMotion((int)mMouse.get_x(), (int)mMouse.get_y());
             queueRedraw();
         }
         mPrecMouse = mMouse;
         break;
     case GVLE::DELETE:
-        highlightLine(event->x, event->y);
+        highlightLine((int)event->x, (int)event->y);
         mPrecMouse = mMouse;
         break;
     default:

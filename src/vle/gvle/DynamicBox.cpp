@@ -149,8 +149,8 @@ void DynamicBox::on_apply()
     if (mLocationHost->get_text().empty()) {
         mDyn->setLocalDynamics();
     } else {
-        mDyn->setDistantDynamics(mLocationHost->get_text(),
-                                 mLocationPort->get_value());
+        int port = (int)std::floor(std::abs(mLocationPort->get_value()));
+        mDyn->setDistantDynamics(mLocationHost->get_text(), port);
     }
 
     mDyn->setModel(mModel->get_text());

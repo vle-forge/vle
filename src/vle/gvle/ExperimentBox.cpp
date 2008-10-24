@@ -192,7 +192,6 @@ bool ExperimentBox::apply()
     vpz::Experiment& exp = mModeling->experiment();
     vpz::Replicas& rep = exp.replicas();
 
-    // Experiment frame
     {
 	exp.setName(mEntryName->get_text());
 
@@ -201,16 +200,17 @@ bool ExperimentBox::apply()
 			mSpinDuration->get_value());
     }
 
-    // Simulation frame
     {
-	exp.setSeed(mSpinSimuSeed->get_value());
+        long seed = (long)std::floor(std::abs(mSpinSimuSeed->get_value()));
+	exp.setSeed(seed);
     }
 
-    // Plan frame
     {
+        long seed = (long)std::floor(std::abs(mSpinPlanSeed->get_value()));
+        long number = (long)std::floor(std::abs(mButtonNumber->get_value()));
 	exp.setCombination(mComboCombi->get_active_text());
-	rep.setSeed(mSpinPlanSeed->get_value());
-	rep.setNumber(mButtonNumber->get_value());
+	rep.setSeed(seed);
+	rep.setNumber(number);
     }
     return true;
 }

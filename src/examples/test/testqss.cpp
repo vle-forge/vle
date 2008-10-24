@@ -53,13 +53,16 @@ BOOST_AUTO_TEST_CASE(test_qss1)
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
     oov::OutputMatrixViewList out(r.outputs());
-    BOOST_REQUIRE_EQUAL(out.size(), 1);
+    BOOST_REQUIRE_EQUAL(out.size(),
+                        (oov::OutputMatrixViewList::size_type)1);
 
     oov::OutputMatrix& view(out["qssview"]);
     value::MatrixFactory::MatrixView result(view.values());
 
-    BOOST_REQUIRE_EQUAL(result.shape()[0], 3);
-    BOOST_REQUIRE_EQUAL(result.shape()[1], 1001);
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+                       (value::MatrixFactory::MatrixView::size_type)3);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+                        (value::MatrixFactory::MatrixView::size_type)1001);
 
     BOOST_REQUIRE_CLOSE(value::toDouble(result[1][1000]), 46.15520, 10e-5);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[2][1000]), 529.70039, 10e-5);
@@ -79,13 +82,15 @@ BOOST_AUTO_TEST_CASE(test_qss2)
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
     oov::OutputMatrixViewList out(r.outputs());
-    BOOST_REQUIRE_EQUAL(out.size(), 1);
+    BOOST_REQUIRE_EQUAL(out.size(), (oov::OutputMatrixViewList::size_type)1);
 
     oov::OutputMatrix& view(out["qssview"]);
     value::MatrixFactory::MatrixView result(view.values());
 
-    BOOST_REQUIRE_EQUAL(result.shape()[0], 3);
-    BOOST_REQUIRE_EQUAL(result.shape()[1], 2500);
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+                        (value::MatrixFactory::MatrixView::size_type)3);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+                        (value::MatrixFactory::MatrixView::size_type)2500);
 
     BOOST_REQUIRE_CLOSE(value::toDouble(result[1][2499]), 3121.71211, 10e-5);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[2][2499]), 30.34103, 10e-5);

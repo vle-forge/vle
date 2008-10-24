@@ -59,7 +59,8 @@ BOOST_AUTO_TEST_CASE(test_gens)
     /* begin check */
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
     oov::OutputMatrixViewList out(r.outputs());
-    BOOST_REQUIRE_EQUAL(out.size(), 2);
+    BOOST_REQUIRE_EQUAL(out.size(),
+                        (oov::OutputMatrixViewList::size_type)2);
 
     /* get result of simulation */
     oov::OutputMatrix& view1(out["view1"]);
@@ -67,8 +68,10 @@ BOOST_AUTO_TEST_CASE(test_gens)
     /* check matrix */
     value::MatrixFactory::MatrixView result(view1.values());
 
-    BOOST_REQUIRE_EQUAL(result.shape()[0], 3); /* column */
-    BOOST_REQUIRE_EQUAL(result.shape()[1], 101); /* time */
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+                        (value::MatrixFactory::MatrixView::size_type)3);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+                        (value::MatrixFactory::MatrixView::size_type)101);
 
     BOOST_REQUIRE_EQUAL(value::toDouble(result[0][0]), 0);
     BOOST_REQUIRE_EQUAL(value::toDouble(result[1][0]), 0);
@@ -81,7 +84,7 @@ BOOST_AUTO_TEST_CASE(test_gens)
     BOOST_REQUIRE_EQUAL(value::toDouble(result[0][14]), 14);
     BOOST_REQUIRE_EQUAL(result[1][14].get(), (value::ValueBase*)0);
     BOOST_REQUIRE_EQUAL(value::toInteger(result[2][14]), 15);
-    
+
     BOOST_REQUIRE_EQUAL(value::toDouble(result[0][31]), 31);
     BOOST_REQUIRE_EQUAL(result[1][31].get(), (value::ValueBase*)0);
     BOOST_REQUIRE_EQUAL(value::toInteger(result[2][31]), 32);
@@ -111,7 +114,8 @@ BOOST_AUTO_TEST_CASE(test_gens_with_class)
     /* begin check */
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
     oov::OutputMatrixViewList out(r.outputs());
-    BOOST_REQUIRE_EQUAL(out.size(), 2);
+    BOOST_REQUIRE_EQUAL(out.size(),
+                        (oov::OutputMatrixViewList::size_type)2);
 
     /* get result of simulation */
     oov::OutputMatrix& view1(out["view1"]);
@@ -119,8 +123,10 @@ BOOST_AUTO_TEST_CASE(test_gens_with_class)
     /* check matrix */
     value::MatrixFactory::MatrixView result(view1.values());
 
-    BOOST_REQUIRE_EQUAL(result.shape()[0], 3); /* column */
-    BOOST_REQUIRE_EQUAL(result.shape()[1], 101); /* time */
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+                        (value::MatrixFactory::MatrixView::size_type)3);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+                        (value::MatrixFactory::MatrixView::size_type)101);
 
     BOOST_REQUIRE_EQUAL(value::toDouble(result[0][0]), 0);
     BOOST_REQUIRE_EQUAL(value::toDouble(result[1][0]), 0);
@@ -133,7 +139,7 @@ BOOST_AUTO_TEST_CASE(test_gens_with_class)
     BOOST_REQUIRE_EQUAL(value::toDouble(result[0][7]), 7);
     BOOST_REQUIRE_EQUAL(result[1][7].get(), (value::ValueBase*)0);
     BOOST_REQUIRE_EQUAL(value::toInteger(result[2][7]), 9);
-    
+
     BOOST_REQUIRE_EQUAL(value::toDouble(result[0][15]), 15);
     BOOST_REQUIRE_EQUAL(value::toDouble(result[1][15]), 528);
     BOOST_REQUIRE_EQUAL(value::toInteger(result[2][15]), 17);

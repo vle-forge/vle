@@ -54,13 +54,16 @@ BOOST_AUTO_TEST_CASE(test_petrinet_and)
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
     oov::OutputMatrixViewList out(r.outputs());
-    BOOST_REQUIRE_EQUAL(out.size(), 1);
+    BOOST_REQUIRE_EQUAL(out.size(),
+                        (oov::OutputMatrixViewList::size_type)1);
 
     oov::OutputMatrix& view(out["view"]);
     value::MatrixFactory::MatrixView result(view.values());
 
-    BOOST_REQUIRE_EQUAL(result.shape()[0], 5);
-    BOOST_REQUIRE_EQUAL(result.shape()[1], 11);
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+                        (value::MatrixFactory::MatrixView::size_type)5);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+                        (value::MatrixFactory::MatrixView::size_type)11);
 
     BOOST_REQUIRE_CLOSE(value::toDouble(result[3][10]), 0.75, 10e-5);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[4][10]), 1.0, 10e-5);
@@ -79,13 +82,16 @@ BOOST_AUTO_TEST_CASE(test_petrinet_or)
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
     oov::OutputMatrixViewList out(r.outputs());
-    BOOST_REQUIRE_EQUAL(out.size(), 1);
+    BOOST_REQUIRE_EQUAL(out.size(),
+                        (oov::OutputMatrixViewList::size_type)1);
 
     oov::OutputMatrix& view(out["view"]);
     value::MatrixFactory::MatrixView result(view.values());
 
-    BOOST_REQUIRE_EQUAL(result.shape()[0], 5);
-    BOOST_REQUIRE_EQUAL(result.shape()[1], 11);
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+                        (value::MatrixFactory::MatrixView::size_type)5);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+                        (value::MatrixFactory::MatrixView::size_type)11);
 
     BOOST_REQUIRE_CLOSE(value::toDouble(result[3][10]), 0.75, 10e-5);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[4][10]), 2.0, 10e-5);
@@ -105,13 +111,16 @@ BOOST_AUTO_TEST_CASE(test_petrinet_nand1)
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
     oov::OutputMatrixViewList out(r.outputs());
-    BOOST_REQUIRE_EQUAL(out.size(), 1);
+    BOOST_REQUIRE_EQUAL(out.size(),
+                        (oov::OutputMatrixViewList::size_type)1);
 
     oov::OutputMatrix& view(out["view"]);
     value::MatrixFactory::MatrixView result(view.values());
 
-    BOOST_REQUIRE_EQUAL(result.shape()[0], 5);
-    BOOST_REQUIRE_EQUAL(result.shape()[1], 11);
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+                        (value::MatrixFactory::MatrixView::size_type)5);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+                        (value::MatrixFactory::MatrixView::size_type)11);
 
     BOOST_REQUIRE_CLOSE(value::toDouble(result[3][10]), 0., 10e-5);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[4][10]), 0., 10e-5);
@@ -131,13 +140,16 @@ BOOST_AUTO_TEST_CASE(test_petrinet_nand2)
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
     oov::OutputMatrixViewList out(r.outputs());
-    BOOST_REQUIRE_EQUAL(out.size(), 1);
+    BOOST_REQUIRE_EQUAL(out.size(),
+                        (oov::OutputMatrixViewList::size_type)1);
 
     oov::OutputMatrix& view(out["view"]);
     value::MatrixFactory::MatrixView result(view.values());
 
-    BOOST_REQUIRE_EQUAL(result.shape()[0], 5);
-    BOOST_REQUIRE_EQUAL(result.shape()[1], 11);
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+                        (value::MatrixFactory::MatrixView::size_type)5);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+                        (value::MatrixFactory::MatrixView::size_type)11);
 
     BOOST_REQUIRE_CLOSE(value::toDouble(result[3][10]), 0.5, 10e-5);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[4][10]), 1., 10e-5);
@@ -157,13 +169,16 @@ BOOST_AUTO_TEST_CASE(test_petrinet_and_timed)
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
     oov::OutputMatrixViewList out(r.outputs());
-    BOOST_REQUIRE_EQUAL(out.size(), 1);
+    BOOST_REQUIRE_EQUAL(out.size(),
+                        (oov::OutputMatrixViewList::size_type)1);
 
     oov::OutputMatrix& view(out["view"]);
     value::MatrixFactory::MatrixView result(view.values());
 
-    BOOST_REQUIRE_EQUAL(result.shape()[0], 5);
-    BOOST_REQUIRE_EQUAL(result.shape()[1], 20);
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+                        (value::MatrixFactory::MatrixView::size_type)5);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+                        (value::MatrixFactory::MatrixView::size_type)20);
 
     BOOST_REQUIRE_CLOSE(value::toDouble(result[3][19]), 1.7, 10e-5);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[4][19]), 3., 10e-5);
@@ -183,13 +198,16 @@ BOOST_AUTO_TEST_CASE(test_petrinet_or_priority)
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
     oov::OutputMatrixViewList out(r.outputs());
-    BOOST_REQUIRE_EQUAL(out.size(), 1);
+    BOOST_REQUIRE_EQUAL(out.size(),
+                        (oov::OutputMatrixViewList::size_type)1);
 
     oov::OutputMatrix& view(out["view"]);
     value::MatrixFactory::MatrixView result(view.values());
 
-    BOOST_REQUIRE_EQUAL(result.shape()[0], 5);
-    BOOST_REQUIRE_EQUAL(result.shape()[1], 11);
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+                        (value::MatrixFactory::MatrixView::size_type)5);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+                        (value::MatrixFactory::MatrixView::size_type)11);
 
     BOOST_REQUIRE_CLOSE(value::toDouble(result[3][10]), 1., 10e-5);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[4][10]), 6., 10e-5);
@@ -209,13 +227,16 @@ BOOST_AUTO_TEST_CASE(test_petrinet_meteo)
 
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
     oov::OutputMatrixViewList out(r.outputs());
-    BOOST_REQUIRE_EQUAL(out.size(), 1);
+    BOOST_REQUIRE_EQUAL(out.size(),
+                        (oov::OutputMatrixViewList::size_type)1);
 
     oov::OutputMatrix& view(out["view"]);
     value::MatrixFactory::MatrixView result(view.values());
 
-    BOOST_REQUIRE_EQUAL(result.shape()[0], 6);
-    BOOST_REQUIRE_EQUAL(result.shape()[1], 31);
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+                        (value::MatrixFactory::MatrixView::size_type)6);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+                        (value::MatrixFactory::MatrixView::size_type)31);
 
     BOOST_REQUIRE_CLOSE(value::toDouble(result[4][30]), 25., 10e-5);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[5][30]), 4., 10e-5);

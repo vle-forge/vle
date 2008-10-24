@@ -179,8 +179,8 @@ void MainWindow::onAboutClose(int /* response */)
 void MainWindow::onPrefButton(int response)
 {
     if (response == Gtk::RESPONSE_APPLY) {
-        mPort = mSpinPort->get_value();
-        mRefresh = mSpinRefresh->get_value();
+        mPort = (int)std::floor(std::abs(mSpinPort->get_value()));
+        mRefresh = (int)std::floor(std::abs(mSpinRefresh->get_value()));
     }
     mPref->hide();
 }
