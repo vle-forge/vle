@@ -29,57 +29,66 @@
 
 namespace vle { namespace extension {
 
-class DESS;
+    class DESS;
 
-struct Method 
-{
-public:
-    Method(DESS& dess):dess(dess) { }
+    class Method
+    {
+    public:
+        Method(DESS& dess):dess(dess) {}
 
-    virtual void operator()(const vle::devs::Time& time) =0;
-    
-protected:
-    DESS& dess;
-};
+        virtual ~Method() {}
 
-class DESS : public vle::extension::DifferentialEquation
-{
-public:
-    DESS(const vle::graph::AtomicModel& model,
-	 const vle::devs::InitEventList& events); 
-    virtual ~DESS() { }
-    
-    virtual double getEstimatedValue(double e) const;
+        virtual void operator()(const vle::devs::Time& time) = 0;
 
-private:
-    virtual void reset(const vle::devs::Time& /* time */, 
-		       double /* value */);
-    virtual void updateGradient(bool external, 
-				const vle::devs::Time& time);
-    virtual void updateSigma(const vle::devs::Time& time);
-    virtual void updateValue(bool external, const vle::devs::Time& time);
-    
-    double mTimeStep;
-    Method* mMethod;
+    protected:
+        DESS& dess;
+    };
 
-    friend struct RK4;
-    friend struct Euler;    
-};
+    class DESS : public vle::extension::DifferentialEquation
+    {
+    public:
+        DESS(const vle::graph::AtomicModel& model,
+             const vle::devs::InitEventList& events);
 
-struct RK4 : public Method
-{
-    RK4(DESS& dess):Method(dess) { }
+        virtual ~DESS() {}
 
-    virtual void operator()(const vle::devs::Time& time);    
-};
-	
-struct Euler : public Method
-{
-    Euler(DESS& dess):Method(dess) { }
+        virtual double getEstimatedValue(double e) const;
 
-    virtual void operator()(const vle::devs::Time& time);    
-};
-	
+    private:
+        virtual void reset(const vle::devs::Time& time,
+                           double value);
+        virtual void updateGradient(bool external,
+                                    const vle::devs::Time& time);
+        virtual void updateSigma(const vle::devs::Time& time);
+        virtual void updateValue(bool external, const vle::devs::Time& time);
+
+        double mTimeStep;
+        Method* mMethod;
+
+        friend struct RK4;
+        friend struct Euler;
+    };
+
+    class RK4 : public Method
+    {
+    public:
+        RK4(DESS& dess) : Method(dess) {}
+
+        virtual ~RK4() {}
+
+        virtual void operator()(const vle::devs::Time& time);
+    };
+
+    class Euler : public Method
+    {
+    public:
+        Euler(DESS& dess):Method(dess) {}
+
+        virtual ~Euler() {}
+
+        virtual void operator()(const vle::devs::Time& time);
+    };
+
 }} // namespace vle extension
 
 #endif
