@@ -48,19 +48,19 @@ Time Cell::init(const vle::devs::Time& /* time */)
     initBooleanNeighbourhood("s",false);
     if (!existState("s")) {
 	double colour = rand().get_double_range_excluded(0, 1);
-	
+
 	if (colour > 0.5) initBooleanState("s", true);
 	else initBooleanState("s", false);
     }
 
 //     std::cout << getModelName() << " : " << getBooleanState("s") << std::endl;
-    
+
     mState = INIT;
     neighbourModify();
     setSigma(Time(0));
     return Time(0);
 }
-	
+
 void Cell::internalTransition(const Time& time)
 {
     CellDevs::internalTransition(time);
@@ -77,8 +77,8 @@ void Cell::internalTransition(const Time& time)
     case NEWSTATE:
 	bool v_state = getBooleanState("s");
 	unsigned int n = getBooleanNeighbourStateNumber("s", true);
-	
-// 	std::cout << "[" << time << "] " << getModelName() << " : " << getBooleanState("s") 
+
+// 	std::cout << "[" << time << "] " << getModelName() << " : " << getBooleanState("s")
 // 		  << " - " << n << std::endl;
 
 	if (v_state && (n < 2 || n > 3)) {
@@ -86,7 +86,7 @@ void Cell::internalTransition(const Time& time)
 	    modify();
 	    mState = INIT;
 	    setSigma(mTimeStep);
-	}	
+	}
 	else if (!v_state && (n == 3)) {
 	    setBooleanState("s",true);
 	    modify();

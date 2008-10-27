@@ -31,7 +31,7 @@
 
 namespace vle { namespace devs {
 
-    /** 
+    /**
      * @brief Define a Finish view based on devs::View class. This class build
      * state event only at the end of the simulation.
      */

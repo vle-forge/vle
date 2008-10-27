@@ -113,6 +113,12 @@ namespace vle { namespace utils {
         { if (mPath == 0) mPath = new Path; return *mPath; }
 
         /**
+         * @brief Initialize the Path singleton.
+         */
+        inline static void init()
+        { path(); }
+
+        /**
          * @brief Delete Path object instantiate from function path().
          */
         inline static void kill()

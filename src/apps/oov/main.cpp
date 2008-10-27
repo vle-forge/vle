@@ -23,6 +23,7 @@
  */
 
 
+#include <vle/manager/VLE.hpp>
 #include <apps/oov/OptionGroup.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
@@ -38,6 +39,7 @@ int main(int argc, char* argv[])
 
     apps::CommandOptionGroup command;
     context.set_main_group(command);
+    vle::manager::init();
 
     try {
         context.parse(argc, argv);
@@ -83,7 +85,7 @@ int main(int argc, char* argv[])
         }
     }
 
-    utils::finalize();
+    vle::manager::finalize();
     return result ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 

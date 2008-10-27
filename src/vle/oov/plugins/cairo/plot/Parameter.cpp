@@ -28,15 +28,15 @@
 #include <iostream>
 
 namespace vle { namespace oov { namespace plugin {
-    
+
 /************************************/
 /* constructeur                     */
 /* recupere la hauteur d'un text   */
 /************************************/
-Parameter::Parameter() : m_shift_top_default(5), m_shift_left(50), 
-			 m_shift_left_text_width(5), m_axe_y0_show(false), 
-			 m_min_already_initialized(false), 
-			 m_max_already_initialized(false) 
+Parameter::Parameter() : m_shift_top_default(5), m_shift_left(50),
+			 m_shift_left_text_width(5), m_axe_y0_show(false),
+			 m_min_already_initialized(false),
+			 m_max_already_initialized(false)
 {
     m_min_draw_index = 0;
     m_max_draw_index = 0;
@@ -171,7 +171,7 @@ void Parameter::set_drawing_area_size(int width, int height)
     if(height != m_da_height) {
         m_da_height = height;
         update_unit_height();
-    } 
+    }
     update_m_y0();
 }
 
@@ -392,15 +392,15 @@ double Parameter::get_max_value()
 /**************************************/
 void Parameter::set_min_value(double value, bool absolute)
 {
-    m_min_already_initialized = true; 
+    m_min_already_initialized = true;
     m_min_value_not_increase = value;
     if (absolute) m_min_value = value;
     else if (value != 0.0) m_min_value = value - majoration_min * fabs(value);
     else m_min_value = 0.0;
- 
+
     update_m_y0();
     update_unit_height();
-    update_text_height_value(); 
+    update_text_height_value();
     update_axe_y0_show();
 }
 

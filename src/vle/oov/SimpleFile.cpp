@@ -61,7 +61,7 @@ void SimpleFile::onNewObservable(const vpz::NewObservableTrame& trame)
            boost::format("Observable %1% already exist") % name);
 
     m_columns[name] = m_buffer.size();
-    m_buffer.push_back(value::Value());
+    m_buffer.push_back("NA");
 }
 
 void SimpleFile::onDelObservable(const vpz::DelObservableTrame& /* trame */)
@@ -88,10 +88,10 @@ void SimpleFile::onValue(const vpz::ValueTrame& trame)
         Columns::iterator jt = m_columns.find(name);
 
         Assert(utils::InternalError, jt != m_columns.end(), boost::format(
-                "The columns %1% does not exist. No new Observable ?") % 
+                "The columns %1% does not exist. No new Observable ?") %
             name);
 
-        m_buffer[jt->second] = it->value();
+        m_buffer[jt->second] = it->value()->writeToString();
     }
 }
 
@@ -103,7 +103,7 @@ void SimpleFile::close(const vpz::EndTrame& trame)
     Columns::iterator it = m_columns.begin();
     for (it = m_columns.begin(); it != m_columns.end(); ++it) {
         array[it->second] = it->first;
-    } 
+    }
     m_file << '\n' << std::flush;
     m_file.close();
 
@@ -134,18 +134,14 @@ void SimpleFile::flush(double trame_time)
     if (trame_time != m_time) {
         m_file << m_time;
         writeSeparator(m_file);
-        std::vector < value::Value >::iterator it;
+        std::vector < std::string >::iterator it;
         for (it = m_buffer.begin(); it != m_buffer.end(); ++it) {
-            if ((*it).get()) {
-                m_file << (*it)->toString();
-            } else {
-                m_file << "NA";
-            }
+            m_file << *it;
 
             if (it + 1 != m_buffer.end()) {
                 writeSeparator(m_file);
             }
-            (*it).reset();
+            *it = "NA";
         }
         m_file << '\n' << std::flush;
         m_time = trame_time;
@@ -157,26 +153,22 @@ void SimpleFile::finalFlush(double trame_time)
     flush(trame_time);
     bool empty = true;
 
-    for (std::vector < value::Value >::iterator it = m_buffer.begin(); 
+    for (std::vector < std::string >::iterator it = m_buffer.begin();
 	 it != m_buffer.end() and empty; ++it) {
-        empty = not (*it).get();
+        empty = (*it) == "NA";
     }
 
     if (not empty) {
         m_file << trame_time;
         writeSeparator(m_file);
-        std::vector < value::Value >::iterator it;
+        std::vector < std::string >::iterator it;
         for (it = m_buffer.begin(); it != m_buffer.end(); ++it) {
-            if ((*it).get()) {
-                m_file << (*it)->toString();
-            } else {
-                m_file << "NA";
-            }
+            m_file << (*it);
 
             if (it + 1 != m_buffer.end()) {
                 writeSeparator(m_file);
             }
-            (*it).reset();
+            *it = "NA";
         }
         m_file << '\n' << std::flush;
     }

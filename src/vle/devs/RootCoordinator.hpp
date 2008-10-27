@@ -55,54 +55,54 @@ namespace vle { namespace devs {
 
 	~RootCoordinator();
 
-        /** 
+        /**
          * @brief initialiase a new Coordinator with the specified vpz::Vpz
          * reference and intitialise the simulation time.
          * @param vp a reference to a structure.
          */
         void load(const vpz::Vpz& vp);
 
-        /** 
+        /**
          * @brief Initialise RootCoordinator and his Coordinator: initiale time
          * is define, coordinator init function is call.
          */
 	void init();
 
-        /** 
+        /**
          * @brief Call the coordinator run function and test if current time is
          * the end of the simulation.
          * @return false when simulation is finished, true otherwise.
          */
 	bool run();
 
-        /** 
+        /**
          * @brief Call the coordinator finish function and delete the
          * coordinator and all attached data.
          */
 	void finish();
 
-        /** 
+        /**
          * @brief Return the current time of the simulation.
          * @return A constant reference to the current time.
          */
         inline const Time& getCurrentTime()
         { return m_currentTime; }
 
-        /** 
+        /**
          * @brief Return a constant reference to the list of view plugins.
          * @return  Return a constant reference to the list of view plugins.
          */
         inline const oov::OutputMatrixViewList& outputs() const
         { return m_outputs; }
 
-        /** 
+        /**
          * @brief Return a reference to the list of view plugins.
          * @return  Return a reference to the list of view plugins.
          */
         inline oov::OutputMatrixViewList& outputs()
         { return m_outputs; }
 
-        /** 
+        /**
          * @brief Update the output matrix of result in the RootCoordinator by
          * getting from coordinator, all matrix of result.
          */

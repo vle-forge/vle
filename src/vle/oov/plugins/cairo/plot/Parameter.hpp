@@ -37,12 +37,12 @@ private :
     /* recalcul le largeur unitaire en pixel */
     /*****************************************/
     void update_unit_width();
-    
+
     /*****************************************/
     /* recalcul le hauteur unitaire en pixel */
     /*****************************************/
     void update_unit_height();
-    
+
     /******************************/
     /* gestion largeur et hauteur */
     /******************************/
@@ -52,14 +52,14 @@ private :
     /* largeur */
     int m_screen_width;
     int m_screen_height;
-    
+
     /****************/
     /* drawing_area */
     /****************/
     /* largeur du drawing area */
-    int m_da_width; 
+    int m_da_width;
     int m_da_height;
-    
+
     /******************************************/
     /* zone libre autour de la zone de dessin */
     /******************************************/
@@ -68,16 +68,16 @@ private :
     int m_shift_left; /* largeur a gauche pour pouvoir afficher les textes */
     int m_shift_right; /* largeur a droite pour pouvoir afficher rien du tout :D */
     int m_shift_left_text_width; /* espace entre la fin des textes et l'axe des ordonnées */
-    
+
     /******************/
     /* zone de dessin */
     /******************/
     int m_number_drawn_date; /* nombre de date affiché */
     int m_graph_zone_height; /* hauteur de la zone des graphiques */
-    int m_graph_zone_width; /* largeur de la zone des graphiques */	
+    int m_graph_zone_width; /* largeur de la zone des graphiques */
     bool m_scrolling; /* scroll ou non */
     double m_unit_height, m_unit_width; /* largeur unitaire */
-    
+
     /********************/
     /* gestion des date */
     /********************/
@@ -88,46 +88,46 @@ private :
     int m_text_height;
     double m_text_height_value; /* conversion de la hauteur pixel --> valeur de l'axe des ordonn�es */
     int m_y0; /* axe y = 0 */
-    
+
     /*********************************************/
     /* gestion valeur minimum et maximum affiché */
     /*********************************************/
     double m_max_value, m_max_value_not_increase; // zoogaku // zougaku
     double m_min_value, m_min_value_not_increase;
     bool m_axe_y0_show;
-    
+
     /*************************************************/
     /* majoration pour calculer la valeur min et max */
     /*************************************************/
     double majoration_min, majoration_max;
-    
+
     /*****************************************************/
     /* permet de savoir si l'on a deja parse des données */
     /* pour calculer le min et le max                    */
     /*****************************************************/
     bool m_min_already_initialized;
     bool m_max_already_initialized;
-    
+
     /**************************************/
     /* recalcul la valeur du text_height */
     /**************************************/
     void update_text_height_value();
-    
+
     /*************************************/
     /* recalcul si l'axe y=0 est visible */
     /*************************************/
     void update_axe_y0_show();
-    
+
     /***********************************************/
     /* arrondi le double a l'entier le plus proche */
     /* 1.5 --> 2                                   */
     /***********************************************/
     //	int round_nearest(double value);
-    
+
 public :
     Parameter();
     virtual ~Parameter() { }
-    
+
     void printParameter();
     int round_nearest(double value);
     void set_screen_size(int width, int height);
@@ -184,7 +184,7 @@ public :
     void update_m_y0();
     bool is_inside_min_max(double value);
 };
-	    
+
 }}} // namespace vle oov plugin
-    
+
 #endif

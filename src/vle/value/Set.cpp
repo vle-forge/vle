@@ -32,14 +32,14 @@
 #include <vle/value/Boolean.hpp>
 #include <vle/value/XML.hpp>
 #include <vle/value/Null.hpp>
+#include <vle/value/Deleter.hpp>
 #include <vle/utils/Debug.hpp>
-
-
+#include <boost/utility.hpp>
 
 namespace vle { namespace value {
 
-SetFactory::SetFactory(const SetFactory& setfactory) :
-    ValueBase(setfactory)
+Set::Set(const Set& setfactory) :
+    Value(setfactory)
 {
     m_value.resize(setfactory.size());
 
@@ -47,151 +47,167 @@ SetFactory::SetFactory(const SetFactory& setfactory) :
                    m_value.begin(), CloneValue());
 }
 
-Set SetFactory::create()
+Set::~Set()
 {
-    return Set(new SetFactory());
+    clear();
 }
 
-Value SetFactory::clone() const
+void Set::writeFile(std::ostream& out) const
 {
-    return Value(new SetFactory(*this));
-}
-
-void SetFactory::addNullValue()
-{
-    m_value.push_back(NullFactory::create());
-}
-
-void SetFactory::addBooleanValue(bool value)
-{
-    m_value.push_back(BooleanFactory::create(value));
-}
-
-bool SetFactory::getBooleanValue(const size_t i) const
-{
-    return toBoolean(getValue(i));
-}
-
-void SetFactory::addDoubleValue(double value)
-{
-    m_value.push_back(DoubleFactory::create(value));
-}
-
-double SetFactory::getDoubleValue(const size_t i) const
-{
-    return toDouble(getValue(i));
-}
-
-void SetFactory::addIntValue(int value)
-{
-    m_value.push_back(IntegerFactory::create(value));
-}
-
-int SetFactory::getIntValue(const size_t i) const
-{
-    return toInteger(getValue(i));
-}
-
-void SetFactory::addLongValue(long value)
-{
-    m_value.push_back(IntegerFactory::create(value));
-}
-
-long SetFactory::getLongValue(const size_t i) const
-{
-    return toLong(getValue(i));
-}
-
-void SetFactory::addStringValue(const std::string& value)
-{
-    m_value.push_back(StringFactory::create(value));
-}
-
-const std::string& SetFactory::getStringValue(const size_t i) const
-{
-    return value::toString(getValue(i));
-}
-
-void SetFactory::addXMLValue(const std::string& value)
-{
-    m_value.push_back(XMLFactory::create(value));
-}
-
-const std::string& SetFactory::getXMLValue(const size_t i) const
-{
-    return value::toXml(getValue(i));
-}
-
-const Value& SetFactory::getValue(const size_t i) const
-{
-    Assert(utils::ArgError, i < size(), boost::format(
-            "The index '%1%' is to big for this Set (size='%2%')") % i % size());
-
-    return m_value[i];
-}
-
-Value& SetFactory::getValue(const size_t i)
-{
-    Assert(utils::ArgError, i < size(), boost::format(
-            "The index '%1%' is to big for this Set (size='%2%')") % i % size());
-
-    return m_value[i];
-}
-
-std::string SetFactory::toFile() const
-{
-    std::string s;
-    VectorValue::const_iterator it = m_value.begin();
-
-    while (it != m_value.end()) {
-	s += (*it)->toFile();
-	++it;
-	if (it != m_value.end())
-	    s += " ";
+    for (VectorValue::const_iterator it = m_value.begin();
+         it != m_value.end(); ++it) {
+	if (it != m_value.begin()) {
+	    out << ",";
+        }
+        (*it)->writeFile(out);
     }
-    return s;
 }
 
-std::string SetFactory::toString() const
+void Set::writeString(std::ostream& out) const
 {
-    std::string s = "(";
-    VectorValue::const_iterator it = m_value.begin();
-
-    while (it != m_value.end()) {
-	s += (*it)->toString();
-	++it;
-	if (it != m_value.end())
-	    s += ",";
+    out << "(";
+    for (VectorValue::const_iterator it = m_value.begin();
+         it != m_value.end(); ++it) {
+	if (it != m_value.begin()) {
+	    out << ",";
+        }
+	(*it)->writeString(out);
     }
-    s += ")";
-    return s;
+    out << ")";
 }
 
-std::string SetFactory::toXML() const
+void Set::writeXml(std::ostream& out) const
 {
-    std::string s="<set>";
-    VectorValue::const_iterator it = m_value.begin();
-
-    while (it != m_value.end()) {
-	s += (*it)->toXML();
-	++it;
+    out << "<set>";
+    for (VectorValue::const_iterator it = m_value.begin();
+         it != m_value.end(); ++it) {
+        (*it)->writeXml(out);
     }
-    s += "</set>";
-    return s;
+    out << "</set>";
 }
 
-Set toSetValue(const Value& value)
+void Set::add(Value* value)
 {
-    Assert(utils::ArgError, value->getType() == ValueBase::SET,
-           "Value is not a Set");
-    return boost::static_pointer_cast < SetFactory >(value);
+    if (value == 0) {
+        throw std::invalid_argument("Set: add a null value");
+    }
+    m_value.push_back(value);
 }
 
-const VectorValue& toSet(const Value& value)
+void Set::addNull()
 {
-    Assert(utils::ArgError, value->getType() == ValueBase::SET,
-           "Value is not a Set");
-    return boost::static_pointer_cast < SetFactory >(value)->getValue();
+    m_value.push_back(Null::create());
+}
+
+void Set::addBoolean(bool value)
+{
+    m_value.push_back(Boolean::create(value));
+}
+
+bool Set::getBoolean(const size_type i) const
+{
+    return get(i).toBoolean().value();
+}
+
+void Set::addDouble(double value)
+{
+    m_value.push_back(Double::create(value));
+}
+
+double Set::getDouble(const size_type i) const
+{
+    return get(i).toDouble().value();
+}
+
+void Set::addInt(int value)
+{
+    m_value.push_back(Integer::create(value));
+}
+
+int Set::getInt(const size_type i) const
+{
+    return get(i).toInteger().intValue();
+}
+
+void Set::addLong(long value)
+{
+    m_value.push_back(Integer::create(value));
+}
+
+long Set::getLong(const size_type i) const
+{
+    return get(i).toInteger().value();
+}
+
+void Set::addString(const std::string& value)
+{
+    m_value.push_back(String::create(value));
+}
+
+const std::string& Set::getString(const size_type i) const
+{
+    return value::toString(get(i));
+}
+
+void Set::addXml(const std::string& value)
+{
+    m_value.push_back(Xml::create(value));
+}
+
+const std::string& Set::getXml(const size_type i) const
+{
+    return value::toXml(get(i));
+}
+
+const Value& Set::get(const size_type i) const
+{
+    if (i >= size()) {
+        throw std::out_of_range("Set: too big index");
+    }
+    assert(m_value[i]);
+
+    return *m_value[i];
+}
+
+Value& Set::get(const size_type i)
+{
+    if (i >= size()) {
+        throw std::out_of_range("Set: too big index");
+    }
+    assert(m_value[i]);
+
+    return *m_value[i];
+}
+
+void Set::del(const size_type i)
+{
+    if (i >= size()) {
+        throw std::out_of_range("Set: too big index");
+    }
+    assert(m_value[i]);
+
+    delete m_value[i];
+    m_value[i] = 0;
+    m_value.erase(begin() + i);
+}
+
+void Set::clear()
+{
+    std::stack < Value* > composite;
+
+    for (iterator it = begin(); it != end(); ++it) {
+        if (*it) {
+            if (isComposite(*it)) {
+                composite.push(*it);
+            } else {
+                delete *it;
+                *it = 0;
+            }
+        }
+    }
+
+    deleter(composite);
+    m_value.clear();
 }
 
 }} // namespace vle value

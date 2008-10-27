@@ -33,7 +33,7 @@ Ladybirdplantlouse::Ladybirdplantlouse(const graph::AtomicModel& model,
                                        const devs::InitEventList& events) :
     extension::CombinedQss(model,events)
 {
-    a = value::toDouble(events.get("a"));   
+    a = value::toDouble(events.get("a"));
     b = value::toDouble(events.get("b"));
     d = value::toDouble(events.get("d"));
     e = value::toDouble(events.get("e"));
@@ -43,9 +43,9 @@ Ladybirdplantlouse::~Ladybirdplantlouse()
 {
 }
 
-double Ladybirdplantlouse::compute(unsigned int i, 
+double Ladybirdplantlouse::compute(unsigned int i,
 				   const devs::Time& /* time */) const
-{        
+{
     switch (i) {
     case 0:
         return a * getValue(0) - b * getValue(0) * getValue(1);
@@ -54,11 +54,11 @@ double Ladybirdplantlouse::compute(unsigned int i,
     default:
         Throw(utils::InternalError, boost::format(
                 "Compute problem with Ladybirdplantlouse, i == %1%") % i );
-    } 
+    }
 }
 
 }}} // namespace vle examples qss
 
-DECLARE_NAMED_DYNAMICS(ladybirdplantlouse, 
+DECLARE_NAMED_DYNAMICS(ladybirdplantlouse,
 		       vle::examples::qss::Ladybirdplantlouse)
 

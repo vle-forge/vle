@@ -31,9 +31,9 @@ namespace vle { namespace data {
     std::map < std::string , SQLReader* > SQLReader::databases;
 
     SQLReader::SQLReader(const std::string & databaseName, type type,
-			 const std::string & userName, 
+			 const std::string & userName,
 			 const std::string & password,
-			 const std::string & hostName, 
+			 const std::string & hostName,
 			 unsigned int port) {
       SQL.setDatabase(databaseName);
       switch (type) {
@@ -56,9 +56,9 @@ namespace vle { namespace data {
       databases.erase(it,it);
     }
 
-    SQLReader* SQLReader::open(const std::string & databaseName, 
+    SQLReader* SQLReader::open(const std::string & databaseName,
 			       type type, const std::string & userName,
-			       const std::string & password, 
+			       const std::string & password,
 			       const std::string & hostName,
 			       unsigned int port) {
       SQLReader* r = NULL;

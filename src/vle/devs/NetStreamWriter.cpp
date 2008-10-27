@@ -132,9 +132,10 @@ void NetStreamWriter::process(const ObservationEvent& event)
         << "\" parent=\"" << event.getModel()->getParent()
         << "\" port=\"" << event.getPortName()
         << "\" view=\"" << event.getViewName()
-        << "\" >"
-        << event.getAttributeValue(event.getPortName())->toXML()
-        << "</modeltrame></trame>";
+        << "\" >";
+
+    event.getAttributeValue(event.getPortName()).writeXml(out);
+    out << "</modeltrame></trame>";
 
     try {
         m_client->send_buffer(out.str());
@@ -194,9 +195,9 @@ oov::PluginPtr NetStreamWriter::getPlugin() const
         result = m_client->recv_buffer(sz);
         m_client->send_buffer("ok");
 
-        value::Set vals = value::toSetValue(vpz::Vpz::parseValue(result));
-        std::string name = value::toString(vals->getValue(0));
-                
+        value::Set* vals = value::toSetValue(vpz::Vpz::parseValue(result));
+        std::string name = value::toString(vals->get(0));
+
         utils::Path::PathList lst(utils::Path::path().getStreamDirs());
         utils::Path::PathList::const_iterator it;
         oov::PluginPtr plugin;
@@ -210,9 +211,9 @@ oov::PluginPtr NetStreamWriter::getPlugin() const
                 error += e.what();
             }
         }
-        
+
         Assert(utils::ArgError, plugin.get(), error);
-        plugin->deserialize(vals->getValue(1));
+        plugin->deserialize(vals->get(1));
 
         return plugin;
     }

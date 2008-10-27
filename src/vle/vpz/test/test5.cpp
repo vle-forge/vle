@@ -55,7 +55,7 @@ using namespace vle;
 
 BOOST_AUTO_TEST_CASE(trame_parameter)
 {
-    const char* xml = 
+    const char* xml =
         "<?xml version=\"1.0\"?>\n"
         "<vle_trame>\n"
         "<trame type=\"parameter\" date=\"0.33\" plugin=\"text\" location=\"tutu\" >\n"
@@ -164,17 +164,17 @@ BOOST_AUTO_TEST_CASE(trame_value)
         BOOST_REQUIRE_EQUAL(r.port(), "port");
         BOOST_REQUIRE_EQUAL(r.view(), "view1");
 
-        value::Value v = r.value();
+        const value::Value* v = r.value();
         BOOST_CHECK(v->isSet());
-        value::Set s1 = value::toSetValue(v);
+        const value::Set* s1 = value::toSetValue(v);
         BOOST_REQUIRE_EQUAL(s1->size(), (unsigned int)2);
-        value::Value v1 = s1->getValue(0);
-        BOOST_CHECK(v1->isInteger());
+        const value::Value& v1(s1->get(0));
+        BOOST_CHECK(v1.isInteger());
         BOOST_REQUIRE_EQUAL(value::toInteger(v1), 1);
-        value::Set s2 = value::toSetValue(s1->getValue(1));
-        BOOST_REQUIRE_EQUAL(value::toInteger(s2->getValue(0)), 2);
-        BOOST_REQUIRE_EQUAL(value::toInteger(s2->getValue(1)), 3);
-        BOOST_REQUIRE_EQUAL(value::toInteger(s2->getValue(2)), 4);
+        const value::Set& s2 = value::toSetValue(s1->get(1));
+        BOOST_REQUIRE_EQUAL(value::toInteger(s2.get(0)), 2);
+        BOOST_REQUIRE_EQUAL(value::toInteger(s2.get(1)), 3);
+        BOOST_REQUIRE_EQUAL(value::toInteger(s2.get(2)), 4);
     }
     it++;
     {
@@ -184,16 +184,16 @@ BOOST_AUTO_TEST_CASE(trame_value)
         BOOST_REQUIRE_EQUAL(r.port(), "port");
         BOOST_REQUIRE_EQUAL(r.view(), "view1");
 
-        value::Value v = r.value();
+        const value::Value* v = r.value();
         BOOST_CHECK(v->isSet());
-        value::Set s1 = value::toSetValue(v);
+        const value::Set* s1(value::toSetValue(v));
         BOOST_REQUIRE_EQUAL(s1->size(), (unsigned int)2);
-        value::Value v1 = s1->getValue(0);
-        BOOST_CHECK(v1->isInteger());
+        const value::Value& v1(s1->get(0));
+        BOOST_CHECK(v1.isInteger());
         BOOST_REQUIRE_EQUAL(value::toInteger(v1), 5);
-        value::Set s2 = value::toSetValue(s1->getValue(1));
-        BOOST_REQUIRE_EQUAL(value::toInteger(s2->getValue(0)), 6);
-        BOOST_REQUIRE_EQUAL(value::toInteger(s2->getValue(1)), 7);
-        BOOST_REQUIRE_EQUAL(value::toInteger(s2->getValue(2)), 8);
+        const value::Set& s2(value::toSetValue(s1->get(1)));
+        BOOST_REQUIRE_EQUAL(value::toInteger(s2.get(0)), 6);
+        BOOST_REQUIRE_EQUAL(value::toInteger(s2.get(1)), 7);
+        BOOST_REQUIRE_EQUAL(value::toInteger(s2.get(2)), 8);
     }
 }

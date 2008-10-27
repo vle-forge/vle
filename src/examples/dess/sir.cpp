@@ -35,7 +35,7 @@ sir::sir(const graph::AtomicModel& model,
     r = value::toDouble(evList.get("r"));
     a = value::toDouble(evList.get("a"));
 }
-	    
+
 double sir::compute(unsigned int i, const devs::Time& /* time */) const
 {
     switch(i){
@@ -50,7 +50,7 @@ double sir::compute(unsigned int i, const devs::Time& /* time */) const
 		  "Compute problem with sir model, i == %1%") % i );
     }
 }
-	    
+
 DECLARE_NAMED_DYNAMICS(sir, sir)
-	
+
 }}} // namespace vle examples dess

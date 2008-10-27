@@ -23,7 +23,6 @@
  */
 
 
-#include <iostream>
 #include <cerrno>
 #include <cstdio>
 #include <glibmm/spawn.h>
@@ -99,7 +98,7 @@ void ManagerRunThread::operator()(const vpz::Vpz& file)
 {
     m_out << boost::format(
         "Manager: run experimental frames in %1% threads\n") % m_process;
-    
+
     initRandomGenerator(file);
     m_exp = getCombinationPlan(file, m_out);
     m_exp->saveVPZinstance(m_writefile);
@@ -200,7 +199,7 @@ ManagerRunDistant::ManagerRunDistant(std::ostream& out, bool writefile,
     try {
         mHost.read_file();
     } catch(const std::exception& e) {
-        m_out << boost::format("manager parsing host file error: %1%\n") 
+        m_out << boost::format("manager parsing host file error: %1%\n")
             % e.what();
     }
 }
@@ -252,7 +251,7 @@ void ManagerRunDistant::operator()(const vpz::Vpz& file)
 {
     m_out << boost::format("Manager: run experimental frames in distant\n");
     initRandomGenerator(file);
-    
+
     m_exp = getCombinationPlan(file, m_out);
 
     Glib::Thread* prod(Glib::Thread::create(
@@ -263,7 +262,7 @@ void ManagerRunDistant::operator()(const vpz::Vpz& file)
 
     prod->join();
     cond->join();
-    
+
     if (utils::Trace::trace().haveWarning()) {
         m_out << boost::format(
             "\n/!\\ Some warnings during simulation: See file %1%\n") %
@@ -401,10 +400,10 @@ void ManagerRunDistant::getResult(utils::net::Client& cl)
             cl.send_string("ok");
             std::string result = cl.recv_buffer(sz);
 
-            value::Set vals = value::toSetValue(vpz::Vpz::parseValue(result));
-            int nbview = value::toInteger(vals->getValue(0));
-            int instance = value::toInteger(vals->getValue(1));
-            int replica = value::toInteger(vals->getValue(2));
+            value::Set* vals = value::toSetValue(vpz::Vpz::parseValue(result));
+            int nbview = value::toInteger(vals->get(0));
+            int instance = value::toInteger(vals->get(1));
+            int replica = value::toInteger(vals->get(2));
             cl.send_string("ok");
 
             for (int j = 0; j < nbview; ++j) {
@@ -415,10 +414,10 @@ void ManagerRunDistant::getResult(utils::net::Client& cl)
                 vals = value::toSetValue(vpz::Vpz::parseValue(result));
                 cl.send_string("ok");
 
-                std::string view = value::toString(vals->getValue(0));
+                std::string view = value::toString(vals->get(0));
 
                 oov::OutputMatrix m;
-                m.deserialize(vals->getValue(1));
+                m.deserialize(vals->get(1));
 
                 {
                     Glib::Mutex::Lock lock(m_mutex);

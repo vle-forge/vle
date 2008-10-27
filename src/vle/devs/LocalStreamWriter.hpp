@@ -33,7 +33,7 @@
 
 namespace vle { namespace devs {
 
-    /** 
+    /**
      * @brief Use a local communication to observe. LocalStreamWriter are just
      * a reference to the oov::LocalStreamReader.
      */
@@ -65,7 +65,7 @@ namespace vle { namespace devs {
         virtual oov::PluginPtr close(const devs::Time& time);
 
         virtual oov::PluginPtr refreshPlugin();
-        
+
     private:
         oov::OovLocalStreamReader      m_reader;
     };

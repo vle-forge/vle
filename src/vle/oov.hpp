@@ -40,7 +40,7 @@
 
 namespace vle {
 
-    /** 
+    /**
      * @brief The OOV library of Output Of VLE, is used to build the outputs of
      * the VLE plateform. Currently, it provides local (synchron memory
      * transfert) or distant (synchorn memory transfert via socket). The class

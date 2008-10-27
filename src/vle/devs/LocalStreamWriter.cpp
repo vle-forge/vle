@@ -86,7 +86,7 @@ void LocalStreamWriter::process(const ObservationEvent& event)
            event.getModel()->getParent(),
            event.getPortName(),
            event.getViewName());
-    tr.add(event.getAttributeValue(event.getPortName()));
+    tr.add(&event.getAttributeValue(event.getPortName()));
     m_reader.onValue(tr);
 }
 

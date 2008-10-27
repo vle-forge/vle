@@ -75,7 +75,7 @@ void JustRunThread::operator()(const CmdArgs& args)
         m_process;
 
     m_args = args;
-    
+
     Glib::Thread* prod(Glib::Thread::create(
         sigc::mem_fun(*this, &JustRunThread::read), true));
 

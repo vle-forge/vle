@@ -33,7 +33,7 @@
 
 namespace vle { namespace oov {
 
-    /** 
+    /**
      * @brief The vle::oov::CairoPlugin is a class to develop cairo output steam
      * plugins. Do not forget the plugin declaration:
      * @code
@@ -43,7 +43,7 @@ namespace vle { namespace oov {
     class CairoPlugin : public Plugin
     {
     public:
-        /** 
+        /**
          * @brief Default constructor of the CairoPlugin.
          * @param location this string represents the name of the default
          * directory for a devs::LocalStreamWriter or a host:port:directory for
@@ -56,14 +56,14 @@ namespace vle { namespace oov {
         virtual ~CairoPlugin()
         { }
 
-        /** 
+        /**
          * @brief Return true, CairoPlugin is a Cairo plugin.
          * @return true.
          */
         virtual bool isCairo() const
         { return true; }
 
-        /** 
+        /**
          * @brief Use to react to an external event for instance, from an
          * graphical user interface. Example:
          * @code
@@ -76,7 +76,7 @@ namespace vle { namespace oov {
                               const value::Map& /* params */)
         { }
 
-        /** 
+        /**
          * @brief Use to react to a modification of the external Cairo::Surface.
          * @param width the new width of the Cairo::Surface.
          * @param height the new height of the Cairo::Surface.
@@ -84,7 +84,7 @@ namespace vle { namespace oov {
         virtual void onSize(int /* width */, int /* height */)
         { }
 
-        /** 
+        /**
          * @brief Use to define the prefered size of the CairoSurface of the
          * CairoPlugin.
          * @param width output parameter for the prefered width of the
@@ -94,7 +94,7 @@ namespace vle { namespace oov {
          */
         virtual void preferredSize(int& /* width */, int& /* height */) = 0;
 
-        /** 
+        /**
          * @brief build a new context from the specified surface to the
          * CairoPlugin.
          * @param the surface to use with the context.
@@ -102,7 +102,7 @@ namespace vle { namespace oov {
         inline void setSurface(Cairo::RefPtr < Cairo::Surface > surf)
         { m_ctx = Cairo::Context::create(surf); }
 
-        /** 
+        /**
          * @brief Set a context to the CairoPlugin.
          * @param ctx the new context to use.
          */
@@ -126,7 +126,7 @@ namespace vle { namespace oov {
      */
     typedef boost::shared_ptr < CairoPlugin > CairoPluginPtr;
 
-    /** 
+    /**
      * @brief Convert a PluginPtr reference to a CairoPluginPtr reference.
      * @param plg The PluginPtr to convert.
      * @return The reference to the CairoPluginPtr or 0 if convert failed.

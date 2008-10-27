@@ -36,8 +36,7 @@ TARGET_LINK_LIBRARIES(vleoov
   vledata
   vlevalue
   vlegraph
-  vlevpz
-  vleoov)
+  vlevpz)
 
 INSTALL(TARGETS vleoov
   RUNTIME DESTINATION bin

@@ -39,7 +39,7 @@ namespace vle { namespace utils {
 
         virtual ~PathOptionGroup();
 
-        /** 
+        /**
          * @brief Assign all the paths to the utils::Path singleton.
          */
         void assignToPath();

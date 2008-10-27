@@ -23,82 +23,193 @@
  */
 
 
-#ifndef UTILS_VALUE_TABLE_HPP
-#define UTILS_VALUE_TABLE_HPP
+#ifndef VLE_VALUE_TABLE_HPP
+#define VLE_VALUE_TABLE_HPP
 
 #include <vle/value/Value.hpp>
 #include <boost/multi_array.hpp>
 
-
-
 namespace vle { namespace value {
+
+    /**
+     * @brief Define an array of two dimensions of real.
+     */
+    typedef boost::multi_array < double, 2 > TableValue;
 
     /**
      * @brief A table is a container for double value into an
      * boost::multi_array < double, 2 >. The XML format is:
-     * @code
-     * <table row="2" width="3">
-     * 1 2 3 4 5 6
-     * </table>
-     * @endcode
-     *
-     * @author The VLE Development Team.
      */
-    class TableFactory : public ValueBase
+    class Table : public Value
     {
-    private:
-        TableFactory(const int width, const int height);
-
-        TableFactory(const TableFactory& setfactory);
-
     public:
-        typedef boost::multi_array < double, 2 > TableValue;
         typedef TableValue::index index;
+        typedef TableValue::size_type size_type;
+        typedef TableValue::iterator iterator;
+        typedef TableValue::const_iterator const_iterator;
 
-        virtual ~TableFactory()
-        { }
+        /**
+         * @brief Build a Table object with a default value to empty TableValue.
+         */
+        Table() :
+            m_width(0), m_height(0)
+        {}
 
-        static Table create(const int width, const int height);
-            
-        virtual Value clone() const;
+        /**
+         * @brief Build a Table object wi a specified size.
+         * @param width The number of columns.
+         * @param height The number of rows.
+         */
+        Table(const int width, const int height) :
+            m_value(boost::extents[width][height]),
+            m_width(width),
+            m_height(height)
+        {}
 
-        virtual ValueBase::type getType() const
-        { return ValueBase::TABLE; }
+        /**
+         * @brief Copy constructor.
+         * @param value The value to copy.
+         */
+        Table(const Table& value) :
+            Value(value),
+            m_value(value.m_value),
+            m_width(value.m_width),
+            m_height(value.m_height)
+        {}
 
-        inline TableValue& getValue()
+        /**
+         * @brief Nothing to delete.
+         */
+        virtual ~Table() {}
+
+        ///
+        ////
+        ///
+
+        /**
+         * @brief Build a Table using the boost::pool memory management.
+         * @param width The width of the TableValue.
+         * @param height The height of the TableValue.
+         * @return A new Table with the specified size, all real are initialized
+         * with 0.0.
+         */
+        static Table* create(const int width, const int height)
+        { return new Table(width, height); }
+
+        ///
+        ////
+        ///
+
+        /**
+         * @brief Clone the current Table with the same TableValue datas.
+         * @return A new boost::pool allocated value::Value.
+         */
+        virtual Value* clone() const
+        { return new Table(*this); }
+
+        /**
+         * @brief Get the type of this class.
+         * @return Value::TABLE.
+         */
+        virtual Value::type getType() const
+        { return Value::TABLE; }
+
+        /**
+         * @brief Push all real from the TableValue separated by space for
+         * columns and end line for line.
+         * @code
+         * 1 2 3 4
+         * 5 6 7 8
+         * @endcode
+         * @param out The output stream.
+         */
+        virtual void writeFile(std::ostream& out) const;
+
+        /**
+         * @brief Push all real from the TableValue separated by colon for
+         * columns and parenthesis for line.
+         * @code
+         * ((1,2,3,4),(5,6,7,8))
+         * @param out The output stream.
+         */
+	virtual void writeString(std::ostream& out) const;
+
+        /**
+         * @brief Push all real from the TableValue into an XML representation.
+         * @code
+         * <table width="4" height="2">
+         * 1 2 3 4 5 6 7 8
+         * </table>
+         * @endcode
+         * @param out The output stream.
+         */
+	virtual void writeXml(std::ostream& out) const;
+
+        ///
+        ////
+        ///
+
+        /**
+         * @brief Get a reference to the TableValue.
+         * @return A reference to the TableValue.
+         */
+        inline TableValue& value()
         { return m_value; }
 
-        inline const TableValue& getValue() const
+        /**
+         * @brief Get a constant reference to the TableValue.
+         * @return A constant reference to the TableValue.
+         */
+        inline const TableValue& value() const
         { return m_value; }
 
+        /**
+         * @brief Check if the TableValue is empty.
+         * @return True if TableValue is empty, false otherwise.
+         */
         inline bool empty() const
         { return m_value.empty(); }
 
+        /**
+         * @brief Get the width of the TableValue.
+         * @return The width.
+         */
         inline index width() const
         { return m_width; }
 
+        /**
+         * @brief Get the height of the TableValue.
+         * @return The height.
+         */
         inline index height() const
         { return m_height; }
 
-        inline double get(const index x, const index y) const
+        /**
+         * @brief get a constant reference to the value at the specified index.
+         * @param x the index of the column.
+         * @param y the index of the row.
+         * @return a constant reference to the real.
+         */
+        inline const double& get(const index x, const index y) const
         { return m_value[x][y]; }
 
-        /** 
+        /**
+         * @brief get a reference to the value at the specified index.
+         * @param x the index of the column.
+         * @param y the index of the row.
+         * @return a reference to the real.
+         */
+        inline double& get(const index x, const index y)
+        { return m_value[x][y]; }
+
+        /**
          * @brief Fill the current table with multiple reals read from a string.
          * The number of real must be equal to width x height.
-         * 
          * @param str A string with [0.. x] real.
-         *
          * @throw utils::ArgError if string have problem like bad number of
          * real.
          */
         void fill(const std::string& str);
-
-        virtual std::string toFile() const;
-
-        virtual std::string toString() const;
-
-        virtual std::string toXML() const;
 
     private:
         TableValue      m_value;
@@ -106,9 +217,29 @@ namespace vle { namespace value {
         index           m_height;
     };
 
-    Table toTableValue(const Value& value);
+    inline const Table& toTableValue(const Value& value)
+    { return value.toTable(); }
 
-    const TableFactory::TableValue& toTable(const Value& value);
+    inline const Table* toTableValue(const Value* value)
+    { return value ? &value->toTable() : 0; }
+
+    inline Table& toTableValue(Value& value)
+    { return value.toTable(); }
+
+    inline Table* toTableValue(Value* value)
+    { return value ? &value->toTable() : 0; }
+
+    inline const TableValue& toTable(const Value& value)
+    { return value.toTable().value(); }
+
+    inline TableValue& toTable(Value& value)
+    { return value.toTable().value(); }
+
+    inline const TableValue& toTable(const Value* value)
+    { return value::reference(value).toTable().value(); }
+
+    inline TableValue& toTable(Value* value)
+    { return value::reference(value).toTable().value(); }
 
 }} // namespace vle value
 #endif

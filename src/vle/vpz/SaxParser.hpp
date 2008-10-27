@@ -59,7 +59,7 @@ namespace vle { namespace vpz {
          */
         virtual ~SaxParser()
         {}
-      
+
         /**
          * @brief Delete all information from Sax parser like stack, etc. Use it
          * before restart a new parse.
@@ -165,7 +165,7 @@ namespace vle { namespace vpz {
          */
         inline bool isEndTrame() const
         { return m_isEndTrame; }
-      
+
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
@@ -177,13 +177,13 @@ namespace vle { namespace vpz {
          * @brief Get the content of the SaxStackValue.
          * @return A constant reference to the vector of value::Value.
          */
-        const std::vector < value::Value >& getValues() const;
+        const std::vector < value::Value* >& getValues() const;
 
         /**
          * @brief Get the content of the SaxParserError.
          * @return A reference to the vector of value::Value.
          */
-        std::vector < value::Value >& getValues();
+        std::vector < value::Value* >& getValues();
 
         /**
          * @brief Get the content of a specific cells of the SaxStackValue.
@@ -191,7 +191,7 @@ namespace vle { namespace vpz {
          * @throw utils::SaxParserError if i is greater that size of the vector.
          * @return A constant reference to the value.
          */
-        const value::Value& getValue(const size_t pos) const;
+        value::Value* getValue(const size_t pos) const;
 
         /**
          * @brief Get a constant reference to the Vpz.

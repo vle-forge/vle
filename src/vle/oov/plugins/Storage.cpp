@@ -40,7 +40,7 @@ Storage::Storage(const std::string& location) :
     Plugin(location),
     m_matrix(2, 2, 1, 1),
     m_time(-1.0),
-    m_isstart(false)    
+    m_isstart(false)
 {
 }
 
@@ -53,12 +53,12 @@ bool Storage::isSerializable() const
     return true;
 }
 
-value::Value Storage::serialize() const
+value::Value* Storage::serialize() const
 {
     return m_matrix.serialize();
 }
 
-void Storage::deserialize(value::Value& vals)
+void Storage::deserialize(const value::Value& vals)
 {
     m_matrix.deserialize(vals);
 }
@@ -112,27 +112,29 @@ void Storage::onValue(const vpz::ValueTrame& trame)
             m_isstart = true;
         }
     }
-    
+
     for (vpz::ModelTrameList::const_iterator it = trame.trames().begin();
          it != trame.trames().end(); ++it) {
         std::string name(it->parent());
         name += it->simulator();
-        m_matrix.addValue(name, it->port(), it->value());
+        if (not it->value()->isNull()) {
+            m_matrix.addValue(name, it->port(), *it->value());
+        }
     }
 }
-    
+
 void Storage::close(const vpz::EndTrame& /*trame*/)
 {
     m_matrix.setLastTime(m_time);
 }
 
-value::MatrixFactory::VectorView Storage::getTime()
+value::VectorView Storage::getTime()
 {
     return m_matrix.getTime();
 }
 
 void Storage::nextTime(double trame_time)
-{   
+{
     if (trame_time != m_time) {
         m_matrix.setLastTime(m_time);
 	m_time = trame_time;

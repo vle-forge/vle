@@ -38,7 +38,7 @@ CairoCAView::CairoCAView(const std::string& location) :
     mRows(0),
     mColumns(0),
     mPen(1),
-    mWindowWidth(405), 
+    mWindowWidth(405),
     mWindowHeight(405),
     mTime(-1.0),
     mReceiveCell(0),
@@ -63,23 +63,24 @@ void CairoCAView::onValue(const vpz::ValueTrame& trame)
     mTime = utils::to_double(trame.time());
 
     for (vpz::ModelTrameList::const_iterator it = trame.trames().begin();
- 	 it != trame.trames().end(); ++it) {
+         it != trame.trames().end(); ++it) {
 	std::vector < std::string > v;
-	
+
 	boost::split(v, it->simulator(), boost::is_any_of("_"));
 
 	if (v[0] == mCellName) {
-	    (*mValues)[(index)(utils::to_int(v[1])-1)][(index)(utils::to_int(v[2])-1)] = it->value()->toString();
+            (*mValues)[(index)(utils::to_int(v[1])-1)][(index)(utils::to_int(v[2])-1)]
+                = it->value()->writeToString();
 	    ++mReceiveCell;
 	}
 	else {
 	    if (it->port() == "x")
 		mObjects[v[0]][utils::to_int(v[1])-1].first = value::toInteger(it->value());
-	    else 
+	    else
 		mObjects[v[0]][utils::to_int(v[1])-1].second = value::toInteger(it->value());
 	    ++mReceiveObject;
 	}
-	
+
     }
     if (mReceiveCell == mRows * mColumns and mReceiveObject == mObjectNumber*2) {
 	draw();
@@ -116,9 +117,9 @@ void CairoCAView::onParameter(const vpz::ParameterTrame& trame)
     }
 
     xmlpp::DomParser parser;
-    
+
     parser.parse_memory(trame.data());
-    xmlpp::Element* root = utils::xml::get_root_node(parser, "parameters");  
+    xmlpp::Element* root = utils::xml::get_root_node(parser, "parameters");
     xmlpp::Element * elt = utils::xml::get_children(root, "size");
     mColumns = utils::to_int(utils::xml::get_attribute(elt,"x").c_str());
     mRows = utils::to_int(utils::xml::get_attribute(elt,"y").c_str());
@@ -158,12 +159,12 @@ void CairoCAView::onParameter(const vpz::ParameterTrame& trame)
 	mType = REAL;
     if (utils::xml::get_attribute(elt, "type") == "boolean")
 	mType = BOOLEAN;
-		
+
     switch (mType) {
     case INTEGER: {
 	xmlpp::Node::NodeList lst = elt->get_children("state");
 	xmlpp::Node::NodeList::iterator it = lst.begin();
-	
+
 	while (it != lst.end()) {
 	    xmlpp::Element * v_valueNode = (xmlpp::Element*)(*it);
 	    int v_value(utils::to_int(utils::xml::get_attribute(v_valueNode, "value")));
@@ -171,7 +172,7 @@ void CairoCAView::onParameter(const vpz::ParameterTrame& trame)
 	    int green = utils::to_int(utils::xml::get_attribute(v_valueNode, "green"));
 	    int blue = utils::to_int(utils::xml::get_attribute(v_valueNode, "blue"));
 	    mColorList[v_value] = CairoCAView::color(red, green, blue);
-	    
+
 	    ++it;
 	}
 	break;
@@ -179,7 +180,7 @@ void CairoCAView::onParameter(const vpz::ParameterTrame& trame)
     case REAL: {
 	xmlpp::Node::NodeList lst = elt->get_children("state");
 	xmlpp::Node::NodeList::iterator it = lst.begin();
-	
+
 	while (it != lst.end()) {
 	    xmlpp::Element * v_valueNode = (xmlpp::Element*)(*it);
 	    double v_minValue = utils::to_double(utils::xml::get_attribute(v_valueNode, "min"));
@@ -187,14 +188,14 @@ void CairoCAView::onParameter(const vpz::ParameterTrame& trame)
 	    std::string v_color = utils::xml::get_attribute(v_valueNode, "color");
 	    RealColor::color_type v_type = RealColor::LINEAR;
 	    double v_coef = 0.;
-	    
+
 	    if (utils::xml::get_attribute(v_valueNode, "type") == "linear")
 		v_type = RealColor::LINEAR;
 	    if (utils::xml::get_attribute(v_valueNode, "type") == "highvalue")
 		v_type = RealColor::HIGHVALUE;
 	    if (utils::xml::get_attribute(v_valueNode, "type") == "lowvalue")
 		v_type = RealColor::LOWVALUE;
-	    if (v_type == RealColor::HIGHVALUE or v_type == RealColor::LOWVALUE) 
+	    if (v_type == RealColor::HIGHVALUE or v_type == RealColor::LOWVALUE)
 		v_coef = utils::to_double(utils::xml::get_attribute(v_valueNode, "coef"));
 
 	    mRealColorList.push_back(RealColor(v_minValue, v_maxValue, v_color, v_type, v_coef));
@@ -205,7 +206,7 @@ void CairoCAView::onParameter(const vpz::ParameterTrame& trame)
     case BOOLEAN: {
 	xmlpp::Node::NodeList lst = elt->get_children("state");
 	xmlpp::Node::NodeList::iterator it = lst.begin();
-	
+
 	while (it != lst.end()) {
 	    xmlpp::Element * v_valueNode = (xmlpp::Element*)(*it);
 	    int red_true = utils::to_int(utils::xml::get_attribute(v_valueNode, "red_true"));
@@ -214,7 +215,7 @@ void CairoCAView::onParameter(const vpz::ParameterTrame& trame)
 	    int red_false = utils::to_int(utils::xml::get_attribute(v_valueNode, "red_false"));
 	    int green_false = utils::to_int(utils::xml::get_attribute(v_valueNode, "green_false"));
 	    int blue_false = utils::to_int(utils::xml::get_attribute(v_valueNode, "blue_false"));
-	    
+
 	    mColorList[0] = CairoCAView::color(red_false, green_false, blue_false);
 	    mColorList[1] = CairoCAView::color(red_true, green_true, blue_true);
 
@@ -230,7 +231,7 @@ void CairoCAView::onParameter(const vpz::ParameterTrame& trame)
 
 	xmlpp::Node::NodeList lst = elt->get_children("object");
 	xmlpp::Node::NodeList::iterator it = lst.begin();
-	
+
 	while (it != lst.end()) {
 	    xmlpp::Element * v_valueNode = (xmlpp::Element*)(*it);
 	    std::string v_name = utils::xml::get_attribute(v_valueNode, "name");
@@ -240,7 +241,7 @@ void CairoCAView::onParameter(const vpz::ParameterTrame& trame)
 	    int v_color_green = utils::to_int(utils::xml::get_attribute(v_valueNode, "color_green"));
 	    int v_color_blue = utils::to_int(utils::xml::get_attribute(v_valueNode, "color_blue"));
 	    CairoCAView::color v_color = color(v_color_red, v_color_green, v_color_blue);
-	    
+
 	    mObjectList[v_name] = std::pair < std::string ,CairoCAView::color>(v_shape, v_color);
 	    mObjects[v_name] = std::vector < std::pair < int, int > >();
 
@@ -250,7 +251,7 @@ void CairoCAView::onParameter(const vpz::ParameterTrame& trame)
 	    ++it;
 	}
     }
-    
+
     mMaxX = mStepX * mColumns;
     mMaxY = mStepY * mRows;
 }
@@ -281,7 +282,7 @@ CairoCAView::cairo_color CairoCAView::build_color(const std::string & p_value)
 	double v_value = utils::to_double(p_value);
 	std::list < RealColor >::iterator it = mRealColorList.begin();
 	bool v_found = false;
-	
+
 	while (!v_found && it != mRealColorList.end()) {
 	    if (it->m_min <= v_value && it->m_max > v_value)
 		v_found = true;
@@ -295,7 +296,7 @@ CairoCAView::cairo_color CairoCAView::build_color(const std::string & p_value)
 	    if (it->m_type == RealColor::HIGHVALUE)
 		c = pow(c,it->m_coef);
 	    else if (it->m_type == RealColor::LOWVALUE)
-		c = exp(-(it->m_coef)*c);		
+		c = exp(-(it->m_coef)*c);
 
 	    if (it->m_color == "red") {
 		v_color.r = 1.;
@@ -361,18 +362,18 @@ void CairoCAView::draw()
 
     ctx->rectangle(0, 0, mWindowWidth, mWindowHeight);
     ctx->set_source_rgb(0.745098, 0.745098, 0.745098);
-    ctx->fill();	
+    ctx->fill();
     if (mGeometry == SQUARE) {
 	int midX = ((mMaxX - mMinX) - (mColumns * mStepX)) / 2;
 	int midY = ((mMaxY - mMinY) - (mRows * mStepY)) / 2;
-	
+
 	for (index y = 0; y < (index)mRows ; ++y)
 	    for (index x = 0; x < (index)mColumns ; ++x) {
 		cairo_color v_color = build_color((*mValues)[x][y]);
-	    
+
 		ctx->set_source_rgb(v_color.r, v_color.g, v_color.b);
-		ctx->rectangle(x * mStepX + 2 + midX, 
-			       y * mStepY + 2 + midY, 
+		ctx->rectangle(x * mStepX + 2 + midX,
+			       y * mStepY + 2 + midY,
 			       mStepX - 1, mStepY - 1 );
 		ctx->fill();
 	    }
@@ -382,7 +383,7 @@ void CairoCAView::draw()
 	for (index y = 0; y < (index)mRows ; ++y)
 	    for (index x = 0; x < (index)mColumns ; ++x) {
 		cairo_color v_color = build_color((*mValues)[x][y]);
-		
+
 		ctx->set_source_rgb(v_color.r, v_color.g, v_color.b);
 		draw_hexa(ctx, x, y);
 	    }
@@ -392,11 +393,11 @@ void CairoCAView::draw()
 }
 
 void CairoCAView::draw_hexa(Cairo::RefPtr < Cairo::Context > ctx, int x, int p_y)
-{	
+{
     double y;
 
     ctx->begin_new_path();
-    if (p_y%2 == 0) {	
+    if (p_y%2 == 0) {
 	y = p_y * 0.7;
 	ctx->move_to(x*mStepX+mPen,y*mStepY+mStepY3);
 	ctx->line_to(x*mStepX+mStepX2,y*mStepY);
@@ -414,7 +415,7 @@ void CairoCAView::draw_hexa(Cairo::RefPtr < Cairo::Context > ctx, int x, int p_y
 	ctx->line_to(x*mStepX+mStepX2+1,y*mStepY+mStepY7);
     }
     ctx->close_path();
-    
+
     ctx->fill_preserve();
     ctx->set_source_rgb( 0.745098, 0.745098, 0.745098);
     ctx->set_line_width(mPen);
@@ -435,25 +436,25 @@ void CairoCAView::draw_objects(Cairo::RefPtr < Cairo::Context > ctx)
 	    int y = it->second;
 	    int midX = ((mMaxX - mMinX) - (mColumns * mStepX)) / 2;
 	    int midY = ((mMaxY - mMinY) - (mRows * mStepY)) / 2;
-	    
+
 	    ctx->set_source_rgb(ito->second.second.r/65535.,
 				ito->second.second.g/65535.,
-				ito->second.second.b/65535.);				
-	    
+				ito->second.second.b/65535.);
+
 	    if (ito->second.first == "square"){
 		ctx->rectangle( (x-1)*mStepX+3+midX,(y-1)*mStepY+3+midY,
 				mStepX-4, mStepY-4 );
 		ctx->fill();
-		
+
 	    }else {
 		if (ito->second.first == "circle"){
 		    ctx->arc( ((x-1)*mStepX+3+midX) + (mStepX-4)/2,
 			      ((y-1)*mStepY+3+midY) + (mStepY-4)/2,
 			      mStepY>mStepX?( (mStepX-4)/2 ):( (mStepY-4)/2 ),
-			      0, 
+			      0,
 			      2*M_PI );
 		    ctx->fill();
-		}	
+		}
 	    }
 	    ++it;
 	}
@@ -473,50 +474,50 @@ void CairoCAView::draw_hexa_objects(Cairo::RefPtr < Cairo::Context > ctx)
 	while (it != lst.end()) {
 	    int x = it->first;
 	    int y = it->second;
-	    
+
 	    ctx->set_source_rgb(ito->second.second.r/65535.,
 				ito->second.second.g/65535.,
-				ito->second.second.b/65535.);				
-	    
+				ito->second.second.b/65535.);
+
 	    double p_y = y *0.7;
 	    if (y % 2 == 0) {
-		if (ito->second.first == "square"){						
+		if (ito->second.first == "square"){
 		    ctx->rectangle( x*mStepX + 1 ,
 				   p_y*mStepY + mStepY3 + 1 ,
-				   2*(mStepX2-1) , 
+				   2*(mStepX2-1) ,
 				   mStepY7-mStepY3 - 2
 			);
 		    ctx->fill();
-		    
+
 		}else{
 		    if (ito->second.first == "circle"){
 			ctx->arc(  x*mStepX  + mStepX2,
-				  (p_y)*mStepY+(mStepY3+mStepY7)/2, 
+				  (p_y)*mStepY+(mStepY3+mStepY7)/2,
 				  mStepX2/2,
 				  0,
 				  2 * M_PI );
 			ctx->fill();
 		    }
 		}
-	    } else {					
-		if (ito->second.first == "square"){						
+	    } else {
+		if (ito->second.first == "square"){
 		    ctx->rectangle( x*mStepX + mStepX2 +1,
 				   p_y*mStepY + mStepY3 +1,
-				   2*(mStepX2-1) , 
+				   2*(mStepX2-1) ,
 				   mStepY7-mStepY3 -2
 			);
 		    ctx->fill();
 		}else{
 		    if (ito->second.first == "circle"){
 			ctx->arc(  (x+1)*mStepX ,
-				  p_y*mStepY +(mStepY3+mStepY7)/2 , 
+				  p_y*mStepY +(mStepY3+mStepY7)/2 ,
 				  mStepX2/2,
 				  0,
 				  2 * M_PI );
 			ctx->fill();
 		    }
 		}
-		
+
 	    }
 	    ++it;
 	}

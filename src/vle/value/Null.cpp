@@ -28,36 +28,19 @@
 
 namespace vle { namespace value {
 
-Null NullFactory::create()
+void Null::writeFile(std::ostream& out) const
 {
-    return Null(new NullFactory());
+    out << "NA";
 }
 
-Value NullFactory::clone() const
+void Null::writeString(std::ostream& out) const
 {
-    return Value(new NullFactory());
+    out << "NA";
 }
 
-std::string NullFactory::toFile() const
+void Null::writeXml(std::ostream& out) const
 {
-    return "NA";
-}
-
-std::string NullFactory::toString() const
-{
-    return "NA";
-}
-
-std::string NullFactory::toXML() const
-{
-    return "<null />";
-}
-
-Null toNullValue(const Value& value)
-{
-    Assert(utils::ArgError, value->getType() == ValueBase::NIL,
-           "Value is not a Null");
-    return boost::static_pointer_cast < NullFactory >(value);
+    out << "<null />";
 }
 
 }} // namespace vle value

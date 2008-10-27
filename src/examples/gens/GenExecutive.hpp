@@ -45,7 +45,7 @@ namespace vle { namespace examples { namespace gens {
 
         virtual void internalTransition(const devs::Time& ev);
 
-        virtual value::Value observation(const devs::ObservationEvent& ev)
+        virtual value::Value* observation(const devs::ObservationEvent& ev)
             const;
 
     private:

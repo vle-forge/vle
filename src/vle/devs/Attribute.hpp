@@ -42,7 +42,7 @@ namespace vle { namespace devs {
      * information. Attribute is this class and define some function to quickly
      * build Attribute.
      */
-    typedef std::pair < std::string, value::Value > Attribute;
+    typedef std::pair < std::string, value::Value* > Attribute;
 
     /**
      * Build an attribute with a specified name and integer value.
@@ -53,7 +53,7 @@ namespace vle { namespace devs {
      * @return a new Attribute.
      */
     inline Attribute attribute(const std::string& name, int value)
-    { return Attribute(name, value::IntegerFactory::create(value)); }
+    { return Attribute(name, value::Integer::create(value)); }
 
     /**
      * Build an attribute with a specified name and double value.
@@ -64,7 +64,7 @@ namespace vle { namespace devs {
      * @return a new Attribute.
      */
     inline Attribute attribute(const std::string& name, double value)
-    { return Attribute(name, value::DoubleFactory::create(value)); }
+    { return Attribute(name, value::Double::create(value)); }
 
     /**
      * Build an attribute with a specified name and boolean value.
@@ -75,8 +75,8 @@ namespace vle { namespace devs {
      * @return a new Attribute.
      */
     inline Attribute attribute(const std::string& name, bool value)
-    { return Attribute(name, value::BooleanFactory::create(value)); }
-    
+    { return Attribute(name, value::Boolean::create(value)); }
+
     /**
      * Build an attribute with a specified name and string value.
      *
@@ -87,21 +87,32 @@ namespace vle { namespace devs {
      */
     inline Attribute attribute(const std::string& name,
                                const std::string& value)
-    { return Attribute(name, value::StringFactory::create(value)); }
+    { return Attribute(name, value::String::create(value)); }
 
-    /** 
+    /**
      * @brief Build an attribute with a specified name and string value.
-     * 
+     *
      * @param name the name of the attribute.
      * @param value the string value.
-     * 
+     *
+     * @return a new Attribute.
+     */
+    inline Attribute attribute(const std::string& name, const char* value)
+    { return attribute(name, value::String::create(std::string(value))); }
+
+    /**
+     * Build an attribute with a specified name and set value. Be carreful, the
+     * set is cloned.
+     *
+     * @param name the name of the attribute.
+     * @param value the value. The value is not cloned.
+     *
      * @return a new Attribute.
      */
     inline Attribute attribute(const std::string& name,
-                               const char* value)
-    { return attribute(name,
-                       value::StringFactory::create(std::string(value))); }
-    
+                               const value::Value& value)
+    { return Attribute(name, value.clone()); }
+
     /**
      * Build an attribute with a specified name and set value. Be carreful, the
      * set is not clone.
@@ -111,8 +122,7 @@ namespace vle { namespace devs {
      *
      * @return a new Attribute.
      */
-    inline Attribute attribute(const std::string& name,
-                               value::Value value)
+    inline Attribute attribute(const std::string& name, value::Value* value)
     { return Attribute(name, value); }
 
     /**
@@ -124,10 +134,9 @@ namespace vle { namespace devs {
      *
      * @return a new Attribute.
      */
-    inline Attribute attribute(const std::string& name,
-                               value::Set value)
+    inline Attribute attribute(const std::string& name, value::Set* value)
     { return Attribute(name, value); }
 
 }} // namespace vle devs
-    
+
 #endif

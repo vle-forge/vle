@@ -32,7 +32,7 @@
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Trace.hpp>
-
+#include <vle/value/Null.hpp>
 
 namespace vle { namespace devs {
 
@@ -176,7 +176,12 @@ InternalEvent* Simulator::externalTransition(
     DTraceDebug(boost::format("%1$20.10g %2% external transition: [%3%]") % time
                 % getName() % event);
 
-    m_dynamics->externalTransition(event, time);
+    try {
+        m_dynamics->externalTransition(event, time);
+    } catch(const std::exception& e) {
+        Throw(utils::ModellingError, (boost::format(
+                    "%1% in external: %2%") % getName() % e.what()));
+    }
     return buildInternalEvent(time);
 }
 
@@ -204,7 +209,12 @@ void Simulator::request(const RequestEvent& event, const Time& time,
     DTraceDebug(boost::format("%1$20.10g %2% request: [%3%]") % time %
                 getName() % event);
 
-    m_dynamics->request(event, time, output);
+    try {
+        m_dynamics->request(event, time, output);
+    } catch(const std::exception& e) {
+        Throw(utils::ModellingError, (boost::format(
+                    "%1% in request: %2%") % getName() % e.what()));
+    }
 }
 
 ObservationEvent* Simulator::observation(const ObservationEvent& event) const
@@ -212,21 +222,21 @@ ObservationEvent* Simulator::observation(const ObservationEvent& event) const
     DTraceDebug(boost::format("%1$20.10g %2% observation: [%3%]") %
                 event.getTime() % getName() % event);
 
-    value::Value val;
+    value::Value* val;
     ObservationEvent* nevent = 0;
 
     if (m_atomicModel) {
         val = m_dynamics->observation(event);
         nevent = new ObservationEvent(event);
+
+        if (not val) {
+            TraceAlways((boost::format(
+                        "Simulator %1% return an empty value on event %2%") %
+                    getName() % event));
+            val = value::Null::create();
+        }
         nevent->putAttribute(event.getPortName(), val);
     }
-
-    if (not val.get()) {
-        TraceDebug((boost::format(
-                    "Simulator %1% return an empty value on event %2%") %
-                getName() % event));
-    }
-
     return nevent;
 }
 

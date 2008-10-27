@@ -131,34 +131,30 @@ void check_experiment_unittest_vpz(const vpz::Experiment& exp)
         {
             const vpz::Condition& c(exp.conditions().get("ca"));
             const value::Set& x(c.getSetValues("x"));
-            BOOST_REQUIRE(not x->getValue().empty());
-            BOOST_REQUIRE(x->getValue(0).get());
-            BOOST_REQUIRE(x->getValue(0)->isDouble());
-            BOOST_CHECK_CLOSE(value::toDouble(x->getValue(0)), 1.2, 0.1);
+            BOOST_REQUIRE(not x.value().empty());
+            BOOST_REQUIRE(x.get(0).isDouble());
+            BOOST_CHECK_CLOSE(value::toDouble(x.get(0)), 1.2, 0.1);
         }
         {
             const vpz::Condition& c(exp.conditions().get("cb"));
             const value::Set& x(c.getSetValues("x"));
-            BOOST_REQUIRE(not x->getValue().empty());
-            BOOST_REQUIRE(x->getValue(0).get());
-            BOOST_REQUIRE(x->getValue(0)->isDouble());
-            BOOST_CHECK_CLOSE(value::toDouble(x->getValue(0)), 1.3, 0.1);
+            BOOST_REQUIRE(not x.value().empty());
+            BOOST_REQUIRE(x.get(0).isDouble());
+            BOOST_CHECK_CLOSE(value::toDouble(x.get(0)), 1.3, 0.1);
         }
         {
             const vpz::Condition& c(exp.conditions().get("cc"));
             const value::Set& x(c.getSetValues("x"));
-            BOOST_REQUIRE(not x->getValue().empty());
-            BOOST_REQUIRE(x->getValue(0).get());
-            BOOST_REQUIRE(x->getValue(0)->isDouble());
-            BOOST_CHECK_CLOSE(value::toDouble(x->getValue(0)), 1.4, 0.1);
+            BOOST_REQUIRE(not x.value().empty());
+            BOOST_REQUIRE(x.get(0).isDouble());
+            BOOST_CHECK_CLOSE(value::toDouble(x.get(0)), 1.4, 0.1);
         }
         {
             const vpz::Condition& c(exp.conditions().get("cd"));
             const value::Set& x(c.getSetValues("x"));
-            BOOST_REQUIRE(not x->getValue().empty());
-            BOOST_REQUIRE(x->getValue(0).get());
-            BOOST_REQUIRE(x->getValue(0)->isDouble());
-            BOOST_CHECK_CLOSE(value::toDouble(x->getValue(0)), 1.5, 0.1);
+            BOOST_REQUIRE(not x.value().empty());
+            BOOST_REQUIRE(x.get(0).isDouble());
+            BOOST_CHECK_CLOSE(value::toDouble(x.get(0)), 1.5, 0.1);
         }
     }
 

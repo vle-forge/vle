@@ -32,230 +32,337 @@
 
 
 namespace vle { namespace value {
-    
-    /** 
-     * @brief Define a std::Vector of value.
-     */
-    typedef std::vector < Value > VectorValue;
 
     /**
-     * @brief Set Value a container to Value class.
-     * @author The VLE Development Team.
+     * @brief Define a std::Vector of value.
      */
-    class SetFactory : public ValueBase
+    typedef std::vector < Value* > VectorValue;
+
+    /**
+     * @brief Set Value is a container of Value object and can not contains null
+     * pointer.
+     */
+    class Set : public Value
     {
-    private:
-        SetFactory()
-        { }
-
-        SetFactory(const SetFactory& setfactory);
-
     public:
-        virtual ~SetFactory()
-        { }
-
-        static Set create();
-            
-        virtual Value clone() const;
-
-        virtual ValueBase::type getType() const
-        { return ValueBase::SET; }
+	typedef VectorValue::size_type size_type;
+	typedef VectorValue::iterator iterator;
+	typedef VectorValue::const_iterator const_iterator;
 
         /**
-         * @brief Add a value into the set. Be carrefull, the data are not
-         * cloned, Don't delete buffer.
+         * @brief Build a Set object with an empty VectorValue.
+         */
+        Set() :
+            m_value()
+        {}
+
+        /**
+         * @brief Copy constructor. All the Value are cloned.
+         * @param value The value to copy.
+         */
+        Set(const Set& value);
+
+        /**
+	 * @brief Delete all Value in the set.
+	 */
+	virtual ~Set();
+
+        ///
+        ////
+        ///
+
+        /**
+         * @brief Build a new Set using the boost::pool memory management.
+         * @return A new Set allocated from the boost::pool.
+         */
+        static Set* create()
+        { return new Set(); }
+
+        ///
+        ////
+        ///
+
+        /**
+         * @brief Clone the current Set and recursively for all Value in the
+         * VectorValue.
+         * @return A new boost pool allocated value::Value.
+         */
+        virtual Value* clone() const
+        { return new Set(*this); }
+
+        /**
+         * @brief Get the type of this class.
+         * @return Value::SET.
+         */
+        virtual Value::type getType() const
+        { return Value::SET; }
+
+        /**
+         * @brief Push all Value from the VectorValue, recursively and colon
+         * separated.
+         * @code
+         * 1,2,123.312,toto,321,1e10
+         * @endcode
+         * @param out The output stream.
+         */
+        virtual void writeFile(std::ostream& out) const;
+
+        /**
+         * @brief Push all Value from the VectorValue, recursively and colon
+         * separated with parentheisis.
+         * @code
+         * (1,2,123.312,toto,321,1e10)
+         * @endcode
+         * @param out The output stream.
+         */
+	virtual void writeString(std::ostream& out) const;
+
+        /**
+         * @brief Push all Value from the VectorValue recursively in an XML
+         * representation:
+         * @code
+         * <set>
+         *  <integer>1</integer>
+         *  <integer>2</integer>
+         *  <double>123.312</double>
+         *  <string>toto</string>
+         *  <integer>321</integer>
+         *  <double>1e10</double>
+         * </set>
+         * @endcode
+         * @param out The output stream.
+         */
+	virtual void writeXml(std::ostream& out) const;
+
+        ///
+        ////
+        ///
+
+        /**
+         * @brief Add a value into the set. Be careful, the data is not cloned,
+         * Don't delete buffer after.
+         * @param value the Value to add.
+         * @throw std::invalid_argument if value is null.
+         */
+        void add(Value* value);
+
+        /**
+         * @brief Add a value into the set. Be careful, the data are not cloned,
+         * Don't delete buffer.
          * @param value the Value to add.
          */
-        void addValue(const Value& value)
-        { m_value.push_back(value); }
-
-        /** 
-         * @brief Add a null value into the set.
-         */
-        void addNullValue();
-
-        /** 
-         * @brief Add a BooleanValue into the set.
-         * @param value
-         */
-        void addBooleanValue(bool value);
-
-        /** 
-         * @brief Get a bool from the specified index.
-         * @param i The index to get value.
-         * @return A value
-         * @throw utils::ArgError if the index 'i' is to big or if value at
-         * index 'i' is not a Boolean.
-         */
-        bool getBooleanValue(const size_t i) const;
-
-        /** 
-         * @brief Add a double into the set.
-         * @param value
-         */
-        void addDoubleValue(double value);
-
-        /** 
-         * @brief Get a double from the specified index.
-         * @param i The index to get value.
-         * @return A value
-         * @throw utils::ArgError if the index 'i' is to big or if value at
-         * index 'i' is not a Double.
-         */
-        double getDoubleValue(const size_t i) const;
-
-        /** 
-         * @brief Add an IntegerValue into the set.
-         * @param value 
-         */
-        void addIntValue(int value);
-
-        /** 
-         * @brief Get a int from the specified index.
-         * @param i The index to get value.
-         * @return A value
-         * @throw utils::ArgError if the index 'i' is to big or if value at
-         * index 'i' is not a Integer.
-         */
-        int getIntValue(const size_t i) const;
-
-        /** 
-         * @brief Add a IntegerValue into the set.
-         * @param value 
-         */
-        void addLongValue(long value);
-
-        /** 
-         * @brief Get a long from the specified index.
-         * @param i The index to get value.
-         * @return A value
-         * @throw utils::ArgError if the index 'i' is to big or if value at
-         * index 'i' is not a Integer.
-         */
-        long getLongValue(const size_t i) const;
-
-        /** 
-         * @brief Add a StringValue into the set.
-         * @param value 
-         */
-        void addStringValue(const std::string& value);
-
-        /** 
-         * @brief Get a string from the specified index.
-         * @param i The index to get value.
-         * @return A value
-         * @throw utils::ArgError if the index 'i' is to big or if value at
-         * index 'i' is not a String.
-         */
-        const std::string& getStringValue(const size_t i) const;
-
-        /** 
-         * @brief Add an XMLValue into the set.
-         * @param value 
-         */
-        void addXMLValue(const std::string& value);
-
-        /** 
-         * @brief Get a string from the specified index.
-         * @param i The index to get value.
-         * @return A value
-         * @throw utils::ArgError if the index 'i' is to big or if value at
-         * index 'i' is not an XML.
-         */
-        const std::string& getXMLValue(const size_t i) const;
+        void add(const Value& value)
+        { m_value.push_back(value.clone()); }
 
         /**
          * @brief Add a value into the set. The value is clone and store into
          * the Set.
          * @param value the Value to clone and add.
          */
-        void addCloneValue(Value value)
-        { m_value.push_back(value->clone()); }
+        void addCloneValue(const Value& value)
+        { m_value.push_back(value.clone()); }
 
-        /** 
-         * @brief Get a reference to the VectorValue of the SetFactory.
+        /**
+         * @brief Add a null value into the set.
+         */
+        void addNull();
+
+        /**
+         * @brief Add a BooleanValue into the set.
+         * @param value
+         */
+        void addBoolean(bool value);
+
+        /**
+         * @brief Get a bool from the specified index.
+         * @param i The index to get value.
+         * @return A value
+         * @throw utils::ArgError if the index 'i' is to big or if value at
+         * index 'i' is not a Boolean.
+         */
+        bool getBoolean(const size_type i) const;
+
+        /**
+         * @brief Add a double into the set.
+         * @param value
+         */
+        void addDouble(double value);
+
+        /**
+         * @brief Get a double from the specified index.
+         * @param i The index to get value.
+         * @return A value
+         * @throw utils::ArgError if the index 'i' is to big or if value at
+         * index 'i' is not a Double.
+         */
+        double getDouble(const size_type i) const;
+
+        /**
+         * @brief Add an IntegerValue into the set.
+         * @param value
+         */
+        void addInt(int value);
+
+        /**
+         * @brief Get a int from the specified index.
+         * @param i The index to get value.
+         * @return A value
+         * @throw utils::ArgError if the index 'i' is to big or if value at
+         * index 'i' is not a Integer.
+         */
+        int getInt(const size_type i) const;
+
+        /**
+         * @brief Add a IntegerValue into the set.
+         * @param value
+         */
+        void addLong(long value);
+
+        /**
+         * @brief Get a long from the specified index.
+         * @param i The index to get value.
+         * @return A value
+         * @throw utils::ArgError if the index 'i' is to big or if value at
+         * index 'i' is not a Integer.
+         */
+        long getLong(const size_type i) const;
+
+        /**
+         * @brief Add a StringValue into the set.
+         * @param value
+         */
+        void addString(const std::string& value);
+
+        /**
+         * @brief Get a string from the specified index.
+         * @param i The index to get value.
+         * @return A value
+         * @throw utils::ArgError if the index 'i' is to big or if value at
+         * index 'i' is not a String.
+         */
+        const std::string& getString(const size_type i) const;
+
+        /**
+         * @brief Add an XMLValue into the set.
+         * @param value
+         */
+        void addXml(const std::string& value);
+
+        /**
+         * @brief Get a string from the specified index.
+         * @param i The index to get value.
+         * @return A value
+         * @throw utils::ArgError if the index 'i' is to big or if value at
+         * index 'i' is not an XML.
+         */
+        const std::string& getXml(const size_type i) const;
+
+        /**
+         * @brief Get a reference to the VectorValue of the Set.
          * @return A reference to the VectorValue.
          */
-        inline VectorValue& getValue()
+        inline VectorValue& value()
         { return m_value; }
 
-        /** 
-         * @brief Get a constant reference to the VectorValue of the SetFactory.
+        /**
+         * @brief Get a constant reference to the VectorValue of the Set.
          * @return A constant reference to the VectorValue.
          */
-        inline const VectorValue& getValue() const
+        inline const VectorValue& value() const
         { return m_value; }
 
-        /** 
+        /**
          * @brief Get the first iterator from VectorValue.
          * @return the first iterator.
          */
         inline VectorValue::iterator begin()
         { return m_value.begin(); }
 
-        /** 
+        /**
          * @brief Get the first const_iterator from VectorValue.
          * @return the first iterator.
          */
         inline VectorValue::const_iterator begin() const
         { return m_value.begin(); }
 
-        /** 
+        /**
          * @brief Get the last iterator from VectorValue.
          * @return the last iterator.
          */
         inline VectorValue::iterator end()
         { return m_value.end(); }
 
-        /** 
+        /**
          * @brief Get the last const_iterator from VectorValue.
          * @return the last iterator.
          */
         inline VectorValue::const_iterator end() const
         { return m_value.end(); }
 
-        /** 
+        /**
          * @brief Get a constant reference to the Value at specified index.
          * @param i The index of the value.
          * @return A constant reference.
          * @throw utils::ArgError if index 'i' is too big.
          */
-        const Value& getValue(const size_t i) const;
+        const Value& get(const size_type i) const;
 
-        /** 
+        /**
          * @brief Get a reference to the Value at specified index.
          * @param i The index of the value.
          * @return A reference.
          * @throw utils::ArgError if index 'i' is too big.
          */
-        Value& getValue(const size_t i);
+        Value& get(const size_type i);
 
-        /** 
+        /**
          * @brief Get the size of the VectorValue.
          * @return the size of the VectorValue.
          */
-        inline size_t size() const
+        inline size_type size() const
         { return m_value.size(); }
 
-        /** 
-         * @brief Remove all value from the VectorValue.
+        /**
+         * @brief Delete all value from the VectorValue and clean the
+         * VectorValue.
          */
-        inline void clear()
-        { return m_value.clear(); }
-
-        virtual std::string toFile() const;
-
-        virtual std::string toString() const;
-
-        virtual std::string toXML() const;
+        void clear();
 
     private:
         VectorValue m_value;
+
+        /**
+         * @brief Delete the Value at the specified index. Be careful, all
+         * reference and iterator are invalided after this call.
+         * @param i The index of the value.
+         * @throw utils::ArgError if index 'i' is too big.
+         */
+        void del(const size_type i);
     };
-    
-    Set toSetValue(const Value& value);
-    
-    const VectorValue& toSet(const Value& value);
+
+    inline const Set& toSetValue(const Value& value)
+    { return value.toSet(); }
+
+    inline const Set* toSetValue(const Value* value)
+    { return value ? &value->toSet() : 0; }
+
+    inline Set& toSetValue(Value& value)
+    { return value.toSet(); }
+
+    inline Set* toSetValue(Value* value)
+    { return value ? &value->toSet() : 0; }
+
+    inline const VectorValue& toSet(const Value& value)
+    { return value.toSet().value(); }
+
+    inline VectorValue& toSet(Value& value)
+    { return value.toSet().value(); }
+
+    inline const VectorValue& toSet(const Value* value)
+    { return value::reference(value).toSet().value(); }
+
+    inline VectorValue& toSet(Value* value)
+    { return value::reference(value).toSet().value(); }
 
 }} // namespace vle value
 #endif

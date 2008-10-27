@@ -713,7 +713,7 @@ void SaxStackVpz::popTrame()
     m_trame.push_back(reinterpret_cast < Trame* >(parent()));
 }
 
-void SaxStackVpz::popModelTrame(const value::Value& value)
+void SaxStackVpz::popModelTrame(value::Value* value)
 {
     AssertS(utils::SaxParserError, parent()->isModelTrame());
     ValueTrame* tr = reinterpret_cast < ValueTrame* >(parent());

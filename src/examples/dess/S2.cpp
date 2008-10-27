@@ -42,11 +42,11 @@ S2::S2(const graph::AtomicModel& model,
 }
 
 double S2::compute(const vle::devs::Time& time) const
-{    
+{
     double b = b0 * (1 + b1 * cos(2 * M_PI * time.getValue()));
-    
+
     return m * N - m * getValue() - b * getValue() * getValue("I");
-} 
+}
 
 DECLARE_NAMED_DYNAMICS(S2, S2)
 

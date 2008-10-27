@@ -69,7 +69,7 @@ namespace vle {
          */
         ~SaxStackVpz()
         {}
-      
+
         /**
          * @brief Clear all element of the stack.
          */
@@ -94,7 +94,7 @@ namespace vle {
          * @throw utils::SaxParserError if stack is empty and parent is not vpz.
          */
         void pushStructure();
-      
+
         /**
          * @brief Push a mode into the stack.
          * @param att The attribute list.
@@ -102,7 +102,7 @@ namespace vle {
          * Structures, Submodels or Class.
          */
         void pushModel(const AttributeList& att);
-      
+
         /**
          * @brief Push Port (condition or observation) into the stack.
          * @param att The attribute list.
@@ -110,7 +110,7 @@ namespace vle {
          * Conditions, Observables or Connection (In or Out).
          */
         void pushPort(const AttributeList& att);
-      
+
         /**
          * @brief Push the type of port.
          * @param name The attribute list.
@@ -118,21 +118,21 @@ namespace vle {
          * model.
          */
         void pushPortType(const Glib::ustring& name);
-      
+
         /**
          * @brief Push a Submodels into the stack.
          * @throw utils::SaxParserError if stack is empty or parent is not a
          * model.
          */
         void pushSubModels();
-      
+
         /**
          * @brief Push a Connections into the stack.
          * @throw utils::SaxParserError if stack is empty or parent is not a
          * Model.
          */
         void pushConnections();
-      
+
         /**
          * @brief Push a Connection (InternalConnection, InputConnection or
          * OutputConnection) into the stack.
@@ -141,7 +141,7 @@ namespace vle {
          * Connections.
          */
         void pushConnection(const AttributeList& att);
-      
+
         /**
          * @brief Push an Origin of Connection into the stack.
          * @param att The attribute list.
@@ -149,7 +149,7 @@ namespace vle {
          * InternalConnection, InputConnection or OutputConnection.
          */
         void pushOrigin(const AttributeList& att);
-      
+
         /**
          * @brief Push an Destination of Connection into the stack.
          * @param att The attribute list.
@@ -157,13 +157,13 @@ namespace vle {
          * InternalConnection, InputConnection or OutputConnection.
          */
         void pushDestination(const AttributeList& att);
-      
+
         /**
          * @brief Push a Dynamics into the stack.
          * @throw utils::SaxParserError if stack is empty or parent is not Vpz.
          */
         void pushDynamics();
-      
+
         /**
          * @brief Push a Dynamic into the stack.
          * @param att The attribute list.
@@ -171,14 +171,14 @@ namespace vle {
          * Dynamics.
          */
         void pushDynamic(const AttributeList& att);
-      
+
         /**
          * @brief Push an Experiment into the stack.
          * @param att The attribute list.
          * @throw utils::SaxParserError if stack is empty or parent is not Vpz.
          */
         void pushExperiment(const AttributeList& att);
-      
+
         /**
          * @brief Push a Replicas into the stack.
          * @param att The attribute list.
@@ -186,14 +186,14 @@ namespace vle {
          * Experiment.
          */
         void pushReplicas(const AttributeList& att);
-      
+
         /**
          * @brief Push a Conditions into th stack.
          * @throw utils::SaxParserError if stack is empty or parent is not
          * Experiment.
          */
         void pushConditions();
-      
+
         /**
          * @brief Push a Condition into the stack.
          * @param att The attribute list.
@@ -201,7 +201,7 @@ namespace vle {
          * Conditions.
          */
         void pushCondition(const AttributeList& att);
-      
+
         /**
          * @brief Push a ConditionPort into a Condition.
          * @param att The attribute list.
@@ -209,21 +209,21 @@ namespace vle {
          * Condition.
          */
         void pushConditionPort(const AttributeList& att);
-      
+
         /**
          * @brief Push a Views into th stack.
          * @throw utils::SaxParserError if stack is empty or parent is not
          * Experiment.
          */
         void pushViews();
-      
+
         /**
          * @brief Push an Outputs into th stack.
          * @throw utils::SaxParserError if stack is empty or parent is not
          * Views.
          */
         void pushOutputs();
-      
+
         /**
          * @brief Push an Output into th stack.
          * @param att The attribute list.
@@ -231,7 +231,7 @@ namespace vle {
          * Outputs.
          */
         void pushOutput(const AttributeList& att);
-      
+
         /**
          * @brief Push an View into th stack.
          * @param att The attribute list.
@@ -239,7 +239,7 @@ namespace vle {
          * Views.
          */
         void pushView(const AttributeList& att);
-      
+
         /**
          * @brief Push an attachedview into th stack.
          * @param att The attribute list.
@@ -247,14 +247,14 @@ namespace vle {
          * ObservablePort.
          */
         void pushAttachedView(const AttributeList& att);
-      
+
         /**
          * @brief Push an Observables into th stack.
          * @throw utils::SaxParserError if stack is empty or parent is not
          * Views.
          */
         void pushObservables();
-      
+
         /**
          * @brief Push an Observable into th stack.
          * @param att The attribute list.
@@ -262,7 +262,7 @@ namespace vle {
          * Observables.
          */
         void pushObservable(const AttributeList& att);
-      
+
         /**
          * @brief Push an ObservablePort into th stack.
          * @param att The attribute list.
@@ -270,7 +270,7 @@ namespace vle {
          * Observable.
          */
         void pushObservablePort(const AttributeList& att);
-      
+
         /**
          * @brief Push a View to an ObservablePort.
          * @param att The attribute list.
@@ -278,14 +278,14 @@ namespace vle {
          * ObservablePort.
          */
         void pushObservablePortOnView(const AttributeList& att);
-      
+
         /**
          * @brief Push a Classes into the stack.
          * @throw utils::SaxParserError if stack is empty or parent is not
          * Vpz.
          */
         void pushClasses();
-      
+
         /**
          * @brief Push a Class into the stack.
          * @param att The attribute list.
@@ -293,14 +293,14 @@ namespace vle {
          * Classes.
          */
         void pushClass(const AttributeList& att);
-      
+
         /**
          * @brief Pop the Classes
          * @throw utils::SaxParserError if stack is empty or parent is not
          * Classes.
          */
         void popClasses();
-      
+
         /**
          * @brief Pop the Class.
          * @throw utils::SaxParserError if stack is empty or parent is not
@@ -313,7 +313,7 @@ namespace vle {
          * @throw utils::SaxParserError if stack is not empty.
          */
         void pushVleTrame();
-      
+
         /**
          * @brief Push a new Trame into the stack.
          * @param att The attribute list.
@@ -321,14 +321,14 @@ namespace vle {
          * VLETrame.
          */
         void pushTrame(const AttributeList& att);
-      
+
         /**
          * @brief Pop the Trame.
          * @throw utils::SaxParserError if stack is empty or parent is not Trame
          * or parent is not ModelTrame.
          */
         void popTrame();
-      
+
         /**
          * @brief Push a ValueTrame into the stack.
          * @param att The attribute list.
@@ -336,13 +336,13 @@ namespace vle {
          * ModelTrame.
          */
         void pushModelTrame(const AttributeList& att);
-      
+
         /**
          * @brief Pop the ValueTrame.
          * @param value The value to pop.
          */
-        void popModelTrame(const value::Value& value);
-      
+        void popModelTrame(value::Value* value);
+
         /**
          * @brief Pop the VLETrame.
          */
@@ -360,7 +360,7 @@ namespace vle {
          * @return A pointer to the vpz::Base class.
          */
         vpz::Base* pop();
-      
+
         /**
          * @brief Build the connection into the graph::Model from the three
          * elements at top of the stack: a Destination, a Origin, Connection

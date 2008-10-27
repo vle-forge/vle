@@ -39,7 +39,7 @@ using namespace vle;
 namespace vle
 {
 namespace gvle {
-MatrixBox::MatrixBox(value::MatrixFactory* m):
+MatrixBox::MatrixBox(value::Matrix* m):
         Gtk::Dialog("Matrix",true,true),
         mValue(m)
 {
@@ -81,8 +81,8 @@ void MatrixBox::run()
 {
     int ret = Gtk::Dialog::run();
     if (ret == Gtk::RESPONSE_CANCEL) {
-        value::MatrixFactory* backup = dynamic_cast<value::MatrixFactory*>(&*mBackup);
-        const value::MatrixFactory::MatrixValue& matrix = backup->matrix();
+        value::Matrix* backup = dynamic_cast<value::Matrix*>(&*mBackup);
+        const value::MatrixValue& matrix = backup->matrix();
 
         if (mValue->columns() != backup->columns() || mValue->rows() != backup->rows()) {
             mValue->resize(backup->columns(), backup->rows());
@@ -90,7 +90,7 @@ void MatrixBox::run()
 
         for (unsigned int i = 0; i != mValue->rows(); ++i) {
             for (unsigned int j = 0; j != mValue->columns(); ++j) {
-                mValue->addValue(j, i, matrix[j][i]);
+                mValue->add(j, i, matrix[j][i]);
             }
         }
     }
@@ -98,13 +98,13 @@ void MatrixBox::run()
 
 void MatrixBox::makeTable()
 {
-    const value::MatrixFactory::MatrixValue& matrix = mValue->matrix();
+    const value::MatrixValue& matrix = mValue->matrix();
     mArray = new array_type(boost::extents[mValue->columns()][mValue->rows()]);
     for (unsigned int i = 0; i != mValue->rows(); ++i) {
         for (unsigned int j = 0; j != mValue->columns(); ++j) {
             //Button
             (*mArray)[j][i].first = new Gtk::Button();
-            if (matrix[j][i].get() != 0)
+            if (matrix[j][i] != 0)
                 (*mArray)[j][i].first->set_label(gvle::valuetype_to_string(matrix[j][i]->getType()));
             else
                 (*mArray)[j][i].first->set_label("(no value)");
@@ -113,12 +113,12 @@ void MatrixBox::makeTable()
             (*mArray)[j][i].first->signal_clicked().connect(sigc::bind(
                         sigc::mem_fun(*this, &MatrixBox::on_click), i, j));
 
-            if (matrix[j][i].get() != 0) {
+            if (matrix[j][i] != 0) {
                 (*mArray)[j][i].second = new Gtk::Tooltips();
 #if GTKMM_MAJOR_VERSION == 2 && GTKMM_MINOR_VERSION > 10
                 (*mArray)[j][i].first->set_has_tooltip();
 #endif
-                (*mArray)[j][i].second->set_tip(*(*mArray)[j][i].first, boost::trim_copy(matrix[j][i]->toString()));
+                (*mArray)[j][i].second->set_tip(*(*mArray)[j][i].first, boost::trim_copy(matrix[j][i]->writeToString()));
             }
         }
     }
@@ -126,62 +126,62 @@ void MatrixBox::makeTable()
 
 void MatrixBox::on_click(unsigned int i, unsigned int j)
 {
-    value::MatrixFactory::MatrixView view = mValue->getValue();
-    value::Value& v = view[j][i];
+    value::MatrixView view = mValue->value();
+    value::Value* v = view[j][i];
 
-    if (v.get() == 0) {
-        NewTypeBox box(&v);
+    if (v == 0) {
+        NewTypeBox box(v);
         box.run();
-        if (v.get() != 0) {
+        if (v != 0) {
             (*mArray)[j][i].first->set_label(gvle::valuetype_to_string(view[j][i]->getType()));
             (*mArray)[j][i].second = new Gtk::Tooltips();
 #if GTKMM_MAJOR_VERSION == 2 && GTKMM_MINOR_VERSION > 10
             (*mArray)[j][i].first->set_has_tooltip();
 #endif
-            (*mArray)[j][i].second->set_tip(*(*mArray)[j][i].first, boost::trim_copy(view[j][i]->toString()));
+            (*mArray)[j][i].second->set_tip(*(*mArray)[j][i].first, boost::trim_copy(view[j][i]->writeToString()));
         }
     } else {
         switch (v->getType()) {
-        case(value::ValueBase::BOOLEAN): {
-            value::BooleanFactory* boolean = dynamic_cast<value::BooleanFactory*>(v.get());
+        case(value::Value::BOOLEAN): {
+            value::Boolean* boolean = dynamic_cast<value::Boolean*>(v);
             BooleanBox box(boolean);
             box.run();
         }
         break;
-        case(value::ValueBase::INTEGER):
-                    case(value::ValueBase::DOUBLE):
-                        case(value::ValueBase::STRING):
-                            case(value::ValueBase::TUPLE): {
-                        SimpleTypeBox box(v.get());
+        case(value::Value::INTEGER):
+                    case(value::Value::DOUBLE):
+                        case(value::Value::STRING):
+                            case(value::Value::TUPLE): {
+                        SimpleTypeBox box(v);
                         box.run();
                     }
         break;
-        case(value::ValueBase::SET): {
-            value::SetFactory* set = dynamic_cast<value::SetFactory*>(v.get());
+        case(value::Value::SET): {
+            value::Set* set = dynamic_cast<value::Set*>(v);
             ValueBox box(set);
             box.run();
         }
         break;
-        case(value::ValueBase::MAP): {
-            value::MapFactory* map = dynamic_cast<value::MapFactory*>(v.get());
+        case(value::Value::MAP): {
+            value::Map* map = dynamic_cast<value::Map*>(v);
             ValueBox box(map);
             box.run();
         }
         break;
-        case(value::ValueBase::TABLE): {
-            value::TableFactory* table = dynamic_cast<value::TableFactory*>(v.get());
+        case(value::Value::TABLE): {
+            value::Table* table = dynamic_cast<value::Table*>(v);
             TableBox box(table);
             box.run();
         }
         break;
-        case(value::ValueBase::MATRIX): {
-            value::MatrixFactory* matrix = dynamic_cast<value::MatrixFactory*>(v.get());
+        case(value::Value::MATRIX): {
+            value::Matrix* matrix = dynamic_cast<value::Matrix*>(v);
             MatrixBox box(matrix);
             box.run();
         }
         break;
-        case(value::ValueBase::XMLTYPE): {
-            value::XMLFactory* xml = dynamic_cast<value::XMLFactory*>(v.get());
+        case(value::Value::XMLTYPE): {
+            value::Xml* xml = dynamic_cast<value::Xml*>(v);
             XmlTypeBox box(xml);
             box.run();
         }
@@ -189,7 +189,7 @@ void MatrixBox::on_click(unsigned int i, unsigned int j)
         default:
             break;
         }
-        (*mArray)[j][i].second->set_tip(*(*mArray)[j][i].first, boost::trim_copy(view[j][i]->toString()));
+        (*mArray)[j][i].second->set_tip(*(*mArray)[j][i].first, boost::trim_copy(view[j][i]->writeToString()));
     }
 }
 }

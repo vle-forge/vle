@@ -30,7 +30,7 @@ using namespace vle;
 namespace vle
 {
 namespace gvle {
-ValueBox::ValueBox(value::MapFactory* map):
+ValueBox::ValueBox(value::Map* map):
         Gtk::Dialog("Map",true,true),
         mTreeView(0),
         mValue(map)
@@ -44,7 +44,7 @@ ValueBox::ValueBox(value::MapFactory* map):
     show_all();
 }
 
-ValueBox::ValueBox(value::SetFactory* set):
+ValueBox::ValueBox(value::Set* set):
         Gtk::Dialog("Set",true,true),
         mTreeView(0),
         mValue(set)
@@ -69,26 +69,26 @@ void ValueBox::run()
 {
     int ret = Gtk::Dialog::run();
     if (ret == Gtk::RESPONSE_CANCEL) {
-        if (mValue->getType() == value::ValueBase::MAP) {
-            value::MapFactory* map = dynamic_cast<value::MapFactory*>(mValue);
-            value::MapFactory* backup = dynamic_cast<value::MapFactory*>(&*mBackup);
+        if (mValue->getType() == value::Value::MAP) {
+            value::Map* map = dynamic_cast<value::Map*>(mValue);
+            value::Map* backup = dynamic_cast<value::Map*>(&*mBackup);
 
-            map->getValue().clear();
+            map->value().clear();
 
             value::MapValue::const_iterator it = backup->begin();
             while (it != backup->end()) {
-                map->addValue(it->first, it->second);
+                map->add(it->first, it->second);
                 ++it;
             }
-        } else if (mValue->getType() == value::ValueBase::SET) {
-            value::SetFactory* set = dynamic_cast<value::SetFactory*>(mValue);
-            value::SetFactory* backup = dynamic_cast<value::SetFactory*>(&*mBackup);
+        } else if (mValue->getType() == value::Value::SET) {
+            value::Set* set = dynamic_cast<value::Set*>(mValue);
+            value::Set* backup = dynamic_cast<value::Set*>(&*mBackup);
 
-            set->getValue().clear();
+            set->value().clear();
 
             value::VectorValue::iterator it = backup->begin();
             while (it != backup->end()) {
-                set->addValue(*it);
+                set->add(*it);
                 ++it;
             }
         }

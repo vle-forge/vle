@@ -34,7 +34,7 @@ namespace vle { namespace oov { namespace plugin {
 
 CairoLevel::CairoLevel(const std::string& location) :
     CairoPlugin(location),
-    m_time(-1.0), 
+    m_time(-1.0),
     m_receive(0)
 {
 }
@@ -47,12 +47,12 @@ void CairoLevel::onNewObservable(const vpz::NewObservableTrame& trame)
 {
     std::string name(buildname(trame.name(),trame.port()));
 
-    Assert(utils::InternalError,m_columns2.find(name) == m_columns2.end(), 
-           boost::format("Observable %1% already exist") % name); 
+    Assert(utils::InternalError,m_columns2.find(name) == m_columns2.end(),
+           boost::format("Observable %1% already exist") % name);
 
     m_columns.push_back(name);
     m_columns2[name] = m_buffer.size();
-    m_buffer.push_back(value::Value());
+    m_buffer.push_back(0);
 }
 
 void CairoLevel::onDelObservable(const vpz::DelObservableTrame& /* trame */)
@@ -71,10 +71,10 @@ void CairoLevel::onValue(const vpz::ValueTrame& trame)
         jt = m_columns2.find(name);
 
         Assert(utils::InternalError,jt != m_columns2.end(),boost::format(
-                "The columns %1% does not exist. No new Observable ?") % 
+                "The columns %1% does not exist. No new Observable ?") %
             name);
 
-        m_buffer[jt->second] = it->value();
+        m_buffer[jt->second] = it->value()->clone();
         m_receive++;
     }
     draw();
@@ -92,26 +92,26 @@ void CairoLevel::onParameter(const vpz::ParameterTrame& trame)
     if (not trame.data().empty()) {
         xmlpp::DomParser parser;
         parser.parse_memory(trame.data());
-	
-	xmlpp::Element* root = utils::xml::get_root_node(parser, "parameters");  
+
+	xmlpp::Element* root = utils::xml::get_root_node(parser, "parameters");
 
         if (root) {
 	    xmlpp::Element* elt = utils::xml::get_children(root, "curves");
 	    xmlpp::Node::NodeList lst = elt->get_children("curve");
 	    xmlpp::Node::NodeList::iterator it = lst.begin();
 	    int i = 0;
-	    
+
 	    while (it != lst.end()) {
 		xmlpp::Element * elt2 = ( xmlpp::Element* )( *it );
 		std::string name = utils::xml::get_attribute(elt2,"name");
-		
+
 //		m_colorList[name] = Gdk::Color(utils::xml::get_attribute(elt2,"color"));
 		m_minList[i] = utils::to_double(utils::xml::get_attribute(elt2,"min"));
 		m_maxList[i] = utils::to_double(utils::xml::get_attribute(elt2,"max"));
 		++it;
 		++i;
 	    }
-	    
+
 	    elt = utils::xml::get_children(root, "size");
             using boost::lexical_cast;
             using utils::xml::get_attribute;
@@ -155,12 +155,12 @@ void CairoLevel::draw()
         int shiftY = 20;
         ctx->rectangle(0, 0, 105, 305);
         ctx->set_source_rgb(1, 1, 1);
-        ctx->fill();	
+        ctx->fill();
 
         if (not m_buffer.empty()) {
             unsigned int stepX = (m_maxX - m_minX - 10) / m_columns.size();
             unsigned int i = 0;
-            std::vector < value::Value >::iterator it;
+            std::vector < value::Value* >::iterator it;
 
             for (it = m_buffer.begin(); it != m_buffer.end(); ++it) {
                 double value;
@@ -209,7 +209,8 @@ void CairoLevel::draw()
                 ctx->move_to(m_minX+i*stepX+1, m_maxY-shiftY);
                 ctx->show_text(m_columns[i]);
 
-                it->reset();
+                delete *it;
+                *it = 0;
 
                 ++i;
             }

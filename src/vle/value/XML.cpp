@@ -30,36 +30,19 @@
 
 namespace vle { namespace value {
 
-XML XMLFactory::create(const std::string& value)
+void Xml::writeFile(std::ostream& out) const
 {
-    return XML(new XMLFactory(value));
+    out << m_value;
 }
 
-Value XMLFactory::clone() const
+void Xml::writeString(std::ostream& out) const
 {
-    return Value(new XMLFactory(m_value));
+    out << m_value;
 }
 
-std::string XMLFactory::toXML() const
+void Xml::writeXml(std::ostream& out) const
 {
-    std::string val("<xml>\n<![CDATA[\n");
-    val += m_value;
-    val += "\n]]>\n</xml>";
-    return val;
-}
-
-XML toXmlValue(const Value& value)
-{
-    Assert(utils::ArgError, value->getType() == ValueBase::XMLTYPE,
-           "Value is not a XML");
-    return boost::static_pointer_cast < XMLFactory >(value);
-}
-
-const std::string& toXml(const Value& value)
-{
-    Assert(utils::ArgError, value->getType() == ValueBase::XMLTYPE,
-           "Value is not a XML");
-    return boost::static_pointer_cast < XMLFactory >(value)->stringValue();
+    out << "<xml>\n<![CDATA[" << m_value.c_str() << "\n]]>\n</xml>";
 }
 
 }} // namespace vle value

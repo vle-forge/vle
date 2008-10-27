@@ -42,9 +42,9 @@ namespace vle { namespace utils {
     class BaseError : public std::runtime_error
     {
     public:
-        explicit BaseError(const std::string& argv) :
+        explicit BaseError(const std::string& argv = std::string()) :
             std::runtime_error(argv)
-        { }
+        {}
     };
 
     /**
@@ -54,9 +54,9 @@ namespace vle { namespace utils {
     class FileError : public BaseError
     {
     public:
-        explicit FileError(const std::string& argv) :
+        explicit FileError(const std::string& argv = std::string()) :
             BaseError(argv)
-        { }
+        {}
     };
 
     /**
@@ -66,9 +66,9 @@ namespace vle { namespace utils {
     class ParseError : public BaseError
     {
     public:
-        explicit ParseError(const std::string& argv) :
+        explicit ParseError(const std::string& argv = std::string()) :
             BaseError(argv)
-        { }
+        {}
     };
 
     /**
@@ -78,9 +78,21 @@ namespace vle { namespace utils {
     class ArgError : public BaseError
     {
     public:
-        explicit ArgError(const std::string& argv) :
+        explicit ArgError(const std::string& argv = std::string()) :
             BaseError(argv)
-        { }
+        {}
+    };
+
+    /**
+     * @brief Throw to report a bad parameter.
+     *
+     */
+    class CastError : public BaseError
+    {
+    public:
+        explicit CastError(const std::string& argv = std::string()) :
+            BaseError(argv)
+        {}
     };
 
     /**
@@ -90,56 +102,56 @@ namespace vle { namespace utils {
     class InternalError : public BaseError
     {
     public:
-        explicit InternalError(const std::string& argv) :
+        explicit InternalError(const std::string& argv = std::string()) :
             BaseError(argv)
-        { }
+        {}
     };
 
-    /** 
+    /**
      * @brief Throw to report an modelling error.
      */
     class ModellingError : public BaseError
     {
     public:
-        explicit ModellingError(const std::string& argv) :
+        explicit ModellingError(const std::string& argv = std::string()) :
             BaseError(argv)
-        { }
+        {}
     };
 
-    /** 
+    /**
      * @brief Throw to report an unimplemted feature.
      */
     class NotYetImplemented : public BaseError
     {
     public:
-        explicit NotYetImplemented(const std::string& argv) :
+        explicit NotYetImplemented(const std::string& argv = std::string()) :
             BaseError(argv)
-        { }
+        {}
     };
 
-    /** 
+    /**
      * @brief Throw to report a DEVS graph library error.
      */
     class DevsGraphError : public BaseError
     {
     public:
-        explicit DevsGraphError(const std::string& argv) :
+        explicit DevsGraphError(const std::string& argv = std::string()) :
             BaseError(argv)
-        { }
+        {}
     };
 
-    /** 
+    /**
      * @brief Throw to report an error in SaxParser.
      */
     class SaxParserError : public xmlpp::exception
     {
     public:
-        explicit SaxParserError(const Glib::ustring& argv) :
+        explicit SaxParserError(const Glib::ustring& argv = std::string()) :
             xmlpp::exception(argv)
-        { }
+        {}
 
         virtual ~SaxParserError() throw()
-        { }
+        {}
 
         virtual void Raise() const
         { throw *this; }

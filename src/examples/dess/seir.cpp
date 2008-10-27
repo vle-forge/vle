@@ -45,12 +45,12 @@ seir::seir(const graph::AtomicModel& model,
     // Population size
     N = value::toDouble(evList.get("N"));
 }
-	    
-	    
+
+
 double seir::compute(unsigned int i, const devs::Time& time) const
 {
     double b;
-    
+
     switch(i){
     case 0: // S
 	b = b0 * (1 + b1 * cos(2 * M_PI * time.getValue()));
@@ -67,7 +67,7 @@ double seir::compute(unsigned int i, const devs::Time& time) const
 		  "Compute problem with seir model, i == %1%") % i );
     }
 }
-	    
+
 DECLARE_NAMED_DYNAMICS(seir, seir)
-	
+
 }}} // namespace vle examples dess

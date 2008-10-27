@@ -45,25 +45,30 @@ namespace vle { namespace devs {
             Event(0),
             m_portName(sourcePortName),
             m_target(0)
-        { }
+        {}
 
         ExternalEvent(const std::string& sourcePortName,
                       Simulator* source) :
             Event(source),
             m_portName(sourcePortName),
             m_target(0)
-        { }
+        {}
 
 	ExternalEvent(ExternalEvent* event,
 		      Simulator* target,
-		      const std::string& targetPortName) :
+                      const std::string& targetPortName,
+                      bool needDeletion) :
 	    Event(*event),
 	    m_portName(targetPortName),
-	    m_target(target)
-	{ }
+            m_target(target)
+        {
+            if (needDeletion) {
+                deleter();
+            }
+        }
 
 	virtual ~ExternalEvent()
-        { }
+        {}
 
 	inline const std::string& getPortName() const
         { return m_portName; }
@@ -71,13 +76,13 @@ namespace vle { namespace devs {
 	inline Simulator* getTarget()
         { return m_target; }
 
-        const std::string getTargetModelName() const;
+        const std::string& getTargetModelName() const;
 
 	inline bool onPort(const std::string& portName) const
         { return m_portName == portName; }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-        
+
         virtual bool isExternal() const
         { return true; }
 
@@ -97,11 +102,11 @@ namespace vle { namespace devs {
     inline std::ostream& operator<<(std::ostream& o, const ExternalEvent& evt)
     {
         return o << "from: '" << evt.getSourceModelName()
-            << "' value: '" << evt.getAttributes()->toString()
+            << "' value: '" << (evt.haveAttributes() ?
+            evt.getAttributes().writeToString() : "")
             << "' to port: '" << evt.getPortName()
             << "'";
     }
-
 
 }} // namespace vle devs
 

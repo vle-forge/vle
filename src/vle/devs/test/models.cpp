@@ -27,7 +27,7 @@
 
 namespace vle { namespace unittest {
 
-    /** 
+    /**
      * @brief A simple unit test model.
      */
     class Transform : public devs::Dynamics
@@ -46,7 +46,7 @@ namespace vle { namespace unittest {
             m_counter = 0;
             return 0.0;
         }
-        
+
         virtual devs::Time timeAdvance() const
         {
             return 1.0;
@@ -72,9 +72,9 @@ namespace vle { namespace unittest {
             }
         }
 
-        virtual value::Value observation(const devs::ObservationEvent&) const
+        virtual value::Value* observation(const devs::ObservationEvent&) const
         {
-            return value::IntegerFactory::create(m_counter);
+            return value::Integer::create(m_counter);
         }
 
     private:

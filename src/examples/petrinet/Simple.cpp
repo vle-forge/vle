@@ -82,10 +82,10 @@ namespace vle { namespace examples { namespace petrinet {
                                         const devs::Time& time)
         { mDate = time; mNumber += evts.size(); }
 
-        virtual value::Value observation(const devs::ObservationEvent& e) const
+        virtual value::Value* observation(const devs::ObservationEvent& e) const
         { return e.onPort("date") ?
-            value::DoubleFactory::create(mDate.getValue()) :
-                value::DoubleFactory::create(mNumber); }
+            value::Double::create(mDate.getValue()) :
+                value::Double::create(mNumber); }
 
     private:
         devs::Time mDate;
@@ -159,13 +159,13 @@ namespace vle { namespace examples { namespace petrinet {
             }
         }
 
-        virtual value::Value observation(
+        virtual value::Value* observation(
             const devs::ObservationEvent& event) const
         {
             if (event.onPort("state")) {
                 return buildBoolean(mActive);
             }
-            return value::Value();
+            return 0;
         }
 
     private:

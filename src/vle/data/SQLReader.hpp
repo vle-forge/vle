@@ -39,7 +39,7 @@ namespace vle { namespace data {
     public:
         enum type { MYSQL, POSTGRES, ODBC };
 
-        static SQLReader* open(const std::string & databaseName, 
+        static SQLReader* open(const std::string & databaseName,
                                type type = MYSQL,
                                const std::string & userName = "",
                                const std::string & password = "",
@@ -54,8 +54,8 @@ namespace vle { namespace data {
         static std::map < std::string , SQLReader* > databases;
         sqlxx::CSQL SQL;
 
-        SQLReader(const std::string & databaseName, 
-                  type type, const std::string & userName, 
+        SQLReader(const std::string & databaseName,
+                  type type, const std::string & userName,
                   const std::string & password, const std::string & hostName,
                   unsigned int port);
     };

@@ -66,11 +66,11 @@ CombinedQss::CombinedQss(const AtomicModel& model,
     const value::Set& variables = value::toSetValue(events.get("variables"));
     unsigned int index;
 
-    for (index = 0; index < variables->size(); ++index) {
-        const value::Set& tab(value::toSetValue(variables->getValue(index)));
-	std::string name = value::toString(tab->getValue(0));
-	double init = value::toDouble(tab->getValue(1));
-	double precision = value::toDouble(tab->getValue(2));
+    for (index = 0; index < variables.size(); ++index) {
+        const value::Set& tab(value::toSetValue(variables.get(index)));
+	std::string name = value::toString(tab.get(0));
+	double init = value::toDouble(tab.get(1));
+	double precision = value::toDouble(tab.get(2));
         mVariableIndex[name] = index;
         mVariableName[index] = name;
         mVariablePrecision[index] = precision;
@@ -359,12 +359,12 @@ void CombinedQss::externalTransition(const ExternalEventList& event,
     }
 }
 
-Value CombinedQss::observation(const ObservationEvent& event) const
+Value* CombinedQss::observation(const ObservationEvent& event) const
 {
     unsigned int i = mVariableIndex.find(event.getPortName())->second;
     double e = (event.getTime() - getLastTime(i)).getValue();
 
-    return DoubleFactory::create(getValue(i)+e*getGradient(i));
+    return Double::create(getValue(i)+e*getGradient(i));
 }
 
 void CombinedQss::request(const RequestEvent& event,

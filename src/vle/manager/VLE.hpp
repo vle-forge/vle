@@ -34,7 +34,7 @@
 
 namespace vle { namespace manager {
 
-    /** 
+    /**
      * @brief A class to start the simulation. This class initialises
      * the user directory and install signal. The desctructor clear all
      * singleton classes.
@@ -42,19 +42,19 @@ namespace vle { namespace manager {
     class VLE
     {
     public:
-        /** 
+        /**
          * @brief Initialise signal and user directory.
          */
         explicit VLE(int port = 8000);
 
-        /** 
+        /**
          * @brief Delete all singleton classes.
          */
         ~VLE();
 
         /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-        /** 
+        /**
          * @brief read an experimental frame VPZ, build the complete condition
          * combinations and launch or connect to the vle::Simulator and send
          * experimental frame instance VPZi. vle::Manager can listening on
@@ -65,7 +65,7 @@ namespace vle { namespace manager {
         bool runManager(bool allInLocal, bool savevpz, int nbProcessor,
                         const CmdArgs& args);
 
-        /** 
+        /**
          * @brief vle::Simulator: manage a number of processor and launch
          * simulation on it. vle::Simulator run in localhost daemon.
          * @param nbProcessor number of processor.
@@ -73,20 +73,42 @@ namespace vle { namespace manager {
          */
         bool runSimulator(int nbProcessor);
 
-        /** 
+        /**
          * @brief vle::JustRun: start a simulation without analysis of the
          * complete condition combinations, just take the fist and run
          * simulation.
-         * 
+         *
          * @return true if justRun simulation is a success.
          */
         bool justRun(int nbProcessor, const CmdArgs& args);
-        
+
     private:
         int             mPort;
     };
 
-    /** 
+
+    /**
+     * @brief Initialize the VLE system by:
+     * - installling signal (segmentation fault etc.) to standard error
+     *   function.
+     * - initialize the user directory ($HOME/.vle/ etc.).
+     * - initialize the WinSock
+     * - initialize the thread system.
+     * - initialize the singleton utils::Trace system.
+     * - initialize the singleton \c boost::pool devs::Pools and value::Pools.
+     */
+    void init();
+
+    /**
+     * @brief Delete all singleton from VLE system.
+     * - kill the utils::Trace singleton.
+     * - kill the utils::Path singleton.
+     * - kill the value::Pools singleton.
+     * - kill the devs::Pools singleton.
+     */
+    void finalize();
+
+    /**
      * @brief A simple functor to produce a vpz::Vpz object from the std::string
      * filename. To use with std::transform for example.
      */

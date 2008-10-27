@@ -37,9 +37,9 @@ I3::I3(const graph::AtomicModel& model,
 }
 
 double I3::compute(const vle::devs::Time& /* time */) const
-{    
+{
     return r * getValue("S") * getValue() - a * getValue();
-} 
+}
 
 DECLARE_NAMED_DYNAMICS(I3, I3)
 

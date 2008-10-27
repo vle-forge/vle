@@ -39,13 +39,13 @@ private:
     double b0;
     double b1;
     double N;
-    
+
 public:
     seir(const vle::graph::AtomicModel&,
-	 const vle::devs::InitEventList&);    
+	 const vle::devs::InitEventList&);
     virtual ~seir(){}
-    
-    virtual double compute(unsigned int i, 
+
+    virtual double compute(unsigned int i,
 			   const vle::devs::Time& time) const;
 };
 

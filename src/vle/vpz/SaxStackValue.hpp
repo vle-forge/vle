@@ -91,12 +91,12 @@ namespace vle { namespace vpz {
          * @param colstep number of columns to add when resize the matrix'columns.
          * @param rowstep number of rows to add when resize the matrix'rows.
          */
-        void pushMatrix(value::MatrixFactory::index col,
-                        value::MatrixFactory::index row,
-                        value::MatrixFactory::index colmax,
-                        value::MatrixFactory::index rowmax,
-                        value::MatrixFactory::index colstep,
-                        value::MatrixFactory::index rowstep);
+        void pushMatrix(value::Matrix::index col,
+                        value::Matrix::index row,
+                        value::Matrix::index colmax,
+                        value::Matrix::index rowmax,
+                        value::Matrix::index colstep,
+                        value::Matrix::index rowstep);
 
         /**
          * @brief Add a value::Tuple to the stack.
@@ -131,14 +131,14 @@ namespace vle { namespace vpz {
          * @return the latest value.
          * @throw utils::SaxParserError if the stack is empty.
          */
-        const value::Value& topValue();
+        value::Value* topValue();
 
         /**
          * @brief Add to the lastest complex value (value::Set, value::Map,
          * value::Matrix, value::Tuple or value::Table), a new value.
          * @param val the value to add.
          */
-        void pushOnVectorValue(const value::Value& val);
+        void pushOnVectorValue(value::Value* val);
 
         /**
          * @brief Pop the current head. If stack is empty, do nothing.
@@ -169,7 +169,7 @@ namespace vle { namespace vpz {
          * @brief Add a value::Value to the values'vector.
          * @param val The value::Value to add.
          */
-        inline void pushResult(const value::Value& val)
+        inline void pushResult(value::Value* val)
         { m_result.push_back(val); }
 
         /**
@@ -180,7 +180,7 @@ namespace vle { namespace vpz {
          * vector'size.
          * @return A constant reference to the value::Value.
          */
-        inline const value::Value& getResult(size_t i) const
+        inline value::Value* getResult(size_t i) const
         {
             Assert(utils::SaxParserError, m_result.size() >= i,
                    (boost::format("Get result value with to big index %1%.") %
@@ -194,7 +194,7 @@ namespace vle { namespace vpz {
          * @throw utils::SaxParserError if the vector of result is empty.
          * @return A constant reference to the latest pushed value::Value.
          */
-        inline const value::Value& getLastResult() const
+        inline value::Value* getLastResult() const
         {
             Assert(utils::SaxParserError, not m_result.empty(),
                    "Get last result value with empty result vector");
@@ -206,14 +206,14 @@ namespace vle { namespace vpz {
          * @brief Get the vector of value::Value.
          * @return A constant reference to the vector of value::Value.
          */
-        const std::vector < value::Value >& getResults() const
+        const std::vector < value::Value* >& getResults() const
         { return m_result; }
 
         /**
          * @brief Get the vector of value::Value.
          * @return A reference to the vector of value::Value.
          */
-        std::vector < value::Value >& getResults()
+        std::vector < value::Value* >& getResults()
         { return m_result; }
 
     private:
@@ -228,13 +228,13 @@ namespace vle { namespace vpz {
          * @brief Store the value stack, usefull for composite value, Map, Set,
          * Matrix.
          */
-        std::stack < value::Value >  m_valuestack;
+        std::stack < value::Value* >  m_valuestack;
 
         /**
          * @brief Store result of Values parsing from trame, simple value,
          * factor.
          */
-        std::vector < value::Value > m_result;
+        std::vector < value::Value* > m_result;
 
         /**
          * @brief Last map key read.

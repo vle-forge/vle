@@ -49,15 +49,15 @@ namespace vle { namespace extension {
         // Liste des noms de variable
         std::vector < std::string > m_stateNameList;
         // L'etat d'une cellule est un map de Value
-        std::map < std::string ,  std::pair < value::Value , bool > > m_state;
+        std::map < std::string ,  std::pair < value::Value* , bool > > m_state;
         // Liste des etats des voisins
         std::map < std::string , std::map < std::string ,
-            value::Value > > m_neighbourState;
+            value::Value* > > m_neighbourState;
         // Liste des ports lies aux voisins
         std::vector < std::string > m_neighbourPortList;
 
     protected:
-	std::map < std::string, value::Value > m_parameters;
+	std::map < std::string, value::Value* > m_parameters;
 
     public:
         CellDevs(const vle::graph::AtomicModel& model,
@@ -77,7 +77,7 @@ namespace vle { namespace extension {
         // Init state
 
         void initState(std::string const & p_name,
-                       value::Value p_value,
+                       value::Value* p_value,
                        bool p_visible=true);
         void initDoubleState(std::string const & p_name,
                              double p_value,
@@ -93,7 +93,7 @@ namespace vle { namespace extension {
                              bool p_visible=true);
 
         void initNeighbourhood(std::string const & p_stateName,
-                               value::Value p_value);
+                               value::Value* p_value);
         void initDoubleNeighbourhood(std::string const & p_stateName,
                                      double p_value);
         void initIntegerNeighbourhood(std::string const & p_stateName,
@@ -104,7 +104,7 @@ namespace vle { namespace extension {
                                      std::string const & p_value);
         void initNeighbourState(std::string const & p_neighbourName,
                                 std::string const & p_stateName,
-                                value::Value p_value);
+                                value::Value* p_value);
         void initDoubleNeighbourState(std::string const & p_neighbourName,
                                       std::string const & p_stateName,
                                       double p_value);
@@ -123,7 +123,7 @@ namespace vle { namespace extension {
         bool isNeighbourEvent(devs::ExternalEvent* p_event) const;
 
         bool existNeighbourState(std::string const & p_name) const;
-        value::Value getNeighbourState(std::string const & p_neighbourName,
+        value::Value* getNeighbourState(std::string const & p_neighbourName,
                                        std::string const & p_stateName) const;
         double getDoubleNeighbourState(std::string const & p_neighbourName,
                                        std::string const & p_stateName) const;
@@ -149,13 +149,13 @@ namespace vle { namespace extension {
         void setDelay(double p_delay) { m_delay = p_delay; }
 
         // Get and set state
-        value::Value getState(std::string const & p_name) const;
+        value::Value* getState(std::string const & p_name) const;
         double getDoubleState(std::string const & p_name) const;
         long getIntegerState(std::string const & p_name) const;
         bool getBooleanState(std::string const & p_name) const;
         std::string getStringState(std::string const & p_name) const;
 
-        void setState(std::string const & p_name,value::Value p_value);
+        void setState(std::string const & p_name,value::Value* p_value);
         void setDoubleState(std::string const & p_name,double p_value);
         void setIntegerState(std::string const & p_name,long p_value);
         void setBooleanState(std::string const & p_name,bool p_value);
@@ -166,9 +166,9 @@ namespace vle { namespace extension {
 
         void setNeighbourState(std::string const & p_neighbourName,
                                std::string const & p_stateName,
-                               value::Value p_value);
+                               const value::Value* p_value);
 
-        inline bool isNeighbourModified() const 
+        inline bool isNeighbourModified() const
         { return m_neighbourModified; }
 
         inline void neighbourModify()
@@ -185,7 +185,7 @@ namespace vle { namespace extension {
         virtual void externalTransition(const vle::devs::ExternalEventList& /* event */,
                                         const vle::devs::Time& /* time */);
         virtual void internalTransition(const vle::devs::Time& /* time */);
-        virtual vle::value::Value observation(
+        virtual vle::value::Value* observation(
             const vle::devs::ObservationEvent& /* event */) const;
 
         virtual void processPerturbation(const vle::devs::ExternalEvent& /* event */) =0;

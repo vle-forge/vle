@@ -31,9 +31,11 @@
 #include <boost/test/auto_unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/utility.hpp>
 #include <stdexcept>
 #include <limits>
 #include <fstream>
+#include <functional>
 #include <vle/value.hpp>
 #include <vle/utils.hpp>
 
@@ -41,151 +43,183 @@ using namespace vle;
 
 BOOST_AUTO_TEST_CASE(check_simple_value)
 {
-    value::Boolean b = value::BooleanFactory::create(true);
-    BOOST_REQUIRE_EQUAL(b->boolValue(), true);
-    b->set(false);
-    BOOST_REQUIRE_EQUAL(b->boolValue(), false);
+    {
+        value::Boolean* b = new value::Boolean(true);
+        BOOST_REQUIRE_EQUAL(b->value(), true);
+        b->set(false);
+        BOOST_REQUIRE_EQUAL(b->value(), false);
+        delete b;
+    }
 
-    value::Double d = value::DoubleFactory::create(12.34);
-    BOOST_REQUIRE_CLOSE(d->doubleValue(), 12.34, 1e-10);
-    d->set(43.21);
-    BOOST_REQUIRE_CLOSE(d->doubleValue(), 43.21, 1e-10);
+    {
+        value::Double* d = value::Double::create(12.34);
+        BOOST_REQUIRE_CLOSE(d->value(), 12.34, 1e-10);
+        d->set(43.21);
+        BOOST_REQUIRE_CLOSE(d->value(), 43.21, 1e-10);
+        delete d;
+    }
 
-    value::Integer i = value::IntegerFactory::create(1234);
-    BOOST_REQUIRE_EQUAL(i->intValue(), 1234);
-    i->set(4321);
-    BOOST_REQUIRE_EQUAL(i->intValue(), 4321);
+    {
+        value::Integer* i = value::Integer::create(1234);
+        BOOST_REQUIRE_EQUAL(i->intValue(), 1234);
+        i->set(4321);
+        BOOST_REQUIRE_EQUAL(i->intValue(), 4321);
+        delete i;
+    }
 
-    value::String s = value::StringFactory::create("1234");
-    BOOST_REQUIRE_EQUAL(s->stringValue(), "1234");
-    s->set("4321");
-    BOOST_REQUIRE_EQUAL(s->stringValue(), "4321");
+    {
+        value::String* s = value::String::create("1234");
+        BOOST_REQUIRE_EQUAL(s->value(), "1234");
+        s->set("4321");
+        BOOST_REQUIRE_EQUAL(s->value(), "4321");
+        delete s;
+    }
 
-    value::XML x = value::XMLFactory::create("test");
-    BOOST_REQUIRE_EQUAL(x->stringValue(), "test");
-    x->set("tset");
-    BOOST_REQUIRE_EQUAL(x->stringValue(), "tset");
+    {
+        value::Xml* x = value::Xml::create("test");
+        BOOST_REQUIRE_EQUAL(x->value(), "test");
+        x->set("tset");
+        BOOST_REQUIRE_EQUAL(x->value(), "tset");
+        delete x;
+    }
 }
 
 BOOST_AUTO_TEST_CASE(check_map_value)
 {
-    value::Map mp = value::MapFactory::create();
-    mp->setBooleanValue("boolean", true);
-    mp->setIntValue("integer", 1234);
-    mp->setDoubleValue("double", 12.34);
-    mp->setStringValue("string", "test");
-    mp->setXMLValue("xml", "xml test");
+    value::Map* mp = value::Map::create();
 
-    BOOST_REQUIRE_EQUAL(mp->getBooleanValue("boolean"), true);
-    BOOST_REQUIRE_EQUAL(mp->getIntValue("integer"), 1234);
-    BOOST_REQUIRE_CLOSE(mp->getDoubleValue("double"), 12.34, 1e-10);
-    BOOST_REQUIRE_EQUAL(mp->getStringValue("string"), "test");
-    BOOST_REQUIRE_EQUAL(mp->getXMLValue("xml"), "xml test");
+    mp->addBoolean("boolean", true);
+    mp->addInt("integer", 1234);
+    mp->addDouble("double", 12.34);
+    mp->addString("string", "test");
+    mp->addXml("xml", "xml test");
 
-    BOOST_REQUIRE_THROW(mp->getIntValue("boolean"), utils::ArgError);
-    BOOST_REQUIRE_NO_THROW(mp->getIntValue("integer"));
-    BOOST_REQUIRE_THROW(mp->getIntValue("double"), utils::ArgError);
-    BOOST_REQUIRE_THROW(mp->getIntValue("string"), utils::ArgError);
-    BOOST_REQUIRE_THROW(mp->getIntValue("xml"), utils::ArgError);
+    BOOST_REQUIRE_EQUAL(mp->getBoolean("boolean"), true);
+    BOOST_REQUIRE_EQUAL(mp->getInt("integer"), 1234);
+    BOOST_REQUIRE_CLOSE(mp->getDouble("double"), 12.34, 1e-10);
+    BOOST_REQUIRE_EQUAL(mp->getString("string"), "test");
+    BOOST_REQUIRE_EQUAL(mp->getXml("xml"), "xml test");
+
+    BOOST_REQUIRE_THROW(mp->getInt("boolean"), utils::CastError);
+    BOOST_REQUIRE_NO_THROW(mp->getInt("integer"));
+    BOOST_REQUIRE_THROW(mp->getInt("double"), utils::CastError);
+    BOOST_REQUIRE_THROW(mp->getInt("string"), utils::CastError);
+    BOOST_REQUIRE_THROW(mp->getInt("xml"), utils::CastError);
+
+    delete(mp);
 }
 
 BOOST_AUTO_TEST_CASE(check_set_value)
 {
-    value::Set st = value::SetFactory::create();
-    st->addBooleanValue(true);
-    st->addIntValue(1234);
-    st->addDoubleValue(12.34);
-    st->addStringValue("test");
-    st->addXMLValue("xml test");
+    value::Set* st = value::Set::create();
+    st->addBoolean(true);
+    st->addInt(1234);
+    st->addDouble(12.34);
+    st->addString("test");
+    st->addXml("xml test");
 
-    BOOST_REQUIRE_EQUAL(st->getBooleanValue(0), true);
-    BOOST_REQUIRE_EQUAL(st->getIntValue(1), 1234);
-    BOOST_REQUIRE_CLOSE(st->getDoubleValue(2), 12.34, 1e-10);
-    BOOST_REQUIRE_EQUAL(st->getStringValue(3), "test");
-    BOOST_REQUIRE_EQUAL(st->getXMLValue(4), "xml test");
+    BOOST_REQUIRE_EQUAL(st->getBoolean(0), true);
+    BOOST_REQUIRE_EQUAL(st->getInt(1), 1234);
+    BOOST_REQUIRE_CLOSE(st->getDouble(2), 12.34, 1e-10);
+    BOOST_REQUIRE_EQUAL(st->getString(3), "test");
+    BOOST_REQUIRE_EQUAL(st->getXml(4), "xml test");
 
-    BOOST_REQUIRE_THROW(st->getIntValue(0), utils::ArgError);
-    BOOST_REQUIRE_NO_THROW(st->getIntValue(1));
-    BOOST_REQUIRE_THROW(st->getIntValue(2), utils::ArgError);
-    BOOST_REQUIRE_THROW(st->getIntValue(3), utils::ArgError);
-    BOOST_REQUIRE_THROW(st->getIntValue(4), utils::ArgError);
+    BOOST_REQUIRE_THROW(st->getInt(0), utils::CastError);
+    BOOST_REQUIRE_NO_THROW(st->getInt(1));
+    BOOST_REQUIRE_THROW(st->getInt(2), utils::CastError);
+    BOOST_REQUIRE_THROW(st->getInt(3), utils::CastError);
+    BOOST_REQUIRE_THROW(st->getInt(4), utils::CastError);
+
+    delete(st);
 }
 
 BOOST_AUTO_TEST_CASE(check_clone)
 {
-    value::Map mp = value::MapFactory::create();
-    mp->addValue("x1", value::StringFactory::create("toto"));
-    mp->addValue("x2", value::StringFactory::create("toto"));
-    mp->addValue("x3", value::StringFactory::create("toto"));
+    value::Map* mp = value::Map::create();
+    mp->add("x1", value::String::create("toto"));
+    mp->add("x2", value::String::create("toto"));
+    mp->add("x3", value::String::create("toto"));
 
-    value::Map mpclone = value::toMapValue(mp->clone());
-    BOOST_REQUIRE(mp->getValue("x1").get() != mpclone->getValue("x1").get());
-    BOOST_REQUIRE(mp->getValue("x2").get() != mpclone->getValue("x2").get());
-    BOOST_REQUIRE(mp->getValue("x3").get() != mpclone->getValue("x3").get());
+    value::Map* mpclone = dynamic_cast < value::Map* >(mp->clone());
+    BOOST_REQUIRE(&mp->get("x1") != &mpclone->get("x1"));
+    BOOST_REQUIRE(&mp->get("x2") != &mpclone->get("x2"));
+    BOOST_REQUIRE(&mp->get("x3") != &mpclone->get("x3"));
 
-    value::Set st = value::SetFactory::create();
-    st->addValue(value::StringFactory::create("toto"));
-    st->addValue(value::StringFactory::create("toto"));
-    st->addValue(value::StringFactory::create("toto"));
+    value::Set* st = value::Set::create();
+    st->add(value::String::create("toto"));
+    st->add(value::String::create("toto"));
+    st->add(value::String::create("toto"));
 
-    value::Set stclone = value::toSetValue(st->clone());
+    value::Set* stclone = dynamic_cast < value::Set* >(st->clone());
 
     BOOST_REQUIRE_EQUAL(st->size(), stclone->size());
 
-    BOOST_REQUIRE(st->getValue(0).get() != stclone->getValue(0).get());
-    BOOST_REQUIRE(st->getValue(1).get() != stclone->getValue(1).get());
-    BOOST_REQUIRE(st->getValue(2).get() != stclone->getValue(2).get());
+    BOOST_REQUIRE(&st->get(0) != &stclone->get(0));
+    BOOST_REQUIRE(&st->get(1) != &stclone->get(1));
+    BOOST_REQUIRE(&st->get(2) != &stclone->get(2));
+
+    delete(mp);
+    delete(mpclone);
+    delete(st);
+    delete(stclone);
 }
 
 BOOST_AUTO_TEST_CASE(check_null)
 {
-    value::Set st = value::SetFactory::create();
-    st->addStringValue("toto1");
-    st->addNullValue();
-    st->addStringValue("toto2");
-    st->addNullValue();
-    st->addStringValue("toto3");
-    st->addNullValue();
-    st->addStringValue("toto4");
-    st->addNullValue();
-    st->addStringValue("toto5");
-    st->addNullValue();
+    value::Set* st = value::Set::create();
+    st->addString("toto1");
+    st->addNull();
+    st->addString("toto2");
+    st->addNull();
+    st->addString("toto3");
+    st->addNull();
+    st->addString("toto4");
+    st->addNull();
+    st->addString("toto5");
+    st->addNull();
 
     BOOST_REQUIRE_EQUAL(st->size(), (value::VectorValue::size_type) 10);
 
-    st->getValue().erase(
-        std::remove_if(st->getValue().begin(),
-                       st->getValue().end(),
-                       value::IsNullValue()),
-        st->getValue().end());
+    value::VectorValue::iterator it = st->value().begin();
+    while ((it = std::find_if(it, st->value().end(), value::IsNullValue()))
+            != st->value().end()) {
+        delete(*it);
+        *it = 0;
+    }
+    it = std::remove_if(st->value().begin(), st->value().end(),
+                        std::bind2nd(std::equal_to <value::Value*>(), 0));
+
+    st->value().erase(it, st->value().end());
 
     BOOST_REQUIRE_EQUAL(st->size(), (value::VectorValue::size_type) 5);
+
+    delete(st);
 }
 
 BOOST_AUTO_TEST_CASE(check_matrix)
 {
-    value::Matrix mx = value::MatrixFactory::create(100, 100, 10, 10);
-    BOOST_REQUIRE_EQUAL(mx->rows(), (value::MatrixFactory::size_type)0);
-    BOOST_REQUIRE_EQUAL(mx->columns(), (value::MatrixFactory::size_type)0);
+    value::Matrix* mx = value::Matrix::create(100, 100, 10, 10);
+    BOOST_REQUIRE_EQUAL(mx->rows(), (value::Matrix::size_type)0);
+    BOOST_REQUIRE_EQUAL(mx->columns(), (value::Matrix::size_type)0);
 
     mx->addColumn();
-    BOOST_REQUIRE_EQUAL(mx->rows(), (value::MatrixFactory::size_type)0);
-    BOOST_REQUIRE_EQUAL(mx->columns(), (value::MatrixFactory::size_type)1);
+    BOOST_REQUIRE_EQUAL(mx->rows(), (value::Matrix::size_type)0);
+    BOOST_REQUIRE_EQUAL(mx->columns(), (value::Matrix::size_type)1);
 
     mx->addRow();
-    BOOST_REQUIRE_EQUAL(mx->rows(), (value::MatrixFactory::size_type)1);
-    BOOST_REQUIRE_EQUAL(mx->columns(), (value::MatrixFactory::size_type)1);
+    BOOST_REQUIRE_EQUAL(mx->rows(), (value::Matrix::size_type)1);
+    BOOST_REQUIRE_EQUAL(mx->columns(), (value::Matrix::size_type)1);
 
-    mx->addValue(0, 0, value::IntegerFactory::create(10));
-    BOOST_REQUIRE_EQUAL(mx->getValue()[0][0]->isInteger(), true);
-    BOOST_REQUIRE_EQUAL(value::toInteger(mx->getValue()[0][0]), 10);
+    mx->add(0, 0, value::Integer::create(10));
+    BOOST_REQUIRE_EQUAL(mx->value()[0][0]->isInteger(), true);
+    BOOST_REQUIRE_EQUAL(value::toInteger(*mx->value()[0][0]), 10);
 
-    value::Matrix cpy = value::toMatrixValue(mx->clone());
-    BOOST_REQUIRE_EQUAL(cpy->getValue()[0][0]->isInteger(), true);
-    value::toIntegerValue(cpy->getValue()[0][0])->set(20);
-    BOOST_REQUIRE_EQUAL(value::toInteger(mx->getValue()[0][0]), 10);
-    BOOST_REQUIRE_EQUAL(value::toInteger(cpy->getValue()[0][0]), 20);
+    value::Matrix* cpy = dynamic_cast < value::Matrix* >(mx->clone());
+    BOOST_REQUIRE_EQUAL(cpy->value()[0][0]->isInteger(), true);
+    value::toIntegerValue(*cpy->value()[0][0]).set(20);
+    BOOST_REQUIRE_EQUAL(value::toInteger(*mx->value()[0][0]), 10);
+    BOOST_REQUIRE_EQUAL(value::toInteger(*cpy->value()[0][0]), 20);
 
-
-
+    delete(mx);
+    delete(cpy);
 }

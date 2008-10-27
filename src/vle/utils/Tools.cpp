@@ -193,7 +193,7 @@ void install_signal()
 #endif
 }
 
-std::string demangle(const std::type_info& in) 
+std::string demangle(const std::type_info& in)
 {
     std::string result;
 #ifdef HAVE_GCC_ABI_DEMANGLE
@@ -294,10 +294,12 @@ void buildDaemon()
 
 void init()
 {
+    utils::Path::init();
+    utils::Trace::init();
+
     utils::install_signal();
     utils::initUserDirectory();
     utils::net::Base::init();
-    Glib::thread_init();
 }
 
 void finalize()

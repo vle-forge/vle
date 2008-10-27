@@ -68,14 +68,13 @@ void CompleteEventBagModel::invalidateModel(Simulator* mdl)
         it->second.clear();
     }
 
-    for (std::deque < ObservationEvent* >::iterator it = _states.begin();
+    for (std::vector < ObservationEvent* >::iterator it = _states.begin();
          it != _states.end(); ++it) {
         if ((*it)->getModel() == mdl) {
             (*it)->invalidate();
         }
     }
 }
-
 
 void CompleteEventBagModel::delModel(Simulator* mdl)
 {
@@ -85,7 +84,7 @@ void CompleteEventBagModel::delModel(Simulator* mdl)
         _bags.erase(it);
     }
 
-    for (std::deque < ObservationEvent* >::iterator it = _states.begin();
+    for (std::vector < ObservationEvent* >::iterator it = _states.begin();
          it != _states.end(); ++it) {
         if ((*it)->getModel() == mdl) {
             _states.erase(it);
@@ -161,7 +160,7 @@ void EventTable::cleanObservationEventList()
 }
 
 const Time& EventTable::topEvent()
-{   
+{
     if (not mExternalEventModel.empty()) {
         return mCurrentTime;
     } else {

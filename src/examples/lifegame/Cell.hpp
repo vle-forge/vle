@@ -40,18 +40,18 @@ public:
     { }
 
     virtual ~Cell() { }
-    
+
     // DEVS Methods
     virtual vle::devs::Time init(const vle::devs::Time& /* time */);
     virtual void internalTransition(const vle::devs::Time& /* event */);
     virtual void processPerturbation(const vle::devs::ExternalEvent& /* event */) { }
-    
+
 private:
     enum state { INIT, IDLE, NEWSTATE };
-    
+
     double mTimeStep;
-    state mState;      
-    
+    state mState;
+
     virtual void updateSigma(vle::devs::Event*) { setSigma(0); };
 };
 

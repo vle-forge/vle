@@ -36,15 +36,15 @@ namespace vle { namespace oov { namespace plugin {
 
 class IntCurve: public Curve
 {
-    class color 
+    class color
     {
     public:
 	double red;
 	double green;
 	double blue;
-	
+
 	color(double r=0, double g=0, double b=0):red(r), green(g), blue(b) { }
-	color(const color& c) 
+	color(const color& c)
 	    { red = c.red; green = c.green; blue = c.blue; }
     };
 
@@ -52,51 +52,51 @@ public :
     IntCurve(const std::string & name,
 	     unsigned int r,
 	     unsigned int g,
-	     unsigned int b) : Curve(name, r, g, b) 
+	     unsigned int b) : Curve(name, r, g, b)
 	{ }
 
     virtual ~IntCurve() { }
 
     void add(double date, int value);
-    
-    void draw(Cairo::RefPtr < Cairo::Context > ctx, Parameter & m_parameter, 
+
+    void draw(Cairo::RefPtr < Cairo::Context > ctx, Parameter & m_parameter,
 	      std::list < IntCurve * > m_list);
-    
+
     int get_last_value();
-    
+
     bool is_integer() { return true; }
-    
+
     int get_size() { return m_valueList.size(); }
-    
+
     void get_min_max_value(int number_value, int & min, int & max,
 				 Parameter & m_parameter);
-    
-    int get_min_value(int number_value, 
+
+    int get_min_value(int number_value,
 			    Parameter & m_parameter);
-    
-    int get_max_value(int number_value, 
+
+    int get_max_value(int number_value,
 			    Parameter & m_parameter);
-    
+
     int get_number_value();
-    
+
     double get_date(int index);
-    
+
     int get_value(int index);
-    
+
     void get_min_max_value_prec_index(int indice, int number_value,
 					    int & min, int & max);
-    
+
     int get_min_value_prec_index(int indice, int number_value);
-    
+
     int get_max_value_prec_index(int indice, int number_value);
-    
+
 private :
     std::vector < std::pair < double, int > > m_valueList;
-    
+
     void swap_int(int &value1, int &value2);
 };
 
 }}} // namespace vle oov plugin
-    
+
 #endif
-    
+

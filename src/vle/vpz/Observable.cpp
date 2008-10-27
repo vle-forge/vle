@@ -95,7 +95,7 @@ ObservablePort& Observable::add(const std::string& portname)
 ObservablePort& Observable::add(const ObservablePort& obs)
 {
     std::pair < iterator, bool > x;
- 
+
     x = m_list.insert(std::make_pair < std::string, ObservablePort >(
                 obs.name(), obs));
 

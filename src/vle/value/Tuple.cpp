@@ -29,32 +29,49 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
-
-
 namespace vle { namespace value {
 
-TupleFactory::TupleFactory(const TupleFactory& setfactory) :
-    ValueBase(setfactory),
-    m_value(setfactory.m_value)
-{ }
-
-Tuple TupleFactory::create()
+void Tuple::writeFile(std::ostream& out) const
 {
-    return Tuple(new TupleFactory());
+    for (const_iterator it = m_value.begin(); it != m_value.end(); ++it) {
+        if (it != m_value.begin()) {
+            out << " ";
+        }
+        out << *it;
+    }
 }
 
-Value TupleFactory::clone() const
+void Tuple::writeString(std::ostream& out) const
 {
-    return Value(new TupleFactory(*this));
+    out << "(";
+    for (const_iterator it = m_value.begin(); it != m_value.end(); ++it) {
+        if (it != m_value.begin()) {
+            out << ",";
+        }
+        out << *it;
+    }
+    out << ")";
 }
 
-void TupleFactory::fill(const std::string& str)
+void Tuple::writeXml(std::ostream& out) const
+{
+    std::string s = "<tuple>";
+    for (const_iterator it = m_value.begin(); it != m_value.end(); ++it) {
+        if (it != m_value.begin()) {
+            out << " ";
+        }
+        out << *it;
+    }
+    out << "</tuple>";
+}
+
+void Tuple::fill(const std::string& str)
 {
     std::string cpy(str);
     boost::algorithm::trim(cpy);
 
     std::vector < std::string > result;
-    boost::algorithm::split(result, cpy, 
+    boost::algorithm::split(result, cpy,
                             boost::algorithm::is_any_of(" \n\t\r"));
 
     for (std::vector < std::string >::iterator it = result.begin();
@@ -75,56 +92,6 @@ void TupleFactory::fill(const std::string& str)
             }
         }
     }
-}
-
-std::string TupleFactory::toFile() const
-{
-    std::string s;
-
-    for (const_iterator it = m_value.begin(); it != m_value.end(); ++it) {
-	s += boost::lexical_cast < std::string >(*it);
-        if (it + 1 != m_value.end())
-            s+= " ";
-    }
-    return s;
-}
-
-std::string TupleFactory::toString() const
-{
-    std::string s = "(";
-    for (const_iterator it = m_value.begin(); it != m_value.end(); ++it) {
-	s += boost::lexical_cast < std::string >(*it);
-	if (it + 1 != m_value.end())
-	    s += ",";
-    }
-    s += ")";
-    return s;
-}
-
-std::string TupleFactory::toXML() const
-{
-    std::string s = "<tuple>";
-    for (const_iterator it = m_value.begin(); it != m_value.end(); ++it) {
-        s += boost::lexical_cast < std::string >(*it);
-        if (it + 1 != m_value.end())
-            s += " ";
-    }
-    s += "</tuple>";
-    return s;
-}
-
-Tuple toTupleValue(const Value& value)
-{
-    Assert(utils::ArgError, value->getType() == ValueBase::TUPLE,
-           "Value is not a Tuple");
-    return boost::static_pointer_cast < TupleFactory >(value);
-}
-
-const TupleFactory::TupleValue& toTuple(const Value& value)
-{
-    Assert(utils::ArgError, value->getType() == ValueBase::TUPLE,
-           "Value is not a Tuple");
-    return boost::static_pointer_cast < TupleFactory >(value)->getValue();
 }
 
 }} // namespace vle value

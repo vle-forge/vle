@@ -42,19 +42,19 @@ class Plot : public CairoPlugin
 public:
     Plot(const std::string& location);
     virtual ~Plot() { }
-    
+
     virtual void onParameter(const vpz::ParameterTrame& trame);
-    
+
     virtual void onNewObservable(const vpz::NewObservableTrame& trame);
-    
+
     virtual void onDelObservable(const vpz::DelObservableTrame& trame);
-    
+
     virtual void onValue(const vpz::ValueTrame& trame);
-    
+
     virtual void close(const vpz::EndTrame& trame);
-    
+
     virtual void preferredSize(int& width, int& height);
-    
+
     virtual void onSize(int width, int height)
         { mWidth = width; mHeight = height; }
 
@@ -99,7 +99,7 @@ private:
     double getMinValueN(int nb_check_value);
 
     void updateStepHeight();
-    
+
     std::string buildname(const std::string& simulator,
 			  const std::string& port)
         {
@@ -109,7 +109,7 @@ private:
             return result;
         }
 };
-	    
+
 }}} // namespace vle oov plugin
 
 DECLARE_OOV_PLUGIN(vle::oov::plugin::Plot)

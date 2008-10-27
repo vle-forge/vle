@@ -91,14 +91,14 @@ namespace vle { namespace extension {
         typedef std::vector < Transition* > enabledTransitionList;
         typedef std::map < std::string, Marking* > MarkingList;
         typedef std::map < std::string, std::pair < std::string,
-                unsigned int > > devsPlaceMarkingList;	
+                unsigned int > > devsPlaceMarkingList;
         typedef std::map < std::string,
-                std::string > devsInTransitionMarkingList;	
+                std::string > devsInTransitionMarkingList;
         typedef std::map < std::string,
                 std::pair < std::string,
-                bool > > devsOutTransitionMarkingList;	
+                bool > > devsOutTransitionMarkingList;
         typedef std::map < std::string, unsigned int >
-            initialMarkingList;	
+            initialMarkingList;
         typedef std::map < std::string, Place* > PlaceList;
         typedef std::vector < Token* > TokenList;
 
@@ -300,7 +300,7 @@ namespace vle { namespace extension {
             const devs::ExternalEventList& event,
             const devs::Time& time);
 
-        virtual value::Value observation(
+        virtual value::Value* observation(
             const devs::ObservationEvent& event) const;
 
         // petrinet construction methods

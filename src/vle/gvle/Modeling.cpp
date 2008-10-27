@@ -40,6 +40,7 @@
 #include <vle/graph/CoupledModel.hpp>
 #include <libxml++/libxml++.h>
 #include <gtkmm/stock.h>
+#include <iostream>
 
 using std::string;
 
@@ -273,10 +274,6 @@ void Modeling::addView(graph::Model* model)
             vpz::AtomicModel& vpz_am = get_model(graph_am);
             mAtomicBox->show(vpz_am, *graph_am);
         } catch (utils::SaxParserError& E) {
-            std::cout << "Can't add view for " << model->getName()
-            //<< " because " << E.what()
-            << "\n";
-            std::cout << "looking for " << model << "\n";
             parse_model(mVpz.project().model().atomicModels());
         }
 
@@ -807,14 +804,14 @@ const Modeling::SetString& Modeling::getNames() const
 /*
   vpz::Observable* Modeling::get_observables(graph::AtomicModel* atom){
   assert(atom);
-  
+
   vpz::AtomicModel a = mVpz.project().model().atomicModels().get(atom);
   if (a.observables() != "") {
   vpz::Observable obs = observables().get(a.observables());
-  
+
   vpz::ObservableList list = observables().observablelist();
   vpz::ObservableList::iterator it = list.begin();
-  
+
   while ( it != list.end() ) {
   if ( it->first == a.observables() ) {
   return &it->second;

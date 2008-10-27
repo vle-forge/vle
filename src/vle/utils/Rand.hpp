@@ -54,18 +54,18 @@ namespace vle { namespace utils {
      * double d = rand().get_double();
      * int i = rand().get_int_range(0, 123);
      * @endcode
-     * 
+     *
      */
     class Rand
     {
     public:
-        /** 
+        /**
          * @brief Create a new random number generator initializecd with a seed
          * takne either from /dev/urandom if exist or from the current time.
          */
         Rand() { }
 
-        /** 
+        /**
          * @brief Set the seed for the random number generator.
          * @param seed a value to reinitialize the random number generator.
          */
@@ -74,7 +74,7 @@ namespace vle { namespace utils {
             m_rand.set_seed(seed);
         }
 
-        /** 
+        /**
          * @brief Generate a boolean value [true, false].
          * @return true of false.
          */
@@ -83,7 +83,7 @@ namespace vle { namespace utils {
             return m_rand.get_bool();
         }
 
-        /** 
+        /**
          * @brief Gererate an unsigned int value [0..2^32-1].
          * @return a unsigned int
          */
@@ -92,7 +92,7 @@ namespace vle { namespace utils {
             return m_rand.get_int();
         }
 
-        /** 
+        /**
          * @brief Generate an integer from begin to end [begin..end-1].
          * @param begin The minimum value include.
          * @param end The limit (exclude) of the range.
@@ -103,7 +103,7 @@ namespace vle { namespace utils {
             return m_rand.get_int_range(begin, end);
         }
 
-        /** 
+        /**
          * @brief Generate a real between 0 and 1 [0..1).
          * @return a real.
          */
@@ -112,7 +112,7 @@ namespace vle { namespace utils {
             return m_rand.get_double();
         }
 
-        /** 
+        /**
          * @brief Generate a real between begin to end [begin..end).
          * @param begin The minimum value.
          * @param end The limit (exclude) of the range.
@@ -133,7 +133,7 @@ namespace vle { namespace utils {
                 (double) (std::numeric_limits < guint32 >::max() - 1.0);
 	}
 
-        /** 
+        /**
          * @brief Generate a real between begin and end [begin..end].
          * @param begin The minimum value include.
          * @param end The maximum value include.
@@ -144,7 +144,7 @@ namespace vle { namespace utils {
 	    return get_double_included() * std::abs(end - begin) + begin;
 	}
 
-        /** 
+        /**
          * @brief Generate a real between begin and end (begin..end).
          * @param begin The minimum value exclude.
          * @param end The maximum value exclude.
@@ -157,7 +157,7 @@ namespace vle { namespace utils {
             return random;
         }
 
-        /** 
+        /**
          * @brief Generate an integer between begin and end (begin..end).
          * @param begin The minimun value exclude.
          * @param end The maximum value exclude.

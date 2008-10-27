@@ -24,85 +24,98 @@
 
 
 #include <vle/value/Matrix.hpp>
+#include <vle/value/Deleter.hpp>
 #include <vle/utils/Debug.hpp>
+#include <boost/utility.hpp>
 
 namespace vle { namespace value {
 
-Matrix MatrixFactory::create(MatrixValue::index columns,
-                             MatrixValue::index rows,
-                             MatrixValue::index resizeColumns,
-                             MatrixValue::index resizeRows)
+Matrix::Matrix(index columns, index rows, index resizeColumns, index
+               resizeRows) :
+    m_matrix(m_extents[columns][rows]),
+    m_nbcol(0),
+    m_nbrow(0),
+    m_stepcol(resizeColumns),
+    m_steprow(resizeRows),
+    m_lastX(0),
+    m_lastY(0)
 {
-    return Matrix(new MatrixFactory(columns, rows, resizeColumns,
-                                    resizeRows));
 }
 
-Matrix MatrixFactory::create(MatrixValue::index columns,
-                             MatrixValue::index rows,
-                             MatrixValue::index columnmax,
-                             MatrixValue::index rowmax,
-                             MatrixValue::index resizeColumns,
-                             MatrixValue::index resizeRows)
+Matrix::Matrix(index columns, index rows, index columnmax, index rowmax, index
+               resizeColumns, index resizeRows) :
+    m_matrix(m_extents[columnmax][rowmax]),
+    m_nbcol(columns),
+    m_nbrow(rows),
+    m_stepcol(resizeColumns),
+    m_steprow(resizeRows),
+    m_lastX(0),
+    m_lastY(0)
 {
     Assert(utils::ArgError, columns < columnmax, boost::format(
             "Number of columns error: %1% on %2%") % columns % columnmax);
     Assert(utils::ArgError, rows < rowmax, boost::format(
             "Number of row error: %1% on %2%") % rows % rowmax);
-
-    return Matrix(new MatrixFactory(columns, rows, columnmax, rowmax,
-                                    resizeColumns, resizeRows));
 }
 
 
-Value MatrixFactory::clone() const
+Matrix::Matrix(const Matrix& m) :
+    Value(m),
+    m_matrix(m.m_matrix),
+    m_nbcol(m.m_nbcol),
+    m_nbrow(m.m_nbrow),
+    m_stepcol(m.m_stepcol),
+    m_steprow(m.m_steprow)
 {
-    return Value(new MatrixFactory(*this));
-}
-
-std::string MatrixFactory::toFile() const
-{
-    std::ostringstream o;
-
-    for (MatrixValue::size_type j = 0; j < m_nbrow; ++j) {
-        for (MatrixValue::size_type i = 0; i < m_nbcol; ++i) {
-            if (m_matrix[i][j].get()) {
-                o << m_matrix[i][j]->toFile();
+    for (size_type i = 0; i < m_nbcol; ++i) {
+        for (size_type j = 0; j < m_nbrow; ++j) {
+            if( m_matrix[i][j]) {
+                m_matrix[i][j] = m_matrix[i][j]->clone();
             } else {
-                o << "NA";
+                m_matrix[i][j] = 0;
             }
-            o << " ";
         }
-        o << "\n";
     }
-
-    o << "]";
-
-    return o.str();
 }
 
-std::string MatrixFactory::toString() const
+Matrix::~Matrix()
 {
-    std::ostringstream o;
+    clear();
+}
 
-    for (MatrixValue::size_type j = 0; j < m_nbrow; ++j) {
-        for (MatrixValue::size_type i = 0; i < m_nbcol; ++i) {
-            if (m_matrix[i][j].get()) {
-                o << m_matrix[i][j]->toString();
+void Matrix::writeFile(std::ostream& out) const
+{
+    for (size_type j = 0; j < m_nbrow; ++j) {
+        for (size_type i = 0; i < m_nbcol; ++i) {
+            if (m_matrix[i][j]) {
+                m_matrix[i][j]->writeFile(out);
             } else {
-                o << "NA";
+                out << "NA";
             }
-            o << " ";
+            out << " ";
         }
-        o << "\n";
+        out << "\n";
     }
-    return o.str();
 }
 
-std::string MatrixFactory::toXML() const
+void Matrix::writeString(std::ostream& out) const
 {
-    std::ostringstream o;
+    for (size_type j = 0; j < m_nbrow; ++j) {
+        for (size_type i = 0; i < m_nbcol; ++i) {
+            if (m_matrix[i][j]) {
+                m_matrix[i][j]->writeString(out);
+            } else {
+                out << "NA";
+            }
+            out << " ";
+        }
+        out << "\n";
+    }
+}
 
-    o << "<matrix "
+void Matrix::writeXml(std::ostream& out) const
+{
+    out << "<matrix "
         << "rows=\"" << m_nbrow  << "\" "
         << "columns=\"" << m_nbcol << "\" "
         << "columnmax=\"" << m_matrix.shape()[0] << "\" "
@@ -110,30 +123,51 @@ std::string MatrixFactory::toXML() const
         << "columnstep=\"" << m_stepcol << "\" "
         << "rowstep=\"" << m_steprow << "\" >";
 
-    for (MatrixValue::size_type j = 0; j < m_nbrow; ++j) {
-        for (MatrixValue::size_type i = 0; i < m_nbcol; ++i) {
-            if (m_matrix[i][j].get()) {
-                o << m_matrix[i][j]->toXML();
+    for (size_type j = 0; j < m_nbrow; ++j) {
+        for (size_type i = 0; i < m_nbcol; ++i) {
+            if (m_matrix[i][j]) {
+                m_matrix[i][j]->writeXml(out);
             } else {
-                o << "<null />";
+                out << "<null />";
             }
-            o << " ";
+            out << " ";
         }
-        o << "\n";
+        out << "\n";
     }
-
-    o << "</matrix>";
-
-    return o.str();
+    out << "</matrix>";
 }
 
-void MatrixFactory::resize(MatrixValue::size_type columns,
-                           MatrixValue::size_type rows)
+void Matrix::clear()
+{
+    std::stack < Value* > composite;
+
+    for (size_type j = 0; j < m_nbrow; ++j) {
+        for (size_type i = 0; i < m_nbcol; ++i) {
+            if (m_matrix[i][j]) {
+                if (isComposite(m_matrix[i][j])) {
+                    composite.push(m_matrix[i][j]);
+                } else {
+                    delete m_matrix[i][j];
+                    m_matrix[i][j] = 0;
+                }
+            }
+        }
+    }
+
+    deleter(composite);
+
+    m_nbcol = 0;
+    m_nbrow = 0;
+    m_lastX = 0;
+    m_lastY = 0;
+}
+
+void Matrix::resize(size_type columns, size_type rows)
 {
     m_matrix.resize(m_extents[columns][rows]);
 }
 
-void MatrixFactory::addColumn()
+void Matrix::addColumn()
 {
     if (m_nbcol - 1 >= m_matrix.shape()[0]) {
         m_matrix.resize(
@@ -143,7 +177,7 @@ void MatrixFactory::addColumn()
     ++m_nbcol;
 }
 
-void MatrixFactory::addRow()
+void Matrix::addRow()
 {
     if (m_nbrow + 1 >= m_matrix.shape()[1]) {
         m_matrix.resize(
@@ -153,19 +187,32 @@ void MatrixFactory::addRow()
     ++m_nbrow;
 }
 
-void MatrixFactory::addValue(MatrixValue::size_type column,
-                             MatrixValue::size_type row,
-                             const value::Value& val)
+void Matrix::add(size_type column, size_type row, value::Value* val)
 {
+    if (not val) {
+        throw utils::ArgError();
+    }
     m_matrix[column][row] = val;
 }
 
-void MatrixFactory::addValueToLastCell(const value::Value& val)
+
+void Matrix::add(size_type column, size_type row, const value::Value& val)
 {
+    m_matrix[column][row] = val.clone();
+}
+
+void Matrix::addToLastCell(const value::Value& val)
+{
+    m_matrix[m_lastX][m_lastY] = val.clone();
+}
+
+void Matrix::addToLastCell(value::Value* val)
+{
+    assert(val);
     m_matrix[m_lastX][m_lastY] = val;
 }
 
-void MatrixFactory::moveLastCell()
+void Matrix::moveLastCell()
 {
     ++m_lastX;
     if (m_lastX >= columns()) {
@@ -177,69 +224,4 @@ void MatrixFactory::moveLastCell()
     }
 }
 
-Matrix toMatrixValue(const Value& value)
-{
-    Assert(utils::ArgError, value->getType() == ValueBase::MATRIX,
-           "Value is not a Matrix");
-    return boost::static_pointer_cast < MatrixFactory >(value);
-}
-
-MatrixFactory::MatrixView toMatrix(const Value& value)
-{
-    Assert(utils::ArgError, value->getType() == ValueBase::MATRIX,
-           "Value is not a Matrix");
-    return boost::static_pointer_cast < MatrixFactory >(value)->getValue();
-}
-
-MatrixFactory::MatrixFactory(MatrixValue::index columns,
-                             MatrixValue::index rows,
-                             MatrixValue::index resizeColumns,
-                             MatrixValue::index resizeRows) :
-    m_matrix(m_extents[columns][rows]),
-    m_nbcol(0),
-    m_nbrow(0),
-    m_stepcol(resizeColumns),
-    m_steprow(resizeRows),
-    m_lastX(0),
-    m_lastY(0)
-{
-}
-
-MatrixFactory::MatrixFactory(MatrixValue::index columns,
-                             MatrixValue::index rows,
-                             MatrixValue::index columnmax,
-                             MatrixValue::index rowmax,
-                             MatrixValue::index resizeColumns,
-                             MatrixValue::index resizeRows) :
-    m_matrix(m_extents[columnmax][rowmax]),
-    m_nbcol(columns),
-    m_nbrow(rows),
-    m_stepcol(resizeColumns),
-    m_steprow(resizeRows),
-    m_lastX(0),
-    m_lastY(0)
-{
-}
-
-
-MatrixFactory::MatrixFactory(const MatrixFactory& m) :
-    ValueBase(m),
-    m_matrix(m.m_matrix),
-    m_nbcol(m.m_nbcol),
-    m_nbrow(m.m_nbrow),
-    m_stepcol(m.m_stepcol),
-    m_steprow(m.m_steprow)
-{
-    for (MatrixValue::size_type i = 0; i < m_nbcol; ++i) {
-        for (MatrixValue::size_type j = 0; j < m_nbrow; ++j) {
-            if( m_matrix[i][j].get() != 0) {
-                m_matrix[i][j] = m_matrix[i][j]->clone();
-            } else {
-                m_matrix[i][j] = Value();
-            }
-        }
-    }
-}
-
 }} // namespace vle value
-

@@ -43,7 +43,7 @@ namespace vle { namespace oov {
 
         virtual ~StreamReader()
         { }
-        
+
         virtual void onParameter(const vpz::ParameterTrame& trame);
 
         virtual void onNewObservable(const vpz::NewObservableTrame& trame);
@@ -51,7 +51,7 @@ namespace vle { namespace oov {
         virtual void onDelObservable(const vpz::DelObservableTrame& trame);
 
         virtual void onValue(const vpz::ValueTrame& trame);
-        
+
         virtual void onClose(const vpz::EndTrame& trame);
 
         ///
@@ -63,7 +63,7 @@ namespace vle { namespace oov {
     private:
         PluginPtr   m_plugin;
 
-        /** 
+        /**
          * @brief Load the specified output plugin from the StreamDirs location.
          * @param plugin the name of the plugin.
          * @param location the location of the plugin output.

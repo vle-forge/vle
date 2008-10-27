@@ -52,18 +52,18 @@ namespace vle { namespace examples { namespace qss {
         void externalTransition(const devs::ExternalEventList& event,
                                    const devs::Time& time);
 
-        virtual value::Value observation(const devs::ObservationEvent& event)
+        virtual value::Value* observation(const devs::ObservationEvent& event)
             const;
 
     private:
         State state;
 
-        double s; 
-        double p_p; 
-        double p_l; 
-        double d; 
-        double plantlouseamount;    
-        double ladybirdamount;    
+        double s;
+        double p_p;
+        double p_l;
+        double d;
+        double plantlouseamount;
+        double ladybirdamount;
     };
 
 }}} // namespace vle examples qss

@@ -32,7 +32,7 @@
 namespace vle { namespace devs {
 
     class Simulator;
-    
+
     typedef std::multimap < Simulator*, std::string > ObservableList;
 
 

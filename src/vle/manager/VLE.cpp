@@ -34,6 +34,8 @@
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Rand.hpp>
 #include <vle/vpz/Vpz.hpp>
+#include <vle/value/Value.hpp>
+#include <vle/devs/Event.hpp>
 
 #include <glibmm/optioncontext.h>
 #include <iostream>
@@ -95,7 +97,7 @@ bool VLE::runSimulator(int process)
         if (utils::Trace::trace().getLevel() != utils::Trace::DEBUG) {
             utils::buildDaemon();
         }
-        
+
         utils::Trace::trace().setLogFile(
             utils::Trace::getLogFilename(boost::str(boost::format(
                     "distant-%1%") % utils::get_simple_current_date())));
@@ -132,6 +134,21 @@ bool VLE::justRun(int nbProcessor, const CmdArgs& args)
         }
     }
     return true;
+}
+
+void init()
+{
+    utils::init();
+    devs::Pools::init();
+    value::init();
+    Glib::thread_init();
+}
+
+void finalize()
+{
+    utils::finalize();
+    value::finalize();
+    devs::finalize();
 }
 
 }} // namespace vle manager

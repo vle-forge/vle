@@ -122,8 +122,8 @@ void SaxParser::onSet(const AttributeList&)
 
 void SaxParser::onMatrix(const AttributeList& lst)
 {
-    value::MatrixFactory::index row = 0, rowmax = 0, rowstep = 0;
-    value::MatrixFactory::index col = 0, colmax = 0, colstep = 0;
+    value::Matrix::index row = 0, rowmax = 0, rowstep = 0;
+    value::Matrix::index col = 0, colmax = 0, colstep = 0;
     bool haverow = false;
     bool havecol = false;
 
@@ -132,18 +132,18 @@ void SaxParser::onMatrix(const AttributeList& lst)
         using boost::lexical_cast;;
         if (it->name == "rows") {
             haverow = true;
-            row = lexical_cast < value::MatrixFactory::index >(it->value);
+            row = lexical_cast < value::Matrix::index >(it->value);
         } else if (it->name == "columns") {
             havecol = true;
-            col = lexical_cast < value::MatrixFactory::index >(it->value);
+            col = lexical_cast < value::Matrix::index >(it->value);
         } else if (it->name == "rowmax") {
-            rowmax = lexical_cast < value::MatrixFactory::index >(it->value);
+            rowmax = lexical_cast < value::Matrix::index >(it->value);
         } else if (it->name == "columnmax") {
-            colmax = lexical_cast < value::MatrixFactory::index >(it->value);
+            colmax = lexical_cast < value::Matrix::index >(it->value);
         } else if (it->name == "columnstep") {
-            colstep = lexical_cast < value::MatrixFactory::index >(it->value);
+            colstep = lexical_cast < value::Matrix::index >(it->value);
         } else if (it->name == "rowstep") {
-            rowstep = lexical_cast < value::MatrixFactory::index >(it->value);
+            rowstep = lexical_cast < value::Matrix::index >(it->value);
         }
     }
 
@@ -171,8 +171,8 @@ void SaxParser::onTuple(const AttributeList&)
 void SaxParser::onTable(const AttributeList& att)
 {
     m_valuestack.pushTable(
-        getAttribute < value::TableFactory::index >(att, "width"),
-        getAttribute < value::TableFactory::index >(att, "height"));
+        getAttribute < value::Table::index >(att, "width"),
+        getAttribute < value::Table::index >(att, "height"));
 }
 
 void SaxParser::onXML(const AttributeList&)
@@ -345,28 +345,28 @@ void SaxParser::on_end_element(const Glib::ustring& name)
 void SaxParser::onEndBoolean()
 {
     m_valuestack.pushOnVectorValue(
-        value::BooleanFactory::create(
+        value::Boolean::create(
             utils::to_boolean(lastCharactersStored())));
 }
 
 void SaxParser::onEndInteger()
 {
     m_valuestack.pushOnVectorValue(
-        value::IntegerFactory::create(
+        value::Integer::create(
             utils::to_int(lastCharactersStored())));
 }
 
 void SaxParser::onEndDouble()
 {
     m_valuestack.pushOnVectorValue(
-        value::DoubleFactory::create(
+        value::Double::create(
             utils::to_double(lastCharactersStored())));
 }
 
 void SaxParser::onEndString()
 {
     m_valuestack.pushOnVectorValue(
-        value::StringFactory::create(
+        value::String::create(
             utils::to_string(lastCharactersStored())));
 }
 
@@ -391,28 +391,27 @@ void SaxParser::onEndMap()
 
 void SaxParser::onEndTuple()
 {
-    value::Tuple tuple = value::toTupleValue(m_valuestack.topValue());
-    tuple->fill(lastCharactersStored());
+    value::Tuple& tuple(m_valuestack.topValue()->toTuple());
+    tuple.fill(lastCharactersStored());
     m_valuestack.popValue();
 }
 
 void SaxParser::onEndTable()
 {
-    value::Table table = value::toTableValue(m_valuestack.topValue());
-    table->fill(lastCharactersStored());
+    value::Table& table(m_valuestack.topValue()->toTable());
+    table.fill(lastCharactersStored());
     m_valuestack.popValue();
 }
 
 void SaxParser::onEndXML()
 {
-    m_valuestack.pushOnVectorValue(
-        value::XMLFactory::create(m_cdata));
+    m_valuestack.pushOnVectorValue(value::Xml::create(m_cdata));
     m_cdata.clear();
 }
 
 void SaxParser::onEndNull()
 {
-    m_valuestack.pushOnVectorValue(value::NullFactory::create());
+    m_valuestack.pushOnVectorValue(value::Null::create());
 }
 
 void SaxParser::onEndTrame()
@@ -445,10 +444,10 @@ void SaxParser::onEndPort()
 {
     if (m_vpzstack.top()->isCondition()) {
         value::Set& vals(m_vpzstack.popConditionPort());
-        std::vector < value::Value >& lst(getValues());
-        for (std::vector < value::Value >::iterator it =
+        std::vector < value::Value* >& lst(getValues());
+        for (std::vector < value::Value* >::iterator it =
              lst.begin(); it != lst.end(); ++it) {
-            vals->addValue(*it);
+            vals.add(*it);
         }
         m_valuestack.clear();
     } else if (m_vpzstack.top()->isObservablePort()) {
@@ -625,17 +624,17 @@ void SaxParser::on_validity_warning(const Glib::ustring& text)
     TraceAlways(boost::format("XML validity warning: %1%") % text);
 }
 
-const std::vector < value::Value >& SaxParser::getValues() const
+const std::vector < value::Value* >& SaxParser::getValues() const
 {
     return m_valuestack.getResults();
 }
 
-std::vector < value::Value >& SaxParser::getValues()
+std::vector < value::Value* >& SaxParser::getValues()
 {
     return m_valuestack.getResults();
 }
 
-const value::Value& SaxParser::getValue(const size_t pos) const
+value::Value* SaxParser::getValue(const size_t pos) const
 {
     return m_valuestack.getResult(pos);
 }

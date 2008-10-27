@@ -60,13 +60,13 @@ Couple mfi::init()
     double* sav = new double[m_functionNumber];
     Couple ret;
 
-    for(unsigned int j = 0;j < m_functionNumber;j++) 
+    for(unsigned int j = 0;j < m_functionNumber;j++)
         z[j] = m_qss->getValue(j);
-    for(unsigned int j = 0;j < m_functionNumber;j++) 
+    for(unsigned int j = 0;j < m_functionNumber;j++)
         mz[j] =  m_qss->compute(j);
     fiz = mz[index];
     for(unsigned int j = 0;j < m_functionNumber;j++)  {
-        for(unsigned int k = 0;k < m_functionNumber;k++) 
+        for(unsigned int k = 0;k < m_functionNumber;k++)
             xt[k] = z[k];
         xt[j] += m_qss->m_precision;
 
@@ -74,15 +74,15 @@ Couple mfi::init()
             sav[k] = m_qss->getValue(k);
             m_qss->setValue(k,xt[k]);
         }
-        for(unsigned int k = 0;k < m_functionNumber;k++) 
+        for(unsigned int k = 0;k < m_functionNumber;k++)
             yt[k] = m_qss->compute(k);
-        for(unsigned int k = 0;k < m_functionNumber;k++) 
+        for(unsigned int k = 0;k < m_functionNumber;k++)
             m_qss->setValue(k,sav[k]);
         c[j] = (yt[index] - fiz)/m_qss->m_precision;
     }
     ret.value = mz[index];
     ret.derivative = 0;
-    for(unsigned int j = 0;j < m_functionNumber;j++) 
+    for(unsigned int j = 0;j < m_functionNumber;j++)
         ret.derivative += c[j]*mz[j];
     m_lastTime = Time(0);
     return ret;
@@ -98,15 +98,15 @@ Couple mfi::ext(const Time& p_time, unsigned int i,const Couple & input)
 
     m_lastTime = p_time;
     normal = z[i]+mz[i]*e;
-    for(unsigned int j = 0;j < m_functionNumber;j++) 
+    for(unsigned int j = 0;j < m_functionNumber;j++)
         zz[j] = z[j]+mz[j]*e;
-    for(unsigned int j = 0;j < m_functionNumber;j++) 
+    for(unsigned int j = 0;j < m_functionNumber;j++)
         if (j==i) {
             z[j]=input.value;
             mz[j]=input.derivative;
         }
         else z[j]+=mz[j]*e;
-    /*  for(unsigned int k = 0;k < m_functionNumber;k++) 
+    /*  for(unsigned int k = 0;k < m_functionNumber;k++)
         yt[k] = m_qss->compute(k);
         ret.value = yt[index]; */
 
@@ -115,7 +115,7 @@ Couple mfi::ext(const Time& p_time, unsigned int i,const Couple & input)
         m_qss->setValue(j,z[j]);
     }
     ret.value = m_qss->compute(index);
-    for(unsigned int j = 0;j < m_functionNumber;j++) 
+    for(unsigned int j = 0;j < m_functionNumber;j++)
         m_qss->setValue(j,sav[j]);
 
     if (fabs(normal - z[i]) >= m_qss->m_threshold) {
@@ -126,13 +126,13 @@ Couple mfi::ext(const Time& p_time, unsigned int i,const Couple & input)
 
         double w = m_qss->compute(index);
 
-        for(unsigned int j = 0;j < m_functionNumber;j++) 
+        for(unsigned int j = 0;j < m_functionNumber;j++)
             m_qss->setValue(j,sav[j]);
         c[i] = (w-ret.value)/(normal-z[i]);
     }
 
     ret.derivative = 0;
-    for(unsigned int j = 0;j < m_functionNumber;j++) 
+    for(unsigned int j = 0;j < m_functionNumber;j++)
         ret.derivative+=c[j]*mz[j];
     delete[] sav;
     delete[] zz;
@@ -160,7 +160,7 @@ qss2::qss2(const AtomicModel& p_model,
     m_active = toBoolean(active);
 
     const Map& variables = toMapValue(events.get("variables"));
-    const MapValue& lst = variables->getValue();
+    const MapValue& lst = variables.value();
 
     m_functionNumber = lst.size();
 
@@ -177,10 +177,10 @@ qss2::qss2(const AtomicModel& p_model,
 
     for (MapValue::const_iterator it = lst.begin(); it != lst.end();
          ++it) {
-        const Set& tab(toSetValue(it->second));
+        const Set& tab(toSetValue(*it->second));
 
-        unsigned int index = toInteger(tab->getValue(0));
-        double init = toDouble(tab->getValue(1));
+        unsigned int index = toInteger(tab.get(0));
+        double init = toDouble(tab.get(1));
         m_variableIndex[it->first] = index;
         m_variableName[index] = it->first;
         m_initialValueList.push_back(std::pair < unsigned int, double >(
@@ -249,7 +249,7 @@ void qss2::setSigma(unsigned int i,const Time & p_time)
 }
 
 void qss2::setValue(unsigned int i,double p_value)
-{  
+{
     m_value[i] = p_value;
 }
 
@@ -333,7 +333,7 @@ bool qss2::intermediaire(double a,double b,double c,double cp,double& s)
                 s = s1;
                 return true;
             }
-            else 
+            else
             {
                 s = s2;
                 return true;
@@ -382,7 +382,7 @@ void qss2::init2()
         m_derivative2[i] = res.derivative;
 
         m_index2[i] = m_derivative[i];
-        if (fabs(m_derivative2[i]) < m_threshold) 
+        if (fabs(m_derivative2[i]) < m_threshold)
             setSigma(i,Time::infinity);
         else
             setSigma(i,Time(sqrt(2*m_precision/fabs(m_derivative2[i]))));
@@ -437,7 +437,7 @@ void qss2::internalTransition(const Time& time)
     unsigned int i = m_currentModel;
     Couple input;
 
-    //  std::cout << "[" << i << "] int at " 
+    //  std::cout << "[" << i << "] int at "
     //	    << time << std::endl;
 
     input.value = m_value[i]+m_derivative[i]*m_sigma[i].getValue()
@@ -445,7 +445,7 @@ void qss2::internalTransition(const Time& time)
     input.derivative = m_derivative[i]+m_derivative2[i]*m_sigma[i].getValue();
 
     //   std::cout << time
-    // 	    << " : " << input.value << " ; " 
+    // 	    << " : " << input.value << " ; "
     // 	    << input.derivative << std::endl;
 
 
@@ -465,7 +465,7 @@ void qss2::internalTransition(const Time& time)
     else m_sigma[i] = Time(sqrt(2*m_precision/fabs(m_derivative2[i])));
     setLastTime(i, time);
 
-    // Mise à jour des autres équations    
+    // Mise à jour des autres équations
     for (unsigned int j = 0;j < m_functionNumber;j++) {
         double e = (time - getLastTime(j)).getValue();
 
@@ -514,14 +514,14 @@ void qss2::externalTransition(const ExternalEventList& event,
     }
 }
 
-Value qss2::observation(const ObservationEvent& event) const
+Value* qss2::observation(const ObservationEvent& event) const
 {
     //  unsigned int i = to_int(event->getPortName());
     unsigned int i = m_variableIndex.find(event.getPortName())->second;
     double e = (event.getTime()-m_lastTime[i]).getValue();
     double x = m_value[i]+m_derivative[i]*e+m_derivative2[i]/2*e*e;
 
-    return DoubleFactory::create(x);
+    return Double::create(x);
 }
 
 }} // namespace vle extension

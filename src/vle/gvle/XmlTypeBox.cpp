@@ -31,12 +31,12 @@ namespace vle
 {
 namespace gvle {
 
-XmlTypeBox::XmlTypeBox(value::XMLFactory* xml):
+XmlTypeBox::XmlTypeBox(value::Xml* xml):
         Gtk::Dialog("XML",true,true),
         mValue(xml)
 {
     makeBox();
-    mBuff->set_text(xml->toString());
+    mBuff->set_text(xml->writeToString());
 
     set_size_request(350, 350);
     show_all();

@@ -419,7 +419,7 @@ private:
     LaunchSimulationBox*  mSimulationBox;
 };
 
-std::string valuetype_to_string(value::ValueBase::type type);
+std::string valuetype_to_string(value::Value::type type);
 
 }
 } // namespace vle gvle

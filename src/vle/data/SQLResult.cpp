@@ -27,10 +27,10 @@
 
 namespace vle { namespace data {
 
-    SQLResult::SQLResult(sqlxx::CSQLResult* r):value(r) { 
+    SQLResult::SQLResult(sqlxx::CSQLResult* r):value(r) {
     }
 
-    SQLResult::~SQLResult() { 
+    SQLResult::~SQLResult() {
     }
 
     bool SQLResult::next() {

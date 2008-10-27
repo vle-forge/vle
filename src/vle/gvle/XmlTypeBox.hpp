@@ -36,7 +36,7 @@ namespace gvle {
 class XmlTypeBox : public Gtk::Dialog
 {
 public:
-    XmlTypeBox(value::XMLFactory*);
+    XmlTypeBox(value::Xml*);
     XmlTypeBox(std::string&);
 
     virtual ~XmlTypeBox();
@@ -48,7 +48,7 @@ private:
     Gtk::TextView* mView;
     Gtk::ScrolledWindow mScrolledWindow;
 
-    value::XMLFactory* mValue;
+    value::Xml* mValue;
     std::string* mXml;
 
     void makeBox();

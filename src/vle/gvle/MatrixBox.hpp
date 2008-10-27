@@ -42,7 +42,7 @@ namespace gvle {
 class MatrixBox : public Gtk::Dialog
 {
 public:
-    MatrixBox(value::MatrixFactory* matrix);
+    MatrixBox(value::Matrix* matrix);
     virtual ~MatrixBox();
 
     void run();
@@ -53,8 +53,8 @@ private:
     Gtk::Table* mTable;
     array_type* mArray;
 
-    value::MatrixFactory* mValue;
-    value::Value mBackup;
+    value::Matrix* mValue;
+    value::Value* mBackup;
 
     void makeTable();
 

@@ -68,12 +68,12 @@ namespace vle { namespace data {
 
         // liste des colonnes dans le vecteur résultat
         std::vector < int > selectionList;
-        // correspondance entre indice des colonnes et l'indice 
-        // dans le vecteur de résultat     
-        std::map < int, int > selectionIndexMap; 
+        // correspondance entre indice des colonnes et l'indice
+        // dans le vecteur de résultat
+        std::map < int, int > selectionIndexMap;
         // correspondance entre le nom de la colonne et l'indice de la colonne
         // (sous-ensemble de columnNameMap)
-        std::map < std::string, std::pair < int,bool > > selectionNameMap;      
+        std::map < std::string, std::pair < int,bool > > selectionNameMap;
         std::map < std::string, std::list < std::string > > distinctMap;
         std::vector < std::string > result;
 

@@ -37,7 +37,7 @@
 
 namespace vle {
 
-    /** 
+    /**
      * @brief This namespace provides access to undefined type. At this
      * time we propose database via an ODBC driver (libsqlxx) and a CSV files
      * access.

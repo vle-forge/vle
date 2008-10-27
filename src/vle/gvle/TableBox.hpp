@@ -37,7 +37,7 @@ namespace gvle {
 class TableBox : public Gtk::Dialog
 {
 public:
-    TableBox(value::TableFactory* table);
+    TableBox(value::Table* table);
     virtual ~TableBox();
 
     void run();
@@ -49,7 +49,7 @@ private:
     Gtk::Table* mTable;
     array_type* mArray;
 
-    value::TableFactory* mValue;
+    value::Table* mValue;
 
 
     void makeTable();

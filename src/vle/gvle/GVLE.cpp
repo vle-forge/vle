@@ -631,40 +631,40 @@ void GVLE::onShowAbout()
     box.run();
 }
 
-std::string valuetype_to_string(value::ValueBase::type type)
+std::string valuetype_to_string(value::Value::type type)
 {
     switch (type) {
-    case(value::ValueBase::BOOLEAN):
+    case(value::Value::BOOLEAN):
         return "boolean";
         break;
-    case(value::ValueBase::INTEGER):
+    case(value::Value::INTEGER):
         return "integer";
         break;
-    case(value::ValueBase::DOUBLE):
+    case(value::Value::DOUBLE):
         return "double";
         break;
-    case(value::ValueBase::STRING):
+    case(value::Value::STRING):
         return "string";
         break;
-    case(value::ValueBase::SET):
+    case(value::Value::SET):
         return "set";
         break;
-    case(value::ValueBase::MAP):
+    case(value::Value::MAP):
         return "map";
         break;
-    case(value::ValueBase::TUPLE):
+    case(value::Value::TUPLE):
         return "tuple";
         break;
-    case(value::ValueBase::TABLE):
+    case(value::Value::TABLE):
         return "table";
         break;
-    case(value::ValueBase::XMLTYPE):
+    case(value::Value::XMLTYPE):
         return "xml";
         break;
-    case(value::ValueBase::NIL):
+    case(value::Value::NIL):
         return "null";
         break;
-    case(value::ValueBase::MATRIX):
+    case(value::Value::MATRIX):
         return "matrix";
         break;
     default:

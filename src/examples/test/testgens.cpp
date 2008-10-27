@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(test_gens)
 
     /* begin check */
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
-    oov::OutputMatrixViewList out(r.outputs());
+    oov::OutputMatrixViewList& out(r.outputs());
     BOOST_REQUIRE_EQUAL(out.size(),
                         (oov::OutputMatrixViewList::size_type)2);
 
@@ -66,12 +66,12 @@ BOOST_AUTO_TEST_CASE(test_gens)
     oov::OutputMatrix& view1(out["view1"]);
 
     /* check matrix */
-    value::MatrixFactory::MatrixView result(view1.values());
+    value::MatrixView result(view1.values());
 
     BOOST_REQUIRE_EQUAL(result.shape()[0],
-                        (value::MatrixFactory::MatrixView::size_type)3);
+                        (value::MatrixView::size_type)3);
     BOOST_REQUIRE_EQUAL(result.shape()[1],
-                        (value::MatrixFactory::MatrixView::size_type)101);
+                        (value::MatrixView::size_type)101);
 
     BOOST_REQUIRE_EQUAL(value::toDouble(result[0][0]), 0);
     BOOST_REQUIRE_EQUAL(value::toDouble(result[1][0]), 0);
@@ -82,16 +82,18 @@ BOOST_AUTO_TEST_CASE(test_gens)
     BOOST_REQUIRE_EQUAL(value::toInteger(result[2][10]), 11);
 
     BOOST_REQUIRE_EQUAL(value::toDouble(result[0][14]), 14);
-    BOOST_REQUIRE_EQUAL(result[1][14].get(), (value::ValueBase*)0);
+    BOOST_REQUIRE_EQUAL(result[1][14], (value::Value*)0);
     BOOST_REQUIRE_EQUAL(value::toInteger(result[2][14]), 15);
 
     BOOST_REQUIRE_EQUAL(value::toDouble(result[0][31]), 31);
-    BOOST_REQUIRE_EQUAL(result[1][31].get(), (value::ValueBase*)0);
+    BOOST_REQUIRE_EQUAL(result[1][31], (value::Value*)0);
     BOOST_REQUIRE_EQUAL(value::toInteger(result[2][31]), 32);
 
     BOOST_REQUIRE_EQUAL(value::toDouble(result[0][100]), 100);
     BOOST_REQUIRE_EQUAL(value::toDouble(result[1][100]), 2550);
     BOOST_REQUIRE_EQUAL(value::toInteger(result[2][100]), 1);
+
+    vle::utils::finalize();
 }
 
 BOOST_AUTO_TEST_CASE(test_gens_with_class)
@@ -110,10 +112,11 @@ BOOST_AUTO_TEST_CASE(test_gens_with_class)
     /* run the simulation */
     manager::RunVerbose r(std::cerr);
     r.start(file);
+    file = 0;
 
     /* begin check */
     BOOST_REQUIRE_EQUAL(r.haveError(), false);
-    oov::OutputMatrixViewList out(r.outputs());
+    oov::OutputMatrixViewList& out(r.outputs());
     BOOST_REQUIRE_EQUAL(out.size(),
                         (oov::OutputMatrixViewList::size_type)2);
 
@@ -121,12 +124,12 @@ BOOST_AUTO_TEST_CASE(test_gens_with_class)
     oov::OutputMatrix& view1(out["view1"]);
 
     /* check matrix */
-    value::MatrixFactory::MatrixView result(view1.values());
+    value::MatrixView result(view1.values());
 
     BOOST_REQUIRE_EQUAL(result.shape()[0],
-                        (value::MatrixFactory::MatrixView::size_type)3);
+                        (value::MatrixView::size_type)3);
     BOOST_REQUIRE_EQUAL(result.shape()[1],
-                        (value::MatrixFactory::MatrixView::size_type)101);
+                        (value::MatrixView::size_type)101);
 
     BOOST_REQUIRE_EQUAL(value::toDouble(result[0][0]), 0);
     BOOST_REQUIRE_EQUAL(value::toDouble(result[1][0]), 0);
@@ -137,7 +140,7 @@ BOOST_AUTO_TEST_CASE(test_gens_with_class)
     BOOST_REQUIRE_EQUAL(value::toInteger(result[2][5]), 7);
 
     BOOST_REQUIRE_EQUAL(value::toDouble(result[0][7]), 7);
-    BOOST_REQUIRE_EQUAL(result[1][7].get(), (value::ValueBase*)0);
+    BOOST_REQUIRE_EQUAL(result[1][7], (value::Value*)0);
     BOOST_REQUIRE_EQUAL(value::toInteger(result[2][7]), 9);
 
     BOOST_REQUIRE_EQUAL(value::toDouble(result[0][15]), 15);
@@ -147,4 +150,6 @@ BOOST_AUTO_TEST_CASE(test_gens_with_class)
     BOOST_REQUIRE_EQUAL(value::toDouble(result[0][100]), 100);
     BOOST_REQUIRE_EQUAL(value::toDouble(result[1][100]), 11400);
     BOOST_REQUIRE_EQUAL(value::toInteger(result[2][100]), 2);
+
+    vle::utils::finalize();
 }

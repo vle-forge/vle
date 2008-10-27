@@ -78,7 +78,7 @@ namespace vle { namespace extension {
             const vle::devs::ExternalEventList& event,
             const vle::devs::Time& time);
 
-        virtual vle::value::Value observation(
+        virtual vle::value::Value* observation(
             const vle::devs::ObservationEvent& event) const;
 
         virtual void request(const vle::devs::RequestEvent& event,
@@ -87,7 +87,7 @@ namespace vle { namespace extension {
 
     private:
 	void updateExternalVariable(const vle::devs::Time& time);
-	
+
     protected:
         enum thresholdType { UP, DOWN };
         typedef std::map < std::string, std::pair < double, thresholdType > >
@@ -106,7 +106,7 @@ namespace vle { namespace extension {
         virtual void updateValue(bool external, const vle::devs::Time& time) =0;
 
         inline void setGradient(const std::string& name, double gradient)
-        { mExternalVariableGradient[name] = gradient; }	
+        { mExternalVariableGradient[name] = gradient; }
 
 	bool mUseGradient;
         bool mActive;
@@ -138,7 +138,7 @@ namespace vle { namespace extension {
 	int mSize;
 	valueBuffer mValueBuffer;
 	std::map < std::string, valueBuffer > mExternalValueBuffer;
-	
+
         /** State */
         double mGradient;
         devs::Time mSigma;

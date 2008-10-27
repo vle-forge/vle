@@ -28,27 +28,30 @@
 #include <vle/utils/Algo.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/value/Set.hpp>
+#include <boost/utility.hpp>
 
 namespace vle { namespace vpz {
 
-value::Value ValueList::get(const std::string& name)
+void ValueList::add(const std::string& key, const value::Value* val)
 {
+    std::pair < iterator, bool > x;
+
+    x = m_lst.insert(
+        std::make_pair < std::string, const value::Value* >(key, val));
+
+    Assert(utils::ArgError, x.second, boost::format(
+            "Initialization port '%1%' already exist") % key);
+}
+
+const value::Value& ValueList::get(const std::string& name)
+{ // TODO delete this function.
     iterator it;
     if ((it = m_lst.find(name)) == end()) {
         Throw(utils::ArgError, boost::format(
                 "Initialization port '%1%' does not exist") % name);
     }
-    return it->second;
-}
-
-void ValueList::add(const std::string& key, const value::Value& val)
-{
-    std::pair < iterator, bool > x;
-
-    x = m_lst.insert(std::make_pair < std::string, value::Value >(key, val));
-
-    Assert(utils::ArgError, x.second, boost::format(
-            "Initialization port '%1%' already exist") % key);
+    assert(it->second);
+    return *it->second;
 }
 
 const value::Value& ValueList::get(const std::string& name) const
@@ -58,7 +61,8 @@ const value::Value& ValueList::get(const std::string& name) const
         Throw(utils::ArgError, boost::format(
                 "Initilization port '%1%' does not exist") % name);
     }
-    return it->second;
+    assert(it->second);
+    return *it->second;
 }
 
 Condition::Condition(const std::string& name) :
@@ -75,8 +79,15 @@ Condition::Condition(const Condition& cnd) :
 {
     for (ConditionValues::const_iterator it = cnd.m_list.begin();
          it != cnd.m_list.end(); ++it) {
-        m_list[it->first] = toSetValue(it->second->clone());
+        assert(it->second);
+        m_list[it->first] = dynamic_cast < value::Set*>(it->second->clone());
     }
+}
+
+Condition::~Condition()
+{
+    utils::for_each(m_list.begin(), m_list.end(),
+                   boost::checked_deleter < value::Set >());
 }
 
 void Condition::write(std::ostream& out) const
@@ -90,10 +101,12 @@ void Condition::write(std::ostream& out) const
             << "name=\"" << it->first.c_str() << "\" "
             << ">\n";
 
-        const value::VectorValue& val(value::toSet(it->second));
+        assert(it->second);
+        const value::VectorValue& val(value::toSet(*it->second));
         for (value::VectorValue::const_iterator jt = val.begin();
              jt != val.end(); ++jt) {
-            out << (*jt)->toXML().c_str() << "\n";
+            (*jt)->writeXml(out);
+            out << "\n";
         }
         out << "</port>\n";
     }
@@ -109,8 +122,8 @@ void Condition::portnames(std::list < std::string >& lst) const
 
 void Condition::add(const std::string& portname)
 {
-    m_list.insert(std::make_pair < std::string, value::Set >(
-            portname, value::SetFactory::create()));
+    m_list.insert(std::make_pair < std::string, value::Set* >(
+            portname, value::Set::create()));
     m_last_port.assign(portname);
 }
 
@@ -120,19 +133,36 @@ void Condition::del(const std::string& portname)
 }
 
 void Condition::addValueToPort(const std::string& portname,
+                               value::Value* value)
+{
+    ConditionValues::iterator it = m_list.find(portname);
+
+    if (it == m_list.end()) {
+        value::Set* newset = value::Set::create();
+        newset->add(value);
+
+        m_list.insert(std::make_pair < std::string, value::Set* >(
+                portname, newset));
+        m_last_port.assign(portname);
+    } else {
+        it->second->add(value);
+    }
+}
+
+void Condition::addValueToPort(const std::string& portname,
                                const value::Value& value)
 {
     ConditionValues::iterator it = m_list.find(portname);
 
     if (it == m_list.end()) {
-        value::Set newset = value::SetFactory::create();
-        newset->addValue(value);
+        value::Set* newset = value::Set::create();
+        newset->add(value);
 
-        m_list.insert(std::make_pair < std::string, value::Set >(
+        m_list.insert(std::make_pair < std::string, value::Set* >(
                 portname, newset));
         m_last_port.assign(portname);
     } else {
-        it->second->addValue(value);
+        it->second->add(value);
     }
 }
 
@@ -145,7 +175,7 @@ void Condition::setValueToPort(const std::string& portname,
            m_name % portname);
 
     it->second->clear();
-    it->second->addValue(value);
+    it->second->add(value);
 }
 
 void Condition::clearValueOfPort(const std::string& portname)
@@ -166,7 +196,7 @@ ValueList Condition::firstValues() const
          m_list.end();
          ++it) {
         if (it->second->size() > 0) {
-            result.add(it->first, it->second->getValue(0));
+            result.add(it->first, &it->second->get(0));
         } else {
             Throw(utils::ArgError, (boost::format(
                         "Build a empty first values for condition %1%.") %
@@ -184,18 +214,31 @@ const value::Set& Condition::getSetValues(const std::string& portname) const
            boost::format("Condition %1% have no port %2%") %
            m_name % portname);
 
-    return it->second;
+    assert(it->second);
+    return *it->second;
+}
+
+value::Set& Condition::getSetValues(const std::string& portname)
+{
+    ConditionValues::iterator it = m_list.find(portname);
+
+    Assert(utils::ArgError, it != m_list.end(),
+           boost::format("Condition %1% have no port %2%") %
+           m_name % portname);
+
+    assert(it->second);
+    return *it->second;
 }
 
 const value::Value& Condition::firstValue(const std::string& portname) const
 {
-    return getSetValues(portname)->getValue(0);
+    return getSetValues(portname).get(0);
 }
 
 const value::Value& Condition::nValue(const std::string& portname,
                                       size_t i) const
 {
-    return getSetValues(portname)->getValue(i);
+    return getSetValues(portname).get(i);
 }
 
 value::Set& Condition::lastAddedPort()
@@ -206,14 +249,15 @@ value::Set& Condition::lastAddedPort()
            boost::format("Condition %1% have no port %2%") %
            m_name % m_last_port);
 
-    return it->second;
+    assert(it->second);
+    return *it->second;
 }
 
 void Condition::rebuildValueSet()
 {
     for (ConditionValues::iterator it = m_list.begin(); it != m_list.end();
          ++it) {
-        it->second = value::SetFactory::create();
+        it->second = value::Set::create();
     }
 }
 

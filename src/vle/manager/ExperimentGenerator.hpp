@@ -38,13 +38,13 @@
 
 namespace vle { namespace manager {
 
-    /** 
+    /**
      * @brief A class to translate Experiment file into Instance of Experiment.
      */
     class ExperimentGenerator
     {
     public:
-        /** 
+        /**
          * @brief Build a experimental frame base on the const vpz::Vpz give in
          * parameters. It allows to build a combination of value from this
          * vpz::Vpz.
@@ -69,9 +69,9 @@ namespace vle { namespace manager {
         void build(Glib::Mutex* mutex, Glib::Cond* prod,
                    OutputSimulationMatrix* matrix);
 
-        /** 
+        /**
          * @brief Save the generated VPZ instance file.
-         * 
+         *
          * @param save true to save the files, otherwise, this file are remove.
          * The default option is to remove file.
          */
@@ -79,25 +79,25 @@ namespace vle { namespace manager {
         { mSaveVpz = save; }
 
     protected:
-        /** 
+        /**
          * @brief Build just one condition based on information of VPZ file.
          */
         virtual void buildCombination(size_t& nb) = 0;
 
-        /** 
+        /**
          * @brief Get the number of combination from vpz file.
          * @return A value greater than 0.
          */
         virtual size_t getCombinationNumber() const = 0;
-        
+
         /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-        /** 
+        /**
          * @brief Build a list of replicas based on information of VPZ file.
          */
         void buildReplicasList();
 
-        /** 
+        /**
          * @brief Build a list of conditions based on information of VPZ file.
          */
         void buildConditionsList();
@@ -106,7 +106,7 @@ namespace vle { namespace manager {
 
         void buildCombinationsFromReplicas(size_t cmbnumber);
 
-        /** 
+        /**
          * @brief Build an instance of the current specified vpz file and push
          * it into the output list. This function use the Glib::Mutex and
          * Glib::Cond to protect the access to data.
@@ -114,8 +114,8 @@ namespace vle { namespace manager {
          * @param replnumber the number of the replicas.
          */
         void writeInstanceThread(size_t cmbnumber, size_t replnumber);
-        
-        /** 
+
+        /**
          * @brief Build an instance of the current specified vpz file and push
          * it into the output list.
          * @param cmbnumber the index of the combination.
@@ -123,7 +123,7 @@ namespace vle { namespace manager {
          */
         void writeInstance(size_t cmbnumber, size_t replnumber);
 
-        /** 
+        /**
          * @brief Get the number of replicas from vpz file.
          * @return A value greater than 0.
          */
@@ -132,7 +132,7 @@ namespace vle { namespace manager {
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     protected:
-        /** 
+        /**
          * @brief Define a condition used to generate combination list.
          */
         struct cond_t {

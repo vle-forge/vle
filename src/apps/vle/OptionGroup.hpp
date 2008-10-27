@@ -31,7 +31,7 @@
 
 namespace vle { namespace apps {
 
-    /** 
+    /**
      * @brief An abstract class to force checking of attributes members.
      */
     class VLEOptionGroup : public Glib::OptionGroup
@@ -41,19 +41,19 @@ namespace vle { namespace apps {
                        const Glib::ustring& description,
                        const Glib::ustring& help_description =
                        Glib::ustring()) :
-            Glib::OptionGroup(name, description, help_description) 
+            Glib::OptionGroup(name, description, help_description)
         { }
 
         virtual ~VLEOptionGroup() { }
 
-        /** 
+        /**
          * @brief A function to throw exception when an error occured in
          * attributes members.
          */
         virtual void check() { }
     };
 
-    /** 
+    /**
      * @brief Manage the command option, manager, simulator and justrun
      * simulator.
      */
@@ -73,8 +73,8 @@ namespace vle { namespace apps {
         inline int port() const { return mPort; }
 
         inline int processor() const { return mProcess; }
-        
-        /** 
+
+        /**
          * @brief Check if only on mode is active.
          *
          * @throw Exception::Internal two or three modes are actives.
@@ -89,7 +89,7 @@ namespace vle { namespace apps {
         int     mProcess;
     };
 
-    /** 
+    /**
      * @brief Options for manager, ie. run in daemon and all simulation in
      * local vle::Simulator.
      */
@@ -101,9 +101,9 @@ namespace vle { namespace apps {
         virtual ~ManagerOptionGroup() { }
 
         inline bool allInLocal() const { return mAllinlocal; }
-        
+
         inline bool savevpz() const { return mSaveVpz; }
-        
+
         virtual void check();
 
     private:
@@ -111,7 +111,7 @@ namespace vle { namespace apps {
         bool    mSaveVpz;
     };
 
-    /** 
+    /**
      * @brief Global option for all commands, informations, help, version and
      * the verbose mode.
      */
@@ -128,7 +128,7 @@ namespace vle { namespace apps {
 
         inline int verbose() const { return mVerbose; }
 
-        /** 
+        /**
          * @brief Check if verbose number mode is correct.
          *
          * @throw Exception::Internal if number is not in range [0 - 3].

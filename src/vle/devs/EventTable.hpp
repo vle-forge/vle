@@ -39,7 +39,6 @@
 #include <vector>
 #include <list>
 #include <set>
-#include <deque>
 
 namespace vle { namespace devs {
 
@@ -78,12 +77,17 @@ namespace vle { namespace devs {
     public:
 	inline EventBagModel() :
 	    _intev(0)
-	{ }
+	{}
+
+        inline ~EventBagModel() { clear(); }
 
         inline void addInternal(InternalEvent* ev)
         { _intev = ev; }
 
         inline InternalEvent* internal()
+        { return _intev; }
+
+        inline const InternalEvent* internal() const
         { return _intev; }
 
         inline void delInternal()
@@ -94,6 +98,9 @@ namespace vle { namespace devs {
         { _extev = evs; }
 
         inline ExternalEventList& externals()
+        { return _extev; }
+
+        inline const ExternalEventList& externals() const
         { return _extev; }
 
         inline void delExternals()
@@ -107,6 +114,9 @@ namespace vle { namespace devs {
         { _instev.addEvent(evt); }
 
         inline RequestEventList& Request()
+        { return _instev; }
+
+        inline const RequestEventList& Request() const
         { return _instev; }
 
         inline void delRequest()
@@ -161,14 +171,14 @@ namespace vle { namespace devs {
         { }
 
 	/**
-	 * Return the bag for a specified model. 
+	 * Return the bag for a specified model.
 	 * @param m the specified model to search or to add.
 	 * @return a reference to the a bag or a new bag.
 	 */
         inline EventBagModel& getBag(Simulator* m)
         { return _bags[m]; }
 
-        /** 
+        /**
          * @brief Return true if the Simulator already exist in the bag.
          * @param m A reference to the simulator.
          * @return True if Simulator was find, false otherwise.
@@ -184,7 +194,7 @@ namespace vle { namespace devs {
 
         inline void addRequest(Simulator* m, const RequestEventList& lst)
         { getBag(m).addRequest(lst); }
-        
+
         inline void addRequest(Simulator* m, RequestEvent* evt)
         { getBag(m).addRequest(evt); }
 
@@ -192,7 +202,7 @@ namespace vle { namespace devs {
         inline void addState(ObservationEvent* ev)
         { _states.push_back(ev); }
 
-        
+
         inline bool empty()
         { return (_bags.empty() and _states.empty()); }
 
@@ -202,7 +212,7 @@ namespace vle { namespace devs {
         inline bool emptyStates()
         { return _states.empty(); }
 
-        /** 
+        /**
          * @brief Return a bag with the priority to the Executive model ie. the
          * first bag for a non-executive model of this CompleteEventBagModel. If
          * the size of the CompleteEventBagModel is equal to the list of
@@ -221,14 +231,11 @@ namespace vle { namespace devs {
         inline void popBag()
         { _bags.erase(_bags.begin()); }
 
-        inline void popState()
-        { _states.pop_front(); }
-
         inline void popStates()
         { _states.clear(); }
 
         void invalidateModel(Simulator*);
-        
+
         void delModel(Simulator*);
 
         void clear()
@@ -241,7 +248,7 @@ namespace vle { namespace devs {
         friend std::ostream& operator<<(std::ostream& o,
                                         const CompleteEventBagModel& c)
         {
-            o << "Nb bags: " << c._bags.size() << " Nb states: " 
+            o << "Nb bags: " << c._bags.size() << " Nb states: "
                 << c._states.size();
             return o;
         }
@@ -251,8 +258,8 @@ namespace vle { namespace devs {
         std::map < Simulator*, EventBagModel >::iterator    _itbags;
         std::list < std::map < Simulator*, EventBagModel >::value_type* > _exec;
         std::list < std::map < Simulator*, EventBagModel >::value_type* >::iterator _itexec;
-    
-        std::deque < ObservationEvent* >                    _states;
+
+        std::vector < ObservationEvent* >                    _states;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -317,7 +324,7 @@ namespace vle { namespace devs {
          * @return true.
          */
         bool putExternalEvent(ExternalEvent* event);
-        
+
         /**
          * Put an Request event into vector heap. Delete Internal event
          * from same model source if present in vector heap.
@@ -342,17 +349,17 @@ namespace vle { namespace devs {
         inline const Time& getCurrentTime() const
         { return mCurrentTime; }
 
-        /** 
+        /**
          * @brief Delete all event from Simulator.
-         * 
-         * @param mdl the model to delete events. 
+         *
+         * @param mdl the model to delete events.
          */
         void invalidateModel(Simulator* mdl);
 
-        /** 
+        /**
          * @brief Delete all event from Simulator.
-         * 
-         * @param mdl the model to delete events. 
+         *
+         * @param mdl the model to delete events.
          */
         void delModelEvents(Simulator* mdl);
 
@@ -361,7 +368,7 @@ namespace vle { namespace devs {
         typedef std::map < Simulator*,
                 std::pair < ExternalEventList, RequestEventList > >
                     ExternalEventModel;
-        
+
 	/**
 	 * Delete the first event in Internal heap.
 	 *
@@ -374,12 +381,12 @@ namespace vle { namespace devs {
 	 */
 	void popObservationEvent();
 
-        /** 
+        /**
          * @brief delete the first invalid InternalEvent from InternalEventList.
          */
         void cleanInternalEventList();
 
-        /** 
+        /**
          * @brief delete the first invalid ObservationEvent from
          * ObservationEventList.
          */

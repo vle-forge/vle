@@ -38,48 +38,48 @@ class RealCurve: public Curve
 private :
     std::vector < std::pair < double, double > > m_valueList;
     std::string const m_type;
-    
+
 public :
     RealCurve(const std::string & name,
 	      unsigned int r,
 	      unsigned int g,
-	      unsigned int b) : Curve(name, r, g, b) 
+	      unsigned int b) : Curve(name, r, g, b)
 	{ }
-    
+
     virtual ~RealCurve() { }
-    
+
     void add(double date, double value);
-    
+
     void draw(Cairo::RefPtr < Cairo::Context > ctx, Parameter & m_parameter);
-    
+
     double get_last_value() const;
-    
+
     bool is_double() { return true; }
-    
+
     int get_size() { return m_valueList.size(); }
-    
+
     void get_min_max_value(int number_value, double & min, double &
 				 max, Parameter & m_parameter);
-    
+
     double get_min_value(int number_value, Parameter & m_parameter);
-    
+
     double get_max_value(int number_value, Parameter & m_parameter);
-    
+
     int get_number_value();
-    
+
     double get_date(int index);
-    
+
     double get_value(int index);
-    
+
     void get_min_max_value_prec_index(int indice, int number_value,
 					    double & min, double & max);
-    
+
     double get_min_value_prec_index(int indice, int number_value);
-    
+
     double get_max_value_prec_index(int indice, int number_value);
-    
+
 };
-	    
+
 }}} // namespace vle oov plugin
 
 #endif

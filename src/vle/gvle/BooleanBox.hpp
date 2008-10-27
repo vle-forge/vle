@@ -36,13 +36,13 @@ namespace gvle {
 class BooleanBox : public Gtk::Dialog
 {
 public:
-    BooleanBox(value::BooleanFactory* boolean);
+    BooleanBox(value::Boolean* boolean);
     virtual ~BooleanBox();
 
     void run();
 private:
     Gtk::ComboBoxText* m_Combo;
-    value::BooleanFactory* mValue;
+    value::Boolean* mValue;
 };
 
 }

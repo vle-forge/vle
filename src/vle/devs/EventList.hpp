@@ -27,6 +27,7 @@
 #define VLE_DEVS_EVENTLIST_HPP
 
 #include <vector>
+#include <algorithm>
 #include <boost/checked_delete.hpp>
 
 namespace vle { namespace devs {

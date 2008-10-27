@@ -64,7 +64,7 @@ namespace vle { namespace utils {
 	}
 
 	double compute();
-    
+
     private:
 	double (*v_f)(double);
 	double v_a,v_b;

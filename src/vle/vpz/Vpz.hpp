@@ -135,7 +135,7 @@ namespace vle { namespace vpz {
          * @throw utils::ArgError if buffer is not a value.
          * @return value read from buffer.
          */
-        static value::Value parseValue(const std::string& buffer);
+        static value::Value* parseValue(const std::string& buffer);
 
         /**
          * @brief Parse the buffer to find a value.
@@ -152,7 +152,7 @@ namespace vle { namespace vpz {
          * @throw utils::ArgError if buffer is not a value.
          * @return a vector of values read from buffer.
          */
-        static std::vector < value::Value > parseValues(
+        static std::vector < value::Value* > parseValues(
             const std::string& buffer);
 
         /**

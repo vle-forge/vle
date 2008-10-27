@@ -30,7 +30,7 @@ namespace vle { namespace vpz {
 bool ValueStackSax::isCompositeParent() const
 {
     if (not m_valuestack.empty()) {
-        const value::Value val = m_valuestack.top();
+        const value::Value* val = m_valuestack.top();
 
         return val->isMap() or val->isSet() or val->isMatrix();
     }
@@ -71,7 +71,7 @@ void ValueStackSax::pushMap()
         AssertS(utils::SaxParserError, isCompositeParent());
     }
 
-    pushOnVectorValue(value::MapFactory::create());
+    pushOnVectorValue(value::Map::create());
 }
 
 void ValueStackSax::pushMapKey(const std::string& key)
@@ -89,21 +89,21 @@ void ValueStackSax::pushSet()
         AssertS(utils::SaxParserError, isCompositeParent());
     }
 
-    pushOnVectorValue(value::SetFactory::create());
+    pushOnVectorValue(value::Set::create());
 }
 
-void ValueStackSax::pushMatrix(value::MatrixFactory::index col,
-                               value::MatrixFactory::index row,
-                               value::MatrixFactory::index colmax,
-                               value::MatrixFactory::index rowmax,
-                               value::MatrixFactory::index colstep,
-                               value::MatrixFactory::index rowstep)
+void ValueStackSax::pushMatrix(value::Matrix::index col,
+                               value::Matrix::index row,
+                               value::Matrix::index colmax,
+                               value::Matrix::index rowmax,
+                               value::Matrix::index colstep,
+                               value::Matrix::index rowstep)
 {
     if (not m_valuestack.empty()) {
         AssertS(utils::SaxParserError, isCompositeParent());
     }
 
-    pushOnVectorValue(value::MatrixFactory::create(col, row, colmax, rowmax,
+    pushOnVectorValue(value::Matrix::create(col, row, colmax, rowmax,
                                                    colstep, rowstep));
 }
 
@@ -113,7 +113,7 @@ void ValueStackSax::pushTuple()
         AssertS(utils::SaxParserError, isCompositeParent());
     }
 
-    pushOnVectorValue(value::TupleFactory::create());
+    pushOnVectorValue(value::Tuple::create());
 }
 
 void ValueStackSax::pushTable(const size_t width, const size_t height)
@@ -122,7 +122,7 @@ void ValueStackSax::pushTable(const size_t width, const size_t height)
         AssertS(utils::SaxParserError, isCompositeParent());
     }
 
-    pushOnVectorValue(value::TableFactory::create(width, height));
+    pushOnVectorValue(value::Table::create(width, height));
 }
 
 void ValueStackSax::pushXml()
@@ -146,7 +146,7 @@ void ValueStackSax::popValue()
     }
 }
 
-const value::Value& ValueStackSax::topValue()
+value::Value* ValueStackSax::topValue()
 {
     Assert(utils::SaxParserError, not m_valuestack.empty(),
            "Empty sax parser value stack for the top operation");
@@ -154,22 +154,19 @@ const value::Value& ValueStackSax::topValue()
     return m_valuestack.top();
 }
 
-void ValueStackSax::pushOnVectorValue(const value::Value& val)
+void ValueStackSax::pushOnVectorValue(value::Value* val)
 {
     if (not m_valuestack.empty()) {
         if (m_valuestack.top()->isSet()) {
-            value::toSetValue(m_valuestack.top())->addValue(val);
+            m_valuestack.top()->toSet().add(val);
         } else if (m_valuestack.top()->isMap()) {
-            value::toMapValue(m_valuestack.top())->addValue(
-                m_lastkey, val);
+            m_valuestack.top()->toMap().add(m_lastkey, val);
         } else if (m_valuestack.top()->isMatrix()) {
-            value::Matrix mx = value::toMatrixValue(m_valuestack.top());
-            if (val->isNull()) {
-                mx->addValueToLastCell(value::Value());
-            } else {
-                mx->addValueToLastCell(val);
+            value::Matrix& mx(m_valuestack.top()->toMatrix());
+            if (not val->isNull()) {
+                mx.addToLastCell(val);
             }
-            mx->moveLastCell();
+            mx.moveLastCell();
         }
     } else {
         m_result.push_back(val);
@@ -178,6 +175,10 @@ void ValueStackSax::pushOnVectorValue(const value::Value& val)
     if (val->isSet() or val->isMap() or val->isTuple() or val->isTable() or
         val->isMatrix()) {
         m_valuestack.push(val);
+    }
+
+    if (val->isNull()) {
+        delete val;
     }
 }
 

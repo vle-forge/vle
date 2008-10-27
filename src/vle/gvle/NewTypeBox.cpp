@@ -69,35 +69,35 @@ void NewTypeBox::run()
     int ret = Gtk::Dialog::run();
     if (ret == Gtk::RESPONSE_APPLY) {
         if (m_Combo->get_active_text() == "Boolean") {
-            *mVal = BooleanFactory::create();
+            mVal = Boolean::create();
         } else if (m_Combo->get_active_text() == "Double") {
-            *mVal = DoubleFactory::create();
+            mVal = Double::create();
         } else if (m_Combo->get_active_text() == "Integer") {
-            *mVal = IntegerFactory::create();
+            mVal = Integer::create();
         } else if (m_Combo->get_active_text() == "Matrix") {
             SimpleTypeBox box("columns ?");
             int cols = utils::to_int(box.run());
             SimpleTypeBox box2("rows ?");
             int rows = utils::to_int(box2.run());
-            *mVal = MatrixFactory::create(cols, rows, cols*2, rows*2, cols/5, rows/5);
+            mVal = Matrix::create(cols, rows, cols*2, rows*2, cols/5, rows/5);
         } else if (m_Combo->get_active_text() == "Map") {
-            *mVal = MapFactory::create();
+            mVal = Map::create();
         } else if (m_Combo->get_active_text() == "Null") {
-            *mVal = NullFactory::create();
+            mVal = Null::create();
         } else if (m_Combo->get_active_text() == "Set") {
-            *mVal = SetFactory::create();
+            mVal = Set::create();
         } else if (m_Combo->get_active_text() == "String") {
-            *mVal = StringFactory::create();
+            mVal = String::create();
         } else if (m_Combo->get_active_text() == "Table") {
             SimpleTypeBox box("Width ?");
             int w = utils::to_int(box.run());
             SimpleTypeBox box2("Height ?");
             int h = utils::to_int(box2.run());
-            *mVal = TableFactory::create(w, h);
+            mVal = Table::create(w, h);
         } else if (m_Combo->get_active_text() == "Tuple") {
-            *mVal = TupleFactory::create();
+            mVal = Tuple::create();
         } else if (m_Combo->get_active_text() == "Xml") {
-            *mVal = XMLFactory::create();
+            mVal = Xml::create();
         }
     }
 }

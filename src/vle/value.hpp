@@ -23,10 +23,11 @@
  */
 
 
-#ifndef VLE_VALUE_VALUE_HPP
-#define VLE_VALUE_VALUE_HPP
+#ifndef VLE_COMMON_VALUE_VALUE_HPP
+#define VLE_COMMON_VALUE_VALUE_HPP
 
 #include <vle/value/Boolean.hpp>
+#include <vle/value/Deleter.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
 #include <vle/value/Map.hpp>
@@ -43,11 +44,14 @@
 
 namespace vle {
 
-    /** 
-     * @brief The value namespace is used to wrap datas (boolean, integer,
-     * real, string, xml, array, map and set) which are shared by external,
-     * initial and state event. All class are manager using a reference counter
-     * from Boost.org: boost::shared_ptr < type >.
+    /**
+     * @brief The value namespace is used to wrap datas, like single
+     * type (long, bool, double), class (std::string, std::vector < double >)
+     * and composite values (std::set < Value* >, std::map < std::string,
+     * Value * > >. This values are used:
+     * - initial events.
+     * - external events.
+     * - observations.
      */
     namespace value {
 

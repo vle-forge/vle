@@ -84,7 +84,7 @@ namespace vle { namespace extension {
         virtual void internalTransition(const vle::devs::Time& /* event */);
         virtual void externalTransition(const vle::devs::ExternalEventList& /* event */,
                                         const vle::devs::Time& /* time */);
-        virtual vle::value::Value observation(const vle::devs::ObservationEvent& /* event */) const;
+        virtual vle::value::Value* observation(const vle::devs::ObservationEvent& /* event */) const;
 
     private:
         bool m_active;

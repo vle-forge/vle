@@ -58,6 +58,12 @@ namespace vle { namespace utils {
         static Trace& trace()
         { if (not m_trace) m_trace = new Trace; return *m_trace; }
 
+        /**
+         * @brief Initialize the Trace singleton.
+         */
+        static void init()
+        { trace(); }
+
 	/**
 	 * @brief Delete Trace object instiate from function trace().
 	 */
@@ -124,7 +130,7 @@ namespace vle { namespace utils {
                 utils::Trace::DEBUG : level;
         }
 
-        /** 
+        /**
          * @brief Return true if the specified level is between [ALWAYS, level].
          * @param level the specified level to test.
          * @return true if the specified level is between ALWAYS and level,
@@ -133,7 +139,7 @@ namespace vle { namespace utils {
         inline bool isInLevel(Level level)
         { return ALWAYS <= level and level <= m_minlevel; }
 
-        /** 
+        /**
          * @brief Return true if warning are flushed in the stream. Warnigs are
          * defined like not ALWAYS.
          * @return true if one or more warning are flushed.
@@ -141,14 +147,14 @@ namespace vle { namespace utils {
         inline bool haveWarning() const
         { return m_warnings > 0; }
 
-        /** 
+        /**
          * @brief Return the number of warnings.
          * @return the number of warnings.
          */
         inline unsigned int warnings() const
         { return m_warnings; }
 
-        /** 
+        /**
          * @brief Get the current stream.
          * @return The current stream where push data.
          * @throw utils::InternalError if current stream is empty.

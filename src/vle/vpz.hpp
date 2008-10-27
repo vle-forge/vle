@@ -59,7 +59,7 @@
 
 namespace vle {
 
-    /** 
+    /**
      * @brief The namespace vpz is use to parse and to write the VPZ (vle
      * project file zipped) XML file. vpz uses the Sax parser of the libxml++ to
      * read VPZ format, Value format and Trame format from a stream.

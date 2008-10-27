@@ -33,21 +33,21 @@ namespace vle { namespace oov {
     class OOV
     {
     public:
-        /** 
+        /**
          * @brief Print the informations of VLE framework.
-         * 
+         *
          * @param out stream to put information.
          */
         static void printInformations(std::ostream& out);
 
-        /** 
+        /**
          * @brief Print the version of VLE framework.
-         * 
+         *
          * @param out stream to put information.
          */
         static void printVersion(std::ostream& out);
     };
 
-}} // namespace vle oov 
+}} // namespace vle oov
 
 #endif

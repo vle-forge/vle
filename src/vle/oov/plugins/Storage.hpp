@@ -44,7 +44,7 @@ namespace vle { namespace oov { namespace plugin {
 
         virtual bool isSerializable() const;
 
-        /** 
+        /**
          * @brief Serialize the storage plugin data's to and output values. The
          * serialization is defined like:
          * @code
@@ -67,9 +67,9 @@ namespace vle { namespace oov { namespace plugin {
          * @param pluginname Name of this plugins
          * @return The serialized Storage plugin data's.
          */
-        virtual value::Value serialize() const;
+        virtual value::Value* serialize() const;
 
-        virtual void deserialize(value::Value& vals);
+        virtual void deserialize(const value::Value& vals);
 
         /*
          * override the oov::OutputMatrix function to get the result of a
@@ -95,27 +95,27 @@ namespace vle { namespace oov { namespace plugin {
         virtual void close(const vpz::EndTrame& trame);
 
 
-        /** 
+        /**
          * @brief Return a constant reference to the oov::OutputMatrix.
          * @return A constant reference.
          */
         inline const oov::OutputMatrix& outputmatrix() const
         { return m_matrix; }
 
-        /** 
+        /**
          * @brief Return a view on the Time vector..
          * @return A view on the Time vector.
          */
-        value::MatrixFactory::VectorView getTime();
+        value::VectorView getTime();
 
-        /** 
+        /**
          * @brief Return the Matrix of the values.
          * @return A constant reference to the Matrix.
          */
         inline const OutputMatrix& values() const
         { return m_matrix; }
 
-        /** 
+        /**
          * @brief Return the Matrix of the values.
          * @return A constant reference to the Matrix.
          */

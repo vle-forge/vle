@@ -50,7 +50,7 @@ namespace vle { namespace examples { namespace gens {
         virtual void externalTransition(const devs::ExternalEventList& event,
                                         const devs::Time& time);
 
-        virtual value::Value observation(
+        virtual value::Value* observation(
             const devs::ObservationEvent& event) const;
 
     private:

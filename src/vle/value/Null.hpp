@@ -30,41 +30,122 @@
 
 namespace vle { namespace value {
 
-    /** 
-     * @brief A null Value. This class is use to build empty value into
-     * container. Can be usefull on Map, Set etc.
+    /**
+     * @brief A null Value. This class is uses to build empty value into
+     * container. Can be useful on Map, Set etc.
      */
-    class NullFactory : public ValueBase
+    class Null : public Value
     {
-    private:
-        NullFactory()
-        { }
-
     public:
-        virtual ~NullFactory()
-        { }
+        /**
+         * @brief Build a Null object.
+         */
+        Null() {}
 
-        static Null create();
+        /**
+         * @brief Copy constructor.
+         * @param value The value to copy.
+         */
+        Null(const Null& value) :
+            Value(value)
+        {}
 
-        virtual Value clone() const;
+        /**
+         * @brief Nothing to delete.
+         */
+        virtual ~Null() {}
 
-        inline virtual ValueBase::type getType() const
-        { return ValueBase::NIL; }
+        ///
+        ////
+        ///
 
-        virtual std::string toFile() const;
+        /**
+         * @brief Build a new Null value.
+         * @return A new allocated Null.
+         */
+        static Null* create()
+        { return new Null(); }
 
-        virtual std::string toString() const;
+        ///
+        ////
+        ///
 
-        virtual std::string toXML() const;
+        /**
+         * @brief Clone the current Null.
+         * @return A new Null.
+         */
+        virtual Value* clone() const
+        { return new Null(); }
+
+        /**
+         * @brief Get the type of this class.
+         * @return Return Value::NIL.
+         */
+        inline virtual Value::type getType() const
+        { return Value::NIL; }
+
+        /**
+         * @brief Push the string 'NA' into the stream.
+         * @param out The output stream.
+         */
+        virtual void writeFile(std::ostream& out) const;
+
+        /**
+         * @brief Push the string 'NA' into the stream.
+         * @param out The output stream.
+         */
+	virtual void writeString(std::ostream& out) const;
+
+        /**
+         * @brief Push a specific string into the stream. The XML representation
+         * of the Null value is:
+         * @code
+         * <null />
+         * @endcode
+         * @param out The output stream.
+         */
+	virtual void writeXml(std::ostream& out) const;
     };
 
+    /**
+     * @brief A functor useful to test if a value is NULL or Null. To use with
+     * the std::find_if for instance.
+     * @code
+     * std::vector < value::Value* > vals;
+     * std::vector < value::Value* >::iterator it;
+     * it = std::find_if(v.begin(), v.end(), value::IsNullValue());
+     * @endcode
+     */
     struct IsNullValue
     {
+        /**
+         * @brief Check if the value is a Null value.
+         * @param value The value to check.
+         * @return Ture if the value is a Null, false otherwise.
+         */
         bool operator()(const value::Value& value) const
-        { return value.get() and value->getType() == ValueBase::NIL; }
+        { return value.getType() == Value::NIL; }
+
+        /**
+         * @brief Check if the pointer value is 0 or a Null value.
+         * @param value The pointer to check.
+         * @return True if the value is 0 or a Null value, false otherwise.
+         */
+        bool operator()(const value::Value* value) const
+        { return value and value->getType() == Value::NIL; }
     };
-    
-    Null toNullValue(const Value& value);
+
+    inline const Null& toNullValue(const Value& value)
+    { return value.toNull(); }
+
+    inline const Null* toNullValue(const Value* value)
+    { return value ? &value->toNull() : 0; }
+
+    inline Null& toNullValue(Value& value)
+    { return value.toNull(); }
+
+    inline Null* toNullValue(Value* value)
+    { return value ? &value->toNull() : 0; }
 
 }} // namespace vle value
 

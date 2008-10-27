@@ -197,7 +197,7 @@ void Model::writePort(std::ostream& out, const graph::Model* mdl) const
         }
         out << "</in>\n";
     }
- 
+
     const graph::ConnectionList& outs(mdl->getOutputPortList());
     if (not outs.empty()) {
         out << "<out>\n";

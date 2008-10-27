@@ -42,7 +42,7 @@ void explodeStringNet(const std::string& input, std::string& ip, int& port)
     if (not input.empty()) {
         std::string::size_type position = 0;
         position = input.find(':');
-        
+
         if (position == std::string::npos) {
             ip.assign(input);
         } else {
@@ -284,7 +284,7 @@ void Client::close()
         vleSocketShutdown(mSocket);
         int r = vleSocketClose(mSocket);
         Assert(InternalError, r == 0, boost::format(
-                "Cannot close client socket properly, %1%\n") % 
+                "Cannot close client socket properly, %1%\n") %
             Glib::strerror(vleSocketErrno()));
         mRunning = false;
     }

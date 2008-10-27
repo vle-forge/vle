@@ -26,42 +26,57 @@
 #include <vle/value/Table.hpp>
 #include <vle/utils/Debug.hpp>
 
-
-
 namespace vle { namespace value {
 
-TableFactory::TableFactory(const int width, const int height) :
-    m_value(boost::extents[width][height]),
-    m_width(width),
-    m_height(height)
+void Table::writeFile(std::ostream& out) const
 {
+    for (index j = 0; j < m_height; ++j) {
+        for (index i = 0; i < m_width; ++i) {
+            out << m_value[i][j] << " ";
+        }
+        out << "\n";
+    }
 }
 
-TableFactory::TableFactory(const TableFactory& setfactory) :
-    ValueBase(setfactory),
-    m_value(setfactory.m_value),
-    m_width(setfactory.m_width),
-    m_height(setfactory.m_height)
+void Table::writeString(std::ostream& out) const
 {
+    out << "(";
+
+    for (index j = 0; j < m_height; ++j) {
+        out << "(";
+        for (index i = 0; i < m_width; ++i) {
+            out << m_value[i][j];
+            if (i + 1 < m_width) {
+                out << ",";
+            }
+        }
+        if (j + 1 < m_height) {
+            out << "),";
+        } else {
+            out << ")";
+        }
+    }
+    out << ")";
 }
 
-Table TableFactory::create(const int width, const int height)
+void Table::writeXml(std::ostream& out) const
 {
-    return Table(new TableFactory(width, height));
+    out << "<table width=\"" << m_width << "\" height=\"" << m_height << "\" >";
+    for (index j = 0; j < m_height; ++j) {
+        for (index i = 0; i < m_width; ++i) {
+            out << m_value[i][j] << " ";
+        }
+    }
+    out << "</table>";
 }
 
-Value TableFactory::clone() const
-{
-    return Value(new TableFactory(*this));
-}
-
-void TableFactory::fill(const std::string& str)
+void Table::fill(const std::string& str)
 {
     std::string cpy(str);
     boost::algorithm::trim(cpy);
 
     std::vector < std::string > result;
-    boost::algorithm::split(result, cpy, 
+    boost::algorithm::split(result, cpy,
                             boost::algorithm::is_any_of(" \n\t\r"));
 
     index i = 0;
@@ -97,70 +112,6 @@ void TableFactory::fill(const std::string& str)
             }
         }
     }
-}
-
-std::string TableFactory::toFile() const
-{
-    std::string s;
-
-    for (index j = 0; j < m_height; ++j) {
-        for (index i = 0; i < m_width; ++i) {
-	    s += boost::lexical_cast < std::string >(m_value[i][j]);
-            s += " ";
-        }
-        s += "\n";
-    }
-    return s;
-}
-
-std::string TableFactory::toString() const
-{
-    std::string s = "(";
-    
-    for (index j = 0; j < m_height; ++j) {
-        s += "(";
-        for (index i = 0; i < m_width; ++i) {
-            s += boost::lexical_cast < std::string >(m_value[i][j]);
-            if (i + 1 < m_width) {
-                s += ",";
-            }
-        }
-        if (j + 1 < m_height) {
-            s += "),";
-        } else {
-            s += ")";
-        }
-    }
-    s += ")";
-    return s;
-}
-
-std::string TableFactory::toXML() const
-{
-    std::string s = (boost::format("<table width=\"%1%\" height=\"%2%\">") %
-                     m_width % m_height).str();
-    for (index j = 0; j < m_height; ++j) {
-        for (index i = 0; i < m_width; ++i) {
-	    s += boost::lexical_cast < std::string >(m_value[i][j]);
-            s += " ";
-        }
-    }
-    s += "</table>";
-    return s;
-}
-
-Table toTableValue(const Value& value)
-{
-    Assert(utils::ArgError, value->getType() == ValueBase::TABLE,
-           "Value is not a Table");
-    return boost::static_pointer_cast < TableFactory >(value);
-}
-
-const TableFactory::TableValue& toTable(const Value& value)
-{
-    Assert(utils::ArgError, value->getType() == ValueBase::TABLE,
-           "Value is not a Table");
-    return boost::static_pointer_cast < TableFactory >(value)->getValue();
 }
 
 }} // namespace vle value

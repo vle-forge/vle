@@ -66,19 +66,23 @@ BOOST_AUTO_TEST_CASE(value_bool)
     const char* t3 = "<?xml version=\"1.0\"?>\n<boolean>1</boolean>";
     const char* t4 = "<?xml version=\"1.0\"?>\n<boolean>0</boolean>";
 
-    value::Value v;
+    value::Value* v;
 
     v = vpz::Vpz::parseValue(t1);
     BOOST_CHECK(value::toBoolean(v) == true);
+    delete v;
 
     v = vpz::Vpz::parseValue(t2);
     BOOST_CHECK(value::toBoolean(v) == false);
+    delete v;
 
     v = vpz::Vpz::parseValue(t3);
     BOOST_CHECK(value::toBoolean(v) == true);
+    delete v;
 
     v = vpz::Vpz::parseValue(t4);
     BOOST_CHECK(value::toBoolean(v) == false);
+    delete v;
 }
 
 BOOST_AUTO_TEST_CASE(value_integer)
@@ -94,21 +98,25 @@ BOOST_AUTO_TEST_CASE(value_integer)
             utils::to_string(std::numeric_limits< long >::min()).c_str());
 
 
-    value::Value v;
+    value::Value* v;
 
     v = vpz::Vpz::parseValue(t1);
     BOOST_CHECK(value::toInteger(v) == 100);
+    delete v;
 
     v = vpz::Vpz::parseValue(t2);
     BOOST_CHECK(value::toInteger(v) == -100);
+    delete v;
 
     v = vpz::Vpz::parseValue(t3);
     BOOST_CHECK(value::toLong(v) ==
                 std::numeric_limits < long >::max());
+    delete v;
 
     v = vpz::Vpz::parseValue(t4);
     BOOST_CHECK(value::toLong(v) ==
                 std::numeric_limits < long >::min());
+    delete v;
 }
 
 BOOST_AUTO_TEST_CASE(value_double)
@@ -116,13 +124,15 @@ BOOST_AUTO_TEST_CASE(value_double)
     const char* t1 = "<?xml version=\"1.0\"?>\n<double>100.5</double>";
     const char* t2 = "<?xml version=\"1.0\"?>\n<double>-100.5</double>";
 
-    value::Value v;
+    value::Value* v;
 
     v = vpz::Vpz::parseValue(t1);
     BOOST_CHECK_CLOSE(value::toDouble(v), 100.5, 1);
+    delete v;
 
     v = vpz::Vpz::parseValue(t2);
     BOOST_CHECK_CLOSE(value::toDouble(v), -100.5, 1);
+    delete v;
 }
 
 BOOST_AUTO_TEST_CASE(value_string)
@@ -130,13 +140,15 @@ BOOST_AUTO_TEST_CASE(value_string)
     const char* t1 = "<?xml version=\"1.0\"?>\n<string>a b c d e f g h i j</string>";
     const char* t2 = "<?xml version=\"1.0\"?>\n<string>a\nb\tc\n</string>";
 
-    value::Value v;
+    value::Value* v;
 
     v = vpz::Vpz::parseValue(t1);
     BOOST_CHECK(value::toString(v) == "a b c d e f g h i j");
+    delete v;
 
     v = vpz::Vpz::parseValue(t2);
     BOOST_CHECK(value::toString(v) == "a\nb\tc\n");
+    delete v;
 }
 
 BOOST_AUTO_TEST_CASE(value_set)
@@ -155,16 +167,18 @@ BOOST_AUTO_TEST_CASE(value_set)
         "  </set>\n"
         "</set>";
 
-    value::Set v;
+    value::Set* v;
 
     v = value::toSetValue(vpz::Vpz::parseValue(t1));
-    BOOST_CHECK(value::toString(v->getValue(1)) == "test");
-    BOOST_CHECK(value::toInteger(v->getValue(0)) == 1);
+    BOOST_CHECK(value::toString(v->get(1)) == "test");
+    BOOST_CHECK(value::toInteger(v->get(0)) == 1);
+    delete v;
 
     v = value::toSetValue(vpz::Vpz::parseValue(t2));
-    BOOST_CHECK(value::toInteger(v->getValue(0)) == 1);
-    value::Set v2 = value::toSetValue(v->getValue(1));
-    BOOST_CHECK(value::toString(v2->getValue(0)) == "test");
+    BOOST_CHECK(value::toInteger(v->get(0)) == 1);
+    value::Set& v2 = value::toSetValue(v->get(1));
+    BOOST_CHECK(value::toString(v2.get(0)) == "test");
+    delete v;
 }
 
 BOOST_AUTO_TEST_CASE(value_map)
@@ -186,17 +200,17 @@ BOOST_AUTO_TEST_CASE(value_map)
         " </key>\n"
         "</map>\n";
 
-    value::Map v;
+    value::Map* v;
 
     v = value::toMapValue(vpz::Vpz::parseValue(t1));
-    BOOST_CHECK(value::toInteger(v->getValue("a")) == 10);
+    BOOST_CHECK(value::toInteger(v->get("a")) == 10);
+    delete v;
 
     v = value::toMapValue(vpz::Vpz::parseValue(t2));
-    value::Set s;
-
-    s = value::toSetValue(v->getValue("a"));
-    BOOST_CHECK(value::toInteger(s->getValue(0)) == 1);
-    BOOST_CHECK(value::toString(s->getValue(1)) == "test");
+    value::Set& s = value::toSetValue(v->get("a"));
+    BOOST_CHECK(value::toInteger(s.get(0)) == 1);
+    BOOST_CHECK(value::toString(s.get(1)) == "test");
+    delete v;
 }
 
 BOOST_AUTO_TEST_CASE(value_tuple)
@@ -204,13 +218,14 @@ BOOST_AUTO_TEST_CASE(value_tuple)
     const char* t1 = "<?xml version=\"1.0\"?>\n"
         "<tuple>1 2 3</tuple>\n";
 
-    value::Tuple v;
+    value::Tuple* v;
 
     v = value::toTupleValue(vpz::Vpz::parseValue(t1));
     BOOST_REQUIRE_EQUAL(v->size(), (size_t)3);
     BOOST_CHECK_CLOSE(v->operator[](0), 1.0, 0.1);
     BOOST_CHECK_CLOSE(v->operator[](1), 2.0, 0.1);
     BOOST_CHECK_CLOSE(v->operator[](2), 3.0, 0.1);
+    delete v;
 
     const char* t2 = "<?xml version=\"1.0\"?>\n"
         "<map>\n"
@@ -219,14 +234,15 @@ BOOST_AUTO_TEST_CASE(value_tuple)
         "   </key>\n"
         "</map>\n";
 
-    value::Map m;
+    value::Map* m;
     m = value::toMapValue(vpz::Vpz::parseValue(t2));
 
-    value::Value t = m->getValue("testtest");
-    v = toTupleValue(t);
-    BOOST_CHECK_CLOSE(v->operator[](0), 100.0, 0.1);
-    BOOST_CHECK_CLOSE(v->operator[](1), 200.0, 0.1);
-    BOOST_CHECK_CLOSE(v->operator[](2), 300.0, 0.1);
+    value::Value& t = m->get("testtest");
+    value::Tuple& v2(toTupleValue(t));
+    BOOST_CHECK_CLOSE(v2.operator[](0), 100.0, 0.1);
+    BOOST_CHECK_CLOSE(v2.operator[](1), 200.0, 0.1);
+    BOOST_CHECK_CLOSE(v2.operator[](2), 300.0, 0.1);
+    delete m;
 }
 
 BOOST_AUTO_TEST_CASE(value_table)
@@ -236,11 +252,9 @@ BOOST_AUTO_TEST_CASE(value_table)
         "1 2 3 4 5 6"
         "</table>\n";
 
-    value::Table v;
-
-    v = value::toTableValue(vpz::Vpz::parseValue(t1));
-    BOOST_REQUIRE_EQUAL(v->width(), (value::TableFactory::index)2);
-    BOOST_REQUIRE_EQUAL(v->height(), (value::TableFactory::index)3);
+    value::Table* v = value::toTableValue(vpz::Vpz::parseValue(t1));
+    BOOST_REQUIRE_EQUAL(v->width(), (value::Table::index)2);
+    BOOST_REQUIRE_EQUAL(v->height(), (value::Table::index)3);
     BOOST_CHECK_CLOSE(v->get(0, 0), 1.0, 0.1);
     BOOST_CHECK_CLOSE(v->get(0, 1), 3.0, 0.1);
     BOOST_CHECK_CLOSE(v->get(0, 2), 5.0, 0.1);
@@ -248,20 +262,22 @@ BOOST_AUTO_TEST_CASE(value_table)
     BOOST_CHECK_CLOSE(v->get(1, 1), 4.0, 0.1);
     BOOST_CHECK_CLOSE(v->get(1, 2), 6.0, 0.1);
 
-    BOOST_REQUIRE_EQUAL(v->toString(), "((1,2),(3,4),(5,6))");
+    BOOST_REQUIRE_EQUAL(v->writeToString(), "((1,2),(3,4),(5,6))");
 
     std::string result("<?xml version=\"1.0\"?>\n");
-    result += v->toXML();
-    value::Table w;
-    w = value::toTableValue(vpz::Vpz::parseValue(result));
-    BOOST_REQUIRE_EQUAL(w->width(), (value::TableFactory::index)2);
-    BOOST_REQUIRE_EQUAL(w->height(), (value::TableFactory::index)3);
+    result += v->writeToXml();
+    value::Table* w = value::toTableValue(vpz::Vpz::parseValue(result));
+    BOOST_REQUIRE_EQUAL(w->width(), (value::Table::index)2);
+    BOOST_REQUIRE_EQUAL(w->height(), (value::Table::index)3);
     BOOST_CHECK_CLOSE(w->get(0, 0), 1.0, 0.1);
     BOOST_CHECK_CLOSE(w->get(0, 1), 3.0, 0.1);
     BOOST_CHECK_CLOSE(w->get(0, 2), 5.0, 0.1);
     BOOST_CHECK_CLOSE(w->get(1, 0), 2.0, 0.1);
     BOOST_CHECK_CLOSE(w->get(1, 1), 4.0, 0.1);
     BOOST_CHECK_CLOSE(w->get(1, 2), 6.0, 0.1);
+
+    delete v;
+    delete w;
 }
 
 BOOST_AUTO_TEST_CASE(value_xml)
@@ -271,9 +287,9 @@ BOOST_AUTO_TEST_CASE(value_xml)
         "<![CDATA[test 1 2 1 2]]>\n"
         "</xml>";
 
-    value::XML v;
-
-    BOOST_REQUIRE_EQUAL(value::toXml(vpz::Vpz::parseValue(t1)), "test 1 2 1 2");
+    value::Xml* str(value::toXmlValue(vpz::Vpz::parseValue(t1)));
+    BOOST_REQUIRE_EQUAL(str->value(), "test 1 2 1 2");
+    delete str;
 }
 
 BOOST_AUTO_TEST_CASE(value_matrix)
@@ -289,14 +305,14 @@ BOOST_AUTO_TEST_CASE(value_matrix)
         "<integer>6</integer>"
         "</matrix>";
 
-    value::Value v = vpz::Vpz::parseValue(t1);
+    value::Value* v = vpz::Vpz::parseValue(t1);
     BOOST_REQUIRE_EQUAL(v->isMatrix(), true);
 
-    value::Matrix m = value::toMatrixValue(v);
-    value::MatrixFactory::MatrixView mv = value::toMatrix(v);
+    value::Matrix* m = value::toMatrixValue(v);
+    value::MatrixView mv = value::toMatrix(v);
 
-    BOOST_REQUIRE_EQUAL(m->rows(), (value::MatrixFactory::size_type)3);
-    BOOST_REQUIRE_EQUAL(m->columns(), (value::MatrixFactory::size_type)2);
+    BOOST_REQUIRE_EQUAL(m->rows(), (value::Matrix::size_type)3);
+    BOOST_REQUIRE_EQUAL(m->columns(), (value::Matrix::size_type)2);
 
     BOOST_REQUIRE_EQUAL(mv[0][0]->isInteger(), true);
     BOOST_REQUIRE_EQUAL(mv[0][1]->isInteger(), true);
@@ -313,14 +329,14 @@ BOOST_AUTO_TEST_CASE(value_matrix)
     BOOST_REQUIRE_EQUAL(value::toInteger(mv[1][2]), 6);
 
     std::string result("<?xml version=\"1.0\"?>\n");
-    result += v->toXML();
-    value::Value v2 = vpz::Vpz::parseValue(result);
+    result += v->writeToXml();
+    value::Value* v2 = vpz::Vpz::parseValue(result);
     BOOST_REQUIRE_EQUAL(v2->isMatrix(), true);
-    value::Matrix m2 = value::toMatrixValue(v2);
-    value::MatrixFactory::MatrixView mv2 = value::toMatrix(v2);
+    value::Matrix* m2 = value::toMatrixValue(v2);
+    value::MatrixView mv2 = value::toMatrix(v2);
 
-    BOOST_REQUIRE_EQUAL(m2->rows(), (value::MatrixFactory::size_type)3);
-    BOOST_REQUIRE_EQUAL(m2->columns(), (value::MatrixFactory::size_type)2);
+    BOOST_REQUIRE_EQUAL(m2->rows(), (value::Matrix::size_type)3);
+    BOOST_REQUIRE_EQUAL(m2->columns(), (value::Matrix::size_type)2);
 
     BOOST_REQUIRE_EQUAL(mv2[0][0]->isInteger(), true);
     BOOST_REQUIRE_EQUAL(mv2[0][1]->isInteger(), true);
@@ -335,6 +351,9 @@ BOOST_AUTO_TEST_CASE(value_matrix)
     BOOST_REQUIRE_EQUAL(value::toInteger(mv2[1][1]), 4);
     BOOST_REQUIRE_EQUAL(value::toInteger(mv2[0][2]), 5);
     BOOST_REQUIRE_EQUAL(value::toInteger(mv2[1][2]), 6);
+
+    delete v;
+    delete v2;
 }
 
 
@@ -363,22 +382,22 @@ BOOST_AUTO_TEST_CASE(value_matrix_of_matrix)
         "</matrix>"
         "</matrix>";
 
-    value::Value v = vpz::Vpz::parseValue(t1);
+    value::Value* v = vpz::Vpz::parseValue(t1);
     BOOST_REQUIRE_EQUAL(v->isMatrix(), true);
 
-    value::Matrix m = value::toMatrixValue(v);
-    value::MatrixFactory::MatrixView mv = value::toMatrix(v);
+    value::Matrix* m = value::toMatrixValue(v);
+    value::MatrixView mv = value::toMatrix(v);
 
-    BOOST_REQUIRE_EQUAL(m->rows(), (value::MatrixFactory::size_type)1);
-    BOOST_REQUIRE_EQUAL(m->columns(), (value::MatrixFactory::size_type)3);
+    BOOST_REQUIRE_EQUAL(m->rows(), (value::Matrix::size_type)1);
+    BOOST_REQUIRE_EQUAL(m->columns(), (value::Matrix::size_type)3);
 
     BOOST_REQUIRE_EQUAL(mv[0][0]->isMatrix(), true);
     BOOST_REQUIRE_EQUAL(mv[1][0]->isMatrix(), true);
     BOOST_REQUIRE_EQUAL(mv[2][0]->isMatrix(), true);
 
-    value::MatrixFactory::MatrixView m1 = value::toMatrix(mv[0][0]);
-    value::MatrixFactory::MatrixView m2 = value::toMatrix(mv[1][0]);
-    value::MatrixFactory::MatrixView m3 = value::toMatrix(mv[2][0]);
+    value::MatrixView m1 = value::toMatrix(mv[0][0]);
+    value::MatrixView m2 = value::toMatrix(mv[1][0]);
+    value::MatrixView m3 = value::toMatrix(mv[2][0]);
     BOOST_REQUIRE_EQUAL(value::toInteger(m1[0][0]), 1);
     BOOST_REQUIRE_EQUAL(value::toInteger(m1[1][0]), 2);
     BOOST_REQUIRE_EQUAL(value::toInteger(m1[2][0]), 3);
@@ -388,6 +407,8 @@ BOOST_AUTO_TEST_CASE(value_matrix_of_matrix)
     BOOST_REQUIRE_EQUAL(value::toInteger(m3[0][0]), 7);
     BOOST_REQUIRE_EQUAL(value::toInteger(m3[1][0]), 8);
     BOOST_REQUIRE_EQUAL(value::toInteger(m3[2][0]), 9);
+
+    delete v;
 }
 
 BOOST_AUTO_TEST_CASE(value_matrix_of_matrix_io)
@@ -415,34 +436,37 @@ BOOST_AUTO_TEST_CASE(value_matrix_of_matrix_io)
         "</matrix>"
         "</matrix>";
 
-    value::Value v = vpz::Vpz::parseValue(t1);
+    value::Value* v = vpz::Vpz::parseValue(t1);
 
-    std::string str(v->toXML());
+    std::string str(v->writeToXml());
     str = "<?xml version=\"1.0\"?>\n" + str;
 
-    value::Value v2 = vpz::Vpz::parseValue(str);
+    value::Value* v2 = vpz::Vpz::parseValue(str);
     BOOST_REQUIRE_EQUAL(v2->isMatrix(), true);
 
-    value::Matrix m = value::toMatrixValue(v2);
-    value::MatrixFactory::MatrixView mv = value::toMatrix(v2);
+    value::Matrix* m = value::toMatrixValue(v2);
+    value::MatrixView mv = value::toMatrix(v2);
 
-    BOOST_REQUIRE_EQUAL(m->rows(), (value::MatrixFactory::size_type)1);
-    BOOST_REQUIRE_EQUAL(m->columns(), (value::MatrixFactory::size_type)3);
+    BOOST_REQUIRE_EQUAL(m->rows(), (value::Matrix::size_type)1);
+    BOOST_REQUIRE_EQUAL(m->columns(), (value::Matrix::size_type)3);
 
     BOOST_REQUIRE_EQUAL(mv[0][0]->isMatrix(), true);
     BOOST_REQUIRE_EQUAL(mv[1][0]->isMatrix(), true);
     BOOST_REQUIRE_EQUAL(mv[2][0]->isMatrix(), true);
 
-    value::MatrixFactory::MatrixView m1 = value::toMatrix(mv[0][0]);
-    value::MatrixFactory::MatrixView m2 = value::toMatrix(mv[1][0]);
-    value::MatrixFactory::MatrixView m3 = value::toMatrix(mv[2][0]);
-    BOOST_REQUIRE_EQUAL(m1[0][0].get(), (value::ValueBase*)0);
+    value::MatrixView m1 = value::toMatrix(mv[0][0]);
+    value::MatrixView m2 = value::toMatrix(mv[1][0]);
+    value::MatrixView m3 = value::toMatrix(mv[2][0]);
+    BOOST_REQUIRE_EQUAL(m1[0][0], (value::Value*)0);
     BOOST_REQUIRE_EQUAL(value::toInteger(m1[1][0]), 2);
     BOOST_REQUIRE_EQUAL(value::toInteger(m1[2][0]), 3);
     BOOST_REQUIRE_EQUAL(value::toInteger(m2[0][0]), 4);
     BOOST_REQUIRE_EQUAL(value::toInteger(m2[1][0]), 5);
-    BOOST_REQUIRE_EQUAL(m2[2][0].get(), (value::ValueBase*)0);
+    BOOST_REQUIRE_EQUAL(m2[2][0], (value::Value*)0);
     BOOST_REQUIRE_EQUAL(value::toInteger(m3[0][0]), 7);
-    BOOST_REQUIRE_EQUAL(m3[1][0].get(), (value::ValueBase*)0);
+    BOOST_REQUIRE_EQUAL(m3[1][0], (value::Value*)0);
     BOOST_REQUIRE_EQUAL(value::toInteger(m3[2][0]), 9);
+
+    delete v;
+    delete v2;
 }

@@ -40,16 +40,17 @@ namespace vle { namespace devs {
     public:
 	RequestEvent(const std::string& sourcePortName) :
             ExternalEvent(sourcePortName)
-        { }
-            
+        {}
+
 	RequestEvent(RequestEvent* event,
                            Simulator* target,
-                           const std::string& targetPortName) :
-            ExternalEvent(event, target, targetPortName)
-        { }
+                           const std::string& targetPortName,
+                           bool deleter) :
+            ExternalEvent(event, target, targetPortName, deleter)
+        {}
 
 	virtual ~RequestEvent()
-        { }
+        {}
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 

@@ -248,7 +248,7 @@ namespace vle { namespace vpz {
          */
         virtual Base::type getType() const
         { return OBSERVABLE; }
-     
+
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
          * Manage the ObservablePortList.
@@ -323,7 +323,7 @@ namespace vle { namespace vpz {
          * Get/Set function.
          *
          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-     
+
         /**
          * @brief Get a constant reference to the ObservablePortList.
          * @return Return a constant reference to the ObservablePortList.
@@ -360,7 +360,7 @@ namespace vle { namespace vpz {
          */
         inline const std::string& name() const
         { return m_name; }
-     
+
         /**
          * @brief Get a iterator the begin of the ObservablePortList.
          * @return Get a iterator the begin of the ObservablePortList.

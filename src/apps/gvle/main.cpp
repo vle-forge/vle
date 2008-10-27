@@ -23,6 +23,7 @@
  */
 
 
+#include <vle/manager/VLE.hpp>
 #include <vle/gvle/GVLE.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
@@ -71,10 +72,9 @@ public:
 
 int main(int argc, char** argv)
 {
-    vle::utils::init();
-
     Gtk::Main application(&argc, &argv);
-    
+    vle::manager::init();
+
     Glib::OptionContext context;
     vle::gvle::GVLEOptionGroup group;
     context.set_main_group(group);
@@ -124,6 +124,6 @@ int main(int argc, char** argv)
         }
     }
 
-    vle::utils::finalize();
+    vle::manager::finalize();
     return result ? EXIT_SUCCESS : EXIT_FAILURE;
 }

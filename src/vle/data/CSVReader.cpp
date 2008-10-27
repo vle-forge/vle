@@ -48,15 +48,15 @@ namespace vle { namespace data {
 
     // getline: get one line, grow as needed
     int CSVReader::Csv::getline(std::string& str)
-    {	
+    {
       char c;
       bool eof;
-      
+
       line = "";
       do {
 	fin.get(c);
 	if (!endofline(c)) line += c;
-      }	
+      }
       while (!endofline(c));
       split();
       str = line;
@@ -64,18 +64,18 @@ namespace vle { namespace data {
       if (eof) fin.clear();
       return !eof;
     }
-    
+
     // split: split line into fields
     int CSVReader::Csv::split()
     {
       std::string fld;
       unsigned int i, j;
-      
+
       nfield = 0;
       if (line.length() == 0)
 	return 0;
       i = 0;
-      
+
       do {
 	if (i < line.length() && line[i] == '"')
 	  j = advquoted(line, fld, ++i);	// skip quote
@@ -88,7 +88,7 @@ namespace vle { namespace data {
 	nfield++;
 	i = j + 1;
       } while (j < line.length());
-      
+
       return nfield;
     }
 
@@ -96,7 +96,7 @@ namespace vle { namespace data {
     int CSVReader::Csv::advquoted(const std::string& s, std::string& fld, int i)
     {
       unsigned int j;
-      
+
       fld = "";
       for (j = i; j < s.length(); j++) {
 	if (s[j] == '"' && s[++j] != '"') {
@@ -111,19 +111,19 @@ namespace vle { namespace data {
       }
       return j;
     }
-    
+
     // advplain: unquoted field; return index of next separator
     int CSVReader::Csv::advplain(const std::string& s, std::string& fld, int i)
     {
       unsigned int j;
-      
+
       j = s.find_first_of(fieldsep, i); // look for separator
       if (j > s.length())               // none found
 	j = s.length();
       fld = std::string(s, i, j-i);
       return j;
     }
-    
+
     // getfield: return n-th field
     std::string CSVReader::Csv::getfield(int n)
     {
@@ -135,14 +135,14 @@ namespace vle { namespace data {
 
     CSVReader* CSVReader::CSVReaderMap::add(const std::string& name,
 					    CSVReader* reader) {
-      std::map < std::string , std::pair < unsigned int, 
+      std::map < std::string , std::pair < unsigned int,
 	CSVReader* > >::iterator it = readers.find(name);
 
       if (it == readers.end()) {
 	readers[name] = std::pair < unsigned int, CSVReader*>(0,reader);
 	it = readers.find(name);
       }
-      else 
+      else
 	it->second.first++;
       return it->second.second;
     }
@@ -152,7 +152,7 @@ namespace vle { namespace data {
     }
 
     void CSVReader::CSVReaderMap::remove(const std::string& name) {
-      std::map < std::string , std::pair < unsigned int, 
+      std::map < std::string , std::pair < unsigned int,
 	CSVReader* > >::iterator it = readers.find(name);
 
       if (it != readers.end()) {
@@ -167,7 +167,7 @@ namespace vle { namespace data {
     }
 
     CSVReader::CSVReaderMap::~CSVReaderMap() {
-      std::map < std::string , std::pair < unsigned int, 
+      std::map < std::string , std::pair < unsigned int,
 	CSVReader* > >::iterator it = readers.begin();
 
       while (it != readers.end()) {
@@ -176,7 +176,7 @@ namespace vle { namespace data {
 	++it;
       }
     }
-    
+
     CSVReader::CSVReader(const std::string & fileName,
 			 const std::string & separator,
 			 t_type type,unsigned int columnNumber):
@@ -189,11 +189,11 @@ namespace vle { namespace data {
       csv.getline(str);
       colNumber = csv.getnfield();
       csv.fin.seekg(0,std::ios::beg);
-      
+
       rowNumber = 0;
-      if (type == CSVReader::TITLE or type == CSVReader::MATRIX) 
-	csv.getline(str);      
-      while (csv.getline(str) != 0) 
+      if (type == CSVReader::TITLE or type == CSVReader::MATRIX)
+	csv.getline(str);
+      while (csv.getline(str) != 0)
 	++rowNumber;
       csv.fin.seekg(0,std::ios::beg);
     }
@@ -207,10 +207,10 @@ namespace vle { namespace data {
 
     CSVReader& CSVReader::open(const std::string & fileName,
 			       const std::string & separator,
-			       t_type type, unsigned int columnNumber) { 
+			       t_type type, unsigned int columnNumber) {
       CSVReader* r = NULL;
-      
-      if (!map.exist(fileName)) 
+
+      if (!map.exist(fileName))
 	r = new CSVReader(fileName,separator,type,columnNumber);
       r = map.add(fileName,r);
       return *r;

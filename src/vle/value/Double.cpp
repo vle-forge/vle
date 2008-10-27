@@ -30,46 +30,19 @@
 
 namespace vle { namespace value {
 
-Double DoubleFactory::create(double value)
+void Double::writeFile(std::ostream& out) const
 {
-    return Double(new DoubleFactory(value));
+    out << m_value;
 }
 
-Value DoubleFactory::clone() const
+void Double::writeString(std::ostream& out) const
 {
-    return Value(new DoubleFactory(m_value));
+    out << m_value;
 }
 
-std::string DoubleFactory::toFile() const
+void Double::writeXml(std::ostream& out) const
 {
-    return boost::lexical_cast < std::string >(m_value);
-}
-
-std::string DoubleFactory::toString() const
-{
-    return boost::lexical_cast < std::string >(m_value);
-}
-
-std::string DoubleFactory::toXML() const
-{
-    std::string val("<double>");
-    val += boost::lexical_cast < std::string >(m_value);
-    val += "</double>";
-    return val;
-}
-
-Double toDoubleValue(const Value& value)
-{
-    Assert(utils::ArgError, value->getType() == ValueBase::DOUBLE,
-           "Value is not a Double");
-    return boost::static_pointer_cast < DoubleFactory >(value);
-}
-
-double toDouble(const Value& value)
-{
-    Assert(utils::ArgError, value->getType() == ValueBase::DOUBLE,
-           "Value is not a Double");
-    return boost::static_pointer_cast < DoubleFactory >(value)->doubleValue();
+    out << "<double>" << m_value << "</double>";
 }
 
 }} // namespace vle value

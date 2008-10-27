@@ -36,9 +36,9 @@ R3::R3(const graph::AtomicModel& model,
 }
 
 double R3::compute(const vle::devs::Time& /* time */) const
-{    
+{
     return a * getValue("I");
-} 
+}
 
 DECLARE_NAMED_DYNAMICS(R3, R3)
 

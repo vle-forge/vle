@@ -32,16 +32,21 @@ namespace vle { namespace devs {
 
     class Simulator;
 
+    /**
+     * @brief The internal event is only used into the scheduler (class
+     * EventTable), to manager the internal transition and the time advance
+     * function.
+     */
     class InternalEvent : public Event
     {
     public:
 	InternalEvent(const Time& time, Simulator* model) :
             Event(model),
             m_time(time)
-	{ }
+	{}
 
 	virtual ~ InternalEvent()
-	{ }
+	{}
 
         virtual bool isInternal() const
         { return true; }

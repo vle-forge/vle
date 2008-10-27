@@ -86,7 +86,7 @@ namespace vle { namespace devs {
                                              const devs::Time& time,
                                              const std::string& view) = 0;
 
-        /** 
+        /**
          * @brief Process the devs::ObservationEvent and write it to the Stream.
          * @param event the devs::ObservationEvent to write.
          */
@@ -98,7 +98,7 @@ namespace vle { namespace devs {
          */
         virtual oov::PluginPtr close(const devs::Time& time) = 0;
 
-        /** 
+        /**
          * @brief Refresh the output to get a oov::PluginPtr during the
          * simulation.
          * @return A reference to the oov::Plugin if the plugin is serializable.

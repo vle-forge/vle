@@ -33,7 +33,7 @@
 #include <map>
 
 namespace vle { namespace extension {
-    
+
     class CombinedQss : public devs::Dynamics
     {
     public:
@@ -62,7 +62,7 @@ namespace vle { namespace extension {
             const devs::ExternalEventList& event,
             const devs::Time& time);
 
-        virtual value::Value observation(
+        virtual value::Value* observation(
             const devs::ObservationEvent& event) const;
 
         virtual void request(const devs::RequestEvent& /* event */,
@@ -80,7 +80,7 @@ namespace vle { namespace extension {
          * @param i the index of the variable to compute.
          * @param time the time of the computation.
          */
-        virtual double compute(unsigned int i, 
+        virtual double compute(unsigned int i,
 			       const devs::Time& time) const = 0;
 
         /**
@@ -101,13 +101,13 @@ namespace vle { namespace extension {
         { mValue[i] = value; }
 
         inline double getExternalValue(const std::string& name) const
-        { return mExternalVariableValue.find(mExternalVariableIndex.find(name)->second)->second; }	
+        { return mExternalVariableValue.find(mExternalVariableIndex.find(name)->second)->second; }
 
         inline void setExternalValue(const std::string& name, double value)
-        { mExternalVariableValue[mExternalVariableIndex[name]] = value; }	
+        { mExternalVariableValue[mExternalVariableIndex[name]] = value; }
 
         inline void setExternalGradient(const std::string& name, double gradient)
-        { mExternalVariableGradient[mExternalVariableIndex[name]] = gradient; }	
+        { mExternalVariableGradient[mExternalVariableIndex[name]] = gradient; }
 
         bool mActive;
         bool mDependance;
@@ -126,7 +126,7 @@ namespace vle { namespace extension {
         std::map < unsigned int , bool > mIsGradient;
         std::map < std::string , unsigned int > mExternalVariableIndex;
         bool mExternalValues; // y-a-t-il des variables externes
-        // sans gradient ? 
+        // sans gradient ?
         /** State */
         long* mIndex;
         double* mGradient;

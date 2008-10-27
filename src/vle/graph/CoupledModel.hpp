@@ -42,7 +42,7 @@ namespace vle { namespace graph {
     public:
         typedef std::vector < std::string > StringList;
 
-        /** 
+        /**
          * @brief Constructor to intialize parent, position (0,0), size (0,0)
          * and name.
          * @param name the new name of this coupled model.
@@ -58,7 +58,7 @@ namespace vle { namespace graph {
         virtual Model* clone() const
         { return new CoupledModel(*this); }
 
-        /** 
+        /**
          * @brief Delete his children.
          */
 	virtual ~CoupledModel();
@@ -69,7 +69,7 @@ namespace vle { namespace graph {
          */
         virtual bool isCoupled() const { return true; }
 
-        /** 
+        /**
          * @brief Write the coupled model in the output stream.
          * @param out output stream.
          */
@@ -90,7 +90,7 @@ namespace vle { namespace graph {
          */
         void addModel(Model* model);
 
-        /** 
+        /**
          * @brief Add a model into the model list. Parent is set to thie coupled
          * model and the model name if changed.
          * @param model The model to add.
@@ -98,12 +98,12 @@ namespace vle { namespace graph {
          */
         void addModel(Model* model, const std::string& name);
 
-        /** 
+        /**
          * @brief add a new atomic model to the list. Parent is set to this
          * coupled model.
-         * 
+         *
          * @param name atomic model name to add.
-         * 
+         *
          * @return The AtomicModel builded by this function.
          *
          * @throw Exception::Internal if name already exist in this
@@ -111,12 +111,12 @@ namespace vle { namespace graph {
          */
         AtomicModel* addAtomicModel(const std::string& name);
 
-        /** 
+        /**
          * @brief add a new coupled model to the list. Parent is set to this
          * coupled model.
-         * 
+         *
          * @param name coupled model name to add.
-         * 
+         *
          * @return The CoupledModel builded by this function.
          *
          * @throw Exception::Internal if name already exist in this
@@ -134,7 +134,7 @@ namespace vle { namespace graph {
          */
         void delModel(Model* model);
 
-        /** 
+        /**
          * @brief Delete all model from this coupled model. If connection
          * exist, there are destroy.
          */
@@ -147,7 +147,7 @@ namespace vle { namespace graph {
          */
         void attachModel(Model* model);
 
-        /** 
+        /**
          * @brief Attach a list of models into this coupled model. Parent will
          * be informed and detached of this model.
          * @param models a list of models.
@@ -162,10 +162,10 @@ namespace vle { namespace graph {
          */
         void detachModel(Model* model);
 
-        /** 
+        /**
          * @brief Detach a list of model from this coupled model. For each
          * model, there parent variable is set to null.
-         * 
+         *
          * @param models a list of model.
          */
         void detachModels(const ModelList& models);
@@ -238,7 +238,7 @@ namespace vle { namespace graph {
          * @param m model to delete connection.
          */
 	void delAllConnection(Model* m);
-        
+
         /**
          * @brief delete all connection (input, output and internal) into
          * current CoupledModel.
@@ -246,11 +246,11 @@ namespace vle { namespace graph {
          */
         void delAllConnection();
 
-        /** 
+        /**
          * @brief Replace the old model (Atomic or Coupled) into the new model
          * mdl (Atomic or Coupled). This function delete the model old and set
          * the new mdl, no clone is build.
-         * 
+         *
          * @param old the model to delete from hierarchy.
          * @param mdl the new model to set.
          *
@@ -259,7 +259,7 @@ namespace vle { namespace graph {
          */
         void replace(Model* old, Model* mdl);
 
-        /** 
+        /**
          * @brief Return a string representation of internal connection for the
          * specified model list. Each connection is represented by 4-uples
          * (modelsource, portsource, modeldestination, portdestination). For
@@ -285,7 +285,7 @@ namespace vle { namespace graph {
          */
         StringList getBasicConnections(const ModelList& models) const;
 
-        /** 
+        /**
          * @brief Set a list of connection to this coupled model.Each connection
          * is represented by 4-uples (modelsource, portsource, modeldestination,
          * portdestination). For instance:
@@ -318,7 +318,7 @@ namespace vle { namespace graph {
          */
         bool hasConnectionProblem(const ModelList& lst) const;
 
-        /** 
+        /**
          * @brief Return true if the connection list have connection with models
          * not added in model lists provided.
          * @param cnts the list of connection to check.
@@ -332,32 +332,32 @@ namespace vle { namespace graph {
 
         void writeConnections(std::ostream& out) const;
 
-        /** 
+        /**
          * @brief Return a reference to the children graph::Model under the
          * specified position.
-         * 
+         *
          * @param x the position of graph::Model.
          * @param y the position of graph::Model.
-         * 
+         *
          * @return A reference to the founded model otherwise null.
          */
         Model* find(int x, int y) const;
-        
-        /** 
+
+        /**
          * @brief Build a new string for model name. This function assert that
          * no name is already defined in this coupled model.
-         * 
+         *
          * @param prefix a prefix of model.
-         * 
+         *
          * @return a new model name.
          */
         std::string buildNewName(const std::string& prefix) const;
 
-        /** 
+        /**
          * @brief Test if the name already exist in model list.
-         * 
+         *
          * @param name the model name to test.
-         * 
+         *
          * @return true if model name exist, false otherwise.
          */
         inline bool exist(const std::string& name) const
@@ -369,7 +369,7 @@ namespace vle { namespace graph {
 
         inline const ModelList& getModelList() const
         { return m_modelList; }
-        
+
         inline ModelList& getModelList()
         { return m_modelList; }
 
@@ -386,9 +386,9 @@ namespace vle { namespace graph {
         { return m_internalOutputList; }
 
         ModelPortList& getInternalInPort(const std::string& name);
-        
+
         const ModelPortList& getInternalInPort(const std::string& name) const;
-        
+
         ModelPortList& getInternalOutPort(const std::string& name);
 
         const ModelPortList& getInternalOutPort(const std::string& name) const;
@@ -397,7 +397,7 @@ namespace vle { namespace graph {
         //// Functors
         ////
 
-        /** 
+        /**
          * @brief A functor to easily attach ModelList::value_type. Use it with
          * std::for_each.
          */
@@ -410,8 +410,8 @@ namespace vle { namespace graph {
 
             CoupledModel*   model;
         };
-        
-        /** 
+
+        /**
          * @brief A functor to easily detach ModelList::value_type. Use it with
          * std::for_each.
          */
@@ -425,7 +425,7 @@ namespace vle { namespace graph {
             CoupledModel*   model;
         };
 
-        /** 
+        /**
          * @brief A functor to easily delete ModelList::value_type. Use it with
          * std::for_each.
          */
@@ -443,7 +443,7 @@ namespace vle { namespace graph {
             CoupledModel*   model;
         };
 
-        /** 
+        /**
          * @brief A functor to easily test a position (x, y) in a range of a
          * ModelList::value_type. Use it with std::find_if, etc.
          */
@@ -463,7 +463,7 @@ namespace vle { namespace graph {
          * @brief A functor to easily clone a ModelList. To use with the
          * for_each algorith.
          */
-        struct CloneModel 
+        struct CloneModel
         {
             CoupledModel* parent;
 
@@ -477,7 +477,7 @@ namespace vle { namespace graph {
         void delConnection(Model* src, const std::string& portSrc,
                            Model* dst, const std::string& portDst);
 
-        /** 
+        /**
          * @brief Copy the connections list from the ConnectionList src to the
          * dst.
          * @param src The source of the copy.
@@ -485,7 +485,7 @@ namespace vle { namespace graph {
          */
         void copyConnection(const ConnectionList& src, ConnectionList& dst);
 
-        /** 
+        /**
          * @brief Copy the connection from ModelPortList src to the
          * ModelPortList dst.
          * @param src The source of the copy.

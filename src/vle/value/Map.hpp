@@ -27,68 +27,127 @@
 #define UTILS_VALUE_MAP_HPP
 
 #include <vle/value/Value.hpp>
+#include <vle/utils/Exception.hpp>
 #include <map>
 
 
 
 namespace vle { namespace value {
-    
-    /** 
-     * @brief Define a list of Value in a dictionnary.
-     */
-    typedef std::map < std::string, Value > MapValue;
 
     /**
-     * @brief Map Value a container to a pair of (std::string,  Value class).
+     * @brief Define a list of Value in a dictionnary.
      */
-    class MapFactory : public ValueBase
+    typedef std::map < std::string, Value* > MapValue;
+
+    /**
+     * @brief Map Value a container to a pair of std::string, Value pointer. The
+     * map can not contains null data. .
+     */
+    class Map : public Value
     {
-    private:
-        MapFactory()
-        { }
-
-        MapFactory(const MapFactory& mapfactory);
-
     public:
-        virtual ~MapFactory()
-        { }
-
-        static Map create();
-
-        virtual Value clone() const;
-
-        virtual ValueBase::type getType() const
-        { return ValueBase::MAP; }
-
-        virtual std::string toFile() const;
-
-        virtual std::string toString() const;
+        typedef MapValue::size_type size_type;
+	typedef MapValue::iterator iterator;
+	typedef MapValue::const_iterator const_iterator;
 
         /**
+         * @brief Build a Map object with an empty MapValue.
+         */
+        Map() :
+            m_value()
+        {}
+
+        /**
+         * @brief Copy constructor. All the Value are cloned.
+         * @param value The value to copy.
+         */
+        Map(const Map& value);
+
+        /**
+         * @brief Delete all Value in the Set.
+         */
+	virtual ~Map();
+
+        ///
+        ////
+        ///
+
+        /**
+         * @brief Build a new Map using the boost::pool memory management.
+         * @return A new Map allocated from the boost::pool.
+         */
+        static Map* create()
+        { return new Map(); }
+
+        ///
+        ////
+        ///
+
+        /**
+         * @brief Clone the current Map and recursively for all Value in the
+         * MapValue.
+         * @return A new boost pool allocated value::Value.
+         */
+        virtual Value* clone() const
+        { return new Map(*this); }
+
+        /**
+         * @brief Get the type of this class.
+         * @return Value::MAP.
+         */
+        virtual Value::type getType() const
+        { return Value::MAP; }
+
+        /**
+         * @brief Push all Value from the MapValue, recursively and colon
+         * separated.
+         * @code
+         * (key,value), key2,123) (key3, true)
+         * @endcode
+         * @param out The output stream.
+         */
+        virtual void writeFile(std::ostream& out) const;
+
+        /**
+         * @brief Push all VAlue from the MapValue, recursively and colon
+         * separated.
+         * @code
+         * (key,value), key2,123) (key3, true)
+         * @param out The output stream.
+         */
+	virtual void writeString(std::ostream& out) const;
+
+        /**
+         * @brief Push all Value from the MapValue recursively in an XML
+         * representation.
          * @code
          * <map>
-         *  <value name="x">
-         *   <integer value="5" />
-         *  </value>
-         *  <value name="y">
-         *   <integer value="0" />
-         *  </value>
+         *  <key name="key1">
+         *   <string>value</string>
+         *  </key>
+         *  <key name="key2">
+         *   <integer>123</integer>
+         *  </key>
+         *  <key name="key3">
+         *   <boolean>true</boolean>
+         *  </key>
          * </map>
          * @endcode
+         * @param out The output stream.
          */
-        virtual std::string toXML() const;
+	virtual void writeXml(std::ostream& out) const;
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
         /**
          * @brief Add a value into the map. Be carrefull, the data is not
          * cloned. Don't delete buffer after. If a value already exist with the
-         * same name it will be replace.
+         * same key, it will be deleted and replaced.
          * @param name the name of Value to add.
          * @param value the Value to add.
+         * @throw utils::ArgError if the value is null.
          */
-        void addValue(const std::string& name, Value value)
-        { m_value[name] = value; }
+        void add(const std::string& name, Value* value);
 
         /**
          * @brief Add a value into the map. The data is clone. If a value
@@ -96,10 +155,17 @@ namespace vle { namespace value {
          * @param name the name of Value to add.
          * @param value the Value to add.
          */
-        void addCloneValue(const std::string& name, Value value)
-        { m_value[name] = CloneValue()(value); }
+        void addClone(const std::string& name, const Value& value);
 
-        /** 
+        /**
+         * @brief Add a value into the map. The data is clone. If a value
+         * already exist with the same name it will be replace.
+         * @param name the name of Value to add.
+         * @param value the Value to add.
+         */
+        void addClone(const std::string& name, const Value* value);
+
+        /**
          * @brief Test if the map have already a Value with specified name.
          * @param name the name to find into value.
          * @return true if Value exist, false otherwise.
@@ -107,28 +173,22 @@ namespace vle { namespace value {
         inline bool existValue(const std::string& name) const
         { return m_value.find(name) != m_value.end(); }
 
-        /** 
-         * @brief Get a Value from the map specified by his name. If name does
-         * not exist, a new value::Value() is build.
+        /**
+         * @brief Get a Value from the map specified by his name.
          * @param name The name of the value.
          * @return A reference to the specified value or a newly builded.
+         * @throw utils::ArgError if the key does not exist.
          */
-        inline Value& operator[](const std::string& name)
-        { return m_value[name]; }
+        Value& operator[](const std::string& name);
 
-        /** 
-         * @brief Get an access to the std::map.
-         * @return a reference to the set::map.
+        /**
+         * @brief Get a Value from the map specified by his name.
+         * @param name The name of the value.
+         * @return A constant reference to the specified value or a newly
+         * builded.
+         * @throw utils::ArgError if the key does not exist.
          */
-        inline MapValue& getValue()
-        { return m_value; }
-
-        /** 
-         * @brief Get a constant access to the std::map.
-         * @return a reference to the const std::map.
-         */
-        inline const MapValue& getValue() const
-        { return m_value; }
+        const Value& operator[](const std::string& name) const;
 
         /**
          * @brief Get the Value objet for specified name.
@@ -136,154 +196,214 @@ namespace vle { namespace value {
          * @return a reference to the Value.
          * @throw utils::ArgError if value don't exist.
          */
-        Value getValue(const std::string& name) const;
+        const Value& get(const std::string& name) const;
 
-        /** 
+	/**
+         * @brief Get the Value objet for specified name.
+         * @param name The name of the Value in the map.
+         * @return a reference to the Value.
+         * @throw utils::ArgError if value don't exist.
+         */
+        Value& get(const std::string& name);
+
+        /**
+         * @brief Get an access to the std::map.
+         * @return a reference to the set::map.
+         */
+        inline MapValue& value()
+        { return m_value; }
+
+        /**
+         * @brief Get a constant access to the std::map.
+         * @return a reference to the const std::map.
+         */
+        inline const MapValue& value() const
+        { return m_value; }
+
+        /**
          * @brief Get the String value objet from specified name.
          * @param name The name of the Value in the map.
          * @return a reference to the Value.
          * @throw utils::ArgError if type is not Value::STRING or value do not
          * exist.
          */
-        const std::string& getStringValue(const std::string& name) const;
+        const std::string& getString(const std::string& name) const;
 
-        /** 
+        /**
          * @brief Set a string to the value of the specified key. If the key
          * does not exist, it will be build.
          * @param name The key of the map.
          * @param value The value of the key.
          */
-        void setStringValue(const std::string& name, const std::string& value);
+        void addString(const std::string& name, const std::string& value);
 
-        /** 
+        /**
          * @brief Get the String value objet from specified name.
          * @param name The name of the Value in the map.
          * @return a reference to the Value.
          * @throw utils::ArgError if type is not Value::STRING or value do not
          * exist.
          */
-        bool getBooleanValue(const std::string& name) const;
+        bool getBoolean(const std::string& name) const;
 
-        /** 
+        /**
          * @brief Set a boolean to the value of the specified key. If the key
          * does not exist, it will be build.
          * @param name The key of the map.
          * @param value The value of the key.
          */
-        void setBooleanValue(const std::string& name, bool value);
+        void addBoolean(const std::string& name, bool value);
 
-        /** 
+        /**
          * @brief Get the long integer value objet from specified name.
          * @param name The name of the Value in the map.
          * @return a reference to the Value.
          * @throw utils::ArgError if type is not Value::INTEGER or value do not
          * exist.
          */
-        long getLongValue(const std::string& name) const;
+        long getLong(const std::string& name) const;
 
-        /** 
+        /**
          * @brief Set a long integer to the value of the specified key. If the
          * key does not exist, it will be build.
          * @param name The key of the map.
          * @param value The value of the key.
          */
-        void setLongValue(const std::string& name, long value);
+        void addLong(const std::string& name, long value);
 
-        /** 
+        /**
          * @brief Get the integer value objet from specified name.
          * @param name The name of the Value in the map.
          * @return a reference to the Value.
          * @throw utils::ArgError if type is not Value::INTEGER or value do not
          * exist.
          */
-        int getIntValue(const std::string& name) const;
+        int getInt(const std::string& name) const;
 
-        /** 
+        /**
          * @brief Set a integer to the value of the specified key. If the
          * key does not exist, it will be build.
          * @param name The key of the map.
          * @param value The value of the key.
          */
-        void setIntValue(const std::string& name, int value);
+        void addInt(const std::string& name, int value);
 
-        /** 
+        /**
          * @brief Get the Double value objet from specified name.
          * @param name The name of the Value in the map.
          * @return a reference to the Value.
          * @throw utils::ArgError if type is not Value::DOUBLE or value do not
          * exist.
          */
-        double getDoubleValue(const std::string& name) const;
+        double getDouble(const std::string& name) const;
 
-        /** 
+        /**
          * @brief Set a double to the value of the specified key. If the
          * key does not exist, it will be build.
          * @param name The key of the map.
          * @param value The value of the key.
          */
-        void setDoubleValue(const std::string& name, double value);
+        void addDouble(const std::string& name, double value);
 
-        /** 
+        /**
          * @brief Get the XML value objet from specified name.
          * @param name The name of the Value in the map.
          * @return a reference to the Value.
          * @throw utils::ArgError if type is not Value::STRING or value do not
          * exist.
          */
-        const std::string& getXMLValue(const std::string& name) const;
+        const std::string& getXml(const std::string& name) const;
 
-        /** 
+        /**
          * @brief Set an XML to the value of the specified key. If the key
          * does not exist, it will be build.
          * @param name The key of the map.
          * @param value The value of the key.
          */
-        void setXMLValue(const std::string& name, const std::string& value);
+        void addXml(const std::string& name, const std::string& value);
 
-        /** 
+        /**
          * @brief Get the Map value objet from specified name.
          * @param name The name of the Value in the map.
          * @return a reference to the Value.
          * @throw utils::ArgError if type is not Value::Map or value do not
          * exist.
          */
-        Map getMapValue(const std::string& name) const;
+        const Map& getMap(const std::string& name) const;
 
-        /** 
+        /**
          * @brief Get the Set value objet from specified name.
          * @param name The name of the Value in the map.
          * @return a reference to the Value.
-         * @throw utils::ArgError if type is not Value::SET or value do not
+         * @throw utils::ArgError if type is not Value::add or value do not
          * exist.
          */
-        Set getSetValue(const std::string& name) const;
+        const Set& getSet(const std::string& name) const;
 
-        /** 
+        /**
          * @brief Delete all value from map.
          */
         void clear();
 
-        /** 
+        /**
          * @brief Get the first constant iterator from Map.
          * @return the first iterator.
          */
-        inline MapValue::const_iterator begin() const
+        inline const_iterator begin() const
         { return m_value.begin(); }
 
-        /** 
+        /**
          * @brief Get the last constant iterator from Map.
          * @return the last iterator.
          */
-        inline MapValue::const_iterator end() const
+        inline const_iterator end() const
+        { return m_value.end(); }
+
+        /**
+         * @brief Get the first constant iterator from Map.
+         * @return the first iterator.
+         */
+        inline iterator begin()
+        { return m_value.begin(); }
+
+        /**
+         * @brief Get the last constant iterator from Map.
+         * @return the last iterator.
+         */
+        inline iterator end()
         { return m_value.end(); }
 
     private:
         MapValue m_value;
+
+        Value* getPointer(const std::string& name);
+
+        const Value* getPointer(const std::string& name) const;
     };
 
-    Map toMapValue(const Value& value);
+    inline const Map& toMapValue(const Value& value)
+    { return value.toMap(); }
 
-    const MapValue& toMap(const Value& value);
+    inline const Map* toMapValue(const Value* value)
+    { return value ? &value->toMap() : 0; }
+
+    inline Map& toMapValue(Value& value)
+    { return value.toMap(); }
+
+    inline Map* toMapValue(Value* value)
+    { return value ? &value->toMap() : 0; }
+
+    inline const MapValue& toMap(const Value& value)
+    { return value.toMap().value(); }
+
+    inline MapValue& toMap(Value& value)
+    { return value.toMap().value(); }
+
+    inline const MapValue& toMap(const Value* value)
+    { return value::reference(value).toMap().value(); }
+
+    inline MapValue& toMap(Value* value)
+    { return value::reference(value).toMap().value(); }
 
 }} // namespace vle value
 #endif

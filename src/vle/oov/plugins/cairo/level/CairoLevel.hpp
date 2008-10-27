@@ -65,7 +65,7 @@ namespace vle { namespace oov { namespace plugin {
 
         std::vector < std::string > m_columns;
         std::map < std::string, int > m_columns2;
-        std::vector < value::Value > m_buffer;
+        std::vector < value::Value* > m_buffer;
         double m_time;
         unsigned int m_receive;
         std::map < int, double > m_minList;
@@ -79,7 +79,7 @@ namespace vle { namespace oov { namespace plugin {
 
         Cairo::RefPtr < Cairo::ImageSurface > m_img;
     };
-    
+
     DECLARE_OOV_PLUGIN(oov::plugin::CairoLevel)
 
 }}} // namespace vle oov plugin

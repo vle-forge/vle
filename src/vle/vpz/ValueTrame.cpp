@@ -36,7 +36,7 @@ void ValueTrame::add(const std::string& simulator,
     m_list.push_back(ModelTrame(simulator, parent, port, view));
 }
 
-void ValueTrame::add(const value::Value& value)
+void ValueTrame::add(const value::Value* value)
 {
     Assert(utils::ArgError, not m_list.empty(),
            "ValueTrame have not model trame.");

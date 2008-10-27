@@ -26,40 +26,21 @@
 #include <vle/value/String.hpp>
 #include <vle/utils/Debug.hpp>
 
-
-
 namespace vle { namespace value {
 
-String StringFactory::create(const std::string& value)
+void String::writeFile(std::ostream& out) const
 {
-    return String(new StringFactory(value));
+    out << m_value;
 }
 
-Value StringFactory::clone() const
+void String::writeString(std::ostream& out) const
 {
-    return Value(new StringFactory(m_value));
+    out << m_value;
 }
 
-std::string StringFactory::toXML() const
+void String::writeXml(std::ostream& out) const
 {
-    std::string val("<string>");
-    val += m_value;
-    val += "</string>";
-    return val;
-}
-
-String toStringValue(const Value& value)
-{
-    Assert(utils::ArgError, value->getType() == ValueBase::STRING,
-           "Value is not a String");
-    return boost::static_pointer_cast < StringFactory >(value);
-}
-
-const std::string& toString(const Value& value)
-{
-    Assert(utils::ArgError, value->getType() == ValueBase::STRING,
-           "Value is not a String");
-    return boost::static_pointer_cast < StringFactory >(value)->stringValue();
+    out << "<string>" << m_value.c_str() << "</string>";
 }
 
 }} // namespace vle value

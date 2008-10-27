@@ -42,7 +42,7 @@ void RunVerbose::operator()(vpz::Vpz* vpz)
         delete vpz;
         m_out << "ok\n";
 
-        m_out << " - Coordinator initializing .....: "; 
+        m_out << " - Coordinator initializing .....: ";
         m_root.init();
         m_out << "ok\n";
 
@@ -83,7 +83,7 @@ void RunVerbose::operator()(const std::string& filename)
         }
         m_out << "ok\n";
 
-        m_out << " - Coordinator initializing .....: "; 
+        m_out << " - Coordinator initializing .....: ";
         m_root.init();
         m_out << "ok\n";
 
@@ -122,7 +122,7 @@ void RunVerbose::operator()(const vpz::Vpz& vpz)
         }
         m_out << "ok\n";
 
-        m_out << " - Coordinator initializing .....: "; 
+        m_out << " - Coordinator initializing .....: ";
         m_root.init();
         m_out << "ok\n";
 

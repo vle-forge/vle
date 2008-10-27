@@ -23,6 +23,7 @@
  */
 
 
+#include <vle/manager/VLE.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Debug.hpp>
@@ -49,9 +50,9 @@ void eov_on_error(const std::string& type, const std::string& what)
 
 int main(int argc, char* argv[])
 {
-    utils::init();
+    vle::manager::init();
 
-    Glib::OptionContext context; 
+    Glib::OptionContext context;
     eov::CommandOptionGroup command;
     context.set_main_group(command);
 
@@ -96,7 +97,7 @@ int main(int argc, char* argv[])
         }
     }
 
-    utils::finalize();
+    vle::manager::finalize();
     return result ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 

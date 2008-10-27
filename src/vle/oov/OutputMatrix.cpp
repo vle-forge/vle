@@ -39,80 +39,85 @@ OutputMatrix::OutputMatrix(int columns,
                            int resizeColumns,
                            int resizeRows)
 {
-    m_values = value::MatrixFactory::create(
+    m_values = value::Matrix::create(
         1, // one row by default for the time column.
         0, // no data by default.
         (columns == 0) ? 1 : columns, // default size, minimun 1 column.
         rows, resizeColumns, resizeRows);
 }
 
-value::Value OutputMatrix::serialize() const
+OutputMatrix::~OutputMatrix()
 {
-    value::Set result(value::SetFactory::create());
-    result->addValue(m_values);
+    delete m_values;
+}
 
-    value::Set id(value::SetFactory::create());
+value::Value* OutputMatrix::serialize() const
+{
+    value::Set* result(value::Set::create());
+    result->add(m_values);
+
+    value::Set* id(value::Set::create());
     for (MapPairIndex::const_iterator it = m_colAccess.begin();
          it != m_colAccess.end(); ++it) {
-        id->addValue(value::StringFactory::create(it->first.first));
-        id->addValue(value::StringFactory::create(it->first.second));
-        id->addValue(value::IntegerFactory::create(it->second));
+        id->add(value::String::create(it->first.first));
+        id->add(value::String::create(it->first.second));
+        id->add(value::Integer::create(it->second));
     }
-    result->addValue(id);
+    result->add(id);
 
     return result;
 }
 
-void OutputMatrix::deserialize(value::Value vals)
+void OutputMatrix::deserialize(const value::Value& vals)
 {
     m_colAccess.clear();
 
-    value::Set result(value::toSetValue(vals));
-    Assert(utils::ArgError, result->size() == 2,
+    const value::Set& result(vals.toSet());
+    Assert(utils::ArgError, result.size() == 2,
            "Bad OutputMatrix deserialize flows");
 
-    m_values = value::toMatrixValue(result->getValue(0));
-    value::Set id(value::toSetValue(result->getValue(1)));
+    m_values = value::toMatrixValue(result.get(0).clone());
+    const value::Set& id(result.get(1).toSet());
 
-    Assert(utils::ArgError, id->size() % 3 == 0,
-           boost::format("Bad id's for the OutputMatrix: %1%") %
-           id->toString());
+    Assert(utils::ArgError, id.size() % 3 == 0,
+           boost::format("Bad id's for the OutputMatrix: '%1%'") % id);
 
-    Assert(utils::ArgError, id->size() / 3 == m_values->columns() - 1,
+    Assert(utils::ArgError, id.size() / 3 == m_values->columns() - 1,
            boost::format("Bad id's number (%2%) for matrix (%1%)") %
-           m_values->columns() % id->size());
+           m_values->columns() % id.size());
 
     {
-        value::VectorValue::const_iterator it = id->begin();
-        while (it != id->end()) {
+        value::VectorValue::const_iterator it = id.begin();
+        while (it != id.end()) {
             value::VectorValue::const_iterator model(it);
             value::VectorValue::const_iterator port(it + 1);
             value::VectorValue::const_iterator value(it + 2);
-            PairString colref(value::toString(*model), value::toString(*port));
-            m_colAccess[colref] = value::toInteger(*value);
+            PairString colref((*model)->toString().value(),
+                              (*port)->toString().value());
+            m_colAccess[colref] = (*value)->toInteger().value();
             it = it + 3;
         }
     }
 }
 
-void OutputMatrix::resize(value::MatrixFactory::size_type columns,
-                          value::MatrixFactory::size_type rows)
+void OutputMatrix::resize(value::Matrix::size_type columns,
+                          value::Matrix::size_type rows)
 {
     m_values->resize(columns, rows);
 }
 
-void OutputMatrix::updateStep(value::MatrixFactory::size_type resizeColumns,
-                              value::MatrixFactory::size_type resizeRows)
+void OutputMatrix::updateStep(value::Matrix::size_type resizeColumns,
+                              value::Matrix::size_type resizeRows)
 {
     m_values->setResizeColumn(resizeColumns);
     m_values->setResizeRow(resizeRows);
 }
 
-value::MatrixFactory::index OutputMatrix::addModel(const std::string& model,
+value::Matrix::index OutputMatrix::addModel(const std::string& model,
                                                    const std::string& port)
 {
     PairString colref(model, port);
-    
+
     MapStringList::const_iterator it = m_info.find(model);
     if (it == m_info.end()){
 	m_info[model] = StringList();
@@ -134,17 +139,17 @@ void OutputMatrix::addValue(const std::string& model,
     Assert(utils::ArgError, it != m_colAccess.end(), boost::format(
             "OutputMatrix have no couple (%1%, %2%)") % model % port);
 
-    m_values->addValue(it->second, m_values->rows(), value);
+    m_values->add(it->second, m_values->rows(), value);
 }
 
 void OutputMatrix::setLastTime(double value)
 {
-    value::MatrixFactory::MatrixValue::size_type row(m_values->rows());
+    value::Matrix::size_type row(m_values->rows());
     m_values->addRow();
-    m_values->addValue(0, row, value::DoubleFactory::create(value));
+    m_values->add(0, row, value::Double::create(value));
 }
 
-value::MatrixFactory::index OutputMatrix::column(const std::string& model,
+value::Matrix::index OutputMatrix::column(const std::string& model,
                                                  const std::string& port) const
 {
     MapStringList::const_iterator it = m_info.find(model);
@@ -160,7 +165,7 @@ value::MatrixFactory::index OutputMatrix::column(const std::string& model,
     return jt->second;
 }
 
-value::MatrixFactory::VectorView
+value::VectorView
 OutputMatrix::getValue(const std::string& model, const std::string& port)
 {
     PairString colref(model,port);
@@ -172,8 +177,8 @@ OutputMatrix::getValue(const std::string& model, const std::string& port)
     return m_values->column(it->second);
 }
 
-value::MatrixFactory::VectorView
-OutputMatrix::getValue(value::MatrixFactory::size_type idx)
+value::VectorView
+OutputMatrix::getValue(value::Matrix::size_type idx)
 {
     Assert(utils::ArgError, idx < m_values->columns(), boost::format(
             "Too big index for the matrix: %1%/%2%") % idx
@@ -182,7 +187,7 @@ OutputMatrix::getValue(value::MatrixFactory::size_type idx)
     return m_values->column(idx);
 }
 
-value::MatrixFactory::ConstVectorView
+value::ConstVectorView
 OutputMatrix::getValue(const std::string& model, const std::string& port) const
 {
     PairString colref(model,port);
@@ -194,8 +199,8 @@ OutputMatrix::getValue(const std::string& model, const std::string& port) const
     return m_values->column(it->second);
 }
 
-value::MatrixFactory::ConstVectorView
-OutputMatrix::getValue(value::MatrixFactory::size_type idx) const
+value::ConstVectorView
+OutputMatrix::getValue(value::Matrix::size_type idx) const
 {
     Assert(utils::ArgError, idx < m_values->columns(), boost::format(
             "Too big index for the matrix: %1%/%2%") % idx

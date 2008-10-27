@@ -26,58 +26,21 @@
 #include <vle/value/Integer.hpp>
 #include <vle/utils/Debug.hpp>
 
-
-
 namespace vle { namespace value {
 
-Integer IntegerFactory::create(long value)
+void Integer::writeFile(std::ostream& out) const
 {
-    return Integer(new IntegerFactory(value));
+    out << m_value;
 }
 
-Value IntegerFactory::clone() const
+void Integer::writeString(std::ostream& out) const
 {
-    return Value(new IntegerFactory(m_value));
+    out << m_value;
 }
 
-std::string IntegerFactory::toFile() const
+void Integer::writeXml(std::ostream& out) const
 {
-    return boost::lexical_cast < std::string >(m_value);
+    out << "<integer>" << m_value << "</integer>";
 }
-
-std::string IntegerFactory::toString() const
-{
-    return boost::lexical_cast < std::string >(m_value); 
-}
-
-std::string IntegerFactory::toXML() const
-{
-    std::string val("<integer>");
-    val += boost::lexical_cast < std::string >(m_value); 
-    val += "</integer>";
-    return val;
-}
-
-Integer toIntegerValue(const Value& value)
-{
-    Assert(utils::ArgError, value->getType() == ValueBase::INTEGER,
-           "Value is not an Integer");
-    return boost::static_pointer_cast < IntegerFactory >(value);
-}
-
-long toLong(const Value& value)
-{
-    Assert(utils::ArgError, value->getType() == ValueBase::INTEGER,
-           "Value is not an Integer");
-    return boost::static_pointer_cast < IntegerFactory >(value)->longValue();
-}
-
-int toInteger(const Value& value)
-{
-    Assert(utils::ArgError, value->getType() == ValueBase::INTEGER,
-           "Value is not an Integer");
-    return boost::static_pointer_cast < IntegerFactory >(value)->intValue();
-}
-
 
 }} // namespace vle value

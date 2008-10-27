@@ -28,7 +28,6 @@
 #include <vle/utils/XML.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/value/Set.hpp>
-#include <iostream>
 #include <fstream>
 
 
@@ -143,7 +142,7 @@ void ExperimentGenerator::buildCombinations()
         mTmpfile.project().experiment().conditions().rebuildValueSet();
         buildCombinationsFromReplicas(nb);
         buildCombination(nb);
-    } while (nb < getCombinationNumber()); 
+    } while (nb < getCombinationNumber());
 }
 
 void ExperimentGenerator::buildCombinationsFromReplicas(size_t cmbnumber)
@@ -165,9 +164,9 @@ void ExperimentGenerator::buildCombinationsFromReplicas(size_t cmbnumber)
 
     for (size_t jcom = 0; jcom < mCondition.size(); ++jcom) {
         size_t index = mCondition[jcom].pos;
-        value::Value val = itValueOrig->second->getValue(index);
+        value::Value& val = itValueOrig->second->get(index);
         itValueDest->second->clear();
-        itValueDest->second->addValue(val);
+        itValueDest->second->add(val);
 
         itValueDest++;
         itValueOrig++;

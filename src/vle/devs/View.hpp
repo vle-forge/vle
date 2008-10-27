@@ -79,7 +79,7 @@ namespace vle { namespace devs {
 	 */
 	void removeObservable(Simulator* model);
 
-        /** 
+        /**
          * @brief Test if a simulator is already connected with the same port
          * to the View.
          * @param simulator the simulator to observe.
@@ -88,14 +88,14 @@ namespace vle { namespace devs {
          */
         bool exist(Simulator* simulator, const std::string& portname) const;
 
-        /** 
+        /**
          * @brief Test if a simulator is already connected to the View.
          * @param simulator the simulator to search.
          * @return true if simulator is already connected.
          */
         bool exist(Simulator* simulator) const;
 
-        /** 
+        /**
          * @brief Get the portnames of the Simulator.
          * @param simulator the simulator to search.
          * @return the list of portname of the value.
@@ -119,13 +119,13 @@ namespace vle { namespace devs {
         inline vle::devs::StreamWriter * getStream() const
         { return m_stream; }
 
-        /** 
+        /**
          * @brief Get the current reference of the plugin.
          * @return A reference to the plugin.
          */
         oov::PluginPtr plugin() const;
 
-        /** 
+        /**
          * @brief Ask to the StreamWriter a new reference of the plugin and
          * affect it to the local reference. If the plugin receive from the
          * StreamWriter is null, then, the previous plugin is not modified.

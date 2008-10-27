@@ -37,12 +37,18 @@ EventView::EventView(const std::string& name, StreamWriter* stream) :
 
 ObservationEvent* EventView::processObservationEvent(ObservationEvent* event)
 {
-    value::Value val = event->getAttributeValue(event->getPortName());
-
-    if (val.get()) {
+    // TODO check this behaviour
+    if (event->existAttributeValue(event->getPortName())) {
         m_stream->process(*event);
     }
     return 0;
+
+    //value::Value* val = event->getAttributeValue(event->getPortName());
+
+    //if (val) {
+        //m_stream->process(*event);
+    //}
+    //return 0;
 }
 
 }} // namespace vle devs

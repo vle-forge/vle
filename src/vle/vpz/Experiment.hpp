@@ -78,7 +78,7 @@ namespace vle { namespace vpz {
          * Conditions, Views functions
          *
          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-     
+
         /**
          * @brief Just delete the complete list of information from
          * vpz::Experiment.

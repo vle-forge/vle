@@ -90,17 +90,15 @@ void GenExecutive::internalTransition(const devs::Time& time)
     }
 }
 
-value::Value GenExecutive::observation(const devs::ObservationEvent& ev) const
+value::Value* GenExecutive::observation(const devs::ObservationEvent& ev) const
 {
     if (ev.onPort("nbmodel")) {
-        return value::IntegerFactory::create(get_nb_model());
-    }
-    else if (ev.onPort("structure")) {
+        return value::Integer::create(get_nb_model());
+    } else if (ev.onPort("structure")) {
         std::ostringstream out;
         coupledmodel().writeXML(out);
-        return value::StringFactory::create(out.str());
-    }
-    else {
+        return value::String::create(out.str());
+    } else {
         return devs::Executive::observation(ev);
     }
 }

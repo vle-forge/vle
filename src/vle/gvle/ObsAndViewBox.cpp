@@ -42,7 +42,7 @@ ObsAndViewBox::ObsAndViewBox(Glib::RefPtr<Gnome::Glade::Xml> xml):
     mRefTreeObs = Gtk::TreeStore::create(mColumnsObs);
     mTreeViewObs->set_model(mRefTreeObs);
     mTreeViewObs->append_column("ObservablePorts", mColumnsObs.m_col_name);
-    
+
     mTreeViewObs->signal_button_press_event().connect_notify(
         sigc::mem_fun(*this, &ObsAndViewBox::on_button_press));
 

@@ -30,184 +30,243 @@
 #include <vle/value/Double.hpp>
 #include <vle/value/Boolean.hpp>
 #include <vle/value/XML.hpp>
+#include <vle/value/Deleter.hpp>
 #include <vle/utils/Debug.hpp>
-
-
+#include <vle/utils/Algo.hpp>
+#include <boost/utility.hpp>
 
 namespace vle { namespace value {
 
-MapFactory::MapFactory(const MapFactory& mapfactory) :
-    ValueBase(mapfactory)
+Map::Map(const Map& orig) :
+    Value(orig)
 {
-    for (MapValue::const_iterator it = mapfactory.m_value.begin();
-         it != mapfactory.m_value.end(); ++it) {
-        m_value[(*it).first] = CloneValue()((*it).second);
+    for (MapValue::const_iterator it = orig.m_value.begin();
+         it != orig.m_value.end(); ++it) {
+        m_value[(*it).first] = ((*it).second)->clone();
     }
 }
 
-Map MapFactory::create()
+Map::~Map()
 {
-    return Map(new MapFactory());
+    clear();
 }
 
-Value MapFactory::clone() const
+void Map::writeFile(std::ostream& out) const
 {
-    return Value(new MapFactory(*this));
+    for (MapValue::const_iterator it = m_value.begin();
+         it != m_value.end(); ++it) {
+        if (it != m_value.begin()) {
+            out << " ";
+        }
+        out << "(" << (*it).first.c_str() << ", ";
+        (*it).second->writeFile(out);
+        out << ")";
+    }
 }
 
-Value MapFactory::getValue(const std::string& name) const
+void Map::writeString(std::ostream& out) const
 {
-    MapValue::const_iterator it = m_value.find(name);
+    for (MapValue::const_iterator it = m_value.begin();
+         it != m_value.end(); ++it) {
+        if (it != m_value.begin()) {
+            out << " ";
+        }
+        out << "(" << (*it).first.c_str() << ", ";
+        (*it).second->writeString(out);
+        out << ")";
+    }
+}
 
+void Map::writeXml(std::ostream& out) const
+{
+    out << "<map>";
+
+    for (MapValue::const_iterator it = m_value.begin();
+         it != m_value.end(); ++it) {
+        out << "<key name=\"" << (*it).first.c_str() << "\">";
+        (*it).second->writeXml(out);
+        out << "</key>";
+    }
+    out << "</map>";
+}
+
+void Map::add(const std::string& name, Value* value)
+{
+    Assert(utils::ArgError, value, "Map: add empty value");
+
+    iterator it = m_value.find(name);
+    if (it != m_value.end()) {
+        delete it->second;
+        it->second = value;
+    } else {
+        m_value[name] = value;
+    }
+}
+
+void Map::addClone(const std::string& name, const Value& value)
+{
+    iterator it = m_value.find(name);
+    if (it != m_value.end()) {
+	delete it->second;
+        it->second = value.clone();
+    } else {
+        m_value[name] = value.clone();
+    }
+}
+
+void Map::addClone(const std::string& name, const Value* value)
+{
+    Assert(utils::ArgError, value, (boost::format(
+           "Map: add empty value with key '%1%'") % name));
+
+    iterator it = m_value.find(name);
+    if (it != m_value.end()) {
+        delete it->second;
+        it->second = value->clone();
+    } else {
+        m_value[name] = value->clone();
+    }
+}
+
+const Value& Map::operator[](const std::string& name) const
+{
+    const_iterator it = m_value.find(name);
     Assert(utils::ArgError, it != m_value.end(),
-           boost::format("Map Value have no value name '%1%'\n") %
-           name);
-
-    return (*it).second;
+	    (boost::format("Map: the key '%1%' does not exist") % name));
+    assert(it->second);
+    return *it->second;
 }
 
-const std::string& MapFactory::getStringValue(const std::string& name) const
+Value& Map::operator[](const std::string& name)
 {
-    return value::toString(getValue(name));
+    iterator it = m_value.find(name);
+    Assert(utils::ArgError, it != m_value.end(),
+	    (boost::format("Map: the key '%1%' does not exist") % name));
+
+    assert((*it).second);
+    return *it->second;
 }
 
-void MapFactory::setStringValue(const std::string& name, const std::string& value)
+const Value& Map::get(const std::string& name) const
 {
-    m_value[name] = StringFactory::create(value);
-}
-    
-bool MapFactory::getBooleanValue(const std::string& name) const
-{
-    return value::toBoolean(getValue(name));
+    const_iterator it = m_value.find(name);
+    Assert(utils::ArgError, it != m_value.end(),
+           (boost::format("Map: the key '%1%' does not exist") % name));
+
+    assert((*it).second);
+    return *(*it).second;
 }
 
-void MapFactory::setBooleanValue(const std::string& name, bool value)
+Value& Map::get(const std::string& name)
 {
-    m_value[name] = BooleanFactory::create(value);
-}
-    
-long MapFactory::getLongValue(const std::string& name) const
-{
-    return value::toLong(getValue(name));
+    iterator it = m_value.find(name);
+    Assert(utils::ArgError, it != m_value.end(),
+            (boost::format("Map: the key '%1%' does not exist") % name));
+
+    assert((*it).second);
+    return *(*it).second;
 }
 
-void MapFactory::setLongValue(const std::string& name, long value)
+const std::string& Map::getString(const std::string& name) const
 {
-    m_value[name] = IntegerFactory::create(value);
+    return value::toString(get(name));
 }
 
-int MapFactory::getIntValue(const std::string& name) const
+void Map::addString(const std::string& name, const std::string& value)
 {
-    return value::toInteger(getValue(name));
+    add(name, String::create(value));
 }
 
-void MapFactory::setIntValue(const std::string& name, int value)
+bool Map::getBoolean(const std::string& name) const
 {
-    m_value[name] = IntegerFactory::create(value);
-}
-    
-double MapFactory::getDoubleValue(const std::string& name) const
-{
-    return value::toDouble(getValue(name));
+    const Value* r = getPointer(name);
+    return value::toBoolean(r);
 }
 
-void MapFactory::setDoubleValue(const std::string& name, double value)
+void Map::addBoolean(const std::string& name, bool value)
 {
-    m_value[name] = DoubleFactory::create(value);
+    add(name, Boolean::create(value));
 }
 
-const std::string& MapFactory::getXMLValue(const std::string& name) const
+long Map::getLong(const std::string& name) const
 {
-    return value::toXml(getValue(name));
+    return value::toLong(get(name));
 }
 
-void MapFactory::setXMLValue(const std::string& name, const std::string& value)
+void Map::addLong(const std::string& name, long value)
 {
-    m_value[name] = XMLFactory::create(value);
-}
-    
-Map MapFactory::getMapValue(const std::string& name) const
-{
-    return value::toMapValue(getValue(name));
-}
-    
-Set MapFactory::getSetValue(const std::string& name) const
-{
-    return value::toSetValue(getValue(name));
+    add(name, Integer::create(value));
 }
 
-void MapFactory::clear()
+int Map::getInt(const std::string& name) const
 {
+    return value::toInteger(get(name));
+}
+
+void Map::addInt(const std::string& name, int value)
+{
+    add(name, Integer::create(value));
+}
+
+double Map::getDouble(const std::string& name) const
+{
+    return value::toDouble(get(name));
+}
+
+void Map::addDouble(const std::string& name, double value)
+{
+    add(name, Double::create(value));
+}
+
+const std::string& Map::getXml(const std::string& name) const
+{
+    return value::toXml(get(name));
+}
+
+void Map::addXml(const std::string& name, const std::string& value)
+{
+    add(name, Xml::create(value));
+}
+
+const Map& Map::getMap(const std::string& name) const
+{
+    return value::toMapValue(get(name));
+}
+
+const Set& Map::getSet(const std::string& name) const
+{
+    return value::toSetValue(get(name));
+}
+
+void Map::clear()
+{
+    std::stack < Value* > composite;
+
+    for (iterator it = begin(); it != end(); ++it) {
+        if (it->second) {
+            if (isComposite(it->second)) {
+                composite.push(it->second);
+            } else {
+                delete it->second;
+                it->second = 0;
+            }
+        }
+    }
+
+    deleter(composite);
     m_value.clear();
 }
-    
-std::string MapFactory::toFile() const
-{
-    std::string s;
-    MapValue::const_iterator it = m_value.begin();
 
-    while (it != m_value.end()) {
-        s += "(";
-        s += (*it).first;
-        s += ", ";
-        s += (*it).second->toFile();
-        s += ")";
-        ++it;
-        if (it != m_value.end()) {
-            s += " ";
-        }
-    }
-    return s;
+Value* Map::getPointer(const std::string& name)
+{
+    iterator it = m_value.find(name);
+    return it == m_value.end() ? 0 : it->second;
 }
 
-std::string MapFactory::toString() const
+const Value* Map::getPointer(const std::string& name) const
 {
-    std::string s;
-    MapValue::const_iterator it = m_value.begin();
-
-    while (it != m_value.end()) {
-        s += "(";
-        s += (*it).first;
-        s += ", ";
-        s += (*it).second->toString();
-        s += ")";
-        ++it;
-        if (it != m_value.end()) {
-            s += " ";
-        }
-    }
-    return s;
-}
-
-std::string MapFactory::toXML() const
-{
-    std::string s="<map>";
-    MapValue::const_iterator it = m_value.begin();
-
-    while (it != m_value.end()) {
-        s += "<key name=\"";
-        s += (*it).first;
-        s += "\">";
-        s += (*it).second->toXML();
-        s += "</key>";
-	++it;
-    }
-    s += "</map>";
-    return s;
-}
-
-Map toMapValue(const Value& value)
-{
-    Assert(utils::ArgError, value->getType() == ValueBase::MAP,
-           "Value is not a Map");
-    return boost::static_pointer_cast < MapFactory >(value);
-}
-
-const MapValue& toMap(const Value& value)
-{
-    Assert(utils::ArgError, value->getType() == ValueBase::MAP,
-           "Value is not a Map");
-    return boost::static_pointer_cast < MapFactory >(value)->getValue();
+    const_iterator it = m_value.find(name);
+    return it == m_value.end() ? 0 : it->second;
 }
 
 }} // namespace vle value

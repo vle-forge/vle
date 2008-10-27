@@ -26,6 +26,7 @@
 #include <vle/extension/DifferenceEquation.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Trace.hpp>
+#include <iostream>
 #include <cmath>
 
 namespace vle { namespace extension {
@@ -74,7 +75,7 @@ DifferenceEquation::DifferenceEquation(const AtomicModel& model,
                        % getModelName()).str());
 
             const value::Map& mapping = value::toMapValue(events.get("mapping"));
-            const value::MapValue& lst = mapping->getValue();
+            const value::MapValue& lst = mapping.value();
             for (value::MapValue::const_iterator it = lst.begin();
                  it != lst.end(); ++it) {
                 std::string port = it->first;
@@ -537,10 +538,10 @@ void DifferenceEquation::externalTransition(const ExternalEventList& event,
     }
 }
 
-Value DifferenceEquation::observation(const ObservationEvent& event) const
+Value* DifferenceEquation::observation(const ObservationEvent& event) const
 {
     if (mInvalid) {
-        return Value();
+        return 0;
     } else {
         Assert(utils::InternalError, event.getPortName() == mVariableName,
                boost::format("Observation: %1% model, invalid variable" \

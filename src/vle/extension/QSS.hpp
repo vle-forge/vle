@@ -41,13 +41,13 @@ namespace vle { namespace extension {
         virtual vle::devs::Time init(const devs::Time& time);
 
     private:
-        virtual void reset(const vle::devs::Time& /* time */, 
+        virtual void reset(const vle::devs::Time& /* time */,
 			   double /* value */);
 	virtual void updateGradient(bool external, const vle::devs::Time& time);
         virtual void updateSigma(const vle::devs::Time& time);
         virtual void updateValue(bool external, const vle::devs::Time& time);
 
-        unsigned long mIndex;	
+        unsigned long mIndex;
         /** Constantes */
         double mPrecision;
         double mEpsilon;

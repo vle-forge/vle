@@ -153,7 +153,7 @@ namespace vle { namespace vpz {
          * Get/Set
          *
          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-    
+
         /**
          * @brief Get a constant reference to the vpz::DynamicList.
          * @return Get a constant reference to the vpz::DynamicList.
@@ -167,7 +167,7 @@ namespace vle { namespace vpz {
          */
         inline DynamicList& dynamiclist()
         { return m_list; }
-    
+
         /**
          * @brief Get a iterator the begin of the vpz::DynamicList.
          * @return Get a iterator the begin of the vpz::DynamicList.

@@ -30,34 +30,31 @@
 #include <vle/value/Boolean.hpp>
 #include <vle/value/String.hpp>
 #include <vle/utils/Debug.hpp>
-
-
+#include <vle/devs/ExternalEvent.hpp>
+#include <vle/devs/ObservationEvent.hpp>
+#include <vle/devs/RequestEvent.hpp>
 
 namespace vle { namespace devs {
 
-Event::Event() :
-    m_source(0),
-    m_valid(true),
-    m_attributes(value::MapFactory::create())
-{ 
-}
+Pools* Pools::m_pool = 0;
 
-Event::Event(Simulator* model) :
-    m_source(model),
-    m_valid(true),
-    m_attributes(value::MapFactory::create())
-{
-}
+Pools::Pools() :
+    m_pools(
+        std::max(sizeof(InternalEvent), std::max(sizeof(ExternalEvent),
+        std::max(sizeof(ObservationEvent), sizeof(RequestEvent)))) + 1)
+{}
 
-Event::Event(const Event& event) :
-    m_source(event.m_source),
-    m_valid(event.m_valid),
-    m_attributes(event.m_attributes)
-{
-}
+Pools::Pools(const Pools& /* other */) :
+    m_pools(
+        std::max(sizeof(InternalEvent), std::max(sizeof(ExternalEvent),
+        std::max(sizeof(ObservationEvent), sizeof(RequestEvent)))) + 1)
+{}
 
 Event::~Event()
 {
+    if (m_delete and m_attributes) {
+        delete m_attributes;
+    }
 }
 
 const std::string Event::getSourceModelName() const
@@ -65,12 +62,22 @@ const std::string Event::getSourceModelName() const
     return m_source->getName();
 }
 
-void Event::putAttribute(vle::value::Map mp)
+void Event::putAttributes(const value::Map& mp)
 {
-    for (value::MapValue::iterator it = mp->getValue().begin();
-         it != mp->getValue().end(); ++it) {
-        putAttribute((*it).first, (*it).second);
+    for (value::MapValue::const_iterator it = mp.value().begin();
+         it != mp.value().end(); ++it) {
+        putAttribute((*it).first, (*it).second->clone());
     }
+}
+
+void init()
+{
+    devs::Pools::init();
+}
+
+void finalize()
+{
+    devs::Pools::kill();
 }
 
 }} // namespace vle devs

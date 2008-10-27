@@ -39,9 +39,7 @@ TimedView::TimedView(const std::string& name, StreamWriter* stream,
 
 ObservationEvent* TimedView::processObservationEvent(ObservationEvent* event)
 {
-    value::Value value = event->getAttributeValue(event->getPortName());
-
-    if (value.get()) {
+    if (event->existAttributeValue(event->getPortName())) {
         m_stream->process(*event);
     }
 
@@ -49,6 +47,17 @@ ObservationEvent* TimedView::processObservationEvent(ObservationEvent* event)
                                 event->getModel(),
                                 getName(),
                                 event->getPortName());
+    // TODO check this behaviour
+    //value::Value value = event->getAttributeValue(event->getPortName());
+    //
+    //if (value.get()) {
+    //m_stream->process(*event);
+    //}
+    //
+    //return new ObservationEvent(event->getTime() + m_timeStep,
+    //event->getModel(),
+    //getName(),
+    //event->getPortName());
 }
 
 }} // namespace vle devs

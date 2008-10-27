@@ -44,7 +44,7 @@ namespace vle { namespace extension {
         virtual void internalTransition(const devs::Time& event);
         virtual void externalTransition(const devs::ExternalEventList& event,
                                         const devs::Time& time);
-        virtual value::Value observation(const devs::ObservationEvent& event)
+        virtual value::Value* observation(const devs::ObservationEvent& event)
             const;
 
         virtual void processPerturbation(const devs::ExternalEvent& event);

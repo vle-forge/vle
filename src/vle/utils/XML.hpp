@@ -32,9 +32,9 @@
 
 
 namespace vle { namespace utils {
-   
-   
-    /** 
+
+
+    /**
      * @brief This namespace provides some static function other the libxml++
      * API for help developer to reduce his source code.
      */
@@ -97,12 +97,12 @@ namespace vle { namespace utils {
     double get_double_attribute(xmlpp::Element* elt,
 				const Glib::ustring& name);
 
-    /** 
+    /**
      * @brief Get size_t conversion of an attribute value from an element node.
-     * 
+     *
      * @param elt element node to examine.
      * @param name attribute name to find.
-     * 
+     *
      * @return size_t translation.
      *
      * @throw ParseError.
@@ -221,9 +221,9 @@ namespace vle { namespace utils {
     void import_children_nodes(xmlpp::Element* destination,
 			       xmlpp::Element* origin);
 
-    /** 
+    /**
      * @brief Import children nodes from string. Parent node is forget.
-     * 
+     *
      * @param dest root node to import.
      * @param xml string to translate.
      */

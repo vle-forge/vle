@@ -39,7 +39,7 @@ using std::vector;
 
 
 namespace vle { namespace extension {
-    
+
 using namespace devs;
 using namespace vle::value;
 
@@ -64,7 +64,7 @@ CellQSS::CellQSS(const vle::graph::AtomicModel& model,
     m_active = value::toBoolean(active);
 
     const value::Map& variables = value::toMapValue(events.get("variables"));
-    const value::MapValue& lst = variables->getValue();
+    const value::MapValue& lst = variables.value();
 
     m_functionNumber = lst.size();
 
@@ -77,10 +77,10 @@ CellQSS::CellQSS(const vle::graph::AtomicModel& model,
 
     for (value::MapValue::const_iterator it = lst.begin(); it != lst.end();
          ++it) {
-        const value::Set& tab(value::toSetValue(it->second));
+        const value::Set& tab(*value::toSetValue(it->second));
 
-        unsigned int index = value::toInteger(tab->getValue(0));
-        double init = value::toDouble(tab->getValue(1));
+        unsigned int index = value::toInteger(tab.get(0));
+        double init = value::toDouble(tab.get(1));
         m_variableIndex[it->first] = index;
         m_variableName[index] = it->first;
         m_initialValueList.push_back(std::pair < unsigned int, double >(
@@ -309,9 +309,9 @@ void CellQSS::processPerturbation(const ExternalEvent& /* event */)
     CellDevs::setSigma(0);
 }
 
-Value CellQSS::observation(const ObservationEvent& event) const
+Value* CellQSS::observation(const ObservationEvent& event) const
 {
-    return value::DoubleFactory::create(getDoubleState(event.getPortName()));
+    return value::Double::create(getDoubleState(event.getPortName()));
 }
 
 }} // namespace vle extension

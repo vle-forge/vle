@@ -28,7 +28,7 @@
 
 namespace vle { namespace examples { namespace dess {
 
-    /** 
+    /**
      * @brief A DEVS counter which store the date of the latest event.
      */
     class Counter : public devs::Dynamics
@@ -47,7 +47,7 @@ namespace vle { namespace examples { namespace dess {
         virtual void externalTransition(const devs::ExternalEventList& evts,
                                         const devs::Time& time);
 
-        virtual value::Value observation(const devs::ObservationEvent& e) const;
+        virtual value::Value* observation(const devs::ObservationEvent& e) const;
 
     private:
         devs::Time mDate;

@@ -23,59 +23,155 @@
  */
 
 
-#ifndef UTILS_VALUE_DOUBLE_HPP
-#define UTILS_VALUE_DOUBLE_HPP
+#ifndef VLE_VALUE_DOUBLE_HPP
+#define VLE_VALUE_DOUBLE_HPP
 
 #include <vle/value/Value.hpp>
-
-
 
 namespace vle { namespace value {
 
     /**
-     * @brief Double Value.
+     * @brief Double Value encapsulate a C++ 'double' type into a class to
+     * perform serialization, pool of memory etc.
      */
-    class DoubleFactory : public ValueBase
+    class Double : public Value
     {
-    private:
-        DoubleFactory() :
-            m_value(0.0)
-        { }
-
-        DoubleFactory(double value = 0.0) :
-            m_value(value)
-        { }
-
     public:
-        virtual ~DoubleFactory()
-        { }
+        /**
+         * @brief Build a Double object with a default value as 0.0.
+         */
+        Double() :
+            m_value(0.0)
+        {}
 
-        static Double create(double value = 0.0);
+        /**
+         * @brief Build a Double object with a specifiied value.
+         * @param value The value to copy.
+         */
+        Double(double value) :
+            m_value(value)
+        {}
 
-        virtual Value clone() const;
+        /**
+         * @brief Copy constuctor.
+         * @param value The value to copy.
+         */
+        Double(const Double& value) :
+            Value(value),
+            m_value(value.m_value)
+        {}
 
-        inline virtual ValueBase::type getType() const
-        { return ValueBase::DOUBLE; }
+        /**
+         * @brief Nothing to delete.
+         */
+	virtual ~Double() {}
 
-        inline double doubleValue() const
+        ///
+        ////
+        ///
+
+        /**
+         * @brief Build a Double using the boost::pool memory management.
+         * @param value the value of the Double.
+         * @return A new Double allocated from the boost::pool.
+         */
+        static Double* create(double value = 0.0)
+        { return new Double(value); }
+
+        ///
+        ////
+        ///
+
+        /**
+         * @brief Clone the current Double with the same value.
+         * @return A new boost::pool allocated value::Value.
+         */
+        virtual Value* clone() const
+        { return new Double(m_value); }
+
+        /**
+         * @brief Get the type of this class.
+         * @return Return Value::DOUBLE.
+         */
+        inline virtual Value::type getType() const
+        { return Value::DOUBLE; }
+
+        /**
+         * @brief Push the long in the stream. Use the stream operator
+         * setprecision, fill etc. to manage the representation of this double.
+         * @param out The output stream.
+         */
+        virtual void writeFile(std::ostream& out) const;
+
+        /**
+         * @brief Push the long in the stream. Use the stream operator
+         * setprecision, fill etc. to manage the representation of this double.
+         * @param out The output stream.
+         */
+	virtual void writeString(std::ostream& out) const;
+
+        /**
+         * @brief Push the double in the stream. The string pushed in the
+         * stream:
+         * @code
+         * <double>12.134</double>
+         * <double>-0.7854e-123</double>
+         * @param out The output stream.
+         */
+	virtual void writeXml(std::ostream& out) const;
+
+        ///
+        ////
+        ///
+
+        /**
+         * @brief Get the value of the double.
+         * @return A double.
+         */
+        inline double value() const
         { return m_value; }
 
+        /**
+         * @brief Get a reference to the encapsulated double.
+         * @return A reference to the encapsulated double.
+         */
+        inline double& value()
+        { return m_value; }
+
+        /**
+         * @brief Assign a value to the encapsulated double.
+         * @param value The value to set.
+         */
         inline void set(double value)
         { m_value = value; }
-
-        virtual std::string toFile() const;
-
-        virtual std::string toString() const;
-
-        virtual std::string toXML() const;
 
     private:
         double m_value;
     };
 
-    Double toDoubleValue(const Value& value);
+    inline const Double& toDoubleValue(const Value& value)
+    { return value.toDouble(); }
 
-    double toDouble(const Value& value);
+    inline const Double* toDoubleValue(const Value* value)
+    { return value ? &value->toDouble() : 0; }
+
+    inline Double& toDoubleValue(Value& value)
+    { return value.toDouble(); }
+
+    inline Double* toDoubleValue(Value* value)
+    { return value ? &value->toDouble() : 0; }
+
+    inline double toDouble(const Value& value)
+    { return value.toDouble().value(); }
+
+    inline double& toDouble(Value& value)
+    { return value.toDouble().value(); }
+
+    inline double toDouble(const Value* value)
+    { return value::reference(value).toDouble().value(); }
+
+    inline double& toDouble(Value* value)
+    { return value::reference(value).toDouble().value(); }
 
 }} // namespace vle value
 #endif

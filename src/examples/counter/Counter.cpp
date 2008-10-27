@@ -58,10 +58,10 @@ void Counter::externalTransition(const devs::ExternalEventList& /* event */,
     m_active = true;
 }
 
-value::Value Counter::observation(const devs::ObservationEvent& event) const
+value::Value* Counter::observation(const devs::ObservationEvent& event) const
 {
     if (event.onPort("c")) return buildDouble(m_counter);
-    return value::Value();
+    return 0;
 }
 
 }}} // namespace vle examples counter

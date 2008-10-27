@@ -62,7 +62,7 @@ double Rand::log_normal(double standarddeviation, double average)
 double Rand::von_mises(const double kappa, const double mu)
 {
     if (kappa <= 1e-6){
-	return 2.*G_PI * get_double_included(); 
+	return 2.*G_PI * get_double_included();
     }
 
     double a = 1.0 + sqrt(1.0 + 4.0 * kappa * kappa);

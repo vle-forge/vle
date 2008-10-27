@@ -41,7 +41,7 @@
 namespace vle { namespace manager {
 
 
-    /** 
+    /**
      * @brief ManagerRun is the base class for running simulation from a
      * specified vpz file that containts and experimental frames. ManagerRun
      * does not run simulation, see ManagerRunThread and ManagerRunDistant.
@@ -51,7 +51,7 @@ namespace vle { namespace manager {
     class ManagerRun : public boost::noncopyable
     {
     public:
-        /** 
+        /**
          * @brief Build a ManagerRun.
          *
          * @param out output to log error.
@@ -64,7 +64,7 @@ namespace vle { namespace manager {
 
         virtual ~ManagerRun();
 
-        /** 
+        /**
          * @brief Get a reference to the oov::PluginPtr list of the simulation
          * sort by filename.
          *
@@ -72,7 +72,7 @@ namespace vle { namespace manager {
          */
         OutputSimulationMatrix& outputSimulationMatrix();
 
-        /** 
+        /**
          * @brief Get a constant reference to the oov::PluginPtr list of the
          * simulation sort by filename.
          *
@@ -87,7 +87,7 @@ namespace vle { namespace manager {
         RandPtr                 m_rand;
         ExperimentGenerator*    m_exp;
 
-        /** 
+        /**
          * @brief Build the ExperimentGenerator attached to the vpz::Vpz
          * definition in experiments tags.
          *
@@ -97,7 +97,7 @@ namespace vle { namespace manager {
         ExperimentGenerator* getCombinationPlan(
             const vpz::Vpz& file, std::ostream& out);
 
-        /** 
+        /**
          * @brief Initialize a random number generator if the user does not
          * call the constructor with a valid RandomNumberGenerator. The seed is
          * provided by the vpz::Vpz file instance in the replicas tags. If the
@@ -110,14 +110,14 @@ namespace vle { namespace manager {
 
 
 
-    /** 
+    /**
      * @brief ManagerRunMono is the class for running experimental frames onto
      * the same host with only one thread.
      */
     class ManagerRunMono : public ManagerRun
     {
     public:
-        /** 
+        /**
          * @brief Build a ManagerRunMono.
          * @param out output to log error.
          * @param writefile write all experimental frames file produced.
@@ -132,28 +132,28 @@ namespace vle { namespace manager {
         virtual ~ManagerRunMono()
         { }
 
-        /** 
+        /**
          * @brief Read specified vpz files an start simulations on the number of
          * processor specified in constructor.
          * @param filename.
          */
         void operator()(const std::string& filename);
 
-        /** 
+        /**
          * @brief Read specified vpz files an start simulations on the number of
          * processor specified in constructor.
          * @param filename.
          */
         void start(const std::string& filename);
 
-        /** 
+        /**
          * @brief Read specified vpz files an start simulations on the number of
          * processor specified in constructor.
          * @param file.
          */
         void operator()(const vpz::Vpz& file);
 
-        /** 
+        /**
          * @brief Read specified vpz files an start simulations on the number of
          * processor specified in constructor.
          * @param filename.
@@ -168,14 +168,14 @@ namespace vle { namespace manager {
 
 
 
-    /** 
+    /**
      * @brief ManagerRunThread is the class for running experimental frames onto
      * the same host with a specific number of threads.
      */
     class ManagerRunThread : public ManagerRun
     {
     public:
-        /** 
+        /**
          * @brief Build a ManagerRunThread.
          * @param out output to log error.
          * @param writefile write all experimental frames file produced.
@@ -190,40 +190,40 @@ namespace vle { namespace manager {
         virtual ~ManagerRunThread()
         { }
 
-        /** 
+        /**
          * @brief Read specified vpz files an start simulations on the number of
          * processor specified in constructor.
          * @param filename.
          */
         void operator()(const std::string& filename);
 
-        /** 
+        /**
          * @brief Read specified vpz files an start simulations on the number of
          * processor specified in constructor.
          * @param filename.
          */
         void start(const std::string& filename);
 
-        /** 
+        /**
          * @brief Read specified vpz files an start simulations on the number of
          * processor specified in constructor.
          * @param file.
          */
         void operator()(const vpz::Vpz& file);
 
-        /** 
+        /**
          * @brief Read specified vpz files an start simulations on the number of
          * processor specified in constructor.
          * @param filename.
          */
         void start(const vpz::Vpz& file);
 
-        /** 
+        /**
          * @brief A pool of threads to run simulation.
          */
         void run();
 
-        /** 
+        /**
          * @brief A thread to build plan.
          */
         void read();
@@ -241,8 +241,8 @@ namespace vle { namespace manager {
     };
 
 
-    
-    /** 
+
+    /**
      * @brief ManagerRunDistant is the class for running experimental frames
      * onto distant nodes. It parses the user hosts file to get Simulator
      * position and lauch simulation on hosts in immediate mode.
@@ -250,7 +250,7 @@ namespace vle { namespace manager {
     class ManagerRunDistant : public ManagerRun
     {
     public:
-        /** 
+        /**
          * @brief Build a ManagerRunDistant.
          * @param out output to log error.
          * @param writefile write all experimental frames file produced.
@@ -264,40 +264,40 @@ namespace vle { namespace manager {
         virtual ~ManagerRunDistant()
         { }
 
-        /** 
+        /**
          * @brief Read specified vpz files an start simulations on the number of
          * processor specified in constructor.
          * @param filename.
          */
         void operator()(const std::string& filename);
 
-        /** 
+        /**
          * @brief Read specified vpz files an start simulations on the number of
          * processor specified in constructor.
          * @param filename.
          */
         void start(const std::string& filename);
 
-        /** 
+        /**
          * @brief Read specified vpz files an start simulations on the number of
          * processor specified in constructor.
          * @param file.
          */
         void operator()(const vpz::Vpz& file);
 
-        /** 
+        /**
          * @brief Read specified vpz files an start simulations on the number of
          * processor specified in constructor.
          * @param filename.
          */
         void start(const vpz::Vpz& file);
-        
-        /** 
+
+        /**
          * @brief A thread to send vpz to simulators.
          */
         void send();
 
-        /** 
+        /**
          * @brief A thread to build plan.
          */
         void read();
@@ -320,14 +320,14 @@ namespace vle { namespace manager {
         Glib::Mutex                                 m_mutex;
         Glib::Cond                                  m_prodcond;
 
-        /** 
+        /**
          * @brief A thread safe function to acces to the top of the vpz::Vpz
          * reference from the ExperimentGenerator.
          * @return A reference to the vpz::Vpz reference or null if empty.
          */
         vpz::Vpz* getVpz();
 
-        /** 
+        /**
          * @brief Return the number of vpz::Vpz file remaining in the
          * ExperimentGenerator.
          * @return A number of vpz::Vpz file to simulate;
@@ -353,7 +353,7 @@ namespace vle { namespace manager {
         return m_matrix;
     }
 
-    inline const 
+    inline const
     OutputSimulationMatrix& ManagerRun::outputSimulationMatrix() const
     {
         return m_matrix;
@@ -374,7 +374,7 @@ namespace vle { namespace manager {
     {
         operator()(file);
     }
-    
+
     inline ManagerRunThread::ManagerRunThread(std::ostream& out, bool writefile,
                                               int process, RandPtr rnd) :
         ManagerRun(out, writefile, rnd),

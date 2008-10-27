@@ -63,8 +63,8 @@ BOOST_AUTO_TEST_CASE(build_experimental_frames)
     file.project().experiment().replicas().setNumber(4);
 
     vpz::Conditions& cnds(file.project().experiment().conditions());
-    cnds.get("ca").addValueToPort("x", value::DoubleFactory::create(1.0));
-    cnds.get("ca").addValueToPort("x", value::DoubleFactory::create(2.0));
+    cnds.get("ca").addValueToPort("x", value::Double::create(1.0));
+    cnds.get("ca").addValueToPort("x", value::Double::create(2.0));
 
     using namespace manager;
 
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(build_experimental_frames)
 
     for (OutputSimulationMatrix::size_type x(0); x < out.shape()[0]; ++x) {
         for (OutputSimulationMatrix::size_type y = 0; y < out.shape()[1]; ++y) {
-            typedef value::MatrixFactory::MatrixView::size_type tmp_type ;
+            typedef value::MatrixView::size_type tmp_type ;
 
             BOOST_REQUIRE_EQUAL(out[x][y].size(),
                                 (oov::OutputMatrixViewList::size_type)2);
@@ -115,18 +115,18 @@ BOOST_AUTO_TEST_CASE(build_linear_combination_size)
     file.project().experiment().setCombination("linear");
 
     vpz::Conditions& cnds(file.project().experiment().conditions());
-    cnds.get("ca").addValueToPort("x", value::DoubleFactory::create(1.0));
-    cnds.get("ca").addValueToPort("x", value::DoubleFactory::create(2.0));
-    cnds.get("ca").addValueToPort("x", value::DoubleFactory::create(3.0));
-    cnds.get("ca").addValueToPort("x", value::DoubleFactory::create(4.0));
+    cnds.get("ca").addValueToPort("x", value::Double::create(1.0));
+    cnds.get("ca").addValueToPort("x", value::Double::create(2.0));
+    cnds.get("ca").addValueToPort("x", value::Double::create(3.0));
+    cnds.get("ca").addValueToPort("x", value::Double::create(4.0));
 
-    cnds.get("cb").addValueToPort("x", value::DoubleFactory::create(5.0));
-    cnds.get("cb").addValueToPort("x", value::DoubleFactory::create(6.0));
-    cnds.get("cb").addValueToPort("x", value::DoubleFactory::create(7.0));
-    cnds.get("cb").addValueToPort("x", value::DoubleFactory::create(8.0));
+    cnds.get("cb").addValueToPort("x", value::Double::create(5.0));
+    cnds.get("cb").addValueToPort("x", value::Double::create(6.0));
+    cnds.get("cb").addValueToPort("x", value::Double::create(7.0));
+    cnds.get("cb").addValueToPort("x", value::Double::create(8.0));
 
-    cnds.get("cd").addValueToPort("x", value::DoubleFactory::create(9.0));
-    cnds.get("cd").addValueToPort("x", value::DoubleFactory::create(10.0));
+    cnds.get("cd").addValueToPort("x", value::Double::create(9.0));
+    cnds.get("cd").addValueToPort("x", value::Double::create(10.0));
 
     using namespace manager;
 
@@ -146,15 +146,15 @@ BOOST_AUTO_TEST_CASE(build_linear_output_matrix_size)
     file.project().experiment().setCombination("linear");
 
     vpz::Conditions& cnds(file.project().experiment().conditions());
-    cnds.get("ca").addValueToPort("x", value::DoubleFactory::create(1.0));
-    cnds.get("ca").addValueToPort("x", value::DoubleFactory::create(2.0));
-    cnds.get("ca").addValueToPort("x", value::DoubleFactory::create(3.0));
-    cnds.get("ca").addValueToPort("x", value::DoubleFactory::create(4.0));
+    cnds.get("ca").addValueToPort("x", value::Double::create(1.0));
+    cnds.get("ca").addValueToPort("x", value::Double::create(2.0));
+    cnds.get("ca").addValueToPort("x", value::Double::create(3.0));
+    cnds.get("ca").addValueToPort("x", value::Double::create(4.0));
 
-    cnds.get("cb").addValueToPort("x", value::DoubleFactory::create(6.0));
-    cnds.get("cb").addValueToPort("x", value::DoubleFactory::create(7.0));
-    cnds.get("cb").addValueToPort("x", value::DoubleFactory::create(8.0));
-    cnds.get("cb").addValueToPort("x", value::DoubleFactory::create(9.0));
+    cnds.get("cb").addValueToPort("x", value::Double::create(6.0));
+    cnds.get("cb").addValueToPort("x", value::Double::create(7.0));
+    cnds.get("cb").addValueToPort("x", value::Double::create(8.0));
+    cnds.get("cb").addValueToPort("x", value::Double::create(9.0));
 
     using namespace manager;
 
@@ -169,7 +169,7 @@ BOOST_AUTO_TEST_CASE(build_linear_output_matrix_size)
 
     for (OutputSimulationMatrix::size_type x(0); x < out.shape()[0]; ++x) {
         for (OutputSimulationMatrix::size_type y = 0; y < out.shape()[1]; ++y) {
-            typedef value::MatrixFactory::MatrixView::size_type tmp_type ;
+            typedef value::MatrixView::size_type tmp_type ;
 
             BOOST_REQUIRE_EQUAL(out[x][y].size(),
                                 (oov::OutputMatrixViewList::size_type)2);

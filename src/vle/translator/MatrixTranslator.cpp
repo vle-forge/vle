@@ -526,17 +526,17 @@ void MatrixTranslator::translateCondition1D(unsigned int i)
     std::string name = (boost::format("cond_%1%_%2%")
                         % m_prefix % i).str();
     vpz::Condition condition(name);
-    value::Set neighbourhood = value::SetFactory::create();
+    value::Set* neighbourhood = value::Set::create();
 
     if (i != 1)
-        neighbourhood->addValue(value::StringFactory::create("L"));
+        neighbourhood->add(value::String::create("L"));
 
     if (i != m_size[0])
-        neighbourhood->addValue(value::StringFactory::create("R"));
+        neighbourhood->add(value::String::create("R"));
 
     condition.addValueToPort("Neighbourhood", neighbourhood);
 
-    condition.addValueToPort("_x", value::IntegerFactory::create(i));
+    condition.addValueToPort("_x", value::Integer::create(i));
 
     mCoordinator->addPermanent(condition);
 }
@@ -547,38 +547,38 @@ void MatrixTranslator::translateCondition2D(unsigned int i,
     std::string name = (boost::format("cond_%1%_%2%_%3%")
                         % m_prefix % i % j).str();
     vpz::Condition condition(name);
-    value::Set neighbourhood = value::SetFactory::create();
+    value::Set* neighbourhood = value::Set::create();
 
     if (i != 1)
-        neighbourhood->addValue(value::StringFactory::create("N"));
+        neighbourhood->add(value::String::create("N"));
 
     if (j != m_size[1])
-        neighbourhood->addValue(value::StringFactory::create("E"));
+        neighbourhood->add(value::String::create("E"));
 
     if (i != m_size[0])
-        neighbourhood->addValue(value::StringFactory::create("S"));
+        neighbourhood->add(value::String::create("S"));
 
     if (j != 1)
-        neighbourhood->addValue(value::StringFactory::create("W"));
+        neighbourhood->add(value::String::create("W"));
 
     if (m_connectivity == VON_NEUMANN) {
         if (i != 1 and j != 1)
-            neighbourhood->addValue(value::StringFactory::create("NW"));
+            neighbourhood->add(value::String::create("NW"));
 
         if (i != 1 and j != m_size[1])
-            neighbourhood->addValue(value::StringFactory::create("NE"));
+            neighbourhood->add(value::String::create("NE"));
 
         if (i != m_size[0] and j != 1)
-            neighbourhood->addValue(value::StringFactory::create("SW"));
+            neighbourhood->add(value::String::create("SW"));
 
         if (i != m_size[0] and j != m_size[1])
-            neighbourhood->addValue(value::StringFactory::create("SE"));
+            neighbourhood->add(value::String::create("SE"));
     }
 
     condition.addValueToPort("Neighbourhood", neighbourhood);
 
-    condition.addValueToPort("_x", value::IntegerFactory::create(i));
-    condition.addValueToPort("_y", value::IntegerFactory::create(j));
+    condition.addValueToPort("_x", value::Integer::create(i));
+    condition.addValueToPort("_y", value::Integer::create(j));
     mCoordinator->addPermanent(condition);
 }
 

@@ -28,16 +28,16 @@ namespace vle { namespace examples { namespace dess {
 
 void Counter::externalTransition(const devs::ExternalEventList& evts,
 				 const devs::Time& time)
-{ 
-    mDate = time; 
-    mNumber += evts.size(); 
+{
+    mDate = time;
+    mNumber += evts.size();
 }
 
-value::Value Counter::observation(const devs::ObservationEvent& e) const
-{ 
+value::Value* Counter::observation(const devs::ObservationEvent& e) const
+{
     return e.onPort("date") ?
-	value::DoubleFactory::create(mDate.getValue()) :
-	value::DoubleFactory::create(mNumber); 
+	value::Double::create(mDate.getValue()) :
+	value::Double::create(mNumber);
 }
 
 }}} // namespace vle examples dess

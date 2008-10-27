@@ -120,7 +120,7 @@ BOOST_AUTO_TEST_CASE(coupledmodel_vpz)
         "  </model>\n"
         " </structures>\n"
         "</vle_project>\n";
-    
+
     vpz::Vpz vpz;
     vpz.parseMemory(xml);
 
@@ -222,7 +222,7 @@ BOOST_AUTO_TEST_CASE(experiment_vpz)
         "  </conditions>"
         " </experiment>\n"
         "</vle_project>\n";
-    
+
     vpz::Vpz vpz;
     vpz.parseMemory(xml);
 
@@ -250,35 +250,40 @@ BOOST_AUTO_TEST_CASE(experiment_vpz)
     BOOST_REQUIRE_EQUAL(*lst.begin(), "init1");
     BOOST_REQUIRE_EQUAL(*lst.rbegin(), "init2");
 
-    value::Set set;
-    value::Double real;
-    value::Integer integer;
-    
     const vpz::Condition& cnd1(cnds.get("cond1"));
-    set = cnd1.getSetValues("init1");
-    real = value::toDoubleValue(set->getValue(0));
-    BOOST_REQUIRE_EQUAL(real->doubleValue(), 123.);
-    integer = value::toIntegerValue(set->getValue(1));
-    BOOST_REQUIRE_EQUAL(integer->intValue(), 1);
-
-    set = cnd1.getSetValues("init2");
-    real = value::toDoubleValue(set->getValue(0));
-    BOOST_REQUIRE_EQUAL(real->doubleValue(), 456.);
-    integer = value::toIntegerValue(set->getValue(1));
-    BOOST_REQUIRE_EQUAL(integer->intValue(), 2);
-
     const vpz::Condition& cnd2(cnds.get("cond2"));
-    set = cnd2.getSetValues("init3");
-    real = value::toDoubleValue(set->getValue(0));
-    BOOST_REQUIRE_EQUAL(real->doubleValue(), .123);
-    integer = value::toIntegerValue(set->getValue(1));
-    BOOST_REQUIRE_EQUAL(integer->intValue(), -1);
-    
-    set = cnd2.getSetValues("init4");
-    real = value::toDoubleValue(set->getValue(0));
-    BOOST_REQUIRE_EQUAL(real->doubleValue(), .456);
-    integer = value::toIntegerValue(set->getValue(1));
-    BOOST_REQUIRE_EQUAL(integer->intValue(), -2);
+
+    {
+        const value::Set& set(cnd1.getSetValues("init1"));
+        const value::Double& real(value::toDoubleValue(set.get(0)));
+        BOOST_REQUIRE_EQUAL(real.value(), 123.);
+        const value::Integer& integer(value::toIntegerValue(set.get(1)));
+        BOOST_REQUIRE_EQUAL(integer.intValue(), 1);
+    }
+
+    {
+        const value::Set& set(cnd1.getSetValues("init2"));
+        const value::Double& real(value::toDoubleValue(set.get(0)));
+        BOOST_REQUIRE_EQUAL(real.value(), 456.);
+        const value::Integer& integer(value::toIntegerValue(set.get(1)));
+        BOOST_REQUIRE_EQUAL(integer.intValue(), 2);
+    }
+
+    {
+        const value::Set& set = cnd2.getSetValues("init3");
+        const value::Double& real = value::toDoubleValue(set.get(0));
+        BOOST_REQUIRE_EQUAL(real.value(), .123);
+        const value::Integer& integer = value::toIntegerValue(set.get(1));
+        BOOST_REQUIRE_EQUAL(integer.intValue(), -1);
+    }
+
+    {
+        const value::Set& set = cnd2.getSetValues("init4");
+        const value::Double& real = value::toDoubleValue(set.get(0));
+        BOOST_REQUIRE_EQUAL(real.value(), .456);
+        const value::Integer& integer = value::toIntegerValue(set.get(1));
+        BOOST_REQUIRE_EQUAL(integer.intValue(), -2);
+    }
 }
 
 BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
@@ -319,14 +324,14 @@ BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
         "  </views>\n"
         " </experiment>\n"
         "</vle_project>\n";
-    
+
     vpz::Vpz vpz;
     vpz.parseMemory(xml);
 
     const vpz::Project& project(vpz.project());
     const vpz::Experiment& experiment(project.experiment());
     const vpz::Views& views(experiment.views());
-    
+
     const vpz::Outputs& outputs(views.outputs());
     BOOST_REQUIRE(outputs.outputlist().size() == 2);
 

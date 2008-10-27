@@ -79,7 +79,7 @@ namespace vle { namespace oov { namespace plugin {
 
         Cairo::RefPtr < Cairo::ImageSurface > mImageSurface;
     };
-    
+
     DECLARE_OOV_PLUGIN(oov::plugin::CairoGauge)
 
 }}} // namespace vle oov plugin

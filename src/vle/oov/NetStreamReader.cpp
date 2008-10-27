@@ -166,11 +166,13 @@ void NetStreamReader::serializePlugin()
         m_server->send_buffer("vle", "ok");
         m_server->recv_string("vle");
 
-        value::Set vals = value::SetFactory::create();
-        vals->addValue(value::StringFactory::create(plugin()->name()));
-        vals->addValue(plugin()->serialize());
+        value::Set* vals = value::Set::create();
+        vals->add(value::String::create(plugin()->name()));
+        vals->add(plugin()->serialize());
 
-        std::string result = vals->toXML();
+        std::ostringstream out;
+        vals->writeXml(out);
+        std::string result(out.str());
         m_server->send_int("vle", result.size());
         m_server->recv_string("vle");
         m_server->send_buffer("vle", result);

@@ -35,23 +35,23 @@ namespace vle { namespace oov { namespace plugin {
 Plot::Plot(const std::string& location):
     CairoPlugin(location),
     mFinish(false),
-    mTime(-1.0), 
+    mTime(-1.0),
     mReceive(0),
     mReceive2(0),
     mWidth(800),
     mHeight(400),
     mDashes(2)
-{ 
+{
     mDashes[0] = 2.0;
-    mDashes[1] = 2.0;    
+    mDashes[1] = 2.0;
 }
 
 void Plot::onNewObservable(const vpz::NewObservableTrame& trame)
 {
     std::string name(buildname(trame.name(),trame.port()));
 
-    Assert(utils::InternalError,mColumns2.find(name) == mColumns2.end(), 
-           boost::format("Observable %1% already exist") % name); 
+    Assert(utils::InternalError,mColumns2.find(name) == mColumns2.end(),
+           boost::format("Observable %1% already exist") % name);
 
     mColumns.push_back(name);
     mColumns2[name] = mReceive2;
@@ -77,7 +77,7 @@ void Plot::onValue(const vpz::ValueTrame& trame)
         jt = mColumns2.find(name);
 
         Assert(utils::InternalError,jt != mColumns2.end(),boost::format(
-                "The columns %1% does not exist. No new Observable ?") % 
+                "The columns %1% does not exist. No new Observable ?") %
             name);
 
 	if (it->value()->isDouble()) {
@@ -90,7 +90,7 @@ void Plot::onValue(const vpz::ValueTrame& trame)
 	}
         mReceive++;
     }
-    
+
     if (mReceive == mColumns.size()) {
 	mReceive = 0;
 	mParameter.inc_max_draw_index();
@@ -101,13 +101,13 @@ void Plot::onValue(const vpz::ValueTrame& trame)
 	{
 	    int v_int;
 	    std::list < IntCurve * >::const_iterator it_int_show;
-	    for (it_int_show = mShowIntCurveList.begin(); 
+	    for (it_int_show = mShowIntCurveList.begin();
 		 it_int_show != mShowIntCurveList.end(); ++it_int_show) {
 		v_int = (*it_int_show)->get_value(mParameter.get_max_draw_index()-1);
 		if (mParameter.is_smaller(v_int))
 		    mParameter.set_min_value(v_int);
 		if (mParameter.is_higher(v_int))
-		    mParameter.set_max_value(v_int);		
+		    mParameter.set_max_value(v_int);
 	    }
 
 	    double v_dble;
@@ -118,11 +118,11 @@ void Plot::onValue(const vpz::ValueTrame& trame)
 		if (mParameter.is_smaller(v_dble))
 		    mParameter.set_min_value(v_dble);
 		if (mParameter.is_higher(v_dble))
-		    mParameter.set_max_value(v_dble);		
+		    mParameter.set_max_value(v_dble);
 	    }
 	}
-	
-	//recalcul la valeur de la 1ere date affichée 
+
+	//recalcul la valeur de la 1ere date affichée
 	if ((mTime - mParameter.get_min_draw_date()) >=
 	    mParameter.get_number_drawn_date()) {
 	    if (mParameter.get_scrolling())
@@ -133,18 +133,18 @@ void Plot::onValue(const vpz::ValueTrame& trame)
 		calcul_new_min_max_no_scroll = true;
 	    }
 	}
-	
+
 	mParameter.set_max_draw_date(mTime);
-	
+
 	//recalcul l'index de la 1ere valeur affichée
 	double min_draw_date;
 	int min_index = mParameter.get_min_draw_index();
-	
+
 	if (!mRealCurveList.empty()) {
 	    std::vector < RealCurve * >::iterator it_dble = mRealCurveList.begin();
 	    min_draw_date = mParameter.get_min_draw_date();
 	    while( (*it_dble)->get_date(min_index) < min_draw_date) {
-		min_index++; 
+		min_index++;
 		nb_check_min_max++;
 	    }
 	    min_date_curve = (*it_dble)->get_date(min_index);
@@ -153,14 +153,14 @@ void Plot::onValue(const vpz::ValueTrame& trame)
 	    min_draw_date = mParameter.get_min_draw_date();
 	    while( (*it_int)->get_date(min_index) < min_draw_date) {
 		min_index++;
-		nb_check_min_max++;	
+		nb_check_min_max++;
 	    }
 	    min_date_curve = (*it_int)->get_date(min_index);
 	}
 	mParameter.set_min_draw_index(min_index);
-	
+
 	// verifie si l'on ne doit pas mettre a jour les valeur max et min
-	// verifie que les n valeur passé (a cause du scroll) n'etait pas soit 
+	// verifie que les n valeur passé (a cause du scroll) n'etait pas soit
 	// la plus haute soit la moins haute
 	if (calcul_new_min_max_no_scroll) {
 	    // comme on efface tout on recalcule le min & max
@@ -171,10 +171,10 @@ void Plot::onValue(const vpz::ValueTrame& trame)
 	    // on verifie que les n valeur passé a cause du scroll
 	    // n'etaient pas les valeurs min et/ou max
 	    double min, max;
-	    
+
 	    min = getMinValueN(nb_check_min_max);
 	    max = getMaxValueN(nb_check_min_max);
-	    
+
 	    // on doit mettre a jour la valeur minimal
 	    if (min == mParameter.get_min_back_value()) {
 		updateMinValueDrawn();
@@ -196,7 +196,7 @@ void Plot::onParameter(const vpz::ParameterTrame& trame)
 
     if (not context()) {
 	std::string s = "t";
-	
+
         m_img = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, mWidth,
                                             mHeight);
         setSurface(m_img);
@@ -210,11 +210,11 @@ void Plot::onParameter(const vpz::ParameterTrame& trame)
         xmlpp::DomParser parser;
 
         parser.parse_memory(trame.data());
-	xmlpp::Element* root = utils::xml::get_root_node(parser, "parameters");  
+	xmlpp::Element* root = utils::xml::get_root_node(parser, "parameters");
 	IntCurve *ic;
 	RealCurve *rc;
 
-	if (utils::xml::exist_children(root,"curves")) {   
+	if (utils::xml::exist_children(root,"curves")) {
 	    xmlpp::Element* elt = utils::xml::get_children(root,"curves");
 	    xmlpp::Node::NodeList lst = elt->get_children("curve");
 	    xmlpp::Node::NodeList::iterator it = lst.begin();
@@ -224,7 +224,7 @@ void Plot::onParameter(const vpz::ParameterTrame& trame)
 		std::string v_type = utils::xml::get_attribute(elt2,"type");
 
 		if (v_type == "real") {
-		    rc = new RealCurve(utils::xml::get_attribute(elt2,"name"), 
+		    rc = new RealCurve(utils::xml::get_attribute(elt2,"name"),
 				       utils::to_int(utils::xml::get_attribute(elt2,"color_red")),
 				       utils::to_int(utils::xml::get_attribute(elt2,"color_green")),
 				       utils::to_int(utils::xml::get_attribute(elt2,"color_blue")));
@@ -241,34 +241,34 @@ void Plot::onParameter(const vpz::ParameterTrame& trame)
 		++it;
 	    }
 	}
-	
+
 	if (utils::xml::exist_children(root, "window")) {
 	    xmlpp::Element* elt = utils::xml::get_children(root, "window");
 	    mParameter.set_min_draw_date(0.0f);
 	    mParameter.set_max_draw_date(utils::to_double(utils::xml::get_attribute(elt, "size")));
 	    mParameter.set_number_drawn_date((int)mParameter.get_max_draw_date());
 	}
-	
+
 	if (utils::xml::exist_children(root, "value")) {
 	    xmlpp::Element* elt = utils::xml::get_children(root, "value");
 	    if (utils::xml::exist_attribute(elt, "min"))
-		mParameter.set_min_value(utils::to_double(utils::xml::get_attribute(elt, "min")), 
+		mParameter.set_min_value(utils::to_double(utils::xml::get_attribute(elt, "min")),
 					 true);
 	    if (utils::xml::exist_attribute(elt, "max"))
-		mParameter.set_max_value(utils::to_double(utils::xml::get_attribute(elt, "max")), 
+		mParameter.set_max_value(utils::to_double(utils::xml::get_attribute(elt, "max")),
 					 true);
 	}
-	
+
 	if (utils::xml::exist_children(root, "scrolling")) {
 	    xmlpp::Element* elt = utils::xml::get_children(root,"scrolling");
 	    mParameter.set_scrolling(utils::to_boolean(utils::xml::get_attribute(elt,"value")));
 	}
-	
+
 	if (utils::xml::exist_children(root, "limits")) {
 	    xmlpp::Element* elt = utils::xml::get_children(root, "limits");
 	    xmlpp::Node::NodeList lst = elt->get_children("limit");
 	    xmlpp::Node::NodeList::iterator it = lst.begin();
-	    
+
 	    double valueLimit;
 	    while (it != lst.end()) {
 		xmlpp::Element * elt2 = ( xmlpp::Element* )( *it );
@@ -280,13 +280,13 @@ void Plot::onParameter(const vpz::ParameterTrame& trame)
 					       utils::to_int(utils::xml::get_attribute(elt2,"color_blue"))));
 		++it;
 	    }
-	}	
+	}
     }
 
     m_it_dble = mRealCurveList.begin();
     m_it_int = mIntCurveList.begin();
 }
-    
+
 void Plot::close(const vpz::EndTrame& /*trame */)
 {
     mParameter.set_number_drawn_date((int)ceil(mParameter.get_max_draw_date()));
@@ -313,10 +313,10 @@ void Plot::draw()
     if (ctx) {
 	if ((mRealCurveList.size() > 0 && mRealCurveList[0]->get_size() > 1) ||
 	    (mIntCurveList.size() > 0 && mIntCurveList[0]->get_size() > 0)) {
-	    
+
 	    ctx->rectangle(0, 0, mWidth, mHeight);
 	    ctx->set_source_rgb(1, 1, 1);
-	    ctx->fill();	
+	    ctx->fill();
 	    drawVerticalStep(ctx);
 	    drawHorizontalStep(ctx);
 	    drawAxis(ctx);
@@ -429,9 +429,9 @@ void Plot::drawLimits(Cairo::RefPtr < Cairo::Context > ctx)
     int x_left, x_right;
 
     x_left = mParameter.get_shift_left();
-    x_right = mParameter.get_shift_left() + mParameter.get_graph_zone_width();	
+    x_right = mParameter.get_shift_left() + mParameter.get_graph_zone_width();
 
-    for (std::list < Limit * >::const_iterator it = mLimitList.begin(); 
+    for (std::list < Limit * >::const_iterator it = mLimitList.begin();
 	 it != mLimitList.end(); ++it) {
         if (mParameter.is_inside_min_max((*it)->get_value())) {
 
@@ -453,8 +453,8 @@ void Plot::drawLimits(Cairo::RefPtr < Cairo::Context > ctx)
 	    ctx->move_to(x_left + 4, y_limit - 4);
 	    ctx->show_text(utils::to_string((*it)->get_value()));
 
-	    ctx->set_source_rgba((*it)->get_red_color()/65535., 
-				 (*it)->get_green_color()/65535., 
+	    ctx->set_source_rgba((*it)->get_red_color()/65535.,
+				 (*it)->get_green_color()/65535.,
 				 (*it)->get_blue_color()/65535.,
 				 0.5);
 	    ctx->set_line_width(1);

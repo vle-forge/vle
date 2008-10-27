@@ -47,7 +47,7 @@ public:
         Gtk::TreeModelColumn<Glib::ustring> m_col_name;
         Gtk::TreeModelColumn<Glib::ustring> m_col_type;
         Gtk::TreeModelColumn<Glib::ustring> m_col_view;
-        Gtk::TreeModelColumn<value::Value> m_col_value;
+        Gtk::TreeModelColumn<value::Value*> m_col_value;
     };
 
     ValuesTreeView(BaseObjectType* cobject,
@@ -57,8 +57,8 @@ public:
     void clear();
     void setCondition(vpz::Condition* condition)
 	{ mCondition = condition; }
-    void makeTreeView(value::SetFactory& set);
-    void makeTreeView(value::MapFactory& map);
+    void makeTreeView(value::Set& set);
+    void makeTreeView(value::Map& map);
     void refresh();
 
 protected:
@@ -70,12 +70,12 @@ private:
     Glib::RefPtr<Gtk::ListStore> m_refTreeModel;
     Gtk::Menu mMenu;
 
-    value::ValueBase* mValue;
+    value::Value* mValue;
 
     void buildMenu();
     void on_row_activated(const Gtk::TreeModel::Path& path,
                           Gtk::TreeViewColumn*  column);
-    void on_menu_insert(value::ValueBase::type);
+    void on_menu_insert(value::Value::type);
     void on_menu_remove();
 
 };

@@ -146,7 +146,7 @@ namespace vle { namespace extension {
             const devs::ExternalEventList& event,
             const devs::Time& time);
 
-        virtual value::Value observation(
+        virtual value::Value* observation(
             const devs::ObservationEvent& event) const;
 
         virtual void request(
@@ -157,7 +157,7 @@ namespace vle { namespace extension {
     protected:
         void displayValues();
 
-    private:	
+    private:
         void addValue(const std::string& /* name */,
                       const vle::devs::Time& /* time */,
                       double /* value */);

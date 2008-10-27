@@ -27,13 +27,13 @@
 
 namespace vle { namespace oov { namespace plugin {
 
-struct SortByNumber { 
+struct SortByNumber {
     bool operator()
     (const std::pair < double, double > & p1,
-     const std::pair < double, double > & p2) const 
-	{ 
-	    return p1.second < p2.second; 
-	} 
+     const std::pair < double, double > & p2) const
+	{
+	    return p1.second < p2.second;
+	}
 };
 
 
@@ -42,7 +42,7 @@ void RealCurve::add(double date, double value)
     m_valueList.push_back(std::pair<double,double>(date, value));
 }
 
-void RealCurve::draw(Cairo::RefPtr < Cairo::Context > ctx, 
+void RealCurve::draw(Cairo::RefPtr < Cairo::Context > ctx,
 		     Parameter & m_parameter)
 {
     // dessine de droite  gauche
@@ -60,13 +60,13 @@ void RealCurve::draw(Cairo::RefPtr < Cairo::Context > ctx,
     v_x = m_parameter.to_pixel_width(v_date);
 
     // change la couleur en la couleur de la courbe
-    ctx->set_source_rgb(get_red_color()/65535., 
+    ctx->set_source_rgb(get_red_color()/65535.,
 			get_green_color()/65535.,
 			get_blue_color()/65535.);
     ctx->set_line_width(1);
-    
+
     for(int cpt = lastIndex - 2; cpt >= firstIndex; cpt--) {
-        v_date2 = m_valueList[cpt].first; 
+        v_date2 = m_valueList[cpt].first;
         v_value2 = m_valueList[cpt].second;
 
         v_x2 = m_parameter.to_pixel_width(v_date2);
@@ -81,12 +81,12 @@ void RealCurve::draw(Cairo::RefPtr < Cairo::Context > ctx,
 	ctx->stroke();
 
         v_date = v_date2;
-        v_value = v_value2; 
+        v_value = v_value2;
         v_x = v_x2;
         v_y = v_y2;
 
         if (cpt == firstIndex && firstIndex != 0 && v_date != m_firstDate) {
-            v_date2 = m_valueList[cpt - 1].first; 
+            v_date2 = m_valueList[cpt - 1].first;
             v_value2 = m_valueList[cpt - 1].second;
             v_date = v_date - m_firstDate;
             v_date2 = m_firstDate - v_date2;
@@ -113,7 +113,7 @@ double RealCurve::get_last_value() const
 
 /********************************************************************************************/
 /* retourne la valeur minimum et maximum de la courbe sur les number_value derniere valeur */
-/********************************************************************************************/		
+/********************************************************************************************/
 void RealCurve::get_min_max_value(int number_value, double & min, double & max, Parameter & m_parameter)
 {
     min = get_min_value(number_value, m_parameter);
@@ -122,7 +122,7 @@ void RealCurve::get_min_max_value(int number_value, double & min, double & max, 
 
 /********************************************************************************/
 /* retourne la valeur minimum de la courbe sur les number_value derniere valeur */
-/********************************************************************************/		
+/********************************************************************************/
 double RealCurve::get_min_value(int number_value, Parameter & m_parameter)
 {
     int index_data_end = m_parameter.get_max_draw_index(); // index de fin de recherche
@@ -133,7 +133,7 @@ double RealCurve::get_min_value(int number_value, Parameter & m_parameter)
     else
         index_end = vector_size - 1;
 
-    if (number_value >= 1) 
+    if (number_value >= 1)
         index_begin = ((index_end - number_value) < 0) ? 0 : index_end - number_value + 1;
     else
         index_begin = index_end;
@@ -148,7 +148,7 @@ double RealCurve::get_min_value(int number_value, Parameter & m_parameter)
 
 /********************************************************************************/
 /* retourne la valeur maximum de la courbe sur les number_value derniere valeur */
-/********************************************************************************/		
+/********************************************************************************/
 double RealCurve::get_max_value(int number_value, Parameter & m_parameter)
 {
     int index_data_end = m_parameter.get_max_draw_index(); // index de fin de recherche
@@ -159,7 +159,7 @@ double RealCurve::get_max_value(int number_value, Parameter & m_parameter)
     else
         index_end = vector_size - 1;
 
-    if (number_value >= 1) 
+    if (number_value >= 1)
         index_begin = ((index_end - number_value) < 0) ? 0 : index_end - number_value + 1;
     else
         index_begin = index_end;
@@ -183,7 +183,7 @@ int RealCurve::get_number_value()
 
 /**************************/
 /* retourne la nieme date */
-/**************************/		
+/**************************/
 double RealCurve::get_date(int index)
 {
     return m_valueList.at(index).first;
@@ -191,7 +191,7 @@ double RealCurve::get_date(int index)
 
 /****************************/
 /* retourne la nieme valeur */
-/****************************/		
+/****************************/
 double RealCurve::get_value(int index)
 {
     return m_valueList.at(index).second;
@@ -205,7 +205,7 @@ void RealCurve::get_min_max_value_prec_index(int indice, int number_value, doubl
 {
     min = get_min_value_prec_index(indice, number_value);
     max = get_min_value_prec_index(indice, number_value);
-}	
+}
 
 /****************************************************************/
 /* retourne la valeur minimum de la courbe sur les number_value */

@@ -23,55 +23,155 @@
  */
 
 
-#ifndef UTILS_VALUE_BOOLEAN_HPP
-#define UTILS_VALUE_BOOLEAN_HPP
+#ifndef VLE_VALUE_BOOLEAN_HPP
+#define VLE_VALUE_BOOLEAN_HPP
 
 #include <vle/value/Value.hpp>
-
-
 
 namespace vle { namespace value {
 
     /**
-     * @brief Boolean Value.
+     * @brief Boolean Value encapsulate a C++ 'bool' type into a class to
+     * perform serialization, pool of memory etc.
      */
-    class BooleanFactory : public ValueBase
+    class Boolean : public Value
     {
-    private:
-        BooleanFactory(bool value = false) :
-            m_value(value)
-        { }
-
     public:
-        virtual ~BooleanFactory()
-        { }
+        /**
+         * @brief Build a Boolean object with a false as value.
+         */
+        Boolean() :
+            m_value(false)
+        {}
 
-        static Boolean create(bool value = false);
+        /**
+         * @brief Build a Boolean object with a specified value.
+         * @param value The value to copy.
+         */
+        Boolean(bool value) :
+            m_value(value)
+        {}
 
-        virtual Value clone() const;
+        /**
+         * @brief Copy constructor.
+         * @param value The value to copy.
+         */
+        Boolean(const Boolean& value) :
+            Value(value),
+            m_value(value.m_value)
+        {}
 
-        inline virtual ValueBase::type getType() const
-        { return ValueBase::BOOLEAN; }
+        /**
+         * @brief Nothing to delete.
+         */
+	virtual ~Boolean() {}
 
-        inline bool boolValue() const
+        ///
+        ////
+        ///
+
+        /**
+         * @brief Build a Boolean using the boost::pool memory management.
+         * @param value the value of the boolean.
+         * @return A new boolean allocated from the boost::pool.
+         */
+        static Boolean* create(bool value = false)
+        { return new Boolean(value); }
+
+        ///
+        ////
+        ///
+
+        /**
+         * @brief Clone the current Boolean with the same value.
+         * @return A new boost::pool allocated value::Value.
+         */
+        virtual Value* clone() const
+        { return new Boolean(m_value); }
+
+        /**
+         * @brief Get the type of this class.
+         * @return Return Value::BOOLEAN.
+         */
+        inline virtual Value::type getType() const
+        { return Value::BOOLEAN; }
+
+        /**
+         * @brief Push the bool in the stream. Use the ostream operator
+         * alphabool() to get true or false string instead of 0 an 1.
+         * @param out The output stream.
+         */
+        virtual void writeFile(std::ostream& out) const;
+
+        /**
+         * @brief Push the bool in the stream. Use the ostream operator
+         * alphabool() to get true or false string instead of 0 and 1.
+         * @param out The output stream.
+         */
+	virtual void writeString(std::ostream& out) const;
+
+        /**
+         * @brief Push the bool in the stream. The string pushed in the ostream:
+         * @code
+         * <boolean>true</boolean>
+         * <boolean>false</boolean>
+         * @endcode
+         * @param out The output stream.
+         */
+	virtual void writeXml(std::ostream& out) const;
+
+        ///
+        ////
+        ///
+
+        /**
+         * @brief Get the value of the bool.
+         * @return true or false.
+         */
+        inline bool value() const
         { return m_value; }
 
+        /**
+         * @brief Get a reference to the bool.
+         * @return A reference true or false.
+         */
+        inline bool& value()
+        { return m_value; }
+
+        /**
+         * @brief Assign a value to the bool.
+         * @param value The value to set.
+         */
         inline void set(bool value)
         { m_value = value; }
-
-        virtual std::string toFile() const;
-
-        virtual std::string toString() const;
-
-        virtual std::string toXML() const;
 
     private:
         bool m_value;
     };
-    
-    Boolean toBooleanValue(const Value& value);
-    
-    bool toBoolean(const Value& value);
+
+    inline const Boolean& toBooleanValue(const Value& value)
+    { return value.toBoolean(); }
+
+    inline const Boolean* toBooleanValue(const Value* value)
+    { return value ? &value->toBoolean() : 0; }
+
+    inline Boolean& toBooleanValue(Value& value)
+    { return value.toBoolean(); }
+
+    inline Boolean* toBooleanValue(Value* value)
+    { return value ? &value->toBoolean() : 0; }
+
+    inline bool toBoolean(const Value& value)
+    { return value.toBoolean().value(); }
+
+    inline bool& toBoolean(Value& value)
+    { return value.toBoolean().value(); }
+
+    inline bool toBoolean(const Value* value)
+    { return value::reference(value).toBoolean().value(); }
+
+    inline bool& toBoolean(Value* value)
+    { return value::reference(value).toBoolean().value(); }
 
 }} // namespace vle value
 #endif

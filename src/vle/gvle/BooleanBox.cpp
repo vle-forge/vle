@@ -30,7 +30,7 @@ using namespace vle;
 namespace vle
 {
 namespace gvle {
-BooleanBox::BooleanBox(value::BooleanFactory* boolean):
+BooleanBox::BooleanBox(value::Boolean* boolean):
         Gtk::Dialog("Boolean",true,true),
         mValue(boolean)
 {
@@ -42,7 +42,7 @@ BooleanBox::BooleanBox(value::BooleanFactory* boolean):
 
     m_Combo->append_text("true");
     m_Combo->append_text("false");
-    m_Combo->set_active_text(boolean->toString());
+    m_Combo->set_active_text(boolean->writeToString());
     show_all();
 }
 

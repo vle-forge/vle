@@ -39,7 +39,7 @@ namespace vle { namespace graph {
     class AtomicModel : public Model
     {
     public:
-        /** 
+        /**
          * @brief Constructor to intialize parent, position (0,0), size (0,0)
          * and name.
          * @param name the new name of this atomic model.
@@ -55,18 +55,18 @@ namespace vle { namespace graph {
         virtual graph::Model* clone() const
         { return new AtomicModel(*this); }
 
-        /** 
+        /**
          * @brief Nothing to delete.
          */
 	virtual ~AtomicModel() { }
 
-        /** 
+        /**
          * @brief Return true, AtomicModel is an atomic model.
          * @return true.
          */
         virtual bool isAtomic() const { return true; }
 
-        /** 
+        /**
          * @brief Return this if name is equal to the model's name. Recursive
          * function.
          * @param name The name of the model to find.
@@ -74,7 +74,7 @@ namespace vle { namespace graph {
          */
         virtual graph::Model* findModel(const std::string & name) const;
 
-        /** 
+        /**
          * @brief Write the atomic model in the output stream.
          * @param out output stream.
          */

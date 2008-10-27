@@ -31,7 +31,6 @@
 #include <vle/vpz/Vpz.hpp>
 #include <vle/devs/RootCoordinator.hpp>
 #include <sstream>
-#include <iostream>
 #include <glibmm/spawn.h>
 #include <glibmm/timer.h>
 #include <vle/value/String.hpp>
@@ -137,12 +136,12 @@ void SimulatorDistant::sendResult()
 
             std::string result = mServer->recv_string("manager");
 
-            value::Set vals = value::SetFactory::create();
-            vals->addValue(value::IntegerFactory::create(it->outputs.size()));
-            vals->addValue(value::IntegerFactory::create(it->instance));
-            vals->addValue(value::IntegerFactory::create(it->replica));
+            value::Set* vals = value::Set::create();
+            vals->add(value::Integer::create(it->outputs.size()));
+            vals->add(value::Integer::create(it->instance));
+            vals->add(value::Integer::create(it->replica));
 
-            result = vals->toXML();
+            result = vals->writeToXml();
 
             mServer->send_int("manager", result.size());
             mServer->recv_string("manager");
@@ -152,11 +151,11 @@ void SimulatorDistant::sendResult()
             for (oov::OutputMatrixViewList::iterator jt = it->outputs.begin();
                  jt != it->outputs.end(); ++jt) {
 
-                vals = value::SetFactory::create();
-                vals->addValue(value::StringFactory::create(jt->first));
-                vals->addValue(jt->second.serialize());
+                vals = value::Set::create();
+                vals->add(value::String::create(jt->first));
+                vals->add(jt->second.serialize());
 
-                result = vals->toXML();
+                result = vals->writeToXml();
                 mServer->send_int("manager", result.size());
                 mServer->recv_string("manager");
                 mServer->send_string("manager", result);
@@ -177,7 +176,7 @@ void SimulatorDistant::daemonExit()
                 break;
             }
         }
-        Glib::usleep(250000); // wait a 1/4 second to try if 
+        Glib::usleep(250000); // wait a 1/4 second to try if
                               // the simulations are finished.
     }
     sendResult();

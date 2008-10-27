@@ -27,16 +27,16 @@
 
 namespace vle { namespace oov { namespace plugin {
 
-struct SortByNumber { 
+struct SortByNumber {
     bool operator ()(const std::pair < double, int > & p1,
                      const std::pair < double, int > & p2) const
-    { return p1.second < p2.second; } 
+    { return p1.second < p2.second; }
 };
-	    
-struct SortByNumberValue { 
+
+struct SortByNumberValue {
     bool operator ()(const std::pair < int, int > & p1,
-                     const std::pair < int, int > & p2) const 
-        { return p1.first > p2.first; } 
+                     const std::pair < int, int > & p2) const
+        { return p1.first > p2.first; }
 };
 
 void IntCurve::swap_int(int &value1, int &value2)
@@ -73,7 +73,7 @@ void IntCurve::draw(Cairo::RefPtr < Cairo::Context > ctx, Parameter& m_parameter
     {
         draw_raccord = false;
 
-        for(it = m_list.begin(); it != m_list.end(); ++it) 
+        for(it = m_list.begin(); it != m_list.end(); ++it)
         {
             v_triValue.push_back(std::pair < int, int >((*it)->get_value(cpt), index));
             v_date = (*it)->get_date(cpt);
@@ -82,7 +82,7 @@ void IntCurve::draw(Cairo::RefPtr < Cairo::Context > ctx, Parameter& m_parameter
             v_x = m_parameter.to_pixel_width(v_date);
             v_x_next = m_parameter.to_pixel_width(next_date);
             if (cpt == firstIndex && firstIndex != 0 && v_date != m_firstDate) {
-                v_triRaccord.push_back(std::pair < int, int >((*it)->get_value(cpt-1) ,index)); 
+                v_triRaccord.push_back(std::pair < int, int >((*it)->get_value(cpt-1) ,index));
                 draw_raccord = true;
             }
             index++;
@@ -100,7 +100,7 @@ void IntCurve::draw(Cairo::RefPtr < Cairo::Context > ctx, Parameter& m_parameter
             if(v_y_bottom > v_y_top) {
                 swap_int(v_y_bottom, v_y_top);
             }
-	    ctx->set_source_rgb(v_colors[v_triValue[k].second].red, 
+	    ctx->set_source_rgb(v_colors[v_triValue[k].second].red,
 				v_colors[v_triValue[k].second].green,
 				v_colors[v_triValue[k].second].blue);
 	    ctx->begin_new_path();
@@ -131,7 +131,7 @@ int IntCurve::get_last_value()
 
 /********************************************************************************************/
 /* retourne la valeur minimum et maximum de la courbe sur les number_value derniere valeur */
-/********************************************************************************************/		
+/********************************************************************************************/
 void IntCurve::get_min_max_value(int number_value, int & min, int & max, Parameter & m_parameter)
 {
     min = get_min_value(number_value, m_parameter);
@@ -141,7 +141,7 @@ void IntCurve::get_min_max_value(int number_value, int & min, int & max, Paramet
 /********************************************************************************/
 /* retourne la valeur minimum de la courbe sur les number_value derniere valeur */
 /* en fonction du dernier index affiché                                         */
-/********************************************************************************/		
+/********************************************************************************/
 int IntCurve::get_min_value(int number_value, Parameter & m_parameter)
 {
     int index_data_end = m_parameter.get_max_draw_index(); // index de fin de recherche
@@ -152,7 +152,7 @@ int IntCurve::get_min_value(int number_value, Parameter & m_parameter)
     else
         index_end = vector_size - 1;
 
-    if (number_value >= 1) 
+    if (number_value >= 1)
         index_begin = ((index_end - number_value) < 0) ? 0 : index_end - number_value + 1;
     else
         index_begin = index_end;
@@ -167,7 +167,7 @@ int IntCurve::get_min_value(int number_value, Parameter & m_parameter)
 
 /********************************************************************************/
 /* retourne la valeur maximum de la courbe sur les number_value derniere valeur */
-/********************************************************************************/		
+/********************************************************************************/
 int IntCurve::get_max_value(int number_value, Parameter & m_parameter)
 {
     int index_data_end = m_parameter.get_max_draw_index(); // index de fin de recherche
@@ -178,7 +178,7 @@ int IntCurve::get_max_value(int number_value, Parameter & m_parameter)
     else
         index_end = vector_size - 1;
 
-    if (number_value >= 1) 
+    if (number_value >= 1)
         index_begin = ((index_end - number_value) < 0) ? 0 : index_end - number_value + 1;
     else
         index_begin = index_end;
@@ -202,7 +202,7 @@ int IntCurve::get_number_value()
 
 /**************************/
 /* retourne la nieme date */
-/**************************/		
+/**************************/
 double IntCurve::get_date(int index)
 {
     return m_valueList.at(index).first;
@@ -210,7 +210,7 @@ double IntCurve::get_date(int index)
 
 /****************************/
 /* retourne la nieme valeur */
-/****************************/		
+/****************************/
 int IntCurve::get_value(int index)
 {
     return m_valueList.at(index).second;
@@ -224,7 +224,7 @@ void IntCurve::get_min_max_value_prec_index(int indice, int number_value, int & 
 {
     min = get_min_value_prec_index(indice, number_value);
     max = get_max_value_prec_index(indice, number_value);
-}	
+}
 
 
 /****************************************************************/

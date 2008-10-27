@@ -30,7 +30,7 @@
 
 namespace vle {
 
-    /** 
+    /**
      * @brief This namespace provides some useful translator classes. For
      * instance the translator::MatrixTranslator allow to build cellular
      * automata within a small xml description.

@@ -64,9 +64,9 @@ DifferentialEquation::DifferentialEquation(const AtomicModel& model,
 
         for (MapValue::const_iterator it = thresholds.begin();
              it != thresholds.end(); it++) {
-            const Set& tab(toSetValue(it->second));
-            double value = toDouble(tab->getValue(0));
-            std::string type = toString(tab->getValue(1));
+            const Set& tab(toSetValue(*it->second));
+            double value = toDouble(tab.get(0));
+            std::string type = toString(tab.get(1));
 
             if (type == "up") {
                 mThresholds[it->first] = std::make_pair(value, UP);
@@ -432,7 +432,7 @@ void DifferentialEquation::externalTransition(const ExternalEventList& event,
                 if (mIsGradient[name])
                     setGradient(name,
                                 (*it)->getDoubleAttributeValue("gradient"));
-            }	
+            }
             // it is a perturbation on an internal variable
             if ((*it)->onPort("perturb")) {
                 Assert(utils::InternalError, name == mVariableName,
@@ -458,7 +458,7 @@ void DifferentialEquation::externalTransition(const ExternalEventList& event,
     }
 }
 
-Value DifferentialEquation::observation(const ObservationEvent& event) const
+Value* DifferentialEquation::observation(const ObservationEvent& event) const
 {
     Assert(utils::InternalError, event.getPortName() == mVariableName,
            boost::format(
@@ -466,7 +466,7 @@ Value DifferentialEquation::observation(const ObservationEvent& event) const
            event.getStringAttributeValue("name"));
     double e = (event.getTime() - mLastTime).getValue();
 
-    return DoubleFactory::create(getEstimatedValue(e));
+    return Double::create(getEstimatedValue(e));
 }
 
 void DifferentialEquation::request(const RequestEvent& event,

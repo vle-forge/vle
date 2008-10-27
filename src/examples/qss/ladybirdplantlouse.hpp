@@ -41,10 +41,10 @@ namespace vle { namespace examples { namespace qss {
         virtual double compute(unsigned int i, const devs::Time& time) const;
 
     private:
-        double a; 
+        double a;
         double b;
         double d;
-        double e; 
+        double e;
 
     };
 

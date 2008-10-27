@@ -35,13 +35,13 @@ class sir : public vle::extension::CombinedQss
 private:
     double r;
     double a;
-    
+
 public:
     sir(const graph::AtomicModel&,
 	const devs::InitEventList&);
     virtual ~sir(){}
-    
-    virtual double compute(unsigned int i, 
+
+    virtual double compute(unsigned int i,
 			   const devs::Time& time) const;
 };
 

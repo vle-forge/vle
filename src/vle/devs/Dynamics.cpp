@@ -51,7 +51,7 @@ ExternalEvent* Dynamics::buildEventWithADouble(
 {
     ExternalEvent* event = new ExternalEvent(portName);
     event->putAttribute(attributeName,
-                        value::DoubleFactory::create(attributeValue));
+                        value::Double::create(attributeValue));
     return event;
 }
 
@@ -63,7 +63,7 @@ ExternalEvent* Dynamics::buildEventWithAInteger(
     ExternalEvent* event = new ExternalEvent(portName);
 
     event->putAttribute(attributeName,
-                          value::IntegerFactory::create(attributeValue));
+                          value::Integer::create(attributeValue));
     return event;
 }
 
@@ -73,9 +73,9 @@ ExternalEvent* Dynamics::buildEventWithABoolean(
     bool attributeValue) const
 {
     ExternalEvent* event = new ExternalEvent(portName);
-   
+
     event->putAttribute(attributeName,
-                        value::BooleanFactory::create(attributeValue));
+                        value::Boolean::create(attributeValue));
     return event;
 }
 
@@ -87,7 +87,7 @@ ExternalEvent* Dynamics::buildEventWithAString(
     ExternalEvent* event = new ExternalEvent(portName);
 
     event->putAttribute(attributeName,
-                        value::StringFactory::create(attributeValue));
+                        value::String::create(attributeValue));
     return event;
 }
 

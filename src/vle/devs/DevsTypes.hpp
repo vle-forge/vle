@@ -26,7 +26,6 @@
 #ifndef DEVS_DEVSTYPES_HPP
 #define DEVS_DEVSTYPES_HPP
 
-#include <deque>
 #include <vector>
 #include <map>
 #include <string>
@@ -41,7 +40,7 @@ namespace vle { namespace devs {
     class InstantaneousEvent;
     class Simulator;
 
-    typedef std::deque < ObservationEvent* >    ObservationEventList;
+    typedef std::vector < ObservationEvent* >    ObservationEventList;
     typedef std::vector < InternalEvent* > InternalEventList;
     typedef std::pair < Simulator*, std::string > StreamModelPort;
     typedef std::map < StreamModelPort, vle::value::Value > StreamModelPortValue;

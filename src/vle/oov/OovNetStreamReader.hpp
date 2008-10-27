@@ -39,11 +39,11 @@ namespace vle { namespace oov {
 
         virtual ~OovNetStreamReader()
         { }
-        
-        /** 
+
+        /**
          * @brief Oov NetStreamReader ask to the CairoPlugin to write a image
          * when receive a value.
-         * @param trame 
+         * @param trame
          */
         virtual void onValue(const vpz::ValueTrame& trame);
     };

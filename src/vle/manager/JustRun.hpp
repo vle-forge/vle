@@ -39,7 +39,7 @@
 
 namespace vle { namespace manager {
 
-    /** 
+    /**
      * @brief JustRun is the base class for running simulation from specified
      * vpz files. Errors are log to specified output std::ostream. JustRun
      * provided access to the oov::PluginPtr object.
@@ -47,34 +47,34 @@ namespace vle { namespace manager {
     class JustRun
     {
     public:
-        /** 
+        /**
          * @brief Build a JustRun object with a specified output std::ostream.
          * @param out output to log error.
          */
         JustRun(std::ostream& out);
 
-        /** 
+        /**
          * @brief Get a reference to the oov::PluginPtr list of the simulation
          * sort by filename.
          * @return A reference to the oov::PluginPtr list.
          */
         OutputSimulationList& outputSimulationList();
 
-        /** 
+        /**
          * @brief Get a constant reference to the oov::PluginPtr list of the
          * simulation sort by filename.
          * @return A reference to the oov::PluginPtr list.
          */
         const OutputSimulationList& outputSimulationList() const;
 
-        /** 
+        /**
          * @brief Get a constant reference to the dictionary to find vpz file
          * name and index in the output simulation list.
          * @return A constant reference to the vpz file names.
          */
         const OutputSimulationNames& outputSimulationNames() const;
 
-        /** 
+        /**
          * @brief Get a reference to the dictionary to find vpz file name and
          * index in the output simulation list.
          * @return A reference to the vpz file names.
@@ -89,21 +89,21 @@ namespace vle { namespace manager {
 
 
 
-    /** 
+    /**
      * @brief JustRunMono is the class for running simulation from specified vpz
      * files. All simulation are run on the same process.
      */
     class JustRunMono : public JustRun
     {
     public:
-        /** 
+        /**
          * @brief Build a JustRunMono object with a specified output
          * std::ostream.
          * @param out output to log error.
          */
         JustRunMono(std::ostream& out);
 
-        /** 
+        /**
          * @brief Read specified vpz files and start simulations on the same
          * process.
          */
@@ -114,14 +114,14 @@ namespace vle { namespace manager {
     };
 
 
-    /** 
+    /**
      * @brief JustRunThread is the class for running simulation from specified
      * vpz files. All simulation are run on the specified number of processor.
      */
     class JustRunThread : public JustRun
     {
     public:
-        /** 
+        /**
          * @brief Build a JustRunMono object with a specified output
          * std::ostream.
          * @param out output to log error.
@@ -129,7 +129,7 @@ namespace vle { namespace manager {
          */
         JustRunThread(std::ostream& out, int process);
 
-        /** 
+        /**
          * @brief Read specified vpz files an start simulations on the number of
          * processor specified in constructor.
          */
@@ -152,12 +152,12 @@ namespace vle { namespace manager {
         Glib::Cond                  m_prodcond;
         Glib::Cond                  m_conscond;
 
-        /** 
+        /**
          * @brief A thread to convert filename to vpz files.
          */
         void read();
 
-        /** 
+        /**
          * @brief A pool of threads to run simulation.
          */
         void run();
@@ -195,7 +195,7 @@ namespace vle { namespace manager {
         m_output(true)
     {
     }
-    
+
     inline JustRunThread::JustRunThread(std::ostream& out, int process) :
         JustRun(out),
         m_process(process),

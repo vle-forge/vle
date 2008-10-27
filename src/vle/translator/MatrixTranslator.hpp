@@ -111,13 +111,13 @@ namespace vle { namespace translator {
         void translateSymmetricConnection2D(unsigned int i,
                                             unsigned int j);
         void translateConnection2D(unsigned int i,
-                                   unsigned int j);	
+                                   unsigned int j);
         void translateStructures();
         void translateDynamics();
         void translateCondition2D(unsigned int i,
                                   unsigned int j);
-        void translateCondition1D(unsigned int i);	
-        void translateConditions();	
+        void translateCondition1D(unsigned int i);
+        void translateConditions();
     };
 
 }} // namespace vle translator

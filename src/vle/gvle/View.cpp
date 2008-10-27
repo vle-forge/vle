@@ -38,6 +38,7 @@
 #include <vle/utils/Debug.hpp>
 #include <gtkmm/filechooserdialog.h>
 #include <gdkmm/cursor.h>
+#include <iostream>
 
 using std::string;
 using std::list;

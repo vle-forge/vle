@@ -256,16 +256,16 @@ namespace vle { namespace devs {
 	void addView(devs::View* view);
 
         void processInternalEvent(Simulator* sim,
-                                  EventBagModel& modelbag);
+                                  const EventBagModel& modelbag);
 
         void processExternalEvents(Simulator* sim,
-                                   EventBagModel& modelbag);
+                                   const EventBagModel& modelbag);
 
         void processConflictEvents(Simulator* sim,
-                                   EventBagModel& modelbag);
+                                   const EventBagModel& modelbag);
 
         void processRequestEvents(Simulator* sim,
-                                        EventBagModel& modelbag);
+                                        const EventBagModel& modelbag);
 
         /**
          * @brief Process for each ObservationEvent in the bag and observation
@@ -318,7 +318,7 @@ namespace vle { namespace devs {
         void delCoupledModel(graph::CoupledModel* parent,
                              graph::CoupledModel* mdl);
 
-        void processEventView(Simulator& model, Event* event = 0);
+        void processEventView(Simulator& model, const Event* event = 0);
 
         /**
          * Set a new date to the Coordinator.

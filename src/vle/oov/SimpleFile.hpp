@@ -63,14 +63,13 @@ namespace vle { namespace oov { namespace plugin {
         /** Define a dictionary (model's name, index) */
         typedef std::map < std::string, int > Columns;
 
-        Columns                         m_columns;
-        std::vector < value::Value >    m_buffer;
-        double                          m_time;
-        std::ofstream                   m_file;
-        std::string                     m_filename;
-        std::string                     m_filenametmp;
-        bool                            m_isstart;
-
+        Columns                     m_columns;
+        std::vector < std::string > m_buffer;
+        double                      m_time;
+        std::ofstream               m_file;
+        std::string                 m_filename;
+        std::string                 m_filenametmp;
+        bool                        m_isstart;
 
         void flush(double trame_time);
 

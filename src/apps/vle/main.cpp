@@ -32,6 +32,8 @@
 
 int main(int argc, char* argv[])
 {
+    vle::manager::init();
+
     Glib::OptionContext context;
 
     vle::apps::CommandOptionGroup command;
@@ -54,11 +56,11 @@ int main(int argc, char* argv[])
         path.assignToPath();
     } catch(const Glib::Error& e) {
         std::cerr << "Error parsing command line: " << e.what() << std::endl;
-        vle::utils::finalize();
+        vle::manager::finalize();
         return EXIT_FAILURE;
     } catch(const std::exception& e) {
         std::cerr << "Command line error: " << e.what() << std::endl;
-        vle::utils::finalize();
+        vle::manager::finalize();
         return EXIT_FAILURE;
     }
 
@@ -83,7 +85,7 @@ int main(int argc, char* argv[])
         }
     }
 
-    vle::utils::finalize();
+    vle::manager::finalize();
     return result ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 

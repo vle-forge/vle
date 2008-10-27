@@ -52,7 +52,8 @@ namespace vle { namespace vpz {
             m_simulator(simulator),
             m_parent(parent),
             m_port(port),
-            m_view(view)
+            m_view(view),
+            m_value(0)
         {}
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -65,7 +66,7 @@ namespace vle { namespace vpz {
          * @brief Assign a new value.
          * @param value The new value.
          */
-        void setValue(const value::Value& value)
+        void setValue(const value::Value* value)
         { m_value = value; }
 
         /**
@@ -100,7 +101,7 @@ namespace vle { namespace vpz {
          * @brief Get a constant reference to the value.
          * @return The value.
          */
-        inline const value::Value& value() const
+        inline const value::Value* value() const
         { return m_value; }
 
         /**
@@ -115,17 +116,19 @@ namespace vle { namespace vpz {
                 << " name=\"" << m.simulator() << "\" "
                 << " parent=\"" << m.parent() << "\" "
                 << " port=\"" << m.port() << "\" "
-                << " view=\"" << m.view() << "\" >"
-                << m.value()->toXML();
+                << " view=\"" << m.view() << "\" >";
+            if (m.value()) {
+                m.value()->writeXml(o);
+            }
             return o << "</modeltrame>";
         }
 
     private:
-        std::string     m_simulator;
-        std::string     m_parent;
-        std::string     m_port;
-        std::string     m_view;
-        value::Value    m_value;
+        std::string         m_simulator;
+        std::string         m_parent;
+        std::string         m_port;
+        std::string         m_view;
+        const value::Value* m_value;
     };
 
     /**
@@ -199,7 +202,7 @@ namespace vle { namespace vpz {
          * @param value The value to attach.
          * @throw utils::ArgError if list of ModelTrameList is empty.
          */
-        void add(const value::Value& value);
+        void add(const value::Value* value);
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *

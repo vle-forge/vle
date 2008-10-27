@@ -44,7 +44,7 @@ namespace vle { namespace eov {
         virtual Glib::RefPtr < Gdk::Window > drawingSurface();
 
         virtual Gtk::Widget& drawingWidget();
-        
+
         virtual Gtk::Widget& widget();
 
         virtual int width();

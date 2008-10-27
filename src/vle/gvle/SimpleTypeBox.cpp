@@ -28,7 +28,7 @@
 
 namespace vle { namespace gvle {
 
-SimpleTypeBox::SimpleTypeBox(value::ValueBase* b):
+SimpleTypeBox::SimpleTypeBox(value::Value* b):
     Gtk::Dialog("?",true,true),
     mBase(b),
     mValid(false)
@@ -75,7 +75,7 @@ void SimpleTypeBox::makeDialog()
     mEntry->set_editable(true);
     mEntry->set_activates_default(true);
     if (mBase) {
-        mEntry->set_text(mBase->toFile());
+        mEntry->set_text(mBase->writeToString());
     }
     get_vbox()->pack_start(*mEntry);
 }
@@ -87,32 +87,32 @@ std::string SimpleTypeBox::run()
     if (mValid) {
         if (mBase) {
             switch (mBase->getType()) {
-            case(value::ValueBase::INTEGER):
+            case(value::Value::INTEGER):
                 {
-                    dynamic_cast < value::IntegerFactory* > (mBase)
+                    dynamic_cast < value::Integer* > (mBase)
                         ->set(utils::to_long(mEntry->get_text()));
                     return mEntry->get_text();
                 }
                 break;
-            case(value::ValueBase::DOUBLE):
+            case(value::Value::DOUBLE):
                 {
-                    dynamic_cast < value::DoubleFactory* > (mBase)
+                    dynamic_cast < value::Double* > (mBase)
                         ->set(utils::to_double(mEntry->get_text()));
                     return mEntry->get_text();
                 }
                 break;
-            case(value::ValueBase::STRING):
+            case(value::Value::STRING):
                 {
-                    dynamic_cast < value::StringFactory* > (mBase)
+                    dynamic_cast < value::String* > (mBase)
                         ->set(mEntry->get_text());
                     return mEntry->get_text();
                 }
                 break;
-            case(value::ValueBase::TUPLE):
+            case(value::Value::TUPLE):
                 {
-                    value::TupleFactory* tuple =
-                        dynamic_cast<value::TupleFactory*>(mBase);
-                    tuple->getValue().clear();
+                    value::Tuple* tuple =
+                        dynamic_cast<value::Tuple*>(mBase);
+                    tuple->value().clear();
                     tuple->fill(mEntry->get_text());
                     return mEntry->get_text();
                 }

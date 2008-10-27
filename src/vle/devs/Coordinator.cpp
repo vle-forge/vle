@@ -104,20 +104,19 @@ ExternalEventList* Coordinator::run()
 
     while (not bags.emptyBag()) {
         std::map < Simulator*, EventBagModel >::value_type& bag(bags.topBag());
-        while (not bag.second.empty()) {
-            if (not bag.second.emptyInternal()) {
-                if (not bag.second.emptyExternal()) {
-                    processConflictEvents(bag.first, bag.second);
-                } else {
-                    processInternalEvent(bag.first, bag.second);
-                }
+        if (not bag.second.emptyInternal()) {
+            if (not bag.second.emptyExternal()) {
+                processConflictEvents(bag.first, bag.second);
             } else {
-                if (not bag.second.emptyExternal()) {
-                    processExternalEvents(bag.first, bag.second);
-                } else {
-                    processRequestEvents(bag.first, bag.second);
-                }
+                processInternalEvent(bag.first, bag.second);
             }
+        } else {
+            if (not bag.second.emptyExternal()) {
+                processExternalEvents(bag.first, bag.second);
+            }
+        }
+        if (not bag.second.emptyRequest()) {
+            processRequestEvents(bag.first, bag.second);
         }
     }
 
@@ -341,6 +340,7 @@ void Coordinator::delAtomicModel(graph::CoupledModel* parent,
     m_eventTable.invalidateModel(satom);
     satom->clear();
     m_deletedSimulator.push_back(satom);
+    ++m_toDelete;
 }
 
 void Coordinator::delCoupledModel(graph::CoupledModel* parent,
@@ -394,21 +394,26 @@ void Coordinator::dispatchExternalEvent(ExternalEventList& eventList,
         graph::TargetModelList out;
         sim->getStructure()->getTargetPortList((*it)->getPortName(), out);
 
-        for (graph::TargetModelList::iterator jt = out.begin();
-             jt != out.end(); ++jt) {
-            assert(jt->model()->isAtomic());
-            Simulator* dst = getModel(
-                reinterpret_cast < graph::AtomicModel* >(jt->model()));
-            const std::string& port(jt->port());
+        if (out.empty()) {    // If this external event have no destination
+            (*it)->deleter(); // it must delete allocated values, else
+        } else {              // the first newly external manage values.
+            for (graph::TargetModelList::iterator jt = out.begin();
+                 jt != out.end(); ++jt) {
+                assert(jt->model()->isAtomic());
+                Simulator* dst = getModel(
+                    reinterpret_cast < graph::AtomicModel* >(jt->model()));
+                const std::string& port(jt->port());
 
-            if ((*it)->isRequest()) {
-                m_eventTable.putRequestEvent(
-                    new RequestEvent(
-                        reinterpret_cast < RequestEvent* >((*it)),
-                        dst, port));
-            } else {
-                m_eventTable.putExternalEvent(
-                    new ExternalEvent((*it), dst, port));
+                if ((*it)->isRequest()) {
+                    m_eventTable.putRequestEvent(
+                        new RequestEvent(
+                            reinterpret_cast < RequestEvent* >((*it)),
+                            dst, port, jt == out.begin()));
+                } else {
+                    m_eventTable.putExternalEvent(
+                        new ExternalEvent((*it), dst, port,
+                                          jt == out.begin()));
+                }
             }
         }
         delete (*it);
@@ -465,7 +470,7 @@ StreamWriter* Coordinator::buildOutput(const vpz::View& view,
     return stream;
 }
 
-void Coordinator::processEventView(Simulator& model, Event* event)
+void Coordinator::processEventView(Simulator& model, const Event* event)
 {
     std::list < std::string > lst;
     for (EventViewList::iterator it = m_eventViewList.begin();
@@ -479,10 +484,11 @@ void Coordinator::processEventView(Simulator& model, Event* event)
             ObservationEvent* newevent = 0;
             if (event == 0 or not event->isInternal()) {
                 newevent = new ObservationEvent(m_currentTime, &model,
-                                          it->second->getName(), *jt);
+                                                it->second->getName(), *jt);
             } else if (event and event->isInternal()) {
-                newevent = new ObservationEvent(((InternalEvent*)event)->getTime(),
-                                          &model, it->second->getName(), *jt);
+                newevent = new
+                    ObservationEvent(((InternalEvent*)event)->getTime(), &model,
+                                     it->second->getName(), *jt);
             }
             ObservationEvent* eventvalue = model.observation(*newevent);
             delete newevent;
@@ -494,10 +500,9 @@ void Coordinator::processEventView(Simulator& model, Event* event)
 
 void Coordinator::processInternalEvent(
     Simulator* sim,
-    EventBagModel& modelbag)
+    const EventBagModel& modelbag)
 {
-    InternalEvent* ev = modelbag.internal();
-    modelbag.delInternal();
+    const InternalEvent* ev = modelbag.internal();
 
     {
         ExternalEventList result;
@@ -513,14 +518,13 @@ void Coordinator::processInternalEvent(
     }
 
     processEventView(*sim, ev);
-    delete ev;
 }
 
 void Coordinator::processExternalEvents(
     Simulator* sim,
-    EventBagModel& modelbag)
+    const EventBagModel& modelbag)
 {
-    ExternalEventList& lst(modelbag.externals());
+    const ExternalEventList& lst(modelbag.externals());
 
     {
         InternalEvent* internal(sim->externalTransition(lst, m_currentTime));
@@ -529,14 +533,12 @@ void Coordinator::processExternalEvents(
         }
     }
 
-    lst.deleteAndClear();
-    modelbag.delExternals();
     processEventView(*sim, 0);
 }
 
 void Coordinator::processConflictEvents(
     Simulator* sim,
-    EventBagModel& modelbag)
+    const EventBagModel& modelbag)
 {
     InternalEvent* internal;
 
@@ -549,9 +551,6 @@ void Coordinator::processConflictEvents(
             *modelbag.internal(), modelbag.externals());
     }
 
-    modelbag.delInternal();
-    modelbag.externals().deleteAndClear();
-    modelbag.delExternals();
     processEventView(*sim, 0);
 
     if (internal) {
@@ -561,20 +560,17 @@ void Coordinator::processConflictEvents(
 
 void Coordinator::processRequestEvents(
     Simulator* sim,
-    EventBagModel& modelbag)
+    const EventBagModel& modelbag)
 {
-    RequestEventList& lst(modelbag.Request());
+    const RequestEventList& lst(modelbag.Request());
 
     ExternalEventList result;
-    for (RequestEventList::iterator it = lst.begin(); it != lst.end();
+    for (RequestEventList::const_iterator it = lst.begin(); it != lst.end();
          ++it) {
         sim->request(**it, m_currentTime, result);
         dispatchExternalEvent(result, sim);
         result.clear();
     }
-
-    lst.deleteAndClear();
-    modelbag.delRequest();
 }
 
 void Coordinator::processTimedObservationEvents(ObservationEventList& bag)
@@ -584,15 +580,15 @@ void Coordinator::processTimedObservationEvents(ObservationEventList& bag)
         if ((*it)->isValid()) {
             Simulator* model((*it)->getModel());
             ObservationEvent* event(model->observation(*(*it)));
+            assert(event);
 
-            if (event) {
-                View* view(getView(event->getViewName()));
-                ObservationEvent* event2(view->processObservationEvent(event));
-                delete event;
+            View* view(getView(event->getViewName()));
+            ObservationEvent* event2(view->processObservationEvent(event));
+            event->deleter();
+            delete event;
 
-                if (event2 and model->getStructure()) {
-                    m_eventTable.putObservationEvent(event2);
-                }
+            if (event2 and model->getStructure()) {
+                m_eventTable.putObservationEvent(event2);
             }
         }
         delete *it;

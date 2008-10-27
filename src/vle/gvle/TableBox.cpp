@@ -31,7 +31,7 @@ using namespace vle;
 namespace vle
 {
 namespace gvle {
-TableBox::TableBox(value::TableFactory* t):
+TableBox::TableBox(value::Table* t):
         Gtk::Dialog("Table",true,true),
         mValue(t)
 {
@@ -68,7 +68,7 @@ void TableBox::run()
 {
     int ret = Gtk::Dialog::run();
     if (ret ==  Gtk::RESPONSE_APPLY) {
-        value::TableFactory::TableValue& table = mValue->getValue();
+        value::TableValue& table = mValue->value();
         for (index i = 0; i != mValue->height(); ++i) {
             for (index j = 0; j != mValue->width(); ++j) {
                 table[j][i] = utils::to_double((*mArray)[j][i]->get_text());

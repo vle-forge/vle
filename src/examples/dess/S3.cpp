@@ -36,9 +36,9 @@ S3::S3(const graph::AtomicModel& model,
 }
 
 double S3::compute(const vle::devs::Time& /* time */) const
-{    
+{
     return -r * getValue() * getValue("I");
-} 
+}
 
 DECLARE_NAMED_DYNAMICS(S3, S3)
 

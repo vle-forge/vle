@@ -364,7 +364,7 @@ void PetriNet::addArc(const std::string first,
         Throw(utils::ModellingError, boost::format(
                 "Petri Net: unknow place: %1% or %2%") % first % second);
     }
-}	
+}
 
 void PetriNet::addInitialMarking(const std::string placeName,
                                  unsigned int tokenNumber)
@@ -417,7 +417,7 @@ void PetriNet::addOutputTransition(const std::string transitionName,
 }
 
 void PetriNet::addPlace(const std::string placeName,
-                        double delay)				
+                        double delay)
 {
     Assert(utils::ModellingError, not existPlace(placeName), boost::format(
             "Petri Net: place '%1%' already exists") % placeName);
@@ -443,7 +443,7 @@ void PetriNet::addTransition(const std::string transitionName,
 
     mTransitions[transitionName] = new Transition(transitionName, delay,
                                                   priority);
-}			
+}
 
 void PetriNet::build()
 {
@@ -492,7 +492,7 @@ void PetriNet::initInitialMarking(const value::VectorValue& initialMarkings)
         it != initialMarkings.end(); it++) {
         value::VectorValue initialMarking = value::toSet(*it);
         std::string name = value::toString(initialMarking[0]);
-        unsigned int tokenNumber = value::toInteger(initialMarking[1]);	
+        unsigned int tokenNumber = value::toInteger(initialMarking[1]);
 
         addInitialMarking(name, tokenNumber);
     }
@@ -700,20 +700,20 @@ void PetriNet::externalTransition(const devs::ExternalEventList& event,
     else mPhase = WAITING;
 }
 
-value::Value PetriNet::observation(const devs::ObservationEvent& event) const
+value::Value* PetriNet::observation(const devs::ObservationEvent& event) const
 {
     if (event.onPort("token")) {
         return buildInteger(mTokenNumber);
     } else if (event.onPort("marking")) {
-        value::Set markings = value::SetFactory::create();
+        value::Set* markings = value::Set::create();
         MarkingList::const_iterator it = mMarkings.begin();
 
         while (it != mMarkings.end()) {
-            value::Set marking = value::SetFactory::create();
+            value::Set* marking = value::Set::create();
 
-            marking->addValue(buildString(it->first));
-            marking->addValue(buildInteger(it->second->getTokenNumber()));
-            markings->addValue(marking);
+            marking->add(buildString(it->first));
+            marking->add(buildInteger(it->second->getTokenNumber()));
+            markings->add(marking);
             ++it;
         }
         return markings;

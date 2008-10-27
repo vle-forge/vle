@@ -33,8 +33,8 @@
 
 
 namespace vle { namespace utils {
-   
-    /** 
+
+    /**
      * @brief This namespace provides two public classes of portable and object
      * oriented unix socket API.
      */
@@ -84,7 +84,7 @@ namespace vle { namespace utils {
                           std::string& ip,
                           int& port,
                           std::string& directory);
-    
+
     /**
      * @brief Define base class of socket Client and Server.
      *

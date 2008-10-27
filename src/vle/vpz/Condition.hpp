@@ -38,12 +38,12 @@ namespace vle { namespace vpz {
     /**
      * @brief Define the ConditionValues like a dictionnary, (portname, values).
      */
-    typedef std::map < std::string, value::Set > ConditionValues;
+    typedef std::map < std::string, value::Set* > ConditionValues;
 
     /**
      * @brief Define the ConditionValue like a dictionary, (portname, value).
      */
-    typedef std::map < std::string, value::Value > ConditionValue;
+    typedef std::map < std::string, const value::Value* > ConditionValue;
 
     /**
      * @brief Define the ValueList, a wrapper to the ConditionValue which
@@ -65,10 +65,10 @@ namespace vle { namespace vpz {
         /**
          * @brief Add a new pair portname, values to the dictionary.
          * @param key The name of the port.
-         * @param val The value to attach.
+         * @param val The value to clone and attach.
          * @throw utils::ArgError if name already exists.
          */
-        void add(const std::string& key, const value::Value& val);
+        void add(const std::string& key, const value::Value* val);
 
         /**
          * @brief Get a constant reference to the specified Value.
@@ -76,7 +76,7 @@ namespace vle { namespace vpz {
          * @return A constant reference to the Value.
          * @throw utils::ArgError if name does not exist.
          */
-        value::Value get(const std::string& name);
+        const value::Value& get(const std::string& name);
 
         /**
          * @brief Get a constant reference to the specified Value.
@@ -162,10 +162,9 @@ namespace vle { namespace vpz {
         Condition(const Condition& cnd);
 
         /**
-         * @brief Nothing to delete.
+         * @brief Delete all the values attached to this Conditon.
          */
-        virtual ~Condition()
-        {}
+        virtual ~Condition();
 
         /**
          * @brief Add Condition informations to the stream.
@@ -219,6 +218,15 @@ namespace vle { namespace vpz {
          * @param value the value to push.
          */
         void addValueToPort(const std::string& portname,
+                            value::Value* value);
+
+        /**
+         * @brief Add a value to a specified port. If port does not exist, it
+         * will be create.
+         * @param portname name of the port to add value.
+         * @param value the value to push.
+         */
+        void addValueToPort(const std::string& portname,
                             const value::Value& value);
 
         /**
@@ -252,6 +260,14 @@ namespace vle { namespace vpz {
          * @throw utils::ArgError if portname not exist.
          */
         const value::Set& getSetValues(const std::string& portname) const;
+
+        /**
+         * @brief Get the value::Set attached to a port.
+         * @param portname The name of the port.
+         * @return A reference to a value::Set.
+         * @throw utils::ArgError if portname not exist.
+         */
+        value::Set& getSetValues(const std::string& portname);
 
         /**
          * @brief Return a reference to the first value::Value of the specified

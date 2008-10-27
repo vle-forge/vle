@@ -24,58 +24,26 @@
 
 
 #include <vle/value/Boolean.hpp>
-#include <vle/utils/Debug.hpp>
-
-
 
 namespace vle { namespace value {
 
-Boolean BooleanFactory::create(bool value)
+void Boolean::writeFile(std::ostream& out) const
 {
-    return Boolean(new BooleanFactory(value));
+    out << m_value;
 }
 
-Value BooleanFactory::clone() const
+void Boolean::writeString(std::ostream& out) const
 {
-    return Value(new BooleanFactory(m_value));
+    out << m_value;
 }
 
-std::string BooleanFactory::toFile() const
+void Boolean::writeXml(std::ostream& out) const
 {
-    if (m_value)
-        return "true";
-    else
-        return "false";
-}
-
-std::string BooleanFactory::toString() const
-{
-    if (m_value)
-        return "true";
-    else
-        return "false";
-}
-
-std::string BooleanFactory::toXML() const
-{
-    if (m_value)
-	return "<boolean>true</boolean>";
-    else
-	return "<boolean>false</boolean>";
-}
-
-Boolean toBooleanValue(const Value& value)
-{
-    Assert(utils::ArgError, value->getType() == ValueBase::BOOLEAN,
-           "Value is not a Boolean");
-    return boost::static_pointer_cast < BooleanFactory >(value);
-}
-
-bool toBoolean(const Value& value)
-{
-    Assert(utils::ArgError, value->getType() == ValueBase::BOOLEAN,
-           "Value is not a Boolean");
-    return boost::static_pointer_cast < BooleanFactory >(value)->boolValue();
+    if (m_value) {
+	out << "<boolean>true</boolean>";
+    } else {
+	out << "<boolean>false</boolean>";
+    }
 }
 
 }} // namespace vle value

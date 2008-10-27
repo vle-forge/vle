@@ -50,8 +50,8 @@ double qss::getEstimatedValue(double e) const
     return mValue + e * mGradient;
 }
 
-void qss::updateGradient(bool external, const vle::devs::Time& time) 
-{ 
+void qss::updateGradient(bool external, const vle::devs::Time& time)
+{
     mLastTime = time;
     mGradient = compute(time);
     if (external) {
@@ -87,7 +87,7 @@ void qss::updateValue(bool external,
 	pushValue(time, d(mIndex));
     }
 }
-	
+
 void qss::reset(const Time& time, double value)
 {
     mPreviousValue = mValue;
@@ -95,14 +95,14 @@ void qss::reset(const Time& time, double value)
     mIndex = (long)(floor(mValue/mPrecision));
     mLastTime = time;
     mGradient = compute(time);
-    updateSigma(time);    
+    updateSigma(time);
 }
 
 // DEVS Methods
 Time qss::init(const devs::Time& time)
 {
     Time r = DifferentialEquation::init(time);
-    
+
     mIndex = (long)(floor(mValue/mPrecision));
     return r;
 }

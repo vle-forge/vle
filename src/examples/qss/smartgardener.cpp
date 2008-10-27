@@ -27,7 +27,7 @@
 #include <vle/utils/Debug.hpp>
 
 namespace vle { namespace examples { namespace qss {
-  
+
 Smartgardener::Smartgardener(const graph::AtomicModel& model,
                              const devs::InitEventList& events) :
     devs::Dynamics(model, events)
@@ -115,18 +115,18 @@ void Smartgardener::internalTransition(const devs::Time& /* event */)
     }
 }
 
-value::Value Smartgardener::observation(const devs::ObservationEvent& event)
+value::Value* Smartgardener::observation(const devs::ObservationEvent& event)
     const
 {
     if (event.onPort("c")) {
         if (state == PEST) {
             return buildDouble(1);
         } else {
-            return value::ValueBase::empty;
+            return 0;
         }
     }
 
-    return value::Value();
+    return 0;
 }
 
 void Smartgardener::externalTransition(const devs::ExternalEventList& event,
@@ -136,7 +136,7 @@ void Smartgardener::externalTransition(const devs::ExternalEventList& event,
     // ladybirds (y)
     if (state == IDLE) {
         for (devs::ExternalEventList::const_iterator it = event.begin();
-             it != event.end(); ++it) {		
+             it != event.end(); ++it) {
             if ((*it)->getStringAttributeValue("name") == "x") {
                 plantlouseamount = (*it)->getDoubleAttributeValue("value");
 

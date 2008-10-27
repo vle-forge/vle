@@ -34,7 +34,7 @@ namespace vle { namespace examples { namespace counter {
     {
     public:
         Counter(const vle::graph::AtomicModel& model,
-                const vle::devs::InitEventList& events) : 
+                const vle::devs::InitEventList& events) :
             vle::devs::Dynamics(model, events),
             m_counter(0),
             m_delay(1.0),
@@ -53,7 +53,7 @@ namespace vle { namespace examples { namespace counter {
         virtual void internalTransition(const vle::devs::Time& /* event */);
         virtual void externalTransition(const vle::devs::ExternalEventList& /* event */,
                                         const vle::devs::Time& /* time */);
-        virtual vle::value::Value observation(const vle::devs::ObservationEvent& /* event */) const;
+        virtual vle::value::Value* observation(const vle::devs::ObservationEvent& /* event */) const;
 
     private:
         long m_counter;

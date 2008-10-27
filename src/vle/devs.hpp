@@ -58,7 +58,7 @@
 
 namespace vle {
 
-    /** 
+    /**
      * @brief The devs namespace represents the DEVS Kernel simulator with B.P.
      * Zeigler algorithm for Simulator, Coordinator, RootCoordinator. Some
      * classes are provides like Time, Event to simplify the development of new

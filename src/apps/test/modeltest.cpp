@@ -23,6 +23,7 @@
  */
 
 
+#include <vle/manager/VLE.hpp>
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/vpz/Vpz.hpp>
@@ -85,12 +86,13 @@ bool run_model(const std::string& modelname)
         }
     } catch(const std::exception& e) {
         std::cerr << "failed\n" << e.what() << std::endl;
-        return false; 
+        return false;
     }
 }
 
 int main(int argc, char* argv[])
 {
+    vle::manager::init();
     vle::utils::Trace::trace().setLevel(vle::utils::Trace::DEBUG);
 
     bool success = true;
@@ -109,5 +111,6 @@ int main(int argc, char* argv[])
         print_help();
     }
 
+    vle::manager::finalize();
     return success ? EXIT_SUCCESS : EXIT_FAILURE;
 }

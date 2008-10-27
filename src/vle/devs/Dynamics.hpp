@@ -179,9 +179,9 @@ namespace vle { namespace devs {
 	 * @param event the state event with of the port
 	 * @return the value of state variable
 	 */
-        virtual vle::value::Value observation(
+        virtual vle::value::Value* observation(
 	    const vle::devs::ObservationEvent& /* event */) const
-        { return value::ValueBase::empty; }
+        { return 0; }
 
         /**
          * @brief When the simulation of the atomic model is finished, the
@@ -239,8 +239,8 @@ namespace vle { namespace devs {
 	 *
 	 * @return the Double object
 	 */
-        inline vle::value::Value buildDouble(double value) const
-        { return value::DoubleFactory::create(value); }
+        inline vle::value::Double* buildDouble(double value) const
+        { return value::Double::create(value); }
 
 	/**
 	 * Build a Integer object from a long value
@@ -249,8 +249,8 @@ namespace vle { namespace devs {
 	 *
 	 * @return the Integer object
 	 */
-        inline vle::value::Value buildInteger(long value) const
-        { return value::IntegerFactory::create(value); }
+        inline vle::value::Integer* buildInteger(long value) const
+        { return value::Integer::create(value); }
 
 	/**
 	 * Build a Boolean object from a bool value
@@ -259,8 +259,8 @@ namespace vle { namespace devs {
 	 *
 	 * @return the Boolean object
 	 */
-        inline vle::value::Value buildBoolean(bool value) const
-        { return value::BooleanFactory::create(value); }
+        inline vle::value::Boolean* buildBoolean(bool value) const
+        { return value::Boolean::create(value); }
 
 	/**
 	 * Build a String object from a string value
@@ -269,8 +269,8 @@ namespace vle { namespace devs {
 	 *
 	 * @return the String object
 	 */
-        inline vle::value::Value buildString(const std::string& value) const
-        { return value::StringFactory::create(value); }
+        inline vle::value::String* buildString(const std::string& value) const
+        { return value::String::create(value); }
 
 	/**
 	 * Build an empty event list

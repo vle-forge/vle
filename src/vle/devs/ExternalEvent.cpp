@@ -28,7 +28,7 @@
 
 namespace vle { namespace devs {
 
-const std::string ExternalEvent::getTargetModelName() const
+const std::string& ExternalEvent::getTargetModelName() const
 {
     return m_target->getName();
 }

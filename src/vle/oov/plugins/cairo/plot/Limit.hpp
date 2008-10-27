@@ -37,7 +37,7 @@ private :
     unsigned int mRedColor;
     unsigned int mGreenColor;
     unsigned int mBlueColor;
-    
+
 public :
     Limit(double value,
 	  unsigned int r = 0,
@@ -48,15 +48,15 @@ public :
 	mGreenColor(g),
 	mBlueColor(b)
         { }
-    
+
     virtual ~Limit() { }
-    
+
     inline double get_value() { return mValue; }
-    
+
     inline unsigned int get_red_color() { return mRedColor; }
-    
+
     inline unsigned int get_green_color() { return mGreenColor; }
-    
+
     inline unsigned int get_blue_color() { return mBlueColor; }
 };
 

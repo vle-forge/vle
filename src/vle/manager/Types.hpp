@@ -34,13 +34,13 @@
 #include <list>
 
 namespace vle { namespace manager  {
-    
-    /** 
+
+    /**
      * @brief A boost share_ptr around the vle::utils::Rand class.
      */
     typedef boost::shared_ptr < utils::Rand > RandPtr;
 
-    /** 
+    /**
      * @brief Define a list of filename from command line arguments argv and
      * argc.
      */
@@ -49,12 +49,12 @@ namespace vle { namespace manager  {
     //
     // JustRun output types
 
-    /** 
+    /**
      * @brief Define a list of oov::OutputMatrixViewList.
      */
     typedef std::vector < oov::OutputMatrixViewList > OutputSimulationList;
 
-    /** 
+    /**
      * @brief Define a dictionary of key vpz filename and index. Index is the
      * index in the OutputSimulationList.
      */
@@ -66,7 +66,7 @@ namespace vle { namespace manager  {
     // Distant simulation types
     //
 
-    /** 
+    /**
      * @brief
      */
     struct OutputSimulationDistant
@@ -84,8 +84,8 @@ namespace vle { namespace manager  {
         oov::OutputMatrixViewList outputs;
     };
 
-    /** 
-     * @brief 
+    /**
+     * @brief
      */
     typedef std::vector < OutputSimulationDistant > OutputSimulationDistantList;
 
@@ -93,7 +93,7 @@ namespace vle { namespace manager  {
     // Manager simulation types
     //
 
-    /** 
+    /**
      * @brief Define a two dimensional array of OutputSimulationList to store
      * result of a ManagerRun.
      */

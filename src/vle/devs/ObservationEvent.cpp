@@ -24,7 +24,6 @@
 
 
 #include <vle/devs/ObservationEvent.hpp>
-#include <string>
 
 namespace vle { namespace devs {
 

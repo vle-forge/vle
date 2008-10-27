@@ -42,7 +42,7 @@ namespace vle { namespace examples { namespace dess {
     private:
 	double a;
 	double m;
-	double g;	
+	double g;
     };
 
 }}} // namespace vle examples dess

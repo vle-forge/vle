@@ -42,7 +42,7 @@ namespace vle { namespace data {
 
         static CSVReader& open(const std::string& fileName,
                                const std::string& separator = ";",
-                               t_type type = TITLE, 
+                               t_type type = TITLE,
                                unsigned int columnNumber = 0);
 
         virtual ~CSVReader();
@@ -55,9 +55,9 @@ namespace vle { namespace data {
     private:
 
         /**
-         *  @brief Copyright (C) 1999 Lucent Technologies 
-         *  Excepted from 'The Practice of Programming' 
-         *  by Brian W. Kernighan and Rob Pike 
+         *  @brief Copyright (C) 1999 Lucent Technologies
+         *  Excepted from 'The Practice of Programming'
+         *  by Brian W. Kernighan and Rob Pike
          */
         class Csv {
         public:
@@ -84,7 +84,7 @@ namespace vle { namespace data {
         };
 
         class CSVReaderMap {
-        public:	
+        public:
             CSVReaderMap() { }
             virtual ~CSVReaderMap();
 
@@ -95,7 +95,7 @@ namespace vle { namespace data {
             friend class CSVReader;
 
         private:
-            std::map < std::string , 
+            std::map < std::string ,
                 std::pair < unsigned int, CSVReader* > > readers;
         };
 
@@ -108,7 +108,7 @@ namespace vle { namespace data {
         unsigned int colNumber;
         unsigned int rowNumber;
 
-        CSVReader(const std::string & fileName, const std::string & separator, 
+        CSVReader(const std::string & fileName, const std::string & separator,
                   t_type type,unsigned int columnNumber);
 
         friend class CSVResult;

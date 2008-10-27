@@ -34,7 +34,7 @@
 
 namespace vle { namespace manager {
 
-    /** 
+    /**
      * @brief Run is a base class for launch simulation from specified vpz::Vpz
      * object in a verbose mode or a quiet mode. It provides an access to
      * RootCoordinator builded for this simulation.
@@ -42,37 +42,37 @@ namespace vle { namespace manager {
     class Run
     {
     public:
-        /** 
+        /**
          * @brief Default constructor.
          */
         Run();
 
-        /** 
+        /**
          * @brief Return true if the simulation reports error.
          * @return true if the simulation reports error, false otherwise.
          */
         bool haveError() const;
 
-        /** 
+        /**
          * @brief Return a constant reference to the RootCoordinator.
          * @return Return a constant reference to the RootCoordinator.
          */
         const devs::RootCoordinator& rootCoordinator() const;
 
-        /** 
+        /**
          * @brief Return a reference to the RootCoordinator.
          * @return Return a reference to the RootCoordinator.
          */
         devs::RootCoordinator& rootCoordinator();
 
-        /** 
+        /**
          * @brief Return a constant list of the dictionary viewname,
          * oov::Plugin.
          * @return Return a constant list of the dictionary viewname.
          */
         const oov::OutputMatrixViewList& outputs() const;
 
-        /** 
+        /**
          * @brief Return the list of the dictionary viewname, oov::Plugin.
          * @return Return the list of the dictionary viewname.
          */
@@ -85,7 +85,7 @@ namespace vle { namespace manager {
 
 
 
-    /** 
+    /**
      * @brief RunVerbose is a specific Run class to launch simulation from
      * specified vpz::Vpz object with verbose mode to standard error. This
      * class is a functor to be use with std::for_each.
@@ -94,8 +94,8 @@ namespace vle { namespace manager {
     {
     public:
         RunVerbose(std::ostream& out);
-        
-        /** 
+
+        /**
          * @brief Launch the simulation of the specified vpz::Vpz object. Be
          * carrefull, the object is destroyed in this function.
          * @param vpz a reference to the vpz::Vpz to simulate. Be carreful,
@@ -103,34 +103,34 @@ namespace vle { namespace manager {
          */
         void operator()(vpz::Vpz* vpz);
 
-        /** 
+        /**
          * @brief Launch the simulation on the specified filename.
          * @param filename the filename of the vpz::Vpz to simulate.
          */
         void operator()(const std::string& filename);
 
-        /** 
+        /**
          * @brief Launch the simulation of the specified vpz::Vpz object. A
          * clone of this vpz::Vpz is build to allow simulation.
          * @param a reference to the vpz::vpz to simulate.
          */
         void operator()(const vpz::Vpz& vpz);
-        
-        /** 
+
+        /**
          * @brief Launch the simulation of the specifieed vpz::Vpz object. Be
          * carrefull, the object is destroyed in this function.
          * @param vpz a reference to the vpz::Vpz to simulate. Be carreful,
          * destroy by this function.
          */
         void start(vpz::Vpz* vpz);
-        
-        /** 
+
+        /**
          * @brief Launch the simulation on the specified filename.
          * @param filename The filename to simulate.
          */
         void start(const std::string& filename);
 
-        /** 
+        /**
          * @brief Launch the simulation of the specified vpz::Vpz object. A
          * clone of this vpz::Vpz is build to allow simulation.
          * @param a reference to the vpz::vpz to simulate.
@@ -143,7 +143,7 @@ namespace vle { namespace manager {
 
 
 
-    /** 
+    /**
      * @brief RunQuiet is a specific Run class to launch simulation from
      * specified vpz::Vpz object with verbose mode into std::string and a member
      * to access it. This class is a functor to be use with std::for_each.
@@ -151,7 +151,7 @@ namespace vle { namespace manager {
     class RunQuiet : public Run
     {
     public:
-        /** 
+        /**
          * @brief Launch the simulation of the specified vpz::Vpz object. Be
          * carrefull, the object is destroyed in this function.
          * @param vpz a reference to the vpz::Vpz to simulate. Be carreful,
@@ -159,41 +159,41 @@ namespace vle { namespace manager {
          */
         void operator()(vpz::Vpz* vpz);
 
-        /** 
+        /**
          * @brief Launch the simulation on the specified filename.
          * @param filename the filename of the vpz::Vpz to simulate.
          */
         void operator()(const std::string& filename);
 
-        /** 
+        /**
          * @brief Launch the simulation of the specified vpz::Vpz object. A
          * clone of this vpz::Vpz is build to allow simulation.
          * @param a reference to the vpz::vpz to simulate.
          */
         void operator()(const vpz::Vpz& vpz);
-        
-        /** 
+
+        /**
          * @brief Launch the simulation of the specifieed vpz::Vpz object. Be
          * carrefull, the object is destroyed in this function.
          * @param vpz a reference to the vpz::Vpz to simulate. Be carreful,
          * destroy by this function.
          */
         void start(vpz::Vpz* vpz);
-        
-        /** 
+
+        /**
          * @brief Launch the simulation on the specified filename.
          * @param filename The filename to simulate.
          */
         void start(const std::string& filename);
 
-        /** 
+        /**
          * @brief Launch the simulation of the specified vpz::Vpz object. A
          * clone of this vpz::Vpz is build to allow simulation.
          * @param a reference to the vpz::vpz to simulate.
          */
         void start(const vpz::Vpz& vpz);
 
-        /** 
+        /**
          * @brief Return a string description of the error. use Run::haveError()
          * before otherwise, this function returns an empty string.
          * @return A description of the error if the simulation failed,
@@ -258,7 +258,7 @@ namespace vle { namespace manager {
     {
         operator()(vpz);
     }
-    
+
     /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
     inline const std::string& RunQuiet::error() const

@@ -36,7 +36,7 @@ namespace vle { namespace oov {
     class NetStreamReader : public StreamReader
     {
     public:
-        /** 
+        /**
          * @brief Build a NetStreamReader based on a new socket server.
          * @param port the port number [0 and 65535].
          * @throw utils::InternalError if the building of the socket server
@@ -46,20 +46,20 @@ namespace vle { namespace oov {
 
         virtual ~NetStreamReader();
 
-        /** 
+        /**
          * @brief Build a socket server and wait connection from a
          * devs::NetStreamWriter client.
          */
         void process();
 
-        /** 
+        /**
          * @brief Return the port used by the oov::NetStreamReader socket
          * server.
          * @return the port number [0 and 65535].
          */
         inline int port() const;
 
-        /** 
+        /**
          * @brief Affect a new size to the buffer.
          * @param buffer the new size of the buffer.
          * @throw utils::InternalError if buffer equal 0 or greater than memory
@@ -67,13 +67,13 @@ namespace vle { namespace oov {
          */
         void setBufferSize(size_t buffer);
 
-        /** 
+        /**
          * @brief Return the size of the buffer.
          * @return The size of the buffer.
          */
         inline size_t bufferSize() const;
 
-        /** 
+        /**
          * @brief Return a reference to the buffer.
          * @return A reference to the buffer.
          */
@@ -95,7 +95,7 @@ namespace vle { namespace oov {
 
     inline int NetStreamReader::port() const
     { return m_port; }
-    
+
     inline size_t NetStreamReader::bufferSize() const
     { return m_buffer.size(); }
 

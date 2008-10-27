@@ -50,28 +50,28 @@ public :
 	mBlueColor(b)
         {
         }
-    
+
     virtual ~Curve() { }
-    
+
     inline std::string get_name() { return mName; }
-    
+
     inline unsigned int get_red_color() { return mRedColor; }
-    
+
     inline unsigned int get_green_color() { return mGreenColor; }
-    
+
     inline unsigned int get_blue_color() { return mBlueColor; }
-    
+
     virtual bool is_integer() { return false; }
-    
+
     virtual bool is_double() { return false; }
-    
+
     virtual int get_number_value() = 0;
-    
+
     virtual double get_date(int index) = 0;
-    
+
     virtual int get_size() = 0;
 };
-	    
+
 }}} // namespace vle oov plugin
-    
+
 #endif

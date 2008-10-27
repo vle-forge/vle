@@ -70,10 +70,10 @@ void Counter::externalTransition(const devs::ExternalEventList& events,
     m_active = true;
 }
 
-value::Value Counter::observation(const devs::ObservationEvent& /* event */) const
+value::Value* Counter::observation(const devs::ObservationEvent& /* event */) const
 {
     if (m_counter > 100 and m_counter < 500) {
-        return value::Value();
+        return 0;
     } else {
         return buildDouble(m_counter);
     }

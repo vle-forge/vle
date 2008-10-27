@@ -42,7 +42,7 @@ Plantlouse::~Plantlouse()
 }
 
 double Plantlouse::compute(const vle::devs::Time& /* time */) const
-{    
+{
     return a * getValue() - b * getValue("y") * getValue();
 }
 }}} // namespace vle examples qss

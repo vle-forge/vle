@@ -38,7 +38,7 @@
 
 namespace vle {
 
-    /** 
+    /**
      * @brief Manager is use to run simulation, to run experimentales frames
      * and to build instances of an experimental frame using generator (linear
      * or total).

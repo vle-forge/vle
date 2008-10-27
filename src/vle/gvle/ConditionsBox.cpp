@@ -321,10 +321,11 @@ void ConditionsBox::buildTreePorts(const std::string& conditionName)
 void ConditionsBox::buildTreeValues(const std::string& conditionName,
 				    const std::string& portName)
 {
-    value::Set values = mConditions->get(conditionName).getSetValues(portName);
+    value::Set&
+        values(mConditions->get(conditionName).getSetValues(portName));
 
     m_treeValues->setCondition(&mConditions->get(conditionName));
-    m_treeValues->makeTreeView(*values);
+    m_treeValues->makeTreeView(values);
 }
 
 void ConditionsBox::show()

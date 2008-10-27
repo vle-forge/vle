@@ -35,7 +35,7 @@ double LogNormalGenerator::generate()
     double s, x, y, z;
 
     x = 0.0;
-    y = std::log(((m_standardDeviation * m_standardDeviation) / 
+    y = std::log(((m_standardDeviation * m_standardDeviation) /
                   (m_average * m_average)) + 1.0);
     s = sqrt(y);
 

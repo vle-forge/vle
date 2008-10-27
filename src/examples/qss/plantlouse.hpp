@@ -42,9 +42,9 @@ namespace vle { namespace examples { namespace qss {
 
         virtual double compute(const devs::Time& time) const;
 
-    private:   
+    private:
         double a;
-        double b; 
+        double b;
     };
 
 }}} // namespace vle examples qss

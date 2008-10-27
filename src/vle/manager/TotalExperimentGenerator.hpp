@@ -32,7 +32,7 @@
 
 namespace vle { namespace manager {
 
-    /** 
+    /**
      * @brief A class to translate Experiment file into Instance of Experiment.
      */
     class TotalExperimentGenerator : public ExperimentGenerator
@@ -53,9 +53,9 @@ namespace vle { namespace manager {
 
         virtual void buildCombination(size_t& nb);
 
-        /** 
+        /**
          * @brief Get the number of combination from vpz file.
-         * 
+         *
          * @return A value greater than 0.
          */
         virtual size_t getCombinationNumber() const;

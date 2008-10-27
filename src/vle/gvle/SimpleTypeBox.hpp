@@ -38,7 +38,7 @@ namespace vle { namespace gvle {
     class SimpleTypeBox : public Gtk::Dialog
     {
     public:
-        SimpleTypeBox(value::ValueBase* base);
+        SimpleTypeBox(value::Value* base);
         SimpleTypeBox(const std::string& title);
 
         virtual ~SimpleTypeBox();
@@ -54,7 +54,7 @@ namespace vle { namespace gvle {
         bool valid() const { return mValid; }
 
     private:
-        value::ValueBase* mBase;
+        value::Value* mBase;
         Gtk::Entry* mEntry;
         bool mValid;
 

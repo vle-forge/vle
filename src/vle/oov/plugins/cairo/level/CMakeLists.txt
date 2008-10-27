@@ -25,6 +25,6 @@ TARGET_LINK_LIBRARIES(cairolevel
   vlevpz
   vleoov)
 
-INSTALL(TARGETS cairolevel 
+INSTALL(TARGETS cairolevel
   RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/stream"
   LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/stream")

@@ -60,7 +60,7 @@ size_t TotalExperimentGenerator::getCombinationNumber() const
     for (it = mCondition.begin(); it != mCondition.end(); ++it) {
         nb *= it->sz;
     }
-    
+
     return nb;
 }
 

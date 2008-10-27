@@ -40,16 +40,16 @@ namespace gvle {
 class ValueBox : public Gtk::Dialog
 {
 public:
-    ValueBox(value::MapFactory* map);
-    ValueBox(value::SetFactory* set);
+    ValueBox(value::Map* map);
+    ValueBox(value::Set* set);
 
     virtual ~ValueBox();
 
     void run();
 private:
     TreeViewValue* mTreeView;
-    value::ValueBase* mValue;
-    value::Value mBackup;
+    value::Value* mValue;
+    value::Value* mBackup;
 
     void makeDialog();
 };

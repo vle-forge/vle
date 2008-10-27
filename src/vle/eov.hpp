@@ -34,7 +34,7 @@
 
 namespace vle {
 
-    /** 
+    /**
      * @brief The EOV library is based on the OOV libary (output of VLE) and
      * more particulary, on the Cairo plugin. EOV is a Gtk application to
      * show the CairoPlugin into a Gtk frame.

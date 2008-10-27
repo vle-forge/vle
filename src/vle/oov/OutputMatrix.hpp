@@ -27,6 +27,7 @@
 #define VLE_OOV_OUTPUTMATRIX_HPP
 
 #include <vle/value/Matrix.hpp>
+#include <boost/utility.hpp>
 #include <list>
 #include <string>
 #include <map>
@@ -35,7 +36,7 @@
 
 namespace vle { namespace oov {
 
-    /** 
+    /**
      * @brief This class use a value::Matrix to store all result from a
      * simulation. Each column are referenced by a couple (model's name, port's
      * name) stored into a std::map to get the index of a value. The column 0 is
@@ -53,7 +54,7 @@ namespace vle { namespace oov {
         ///! @brief define a pair model, port names.
         typedef std::pair < std::string, std::string > PairString;
 
-        /** 
+        /**
          * @brief A functor to test the difference between two couple model,
          * port.
          * To use with, find, compare etc.
@@ -67,12 +68,11 @@ namespace vle { namespace oov {
 
         ///! @brief define a dictionary model-port name to index in matrix.
         typedef std::map < PairString,
-                value::MatrixFactory::MatrixValue::index, pairCmp > 
-                    MapPairIndex;
+                value::MatrixValue::index, pairCmp > MapPairIndex;
 
-        /** 
+        /**
          * @brief Build an empty matrix of value of size [colums][row].
-         * 
+         *
          * @param columns the initial number of columns.
          * @param rows the initial number of rows.
          * @param resizeColumns the number of columns to add when resize the
@@ -84,14 +84,23 @@ namespace vle { namespace oov {
                      int resizeColumns = 100,
                      int resizeRow = 1000);
 
-        /** 
-         * @brief Destroy
+        /**
+         * @brief Copy constructor make a clone of the value::Matrix.
+         * @param outputmatrix The OutputMatrix to copy.
          */
-        virtual ~OutputMatrix()
-        {
-        }
+        OutputMatrix(const OutputMatrix& outputmatrix) :
+            m_values(value::toMatrixValue(outputmatrix.m_values->clone())),
+            m_info(outputmatrix.m_info),
+            m_modelNames(outputmatrix.m_modelNames),
+            m_colAccess(outputmatrix.m_colAccess)
+        {}
 
-        /** 
+        /**
+         * @brief Destroy the allocated value::Matrix.
+         */
+        virtual ~OutputMatrix();
+
+        /**
          * @brief Serialize the data's to an output of value::Value object. Be
          * careful, the data (from the matrix) is not cloned. The
          * serialization is defined like:
@@ -110,29 +119,29 @@ namespace vle { namespace oov {
          * @endcode
          * @return The serialized representation of this Object.
          */
-        value::Value serialize() const;
+        value::Value* serialize() const;
 
-        /** 
+        /**
          * @brief Read the value::Value and rebuild the content of the
          * OutputMatrix.
          * @param vals A value::Value to rebuild the OutputMatrix.
          * @throw utils::ArgError if an error occurred in parsing.
          */
-        void deserialize(value::Value vals);
+        void deserialize(const value::Value& vals);
 
-        void resize(value::MatrixFactory::size_type maxcols,
-                    value::MatrixFactory::size_type maxrows);
+        void resize(value::Matrix::size_type maxcols,
+                    value::Matrix::size_type maxrows);
 
-        /** 
+        /**
          * @brief Update the resize value in columns and rows.
-         * 
+         *
          * @param resizeColumns The number of columns to add.
          * @param resizeRows The number of rows to add.
          */
-        void updateStep(value::MatrixFactory::size_type resizeColumns,
-                        value::MatrixFactory::size_type resizeRows);
+        void updateStep(value::Matrix::size_type resizeColumns,
+                        value::Matrix::size_type resizeRows);
 
-        /** 
+        /**
          * @brief Add a new column into the output matrix. If the number of
          * column is equal to the size of the matrix, the matrix is resize in
          * column and row by the resizeColumns and resizeRow of the constructor.
@@ -142,12 +151,12 @@ namespace vle { namespace oov {
          *
          * @return the index of the model, port in the matrix.
          */
-        value::MatrixFactory::index addModel(const std::string& model,
-                                             const std::string& port);
+        value::Matrix::index addModel(const std::string& model,
+                                      const std::string& port);
 
-        /** 
+        /**
          * @brief Add a value to the specified couple model port.
-         * 
+         *
          * @param model the model name.
          * @param port the port name.
          * @param value the value to set.
@@ -155,7 +164,7 @@ namespace vle { namespace oov {
         void addValue(const std::string& model, const std::string& port,
                       const value::Value& value);
 
-        /** 
+        /**
          * @brief Set the last time (column 0, last row) to the specified
          * value and add a new row in the matrix. If the number of row equal the
          * number of row of the Matrix, the matrix is resized in row by the
@@ -165,22 +174,22 @@ namespace vle { namespace oov {
          */
         void setLastTime(double time);
 
-        /** 
+        /**
          * @brief Get the Time vector.
-         * 
+         *
          * @return A view on the Time column;
          */
-        value::MatrixFactory::VectorView getTime()
+        value::VectorView getTime()
         { return m_values->row(0); }
 
-        /** 
+        /**
          * @brief Return the list of model name.
          * @return A const reference on a vector of string.
          */
         const OutputMatrix::StringList& getModelList() const
         { return m_modelNames; }
 
-        /** 
+        /**
          * @brief Return the list of port for a specific model.
          * @param model The model name to get the list of ports.
          * @return A const reference on a vector of string.
@@ -188,7 +197,7 @@ namespace vle { namespace oov {
         const OutputMatrix::StringList&
             getPortList(const std::string& model) const;
 
-        /** 
+        /**
          * @brief Retrieve the vector of a couple model, port.
          * @param model the model name.
          * @param port the port name.
@@ -196,20 +205,19 @@ namespace vle { namespace oov {
          * @throw utils::ArgError if the model or if the port's model does not
          * exist.
          */
-        value::MatrixFactory::VectorView getValue(const std::string& model,
-                                                  const std::string& port);
+        value::VectorView getValue(const std::string& model,
+                                   const std::string& port);
 
-        /** 
+        /**
          * @brief Retrive the vector or column of a specific index.
-         * 
+         *
          * @param idx the index of the vector.
-         * 
+         *
          * @return A Vector View.
          */
-        value::MatrixFactory::VectorView getValue(
-                        value::MatrixFactory::size_type idx);
+        value::VectorView getValue(value::Matrix::size_type idx);
 
-        /** 
+        /**
          * @brief Retrieve the constant vector of a couple model, port.
          * @param model the model name.
          * @param port the port name.
@@ -217,66 +225,63 @@ namespace vle { namespace oov {
          * @throw utils::ArgError if the model or if the port's model does not
          * exist.
          */
-        value::MatrixFactory::ConstVectorView getValue(
-                        const std::string& model,
-                        const std::string& port) const;
+        value::ConstVectorView getValue(const std::string& model,
+                                        const std::string& port) const;
 
-        /** 
+        /**
          * @brief Retrive the constant vector or column of a specific index.
          * @param idx the index of the vector.
          * @return A Vector View.
          */
-        value::MatrixFactory::ConstVectorView getValue(
-                        value::MatrixFactory::size_type idx) const;
+        value::ConstVectorView getValue(value::Matrix::size_type idx) const;
 
-        /** 
+        /**
          * @brief Return the size of a vector.
          * @return A integer.
          */
-        value::MatrixFactory::MatrixValue::index getVectorSize() const
+        value::Matrix::index getVectorSize() const
         { return m_values->rows(); }
 
-        /** 
+        /**
          * @brief Return the Matrix of the values.
          * @return A constant reference to the Matrix.
          */
-        inline value::MatrixFactory::ConstMatrixView values() const
+        inline value::ConstMatrixView values() const
         { return m_values->getConstValue(); }
 
-        /** 
+        /**
          * @brief Return the Matrix of the values.
          * @return A constant reference to the Matrix.
          */
-        inline value::MatrixFactory::MatrixView values()
-        { return m_values->getValue(); }
+        inline value::MatrixView values()
+        { return m_values->value(); }
 
-        /** 
+        /**
          * @brief Return the index of the specified couple model port.
          * @param model Name of the model.
          * @param port Name of the port.
          * @throw utils::ArgError if couple model port does not exist.
          * @return A index.
          */
-        value::MatrixFactory::MatrixValue::index
-            column(const std::string& model, const std::string& port) const;
+        value::Matrix::index column(const std::string& model,
+                                    const std::string& port) const;
 
-        /** 
+        /**
          * @brief Return the index (model, port) to matrix index.
-         * 
+         *
          * @return A constant reference to the index.
          */
         inline const MapPairIndex& index() const
         { return m_colAccess; }
 
     private:
-        value::Matrix m_values; ///! the matrix.
+        value::Matrix* m_values; ///! the matrix.
         MapStringList m_info; ///! store for each model, list of port.
         StringList m_modelNames; ///! store the list of model's name.
         MapPairIndex m_colAccess; ///! from (model, port) to matrix index.
     };
 
-
-    /** 
+    /**
      * @brief This typedef is used to defined the dictionnary of key view name
      * and oov::PluginPtr.
      */

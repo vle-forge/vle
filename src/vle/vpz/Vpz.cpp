@@ -95,7 +95,7 @@ void Vpz::parseMemory(const std::string& buffer)
     }
 }
 
-value::Value Vpz::parseValue(const std::string& buffer)
+value::Value* Vpz::parseValue(const std::string& buffer)
 {
     Vpz vpz;
     SaxParser sax(vpz);
@@ -119,7 +119,7 @@ TrameList Vpz::parseTrame(const std::string& buffer)
     return sax.tramelist();
 }
 
-std::vector < value::Value > Vpz::parseValues(const std::string& buffer)
+std::vector < value::Value* > Vpz::parseValues(const std::string& buffer)
 {
     Vpz vpz;
     SaxParser sax(vpz);
