@@ -27,6 +27,7 @@
 #define VLE_VALUE_STRING_HPP
 
 #include <vle/value/Value.hpp>
+#include <boost/serialization/string.hpp>
 
 namespace vle { namespace value {
 
@@ -144,6 +145,14 @@ namespace vle { namespace value {
 
     private:
         std::string m_value;
+
+	friend class boost::serialization::access;
+	template < class Archive >
+	    void serialize(Archive& ar, const unsigned int /* version */)
+	    {
+		ar & boost::serialization::base_object < Value >(*this);
+		ar & m_value;
+	    }
     };
 
     inline const String& toStringValue(const Value& value)

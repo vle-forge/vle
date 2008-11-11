@@ -29,6 +29,12 @@
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Pool.hpp>
 #include <ostream>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/utility.hpp>
 
 namespace vle { namespace value {
 
@@ -285,6 +291,17 @@ namespace vle { namespace value {
         friend std::ostream& operator<<(std::ostream& out, const Value& obj)
         { obj.writeString(out); return out; }
 
+	/**
+	 * @brief Boost serialization operator to permit a text, xml or binary
+	 * stream of the value value.
+	 * @param ar The archive where writting the values.
+	 * @param version The version of the serialization.
+	 */
+	friend class boost::serialization::access;
+	template < class Archive >
+	    void serialize(Archive& /* ar */, const unsigned int /* version */)
+	    {}
+
     private:
         Value& operator=(const Value& /* value */) { return *this; }
     };
@@ -326,6 +343,17 @@ namespace vle { namespace value {
         }
     }
 
+    ///
+    ////
+    ///
+
+    /**
+     * @brief A functor to find composite Value, ie., values of type Map, Set or
+     * Matrix. To use with std::find_if for instance:
+     * @code
+     * iterator it = std::find_if(begin(), end(), IsComposite());
+     * @endcode
+     */
     struct IsComposite
     {
         bool operator()(const Value& val) const
@@ -349,7 +377,6 @@ namespace vle { namespace value {
 
 	Value* operator()(const Value* val) const
 	{ return (not val) ? 0 : val->clone(); }
-
     };
 
     /**
@@ -363,5 +390,11 @@ namespace vle { namespace value {
     void finalize();
 
 }} // namespace vle
+
+/*
+ * Macro used to define the Value class as an abstract class for the
+ * boost::serialization library.
+ */
+BOOST_IS_ABSTRACT(vle::value::Value)
 
 #endif

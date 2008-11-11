@@ -105,6 +105,14 @@ namespace vle { namespace value {
          * @param out The output stream.
          */
 	virtual void writeXml(std::ostream& out) const;
+
+    private:
+	friend class boost::serialization::access;
+	template < class Archive >
+	    void serialize(Archive& ar, const unsigned int /* version */)
+	    {
+		ar & boost::serialization::base_object < Value >(*this);
+	    }
     };
 
     /**

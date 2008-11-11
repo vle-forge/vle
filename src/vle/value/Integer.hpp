@@ -49,7 +49,7 @@ namespace vle { namespace value {
          * @brief Build an Integer object with a specified value.
          * @param value The value to copy.
          */
-        Integer(long value = 0) :
+        Integer(long value) :
             m_value(value)
         {}
 
@@ -156,6 +156,14 @@ namespace vle { namespace value {
 
     private:
         long m_value;
+
+	friend class boost::serialization::access;
+	template < class Archive >
+	    void serialize(Archive& ar, const unsigned int /* version */)
+	    {
+		ar & boost::serialization::base_object < Value >(*this);
+		ar & m_value;
+	    }
     };
 
     inline const Integer& toIntegerValue(const Value& value)

@@ -24,7 +24,6 @@
 
 
 #include <vle/value/Integer.hpp>
-#include <vle/utils/Debug.hpp>
 
 namespace vle { namespace value {
 

@@ -30,6 +30,17 @@
 
 namespace vle { namespace value {
 
+Matrix::Matrix() :
+    m_matrix(),
+    m_nbcol(0),
+    m_nbrow(0),
+    m_stepcol(1),
+    m_steprow(1),
+    m_lastX(0),
+    m_lastY(0)
+{
+}
+
 Matrix::Matrix(index columns, index rows, index resizeColumns, index
                resizeRows) :
     m_matrix(m_extents[columns][rows]),

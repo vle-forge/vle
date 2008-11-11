@@ -26,8 +26,6 @@
 #include <vle/value/Double.hpp>
 #include <vle/utils/Debug.hpp>
 
-
-
 namespace vle { namespace value {
 
 void Double::writeFile(std::ostream& out) const

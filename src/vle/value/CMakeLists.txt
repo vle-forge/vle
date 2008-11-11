@@ -6,7 +6,8 @@ INCLUDE_DIRECTORIES(
 
 LINK_DIRECTORIES(
   ${GLIBMM_LIBRARY_DIRS}
-  ${LIBXMLPP_LIBRARY_DIR})
+  ${LIBXMLPP_LIBRARY_DIR}
+  ${Boost_LIBRARY_DIRS})
 
 SET(VALUE_HPP Boolean.hpp Deleter.hpp Double.hpp Integer.hpp Map.hpp Matrix.hpp
   Null.hpp Set.hpp String.hpp Table.hpp Tuple.hpp Value.hpp XML.hpp)
@@ -22,6 +23,7 @@ TARGET_LINK_LIBRARIES(vlevalue
   ${GLIBMM_LIBRARIES}
   ${LIBXMLPP_LIBRARIES}
   ${GTHREAD_LIBRARIES}
+  ${Boost_SERIALIZATION_LIBRARY}
   vlegeometry
   vleutils
   vledata)

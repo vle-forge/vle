@@ -21,5 +21,18 @@ TARGET_LINK_LIBRARIES(test_values
   vledata
   vlevalue)
 
-ADD_TEST(valuetest test_values)
+ADD_EXECUTABLE(test_values_serial test_serialization.cpp)
+TARGET_LINK_LIBRARIES(test_values_serial
+  ${GLIBMM_LIBRARIES}
+  ${LIBXMLPP_LIBRARIES}
+  ${GTHREAD_LIBRARIES}
+  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
+  ${Boost_SERIALIZATION_LIBRARY}
+  vlegeometry
+  vleutils
+  vledata
+  vlevalue)
+
+ADD_TEST(valuetest_simple test_values)
+ADD_TEST(valuetest_serialization test_values_serial)
 
