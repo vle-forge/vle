@@ -137,7 +137,7 @@ namespace vle { namespace devs {
          * @param size The size of the memory.
          */
         inline static void operator delete(void* deletable, size_t size)
-        { Pools::pools().deallocate(deletable, size); }
+        { if (deletable) Pools::pools().deallocate(deletable, size); }
 
         ///
         ////
@@ -280,7 +280,7 @@ namespace vle { namespace devs {
          * @return true if Value exist, false otherwise.
          */
         inline bool existAttributeValue(const std::string& name) const
-        { return attributes().existValue(name); }
+        { return haveAttributes() ? attributes().existValue(name) : false; }
 
         /**
          * Get an attribute from this Event.
@@ -355,6 +355,13 @@ namespace vle { namespace devs {
          * @return a reference to the attached map.
          */
         inline const value::Map& getAttributes() const
+        { return attributes(); }
+
+        /**
+         * @brief Return the map attached to the event.
+         * @return a reference to the attached map.
+         */
+        inline value::Map& getAttributes()
         { return attributes(); }
 
         /**

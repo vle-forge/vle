@@ -138,15 +138,6 @@ namespace vle { namespace vpz {
         static value::Value* parseValue(const std::string& buffer);
 
         /**
-         * @brief Parse the buffer to find a value.
-         * @param buffer the buffer to translate
-         * @throw utils::ArgError if buffer is not a valid trame.
-         * @return a reference to the Trame read. You must manage the memory of
-         * this trame.
-         */
-        static TrameList parseTrame(const std::string& buffer);
-
-        /**
          * @brief Parse the buffer to find a list of values.
          * @param buffer the buffer to translate.
          * @throw utils::ArgError if buffer is not a value.

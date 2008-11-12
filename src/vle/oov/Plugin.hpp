@@ -23,23 +23,16 @@
  */
 
 
-#ifndef VLE_VPZ_PLUGIN_HPP
-#define VLE_VPZ_PLUGIN_HPP
+#ifndef VLE_OOV_PLUGIN_HPP
+#define VLE_OOV_PLUGIN_HPP
 
-#include <vle/vpz/Trame.hpp>
-#include <vle/vpz/ParameterTrame.hpp>
-#include <vle/vpz/NewObservableTrame.hpp>
-#include <vle/vpz/DelObservableTrame.hpp>
-#include <vle/vpz/ValueTrame.hpp>
-#include <vle/vpz/EndTrame.hpp>
 #include <vle/oov/OutputMatrix.hpp>
-#include <boost/shared_ptr.hpp>
-#include <iostream>
+#include <vle/value/Set.hpp>
 
 namespace vle { namespace oov {
 
     /**
-     * @brief The vle::vpz::Plugin is a class to develop output steam plugins.
+     * @brief The vle::oov::Plugin is a class to develop output steam plugins.
      * For instance, an output stream text (for gnuplot or R) and cairo (for
      * building vectorial image or bitmap). This class define a plugin.
      * @code
@@ -66,10 +59,15 @@ namespace vle { namespace oov {
             m_location(location)
         {}
 
+        /**
+         * @brief Nothing to delete.
+         */
         virtual ~Plugin()
         {}
 
-        /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+        ///
+        ////
+        ///
 
         /**
          * @brief This plugin can be serialized into a value::Value stream.
@@ -87,7 +85,6 @@ namespace vle { namespace oov {
 
         /**
          * @brief Initialize this plugin using the value::Value stream.
-         *
          * @param A value::Value.
          */
         virtual void deserialize(const value::Value& /* vals */)
@@ -95,7 +92,6 @@ namespace vle { namespace oov {
 
         /**
          * @brief This plugin use an OutputMatrix.
-         *
          * @return true if this plugin use and OutputMatrix, false otherwise.
          */
         virtual bool haveOutputMatrix() const
@@ -104,7 +100,6 @@ namespace vle { namespace oov {
         /**
          * @brief Get a reference to the OutputMatrix. If the Plugin do not use
          * and OutputMatrix, an empty OutputMatrix is returned.
-         *
          * @return A reference to the OutputMatrix.
          */
         virtual oov::OutputMatrix outputMatrix() const
@@ -112,13 +107,14 @@ namespace vle { namespace oov {
 
         /**
          * @brief Get the name of the Plugin class.
-         *
          * @return The name of the plugin class.
          */
         virtual std::string name() const
         { return std::string(); }
 
-        /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+        ///
+        ////
+        ///
 
         /**
          * @brief By default, a plugin is not a cairo plugin.
@@ -130,41 +126,52 @@ namespace vle { namespace oov {
         /**
          * @brief Call to initialise plugin. Just before the Plugin constructor.
          * This function is used to initialise the Plugin with parameter
-         * provided by the Vpz class.
-         *
-         * @param trame
+         * provided by the devs::StreamWriter.
          */
-        virtual void onParameter(const vpz::ParameterTrame& trame) = 0;
+        virtual void onParameter(const std::string& plugin,
+                                 const std::string& location,
+                                 const std::string& file,
+                                 const std::string& parameters,
+                                 const double& time) = 0;
 
         /**
          * @brief Call when a new observable (the devs::Simulator and port name)
          * is attached to a view.
-         *
-         * @param trame
          */
-        virtual void onNewObservable(const vpz::NewObservableTrame& trame) = 0;
+        virtual void onNewObservable(const std::string& simulator,
+                                     const std::string& parent,
+                                     const std::string& port,
+                                     const std::string& view,
+                                     const double& time) = 0;
 
         /**
          * @brief Call whe a observable (the devs::Simulator and port name) is
          * deleted from a view.
-         *
-         * @param trame
          */
-        virtual void onDelObservable(const vpz::DelObservableTrame& trame) = 0;
+        virtual void onDelObservable(const std::string& simulator,
+                                     const std::string& parent,
+                                     const std::string& port,
+                                     const std::string& view,
+                                     const double& time) = 0;
 
         /**
          * @brief Call when an external event is send to the view.
-         *
-         * @param trame
          */
-        virtual void onValue(const vpz::ValueTrame& trame) = 0;
+        virtual void onValue(const std::string& simulator,
+                             const std::string& parent,
+                             const std::string& port,
+                             const std::string& view,
+                             const double& time,
+                             value::Value* value) = 0;
 
         /**
          * @brief Call when the simulation is finished.
-         *
-         * @param trame
          */
-        virtual void close(const vpz::EndTrame& trame) = 0;
+        virtual void close(const double& time) = 0;
+
+        ///
+        ////
+        ///
 
         /**
          * @brief Get the location provide at the constructor of this Plugin.
@@ -193,7 +200,8 @@ namespace vle { namespace oov {
     typedef std::map < std::string, PluginPtr > PluginViewList;
 
 #define DECLARE_OOV_PLUGIN(x) \
-    extern "C" { vle::oov::Plugin* makeNewOovPlugin(const std::string& location) \
+    extern "C" { vle::oov::Plugin* makeNewOovPlugin( \
+                const std::string& location) \
         { return new x(location); } }
 
 }} // namespace vle oov

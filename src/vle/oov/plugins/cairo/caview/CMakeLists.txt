@@ -22,7 +22,6 @@ TARGET_LINK_LIBRARIES(cairocaview
   vledata
   vlevalue
   vlegraph
-  vlevpz
   vleoov)
 
 INSTALL(TARGETS cairocaview

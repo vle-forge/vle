@@ -29,6 +29,7 @@
 #include <vle/utils/XML.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
+#include <vle/value/String.hpp>
 #include <boost/algorithm/string/split.hpp>
 
 namespace vle { namespace oov { namespace plugin {
@@ -50,75 +51,21 @@ CairoCAView::~CairoCAView()
 {
 }
 
-void CairoCAView::onNewObservable(const vpz::NewObservableTrame& /*trame*/)
-{
-}
-
-void CairoCAView::onDelObservable(const vpz::DelObservableTrame& /* trame */)
-{
-}
-
-void CairoCAView::onValue(const vpz::ValueTrame& trame)
-{
-    mTime = utils::to_double(trame.time());
-
-    for (vpz::ModelTrameList::const_iterator it = trame.trames().begin();
-         it != trame.trames().end(); ++it) {
-	std::vector < std::string > v;
-
-	boost::split(v, it->simulator(), boost::is_any_of("_"));
-
-	if (v[0] == mCellName) {
-            (*mValues)[(index)(utils::to_int(v[1])-1)][(index)(utils::to_int(v[2])-1)]
-                = it->value()->writeToString();
-	    ++mReceiveCell;
-	}
-	else {
-	    if (it->port() == "x")
-		mObjects[v[0]][utils::to_int(v[1])-1].first = value::toInteger(it->value());
-	    else
-		mObjects[v[0]][utils::to_int(v[1])-1].second = value::toInteger(it->value());
-	    ++mReceiveObject;
-	}
-
-    }
-    if (mReceiveCell == mRows * mColumns and mReceiveObject == mObjectNumber*2) {
-	draw();
-//	mSurface->write_to_png((boost::format("%1%_%2$05d.png") % location() % (int)mTime).str());
-	mReceiveCell = 0;
-	mReceiveObject = 0;
-    }
-}
-
-/*        <parameters>
-	  <model name="c" />
-          <size x="20" y="20" />
-          <geometry type="square" />
-	  <cell name="c" />
-          <states type="real">
-            <state type="linear" min="0" max="300" color="blue" />
-            <state type="linear" min="300" max="600" color="yellow" />
-            <state type="linear" min="600" max="2000" color="red" />
-            <state type="linear" min="2000" max="2000" color="red_only" />
-          </states>
-	  <objects>
-	    <object name="fireman" number="1" color_red="0" color_green="0"
-	  color_blue="1" shape="square" />
-	    <object name="pyroman" number="1" color_red="1" color_green="0"
-	  color_blue="0" shape="circle" />
-	  </objects>
-        </parameters> */
-
-void CairoCAView::onParameter(const vpz::ParameterTrame& trame)
+void CairoCAView::onParameter(const std::string& /* plugin */,
+                              const std::string& /* location */,
+                              const std::string& /* file */,
+                              const std::string& parameters,
+                              const double& /* time */)
 {
     if (not context()) {
-	mImageSurface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, mWindowWidth, mWindowHeight);
+        mImageSurface = Cairo::ImageSurface::create(
+            Cairo::FORMAT_ARGB32, mWindowWidth, mWindowHeight);
 	setSurface(mImageSurface);
     }
 
     xmlpp::DomParser parser;
 
-    parser.parse_memory(trame.data());
+    parser.parse_memory(parameters);
     xmlpp::Element* root = utils::xml::get_root_node(parser, "parameters");
     xmlpp::Element * elt = utils::xml::get_children(root, "size");
     mColumns = utils::to_int(utils::xml::get_attribute(elt,"x").c_str());
@@ -256,7 +203,78 @@ void CairoCAView::onParameter(const vpz::ParameterTrame& trame)
     mMaxY = mStepY * mRows;
 }
 
-void CairoCAView::close(const vpz::EndTrame& /*trame */)
+void CairoCAView::onNewObservable(const std::string& /* simulator */,
+                                  const std::string& /* parent */,
+                                  const std::string& /* port */,
+                                  const std::string& /* view */,
+                                  const double& /* time */)
+{
+}
+
+void CairoCAView::onDelObservable(const std::string& /* simulator */,
+                                  const std::string& /* parent */,
+                                  const std::string& /* port */,
+                                  const std::string& /* view */,
+                                  const double& /* time */)
+{
+}
+
+void CairoCAView::onValue(const std::string& simulator,
+                          const std::string& /* parent */,
+                          const std::string& port,
+                          const std::string& /* view */,
+                          const double& time,
+                          value::Value* value)
+{
+    mTime = time;
+    std::vector < std::string > v;
+
+    boost::split(v, simulator, boost::is_any_of("_"));
+
+    if (v[0] == mCellName) {
+        (*mValues)[(index)(utils::to_int(v[1])-1)][(index)(utils::to_int(v[2])-1)]
+            = value->writeToString();
+        ++mReceiveCell;
+    } else {
+        if (port == "x") {
+            mObjects[v[0]][utils::to_int(v[1])-1].first =
+                value->toInteger().value();
+        } else {
+            mObjects[v[0]][utils::to_int(v[1])-1].second =
+                value->toInteger().value();
+        }
+        ++mReceiveObject;
+    }
+    delete value;
+
+    if (mReceiveCell == mRows * mColumns and mReceiveObject == mObjectNumber*2) {
+	draw();
+//	mSurface->write_to_png((boost::format("%1%_%2$05d.png") % location() % (int)mTime).str());
+	mReceiveCell = 0;
+	mReceiveObject = 0;
+    }
+}
+
+/*        <parameters>
+	  <model name="c" />
+          <size x="20" y="20" />
+          <geometry type="square" />
+	  <cell name="c" />
+          <states type="real">
+            <state type="linear" min="0" max="300" color="blue" />
+            <state type="linear" min="300" max="600" color="yellow" />
+            <state type="linear" min="600" max="2000" color="red" />
+            <state type="linear" min="2000" max="2000" color="red_only" />
+          </states>
+	  <objects>
+	    <object name="fireman" number="1" color_red="0" color_green="0"
+	  color_blue="1" shape="square" />
+	    <object name="pyroman" number="1" color_red="1" color_green="0"
+	  color_blue="0" shape="circle" />
+	  </objects>
+        </parameters> */
+
+void CairoCAView::close(const double& /* time */)
 {
     delete mValues;
 }

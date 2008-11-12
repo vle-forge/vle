@@ -27,7 +27,6 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <vle/data/CSVResult.hpp>
 #include <vle/utils/Tools.hpp>
-#include <iostream>
 
 namespace vle { namespace data {
 

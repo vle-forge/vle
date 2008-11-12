@@ -36,9 +36,12 @@
 #include <limits>
 #include <fstream>
 #include <sstream>
+#include <iostream>
 #include <functional>
 #include <vle/value.hpp>
 #include <vle/utils.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
 
 using namespace vle;
 
@@ -278,5 +281,53 @@ BOOST_AUTO_TEST_CASE(check_composite1_serialization)
         BOOST_REQUIRE_EQUAL(st.getString(1), "test 6");
         BOOST_REQUIRE_EQUAL(st.getString(2), "test 7");
         BOOST_REQUIRE_EQUAL(st.getString(3), "test 8");
+    }
+}
+
+BOOST_AUTO_TEST_CASE(check_composite2_serialization)
+{
+    std::string save;
+
+    {
+        value::Set* st = value::Set::create();
+        st->addBoolean(true);
+        st->addInt(1234);
+        st->addDouble(12.34);
+        st->addString("test");
+        st->addXml("xml test");
+        st->addNull();
+
+        std::ostringstream out(std::ostringstream::binary);
+        boost::archive::binary_oarchive oa(out);
+        oa << (const value::Set&)*st;
+        save = out.str();
+
+        delete st;
+    }
+
+    std::cout << "save: [" << save << "]\n";
+
+    {
+        value::Set* st = value::Set::create();
+
+        std::istringstream in(save, std::istringstream::binary);
+        boost::archive::binary_iarchive ia(in);
+        ia >> (value::Set&)*st;
+
+        BOOST_REQUIRE_EQUAL(st->size(), (value::Set::size_type)6);
+        BOOST_REQUIRE_EQUAL(st->getBoolean(0), true);
+        BOOST_REQUIRE_EQUAL(st->getInt(1), 1234);
+        BOOST_REQUIRE_CLOSE(st->getDouble(2), 12.34, 1e-10);
+        BOOST_REQUIRE_EQUAL(st->getString(3), "test");
+        BOOST_REQUIRE_EQUAL(st->getXml(4), "xml test");
+        BOOST_REQUIRE_EQUAL(st->get(5).getType(), value::Value::NIL);
+
+        BOOST_REQUIRE_THROW(st->getInt(0), utils::CastError);
+        BOOST_REQUIRE_NO_THROW(st->getInt(1));
+        BOOST_REQUIRE_THROW(st->getInt(2), utils::CastError);
+        BOOST_REQUIRE_THROW(st->getInt(3), utils::CastError);
+        BOOST_REQUIRE_THROW(st->getInt(4), utils::CastError);
+
+        delete st;
     }
 }

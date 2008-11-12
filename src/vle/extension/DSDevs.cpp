@@ -32,10 +32,10 @@
 #include <vle/value/Set.hpp>
 #include <vle/value/String.hpp>
 #include <vle/utils/Exception.hpp>
+#include <iostream>
+
 
 namespace vle { namespace extension {
-
-
 
 DSDevs::DSDevs(const graph::AtomicModel& model,
                const devs::InitEventList& events) :

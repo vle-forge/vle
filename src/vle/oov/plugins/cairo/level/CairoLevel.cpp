@@ -29,6 +29,7 @@
 #include <vle/utils/XML.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
+#include <vle/value/String.hpp>
 
 namespace vle { namespace oov { namespace plugin {
 
@@ -43,55 +44,65 @@ CairoLevel::~CairoLevel()
 {
 }
 
-void CairoLevel::onNewObservable(const vpz::NewObservableTrame& trame)
+void CairoLevel::onNewObservable(const std::string& simulator,
+                                 const std::string& parent,
+                                 const std::string& /* port */,
+                                 const std::string& /* view */,
+                                 const double& /* time */)
 {
-    std::string name(buildname(trame.name(),trame.port()));
+    std::string name(buildname(parent, simulator));
 
     Assert(utils::InternalError,m_columns2.find(name) == m_columns2.end(),
-           boost::format("Observable %1% already exist") % name);
+           boost::format("CairoLevel: observable '%1%' already exist") % name);
 
     m_columns.push_back(name);
     m_columns2[name] = m_buffer.size();
     m_buffer.push_back(0);
 }
 
-void CairoLevel::onDelObservable(const vpz::DelObservableTrame& /* trame */)
+void CairoLevel::onDelObservable(const std::string& /* simulator */,
+                                 const std::string& /* parent */,
+                                 const std::string& /* port */,
+                                 const std::string& /* view */,
+                                 const double& /* time */)
 {
 }
 
-void CairoLevel::onValue(const vpz::ValueTrame& trame)
+void CairoLevel::onValue(const std::string& simulator,
+                         const std::string& parent,
+                         const std::string& /* port */,
+                         const std::string& /* view */,
+                         const double& time,
+                         value::Value* value)
 {
-    m_time = utils::to_double(trame.time());
+    m_time = time;
 
-    for (vpz::ModelTrameList::const_iterator it = trame.trames().begin();
-         it != trame.trames().end(); ++it) {
+    std::string name(buildname(parent, simulator));
+    std::map < std::string,int >::iterator it = m_columns2.find(name);
 
-        std::string name(buildname(it->simulator(),it->port()));
-        std::map < std::string,int >::iterator jt;
-        jt = m_columns2.find(name);
+    Assert(utils::InternalError,it != m_columns2.end(),boost::format(
+            "CairoLevel: columns %1% does not exist. No new Observable ?") %
+        name);
 
-        Assert(utils::InternalError,jt != m_columns2.end(),boost::format(
-                "The columns %1% does not exist. No new Observable ?") %
-            name);
-
-        m_buffer[jt->second] = it->value()->clone();
-        m_receive++;
-    }
+    m_buffer[it->second] = value;
+    m_receive++;
     draw();
-    //m_img->write_to_png((boost::format(
-    //"%1%_%2$05d.png") % location() % (int)m_time).str());
 }
 
-void CairoLevel::onParameter(const vpz::ParameterTrame& trame)
+void CairoLevel::onParameter(const std::string& /* plugin */,
+                             const std::string& /* location */,
+                             const std::string& /* file */,
+                             const std::string& parameters,
+                             const double& /* time */)
 {
     m_minX = 1;
     m_maxX = 106;
     m_minY = 1;
     m_maxY = 306;
 
-    if (not trame.data().empty()) {
+    if (not parameters.empty()) {
         xmlpp::DomParser parser;
-        parser.parse_memory(trame.data());
+        parser.parse_memory(parameters);
 
 	xmlpp::Element* root = utils::xml::get_root_node(parser, "parameters");
 
@@ -136,7 +147,7 @@ void CairoLevel::onParameter(const vpz::ParameterTrame& trame)
     m_colorList[0][2] = 0;
 }
 
-void CairoLevel::close(const vpz::EndTrame& /*trame */)
+void CairoLevel::close(const double& /* time */)
 {
 }
 

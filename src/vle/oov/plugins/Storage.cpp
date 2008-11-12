@@ -29,6 +29,7 @@
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
 #include <vle/value/String.hpp>
+#include <vle/value/XML.hpp>
 #include <vle/value/Null.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -68,9 +69,13 @@ std::string Storage::name() const
     return std::string("storage");
 }
 
-void Storage::onParameter(const vpz::ParameterTrame& trame)
+void Storage::onParameter(const std::string& /* plugin */,
+                          const std::string& /* location */,
+                          const std::string& /* file */,
+                          const std::string& parameters,
+                          const double& /* time */)
 {
-    std::istringstream param(trame.data());
+    std::istringstream param(parameters);
     int columns = -1, rows = -1, rzcolumns = -1, rzrows = -1;
 
     if (param) {
@@ -89,41 +94,49 @@ void Storage::onParameter(const vpz::ParameterTrame& trame)
     m_matrix.updateStep(rzcolumns > 0 ? rzcolumns : 1, rzrows > 0 ? rzrows : 1);
 }
 
-void Storage::onNewObservable(const vpz::NewObservableTrame& trame)
+void Storage::onNewObservable(const std::string& simulator,
+                              const std::string& parent,
+                              const std::string& port,
+                              const std::string& /* view */,
+                              const double& /* time */)
 {
-    std::string name(trame.parent());
-    name += trame.name();
-    m_matrix.addModel(name, trame.port());
+    std::string name(parent);
+    name += simulator;
+    m_matrix.addModel(name, port);
 }
 
-void Storage::onDelObservable(const vpz::DelObservableTrame& /* trame */)
+void Storage::onDelObservable(const std::string& /* simulator */,
+                              const std::string& /* parent */,
+                              const std::string& /* port */,
+                              const std::string& /* view */,
+                              const double& /* time */)
 {
 }
 
-void Storage::onValue(const vpz::ValueTrame& trame)
+void Storage::onValue(const std::string& simulator,
+                      const std::string& parent,
+                      const std::string& port,
+                      const std::string& /* view */,
+                      const double& time,
+                      value::Value* value)
 {
     if (m_isstart) {
-        nextTime(utils::to_double(trame.time()));
+        nextTime(time);
     } else {
         if (m_time < .0) {
-            m_time = utils::to_double(trame.time());
+            m_time = time;
         } else {
-            nextTime(utils::to_double(trame.time()));
+            nextTime(time);
             m_isstart = true;
         }
     }
 
-    for (vpz::ModelTrameList::const_iterator it = trame.trames().begin();
-         it != trame.trames().end(); ++it) {
-        std::string name(it->parent());
-        name += it->simulator();
-        if (not it->value()->isNull()) {
-            m_matrix.addValue(name, it->port(), *it->value());
-        }
-    }
+    std::string name(parent);
+    name += simulator;
+    m_matrix.addValue(name, port, value);
 }
 
-void Storage::close(const vpz::EndTrame& /*trame*/)
+void Storage::close(const double& /* time */)
 {
     m_matrix.setLastTime(m_time);
 }

@@ -28,6 +28,7 @@
 #include <vle/oov/Plugin.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Debug.hpp>
+#include <vle/value/String.hpp>
 
 namespace vle { namespace oov {
 
@@ -61,30 +62,47 @@ void StreamReader::initPlugin(const std::string& plugin,
     Throw(utils::InternalError, error);
 }
 
-void StreamReader::onParameter(const vpz::ParameterTrame& trame)
+void StreamReader::onParameter(const std::string& pluginname,
+                               const std::string& location,
+                               const std::string& file,
+                               const std::string& parameters,
+                               const double& time)
 {
-    initPlugin(trame.plugin(), trame.location());
-    plugin()->onParameter(trame);
+    initPlugin(pluginname, parameters);
+    plugin()->onParameter(pluginname, location, file, parameters, time);
 }
 
-void StreamReader::onNewObservable(const vpz::NewObservableTrame& trame)
+void StreamReader::onNewObservable(const std::string& simulator,
+                                   const std::string& parent,
+                                   const std::string& portname,
+                                   const std::string& view,
+                                   const double& time)
 {
-   plugin()->onNewObservable(trame);
+    plugin()->onNewObservable(simulator, parent, portname, view, time);
 }
 
-void StreamReader::onDelObservable(const vpz::DelObservableTrame& trame)
+void StreamReader::onDelObservable(const std::string& simulator,
+                                   const std::string& parent,
+                                   const std::string& portname,
+                                   const std::string& view,
+                                   const double& time)
 {
-   plugin()->onDelObservable(trame);
+    plugin()->onDelObservable(simulator, parent, portname, view, time);
 }
 
-void StreamReader::onValue(const vpz::ValueTrame& trame)
+void StreamReader::onValue(const std::string& simulator,
+                           const std::string& parent,
+                           const std::string& port,
+                           const std::string& view,
+                           const double& time,
+                           value::Value* value)
 {
-    plugin()->onValue(trame);
+    plugin()->onValue(simulator, parent, port, view, time, value);
 }
 
-void StreamReader::onClose(const vpz::EndTrame& trame)
+void StreamReader::onClose(const double& time)
 {
-    plugin()->close(trame);
+    plugin()->close(time);
 }
 
 }} // namespace vle oov

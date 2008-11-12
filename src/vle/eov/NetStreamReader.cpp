@@ -28,6 +28,7 @@
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Algo.hpp>
+#include <vle/value/String.hpp>
 #include <gtkmm/main.h>
 #include <gdkmm/drawable.h>
 #include <gdkmm/gc.h>
@@ -47,7 +48,7 @@ void NetStreamReader::process()
 	m_finisherror.assign("unknown error");
     }
     try {
-	close();
+	oov::NetStreamReader::close();
     } catch (std::exception& e) {
 	m_finisherror += "\n";
 	m_finisherror += e.what();
@@ -56,35 +57,57 @@ void NetStreamReader::process()
     m_finish = true;
 }
 
-void NetStreamReader::onParameter(const vpz::ParameterTrame& trame)
+void NetStreamReader::onParameter(const std::string& pluginname,
+                                  const std::string& location,
+                                  const std::string& file,
+                                  const std::string& parameters,
+                                  const double& time)
 {
-    oov::NetStreamReader::onParameter(trame);
+    oov::NetStreamReader::onParameter(pluginname, location, file, parameters,
+                                      time);
+
     oov::PluginPtr poov = plugin();
     Assert(utils::InternalError, poov->isCairo(), boost::format(
-         "Plugin '%1%' is not a oov::CairoPlugin") % trame.plugin());
+            "Eov: plugin '%1%' is not a oov::CairoPlugin") %
+        pluginname);
 
     runWindow();
-    m_newpluginname = trame.plugin();
+    m_newpluginname = pluginname;
 }
 
-void NetStreamReader::onNewObservable(const vpz::NewObservableTrame& trame)
+void NetStreamReader::onNewObservable(const std::string& simulator,
+                                      const std::string& parent,
+                                      const std::string& portname,
+                                      const std::string& view,
+                                      const double& time)
 {
-    oov::NetStreamReader::onNewObservable(trame);
+    oov::NetStreamReader::onNewObservable(simulator, parent, portname, view,
+                                          time);
 }
 
-void NetStreamReader::onDelObservable(const vpz::DelObservableTrame& trame)
+void NetStreamReader::onDelObservable(const std::string& simulator,
+                                      const std::string& parent,
+                                      const std::string& portname,
+                                      const std::string& view,
+                                      const double& time)
 {
-    oov::NetStreamReader::onDelObservable(trame);
+    oov::NetStreamReader::onDelObservable(simulator, parent, portname, view,
+                                          time);
 }
 
-void NetStreamReader::onValue(const vpz::ValueTrame& trame)
+void NetStreamReader::onValue(const std::string& simulator,
+                              const std::string& parent,
+                              const std::string& port,
+                              const std::string& view,
+                              const double& time,
+                              value::Value* value)
 {
-    oov::NetStreamReader::onValue(trame);
+    oov::NetStreamReader::onValue(simulator, parent, port, view, time, value);
 }
 
-void NetStreamReader::onClose(const vpz::EndTrame& trame)
+void NetStreamReader::onClose(const double& time)
 {
-    oov::NetStreamReader::onClose(trame);
+    oov::NetStreamReader::onClose(time);
 
     {
         Glib::Mutex::Lock lock(m_mutex);

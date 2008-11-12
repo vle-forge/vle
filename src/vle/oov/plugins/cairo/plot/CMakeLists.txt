@@ -24,7 +24,6 @@ TARGET_LINK_LIBRARIES(cairoplot
   vledata
   vlevalue
   vlegraph
-  vlevpz
   vleoov)
 
 INSTALL(TARGETS cairoplot

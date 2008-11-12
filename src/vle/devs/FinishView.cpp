@@ -37,18 +37,8 @@ FinishView::FinishView(const std::string& name, StreamWriter* stream) :
 
 ObservationEvent* FinishView::processObservationEvent(ObservationEvent* event)
 {
-    if (event->existAttributeValue(event->getPortName())) {
-        m_stream->process(*event);
-    }
+    m_stream->process(*event);
     return 0;
-
-    // TODO check this behaviour
-    //value::Value val = event->getAttributeValue(event->getPortName());
-    //
-    //if (val.get()) {
-    //m_stream->process(*event);
-    //}
-    //return 0;
 }
 
 }} // namespace vle devs

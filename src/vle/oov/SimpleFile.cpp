@@ -25,8 +25,8 @@
 
 #include <vle/oov/SimpleFile.hpp>
 #include <vle/utils/Debug.hpp>
-
-
+#include <vle/value/String.hpp>
+#include <vle/value/Double.hpp>
 
 namespace vle { namespace oov { namespace plugin {
 
@@ -35,12 +35,6 @@ SimpleFile::SimpleFile(const std::string& location) :
     m_time(-1.0),
     m_isstart(false)
 {
-    m_filenametmp = location;
-
-    m_file.open(m_filenametmp.c_str());
-
-    Assert(utils::InternalError, m_file.is_open(), boost::format(
-            "Cannot open file [%1%]") % location);
 }
 
 SimpleFile::~SimpleFile()
@@ -48,56 +42,77 @@ SimpleFile::~SimpleFile()
     m_file.close();
 }
 
-void SimpleFile::onParameter(const vpz::ParameterTrame& /* trame */)
+void SimpleFile::onParameter(const std::string& /* plugin */,
+                             const std::string& location,
+                             const std::string& file,
+                             const std::string& /* parameters */,
+                             const double& /* time */)
 {
-    m_filename = m_filenametmp + extension();
+    m_filenametmp = Glib::build_filename(location, file);
+    m_filename = m_filenametmp;
+    m_filename += extension();
+
+    m_file.open(m_filenametmp.c_str());
+
+    Assert(utils::ModellingError, m_file.is_open(),
+           boost::format(
+            "SimpleFile: cannot open file '%1%'") % m_filenametmp);
 }
 
-void SimpleFile::onNewObservable(const vpz::NewObservableTrame& trame)
+void SimpleFile::onNewObservable(const std::string& simulator,
+                                 const std::string& parent,
+                                 const std::string& portname,
+                                 const std::string& /* view */,
+                                 const double& /* time */)
 {
-    std::string name(buildname(trame.parent(), trame.name(), trame.port()));
+    std::string name(buildname(parent, simulator, portname));
 
     Assert(utils::InternalError, m_columns.find(name) == m_columns.end(),
-           boost::format("Observable %1% already exist") % name);
+           boost::format("SimpleFile: observable '%1%' already exist") % name);
 
     m_columns[name] = m_buffer.size();
-    m_buffer.push_back("NA");
+    m_buffer.push_back((value::Value*)0);
 }
 
-void SimpleFile::onDelObservable(const vpz::DelObservableTrame& /* trame */)
+void SimpleFile::onDelObservable(const std::string& /* simulator */,
+                                 const std::string& /* parent */,
+                                 const std::string& /* portname */,
+                                 const std::string& /* view */,
+                                 const double& /* time */)
 {
 }
 
-void SimpleFile::onValue(const vpz::ValueTrame& trame)
+void SimpleFile::onValue(const std::string& simulator,
+                         const std::string& parent,
+                         const std::string& port,
+                         const std::string& /* view */,
+                         const double& time,
+                         value::Value* value)
 {
     if (m_isstart) {
-        flush(utils::to_double(trame.time()));
+        flush(time);
     } else {
         if (m_time < .0) {
-            m_time = utils::to_double(trame.time());
+            m_time = time;
         } else {
-            flush(utils::to_double(trame.time()));
+            flush(time);
             m_isstart = true;
         }
     }
 
-    for (vpz::ModelTrameList::const_iterator it = trame.trames().begin();
-         it != trame.trames().end(); ++it) {
+    std::string name(buildname(parent, simulator, port));
+    Columns::iterator it = m_columns.find(name);
 
-        std::string name(buildname(it->parent(), it->simulator(), it->port()));
-        Columns::iterator jt = m_columns.find(name);
-
-        Assert(utils::InternalError, jt != m_columns.end(), boost::format(
-                "The columns %1% does not exist. No new Observable ?") %
+    Assert(utils::InternalError, it != m_columns.end(), boost::format(
+            "SimpleFile: columns '%1%' does not exist. No new Observable ?") %
             name);
 
-        m_buffer[jt->second] = it->value()->writeToString();
-    }
+    m_buffer[it->second] = value;
 }
 
-void SimpleFile::close(const vpz::EndTrame& trame)
+void SimpleFile::close(const double& time)
 {
-    finalFlush(utils::to_double(trame.time()));
+    finalFlush(time);
     std::vector < std::string > array(m_columns.size());
 
     Columns::iterator it = m_columns.begin();
@@ -134,14 +149,19 @@ void SimpleFile::flush(double trame_time)
     if (trame_time != m_time) {
         m_file << m_time;
         writeSeparator(m_file);
-        std::vector < std::string >::iterator it;
-        for (it = m_buffer.begin(); it != m_buffer.end(); ++it) {
-            m_file << *it;
+
+        for (Line::iterator it = m_buffer.begin(); it != m_buffer.end(); ++it) {
+            if (*it) {
+                (*it)->writeFile(m_file);
+            } else {
+                m_file << "NA";
+            }
 
             if (it + 1 != m_buffer.end()) {
                 writeSeparator(m_file);
             }
-            *it = "NA";
+            delete *it;
+            *it = 0;
         }
         m_file << '\n' << std::flush;
         m_time = trame_time;
@@ -153,22 +173,27 @@ void SimpleFile::finalFlush(double trame_time)
     flush(trame_time);
     bool empty = true;
 
-    for (std::vector < std::string >::iterator it = m_buffer.begin();
-	 it != m_buffer.end() and empty; ++it) {
-        empty = (*it) == "NA";
+    Line::iterator it = m_buffer.begin();
+    while (empty and it != m_buffer.end()) {
+        empty = not (*it);
+        ++it;
     }
 
     if (not empty) {
         m_file << trame_time;
         writeSeparator(m_file);
-        std::vector < std::string >::iterator it;
-        for (it = m_buffer.begin(); it != m_buffer.end(); ++it) {
-            m_file << (*it);
+        for (Line::iterator it = m_buffer.begin(); it != m_buffer.end(); ++it) {
+            if (*it) {
+                (*it)->writeFile(m_file);
+            } else {
+                m_file << "NA";
+            }
 
             if (it + 1 != m_buffer.end()) {
                 writeSeparator(m_file);
             }
-            *it = "NA";
+            delete *it;
+            *it = 0;
         }
         m_file << '\n' << std::flush;
     }

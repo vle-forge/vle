@@ -50,16 +50,14 @@ namespace vle { namespace devs {
     public:
         StreamWriter() :
             m_view(0)
-        { }
+        {}
 
         virtual ~StreamWriter()
-        { }
+        {}
 
-        //
         ///
-        /// Virtual function to develop stream writer plugins.
+        ////
         ///
-        //
 
         /**
          * @brief Initialise plugin with specified information.
@@ -90,7 +88,7 @@ namespace vle { namespace devs {
          * @brief Process the devs::ObservationEvent and write it to the Stream.
          * @param event the devs::ObservationEvent to write.
          */
-        virtual void process(const ObservationEvent& event) = 0;
+        virtual void process(ObservationEvent& event) = 0;
 
         /**
          * Close the output stream.
@@ -105,11 +103,9 @@ namespace vle { namespace devs {
          */
         virtual oov::PluginPtr refreshPlugin() = 0;
 
-        //
         ///
-        /// Get/Set functions
+        ////
         ///
-        //
 
         /**
          * @brief Get the current View.

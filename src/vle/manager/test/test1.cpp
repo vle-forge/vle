@@ -37,6 +37,7 @@
 #include <vle/vpz.hpp>
 #include <vle/value.hpp>
 #include <vle/utils.hpp>
+#include <iostream>
 
 using namespace vle;
 

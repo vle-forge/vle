@@ -29,6 +29,7 @@
 #include <vle/value/Value.hpp>
 #include <vector>
 #include <boost/serialization/vector.hpp>
+#include <boost/serialization/export.hpp>
 
 namespace vle { namespace value {
 
@@ -315,6 +316,15 @@ namespace vle { namespace value {
         Value& get(const size_type i);
 
         /**
+         * @brief Get the pointer of the Value at specified index. The value at
+         * the specified index was assign to NULL.
+         * @param i The index of the value.
+         * @return A reference.
+         * @throw utils::ArgError if index 'i' is too big.
+         */
+        Value* give(const size_type& i);
+
+        /**
          * @brief Get the size of the VectorValue.
          * @return the size of the VectorValue.
          */
@@ -342,9 +352,6 @@ namespace vle { namespace value {
 	template < class Archive >
 	    void serialize(Archive& ar, const unsigned int /* version */)
 	    {
-		ar.register_type(static_cast<Boolean*>(NULL));
-		ar.register_type(static_cast<Double*>(NULL));
-		ar.register_type(static_cast<Map*>(NULL));
 		ar.register_type(static_cast<Boolean*>(NULL));
 		ar.register_type(static_cast<Integer*>(NULL));
 		ar.register_type(static_cast<Double*>(NULL));
@@ -387,4 +394,5 @@ namespace vle { namespace value {
     { return value::reference(value).toSet().value(); }
 
 }} // namespace vle value
+
 #endif

@@ -270,18 +270,6 @@ namespace vle { namespace vpz {
         inline bool isVpz() const
         { return getType() == VPZ; }
 
-        /**
-         * @return True if type is TRAME.
-         */
-        inline bool isTrame() const
-        { return getType() == TRAME; }
-
-        /**
-         * @return True if type is MODELTRAME.
-         */
-        inline bool isModelTrame() const
-        { return getType() == MODELTRAME; }
-
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
          * Output stream.

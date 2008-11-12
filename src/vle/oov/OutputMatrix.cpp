@@ -142,6 +142,17 @@ void OutputMatrix::addValue(const std::string& model,
     m_values->add(it->second, m_values->rows(), value);
 }
 
+void OutputMatrix::addValue(const std::string& model,
+                            const std::string& port,
+                            value::Value* value)
+{
+    MapPairIndex::const_iterator it(m_colAccess.find(PairString(model, port)));
+    Assert(utils::ArgError, it != m_colAccess.end(), boost::format(
+            "OutputMatrix have no couple (%1%, %2%)") % model % port);
+
+    m_values->add(it->second, m_values->rows(), value);
+}
+
 void OutputMatrix::setLastTime(double value)
 {
     value::Matrix::size_type row(m_values->rows());

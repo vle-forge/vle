@@ -37,78 +37,95 @@
 
 namespace vle { namespace oov { namespace plugin {
 
-class Plot : public CairoPlugin
-{
-public:
-    Plot(const std::string& location);
-    virtual ~Plot() { }
+    class Plot : public CairoPlugin
+    {
+    public:
+        Plot(const std::string& location);
+        virtual ~Plot() { }
 
-    virtual void onParameter(const vpz::ParameterTrame& trame);
+        virtual void onParameter(const std::string& plugin,
+                                 const std::string& location,
+                                 const std::string& file,
+                                 const std::string& parameters,
+                                 const double& time);
 
-    virtual void onNewObservable(const vpz::NewObservableTrame& trame);
+        virtual void onNewObservable(const std::string& simulator,
+                                     const std::string& parent,
+                                     const std::string& port,
+                                     const std::string& view,
+                                     const double& time);
 
-    virtual void onDelObservable(const vpz::DelObservableTrame& trame);
+        virtual void onDelObservable(const std::string& simulator,
+                                     const std::string& parent,
+                                     const std::string& port,
+                                     const std::string& view,
+                                     const double& time);
 
-    virtual void onValue(const vpz::ValueTrame& trame);
+        virtual void onValue(const std::string& simulator,
+                             const std::string& parent,
+                             const std::string& port,
+                             const std::string& view,
+                             const double& time,
+                             value::Value* value);
 
-    virtual void close(const vpz::EndTrame& trame);
+        virtual void close(const double& time);
 
-    virtual void preferredSize(int& width, int& height);
+        virtual void preferredSize(int& width, int& height);
 
-    virtual void onSize(int width, int height)
+        virtual void onSize(int width, int height)
         { mWidth = width; mHeight = height; }
 
-private:
-    std::vector < IntCurve * > mIntCurveList; // vector des courbes entieres
-    std::vector < RealCurve * > mRealCurveList; // vector des courbes réelles
-    std::list < IntCurve * > mShowIntCurveList; // liste des courbes entieres affichées
-    std::list < RealCurve * > mShowRealCurveList; // liste des courbes érelles affichées
-    std::list < Limit * > mLimitList; // liste des limites
-    Parameter mParameter;
-    bool mFinish;
+    private:
+        std::vector < IntCurve * > mIntCurveList; // vector des courbes entieres
+        std::vector < RealCurve * > mRealCurveList; // vector des courbes réelles
+        std::list < IntCurve * > mShowIntCurveList; // liste des courbes entieres affichées
+        std::list < RealCurve * > mShowRealCurveList; // liste des courbes érelles affichées
+        std::list < Limit * > mLimitList; // liste des limites
+        Parameter mParameter;
+        bool mFinish;
 
-    std::vector < std::string > mColumns;
-    std::map < std::string, int > mColumns2;
-    double mTime;
-    unsigned int mReceive;
-    unsigned int mReceive2;
+        std::vector < std::string > mColumns;
+        std::map < std::string, int > mColumns2;
+        double mTime;
+        unsigned int mReceive;
+        unsigned int mReceive2;
 
-    int mWidth;
-    int mHeight;
+        int mWidth;
+        int mHeight;
 
-    double mStepHeight;
+        double mStepHeight;
 
-    Cairo::TextExtents mExtents;
-    std::valarray < double > mDashes;
+        Cairo::TextExtents mExtents;
+        std::valarray < double > mDashes;
 
-    std::vector < RealCurve * >::iterator m_it_dble;
-    std::vector < IntCurve * > :: iterator m_it_int;
+        std::vector < RealCurve * >::iterator m_it_dble;
+        std::vector < IntCurve * > :: iterator m_it_int;
 
-    Cairo::RefPtr < Cairo::ImageSurface > m_img;
+        Cairo::RefPtr < Cairo::ImageSurface > m_img;
 
-    void draw();
-    void drawAxis(Cairo::RefPtr < Cairo::Context > ctx);
-    void drawVerticalStep(Cairo::RefPtr < Cairo::Context > ctx);
-    void drawHorizontalStep(Cairo::RefPtr < Cairo::Context > ctx);
-    void drawCurves(Cairo::RefPtr < Cairo::Context > ctx);
-    void drawLimits(Cairo::RefPtr < Cairo::Context > ctx);
+        void draw();
+        void drawAxis(Cairo::RefPtr < Cairo::Context > ctx);
+        void drawVerticalStep(Cairo::RefPtr < Cairo::Context > ctx);
+        void drawHorizontalStep(Cairo::RefPtr < Cairo::Context > ctx);
+        void drawCurves(Cairo::RefPtr < Cairo::Context > ctx);
+        void drawLimits(Cairo::RefPtr < Cairo::Context > ctx);
 
-    void updateMinValueDrawn();
-    void updateMaxValueDrawn();
-    double getMaxValueN(int nb_check_value);
-    double getMinValueN(int nb_check_value);
+        void updateMinValueDrawn();
+        void updateMaxValueDrawn();
+        double getMaxValueN(int nb_check_value);
+        double getMinValueN(int nb_check_value);
 
-    void updateStepHeight();
+        void updateStepHeight();
 
-    std::string buildname(const std::string& simulator,
-			  const std::string& port)
+        std::string buildname(const std::string& simulator,
+                              const std::string& port)
         {
             std::string result(simulator);
             result += '_';
             result += port;
             return result;
         }
-};
+    };
 
 }}} // namespace vle oov plugin
 

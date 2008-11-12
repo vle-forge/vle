@@ -159,10 +159,20 @@ namespace vle { namespace oov {
          *
          * @param model the model name.
          * @param port the port name.
-         * @param value the value to set.
+         * @param value the value clone and set.
          */
         void addValue(const std::string& model, const std::string& port,
                       const value::Value& value);
+
+        /**
+         * @brief Add a value to the specified couple model port.
+         *
+         * @param model the model name.
+         * @param port the port name.
+         * @param value the value to set.
+         */
+        void addValue(const std::string& model, const std::string& port,
+                      value::Value* value);
 
         /**
          * @brief Set the last time (column 0, last row) to the specified

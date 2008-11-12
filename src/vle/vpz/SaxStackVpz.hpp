@@ -27,7 +27,6 @@
 #define VLE_VPZ_SAXSTACKVPZ_HPP
 
 #include <vle/value/Value.hpp>
-#include <vle/vpz/Trame.hpp>
 #include <libxml++/libxml++.h>
 #include <list>
 
@@ -46,8 +45,8 @@ namespace vle {
      */
     typedef xmlpp::SaxParser::AttributeList AttributeList;
 
+    class Base;
     class Vpz;
-    class Trame;
     class Class;
 
     /**
@@ -309,46 +308,6 @@ namespace vle {
         void popClass();
 
         /**
-         * @brief Push a VLETrame into the stack.
-         * @throw utils::SaxParserError if stack is not empty.
-         */
-        void pushVleTrame();
-
-        /**
-         * @brief Push a new Trame into the stack.
-         * @param att The attribute list.
-         * @throw utils::SaxParserError if stack is empty or parent is not
-         * VLETrame.
-         */
-        void pushTrame(const AttributeList& att);
-
-        /**
-         * @brief Pop the Trame.
-         * @throw utils::SaxParserError if stack is empty or parent is not Trame
-         * or parent is not ModelTrame.
-         */
-        void popTrame();
-
-        /**
-         * @brief Push a ValueTrame into the stack.
-         * @param att The attribute list.
-         * @throw utils::SaxParserError if stack is empty or parent is not
-         * ModelTrame.
-         */
-        void pushModelTrame(const AttributeList& att);
-
-        /**
-         * @brief Pop the ValueTrame.
-         * @param value The value to pop.
-         */
-        void popModelTrame(value::Value* value);
-
-        /**
-         * @brief Pop the VLETrame.
-         */
-        void popVleTrame();
-
-        /**
          * @brief Pop the ConditionPort.
          * @return The value::Set read.
          */
@@ -392,20 +351,6 @@ namespace vle {
         { return m_vpz; }
 
         /**
-         * @brief Get the TrameList.
-         * @return A constant reference to the TrameList.
-         */
-        inline const TrameList& trame() const
-        { return m_trame; }
-
-        /**
-         * @brief Get the TrameList.
-         * @return A reference to the TrameList.
-         */
-        inline TrameList& trame()
-        { return m_trame; }
-
-        /**
          * @brief Output stream operator.
          * @param out The output stream.
          * @param stack The stack to show.
@@ -441,7 +386,6 @@ namespace vle {
 
         std::list < vpz::Base* >        m_stack;
         vpz::Vpz&                       m_vpz;
-        TrameList                       m_trame;
 
         /**
          * @brief Assign the to graph::Model mdl the graphics information from

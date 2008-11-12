@@ -200,8 +200,8 @@ void Matrix::addRow()
 
 void Matrix::add(size_type column, size_type row, value::Value* val)
 {
-    if (not val) {
-        throw utils::ArgError();
+    if (m_matrix[column][row]) {
+        delete m_matrix[column][row];
     }
     m_matrix[column][row] = val;
 }
@@ -209,6 +209,9 @@ void Matrix::add(size_type column, size_type row, value::Value* val)
 
 void Matrix::add(size_type column, size_type row, const value::Value& val)
 {
+    if (m_matrix[column][row]) {
+        delete m_matrix[column][row];
+    }
     m_matrix[column][row] = val.clone();
 }
 
@@ -236,3 +239,6 @@ void Matrix::moveLastCell()
 }
 
 }} // namespace vle value
+
+BOOST_CLASS_EXPORT(vle::value::Matrix)
+

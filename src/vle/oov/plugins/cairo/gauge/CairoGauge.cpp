@@ -29,6 +29,7 @@
 #include <vle/utils/XML.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
+#include <vle/value/String.hpp>
 
 namespace vle { namespace oov { namespace plugin {
 
@@ -49,48 +50,22 @@ CairoGauge::~CairoGauge()
 {
 }
 
-void CairoGauge::onNewObservable(const vpz::NewObservableTrame& trame)
-{
-    std::string name(buildname(trame.name(),trame.port()));
-
-    Assert(utils::InternalError,mName == "",boost::format("An observable already exists"));
-
-    mName = name;
-}
-
-void CairoGauge::onDelObservable(const vpz::DelObservableTrame& /* trame */)
-{
-}
-
-void CairoGauge::onValue(const vpz::ValueTrame& trame)
-{
-    mTime = utils::to_double(trame.time());
-
-    for (vpz::ModelTrameList::const_iterator it = trame.trames().begin();
-	 it != trame.trames().end(); ++it) {
-
-	std::string name(buildname(it->simulator(),it->port()));
-
-	if (name == mName)
-	    mValue = value::toDouble(it->value());
-	else Assert(utils::InternalError, true, boost::format(
-			"The columns %1% does not exist. No new Observable ?") %
-		    name);
-    }
-    draw();
-//    mSurface->write_to_png((boost::format("%1%_%2$05d.png") % location() % (int)mTime).str());
-}
-
-void CairoGauge::onParameter(const vpz::ParameterTrame& trame)
+void CairoGauge::onParameter(const std::string& /* plugin */,
+                             const std::string& /* location */,
+                             const std::string& /* file */,
+                             const std::string& parameters,
+                             const double& /* time */)
 {
     if (not context()) {
-	mImageSurface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, mWindowWidth, mWindowHeight);
+        mImageSurface =
+            Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32,
+                                        mWindowWidth, mWindowHeight);
 	setSurface(mImageSurface);
     }
 
     xmlpp::DomParser parser;
 
-    parser.parse_memory(trame.data());
+    parser.parse_memory(parameters);
     xmlpp::Element* root = utils::xml::get_root_node(parser, "parameters");
     xmlpp::Element * elt = utils::xml::get_children(root,"min");
     mMin = utils::to_double(utils::xml::get_attribute(elt,"value").c_str());
@@ -98,7 +73,52 @@ void CairoGauge::onParameter(const vpz::ParameterTrame& trame)
     mMax = utils::to_double(utils::xml::get_attribute(elt2,"value").c_str());
 }
 
-void CairoGauge::close(const vpz::EndTrame& /*trame */)
+void CairoGauge::onNewObservable(const std::string& simulator,
+                                 const std::string& /* parent */,
+                                 const std::string& port,
+                                 const std::string& /* view */,
+                                 const double& /* time */)
+{
+    std::string name(buildname(simulator, port));
+
+    Assert(utils::InternalError, mName == "",
+           boost::format("CairoGauge: observable '%1%' already exists")
+           % name);
+
+    mName = name;
+}
+
+void CairoGauge::onDelObservable(const std::string& /* simulator */,
+                                 const std::string& /* parent */,
+                                 const std::string& /* port */,
+                                 const std::string& /* view */,
+                                 const double& /* time */)
+{
+}
+
+void CairoGauge::onValue(const std::string& simulator,
+                         const std::string& /* parent */,
+                         const std::string& port,
+                         const std::string& /* view */,
+                         const double& time,
+                         value::Value* value)
+{
+    mTime = time;
+
+    std::string name(buildname(simulator, port));
+
+    if (name == mName) {
+        mValue = value->toDouble().value();
+        delete value;
+    } else {
+        Throw(utils::InternalError, boost::format(
+                "CairoGauge: columns %1% does not exist") % name);
+    }
+
+    draw();
+}
+
+void CairoGauge::close(const double& /* time */)
 {
 }
 

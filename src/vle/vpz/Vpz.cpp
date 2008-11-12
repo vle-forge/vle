@@ -107,18 +107,6 @@ value::Value* Vpz::parseValue(const std::string& buffer)
     return sax.getValue(0);
 }
 
-TrameList Vpz::parseTrame(const std::string& buffer)
-{
-    Vpz vpz;
-    SaxParser sax(vpz);
-    sax.parse_memory(buffer);
-
-    Assert(utils::ArgError, sax.isTrame(),
-           boost::format("The buffer [%1%] is not a trame.") % buffer);
-
-    return sax.tramelist();
-}
-
 std::vector < value::Value* > Vpz::parseValues(const std::string& buffer)
 {
     Vpz vpz;

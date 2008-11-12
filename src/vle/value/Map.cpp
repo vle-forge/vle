@@ -167,6 +167,19 @@ Value& Map::get(const std::string& name)
     return *(*it).second;
 }
 
+Value* Map::give(const std::string& name)
+{
+    iterator it = m_value.find(name);
+    Assert(utils::ArgError, it != m_value.end(),
+            (boost::format("Map: the key '%1%' does not exist") % name));
+
+    Value* result = it->second;
+    it->second = 0;
+    m_value.erase(it);
+
+    return result;
+}
+
 const std::string& Map::getString(const std::string& name) const
 {
     return value::toString(get(name));
@@ -270,3 +283,6 @@ const Value* Map::getPointer(const std::string& name) const
 }
 
 }} // namespace vle value
+
+BOOST_CLASS_EXPORT(vle::value::Map)
+

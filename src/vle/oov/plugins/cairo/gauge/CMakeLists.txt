@@ -22,7 +22,6 @@ TARGET_LINK_LIBRARIES(cairogauge
   vledata
   vlevalue
   vlegraph
-  vlevpz
   vleoov)
 
 INSTALL(TARGETS cairogauge

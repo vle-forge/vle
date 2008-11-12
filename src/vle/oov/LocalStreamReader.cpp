@@ -26,18 +26,35 @@
 #include <vle/oov/LocalStreamReader.hpp>
 #include <vle/oov/Plugin.hpp>
 #include <vle/utils/Debug.hpp>
+#include <boost/format.hpp>
+#include <config.h>
 
+#ifdef HAVE_CAIRO
+#   include <vle/oov/CairoPlugin.hpp>
+#endif
 
 
 namespace vle { namespace oov {
 
-LocalStreamReader::LocalStreamReader() :
-  StreamReader()
-{
-}
+    void LocalStreamReader::onValue(const std::string& simulator,
+                                    const std::string& parent,
+                                    const std::string& port,
+                                    const std::string& view,
+                                    const double& time,
+                                    value::Value* value)
+    {
+        plugin()->onValue(simulator, parent, port, view, time, value);
 
-LocalStreamReader::~LocalStreamReader()
-{
-}
+#ifdef HAVE_CAIRO
+        //if (plugin()->isCairo()) {
+        //CairoPluginPtr plg = toCairoPlugin(plugin());
+        //plg->context()->get_target()->write_to_png((boost::format(
+        //"%1%_%2$05d.png") % plg->location() %
+        //(int)m_image).str());
+        //m_image++;
+        //}
+#endif
+    }
+
 
 }} // namespace vle oov

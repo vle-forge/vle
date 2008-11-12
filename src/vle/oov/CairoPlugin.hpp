@@ -28,6 +28,7 @@
 
 #include <vle/oov/Plugin.hpp>
 #include <vle/value/Map.hpp>
+#include <boost/shared_ptr.hpp>
 #include <cairomm/cairomm.h>
 
 
@@ -51,10 +52,10 @@ namespace vle { namespace oov {
          */
         CairoPlugin(const std::string& location) :
             Plugin(location)
-        { }
+        {}
 
         virtual ~CairoPlugin()
-        { }
+        {}
 
         /**
          * @brief Return true, CairoPlugin is a Cairo plugin.
@@ -74,7 +75,7 @@ namespace vle { namespace oov {
          */
         virtual void onSignal(const std::string& /* method */,
                               const value::Map& /* params */)
-        { }
+        {}
 
         /**
          * @brief Use to react to a modification of the external Cairo::Surface.
@@ -82,7 +83,7 @@ namespace vle { namespace oov {
          * @param height the new height of the Cairo::Surface.
          */
         virtual void onSize(int /* width */, int /* height */)
-        { }
+        {}
 
         /**
          * @brief Use to define the prefered size of the CairoSurface of the

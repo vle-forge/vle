@@ -25,22 +25,10 @@
 
 #include <vle/devs/LocalStreamWriter.hpp>
 #include <vle/devs/Simulator.hpp>
-#include <vle/vpz/ParameterTrame.hpp>
-#include <vle/vpz/NewObservableTrame.hpp>
-#include <vle/vpz/DelObservableTrame.hpp>
-#include <vle/vpz/ValueTrame.hpp>
 
 
 
 namespace vle { namespace devs {
-
-LocalStreamWriter::LocalStreamWriter()
-{
-}
-
-LocalStreamWriter::~LocalStreamWriter()
-{
-}
 
 void LocalStreamWriter::open(const std::string& plugin,
                              const std::string& location,
@@ -48,9 +36,8 @@ void LocalStreamWriter::open(const std::string& plugin,
                              const std::string& parameters,
                              const devs::Time& time)
 {
-    std::string filename(Glib::build_filename(location, file));
-    m_reader.onParameter(vpz::ParameterTrame(utils::to_string(time),
-                                             parameters, plugin, filename));
+    m_reader.onParameter(plugin, location, file, parameters,
+                         time.getValue());
 }
 
 void LocalStreamWriter::processNewObservable(Simulator* simulator,
@@ -58,12 +45,8 @@ void LocalStreamWriter::processNewObservable(Simulator* simulator,
                                              const devs::Time& time,
                                              const std::string& view)
 {
-    m_reader.onNewObservable(vpz::NewObservableTrame(
-            utils::to_string(time),
-            simulator->getName(),
-            simulator->getParent(),
-            portname,
-            view));
+    m_reader.onNewObservable(simulator->getName(), simulator->getParent(),
+                             portname, view, time.getValue());
 }
 
 void LocalStreamWriter::processRemoveObservable(Simulator* simulator,
@@ -71,28 +54,34 @@ void LocalStreamWriter::processRemoveObservable(Simulator* simulator,
                                                 const devs::Time& time,
                                                 const std::string& view)
 {
-    m_reader.onDelObservable(vpz::DelObservableTrame(
-            utils::to_string(time),
-            simulator->getName(),
-            simulator->getParent(),
-            portname,
-            view));
+    m_reader.onDelObservable(simulator->getName(), simulator->getParent(),
+                             portname, view, time.getValue());
 }
 
-void LocalStreamWriter::process(const ObservationEvent& event)
+void LocalStreamWriter::process(ObservationEvent& event)
 {
-    vpz::ValueTrame tr(utils::to_string(event.getTime()));
-    tr.add(event.getModel()->getName(),
-           event.getModel()->getParent(),
-           event.getPortName(),
-           event.getViewName());
-    tr.add(&event.getAttributeValue(event.getPortName()));
-    m_reader.onValue(tr);
+    value::Value* val = 0;
+    if (event.haveAttributes()) {
+        value::Map::iterator
+            it(event.getAttributes().value().find(event.getPortName()));
+        if (it != event.getAttributes().value().end()) {
+            val = it->second;
+            it->second = 0;
+            event.getAttributes().value().erase(it);
+        }
+    }
+
+    m_reader.onValue(event.getModel()->getName(),
+                     event.getModel()->getParent(),
+                     event.getPortName(),
+                     event.getViewName(),
+                     event.getTime().getValue(),
+                     val);
 }
 
 oov::PluginPtr LocalStreamWriter::close(const devs::Time& time)
 {
-    m_reader.onClose(vpz::EndTrame(utils::to_string(time)));
+    m_reader.onClose(time.getValue());
     return m_reader.plugin();
 }
 

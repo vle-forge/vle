@@ -31,7 +31,6 @@
 #include <vle/vpz/Base.hpp>
 #include <vle/vpz/SaxStackValue.hpp>
 #include <vle/vpz/SaxStackVpz.hpp>
-#include <vle/vpz/Trame.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/value/Map.hpp>
@@ -39,7 +38,6 @@
 namespace vle { namespace vpz {
 
     class Vpz;
-    class Trame;
 
     /**
      * @brief The SaxParser inherits from the xmlpp::SaxParser class of the
@@ -152,21 +150,6 @@ namespace vle { namespace vpz {
         inline bool isVpz() const
         { return m_isVPZ; }
 
-        /**
-         * @brief Return true if the SaxParser have read a trame.
-         * @return true if the parser have read a trame, false otherwise.
-         */
-        inline bool isTrame() const
-        { return m_isTrame; }
-
-        /**
-         * @brief Return true if the SaxParser have read an end trame.
-         * @return true if the parser have read an end trame, false otherwise.
-         */
-        inline bool isEndTrame() const
-        { return m_isEndTrame; }
-
-
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
          * Get/Set functions.
@@ -200,20 +183,6 @@ namespace vle { namespace vpz {
         inline const vpz::Vpz& vpz() const
         { return m_vpz; }
 
-        /**
-         * @brief Get a constant reference to the TrameList.
-         * @return A constant reference to the TrameList.
-         */
-        inline const TrameList& tramelist() const
-        { return m_vpzstack.trame(); }
-
-        /**
-         * @brief Get a reference to the TrameList.
-         * @return A reference to the TrameList.
-         */
-        inline TrameList& tramelist()
-        { return m_vpzstack.trame(); }
-
     private:
         /**
          * @brief Get the last characters from internal buffer.
@@ -236,9 +205,6 @@ namespace vle { namespace vpz {
 
         bool                            m_isValue;
         bool                            m_isVPZ;
-        bool                            m_isTrame;
-
-        bool                            m_isEndTrame;
 
         typedef void (SaxParser::* startfunc)(const AttributeList&);
         typedef void (SaxParser::* endfunc)();
@@ -247,7 +213,6 @@ namespace vle { namespace vpz {
 
         StartFuncList   m_starts;
         EndFuncList     m_ends;
-
 
         void onBoolean(const AttributeList& att);
         void onInteger(const AttributeList& att);
@@ -261,9 +226,6 @@ namespace vle { namespace vpz {
         void onTable(const AttributeList& att);
         void onXML(const AttributeList& att);
         void onNull(const AttributeList& att);
-        void onVLETrame(const AttributeList& att);
-        void onTrame(const AttributeList& att);
-        void onModelTrame(const AttributeList& att);
         void onVLEProject(const AttributeList& att);
         void onStructures(const AttributeList& att);
         void onModel(const AttributeList& att);
@@ -303,9 +265,6 @@ namespace vle { namespace vpz {
         void onEndTable();
         void onEndXML();
         void onEndNull();
-        void onEndVLETrame();
-        void onEndTrame();
-        void onEndModelTrame();
         void onEndVLEProject();
         void onEndStructures();
         void onEndModel();
@@ -353,10 +312,6 @@ namespace vle { namespace vpz {
             add("table", &SaxParser::onTable, &SaxParser::onEndTable);
             add("xml", &SaxParser::onXML, &SaxParser::onEndXML);
             add("null", &SaxParser::onNull, &SaxParser::onEndNull);
-            add("vle_trame", &SaxParser::onVLETrame, &SaxParser::onEndVLETrame);
-            add("trame", &SaxParser::onTrame, &SaxParser::onEndTrame);
-            add("modeltrame", &SaxParser::onModelTrame,
-                &SaxParser::onEndModelTrame);
             add("vle_project", &SaxParser::onVLEProject,
                 &SaxParser::onEndVLEProject);
             add("structures", &SaxParser::onStructures,

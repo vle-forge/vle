@@ -26,8 +26,8 @@
 #include <vle/extension/DifferenceEquation.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Trace.hpp>
-#include <iostream>
 #include <cmath>
+#include <iostream>
 
 namespace vle { namespace extension {
 

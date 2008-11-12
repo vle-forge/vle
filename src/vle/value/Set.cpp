@@ -59,7 +59,11 @@ void Set::writeFile(std::ostream& out) const
 	if (it != m_value.begin()) {
 	    out << ",";
         }
-        (*it)->writeFile(out);
+        if (*it) {
+            (*it)->writeFile(out);
+        } else {
+            out << "NA";
+        }
     }
 }
 
@@ -71,7 +75,11 @@ void Set::writeString(std::ostream& out) const
 	if (it != m_value.begin()) {
 	    out << ",";
         }
-	(*it)->writeString(out);
+        if (*it) {
+            (*it)->writeString(out);
+        } else {
+            out << "NA";
+        }
     }
     out << ")";
 }
@@ -81,16 +89,17 @@ void Set::writeXml(std::ostream& out) const
     out << "<set>";
     for (VectorValue::const_iterator it = m_value.begin();
          it != m_value.end(); ++it) {
-        (*it)->writeXml(out);
+        if (*it) {
+            (*it)->writeXml(out);
+        } else {
+            out << "<null />";
+        }
     }
     out << "</set>";
 }
 
 void Set::add(Value* value)
 {
-    if (value == 0) {
-        throw std::invalid_argument("Set: add a null value");
-    }
     m_value.push_back(value);
 }
 
@@ -164,7 +173,10 @@ const Value& Set::get(const size_type i) const
     if (i >= size()) {
         throw std::out_of_range("Set: too big index");
     }
-    assert(m_value[i]);
+
+    if (m_value[i] == 0) {
+        throw utils::ArgError("Set: no value in this cell");
+    }
 
     return *m_value[i];
 }
@@ -174,9 +186,23 @@ Value& Set::get(const size_type i)
     if (i >= size()) {
         throw std::out_of_range("Set: too big index");
     }
-    assert(m_value[i]);
+
+    if (m_value[i] == 0) {
+        throw utils::ArgError("Set: no value in this cell");
+    }
 
     return *m_value[i];
+}
+
+Value* Set::give(const size_type& i)
+{
+    if (i >= size()) {
+        throw std::out_of_range("Set: too big index");
+    }
+
+    Value* result = m_value[i];
+    m_value[i] = 0;
+    return result;
 }
 
 void Set::del(const size_type i)
@@ -184,7 +210,6 @@ void Set::del(const size_type i)
     if (i >= size()) {
         throw std::out_of_range("Set: too big index");
     }
-    assert(m_value[i]);
 
     delete m_value[i];
     m_value[i] = 0;
@@ -211,3 +236,6 @@ void Set::clear()
 }
 
 }} // namespace vle value
+
+BOOST_CLASS_EXPORT(vle::value::Set)
+

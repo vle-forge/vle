@@ -137,7 +137,7 @@ namespace vle { namespace value {
          * @param size The size of the memory.
          */
         inline static void operator delete(void* deletable, size_t size)
-        { Pools::pools().deallocate(deletable, size); }
+        { if (deletable) { Pools::pools().deallocate(deletable, size); } }
 
         ///
         ////

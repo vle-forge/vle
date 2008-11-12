@@ -23,7 +23,6 @@ TARGET_LINK_LIBRARIES(default
   vledata
   vlevalue
   vlegraph
-  vlevpz
   vleoov)
 
 TARGET_LINK_LIBRARIES(text
@@ -35,7 +34,6 @@ TARGET_LINK_LIBRARIES(text
   vledata
   vlevalue
   vlegraph
-  vlevpz
   vleoov)
 
 TARGET_LINK_LIBRARIES(rdata
@@ -47,7 +45,6 @@ TARGET_LINK_LIBRARIES(rdata
   vledata
   vlevalue
   vlegraph
-  vlevpz
   vleoov)
 
 TARGET_LINK_LIBRARIES(csv
@@ -59,7 +56,6 @@ TARGET_LINK_LIBRARIES(csv
   vledata
   vlevalue
   vlegraph
-  vlevpz
   vleoov)
 
 TARGET_LINK_LIBRARIES(storage
@@ -71,7 +67,6 @@ TARGET_LINK_LIBRARIES(storage
   vledata
   vlevalue
   vlegraph
-  vlevpz
   vleoov)
 
 INSTALL(TARGETS default

@@ -26,7 +26,6 @@
 #include <vle/data/CSVReader.hpp>
 #include <vle/data/CSVResult.hpp>
 #include <algorithm>
-#include <iostream>
 
 namespace vle { namespace data {
 

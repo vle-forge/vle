@@ -29,6 +29,7 @@
 #include <vle/value/Value.hpp>
 #include <map>
 #include <boost/serialization/map.hpp>
+#include <boost/serialization/export.hpp>
 
 namespace vle { namespace value {
 
@@ -203,6 +204,15 @@ namespace vle { namespace value {
          * @throw utils::ArgError if value don't exist.
          */
         Value& get(const std::string& name);
+
+        /**
+         * @brief Get the Value object for the specified name. If the name
+         * exist, the pair key value is destroyed and the value is returned.
+         * @param name The name of the Value in the map.
+         * @return the pointer to the Value.
+         * @throw utils::ArgError if value don't exist.
+         */
+        Value* give(const std::string& name);
 
         /**
          * @brief Get an access to the std::map.
@@ -383,9 +393,6 @@ namespace vle { namespace value {
 	    void serialize(Archive& ar, const unsigned int /* version */)
 	    {
 		ar.register_type(static_cast<Boolean*>(NULL));
-		ar.register_type(static_cast<Double*>(NULL));
-		ar.register_type(static_cast<Map*>(NULL));
-		ar.register_type(static_cast<Boolean*>(NULL));
 		ar.register_type(static_cast<Integer*>(NULL));
 		ar.register_type(static_cast<Double*>(NULL));
 		ar.register_type(static_cast<String*>(NULL));
@@ -427,4 +434,5 @@ namespace vle { namespace value {
     { return value::reference(value).toMap().value(); }
 
 }} // namespace vle value
+
 #endif

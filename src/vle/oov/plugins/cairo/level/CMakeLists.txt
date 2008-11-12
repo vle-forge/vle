@@ -22,7 +22,6 @@ TARGET_LINK_LIBRARIES(cairolevel
   vledata
   vlevalue
   vlegraph
-  vlevpz
   vleoov)
 
 INSTALL(TARGETS cairolevel

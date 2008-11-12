@@ -43,29 +43,72 @@ Default::~Default()
 {
 }
 
-void Default::onParameter(const vpz::ParameterTrame& trame)
+void Default::onParameter(const std::string& plugin,
+                         const std::string& location,
+                         const std::string& file,
+                         const std::string& parameters,
+                         const double& time)
 {
-    m_file << trame << "\n";
+    m_file << time << ": parameter "
+        << " plugin: " << plugin
+        << " location: " << location
+        << " file: " << file
+        << " parameters: " << parameters
+        << "\n";
 }
 
-void Default::onNewObservable(const vpz::NewObservableTrame& trame)
+void Default::onNewObservable(const std::string& simulator,
+                             const std::string& parent,
+                             const std::string& port,
+                             const std::string& view,
+                             const double& time)
 {
-    m_file << trame << "\n";
+    m_file << time << ": new observable "
+        << " simulator: " << simulator
+        << " parent: " << parent
+        << " port: " << port
+        << " view: " << view
+        << "\n";
 }
 
-void Default::onDelObservable(const vpz::DelObservableTrame& trame)
+void Default::onDelObservable(const std::string& simulator,
+                             const std::string& parent,
+                             const std::string& port,
+                             const std::string& view,
+                             const double& time)
 {
-    m_file << trame << "\n";
+    m_file << time << ": delete observable "
+        << " simulator: " << simulator
+        << " parent: " << parent
+        << " port: " << port
+        << " view: " << view
+        << "\n";
 }
 
-void Default::onValue(const vpz::ValueTrame& trame)
+void Default::onValue(const std::string& simulator,
+                     const std::string& parent,
+                     const std::string& port,
+                     const std::string& view,
+                     const double& time,
+                     value::Value* value)
 {
-    m_file << trame << "\n";
+    m_file << time << ": value from "
+        << " simulator: " << simulator
+        << " parent: " << parent
+        << " port: " << port
+        << " view: " << view;
+
+    if (value) {
+        m_file << " = " << value;
+        delete value;
+    }
+
+    m_file << "\n";
 }
 
-void Default::close(const vpz::EndTrame& trame)
+void Default::close(const double& time)
 {
-    m_file << trame << "\n";
+    m_file << time << ": end" << "\n";
     m_file.flush();
 }
 

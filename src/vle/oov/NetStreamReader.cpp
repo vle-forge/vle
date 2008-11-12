@@ -25,29 +25,55 @@
 
 #include <vle/oov/NetStreamReader.hpp>
 #include <vle/oov/Plugin.hpp>
-#include <vle/vpz/SaxParser.hpp>
-#include <vle/vpz/Vpz.hpp>
-#include <vle/vpz/ParameterTrame.hpp>
-#include <vle/vpz/ValueTrame.hpp>
-#include <vle/vpz/DelObservableTrame.hpp>
-#include <vle/vpz/NewObservableTrame.hpp>
-#include <vle/vpz/EndTrame.hpp>
-#include <vle/vpz/RefreshTrame.hpp>
 #include <vle/utils/Socket.hpp>
 #include <vle/utils/Trace.hpp>
-#include <vle/value/String.hpp>
-#include <vle/value/Set.hpp>
+#include <vle/value.hpp>
+#include <vle/utils/Debug.hpp>
+#include <boost/format.hpp>
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/export.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <config.h>
 
+#ifdef HAVE_CAIRO
+#   include <vle/oov/CairoPlugin.hpp>
+#endif
 
 
 namespace vle { namespace oov {
 
 NetStreamReader::NetStreamReader(int port) :
     m_port(port),
-    m_server(new utils::net::Server(port))
+    m_server(new utils::net::Server(port)),
+    m_image(0)
 {
     setBufferSize(4096);
     TraceAlways(boost::format("Build a NetStreamReader on port %1%") % port);
+
+    // TODO: why segfault without this... Very very strange.
+    value::Map* m = new value::Map;
+    value::Set* s = new value::Set;
+    value::Integer* i = new value::Integer;
+    value::Double* d = new value::Double;
+    value::Boolean* b = new value::Boolean;
+    value::String* s2 = new value::String;
+    value::Xml* x = new value::Xml;
+    value::Null* n = new value::Null;
+    value::Table* t = new value::Table;
+    value::Tuple* t2 = new value::Tuple;
+    value::Matrix* m2 = new value::Matrix;
+
+    delete m;
+    delete s;
+    delete i;
+    delete d;
+    delete b;
+    delete s2;
+    delete x;
+    delete n;
+    delete t;
+    delete t2;
+    delete m2;
 }
 
 NetStreamReader::~NetStreamReader()
@@ -61,9 +87,7 @@ void NetStreamReader::process()
 {
     for (; ;) {
         waitConnection();
-
         readConnection();
-
         closeConnection();
     }
 }
@@ -77,76 +101,78 @@ void NetStreamReader::waitConnection()
 
 void NetStreamReader::readConnection()
 {
-    vpz::Vpz vpz;
-    vpz::SaxParser sax(vpz);
-    bool trameend = false;
+    bool stop = false;
 
-    while (not sax.isEndTrame()) {
-        m_buffer = m_server->recv_string("vle");
-        sax.parse_chunk(m_buffer);
-        while (not sax.tramelist().empty()) {
-            trameend = dispatch(sax.tramelist().front());
-            sax.tramelist().pop_front();
+    while (not stop) {
+        try {
+            guint32 val = m_server->recv_int("vle");
+
+            Assert(utils::InternalError, val > 0,
+                   "NetStreamReader: bad size for package");
+
+            m_buffer = m_server->recv_buffer("vle", val);
+
+            std::istringstream in(m_buffer, std::istringstream::binary);
+            boost::archive::binary_iarchive ia(in);
+            value::Set frame;
+            ia >> (value::Set&)frame;
+
+            stop = dispatch(frame);
+        } catch (const std::exception& e) {
+            Throw(utils::InternalError, boost::format(
+                    "NetStreamReader: %1%") % e.what());
         }
     }
 }
 
-bool NetStreamReader::dispatch(const vpz::Trame* trame)
+bool NetStreamReader::dispatch(value::Set& frame)
 {
-    {
-        const vpz::ValueTrame* tr;
-        if ((tr = dynamic_cast < const vpz::ValueTrame* >(trame))) {
-            onValue(*tr);
-            delete tr;
-            return false;
-        }
-    }
-    {
-        const vpz::ParameterTrame* tr;
-        if ((tr = dynamic_cast < const vpz::ParameterTrame* >(trame))) {
-            TraceAlways(boost::format(
-                    "NetStreamReader plugin: [%1%] and location [%2%]") %
-                tr->plugin() % tr->location());
-            onParameter(*tr);
-            delete tr;
-            return false;
-        }
-    }
-    {
-        const vpz::NewObservableTrame* tr;
-        if ((tr = dynamic_cast < const vpz::NewObservableTrame* >(trame))) {
-            onNewObservable(*tr);
-            delete tr;
-            return false;
-        }
-    }
-    {
-        const vpz::DelObservableTrame* tr;
-        if ((tr = dynamic_cast < const vpz::DelObservableTrame* >(trame))) {
-            onDelObservable(*tr);
-            delete tr;
-            return false;
-        }
-    }
-    {
-        const vpz::EndTrame* tr;
-        if ((tr = dynamic_cast < const vpz::EndTrame* >(trame))) {
-            TraceAlways("NetStreamReader close");
-            serializePlugin();
-            onClose(*tr);
-            delete tr;
-            return true;
-        }
-    }
-    {
-        const vpz::RefreshTrame* tr;
-        if ((tr = dynamic_cast < const vpz::RefreshTrame* >(trame))) {
-            serializePlugin();
-            return false;
-        }
-    }
+    bool end = false;
 
-    Throw(utils::InternalError, "Distant stream reader failed: unknow trame");
+    switch (frame.get(0).toInteger().value()) {
+    case 0:
+        onParameter(frame.get(1).toString().value(),
+                    frame.get(2).toString().value(),
+                    frame.get(3).toString().value(),
+                    frame.get(4).toXml().value(),
+                    frame.get(5).toDouble().value());
+        break;
+    case 1:
+        onNewObservable(frame.get(1).toString().value(),
+                        frame.get(2).toString().value(),
+                        frame.get(3).toString().value(),
+                        frame.get(4).toString().value(),
+                        frame.get(5).toDouble().value());
+        break;
+    case 2:
+        onDelObservable(frame.get(1).toString().value(),
+                        frame.get(2).toString().value(),
+                        frame.get(3).toString().value(),
+                        frame.get(4).toString().value(),
+                        frame.get(5).toDouble().value());
+        break;
+    case 3:
+        onValue(frame.get(1).toString().value(),
+                frame.get(2).toString().value(),
+                frame.get(3).toString().value(),
+                frame.get(4).toString().value(),
+                frame.get(5).toDouble().value(),
+                frame.give(6));
+        break;
+    case 4:
+        serializePlugin();
+        onClose(frame.get(1).toDouble().value());
+        end = true;
+        break;
+    case 5:
+        serializePlugin();
+        break;
+    default:
+        Throw(utils::InternalError, boost::format(
+                "NetStreamReader: unknow tag '%1%'") %
+            frame.get(0).toInteger().value());
+    }
+    return end;
 }
 
 void NetStreamReader::closeConnection()
@@ -160,6 +186,27 @@ void NetStreamReader::close()
     m_server = 0;
 }
 
+void NetStreamReader::onValue(const std::string& simulator,
+                              const std::string& parent,
+                              const std::string& port,
+                              const std::string& view,
+                              const double& time,
+                              value::Value* value)
+{
+    plugin()->onValue(simulator, parent, port, view, time, value);
+
+#ifdef HAVE_CAIRO
+    //if (plugin()->isCairo()) {
+    //CairoPluginPtr plg = toCairoPlugin(plugin());
+    //if (plg and plg->context() and plg->context()->get_target()) {
+    //plg->context()->get_target()->write_to_png((boost::format(
+    //"%1%_%2$05d.png") % plg->location() % m_image).str());
+    //m_image++;
+    //}
+    //}
+#endif
+}
+
 void NetStreamReader::serializePlugin()
 {
     if (plugin()->isSerializable()) {
@@ -170,12 +217,14 @@ void NetStreamReader::serializePlugin()
         vals->add(value::String::create(plugin()->name()));
         vals->add(plugin()->serialize());
 
-        std::ostringstream out;
-        vals->writeXml(out);
-        std::string result(out.str());
-        m_server->send_int("vle", result.size());
+        std::ostringstream out(std::ostringstream::binary);
+        boost::archive::binary_oarchive oa(out);
+        oa << (const value::Set&)*vals;
+        delete vals;
+
+        m_server->send_int("vle", out.str().size());
         m_server->recv_string("vle");
-        m_server->send_buffer("vle", result);
+        m_server->send_buffer("vle", out.str());
         m_server->recv_string("vle");
     } else {
         m_server->send_buffer("vle", "no");

@@ -30,7 +30,6 @@
 #include <vle/data/CSVReader.hpp>
 #include <map>
 #include <string>
-#include <iostream>
 #include <list>
 #include <vector>
 

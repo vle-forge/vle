@@ -36,6 +36,7 @@
 #include <gtkmm/main.h>
 #include <gtkmm/messagedialog.h>
 #include <libglademm.h>
+#include <iostream>
 
 using namespace vle;
 

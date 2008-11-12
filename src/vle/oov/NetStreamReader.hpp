@@ -33,6 +33,11 @@
 
 namespace vle { namespace oov {
 
+    /**
+     * @brief The NetStreamReader inherits the class StreamReader and provides
+     * an TCP/IP access to the observations information produced by models and
+     * sends via the devs::NetStreamWriter.
+     */
     class NetStreamReader : public StreamReader
     {
     public:
@@ -44,6 +49,9 @@ namespace vle { namespace oov {
          */
         NetStreamReader(int port);
 
+        /**
+         * @brief Release the resources from the TCP/IP server and delete it.
+         */
         virtual ~NetStreamReader();
 
         /**
@@ -84,12 +92,92 @@ namespace vle { namespace oov {
         void closeConnection();
 	void close();
 
+        /**
+         * @brief Oov NetStreamReader ask to the CairoPlugin to write a image
+         * when receive a value.
+         * @param trame
+         */
+        virtual void onValue(const std::string& simulator,
+                             const std::string& parent,
+                             const std::string& port,
+                             const std::string& view,
+                             const double& time,
+                             value::Value* value);
+    protected:
+        /**
+         * @brief Dispatch the value::Set receives from the socket into the
+         * function of the oov::Plugin.
+         * - parameters: This function is called to initialize the plugin.
+         *   @param frame The vector of values that define a parameter frame:
+         *   the date, the data, the name of the plugin and the location where
+         *   write data. For instance:
+         * @code
+         * int tag = frame.get(0).toInt().value();
+         * std::string plugin = frame.get(1).toString().value();
+         * std::string location = frame.get(2).toString().value();
+         * std::string file = frame.get(3).toString().value();
+         * std::string data = frame.get(4).toXml().value();
+         * double time = frame.get(5).toDouble().value();
+         * @endocde
+         * - newObservable: This function is called when a new model is
+         *   connected to the StreamWriter. @param frame the vector of value
+         *   that define an observable frame: the date, the model's name, the
+         *   model's parents, the model's observation port and the name of the
+         *   view. For instance:
+         * @code
+         * int tag = frame.get(0).toInt().value();
+         * std::string name = frame.get(1).toString().value();
+         * std::string parent = frame.get(2).toString().value();
+         * std::string port = frame.get(3).toString().value();
+         * std::string view = frame.get(4).toString().value();
+         * double time = frame.get(5).toDouble().value();
+         * @endcode
+         * - delObservable: This function is called when a model is disconnected
+         *   from the StreamWriter. The frame the vector of value that define an
+         *   observable frame: the date, the model's name, the model's parents,
+         *   the model's observation port and the name of the view. For
+         *   instance:
+         * @code
+         * int tag = frame.get(0).toInt().value();
+         * std::string name = frame.get(1).toString().value();
+         * std::string parent = frame.get(2).toString().value();
+         * std::string port = frame.get(3).toString().value();
+         * std::string view = frame.get(4).toString().value();
+         * double time = frame.get(5).toDouble().value();
+         * @endcode
+         * - onValue: This function is called when models send value::Value
+         *   class from the devs::Dynamics::observation function. Trame the
+         *   vector of value that define a value frame: the date and a
+         *   value::Set for each models: the model's name, the model's parents,
+         *   the model's observation port and the name of the view. For
+         *   instance:
+         * @code
+         * int tag = frame.get(0).toInt().value();
+         * std::string name = frame.get(1).toDouble().value();
+         * std::string parent = frame.get(2).toDouble().value();
+         * std::string port = frame.get(3).toDouble().value();
+         * std::string view = frame.get(4).toDouble().value();
+         * double time = frame.get(5).toDouble().value();
+         * value::Value* = frame.get(6);
+         * @endcode
+         * - Clone: This function is called when the StreamWriter is closed.
+         *   @param frame the vector of value that define an end frame: only the
+         *   date. For instance:
+         * @code
+         * int tag = frame.get(0).toInt().value();
+         * double time = frame.get(1).toDouble().value();
+         * @endcode
+         * @param trame The value receive from the network.
+         * @throw utils::ArgError if an error occured into the stream.
+         */
+        bool dispatch(value::Set& trame);
+
     private:
         int                 m_port;
         utils::net::Server* m_server;
         std::string         m_buffer;
+        unsigned int        m_image;
 
-        bool dispatch(const vpz::Trame* trame);
         void serializePlugin();
     };
 

@@ -27,6 +27,7 @@
 #define VLE_VALUE_NULL_HPP
 
 #include <vle/value/Value.hpp>
+#include <boost/serialization/export.hpp>
 
 namespace vle { namespace value {
 

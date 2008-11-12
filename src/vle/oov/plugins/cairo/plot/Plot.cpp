@@ -29,6 +29,7 @@
 #include <vle/utils/XML.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
+#include <vle/value/String.hpp>
 
 namespace vle { namespace oov { namespace plugin {
 
@@ -46,50 +47,59 @@ Plot::Plot(const std::string& location):
     mDashes[1] = 2.0;
 }
 
-void Plot::onNewObservable(const vpz::NewObservableTrame& trame)
+void Plot::onNewObservable(const std::string& simulator,
+                           const std::string& /* parent */,
+                           const std::string& port,
+                           const std::string& /* view */,
+                           const double& /* time */)
 {
-    std::string name(buildname(trame.name(),trame.port()));
+    std::string name(buildname(simulator, port));
 
     Assert(utils::InternalError,mColumns2.find(name) == mColumns2.end(),
-           boost::format("Observable %1% already exist") % name);
+           boost::format("Plot: observable '%1%' already exist") % name);
 
     mColumns.push_back(name);
     mColumns2[name] = mReceive2;
     ++mReceive2;
 }
 
-void Plot::onDelObservable(const vpz::DelObservableTrame& /* trame */)
+void Plot::onDelObservable(const std::string& /* simulator */,
+                           const std::string& /* parent */,
+                           const std::string& /* port */,
+                           const std::string& /* view */,
+                           const double& /* time */)
 {
 }
 
-void Plot::onValue(const vpz::ValueTrame& trame)
+void Plot::onValue(const std::string& simulator,
+                   const std::string& /* parent */,
+                   const std::string& port,
+                   const std::string& /* view */,
+                   const double& time,
+                   value::Value* value)
 {
     double min_date_curve;
     int nb_check_min_max = 0;
     bool calcul_new_min_max_no_scroll = false;
 
-    mTime = utils::to_double(trame.time());
+    mTime = time;
 
-    for (vpz::ModelTrameList::const_iterator it = trame.trames().begin();
-         it != trame.trames().end(); ++it) {
-        std::string name(buildname(it->simulator(),it->port()));
-        std::map < std::string,int >::iterator jt;
-        jt = mColumns2.find(name);
+    std::string name(buildname(simulator, port));
+    std::map < std::string,int >::iterator it;
+    it = mColumns2.find(name);
 
-        Assert(utils::InternalError,jt != mColumns2.end(),boost::format(
-                "The columns %1% does not exist. No new Observable ?") %
-            name);
+    Assert(utils::InternalError,it != mColumns2.end(),boost::format(
+            "Plot: columns '%1%' does not exist") % name);
 
-	if (it->value()->isDouble()) {
-	    (*m_it_dble)->add(mTime, toDouble(it->value()));
-	    ++m_it_dble;
-	}
-	else if (it->value()->isInteger()) {
-	    (*m_it_int)->add(mTime, toInteger(it->value()));
-	    ++m_it_int;
-	}
-        mReceive++;
+    if (value->isDouble()) {
+        (*m_it_dble)->add(mTime, value->toDouble().value());
+        ++m_it_dble;
+    } else if (value->isInteger()) {
+        (*m_it_int)->add(mTime, value->toInteger().value());
+        ++m_it_int;
     }
+    delete value;
+    mReceive++;
 
     if (mReceive == mColumns.size()) {
 	mReceive = 0;
@@ -189,7 +199,11 @@ void Plot::onValue(const vpz::ValueTrame& trame)
     }
 }
 
-void Plot::onParameter(const vpz::ParameterTrame& trame)
+void Plot::onParameter(const std::string& /* plugin */,
+                       const std::string& /* location */,
+                       const std::string& /* file */,
+                       const std::string& parameters,
+                       const double& /* time */)
 {
     mParameter.set_drawing_area_size(mWidth, mHeight);
     mParameter.set_screen_size(mWidth, mHeight);
@@ -206,10 +220,10 @@ void Plot::onParameter(const vpz::ParameterTrame& trame)
 	updateStepHeight();
     }
 
-    if (not trame.data().empty()) {
+    if (not parameters.empty()) {
         xmlpp::DomParser parser;
 
-        parser.parse_memory(trame.data());
+        parser.parse_memory(parameters);
 	xmlpp::Element* root = utils::xml::get_root_node(parser, "parameters");
 	IntCurve *ic;
 	RealCurve *rc;
@@ -287,7 +301,7 @@ void Plot::onParameter(const vpz::ParameterTrame& trame)
     m_it_int = mIntCurveList.begin();
 }
 
-void Plot::close(const vpz::EndTrame& /*trame */)
+void Plot::close(const double& /* time */)
 {
     mParameter.set_number_drawn_date((int)ceil(mParameter.get_max_draw_date()));
     mParameter.set_min_draw_index(0);

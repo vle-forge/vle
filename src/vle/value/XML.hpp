@@ -28,6 +28,7 @@
 
 #include <vle/value/Value.hpp>
 #include <boost/serialization/string.hpp>
+#include <boost/serialization/export.hpp>
 
 namespace vle { namespace value {
 
@@ -181,4 +182,5 @@ namespace vle { namespace value {
     { return value::reference(value).toXml().value(); }
 
 }} // namespace vle value
+
 #endif

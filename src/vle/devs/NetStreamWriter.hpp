@@ -40,35 +40,66 @@ namespace vle { namespace devs {
 
         virtual ~NetStreamWriter();
 
-        virtual void open(
-                    const std::string& plugin,
-                    const std::string& location,
-                    const std::string& file,
-                    const std::string& parameters,
-                    const devs::Time& time);
+        virtual void open(const std::string& plugin,
+                          const std::string& location,
+                          const std::string& file,
+                          const std::string& parameters,
+                          const devs::Time& time);
 
-        virtual void processNewObservable(
-                    Simulator* simulator,
-                    const std::string& portname,
-                    const devs::Time& time,
-                    const std::string& view);
+        virtual void processNewObservable(Simulator* simulator,
+                                          const std::string& portname,
+                                          const devs::Time& time,
+                                          const std::string& view);
 
-        virtual void processRemoveObservable(
-                    Simulator* simulator,
-                    const std::string& portname,
-                    const devs::Time& time,
-                    const std::string& view);
+        virtual void processRemoveObservable(Simulator* simulator,
+                                             const std::string& portname,
+                                             const devs::Time& time,
+                                             const std::string& view);
 
-        virtual void process(
-                    const ObservationEvent& event);
+        virtual void process(ObservationEvent& event);
 
-        virtual oov::PluginPtr close(
-                    const devs::Time& time);
+        virtual oov::PluginPtr close(const devs::Time& time);
 
         virtual oov::PluginPtr refreshPlugin();
 
     private:
         oov::PluginPtr getPlugin() const;
+
+        value::Set*      m_paramFrame;
+        value::Set*      m_newObsFrame;
+        value::Set*      m_delObsFrame;
+        value::Set*      m_valueFrame;
+        value::Set*      m_closeFrame;
+        value::Set*      m_refreshFrame;
+
+        void buildParameters(const std::string& plugin,
+                            const std::string& location,
+                            const std::string& directory,
+                            const std::string& file,
+                            const double& time);
+
+        void buildNewObs(const std::string& simulator,
+                         const std::string& parents,
+                         const std::string& port,
+                         const std::string& view,
+                         const double& time);
+
+        void buildDelObs(const std::string& simulator,
+                         const std::string& parents,
+                         const std::string& port,
+                         const std::string& view,
+                         const double& time);
+
+        void buildValue(const std::string& simulator,
+                        const std::string& parents,
+                        const std::string& port,
+                        const std::string& view,
+                        const double& time,
+                        value::Value* value);
+
+        void buildClose(const double& time);
+
+        void buildRefresh();
 
         utils::net::Client*     m_client;
     };

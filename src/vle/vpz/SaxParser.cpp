@@ -26,7 +26,6 @@
 #include <vle/vpz/SaxParser.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/vpz/Model.hpp>
-#include <vle/vpz/ParameterTrame.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/value/Map.hpp>
@@ -46,9 +45,7 @@ SaxParser::SaxParser(Vpz& vpz) :
     m_vpzstack(vpz),
     m_vpz(vpz),
     m_isValue(false),
-    m_isVPZ(false),
-    m_isTrame(false),
-    m_isEndTrame(false)
+    m_isVPZ(false)
 {
     fillTagList();
 }
@@ -60,8 +57,6 @@ void SaxParser::clearParserState()
     m_lastCharacters.clear();
     m_isValue = false;
     m_isVPZ = false;
-    m_isTrame = false;
-    m_isEndTrame = false;
 }
 
 void SaxParser::on_start_document()
@@ -72,12 +67,8 @@ void SaxParser::on_start_document()
 void SaxParser::on_end_document()
 {
     if (m_isVPZ == false) {
-        if (not m_vpzstack.trame().empty()) {
-            m_isTrame = true;
-        } else {
-            if (not m_valuestack.getResults().empty()) {
-                m_isValue = true;
-            }
+        if (not m_valuestack.getResults().empty()) {
+            m_isValue = true;
         }
     }
 }
@@ -185,25 +176,9 @@ void SaxParser::onNull(const AttributeList&)
     m_valuestack.pushNull();
 }
 
-void SaxParser::onVLETrame(const AttributeList&)
-{
-    m_isEndTrame = false;
-    m_vpzstack.pushVleTrame();
-}
-
-void SaxParser::onTrame(const AttributeList& att)
-{
-    m_vpzstack.pushTrame(att);
-}
-
-void SaxParser::onModelTrame(const AttributeList& att)
-{
-    m_vpzstack.pushModelTrame(att);
-}
-
 void SaxParser::onVLEProject(const AttributeList& att)
 {
-    AssertS(utils::SaxParserError, not m_isValue and not m_isTrame);
+    AssertS(utils::SaxParserError, not m_isValue);
     m_isVPZ = true;
     m_vpzstack.pushVpz(att);
 }
@@ -412,32 +387,6 @@ void SaxParser::onEndXML()
 void SaxParser::onEndNull()
 {
     m_valuestack.pushOnVectorValue(value::Null::create());
-}
-
-void SaxParser::onEndTrame()
-{
-    m_vpzstack.popTrame();
-    if (not m_cdata.empty()) {
-        ParameterTrame* pt;
-        pt  = dynamic_cast < ParameterTrame* >(m_vpzstack.top());
-        if (pt) {
-            pt->setData(m_cdata);
-            m_cdata.clear();
-        }
-    }
-    m_vpzstack.pop();
-}
-
-void SaxParser::onEndModelTrame()
-{
-    m_vpzstack.popModelTrame(getValue(0));
-    m_valuestack.clear();
-}
-
-void SaxParser::onEndVLETrame()
-{
-    m_vpzstack.popVleTrame();
-    m_isEndTrame = true;
 }
 
 void SaxParser::onEndPort()

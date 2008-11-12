@@ -28,6 +28,7 @@
 
 #include <vle/value/Value.hpp>
 #include <boost/multi_array.hpp>
+#include <boost/serialization/export.hpp>
 
 namespace vle { namespace value {
 
@@ -423,9 +424,6 @@ namespace vle { namespace value {
 	    void load(Archive& ar, const unsigned int /* version */)
 	    {
 		ar.register_type(static_cast<Boolean*>(NULL));
-		ar.register_type(static_cast<Double*>(NULL));
-		ar.register_type(static_cast<Map*>(NULL));
-		ar.register_type(static_cast<Boolean*>(NULL));
 		ar.register_type(static_cast<Integer*>(NULL));
 		ar.register_type(static_cast<Double*>(NULL));
 		ar.register_type(static_cast<String*>(NULL));
@@ -456,9 +454,6 @@ namespace vle { namespace value {
 	template < class Archive >
 	    void save(Archive& ar, const unsigned int /* version */) const
 	    {
-		ar.register_type(static_cast<Boolean*>(NULL));
-		ar.register_type(static_cast<Double*>(NULL));
-		ar.register_type(static_cast<Map*>(NULL));
 		ar.register_type(static_cast<Boolean*>(NULL));
 		ar.register_type(static_cast<Integer*>(NULL));
 		ar.register_type(static_cast<Double*>(NULL));

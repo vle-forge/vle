@@ -84,16 +84,40 @@ namespace vle { namespace oov { namespace plugin {
 
         virtual std::string name() const;
 
-        virtual void onParameter(const vpz::ParameterTrame& trame);
+        ///
+        ////
+        ///
 
-        virtual void onNewObservable(const vpz::NewObservableTrame& trame);
+        virtual void onParameter(const std::string& plugin,
+                                 const std::string& location,
+                                 const std::string& file,
+                                 const std::string& parameters,
+                                 const double& time);
 
-        virtual void onDelObservable(const vpz::DelObservableTrame& trame);
+        virtual void onNewObservable(const std::string& simulator,
+                                     const std::string& parent,
+                                     const std::string& port,
+                                     const std::string& view,
+                                     const double& time);
 
-        virtual void onValue(const vpz::ValueTrame& trame);
+        virtual void onDelObservable(const std::string& simulator,
+                                     const std::string& parent,
+                                     const std::string& port,
+                                     const std::string& view,
+                                     const double& time);
 
-        virtual void close(const vpz::EndTrame& trame);
+        virtual void onValue(const std::string& simulator,
+                             const std::string& parent,
+                             const std::string& port,
+                             const std::string& view,
+                             const double& time,
+                             value::Value* value);
 
+        virtual void close(const double& time);
+
+        ///
+        ////
+        ///
 
         /**
          * @brief Return a constant reference to the oov::OutputMatrix.

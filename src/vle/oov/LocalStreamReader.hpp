@@ -32,12 +32,53 @@
 
 namespace vle { namespace oov {
 
+    /**
+     * @brief The LocalStreamReader inherits the class StreamReader and provided
+     * a direct access to the observations information produced by models and
+     * send via the devs::LocalStreamWriter.
+     */
     class LocalStreamReader : public StreamReader
     {
     public:
-        LocalStreamReader();
+        /**
+         * @brief Build a new LocalStreamReader.
+         */
+        LocalStreamReader() :
+            m_image(0)
+        {}
 
-        virtual ~LocalStreamReader();
+        /**
+         * @brief Nothing to delete.
+         */
+        virtual ~LocalStreamReader()
+        {}
+
+        ///
+        ////
+        ///
+
+        /**
+         * @brief The LocalStreamReader can write cairo image if the Plugin is a
+         * CairoPlugin a can grab image.
+         * @param simulator The name of the simulator.
+         * @param parent The parents of the simulator.
+         * @param port The observation's port.
+         * @param view The observation's view.
+         * @param time The date of the observation.
+         * @param value The value attached to this observation.
+         */
+        virtual void onValue(const std::string& simulator,
+                             const std::string& parent,
+                             const std::string& port,
+                             const std::string& view,
+                             const double& time,
+                             value::Value* value);
+
+    private:
+        /**
+         * @brief A counter of images.
+         */
+        unsigned int m_image;
     };
 
 }} // namespace vle oov

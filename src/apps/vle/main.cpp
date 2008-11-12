@@ -29,6 +29,7 @@
 #include <vle/utils/PathOptionGroup.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Debug.hpp>
+#include <iostream>
 
 int main(int argc, char* argv[])
 {

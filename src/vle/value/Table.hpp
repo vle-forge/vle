@@ -28,6 +28,7 @@
 
 #include <vle/value/Value.hpp>
 #include <boost/multi_array.hpp>
+#include <boost/serialization/export.hpp>
 
 namespace vle { namespace value {
 
@@ -277,4 +278,5 @@ namespace vle { namespace value {
     { return value::reference(value).toTable().value(); }
 
 }} // namespace vle value
+
 #endif

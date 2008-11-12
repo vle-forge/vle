@@ -41,15 +41,40 @@ namespace vle { namespace oov { namespace plugin {
 
         virtual ~SimpleFile();
 
-        virtual void onParameter(const vpz::ParameterTrame& trame);
+        ///
+        //// the interface provided by oov::Plugin.
+        ///
 
-        virtual void onNewObservable(const vpz::NewObservableTrame& trame);
+        virtual void onParameter(const std::string& plugin,
+                                 const std::string& location,
+                                 const std::string& file,
+                                 const std::string& parameters,
+                                 const double& time);
 
-        virtual void onDelObservable(const vpz::DelObservableTrame& trame);
+        virtual void onNewObservable(const std::string& simulator,
+                                     const std::string& parent,
+                                     const std::string& portname,
+                                     const std::string& view,
+                                     const double& time);
 
-        virtual void onValue(const vpz::ValueTrame& trame);
+        virtual void onDelObservable(const std::string& simulator,
+                                     const std::string& parent,
+                                     const std::string& portname,
+                                     const std::string& view,
+                                     const double& time);
 
-        virtual void close(const vpz::EndTrame& trame);
+        virtual void onValue(const std::string& simulator,
+                             const std::string& parent,
+                             const std::string& port,
+                             const std::string& view,
+                             const double& time,
+                             value::Value* value);
+
+        virtual void close(const double& time);
+
+        ///
+        //// the new interface for derived oov::SimpleFile plug-ins.
+        ///
 
         virtual std::string extension() const = 0;
 
@@ -58,18 +83,20 @@ namespace vle { namespace oov { namespace plugin {
         virtual void writeHead(std::ostream& out,
                                const std::vector < std::string >& heads) = 0;
 
-
     private:
         /** Define a dictionary (model's name, index) */
         typedef std::map < std::string, int > Columns;
 
-        Columns                     m_columns;
-        std::vector < std::string > m_buffer;
-        double                      m_time;
-        std::ofstream               m_file;
-        std::string                 m_filename;
-        std::string                 m_filenametmp;
-        bool                        m_isstart;
+        /** Define the buffer of values. */
+        typedef std::vector < value::Value* > Line;
+
+        Columns         m_columns;
+        Line            m_buffer;
+        double          m_time;
+        std::ofstream   m_file;
+        std::string     m_filename;
+        std::string     m_filenametmp;
+        bool            m_isstart;
 
         void flush(double trame_time);
 

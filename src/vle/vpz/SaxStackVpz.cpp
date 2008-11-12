@@ -27,12 +27,6 @@
 #include <vle/vpz/Structures.hpp>
 #include <vle/vpz/Port.hpp>
 #include <vle/vpz/Vpz.hpp>
-#include <vle/vpz/ValueTrame.hpp>
-#include <vle/vpz/ParameterTrame.hpp>
-#include <vle/vpz/NewObservableTrame.hpp>
-#include <vle/vpz/DelObservableTrame.hpp>
-#include <vle/vpz/EndTrame.hpp>
-#include <vle/vpz/RefreshTrame.hpp>
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/utils/Socket.hpp>
@@ -69,9 +63,7 @@ void SaxStackVpz::clear()
             parent()->isInputConnection() or
             parent()->isOutputConnection() or
             parent()->isOrigin() or
-            parent()->isDestination() or
-            parent()->isTrame() or
-            parent()->isModelTrame()) {
+            parent()->isDestination()) {
             delete parent();
         }
         pop();
@@ -652,82 +644,6 @@ void SaxStackVpz::pushObservablePortOnView(const AttributeList& att)
     port->add(name);
 }
 
-void SaxStackVpz::pushVleTrame()
-{
-    AssertS(utils::SaxParserError, m_stack.empty());
-    push(new VLETrame);
-}
-
-void SaxStackVpz::pushTrame(const AttributeList& att)
-{
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, dynamic_cast < VLETrame* >(parent()));
-
-    std::string type, date, name, parent, port, view, plugin, location;
-    for (AttributeList::const_iterator it = att.begin();
-         it != att.end(); ++it) {
-        if (it->name == "type") {
-            type = it->value;
-        } if (it->name == "date") {
-            date = it->value;
-        } else if (it->name == "name") {
-            name = it->value;
-        } else if (it->name == "parent") {
-            parent = it->value;
-        } else if (it->name == "port") {
-            port = it->value;
-        } else if (it->name == "view") {
-            view = it->value;
-        } else if (it->name == "plugin") {
-            plugin = it->value;
-        } else if (it->name == "location") {
-            location = it->value;
-        }
-    }
-
-    if (type == "value") {
-        push(new ValueTrame(date));
-    } else if (type == "new") {
-        push(new NewObservableTrame(date, name, parent, port, view));
-    } else if (type == "del") {
-        push(new DelObservableTrame(date, name, parent, port, view));
-    } else if (type == "parameter") {
-        push(new ParameterTrame(date, plugin, location));
-    } else if (type == "value") {
-        push(new ValueTrame(date));
-    } else if (type == "end") {
-        push(new EndTrame(date));
-    } else if (type == "refresh") {
-        push(new RefreshTrame());
-    } else {
-        Throw(utils::SaxParserError, boost::format(
-                "Unknow trame named %1%") % type);
-    }
-}
-
-void SaxStackVpz::popTrame()
-{
-    AssertS(utils::SaxParserError, parent()->isTrame() or
-            parent()->isModelTrame());
-
-    m_trame.push_back(reinterpret_cast < Trame* >(parent()));
-}
-
-void SaxStackVpz::popModelTrame(value::Value* value)
-{
-    AssertS(utils::SaxParserError, parent()->isModelTrame());
-    ValueTrame* tr = reinterpret_cast < ValueTrame* >(parent());
-    tr->add(value);
-}
-
-void SaxStackVpz::popVleTrame()
-{
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, dynamic_cast < VLETrame* >(parent()));
-    delete parent();
-    pop();
-}
-
 void SaxStackVpz::pushClasses()
 {
     AssertS(utils::SaxParserError, not m_stack.empty());
@@ -761,29 +677,6 @@ void SaxStackVpz::popClass()
     AssertS(utils::SaxParserError, parent()->isClass());
 
     pop();
-}
-
-void SaxStackVpz::pushModelTrame(const AttributeList& att)
-{
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, parent()->isModelTrame());
-
-    std::string name, par, port, view;
-    for (AttributeList::const_iterator it = att.begin();
-         it != att.end(); ++it) {
-        if (it->name == "name") {
-            name = it->value;
-        } else if (it->name == "parent") {
-            par = it->value;
-        } else if (it->name == "port") {
-            port = it->value;
-        } else if (it->name == "view") {
-            view = it->value;
-        }
-    }
-
-    reinterpret_cast < ValueTrame* >(
-        parent())->add(name, par, port, view);
 }
 
 vpz::Base* SaxStackVpz::pop()

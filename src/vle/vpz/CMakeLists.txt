@@ -9,18 +9,15 @@ LINK_DIRECTORIES(
   ${LIBXMLPP_LIBRARY_DIR})
 
 SET(VPZ_CPP AtomicModels.cpp Class.cpp Classes.cpp Condition.cpp Conditions.cpp
-  DelObservableTrame.cpp Dynamic.cpp Dynamics.cpp EndTrame.cpp Experiment.cpp
-  Model.cpp NewObservableTrame.cpp Observable.cpp Observables.cpp Output.cpp
-  Outputs.cpp ParameterTrame.cpp Project.cpp RefreshTrame.cpp Replicas.cpp
-  SaxStackValue.cpp SaxStackVpz.cpp Trame.cpp ValueTrame.cpp View.cpp Views.cpp
-  Vpz.cpp SaxParser.cpp)
+  Dynamic.cpp Dynamics.cpp Experiment.cpp Model.cpp Observable.cpp
+  Observables.cpp Output.cpp Outputs.cpp Project.cpp Replicas.cpp
+  SaxStackValue.cpp SaxStackVpz.cpp View.cpp Views.cpp Vpz.cpp SaxParser.cpp)
 
 SET(VPZ_HPP AtomicModels.hpp Base.hpp Classes.hpp Class.hpp Condition.hpp
-  Conditions.hpp DelObservableTrame.hpp Dynamic.hpp Dynamics.hpp EndTrame.hpp
-  Experiment.hpp Model.hpp NewObservableTrame.hpp Observable.hpp Observables.hpp
-  Output.hpp Outputs.hpp ParameterTrame.hpp Port.hpp Project.hpp
-  RefreshTrame.hpp Replicas.hpp SaxStackValue.hpp SaxStackVpz.hpp Structures.hpp
-  Trame.hpp ValueTrame.hpp View.hpp Views.hpp Vpz.hpp SaxParser.hpp)
+  Conditions.hpp Dynamic.hpp Dynamics.hpp Experiment.hpp Model.hpp
+  Observable.hpp Observables.hpp Output.hpp Outputs.hpp Port.hpp Project.hpp
+  Replicas.hpp SaxStackValue.hpp SaxStackVpz.hpp Structures.hpp View.hpp
+  Views.hpp Vpz.hpp SaxParser.hpp)
 
 ADD_LIBRARY(vlevpz SHARED ${VPZ_HPP};${VPZ_CPP})
 

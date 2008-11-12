@@ -27,7 +27,7 @@
 #define VLE_DEVS_LOCALSTREAMWRITER_HPP
 
 #include <vle/devs/StreamWriter.hpp>
-#include <vle/oov/OovLocalStreamReader.hpp>
+#include <vle/oov/LocalStreamReader.hpp>
 
 
 
@@ -40,9 +40,11 @@ namespace vle { namespace devs {
     class LocalStreamWriter : public StreamWriter
     {
     public:
-        LocalStreamWriter();
+        LocalStreamWriter()
+        {}
 
-        virtual ~LocalStreamWriter();
+        virtual ~LocalStreamWriter()
+        {}
 
         virtual void open(const std::string& plugin,
                           const std::string& location,
@@ -60,14 +62,14 @@ namespace vle { namespace devs {
                                              const devs::Time& time,
                                              const std::string& view);
 
-        virtual void process(const ObservationEvent& event);
+        virtual void process(ObservationEvent& event);
 
         virtual oov::PluginPtr close(const devs::Time& time);
 
         virtual oov::PluginPtr refreshPlugin();
 
     private:
-        oov::OovLocalStreamReader      m_reader;
+        oov::LocalStreamReader      m_reader;
     };
 
 }} // namespace vle devs

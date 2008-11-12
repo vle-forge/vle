@@ -10,13 +10,11 @@ LINK_DIRECTORIES(
   ${LIBXMLPP_LIBRARY_DIR}
   ${CAIROMM_LIBRARY_DIR})
 
-SET(OOV_CPP LocalStreamReader.cpp NetStreamReader.cpp OOV.cpp
-  OovLocalStreamReader.cpp OovNetStreamReader.cpp OutputMatrix.cpp Plugin.cpp
-  PluginFactory.cpp SimpleFile.cpp StreamReader.cpp)
+SET(OOV_CPP LocalStreamReader.cpp NetStreamReader.cpp OOV.cpp OutputMatrix.cpp
+  Plugin.cpp PluginFactory.cpp SimpleFile.cpp StreamReader.cpp)
 
-SET(OOV_HPP LocalStreamReader.hpp NetStreamReader.hpp OOV.hpp
-  OovLocalStreamReader.hpp OovNetStreamReader.hpp OutputMatrix.hpp Plugin.hpp
-  PluginFactory.hpp SimpleFile.hpp StreamReader.hpp)
+SET(OOV_HPP LocalStreamReader.hpp NetStreamReader.hpp OOV.hpp OutputMatrix.hpp
+  Plugin.hpp PluginFactory.hpp SimpleFile.hpp StreamReader.hpp)
 
 IF (HAVE_CAIRO)
  SET(OOV_HPP ${OOV_HPP} CairoPlugin.hpp)
@@ -35,8 +33,7 @@ TARGET_LINK_LIBRARIES(vleoov
   vleutils
   vledata
   vlevalue
-  vlegraph
-  vlevpz)
+  vlegraph)
 
 INSTALL(TARGETS vleoov
   RUNTIME DESTINATION bin

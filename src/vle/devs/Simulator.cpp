@@ -233,9 +233,9 @@ ObservationEvent* Simulator::observation(const ObservationEvent& event) const
             TraceAlways((boost::format(
                         "Simulator %1% return an empty value on event %2%") %
                     getName() % event));
-            val = value::Null::create();
+        } else {
+            nevent->putAttribute(event.getPortName(), val);
         }
-        nevent->putAttribute(event.getPortName(), val);
     }
     return nevent;
 }

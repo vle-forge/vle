@@ -72,15 +72,51 @@ namespace vle { namespace eov {
 	{ return m_finisherror; }
 
     private:
-        virtual void onParameter(const vpz::ParameterTrame& trame);
+        /**
+         * @brief Call to initialise plug-in. Just before the Plugin
+         * constructor. This function is used to initialise the Plugin with
+         * parameter provided by the devs::StreamWritter class.
+         */
+        virtual void onParameter(const std::string& plugin,
+                                 const std::string& location,
+                                 const std::string& file,
+                                 const std::string& parameters,
+                                 const double& time);
 
-        virtual void onNewObservable(const vpz::NewObservableTrame& trame);
+        /**
+         * @brief Call when a new observable (the devs::Simulator and port name)
+         * is attached to a view.
+         */
+        virtual void onNewObservable(const std::string& simulator,
+                                     const std::string& parent,
+                                     const std::string& portname,
+                                     const std::string& view,
+                                     const double& time);
 
-        virtual void onDelObservable(const vpz::DelObservableTrame& trame);
+        /**
+         * @brief Call whe a observable (the devs::Simulator and port name) is
+         * deleted from a view.
+         */
+        virtual void onDelObservable(const std::string& simulator,
+                                     const std::string& parent,
+                                     const std::string& portname,
+                                     const std::string& view,
+                                     const double& time);
 
-        virtual void onValue(const vpz::ValueTrame& trame);
+        /**
+         * @brief Call when an observation event is send to the view.
+         */
+        virtual void onValue(const std::string& simulator,
+                             const std::string& parent,
+                             const std::string& port,
+                             const std::string& view,
+                             const double& time,
+                             value::Value* value);
 
-        virtual void onClose(const vpz::EndTrame& trame);
+        /**
+         * @brief Call when the simulation is finished.
+         */
+        virtual void onClose(const double& time);
 
         void getGtkPlugin(const std::string& name);
 

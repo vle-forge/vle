@@ -35,29 +35,108 @@
 
 namespace vle { namespace oov {
 
+    /**
+     * @brief The StreamReader is a general class to read observation
+     * information from the devs::StreamWriter classes add give this information
+     * to the oov::Plugin.
+     */
     class StreamReader
     {
     public:
+        /**
+         * @brief Build a new StreamReader.
+         */
 	StreamReader()
-        { }
+        {}
 
+        /**
+         * @brief Nothing to delete.
+         */
         virtual ~StreamReader()
-        { }
-
-        virtual void onParameter(const vpz::ParameterTrame& trame);
-
-        virtual void onNewObservable(const vpz::NewObservableTrame& trame);
-
-        virtual void onDelObservable(const vpz::DelObservableTrame& trame);
-
-        virtual void onValue(const vpz::ValueTrame& trame);
-
-        virtual void onClose(const vpz::EndTrame& trame);
+        {}
 
         ///
-        /// Get/Set functions
+        ////
         ///
 
+        /**
+         * @brief Call to initialise plug-in. Just before the Plugin
+         * constructor. This function is used to initialise the Plugin with
+         * parameter provided by the devs::StreamWritter class.
+         */
+        virtual void onParameter(const std::string& plugin,
+                                 const std::string& location,
+                                 const std::string& file,
+                                 const std::string& parameters,
+                                 const double& time);
+
+        /**
+         * @brief Call when a new observable (the devs::Simulator and port name)
+         * is attached to a view.
+         */
+        virtual void onNewObservable(const std::string& simulator,
+                                     const std::string& parent,
+                                     const std::string& portname,
+                                     const std::string& view,
+                                     const double& time);
+
+        /**
+         * @brief Call whe a observable (the devs::Simulator and port name) is
+         * deleted from a view.
+         */
+        virtual void onDelObservable(const std::string& simulator,
+                                     const std::string& parent,
+                                     const std::string& portname,
+                                     const std::string& view,
+                                     const double& time);
+
+        /**
+         * @brief Call when an observation event is send to the view. The
+         * plug-in must delete the attachted value. For instance:
+         * @code
+         * class Position : public Plugin
+         * {
+         *   ...
+         *
+         *   virtual void onValue(const std::string& simulator,
+         *                      const std::string& parent,
+         *                      const std::string& port,
+         *                      const std::string& view,
+         *                      const double& time,
+         *                      value::Value* value)
+         *   {
+         *     if (port == "x") {
+         *       m_position[(int)time].x() = value->toInteger().value();
+         *     } else if (port == "y") {
+         *       m_position[(int)time].y() = value->toInteger().value();
+         *     }
+         *     delete value;
+         *   }
+         *   ...
+         * };
+         * @endcode
+         */
+        virtual void onValue(const std::string& simulator,
+                             const std::string& parent,
+                             const std::string& port,
+                             const std::string& view,
+                             const double& time,
+                             value::Value* value);
+
+        /**
+         * @brief Call when the simulation is finished.
+         */
+        virtual void onClose(const double& time);
+
+        ///
+        ////
+        ///
+
+        /**
+         * @brief Get a reference to the Plugin attached to the StreamReader.
+         * @return A reference to the Plugin.
+         * @throw utils::InternalError if the plug-in is not initialized.
+         */
         PluginPtr plugin() const;
 
     private:
