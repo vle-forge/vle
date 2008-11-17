@@ -35,6 +35,10 @@
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/utility.hpp>
+#include <boost/version.hpp>
+#if BOOST_VERSION > 103500
+#include <boost/serialization/assume_abstract.hpp>
+#endif
 
 namespace vle { namespace value {
 
@@ -395,6 +399,10 @@ namespace vle { namespace value {
  * Macro used to define the Value class as an abstract class for the
  * boost::serialization library.
  */
+#if BOOST_VERSION <= 103500
 BOOST_IS_ABSTRACT(vle::value::Value)
+#else
+BOOST_SERIALIZATION_ASSUME_ABSTRACT(vle::value::Value)
+#endif
 
 #endif
