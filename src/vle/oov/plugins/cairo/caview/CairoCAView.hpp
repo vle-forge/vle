@@ -36,39 +36,39 @@ namespace vle { namespace oov { namespace plugin {
     class RealColor
     {
     public:
-	enum color_type { LINEAR, HIGHVALUE, LOWVALUE };
+        enum color_type { LINEAR, HIGHVALUE, LOWVALUE };
 
-	double m_min;
-	double m_max;
-	std::string m_color;
-	color_type m_type;
-	double m_coef;
+        double m_min;
+        double m_max;
+        std::string m_color;
+        color_type m_type;
+        double m_coef;
 
-	RealColor(double p_min, double p_max, const std::string & p_color,
-		  color_type p_type, double p_coef):
-	    m_min(p_min), m_max(p_max), m_color(p_color),
-	    m_type(p_type), m_coef(p_coef) { }
+        RealColor(double p_min, double p_max, const std::string & p_color,
+                  color_type p_type, double p_coef):
+            m_min(p_min), m_max(p_max), m_color(p_color),
+            m_type(p_type), m_coef(p_coef) { }
     };
 
     class CairoCAView: public CairoPlugin
     {
     public:
-	enum geometry { SQUARE, HEXA };
-	enum type { INTEGER, REAL, BOOLEAN };
+        enum geometry { SQUARE, HEXA };
+        enum type { INTEGER, REAL, BOOLEAN };
 
-	class color {
-	public:
-	    int r; int g; int b;
-	    color(int _r = 0, int _g = 0, int _b = 0):r(_r), g(_g), b(_b) { }
-	};
+        class color {
+        public:
+            int r; int g; int b;
+            color(int _r = 0, int _g = 0, int _b = 0):r(_r), g(_g), b(_b) { }
+        };
 
-	class cairo_color {
-	public:
-	    double r; double g; double b;
-	    cairo_color(double _r = 0, double _g = 0, double _b = 0):r(_r), g(_g), b(_b) { }
-	};
+        class cairo_color {
+        public:
+            double r; double g; double b;
+            cairo_color(double _r = 0, double _g = 0, double _b = 0):r(_r), g(_g), b(_b) { }
+        };
 
-	typedef std::map < std::string , std::pair < std::string , color > > ObjectList;
+        typedef std::map < std::string , std::pair < std::string , color > > ObjectList;
 
     public:
         CairoCAView(const std::string& location);
@@ -109,13 +109,13 @@ namespace vle { namespace oov { namespace plugin {
         virtual void preferredSize(int& width, int& height);
 
     private:
-	cairo_color build_color(const std::string & p_value);
+        cairo_color build_color(const std::string & p_value);
         void draw();
-	void draw_hexa(Cairo::RefPtr < Cairo::Context > ctx, int x, int p_y);
-	void draw_objects(Cairo::RefPtr < Cairo::Context > ctx);
-	void draw_hexa_objects(Cairo::RefPtr < Cairo::Context > ctx);
+        void draw_hexa(Cairo::RefPtr < Cairo::Context > ctx, int x, int p_y);
+        void draw_objects(Cairo::RefPtr < Cairo::Context > ctx);
+        void draw_hexa_objects(Cairo::RefPtr < Cairo::Context > ctx);
 
-	geometry mGeometry;
+        geometry mGeometry;
         type mType;
         std::string mCellName;
         std::string mStateName;
@@ -123,37 +123,37 @@ namespace vle { namespace oov { namespace plugin {
         std::list < RealColor > mRealColorList;
         ObjectList mObjectList;
 
-	unsigned int mRows;
-	unsigned int mColumns;
+        unsigned int mRows;
+        unsigned int mColumns;
 
-	int mWidth;
-	int mHeight;
-	int mMinX;
-	int mMaxX;
-	int mMinY;
-	int mMaxY;
-	int mStepX;
-	int mStepX2;
-	int mStepY;
-	int mStepY3;
-	int mStepY7;
+        int mWidth;
+        int mHeight;
+        int mMinX;
+        int mMaxX;
+        int mMinY;
+        int mMaxY;
+        int mStepX;
+        int mStepX2;
+        int mStepY;
+        int mStepY3;
+        int mStepY7;
 
-	double mPen;
+        double mPen;
 
-	int mWindowWidth;
-	int mWindowHeight;
+        int mWindowWidth;
+        int mWindowHeight;
 
-	double mTime;
-	unsigned int mReceiveCell;
-	unsigned int mReceiveObject;
-	unsigned int mObjectNumber;
+        double mTime;
+        unsigned int mReceiveCell;
+        unsigned int mReceiveObject;
+        unsigned int mObjectNumber;
 
-	typedef boost::multi_array < std::string, 2> array_type;
-	typedef array_type::index index;
-	array_type* mValues;
+        typedef boost::multi_array < std::string, 2> array_type;
+        typedef array_type::index index;
+        array_type* mValues;
 
-	typedef std::map < std::string, std::vector < std::pair < int, int > > > object_type;
-	object_type mObjects;
+        typedef std::map < std::string, std::vector < std::vector < int > > > object_type;
+        object_type mObjects;
     };
 
     DECLARE_OOV_PLUGIN(oov::plugin::CairoCAView)

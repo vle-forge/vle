@@ -33,6 +33,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <iostream>
 
+
 namespace vle { namespace oov { namespace plugin {
 
 CairoCAView::CairoCAView(const std::string& location) :
@@ -181,6 +182,14 @@ void CairoCAView::onParameter(const std::string& /* plugin */,
 	xmlpp::Node::NodeList lst = elt->get_children("object");
 	xmlpp::Node::NodeList::iterator it = lst.begin();
 
+
+        /*
+         * tmp vector with size equal to the number of object attribute.
+         * At this time, there are 5 attributes, "x" position, "y" position, "rgb"
+         * colors.
+         */
+        std::vector<int> tmp_vector(5, 0);
+
 	while (it != lst.end()) {
 	    xmlpp::Element * v_valueNode = (xmlpp::Element*)(*it);
 	    std::string v_name = utils::xml::get_attribute(v_valueNode, "name");
@@ -191,11 +200,13 @@ void CairoCAView::onParameter(const std::string& /* plugin */,
 	    int v_color_blue = utils::to_int(utils::xml::get_attribute(v_valueNode, "color_blue"));
 	    CairoCAView::color v_color = color(v_color_red, v_color_green, v_color_blue);
 
-	    mObjectList[v_name] = std::pair < std::string ,CairoCAView::color>(v_shape, v_color);
-	    mObjects[v_name] = std::vector < std::pair < int, int > >();
+            mObjectList[v_name] = std::pair < std::string ,CairoCAView::color>(v_shape, v_color);
 
+            tmp_vector[2] = v_color_red;
+            tmp_vector[3] = v_color_green;
+            tmp_vector[4] = v_color_blue;
 	    for (int i = 0; i < v_nb; i++)
-		mObjects[v_name].push_back(std::pair < int, int >(0, 0));
+                mObjects[v_name].push_back(tmp_vector);
 	    mObjectNumber += v_nb;
 	    ++it;
 	}
@@ -238,14 +249,19 @@ void CairoCAView::onValue(const std::string& simulator,
             = value->writeToString();
         ++mReceiveCell;
     } else {
-        if (port == "x") {
-            mObjects[v[0]][utils::to_int(v[1])-1].first =
-                value->toInteger().value();
+        if(port == "c"){
+            value::Set v_color = value->toSet();
+            mObjects[v[0]][utils::to_int(v[1])-1][2] = v_color.get(0).toInteger().value();
+            mObjects[v[0]][utils::to_int(v[1])-1][3] = v_color.get(1).toInteger().value();
+            mObjects[v[0]][utils::to_int(v[1])-1][4] = v_color.get(2).toInteger().value();
         } else {
-            mObjects[v[0]][utils::to_int(v[1])-1].second =
-                value->toInteger().value();
+            if (port == "x") {
+                mObjects[v[0]][utils::to_int(v[1])-1][0] = value->toInteger().value();
+            } else {
+                mObjects[v[0]][utils::to_int(v[1])-1][1] = value->toInteger().value();
+            }
+            ++mReceiveObject;
         }
-        ++mReceiveObject;
     }
     delete value;
 
@@ -445,18 +461,17 @@ void CairoCAView::draw_objects(Cairo::RefPtr < Cairo::Context > m_ctx)
 
     while (ito != mObjectList.end()) {
 	std::string v_name = ito->first;
-	std::vector < std::pair < int, int > >& lst = mObjects[v_name];
-	std::vector < std::pair < int, int > >::const_iterator it = lst.begin();
 
-	while (it != lst.end()) {
-	    int x = it->first;
-	    int y = it->second;
+        for(unsigned int i=0; i < mObjects[v_name].size(); ++i){
+            int x = mObjects[v_name][i][0];
+            int y = mObjects[v_name][i][1];
+
 	    int midX = ((mMaxX - mMinX) - (mColumns * mStepX)) / 2;
 	    int midY = ((mMaxY - mMinY) - (mRows * mStepY)) / 2;
 
-	    m_ctx->set_source_rgb(ito->second.second.r/65535.,
-				ito->second.second.g/65535.,
-				ito->second.second.b/65535.);
+            m_ctx->set_source_rgb(mObjects[v_name][i][2]/65535.,
+				mObjects[v_name][i][3]/65535.,
+				mObjects[v_name][i][4]/65535.);
 
 	    if (ito->second.first == "square"){
 		m_ctx->rectangle( (x-1)*mStepX+3+midX,(y-1)*mStepY+3+midY,
@@ -473,7 +488,6 @@ void CairoCAView::draw_objects(Cairo::RefPtr < Cairo::Context > m_ctx)
 		    m_ctx->fill();
 		}
 	    }
-	    ++it;
 	}
 	++ito;
     }
@@ -485,16 +499,14 @@ void CairoCAView::draw_hexa_objects(Cairo::RefPtr < Cairo::Context > m_ctx)
 
     while (ito != mObjectList.end()) {
 	std::string v_name = ito->first;
-	std::vector < std::pair < int, int > >& lst = mObjects[v_name];
-	std::vector < std::pair < int, int > >::const_iterator it = lst.begin();
 
-	while (it != lst.end()) {
-	    int x = it->first;
-	    int y = it->second;
+        for(unsigned int i=0; i < mObjects[v_name].size(); ++i){
+            int x = mObjects[v_name][i][0];
+	    int y = mObjects[v_name][i][1];
 
-	    m_ctx->set_source_rgb(ito->second.second.r/65535.,
-				ito->second.second.g/65535.,
-				ito->second.second.b/65535.);
+            m_ctx->set_source_rgb(mObjects[v_name][i][2]/65535.,
+				mObjects[v_name][i][3]/65535.,
+				mObjects[v_name][i][4]/65535.);
 
 	    double p_y = y *0.7;
 	    if (y % 2 == 0) {
@@ -536,7 +548,6 @@ void CairoCAView::draw_hexa_objects(Cairo::RefPtr < Cairo::Context > m_ctx)
 		}
 
 	    }
-	    ++it;
 	}
 	++ito;
     }
