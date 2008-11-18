@@ -29,6 +29,11 @@
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/value/String.hpp>
+#include <config.h>
+
+#ifdef HAVE_CAIRO
+#   include <vle/oov/CairoPlugin.hpp>
+#endif
 
 namespace vle { namespace oov {
 
@@ -68,7 +73,19 @@ void StreamReader::onParameter(const std::string& pluginname,
                                const std::string& parameters,
                                const double& time)
 {
-    initPlugin(pluginname, parameters);
+    initPlugin(pluginname, location);
+
+#ifdef HAVE_CAIRO
+    /*
+     * For cairo plug-ins, we build the cairo graphics context via the
+     * CairoPlugin::init function.
+     */
+    if (plugin()->isCairo()) {
+        CairoPluginPtr plg = toCairoPlugin(plugin());
+        plg->init();
+    }
+#endif
+
     plugin()->onParameter(pluginname, location, file, parameters, time);
 }
 

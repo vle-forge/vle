@@ -193,17 +193,23 @@ void NetStreamReader::onValue(const std::string& simulator,
                               const double& time,
                               value::Value* value)
 {
-    plugin()->onValue(simulator, parent, port, view, time, value);
-
 #ifdef HAVE_CAIRO
-    //if (plugin()->isCairo()) {
-    //CairoPluginPtr plg = toCairoPlugin(plugin());
-    //if (plg and plg->context() and plg->context()->get_target()) {
-    //plg->context()->get_target()->write_to_png((boost::format(
-    //"%1%_%2$05d.png") % plg->location() % m_image).str());
-    //m_image++;
-    //}
-    //}
+    if (plugin()->isCairo()) {
+        CairoPluginPtr plg = toCairoPlugin(plugin());
+        plg->needCopy();
+        plugin()->onValue(simulator, parent, port, view, time, value);
+        if (plg->isCopyDone()) {
+            plg->stored()->write_to_png(
+                Glib::build_filename(plg->location(),
+                                     (boost::format("img-%1$08d.png") %
+                                      m_image).str()));
+            m_image++;
+        }
+    } else {
+#endif
+        plugin()->onValue(simulator, parent, port, view, time, value);
+#ifdef HAVE_CAIRO
+    }
 #endif
 }
 

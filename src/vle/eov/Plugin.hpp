@@ -93,6 +93,13 @@ namespace vle { namespace eov {
          */
         void onExposeEvent(GdkEventExpose* event);
 
+        /**
+         * @brief Send to the CairoPlugin a message to redraw is storage image
+         * buffer.
+         */
+        void copy()
+        { m_cairoplugin->needCopy(); }
+
     protected:
         oov::CairoPluginPtr                 m_cairoplugin;
         NetStreamReader*                    m_net;

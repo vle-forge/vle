@@ -196,6 +196,7 @@ void Plot::onValue(const std::string& simulator,
 	}
 	updateStepHeight();
 	draw();
+        copy();
     }
 }
 
@@ -205,20 +206,17 @@ void Plot::onParameter(const std::string& /* plugin */,
                        const std::string& parameters,
                        const double& /* time */)
 {
+    Assert(utils::InternalError, m_ctx, "Cairo plot drawing error");
+
     mParameter.set_drawing_area_size(mWidth, mHeight);
     mParameter.set_screen_size(mWidth, mHeight);
 
-    if (not context()) {
-	std::string s = "t";
+    std::string s = "t";
 
-        m_img = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, mWidth,
-                                            mHeight);
-        setSurface(m_img);
-	context()->set_font_size(10);
-	context()->get_text_extents(s, mExtents);
-	mParameter.set_text_height((int)(mExtents.height * 5));
-	updateStepHeight();
-    }
+    m_ctx->set_font_size(10);
+    m_ctx->get_text_extents(s, mExtents);
+    mParameter.set_text_height((int)(mExtents.height * 5));
+    updateStepHeight();
 
     if (not parameters.empty()) {
         xmlpp::DomParser parser;
@@ -321,26 +319,21 @@ void Plot::preferredSize(int& width, int& height)
 
 void Plot::draw()
 {
-    Assert(utils::InternalError, context(), "Cairo plot drawing error");
-    Cairo::RefPtr < Cairo::Context > ctx = context();
+    if ((mRealCurveList.size() > 0 && mRealCurveList[0]->get_size() > 1) ||
+        (mIntCurveList.size() > 0 && mIntCurveList[0]->get_size() > 0)) {
 
-    if (ctx) {
-	if ((mRealCurveList.size() > 0 && mRealCurveList[0]->get_size() > 1) ||
-	    (mIntCurveList.size() > 0 && mIntCurveList[0]->get_size() > 0)) {
-
-	    ctx->rectangle(0, 0, mWidth, mHeight);
-	    ctx->set_source_rgb(1, 1, 1);
-	    ctx->fill();
-	    drawVerticalStep(ctx);
-	    drawHorizontalStep(ctx);
-	    drawAxis(ctx);
-	    drawCurves(ctx);
-	    drawLimits(ctx);
-	}
+        m_ctx->rectangle(0, 0, mWidth, mHeight);
+        m_ctx->set_source_rgb(1, 1, 1);
+        m_ctx->fill();
+        drawVerticalStep(m_ctx);
+        drawHorizontalStep(m_ctx);
+        drawAxis(m_ctx);
+        drawCurves(m_ctx);
+        drawLimits(m_ctx);
     }
 }
 
-void Plot::drawVerticalStep(Cairo::RefPtr < Cairo::Context > ctx)
+void Plot::drawVerticalStep(Cairo::RefPtr < Cairo::Context > m_ctx)
 {
     double m_stepX, date, m_firstDate, m_lastDate, rest;
     int v_x, m_maxY, m_minY;
@@ -357,32 +350,32 @@ void Plot::drawVerticalStep(Cairo::RefPtr < Cairo::Context > ctx)
     else
         date = ceil(rest) * m_stepX;
 
-    ctx->set_source_rgb(0, 0, 0);
-    ctx->set_line_width(1);
+    m_ctx->set_source_rgb(0, 0, 0);
+    m_ctx->set_line_width(1);
     while(date <= m_lastDate) {
         v_x = mParameter.to_pixel_width(date);
 
-	ctx->begin_new_path();
-	ctx->move_to(v_x, m_minY);
-	ctx->line_to(v_x, m_maxY);
-	ctx->close_path();
-	ctx->stroke();
+	m_ctx->begin_new_path();
+	m_ctx->move_to(v_x, m_minY);
+	m_ctx->line_to(v_x, m_maxY);
+	m_ctx->close_path();
+	m_ctx->stroke();
 
-	ctx->move_to(v_x +1, m_minY);
-	ctx->show_text(utils::to_string(date));
+	m_ctx->move_to(v_x +1, m_minY);
+	m_ctx->show_text(utils::to_string(date));
 
         date += m_stepX;
     }
 }
 
-void Plot::drawHorizontalStep(Cairo::RefPtr < Cairo::Context > ctx)
+void Plot::drawHorizontalStep(Cairo::RefPtr < Cairo::Context > m_ctx)
 {
     int x_left, x_right, y_bottom;
     int y;
     double value_show = mParameter.get_min_value();
     double max_value_show = mParameter.get_max_value();
 
-    ctx->set_dash(mDashes, 0);
+    m_ctx->set_dash(mDashes, 0);
 
     x_left = mParameter.get_shift_left();
     x_right = mParameter.get_shift_left() + mParameter.get_graph_zone_width();
@@ -390,33 +383,33 @@ void Plot::drawHorizontalStep(Cairo::RefPtr < Cairo::Context > ctx)
     y = y_bottom;
 
     while(value_show <= max_value_show) {
-	ctx->set_source_rgb(0., 0., 0.);
-	ctx->move_to(x_left, y);
-	ctx->line_to(x_right, y);
-	ctx->set_line_width(1);
+	m_ctx->set_source_rgb(0., 0., 0.);
+	m_ctx->move_to(x_left, y);
+	m_ctx->line_to(x_right, y);
+	m_ctx->set_line_width(1);
 
-	ctx->move_to(0, y - 1);
-	ctx->show_text(utils::to_string(value_show));
-	ctx->stroke();
+	m_ctx->move_to(0, y - 1);
+	m_ctx->show_text(utils::to_string(value_show));
+	m_ctx->stroke();
 
         y -= mParameter.get_text_height();
         value_show += mStepHeight;
     }
-    ctx->unset_dash();
+    m_ctx->unset_dash();
 }
 
-void Plot::drawCurves(Cairo::RefPtr < Cairo::Context > ctx)
+void Plot::drawCurves(Cairo::RefPtr < Cairo::Context > m_ctx)
 {
     std::list < RealCurve * > :: const_iterator it_dble;
     for (it_dble = mShowRealCurveList.begin(); it_dble != mShowRealCurveList.end();
          ++it_dble)
-        (*it_dble)->draw(ctx, mParameter);
+        (*it_dble)->draw(m_ctx, mParameter);
 
     if(!mShowIntCurveList.empty())
-        (*(mShowIntCurveList.begin()))->draw(ctx, mParameter, mShowIntCurveList);
+        (*(mShowIntCurveList.begin()))->draw(m_ctx, mParameter, mShowIntCurveList);
 }
 
-void Plot::drawAxis(Cairo::RefPtr < Cairo::Context > ctx)
+void Plot::drawAxis(Cairo::RefPtr < Cairo::Context > m_ctx)
 {
     int x_left, x_right, y_top, y_bottom;
 
@@ -425,19 +418,19 @@ void Plot::drawAxis(Cairo::RefPtr < Cairo::Context > ctx)
     y_top = mParameter.get_shift_top();
     y_bottom = mParameter.get_graph_zone_height() + mParameter.get_shift_top();
 
-    ctx->set_line_width(1);
-    ctx->set_source_rgb(0, 0, 0);
-    ctx->begin_new_path();
-    ctx->move_to(x_left, y_top);
-    ctx->line_to(x_right, y_top);
-    ctx->line_to(x_right, y_bottom);
-    ctx->line_to(x_left, y_bottom);
-    ctx->line_to(x_left, y_top);
-    ctx->close_path();
-    ctx->stroke();
+    m_ctx->set_line_width(1);
+    m_ctx->set_source_rgb(0, 0, 0);
+    m_ctx->begin_new_path();
+    m_ctx->move_to(x_left, y_top);
+    m_ctx->line_to(x_right, y_top);
+    m_ctx->line_to(x_right, y_bottom);
+    m_ctx->line_to(x_left, y_bottom);
+    m_ctx->line_to(x_left, y_top);
+    m_ctx->close_path();
+    m_ctx->stroke();
 }
 
-void Plot::drawLimits(Cairo::RefPtr < Cairo::Context > ctx)
+void Plot::drawLimits(Cairo::RefPtr < Cairo::Context > m_ctx)
 {
     int y_limit;
     int x_left, x_right;
@@ -450,33 +443,33 @@ void Plot::drawLimits(Cairo::RefPtr < Cairo::Context > ctx)
         if (mParameter.is_inside_min_max((*it)->get_value())) {
 
             y_limit = mParameter.to_pixel_height((*it)->get_value());
-	    context()->get_text_extents(utils::to_string((*it)->get_value()), mExtents);
+	    m_ctx->get_text_extents(utils::to_string((*it)->get_value()), mExtents);
 
-	    ctx->set_source_rgba(1, 1, 0, 0.5);
-	    ctx->begin_new_path();
-	    ctx->move_to(x_left + 2, y_limit - 2);
-	    ctx->rel_line_to(0, -mExtents.height - 4);
-	    ctx->rel_line_to(mExtents.width + 4, 0);
-	    ctx->rel_line_to(0, mExtents.height + 4);
-	    ctx->rel_line_to(-mExtents.width - 4, 0);
-	    ctx->close_path();
-	    ctx->fill();
-	    ctx->stroke();
+	    m_ctx->set_source_rgba(1, 1, 0, 0.5);
+	    m_ctx->begin_new_path();
+	    m_ctx->move_to(x_left + 2, y_limit - 2);
+	    m_ctx->rel_line_to(0, -mExtents.height - 4);
+	    m_ctx->rel_line_to(mExtents.width + 4, 0);
+	    m_ctx->rel_line_to(0, mExtents.height + 4);
+	    m_ctx->rel_line_to(-mExtents.width - 4, 0);
+	    m_ctx->close_path();
+	    m_ctx->fill();
+	    m_ctx->stroke();
 
-	    ctx->set_source_rgba(0., 0., 0., 1.);
-	    ctx->move_to(x_left + 4, y_limit - 4);
-	    ctx->show_text(utils::to_string((*it)->get_value()));
+	    m_ctx->set_source_rgba(0., 0., 0., 1.);
+	    m_ctx->move_to(x_left + 4, y_limit - 4);
+	    m_ctx->show_text(utils::to_string((*it)->get_value()));
 
-	    ctx->set_source_rgba((*it)->get_red_color()/65535.,
+	    m_ctx->set_source_rgba((*it)->get_red_color()/65535.,
 				 (*it)->get_green_color()/65535.,
 				 (*it)->get_blue_color()/65535.,
 				 0.5);
-	    ctx->set_line_width(1);
-	    ctx->begin_new_path();
-	    ctx->move_to(x_left, y_limit);
-	    ctx->line_to(x_right, y_limit);
-	    ctx->close_path();
-	    ctx->stroke();
+	    m_ctx->set_line_width(1);
+	    m_ctx->begin_new_path();
+	    m_ctx->move_to(x_left, y_limit);
+	    m_ctx->line_to(x_right, y_limit);
+	    m_ctx->close_path();
+	    m_ctx->stroke();
         }
     }
 }

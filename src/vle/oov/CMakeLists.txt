@@ -18,6 +18,7 @@ SET(OOV_HPP LocalStreamReader.hpp NetStreamReader.hpp OOV.hpp OutputMatrix.hpp
 
 IF (HAVE_CAIRO)
  SET(OOV_HPP ${OOV_HPP} CairoPlugin.hpp)
+ SET(OOV_CPP ${OOV_CPP} CairoPlugin.cpp)
 ENDIF (HAVE_CAIRO)
 
 ADD_LIBRARY(vleoov SHARED ${OOV_CPP};${OOV_HPP})

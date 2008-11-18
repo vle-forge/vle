@@ -102,7 +102,7 @@ void NetStreamReader::onValue(const std::string& simulator,
                               const double& time,
                               value::Value* value)
 {
-    oov::NetStreamReader::onValue(simulator, parent, port, view, time, value);
+    plugin()->onValue(simulator, parent, port, view, time, value);
 }
 
 void NetStreamReader::onClose(const double& time)

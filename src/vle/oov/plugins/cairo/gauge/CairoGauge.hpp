@@ -97,8 +97,6 @@ namespace vle { namespace oov { namespace plugin {
 
 	std::string mName;
 	double mTime;
-
-        Cairo::RefPtr < Cairo::ImageSurface > mImageSurface;
     };
 
     DECLARE_OOV_PLUGIN(oov::plugin::CairoGauge)

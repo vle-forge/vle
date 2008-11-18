@@ -87,6 +87,7 @@ void CairoLevel::onValue(const std::string& simulator,
     m_buffer[it->second] = value;
     m_receive++;
     draw();
+    copy();
 }
 
 void CairoLevel::onParameter(const std::string& /* plugin */,
@@ -95,6 +96,8 @@ void CairoLevel::onParameter(const std::string& /* plugin */,
                              const std::string& parameters,
                              const double& /* time */)
 {
+    Assert(utils::InternalError, m_ctx, "Cairo level drawing error");
+
     m_minX = 1;
     m_maxX = 106;
     m_minY = 1;
@@ -133,14 +136,6 @@ void CairoLevel::onParameter(const std::string& /* plugin */,
         }
     }
 
-    if (not context()) {
-        int width = m_maxX - m_minX;
-        int height = m_maxY - m_minY;
-        m_img = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, width,
-                                            height);
-        setSurface(m_img);
-    }
-
     m_colorList[0] = std::vector<int>(3);
     m_colorList[0][0] = 255;
     m_colorList[0][1] = 0;
@@ -159,14 +154,11 @@ void CairoLevel::preferredSize(int& width, int& height)
 
 void CairoLevel::draw()
 {
-    Assert(utils::InternalError, context(), "Cairo level drawing error");
-    Cairo::RefPtr < Cairo::Context > ctx = context();
-
     if (m_receive == m_columns.size()) {
         int shiftY = 20;
-        ctx->rectangle(0, 0, 105, 305);
-        ctx->set_source_rgb(1, 1, 1);
-        ctx->fill();
+        m_ctx->rectangle(0, 0, 105, 305);
+        m_ctx->set_source_rgb(1, 1, 1);
+        m_ctx->fill();
 
         if (not m_buffer.empty()) {
             unsigned int stepX = (m_maxX - m_minX - 10) / m_columns.size();
@@ -195,30 +187,30 @@ void CairoLevel::draw()
                     y = m_maxY - m_minY - shiftY;
                 }
 
-                ctx->set_source_rgb(m_colorList[i][0], m_colorList[i][1],
+                m_ctx->set_source_rgb(m_colorList[i][0], m_colorList[i][1],
                                     m_colorList[i][2]);
-                ctx->rectangle(m_minX + i * stepX,
+                m_ctx->rectangle(m_minX + i * stepX,
                                m_maxY - y - shiftY, stepX, y);
-                ctx->fill();
-                ctx->stroke();
+                m_ctx->fill();
+                m_ctx->stroke();
 
-                ctx->set_source_rgb(0., 0., 0.);
+                m_ctx->set_source_rgb(0., 0., 0.);
 
-                ctx->rectangle(m_minX + i * stepX, m_minY, stepX,
+                m_ctx->rectangle(m_minX + i * stepX, m_minY, stepX,
                                (m_maxY - m_minY - shiftY));
-                ctx->begin_new_path();
-                ctx->move_to(m_minX + i * stepX, m_maxY - y - shiftY);
-                ctx->line_to(m_minX + (i + 1) * stepX, m_maxY - y - shiftY);
-                ctx->close_path();
-                ctx->stroke();
+                m_ctx->begin_new_path();
+                m_ctx->move_to(m_minX + i * stepX, m_maxY - y - shiftY);
+                m_ctx->line_to(m_minX + (i + 1) * stepX, m_maxY - y - shiftY);
+                m_ctx->close_path();
+                m_ctx->stroke();
 
-                ctx->set_source_rgb(0., 0., 0.);
-                ctx->move_to(m_minX + i * stepX + 1,
+                m_ctx->set_source_rgb(0., 0., 0.);
+                m_ctx->move_to(m_minX + i * stepX + 1,
                                (int)((m_maxY - m_minY - shiftY) / 2));
-                ctx->show_text(utils::to_string(value));
+                m_ctx->show_text(utils::to_string(value));
 
-                ctx->move_to(m_minX+i*stepX+1, m_maxY-shiftY);
-                ctx->show_text(m_columns[i]);
+                m_ctx->move_to(m_minX+i*stepX+1, m_maxY-shiftY);
+                m_ctx->show_text(m_columns[i]);
 
                 delete *it;
                 *it = 0;

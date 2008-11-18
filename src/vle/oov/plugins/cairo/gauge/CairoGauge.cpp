@@ -56,12 +56,7 @@ void CairoGauge::onParameter(const std::string& /* plugin */,
                              const std::string& parameters,
                              const double& /* time */)
 {
-    if (not context()) {
-        mImageSurface =
-            Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32,
-                                        mWindowWidth, mWindowHeight);
-	setSurface(mImageSurface);
-    }
+    Assert(utils::InternalError, m_ctx, "Cairo gauge drawing error");
 
     xmlpp::DomParser parser;
 
@@ -116,6 +111,7 @@ void CairoGauge::onValue(const std::string& simulator,
     }
 
     draw();
+    copy();
 }
 
 void CairoGauge::close(const double& /* time */)
@@ -130,30 +126,28 @@ void CairoGauge::preferredSize(int& width, int& height)
 
 void CairoGauge::draw()
 {
-    Assert(utils::InternalError, context(), "Cairo gauge drawing error");
-    Cairo::RefPtr < Cairo::Context > ctx = context();
-
-    draw_background(ctx);
-    draw_text(ctx);
-    draw_line(ctx);
+    draw_background(m_ctx);
+    draw_text(m_ctx);
+    draw_line(m_ctx);
 }
 
-void CairoGauge::draw_background(Cairo::RefPtr < Cairo::Context > ctx)
+void CairoGauge::draw_background(Cairo::RefPtr < Cairo::Context > m_ctx)
 {
     double sy = mWindowHeight * mScale;
 
-    ctx->rectangle(0, 0, mWindowWidth, mWindowHeight);
-    ctx->set_source_rgb(1.,1.,1.);
-    ctx->fill();
+    m_ctx->rectangle(0, 0, mWindowWidth, mWindowHeight);
+    m_ctx->set_source_rgb(1.,1.,1.);
+    m_ctx->fill();
 
-    ctx->begin_new_path();
-    ctx->set_source_rgb(0.,0.,0.);
-    ctx->arc(mWindowWidth/2, mWindowHeight, (mWindowWidth>sy)?sy/2:mWindowWidth/2 , M_PI, 0);
-    ctx->close_path();
-    ctx->stroke();
+    m_ctx->begin_new_path();
+    m_ctx->set_source_rgb(0.,0.,0.);
+    m_ctx->arc(mWindowWidth/2, mWindowHeight,
+               (mWindowWidth>sy) ? sy/2 : mWindowWidth / 2, M_PI, 0);
+    m_ctx->close_path();
+    m_ctx->stroke();
 }
 
-void CairoGauge::draw_line(Cairo::RefPtr < Cairo::Context > ctx)
+void CairoGauge::draw_line(Cairo::RefPtr < Cairo::Context > m_ctx)
 {
     double nx = 0.;
     double ny = 0.;
@@ -161,9 +155,7 @@ void CairoGauge::draw_line(Cairo::RefPtr < Cairo::Context > ctx)
     double my = mWindowHeight - mLine ;
 
     double sy = mWindowHeight * mScale;
-    double rayon = (mWindowWidth>sy)?sy/2:mWindowWidth/2;
-
-//		std::cout << "mx : " << mx << " / " <<  mWindowWidth << " my : " << my << " / " << mWindowHeight << "\n";
+    double rayon = (mWindowWidth > sy) ? sy/2 : mWindowWidth/2;
 
     if (mValue <= mMin) {
 	nx = mx - rayon  + mLine ;
@@ -173,35 +165,33 @@ void CairoGauge::draw_line(Cairo::RefPtr < Cairo::Context > ctx)
 	ny = mWindowHeight;
     } else {
 	double angle = M_PI + (M_PI * mValue / (mMax - mMin));
-	nx = mx + ( std::cos(angle) * rayon ) - mLine;
-	ny = my + ( std::sin(angle) * rayon ) - mLine;
+	nx = mx + (std::cos(angle) * rayon) - mLine;
+	ny = my + (std::sin(angle) * rayon) - mLine;
     }
 
-    ctx->set_line_width(mLine);
-    ctx->set_source_rgb(0.,0.,1.);
-    ctx->begin_new_path();
-    ctx->move_to(mx, my);
-    ctx->line_to(nx, ny);
-    ctx->close_path();
-    ctx->stroke();
+    m_ctx->set_line_width(mLine);
+    m_ctx->set_source_rgb(0.,0.,1.);
+    m_ctx->begin_new_path();
+    m_ctx->move_to(mx, my);
+    m_ctx->line_to(nx, ny);
+    m_ctx->close_path();
+    m_ctx->stroke();
 }
 
-void CairoGauge::draw_text(Cairo::RefPtr < Cairo::Context > ctx)
+void CairoGauge::draw_text(Cairo::RefPtr < Cairo::Context > m_ctx)
 {
-//    int nx, ny;
-
     double sy = mWindowHeight * mScale;
     double rayon = (mWindowWidth>sy)?sy/2:mWindowWidth/2;
 
-    ctx->set_source_rgb(0.,0.,0.);
-    ctx->move_to( mWindowWidth / 2 - rayon + 5 , mWindowHeight - 3*mLine);
-    ctx->show_text((boost::format("min: %1%") % mMin).str());
+    m_ctx->set_source_rgb(0.,0.,0.);
+    m_ctx->move_to( mWindowWidth / 2 - rayon + 5 , mWindowHeight - 3*mLine);
+    m_ctx->show_text((boost::format("min: %1%") % mMin).str());
 
-    ctx->move_to(mWindowWidth / 2 - 15, mWindowHeight - 3*mLine ) ;
-    ctx->show_text(vle::utils::to_string( mValue));
+    m_ctx->move_to(mWindowWidth / 2 - 15, mWindowHeight - 3*mLine ) ;
+    m_ctx->show_text(vle::utils::to_string( mValue));
 
-    ctx->move_to(mWindowWidth / 2 + rayon - 40, mWindowHeight - 3*mLine );
-    ctx->show_text( (boost::format("max: %1%") % mMax).str() );
+    m_ctx->move_to(mWindowWidth / 2 + rayon - 40, mWindowHeight - 3*mLine );
+    m_ctx->show_text( (boost::format("max: %1%") % mMax).str() );
 }
 
 }}} // namespace vle oov plugin

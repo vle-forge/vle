@@ -34,7 +34,8 @@ Window::Window(Glib::Mutex& mutex, int timer) :
     m_mutex(mutex),
     m_rootBox(true, 5),
     m_isinit(false),
-    m_timeout(timer)
+    m_timeout(timer),
+    m_median(true)
 {
     set_title("eov - the Eyes of VLE");
     set_border_width(0);
@@ -90,7 +91,12 @@ bool Window::redrawTimer()
     assert(m_plugin);
 
     if (is_realized()) {
-	m_plugin->drawingWidget().queue_draw();
+        if (m_median) {
+            m_plugin->copy();
+        } else {
+            m_plugin->drawingWidget().queue_draw();
+        }
+        m_median = not m_median;
     }
 
     return true;

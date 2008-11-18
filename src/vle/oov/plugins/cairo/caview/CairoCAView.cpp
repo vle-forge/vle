@@ -31,6 +31,7 @@
 #include <vle/value/Integer.hpp>
 #include <vle/value/String.hpp>
 #include <boost/algorithm/string/split.hpp>
+#include <iostream>
 
 namespace vle { namespace oov { namespace plugin {
 
@@ -57,12 +58,7 @@ void CairoCAView::onParameter(const std::string& /* plugin */,
                               const std::string& parameters,
                               const double& /* time */)
 {
-    if (not context()) {
-        mImageSurface = Cairo::ImageSurface::create(
-            Cairo::FORMAT_ARGB32, mWindowWidth, mWindowHeight);
-	setSurface(mImageSurface);
-    }
-
+    Assert(utils::InternalError, m_ctx, "Cairo caview drawing error");
     xmlpp::DomParser parser;
 
     parser.parse_memory(parameters);
@@ -114,10 +110,14 @@ void CairoCAView::onParameter(const std::string& /* plugin */,
 
 	while (it != lst.end()) {
 	    xmlpp::Element * v_valueNode = (xmlpp::Element*)(*it);
-	    int v_value(utils::to_int(utils::xml::get_attribute(v_valueNode, "value")));
-	    int red = utils::to_int(utils::xml::get_attribute(v_valueNode, "red"));
-	    int green = utils::to_int(utils::xml::get_attribute(v_valueNode, "green"));
-	    int blue = utils::to_int(utils::xml::get_attribute(v_valueNode, "blue"));
+            int v_value(utils::to_int(utils::xml::get_attribute(v_valueNode,
+                                                                "value")));
+            int red = utils::to_int(utils::xml::get_attribute(v_valueNode,
+                                                              "red"));
+            int green = utils::to_int(utils::xml::get_attribute(v_valueNode,
+                                                                "green"));
+            int blue = utils::to_int(utils::xml::get_attribute(v_valueNode,
+                                                               "blue"));
 	    mColorList[v_value] = CairoCAView::color(red, green, blue);
 
 	    ++it;
@@ -130,8 +130,10 @@ void CairoCAView::onParameter(const std::string& /* plugin */,
 
 	while (it != lst.end()) {
 	    xmlpp::Element * v_valueNode = (xmlpp::Element*)(*it);
-	    double v_minValue = utils::to_double(utils::xml::get_attribute(v_valueNode, "min"));
-	    double v_maxValue = utils::to_double(utils::xml::get_attribute(v_valueNode, "max"));
+            double v_minValue =
+                utils::to_double(utils::xml::get_attribute(v_valueNode, "min"));
+            double v_maxValue =
+                utils::to_double(utils::xml::get_attribute(v_valueNode, "max"));
 	    std::string v_color = utils::xml::get_attribute(v_valueNode, "color");
 	    RealColor::color_type v_type = RealColor::LINEAR;
 	    double v_coef = 0.;
@@ -249,7 +251,7 @@ void CairoCAView::onValue(const std::string& simulator,
 
     if (mReceiveCell == mRows * mColumns and mReceiveObject == mObjectNumber*2) {
 	draw();
-//	mSurface->write_to_png((boost::format("%1%_%2$05d.png") % location() % (int)mTime).str());
+        copy();
 	mReceiveCell = 0;
 	mReceiveObject = 0;
     }
@@ -375,12 +377,9 @@ CairoCAView::cairo_color CairoCAView::build_color(const std::string & p_value)
 
 void CairoCAView::draw()
 {
-    Assert(utils::InternalError, context(), "Cairo caview drawing error");
-    Cairo::RefPtr < Cairo::Context > ctx = context();
-
-    ctx->rectangle(0, 0, mWindowWidth, mWindowHeight);
-    ctx->set_source_rgb(0.745098, 0.745098, 0.745098);
-    ctx->fill();
+    m_ctx->rectangle(0, 0, mWindowWidth, mWindowHeight);
+    m_ctx->set_source_rgb(0.745098, 0.745098, 0.745098);
+    m_ctx->fill();
     if (mGeometry == SQUARE) {
 	int midX = ((mMaxX - mMinX) - (mColumns * mStepX)) / 2;
 	int midY = ((mMaxY - mMinY) - (mRows * mStepY)) / 2;
@@ -389,58 +388,58 @@ void CairoCAView::draw()
 	    for (index x = 0; x < (index)mColumns ; ++x) {
 		cairo_color v_color = build_color((*mValues)[x][y]);
 
-		ctx->set_source_rgb(v_color.r, v_color.g, v_color.b);
-		ctx->rectangle(x * mStepX + 2 + midX,
+		m_ctx->set_source_rgb(v_color.r, v_color.g, v_color.b);
+		m_ctx->rectangle(x * mStepX + 2 + midX,
 			       y * mStepY + 2 + midY,
 			       mStepX - 1, mStepY - 1 );
-		ctx->fill();
+		m_ctx->fill();
 	    }
-	draw_objects(ctx);
+	draw_objects(m_ctx);
     }
     else if (mGeometry == HEXA) {
 	for (index y = 0; y < (index)mRows ; ++y)
 	    for (index x = 0; x < (index)mColumns ; ++x) {
 		cairo_color v_color = build_color((*mValues)[x][y]);
 
-		ctx->set_source_rgb(v_color.r, v_color.g, v_color.b);
-		draw_hexa(ctx, x, y);
+		m_ctx->set_source_rgb(v_color.r, v_color.g, v_color.b);
+		draw_hexa(m_ctx, x, y);
 	    }
-	draw_hexa_objects(ctx);
+	draw_hexa_objects(m_ctx);
     }
 
 }
 
-void CairoCAView::draw_hexa(Cairo::RefPtr < Cairo::Context > ctx, int x, int p_y)
+void CairoCAView::draw_hexa(Cairo::RefPtr < Cairo::Context > m_ctx, int x, int p_y)
 {
     double y;
 
-    ctx->begin_new_path();
+    m_ctx->begin_new_path();
     if (p_y%2 == 0) {
 	y = p_y * 0.7;
-	ctx->move_to(x*mStepX+mPen,y*mStepY+mStepY3);
-	ctx->line_to(x*mStepX+mStepX2,y*mStepY);
-	ctx->line_to((x+1)*mStepX-mPen,y*mStepY+mStepY3);
-	ctx->line_to((x+1)*mStepX-mPen,y*mStepY+mStepY7);
-	ctx->line_to(x*mStepX+mStepX2,(y+1)*mStepY);
-	ctx->line_to(x*mStepX+mPen,y*mStepY+mStepY7);
+	m_ctx->move_to(x*mStepX+mPen,y*mStepY+mStepY3);
+	m_ctx->line_to(x*mStepX+mStepX2,y*mStepY);
+	m_ctx->line_to((x+1)*mStepX-mPen,y*mStepY+mStepY3);
+	m_ctx->line_to((x+1)*mStepX-mPen,y*mStepY+mStepY7);
+	m_ctx->line_to(x*mStepX+mStepX2,(y+1)*mStepY);
+	m_ctx->line_to(x*mStepX+mPen,y*mStepY+mStepY7);
     }else{
 	y = p_y * 0.7;
-	ctx->move_to(x*mStepX+mStepX2+mPen,y*mStepY+mStepY3);
-	ctx->line_to((x+1)*mStepX,y*mStepY);
-	ctx->line_to((x+1)*mStepX+mStepX2-1,y*mStepY+mStepY3);
-	ctx->line_to((x+1)*mStepX+mStepX2-1,y*mStepY+mStepY7);
-	ctx->line_to((x+1)*mStepX,(y+1)*mStepY);
-	ctx->line_to(x*mStepX+mStepX2+1,y*mStepY+mStepY7);
+	m_ctx->move_to(x*mStepX+mStepX2+mPen,y*mStepY+mStepY3);
+	m_ctx->line_to((x+1)*mStepX,y*mStepY);
+	m_ctx->line_to((x+1)*mStepX+mStepX2-1,y*mStepY+mStepY3);
+	m_ctx->line_to((x+1)*mStepX+mStepX2-1,y*mStepY+mStepY7);
+	m_ctx->line_to((x+1)*mStepX,(y+1)*mStepY);
+	m_ctx->line_to(x*mStepX+mStepX2+1,y*mStepY+mStepY7);
     }
-    ctx->close_path();
+    m_ctx->close_path();
 
-    ctx->fill_preserve();
-    ctx->set_source_rgb( 0.745098, 0.745098, 0.745098);
-    ctx->set_line_width(mPen);
-    ctx->stroke();
+    m_ctx->fill_preserve();
+    m_ctx->set_source_rgb( 0.745098, 0.745098, 0.745098);
+    m_ctx->set_line_width(mPen);
+    m_ctx->stroke();
 }
 
-void CairoCAView::draw_objects(Cairo::RefPtr < Cairo::Context > ctx)
+void CairoCAView::draw_objects(Cairo::RefPtr < Cairo::Context > m_ctx)
 {
     ObjectList::iterator ito = mObjectList.begin();
 
@@ -455,23 +454,23 @@ void CairoCAView::draw_objects(Cairo::RefPtr < Cairo::Context > ctx)
 	    int midX = ((mMaxX - mMinX) - (mColumns * mStepX)) / 2;
 	    int midY = ((mMaxY - mMinY) - (mRows * mStepY)) / 2;
 
-	    ctx->set_source_rgb(ito->second.second.r/65535.,
+	    m_ctx->set_source_rgb(ito->second.second.r/65535.,
 				ito->second.second.g/65535.,
 				ito->second.second.b/65535.);
 
 	    if (ito->second.first == "square"){
-		ctx->rectangle( (x-1)*mStepX+3+midX,(y-1)*mStepY+3+midY,
+		m_ctx->rectangle( (x-1)*mStepX+3+midX,(y-1)*mStepY+3+midY,
 				mStepX-4, mStepY-4 );
-		ctx->fill();
+		m_ctx->fill();
 
 	    }else {
 		if (ito->second.first == "circle"){
-		    ctx->arc( ((x-1)*mStepX+3+midX) + (mStepX-4)/2,
+		    m_ctx->arc( ((x-1)*mStepX+3+midX) + (mStepX-4)/2,
 			      ((y-1)*mStepY+3+midY) + (mStepY-4)/2,
 			      mStepY>mStepX?( (mStepX-4)/2 ):( (mStepY-4)/2 ),
 			      0,
 			      2*M_PI );
-		    ctx->fill();
+		    m_ctx->fill();
 		}
 	    }
 	    ++it;
@@ -480,7 +479,7 @@ void CairoCAView::draw_objects(Cairo::RefPtr < Cairo::Context > ctx)
     }
 }
 
-void CairoCAView::draw_hexa_objects(Cairo::RefPtr < Cairo::Context > ctx)
+void CairoCAView::draw_hexa_objects(Cairo::RefPtr < Cairo::Context > m_ctx)
 {
     ObjectList::iterator ito = mObjectList.begin();
 
@@ -493,46 +492,46 @@ void CairoCAView::draw_hexa_objects(Cairo::RefPtr < Cairo::Context > ctx)
 	    int x = it->first;
 	    int y = it->second;
 
-	    ctx->set_source_rgb(ito->second.second.r/65535.,
+	    m_ctx->set_source_rgb(ito->second.second.r/65535.,
 				ito->second.second.g/65535.,
 				ito->second.second.b/65535.);
 
 	    double p_y = y *0.7;
 	    if (y % 2 == 0) {
 		if (ito->second.first == "square"){
-		    ctx->rectangle( x*mStepX + 1 ,
+		    m_ctx->rectangle( x*mStepX + 1 ,
 				   p_y*mStepY + mStepY3 + 1 ,
 				   2*(mStepX2-1) ,
 				   mStepY7-mStepY3 - 2
 			);
-		    ctx->fill();
+		    m_ctx->fill();
 
 		}else{
 		    if (ito->second.first == "circle"){
-			ctx->arc(  x*mStepX  + mStepX2,
+			m_ctx->arc(  x*mStepX  + mStepX2,
 				  (p_y)*mStepY+(mStepY3+mStepY7)/2,
 				  mStepX2/2,
 				  0,
 				  2 * M_PI );
-			ctx->fill();
+			m_ctx->fill();
 		    }
 		}
 	    } else {
 		if (ito->second.first == "square"){
-		    ctx->rectangle( x*mStepX + mStepX2 +1,
+		    m_ctx->rectangle( x*mStepX + mStepX2 +1,
 				   p_y*mStepY + mStepY3 +1,
 				   2*(mStepX2-1) ,
 				   mStepY7-mStepY3 -2
 			);
-		    ctx->fill();
+		    m_ctx->fill();
 		}else{
 		    if (ito->second.first == "circle"){
-			ctx->arc(  (x+1)*mStepX ,
+			m_ctx->arc(  (x+1)*mStepX ,
 				  p_y*mStepY +(mStepY3+mStepY7)/2 ,
 				  mStepX2/2,
 				  0,
 				  2 * M_PI );
-			ctx->fill();
+			m_ctx->fill();
 		    }
 		}
 

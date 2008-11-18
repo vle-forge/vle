@@ -48,8 +48,7 @@ void Plugin::onExposeEvent(GdkEventExpose* /* event */)
 		Glib::Mutex::Lock lock(m_net->mutex());
 
 		m_ctx->save();
-		m_ctx->set_source(m_cairoplugin->context()->get_target(), 0.0,
-                                  0.0);
+                m_ctx->set_source(m_cairoplugin->stored(), 0.0, 0.0);
 		m_ctx->paint();
 		m_ctx->restore();
 

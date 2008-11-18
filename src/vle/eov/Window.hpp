@@ -72,6 +72,7 @@ namespace vle { namespace eov {
 	bool                        m_isinit;
         sigc::connection            m_connection;
         unsigned int                m_timeout;
+        bool                        m_median;
     };
 
 }} // namespace vle eov

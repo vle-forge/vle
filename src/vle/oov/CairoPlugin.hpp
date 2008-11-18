@@ -51,11 +51,26 @@ namespace vle { namespace oov {
          * a devs::DistantStreamWriter.
          */
         CairoPlugin(const std::string& location) :
-            Plugin(location)
+            Plugin(location),
+            m_need(false),
+            m_copydone(false)
         {}
 
+        /**
+         * @brief Nothing to delete.
+         */
         virtual ~CairoPlugin()
         {}
+
+        /**
+         * @brief Build the Cairo::Context and the Cairo::ImageSurface. The size
+         * of the images are taken from the preferredSize function.
+         */
+        void init();
+
+        ///
+        ////
+        ///
 
         /**
          * @brief Return true, CairoPlugin is a Cairo plugin.
@@ -95,30 +110,65 @@ namespace vle { namespace oov {
          */
         virtual void preferredSize(int& /* width */, int& /* height */) = 0;
 
-        /**
-         * @brief build a new context from the specified surface to the
-         * CairoPlugin.
-         * @param the surface to use with the context.
-         */
-        inline void setSurface(Cairo::RefPtr < Cairo::Surface > surf)
-        { m_ctx = Cairo::Context::create(surf); }
+        ///
+        ////
+        ///
 
         /**
-         * @brief Set a context to the CairoPlugin.
-         * @param ctx the new context to use.
+         * @brief Call this function to append an order to build new stored
+         * image.
          */
-        inline void setContext(Cairo::RefPtr < Cairo::Context > ctx)
-        { m_ctx = ctx; }
+        void needCopy()
+        { m_need = true; m_copydone = false; }
 
         /**
-         * @brief Retrieve the current context of the CairoPlugin.
-         * @return the current context.
+         * @brief Get the state of the image buffer copy.
+         * @return True if the
          */
-        inline Cairo::RefPtr < Cairo::Context > context() const
-        { return m_ctx; }
+        bool isCopyDone() const
+        { return m_copydone; }
+
+        /**
+         * @brief Get a reference to the latest image produce by this plugin.
+         * @return A reference to an ImageSurface.
+         */
+        Cairo::RefPtr < Cairo::ImageSurface > stored()
+        { return m_store; }
+
+        /**
+         * @brief Call this function to copy the drawing ImageSurface into the
+         * stored ImageSurface for the public API.
+         */
+        void copy();
+
+    protected:
+        /**
+         * @brief Context to draw onto the m_img ImageSurface.
+         */
+        Cairo::RefPtr < Cairo::Context > m_ctx;
+
+        /**
+         * @brief ImageSurface to draw.
+         */
+        Cairo::RefPtr < Cairo::ImageSurface > m_img;
+
+        /**
+         * @brief The public ImageSurface to show into eov or to write.
+         */
+        Cairo::RefPtr < Cairo::ImageSurface > m_store;
 
     private:
-        Cairo::RefPtr < Cairo::Context > m_ctx;
+        /**
+         * @brief A boolean to inform CairoPlugin to copy or not the
+         * ImageSurface into the stored ImageSurface.
+         */
+        bool m_need;
+
+        /**
+         * @brief A boolean to inform user that a new copy as been build and
+         * can be get with stored() function.
+         */
+        bool m_copydone;
     };
 
     /**

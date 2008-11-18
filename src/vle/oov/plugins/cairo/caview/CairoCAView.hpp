@@ -154,8 +154,6 @@ namespace vle { namespace oov { namespace plugin {
 
 	typedef std::map < std::string, std::vector < std::pair < int, int > > > object_type;
 	object_type mObjects;
-
-        Cairo::RefPtr < Cairo::ImageSurface > mImageSurface;
     };
 
     DECLARE_OOV_PLUGIN(oov::plugin::CairoCAView)
