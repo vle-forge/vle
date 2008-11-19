@@ -55,6 +55,17 @@ void SimpleFile::onParameter(const vpz::ParameterTrame& /* trame */)
 
 void SimpleFile::onNewObservable(const vpz::NewObservableTrame& trame)
 {
+    if (m_isstart) {
+        flush(utils::to_double(trame.time()));
+    } else {
+        if (m_time < .0) {
+            m_time = utils::to_double(trame.time());
+        } else {
+            flush(utils::to_double(trame.time()));
+            m_isstart = true;
+        }
+    }
+
     std::string name(buildname(trame.parent(), trame.name(), trame.port()));
 
     Assert(utils::InternalError, m_columns.find(name) == m_columns.end(),
