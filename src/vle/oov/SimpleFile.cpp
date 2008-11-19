@@ -63,8 +63,19 @@ void SimpleFile::onNewObservable(const std::string& simulator,
                                  const std::string& parent,
                                  const std::string& portname,
                                  const std::string& /* view */,
-                                 const double& /* time */)
+                                 const double& time)
 {
+    if (m_isstart) {
+        flush(time);
+    } else {
+        if (m_time < .0) {
+            m_time = time;
+        } else {
+            flush(time);
+            m_isstart = true;
+        }
+    }
+
     std::string name(buildname(parent, simulator, portname));
 
     Assert(utils::InternalError, m_columns.find(name) == m_columns.end(),
