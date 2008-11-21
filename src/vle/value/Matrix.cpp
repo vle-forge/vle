@@ -180,7 +180,7 @@ void Matrix::resize(size_type columns, size_type rows)
 
 void Matrix::addColumn()
 {
-    if (m_nbcol - 1 >= m_matrix.shape()[0]) {
+    if (m_nbcol + 1 >= m_matrix.shape()[0]) {
         m_matrix.resize(
             m_extents[m_matrix.shape()[0] + m_stepcol]
             [m_matrix.shape()[1]]);
