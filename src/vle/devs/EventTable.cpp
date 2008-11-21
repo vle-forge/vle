@@ -300,8 +300,10 @@ void EventTable::invalidateModel(Simulator* mdl)
     {
         InternalEventModel::iterator it = mInternalEventModel.find(mdl);
         if (it != mInternalEventModel.end()) {
-            if ((*it).second)
+            if ((*it).second) {
                 (*it).second->invalidate();
+                (*it).second = 0;
+            }
         }
     }
 
