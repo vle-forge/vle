@@ -32,7 +32,6 @@
 #include <vle/devs/RequestEventList.hpp>
 #include <vle/devs/EventList.hpp>
 #include <vle/devs/EventTable.hpp>
-#include <vle/devs/DevsTypes.hpp>
 #include <vle/graph/AtomicModel.hpp>
 
 namespace vle { namespace devs {

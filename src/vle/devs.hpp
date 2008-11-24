@@ -28,7 +28,6 @@
 
 #include <vle/devs/Attribute.hpp>
 #include <vle/devs/Coordinator.hpp>
-#include <vle/devs/DevsTypes.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/devs/DynamicsWrapper.hpp>
 #include <vle/devs/Event.hpp>

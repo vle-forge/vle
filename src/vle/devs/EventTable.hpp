@@ -31,7 +31,6 @@
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/devs/RequestEvent.hpp>
 #include <vle/devs/ObservationEvent.hpp>
-#include <vle/devs/DevsTypes.hpp>
 #include <vle/devs/EventList.hpp>
 #include <vle/devs/Simulator.hpp>
 #include <vle/devs/Dynamics.hpp>

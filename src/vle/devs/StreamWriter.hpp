@@ -28,7 +28,6 @@
 
 #include <vle/devs/View.hpp>
 #include <vle/devs/Time.hpp>
-#include <vle/devs/DevsTypes.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/oov/Plugin.hpp>
 #include <map>

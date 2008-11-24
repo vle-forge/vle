@@ -28,7 +28,6 @@
 
 #include <vle/devs/RootCoordinator.hpp>
 #include <vle/devs/Event.hpp>
-#include <vle/devs/DevsTypes.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/devs/EventList.hpp>
 #include <vle/devs/EventTable.hpp>
