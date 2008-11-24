@@ -371,6 +371,46 @@ namespace vle { namespace devs {
         inline bool haveAttributes() const
         { return m_attributes; }
 
+        ///
+        ////
+        ///
+
+        /**
+         * @brief A functor to use with std::for_each function to invalidate a
+         * specified models. For instance:
+         * @code
+         * InternalEventList l;
+         * ...
+         * Simulator* s = getModel(...);
+         * ...
+         * std::for_each(l.begin(), l.end(), Event::InvalidateModel(s));
+         * @endcode
+         */
+        struct InvalidateSimulator
+        {
+            Simulator* sim;
+
+            /**
+             * @brief Invalidate the event for a specified simulator.
+             * @param sim Simulator to invalidate events.
+             */
+            InvalidateSimulator(Simulator* sim)
+                : sim(sim)
+            {}
+
+            /**
+             * @brief Get an Event (InternalEvent, ObservationEvent) and
+             * invalidate it if the simulator equal the constructor speicified
+             * simulator.
+             */
+            void operator()(Event* evt)
+            {
+                if (evt and evt->getModel() == sim) {
+                    evt->invalidate();
+                }
+            };
+        };
+
     private:
         Event() :
             m_source(0),

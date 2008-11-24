@@ -68,12 +68,8 @@ void CompleteEventBagModel::invalidateModel(Simulator* mdl)
         it->second.clear();
     }
 
-    for (std::vector < ObservationEvent* >::iterator it = _states.begin();
-         it != _states.end(); ++it) {
-        if ((*it)->getModel() == mdl) {
-            (*it)->invalidate();
-        }
-    }
+    std::for_each(_states.begin(), _states.end(),
+                  Event::InvalidateSimulator(mdl));
 }
 
 void CompleteEventBagModel::delModel(Simulator* mdl)
@@ -314,14 +310,8 @@ void EventTable::invalidateModel(Simulator* mdl)
         }
     }
 
-    {
-        for (ObservationEventList::iterator it = mObservationEventList.begin();
-             it != mObservationEventList.end(); ++it) {
-            if  ((*it)->getModel() == mdl) {
-                (*it)->invalidate();
-            }
-        }
-    }
+    std::for_each(mObservationEventList.begin(), mObservationEventList.end(),
+                  Event::InvalidateSimulator(mdl));
 
     mCompleteEventBagModel.invalidateModel(mdl);
 }
@@ -346,14 +336,8 @@ void EventTable::delModelEvents(Simulator* mdl)
         }
     }
 
-    {
-        for (ObservationEventList::iterator it = mObservationEventList.begin();
-             it != mObservationEventList.end(); ++it) {
-            if  ((*it)->getModel() == mdl) {
-                (*it)->invalidate();
-            }
-        }
-    }
+    std::for_each(mObservationEventList.begin(), mObservationEventList.end(),
+                  Event::InvalidateSimulator(mdl));
 
     mCompleteEventBagModel.delModel(mdl);
 }
