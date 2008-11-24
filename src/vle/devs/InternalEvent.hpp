@@ -85,6 +85,11 @@ namespace vle { namespace devs {
         Time        m_time;
     };
 
+    /**
+     * @brief Define a vector of pionter of InternalEvent.
+     */
+    typedef std::vector < InternalEvent* > InternalEventList;
+
 }} // namespace vle devs
 
 #endif

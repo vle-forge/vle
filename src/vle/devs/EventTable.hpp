@@ -221,9 +221,6 @@ namespace vle { namespace devs {
         inline void popBag()
         { _bags.erase(_bags.begin()); }
 
-        inline void popState()
-        { _states.pop_front(); }
-
         inline void popStates()
         { _states.clear(); }
 
@@ -252,7 +249,7 @@ namespace vle { namespace devs {
         std::list < std::map < Simulator*, EventBagModel >::value_type* > _exec;
         std::list < std::map < Simulator*, EventBagModel >::value_type* >::iterator _itexec;
     
-        std::deque < ObservationEvent* >                    _states;
+        ObservationEventList _states;
     };
 
     ///////////////////////////////////////////////////////////////////////////

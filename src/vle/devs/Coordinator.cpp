@@ -341,6 +341,11 @@ void Coordinator::delAtomicModel(graph::CoupledModel* parent,
     m_eventTable.invalidateModel(satom);
     satom->clear();
     m_deletedSimulator.push_back(satom);
+
+    std::for_each(m_obsEventBuffer.begin(), m_obsEventBuffer.end(),
+                  Event::InvalidateSimulator(satom));
+
+    ++m_toDelete;
 }
 
 void Coordinator::delCoupledModel(graph::CoupledModel* parent,

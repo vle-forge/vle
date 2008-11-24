@@ -27,6 +27,7 @@
 #define DEVS_OBSERVATION_EVENT_HPP
 
 #include <vle/devs/Event.hpp>
+#include <vector>
 
 namespace vle { namespace devs {
 
@@ -116,6 +117,11 @@ namespace vle { namespace devs {
         return o << "from: '" << evt.getViewName()
             << "' port: '" << evt.getPortName() << "'";
     }
+
+    /**
+     * @brief Define a vector pointer of ObservationEvent.
+     */
+    typedef std::vector < ObservationEvent* > ObservationEventList;
 
 }} // namespace vle devs
 
