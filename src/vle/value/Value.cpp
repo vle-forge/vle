@@ -260,27 +260,27 @@ void init()
     value::Pools::init();
 
     boost::serialization::void_cast_register(
-        static_cast<Boolean*>(NULL), static_cast<Value*>(NULL));
+        static_cast<Boolean*>(0), static_cast<Value*>(0));
     boost::serialization::void_cast_register(
-        static_cast<Double*>(NULL), static_cast<Value*>(NULL));
+        static_cast<Double*>(0), static_cast<Value*>(0));
     boost::serialization::void_cast_register(
-        static_cast<Map*>(NULL), static_cast<Value*>(NULL));
+        static_cast<Map*>(0), static_cast<Value*>(0));
     boost::serialization::void_cast_register(
-        static_cast<Integer*>(NULL), static_cast<Value*>(NULL));
+        static_cast<Integer*>(0), static_cast<Value*>(0));
     boost::serialization::void_cast_register(
-        static_cast<String*>(NULL), static_cast<Value*>(NULL));
+        static_cast<String*>(0), static_cast<Value*>(0));
     boost::serialization::void_cast_register(
-        static_cast<Set*>(NULL), static_cast<Value*>(NULL));
+        static_cast<Set*>(0), static_cast<Value*>(0));
     boost::serialization::void_cast_register(
-        static_cast<Tuple*>(NULL), static_cast<Value*>(NULL));
+        static_cast<Tuple*>(0), static_cast<Value*>(0));
     boost::serialization::void_cast_register(
-        static_cast<Table*>(NULL), static_cast<Value*>(NULL));
+        static_cast<Table*>(0), static_cast<Value*>(0));
     boost::serialization::void_cast_register(
-        static_cast<Xml*>(NULL), static_cast<Value*>(NULL));
+        static_cast<Xml*>(0), static_cast<Value*>(0));
     boost::serialization::void_cast_register(
-        static_cast<Null*>(NULL), static_cast<Value*>(NULL));
+        static_cast<Null*>(0), static_cast<Value*>(0));
     boost::serialization::void_cast_register(
-        static_cast<Matrix*>(NULL), static_cast<Value*>(NULL));
+        static_cast<Matrix*>(0), static_cast<Value*>(0));
 }
 
 void finalize()

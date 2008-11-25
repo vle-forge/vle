@@ -29,7 +29,6 @@
 #include <vle/value/Value.hpp>
 #include <map>
 #include <boost/serialization/map.hpp>
-#include <boost/serialization/export.hpp>
 
 namespace vle { namespace value {
 
@@ -392,18 +391,6 @@ namespace vle { namespace value {
 	template < class Archive >
 	    void serialize(Archive& ar, const unsigned int /* version */)
 	    {
-		ar.register_type(static_cast<Boolean*>(NULL));
-		ar.register_type(static_cast<Integer*>(NULL));
-		ar.register_type(static_cast<Double*>(NULL));
-		ar.register_type(static_cast<String*>(NULL));
-		ar.register_type(static_cast<Set*>(NULL));
-		ar.register_type(static_cast<Map*>(NULL));
-		ar.register_type(static_cast<Tuple*>(NULL));
-		ar.register_type(static_cast<Table*>(NULL));
-		ar.register_type(static_cast<Xml*>(NULL));
-		ar.register_type(static_cast<Null*>(NULL));
-		ar.register_type(static_cast<Matrix*>(NULL));
-
 		ar & boost::serialization::base_object < Value >(*this);
 		ar & m_value;
 	    }

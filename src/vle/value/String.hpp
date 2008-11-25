@@ -28,7 +28,6 @@
 
 #include <vle/value/Value.hpp>
 #include <boost/serialization/string.hpp>
-#include <boost/serialization/export.hpp>
 
 namespace vle { namespace value {
 

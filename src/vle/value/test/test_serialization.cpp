@@ -36,17 +36,16 @@
 #include <limits>
 #include <fstream>
 #include <sstream>
-#include <iostream>
 #include <functional>
 #include <vle/value.hpp>
 #include <vle/utils.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/archive/binary_oarchive.hpp>
 
 using namespace vle;
 
 BOOST_AUTO_TEST_CASE(check_tuple_serialization)
 {
+    value::init();
+
     std::string save;
 
     {
@@ -58,6 +57,7 @@ BOOST_AUTO_TEST_CASE(check_tuple_serialization)
 
         std::ostringstream out;
         boost::archive::text_oarchive oa(out);
+        value::Value::registerValues(oa);
         oa << (const value::Tuple&)mp;
         save = out.str();
     }
@@ -67,6 +67,7 @@ BOOST_AUTO_TEST_CASE(check_tuple_serialization)
 
         std::istringstream in(save);
         boost::archive::text_iarchive ia(in);
+        value::Value::registerValues(ia);
         ia >> (value::Tuple&)mp;
 
         BOOST_REQUIRE_EQUAL(mp.size(), (value::Tuple::size_type)100);
@@ -75,10 +76,14 @@ BOOST_AUTO_TEST_CASE(check_tuple_serialization)
             BOOST_REQUIRE_EQUAL(mp[(int)i], (double)i);
         }
     }
+
+    value::finalize();
 }
 
 BOOST_AUTO_TEST_CASE(check_table_serialization)
 {
+    value::init();
+
     std::string save;
 
     {
@@ -93,6 +98,7 @@ BOOST_AUTO_TEST_CASE(check_table_serialization)
 
         std::ostringstream out;
         boost::archive::text_oarchive oa(out);
+        value::Value::registerValues(oa);
         oa << (const value::Table&)mp;
         save = out.str();
     }
@@ -102,6 +108,7 @@ BOOST_AUTO_TEST_CASE(check_table_serialization)
 
         std::istringstream in(save);
         boost::archive::text_iarchive ia(in);
+        value::Value::registerValues(ia);
         ia >> (value::Table&)mp;
 
         BOOST_REQUIRE_EQUAL(mp.width(), (value::Table::size_type)10);
@@ -116,10 +123,14 @@ BOOST_AUTO_TEST_CASE(check_table_serialization)
             }
         }
     }
+
+    value::finalize();
 }
 
 BOOST_AUTO_TEST_CASE(check_map_serialization)
 {
+    value::init();
+
     std::string save;
 
     {
@@ -132,6 +143,7 @@ BOOST_AUTO_TEST_CASE(check_map_serialization)
 
         std::ostringstream out;
         boost::archive::text_oarchive oa(out);
+        value::Value::registerValues(oa);
         oa << (const value::Map&)*mp;
         save = out.str();
 
@@ -143,6 +155,7 @@ BOOST_AUTO_TEST_CASE(check_map_serialization)
 
         std::istringstream in(save);
         boost::archive::text_iarchive ia(in);
+        value::Value::registerValues(ia);
         ia >> (value::Map&)*mp;
 
         BOOST_REQUIRE_EQUAL(mp->getBoolean("boolean"), true);
@@ -153,10 +166,14 @@ BOOST_AUTO_TEST_CASE(check_map_serialization)
 
         delete mp;
     }
+
+    value::finalize();
 }
 
 BOOST_AUTO_TEST_CASE(check_set_serialization)
 {
+    value::init();
+
     std::string save;
 
     {
@@ -170,6 +187,7 @@ BOOST_AUTO_TEST_CASE(check_set_serialization)
 
         std::ostringstream out;
         boost::archive::text_oarchive oa(out);
+        value::Value::registerValues(oa);
         oa << (const value::Set&)*st;
         save = out.str();
 
@@ -181,6 +199,7 @@ BOOST_AUTO_TEST_CASE(check_set_serialization)
 
         std::istringstream in(save);
         boost::archive::text_iarchive ia(in);
+        value::Value::registerValues(ia);
         ia >> (value::Set&)*st;
 
         BOOST_REQUIRE_EQUAL(st->size(), (value::Set::size_type)6);
@@ -199,10 +218,14 @@ BOOST_AUTO_TEST_CASE(check_set_serialization)
 
         delete st;
     }
+
+    value::finalize();
 }
 
 BOOST_AUTO_TEST_CASE(check_matrix_serialization)
 {
+    value::init();
+
     std::string save;
 
     {
@@ -213,6 +236,7 @@ BOOST_AUTO_TEST_CASE(check_matrix_serialization)
 
         std::ostringstream out;
         boost::archive::text_oarchive oa(out);
+        value::Value::registerValues(oa);
         oa << (const value::Matrix&)*mx;
         save = out.str();
 
@@ -224,6 +248,7 @@ BOOST_AUTO_TEST_CASE(check_matrix_serialization)
 
         std::istringstream in(save);
         boost::archive::text_iarchive ia(in);
+        value::Value::registerValues(ia);
         ia >> (value::Matrix&)*mx;
 
         BOOST_REQUIRE_EQUAL(mx->rows(), (value::Matrix::size_type)1);
@@ -234,10 +259,14 @@ BOOST_AUTO_TEST_CASE(check_matrix_serialization)
 
         delete mx;
     }
+
+    value::finalize();
 }
 
 BOOST_AUTO_TEST_CASE(check_composite1_serialization)
 {
+    value::init();
+
     std::string save;
 
     {
@@ -258,6 +287,7 @@ BOOST_AUTO_TEST_CASE(check_composite1_serialization)
 
         std::ostringstream out;
         boost::archive::text_oarchive oa(out);
+        value::Value::registerValues(oa);
         oa << (const value::Map&)mp;
         save = out.str();
     }
@@ -267,6 +297,7 @@ BOOST_AUTO_TEST_CASE(check_composite1_serialization)
 
         std::istringstream in(save);
         boost::archive::text_iarchive ia(in);
+        value::Value::registerValues(ia);
         ia >> (value::Map&)mp;
 
         BOOST_REQUIRE_EQUAL(mp.getString("test-1"), "test 1");
@@ -282,10 +313,14 @@ BOOST_AUTO_TEST_CASE(check_composite1_serialization)
         BOOST_REQUIRE_EQUAL(st.getString(2), "test 7");
         BOOST_REQUIRE_EQUAL(st.getString(3), "test 8");
     }
+
+    value::finalize();
 }
 
 BOOST_AUTO_TEST_CASE(check_composite2_serialization)
 {
+    value::init();
+
     std::string save;
 
     {
@@ -299,19 +334,19 @@ BOOST_AUTO_TEST_CASE(check_composite2_serialization)
 
         std::ostringstream out(std::ostringstream::binary);
         boost::archive::binary_oarchive oa(out);
+        value::Value::registerValues(oa);
         oa << (const value::Set&)*st;
         save = out.str();
 
         delete st;
     }
 
-    std::cout << "save: [" << save << "]\n";
-
     {
         value::Set* st = value::Set::create();
 
         std::istringstream in(save, std::istringstream::binary);
         boost::archive::binary_iarchive ia(in);
+        value::Value::registerValues(ia);
         ia >> (value::Set&)*st;
 
         BOOST_REQUIRE_EQUAL(st->size(), (value::Set::size_type)6);
@@ -330,4 +365,72 @@ BOOST_AUTO_TEST_CASE(check_composite2_serialization)
 
         delete st;
     }
+
+    value::finalize();
+}
+
+BOOST_AUTO_TEST_CASE(check_serialize_deserialize)
+{
+    value::init();
+
+    std::string buffer;
+
+    for (int i = 0; i < 10; ++i) {
+        {
+            value::Set* st = new value::Set;
+            value::Map* mp = new value::Map;
+            mp->addString("test", "test");
+            mp->addDouble("toto", 123.321);
+            mp->addBoolean("tutu", true);
+
+            st->add(mp);
+            st->add(new value::String("test"));
+
+            value::Set::serializeBinaryBuffer(*st, buffer);
+            delete st;
+        }
+
+        {
+            value::Set* st = new value::Set;
+            value::Set::deserializeBinaryBuffer(*st, buffer);
+
+            BOOST_REQUIRE_EQUAL(st->size(), (value::Set::size_type)2);
+            delete st;
+        }
+    }
+
+    value::finalize();
+}
+
+BOOST_AUTO_TEST_CASE(check_serialize_deserialize2)
+{
+    value::init();
+
+    std::string buffer;
+
+    for (int i = 0; i < 10; ++i) {
+        {
+            value::Set* st = new value::Set;
+            value::Map* mp = new value::Map;
+            mp->addString("test", "test");
+            mp->addDouble("toto", 123.321);
+            mp->addBoolean("tutu", true);
+
+            st->add(mp);
+            st->add(new value::String("test"));
+
+            value::Set::serializeBinaryBuffer(*st, buffer);
+            delete st;
+        }
+
+        {
+            value::Set* st = new value::Set;
+            value::Set::deserializeBinaryBuffer(*st, buffer);
+
+            BOOST_REQUIRE_EQUAL(st->size(), (value::Set::size_type)2);
+            delete st;
+        }
+    }
+
+    value::finalize();
 }

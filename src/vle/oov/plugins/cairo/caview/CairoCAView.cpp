@@ -45,12 +45,14 @@ CairoCAView::CairoCAView(const std::string& location) :
     mWindowHeight(405),
     mTime(-1.0),
     mReceiveCell(0),
-    mReceiveObject(0)
+    mReceiveObject(0),
+    mValues(0)
 {
 }
 
 CairoCAView::~CairoCAView()
 {
+    delete mValues;
 }
 
 void CairoCAView::onParameter(const std::string& /* plugin */,

@@ -28,17 +28,12 @@
 
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Pool.hpp>
-#include <ostream>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/utility.hpp>
-#include <boost/version.hpp>
-#if BOOST_VERSION > 103500
-#include <boost/serialization/assume_abstract.hpp>
-#endif
 
 namespace vle { namespace value {
 
@@ -141,7 +136,7 @@ namespace vle { namespace value {
          * @param size The size of the memory.
          */
         inline static void operator delete(void* deletable, size_t size)
-        { if (deletable) { Pools::pools().deallocate(deletable, size); } }
+        { Pools::pools().deallocate(deletable, size); }
 
         ///
         ////
@@ -167,36 +162,49 @@ namespace vle { namespace value {
 	 */
 	virtual ~Value() {}
 
+        ///
+        //// Abstract functions
+        ///
+
 	/**
 	 * @brief Pure virtual clone function.
 	 * @return Clone of instantiate object.
 	 */
-	virtual Value* clone() const = 0;
+        virtual Value* clone() const
+        { throw utils::InternalError(); }
 
 	/**
 	 * @brief Transform value into a simple std::string for text file.
 	 * @return std::string representation of Value.
 	 */
-	virtual void writeFile(std::ostream& out) const = 0;
+	virtual void writeFile(std::ostream& /* out */) const
+        { throw utils::InternalError(); }
 
 	/**
 	 * @brief Transform value into a simple std::string.
 	 * @return std::string representation of Value.
 	 */
-	virtual void writeString(std::ostream& out) const = 0;
+	virtual void writeString(std::ostream& /* out */) const
+        { throw utils::InternalError(); }
 
 	/**
 	 * @brief Transform value into XML structure.
 	 * @return std::string representation of XML structure of Value.
 	 */
-	virtual void writeXml(std::ostream& out) const = 0;
+	virtual void writeXml(std::ostream& /* out */) const
+        { throw utils::InternalError(); }
 
 	/**
 	 * @brief Return the type of value. The type is one of the 'type'
 	 * enumeration ie. BOOL, INTEGER, DOUBLE, STRING, SET, MAP.
 	 * @return the type of value object.
 	 */
-	virtual Value::type getType() const = 0;
+	virtual Value::type getType() const
+        { throw utils::InternalError(); }
+
+        ///
+        ////
+        ///
 
         /**
          * @brief Build a file representation of this class. This function
@@ -295,16 +303,39 @@ namespace vle { namespace value {
         friend std::ostream& operator<<(std::ostream& out, const Value& obj)
         { obj.writeString(out); return out; }
 
+	friend class boost::serialization::access;
+
 	/**
 	 * @brief Boost serialization operator to permit a text, xml or binary
 	 * stream of the value value.
 	 * @param ar The archive where writting the values.
 	 * @param version The version of the serialization.
 	 */
-	friend class boost::serialization::access;
 	template < class Archive >
 	    void serialize(Archive& /* ar */, const unsigned int /* version */)
 	    {}
+
+        /**
+         * @brief Register the vle::Values for the specified boost::archive. Use
+         * it to allow writing null pointer into value::Set, value::Map or
+         * value::Matrix.
+         * @param ar The archive to register value::Value types.
+         */
+        template < class Archive >
+            static void registerValues(Archive& ar)
+            {
+                ar.register_type(static_cast < Boolean* > (0));
+                ar.register_type(static_cast < Integer* > (0));
+                ar.register_type(static_cast < Double* > (0));
+                ar.register_type(static_cast < String* > (0));
+                ar.register_type(static_cast < Set* > (0));
+                ar.register_type(static_cast < Map* > (0));
+                ar.register_type(static_cast < Tuple* > (0));
+                ar.register_type(static_cast < Table* > (0));
+                ar.register_type(static_cast < Xml* > (0));
+                ar.register_type(static_cast < Null* > (0));
+                ar.register_type(static_cast < Matrix* > (0));
+            }
 
     private:
         Value& operator=(const Value& /* value */) { return *this; }
@@ -394,15 +425,5 @@ namespace vle { namespace value {
     void finalize();
 
 }} // namespace vle
-
-/*
- * Macro used to define the Value class as an abstract class for the
- * boost::serialization library.
- */
-#if BOOST_VERSION <= 103500
-BOOST_IS_ABSTRACT(vle::value::Value)
-#else
-BOOST_SERIALIZATION_ASSUME_ABSTRACT(vle::value::Value)
-#endif
 
 #endif

@@ -35,6 +35,8 @@
 #include <vle/value/Deleter.hpp>
 #include <vle/utils/Debug.hpp>
 #include <boost/utility.hpp>
+#include <fstream>
+#include <sstream>
 
 namespace vle { namespace value {
 
@@ -235,7 +237,97 @@ void Set::clear()
     m_value.clear();
 }
 
-}} // namespace vle value
+void Set::serializeTxtFile(const Set& set, const std::string& filename)
+{
+    std::ofstream out(filename.c_str());
+    Assert(utils::InternalError, out.is_open(), boost::format(
+            "serialize error: can not open file %1%") % filename);
 
-BOOST_CLASS_EXPORT(vle::value::Set)
+    boost::archive::text_oarchive oa(out);
+    value::Value::registerValues(oa);
+
+    oa << (const value::Set&)set;
+}
+
+void Set::serializeTxtBuffer(const Set& set, std::string& buffer)
+{
+    std::ostringstream out;
+
+    boost::archive::text_oarchive oa(out);
+    value::Value::registerValues(oa);
+
+    oa << (const value::Set&)set;
+
+    buffer = out.str();
+}
+
+void Set::serializeBinaryFile(const Set& set, const std::string& filename)
+{
+    std::ofstream out(filename.c_str(), std::ofstream::binary);
+    Assert(utils::InternalError, out.is_open(), boost::format(
+            "serialize error: can not open file %1%") % filename);
+
+    boost::archive::text_oarchive oa(out);
+    value::Value::registerValues(oa);
+
+    oa << (const value::Set&)set;
+}
+
+void Set::serializeBinaryBuffer(const Set& set, std::string& buffer)
+{
+    std::ostringstream out(std::ostringstream::binary);
+
+    boost::archive::text_oarchive oa(out);
+    value::Value::registerValues(oa);
+
+    oa << (const value::Set&)set;
+
+    buffer = out.str();
+}
+
+void Set::deserializeTxtFile(Set& set, const std::string& filename)
+{
+    std::ifstream out(filename.c_str());
+    Assert(utils::InternalError, out.is_open(), boost::format(
+            "deserialize error: can not open file %1%") % filename);
+
+    boost::archive::text_iarchive ia(out);
+    value::Value::registerValues(ia);
+
+    ia >> (value::Set&)set;
+}
+
+void Set::deserializeTxtBuffer(Set& set, const std::string& buffer)
+{
+    std::istringstream out(buffer);
+
+    boost::archive::text_iarchive ia(out);
+    value::Value::registerValues(ia);
+
+    ia >> (value::Set&)set;
+}
+
+void Set::deserializeBinaryFile(Set& set, const std::string& filename)
+{
+    std::ifstream out(filename.c_str(), std::ifstream::binary);
+    Assert(utils::InternalError, out.is_open(), boost::format(
+            "deserialize error: can not open file %1%") % filename);
+
+    boost::archive::text_iarchive ia(out);
+    value::Value::registerValues(ia);
+
+    ia >> (value::Set&)set;
+}
+
+void Set::deserializeBinaryBuffer(Set& set, const std::string& buffer)
+{
+    std::istringstream out(buffer, std::istringstream::binary);
+
+    boost::archive::text_iarchive ia(out);
+    value::Value::registerValues(ia);
+
+    ia >> (value::Set&)set;
+}
+
+}} // namespace vle value
 

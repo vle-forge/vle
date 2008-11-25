@@ -84,7 +84,15 @@ namespace vle { namespace utils {
         {
             assert(size < m_pools.size());
             if (deletable) {
-                m_pools[size]->free(deletable);
+                if (not m_pools[size]) {
+                    ::operator delete(deletable);
+                } else {
+                    if (m_pools[size]->is_from(deletable)) {
+                        m_pools[size]->free(deletable);
+                    } else {
+                        ::operator delete(deletable);
+                    }
+                }
             }
         }
 

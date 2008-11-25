@@ -30,9 +30,6 @@
 #include <vle/value.hpp>
 #include <vle/utils/Debug.hpp>
 #include <boost/format.hpp>
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/export.hpp>
-#include <boost/archive/binary_iarchive.hpp>
 #include <config.h>
 
 #ifdef HAVE_CAIRO
@@ -49,31 +46,6 @@ NetStreamReader::NetStreamReader(int port) :
 {
     setBufferSize(4096);
     TraceAlways(boost::format("Build a NetStreamReader on port %1%") % port);
-
-    // TODO: why segfault without this... Very very strange.
-    value::Map* m = new value::Map;
-    value::Set* s = new value::Set;
-    value::Integer* i = new value::Integer;
-    value::Double* d = new value::Double;
-    value::Boolean* b = new value::Boolean;
-    value::String* s2 = new value::String;
-    value::Xml* x = new value::Xml;
-    value::Null* n = new value::Null;
-    value::Table* t = new value::Table;
-    value::Tuple* t2 = new value::Tuple;
-    value::Matrix* m2 = new value::Matrix;
-
-    delete m;
-    delete s;
-    delete i;
-    delete d;
-    delete b;
-    delete s2;
-    delete x;
-    delete n;
-    delete t;
-    delete t2;
-    delete m2;
 }
 
 NetStreamReader::~NetStreamReader()
@@ -112,11 +84,8 @@ void NetStreamReader::readConnection()
 
             m_buffer = m_server->recv_buffer("vle", val);
 
-            std::istringstream in(m_buffer, std::istringstream::binary);
-            boost::archive::binary_iarchive ia(in);
             value::Set frame;
-            ia >> (value::Set&)frame;
-
+            value::Set::deserializeBinaryBuffer(frame, m_buffer);
             stop = dispatch(frame);
         } catch (const std::exception& e) {
             Throw(utils::InternalError, boost::format(
@@ -223,14 +192,13 @@ void NetStreamReader::serializePlugin()
         vals->add(value::String::create(plugin()->name()));
         vals->add(plugin()->serialize());
 
-        std::ostringstream out(std::ostringstream::binary);
-        boost::archive::binary_oarchive oa(out);
-        oa << (const value::Set&)*vals;
+        std::string out;
+        value::Set::serializeBinaryBuffer(*vals, out);
         delete vals;
 
-        m_server->send_int("vle", out.str().size());
+        m_server->send_int("vle", out.size());
         m_server->recv_string("vle");
-        m_server->send_buffer("vle", out.str());
+        m_server->send_buffer("vle", out);
         m_server->recv_string("vle");
     } else {
         m_server->send_buffer("vle", "no");

@@ -116,5 +116,3 @@ void Table::fill(const std::string& str)
 
 }} // namespace vle value
 
-BOOST_CLASS_EXPORT(vle::value::Table)
-

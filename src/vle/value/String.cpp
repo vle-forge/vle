@@ -44,5 +44,3 @@ void String::writeXml(std::ostream& out) const
 
 }} // namespace vle value
 
-BOOST_CLASS_EXPORT(vle::value::String)
-

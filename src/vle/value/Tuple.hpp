@@ -30,7 +30,6 @@
 #include <boost/pool/pool_alloc.hpp>
 #include <vector>
 #include <boost/serialization/vector.hpp>
-#include <boost/serialization/export.hpp>
 
 namespace vle { namespace value {
 

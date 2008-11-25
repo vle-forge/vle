@@ -96,4 +96,3 @@ void Tuple::fill(const std::string& str)
 
 }} // namespace vle value
 
-BOOST_CLASS_EXPORT(vle::value::Tuple)

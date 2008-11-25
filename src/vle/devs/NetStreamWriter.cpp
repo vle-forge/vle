@@ -31,9 +31,6 @@
 #include <vle/value.hpp>
 #include <vle/oov/PluginFactory.hpp>
 #include <string>
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/export.hpp>
-#include <boost/archive/binary_oarchive.hpp>
 
 
 namespace vle { namespace devs {
@@ -66,7 +63,7 @@ void NetStreamWriter::open(const std::string& plugin,
                            const std::string& parameters,
                            const devs::Time& time)
 {
-    std::string host, directory;
+    std::string host, directory, out;
     int port;
 
     try {
@@ -77,12 +74,10 @@ void NetStreamWriter::open(const std::string& plugin,
 
         buildParameters(plugin, directory, file, parameters, time.getValue());
 
-        std::ostringstream out(std::ostringstream::binary);
-        boost::archive::binary_oarchive oa(out);
-        oa << (const value::Set&)*m_paramFrame;
+        value::Set::serializeBinaryBuffer(*m_paramFrame, out);
 
-        m_client->send_int(out.str().size());
-        m_client->send_buffer(out.str());
+        m_client->send_int(out.size());
+        m_client->send_buffer(out);
     } catch(const std::exception& e) {
         Throw(utils::InternalError, boost::format(
                 "NetStreamWriter open: error opening the client connection "
@@ -100,13 +95,12 @@ void NetStreamWriter::processNewObservable(Simulator* simulator,
     buildNewObs(simulator->getName(), simulator->getParent(), portname, view,
                 time.getValue());
 
-    std::ostringstream out(std::ostringstream::binary);
-    boost::archive::binary_oarchive oa(out);
-    oa << (const value::Set&)*m_newObsFrame;
+    std::string out;
+    value::Set::serializeBinaryBuffer(*m_newObsFrame, out);
 
     try {
-        m_client->send_int(out.str().size());
-        m_client->send_buffer(out.str());
+        m_client->send_int(out.size());
+        m_client->send_buffer(out);
     } catch(const std::exception& e) {
         Throw(utils::InternalError, boost::format(
                 "NetStreamWriter new observable: error writing new observable. "
@@ -122,13 +116,12 @@ void NetStreamWriter::processRemoveObservable(Simulator* simulator,
     buildDelObs(simulator->getName(), simulator->getParent(), portname, view,
                 time.getValue());
 
-    std::ostringstream out(std::ostringstream::binary);
-    boost::archive::binary_oarchive oa(out);
-    oa << (const value::Set&)*m_delObsFrame;
+    std::string out;
+    value::Set::serializeBinaryBuffer(*m_delObsFrame, out);
 
     try {
-        m_client->send_int(out.str().size());
-        m_client->send_buffer(out.str());
+        m_client->send_int(out.size());
+        m_client->send_buffer(out);
     } catch(const std::exception& e) {
         Throw(utils::InternalError, boost::format(
                 "NetStreamWriter delete observable: error writing new"
@@ -153,13 +146,12 @@ void NetStreamWriter::process(ObservationEvent& event)
                event.getPortName(), event.getViewName(),
                event.getTime().getValue(), val);
 
-    std::ostringstream out(std::ostringstream::binary);
-    boost::archive::binary_oarchive oa(out);
-    oa << (const value::Set&)*m_valueFrame;
+    std::string out;
+    value::Set::serializeBinaryBuffer(*m_valueFrame, out);
 
     try {
-        m_client->send_int(out.str().size());
-        m_client->send_buffer(out.str());
+        m_client->send_int(out.size());
+        m_client->send_buffer(out);
     } catch(const std::exception& e) {
         Throw(utils::InternalError, boost::format(
                 "NetStreamWriter process state event: error writing a state"
@@ -171,13 +163,12 @@ oov::PluginPtr NetStreamWriter::close(const devs::Time& time)
 {
     buildClose(time.getValue());
 
-    std::ostringstream out(std::ostringstream::binary);
-    boost::archive::binary_oarchive oa(out);
-    oa << (const value::Set&)*m_closeFrame;
+    std::string out;
+    value::Set::serializeBinaryBuffer(*m_closeFrame, out);
 
     try {
-        m_client->send_int(out.str().size());
-        m_client->send_buffer(out.str());
+        m_client->send_int(out.size());
+        m_client->send_buffer(out);
 
         oov::PluginPtr plugin = getPlugin();
 
@@ -196,15 +187,14 @@ oov::PluginPtr NetStreamWriter::refreshPlugin()
 {
     buildRefresh();
 
-    std::ostringstream out(std::ostringstream::binary);
-    boost::archive::binary_oarchive oa(out);
-    oa << (const value::Set&)*m_refreshFrame;
+    std::string out;
+    value::Set::serializeBinaryBuffer(*m_refreshFrame, out);
 
     try {
         oov::PluginPtr plugin;
         if (m_client) {
-            m_client->send_int(out.str().size());
-            m_client->send_buffer(out.str());
+            m_client->send_int(out.size());
+            m_client->send_buffer(out);
             plugin = getPlugin();
         }
         return plugin;
@@ -227,10 +217,8 @@ oov::PluginPtr NetStreamWriter::getPlugin() const
         result = m_client->recv_buffer(sz);
         m_client->send_buffer("ok");
 
-        std::istringstream in(result, std::istringstream::binary);
-        boost::archive::binary_iarchive ia(in);
         value::Set vals;
-        ia >> (value::Set&)vals;
+        value::Set::deserializeBinaryBuffer(vals, result);
 
         const std::string& name(vals.get(0).toString().value());
 

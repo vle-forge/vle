@@ -240,5 +240,3 @@ void Matrix::moveLastCell()
 
 }} // namespace vle value
 
-BOOST_CLASS_EXPORT(vle::value::Matrix)
-
