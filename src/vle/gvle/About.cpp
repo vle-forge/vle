@@ -24,7 +24,7 @@
 
 
 #include <vle/gvle/About.hpp>
-#include "config.h"
+#include <vle/version.hpp>
 
 namespace vle { namespace gvle {
 

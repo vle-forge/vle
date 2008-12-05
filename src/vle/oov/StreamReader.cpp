@@ -29,9 +29,9 @@
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/value/String.hpp>
-#include <config.h>
+#include <vle/version.hpp>
 
-#ifdef HAVE_CAIRO
+#ifdef VLE_HAVE_CAIRO
 #   include <vle/oov/CairoPlugin.hpp>
 #endif
 
@@ -75,7 +75,7 @@ void StreamReader::onParameter(const std::string& pluginname,
 {
     initPlugin(pluginname, location);
 
-#ifdef HAVE_CAIRO
+#ifdef VLE_HAVE_CAIRO
     /*
      * For cairo plug-ins, we build the cairo graphics context via the
      * CairoPlugin::init function.

@@ -26,7 +26,7 @@
 #include <vle/vpz/Vpz.hpp>
 #include <vle/utils/Debug.hpp>
 #include <fstream>
-#include <config.h>
+#include <vle/version.hpp>
 
 namespace vle { namespace vpz {
 

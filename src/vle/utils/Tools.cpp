@@ -28,7 +28,7 @@
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Socket.hpp>
 #include <vle/utils/Path.hpp>
-#include <config.h>
+#include <vle/version.hpp>
 
 #include <glibconfig.h>
 #include <glibmm/markup.h>
@@ -50,15 +50,15 @@
 #include <io.h>
 #endif
 
-#ifdef HAVE_EXECINFO_H
+#ifdef VLE_HAVE_EXECINFO_H
 #include <execinfo.h>
 #endif
 
-#ifdef HAVE_SIGNAL_H
+#ifdef VLE_HAVE_SIGNAL_H
 #include <signal.h>
 #endif
 
-#ifdef HAVE_GCC_ABI_DEMANGLE
+#ifdef VLE_HAVE_GCC_ABI_DEMANGLE
 #include <cxxabi.h>
 #endif
 
@@ -135,7 +135,7 @@ bool is_vle_string(const Glib::ustring& str)
 Glib::ustring print_trace_report()
 {
     Glib::ustring msg;
-#ifdef HAVE_EXECINFO_H
+#ifdef VLE_HAVE_EXECINFO_H
     if (Trace::trace().isInLevel(Trace::IMPORTANT)) {
         const int size_buffer = 255;
         void* array[size_buffer];
@@ -182,7 +182,7 @@ void print_trace_signals(int signal_number)
 
 void install_signal()
 {
-#ifdef HAVE_SIGNAL_H
+#ifdef VLE_HAVE_SIGNAL_H
 #ifdef G_OS_UNIX
     //if (utils::Trace::trace().get_level() != 3) {
     signal(SIGILL, print_trace_signals);
@@ -196,7 +196,7 @@ void install_signal()
 std::string demangle(const std::type_info& in)
 {
     std::string result;
-#ifdef HAVE_GCC_ABI_DEMANGLE
+#ifdef VLE_HAVE_GCC_ABI_DEMANGLE
     result.assign(utils::demangle(in.name()));
 #else
     result.assign(in.name());
@@ -207,7 +207,7 @@ std::string demangle(const std::type_info& in)
 std::string demangle(const std::string& in)
 {
     std::string result;
-#ifdef HAVE_GCC_ABI_DEMANGLE
+#ifdef VLE_HAVE_GCC_ABI_DEMANGLE
     char* output = NULL;
     int status;
     output = abi::__cxa_demangle(in.c_str(), NULL, NULL, &status);

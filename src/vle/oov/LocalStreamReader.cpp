@@ -26,10 +26,10 @@
 #include <vle/oov/LocalStreamReader.hpp>
 #include <vle/oov/Plugin.hpp>
 #include <vle/utils/Debug.hpp>
+#include <vle/version.hpp>
 #include <boost/format.hpp>
-#include <config.h>
 
-#ifdef HAVE_CAIRO
+#ifdef VLE_HAVE_CAIRO
 #   include <vle/oov/CairoPlugin.hpp>
 #endif
 
@@ -43,7 +43,7 @@ void LocalStreamReader::onValue(const std::string& simulator,
                                 const double& time,
                                 value::Value* value)
 {
-#ifdef HAVE_CAIRO
+#ifdef VLE_HAVE_CAIRO
     if (plugin()->isCairo()) {
         CairoPluginPtr plg = toCairoPlugin(plugin());
         plg->needCopy();
@@ -58,7 +58,7 @@ void LocalStreamReader::onValue(const std::string& simulator,
     } else {
 #endif
         plugin()->onValue(simulator, parent, port, view, time, value);
-#ifdef HAVE_CAIRO
+#ifdef VLE_HAVE_CAIRO
     }
 #endif
 }

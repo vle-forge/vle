@@ -29,7 +29,7 @@
 
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Exception.hpp>
-#include <config.h>
+#include <vle/version.hpp>
 
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>

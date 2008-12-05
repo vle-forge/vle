@@ -17,10 +17,10 @@ SET(OOV_CPP LocalStreamReader.cpp NetStreamReader.cpp OOV.cpp OutputMatrix.cpp
 SET(OOV_HPP LocalStreamReader.hpp NetStreamReader.hpp OOV.hpp OutputMatrix.hpp
   Plugin.hpp PluginFactory.hpp SimpleFile.hpp StreamReader.hpp)
 
-IF (HAVE_CAIRO)
+IF (VLE_HAVE_CAIRO)
  SET(OOV_HPP ${OOV_HPP} CairoPlugin.hpp)
  SET(OOV_CPP ${OOV_CPP} CairoPlugin.cpp)
-ENDIF (HAVE_CAIRO)
+ENDIF (VLE_HAVE_CAIRO)
 
 ADD_LIBRARY(vleoov SHARED ${OOV_CPP};${OOV_HPP})
 

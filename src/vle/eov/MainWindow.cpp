@@ -32,7 +32,7 @@
 #include <gtkmm/textbuffer.h>
 #include <gtkmm/messagedialog.h>
 #include <boost/format.hpp>
-#include <config.h>
+#include <vle/version.hpp>
 
 namespace vle { namespace eov {
 

@@ -30,9 +30,9 @@
 #include <vle/value.hpp>
 #include <vle/utils/Debug.hpp>
 #include <boost/format.hpp>
-#include <config.h>
+#include <vle/version.hpp>
 
-#ifdef HAVE_CAIRO
+#ifdef VLE_HAVE_CAIRO
 #   include <vle/oov/CairoPlugin.hpp>
 #endif
 
@@ -162,7 +162,7 @@ void NetStreamReader::onValue(const std::string& simulator,
                               const double& time,
                               value::Value* value)
 {
-#ifdef HAVE_CAIRO
+#ifdef VLE_HAVE_CAIRO
     if (plugin()->isCairo()) {
         CairoPluginPtr plg = toCairoPlugin(plugin());
         plg->needCopy();
@@ -177,7 +177,7 @@ void NetStreamReader::onValue(const std::string& simulator,
     } else {
 #endif
         plugin()->onValue(simulator, parent, port, view, time, value);
-#ifdef HAVE_CAIRO
+#ifdef VLE_HAVE_CAIRO
     }
 #endif
 }
