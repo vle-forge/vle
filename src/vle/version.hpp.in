@@ -35,7 +35,9 @@
 #define VLE_EXTRA_VERSION   ("@VLE_EXTRA@")
 #define VLE_NAME_COMPLETE   ("@VLE_NAME_COMPLETE@")
 
-/** 
+#cmakedefine VLE_HAVE_POOL
+
+/**
  * @brief Check whether a VLE version equal to or greather than major.mino.patch
  * is present.
  */

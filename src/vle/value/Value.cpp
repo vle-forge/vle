@@ -38,25 +38,6 @@
 
 namespace vle { namespace value {
 
-Pools* Pools::m_pool = 0;
-
-Pools::Pools() :
-    m_pools(
-        std::max(sizeof(Boolean), std::max(sizeof(Integer),
-        std::max(sizeof(Map), std::max(sizeof(Matrix),
-        std::max(sizeof(Null), std::max(sizeof(Set),
-        std::max(sizeof(String), std::max(sizeof(Table),
-        std::max(sizeof(Tuple), sizeof(Xml)))))))))) + 1)
-{}
-
-Pools::Pools(const Pools& /* other */) :
-    m_pools(
-        std::max(sizeof(Boolean), std::max(sizeof(Integer),
-        std::max(sizeof(Map), std::max(sizeof(Matrix),
-        std::max(sizeof(Null), std::max(sizeof(Set),
-        std::max(sizeof(String), std::max(sizeof(Table),
-        std::max(sizeof(Tuple), sizeof(Xml)))))))))) + 1)
-{}
 
 std::string Value::writeToFile() const
 {
@@ -257,7 +238,9 @@ Matrix& Value::toMatrix()
 
 void init()
 {
+#ifdef VLE_HAVE_POOL
     value::Pools::init();
+#endif
 
     boost::serialization::void_cast_register(
         static_cast<Boolean*>(0), static_cast<Value*>(0));
@@ -285,7 +268,9 @@ void init()
 
 void finalize()
 {
+#ifdef VLE_HAVE_POOL
     value::Pools::kill();
+#endif
 }
 
 }} // namespace vle value

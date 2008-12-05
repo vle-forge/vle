@@ -23,76 +23,20 @@
  */
 
 
-#ifndef DEVS_EVENT_HPP
-#define DEVS_EVENT_HPP
+#ifndef VLE_DEVS_EVENT_HPP
+#define VLE_DEVS_EVENT_HPP
 
+#include <vle/version.hpp>
+#include <vle/devs/Pools.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/devs/Attribute.hpp>
 #include <vle/value/Map.hpp>
-#include <vle/utils/Pool.hpp>
 #include <string>
 
 namespace vle { namespace devs {
 
     class Simulator;
     class Event;
-
-    class Pools
-    {
-    public:
-        /**
-         * @brief Thread-Safe access to the Pools singleton.
-         * @return A reference to the boost::pools.
-         */
-        static utils::Pools < Event >& pools();
-
-        /**
-         * @brief Initialize the singleton.
-         */
-        static void init()
-        { pools(); }
-
-        /**
-         * @brief Kill the singleton.
-         */
-        static void kill()
-        { delete m_pool; m_pool = 0; }
-
-    private:
-        /**
-         * @brief The singleton object.
-         */
-        static Pools* m_pool;
-
-        /**
-         * @brief The set of boost::pool for Event class.
-         */
-        utils::Pools < Event > m_pools;
-
-        ///
-        ////
-        ///
-
-        /**
-         * @brief Build a new utils::Pools with a default size defined to the
-         * max size of the Event (InternalEvent, ExternalEvent,
-         * RequestEvent or ObservationEvent).
-         */
-        Pools();
-
-        /**
-         * @brief Private copy constructor.
-         * @param other
-         */
-        Pools(const Pools& other);
-
-        /**
-         * @brief Private assign operator.
-         * @param other
-         * @return
-         */
-        Pools& operator=(const Pools& /* other */) { return *this; }
-    };
 
     /**
      * @brief The Event base class. Define the base for internal,
@@ -121,6 +65,7 @@ namespace vle { namespace devs {
         ////
         ///
 
+#ifdef VLE_HAVE_POOL
         /**
          * @brief Override the new operator to use the boost::pool allocator.
          * See the class Pools.
@@ -138,6 +83,7 @@ namespace vle { namespace devs {
          */
         inline static void operator delete(void* deletable, size_t size)
         { Pools::pools().deallocate(deletable, size); }
+#endif
 
         ///
         ////
@@ -442,14 +388,6 @@ namespace vle { namespace devs {
         bool            m_delete;
         value::Map*     m_attributes;
     };
-
-    inline utils::Pools < Event >& Pools::pools()
-    {
-        if (not m_pool) {
-            m_pool = new Pools();
-        }
-        return m_pool->m_pools;
-    }
 
     /**
      * @brief Initialize the Pools singleton.

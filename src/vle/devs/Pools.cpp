@@ -1,5 +1,5 @@
 /**
- * @file vle/devs/Event.cpp
+ * @file vle/value/Pools.cpp
  * @author The VLE Development Team
  */
 
@@ -23,52 +23,33 @@
  */
 
 
-#include <vle/devs/Event.hpp>
-#include <vle/devs/Pools.hpp>
-#include <vle/devs/Simulator.hpp>
-#include <vle/value/Double.hpp>
-#include <vle/value/Integer.hpp>
-#include <vle/value/Boolean.hpp>
-#include <vle/value/String.hpp>
-#include <vle/utils/Debug.hpp>
+#include <vle/version.hpp>
+#include <vle/value/Pools.hpp>
+#include <vle/devs/InternalEvent.hpp>
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/devs/ObservationEvent.hpp>
 #include <vle/devs/RequestEvent.hpp>
 
 namespace vle { namespace devs {
 
-Event::~Event()
-{
-    if (m_delete and m_attributes) {
-        delete m_attributes;
-    }
-}
 
-const std::string Event::getSourceModelName() const
-{
-    return m_source->getName();
-}
-
-void Event::putAttributes(const value::Map& mp)
-{
-    for (value::MapValue::const_iterator it = mp.value().begin();
-         it != mp.value().end(); ++it) {
-        putAttribute((*it).first, (*it).second->clone());
-    }
-}
-
-void init()
-{
 #ifdef VLE_HAVE_POOL
-    devs::Pools::init();
-#endif
-}
+Pools* Pools::m_pool = 0;
 
-void finalize()
+Pools::Pools() :
+    m_pools(
+        std::max(sizeof(InternalEvent), std::max(sizeof(ExternalEvent),
+        std::max(sizeof(ObservationEvent), sizeof(RequestEvent)))) + 1)
 {
-#ifdef VLE_HAVE_POOL
-    devs::Pools::kill();
-#endif
 }
 
-}} // namespace vle devs
+Pools::Pools(const Pools& /* other */) :
+    m_pools(
+        std::max(sizeof(InternalEvent), std::max(sizeof(ExternalEvent),
+        std::max(sizeof(ObservationEvent), sizeof(RequestEvent)))) + 1)
+{
+}
+#endif
+
+}} // namespace vle value
+

@@ -26,6 +26,9 @@
 #ifndef VLE_UTILS_POOL_HPP
 #define VLE_UTILS_POOL_HPP
 
+#include <vle/version.hpp>
+
+#ifdef VLE_HAVE_POOL
 #include <boost/pool/pool.hpp>
 #include <boost/utility.hpp>
 #include <vector>
@@ -112,5 +115,7 @@ namespace vle { namespace utils {
     };
 
 }} // namespace vle utils
+
+#endif // VLE_HAVE_POOL
 
 #endif

@@ -1,4 +1,5 @@
 INCLUDE_DIRECTORIES(
+  ${VLE_BINARY_DIR}/src
   ${VLE_SOURCE_DIR}/src
   ${Boost_INCLUDE_DIRS}
   ${GLIBMM_INCLUDE_DIRS}
@@ -11,14 +12,14 @@ LINK_DIRECTORIES(
 SET(DEVS_CPP Coordinator.cpp Dynamics.cpp Event.cpp EventTable.cpp EventView.cpp
   ExternalEvent.cpp Executive.cpp RequestEvent.cpp FinishView.cpp
   InternalEvent.cpp LocalStreamWriter.cpp ModelFactory.cpp NetStreamWriter.cpp
-  Observable.cpp RootCoordinator.cpp Simulator.cpp ObservationEvent.cpp
-  StreamWriter.cpp Time.cpp TimedView.cpp View.cpp)
+  Observable.cpp Pools.cpp RootCoordinator.cpp Simulator.cpp
+  ObservationEvent.cpp StreamWriter.cpp Time.cpp TimedView.cpp View.cpp)
 
 SET(DEVS_HPP Attribute.hpp Coordinator.hpp Dynamics.hpp DynamicsWrapper.hpp
   Event.hpp EventList.hpp EventView.hpp EventTable.hpp Executive.hpp
   ExternalEvent.hpp ExternalEventList.hpp FinishView.hpp RequestEvent.hpp
   RequestEventList.hpp InternalEvent.hpp LocalStreamWriter.hpp ModelFactory.hpp
-  NetStreamWriter.hpp Observable.hpp RootCoordinator.hpp Simulator.hpp
+  NetStreamWriter.hpp Observable.hpp Pools.hpp RootCoordinator.hpp Simulator.hpp
   ObservationEvent.hpp StreamWriter.hpp TimedView.hpp Time.hpp View.hpp)
 
 ADD_LIBRARY(vledevs SHARED ${DEVS_CPP};${DEVS_HPP})

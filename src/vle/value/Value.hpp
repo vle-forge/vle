@@ -26,8 +26,9 @@
 #ifndef VLE_VALUE_VALUE_HPP
 #define VLE_VALUE_VALUE_HPP
 
+#include <vle/version.hpp>
+#include <vle/value/Pools.hpp>
 #include <vle/utils/Exception.hpp>
-#include <vle/utils/Pool.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
@@ -51,67 +52,6 @@ namespace vle { namespace value {
     class Matrix;
 
     /**
-     * @brief A thread-safe singleton to manage a set of boost::pools defined in
-     * the utils::Pools class.
-     */
-    class Pools
-    {
-    public:
-        /**
-         * @brief Thread-Safe access to the Pools singleton.
-         * @return A reference to the boost::pools.
-         */
-        static utils::Pools < Value >& pools();
-
-        /**
-         * @brief Initialize the singleton.
-         */
-        static void init()
-        { pools(); }
-
-        /**
-         * @brief Delete the singleton.
-         */
-        static void kill()
-        { delete m_pool; m_pool = 0; }
-
-    private:
-        /**
-         * @brief The singleton object.
-         */
-        static Pools* m_pool;
-
-        /**
-         * @brief The set of boost::pool for Value class.
-         */
-        utils::Pools < Value > m_pools;
-
-        ///
-        ////
-        ///
-
-        /**
-         * @brief Build a new utils::Pools with a default size defined to the
-         * max size of the Value (Boolean, Integer, Map, Matrix, Null, Set,
-         * String, Table, Tuple or Xml).
-         */
-        Pools();
-
-        /**
-         * @brief Private copy constructor.
-         * @param other
-         */
-        Pools(const Pools& other);
-
-        /**
-         * @brief Private assign operator.
-         * @param other
-         * @return
-         */
-        Pools& operator=(const Pools& /* other */) { return *this; }
-    };
-
-    /**
      * @brief Virtual class to assign Value into Event object.
      */
     class Value
@@ -120,6 +60,7 @@ namespace vle { namespace value {
         enum type { BOOLEAN, INTEGER, DOUBLE, STRING, SET, MAP, TUPLE, TABLE,
             XMLTYPE, NIL, MATRIX };
 
+#ifdef VLE_HAVE_POOL
         /**
          * @brief Override the new operator to use the boost::pool allocator.
          * See the class Pools.
@@ -137,6 +78,7 @@ namespace vle { namespace value {
          */
         inline static void operator delete(void* deletable, size_t size)
         { Pools::pools().deallocate(deletable, size); }
+#endif
 
         ///
         ////
@@ -340,14 +282,6 @@ namespace vle { namespace value {
     private:
         Value& operator=(const Value& /* value */) { return *this; }
     };
-
-    inline utils::Pools < Value >& Pools::pools()
-    {
-        if (not m_pool) {
-            m_pool = new Pools();
-        }
-        return m_pool->m_pools;
-    }
 
     inline const Value& reference(const Value* value)
     {

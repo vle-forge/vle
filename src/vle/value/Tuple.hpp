@@ -27,7 +27,6 @@
 #define VLE_VALUE_TUPLE_HPP
 
 #include <vle/value/Value.hpp>
-#include <boost/pool/pool_alloc.hpp>
 #include <vector>
 #include <boost/serialization/vector.hpp>
 
@@ -36,7 +35,7 @@ namespace vle { namespace value {
     /**
      * @brief Define a array of double.
      */
-    typedef std::vector < double, boost::pool_allocator < double > > TupleValue;
+    typedef std::vector < double > TupleValue;
 
     /**
      * @brief A Tuple Value is a container to store a list of double value into

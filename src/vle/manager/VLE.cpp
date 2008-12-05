@@ -139,7 +139,7 @@ bool VLE::justRun(int nbProcessor, const CmdArgs& args)
 void init()
 {
     utils::init();
-    devs::Pools::init();
+    devs::init();
     value::init();
     Glib::thread_init();
 }
