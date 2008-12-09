@@ -44,6 +44,7 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <gtkmm/filechooserdialog.h>
+#include <glibmm/miscutils.h>
 
 namespace vle { namespace gvle {
 
@@ -629,6 +630,16 @@ void GVLE::onShowAbout()
 {
     About box(mRefXML);
     box.run();
+}
+
+void GVLE::setTitle(const Glib::ustring& name)
+{
+    Glib::ustring title("gvle");
+    if (not name.empty()) {
+        title += " - ";
+        title += Glib::path_get_basename(name);
+    }
+    set_title(title);
 }
 
 std::string valuetype_to_string(value::ValueBase::type type)

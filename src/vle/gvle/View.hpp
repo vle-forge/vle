@@ -58,6 +58,8 @@ public:
 
     void redraw();
 
+    void setTitle(const Glib::ustring& name);
+
     /**
      * Get current button type from GVLE GUI.
      *

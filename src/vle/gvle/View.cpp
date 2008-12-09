@@ -75,7 +75,6 @@ View::View(Modeling* m, graph::CoupledModel* c, size_t index) :
     mVbox.pack_start(mScrolledWindow, Gtk::PACK_EXPAND_WIDGET);
 
     add(mVbox);
-    set_title(c->getName());
     mDrawing->set_size_request(mCurrent->width(), mCurrent->height());
     resize(450, 350);
 
@@ -91,6 +90,17 @@ View::~View()
 void View::redraw()
 {
     mDrawing->draw();
+}
+
+void View::setTitle(const Glib::ustring& name)
+{
+    if (mCurrent) {
+        Glib::ustring title(name);
+        title += " - ";
+        title += mCurrent->getName();
+
+        set_title(title);
+    }
 }
 
 void View::initAllOptions()
