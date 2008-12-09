@@ -79,6 +79,7 @@ Modeling::Modeling(GVLE* gvle, const string& filename) :
             t->addModel(mVpz.project().model().model());
             mVpz.project().model().setModel(t);
             mTop = t;
+            setTitles();
         }
     } else {
         mTop = newCoupledModel(0, "Top model", "", 0, 0);
@@ -113,6 +114,7 @@ void Modeling::clearModeling()
     mVpz.clear();
     delViews();
     mTop = 0;
+    setTitles();
 }
 
 void Modeling::setGlade(Glib::RefPtr < Gnome::Glade::Xml > xml)
@@ -163,6 +165,7 @@ void Modeling::parseXML(const string& filename)
         mIsSaved = true;
         mIsModified = false;
         mFileName.assign(filename);
+        setTitles();
     } catch (const utils::ParseError& p) {
         gvle::Error((boost::format("Error parsing file, %1%") %
                      p.what()).str());
@@ -185,6 +188,7 @@ void Modeling::saveXML(const std::string& name)
         mFileName.assign(name);
         mIsSaved = true;
         mIsModified = false;
+        setTitles();
     } catch (const utils::FileError& file) {
         gvle::Error((boost::format(
                          "Project save problem. Check your file %1%. %2%") % name %
@@ -461,6 +465,18 @@ void Modeling::EditCoupledModel(graph::CoupledModel* model)
 {
     assert(model);
     mCoupledBox->show(model);
+}
+
+void Modeling::setTitles()
+{
+    mGVLE->setTitle(mFileName);
+
+    for (ListView::iterator it = mListView.begin(); it != mListView.end(); ++it)
+    {
+        if (*it) {
+            (*it)->setTitle(mFileName);
+        }
+    }
 }
 
 void Modeling::redrawModelTreeBox()

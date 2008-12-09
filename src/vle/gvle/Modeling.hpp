@@ -293,6 +293,11 @@ public:
 
     void EditCoupledModel(graph::CoupledModel* model);
 
+    /**
+     * @brief Assign a new titles to all gvle::View.
+     */
+    void setTitles();
+
 
     /********************************************************************
      *

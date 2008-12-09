@@ -381,6 +381,13 @@ public:
      */
     void onShowAbout();
 
+    /**
+     * @brief Assign a new titles to Gtk::Window managed by the GVLE
+     * class.
+     * @param name The name to assign.
+     */
+    void setTitle(const Glib::ustring& name);
+
 private:
     Gtk::VBox                       m_vbox;
     GVLEMenu*                       m_menu;
