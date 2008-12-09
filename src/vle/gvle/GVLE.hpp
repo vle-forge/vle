@@ -382,11 +382,16 @@ public:
     void onShowAbout();
 
     /**
-     * @brief Assign a new titles to Gtk::Window managed by the GVLE
+     * @brief Assign a new title to Gtk::Window managed by the GVLE
      * class.
      * @param name The name to assign.
      */
     void setTitle(const Glib::ustring& name);
+
+    /**
+     * @brief Append an asterisk to the Gtk::Window's title with an asterick.
+     */
+    void setModifiedTitle();
 
 private:
     Gtk::VBox                       m_vbox;
