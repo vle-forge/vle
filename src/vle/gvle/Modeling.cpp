@@ -49,17 +49,17 @@ namespace vle
 namespace gvle {
 
 Modeling::Modeling(GVLE* gvle, const string& filename) :
-        mTop(NULL),
-        mGVLE(gvle),
-        mModelTreeBox(new ModelTreeBox(this)),
-        //mClassModelTreeBox(new ClassModelTreeBox(this)),
-        mModelClassBox(0),
-        mIsModified(false),
-        mIsSaved(false),
-        mSocketPort(8000),
-        mAtomicBox(0),
-        mImportBox(0),
-        mCoupledBox(0)
+    mTop(NULL),
+    mGVLE(gvle),
+    mModelTreeBox(new ModelTreeBox(this)),
+    //mClassModelTreeBox(new ClassModelTreeBox(this)),
+    mModelClassBox(0),
+    mIsModified(false),
+    mIsSaved(false),
+    mSocketPort(8000),
+    mAtomicBox(0),
+    mImportBox(0),
+    mCoupledBox(0)
 {
     assert(gvle);
 
@@ -85,11 +85,12 @@ Modeling::Modeling(GVLE* gvle, const string& filename) :
         mTop = newCoupledModel(0, "Top model", "", 0, 0);
         //mTop->setParent(NULL);
         mVpz.project().model().setModel(mTop);
-        setModified(false);
+        setTitles();
     }
     View* v = new View(this, mTop, mListView.size());
     mListView.push_back(v);
     mModelTreeBox->parseModel(mTop);
+    setModified(false);
 }
 
 Modeling::~Modeling()
@@ -479,6 +480,18 @@ void Modeling::setTitles()
     }
 }
 
+void Modeling::setModifiedTitles()
+{
+    mGVLE->setModifiedTitle();
+
+    for (ListView::iterator it = mListView.begin(); it != mListView.end(); ++it)
+    {
+        if (*it) {
+            (*it)->setModifiedTitle();
+        }
+    }
+}
+
 void Modeling::redrawModelTreeBox()
 {
     assert(mTop);
@@ -590,6 +603,17 @@ void Modeling::paste(graph::CoupledModel* gc)
     */
 }
 
+void Modeling::setModified(bool modified)
+{
+    if (mIsModified != modified) {
+        mIsModified = modified;
+
+        if (mIsModified) {
+            setModifiedTitles();
+        }
+    }
+}
+
 void Modeling::exportCoupledModel(graph::CoupledModel* model, vpz::Vpz* dst)
 {
     vpz::Project& project = dst->project();
@@ -690,6 +714,7 @@ void Modeling::importCoupledModel(graph::CoupledModel* parent, vpz::Vpz* src)
         conditions().add(src->project().experiment().conditions());
         measures().add(src->project().experiment().views());
         mModelTreeBox->parseModel(mTop);
+        setModified(true);
     }
 }
 
@@ -964,6 +989,7 @@ void Modeling::delModel(graph::Model* model)
     if (model->isAtomic()) {
         vpz::AtomicModelList& list = mVpz.project().model().atomicModels();
         list.del(model);
+        setModified(true);
     }
 }
 

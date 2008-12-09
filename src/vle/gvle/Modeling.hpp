@@ -298,6 +298,12 @@ public:
      */
     void setTitles();
 
+    /**
+     * @brief Assign a new titles to all gvle::View and an asterisk to inform
+     * that this model is modified.
+     */
+    void setModifiedTitles();
+
 
     /********************************************************************
      *
@@ -328,9 +334,8 @@ public:
      *
      * @return ptr to application GVLE.
      */
-    inline GVLE* getGVLE() {
-        return mGVLE;
-    }
+    inline GVLE* getGVLE()
+    { setModified(true); return mGVLE; }
 
 
     /********************************************************************
@@ -550,9 +555,7 @@ public:
      *
      * @param modified true if document is modified, otherwise false.
      */
-    inline void setModified(bool modified) {
-        mIsModified = modified;
-    }
+    void setModified(bool modified);
 
     /**
      * Set document save.
@@ -685,29 +688,23 @@ public:
      *
      ********************************************************************/
 
-    const vpz::Experiment& experiment() const {
-        return mVpz.project().experiment();
-    }
+    const vpz::Experiment& experiment() const
+    { return mVpz.project().experiment(); }
 
-    vpz::Experiment& experiment() {
-        return mVpz.project().experiment();
-    }
+    vpz::Experiment& experiment()
+    { setModified(true); return mVpz.project().experiment(); }
 
-    const vpz::Views& views() const {
-        return mVpz.project().experiment().views();
-    }
+    const vpz::Views& views() const
+    { return mVpz.project().experiment().views(); }
 
-    vpz::Views& measures() {
-        return mVpz.project().experiment().views();
-    }
+    vpz::Views& measures()
+    { setModified(true); return mVpz.project().experiment().views(); }
 
-    const vpz::Outputs& outputs() const {
-        return mVpz.project().experiment().views().outputs();
-    }
+    const vpz::Outputs& outputs() const
+    { return mVpz.project().experiment().views().outputs(); }
 
-    vpz::Outputs& outputs() {
-        return mVpz.project().experiment().views().outputs();
-    }
+    vpz::Outputs& outputs()
+    { setModified(true); return mVpz.project().experiment().views().outputs(); }
 
     /********************************************************************
      *
@@ -715,23 +712,26 @@ public:
      *
      ********************************************************************/
 
-    vpz::Dynamics& dynamics() {
-        return mVpz.project().dynamics();
-    }
+    vpz::Dynamics& dynamics()
+    { setModified(true); return mVpz.project().dynamics(); }
 
-    vpz::Observables& observables() {
+    vpz::Observables& observables()
+    {
+        setModified(true);
         return mVpz.project().experiment().views().observables();
     }
 
-    vpz::Conditions& conditions() {
+    vpz::Conditions& conditions()
+    {
+        setModified(true);
         return mVpz.project().experiment().conditions();
     }
 
-    inline vpz::AtomicModel& get_model(graph::AtomicModel* atom) {
+    inline vpz::AtomicModel& get_model(graph::AtomicModel* atom)
+    {
+        setModified(true);
         return mVpz.project().model().atomicModels().get(atom);
     }
-
-    //vpz::Observable* get_observables(graph::AtomicModel* atom);
 
     const vpz::Strings* get_conditions(graph::AtomicModel* atom);
 
@@ -795,9 +795,8 @@ public:
         return mVpz;
     }
 
-    inline vpz::Vpz& vpz() {
-        return mVpz;
-    }
+    inline vpz::Vpz& vpz()
+    { setModified(true); return mVpz; }
 
     void vpz_is_correct(std::vector<std::string>& vec);
 

@@ -104,6 +104,14 @@ void View::setTitle(const Glib::ustring& name)
     }
 }
 
+void View::setModifiedTitle()
+{
+    Glib::ustring current("* ");
+    current += get_title();
+
+    set_title(current);
+}
+
 void View::initAllOptions()
 {
     clearSelectedModels();

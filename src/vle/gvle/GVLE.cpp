@@ -642,6 +642,14 @@ void GVLE::setTitle(const Glib::ustring& name)
     set_title(title);
 }
 
+void GVLE::setModifiedTitle()
+{
+    Glib::ustring current("* ");
+    current += get_title();
+
+    set_title(current);
+}
+
 std::string valuetype_to_string(value::Value::type type)
 {
     switch (type) {
