@@ -362,25 +362,68 @@ namespace vle { namespace vpz {
      * @throw utils::SaxParserError if the attribute was not found or if the
      * boost::lexical_cast failed.
      */
-    template < typename T > T getAttribute(const AttributeList& lst,
-                                           const Glib::ustring& name)
-    {
-        AttributeList::const_iterator it;
-        it = std::find_if(lst.begin(), lst.end(),
-                          xmlpp::SaxParser::AttributeHasName(name));
-        Assert(utils::SaxParserError, it != lst.end(),
-               (boost::format("Unknow attribute '%1%'") % name).str());
+    template < typename T >
+        inline T getAttribute(const AttributeList& lst,
+                              const Glib::ustring& name)
+        {
+            AttributeList::const_iterator it;
+            it = std::find_if(lst.begin(), lst.end(),
+                              xmlpp::SaxParser::AttributeHasName(name));
+            Assert(utils::SaxParserError, it != lst.end(),
+                   (boost::format("Unknow attribute '%1%'") % name).str());
 
-        T result;
-        try {
-            result = boost::lexical_cast < T >((*it).value);
-        } catch(const std::exception& e) {
-            Throw(utils::SaxParserError, (boost::format(
-                        "Cannot convert '%1%' into desired type: %2%") %
-                    name % e.what()).str());
+            T result;
+            try {
+                result = boost::lexical_cast < T >((*it).value);
+            } catch(const std::exception& e) {
+                Throw(utils::SaxParserError, (boost::format(
+                            "Cannot convert '%1%' into desired type: %2%") %
+                        name % e.what()).str());
+            }
+            return result;
         }
-        return result;
-    }
+
+    /**
+     * @brief A template specialization function de get a Glib::ustring value of
+     * an attribute from an attribute list.
+     * @param lst the list of attribute to search an attribute
+     * @param name the name of the attribute to get value
+     * @return the value of the attribute.
+     * @throw utils::SaxParserError if the attribute was not found.
+     */
+    template <>
+        inline Glib::ustring getAttribute < Glib::ustring >(
+            const AttributeList& lst, const Glib::ustring& name)
+        {
+            AttributeList::const_iterator it;
+            it = std::find_if(lst.begin(), lst.end(),
+                              xmlpp::SaxParser::AttributeHasName(name));
+            Assert(utils::SaxParserError, it != lst.end(),
+                   (boost::format("Unknow attribute '%1%'") % name).str());
+
+            return it->value;
+        }
+
+    /**
+     * @brief A template specialization function de get a std::string value of
+     * an attribute from an attribute list.
+     * @param lst the list of attribute to search an attribute
+     * @param name the name of the attribute to get value
+     * @return the value of the attribute.
+     * @throw utils::SaxParserError if the attribute was not found.
+     */
+    template <>
+        inline std::string getAttribute < std::string >(
+            const AttributeList& lst, const Glib::ustring& name)
+        {
+            AttributeList::const_iterator it;
+            it = std::find_if(lst.begin(), lst.end(),
+                              xmlpp::SaxParser::AttributeHasName(name));
+            Assert(utils::SaxParserError, it != lst.end(),
+                   (boost::format("Unknow attribute '%1%'") % name).str());
+
+            return it->value;
+        }
 
     /**
      * @brief Search an attribute in an attribute list.
