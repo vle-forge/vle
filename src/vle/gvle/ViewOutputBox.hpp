@@ -90,6 +90,7 @@ namespace vle { namespace gvle {
         void initViews();
         void fillViews();
         void initMenuPopupViews();
+        void sensitive(bool active);
         bool onButtonRealeaseViews(GdkEventButton* event);
         void onCursorChangedViews();
         void onChangedType();

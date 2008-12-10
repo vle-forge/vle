@@ -129,12 +129,13 @@ void ViewOutputBox::fillViews()
 {
     for (vpz::Views::const_iterator it = m_viewscopy.begin();
          it != m_viewscopy.end(); ++it) {
-        Gtk::TreeIter iter = m_model->append();
-        if (iter) {
-            Gtk::ListStore::Row row = *iter;
-            row[m_viewscolumnrecord.name] = it->first;
-        }
+            Gtk::TreeIter iter = m_model->append();
+            if (iter) {
+                Gtk::ListStore::Row row = *iter;
+                row[m_viewscolumnrecord.name] = it->first;
+            }
     }
+    sensitive(false);
 }
 
 void ViewOutputBox::initMenuPopupViews()
@@ -157,6 +158,7 @@ void ViewOutputBox::initMenuPopupViews()
 void ViewOutputBox::onAddViews()
 {
     storePrevious();
+    sensitive(true);
 
     SimpleTypeBox box("Name of the view ?");
     std::string name = boost::trim_copy(box.run());
@@ -196,6 +198,17 @@ void ViewOutputBox::onRemoveViews()
     }
 }
 
+void ViewOutputBox::sensitive(bool active)
+{
+    m_type->set_sensitive(active);
+    m_timestep->set_sensitive(active);
+    m_format->set_sensitive(active);
+    m_location->set_sensitive(active);
+    m_directory->set_sensitive(active);
+    m_plugin->set_sensitive(active);
+    m_data->set_sensitive(active);
+}
+
 bool ViewOutputBox::onButtonRealeaseViews(GdkEventButton* event)
 {
     if (event->button == 3) {
@@ -212,6 +225,7 @@ void ViewOutputBox::onCursorChangedViews()
     if (ref) {
         Gtk::TreeModel::iterator iter = ref->get_selected();
         if (iter) {
+            sensitive(true);
             Gtk::TreeModel::Row row = *iter;
             std::string name(row.get_value(m_viewscolumnrecord.name));
             updateView(name);
