@@ -147,7 +147,7 @@
      <double>0.2</double>
     </port>
     <port name="precision">
-     <double>.1</double>
+     <double>.005</double>
     </port>
     <port name="threshold">
      <double>1e-10</double>

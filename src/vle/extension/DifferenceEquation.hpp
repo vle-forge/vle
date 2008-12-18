@@ -29,109 +29,255 @@
 #include <vle/devs/Dynamics.hpp>
 #include <set>
 
-namespace vle { namespace extension {
+namespace vle { namespace extension { namespace DifferenceEquation {
 
-    class DifferenceEquation : public devs::Dynamics
+    /**
+     * @brief Base The class Base encapsules the general
+     * mecanisms of DifferenceEquation extension.
+     */
+    class Base : public devs::Dynamics
     {
-        typedef std::map < std::string,
-                std::deque < std::pair < double, double > > > valueList;
+    protected:
+        typedef std::deque < double > Values;
+
+        /**
+         * @brief Variable The class represents a variable of
+         * difference equation.
+         */
+        class Variable
+        {
+        public:
+            /**
+             * @brief Default constructor
+             */
+            Variable() : mEquation(0)
+            {}
+
+            /**
+             * @brief Returns the name of variable
+             * @return the name of variable
+             */
+            const std::string& name() const
+            { return mName; }
+
+        protected:
+            Variable(std::string name, Base* equation) :
+                mName(name), mEquation(equation)
+            {
+            }
+
+            std::string mName;
+            Base* mEquation;
+        };
+
+        struct VariableIterators
+        {
+            Values* mValues;
+            Values* mInitValues;
+            bool* mReceivedValues;
+            bool mSynchro;
+        };
+
+        /**
+         * @brief ext The class represents an external variable of
+         * difference equation.
+         */
+        class Ext : public Variable
+        {
+        public:
+            /**
+             * @brief Default constructor
+             */
+            Ext() {}
+
+            /**
+             * @brief Returns the value of variable.
+             * @param shift the temporal shift.
+             * @return the name of variable.
+             */
+            virtual double operator()(int shift = 0)
+            {
+                Assert(utils::InternalError,
+                       mEquation,
+                       "DifferenceEquation - variable not build");
+
+                if (mEquation->init(mIterators)) {
+                    return mEquation->val(mName, mIterators.mInitValues,
+                                          mIterators, shift);
+                } else {
+                    return mEquation->val(mName, mIterators.mValues,
+                                          mIterators, shift);
+                }
+            }
+
+        protected:
+            Ext(std::string name, Base* equation) :
+                Variable(name, equation)
+            { mEquation->createExternalVariable(name, mIterators); }
+
+            VariableIterators mIterators;
+        };
 
     public:
         /**
-         * @brief Constructor of Difference Equation extension. A
-         * difference equation is composed to a internal variable
-         * defined by the equation and some external
-         * variables. The external variables can be synchronous
-         * or not. The computation of internal variable waits the
-         * value of synchronous variables.
-         * @param model the atomic model to which belongs the dynamics.
-         * @param event the init event list.
+         * @brief sync The class sync represents a synchronous
+         * external variable
          */
-        DifferenceEquation(const graph::AtomicModel& model,
-                           const devs::InitEventList& events);
+        class Sync : public Ext
+        {
+        public:
+            /**
+             * @brief Default constructor
+             */
+            Sync() {}
 
-        virtual ~DifferenceEquation() { }
+        private:
+            Sync(std::string name, Base* equation) :
+                Ext(name, equation)
+            {
+                equation->depends(name, true);
+                mIterators.mSynchro = true;
+            }
 
-        /**
-         * @brief Compute the value of internal variable. This
-         * method is abstract.
-         * @param time the time of the computation.
-         * @return the new value of internal variable.
-         */
-        virtual double compute(const vle::devs::Time& /* time */) =0;
-
-        /**
-         * @brief Initialize the value of internal variable. This
-         * method is not abstract. The default value is null if
-         * no initialization event provide an initial value.
-         * @return the initial value of internal variable.
-         */
-        virtual double initValue() { return 0.0; }
+            friend class Base;
+        };
 
         /**
-         * @brief Return the time step of equation.
-         * @return the time step of equation.
+         * @brief nosync The class nosync represents a asynchronous
+         * external variable
          */
-        double getTimeStep() const { return mTimeStep; }
+        class NoSync : public Ext
+        {
+        public:
+            /**
+             * @brief Default constructor
+             */
+            NoSync() {}
+
+        private:
+            NoSync(std::string name, Base* equation) :
+                Ext(name, equation)
+            {
+                equation->depends(name, false);
+                mIterators.mSynchro = false;
+            }
+
+            friend class Base;
+        };
+
+        /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
+        static const unsigned int DEFAULT_SIZE;
+
+        /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
         /**
-         * @brief Return the value of an external variable. By
-         * default, this method returns the current value. If the
-         * parameter shift is specified, it returns the value of
-         * external variable at current time minus shift. Shift
-         * is the number of time step.
-         * @param name the name of external variable.
-         * @param shift the temporal shift.
-         * @return the value of external variable.
+         * @brief Create a synchronous external variable
+         * @param name the name of the external variable
+         * @return the synchronous external variable
          */
-        double getValue(const char* /* name */,
-                        int /* shift */ = 0) const;
+        inline Sync createSync(const std::string& name)
+        {
+            return Base::Sync(name, this);
+        }
 
         /**
-         * @brief Return the value of the internal variable. By
-         * default, this method returns the current value. If the
-         * parameter shift is specified, it returns the value of
-         * internal variable at current time minus shift. Shift
-         * is the number of time step.
-         * @param shift the temporal shift.
-         * @return the value of the internal variable.
+         * @brief Create a asynchronous external variable
+         * @param name the name of the external variable
+         * @return the asynchronous external variable
          */
-        double getValue(int /* shift */ = 0) const;
-
-        /**
-         * @brief Specify if the external variable is
-         * synchronous. By default, the external variables are
-         * not synchronous.
-         * @param name the name of external variable.
-         */
-        void setSynchronizedVariable(const std::string& /* name */);
-
-        /**
-         * @brief Specify that all external variables are
-         * synchronous. By default, the external variables are
-         * not synchronous.
-         */
-        void allSynchronizedVariable();
+        inline NoSync createNosync(const std::string& name)
+        {
+            return Base::NoSync(name, this);
+        }
 
         /**
          * @brief Set the size of value buffer of an external
-         * variable. By default, this size is infinity.
+         * variable. By default, this size is DEFAULT_SIZE.
          * @param name the name of external variable.
-         * @param name the size of buffer.
+         * @param size the size of buffer.
          */
-        void setSize(const std::string& /* name */,
-                     int /* size */);
+        void size(const std::string& /* name */,
+                  int /* size */);
 
-        // iteration of dependance variables
-        void beginNames();
-        bool endNames();
-        void nextName();
-        std::string name() const;
+        /**
+         * @brief Returns the time step of equation.
+         * @return the time step of equation.
+         */
+        double timeStep() const { return mTimeStep; }
+
+    protected:
+        typedef Values::const_iterator ValuesIterator;
+        typedef std::map < std::string, Values> ValuesMap;
+        typedef ValuesMap::const_iterator ValuesMapIterator;
+        typedef std::map < std::string, bool > ReceivedMap;
+        typedef ReceivedMap::const_iterator ReceivedMapIterator;
+        typedef std::map < std::string, int > SizeMap;
+        typedef SizeMap::const_iterator SizeMapIterator;
+        typedef std::map < std::string, std::string > Mapping;
+        typedef std::set < std::string > SynchroSet;
+        typedef SynchroSet::const_iterator SynchroSetIterator;
+        typedef std::set < std::string > DependanceSet;
+        typedef DependanceSet::const_iterator DependanceSetIterator;
+
+        /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
+        enum state { SEND_INIT, POST_SEND_INIT, PRE_INIT, PRE_INIT2, INIT,
+            PRE, RUN, POST, POST2, POST3 };
+        enum mode { NAME, PORT, MAPPING };
+
+        /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
+        Base(const graph::AtomicModel& model,
+             const devs::InitEventList& events,
+             bool control = true);
+
+        virtual ~Base() {}
+
+        void addExternalValue(double value,
+                              const std::string& name,
+                              bool init = false);
+
+        void clearReceivedValues();
+
+        void createExternalVariable(const std::string& name,
+                                    VariableIterators& iterators);
+
+        void depends(const std::string& name,
+                     bool synchronized);
+
+        bool init(const VariableIterators& it) const
+        { return (mState == INIT and
+                  not it.mInitValues->empty()); }
+
+        void initExternalVariable(const std::string& name);
+
+        void processUpdate(const std::string& name,
+                           const vle::devs::ExternalEvent& event,
+                           bool begin, bool end);
+
+        void pushNoEDValues();
+
+        virtual double val(const std::string& name,
+                           const Values* it,
+                           const VariableIterators& iterators,
+                           int shift) const;
+
+        /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
+        virtual void addValue(double value, const std::string& name) =0;
+
+        virtual bool check() =0;
+
+        virtual void initValues(const vle::devs::Time& time) =0;
+
+        virtual void removeValue(const std::string& name) =0;
+
+        virtual void updateValues(const vle::devs::Time& time) =0;
+
+        /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
         virtual devs::Time init(const devs::Time& time);
-
-        virtual void output(const devs::Time& time,
-                            devs::ExternalEventList& output) const;
 
         virtual devs::Time timeAdvance() const;
 
@@ -146,6 +292,148 @@ namespace vle { namespace extension {
             const devs::ExternalEventList& event,
             const devs::Time& time);
 
+        /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
+        state mState;
+        double mTimeStep;
+
+        // external variable info section
+        ValuesMap mExternalValues;
+        ValuesMap mInitExternalValues;
+        ValuesMap mNoEDValues;
+        ReceivedMap mReceivedValues;
+        SizeMap mSize;
+        mode mMode;
+        Mapping mMapping;
+
+        // dependance and synchronous info section
+        DependanceSet mDepends;
+        bool mControl;
+        bool mSynchro;
+        SynchroSet mSynchros;
+        unsigned int mSyncs;
+        bool mAllSynchro;
+
+        bool mActive;
+        bool mDependance;
+        unsigned int mReceive;
+        vle::devs::Time mSigma;
+        vle::devs::Time mSigma2;
+        vle::devs::Time mLastTime;
+        int mWaiting;
+    };
+
+    class Simple : public Base
+    {
+    public:
+        /**
+         * @brief var The class var represents an internal
+         * variable of the equation
+         */
+        class Var : public Variable
+        {
+        public:
+            /**
+             * @brief Default constructor
+             */
+            Var() {}
+
+            /**
+             * @brief Returns the value of variable.
+             * @param shift the temporal shift.
+             * @return the name of variable.
+             */
+            virtual double operator()(int shift = 0)
+            { return ((Simple*)mEquation)->val(shift); }
+
+        private:
+            Var(std::string name, Base* equation) :
+                Variable(name, equation)
+            {
+                Assert(utils::InternalError,
+                       name == ((Simple*)equation)->mVariableName,
+                       (boost::format("DifferenceEquation::simple "\
+                                      "- wrong variable"	       \
+                                      " name: %1% in %2%"))
+                       % name % ((Simple*)equation)->mVariableName);
+            }
+
+            friend class Simple;
+        };
+
+        /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
+        /**
+         * @brief Constructor of the dynamics of an
+         * DifferenceEquation::Simple model. Process the
+         * init events: these events occurs only at the beginning of the
+         * simulation and initialize the state of the model.
+         * @param model the atomic model to which belongs the dynamics.
+         * @param event the init event list.
+         * @param control if true then the external variables are
+         * declared before use.
+         */
+        Simple(const graph::AtomicModel& model,
+               const devs::InitEventList& events,
+               bool control = true);
+
+        /**
+         * @brief Destructor
+         */
+        virtual ~Simple() {}
+
+        /**
+         * @brief Compute the value of internal variable. This
+         * method is abstract.
+         * @param time the time of the computation.
+         * @return the new value of internal variable.
+         */
+        virtual double compute(const vle::devs::Time& time) =0;
+
+        /**
+         * @brief Initialize the value of internal variable. This
+         * method is not abstract. The default value is null if
+         * no initialization event provides an initial value.
+         * @param time the time of the computation.
+         * @return the initial value of internal variable.
+         */
+        virtual double initValue(const vle::devs::Time& /* time */)
+        { return 0.0; }
+
+        /**
+         * @brief Create an internal variable (the variable
+         * managed by the equation)
+         * @param name the name of the internal variable
+         * @return the internal variable
+         */
+        Var createVar(const std::string& name)
+        { return Var(name, this); }
+
+        void size(int size);
+
+    private:
+        double val() const;
+
+        double val(int shift) const;
+
+        /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
+        virtual void addValue(double value, const std::string& name);
+
+        virtual bool check()
+        { return mInitValue; }
+
+        virtual void initValues(const vle::devs::Time& time);
+
+        virtual void removeValue(const std::string& name);
+
+        virtual void updateValues(const vle::devs::Time& time);
+
+        /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
+        virtual void output(const devs::Time& time,
+                            devs::ExternalEventList& output) const;
+
         virtual value::Value* observation(
             const devs::ObservationEvent& event) const;
 
@@ -154,51 +442,303 @@ namespace vle { namespace extension {
             const devs::Time& /* time */,
             devs::ExternalEventList& /* output */) const;
 
-    protected:
-        void displayValues();
-
-    private:
-        void addValue(const std::string& /* name */,
-                      const vle::devs::Time& /* time */,
-                      double /* value */);
-        bool initExternalVariable(const std::string& /* name */,
-                                  const vle::devs::ExternalEvent& /* event */,
-                                  double& timeStep);
-
-        enum state { PRE_INIT, PRE_INIT2, INIT, PRE, RUN, POST, POST2 };
-        enum mode { NAME, PORT, MAPPING };
+        /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
         std::string mVariableName;
-        state mState;
-        double mTimeStep;
-        std::deque < double > mValue;
-        valueList mValues;
-
-        bool mSynchro;
-        std::set < std::string > mSynchros;
-        unsigned int mSyncs;
-        bool mAllSynchro;
-
-        bool mActive;
-        bool mDependance;
-        std::map < std::string , int > mSize;
-        unsigned int mReceive;
-        vle::devs::Time mSigma;
-        vle::devs::Time mSigma2;
-        vle::devs::Time mLastTime;
-        int mWaiting;
-        std::vector < std::string > mWait;
-        bool mInitValue;
+        Values mValues;
         double mInitialValue;
-        bool mInvalid;
-        mode mMode;
-        std::map < std::string, std::string > mMapping;
-
-        valueList::const_iterator valuesIt;
-        valueList::const_iterator namesIt;
-
+        bool mInitValue;
+        int mSize;
     };
 
-}} // namespace vle extension
+    class Multiple : public Base
+    {
+        typedef std::map < std::string, bool > SetValuesMap;
+
+        class MultipleValues
+        {
+        public:
+            MultipleValues() {}
+            virtual ~MultipleValues() {}
+
+            bool empty() const
+            { return mDeque.empty(); }
+
+            double front() const
+            { return mDeque.front(); }
+
+            void operator=(double value)
+            { mDeque.push_front(value); }
+
+            double operator[](unsigned int index) const
+            { return mDeque[index]; }
+
+            void pop_back()
+            { mDeque.pop_back(); }
+
+            void pop_front()
+            { mDeque.pop_front(); }
+
+            size_t size() const
+            { return mDeque.size(); }
+
+        private:
+            Values mDeque;
+        };
+
+        typedef std::map < std::string, MultipleValues > MultipleValuesMap;
+
+        struct MultipleVariableIterators
+        {
+            MultipleValues* mMultipleValues;
+            bool* mSetValues;
+        };
+
+    public:
+        /**
+         * @brief var The class var represents an internal
+         * variable of the system of equations
+         */
+        class Var : public Variable
+        {
+        public:
+            /**
+             * @brief Default constructor
+             */
+            Var() {}
+
+            /**
+             * @brief Set the value of variable.
+             * @param value the new value of variable
+             */
+            virtual void operator=(double value)
+            {
+                Assert(utils::InternalError,
+                       mEquation,
+                       boost::format("DifferenceEquation::multiple "\
+                                     "- variable %1% not build") % name());
+
+                Assert(utils::InternalError,
+                       not(*mIterators.mSetValues),
+                       boost::format("DifferenceEquation::multiple "\
+                                     "- variable %1% already assigned")
+                       % name());
+
+                *mIterators.mMultipleValues = value;
+                *mIterators.mSetValues = true;
+            }
+
+            /**
+             * @brief Returns the value of variable.
+             * @param shift the temporal shift.
+             * @return the name of variable.
+             */
+            virtual double operator()(int shift = 0)
+            {
+                Assert(utils::InternalError,
+                       mEquation,
+                       "DifferenceEquation::multiple - variable not build");
+
+                return ((Multiple*)mEquation)->val(mName,
+                                                   mIterators, shift);
+            }
+
+        private:
+            Var(std::string name, Base* equation) :
+                Variable(name, equation)
+            {
+                ((Multiple*)mEquation)->create(name, mIterators);
+            }
+
+            MultipleVariableIterators mIterators;
+
+            friend class Multiple;
+        };
+
+        /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
+        /**
+         * @brief Constructor of the dynamics of an
+         * DifferenceEquation::Multiple model. Process the
+         * init events: these events occurs only at the beginning of the
+         * simulation and initialize the state of the model.
+         * @param model the atomic model to which belongs the dynamics.
+         * @param event the init event list.
+         * @param control if true then the external variables are
+         * declared before use.
+         */
+        Multiple(const graph::AtomicModel& model,
+                 const devs::InitEventList& events,
+                 bool control = true);
+
+        /**
+         * @brief Destructor
+         */
+        virtual ~Multiple() {}
+
+        /**
+         * @brief Compute the value of all internal variables. This
+         * method is abstract.
+         * @param time the time of the computation.
+         */
+        virtual void compute(const vle::devs::Time& time) =0;
+
+        /**
+         * @brief Call the compute method at beginning and
+         * declare that all internal variables are initialized.
+         */
+        void computeInit(const vle::devs::Time& time);
+
+        /**
+         * @brief Create an internal variable (the variable
+         * managed by the equation).
+         * @param name the name of the internal variable.
+         * @return the internal variable.
+         */
+        Var createVar(const std::string& name)
+        { return Var(name, this); }
+
+        /**
+         * @brief Initialize an internal variable.
+         * @param var the internal variable.
+         * @param value the initial value of the internal variable.
+         */
+        void init(const Var& variable, double value);
+
+        /**
+         * @brief Initialize the value of internal variable. This
+         * method is not abstract. The default value is null if
+         * no initialization event provide an initial value.
+         * @param time the time of the computation.
+         * @return the initial value of internal variable.
+         */
+        virtual void initValue(const vle::devs::Time& time);
+
+    private:
+        void create(const std::string& name,
+                    MultipleVariableIterators& iterator);
+
+        void unset();
+
+        double val(const std::string& name) const;
+
+        double val(const std::string& name,
+                   const MultipleVariableIterators& iterators,
+                   int shift) const;
+
+        /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
+        virtual void addValue(double value, const std::string& name);
+
+        virtual bool check();
+
+        virtual void initValues(const vle::devs::Time& time);
+
+        virtual void removeValue(const std::string& name);
+
+        virtual void updateValues(const vle::devs::Time& time);
+
+        /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
+        virtual devs::Time init(const devs::Time& time);
+
+        virtual void output(const devs::Time& time,
+                            devs::ExternalEventList& output) const;
+
+        virtual value::Value* observation(
+            const devs::ObservationEvent& event) const;
+
+        virtual void request(
+            const devs::RequestEvent& /* event */,
+            const devs::Time& /* time */,
+            devs::ExternalEventList& /* output */) const;
+
+        /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
+        std::vector < std::string > mVariableNames;
+        MultipleValuesMap mValues;
+        std::map < std::string, double > mInitialValues;
+        std::map < std::string, bool > mInitValues;
+        SetValuesMap mSetValues;
+    };
+
+    class Generic : public Simple
+    {
+    public:
+        /**
+         * @brief Constructor of the dynamics of an
+         * DifferenceEquation::Generic model. Process the
+         * init events: these events occurs only at the beginning of the
+         * simulation and initialize the state of the model.
+         * @param model the atomic model to which belongs the dynamics.
+         * @param event the init event list.
+         * @param control if true then the external variables are
+         * declared before use.
+         */
+        Generic(const graph::AtomicModel& model,
+                const devs::InitEventList& events);
+
+        /**
+         * @brief Destructor
+         */
+        virtual ~Generic() {}
+
+        /**
+         * @brief Specify that all external variables are
+         * synchronous. By default, the external variables are
+         * not synchronous.
+         */
+        void allSync();
+
+        /**
+         * @brief The iterator points to the beginning of the
+         * list of external variables.
+         */
+        void beginExt();
+
+        /**
+         * @brief Returns true if the iterator is at the ending
+         * of the list of external variables.
+         * @return true if the iterator is at the ending
+         * of the list of external variables.
+         */
+        bool endExt();
+
+        /**
+         * @brief Return the value of current external variable.
+         * @return the value of current variable.
+         */
+        double valueExt(int shift);
+
+        /**
+         * @brief Return the name of current external variable.
+         * @return the name of current variable.
+         */
+        std::string nameExt();
+
+        /**
+         * @brief The iterator points to the next external variable.
+         */
+        void nextExt();
+
+        /**
+         * @brief Return the number of external variables.
+         * @return the number of external variables.
+         */
+        size_t sizeExt() const
+        { return mExternalValues.size(); }
+
+    protected:
+        virtual void externalTransition(
+            const devs::ExternalEventList& event,
+            const devs::Time& time);
+
+    private:
+        ValuesMapIterator mValuesIt;
+        ValuesMapIterator mNamesIt;
+    };
+
+
+}}} // namespace vle extension DifferenceEquation
 
 #endif

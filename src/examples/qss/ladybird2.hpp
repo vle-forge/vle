@@ -30,21 +30,24 @@
 
 namespace vle { namespace examples { namespace qss {
 
-    class Ladybird2 : public vle::extension::DifferenceEquation
-    {
-    public:
-        Ladybird2(const vle::graph::AtomicModel& model,
-                  const vle::devs::InitEventList& events);
+class Ladybird2 : public vle::extension::DifferenceEquation::Simple
+{
+public:
+    Ladybird2(const vle::graph::AtomicModel& model,
+	      const vle::devs::InitEventList& events);
 
-        virtual ~Ladybird2();
+    virtual ~Ladybird2();
 
-        virtual double compute(const vle::devs::Time& /* time */);
+    virtual double compute(const vle::devs::Time& /* time */);
 
-    private:
-        double b;
-        double d;
-        double e;
-    };
+private:
+    Var y;
+    Sync x;
+
+    double b;
+    double d;
+    double e;
+};
 
 }}} // namespace vle examples qss
 #endif

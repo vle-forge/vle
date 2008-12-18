@@ -30,11 +30,13 @@ namespace vle { namespace examples { namespace qss {
 
 Ladybird2::Ladybird2(const graph::AtomicModel& model,
                      const devs::InitEventList& events) :
-    extension::DifferenceEquation(model, events)
+    extension::DifferenceEquation::Simple(model, events)
 {
     b = value::toDouble(events.get("b"));
     d = value::toDouble(events.get("d"));
     e = value::toDouble(events.get("e"));
+    y = createVar("y");
+    x = createSync("x");
 }
 
 Ladybird2::~Ladybird2()
@@ -43,8 +45,7 @@ Ladybird2::~Ladybird2()
 
 double Ladybird2::compute(const vle::devs::Time& /*time*/)
 {
-    return getValue() + getTimeStep() * (b * d * getValue("x") * getValue() - e *
-					 getValue());
+    return y(-1) + timeStep() * (b * d * x(0) * y(-1) - e * y(-1));
 }
 
 }}} // namespace vle examples qss

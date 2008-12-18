@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://vle.univ-littoral.fr/vle-0.6.0.dtd">
+<vle_project version="0.5" date="mar, 18 nov 2008" author="Eric Ramat">
+  <structures>
+    <model name="m" type="coupled" x="180" y="34" width="803" height="541"  >
+      <submodels>
+	<model name="Controller" type="atomic" conditions="cond"
+	       dynamics="dynController" observables="">
+	  <out>
+	    <port name="add" />
+	    <port name="remove" />
+	  </out>
+	</model>
+	<model name="Executive" type="atomic" conditions="cond,cond_executive"
+	       dynamics="dynExecutive" observables="">
+	  <in>
+	    <port name="update" />
+	    <port name="add" />
+	    <port name="remove" />
+	  </in>
+	  <out>
+	    <port name="add" />
+	    <port name="remove" />
+	  </out>
+	</model>
+	<model name="A" type="atomic" conditions="cond,cond_A"
+	       dynamics="dynA" observables="obsA" >
+	  <out>
+	    <port name="update" />
+	  </out>
+	</model>
+	<model name="sum" type="atomic" conditions="cond,cond_sum"
+	       dynamics="dynSum" observables="obsSum" >
+	  <in>
+	    <port name="add" />
+	    <port name="remove" />
+	  </in>
+	</model>
+      </submodels>
+      <connections>
+	<connection type="internal">
+	  <origin model="Controller" port="add" />
+	  <destination model="Executive" port="add" />
+	</connection>
+	<connection type="internal">
+	  <origin model="Controller" port="remove" />
+	  <destination model="Executive" port="remove" />
+	</connection>
+	<connection type="internal">
+	  <origin model="A" port="update" />
+	  <destination model="Executive" port="update" />
+	</connection>
+	<connection type="internal">
+	  <origin model="Executive" port="add" />
+	  <destination model="sum" port="add" />
+	</connection>
+	<connection type="internal">
+	  <origin model="Executive" port="remove" />
+	  <destination model="sum" port="remove" />
+	</connection>
+      </connections>
+    </model>
+  </structures>
+  <dynamics>
+    <dynamic name="dynController" library="equation1"
+	     model="Controller" type="local"  />
+    <dynamic name="dynExecutive" library="equation1"
+	     model="Executive" type="local"  />
+    <dynamic name="dynA" library="equation1" model="A1" type="local"  />
+    <dynamic name="dynSum" library="equation1" model="sum" type="local"  />
+  </dynamics>
+  <experiment name="exp" duration="20" combination="linear" seed="12389" >
+    <conditions>
+      <condition name="cond" >
+	<port name="size" >
+	  <integer>2</integer>
+	</port>
+	<port name="time-step" >
+	  <double>1</double>
+	</port>
+      </condition>
+      <condition name="cond_A" >
+	<port name="name" >
+	  <string>a</string>
+	</port>
+	<port name="value" >
+	  <double>0</double>
+	</port>
+      </condition>
+      <condition name="cond_sum" >
+	<port name="name" >
+	  <string>s</string>
+	</port>
+      </condition>
+      <condition name="cond_executive" >
+	<port name="view" >
+	  <string>view</string>
+	</port>
+      </condition>
+    </conditions>
+    <views>
+      <outputs>
+	<output name="o" location="" format="local" plugin="text" />
+
+      </outputs>
+      <observables>
+	<observable name="obsA" >
+	  <port name="a" >
+	    <attachedview name="view" />
+	  </port>
+
+	</observable>
+
+	<observable name="obsB" >
+	  <port name="b" >
+	    <attachedview name="view" />
+	  </port>
+
+	</observable>
+
+	<observable name="obsSum" >
+	  <port name="s" >
+	    <attachedview name="view" />
+	  </port>
+
+	</observable>
+
+      </observables>
+      <view name="view" output="o" type="timed" timestep="1" />
+
+    </views>
+  </experiment>
+</vle_project>

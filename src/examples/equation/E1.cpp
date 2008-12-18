@@ -1,5 +1,5 @@
 /**
- * @file examples/equation/C2.cpp
+ * @file examples/equation/E1.cpp
  * @author The VLE Development Team
  */
 
@@ -23,22 +23,22 @@
  */
 
 
-#include <examples/equation/C2.hpp>
+#include <examples/equation/E1.hpp>
 
 namespace vle { namespace examples { namespace equation {
 
-//C(t)=D(t)+1
-C2::C2(const graph::AtomicModel& model,
-       const devs::InitEventList& events) :
-    extension::DifferenceEquation::Simple(model, events)
+void E1::compute(const devs::Time& /* time */)
 {
-    c = createVar("c");
-    d = createSync("d");
+    a = a(-1) + 1;
+    b = b(-1) + a(-1) + 1;
+    c = c(-1) + b(-1) + 1;
 }
 
-double C2::compute(const devs::Time& /* time */)
+void E1::initValue(const devs::Time& /* time */)
 {
-    return d(0) + 1;
+    init(a, 0.0);
+    init(b, a(0) - 3);
+    init(c, 0.0);
 }
 
 }}} // namespace vle examples equation

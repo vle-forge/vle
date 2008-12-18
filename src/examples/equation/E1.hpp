@@ -1,5 +1,5 @@
 /**
- * @file examples/equation/C2.cpp
+ * @file examples/equation/E1.hpp
  * @author The VLE Development Team
  */
 
@@ -23,22 +23,36 @@
  */
 
 
-#include <examples/equation/C2.hpp>
+#ifndef EXAMPLES_EQUATION_E1_HPP
+#define EXAMPLES_EQUATION_E1_HPP
+
+#include <vle/extension/DifferenceEquation.hpp>
 
 namespace vle { namespace examples { namespace equation {
 
-//C(t)=D(t)+1
-C2::C2(const graph::AtomicModel& model,
-       const devs::InitEventList& events) :
-    extension::DifferenceEquation::Simple(model, events)
-{
-    c = createVar("c");
-    d = createSync("d");
-}
+    class E1 : public extension::DifferenceEquation::Multiple
+    {
+        Var a;
+        Var b;
+        Var c;
 
-double C2::compute(const devs::Time& /* time */)
-{
-    return d(0) + 1;
-}
+    public:
+        E1(const graph::AtomicModel& model,
+           const devs::InitEventList& events) :
+            extension::DifferenceEquation::Multiple(model, events)
+        {
+            a = createVar("a");
+            b = createVar("b");
+            c = createVar("c");
+        }
+        virtual ~E1() { }
+
+        virtual void compute(const devs::Time& time);
+        virtual void initValue(const devs::Time& time);
+    };
 
 }}} // namespace vle examples equation
+
+DECLARE_NAMED_DYNAMICS(E1, vle::examples::equation::E1)
+
+#endif

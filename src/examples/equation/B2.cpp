@@ -28,17 +28,18 @@
 namespace vle { namespace examples { namespace equation {
 
 // B(t)=A(t)+C(t-1)+1
-B2::B2(const vle::graph::AtomicModel& model,
-       const vle::devs::InitEventList& events) :
-    vle::extension::DifferenceEquation(model, events)
+B2::B2(const graph::AtomicModel& model,
+       const devs::InitEventList& events) :
+    extension::DifferenceEquation::Simple(model, events)
 {
-    setSynchronizedVariable("a");
+    b = createVar("b");
+    a = createSync("a");
+    c = createNosync("c");
 }
 
-double B2::compute(const vle::devs::Time& /* time */)
+double B2::compute(const devs::Time& /* time */)
 {
-    return getValue("a") + getValue("c", -1) + 1;
+    return a(0) + c(-1) + 1;
 }
 
 }}} // namespace vle examples equation
-

@@ -109,7 +109,7 @@
   </conditions>
   <views>
    <outputs>
-    <output name="o" format="local" plugin="storage"/>
+    <output name="o" format="local" plugin="text"/>
    </outputs>
    <observables>
     <observable name="obsA">

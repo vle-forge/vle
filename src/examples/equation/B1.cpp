@@ -27,21 +27,22 @@
 
 namespace vle { namespace examples { namespace equation {
 
-B1::B1(const vle::graph::AtomicModel& model,
-       const vle::devs::InitEventList& events) :
-    vle::extension::DifferenceEquation(model, events)
+B1::B1(const graph::AtomicModel& model,
+       const devs::InitEventList& events) :
+    extension::DifferenceEquation::Simple(model, events)
 {
-    setSynchronizedVariable("a");
+    b = createVar("b");
+    a = createSync("a");
 }
 
-double B1::compute(const vle::devs::Time& /* time */)
+double B1::compute(const devs::Time& /* time */)
 {
-    return getValue() + getValue("a", -1) + 1;
+    return b(-1) + a(-1) + 1;
 }
 
-double B1::initValue()
+double B1::initValue(const devs::Time& /* time */)
 {
-    return getValue("a") - 3;
+    return a(0) - 3;
 }
 
 }}} // namespace vle examples equation

@@ -1,126 +1,176 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://vle.univ-littoral.fr/vle-0.6.0.dtd">
-<vle_project version="0.5" date="" author="Eric Ramat">
- <structures>
-  <model name="m" type="coupled">
-   <submodels>
-    <model name="A" type="atomic" dynamics="dynA" observables="obsA" conditions="cond,cond_A">
-     <out>
-      <port name="update"/>
-     </out>
-    </model>
-    <model name="B" type="atomic" dynamics="dynB" observables="obsB" conditions="cond,cond_B">
-     <in>
-      <port name="update"/>
-     </in>
-     <out>
-      <port name="update"/>
-     </out>
-    </model>
-    <model name="C" type="atomic" dynamics="dynC" observables="obsC" conditions="cond,cond_C">
-     <in>
-      <port name="update"/>
-     </in>
-     <out>
-      <port name="update"/>
-     </out>
-    </model>
-    <model name="D" type="atomic" dynamics="dynD" observables="obsD" conditions="cond,cond_D">
-     <in>
-      <port name="update"/>
-     </in>
-    </model>
-   </submodels>
-   <connections>
-    <connection type="internal">
-     <origin model="A" port="update"/>
-     <destination model="B" port="update"/>
-    </connection>
-    <connection type="internal">
-     <origin model="A" port="update"/>
-     <destination model="D" port="update"/>
-    </connection>
-    <connection type="internal">
-     <origin model="B" port="update"/>
-     <destination model="C" port="update"/>
-    </connection>
-    <connection type="internal">
-     <origin model="C" port="update"/>
-     <destination model="D" port="update"/>
-    </connection>
-   </connections>
-  </model>
- </structures>
- <dynamics>
-  <dynamic name="dynA" library="equation1" model="A1"/>
-  <dynamic name="dynB" library="equation1" model="B1"/>
-  <dynamic name="dynC" library="equation1" model="C1"/>
-  <dynamic name="dynD" library="equation1" model="D1"/>
- </dynamics>
- <experiment name="exp" duration="1" seed="12389">
-  <conditions>
-   <condition name="cond">
-    <port name="time-step">
-     <double>.1</double>
-    </port>
-    <port name="size">
-     <integer>2</integer>
-    </port>
-   </condition>
-   <condition name="cond_A">
-    <port name="name">
-     <string>a</string>
-    </port>
-    <port name="value">
-     <double>0</double>
-    </port>
-   </condition>
-   <condition name="cond_B">
-    <port name="name">
-     <string>b</string>
-    </port>
-   </condition>
-   <condition name="cond_C">
-    <port name="name">
-     <string>c</string>
-    </port>
-    <port name="value">
-     <double>1</double>
-    </port>
-   </condition>
-   <condition name="cond_D">
-    <port name="name">
-     <string>d</string>
-    </port>
-   </condition>
-  </conditions>
-  <views>
-   <outputs>
-    <output name="o" format="local" plugin="storage"/>
-   </outputs>
-   <observables>
-    <observable name="obsA">
-     <port name="a">
-      <attachedview name="view"/>
-     </port>
-    </observable>
-    <observable name="obsB">
-     <port name="b">
-      <attachedview name="view"/>
-     </port>
-    </observable>
-    <observable name="obsC">
-     <port name="c">
-      <attachedview name="view"/>
-     </port>
-    </observable>
-    <observable name="obsD">
-     <port name="d">
-      <attachedview name="view"/>
-     </port>
-    </observable>
-   </observables>
-   <view name="view" type="timed" timestep=".1" output="o"/>
-  </views>
- </experiment>
+<vle_project version="0.5" date="mar, 18 nov 2008" author="Eric Ramat">
+<structures>
+<model name="m" type="coupled" x="180" y="34" width="803" height="541"  >
+<submodels>
+<model name="A" type="atomic" conditions="cond,cond_A" dynamics="dynA" observables="obsA" x="342" y="350" width="100" height="45" >
+<out>
+ <port name="update" />
+</out>
+</model>
+<model name="B" type="atomic" conditions="cond,cond_B" dynamics="dynB" observables="obsB" x="198" y="251" width="100" height="45" >
+<in>
+ <port name="update" />
+</in>
+<out>
+ <port name="update" />
+</out>
+</model>
+<model name="C" type="atomic" conditions="cond,cond_C" dynamics="dynC" observables="obsC" x="143" y="151" width="100" height="45" >
+<in>
+ <port name="update" />
+</in>
+<out>
+ <port name="update" />
+</out>
+</model>
+<model name="D" type="atomic" conditions="cond,cond_D" dynamics="dynD" observables="obsD" x="522" y="201" width="100" height="45" >
+<in>
+ <port name="update" />
+</in>
+<out>
+ <port name="update" />
+</out>
+</model>
+<model name="sum" type="atomic" conditions="cond,cond_sum" dynamics="dynSum" observables="obsSum" x="674" y="115" width="100" height="45" >
+<in>
+ <port name="a" />
+ <port name="b" />
+ <port name="c" />
+ <port name="d" />
+</in>
+</model>
+</submodels>
+<connections>
+<connection type="internal">
+ <origin model="A" port="update" />
+ <destination model="B" port="update" />
+</connection>
+<connection type="internal">
+ <origin model="A" port="update" />
+ <destination model="D" port="update" />
+</connection>
+<connection type="internal">
+ <origin model="A" port="update" />
+ <destination model="sum" port="a" />
+</connection>
+<connection type="internal">
+ <origin model="B" port="update" />
+ <destination model="C" port="update" />
+</connection>
+<connection type="internal">
+ <origin model="B" port="update" />
+ <destination model="sum" port="b" />
+</connection>
+<connection type="internal">
+ <origin model="C" port="update" />
+ <destination model="D" port="update" />
+</connection>
+<connection type="internal">
+ <origin model="C" port="update" />
+ <destination model="sum" port="c" />
+</connection>
+<connection type="internal">
+ <origin model="D" port="update" />
+ <destination model="sum" port="d" />
+</connection>
+</connections>
+</model>
+</structures>
+<dynamics>
+<dynamic name="dynA" library="equation1" model="A1" type="local"  />
+<dynamic name="dynB" library="equation1" model="B1" type="local"  />
+<dynamic name="dynC" library="equation1" model="C1" type="local"  />
+<dynamic name="dynD" library="equation1" model="D1" type="local"  />
+<dynamic name="dynSum" library="equation1" model="sum" type="local"  />
+</dynamics>
+<experiment name="exp" duration="1" combination="linear" seed="12389" >
+<conditions>
+<condition name="cond" >
+ <port name="size" >
+<integer>2</integer>
+</port>
+ <port name="time-step" >
+<double>0.1</double>
+</port>
+</condition>
+<condition name="cond_A" >
+ <port name="name" >
+<string>a</string>
+</port>
+ <port name="value" >
+<double>0</double>
+</port>
+</condition>
+<condition name="cond_B" >
+ <port name="name" >
+<string>b</string>
+</port>
+</condition>
+<condition name="cond_C" >
+ <port name="name" >
+<string>c</string>
+</port>
+ <port name="value" >
+<double>1</double>
+</port>
+</condition>
+<condition name="cond_D" >
+ <port name="name" >
+<string>d</string>
+</port>
+</condition>
+<condition name="cond_sum" >
+ <port name="name" >
+<string>s</string>
+</port>
+</condition>
+</conditions>
+<views>
+<outputs>
+<output name="o" location="" format="local" plugin="text" />
+
+</outputs>
+<observables>
+<observable name="obsA" >
+<port name="a" >
+ <attachedview name="view" />
+</port>
+
+</observable>
+
+<observable name="obsB" >
+<port name="b" >
+ <attachedview name="view" />
+</port>
+
+</observable>
+
+<observable name="obsC" >
+<port name="c" >
+ <attachedview name="view" />
+</port>
+
+</observable>
+
+<observable name="obsD" >
+<port name="d" >
+ <attachedview name="view" />
+</port>
+
+</observable>
+
+<observable name="obsSum" >
+<port name="s" >
+ <attachedview name="view" />
+</port>
+
+</observable>
+
+</observables>
+<view name="view" output="o" type="timed" timestep="0.1" />
+
+</views>
+</experiment>
 </vle_project>

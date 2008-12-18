@@ -30,15 +30,17 @@
 
 namespace vle { namespace examples { namespace equation {
 
-    class C2 : public vle::extension::DifferenceEquation
+    class C2 : public extension::DifferenceEquation::Simple
     {
-    public:
-        C2(const vle::graph::AtomicModel& model,
-           const vle::devs::InitEventList& events);
+        Var c;
+        Sync d;
 
+    public:
+        C2(const graph::AtomicModel& model,
+           const devs::InitEventList& events);
         virtual ~C2() { }
 
-        virtual double compute(const vle::devs::Time& time);
+        virtual double compute(const devs::Time& time);
     };
 
 }}} // namespace vle examples equation

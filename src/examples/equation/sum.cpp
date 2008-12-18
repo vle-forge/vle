@@ -1,5 +1,5 @@
 /**
- * @file examples/equation/C2.cpp
+ * @file examples/equation/sum.cpp
  * @author The VLE Development Team
  */
 
@@ -23,22 +23,45 @@
  */
 
 
-#include <examples/equation/C2.hpp>
+#ifndef EXAMPLES_EQUATION_sum_HPP
+#define EXAMPLES_EQUATION_sum_HPP
+
+#include <vle/extension/DifferenceEquation.hpp>
 
 namespace vle { namespace examples { namespace equation {
 
-//C(t)=D(t)+1
-C2::C2(const graph::AtomicModel& model,
+class sum : public extension::DifferenceEquation::Generic
+{
+public:
+    sum(const graph::AtomicModel& model,
        const devs::InitEventList& events) :
-    extension::DifferenceEquation::Simple(model, events)
-{
-    c = createVar("c");
-    d = createSync("d");
-}
+	extension::DifferenceEquation::Generic(model, events)
+        {
+	    allSync();
+	}
 
-double C2::compute(const devs::Time& /* time */)
-{
-    return d(0) + 1;
-}
+    virtual ~sum() { }
+
+    virtual double compute(const devs::Time& /* time */)
+	{
+	    double s = 0;
+
+	    beginExt();
+	    while (not endExt()) {
+		s += valueExt(0);
+		nextExt();
+	    }
+	    return s;
+	}
+
+    virtual double initValue(const devs::Time& time)
+	{
+	    return compute(time);
+	}
+};
 
 }}} // namespace vle examples equation
+
+DECLARE_NAMED_DYNAMICS(sum, vle::examples::equation::sum)
+
+#endif

@@ -27,12 +27,12 @@
 
 namespace vle { namespace examples { namespace equation {
 
-double A1::compute(const vle::devs::Time& /* time */)
+double A1::compute(const devs::Time& /* time */)
 {
-    return getValue() + 1;
+    return a(-1) + 1;
 }
 
-double A1::initValue()
+double A1::initValue(const devs::Time& /* time */)
 {
     return 0;
 }

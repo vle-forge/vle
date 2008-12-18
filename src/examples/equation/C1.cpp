@@ -27,15 +27,17 @@
 
 namespace vle { namespace examples { namespace equation {
 
-C1::C1(const vle::graph::AtomicModel& model,
-       const vle::devs::InitEventList& events) :
-  vle::extension::DifferenceEquation(model, events)
+C1::C1(const graph::AtomicModel& model,
+       const devs::InitEventList& events) :
+    extension::DifferenceEquation::Simple(model, events)
 {
+    c = createVar("c");
+    b = createNosync("b");
 }
 
-double C1::compute(const vle::devs::Time& /* time */)
+double C1::compute(const devs::Time& /* time */)
 {
-  return getValue() + getValue("b", -1) + 1;
+    return c(-1) + b(-1) + 1;
 }
 
 }}} // namespace vle examples equation

@@ -30,10 +30,12 @@ namespace vle { namespace examples { namespace qss {
 
 Plantlouse2::Plantlouse2(const graph::AtomicModel& model,
                          const devs::InitEventList& events) :
-    extension::DifferenceEquation(model, events)
+    extension::DifferenceEquation::Simple(model, events)
 {
     a = value::toDouble(events.get("a"));
     b = value::toDouble(events.get("b"));
+    x = createVar("x");
+    y = createSync("y");
 }
 
 Plantlouse2::~Plantlouse2()
@@ -42,8 +44,7 @@ Plantlouse2::~Plantlouse2()
 
 double Plantlouse2::compute(const vle::devs::Time& /* time */)
 {
-    return getValue() + getTimeStep() * (a * getValue() - b * getValue("y") *
-					 getValue());
+    return x(-1) + timeStep() * (a * x(-1) - b * y(0) * x(-1));
 }
 
 }}} // namespace vle examples qss

@@ -24,42 +24,36 @@
 
 
 #include <vle/extension/DifferenceEquation.hpp>
-#include <vle/utils/Debug.hpp>
-#include <vle/utils/Trace.hpp>
 #include <cmath>
-#include <iostream>
 
-namespace vle { namespace extension {
+namespace vle { namespace extension { namespace DifferenceEquation {
 
 using namespace devs;
 using namespace graph;
 using namespace value;
 
-DifferenceEquation::DifferenceEquation(const AtomicModel& model,
-                                       const InitEventList& events) :
+const unsigned int Base::DEFAULT_SIZE = 2;
+
+Base::Base(const AtomicModel& model,
+	   const InitEventList& events,
+	   bool control) :
     Dynamics(model, events),
     mTimeStep(0),
+    mMode(NAME),
+    mControl(control),
     mSynchro(false),
     mAllSynchro(false),
-    mWaiting(0),
-    mInitValue(false),
-    mMode(NAME)
+    mWaiting(0)
 {
-    if (events.exist("name")) {
-        mVariableName = toString(events.get("name"));
-    } else {
-        mVariableName = getModelName();
-    }
-
-    if (events.exist("value")) {
-        mInitialValue = toDouble(events.get("value"));
-        mInitValue = true;
-    }
-
-    if (events.exist("time-step"))
+    if (events.exist("time-step")) {
         mTimeStep = toDouble(events.get("time-step"));
-    else
-        mTimeStep = 0;
+    } else {
+        Assert(utils::InternalError,
+               events.exist("time-step"),
+               (boost::format(
+                       "[%1%] DifferenceEquation - time-step port not exists")
+                   % getModelName()).str());
+    }
 
     if (events.exist("mode")) {
         std::string str = toString(events.get("mode"));
@@ -70,11 +64,13 @@ DifferenceEquation::DifferenceEquation(const AtomicModel& model,
             mMode = MAPPING;
 
             Assert(utils::InternalError,
-                   events.exist("mapping"), (boost::format(
+                   events.exist("mapping"),
+                   (boost::format(
                            "[%1%] DifferenceEquation - mapping port not exists")
                        % getModelName()).str());
 
-            const value::Map& mapping = value::toMapValue(events.get("mapping"));
+            const value::Map& mapping = value::toMapValue(
+                events.get("mapping"));
             const value::MapValue& lst = mapping.value();
             for (value::MapValue::const_iterator it = lst.begin();
                  it != lst.end(); ++it) {
@@ -88,302 +84,394 @@ DifferenceEquation::DifferenceEquation(const AtomicModel& model,
     }
 }
 
-void DifferenceEquation::addValue(const std::string& name,
-                                  const Time& time,
-                                  double value)
+void Base::addExternalValue(double value,
+                            const std::string& name,
+                            bool init)
 {
-    mValues[name].push_front(std::pair < double, double >(time.getValue(),
-                                                          value));
-    if (mSize[name] != -1 and (int)mValues[name].size() > mSize[name])
-        mValues[name].pop_back();
+
+    Assert(utils::ModellingError,
+           mExternalValues.find(name) != mExternalValues.end(),
+           (boost::format(
+                   "[%1%] DifferenceEquation::add - invalid variable name: %2%") %
+               getModelName() % name).str());
+
+    mExternalValues[name].push_front(value);
+    if (mSize[name] != -1 and
+        (int)mExternalValues[name].size() > mSize[name]) {
+        mExternalValues[name].pop_back();
+    }
+    if (not init) {
+        mReceivedValues[name] = true;
+    }
 }
 
-void DifferenceEquation::displayValues()
+void Base::clearReceivedValues()
 {
-    valueList::const_iterator it = mValues.begin();
+    ReceivedMap::iterator it = mReceivedValues.begin();
 
-    while (it != mValues.end()) {
-        std::deque < std::pair < double, double > > list = it->second;
-        std::deque < std::pair < double, double > >::const_iterator it2 =
-            list.begin();
-
-        std::cout << it->first << ":";
-        while (it2 != list.end()) {
-            std::cout << "(" << it2->first << "," << it2->second << ") ";
-            ++it2;
-        }
-        std::cout << std::endl;
+    while (it != mReceivedValues.end()) {
+        it->second = false;
         ++it;
     }
 }
 
-double DifferenceEquation::getValue(int shift) const
+void Base::createExternalVariable(const std::string& name,
+                                  VariableIterators& iterators)
 {
-    Assert(utils::InternalError, shift <= 0, (boost::format(
-                "[%1%] DifferenceEquation::getValue - positive shift") %
-            getModelName()).str());
-
-    if (shift == 0) return mValue.front();
-    else {
-
-        Assert(utils::InternalError, (int)(mValue.size() - 1) >= -shift,
-               (boost::format("[%1%] - getValue - shift too large") %
-                getModelName()).str());
-
-        return mValue[-shift];
-    }
+    mExternalValues.insert(std::make_pair(name, Values()));
+    iterators.mValues = &mExternalValues.find(name)->second;
+    mInitExternalValues.insert(std::make_pair(name, Values()));
+    iterators.mInitValues = &mInitExternalValues.find(name)->second;
+    mReceivedValues.insert(std::make_pair(name, false));
+    iterators.mReceivedValues = &mReceivedValues.find(name)->second;
 }
 
-bool DifferenceEquation::initExternalVariable(const std::string& name,
-                                              const devs::ExternalEvent& event,
-                                              double& timeStep)
+void Base::depends(const std::string& name,
+                   bool synchronized)
 {
-    bool ok = true;
+    if (synchronized) {
+        mSynchro = true;
+        mSynchros.insert(name);
+        ++mWaiting;
+    }
+    mDepends.insert(name);
+}
+
+void Base::initExternalVariable(const std::string& name)
+{
+
+    Assert(utils::ModellingError,
+           (mControl and mDepends.find(name) != mDepends.end()) or not mControl,
+           (boost::format(
+                   "[%1%] DifferenceEquation::init - invalid variable name: "\
+                   "\"%2%\"") % getModelName() % name).str());
 
     if (mSynchros.find(name) == mSynchros.end()) {
         if (mAllSynchro) {
             mSynchros.insert(name);
             ++mSyncs;
+            --mWaiting;
         }
-    }
-    else ++mSyncs;
-
-    // est-ce que cette variable externe possède une
-    // limite de buffer ? si non alors ...
-    if (mSize.find(name) == mSize.end())
-        mSize[name] = 2;
-
-    // est-ce que je connais ce modèle ? si non alors ...
-    if (mValues.find(name) == mValues.end()) {
-        // est-ce que je suis en attente des
-        // caractéristiques d'un modèle non défini ?
-        // si oui alors recherche du modèle et
-        // suppression de celui-ci de la liste des attentes
-        if (!mWait.empty()) {
-            std::vector < std::string >::iterator itw = mWait.begin();
-            bool found = false;
-
-            while (!found and itw != mWait.end()) {
-                found = (*itw == name);
-                ++itw;
-            }
-            if (found) mWait.erase(itw);
-        }
-
+    } else {
+        ++mSyncs;
         --mWaiting;
-
-        // création de la liste des valeurs reçues
-        mValues[name] = std::deque < std::pair < double, double > >();
-        // récupération du delta de ma dépendance,
-        // c'est utilisé si delta n'a pas été initialisé
-	if (event.existAttributeValue("time-step"))
-	    timeStep = event.getDoubleAttributeValue("time-step");
     }
-    // ma dépendance ne connait pas son pas de temps
-    else {
-        mWait.push_back(name);
-        ok = false;
+
+    if (mSize.find(name) == mSize.end()) {
+        mSize[name] = DEFAULT_SIZE;
     }
-    return ok;
+
+    if (mExternalValues.find(name) == mExternalValues.end()) {
+        mReceivedValues[name] = false;
+        mExternalValues[name] = Values();
+    }
+
+    if (mInitExternalValues.find(name) != mInitExternalValues.end()) {
+        ValuesIterator it = mInitExternalValues[name].begin();
+
+        while (it != mInitExternalValues[name].end()) {
+            double value = *it;
+
+            addExternalValue(value, name, true);
+            ++it;
+        }
+        mInitExternalValues[name].clear();
+    }
 }
 
-void DifferenceEquation::beginNames()
+double Base::val(const std::string& name,
+                 const Values* it,
+                 const VariableIterators& iterators,
+                 int shift) const
 {
-    namesIt = mValues.begin();
-}
-
-bool DifferenceEquation::endNames()
-{
-    return namesIt == mValues.end();
-}
-
-void DifferenceEquation::nextName()
-{
-    ++namesIt;
-}
-
-std::string DifferenceEquation::name() const
-{
-    return namesIt->first;
-}
-
-double DifferenceEquation::getValue(const char* name,
-                                    int shift) const
-{
-    valueList::const_iterator it = mValues.find(name);
-
-    Assert(utils::InternalError, it != mValues.end(), (boost::format(
-    "[%1%] DifferenceEquation::getValue - invalid variable name: %2%") %
-            getModelName() % name).str());
-
-    Assert(utils::InternalError, shift <= 0, (boost::format(
-    "[%1%] DifferenceEquation::getValue - positive shift on %2%") %
-            getModelName() % name).str());
+    Assert(utils::ModellingError,
+           shift <= 0,
+           (boost::format(
+                   "[%1%] DifferenceEquation::getValue - positive shift on %2%") %
+               getModelName() % name).str());
 
     if (mState == INIT) {
-        Assert(utils::InternalError, shift == 0, (boost::format(
-    "[%1%] DifferenceEquation::getValue - not null shift on %2% in INIT state")
-                % getModelName() % name).str());
-
-        return it->second.front().second;
-    } else {
-        std::set < std::string >::const_iterator its = mSynchros.find(name);
-
-        if (its == mSynchros.end()) ++shift;
-
-        Assert(utils::InternalError, shift <= 0, (boost::format(
-                    "[%1%] DifferenceEquation::getValue - wrong shift on %2%") %
-                getModelName() % name).str());
+        if (not iterators.mSynchro and
+            not *iterators.mReceivedValues) {
+            ++shift;
+        }
 
         if (shift == 0) {
-            return it->second.front().second;
+            ValuesIterator itv = mExternalValues.find(name)->second.begin();
+
+            return it->front();
         } else {
-            std::deque < std::pair < double, double > > list = it->second;
+            Assert(utils::InternalError, (int)(it->size() - 1) >= -shift,
+                   (boost::format("[%1%] - %2%[%3%] "	\
+                                  "- shift too large") %
+                    getModelName() % name % shift).str());
 
-            Assert(utils::InternalError, (int)(list.size() - 1) >= -shift,
-                   (boost::format("[%1%] - getValue - shift too large") %
-                    getModelName()).str());
+            return (*it)[-shift];
+        }
+    } else {
+        if (not iterators.mSynchro and
+            not *iterators.mReceivedValues) {
+            ++shift;
+        }
 
-            return list[-shift].second;
+        Assert(utils::InternalError,
+               shift <= 0,
+               (boost::format(
+                       "[%1%] DifferenceEquation::getValue - wrong shift on %2%") %
+                   getModelName() % name).str());
+
+        if (shift == 0) {
+            return it->front();
+        } else {
+            Assert(utils::InternalError, (int)(it->size() - 1) >= -shift,
+                   (boost::format("[%1%] - %2%[%3%] - "	\
+                                  "shift too large") %
+                    getModelName() % name % shift).str());
+
+            return (*it)[-shift];
         }
     }
 }
 
-void DifferenceEquation::setSize(const std::string& name,
-                                 int size)
+void Base::processUpdate(const std::string& name,
+                         const devs::ExternalEvent& event,
+                         bool begin, bool end)
+{
+    double value = 0.0;
+    bool ok = true;
+
+    if (mState == POST_SEND_INIT) {
+
+        Assert(utils::ModellingError,
+               mControl and mDepends.find(name) != mDepends.end(),
+               (boost::format(
+                       "[%1%] DifferenceEquation::init "		\
+                       "- invalid variable name: %2%") %
+                   getModelName() % name).str());
+
+        if (event.existAttributeValue("init")) {
+            const value::Set& init =
+                event.getSetAttributeValue("init");
+            unsigned int i;
+
+            for (i = 0; i < init.size(); ++i) {
+                mInitExternalValues[name].push_front(
+                    toDouble(init.get(i)));
+            }
+        }
+        else if (event.existAttributeValue("value")) {
+            value = event.getDoubleAttributeValue("value");
+            mNoEDValues[name].push_front(value);
+        }
+        ok = false;
+    } else {
+        value = event.getDoubleAttributeValue("value");
+    }
+
+    if (mState == INIT) {
+        initExternalVariable(name);
+    }
+
+    if (ok) {
+        if ((not begin) and (not end)
+            and mSynchros.find(name) != mSynchros.end()) {
+            if (not mReceivedValues[name]) {
+                ++mReceive;
+            }
+            mExternalValues[name].pop_back();
+            addExternalValue(value, name);
+        } else {
+            addExternalValue(value, name);
+            if ((mState == INIT or (mState == PRE and end))
+                and mSynchros.find(name) != mSynchros.end()) {
+                ++mReceive;
+            }
+        }
+    }
+}
+
+void Base::pushNoEDValues()
+{
+    if (not mNoEDValues.empty()) {
+        ValuesMapIterator itl = mNoEDValues.begin();
+
+        while (itl != mNoEDValues.end()) {
+            std::deque < double >::const_iterator itv = itl->second.begin();
+
+            while (itv != itl->second.end()) {
+                initExternalVariable(itl->first);
+                addExternalValue(*itv, itl->first);
+                if (mSynchros.find(itl->first) != mSynchros.end()) {
+                    ++mReceive;
+                }
+                ++itv;
+            }
+            ++itl;
+        }
+        mNoEDValues.clear();
+    }
+}
+
+void Base::size(const std::string& name,
+                int s)
 {
     Assert(utils::InternalError, mSize.find(name) == mSize.end(),
            (boost::format(
-                   "[%1%] DifferenceEquation::setSize - %2% already exists") %
-            getModelName() % name).str());
+                   "[%1%] DifferenceEquation::size - %2% already exists") %
+               getModelName() % name).str());
 
-    mSize[name] = size;
+    mSize[name] = s;
 }
 
-void DifferenceEquation::setSynchronizedVariable(const std::string& name)
+Time Base::init(const devs::Time& time)
 {
-    mSynchro = true;
-    mSynchros.insert(name);
-    ++mWaiting;
-}
-
-void DifferenceEquation::allSynchronizedVariable()
-{
-    mAllSynchro = true;
-}
-
-Time DifferenceEquation::init(const devs::Time& /* time */)
-{
-    if (mMode == NAME) mDependance = getModel().existInputPort("update");
-    else mDependance = (getModel().getInputPortNumber() -
-                        getModel().existInputPort("perturb")?1:0 -
-                        getModel().existInputPort("request")?1:0) > 0;
+    if (mMode == NAME) {
+        mDependance = getModel().existInputPort("update");
+    } else {
+        mDependance = (getModel().getInputPortNumber() -
+                       (getModel().existInputPort("perturb")?1:0) -
+                       (getModel().existInputPort("request")?1:0) -
+                       (getModel().existInputPort("add")?1:0) -
+                       (getModel().existInputPort("remove")?1:0)) > 0;
+    }
 
     mActive = getModel().existOutputPort("update");
     mSyncs = 0;
+    if (mControl) {
+        unsigned int n;
+
+        if (mMode == NAME) {
+            if (getModel().existInputPort("update")) {
+                n = std::distance(getModel().getInPort("update").begin(),
+                                  getModel().getInPort("update").end());
+            } else {
+                n = 0;
+            }
+        } else {
+            n = getModel().getInputPortNumber() -
+                (getModel().existInputPort("perturb")?1:0) -
+                (getModel().existInputPort("request")?1:0) -
+                (getModel().existInputPort("add")?1:0) -
+                (getModel().existInputPort("remove")?1:0);
+        }
+
+        Assert(utils::InternalError,
+               mDepends.size() == n,
+               (boost::format(
+                       "[%1%] DifferenceEquation::size - "			\
+                       "%2% connection(s) on update port missing") %
+                   getModelName() % (mDepends.size() - n)));
+
+    } else {
+        if (mMode == NAME) {
+            if (getModel().existInputPort("update")) {
+                mWaiting = std::distance(getModel().getInPort("update").begin(),
+                                         getModel().getInPort("update").end());
+            }
+        } else {
+            mWaiting = getModel().getInputPortNumber() -
+                (getModel().existInputPort("perturb")?1:0) -
+                (getModel().existInputPort("request")?1:0) -
+                (getModel().existInputPort("add")?1:0) -
+                (getModel().existInputPort("remove")?1:0);
+        }
+    }
+
     mReceive = 0;
-    mLastTime = 0;
-    if (mInitValue) {
-        mValue.push_front(mInitialValue);
-    }
-    else if (!mDependance or !mSynchro) {
-        mState = INIT;
-        mValue.push_front(initValue());
-        mInitValue = true;
-    }
-
-    // si la valeur n'est pas initialisée alors la valeur est invalide
-    mInvalid = !mInitValue;
-
-    // dois-je envoyer mes caractéristiques ?
-    if (mActive and mInitValue) {
-        mState = PRE_INIT;
-        mSigma = 0;
-        return Time(0);
-    } else if (mDependance) { // est-ce que j'attends les caractéristiques de
-        // quelqu'un ?
-        mState = INIT;
-        mSigma = Time::infinity;
-        return Time::infinity;
-    } else {                  // j'attends rien !
-        mState = RUN;
-        mSigma = mTimeStep;
-        return Time(mTimeStep);
-    }
+    mLastTime = time;
+    mState = SEND_INIT;
+    return 0.0;
 }
 
-void DifferenceEquation::output(const Time& /*time*/,
-                                ExternalEventList& output) const
-{
-    if (mActive and (mState == PRE_INIT or mState == PRE_INIT2 or mState == POST
-                     or mState == POST2)) {
-        ExternalEvent* ee = new ExternalEvent("update");
-
-        if (mState == PRE_INIT or mState == PRE_INIT2 or mState == POST or
-            mState == POST2) {
-            ee << attribute("name", mVariableName);
-            ee << attribute("value", getValue());
-        }
-
-        if (mState == PRE_INIT or mState == PRE_INIT2) {
-            ee << attribute("time-step", mTimeStep);
-        }
-        output.addEvent(ee);
-    }
-}
-
-Time DifferenceEquation::timeAdvance() const
+Time Base::timeAdvance() const
 {
     return mSigma;
 }
 
-Event::EventType DifferenceEquation::confluentTransitions(
+Event::EventType Base::confluentTransitions(
     const Time& /* internal */,
     const ExternalEventList& /* extEventlist */) const
 {
     return Event::EXTERNAL;
 }
 
-void DifferenceEquation::internalTransition(const Time& time)
+void Base::internalTransition(const Time& time)
 {
     switch (mState) {
-    case PRE_INIT:
-        // est-ce que j'attends les caractéristiques de quelqu'un ?
-        if (mDependance) {
+    case SEND_INIT:
+        mSigma = 0.0;
+        mState = POST_SEND_INIT;
+        break;
+    case POST_SEND_INIT:
+        pushNoEDValues();
+
+        if (mControl) {
+            if (check()) {
+                initValues(time);
+            } else {
+                if (!mDependance or !mSynchro or mWaiting <= 0) {
+                    mState = INIT;
+                    initValues(time);
+                }
+            }
+
+            if (mReceive == mSyncs and mWaiting <= 0) {
+                mReceive = 0;
+            }
+
+            if (mActive and check()) {
+                mState = PRE_INIT;
+                mSigma = 0;
+            } else {
+                if (mDependance and mWaiting > 0) {
+                    mState = INIT;
+                    mSigma = Time::infinity;
+                } else {
+                    clearReceivedValues();
+                    mState = RUN;
+                    mSigma = mTimeStep;
+                }
+            }
+        } else {
             mState = INIT;
             mSigma = Time::infinity;
-        } else { // j'attends rien !
-            mState = RUN;
+        }
+        break;
+    case PRE_INIT:
+        if (mDependance and mWaiting > 0) {
+            mState = INIT;
+            mSigma = Time::infinity;
+        } else {
+            clearReceivedValues();
+            if (mSynchro or mAllSynchro) {
+                mState = PRE;
+            } else {
+                mState = RUN;
+            }
             mSigma = mTimeStep;
         }
         break;
     case PRE_INIT2:
-        //        if (mDependance) mState = PRE;
-        if (mSynchro or mAllSynchro) mState = PRE;
-        else mState = RUN;
+        if (mSynchro or mAllSynchro) {
+            mState = PRE;
+        } else {
+            mState = RUN;
+        }
         mSigma = mTimeStep;
         break;
     case INIT:
         break;
     case PRE:
-        // si pas de cycle alors
         if (mSyncs != 0 and (mSynchro or mAllSynchro)) break;
     case RUN:
-        // je calcule ma nouvelle valeur
         mLastTime = time;
-        try {
-            mValue.push_front(compute(time));
-            mInvalid = false;
-        } catch(utils::InternalError) {
-            mInvalid = true;
-        }
-        // je vais propager ma nouvelle valeur à ceux qui
-        // dépendent de moi
+        updateValues(time);
         if (mActive) {
             mState = POST;
             mSigma = 0;
         } else {
-            if (mDependance) {
+            clearReceivedValues();
+            if (mSynchro or mAllSynchro) {
                 mState = PRE;
             } else {
                 mState = RUN;
@@ -392,73 +480,52 @@ void DifferenceEquation::internalTransition(const Time& time)
         }
         break;
     case POST:
-        // ma nouvelle valeur est propagée
+        clearReceivedValues();
 
-        // est-ce que je suis synchronisé ?
-        if (mSynchro or mAllSynchro) mState = PRE;
-        else {
-            TraceDebug(boost::format("%1% %2%: fin") % time % getModelName());
+        mReceive = 0;
+
+        if (mSynchro or mAllSynchro) {
+            mState = PRE;
+        } else {
             mState = RUN;
         }
         mSigma = mTimeStep;
         break;
     case POST2:
-        // ma valeur a été propagée suite à la reception d'une
-        // mise à jour d'une de mes dépendances non synchrones
-        // cette propagation est utile pour la compatibilité avec
-        // QSS
-        if (mDependance) {
-            mState = PRE;
-        } else {
-            mState = RUN;
-        }
+        mState = RUN;
         mSigma = mSigma2;
+        break;
+    case POST3:
+        mState = POST;
+        mSigma = 0;
     }
 }
 
-void DifferenceEquation::externalTransition(const ExternalEventList& event,
-                                            const Time& time)
+void Base::externalTransition(const ExternalEventList& event,
+                              const Time& time)
 {
     Time e = time - mLastTime;
-    // PROBLEMATIQUE !!!!!!! l'idéal serait : bool end = (e == mSigma);
+    // FIXME: bool end = (e == mSigma);
     bool end = std::abs(e.getValue() - mSigma.getValue()) < 1e-10;
     bool begin = (e == 0);
     ExternalEventList::const_iterator it = event.begin();
-    double timeStep;
     bool reset = false;
 
     while (it != event.end()) {
         if (mMode == NAME and (*it)->onPort("update")) {
             std::string name = (*it)->getStringAttributeValue("name");
-            double value = (*it)->getDoubleAttributeValue("value");
-            bool ok = true;
 
-            if (mState == INIT)
-                ok = initExternalVariable(name, **it, timeStep);
-
-            // est-ce que je suis dans l'état de recevoir les
-            // valeurs de mes dépendances
-            if (ok) {
-                addValue(name, time.getValue(), value);
-                // si j'étais en attente de mes dépendances et
-                // que je suis au tout début de l'attente alors
-                // je comptabilise cette dépendance afin de
-                // vérifier que j'ai bien tout reçu et je
-                // pourrais alors lancer mon propre calcul
-                if (mState == PRE and end
-		    and mSynchros.find(name) != mSynchros.end())
-		    ++mReceive;
-            }
+            processUpdate(name, **it, begin, end);
         }
-        // c'est une perturbation d'un modèle externe sur la
-        // variable du modèle
         else if ((*it)->onPort("perturb")) {
             std::string name = (*it)->getStringAttributeValue("name");
             double value = (*it)->getDoubleAttributeValue("value");
 
-            mValue.push_front(value);
+            removeValue(name);
+            addValue(value, name);
             reset = true;
-        } else {
+        } else if (not (*it)->onPort("add") and
+                   not (*it)->onPort("remove")) {
 
             Assert(utils::InternalError, mMode == PORT or mMode == MAPPING,
                    (boost::format("[%1%] - DifferenceEquation: invalid mode") %
@@ -466,106 +533,575 @@ void DifferenceEquation::externalTransition(const ExternalEventList& event,
 
             std::string portName = (*it)->getPortName();
             std::string name = (mMode == PORT)?portName:mMapping[portName];
-            double value = (*it)->getDoubleAttributeValue("value");
-            bool ok = true;
 
-            if (mState == INIT)
-                ok = initExternalVariable(name, **it, timeStep);
-
-            // est-ce que je suis dans l'état de recevoir les
-            // valeurs de mes dépendances
-            if (ok) {
-                addValue(name, time.getValue(), value);
-                // si j'étais en attente de mes dépendances et
-                // que je suis au tout début de l'attente alors
-                // je comptabilise cette dépendance afin de
-                // vérifier que j'ai bien tout reçu et je
-                // pourrais alors lancer mon propre calcul
-                if (mState == PRE and end) ++mReceive;
-            }
+            processUpdate(name, **it, begin, end);
         }
         ++it;
     }
-    // je suis en phase d'initialisation
+
     if (mState == INIT) {
-        // si le modèle se synchronise sur ses dépendances alors
-        // il faut calculer son pas de temps
-        // ce pas de temps est égal au plus petit pas de temps
-        // des dépendances
-        if (mTimeStep == 0 and mWait.empty()) {
-            // si le pas de temps n'est pas défini
-            if (mTimeStep == 0) mTimeStep = timeStep;
-            // si ma valeur initiale n'est pas définie alors je
-            // la calcule
-            if (!mInitValue) {
-                mValue.push_front(initValue());
-                mInvalid = false;
-            }
-            // je propage mes caractéristiques si nécessaire
-            mSigma = 0;
-            mState = PRE_INIT2;
-        }
-        // est-ce que j'ai reçu les caractéristiques de toutes
-        // mes dépendances ? si oui, je calcule ma valeur initiale
-        else if (mWait.empty() and mWaiting <= 0) {
-            if (!mInitValue) {
-                mValue.push_front(initValue());
-                mInvalid = false;
-                // je propage mes caractéristiques si nécessaire
+        pushNoEDValues();
+        if (mWaiting <= 0) {
+            if (!check()) {
+                initValues(time);
                 mSigma = 0;
                 mState = PRE_INIT2;
-            }
-            else {
+                clearReceivedValues();
+            } else {
+                clearReceivedValues();
                 mSigma = mTimeStep;
                 mState = PRE;
             }
+            if (mReceive == mSyncs) {
+                mReceive = 0;
+            }
+        }
+    } else {
+        if ((mState == PRE or mState == RUN) and not end) {
+            if (begin) {
+                clearReceivedValues();
+            }
+        }
+
+        if (mState == PRE and end and (mReceive == mSyncs or reset)) {
+            mState = RUN;
+            mSigma = 0;
+            if (mReceive == mSyncs and mWaiting <= 0) {
+                mReceive = 0;
+            }
+        }
+        else {
+            if ((mState == RUN or mState == PRE)
+                and (not end) and (not begin)) {
+                mLastTime = time;
+                mState = POST2;
+                mSigma2 = mSigma - e;
+                mSigma = 0;
+            } else {
+                if (mState == POST) {
+                    mState = POST3;
+                    mSigma = 0;
+                } else {
+                    mLastTime = time;
+                    mSigma -= e;
+                }
+            }
         }
     }
-    // j'ai tout reçu, je peux passer en mode calcul
-    //    else if (mState == PRE and end and (mReceive == mSyncs or reset) and mSynchro) {
-    else if (mState == PRE and end and (mReceive == mSyncs or reset)) {
-        mState = RUN;
-        mSigma = 0;
-        mReceive = 0;
-    }
-    // je reçois la valeur d'autres modèles lorsque je ne suis
-    // pas en phase de calcul
-    else if ((mState == RUN or mState == PRE) and !end and !begin) {
-        mLastTime = time;
-        mState = POST2;
-        mSigma2 = mSigma - e;
-        mSigma = 0;
-    }
 }
 
-Value* DifferenceEquation::observation(const ObservationEvent& event) const
+/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
+Simple::Simple(const graph::AtomicModel& model,
+               const devs::InitEventList& events,
+               bool control) :
+    Base(model, events, control),
+    mInitValue(false), mSize(DEFAULT_SIZE)
 {
-    if (mInvalid) {
-        return 0;
+    if (events.exist("name")) {
+        mVariableName = toString(events.get("name"));
     } else {
-        Assert(utils::InternalError, event.getPortName() == mVariableName,
-               boost::format("Observation: %1% model, invalid variable" \
-                             " name: %2%") % getModelName()
-               % event.getPortName());
-        return buildDouble(getValue());
+        mVariableName = getModelName();
+    }
+
+    if (events.exist("value")) {
+        mInitialValue = toDouble(events.get("value"));
+        mInitValue = true;
+    }
+
+    if (events.exist("init")) {
+        const value::Set& init = toSetValue(events.get("init"));
+        unsigned int i;
+
+        for (i = 0; i < init.size(); ++i) {
+            addValue(toDouble(init.get(i)), mVariableName);
+        }
     }
 }
 
-void DifferenceEquation::request(const RequestEvent& event,
-                                 const Time& /*time*/,
-                                 ExternalEventList& output) const
+void Simple::addValue(double value, const std::string& /* name */)
+{
+    mValues.push_front(value);
+    if (mSize > 0
+        and mValues.size() > (unsigned int)mSize) {
+        mValues.pop_back();
+    }
+}
+
+void Simple::initValues(const vle::devs::Time& time)
+{
+    if (mInitValue) {
+        addValue(mInitialValue, mVariableName);
+    } else {
+        addValue(initValue(time), mVariableName);
+        mInitValue = true;
+    }
+}
+
+void Simple::removeValue(const std::string& /* name */)
+{
+    mValues.pop_front();
+}
+
+void Simple::updateValues(const vle::devs::Time& time)
+{
+    addValue(compute(time), mVariableName);
+}
+
+void Simple::size(int size)
+{
+    Assert(utils::ModellingError,
+           size != 0,
+           (boost::format(
+                   "[%1%] DifferenceEquation::size - not null size") %
+               getModelName()).str());
+
+    mSize = size;
+}
+
+double Simple::val() const
+{
+    return mValues.front();
+}
+
+double Simple::val(int shift) const
+{
+    Assert(utils::ModellingError,
+           shift <= 0,
+           (boost::format(
+                   "[%1%] DifferenceEquation::getValue - positive shift on %2%") %
+               getModelName() % mVariableName).str());
+
+    ++shift;
+    if (shift == 0) {
+        return mValues.front();
+    } else {
+
+        Assert(utils::InternalError, (int)(mValues.size() - 1) >= -shift,
+               (boost::format("[%1%] - %2%[%3%] - "	\
+                              "shift too large") %
+                getModelName() % mVariableName % shift).str());
+
+        return mValues[-shift];
+    }
+}
+
+void Simple::output(const Time& /* time */,
+                    ExternalEventList& output) const
+{
+    if (mState == SEND_INIT and not mValues.empty()) {
+        ExternalEvent* ee = new ExternalEvent("update");
+
+        Set* values = Set::create();
+        std::deque < double>::const_iterator it = mValues.begin();
+
+        while (it != mValues.end()) {
+            values->addDouble(*it++);
+        }
+        ee << attribute("name", mVariableName);
+        ee << attribute("init", values);
+        output.addEvent(ee);
+    } else {
+        if (mActive and (mState == PRE_INIT or mState == PRE_INIT2
+                         or mState == POST or mState == POST2)) {
+            ExternalEvent* ee = new ExternalEvent("update");
+
+            ee << attribute("name", mVariableName);
+            ee << attribute("value", val());
+            output.addEvent(ee);
+        }
+    }
+}
+
+Value* Simple::observation(const ObservationEvent& event) const
+{
+    Assert(utils::InternalError,
+           event.getPortName() == mVariableName,
+           boost::format(
+               "[%1%] DifferenceEquation::observation: invalid variable" \
+               " name: %2%") % getModelName()
+           % event.getPortName());
+    return Double::create(val());
+}
+
+void Simple::request(const RequestEvent& event,
+                     const Time& /*time*/,
+                     ExternalEventList& output) const
 {
     Assert(utils::InternalError,
            event.getStringAttributeValue("name") == mVariableName,
            boost::format(
-               "DifferenceEquation model, invalid variable name: %1%") %
-           event.getStringAttributeValue("name"));
+               "[%1%] DifferenceEquation::request - invalid variable" \
+               "name: %2%")  % getModelName()
+           % event.getStringAttributeValue("name"));
 
     ExternalEvent* ee = new ExternalEvent("response");
 
-    ee << attribute("name", event.getStringAttributeValue("name"));
-    ee << attribute("value", getValue());
+    ee << attribute("name", mVariableName);
+    ee << attribute("value", val());
     output.addEvent(ee);
 }
 
-}} // namespace vle extension
+/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
+Multiple::Multiple(const graph::AtomicModel& model,
+                   const devs::InitEventList& events,
+                   bool control) :
+    Base(model, events, control)
+{
+    const value::Set& variables = toSetValue(events.get("variables"));
+    unsigned int index;
+
+    for (index = 0; index < variables.size(); ++index) {
+        const value::Set& tab(toSetValue(variables.get(index)));
+        std::string name = toString(tab.get(0));
+
+        mVariableNames.push_back(name);
+        mValues[name] = MultipleValues();
+        mInitValues[name] = false;
+        size(name, DEFAULT_SIZE);
+
+        if (tab.size() > 1) {
+            if (tab.get(1).isDouble()) {
+                double init = toDouble(tab.get(1));
+
+                mInitialValues[name] = init;
+                mInitValues[name] = true;
+            } else {
+                if (tab.get(1).isSet()) {
+                    const value::Set& init = toSetValue(tab.get(1));
+                    unsigned int i;
+
+                    for (i = 0; i < init.size(); ++i) {
+                        addValue(toDouble(init.get(i)), name);
+                    }
+                }
+            }
+            if (tab.size() == 3) {
+                const value::Set& init = toSetValue(tab.get(2));
+                unsigned int i;
+
+                for (i = 0; i < init.size(); ++i) {
+                    addValue(toDouble(init.get(i)), name);
+                }
+            }
+        }
+    }
+}
+
+void Multiple::addValue(double value, const std::string& name)
+{
+    mValues[name] = value;
+    if (mSize[name] > 0
+        and mValues[name].size() > (unsigned int)mSize[name]) {
+        mValues[name].pop_back();
+    }
+}
+
+bool Multiple::check()
+{
+    bool ok = true;
+    std::map < std::string, bool >::const_iterator it = mInitValues.begin();
+
+    while (ok and it != mInitValues.end()) {
+        ok = it->second;
+        ++it;
+    }
+    return ok;
+}
+
+void Multiple::computeInit(const vle::devs::Time& time)
+{
+    compute(time);
+
+    {
+        std::map < std::string, bool >::iterator it = mInitValues.begin();
+
+        while (it != mInitValues.end()) {
+            it->second = true;
+            ++it;
+        }
+    }
+
+    unset();
+}
+
+void Multiple::create(const std::string& name,
+                      MultipleVariableIterators& iterators)
+{
+
+    Assert(utils::InternalError,
+           mValues.find(name) != mValues.end(),
+           (boost::format("DifferenceEquation - wrong variable"	\
+                          " name: %1% in %2%"))
+           % name % getModelName());
+
+    mSetValues.insert(std::make_pair(name, false)).first;
+    iterators.mSetValues = &mSetValues[name];
+    iterators.mMultipleValues = &mValues[name];
+}
+
+void Multiple::initValue(const vle::devs::Time& /* time */)
+{
+    std::vector < std::string >::const_iterator it = mVariableNames.begin();
+
+    while (it != mVariableNames.end()) {
+        if (mInitValues[*it]) {
+            addValue(mInitialValues[*it], *it);
+        } else {
+            addValue(0.0, *it);
+        }
+        mInitValues[*it] = true;
+    }
+}
+
+void Multiple::initValues(const vle::devs::Time& time)
+{
+    initValue(time);
+    {
+        std::map < std::string, bool >::iterator it = mInitValues.begin();
+
+        while (it != mInitValues.end()) {
+            it->second = true;
+            ++it;
+        }
+    }
+    unset();
+}
+
+Time Multiple::init(const devs::Time& time)
+{
+    Time t = Base::init(time);
+
+    {
+        std::vector < std::string >::const_iterator it = mVariableNames.begin();
+        bool ok = false;
+
+        while (not ok and it != mVariableNames.end()) {
+            ok = getModel().existOutputPort(*it);
+            ++it;
+        }
+        mActive = ok;
+    }
+    unset();
+    return t;
+}
+
+void Multiple::init(const Var& variable, double value)
+{
+    if (mInitValues[variable.name()]) {
+        addValue(mInitialValues[variable.name()], variable.name());
+    } else {
+        addValue(value, variable.name());
+    }
+    mInitValues[variable.name()] = true;
+    mSetValues[variable.name()] = true;
+}
+
+void Multiple::removeValue(const std::string& name)
+{
+    mValues[name].pop_front();
+}
+
+void Multiple::unset()
+{
+    std::map < std::string, bool >::iterator it = mSetValues.begin();
+
+    while (it != mSetValues.end()) {
+        it->second = false;
+        ++it;
+    }
+}
+
+void Multiple::updateValues(const vle::devs::Time& time)
+{
+    compute(time);
+    unset();
+}
+
+double Multiple::val(const std::string& name,
+                     const MultipleVariableIterators& iterators,
+                     int shift) const
+{
+    Assert(utils::ModellingError,
+           shift <= 0,
+           (boost::format(
+                   "[%1%] DifferenceEquation::getValue - positive shift on %2%") %
+               getModelName() % name).str());
+
+    if (shift == 0) {
+        return iterators.mMultipleValues->front();
+    }
+    else {
+        if (not *iterators.mSetValues) {
+            ++shift;
+        }
+
+        Assert(utils::InternalError,
+               (int)(iterators.mMultipleValues->size() - 1) >= -shift,
+               (boost::format("[%1%] - %2%[%3%] - "	\
+                              "shift too large") %
+                getModelName() % name % shift).str());
+
+        return (*iterators.mMultipleValues)[-shift];
+    }
+}
+
+double Multiple::val(const std::string& name) const
+{
+    MultipleValuesMap::const_iterator it =
+        mValues.find(name);
+
+    return it->second.front();
+}
+
+void Multiple::output(const Time& /* time */,
+                      ExternalEventList& output) const
+{
+    MultipleValuesMap::const_iterator it =
+        mValues.begin();
+
+    while (it != mValues.end()) {
+        if (mState == SEND_INIT and not it->second.empty()) {
+            ExternalEvent* ee = new ExternalEvent(it->first);
+
+            Set* values = Set::create();
+            unsigned int i = 0;
+
+            while (i < it->second.size()) {
+                values->addDouble(it->second[i]);
+                ++i;
+            }
+            ee << attribute("name", it->first);
+            ee << attribute("init", values);
+            output.addEvent(ee);
+        }
+        else if (mActive and (mState == PRE_INIT or mState == PRE_INIT2
+                              or mState == POST or mState == POST2)) {
+            if (getModel().existOutputPort(it->first)) {
+                ExternalEvent* ee = new ExternalEvent(it->first);
+
+                if (mState == PRE_INIT or mState == PRE_INIT2
+                    or mState == POST or mState == POST2) {
+                    ee << attribute("name", it->first);
+                    ee << attribute("value", val(it->first));
+                }
+                output.addEvent(ee);
+            }
+        }
+        ++it;
+    }
+}
+
+Value* Multiple::observation(const ObservationEvent& event) const
+{
+    if (event.getPortName() != "all") {
+        return Double::create(val(event.getPortName()));
+    } else {
+        Tuple* values = Tuple::create();
+        MultipleValuesMap::const_iterator it =
+            mValues.begin();
+
+        while (it != mValues.end()) {
+            values->add(it->second[0]);
+            ++it;
+        }
+        return values;
+    }
+}
+
+void Multiple::request(const RequestEvent& event,
+                       const Time& /*time*/,
+                       ExternalEventList& output) const
+{
+    ExternalEvent* ee = new ExternalEvent("response");
+
+    ee << attribute("name", event.getStringAttributeValue("name"));
+    ee << attribute("value", val(event.getStringAttributeValue("name")));
+    output.addEvent(ee);
+}
+
+/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
+Generic::Generic(const graph::AtomicModel& model,
+                 const devs::InitEventList& events) :
+    Simple(model, events, false)
+{
+    mMode = PORT;
+}
+
+void Generic::allSync()
+{
+    mAllSynchro = true;
+}
+
+void Generic::beginExt()
+{
+    mNamesIt = mExternalValues.begin();
+}
+
+bool Generic::endExt()
+{
+    return mNamesIt == mExternalValues.end();
+}
+
+void Generic::nextExt()
+{
+    ++mNamesIt;
+}
+
+std::string Generic::nameExt()
+{
+    return mNamesIt->first;
+}
+
+double Generic::valueExt(int shift)
+{
+    const std::string name = mNamesIt->first;
+    VariableIterators iterators;
+
+    iterators.mValues = &mExternalValues.find(name)->second;
+    iterators.mInitValues = &mInitExternalValues.find(name)->second;
+    iterators.mReceivedValues = &mReceivedValues.find(name)->second;
+    return Base::val(name, &mExternalValues.find(name)->second,
+                     iterators, shift);
+}
+
+void Generic::externalTransition(const devs::ExternalEventList& event,
+                                 const devs::Time& time)
+{
+    ExternalEventList::const_iterator it = event.begin();
+
+    while (it != event.end()) {
+        if ((*it)->onPort("add")) {
+            std::string name = (*it)->getStringAttributeValue("name");
+
+            if (mAllSynchro) {
+                mSynchros.insert(name);
+                ++mWaiting;
+            }
+            mDepends.insert(name);
+            if (mState != INIT) {
+                initExternalVariable(name);
+            }
+        } else if ((*it)->onPort("remove")) {
+            std::string name = (*it)->getStringAttributeValue("name");
+
+            if (mAllSynchro) {
+                mSynchros.erase(name);
+                --mSyncs;
+            }
+            mDepends.erase(name);
+            mExternalValues.erase(name);
+            mInitExternalValues.erase(name);
+            if (mReceivedValues.find(name)->second) {
+                --mReceive;
+            }
+            mReceivedValues.erase(name);
+        }
+        ++it;
+    }
+    Simple::externalTransition(event, time);
+}
+
+}}} // namespace vle extension DifferenceEquation
