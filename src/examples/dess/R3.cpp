@@ -30,14 +30,16 @@ namespace vle { namespace examples { namespace dess {
 
 R3::R3(const graph::AtomicModel& model,
        const devs::InitEventList& events):
-    extension::qss(model, events)
+    extension::QSS::Simple(model, events)
 {
     a = value::toDouble(events.get("a"));
+
+    I = createExt("I");
 }
 
 double R3::compute(const vle::devs::Time& /* time */) const
 {
-    return a * getValue("I");
+    return a * I();
 }
 
 DECLARE_NAMED_DYNAMICS(R3, R3)

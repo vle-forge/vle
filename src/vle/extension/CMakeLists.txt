@@ -9,11 +9,11 @@ LINK_DIRECTORIES(
   ${GLIBMM_LIBRARY_DIRS}
   ${LIBXMLPP_LIBRARY_DIR})
 
-SET(EXTENSION_CPP CellDevs.cpp CellQSS.cpp CombinedQSS.cpp DESS.cpp
+SET(EXTENSION_CPP CellDevs.cpp CellQSS.cpp DESS.cpp
   DifferenceEquation.cpp DifferentialEquation.cpp DSDevs.cpp PetriNet.cpp
   QSS2.cpp QSS.cpp)
 
-SET(EXTENSION_HPP CellDevs.hpp CellQSS.hpp CombinedQSS.hpp DESS.hpp
+SET(EXTENSION_HPP CellDevs.hpp CellQSS.hpp DESS.hpp
   DifferenceEquation.hpp DifferentialEquation.hpp DSDevs.hpp PetriNet.hpp
   QSS2.hpp QSS.hpp)
 

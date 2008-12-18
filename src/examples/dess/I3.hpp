@@ -29,20 +29,23 @@
 
 namespace vle { namespace examples { namespace dess {
 
-    class I3 : public extension::qss
-    {
-    public:
-        I3(const graph::AtomicModel& model,
-	   const devs::InitEventList& events);
-	virtual ~I3()
+class I3 : public extension::QSS::Simple
+{
+public:
+    I3(const graph::AtomicModel& model,
+       const devs::InitEventList& events);
+    virtual ~I3()
         { }
-
-        virtual double compute(const devs::Time& time) const;
-
-    private:
-        double a;
-        double r;
-    };
+    
+    virtual double compute(const devs::Time& time) const;
+    
+private:
+    double a;
+    double r;
+    
+    Var I;
+    Ext S;
+};
 
 }}} // namespace vle examples dess
 

@@ -31,7 +31,7 @@ namespace vle { namespace examples { namespace dess {
 
 seir::seir(const graph::AtomicModel& model,
 	   const devs::InitEventList &evList) :
-    extension::CombinedQss(model,evList)
+    extension::QSS::Multiple(model,evList)
 {
     // birth and death rate
     m = value::toDouble(evList.get("m"));
@@ -44,8 +44,12 @@ seir::seir(const graph::AtomicModel& model,
     b1 = value::toDouble(evList.get("b1"));
     // Population size
     N = value::toDouble(evList.get("N"));
-}
 
+    S = createVar(0, "S");
+    E = createVar(1, "E");
+    I = createVar(2, "I");
+    R = createVar(3, "R");    
+}
 
 double seir::compute(unsigned int i, const devs::Time& time) const
 {
@@ -54,14 +58,14 @@ double seir::compute(unsigned int i, const devs::Time& time) const
     switch(i){
     case 0: // S
 	b = b0 * (1 + b1 * cos(2 * M_PI * time.getValue()));
-	return m * N - m * getValue(0) - b * getValue(0) * getValue(2);
+	return m * N - m * S() - b * S() * I();
     case 1: // E
 	b = b0 * (1 + b1 * cos(2 * M_PI * time.getValue()));
-	return b * getValue(0) * getValue(2) - (m + a) * getValue(1);
+	return b * S() * I() - (m + a) * E();
     case 2: // I
-	return a * getValue(1) - (m + g) * getValue(2);
+	return a * E() - (m + g) * I();
     case 3: // R
-	return g * getValue(2) - m * getValue(3);
+	return g * I() - m * R();
     default:
 	Throw(utils::InternalError, boost::format(
 		  "Compute problem with seir model, i == %1%") % i );

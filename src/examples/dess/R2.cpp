@@ -36,11 +36,14 @@ R2::R2(const graph::AtomicModel& model,
     m = value::toDouble(evList.get("m"));
     // rate at which infected individuals (I) recover (R)
     g = value::toDouble(evList.get("g"));
+
+    R = createVar("R");
+    I = createExt("I");
 }
 
 double R2::compute(const vle::devs::Time& /* time */) const
 {
-    return g * getValue("I") - m * getValue();
+    return g * I() - m * R();
 }
 
 DECLARE_NAMED_DYNAMICS(R2, R2)

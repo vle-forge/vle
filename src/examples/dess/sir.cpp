@@ -30,21 +30,25 @@ namespace vle { namespace examples { namespace dess {
 
 sir::sir(const graph::AtomicModel& model,
 	 const devs::InitEventList &evList) :
-    extension::CombinedQss(model,evList)
+    extension::QSS::Multiple(model,evList)
 {
     r = value::toDouble(evList.get("r"));
     a = value::toDouble(evList.get("a"));
+
+    S = createVar(0, "S");
+    I = createVar(1, "I");
+    R = createVar(2, "R");    
 }
 
 double sir::compute(unsigned int i, const devs::Time& /* time */) const
 {
     switch(i){
     case 0: // S
-	return -r * getValue(0) * getValue(1);
+	return -r * S() * I();
     case 1: // I
-	return r * getValue(0) * getValue(1) - a * getValue(1);
+	return r * S() * I() - a * I();
     case 2: // R
-	return a * getValue(1);
+	return a * I();
     default:
 	Throw(utils::InternalError, boost::format(
 		  "Compute problem with sir model, i == %1%") % i );

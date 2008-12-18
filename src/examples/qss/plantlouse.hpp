@@ -32,21 +32,24 @@ using namespace vle;
 
 namespace vle { namespace examples { namespace qss {
 
-    class Plantlouse : public extension::qss
-    {
-    public:
-        Plantlouse(const graph::AtomicModel& model,
-                   const devs::InitEventList& events);
+class Plantlouse : public extension::QSS::Simple
+{
+public:
+    Plantlouse(const graph::AtomicModel& model,
+	       const devs::InitEventList& events);
 
-        virtual ~Plantlouse();
-
-        virtual double compute(const devs::Time& time) const;
-
-    private:
-        double a;
-        double b;
-    };
-
+    virtual ~Plantlouse();
+    
+    virtual double compute(const devs::Time& time) const;
+    
+private:
+    Var x;
+    Ext y;
+    
+    double a;
+    double b;
+};
+	    
 }}} // namespace vle examples qss
 
 #endif

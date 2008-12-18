@@ -40,7 +40,8 @@ DifferentialEquation::DifferentialEquation(const AtomicModel& model,
     mActive(true),
     mDependance(true),
     mExternalVariableNumber(0),
-    mExternalValues(false)
+    mExternalValues(false),
+    mBuffer(false)
 {
     if (events.exist("active")) {
         const Value& active = events.get("active");
@@ -75,25 +76,6 @@ DifferentialEquation::DifferentialEquation(const AtomicModel& model,
             }
         }
     }
-
-    if (events.exist("bufferized")) {
-        mBuffer = toBoolean(events.get("bufferized"));
-        if (events.exist("delay")) {
-            const Value& delay = events.get("delay");
-            mDelay = toDouble(delay);
-        }
-        if (events.exist("size")) {
-            const Value& size = events.get("size");
-            mSize = toInteger(size);
-
-            Assert(utils::InternalError, mSize > 0, boost::format(
-                    "DifferentialEquation: invalid size: %1%") % mSize);
-        }
-        else
-            mSize = -1;
-    }
-    else
-        mBuffer = false;
 }
 
 double DifferentialEquation::getValue(const Time& now,

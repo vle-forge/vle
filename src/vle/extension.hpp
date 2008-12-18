@@ -28,7 +28,6 @@
 
 #include <vle/extension/CellDevs.hpp>
 #include <vle/extension/CellQSS.hpp>
-#include <vle/extension/CombinedQSS.hpp>
 #include <vle/extension/DESS.hpp>
 #include <vle/extension/DifferenceEquation.hpp>
 #include <vle/extension/DifferentialEquation.hpp>

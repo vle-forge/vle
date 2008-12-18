@@ -30,21 +30,24 @@
 
 namespace vle { namespace examples { namespace qss {
 
-    class Ladybird : public extension::qss
-    {
-    public:
-        Ladybird(const graph::AtomicModel& model,
-                 const devs::InitEventList& events);
+class Ladybird : public extension::QSS::Simple
+{
+public:
+    Ladybird(const graph::AtomicModel& model,
+	     const devs::InitEventList& events);
 
-        virtual ~Ladybird();
+    virtual ~Ladybird();
 
-        virtual double compute(const devs::Time& time) const;
+    virtual double compute(const devs::Time& time) const;
 
-    private:
-        double b;
-        double d;
-        double e;
-    };
+private:
+    Ext x;
+    Var y;
+    
+    double b;
+    double d;
+    double e;
+};
 
 }}} // namespace vle examples qss
 

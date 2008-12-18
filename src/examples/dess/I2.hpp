@@ -29,21 +29,24 @@
 
 namespace vle { namespace examples { namespace dess {
 
-    class I2 : public extension::DESS
-    {
-    public:
-        I2(const graph::AtomicModel& model,
-	   const devs::InitEventList& events);
-	virtual ~I2()
+class I2 : public extension::DESS
+{
+public:
+    I2(const graph::AtomicModel& model,
+       const devs::InitEventList& events);
+    virtual ~I2()
         { }
-
-        virtual double compute(const devs::Time& time) const;
-
-    private:
-	double a;
-	double m;
-	double g;
-    };
+    
+    virtual double compute(const devs::Time& time) const;
+    
+private:
+    double a;
+    double m;
+    double g;
+    
+    Var I;
+    Ext E;
+};
 
 }}} // namespace vle examples dess
 

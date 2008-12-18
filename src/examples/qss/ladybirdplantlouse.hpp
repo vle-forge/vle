@@ -26,27 +26,29 @@
 #ifndef VLE_TUTORIAL_0_LADYBIRD_PLANT_LOUSE_HPP
 #define VLE_TUTORIAL_0_LADYBIRD_PLANT_LOUSE_HPP
 
-#include <vle/extension/CombinedQSS.hpp>
+#include <vle/extension/QSS.hpp>
 
 namespace vle { namespace examples { namespace qss {
 
-    class Ladybirdplantlouse : public extension::CombinedQss
-    {
-    public:
-        Ladybirdplantlouse(const graph::AtomicModel& model,
-                           const devs::InitEventList& events);
+class Ladybirdplantlouse : public extension::QSS::Multiple
+{
+public:
+    Ladybirdplantlouse(const graph::AtomicModel& model,
+		       const devs::InitEventList& events);
+    
+    virtual ~Ladybirdplantlouse();
+    
+    virtual double compute(unsigned int i, const devs::Time& time) const;
+    
+private:
+    double a;
+    double b;
+    double d;
+    double e;
 
-        virtual ~Ladybirdplantlouse();
-
-        virtual double compute(unsigned int i, const devs::Time& time) const;
-
-    private:
-        double a;
-        double b;
-        double d;
-        double e;
-
-    };
+    Var x;
+    Var y;
+};
 
 }}} // namespace vle examples qss
 #endif

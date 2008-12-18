@@ -31,10 +31,13 @@ namespace vle { namespace examples { namespace qss {
 
 Plantlouse::Plantlouse(const graph::AtomicModel& model,
                        const devs::InitEventList& events) :
-    extension::qss(model, events)
+    extension::QSS::Simple(model, events)
 {
     a = value::toDouble(events.get("a"));
     b = value::toDouble(events.get("b"));
+
+    x = createVar("x");
+    y = createExt("y");
 }
 
 Plantlouse::~Plantlouse()
@@ -43,8 +46,9 @@ Plantlouse::~Plantlouse()
 
 double Plantlouse::compute(const vle::devs::Time& /* time */) const
 {
-    return a * getValue() - b * getValue("y") * getValue();
+    return a * x() - b * y() * x();
 }
+
 }}} // namespace vle examples qss
 
 DECLARE_NAMED_DYNAMICS(plantlouse, vle::examples::qss::Plantlouse)

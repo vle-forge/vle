@@ -26,16 +26,12 @@
 #ifndef VLE_EXAMPLES_SIR_HPP
 #define VLE_EXAMPLES_SIR_HPP
 
-#include <vle/extension/CombinedQSS.hpp>
+#include <vle/extension/QSS.hpp>
 
 namespace vle { namespace examples { namespace dess {
 
-class sir : public vle::extension::CombinedQss
+	    class sir : public vle::extension::QSS::Multiple
 {
-private:
-    double r;
-    double a;
-
 public:
     sir(const graph::AtomicModel&,
 	const devs::InitEventList&);
@@ -43,6 +39,14 @@ public:
 
     virtual double compute(unsigned int i,
 			   const devs::Time& time) const;
+
+private:
+    double r;
+    double a;
+
+    Var S;
+    Var I;
+    Var R;
 };
 
 }}} // namespace vle examples dess

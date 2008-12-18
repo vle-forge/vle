@@ -31,12 +31,15 @@ namespace vle { namespace examples { namespace qss {
 
 Ladybirdplantlouse::Ladybirdplantlouse(const graph::AtomicModel& model,
                                        const devs::InitEventList& events) :
-    extension::CombinedQss(model,events)
+    extension::QSS::Multiple(model,events)
 {
     a = value::toDouble(events.get("a"));
     b = value::toDouble(events.get("b"));
     d = value::toDouble(events.get("d"));
     e = value::toDouble(events.get("e"));
+
+    x = createVar(0, "x");
+    y = createVar(1, "y");    
 }
 
 Ladybirdplantlouse::~Ladybirdplantlouse()
@@ -47,10 +50,10 @@ double Ladybirdplantlouse::compute(unsigned int i,
 				   const devs::Time& /* time */) const
 {
     switch (i) {
-    case 0:
-        return a * getValue(0) - b * getValue(0) * getValue(1);
-    case 1:
-        return b * d * getValue(0) * getValue(1) - e * getValue(1);
+    case 0: // x
+        return a * x() - b * x() * y();
+    case 1: // y
+        return b * d * x() * y() - e * y();
     default:
         Throw(utils::InternalError, boost::format(
                 "Compute problem with Ladybirdplantlouse, i == %1%") % i );

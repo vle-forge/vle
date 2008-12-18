@@ -38,11 +38,14 @@ I2::I2(const graph::AtomicModel& model,
     g = value::toDouble(evList.get("g"));
     // rate at which exposed individuals (E) become infected (I)
     a = value::toDouble(evList.get("a"));
+
+    I = createVar("I");
+    E = createExt("E");
 }
 
 double I2::compute(const vle::devs::Time& /* time */) const
 {
-    return a * getValue("E") - (m + g) * getValue();
+    return a * E() - (m + g) * I();
 }
 
 DECLARE_NAMED_DYNAMICS(I2, I2)

@@ -30,14 +30,17 @@ namespace vle { namespace examples { namespace dess {
 
 S3::S3(const graph::AtomicModel& model,
        const devs::InitEventList& events):
-    extension::qss(model, events)
+    extension::QSS::Simple(model, events)
 {
     r = value::toDouble(events.get("r"));
+
+    S = createVar("S");
+    I = createExt("I");
 }
 
 double S3::compute(const vle::devs::Time& /* time */) const
 {
-    return -r * getValue() * getValue("I");
+    return -r * S() * I();
 }
 
 DECLARE_NAMED_DYNAMICS(S3, S3)

@@ -34,11 +34,14 @@ I::I(const graph::AtomicModel& model,
 {
     a = value::toDouble(events.get("a"));
     r = value::toDouble(events.get("r"));
+
+    _I = createVar("I");
+    S = createExt("S");
 }
 
 double I::compute(const vle::devs::Time& /* time */) const
 {
-    return r * getValue("S") * getValue() - a * getValue();
+    return r * S() * _I() - a * _I();
 }
 
 DECLARE_NAMED_DYNAMICS(I, I)

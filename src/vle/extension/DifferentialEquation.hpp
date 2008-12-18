@@ -31,36 +31,219 @@ namespace vle { namespace extension {
 
     class DifferentialEquation : public vle::devs::Dynamics
     {
-    public:
-        DifferentialEquation(const vle::graph::AtomicModel& model,
-			     const vle::devs::InitEventList& events);
-
-	virtual ~DifferentialEquation() { }
-
-        inline double getValue() const
-        { return mValue; }
-
-	double getValue(const vle::devs::Time& time, double delay) const;
-
-        double getValue(const std::string& name) const;
-
-	double getValue(const std::string& name,
-			const vle::devs::Time& time, double delay) const;
-
-	virtual double getEstimatedValue(double e) const =0;
+    protected:
 
         /**
-         * @brief The function to develop mathemacial expression like:
+         * @brief Variable The class represents a variable of
+         * differential equation.
+         */
+        class Variable
+        {
+        public:
+            /**
+             * @brief Default constructor
+             */
+            Variable() : mEquation(0)
+            {}
+
+            /**
+             * @brief Returns the name of variable
+             * @return the name of variable
+             */
+            const std::string& name() const
+            { return mName; }
+
+        protected:
+            Variable(const std::string& name, DifferentialEquation* equation) :
+                mName(name), mEquation(equation)
+            {
+            }
+
+            std::string mName;
+            DifferentialEquation* mEquation;
+        };
+
+    public:
+
+        /**
+         * @brief var The class var represents an internal
+         * variable of the equation
+         */
+        class Var : public Variable
+        {
+        public:
+            /**
+             * @brief Default constructor
+             */
+            Var() {}
+
+            /**
+             * @brief Returns the current value of variable.
+             * @return the current value of variable.
+             */
+            virtual double operator()() const
+            {
+                Assert(utils::InternalError,
+                       mEquation,
+                       "DifferentialEquation - variable not create");
+                return mEquation->getValue();
+            }
+
+            /**
+             * @brief Returns the value of variable.
+             * @param delay the temporal delay.
+             * @return the value of variable.
+             */
+            virtual double operator()(const vle::devs::Time& time,
+                                      int delay) const
+            {
+                Assert(utils::InternalError,
+                       mEquation,
+                       "DifferentialEquation - variable not create");
+                return mEquation->getValue(time, delay);
+            }
+
+        private:
+            Var(const std::string& name, DifferentialEquation* equation) :
+                Variable(name, equation)
+            {
+                Assert(utils::InternalError,
+                       name == equation->mVariableName,
+                       (boost::format(
+                               "DifferentialEquation - wrong variable"	\
+                               " name: %1% in %2%"))
+                       % name % equation->mVariableName);
+            }
+
+            friend class DifferentialEquation;
+        };
+
+        /**
+         * @brief ext The class represents an external variable of
+         * difference equation.
+         */
+        class Ext : public Variable
+        {
+        public:
+            /**
+             * @brief Default constructor
+             */
+            Ext() {}
+
+            /**
+             * @brief Returns the value of external variable.
+             * @return the value of external variable.
+             */
+            virtual double operator()() const
+            {
+                Assert(utils::InternalError,
+                       mEquation,
+                       "DifferentialEquation - variable not create");
+                return mEquation->getValue(mName);
+            }
+
+            /**
+             * @brief Returns the value of variable.
+             * @param delay the temporal delay.
+             * @return the value of variable.
+             */
+            virtual double operator()(const vle::devs::Time& time,
+                                      int delay) const
+            {
+                Assert(utils::InternalError,
+                       mEquation,
+                       "DifferentialEquation - variable not create");
+                return mEquation->getValue(mName, time, delay);
+            }
+
+        protected:
+            Ext(const std::string& name, DifferentialEquation* equation) :
+                Variable(name, equation)
+            {}
+
+            friend class DifferentialEquation;
+        };
+
+        /**
+         * @brief Create an external variable
+         * @param name the name of the external variable
+         * @return the external variable
+         */
+        inline Ext createExt(const std::string& name)
+        {
+            return Ext(name, this);
+        }
+
+        /**
+         * @brief Create the internal variable
+         * @param name the name of the internal variable
+         * @return the internal variable
+         */
+        inline Var createVar(const std::string& name)
+        {
+            return Var(name, this);
+        }
+
+        /**
+         * @brief The function to develop mathematical expression like:
          * @code
-         * return a * getValue() - b * getValue() * getValue("y");
+         * return a * x() - b * x() * y();
          * @endcode
          */
         virtual double compute(const vle::devs::Time& time) const =0;
 
+        /**
+         * @brief Activate the buffering mechanism of external
+         * variable and set the size of value buffer of external
+         * variables. By default, the external variables are not bufferized.
+         * @param size the size of buffer.
+         * @param delay the value of delay quantum.
+         */
+        void size(int size, double delay)
+        {
+            mBuffer = true;
+            mSize = size;
+            mDelay = delay;
+        }
+
+        /**
+         * @brief Activate the buffering mechanism of external
+         * variables with an unlimited size for the buffer.
+         * By default, the external variables are not bufferized.
+         */
+        void buffer()
+        {
+            mBuffer = true;
+            mSize = -1;
+        }
+
+    protected:
+        DifferentialEquation(const vle::graph::AtomicModel& model,
+                             const vle::devs::InitEventList& events);
+
+        virtual ~DifferentialEquation() {}
+
+        /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
+        virtual double getEstimatedValue(double e) const =0;
+        virtual void reset(const vle::devs::Time& time, double value) =0;
+        virtual void updateGradient(bool external,
+                                    const vle::devs::Time& time) =0;
+        virtual void updateSigma(const vle::devs::Time& time) =0;
+        virtual void updateValue(bool external, const vle::devs::Time& time) =0;
+
+        /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
+        void pushValue(const vle::devs::Time& time,
+                       double value);
+
         enum state { INIT, POST_INIT, RUN, RUN2, POST, POST2, POST3 };
+
+        /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
         virtual vle::devs::Time init(const devs::Time& time);
 
+    private:
         virtual void output(
             const vle::devs::Time& time,
             vle::devs::ExternalEventList& output) const;
@@ -85,40 +268,42 @@ namespace vle { namespace extension {
                              const vle::devs::Time& time,
                              vle::devs::ExternalEventList& output) const;
 
-    private:
-	void updateExternalVariable(const vle::devs::Time& time);
+        /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-    protected:
         enum thresholdType { UP, DOWN };
         typedef std::map < std::string, std::pair < double, thresholdType > >
             threshold;
-	typedef std::deque < std::pair < devs::Time, double > > valueBuffer;
-
-	void pushValue(const vle::devs::Time& time,
-		       double value);
-	void pushExternalValue(const std::string& name,
-			       const vle::devs::Time& time,
-			       double value);
-        virtual void reset(const vle::devs::Time& time, double value) =0;
-	virtual void updateGradient(bool external,
-				    const vle::devs::Time& time) =0;
-        virtual void updateSigma(const vle::devs::Time& time) =0;
-        virtual void updateValue(bool external, const vle::devs::Time& time) =0;
-
-        inline void setGradient(const std::string& name, double gradient)
-        { mExternalVariableGradient[name] = gradient; }
-
-	bool mUseGradient;
-        bool mActive;
-        bool mDependance;
+        typedef std::deque < std::pair < devs::Time, double > > valueBuffer;
 
         const valueBuffer& externalValueBuffer(const std::string& name) const;
         valueBuffer& externalValueBuffer(const std::string& name);
 
+        inline double getValue() const
+        { return mValue; }
+
+        double getValue(const vle::devs::Time& time, double delay) const;
+
+        double getValue(const std::string& name) const;
+
+        double getValue(const std::string& name,
+                        const vle::devs::Time& time, double delay) const;
+
+        void pushExternalValue(const std::string& name,
+                               const vle::devs::Time& time,
+                               double value);
+
+        inline void setGradient(const std::string& name, double gradient)
+        { mExternalVariableGradient[name] = gradient; }
+
+    protected:
+        bool mUseGradient;
+        bool mActive;
+        bool mDependance;
+
         /** Internal variable */
         double mInitialValue;
         std::string mVariableName;
-	double mValue;
+        double mValue;
 
         /** External variables */
         unsigned int mExternalVariableNumber;
@@ -127,23 +312,29 @@ namespace vle { namespace extension {
         std::map < std::string , bool > mIsGradient;
         bool mExternalValues;
 
-	/** Thresholds **/
-	double mPreviousValue;
-	threshold mThresholds;
+        /** Thresholds **/
+        double mPreviousValue;
+        threshold mThresholds;
 
-	/** Buffer */
-	bool mBuffer;
-	devs::Time mStartTime;
-	double mDelay;
-	int mSize;
-	valueBuffer mValueBuffer;
-	std::map < std::string, valueBuffer > mExternalValueBuffer;
+        /** Buffer */
+        bool mBuffer;
+        devs::Time mStartTime;
+        double mDelay;
+        int mSize;
+        valueBuffer mValueBuffer;
+        std::map < std::string, valueBuffer > mExternalValueBuffer;
 
         /** State */
         double mGradient;
         devs::Time mSigma;
         devs::Time mLastTime;
         state mState;
+
+    private:
+        void updateExternalVariable(const vle::devs::Time& time);
+
+        friend class Var;
+        friend class Ext;
     };
 
 }} // namespace vle extension

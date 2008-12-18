@@ -33,11 +33,14 @@ S::S(const graph::AtomicModel& model,
     extension::DESS(model, events)
 {
     r = value::toDouble(events.get("r"));
+
+    _S = createVar("S");
+    I = createExt("I");
 }
 
 double S::compute(const vle::devs::Time& /* time */) const
 {
-    return -r * getValue() * getValue("I");
+    return -r * _S() * I();
 }
 
 DECLARE_NAMED_DYNAMICS(S, S)

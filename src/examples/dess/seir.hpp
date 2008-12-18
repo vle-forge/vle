@@ -26,12 +26,20 @@
 #ifndef VLE_EXAMPLES_SEIR_HPP
 #define VLE_EXAMPLES_SEIR_HPP
 
-#include <vle/extension/CombinedQSS.hpp>
+#include <vle/extension/QSS.hpp>
 
 namespace vle { namespace examples { namespace dess {
 
-class seir : public vle::extension::CombinedQss
+class seir : public vle::extension::QSS::Multiple
 {
+public:
+    seir(const vle::graph::AtomicModel&,
+	 const vle::devs::InitEventList&);
+    virtual ~seir(){}
+
+    virtual double compute(unsigned int i,
+			   const vle::devs::Time& time) const;
+
 private:
     double m;
     double g;
@@ -40,13 +48,10 @@ private:
     double b1;
     double N;
 
-public:
-    seir(const vle::graph::AtomicModel&,
-	 const vle::devs::InitEventList&);
-    virtual ~seir(){}
-
-    virtual double compute(unsigned int i,
-			   const vle::devs::Time& time) const;
+    Var S;
+    Var E;
+    Var I;
+    Var R;
 };
 
 }}} // namespace vle examples dess

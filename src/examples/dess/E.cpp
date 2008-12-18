@@ -39,13 +39,17 @@ E::E(const graph::AtomicModel& model,
     // contact rates
     b0 = value::toDouble(evList.get("b0"));
     b1 = value::toDouble(evList.get("b1"));
+
+    _E = createVar("E");
+    S = createExt("S");
+    I = createExt("I");
 }
 
 double E::compute(const vle::devs::Time& time) const
 {
     double b = b0 * (1 + b1 * cos(2 * M_PI * time.getValue()));
 
-    return b * getValue("S") * getValue("I") - (m + a) * getValue();
+    return b * S() * I() - (m + a) * _E();
 }
 
 DECLARE_NAMED_DYNAMICS(E, E)
