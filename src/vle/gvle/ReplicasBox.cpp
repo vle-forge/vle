@@ -155,7 +155,7 @@ void ReplicasBox::onRandom()
     if (it) {
         while (it != children.end()) {
             Gtk::TreeModel::Row row = *it;
-            row[mColumn.mValue] = mRand->get_int();
+            row[mColumn.mValue] = mRand->getInt();
             ++it;
         }
     }

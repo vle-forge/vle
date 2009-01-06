@@ -32,16 +32,7 @@ namespace vle { namespace examples { namespace generator {
 
 double NormalGenerator::generate()
 {
-    double x, y, z;
-
-    y = m_rand.get_double_range_excluded(0.0, 1.0);
-
-    x = std::sqrt(-2.0 * std::log(y)) *
-        std::sin(G_PI_2) * m_rand.get_double() *
-        m_standardDeviation + m_average;
-
-    z = m_rand.get_bool() ? 2 * m_average - x : x;
-    return z;
+    return m_rand.normal(m_average, m_standardDeviation);
 }
 
 }}} // namespace vle examples generator

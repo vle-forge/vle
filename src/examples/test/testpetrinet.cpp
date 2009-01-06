@@ -238,6 +238,6 @@ BOOST_AUTO_TEST_CASE(test_petrinet_meteo)
     BOOST_REQUIRE_EQUAL(result.shape()[1],
                         (value::MatrixView::size_type)31);
 
-    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][30]), 25., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][30]), 29., 10e-5);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[5][30]), 4., 10e-5);
 }

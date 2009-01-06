@@ -455,7 +455,7 @@ void ManagerRun::initRandomGenerator(const vpz::Vpz& file)
                file.project().experiment().replicas().number() > 0,
                boost::format("The replicas's tag does not defined"));
 
-        m_rand->set_seed(file.project().experiment().replicas().seed());
+        m_rand->seed(file.project().experiment().replicas().seed());
     }
 }
 

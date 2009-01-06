@@ -47,7 +47,7 @@ Time Cell::init(const vle::devs::Time& /* time */)
 // States
     initBooleanNeighbourhood("s",false);
     if (!existState("s")) {
-	double colour = rand().get_double_range_excluded(0, 1);
+	double colour = rand().getDouble();
 
 	if (colour > 0.5) initBooleanState("s", true);
 	else initBooleanState("s", false);

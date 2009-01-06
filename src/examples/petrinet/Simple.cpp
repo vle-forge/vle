@@ -145,7 +145,7 @@ namespace vle { namespace examples { namespace petrinet {
         virtual devs::Time init(const devs::Time& /* time */)
         {
             mActive = mInit;
-            mNextTime = rand().get_int_range(mMin, mMax);
+            mNextTime = rand().getInt(mMin, mMax);
             return devs::Time(0);
         }
 
@@ -153,7 +153,7 @@ namespace vle { namespace examples { namespace petrinet {
         {
             if (mNextTime == 0) {
                 mActive = not mActive;
-                mNextTime = rand().get_int_range(mMin, mMax);
+                mNextTime = rand().getInt(mMin, mMax);
             } else {
                 --mNextTime;
             }

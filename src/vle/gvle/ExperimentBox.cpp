@@ -217,12 +217,12 @@ bool ExperimentBox::apply()
 
 void ExperimentBox::on_random_simu()
 {
-    mSpinSimuSeed->set_value(mRand.get_int());
+    mSpinSimuSeed->set_value(mRand.getInt());
 }
 
 void ExperimentBox::on_random_plan()
 {
-    mSpinPlanSeed->set_value(mRand.get_int());
+    mSpinPlanSeed->set_value(mRand.getInt());
 }
 
 void ExperimentBox::on_calendar()

@@ -32,18 +32,7 @@ namespace vle { namespace examples { namespace generator {
 
 double LogNormalGenerator::generate()
 {
-    double s, x, y, z;
-
-    x = 0.0;
-    y = std::log(((m_standardDeviation * m_standardDeviation) /
-                  (m_average * m_average)) + 1.0);
-    s = sqrt(y);
-
-    for (int i=1; i<=12; i++)
-        x += m_rand.get_int();
-
-    z = std::exp(std::log(m_average) - 1.0 / 2 * y + s * ( x - 6.0));
-    return z;
+    return m_rand.logNormal(m_average, m_standardDeviation);
 }
 
 }}} // namespace vle examples generator

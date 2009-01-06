@@ -294,12 +294,12 @@ PetriNet::Transition* PetriNet::selectTransition()
             ++it;
         }
 
-        int index = rand().get_int_range(0, list.size());
+        int index = rand().getInt(0, list.size() - 1);
 
         return list.at(index);
     }
     else {
-        int index = rand().get_int_range(0, mEnabledTransitions.size());
+        int index = rand().getInt(0, mEnabledTransitions.size() - 1);
 
         return mEnabledTransitions.at(index);
     }

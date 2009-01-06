@@ -31,7 +31,7 @@ namespace vle { namespace examples { namespace generator {
 
 double UniformGenerator::generate()
 {
-    return m_rand.get_double_range_excluded(m_min, m_max);
+    return m_rand.getDouble(m_min, m_max);
 }
 
 }}} // namespace vle examples generator

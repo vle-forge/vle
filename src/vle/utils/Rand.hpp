@@ -26,188 +26,198 @@
 #ifndef UTILS_RAND_HPP
 #define UTILS_RAND_HPP
 
-#include <cmath>
-#include <limits>
-#include <glibmm/random.h>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/variate_generator.hpp>
+#include <boost/random/bernoulli_distribution.hpp>
+#include <boost/random/uniform_int.hpp>
+#include <boost/random/uniform_real.hpp>
+#include <boost/random/normal_distribution.hpp>
+#include <boost/random/lognormal_distribution.hpp>
 
 namespace vle { namespace utils {
 
     /**
-     * @brief Random Numbers - pseudo-random number generator based on
-     * Glib::Rand ie. Mersene Twister. The Glib::Rand provides functions:
-     * @code
-     * // return true or false
-     * bool get_bool();
-     * // return a number between [0..2^32-1]
-     * guint32 get_int();
-     * // return a number between [begin..end-1]
-     * gint32  get_int_range(gint32 begin, gint32 end);
-     * // return a real [0..1)
-     * double get_double();
-     * // return a real [begin..end)
-     * double get_double_range(double begin, double end);
-     * @endcode
+     * @brief vle::utils::Rand is a pseudo-random number generator based on
+     * boost random packages. vle::utils::Rand uses the mersene_twister PRNG.
      *
-     * For instance, to develop a DEVS atomic model:
-     * @code
-     * // in a devs::Dynamics model:
-     * double d = rand().get_double();
-     * int i = rand().get_int_range(0, 123);
-     * @endcode
+     * @note "Mersenne Twister: A 623-dimensionally equidistributed uniform
+     * pseudo-random number generator", Makoto Matsumoto and Takuji Nishimura,
+     * ACM Transactions on Modeling and Computer Simulation: Special Issue on
+     * Uniform Random Number Generation, Vol. 8, No. 1, January 1998, pp. 3-30.
      *
+     * @code
+     * vle::utils::Rand r;
+     * r.seed((uint32_t)12345);
+     * r.getInt(); // uint32_t [0, 2^32-1]
+     * r.getInt(1, 10); // int [1, 10]
+     * r.getBool(); // bool [true, false]
+     * r.getDouble(); // double [0.0, 1.0)
+     * r.getDouble(0.0, 1.0); // double [0.0, 1.0)
+     * r.normal(1.0, 0.0);
+     * r.lognormal(1.0, 0.0);
+     * @endcode
      */
     class Rand
     {
     public:
+        typedef boost::mt19937::result_type result_type;
+
         /**
-         * @brief Create a new random number generator initializecd with a seed
-         * takne either from /dev/urandom if exist or from the current time.
+         * @brief Create a new PRNG mersene twister initializecd with a seed
+         * equal to 5489.
          */
-        Rand() { }
+        Rand() {}
+
+        /**
+         * @brief Create a new PRNG mersene twister initialized with a seed
+         * provide by parameters.
+         * @param seed The seed to assign to the PRNG.
+         */
+        explicit Rand(result_type seed) :
+            m_rand(seed)
+        {}
 
         /**
          * @brief Set the seed for the random number generator.
          * @param seed a value to reinitialize the random number generator.
          */
-        void set_seed(guint32 seed)
-        {
-            m_rand.set_seed(seed);
-        }
+        void seed(result_type seed)
+        { m_rand.seed(seed); }
 
         /**
-         * @brief Generate a boolean value [true, false].
-         * @return true of false.
+         * @brief Generate a boolean value [true, false] using the Bernoulli
+         * distribition where p = 0.5. (P(true) = p, P(false) = 1 - p).
+         * @return a random true or false boolean.
          */
-        inline bool get_bool()
+        inline bool getBool()
         {
-            return m_rand.get_bool();
+            boost::bernoulli_distribution < > distrib(0.5);
+            boost::variate_generator < boost::mt19937&,
+                boost::bernoulli_distribution < > >gen(m_rand, distrib);
+
+            return gen();
         }
 
         /**
          * @brief Gererate an unsigned int value [0..2^32-1].
-         * @return a unsigned int
+         * @return a random unsigned int
          */
-        inline guint32 get_int()
+        inline result_type getInt()
         {
-            return m_rand.get_int();
+            boost::uniform_int < > distrib(m_rand.min(), m_rand.max());
+            boost::variate_generator < boost::mt19937&,
+                boost::uniform_int < > > gen(m_rand, distrib);
+
+            return gen();
         }
 
         /**
-         * @brief Generate an integer from begin to end [begin..end-1].
+         * @brief Generate an integer from begin to end [begin..end].
          * @param begin The minimum value include.
-         * @param end The limit (exclude) of the range.
-         * @return an integer.
+         * @param end The limit of the range.
+         * @return a random integer.
          */
-        inline gint32  get_int_range(gint32 begin, gint32 end)
+        inline int getInt(int begin, int end)
         {
-            return m_rand.get_int_range(begin, end);
+            boost::uniform_int < > distrib(begin, end);
+            boost::variate_generator < boost::mt19937&,
+                boost::uniform_int < > > gen(m_rand, distrib);
+
+            return gen();
         }
 
         /**
-         * @brief Generate a real between 0 and 1 [0..1).
-         * @return a real.
+         * @brief Generate a real value [0, 1)
+         * @return a random real.
          */
-        inline double get_double()
+        inline double getDouble()
         {
-            return m_rand.get_double();
+            boost::uniform_real < > distrib(0.0, 1.0);
+            boost::variate_generator < boost::mt19937&,
+                boost::uniform_real < > > gen(m_rand, distrib);
+
+            return gen();
         }
 
         /**
-         * @brief Generate a real between begin to end [begin..end).
+         * @brief Generate a real from begin to end [begin..end).
          * @param begin The minimum value.
          * @param end The limit (exclude) of the range.
-         * @return a real.
+         * @return a random real.
          */
-        inline double get_double_range(double begin, double end)
+        inline double getDouble(double begin, double end)
         {
-            return m_rand.get_double_range(begin, end);
+            boost::uniform_real < > distrib(begin, end);
+            boost::variate_generator < boost::mt19937&,
+                boost::uniform_real < > > gen(m_rand, distrib);
+
+            return gen();
         }
-
-        /**
-         * @brief Generate a real between 0 and 1 [0..1].
-         * @return a real.
-         */
-	inline double get_double_included()
-	{
-            return (double) get_int() /
-                (double) (std::numeric_limits < guint32 >::max() - 1.0);
-	}
-
-        /**
-         * @brief Generate a real between begin and end [begin..end].
-         * @param begin The minimum value include.
-         * @param end The maximum value include.
-         * @return a real.
-         */
-	inline double get_double_included(double begin, double end)
-	{
-	    return get_double_included() * std::abs(end - begin) + begin;
-	}
-
-        /**
-         * @brief Generate a real between begin and end (begin..end).
-         * @param begin The minimum value exclude.
-         * @param end The maximum value exclude.
-         * @return a real.
-         */
-        inline double get_double_range_excluded(double begin, double end)
-        {
-            double random;
-            while (begin == (random = get_double_range(begin, end))) {}
-            return random;
-        }
-
-        /**
-         * @brief Generate an integer between begin and end (begin..end).
-         * @param begin The minimun value exclude.
-         * @param end The maximum value exclude.
-         * @return a integer.
-         */
-        inline gint32 get_int_range_excluded(gint32 begin, gint32 end)
-        {
-            gint32 random;
-            while (begin == (random = get_int_range(begin, end))) {}
-            return random;
-        }
-
-        ////
-        //// Specific random generator method
-        ////
 
 	/**
-	 * @brief Generate a real using the Normal law.
-	 * @param standarddeviation
-	 * @param average
+	 * @brief Generate a real using the normal law.
+	 * @param mean
+	 * @param sigma
 	 * @return a real.
 	 */
-	double normal(double standarddeviation, double average);
+        double normal(double mean, double sigma)
+        {
+            boost::normal_distribution < > distrib(mean, sigma);
+            boost::variate_generator < boost::mt19937&,
+                boost::normal_distribution < > > gen(m_rand, distrib);
+
+            return gen();
+        }
 
 	/**
 	 * @brief Generate a real using the Log Normal law.
-	 * @param standarddeviation
-	 * @param average
+	 * @param mean
+	 * @param sigma
 	 * @return a real.
 	 */
-	double log_normal(double standarddeviation, double average);
+        double logNormal(double mean, double sigma)
+        {
+            boost::lognormal_distribution < > distrib(mean, sigma);
+            boost::variate_generator < boost::mt19937&,
+                boost::lognormal_distribution < > > gen(m_rand, distrib);
+
+            return gen();
+        }
 
 	/**
          * @brief Generate a random number between 0 and 2*PI using the von
-         * Mises law [0..2*PI]. mu is the mean mu is the mean angle, expressed
-         * in radians between 0 and 2*pi, and kappa is the concentration
-         * parameter, which must be greater than or equal to zero. If kappa is
-         * equal to zero, this distribution reduces to a uniform random angle
-         * over the range 0 to 2*pi.angle, expressed in radians between 0 and
-         * 2*pi, and kappa is the concentration parameter, which must be greater
-         * than or equal to zero.  If kappa is equal to zero, this distribution
-         * reduces to a uniform random angle over the range 0 to 2*pi.
+         * Mises law [0..2*PI]. mu is the mean angle, expressed in radians
+         * between 0 and 2*pi, and kappa is the concentration parameter, which
+         * must be greater than or equal to zero. If kappa is equal to zero,
+         * this distribution reduces to a uniform random angle over the range 0
+         * to 2*pi.angle, expressed in radians between 0 and 2*pi, and kappa is
+         * the concentration parameter, which must be greater than or equal to
+         * zero.  If kappa is equal to zero, this distribution reduces to a
+         * uniform random angle over the range 0 to 2*pi.
 	 * @param kappa
 	 * @param mu
-	 * @return a random number [0;2PI]
+	 * @return a random number [0,2PI]
 	 */
-	double von_mises(double kappa, double mu);
+        double vonMises(double kappa, double mu);
+
+        /**
+         * @brief Get a reference to the Mersenne Twister PRNG.
+         * @code
+         * vle::utils::Rand r(123456789);
+         * boost::uniform_real < > d(0., 100.); // [0., 100.)
+         * boost::variate_generator < boost::mt19937&,
+         *                            boost::uniform_real < > > gen(r, d);
+         * std::cout << gen() << "\n";
+         *
+         * std::vector < uint32_t > vec(1000);
+         * vle::utils::generate(vec.begin(), vec.end(), gen);
+         * @endcode
+         * @return A reference to the PRNG.
+         */
+        boost::mt19937& gen() { return m_rand; }
 
     private:
-        Glib::Rand  m_rand;
+        boost::mt19937  m_rand;
     };
 
 }} // namespace vle utils

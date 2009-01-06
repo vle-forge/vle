@@ -58,7 +58,7 @@ void RootCoordinator::load(const vpz::Vpz& io)
         delete m_root;
     }
 
-    m_rand.set_seed(io.project().experiment().seed());
+    m_rand.seed(io.project().experiment().seed());
     m_duration = io.project().experiment().duration();
 
     m_modelfactory = new ModelFactory(io.project().dynamics(),

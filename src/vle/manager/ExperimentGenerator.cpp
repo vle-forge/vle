@@ -110,7 +110,7 @@ void ExperimentGenerator::buildReplicasList()
     mReplicasTab.resize(mFile.project().experiment().replicas().number());
     for (std::vector < guint32 >::iterator it = mReplicasTab.begin();
          it != mReplicasTab.end(); ++it) {
-        *it = mRand->get_int();
+        *it = mRand->getInt();
     }
 }
 

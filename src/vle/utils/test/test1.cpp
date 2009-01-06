@@ -26,7 +26,7 @@
 #define BOOST_TEST_MAIN
 #define BOOST_AUTO_TEST_MAIN
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE atomicdynamics_test
+#define BOOST_TEST_MODULE utils_library_test
 #include <boost/test/unit_test.hpp>
 #include <boost/test/auto_unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
@@ -39,6 +39,7 @@
 #include <string>
 #include <vle/utils.hpp>
 #include <iostream>
+#include <numeric>
 
 using namespace vle;
 
@@ -141,4 +142,76 @@ BOOST_AUTO_TEST_CASE(test_unary_function)
 
         BOOST_REQUIRE_EQUAL(out.str(), "xurentou");
     }
+}
+
+BOOST_AUTO_TEST_CASE(test_uniform)
+{
+    const std::size_t szmax(1000);
+    std::vector < uint32_t > vec1(szmax, 0);
+    std::vector < double > vec2(szmax, 0);
+    vle::utils::Rand r(123456789);
+
+    boost::uniform_int < > distrib1(0, 10);
+    boost::uniform_real < > distrib2(0.0, 10.0);
+
+    boost::variate_generator < boost::mt19937&,
+        boost::uniform_int < > > gen1(r.gen(), distrib1);
+    boost::variate_generator < boost::mt19937&,
+        boost::uniform_real < > > gen2(r.gen(), distrib2);
+
+    vle::utils::generate(vec1.begin(), vec1.end(), gen1);
+
+    double result1 = ((double)std::accumulate(vec1.begin(), vec1.end(),
+                                              (uint32_t)0)) / (double)szmax;
+    BOOST_REQUIRE_CLOSE(result1, 5.0, 10);
+
+    vle::utils::generate(vec2.begin(), vec2.end(), gen2);
+
+    double result2 = std::accumulate(vec2.begin(), vec2.end(), (double)0.0) /
+        (double) szmax;
+    BOOST_REQUIRE_CLOSE(result2, 5.0, 10);
+
+    {
+        std::vector < uint32_t > vec1_test(vec1);
+        BOOST_REQUIRE(vec1 == vec1_test);
+
+        for (std::vector < uint32_t >::iterator it = vec1_test.begin();
+             it != vec1_test.end(); ++it) {
+            *it = r.getInt(0, 10);
+        }
+        BOOST_REQUIRE(vec1 != vec1_test);
+
+        vle::utils::generate(vec1_test.begin(), vec1_test.end(), gen1);
+        BOOST_REQUIRE(vec1 != vec1_test);
+
+        boost::uniform_int < > distrib3(0, 10);
+        boost::variate_generator < boost::mt19937&,
+            boost::uniform_int < > > gen3(r.gen(), distrib3);
+
+        vle::utils::generate(vec1_test.begin(), vec1_test.end(), gen3);
+        BOOST_REQUIRE(vec1 != vec1_test);
+    }
+}
+
+BOOST_AUTO_TEST_CASE(test_normal)
+{
+    const std::size_t szmax(1000);
+    std::vector < double > n1(szmax, 0), n2(szmax, 0);
+
+    vle::utils::Rand r(123456789);
+    boost::normal_distribution < >dist(1, 1);
+    boost::variate_generator < boost::mt19937&,
+        boost::normal_distribution < > > gen(r.gen(), dist);
+
+    vle::utils::generate(n1.begin(), n1.end(), gen);
+
+    for (std::vector < double >::iterator it = n2.begin();
+         it != n2.end(); ++it) {
+        *it = r.normal(1, 1);
+    }
+
+    BOOST_REQUIRE_CLOSE(std::accumulate(n1.begin(), n1.end(), 0.0) /
+                        (double)szmax, 1.0, 10);
+    BOOST_REQUIRE_CLOSE(std::accumulate(n2.begin(), n2.end(), 0.0) /
+                        (double)szmax, 1.0, 10);
 }
