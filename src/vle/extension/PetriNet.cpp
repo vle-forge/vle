@@ -81,6 +81,43 @@ void PetriNet::computeEnabledTransition(const vle::devs::Time& time)
     mSigma = min - time;
 }
 
+void PetriNet::disableOutTransition()
+{
+    devsOutTransitionMarkingList::iterator it =
+        mOutTransitionMarkings.begin();
+
+    while (it != mOutTransitionMarkings.end()) {
+        it->second.second = false;
+        ++it;
+    }
+}
+
+void PetriNet::disableOutPlace(const devs::Time& time)
+{
+    devsPlaceMarkingList::const_iterator it = mOutPlaceMarkings.begin();
+
+    while (it != mOutPlaceMarkings.end()) {
+        const std::string& placeName = it->second.first;
+        unsigned int tokenNumber = it->second.second;
+        MarkingList::const_iterator itm = mMarkings.find(placeName);
+
+        if (itm != mMarkings.end() and
+            itm->second->getTokenNumber() >= tokenNumber) {
+            TokenList::const_iterator itt = itm->second->getTokens().
+                begin();
+
+            while (itt != itm->second->getTokens().end()) {
+                if (not (*itt)->sent() and
+                    (*itt)->getTime() == time) {
+                    (*itt)->send();
+                }
+                ++itt;
+            }
+        }
+        ++it;
+    }
+}
+
 void PetriNet::fire(const devs::Time& time)
 {
     if (mEnabledTransitions.empty()) {
@@ -248,7 +285,8 @@ bool PetriNet::removeTokens(Marking* marking,
     TokenList::iterator it = tokens.begin();
 
     while (it != tokens.end()) {
-        if ((*it)->getTime() <= time) {
+        if ((*it)->getTime() <= time and tokenNumber != 0) {
+            --tokenNumber;
             delete *it;
             it = tokens.erase(it);
         } else {
@@ -334,39 +372,39 @@ PetriNet::~PetriNet()
         delete it->second;
 }
 
-// Init methods
+/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-void PetriNet::addArc(const std::string first,
-                      const std::string second,
+void PetriNet::addArc(const std::string& src,
+                      const std::string& dst,
                       unsigned int tokenNumber)
 {
-    if (existPlace(first)) {
-        Assert(utils::ModellingError, existTransition(second),
-               boost::format("Petri Net: Unknow transition: %1%") % second);
-        Input* input = new Input(mPlaces[first],
-                                 mTransitions[second],
+    if (existPlace(src)) {
+        Assert(utils::ModellingError, existTransition(dst),
+               boost::format("Petri Net: Unknow transition: %1%") % dst);
+        Input* input = new Input(mPlaces[src],
+                                 mTransitions[dst],
                                  tokenNumber);
 
-        mTransitions[second]->addInput(input);
-        mPlaces[first]->addInput(input);
+        mTransitions[dst]->addInput(input);
+        mPlaces[src]->addInput(input);
         mInputs.push_back(input);
-    } else if (existPlace(second)) {
-        Assert(utils::ModellingError, existTransition(first),
-               boost::format( "Petri Net: Unknow transition: %1%") % first);
-        Output* output = new Output(mTransitions[first],
-                                    mPlaces[second],
+    } else if (existPlace(dst)) {
+        Assert(utils::ModellingError, existTransition(src),
+               boost::format( "Petri Net: Unknow transition: %1%") % src);
+        Output* output = new Output(mTransitions[src],
+                                    mPlaces[dst],
                                     tokenNumber);
 
-        mTransitions[first]->addOutput(output);
-        mPlaces[second]->addOutput(output);
+        mTransitions[src]->addOutput(output);
+        mPlaces[dst]->addOutput(output);
         mOutputs.push_back(output);
     } else {
         Throw(utils::ModellingError, boost::format(
-                "Petri Net: unknow place: %1% or %2%") % first % second);
+                "Petri Net: unknow place: %1% or %2%") % src % dst);
     }
-}	
+}
 
-void PetriNet::addInitialMarking(const std::string placeName,
+void PetriNet::addInitialMarking(const std::string& placeName,
                                  unsigned int tokenNumber)
 {
     Assert(utils::ModellingError, existPlace(placeName),
@@ -376,8 +414,8 @@ void PetriNet::addInitialMarking(const std::string placeName,
         mInitialMarking[placeName] = tokenNumber;
 }
 
-void PetriNet::addInputTransition(const std::string transitionName,
-                                  const std::string portName,
+void PetriNet::addInputTransition(const std::string& transitionName,
+                                  const std::string& portName,
                                   double delay)
 {
     Assert(utils::ModellingError, not existTransition(transitionName),
@@ -392,8 +430,8 @@ void PetriNet::addInputTransition(const std::string transitionName,
     mInTransitionMarkings[portName] = transitionName;
 }
 
-void PetriNet::addOutputPlace(const std::string placeName,
-                              const std::string portName)
+void PetriNet::addOutputPlace(const std::string& placeName,
+                              const std::string& portName)
 {
     Assert(utils::ModellingError, not existPlace(placeName), boost::format(
             "Petri Net: place '%1%' already exists") % placeName);
@@ -402,8 +440,8 @@ void PetriNet::addOutputPlace(const std::string placeName,
     mOutPlaceMarkings[portName] = std::make_pair(placeName, 1);
 }
 
-void PetriNet::addOutputTransition(const std::string transitionName,
-                                   const std::string portName,
+void PetriNet::addOutputTransition(const std::string& transitionName,
+                                   const std::string& portName,
                                    unsigned int priority)
 {
     Assert(utils::ModellingError, not existTransition(transitionName),
@@ -416,8 +454,7 @@ void PetriNet::addOutputTransition(const std::string transitionName,
                                                             false);
 }
 
-void PetriNet::addPlace(const std::string placeName,
-                        double delay)				
+void PetriNet::addPlace(const std::string& placeName, double delay)
 {
     Assert(utils::ModellingError, not existPlace(placeName), boost::format(
             "Petri Net: place '%1%' already exists") % placeName);
@@ -429,7 +466,7 @@ void PetriNet::addPlace(const std::string placeName,
     mPlaces[placeName] = new Place(placeName, delay);
 }
 
-void PetriNet::addTransition(const std::string transitionName,
+void PetriNet::addTransition(const std::string& transitionName,
                              double delay,
                              unsigned int priority)
 {
@@ -443,7 +480,9 @@ void PetriNet::addTransition(const std::string transitionName,
 
     mTransitions[transitionName] = new Transition(transitionName, delay,
                                                   priority);
-}			
+}
+
+/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 void PetriNet::build()
 {
@@ -492,7 +531,7 @@ void PetriNet::initInitialMarking(const value::VectorValue& initialMarkings)
         it != initialMarkings.end(); it++) {
         value::VectorValue initialMarking = value::toSet(*it);
         std::string name = value::toString(initialMarking[0]);
-        unsigned int tokenNumber = value::toInteger(initialMarking[1]);	
+        unsigned int tokenNumber = value::toInteger(initialMarking[1]);
 
         addInitialMarking(name, tokenNumber);
     }
@@ -565,7 +604,8 @@ void PetriNet::initTransitions(const value::VectorValue& transitions)
     }
 }
 
-// DEVS methods
+/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
 devs::Time PetriNet::init(const devs::Time& time)
 {
     build();
@@ -579,7 +619,7 @@ devs::Time PetriNet::init(const devs::Time& time)
 void PetriNet::output(const devs::Time& time,
                       devs::ExternalEventList& output) const
 {
-    if (mPhase == OUT) {
+    if (mPhase == OUT or mPhase == OUT2) {
         {
             devsPlaceMarkingList::const_iterator it = mOutPlaceMarkings.begin();
 
@@ -595,8 +635,10 @@ void PetriNet::output(const devs::Time& time,
                         begin();
 
                     while (itt != itm->second->getTokens().end()) {
-                        if ((*itt)->getTime() == time)
-                            output.addEvent(new devs::ExternalEvent(portName));
+                        if (not (*itt)->sent() and
+                            (*itt)->getTime() == time) {
+                            output.addEvent(buildEvent(portName));
+                        }
                         ++itt;
                     }
                 }
@@ -611,7 +653,7 @@ void PetriNet::output(const devs::Time& time,
             while (it != mOutTransitionMarkings.end()) {
                 if (it->second.second) {
                     const std::string& portName = it->second.first;
-                    output.addEvent(new devs::ExternalEvent(portName));
+                    output.addEvent(buildEvent(portName));
                 }
                 ++it;
             }
@@ -623,9 +665,13 @@ void PetriNet::output(const devs::Time& time,
 devs::Time PetriNet::timeAdvance() const
 {
     switch (mPhase) {
+    case IDLE:
+        return 0;
     case WAITING:
         return mSigma;
     case OUT:
+        return 0;
+    case OUT2:
         return 0;
     case RUN:
         return 0;
@@ -636,18 +682,24 @@ devs::Time PetriNet::timeAdvance() const
 void PetriNet::internalTransition(const devs::Time& time)
 {
     switch (mPhase) {
+    case IDLE:
+        {
+            mPhase = OUT;
+            break;
+        }
     case OUT:
         {
-            {
-                devsOutTransitionMarkingList::iterator it =
-                    mOutTransitionMarkings.begin();
-
-                while (it != mOutTransitionMarkings.end()) {
-                    it->second.second = false;
-                    ++it;
-                }
-            }
-
+            disableOutTransition();
+            disableOutPlace(time);
+            computeEnabledTransition(time);
+            if (mSigma == 0) mPhase = RUN;
+            else mPhase = WAITING;
+            break;
+        }
+    case OUT2:
+        {
+            disableOutTransition();
+            disableOutPlace(time);
             if (mSigma == 0) mPhase = RUN;
             else mPhase = WAITING;
             break;
@@ -656,7 +708,7 @@ void PetriNet::internalTransition(const devs::Time& time)
     case RUN:
         {
             run(time);
-            mPhase = OUT;
+            mPhase = OUT2;
         }
     }
 }
@@ -685,9 +737,10 @@ void PetriNet::externalTransition(const devs::ExternalEventList& event,
                    mInTransitionMarkings.end()) {
             Transition* transition = mTransitions[mInTransitionMarkings[port]];
 
-            if (transition->getDelay() == 0)
+            if (transition->getDelay() == 0) {
                 goOutTransition(transition, time);
-            else {
+                ok = true;
+            } else {
                 mWaitingTransitions.push_back(pairTimeTransition(
                         time + transition->getDelay(), transition));
                 mWaitingTransitions.sort();
@@ -695,9 +748,7 @@ void PetriNet::externalTransition(const devs::ExternalEventList& event,
         }
         ++it;
     }
-    computeEnabledTransition(time);
-    if (mSigma == 0) mPhase = RUN;
-    else mPhase = WAITING;
+    mPhase = IDLE;
 }
 
 value::Value PetriNet::observation(const devs::ObservationEvent& event) const

@@ -88,8 +88,8 @@ namespace vle { namespace examples { namespace petrinet {
                 value::DoubleFactory::create(mNumber); }
 
     private:
-        devs::Time mDate;
-        int mNumber;
+            devs::Time mDate;
+            int mNumber;
     };
 
     /**
@@ -169,10 +169,10 @@ namespace vle { namespace examples { namespace petrinet {
         }
 
     private:
-	bool mInit;
+        bool mInit;
         unsigned int mMin;
         unsigned int mMax;
-	unsigned int mNextTime;
+        unsigned int mNextTime;
         bool mActive;
     };
 
@@ -242,6 +242,62 @@ namespace vle { namespace examples { namespace petrinet {
         unsigned int mDayNumber;
     };
 
+    /**
+     * @brief Build an Petri Net model with only one input transition
+     * and only one output place.
+     */
+    class InOut : public extension::PetriNet
+    {
+    public:
+        InOut(const graph::AtomicModel& model,
+              const devs::InitEventList& events) :
+            extension::PetriNet(model, events)
+        {
+        }
+
+        virtual ~InOut()
+        { }
+
+        virtual void build()
+        {
+            addOutputPlace("P1", "out");
+            addInputTransition("T1", "in");
+            addArc("T1", "P1");
+        }
+
+    };
+
+    /**
+     * @brief Build an Petri Net model with a conflict between
+     * external event and send an event to output DEVS port.
+     */
+    class Conflict : public extension::PetriNet
+    {
+    public:
+        Conflict(const graph::AtomicModel& model,
+                 const devs::InitEventList& events) :
+            extension::PetriNet(model, events)
+        {
+        }
+
+        virtual ~Conflict()
+        { }
+
+        virtual void build()
+        {
+            addPlace("P1");
+            addOutputPlace("P2", "out");
+            addInputTransition("T1", "in");
+            addTransition("T2", 0.1);
+            addTransition("T3");
+            addArc("T1", "P1");
+            addArc("P1", "T2");
+            addArc("T2", "P2");
+            addArc("P2", "T3");
+        }
+
+    };
+
 }}} // namespace vle examples petrinet
 
 DECLARE_NAMED_DYNAMICS(Beep, vle::examples::petrinet::PetrinetBeep)
@@ -249,3 +305,5 @@ DECLARE_NAMED_DYNAMICS(Ordinary, vle::examples::petrinet::PetrinetOrdinary)
 DECLARE_NAMED_DYNAMICS(Counter, vle::examples::petrinet::PetrinetCounter)
 DECLARE_NAMED_DYNAMICS(Meteo, vle::examples::petrinet::Meteo)
 DECLARE_NAMED_DYNAMICS(Trigger, vle::examples::petrinet::Trigger)
+DECLARE_NAMED_DYNAMICS(InOut, vle::examples::petrinet::InOut)
+DECLARE_NAMED_DYNAMICS(Conflict, vle::examples::petrinet::Conflict)

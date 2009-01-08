@@ -34,5 +34,6 @@ INSTALL(TARGETS petrinet
 
 INSTALL(FILES petrinet-and.vpz petrinet-mult.vpz petrinet-or.vpz
   petrinet-nand1.vpz petrinet-nand2.vpz petrinet-and-timed.vpz
-  petrinet-or-priority.vpz petrinet-simple.vpz petrinet-meteo.vpz DESTINATION
+  petrinet-or-priority.vpz petrinet-simple.vpz petrinet-meteo.vpz
+  petrinet-inout.vpz petrinet-conflict.vpz DESTINATION
   "${VLE_SHARE_DIRS}/examples")
