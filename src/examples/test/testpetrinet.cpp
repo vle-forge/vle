@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE(test_petrinet_nand1)
 {
     vpz::Vpz file(utils::Path::buildPrefixSharePath(
             utils::Path::path().getPrefixDir(), "examples",
-	    "petrinet-nand1.vpz"));
+            "petrinet-nand1.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("out"));
     o.setLocalStream("", "storage");
@@ -130,7 +130,7 @@ BOOST_AUTO_TEST_CASE(test_petrinet_nand2)
 {
     vpz::Vpz file(utils::Path::buildPrefixSharePath(
             utils::Path::path().getPrefixDir(), "examples",
-	    "petrinet-nand2.vpz"));
+            "petrinet-nand2.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("out"));
     o.setLocalStream("", "storage");
@@ -159,7 +159,7 @@ BOOST_AUTO_TEST_CASE(test_petrinet_and_timed)
 {
     vpz::Vpz file(utils::Path::buildPrefixSharePath(
             utils::Path::path().getPrefixDir(), "examples",
-	    "petrinet-and-timed.vpz"));
+            "petrinet-and-timed.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("out"));
     o.setLocalStream("", "storage");
@@ -188,7 +188,7 @@ BOOST_AUTO_TEST_CASE(test_petrinet_or_priority)
 {
     vpz::Vpz file(utils::Path::buildPrefixSharePath(
             utils::Path::path().getPrefixDir(), "examples",
-	    "petrinet-or-priority.vpz"));
+            "petrinet-or-priority.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("out"));
     o.setLocalStream("", "storage");
@@ -217,7 +217,7 @@ BOOST_AUTO_TEST_CASE(test_petrinet_meteo)
 {
     vpz::Vpz file(utils::Path::buildPrefixSharePath(
             utils::Path::path().getPrefixDir(), "examples",
-	    "petrinet-meteo.vpz"));
+            "petrinet-meteo.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("out"));
     o.setLocalStream("", "storage");
@@ -240,4 +240,64 @@ BOOST_AUTO_TEST_CASE(test_petrinet_meteo)
 
     BOOST_REQUIRE_CLOSE(value::toDouble(result[4][30]), 29., 10e-5);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[5][30]), 4., 10e-5);
+}
+
+BOOST_AUTO_TEST_CASE(test_petrinet_inout)
+{
+    vpz::Vpz file(utils::Path::buildPrefixSharePath(
+            utils::Path::path().getPrefixDir(), "examples",
+            "petrinet-inout.vpz"));
+
+    vpz::Output& o(file.project().experiment().views().outputs().get("out"));
+    o.setLocalStream("", "storage");
+
+    manager::RunQuiet r;
+    r.start(file);
+
+    BOOST_REQUIRE_EQUAL(r.haveError(), false);
+    oov::OutputMatrixViewList out(r.outputs());
+    BOOST_REQUIRE_EQUAL(out.size(),
+                        (oov::OutputMatrixViewList::size_type)1);
+
+    oov::OutputMatrix& view(out["view"]);
+    value::MatrixView result(view.values());
+
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+                        (value::MatrixView::size_type)5);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+                        (value::MatrixView::size_type)11);
+
+    BOOST_REQUIRE_CLOSE((double)value::toInteger(result[2][10]), 6., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][10]), 1., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][10]), 6., 10e-5);
+}
+
+BOOST_AUTO_TEST_CASE(test_petrinet_conflict)
+{
+    vpz::Vpz file(utils::Path::buildPrefixSharePath(
+            utils::Path::path().getPrefixDir(), "examples",
+            "petrinet-conflict.vpz"));
+
+    vpz::Output& o(file.project().experiment().views().outputs().get("out"));
+    o.setLocalStream("", "storage");
+
+    manager::RunQuiet r;
+    r.start(file);
+
+    BOOST_REQUIRE_EQUAL(r.haveError(), false);
+    oov::OutputMatrixViewList out(r.outputs());
+    BOOST_REQUIRE_EQUAL(out.size(),
+                        (oov::OutputMatrixViewList::size_type)1);
+
+    oov::OutputMatrix& view(out["view"]);
+    value::MatrixView result(view.values());
+
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+                        (value::MatrixView::size_type)5);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+                        (value::MatrixView::size_type)11);
+
+    BOOST_REQUIRE_CLOSE((double)value::toInteger(result[2][10]), 1., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][10]), 1., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][10]), 5., 10e-5);
 }
