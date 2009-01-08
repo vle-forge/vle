@@ -182,6 +182,24 @@ namespace vle { namespace utils {
         }
 
     /**
+     * @brief Assign the result of a function to each value in a sequence.
+     * @param first Forward iterator to the initial position in a sequence.
+     * @param end Forward iterator to the finial position in a sequence.
+     * @param f Function to call for each value in the sequence.
+     * @remark the main difference with std::generate if the Function parameter
+     * passed by reference in vle::utils::generator instead of value in
+     * std::generate.
+     */
+    template <
+        typename ForwardIterator, typename Generator >
+        void generate(ForwardIterator first, ForwardIterator end, Generator& f)
+        {
+            for (; first != end; ++first) {
+                *first = f();
+            }
+        }
+
+    /**
      * @brief A std::unary_function to select the first element of a std::pair.
      */
     template < class __vle_pair >
