@@ -23,8 +23,8 @@
  */
 
 
-#ifndef UTILS_RAND_HPP
-#define UTILS_RAND_HPP
+#ifndef VLE_UTILS_RAND_HPP
+#define VLE_UTILS_RAND_HPP
 
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -104,11 +104,7 @@ namespace vle { namespace utils {
          */
         inline result_type getInt()
         {
-            boost::uniform_int < > distrib(m_rand.min(), m_rand.max());
-            boost::variate_generator < boost::mt19937&,
-                boost::uniform_int < > > gen(m_rand, distrib);
-
-            return gen();
+            return m_rand();
         }
 
         /**

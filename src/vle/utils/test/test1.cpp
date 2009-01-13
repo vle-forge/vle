@@ -144,6 +144,17 @@ BOOST_AUTO_TEST_CASE(test_unary_function)
     }
 }
 
+BOOST_AUTO_TEST_CASE(test_generator)
+{
+    vle::utils::Rand r(123456789);
+
+    r.getBool();
+    r.getInt();
+    r.getInt(-100, 100);
+    r.getDouble();
+    r.getDouble(-1.0, 1.0);
+}
+
 BOOST_AUTO_TEST_CASE(test_uniform)
 {
     const std::size_t szmax(1000);
@@ -215,3 +226,5 @@ BOOST_AUTO_TEST_CASE(test_normal)
     BOOST_REQUIRE_CLOSE(std::accumulate(n2.begin(), n2.end(), 0.0) /
                         (double)szmax, 1.0, 10);
 }
+
+
