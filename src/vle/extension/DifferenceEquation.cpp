@@ -852,6 +852,7 @@ void Multiple::initValue(const vle::devs::Time& /* time */)
             addValue(0.0, *it);
         }
         mInitValues[*it] = true;
+	++it;
     }
 }
 

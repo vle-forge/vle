@@ -131,3 +131,34 @@ BOOST_AUTO_TEST_CASE(test_equation3)
     BOOST_REQUIRE_CLOSE(value::toDouble(result[5][10]), 669., 10e-5);
 }
 
+BOOST_AUTO_TEST_CASE(test_equation4)
+{
+    vpz::Vpz file(utils::Path::buildPrefixSharePath(
+            utils::Path::path().getPrefixDir(), "examples", "equation5.vpz"));
+
+    vpz::Output& o(file.project().experiment().views().outputs().get("o"));
+    o.setLocalStream("", "storage");
+
+    manager::RunQuiet r;
+    r.start(file);
+
+    BOOST_REQUIRE_EQUAL(r.haveError(), false);
+    oov::OutputMatrixViewList& out(r.outputs());
+    BOOST_REQUIRE_EQUAL(out.size(),
+                        (oov::OutputMatrixViewList::size_type)1);
+
+    oov::OutputMatrix& view(out["view"]);
+    value::MatrixView result(view.values());
+
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+                        (value::MatrixView::size_type)6);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+                        (value::MatrixView::size_type)11);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][10]), 626., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][10]), 10., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][10]), 55., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][10]), 176., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[5][10]), 867., 10e-5);
+}
+

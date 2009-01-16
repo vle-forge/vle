@@ -50,7 +50,7 @@ TARGET_LINK_LIBRARIES(equation2
   vlemanager
   vletranslator)
 
-ADD_LIBRARY(equation3 SHARED E1.cpp E1.hpp)
+ADD_LIBRARY(equation3 SHARED E1.cpp E1.hpp E2.cpp E2.hpp)
 
 TARGET_LINK_LIBRARIES(equation3
   ${GLIBMM_LIBRARIES}
@@ -90,4 +90,7 @@ INSTALL(FILES equation3.vpz
   DESTINATION "${VLE_SHARE_DIRS}/examples")
 
 INSTALL(FILES equation4.vpz
+  DESTINATION "${VLE_SHARE_DIRS}/examples")
+
+INSTALL(FILES equation5.vpz
   DESTINATION "${VLE_SHARE_DIRS}/examples")
