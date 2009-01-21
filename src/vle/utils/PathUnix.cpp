@@ -64,6 +64,8 @@ bool Path::initPath()
 {
     m_prefix.assign(VLE_PREFIX_DIR);
 
+    readEnvPackage();
+
     readEnv("VLE_SIMULATOR_PATH", m_simulator);
     readEnv("VLE_OOV_PATH", m_stream);
     readEnv("VLE_MODEL_PATH", m_model);

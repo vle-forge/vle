@@ -63,6 +63,27 @@ to init process.
 Define the listening port for vle application. Default is 8888. This option is
 only available for the mode \fBManager\fP and \fBSimulator\fP. 
 
+.SH "ENVIRONMENTS"
+.IP VLE_PACKAGE_PATH
+A path where you push models packages (ie. simulators, vpz files, data, etc.).
+From the package path (for example, /tmp), vle search simulators in
+/tmp/simulator etc.
+
+.IP VLE_SIMULATOR_PATH
+A colon-separated list of directories in which to search the simulators (VLE
+DEVS atomic plug-ins) libraries at execution-time. Similar to the PATH
+environment variable.
+
+.IP VLE_OOV_PATH
+A colon-separated list of directories in which to search the simulators (OOV
+output stream plug-ins) libraries at execution-time. Similar to the PATH
+environment variable.
+
+.IP VLE_MODEL_PATH
+A colon-separated list of directories in which to search the models (GVLE
+plug-ins) libraries at execution-time. Similar to the PATH environment variable.
+
+
 .SH "SEE ALSO" 
 .PP 
 vle (1), oov (1), gvle (1), eov (1), avle (1).

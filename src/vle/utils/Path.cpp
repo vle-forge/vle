@@ -151,6 +151,25 @@ bool Path::readEnv(const std::string& variable, PathList& out)
     return false;
 }
 
+void Path::readEnvPackage()
+{
+    std::string path(Glib::getenv("VLE_PACKAGE_PATH"));
+    if (not path.empty()) {
+        PathList result;
+        PathList::iterator it;
+
+        boost::algorithm::split(result, path, boost::is_any_of(":"),
+                                boost::algorithm::token_compress_on);
+
+        if (isDirectory(result.front())) {
+            std::string sim(buildPath(result.front(), "simulator"));
+            if (isDirectory(sim)) {
+                m_simulator.push_back(sim);
+            }
+        }
+    }
+}
+
 Path::Path()
 {
     if (initPath() == false) {

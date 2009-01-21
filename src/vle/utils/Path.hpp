@@ -267,6 +267,11 @@ namespace vle { namespace utils {
          */
         bool readEnv(const std::string& variable, PathList& out);
 
+        /**
+         * @brief Build the patch for package from environment variables.
+         */
+        void readEnvPackage();
+
         static Path* mPath; /// The static Path for singleton design pattern.
     };
 
