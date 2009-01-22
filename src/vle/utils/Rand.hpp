@@ -33,6 +33,7 @@
 #include <boost/random/uniform_real.hpp>
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/lognormal_distribution.hpp>
+#include <boost/random/exponential_distribution.hpp>
 
 namespace vle { namespace utils {
 
@@ -176,6 +177,20 @@ namespace vle { namespace utils {
             boost::lognormal_distribution < > distrib(mean, sigma);
             boost::variate_generator < boost::mt19937&,
                 boost::lognormal_distribution < > > gen(m_rand, distrib);
+
+            return gen();
+        }
+
+        /**
+         * @brief Generate a real using an exponential distribution.
+         * @param rate
+         * @return a real between 0 and infinite.
+         */
+        double exponential(double rate)
+        {
+            boost::exponential_distribution < > distrib(rate);
+            boost::variate_generator < boost::mt19937&,
+                boost::exponential_distribution < > > gen(m_rand, distrib);
 
             return gen();
         }
