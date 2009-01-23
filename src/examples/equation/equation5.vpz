@@ -1,143 +1,133 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://vle.univ-littoral.fr/vle-0.6.0.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://vle.univ-littoral.fr/vle-0.7.0.dtd">
 <vle_project version="0.5" date="mar, 18 nov 2008" author="Eric Ramat">
-<structures>
-<model name="m" type="coupled" width="618" height="361"  >
-<submodels>
-<model name="D" type="atomic" conditions="cond,cond_D" dynamics="dynD" observables="obsD" x="290" y="105" width="100" height="45" >
-<in>
- <port name="update" />
-</in>
-<out>
- <port name="update" />
-</out>
-</model>
-<model name="E" type="atomic" conditions="cond,cond_E" dynamics="dynE" observables="obsE" x="84" y="165" width="100" height="75" >
-<out>
- <port name="a" />
- <port name="b" />
- <port name="c" />
-</out>
-</model>
-<model name="sum" type="atomic" conditions="cond,cond_sum" dynamics="dynSum" observables="obsSum" x="451" y="269" width="100" height="45" >
-<in>
- <port name="a" />
- <port name="b" />
- <port name="c" />
- <port name="d" />
-</in>
-</model>
-</submodels>
-<connections>
-<connection type="internal">
- <origin model="D" port="update" />
- <destination model="sum" port="d" />
-</connection>
-<connection type="internal">
- <origin model="E" port="a" />
- <destination model="D" port="update" />
-</connection>
-<connection type="internal">
- <origin model="E" port="a" />
- <destination model="sum" port="a" />
-</connection>
-<connection type="internal">
- <origin model="E" port="b" />
- <destination model="sum" port="b" />
-</connection>
-<connection type="internal">
- <origin model="E" port="c" />
- <destination model="D" port="update" />
-</connection>
-<connection type="internal">
- <origin model="E" port="c" />
- <destination model="sum" port="c" />
-</connection>
-</connections>
-</model>
-</structures>
-<dynamics>
-<dynamic name="dynD" library="equation1" model="D1" type="local"  />
-<dynamic name="dynE" library="equation3" model="E2" type="local"  />
-<dynamic name="dynSum" library="equation1" model="sum" type="local"  />
-</dynamics>
-<experiment name="exp" duration="1" combination="linear" seed="12389" >
-<conditions>
-<condition name="cond" >
- <port name="size" >
-<integer>2</integer>
-</port>
- <port name="time-step" >
-<double>0.1</double>
-</port>
-</condition>
-<condition name="cond_D" >
- <port name="name" >
-<string>d</string>
-</port>
-</condition>
-<condition name="cond_E" >
- <port name="variables" >
-   <set>
+ <structures>
+  <model name="m" type="coupled" width="618" height="361">
+   <submodels>
+    <model name="D" type="atomic" conditions="cond,cond_D" dynamics="dynD" observables="obsD" x="290" y="105" width="100" height="45">
+     <in>
+      <port name="update"/>
+     </in>
+     <out>
+      <port name="update"/>
+     </out>
+    </model>
+    <model name="E" type="atomic" conditions="cond,cond_E" dynamics="dynE" observables="obsE" x="84" y="165" width="100" height="75">
+     <out>
+      <port name="a"/>
+      <port name="b"/>
+      <port name="c"/>
+     </out>
+    </model>
+    <model name="sum" type="atomic" conditions="cond,cond_sum" dynamics="dynSum" observables="obsSum" x="451" y="269" width="100" height="45">
+     <in>
+      <port name="a"/>
+      <port name="b"/>
+      <port name="c"/>
+      <port name="d"/>
+     </in>
+    </model>
+   </submodels>
+   <connections>
+    <connection type="internal">
+     <origin model="D" port="update"/>
+     <destination model="sum" port="d"/>
+    </connection>
+    <connection type="internal">
+     <origin model="E" port="a"/>
+     <destination model="D" port="update"/>
+    </connection>
+    <connection type="internal">
+     <origin model="E" port="a"/>
+     <destination model="sum" port="a"/>
+    </connection>
+    <connection type="internal">
+     <origin model="E" port="b"/>
+     <destination model="sum" port="b"/>
+    </connection>
+    <connection type="internal">
+     <origin model="E" port="c"/>
+     <destination model="D" port="update"/>
+    </connection>
+    <connection type="internal">
+     <origin model="E" port="c"/>
+     <destination model="sum" port="c"/>
+    </connection>
+   </connections>
+  </model>
+ </structures>
+ <dynamics>
+  <dynamic name="dynD" library="equation1" model="D1" type="local"/>
+  <dynamic name="dynE" library="equation3" model="E2" type="local"/>
+  <dynamic name="dynSum" library="equation1" model="sum" type="local"/>
+ </dynamics>
+ <experiment name="exp" duration="1" combination="linear" seed="12389">
+  <conditions>
+   <condition name="cond">
+    <port name="size">
+     <integer>2</integer>
+    </port>
+    <port name="time-step">
+     <double>0.1</double>
+    </port>
+   </condition>
+   <condition name="cond_D">
+    <port name="name">
+     <string>d</string>
+    </port>
+   </condition>
+   <condition name="cond_E">
+    <port name="variables">
      <set>
+      <set>
        <string>a</string>
        <double>0</double>
-     </set>
-     <set>
+      </set>
+      <set>
        <string>b</string>
        <double>0</double>
-     </set>
-     <set>
+      </set>
+      <set>
        <string>c</string>
        <double>1</double>
+      </set>
      </set>
-   </set>
-</port>
-</condition>
-<condition name="cond_sum" >
- <port name="name" >
-<string>s</string>
-</port>
-</condition>
-</conditions>
-<views>
-<outputs>
-<output name="o" location="" format="local" plugin="text" />
-
-</outputs>
-<observables>
-<observable name="obsD" >
-<port name="d" >
- <attachedview name="view" />
-</port>
-
-</observable>
-
-<observable name="obsE" >
-<port name="a" >
- <attachedview name="view" />
-</port>
-
-<port name="b" >
- <attachedview name="view" />
-</port>
-
-<port name="c" >
- <attachedview name="view" />
-</port>
-
-</observable>
-
-<observable name="obsSum" >
-<port name="s" >
- <attachedview name="view" />
-</port>
-
-</observable>
-
-</observables>
-<view name="view" output="o" type="timed" timestep="0.1" />
-
-</views>
-</experiment>
+    </port>
+   </condition>
+   <condition name="cond_sum">
+    <port name="name">
+     <string>s</string>
+    </port>
+   </condition>
+  </conditions>
+  <views>
+   <outputs>
+    <output name="o" location="" format="local" plugin="text"/>
+   </outputs>
+   <observables>
+    <observable name="obsD">
+     <port name="d">
+      <attachedview name="view"/>
+     </port>
+    </observable>
+    <observable name="obsE">
+     <port name="a">
+      <attachedview name="view"/>
+     </port>
+     <port name="b">
+      <attachedview name="view"/>
+     </port>
+     <port name="c">
+      <attachedview name="view"/>
+     </port>
+    </observable>
+    <observable name="obsSum">
+     <port name="s">
+      <attachedview name="view"/>
+     </port>
+    </observable>
+   </observables>
+   <view name="view" output="o" type="timed" timestep="0.1"/>
+  </views>
+ </experiment>
 </vle_project>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://vle.univ-littoral.fr/vle-0.6.0.dtd">
+<!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://vle.univ-littoral.fr/vle-0.7.0.dtd">
 <vle_project version="0.1" date="" author="PC">
  <structures>
   <model name="ladybirdplantlouse" type="atomic" conditions="cond_ladybirdplantlouse" dynamics="dyn_ladybirdplantlouse" observables="obs_ladybirdplantlouse">
@@ -54,8 +54,7 @@
   </conditions>
   <views>
    <outputs>
-    <output name="o1" format="distant" plugin="cairoplot" location="localhost:8000:.">
-          <![CDATA[
+    <output name="o1" format="distant" plugin="cairoplot" location="localhost:8000:."><![CDATA[
             <parameters>
 	      <curves>
 		<curve name="x" type="real" color_red="0"
@@ -68,10 +67,8 @@
 		       color_green="0" color_blue="0" />
 	      </limits>
 	    </parameters>
-	    ]]>
-	</output>
-    <output name="o2" format="distant" plugin="cairoplot" location="localhost:8001:.">
-          <![CDATA[
+	    ]]></output>
+    <output name="o2" format="distant" plugin="cairoplot" location="localhost:8001:."><![CDATA[
             <parameters>
 	      <curves>
 		<curve name="y" type="real" color_red="0"
@@ -84,8 +81,7 @@
 		       color_green="0" color_blue="0" />
 	      </limits>
 	    </parameters>
-	    ]]>
-	</output>
+	    ]]></output>
    </outputs>
    <observables>
     <observable name="obs_ladybirdplantlouse">

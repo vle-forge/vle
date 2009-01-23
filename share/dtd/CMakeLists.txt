@@ -1,1 +1,2 @@
-INSTALL(FILES vle-0.5.0.dtd vle-0.6.0.dtd DESTINATION "${VLE_SHARE_DIRS}/dtd")
+INSTALL(FILES vle-0.5.0.dtd vle-0.6.0.dtd vle-0.7.0.dtd DESTINATION
+  "${VLE_SHARE_DIRS}/dtd")
