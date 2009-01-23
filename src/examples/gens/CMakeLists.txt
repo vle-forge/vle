@@ -11,8 +11,10 @@ LINK_DIRECTORIES(
   ${LIBXMLPP_LIBRARY_DIR}
   ${Boost_LIBRARY_DIRS})
 
-ADD_LIBRARY(gens SHARED Beep.cpp Beep.hpp Counter.cpp Counter.hpp
-  GenExecutive.cpp GenExecutive.hpp GenExecutiveClass.cpp GenExecutiveClass.hpp)
+SET(SOURCES_CPP Beep.cpp Beep.hpp Counter.cpp Counter.hpp GenExecutive.cpp
+  GenExecutive.hpp GenExecutiveClass.cpp GenExecutiveClass.hpp)
+
+ADD_LIBRARY(gens SHARED ${SOURCES_CPP})
 
 TARGET_LINK_LIBRARIES(gens
   ${GLIBMM_LIBRARIES}
@@ -36,3 +38,5 @@ INSTALL(TARGETS gens
 
 INSTALL(FILES gens.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
 INSTALL(FILES genswithclass.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
+INSTALL(FILES ${SOURCES_CPP} DESTINATION
+  "${VLE_SHARE_DIRS}/examples/sources/gens")

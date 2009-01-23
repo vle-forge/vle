@@ -11,7 +11,9 @@ LINK_DIRECTORIES(
   ${LIBXMLPP_LIBRARY_DIR}
   ${Boost_LIBRARY_DIRS})
 
-ADD_LIBRARY(lifegame SHARED Executive.cpp Executive.hpp Cell.cpp Cell.hpp)
+SET(SOURCES_CPP Executive.cpp Executive.hpp Cell.cpp Cell.hpp)
+
+ADD_LIBRARY(lifegame SHARED ${SOURCES_CPP})
 
 TARGET_LINK_LIBRARIES(lifegame
   ${GLIBMM_LIBRARIES}
@@ -33,5 +35,8 @@ INSTALL(TARGETS lifegame
   RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/simulator"
   LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/simulator")
 
-INSTALL(FILES lifegame.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
-INSTALL(FILES lifegame_txt.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
+INSTALL(FILES lifegame_txt.vpz lifegame.vpz DESTINATION
+  "${VLE_SHARE_DIRS}/examples")
+
+INSTALL(FILES ${SOURCES_CPP} DESTINATION
+  "${VLE_SHARE_DIRS}/examples/sources/lifegame")

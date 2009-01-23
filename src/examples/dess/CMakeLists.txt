@@ -11,10 +11,11 @@ LINK_DIRECTORIES(
   ${LIBXMLPP_LIBRARY_DIR}
   ${Boost_LIBRARY_DIRS})
 
-ADD_LIBRARY(sir SHARED sir.hpp sir.cpp seir.hpp seir.cpp S.hpp S.cpp
-		       I.hpp I.cpp R.hpp R.cpp S2.hpp S2.cpp E.hpp E.cpp
-		       I2.hpp I2.cpp R2.hpp R2.cpp S3.hpp S3.cpp I3.cpp
-		       I3.hpp R3.hpp R3.cpp Counter.hpp Counter.cpp)
+SET(SOURCES_CPP Counter.cpp Counter.hpp E.cpp E.hpp I2.cpp I2.hpp I3.cpp I3.hpp
+  I.cpp I.hpp R2.cpp R2.hpp R3.cpp R3.hpp R.cpp R.hpp S2.cpp S2.hpp S3.cpp
+  S3.hpp S.cpp seir.cpp seir.hpp S.hpp sir.cpp sir.hpp)
+
+ADD_LIBRARY(sir SHARED ${SOURCES_CPP})
 
 TARGET_LINK_LIBRARIES(sir
   ${GLIBMM_LIBRARIES}
@@ -38,3 +39,6 @@ INSTALL(TARGETS sir
 
 INSTALL(FILES sir.vpz sir2.vpz sir3.vpz seir.vpz seir2.vpz
   DESTINATION "${VLE_SHARE_DIRS}/examples")
+
+INSTALL(FILES ${SOURCES_CPP} DESTINATION
+  "${VLE_SHARE_DIRS}/examples/sources/dess")

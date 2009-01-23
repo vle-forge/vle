@@ -11,7 +11,9 @@ LINK_DIRECTORIES(
   ${LIBXMLPP_LIBRARY_DIR}
   ${Boost_LIBRARY_DIRS})
 
-ADD_LIBRARY(counter SHARED Counter.cpp Counter.hpp)
+SET(SOURCES1_CPP Counter.cpp Counter.hpp)
+  
+ADD_LIBRARY(counter SHARED ${SOURCES1_CPP})
 
 TARGET_LINK_LIBRARIES(counter
   ${GLIBMM_LIBRARIES}
@@ -29,8 +31,38 @@ TARGET_LINK_LIBRARIES(counter
   vlemanager
   vletranslator)
 
+SET(SOURCES2_CPP Generator.hpp GeneratorWrapper.cpp GeneratorWrapper.hpp
+  LogNormalGenerator.cpp LogNormalGenerator.hpp NormalGenerator.cpp
+  NormalGenerator.hpp RandomGenerator.cpp RandomGenerator.hpp
+  RegularGenerator.hpp UniformGenerator.cpp UniformGenerator.hpp)
+
+ADD_LIBRARY(generator SHARED ${SOURCES2_CPP})
+
+TARGET_LINK_LIBRARIES(generator
+  ${GLIBMM_LIBRARIES}
+  ${LIBXMLPP_LIBRARIES}
+  ${GTHREAD_LIBRARIES}
+  vlegeometry
+  vleutils
+  vledata
+  vlevalue
+  vlegraph
+  vlevpz
+  vleoov
+  vledevs
+  vleextension
+  vlemanager
+  vletranslator)
+
+INSTALL(TARGETS generator
+  RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/simulator"
+  LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/simulator")
+
 INSTALL(TARGETS counter
   RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/simulator"
   LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/simulator")
 
 INSTALL(FILES counter.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
+
+INSTALL(FILES ${SOURCES1_CPP} ${SOURCES2_CPP} DESTINATION
+  "${VLE_SHARE_DIRS}/examples/sources/counter")

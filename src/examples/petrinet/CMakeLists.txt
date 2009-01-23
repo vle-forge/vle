@@ -11,7 +11,9 @@ LINK_DIRECTORIES(
   ${LIBXMLPP_LIBRARY_DIR}
   ${Boost_LIBRARY_DIRS})
 
-ADD_LIBRARY(petrinet SHARED Simple.cpp)
+SET(SOURCES_CPP Simple.cpp)
+
+ADD_LIBRARY(petrinet SHARED ${SOURCES_CPP})
 
 TARGET_LINK_LIBRARIES(petrinet
   ${GLIBMM_LIBRARIES}
@@ -38,3 +40,6 @@ INSTALL(FILES petrinet-and.vpz petrinet-mult.vpz petrinet-or.vpz
   petrinet-or-priority.vpz petrinet-simple.vpz petrinet-meteo.vpz
   petrinet-inout.vpz petrinet-conflict.vpz DESTINATION
   "${VLE_SHARE_DIRS}/examples")
+
+INSTALL(FILES ${SOURCES_CPP} DESTINATION
+  "${VLE_SHARE_DIRS}/examples/sources/petrinet")
