@@ -43,7 +43,7 @@ devs::Time GenExecutive::init(const devs::Time& /* time */)
     dyn.setLibrary("gens");
     dyn.setModel("beep");
     dyn.setLocalDynamics();
-    coordinator().addPermanent(dyn);
+    dynamics().add(dyn);
 
     m_state = INIT;
 
@@ -117,7 +117,7 @@ void GenExecutive::add_new_model()
     atom->addOutputPort("out");
     coupledmodel().addInternalConnection(name, "out", "counter", "in");
 
-    coordinator().createModel(atom, "gensbeep", vpz::Strings(), "");
+    createModel(atom, "gensbeep", vpz::Strings(), "");
     m_stacknames.push(name);
 }
 
@@ -129,7 +129,7 @@ void GenExecutive::del_first_model()
                 "element.").str());
     }
 
-    coordinator().delModel(&coupledmodel(), m_stacknames.top());
+    delModel(&coupledmodel(), m_stacknames.top());
     m_stacknames.pop();
 }
 

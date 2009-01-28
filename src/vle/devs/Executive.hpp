@@ -29,6 +29,9 @@
 #include <vle/devs/Coordinator.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/graph/CoupledModel.hpp>
+#include <vle/vpz/Dynamics.hpp>
+#include <vle/vpz/Conditions.hpp>
+#include <vle/vpz/Observables.hpp>
 
 namespace vle { namespace devs {
 
@@ -70,6 +73,117 @@ namespace vle { namespace devs {
         inline virtual bool isExecutive() const
         { return true; }
 
+        ////
+        //// Functions used by Executive models to manage DsDevs simulation.
+        ////
+
+        /**
+         * @brief Get a constant reference to the list of vpz::Dynamics objects.
+         * @return A constant reference to the list of vpz::Dynamics objects.
+         */
+        const vpz::Dynamics& dynamics() const
+        { return coordinator().dynamics(); }
+
+        /**
+         * @brief Get a reference to the list of vpz::Dynamics objects.
+         * @return A reference to the list of vpz::Dynamics objects.
+         */
+        vpz::Dynamics& dynamics()
+        { return coordinator().dynamics(); }
+
+        /**
+         * @brief Get a constant reference to the list of vpz::Conditions objects.
+         * @return A constant reference to the list of vpz::Conditions objects.
+         */
+        const vpz::Conditions& conditions() const
+        { return coordinator().conditions(); }
+
+        /**
+         * @brief Get a reference to the list of vpz::Conditions objects.
+         * @return A reference to the list of vpz::Conditions objects.
+         */
+        vpz::Conditions& conditions()
+        { return coordinator().conditions(); }
+
+        /**
+         * @brief Get a constant reference to the list of vpz::Observables objects.
+         * @return A constant reference to the list of vpz::Observables objects.
+         */
+        const vpz::Observables& observables() const
+        { return coordinator().observables(); }
+
+        /**
+         * @brief Get a reference to the list of vpz::Conditions objects.
+         * @return A reference to the list of vpz::Conditions objects.
+         */
+        vpz::Observables& observables()
+        { return coordinator().observables(); }
+
+        /**
+         * @brief Build a new devs::Simulator from the dynamics library. Attach
+         * to this model information of dynamics, condition and observable.
+         * @param model the graph::AtomicModel reference source of
+         * devs::Simulator.
+         * @param dynamics the name of the dynamics to attach.
+         * @param condition the name of the condition to attach.
+         * @param observable the name of the observable to attach.
+         * @throw utils::InternalError if dynamics not exist.
+         */
+        void createModel(graph::AtomicModel* model, const std::string& dynamics,
+                         const vpz::Strings& conditions,
+                         const std::string& observable)
+        { return coordinator().createModel(model, dynamics, conditions, observable); }
+
+        /**
+         * @brief Build a new devs::Simulator from the vpz::Classes information.
+         * @param classname the name of the class to clone.
+         * @param parent the parent of the model.
+         * @param modelname the new name of the model.
+         * @throw utils::badArg if modelname already exist.
+         */
+        graph::Model* createModelFromClass(const std::string& classname,
+                                           graph::CoupledModel* parent,
+                                           const std::string& modelname)
+        { return coordinator().createModelFromClass(classname, parent, modelname); }
+
+        /**
+         * @brief Add an observable, ie. a reference and a model to the
+         * specified view.
+         * @param model the model to attach to the view.
+         * @param portname the port of the model to attach.
+         * @param view the view.
+         */
+        void addObservableToView(graph::AtomicModel* model,
+                                 const std::string& portname,
+                                 const std::string& view)
+        { coordinator().addObservableToView(model, portname, view); }
+
+        /**
+         * @brief Delete the specified model from coupled model. All
+         * connection are deleted, Simulator are deleted and all events are
+         * deleted from event table.
+         * @param parent the coupled model parent of model to delete.
+         * @param modelname the name of model to delete.
+         */
+        void delModel(graph::CoupledModel* parent, const std::string& modelname)
+        { coordinator().delModel(parent, modelname); }
+
+        /**
+         * @brief Get a reference to the current coupled model.
+         * @return A constant reference to the coupled model.
+         */
+        const graph::CoupledModel& coupledmodel() const;
+
+        /**
+         * @brief Get a reference to the current coupled model.
+         * @return A reference to the coupled model.
+         */
+        graph::CoupledModel& coupledmodel();
+
+        ////
+        //// Function to assign a coordinator reference to the executive object.
+        ////
+
         /**
          * @brief Assign a coordinator to the Executive model to give access to
          * vle::graph, vle::devs and vle::vpz API.
@@ -77,16 +191,11 @@ namespace vle { namespace devs {
          */
         friend void Coordinator::setCoordinator(Executive& exe);
 
-    protected:
-        Coordinator& coordinator() const;
-
-        graph::CoupledModel& coupledmodel() const;
-
+    private:
         Coordinator& coordinator();
 
-        graph::CoupledModel& coupledmodel();
+        const Coordinator& coordinator() const;
 
-    private:
         Coordinator*    m_coordinator; /** Reference to the coordinator object
                                          to build, delete or construct new
                                          models at runtime. */

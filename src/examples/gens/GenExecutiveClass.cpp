@@ -108,11 +108,9 @@ void GenExecutiveClass::add_new_model()
 {
     std::string name((boost::format("beep-%1%") % m_stacknames.size()).str());
     if (m_buildbeepbeep) {
-        coordinator().createModelFromClass("beepbeep", &coupledmodel(), name);
-    }
-    else {
-        coordinator().createModelFromClass("beepbeepbeep", &coupledmodel(),
-                                           name);
+        createModelFromClass("beepbeep", &coupledmodel(), name);
+    } else {
+        createModelFromClass("beepbeepbeep", &coupledmodel(), name);
     }
     coupledmodel().addInternalConnection(name, "out", "counter", "in");
 
@@ -128,7 +126,7 @@ void GenExecutiveClass::del_first_model()
                 "element.").str());
     }
 
-    coordinator().delModel(&coupledmodel(), m_stacknames.top());
+    delModel(&coupledmodel(), m_stacknames.top());
     m_stacknames.pop();
 }
 

@@ -28,13 +28,13 @@
 
 namespace vle { namespace devs {
 
-Coordinator& Executive::coordinator() const
+const Coordinator& Executive::coordinator() const
 {
     isInitialized();
     return *m_coordinator;
 }
 
-graph::CoupledModel& Executive::coupledmodel() const
+const graph::CoupledModel& Executive::coupledmodel() const
 {
     isInitialized();
     return *getModel().getParent();

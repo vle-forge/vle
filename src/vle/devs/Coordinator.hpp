@@ -33,12 +33,12 @@
 #include <vle/devs/Time.hpp>
 #include <vle/devs/TimedView.hpp>
 #include <vle/devs/FinishView.hpp>
+#include <vle/devs/ModelFactory.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/oov/Plugin.hpp>
 
 namespace vle { namespace devs {
 
-    class ModelFactory;
     class Executive;
 
     typedef std::vector < Simulator* > SimulatorList;
@@ -72,7 +72,7 @@ namespace vle { namespace devs {
          * @brief Return the top devs::Time of the devs::EventTable.
          * @return A devs::Time.
          */
-	const Time& getNextTime();
+        const Time& getNextTime();
 
         /**
          * @brief Pop the next devs::CompleteEventBagModel from the
@@ -85,7 +85,7 @@ namespace vle { namespace devs {
          * @brief Delete all devs::Simulator and all devs::View of this
          * simulator.
          */
-	void finish();
+        void finish();
 
         //
         ///
@@ -175,21 +175,21 @@ namespace vle { namespace devs {
          */
         void addModel(graph::AtomicModel* model, Simulator* simulator);
 
-	/**
-	 * Return the devs::Simulator with a specified graph::AtomicModel.
+        /**
+         * Return the devs::Simulator with a specified graph::AtomicModel.
          * Complexity: log O(log(n)).
-	 * @param model the atomicmodel reference to search.
-	 * @return A reference to the devs::Simulator or 0 if not found.
-	 */
-	Simulator* getModel(const graph::AtomicModel* model) const;
+         * @param model the atomicmodel reference to search.
+         * @return A reference to the devs::Simulator or 0 if not found.
+         */
+        Simulator* getModel(const graph::AtomicModel* model) const;
 
-	/**
-	 * Return the devs::Simulator with a specified atomic model name.
+        /**
+         * Return the devs::Simulator with a specified atomic model name.
          * Complexity: linear O(n).
-	 * @param model the name of atomic model to search.
-	 * @return a reference to the devs::Simulator or 0 if not found.
-	 */
-	Simulator* getModel(const std::string& model) const;
+         * @param model the name of atomic model to search.
+         * @return a reference to the devs::Simulator or 0 if not found.
+         */
+        Simulator* getModel(const std::string& model) const;
 
         /**
          * @brief Return the devs::View from a specified View name.
@@ -197,7 +197,7 @@ namespace vle { namespace devs {
          * @param name the name of the View to search.
          * @return A reference to the devs::View or 0 if not found.
          */
-	devs::View* getView(const std::string& name) const;
+        devs::View* getView(const std::string& name) const;
 
         //
         ///
@@ -217,6 +217,42 @@ namespace vle { namespace devs {
         inline const SimulatorMap& modellist() const
         { return m_modelList; }
 
+        /**
+         * @brief Get a constant reference to the list of vpz::Dynamics objects.
+         * @return A constant reference to the list of vpz::Dynamics objects.
+         */
+        const vpz::Dynamics& dynamics() const { return m_modelFactory.dynamics(); }
+
+        /**
+         * @brief Get a reference to the list of vpz::Dynamics objects.
+         * @return A reference to the list of vpz::Dynamics objects.
+         */
+        vpz::Dynamics& dynamics() { return m_modelFactory.dynamics(); }
+
+        /**
+         * @brief Get a constant reference to the list of vpz::Conditions objects.
+         * @return A constant reference to the list of vpz::Conditions objects.
+         */
+        const vpz::Conditions& conditions() const { return m_modelFactory.conditions(); }
+
+        /**
+         * @brief Get a reference to the list of vpz::Conditions objects.
+         * @return A reference to the list of vpz::Conditions objects.
+         */
+        vpz::Conditions& conditions() { return m_modelFactory.conditions(); }
+
+        /**
+         * @brief Get a constant reference to the list of vpz::Observables objects.
+         * @return A constant reference to the list of vpz::Observables objects.
+         */
+        const vpz::Observables& observables() const { return m_modelFactory.observables(); }
+
+        /**
+         * @brief Get a reference to the list of vpz::Conditions objects.
+         * @return A reference to the list of vpz::Conditions objects.
+         */
+        vpz::Observables& observables() { return m_modelFactory.observables(); }
+
         oov::OutputMatrixViewList outputs() const;
 
         /**
@@ -226,12 +262,12 @@ namespace vle { namespace devs {
         void setCoordinator(Executive& exe);
 
     private:
-	Time                        m_currentTime;
-	SimulatorMap                m_modelList;
-	EventTable                  m_eventTable;
-	ViewList                    m_viewList;
-	EventViewList               m_eventViewList;
-	TimedViewList               m_timedViewList;
+        Time                        m_currentTime;
+        SimulatorMap                m_modelList;
+        EventTable                  m_eventTable;
+        ViewList                    m_viewList;
+        EventViewList               m_eventViewList;
+        TimedViewList               m_timedViewList;
         FinishViewList              m_finishViewList;
         ModelFactory&               m_modelFactory;
         SimulatorList               m_deletedSimulator;
@@ -253,7 +289,7 @@ namespace vle { namespace devs {
         StreamWriter* buildOutput(const vpz::View& view,
                                   const vpz::Output& output);
 
-	void addView(devs::View* view);
+        void addView(devs::View* view);
 
         void processInternalEvent(Simulator* sim,
                                   const EventBagModel& modelbag);
@@ -265,7 +301,7 @@ namespace vle { namespace devs {
                                    const EventBagModel& modelbag);
 
         void processRequestEvents(Simulator* sim,
-                                        const EventBagModel& modelbag);
+                                  const EventBagModel& modelbag);
 
         /**
          * @brief Process for each ObservationEvent in the bag and observation

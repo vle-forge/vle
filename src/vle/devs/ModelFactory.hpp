@@ -134,6 +134,13 @@ namespace vle { namespace devs {
         { return mExperiment.conditions(); }
 
         /**
+         * @brief Return the reference to the list of dynamcis.
+         * @return A constant reference to the vpz::Dynamics.
+         */
+        inline const vpz::Dynamics& dynamics() const
+        { return mDynamics; }
+
+        /**
          * @brief Return the reference to the list of views.
          * @return A constant reference to the vpz::Views.
          */
@@ -153,6 +160,56 @@ namespace vle { namespace devs {
          */
         inline const vpz::Experiment& experiment() const
         { return mExperiment; }
+
+        /**
+         * @brief Return the reference to the observables object.
+         * @return A constant reference to the vpz::Observables.
+         */
+        inline const vpz::Observables& observables() const
+        { return mExperiment.views().observables(); }
+
+        /**
+         * @brief Return the reference to the list of initiale conditions for
+         * each models.
+         * @return A reference to the vpz::Conditions.
+         */
+        inline vpz::Conditions& conditions()
+        { return mExperiment.conditions(); }
+
+        /**
+         * @brief Return the reference to the list of dynamcis.
+         * @return A constant reference to the vpz::Dynamics.
+         */
+        inline vpz::Dynamics& dynamics()
+        { return mDynamics; }
+
+        /**
+         * @brief Return the reference to the list of views.
+         * @return A reference to the vpz::Views.
+         */
+        inline vpz::Views& views()
+        { return mExperiment.views(); }
+
+        /**
+         * @brief Return the reference to the list of outputs.
+         * @return A reference to the vpz::Outputs.
+         */
+        inline vpz::Outputs& outputs()
+        { return mExperiment.views().outputs(); }
+
+        /**
+         * @brief Return the reference to the experiment object.
+         * @return A reference to the vpz::Experiment.
+         */
+        inline vpz::Experiment& experiment()
+        { return mExperiment; }
+
+        /**
+         * @brief Return the reference to the observables object.
+         * @return A constant reference to the vpz::Observables.
+         */
+        inline vpz::Observables& observables()
+        { return mExperiment.views().observables(); }
 
         //
         ///

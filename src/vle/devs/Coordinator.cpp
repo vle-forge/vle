@@ -42,19 +42,13 @@
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Debug.hpp>
-#include <vle/utils/XML.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/value/Value.hpp>
-#include <libxml++/libxml++.h>
-#include <glibmm/spawn.h>
-#include <glibmm/timer.h>
 
 using std::vector;
 using std::map;
 using std::string;
 using std::pair;
-
-using namespace xmlpp;
 
 namespace vle { namespace devs {
 

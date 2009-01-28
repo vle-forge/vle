@@ -121,26 +121,23 @@ void Executive::createModel(model* mdl)
     std::string dynamicsName((boost::format("dyn_%1%") % modelName).str());
     std::string library = dyn[0];
     std::string model = dyn[1];
-    vpz::Dynamic dynamics(dynamicsName);
+    vpz::Dynamic dyns(dynamicsName);
 
-    dynamics.setLibrary(library);
-    dynamics.setModel(model);
-    dynamics.setLocalDynamics();
+    dyns.setLibrary(library);
+    dyns.setModel(model);
+    dyns.setLocalDynamics();
     try {
-	coordinator().addPermanent(dynamics);
-    } catch (...)
-    { }
+        dynamics().add(dyns);
+    } catch (...) { }
 
     // Build condition
     std::string conditionName((boost::format("cond_%1%") % modelName).str());
     vpz::Strings conditions;
     vpz::Condition condition(conditionName);
 
-    condition.addValueToPort("name",value::String::create(
-				 mdl->var));
-    condition.addValueToPort("time-step",
-			     value::Double::create(mTimeStep));
-    coordinator().addPermanent(condition);
+    condition.addValueToPort("name",value::String::create( mdl->var));
+    condition.addValueToPort("time-step", value::Double::create(mTimeStep));
+    Executive::conditions().add(condition);
 
     // Build observable
     std::string obsName((boost::format("obs_%1%") % modelName).str());
@@ -148,7 +145,7 @@ void Executive::createModel(model* mdl)
     vpz::ObservablePort& port = obs.add(mdl->var);
 
     port.add(mView);
-    coordinator().addPermanent(obs);
+    observables().add(obs);
 
     // Build model
     graph::AtomicModel* atom(new graph::AtomicModel(modelName,
@@ -175,7 +172,7 @@ void Executive::createModel(model* mdl)
 					     modelName, "update");
 	++it;
     }
-    coordinator().createModel(atom, dynamicsName, conditions, obsName);
+    devs::Executive::createModel(atom, dynamicsName, conditions, obsName);
 }
 
 void Executive::removeInputConnections(model* mdl)
@@ -194,7 +191,7 @@ void Executive::removeModel(model* mdl)
 {
     std::string name(mdl->name);
 
-    coordinator().delModel(&coupledmodel(), name);
+    delModel(&coupledmodel(), name);
 }
 
 void Executive::removeOutputConnections(model* mdl)

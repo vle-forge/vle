@@ -69,8 +69,9 @@ namespace vle { namespace translator {
     class MatrixTranslator
     {
     public:
-        MatrixTranslator(graph::CoupledModel* model,
-                         devs::Coordinator* coordinator);
+        MatrixTranslator(devs::Executive& exe)
+            : m_exe(exe), m_dimension(0), m_init(0), m_symmetricport(false)
+        {}
 
         virtual ~MatrixTranslator();
 
@@ -83,8 +84,7 @@ namespace vle { namespace translator {
     private:
         typedef enum { VON_NEUMANN, MOORE, LINEAR } connectivity_type;
 
-        graph::CoupledModel* mCoupledModel;
-        devs::Coordinator* mCoordinator;
+        devs::Executive& m_exe;
 
         unsigned int m_dimension;
         std::map < unsigned int, unsigned int > m_size;
