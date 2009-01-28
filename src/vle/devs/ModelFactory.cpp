@@ -228,6 +228,7 @@ graph::Model* ModelFactory::createModelFromClass(Coordinator& coordinator,
 
     graph::AtomicModelVector atomicmodellist;
     graph::Model::getAtomicModelList(mdl, atomicmodellist);
+    parent->addModel(mdl, modelname);
 
     for (graph::AtomicModelVector::iterator it = atomicmodellist.begin();
          it != atomicmodellist.end(); ++it) {
@@ -238,7 +239,6 @@ graph::Model* ModelFactory::createModelFromClass(Coordinator& coordinator,
                     atominfo.conditions(), atominfo.observables());
     }
 
-    parent->addModel(mdl, modelname);
     return mdl;
 }
 
