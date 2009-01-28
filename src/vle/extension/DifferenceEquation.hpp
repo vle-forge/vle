@@ -90,6 +90,8 @@ namespace vle { namespace extension { namespace DifferenceEquation {
              */
             Ext() {}
 
+            virtual ~Ext() {}
+
             /**
              * @brief Returns the value of variable.
              * @param shift the temporal shift.
@@ -131,6 +133,8 @@ namespace vle { namespace extension { namespace DifferenceEquation {
              */
             Sync() {}
 
+            virtual ~Sync() {}
+
         private:
             Sync(std::string name, Base* equation) :
                 Ext(name, equation)
@@ -153,6 +157,8 @@ namespace vle { namespace extension { namespace DifferenceEquation {
              * @brief Default constructor
              */
             NoSync() {}
+
+            virtual ~NoSync() {}
 
         private:
             NoSync(std::string name, Base* equation) :
@@ -338,6 +344,8 @@ namespace vle { namespace extension { namespace DifferenceEquation {
              */
             Var() {}
 
+            virtual ~Var() {}
+
             /**
              * @brief Returns the value of variable.
              * @param shift the temporal shift.
@@ -506,6 +514,8 @@ namespace vle { namespace extension { namespace DifferenceEquation {
              * @brief Default constructor
              */
             Var() {}
+
+            virtual ~Var() {}
 
             /**
              * @brief Set the value of variable.

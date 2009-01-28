@@ -35,6 +35,7 @@
 #include <vle/value/XML.hpp>
 #include <vle/value/Null.hpp>
 #include <vle/value/Matrix.hpp>
+#include <sstream>
 
 namespace vle { namespace value {
 

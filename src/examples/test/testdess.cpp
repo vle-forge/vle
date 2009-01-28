@@ -94,9 +94,9 @@ BOOST_AUTO_TEST_CASE(test_dess2)
     BOOST_REQUIRE_EQUAL(result.shape()[1],
                         (value::MatrixView::size_type)2000);
 
-    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][321]), 3.2030279, 10e-5);
-    BOOST_REQUIRE_CLOSE(value::toDouble(result[5][321]), 1.0, 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][321]), 3.2030279, 10e-2);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[5][321]), 1.0, 10e-2);
 
-    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][483]), 4.8268177, 10e-5);
-    BOOST_REQUIRE_CLOSE(value::toDouble(result[5][483]), 2.0, 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][483]), 4.8268177, 10e-2);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[5][483]), 2.0, 10e-2);
 }

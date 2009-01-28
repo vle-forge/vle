@@ -28,6 +28,7 @@
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Socket.hpp>
+#include <cmath>
 
 namespace vle { namespace gvle {
 

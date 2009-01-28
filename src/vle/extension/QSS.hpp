@@ -101,7 +101,9 @@ namespace vle { namespace extension { namespace QSS {
 	    /**
 	     * @brief Default constructor
 	     */
-	    Var() { }
+            Var() { }
+
+            virtual ~Var() {}
 
 	    /**
 	     * @brief Returns the value of internal variable.
@@ -137,6 +139,8 @@ namespace vle { namespace extension { namespace QSS {
 	     * @brief Default constructor
 	     */
 	    Ext() { }
+
+            virtual ~Ext() {}
 
 	    /**
 	     * @brief Returns the value of external variable.

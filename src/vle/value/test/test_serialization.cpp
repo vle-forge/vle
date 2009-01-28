@@ -111,8 +111,8 @@ BOOST_AUTO_TEST_CASE(check_table_serialization)
         value::Value::registerValues(ia);
         ia >> (value::Table&)mp;
 
-        BOOST_REQUIRE_EQUAL(mp.width(), (value::Table::size_type)10);
-        BOOST_REQUIRE_EQUAL(mp.height(), (value::Table::size_type)5);
+        BOOST_REQUIRE_EQUAL(mp.width(), (value::Table::index)10);
+        BOOST_REQUIRE_EQUAL(mp.height(), (value::Table::index)5);
 
         double val = 0.;
 

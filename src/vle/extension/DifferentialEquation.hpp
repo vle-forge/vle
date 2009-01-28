@@ -77,6 +77,8 @@ namespace vle { namespace extension {
              */
             Var() {}
 
+            virtual ~Var() {}
+
             /**
              * @brief Returns the current value of variable.
              * @return the current value of variable.
@@ -129,6 +131,8 @@ namespace vle { namespace extension {
              * @brief Default constructor
              */
             Ext() {}
+
+            virtual ~Ext() {}
 
             /**
              * @brief Returns the value of external variable.
