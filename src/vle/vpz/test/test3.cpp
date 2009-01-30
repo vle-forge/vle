@@ -37,8 +37,18 @@
 #include <vle/value/Integer.hpp>
 #include <vle/value/Double.hpp>
 
+struct F
+{
+    F() { vle::value::init(); }
+    ~F() { vle::value::finalize(); }
+};
+
+BOOST_FIXTURE_TEST_SUITE(vpz_translator, F)
+
 using namespace vle;
 
 BOOST_AUTO_TEST_CASE(test_translator)
 {
 }
+
+BOOST_AUTO_TEST_SUITE_END()

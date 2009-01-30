@@ -36,6 +36,14 @@
 #include <vle/vpz.hpp>
 #include <vle/graph.hpp>
 
+struct F
+{
+    F() { vle::value::init(); }
+    ~F() { vle::value::finalize(); }
+};
+
+BOOST_FIXTURE_TEST_SUITE(vpz_vpz, F)
+
 using namespace vle;
 
 BOOST_AUTO_TEST_CASE(single_class)
@@ -212,3 +220,5 @@ BOOST_AUTO_TEST_CASE(single_class)
 
     delete vpz.project().model().model();
 }
+
+BOOST_AUTO_TEST_SUITE_END()

@@ -39,6 +39,14 @@
 #include <vle/value.hpp>
 #include <vle/utils.hpp>
 
+struct F
+{
+    F() { vle::manager::init(); }
+    ~F() { vle::manager::finalize(); }
+};
+
+BOOST_FIXTURE_TEST_SUITE(manager_experimental_frames, F)
+
 using namespace vle;
 
 BOOST_AUTO_TEST_CASE(build_experimental_frames)
@@ -188,3 +196,5 @@ BOOST_AUTO_TEST_CASE(build_linear_output_matrix_size)
         }
     }
 }
+
+BOOST_AUTO_TEST_SUITE_END()

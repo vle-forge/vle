@@ -40,12 +40,18 @@
 #include <vle/value.hpp>
 #include <vle/utils.hpp>
 
+struct F
+{
+    F() { vle::value::init(); }
+    ~F() { vle::value::finalize(); }
+};
+
+BOOST_FIXTURE_TEST_SUITE(value_serialization, F)
+
 using namespace vle;
 
 BOOST_AUTO_TEST_CASE(check_tuple_serialization)
 {
-    value::init();
-
     std::string save;
 
     {
@@ -76,14 +82,10 @@ BOOST_AUTO_TEST_CASE(check_tuple_serialization)
             BOOST_REQUIRE_EQUAL(mp[(int)i], (double)i);
         }
     }
-
-    value::finalize();
 }
 
 BOOST_AUTO_TEST_CASE(check_table_serialization)
 {
-    value::init();
-
     std::string save;
 
     {
@@ -123,14 +125,10 @@ BOOST_AUTO_TEST_CASE(check_table_serialization)
             }
         }
     }
-
-    value::finalize();
 }
 
 BOOST_AUTO_TEST_CASE(check_map_serialization)
 {
-    value::init();
-
     std::string save;
 
     {
@@ -166,14 +164,10 @@ BOOST_AUTO_TEST_CASE(check_map_serialization)
 
         delete mp;
     }
-
-    value::finalize();
 }
 
 BOOST_AUTO_TEST_CASE(check_set_serialization)
 {
-    value::init();
-
     std::string save;
 
     {
@@ -218,14 +212,10 @@ BOOST_AUTO_TEST_CASE(check_set_serialization)
 
         delete st;
     }
-
-    value::finalize();
 }
 
 BOOST_AUTO_TEST_CASE(check_matrix_serialization)
 {
-    value::init();
-
     std::string save;
 
     {
@@ -259,14 +249,10 @@ BOOST_AUTO_TEST_CASE(check_matrix_serialization)
 
         delete mx;
     }
-
-    value::finalize();
 }
 
 BOOST_AUTO_TEST_CASE(check_composite1_serialization)
 {
-    value::init();
-
     std::string save;
 
     {
@@ -313,14 +299,10 @@ BOOST_AUTO_TEST_CASE(check_composite1_serialization)
         BOOST_REQUIRE_EQUAL(st.getString(2), "test 7");
         BOOST_REQUIRE_EQUAL(st.getString(3), "test 8");
     }
-
-    value::finalize();
 }
 
 BOOST_AUTO_TEST_CASE(check_composite2_serialization)
 {
-    value::init();
-
     std::string save;
 
     {
@@ -365,14 +347,10 @@ BOOST_AUTO_TEST_CASE(check_composite2_serialization)
 
         delete st;
     }
-
-    value::finalize();
 }
 
 BOOST_AUTO_TEST_CASE(check_serialize_deserialize)
 {
-    value::init();
-
     std::string buffer;
 
     for (int i = 0; i < 10; ++i) {
@@ -398,14 +376,10 @@ BOOST_AUTO_TEST_CASE(check_serialize_deserialize)
             delete st;
         }
     }
-
-    value::finalize();
 }
 
 BOOST_AUTO_TEST_CASE(check_serialize_deserialize2)
 {
-    value::init();
-
     std::string buffer;
 
     for (int i = 0; i < 10; ++i) {
@@ -431,6 +405,6 @@ BOOST_AUTO_TEST_CASE(check_serialize_deserialize2)
             delete st;
         }
     }
-
-    value::finalize();
 }
+
+BOOST_AUTO_TEST_SUITE_END()

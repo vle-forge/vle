@@ -240,6 +240,9 @@ Matrix& Value::toMatrix()
 void init()
 {
 #ifdef VLE_HAVE_POOL
+    if (not Glib::thread_supported()) {
+        Glib::thread_init();
+    }
     value::Pools::init();
 #endif
 

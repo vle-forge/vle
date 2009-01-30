@@ -33,6 +33,14 @@
 #include <stdexcept>
 #include <vle/vpz.hpp>
 
+struct F
+{
+    F() { vle::value::init(); }
+    ~F() { vle::value::finalize(); }
+};
+
+BOOST_FIXTURE_TEST_SUITE(vpz_ports, F)
+
 using namespace vle;
 using namespace vpz;
 
@@ -69,3 +77,5 @@ BOOST_AUTO_TEST_CASE(vpz_add_output)
     BOOST_REQUIRE_THROW(views.addTimedView("view4", 0.0, "out2"),
                         utils::ArgError);
 }
+
+BOOST_AUTO_TEST_SUITE_END()

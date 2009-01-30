@@ -29,6 +29,7 @@
 #include <vle/version.hpp>
 
 #ifdef VLE_HAVE_POOL
+#include <glibmm/thread.h>
 #include <boost/pool/pool.hpp>
 #include <boost/utility.hpp>
 #include <vector>
@@ -45,6 +46,8 @@ namespace vle { namespace utils {
         typedef VectorPool::size_type size_type;
         typedef VectorPool::iterator iterator;
         typedef VectorPool::const_iterator const_iterator;
+
+        Glib::Mutex poolMutex;
 
         /**
          * @brief Build a specified number of boost::pool.
@@ -70,6 +73,7 @@ namespace vle { namespace utils {
          */
         inline void* allocate(size_t size)
         {
+            Glib::Mutex::Lock lock(poolMutex);
             assert(size < m_pools.size());
 
             if (not m_pools[size]) {
@@ -85,6 +89,7 @@ namespace vle { namespace utils {
          */
         inline void deallocate(void* deletable, size_t size)
         {
+            Glib::Mutex::Lock lock(poolMutex);
             assert(size < m_pools.size());
             if (deletable) {
                 if (not m_pools[size]) {

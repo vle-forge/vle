@@ -39,6 +39,14 @@
 #include <vle/value.hpp>
 #include <vle/utils.hpp>
 
+struct F
+{
+    F() { vle::value::init(); }
+    ~F() { vle::value::finalize(); }
+};
+
+BOOST_FIXTURE_TEST_SUITE(value_values, F)
+
 using namespace vle;
 
 BOOST_AUTO_TEST_CASE(check_simple_value)
@@ -82,8 +90,6 @@ BOOST_AUTO_TEST_CASE(check_simple_value)
         BOOST_REQUIRE_EQUAL(x->value(), "tset");
         delete x;
     }
-
-    value::finalize();
 }
 
 BOOST_AUTO_TEST_CASE(check_map_value)
@@ -109,8 +115,6 @@ BOOST_AUTO_TEST_CASE(check_map_value)
     BOOST_REQUIRE_THROW(mp->getInt("xml"), utils::CastError);
 
     delete(mp);
-
-    value::finalize();
 }
 
 BOOST_AUTO_TEST_CASE(check_set_value)
@@ -135,8 +139,6 @@ BOOST_AUTO_TEST_CASE(check_set_value)
     BOOST_REQUIRE_THROW(st->getInt(4), utils::CastError);
 
     delete(st);
-
-    value::finalize();
 }
 
 BOOST_AUTO_TEST_CASE(check_clone)
@@ -168,8 +170,6 @@ BOOST_AUTO_TEST_CASE(check_clone)
     delete(mpclone);
     delete(st);
     delete(stclone);
-
-    value::finalize();
 }
 
 BOOST_AUTO_TEST_CASE(check_null)
@@ -202,8 +202,6 @@ BOOST_AUTO_TEST_CASE(check_null)
     BOOST_REQUIRE_EQUAL(st->size(), (value::VectorValue::size_type) 5);
 
     delete(st);
-
-    value::finalize();
 }
 
 BOOST_AUTO_TEST_CASE(check_matrix)
@@ -232,6 +230,6 @@ BOOST_AUTO_TEST_CASE(check_matrix)
 
     delete(mx);
     delete(cpy);
-
-    value::finalize();
 }
+
+BOOST_AUTO_TEST_SUITE_END()

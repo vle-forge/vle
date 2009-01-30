@@ -41,6 +41,14 @@
 #include <limits>
 #include <fstream>
 
+struct F
+{
+    F() { vle::value::init(); }
+    ~F() { vle::value::finalize(); }
+};
+
+BOOST_FIXTURE_TEST_SUITE(vpz_model, F)
+
 using namespace vle;
 
 BOOST_AUTO_TEST_CASE(atomicmodel_vpz)
@@ -398,3 +406,5 @@ BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
 BOOST_AUTO_TEST_CASE(translator_vpz)
 {
 }
+
+BOOST_AUTO_TEST_SUITE_END()

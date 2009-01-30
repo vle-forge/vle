@@ -38,6 +38,14 @@
 #include <vle/value.hpp>
 #include <vle/utils.hpp>
 
+struct F
+{
+    F() { vle::manager::init(); }
+    ~F() { vle::manager::finalize(); }
+};
+
+BOOST_FIXTURE_TEST_SUITE(test_petrinet_extension, F)
+
 using namespace vle;
 
 BOOST_AUTO_TEST_CASE(test_petrinet_and)
@@ -301,3 +309,5 @@ BOOST_AUTO_TEST_CASE(test_petrinet_conflict)
     BOOST_REQUIRE_CLOSE(value::toDouble(result[3][10]), 1., 10e-5);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[4][10]), 5., 10e-5);
 }
+
+BOOST_AUTO_TEST_SUITE_END()

@@ -49,7 +49,6 @@ namespace vle { namespace manager {
 VLE::VLE(int port) :
     mPort(port)
 {
-    utils::init();
 }
 
 VLE::~VLE()
@@ -138,14 +137,14 @@ bool VLE::justRun(int nbProcessor, const CmdArgs& args)
 
 void init()
 {
+    value::init();
     utils::init();
     devs::init();
-    value::init();
-    Glib::thread_init();
 }
 
 void finalize()
 {
+    value::finalize();
     utils::finalize();
     value::finalize();
     devs::finalize();

@@ -37,6 +37,14 @@
 #include <vle/value.hpp>
 #include <vle/utils.hpp>
 
+struct F
+{
+    F() { vle::manager::init(); }
+    ~F() { vle::manager::finalize(); }
+};
+
+BOOST_FIXTURE_TEST_SUITE(test_difference_equation_extension, F)
+
 using namespace vle;
 
 BOOST_AUTO_TEST_CASE(test_equation1)
@@ -162,3 +170,4 @@ BOOST_AUTO_TEST_CASE(test_equation4)
     BOOST_REQUIRE_CLOSE(value::toDouble(result[5][10]), 867., 10e-5);
 }
 
+BOOST_AUTO_TEST_SUITE_END()

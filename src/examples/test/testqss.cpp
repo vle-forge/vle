@@ -37,6 +37,14 @@
 #include <vle/value.hpp>
 #include <vle/utils.hpp>
 
+struct F
+{
+    F() { vle::manager::init(); }
+    ~F() { vle::manager::finalize(); }
+};
+
+BOOST_FIXTURE_TEST_SUITE(test_qss_extension, F)
+
 using namespace vle;
 
 BOOST_AUTO_TEST_CASE(test_qss1)
@@ -95,3 +103,5 @@ BOOST_AUTO_TEST_CASE(test_qss2)
     BOOST_REQUIRE_CLOSE(value::toDouble(result[1][2499]), 3121.71211, 10e-5);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[2][2499]), 30.34103, 10e-5);
 }
+
+BOOST_AUTO_TEST_SUITE_END()

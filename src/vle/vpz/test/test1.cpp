@@ -48,16 +48,15 @@
 #include <limits>
 #include <fstream>
 
-using namespace vle;
-
-BOOST_AUTO_TEST_CASE(build)
+struct F
 {
-    //vpz::VLESaxParser sax;
-    //sax.parse_memory("<?xml version=\"1.0\"?>\n<trame></trame>");
-    //
-    //BOOST_CHECK(sax.is_value() == false);
-    //BOOST_CHECK(sax.get_values().empty() == true);
-}
+    F() { vle::value::init(); }
+    ~F() { vle::value::finalize(); }
+};
+
+BOOST_FIXTURE_TEST_SUITE(vpz_values, F)
+
+using namespace vle;
 
 BOOST_AUTO_TEST_CASE(value_bool)
 {
@@ -470,3 +469,5 @@ BOOST_AUTO_TEST_CASE(value_matrix_of_matrix_io)
     delete v;
     delete v2;
 }
+
+BOOST_AUTO_TEST_SUITE_END()
