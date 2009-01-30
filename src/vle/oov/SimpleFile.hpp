@@ -117,7 +117,7 @@ namespace vle { namespace oov { namespace plugin {
             std::string r(parent);
             r += ':';
             r += simulator;
-            r += '_';
+            r += '.';
             r += port;
             return r;
         }

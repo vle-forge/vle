@@ -101,6 +101,7 @@ void Storage::onNewObservable(const std::string& simulator,
                               const double& /* time */)
 {
     std::string name(parent);
+    name += ":";
     name += simulator;
     m_matrix.addModel(name, port);
 }
@@ -132,6 +133,7 @@ void Storage::onValue(const std::string& simulator,
     }
 
     std::string name(parent);
+    name += ":";
     name += simulator;
     m_matrix.addValue(name, port, value);
 }
