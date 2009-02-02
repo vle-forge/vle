@@ -43,7 +43,7 @@ struct F
     ~F() { vle::manager::finalize(); }
 };
 
-BOOST_FIXTURE_TEST_SUITE(test_difference_equation_extension, F)
+BOOST_GLOBAL_FIXTURE(F)
 
 using namespace vle;
 
@@ -169,5 +169,3 @@ BOOST_AUTO_TEST_CASE(test_equation4)
     BOOST_REQUIRE_CLOSE(value::toDouble(result[4][10]), 176., 10e-5);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[5][10]), 867., 10e-5);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

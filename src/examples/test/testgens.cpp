@@ -45,7 +45,7 @@ struct F
     ~F() { vle::manager::finalize(); }
 };
 
-BOOST_FIXTURE_TEST_SUITE(test_executive_simulator, F)
+BOOST_GLOBAL_FIXTURE(F)
 
 using namespace vle;
 
@@ -162,5 +162,3 @@ BOOST_AUTO_TEST_CASE(test_gens_with_class)
 
     vle::utils::finalize();
 }
-
-BOOST_AUTO_TEST_SUITE_END()

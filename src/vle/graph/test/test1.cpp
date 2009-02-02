@@ -44,7 +44,7 @@ struct F
     ~F() { vle::value::finalize(); }
 };
 
-BOOST_FIXTURE_TEST_SUITE(graph_test, F)
+BOOST_GLOBAL_FIXTURE(F)
 
 using namespace vle;
 using namespace graph;
@@ -418,5 +418,3 @@ BOOST_AUTO_TEST_CASE(test_get_port_index)
     utils::Trace::kill();
     utils::Path::kill();
 }
-
-BOOST_AUTO_TEST_SUITE_END()

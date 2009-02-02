@@ -53,7 +53,7 @@ struct F
     ~F() { vle::value::finalize(); }
 };
 
-BOOST_FIXTURE_TEST_SUITE(vpz_trame, F)
+BOOST_GLOBAL_FIXTURE(F)
 
 using namespace vle;
 
@@ -201,5 +201,3 @@ BOOST_AUTO_TEST_CASE(trame_value)
     //BOOST_REQUIRE_EQUAL(value::toInteger(s2.get(2)), 8);
     //}
 }
-
-BOOST_AUTO_TEST_SUITE_END()

@@ -45,7 +45,7 @@ struct F
     ~F() { vle::value::finalize(); }
 };
 
-BOOST_FIXTURE_TEST_SUITE(value_values, F)
+BOOST_GLOBAL_FIXTURE(F)
 
 using namespace vle;
 
@@ -231,5 +231,3 @@ BOOST_AUTO_TEST_CASE(check_matrix)
     delete(mx);
     delete(cpy);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

@@ -46,7 +46,7 @@ struct F
     ~F() { vle::value::finalize(); }
 };
 
-BOOST_FIXTURE_TEST_SUITE(value_serialization, F)
+BOOST_GLOBAL_FIXTURE(F)
 
 using namespace vle;
 
@@ -406,5 +406,3 @@ BOOST_AUTO_TEST_CASE(check_serialize_deserialize2)
         }
     }
 }
-
-BOOST_AUTO_TEST_SUITE_END()

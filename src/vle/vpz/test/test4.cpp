@@ -44,7 +44,7 @@ struct F
     ~F() { vle::value::finalize(); }
 };
 
-BOOST_FIXTURE_TEST_SUITE(vpz_graph, F)
+BOOST_GLOBAL_FIXTURE(F)
 
 using namespace vle;
 
@@ -363,5 +363,3 @@ BOOST_AUTO_TEST_CASE(test_read_write_read2)
     delete vpz.project().model().model();
     delete vpz2.project().model().model();
 }
-
-BOOST_AUTO_TEST_SUITE_END()

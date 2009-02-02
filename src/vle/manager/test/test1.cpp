@@ -45,7 +45,7 @@ struct F
     ~F() { vle::manager::finalize(); }
 };
 
-BOOST_FIXTURE_TEST_SUITE(manager_experimental_frames, F)
+BOOST_GLOBAL_FIXTURE(F)
 
 using namespace vle;
 
@@ -196,5 +196,3 @@ BOOST_AUTO_TEST_CASE(build_linear_output_matrix_size)
         }
     }
 }
-
-BOOST_AUTO_TEST_SUITE_END()
