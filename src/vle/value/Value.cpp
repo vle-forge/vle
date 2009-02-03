@@ -36,6 +36,7 @@
 #include <vle/value/Null.hpp>
 #include <vle/value/Matrix.hpp>
 #include <sstream>
+#include <boost/serialization/export.hpp>
 
 namespace vle { namespace value {
 
@@ -278,3 +279,15 @@ void finalize()
 }
 
 }} // namespace vle value
+
+BOOST_CLASS_EXPORT(vle::value::Boolean)
+BOOST_CLASS_EXPORT(vle::value::Double)
+BOOST_CLASS_EXPORT(vle::value::Map)
+BOOST_CLASS_EXPORT(vle::value::Integer)
+BOOST_CLASS_EXPORT(vle::value::String)
+BOOST_CLASS_EXPORT(vle::value::Set)
+BOOST_CLASS_EXPORT(vle::value::Tuple)
+BOOST_CLASS_EXPORT(vle::value::Table)
+BOOST_CLASS_EXPORT(vle::value::Xml)
+BOOST_CLASS_EXPORT(vle::value::Null)
+BOOST_CLASS_EXPORT(vle::value::Matrix)
