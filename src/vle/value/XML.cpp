@@ -39,7 +39,7 @@ void Xml::writeString(std::ostream& out) const
 
 void Xml::writeXml(std::ostream& out) const
 {
-    out << "<xml>\n<![CDATA[" << m_value.c_str() << "\n]]>\n</xml>";
+    out << "<xml>\n<![CDATA[" << m_value.c_str() << "]]>\n</xml>";
 }
 
 }} // namespace vle value

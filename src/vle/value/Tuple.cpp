@@ -55,7 +55,7 @@ void Tuple::writeString(std::ostream& out) const
 
 void Tuple::writeXml(std::ostream& out) const
 {
-    std::string s = "<tuple>";
+    out << "<tuple>";
     for (const_iterator it = m_value.begin(); it != m_value.end(); ++it) {
         if (it != m_value.begin()) {
             out << " ";

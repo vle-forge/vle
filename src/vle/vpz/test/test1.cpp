@@ -81,6 +81,9 @@ BOOST_AUTO_TEST_CASE(value_bool)
 
     v = vpz::Vpz::parseValue(t4);
     BOOST_CHECK(value::toBoolean(v) == false);
+
+    v = vpz::Vpz::parseValue(v->writeToXml());
+    BOOST_CHECK(value::toBoolean(v) == false);
     delete v;
 }
 
@@ -96,7 +99,6 @@ BOOST_AUTO_TEST_CASE(value_integer)
     sprintf(t4, "<?xml version=\"1.0\"?>\n<integer>%s</integer>",
             utils::to_string(std::numeric_limits< long >::min()).c_str());
 
-
     value::Value* v;
 
     v = vpz::Vpz::parseValue(t1);
@@ -108,13 +110,16 @@ BOOST_AUTO_TEST_CASE(value_integer)
     delete v;
 
     v = vpz::Vpz::parseValue(t3);
-    BOOST_CHECK(value::toLong(v) ==
-                std::numeric_limits < long >::max());
+    BOOST_CHECK(value::toLong(v) == std::numeric_limits < long >::max());
     delete v;
 
     v = vpz::Vpz::parseValue(t4);
-    BOOST_CHECK(value::toLong(v) ==
-                std::numeric_limits < long >::min());
+    BOOST_CHECK(value::toLong(v) == std::numeric_limits < long >::min());
+    std::string t5(v->writeToXml());
+    delete v;
+
+    v = vpz::Vpz::parseValue(t5);
+    BOOST_CHECK(value::toLong(v) == std::numeric_limits < long >::min());
     delete v;
 }
 
@@ -131,6 +136,11 @@ BOOST_AUTO_TEST_CASE(value_double)
 
     v = vpz::Vpz::parseValue(t2);
     BOOST_CHECK_CLOSE(value::toDouble(v), -100.5, 1);
+    std::string t3(v->writeToXml());
+    delete v;
+
+    v = vpz::Vpz::parseValue(t3);
+    BOOST_CHECK_CLOSE(value::toDouble(v), -100.5, 1);
     delete v;
 }
 
@@ -146,6 +156,11 @@ BOOST_AUTO_TEST_CASE(value_string)
     delete v;
 
     v = vpz::Vpz::parseValue(t2);
+    BOOST_CHECK(value::toString(v) == "a\nb\tc\n");
+    std::string t3(v->writeToXml());
+    delete v;
+
+    v = vpz::Vpz::parseValue(t3);
     BOOST_CHECK(value::toString(v) == "a\nb\tc\n");
     delete v;
 }
@@ -175,8 +190,19 @@ BOOST_AUTO_TEST_CASE(value_set)
 
     v = value::toSetValue(vpz::Vpz::parseValue(t2));
     BOOST_CHECK(value::toInteger(v->get(0)) == 1);
-    value::Set& v2 = value::toSetValue(v->get(1));
-    BOOST_CHECK(value::toString(v2.get(0)) == "test");
+    {
+        value::Set& v2 = value::toSetValue(v->get(1));
+        BOOST_CHECK(value::toString(v2.get(0)) == "test");
+    }
+    std::string t3(v->writeToXml());
+    delete v;
+
+    v = value::toSetValue(vpz::Vpz::parseValue(t3));
+    BOOST_CHECK(value::toInteger(v->get(0)) == 1);
+    {
+        value::Set& v2 = value::toSetValue(v->get(1));
+        BOOST_CHECK(value::toString(v2.get(0)) == "test");
+    }
     delete v;
 }
 
@@ -206,9 +232,20 @@ BOOST_AUTO_TEST_CASE(value_map)
     delete v;
 
     v = value::toMapValue(vpz::Vpz::parseValue(t2));
-    value::Set& s = value::toSetValue(v->get("a"));
-    BOOST_CHECK(value::toInteger(s.get(0)) == 1);
-    BOOST_CHECK(value::toString(s.get(1)) == "test");
+    std::string t3(v->writeToXml());
+    {
+        value::Set& s = value::toSetValue(v->get("a"));
+        BOOST_CHECK(value::toInteger(s.get(0)) == 1);
+        BOOST_CHECK(value::toString(s.get(1)) == "test");
+    }
+    delete v;
+
+    v = value::toMapValue(vpz::Vpz::parseValue(t3));
+    {
+        value::Set& s = value::toSetValue(v->get("a"));
+        BOOST_CHECK(value::toInteger(s.get(0)) == 1);
+        BOOST_CHECK(value::toString(s.get(1)) == "test");
+    }
     delete v;
 }
 
@@ -241,7 +278,14 @@ BOOST_AUTO_TEST_CASE(value_tuple)
     BOOST_CHECK_CLOSE(v2.operator[](0), 100.0, 0.1);
     BOOST_CHECK_CLOSE(v2.operator[](1), 200.0, 0.1);
     BOOST_CHECK_CLOSE(v2.operator[](2), 300.0, 0.1);
+    std::string t3 = v2.writeToXml();
     delete m;
+
+    value::Tuple* v3 = value::toTupleValue(vpz::Vpz::parseValue(t3));
+    BOOST_CHECK_CLOSE(v3->operator[](0), 100.0, 0.1);
+    BOOST_CHECK_CLOSE(v3->operator[](1), 200.0, 0.1);
+    BOOST_CHECK_CLOSE(v3->operator[](2), 300.0, 0.1);
+    delete v3;
 }
 
 BOOST_AUTO_TEST_CASE(value_table)
@@ -287,8 +331,13 @@ BOOST_AUTO_TEST_CASE(value_xml)
         "</xml>";
 
     value::Xml* str(value::toXmlValue(vpz::Vpz::parseValue(t1)));
+    std::string t2(str->writeToXml());
     BOOST_REQUIRE_EQUAL(str->value(), "test 1 2 1 2");
     delete str;
+
+    value::Xml* str2(value::toXmlValue(vpz::Vpz::parseValue(t2)));
+    BOOST_REQUIRE_EQUAL(str2->value(), "test 1 2 1 2");
+    delete str2;
 }
 
 BOOST_AUTO_TEST_CASE(value_matrix)
