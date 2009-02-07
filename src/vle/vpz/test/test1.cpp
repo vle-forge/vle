@@ -93,7 +93,6 @@ BOOST_AUTO_TEST_CASE(value_integer)
     sprintf(t4, "<?xml version=\"1.0\"?>\n<integer>%s</integer>",
             utils::to_string(std::numeric_limits< long >::min()).c_str());
 
-
     value::Value v;
 
     v = vpz::Vpz::parseValue(t1);
@@ -103,12 +102,15 @@ BOOST_AUTO_TEST_CASE(value_integer)
     BOOST_CHECK(value::toInteger(v) == -100);
 
     v = vpz::Vpz::parseValue(t3);
-    BOOST_CHECK(value::toLong(v) ==
-                std::numeric_limits < long >::max());
 
+    BOOST_CHECK_EQUAL(value::toLong(v), std::numeric_limits < long >::max());
     v = vpz::Vpz::parseValue(t4);
-    BOOST_CHECK(value::toLong(v) ==
-                std::numeric_limits < long >::min());
+
+    BOOST_CHECK_EQUAL(value::toLong(v), std::numeric_limits < long >::min());
+    std::string t5(v->toXML());
+
+    v = vpz::Vpz::parseValue(t5);
+    BOOST_CHECK_EQUAL(value::toLong(v), std::numeric_limits < long >::min());
 }
 
 BOOST_AUTO_TEST_CASE(value_double)

@@ -353,7 +353,7 @@ void SaxParser::onEndInteger()
 {
     m_valuestack.pushOnVectorValue(
         value::IntegerFactory::create(
-            utils::to_int(lastCharactersStored())));
+            utils::to_long(lastCharactersStored())));
 }
 
 void SaxParser::onEndDouble()
