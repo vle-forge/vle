@@ -110,16 +110,17 @@ BOOST_AUTO_TEST_CASE(value_integer)
     delete v;
 
     v = vpz::Vpz::parseValue(t3);
-    BOOST_CHECK(value::toLong(v) == std::numeric_limits < long >::max());
+    BOOST_CHECK_EQUAL(value::toLong(v), std::numeric_limits < long >::max());
     delete v;
 
     v = vpz::Vpz::parseValue(t4);
-    BOOST_CHECK(value::toLong(v) == std::numeric_limits < long >::min());
+
+    BOOST_CHECK_EQUAL(value::toLong(v), std::numeric_limits < long >::min());
     std::string t5(v->writeToXml());
     delete v;
 
     v = vpz::Vpz::parseValue(t5);
-    BOOST_CHECK(value::toLong(v) == std::numeric_limits < long >::min());
+    BOOST_CHECK_EQUAL(value::toLong(v), std::numeric_limits < long >::min());
     delete v;
 }
 
