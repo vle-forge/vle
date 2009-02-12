@@ -294,6 +294,10 @@ void buildDaemon()
 
 void init()
 {
+    if (not Glib::thread_supported()) {
+        Glib::thread_init();
+    }
+
     utils::Path::init();
     utils::Trace::init();
 
