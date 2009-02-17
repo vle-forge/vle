@@ -70,13 +70,18 @@ void Counter::externalTransition(const devs::ExternalEventList& events,
     m_active = true;
 }
 
-value::Value* Counter::observation(const devs::ObservationEvent& /* event */) const
+value::Value* Counter::observation(const devs::ObservationEvent&  ev) const
 {
-    if (m_counter > 100 and m_counter < 500) {
-        return 0;
-    } else {
-        return buildDouble(m_counter);
+    if (ev.onPort("c")){
+        if (m_counter > 100 and m_counter < 500) {
+            return 0;
+        } else {
+            return buildDouble(m_counter);
+        }
+    } else if (ev.onPort("value")) {
+        return buildInteger(0);
     }
+    return 0;
 }
 
 }}} // namespace vle examples gens

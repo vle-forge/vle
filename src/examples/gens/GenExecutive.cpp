@@ -98,9 +98,29 @@ value::Value* GenExecutive::observation(const devs::ObservationEvent& ev) const
         std::ostringstream out;
         coupledmodel().writeXML(out);
         return value::String::create(out.str());
-    } else {
-        return devs::Executive::observation(ev);
-    }
+    } else if (ev.onPort("adjacency_matrix")) {
+        value::Set *set = value::Set::create();
+        set->addCloneValue(*value::Integer::create(1));
+        if(get_nb_model() > 0 and ev.getTime() < 50){
+            set->addCloneValue(*value::String::create("add"));
+            std::string name = (boost::format("beep_%1%") % m_stacknames.size()).str();
+            set->addCloneValue(*value::String::create(name));
+            set->addCloneValue(*value::String::create("2"));
+            std::string edge =  name + std::string(" counter ");
+            set->addCloneValue(*value::String::create(edge));
+        }
+        else if(get_nb_model() > 0){
+            set->addCloneValue(*value::String::create("delete"));
+            std::string name = (boost::format(
+                    "beep_%1%") % (get_nb_model())).str();
+            set->addCloneValue(*value::String::create(name));
+        }
+
+        return set;
+    } else if (ev.onPort("value"))
+        return value::Integer::create(1);
+
+    return devs::Executive::observation(ev);
 }
 
 //
@@ -111,7 +131,7 @@ value::Value* GenExecutive::observation(const devs::ObservationEvent& ev) const
 
 void GenExecutive::add_new_model()
 {
-    std::string name((boost::format("beep-%1%") % m_stacknames.size()).str());
+    std::string name((boost::format("beep_%1%") % m_stacknames.size()).str());
 
     graph::AtomicModel* atom(new graph::AtomicModel(name, &coupledmodel()));
     atom->addOutputPort("out");

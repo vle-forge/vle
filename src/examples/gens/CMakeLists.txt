@@ -38,5 +38,6 @@ INSTALL(TARGETS gens
 
 INSTALL(FILES gens.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
 INSTALL(FILES genswithclass.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
+INSTALL(FILES gensnetview.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
 INSTALL(FILES ${SOURCES_CPP} DESTINATION
   "${VLE_SHARE_DIRS}/examples/sources/gens")
