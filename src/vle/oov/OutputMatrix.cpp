@@ -183,7 +183,7 @@ OutputMatrix::getValue(const std::string& model, const std::string& port)
     MapPairIndex::const_iterator it = m_colAccess.find(colref);
 
     Assert(utils::ArgError, it != m_colAccess.end(), boost::format(
-            "Pair (model, port) (%1%,%2) does not exist.") % model % port);
+            "Pair (model, port) (%1%,%2%) does not exist.") % model % port);
 
     return m_values->column(it->second);
 }
@@ -205,7 +205,7 @@ OutputMatrix::getValue(const std::string& model, const std::string& port) const
     MapPairIndex::const_iterator it = m_colAccess.find(colref);
 
     Assert(utils::ArgError, it != m_colAccess.end(), boost::format(
-            "Pair (model, port) (%1%,%2) does not exist.") % model % port);
+            "Pair (model, port) (%1%,%2%) does not exist.") % model % port);
 
     return m_values->column(it->second);
 }
