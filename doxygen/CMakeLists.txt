@@ -27,8 +27,6 @@ IF (WIN32)
     ADD_CUSTOM_TARGET(winhelp "${HTML_HELP_COMPILER}" "${HHP_FILE}")
     ADD_DEPENDENCIES (winhelp doc)
 
-    MESSAGE(STATUS "${HTML_HELP_COMPILER} ${HHP_FILE}")
-
     IF (EXISTS "${VLE_BINARY_DIR}/doxygen/html/vle.chm")
       INSTALL(FILES "${VLE_BINARY_DIR}/doxygen/html/vle.chm"
 	    DESTINATION "${VLE_SHARE_DIRS}/doc")

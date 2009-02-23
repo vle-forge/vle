@@ -280,6 +280,7 @@ void finalize()
 
 }} // namespace vle value
 
+#ifndef __WIN32__
 BOOST_CLASS_EXPORT(vle::value::Boolean)
 BOOST_CLASS_EXPORT(vle::value::Double)
 BOOST_CLASS_EXPORT(vle::value::Map)
@@ -291,3 +292,4 @@ BOOST_CLASS_EXPORT(vle::value::Table)
 BOOST_CLASS_EXPORT(vle::value::Xml)
 BOOST_CLASS_EXPORT(vle::value::Null)
 BOOST_CLASS_EXPORT(vle::value::Matrix)
+#endif
