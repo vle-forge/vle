@@ -36,7 +36,6 @@
 
 namespace vle { namespace oov { namespace plugin {
 
-
     class CairoNetView: public CairoPlugin
     {
     public:
@@ -87,6 +86,9 @@ namespace vle { namespace oov { namespace plugin {
         void draw_arrow(const int start_x, const int start_y,
                         int end_x, int end_y, int rayon);
         double get_length(const int Ax, const int Ay, const int Bx, const int By);
+        bool m_display_node_names;
+        void draw_node_name(const std::string &node_name, double x,
+                            double y, double font_size);
 
         std::string mExecutiveName;
         std::string mStateName;

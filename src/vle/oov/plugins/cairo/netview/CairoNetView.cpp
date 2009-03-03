@@ -42,12 +42,14 @@ CairoNetView::CairoNetView(const std::string& location) :
     mWindowWidth(605),
     mWindowHeight(605),
     mTime(-1.0),
-    mReceiveCell(0)
+    mReceiveCell(0),
+    m_G(0)
 {
 }
 
 CairoNetView::~CairoNetView()
 {
+    delete m_G;
 }
 
 void CairoNetView::onParameter(const std::string& /* plugin */,
@@ -56,6 +58,8 @@ void CairoNetView::onParameter(const std::string& /* plugin */,
                                const std::string& parameters,
                                const double& /* time */)
 {
+    m_display_node_names = false;
+
     Assert(utils::InternalError, m_ctx, "Cairo caview drawing error");
     xmlpp::DomParser parser;
 
@@ -72,12 +76,12 @@ void CairoNetView::onParameter(const std::string& /* plugin */,
     elt = utils::xml::get_children(root, "nodes");
     std::string node_names;
     xmlpp::TextNode* tn;
-    if("set" == utils::xml::get_attribute(elt,"type")){
+    if ("set" == utils::xml::get_attribute(elt,"type")) {
         tn = elt->get_child_text();
         node_names = tn->get_content();
-    }
-    else
+    } else {
         node_names = utils::xml::get_attribute(elt,"prefix").c_str();
+    }
 
     elt = utils::xml::get_children(root,"adjacency_matrix");
     tn = elt->get_child_text();
@@ -88,7 +92,7 @@ void CairoNetView::onParameter(const std::string& /* plugin */,
 
     // set the positions
     elt = utils::xml::get_children(root,"positions");
-    if("set" == utils::xml::get_attribute(elt,"type")){
+    if ("set" == utils::xml::get_attribute(elt,"type")) {
         xmlpp::TextNode* tn = elt->get_child_text();
         m_G->set_positions(tn->get_content());
     } else {
@@ -97,58 +101,61 @@ void CairoNetView::onParameter(const std::string& /* plugin */,
         mMaxY = 300;
     }
     m_G->scale_positions(mWindowWidth / mMaxX, mWindowHeight / mMaxY);
-    //
-    ///
-    //
+
     elt = utils::xml::get_children(root, "states");
     if (utils::xml::exist_attribute(elt, "name"))
-	mStateName = utils::xml::get_attribute(elt, "name");
+        mStateName = utils::xml::get_attribute(elt, "name");
 
     std::string type = utils::xml::get_attribute(elt, "type");
     xmlpp::Node::NodeList lst = elt->get_children("state");
     mColors.build_color_list(type, lst);
+
+    if (utils::xml::exist_children(root, "display_names")) {
+        elt = utils::xml::get_children(root, "display_names");
+        if (utils::xml::get_attribute(elt,"activate") == "yes")
+            m_display_node_names = true;
+    }
 }
 
 void CairoNetView::onNewObservable(const std::string& /* simulator */,
-                                  const std::string& /* parent */,
-                                  const std::string& /* port */,
-                                  const std::string& /* view */,
-                                  const double& /* time */)
+                                   const std::string& /* parent */,
+                                   const std::string& /* port */,
+                                   const std::string& /* view */,
+                                   const double& /* time */)
 {
 }
 
 void CairoNetView::onDelObservable(const std::string& /* simulator */,
-                                  const std::string& /* parent */,
-                                  const std::string& /* port */,
-                                  const std::string& /* view */,
-                                  const double& /* time */)
+                                   const std::string& /* parent */,
+                                   const std::string& /* port */,
+                                   const std::string& /* view */,
+                                   const double& /* time */)
 {
 }
 
 void CairoNetView::onValue(const std::string& simulator,
-                          const std::string& /* parent */,
-                          const std::string& /*port*/,
-                          const std::string& /* view */,
-                          const double& time,
-                          value::Value* value)
+                           const std::string& /* parent */,
+                           const std::string& /*port*/,
+                           const std::string& /* view */,
+                           const double& time,
+                           value::Value* value)
 {
     mTime = time;
     boost::char_separator<char> sep(" \n\t");
     typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 
-
-    if (simulator == mExecutiveName){
+    if (simulator == mExecutiveName) {
         value::Set set(value::toSetValue(*value));
 
         mValues[simulator] = set.get(0).writeToString();
         mReceiveCell++;
 
-        if (set.getString(1) == "add"){
+        if (set.getString(1) == "add") {
             tokenizer vertices_tok(set.getString(2), sep);
             tokenizer values_tok(set.getString(3), sep);
             tokenizer::iterator val_it = values_tok.begin();
             for (tokenizer::iterator v_it = vertices_tok.begin();
-                v_it != vertices_tok.end(); ++v_it){
+                 v_it != vertices_tok.end(); ++v_it) {
                 m_G->add_node(*v_it);
                 mValues[*v_it] = *val_it;
                 ++val_it;
@@ -156,18 +163,18 @@ void CairoNetView::onValue(const std::string& simulator,
 
             tokenizer edges_tok(set.getString(4), sep);
             tokenizer::iterator it = edges_tok.begin();
-            while (it != edges_tok.end()){
+            while (it != edges_tok.end()) {
                 tokenizer::iterator it_origin = it;
                 ++it;
                 m_G->push_back_edge(*it_origin, *it);
                 ++it;
             }
 
-        } else if(set.getString(1) == "delete"){
+        } else if (set.getString(1) == "delete") {
             tokenizer vertices_tok(set.getString(2), sep);
 
             for (tokenizer::iterator it = vertices_tok.begin();
-                 it != vertices_tok.end(); ++it){
+                 it != vertices_tok.end(); ++it) {
                 m_G->remove_node(*it);
                 mValues.erase(*it);
             }
@@ -183,9 +190,9 @@ void CairoNetView::onValue(const std::string& simulator,
         mValues[simulator] = value->writeToString();
         ++mReceiveCell;
         if (mReceiveCell == m_G->num_nodes()) {
-	    draw();
+            draw();
             copy();
-	    mReceiveCell = 0;
+            mReceiveCell = 0;
         }
     }
     delete value;
@@ -194,6 +201,7 @@ void CairoNetView::onValue(const std::string& simulator,
 void CairoNetView::close(const double& /* time */)
 {
     delete m_G;
+    m_G = 0;
 }
 
 void CairoNetView::preferredSize(int& width, int& height)
@@ -205,7 +213,7 @@ void CairoNetView::preferredSize(int& width, int& height)
 void CairoNetView::draw()
 {
     m_ctx->rectangle(0, 0, mWindowWidth, mWindowHeight);
-    m_ctx->set_source_rgb(0.745098, 0.745098, 0.745098);
+    m_ctx->set_source_rgb(0.74, 0.74, 0.74);
     m_ctx->fill();
 
     int rayon = mWindowWidth / (3 * m_G->num_nodes());
@@ -213,10 +221,10 @@ void CairoNetView::draw()
 
     std::vector<std::string> v_names = m_G->get_all_vertice_names();
 
-    for (unsigned int i = 0; i < v_names.size(); ++i){
+    for (unsigned int i = 0; i < v_names.size(); ++i) {
         std::vector<std::string> adjacents(
-                                    m_G->get_adjacent_vertices(v_names[i]));
-        for (unsigned int j = 0; j < adjacents.size(); ++j){
+            m_G->get_adjacent_vertices(v_names[i]));
+        for (unsigned int j = 0; j < adjacents.size(); ++j) {
             double Ax = m_G->get_position(v_names[i]).first;
             double Ay = m_G->get_position(v_names[i]).second;
             double Bx = m_G->get_position(adjacents[j]).first;
@@ -228,17 +236,17 @@ void CairoNetView::draw()
 
     }
 
-    for (unsigned int i = 0; i < v_names.size(); ++i){
+    for (unsigned int i = 0; i < v_names.size(); ++i) {
         std::vector<std::string> adjacents(
-                                    m_G->get_adjacent_vertices(v_names[i]));
+            m_G->get_adjacent_vertices(v_names[i]));
         mColors.build_color(mValues[v_names[i]]);
         m_ctx->set_source_rgb(mColors.r, mColors.g, mColors.b);
-        m_ctx->arc(static_cast<int>(m_G->get_position(v_names[i]).first),
-                   static_cast<int>(m_G->get_position(v_names[i]).second),
-                   rayon,
-                   0,
-                   2*M_PI );
+        int x = static_cast<int>(m_G->get_position(v_names[i]).first);
+        int y = static_cast<int>(m_G->get_position(v_names[i]).second);
+        m_ctx->arc(x, y, rayon, 0, 2*M_PI);
         m_ctx->fill();
+        if (m_display_node_names)
+            draw_node_name(v_names[i], x, y, 2.*rayon/3.);
     }
 }
 
@@ -246,58 +254,77 @@ void CairoNetView::draw_arrow(const int start_x, const int start_y,
                               int end_x, int end_y, int rayon)
 {
 
-        double cos_teta = (start_x - end_x) /
-                        get_length(start_x, start_y, end_x, end_y);
-        double sin_teta = (start_y - end_y) /
-                        get_length(start_x, start_y, end_x, end_y);
-        double teta = acos(cos_teta);
+    double cos_teta = (start_x - end_x) /
+        get_length(start_x, start_y, end_x, end_y);
+    double sin_teta = (start_y - end_y) /
+        get_length(start_x, start_y, end_x, end_y);
+    double teta = acos(cos_teta);
 
-        end_x += (int)(cos_teta * rayon);
-        end_y += (int)(sin_teta * rayon);
+    end_x += (int)(cos_teta * rayon);
+    end_y += (int)(sin_teta * rayon);
 
-	m_ctx->set_source_rgb(0.4, 0.0, 0.0);
-        m_ctx->set_line_width(0.8);
-        m_ctx->begin_new_path();
-        m_ctx->move_to (start_x, start_y);
-        m_ctx->line_to (end_x, end_y);
-        m_ctx->close_path();
-        m_ctx->stroke();
+    m_ctx->set_source_rgb(0.4, 0.0, 0.0);
+    m_ctx->set_line_width(0.8);
+    m_ctx->begin_new_path();
+    m_ctx->move_to (start_x, start_y);
+    m_ctx->line_to (end_x, end_y);
+    m_ctx->close_path();
+    m_ctx->stroke();
 
-        double teta0 = teta + M_PI / 6.;
-        double teta1 = teta - M_PI / 6.;
+    double teta0 = teta + M_PI / 6.;
+    double teta1 = teta - M_PI / 6.;
 
-        double x;
-        double y;
+    double x;
+    double y;
 
-        x = end_x + rayon * cos(teta0);
-        if (end_y < start_y){
-            y = end_y + rayon * sin(teta0);
-        } else {
-            y = end_y - rayon * sin(teta0);
-        }
-        m_ctx->line_to(static_cast<int>(x), static_cast<int>(y));
+    x = end_x + rayon * cos(teta0);
+    if (end_y < start_y) {
+        y = end_y + rayon * sin(teta0);
+    } else {
+        y = end_y - rayon * sin(teta0);
+    }
+    m_ctx->line_to(static_cast<int>(x), static_cast<int>(y));
 
-        x = end_x + (rayon*0.7) * cos_teta;
-        y = end_y + (rayon*0.7) * sin_teta;
+    x = end_x + (rayon*0.7) * cos_teta;
+    y = end_y + (rayon*0.7) * sin_teta;
 
-        m_ctx->line_to(static_cast<int>(x), static_cast<int>(y));
-        x = end_x + rayon * cos(teta1);
-        if (end_y < start_y){
-            y = end_y + rayon * sin(teta1);
-        } else {
-            y = end_y - rayon * sin(teta1);
-        }
-        m_ctx->line_to(static_cast<int>(x), static_cast<int>(y));
+    m_ctx->line_to(static_cast<int>(x), static_cast<int>(y));
+    x = end_x + rayon * cos(teta1);
+    if (end_y < start_y) {
+        y = end_y + rayon * sin(teta1);
+    } else {
+        y = end_y - rayon * sin(teta1);
+    }
+    m_ctx->line_to(static_cast<int>(x), static_cast<int>(y));
 
-        m_ctx->line_to (end_x, end_y);
-        m_ctx->fill();
+    m_ctx->line_to (end_x, end_y);
+    m_ctx->fill();
 }
 
 double CairoNetView::get_length(const int Ax, const int Ay,
-                                const int Bx, const int By){
-		return sqrt((Bx-Ax)*(Bx-Ax) + (By-Ay)*(By-Ay));
+                                const int Bx, const int By)
+{
+    return sqrt((Bx-Ax)*(Bx-Ax) + (By-Ay)*(By-Ay));
 }
 
+
+void CairoNetView::draw_node_name(const std::string &node_name,
+                                  double x, double y, double font_size)
+{
+    m_ctx->set_source_rgb(0.0, 0.0, 0.0);
+    m_ctx->select_font_face("Sans", Cairo::FONT_SLANT_NORMAL,
+                            Cairo::FONT_WEIGHT_BOLD);
+
+    m_ctx->set_font_size(font_size);
+
+    Cairo::TextExtents extents;
+    m_ctx->get_text_extents(node_name, extents);
+    x -= extents.width/2 + extents.x_bearing;
+    y -= extents.height/2 + extents.y_bearing;
+
+    m_ctx->move_to(x, y);
+    m_ctx->show_text(node_name);
+}
 
 }}} // namespace vle oov plugin
 
