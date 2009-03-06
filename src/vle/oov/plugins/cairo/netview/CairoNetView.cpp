@@ -210,6 +210,18 @@ void CairoNetView::preferredSize(int& width, int& height)
     height = mWindowHeight;
 }
 
+
+void CairoNetView::onSize(int width, int height)
+{
+    mMaxX = mWindowWidth;
+    mMaxY = mWindowHeight;
+    mWindowWidth = width;
+    mWindowHeight = height;
+    m_G->scale_positions(mWindowWidth / mMaxX, mWindowHeight / mMaxY);
+}
+
+
+
 void CairoNetView::draw()
 {
     m_ctx->rectangle(0, 0, mWindowWidth, mWindowHeight);
@@ -219,34 +231,30 @@ void CairoNetView::draw()
     int rayon = mWindowWidth / (3 * m_G->num_nodes());
     if (rayon < 2) rayon = 2;
 
-    std::vector<std::string> v_names = m_G->get_all_vertice_names();
-
-    for (unsigned int i = 0; i < v_names.size(); ++i) {
-        std::vector<std::string> adjacents(
-            m_G->get_adjacent_vertices(v_names[i]));
-        for (unsigned int j = 0; j < adjacents.size(); ++j) {
-            double Ax = m_G->get_position(v_names[i]).first;
-            double Ay = m_G->get_position(v_names[i]).second;
-            double Bx = m_G->get_position(adjacents[j]).first;
-            double By = m_G->get_position(adjacents[j]).second;
+    double xx, yy;
+    Graph::p_vertex_it pv_it;
+    for (pv_it = m_G->get_first_last_vertice_iterators();
+         pv_it.first != pv_it.second; ++pv_it.first) {
+        Graph::p_adjacency_it pa_it;
+        for (pa_it = m_G->get_first_last_adjacent_iterators(pv_it.first);
+             pa_it.first != pa_it.second; ++pa_it.first){
+            double Ax, Ay, Bx, By;
+            m_G->get_vertex_position(pv_it.first, Ax, Ay);
+            m_G->get_vertex_position(pa_it.first, Bx, By);
             draw_arrow(static_cast<int>(Ax), static_cast<int>(Ay),
                        static_cast<int>(Bx), static_cast<int>(By),
                        rayon);
         }
-
-    }
-
-    for (unsigned int i = 0; i < v_names.size(); ++i) {
-        std::vector<std::string> adjacents(
-            m_G->get_adjacent_vertices(v_names[i]));
-        mColors.build_color(mValues[v_names[i]]);
+        std::string node_name = m_G->get_vertex_name(pv_it.first);
+        mColors.build_color(mValues[node_name]);
         m_ctx->set_source_rgb(mColors.r, mColors.g, mColors.b);
-        int x = static_cast<int>(m_G->get_position(v_names[i]).first);
-        int y = static_cast<int>(m_G->get_position(v_names[i]).second);
+        m_G->get_vertex_position(pv_it.first, xx ,yy);
+        int x = static_cast<int>(xx);
+        int y = static_cast<int>(yy);
         m_ctx->arc(x, y, rayon, 0, 2*M_PI);
         m_ctx->fill();
         if (m_display_node_names)
-            draw_node_name(v_names[i], x, y, 2.*rayon/3.);
+            draw_node_name(node_name, x, y, 2.*rayon/3.);
     }
 }
 

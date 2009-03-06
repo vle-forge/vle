@@ -144,10 +144,10 @@ void Graph::set_positions()
         nb_iter=200;
     gursoy_atun_layout(m_G, m_topology, map, nb_iter);
 
-    for (IndexMap::iterator it = m_index_map.begin();
-         it != m_index_map.end(); ++it) {
-        m_positions[m_G[it->first].name].first  = it->second[0];
-        m_positions[m_G[it->first].name].second = it->second[1];
+    for (Graph::p_vertex_it pv_it = vertices(m_G);
+         pv_it.first != pv_it.second; ++pv_it.first) {
+        m_G[*pv_it.first].position.first  = m_index_map[*pv_it.first][0];
+        m_G[*pv_it.first].position.second = m_index_map[*pv_it.first][1];
     }
 }
 
@@ -167,11 +167,14 @@ void Graph::set_positions(const std::string &p)
         Assert(utils::InternalError, tok_iter != tokens.end(),
         "netview plugin error: The number of position must be pair!");
         double y = utils::to_double(*tok_iter);
-        set_position(m_G[*vp.first].name, x, y);
+        m_G[*vp.first].position.first  = x;
+        m_G[*vp.first].position.second = y;
+
         ++tok_iter;
         ++vp.first;
     }
 }
+
 
 Graph::v_descriptor Graph::get_vertex_descriptor(const std::string &vertex)
 {

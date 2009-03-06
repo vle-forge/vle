@@ -79,6 +79,8 @@ namespace vle { namespace oov { namespace plugin {
 
         virtual void preferredSize(int& width, int& height);
 
+        virtual void onSize(int width, int height);
+
     private:
         cairo_color mColors;
         void draw();
