@@ -26,37 +26,64 @@
 #include <vle/eov/Plugin.hpp>
 #include <vle/eov/NetStreamReader.hpp>
 #include <vle/utils/Tools.hpp>
+#include <iostream>
 
 namespace vle { namespace eov {
 
 void Plugin::onExposeEvent(GdkEventExpose* /* event */)
 {
     if (drawingSurface() and drawingWidget().is_realized() and m_cairoplugin) {
-	int width, height;
-	m_cairoplugin->preferredSize(width, height);
+        int width, height;
+        m_cairoplugin->preferredSize(width, height);
 
-        if (not m_buffer) {
-            m_buffer = Gdk::Pixmap::create(drawingSurface(), width, height);
+        if (not m_buffer or not m_ctx) {
+            buildBuffer(width, height);
         }
 
-	if (m_buffer) {
-	    if (not m_ctx) {
-		m_ctx = m_buffer->create_cairo_context();
-	    }
+        if (m_buffer and m_ctx and m_cairoplugin->stored()) {
+            Glib::Mutex::Lock lock(m_net->mutex());
 
-	    if (m_ctx) {
-		Glib::Mutex::Lock lock(m_net->mutex());
+            m_ctx->save();
+            m_ctx->set_source(m_cairoplugin->stored(), 0.0, 0.0);
+            m_ctx->paint();
+            m_ctx->restore();
 
-		m_ctx->save();
-                m_ctx->set_source(m_cairoplugin->stored(), 0.0, 0.0);
-		m_ctx->paint();
-		m_ctx->restore();
+            drawingSurface()->draw_drawable(
+                Gdk::GC::create(drawingSurface()), m_buffer, 0, 0, 0,
+                0, width, height);
+        }
+    }
+}
 
-		drawingSurface()->draw_drawable(
-			Gdk::GC::create(drawingSurface()), m_buffer, 0, 0, 0,
-					0, width, height);
-	    }
-	}
+void Plugin::onConfigureEvent(GdkEventConfigure* event)
+{
+    if (drawingSurface() and drawingWidget().is_realized() and m_cairoplugin) {
+        Glib::Mutex::Lock lock(m_net->mutex());
+
+        int width = event->width;
+        int height = event->height;
+        m_cairoplugin->onSize(width, height);
+        m_cairoplugin->preferredSize(width, height);
+
+        buildBuffer(width, height);
+
+        m_cairoplugin->needInit();
+    }
+}
+
+void Plugin::buildBuffer(int width, int height)
+{
+    if (m_buffer) {
+        m_buffer.clear();
+    }
+
+    if (m_ctx) {
+        m_ctx.clear();
+    }
+
+    m_buffer = Gdk::Pixmap::create(drawingSurface(), width, height);
+    if (m_buffer) {
+        m_ctx = m_buffer->create_cairo_context();
     }
 }
 

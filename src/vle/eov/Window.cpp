@@ -74,6 +74,9 @@ bool Window::checkPluginTimer()
 	m_plugin->drawingWidget().signal_expose_event().connect_notify(
 	    sigc::mem_fun(*m_plugin.get(), &Plugin::onExposeEvent));
 
+        m_plugin->drawingWidget().signal_configure_event().connect_notify(
+	    sigc::mem_fun(*m_plugin.get(), &Plugin::onConfigureEvent));
+
         m_rootBox.pack_start(m_plugin->widget(), true, true);
 	add(m_rootBox);
 	resize_children();

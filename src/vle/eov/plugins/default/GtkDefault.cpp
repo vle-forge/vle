@@ -33,19 +33,6 @@ GtkDefault::GtkDefault(oov::CairoPluginPtr cairoplugin,
     m_vbox(false, 5),
     m_label("Default plugin")
 {
-    int width, height;
-
-    m_cairoplugin->preferredSize(width, height);
-
-    if (width > 0 and height > 0) {
-        m_da.set_size_request(width, height);
-    } else {
-        m_da.set_size_request(400, 300);
-    }
-
-    m_da.signal_expose_event().connect(
-        sigc::mem_fun(*this, &GtkDefault::on_expose_event));
-
     m_vbox.pack_start(m_da, true, true, 0);
     m_vbox.pack_start(m_label, false, false, 0);
 }
@@ -64,14 +51,9 @@ Gtk::Widget& GtkDefault::drawingWidget()
     return m_da;
 }
 
-Gtk::Widget& GtkDefault::widget()
+Gtk::Container& GtkDefault::widget()
 {
     return m_vbox;
-}
-
-bool GtkDefault::on_expose_event(GdkEventExpose* /* event */)
-{
-    return true;
 }
 
 int GtkDefault::width()
@@ -88,4 +70,4 @@ int GtkDefault::height()
     return height;
 }
 
-}} // namespace vle eov
+}} // namespace vle::eov

@@ -24,7 +24,7 @@
 
 
 #include <vle/oov/CairoPlugin.hpp>
-
+#include <iostream>
 
 namespace vle { namespace oov {
 
@@ -32,9 +32,8 @@ void CairoPlugin::init()
 {
     int height, width;
 
-    assert(not m_ctx);
-
     preferredSize(width, height);
+
     m_img = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, width, height);
     m_store = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, width, height);
     m_ctx = Cairo::Context::create(m_img);
@@ -54,10 +53,17 @@ void CairoPlugin::init()
     m_ctx->paint();
     m_ctx->set_operator(Cairo::OPERATOR_OVER);
     m_ctx->restore();
+
+    m_init = false;
+    m_need = true;
 }
 
 void CairoPlugin::copy()
 {
+    if (m_init) {
+        init();
+    }
+
     if (m_need) {
         Cairo::RefPtr < Cairo::Context > ctx = Cairo::Context::create(m_store);
 

@@ -29,6 +29,7 @@
 #include <sigc++/trackable.h>
 #include <gdkmm/window.h>
 #include <gtkmm/widget.h>
+#include <gtkmm/container.h>
 #include <glibmm/thread.h>
 #include <vle/oov/CairoPlugin.hpp>
 
@@ -48,9 +49,8 @@ namespace vle { namespace eov {
          * @brief Default constructor of the eov plugin.
          * @param cairoplugin A reference to the loaded oov::Plugin.
          */
-        Plugin(oov::CairoPluginPtr cairoplugin, NetStreamReader* net) :
-            m_cairoplugin(cairoplugin),
-            m_net(net) {}
+        Plugin(oov::CairoPluginPtr cairoplugin, NetStreamReader* net)
+            : m_cairoplugin(cairoplugin), m_net(net) {}
 
         virtual ~Plugin() {}
 
@@ -71,7 +71,7 @@ namespace vle { namespace eov {
          * @brief Get the widget of the plugin.
          * @return A reference to the main widget, a container for instance.
          */
-        virtual Gtk::Widget& widget() = 0;
+        virtual Gtk::Container& widget() = 0;
 
         /**
          * @brief Return the width of the drawing surface.
@@ -93,6 +93,8 @@ namespace vle { namespace eov {
          */
         void onExposeEvent(GdkEventExpose* event);
 
+        void onConfigureEvent(GdkEventConfigure* event);
+
         /**
          * @brief Send to the CairoPlugin a message to redraw is storage image
          * buffer.
@@ -100,12 +102,21 @@ namespace vle { namespace eov {
         void copy()
         { m_cairoplugin->needCopy(); }
 
+        /**
+         * @brief Send to the CairoPlugin a message to initialize all
+         * CairoSurface.
+         */
+        void init()
+        { m_cairoplugin->needInit(); }
+
     protected:
         oov::CairoPluginPtr                 m_cairoplugin;
         NetStreamReader*                    m_net;
         Glib::RefPtr < Gdk::Pixmap >        m_buffer;
         Glib::RefPtr < Gdk::GC >            m_gc;
         Cairo::RefPtr < Cairo::Context >    m_ctx;
+
+        void buildBuffer(int width, int height);
     };
 
     /**

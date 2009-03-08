@@ -53,6 +53,7 @@ namespace vle { namespace oov {
         CairoPlugin(const std::string& location) :
             Plugin(location),
             m_need(false),
+            m_init(true),
             m_copydone(false)
         {}
 
@@ -121,6 +122,9 @@ namespace vle { namespace oov {
         void needCopy()
         { m_need = true; m_copydone = false; }
 
+        void needInit()
+        { m_init = true; m_copydone = false; }
+
         /**
          * @brief Get the state of the image buffer copy.
          * @return True if the
@@ -163,6 +167,12 @@ namespace vle { namespace oov {
          * ImageSurface into the stored ImageSurface.
          */
         bool m_need;
+
+        /**
+         * @brief A boolean to inform CairoPlugin to re-initialize all the
+         * Cairo::Surface.
+         */
+        bool m_init;
 
         /**
          * @brief A boolean to inform user that a new copy as been build and

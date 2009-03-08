@@ -45,7 +45,7 @@ namespace vle { namespace eov {
 
         virtual Gtk::Widget& drawingWidget();
 
-        virtual Gtk::Widget& widget();
+        virtual Gtk::Container& widget();
 
         virtual int width();
 
@@ -55,8 +55,6 @@ namespace vle { namespace eov {
         Gtk::VBox           m_vbox;
         Gtk::DrawingArea    m_da;
         Gtk::Label          m_label;
-
-        bool on_expose_event(GdkEventExpose* event);
     };
 
 }} // namespace vle eov
