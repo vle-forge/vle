@@ -56,19 +56,22 @@ namespace vle { namespace oov { namespace plugin {
         enum geometry { SQUARE, HEXA };
         enum type { INTEGER, REAL, BOOLEAN };
 
-        class color {
-        public:
+        struct color
+        {
             int r; int g; int b;
-            color(int _r = 0, int _g = 0, int _b = 0):r(_r), g(_g), b(_b) { }
+            color(int _r = 0, int _g = 0, int _b = 0)
+                : r(_r), g(_g), b(_b) {}
         };
 
-        class cairo_color {
-        public:
+        struct cairo_color
+        {
             double r; double g; double b;
-            cairo_color(double _r = 0, double _g = 0, double _b = 0):r(_r), g(_g), b(_b) { }
+            cairo_color(double _r = 0, double _g = 0, double _b = 0)
+                : r(_r), g(_g), b(_b) {}
         };
 
-        typedef std::map < std::string , std::pair < std::string , color > > ObjectList;
+        typedef std::map < std::string,
+                std::pair < std::string , color > > ObjectList;
 
     public:
         CairoCAView(const std::string& location);
@@ -107,6 +110,8 @@ namespace vle { namespace oov { namespace plugin {
         ///
 
         virtual void preferredSize(int& width, int& height);
+
+        virtual void onSize(int width, int height);
 
     private:
         cairo_color build_color(const std::string & p_value);

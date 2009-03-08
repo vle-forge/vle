@@ -299,6 +299,33 @@ void CairoCAView::close(const double& /* time */)
     delete mValues;
 }
 
+void CairoCAView::onSize(int width, int height)
+{
+    if (width > 10 and height > 10) {
+        mWindowWidth = width;
+        mWindowHeight = height;
+
+        mMinX = 0;
+        mMinY = 0;
+        mMaxX = mWindowWidth;
+        mMaxY = mWindowHeight;
+
+        if (mGeometry == SQUARE) {
+            mGeometry = SQUARE;
+            mStepX = (mMaxX - mMinX) / mColumns;
+            mStepY = (mMaxY - mMinY) / mRows;
+        } else {
+            mStepX = (mMaxX - mMinX) / (mColumns+1);
+            mStepX2 = (int)(mStepX * 0.5);
+            mStepY = (int)((mMaxY - mMinY) / (mRows * 0.7));
+            mStepY3 = (int)(mStepY * 0.3);
+            mStepY7 = (int)(mStepY * 0.7);
+        }
+        mMaxX = mStepX * mColumns;
+        mMaxY = mStepY * mRows;
+    }
+}
+
 void CairoCAView::preferredSize(int& width, int& height)
 {
     width = mWindowWidth;
