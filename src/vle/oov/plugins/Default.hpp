@@ -68,7 +68,8 @@ namespace vle { namespace oov { namespace plugin {
         virtual void close(const double& time);
 
     private:
-        std::ofstream                   m_file;
+        std::ofstream   m_file;
+        std::string     m_filename;
     };
 
 

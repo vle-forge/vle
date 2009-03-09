@@ -32,15 +32,11 @@ namespace vle { namespace oov { namespace plugin {
 Default::Default(const std::string& location) :
     Plugin(location)
 {
-    m_file.open(location.c_str());
-    if (not m_file.is_open()) {
-        Throw(utils::InternalError, (boost::format(
-                    "Cannot open file '%1%'") % location));
-    }
 }
 
 Default::~Default()
 {
+    m_file.close();
 }
 
 void Default::onParameter(const std::string& plugin,
@@ -49,6 +45,13 @@ void Default::onParameter(const std::string& plugin,
                          const std::string& parameters,
                          const double& time)
 {
+    m_filename = Glib::build_filename(location, file);
+    m_file.open(m_filename.c_str());
+
+    Assert(utils::ModellingError, m_file.is_open(),
+           boost::format(
+            "SimpleFile: cannot open file '%1%'") % m_filename);
+
     m_file << time << ": parameter "
         << " plugin: " << plugin
         << " location: " << location
@@ -99,7 +102,7 @@ void Default::onValue(const std::string& simulator,
         << " view: " << view;
 
     if (value) {
-        m_file << " = " << value;
+        m_file << "value = " << value->writeToXml();
         delete value;
     }
 
@@ -109,7 +112,7 @@ void Default::onValue(const std::string& simulator,
 void Default::close(const double& time)
 {
     m_file << time << ": end" << "\n";
-    m_file.flush();
+    m_file.close();
 }
 
 }}} // namespace vle oov plugin
