@@ -27,6 +27,7 @@
 #include <vle/utils/Debug.hpp>
 #include <vle/value/String.hpp>
 #include <vle/value/Double.hpp>
+#include <iostream>
 
 namespace vle { namespace oov { namespace plugin {
 
@@ -83,6 +84,7 @@ void SimpleFile::onNewObservable(const std::string& simulator,
 
     m_columns[name] = m_buffer.size();
     m_buffer.push_back((value::Value*)0);
+    m_valid.push_back(false);
 }
 
 void SimpleFile::onDelObservable(const std::string& /* simulator */,
@@ -119,6 +121,7 @@ void SimpleFile::onValue(const std::string& simulator,
             name);
 
     m_buffer[it->second] = value;
+    m_valid[it->second] = true;
 }
 
 void SimpleFile::close(const double& time)
@@ -158,39 +161,36 @@ void SimpleFile::close(const double& time)
 void SimpleFile::flush(double trame_time)
 {
     if (trame_time != m_time) {
-        m_file << m_time;
-        writeSeparator(m_file);
+        if (std::find(m_valid.begin(), m_valid.end(), true) != m_valid.end()) {
+            m_file << m_time;
+            writeSeparator(m_file);
 
-        for (Line::iterator it = m_buffer.begin(); it != m_buffer.end(); ++it) {
-            if (*it) {
-                (*it)->writeFile(m_file);
-            } else {
-                m_file << "NA";
-            }
+            const size_t nb(m_buffer.size());
+            for (size_t i = 0; i < nb; ++i) {
+                if (m_buffer[i]) {
+                    m_buffer[i]->writeFile(m_file);
+                } else {
+                    m_file << "NA";
+                }
 
-            if (it + 1 != m_buffer.end()) {
-                writeSeparator(m_file);
+                if (i + 1 < nb) {
+                    writeSeparator(m_file);
+                }
+                delete m_buffer[i];
+                m_buffer[i] = 0;
+                m_valid[i] = false;
             }
-            delete *it;
-            *it = 0;
+            m_file << '\n' << std::flush;
         }
-        m_file << '\n' << std::flush;
-        m_time = trame_time;
     }
+    m_time = trame_time;
 }
 
 void SimpleFile::finalFlush(double trame_time)
 {
     flush(trame_time);
-    bool empty = true;
 
-    Line::iterator it = m_buffer.begin();
-    while (empty and it != m_buffer.end()) {
-        empty = not (*it);
-        ++it;
-    }
-
-    if (not empty) {
+    if (std::find(m_valid.begin(), m_valid.end(), true) != m_valid.end()) {
         m_file << trame_time;
         writeSeparator(m_file);
         for (Line::iterator it = m_buffer.begin(); it != m_buffer.end(); ++it) {

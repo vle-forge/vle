@@ -90,8 +90,12 @@ namespace vle { namespace oov { namespace plugin {
         /** Define the buffer of values. */
         typedef std::vector < value::Value* > Line;
 
+        /** Define the buffer for valid values (model observed). */
+        typedef std::vector < bool > ValidElement;
+
         Columns         m_columns;
         Line            m_buffer;
+        ValidElement    m_valid;
         double          m_time;
         std::ofstream   m_file;
         std::string     m_filename;
