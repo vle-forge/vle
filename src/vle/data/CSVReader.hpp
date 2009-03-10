@@ -59,7 +59,8 @@ namespace vle { namespace data {
          *  Excepted from 'The Practice of Programming'
          *  by Brian W. Kernighan and Rob Pike
          */
-        class Csv {
+        class Csv
+        {
         public:
             Csv(std::ifstream& fin, std::string sep):fin(fin),fieldsep(sep) { }
 
@@ -83,7 +84,8 @@ namespace vle { namespace data {
             friend class CSVReader;
         };
 
-        class CSVReaderMap {
+        class CSVReaderMap
+        {
         public:
             CSVReaderMap() { }
             virtual ~CSVReaderMap();
