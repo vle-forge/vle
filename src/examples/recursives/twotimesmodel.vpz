@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://vle.univ-littoral.fr/vle-0.7.0.dtd">
+<vle_project version="0.7" date="" author="Gauthier Quesnel">
+ <structures>
+  <model name="0" type="atomic" dynamics="dyn" />
+ </structures>
+ <dynamics>
+  <dynamic name="dyn" model="twotimesmodel" library="recursives"/>
+ </dynamics>
+ <experiment name="twotimesmodel" duration="1" seed="123456789"/>
+</vle_project>
