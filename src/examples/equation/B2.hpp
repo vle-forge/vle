@@ -34,7 +34,7 @@ namespace vle { namespace examples { namespace equation {
     {
         Var b;
         Sync a;
-        NoSync c;
+        Nosync c;
 
     public:
         B2(const graph::AtomicModel& model,

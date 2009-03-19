@@ -150,18 +150,18 @@ namespace vle { namespace extension { namespace DifferenceEquation {
          * @brief nosync The class nosync represents a asynchronous
          * external variable
          */
-        class NoSync : public Ext
+        class Nosync : public Ext
         {
         public:
             /**
              * @brief Default constructor
              */
-            NoSync() {}
+            Nosync() {}
 
-            virtual ~NoSync() {}
+            virtual ~Nosync() {}
 
         private:
-            NoSync(std::string name, Base* equation) :
+            Nosync(std::string name, Base* equation) :
                 Ext(name, equation)
             {
                 equation->depends(name, false);
@@ -192,9 +192,9 @@ namespace vle { namespace extension { namespace DifferenceEquation {
          * @param name the name of the external variable
          * @return the asynchronous external variable
          */
-        inline NoSync createNosync(const std::string& name)
+        inline Nosync createNosync(const std::string& name)
         {
-            return Base::NoSync(name, this);
+            return Base::Nosync(name, this);
         }
 
         /**

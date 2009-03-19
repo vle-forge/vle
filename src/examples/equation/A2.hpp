@@ -33,7 +33,7 @@ namespace vle { namespace examples { namespace equation {
     class A2 : public extension::DifferenceEquation::Simple
     {
         Var a;
-        NoSync b;
+        Nosync b;
 
     public:
         A2(const graph::AtomicModel& model,
