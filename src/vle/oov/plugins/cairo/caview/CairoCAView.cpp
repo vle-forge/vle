@@ -297,6 +297,7 @@ void CairoCAView::onValue(const std::string& simulator,
 void CairoCAView::close(const double& /* time */)
 {
     delete mValues;
+    mValues = 0;
 }
 
 void CairoCAView::onSize(int width, int height)
