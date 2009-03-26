@@ -72,6 +72,15 @@ void NetStreamReader::onParameter(const std::string& pluginname,
         pluginname);
 
     runWindow();
+
+    {
+        Glib::Mutex::Lock lock(m_mutex);
+        oov::CairoPluginPtr cr = oov::toCairoPlugin(poov);
+        int width, height;
+        cr->preferredSize(width, height);
+        m_main.resize(width, height);
+    }
+
     m_newpluginname = pluginname;
 }
 
