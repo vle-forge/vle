@@ -35,7 +35,7 @@ SET(CPACK_PACKAGE_INSTALL_DIRECTORY ${VLE_NAME_COMPLETE})
 SET(CPACK_PACKAGE_EXECUTABLES "vle" "VLE" "oov" "OOV" "eov" "EOV" "gvle" "GVLE")
 
 # CPack source configuration
-SET(CPACK_SOURCE_PACKAGE_FILE_NAME ${VLE_NAME_COMPLETE}-sources)
+SET(CPACK_SOURCE_PACKAGE_FILE_NAME ${VLE_NAME_COMPLETE})
 SET(CPACK_SOURCE_IGNORE_FILES "\\\\.swp$;/\\\\.gitignore;/build/;/\\\\.git/")
 
 # CPack DEB configuration
