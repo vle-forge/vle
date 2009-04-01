@@ -62,6 +62,12 @@ namespace vle { namespace gvle {
          */
         void onRemoveViews();
 
+	/**
+	 * @brief Call when user want to rename a vpz::View.
+	 */
+	void onRenameViews();
+
+
     private:
         /** a reference to the origin vpz::Views, filled when user modify and
          * valid the ViewOutputBox.

@@ -151,6 +151,10 @@ void ViewOutputBox::initMenuPopupViews()
         Gtk::Menu_Helpers::MenuElem(
             "_Remove", sigc::mem_fun(
                 *this, &ViewOutputBox::onRemoveViews)));
+    menulist.push_back(
+	Gtk::Menu_Helpers::MenuElem(
+            "_Rename", sigc::mem_fun(
+                *this, &ViewOutputBox::onRenameViews)));
 
     m_menu.accelerate(*m_views);
 }
@@ -197,6 +201,27 @@ void ViewOutputBox::onRemoveViews()
         }
     }
 }
+
+void ViewOutputBox::onRenameViews()
+{
+    storePrevious();
+
+    Glib::RefPtr < Gtk::TreeView::Selection > ref = m_views->get_selection();
+    if (ref) {
+        Gtk::TreeModel::iterator iter = ref->get_selected();
+        if (iter) {
+            Gtk::TreeModel::Row row = *iter;
+            std::string oldname(row.get_value(m_viewscolumnrecord.name));
+	    SimpleTypeBox box("Name of the view ?");
+	    std::string newname = boost::trim_copy(box.run());
+	    if (box.valid() and not newname.empty() and not m_viewscopy.exist(newname)) {
+		row[m_viewscolumnrecord.name] = newname;
+		m_viewscopy.renameView(oldname, newname);
+	    }
+	}
+    }
+}
+
 
 void ViewOutputBox::sensitive(bool active)
 {

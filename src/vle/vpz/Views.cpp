@@ -191,6 +191,17 @@ void Views::renameOutput(const std::string& oldname,
     }
 }
 
+void Views::renameView(const std::string& oldname,
+		       const std::string& newname)
+{
+    vpz::View v = get(oldname);
+    v.setName(newname);
+    add(v);
+    del(oldname);
+}
+
+
+
 bool Views::isUsedOutput(const std::string& name) const
 {
     ViewList::const_iterator it(std::find_if(begin(), end(), UseOutput(name)));

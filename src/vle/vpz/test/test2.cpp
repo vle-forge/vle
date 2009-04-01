@@ -40,6 +40,7 @@
 #include <vle/value/Double.hpp>
 #include <limits>
 #include <fstream>
+#include <iostream>
 
 struct F
 {
@@ -422,6 +423,16 @@ BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
         BOOST_REQUIRE(ob.exist("x4"));
         BOOST_REQUIRE(ob.exist("x5"));
         BOOST_REQUIRE(ob.exist("x6"));
+    }
+
+    {
+	vpz::Views views(experiment.views());
+	BOOST_REQUIRE_NO_THROW(views.renameView(std::string("x"), std::string("y")));
+	const vpz::View& view(views.viewlist().begin()->second);
+	BOOST_REQUIRE_EQUAL(view.name(), "y");
+	BOOST_REQUIRE_EQUAL(view.streamtype(), "timed");
+	BOOST_REQUIRE_EQUAL(view.timestep(), .05);
+	BOOST_REQUIRE_EQUAL(view.output(), "x");
     }
 }
 

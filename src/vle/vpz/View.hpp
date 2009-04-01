@@ -103,6 +103,13 @@ namespace vle { namespace vpz {
         { return m_name; }
 
         /**
+          * @brief Set a new name for this View.
+	  * @param name The new name for this View.
+	  */
+	inline void setName(std::string name)
+        { m_name = name; }
+
+        /**
          * @brief Get the type of this View.
          * @return The type, TIMED, FINISH or EVENT.
          */

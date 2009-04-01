@@ -251,6 +251,16 @@ namespace vle { namespace vpz {
         void renameOutput(const std::string& oldname,
                           const std::string& newname);
 
+	/**
+	 * @brief Rename a specified vpz::View oldname with the newname
+	 * parameter.
+	 * @param oldname The old name of the vpz::View
+	 * @param newname The new name of the vpz::View
+	 */
+	void renameView(const std::string& oldname,
+			const std::string& newname);
+
+
         /**
          * @brief Check if a View of the ViewList use the specific output.
          * @param name The name of the Output to check.
