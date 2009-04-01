@@ -194,7 +194,7 @@ namespace vle { namespace vpz {
          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
         /**
-         * @brief Build al ist of string that contains all port names.
+         * @brief Build a list of string that contains all port names.
          * @param lst An output string list.
          */
         void portnames(std::list < std::string >& lst) const;
@@ -210,6 +210,13 @@ namespace vle { namespace vpz {
          * @param portname name of the port.
          */
         void del(const std::string& portname);
+
+	/**
+	  * @brief Rename a port of the value list.
+	  * @param old_name name of the port to rename
+	  * @param new_name new name of the specified port
+	  */
+	void rename(const std::string& oldportname, const std::string& newportname);
 
         /**
          * @brief Add a value to a specified port. If port does not exist, it
@@ -322,6 +329,14 @@ namespace vle { namespace vpz {
          */
         inline const std::string& name() const
         { return m_name; }
+
+	/**
+	 * @brief Set a new name to this condition.
+	 * @param new_name The new name for this condition.
+	 * @return
+	 */
+	inline void setName(const std::string& new_name)
+	{ m_name.assign(new_name); }
 
         /**
          * @brief Return true if this condition is a permanent data for the

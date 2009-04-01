@@ -132,6 +132,18 @@ void Condition::del(const std::string& portname)
     m_list.erase(portname);
 }
 
+void Condition::rename(const std::string& oldportname, const std::string& newportname)
+{
+	value::Set values = getSetValues(oldportname);
+	value::Set::const_iterator it;
+	add(newportname);
+	for (it = values.begin(); it != values.end(); ++it) {
+		value::Value *v = *it;
+		addValueToPort(newportname, *v);
+	}
+	del(oldportname);
+}
+
 void Condition::addValueToPort(const std::string& portname,
                                value::Value* value)
 {

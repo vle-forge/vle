@@ -133,6 +133,13 @@ namespace vle { namespace vpz {
          */
         void del(const std::string& condition);
 
+	/**
+	  * @brief Rename the specified condition.
+	  * @param old_name The current condition name
+	  * @param new_name The new name for the condition
+	  */
+	void rename(const std::string& oldconditionname, const std::string& newconditinname);
+
         /**
          * @brief Clear the ConditionList object.
          */

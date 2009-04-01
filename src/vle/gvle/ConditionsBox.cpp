@@ -63,6 +63,12 @@ ConditionsBox::ConditionsTreeView::ConditionsTreeView(
 		sigc::mem_fun(
 		    *this,
 		    &ConditionsBox::ConditionsTreeView::on_remove)));
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		"_Rename",
+		sigc::mem_fun(
+		    *this,
+		    &ConditionsBox::ConditionsTreeView::onRename)));
     }
     mMenuPopup.accelerate(*this);
 }
@@ -138,6 +144,24 @@ void ConditionsBox::ConditionsTreeView::on_remove()
     }
 }
 
+void ConditionsBox::ConditionsTreeView::onRename()
+{
+    Gtk::TreeModel::iterator it = mRefTreeSelection->get_selected();
+
+    if (it) {
+        Glib::ustring oldname = (*it)[mColumns.m_col_name];
+        SimpleTypeBox box("New name of the condition ?");
+        std::string newname = boost::trim_copy(box.run());
+	vpz::ConditionList& list = mConditions->conditionlist();
+
+	if(box.valid() and not newname.empty() and list.find(newname) == list.end()) {
+	    mConditions->rename(oldname, newname);
+	    mParent->buildTreeConditions();
+	}
+    }
+}
+
+
 ////
 //  PortsTreeView
 ////
@@ -172,6 +196,12 @@ ConditionsBox::PortsTreeView::PortsTreeView(
 		sigc::mem_fun(
 		    *this,
 		    &ConditionsBox::PortsTreeView::on_remove)));
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		"_Rename",
+		sigc::mem_fun(
+		    *this,
+		    &ConditionsBox::PortsTreeView::onRename)));
     }
     mMenuPopup.accelerate(*this);
 }
@@ -241,8 +271,8 @@ void ConditionsBox::PortsTreeView::on_add()
 	std::find(list.begin(), list.end(), name);
 
     if (box.valid() and not name.empty() and it == list.end()) {
-	mCondition->add(name);
-	mParent->buildTreePorts(mCondition->name());
+        mCondition->add(name);
+        mParent->buildTreePorts(mCondition->name());
     }
 }
 
@@ -252,9 +282,26 @@ void ConditionsBox::PortsTreeView::on_remove()
 
     if (it) {
         Glib::ustring name = (*it)[mColumns.m_col_name];
+        mCondition->del(name);
+        mParent->buildTreePorts(mCondition->name());
+    }
+}
 
-	mCondition->del(name);
-	mParent->buildTreePorts(mCondition->name());
+void ConditionsBox::PortsTreeView::onRename()
+{
+    Gtk::TreeModel::iterator it_select = mRefTreeSelection->get_selected();
+    std::list < std::string > list;
+    mCondition->portnames(list);
+    if (it_select) {
+        SimpleTypeBox box("Name of the condition ?");
+        std::string newname = boost::trim_copy(box.run());
+        std::list < std::string >::const_iterator it_find =
+            std::find(list.begin(), list.end(), newname);
+        if (it_find == list.end()){
+            Glib::ustring oldname = (*it_select)[mColumns.m_col_name];
+            mCondition->rename(oldname, newname);
+            mParent->buildTreePorts(mCondition->name());
+        }
     }
 }
 

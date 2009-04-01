@@ -292,6 +292,28 @@ BOOST_AUTO_TEST_CASE(experiment_vpz)
         const value::Integer& integer = value::toIntegerValue(set.get(1));
         BOOST_REQUIRE_EQUAL(integer.intValue(), -2);
     }
+
+    {
+	const std::string oldcond("cond1");
+	const std::string newcond("new_cond1");
+	vpz::Conditions cnds = (project.experiment().conditions());
+        BOOST_REQUIRE_NO_THROW(cnds.rename(oldcond, newcond));
+	{
+	    vpz::Condition cnd1(cnds.get(newcond));
+	    const std::string oldport("init1");
+	    const std::string newport("new_init1");
+	    BOOST_REQUIRE_NO_THROW(cnd1.rename(oldport, newport));
+	    {
+		const value::Set& set(cnd1.getSetValues(newport));
+		const value::Double& real(value::toDoubleValue(set.get(0)));
+		BOOST_REQUIRE_EQUAL(real.value(), 123.);
+		const value::Integer& integer(value::toIntegerValue(set.get(1)));
+		BOOST_REQUIRE_EQUAL(integer.intValue(), 1);
+	    }
+
+	}
+
+    }
 }
 
 BOOST_AUTO_TEST_CASE(experiment_measures_vpz)

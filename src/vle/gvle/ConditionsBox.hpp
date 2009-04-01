@@ -73,6 +73,7 @@ private:
 	//Signal handler for popup menu items:
 	virtual void on_add();
 	virtual void on_remove();
+	virtual void onRename();
 
     private:
 	ConditionsBox* mParent;
@@ -120,6 +121,7 @@ private:
 	//Signal handler for popup menu items:
 	virtual void on_add();
 	virtual void on_remove();
+	virtual void onRename();
 
     private:
 	ConditionsBox* mParent;

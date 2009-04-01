@@ -79,6 +79,18 @@ void Conditions::del(const std::string& condition)
     m_list.erase(condition);
 }
 
+void Conditions::rename(const std::string& oldconditionname, const std::string& newconditionname)
+{
+    /* Make a copy the oldconditionname condition and rename it with newconditionname.
+     * Add this new copy in the map
+     * Then delete the old Condition
+     */
+    Condition c = get(oldconditionname);
+    c.setName(newconditionname);
+    add(c);
+    del(oldconditionname);
+}
+
 const Condition& Conditions::get(const std::string& condition) const
 {
     const_iterator it = m_list.find(condition);
