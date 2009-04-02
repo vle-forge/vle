@@ -52,13 +52,19 @@ AtomicModelBox::InputPortTreeView::InputPortTreeView(
 		"_Add",
 		sigc::mem_fun(
 		    *this,
-		    &AtomicModelBox::InputPortTreeView::on_add)));
+		    &AtomicModelBox::InputPortTreeView::onAdd)));
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
 		"_Remove",
 		sigc::mem_fun(
 		    *this,
-		    &AtomicModelBox::InputPortTreeView::on_remove)));
+		    &AtomicModelBox::InputPortTreeView::onRemove)));
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		"_Rename",
+		sigc::mem_fun(
+		    *this,
+		    &AtomicModelBox::InputPortTreeView::onRename)));
     }
     mMenuPopup.accelerate(*this);
 }
@@ -100,7 +106,7 @@ void AtomicModelBox::InputPortTreeView::build()
     }
 }
 
-void AtomicModelBox::InputPortTreeView::on_add()
+void AtomicModelBox::InputPortTreeView::onAdd()
 {
     SimpleTypeBox box("Name of the Input port ?");
     graph::ConnectionList& list = mModel->getInputPortList();
@@ -112,7 +118,7 @@ void AtomicModelBox::InputPortTreeView::on_add()
     }
 }
 
-void AtomicModelBox::InputPortTreeView::on_remove()
+void AtomicModelBox::InputPortTreeView::onRemove()
 {
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
 
@@ -128,6 +134,31 @@ void AtomicModelBox::InputPortTreeView::on_remove()
             }
             build();
         }
+    }
+}
+
+void AtomicModelBox::InputPortTreeView::onRename()
+{
+    SimpleTypeBox box("New name of the input port ?");
+    graph::ConnectionList& list = mModel->getInputPortList();
+    Glib::ustring new_name = boost::trim_copy(box.run());
+
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+
+    if (refSelection and box.valid() and not new_name.empty()
+	and list.find(new_name) == list.end()) {
+        Gtk::TreeModel::iterator iter = refSelection->get_selected();
+
+	if (iter) {
+            Gtk::TreeModel::Row row = *iter;
+	    std::string old_name = row.get_value(mColumnsInputPort.m_col_name);
+	    row.set_value(mColumnsInputPort.m_col_name, new_name);
+
+	    if (mModel->existInputPort(old_name)) {
+	        mModel->renameInputPort(old_name, new_name);
+	    }
+	    build();
+	}
     }
 }
 
@@ -151,13 +182,19 @@ AtomicModelBox::OutputPortTreeView::OutputPortTreeView(
 		"_Add",
 		sigc::mem_fun(
 		    *this,
-		    &AtomicModelBox::OutputPortTreeView::on_add)));
+		    &AtomicModelBox::OutputPortTreeView::onAdd)));
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
 		"_Remove",
 		sigc::mem_fun(
 		    *this,
-		    &AtomicModelBox::OutputPortTreeView::on_remove)));
+		    &AtomicModelBox::OutputPortTreeView::onRemove)));
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		"_Rename",
+		sigc::mem_fun(
+		    *this,
+		    &AtomicModelBox::OutputPortTreeView::onRename)));
     }
     mMenuPopup.accelerate(*this);
 }
@@ -199,7 +236,7 @@ void AtomicModelBox::OutputPortTreeView::build()
     }
 }
 
-void AtomicModelBox::OutputPortTreeView::on_add()
+void AtomicModelBox::OutputPortTreeView::onAdd()
 {
     SimpleTypeBox box("Name of the output port ?");
     graph::ConnectionList& list = mModel->getOutputPortList();
@@ -211,7 +248,7 @@ void AtomicModelBox::OutputPortTreeView::on_add()
     }
 }
 
-void AtomicModelBox::OutputPortTreeView::on_remove()
+void AtomicModelBox::OutputPortTreeView::onRemove()
 {
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
 
@@ -227,6 +264,31 @@ void AtomicModelBox::OutputPortTreeView::on_remove()
             }
             build();
         }
+    }
+}
+
+void AtomicModelBox::OutputPortTreeView::onRename()
+{
+    SimpleTypeBox box("New name of the output port ?");
+    graph::ConnectionList& list = mModel->getOutputPortList();
+    Glib::ustring new_name = boost::trim_copy(box.run());
+
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+
+    if (refSelection and box.valid() and not new_name.empty()
+	and list.find(new_name) == list.end()) {
+        Gtk::TreeModel::iterator iter = refSelection->get_selected();
+
+	if (iter) {
+            Gtk::TreeModel::Row row = *iter;
+	    std::string old_name = row.get_value(mColumnsOutputPort.m_col_name);
+	    row.set_value(mColumnsOutputPort.m_col_name, new_name);
+
+	    if (mModel->existOutputPort(old_name)) {
+	        mModel->renameOutputPort(old_name, new_name);
+	    }
+	    build();
+	}
     }
 }
 
@@ -731,23 +793,25 @@ void AtomicModelBox::on_cancel()
             ++it_connect_out) {
         mGraph_atom->delOutputPort(it_connect_out->first);
     }
-    for (graph::ConnectionList::iterator it_out_connec =mConnection_out_backup->begin();
+    for (graph::ConnectionList::iterator it_out_connec = mConnection_out_backup->begin();
             it_out_connec != mConnection_out_backup->end();
             ++it_out_connec) {
         mGraph_atom->addOutputPort(it_out_connec->first);
     }
 
     //Input Ports
-    for (graph::ConnectionList::iterator it_in_connec =mConnection_in_backup->begin();
+    for (graph::ConnectionList::iterator it_in_connec = mConnection_in_backup->begin();
             it_in_connec != mConnection_in_backup->end();
             ++it_in_connec) {
         graph::ModelPortList& in_port_list = it_in_connec->second;
         graph::ModelPortList::iterator it_port_list = in_port_list.begin();
         while (it_port_list != in_port_list.end()) {
             if (it_port_list->first == parent) {
-                parent->addInputConnection(it_port_list->second, mGraph_atom, it_in_connec->first);
+                parent->addInputConnection(it_port_list->second, mGraph_atom,
+					   it_in_connec->first);
             } else {
-                parent->addInternalConnection(it_port_list->first, it_port_list->second,
+                parent->addInternalConnection(it_port_list->first,
+					      it_port_list->second,
                                               mGraph_atom, it_in_connec->first);
             }
 
@@ -756,14 +820,15 @@ void AtomicModelBox::on_cancel()
     }
 
     //Output Ports
-    for (graph::ConnectionList::iterator it_out_connec =mConnection_out_backup->begin();
+    for (graph::ConnectionList::iterator it_out_connec = mConnection_out_backup->begin();
             it_out_connec != mConnection_out_backup->end();
             ++it_out_connec) {
         graph::ModelPortList& out_port_list = it_out_connec->second;
         graph::ModelPortList::iterator it_port_list = out_port_list.begin();
         while (it_port_list != out_port_list.end()) {
             if (it_port_list->first == parent) {
-                parent->addOutputConnection(mGraph_atom, it_out_connec->first, it_port_list->second);
+                parent->addOutputConnection(mGraph_atom, it_out_connec->first,
+					    it_port_list->second);
             } else {
                 parent->addInternalConnection(mGraph_atom, it_out_connec->first,
                                               it_port_list->first, it_port_list->second);

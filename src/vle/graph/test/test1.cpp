@@ -418,3 +418,39 @@ BOOST_AUTO_TEST_CASE(test_get_port_index)
     utils::Trace::kill();
     utils::Path::kill();
 }
+
+BOOST_AUTO_TEST_CASE(test_rename_port)
+{
+    vpz::Vpz file(utils::Path::buildPrefixSharePath(
+		      utils::Path::path().getPrefixDir(),
+		      "examples", "unittest.vpz"));
+
+    CoupledModel* top =
+        dynamic_cast<CoupledModel*>(file.project().model().model());
+    BOOST_REQUIRE(top);
+    BOOST_REQUIRE_EQUAL(top->existInternalConnection("top1", "out", "top2",
+                                                     "in"), true);
+
+    //Atomic Model
+    AtomicModel* d = dynamic_cast<AtomicModel*>(top->findModel("d"));
+    BOOST_REQUIRE(d);
+    BOOST_REQUIRE_EQUAL(d->existInputPort("in"), true);
+    BOOST_REQUIRE_EQUAL(d->existOutputPort("out"), true);
+    BOOST_REQUIRE_EQUAL(top->existInternalConnection("top1", "out", "d",
+                                                     "in"), true);
+
+    //Atomic Model -- Input Port
+    d->renameInputPort("in", "new_in");
+    BOOST_REQUIRE_EQUAL(d->existInputPort("in"), false);
+    BOOST_REQUIRE_EQUAL(top->existInternalConnection("top1", "out", "d",
+                                                     "in"), false);
+    BOOST_REQUIRE_EQUAL(d->existInputPort("new_in"), true);
+    BOOST_REQUIRE_EQUAL(top->existInternalConnection("top1", "out", "d",
+						     "new_in"), true);
+
+    //Atomic Model -- Output Port
+    d->renameOutputPort("out", "new_out");
+    BOOST_REQUIRE_EQUAL(d->existOutputPort("out"), false);
+    BOOST_REQUIRE_EQUAL(d->existOutputPort("new_out"), true);
+}
+

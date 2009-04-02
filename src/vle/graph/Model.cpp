@@ -300,6 +300,83 @@ void Model::delOutputPort(const std::string & name)
     m_outPortList.erase(name);
 }
 
+void Model::addInPort(ModelPortList&  model, const std::string& name)
+{
+    for (ModelPortList::iterator it = model.begin(); it != model.end(); ++it) {
+	if (it->first != m_parent) {
+	    it->first->getOutPort(it->second).add(this, name);
+	} else {
+	    m_parent->getInternalInPort(it->second).add(this, name);
+	}
+    }
+}
+
+void Model::addOutPort(ModelPortList&  model, const std::string& name)
+{
+    for (ModelPortList::iterator it = model.begin(); it != model.end(); ++it) {
+	if (it->first != m_parent) {
+	    it->first->getInPort(it->second).add(this, name);
+	} else {
+	    m_parent->getInternalOutPort(it->second).add(this, name);
+	}
+    }
+}
+
+ModelPortList& Model::renameInputPort(const std::string& old_name,
+				      const std::string& new_name)
+{
+    ConnectionList::iterator iter = getInputPortList().find(old_name);
+    ModelPortList connect(iter->second);
+
+    if (isCoupled()) {
+	CoupledModel* tmp(toCoupled(this));
+	ModelPortList internalConnect(tmp->getInternalInPort(old_name));
+    }
+
+    delInputPort(old_name);
+
+    ConnectionList::iterator it(m_inPortList.find(new_name));
+    if (it == m_inPortList.end()) {
+	if (isCoupled()) {
+	    CoupledModel* cpl = static_cast < CoupledModel* >(this);
+	    cpl->getInternalInputPortList().insert(
+		std::make_pair < std::string, ModelPortList >(
+		    new_name, connect));
+	}
+	addInPort(connect, new_name);
+	return (*m_inPortList.insert(
+		    std::make_pair < std::string, ModelPortList >(
+			new_name, connect)).first).second;
+    } else {
+	return it->second;
+    }
+}
+
+ModelPortList& Model::renameOutputPort(const std::string& old_name,
+				       const std::string& new_name)
+{
+    ConnectionList::iterator iter = getOutputPortList().find(old_name);
+    ModelPortList connect(iter->second);
+
+    delOutputPort(old_name);
+
+    ConnectionList::iterator it(m_outPortList.find(new_name));
+    if (it == m_outPortList.end()) {
+	if (isCoupled()) {
+	    CoupledModel* cpl = static_cast < CoupledModel* >(this);
+	    cpl->getInternalOutputPortList().insert(
+		std::make_pair < std::string, ModelPortList >(
+		    new_name, connect));
+	}
+	addOutPort(connect, new_name);
+	return (*m_outPortList.insert(
+		    std::make_pair < std::string, ModelPortList >(
+			new_name, connect)).first).second;
+    } else {
+	return it->second;
+    }
+}
+
 void Model::addInputPort(const std::list < std::string > & lst)
 {
     std::for_each(lst.begin(), lst.end(), AddInputPort(*this));

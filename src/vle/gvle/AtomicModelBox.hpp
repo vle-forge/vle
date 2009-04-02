@@ -105,8 +105,9 @@ private:
 	virtual bool on_button_press_event(GdkEventButton *ev);
 
 	//Signal handler for popup menu items:
-	virtual void on_add();
-	virtual void on_remove();
+	virtual void onAdd();
+	virtual void onRemove();
+	virtual void onRename();
 
     private:
 	graph::AtomicModel* mModel;
@@ -132,8 +133,9 @@ private:
 	virtual bool on_button_press_event(GdkEventButton *ev);
 
 	//Signal handler for popup menu items:
-	virtual void on_add();
-	virtual void on_remove();
+	virtual void onAdd();
+	virtual void onRemove();
+	virtual void onRename();
 
     private:
 	graph::AtomicModel* mModel;
