@@ -26,6 +26,7 @@
 #include <vle/gvle/ConditionsBox.hpp>
 #include <vle/gvle/SimpleTypeBox.hpp>
 #include <vle/gvle/Modeling.hpp>
+#include <vle/vpz/AtomicModels.hpp>
 
 namespace vle { namespace gvle {
 
@@ -154,9 +155,14 @@ void ConditionsBox::ConditionsTreeView::onRename()
         std::string newname = boost::trim_copy(box.run());
 	vpz::ConditionList& list = mConditions->conditionlist();
 
-	if(box.valid() and not newname.empty() and list.find(newname) == list.end()) {
+	if (box.valid() and not newname.empty()
+	   and list.find(newname) == list.end()) {
 	    mConditions->rename(oldname, newname);
 	    mParent->buildTreeConditions();
+
+	    vpz::AtomicModelList& atomlist(
+		mParent->getModeling()->vpz().project().model().atomicModels());
+	    atomlist.updateCondition(oldname, newname);
 	}
     }
 }

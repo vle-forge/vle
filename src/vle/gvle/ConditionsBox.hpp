@@ -148,6 +148,10 @@ public:
 
     void show();
 
+    inline Modeling* getModeling()
+    { return mModeling; }
+
+
 private:
     Modeling*           mModeling;
     vpz::Conditions*    mConditions;

@@ -48,6 +48,53 @@ BOOST_GLOBAL_FIXTURE(F)
 
 using namespace vle;
 
+void check_project_unittest_vpz(vpz::Project& project)
+{
+    vpz::AtomicModelList &lst = project.model().atomicModels();
+    vpz::Conditions& cnds = project.experiment().conditions();
+
+    BOOST_REQUIRE_NO_THROW(
+	cnds.rename(std::string("ca"), std::string("new_ca")));
+    BOOST_REQUIRE_NO_THROW(
+	cnds.rename(std::string("cb"), std::string("new_cb")));
+    BOOST_REQUIRE_NO_THROW(
+	cnds.rename(std::string("cc"), std::string("new_cc")));
+    BOOST_REQUIRE_NO_THROW(
+	cnds.rename(std::string("cd"), std::string("new_cd")));
+
+    BOOST_REQUIRE(project.experiment().conditions().exist("new_ca"));
+    BOOST_REQUIRE(project.experiment().conditions().exist("new_cb"));
+    BOOST_REQUIRE(project.experiment().conditions().exist("new_cc"));
+    BOOST_REQUIRE(project.experiment().conditions().exist("new_cd"));
+
+    BOOST_CHECK(not project.experiment().conditions().exist("ca"));
+    BOOST_CHECK(not project.experiment().conditions().exist("cb"));
+    BOOST_CHECK(not project.experiment().conditions().exist("cc"));
+    BOOST_CHECK(not project.experiment().conditions().exist("cd"));
+
+    BOOST_REQUIRE_NO_THROW(
+	lst.updateCondition(std::string("ca"), std::string("new_ca")));
+    BOOST_REQUIRE_NO_THROW(
+	lst.updateCondition(std::string("cb"), std::string("new_cb")));
+    BOOST_REQUIRE_NO_THROW(
+	lst.updateCondition(std::string("cc"), std::string("new_cc")));
+    BOOST_REQUIRE_NO_THROW(
+	lst.updateCondition(std::string("cd"), std::string("new_cd")));
+
+    BOOST_REQUIRE_THROW(
+	lst.updateCondition(std::string("ca"), std::string("new_cd")),
+	utils::ArgError);
+    BOOST_REQUIRE_THROW(
+	lst.updateCondition(std::string("ca"), std::string("new_cd")),
+	utils::ArgError);
+    BOOST_REQUIRE_THROW(
+	lst.updateCondition(std::string("ca"), std::string("new_cd")),
+	utils::ArgError);
+    BOOST_REQUIRE_THROW(
+	lst.updateCondition(std::string("ca"), std::string("new_cd")),
+	utils::ArgError);
+}
+
 void check_model_unittest_vpz(const vpz::Model& model)
 {
     BOOST_REQUIRE(model.model());
@@ -289,6 +336,25 @@ void check_unittest_vpz(const vpz::Vpz& file)
 
     const vpz::Classes& cls(file.project().classes());
     check_classes_unittest_vpz(cls);
+}
+
+BOOST_AUTO_TEST_CASE(test_rename_conds)
+{
+    vpz::Vpz vpz;
+    vpz.parseFile(utils::Path::path().buildPrefixSharePath(
+            utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
+
+    BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
+    BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
+
+    vpz::Project proj(vpz.project());
+    check_project_unittest_vpz(proj);
+
+    std::string str(vpz.writeToString());
+    delete vpz.project().model().model();
+    vpz.clear();
+
+    vpz.parseMemory(str);
 }
 
 BOOST_AUTO_TEST_CASE(test_connection)

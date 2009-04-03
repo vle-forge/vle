@@ -91,6 +91,12 @@ namespace vle { namespace vpz {
         inline void addCondition(const std::string& str)
         { m_conditions.push_back(str); }
 
+	/**
+	 * @brief Del a condition.
+	 * @param str The condition to delete.
+	 */
+	void delCondition(const std::string& str);
+
         /**
          * @brief Assign the dynamic.
          * @param str The dynamic.
@@ -205,6 +211,15 @@ namespace vle { namespace vpz {
          * @return A constant reference to the vpz::Model.
          */
         AtomicModel& get(const graph::Model* atom);
+
+	/**
+	 * @brief Update the conditions list of each AtomicModel
+	 * where an oldname became newname.
+	 * @param oldname the old name of the condition.
+	 * @param newname the new name of the condition.
+	 */
+	void updateCondition(const std::string oldname,
+			     const std::string newname);
 
         /**
          * @brief Check if the graph::AtomicModel exist into the

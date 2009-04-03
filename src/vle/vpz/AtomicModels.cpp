@@ -46,6 +46,14 @@ AtomicModel::AtomicModel(const std::string& conditions,
     }
 }
 
+void AtomicModel::delCondition(const std::string& str)
+{
+    std::list < std::string >::iterator itfind =
+	std::find(m_conditions.begin(), m_conditions.end(), str);
+
+    m_conditions.erase(itfind);
+}
+
 void AtomicModelList::add(const AtomicModelList& atoms)
 {
     for (const_iterator it = atoms.atomicmodels().begin();
@@ -81,7 +89,7 @@ const AtomicModel& AtomicModelList::get(graph::Model* atom) const
     const_iterator it = m_lst.find(atom);
     if (it == end()) {
         Throw(utils::ArgError, boost::format(
-                "The information about atomic model [%1%] does not exist") %
+		 "The information about atomic model [%1%] does not exist") %
             atom->getName());
     }
     return it->second;
@@ -103,7 +111,7 @@ const AtomicModel& AtomicModelList::get(const graph::Model* atom) const
     const_iterator it = m_lst.find(const_cast < graph::Model* >(atom));
     if (it == end()) {
         Throw(utils::ArgError, boost::format(
-                "The information about atomic model [%1%] does not exist") %
+		"The information about atomic model [%1%] does not exist") %
             atom->getName());
     }
     return it->second;
@@ -118,6 +126,29 @@ AtomicModel& AtomicModelList::get(const graph::Model* atom)
                     atom->getName());
     }
     return it->second;
+}
+
+void AtomicModelList::updateCondition(const std::string oldname,
+				      const std::string newname)
+{
+    for (iterator it = m_lst.begin(); it != m_lst.end(); ++it) {
+        const std::list<std::string>& lstconds(it->second.conditions());
+
+	if (std::find(lstconds.begin(), lstconds.end(), newname)
+                != lstconds.end()) {
+            Throw(utils::ArgError, boost::format(
+                    "Condition [%1%] already exist") %
+                        newname);
+        }
+
+        std::list < std::string >::const_iterator itfind =
+                std::find(lstconds.begin(), lstconds.end(), oldname);
+
+        if (itfind != lstconds.end()) {
+            it->second.delCondition(oldname);
+            it->second.addCondition(newname);
+        }
+    }
 }
 
 }} // namespace vle vpz
