@@ -45,7 +45,7 @@ namespace gvle {
 
 class Modeling;
 
-class CoupledModelBox
+class CoupledModelBox : public Gtk::TreeView
 {
 public:
     CoupledModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m);
@@ -63,15 +63,54 @@ class ModelColumns : public Gtk::TreeModelColumnRecord
 
         Gtk::TreeModelColumn<Glib::ustring> m_col_name;
     };
+
 private:
-    void make_input();
-    void make_output();
 
-    void add_input();
-    void del_input();
+    class InputPortTreeView : public Gtk::TreeView
+    {
+    public:
+	InputPortTreeView(BaseObjectType* cobject,
+			  const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
+	virtual ~InputPortTreeView();
 
-    void add_output();
-    void del_output();
+	void build();
+	void setModel(graph::CoupledModel* model)
+	    { mModel = model; }
+
+    protected:
+	virtual bool on_button_press_event(GdkEventButton *ev);
+	virtual void onAdd();
+	virtual void onRemove();
+
+    private:
+	graph::CoupledModel* mModel;
+	Gtk::Menu mMenuPopup;
+	ModelColumns mColumnsInputPort;
+	Glib::RefPtr<Gtk::ListStore> mRefTreeModelInputPort;
+    };
+
+    class OutputPortTreeView : public Gtk::TreeView
+    {
+    public:
+	OutputPortTreeView(BaseObjectType* cobject,
+			   const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
+	virtual ~OutputPortTreeView();
+
+	void build();
+	void setModel(graph::CoupledModel* model)
+	    { mModel = model; }
+    protected:
+	virtual bool on_button_press_event(GdkEventButton *ev);
+
+	virtual void onAdd();
+	virtual void onRemove();
+
+    private:
+	graph::CoupledModel* mModel;
+	Gtk::Menu mMenuPopup;
+	ModelColumns mColumnsOutputPort;
+	Glib::RefPtr<Gtk::ListStore> mRefTreeModelOutputPort;
+    };
 
     void on_validate();
 
@@ -83,21 +122,17 @@ private:
     Gtk::Label*                            mModelName;
     Gtk::Label*                            mModelNbChildren;
 
-    Gtk::TreeView*                         mTreeViewInput;
-    ModelColumns                           mColumnsInput;
-    Glib::RefPtr<Gtk::ListStore>           mRefListInput;
+
+    InputPortTreeView*                     mInputPorts;
+    OutputPortTreeView*                    mOutputPorts;
+
 
     Gtk::TreeView*                         mTreeViewOutput;
     ModelColumns                           mColumnsOutput;
     Glib::RefPtr<Gtk::ListStore>           mRefListOutput;
 
-    Gtk::Button*                           mButtonAddInput;
-    Gtk::Button*                           mButtonDelInput;
-
-    Gtk::Button*                           mButtonAddOutput;
-    Gtk::Button*                           mButtonDelOutput;
-
     Gtk::Button*                           mButtonValidate;
+
 };
 
 }

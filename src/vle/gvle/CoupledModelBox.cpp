@@ -36,6 +36,177 @@ namespace vle
 {
 namespace gvle {
 
+CoupledModelBox::InputPortTreeView::InputPortTreeView(
+    BaseObjectType* cobject,
+    const Glib::RefPtr<Gnome::Glade::Xml>&):
+    Gtk::TreeView(cobject)
+{
+    mRefTreeModelInputPort = Gtk::ListStore::create(mColumnsInputPort);
+    set_model(mRefTreeModelInputPort);
+    append_column("Input Ports", mColumnsInputPort.m_col_name);
+
+    {
+	Gtk::Menu::MenuList& menulist = mMenuPopup.items();
+
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		"_Add",
+		sigc::mem_fun(
+		    *this,
+		    &CoupledModelBox::InputPortTreeView::onAdd)));
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		"_Remove",
+		sigc::mem_fun(
+		    *this,
+		    &CoupledModelBox::InputPortTreeView::onRemove)));
+    }
+
+    mMenuPopup.accelerate(*this);
+}
+
+CoupledModelBox::InputPortTreeView::~InputPortTreeView()
+{
+}
+
+bool CoupledModelBox::InputPortTreeView::on_button_press_event(
+    GdkEventButton* event)
+{
+    bool return_value = TreeView::on_button_press_event(event);
+    if ( (event->type == GDK_BUTTON_PRESS) && (event->button == 3) ) {
+	mMenuPopup.popup(event->button, event->time);
+    }
+
+    return return_value;
+}
+
+void CoupledModelBox::InputPortTreeView::build()
+{
+    assert(mModel);
+    using namespace graph;
+
+    mRefTreeModelInputPort->clear();
+
+    ConnectionList list = mModel->getInputPortList();
+    ConnectionList::const_iterator it = list.begin();
+    while (it != list.end()) {
+        Gtk::TreeModel::Row row = *(mRefTreeModelInputPort->append());
+        row[mColumnsInputPort.m_col_name] = it->first;
+
+        ++it;
+    }
+}
+
+void CoupledModelBox::InputPortTreeView::onAdd()
+{
+    PortDialog box(mModel, PortDialog::INPUT);
+    if (box.run()) {
+        build();
+    }
+}
+
+void CoupledModelBox::InputPortTreeView::onRemove()
+{
+    Glib::RefPtr<Gtk::TreeSelection> selection = get_selection();
+    Gtk::TreeModel::iterator iter = selection->get_selected();
+    if (iter) {
+        Gtk::TreeModel::Row row = *iter;
+	std::string name = row.get_value(mColumnsInputPort.m_col_name);
+
+	if(mModel->existInputPort(name)) {
+	    mModel->delInputPort(name);
+	}
+	build();
+
+    }
+}
+
+CoupledModelBox::OutputPortTreeView::OutputPortTreeView(
+    BaseObjectType* cobject,
+    const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/) :
+    Gtk::TreeView(cobject)
+{
+    mRefTreeModelOutputPort = Gtk::ListStore::create(mColumnsOutputPort);
+    set_model(mRefTreeModelOutputPort);
+    append_column("Output Ports", mColumnsOutputPort.m_col_name);
+
+    //Fill popup menu:
+    {
+	Gtk::Menu::Menu::MenuList& menulist = mMenuPopup.items();
+
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		"_Add",
+		sigc::mem_fun(
+		    *this,
+		    &CoupledModelBox::OutputPortTreeView::onAdd)));
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		"_Remove",
+		sigc::mem_fun(
+		    *this,
+		    &CoupledModelBox::OutputPortTreeView::onRemove)));
+    }
+    mMenuPopup.accelerate(*this);
+}
+
+CoupledModelBox::OutputPortTreeView::~OutputPortTreeView()
+{
+}
+
+bool CoupledModelBox::OutputPortTreeView::on_button_press_event(
+    GdkEventButton* event)
+{
+    bool return_value = TreeView::on_button_press_event(event);
+
+    if ( (event->type == GDK_BUTTON_PRESS) && (event->button == 3) ) {
+	mMenuPopup.popup(event->button, event->time);
+    }
+
+    return return_value;
+}
+
+void CoupledModelBox::OutputPortTreeView::build()
+{
+    assert(mModel);
+    using namespace graph;
+
+    mRefTreeModelOutputPort->clear();
+
+    ConnectionList list = mModel->getOutputPortList();
+    ConnectionList::const_iterator it = list.begin();
+    while (it != list.end()) {
+	Gtk::TreeModel::Row row = *(mRefTreeModelOutputPort->append());
+	row[mColumnsOutputPort.m_col_name] = it->first;
+
+	++it;
+    }
+}
+
+void CoupledModelBox::OutputPortTreeView::onAdd()
+{
+    PortDialog box(mModel, PortDialog::OUTPUT);
+    if (box.run()) {
+        build();
+    }
+}
+
+void CoupledModelBox::OutputPortTreeView::onRemove()
+{
+    Glib::RefPtr<Gtk::TreeSelection> selection = get_selection();
+    Gtk::TreeModel::iterator iter = selection->get_selected();
+    if (iter) {
+        Gtk::TreeModel::Row row = *iter;
+	std::string name = row.get_value(mColumnsOutputPort.m_col_name);
+
+	if(mModel->existOutputPort(name)) {
+	    mModel->delOutputPort(name);
+	}
+	build();
+
+    }
+}
+
 CoupledModelBox::CoupledModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m):
         mXml(xml),
         mModeling(m),
@@ -46,36 +217,14 @@ CoupledModelBox::CoupledModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* 
     xml->get_widget("CoupledModelName", mModelName);
     xml->get_widget("CoupledModelNbChildren", mModelNbChildren);
 
-    xml->get_widget("CoupledModelTreeViewInput", mTreeViewInput);
-    mRefListInput = Gtk::ListStore::create(mColumnsInput);
-    mTreeViewInput->set_model(mRefListInput);
-    mTreeViewInput->append_column("Input Ports", mColumnsInput.m_col_name);
+    xml->get_widget_derived("CoupledModelTreeViewInput", mInputPorts);
 
-    xml->get_widget("CoupledModelTreeViewOutput", mTreeViewOutput);
-    mRefListOutput = Gtk::ListStore::create(mColumnsOutput);
-    mTreeViewOutput->set_model(mRefListOutput);
-    mTreeViewOutput->append_column("Output Ports", mColumnsOutput.m_col_name);
+    xml->get_widget_derived("CoupledModelTreeViewOutput", mOutputPorts);
 
-    xml->get_widget("CoupledModelAddInput", mButtonAddInput);
-    mButtonAddInput->signal_clicked().connect(
-        sigc::mem_fun(*this, &CoupledModelBox::add_input));
-
-    xml->get_widget("CoupledModelDelInput", mButtonDelInput);
-    mButtonDelInput->signal_clicked().connect(
-        sigc::mem_fun(*this, &CoupledModelBox::del_input));
-
-    xml->get_widget("CoupledModelAddOutput", mButtonAddOutput);
-    mButtonAddOutput->signal_clicked().connect(
-        sigc::mem_fun(*this, &CoupledModelBox::add_output));
-
-    xml->get_widget("CoupledModelDelOutput", mButtonDelOutput);
-    mButtonDelOutput->signal_clicked().connect(
-        sigc::mem_fun(*this, &CoupledModelBox::del_output));
 
     xml->get_widget("ButtonCoupledValidate", mButtonValidate);
     mButtonValidate->signal_clicked().connect(
         sigc::mem_fun(*this, &CoupledModelBox::on_validate));
-
 }
 
 void CoupledModelBox::show(graph::CoupledModel* model)
@@ -85,81 +234,13 @@ void CoupledModelBox::show(graph::CoupledModel* model)
     mModelName->set_text(model->getName());
     mModelNbChildren->set_text(utils::to_string(model->getModelList().size()));
 
-    make_input();
-    make_output();
+    mInputPorts->setModel(mModel);
+    mInputPorts->build();
+    mOutputPorts->setModel(mModel);
+    mOutputPorts->build();
 
     mDialog->show_all();
     mDialog->run();
-}
-
-void CoupledModelBox::make_input()
-{
-    using namespace graph;
-
-    mRefListInput->clear();
-    ConnectionList list = mModel->getInputPortList();
-    ConnectionList::const_iterator it = list.begin();
-    while (it != list.end()) {
-        Gtk::TreeModel::Row row = *(mRefListInput->append());
-        row[mColumnsInput.m_col_name] = it->first;
-
-        ++it;
-    }
-}
-
-void CoupledModelBox::make_output()
-{
-    using namespace graph;
-
-    mRefListOutput->clear();
-    ConnectionList list = mModel->getOutputPortList();
-    ConnectionList::const_iterator it = list.begin();
-    while (it != list.end()) {
-        Gtk::TreeModel::Row row = *(mRefListOutput->append());
-        row[mColumnsOutput.m_col_name] = it->first;
-
-        ++it;
-    }
-}
-
-void CoupledModelBox::add_input()
-{
-    PortDialog box(mModel, PortDialog::INPUT);
-    if (box.run()) {
-        make_input();
-    }
-}
-
-void CoupledModelBox::del_input()
-{
-    Glib::RefPtr<Gtk::TreeSelection> selection = mTreeViewInput->get_selection();
-    Gtk::TreeModel::iterator iter = selection->get_selected();
-    if (iter) {
-        Gtk::TreeModel::Row row = *iter;
-        Glib::ustring name(row[mColumnsInput.m_col_name]);
-        mModel->delInputPort(name);
-        make_input();
-    }
-}
-
-void CoupledModelBox::add_output()
-{
-    PortDialog box(mModel, PortDialog::OUTPUT);
-    if (box.run()) {
-        make_output();
-    }
-}
-
-void CoupledModelBox::del_output()
-{
-    Glib::RefPtr<Gtk::TreeSelection> selection = mTreeViewOutput->get_selection();
-    Gtk::TreeModel::iterator iter = selection->get_selected();
-    if (iter) {
-        Gtk::TreeModel::Row row = *iter;
-        Glib::ustring name(row[mColumnsOutput.m_col_name]);
-        mModel->delOutputPort(name);
-        make_output();
-    }
 }
 
 void CoupledModelBox::on_validate()

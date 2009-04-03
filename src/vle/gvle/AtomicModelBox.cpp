@@ -83,7 +83,7 @@ bool AtomicModelBox::InputPortTreeView::on_button_press_event(
   //Then do our custom stuff:
   if( (event->type == GDK_BUTTON_PRESS) && (event->button == 3) )
   {
-    mMenuPopup.popup(event->button, event->time);
+      mMenuPopup.popup(event->button, event->time);
   }
 
   return return_value;
