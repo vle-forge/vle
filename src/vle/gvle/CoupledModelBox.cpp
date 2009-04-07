@@ -26,6 +26,7 @@
 #include <vle/gvle/CoupledModelBox.hpp>
 #include <vle/gvle/PortDialog.hpp>
 #include <vle/gvle/Message.hpp>
+#include <vle/gvle/SimpleTypeBox.hpp>
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/utils/Tools.hpp>
 #include <gtkmm/stock.h>
@@ -60,6 +61,12 @@ CoupledModelBox::InputPortTreeView::InputPortTreeView(
 		sigc::mem_fun(
 		    *this,
 		    &CoupledModelBox::InputPortTreeView::onRemove)));
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		"_Rename",
+		sigc::mem_fun(
+		    *this,
+		    &CoupledModelBox::InputPortTreeView::onRename)));
     }
 
     mMenuPopup.accelerate(*this);
@@ -121,6 +128,33 @@ void CoupledModelBox::InputPortTreeView::onRemove()
     }
 }
 
+void CoupledModelBox::InputPortTreeView::onRename()
+{
+    SimpleTypeBox box("New name of the input port ?");
+    graph::ConnectionList& list = mModel->getInputPortList();
+    Glib::ustring new_name = boost::trim_copy(box.run());
+
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+
+    if (refSelection and box.valid() and not new_name.empty()
+	and list.find(new_name) == list.end()) {
+
+	Gtk::TreeModel::iterator iter = refSelection->get_selected();
+
+	if (iter) {
+	    Gtk::TreeModel::Row row = *iter;
+	    std::string old_name = row.get_value(mColumnsInputPort.m_col_name);
+	    row.set_value(mColumnsInputPort.m_col_name, new_name);
+
+	    if (mModel->existInputPort(old_name)) {
+		mModel->renameInputPort(old_name, new_name);
+	    }
+	    build();
+	}
+    }
+}
+
+
 CoupledModelBox::OutputPortTreeView::OutputPortTreeView(
     BaseObjectType* cobject,
     const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/) :
@@ -146,6 +180,12 @@ CoupledModelBox::OutputPortTreeView::OutputPortTreeView(
 		sigc::mem_fun(
 		    *this,
 		    &CoupledModelBox::OutputPortTreeView::onRemove)));
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		"_Rename",
+		sigc::mem_fun(
+		    *this,
+		    &CoupledModelBox::OutputPortTreeView::onRename)));
     }
     mMenuPopup.accelerate(*this);
 }
@@ -204,6 +244,32 @@ void CoupledModelBox::OutputPortTreeView::onRemove()
 	}
 	build();
 
+    }
+}
+
+void CoupledModelBox::OutputPortTreeView::onRename()
+{
+    SimpleTypeBox box("New name of the input port ?");
+    graph::ConnectionList& list = mModel->getOutputPortList();
+    Glib::ustring new_name = boost::trim_copy(box.run());
+
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+
+    if (refSelection and box.valid() and not new_name.empty()
+	and list.find(new_name) == list.end()) {
+
+	Gtk::TreeModel::iterator iter = refSelection->get_selected();
+
+	if (iter) {
+	    Gtk::TreeModel::Row row = *iter;
+	    std::string old_name = row.get_value(mColumnsOutputPort.m_col_name);
+	    row.set_value(mColumnsOutputPort.m_col_name, new_name);
+
+	    if (mModel->existOutputPort(old_name)) {
+		mModel->renameOutputPort(old_name, new_name);
+	    }
+	    build();
+	}
     }
 }
 

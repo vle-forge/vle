@@ -231,6 +231,92 @@ bool CoupledModel::existInternalConnection(const std::string& src,
     return true;
 }
 
+int CoupledModel::nbInputConnection(const std::string& portsrc,
+				    const std::string& dst,
+				    const std::string& portdst)
+{
+    int nbConnections=0;
+
+    Model* mdst = findModel(dst);
+
+    if (mdst == 0) {
+        return false;
+    }
+
+    if (not mdst->existInputPort(portdst)) {
+        return false;
+    }
+
+    if (not existInternalInputPort(portsrc)) {
+        return false;
+    }
+
+    const ModelPortList& mp_src = getInternalInPort(portsrc);
+    const ModelPortList& mp_dst = mdst->getInPort(portdst);
+
+    if (not mp_src.exist(mdst, portdst)) {
+        return false;
+    }
+
+    if (not mp_dst.exist(this, portsrc)) {
+        return false;
+    }
+
+    return true;
+
+    ConnectionList::iterator iter = mdst->getInputPortList().find(portdst);
+    ModelPortList model(iter->second);
+    for (ModelPortList::iterator it = model.begin(); it != model.end(); ++it) {
+	if (it->first == this and it->second == portdst) {
+	    nbConnections++;
+	}
+    }
+
+    return nbConnections;
+}
+
+int CoupledModel::nbOutputConnection(const std::string& src,
+				const std::string& portsrc,
+				const std::string& portdst)
+{
+    Model* msrc = findModel(src);
+    int nbConnections=0;
+
+    if (msrc == 0) {
+        return 0;
+    }
+
+    if (not msrc->existOutputPort(portsrc)) {
+        return 0;
+    }
+
+    if (not existInternalOutputPort(portdst)) {
+        return 0;
+    }
+
+    const ModelPortList& mp_src = msrc->getOutPort(portsrc);
+    const ModelPortList& mp_dst = getInternalOutPort(portdst);
+
+    if (not mp_src.exist(this, portdst)) {
+        return 0;
+    }
+
+
+    if (not mp_dst.exist(msrc, portsrc)) {
+        return 0;
+    }
+
+    ConnectionList::iterator iter = msrc->getOutputPortList().find(portsrc);
+    ModelPortList model(iter->second);
+    for (ModelPortList::iterator it = model.begin(); it != model.end(); ++it) {
+	if (it->first == this and it->second == portdst) {
+	    nbConnections++;
+	}
+    }
+
+    return nbConnections;
+}
+
 void CoupledModel::addInputConnection(const std::string& portSrc,
                                       const std::string& dst,
                                       const std::string& portDst)

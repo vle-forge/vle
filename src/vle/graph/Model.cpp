@@ -300,7 +300,8 @@ void Model::delOutputPort(const std::string & name)
     m_outPortList.erase(name);
 }
 
-void Model::addInPort(ModelPortList&  model, const std::string& name)
+void Model::addInPort(ModelPortList&  model, ModelPortList& intern,
+		      const std::string& name)
 {
     for (ModelPortList::iterator it = model.begin(); it != model.end(); ++it) {
 	if (it->first != m_parent) {
@@ -309,15 +310,30 @@ void Model::addInPort(ModelPortList&  model, const std::string& name)
 	    m_parent->getInternalInPort(it->second).add(this, name);
 	}
     }
+    if (isCoupled()) {
+	ModelPortList::iterator jt = intern.begin();
+	while (jt != intern.end()) {
+	    jt->first->getInPort(jt->second).add(this, name);
+	    ++jt;
+	}
+    }
 }
 
-void Model::addOutPort(ModelPortList&  model, const std::string& name)
+void Model::addOutPort(ModelPortList&  model, ModelPortList& intern,
+			       const std::string& name)
 {
     for (ModelPortList::iterator it = model.begin(); it != model.end(); ++it) {
 	if (it->first != m_parent) {
 	    it->first->getInPort(it->second).add(this, name);
 	} else {
 	    m_parent->getInternalOutPort(it->second).add(this, name);
+	}
+    }
+    if (isCoupled()) {
+	ModelPortList::iterator jt = intern.begin();
+	while (jt != intern.end()) {
+	    jt->first->getOutPort(jt->second).add(this, name);
+	    ++jt;
 	}
     }
 }
@@ -327,10 +343,11 @@ ModelPortList& Model::renameInputPort(const std::string& old_name,
 {
     ConnectionList::iterator iter = getInputPortList().find(old_name);
     ModelPortList connect(iter->second);
-
+    ModelPortList internalConnect;
     if (isCoupled()) {
 	CoupledModel* tmp(toCoupled(this));
-	ModelPortList internalConnect(tmp->getInternalInPort(old_name));
+	internalConnect = tmp->getInternalInPort(old_name);
+
     }
 
     delInputPort(old_name);
@@ -341,9 +358,9 @@ ModelPortList& Model::renameInputPort(const std::string& old_name,
 	    CoupledModel* cpl = static_cast < CoupledModel* >(this);
 	    cpl->getInternalInputPortList().insert(
 		std::make_pair < std::string, ModelPortList >(
-		    new_name, connect));
+		new_name, internalConnect));
 	}
-	addInPort(connect, new_name);
+	addInPort(connect, internalConnect,  new_name);
 	return (*m_inPortList.insert(
 		    std::make_pair < std::string, ModelPortList >(
 			new_name, connect)).first).second;
@@ -357,6 +374,12 @@ ModelPortList& Model::renameOutputPort(const std::string& old_name,
 {
     ConnectionList::iterator iter = getOutputPortList().find(old_name);
     ModelPortList connect(iter->second);
+    ModelPortList internalConnect;
+    if (isCoupled()) {
+	CoupledModel* tmp(toCoupled(this));
+	internalConnect = tmp->getInternalOutPort(old_name);
+    }
+
 
     delOutputPort(old_name);
 
@@ -366,9 +389,9 @@ ModelPortList& Model::renameOutputPort(const std::string& old_name,
 	    CoupledModel* cpl = static_cast < CoupledModel* >(this);
 	    cpl->getInternalOutputPortList().insert(
 		std::make_pair < std::string, ModelPortList >(
-		    new_name, connect));
+		new_name, internalConnect));
 	}
-	addOutPort(connect, new_name);
+	addOutPort(connect, internalConnect, new_name);
 	return (*m_outPortList.insert(
 		    std::make_pair < std::string, ModelPortList >(
 			new_name, connect)).first).second;

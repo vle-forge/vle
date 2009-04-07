@@ -452,5 +452,54 @@ BOOST_AUTO_TEST_CASE(test_rename_port)
     d->renameOutputPort("out", "new_out");
     BOOST_REQUIRE_EQUAL(d->existOutputPort("out"), false);
     BOOST_REQUIRE_EQUAL(d->existOutputPort("new_out"), true);
+
+    //Coupled Model
+    CoupledModel* top1 =
+        dynamic_cast<CoupledModel*>(top->findModel("top1"));
+    BOOST_REQUIRE(top1);
+
+    //Coupled Model -- Input Port
+    BOOST_REQUIRE_EQUAL(top1->existInputPort("in"), true);
+    BOOST_REQUIRE_EQUAL(top->existInternalConnection("top2", "out", "top1",
+                                                     "in"), true);
+    BOOST_REQUIRE_EQUAL(top1->existInputConnection("in", "x", "in"), true);
+
+    top1->renameInputPort("in", "new_in");
+    BOOST_REQUIRE_EQUAL(top1->existInputPort("in"), false);
+    BOOST_REQUIRE_EQUAL(top->existInternalConnection("top2", "out", "top1",
+                                                     "in"), false);
+    BOOST_REQUIRE_EQUAL(top1->existInputConnection("in", "x", "in"), false);
+    BOOST_REQUIRE_EQUAL(top1->existInputPort("new_in"), true);
+    BOOST_REQUIRE_EQUAL(top->existInternalConnection("top2", "out", "top1",
+                                                     "new_in"), true);
+    BOOST_REQUIRE_EQUAL(top1->existInputConnection("new_in", "x", "in"), true);
+    BOOST_REQUIRE_EQUAL(top1->nbInputConnection("new_in", "x", "in"), 1);
+
+    //Coupled Model -- Output Port
+    BOOST_REQUIRE_EQUAL(top1->existOutputPort("out"), true);
+    BOOST_REQUIRE_EQUAL(top->existInternalConnection("top1", "out", "e",
+                                                     "in1"), true);
+    BOOST_REQUIRE_EQUAL(top->existInternalConnection("top1", "out", "e",
+                                                     "in2"), true);
+    BOOST_REQUIRE_EQUAL(top1->existOutputConnection("x", "out", "out"),
+                        true);
+
+    top1->renameOutputPort("out", "new_out");
+    BOOST_REQUIRE_EQUAL(top1->existOutputPort("out"), false);
+    BOOST_REQUIRE_EQUAL(top->existInternalConnection("top1", "out", "e",
+                                                     "in1"), false);
+    BOOST_REQUIRE_EQUAL(top->existInternalConnection("top1", "out", "e",
+                                                     "in2"), false);
+    BOOST_REQUIRE_EQUAL(top1->existOutputConnection("x", "out", "out"),
+			false);
+    BOOST_REQUIRE_EQUAL(top1->existOutputPort("new_out"), true);
+    BOOST_REQUIRE_EQUAL(top->existInternalConnection("top1", "new_out", "e",
+                                                     "in1"), true);
+    BOOST_REQUIRE_EQUAL(top->existInternalConnection("top1", "new_out", "e",
+                                                     "in2"), true);
+    BOOST_REQUIRE_EQUAL(top1->existOutputConnection("x", "out", "new_out"),
+			true);
+    BOOST_REQUIRE_EQUAL(top1->nbOutputConnection("x", "out", "new_out"), 1);
+
 }
 

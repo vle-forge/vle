@@ -81,6 +81,7 @@ private:
 	virtual bool on_button_press_event(GdkEventButton *ev);
 	virtual void onAdd();
 	virtual void onRemove();
+	virtual void onRename();
 
     private:
 	graph::CoupledModel* mModel;
@@ -104,6 +105,7 @@ private:
 
 	virtual void onAdd();
 	virtual void onRemove();
+	virtual void onRename();
 
     private:
 	graph::CoupledModel* mModel;

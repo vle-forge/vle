@@ -232,6 +232,13 @@ namespace vle { namespace graph {
         bool existInternalOutputPort(const std::string& name) const
         { return m_internalOutputList.find(name) != m_internalOutputList.end(); }
 
+	int nbInputConnection(const std::string& portsrc,
+			      const std::string& dst,
+			      const std::string& portdst);
+
+	int nbOutputConnection(const std::string& src,
+			       const std::string& portsrc,
+			       const std::string& portdst);
         /**
          * @brief Delete all connection around model m.
          *

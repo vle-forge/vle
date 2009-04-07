@@ -227,10 +227,14 @@ namespace vle { namespace graph {
          */
         void delOutputPort(const std::string & name);
 
-	void addInPort(ModelPortList& model, const std::string& name);
-	void addOutPort(ModelPortList& model, const std::string& name);
-	ModelPortList& renameInputPort(const std::string& old_name, const std::string& new_name);
-	ModelPortList& renameOutputPort(const std::string& old_name, const std::string& new_name);
+	void addInPort(ModelPortList& model, ModelPortList& intern,
+		       const std::string& name);
+	void addOutPort(ModelPortList& model, ModelPortList& intern,
+			const std::string& name);
+	ModelPortList& renameInputPort(const std::string& old_name,
+				       const std::string& new_name);
+	ModelPortList& renameOutputPort(const std::string& old_name,
+					const std::string& new_name);
 
         void addInputPort(const std::list < std::string > & lst);
         void addOutputPort(const std::list < std::string > & lst);
