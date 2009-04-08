@@ -157,6 +157,14 @@ namespace vle { namespace vpz {
          */
         void cleanNoPermanent();
 
+	/**
+	 * @brief Update the name of the attached view of each
+	 * Observable related to oldname view.
+	 * @param oldname The old name of the view attached to the port
+	 * @param newname The new name of the view attached to the port
+	 */
+	void updateView(const std::string oldname, const std::string newname);
+
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
          * Get/Set functions

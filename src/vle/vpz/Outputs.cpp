@@ -105,6 +105,22 @@ const Output& Outputs::get(const std::string& name) const
     return it->second;
 }
 
+void Outputs::rename(const std::string oldoutputname,
+		     const std::string newoutputname)
+{
+    Output copy = get(oldoutputname);
+    del(oldoutputname);
+
+    switch(copy.format()) {
+    case Output::LOCAL:
+	addLocalStream(newoutputname, copy.location(), copy.plugin());
+	break;
+    case Output::DISTANT:
+	addDistantStream(newoutputname, copy.location(), copy.plugin());
+        break;
+    }
+}
+
 std::vector < std::string > Outputs::outputsname() const
 {
     std::vector < std::string > result(m_list.size());

@@ -194,10 +194,21 @@ void Views::renameOutput(const std::string& oldname,
 void Views::renameView(const std::string& oldname,
 		       const std::string& newname)
 {
-    vpz::View v = get(oldname);
-    v.setName(newname);
-    add(v);
+    vpz::View copy = get(oldname);
+    m_outputs.rename(oldname, newname);
     del(oldname);
+
+    switch (copy.type()) {
+    case vpz::View::TIMED:
+	addTimedView(newname, copy.timestep(), newname);
+	break;
+    case vpz::View::EVENT:
+	addEventView(newname, newname);
+	break;
+    case vpz::View::FINISH:
+	addFinishView(newname, newname);
+	break;
+    }
 }
 
 

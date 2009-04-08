@@ -217,6 +217,7 @@ void ViewOutputBox::onRenameViews()
 	    if (box.valid() and not newname.empty() and not m_viewscopy.exist(newname)) {
 		row[m_viewscolumnrecord.name] = newname;
 		m_viewscopy.renameView(oldname, newname);
+		m_viewscopy.observables().updateView(oldname, newname);
 	    }
 	}
     }

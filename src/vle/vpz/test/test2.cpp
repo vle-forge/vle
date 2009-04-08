@@ -432,7 +432,7 @@ BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
 	BOOST_REQUIRE_EQUAL(view.name(), "y");
 	BOOST_REQUIRE_EQUAL(view.streamtype(), "timed");
 	BOOST_REQUIRE_EQUAL(view.timestep(), .05);
-	BOOST_REQUIRE_EQUAL(view.output(), "x");
+	BOOST_REQUIRE_EQUAL(view.output(), "y");
     }
 }
 

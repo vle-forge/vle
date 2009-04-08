@@ -32,6 +32,7 @@
 #include <boost/test/output_test_stream.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 #include <boost/algorithm/string.hpp>
+#include <iostream>
 
 #include <vle/value.hpp>
 #include <vle/utils.hpp>
@@ -48,7 +49,7 @@ BOOST_GLOBAL_FIXTURE(F)
 
 using namespace vle;
 
-void check_project_unittest_vpz(vpz::Project& project)
+void check_rename_conds_unittest_vpz(vpz::Project& project)
 {
     vpz::AtomicModelList &lst = project.model().atomicModels();
     vpz::Conditions& cnds = project.experiment().conditions();
@@ -94,6 +95,30 @@ void check_project_unittest_vpz(vpz::Project& project)
 	lst.updateCondition(std::string("ca"), std::string("new_cd")),
 	utils::ArgError);
 }
+
+void check_rename_views_unittest_vpz(vpz::Views& views)
+{
+    BOOST_REQUIRE_NO_THROW(views.renameView("view1", "new_view1"));
+    BOOST_REQUIRE_NO_THROW(views.renameView("view2", "new_view2"));
+
+    BOOST_REQUIRE(views.exist("new_view1"));
+    BOOST_REQUIRE(views.exist("new_view2"));
+
+    BOOST_CHECK(not views.exist("view1"));
+    BOOST_CHECK(not views.exist("view2"));
+
+    vpz::Observables& obs_list = views.observables();
+    BOOST_REQUIRE_NO_THROW(obs_list.updateView("view1", "new_view1"));
+    BOOST_REQUIRE_NO_THROW(obs_list.updateView("view2", "new_view2"));
+
+    BOOST_CHECK(views.observables().get("obs1").hasView("new_view1"));
+    BOOST_CHECK(views.observables().get("obs2").hasView("new_view1"));
+    BOOST_CHECK(views.observables().get("obs2").hasView("new_view2"));
+
+    BOOST_CHECK(views.get("new_view1").output() == "new_view1");
+    BOOST_CHECK(views.get("new_view2").output() == "new_view2");
+}
+
 
 void check_model_unittest_vpz(const vpz::Model& model)
 {
@@ -214,19 +239,19 @@ void check_experiment_unittest_vpz(const vpz::Experiment& exp)
     }
 
     {
-        BOOST_REQUIRE(exp.views().outputs().exist("o"));
-        BOOST_REQUIRE(exp.views().outputs().exist("o2"));
+        BOOST_REQUIRE(exp.views().outputs().exist("view1"));
+        BOOST_REQUIRE(exp.views().outputs().exist("view2"));
         {
-            const vpz::Output& o(exp.views().outputs().get("o"));
-            BOOST_REQUIRE_EQUAL(o.name(), "o");
+            const vpz::Output& o(exp.views().outputs().get("view1"));
+            BOOST_REQUIRE_EQUAL(o.name(), "view1");
             BOOST_REQUIRE_EQUAL(o.format(), vpz::Output::LOCAL);
             BOOST_REQUIRE_EQUAL(o.plugin(), "storage");
             BOOST_REQUIRE_EQUAL(boost::algorithm::trim_copy(o.data()),
                                 "10 10 1 1");
         }
         {
-            const vpz::Output& o(exp.views().outputs().get("o2"));
-            BOOST_REQUIRE_EQUAL(o.name(), "o2");
+            const vpz::Output& o(exp.views().outputs().get("view2"));
+            BOOST_REQUIRE_EQUAL(o.name(), "view2");
             BOOST_REQUIRE_EQUAL(o.format(), vpz::Output::LOCAL);
             BOOST_REQUIRE_EQUAL(o.plugin(), "storage");
             BOOST_REQUIRE(o.data().empty());
@@ -348,7 +373,7 @@ BOOST_AUTO_TEST_CASE(test_rename_conds)
     BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
 
     vpz::Project proj(vpz.project());
-    check_project_unittest_vpz(proj);
+    check_rename_conds_unittest_vpz(proj);
 
     std::string str(vpz.writeToString());
     delete vpz.project().model().model();
@@ -356,6 +381,22 @@ BOOST_AUTO_TEST_CASE(test_rename_conds)
 
     vpz.parseMemory(str);
 }
+
+BOOST_AUTO_TEST_CASE(test_rename_views)
+{
+    vpz::Vpz vpz;
+    vpz.parseFile(utils::Path::path().buildPrefixSharePath(
+            utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
+
+    BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
+    BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
+
+    vpz::Views& views(vpz.project().experiment().views());
+    check_rename_views_unittest_vpz(views);
+
+    delete vpz.project().model().model();
+}
+
 
 BOOST_AUTO_TEST_CASE(test_connection)
 {

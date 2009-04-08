@@ -295,12 +295,12 @@
   </conditions>
   <views>
    <outputs>
-    <output name="o" format="local" plugin="storage" >
+    <output name="view1" format="local" plugin="storage" >
 <![CDATA[
 10 10 1 1
 ]]>
     </output>
-    <output name="o2" format="local" plugin="storage" />
+    <output name="view2" format="local" plugin="storage" />
    </outputs>
    <observables>
     <observable name="obs1">
@@ -317,8 +317,8 @@
      </port>
     </observable>
    </observables>
-   <view name="view1" type="timed" timestep="1" output="o" />
-   <view name="view2" type="timed" timestep="1" output="o2" />
+   <view name="view1" type="timed" timestep="1" output="view1" />
+   <view name="view2" type="timed" timestep="1" output="view2" />
   </views>
  </experiment>
 </vle_project>

@@ -90,4 +90,23 @@ void Observables::cleanNoPermanent()
     }
 }
 
+void Observables::updateView(const std::string oldname, const std::string newname)
+{
+    for (iterator itobs = m_list.begin(); itobs != m_list.end(); ++itobs) {
+	if (itobs->second.hasView(oldname)) {
+	    vpz::Observable& obs = itobs->second;
+	    ObservablePortList::iterator itport;
+	    for (itport = obs.begin(); itport != obs.end(); ++itport) {
+		vpz::ObservablePort& obsport = itport->second;
+		ViewNameList::iterator itfind;
+		itfind = std::find(obsport.begin(), obsport.end(), oldname);
+		if (itfind != obsport.end()) {
+		    obsport.del(oldname);
+		    obsport.add(newname);
+		}
+	    }
+	}
+    }
+}
+
 }} // namespace vle vpz

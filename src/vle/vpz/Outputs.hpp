@@ -174,6 +174,13 @@ namespace vle { namespace vpz {
         inline bool empty() const
         { return m_list.empty(); }
 
+	/**
+	 * @brief rename an Output with the specified name.
+	 * @param oldname the Output to rename
+	 * @param newname the new name for the Output
+	 */
+	void rename(const std::string oldoutputname, const std::string newoutputname);
+
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
          * Get/Set functions.
