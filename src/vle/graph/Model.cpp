@@ -257,18 +257,18 @@ void Model::delInputPort(const std::string& name)
             ModelPortList& toclean(m_parent->getInternalInPort(it->second));
             toclean.erase(this);
         }
-
-        if (isCoupled()) {
-            CoupledModel* tmp(toCoupled(this));
-            ModelPortList& intern(tmp->getInternalInPort(name));
-            ModelPortList::iterator jt = intern.begin();
-            while(jt != intern.end()) {
-                jt->first->getInPort(jt->second).erase(this);
-                ++jt;
-            }
-            intern.removeAll();
-        }
     }
+    if (isCoupled()) {
+	CoupledModel* tmp(toCoupled(this));
+	ModelPortList& intern(tmp->getInternalInPort(name));
+	ModelPortList::iterator jt = intern.begin();
+	while(jt != intern.end()) {
+	    jt->first->getInPort(jt->second).erase(this);
+	    ++jt;
+	}
+	intern.removeAll();
+    }
+
     lst.removeAll();
     m_inPortList.erase(name);
 }
@@ -284,18 +284,18 @@ void Model::delOutputPort(const std::string & name)
             ModelPortList& toclean(m_parent->getInternalOutPort(it->second));
             toclean.erase(this);
         }
-
-        if (isCoupled()) {
-            CoupledModel* tmp(toCoupled(this));
-            ModelPortList& intern(tmp->getInternalOutPort(name));
-            ModelPortList::iterator jt = intern.begin();
-            while(jt != intern.end()) {
-                jt->first->getOutPort(jt->second).erase(this);
-                ++jt;
-            }
-            intern.removeAll();
-        }
     }
+    if (isCoupled()) {
+	CoupledModel* tmp(toCoupled(this));
+	ModelPortList& intern(tmp->getInternalOutPort(name));
+	ModelPortList::iterator jt = intern.begin();
+	while(jt != intern.end()) {
+	    jt->first->getOutPort(jt->second).erase(this);
+	    ++jt;
+	}
+	intern.removeAll();
+    }
+
     lst.removeAll();
     m_outPortList.erase(name);
 }
@@ -437,7 +437,7 @@ ModelPortList& Model::getInPort(const std::string& name)
     ConnectionList::iterator it = m_inPortList.find(name);
     if (it == m_inPortList.end()) {
         Throw(utils::DevsGraphError, boost::format(
-                "Model %1% have no input port %2%") % getName() % name);
+	  "Model %1% have no input port %2%") % getName() % name);
     }
 
     return it->second;
@@ -468,7 +468,7 @@ int Model::getInputPortIndex(const std::string& name) const
 {
     ConnectionList::const_iterator it = m_inPortList.find(name);
     Assert(utils::DevsGraphError, it != m_inPortList.end(), boost::format(
-            "Input port %1% not exist in model %2%") % name % getName());
+      "Input port %1% not exist in model %2%") % name % getName());
 
     return std::distance(m_inPortList.begin(), it);
 }

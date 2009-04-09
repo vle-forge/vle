@@ -311,13 +311,13 @@ void ViewDrawingArea::preComputeConnection()
 
             for (jt = ports.begin(); jt != ports.end(); ++jt) {
                 preComputeConnection(mCurrent, it->first,
-                                     jt->first, jt->second);
+				     jt->first, jt->second);
                 mText.push_back(mCurrent->getName() +
                                 ":" + it->first +
                                 " -> " + jt->first->getName() +
                                 ":" + jt->second);
-            }
-        }
+	    }
+	}
     }
 
     {

@@ -124,7 +124,6 @@ void CoupledModelBox::InputPortTreeView::onRemove()
 	    mModel->delInputPort(name);
 	}
 	build();
-
     }
 }
 
@@ -243,7 +242,6 @@ void CoupledModelBox::OutputPortTreeView::onRemove()
 	    mModel->delOutputPort(name);
 	}
 	build();
-
     }
 }
 

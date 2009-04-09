@@ -500,6 +500,41 @@ BOOST_AUTO_TEST_CASE(test_rename_port)
     BOOST_REQUIRE_EQUAL(top1->existOutputConnection("x", "out", "new_out"),
 			true);
     BOOST_REQUIRE_EQUAL(top1->nbOutputConnection("x", "out", "new_out"), 1);
-
 }
 
+BOOST_AUTO_TEST_CASE(test_bug_rename_port)
+{
+    vpz::Vpz file(utils::Path::buildPrefixSharePath(
+		      utils::Path::path().getPrefixDir(),
+		      "examples", "unittest.vpz"));
+
+    CoupledModel* top =
+        dynamic_cast<CoupledModel*>(file.project().model().model());
+    BOOST_REQUIRE(top);
+    BOOST_REQUIRE_EQUAL(top->existInternalConnection("top1", "out", "top2",
+                                                     "in"), true);
+    CoupledModel* top1 =
+        dynamic_cast<CoupledModel*>(top->findModel("top1"));
+    BOOST_REQUIRE(top1);
+
+    CoupledModel* top2 =
+        dynamic_cast<CoupledModel*>(top->findModel("top2"));
+    BOOST_REQUIRE(top2);
+
+    BOOST_REQUIRE_EQUAL(top->existInternalConnection("top2", "out", "top1",
+                                                     "in"), true);
+
+    BOOST_REQUIRE_EQUAL(top2->existOutputPort("out"), true);
+    top2->delOutputPort("out");
+    BOOST_REQUIRE_EQUAL(top2->existOutputPort("out"), false);
+
+    BOOST_REQUIRE_EQUAL(top->existInternalConnection("top2", "out", "top1",
+                                                     "in"), false);
+
+    BOOST_REQUIRE_EQUAL(top1->existInputPort("in"), true);
+    BOOST_REQUIRE_NO_THROW(top1->delInputPort("in"));
+    BOOST_REQUIRE_EQUAL(top1->existInputPort("in"), false);
+
+    BOOST_REQUIRE_EQUAL(top->existInternalConnection("top2", "out", "top1",
+                                                     "in"), false);
+}
