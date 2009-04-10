@@ -74,6 +74,7 @@ private:
 	virtual void on_add();
 	virtual void on_remove();
 	virtual void onRename();
+	virtual void onCopy();
 
     private:
 	ConditionsBox* mParent;

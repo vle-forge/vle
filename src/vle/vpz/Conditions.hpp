@@ -140,6 +140,15 @@ namespace vle { namespace vpz {
 	  */
 	void rename(const std::string& oldconditionname, const std::string& newconditinname);
 
+	/**
+	  * @brief Copy the specified condition
+	  * @param conditionname The current condition name
+	  * @param copyconditionname The copy condition name
+	  */
+	void copy(const std::string& conditionname,
+		  const std::string& copyconditionname);
+
+
         /**
          * @brief Clear the ConditionList object.
          */

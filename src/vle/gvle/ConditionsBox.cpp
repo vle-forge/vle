@@ -70,6 +70,12 @@ ConditionsBox::ConditionsTreeView::ConditionsTreeView(
 		sigc::mem_fun(
 		    *this,
 		    &ConditionsBox::ConditionsTreeView::onRename)));
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		"_Copy",
+		sigc::mem_fun(
+		    *this,
+		    &ConditionsBox::ConditionsTreeView::onCopy)));
     }
     mMenuPopup.accelerate(*this);
 }
@@ -166,6 +172,27 @@ void ConditionsBox::ConditionsTreeView::onRename()
 	}
     }
 }
+
+void ConditionsBox::ConditionsTreeView::onCopy()
+{
+    vpz::ConditionList& list = mConditions->conditionlist();
+    Gtk::TreeModel::iterator it = mRefTreeSelection->get_selected();
+    int number = 1;
+    std::string copy;
+
+    if (it) {
+	Glib::ustring name = (*it)[mColumns.m_col_name];
+	do {
+	    copy = name + "_" + boost::lexical_cast < std::string >(number);
+	    ++number;
+	}while (list.find(copy) != list.end());
+	mConditions->copy(name, copy);
+        mParent->buildTreeConditions();
+    }
+
+}
+
+
 
 
 ////

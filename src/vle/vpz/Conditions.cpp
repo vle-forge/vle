@@ -91,6 +91,14 @@ void Conditions::rename(const std::string& oldconditionname, const std::string& 
     del(oldconditionname);
 }
 
+void Conditions::copy(const std::string& conditionname,
+		      const std::string& copyconditionname)
+{
+    Condition c = get(conditionname);
+    c.setName(copyconditionname);
+    add(c);
+}
+
 const Condition& Conditions::get(const std::string& condition) const
 {
     const_iterator it = m_list.find(condition);
