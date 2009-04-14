@@ -49,6 +49,26 @@ BOOST_GLOBAL_FIXTURE(F)
 using namespace vle;
 using namespace graph;
 
+BOOST_AUTO_TEST_CASE(test_rename_model)
+{
+    vpz::Vpz file(utils::Path::buildPrefixSharePath(
+		      utils::Path::path().getPrefixDir(),
+		      "examples", "unittest.vpz"));
+
+    CoupledModel* top =
+        dynamic_cast<CoupledModel*>(file.project().model().model());
+    BOOST_REQUIRE(top);
+    BOOST_REQUIRE_NO_THROW(graph::Model::rename(top, "new_top"));
+
+    AtomicModel* d = dynamic_cast<AtomicModel*>(top->findModel("d"));
+    BOOST_REQUIRE_THROW(graph::Model::rename(d, "e"), utils::DevsGraphError);
+    BOOST_REQUIRE_NO_THROW(graph::Model::rename(d, "new_d"));
+
+    CoupledModel * top1 = dynamic_cast<CoupledModel*>(top->findModel("top1"));
+    BOOST_REQUIRE_THROW(graph::Model::rename(top1, "top2"), utils::DevsGraphError);
+    BOOST_REQUIRE_NO_THROW(graph::Model::rename(top1, "new_top1"));
+}
+
 BOOST_AUTO_TEST_CASE(test_del_all_connection)
 {
     CoupledModel* top = new CoupledModel("top", 0);

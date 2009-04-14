@@ -26,6 +26,7 @@
 #ifndef GUI_MODELTREEBOX_HPP
 #define GUI_MODELTREEBOX_HPP
 
+#include <vle/gvle/SimpleTypeBox.hpp>
 #include <gtkmm/window.h>
 #include <gtkmm/scrolledwindow.h>
 #include <gtkmm/treeview.h>
@@ -73,6 +74,11 @@ public:
      * @param model_name model name to activate
      */
     void showRow(const std::string& model_name);
+
+    /**
+     * @brief Rename a model with the specified name
+     */
+    void onRenameModels();
 
 protected:
     /**
@@ -150,15 +156,26 @@ class ModelTreeColumn : public Gtk::TreeModel::ColumnRecord
         }
 
         Gtk::TreeModelColumn <Glib::ustring> mName;
-        Gtk::TreeModelColumn <graph::Model*>   mModel;
+        Gtk::TreeModelColumn <graph::Model*> mModel;
     };
 
     ModelTreeColumn              m_Columns;
     Gtk::ScrolledWindow          m_ScrolledWindow;
     Gtk::TreeView                m_TreeView;
     Glib::RefPtr<Gtk::TreeStore> m_refTreeModel;
+    Gtk::Menu                    m_menu;
     Modeling*                    m_modeling;
     std::string                  m_search;
+
+private:
+    void initMenuPopupModels();
+    bool onButtonRealeaseModels(GdkEventButton* event);
+
+    struct ModelsColumnRecord : public Gtk::TreeModel::ColumnRecord
+    {
+        Gtk::TreeModelColumn < std::string > name;
+        ModelsColumnRecord() { add(name); }
+    } m_modelscolumnrecord;
 };
 
 }

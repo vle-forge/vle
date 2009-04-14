@@ -130,10 +130,16 @@ void Model::rename(Model* mdl, const std::string& newname)
         ModelList::iterator it = parent->getModelList().find(mdl->getName());
         Assert(utils::DevsGraphError, it != parent->getModelList().end(),
                "Cannot rename a model without parent");
-
-        mdl->m_name.assign(newname);
-        parent->getModelList().erase(it);
-        parent->addModel(mdl);
+	ModelList::iterator itfind = parent->getModelList().find(newname);
+	if (itfind != parent->getModelList().end()) {
+	    Throw(utils::DevsGraphError, boost::format(
+		      "Coupled model %1% already has submodel %2%")
+		  % parent->getName() % newname);
+	} else {
+	    mdl->m_name.assign(newname);
+	    parent->getModelList().erase(it);
+	    parent->addModel(mdl);
+	}
     } else {
         mdl->m_name.assign(newname);
     }

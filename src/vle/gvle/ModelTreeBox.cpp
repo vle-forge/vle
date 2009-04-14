@@ -53,11 +53,55 @@ ModelTreeBox::ModelTreeBox(Modeling* m) :
 
     m_TreeView.signal_row_activated().connect(
         sigc::mem_fun(*this, &ModelTreeBox::row_activated));
+    m_TreeView.signal_button_release_event().connect(
+        sigc::mem_fun(*this, &ModelTreeBox::onButtonRealeaseModels));
 
     m_TreeView.expand_all();
     m_TreeView.set_rules_hint(true);
     add(m_ScrolledWindow);
+    initMenuPopupModels();
     show_all();
+}
+
+void ModelTreeBox::initMenuPopupModels()
+{
+    Gtk::Menu::MenuList& menulist(m_menu.items());
+
+    menulist.push_back(
+        Gtk::Menu_Helpers::MenuElem(
+            "_Rename", sigc::mem_fun(
+		*this, &ModelTreeBox::onRenameModels)));
+    m_menu.accelerate(m_TreeView);
+}
+
+bool ModelTreeBox::onButtonRealeaseModels(GdkEventButton* event)
+{
+    if (event->button == 3) {
+        m_menu.popup(event->button, event->time);
+    }
+    return true;
+}
+
+void ModelTreeBox::onRenameModels()
+{
+    Glib::RefPtr < Gtk::TreeView::Selection > ref = m_TreeView.get_selection();
+    if (ref) {
+        Gtk::TreeModel::iterator iter = ref->get_selected();
+        if (iter) {
+            Gtk::TreeModel::Row row = *iter;
+            std::string oldname(row.get_value(m_modelscolumnrecord.name));
+	    SimpleTypeBox box("New name of this model?");
+	    std::string newname = boost::trim_copy(box.run());
+	    if (box.valid() and not newname.empty()) {
+		try {
+		    row[m_modelscolumnrecord.name] = newname;
+		    graph::Model::rename(row[m_Columns.mModel], newname);
+		} catch(utils::DevsGraphError dge) {
+		    row[m_modelscolumnrecord.name] = oldname;
+		}
+	    }
+	}
+    }
 }
 
 void ModelTreeBox::parseModel(graph::Model* top)
