@@ -116,6 +116,30 @@ GVLE::~GVLE()
     delete mConditionsBox;
     delete mSimulationBox;
 }
+
+Gtk::RadioButton* GVLE::getButtonRef(ButtonType button)
+{
+    switch (button)
+    {
+    case POINTER:
+	return &m_arrow;
+    case ADDMODEL:
+	return &m_addModels;
+    case ADDLINK:
+	return &m_addLinks;
+    case DELETE:
+	return &m_delete;
+    case ADDCOUPLED:
+	return &m_addCoupled;
+    case ZOOM:
+	return &m_zoom;
+    case QUESTION:
+	return &m_question;
+    default:
+	return NULL;
+    }
+}
+
 /*
 void GVLE::loadPlugins(const std::string& rep)
 {
@@ -334,23 +358,23 @@ void GVLE::makeButtons()
 
     m_arrow.set_relief(Gtk::RELIEF_NONE);
     m_tooltips.set_tip(m_arrow, "Move models, open coupled models, show"
-                       " dynamics of models");
+                       " dynamics of models. (F1)");
     m_addModels.set_relief(Gtk::RELIEF_NONE);
     m_tooltips.set_tip(m_addModels, "Add empty atomics models. You can"
                        " specify inputs, outputs, inits and states ports."
                        " Select dynamics plugins file and XML write your"
-                       " XML Dynamics.");
+                       " XML Dynamics. (F2)");
     m_addLinks.set_relief(Gtk::RELIEF_NONE);
-    m_tooltips.set_tip(m_addLinks, "Add connections between models.");
+    m_tooltips.set_tip(m_addLinks, "Add connections between models. (F3)");
     m_addCoupled.set_relief(Gtk::RELIEF_NONE);
-    m_tooltips.set_tip(m_addCoupled, "Add coupled models.");
+    m_tooltips.set_tip(m_addCoupled, "Add coupled models. (F4)");
     m_delete.set_relief(Gtk::RELIEF_NONE);
-    m_tooltips.set_tip(m_delete, "Delete connections or models");
+    m_tooltips.set_tip(m_delete, "Delete connections or models. (F5)");
     m_zoom.set_relief(Gtk::RELIEF_NONE);
-    m_tooltips.set_tip(m_zoom, "Zoom into coupled models.");
+    m_tooltips.set_tip(m_zoom, "Zoom into coupled models. (F6)");
     m_question.set_relief(Gtk::RELIEF_NONE);
     m_tooltips.set_tip(m_question, "Show XML Dynamics if atomic model is"
-                       " selected, show XML Structures if coupled model.");
+                       " selected, show XML Structures if coupled model. (F7)");
     m_arrow.set_mode(false);
     m_addModels.set_mode(false);
     m_addLinks.set_mode(false);

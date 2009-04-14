@@ -107,6 +107,8 @@ public:
 	return mConditionsBox;
     }
 
+    Gtk::RadioButton* getButtonRef(ButtonType button);
+
     /*********************************************************************
      *
      * PLUGIN
