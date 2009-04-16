@@ -363,6 +363,28 @@ void check_unittest_vpz(const vpz::Vpz& file)
     check_classes_unittest_vpz(cls);
 }
 
+void check_copy_views_unittest_vpz(vpz::Views& views)
+{
+    BOOST_REQUIRE_NO_THROW(views.copyView("view1", "view1_1"));
+    BOOST_REQUIRE_NO_THROW(views.copyView("view1", "view1_2"));
+    BOOST_REQUIRE_NO_THROW(views.copyView("view1_1", "view1_1_1"));
+
+    BOOST_REQUIRE(views.exist("view1_1"));
+    BOOST_REQUIRE(views.exist("view1_2"));
+    BOOST_REQUIRE(views.exist("view1_1_1"));
+
+    BOOST_CHECK(views.get("view1_1").output() == "view1_1");
+    BOOST_CHECK(views.get("view1_2").output() == "view1_2");
+    BOOST_CHECK(views.get("view1_1_1").output() == "view1_1_1");
+
+    BOOST_REQUIRE_NO_THROW(views.del("view1"));
+
+    BOOST_REQUIRE(views.exist("view1_1"));
+    BOOST_REQUIRE(views.exist("view1_2"));
+    BOOST_REQUIRE(views.exist("view1_1_1"));
+
+}
+
 BOOST_AUTO_TEST_CASE(test_rename_conds)
 {
     vpz::Vpz vpz;
@@ -469,4 +491,19 @@ BOOST_AUTO_TEST_CASE(test_read_write_read2)
 
     delete vpz.project().model().model();
     delete vpz2.project().model().model();
+}
+
+BOOST_AUTO_TEST_CASE(test_copy_del_views)
+{
+    vpz::Vpz vpz;
+    vpz.parseFile(utils::Path::buildPrefixSharePath(
+            utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
+
+    BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
+    BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
+
+    vpz::Views& views(vpz.project().experiment().views());
+    check_copy_views_unittest_vpz(views);
+
+    delete vpz.project().model().model();
 }

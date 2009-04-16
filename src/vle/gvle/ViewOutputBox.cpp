@@ -29,6 +29,7 @@
 #include <gtkmm/filechooserdialog.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
+#include <boost/lexical_cast.hpp>
 #include <limits>
 
 namespace vle { namespace gvle {
@@ -148,6 +149,11 @@ void ViewOutputBox::initMenuPopupViews()
                 *this, &ViewOutputBox::onAddViews)));
 
     menulist.push_back(
+	Gtk::Menu_Helpers::MenuElem(
+	    "_Copy", sigc::mem_fun(
+		*this, &ViewOutputBox::onCopyViews)));
+
+    menulist.push_back(
         Gtk::Menu_Helpers::MenuElem(
             "_Remove", sigc::mem_fun(
                 *this, &ViewOutputBox::onRemoveViews)));
@@ -223,6 +229,32 @@ void ViewOutputBox::onRenameViews()
     }
 }
 
+
+void ViewOutputBox::onCopyViews()
+{
+    int number = 1;
+    std::string copy;
+
+    Glib::RefPtr < Gtk::TreeView::Selection > ref = m_views->get_selection();
+    if (ref) {
+        Gtk::TreeModel::iterator iter = ref->get_selected();
+        if (iter) {
+            Gtk::TreeModel::Row row = *iter;
+            std::string name(row.get_value(m_viewscolumnrecord.name));
+	    do {
+		copy = name + "_" + boost::lexical_cast< std::string >(number);
+		++number;
+	    }while (m_viewscopy.exist(copy));
+	    iter = m_model->append();
+	    row = *iter;
+	    row[m_viewscolumnrecord.name] = copy;
+	    m_viewscopy.copyView(name, copy);
+	    updateView(copy);
+            m_views->set_cursor(m_model->get_path(iter));
+            m_deletedView.erase(copy);
+	}
+    }
+}
 
 void ViewOutputBox::sensitive(bool active)
 {

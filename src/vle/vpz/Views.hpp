@@ -260,6 +260,22 @@ namespace vle { namespace vpz {
 	void renameView(const std::string& oldname,
 			const std::string& newname);
 
+	/**
+	 * @brief Copy and create a vpz::Output
+	 * @param outputname the name of the original vpz::Output
+	 * @param copyname the name of the copy vpz::Output
+	 */
+	void copyOutput(const std::string& outputname,
+			const std::string& copyname);
+
+	/**
+	 * @brief Copy a specified vpz::View.
+	 * @param viewname the name of the current vpz::View
+	 * @param copyname the name of the copy
+	 */
+	void copyView(const std::string& viewname,
+			const std::string& copyname);
+
 
         /**
          * @brief Check if a View of the ViewList use the specific output.

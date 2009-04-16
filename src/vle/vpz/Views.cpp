@@ -211,6 +211,51 @@ void Views::renameView(const std::string& oldname,
     }
 }
 
+void Views::copyOutput(const std::string& outputname,
+		       const std::string& copyname)
+{
+    if (m_outputs.get(outputname).streamformat() == "local") {
+	addLocalStreamOutput(copyname,
+			     m_outputs.get(outputname).location(),
+			     m_outputs.get(outputname).plugin());
+    } else {
+	addDistantStreamOutput(copyname,
+			       m_outputs.get(outputname).location(),
+			       m_outputs.get(outputname).plugin());
+    }
+    m_outputs.get(copyname).setData(m_outputs.get(outputname).data());
+}
+
+void Views::copyView(const std::string& viewname,
+		     const std::string& copyname)
+{
+    vpz::View view = get(viewname);
+    vpz::View copy = get(viewname);
+    copy.setName(copyname);
+    std::string copyoutputname;
+    int number = 1;
+
+    do {
+	copyoutputname = view.output() + "_";
+	copyoutputname += boost::lexical_cast< std::string >(number);
+	++number;
+    }while (outputs().exist(copyoutputname));
+
+    copyOutput(view.output(), copyoutputname);
+
+    switch (copy.type()) {
+    case vpz::View::TIMED:
+	addTimedView(copy.name(), copy.timestep(), copyoutputname);
+	break;
+    case vpz::View::EVENT:
+	addEventView(copy.name(), copyoutputname);
+	break;
+    case vpz::View::FINISH:
+	addFinishView(copy.name(), copyoutputname);
+	break;
+    }
+}
+
 
 
 bool Views::isUsedOutput(const std::string& name) const

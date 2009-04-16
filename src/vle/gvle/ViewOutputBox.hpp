@@ -67,6 +67,11 @@ namespace vle { namespace gvle {
 	 */
 	void onRenameViews();
 
+	/**
+	 * @brief Call when user want to copy a vpz::View
+	 */
+	void onCopyViews();
+
 
     private:
         /** a reference to the origin vpz::Views, filled when user modify and
