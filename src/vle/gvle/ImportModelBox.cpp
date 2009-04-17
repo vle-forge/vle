@@ -289,7 +289,7 @@ bool ImportModelBox::is_valid_view(std::string view)
     if (s.empty())
         return false;
 
-    bool ret = mModeling->measures().exist(s);
+    bool ret = mModeling->views().exist(s);
     if (ret)
         return false;
     else {

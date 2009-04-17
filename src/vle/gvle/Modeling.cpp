@@ -712,7 +712,7 @@ void Modeling::importCoupledModel(graph::CoupledModel* parent, vpz::Vpz* src)
         import_coupled_model(src, dynamic_cast<graph::CoupledModel*>(import));
         dynamics().add(src->project().dynamics());
         conditions().add(src->project().experiment().conditions());
-        measures().add(src->project().experiment().views());
+        views().add(src->project().experiment().views());
         mModelTreeBox->parseModel(mTop);
         setModified(true);
     }

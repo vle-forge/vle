@@ -648,7 +648,7 @@ void AtomicModelBox::ObservableTreeView::onEdit()
     if (obs != "") {
         mObsAndViewBox.show(mModeling->observables(),
 			    std::string(obs),
-			    mModeling->measures());
+			    mModeling->views());
     }
 }
 
@@ -747,7 +747,7 @@ void AtomicModelBox::show(vpz::AtomicModel& atom,  graph::AtomicModel& model)
     mGraph_atom = &model;
     mDyn = &mModeling->dynamics();
     mObs = &mModeling->observables();
-    mViews = &mModeling->measures();
+    mViews = &mModeling->views();
     mCond = &mModeling->conditions();
     mOutputs = &mModeling->outputs();
 

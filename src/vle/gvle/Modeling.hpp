@@ -697,7 +697,7 @@ public:
     const vpz::Views& views() const
     { return mVpz.project().experiment().views(); }
 
-    vpz::Views& measures()
+    vpz::Views& views()
     { setModified(true); return mVpz.project().experiment().views(); }
 
     const vpz::Outputs& outputs() const
