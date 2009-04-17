@@ -274,8 +274,24 @@ namespace vle { namespace vpz {
         const_iterator end() const
         { return m_lst.end(); }
 
+        /**
+         * @brief Write the model or hierarchy of models into the output stream.
+         * @param mdl The top node of the hierarchy or a single atomic model.
+         * @param out The output stream.
+         */
+        void writeModel(const graph::Model* mdl, std::ostream& out) const;
+
     private:
         AtomicModels m_lst;
+
+        void writeAtomic(std::ostream& out,
+                         const graph::AtomicModel* mdl) const;
+        void writeCoupled(std::ostream& out,
+                          const graph::CoupledModel* mdl) const;
+        void writePort(std::ostream& out, const graph::Model* mdl) const;
+        void writeConnection(std::ostream& out,
+                             const graph::CoupledModel* mdl) const;
+        void writeGraphics(std::ostream& out, const graph::Model* mdl) const;
     };
 
     /**

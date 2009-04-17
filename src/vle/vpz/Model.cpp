@@ -25,9 +25,6 @@
 
 #include <vle/vpz/Model.hpp>
 #include <vle/utils/Debug.hpp>
-#include <vle/graph/CoupledModel.hpp>
-#include <vle/graph/AtomicModel.hpp>
-#include <stack>
 
 namespace vle { namespace vpz {
 
@@ -46,7 +43,7 @@ Model::Model(const Model& mdl) :
 void Model::write(std::ostream& out) const
 {
     out << "<structures>\n";
-    writeModel(out);
+    m_atomicmodels.writeModel(m_graph, out);
     out << "</structures>\n";
 }
 
@@ -69,152 +66,6 @@ graph::Model* Model::model()
 graph::Model* Model::model() const
 {
     return m_graph;
-}
-
-//
-///
-//// Write graph information to stream.
-///
-//
-
-void Model::writeModel(std::ostream& out) const
-{
-    if (m_graph) {
-        if (m_graph->isAtomic()) {
-            writeAtomic(out, static_cast < const graph::AtomicModel*
-                        >(m_graph));
-        } else {
-            writeCoupled(out, static_cast < const graph::CoupledModel* >
-                         (m_graph));
-        }
-    }
-}
-
-void Model::writeCoupled(std::ostream& out, const graph::CoupledModel* mdl) const
-{
-    typedef std::stack < const graph::CoupledModel* > CoupledModelList;
-    typedef std::stack < bool > IsWritedCoupledModel;
-
-    CoupledModelList cms;
-    IsWritedCoupledModel writed;
-
-    cms.push(mdl);
-    writed.push(false);
-
-    while (not cms.empty()) {
-        const graph::CoupledModel* top(cms.top());
-
-        if (not writed.top()) {
-            writed.top() = true;
-            out << "<model name=\"" << top->getName().c_str() << "\" "
-                << "type=\"coupled\" ";
-            writeGraphics(out, top);
-            out << " >\n";
-            writePort(out, top);
-            out << "<submodels>\n";
-
-            const graph::ModelList& childs(top->getModelList());
-            for (graph::ModelList::const_iterator it = childs.begin();
-                 it != childs.end(); ++it) {
-                if (it->second->isCoupled()) {
-                    cms.push(static_cast < graph::CoupledModel* >(it->second));
-                    writed.push(false);
-                } else if (it->second->isAtomic()) {
-                    writeAtomic(out, static_cast < graph::AtomicModel* >
-                                (it->second));
-                }
-            }
-        } else {
-            out << "</submodels>\n";
-            writeConnection(out, top);
-            cms.pop();
-            writed.pop();
-            out << "</model>\n";
-        }
-    }
-}
-
-void Model::writeAtomic(std::ostream& out, const graph::AtomicModel* mdl) const
-{
-    const AtomicModel& vpzatom(atomicModels().get(mdl));
-
-    out << "<model name=\"" << mdl->getName().c_str() << "\" "
-        << "type=\"atomic\" ";
-
-    if (not vpzatom.conditions().empty()) {
-	out << "conditions=\"";
-
-        Strings::const_iterator it = vpzatom.conditions().begin();
-        while (it != vpzatom.conditions().end()) {
-            out << it->c_str();
-            ++it;
-            if (it != vpzatom.conditions().end()) {
-                out << ",";
-            }
-        }
-
-        out << "\" ";
-    }
-    out << "dynamics=\"" << vpzatom.dynamics().c_str() << "\" ";
-
-    if (not vpzatom.observables().empty()) {
-        out << "observables=\"" << vpzatom.observables().c_str() << "\" ";
-    }
-
-    writeGraphics(out, mdl);
-
-    out << ">\n";
-
-    writePort(out, mdl);
-
-    out << "</model>\n";
-}
-
-void Model::writeGraphics(std::ostream& out, const graph::Model* mdl) const
-{
-    if (mdl->x() >= 0) {
-        out << "x=\"" << mdl->x() << "\" ";
-    }
-    if (mdl->y() >= 0) {
-        out << "y=\"" << mdl->y() << "\" ";
-    }
-    if (mdl->width() >= 0) {
-        out << "width=\"" << mdl->width() << "\" ";
-    }
-    if (mdl->height() >= 0) {
-        out << "height=\"" << mdl->height() << "\" ";
-    }
-}
-
-void Model::writePort(std::ostream& out, const graph::Model* mdl) const
-{
-    const graph::ConnectionList& ins(mdl->getInputPortList());
-    if (not ins.empty()) {
-        out << "<in>\n";
-        for (graph::ConnectionList::const_iterator it = ins.begin();
-             it != ins.end(); ++it) {
-            out << " <port name=\"" << it->first.c_str() << "\" />\n";
-        }
-        out << "</in>\n";
-    }
-
-    const graph::ConnectionList& outs(mdl->getOutputPortList());
-    if (not outs.empty()) {
-        out << "<out>\n";
-        for (graph::ConnectionList::const_iterator it = outs.begin();
-             it != outs.end(); ++it) {
-            out << " <port name=\"" << it->first.c_str() << "\" />\n";
-        }
-        out << "</out>\n";
-    }
-
-}
-
-void Model::writeConnection(std::ostream& out, const graph::CoupledModel* mdl) const
-{
-    out << "<connections>\n";
-    mdl->writeConnections(out);
-    out << "</connections>\n";
 }
 
 }} // namespace vle vpz
