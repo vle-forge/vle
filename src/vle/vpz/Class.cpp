@@ -44,7 +44,7 @@ Class::Class(const Class& cls) :
 void Class::write(std::ostream& out) const
 {
     out << "<class name=\"" << m_name.c_str() << "\" >\n";
-    m_model->writeXML(out);
+    m_atomicmodels.writeModel(m_model, out);
     out << "</class>\n";
 }
 
