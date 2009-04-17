@@ -301,8 +301,8 @@ AtomicModelBox::ConditionTreeView::ConditionTreeView(
 {
     mRefTreeModel = Gtk::ListStore::create(mColumns);
     set_model(mRefTreeModel);
-    append_column("Name", mColumns.m_col_name);
     append_column_editable("In", mColumns.m_col_activ);
+    append_column("Name", mColumns.m_col_name);
 }
 
 AtomicModelBox::ConditionTreeView::~ConditionTreeView()
@@ -317,18 +317,22 @@ void AtomicModelBox::ConditionTreeView::build()
     vpz::Strings::const_iterator f;
     vpz::ConditionList list = mConditions->conditionlist();
     vpz::ConditionList::iterator it = list.begin();
+    std::string selections("");
 
     while (it != list.end()) {
         Gtk::TreeModel::Row row = *(mRefTreeModel->append());
 
         row[mColumns.m_col_name] = it->first;
         f = std::find(cond.begin(), cond.end(), it->first);
-        if (f != cond.end())
+        if (f != cond.end()) {
             row[mColumns.m_col_activ] = true;
-        else
+	    selections += (it->first + " ");
+	} else {
             row[mColumns.m_col_activ] = false;
+	}
         it++;
     }
+    mLabel->set_label("Selected conditions: " + selections);
 }
 
 vpz::Strings AtomicModelBox::ConditionTreeView::getConditions()
@@ -348,10 +352,330 @@ vpz::Strings AtomicModelBox::ConditionTreeView::getConditions()
     return vec;
 }
 
+//DynamicTreeView
+
+AtomicModelBox::DynamicTreeView::DynamicTreeView(
+    BaseObjectType* cobject,
+    const Glib::RefPtr<Gnome::Glade::Xml>& xml /*refGlade*/) :
+    Gtk::TreeView(cobject),
+    mDynamicBox(xml)
+{
+    mRefTreeModelDyn = Gtk::ListStore::create(mColumnsDyn);
+    set_model(mRefTreeModelDyn);
+    append_column("Name", mColumnsDyn.m_col_name);
+    append_column("Library", mColumnsDyn.m_dyn);
+
+    //Fill popup menu:
+    {
+	Gtk::Menu::MenuList& menulist = mMenuPopup.items();
+
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		"_Add",
+		sigc::mem_fun(
+		    *this,
+		    &AtomicModelBox::DynamicTreeView::onAdd)));
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		"_Edit",
+		sigc::mem_fun(
+		    *this,
+		    &AtomicModelBox::DynamicTreeView::onEdit)));
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		"_Remove",
+		sigc::mem_fun(
+		    *this,
+		    &AtomicModelBox::DynamicTreeView::onRemove)));
+    }
+    mMenuPopup.accelerate(*this);
+}
+
+AtomicModelBox::DynamicTreeView::~DynamicTreeView()
+{
+
+}
+
+void AtomicModelBox::DynamicTreeView::build()
+{
+    assert(mModeling);
+    using namespace vpz;
+
+    mRefTreeModelDyn->clear();
+
+    const DynamicList& list = mModeling->dynamics().dynamiclist();
+    DynamicList::const_iterator it = list.begin();
+    while (it != list.end()) {
+        Gtk::TreeModel::Row row = *(mRefTreeModelDyn->append());
+        row[mColumnsDyn.m_col_name] = it->first;
+        row[mColumnsDyn.m_dyn] = it->second.library();
+
+        ++it;
+    }
+
+    const Gtk::TreeModel::Children& child = mRefTreeModelDyn->children();
+    Gtk::TreeModel::Children::const_iterator it_child = child.begin();
+    while (it_child != child.end()) {
+        if (it_child->get_value(mColumnsDyn.m_col_name) == mModel->dynamics()) {
+	    Gtk::TreeModel::Path path = mRefTreeModelDyn->get_path(it_child);
+	    set_cursor(path);
+	    mLabel->set_label("Selected Dynamic: " + mModel->dynamics());
+	}
+        ++it_child;
+    }
+}
+
+bool AtomicModelBox::DynamicTreeView::on_button_press_event(GdkEventButton *event)
+{
+  //Call base class, to allow normal handling,
+  //such as allowing the row to be selected by the right-click:
+  bool return_value = TreeView::on_button_press_event(event);
+
+  //Then do our custom stuff:
+  if( (event->type == GDK_BUTTON_PRESS) && (event->button == 3) )
+  {
+      mMenuPopup.popup(event->button, event->time);
+  }
+
+  return return_value;
+}
+
+void AtomicModelBox::DynamicTreeView::onAdd()
+{
+    SimpleTypeBox box("Name of the Dynamic ?");
+
+    std::string name = box.run();
+    if (box.valid()) {
+	box.hide_all();
+        name = boost::trim_copy(name);
+        if (mModeling->dynamics().exist(name)) {
+            Error(boost::str(boost::format(
+                        "The Dynamics '%1%' already exists") % name));
+        } else {
+            vpz::Dynamic* dyn = new vpz::Dynamic(name);
+            mDynamicBox.show(dyn);
+            if (mDynamicBox.valid()) {
+                mModeling->dynamics().add(*dyn);
+                build();
+
+		const Gtk::TreeModel::Children& child(mRefTreeModelDyn->children());
+                Gtk::TreeModel::Children::const_iterator it = child.begin();
+                while (it != child.end()) {
+                    if (it->get_value(mColumnsDyn.m_col_name) == dyn->name()) {
+			Gtk::TreeModel::Path path = mRefTreeModelDyn->get_path(it);
+			set_cursor(path);
+                        break;
+                    }
+                    ++it;
+                }
+            }
+        }
+    }
+}
+
+void AtomicModelBox::DynamicTreeView::onEdit()
+{
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection	= get_selection();
+    Gtk::TreeModel::iterator it = refSelection->get_selected();
+    Glib::ustring dyn = (*it)[mColumnsDyn.m_col_name];
+
+    if (!dyn.empty()) {
+        mDynamicBox.show(&(mModeling->dynamics().get(dyn)));
+        build();
+
+	const Gtk::TreeModel::Children& child(mRefTreeModelDyn->children());
+	Gtk::TreeModel::Children::const_iterator it = child.begin();
+	while (it != child.end()) {
+	    if (it->get_value(mColumnsDyn.m_col_name) == dyn) {
+		Gtk::TreeModel::Path path = mRefTreeModelDyn->get_path(it);
+		set_cursor(path);
+		mLabel->set_label("Selected Dynamic: " + mModel->dynamics());
+		break;
+	    }
+	    ++it;
+	}
+    }
+}
+
+void AtomicModelBox::DynamicTreeView::onRemove()
+{
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection	= get_selection();
+    Gtk::TreeModel::iterator it = refSelection->get_selected();
+    Glib::ustring dyn = (*it)[mColumnsDyn.m_col_name];
+
+    if (dyn != "") {
+        mModeling->dynamics().del(dyn);
+	build();
+    }
+}
+
+std::string AtomicModelBox::DynamicTreeView::getDynamic()
+{
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+    Gtk::TreeModel::iterator iter = refSelection->get_selected();
+    Gtk::TreeModel::Row row = *iter;
+    std::string dynamicname = row.get_value(mColumnsDyn.m_col_name);
+    return dynamicname;
+}
+
+//ObservableTreeView
+
+AtomicModelBox::ObservableTreeView::ObservableTreeView(
+    BaseObjectType* cobject,
+    const Glib::RefPtr<Gnome::Glade::Xml>& xml /*refGlade*/) :
+    Gtk::TreeView(cobject),
+    mObsAndViewBox(xml)
+{
+    mRefTreeModelObs = Gtk::ListStore::create(mColumnsObs);
+    set_model(mRefTreeModelObs);
+    append_column("Name", mColumnsObs.m_col_name);
+
+    //Fill popup menu:
+    {
+	Gtk::Menu::MenuList& menulist = mMenuPopup.items();
+
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		"_Add",
+		sigc::mem_fun(
+		    *this,
+		    &AtomicModelBox::ObservableTreeView::onAdd)));
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		"_Edit",
+		sigc::mem_fun(
+		    *this,
+		    &AtomicModelBox::ObservableTreeView::onEdit)));
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		"_Remove",
+		sigc::mem_fun(
+		    *this,
+		    &AtomicModelBox::ObservableTreeView::onRemove)));
+    }
+    mMenuPopup.accelerate(*this);
+}
+
+AtomicModelBox::ObservableTreeView::~ObservableTreeView()
+{
+
+}
+
+void AtomicModelBox::ObservableTreeView::build()
+{
+    assert(mModeling);
+    using namespace vpz;
+
+    mRefTreeModelObs->clear();
+
+    Observables observables = mModeling->observables();
+    Observables::const_iterator it = observables.begin();
+
+    Gtk::TreeModel::Row row = *(mRefTreeModelObs->append());
+    row[mColumnsObs.m_col_name] = "";
+
+    while (it != observables.end()) {
+        Gtk::TreeModel::Row row = *(mRefTreeModelObs->append());
+        row[mColumnsObs.m_col_name] = it->first;
+
+        ++it;
+    }
+
+    const Gtk::TreeModel::Children& child = mRefTreeModelObs->children();
+    Gtk::TreeModel::Children::const_iterator it_child = child.begin();
+    while (it_child != child.end()) {
+        if (it_child->get_value(mColumnsObs.m_col_name) == mModel->observables()) {
+	    Gtk::TreeModel::Path path = mRefTreeModelObs->get_path(it_child);
+	    set_cursor(path);
+	    mLabel->set_label("Selected Observable: " + mModel->observables());
+	}
+        ++it_child;
+    }
+}
+
+bool AtomicModelBox::ObservableTreeView::on_button_press_event(
+    GdkEventButton *event)
+{
+  //Call base class, to allow normal handling,
+  //such as allowing the row to be selected by the right-click:
+  bool return_value = TreeView::on_button_press_event(event);
+
+  //Then do our custom stuff:
+  if( (event->type == GDK_BUTTON_PRESS) && (event->button == 3) )
+  {
+      mMenuPopup.popup(event->button, event->time);
+  }
+
+  return return_value;
+}
+
+void AtomicModelBox::ObservableTreeView::onAdd()
+{
+    SimpleTypeBox box("Name of the Observable ?");
+
+    std::string name = box.run();
+    if (box.valid()) {
+        name = boost::trim_copy(name);
+        if (mModeling->observables().exist(name)) {
+            Error(boost::str(boost::format(
+                        "The observable '%1%' already exists") % name));
+        } else {
+            mModeling->observables().add(vpz::Observable(name));
+	    build();
+
+            const Gtk::TreeModel::Children& child =
+		mRefTreeModelObs->children();
+            Gtk::TreeModel::Children::const_iterator it_child = child.begin();
+            while (it_child != child.end()) {
+                if (it_child->get_value(mColumnsObs.m_col_name) == name) {
+		    Gtk::TreeModel::Path path =
+			mRefTreeModelObs->get_path(it_child);
+		    set_cursor(path);
+                    break;
+                }
+                ++it_child;
+            }
+        }
+    }
+}
+
+void AtomicModelBox::ObservableTreeView::onEdit()
+{
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection	= get_selection();
+    Gtk::TreeModel::iterator it = refSelection->get_selected();
+    Glib::ustring obs = (*it)[mColumnsObs.m_col_name];
+
+    if (obs != "") {
+        mObsAndViewBox.show(mModeling->observables(),
+			    std::string(obs),
+			    mModeling->measures());
+    }
+}
+
+void AtomicModelBox::ObservableTreeView::onRemove()
+{
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection	= get_selection();
+    Gtk::TreeModel::iterator it = refSelection->get_selected();
+    Glib::ustring obs = (*it)[mColumnsObs.m_col_name];
+
+    if (obs != "") {
+        mModeling->observables().del(obs);
+	build();
+    }
+}
+
+std::string AtomicModelBox::ObservableTreeView::getObservable()
+{
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+    Gtk::TreeModel::iterator iter = refSelection->get_selected();
+    Gtk::TreeModel::Row row = *iter;
+    std::string observablename = row.get_value(mColumnsObs.m_col_name);
+    return observablename;
+}
+
 // AtomicModelBox
 
-AtomicModelBox::AtomicModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
-			       Modeling* m):
+AtomicModelBox::AtomicModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m):
     mXml(xml),
     mModeling(m),
     mAtom(0),
@@ -366,9 +690,7 @@ AtomicModelBox::AtomicModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
     mCond_backup(0),
     mOutputs_backup(0),
     mConnection_in_backup(0),
-    mConnection_out_backup(0),
-    mDynamicBox(xml),
-    mObsAndViewBox(new ObsAndViewBox(xml))
+    mConnection_out_backup(0)
 {
     xml->get_widget("DialogAtomicModel", mDialog);
 
@@ -379,42 +701,16 @@ AtomicModelBox::AtomicModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
     xml->get_widget_derived("TreeViewOutputPorts", mOutputPorts);
 
     //Dynamic
-    xml->get_widget("ComboBoxDynamic", mComboDyn);
-    mRefComboDyn = Gtk::ListStore::create(m_ColumnsDyn);
-    mComboDyn->set_model(mRefComboDyn);
-    mComboDyn->pack_start(m_ColumnsDyn.m_name);
-    mComboDyn->pack_start(m_ColumnsDyn.m_dyn);
-    mComboDyn->signal_changed().connect(
-        sigc::mem_fun(*this, &AtomicModelBox::changed_dynamic));
-    xml->get_widget("AddDynamic", mAddDyn);
-    mAddDyn->signal_clicked().connect(
-        sigc::mem_fun(*this, &AtomicModelBox::add_dynamic));
-    xml->get_widget("EditDynamic", mEditDyn);
-    mEditDyn->signal_clicked().connect(
-        sigc::mem_fun(*this, &AtomicModelBox::edit_dynamic));
-    xml->get_widget("DeleteDynamic", mDelDyn);
-    mDelDyn->signal_clicked().connect(
-        sigc::mem_fun(*this, &AtomicModelBox::del_dynamic));
+    xml->get_widget_derived("TreeViewDynamics", mDynamics);
+    xml->get_widget("labelDynamicList", mLabelDynamics);
 
     //Observable
-    xml->get_widget("ComboBoxObs", mComboObs);
-    mRefComboObs = Gtk::ListStore::create(m_ColumnsObs);
-    mComboObs->set_model(mRefComboObs);
-    mComboObs->pack_start(m_ColumnsObs.m_col_name);
-    mComboObs->signal_changed().connect(
-        sigc::mem_fun(*this, &AtomicModelBox::changed_observable));
-    xml->get_widget("AddObservable", mAddObs);
-    mAddObs->signal_clicked().connect(
-        sigc::mem_fun(*this, &AtomicModelBox::add_observable));
-    xml->get_widget("EditObservable", mEditObs);
-    mEditObs->signal_clicked().connect(
-        sigc::mem_fun(*this, &AtomicModelBox::edit_observable));
-    xml->get_widget("DeleteObservable", mDelObs);
-    mDelObs->signal_clicked().connect(
-        sigc::mem_fun(*this, &AtomicModelBox::del_observable));
+    xml->get_widget_derived("TreeViewObservables", mObservables);
+    xml->get_widget("labelObservableList", mLabelObservables);
 
     //Conditions
     xml->get_widget_derived("TreeViewConditions", mConditions);
+    xml->get_widget("labelConditionList", mLabelConditions);
 
     //Buttons
     xml->get_widget("ButtonAtomicApply", mButtonApply);
@@ -424,10 +720,6 @@ AtomicModelBox::AtomicModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
     xml->get_widget("ButtonAtomicCancel", mButtonCancel);
     mButtonCancel->signal_clicked().connect(
         sigc::mem_fun(*this, &AtomicModelBox::on_cancel));
-
-    mAddDyn->set_sensitive(true);
-    mEditDyn->set_sensitive(false);
-    mDelDyn->set_sensitive(false);
 }
 
 AtomicModelBox::~AtomicModelBox()
@@ -444,8 +736,6 @@ AtomicModelBox::~AtomicModelBox()
         delete mViews_backup;
     if (mCond_backup)
         delete mCond_backup;
-
-    delete mObsAndViewBox;
 }
 
 void AtomicModelBox::show(vpz::AtomicModel& atom,  graph::AtomicModel& model)
@@ -500,221 +790,40 @@ void AtomicModelBox::show(vpz::AtomicModel& atom,  graph::AtomicModel& model)
     mOutputPorts->setModel(&model);
     mOutputPorts->build();
 
-    makeDynamicsCombo();
-    makeObsCombo();
-
     mConditions->setModel(&atom);
     mConditions->setConditions(&mModeling->conditions());
+    mConditions->setLabel(mLabelConditions);
     mConditions->build();
+
+    mDynamics->setModel(&atom);
+    mDynamics->setModeling(mModeling);
+    mDynamics->setLabel(mLabelDynamics);
+    mDynamics->build();
+
+    mObservables->setModel(&atom);
+    mObservables->setModeling(mModeling);
+    mObservables->setLabel(mLabelObservables);
+    mObservables->build();
 
     mDialog->show_all();
     mDialog->run();
 }
 
-void AtomicModelBox::makeDynamicsCombo()
-{
-    mRefComboDyn->clear();
-
-    const vpz::DynamicList& list = mDyn->dynamiclist();
-    vpz::DynamicList::const_iterator it = list.begin();
-    while (it != list.end())  {
-        Gtk::TreeModel::Row row = *(mRefComboDyn->append());
-        row[m_ColumnsDyn.m_name] = it->first;
-        row[m_ColumnsDyn.m_dyn] = it->second.library();
-
-        ++it;
-    }
-
-    const Gtk::TreeModel::Children& child = mRefComboDyn->children();
-    Gtk::TreeModel::Children::const_iterator it_child = child.begin();
-    while (it_child != child.end()) {
-        if (it_child->get_value(m_ColumnsDyn.m_name) == mAtom->dynamics())
-            mComboDyn->set_active(it_child);
-
-        ++it_child;
-    }
-}
-
-void AtomicModelBox::makeObsCombo()
-{
-    mRefComboObs->clear();
-
-    vpz::ObservableList list = mObs->observablelist();
-    vpz::ObservableList::iterator it = list.begin();
-
-    Gtk::TreeModel::Row row = *(mRefComboObs->append());
-    row[m_ColumnsObs.m_col_name] = "";
-
-    while (it != list.end()) {
-        Gtk::TreeModel::Row row = *(mRefComboObs->append());
-        row[m_ColumnsObs.m_col_name] = it->first;
-
-        it++;
-    }
-    const Gtk::TreeModel::Children& child = mRefComboObs->children();
-    Gtk::TreeModel::Children::const_iterator it_child = child.begin();
-    while (it_child != child.end()) {
-        if (it_child->get_value(m_ColumnsObs.m_col_name) == mAtom->observables())
-            mComboObs->set_active(it_child);
-
-        ++it_child;
-    }
-}
-
-void AtomicModelBox::add_dynamic()
-{
-    SimpleTypeBox box("Name of the Dynamic ?");
-
-    std::string name = box.run();
-    if (box.valid()) {
-	box.hide_all();
-        name = boost::trim_copy(name);
-        if (mDyn->exist(name)) {
-            Error(boost::str(boost::format(
-                        "The Dynamics '%1%' already exists") % name));
-        } else {
-            vpz::Dynamic* dyn = new vpz::Dynamic(name);
-            mDynamicBox.show(dyn);
-            if (mDynamicBox.valid()) {
-                mDyn->add(*dyn);
-                makeDynamicsCombo();
-
-                const Gtk::TreeModel::Children& child(mRefComboDyn->children());
-                Gtk::TreeModel::Children::const_iterator it = child.begin();
-                while (it != child.end()) {
-                    if (it->get_value(m_ColumnsDyn.m_name) == dyn->name()) {
-                        mComboDyn->set_active(it);
-                        break;
-                    }
-                    ++it;
-                }
-            }
-        }
-    }
-}
-
-void AtomicModelBox::edit_dynamic()
-{
-    std::string dyn = mComboDyn->get_active()->get_value(m_ColumnsDyn.m_name);
-
-    if (!dyn.empty()) {
-        mDynamicBox.show(&(mDyn->get(dyn)));
-        makeDynamicsCombo();
-
-	const Gtk::TreeModel::Children& child = mRefComboDyn->children();
-	Gtk::TreeModel::Children::const_iterator it_child = child.begin();
-	while (it_child != child.end()) {
-	    if (it_child->get_value(m_ColumnsDyn.m_name) == dyn) {
-		mComboDyn->set_active(it_child);
-		break;
-	    }
-	    ++it_child;
-	}
-    }
-}
-
-void AtomicModelBox::del_dynamic()
-{
-    std::string dyn = mComboDyn->get_active()->get_value(m_ColumnsDyn.m_name);
-
-    if (dyn != "") {
-        mDyn->del(dyn);
-        makeDynamicsCombo();
-    }
-}
-
-void AtomicModelBox::changed_dynamic()
-{
-    if (mComboDyn->get_active()) {
-        if (not mComboDyn->get_active()->get_value(
-                m_ColumnsDyn.m_name).empty()) {
-            mAddDyn->set_sensitive(true);
-            mEditDyn->set_sensitive(true);
-            mDelDyn->set_sensitive(true);
-            return;
-        }
-    }
-    mAddDyn->set_sensitive(true);
-    mEditDyn->set_sensitive(false);
-    mDelDyn->set_sensitive(false);
-}
-
-void AtomicModelBox::add_observable()
-{
-    SimpleTypeBox box("Name of the Observable ?");
-
-    std::string name = box.run();
-    if (box.valid()) {
-        name = boost::trim_copy(name);
-        if (mObs->exist(name)) {
-            Error(boost::str(boost::format(
-                        "The observable '%1%' already exists") % name));
-        } else {
-            mObs->add(vpz::Observable(name));
-            makeObsCombo();
-
-            const Gtk::TreeModel::Children& child = mRefComboObs->children();
-            Gtk::TreeModel::Children::const_iterator it_child = child.begin();
-            while (it_child != child.end()) {
-                if (it_child->get_value(m_ColumnsObs.m_col_name) == name) {
-                    mComboObs->set_active(it_child);
-                    break;
-                }
-                ++it_child;
-            }
-        }
-    }
-}
-
-void AtomicModelBox::edit_observable()
-{
-    std::string obs = mComboObs->get_active()
-	->get_value(m_ColumnsObs.m_col_name);
-
-    if (obs != "") {
-        //ObservableBox box( mObs->get(obs), *mViews );
-        //box.run();
-        mObsAndViewBox->show(*mObs, obs, *mViews);
-    }
-}
-
-void AtomicModelBox::del_observable()
-{
-    std::string name = mComboObs->get_active()->get_value(m_ColumnsObs.m_col_name);
-    if (name != "") {
-        mObs->del(name);
-        makeObsCombo();
-    }
-}
-
-void AtomicModelBox::changed_observable()
-{
-    if (mComboObs->get_active()) {
-        if (not mComboObs->get_active()->get_value(
-                m_ColumnsObs.m_col_name).empty()) {
-            mAddObs->set_sensitive(true);
-            mEditObs->set_sensitive(true);
-            mDelObs->set_sensitive(true);
-            return;
-        }
-    }
-    mAddObs->set_sensitive(true);
-    mEditObs->set_sensitive(false);
-    mDelObs->set_sensitive(false);
-}
-
-
 void AtomicModelBox::on_apply()
 {
-    if (mComboDyn->get_active() == 0) {
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection
+	= mDynamics->get_selection();
+    if (not refSelection->get_selected()) {
         Error("You Have to assign a dynamic.");
     } else {
-        mAtom->setDynamics(mComboDyn->get_active()->get_value(
-			       m_ColumnsDyn.m_name));
-        mAtom->setObservables(mComboObs->get_active()->get_value(
-				  m_ColumnsObs.m_col_name));
-        mAtom->setConditions(mConditions->getConditions());
-        mDialog->hide_all();
+	refSelection = mObservables->get_selection();
+	if (refSelection->get_selected()) {
+	    mAtom->setObservables(mObservables->getObservable());
+	}
+	mAtom->setDynamics(mDynamics->getDynamic());
+	mAtom->setConditions(mConditions->getConditions());
+
+	mDialog->hide_all();
     }
 }
 

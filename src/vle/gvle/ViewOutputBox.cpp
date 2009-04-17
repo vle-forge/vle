@@ -31,6 +31,7 @@
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 #include <limits>
+#include <iostream>
 
 namespace vle { namespace gvle {
 
