@@ -205,6 +205,15 @@ void ViewOutputBox::onRemoveViews()
             m_viewscopy.outputs().del(output);
             m_model->erase(iter);
             m_deletedView.insert(name);
+
+	    Gtk::TreeModel::Children children = m_model->children();
+	    m_iter = children.begin();
+	    if (m_iter != children.end()) {
+		row = *m_iter;
+		updateView(row.get_value(m_viewscolumnrecord.name));
+		Gtk::TreeModel::Path path = m_model->get_path(m_iter);
+		m_views->set_cursor(path);
+	    }
         }
     }
 }
@@ -317,8 +326,8 @@ void ViewOutputBox::onClickedDirectory()
 void ViewOutputBox::storePrevious()
 {
     if (m_iter) { /* store the old view */
-        if (m_model->iter_is_valid(m_iter)) {
-            Gtk::TreeModel::Row row = *m_iter;
+	if (m_model->iter_is_valid(m_iter)) {
+	    Gtk::TreeModel::Row row = *m_iter;
             std::string name(row.get_value(m_viewscolumnrecord.name));
             assignView(name);
         }
