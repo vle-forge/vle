@@ -71,7 +71,7 @@ devs::Time GeneratorWrapper::init(const vle::devs::Time& /* time */)
             value::toDouble(m_events.get("average")),
             value::toDouble(m_events.get("stdvariation")));
     } else {
-        Throw(utils::InternalError, boost::format("Unknow generator %1%") %
+        throw utils::InternalError(boost::format("Unknow generator %1%") %
               formalism);
     }
 

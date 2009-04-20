@@ -56,7 +56,7 @@ void CairoGauge::onParameter(const std::string& /* plugin */,
                              const std::string& parameters,
                              const double& /* time */)
 {
-    Assert(utils::InternalError, m_ctx, "Cairo gauge drawing error");
+    Assert < utils::InternalError >(m_ctx, "Cairo gauge drawing error");
 
     xmlpp::DomParser parser;
 
@@ -76,7 +76,7 @@ void CairoGauge::onNewObservable(const std::string& simulator,
 {
     std::string name(buildname(simulator, port));
 
-    Assert(utils::InternalError, mName == "",
+    Assert < utils::InternalError >(mName == "",
            boost::format("CairoGauge: observable '%1%' already exists")
            % name);
 
@@ -106,7 +106,7 @@ void CairoGauge::onValue(const std::string& simulator,
         mValue = value->toDouble().value();
         delete value;
     } else {
-        Throw(utils::InternalError, boost::format(
+        throw utils::InternalError(boost::format(
                 "CairoGauge: columns %1% does not exist") % name);
     }
 

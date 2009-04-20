@@ -68,7 +68,7 @@ AtomicModel& AtomicModelList::add(graph::Model* mdl,
                                   const AtomicModel& atom)
 {
     const_iterator it = m_lst.find(mdl);
-    Assert(utils::ArgError, it == end(), boost::format(
+    Assert < utils::ArgError >(it == end(), boost::format(
             "The model [%1%] already have external information")
             % mdl->getName());
 
@@ -79,7 +79,7 @@ AtomicModel& AtomicModelList::add(graph::Model* mdl,
 void AtomicModelList::del(graph::Model* mdl)
 {
     iterator it = m_lst.find(mdl);
-    Assert(utils::ArgError, it != end(), boost::format(
+    Assert < utils::ArgError >(it != end(), boost::format(
             "The model [%1%] have not external information")
         % mdl->getName());
 
@@ -90,9 +90,9 @@ const AtomicModel& AtomicModelList::get(graph::Model* atom) const
 {
     const_iterator it = m_lst.find(atom);
     if (it == end()) {
-        Throw(utils::ArgError, boost::format(
+        throw(utils::ArgError(utils::ArgError(boost::format(
 		 "The information about atomic model [%1%] does not exist") %
-            atom->getName());
+            atom->getName())));
     }
     return it->second;
 }
@@ -101,9 +101,9 @@ AtomicModel& AtomicModelList::get(graph::Model* atom)
 {
     iterator it = m_lst.find(atom);
     if (it == end()) {
-        Throw(utils::ArgError, boost::format(
+        throw(utils::ArgError(boost::format(
                 "The information about atomic model [%1%] does not exist") %
-                    atom->getName());
+                    atom->getName()));
     }
     return it->second;
 }
@@ -112,9 +112,9 @@ const AtomicModel& AtomicModelList::get(const graph::Model* atom) const
 {
     const_iterator it = m_lst.find(const_cast < graph::Model* >(atom));
     if (it == end()) {
-        Throw(utils::ArgError, boost::format(
+        throw(utils::ArgError(boost::format(
 		"The information about atomic model [%1%] does not exist") %
-            atom->getName());
+            atom->getName()));
     }
     return it->second;
 }
@@ -123,9 +123,9 @@ AtomicModel& AtomicModelList::get(const graph::Model* atom)
 {
     iterator it = m_lst.find(const_cast < graph::Model* >(atom));
     if (it == end()) {
-        Throw(utils::ArgError, boost::format(
+        throw(utils::ArgError(boost::format(
                 "The information about atomic model [%1%] does not exist") %
-                    atom->getName());
+                    atom->getName()));
     }
     return it->second;
 }
@@ -138,9 +138,9 @@ void AtomicModelList::updateCondition(const std::string oldname,
 
 	if (std::find(lstconds.begin(), lstconds.end(), newname)
                 != lstconds.end()) {
-            Throw(utils::ArgError, boost::format(
+            throw(utils::ArgError(boost::format(
                     "Condition [%1%] already exist") %
-                        newname);
+                        newname));
         }
 
         std::list < std::string >::const_iterator itfind =

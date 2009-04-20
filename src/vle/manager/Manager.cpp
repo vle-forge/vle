@@ -285,7 +285,7 @@ void ManagerRunDistant::read()
 void ManagerRunDistant::send()
 {
     openConnectionWithSimulators();
-    Assert(utils::InternalError, not mClients.empty(),
+    Assert < utils::InternalError >(not mClients.empty(),
            "Manager have no simulator connection.");
 
     const utils::Hosts::SetHosts hosts = mHost.hosts();
@@ -451,7 +451,7 @@ void ManagerRun::initRandomGenerator(const vpz::Vpz& file)
         m_out << "Use the seed from vpz::Vpz replicas tags\n";
         m_rand = boost::shared_ptr < utils::Rand >(new utils::Rand());
 
-        Assert(utils::ArgError,
+        Assert < utils::ArgError >(
                file.project().experiment().replicas().number() > 0,
                boost::format("The replicas's tag does not defined"));
 

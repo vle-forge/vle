@@ -50,7 +50,7 @@ UndoRedo::~UndoRedo()
 
 void UndoRedo::addModel(const graph::Model* /* m */)
 {
-    Throw(utils::NotYetImplemented, "UndoRedo::addModel");
+    throw utils::NotYetImplemented("UndoRedo::addModel");
 }
 
 graph::Model* UndoRedo::getModel()

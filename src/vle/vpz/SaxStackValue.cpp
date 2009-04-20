@@ -40,35 +40,35 @@ bool ValueStackSax::isCompositeParent() const
 void ValueStackSax::pushInteger()
 {
     if (not m_valuestack.empty()) {
-        AssertS(utils::SaxParserError, isCompositeParent());
+        Assert < utils::SaxParserError >(isCompositeParent());
     }
 }
 
 void ValueStackSax::pushBoolean()
 {
     if (not m_valuestack.empty()) {
-        AssertS(utils::SaxParserError, isCompositeParent());
+        Assert < utils::SaxParserError >(isCompositeParent());
     }
 }
 
 void ValueStackSax::pushString()
 {
     if (not m_valuestack.empty()) {
-        AssertS(utils::SaxParserError, isCompositeParent());
+        Assert < utils::SaxParserError >(isCompositeParent());
     }
 }
 
 void ValueStackSax::pushDouble()
 {
     if (not m_valuestack.empty()) {
-        AssertS(utils::SaxParserError, isCompositeParent());
+        Assert < utils::SaxParserError >(isCompositeParent());
     }
 }
 
 void ValueStackSax::pushMap()
 {
     if (not m_valuestack.empty()) {
-        AssertS(utils::SaxParserError, isCompositeParent());
+        Assert < utils::SaxParserError >(isCompositeParent());
     }
 
     pushOnVectorValue(value::Map::create());
@@ -77,7 +77,7 @@ void ValueStackSax::pushMap()
 void ValueStackSax::pushMapKey(const std::string& key)
 {
     if (not m_valuestack.empty()) {
-        AssertS(utils::SaxParserError, m_valuestack.top()->isMap());
+        Assert < utils::SaxParserError >(m_valuestack.top()->isMap());
     }
 
     m_lastkey.assign(key);
@@ -86,7 +86,7 @@ void ValueStackSax::pushMapKey(const std::string& key)
 void ValueStackSax::pushSet()
 {
     if (not m_valuestack.empty()) {
-        AssertS(utils::SaxParserError, isCompositeParent());
+        Assert < utils::SaxParserError >(isCompositeParent());
     }
 
     pushOnVectorValue(value::Set::create());
@@ -100,7 +100,7 @@ void ValueStackSax::pushMatrix(value::Matrix::index col,
                                value::Matrix::index rowstep)
 {
     if (not m_valuestack.empty()) {
-        AssertS(utils::SaxParserError, isCompositeParent());
+        Assert < utils::SaxParserError >(isCompositeParent());
     }
 
     pushOnVectorValue(value::Matrix::create(col, row, colmax, rowmax,
@@ -110,7 +110,7 @@ void ValueStackSax::pushMatrix(value::Matrix::index col,
 void ValueStackSax::pushTuple()
 {
     if (not m_valuestack.empty()) {
-        AssertS(utils::SaxParserError, isCompositeParent());
+        Assert < utils::SaxParserError >(isCompositeParent());
     }
 
     pushOnVectorValue(value::Tuple::create());
@@ -119,7 +119,7 @@ void ValueStackSax::pushTuple()
 void ValueStackSax::pushTable(const size_t width, const size_t height)
 {
     if (not m_valuestack.empty()) {
-        AssertS(utils::SaxParserError, isCompositeParent());
+        Assert < utils::SaxParserError >(isCompositeParent());
     }
 
     pushOnVectorValue(value::Table::create(width, height));
@@ -128,14 +128,14 @@ void ValueStackSax::pushTable(const size_t width, const size_t height)
 void ValueStackSax::pushXml()
 {
     if (not m_valuestack.empty()) {
-        AssertS(utils::SaxParserError, isCompositeParent());
+        Assert < utils::SaxParserError >(isCompositeParent());
     }
 }
 
 void ValueStackSax::pushNull()
 {
     if (not m_valuestack.empty()) {
-        AssertS(utils::SaxParserError, isCompositeParent());
+        Assert < utils::SaxParserError >(isCompositeParent());
     }
 }
 
@@ -148,7 +148,7 @@ void ValueStackSax::popValue()
 
 value::Value* ValueStackSax::topValue()
 {
-    Assert(utils::SaxParserError, not m_valuestack.empty(),
+    Assert < utils::SaxParserError >(not m_valuestack.empty(),
            "Empty sax parser value stack for the top operation");
 
     return m_valuestack.top();

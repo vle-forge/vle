@@ -413,8 +413,11 @@ void qss2::output(const Time& /* time */,
         for (unsigned int i = 0; i < m_functionNumber ; i++) {
             std::map < unsigned int , std::string >::const_iterator it;
             it = m_variableName.find(i);
-            Assert(utils::ModellingError, it != m_variableName.end(),
-                   (boost::format("Qss2: unknow variable %1%") % it->second));
+
+            if (it == m_variableName.end()) {
+                throw utils::ModellingError(boost::format(
+                        "Qss2: unknow variable %1%") % it->second);
+            }
             ee << attribute(it->second, getValue(i));
         }
         output.addEvent(ee);

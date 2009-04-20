@@ -81,9 +81,10 @@ DifferentialEquation::DifferentialEquation(const AtomicModel& model,
 double DifferentialEquation::getValue(const Time& now,
                                       double delay) const
 {
-    Assert(utils::InternalError,
-           delay <= 0 and (mSize < 0 or -delay <= (int)mSize),
-           boost::format( "DifferentialEquation: invalid delay: %1%") % delay);
+    if (not (delay <= 0 and (mSize < 0 or -delay <= (int)mSize))) {
+        throw utils::InternalError(boost::format(
+                "DifferentialEquation: invalid delay: %1%") % delay);
+    }
 
     if (delay == 0) {
         return mValue;
@@ -131,8 +132,10 @@ double DifferentialEquation::getValue(const std::string& name) const
     std::map < std::string, double >::const_iterator it(
         mExternalVariableValue.find(name));
 
-    Assert(utils::InternalError, it != mExternalVariableValue.end(),
-           boost::format("DifferentialEquation: unknow variable %1%") % name);
+    if (it == mExternalVariableValue.end()) {
+        throw utils::InternalError(boost::format(
+                "DifferentialEquation: unknow variable %1%") % name);
+    }
 
     return it->second;
 }
@@ -142,13 +145,14 @@ double DifferentialEquation::getValue(const std::string& name,
                                       const Time& now,
                                       double delay) const
 {
-    Assert(utils::InternalError,
-           delay <= 0 and (mSize < 0 or -delay <= (int)mSize),
-           boost::format("DifferentialEquation: invalid delay: %1%") % delay);
+    if (not (delay <= 0 and (mSize < 0 or -delay <= (int)mSize))) {
+        throw utils::InternalError(boost::format(
+           "DifferentialEquation: invalid delay: %1%") % delay);
+    }
 
-    if (delay == 0)
+    if (delay == 0) {
         return getValue(name);
-    else {
+    } else {
         if (mSize > 0) {
             if ((now - mStartTime).getValue() < -delay * mDelay) {
                 return externalValueBuffer(name).back().second;
@@ -406,20 +410,25 @@ void DifferentialEquation::externalTransition(const ExternalEventList& event,
 
             // it is a numerical external variable
             if ((*it)->onPort("update")) {
-                Assert(utils::InternalError, name != mVariableName,
-                       boost::format(
-                           "DifferentialEquation update, invalid variable name: %1%") % name);
+                if (name == mVariableName) {
+                    throw utils::InternalError(boost::format(
+                            "DifferentialEquation update, invalid variable " \
+                            "name: %1%") % name);
+                }
 
                 pushExternalValue(name, time, value);
-                if (mIsGradient[name])
+                if (mIsGradient[name]){
                     setGradient(name,
                                 (*it)->getDoubleAttributeValue("gradient"));
+                }
             }
             // it is a perturbation on an internal variable
             if ((*it)->onPort("perturb")) {
-                Assert(utils::InternalError, name == mVariableName,
-                       boost::format(
-                           "DifferentialEquation perturbation, invalid variable name: %1%") % name);
+                if (name != mVariableName) {
+                    throw utils::InternalError(boost::format(
+                            "DifferentialEquation perturbation, invalid " \
+                            "variable name: %1%") % name);
+                }
 
                 reset(time, value);
                 _reset = true;
@@ -442,12 +451,13 @@ void DifferentialEquation::externalTransition(const ExternalEventList& event,
 
 Value* DifferentialEquation::observation(const ObservationEvent& event) const
 {
-    Assert(utils::InternalError, event.getPortName() == mVariableName,
-           boost::format(
-               "DifferentialEquation model, invalid variable name: %1%") %
-           event.getStringAttributeValue("name"));
-    double e = (event.getTime() - mLastTime).getValue();
+    if (event.getPortName() != mVariableName) {
+        throw utils::InternalError(boost::format(
+                "DifferentialEquation model, invalid variable name: %1%") %
+            event.getStringAttributeValue("name"));
+    }
 
+    double e = (event.getTime() - mLastTime).getValue();
     return Double::create(getEstimatedValue(e));
 }
 
@@ -455,11 +465,11 @@ void DifferentialEquation::request(const RequestEvent& event,
                                    const Time& time,
                                    ExternalEventList& output) const
 {
-    Assert(utils::InternalError,
-           event.getStringAttributeValue("name") == mVariableName,
-           boost::format(
-               "DifferentialEquation model, invalid variable name: %1%") %
-           event.getStringAttributeValue("name"));
+    if (event.getStringAttributeValue("name") != mVariableName) {
+        throw utils::InternalError(boost::format(
+                "DifferentialEquation model, invalid variable name: %1%") %
+            event.getStringAttributeValue("name"));
+    }
 
     double e = (time - mLastTime).getValue();
     ExternalEvent* ee = new ExternalEvent("response");
@@ -479,9 +489,10 @@ DifferentialEquation::externalValueBuffer(
     std::map < std::string, valueBuffer >::const_iterator it(
         mExternalValueBuffer.find(name));
 
-    Assert(utils::InternalError, it != mExternalValueBuffer.end(),
-           boost::format(
+    if (it == mExternalValueBuffer.end()) {
+        throw utils::InternalError(boost::format(
                "DifferentialEquation: unknow value buffer '%1%'") % name);
+    }
 
     return it->second;
 }
@@ -493,9 +504,10 @@ DifferentialEquation::externalValueBuffer(
     std::map < std::string, valueBuffer >::iterator it(
         mExternalValueBuffer.find(name));
 
-    Assert(utils::InternalError, it != mExternalValueBuffer.end(),
-           boost::format(
-               "DifferentialEquation: unknow value buffer '%1%'") % name);
+    if (it == mExternalValueBuffer.end()) {
+        throw utils::InternalError(boost::format(
+                "DifferentialEquation: unknow value buffer '%1%'") % name);
+    }
 
     return it->second;
 }

@@ -55,7 +55,7 @@ double Ladybirdplantlouse::compute(unsigned int i,
     case 1: // y
         return b * d * x() * y() - e * y();
     default:
-        Throw(utils::InternalError, boost::format(
+        throw utils::InternalError(boost::format(
                 "Compute problem with Ladybirdplantlouse, i == %1%") % i );
     }
 }

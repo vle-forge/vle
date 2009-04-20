@@ -80,7 +80,7 @@ void SaxParser::on_start_element(
     clearLastCharactersStored();
 
     StartFuncList::iterator it = m_starts.find(name);
-    Assert(utils::SaxParserError, it != m_starts.end(), boost::format(
+    Assert < utils::SaxParserError >(it != m_starts.end(), boost::format(
             "Unknow element %1%") % name);
 
     (this->*(it->second))(att);
@@ -138,7 +138,7 @@ void SaxParser::onMatrix(const AttributeList& lst)
         }
     }
 
-    Assert(utils::SaxParserError, haverow and havecol,
+    Assert < utils::SaxParserError >(haverow and havecol,
             "Matrix value have no row or column attribute");
 
     m_valuestack.pushMatrix(col, row, colmax, rowmax, colstep, rowstep);
@@ -178,7 +178,7 @@ void SaxParser::onNull(const AttributeList&)
 
 void SaxParser::onVLEProject(const AttributeList& att)
 {
-    AssertS(utils::SaxParserError, not m_isValue);
+    Assert < utils::SaxParserError >(not m_isValue);
     m_isVPZ = true;
     m_vpzstack.pushVpz(att);
 }
@@ -311,7 +311,7 @@ void SaxParser::onClass(const AttributeList& att)
 void SaxParser::on_end_element(const Glib::ustring& name)
 {
     EndFuncList::iterator it = m_ends.find(name);
-    Assert(utils::SaxParserError, it != m_ends.end(), boost::format(
+    Assert < utils::SaxParserError >(it != m_ends.end(), boost::format(
             "Unknow end element %1%") % name);
 
     (this->*(it->second))();
@@ -547,14 +547,14 @@ void SaxParser::on_warning(const Glib::ustring& text)
 
 void SaxParser::on_error(const Glib::ustring& text)
 {
-    Throw(utils::SaxParserError,
-          (boost::format("XML Error: %1%, stack: %2%") % text % m_vpzstack));
+    throw(utils::SaxParserError(boost::format(
+                "XML Error: %1%, stack: %2%") % text % m_vpzstack));
 }
 
 void SaxParser::on_fatal_error(const Glib::ustring& text)
 {
-    Throw(utils::SaxParserError,
-          (boost::format("XML Fatal error: %1%") % text));
+    throw(utils::SaxParserError(boost::format(
+                "XML Fatal error: %1%") % text));
 }
 
 void SaxParser::on_cdata_block(const Glib::ustring& text)
@@ -564,8 +564,8 @@ void SaxParser::on_cdata_block(const Glib::ustring& text)
 
 void SaxParser::on_validity_error(const Glib::ustring& text)
 {
-    Throw(utils::SaxParserError,
-          (boost::format("XML validity error: %1%") % text));
+    throw(utils::SaxParserError(boost::format(
+                "XML validity error: %1%") % text));
 }
 
 void SaxParser::on_validity_warning(const Glib::ustring& text)

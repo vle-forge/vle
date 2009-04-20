@@ -79,7 +79,7 @@ void NetStreamWriter::open(const std::string& plugin,
         m_client->send_int(out.size());
         m_client->send_buffer(out);
     } catch(const std::exception& e) {
-        Throw(utils::InternalError, boost::format(
+        throw utils::InternalError(boost::format(
                 "NetStreamWriter open: error opening the client connection "
                 "with the OOV plugin, hostname %1% type %2% port %3%. "
                 "Error reported: %4%") % host % location % file %
@@ -102,7 +102,7 @@ void NetStreamWriter::processNewObservable(Simulator* simulator,
         m_client->send_int(out.size());
         m_client->send_buffer(out);
     } catch(const std::exception& e) {
-        Throw(utils::InternalError, boost::format(
+        throw utils::InternalError(boost::format(
                 "NetStreamWriter new observable: error writing new observable. "
                 "Error reported: %1%") % e.what());
     }
@@ -123,7 +123,7 @@ void NetStreamWriter::processRemoveObservable(Simulator* simulator,
         m_client->send_int(out.size());
         m_client->send_buffer(out);
     } catch(const std::exception& e) {
-        Throw(utils::InternalError, boost::format(
+        throw utils::InternalError(boost::format(
                 "NetStreamWriter delete observable: error writing new"
                " observable. Error reported: %1%") % e.what());
     }
@@ -153,7 +153,7 @@ void NetStreamWriter::process(ObservationEvent& event)
         m_client->send_int(out.size());
         m_client->send_buffer(out);
     } catch(const std::exception& e) {
-        Throw(utils::InternalError, boost::format(
+        throw utils::InternalError(boost::format(
                 "NetStreamWriter process state event: error writing a state"
                 " event. Error reported: %1%") % e.what());
     }
@@ -177,7 +177,7 @@ oov::PluginPtr NetStreamWriter::close(const devs::Time& time)
         m_client = 0;
         return plugin;
     } catch(const std::exception& e) {
-        Throw(utils::InternalError, boost::format(
+        throw utils::InternalError(boost::format(
                 "NetStreamWriter close: OOV does not respond. "
                 "Error reported: %1%") % e.what());
     }
@@ -199,7 +199,7 @@ oov::PluginPtr NetStreamWriter::refreshPlugin()
         }
         return plugin;
     } catch(const std::exception& e) {
-        Throw(utils::InternalError, boost::format(
+        throw utils::InternalError(boost::format(
                 "NetStreamWriter refreshPlugin: OOV does not respond."
                 "Error reported: %1%") % e.what());
     }
@@ -236,10 +236,12 @@ oov::PluginPtr NetStreamWriter::getPlugin() const
             }
         }
 
-        Assert(utils::ArgError, plugin.get(), error);
-        plugin->deserialize(vals.get(1));
-
-        return plugin;
+        if (not plugin.get()) {
+            throw utils::ArgError(error);
+        } else {
+            plugin->deserialize(vals.get(1));
+            return plugin;
+        }
     }
     return oov::PluginPtr();
 }

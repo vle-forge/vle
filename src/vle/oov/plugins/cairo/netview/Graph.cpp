@@ -160,11 +160,11 @@ void Graph::set_positions(const std::string &p)
 
     tokenizer::iterator tok_iter = tokens.begin();
     while (tok_iter != tokens.end()) {
-        Assert(utils::InternalError, vp.first != vp.second,
+        Assert < utils::InternalError >(vp.first != vp.second,
                 "The number of vertice does not match the number of names!");
         double x = utils::to_double(*tok_iter);
         ++tok_iter;
-        Assert(utils::InternalError, tok_iter != tokens.end(),
+        Assert < utils::InternalError >(tok_iter != tokens.end(),
         "netview plugin error: The number of position must be pair!");
         double y = utils::to_double(*tok_iter);
         m_G[*vp.first].position.first  = x;

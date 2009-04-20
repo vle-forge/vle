@@ -66,9 +66,9 @@ void Vpz::parseFile(const std::string& filename)
             Vpz::validateFile(m_filename);
         } catch(const xmlpp::exception& dom) {
             saxparser.clearParserState();
-            Throw(utils::ArgError, boost::format(
+            throw(utils::ArgError(boost::format(
                     "Parse file '%1%':\n[--libxml--]\n%2%[--libvpz--]\n%3%") %
-                filename % dom.what() % sax.what());
+                filename % dom.what() % sax.what()));
         }
     }
 }
@@ -86,12 +86,12 @@ void Vpz::parseMemory(const std::string& buffer)
             saxparser.clearParserState();
             Vpz::validateMemory(buffer);
         } catch(const std::exception& dom) {
-            Throw(utils::ArgError, boost::format(
+            throw(utils::ArgError(boost::format(
                     "Parse memory:\n[--libxml--]\n%1%[--libvpz--]\n%2%") %
-                dom.what() % sax.what());
+                dom.what() % sax.what()));
         }
-        Throw(utils::ArgError, boost::format(
-                "Parse memory:\n[--libvpz--]\n%1%") % sax.what());
+        throw(utils::ArgError(boost::format(
+                "Parse memory:\n[--libvpz--]\n%1%") % sax.what()));
     }
 }
 
@@ -101,7 +101,7 @@ value::Value* Vpz::parseValue(const std::string& buffer)
     SaxParser sax(vpz);
     sax.parse_memory(buffer);
 
-    Assert(utils::ArgError, sax.isValue(),
+    Assert < utils::ArgError >(sax.isValue(),
            boost::format("The buffer [%1%] is not a value.") % buffer);
 
     return sax.getValue(0);
@@ -113,7 +113,7 @@ std::vector < value::Value* > Vpz::parseValues(const std::string& buffer)
     SaxParser sax(vpz);
     sax.parse_memory(buffer);
 
-    Assert(utils::ArgError, sax.isValue(),
+    Assert < utils::ArgError >(sax.isValue(),
            boost::format("The buffer [%1%] is not a value.") % buffer);
 
     return sax.getValues();
@@ -122,11 +122,12 @@ std::vector < value::Value* > Vpz::parseValues(const std::string& buffer)
 void Vpz::write()
 {
     std::ofstream out(m_filename.c_str());
-    if (out.fail() or out.bad()) {
-        Throw(utils::ArgError,
-              (boost::format("Cannot open file %1% for writing.") %
-               m_filename));
-    }
+
+    Assert < utils::ArgError >(out.fail() or out.bad(),
+                               boost::format(
+                                       "Cannot open file %1% for writing.") %
+                                   m_filename);
+
     out << *this;
 }
 

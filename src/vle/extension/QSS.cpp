@@ -242,8 +242,12 @@ void Multiple::output(const Time& time, ExternalEventList& output) const
          (getState(mCurrentModel) == RUN and mActive))) {
         std::map < unsigned int , std::string >::const_iterator it;
         it = mVariableName.find(mCurrentModel);
-        Assert(utils::ModellingError, it != mVariableName.end(), (boost::format(
-                    "QSS::Multiple: unknown variable: %1%") % it->second));
+
+        if (it == mVariableName.end()) {
+            throw utils::ModellingError(boost::format(
+                    "QSS::Multiple: unknown variable: '%1%'") % it->second);
+        }
+
         ExternalEvent* ee = new ExternalEvent(it->second);
         double e = (time - getLastTime(mCurrentModel)).getValue();
 
@@ -383,10 +387,13 @@ void Multiple::externalTransition(const ExternalEventList& event,
 
             // c'est une variable externe numérique
             if ((*it)->onPort("update")) {
-                Assert(utils::InternalError, mVariableIndex.find(name) !=
-                       mVariableIndex.end(), boost::format(
-                           "QSS::Multiple update, invalid variable name: %1%") %
-                       name);
+
+                if (mVariableIndex.find(name) == mVariableIndex.end()) {
+                   throw utils::ModellingError(boost::format(
+                           "QSS::Multiple update, invalid variable name: '%1%'")
+                       % name);
+                }
+
                 setExternalValue(name, value);
                 if (mIsGradient[mExternalVariableIndex[name]])
                     setExternalGradient(name,
@@ -394,9 +401,12 @@ void Multiple::externalTransition(const ExternalEventList& event,
             }
             // c'est une perturbation sur une variable interne
             if ((*it)->onPort("perturb")) {
-                Assert(utils::InternalError, mVariableIndex.find(name) !=
-                       mVariableIndex.end(),
-                       boost::format("Combined Qss update, invalid variable name: %1%") % name);
+
+                if (mVariableIndex.find(name) == mVariableIndex.end()) {
+                    throw utils::InternalError(boost::format(
+                            "QSS::Multiple update, invalid variable name: %1%")
+                        % name);
+                }
 
                 reset(time, mVariableIndex[name], value);
                 _reset = true;
@@ -406,8 +416,9 @@ void Multiple::externalTransition(const ExternalEventList& event,
         // Mise à jour des valeurs de variables externes
         if (mExternalVariableNumber > 1) {
             for (unsigned int j = 0 ; j < mExternalVariableNumber ; j++)
-                mExternalVariableValue[j] += (time -
-                                              getLastTime(0)).getValue()*mExternalVariableGradient[j];
+                mExternalVariableValue[j] +=
+                    (time -
+                     getLastTime(0)).getValue()*mExternalVariableGradient[j];
         }
         for (unsigned int i = 0; i < mVariableNumber; i++) {
             if (getState(i) == POST) {
@@ -467,8 +478,10 @@ const std::string& Multiple::getVariable(unsigned int index) const
     std::map < unsigned int, std::string >::const_iterator it;
     it = mVariableName.find(index);
 
-    Assert(utils::InternalError, it != mVariableName.end(), boost::format(
-            "QSS::Multiple model, unknow variable index %1%") % index);
+    if (it == mVariableName.end()) {
+        throw utils::InternalError(boost::format(
+                "QSS::Multiple model, unknow variable index '%1%'") % index);
+    }
 
     return it->second;
 }

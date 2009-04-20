@@ -54,9 +54,11 @@ graph::CoupledModel& Executive::coupledmodel()
 
 void Executive::isInitialized() const
 {
-    Assert(utils::ModellingError, m_coordinator, boost::format(
-            "Executive model: do not use constructor to manage " \
-            "the DEVS graph (model '%1%')") % getModel().getName());
+    if (not m_coordinator) {
+        throw utils::ModellingError(boost::format(
+                "Executive model: do not use constructor to manage " \
+                "the DEVS graph (model '%1%')") % getModel().getName());
+    }
 }
 
 }} // namespace vle devs

@@ -84,10 +84,8 @@ namespace vle { namespace utils {
 
     std::ostream& Trace::output()
     {
-        Assert(utils::InternalError, m_file,
-               "Trace stream is empty");
-        Assert(utils::InternalError, m_file->is_open(),
-               "Trace stream is not opened");
+        Assert(m_file, "Trace stream is empty");
+        Assert(m_file->is_open(), "Trace stream is not opened");
 
         return *m_file;
 

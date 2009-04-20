@@ -55,7 +55,7 @@ Observable& Observables::add(const Observable& obs)
     x = m_list.insert(std::make_pair < std::string, Observable >(
             obs.name(), obs));
 
-    Assert(utils::ArgError, x.second, boost::format(
+    Assert < utils::ArgError >(x.second, boost::format(
             "Observable %1% already exist") % obs.name());
 
     return x.first->second;
@@ -64,7 +64,7 @@ Observable& Observables::add(const Observable& obs)
 Observable& Observables::get(const std::string& name)
 {
     iterator it = m_list.find(name);
-    Assert(utils::ArgError, it != m_list.end(), boost::format(
+    Assert < utils::ArgError >(it != m_list.end(), boost::format(
             "Observable %1% does not exist") % name);
 
     return it->second;
@@ -73,7 +73,7 @@ Observable& Observables::get(const std::string& name)
 const Observable& Observables::get(const std::string& name) const
 {
     const_iterator it = m_list.find(name);
-    Assert(utils::ArgError, it != m_list.end(), boost::format(
+    Assert < utils::ArgError >(it != m_list.end(), boost::format(
             "Observable %1% doest not exist") % name);
 
     return it->second;

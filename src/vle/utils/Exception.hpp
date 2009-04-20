@@ -30,6 +30,7 @@
 #include <exception>
 #include <stdexcept>
 #include <libxml++/exceptions/exception.h>
+#include <boost/format.hpp>
 
 
 
@@ -42,9 +43,11 @@ namespace vle { namespace utils {
     class BaseError : public std::runtime_error
     {
     public:
-        explicit BaseError(const std::string& argv = std::string()) :
-            std::runtime_error(argv)
-        {}
+        explicit BaseError(const std::string& argv = std::string())
+            : std::runtime_error(argv) {}
+
+        explicit BaseError(const boost::format& argv)
+            : std::runtime_error(argv.str()) {}
     };
 
     /**
@@ -54,9 +57,11 @@ namespace vle { namespace utils {
     class FileError : public BaseError
     {
     public:
-        explicit FileError(const std::string& argv = std::string()) :
-            BaseError(argv)
-        {}
+        explicit FileError(const std::string& argv = std::string())
+            : BaseError(argv) {}
+
+        explicit FileError(const boost::format& argv)
+            : BaseError(argv) {}
     };
 
     /**
@@ -66,9 +71,11 @@ namespace vle { namespace utils {
     class ParseError : public BaseError
     {
     public:
-        explicit ParseError(const std::string& argv = std::string()) :
-            BaseError(argv)
-        {}
+        explicit ParseError(const std::string& argv = std::string())
+            : BaseError(argv) {}
+
+        explicit ParseError(const boost::format& argv)
+            : BaseError(argv) {}
     };
 
     /**
@@ -78,9 +85,11 @@ namespace vle { namespace utils {
     class ArgError : public BaseError
     {
     public:
-        explicit ArgError(const std::string& argv = std::string()) :
-            BaseError(argv)
-        {}
+        explicit ArgError(const std::string& argv = std::string())
+            : BaseError(argv) {}
+
+        explicit ArgError(const boost::format& argv)
+            : BaseError(argv) {}
     };
 
     /**
@@ -90,9 +99,11 @@ namespace vle { namespace utils {
     class CastError : public BaseError
     {
     public:
-        explicit CastError(const std::string& argv = std::string()) :
-            BaseError(argv)
-        {}
+        explicit CastError(const std::string& argv = std::string())
+            : BaseError(argv) {}
+
+        explicit CastError(const boost::format& argv)
+            : BaseError(argv) {}
     };
 
     /**
@@ -102,9 +113,11 @@ namespace vle { namespace utils {
     class InternalError : public BaseError
     {
     public:
-        explicit InternalError(const std::string& argv = std::string()) :
-            BaseError(argv)
-        {}
+        explicit InternalError(const std::string& argv = std::string())
+            : BaseError(argv) {}
+
+        explicit InternalError(const boost::format& argv)
+            : BaseError(argv) {}
     };
 
     /**
@@ -113,9 +126,11 @@ namespace vle { namespace utils {
     class ModellingError : public BaseError
     {
     public:
-        explicit ModellingError(const std::string& argv = std::string()) :
-            BaseError(argv)
-        {}
+        explicit ModellingError(const std::string& argv = std::string())
+            : BaseError(argv) {}
+
+        explicit ModellingError(const boost::format& argv)
+            : BaseError(argv) {}
     };
 
     /**
@@ -124,9 +139,11 @@ namespace vle { namespace utils {
     class NotYetImplemented : public BaseError
     {
     public:
-        explicit NotYetImplemented(const std::string& argv = std::string()) :
-            BaseError(argv)
-        {}
+        explicit NotYetImplemented(const std::string& argv = std::string())
+            : BaseError(argv) {}
+
+        explicit NotYetImplemented(const boost::format& argv)
+            : BaseError(argv) {}
     };
 
     /**
@@ -135,9 +152,21 @@ namespace vle { namespace utils {
     class DevsGraphError : public BaseError
     {
     public:
-        explicit DevsGraphError(const std::string& argv = std::string()) :
-            BaseError(argv)
-        {}
+        explicit DevsGraphError(const std::string& argv = std::string())
+            : BaseError(argv) {}
+
+        explicit DevsGraphError(const boost::format& argv)
+            : BaseError(argv) {}
+    };
+
+    class VpzError : public BaseError
+    {
+    public:
+        explicit VpzError(const std::string& argv = std::string())
+            : BaseError(argv) {}
+
+        explicit VpzError(const boost::format& argv)
+            : BaseError(argv) {}
     };
 
     /**
@@ -146,9 +175,11 @@ namespace vle { namespace utils {
     class SaxParserError : public xmlpp::exception
     {
     public:
-        explicit SaxParserError(const Glib::ustring& argv = std::string()) :
-            xmlpp::exception(argv)
-        {}
+        explicit SaxParserError(const Glib::ustring& argv = std::string())
+            : xmlpp::exception(argv) {}
+
+        explicit SaxParserError(const boost::format& argv)
+            : xmlpp::exception(argv.str()) {}
 
         virtual ~SaxParserError() throw()
         {}

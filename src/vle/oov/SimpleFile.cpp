@@ -55,8 +55,7 @@ void SimpleFile::onParameter(const std::string& /* plugin */,
 
     m_file.open(m_filenametmp.c_str());
 
-    Assert(utils::ModellingError, m_file.is_open(),
-           boost::format(
+    Assert <utils::ModellingError >(m_file.is_open(), boost::format(
             "SimpleFile: cannot open file '%1%'") % m_filenametmp);
 }
 
@@ -79,7 +78,7 @@ void SimpleFile::onNewObservable(const std::string& simulator,
 
     std::string name(buildname(parent, simulator, portname));
 
-    Assert(utils::InternalError, m_columns.find(name) == m_columns.end(),
+    Assert <utils::InternalError >(m_columns.find(name) == m_columns.end(),
            boost::format("SimpleFile: observable '%1%' already exist") % name);
 
     m_columns[name] = m_buffer.size();
@@ -116,7 +115,7 @@ void SimpleFile::onValue(const std::string& simulator,
     std::string name(buildname(parent, simulator, port));
     Columns::iterator it = m_columns.find(name);
 
-    Assert(utils::InternalError, it != m_columns.end(), boost::format(
+    Assert < utils::InternalError >(it != m_columns.end(), boost::format(
             "SimpleFile: columns '%1%' does not exist. No new Observable ?") %
             name);
 

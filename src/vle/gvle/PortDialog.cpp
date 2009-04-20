@@ -81,7 +81,7 @@ PortDialog::PortDialog(graph::Model* model, PortDialog::PortType type) :
 
 void PortDialog::fillTreeView()
 {
-    Throw(utils::NotYetImplemented, "PortDialog::fillTreeView");
+    throw utils::NotYetImplemented("PortDialog::fillTreeView");
     //const graph::MapStringPort& lst =
     //(mPortType == PortDialog::INPUT) ? mModel->getInputPortList() :
     //(mPortType == PortDialog::OUTPUT) ? mModel->getOutputPortList() :

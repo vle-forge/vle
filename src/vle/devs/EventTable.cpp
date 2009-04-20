@@ -57,7 +57,7 @@ std::map < Simulator*, EventBagModel >::value_type&
         return **r;
     }
 
-    Throw(utils::InternalError, "Top bag problem");
+    throw utils::InternalError("Top bag problem");
 }
 
 void CompleteEventBagModel::invalidateModel(Simulator* mdl)
@@ -223,7 +223,7 @@ bool EventTable::putInternalEvent(InternalEvent* event)
     std::push_heap(mInternalEventList.begin(), mInternalEventList.end(),
                    internalLessThan);
 
-    Assert(utils::InternalError, event->getModel(), "Put internal event.");
+    assert(event->getModel());
 
     if (mInternalEventModel[event->getModel()])
       mInternalEventModel[event->getModel()]->invalidate();
@@ -235,7 +235,7 @@ bool EventTable::putInternalEvent(InternalEvent* event)
 bool EventTable::putExternalEvent(ExternalEvent* event)
 {
     Simulator* mdl = event->getTarget();
-    Assert(utils::InternalError, mdl, "Put external event.");
+    assert(mdl);
 
     mExternalEventModel[mdl].first.addEvent(event);
     InternalEventModel::iterator it = mInternalEventModel.find(mdl);
@@ -250,7 +250,7 @@ bool EventTable::putExternalEvent(ExternalEvent* event)
 bool EventTable::putRequestEvent(RequestEvent* event)
 {
     Simulator* mdl = event->getTarget();
-    Assert(utils::InternalError, mdl, "Put Request event.");
+    assert(mdl);
 
     mExternalEventModel[mdl].second.addEvent(event);
     return true;

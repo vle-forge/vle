@@ -92,10 +92,9 @@ void Table::fill(const std::string& str)
                 try {
                     result = boost::lexical_cast < long >(*it);
                 } catch(const boost::bad_lexical_cast& e) {
-                    Throw(utils::ArgError,
-                          ((boost::format("Can not convert string \'%1%\' into"
-                                    " double or long") %
-                            (*it)).str()));
+                    throw utils::ArgError(boost::format(
+                            "Can not convert string \'%1%\' into"
+                            " double or long") % (*it));
                 }
             }
 

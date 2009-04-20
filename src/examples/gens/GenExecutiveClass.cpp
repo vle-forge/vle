@@ -56,7 +56,7 @@ devs::Time GenExecutiveClass::timeAdvance() const
     case DELMODEL:
         return 1.0;
     }
-    Throw(utils::InternalError, "GenExecutiveClass ta");
+    throw utils::InternalError("GenExecutiveClass ta");
 }
 
 void GenExecutiveClass::internalTransition(const devs::Time& time)

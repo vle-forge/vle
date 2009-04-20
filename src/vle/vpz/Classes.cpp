@@ -46,7 +46,7 @@ Class& Classes::add(const std::string& name)
     x = m_lst.insert(std::make_pair < std::string, Class >(
             name, Class(name)));
 
-    Assert(utils::ArgError, x.second, boost::format(
+    Assert < utils::ArgError >(x.second, boost::format(
             "Class '%1%' already exist") % name);
 
     return x.first->second;
@@ -60,7 +60,7 @@ void Classes::del(const std::string& name)
 const Class& Classes::get(const std::string& name) const
 {
     const_iterator it = m_lst.find(name);
-    Assert(utils::ArgError, it != end(),
+    Assert < utils::ArgError >(it != end(),
            boost::format("Unknow class '%1%'") % name);
 
     return it->second;
@@ -69,7 +69,7 @@ const Class& Classes::get(const std::string& name) const
 Class& Classes::get(const std::string& name)
 {
     iterator it = m_lst.find(name);
-    Assert(utils::ArgError, it != end(),
+    Assert < utils::ArgError >(it != end(),
            boost::format("Unknow class '%1%'") % name);
 
     return it->second;

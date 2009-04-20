@@ -80,7 +80,7 @@ Output& Outputs::add(const Output& o)
 
     x = m_list.insert(std::make_pair < std::string, Output >( o.name(), o));
 
-    Assert(utils::ArgError, x.second, boost::format(
+    Assert < utils::ArgError >(x.second, boost::format(
             "An output have already this name '%1%'\n") %
         o.name());
 
@@ -90,7 +90,7 @@ Output& Outputs::add(const Output& o)
 Output& Outputs::get(const std::string& name)
 {
     iterator it = m_list.find(name);
-    Assert(utils::ArgError, it != end(),
+    Assert < utils::ArgError >(it != end(),
            boost::format("Unknow output '%1%'\n") % name);
 
     return it->second;
@@ -99,7 +99,7 @@ Output& Outputs::get(const std::string& name)
 const Output& Outputs::get(const std::string& name) const
 {
     const_iterator it = m_list.find(name);
-    Assert(utils::ArgError, it != end(),
+    Assert < utils::ArgError >(it != end(),
            boost::format("Unknow output '%1%'\n") % name);
 
     return it->second;

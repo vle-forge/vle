@@ -85,9 +85,10 @@ namespace vle { namespace extension {
              */
             virtual double operator()() const
             {
-                Assert(utils::InternalError,
-                       mEquation,
-                       "DifferentialEquation - variable not create");
+                if (not mEquation) {
+                    throw utils::InternalError(
+                        "DifferentialEquation - variable not create");
+                }
                 return mEquation->getValue();
             }
 
@@ -99,9 +100,10 @@ namespace vle { namespace extension {
             virtual double operator()(const vle::devs::Time& time,
                                       int delay) const
             {
-                Assert(utils::InternalError,
-                       mEquation,
-                       "DifferentialEquation - variable not create");
+                if (not mEquation) {
+                    throw utils::InternalError(
+                        "DifferentialEquation - variable not create");
+                }
                 return mEquation->getValue(time, delay);
             }
 
@@ -109,12 +111,12 @@ namespace vle { namespace extension {
             Var(const std::string& name, DifferentialEquation* equation) :
                 Variable(name, equation)
             {
-                Assert(utils::InternalError,
-                       name == equation->mVariableName,
-                       (boost::format(
-                               "DifferentialEquation - wrong variable"	\
-                               " name: %1% in %2%"))
-                       % name % equation->mVariableName);
+                if (name != equation->mVariableName) {
+                    throw utils::InternalError(boost::format(
+                            "DifferentialEquation - wrong variable " \
+                            "name: %1% in %2%") % name %
+                        equation->mVariableName);
+                }
             }
 
             friend class DifferentialEquation;
@@ -140,9 +142,10 @@ namespace vle { namespace extension {
              */
             virtual double operator()() const
             {
-                Assert(utils::InternalError,
-                       mEquation,
-                       "DifferentialEquation - variable not create");
+                if (not mEquation) {
+                    throw utils::InternalError(
+                        "DifferentialEquation - variable not create");
+                }
                 return mEquation->getValue(mName);
             }
 
@@ -154,9 +157,10 @@ namespace vle { namespace extension {
             virtual double operator()(const vle::devs::Time& time,
                                       int delay) const
             {
-                Assert(utils::InternalError,
-                       mEquation,
-                       "DifferentialEquation - variable not create");
+                if (not mEquation) {
+                    throw utils::InternalError(
+                        "DifferentialEquation - variable not create");
+                }
                 return mEquation->getValue(mName, time, delay);
             }
 

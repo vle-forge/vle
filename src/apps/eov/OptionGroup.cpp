@@ -80,7 +80,7 @@ void CommandOptionGroup::check()
     if (mPort == 0) {
         mPort = 8000;
     } else if (mPort > 65535 or mPort < 0) {
-        Throw(vle::utils::InternalError, boost::format(
+        throw vle::utils::InternalError(boost::format(
                 "Invalid port %1%. Choose a correct port ie. [1 - 65535]\n") %
             mPort);
     }

@@ -63,10 +63,15 @@ Matrix::Matrix(index columns, index rows, index columnmax, index rowmax, index
     m_lastX(0),
     m_lastY(0)
 {
-    Assert(utils::ArgError, columns < columnmax, boost::format(
-            "Number of columns error: %1% on %2%") % columns % columnmax);
-    Assert(utils::ArgError, rows < rowmax, boost::format(
-            "Number of row error: %1% on %2%") % rows % rowmax);
+    if (columns >= columnmax) {
+        throw utils::ArgError(boost::format(
+                "Number of columns error: %1% on %2%") % columns % columnmax);
+    }
+
+    if (rows >= rowmax) {
+        throw utils::ArgError(boost::format(
+                "Number of row error: %1% on %2%") % rows % rowmax);
+    }
 }
 
 

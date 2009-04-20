@@ -87,7 +87,7 @@ devs::Time Smartgardener2::timeAdvance() const
     case PEST:
         return 0.0;
     default:
-        Throw(utils::InternalError, "Smartgardener::timeAdvance()");
+        throw utils::InternalError("Smartgardener::timeAdvance()");
     }
 }
 
@@ -111,7 +111,7 @@ void Smartgardener2::internalTransition(const devs::Time&)
         state = IDLE;
         return;
     default:
-        Throw(utils::InternalError, "Smartgardener::internalTransition");
+        throw utils::InternalError("Smartgardener::internalTransition");
     }
 }
 

@@ -61,7 +61,7 @@ void CairoCAView::onParameter(const std::string& /* plugin */,
                               const std::string& parameters,
                               const double& /* time */)
 {
-    Assert(utils::InternalError, m_ctx, "Cairo caview drawing error");
+    Assert < utils::InternalError >(m_ctx, "Cairo caview drawing error");
     xmlpp::DomParser parser;
 
     parser.parse_memory(parameters);

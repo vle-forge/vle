@@ -44,8 +44,10 @@ DSDevs::DSDevs(const graph::AtomicModel& model,
     m_response(false),
     m_coupledModel(0)
 {
-    Assert(utils::InternalError, model.getParent(),
-           "The DSDEVS is not in an coupled model.");
+    if (not model.getParent()) {
+        throw utils::ModellingError(
+            "DSDevs ext.: not in a coupeld model");
+    }
 
     m_coupledModel = model.getParent();
 }
@@ -471,8 +473,8 @@ bool DSDevs::processSwitch(const std::string& action, const value::Map& val)
     } else if (action == "bag") {
         return processBag(val);
     } else {
-        Throw(utils::InternalError, boost::format("Unknow action '%1%'\n") %
-              action);
+        throw utils::InternalError(boost::format(
+                "DSDevs ext.: unknow action '%1%'") % action);
     }
 }
 
@@ -759,9 +761,10 @@ bool DSDevs::addModel(const std::string& /* prefixModelName */,
                  //}
              //}
          //}
-
-    Throw(utils::NotYetImplemented, "addModel from class not allowed");
          //return true;
+
+    throw utils::NotYetImplemented(
+        "DSDevs ext.: addModel from class not allowed");
 }
 
 bool DSDevs::removeModel(const std::string& /* modelName */)

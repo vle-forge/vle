@@ -52,8 +52,10 @@ void CairoLevel::onNewObservable(const std::string& simulator,
 {
     std::string name(buildname(parent, simulator));
 
-    Assert(utils::InternalError,m_columns2.find(name) == m_columns2.end(),
-           boost::format("CairoLevel: observable '%1%' already exist") % name);
+    if (m_columns2.find(name) != m_columns2.end()) {
+        throw utils::InternalError(boost::format(
+                "CairoLevel: observable '%1%' already exist") % name);
+    }
 
     m_columns.push_back(name);
     m_columns2[name] = m_buffer.size();
@@ -80,9 +82,11 @@ void CairoLevel::onValue(const std::string& simulator,
     std::string name(buildname(parent, simulator));
     std::map < std::string,int >::iterator it = m_columns2.find(name);
 
-    Assert(utils::InternalError,it != m_columns2.end(),boost::format(
-            "CairoLevel: columns %1% does not exist. No new Observable ?") %
-        name);
+    if (it == m_columns2.end()) {
+        throw utils::InternalError(boost::format(
+                "CairoLevel: columns %1% does not exist. No new Observable ?") %
+            name);
+    }
 
     m_buffer[it->second] = value;
     m_receive++;
@@ -96,7 +100,7 @@ void CairoLevel::onParameter(const std::string& /* plugin */,
                              const std::string& parameters,
                              const double& /* time */)
 {
-    Assert(utils::InternalError, m_ctx, "Cairo level drawing error");
+    Assert < utils::InternalError >(m_ctx, "Cairo level drawing error");
 
     m_minX = 1;
     m_maxX = 106;
@@ -172,7 +176,7 @@ void CairoLevel::draw()
                 } else if ((*it)->isDouble()) {
                     value = value::toDouble(*it);
                 } else {
-                    Throw(utils::InternalError,
+                    throw utils::InternalError(
                           "Can only represent integer or real");
                 }
                 unsigned int y = (int)((value - m_minList[i]) *

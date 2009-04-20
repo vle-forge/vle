@@ -50,7 +50,7 @@ void Dynamic::write(std::ostream& out) const
 
 void Dynamic::setDistantDynamics(const std::string& host, int port)
 {
-    Assert(utils::ArgError, port > 0 and port < 65535, boost::format(
+    Assert < utils::ArgError >(port > 0 and port < 65535, boost::format(
             "Error in TCP/IP port for Dynamics distant model %1% (%2%:%3%)") %
         m_name % host % port);
 

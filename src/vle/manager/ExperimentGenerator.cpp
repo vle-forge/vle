@@ -104,7 +104,7 @@ void ExperimentGenerator::build(Glib::Mutex* mutex, Glib::Cond* prod,
 
 void ExperimentGenerator::buildReplicasList()
 {
-    Assert(utils::ArgError, mFile.project().experiment().replicas().number() > 0,
+    Assert < utils::ArgError >(mFile.project().experiment().replicas().number() > 0,
            "The replicas's tag is not defined in the vpz file");
 
     mReplicasTab.resize(mFile.project().experiment().replicas().number());
@@ -157,7 +157,7 @@ void ExperimentGenerator::buildCombinationsFromReplicas(size_t cmbnumber)
     vpz::ConditionValues::const_iterator
         itValueOrig(itOrig->second.conditionvalues().begin());
 
-    Assert(utils::InternalError,
+    Assert < utils::InternalError >(
            dest.conditionlist().size() == orig.conditionlist().size(),
            boost::format("Error: %1% %2% %3%\n") % dest.conditionlist().size() %
            orig.conditionlist().size() % mCondition.size());
@@ -172,7 +172,7 @@ void ExperimentGenerator::buildCombinationsFromReplicas(size_t cmbnumber)
         itValueOrig++;
 
         if (itValueDest == itDest->second.conditionvalues().end()) {
-            Assert(utils::InternalError, itValueOrig ==
+            Assert < utils::InternalError >(itValueOrig ==
                    itOrig->second.conditionvalues().end(),
                    boost::format("Error: %1% %2%\n") %
                    itDest->second.conditionvalues().size() %

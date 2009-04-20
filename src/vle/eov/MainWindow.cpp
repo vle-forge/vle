@@ -64,7 +64,7 @@ MainWindow::MainWindow(Glib::RefPtr < Gnome::Glade::Xml > refXml, int port)
 Gtk::Window& MainWindow::window()
 {
     if (mWindow == 0) {
-        throw(utils::InternalError("EOV main window is not initialized"));
+        throw utils::InternalError("EOV main window is not initialized");
     }
     return *mWindow;
 }
@@ -142,7 +142,7 @@ void MainWindow::onAbout()
     if (not mAbout) {
         mRefXml->get_widget("aboutdialog_eov", mAbout);
         if (not mAbout) {
-            throw(utils::InternalError("EOV Glade file have problem"));
+            throw utils::InternalError("EOV Glade file have problem");
         }
         mAbout->signal_response().connect(
             sigc::mem_fun(*this, &MainWindow::onAboutClose));

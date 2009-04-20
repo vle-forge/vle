@@ -48,9 +48,10 @@ void Default::onParameter(const std::string& plugin,
     m_filename = Glib::build_filename(location, file);
     m_file.open(m_filename.c_str());
 
-    Assert(utils::ModellingError, m_file.is_open(),
-           boost::format(
+    if (not m_file.is_open()) {
+        throw utils::ModellingError(boost::format(
             "SimpleFile: cannot open file '%1%'") % m_filename);
+    }
 
     m_file << time << ": parameter "
         << " plugin: " << plugin

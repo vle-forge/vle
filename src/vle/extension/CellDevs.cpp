@@ -115,9 +115,7 @@ void CellDevs::setLastTime(devs::Time const & p_lastTime)
 
 void CellDevs::hiddenState(std::string const & p_name)
 {
-    //*** -> Assertion
     assert(m_state.find(p_name) != m_state.end());
-    //*** <- Assertion
 
     value::Value* v_value = getState(p_name);
 
@@ -128,9 +126,7 @@ void CellDevs::initState(std::string const & p_name,
                          value::Value* p_value,
                          bool p_visible)
 {
-    //*** -> Assertion
     assert(m_state.find(p_name) == m_state.end());
-    //*** <- Assertion
 
     m_stateNameList.push_back(p_name);
     m_state[p_name] = pair < value::Value* , bool >(p_value,p_visible);
@@ -285,10 +281,8 @@ double CellDevs::getDelay() const
 
 value::Value* CellDevs::getState(std::string const & p_name) const
 {
-    //*** -> Assertion
     assert(existState(p_name));
     assert(m_state.find(p_name) != m_state.end());
-    //*** <- Assertion
 
     return m_state.find(p_name)->second.first;
 }
@@ -316,13 +310,11 @@ string CellDevs::getStringState(std::string const & p_name) const
 value::Value* CellDevs::getNeighbourState(std::string const & p_neighbourName,
                                          std::string const & p_stateName) const
 {
-    //*** -> Assertion
     assert(m_neighbourState.find(p_neighbourName) !=
            m_neighbourState.end());
     assert(m_neighbourState.find(p_neighbourName)->second.
            find(p_stateName) != m_neighbourState.
            find(p_neighbourName)->second.end());
-    //*** <- Assertion
 
     return m_neighbourState.find(p_neighbourName)->second.
         find(p_stateName)->second;
@@ -360,9 +352,6 @@ unsigned int CellDevs::getNeighbourStateNumber() const
 unsigned int CellDevs::getBooleanNeighbourStateNumber(std::string const & p_stateName,
                                                       bool p_value) const
 {
-    //*** -> Assertion
-    //*** <- Assertion
-
     unsigned int v_counter = 0;
     map < string , map < string , value::Value* > >::const_iterator it =
         m_neighbourState.begin();
@@ -380,9 +369,6 @@ unsigned int CellDevs::getBooleanNeighbourStateNumber(std::string const & p_stat
 unsigned int CellDevs::getIntegerNeighbourStateNumber(std::string const & p_stateName,
                                                       long p_value) const
 {
-    //*** -> Assertion
-    //*** <- Assertion
-
     unsigned int v_counter = 0;
     map < string , map < string , value::Value* > >::const_iterator it =
         m_neighbourState.begin();
@@ -400,9 +386,7 @@ unsigned int CellDevs::getIntegerNeighbourStateNumber(std::string const & p_stat
 void CellDevs::setState(std::string const & p_name,
                         value::Value* p_value)
 {
-    //*** -> Assertion
     assert(existState(p_name));
-    //*** <- Assertion
 
     std::map < string ,  pair < value::Value* , bool > >::iterator it =
         m_state.find(p_name);
@@ -437,10 +421,8 @@ void CellDevs::setNeighbourState(std::string const & p_neighbourName,
                                  std::string const & p_stateName,
                                  const value::Value* p_value)
 {
-    //*** -> Assertion
     assert(m_neighbourState.find(p_neighbourName) !=
            m_neighbourState.end());
-    //*** <- Assertion
 
     std::map < string , value::Value* >& v_state = m_neighbourState.
         find(p_neighbourName)->second;

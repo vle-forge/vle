@@ -79,7 +79,7 @@ std::string write_to_temp(const std::string& prefix,
     else
         fd = Glib::file_open_tmp(filename);
 
-    Assert(InternalError, fd != -1, boost::format(
+    Assert(fd != -1, boost::format(
             "Cannot open file %2% with prefix %1% in tempory directory\n") %
         prefix % filename);
 
@@ -89,7 +89,7 @@ std::string write_to_temp(const std::string& prefix,
     ssize_t sz = ::write(fd, buffer.c_str(), buffer.size());
 #endif
 
-    Assert(InternalError, sz != -1 and sz != 0,
+    Assert(sz != -1 and sz != 0,
            boost::format("Cannot write buffer in file %1% in tempory "
                          "directory\n") % filename);
 

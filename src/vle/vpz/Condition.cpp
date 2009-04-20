@@ -39,7 +39,7 @@ void ValueList::add(const std::string& key, const value::Value* val)
     x = m_lst.insert(
         std::make_pair < std::string, const value::Value* >(key, val));
 
-    Assert(utils::ArgError, x.second, boost::format(
+    Assert < utils::ArgError >(x.second, boost::format(
             "Initialization port '%1%' already exist") % key);
 }
 
@@ -47,8 +47,8 @@ const value::Value& ValueList::get(const std::string& name)
 { // TODO delete this function.
     iterator it;
     if ((it = m_lst.find(name)) == end()) {
-        Throw(utils::ArgError, boost::format(
-                "Initialization port '%1%' does not exist") % name);
+        throw(utils::ArgError(boost::format(
+                "Initialization port '%1%' does not exist") % name));
     }
     assert(it->second);
     return *it->second;
@@ -58,8 +58,8 @@ const value::Value& ValueList::get(const std::string& name) const
 {
     const_iterator it;
     if ((it = m_lst.find(name)) == end()) {
-        Throw(utils::ArgError, boost::format(
-                "Initilization port '%1%' does not exist") % name);
+        throw(utils::ArgError(boost::format(
+                "Initilization port '%1%' does not exist") % name));
     }
     assert(it->second);
     return *it->second;
@@ -182,7 +182,7 @@ void Condition::setValueToPort(const std::string& portname,
                                const value::Value& value)
 {
     ConditionValues::iterator it = m_list.find(portname);
-    Assert(utils::ArgError, it != m_list.end(),
+    Assert < utils::ArgError >(it != m_list.end(),
            boost::format("Condition %1% have no port %2%") %
            m_name % portname);
 
@@ -193,7 +193,7 @@ void Condition::setValueToPort(const std::string& portname,
 void Condition::clearValueOfPort(const std::string& portname)
 {
     ConditionValues::iterator it = m_list.find(portname);
-    Assert(utils::ArgError, it != m_list.end(),
+    Assert < utils::ArgError >(it != m_list.end(),
            boost::format("Condition %1% have no port %2%") %
            m_name % portname);
 
@@ -210,7 +210,7 @@ ValueList Condition::firstValues() const
         if (it->second->size() > 0) {
             result.add(it->first, &it->second->get(0));
         } else {
-            Throw(utils::ArgError, (boost::format(
+            throw(utils::ArgError(boost::format(
                         "Build a empty first values for condition %1%.") %
                     m_name));
         }
@@ -222,9 +222,9 @@ const value::Set& Condition::getSetValues(const std::string& portname) const
 {
     ConditionValues::const_iterator it = m_list.find(portname);
 
-    Assert(utils::ArgError, it != m_list.end(),
-           boost::format("Condition %1% have no port %2%") %
-           m_name % portname);
+    Assert < utils::ArgError >(
+        it != m_list.end(), boost::format("Condition %1% have no port %2%") %
+        m_name % portname);
 
     assert(it->second);
     return *it->second;
@@ -234,7 +234,7 @@ value::Set& Condition::getSetValues(const std::string& portname)
 {
     ConditionValues::iterator it = m_list.find(portname);
 
-    Assert(utils::ArgError, it != m_list.end(),
+    Assert < utils::ArgError >(it != m_list.end(),
            boost::format("Condition %1% have no port %2%") %
            m_name % portname);
 
@@ -257,7 +257,7 @@ value::Set& Condition::lastAddedPort()
 {
     ConditionValues::iterator it = m_list.find(m_last_port);
 
-    Assert(utils::ArgError, it != m_list.end(),
+    Assert < utils::ArgError >(it != m_list.end(),
            boost::format("Condition %1% have no port %2%") %
            m_name % m_last_port);
 

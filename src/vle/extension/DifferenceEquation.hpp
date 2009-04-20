@@ -99,9 +99,10 @@ namespace vle { namespace extension { namespace DifferenceEquation {
              */
             virtual double operator()(int shift = 0)
             {
-                Assert(utils::InternalError,
-                       mEquation,
+                if (not mEquation) {
+                    throw utils::InternalError(
                        "DifferenceEquation - variable not build");
+                }
 
                 if (mEquation->init(mIterators)) {
                     return mEquation->val(mName, mIterators.mInitValues,
@@ -358,12 +359,12 @@ namespace vle { namespace extension { namespace DifferenceEquation {
             Var(std::string name, Base* equation) :
                 Variable(name, equation)
             {
-                Assert(utils::InternalError,
-                       name == ((Simple*)equation)->mVariableName,
-                       (boost::format("DifferenceEquation::simple "\
-                                      "- wrong variable"	       \
-                                      " name: %1% in %2%"))
-                       % name % ((Simple*)equation)->mVariableName);
+                if (name != ((Simple*)equation)->mVariableName) {
+                    throw utils::InternalError(boost::format(
+                            "DifferenceEquation::simple - wrong variable" \
+                            " name: %1% in %2%") % name %
+                        ((Simple*)equation)->mVariableName);
+                }
             }
 
             friend class Simple;
@@ -523,16 +524,18 @@ namespace vle { namespace extension { namespace DifferenceEquation {
              */
             virtual void operator=(double value)
             {
-                Assert(utils::InternalError,
-                       mEquation,
-                       boost::format("DifferenceEquation::multiple "\
-                                     "- variable %1% not build") % name());
+                if (not mEquation) {
+                    throw utils::InternalError(boost::format(
+                       "DifferenceEquation::multiple - variable %1% not build")
+                        % name());
+                }
 
-                Assert(utils::InternalError,
-                       not(*mIterators.mSetValues),
-                       boost::format("DifferenceEquation::multiple "\
-                                     "- variable %1% already assigned")
+                if (*mIterators.mSetValues) {
+                    throw utils::InternalError(boost::format(
+                            "DifferenceEquation::multiple " \
+                            "- variable %1% already assigned")
                        % name());
+                }
 
                 *mIterators.mMultipleValues = value;
                 *mIterators.mSetValues = true;
@@ -545,12 +548,12 @@ namespace vle { namespace extension { namespace DifferenceEquation {
              */
             virtual double operator()(int shift = 0)
             {
-                Assert(utils::InternalError,
-                       mEquation,
-                       "DifferenceEquation::multiple - variable not build");
+                if (not mEquation) {
+                    throw utils::InternalError(
+                        "DifferenceEquation::multiple - variable not build");
+                }
 
-                return ((Multiple*)mEquation)->val(mName,
-                                                   mIterators, shift);
+                return ((Multiple*)mEquation)->val(mName, mIterators, shift);
             }
 
         private:

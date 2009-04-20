@@ -379,7 +379,7 @@ void PetriNet::addArc(const std::string& src,
                       unsigned int tokenNumber)
 {
     if (existPlace(src)) {
-        Assert(utils::ModellingError, existTransition(dst),
+        Assert < utils::ModellingError >(existTransition(dst),
                boost::format("Petri Net: Unknow transition: %1%") % dst);
         Input* input = new Input(mPlaces[src],
                                  mTransitions[dst],
@@ -389,7 +389,7 @@ void PetriNet::addArc(const std::string& src,
         mPlaces[src]->addInput(input);
         mInputs.push_back(input);
     } else if (existPlace(dst)) {
-        Assert(utils::ModellingError, existTransition(src),
+        Assert < utils::ModellingError >(existTransition(src),
                boost::format( "Petri Net: Unknow transition: %1%") % src);
         Output* output = new Output(mTransitions[src],
                                     mPlaces[dst],
@@ -399,7 +399,7 @@ void PetriNet::addArc(const std::string& src,
         mPlaces[dst]->addOutput(output);
         mOutputs.push_back(output);
     } else {
-        Throw(utils::ModellingError, boost::format(
+        throw utils::ModellingError(boost::format(
                 "Petri Net: unknow place: %1% or %2%") % src % dst);
     }
 }
@@ -407,7 +407,7 @@ void PetriNet::addArc(const std::string& src,
 void PetriNet::addInitialMarking(const std::string& placeName,
                                  unsigned int tokenNumber)
 {
-    Assert(utils::ModellingError, existPlace(placeName),
+    Assert < utils::ModellingError >(existPlace(placeName),
            boost::format( "Petri Net: Unknow place: %1%") % placeName);
 
     if (tokenNumber > 0)
@@ -418,11 +418,11 @@ void PetriNet::addInputTransition(const std::string& transitionName,
                                   const std::string& portName,
                                   double delay)
 {
-    Assert(utils::ModellingError, not existTransition(transitionName),
+    Assert < utils::ModellingError >(not existTransition(transitionName),
            boost::format("Petri Net: transition '%1%' already exists")
            % transitionName);
 
-    Assert(utils::ModellingError, delay >= 0,
+    Assert < utils::ModellingError >(delay >= 0,
            boost::format("Petri Net: delay on transition %1% is negative")
            % transitionName);
 
@@ -433,7 +433,7 @@ void PetriNet::addInputTransition(const std::string& transitionName,
 void PetriNet::addOutputPlace(const std::string& placeName,
                               const std::string& portName)
 {
-    Assert(utils::ModellingError, not existPlace(placeName), boost::format(
+    Assert < utils::ModellingError >(not existPlace(placeName), boost::format(
             "Petri Net: place '%1%' already exists") % placeName);
 
     mPlaces[placeName] = new Place(placeName, 0.0);
@@ -444,7 +444,7 @@ void PetriNet::addOutputTransition(const std::string& transitionName,
                                    const std::string& portName,
                                    unsigned int priority)
 {
-    Assert(utils::ModellingError, not existTransition(transitionName),
+    Assert < utils::ModellingError >(not existTransition(transitionName),
            boost::format("Petri Net: transition '%1%' already exists")
            % transitionName);
 
@@ -457,10 +457,10 @@ void PetriNet::addOutputTransition(const std::string& transitionName,
 void PetriNet::addPlace(const std::string& placeName,
                         double delay)
 {
-    Assert(utils::ModellingError, not existPlace(placeName), boost::format(
+    Assert < utils::ModellingError >(not existPlace(placeName), boost::format(
             "Petri Net: place '%1%' already exists") % placeName);
 
-    Assert(utils::ModellingError, delay >= 0,
+    Assert < utils::ModellingError >(delay >= 0,
            boost::format("Petri Net: delay on place %1% is negative")
            % placeName);
 
@@ -471,11 +471,11 @@ void PetriNet::addTransition(const std::string& transitionName,
                              double delay,
                              unsigned int priority)
 {
-    Assert(utils::ModellingError, not existTransition(transitionName),
+    Assert < utils::ModellingError >(not existTransition(transitionName),
            boost::format("Petri Net: transition '%1%' already exists")
            % transitionName);
 
-    Assert(utils::ModellingError, delay >= 0,
+    Assert < utils::ModellingError >(delay >= 0,
            boost::format("Petri Net: delay on transition %1% is negative")
            % transitionName);
 

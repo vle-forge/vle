@@ -23,8 +23,8 @@
  */
 
 
-#ifndef UTILS_DEBUG_HPP
-#define UTILS_DEBUG_HPP
+#ifndef VLE_UTILS_DEBUG_HPP
+#define VLE_UTILS_DEBUG_HPP
 
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Tools.hpp>
@@ -33,114 +33,53 @@
 
 
 
-namespace vle { namespace utils {
+namespace vle {
 
-/**
- * A assert macro to throw exception when assertion failed. This macro
- * show compilation information like current file, line, function when
- * NDEBUG is not defile. If it define, only message is show.
- *
- * To use:
- * @code
- * Assert(file_exception, f->isopen(), "error opening file");
- * @endcode
- *
- * @param type exception class to throw
- * @param test represent test to perform
- * @param debugstring a message send to exception
- * @throw an exception define by type
- */
-#ifndef NDEBUG
-#define Assert(type, test, debugstring) { \
-    if (! (test)) { \
-        if (vle::utils::Trace::trace().isInLevel( \
-            vle::utils::Trace::IMPORTANT)) { \
-            std::string _vleerr__( \
-                boost::str(boost::format( \
-                "%5%\nAssertion '%1%' failed in file %2%: line " \
-                "%3%\n'%4%'\n%6%\n") % \
-                           #test % __FILE__ % __LINE__ % __PRETTY_FUNCTION__ % \
-                           (debugstring) % vle::utils::print_trace_report())); \
-                throw type(_vleerr__); \
-        } else { \
-            std::string _vleerr__( \
-                boost::str(boost::format("%1%") % (debugstring))); \
-            throw type(_vleerr__); \
-        } \
-    } \
-}
-#else // NDEBUG
-#define Assert(type, test, debugstring) { \
-    if (! (test)) { \
-        std::string _vleerr__( \
-            boost::str(boost::format("%1%") % (debugstring))); \
-        throw type(_vleerr__); \
-    } \
-}
-#endif // NDEBUG
+    template < typename X >
+        inline void Assert(bool test)
+        {
+            if (not test) {
+                throw X();
+            }
+        }
 
-#ifndef NDEBUG
-#define AssertS(type, test) { \
-    if (! (test)) { \
-        if (vle::utils::Trace::trace().isInLevel( \
-            vle::utils::Trace::IMPORTANT)) { \
-            std::string _vleerr__( \
-                boost::str(boost::format( \
-                "Assertion '%1%' failed in file %2%: line %3%\n'%4%'\n%5%\n") % \
-                           #test % __FILE__ % __LINE__ % __PRETTY_FUNCTION__ % \
-                           vle::utils::print_trace_report())); \
-                throw type(_vleerr__); \
-        } else { \
-	    throw type(""); \
-        } \
-    } \
-}
-#else // NDEBUG
-#define AssertS(type, test) { \
-    if (! (test)) { \
-        throw type(""); \
-    } \
-}
-#endif // NDEBUG
+    template < typename X >
+        inline void Assert(bool test, const std::string& error)
+        {
+            if (not test) {
+                throw X(error);
+            }
+        }
 
-/**
- * A function to throw an specified Exception. This marco show compilation
- * information like current file, line, function when NDEBUG is not defined.
- *
- * To use:
- * @code
- * if (not x) {
- *     delete value;
- *     Throw(Exception::File, "file not found");
- * }
- * @endcode
- *
- * @throw the specified argument.
- */
-#ifndef NDEBUG
-#define Throw(type, debugstring) { \
-    if (vle::utils::Trace::trace().isInLevel( \
-            vle::utils::Trace::IMPORTANT)) { \
-        std::string _vleerr__( \
-            boost::str(boost::format( \
-            "%4%\nThrow exception failed in file %1%: line %2%\n'%3%'\n%5%\n") % \
-                       __FILE__ % __LINE__ % __PRETTY_FUNCTION__ % \
-                       (debugstring) % vle::utils::print_trace_report())); \
-            throw type(_vleerr__); \
-    } else { \
-        std::string _vleerr__( \
-            boost::str(boost::format("%1%") % (debugstring))); \
-	throw type(_vleerr__); \
-    } \
-}
-#else // NDEBUG
-#define Throw(type, debugstring) { \
-    std::string _vleerr__( \
-        boost::str(boost::format("%1%") % (debugstring))); \
-    throw type(_vleerr__); \
-}
-#endif
+    template < typename X >
+        inline void Assert(bool test, const boost::format& error)
+        {
+            if (not test) {
+                throw X(error);
+            }
+        }
 
-}} // namespace vle utils
+    inline void Assert(bool test)
+    {
+        if (not test) {
+            throw utils::InternalError();
+        }
+    }
+
+    inline void Assert(bool test, const std::string& error)
+    {
+        if (not test) {
+            throw utils::InternalError(error);
+        }
+    }
+
+    inline void Assert(bool test, const boost::format& error)
+    {
+        if (not test) {
+            throw utils::InternalError(error);
+        }
+    }
+
+} // namespace vle
 
 #endif

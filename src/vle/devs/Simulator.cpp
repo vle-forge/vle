@@ -41,8 +41,10 @@ Simulator::Simulator(graph::AtomicModel* atomic) :
     m_dynamics(0),
     m_atomicModel(atomic)
 {
-    Assert(utils::InternalError, atomic,
-           "Simulator if not connected to an atomic model.");
+    if (not atomic) {
+        throw utils::InternalError(
+            "Simulator is not connected to an atomic model.");
+    }
 }
 
 Simulator::~Simulator()
@@ -67,14 +69,18 @@ void Simulator::addDynamics(Dynamics* dynamics)
 
 const std::string& Simulator::getName() const
 {
-    Assert(utils::InternalError, m_atomicModel, "Simulator destroyed");
+    if (not m_atomicModel) {
+        throw utils::InternalError("Simulator destroyed");
+    }
 
     return m_atomicModel->getName();
 }
 
 const std::string& Simulator::getParent()
 {
-    Assert(utils::InternalError, m_atomicModel, "Simulator destroyed");
+    if (not m_atomicModel) {
+        throw utils::InternalError("Simulator destroyed");
+    }
 
     if (m_parents.empty()) {
         m_parents.assign(m_atomicModel->getParentName());
@@ -179,8 +185,8 @@ InternalEvent* Simulator::externalTransition(
     try {
         m_dynamics->externalTransition(event, time);
     } catch(const std::exception& e) {
-        Throw(utils::ModellingError, (boost::format(
-                    "%1% in external: %2%") % getName() % e.what()));
+        throw utils::ModellingError(boost::format(
+                    "%1% in external: %2%") % getName() % e.what());
     }
     return buildInternalEvent(time);
 }
@@ -212,8 +218,8 @@ void Simulator::request(const RequestEvent& event, const Time& time,
     try {
         m_dynamics->request(event, time, output);
     } catch(const std::exception& e) {
-        Throw(utils::ModellingError, (boost::format(
-                    "%1% in request: %2%") % getName() % e.what()));
+        throw utils::ModellingError(boost::format(
+                    "%1% in request: %2%") % getName() % e.what());
     }
 }
 

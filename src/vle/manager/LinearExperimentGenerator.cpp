@@ -39,8 +39,10 @@ void LinearExperimentGenerator::buildCombination(size_t& nb)
 
 size_t LinearExperimentGenerator::getCombinationNumber() const
 {
-    Assert(utils::InternalError, not mCondition.empty(),
-           "Build a linear experimental frame with empty value?");
+    if (mCondition.empty()) {
+        throw utils::InternalError(
+            "Build a linear experimental frame with empty value?");
+    }
 
     size_t nb = 1;
 
@@ -58,9 +60,13 @@ size_t LinearExperimentGenerator::getCombinationNumber() const
 
     std::vector < cond_t >::const_iterator it;
     for (it = mCondition.begin(); it != mCondition.end(); ++it) {
-        Assert(utils::InternalError, nb == it->sz or it->sz == 1,
-               boost::format("Build a linear experimental frame with bad"
-                             " number value for condition %1%") % cndnb);
+
+        if (it->sz != nb and it->sz != 1) {
+            throw utils::InternalError(boost::format(
+                    "Build a linear experimental frame with bad"
+                    " number value for condition '%1%'") % cndnb);
+        }
+
         cndnb++;
     }
 

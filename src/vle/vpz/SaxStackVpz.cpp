@@ -72,7 +72,7 @@ void SaxStackVpz::clear()
 
 vpz::Vpz* SaxStackVpz::pushVpz(const AttributeList& att)
 {
-    AssertS(utils::SaxParserError, m_stack.empty());
+    Assert < utils::SaxParserError >(m_stack.empty());
 
     if (existAttribute(att, "date")) {
         m_vpz.project().setDate(getAttribute < std::string >(att, "date"));
@@ -96,16 +96,16 @@ vpz::Vpz* SaxStackVpz::pushVpz(const AttributeList& att)
 
 void SaxStackVpz::pushStructure()
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, parent()->isVpz());
+    Assert < utils::SaxParserError >(not m_stack.empty());
+    Assert < utils::SaxParserError >(parent()->isVpz());
 
     push(new vpz::Structures());
 }
 
 void SaxStackVpz::pushModel(const AttributeList& att)
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, parent()->isStructures() or
+    Assert < utils::SaxParserError >(not m_stack.empty());
+    Assert < utils::SaxParserError >(parent()->isStructures() or
             parent()->isSubmodels() or parent()->isClass());
 
     graph::CoupledModel* cplparent = 0;
@@ -144,18 +144,18 @@ void SaxStackVpz::pushModel(const AttributeList& att)
         }
     }
 
-    Assert(utils::SaxParserError, not name.empty(),
+    Assert < utils::SaxParserError >(not name.empty(),
            "Attribute name not defined");
-    Assert(utils::SaxParserError, not type.empty(), boost::format(
+    Assert < utils::SaxParserError >(not type.empty(), boost::format(
             "Attribute type not defined for model '%1%'") % name);
 
     if (type == "atomic") {
         try {
             gmdl = new graph::AtomicModel(name, cplparent);
         } catch(const utils::DevsGraphError& e) {
-            Throw(utils::SaxParserError, boost::format(
+            throw(utils::SaxParserError(boost::format(
                     "Error build atomic model '%1%' with error: %2%") % name %
-                e.what());
+                e.what()));
         }
 
         Class* clsparent(getLastClass());
@@ -172,12 +172,12 @@ void SaxStackVpz::pushModel(const AttributeList& att)
         try {
             gmdl = new graph::CoupledModel(name, cplparent);
         } catch(const utils::DevsGraphError& e) {
-            Throw(utils::SaxParserError, boost::format(
+            throw(utils::SaxParserError(boost::format(
                     "Error build coupled model '%1%' with error: %2%") % name %
-                e.what());
+                e.what()));
         }
     } else {
-        Throw(utils::SaxParserError, (boost::format(
+        throw(utils::SaxParserError(boost::format(
                         "Unknow model type %1%") % type));
     }
 
@@ -205,9 +205,9 @@ void SaxStackVpz::buildModelGraphics(graph::Model* mdl,
             mdl->setX(boost::lexical_cast < int >(x));
             mdl->setY(boost::lexical_cast < int >(y));
         } catch (boost::bad_lexical_cast& e) {
-            Throw(utils::SaxParserError, boost::format(
+            throw(utils::SaxParserError(boost::format(
                     "Cannot convert x or y position for model %1%") %
-                mdl->getName());
+                mdl->getName()));
         }
     }
 
@@ -216,28 +216,28 @@ void SaxStackVpz::buildModelGraphics(graph::Model* mdl,
             mdl->setWidth(boost::lexical_cast < int >(width));
             mdl->setHeight(boost::lexical_cast < int >(height));
         } catch (boost::bad_lexical_cast& e) {
-            Throw(utils::SaxParserError, boost::format(
+            throw(utils::SaxParserError(boost::format(
                     "Cannot convert width or height for model %1%") %
-                mdl->getName());
+                mdl->getName()));
         }
     }
 }
 
 void SaxStackVpz::pushPort(const AttributeList& att)
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
+    Assert < utils::SaxParserError >(not m_stack.empty());
 
     if (parent()->isCondition()) {
         pushConditionPort(att);
     } else if (parent()->isObservable()) {
         pushObservablePort(att);
     } else {
-        AssertS(utils::SaxParserError, parent()->isIn() or
+        Assert < utils::SaxParserError >(parent()->isIn() or
                 parent()->isOut());
 
         vpz::Base* type = pop();
 
-        AssertS(utils::SaxParserError, parent()->isModel());
+        Assert < utils::SaxParserError >(parent()->isModel());
 
         vpz::Model* mdl = static_cast < vpz::Model* >(parent());
         graph::Model* gmdl = mdl->model();
@@ -255,8 +255,8 @@ void SaxStackVpz::pushPort(const AttributeList& att)
 
 void SaxStackVpz::pushPortType(const Glib::ustring& name)
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, parent()->isModel());
+    Assert < utils::SaxParserError >(not m_stack.empty());
+    Assert < utils::SaxParserError >(parent()->isModel());
 
     vpz::Base* prt = 0;
     if (name == "in") {
@@ -268,16 +268,16 @@ void SaxStackVpz::pushPortType(const Glib::ustring& name)
     } else if (name == "init") {
         prt = new vpz::Init();
     } else {
-        Throw(utils::SaxParserError, (boost::format("Unknow port type %1%.") %
-                                     name));
+        throw(utils::SaxParserError(boost::format(
+                    "Unknow port type %1%.") % name));
     }
     push(prt);
 }
 
 void SaxStackVpz::pushSubModels()
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, parent()->isModel());
+    Assert < utils::SaxParserError >(not m_stack.empty());
+    Assert < utils::SaxParserError >(parent()->isModel());
 
     vpz::Submodels* sub = new vpz::Submodels();
     push(sub);
@@ -285,8 +285,8 @@ void SaxStackVpz::pushSubModels()
 
 void SaxStackVpz::pushConnections()
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, parent()->isModel());
+    Assert < utils::SaxParserError >(not m_stack.empty());
+    Assert < utils::SaxParserError >(parent()->isModel());
 
     vpz::Connections* cnts = new vpz::Connections();
     push(cnts);
@@ -294,8 +294,8 @@ void SaxStackVpz::pushConnections()
 
 void SaxStackVpz::pushConnection(const AttributeList& att)
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, parent()->isConnections());
+    Assert < utils::SaxParserError >(not m_stack.empty());
+    Assert < utils::SaxParserError >(parent()->isConnections());
 
     std::string type(getAttribute < std::string >(att, "type"));
     vpz::Base* cnt = 0;
@@ -307,16 +307,16 @@ void SaxStackVpz::pushConnection(const AttributeList& att)
     } else if (type == "output") {
         cnt = new vpz::OutputConnection();
     } else {
-        Throw(utils::SaxParserError, (boost::format("Unknow connection type %1%")
-                                     % type));
+        throw(utils::SaxParserError(boost::format(
+                    "Unknow connection type %1%") % type));
     }
     push(cnt);
 }
 
 void SaxStackVpz::pushOrigin(const AttributeList& att)
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, parent()->isInternalConnection() or
+    Assert < utils::SaxParserError >(not m_stack.empty());
+    Assert < utils::SaxParserError >(parent()->isInternalConnection() or
             parent()->isInputConnection() or
             parent()->isOutputConnection());
 
@@ -329,8 +329,8 @@ void SaxStackVpz::pushOrigin(const AttributeList& att)
 
 void SaxStackVpz::pushDestination(const AttributeList& att)
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, parent()->isOrigin());
+    Assert < utils::SaxParserError >(not m_stack.empty());
+    Assert < utils::SaxParserError >(parent()->isOrigin());
 
     std::string mdl(getAttribute < std::string >(att, "model"));
     std::string port(getAttribute < std::string >(att, "port"));
@@ -341,23 +341,23 @@ void SaxStackVpz::pushDestination(const AttributeList& att)
 
 void SaxStackVpz::buildConnection()
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
+    Assert < utils::SaxParserError >(not m_stack.empty());
 
-    AssertS(utils::SaxParserError, parent()->isDestination());
+    Assert < utils::SaxParserError >(parent()->isDestination());
     vpz::Destination* dest = static_cast < vpz::Destination* >(pop());
 
-    AssertS(utils::SaxParserError, parent()->isOrigin());
+    Assert < utils::SaxParserError >(parent()->isOrigin());
     vpz::Origin* orig = static_cast < vpz::Origin* >(pop());
 
-    AssertS(utils::SaxParserError, parent()->isInternalConnection() or
+    Assert < utils::SaxParserError >(parent()->isInternalConnection() or
             parent()->isInputConnection() or
             parent()->isOutputConnection());
     vpz::Base* cnt = pop();
 
-    AssertS(utils::SaxParserError, parent()->isConnections());
+    Assert < utils::SaxParserError >(parent()->isConnections());
     vpz::Base* cntx = pop();
 
-    AssertS(utils::SaxParserError, parent()->isModel());
+    Assert < utils::SaxParserError >(parent()->isModel());
     vpz::Model* model = static_cast < vpz::Model* >(parent());
 
     graph::CoupledModel* cpl = static_cast < graph::CoupledModel*
@@ -380,16 +380,16 @@ void SaxStackVpz::buildConnection()
 
 void SaxStackVpz::pushDynamics()
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, parent()->isVpz());
+    Assert < utils::SaxParserError >(not m_stack.empty());
+    Assert < utils::SaxParserError >(parent()->isVpz());
 
     push(&m_vpz.project().dynamics());
 }
 
 void SaxStackVpz::pushDynamic(const AttributeList& att)
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, parent()->isDynamics());
+    Assert < utils::SaxParserError >(not m_stack.empty());
+    Assert < utils::SaxParserError >(parent()->isDynamics());
 
     vpz::Dynamic dyn(getAttribute < std::string >(att, "name"));
     dyn.setLibrary(getAttribute < std::string >(att, "library"));
@@ -425,8 +425,8 @@ void SaxStackVpz::pushDynamic(const AttributeList& att)
 
 void SaxStackVpz::pushExperiment(const AttributeList& att)
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, parent()->isVpz());
+    Assert < utils::SaxParserError >(not m_stack.empty());
+    Assert < utils::SaxParserError >(parent()->isVpz());
 
     vpz::Experiment& exp(m_vpz.project().experiment());
     push(&exp);
@@ -442,8 +442,8 @@ void SaxStackVpz::pushExperiment(const AttributeList& att)
 
 void SaxStackVpz::pushReplicas(const AttributeList& att)
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, parent()->isExperiment());
+    Assert < utils::SaxParserError >(not m_stack.empty());
+    Assert < utils::SaxParserError >(parent()->isExperiment());
 
     vpz::Replicas& rep(m_vpz.project().experiment().replicas());
 
@@ -457,41 +457,41 @@ void SaxStackVpz::pushReplicas(const AttributeList& att)
                 rep.setSeed(boost::lexical_cast < guint32 >((*it).value));
                 haveseed = true;
             } catch(const boost::bad_lexical_cast& ) {
-                Throw(utils::ArgError, boost::format(
+                throw(utils::ArgError(boost::format(
                         "Cannot convert replicas's tag seed: '%1%'") %
-                    (*it).value);
+                    (*it).value));
             }
         } else if ((*it).name == "number") {
             try {
                 rep.setNumber(boost::lexical_cast < size_t >((*it).value));
                 havenumber = true;
             } catch(const boost::bad_lexical_cast& ) {
-                Throw(utils::ArgError, boost::format(
+                throw(utils::ArgError(boost::format(
                         "Cannot convert replicas's tag number: '%1%'") %
-                    (*it).value);
+                    (*it).value));
             }
         }
     }
 
-    Assert(utils::ArgError, haveseed,
+    Assert < utils::ArgError >(haveseed,
            "The replicas's tag does not define a seed");
 
-    Assert(utils::ArgError, havenumber,
+    Assert < utils::ArgError >(havenumber,
            "The replica's tag does not define a number");
 }
 
 void SaxStackVpz::pushConditions()
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, parent()->isExperiment());
+    Assert < utils::SaxParserError >(not m_stack.empty());
+    Assert < utils::SaxParserError >(parent()->isExperiment());
 
     push(&m_vpz.project().experiment().conditions());
 }
 
 void SaxStackVpz::pushCondition(const AttributeList& att)
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, parent()->isConditions());
+    Assert < utils::SaxParserError >(not m_stack.empty());
+    Assert < utils::SaxParserError >(parent()->isConditions());
 
     vpz::Conditions& cnds(m_vpz.project().experiment().conditions());
     std::string name(getAttribute < std::string >(att, "name"));
@@ -503,8 +503,8 @@ void SaxStackVpz::pushCondition(const AttributeList& att)
 
 void SaxStackVpz::pushConditionPort(const AttributeList& att)
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, parent()->isCondition());
+    Assert < utils::SaxParserError >(not m_stack.empty());
+    Assert < utils::SaxParserError >(parent()->isCondition());
 
     std::string name(getAttribute < std::string >(att, "name"));
 
@@ -514,8 +514,8 @@ void SaxStackVpz::pushConditionPort(const AttributeList& att)
 
 value::Set& SaxStackVpz::popConditionPort()
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, parent()->isCondition());
+    Assert < utils::SaxParserError >(not m_stack.empty());
+    Assert < utils::SaxParserError >(parent()->isCondition());
 
     vpz::Condition* cnd(static_cast < vpz::Condition* >(parent()));
     value::Set& vals(cnd->lastAddedPort());
@@ -525,24 +525,24 @@ value::Set& SaxStackVpz::popConditionPort()
 
 void SaxStackVpz::pushViews()
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, parent()->isExperiment());
+    Assert < utils::SaxParserError >(not m_stack.empty());
+    Assert < utils::SaxParserError >(parent()->isExperiment());
 
     push(&m_vpz.project().experiment().views());
 }
 
 void SaxStackVpz::pushOutputs()
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, parent()->isViews());
+    Assert < utils::SaxParserError >(not m_stack.empty());
+    Assert < utils::SaxParserError >(parent()->isViews());
 
     push(&m_vpz.project().experiment().views().outputs());
 }
 
 void SaxStackVpz::pushOutput(const AttributeList& att)
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, parent()->isOutputs());
+    Assert < utils::SaxParserError >(not m_stack.empty());
+    Assert < utils::SaxParserError >(parent()->isOutputs());
 
     std::string name(getAttribute < std::string >(att, "name"));
     std::string format(getAttribute < std::string >(att, "format"));
@@ -558,15 +558,15 @@ void SaxStackVpz::pushOutput(const AttributeList& att)
     } else if (format == "distant") {
         push(&outs.addDistantStream(name, location, plugin));
     } else {
-        Throw(utils::SaxParserError, (boost::format(
+        throw(utils::SaxParserError(boost::format(
                     "Unknow format '%1%' for the output %2%") % format % name));
     }
 }
 
 void SaxStackVpz::pushView(const AttributeList& att)
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, parent()->isViews());
+    Assert < utils::SaxParserError >(not m_stack.empty());
+    Assert < utils::SaxParserError >(parent()->isViews());
 
     std::string name(getAttribute< std::string >(att, "name"));
     std::string type(getAttribute< std::string >(att, "type"));
@@ -575,7 +575,7 @@ void SaxStackVpz::pushView(const AttributeList& att)
     Views& views(m_vpz.project().experiment().views());
 
     if (type == "timed") {
-        Assert(utils::SaxParserError, existAttribute(att, "timestep"),
+        Assert < utils::SaxParserError >(existAttribute(att, "timestep"),
                (boost::format("View %1% have no timestep attribute.") %
                 name));
 
@@ -586,23 +586,23 @@ void SaxStackVpz::pushView(const AttributeList& att)
     } else if (type == "finish") {
         views.addFinishView(name, out);
     } else {
-        Throw(utils::SaxParserError, (boost::format(
+        throw(utils::SaxParserError(boost::format(
                     "Unknow type '%1%' for the view %1%") % type % name));
     }
 }
 
 void SaxStackVpz::pushAttachedView(const AttributeList& att)
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, parent()->isObservablePort());
+    Assert < utils::SaxParserError >(not m_stack.empty());
+    Assert < utils::SaxParserError >(parent()->isObservablePort());
 
     pushObservablePortOnView(att);
 }
 
 void SaxStackVpz::pushObservables()
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, parent()->isViews());
+    Assert < utils::SaxParserError >(not m_stack.empty());
+    Assert < utils::SaxParserError >(parent()->isViews());
 
     Observables& obs(m_vpz.project().experiment().views().observables());
     push(&obs);
@@ -610,8 +610,8 @@ void SaxStackVpz::pushObservables()
 
 void SaxStackVpz::pushObservable(const AttributeList& att)
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, parent()->isObservables());
+    Assert < utils::SaxParserError >(not m_stack.empty());
+    Assert < utils::SaxParserError >(parent()->isObservables());
 
     Views& views(m_vpz.project().experiment().views());
 
@@ -622,8 +622,8 @@ void SaxStackVpz::pushObservable(const AttributeList& att)
 
 void SaxStackVpz::pushObservablePort(const AttributeList& att)
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, parent()->isObservable());
+    Assert < utils::SaxParserError >(not m_stack.empty());
+    Assert < utils::SaxParserError >(parent()->isObservable());
 
     std::string name(getAttribute < std::string >(att, "name"));
 
@@ -634,8 +634,8 @@ void SaxStackVpz::pushObservablePort(const AttributeList& att)
 
 void SaxStackVpz::pushObservablePortOnView(const AttributeList& att)
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, parent()->isObservablePort());
+    Assert < utils::SaxParserError >(not m_stack.empty());
+    Assert < utils::SaxParserError >(parent()->isObservablePort());
 
     std::string name(getAttribute < std::string >(att, "name"));
 
@@ -646,16 +646,16 @@ void SaxStackVpz::pushObservablePortOnView(const AttributeList& att)
 
 void SaxStackVpz::pushClasses()
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, parent()->isVpz());
+    Assert < utils::SaxParserError >(not m_stack.empty());
+    Assert < utils::SaxParserError >(parent()->isVpz());
 
     push(&m_vpz.project().classes());
 }
 
 void SaxStackVpz::pushClass(const AttributeList& att)
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, parent()->isClasses());
+    Assert < utils::SaxParserError >(not m_stack.empty());
+    Assert < utils::SaxParserError >(parent()->isClasses());
 
     std::string name(getAttribute < std::string >(att, "name"));
 
@@ -665,16 +665,16 @@ void SaxStackVpz::pushClass(const AttributeList& att)
 
 void SaxStackVpz::popClasses()
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, parent()->isClasses());
+    Assert < utils::SaxParserError >(not m_stack.empty());
+    Assert < utils::SaxParserError >(parent()->isClasses());
 
     pop();
 }
 
 void SaxStackVpz::popClass()
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
-    AssertS(utils::SaxParserError, parent()->isClass());
+    Assert < utils::SaxParserError >(not m_stack.empty());
+    Assert < utils::SaxParserError >(parent()->isClass());
 
     pop();
 }
@@ -688,13 +688,13 @@ vpz::Base* SaxStackVpz::pop()
 
 const vpz::Base* SaxStackVpz::top() const
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
+    Assert < utils::SaxParserError >(not m_stack.empty());
     return parent();
 }
 
 vpz::Base* SaxStackVpz::top()
 {
-    AssertS(utils::SaxParserError, not m_stack.empty());
+    Assert < utils::SaxParserError >(not m_stack.empty());
     return parent();
 }
 

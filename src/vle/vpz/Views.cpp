@@ -107,7 +107,7 @@ View& Views::add(const View& view)
     std::pair < iterator, bool > x;
     x = m_list.insert(std::make_pair < std::string, View >(view.name(), view));
 
-    Assert(utils::ArgError, x.second, boost::format(
+    Assert < utils::ArgError >(x.second, boost::format(
             "View '%1%' already exist") % view.name());
 
     return x.first->second;
@@ -116,7 +116,7 @@ View& Views::add(const View& view)
 View& Views::addEventView(const std::string& name,
                           const std::string& output)
 {
-    Assert(utils::ArgError, not isUsedOutput(output),
+    Assert < utils::ArgError >(not isUsedOutput(output),
            boost::format("Output '%1%' of view '%2%' is already used") %
            output % name);
 
@@ -127,7 +127,7 @@ View& Views::addTimedView(const std::string& name,
                           double timestep,
                           const std::string& output)
 {
-    Assert(utils::ArgError, not isUsedOutput(output),
+    Assert < utils::ArgError >(not isUsedOutput(output),
            boost::format("Output '%1%' of view '%2%' is already used") %
            output % name);
 
@@ -137,7 +137,7 @@ View& Views::addTimedView(const std::string& name,
 View& Views::addFinishView(const std::string& name,
                            const std::string& output)
 {
-    Assert(utils::ArgError, not isUsedOutput(output),
+    Assert < utils::ArgError >(not isUsedOutput(output),
            boost::format("Output '%1%' of view '%2%' is already used") %
            output % name);
 
@@ -152,7 +152,7 @@ void Views::del(const std::string& name)
 const View& Views::get(const std::string& name) const
 {
     ViewList::const_iterator it = m_list.find(name);
-    Assert(utils::ArgError, it != end(),
+    Assert < utils::ArgError >(it != end(),
            boost::format("Unknow view '%1%'\n") % name);
 
     return it->second;
@@ -161,7 +161,7 @@ const View& Views::get(const std::string& name) const
 View& Views::get(const std::string& name)
 {
     ViewList::iterator it = m_list.find(name);
-    Assert(utils::ArgError, it != end(),
+    Assert < utils::ArgError >(it != end(),
            boost::format("Unknow view '%1%'\n") % name);
 
     return it->second;

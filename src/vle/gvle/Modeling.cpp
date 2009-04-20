@@ -906,7 +906,7 @@ graph::Model* Modeling::newPluginModel(graph::CoupledModel* /*parent*/,
                                        const string& /*description*/,
                                        int /*x*/, int /*y*/)
 {
-    Throw(utils::NotYetImplemented, "Modeling::newPluginModel");
+    throw utils::NotYetImplemented("Modeling::newPluginModel");
     ////assert(parent);
     //assert(not name.empty());
     //assert(getPlugin());

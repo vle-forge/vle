@@ -118,8 +118,8 @@ const Host& Hosts::get_host(const std::string& hostname) const
 {
     SetHosts::iterator it = mHosts.find(Host(hostname, 0, 0));
 
-    Assert(InternalError, it != mHosts.end(),
-           boost::format("Cannot delete hostname '%1%\n") % hostname);
+    Assert < utils::ArgError >(it != mHosts.end(), boost::format(
+                "Cannot delete hostname '%1%") % hostname);
 
     return (*it);
 }

@@ -44,7 +44,7 @@ void ObservablePort::write(std::ostream& out) const
 
 void ObservablePort::add(const std::string& portname)
 {
-    Assert(utils::ArgError, not exist(portname),
+    Assert < utils::ArgError >(not exist(portname),
            (boost::format("The port %1% have already a view %2%") %
             m_name % portname));
 
@@ -85,7 +85,7 @@ ObservablePort& Observable::add(const std::string& portname)
     x = m_list.insert(std::make_pair < std::string, ObservablePort >(
             portname, ObservablePort(portname)));
 
-    Assert(utils::ArgError, x.second,
+    Assert < utils::ArgError >(x.second,
            (boost::format("The observable %1% have already a port %2%") %
             m_name, portname));
 
@@ -99,7 +99,7 @@ ObservablePort& Observable::add(const ObservablePort& obs)
     x = m_list.insert(std::make_pair < std::string, ObservablePort >(
                 obs.name(), obs));
 
-    Assert(utils::ArgError, x.second,
+    Assert < utils::ArgError >(x.second,
            (boost::format("The observable %1% have already a port %2%") %
             m_name, obs.name()));
 
@@ -109,7 +109,7 @@ ObservablePort& Observable::add(const ObservablePort& obs)
 ObservablePort& Observable::get(const std::string& portname)
 {
     iterator it = m_list.find(portname);
-    Assert(utils::ArgError, it != m_list.end(),
+    Assert < utils::ArgError >(it != m_list.end(),
            (boost::format("The observable %1% have not port %2%") %
             m_name, portname));
     return it->second;
@@ -118,7 +118,7 @@ ObservablePort& Observable::get(const std::string& portname)
 const ObservablePort& Observable::get(const std::string& portname) const
 {
     const_iterator it = m_list.find(portname);
-    Assert(utils::ArgError, it != m_list.end(),
+    Assert < utils::ArgError >(it != m_list.end(),
            (boost::format("The observable %1% have not port %2%") %
             m_name, portname));
     return it->second;

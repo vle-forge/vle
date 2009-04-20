@@ -122,17 +122,17 @@ void Model::getTargetPortList(const std::string& portname,
 
 void Model::rename(Model* mdl, const std::string& newname)
 {
-    Assert(utils::DevsGraphError, mdl, boost::format(
+    Assert < utils::DevsGraphError >(mdl,boost::format(
             "Cannot rename empty model with '%1%'") % newname);
 
     CoupledModel* parent = mdl->getParent();
     if (parent) {
         ModelList::iterator it = parent->getModelList().find(mdl->getName());
-        Assert(utils::DevsGraphError, it != parent->getModelList().end(),
+        Assert < utils::DevsGraphError >(it != parent->getModelList().end(),
                "Cannot rename a model without parent");
 	ModelList::iterator itfind = parent->getModelList().find(newname);
 	if (itfind != parent->getModelList().end()) {
-	    Throw(utils::DevsGraphError, boost::format(
+	    throw utils::DevsGraphError(boost::format(
 		      "Coupled model %1% already has submodel %2%")
 		  % parent->getName() % newname);
 	} else {
@@ -182,15 +182,17 @@ Model* Model::getModel(const CoupledModelVector& lst,
     if (lst.empty()) {
         return findModel(name);
     } else {
-        Assert(utils::DevsGraphError, isCoupled(),
+        Assert < utils::DevsGraphError >(isCoupled(),
                "Bad use of getModel from a list");
         CoupledModelVector::const_reverse_iterator it = lst.rbegin();
         CoupledModel* top = static_cast < CoupledModel* >(this);
         CoupledModel* other = *it;
 
-        Assert(utils::DevsGraphError, other->getName() == top->getName(),
-               boost::format("Get model have not the same name '%1%' and '%2%'")
-               % top->getName() % other->getName());
+        if (other->getName() != top->getName()) {
+            throw utils::DevsGraphError(boost::format(
+                    "Get model have not the same name '%1%' and '%2%'")
+                % top->getName() % other->getName());
+        }
 
         it++;
 
@@ -198,15 +200,22 @@ Model* Model::getModel(const CoupledModelVector& lst,
             other = *it;
             Model* tmp = top->findModel(other->getName());
 
-            Assert(utils::DevsGraphError, tmp, boost::format(
-                    "Model %1% not found") % other->getName());
+            if (not tmp) {
+                throw utils::DevsGraphError(boost::format(
+                        "Model '%1%' not found") % other->getName());
+            }
 
-            Assert(utils::DevsGraphError, tmp->isCoupled(), boost::format(
-                    "Model %1% is not a coupled model") % other->getName());
+            if (not tmp->isCoupled()) {
+                throw utils::DevsGraphError(boost::format(
+                        "Model '%1%' is not a coupled model") %
+                    other->getName());
+            }
 
-            Assert(utils::DevsGraphError, tmp->getName() == other->getName(),
-                   boost::format( "Model %1% have not the same parent") %
-                   other->getName());
+            if (tmp->getName() != other->getName()) {
+                throw utils::DevsGraphError(boost::format(
+                        "Model '%1%' have not the same parent") %
+                    other->getName());
+            }
 
             top = static_cast < CoupledModel* >(tmp);
             ++it;
@@ -420,7 +429,7 @@ const ModelPortList& Model::getInPort(const std::string& name) const
 {
     ConnectionList::const_iterator it = m_inPortList.find(name);
     if (it == m_inPortList.end()) {
-        Throw(utils::DevsGraphError, boost::format(
+        throw utils::DevsGraphError(boost::format(
                 "Coupled model %1% have no input port %2%") % getName() % name);
     }
 
@@ -431,7 +440,7 @@ const ModelPortList& Model::getOutPort(const std::string& name) const
 {
     ConnectionList::const_iterator it = m_outPortList.find(name);
     if (it == m_outPortList.end()) {
-        Throw(utils::DevsGraphError, boost::format(
+        throw utils::DevsGraphError(boost::format(
                 "Coupled model %1% have no output port %2%") % getName() % name);
     }
 
@@ -442,7 +451,7 @@ ModelPortList& Model::getInPort(const std::string& name)
 {
     ConnectionList::iterator it = m_inPortList.find(name);
     if (it == m_inPortList.end()) {
-        Throw(utils::DevsGraphError, boost::format(
+        throw utils::DevsGraphError(boost::format(
 	  "Model %1% have no input port %2%") % getName() % name);
     }
 
@@ -453,7 +462,7 @@ ModelPortList& Model::getOutPort(const std::string& name)
 {
     ConnectionList::iterator it = m_outPortList.find(name);
     if (it == m_outPortList.end()) {
-        Throw(utils::DevsGraphError, boost::format(
+        throw utils::DevsGraphError(boost::format(
                 "Model %1% have no output port %2%") % getName() % name);
     }
 
@@ -473,7 +482,7 @@ bool Model::existOutputPort(const std::string & name)
 int Model::getInputPortIndex(const std::string& name) const
 {
     ConnectionList::const_iterator it = m_inPortList.find(name);
-    Assert(utils::DevsGraphError, it != m_inPortList.end(), boost::format(
+    Assert < utils::DevsGraphError >(it != m_inPortList.end(),boost::format(
       "Input port %1% not exist in model %2%") % name % getName());
 
     return std::distance(m_inPortList.begin(), it);
@@ -482,7 +491,7 @@ int Model::getInputPortIndex(const std::string& name) const
 int Model::getOutputPortIndex(const std::string& name) const
 {
     ConnectionList::const_iterator it = m_outPortList.find(name);
-    Assert(utils::DevsGraphError, it != m_outPortList.end(), boost::format(
+    Assert < utils::DevsGraphError >(it != m_outPortList.end(),boost::format(
             "Output port %1% not exist in model %2%") % name % getName());
 
     return std::distance(m_outPortList.begin(), it);
@@ -563,12 +572,12 @@ Model::Model() :
     m_width(-1),
     m_height(-1)
 {
-    Throw(utils::NotYetImplemented, "Model::Model not developed");
+    throw utils::NotYetImplemented("Model::Model not developed");
 }
 
 Model& Model::operator=(const Model& /* mdl */)
 {
-    Throw(utils::NotYetImplemented, "Model::operator= not developed");
+    throw utils::NotYetImplemented("Model::operator= not developed");
 }
 
 }} // namespace vle graph

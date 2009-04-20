@@ -369,16 +369,16 @@ namespace vle { namespace vpz {
             AttributeList::const_iterator it;
             it = std::find_if(lst.begin(), lst.end(),
                               xmlpp::SaxParser::AttributeHasName(name));
-            Assert(utils::SaxParserError, it != lst.end(),
+            Assert < utils::SaxParserError >(it != lst.end(),
                    (boost::format("Unknow attribute '%1%'") % name).str());
 
             T result;
             try {
                 result = boost::lexical_cast < T >((*it).value);
             } catch(const std::exception& e) {
-                Throw(utils::SaxParserError, (boost::format(
+                throw(utils::SaxParserError(boost::format(
                             "Cannot convert '%1%' into desired type: %2%") %
-                        name % e.what()).str());
+                        name % e.what()));
             }
             return result;
         }
@@ -398,7 +398,7 @@ namespace vle { namespace vpz {
             AttributeList::const_iterator it;
             it = std::find_if(lst.begin(), lst.end(),
                               xmlpp::SaxParser::AttributeHasName(name));
-            Assert(utils::SaxParserError, it != lst.end(),
+            Assert < utils::SaxParserError >(it != lst.end(),
                    (boost::format("Unknow attribute '%1%'") % name).str());
 
             return it->value;
@@ -419,7 +419,7 @@ namespace vle { namespace vpz {
             AttributeList::const_iterator it;
             it = std::find_if(lst.begin(), lst.end(),
                               xmlpp::SaxParser::AttributeHasName(name));
-            Assert(utils::SaxParserError, it != lst.end(),
+            Assert < utils::SaxParserError >(it != lst.end(),
                    (boost::format("Unknow attribute '%1%'") % name).str());
 
             return it->value;

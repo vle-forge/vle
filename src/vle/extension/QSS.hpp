@@ -110,15 +110,16 @@ namespace vle { namespace extension { namespace QSS {
 	     * @return the value of internal variable.
 	     */
 	    virtual double operator()() const
-		{ 
-		    Assert(utils::InternalError,
-			   mEquation,
-			   "QSS::Multiple - variable not create");
+		{
+                    if (not mEquation) {
+                        throw utils::InternalError(
+                            "QSS::Multiple - variable not create");
+                    }
 		    return mEquation->getValue(mIndex);
 		}
 
 	private:
-	    Var(unsigned int index, const std::string& name, 
+	    Var(unsigned int index, const std::string& name,
 		Multiple* equation) :
 		Variable(name, equation), mIndex(index)
 		{ }
@@ -148,9 +149,10 @@ namespace vle { namespace extension { namespace QSS {
 	     */
 	    virtual double operator()() const
 		{
-		    Assert(utils::InternalError,
-			   mEquation,
-			   "QSS::Multiple - variable not create");
+                    if (not mEquation) {
+                        throw utils::InternalError(
+                            "QSS::Multiple - variable not create");
+                    }
 		    return mEquation->getExternalValue(mName);
 		}
 

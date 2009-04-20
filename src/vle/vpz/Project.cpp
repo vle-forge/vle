@@ -70,7 +70,7 @@ void Project::clear()
 
 void Project::setAuthor(const std::string& name)
 {
-    Assert(utils::ArgError, not name.empty(),
+    Assert < utils::ArgError >(not name.empty(),
             "Project author unknow");
 ;
     m_author.assign(name);

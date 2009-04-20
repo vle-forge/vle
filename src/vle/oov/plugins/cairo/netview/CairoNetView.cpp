@@ -60,7 +60,7 @@ void CairoNetView::onParameter(const std::string& /* plugin */,
 {
     m_display_node_names = false;
 
-    Assert(utils::InternalError, m_ctx, "Cairo caview drawing error");
+    Assert < utils::InternalError >(m_ctx, "Cairo caview drawing error");
     xmlpp::DomParser parser;
 
     parser.parse_memory(parameters);

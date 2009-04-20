@@ -240,8 +240,10 @@ void Set::clear()
 void Set::serializeTxtFile(const Set& set, const std::string& filename)
 {
     std::ofstream out(filename.c_str());
-    Assert(utils::InternalError, out.is_open(), boost::format(
-            "serialize error: can not open file %1%") % filename);
+    if (not out.is_open()) {
+        throw utils::ArgError(boost::format(
+                "serialize error: cannot open file '%1%'") % filename);
+    }
 
     boost::archive::text_oarchive oa(out);
     value::Value::registerValues(oa);
@@ -264,8 +266,10 @@ void Set::serializeTxtBuffer(const Set& set, std::string& buffer)
 void Set::serializeBinaryFile(const Set& set, const std::string& filename)
 {
     std::ofstream out(filename.c_str(), std::ofstream::binary);
-    Assert(utils::InternalError, out.is_open(), boost::format(
-            "serialize error: can not open file %1%") % filename);
+    if (not out.is_open()) {
+        throw utils::ArgError(boost::format(
+                "serialize error: cannot open file '%1%'") % filename);
+    }
 
     boost::archive::text_oarchive oa(out);
     value::Value::registerValues(oa);
@@ -288,8 +292,10 @@ void Set::serializeBinaryBuffer(const Set& set, std::string& buffer)
 void Set::deserializeTxtFile(Set& set, const std::string& filename)
 {
     std::ifstream out(filename.c_str());
-    Assert(utils::InternalError, out.is_open(), boost::format(
-            "deserialize error: can not open file %1%") % filename);
+    if (not out.is_open()) {
+        throw utils::ArgError(boost::format(
+                "deserialize error: can not open file '%1%'") % filename);
+    }
 
     boost::archive::text_iarchive ia(out);
     value::Value::registerValues(ia);
@@ -310,8 +316,10 @@ void Set::deserializeTxtBuffer(Set& set, const std::string& buffer)
 void Set::deserializeBinaryFile(Set& set, const std::string& filename)
 {
     std::ifstream out(filename.c_str(), std::ifstream::binary);
-    Assert(utils::InternalError, out.is_open(), boost::format(
-            "deserialize error: can not open file %1%") % filename);
+    if (not out.is_open()) {
+        throw utils::ArgError(boost::format(
+                "deserialize error: can not open file '%1%'") % filename);
+    }
 
     boost::archive::text_iarchive ia(out);
     value::Value::registerValues(ia);

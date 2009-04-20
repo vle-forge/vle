@@ -73,16 +73,16 @@ void OutputMatrix::deserialize(const value::Value& vals)
     m_colAccess.clear();
 
     const value::Set& result(vals.toSet());
-    Assert(utils::ArgError, result.size() == 2,
+    Assert < utils::ArgError >(result.size() == 2,
            "Bad OutputMatrix deserialize flows");
 
     m_values = value::toMatrixValue(result.get(0).clone());
     const value::Set& id(result.get(1).toSet());
 
-    Assert(utils::ArgError, id.size() % 3 == 0,
+    Assert < utils::ArgError >(id.size() % 3 == 0,
            boost::format("Bad id's for the OutputMatrix: '%1%'") % id);
 
-    Assert(utils::ArgError, id.size() / 3 == m_values->columns() - 1,
+    Assert < utils::ArgError >(id.size() / 3 == m_values->columns() - 1,
            boost::format("Bad id's number (%2%) for matrix (%1%)") %
            m_values->columns() % id.size());
 
@@ -136,7 +136,7 @@ void OutputMatrix::addValue(const std::string& model,
                             const value::Value& value)
 {
     MapPairIndex::const_iterator it(m_colAccess.find(PairString(model, port)));
-    Assert(utils::ArgError, it != m_colAccess.end(), boost::format(
+    Assert < utils::ArgError >(it != m_colAccess.end(), boost::format(
             "OutputMatrix have no couple (%1%, %2%)") % model % port);
 
     m_values->add(it->second, m_values->rows(), value);
@@ -147,7 +147,7 @@ void OutputMatrix::addValue(const std::string& model,
                             value::Value* value)
 {
     MapPairIndex::const_iterator it(m_colAccess.find(PairString(model, port)));
-    Assert(utils::ArgError, it != m_colAccess.end(), boost::format(
+    Assert < utils::ArgError >(it != m_colAccess.end(), boost::format(
             "OutputMatrix have no couple (%1%, %2%)") % model % port);
 
     m_values->add(it->second, m_values->rows(), value);
@@ -164,13 +164,13 @@ value::Matrix::index OutputMatrix::column(const std::string& model,
                                                  const std::string& port) const
 {
     MapStringList::const_iterator it = m_info.find(model);
-    Assert(utils::ArgError, it != m_info.end(), boost::format(
+    Assert < utils::ArgError >(it != m_info.end(), boost::format(
             "Unkown model %1%") % model);
 
     PairString colref(model, port);
 
     MapPairIndex::const_iterator jt = m_colAccess.find(colref);
-    Assert(utils::ArgError, jt != m_colAccess.end(), boost::format(
+    Assert < utils::ArgError >(jt != m_colAccess.end(), boost::format(
             "Unknow port %1% for model %2%") % port % model);
 
     return jt->second;
@@ -182,7 +182,7 @@ OutputMatrix::getValue(const std::string& model, const std::string& port)
     PairString colref(model,port);
     MapPairIndex::const_iterator it = m_colAccess.find(colref);
 
-    Assert(utils::ArgError, it != m_colAccess.end(), boost::format(
+    Assert < utils::ArgError >(it != m_colAccess.end(), boost::format(
             "Pair (model, port) (%1%,%2%) does not exist.") % model % port);
 
     return m_values->column(it->second);
@@ -191,7 +191,7 @@ OutputMatrix::getValue(const std::string& model, const std::string& port)
 value::VectorView
 OutputMatrix::getValue(value::Matrix::size_type idx)
 {
-    Assert(utils::ArgError, idx < m_values->columns(), boost::format(
+    Assert < utils::ArgError >(idx < m_values->columns(), boost::format(
             "Too big index for the matrix: %1%/%2%") % idx
         % m_values->columns());
 
@@ -204,7 +204,7 @@ OutputMatrix::getValue(const std::string& model, const std::string& port) const
     PairString colref(model,port);
     MapPairIndex::const_iterator it = m_colAccess.find(colref);
 
-    Assert(utils::ArgError, it != m_colAccess.end(), boost::format(
+    Assert < utils::ArgError >(it != m_colAccess.end(), boost::format(
             "Pair (model, port) (%1%,%2%) does not exist.") % model % port);
 
     return m_values->column(it->second);
@@ -213,7 +213,7 @@ OutputMatrix::getValue(const std::string& model, const std::string& port) const
 value::ConstVectorView
 OutputMatrix::getValue(value::Matrix::size_type idx) const
 {
-    Assert(utils::ArgError, idx < m_values->columns(), boost::format(
+    Assert < utils::ArgError >(idx < m_values->columns(), boost::format(
             "Too big index for the matrix: %1%/%2%") % idx
         % m_values->columns());
 
@@ -225,7 +225,7 @@ OutputMatrix::getPortList(const std::string& model) const
 {
     MapStringList::const_iterator it = m_info.find(model);
 
-    Assert(utils::ArgError, it != m_info.end(),
+    Assert < utils::ArgError >(it != m_info.end(),
 	    boost::format("Model %1% does not exist.") % model);
 
     return it->second;

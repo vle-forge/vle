@@ -48,11 +48,11 @@ Base::Base(const AtomicModel& model,
     if (events.exist("time-step")) {
         mTimeStep = toDouble(events.get("time-step"));
     } else {
-        Assert(utils::InternalError,
-               events.exist("time-step"),
-               (boost::format(
-                       "[%1%] DifferenceEquation - time-step port not exists")
-                   % getModelName()).str());
+        if (not events.exist("time-step")) {
+            throw utils::InternalError(boost::format(
+                    "[%1%] DifferenceEquation - time-step port not exists")
+                   % getModelName());
+        }
     }
 
     if (events.exist("mode")) {
@@ -63,11 +63,11 @@ Base::Base(const AtomicModel& model,
         else if (str == "mapping" ) {
             mMode = MAPPING;
 
-            Assert(utils::InternalError,
-                   events.exist("mapping"),
-                   (boost::format(
-                           "[%1%] DifferenceEquation - mapping port not exists")
-                       % getModelName()).str());
+            if (not events.exist("mapping")) {
+                throw utils::InternalError(boost::format(
+                        "[%1%] DifferenceEquation - mapping port not exists")
+                    % getModelName());
+            }
 
             const value::Map& mapping = value::toMapValue(
                 events.get("mapping"));
@@ -88,12 +88,11 @@ void Base::addExternalValue(double value,
                             const std::string& name,
                             bool init)
 {
-
-    Assert(utils::ModellingError,
-           mExternalValues.find(name) != mExternalValues.end(),
-           (boost::format(
-                   "[%1%] DifferenceEquation::add - invalid variable name: %2%") %
-               getModelName() % name).str());
+    if (mExternalValues.find(name) == mExternalValues.end()) {
+        throw utils::ModellingError(boost::format(
+                "[%1%] DifferenceEquation::add - invalid variable name: %2%") %
+            getModelName() % name);
+    }
 
     mExternalValues[name].push_front(value);
     if (mSize[name] != -1 and
@@ -139,12 +138,11 @@ void Base::depends(const std::string& name,
 
 void Base::initExternalVariable(const std::string& name)
 {
-
-    Assert(utils::ModellingError,
-           (mControl and mDepends.find(name) != mDepends.end()) or not mControl,
-           (boost::format(
-                   "[%1%] DifferenceEquation::init - invalid variable name: "\
-                   "\"%2%\"") % getModelName() % name).str());
+    if (not ((mControl and mDepends.find(name) != mDepends.end()) or not mControl)) {
+        throw utils::ModellingError(boost::format(
+                "[%1%] DifferenceEquation::init - invalid variable name: "\
+                "%2%") % getModelName() % name);
+    }
 
     if (mSynchros.find(name) == mSynchros.end()) {
         if (mAllSynchro) {
@@ -184,11 +182,11 @@ double Base::val(const std::string& name,
                  const VariableIterators& iterators,
                  int shift) const
 {
-    Assert(utils::ModellingError,
-           shift <= 0,
-           (boost::format(
-                   "[%1%] DifferenceEquation::getValue - positive shift on %2%") %
-               getModelName() % name).str());
+    if (shift > 0) {
+        throw utils::ModellingError(boost::format(
+                "[%1%] DifferenceEquation::getValue - positive shift on %2%") %
+            getModelName() % name);
+    }
 
     if (mState == INIT) {
         if (not iterators.mSynchro and
@@ -201,10 +199,11 @@ double Base::val(const std::string& name,
 
             return it->front();
         } else {
-            Assert(utils::InternalError, (int)(it->size() - 1) >= -shift,
-                   (boost::format("[%1%] - %2%[%3%] "	\
-                                  "- shift too large") %
-                    getModelName() % name % shift).str());
+            if ((int)(it->size() - 1) < -shift) {
+                throw utils::ModellingError(boost::format(
+                        "[%1%] - %2%[%3%] - shift too large") %
+                    getModelName() % name % shift);
+            }
 
             return (*it)[-shift];
         }
@@ -214,20 +213,20 @@ double Base::val(const std::string& name,
             ++shift;
         }
 
-        Assert(utils::InternalError,
-               shift <= 0,
-               (boost::format(
-                       "[%1%] DifferenceEquation::getValue - wrong shift on %2%") %
-                   getModelName() % name).str());
+        if (shift > 0) {
+            throw utils::InternalError(boost::format(
+                    "[%1%] DifferenceEquation::getValue - wrong shift on %2%") %
+                getModelName() % name);
+        }
 
         if (shift == 0) {
             return it->front();
         } else {
-            Assert(utils::InternalError, (int)(it->size() - 1) >= -shift,
-                   (boost::format("[%1%] - %2%[%3%] - "	\
-                                  "shift too large") %
-                    getModelName() % name % shift).str());
-
+            if ((int)(it->size() - 1) < -shift) {
+                throw utils::InternalError(boost::format(
+                        "[%1%] - %2%[%3%] - shift too large") %
+                    getModelName() % name % shift);
+            }
             return (*it)[-shift];
         }
     }
@@ -242,12 +241,12 @@ void Base::processUpdate(const std::string& name,
 
     if (mState == POST_SEND_INIT) {
 
-        Assert(utils::ModellingError,
-               mControl and mDepends.find(name) != mDepends.end(),
-               (boost::format(
-                       "[%1%] DifferenceEquation::init "		\
-                       "- invalid variable name: %2%") %
-                   getModelName() % name).str());
+        if (not (mControl and mDepends.find(name) != mDepends.end())) {
+            throw utils::ModellingError(boost::format(
+                    "[%1%] DifferenceEquation::init " \
+                       "- invalid variable name: %2%") % getModelName() %
+                name);
+        }
 
         if (event.existAttributeValue("init")) {
             const value::Set& init =
@@ -315,10 +314,11 @@ void Base::pushNoEDValues()
 void Base::size(const std::string& name,
                 int s)
 {
-    Assert(utils::InternalError, mSize.find(name) == mSize.end(),
-           (boost::format(
-                   "[%1%] DifferenceEquation::size - %2% already exists") %
-               getModelName() % name).str());
+    if (mSize.find(name) != mSize.end()) {
+        throw utils::InternalError(boost::format(
+                "[%1%] DifferenceEquation::size - %2% already exists") %
+            getModelName() % name);
+    }
 
     mSize[name] = s;
 }
@@ -355,12 +355,12 @@ Time Base::init(const devs::Time& time)
                 (getModel().existInputPort("remove")?1:0);
         }
 
-        Assert(utils::InternalError,
-               mDepends.size() == n,
-               (boost::format(
-                       "[%1%] DifferenceEquation::size - "			\
-                       "%2% connection(s) on update port missing") %
-                   getModelName() % (mDepends.size() - n)));
+        if (mDepends.size() != n) {
+            throw utils::InternalError(boost::format(
+                    "[%1%] DifferenceEquation::size - " \
+                    "%2% connection(s) on update port missing") %
+                getModelName() % (mDepends.size() - n));
+        }
 
     } else {
         if (mMode == NAME) {
@@ -527,9 +527,11 @@ void Base::externalTransition(const ExternalEventList& event,
         } else if (not (*it)->onPort("add") and
                    not (*it)->onPort("remove")) {
 
-            Assert(utils::InternalError, mMode == PORT or mMode == MAPPING,
-                   (boost::format("[%1%] - DifferenceEquation: invalid mode") %
-                    getModelName()).str());
+            if (mMode != PORT and mMode != MAPPING) {
+                throw utils::InternalError(boost::format(
+                        "[%1%] - DifferenceEquation: invalid mode") %
+                    getModelName());
+            }
 
             std::string portName = (*it)->getPortName();
             std::string name = (mMode == PORT)?portName:mMapping[portName];
@@ -650,11 +652,11 @@ void Simple::updateValues(const vle::devs::Time& time)
 
 void Simple::size(int size)
 {
-    Assert(utils::ModellingError,
-           size != 0,
-           (boost::format(
-                   "[%1%] DifferenceEquation::size - not null size") %
-               getModelName()).str());
+    if (size == 0) {
+        throw utils::ModellingError(boost::format(
+                "[%1%] DifferenceEquation::size - not null size") %
+            getModelName());
+    }
 
     mSize = size;
 }
@@ -666,21 +668,21 @@ double Simple::val() const
 
 double Simple::val(int shift) const
 {
-    Assert(utils::ModellingError,
-           shift <= 0,
-           (boost::format(
-                   "[%1%] DifferenceEquation::getValue - positive shift on %2%") %
-               getModelName() % mVariableName).str());
+    if (shift > 0) {
+        throw utils::ModellingError(boost::format(
+                "[%1%] DifferenceEquation::getValue - positive shift on %2%") %
+            getModelName() % mVariableName);
+    }
 
     ++shift;
     if (shift == 0) {
         return mValues.front();
     } else {
-
-        Assert(utils::InternalError, (int)(mValues.size() - 1) >= -shift,
-               (boost::format("[%1%] - %2%[%3%] - "	\
-                              "shift too large") %
-                getModelName() % mVariableName % shift).str());
+        if ((int)(mValues.size() - 1) < -shift) {
+            throw utils::InternalError(boost::format(
+               "[%1%] - %2%[%3%] - shift too large") %
+                getModelName() % mVariableName % shift);
+        }
 
         return mValues[-shift];
     }
@@ -715,12 +717,11 @@ void Simple::output(const Time& /* time */,
 
 Value* Simple::observation(const ObservationEvent& event) const
 {
-    Assert(utils::InternalError,
-           event.getPortName() == mVariableName,
-           boost::format(
-               "[%1%] DifferenceEquation::observation: invalid variable" \
-               " name: %2%") % getModelName()
-           % event.getPortName());
+    if (event.getPortName() != mVariableName) {
+        throw utils::InternalError(boost::format(
+                "[%1%] DifferenceEquation::observation: invalid variable" \
+                " name: %2%") % getModelName() % event.getPortName());
+    }
     return Double::create(val());
 }
 
@@ -728,12 +729,12 @@ void Simple::request(const RequestEvent& event,
                      const Time& /*time*/,
                      ExternalEventList& output) const
 {
-    Assert(utils::InternalError,
-           event.getStringAttributeValue("name") == mVariableName,
-           boost::format(
-               "[%1%] DifferenceEquation::request - invalid variable" \
-               "name: %2%")  % getModelName()
-           % event.getStringAttributeValue("name"));
+    if (event.getStringAttributeValue("name") != mVariableName) {
+        throw utils::InternalError(boost::format(
+                "[%1%] DifferenceEquation::request - invalid variable" \
+                "name: %2%")  % getModelName() %
+            event.getStringAttributeValue("name"));
+    }
 
     ExternalEvent* ee = new ExternalEvent("response");
 
@@ -829,12 +830,11 @@ void Multiple::computeInit(const vle::devs::Time& time)
 void Multiple::create(const std::string& name,
                       MultipleVariableIterators& iterators)
 {
-
-    Assert(utils::InternalError,
-           mValues.find(name) != mValues.end(),
-           (boost::format("DifferenceEquation - wrong variable"	\
-                          " name: %1% in %2%"))
-           % name % getModelName());
+    if (mValues.find(name) == mValues.end()) {
+        throw utils::InternalError(boost::format(
+           "DifferenceEquation - wrong variable name: %1% in %2%") % name %
+            getModelName());
+    }
 
     mSetValues.insert(std::make_pair(name, false)).first;
     iterators.mSetValues = &mSetValues[name];
@@ -924,25 +924,24 @@ double Multiple::val(const std::string& name,
                      const MultipleVariableIterators& iterators,
                      int shift) const
 {
-    Assert(utils::ModellingError,
-           shift <= 0,
-           (boost::format(
-                   "[%1%] DifferenceEquation::getValue - positive shift on %2%") %
-               getModelName() % name).str());
+    if (shift > 0) {
+        throw utils::ModellingError(boost::format(
+                "[%1%] DifferenceEquation::getValue - positive shift on %2%") %
+            getModelName() % name);
+    }
 
     if (shift == 0) {
         return iterators.mMultipleValues->front();
-    }
-    else {
+    } else {
         if (not *iterators.mSetValues) {
             ++shift;
         }
 
-        Assert(utils::InternalError,
-               (int)(iterators.mMultipleValues->size() - 1) >= -shift,
-               (boost::format("[%1%] - %2%[%3%] - "	\
-                              "shift too large") %
-                getModelName() % name % shift).str());
+        if ((int)(iterators.mMultipleValues->size() - 1) < -shift) {
+            throw utils::InternalError(boost::format(
+                    "[%1%] - %2%[%3%] - shift too large") % getModelName() %
+                name % shift);
+        }
 
         return (*iterators.mMultipleValues)[-shift];
     }

@@ -79,7 +79,7 @@ void NetStreamReader::readConnection()
         try {
             guint32 val = m_server->recv_int("vle");
 
-            Assert(utils::InternalError, val > 0,
+            Assert <utils::InternalError >(val > 0,
                    "NetStreamReader: bad size for package");
 
             m_buffer = m_server->recv_buffer("vle", val);
@@ -88,8 +88,8 @@ void NetStreamReader::readConnection()
             value::Set::deserializeBinaryBuffer(frame, m_buffer);
             stop = dispatch(frame);
         } catch (const std::exception& e) {
-            Throw(utils::InternalError, boost::format(
-                    "NetStreamReader: %1%") % e.what());
+            throw(utils::InternalError(boost::format(
+                    "NetStreamReader: %1%") % e.what()));
         }
     }
 }
@@ -137,9 +137,9 @@ bool NetStreamReader::dispatch(value::Set& frame)
         serializePlugin();
         break;
     default:
-        Throw(utils::InternalError, boost::format(
+        throw(utils::InternalError(boost::format(
                 "NetStreamReader: unknow tag '%1%'") %
-            frame.get(0).toInteger().value());
+            frame.get(0).toInteger().value()));
     }
     return end;
 }
@@ -207,10 +207,10 @@ void NetStreamReader::serializePlugin()
 
 void NetStreamReader::setBufferSize(size_t buffer)
 {
-    Assert(utils::InternalError, buffer != 0,
+    Assert < utils::InternalError >(buffer != 0,
            "Cannot build a buffer with an empty size");
 
-    Assert(utils::InternalError, buffer < m_buffer.max_size(), boost::format(
+    Assert < utils::InternalError >(buffer < m_buffer.max_size(), boost::format(
             "Cannot allocate a buffer of size %1%") % buffer);
 
     m_buffer.reserve(buffer);

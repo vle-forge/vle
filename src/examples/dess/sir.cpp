@@ -37,7 +37,7 @@ sir::sir(const graph::AtomicModel& model,
 
     S = createVar(0, "S");
     I = createVar(1, "I");
-    R = createVar(2, "R");    
+    R = createVar(2, "R");
 }
 
 double sir::compute(unsigned int i, const devs::Time& /* time */) const
@@ -50,7 +50,7 @@ double sir::compute(unsigned int i, const devs::Time& /* time */) const
     case 2: // R
 	return a * I();
     default:
-	Throw(utils::InternalError, boost::format(
+	throw utils::InternalError(boost::format(
 		  "Compute problem with sir model, i == %1%") % i );
     }
 }

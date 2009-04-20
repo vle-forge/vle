@@ -83,10 +83,10 @@ void CommandOptionGroup::check()
 {
     if ((mManager and mSimulator) or (mManager and mJustrun) or
         (mSimulator and mJustrun)) {
-        Throw(utils::InternalError, (boost::format(
+        throw utils::InternalError(boost::format(
                     "Choose a correct mode not: %1% %2% %3%\n") %
                     (mManager ? "manager" : "") % (mSimulator ? "simulator" : "") %
-                    (mJustrun ? "justrun": "")).str());
+                    (mJustrun ? "justrun": ""));
     }
 
     if (not mManager and not mSimulator and not mJustrun)
@@ -95,7 +95,7 @@ void CommandOptionGroup::check()
     if (mPort == 0) {
         mPort = 8000;
     } else if (mPort > 65535 or mPort < 0) {
-        Throw(utils::InternalError, boost::format(
+        throw utils::InternalError(boost::format(
                 "Invalid port %1%. Choose a correct port ie. [1 - 65535]\n") %
             mPort);
     }
@@ -103,7 +103,7 @@ void CommandOptionGroup::check()
     if (mProcess == 0) {
         mProcess = 1;
     } else if (mProcess <= 0) {
-        Throw(utils::InternalError, boost::format(
+        throw utils::InternalError(boost::format(
                 "Invalid %1%. Choose a correct number of process ie. > 0\n") %
             mProcess);
     }
@@ -173,7 +173,7 @@ GlobalOptionGroup::GlobalOptionGroup() :
 void GlobalOptionGroup::check()
 {
     if (mVerbose < 0 or mVerbose > 3) {
-        Throw(utils::InternalError, boost::format(
+        throw utils::InternalError(boost::format(
                 "Invalid verbose %1%. Choose a correcte number [0 - 3]\n") %
             mVerbose);
     }
