@@ -352,6 +352,26 @@ vpz::Strings AtomicModelBox::ConditionTreeView::getConditions()
     return vec;
 }
 
+void AtomicModelBox::ConditionTreeView::on_row_activated(
+    const Gtk::TreeModel::Path&, Gtk::TreeViewColumn* )
+{
+    mModeling->getGVLE()->getConditionsBox()->show();
+    build();
+}
+
+bool AtomicModelBox::ConditionTreeView::on_button_press_event(
+    GdkEventButton* event)
+{
+    if (event->type == GDK_2BUTTON_PRESS && event->button == 1) {
+	mModeling->getGVLE()->getConditionsBox()->show();
+	build();
+	return true;
+    } else {
+	return Gtk::Widget::on_button_press_event(event);
+    }
+
+}
+
 //DynamicTreeView
 
 AtomicModelBox::DynamicTreeView::DynamicTreeView(
@@ -792,6 +812,7 @@ void AtomicModelBox::show(vpz::AtomicModel& atom,  graph::AtomicModel& model)
 
     mConditions->setModel(&atom);
     mConditions->setConditions(&mModeling->conditions());
+    mConditions->setModeling(mModeling);
     mConditions->setLabel(mLabelConditions);
     mConditions->build();
 

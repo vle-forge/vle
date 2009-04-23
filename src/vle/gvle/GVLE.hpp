@@ -99,6 +99,14 @@ public:
         return m_currentButton;
     }
 
+    /**
+     * return the ConditionBox
+     * @return ConditionBox instance of ConditionBox
+     */
+    inline ConditionsBox* getConditionsBox() {
+	return mConditionsBox;
+    }
+
     /*********************************************************************
      *
      * PLUGIN

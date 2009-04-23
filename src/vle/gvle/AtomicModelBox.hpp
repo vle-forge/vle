@@ -166,14 +166,22 @@ private:
 	vpz::Strings getConditions();
 	void setConditions(vpz::Conditions* conditions)
 	    { mConditions = conditions; }
+	void setModeling(Modeling* modeling)
+	    { mModeling = modeling; }
 	void setModel(vpz::AtomicModel* model)
 	    { mModel = model; }
 	void setLabel(Gtk::Label* label)
 	    { mLabel = label; }
 
     private:
+	void on_row_activated(const Gtk::TreeModel::Path& path,
+			      Gtk::TreeViewColumn*  column);
+	virtual bool on_button_press_event(GdkEventButton* event);
+
+	// class members
 	vpz::AtomicModel* mModel;
 	vpz::Conditions* mConditions;
+	Modeling* mModeling;
 	Gtk::Menu mMenuPopup;
 	ModelColumnsCond mColumns;
 	Glib::RefPtr < Gtk::ListStore > mRefTreeModel;
