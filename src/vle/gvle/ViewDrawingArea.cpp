@@ -31,6 +31,7 @@
 #include <gdkmm/pixbuf.h>
 #include <vector>
 #include <cmath>
+#include <cairomm/scaledfont.h>
 
 namespace vle { namespace gvle {
 
@@ -88,30 +89,42 @@ void ViewDrawingArea::draw()
 
 void ViewDrawingArea::drawCurrentCoupledModel()
 {
-
     if (mView->existInSelectedModels(mCurrent)) {
-        mBuffer->draw_rectangle(mRed, true, 0, 0,
-                                (int)(mWidth * mZoom),
-                                (int)(mHeight * mZoom));
-        mBuffer->draw_rectangle(mWhite, true,
-                                (int)(MODEL_PORT * mZoom),
-                                (int)(MODEL_PORT * mZoom),
-                                (int)((mWidth - 2 * MODEL_PORT) * mZoom),
-                                (int)((mHeight - 2 * MODEL_PORT) * mZoom));
-        mBuffer->draw_rectangle(mBlack, false,
-                                (int)(MODEL_PORT * mZoom),
-                                (int)(MODEL_PORT * mZoom),
-                                (int)((mWidth - 2 * MODEL_PORT) * mZoom),
-                                (int)((mHeight - 2 * MODEL_PORT) * mZoom));
+	setColor(mRed);
+	mContext->rectangle(0, 0,
+			    (int)(mWidth * mZoom),
+			    (int)(mHeight * mZoom));
+	mContext->fill();
+	mContext->stroke();
+
+	setColor(mWhite);
+	mContext->rectangle((int)(MODEL_PORT * mZoom),
+			    (int)(MODEL_PORT * mZoom),
+			    (int)((mWidth - 2 * MODEL_PORT) * mZoom),
+			    (int)((mHeight - 2 * MODEL_PORT) * mZoom));
+	mContext->fill();
+	mContext->stroke();
+
+	setColor(mBlack);
+	mContext->rectangle((int)(MODEL_PORT * mZoom),
+			    (int)(MODEL_PORT * mZoom),
+			    (int)((mWidth - 2 * MODEL_PORT) * mZoom),
+			    (int)((mHeight - 2 * MODEL_PORT) * mZoom));
+	mContext->stroke();
     } else {
-        mBuffer->draw_rectangle(mWhite, true, 0, 0,
-                                (int)(mWidth * mZoom),
-                                (int)(mHeight * mZoom));
-        mBuffer->draw_rectangle(mBlack, false,
-                                (int)(MODEL_PORT * mZoom),
-                                (int)(MODEL_PORT * mZoom),
-                                (int)((mWidth - 2 * MODEL_PORT) * mZoom),
-                                (int)((mHeight - 2 * MODEL_PORT) * mZoom));
+	setColor(mWhite);
+	mContext->rectangle(0, 0,
+			    (int)(mWidth * mZoom),
+			    (int)(mHeight * mZoom));
+	mContext->fill();
+	mContext->stroke();
+
+	setColor(mBlack);
+	mContext->rectangle((int)(MODEL_PORT * mZoom),
+			    (int)(MODEL_PORT * mZoom),
+			    (int)((mWidth - 2 * MODEL_PORT) * mZoom),
+			    (int)((mHeight - 2 * MODEL_PORT) * mZoom));
+	mContext->stroke();
     }
 }
 
@@ -126,67 +139,66 @@ void ViewDrawingArea::drawCurrentModelPorts()
     const size_t maxOutput = opl.size();
     const size_t stepInput = (int)((mHeight * mZoom) / (maxInput + 1));
     const size_t stepOutput = (int)((mHeight * mZoom) / (maxOutput + 1));
-    std::vector < Gdk::Point > array(4);
 
-    mPango->set_width((int)(mZoom * MODEL_WIDTH));
-    mPango->set_alignment(Pango::ALIGN_LEFT);
-    Pango::FontDescription desc;
-    desc.set_size((int)(10000 * mZoom));
-    desc.set_style(Pango::STYLE_OBLIQUE);
-    mPango->set_font_description(desc);
+    mContext->select_font_face("Sans",
+			  Cairo::FONT_SLANT_OBLIQUE,
+			  Cairo::FONT_WEIGHT_NORMAL);
+    mContext->set_font_size(12 * mZoom);
 
     itl = ipl.begin();
 
     for (size_t i = 0; i < maxInput; ++i) {
 
         // to draw the port
-        array[0].set_x((int)(mZoom * (MODEL_PORT)));
-        array[0].set_y((int)(stepInput * (i + 1) - MODEL_PORT));
-        array[1].set_x((int)(mZoom * (MODEL_PORT)));
-        array[1].set_y((int)(stepInput * (i + 1) + MODEL_PORT));
-        array[2].set_x((int)(mZoom * (MODEL_PORT + MODEL_PORT)));
-        array[2].set_y((int)(stepInput * (i + 1)));
-        array[3] = array[0];
-        mBuffer->draw_polygon(mBlack, true, array);
+	setColor(mBlack);
+	mContext->move_to((int)(mZoom * (MODEL_PORT)),
+			  (int)(stepInput * (i + 1) - MODEL_PORT));
+	mContext->line_to((int)(mZoom * (MODEL_PORT)),
+			  (int)(stepInput * (i + 1) + MODEL_PORT));
+	mContext->line_to((int)(mZoom * (MODEL_PORT + MODEL_PORT)),
+			  (int)(stepInput * (i + 1)));
+	mContext->line_to((int)(mZoom * (MODEL_PORT)),
+			  (int)(stepInput * (i + 1) - MODEL_PORT));
+	mContext->fill();
+	mContext->stroke();
+
 
         // to draw the label of the port
-        mPango->set_markup(itl->first);
-        mBuffer->draw_layout(mBlack,
-                             (int)(mZoom * (MODEL_PORT + MODEL_PORT_SPACING_LABEL)),
-                             (int)(stepInput * (i + 1)),
-                             mPango);
+	setColor(mBlack);
+	mContext->move_to((int)(mZoom * (MODEL_PORT + MODEL_PORT_SPACING_LABEL)),
+			  (int)(stepInput * (i + 1) + 10));
+	mContext->show_text(itl->first);
+	mContext->stroke();
 
-        itl++;
+	itl++;
     }
 
     itl = opl.begin();
 
-    mPango->set_alignment(Pango::ALIGN_RIGHT);
-
     for (guint i = 0; i < maxOutput; ++i) {
 
         // to draw the port
-        array[0].set_x((int)(mZoom * (mWidth - MODEL_PORT)));
-        array[0].set_y((int)(stepOutput * (i + 1) - MODEL_PORT));
-        array[1].set_x((int)(mZoom * (mWidth - MODEL_PORT)));
-        array[1].set_y((int)(stepOutput * (i + 1) + MODEL_PORT));
-        array[2].set_x((int)(mZoom * (MODEL_PORT + mWidth - MODEL_PORT)));
-        array[2].set_y((int)(stepOutput * (i + 1)));
-        array[3] = array[0];
-        mBuffer->draw_polygon(mBlack, true, array);
+	setColor(mBlack);
+	mContext->move_to((int)(mZoom * (mWidth - MODEL_PORT)),
+			  (int)(stepOutput * (i + 1) - MODEL_PORT));
+	mContext->line_to((int)(mZoom * (mWidth - MODEL_PORT)),
+			  (int)(stepOutput * (i + 1) + MODEL_PORT));
+	mContext->line_to((int)(mZoom * (MODEL_PORT + mWidth - MODEL_PORT)),
+			  (int)(stepOutput * (i + 1)));
+	mContext->line_to((int)(mZoom * (mWidth - MODEL_PORT)),
+			  (int)(stepOutput * (i + 1) - MODEL_PORT));
+	mContext->fill();
+	mContext->stroke();
 
         // to draw the label of the port
-        mPango->set_markup(itl->first);
-        mBuffer->draw_layout(mBlack,
-                             (int)(mZoom * (mWidth - MODEL_PORT
-                                            - MODEL_PORT_SPACING_LABEL)),
-                             (int)(stepOutput * (i + 1)),
-                             mPango);
-        itl++;
-    }
+	mContext->move_to((int)(mZoom * (mWidth - MODEL_PORT
+					 - MODEL_PORT_SPACING_LABEL) - 15),
+			  (int)(stepOutput * (i + 1) + 10));
+	mContext->show_text(itl->first);
+	mContext->stroke();
 
-    mPango->set_alignment(Pango::ALIGN_LEFT);
-    desc.set_style(Pango::STYLE_NORMAL);
+	itl++;
+    }
 }
 
 void ViewDrawingArea::preComputeConnection(int xs, int ys,
@@ -355,29 +367,32 @@ ViewDrawingArea::StraightLine ViewDrawingArea::computeConnection(
     Point inpt(xd, yd);
     Point outpt(xs, ys);
 
-    list.push_back(Gdk::Point((int)(xs * mZoom),
-                              (int)(ys * mZoom)));
-    list.push_back(Gdk::Point((int)((xs + SPACING_MODEL_PORT) * mZoom),
-                              (int)(ys * mZoom)));
+    list.push_back(Point((int)(xs * mZoom),
+			 (int)(ys * mZoom)));
+    list.push_back(Point((int)((xs + SPACING_MODEL_PORT) * mZoom),
+			 (int)(ys * mZoom)));
     if (con.x2 >= con.x1) {
-        list.push_back(Gdk::Point((int)(con.x1 * mZoom),
-                                  (int)(con.y4 * mZoom)));
-        if (con.x2 > con.x1) {
-            list.push_back(Gdk::Point((int)(con.x1 * mZoom),
-                                      (int)(con.y3 * mZoom)));
-        }
+	list.push_back(Point((int)(con.x1 * mZoom),
+			     (int)(con.y4 * mZoom)));
+
+	if (con.x2 > con.x1) {
+	    list.push_back(Point((int)(con.x1 * mZoom),
+				 (int)(con.y3 * mZoom)));
+	}
     } else {
-        list.push_back(Gdk::Point((int)(con.x1 * mZoom),
-                                  (int)(con.y4 * mZoom)));
-        list.push_back(Gdk::Point((int)(con.x1 * mZoom),
-                                  (int)(con.y1 * mZoom)));
-        list.push_back(Gdk::Point((int)(con.x2 * mZoom),
-                                  (int)(con.y1 * mZoom)));
+	list.push_back(Point((int)(con.x1 * mZoom),
+			     (int)(con.y4 * mZoom)));
+	list.push_back(Point((int)(con.x1 * mZoom),
+			     (int)(con.y1 * mZoom)));
+	list.push_back(Point((int)(con.x2 * mZoom),
+			     (int)(con.y1 * mZoom)));
     }
-    list.push_back(Gdk::Point((int)(con.x2 * mZoom), (int)(con.y3 * mZoom)));
-    list.push_back(Gdk::Point((int)((xd - SPACING_MODEL_PORT) * mZoom),
-                              (int)(yd * mZoom)));
-    list.push_back(Gdk::Point((int)(xd * mZoom), (int)(yd * mZoom)));
+    list.push_back(Point((int)(con.x2 * mZoom),
+			 (int)(con.y3 * mZoom)));
+    list.push_back(Point((int)((xd - SPACING_MODEL_PORT) * mZoom),
+			 (int)(yd * mZoom)));
+    list.push_back(Point((int)(xd * mZoom),
+			 (int)(yd * mZoom)));
     return list;
 }
 
@@ -465,12 +480,17 @@ void ViewDrawingArea::drawLines()
 
     while (itl != mLines.end()) {
         if (i != mHighlightLine) {
-            mWingc->set_line_attributes(1, Gdk::LINE_SOLID,
-                                        Gdk::CAP_NOT_LAST,
-                                        Gdk::JOIN_ROUND);
-            mWingc->set_rgb_fg_color(Gdk::Color("black"));
+	    mContext->set_line_join(Cairo::LINE_JOIN_ROUND);
+	    setColor(mBlack);
         }
-        mBuffer->draw_lines(mWingc, *itl);
+	mContext->move_to(itl->begin()->first, itl->begin()->second);
+	std::vector <Point>::const_iterator iter = itl->begin();
+	while (iter != itl->end()) {
+	    mContext->line_to(iter->first, iter->second);
+	    ++iter;
+	}
+
+	mContext->stroke();
         ++i;
         ++itl;
     }
@@ -479,53 +499,48 @@ void ViewDrawingArea::drawLines()
 void ViewDrawingArea::drawHighlightConnection()
 {
     if (mHighlightLine != -1) {
-        mWingc->set_line_attributes(5, Gdk::LINE_SOLID,
-                                    Gdk::CAP_ROUND,
-                                    Gdk::JOIN_ROUND);
-        Gdk::Color color;
-        color.set_rgb(27243, 22359, 23258);
-        mWingc->set_rgb_fg_color(color);
 
-        mBuffer->draw_lines(mWingc, mLines[mHighlightLine]);
+	mContext->set_line_width(3);
+	mContext->set_line_cap(Cairo::LINE_CAP_ROUND);
+	mContext->set_line_join(Cairo::LINE_JOIN_ROUND);
 
-        Pango::FontDescription desc;
-        desc.set_size((int)(10000 * mZoom));
-        desc.set_style(Pango::STYLE_NORMAL);
-        mPango->set_font_description(desc);
+	Color color(0.41, 0.34, 0.35);
+	std::vector <Point>::const_iterator iter = mLines[mHighlightLine].begin();
+	mContext->move_to(iter->first, iter->second);
+	while (iter != mLines[mHighlightLine].end()) {
+	    mContext->line_to(iter->first, iter->second);
+	    ++iter;
+	}
+	mContext->stroke();
 
-        mPango->set_width(-1);
-        mPango->set_alignment(Pango::ALIGN_CENTER);
-        mPango->set_text(mText[mHighlightLine]);
+	mContext->set_line_width(2);
+	mContext->select_font_face("Sans",
+				   Cairo::FONT_SLANT_NORMAL,
+				   Cairo::FONT_WEIGHT_NORMAL);
+	mContext->set_font_size(10 * mZoom);
 
-        int width;
-        int height;
-        Gdk::Color c;
+	Cairo::TextExtents textExtents;
+	mContext->get_text_extents(mText[mHighlightLine],textExtents);
+	Color c(1.0, 1.0, 0.25);
+	setColor(c);
+	mContext->rectangle((int)(mZoom * mMouse.get_x()),
+			    (int)(mZoom * mMouse.get_y() - textExtents.height - 6),
+			    (int)(textExtents.width + 5),
+			    (int)(textExtents.height + 5));
+	mContext->fill();
+	mContext->stroke();
 
-        color.set_rgb(65535, 65535, 16384);
-        mPango->get_size(width, height);
-        width /= Pango::SCALE;
-        height /= Pango::SCALE;
+	setColor(mBlack);
+	mContext->rectangle((int)(mZoom * (mMouse.get_x())),
+			    (int)(mZoom * mMouse.get_y() - textExtents.height - 6),
+			    (int)(textExtents.width + 5),
+			    (int)(textExtents.height + 5));
 
-        mWingc->set_line_attributes(1, Gdk::LINE_SOLID, Gdk::CAP_NOT_LAST,
-                                    Gdk::JOIN_ROUND);
-        mWingc->set_rgb_fg_color(color);
-        mBuffer->draw_rectangle(mWingc, true,
-                                (int)(mZoom * mMouse.get_x()),
-                                (int)(mZoom * mMouse.get_y() - height - 6),
-                                (int)(width + 4),
-                                (int)(height + 4));
+	mContext->move_to((int)(mZoom * mMouse.get_x() + 2),
+			  (int)(mZoom * mMouse.get_y() - textExtents.height + 5));
+	mContext->show_text(mText[mHighlightLine]);
 
-        mWingc->set_rgb_fg_color(Gdk::Color("black"));
-        mBuffer->draw_rectangle(mWingc, false,
-                                (int)(mZoom * (mMouse.get_x())),
-                                (int)(mZoom * mMouse.get_y() - height - 6),
-                                (int)(width + 4),
-                                (int)(height + 4));
-
-        mBuffer->draw_layout(mWingc,
-                             (int)(mZoom * mMouse.get_x() + 2),
-                             (int)(mZoom * mMouse.get_y() - height - 4),
-                             mPango);
+	mContext->stroke();
     }
 }
 
@@ -554,22 +569,28 @@ void ViewDrawingArea::drawChildrenModels()
 }
 
 void ViewDrawingArea::drawChildrenModel(graph::Model* model,
-                                        Glib::RefPtr < Gdk::GC > color)
+                                        Color color)
 {
-    mBuffer->draw_rectangle(mBlack, false, (int)(mZoom * model->x()),
-                            (int)(mZoom * model->y()),
-                            (int)(mZoom * model->width()),
-                            (int)(mZoom * model->height()));
-    mBuffer->draw_rectangle(color, false, (int)(mZoom * model->x()),
-                            (int)(mZoom * model->y()),
-                            (int)(mZoom * model->width()),
-                            (int)(mZoom * model->height()));
+    setColor(mBlack);
+    mContext->rectangle((int)(mZoom * model->x()),
+			(int)(mZoom * model->y()),
+			(int)(mZoom * model->width()),
+			(int)(mZoom * model->height()));
+    mContext->stroke();
+
+    setColor(color);
+    mContext->rectangle((int)(mZoom * model->x()),
+			(int)(mZoom * model->y()),
+			(int)(mZoom * model->width()),
+			(int)(mZoom * model->height()));
+    mContext->stroke();
+
     model->setWidth(100);
     drawChildrenPorts(model, color);
 }
 
 void ViewDrawingArea::drawChildrenPorts(graph::Model* model,
-                                        Glib::RefPtr < Gdk::GC > color)
+                                        Color color)
 {
     const graph::ConnectionList ipl =  model->getInputPortList();
     const graph::ConnectionList opl =  model->getOutputPortList();
@@ -581,39 +602,37 @@ void ViewDrawingArea::drawChildrenPorts(graph::Model* model,
     const size_t stepOutput = model->height() / (maxOutput + 1);
     const int    mX = model->x();
     const int    mY = model->y();
-    Gdk::Point   array[4];
 
-    mPango->set_width((int)(mZoom * model->width()));
-    mPango->set_alignment(Pango::ALIGN_LEFT);
-    Pango::FontDescription desc;
-    desc.set_size((int)(10000 * mZoom));
-    desc.set_style(Pango::STYLE_OBLIQUE);
-    mPango->set_font_description(desc);
+    mContext->select_font_face("Sans",
+			       Cairo::FONT_SLANT_OBLIQUE,
+			       Cairo::FONT_WEIGHT_NORMAL);
+    mContext->set_font_size(12 * mZoom);
 
     itl = ipl.begin();
 
     for (size_t i = 0; i < maxInput; ++i) {
 
         // to draw the port
-        array[0].set_x((int)(mZoom * (mX)));
-        array[0].set_y((int)(mZoom * (mY + stepInput * (i + 1) -
-                                      MODEL_SPACING_PORT)));
-        array[1].set_x((int)(mZoom * (mX)));
-        array[1].set_y((int)(mZoom * (mY + stepInput * (i + 1) +
-                                      MODEL_SPACING_PORT)));
-        array[2].set_x((int)(mZoom * (mX + MODEL_SPACING_PORT)));
-        array[2].set_y((int)(mZoom * (mY + stepInput * (i + 1))));
-        array[3] = array[0];
+	setColor(color);
+	mContext->move_to((int)(mZoom * (mX)),
+			  (int)(mZoom * (mY + stepInput * (i + 1) -
+					 MODEL_SPACING_PORT)));
+	mContext->line_to((int)(mZoom * (mX)),
+			  (int)(mZoom * (mY + stepInput * (i + 1) +
+					 MODEL_SPACING_PORT)));
+	mContext->line_to((int)(mZoom * (mX + MODEL_SPACING_PORT)),
+			  (int)(mZoom * (mY + stepInput * (i + 1))));
+	mContext->line_to((int)(mZoom * (mX)),
+			  (int)(mZoom * (mY + stepInput * (i + 1) -
+					 MODEL_SPACING_PORT)));
+	mContext->fill();
+	mContext->stroke();
 
-
-        // to draw the label of the port
-        mPango->set_markup(itl->first);
-        mBuffer->draw_layout(color,
-                             (int)(mZoom * (mX + PORT_SPACING_LABEL)),
-                             (int)(mZoom * (mY + stepInput * (i + 1))),
-                             mPango);
-
-        mBuffer->draw_polygon(color, true, array);
+	// to draw the label of the port
+	mContext->move_to((int)(mZoom * (mX + PORT_SPACING_LABEL)),
+			  (int)(mZoom * (mY + stepInput * (i + 1) + 10)));
+	mContext->show_text(itl->first);
+	mContext->stroke();
 
         itl++;
     }
@@ -623,42 +642,42 @@ void ViewDrawingArea::drawChildrenPorts(graph::Model* model,
     for (size_t i = 0; i < maxOutput; ++i) {
 
         // to draw the port
-        array[0].set_x((int)(mZoom * (mX + model->width())));
-        array[0].set_y((int)(mZoom * (mY + stepOutput * (i + 1) -
-                                      MODEL_SPACING_PORT)));
-        array[1].set_x((int)(mZoom * (mX + model->width())));
-        array[1].set_y((int)(mZoom * (mY + stepOutput * (i + 1) +
-                                      MODEL_SPACING_PORT)));
-        array[2].set_x((int)(mZoom * (mX + MODEL_SPACING_PORT +
-                                      model->width())));
-        array[2].set_y((int)(mZoom * (mY + stepOutput * (i + 1))));
-        array[3] = array[0];
+	setColor(color);
+	mContext->move_to((int)(mZoom * (mX + model->width())),
+			  (int)(mZoom * (mY + stepOutput * (i + 1) -
+					 MODEL_SPACING_PORT)));
+	mContext->line_to((int)(mZoom * (mX + model->width())),
+			  (int)(mZoom * (mY + stepOutput * (i + 1) +
+					 MODEL_SPACING_PORT)));
+	mContext->line_to((int)(mZoom * (mX + MODEL_SPACING_PORT +
+					 model->width())),
+			  (int)(mZoom * (mY + stepOutput * (i + 1))));
+	mContext->line_to((int)(mZoom * (mX + model->width())),
+			  (int)(mZoom * (mY + stepOutput * (i + 1) -
+					 MODEL_SPACING_PORT)));
+	mContext->fill();
+	mContext->stroke();
 
-        // to draw the label of the port
-        mPango->set_markup(itl->first);
-        mBuffer->draw_layout(color,
-                             (int)(mZoom * (mX + model->width()+
-                                            PORT_SPACING_LABEL)),
-                             (int)(mZoom * (mY + stepOutput * (i + 1))),
-                             mPango);
-
-        mBuffer->draw_polygon(color, true, array);
+	// to draw the label of the port
+	setColor(color);
+	mContext->move_to((int)(mZoom * (mX + model->width() +
+					 PORT_SPACING_LABEL)),
+			  (int)(mZoom * (mY + stepOutput * (i + 1) + 10)));
+	mContext->show_text(itl->first);
+	mContext->stroke();
 
         itl++;
     }
 
+    mContext->select_font_face("Sans",
+			       Cairo::FONT_SLANT_NORMAL,
+			       Cairo::FONT_WEIGHT_NORMAL);
+    mContext->set_font_size(12 * mZoom);
 
-    desc.set_style(Pango::STYLE_NORMAL);
-    mPango->set_font_description(desc);
-
-    mPango->set_width((int)(mZoom * model->width()));
-    mPango->set_alignment(Pango::ALIGN_CENTER);
-    mPango->set_markup(model->getName());
-    mBuffer->draw_layout(color,
-                         (int)((model->x() + (model->width() / 2)) * mZoom),
-                         (int)((model->y() + model->height() +
-                                MODEL_SPACING_PORT) * mZoom),
-                         mPango);
+    mContext->move_to((int)((model->x() + (model->width() / 2)) * mZoom),
+		      (int)((model->y() + (model->height() * 1) +
+			     MODEL_SPACING_PORT) * mZoom + 10));
+    mContext->show_text(model->getName());
 }
 
 void ViewDrawingArea::drawLink()
@@ -666,24 +685,25 @@ void ViewDrawingArea::drawLink()
     if (mView->getCurrentButton() == GVLE::ADDLINK and
         mView->isEmptySelectedModels() == false) {
         graph::Model* src = mView->getFirstSelectedModels();
+	setColor(mBlack);
         if (src == mCurrent) {
-            mBuffer->draw_line(mBlack,
-                               (int)(MODEL_PORT * mZoom),
-                               (int)(mZoom * mHeight / 2),
-                               (int)(mMouse.get_x() * mZoom),
-                               (int)(mZoom * mMouse.get_y()));
+	    mContext->move_to((int)(MODEL_PORT * mZoom),
+			      (int)(mZoom * mHeight / 2));
+	    mContext->line_to((int)(mMouse.get_x() * mZoom),
+			      (int)(mZoom * mMouse.get_y()));
+
         } else {
             int w = src->width();
             int h = src->height();
             int x = src->x();
             int y = src->y();
 
-            mBuffer->draw_line(mBlack,
-                               (int)(mZoom * (x + w / 2)),
-                               (int)(mZoom * (y + h / 2)),
-                               (int)(mMouse.get_x() * mZoom),
-                               (int)(mMouse.get_y() * mZoom));
+	    mContext->move_to((int)(mZoom * (x + w / 2)),
+			      (int)(mZoom * (y + h / 2)));
+	    mContext->line_to((int)(mMouse.get_x() * mZoom),
+			      (int)(mMouse.get_y() * mZoom));
         }
+	mContext->stroke();
     }
 }
 
@@ -696,11 +716,12 @@ void ViewDrawingArea::drawZoomFrame()
         int ymin = std::min(mMouse.get_y(), mPrecMouse.get_y());
         int ymax = std::max(mMouse.get_y(), mPrecMouse.get_y());
 
-        mBuffer->draw_rectangle(mBlack, false,
-                                (int)(mZoom * xmin),
-                                (int)(mZoom * ymin),
-                                (int)(mZoom * (xmax - xmin)),
-                                (int)(mZoom * (ymax - ymin)));
+	setColor(mBlack);
+	mContext->rectangle((int)(mZoom * xmin),
+			    (int)(mZoom * ymin),
+			    (int)(mZoom * (xmax - xmin)),
+			    (int)(mZoom * (ymax - ymin)));
+	mContext->stroke();
     }
 }
 
@@ -714,26 +735,26 @@ void ViewDrawingArea::highlightLine(int mx, int my)
         int xs2, ys2;
         StraightLine::const_iterator it = itl->begin();
 
-        xs2 = it->get_x();
-        ys2 = it->get_y();
+        xs2 = it->first;
+        ys2 = it->second;
         ++it;
         while (it != itl->end() and not found) {
             int xs, ys, xd, yd;
 
-            if (xs2 == it->get_x()) {
+            if (xs2 == it->first) {
                 xs = xs2 - 5;
-                xd = it->get_x() + 5;
+                xd = it->first + 5;
             } else {
                 xs = xs2;
-                xd = it->get_x();
+                xd = it->first;
             }
 
-            if (ys2 == it->get_y()) {
+            if (ys2 == it->second) {
                 ys = ys2 - 5;
-                yd = it->get_y() + 5;
+                yd = it->second + 5;
             } else {
                 ys = ys2;
-                yd = it->get_y();
+                yd = it->second;
             }
 
             double h = -1;
@@ -747,13 +768,13 @@ void ViewDrawingArea::highlightLine(int mx, int my)
                     mHighlightLine = i;
                 }
             }
-            xs2 = it->get_x();
-            ys2 = it->get_y();
+            xs2 = it->first;
+            ys2 = it->second;
             ++it;
         }
         ++itl;
         ++i;
-    }
+	}
     if (found) {
         queueRedraw();
     } else {
@@ -898,12 +919,16 @@ bool ViewDrawingArea::on_expose_event(GdkEventExpose*)
         }
         if (mBuffer) {
             if (mNeedRedraw) {
+		mContext = mBuffer->create_cairo_context();
                 draw();
                 mNeedRedraw = false;
             }
             mWin->draw_drawable(mWingc, mBuffer, 0, 0, 0, 0, -1, -1);
-        }
+	}
+
+
     }
+
     return true;
 }
 
@@ -960,27 +985,11 @@ void ViewDrawingArea::on_realize()
     mWin = get_window();
     assert(mWin);
     mWingc = Gdk::GC::create(mWin);
-    mBlack = get_style()->get_black_gc();
-    mWhite = get_style()->get_white_gc();
-    Gdk::Color red;
-    Gdk::Color blue;
-    Gdk::Color green;
-    red.set_rgb(54484, 44718, 46517);
-    blue.set_rgb(44718, 46517, 54484);
-    green.set_rgb(46517, 54484, 44718);
-    mRed = Gdk::GC::create(mWin);
-    mRed->set_fill(Gdk::STIPPLED);
-    mRed->set_rgb_fg_color(red);
-    mBlue = Gdk::GC::create(mWin);
-    mBlue->set_fill(Gdk::STIPPLED);
-    mBlue->set_rgb_fg_color(blue);
-    mGreen = Gdk::GC::create(mWin);
-    mGreen->set_fill(Gdk::STIPPLED);
-    mGreen->set_rgb_fg_color(green);
-    Pango::FontDescription desc;
-    desc.set_size(10000);
-    mPango = create_pango_layout("");
-    mPango->set_font_description(desc);
+    mBlack = Color(0.0, 0.0, 0.0);
+    mWhite = Color(1.0, 1.0, 1.0);
+    mRed = Color(0.83, 0.68, 0.70);
+    mGreen = Color(0.70, 0.83, 0.68);
+    mBlue = Color(0.68, 0.70, 0.83);
     mIsRealized = true;
     queueRedraw();
 }
@@ -1205,10 +1214,7 @@ void ViewDrawingArea::onZoom(int button)
 void ViewDrawingArea::addCoefZoom()
 {
     mZoom = (mZoom >= ZOOM_MAX) ? ZOOM_MAX : mZoom + ZOOM_FACTOR_SUP;
-
-    Pango::FontDescription desc;
-    desc.set_size((int)(10000 * mZoom));
-    mPango->set_font_description(desc);
+    mContext->set_font_size(12 * mZoom);
     newSize();
 }
 
@@ -1218,19 +1224,14 @@ void ViewDrawingArea::delCoefZoom()
         mZoom = mZoom - ZOOM_FACTOR_SUP;
     else
         mZoom = (mZoom <= ZOOM_MIN) ? ZOOM_MIN : mZoom - ZOOM_FACTOR_INF;
-    Pango::FontDescription desc;
-
-    desc.set_size((int)(10000 * mZoom));
-    mPango->set_font_description(desc);
+    mContext->set_font_size(12 * mZoom);
     newSize();
 }
 
 void ViewDrawingArea::restoreZoom()
 {
     mZoom = 1.0;
-    Pango::FontDescription desc;
-    desc.set_size((int)(10000));
-    mPango->set_font_description(desc);
+    mContext->set_font_size(12);
     newSize();
 }
 
@@ -1244,12 +1245,16 @@ void ViewDrawingArea::selectZoom(int xmin, int ymin, int xmax, int ymax)
         mZoom = 0.1;
     if (mZoom >= 4.0)
         mZoom = 4.0;
-    Pango::FontDescription desc;
-    desc.set_size((int)(10000));
-    mPango->set_font_description(desc);
+    mContext->set_font_size(12);
     newSize();
 
     mView->updateAdjustment(xmin * mZoom, ymin * mZoom);
 }
+
+void ViewDrawingArea::setColor(Color color)
+{
+    mContext->set_source_rgb(color.m_r, color.m_g, color.m_b);
+}
+
 
 }} // namespace vle gvle

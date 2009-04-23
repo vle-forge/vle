@@ -123,7 +123,18 @@ namespace vle { namespace gvle {
 
 
     private:
-        typedef std::vector < Gdk::Point > StraightLine;
+
+	typedef std::pair < int, int > Point;
+	typedef std::vector < Point > StraightLine;
+
+	class Color
+        {
+	public:
+            double m_r; double m_g; double m_b;
+            Color(double r = 0, double g = 0, double b = 0) :
+		m_r(r), m_g(g), m_b(b)
+		{}
+	};
 
         class Connection
         {
@@ -138,7 +149,7 @@ namespace vle { namespace gvle {
             {}
         };
 
-        void drawCurrentCoupledModel();
+	void drawCurrentCoupledModel();
         void drawCurrentModelPorts();
 
         void preComputeConnection(int xs, int ys, int xd, int yd,
@@ -161,10 +172,10 @@ namespace vle { namespace gvle {
         void drawConnection();
         void drawHighlightConnection();
         void drawChildrenModels();
-        void drawChildrenModel(graph::Model* model,
-                               Glib::RefPtr < Gdk::GC > color);
-        void drawChildrenPorts(graph::Model* model,
-                               Glib::RefPtr < Gdk::GC > color);
+	void drawChildrenModel(graph::Model* model,
+			       Color color);
+	void drawChildrenPorts(graph::Model* model,
+			       Color color);
         void drawLines();
         void drawLink();
         void drawZoomFrame();
@@ -188,6 +199,11 @@ namespace vle { namespace gvle {
         void addLinkOnButtonPress(int x, int y);
         void addLinkOnMotion(int x, int y);
         void addLinkOnButtonRelease(int x, int y);
+
+	/**
+	 * Change the color of the drawing
+	 */
+	void setColor(Color color);
 
 
         /**
@@ -213,14 +229,14 @@ namespace vle { namespace gvle {
         int                             mWidth;
         double                          mZoom;
         Glib::RefPtr < Gdk::Pixmap >    mBuffer;
+	Cairo::RefPtr<Cairo::Context>   mContext;
         Glib::RefPtr < Gdk::Window >    mWin;
         Glib::RefPtr < Gdk::GC >        mWingc;
-        Glib::RefPtr < Gdk::GC >        mBlack;
-        Glib::RefPtr < Gdk::GC >        mWhite;
-        Glib::RefPtr < Gdk::GC >        mRed;
-        Glib::RefPtr < Gdk::GC >        mGreen;
-        Glib::RefPtr < Gdk::GC >        mBlue;
-        Glib::RefPtr < Pango::Layout>   mPango;
+	Color                           mBlack;
+	Color                           mWhite;
+	Color                           mRed;
+	Color                           mGreen;
+	Color                           mBlue;
         bool                            mIsRealized;
 
         /**
@@ -228,8 +244,6 @@ namespace vle { namespace gvle {
          * redraw by calling the draw() function. False, just switch buffer.
          */
         bool                            mNeedRedraw;
-
-        typedef std::pair < int, int > Point;
 
         std::map < int, Point > mInPts;
         std::map < int, Point > mOutPts;
