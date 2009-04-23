@@ -240,6 +240,45 @@ void View::exportCurrentModel()
     }
 }
 
+void View::exportGraphic()
+{
+    vpz::Experiment& experiment = mModeling->vpz().project().experiment();
+    if (experiment.name().empty() || experiment.duration() == 0) {
+        Error("Fix a Value to the name and the duration of the experiment before exportation.");
+        return;
+    }
+
+    Gtk::FileChooserDialog file("Image file", Gtk::FILE_CHOOSER_ACTION_SAVE);
+    file.set_transient_for(*this);
+    file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+    file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+    Gtk::FileFilter filterPng;
+    Gtk::FileFilter filterPdf;
+    Gtk::FileFilter filterSvg;
+    filterPng.set_name("Portable Newtork Graphics (.png)");
+    filterPng.add_pattern("*.png");
+    filterPdf.set_name("Portable Format Document (.pdf)");
+    filterPdf.add_pattern("*.pdf");
+    filterSvg.set_name("Scalable Vector Graphics (.svg)");
+    filterSvg.add_pattern("*.svg");
+    file.add_filter(filterPng);
+    file.add_filter(filterPdf);
+    file.add_filter(filterSvg);
+
+
+    if (file.run() == Gtk::RESPONSE_OK) {
+        std::string filename(file.get_filename());
+	std::string extension(file.get_filter()->get_name());
+
+	if (extension == "Portable Newtork Graphics (.png)")
+	    mDrawing->exportPng(filename);
+	else if (extension == "Portable Format Document (.pdf)")
+	    mDrawing->exportPdf(filename);
+	else if (extension == "Scalable Vector Graphics (.svg)")
+	    mDrawing->exportSvg(filename);
+    }
+}
+
 void View::importModel()
 {
     Gtk::FileChooserDialog file("VPZ file", Gtk::FILE_CHOOSER_ACTION_OPEN);

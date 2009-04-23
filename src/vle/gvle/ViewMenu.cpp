@@ -64,6 +64,11 @@ void ViewMenu::makeMenuFile(View* v)
                            Gtk::AccelKey(GDK_E, Gdk::CONTROL_MASK),
                            sigc::mem_fun(v, &View::exportCurrentModel)));
 
+    menuList.push_back(Gtk::Menu_Helpers::MenuElem(
+			   "_Export Graphic",
+			   Gtk::AccelKey(GDK_L, Gdk::CONTROL_MASK),
+			   sigc::mem_fun(v, &View::exportGraphic)));
+
     menuList.push_back(Gtk::Menu_Helpers::SeparatorElem());
 
     menuList.push_back(Gtk::Menu_Helpers::StockMenuElem(

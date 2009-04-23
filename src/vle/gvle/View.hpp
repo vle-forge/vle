@@ -224,6 +224,9 @@ public:
     /** export the current model into XML file. */
     void exportCurrentModel();
 
+    /** export the current model into an image */
+    void exportGraphic();
+
     /** import a model into current GCoupledModel. */
     void importModel();
 

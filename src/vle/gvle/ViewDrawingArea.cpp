@@ -1256,5 +1256,36 @@ void ViewDrawingArea::setColor(Color color)
     mContext->set_source_rgb(color.m_r, color.m_g, color.m_b);
 }
 
+void ViewDrawingArea::exportPng(const std::string& filename)
+{
+
+    Cairo::RefPtr<Cairo::ImageSurface> surface =
+        Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, mWidth, mHeight);
+    mContext = Cairo::Context::create(surface);
+    draw();
+    surface->write_to_png(filename + ".png");
+}
+
+void ViewDrawingArea::exportPdf(const std::string& filename)
+{
+    Cairo::RefPtr<Cairo::PdfSurface> surface =
+        Cairo::PdfSurface::create(filename + ".pdf", mWidth, mHeight);
+    mContext = Cairo::Context::create(surface);
+    draw();
+    mContext->show_page();
+    surface->finish();
+}
+
+void ViewDrawingArea::exportSvg(const std::string& filename)
+{
+    Cairo::RefPtr<Cairo::SvgSurface> surface =
+        Cairo::SvgSurface::create(filename + ".svg", mWidth, mHeight);
+
+    mContext = Cairo::Context::create(surface);
+    draw();
+    mContext->show_page();
+    surface->finish();
+}
+
 
 }} // namespace vle gvle

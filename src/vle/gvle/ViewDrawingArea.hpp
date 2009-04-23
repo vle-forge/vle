@@ -121,6 +121,12 @@ namespace vle { namespace gvle {
                                  int& x, int& y);
         void calcSize(graph::Model* m);
 
+	/**
+	 * Export the view in image
+	 */
+	void exportPng(const std::string& filename);
+	void exportPdf(const std::string& filename);
+	void exportSvg(const std::string& filename);
 
     private:
 
@@ -204,7 +210,6 @@ namespace vle { namespace gvle {
 	 * Change the color of the drawing
 	 */
 	void setColor(Color color);
-
 
         /**
          * Return nearest connection between all connection and mouse position
