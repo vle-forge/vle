@@ -940,9 +940,10 @@ void AtomicModelBox::on_cancel()
                 parent->addInputConnection(it_port_list->second, mGraph_atom,
 					   it_in_connec->first);
             } else {
-                parent->addInternalConnection(it_port_list->first,
+		parent->addInternalConnection(it_port_list->first,
 					      it_port_list->second,
-                                              mGraph_atom, it_in_connec->first);
+					      mGraph_atom,
+					      it_in_connec->first);
             }
 
             ++it_port_list;
@@ -960,8 +961,14 @@ void AtomicModelBox::on_cancel()
                 parent->addOutputConnection(mGraph_atom, it_out_connec->first,
 					    it_port_list->second);
             } else {
-                parent->addInternalConnection(mGraph_atom, it_out_connec->first,
-                                              it_port_list->first, it_port_list->second);
+		if(not parent->existInternalConnection(mGraph_atom->getName(),
+						       it_out_connec->first,
+						       it_port_list->first->getName(),
+						       it_port_list->second)) {
+		    parent->addInternalConnection(mGraph_atom, it_out_connec->first,
+						  it_port_list->first,
+						  it_port_list->second);
+		}
             }
 
             ++it_port_list;
