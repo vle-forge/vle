@@ -906,26 +906,31 @@ void AtomicModelBox::on_cancel()
     graph::CoupledModel* parent = mGraph_atom->getParent();
 
     graph::ConnectionList& connec_in_list = mGraph_atom->getInputPortList();
-    for (graph::ConnectionList::iterator it_connect_in = connec_in_list.begin();
-            it_connect_in != connec_in_list.end();
-            ++it_connect_in) {
-        mGraph_atom->delInputPort(it_connect_in->first);
+    {
+        graph::ConnectionList::iterator it = connec_in_list.begin();
+        while (it != connec_in_list.end()) {
+            mGraph_atom->delInputPort(it->first);
+            it = connec_in_list.begin();
+        }
     }
-    for (graph::ConnectionList::iterator it_in_connec =mConnection_in_backup->begin();
-            it_in_connec != mConnection_in_backup->end();
-            ++it_in_connec) {
+
+    for (graph::ConnectionList::iterator it_in_connec
+         =mConnection_in_backup->begin(); it_in_connec !=
+         mConnection_in_backup->end(); ++it_in_connec) {
         mGraph_atom->addInputPort(it_in_connec->first);
     }
 
     graph::ConnectionList& connec_out_list = mGraph_atom->getOutputPortList();
-    for (graph::ConnectionList::iterator it_connect_out = connec_out_list.begin();
-            it_connect_out != connec_out_list.end();
-            ++it_connect_out) {
-        mGraph_atom->delOutputPort(it_connect_out->first);
+    {
+        graph::ConnectionList::iterator it = connec_out_list.begin();
+        while (it != connec_out_list.end()) {
+            mGraph_atom->delOutputPort(it->first);
+            it = connec_out_list.begin();
+        }
     }
-    for (graph::ConnectionList::iterator it_out_connec = mConnection_out_backup->begin();
-            it_out_connec != mConnection_out_backup->end();
-            ++it_out_connec) {
+    for (graph::ConnectionList::iterator it_out_connec =
+         mConnection_out_backup->begin(); it_out_connec !=
+         mConnection_out_backup->end(); ++it_out_connec) {
         mGraph_atom->addOutputPort(it_out_connec->first);
     }
 
@@ -976,6 +981,7 @@ void AtomicModelBox::on_cancel()
     }
 
     mDialog->hide_all();
+    mGraph_atom = 0;
 }
 
 } } // namespace vle gvle
