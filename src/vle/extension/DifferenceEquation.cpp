@@ -507,7 +507,7 @@ void Base::externalTransition(const ExternalEventList& event,
     Time e = time - mLastTime;
     // FIXME: bool end = (e == mSigma);
     bool end = std::abs(e.getValue() - mSigma.getValue()) < 1e-10;
-    bool begin = (e == 0);
+    bool begin = (e == 0.0);
     ExternalEventList::const_iterator it = event.begin();
     bool reset = false;
 

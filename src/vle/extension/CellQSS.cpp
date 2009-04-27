@@ -290,8 +290,9 @@ void CellQSS::externalTransition(const ExternalEventList& event,
                 // Mise à jour de sigma
                 updateSigma(i);
 
-                if (getSigma(i) < 0)
+                if (getSigma(i) < 0.0) {
                     setSigma(i,Time(0));
+                }
                 setLastTime(i,time);
             }
         ++it;

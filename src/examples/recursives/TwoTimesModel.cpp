@@ -57,7 +57,7 @@ namespace vle { namespace examples { namespace recursives {
         {
             // If the sub simulation thresh the date 50.0, we stop the sub
             // simulation.
-            if (m_root.getCurrentTime() > 50) {
+            if (m_root.getCurrentTime() > 50.0) {
                 m_stop = true;
             }
 

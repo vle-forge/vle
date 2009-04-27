@@ -233,7 +233,7 @@ devs::Time PetriNet::getValidTime(Transition* transition)
              mMarkings[place->getName()]->getTokenNumber()))
         {
             vle::devs::Time validTime = ((*it)->getConsumedTokenNumber() == 0)
-                ?0:getNextValid(itm->second,
+                ? devs::Time(0.0) : getNextValid(itm->second,
                                 (*it)->getConsumedTokenNumber());
             if (validTime > time)
                 time = validTime;

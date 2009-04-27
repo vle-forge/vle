@@ -27,6 +27,6 @@
 
 namespace vle { namespace devs {
 
-const Time Time::infinity(-1);
+const Time Time::infinity(std::numeric_limits < double >::max());
 
 }} // namespace vle devs

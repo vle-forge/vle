@@ -43,3 +43,19 @@ TARGET_LINK_LIBRARIES(test_devsmodel
   vlevpz)
 
 ADD_TEST(devstest test_devsmodel)
+
+ADD_EXECUTABLE(test_time time.cpp)
+TARGET_LINK_LIBRARIES(test_time
+  ${GLIBMM_LIBRARIES}
+  ${LIBXMLPP_LIBRARIES}
+  ${GTHREAD_LIBRARIES}
+  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
+  vlegeometry
+  vleutils
+  vledata
+  vlevalue
+  vlegraph
+  vledevs
+  vlevpz)
+
+ADD_TEST(devsttime test_time)

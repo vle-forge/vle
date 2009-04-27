@@ -101,7 +101,7 @@ value::Value* GenExecutive::observation(const devs::ObservationEvent& ev) const
     } else if (ev.onPort("adjacency_matrix")) {
         value::Set *set = value::Set::create();
         set->addCloneValue(*value::Integer::create(1));
-        if(get_nb_model() > 0 and ev.getTime() < 50){
+        if(get_nb_model() > 0 and ev.getTime() < 50.0){
             set->addCloneValue(*value::String::create("add"));
             std::string name = (boost::format("beep_%1%") % m_stacknames.size()).str();
             set->addCloneValue(*value::String::create(name));

@@ -23,143 +23,337 @@
  */
 
 
-#ifndef DEVS_TIME_HPP
-#define DEVS_TIME_HPP
+#ifndef VLE_DEVS_TIME_HPP
+#define VLE_DEVS_TIME_HPP
 
-#include <limits>
+#include <vle/utils/Exception.hpp>
 #include <ostream>
+#include <limits>
 
 namespace vle { namespace devs {
 
+/**
+ * @brief The definition of time in DEVS simulators. This class encapsulates
+ * a real type in a double simple type.
+ * - The infinity is represented by std::numeric_limits < double >::max().
+ * - The infinity constant static object is used to simplify the source code.
+ */
+class Time
+{
+public:
     /**
-     * @brief The definition of time in VLE simulators. This class encapsulate
-     * a double simple type to define time.
-     *
-     * - The infinity static variable is equal to -1.
-     * - All function are inline.
-     *
+     * @brief Constructor with  a real value.
+     * @param the double value to assign.
      */
-    class Time
+    Time(const double& value = 0.0)
+        : m_value(value)
+    {}
+
+    /**
+     * @brief Constructor with an integer value.
+     * @param the integer value to assign.
+     */
+    Time(const int& value)
+        : m_value(value)
+    {}
+
+    /**
+     * @brief Copy constructor.
+     * @param time the Time to copy.
+     */
+    Time(const Time& time)
+        : m_value(time.m_value)
+    {}
+
+    /**
+     * @brief Destructor, nothing to delete.
+     */
+    ~Time() {}
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /**
+     * @brief Test if the time represents the infinity.
+     * @return true if time is infinity, otherwise false.
+     */
+    inline bool isInfinity() const
+    { return m_value == std::numeric_limits < double >::max(); }
+
+    /**
+     * @brief Test if the time represents the infinity.
+     * @param value the value to ckeck.
+     * @return true if time is infinity, otherwise false.
+     */
+    inline static bool isInfinity(const double& value)
+    { return value == std::numeric_limits < double >::max(); }
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /**
+     * @brief Swap the content of the devs::Time object.
+     * @param other The other devs::Time of swap time.
+     */
+    inline void swap(Time& other)
+    { std::swap(m_value, other.m_value); }
+
+    /**
+     * @brief Assigment operator.
+     * @param other The devs::Time to assign.
+     * @return The newly allocated devs::Time.
+     */
+    inline Time operator=(const Time& other)
+    { Time tmp(other); swap(tmp); return *this; }
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /**
+     * @brief Cast operator for double. This operator automatically cast a
+     * vle::devs::Time into a double value.
+     * @code
+     * vle::devs::Time t(1.234);
+     * double y = 2.345;
+     * double z = x + y;
+     * @endcode
+     * @return The double representation of the vle::devs::Time.
+     */
+    inline operator double() const
+    { return m_value; }
+
+    /**
+     * @brief Get current value.
+     * @return double representation of Time.
+     */
+    inline const double& getValue() const
+    { return m_value; }
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    inline bool operator<(const Time& time) const
+    { return (m_value < time.m_value and !isInfinity()) or time.isInfinity(); }
+
+    inline bool operator<(const double& time) const
+    { return (m_value < time and !isInfinity()) or isInfinity(time); }
+
+    inline bool operator<(const int& time) const
+    { return (m_value < time and !isInfinity()) or isInfinity(time); }
+
+
+    inline bool operator<=(const Time& time) const
+    { return (m_value <= time.m_value and !isInfinity()) or time.isInfinity(); }
+
+    inline bool operator<=(const double& time) const
+    { return (m_value <= m_value and !isInfinity()) or isInfinity(time); }
+
+    inline bool operator<=(const int& time) const
+    { return (m_value <= m_value and !isInfinity()) or isInfinity(time); }
+
+
+    inline bool operator>(const Time& time) const
+    { return (m_value > time.m_value and !time.isInfinity()) or
+        (isInfinity() and !time.isInfinity()); }
+
+    inline bool operator>(const double& time) const
+    { return (m_value > time and not isInfinity(time)) or
+        (isInfinity() and not isInfinity(time)); }
+
+    inline bool operator>(const int& time) const
+    { return (m_value > time and not isInfinity(time)) or
+        (isInfinity() and not isInfinity(time)); }
+
+
+    inline bool operator>=(const Time& time) const
+    { return (m_value >= time.m_value and !time.isInfinity()) or
+        (isInfinity() and !time.isInfinity()); }
+
+    inline bool operator>=(const double& time) const
+    { return (m_value >= m_value and not isInfinity(time)) or
+        (isInfinity() and not isInfinity(time)); }
+
+    inline bool operator>=(const int& time) const
+    { return ( m_value >= time and not isInfinity(time)) or
+        (isInfinity() and not isInfinity(time)); }
+
+
+    inline bool operator==(const Time& time) const
+    { return m_value == time.m_value; }
+
+    inline bool operator==(const double& time) const
+    { return m_value == time; }
+
+    inline bool operator==(const int& time) const
+    { return m_value == static_cast < double >(time); }
+
+
+    inline bool operator!=(const Time& time) const
+    { return m_value != time.m_value; }
+
+    inline bool operator!=(const double& time) const
+    { return m_value != time; }
+
+    inline bool operator!=(const int& time) const
+    { return m_value != static_cast < double >(time); }
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    inline void operator++()
     {
-    public:
-	/**
-	 * Constructor with specified value.
-	 *
-	 * @param value specified time.
-	 */
-	Time(double value = 0.0) :
-	    m_value(value)
-        { }
-
-	/**
-	 * Copy constructor.
-	 *
-	 * @param time Time to copy.
-	 */
-	Time(const Time& time) :
-	    m_value(time.m_value)
-        { }
-
-	/**
-	 * Destructor, nothing to delete.
-	 */
-	virtual ~Time()
-        { }
-
-	/**
-	 * Test if time is infinity.
-	 *
-	 * @return true if time is infinity, otherwise false.
-	 */
-	inline bool isInfinity() const
-        { return m_value == -1; }
-
-	/**
-	 * Get current value.
-	 *
-	 * @return double representation of Time.
-	 */
-	inline double getValue() const {
-	    return isInfinity() ?
-		std::numeric_limits<double>::max() :
-		m_value; }
-
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-	inline virtual bool operator<(const Time& time) const {
-	    return (m_value < time.m_value and !isInfinity()) or
-		time.isInfinity(); }
-
-	inline virtual bool operator<=(const Time& time) const {
-	    return (m_value <= time.m_value and !isInfinity()) or
-		time.isInfinity(); }
-
-	inline virtual bool operator>(const Time& time) const {
-	    return (m_value > time.m_value and !time.isInfinity()) or
-		(isInfinity() and !time.isInfinity()); }
-
-	inline virtual bool operator>=(const Time& time) const {
-	    return (m_value >= time.m_value and !time.isInfinity()) or
-		isInfinity(); }
-
-	inline virtual bool operator==(const Time& time) const {
-	    return m_value == time.m_value; }
-
-	inline virtual bool operator!=(const Time& time) const {
-	    return m_value != time.m_value; }
-
-	inline virtual void operator++() {
-	    if (!isInfinity()) m_value++; }
-
-	inline virtual void operator+=(double step) {
-	    if (!isInfinity()) m_value += step; }
-
-	inline virtual void operator+=(const Time& step) {
-	    if (!isInfinity() and !step.isInfinity())
-		m_value += step.m_value;
-	    else
-		m_value = -1;
-	}
-
-	inline virtual Time operator+(const Time& step) const {
-	    return (!isInfinity() and !step.isInfinity()) ?
-		Time(m_value + step.m_value) :
-		infinity;
-	}
-
-	inline virtual Time operator+(double step) const {
-	    return (!isInfinity()) ?
-		Time(m_value + step) :
-		infinity; }
-
-	inline virtual void operator--() {
-	    if (!isInfinity()) m_value--; }
-
-	inline virtual void operator-=(double step) {
-	    if (!isInfinity()) m_value -= step; }
-
-	inline virtual void operator-=(const Time& step) {
-	    if (!isInfinity()) m_value -= step.m_value; }
-
-	inline virtual Time operator-(double step) const {
-	    return (!isInfinity()) ? Time(m_value - step) : infinity; }
-
-	inline virtual Time operator-(const Time& step) const {
-	    return (!isInfinity() and !step.isInfinity()) ?
-		Time(m_value - step.m_value) :
-		(isInfinity()?infinity:Time(0));
-	}
-
-	static const Time infinity;
-
-        inline friend std::ostream& operator<<(std::ostream& out, const Time& t)
-        {
-            return out << t.m_value;
+        if (not isInfinity()) {
+            ++m_value;
         }
+    }
 
-    private:
-	double m_value;
-    };
+    inline void operator+=(const Time& step)
+    {
+        if (not isInfinity() and not step.isInfinity()) {
+            m_value += step.m_value;
+        } else {
+            m_value = infinity;
+        }
+    }
+
+    inline void operator+=(const double& step)
+    {
+        if (not isInfinity()) {
+            m_value += step;
+        }
+    }
+
+    inline void operator+=(const int& step)
+    {
+        if (not isInfinity()) {
+            m_value += step;
+        }
+    }
+
+
+    inline Time operator+(const Time& step) const
+    {
+        if (not isInfinity() and not step.isInfinity()) {
+            return Time(m_value + step.m_value);
+        } else {
+            return infinity;
+        }
+    }
+
+    inline Time operator+(const double& step) const
+    {
+        if (not isInfinity()) {
+            return Time(m_value + step);
+        } else {
+            return infinity;
+        }
+    }
+
+    inline Time operator+(const int& step) const
+    {
+        if (not isInfinity()) {
+            return Time(m_value + step);
+        } else {
+            return infinity;
+        }
+    }
+
+
+    inline void operator--()
+    {
+        if (not isInfinity()) {
+            --m_value;
+        }
+    }
+
+
+    inline void operator-=(const Time& step)
+    {
+        if (not isInfinity()) {
+            if (not step.isInfinity()) {
+                m_value -= step;
+            } else {
+                throw utils::ArgError("Time: -infinity is not representable");
+            }
+        } else {
+            if (step.isInfinity()) {
+                throw utils::ArgError("Time: infinity -= infinity");
+            }
+        }
+    }
+
+    inline void operator-=(const double& step)
+    {
+        if (not isInfinity()) {
+            m_value -= step;
+        }
+    }
+
+    inline void operator-=(const int& step)
+    {
+        if (not isInfinity()) {
+            m_value -= step;
+        }
+    }
+
+
+    inline Time operator-(const Time& step) const
+    {
+        if (not isInfinity()) {
+            if (not step.isInfinity()) {
+                return Time(m_value - step.m_value);
+            } else {
+                throw utils::ArgError("Time: -infinity is not representable");
+            }
+        } else {
+            if (not step.isInfinity()) {
+                return infinity;
+            } else {
+                throw utils::ArgError("Time: infinity -= infinity");
+            }
+        }
+    }
+
+    inline Time operator-(const double& step) const
+    {
+        if (not isInfinity()) {
+            return Time(m_value - step);
+        } else {
+            return infinity;
+        }
+    }
+
+    inline Time operator-(const int& step) const
+    {
+        if (not isInfinity()) {
+            return Time(m_value - step);
+        } else {
+            return infinity;
+        }
+    }
+
+
+    static const Time infinity;
+
+    inline friend std::ostream& operator<<(std::ostream& out, const Time& t)
+    {
+        return out << t.m_value;
+    }
+
+private:
+    double m_value;
+};
+
+
+/**
+ * @brief Functor to check if the Time is infinity.
+ * @code
+ * it = std::find_if(c.begin(), c.end(), IsInfinity());
+ * if (it != c.end()) {
+ *     std::cout << "Infinity time found";
+ * }
+ * @endcode
+ */
+struct IsInfinity
+{
+    inline bool operator()(const Time& time) const
+    { return time.isInfinity(); }
+};
 
 }} // namespace vle devs
 

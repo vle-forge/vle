@@ -92,7 +92,7 @@ void DSDevs::output(const devs::Time& /* time */,
 
 devs::Time DSDevs::timeAdvance() const
 {
-    return (m_state != IDLE) ? 0 : devs::Time::infinity;
+    return (m_state != IDLE) ? devs::Time(0.0) : devs::Time::infinity;
 }
 
 devs::Event::EventType DSDevs::confluentTransitions(
