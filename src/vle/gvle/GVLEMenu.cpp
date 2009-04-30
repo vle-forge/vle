@@ -106,6 +106,13 @@ void GVLEMenu::makeMenuView(GVLE* gvle)
         Gtk::Menu_Helpers::MenuElem("_Close all views",
                                     Gtk::AccelKey(GDK_W, Gdk::CONTROL_MASK),
             sigc::mem_fun(gvle, &GVLE::onCloseAllViews)));
+
+    menulist.push_back(Gtk::Menu_Helpers::SeparatorElem());
+
+    menulist.push_back(
+        Gtk::Menu_Helpers::MenuElem("Pre_ferences",
+                                    Gtk::AccelKey(GDK_F, Gdk::CONTROL_MASK),
+            sigc::mem_fun(gvle, &GVLE::onPreferences)));
 }
 
 void GVLEMenu::makeMenuSimulation(GVLE* gvle)

@@ -56,6 +56,7 @@ namespace gvle {
 class GVLEMenu;
 class Modeling;
 class PluginTable;
+class PreferencesBox;
 
 /**
  * @brief GVLE is a Gtk::Window use to build the main window with all button
@@ -329,6 +330,11 @@ public:
      */
     void onDeiconifyAllViews();
 
+    /**
+     * @brief Show the PreferencesBox
+     */
+    void onPreferences();
+
     /*********************************************************************
      *
      * MENU EXECUTION
@@ -439,6 +445,7 @@ private:
     //Menu
     ConditionsBox*        mConditionsBox;
     LaunchSimulationBox*  mSimulationBox;
+    PreferencesBox*       mPreferencesBox;
 };
 
 std::string valuetype_to_string(value::Value::type type);

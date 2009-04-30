@@ -90,14 +90,14 @@ void ViewDrawingArea::draw()
 void ViewDrawingArea::drawCurrentCoupledModel()
 {
     if (mView->existInSelectedModels(mCurrent)) {
-	setColor(mRed);
+	setColor(mModeling->getSelectedColor());
 	mContext->rectangle(0, 0,
 			    (int)(mWidth * mZoom),
 			    (int)(mHeight * mZoom));
 	mContext->fill();
 	mContext->stroke();
 
-	setColor(mWhite);
+	setColor(mModeling->getBackgroundColor());
 	mContext->rectangle((int)(MODEL_PORT * mZoom),
 			    (int)(MODEL_PORT * mZoom),
 			    (int)((mWidth - 2 * MODEL_PORT) * mZoom),
@@ -105,21 +105,21 @@ void ViewDrawingArea::drawCurrentCoupledModel()
 	mContext->fill();
 	mContext->stroke();
 
-	setColor(mBlack);
+	setColor(mModeling->getForegroundColor());
 	mContext->rectangle((int)(MODEL_PORT * mZoom),
 			    (int)(MODEL_PORT * mZoom),
 			    (int)((mWidth - 2 * MODEL_PORT) * mZoom),
 			    (int)((mHeight - 2 * MODEL_PORT) * mZoom));
 	mContext->stroke();
     } else {
-	setColor(mWhite);
+	setColor(mModeling->getBackgroundColor());
 	mContext->rectangle(0, 0,
 			    (int)(mWidth * mZoom),
 			    (int)(mHeight * mZoom));
 	mContext->fill();
 	mContext->stroke();
 
-	setColor(mBlack);
+	setColor(mModeling->getForegroundColor());
 	mContext->rectangle((int)(MODEL_PORT * mZoom),
 			    (int)(MODEL_PORT * mZoom),
 			    (int)((mWidth - 2 * MODEL_PORT) * mZoom),
@@ -140,7 +140,7 @@ void ViewDrawingArea::drawCurrentModelPorts()
     const size_t stepInput = (int)((mHeight * mZoom) / (maxInput + 1));
     const size_t stepOutput = (int)((mHeight * mZoom) / (maxOutput + 1));
 
-    mContext->select_font_face("Sans",
+    mContext->select_font_face(mModeling->getFont(),
 			  Cairo::FONT_SLANT_OBLIQUE,
 			  Cairo::FONT_WEIGHT_NORMAL);
     mContext->set_font_size(12 * mZoom);
@@ -150,7 +150,7 @@ void ViewDrawingArea::drawCurrentModelPorts()
     for (size_t i = 0; i < maxInput; ++i) {
 
         // to draw the port
-	setColor(mBlack);
+	setColor(mModeling->getForegroundColor());
 	mContext->move_to((int)(mZoom * (MODEL_PORT)),
 			  (int)(stepInput * (i + 1) - MODEL_PORT));
 	mContext->line_to((int)(mZoom * (MODEL_PORT)),
@@ -164,7 +164,7 @@ void ViewDrawingArea::drawCurrentModelPorts()
 
 
         // to draw the label of the port
-	setColor(mBlack);
+	setColor(mModeling->getForegroundColor());
 	mContext->move_to((int)(mZoom * (MODEL_PORT + MODEL_PORT_SPACING_LABEL)),
 			  (int)(stepInput * (i + 1) + 10));
 	mContext->show_text(itl->first);
@@ -178,7 +178,7 @@ void ViewDrawingArea::drawCurrentModelPorts()
     for (guint i = 0; i < maxOutput; ++i) {
 
         // to draw the port
-	setColor(mBlack);
+	setColor(mModeling->getForegroundColor());
 	mContext->move_to((int)(mZoom * (mWidth - MODEL_PORT)),
 			  (int)(stepOutput * (i + 1) - MODEL_PORT));
 	mContext->line_to((int)(mZoom * (mWidth - MODEL_PORT)),
@@ -481,7 +481,7 @@ void ViewDrawingArea::drawLines()
     while (itl != mLines.end()) {
         if (i != mHighlightLine) {
 	    mContext->set_line_join(Cairo::LINE_JOIN_ROUND);
-	    setColor(mBlack);
+	    setColor(mModeling->getForegroundColor());
         }
 	mContext->move_to(itl->begin()->first, itl->begin()->second);
 	std::vector <Point>::const_iterator iter = itl->begin();
@@ -514,7 +514,7 @@ void ViewDrawingArea::drawHighlightConnection()
 	mContext->stroke();
 
 	mContext->set_line_width(2);
-	mContext->select_font_face("Sans",
+	mContext->select_font_face(mModeling->getFont(),
 				   Cairo::FONT_SLANT_NORMAL,
 				   Cairo::FONT_WEIGHT_NORMAL);
 	mContext->set_font_size(10 * mZoom);
@@ -530,7 +530,7 @@ void ViewDrawingArea::drawHighlightConnection()
 	mContext->fill();
 	mContext->stroke();
 
-	setColor(mBlack);
+	setColor(mModeling->getForegroundColor());
 	mContext->rectangle((int)(mZoom * (mMouse.get_x())),
 			    (int)(mZoom * mMouse.get_y() - textExtents.height - 6),
 			    (int)(textExtents.width + 5),
@@ -552,26 +552,26 @@ void ViewDrawingArea::drawChildrenModels()
         graph::Model* model = it->second;
         calcSize(model);
         if (mView->existInSelectedModels(model)) {
-            drawChildrenModel(model, mRed);
+            drawChildrenModel(model, mModeling->getSelectedColor());
         } else {
             if (model->isAtomic()) {
-                drawChildrenModel(model, mBlack);
+                drawChildrenModel(model, mModeling->getAtomicColor());
             } else {
-                drawChildrenModel(model, mGreen);
+                drawChildrenModel(model, mModeling->getCoupledColor());
             }
         }
         ++it;
     }
     if (mView->getDestinationModel() != NULL and mView->getDestinationModel() !=
         mCurrent) {
-        drawChildrenModel(mView->getDestinationModel(), mBlue);
+        drawChildrenModel(mView->getDestinationModel(), mModeling->getAtomicColor());
     }
 }
 
 void ViewDrawingArea::drawChildrenModel(graph::Model* model,
                                         Color color)
 {
-    setColor(mBlack);
+    setColor(mModeling->getForegroundColor());
     mContext->rectangle((int)(mZoom * model->x()),
 			(int)(mZoom * model->y()),
 			(int)(mZoom * model->width()),
@@ -603,7 +603,7 @@ void ViewDrawingArea::drawChildrenPorts(graph::Model* model,
     const int    mX = model->x();
     const int    mY = model->y();
 
-    mContext->select_font_face("Sans",
+    mContext->select_font_face(mModeling->getFont(),
 			       Cairo::FONT_SLANT_OBLIQUE,
 			       Cairo::FONT_WEIGHT_NORMAL);
     mContext->set_font_size(12 * mZoom);
@@ -669,7 +669,7 @@ void ViewDrawingArea::drawChildrenPorts(graph::Model* model,
         itl++;
     }
 
-    mContext->select_font_face("Sans",
+    mContext->select_font_face(mModeling->getFont(),
 			       Cairo::FONT_SLANT_NORMAL,
 			       Cairo::FONT_WEIGHT_NORMAL);
     mContext->set_font_size(12 * mZoom);
@@ -685,7 +685,7 @@ void ViewDrawingArea::drawLink()
     if (mView->getCurrentButton() == GVLE::ADDLINK and
         mView->isEmptySelectedModels() == false) {
         graph::Model* src = mView->getFirstSelectedModels();
-	setColor(mBlack);
+	setColor(mModeling->getForegroundColor());
         if (src == mCurrent) {
 	    mContext->move_to((int)(MODEL_PORT * mZoom),
 			      (int)(mZoom * mHeight / 2));
@@ -716,7 +716,7 @@ void ViewDrawingArea::drawZoomFrame()
         int ymin = std::min(mMouse.get_y(), mPrecMouse.get_y());
         int ymax = std::max(mMouse.get_y(), mPrecMouse.get_y());
 
-	setColor(mBlack);
+	setColor(mModeling->getForegroundColor());
 	mContext->rectangle((int)(mZoom * xmin),
 			    (int)(mZoom * ymin),
 			    (int)(mZoom * (xmax - xmin)),
@@ -985,11 +985,6 @@ void ViewDrawingArea::on_realize()
     mWin = get_window();
     assert(mWin);
     mWingc = Gdk::GC::create(mWin);
-    mBlack = Color(0.0, 0.0, 0.0);
-    mWhite = Color(1.0, 1.0, 1.0);
-    mRed = Color(0.83, 0.68, 0.70);
-    mGreen = Color(0.70, 0.83, 0.68);
-    mBlue = Color(0.68, 0.70, 0.83);
     mIsRealized = true;
     queueRedraw();
 }

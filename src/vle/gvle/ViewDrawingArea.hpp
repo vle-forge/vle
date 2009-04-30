@@ -40,6 +40,15 @@ namespace vle { namespace gvle {
     class View;
     class Modeling;
 
+    class Color
+    {
+    public:
+	double m_r; double m_g; double m_b;
+	Color(double r = 0, double g = 0, double b = 0) :
+	    m_r(r), m_g(g), m_b(b)
+	    {}
+    };
+
     /**
      * @brief A Gtk::DrawingArea to draw the gui::GModel onto the screen. This
      * objet is attached to a gui::View that manage menu and global Gtk::Window
@@ -132,15 +141,6 @@ namespace vle { namespace gvle {
 
 	typedef std::pair < int, int > Point;
 	typedef std::vector < Point > StraightLine;
-
-	class Color
-        {
-	public:
-            double m_r; double m_g; double m_b;
-            Color(double r = 0, double g = 0, double b = 0) :
-		m_r(r), m_g(g), m_b(b)
-		{}
-	};
 
         class Connection
         {
@@ -237,11 +237,6 @@ namespace vle { namespace gvle {
 	Cairo::RefPtr<Cairo::Context>   mContext;
         Glib::RefPtr < Gdk::Window >    mWin;
         Glib::RefPtr < Gdk::GC >        mWingc;
-	Color                           mBlack;
-	Color                           mWhite;
-	Color                           mRed;
-	Color                           mGreen;
-	Color                           mBlue;
         bool                            mIsRealized;
 
         /**

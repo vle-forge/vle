@@ -34,6 +34,7 @@
 #include <vle/gvle/PluginTable.hpp>
 #include <vle/gvle/GVLEMenu.hpp>
 #include <vle/gvle/PluginPlus.hpp>
+#include <vle/gvle/PreferencesBox.hpp>
 #include <vle/gvle/ViewOutputBox.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Trace.hpp>
@@ -70,6 +71,7 @@ GVLE::GVLE(const std::string& filename) :
 
     mConditionsBox = new ConditionsBox(mRefXML, m_modeling);
     mSimulationBox = new LaunchSimulationBox(mRefXML, m_modeling);
+    mPreferencesBox = new PreferencesBox(mRefXML, m_modeling);
 
     //loadObserverPlugins(utils::Path::path().getDefaultObserverPluginDir());
     //loadObserverPlugins(utils::Path::path().getUserObserverPluginDir());
@@ -115,6 +117,7 @@ GVLE::~GVLE()
 
     delete mConditionsBox;
     delete mSimulationBox;
+    delete mPreferencesBox;
 }
 
 Gtk::RadioButton* GVLE::getButtonRef(ButtonType button)
@@ -600,6 +603,11 @@ void GVLE::onIconifyAllViews()
 void GVLE::onDeiconifyAllViews()
 {
     m_modeling->deiconifyViews();
+}
+
+void GVLE::onPreferences()
+{
+    mPreferencesBox->show();
 }
 
 void GVLE::onSimulationBox()

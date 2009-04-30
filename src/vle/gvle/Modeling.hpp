@@ -32,6 +32,7 @@
 #include <vle/gvle/CoupledModelBox.hpp>
 #include <vle/gvle/CutCopyPaste.hpp>
 #include <vle/gvle/ImportModelBox.hpp>
+#include <vle/gvle/ViewDrawingArea.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/graph/Model.hpp>
 #include <vle/graph/AtomicModel.hpp>
@@ -317,9 +318,8 @@ public:
      *
      * @return selected button.
      */
-    inline GVLE::ButtonType getCurrentButton() const {
-        return mGVLE->getCurrentButton();
-    }
+    inline GVLE::ButtonType getCurrentButton() const
+	{ return mGVLE->getCurrentButton(); }
 
     /**
      * get current plugin selected in GVLE panel.
@@ -800,6 +800,49 @@ public:
 
     void vpz_is_correct(std::vector<std::string>& vec);
 
+
+    /********************************************************************
+     *
+     * MANAGE THE DRAWING SETTINGS
+     *
+     ********************************************************************/
+
+    inline void setForegroundColor(Color color)
+	{ mForegroundColor = color; }
+
+    inline const Color getForegroundColor() const
+	{ return mForegroundColor; }
+
+    inline void setBackgroundColor(const Color color)
+	{ mBackgroundColor = color; }
+
+    inline const Color getBackgroundColor() const
+	{ return mBackgroundColor; }
+
+    inline void setSelectedColor(const Color color)
+	{ mSelectedColor = color; }
+
+    inline const Color getSelectedColor() const
+	{ return mSelectedColor; }
+
+    inline void setCoupledColor(const Color color)
+	{ mCoupledColor = color; }
+
+    inline const Color getCoupledColor() const
+	{ return mCoupledColor; }
+
+    inline void setAtomicColor(const Color color)
+	{ mAtomicColor = color; }
+
+    inline const Color getAtomicColor() const
+	{ return mAtomicColor; }
+
+    inline void setFont(const std::string font)
+	{ mFont = font; }
+
+    inline const std::string getFont() const
+	{ return mFont; }
+
 private:
     vpz::Vpz                    mVpz;
     graph::CoupledModel*        mTop;
@@ -818,6 +861,14 @@ private:
     AtomicModelBox*             mAtomicBox;
     ImportModelBox*             mImportBox;
     CoupledModelBox*            mCoupledBox;
+
+    // Drawing attributes
+    Color                       mForegroundColor;
+    Color                       mBackgroundColor;
+    Color                       mSelectedColor;
+    Color                       mCoupledColor;
+    Color                       mAtomicColor;
+    std::string                 mFont;
 
     Glib::RefPtr < Gnome::Glade::Xml >  mRefXML;
 
