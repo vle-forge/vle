@@ -27,6 +27,7 @@
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Algo.hpp>
+#include <vle/value/Value.hpp>
 
 namespace vle { namespace vpz {
 
@@ -214,16 +215,18 @@ void Views::renameView(const std::string& oldname,
 void Views::copyOutput(const std::string& outputname,
 		       const std::string& copyname)
 {
-    if (m_outputs.get(outputname).streamformat() == "local") {
-	addLocalStreamOutput(copyname,
-			     m_outputs.get(outputname).location(),
-			     m_outputs.get(outputname).plugin());
+    const Output& o = m_outputs.get(outputname);
+    if (o.format() == Output::LOCAL) {
+        Output& no = addLocalStreamOutput(copyname, o.location(), o.plugin());
+        if (o.data()) {
+            no.setData(o.data()->clone());
+        }
     } else {
-	addDistantStreamOutput(copyname,
-			       m_outputs.get(outputname).location(),
-			       m_outputs.get(outputname).plugin());
+        Output& no = addDistantStreamOutput(copyname, o.location(), o.plugin());
+        if (o.data()) {
+            no.setData(o.data()->clone());
+        }
     }
-    m_outputs.get(copyname).setData(m_outputs.get(outputname).data());
 }
 
 void Views::copyView(const std::string& viewname,

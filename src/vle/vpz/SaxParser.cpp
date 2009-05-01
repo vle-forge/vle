@@ -510,15 +510,23 @@ void SaxParser::onEndDynamic()
 
 void SaxParser::onEndOutput()
 {
-    if (not m_cdata.empty()) {
-        Output* out;
-        out = dynamic_cast < Output* >(m_vpzstack.top());
-        if (out) {
-            out->setData(m_cdata);
-            m_cdata.clear();
+    if (m_vpzstack.top()->isOutput()) {
+        Output* out = dynamic_cast < Output* >(m_vpzstack.top());
+
+        std::vector < value::Value* >& lst(getValues());
+        if (not lst.empty()) {
+            if (lst.size() > 1) {
+                throw utils::SaxParserError(
+                    "VPZ parser: multiples values for output");
+            }
+            value::Value* val = lst[0];
+            if (val) {
+                out->setData(val);
+                m_valuestack.clear();
+            }
         }
+        m_vpzstack.popOutput();
     }
-    m_vpzstack.pop();
 }
 
 void SaxParser::onEndClasses()

@@ -46,7 +46,7 @@ SimpleFile::~SimpleFile()
 void SimpleFile::onParameter(const std::string& /* plugin */,
                              const std::string& location,
                              const std::string& file,
-                             const std::string& /* parameters */,
+                             value::Value* parameters,
                              const double& /* time */)
 {
     m_filenametmp = Glib::build_filename(location, file);
@@ -57,6 +57,8 @@ void SimpleFile::onParameter(const std::string& /* plugin */,
 
     Assert <utils::ModellingError >(m_file.is_open(), boost::format(
             "SimpleFile: cannot open file '%1%'") % m_filenametmp);
+
+    delete parameters;
 }
 
 void SimpleFile::onNewObservable(const std::string& simulator,

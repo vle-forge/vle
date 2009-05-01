@@ -29,12 +29,21 @@
 #include <string>
 #include <vle/vpz/Base.hpp>
 
-namespace vle { namespace vpz {
+namespace vle {
+
+    namespace value {
+
+        class Value;
+
+    } // namespace value
+
+    namespace vpz {
 
     /**
-     * @brief This class defines an output information and store the type of
-     * output, text stream, sdml stream or Eov stream. For text and sdml, it
-     * store the location filename and for Eov stream, the host.
+     * @brief This class defines an output information and stores the type of
+     * output: local or distant, the name of the oov::Plugin, its location
+     * (local file system or internet address and the parametrization of the
+     * plug-in).
      */
     class Output : public Base
     {
@@ -49,15 +58,32 @@ namespace vle { namespace vpz {
         /**
          * @brief Build a empty local output.
          */
-        Output()
-            : m_format(LOCAL)
-        {}
+        Output();
+
+        /**
+         * @brief Copy constructor.
+         * @param output The Output to copy. The m_data is cloned.
+         */
+        Output(const Output& output);
+
+        /**
+         * @brief Affectation operator.
+         * @param output The Output to assign. The m_data is cloned.
+         * @return A reference to this.
+         */
+        Output& operator=(const Output& output);
 
         /**
          * @brief Nothing to delete.
          */
-        virtual ~Output()
-        {}
+        virtual ~Output();
+
+        /**
+         * @brief Swap all the value between this output and the parameter. The
+         * m_data is not cloned.
+         * @param output The Output to replace data.
+         */
+        void swap(Output& output);
 
         /**
          * @brief Write the XML representation of the Output.
@@ -107,11 +133,16 @@ namespace vle { namespace vpz {
                               const std::string& plugin);
 
         /**
-         * @brief Set the output data to initialise the plugin. The data is
-         * the children of output tag.
-         * @param data the string representation of the data.
+         * @brief Assign data to the Output. If previous data exists, it will be
+         * deleted. Be careful, the data parameter is not cloned.
+         * @param value The new data to assign.
          */
-        void setData(const std::string& data);
+        void setData(value::Value* value);
+
+        /**
+         * @brief Delete the m_data value and assign null.
+         */
+        void clearData();
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
@@ -149,10 +180,10 @@ namespace vle { namespace vpz {
         { return m_location; }
 
         /**
-         * @brief Get the data of this Output.
+         * @brief Get a reference to the data. The data can be null.
          * @return a string representation of the data.
          */
-        const std::string& data() const
+        const value::Value* data() const
         { return m_data; }
 
         /**
@@ -170,11 +201,11 @@ namespace vle { namespace vpz {
         { m_name.assign(name); }
 
     private:
-        Format      m_format;
-        std::string m_name;
-        std::string m_plugin;
-        std::string m_location;
-        std::string m_data;
+        Format          m_format;
+        std::string     m_name;
+        std::string     m_plugin;
+        std::string     m_location;
+        value::Value*   m_data;
     };
 
 }} // namespace vle vpz

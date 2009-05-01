@@ -25,8 +25,46 @@
 
 #include <vle/vpz/Output.hpp>
 #include <vle/utils/Debug.hpp>
+#include <vle/value/Value.hpp>
 
 namespace vle { namespace vpz {
+
+Output::Output()
+    : m_format(LOCAL), m_data(0)
+{
+}
+
+Output::Output(const Output& output)
+    : m_format(output.m_format), m_name(output.m_name),
+    m_plugin(output.m_plugin), m_location(output.m_location)
+{
+    if (output.m_data) {
+        m_data = output.m_data->clone();
+    } else {
+        m_data = 0;
+    }
+}
+
+Output& Output::operator=(const Output& output)
+{
+    Output tmp(output);
+    swap(tmp);
+    return *this;
+}
+
+Output::~Output()
+{
+    clearData();
+}
+
+void Output::swap(Output& output)
+{
+    std::swap(m_format, output.m_format);
+    std::swap(m_name, output.m_name);
+    std::swap(m_plugin, output.m_plugin);
+    std::swap(m_location, output.m_location);
+    std::swap(m_data, output.m_data);
+}
 
 void Output::write(std::ostream& out) const
 {
@@ -45,8 +83,10 @@ void Output::write(std::ostream& out) const
 
     out << " plugin=\"" << m_plugin.c_str() << "\" ";
 
-    if (not m_data.empty()) {
-        out << ">\n<![CDATA[\n" << m_data.c_str() << "\n]]>\n</output>\n";
+    if (m_data) {
+        out << ">\n";
+        m_data->writeXml(out);
+        out << "</output>\n";
     } else {
         out << "/>\n";
     }
@@ -61,6 +101,8 @@ void Output::setLocalStream(const std::string& location,
     m_location.assign(location);
     m_plugin.assign(plugin);
     m_format = Output::LOCAL;
+
+    clearData();
 }
 
 void Output::setDistantStream(const std::string& location,
@@ -72,11 +114,21 @@ void Output::setDistantStream(const std::string& location,
     m_location.assign(location);
     m_plugin.assign(plugin);
     m_format = Output::DISTANT;
+
+    clearData();
 }
 
-void Output::setData(const std::string& data)
+void Output::setData(value::Value* value)
 {
-    m_data.assign(data);
+    clearData();
+
+    m_data = value;
+}
+
+void Output::clearData()
+{
+    delete m_data;
+    m_data = 0;
 }
 
 }} // namespace vle vpz

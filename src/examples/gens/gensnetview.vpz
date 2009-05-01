@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://vle.univ-littoral.fr/vle-0.7.0.dtd">
+<!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://vle.univ-littoral.fr/vle-0.8.0.dtd">
 <vle_project version="0.7" date="" author="Gauthier Quesnel, Raphael Duboz">
  <structures>
   <model name="top" type="coupled">
@@ -23,9 +23,9 @@
  <experiment name="generatorexecutive" duration="100.0" seed="123">
   <views>
    <outputs>
-    <output name="o" format="local" plugin="caironetview"
-            location="">
-                <![CDATA[
+    <output name="o" format="local" plugin="caironetview" location="">
+     <xml>
+<![CDATA[
                 <parameters>
                 <!-- dimension of the modeled space if any -->
                     <dimensions x="10" y="10" />
@@ -67,14 +67,15 @@
                             blue="1"/>
                     </states>
                 </parameters>
-                ]]>
+]]>
+     </xml>
     </output>
    </outputs>
    <observables>
     <observable name="obs1">
      <port name="adjacency_matrix">
       <attachedview name="view"/>
-      </port>
+     </port>
     </observable>
     <observable name="obs2">
      <port name="value">

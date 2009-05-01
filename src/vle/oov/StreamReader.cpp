@@ -70,7 +70,7 @@ void StreamReader::initPlugin(const std::string& plugin,
 void StreamReader::onParameter(const std::string& pluginname,
                                const std::string& location,
                                const std::string& file,
-                               const std::string& parameters,
+                               value::Value* parameters,
                                const double& time)
 {
     initPlugin(pluginname, location);

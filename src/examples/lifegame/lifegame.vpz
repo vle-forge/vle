@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://vle.univ-littoral.fr/vle-0.7.0.dtd">
+<!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://vle.univ-littoral.fr/vle-0.8.0.dtd">
 <vle_project version="0.5" author="Eric" date="">
  <structures>
   <model name="system" type="coupled">
@@ -52,7 +52,9 @@
   </conditions>
   <views>
    <outputs>
-    <output name="o" format="distant" plugin="cairocaview" location="localhost:8000:."><![CDATA[
+    <output name="o" format="distant" plugin="cairocaview" location="localhost:8000:.">
+     <xml>
+<![CDATA[
             <parameters>
 	      <size x="30" y="30" />
 	      <geometry type="square" />
@@ -63,7 +65,9 @@
 	      </states>
 	      <objects />
 	    </parameters>
-	    ]]></output>
+]]>
+				 </xml>
+    </output>
    </outputs>
    <observables>
     <observable name="obs_cell">

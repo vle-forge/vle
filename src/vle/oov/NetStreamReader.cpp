@@ -103,7 +103,7 @@ bool NetStreamReader::dispatch(value::Set& frame)
         onParameter(frame.get(1).toString().value(),
                     frame.get(2).toString().value(),
                     frame.get(3).toString().value(),
-                    frame.get(4).toXml().value(),
+                    frame.give(4),
                     frame.get(5).toDouble().value());
         break;
     case 1:

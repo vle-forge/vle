@@ -31,6 +31,7 @@
 #include <vle/value/Integer.hpp>
 #include <vle/value/String.hpp>
 #include <vle/value/Set.hpp>
+#include <vle/value/XML.hpp>
 #include <iostream>
 
 
@@ -55,7 +56,7 @@ CairoNetView::~CairoNetView()
 void CairoNetView::onParameter(const std::string& /* plugin */,
                                const std::string& /* location */,
                                const std::string& /* file */,
-                               const std::string& parameters,
+                               value::Value* parameters,
                                const double& /* time */)
 {
     m_display_node_names = false;
@@ -63,7 +64,12 @@ void CairoNetView::onParameter(const std::string& /* plugin */,
     Assert < utils::InternalError >(m_ctx, "Cairo caview drawing error");
     xmlpp::DomParser parser;
 
-    parser.parse_memory(parameters);
+    if (not parameters and not parameters->isXml()) {
+        throw utils::ArgError(
+            "NetView: Initialization failed, bad parameters");
+    }
+
+    parser.parse_memory(value::toXml(parameters));
     xmlpp::Element* root = utils::xml::get_root_node(parser, "parameters");
 
     xmlpp::Element *elt = utils::xml::get_children(root,"dimensions");
@@ -115,6 +121,8 @@ void CairoNetView::onParameter(const std::string& /* plugin */,
         if (utils::xml::get_attribute(elt,"activate") == "yes")
             m_display_node_names = true;
     }
+
+    delete parameters;
 }
 
 void CairoNetView::onNewObservable(const std::string& /* simulator */,

@@ -539,6 +539,14 @@ void SaxStackVpz::pushOutputs()
     push(&m_vpz.project().experiment().views().outputs());
 }
 
+void SaxStackVpz::popOutput()
+{
+    Assert < utils::SaxParserError >(not m_stack.empty());
+    Assert < utils::SaxParserError >(parent()->isOutput());
+
+    pop();
+}
+
 void SaxStackVpz::pushOutput(const AttributeList& att)
 {
     Assert < utils::SaxParserError >(not m_stack.empty());

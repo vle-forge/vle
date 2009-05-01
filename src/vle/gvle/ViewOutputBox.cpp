@@ -25,7 +25,9 @@
 
 #include <vle/gvle/ViewOutputBox.hpp>
 #include <vle/gvle/SimpleTypeBox.hpp>
+#include <vle/gvle/Message.hpp>
 #include <vle/utils/Path.hpp>
+#include <vle/vpz/Vpz.hpp>
 #include <gtkmm/filechooserdialog.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
@@ -401,7 +403,16 @@ void ViewOutputBox::assignView(const std::string& name)
                               m_plugin->get_active_text());
     }
 
-    output.setData(m_data->get_buffer()->get_text());
+    if (not m_data->get_buffer()->get_text().empty()) {
+        try {
+            value::Value* result = vpz::Vpz::parseValue(
+                m_data->get_buffer()->get_text());
+            output.setData(result);
+        } catch (const std::exception& e) {
+            Error("Error: parametrization plug-in error");
+            output.setData(0);
+        }
+    }
 }
 
 void ViewOutputBox::updateView(const std::string& name)
@@ -416,7 +427,10 @@ void ViewOutputBox::updateView(const std::string& name)
     m_location->set_text(output.location());
     m_directory->set_sensitive(output.format() == vpz::Output::LOCAL);
     m_plugin->set_active_text(output.plugin());
-    m_data->get_buffer()->set_text(output.data());
+
+    if (output.data()) {
+        m_data->get_buffer()->set_text(output.data()->writeToXml());
+    }
 }
 
 std::string ViewOutputBox::buildOutputName(const std::string& name) const

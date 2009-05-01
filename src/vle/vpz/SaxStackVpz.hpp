@@ -314,6 +314,12 @@ namespace vle {
         value::Set& popConditionPort();
 
         /**
+         * @brief Pop the Output.
+         * @return The value::Value read.
+         */
+        void popOutput();
+
+        /**
          * @brief Pop the top of the stack and return it.
          * @throw utils::SaxParserError if stack is empty.
          * @return A pointer to the vpz::Base class.

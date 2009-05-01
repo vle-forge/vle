@@ -43,7 +43,7 @@ namespace vle { namespace devs {
         virtual void open(const std::string& plugin,
                           const std::string& location,
                           const std::string& file,
-                          const std::string& parameters,
+                          value::Value* parameters,
                           const devs::Time& time);
 
         virtual void processNewObservable(Simulator* simulator,
@@ -73,10 +73,10 @@ namespace vle { namespace devs {
         value::Set*      m_refreshFrame;
 
         void buildParameters(const std::string& plugin,
-                            const std::string& location,
-                            const std::string& directory,
-                            const std::string& file,
-                            const double& time);
+                             const std::string& location,
+                             const std::string& directory,
+                             value::Value* file,
+                             const double& time);
 
         void buildNewObs(const std::string& simulator,
                          const std::string& parents,

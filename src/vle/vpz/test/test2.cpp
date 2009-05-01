@@ -38,6 +38,7 @@
 #include <vle/value/Set.hpp>
 #include <vle/value/Integer.hpp>
 #include <vle/value/Double.hpp>
+#include <vle/value/String.hpp>
 #include <limits>
 #include <fstream>
 #include <iostream>
@@ -329,9 +330,7 @@ BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
         "   <outputs>\n"
         "    <output name=\"x\" format=\"local\" "
         "            plugin=\"yyy\" location=\"TEMP\">\n"
-        "   <![CDATA["
-        "test"
-        "]]>"
+        "     <string>test</string>"
         "    </output>\n"
         "    <output name=\"z\" format=\"distant\" "
         "            plugin=\"xxx\" location=\"127.0.0.1:8888\" />\n"
@@ -371,7 +370,9 @@ BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
         const vpz::Output& out(outputs.outputlist().find("x")->second);
         BOOST_REQUIRE_EQUAL(out.name(), "x");
         BOOST_REQUIRE_EQUAL(out.format(), vpz::Output::LOCAL);
-        BOOST_REQUIRE_EQUAL(out.data(), "test");
+        BOOST_REQUIRE_NE(out.data(), (value::Value*)0);
+        BOOST_REQUIRE_EQUAL(out.data()->isString(), true);
+        BOOST_REQUIRE_EQUAL(value::toString(out.data()), "test");
     }
     BOOST_REQUIRE(outputs.outputlist().find("z") != outputs.outputlist().end());
     {

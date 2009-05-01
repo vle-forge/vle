@@ -30,6 +30,7 @@
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
 #include <vle/value/String.hpp>
+#include <vle/value/XML.hpp>
 
 namespace vle { namespace oov { namespace plugin {
 
@@ -97,7 +98,7 @@ void CairoLevel::onValue(const std::string& simulator,
 void CairoLevel::onParameter(const std::string& /* plugin */,
                              const std::string& /* location */,
                              const std::string& /* file */,
-                             const std::string& parameters,
+                             value::Value* parameters,
                              const double& /* time */)
 {
     Assert < utils::InternalError >(m_ctx, "Cairo level drawing error");
@@ -107,9 +108,9 @@ void CairoLevel::onParameter(const std::string& /* plugin */,
     m_minY = 1;
     m_maxY = 306;
 
-    if (not parameters.empty()) {
+    if (parameters and parameters->isXml()) {
         xmlpp::DomParser parser;
-        parser.parse_memory(parameters);
+        parser.parse_memory(value::toXml(parameters));
 
 	xmlpp::Element* root = utils::xml::get_root_node(parser, "parameters");
 
@@ -138,6 +139,7 @@ void CairoLevel::onParameter(const std::string& /* plugin */,
             m_minY = lexical_cast < int >(get_attribute(elt, "miny"));
             m_maxY = lexical_cast < int >(get_attribute(elt, "maxy"));
         }
+        delete parameters;
     }
 
     m_colorList[0] = std::vector<int>(3);

@@ -60,17 +60,16 @@ namespace vle { namespace devs {
 
         /**
          * @brief Initialise plugin with specified information.
-         * @param plugin the name of the instance of plugin loaded like,
-         * text, sdml or net.
+         * @param plugin the plugin' name.
          * @param location where the plugin write data.
          * @param file name of the file.
-         * @param parameters a string representation of parameters the XML
-         * parameters.
+         * @param parameters the value attached to the plug-in.
+         * @param time the date when the plug-in was opened.
          */
         virtual void open(const std::string& plugin,
                           const std::string& location,
                           const std::string& file,
-                          const std::string& parameters,
+                          value::Value* parameters,
                           const devs::Time& time) = 0;
 
         virtual void processNewObservable(Simulator* simulator,

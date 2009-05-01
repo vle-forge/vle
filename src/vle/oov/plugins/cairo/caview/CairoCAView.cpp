@@ -30,6 +30,7 @@
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
 #include <vle/value/String.hpp>
+#include <vle/value/XML.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <iostream>
 
@@ -58,13 +59,18 @@ CairoCAView::~CairoCAView()
 void CairoCAView::onParameter(const std::string& /* plugin */,
                               const std::string& /* location */,
                               const std::string& /* file */,
-                              const std::string& parameters,
+                              value::Value* parameters,
                               const double& /* time */)
 {
     Assert < utils::InternalError >(m_ctx, "Cairo caview drawing error");
     xmlpp::DomParser parser;
 
-    parser.parse_memory(parameters);
+    if (not parameters or not parameters->isXml()) {
+        throw utils::ArgError(
+            "CAView: initialization failed, bad parameters");
+    }
+
+    parser.parse_memory(value::toXml(parameters));
     xmlpp::Element* root = utils::xml::get_root_node(parser, "parameters");
     xmlpp::Element * elt = utils::xml::get_children(root, "size");
     mColumns = utils::to_int(utils::xml::get_attribute(elt,"x").c_str());
@@ -216,6 +222,8 @@ void CairoCAView::onParameter(const std::string& /* plugin */,
 
     mMaxX = mStepX * mColumns;
     mMaxY = mStepY * mRows;
+
+    delete parameters;
 }
 
 void CairoCAView::onNewObservable(const std::string& /* simulator */,

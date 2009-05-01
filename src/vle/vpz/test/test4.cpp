@@ -246,15 +246,39 @@ void check_experiment_unittest_vpz(const vpz::Experiment& exp)
             BOOST_REQUIRE_EQUAL(o.name(), "view1");
             BOOST_REQUIRE_EQUAL(o.format(), vpz::Output::LOCAL);
             BOOST_REQUIRE_EQUAL(o.plugin(), "storage");
-            BOOST_REQUIRE_EQUAL(boost::algorithm::trim_copy(o.data()),
-                                "10 10 1 1");
+
+            BOOST_REQUIRE_NE(o.data(), (value::Value*)0);
+            BOOST_REQUIRE(o.data()->isMap());
+
+            const value::Map* map(value::toMapValue(o.data()));
+
+            BOOST_REQUIRE(map->existValue("columns"));
+            BOOST_REQUIRE(map->existValue("rows"));
+            BOOST_REQUIRE(map->existValue("inc_columns"));
+            BOOST_REQUIRE(map->existValue("inc_rows"));
+
+            const value::Value& columns(map->get("columns"));
+            BOOST_REQUIRE(columns.isInteger());
+            BOOST_REQUIRE_EQUAL(value::toInteger(columns), 5);
+
+            const value::Value& rows(map->get("rows"));
+            BOOST_REQUIRE(rows.isInteger());
+            BOOST_REQUIRE_EQUAL(value::toInteger(rows), 100);
+
+            const value::Value& inccolumns(map->get("inc_columns"));
+            BOOST_REQUIRE(inccolumns.isInteger());
+            BOOST_REQUIRE_EQUAL(value::toInteger(inccolumns), 10);
+
+            const value::Value& incrows (map->get("inc_rows"));
+            BOOST_REQUIRE(incrows.isInteger());
+            BOOST_REQUIRE_EQUAL(value::toInteger(incrows), 50);
         }
         {
             const vpz::Output& o(exp.views().outputs().get("view2"));
             BOOST_REQUIRE_EQUAL(o.name(), "view2");
             BOOST_REQUIRE_EQUAL(o.format(), vpz::Output::LOCAL);
             BOOST_REQUIRE_EQUAL(o.plugin(), "storage");
-            BOOST_REQUIRE(o.data().empty());
+            BOOST_REQUIRE_EQUAL(o.data(), (value::Value*)0);
         }
     }
     {

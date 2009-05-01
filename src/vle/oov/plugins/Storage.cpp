@@ -26,6 +26,7 @@
 #include <vle/oov/plugins/Storage.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/value/Set.hpp>
+#include <vle/value/Map.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
 #include <vle/value/String.hpp>
@@ -72,26 +73,40 @@ std::string Storage::name() const
 void Storage::onParameter(const std::string& /* plugin */,
                           const std::string& /* location */,
                           const std::string& /* file */,
-                          const std::string& parameters,
+                          value::Value* parameters,
                           const double& /* time */)
 {
-    std::istringstream param(parameters);
-    int columns = -1, rows = -1, rzcolumns = -1, rzrows = -1;
-
-    if (param) {
-        param >> columns;
-        if (param) {
-            param >> rows;
-            if (param) {
-                param >> rzcolumns;
-                if (param) {
-                    param >> rzrows;
-                }
-            }
+    if (parameters) {
+        if (not parameters->isMap()) {
+            throw utils::ArgError(
+                "Storage: initialization failed, bad parameters");
         }
+        value::Map* init = dynamic_cast < value::Map* >(parameters);
+        int columns = -1, rows = -1, rzcolumns = -1, rzrows = -1;
+
+        if (init->existValue("columns")) {
+            columns = value::toInteger(init->get("columns"));
+        }
+
+        if (init->existValue("rows")) {
+            rows = value::toInteger(init->get("rows"));
+        }
+
+        if (init->existValue("inc_columns")) {
+            rzcolumns = value::toInteger(init->get("inc_columns"));
+        }
+
+        if (init->existValue("inc_rows")) {
+            rzrows = value::toInteger(init->get("inc_rows"));
+        }
+
+        m_matrix.resize(columns > 1 ? columns : 10,
+                        rows > 1 ? rows : 10);
+        m_matrix.updateStep(rzcolumns > 0 ? rzcolumns : 1,
+                            rzrows > 0 ? rzrows : 1);
+
+        delete parameters;
     }
-    m_matrix.resize(columns > 1 ? columns : 10, rows > 1 ? rows : 10);
-    m_matrix.updateStep(rzcolumns > 0 ? rzcolumns : 1, rzrows > 0 ? rzrows : 1);
 }
 
 void Storage::onNewObservable(const std::string& simulator,

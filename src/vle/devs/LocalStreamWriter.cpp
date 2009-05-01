@@ -33,7 +33,7 @@ namespace vle { namespace devs {
 void LocalStreamWriter::open(const std::string& plugin,
                              const std::string& location,
                              const std::string& file,
-                             const std::string& parameters,
+                             value::Value* parameters,
                              const devs::Time& time)
 {
     m_reader.onParameter(plugin, location, file, parameters,

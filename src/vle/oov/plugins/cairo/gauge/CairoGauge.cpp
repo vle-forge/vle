@@ -30,6 +30,7 @@
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
 #include <vle/value/String.hpp>
+#include <vle/value/XML.hpp>
 
 namespace vle { namespace oov { namespace plugin {
 
@@ -53,19 +54,23 @@ CairoGauge::~CairoGauge()
 void CairoGauge::onParameter(const std::string& /* plugin */,
                              const std::string& /* location */,
                              const std::string& /* file */,
-                             const std::string& parameters,
+                             value::Value* parameters,
                              const double& /* time */)
 {
     Assert < utils::InternalError >(m_ctx, "Cairo gauge drawing error");
 
     xmlpp::DomParser parser;
 
-    parser.parse_memory(parameters);
-    xmlpp::Element* root = utils::xml::get_root_node(parser, "parameters");
-    xmlpp::Element * elt = utils::xml::get_children(root,"min");
-    mMin = utils::to_double(utils::xml::get_attribute(elt,"value").c_str());
-    xmlpp::Element * elt2 = utils::xml::get_children(root,"max");
-    mMax = utils::to_double(utils::xml::get_attribute(elt2,"value").c_str());
+    if (parameters and parameters->isXml()) {
+        parser.parse_memory(value::toXml(parameters));
+        xmlpp::Element* root = utils::xml::get_root_node(parser, "parameters");
+        xmlpp::Element * elt = utils::xml::get_children(root,"min");
+        mMin = utils::to_double(utils::xml::get_attribute(elt,"value").c_str());
+        xmlpp::Element * elt2 = utils::xml::get_children(root,"max");
+        mMax = utils::to_double(utils::xml::get_attribute(elt2,"value").c_str());
+
+        delete parameters;
+    }
 }
 
 void CairoGauge::onNewObservable(const std::string& simulator,

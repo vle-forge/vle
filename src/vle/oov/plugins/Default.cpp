@@ -42,7 +42,7 @@ Default::~Default()
 void Default::onParameter(const std::string& plugin,
                          const std::string& location,
                          const std::string& file,
-                         const std::string& parameters,
+                         value::Value* parameters,
                          const double& time)
 {
     m_filename = Glib::build_filename(location, file);
@@ -57,8 +57,12 @@ void Default::onParameter(const std::string& plugin,
         << " plugin: " << plugin
         << " location: " << location
         << " file: " << file
-        << " parameters: " << parameters
-        << "\n";
+        << " parameters: ";
+    if (parameters) {
+        parameters->writeXml(m_file);
+        delete parameters;
+    }
+    m_file << "\n";
 }
 
 void Default::onNewObservable(const std::string& simulator,

@@ -49,7 +49,7 @@ namespace vle { namespace oov { namespace plugin {
         virtual void onParameter(const std::string& plugin,
                                  const std::string& location,
                                  const std::string& file,
-                                 const std::string& parameters,
+                                 value::Value* parameters,
                                  const double& time);
 
         virtual void onNewObservable(const std::string& simulator,

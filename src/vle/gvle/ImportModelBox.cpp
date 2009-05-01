@@ -640,7 +640,7 @@ void ImportModelBox::rename_output(vpz::Vpz* src, std::string old_name,
     } else {
         new_output->setDistantStream(output.location(), output.plugin());
     }
-    new_output->setData(output.data());
+    new_output->setData(output.data()->clone());
 
     outs.del(old_name);
     outs.add(*new_output);

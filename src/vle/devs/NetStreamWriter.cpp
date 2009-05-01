@@ -60,7 +60,7 @@ NetStreamWriter::~NetStreamWriter()
 void NetStreamWriter::open(const std::string& plugin,
                            const std::string& location,
                            const std::string& file,
-                           const std::string& parameters,
+                           value::Value* parameters,
                            const devs::Time& time)
 {
     std::string host, directory, out;
@@ -249,7 +249,7 @@ oov::PluginPtr NetStreamWriter::getPlugin() const
 void NetStreamWriter::buildParameters(const std::string& plugin,
                                       const std::string& directory,
                                       const std::string& file,
-                                      const std::string& parameters,
+                                      value::Value* parameters,
                                       const double& time)
 {
     if (m_paramFrame == 0) {
@@ -258,13 +258,13 @@ void NetStreamWriter::buildParameters(const std::string& plugin,
         m_paramFrame->addString(plugin);
         m_paramFrame->addString(directory);
         m_paramFrame->addString(file);
-        m_paramFrame->addXml(parameters);
+        m_paramFrame->add(parameters);
         m_paramFrame->addDouble(time);
     } else {
         m_paramFrame->get(1).toString().value() = plugin;
         m_paramFrame->get(2).toString().value() = directory;
         m_paramFrame->get(3).toString().value() = file;
-        m_paramFrame->get(4).toString().value() = parameters;
+        m_valueFrame->value()[4] = parameters;
         m_paramFrame->get(5).toDouble().value() = time;
     }
 }

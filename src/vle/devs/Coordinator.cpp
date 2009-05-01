@@ -482,7 +482,7 @@ StreamWriter* Coordinator::buildOutput(const vpz::View& view,
                       m_modelFactory.experiment().name() %
                       view.name()).str());
     stream->open(output.plugin(), output.location(), file,
-                 output.data(), m_currentTime);
+                 (output.data()) ? output.data()->clone() : 0, m_currentTime);
 
     return stream;
 }

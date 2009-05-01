@@ -30,6 +30,7 @@
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
 #include <vle/value/String.hpp>
+#include <vle/value/XML.hpp>
 
 namespace vle { namespace oov { namespace plugin {
 
@@ -207,7 +208,7 @@ void Plot::onValue(const std::string& simulator,
 void Plot::onParameter(const std::string& /* plugin */,
                        const std::string& /* location */,
                        const std::string& /* file */,
-                       const std::string& parameters,
+                       value::Value* parameters,
                        const double& /* time */)
 {
     Assert < utils::InternalError >(m_ctx, "Cairo plot drawing error");
@@ -222,10 +223,10 @@ void Plot::onParameter(const std::string& /* plugin */,
     mParameter.set_text_height((int)(mExtents.height * 5));
     updateStepHeight();
 
-    if (not parameters.empty()) {
+    if (parameters and parameters->isXml()) {
         xmlpp::DomParser parser;
 
-        parser.parse_memory(parameters);
+        parser.parse_memory(value::toXml(parameters));
 	xmlpp::Element* root = utils::xml::get_root_node(parser, "parameters");
 	IntCurve *ic;
 	RealCurve *rc;
@@ -297,6 +298,8 @@ void Plot::onParameter(const std::string& /* plugin */,
 		++it;
 	    }
 	}
+
+        delete parameters;
     }
 
     m_it_dble = mRealCurveList.begin();
