@@ -34,6 +34,29 @@
 
 namespace vle { namespace oov { namespace plugin {
 
+    /**
+     * @brief SimpleFile is a virtual class for the csv, text, and rdata
+     * plug-in. When simulation is running, SimpleFile writes information into a
+     * tempory file localized into the local directory or in the directory
+     * specified in the parameter trame.
+     * The SimpleFile accepts a value::Map in parameter with two keys:
+     * - out: define the type of output. By default, it uses and file. But if
+     *   the value equal 'out', it copy result into the standard output and if
+     *   the value equal 'error', it copy result into the stardard error.
+     * - locale: define the locale of the stream. By default, the locale 'C' is
+     *   used, ie. the C Ansi locale. If the value equal 'user' then the locale
+     *   is attached to the locale of the user (run locale). Otherwise, the user
+     *   can use all locale defines in the environment. Use the 'locale -a'
+     *   command to show all locale of your system.
+     * <map>
+     *  <key name="output">
+     *   <string>out</string> <!-- or 'error' -->
+     *  </key>
+     *  <key name="locale">
+     *   <string>fr_FR.UTF-8</string> <!-- 'user', 'C', '' etc.
+     *  </key>
+     * </map>
+     */
     class SimpleFile : public Plugin
     {
     public:
@@ -93,6 +116,12 @@ namespace vle { namespace oov { namespace plugin {
         /** Define the buffer for valid values (model observed). */
         typedef std::vector < bool > ValidElement;
 
+        enum OutputType {
+            FILE, /*!< classical file stream (std::ofstream). */
+            STANDARD_OUT, /*!< use the standard output (std::cout). */
+            STANDARD_ERROR /*!< use the error output (std::cerr). */
+        };
+
         Columns         m_columns;
         Line            m_buffer;
         ValidElement    m_valid;
@@ -101,10 +130,17 @@ namespace vle { namespace oov { namespace plugin {
         std::string     m_filename;
         std::string     m_filenametmp;
         bool            m_isstart;
+        OutputType      m_type;
 
         void flush(double trame_time);
 
         void finalFlush(double trame_time);
+
+        void copyToFile(const std::string& filename,
+                        const std::vector < std::string >& array);
+
+        void copyToStream(std::ostream& out,
+                          const std::vector < std::string >& array);
 
         /**
          * @brief This function is use to build uniq name to each row of the
@@ -114,17 +150,9 @@ namespace vle { namespace oov { namespace plugin {
          * @param port the name of the state port of the devs::Model.
          * @return a representation of the uniq name.
          */
-        inline std::string buildname(const std::string& parent,
-                                     const std::string& simulator,
-                                     const std::string& port)
-        {
-            std::string r(parent);
-            r += ':';
-            r += simulator;
-            r += '.';
-            r += port;
-            return r;
-        }
+        std::string buildname(const std::string& parent,
+                              const std::string& simulator,
+                              const std::string& port);
     };
 
 }}} // namespace vle oov plugin

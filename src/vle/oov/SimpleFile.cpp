@@ -27,6 +27,7 @@
 #include <vle/utils/Debug.hpp>
 #include <vle/value/String.hpp>
 #include <vle/value/Double.hpp>
+#include <vle/value/Map.hpp>
 #include <iostream>
 
 namespace vle { namespace oov { namespace plugin {
@@ -34,7 +35,8 @@ namespace vle { namespace oov { namespace plugin {
 SimpleFile::SimpleFile(const std::string& location) :
     Plugin(location),
     m_time(-1.0),
-    m_isstart(false)
+    m_isstart(false),
+    m_type(SimpleFile::FILE)
 {
 }
 
@@ -43,7 +45,7 @@ SimpleFile::~SimpleFile()
     m_file.close();
 }
 
-void SimpleFile::onParameter(const std::string& /* plugin */,
+void SimpleFile::onParameter(const std::string& plugin,
                              const std::string& location,
                              const std::string& file,
                              value::Value* parameters,
@@ -55,8 +57,44 @@ void SimpleFile::onParameter(const std::string& /* plugin */,
 
     m_file.open(m_filenametmp.c_str());
 
-    Assert <utils::ModellingError >(m_file.is_open(), boost::format(
-            "SimpleFile: cannot open file '%1%'") % m_filenametmp);
+    if (not m_file.is_open()) {
+        throw utils::ArgError(boost::format(
+                "Output plug-in '%1%': cannot open file '%2%'") % plugin %
+            m_filenametmp);
+    }
+
+    if (parameters and parameters->isMap()) {
+        const value::Map* map = value::toMapValue(parameters);
+        if (map->existValue("locale")) {
+            std::string locale(map->getString("locale"));
+            try {
+                if (locale == "user") {
+                    std::locale selected("");
+                    m_file.imbue(selected);
+                } else {
+                    std::locale selected(locale.c_str());
+                    m_file.imbue(selected);
+                }
+            } catch (...) {
+                throw utils::ArgError(boost::format(
+                        "Output plug-in '%1%': unknow locale '%2%'") % plugin %
+                    locale);
+            }
+        }
+
+        if (map->existValue("output")) {
+            std::string type(map->getString("output"));
+            if (type == "out") {
+                m_type = SimpleFile::STANDARD_OUT;
+            } else if (type == "error") {
+                m_type = SimpleFile::STANDARD_ERROR;
+            } else {
+                throw utils::ArgError(boost::format(
+                        "Output plug-in '%1%': unknow type '%2%'") % plugin %
+                    type);
+            }
+        }
+    }
 
     delete parameters;
 }
@@ -80,8 +118,10 @@ void SimpleFile::onNewObservable(const std::string& simulator,
 
     std::string name(buildname(parent, simulator, portname));
 
-    Assert <utils::InternalError >(m_columns.find(name) == m_columns.end(),
-           boost::format("SimpleFile: observable '%1%' already exist") % name);
+    if (m_columns.find(name) != m_columns.end()) {
+        throw utils::InternalError(boost::format(
+           "Output plug-in: observable '%1%' already exist") % name);
+    }
 
     m_columns[name] = m_buffer.size();
     m_buffer.push_back((value::Value*)0);
@@ -134,28 +174,15 @@ void SimpleFile::close(const double& time)
     for (it = m_columns.begin(); it != m_columns.end(); ++it) {
         array[it->second] = it->first;
     }
-    m_file << '\n' << std::flush;
+    m_file << "\n";
     m_file.close();
 
-    m_file.open(m_filename.c_str());
-
-    {
-        std::vector < std::string > tmp(array);
-        tmp.insert(tmp.begin(), "time");
-        writeHead(m_file, tmp);
+    if (m_type == SimpleFile::FILE) {
+        copyToFile(m_filename, array);
+    } else {
+        copyToStream((m_type == SimpleFile::STANDARD_OUT) ? std::cout :
+                     std::cerr, array);
     }
-
-    {
-        std::ifstream tmpfile(m_filenametmp.c_str());
-        std::string tmpbuffer;
-        while (tmpfile) {
-            std::getline(tmpfile, tmpbuffer);
-            m_file << tmpbuffer << '\n';
-        }
-    }
-
-    m_file << '\n' << std::flush;
-
     std::remove(m_filenametmp.c_str());
 }
 
@@ -181,7 +208,7 @@ void SimpleFile::flush(double trame_time)
                 m_buffer[i] = 0;
                 m_valid[i] = false;
             }
-            m_file << '\n' << std::flush;
+            m_file << "\n";
         }
     }
     m_time = trame_time;
@@ -207,8 +234,52 @@ void SimpleFile::finalFlush(double trame_time)
             delete *it;
             *it = 0;
         }
-        m_file << '\n' << std::flush;
+        m_file << "\n";
     }
+}
+
+void SimpleFile::copyToFile(const std::string& filename,
+                            const std::vector < std::string >& array)
+{
+    std::ofstream file(filename.c_str());
+
+    std::vector < std::string > tmp(array);
+    tmp.insert(tmp.begin(), "time");
+    writeHead(file, tmp);
+
+    std::ifstream tmpfile(m_filenametmp.c_str());
+    std::string tmpbuffer;
+    while (tmpfile) {
+        std::getline(tmpfile, tmpbuffer);
+        file << tmpbuffer << '\n';
+    }
+}
+
+void SimpleFile::copyToStream(std::ostream& stream,
+                              const std::vector < std::string >& array)
+{
+    std::vector < std::string > tmp(array);
+    tmp.insert(tmp.begin(), "time");
+    writeHead(stream, tmp);
+
+    std::ifstream tmpfile(m_filenametmp.c_str());
+    std::string tmpbuffer;
+    while (tmpfile) {
+        std::getline(tmpfile, tmpbuffer);
+        stream << tmpbuffer << '\n';
+    }
+}
+
+std::string SimpleFile::buildname(const std::string& parent,
+                                  const std::string& simulator,
+                                  const std::string& port)
+{
+    std::string r(parent);
+    r += ':';
+    r += simulator;
+    r += '.';
+    r += port;
+    return r;
 }
 
 }}} // namespace vle oov plugin
