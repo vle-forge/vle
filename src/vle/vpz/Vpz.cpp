@@ -123,10 +123,11 @@ void Vpz::write()
 {
     std::ofstream out(m_filename.c_str());
 
-    Assert < utils::ArgError >(out.fail() or out.bad(),
-                               boost::format(
-                                       "Cannot open file %1% for writing.") %
-                                   m_filename);
+    if (out.fail() or out.bad()) {
+        throw utils::FileError(boost::format(
+                "Vpz: cannot open file '%1%' for writing")
+            % m_filename);
+    }
 
     out << *this;
 }
