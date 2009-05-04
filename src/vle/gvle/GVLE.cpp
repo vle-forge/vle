@@ -334,25 +334,32 @@ void GVLE::makeButtons()
     Gtk::Image* img = NULL;
 
     try {
-        r = Gdk::Pixbuf::create_from_file(utils::Path::path().getPixmapsFile("arrow.png"));
+        r = Gdk::Pixbuf::create_from_file(
+	    utils::Path::path().getPixmapsFile("arrow.png"));
         img = Gtk::manage(new Gtk::Image(r));
         m_arrow.add(*img);
-        r = Gdk::Pixbuf::create_from_file(utils::Path::path().getPixmapsFile("model.png"));
+        r = Gdk::Pixbuf::create_from_file(
+	    utils::Path::path().getPixmapsFile("model.png"));
         img = Gtk::manage(new Gtk::Image(r));
         m_addModels.add(*img);
-        r = Gdk::Pixbuf::create_from_file(utils::Path::path().getPixmapsFile("coupled.png"));
+        r = Gdk::Pixbuf::create_from_file(
+	    utils::Path::path().getPixmapsFile("coupled.png"));
         img = Gtk::manage(new Gtk::Image(r));
         m_addCoupled.add(*img);
-        r = Gdk::Pixbuf::create_from_file(utils::Path::path().getPixmapsFile("links.png"));
+        r = Gdk::Pixbuf::create_from_file(
+	    utils::Path::path().getPixmapsFile("links.png"));
         img = Gtk::manage(new Gtk::Image(r));
         m_addLinks.add(*img);
-        r = Gdk::Pixbuf::create_from_file(utils::Path::path().getPixmapsFile("delete.png"));
+        r = Gdk::Pixbuf::create_from_file(
+	    utils::Path::path().getPixmapsFile("delete.png"));
         img = Gtk::manage(new Gtk::Image(r));
         m_delete.add(*img);
-        r = Gdk::Pixbuf::create_from_file(utils::Path::path().getPixmapsFile("zoom.png"));
+        r = Gdk::Pixbuf::create_from_file(
+	    utils::Path::path().getPixmapsFile("zoom.png"));
         img = Gtk::manage(new Gtk::Image(r));
         m_zoom.add(*img);
-        r = Gdk::Pixbuf::create_from_file(utils::Path::path().getPixmapsFile("question.png"));
+        r = Gdk::Pixbuf::create_from_file(
+	    utils::Path::path().getPixmapsFile("question.png"));
         img = Gtk::manage(new Gtk::Image(r));
         m_question.add(*img);
     } catch (const Glib::FileError& e) {
@@ -378,6 +385,7 @@ void GVLE::makeButtons()
     m_question.set_relief(Gtk::RELIEF_NONE);
     m_tooltips.set_tip(m_question, "Show XML Dynamics if atomic model is"
                        " selected, show XML Structures if coupled model. (F7)");
+
     m_arrow.set_mode(false);
     m_addModels.set_mode(false);
     m_addLinks.set_mode(false);
@@ -385,6 +393,35 @@ void GVLE::makeButtons()
     m_delete.set_mode(false);
     m_zoom.set_mode(false);
     m_question.set_mode(false);
+
+    m_arrow.add_accelerator("clicked", this->get_accel_group(),
+			    Gtk::AccelKey("F1").get_key(),
+			    static_cast< Gdk::ModifierType >(0),
+	                    Gtk::ACCEL_MASK);
+    m_addModels.add_accelerator("clicked", this->get_accel_group(),
+				Gtk::AccelKey("F2").get_key(),
+				static_cast< Gdk::ModifierType >(0),
+				Gtk::ACCEL_MASK);
+    m_addLinks.add_accelerator("clicked", this->get_accel_group(),
+			       Gtk::AccelKey("F3").get_key(),
+			       static_cast< Gdk::ModifierType >(0),
+			       Gtk::ACCEL_MASK);
+    m_addCoupled.add_accelerator("clicked", this->get_accel_group(),
+				 Gtk::AccelKey("F4").get_key(),
+				 static_cast< Gdk::ModifierType >(0),
+				 Gtk::ACCEL_MASK);
+    m_delete.add_accelerator("clicked", this->get_accel_group(),
+			     Gtk::AccelKey("F5").get_key(), 
+			     static_cast< Gdk::ModifierType >(0),
+			     Gtk::ACCEL_MASK);
+    m_zoom.add_accelerator("clicked", this->get_accel_group(),
+			   Gtk::AccelKey("F6").get_key(),
+			   static_cast< Gdk::ModifierType >(0),
+			   Gtk::ACCEL_MASK);
+    m_question.add_accelerator("clicked", this->get_accel_group(),
+			       Gtk::AccelKey("F7").get_key(),
+			       static_cast< Gdk::ModifierType >(0),
+			       Gtk::ACCEL_MASK);
 
     m_buttons.attach(m_arrow, 0, 1, 0, 1, Gtk::SHRINK, Gtk::SHRINK, 0, 0);
     m_buttons.attach(m_addModels, 1, 2, 0, 1, Gtk::SHRINK, Gtk::SHRINK, 0, 0);
