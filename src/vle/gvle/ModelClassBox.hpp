@@ -37,7 +37,7 @@ namespace gvle {
 
 class Modeling;
 
-class ModelClassBox
+class ModelClassBox : public Gtk::TreeView
 {
 public:
     ModelClassBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m);
@@ -67,9 +67,40 @@ class ModelColumns : public Gtk::TreeModelColumnRecord
     ModelColumns mColumns;
 
 private:
+
+    class ClassTreeView : public Gtk::TreeView
+    {
+    public:
+	ClassTreeView(BaseObjectType* cobject,
+		      const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
+	virtual ~ClassTreeView();
+
+	void build();
+	void setModel(Modeling* modeling)
+	    { mModeling = modeling; }
+
+	void setBox(NewModelClassBox* newModelBox)
+	    { mNewModelBox = newModelBox; }
+
+
+    protected:
+	virtual bool on_button_press_event(GdkEventButton *ev);
+	virtual void onAdd();
+	virtual void onRemove();
+	virtual void onRename();
+
+    private:
+	Modeling* mModeling;
+	Gtk::Menu mMenuPopup;
+	ModelColumns mColumns;
+	Glib::RefPtr<Gtk::ListStore> mRefTreeModel;
+	NewModelClassBox* mNewModelBox;
+    };
+
     Glib::RefPtr<Gnome::Glade::Xml>      mXml;
     Modeling*                            mModeling;
     NewModelClassBox*                    mNewModelBox;
+    Gtk::Menu                            mMenuPopup;
 
     //Backup
     vpz::ClassList*                      mClasses_backup;
@@ -77,20 +108,8 @@ private:
     Gtk::Window*                         mWindow;
     Gtk::TreeView*                       mTreeView;
     Glib::RefPtr<Gtk::ListStore>         mRefTreeModel;
-    Gtk::Button*                         mButtonAdd;
-    Gtk::Button*                         mButtonEdit;
-    Gtk::Button*                         mButtonDel;
-    Gtk::Button*                         mButtonValidate;
-    Gtk::Button*                         mButtonCancel;
 
-    void make_treeview();
-
-    void on_add();
-    void on_edit();
-    void on_del();
-
-    void on_validate();
-    void on_cancel();
+    ClassTreeView*                       mClass;
 };
 
 }

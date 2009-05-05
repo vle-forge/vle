@@ -212,6 +212,9 @@ public:
         return mDestinationModel;
     }
 
+    inline void setCurrentClass(std::string classeName)
+	{ mCurrentClass = classeName; }
+
     //
     //
     // IMPORT / EXPORT / CLEAR VIEW
@@ -330,6 +333,7 @@ public:
 private:
     Modeling*                   mModeling;
     graph::CoupledModel*        mCurrent;
+    std::string                 mCurrentClass;
     size_t                      mIndex;
 
     Gtk::VBox                   mVbox;

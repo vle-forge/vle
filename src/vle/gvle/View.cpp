@@ -308,7 +308,7 @@ void View::onCutModel()
 {
     // TODO
     mModeling->setModified(true);
-    mModeling->cut(mSelectedModels, mCurrent);
+    mModeling->cut(mSelectedModels, mCurrent, mCurrentClass);
     mModeling->redrawModelTreeBox();
     mSelectedModels.clear();
     mDrawing->queue_draw();
@@ -317,7 +317,7 @@ void View::onCutModel()
 void View::onCopyModel()
 {
     //TODO
-    mModeling->copy(mSelectedModels, mCurrent);
+    mModeling->copy(mSelectedModels, mCurrent, mCurrentClass);
     mSelectedModels.clear();
     mDrawing->queue_draw();
 }
@@ -326,7 +326,7 @@ void View::onPasteModel()
 {
     //TODO
     mModeling->setModified(true);
-    mModeling->paste(mCurrent);
+    mModeling->paste(mCurrent, mCurrentClass);
     mModeling->redrawModelTreeBox();
     mDrawing->queue_draw();
 }
@@ -342,8 +342,12 @@ void View::addAtomicModel(int x, int y)
 
         if (new_atom) {
             try {
-                mModeling->vpz().project().model().atomicModels().add(
-                    new_atom, vpz::AtomicModel("", "", ""));
+		if (mCurrentClass == "") {
+		    mModeling->vpz().project().model().atomicModels().add(
+			new_atom, vpz::AtomicModel("", "", ""));
+		} else {
+		    mModeling->addAtomicModelClass(mCurrentClass, new_atom);
+		}
                 mDrawing->draw();
             } catch (utils::SaxParserError& e) {
                 Error(e.what());
@@ -381,7 +385,10 @@ void View::showModel(graph::Model* model)
     if (not model) {
         mModeling->EditCoupledModel(mCurrent);
     } else {
-        mModeling->addView(model);
+	if (mCurrentClass == "")
+	    mModeling->addView(model);
+	else
+	    mModeling->addViewClass(model, mCurrentClass);
     }
 }
 
@@ -393,7 +400,7 @@ void View::delModel(graph::Model* model)
             if (model->isCoupled()) {
                 mModeling->delViewOnModel((graph::CoupledModel*)model);
             }
-            mModeling->delModel(model);
+            mModeling->delModel(model, mCurrentClass);
             mCurrent->delModel(model);
             mModeling->redrawModelTreeBox();
         }

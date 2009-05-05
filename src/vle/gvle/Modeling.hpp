@@ -164,8 +164,9 @@ public:
      * @return graph::CoupledModel reference to class model, NULL if
      * class model doesn't exist.
      */
-    //inline graph::Model* getClassModel(const std::string& name)
-    //{ return mVpz.project().classes().getClass(name).model().modelRef(); }
+    inline graph::Model* getClassModel(const std::string& name)
+	{ return mVpz.project().classes().get(name).model(); }
+
 
     /**
      * add a new empty class model into modeling ; if name already exist in
@@ -183,6 +184,27 @@ public:
      */
     //inline void delClassModel(const std::string& name)
     //{ mVpz.project().classes().delClass(name); }
+
+    /**
+     * get the AtomicModelList associate to the class
+     *
+     * @param name of class model to delete
+     */
+    inline vpz::AtomicModelList& getAtomicModelClass(std::string className);
+
+    /**
+     * add a new list of atomic model for a class
+     *
+     * @param name of the class
+     * @param new_atom : the new list
+     */
+    inline void addAtomicModelClass(std::string className,
+				    graph::AtomicModel* new_atom)
+	{ vpz().project().classes().get(className).atomicModels().add(
+		new_atom, vpz::AtomicModel("", "", "")); }
+
+
+
 
 
     /********************************************************************
@@ -246,6 +268,20 @@ public:
      * null value
      */
     void addView(graph::CoupledModel* model);
+
+    /**
+     * add a view to the current class
+     *
+     * @param model to ptr to the GModel assiociate to the class
+     */
+    void addViewClass(graph::Model* model, std::string name);
+
+    /**
+     * find a view in list view that reference a GCoupledModel.
+     * @param model reference to GCoupledModel to find.
+     */
+
+    void addViewClass(graph::CoupledModel* model, std::string name);
 
     /**
      * Return True if a View of the parameter already exist.
@@ -507,7 +543,7 @@ public:
      * @param lst list of selected GModel.
      * @param gc parent of selected GModel.
      */
-    void cut(graph::ModelList& lst, graph::CoupledModel* gc);
+    void cut(graph::ModelList& lst, graph::CoupledModel* gc, std::string className);
 
     /**
      * detach the list of GModel of GCoupledModel parent.
@@ -515,7 +551,7 @@ public:
      * @param lst list of selected GModel.
      * @param gc parent of selected GModel.
      */
-    void copy(graph::ModelList& lst, graph::CoupledModel* gc);
+    void copy(graph::ModelList& lst, graph::CoupledModel* gc, std::string className);
 
     /**
      * paste the current list GModel into GCoupledModel ; rename
@@ -523,7 +559,7 @@ public:
      *
      * @param gc paste selected GModel under this GCoupledModel.
      */
-    void paste(graph::CoupledModel* gc);
+    void paste(graph::CoupledModel* gc, std::string className);
 
 
     /********************************************************************
@@ -734,6 +770,12 @@ public:
         return mVpz.project().model().atomicModels().get(atom);
     }
 
+    inline vpz::AtomicModel& get_modelClass(graph::AtomicModel* atom, const std::string& name)
+    {
+        setModified(true);
+        return mVpz.project().classes().get(name).atomicModels().get(atom);
+    }
+
     const vpz::Strings* get_conditions(graph::AtomicModel* atom);
 
     /********************************************************************
@@ -790,7 +832,7 @@ public:
                      const std::string& name,
                      const std::string& description);
 
-    void delModel(graph::Model* model);
+    void delModel(graph::Model* model, std::string className);
 
     inline const vpz::Vpz& vpz() const {
         return mVpz;
@@ -866,6 +908,7 @@ public:
 private:
     vpz::Vpz                    mVpz;
     graph::CoupledModel*        mTop;
+    std::string                 mCurrentClass;
     GVLE*                       mGVLE;
     ListView                    mListView;
     ModelTreeBox*               mModelTreeBox;

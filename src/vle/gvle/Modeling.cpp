@@ -87,6 +87,7 @@ Modeling::Modeling(GVLE* gvle, const string& filename) :
         mVpz.project().model().setModel(mTop);
         setTitles();
     }
+    std::string name = "";
     View* v = new View(this, mTop, mListView.size());
     mListView.push_back(v);
     mModelTreeBox->parseModel(mTop);
@@ -214,6 +215,16 @@ void Modeling::setTopModel(graph::CoupledModel* cp)
     mTop = cp;
 }
 
+vpz::AtomicModelList& Modeling::getAtomicModelClass(std::string className)
+{
+    if (className == "") {
+	return mVpz.project().model().atomicModels();
+    } else {
+	return mVpz.project().classes().get(className).atomicModels();
+    }
+}
+
+
 /*
   graph::CoupledModel* Modeling::getClassModel(const std::string& name)
   {
@@ -338,6 +349,38 @@ void Modeling::addView(graph::CoupledModel* model)
         search->selectedWindow();
     } else {
         mListView.push_back(new View(this, model, szView));
+    }
+}
+
+void Modeling::addViewClass(graph::Model* model, std::string name)
+{
+    assert(model);
+    if (model->isCoupled()) {
+        graph::CoupledModel* m = (graph::CoupledModel*)(model);
+        addViewClass(m, name);
+    } else if (model->isAtomic()) {
+        graph::AtomicModel* graph_am = dynamic_cast<graph::AtomicModel*>(model);
+        try {
+	    vpz::AtomicModel& vpz_am = get_modelClass(graph_am, name);
+	    mAtomicBox->show(vpz_am, *graph_am);
+        } catch (utils::SaxParserError& E) {
+            parse_model(mVpz.project().classes().get(mCurrentClass).atomicModels());
+        }
+    }
+    refreshViews();
+}
+
+void Modeling::addViewClass(graph::CoupledModel* model, std::string name)
+{
+    const size_t szView = mListView.size();
+
+    View* search = findView(model);
+    if (search != NULL) {
+        search->selectedWindow();
+    } else {
+	View* v = new View(this, model, szView);
+	v->setCurrentClass(name);
+        mListView.push_back(v);
     }
 }
 
@@ -578,19 +621,31 @@ bool Modeling::exist(const graph::Model* m) const
     return (mTop->findModel(m->getName()) != 0);
 }
 
-void Modeling::cut(graph::ModelList& lst, graph::CoupledModel* gc)
+void Modeling::cut(graph::ModelList& lst, graph::CoupledModel* gc, std::string className)
 {
-    mCutCopyPaste.cut(lst, gc, mVpz.project().model().atomicModels());
+    if (className == "") {
+	mCutCopyPaste.cut(lst, gc, mVpz.project().model().atomicModels());
+    } else {
+	mCutCopyPaste.cut(lst, gc, mVpz.project().classes().get(className).atomicModels());
+    }
 }
 
-void Modeling::copy(graph::ModelList& lst, graph::CoupledModel* gc)
+void Modeling::copy(graph::ModelList& lst, graph::CoupledModel* gc, std::string className)
 {
-    mCutCopyPaste.copy(lst, gc, mVpz.project().model().atomicModels());
+    if (className == "") {
+	mCutCopyPaste.copy(lst, gc, mVpz.project().model().atomicModels());
+    } else {
+	mCutCopyPaste.copy(lst, gc, mVpz.project().classes().get(className).atomicModels());
+    }
 }
 
-void Modeling::paste(graph::CoupledModel* gc)
+void Modeling::paste(graph::CoupledModel* gc, std::string className)
 {
-    mCutCopyPaste.paste(gc, mVpz.project().model().atomicModels());
+    if (className == "") {
+	mCutCopyPaste.paste(gc, mVpz.project().model().atomicModels());
+    } else {
+	mCutCopyPaste.paste(gc, mVpz.project().classes().get(className).atomicModels());
+    }
     /*
     std::cout << "Atomic List :\n";
     const vpz::AtomicModelList& list = mVpz.project().model().atomicModels();
@@ -984,10 +1039,10 @@ void Modeling::renameModel(graph::Model* model,
     redrawModelTreeBox();
 }
 
-void Modeling::delModel(graph::Model* model)
+void Modeling::delModel(graph::Model* model, std::string className)
 {
     if (model->isAtomic()) {
-        vpz::AtomicModelList& list = mVpz.project().model().atomicModels();
+	vpz::AtomicModelList& list = getAtomicModelClass(className);
         list.del(model);
         setModified(true);
     }

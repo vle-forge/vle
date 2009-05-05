@@ -130,6 +130,14 @@ namespace vle { namespace vpz {
         AtomicModelList& atomicModels()
         { return m_atomicmodels; }
 
+	/**
+	 * @Biref Set the current vpz::AtomicModelList by a new one
+	 * @param mdl The reference to the new AtomicModelList to set
+	 */
+
+	inline void setAtomicModel(AtomicModelList& mdl)
+        { m_atomicmodels = mdl; }
+
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
          * Get/Set functons.
