@@ -35,35 +35,23 @@
 
 namespace vle { namespace utils {
 
-std::string Path::getHomeDir() const
+std::string Path::initHomeDir()
 {
-    std::list < std::string > arb;
-    arb.push_back(Glib::get_home_dir());
-    arb.push_back("vle");
-    return Glib::build_path(G_DIR_SEPARATOR_S, arb);
-}
+    m_home.clear();
 
-std::string Path::buildUserPath(const std::string& dir)
-{
-    if (dir.empty()) {
-        std::list < std::string > arb;
-        arb.push_back(Glib::get_home_dir());
-        arb.push_back("vle");
-        return Glib::build_path(G_DIR_SEPARATOR_S, arb);
-    } else {
-        std::list < std::string > arb;
-        arb.push_back(Glib::get_home_dir());
-        arb.push_back("vle");
-        arb.push_back(dir);
-        return Glib::build_path(G_DIR_SEPARATOR_S, arb);
+    readHomeDir();
+
+    if (m_home.empty()) {
+        std::list < std::string > lst;
+        lst.push_back(Glib::get_home_dir());
+        lst.push_back("vle");
+        m_home = Glib::build_path(G_DIR_SEPARATOR_S, lst);
     }
 }
 
 bool Path::initPath()
 {
-    readEnv("VLE_SIMULATOR_PATH", m_simulator);
-    readEnv("VLE_OOV_PATH", m_stream);
-    readEnv("VLE_MODEL_PATH", m_model);
+    initHomeDir();
 
     {
         LONG result;
@@ -85,35 +73,26 @@ bool Path::initPath()
             if (RegQueryValueEx(hkey, (LPCTSTR)"", NULL, NULL,
                         (LPBYTE)buf, &sz) == ERROR_SUCCESS) {
                 m_prefix.assign(buf);
-                addSimulatorDir(buildPrefixLibrariesPath(m_prefix, "simulator"));
-                addStreamDir(buildPrefixLibrariesPath(m_prefix, "stream"));
-                addModelDir(buildPrefixLibrariesPath(m_prefix, "model"));
             } else {
                 sz = 256;
                 if (RegQueryValueEx(hkey, (LPCTSTR)"Path", NULL, NULL,
                             (LPBYTE)buf, &sz) == ERROR_SUCCESS) {
                     m_prefix.assign(buf);
-                    addSimulatorDir(buildPrefixLibrariesPath(m_prefix,
-                                "simulator"));
-                    addStreamDir(buildPrefixLibrariesPath(m_prefix, "stream"));
-                    addModelDir(buildPrefixLibrariesPath(m_prefix, "model"));
                 }
             }
             delete[] buf;
         }
     }
 
-    addSimulatorDir(buildUserPath("simulator"));
-    addSimulatorDir("..\\simulator");
-    addSimulatorDir(".");
+    addSimulatorDir(getSimulatorDir());
+    addStreamDir(getStreamDir());
+    addOutputDir(getOutputDir());
+    addConditionDir(getConditionDir());
 
-    addStreamDir(buildUserPath("stream"));
-    addStreamDir("..\\stream");
-    addStreamDir(".");
-
-    addModelDir(buildUserPath("model"));
-    addModelDir("..\\model");
-    addModelDir(".");
+    addSimulatorDir(getHomeSimulatorDir());
+    addStreamDir(getHomeStreamDir());
+    addOutputDir(getHomeOutputDir());
+    addConditionDir(getHomeConditionDir());
 
     return true;
 }

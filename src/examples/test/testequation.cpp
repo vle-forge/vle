@@ -49,8 +49,7 @@ using namespace vle;
 
 BOOST_AUTO_TEST_CASE(test_equation1)
 {
-    vpz::Vpz file(utils::Path::buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(), "examples", "equation1.vpz"));
+    vpz::Vpz file(utils::Path::path().getExampleFile("equation1.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
     o.setLocalStream("", "storage");
@@ -80,8 +79,7 @@ BOOST_AUTO_TEST_CASE(test_equation1)
 
 BOOST_AUTO_TEST_CASE(test_equation2)
 {
-    vpz::Vpz file(utils::Path::buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(), "examples", "equation2.vpz"));
+    vpz::Vpz file(utils::Path::path().getExampleFile("equation2.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
     o.setLocalStream("", "storage");
@@ -110,8 +108,7 @@ BOOST_AUTO_TEST_CASE(test_equation2)
 
 BOOST_AUTO_TEST_CASE(test_equation3)
 {
-    vpz::Vpz file(utils::Path::buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(), "examples", "equation3.vpz"));
+    vpz::Vpz file(utils::Path::path().getExampleFile("equation3.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
     o.setLocalStream("", "storage");
@@ -141,8 +138,7 @@ BOOST_AUTO_TEST_CASE(test_equation3)
 
 BOOST_AUTO_TEST_CASE(test_equation4)
 {
-    vpz::Vpz file(utils::Path::buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(), "examples", "equation5.vpz"));
+    vpz::Vpz file(utils::Path::path().getExampleFile("equation5.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
     o.setLocalStream("", "storage");

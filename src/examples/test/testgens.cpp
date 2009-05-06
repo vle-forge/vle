@@ -52,8 +52,7 @@ using namespace vle;
 BOOST_AUTO_TEST_CASE(test_gens)
 {
     /* load the $PREFIX/usr/share/examples/vle-x.y.z/gens.vpz vpz file. */
-    vpz::Vpz file(utils::Path::buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(), "examples", "gens.vpz"));
+    vpz::Vpz file(utils::Path::path().getExampleFile("gens.vpz"));
 
     /* change the output text to storage output */
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
@@ -108,9 +107,8 @@ BOOST_AUTO_TEST_CASE(test_gens)
 BOOST_AUTO_TEST_CASE(test_gens_with_class)
 {
     /* load the $PREFIX/usr/share/examples/vle-x.y.z/gens.vpz vpz file. */
-    vpz::Vpz* file = new vpz::Vpz(utils::Path::buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(), "examples",
-            "genswithclass.vpz"));
+    vpz::Vpz* file = new vpz::Vpz(
+        utils::Path::path().getExampleFile("genswithclass.vpz"));
 
     /* change the output text to storage output */
     vpz::Output& o(file->project().experiment().views().outputs().get("o"));

@@ -412,8 +412,7 @@ void check_copy_views_unittest_vpz(vpz::Views& views)
 BOOST_AUTO_TEST_CASE(test_rename_conds)
 {
     vpz::Vpz vpz;
-    vpz.parseFile(utils::Path::path().buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
+    vpz.parseFile(utils::Path::path().getExampleFile("unittest.vpz"));
 
     BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
     BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
@@ -431,8 +430,7 @@ BOOST_AUTO_TEST_CASE(test_rename_conds)
 BOOST_AUTO_TEST_CASE(test_rename_views)
 {
     vpz::Vpz vpz;
-    vpz.parseFile(utils::Path::path().buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
+    vpz.parseFile(utils::Path::path().getExampleFile("unittest.vpz"));
 
     BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
     BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
@@ -447,8 +445,7 @@ BOOST_AUTO_TEST_CASE(test_rename_views)
 BOOST_AUTO_TEST_CASE(test_connection)
 {
     vpz::Vpz vpz;
-    vpz.parseFile(utils::Path::path().buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
+    vpz.parseFile(utils::Path::path().getExampleFile("unittest.vpz"));
 
     const vpz::Model& model(vpz.project().model());
     BOOST_REQUIRE(model.model());
@@ -475,24 +472,20 @@ BOOST_AUTO_TEST_CASE(test_connection)
 BOOST_AUTO_TEST_CASE(test_read_write_read)
 {
     vpz::Vpz vpz;
-    vpz.parseFile(utils::Path::buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
+    vpz.parseFile(utils::Path::path().getExampleFile("unittest.vpz"));
     check_unittest_vpz(vpz);
     delete vpz.project().model().model();
     vpz.clear();
-    vpz.parseFile(utils::Path::path().buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
+    vpz.parseFile(utils::Path::path().getExampleFile("unittest.vpz"));
     check_unittest_vpz(vpz);
     delete vpz.project().model().model();
     vpz.clear();
-    vpz.parseFile(utils::Path::path().buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
+    vpz.parseFile(utils::Path::path().getExampleFile("unittest.vpz"));
     check_unittest_vpz(vpz);
     delete vpz.project().model().model();
     vpz.clear();
 
-    vpz.parseFile(utils::Path::path().buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
+    vpz.parseFile(utils::Path::path().getExampleFile("unittest.vpz"));
     check_unittest_vpz(vpz);
 
     std::string str(vpz.writeToString());
@@ -506,8 +499,7 @@ BOOST_AUTO_TEST_CASE(test_read_write_read)
 BOOST_AUTO_TEST_CASE(test_read_write_read2)
 {
     vpz::Vpz vpz;
-    vpz.parseFile(utils::Path::buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
+    vpz.parseFile(utils::Path::path().getExampleFile("unittest.vpz"));
     vpz::Vpz vpz2(vpz);
 
     check_unittest_vpz(vpz);
@@ -520,8 +512,7 @@ BOOST_AUTO_TEST_CASE(test_read_write_read2)
 BOOST_AUTO_TEST_CASE(test_copy_del_views)
 {
     vpz::Vpz vpz;
-    vpz.parseFile(utils::Path::buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(), "examples", "unittest.vpz"));
+    vpz.parseFile(utils::Path::path().getExampleFile("unittest.vpz"));
 
     BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
     BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");

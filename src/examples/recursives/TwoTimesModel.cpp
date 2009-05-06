@@ -44,9 +44,8 @@ namespace vle { namespace examples { namespace recursives {
 
         virtual devs::Time init(const devs::Time& /* t */)
         {
-            vpz::Vpz file(utils::Path::path().buildPrefixSharePath(
-                    utils::Path::path().getPrefixDir(), "examples",
-                    "unittest.vpz"));   // open a simulation
+            // open a simulation
+            vpz::Vpz file(utils::Path::path().getExampleFile("unittest.vpz"));
             m_root.load(file);          // and perform the initialization of
             m_root.init();              // the root coordinator
 

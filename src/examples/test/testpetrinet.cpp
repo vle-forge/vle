@@ -50,9 +50,7 @@ using namespace vle;
 
 BOOST_AUTO_TEST_CASE(test_petrinet_and)
 {
-    vpz::Vpz file(utils::Path::buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(), "examples",
-            "petrinet-and.vpz"));
+    vpz::Vpz file(utils::Path::path().getExampleFile("petrinet-and.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("out"));
     o.setLocalStream("", "storage");
@@ -79,8 +77,7 @@ BOOST_AUTO_TEST_CASE(test_petrinet_and)
 
 BOOST_AUTO_TEST_CASE(test_petrinet_or)
 {
-    vpz::Vpz file(utils::Path::buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(), "examples", "petrinet-or.vpz"));
+    vpz::Vpz file(utils::Path::path().getExampleFile("petrinet-or.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("out"));
     o.setLocalStream("", "storage");
@@ -107,9 +104,7 @@ BOOST_AUTO_TEST_CASE(test_petrinet_or)
 
 BOOST_AUTO_TEST_CASE(test_petrinet_nand1)
 {
-    vpz::Vpz file(utils::Path::buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(), "examples",
-            "petrinet-nand1.vpz"));
+    vpz::Vpz file(utils::Path::path().getExampleFile("petrinet-nand1.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("out"));
     o.setLocalStream("", "storage");
@@ -136,9 +131,7 @@ BOOST_AUTO_TEST_CASE(test_petrinet_nand1)
 
 BOOST_AUTO_TEST_CASE(test_petrinet_nand2)
 {
-    vpz::Vpz file(utils::Path::buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(), "examples",
-            "petrinet-nand2.vpz"));
+    vpz::Vpz file(utils::Path::path().getExampleFile("petrinet-nand2.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("out"));
     o.setLocalStream("", "storage");
@@ -165,9 +158,7 @@ BOOST_AUTO_TEST_CASE(test_petrinet_nand2)
 
 BOOST_AUTO_TEST_CASE(test_petrinet_and_timed)
 {
-    vpz::Vpz file(utils::Path::buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(), "examples",
-            "petrinet-and-timed.vpz"));
+    vpz::Vpz file(utils::Path::path().getExampleFile("petrinet-and-timed.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("out"));
     o.setLocalStream("", "storage");
@@ -194,9 +185,7 @@ BOOST_AUTO_TEST_CASE(test_petrinet_and_timed)
 
 BOOST_AUTO_TEST_CASE(test_petrinet_or_priority)
 {
-    vpz::Vpz file(utils::Path::buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(), "examples",
-            "petrinet-or-priority.vpz"));
+    vpz::Vpz file(utils::Path::path().getExampleFile("petrinet-or-priority.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("out"));
     o.setLocalStream("", "storage");
@@ -223,9 +212,7 @@ BOOST_AUTO_TEST_CASE(test_petrinet_or_priority)
 
 BOOST_AUTO_TEST_CASE(test_petrinet_meteo)
 {
-    vpz::Vpz file(utils::Path::buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(), "examples",
-            "petrinet-meteo.vpz"));
+    vpz::Vpz file(utils::Path::path().getExampleFile("petrinet-meteo.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("out"));
     o.setLocalStream("", "storage");
@@ -252,9 +239,7 @@ BOOST_AUTO_TEST_CASE(test_petrinet_meteo)
 
 BOOST_AUTO_TEST_CASE(test_petrinet_inout)
 {
-    vpz::Vpz file(utils::Path::buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(), "examples",
-            "petrinet-inout.vpz"));
+    vpz::Vpz file(utils::Path::path().getExampleFile("petrinet-inout.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("out"));
     o.setLocalStream("", "storage");
@@ -282,9 +267,7 @@ BOOST_AUTO_TEST_CASE(test_petrinet_inout)
 
 BOOST_AUTO_TEST_CASE(test_petrinet_conflict)
 {
-    vpz::Vpz file(utils::Path::buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(), "examples",
-            "petrinet-conflict.vpz"));
+    vpz::Vpz file(utils::Path::path().getExampleFile("petrinet-conflict.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("out"));
     o.setLocalStream("", "storage");

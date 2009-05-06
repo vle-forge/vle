@@ -35,14 +35,19 @@ namespace vle { namespace utils {
 
     /**
      * @brief Portable way, i.e. Linux/Unix/Windows to get VLE paths. Linux
-     * and Unix versions use compiled paths introduced by installer, Windows
-     * version use Registry to store his paths. This class is a singleton.
-     * Three environment variables are used to store another paths.
-     * VLE_SIMULATOR_PATH, VLE_OOV_PATH and VLE_MODEL_PATH.
+     * and Unix versions use compiled paths, Windows version uses registry to
+     * store path.
+     * And environment variable VLE_HOME is used to change the user home
+     * directory for simulators, streams, packages and other plug-ins. If this
+     * variable is not defined,
      *
-     * To use it:
+     * This class is a singleton. To use it:
      * @code
-     * std::string binpath(utils::Path::path()->getDefaultBinDir());
+     * std::string file(utils::Path::path().getHomeDir("toto");
+     * // Return:
+     * //  - $HOME/.vle/toto if VLE_HOME is not defined.
+     * //  - %HOMEDRIVE%%HOMEPATH%\vle on Windows if VLE_HOME is not defined.
+     * //  - $VLE_HOME/toto if VLE_HOME is defined.
      * @endcode
      */
     class Path
@@ -55,49 +60,145 @@ namespace vle { namespace utils {
 
         /**
          * @brief Return the prefix of the compilation on Unix or installation
-         * on Windows.
+         * directory taken from registry on Windows.
          * @return A string path.
          */
-        const std::string& getPrefixDir() const;
+        const std::string& getPrefixDir() const
+        { return m_prefix; }
 
-        std::string getPixmapsDir() const;
+        /**
+         * @brief Return the VLE home directory. Default, returns $HOME/.vle on
+         * Unix, %HOMEDRIVE%%HOMEPATH%/vle on Windows. If user defines a
+         * VLE_HOME environment variable, this function returns the contents of
+         * this variable.
+         * @return A string path.
+         */
+        const std::string& getHomeDir() const
+        { return m_home; }
+
+        std::string getHomeFile(const std::string& name) const;
+
+        /*
+         * pixmap path
+         */
+
+        std::string getPixmapDir() const;
+        std::string getPixmapFile(const std::string& file) const;
+
+        /*
+         * glade path
+         */
 
         std::string getGladeDir() const;
-
-        std::string getPixmapsFile(const std::string& file) const;
-
         std::string getGladeFile(const std::string& file) const;
 
-        std::string getHomeDir() const;
+        /*
+         * simulation paths
+         */
+
+        std::string getSimulatorDir() const;
+        std::string getHomeSimulatorDir() const;
+
+        /*
+         * examples
+         */
+
+        std::string getExamplesDir() const;
+        std::string getExampleFile(const std::string& file) const;
+
+        /*
+         * stream paths
+         */
+
+        std::string getStreamDir() const;
+        std::string getHomeStreamDir() const;
+
+        /*
+         * output paths
+         */
+
+        std::string getOutputDir() const;
+        std::string getHomeOutputDir() const;
+        std::string getOutputFile(const std::string& file) const;
+        std::string getHomeOutputFile(const std::string& file) const;
+
+        std::string getOutputPixmapDir() const;
+        std::string getHomeOutputPixmapDir() const;
+        std::string getOutputPixmapFile(const std::string& file) const;
+        std::string getHomeOutputPixmapFile(const std::string& file) const;
+
+        std::string getOutputGladeDir() const;
+        std::string getHomeOutputGladeDir() const;
+        std::string getOutputGladeFile(const std::string& file) const;
+        std::string getHomeOutputGladeFile(const std::string& file) const;
+
+        std::string getOutputDocDir() const;
+        std::string getHomeOutputDocDir() const;
+        std::string getOutputDocFile(const std::string& file) const;
+        std::string getHomeOutputDocFile(const std::string& file) const;
+
+        /*
+         * condition paths
+         */
+
+        std::string getConditionDir() const;
+        std::string getHomeConditionDir() const;
+        std::string getConditionFile(const std::string& file) const;
+        std::string getHomeConditionFile(const std::string& file) const;
+
+        std::string getConditionPixmapDir() const;
+        std::string getHomeConditionPixmapDir() const;
+        std::string getConditionPixmapFile(const std::string& file) const;
+        std::string getHomeConditionPixmapFile(const std::string& file) const;
+
+        std::string getConditionGladeDir() const;
+        std::string getHomeConditionGladeDir() const;
+        std::string getConditionGladeFile(const std::string& file) const;
+        std::string getHomeConditionGladeFile(const std::string& file) const;
+
+        std::string getConditionDocDir() const;
+        std::string getHomeConditionDocDir() const;
+        std::string getConditionDocFile(const std::string& file) const;
+        std::string getHomeConditionDocFile(const std::string& file) const;
+
+        /*
+         * packages path
+         */
+
+        std::string getPackagesDir() const;
+        std::string getPackageDir(const std::string& name) const;
+        std::string getPackageSimulatorsDir(const std::string& name) const;
+        std::string getPackageSourcesDir(const std::string& name) const;
+        std::string getPackageDatasDir(const std::string& name) const;
+        std::string getPackageExperimentDir(const std::string& name) const;
 
         /**
          * @brief Get the list of simulator's directories.
          * @return A list of directory name.
          */
-        inline const PathList& getSimulatorDirs() const
+        const PathList& getSimulatorDirs() const
         { return m_simulator; }
 
         /**
          * @brief Get the list of stream's directories.
          * @return A list of directory name.
          */
-        inline const PathList& getStreamDirs() const
+        const PathList& getStreamDirs() const
         { return m_stream; }
 
         /**
-         * @brief Get the list of model's directories.
+         * @brief Get the list of output directories.
          * @return A list of directory name.
          */
-        inline const PathList& getModelDirs() const
-        { return m_model; }
+        const PathList& getOutputDirs() const
+        { return m_output; }
 
-        void addSimulatorDir(const std::string& dirname);
-
-        void addStreamDir(const std::string& dirname);
-
-        void addModelDir(const std::string& dirname);
-
-        void addPluginDir(const std::string& dirname);
+        /**
+         * @brief Get the list of condition directories.
+         * @return A list of directory name.
+         */
+        const PathList& getConditionDirs() const
+        { return m_condition; }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
@@ -124,86 +225,35 @@ namespace vle { namespace utils {
         inline static void kill()
         { delete mPath; mPath = 0; }
 
-        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-         *
-         * Static function to easily use the utils::Path class.
-         *
-         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+    private:
+        void addSimulatorDir(const std::string& dirname);
 
-        /**
-         * @brief Build a string path based on the concatenation of install
-         * prefix and the provided buffer. For instance, if cmake was called
-         * with CMAKE_INSTALL_PREFIX=$HOME/usr on Unix, this function returns
-         * $HOME/usr/buffer.
-         * @param buf The buffer to concatenate to the install prefix.
-         * @return A string path.
-         */
-        static std::string buildPrefixPath(const std::string& buf);
+        void addStreamDir(const std::string& dirname);
 
-        /**
-         * @brief Build a string path based on the concatenation of install
-         * prefix, library dir and provided buffer. For instance:
-         * @code
-         * buildPrefixLibrariesPath("/home/toto/usr", "simulator");
-         * // /home/toto/usr/lib/vle-0.5.0/simulator on Unix
-         * buildPrefixLibrariesPath("c:\\program files\vle", "simulator");
-         * // c:\program files\vle\lib\vle-0.5.0\simulator on Win32
-         * @endcode
-         * @param prefix the prefix of the path.
-         * @param buf the buffer to concatenate to the install prefix.
-         * @return A string path.
-         */
-        static std::string buildPrefixLibrariesPath(const std::string& prefix,
-                                                    const std::string& buf);
+        void addOutputDir(const std::string& dirname);
 
-        /**
-         * @brief Build a string path based on the concatenation of install
-         * prefix, share prefix dir and provided program name and buffer. For
-         * instance:
-         * @code
-         * buildPrefixSharePath("/home/toto/usr", "vle", "pixmaps");
-         * // /home/toto/usr/share/vle-0.5.0/vle/pixmaps on Unix
-         * buildPrefixSharePath("c:\\program files\vle", "vle", "pixmaps");
-         * // c:\program files\vle\share\vle-0.5.0\vle\pixmaps on Win32
-         * @endcode
-         * @param prefix the prefix of the path.
-         * @param prg A buffer to concatenate.
-         * @param name A buffer to concatenante
-         * @return A string path.
-         */
-        static std::string buildPrefixSharePath(const std::string& prefix,
-                                                const std::string& prg,
-                                                const std::string& name =
-                                                std::string());
+        void addConditionDir(const std::string& dirname);
 
-        /**
-         * @brief Build a path using two string.
-         * For instance:
-         * @code
-         * std::string s = utils::Path::buildPath("home", "vle");
-         * // Returns "home/vle" on Unix or "home\\vle" on Win32.
-         * @endcode
-         * @param left the string dirname.
-         * @param right the string dirname.
-         * @return the build path of left and right strings using the good
-         * separator.
-         */
-        static std::string buildPath(const std::string& left,
-                                     const std::string& right);
+        std::string buildHomePath(const std::string& name) const;
+        std::string buildHomePath(const std::string& directory,
+                                  const std::string& name) const;
+        std::string buildHomePath(const std::string& dir1,
+                                  const std::string& dir2,
+                                  const std::string& name) const;
 
-        /**
-         * @brief Build a path from user home directory to specified dir. The
-         * fallowing example return the string "/home/<user>/.vle/model".
-         * @code
-         * std::string s = utils::Path::buildUserPath("model");
-         * // s == /home/gauthier/.vle/model on unix with my nickname.
-         * // s == c:\Documents and Settings\gauthier\My documents on win32.
-         * @endcode
-         * @param dir the directory to found into the user home dir.
-         * @return a concatenation of user home dir and specified directory.
-         */
-        static std::string buildUserPath(const std::string& dir =
-                                           std::string());
+        std::string buildLibrariesPath(const std::string& name) const;
+        std::string buildLibrariesPath(const std::string& directory,
+                                       const std::string& name) const;
+        std::string buildLibrariesPath(const std::string& dir1,
+                                       const std::string& dir2,
+                                       const std::string& name) const;
+
+        std::string buildSharePath(const std::string& name) const;
+        std::string buildSharePath(const std::string& directory,
+                                   const std::string& name) const;
+        std::string buildSharePath(const std::string& dir1,
+                                   const std::string& dir2,
+                                   const std::string& name) const;
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
@@ -234,17 +284,19 @@ namespace vle { namespace utils {
          * @param dirname the directory to check.
          * @return true if str is a directory.
          */
-        bool static isDirectory(const std::string& dirname)
+        static bool isDirectory(const std::string& dirname)
         {
             return Glib::file_test(dirname, Glib::FILE_TEST_EXISTS |
                                    Glib::FILE_TEST_IS_DIR);
         }
 
-    private:
         PathList    m_simulator;
         PathList    m_stream;
-        PathList    m_model;
-        std::string m_prefix;
+        PathList    m_output;
+        PathList    m_condition;
+
+        std::string m_prefix; /*!< the $prefix of installation */
+        std::string m_home; /*!< the $VLE_HOME */
 
         /**
          * @brief A default constructor that call the initPath member.
@@ -268,12 +320,37 @@ namespace vle { namespace utils {
         bool readEnv(const std::string& variable, PathList& out);
 
         /**
-         * @brief Build the patch for package from environment variables.
+         * @brief Assign to the m_home attribut the content of the VLE_HOME
+         * variable. If this variable does not exist, m_home is initialized with
+         * the $HOME/.vle on Unix and %HOMEDRIVE%%HOMEPATH%\vle on Win.
          */
-        void readEnvPackage();
+        void initHomeDir();
 
-        static Path* mPath; /// The static Path for singleton design pattern.
+        /**
+         * @brief Assign to the m_home attribute the content of the VLE_HOME
+         * variable if it exist.
+         */
+        void readHomeDir();
+
+        static Path* mPath; /*!< The static variable Path for singleton design
+                              pattern. */
     };
+
+    /**
+     * @brief Stream operator to show the content of the Path::PathList.
+     * @param out The output stream.
+     * @param paths The list of path.
+     * @return The output stream.
+     */
+    std::ostream& operator<<(std::ostream& out, const Path::PathList& paths);
+
+    /**
+     * @brief Stream operator to show the content of the Path class.
+     * @param out The output stream.
+     * @param p The Path to show.
+     * @return The output stream.
+     */
+    std::ostream& operator<<(std::ostream& out, const Path& p);
 
 }} // namespace vle utils
 

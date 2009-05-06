@@ -227,4 +227,7 @@ BOOST_AUTO_TEST_CASE(test_normal)
                         (double)szmax, 1.0, 10);
 }
 
-
+BOOST_AUTO_TEST_CASE(show_path)
+{
+    std::cout << vle::utils::Path::path() << "\n";
+}

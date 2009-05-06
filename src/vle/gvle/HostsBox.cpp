@@ -239,7 +239,7 @@ bool HostsBox::build_only_localhost_user_hosts_file()
 
 Glib::ustring HostsBox::get_hosts_filename()
 {
-    return utils::Path::buildUserPath("hosts.xml");
+    return utils::Path::path().getHomeFile("hosts.xml");
 }
 
 void HostsBox::init_hosts()

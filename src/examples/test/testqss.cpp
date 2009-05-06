@@ -49,9 +49,7 @@ using namespace vle;
 
 BOOST_AUTO_TEST_CASE(test_qss1)
 {
-    vpz::Vpz file(utils::Path::buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(), "examples",
-	    "qss_exp1_test.vpz"));
+    vpz::Vpz file(utils::Path::path().getExampleFile("qss_exp1_test.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
     o.setLocalStream("", "storage");
@@ -78,9 +76,7 @@ BOOST_AUTO_TEST_CASE(test_qss1)
 
 BOOST_AUTO_TEST_CASE(test_qss2)
 {
-    vpz::Vpz file(utils::Path::buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(), "examples",
-	    "qss_exp3_test.vpz"));
+    vpz::Vpz file(utils::Path::path().getExampleFile("qss_exp3_test.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
     o.setLocalStream("", "storage");

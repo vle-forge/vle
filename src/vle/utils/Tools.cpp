@@ -316,27 +316,10 @@ void printInformations(std::ostream& out)
 {
     utils::printVersion(out);
 
-    {
-        out << "* Simulator paths:\n";
-        const Path::PathList& paths(Path::path().getSimulatorDirs());
-        std::copy(paths.begin(), paths.end(), std::ostream_iterator <
-                Path::PathList::value_type >(out, ";"));
-        out << "\n";
-    }
-    {
-        out << "* Stream paths:\n";
-        const Path::PathList& paths(Path::path().getStreamDirs());
-        std::copy(paths.begin(), paths.end(), std::ostream_iterator <
-                Path::PathList::value_type >(out, ";"));
-        out << "\n";
-    }
-    {
-        out << "* Model paths:\n";
-        const Path::PathList& paths(Path::path().getModelDirs());
-        std::copy(paths.begin(), paths.end(), std::ostream_iterator <
-                Path::PathList::value_type >(out, ";"));
-        out << "\n";
-    }
+    out << "* Simulator paths:\n" << Path::path().getSimulatorDirs();
+    out << "* Stream paths:\n" << Path::path().getStreamDirs();
+    out << "* Output paths:\n" << Path::path().getOutputDirs();
+    out << "* Conditions paths:\n" << Path::path().getConditionDirs();
 }
 
 void printVersion(std::ostream& out)

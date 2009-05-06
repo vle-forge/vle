@@ -51,9 +51,7 @@ using namespace vle;
 
 BOOST_AUTO_TEST_CASE(build_experimental_frames)
 {
-    vpz::Vpz file(utils::Path::buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(),
-            "examples", "unittest.vpz"));
+    vpz::Vpz file(utils::Path::path().getExampleFile("unittest.vpz"));
 
     file.project().experiment().replicas().setSeed(123);
     file.project().experiment().replicas().setNumber(4);
@@ -102,9 +100,7 @@ BOOST_AUTO_TEST_CASE(build_experimental_frames)
 
 BOOST_AUTO_TEST_CASE(build_linear_combination_size)
 {
-    vpz::Vpz file(utils::Path::buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(),
-            "examples", "unittest.vpz"));
+    vpz::Vpz file(utils::Path::path().getExampleFile("unittest.vpz"));
 
     file.project().experiment().replicas().setSeed(123);
     file.project().experiment().replicas().setNumber(4);
@@ -133,9 +129,7 @@ BOOST_AUTO_TEST_CASE(build_linear_combination_size)
 
 BOOST_AUTO_TEST_CASE(build_linear_output_matrix_size)
 {
-    vpz::Vpz file(utils::Path::buildPrefixSharePath(
-            utils::Path::path().getPrefixDir(),
-            "examples", "unittest.vpz"));
+    vpz::Vpz file(utils::Path::path().getExampleFile("unittest.vpz"));
 
     file.project().experiment().replicas().setSeed(123);
     file.project().experiment().replicas().setNumber(2);

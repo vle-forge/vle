@@ -41,9 +41,7 @@ namespace vle { namespace examples { namespace recursives {
 
         devs::Time init(const devs::Time& /* time */)
         {
-            vpz::Vpz file(utils::Path::path().buildPrefixSharePath(
-                    utils::Path::path().getPrefixDir(), "examples",
-                    "counter.vpz"));
+            vpz::Vpz file(utils::Path::path().getExampleFile("counter.vpz"));
 
             manager::RunQuiet r;    // build a VLE manager
             r.start(file);          // exacute the local file simulation
@@ -95,9 +93,7 @@ namespace vle { namespace examples { namespace recursives {
             const std::string& myname(getModelName());
             const int nb = boost::lexical_cast < int >(myname);
 
-            vpz::Vpz file(utils::Path::path().buildPrefixSharePath(
-                    utils::Path::path().getPrefixDir(), "examples",
-                    "recursive.vpz"));
+            vpz::Vpz file(utils::Path::path().getExampleFile("recursive.vpz"));
 
             graph::Model::rename(file.project().model().model(),
                                  boost::lexical_cast < std::string >(nb + 1));

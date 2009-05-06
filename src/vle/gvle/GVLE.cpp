@@ -335,31 +335,31 @@ void GVLE::makeButtons()
 
     try {
         r = Gdk::Pixbuf::create_from_file(
-	    utils::Path::path().getPixmapsFile("arrow.png"));
+            utils::Path::path().getPixmapFile("arrow.png"));
         img = Gtk::manage(new Gtk::Image(r));
         m_arrow.add(*img);
         r = Gdk::Pixbuf::create_from_file(
-	    utils::Path::path().getPixmapsFile("model.png"));
+            utils::Path::path().getPixmapFile("model.png"));
         img = Gtk::manage(new Gtk::Image(r));
         m_addModels.add(*img);
         r = Gdk::Pixbuf::create_from_file(
-	    utils::Path::path().getPixmapsFile("coupled.png"));
+            utils::Path::path().getPixmapFile("coupled.png"));
         img = Gtk::manage(new Gtk::Image(r));
         m_addCoupled.add(*img);
         r = Gdk::Pixbuf::create_from_file(
-	    utils::Path::path().getPixmapsFile("links.png"));
+            utils::Path::path().getPixmapFile("links.png"));
         img = Gtk::manage(new Gtk::Image(r));
         m_addLinks.add(*img);
         r = Gdk::Pixbuf::create_from_file(
-	    utils::Path::path().getPixmapsFile("delete.png"));
+            utils::Path::path().getPixmapFile("delete.png"));
         img = Gtk::manage(new Gtk::Image(r));
         m_delete.add(*img);
         r = Gdk::Pixbuf::create_from_file(
-	    utils::Path::path().getPixmapsFile("zoom.png"));
+            utils::Path::path().getPixmapFile("zoom.png"));
         img = Gtk::manage(new Gtk::Image(r));
         m_zoom.add(*img);
         r = Gdk::Pixbuf::create_from_file(
-	    utils::Path::path().getPixmapsFile("question.png"));
+            utils::Path::path().getPixmapFile("question.png"));
         img = Gtk::manage(new Gtk::Image(r));
         m_question.add(*img);
     } catch (const Glib::FileError& e) {

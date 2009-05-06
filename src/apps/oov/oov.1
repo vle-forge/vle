@@ -70,24 +70,9 @@ Run oov in localhost without daemon and listening TCP/IP port 8000:
 $ oov -p 8000
 
 .SH "ENVIRONMENTS"
-.IP VLE_PACKAGE_PATH
-A path where you push models packages (ie. simulators, vpz files, data, etc.).
-From the package path (for example, /tmp), vle search simulators in
-/tmp/simulator etc.
-
-.IP VLE_SIMULATOR_PATH
-A colon-separated list of directories in which to search the simulators (VLE
-DEVS atomic plug-ins) libraries at execution-time. Similar to the PATH
-environment variable.
-
-.IP VLE_OOV_PATH
-A colon-separated list of directories in which to search the simulators (OOV
-output stream plug-ins) libraries at execution-time. Similar to the PATH
-environment variable.
-
-.IP VLE_MODEL_PATH
-A colon-separated list of directories in which to search the models (GVLE
-plug-ins) libraries at execution-time. Similar to the PATH environment variable.
+.IP VLE_HOME
+A path where you push models packages (ie. simulators, vpz files, data, etc.),
+and the outputs, streams and conditions plug-ins.
 
 .SH "SEE ALSO" 
 .PP 
