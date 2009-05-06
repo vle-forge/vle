@@ -42,10 +42,13 @@
 
 namespace vle { namespace gvle {
 
+    class Modeling;
+
     class ViewOutputBox
     {
     public:
-        ViewOutputBox(Glib::RefPtr < Gnome::Glade::Xml > ref,
+        ViewOutputBox(Modeling& modeling,
+                      Glib::RefPtr < Gnome::Glade::Xml > ref,
                       vpz::Views& views);
 
         virtual ~ViewOutputBox();
@@ -74,6 +77,8 @@ namespace vle { namespace gvle {
 
 
     private:
+        Modeling&      m_modeling;
+
         /** a reference to the origin vpz::Views, filled when user modify and
          * valid the ViewOutputBox.
          */
@@ -89,9 +94,17 @@ namespace vle { namespace gvle {
         Gtk::ComboBoxText*  m_format;
         Gtk::Entry*         m_location;
         Gtk::Button*        m_directory;
+        Gtk::Button*        m_editplugin;
         Gtk::ComboBoxText*  m_plugin;
         Gtk::TreeView*      m_views;
         Gtk::TextView*      m_data;
+
+        sigc::connection m_cntViewButtonRelease;
+        sigc::connection m_cntViewCursorChanged;
+        sigc::connection m_cntTypeChanged;
+        sigc::connection m_cntFormatChanged;
+        sigc::connection m_cntDirectoryClicked;
+        sigc::connection m_cntEditPluginClicked;
 
         Glib::RefPtr < Gtk::ListStore > m_model;
         Gtk::Menu           m_menu;
@@ -107,6 +120,7 @@ namespace vle { namespace gvle {
         void onChangedType();
         void onChangedFormat();
         void onClickedDirectory();
+        void onEditPlugin();
 
         void fillCombobox();
         void assignView(const std::string& name);

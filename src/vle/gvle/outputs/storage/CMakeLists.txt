@@ -1,0 +1,48 @@
+INCLUDE_DIRECTORIES(
+  ${VLE_BINARY_DIR}/src
+  ${VLE_SOURCE_DIR}/src
+  ${Boost_INCLUDE_DIRS}
+  ${GLIBMM_INCLUDE_DIRS}
+  ${LIBXMLPP_INCLUDE_DIRS}
+  ${GLADEMM_INCLUDE_DIRS}
+  ${GTKMM_INCLUDE_DIRS}
+  ${GTHREAD_INCLUDE_DIRS})
+
+LINK_DIRECTORIES(
+  ${GLIBMM_LIBRARY_DIRS}
+  ${LIBXMLPP_LIBRARY_DIR}
+  ${GLADEMM_LIBRARY_DIRS}
+  ${GTKMM_LIBRARY_DIRS}
+  ${GTHREAD_LIBRARY_DIRS})
+
+ADD_LIBRARY(output-storage MODULE Storage.hpp Storage.cpp)
+SET_TARGET_PROPERTIES(output-storage PROPERTIES OUTPUT_NAME "storage")
+
+TARGET_LINK_LIBRARIES(output-storage
+  ${GLIBMM_LIBRARIES}
+  ${LIBXMLPP_LIBRARIES}
+  ${CAIROMM_LIBRARIES}
+  ${GLADEMM_LIBRARIES}
+  ${GTKMM_LIBRARIES}
+  ${GTHREAD_LIBRARIES}
+  ${OS_SPECIFIC_LIBRARIES}
+  vlemanager
+  vleutils
+  vledata
+  vlevalue
+  vlegraph
+  vlevpz
+  vleoov
+  vlevpz
+  vledevs
+  vleextension
+  vlemanager
+  vletranslator
+  vlegvle)
+
+INSTALL(TARGETS output-storage
+  RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/outputs"
+  LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/outputs")
+
+INSTALL(FILES storage.glade DESTINATION ${VLE_SHARE_DIRS}/outputs/glade)
+

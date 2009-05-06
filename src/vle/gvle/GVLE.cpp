@@ -691,7 +691,7 @@ void GVLE::onHelpBox()
 
 void GVLE::onViewOutputBox()
 {
-    ViewOutputBox box(mRefXML, m_modeling->views());
+    ViewOutputBox box(*m_modeling, mRefXML, m_modeling->views());
     box.run();
 }
 

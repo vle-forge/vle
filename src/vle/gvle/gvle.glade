@@ -3139,6 +3139,19 @@ Geoffroy Weisenhorn &lt;geoffroy.weisenhorn@gmail.com&gt;</property>
                                         <child>
                                           <placeholder/>
                                         </child>
+                                        <child>
+                                          <widget class="GtkButton" id="buttonEditPlugin">
+                                            <property name="label" translatable="yes">gtk-edit</property>
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">True</property>
+                                            <property name="receives_default">True</property>
+                                            <property name="use_stock">True</property>
+                                          </widget>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="position">2</property>
+                                          </packing>
+                                        </child>
                                       </widget>
                                       <packing>
                                         <property name="expand">False</property>

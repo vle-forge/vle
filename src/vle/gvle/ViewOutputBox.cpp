@@ -26,6 +26,7 @@
 #include <vle/gvle/ViewOutputBox.hpp>
 #include <vle/gvle/SimpleTypeBox.hpp>
 #include <vle/gvle/Message.hpp>
+#include <vle/gvle/Modeling.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <gtkmm/filechooserdialog.h>
@@ -37,15 +38,11 @@
 
 namespace vle { namespace gvle {
 
-ViewOutputBox::ViewOutputBox(Glib::RefPtr < Gnome::Glade::Xml > ref,
-                             vpz::Views& views) :
-    m_viewsorig(views),
-    m_viewscopy(views),
-    m_xml(ref),
-    m_type(0),
-    m_format(0),
-    m_plugin(0),
-    m_views(0)
+ViewOutputBox::ViewOutputBox(Modeling& modeling,
+                             Glib::RefPtr < Gnome::Glade::Xml > ref,
+                             vpz::Views& views)
+    : m_modeling(modeling), m_viewsorig(views), m_viewscopy(views), m_xml(ref),
+    m_type(0), m_format(0), m_plugin(0), m_views(0)
 {
     m_xml->get_widget("DialogViewOutput", m_dialog);
     m_xml->get_widget("spinbuttonTimestepDialogViewOutput", m_timestep);
@@ -53,6 +50,7 @@ ViewOutputBox::ViewOutputBox(Glib::RefPtr < Gnome::Glade::Xml > ref,
     m_xml->get_widget("buttonLocationDialogViewOutput", m_directory);
     m_xml->get_widget("treeviewDialogViewOutput", m_views);
     m_xml->get_widget("textviewDataDialogViewOutput", m_data);
+    m_xml->get_widget("buttonEditPlugin", m_editplugin);
 
     initViews();
     fillCombobox();
@@ -62,16 +60,19 @@ ViewOutputBox::ViewOutputBox(Glib::RefPtr < Gnome::Glade::Xml > ref,
     m_timestep->set_value(1.0);
     m_timestep->set_range(std::numeric_limits < double >::epsilon(),
                           std::numeric_limits < double >::max());
-    m_views->signal_button_release_event().connect(sigc::mem_fun(
-            *this, &ViewOutputBox::onButtonRealeaseViews));
-    m_views->signal_cursor_changed().connect(sigc::mem_fun(
-            *this, &ViewOutputBox::onCursorChangedViews));
-    m_type->signal_changed().connect(sigc::mem_fun(
+
+    m_cntViewButtonRelease = m_views->signal_button_release_event().connect(
+        sigc::mem_fun( *this, &ViewOutputBox::onButtonRealeaseViews));
+    m_cntViewCursorChanged = m_views->signal_cursor_changed().connect(
+        sigc::mem_fun( *this, &ViewOutputBox::onCursorChangedViews));
+    m_cntTypeChanged = m_type->signal_changed().connect(sigc::mem_fun(
             *this, &ViewOutputBox::onChangedType));
-    m_format->signal_changed().connect(sigc::mem_fun(
+    m_cntFormatChanged = m_format->signal_changed().connect(sigc::mem_fun(
             *this, &ViewOutputBox::onChangedFormat));
-    m_directory->signal_clicked().connect(sigc::mem_fun(
-            *this, &ViewOutputBox::onClickedDirectory));
+    m_cntDirectoryClicked = m_directory->signal_clicked().connect(
+        sigc::mem_fun( *this, &ViewOutputBox::onClickedDirectory));
+    m_cntEditPluginClicked = m_editplugin->signal_clicked().connect(
+        sigc::mem_fun( *this, &ViewOutputBox::onEditPlugin));
 }
 
 ViewOutputBox::~ViewOutputBox()
@@ -82,6 +83,13 @@ ViewOutputBox::~ViewOutputBox()
     delete m_type;
     delete m_format;
     delete m_plugin;
+
+    m_cntViewButtonRelease.disconnect();
+    m_cntViewCursorChanged.disconnect();
+    m_cntTypeChanged.disconnect();
+    m_cntFormatChanged.disconnect();
+    m_cntDirectoryClicked.disconnect();
+    m_cntEditPluginClicked.disconnect();
 }
 
 void ViewOutputBox::run()
@@ -256,7 +264,7 @@ void ViewOutputBox::onCopyViews()
 	    do {
 		copy = name + "_" + boost::lexical_cast< std::string >(number);
 		++number;
-	    }while (m_viewscopy.exist(copy));
+	    } while (m_viewscopy.exist(copy));
 	    iter = m_model->append();
 	    row = *iter;
 	    row[m_viewscolumnrecord.name] = copy;
@@ -325,6 +333,38 @@ void ViewOutputBox::onClickedDirectory()
     box->hide();
 }
 
+void ViewOutputBox::onEditPlugin()
+{
+    std::string name;
+
+    {
+        Glib::RefPtr < Gtk::TreeView::Selection > ref =
+            m_views->get_selection();
+        if (ref) {
+            Gtk::TreeModel::iterator iter = ref->get_selected();
+            if (iter) {
+                Gtk::TreeModel::Row row = *iter;
+                name.assign(row.get_value(m_viewscolumnrecord.name));
+            }
+        }
+    }
+
+    if (not name.empty()) {
+        PluginFactory& plf = m_modeling.pluginFactory();
+        try {
+            OutputPlugin& plugin = plf.getOutput(m_plugin->get_active_text());
+            vpz::View& view(m_viewscopy.get(name));
+            vpz::Output& output(m_viewscopy.outputs().get(view.output()));
+            plugin.start(output, view);
+            if (output.data()) {
+                m_data->get_buffer()->set_text(output.data()->writeToXml());
+            }
+        } catch(const std::exception& e) {
+            Error(e.what());
+        }
+    }
+}
+
 void ViewOutputBox::storePrevious()
 {
     if (m_iter) { /* store the old view */
@@ -359,7 +399,6 @@ void ViewOutputBox::fillCombobox()
     m_type->append_text("timed");
     m_format->append_text("distant");
     m_format->append_text("local");
-
     {
         using namespace utils;
         Path::PathList paths = Path::path().getStreamDirs();

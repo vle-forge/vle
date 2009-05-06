@@ -33,6 +33,7 @@
 #include <vle/gvle/CutCopyPaste.hpp>
 #include <vle/gvle/ImportModelBox.hpp>
 #include <vle/gvle/ViewDrawingArea.hpp>
+#include <vle/gvle/PluginFactory.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/graph/Model.hpp>
 #include <vle/graph/AtomicModel.hpp>
@@ -800,7 +801,6 @@ public:
 
     void vpz_is_correct(std::vector<std::string>& vec);
 
-
     /********************************************************************
      *
      * MANAGE THE DRAWING SETTINGS
@@ -808,40 +808,60 @@ public:
      ********************************************************************/
 
     inline void setForegroundColor(Color color)
-	{ mForegroundColor = color; }
+    { mForegroundColor = color; }
 
     inline const Color getForegroundColor() const
-	{ return mForegroundColor; }
+    { return mForegroundColor; }
 
     inline void setBackgroundColor(const Color color)
-	{ mBackgroundColor = color; }
+    { mBackgroundColor = color; }
 
     inline const Color getBackgroundColor() const
-	{ return mBackgroundColor; }
+    { return mBackgroundColor; }
 
     inline void setSelectedColor(const Color color)
-	{ mSelectedColor = color; }
+    { mSelectedColor = color; }
 
     inline const Color getSelectedColor() const
-	{ return mSelectedColor; }
+    { return mSelectedColor; }
 
     inline void setCoupledColor(const Color color)
-	{ mCoupledColor = color; }
+    { mCoupledColor = color; }
 
     inline const Color getCoupledColor() const
-	{ return mCoupledColor; }
+    { return mCoupledColor; }
 
     inline void setAtomicColor(const Color color)
-	{ mAtomicColor = color; }
+    { mAtomicColor = color; }
 
     inline const Color getAtomicColor() const
-	{ return mAtomicColor; }
+    { return mAtomicColor; }
 
     inline void setFont(const std::string font)
-	{ mFont = font; }
+    { mFont = font; }
 
     inline const std::string getFont() const
-	{ return mFont; }
+    { return mFont; }
+
+    /********************************************************************
+     *
+     * MANAGE OUTPUT AND CONDITION PLUG-INS
+     *
+     ********************************************************************/
+
+    /**
+     * @brief Get a constant reference to the PluginFactory.
+     * @return A constant reference.
+     */
+    const PluginFactory& pluginFactory() const
+    { return mPluginFactory; }
+
+    /**
+     * @brief Get a reference to the PluginFactory.
+     * @return A reference.
+     */
+    PluginFactory& pluginFactory()
+    { return mPluginFactory; }
 
 private:
     vpz::Vpz                    mVpz;
@@ -861,6 +881,7 @@ private:
     AtomicModelBox*             mAtomicBox;
     ImportModelBox*             mImportBox;
     CoupledModelBox*            mCoupledBox;
+    PluginFactory               mPluginFactory;
 
     // Drawing attributes
     Color                       mForegroundColor;
