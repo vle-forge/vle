@@ -88,6 +88,7 @@ private:
 	virtual void onAdd();
 	virtual void onRemove();
 	virtual void onRename();
+	virtual void onExportVpz();
 
     private:
 	Modeling* mModeling;

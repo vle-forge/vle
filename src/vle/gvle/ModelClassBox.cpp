@@ -64,6 +64,13 @@ ModelClassBox::ClassTreeView::ClassTreeView(
 		sigc::mem_fun(
 		    *this,
 		    &ModelClassBox::ClassTreeView::onRename)));
+
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		"_Export Class",
+		sigc::mem_fun(
+		    *this,
+		    &ModelClassBox::ClassTreeView::onExportVpz)));
     }
 
     mMenuPopup.accelerate(*this);
@@ -164,6 +171,42 @@ void ModelClassBox::ClassTreeView::onRename()
 	    mModeling->vpz().project().classes().get(row.get_value(mColumns.m_col_name)).setModel(0);
             mModeling->vpz().project().classes().del(row.get_value(mColumns.m_col_name));
             build();
+	}
+    }
+}
+
+void ModelClassBox::ClassTreeView::onExportVpz()
+{
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+    if (refSelection) {
+	Gtk::TreeModel::iterator iter = refSelection->get_selected();
+	if (iter) {
+	    Gtk::TreeModel::Row row = *iter;
+	    vpz::Class& currentClass = mModeling->vpz().project().classes().get(
+		row.get_value(mColumns.m_col_name));
+	    graph::Model* model = currentClass.model();
+
+	    Gtk::FileChooserDialog file("VPZ file", Gtk::FILE_CHOOSER_ACTION_SAVE);
+	    file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+	    file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+	    Gtk::FileFilter filter;
+	    filter.set_name("Vle Project gZipped");
+	    filter.add_pattern("*.vpz");
+	    file.add_filter(filter);
+
+	    if (file.run() == Gtk::RESPONSE_OK) {
+		std::string filename(file.get_filename());
+		vpz::Vpz::fixExtension(filename);
+
+		vpz::Vpz* save = new vpz::Vpz();
+		if (utils::exist_file(filename)) {
+		    save->clear();
+		}
+		save->setFilename(filename);
+
+		mModeling->exportClass(model, currentClass, save);
+		delete save;
+	    }
 	}
     }
 }

@@ -643,6 +643,8 @@ public:
 
     void importCoupledModel(graph::CoupledModel* parent, vpz::Vpz* src);
 
+    void exportClass(graph::Model* model, vpz::Class classe, vpz::Vpz* dst);
+
     /********************************************************************
      *
      * MANAGE MODELS NAME
@@ -764,16 +766,14 @@ public:
         return mVpz.project().experiment().conditions();
     }
 
-    inline vpz::AtomicModel& get_model(graph::AtomicModel* atom)
+    inline vpz::AtomicModel& get_model(graph::AtomicModel* atom, const std::string& className = "")
     {
         setModified(true);
-        return mVpz.project().model().atomicModels().get(atom);
-    }
-
-    inline vpz::AtomicModel& get_modelClass(graph::AtomicModel* atom, const std::string& name)
-    {
-        setModified(true);
-        return mVpz.project().classes().get(name).atomicModels().get(atom);
+	if (className == "") {
+	    return mVpz.project().model().atomicModels().get(atom);
+	} else {
+	    return mVpz.project().classes().get(className).atomicModels().get(atom);
+	}
     }
 
     const vpz::Strings* get_conditions(graph::AtomicModel* atom);
@@ -936,8 +936,8 @@ private:
 
     Glib::RefPtr < Gnome::Glade::Xml >  mRefXML;
 
-    void export_atomic_model(vpz::Vpz* dst, graph::AtomicModel* atom);
-    void export_coupled_model(vpz::Vpz* dst, graph::CoupledModel* atom);
+    void export_atomic_model(vpz::Vpz* dst, graph::AtomicModel* atom, std::string className = "");
+    void export_coupled_model(vpz::Vpz* dst, graph::CoupledModel* atom, std::string className = "");
 
     void import_atomic_model(vpz::Vpz* src, graph::AtomicModel* atom);
     void import_coupled_model(vpz::Vpz* src, graph::CoupledModel* atom);

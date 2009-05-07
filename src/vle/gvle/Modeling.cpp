@@ -361,7 +361,7 @@ void Modeling::addViewClass(graph::Model* model, std::string name)
     } else if (model->isAtomic()) {
         graph::AtomicModel* graph_am = dynamic_cast<graph::AtomicModel*>(model);
         try {
-	    vpz::AtomicModel& vpz_am = get_modelClass(graph_am, name);
+	    vpz::AtomicModel& vpz_am = get_model(graph_am, name);
 	    mAtomicBox->show(vpz_am, *graph_am);
         } catch (utils::SaxParserError& E) {
             parse_model(mVpz.project().classes().get(mCurrentClass).atomicModels());
@@ -684,11 +684,34 @@ void Modeling::exportCoupledModel(graph::CoupledModel* model, vpz::Vpz* dst)
     dst->write();
 }
 
-void Modeling::export_atomic_model(vpz::Vpz* dst, graph::AtomicModel* model)
+void Modeling::exportClass(graph::Model* model, vpz::Class classe, vpz::Vpz* dst)
+{
+    vpz::Project& project = dst->project();
+    project.setAuthor(vpz().project().author());
+    project.setDate(vpz().project().date());
+    project.setVersion(vpz().project().version());
+    vpz::Experiment& experiment = project.experiment();
+    experiment.setName(vpz().project().experiment().name());
+    experiment.setDuration(vpz().project().experiment().duration());
+
+    std::string classeName = classe.name();
+
+    if (model->isCoupled()) {
+	export_coupled_model(dst, dynamic_cast<graph::CoupledModel*>(model), classeName);
+    } else {
+	export_atomic_model(dst, dynamic_cast<graph::AtomicModel*>(model), classeName);
+    }
+    dst->project().model().setModel(model);
+    dst->write();
+}
+
+void Modeling::export_atomic_model(vpz::Vpz* dst, graph::AtomicModel* model,
+				   std::string className)
 {
     using namespace vpz;
 
-    AtomicModel& atom = get_model(dynamic_cast<graph::AtomicModel*>(model));
+    AtomicModel atom = get_model(dynamic_cast<graph::AtomicModel*>(model), className);
+
     Project& project = dst->project();
     Dynamics& dyns = project.dynamics();
     Views& views = project.experiment().views();
@@ -735,21 +758,27 @@ void Modeling::export_atomic_model(vpz::Vpz* dst, graph::AtomicModel* model)
     }
 
     //Model
-    if (vpz().project().model().atomicModels().exist(model)) {
-        dst->project().model().atomicModels().add(model, atom);
+    if (className == "") {
+	if (vpz().project().model().atomicModels().exist(model)) {
+	    dst->project().model().atomicModels().add(model, atom);
+	}
+    } else {
+	if (vpz().project().classes().get(className).atomicModels().exist(model)) {
+	    dst->project().model().atomicModels().add(model, atom);
+	}
     }
 }
 
-void Modeling::export_coupled_model(vpz::Vpz* dst, graph::CoupledModel* model)
+void Modeling::export_coupled_model(vpz::Vpz* dst, graph::CoupledModel* model, std::string className)
 {
     graph::ModelList& list = model->getModelList();
     graph::ModelList::const_iterator it = list.begin();
     while (it!= list.end()) {
         if (it->second->isAtomic()) {
-            export_atomic_model(dst, dynamic_cast<graph::AtomicModel*>(it->second));
+            export_atomic_model(dst, dynamic_cast<graph::AtomicModel*>(it->second), className);
         } else {
-            export_coupled_model(dst, dynamic_cast<graph::CoupledModel*>(it->second));
-        }
+            export_coupled_model(dst, dynamic_cast<graph::CoupledModel*>(it->second), className);
+	}
 
         ++it;
     }
