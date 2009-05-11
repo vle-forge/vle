@@ -90,8 +90,10 @@ private:
     void init();
     void activate(const Settings& set);
     void copy(const Settings& src, Settings& dest);
-    //void saveSettings(const std::string& path);
-    //void loadSettings(const std::string& path);
+    Gdk::Color makeColorFromString(const std::string& value);
+    std::string makeStringFromColor(const Gdk::Color& color);
+    void saveSettings();
+    void loadSettings();
 };
 
 }} //namespace vle gvle

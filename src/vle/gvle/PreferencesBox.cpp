@@ -24,6 +24,7 @@
 
 
 #include <vle/gvle/PreferencesBox.hpp>
+#include <vle/utils/Preferences.hpp>
 #include <vector>
 #include <string>
 #include <sstream>
@@ -84,6 +85,7 @@ void PreferencesBox::show()
 void PreferencesBox::onApply()
 {
     activate(currentSettings);
+    saveSettings();
     copy(currentSettings, backupSettings);
     mModeling->refreshViews();
     mDialog->hide_all();
@@ -103,31 +105,7 @@ void PreferencesBox::onCancel()
 
 void PreferencesBox::onRestore()
 {
-    Gdk::Color color;
-
-    color.set_rgb_p(1.0, 1.0, 1.0);
-    currentSettings.background = color;
-
-    color.set_rgb_p(0.0, 0.0, 0.0);
-    currentSettings.foreground = color;
-
-    color.set_rgb_p(0.70, 0.83, 0.68);
-    currentSettings.atomic = color;
-
-    color.set_rgb_p(0.68, 0.70, 0.83);
-    currentSettings.coupled = color;
-
-    color.set_rgb_p(0.83, 0.68, 0.70);
-    currentSettings.selected = color;
-
-    currentSettings.font = "Sans";
-
-    mBackgroundColor->set_color(currentSettings.background);
-    mForegroundColor->set_color(currentSettings.foreground);
-    mAtomicColor->set_color(currentSettings.atomic);
-    mCoupledColor->set_color(currentSettings.coupled);
-    mSelectedColor->set_color(currentSettings.selected);
-    mFont->set_font_name(currentSettings.font);
+    init();
 }
 
 void PreferencesBox::onButtonBackgroundColorChange()
@@ -162,13 +140,7 @@ void PreferencesBox::onButtonFontChange()
 
 void PreferencesBox::init()
 {
-    currentSettings.background = mBackgroundColor->get_color();
-    currentSettings.foreground = mForegroundColor->get_color();
-    currentSettings.atomic = mAtomicColor->get_color();
-    currentSettings.coupled = mCoupledColor->get_color();
-    currentSettings.selected = mSelectedColor->get_color();
-    currentSettings.font = mFont->property_font_name().get_value();
-    copy(currentSettings, backupSettings);
+    loadSettings();
     activate(currentSettings);
 }
 
@@ -214,6 +186,13 @@ void PreferencesBox::activate(const Settings& settings)
 	      std::ostream_iterator<std::string>(oss, " " ));
     std::string fontName = oss.str();
     mModeling->setFont(fontName);
+
+    mBackgroundColor->set_color(settings.background);
+    mForegroundColor->set_color(settings.foreground);
+    mAtomicColor->set_color(settings.atomic);
+    mCoupledColor->set_color(settings.coupled);
+    mSelectedColor->set_color(settings.selected);
+    mFont->set_font_name(settings.font);
 }
 
 void PreferencesBox::copy(const Settings& src, Settings& dest)
@@ -226,14 +205,84 @@ void PreferencesBox::copy(const Settings& src, Settings& dest)
     dest.font       = src.font;
 }
 
-/*
-void PreferencesBox::saveSettings(const std::string& path)
+
+void PreferencesBox::saveSettings()
 {
+    vle::utils::Preferences prefs;
+    prefs.load();
+
+    prefs.setAttributes("gvle.graphics",
+			"foreground",
+			makeStringFromColor(currentSettings.foreground));
+    prefs.setAttributes("gvle.graphics",
+			"background",
+			makeStringFromColor(currentSettings.background));
+    prefs.setAttributes("gvle.graphics",
+			"atomic",
+			makeStringFromColor(currentSettings.atomic));
+    prefs.setAttributes("gvle.graphics",
+			"coupled",
+			makeStringFromColor(currentSettings.coupled));
+    prefs.setAttributes("gvle.graphics",
+			"selected",
+			makeStringFromColor(currentSettings.selected));
+    prefs.setAttributes("gvle.graphics",
+			"font",
+			currentSettings.font);
+    prefs.save();
 }
 
-void PreferencesBox::loadSettings(const std::string& path)
+
+void PreferencesBox::loadSettings()
 {
+    vle::utils::Preferences prefs;
+    std::string value;
+
+    prefs.load();
+
+    value = prefs.getAttributes("gvle.graphics", "background");
+    currentSettings.background = (value.empty() ? mBackgroundColor->get_color()
+				  : makeColorFromString(value));
+    value = prefs.getAttributes("gvle.graphics", "foreground");
+    currentSettings.foreground = (value.empty()? mForegroundColor->get_color()
+				  : makeColorFromString(value));
+
+    value = prefs.getAttributes("gvle.graphics", "atomic");
+    currentSettings.atomic = (value.empty() ? mAtomicColor->get_color()
+			      : makeColorFromString(value));
+
+    value = prefs.getAttributes("gvle.graphics", "coupled");
+    currentSettings.coupled = (value.empty() ? mCoupledColor->get_color()
+			       : makeColorFromString(value));
+
+    value = prefs.getAttributes("gvle.graphics", "selected");
+    currentSettings.selected = (value.empty() ? mSelectedColor->get_color()
+				: makeColorFromString(value));
+
+    value = prefs.getAttributes("gvle.graphics", "font");
+    currentSettings.font = (value.empty() ? std::string(mFont->property_font_name().get_value())
+			    : value);
+
+    copy(currentSettings, backupSettings);
 }
-*/
+
+Gdk::Color PreferencesBox::makeColorFromString(const std::string& value)
+{
+    std::vector< std::string > splitVec;
+    boost::split(splitVec, value, boost::is_any_of(" "));
+    double r = boost::lexical_cast<double>(splitVec[0]);
+    double g = boost::lexical_cast<double>(splitVec[1]);
+    double b = boost::lexical_cast<double>(splitVec[2]);
+    Gdk::Color color;
+    color.set_rgb_p(r, g, b);
+    return color;
+}
+
+std::string PreferencesBox::makeStringFromColor(const Gdk::Color& color)
+{
+    std::ostringstream oss;
+    oss << color.get_red_p() << " " << color.get_green_p() << " " << color.get_blue_p();
+    return oss.str();
+}
 
 }} //namespace vle gvle
