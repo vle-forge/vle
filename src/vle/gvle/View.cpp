@@ -280,43 +280,50 @@ void View::addCoupledModel(int x, int y)
     ModelDescriptionBox* box;
     box = new ModelDescriptionBox(mModeling->getNames());
     if (box->run()) {
-	if (not mCurrent or not mCurrent->exist(box->getName())) {
-	    graph::CoupledModel* new_gc =
-		mModeling->newCoupledModel(mCurrent, box->getName(),
-					   "", x, y);
+        if (not mCurrent or not mCurrent->exist(box->getName())) {
+            graph::CoupledModel* new_gc =
+                mModeling->newCoupledModel(mCurrent, box->getName(),
+                                           "", x, y);
 
-	    new_gc->setSize(ViewDrawingArea::MODEL_WIDTH,
-			    ViewDrawingArea::MODEL_HEIGHT);
-	    mCurrent->displace(mSelectedModels, new_gc);
-	    mModeling->getGVLE()->redrawModelTreeBox();
-	    mModeling->getGVLE()->redrawModelClassBox();
-	    mSelectedModels.clear();
+            new_gc->setSize(ViewDrawingArea::MODEL_WIDTH,
+                            ViewDrawingArea::MODEL_HEIGHT);
+            try {
+                mCurrent->displace(mSelectedModels, new_gc);
+            } catch (const std::exception& e) {
+                mModeling->delViewOnModel(new_gc);
+                mCurrent->delModel(new_gc);
+            }
+            mModeling->getGVLE()->redrawModelTreeBox();
+            mModeling->getGVLE()->redrawModelClassBox();
+            mSelectedModels.clear();
+        } else {
+            graph::Model* model = mCurrent->findModel(box->getName());
+            bool select = false;
+            if (model != 0)
+                select = mCurrent->isInList(
+                    mSelectedModels, mCurrent->findModel(box->getName()));
+            if (select) {
+                graph::CoupledModel* new_gc =
+                    mModeling->newCoupledModel(0, box->getName(),
+                                               "", x, y);
 
-	} else {
-	    graph::Model* model = mCurrent->findModel(box->getName());
-	    bool select = false;
-	    if (model != 0)
-		select = mCurrent->isInList(mSelectedModels,
-					    mCurrent->findModel(
-						box->getName()));
-	    if (select) {
-
-		graph::CoupledModel* new_gc =
-		    mModeling->newCoupledModel(0, box->getName(),
-					       "", x, y);
-
-		new_gc->setSize(ViewDrawingArea::MODEL_WIDTH,
-				ViewDrawingArea::MODEL_HEIGHT);
-		mCurrent->displace(mSelectedModels, new_gc);
-		if (mCurrent) {
-		    new_gc->setParent(mCurrent);
-		    mCurrent->addModel(new_gc);
-		}
-		mModeling->getGVLE()->redrawModelTreeBox();
-		mModeling->getGVLE()->redrawModelClassBox();
-		mSelectedModels.clear();
-	    }
-	}
+                new_gc->setSize(ViewDrawingArea::MODEL_WIDTH,
+                                ViewDrawingArea::MODEL_HEIGHT);
+                try {
+                    mCurrent->displace(mSelectedModels, new_gc);
+                } catch(const std::exception& e) {
+                    mModeling->delViewOnModel(new_gc);
+                    mCurrent->delModel(new_gc);
+                }
+                if (mCurrent) {
+                    new_gc->setParent(mCurrent);
+                    mCurrent->addModel(new_gc);
+                }
+                mModeling->getGVLE()->redrawModelTreeBox();
+                mModeling->getGVLE()->redrawModelClassBox();
+                mSelectedModels.clear();
+            }
+        }
     }
     delete box;
 }
