@@ -24,7 +24,7 @@
 
 
 #include <vle/gvle/TableBox.hpp>
-#include <vle/utils.hpp>
+#include <vle/utils/Tools.hpp>
 
 using namespace vle;
 

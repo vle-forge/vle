@@ -24,7 +24,7 @@
 
 
 #include <vle/gvle/SimpleTypeBox.hpp>
-#include <vle/utils.hpp>
+#include <vle/utils/Tools.hpp>
 
 namespace vle { namespace gvle {
 

@@ -25,10 +25,10 @@
 #ifndef GUI_CONDITIONSBOX_HPP
 #define GUI_CONDITIONSBOX_HPP
 
-#include <vle/vpz.hpp>
 #include <gtkmm.h>
 #include <libglademm.h>
 #include <vle/gvle/ValuesTreeView.hpp>
+#include <vle/vpz/Conditions.hpp>
 
 namespace vle { namespace gvle {
 
@@ -51,18 +51,20 @@ private:
     class ConditionsTreeView : public Gtk::TreeView
     {
     public:
-	ConditionsTreeView(BaseObjectType* cobject,
-			   const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
-	virtual ~ConditionsTreeView();
+        ConditionsTreeView(BaseObjectType* cobject,
+                           const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
+        virtual ~ConditionsTreeView();
 
-	void build();
-	Glib::ustring getSelected()
-	    { return (*mRefTreeSelection
-		      ->get_selected())[mColumns.m_col_name]; }
-	void setConditions(vpz::Conditions* conditions)
-	    { mConditions = conditions; }
-	void setParent(ConditionsBox* parent)
-	    { mParent = parent; }
+        void build();
+
+        Glib::ustring getSelected()
+        { return (*mRefTreeSelection->get_selected())[mColumns.m_col_name]; }
+
+        void setConditions(vpz::Conditions* conditions)
+        { mConditions = conditions; }
+
+        void setParent(ConditionsBox* parent)
+        { mParent = parent; }
 
     protected:
 	// Override Signal handler:

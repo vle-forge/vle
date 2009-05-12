@@ -28,7 +28,6 @@
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Path.hpp>
-#include <vle/value.hpp>
 #include <vle/oov/PluginFactory.hpp>
 #include <string>
 

@@ -23,6 +23,9 @@
  */
 
 #include <vle/oov/plugins/cairo/netview/Colors.hpp>
+#include <vle/utils/Tools.hpp>
+#include <vle/utils/XML.hpp>
+#include <cmath>
 
 namespace vle { namespace oov { namespace plugin {
 
@@ -51,9 +54,9 @@ void cairo_color::build_color(const std::string & value)
             double c = v/d;
 
             if (it->m_type == RealColor::HIGHVALUE)
-                c = pow(c,it->m_coef);
+                c = std::pow(c,it->m_coef);
             else if (it->m_type == RealColor::LOWVALUE)
-                c = exp(-(it->m_coef)*c);
+                c = std::exp(-(it->m_coef)*c);
 
             if (it->m_color == "red") {
                 r = 1.;

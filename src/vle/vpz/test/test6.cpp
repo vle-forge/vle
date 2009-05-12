@@ -33,8 +33,9 @@
 #include <boost/test/floating_point_comparison.hpp>
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
-#include <vle/vpz.hpp>
-#include <vle/graph.hpp>
+#include <vle/value/Value.hpp>
+#include <vle/vpz/Vpz.hpp>
+#include <vle/graph/CoupledModel.hpp>
 
 struct F
 {

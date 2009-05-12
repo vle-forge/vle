@@ -37,9 +37,11 @@
 #include <vector>
 #include <map>
 #include <string>
-#include <vle/utils.hpp>
 #include <iostream>
 #include <numeric>
+#include <vle/utils/Algo.hpp>
+#include <vle/utils/Path.hpp>
+#include <vle/utils/Rand.hpp>
 
 using namespace vle;
 

@@ -34,9 +34,11 @@
 #include <stdexcept>
 #include <limits>
 #include <fstream>
-#include <vle/graph.hpp>
-#include <vle/utils.hpp>
-#include <vle/vpz.hpp>
+#include <vle/graph/AtomicModel.hpp>
+#include <vle/graph/CoupledModel.hpp>
+#include <vle/utils/Path.hpp>
+#include <vle/value/Value.hpp>
+#include <vle/vpz/Vpz.hpp>
 
 struct F
 {

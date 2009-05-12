@@ -34,10 +34,10 @@
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
 #include <iostream>
-#include <vle/manager.hpp>
-#include <vle/vpz.hpp>
-#include <vle/value.hpp>
-#include <vle/utils.hpp>
+#include <vle/manager/Manager.hpp>
+#include <vle/manager/VLE.hpp>
+#include <vle/value/Double.hpp>
+#include <vle/value/Integer.hpp>
 
 struct F
 {

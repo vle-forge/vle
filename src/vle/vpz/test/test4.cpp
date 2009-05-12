@@ -33,11 +33,14 @@
 #include <boost/test/floating_point_comparison.hpp>
 #include <boost/algorithm/string.hpp>
 #include <iostream>
-
-#include <vle/value.hpp>
-#include <vle/utils.hpp>
-#include <vle/graph.hpp>
-#include <vle/vpz.hpp>
+#include <vle/value/Value.hpp>
+#include <vle/value/Map.hpp>
+#include <vle/value/Integer.hpp>
+#include <vle/value/Double.hpp>
+#include <vle/vpz/Vpz.hpp>
+#include <vle/graph/AtomicModel.hpp>
+#include <vle/graph/CoupledModel.hpp>
+#include <vle/utils/Path.hpp>
 
 struct F
 {

@@ -94,6 +94,7 @@ BOOST_AUTO_TEST_CASE(value_integer)
     char t3[1000];
     char t4[1000];
 
+
     sprintf(t3, "<?xml version=\"1.0\"?>\n<integer>%s</integer>",
             utils::to_string(std::numeric_limits< long >::max()).c_str());
     sprintf(t4, "<?xml version=\"1.0\"?>\n<integer>%s</integer>",

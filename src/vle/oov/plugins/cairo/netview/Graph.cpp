@@ -22,8 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Graph.hpp"
-#include <vle/utils.hpp>
+#include <vle/oov/plugins/cairo/netview/Graph.hpp>
+#include <vle/utils/Debug.hpp>
 
 namespace vle { namespace oov { namespace plugin {
 

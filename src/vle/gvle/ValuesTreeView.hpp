@@ -28,6 +28,9 @@
 
 #include <gtkmm.h>
 #include <vle/value/Value.hpp>
+#include <vle/value/Integer.hpp>
+#include <vle/value/Double.hpp>
+#include <vle/vpz/Condition.hpp>
 
 namespace vle { namespace gvle {
 

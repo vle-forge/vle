@@ -31,7 +31,6 @@
 #include <vle/gvle/TreeViewValue.hpp>
 #include <vle/gvle/ValueBox.hpp>
 #include <vle/gvle/XmlTypeBox.hpp>
-#include <vle/utils.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
 using namespace vle;

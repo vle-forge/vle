@@ -30,8 +30,9 @@
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/auto_unit_test.hpp>
+#include <vle/value/Value.hpp>
+#include <vle/vpz/Vpz.hpp>
 #include <stdexcept>
-#include <vle/vpz.hpp>
 
 struct F
 {

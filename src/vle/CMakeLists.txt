@@ -12,7 +12,8 @@ ADD_SUBDIRECTORY(translator)
 
 CONFIGURE_FILE(version.hpp.in ${VLE_BINARY_DIR}/src/vle/version.hpp)
 
-INSTALL(FILES ${VLE_BINARY_DIR}/src/vle/version.hpp DESTINATION ${VLE_INCLUDE_DIRS})
+INSTALL(FILES ${VLE_BINARY_DIR}/src/vle/version.hpp DESTINATION
+  ${VLE_INCLUDE_DIRS})
 
 INSTALL(FILES data.hpp devs.hpp extension.hpp geometry.hpp graph.hpp
   manager.hpp oov.hpp translator.hpp utils.hpp value.hpp vpz.hpp DESTINATION
