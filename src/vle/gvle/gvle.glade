@@ -2731,9 +2731,12 @@ You may redistribute copies of VLE
 under the terms of the GNU General Public License.
 For more information about these matters, see the file named COPYING.</property>
     <property name="authors">Aurélien Ansel &lt;camumus@gmail.com&gt;
+Guillaume Ansel &lt;anselg@users.sourceforge.net&gt;
 Patrick Chabrier &lt;patrick.chabrier@toulouse.inra.fr&gt;
+Cyril Marcq &lt;cmarcq@users.sourceforge.net&gt;
 Gauthier Quesnel &lt;quesnel@users.sourceforge.net&gt;
 Eric Ramat &lt;ramat@lil.univ-littoral.fr&gt;
+Daniel Salom&#xE9; &lt;dansal62@users.sourceforge.net&gt;
 Geoffroy Weisenhorn &lt;geoffroy.weisenhorn@gmail.com&gt;</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox17">
