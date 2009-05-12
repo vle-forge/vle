@@ -55,6 +55,8 @@ protected:
 
     virtual void onButtonFontChange();
 
+    virtual void onLineWidthChange();
+
 private:
     /**
      * A struct to store the configuration
@@ -66,6 +68,8 @@ private:
 	Gdk::Color coupled;
 	Gdk::Color selected;
 	std::string font;
+	double fontSize;
+	double lineWidth;
     };
 
     //Class members
@@ -85,6 +89,7 @@ private:
     Gtk::ColorButton* mCoupledColor;
     Gtk::ColorButton* mSelectedColor;
     Gtk::FontButton* mFont;
+    Gtk::HScale* mLineWidth;
 
     //Methods
     void init();

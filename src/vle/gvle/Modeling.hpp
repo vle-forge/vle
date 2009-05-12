@@ -889,6 +889,18 @@ public:
     inline const std::string getFont() const
     { return mFont; }
 
+    inline void setFontSize(const double size)
+    { mFontSize = size; }
+
+    inline double getFontSize() const
+    { return mFontSize; }
+
+    inline void setLineWidth(const double width)
+    { mLineWidth = width; }
+
+    inline double getLineWidth() const
+    { return mLineWidth; }
+
     /********************************************************************
      *
      * MANAGE OUTPUT AND CONDITION PLUG-INS
@@ -937,6 +949,8 @@ private:
     Color                       mCoupledColor;
     Color                       mAtomicColor;
     std::string                 mFont;
+    double                      mFontSize;
+    double                      mLineWidth;
 
     Glib::RefPtr < Gnome::Glade::Xml >  mRefXML;
 

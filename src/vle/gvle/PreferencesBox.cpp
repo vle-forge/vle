@@ -58,6 +58,10 @@ PreferencesBox::PreferencesBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m)
     mFont->signal_font_set().connect(
 	sigc::mem_fun(*this, &PreferencesBox::onButtonFontChange));
 
+    xml->get_widget("HScalePreferencesLineWidth", mLineWidth);
+    mLineWidth->signal_value_changed().connect(
+	sigc::mem_fun(*this, &PreferencesBox::onLineWidthChange));
+
     xml->get_widget("ButtonPreferencesApply", mButtonApply);
     mButtonApply->signal_clicked().connect(
 	sigc::mem_fun(*this, &PreferencesBox::onApply));
@@ -99,7 +103,10 @@ void PreferencesBox::onCancel()
     mAtomicColor->set_color(backupSettings.atomic);
     mCoupledColor->set_color(backupSettings.coupled);
     mSelectedColor->set_color(backupSettings.selected);
-    mFont->set_font_name(backupSettings.font);
+    std::ostringstream oss;
+    oss << backupSettings.font.c_str() << " " << backupSettings.fontSize;
+    mFont->set_font_name(oss.str());
+    mLineWidth->set_value(backupSettings.lineWidth);
     mDialog->hide_all();
 }
 
@@ -135,7 +142,28 @@ void PreferencesBox::onButtonSelectedColorChange()
 
 void PreferencesBox::onButtonFontChange()
 {
+    /**
+     * get_font_name() returns the font name + style + size (ex: "Sans italic 12")
+     * but all we need is the name of the font "Sans". So we cut the string
+     * to keep only what we need.
+     */
+    std::vector< std::string > splitVec;
+    std::ostringstream oss;
     currentSettings.font = mFont->get_font_name();
+
+    boost::split(splitVec, currentSettings.font, boost::is_any_of(" "));
+    std::copy(splitVec.begin(),
+	      splitVec.end()-1,
+	      std::ostream_iterator<std::string>(oss, " " ));
+
+    currentSettings.font = oss.str();
+    currentSettings.fontSize = boost::lexical_cast<double>(
+	splitVec[splitVec.size() -1]);
+}
+
+void PreferencesBox::onLineWidthChange()
+{
+    currentSettings.lineWidth = mLineWidth->get_value();
 }
 
 void PreferencesBox::init()
@@ -173,26 +201,20 @@ void PreferencesBox::activate(const Settings& settings)
     color.m_b = settings.atomic.get_blue_p();
     mModeling->setAtomicColor(color);
 
-    /**
-     * setting.font contains the font name + style + size (ex: "Sans italic 12")
-     * but all we need is the name of the font "Sans". So we cut the string
-     * to keep only what we need.
-     */
-    std::vector< std::string > splitVec;
-    std::ostringstream oss;
-    boost::split(splitVec, settings.font, boost::is_any_of(" "));
-    std::copy(splitVec.begin(),
-	      splitVec.end()-1,
-	      std::ostream_iterator<std::string>(oss, " " ));
-    std::string fontName = oss.str();
-    mModeling->setFont(fontName);
+    mModeling->setFont(settings.font);
+    mModeling->setFontSize(settings.fontSize);
+
+    mModeling->setLineWidth(settings.lineWidth);
 
     mBackgroundColor->set_color(settings.background);
     mForegroundColor->set_color(settings.foreground);
     mAtomicColor->set_color(settings.atomic);
     mCoupledColor->set_color(settings.coupled);
     mSelectedColor->set_color(settings.selected);
-    mFont->set_font_name(settings.font);
+    std::ostringstream oss;
+    oss << settings.font.c_str() << " " << settings.fontSize;
+    mFont->set_font_name(oss.str());
+    mLineWidth->set_value(settings.lineWidth);
 }
 
 void PreferencesBox::copy(const Settings& src, Settings& dest)
@@ -203,6 +225,8 @@ void PreferencesBox::copy(const Settings& src, Settings& dest)
     dest.coupled    = src.coupled;
     dest.atomic     = src.atomic;
     dest.font       = src.font;
+    dest.fontSize   = src.fontSize;
+    dest.lineWidth  = src.lineWidth;
 }
 
 
@@ -229,6 +253,14 @@ void PreferencesBox::saveSettings()
     prefs.setAttributes("gvle.graphics",
 			"font",
 			currentSettings.font);
+    std::ostringstream oss;
+    oss << currentSettings.fontSize;
+    prefs.setAttributes("gvle.graphics", "fontSize", oss.str());
+
+    oss.str("");
+    oss << currentSettings.lineWidth;
+    prefs.setAttributes("gvle.graphics", "lineWidth", oss.str());
+
     prefs.save();
 }
 
@@ -243,6 +275,7 @@ void PreferencesBox::loadSettings()
     value = prefs.getAttributes("gvle.graphics", "background");
     currentSettings.background = (value.empty() ? mBackgroundColor->get_color()
 				  : makeColorFromString(value));
+
     value = prefs.getAttributes("gvle.graphics", "foreground");
     currentSettings.foreground = (value.empty()? mForegroundColor->get_color()
 				  : makeColorFromString(value));
@@ -260,8 +293,16 @@ void PreferencesBox::loadSettings()
 				: makeColorFromString(value));
 
     value = prefs.getAttributes("gvle.graphics", "font");
-    currentSettings.font = (value.empty() ? std::string(mFont->property_font_name().get_value())
+    currentSettings.font = (value.empty() ? std::string(mFont->get_font_name())
 			    : value);
+
+    value = prefs.getAttributes("gvle.graphics", "fontSize");
+    currentSettings.fontSize = (value.empty() ? 10.0
+			    : boost::lexical_cast<double>(value));
+
+    value = prefs.getAttributes("gvle.graphics", "lineWidth");
+    currentSettings.lineWidth = (value.empty() ? mLineWidth->get_value()
+			    : boost::lexical_cast<double>(value));
 
     copy(currentSettings, backupSettings);
 }
@@ -281,7 +322,9 @@ Gdk::Color PreferencesBox::makeColorFromString(const std::string& value)
 std::string PreferencesBox::makeStringFromColor(const Gdk::Color& color)
 {
     std::ostringstream oss;
-    oss << color.get_red_p() << " " << color.get_green_p() << " " << color.get_blue_p();
+    oss << color.get_red_p() << " "
+	<< color.get_green_p() << " "
+	<< color.get_blue_p();
     return oss.str();
 }
 

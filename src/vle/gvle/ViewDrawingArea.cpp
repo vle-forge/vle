@@ -143,7 +143,7 @@ void ViewDrawingArea::drawCurrentModelPorts()
     mContext->select_font_face(mModeling->getFont(),
 			  Cairo::FONT_SLANT_OBLIQUE,
 			  Cairo::FONT_WEIGHT_NORMAL);
-    mContext->set_font_size(12 * mZoom);
+    mContext->set_font_size(mModeling->getFontSize() * mZoom);
 
     itl = ipl.begin();
 
@@ -500,7 +500,7 @@ void ViewDrawingArea::drawHighlightConnection()
 {
     if (mHighlightLine != -1) {
 
-	mContext->set_line_width(3);
+	mContext->set_line_width(mModeling->getLineWidth());
 	mContext->set_line_cap(Cairo::LINE_CAP_ROUND);
 	mContext->set_line_join(Cairo::LINE_JOIN_ROUND);
 
@@ -513,11 +513,11 @@ void ViewDrawingArea::drawHighlightConnection()
 	}
 	mContext->stroke();
 
-	mContext->set_line_width(2);
+	mContext->set_line_width(mModeling->getLineWidth());
 	mContext->select_font_face(mModeling->getFont(),
 				   Cairo::FONT_SLANT_NORMAL,
 				   Cairo::FONT_WEIGHT_NORMAL);
-	mContext->set_font_size(10 * mZoom);
+	mContext->set_font_size(mModeling->getFontSize() * mZoom);
 
 	Cairo::TextExtents textExtents;
 	mContext->get_text_extents(mText[mHighlightLine],textExtents);
@@ -606,7 +606,7 @@ void ViewDrawingArea::drawChildrenPorts(graph::Model* model,
     mContext->select_font_face(mModeling->getFont(),
 			       Cairo::FONT_SLANT_OBLIQUE,
 			       Cairo::FONT_WEIGHT_NORMAL);
-    mContext->set_font_size(12 * mZoom);
+    mContext->set_font_size(mModeling->getFontSize() * mZoom);
 
     itl = ipl.begin();
 
@@ -672,7 +672,7 @@ void ViewDrawingArea::drawChildrenPorts(graph::Model* model,
     mContext->select_font_face(mModeling->getFont(),
 			       Cairo::FONT_SLANT_NORMAL,
 			       Cairo::FONT_WEIGHT_NORMAL);
-    mContext->set_font_size(12 * mZoom);
+    mContext->set_font_size(mModeling->getFontSize() * mZoom);
 
     mContext->move_to((int)((model->x() + (model->width() / 2)) * mZoom),
 		      (int)((model->y() + (model->height() * 1) +
@@ -920,6 +920,7 @@ bool ViewDrawingArea::on_expose_event(GdkEventExpose*)
         if (mBuffer) {
             if (mNeedRedraw) {
 		mContext = mBuffer->create_cairo_context();
+		mContext->set_line_width(mModeling->getLineWidth());
                 draw();
                 mNeedRedraw = false;
             }
@@ -1209,7 +1210,7 @@ void ViewDrawingArea::onZoom(int button)
 void ViewDrawingArea::addCoefZoom()
 {
     mZoom = (mZoom >= ZOOM_MAX) ? ZOOM_MAX : mZoom + ZOOM_FACTOR_SUP;
-    mContext->set_font_size(12 * mZoom);
+    mContext->set_font_size(mModeling->getFontSize() * mZoom);
     newSize();
 }
 
@@ -1219,14 +1220,14 @@ void ViewDrawingArea::delCoefZoom()
         mZoom = mZoom - ZOOM_FACTOR_SUP;
     else
         mZoom = (mZoom <= ZOOM_MIN) ? ZOOM_MIN : mZoom - ZOOM_FACTOR_INF;
-    mContext->set_font_size(12 * mZoom);
+    mContext->set_font_size(mModeling->getFontSize() * mZoom);
     newSize();
 }
 
 void ViewDrawingArea::restoreZoom()
 {
     mZoom = 1.0;
-    mContext->set_font_size(12);
+    mContext->set_font_size(mModeling->getFontSize());
     newSize();
 }
 
@@ -1240,7 +1241,7 @@ void ViewDrawingArea::selectZoom(int xmin, int ymin, int xmax, int ymax)
         mZoom = 0.1;
     if (mZoom >= 4.0)
         mZoom = 4.0;
-    mContext->set_font_size(12);
+    mContext->set_font_size(mModeling->getFontSize());
     newSize();
 
     mView->updateAdjustment(xmin * mZoom, ymin * mZoom);
