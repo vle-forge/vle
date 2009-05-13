@@ -258,7 +258,7 @@ namespace vle { namespace devs {
         std::list < std::map < Simulator*, EventBagModel >::value_type* > _exec;
         std::list < std::map < Simulator*, EventBagModel >::value_type* >::iterator _itexec;
 
-        std::vector < ObservationEvent* >                    _states;
+        ObservationEventList _states;
     };
 
     ///////////////////////////////////////////////////////////////////////////

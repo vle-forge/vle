@@ -91,14 +91,14 @@ BOOST_AUTO_TEST_CASE(value_integer)
 {
     const char* t1 = "<?xml version=\"1.0\"?>\n<integer>100</integer>";
     const char* t2 = "<?xml version=\"1.0\"?>\n<integer>-100</integer>";
-    char t3[1000];
-    char t4[1000];
+    const size_t bufferSize = 1000;
+    char t3[bufferSize];
+    char t4[bufferSize];
 
-
-    sprintf(t3, "<?xml version=\"1.0\"?>\n<integer>%s</integer>",
-            utils::to_string(std::numeric_limits< long >::max()).c_str());
-    sprintf(t4, "<?xml version=\"1.0\"?>\n<integer>%s</integer>",
-            utils::to_string(std::numeric_limits< long >::min()).c_str());
+    snprintf(t3, bufferSize, "<?xml version=\"1.0\"?>\n<integer>%s</integer>",
+             utils::to_string(std::numeric_limits< long >::max()).c_str());
+    snprintf(t4, bufferSize, "<?xml version=\"1.0\"?>\n<integer>%s</integer>",
+             utils::to_string(std::numeric_limits< long >::min()).c_str());
 
     value::Value* v;
 

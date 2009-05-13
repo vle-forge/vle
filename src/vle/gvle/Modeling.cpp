@@ -98,14 +98,10 @@ Modeling::~Modeling()
 {
     delete mModelTreeBox;
     delViews();
-    if (mAtomicBox)
-        delete mAtomicBox;
-    if (mImportBox)
-        delete mImportBox;
-    if (mCoupledBox)
-        delete mCoupledBox;
-    if (mModelClassBox)
-        delete mModelClassBox;
+    delete mAtomicBox;
+    delete mImportBox;
+    delete mCoupledBox;
+    delete mModelClassBox;
 }
 
 void Modeling::clearModeling()

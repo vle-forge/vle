@@ -61,8 +61,7 @@ ValueBox::ValueBox(value::Set* set):
 ValueBox::~ValueBox()
 {
     hide_all();
-    if (mTreeView)
-        delete mTreeView;
+    delete mTreeView;
 }
 
 void ValueBox::run()

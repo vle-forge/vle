@@ -73,16 +73,33 @@ void CompleteEventBagModel::invalidateModel(Simulator* mdl)
 
 void CompleteEventBagModel::delModel(Simulator* mdl)
 {
-    std::map < Simulator*, EventBagModel >::iterator it = _bags.find(mdl);
-    if (it != _bags.end()) {
-        it->second.clear();
-        _bags.erase(it);
+    {
+        std::map < Simulator*, EventBagModel >::iterator it = _bags.find(mdl);
+        if (it != _bags.end()) {
+            it->second.clear();
+            _bags.erase(it);
+        }
     }
 
-    for (std::vector < ObservationEvent* >::iterator it = _states.begin();
-         it != _states.end(); ++it) {
+    ObservationEventList::iterator it = _states.begin();
+    size_t previous = 0;
+
+    while (it != _states.end()) {
         if ((*it)->getModel() == mdl) {
-            _states.erase(it);
+            if (it == _states.begin()) {
+                _states.erase(it);
+                it = _states.begin();
+                previous = 0;
+            } else if (it == _states.end() - 1) {
+                _states.erase(it);
+                it = _states.end();
+            } else {
+                _states.erase(it);
+                it = _states.begin() + previous;
+            }
+        } else {
+            ++it;
+            ++previous;
         }
     }
 }

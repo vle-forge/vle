@@ -105,8 +105,8 @@ const Output& Outputs::get(const std::string& name) const
     return it->second;
 }
 
-void Outputs::rename(const std::string oldoutputname,
-		     const std::string newoutputname)
+void Outputs::rename(const std::string& oldoutputname,
+		     const std::string& newoutputname)
 {
     Output copy = get(oldoutputname);
     del(oldoutputname);

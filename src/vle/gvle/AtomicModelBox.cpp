@@ -745,17 +745,11 @@ AtomicModelBox::AtomicModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m)
 AtomicModelBox::~AtomicModelBox()
 {
     mDialog->hide_all();
-
-    if (mAtom_backup)
-        delete mAtom_backup;
-    if (mDyn_backup)
-        delete mDyn_backup;
-    if (mObs_backup)
-        delete mObs_backup;
-    if (mViews_backup)
-        delete mViews_backup;
-    if (mCond_backup)
-        delete mCond_backup;
+    delete mAtom_backup;
+    delete mDyn_backup;
+    delete mObs_backup;
+    delete mViews_backup;
+    delete mCond_backup;
 }
 
 void AtomicModelBox::show(vpz::AtomicModel& atom,  graph::AtomicModel& model)
@@ -772,36 +766,28 @@ void AtomicModelBox::show(vpz::AtomicModel& atom,  graph::AtomicModel& model)
     mOutputs = &mModeling->outputs();
 
     //Backup
-    if (mAtom_backup)
-        delete mAtom_backup;
+    delete mAtom_backup;
     mAtom_backup = new vpz::AtomicModel(atom);
 
-    if (mObs_backup)
-        delete mObs_backup;
+    delete mObs_backup;
     mObs_backup = new vpz::Observables(*mObs);
 
-    if (mDyn_backup)
-        delete mDyn_backup;
+    delete mDyn_backup;
     mDyn_backup = new vpz::Dynamics(*mDyn);
 
-    if (mCond_backup)
-        delete mCond_backup;
+    delete mCond_backup;
     mCond_backup = new vpz::Conditions(*mCond);
 
-    if (mViews_backup)
-        delete mViews_backup;
+    delete mViews_backup;
     mViews_backup = new vpz::Views(*mViews);
 
-    if (mOutputs_backup)
-        delete mOutputs_backup;
+    delete mOutputs_backup;
     mOutputs_backup = new vpz::Outputs(*mOutputs);
 
-    if (mConnection_in_backup)
-        delete mConnection_in_backup;
+    delete mConnection_in_backup;
     mConnection_in_backup = new graph::ConnectionList(model.getInputPortList());
 
-    if (mConnection_out_backup)
-        delete mConnection_out_backup;
+    delete mConnection_out_backup;
     mConnection_out_backup = new graph::ConnectionList(model.getOutputPortList());
 
     mInputPorts->setModel(&model);

@@ -130,8 +130,8 @@ AtomicModel& AtomicModelList::get(const graph::Model* atom)
     return it->second;
 }
 
-void AtomicModelList::updateCondition(const std::string oldname,
-				      const std::string newname)
+void AtomicModelList::updateCondition(const std::string& oldname,
+				      const std::string& newname)
 {
     for (iterator it = m_lst.begin(); it != m_lst.end(); ++it) {
         const std::list<std::string>& lstconds(it->second.conditions());

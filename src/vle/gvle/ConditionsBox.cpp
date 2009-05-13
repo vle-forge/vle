@@ -376,8 +376,7 @@ ConditionsBox::ConditionsBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
 
 ConditionsBox::~ConditionsBox()
 {
-    if (mBackup)
-        delete mBackup;
+    delete mBackup;
 }
 
 void ConditionsBox::buildTreeConditions()
@@ -411,8 +410,7 @@ void ConditionsBox::buildTreeValues(const std::string& conditionName,
 void ConditionsBox::show()
 {
     mConditions = &mModeling->conditions();
-    if (mBackup)
-        delete mBackup;
+    delete mBackup;
     mBackup = new vpz::Conditions(*mConditions);
 
     buildTreeConditions();

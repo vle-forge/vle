@@ -163,7 +163,8 @@ namespace vle { namespace vpz {
 	 * @param oldname The old name of the view attached to the port
 	 * @param newname The new name of the view attached to the port
 	 */
-	void updateView(const std::string oldname, const std::string newname);
+        void updateView(const std::string& oldname,
+                        const std::string& newname);
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *

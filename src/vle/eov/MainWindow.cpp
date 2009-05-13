@@ -165,9 +165,7 @@ void MainWindow::onQuit()
 	mThread->join();
     }
 
-    if (mNet) {
-	delete mNet;
-    }
+    delete mNet;
     mWindow->hide();
 }
 

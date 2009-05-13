@@ -133,14 +133,13 @@ void ModelFactory::createModel(Coordinator& coordinator,
                                const std::string& observable)
 {
     const SimulatorMap& result(coordinator.modellist());
-    Simulator* sim = new Simulator(model);
-
     if (result.find(model) != result.end()) {
         throw utils::InternalError(boost::format(
                 "The model '%1%' already exist in coordinator") %
             model->getName());
     }
 
+    Simulator* sim = new Simulator(model);
     coordinator.addModel(model, sim);
 
     vpz::ValueList initValues;

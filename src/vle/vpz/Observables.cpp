@@ -90,7 +90,8 @@ void Observables::cleanNoPermanent()
     }
 }
 
-void Observables::updateView(const std::string oldname, const std::string newname)
+void Observables::updateView(const std::string& oldname,
+                             const std::string& newname)
 {
     for (iterator itobs = m_list.begin(); itobs != m_list.end(); ++itobs) {
 	if (itobs->second.hasView(oldname)) {

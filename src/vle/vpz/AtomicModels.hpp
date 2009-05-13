@@ -218,8 +218,8 @@ namespace vle { namespace vpz {
 	 * @param oldname the old name of the condition.
 	 * @param newname the new name of the condition.
 	 */
-	void updateCondition(const std::string oldname,
-			     const std::string newname);
+	void updateCondition(const std::string& oldname,
+			     const std::string& newname);
 
         /**
          * @brief Check if the graph::AtomicModel exist into the

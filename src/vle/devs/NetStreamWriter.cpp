@@ -81,7 +81,7 @@ void NetStreamWriter::open(const std::string& plugin,
         throw utils::InternalError(boost::format(
                 "NetStreamWriter open: error opening the client connection "
                 "with the OOV plugin, hostname %1% type %2% port %3%. "
-                "Error reported: %4%") % host % location % file %
+                "Error reported: %4%") % host % location % port %
             e.what());
     }
 }

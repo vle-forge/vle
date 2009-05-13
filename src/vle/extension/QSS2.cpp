@@ -287,34 +287,26 @@ void qss2::minSigma()
 
 bool qss2::delta(double a,double b,double c,double& s)
 {
-    if (a!=0)
-    {
+    if (a!=0) {
         double d = b*b-4*a*c;
-        double s1,s2,temp;
+        double s1 ,s2;
 
         if (d<0) return false;
         s1 = (-b+sqrt(d))/(2*a);
         s2 = (-b-sqrt(d))/(2*a);
-        if (s2<s1)
-        {
-            temp = s1;
-            s1 = s2;
-            s2 = temp;
+        if (s2<s1) {
+            std::swap(s1, s2);
         }
-        if (s1>0)
-        {
+        if (s1>0) {
             s = s1;
             return true;
-        }
-        else
-            if (s2>0)
-            {
+        } else {
+            if (s2>0) {
                 s = s2;
                 return true;
             }
-    }
-    else
-    {
+        }
+    } else {
         if (b == 0) return false;
         s = -c/b;
         if (s>0) return true;

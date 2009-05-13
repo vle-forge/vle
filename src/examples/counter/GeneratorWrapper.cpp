@@ -46,9 +46,7 @@ GeneratorWrapper::GeneratorWrapper(const graph::AtomicModel& model,
 
 GeneratorWrapper::~GeneratorWrapper()
 {
-    if (m_generator) {
-        delete m_generator;
-    }
+    delete m_generator;
 }
 
 devs::Time GeneratorWrapper::init(const vle::devs::Time& /* time */)

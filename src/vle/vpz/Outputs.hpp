@@ -179,7 +179,8 @@ namespace vle { namespace vpz {
 	 * @param oldname the Output to rename
 	 * @param newname the new name for the Output
 	 */
-	void rename(const std::string oldoutputname, const std::string newoutputname);
+        void rename(const std::string& oldoutputname,
+                    const std::string& newoutputname);
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *

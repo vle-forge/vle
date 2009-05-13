@@ -140,12 +140,12 @@ GModel* Load::cloneModelToGModel(graph::Model* top, MapModelGModel& mmm,
     if (top) {
         if (top->isCoupled()) {
             graph::CoupledModel* topCoupled = graph::Model::toCoupled(top);
-            result = new GCoupledModel(parent, topCoupled, 0, 0);
 
             if (mmm.find(topCoupled) != mmm.end()) {
                 throw Exception::Parse("Cannot found a model to clone");
             }
 
+            result = new GCoupledModel(parent, topCoupled, 0, 0);
             graph::VectorModel children_list = topCoupled->getModelList();
             for (graph::VectorModel::const_iterator it = children_list.begin();
                     it != children_list.end(); ++it) {

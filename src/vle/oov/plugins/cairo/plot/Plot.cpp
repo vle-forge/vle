@@ -81,7 +81,6 @@ void Plot::onValue(const std::string& simulator,
                    const double& time,
                    value::Value* value)
 {
-    double min_date_curve;
     int nb_check_min_max = 0;
     bool calcul_new_min_max_no_scroll = false;
 
@@ -153,6 +152,7 @@ void Plot::onValue(const std::string& simulator,
 
 	//recalcul l'index de la 1ere valeur affichée
 	double min_draw_date;
+        double min_date_curve;
 	int min_index = mParameter.get_min_draw_index();
 
 	if (!mRealCurveList.empty()) {

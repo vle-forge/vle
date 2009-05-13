@@ -61,9 +61,7 @@ void Simulator::clear()
 
 void Simulator::addDynamics(Dynamics* dynamics)
 {
-    if (m_dynamics) {
-        delete m_dynamics;
-    }
+    delete m_dynamics;
     m_dynamics = dynamics;
 }
 

@@ -58,8 +58,6 @@ Hosts::~Hosts()
 
 void Hosts::read_file()
 {
-    Host tmp;
-
     Glib::ustring filename(get_hosts_filename());
     if (utils::exist_file(filename) == false) {
         xmlpp::Document doc;
@@ -70,6 +68,7 @@ void Hosts::read_file()
         host->set_attribute("PROCESS", "1");
         doc.write_to_file_formatted(filename);
     } else {
+        Host tmp;
         xmlpp::DomParser dom(get_hosts_filename());
         xmlpp::Element* elt = utils::xml::get_root_node(dom, "HOSTS");
         xmlpp::Node::NodeList lst = elt->get_children("HOST");

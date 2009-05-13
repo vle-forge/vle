@@ -129,8 +129,7 @@ void HostInformation::thread()
             mPing = true;
             mDaemon = true;
         } catch (std::exception& e) {
-            if (client)
-                delete client;
+            delete client;
             mPing = false;
             mDaemon = false;
         }

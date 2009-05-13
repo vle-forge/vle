@@ -211,11 +211,11 @@ std::string demangle(const std::string& in)
     char* output = NULL;
     int status;
     output = abi::__cxa_demangle(in.c_str(), NULL, NULL, &status);
-    if (status == 0 and output)
+    if (status == 0 and output) {
         result.assign(output);
+    }
 
-    if (output)
-        free(output);
+    free(output);
 #else
     result.assign(in);
 #endif

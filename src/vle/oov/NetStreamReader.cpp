@@ -50,9 +50,7 @@ NetStreamReader::NetStreamReader(int port) :
 
 NetStreamReader::~NetStreamReader()
 {
-    if (m_server) {
-        delete m_server;
-    }
+    delete m_server;
 }
 
 void NetStreamReader::process()
