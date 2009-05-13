@@ -233,6 +233,7 @@ namespace vle { namespace gvle {
         int                             mHeight;
         int                             mWidth;
         double                          mZoom;
+	double                          mOffset;
         Glib::RefPtr < Gdk::Pixmap >    mBuffer;
 	Cairo::RefPtr<Cairo::Context>   mContext;
         Glib::RefPtr < Gdk::Window >    mWin;

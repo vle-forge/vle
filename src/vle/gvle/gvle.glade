@@ -3900,7 +3900,7 @@ Geoffroy Weisenhorn &lt;geoffroy.weisenhorn@gmail.com&gt;</property>
                           <widget class="GtkHScale" id="HScalePreferencesLineWidth">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
-                            <property name="adjustment">5.9000000000000004 1 20 1 10 10</property>
+                            <property name="adjustment">2 1 20 1 10 10</property>
                           </widget>
                           <packing>
                             <property name="left_attach">1</property>
