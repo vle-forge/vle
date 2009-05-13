@@ -411,7 +411,7 @@ void GVLE::makeButtons()
 				 static_cast< Gdk::ModifierType >(0),
 				 Gtk::ACCEL_MASK);
     m_delete.add_accelerator("clicked", this->get_accel_group(),
-			     Gtk::AccelKey("F5").get_key(), 
+			     Gtk::AccelKey("F5").get_key(),
 			     static_cast< Gdk::ModifierType >(0),
 			     Gtk::ACCEL_MASK);
     m_zoom.add_accelerator("clicked", this->get_accel_group(),
@@ -622,9 +622,9 @@ void GVLE::onShowModelTreeView()
     m_modeling->toggleModelTreeBox();
 }
 
-void GVLE::onShowClassModelTreeView()
+void GVLE::onShowModelClassView()
 {
-    m_modeling->toggleClassModelTreeBox();
+    m_modeling->toggleModelClassBox();
 }
 
 void GVLE::onCloseAllViews()

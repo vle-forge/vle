@@ -26,164 +26,161 @@
 #include <vle/gvle/ModelClassBox.hpp>
 #include <vle/gvle/Modeling.hpp>
 #include <boost/algorithm/string/detail/trim.hpp>
+#include <boost/algorithm/string.hpp>
 #include <vle/gvle/View.hpp>
 
 namespace vle
 {
 namespace gvle {
 
-ModelClassBox::ClassTreeView::ClassTreeView(
-    BaseObjectType* cobject,
-    const Glib::RefPtr<Gnome::Glade::Xml>&):
-    Gtk::TreeView(cobject)
+ModelClassBox::ModelClassBox(Glib::RefPtr < Gnome::Glade::Xml > xml,
+			     Modeling* m):
+        mModeling(m),
+	mNewModelBox(new NewModelClassBox(xml,m)),
+        mClasses_backup(0)
 {
-    mRefTreeModel = Gtk::ListStore::create(mColumns);
-    set_model(mRefTreeModel);
-    append_column("Name", mColumns.m_col_name);
+    set_title("Model Class Tree");
+    set_default_size(200, 350);
+    set_border_width(5);
+    mScrolledWindow.add(mTreeView);
+    mScrolledWindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
 
-    {
-	Gtk::Menu::MenuList& menulist = mMenuPopup.items();
+    mRefTreeModel = Gtk::TreeStore::create(mColumns);
+    mTreeView.set_model(mRefTreeModel);
+    mTreeView.append_column("Name", mColumns.mName);
 
-	menulist.push_back(
+    mTreeView.signal_row_activated().connect(
+	sigc::mem_fun(*this, &ModelClassBox::row_activated));
+    mTreeView.signal_button_release_event().connect(
+	sigc::mem_fun(*this, &ModelClassBox::onButtonRealeaseModels));
+
+    mTreeView.expand_all();
+    mTreeView.set_rules_hint(true);
+    add(mScrolledWindow);
+    initMenuPopupModels();
+}
+
+void ModelClassBox::initMenuPopupModels()
+{
+    Gtk::Menu::MenuList& menulist(mMenuPopup.items());
+
+    menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
 		"_Add",
 		sigc::mem_fun(
 		    *this,
-		    &ModelClassBox::ClassTreeView::onAdd)));
+		    &ModelClassBox::onAdd)));
 
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
 		"_Remove",
 		sigc::mem_fun(
 		    *this,
-		    &ModelClassBox::ClassTreeView::onRemove)));
+		    &ModelClassBox::onRemove)));
 
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
 		"_Rename",
 		sigc::mem_fun(
 		    *this,
-		    &ModelClassBox::ClassTreeView::onRename)));
+		    &ModelClassBox::onRename)));
 
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
 		"_Export Class",
 		sigc::mem_fun(
 		    *this,
-		    &ModelClassBox::ClassTreeView::onExportVpz)));
-    }
+		    &ModelClassBox::onExportVpz)));
 
-    mMenuPopup.accelerate(*this);
+    mMenuPopup.accelerate(mTreeView);
 }
 
-ModelClassBox::ClassTreeView::~ClassTreeView()
+ModelClassBox::~ModelClassBox()
 {
+    hide_all();
+    delete mNewModelBox;
 }
 
-bool ModelClassBox::ClassTreeView::on_button_press_event(
-    GdkEventButton* event)
+void ModelClassBox::hide()
 {
-    bool return_value = TreeView::on_button_press_event(event);
-    if ( (event->type == GDK_BUTTON_PRESS) && (event->button == 3) ) {
+    hide_all();
+}
+
+bool ModelClassBox::onButtonRealeaseModels(GdkEventButton* event)
+{
+    if (event->button == 3) {
 	mMenuPopup.popup(event->button, event->time);
     }
-    if ( (event->type == GDK_2BUTTON_PRESS) ) {
-	 Glib::RefPtr<Gtk::TreeView::Selection> refSelection =  get_selection();
-	 if (refSelection) {
-	     Gtk::TreeModel::iterator iter = refSelection->get_selected();
-	     if (iter) {
-		 Gtk::TreeModel::Row row = *iter;
-		 mModeling->addViewClass(
-		     mModeling->getClassModel(row.get_value(mColumns.m_col_name)),
-		     row.get_value(mColumns.m_col_name));
-	     }
-	 }
-    }
-    return return_value;
+    return true;
 }
 
-void ModelClassBox::ClassTreeView::build()
-{
-    using namespace vpz;
-    mRefTreeModel->clear();
-
-    ClassList& class_list = mModeling->vpz().project().classes().list();
-    ClassList::iterator it = class_list.begin();
-    while (it != class_list.end()) {
-        Gtk::TreeModel::Row row = *(mRefTreeModel->append());
-        row[mColumns.m_col_name] = it->first;
-
-        ++it;
-    }
-}
-
-void ModelClassBox::ClassTreeView::onAdd()
+void ModelClassBox::onAdd()
 {
     mNewModelBox->run();
-    build();
+    parseClass();
 }
 
-void ModelClassBox::ClassTreeView::onRemove()
+void ModelClassBox::onRemove()
 {
-    Glib::RefPtr<Gtk::TreeView::Selection> refSelection =  get_selection();
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection =  mTreeView.get_selection();
     if (refSelection) {
         Gtk::TreeModel::iterator iter = refSelection->get_selected();
-        if (iter) {
-            Gtk::TreeModel::Row row = *iter;
+        if (iter and (mRefTreeModel->iter_depth(iter) == 0)) {
+	    Gtk::TreeModel::Row row = *iter;
 
             vpz::Class& class_ = mModeling->vpz().project().classes().get(
-		row.get_value(mColumns.m_col_name));
+		row.get_value(mColumns.mName));
             if (class_.model()->isCoupled()) {
                 graph::CoupledModel* c_model = dynamic_cast<graph::CoupledModel*>(class_.model());
                 if (mModeling->existView(c_model)) {
                     mModeling->delViewOnModel(c_model);
                 }
             }
-            mModeling->vpz().project().classes().del(row.get_value(mColumns.m_col_name));
-            build();
+            mModeling->vpz().project().classes().del(row.get_value(mColumns.mName));
+	    parseClass();
         }
     }
 }
 
-void ModelClassBox::ClassTreeView::onRename()
+void ModelClassBox::onRename()
 {
-    SimpleTypeBox box("Name of the Classe ?");
-    std::string name = boost::trim_copy(box.run());
-    Glib::RefPtr<Gtk::TreeView::Selection> refSelection =  get_selection();
-    if (refSelection and box.valid() and not name.empty()) {
-        Gtk::TreeModel::iterator iter = refSelection->get_selected();
-        if (iter) {
-            Gtk::TreeModel::Row row = *iter;
-	    vpz::Class& oldClass = mModeling->vpz().project().classes().get(
-		row.get_value(mColumns.m_col_name));
-	    graph::Model* model = oldClass.model();
-	    vpz::AtomicModelList& atomicModel = oldClass.atomicModels();
-	    mModeling->vpz().project().classes().add(name);
-	    mModeling->vpz().project().classes().get(name).setModel(model);
-	    mModeling->vpz().project().classes().get(name).setAtomicModel(atomicModel);
+   SimpleTypeBox box("Name of the Classe ?");
+   std::string name = boost::trim_copy(box.run());
+   Glib::RefPtr<Gtk::TreeView::Selection> refSelection =  mTreeView.get_selection();
+   if (refSelection and box.valid() and not name.empty()) {
+       Gtk::TreeModel::iterator iter = refSelection->get_selected();
+       if (iter and (mRefTreeModel->iter_depth(iter) == 0)) {
+	   Gtk::TreeModel::Row row = *iter;
+	   vpz::Class& oldClass = mModeling->vpz().project().classes().get(
+	       row.get_value(mColumns.mName));
+	   graph::Model* model = oldClass.model();
+	   vpz::AtomicModelList& atomicModel = oldClass.atomicModels();
+	   mModeling->vpz().project().classes().add(name);
+	   mModeling->vpz().project().classes().get(name).setModel(model);
+	   mModeling->vpz().project().classes().get(name).setAtomicModel(atomicModel);
 
-	    if (oldClass.model()->isCoupled()) {
-                graph::CoupledModel* c_model = dynamic_cast<graph::CoupledModel*>(oldClass.model());
-                if (mModeling->existView(c_model)) {
-                    mModeling->delViewOnModel(c_model);
-                }
-            }
-	    mModeling->vpz().project().classes().get(row.get_value(mColumns.m_col_name)).setModel(0);
-            mModeling->vpz().project().classes().del(row.get_value(mColumns.m_col_name));
-            build();
-	}
-    }
+	   if (oldClass.model()->isCoupled()) {
+	       graph::CoupledModel* c_model = dynamic_cast<graph::CoupledModel*>(oldClass.model());
+	       if (mModeling->existView(c_model)) {
+		   mModeling->delViewOnModel(c_model);
+	       }
+	   }
+	   mModeling->vpz().project().classes().get(row.get_value(mColumns.mName)).setModel(0);
+	   mModeling->vpz().project().classes().del(row.get_value(mColumns.mName));
+	   parseClass();
+       }
+   }
 }
 
-void ModelClassBox::ClassTreeView::onExportVpz()
+void ModelClassBox::onExportVpz()
 {
-    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = mTreeView.get_selection();
     if (refSelection) {
 	Gtk::TreeModel::iterator iter = refSelection->get_selected();
-	if (iter) {
+	if (iter and (mRefTreeModel->iter_depth(iter) == 0)) {
 	    Gtk::TreeModel::Row row = *iter;
 	    vpz::Class& currentClass = mModeling->vpz().project().classes().get(
-		row.get_value(mColumns.m_col_name));
+		row.get_value(mColumns.mName));
 	    graph::Model* model = currentClass.model();
 
 	    Gtk::FileChooserDialog file("VPZ file", Gtk::FILE_CHOOSER_ACTION_SAVE);
@@ -211,39 +208,101 @@ void ModelClassBox::ClassTreeView::onExportVpz()
     }
 }
 
-ModelClassBox::ModelClassBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m):
-        mXml(xml),
-        mModeling(m),
-        mNewModelBox(new NewModelClassBox(xml,m)),
-        mClasses_backup(0)
+void ModelClassBox::parseClass()
 {
-    xml->get_widget("WindowModelClass", mWindow);
+    mRefTreeModel->clear();
 
-    xml->get_widget_derived("TreeViewModelClass", mClass);
+    vpz::Classes::iterator iter = mModeling->vpz().project().classes().begin();
+    while (iter != mModeling->vpz().project().classes().end()) {
+	Gtk::TreeModel::Row row = addClass(mModeling->vpz().project().classes().get(
+					       iter->second.name()));
+	graph::Model* top = mModeling->vpz().project().classes().get(iter->second.name()).model();
+	Gtk::TreeModel::Row row2 = addSubModel(row, top);
+	if (top->isCoupled()) {
+	    parseModel(row2,  (graph::CoupledModel*)top);
+	}
+	++iter;
+    }
+    mTreeView.expand_all();
 }
 
-ModelClassBox::~ModelClassBox()
+Gtk::TreeModel::Row
+ModelClassBox::addClass(vpz::Class& classe)
 {
-    mWindow->hide_all();
-
-    delete mNewModelBox;
+    Gtk::TreeModel::Row row = *(mRefTreeModel->append());
+    row[mColumns.mName] = classe.name();
+    return row;
 }
 
-void ModelClassBox::show()
+Gtk::TreeModel::Row
+ModelClassBox::addSubModel(Gtk::TreeModel::Row tree, graph::Model* model)
 {
-    using namespace vpz;
-
-    mClasses_backup = new vpz::ClassList(mModeling->vpz().project().classes().list());
-    mClass->setModel(mModeling);
-    mClass->setBox(mNewModelBox);
-    mClass->build();
-
-    mWindow->show_all();
+    Gtk::TreeModel::Row row = *(mRefTreeModel->append(tree.children()));
+    row[mColumns.mName] = model->getName();
+    row[mColumns.mModel] = model;
+    return row;
 }
 
-void ModelClassBox::hide()
+void ModelClassBox::parseModel(Gtk::TreeModel::Row row,
+                              const graph::CoupledModel* top)
 {
-    mWindow->hide_all();
+    const graph::ModelList& list = top->getModelList();
+    graph::ModelList::const_iterator it = list.begin();
+
+    while (it != list.end()) {
+        Gtk::TreeModel::Row row2 = addSubModel(row, it->second);
+        if (it->second->isCoupled() == true) {
+            parseModel(row2, (graph::CoupledModel*)it->second);
+        }
+        ++it;
+    }
+}
+
+bool ModelClassBox::on_key_release_event(GdkEventKey* event)
+{
+    if (((event->state & GDK_CONTROL_MASK) and event->keyval == GDK_w) or
+            (event->keyval == GDK_Escape)) {
+        mModeling->hideModelClassBox();
+    }
+    return true;
+}
+
+void ModelClassBox::showRow(const std::string& model_name)
+{
+    mSearch.assign(model_name);
+    mRefTreeModel->foreach(sigc::mem_fun(*this, &ModelClassBox::on_foreach));
+}
+
+void ModelClassBox::row_activated(const Gtk::TreeModel::Path& path,
+                                 Gtk::TreeViewColumn* column)
+{
+    if (column) {
+        Gtk::TreeIter iter = mRefTreeModel->get_iter(path);
+        Gtk::TreeRow row = (*iter);
+	if (mRefTreeModel->iter_depth(iter) == 0) {
+	    mModeling->addViewClass(mModeling->getClassModel(row.get_value(mColumns.mName)),
+				    row.get_value(mColumns.mName));
+	} else {
+	    std::vector <std::string> Vec;
+	    Glib::ustring str = path.to_string();
+	    boost::split(Vec, str, boost::is_any_of(":"));
+	    Gtk::TreeIter iterClass = mRefTreeModel->get_iter(Vec[0]);
+	    Gtk::TreeRow rowClass = (*iterClass);
+	    mModeling->addViewClass(row.get_value(mColumns.mModel),
+				    rowClass.get_value(mColumns.mName));
+	}
+    }
+}
+
+
+bool ModelClassBox::on_foreach(const Gtk::TreeModel::Path&,
+                              const Gtk::TreeModel::iterator& iter)
+{
+    if ((*iter).get_value(mColumns.mName) == mSearch) {
+        mTreeView.set_cursor(mRefTreeModel->get_path(iter));
+        return true;
+    }
+    return false;
 }
 
 }

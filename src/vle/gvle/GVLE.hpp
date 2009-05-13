@@ -313,7 +313,7 @@ public:
      * When click on Show deconnected models Treeview menu.
      *
      */
-    void onShowClassModelTreeView();
+    void onShowModelClassView();
 
     /**
      * @brief Delete all gvle::View from the gvle::Modeling object.

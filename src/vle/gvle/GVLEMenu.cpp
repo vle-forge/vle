@@ -88,7 +88,7 @@ void GVLEMenu::makeMenuView(GVLE* gvle)
 
     menulist.push_back(Gtk::Menu_Helpers::MenuElem("_Class models",
                        Gtk::AccelKey(GDK_M, Gdk::CONTROL_MASK),
-                       sigc::mem_fun(gvle, &GVLE::onShowClassModelTreeView)));
+                       sigc::mem_fun(gvle, &GVLE::onShowModelClassView)));
 
     menulist.push_back(Gtk::Menu_Helpers::SeparatorElem());
 

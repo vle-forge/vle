@@ -310,6 +310,7 @@ void View::onCutModel()
     mModeling->setModified(true);
     mModeling->cut(mSelectedModels, mCurrent, mCurrentClass);
     mModeling->redrawModelTreeBox();
+    mModeling->redrawModelClassBox();
     mSelectedModels.clear();
     mDrawing->queue_draw();
 }
@@ -328,6 +329,7 @@ void View::onPasteModel()
     mModeling->setModified(true);
     mModeling->paste(mCurrent, mCurrentClass);
     mModeling->redrawModelTreeBox();
+    mModeling->redrawModelClassBox();
     mDrawing->queue_draw();
 }
 
@@ -356,6 +358,7 @@ void View::addAtomicModel(int x, int y)
     }
     delete box;
     mModeling->redrawModelTreeBox();
+    mModeling->redrawModelClassBox();
 }
 
 void View::addPluginModel(int /*x*/, int /*y*/)
@@ -368,19 +371,15 @@ void View::addCoupledModel(int x, int y)
     ModelDescriptionBox* box;
     box = new ModelDescriptionBox(mModeling->getNames());
     if (box->run()) {
-	graph::CoupledModel* new_gc = mModeling->newCoupledModel(
-	    mCurrent, box->getName(), "", x, y);
-	new_gc->setSize(ViewDrawingArea::MODEL_WIDTH,
-			ViewDrawingArea::MODEL_HEIGHT);
-	try {
-	    mCurrent->displace(mSelectedModels, new_gc);
-	} catch(std::exception& e) {
-	    std::cout << e.what() << std::endl;
-	    mModeling->delViewOnModel(new_gc);
-	    mCurrent->delModel(new_gc);
-	}
-	mModeling->redrawModelTreeBox();
-	mSelectedModels.clear();
+        graph::CoupledModel* new_gc =
+            mModeling->newCoupledModel(mCurrent, box->getName(),
+                                       "", x, y);
+        new_gc->setSize(ViewDrawingArea::MODEL_WIDTH,
+                        ViewDrawingArea::MODEL_HEIGHT);
+        mCurrent->displace(mSelectedModels, new_gc);
+        mModeling->redrawModelTreeBox();
+	mModeling->redrawModelClassBox();
+        mSelectedModels.clear();
     }
     delete box;
 }
@@ -408,6 +407,7 @@ void View::delModel(graph::Model* model)
             mModeling->delModel(model, mCurrentClass);
             mCurrent->delModel(model);
             mModeling->redrawModelTreeBox();
+	    mModeling->redrawModelClassBox();
         }
     }
 }

@@ -52,7 +52,6 @@ Modeling::Modeling(GVLE* gvle, const string& filename) :
     mTop(NULL),
     mGVLE(gvle),
     mModelTreeBox(new ModelTreeBox(this)),
-    //mClassModelTreeBox(new ClassModelTreeBox(this)),
     mModelClassBox(0),
     mIsModified(false),
     mIsSaved(false),
@@ -567,44 +566,41 @@ void Modeling::showRowTreeBox(const std::string& name)
     mModelTreeBox->showRow(name);
 }
 
-void Modeling::redrawClassModelTreeBox()
+
+void Modeling::redrawModelClassBox()
 {
-    std::cout << "TODO: redrawModelClassBox\n";
-    //mClassModelTreeBox->parseModel();
+    mModelClassBox->parseClass();
 }
 
-void Modeling::showClassModelTreeBox()
+void Modeling::showModelClassBox()
 {
-    //redrawClassModelTreeBox();
-    //mClassModelTreeBox->show_all();
-    mModelClassBox->show();
+    redrawModelClassBox();
+    mModelClassBox->show_all();
 }
 
 void Modeling::hideClassModelTreeBox()
 {
-    //redrawClassModelTreeBox();
     //mClassModelTreeBox->hide();
+}
+
+void Modeling::hideModelClassBox()
+{
+    redrawModelClassBox();
     mModelClassBox->hide();
 }
 
-void Modeling::toggleClassModelTreeBox()
+void Modeling::toggleModelClassBox()
 {
-    //if (mClassModelTreeBox->is_visible()) {
-    //  hideClassModelTreeBox();
-    //} else {
-    //  showClassModelTreeBox();
-    //}
-
     if (mModelClassBox->is_visible()) {
-        hideClassModelTreeBox();
+        hideModelClassBox();
     } else {
-        showClassModelTreeBox();
+        showModelClassBox();
     }
 }
 
-void Modeling::showRowClassModelTreeBox(const std::string& /*name*/)
+void Modeling::showRowModelClassBox(const std::string& name)
 {
-    //mClassModelTreeBox->showRow(name);
+    mModelClassBox->showRow(name);
 }
 
 bool Modeling::exist(const std::string& name) const

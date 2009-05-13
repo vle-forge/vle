@@ -37,66 +37,104 @@ namespace gvle {
 
 class Modeling;
 
-class ModelClassBox : public Gtk::TreeView
+/**
+ * @brief A Gtk::Window to show the vpz::Class hierarchy into a window.
+ */
+class ModelClassBox : public Gtk::Window
 {
 public:
-    ModelClassBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m);
+    /**
+     * make a new Window show complete class and model tree read from Modeling
+     *
+     * @param m where to get model information
+     */
+    ModelClassBox(Glib::RefPtr < Gnome::Glade::Xml > xml, Modeling* m);
 
     ~ModelClassBox();
 
-    void show();
-
     void hide();
 
-    bool is_visible() {
-        return mWindow->is_visible();
-    }
+    /**
+     * Show in the TextView the class Tree
+     */
+    void parseClass();
+    Gtk::TreeModel::Row addClass(vpz::Class& classe);
+
+    virtual void onAdd();
+    virtual void onRemove();
+    virtual void onRename();
+    virtual void onExportVpz();
+
+    void showRow(const std::string& model_name);
 
 protected:
+    /**
+     * When user press ECHAP or CTRL-W, we close window
+     *
+     * @param event to select key press
+     * @return true
+     */
+    bool on_key_release_event(GdkEventKey* event);
 
-class ModelColumns : public Gtk::TreeModelColumnRecord
+    /**
+     * a recursive function to complete tree
+     *
+     * @param row
+     * @param top
+     */
+    void parseModel(Gtk::TreeModel::Row row,
+                    const graph::CoupledModel* top);
+
+    /**
+     * Add a new row to the child of row tree with model name and
+     *
+     * @param tree parent's row to add model
+     * @param name model's name
+     *
+     * @return A Row to the child of Row tree
+     */
+    Gtk::TreeModel::Row addSubModel(Gtk::TreeModel::Row tree,
+                                    graph::Model* model);
+
+    /**
+     * slot call function to call set cursor on a row
+     *
+     * @param iter iterator to test
+     * @return true if found, otherwise false
+     */
+    bool on_foreach(const Gtk::TreeModel::Path&,
+                    const Gtk::TreeModel::iterator& iter);
+
+    /**
+     * on activated a row, Modeling is all to show a new View centered on
+     * graph::CoupledModel or AtomicModelBox if model is a
+     * graph::AtomicModel.
+     *
+     * @param path
+     * @param column
+     */
+    void row_activated(const Gtk::TreeModel::Path& path,
+                       Gtk::TreeViewColumn* column);
+
+
+    class ModelColumns : public Gtk::TreeModelColumnRecord
     {
     public:
         ModelColumns() {
-            add(m_col_name);
+            add(mName);
+	    add(mModel);
         }
 
-        Gtk::TreeModelColumn<Glib::ustring> m_col_name;
+        Gtk::TreeModelColumn<Glib::ustring> mName;
+	Gtk::TreeModelColumn <graph::Model*> mModel;
     };
 
     ModelColumns mColumns;
 
 private:
 
-    class ClassTreeView : public Gtk::TreeView
-    {
-    public:
-	ClassTreeView(BaseObjectType* cobject,
-		      const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
-	virtual ~ClassTreeView();
-
-	void build();
-	void setModel(Modeling* modeling)
-	    { mModeling = modeling; }
-
-	void setBox(NewModelClassBox* newModelBox)
-	    { mNewModelBox = newModelBox; }
-
-
-    protected:
-	virtual bool on_button_press_event(GdkEventButton *ev);
-	virtual void onAdd();
-	virtual void onRemove();
-	virtual void onRename();
-	virtual void onExportVpz();
-
-    private:
-	Modeling* mModeling;
-	Gtk::Menu mMenuPopup;
-	ModelColumns mColumns;
-	Glib::RefPtr<Gtk::ListStore> mRefTreeModel;
-	NewModelClassBox* mNewModelBox;
-    };
+    void initMenuPopupModels();
+    bool onButtonRealeaseModels(GdkEventButton *event);
 
     Glib::RefPtr<Gnome::Glade::Xml>      mXml;
     Modeling*                            mModeling;
@@ -105,12 +143,10 @@ private:
 
     //Backup
     vpz::ClassList*                      mClasses_backup;
-
-    Gtk::Window*                         mWindow;
-    Gtk::TreeView*                       mTreeView;
-    Glib::RefPtr<Gtk::ListStore>         mRefTreeModel;
-
-    ClassTreeView*                       mClass;
+    Gtk::TreeView                        mTreeView;
+    Glib::RefPtr<Gtk::TreeStore>         mRefTreeModel;
+    Gtk::ScrolledWindow                  mScrolledWindow;
+    std::string                          mSearch;
 };
 
 }

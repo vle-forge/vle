@@ -478,14 +478,19 @@ public:
      *******************************************************************/
 
     /**
-     * need to redraw ClassModelTreeBox if exist.
+     * need to redraw ModelClassBox if exist.
      */
-    void redrawClassModelTreeBox();
+    void redrawModelClassBox();
 
     /**
-     * show ClassModelTreeBox window.
+     * show ModelClassBox window.
      */
-    void showClassModelTreeBox();
+    void showModelClassBox();
+
+    /**
+     * hide ModelClassBox window.
+     */
+    void hideModelClassBox();
 
     /**
      * hide ClassModelTreeBox window.
@@ -493,18 +498,17 @@ public:
     void hideClassModelTreeBox();
 
     /**
-     * toggle show/hide ClassModelTreeBox window.
+     * toggle show/hide ModelClassBox window.
      */
-    void toggleClassModelTreeBox();
+    void toggleModelClassBox();
 
     /**
-     * active a row into ClassTreeBox for a particular string, all activated
+     * active a row into ModelClassBox for a particular string, all activated
      * row area hide.
      *
      * @param name class name to activate.
      */
-    void showRowClassModelTreeBox(const std::string& name);
-
+    void showRowModelClassBox(const std::string& name);
 
     /********************************************************************
      *
