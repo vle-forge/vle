@@ -49,8 +49,8 @@ void Default::onParameter(const std::string& plugin,
     m_file.open(m_filename.c_str());
 
     if (not m_file.is_open()) {
-        throw utils::ModellingError(boost::format(
-            "SimpleFile: cannot open file '%1%'") % m_filename);
+        throw utils::ModellingError(fmt(
+            _("SimpleFile: cannot open file '%1%'")) % m_filename);
     }
 
     m_file << time << ": parameter "

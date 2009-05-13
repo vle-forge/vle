@@ -47,19 +47,19 @@ public:
         Glib::OptionEntry entry1;
         entry1.set_long_name("infos");
         entry1.set_short_name('i');
-        entry1.set_description("Information on GVLE.");
+        entry1.set_description(_("Information on GVLE."));
         add_entry(entry1, mInfo);
 
         Glib::OptionEntry entry2;
         entry2.set_long_name("version");
         entry2.set_short_name('v');
-        entry2.set_description("Version information.");
+        entry2.set_description(_("Version information."));
         add_entry(entry2, mVersion);
 
 	Glib::OptionEntry entry3;
 	entry3.set_long_name("verbose level");
 	entry3.set_short_name('V');
-	entry3.set_description("[int] [0-3] min to max verbose.");
+	entry3.set_description(_("[int] [0-3] min to max verbose."));
 	add_entry(entry3, mLevel);
     }
 
@@ -83,11 +83,11 @@ int main(int argc, char** argv)
     try {
         context.parse(argc, argv);
     } catch (const Glib::Error& e) {
-        std::cerr << "Error parsing command line: " << e.what() << std::endl;
+        std::cerr << _("Error parsing command line: ") << e.what() << std::endl;
         vle::utils::finalize();
         return EXIT_FAILURE;
     } catch (const std::exception& e) {
-        std::cerr << "Error parsing command line: " << e.what() << std::endl;
+        std::cerr << _("Error parsing command line: ") << e.what() << std::endl;
         vle::utils::finalize();
         return EXIT_FAILURE;
     }
@@ -99,10 +99,10 @@ int main(int argc, char** argv)
 
     bool result = true;
     if (group.mInfo) {
-        std::cerr << "GVLE - the Gui of VLE\n";
+        std::cerr << _("GVLE - the Gui of VLE\n");
         vle::utils::printInformations(std::cerr);
     } else if (group.mVersion) {
-        std::cerr << "GVLE - the Gui of VLE\n";
+        std::cerr << _("GVLE - the Gui of VLE\n");
 	vle::utils::printVersion(std::cerr);
     } else {
 	try {
@@ -115,11 +115,11 @@ int main(int argc, char** argv)
 	    delete g;
         } catch(const Glib::Exception& e) {
             result = false;
-            std::cerr << "\n/!\\ eov Glib error reported: " <<
+            std::cerr << _("\n/!\\ eov Glib error reported: ") <<
                 vle::utils::demangle(typeid(e)) << "\n" << e.what();
         } catch(const std::exception& e) {
             result = false;
-            std::cerr << "\n/!\\ eov exception reported: " <<
+            std::cerr << _("\n/!\\ eov exception reported: ") <<
                 vle::utils::demangle(typeid(e)) << "\n" << e.what();
         }
     }

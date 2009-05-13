@@ -93,7 +93,7 @@ void Map::writeXml(std::ostream& out) const
 void Map::add(const std::string& name, Value* value)
 {
     if (not value) {
-        throw utils::ArgError("Map: add empty value");
+        throw utils::ArgError(_("Map: add empty value"));
     }
 
     iterator it = m_value.find(name);
@@ -119,8 +119,8 @@ void Map::addClone(const std::string& name, const Value& value)
 void Map::addClone(const std::string& name, const Value* value)
 {
     if (not value) {
-        throw utils::ArgError(boost::format(
-                "Map: add empty value with key '%1%'") % name);
+        throw utils::ArgError(fmt(_(
+                "Map: add empty value with key '%1%'")) % name);
     }
 
     iterator it = m_value.find(name);
@@ -137,8 +137,8 @@ const Value& Map::operator[](const std::string& name) const
     const_iterator it = m_value.find(name);
 
     if (it == m_value.end()) {
-        throw utils::ArgError(boost::format(
-                "Map: the key '%1%' does not exist") % name);
+        throw utils::ArgError(fmt(_(
+                "Map: the key '%1%' does not exist")) % name);
     }
 
     assert(it->second);
@@ -150,8 +150,8 @@ Value& Map::operator[](const std::string& name)
     iterator it = m_value.find(name);
 
     if (it == m_value.end()) {
-        throw utils::ArgError(boost::format(
-                "Map: the key '%1%' does not exist") % name);
+        throw utils::ArgError(fmt(_(
+                "Map: the key '%1%' does not exist")) % name);
     }
 
     assert((*it).second);
@@ -163,8 +163,8 @@ const Value& Map::get(const std::string& name) const
     const_iterator it = m_value.find(name);
 
     if (it == m_value.end()) {
-        throw utils::ArgError(boost::format(
-                "Map: the key '%1%' does not exist") % name);
+        throw utils::ArgError(fmt(_(
+                "Map: the key '%1%' does not exist")) % name);
     }
 
     assert((*it).second);
@@ -176,8 +176,8 @@ Value& Map::get(const std::string& name)
     iterator it = m_value.find(name);
 
     if (it == m_value.end()) {
-        throw utils::ArgError(boost::format(
-                "Map: the key '%1%' does not exist") % name);
+        throw utils::ArgError(fmt(_(
+                "Map: the key '%1%' does not exist")) % name);
     }
 
     assert((*it).second);
@@ -189,8 +189,8 @@ Value* Map::give(const std::string& name)
     iterator it = m_value.find(name);
 
     if (it == m_value.end()) {
-        throw utils::ArgError(boost::format(
-                "Map: the key '%1%' does not exist") % name);
+        throw utils::ArgError(fmt(_(
+                "Map: the key '%1%' does not exist")) % name);
     }
 
     Value* result = it->second;

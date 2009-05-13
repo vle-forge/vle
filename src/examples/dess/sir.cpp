@@ -50,7 +50,7 @@ double sir::compute(unsigned int i, const devs::Time& /* time */) const
     case 2: // R
 	return a * I();
     default:
-	throw utils::InternalError(boost::format(
+	throw utils::InternalError(fmt(
 		  "Compute problem with sir model, i == %1%") % i );
     }
 }

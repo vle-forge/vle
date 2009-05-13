@@ -86,8 +86,8 @@ namespace vle { namespace extension {
             virtual double operator()() const
             {
                 if (not mEquation) {
-                    throw utils::InternalError(
-                        "DifferentialEquation - variable not create");
+                    throw utils::InternalError(_(
+                        "DifferentialEquation - variable not create"));
                 }
                 return mEquation->getValue();
             }
@@ -101,8 +101,8 @@ namespace vle { namespace extension {
                                       int delay) const
             {
                 if (not mEquation) {
-                    throw utils::InternalError(
-                        "DifferentialEquation - variable not create");
+                    throw utils::InternalError(_(
+                        "DifferentialEquation - variable not create"));
                 }
                 return mEquation->getValue(time, delay);
             }
@@ -112,9 +112,9 @@ namespace vle { namespace extension {
                 Variable(name, equation)
             {
                 if (name != equation->mVariableName) {
-                    throw utils::InternalError(boost::format(
+                    throw utils::InternalError(fmt(_(
                             "DifferentialEquation - wrong variable " \
-                            "name: %1% in %2%") % name %
+                            "name: %1% in %2%")) % name %
                         equation->mVariableName);
                 }
             }
@@ -143,8 +143,8 @@ namespace vle { namespace extension {
             virtual double operator()() const
             {
                 if (not mEquation) {
-                    throw utils::InternalError(
-                        "DifferentialEquation - variable not create");
+                    throw utils::InternalError(_(
+                        "DifferentialEquation - variable not create"));
                 }
                 return mEquation->getValue(mName);
             }
@@ -158,8 +158,8 @@ namespace vle { namespace extension {
                                       int delay) const
             {
                 if (not mEquation) {
-                    throw utils::InternalError(
-                        "DifferentialEquation - variable not create");
+                    throw utils::InternalError(_(
+                        "DifferentialEquation - variable not create"));
                 }
                 return mEquation->getValue(mName, time, delay);
             }

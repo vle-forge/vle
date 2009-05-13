@@ -74,9 +74,9 @@ bool ParameterExecutionBox::run()
 
 void ParameterExecutionBox::buildInterface()
 {
-    Gtk::Frame* local = Gtk::manage(new Gtk::Frame("Local execution"));
-    Gtk::Label* labelPath = Gtk::manage(new Gtk::Label("VLE binary path:"));
-    Gtk::Button* buttonPath = Gtk::manage(new Gtk::Button(" ... "));
+    Gtk::Frame* local = Gtk::manage(new Gtk::Frame(_("Local execution")));
+    Gtk::Label* labelPath = Gtk::manage(new Gtk::Label(_("VLE binary path:")));
+    Gtk::Button* buttonPath = Gtk::manage(new Gtk::Button(_(" ... ")));
     Gtk::HBox* HBoxPath = Gtk::manage(new Gtk::HBox());
     mEntryPath = Gtk::manage(new Gtk::Entry());
     //mEntryPath->set_text(
@@ -88,8 +88,8 @@ void ParameterExecutionBox::buildInterface()
     local->add(*HBoxPath);
     local->set_border_width(3);
 
-    Gtk::Frame* remote = Gtk::manage(new Gtk::Frame("Remote execution"));
-    Gtk::Label* port = Gtk::manage(new Gtk::Label("Network port:"));
+    Gtk::Frame* remote = Gtk::manage(new Gtk::Frame(_("Remote execution")));
+    Gtk::Label* port = Gtk::manage(new Gtk::Label(_("Network port:")));
     Gtk::HBox* HBoxRemote = Gtk::manage(new Gtk::HBox());
     mEntryPort = Gtk::manage(new Gtk::Entry());
     mEntryPort->set_text(utils::to_string(mModeling->getSocketPort()));
@@ -108,7 +108,7 @@ void ParameterExecutionBox::buildInterface()
 
 void ParameterExecutionBox::onClickButtonPath()
 {
-    Gtk::FileChooserDialog file(*this, "Select VLE binary",
+    Gtk::FileChooserDialog file(*this, _("Select VLE binary"),
                                 Gtk::FILE_CHOOSER_ACTION_OPEN);
     file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);

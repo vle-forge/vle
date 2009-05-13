@@ -40,8 +40,9 @@ PluginFactory::PluginFactory(const std::string& plugin,
     if (not (*m_module)) {
         delete m_module;
         m_module = 0;
-        throw(utils::InternalError(boost::format(
-                "\n[%1%]: %2%") % pathname % Glib::Module::get_last_error()));
+        throw(utils::InternalError(fmt(
+                _("\n[%1%]: %2%")) % pathname %
+                Glib::Module::get_last_error()));
     }
     m_module->make_resident();
 }
@@ -62,8 +63,8 @@ PluginPtr PluginFactory::build(const std::string& location)
     void*   makeNewOovPlugin = 0;
 
     if (not m_module->get_symbol("makeNewOovPlugin", makeNewOovPlugin)) {
-        throw(utils::InternalError(boost::format(
-                "Error when searching makeNewOovPlugin function in plugin %1%")
+        throw(utils::InternalError(fmt(
+                _("Error when searching makeNewOovPlugin function in plugin %1%"))
             % m_plugin));
     }
 
@@ -71,8 +72,8 @@ PluginPtr PluginFactory::build(const std::string& location)
     call = fct(location);
 
     if (not call) {
-        throw(utils::InternalError(boost::format(
-                "Error when calling makeNewOovPlugin function in plugin %1%")
+        throw(utils::InternalError(fmt(
+                _("Error when calling makeNewOovPlugin function in plugin %1%"))
             % m_plugin));
     }
 

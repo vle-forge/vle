@@ -43,7 +43,7 @@ using namespace vle;
 void eov_on_error(const std::string& type, const std::string& what)
 {
     Gtk::MessageDialog box(
-        (boost::format("eov reported: %1% (%2%)") % what % type).str(), false,
+        (fmt(_("eov reported: %1% (%2%)")) % what % type).str(), false,
         Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
 
     box.run();
@@ -65,21 +65,21 @@ int main(int argc, char* argv[])
         utils::Trace::trace().setLevel(
             static_cast < utils::Trace::Level >(command.verbose()));
     } catch(const Glib::Error& e) {
-        std::cerr << "Error parsing command line: " << e.what() << std::endl;
+        std::cerr << _("Error parsing command line: ") << e.what() << std::endl;
         utils::finalize();
         return EXIT_FAILURE;
     } catch(const std::exception& e) {
-        std::cerr << "Command line error: " << e.what() << std::endl;
+        std::cerr << _("Command line error: ") << e.what() << std::endl;
         utils::finalize();
         return EXIT_FAILURE;
     }
 
     bool result = true;
     if (command.infos()) {
-        std::cerr << "EOV - the Eyes of VLE\n";
+        std::cerr << _("EOV - the Eyes of VLE\n");
         utils::printInformations(std::cerr);
     } else if (command.version()) {
-        std::cerr << "EOV - the Eyes of VLE\n";
+        std::cerr << _("EOV - the Eyes of VLE\n");
         utils::printVersion(std::cerr);
     } else {
         try {

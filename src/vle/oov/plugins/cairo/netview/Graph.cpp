@@ -81,7 +81,7 @@ Graph::Graph(const std::string &vertice_names,
 
         for (i = 0; i <nb_vertices; ++i) {
             v_descriptor vd = add_vertex(m_G);
-            m_G[vd].name = (boost::format("%1%%2%") % prefix % i).str();
+            m_G[vd].name = (fmt("%1%%2%") % prefix % i).str();
         }
 
         p_vertex_it pv_it_src = vertices(m_G);

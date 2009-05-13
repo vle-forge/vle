@@ -380,7 +380,7 @@ void PetriNet::addArc(const std::string& src,
 {
     if (existPlace(src)) {
         Assert < utils::ModellingError >(existTransition(dst),
-               boost::format("Petri Net: Unknow transition: %1%") % dst);
+               fmt(_("Petri Net: Unknow transition: %1%")) % dst);
         Input* input = new Input(mPlaces[src],
                                  mTransitions[dst],
                                  tokenNumber);
@@ -390,7 +390,7 @@ void PetriNet::addArc(const std::string& src,
         mInputs.push_back(input);
     } else if (existPlace(dst)) {
         Assert < utils::ModellingError >(existTransition(src),
-               boost::format( "Petri Net: Unknow transition: %1%") % src);
+               fmt(_("Petri Net: Unknow transition: %1%")) % src);
         Output* output = new Output(mTransitions[src],
                                     mPlaces[dst],
                                     tokenNumber);
@@ -399,8 +399,8 @@ void PetriNet::addArc(const std::string& src,
         mPlaces[dst]->addOutput(output);
         mOutputs.push_back(output);
     } else {
-        throw utils::ModellingError(boost::format(
-                "Petri Net: unknow place: %1% or %2%") % src % dst);
+        throw utils::ModellingError(fmt(_(
+                "Petri Net: unknow place: %1% or %2%")) % src % dst);
     }
 }
 
@@ -408,7 +408,7 @@ void PetriNet::addInitialMarking(const std::string& placeName,
                                  unsigned int tokenNumber)
 {
     Assert < utils::ModellingError >(existPlace(placeName),
-           boost::format( "Petri Net: Unknow place: %1%") % placeName);
+           fmt(_("Petri Net: Unknow place: %1%")) % placeName);
 
     if (tokenNumber > 0)
         mInitialMarking[placeName] = tokenNumber;
@@ -419,11 +419,11 @@ void PetriNet::addInputTransition(const std::string& transitionName,
                                   double delay)
 {
     Assert < utils::ModellingError >(not existTransition(transitionName),
-           boost::format("Petri Net: transition '%1%' already exists")
+           fmt(_("Petri Net: transition '%1%' already exists"))
            % transitionName);
 
     Assert < utils::ModellingError >(delay >= 0,
-           boost::format("Petri Net: delay on transition %1% is negative")
+           fmt(_("Petri Net: delay on transition %1% is negative"))
            % transitionName);
 
     mTransitions[transitionName] = new Transition(transitionName, delay);
@@ -433,8 +433,8 @@ void PetriNet::addInputTransition(const std::string& transitionName,
 void PetriNet::addOutputPlace(const std::string& placeName,
                               const std::string& portName)
 {
-    Assert < utils::ModellingError >(not existPlace(placeName), boost::format(
-            "Petri Net: place '%1%' already exists") % placeName);
+    Assert < utils::ModellingError >(not existPlace(placeName), fmt(_(
+            "Petri Net: place '%1%' already exists")) % placeName);
 
     mPlaces[placeName] = new Place(placeName, 0.0);
     mOutPlaceMarkings[portName] = std::make_pair(placeName, 1);
@@ -445,7 +445,7 @@ void PetriNet::addOutputTransition(const std::string& transitionName,
                                    unsigned int priority)
 {
     Assert < utils::ModellingError >(not existTransition(transitionName),
-           boost::format("Petri Net: transition '%1%' already exists")
+           fmt(_("Petri Net: transition '%1%' already exists"))
            % transitionName);
 
     mTransitions[transitionName] = new Transition(transitionName, 0.0,
@@ -457,11 +457,11 @@ void PetriNet::addOutputTransition(const std::string& transitionName,
 void PetriNet::addPlace(const std::string& placeName,
                         double delay)
 {
-    Assert < utils::ModellingError >(not existPlace(placeName), boost::format(
-            "Petri Net: place '%1%' already exists") % placeName);
+    Assert < utils::ModellingError >(not existPlace(placeName), fmt(_(
+            "Petri Net: place '%1%' already exists")) % placeName);
 
     Assert < utils::ModellingError >(delay >= 0,
-           boost::format("Petri Net: delay on place %1% is negative")
+           fmt(_("Petri Net: delay on place %1% is negative"))
            % placeName);
 
     mPlaces[placeName] = new Place(placeName, delay);
@@ -472,11 +472,11 @@ void PetriNet::addTransition(const std::string& transitionName,
                              unsigned int priority)
 {
     Assert < utils::ModellingError >(not existTransition(transitionName),
-           boost::format("Petri Net: transition '%1%' already exists")
+           fmt(_("Petri Net: transition '%1%' already exists"))
            % transitionName);
 
     Assert < utils::ModellingError >(delay >= 0,
-           boost::format("Petri Net: delay on transition %1% is negative")
+           fmt(_("Petri Net: delay on transition %1% is negative"))
            % transitionName);
 
     mTransitions[transitionName] = new Transition(transitionName, delay,

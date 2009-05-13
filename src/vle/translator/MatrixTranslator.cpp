@@ -50,8 +50,8 @@ graph::AtomicModel* MatrixTranslator::getModel(const std::string& name) const
     std::map < std::string, graph::AtomicModel* >::const_iterator it(
         m_models.find(name));
 
-    Assert < utils::InternalError >(it != m_models.end(), boost::format(
-            "MatrixTranslator: unknow model '%1%'") % name);
+    Assert < utils::InternalError >(it != m_models.end(), fmt(_(
+            "MatrixTranslator: unknow model '%1%'")) % name);
 
     return it->second;
 }
@@ -61,8 +61,8 @@ unsigned int MatrixTranslator::getSize(unsigned int i) const
     std::map < unsigned int, unsigned int >::const_iterator it(
         m_size.find(i));
 
-    Assert < utils::InternalError >(it != m_size.end(), boost::format(
-            "MatrixTranslator: unknow size '%1%'") % i);
+    Assert < utils::InternalError >(it != m_size.end(), fmt(_(
+            "MatrixTranslator: unknow size '%1%'")) % i);
 
     return it->second;
 }
@@ -89,10 +89,10 @@ std::string MatrixTranslator::getDynamics(unsigned int i, unsigned int j)
 {
     if (m_multipleLibrary) {
         if (m_dimension == 0) {
-            return (boost::format("dyn_cell_%1%") % m_init[i]).str();
+            return (fmt("dyn_cell_%1%") % m_init[i]).str();
         } else {
             if (m_dimension == 1) {
-                return (boost::format("dyn_cell_%1%")
+                return (fmt("dyn_cell_%1%")
                         % (m_init[i + (j - 1) * m_size[0] - 1])).str();
             } else {
                 return std::string();
@@ -106,10 +106,10 @@ std::string MatrixTranslator::getDynamics(unsigned int i, unsigned int j)
 std::string MatrixTranslator::getName(unsigned int i, unsigned int j) const
 {
     if (m_dimension == 0) {
-        return (boost::format("%1%_%2%") % m_prefix % i).str();
+        return (fmt("%1%_%2%") % m_prefix % i).str();
     } else {
         if (m_dimension == 1) {
-            return (boost::format("%1%_%2%_%3%") % m_prefix % i % j).str();
+            return (fmt("%1%_%2%_%3%") % m_prefix % i % j).str();
         }
     }
 
@@ -234,7 +234,7 @@ void MatrixTranslator::translateModel(unsigned int i,
     vpz::Strings conditions;
 
     conditions.push_back("cond_cell");
-    conditions.push_back((boost::format("cond_%1%_%2%_%3%")
+    conditions.push_back((fmt("cond_%1%_%2%_%3%")
                           % m_prefix % i % j).str());
     m_models[getName(i,j)] = atomicModel;
 
@@ -318,7 +318,7 @@ void MatrixTranslator::translateStructures()
             vpz::Strings conditions;
 
             conditions.push_back("cond_cell");
-            conditions.push_back((boost::format("cond_%1%_%2%") % m_prefix %
+            conditions.push_back((fmt("cond_%1%_%2%") % m_prefix %
                                   i).str());
             m_models[getName(i)] = atomicModel;
             m_exe.createModel(atomicModel, getDynamics(i), conditions,
@@ -488,7 +488,7 @@ void MatrixTranslator::translateDynamics()
             std::string > >::const_iterator it = m_libraries.begin();
 
         while (it != m_libraries.end()) {
-            vpz::Dynamic dynamics((boost::format("dyn_cell_%1%") %
+            vpz::Dynamic dynamics((fmt("dyn_cell_%1%") %
                                    it->first).str());
 
             dynamics.setLibrary(it->second.first);
@@ -512,7 +512,7 @@ void MatrixTranslator::translateDynamics()
 
 void MatrixTranslator::translateCondition1D(unsigned int i)
 {
-    std::string name = (boost::format("cond_%1%_%2%")
+    std::string name = (fmt("cond_%1%_%2%")
                         % m_prefix % i).str();
     vpz::Condition condition(name);
     value::Set* neighbourhood = value::Set::create();
@@ -533,7 +533,7 @@ void MatrixTranslator::translateCondition1D(unsigned int i)
 void MatrixTranslator::translateCondition2D(unsigned int i,
                                             unsigned int j)
 {
-    std::string name = (boost::format("cond_%1%_%2%_%3%")
+    std::string name = (fmt("cond_%1%_%2%_%3%")
                         % m_prefix % i % j).str();
     vpz::Condition condition(name);
     value::Set* neighbourhood = value::Set::create();

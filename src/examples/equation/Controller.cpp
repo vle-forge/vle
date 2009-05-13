@@ -74,7 +74,7 @@ devs::ExternalEvent* Controller::makeRemoveEvent(
 void Controller::output(const devs::Time& /* time */,
 			devs::ExternalEventList& output) const
 {
-    std::string nameB((boost::format("b%1%") % mModelNumber).str());
+    std::string nameB((fmt("b%1%") % mModelNumber).str());
     value::Set* inB = value::Set::create();
     value::Set* outB = value::Set::create();
     value::Set* genericB = value::Set::create();
@@ -83,7 +83,7 @@ void Controller::output(const devs::Time& /* time */,
     outB->add(value::String::create("sum"));
     genericB->add(value::Boolean::create(true));
 
-    std::string nameC((boost::format("c%1%") % mModelNumber).str());
+    std::string nameC((fmt("c%1%") % mModelNumber).str());
     value::Set* inC = value::Set::create();
     value::Set* outC = value::Set::create();
     value::Set* genericC = value::Set::create();
@@ -92,7 +92,7 @@ void Controller::output(const devs::Time& /* time */,
     outC->add(value::String::create("sum"));
     genericC->add(value::Boolean::create(true));
 
-    std::string nameD((boost::format("d%1%") % mModelNumber).str());
+    std::string nameD((fmt("d%1%") % mModelNumber).str());
     value::Set* inD = value::Set::create();
     value::Set* outD = value::Set::create();
     value::Set* genericD = value::Set::create();

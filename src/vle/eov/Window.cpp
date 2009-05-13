@@ -37,7 +37,7 @@ Window::Window(Glib::Mutex& mutex, int timer) :
     m_timeout(timer),
     m_median(true)
 {
-    set_title("eov - the Eyes of VLE");
+    set_title(("eov - the Eyes of VLE"));
     set_border_width(0);
     set_position(Gtk::WIN_POS_CENTER);
 

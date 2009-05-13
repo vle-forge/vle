@@ -66,7 +66,7 @@ Modeling::Modeling(GVLE* gvle, const string& filename) :
         mVpz.parseFile(filename);
         if (mVpz.project().model().model() == 0) {
             gvle::Error(
-                (boost::format("Problem loading file %1%, empty structure.") %
+                (fmt(_("Problem loading file %1%, empty structure.")) %
                  filename).str());
             mTop = newCoupledModel(0, "Top model", "", 0, 0);
             //mTop->setParent(NULL);
@@ -145,7 +145,7 @@ void Modeling::parseXML(const string& filename)
         mVpz.parseFile(filename);
         if (mVpz.project().model().model() == 0) {
             gvle::Error(
-                (boost::format("Problem loading file %1%, empty structure.") %
+                (fmt(_("Problem loading file %1%, empty structure.")) %
                  filename).str());
             mTop = newCoupledModel(0, "Top model", "", 0, 0);
             mVpz.project().model().setModel(mTop);
@@ -164,16 +164,16 @@ void Modeling::parseXML(const string& filename)
         mFileName.assign(filename);
         setTitles();
     } catch (const utils::ParseError& p) {
-        gvle::Error((boost::format("Error parsing file, %1%") %
+        gvle::Error((fmt(_("Error parsing file, %1%")) %
                      p.what()).str());
     } catch (const utils::FileError& f) {
-        gvle::Error((boost::format("Error opening file, %1%") %
+        gvle::Error((fmt(_("Error opening file, %1%")) %
                      f.what()).str());
     } catch (const Glib::Error& e) {
-        gvle::Error((boost::format("Error opening file, %1%") %
+        gvle::Error((fmt(_("Error opening file, %1%")) %
                      e.what()).str());
     } catch (const std::exception& e) {
-        gvle::Error((boost::format("Error opening file, %1%") %
+        gvle::Error((fmt(_("Error opening file, %1%")) %
                      e.what()).str());
     }
 }
@@ -187,17 +187,17 @@ void Modeling::saveXML(const std::string& name)
         mIsModified = false;
         setTitles();
     } catch (const utils::FileError& file) {
-        gvle::Error((boost::format(
-                         "Project save problem. Check your file %1%. %2%") % name %
-                     file.what()).str());
+        gvle::Error(
+            (fmt(_("Project save problem. Check your file %1%. %2%")) % name %
+             file.what()).str());
     } catch (const utils::ParseError& parse) {
-        gvle::Error((boost::format(
-                         "Project save problem. Parsing error %1%. %2%") % name %
-                     parse.what()).str());
+        gvle::Error(
+            (fmt(_("Project save problem. Parsing error %1%. %2%")) % name %
+             parse.what()).str());
     } catch (const std::exception& e) {
-        gvle::Error((boost::format(
-                         "Project save problem. Exception %1%. %2%") % name %
-                     e.what()).str());
+        gvle::Error(
+            (fmt(_("Project save problem. Exception %1%. %2%")) % name %
+             e.what()).str());
     }
 }
 
@@ -258,7 +258,7 @@ vpz::AtomicModelList& Modeling::getAtomicModelClass(std::string className)
 
 void Modeling::showDynamics(const std::string& /* name */)
 {
-    Error("This function is not yet implemented");
+    Error(_("This function is not yet implemented"));
 }
 
 /*void Modeling::addView(const string& name)
@@ -1037,7 +1037,7 @@ graph::Model* Modeling::newPluginModel(graph::CoupledModel* /*parent*/,
     //}
     //}
     //} catch(const std::exception& e) {
-    //gvle::Error((boost::format(
+    //gvle::Error((fmt(
     //"Failed to build the new plugin '%1%':\n%2%") % name %
     //e.what()).str());
     //}
@@ -1076,14 +1076,17 @@ void Modeling::vpz_is_correct(std::vector<std::string>& vec)
     const Project& project = mVpz.project();
 
     if (project.author() == "") {
-        vec.push_back("The author is not mentioned.");
+        vec.push_back(_("The author is not mentioned."));
     }
 
     const AtomicModelList& atomic_list = project.model().atomicModels();
     AtomicModelList::const_iterator atomic_it = atomic_list.begin();
     while (atomic_it != atomic_list.end()) {
         if (atomic_it->second.dynamics() == "") {
-            vec.push_back("The Atomic Model '"+atomic_it->first->getName()+"' is not linked to a dynamic.");
+            vec.push_back((fmt(_("The Atomic Model %1% is not linked to a "
+                                 "dynamic.")) %
+                           atomic_it->first->getName()).str());
+
         }
         ++atomic_it;
     }
@@ -1092,23 +1095,25 @@ void Modeling::vpz_is_correct(std::vector<std::string>& vec)
     DynamicList::const_iterator dyn_it = dyn_list.begin();
     while (dyn_it != dyn_list.end()) {
         if (dyn_it->second.library() == "") {
-            vec.push_back("The Dynamic '"+dyn_it->first+"' is not attached to a library.");
+            vec.push_back((fmt(_("The Dynamic %1% is not attached to a "
+                                 "library.")) % dyn_it->first).str());
         }
         ++dyn_it;
     }
 
     const Experiment& exp = project.experiment();
     if (exp.name() == "")
-        vec.push_back("The Experiment has not a name.");
+        vec.push_back(_("The Experiment has not a name."));
 
     if (exp.duration() == 0)
-        vec.push_back("The Experiment has not a duration.");
+        vec.push_back(_("The Experiment has not a duration."));
 
     const ViewList& view_list = exp.views().viewlist();
     ViewList::const_iterator view_it = view_list.begin();
     while (view_it != view_list.end()) {
         if (view_it->second.output() == "") {
-            vec.push_back("The view '"+view_it->first+"' has not an output.");
+            vec.push_back((fmt(_("The view %1% has not an output.")) %
+                           view_it->first).str());
         }
         ++view_it;
     }

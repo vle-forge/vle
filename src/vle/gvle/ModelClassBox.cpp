@@ -39,7 +39,7 @@ ModelClassBox::ModelClassBox(Glib::RefPtr < Gnome::Glade::Xml > xml,
 	mNewModelBox(new NewModelClassBox(xml,m)),
         mClasses_backup(0)
 {
-    set_title("Model Class Tree");
+    set_title(_("Model Class Tree"));
     set_default_size(200, 350);
     set_border_width(5);
     mScrolledWindow.add(mTreeView);
@@ -47,7 +47,7 @@ ModelClassBox::ModelClassBox(Glib::RefPtr < Gnome::Glade::Xml > xml,
 
     mRefTreeModel = Gtk::TreeStore::create(mColumns);
     mTreeView.set_model(mRefTreeModel);
-    mTreeView.append_column("Name", mColumns.mName);
+    mTreeView.append_column(_("Name"), mColumns.mName);
 
     mTreeView.signal_row_activated().connect(
 	sigc::mem_fun(*this, &ModelClassBox::row_activated));
@@ -66,28 +66,28 @@ void ModelClassBox::initMenuPopupModels()
 
     menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-		"_Add",
+		_("_Add"),
 		sigc::mem_fun(
 		    *this,
 		    &ModelClassBox::onAdd)));
 
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-		"_Remove",
+		_("_Remove"),
 		sigc::mem_fun(
 		    *this,
 		    &ModelClassBox::onRemove)));
 
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-		"_Rename",
+		_("_Rename"),
 		sigc::mem_fun(
 		    *this,
 		    &ModelClassBox::onRename)));
 
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-		"_Export Class",
+		_("_Export Class"),
 		sigc::mem_fun(
 		    *this,
 		    &ModelClassBox::onExportVpz)));
@@ -144,7 +144,7 @@ void ModelClassBox::onRemove()
 
 void ModelClassBox::onRename()
 {
-   SimpleTypeBox box("Name of the Classe ?");
+   SimpleTypeBox box(_("Name of the Classe ?"));
    std::string name = boost::trim_copy(box.run());
    Glib::RefPtr<Gtk::TreeView::Selection> refSelection =  mTreeView.get_selection();
    if (refSelection and box.valid() and not name.empty()) {
@@ -183,11 +183,11 @@ void ModelClassBox::onExportVpz()
 		row.get_value(mColumns.mName));
 	    graph::Model* model = currentClass.model();
 
-	    Gtk::FileChooserDialog file("VPZ file", Gtk::FILE_CHOOSER_ACTION_SAVE);
+	    Gtk::FileChooserDialog file(_("VPZ file"), Gtk::FILE_CHOOSER_ACTION_SAVE);
 	    file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
 	    file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
 	    Gtk::FileFilter filter;
-	    filter.set_name("Vle Project gZipped");
+	    filter.set_name(_("Vle Project gZipped"));
 	    filter.add_pattern("*.vpz");
 	    file.add_filter(filter);
 

@@ -39,13 +39,13 @@ SimpleTypeBox::SimpleTypeBox(value::Value* b):
     makeDialog();
 
     if (b->isInteger()) {
-        set_title("Integer");
+        set_title(_("Integer"));
     } else if (b->isDouble()) {
-        set_title("Double");
+        set_title(_("Double"));
     } else if (b->isString()) {
-        set_title("String");
+        set_title(_("String"));
     } else if (b->isTuple()) {
-        set_title("Tuple");
+        set_title(_("Tuple"));
     }
 
     show_all();

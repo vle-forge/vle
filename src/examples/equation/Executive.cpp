@@ -56,7 +56,7 @@ void Executive::buildInputConnections()
 		    if (mVariables.find(varModel)->second.first ==
 			itv->second.first) {
 			std::string updatePort(
-			    (boost::format("update_%1%_%2%") % name %
+			    (fmt("update_%1%_%2%") % name %
 			     varModel).str());
 
 			coupledmodel().delInternalConnection(
@@ -118,7 +118,7 @@ void Executive::createModel(model* mdl)
 
     boost::split(dyn, mdl->dyn, boost::is_any_of(":"));
 
-    std::string dynamicsName((boost::format("dyn_%1%") % modelName).str());
+    std::string dynamicsName((fmt("dyn_%1%") % modelName).str());
     std::string library = dyn[0];
     std::string model = dyn[1];
     vpz::Dynamic dyns(dynamicsName);
@@ -131,7 +131,7 @@ void Executive::createModel(model* mdl)
     } catch (...) { }
 
     // Build condition
-    std::string conditionName((boost::format("cond_%1%") % modelName).str());
+    std::string conditionName((fmt("cond_%1%") % modelName).str());
     vpz::Strings conditions;
     vpz::Condition condition(conditionName);
 
@@ -140,7 +140,7 @@ void Executive::createModel(model* mdl)
     Executive::conditions().add(condition);
 
     // Build observable
-    std::string obsName((boost::format("obs_%1%") % modelName).str());
+    std::string obsName((fmt("obs_%1%") % modelName).str());
     vpz::Observable obs(obsName);
     vpz::ObservablePort& port = obs.add(mdl->var);
 
@@ -161,7 +161,7 @@ void Executive::createModel(model* mdl)
 
     while (it != mdl->in.end()) {
 	std::string updatePort(
-	    (boost::format("update_%1%_%2%") % modelName %
+	    (fmt("update_%1%_%2%") % modelName %
 	     (*it)->writeToString()).str());
 
 	if (not coupledmodel().findModel("Executive")
@@ -224,7 +224,7 @@ void Executive::removeTemporaryConnections(model* mdl)
     value::VectorValue::const_iterator it = mdl->in.begin();
 
     while (it != mdl->in.end()) {
-	std::string updatePort((boost::format("update_%1%_%2%") % mdl->name %
+	std::string updatePort((fmt("update_%1%_%2%") % mdl->name %
 				(*it)->writeToString()).str());
 
 	coupledmodel().delInternalConnection("Executive", updatePort,
@@ -284,7 +284,7 @@ void Executive::output(const devs::Time& /* time */,
 			    if (mVariables.find(varModel)->second.first ==
 				itv->second.first) {
 				std::string updatePort(
-				    (boost::format("update_%1%_%2%") % name %
+				    (fmt("update_%1%_%2%") % name %
 				     varModel).str());
 				devs::ExternalEvent* ee =
 				    new devs::ExternalEvent(updatePort);

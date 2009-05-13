@@ -50,8 +50,8 @@ ModuleCache::~ModuleCache()
 void ModuleCache::add(const std::string& library, Glib::Module* module)
 {
     if (exist(library)) {
-        throw utils::InternalError(boost::format(
-                "The Module '%1%' already exist in cache") % library);
+        throw utils::InternalError(fmt(_(
+                "The Module '%1%' already exist in cache")) % library);
     }
 
     m_lst[library] = module;
@@ -96,8 +96,8 @@ void ModelFactory::addPermanent(const vpz::Dynamic& dynamics)
     try {
         mDynamics.add(dynamics);
     } catch(const std::exception& e) {
-        throw utils::InternalError(boost::format(
-            "Model factory cannot add dynamics %1%: %2%") % dynamics.name() %
+        throw utils::InternalError(fmt(_(
+            "Model factory cannot add dynamics %1%: %2%")) % dynamics.name() %
             e.what());
     }
 }
@@ -108,8 +108,8 @@ void ModelFactory::addPermanent(const vpz::Condition& condition)
         vpz::Conditions& conds(mExperiment.conditions());
         conds.add(condition);
     } catch(const std::exception& e) {
-        throw utils::InternalError(boost::format(
-                "Model factory cannot add condition %1%: %2%") %
+        throw utils::InternalError(fmt(_(
+                "Model factory cannot add condition %1%: %2%")) %
             condition.name() % e.what());
     }
 }
@@ -120,8 +120,8 @@ void ModelFactory::addPermanent(const vpz::Observable& observable)
         vpz::Views& views(mExperiment.views());
         views.addObservable(observable);
     } catch(const std::exception& e) {
-        throw utils::InternalError(boost::format(
-                "Model factory cannot add observable %1%: %2%") %
+        throw utils::InternalError(fmt(_(
+                "Model factory cannot add observable %1%: %2%")) %
             observable.name() % e.what());
     }
 }
@@ -134,8 +134,8 @@ void ModelFactory::createModel(Coordinator& coordinator,
 {
     const SimulatorMap& result(coordinator.modellist());
     if (result.find(model) != result.end()) {
-        throw utils::InternalError(boost::format(
-                "The model '%1%' already exist in coordinator") %
+        throw utils::InternalError(fmt(_(
+                "The model '%1%' already exist in coordinator")) %
             model->getName());
     }
 
@@ -153,9 +153,9 @@ void ModelFactory::createModel(Coordinator& coordinator,
 		 itv != vl.end(); ++itv) {
 
                 if (initValues.exist(itv->first)) {
-                    throw utils::InternalError(boost::format(
+                    throw utils::InternalError(fmt(_(
                             "Multiples condition with the same init port " \
-                            "name '%1%'") % itv->first);
+                            "name '%1%'")) % itv->first);
                 }
                 initValues.add(itv->first, itv->second);
             }
@@ -168,7 +168,7 @@ void ModelFactory::createModel(Coordinator& coordinator,
         attachDynamics(coordinator, sim, dyn, getPlugin(dyn.name()), initValues);
         break;
     case vpz::Dynamic::DISTANT:
-        throw utils::NotYetImplemented("Distant dynamics is not supported");
+        throw utils::NotYetImplemented(_("Distant dynamics is not supported"));
     }
 
     if (not observable.empty()) {
@@ -183,9 +183,9 @@ void ModelFactory::createModel(Coordinator& coordinator,
                 View* view = coordinator.getView(*jt);
 
                 if (not view) {
-                    throw utils::InternalError(boost::format(
-                            "The view '%1%' is unknow of coordinator view list")
-                        % *jt);
+                    throw utils::InternalError(fmt(_(
+                                "The view '%1%' is unknow of coordinator "
+                                "view list")) % *jt);
                 }
 
                 ObservationEvent* evt = view->addObservable(
@@ -257,8 +257,8 @@ Glib::Module* ModelFactory::buildPlugin(const vpz::Dynamic& dyn)
     utils::Path::PathList lst(utils::Path::path().getSimulatorDirs());
     utils::Path::PathList::const_iterator it;
 
-    std::string error((boost::format(
-                "Error opening simulator plugin '%1%' in:") %
+    std::string error((fmt(_(
+                "Error opening simulator plugin '%1%' in:")) %
             dyn.library()).str());
 
     for (it = lst.begin(); it != lst.end(); ++it) {
@@ -272,8 +272,8 @@ Glib::Module* ModelFactory::buildPlugin(const vpz::Dynamic& dyn)
 
         Glib::Module* module = new Glib::Module(file);
         if (not (*module)) {
-            error += boost::str(boost::format(
-                    "\n[%1%]: %2%") % *it % Glib::Module::get_last_error());
+            error += boost::str(fmt(_(
+                    "\n[%1%]: %2%")) % *it % Glib::Module::get_last_error());
             delete module;
         } else {
 #ifdef G_OS_WIN32
@@ -320,8 +320,8 @@ void ModelFactory::attachDynamics(Coordinator& coordinator,
         bool getSymbol = module->get_symbol("makeNewDynamics", makeNewDynamics);
 
         if (not getSymbol) {
-            throw utils::InternalError(boost::format(
-                    "Error in '%1%', function 'makeNewDynamics' not found: '%2%'\n")
+            throw utils::InternalError(fmt(_(
+                    "Error in '%1%', function 'makeNewDynamics' not found: '%2%'\n"))
                 % module->get_name() % Glib::Module::get_last_error());
         }
 
@@ -329,14 +329,14 @@ void ModelFactory::attachDynamics(Coordinator& coordinator,
         try {
             call = fct(*atom->getStructure(), events);
         } catch(const std::exception& e) {
-            throw utils::ModellingError(boost::format(
-                    "%1%: %2%") % atom->getName() % e.what());
+            throw utils::ModellingError(fmt(_(
+                    "%1%: %2%")) % atom->getName() % e.what());
         }
 
         if (not call) {
-            throw utils::InternalError(boost::format(
+            throw utils::InternalError(fmt(_(
                     "Error in '%1%', function 'makeNewDynamics':"
-                    "problem allocation a new Dynamics: '%2%'\n") %
+                    "problem allocation a new Dynamics: '%2%'\n")) %
                 module->get_name() % Glib::Module::get_last_error());
         }
     } else {
@@ -345,8 +345,8 @@ void ModelFactory::attachDynamics(Coordinator& coordinator,
 	bool getSymbol = module->get_symbol(functionanme , makeNewDynamics);
 
         if (not getSymbol) {
-            throw utils::InternalError(boost::format(
-                    "Error in '%1%', function '%2%' not found: '%3%'\n") %
+            throw utils::InternalError(fmt(_(
+                    "Error in '%1%', function '%2%' not found: '%3%'\n")) %
                 module->get_name() % functionanme %
                 Glib::Module::get_last_error());
         }
@@ -355,14 +355,14 @@ void ModelFactory::attachDynamics(Coordinator& coordinator,
         try {
             call = fct(*atom->getStructure(), events);
         } catch(const std::exception& e) {
-            throw utils::ModellingError(boost::format(
-                    "%1%: %2%") % atom->getName() % e.what());
+            throw utils::ModellingError(fmt(_(
+                    "%1%: %2%")) % atom->getName() % e.what());
         }
 
         if (not call) {
-            throw utils::InternalError(boost::format(
+            throw utils::InternalError(fmt(_(
                     "Error in '%1%', function '%2%':"
-                    "problem allocation a new Dynamics: '%3%'\n") %
+                    "problem allocation a new Dynamics: '%3%'\n")) %
                 module->get_name() % functionanme %
                 Glib::Module::get_last_error());
         }

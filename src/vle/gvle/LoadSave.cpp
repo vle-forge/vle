@@ -73,7 +73,7 @@ void gui::Load::addModelName(const std::string& name, std::string& structure,
         try {
             dom.parse_memory(structure);
         } catch (const xmlpp::exception& e) {
-            Assert(Exception::Parse, false, "Bad XML structures");
+            Assert(Exception::Parse, false, _("Bad XML structures"));
         }
         xmlpp::Element* root = utils::XML::get_root_node(dom, "MODEL");
         root->set_attribute("NAME", name);
@@ -85,7 +85,7 @@ void gui::Load::addModelName(const std::string& name, std::string& structure,
         try {
             dom.parse_memory(dynamics);
         } catch (const xmlpp::exception& e) {
-            Assert(Exception::Parse, false, "Bad XML dynamics");
+            Assert(Exception::Parse, false, _("Bad XML dynamics"));
         }
         xmlpp::Element* root = utils::XML::get_root_node(dom, "MODEL");
         root->set_attribute("NAME", name);

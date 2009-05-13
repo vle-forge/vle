@@ -62,12 +62,12 @@ void CairoCAView::onParameter(const std::string& /* plugin */,
                               value::Value* parameters,
                               const double& /* time */)
 {
-    Assert < utils::InternalError >(m_ctx, "Cairo caview drawing error");
+    Assert < utils::InternalError >(m_ctx, _("Cairo caview drawing error"));
     xmlpp::DomParser parser;
 
     if (not parameters or not parameters->isXml()) {
         throw utils::ArgError(
-            "CAView: initialization failed, bad parameters");
+            _("CAView: initialization failed, bad parameters"));
     }
 
     parser.parse_memory(value::toXml(parameters));

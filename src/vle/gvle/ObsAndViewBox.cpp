@@ -108,7 +108,7 @@ void ObsAndViewBox::show(vpz::Observables& obs, std::string name,
     makeObs();
     makeViews();
 
-    mDialog->set_title("Observable "+name);
+    mDialog->set_title(_("Observable ")+name);
     mDialog->show_all();
     mDialog->run();
 }
@@ -249,7 +249,7 @@ void ObsAndViewBox::makeViews()
 
 void ObsAndViewBox::on_add_port()
 {
-    SimpleTypeBox box("Name of the Observable port ?");
+    SimpleTypeBox box(_("Name of the Observable port ?"));
     std::string name = boost::trim_copy(box.run());
 
     if (box.valid() and not name.empty() and not mObs->exist(name)) {

@@ -87,7 +87,7 @@ ExecutionBox::ExecutionBox(const std::string & projectFilename) :
 
 void ExecutionBox::onButtonName()
 {
-    Gtk::FileSelection file_selection("Open project file");
+    Gtk::FileSelection file_selection(_("Open project file"));
 
     if (file_selection.run() == Gtk::RESPONSE_OK) {
         string project_file = file_selection.get_filename();
@@ -109,11 +109,11 @@ void ExecutionBox::launchSimulation()
             //Glib::SpawnFlags(0),
             //sigc::slot0<void>(), 0, 0, 0);
         } catch (const std::exception& e) {
-            Error((boost::format(
-                       "An error ocurred simulation:\n%1") % e.what()).str());
+            Error((fmt(
+                       _("An error ocurred simulation:\n%1")) % e.what()).str());
         }
     } else {
-        Error("Project file not found");
+        Error(_("Project file not found"));
     }
 }
 

@@ -39,7 +39,7 @@ namespace vle
 {
 namespace gvle {
 MatrixBox::MatrixBox(value::Matrix* m):
-        Gtk::Dialog("Matrix",true,true),
+        Gtk::Dialog(_("Matrix"),true,true),
         mValue(m)
 {
     add_button(Gtk::Stock::APPLY, Gtk::RESPONSE_APPLY);
@@ -106,7 +106,7 @@ void MatrixBox::makeTable()
             if (matrix[j][i] != 0)
                 (*mArray)[j][i].first->set_label(gvle::valuetype_to_string(matrix[j][i]->getType()));
             else
-                (*mArray)[j][i].first->set_label("(no value)");
+                (*mArray)[j][i].first->set_label(_("(no value)"));
 
             mTable->attach(*(*mArray)[j][i].first, j, j+1, i , i+1, Gtk::FILL, Gtk::FILL);
             (*mArray)[j][i].first->signal_clicked().connect(sigc::bind(

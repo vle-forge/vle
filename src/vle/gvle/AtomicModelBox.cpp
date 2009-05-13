@@ -41,7 +41,7 @@ AtomicModelBox::InputPortTreeView::InputPortTreeView(
 {
     mRefTreeModelInputPort = Gtk::ListStore::create(mColumnsInputPort);
     set_model(mRefTreeModelInputPort);
-    append_column("Name", mColumnsInputPort.m_col_name);
+    append_column(_("Name"), mColumnsInputPort.m_col_name);
 
     //Fill popup menu:
     {
@@ -49,19 +49,19 @@ AtomicModelBox::InputPortTreeView::InputPortTreeView(
 
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-		"_Add",
+		_("_Add"),
 		sigc::mem_fun(
 		    *this,
 		    &AtomicModelBox::InputPortTreeView::onAdd)));
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-		"_Remove",
+		_("_Remove"),
 		sigc::mem_fun(
 		    *this,
 		    &AtomicModelBox::InputPortTreeView::onRemove)));
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-		"_Rename",
+		_("_Rename"),
 		sigc::mem_fun(
 		    *this,
 		    &AtomicModelBox::InputPortTreeView::onRename)));
@@ -108,7 +108,7 @@ void AtomicModelBox::InputPortTreeView::build()
 
 void AtomicModelBox::InputPortTreeView::onAdd()
 {
-    SimpleTypeBox box("Name of the Input port ?");
+    SimpleTypeBox box(_("Name of the Input port ?"));
     graph::ConnectionList& list = mModel->getInputPortList();
     std::string name = boost::trim_copy(box.run());
 
@@ -139,7 +139,7 @@ void AtomicModelBox::InputPortTreeView::onRemove()
 
 void AtomicModelBox::InputPortTreeView::onRename()
 {
-    SimpleTypeBox box("New name of the input port ?");
+    SimpleTypeBox box(_("New name of the input port ?"));
     graph::ConnectionList& list = mModel->getInputPortList();
     Glib::ustring new_name = boost::trim_copy(box.run());
 
@@ -171,7 +171,7 @@ AtomicModelBox::OutputPortTreeView::OutputPortTreeView(
 {
     mRefTreeModelOutputPort = Gtk::ListStore::create(mColumnsOutputPort);
     set_model(mRefTreeModelOutputPort);
-    append_column("Name", mColumnsOutputPort.m_col_name);
+    append_column(_("Name"), mColumnsOutputPort.m_col_name);
 
     //Fill popup menu:
     {
@@ -179,19 +179,19 @@ AtomicModelBox::OutputPortTreeView::OutputPortTreeView(
 
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-		"_Add",
+		_("_Add"),
 		sigc::mem_fun(
 		    *this,
 		    &AtomicModelBox::OutputPortTreeView::onAdd)));
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-		"_Remove",
+		_("_Remove"),
 		sigc::mem_fun(
 		    *this,
 		    &AtomicModelBox::OutputPortTreeView::onRemove)));
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-		"_Rename",
+		_("_Rename"),
 		sigc::mem_fun(
 		    *this,
 		    &AtomicModelBox::OutputPortTreeView::onRename)));
@@ -238,7 +238,7 @@ void AtomicModelBox::OutputPortTreeView::build()
 
 void AtomicModelBox::OutputPortTreeView::onAdd()
 {
-    SimpleTypeBox box("Name of the output port ?");
+    SimpleTypeBox box(_("Name of the output port ?"));
     graph::ConnectionList& list = mModel->getOutputPortList();
     std::string name = boost::trim_copy(box.run());
 
@@ -269,7 +269,7 @@ void AtomicModelBox::OutputPortTreeView::onRemove()
 
 void AtomicModelBox::OutputPortTreeView::onRename()
 {
-    SimpleTypeBox box("New name of the output port ?");
+    SimpleTypeBox box(_("New name of the output port ?"));
     graph::ConnectionList& list = mModel->getOutputPortList();
     Glib::ustring new_name = boost::trim_copy(box.run());
 
@@ -301,8 +301,8 @@ AtomicModelBox::ConditionTreeView::ConditionTreeView(
 {
     mRefTreeModel = Gtk::ListStore::create(mColumns);
     set_model(mRefTreeModel);
-    append_column_editable("In", mColumns.m_col_activ);
-    append_column("Name", mColumns.m_col_name);
+    append_column_editable(_("In"), mColumns.m_col_activ);
+    append_column(_("Name"), mColumns.m_col_name);
 }
 
 AtomicModelBox::ConditionTreeView::~ConditionTreeView()
@@ -332,7 +332,7 @@ void AtomicModelBox::ConditionTreeView::build()
 	}
         it++;
     }
-    mLabel->set_label("Selected conditions: " + selections);
+    mLabel->set_label(_("Selected conditions: ") + selections);
 }
 
 vpz::Strings AtomicModelBox::ConditionTreeView::getConditions()
@@ -382,8 +382,8 @@ AtomicModelBox::DynamicTreeView::DynamicTreeView(
 {
     mRefTreeModelDyn = Gtk::ListStore::create(mColumnsDyn);
     set_model(mRefTreeModelDyn);
-    append_column("Name", mColumnsDyn.m_col_name);
-    append_column("Library", mColumnsDyn.m_dyn);
+    append_column(_("Name"), mColumnsDyn.m_col_name);
+    append_column(_("Library"), mColumnsDyn.m_dyn);
 
     //Fill popup menu:
     {
@@ -391,19 +391,19 @@ AtomicModelBox::DynamicTreeView::DynamicTreeView(
 
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-		"_Add",
+		_("_Add"),
 		sigc::mem_fun(
 		    *this,
 		    &AtomicModelBox::DynamicTreeView::onAdd)));
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-		"_Edit",
+		_("_Edit"),
 		sigc::mem_fun(
 		    *this,
 		    &AtomicModelBox::DynamicTreeView::onEdit)));
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-		"_Remove",
+		_("_Remove"),
 		sigc::mem_fun(
 		    *this,
 		    &AtomicModelBox::DynamicTreeView::onRemove)));
@@ -439,7 +439,7 @@ void AtomicModelBox::DynamicTreeView::build()
         if (it_child->get_value(mColumnsDyn.m_col_name) == mModel->dynamics()) {
 	    Gtk::TreeModel::Path path = mRefTreeModelDyn->get_path(it_child);
 	    set_cursor(path);
-	    mLabel->set_label("Selected Dynamic: " + mModel->dynamics());
+	    mLabel->set_label(_("Selected Dynamic: ") + mModel->dynamics());
 	}
         ++it_child;
     }
@@ -462,15 +462,15 @@ bool AtomicModelBox::DynamicTreeView::on_button_press_event(GdkEventButton *even
 
 void AtomicModelBox::DynamicTreeView::onAdd()
 {
-    SimpleTypeBox box("Name of the Dynamic ?");
+    SimpleTypeBox box(_("Name of the Dynamic ?"));
 
     std::string name = box.run();
     if (box.valid()) {
 	box.hide_all();
         name = boost::trim_copy(name);
         if (mModeling->dynamics().exist(name)) {
-            Error(boost::str(boost::format(
-                        "The Dynamics '%1%' already exists") % name));
+            Error(boost::str(fmt(
+                        _("The Dynamics '%1%' already exists")) % name));
         } else {
             vpz::Dynamic* dyn = new vpz::Dynamic(name);
             mDynamicBox.show(dyn);
@@ -509,7 +509,7 @@ void AtomicModelBox::DynamicTreeView::onEdit()
 	    if (it->get_value(mColumnsDyn.m_col_name) == dyn) {
 		Gtk::TreeModel::Path path = mRefTreeModelDyn->get_path(it);
 		set_cursor(path);
-		mLabel->set_label("Selected Dynamic: " + mModel->dynamics());
+		mLabel->set_label(_("Selected Dynamic: ") + mModel->dynamics());
 		break;
 	    }
 	    ++it;
@@ -548,7 +548,7 @@ AtomicModelBox::ObservableTreeView::ObservableTreeView(
 {
     mRefTreeModelObs = Gtk::ListStore::create(mColumnsObs);
     set_model(mRefTreeModelObs);
-    append_column("Name", mColumnsObs.m_col_name);
+    append_column(_("Name"), mColumnsObs.m_col_name);
 
     //Fill popup menu:
     {
@@ -556,19 +556,19 @@ AtomicModelBox::ObservableTreeView::ObservableTreeView(
 
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-		"_Add",
+		_("_Add"),
 		sigc::mem_fun(
 		    *this,
 		    &AtomicModelBox::ObservableTreeView::onAdd)));
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-		"_Edit",
+		_("_Edit"),
 		sigc::mem_fun(
 		    *this,
 		    &AtomicModelBox::ObservableTreeView::onEdit)));
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-		"_Remove",
+		_("_Remove"),
 		sigc::mem_fun(
 		    *this,
 		    &AtomicModelBox::ObservableTreeView::onRemove)));
@@ -607,7 +607,7 @@ void AtomicModelBox::ObservableTreeView::build()
         if (it_child->get_value(mColumnsObs.m_col_name) == mModel->observables()) {
 	    Gtk::TreeModel::Path path = mRefTreeModelObs->get_path(it_child);
 	    set_cursor(path);
-	    mLabel->set_label("Selected Observable: " + mModel->observables());
+	    mLabel->set_label(_("Selected Observable: ") + mModel->observables());
 	}
         ++it_child;
     }
@@ -631,14 +631,14 @@ bool AtomicModelBox::ObservableTreeView::on_button_press_event(
 
 void AtomicModelBox::ObservableTreeView::onAdd()
 {
-    SimpleTypeBox box("Name of the Observable ?");
+    SimpleTypeBox box(_("Name of the Observable ?"));
 
     std::string name = box.run();
     if (box.valid()) {
         name = boost::trim_copy(name);
         if (mModeling->observables().exist(name)) {
-            Error(boost::str(boost::format(
-                        "The observable '%1%' already exists") % name));
+            Error(boost::str(fmt(
+                        _("The observable '%1%' already exists")) % name));
         } else {
             mModeling->observables().add(vpz::Observable(name));
 	    build();

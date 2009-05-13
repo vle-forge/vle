@@ -58,7 +58,7 @@ void Plot::onNewObservable(const std::string& simulator,
 
     if (mColumns2.find(name) != mColumns2.end()) {
         throw utils::InternalError(
-            boost::format("Plot: observable '%1%' already exist") % name);
+            fmt(_("Plot: observable '%1%' already exist")) % name);
     }
 
     mColumns.push_back(name);
@@ -91,8 +91,8 @@ void Plot::onValue(const std::string& simulator,
     it = mColumns2.find(name);
 
     if (it == mColumns2.end()) {
-        throw utils::InternalError(boost::format(
-            "Plot: columns '%1%' does not exist") % name);
+        throw utils::InternalError(fmt(
+            _("Plot: columns '%1%' does not exist")) % name);
     }
 
     if (value->isDouble()) {
@@ -211,7 +211,7 @@ void Plot::onParameter(const std::string& /* plugin */,
                        value::Value* parameters,
                        const double& /* time */)
 {
-    Assert < utils::InternalError >(m_ctx, "Cairo plot drawing error");
+    Assert < utils::InternalError >(m_ctx, _("Cairo plot drawing error"));
 
     mParameter.set_drawing_area_size(mWidth, mHeight);
     mParameter.set_screen_size(mWidth, mHeight);

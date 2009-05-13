@@ -79,7 +79,7 @@ void Storage::onParameter(const std::string& /* plugin */,
     if (parameters) {
         if (not parameters->isMap()) {
             throw utils::ArgError(
-                "Storage: initialization failed, bad parameters");
+                _("Storage: initialization failed, bad parameters"));
         }
         value::Map* init = dynamic_cast < value::Map* >(parameters);
         int columns = -1, rows = -1, rzcolumns = -1, rzrows = -1;

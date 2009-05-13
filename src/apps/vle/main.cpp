@@ -28,6 +28,7 @@
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Debug.hpp>
+#include <vle/utils/i18n.hpp>
 #include <iostream>
 
 int main(int argc, char* argv[])
@@ -52,11 +53,12 @@ int main(int argc, char* argv[])
         vle::utils::Trace::trace().setLevel(
             static_cast < vle::utils::Trace::Level >(global.verbose()));
     } catch(const Glib::Error& e) {
-        std::cerr << "Error parsing command line: " << e.what() << std::endl;
+        std::cerr << vle::fmt(_("Error parsing command line: %1%\n")) %
+            e.what();
         vle::manager::finalize();
         return EXIT_FAILURE;
     } catch(const std::exception& e) {
-        std::cerr << "Command line error: " << e.what() << std::endl;
+        std::cerr << vle::fmt(_("Command line error: %1%\n")) % e.what();
         vle::manager::finalize();
         return EXIT_FAILURE;
     }
@@ -81,7 +83,6 @@ int main(int argc, char* argv[])
                                  vle::manager::CmdArgs(argv + 1, argv + argc));
         }
     }
-
     vle::manager::finalize();
     return result ? EXIT_SUCCESS : EXIT_FAILURE;
 }

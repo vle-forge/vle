@@ -42,7 +42,7 @@ ConditionsBox::ConditionsTreeView::ConditionsTreeView(
 {
     mRefTreeModel = Gtk::ListStore::create(mColumns);
     set_model(mRefTreeModel);
-    append_column("Initial conditions", mColumns.m_col_name);
+    append_column(_("Initial conditions"), mColumns.m_col_name);
     mRefTreeSelection = get_selection();
     mRefTreeSelection->signal_changed().connect(
         sigc::mem_fun(*this,
@@ -54,25 +54,25 @@ ConditionsBox::ConditionsTreeView::ConditionsTreeView(
 
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-		"_Add",
+		_("_Add"),
 		sigc::mem_fun(
 		    *this,
 		    &ConditionsBox::ConditionsTreeView::on_add)));
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-		"_Remove",
+		_("_Remove"),
 		sigc::mem_fun(
 		    *this,
 		    &ConditionsBox::ConditionsTreeView::on_remove)));
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-		"_Rename",
+		_("_Rename"),
 		sigc::mem_fun(
 		    *this,
 		    &ConditionsBox::ConditionsTreeView::onRename)));
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-		"_Copy",
+		_("_Copy"),
 		sigc::mem_fun(
 		    *this,
 		    &ConditionsBox::ConditionsTreeView::onCopy)));
@@ -129,7 +129,7 @@ void ConditionsBox::ConditionsTreeView::on_select()
 
 void ConditionsBox::ConditionsTreeView::on_add()
 {
-    SimpleTypeBox box("Name of the condition ?");
+    SimpleTypeBox box(_("Name of the condition ?"));
     vpz::ConditionList& list = mConditions->conditionlist();
     std::string name = boost::trim_copy(box.run());
 
@@ -157,7 +157,7 @@ void ConditionsBox::ConditionsTreeView::onRename()
 
     if (it) {
         Glib::ustring oldname = (*it)[mColumns.m_col_name];
-        SimpleTypeBox box("New name of the condition ?");
+        SimpleTypeBox box(_("New name of the condition ?"));
         std::string newname = boost::trim_copy(box.run());
 	vpz::ConditionList& list = mConditions->conditionlist();
 
@@ -207,7 +207,7 @@ ConditionsBox::PortsTreeView::PortsTreeView(
 {
     mRefTreeModel = Gtk::ListStore::create(mColumns);
     set_model(mRefTreeModel);
-    append_column("Parameters", mColumns.m_col_name);
+    append_column(_("Parameters"), mColumns.m_col_name);
     mRefTreeSelection = get_selection();
     mRefTreeSelection->signal_changed().connect(
         sigc::mem_fun(*this,
@@ -219,19 +219,19 @@ ConditionsBox::PortsTreeView::PortsTreeView(
 
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-		"_Add",
+		_("_Add"),
 		sigc::mem_fun(
 		    *this,
 		    &ConditionsBox::PortsTreeView::on_add)));
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-		"_Remove",
+		_("_Remove"),
 		sigc::mem_fun(
 		    *this,
 		    &ConditionsBox::PortsTreeView::on_remove)));
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-		"_Rename",
+		_("_Rename"),
 		sigc::mem_fun(
 		    *this,
 		    &ConditionsBox::PortsTreeView::onRename)));
@@ -294,7 +294,7 @@ void ConditionsBox::PortsTreeView::on_select()
 
 void ConditionsBox::PortsTreeView::on_add()
 {
-    SimpleTypeBox box("Name of the parameter ?");
+    SimpleTypeBox box(_("Name of the parameter ?"));
     std::list < std::string > list;
 
     mCondition->portnames(list);
@@ -326,7 +326,7 @@ void ConditionsBox::PortsTreeView::onRename()
     std::list < std::string > list;
     mCondition->portnames(list);
     if (it_select) {
-        SimpleTypeBox box("Name of the condition ?");
+        SimpleTypeBox box(_("Name of the condition ?"));
         std::string newname = boost::trim_copy(box.run());
         std::list < std::string >::const_iterator it_find =
             std::find(list.begin(), list.end(), newname);

@@ -57,7 +57,7 @@ SimulatorDistant::~SimulatorDistant()
 
 void SimulatorDistant::start()
 {
-    m_out << boost::format("Simulator: CPU=%1% Port=%2%\n") % mNbCPU % mPort;
+    m_out << fmt(_("Simulator: CPU=%1% Port=%2%\n")) % mNbCPU % mPort;
 
     Glib::Thread* mWait = Glib::Thread::create(
         sigc::mem_fun(*this, &SimulatorDistant::wait), true);
@@ -70,7 +70,7 @@ void SimulatorDistant::wait()
 {
     for (;;) {
         mServer->accept_client("manager");
-        m_out << boost::format("Simulator: connection sucess\n");
+        m_out << fmt(_("Simulator: connection sucess\n"));
         std::string msg;
 
         for (;;) {
@@ -204,13 +204,13 @@ void SimulatorDistant::run()
     instance = file->project().instance();
     replica = file->project().replica();
 
-    m_out << boost::format("Simulator: %1% %2% %3%\n") % filename
+    m_out << fmt(_("Simulator: %1% %2% %3%\n")) % filename
         % instance % replica;
 
     r.start(file);
 
     if (r.haveError()) {
-        m_out << boost::format("/!\\ Error %1%\n") % ostr.str();
+        m_out << fmt(_("/!\\ Error %1%\n")) % ostr.str();
     }
 
     views = r.outputs();

@@ -24,6 +24,7 @@
 
 
 #include <vle/gvle/DialogString.hpp>
+#include <vle/utils/i18n.hpp>
 #include <gtkmm/stock.h>
 
 using Glib::ustring;
@@ -63,19 +64,19 @@ std::string DialogString::run()
         int response = Gtk::Dialog::run();
         if (response == Gtk::RESPONSE_OK) {
             if (get_string().empty()) {
-                return "No empty string";
+                return _("No empty string");
             } else if (get_string().is_ascii() == false) {
-                return "Only ascii character";
+                return _("Only ascii character");
             } else if (std::find(mList.begin(), mList.end(), get_string()) !=
                        mList.end()) {
-                return "Name already exist";
+                return _("Name already exist");
             } else {
                 hide();
                 return "";
             }
         } else {
             hide();
-            return "Empty string";
+            return _("Empty string");
         }
     }
 }

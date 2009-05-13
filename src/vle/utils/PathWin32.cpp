@@ -56,7 +56,7 @@ bool Path::initPath()
     {
         LONG result;
         HKEY hkey;
-        std::string key(boost::str(boost::format("%1% %2%.%3%.0") %
+        std::string key(boost::str(fmt("%1% %2%.%3%.0") %
                     "SOFTWARE\\VLE Development Team\\VLE" %
                     VLE_MAJOR_VERSION % VLE_MINOR_VERSION));
 

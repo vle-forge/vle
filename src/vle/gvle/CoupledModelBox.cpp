@@ -44,26 +44,26 @@ CoupledModelBox::InputPortTreeView::InputPortTreeView(
 {
     mRefTreeModelInputPort = Gtk::ListStore::create(mColumnsInputPort);
     set_model(mRefTreeModelInputPort);
-    append_column("Input Ports", mColumnsInputPort.m_col_name);
+    append_column(_("Input Ports"), mColumnsInputPort.m_col_name);
 
     {
 	Gtk::Menu::MenuList& menulist = mMenuPopup.items();
 
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-		"_Add",
+		_("_Add"),
 		sigc::mem_fun(
 		    *this,
 		    &CoupledModelBox::InputPortTreeView::onAdd)));
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-		"_Remove",
+		_("_Remove"),
 		sigc::mem_fun(
 		    *this,
 		    &CoupledModelBox::InputPortTreeView::onRemove)));
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-		"_Rename",
+		_("_Rename"),
 		sigc::mem_fun(
 		    *this,
 		    &CoupledModelBox::InputPortTreeView::onRename)));
@@ -129,7 +129,7 @@ void CoupledModelBox::InputPortTreeView::onRemove()
 
 void CoupledModelBox::InputPortTreeView::onRename()
 {
-    SimpleTypeBox box("New name of the input port ?");
+    SimpleTypeBox box(_("New name of the input port ?"));
     graph::ConnectionList& list = mModel->getInputPortList();
     Glib::ustring new_name = boost::trim_copy(box.run());
 
@@ -161,7 +161,7 @@ CoupledModelBox::OutputPortTreeView::OutputPortTreeView(
 {
     mRefTreeModelOutputPort = Gtk::ListStore::create(mColumnsOutputPort);
     set_model(mRefTreeModelOutputPort);
-    append_column("Output Ports", mColumnsOutputPort.m_col_name);
+    append_column(_("Output Ports"), mColumnsOutputPort.m_col_name);
 
     //Fill popup menu:
     {
@@ -169,19 +169,19 @@ CoupledModelBox::OutputPortTreeView::OutputPortTreeView(
 
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-		"_Add",
+		_("_Add"),
 		sigc::mem_fun(
 		    *this,
 		    &CoupledModelBox::OutputPortTreeView::onAdd)));
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-		"_Remove",
+		_("_Remove"),
 		sigc::mem_fun(
 		    *this,
 		    &CoupledModelBox::OutputPortTreeView::onRemove)));
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-		"_Rename",
+		_("_Rename)"),
 		sigc::mem_fun(
 		    *this,
 		    &CoupledModelBox::OutputPortTreeView::onRename)));
@@ -247,7 +247,7 @@ void CoupledModelBox::OutputPortTreeView::onRemove()
 
 void CoupledModelBox::OutputPortTreeView::onRename()
 {
-    SimpleTypeBox box("New name of the input port ?");
+    SimpleTypeBox box(_("New name of the input port ?"));
     graph::ConnectionList& list = mModel->getOutputPortList();
     Glib::ustring new_name = boost::trim_copy(box.run());
 

@@ -32,7 +32,7 @@ void JustRunMono::operator()(const CmdArgs& args)
 {
     m_lst.resize(args.size());
 
-    m_out << boost::format(
+    m_out << fmt(
         "JustRun: run %1% simples simulations in one thread\n") % args.size();
 
     if (m_output) {
@@ -56,7 +56,7 @@ void JustRunMono::operator()(const CmdArgs& args)
     }
 
     if (utils::Trace::trace().haveWarning()) {
-        m_out << boost::format(
+        m_out << fmt(
             "\n/!\\ Some warnings during simulation: See file %1%\n") %
             utils::Trace::trace().getLogFile();
     }
@@ -70,7 +70,7 @@ void JustRunThread::operator()(const CmdArgs& args)
         m_process = args.size();
     }
 
-    m_out << boost::format(
+    m_out << fmt(
         "JustRun: run %1% simples simulations in %2% threads\n") % args.size() %
         m_process;
 
@@ -92,7 +92,7 @@ void JustRunThread::operator()(const CmdArgs& args)
     }
 
     if (utils::Trace::trace().haveWarning()) {
-        m_out << boost::format(
+        m_out << fmt(
             "\n/!\\ Some warnings during simulation: See file %1%\n") %
             utils::Trace::trace().getLogFile();
     }

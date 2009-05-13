@@ -74,7 +74,7 @@ void ExperimentGenerator::build(OutputSimulationMatrix* matrix)
 
     OutputSimulationMatrix::extent_gen extent;
 
-    mOut << boost::format("Generator: build (%1% rep. x %2% cmb.)\n") %
+    mOut << fmt(_("Generator: build (%1% rep. x %2% cmb.)\n")) %
         mReplicasTab.size() % getCombinationNumber();
     mMatrix->resize(extent[mReplicasTab.size()][getCombinationNumber()]);
 
@@ -94,7 +94,7 @@ void ExperimentGenerator::build(Glib::Mutex* mutex, Glib::Cond* prod,
     {
         Glib::Mutex::Lock lock(*mMutex);
         OutputSimulationMatrix::extent_gen extent;
-        mOut << boost::format("Generator: build (%1% rep. x %2% cmb.)\n") %
+        mOut << fmt(_("Generator: build (%1% rep. x %2% cmb.)\n")) %
             mReplicasTab.size() % getCombinationNumber();
         mMatrix->resize(extent[mReplicasTab.size()][getCombinationNumber()]);
     }
@@ -105,7 +105,7 @@ void ExperimentGenerator::build(Glib::Mutex* mutex, Glib::Cond* prod,
 void ExperimentGenerator::buildReplicasList()
 {
     Assert < utils::ArgError >(mFile.project().experiment().replicas().number() > 0,
-           "The replicas's tag is not defined in the vpz file");
+           _("The replicas's tag is not defined in the vpz file"));
 
     mReplicasTab.resize(mFile.project().experiment().replicas().number());
     for (std::vector < guint32 >::iterator it = mReplicasTab.begin();
@@ -159,7 +159,7 @@ void ExperimentGenerator::buildCombinationsFromReplicas(size_t cmbnumber)
 
     Assert < utils::InternalError >(
            dest.conditionlist().size() == orig.conditionlist().size(),
-           boost::format("Error: %1% %2% %3%\n") % dest.conditionlist().size() %
+           fmt(_("Error: %1% %2% %3%\n")) % dest.conditionlist().size() %
            orig.conditionlist().size() % mCondition.size());
 
     for (size_t jcom = 0; jcom < mCondition.size(); ++jcom) {
@@ -174,7 +174,7 @@ void ExperimentGenerator::buildCombinationsFromReplicas(size_t cmbnumber)
         if (itValueDest == itDest->second.conditionvalues().end()) {
             Assert < utils::InternalError >(itValueOrig ==
                    itOrig->second.conditionvalues().end(),
-                   boost::format("Error: %1% %2%\n") %
+                   fmt(_("Error: %1% %2%\n")) %
                    itDest->second.conditionvalues().size() %
                    itOrig->second.conditionvalues().size());
             itDest++;
@@ -200,7 +200,7 @@ void ExperimentGenerator::buildCombinationsFromReplicas(size_t cmbnumber)
 void ExperimentGenerator::writeInstance(size_t cmbnumber, size_t replnumber)
 {
     std::string expname(
-        (boost::format("%1%-%2%-%3%") % mFile.project().experiment().
+        (fmt(_("%1%-%2%-%3%")) % mFile.project().experiment().
          name() % cmbnumber % replnumber).str());
 
     mTmpfile.project().experiment().setName(expname);
@@ -222,7 +222,7 @@ void ExperimentGenerator::writeInstance(size_t cmbnumber, size_t replnumber)
 void ExperimentGenerator::writeInstanceThread(size_t cmbnumber, size_t replnumber)
 {
     std::string expname(
-        (boost::format("%1%-%2%-%3%") % mFile.project().experiment().
+        (fmt(_("%1%-%2%-%3%")) % mFile.project().experiment().
          name() % cmbnumber % replnumber).str());
 
     mTmpfile.project().experiment().setName(expname);

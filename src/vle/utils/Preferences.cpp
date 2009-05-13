@@ -25,6 +25,7 @@
 #include <vle/utils/Preferences.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 
 namespace vle { namespace utils {
 
@@ -45,8 +46,8 @@ void Preferences::load()
     try {
         m_file.open(m_filepath.c_str(), std::ios::in);
     } catch (const std::exception& e) {
-        throw utils::InternalError(boost::format(
-                "Preference: cannot open file '%1%' for reading.") %
+        throw utils::InternalError(fmt(_(
+                "Preference: cannot open file '%1%' for reading.")) %
             m_filepath);
     }
 
@@ -70,8 +71,8 @@ void Preferences::save()
     try {
         m_file.open(m_filepath.c_str(), std::ios::out | std::ios::trunc);
     } catch (const std::exception& e) {
-        throw utils::InternalError(boost::format(
-                "Preference: cannot open file '%1%' for writing.") %
+        throw utils::InternalError(fmt(_(
+                "Preference: cannot open file '%1%' for writing.")) %
             m_filepath);
     }
 

@@ -51,7 +51,7 @@ void LocalStreamReader::onValue(const std::string& simulator,
         if (plg->isCopyDone()) {
             plg->stored()->write_to_png(
                 Glib::build_filename(plg->location(),
-                                     (boost::format("img-%1$08d.png") %
+                                     (fmt("img-%1$08d.png") %
                                       m_image).str()));
             m_image++;
         }

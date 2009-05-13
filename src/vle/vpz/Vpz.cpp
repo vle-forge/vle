@@ -66,9 +66,9 @@ void Vpz::parseFile(const std::string& filename)
             Vpz::validateFile(m_filename);
         } catch(const xmlpp::exception& dom) {
             saxparser.clearParserState();
-            throw(utils::ArgError(boost::format(
-                    "Parse file '%1%':\n[--libxml--]\n%2%[--libvpz--]\n%3%") %
-                filename % dom.what() % sax.what()));
+            throw(utils::ArgError(fmt(_(
+                    "Parse file '%1%':\n[--libxml--]\n%2%[--libvpz--]\n%3%")) %
+                    filename % dom.what() % sax.what()));
         }
     }
 }
@@ -86,12 +86,12 @@ void Vpz::parseMemory(const std::string& buffer)
             saxparser.clearParserState();
             Vpz::validateMemory(buffer);
         } catch(const std::exception& dom) {
-            throw(utils::ArgError(boost::format(
-                    "Parse memory:\n[--libxml--]\n%1%[--libvpz--]\n%2%") %
-                dom.what() % sax.what()));
+            throw(utils::ArgError(fmt(_(
+                    "Parse memory:\n[--libxml--]\n%1%[--libvpz--]\n%2%")) %
+                    dom.what() % sax.what()));
         }
-        throw(utils::ArgError(boost::format(
-                "Parse memory:\n[--libvpz--]\n%1%") % sax.what()));
+        throw(utils::ArgError(fmt(_(
+                "Parse memory:\n[--libvpz--]\n%1%")) % sax.what()));
     }
 }
 
@@ -101,8 +101,8 @@ value::Value* Vpz::parseValue(const std::string& buffer)
     SaxParser sax(vpz);
     sax.parse_memory(buffer);
 
-    Assert < utils::ArgError >(sax.isValue(),
-           boost::format("The buffer [%1%] is not a value.") % buffer);
+    Assert < utils::ArgError >(sax.isValue(), fmt(_(
+                "The buffer [%1%] is not a value.")) % buffer);
 
     return sax.getValue(0);
 }
@@ -114,7 +114,7 @@ std::vector < value::Value* > Vpz::parseValues(const std::string& buffer)
     sax.parse_memory(buffer);
 
     Assert < utils::ArgError >(sax.isValue(),
-           boost::format("The buffer [%1%] is not a value.") % buffer);
+           fmt(_("The buffer [%1%] is not a value.")) % buffer);
 
     return sax.getValues();
 }
@@ -124,8 +124,8 @@ void Vpz::write()
     std::ofstream out(m_filename.c_str());
 
     if (out.fail() or out.bad()) {
-        throw utils::FileError(boost::format(
-                "Vpz: cannot open file '%1%' for writing")
+        throw utils::FileError(fmt(_(
+                "Vpz: cannot open file '%1%' for writing"))
             % m_filename);
     }
 

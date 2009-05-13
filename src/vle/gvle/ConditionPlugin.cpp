@@ -25,6 +25,7 @@
 #include <vle/gvle/ConditionPlugin.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 #include <cassert>
 
 namespace vle { namespace gvle {
@@ -42,16 +43,16 @@ Glib::RefPtr < Gdk::Pixbuf > ConditionPlugin::icon() const
         try {
             m_icon = Gdk::Pixbuf::create_from_file(file);
         } catch(const Glib::FileError& e) {
-            throw utils::FileError(boost::format(
-                    "ConditionPlugin '%1%': FileError, %2%") % m_name %
+            throw utils::FileError(fmt(_(
+                    "ConditionPlugin '%1%': FileError, %2%")) % m_name %
                 e.what());
         } catch(const Gdk::PixbufError& e) {
-            throw utils::FileError(boost::format(
-                    "ConditionPlugin '%1%': PixbufError, %2%") % m_name %
+            throw utils::FileError(fmt(_(
+                    "ConditionPlugin '%1%': PixbufError, %2%")) % m_name %
                 e.what());
         } catch(...) {
-            throw utils::FileError(boost::format(
-                    "ConditionPlugin '%1%': Unknow error") % m_name);
+            throw utils::FileError(fmt(_(
+                    "ConditionPlugin '%1%': Unknow error")) % m_name);
         }
     }
     return m_icon;

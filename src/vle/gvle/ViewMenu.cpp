@@ -41,9 +41,9 @@ ViewMenu::ViewMenu(View* v) :
     makeMenuEdit(v);
     makeMenuTools();
 
-    items().push_back(Gtk::Menu_Helpers::MenuElem("_File", mMenuFile));
-    items().push_back(Gtk::Menu_Helpers::MenuElem("Edit", mMenuEdit));
-    items().push_back(Gtk::Menu_Helpers::MenuElem("_Tools", mMenuTools));
+    items().push_back(Gtk::Menu_Helpers::MenuElem(_("_File"), mMenuFile));
+    items().push_back(Gtk::Menu_Helpers::MenuElem(_("Edit"), mMenuEdit));
+    items().push_back(Gtk::Menu_Helpers::MenuElem(_("_Tools"), mMenuTools));
 }
 
 void ViewMenu::makeMenuFile(View* v)
@@ -58,17 +58,17 @@ void ViewMenu::makeMenuFile(View* v)
     menuList.push_back(Gtk::Menu_Helpers::SeparatorElem());
 
     menuList.push_back(Gtk::Menu_Helpers::MenuElem(
-                           "_Import Model",
+                           _("_Import Model"),
                            Gtk::AccelKey(GDK_I, Gdk::CONTROL_MASK),
                            sigc::mem_fun(v, &View::importModel)));
 
     menuList.push_back(Gtk::Menu_Helpers::MenuElem(
-                           "_Export Model",
+                           _("_Export Model"),
                            Gtk::AccelKey(GDK_E, Gdk::CONTROL_MASK),
                            sigc::mem_fun(v, &View::exportCurrentModel)));
 
     menuList.push_back(Gtk::Menu_Helpers::MenuElem(
-			   "_Export Graphic",
+			   _("_Export Graphic"),
 			   Gtk::AccelKey(GDK_L, Gdk::CONTROL_MASK),
 			   sigc::mem_fun(v, &View::exportGraphic)));
 
@@ -106,37 +106,37 @@ void ViewMenu::makeMenuTools()
     Gtk::Menu::MenuList& menuList = mMenuTools.items();
 
     menuList.push_back(Gtk::Menu_Helpers::MenuElem(
-			   "_Selection",
+			   _("_Selection"),
 			   Gtk::AccelKey("F1"),
 			   sigc::mem_fun(this, &ViewMenu::onArrow)));
 
     menuList.push_back(Gtk::Menu_Helpers::MenuElem(
-			   "_AtomicModel",
+			   _("_AtomicModel"),
 			   Gtk::AccelKey("F2"),
 			   sigc::mem_fun(this, &ViewMenu::onAddModels)));
 
     menuList.push_back(Gtk::Menu_Helpers::MenuElem(
-			   "Add _links",
+			   _("Add _links"),
 			   Gtk::AccelKey("F3"),
 			   sigc::mem_fun(this, &ViewMenu::onAddLinks)));
 
     menuList.push_back(Gtk::Menu_Helpers::MenuElem(
-			   "_CoupledModel",
+			   _("_CoupledModel"),
 			   Gtk::AccelKey("F4"),
 			   sigc::mem_fun(this, &ViewMenu::onAddCoupled)));
 
     menuList.push_back(Gtk::Menu_Helpers::MenuElem(
-			   "_Delete",
+			   _("_Delete"),
 			   Gtk::AccelKey("F5"),
 			   sigc::mem_fun(this, &ViewMenu::onDelete)));
 
     menuList.push_back(Gtk::Menu_Helpers::MenuElem(
-			   "_Zoom",
+			   _("_Zoom"),
 			   Gtk::AccelKey("F6"),
 			   sigc::mem_fun(this, &ViewMenu::onZoom)));
 
     menuList.push_back(Gtk::Menu_Helpers::MenuElem(
-			   "_Question",
+			   _("_Question"),
 			   Gtk::AccelKey("F7"),
 			   sigc::mem_fun(this, &ViewMenu::onQuestion)));
 }

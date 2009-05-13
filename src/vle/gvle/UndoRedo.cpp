@@ -68,7 +68,7 @@ graph::Model* UndoRedo::getModel()
 void UndoRedo::setNbUndo(int nbUndo)
 {
     if (nbUndo < 0)
-        gvle::Error("Number undo defined is smaller than 0 ?.");
+        gvle::Error(_("Number undo defined is smaller than 0 ?."));
     else
         mNbUndo = nbUndo;
 }

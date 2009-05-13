@@ -136,8 +136,7 @@ void LaunchSimulationBox::run_local_simu()
     } catch (const std::exception &e) {
         {
             Glib::Mutex::Lock lock(m_mutex_exception);
-            m_exception = (boost::format(
-                               "Error while loading project\n%1%") %
+            m_exception = (fmt(_("Error while loading project\n%1%")) %
                            e.what()).str();
             m_vle_error = true;
         }
@@ -150,8 +149,7 @@ void LaunchSimulationBox::run_local_simu()
     } catch (const std::exception &e) {
         {
             Glib::Mutex::Lock lock(m_mutex_exception);
-            m_exception = (boost::format(
-                               "Error while initializing project\n%1%") %
+            m_exception = (fmt(_("Error while initializing project\n%1%")) %
                            e.what()).str();
             m_vle_error = true;
         }
@@ -176,7 +174,7 @@ void LaunchSimulationBox::run_local_simu()
         } catch (const std::exception &e) {
             {
                 Glib::Mutex::Lock lock(m_mutex_exception);
-                m_exception = (boost::format("Simulator error\n%1%") % e.what()).str();
+                m_exception = (fmt(_("Simulator error\n%1%")) % e.what()).str();
                 m_vle_error = true;
             }
             return;
@@ -226,7 +224,7 @@ bool LaunchSimulationBox::timer()
     {
         Glib::Mutex::Lock lock(m_mutex_pause);
         if (m_pause) {
-            mProgressBar->set_text("PAUSE");
+            mProgressBar->set_text(_("PAUSE"));
             return true;
         }
     }
@@ -238,13 +236,13 @@ bool LaunchSimulationBox::timer()
         m_cond_set_stop.signal();
     }
     if (stop and m_gvle_time == 0.) {
-        mProgressBar->set_text("The simulator initializes the models");
+        mProgressBar->set_text(_("The simulator initializes the models"));
         return true;
     }
 
     if (stop and(m_gvle_time < m_max_time)) {
         mProgressBar->set_fraction(0);
-        mProgressBar->set_text("Simulation stopped");
+        mProgressBar->set_text(_("Simulation stopped"));
         return false;
     }
     if (not stop) {
@@ -275,7 +273,7 @@ void LaunchSimulationBox::catch_vle_exception()
 
 void LaunchSimulationBox::updateCurrentTime()
 {
-    std::string s = (boost::format("%1$10.0f") % m_gvle_time).str();
+    std::string s = (fmt("%1$10.0f") % m_gvle_time).str();
     mCurrentTime->set_label(s);
 }
 
@@ -283,7 +281,7 @@ void LaunchSimulationBox::updateProgressBar()
 {
     double p = m_gvle_time / m_max_time;
     mProgressBar->set_fraction(p);
-    mProgressBar->set_text((boost::format("%1$.0f %%")%(p*100.)).str());
+    mProgressBar->set_text((fmt("%1$.0f %%")%(p*100.)).str());
 }
 
 }} // namespace vle gvle

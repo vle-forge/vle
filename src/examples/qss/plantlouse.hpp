@@ -39,17 +39,17 @@ public:
 	       const devs::InitEventList& events);
 
     virtual ~Plantlouse();
-    
+
     virtual double compute(const devs::Time& time) const;
-    
+
 private:
     Var x;
     Ext y;
-    
+
     double a;
     double b;
 };
-	    
+
 }}} // namespace vle examples qss
 
 #endif

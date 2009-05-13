@@ -57,7 +57,7 @@ void CairoGauge::onParameter(const std::string& /* plugin */,
                              value::Value* parameters,
                              const double& /* time */)
 {
-    Assert < utils::InternalError >(m_ctx, "Cairo gauge drawing error");
+    Assert < utils::InternalError >(m_ctx, _("Cairo gauge drawing error"));
 
     xmlpp::DomParser parser;
 
@@ -82,7 +82,7 @@ void CairoGauge::onNewObservable(const std::string& simulator,
     std::string name(buildname(simulator, port));
 
     Assert < utils::InternalError >(mName == "",
-           boost::format("CairoGauge: observable '%1%' already exists")
+           fmt(_("CairoGauge: observable '%1%' already exists"))
            % name);
 
     mName = name;
@@ -111,8 +111,8 @@ void CairoGauge::onValue(const std::string& simulator,
         mValue = value->toDouble().value();
         delete value;
     } else {
-        throw utils::InternalError(boost::format(
-                "CairoGauge: columns %1% does not exist") % name);
+        throw utils::InternalError(fmt(
+                _("CairoGauge: columns %1% does not exist")) % name);
     }
 
     draw();
@@ -190,13 +190,13 @@ void CairoGauge::draw_text(Cairo::RefPtr < Cairo::Context > m_ctx)
 
     m_ctx->set_source_rgb(0.,0.,0.);
     m_ctx->move_to( mWindowWidth / 2 - rayon + 5 , mWindowHeight - 3*mLine);
-    m_ctx->show_text((boost::format("min: %1%") % mMin).str());
+    m_ctx->show_text((fmt("min: %1%") % mMin).str());
 
     m_ctx->move_to(mWindowWidth / 2 - 15, mWindowHeight - 3*mLine ) ;
     m_ctx->show_text(vle::utils::to_string( mValue));
 
     m_ctx->move_to(mWindowWidth / 2 + rayon - 40, mWindowHeight - 3*mLine );
-    m_ctx->show_text( (boost::format("max: %1%") % mMax).str() );
+    m_ctx->show_text( (fmt("max: %1%") % mMax).str() );
 }
 
 }}} // namespace vle oov plugin

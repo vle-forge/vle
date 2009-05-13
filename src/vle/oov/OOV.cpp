@@ -32,7 +32,7 @@ namespace vle { namespace oov {
 
 void OOV::printInformations(std::ostream& out)
 {
-    out << "Oov - Output of VLE\n";
+    out << _("Oov - Output of VLE\n");
     utils::printInformations(out);
 }
 

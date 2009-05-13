@@ -57,7 +57,7 @@ std::map < Simulator*, EventBagModel >::value_type&
         return **r;
     }
 
-    throw utils::InternalError("Top bag problem");
+    throw utils::InternalError(_("Top bag problem"));
 }
 
 void CompleteEventBagModel::invalidateModel(Simulator* mdl)

@@ -84,7 +84,7 @@ void Tuple::fill(const std::string& str)
                 try {
                     m_value.push_back(boost::lexical_cast < long >(*it));
                 } catch(const boost::bad_lexical_cast& e) {
-                    throw utils::ArgError(boost::format(
+                    throw utils::ArgError(fmt(
                                 "Can not convert string '%1%' into"
                                 " double or long") % (*it));
                 }

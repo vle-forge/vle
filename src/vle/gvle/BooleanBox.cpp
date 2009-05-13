@@ -31,7 +31,7 @@ namespace vle
 {
 namespace gvle {
 BooleanBox::BooleanBox(value::Boolean* boolean):
-        Gtk::Dialog("Boolean",true,true),
+        Gtk::Dialog(_("Boolean"),true,true),
         mValue(boolean)
 {
     add_button(Gtk::Stock::APPLY, Gtk::RESPONSE_APPLY);

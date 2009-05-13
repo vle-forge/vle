@@ -78,13 +78,13 @@ void NewModelClassBox::on_apply()
     boost::trim(class_name);
 
     if (class_name.empty() || classes.exist(class_name)) {
-        Error("Enter a VALID class name.");
+        Error(_("Enter a VALID class name."));
         return;
     }
 
     Gtk::TreeModel::iterator iter = mComboTypeModel->get_active();
     if (not iter) {
-        Error("Choose a model type.");
+        Error(_("Choose a model type."));
         return;
     }
     std::string model_type = iter->get_value(mColumns.m_col_type);
@@ -92,7 +92,7 @@ void NewModelClassBox::on_apply()
     std::string model_name = mEntryModelName->get_text();
     boost::trim(model_name);
     if (model_name.empty()) {
-        Error("Enter a model name.");
+        Error(_("Enter a model name."));
         return;
     }
 

@@ -117,8 +117,8 @@ const Host& Hosts::get_host(const std::string& hostname) const
 {
     SetHosts::iterator it = mHosts.find(Host(hostname, 0, 0));
 
-    Assert < utils::ArgError >(it != mHosts.end(), boost::format(
-                "Cannot delete hostname '%1%") % hostname);
+    Assert < utils::ArgError >(it != mHosts.end(), fmt(
+                _("Cannot delete hostname '%1%")) % hostname);
 
     return (*it);
 }

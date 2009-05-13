@@ -61,12 +61,12 @@ void CairoNetView::onParameter(const std::string& /* plugin */,
 {
     m_display_node_names = false;
 
-    Assert < utils::InternalError >(m_ctx, "Cairo caview drawing error");
+    Assert < utils::InternalError >(m_ctx, _("Cairo caview drawing error"));
     xmlpp::DomParser parser;
 
     if (not parameters and not parameters->isXml()) {
         throw utils::ArgError(
-            "NetView: Initialization failed, bad parameters");
+            _("NetView: Initialization failed, bad parameters"));
     }
 
     parser.parse_memory(value::toXml(parameters));

@@ -30,8 +30,10 @@
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Host.hpp>
+#include <vle/utils/i18n.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Pool.hpp>
+#include <vle/utils/Preferences.hpp>
 #include <vle/utils/Rand.hpp>
 #include <vle/utils/Simpson.hpp>
 #include <vle/utils/Socket.hpp>

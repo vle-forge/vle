@@ -106,7 +106,7 @@ value::Value* GenExecutiveClass::observation(const devs::ObservationEvent& ev)
 
 void GenExecutiveClass::add_new_model()
 {
-    std::string name((boost::format("beep-%1%") % m_stacknames.size()).str());
+    std::string name((fmt("beep-%1%") % m_stacknames.size()).str());
     if (m_buildbeepbeep) {
         createModelFromClass("beepbeep", &coupledmodel(), name);
     } else {
@@ -121,7 +121,7 @@ void GenExecutiveClass::add_new_model()
 void GenExecutiveClass::del_first_model()
 {
     if (m_stacknames.empty()) {
-        throw utils::InternalError(boost::format(
+        throw utils::InternalError(fmt(
                 "Cannot delete any model, the executive have no "
                 "element.").str());
     }

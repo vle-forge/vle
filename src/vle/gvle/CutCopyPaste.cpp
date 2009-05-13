@@ -57,9 +57,9 @@ void CutCopyPaste::cut(graph::ModelList& l, graph::CoupledModel* parent,
                        vpz::AtomicModelList& src)
 {
     if (parent->hasConnectionProblem(l) == true) {
-        std::cout << "Selected model list have connection with external model\n";
+        std::cout << _("Selected model list have connection with external model\n");
     } else if (l.empty()) {
-        std::cout << "No model selected\n";
+        std::cout << _("No model selected\n");
     } else if (l.find(parent->getName()) == l.end()) {
         clear();
         mType = CUT;
@@ -82,7 +82,7 @@ void CutCopyPaste::cut(graph::ModelList& l, graph::CoupledModel* parent,
         }
 
     } else {
-        std::cout << "Nothing to Cut - parent is '" << parent->getName() << "'\n";
+        std::cout << _("Nothing to Cut - parent is '") << parent->getName() << "'\n";
     }
 }
 
@@ -90,9 +90,9 @@ void CutCopyPaste::copy(graph::ModelList& l, graph::CoupledModel* parent,
                         vpz::AtomicModelList& src)
 {
     if (parent->hasConnectionProblem(l) == true) {
-        std::cout << "Selected model list have connection with external model\n";
+        std::cout << _("Selected model list have connection with external model\n");
     } else if (l.empty()) {
-        std::cout << "No model selected\n";
+        std::cout << _("No model selected\n");
     } else {
         clear();
         mType = COPY;
@@ -177,7 +177,7 @@ void CutCopyPaste::paste(graph::CoupledModel* gc, vpz::AtomicModelList& dst)
         gc->setBasicConnections(mwCnts);
         dst.add(list_vpz_clone);
     } else {
-        std::cout << "No Coupled Model\n";
+        std::cout << _("No Coupled Model\n");
     }
 
     //state();

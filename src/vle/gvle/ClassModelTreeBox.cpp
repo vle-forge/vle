@@ -37,16 +37,16 @@ namespace vle
 namespace gvle {
 
 ClassModelTreeBox::ClassModelTreeBox(Modeling* modeling) :
-        mButtonNew("new"),
-        mButtonView("view"),
-        mButtonDel("del"),
+        mButtonNew(_("new")),
+        mButtonView(_("view")),
+        mButtonDel(_("del")),
         mModeling(modeling)
 {
     assert(modeling);
 
     mRefTreeModel = Gtk::ListStore::create(mColumns);
     mTreeView.set_model(mRefTreeModel);
-    mTreeView.append_column("Name", mColumns.mName);
+    mTreeView.append_column(_("Name"), mColumns.mName);
     mTreeView.expand_all();
     mTreeView.set_rules_hint(true);
     mScrolledWindow.add(mTreeView);
@@ -59,7 +59,7 @@ ClassModelTreeBox::ClassModelTreeBox(Modeling* modeling) :
     add(mVBox);
 
     mHBoxButton.set_border_width(3);
-    set_title("Models class");
+    set_title(_("Models class"));
     set_default_size(200, 350);
     mVBox.set_border_width(3);
     set_border_width(5);
@@ -142,7 +142,7 @@ void ClassModelTreeBox::onClickOnButtonDel()
 {
     //std::string selected_model;
     //if (getSelectedName(selected_model)) {
-    //if (widgets::Question((boost::format(
+    //if (widgets::Question((fmt(
     //"Really delete class model '%1%' ?") % selected_model).str())) {
     //mModeling->delClassModel(selected_model);
     //parseModel();

@@ -108,8 +108,8 @@ View& Views::add(const View& view)
     std::pair < iterator, bool > x;
     x = m_list.insert(std::make_pair < std::string, View >(view.name(), view));
 
-    Assert < utils::ArgError >(x.second, boost::format(
-            "View '%1%' already exist") % view.name());
+    Assert < utils::ArgError >(x.second, fmt(
+            _("View '%1%' already exist")) % view.name());
 
     return x.first->second;
 }
@@ -118,7 +118,7 @@ View& Views::addEventView(const std::string& name,
                           const std::string& output)
 {
     Assert < utils::ArgError >(not isUsedOutput(output),
-           boost::format("Output '%1%' of view '%2%' is already used") %
+           fmt(_("Output '%1%' of view '%2%' is already used")) %
            output % name);
 
     return add(View(name, View::EVENT, output));
@@ -129,7 +129,7 @@ View& Views::addTimedView(const std::string& name,
                           const std::string& output)
 {
     Assert < utils::ArgError >(not isUsedOutput(output),
-           boost::format("Output '%1%' of view '%2%' is already used") %
+           fmt(_("Output '%1%' of view '%2%' is already used")) %
            output % name);
 
     return add(View(name, View::TIMED, output, timestep));
@@ -139,7 +139,7 @@ View& Views::addFinishView(const std::string& name,
                            const std::string& output)
 {
     Assert < utils::ArgError >(not isUsedOutput(output),
-           boost::format("Output '%1%' of view '%2%' is already used") %
+           fmt(_("Output '%1%' of view '%2%' is already used")) %
            output % name);
 
     return add(View(name, View::FINISH, output));
@@ -154,7 +154,7 @@ const View& Views::get(const std::string& name) const
 {
     ViewList::const_iterator it = m_list.find(name);
     Assert < utils::ArgError >(it != end(),
-           boost::format("Unknow view '%1%'\n") % name);
+           fmt(_("Unknow view '%1%'\n")) % name);
 
     return it->second;
 }
@@ -163,7 +163,7 @@ View& Views::get(const std::string& name)
 {
     ViewList::iterator it = m_list.find(name);
     Assert < utils::ArgError >(it != end(),
-           boost::format("Unknow view '%1%'\n") % name);
+           fmt(_("Unknow view '%1%'\n")) % name);
 
     return it->second;
 }

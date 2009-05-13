@@ -37,10 +37,10 @@ GVLEMenu::GVLEMenu(GVLE* gvle)
     makeMenuSimulation(gvle);
     makeMenuHelp(gvle);
 
-    items().push_back(Gtk::Menu_Helpers::MenuElem("_File", mMenuFile));
-    items().push_back(Gtk::Menu_Helpers::MenuElem("_View", mMenuView));
-    items().push_back(Gtk::Menu_Helpers::MenuElem("_Sim", mMenuSimulation));
-    items().push_back(Gtk::Menu_Helpers::MenuElem("_Help", mMenuHelp));
+    items().push_back(Gtk::Menu_Helpers::MenuElem(_("_File"), mMenuFile));
+    items().push_back(Gtk::Menu_Helpers::MenuElem(_("_View"), mMenuView));
+    items().push_back(Gtk::Menu_Helpers::MenuElem(_("_Sim"), mMenuSimulation));
+    items().push_back(Gtk::Menu_Helpers::MenuElem(_("_Help"), mMenuHelp));
 }
 
 void GVLEMenu::makeMenuFile(GVLE* gvle)
@@ -84,35 +84,35 @@ void GVLEMenu::makeMenuView(GVLE* gvle)
 {
     Gtk::Menu::MenuList& menulist = mMenuView.items();
 
-    menulist.push_back(Gtk::Menu_Helpers::MenuElem("_Root tree",
+    menulist.push_back(Gtk::Menu_Helpers::MenuElem(_("_Root tree"),
                        Gtk::AccelKey(GDK_R, Gdk::CONTROL_MASK),
                        sigc::mem_fun(gvle, &GVLE::onShowModelTreeView)));
 
-    menulist.push_back(Gtk::Menu_Helpers::MenuElem("_Class models",
+    menulist.push_back(Gtk::Menu_Helpers::MenuElem(_("_Class models"),
                        Gtk::AccelKey(GDK_M, Gdk::CONTROL_MASK),
                        sigc::mem_fun(gvle, &GVLE::onShowModelClassView)));
 
     menulist.push_back(Gtk::Menu_Helpers::SeparatorElem());
 
     menulist.push_back(
-        Gtk::Menu_Helpers::MenuElem("_Iconify all views",
+        Gtk::Menu_Helpers::MenuElem(_("_Iconify all views"),
                                     Gtk::AccelKey(GDK_H, Gdk::CONTROL_MASK),
             sigc::mem_fun(gvle, &GVLE::onIconifyAllViews)));
 
     menulist.push_back(
-        Gtk::Menu_Helpers::MenuElem("_Deiconify all views",
+        Gtk::Menu_Helpers::MenuElem(_("_Deiconify all views"),
                                     Gtk::AccelKey(GDK_D, Gdk::CONTROL_MASK),
             sigc::mem_fun(gvle, &GVLE::onDeiconifyAllViews)));
 
     menulist.push_back(
-        Gtk::Menu_Helpers::MenuElem("_Close all views",
+        Gtk::Menu_Helpers::MenuElem(_("_Close all views"),
                                     Gtk::AccelKey(GDK_W, Gdk::CONTROL_MASK),
             sigc::mem_fun(gvle, &GVLE::onCloseAllViews)));
 
     menulist.push_back(Gtk::Menu_Helpers::SeparatorElem());
 
     menulist.push_back(
-        Gtk::Menu_Helpers::MenuElem("Pre_ferences",
+        Gtk::Menu_Helpers::MenuElem(_("Pre_ferences"),
                                     Gtk::AccelKey(GDK_F, Gdk::CONTROL_MASK),
             sigc::mem_fun(gvle, &GVLE::onPreferences)));
 }
@@ -122,29 +122,29 @@ void GVLEMenu::makeMenuSimulation(GVLE* gvle)
     Gtk::Menu::MenuList& menulist = mMenuSimulation.items();
 
     menulist.push_back(
-	Gtk::Menu_Helpers::MenuElem("_Project",
+	Gtk::Menu_Helpers::MenuElem(_("_Project"),
 				    Gtk::AccelKey(GDK_P,
 						  Gdk::CONTROL_MASK),
 				    sigc::mem_fun(gvle,
 						  &GVLE::onExperimentsBox)));
 
     menulist.push_back(Gtk::Menu_Helpers::MenuElem(
-			   "_Views", Gtk::AccelKey(GDK_Z, Gdk::CONTROL_MASK),
+			   _("_Views"), Gtk::AccelKey(GDK_Z, Gdk::CONTROL_MASK),
 			   sigc::mem_fun(gvle, &GVLE::onViewOutputBox)));
 
     menulist.push_back(Gtk::Menu_Helpers::MenuElem
-		       ("_Conditions", Gtk::AccelKey(GDK_C, Gdk::CONTROL_MASK),
+		       (_("_Conditions"), Gtk::AccelKey(GDK_C, Gdk::CONTROL_MASK),
 			sigc::mem_fun(gvle, &GVLE::onConditionsBox)));
 
     menulist.push_back(Gtk::Menu_Helpers::SeparatorElem());
 
     menulist.push_back(
-	Gtk::Menu_Helpers::MenuElem("H_osts",
+	Gtk::Menu_Helpers::MenuElem(_("H_osts"),
 				    sigc::mem_fun(gvle, &GVLE::onHostsBox)));
 
     menulist.push_back(
 	Gtk::Menu_Helpers::MenuElem(
-	    "_Launch Simulation", Gtk::AccelKey(GDK_L, Gdk::CONTROL_MASK),
+	    _("_Launch Simulation"), Gtk::AccelKey(GDK_L, Gdk::CONTROL_MASK),
 	    sigc::mem_fun(gvle, &GVLE::onSimulationBox)));
 }
 
@@ -153,7 +153,7 @@ void GVLEMenu::makeMenuHelp(GVLE* gvle)
     Gtk::Menu::MenuList& menulist = mMenuHelp.items();
 
     menulist.push_back(
-	Gtk::Menu_Helpers::MenuElem("About",
+	Gtk::Menu_Helpers::MenuElem(_("About"),
 				    sigc::mem_fun(gvle, &GVLE::onShowAbout)));
 }
 

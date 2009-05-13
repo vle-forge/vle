@@ -168,15 +168,15 @@ bool ExperimentBox::apply()
 	std::string error;
 
 	if (mEntryAuthor->get_text().empty()) {
-	    error += "Set an author for this project.\n";
+	    error += _("Set an author for this project.\n");
 	}
 
 	if (mEntryVersion->get_text().empty()) {
-	    error += "Set an number of version for this project.\n";
+	    error += _("Set an number of version for this project.\n");
 	}
 
 	if (mEntryName->get_text().empty()) {
-	    error += "Set a name for this experiment.\n";
+	    error += _("Set a name for this experiment.");
 	}
 
 	if (error.empty()) {

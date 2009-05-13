@@ -44,7 +44,7 @@ namespace vle { namespace utils {
             delete m_file;
             m_file = 0;
 	} else {
-            (*m_file) << "Start log at " << utils::get_current_date() << "\n\n";
+            (*m_file) << _("Start log at ") << utils::get_current_date() << "\n\n";
             (*m_file) << std::flush;
         }
     }
@@ -67,7 +67,7 @@ namespace vle { namespace utils {
 	    }
 	    m_filename.assign(filename);
 	    m_file = tmp;
-            (*m_file) << "Start log at " << utils::get_current_date() << "\n\n";
+            (*m_file) << _("Start log at ") << utils::get_current_date() << "\n\n";
             (*m_file) << std::flush;
 	}
     }
@@ -84,8 +84,8 @@ namespace vle { namespace utils {
 
     std::ostream& Trace::output()
     {
-        Assert(m_file, "Trace stream is empty");
-        Assert(m_file->is_open(), "Trace stream is not opened");
+        Assert(m_file, _("Trace stream is empty"));
+        Assert(m_file->is_open(), _("Trace stream is not opened"));
 
         return *m_file;
 

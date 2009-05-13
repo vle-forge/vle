@@ -50,11 +50,11 @@ int main(int argc, char* argv[])
         utils::Trace::trace().setLevel(
             static_cast < utils::Trace::Level >(command.verbose()));
     } catch(const Glib::Error& e) {
-        std::cerr << "Error parsing command line: " << e.what() << std::endl;
+        std::cerr << _("Error parsing command line: ") << e.what() << std::endl;
         utils::finalize();
         return EXIT_FAILURE;
     } catch(const std::exception& e) {
-        std::cerr << "Command line error: " << e.what() << std::endl;
+        std::cerr << _("Command line error: ") << e.what() << std::endl;
         utils::finalize();
         return EXIT_FAILURE;
     }
@@ -65,10 +65,10 @@ int main(int argc, char* argv[])
 
     bool result = true;
     if (command.infos()) {
-        std::cerr << "Oov - the Output of VLE\n";
+        std::cerr << _("Oov - the Output of VLE\n");
         utils::printInformations(std::cerr);
     } else if (command.version()) {
-        std::cerr << "Oov - the Output of VLE\n";
+        std::cerr << _("Oov - the Output of VLE\n");
         utils::printVersion(std::cerr);
     } else {
         try {
@@ -77,12 +77,12 @@ int main(int argc, char* argv[])
             net.process();
         } catch(const Glib::Exception& e) {
             result = false;
-            std::cerr << "\n/!\\ oov Glib error reported: " <<
-                vle::utils::demangle(typeid(e)) << "\n" << e.what();
+            std::cerr << _("\n/!\\ oov Glib error reported: ") <<
+                vle::utils::demangle(typeid(e)) << _("\n") << e.what();
         } catch(const std::exception& e) {
             result = false;
-            std::cerr << "\n/!\\ oov exception reported: " <<
-                vle::utils::demangle(typeid(e)) << "\n" << e.what();
+            std::cerr << _("\n/!\\ oov exception reported: ") <<
+                vle::utils::demangle(typeid(e)) << _("\n") << e.what();
         }
     }
 

@@ -268,11 +268,13 @@ public:
             if (not step.isInfinity()) {
                 m_value -= step;
             } else {
-                throw utils::ArgError("Time: -infinity is not representable");
+                throw utils::ArgError(_(
+                        "Time: -infinity is not representable"));
             }
         } else {
             if (step.isInfinity()) {
-                throw utils::ArgError("Time: infinity -= infinity");
+                throw utils::ArgError(_(
+                        "Time: infinity -= infinity"));
             }
         }
     }
@@ -298,13 +300,15 @@ public:
             if (not step.isInfinity()) {
                 return Time(m_value - step.m_value);
             } else {
-                throw utils::ArgError("Time: -infinity is not representable");
+                throw utils::ArgError(_(
+                        "Time: -infinity is not representable"));
             }
         } else {
             if (not step.isInfinity()) {
                 return infinity;
             } else {
-                throw utils::ArgError("Time: infinity -= infinity");
+                throw utils::ArgError(_(
+                        "Time: infinity -= infinity"));
             }
         }
     }

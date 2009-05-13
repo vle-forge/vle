@@ -407,8 +407,8 @@ void qss2::output(const Time& /* time */,
             it = m_variableName.find(i);
 
             if (it == m_variableName.end()) {
-                throw utils::ModellingError(boost::format(
-                        "Qss2: unknow variable %1%") % it->second);
+                throw utils::ModellingError(fmt(_(
+                        "Qss2: unknow variable %1%")) % it->second);
             }
             ee << attribute(it->second, getValue(i));
         }

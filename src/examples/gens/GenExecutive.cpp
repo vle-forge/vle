@@ -103,7 +103,7 @@ value::Value* GenExecutive::observation(const devs::ObservationEvent& ev) const
         set->addCloneValue(*value::Integer::create(1));
         if(get_nb_model() > 0 and ev.getTime() < 50.0){
             set->addCloneValue(*value::String::create("add"));
-            std::string name = (boost::format("beep_%1%") % m_stacknames.size()).str();
+            std::string name = (fmt("beep_%1%") % m_stacknames.size()).str();
             set->addCloneValue(*value::String::create(name));
             set->addCloneValue(*value::String::create("2"));
             std::string edge =  name + std::string(" counter ");
@@ -111,7 +111,7 @@ value::Value* GenExecutive::observation(const devs::ObservationEvent& ev) const
         }
         else if(get_nb_model() > 0){
             set->addCloneValue(*value::String::create("delete"));
-            std::string name = (boost::format(
+            std::string name = (fmt(
                     "beep_%1%") % (get_nb_model())).str();
             set->addCloneValue(*value::String::create(name));
         }
@@ -131,7 +131,7 @@ value::Value* GenExecutive::observation(const devs::ObservationEvent& ev) const
 
 void GenExecutive::add_new_model()
 {
-    std::string name((boost::format("beep_%1%") % m_stacknames.size()).str());
+    std::string name((fmt("beep_%1%") % m_stacknames.size()).str());
 
     graph::AtomicModel* atom(new graph::AtomicModel(name, &coupledmodel()));
     atom->addOutputPort("out");
@@ -144,7 +144,7 @@ void GenExecutive::add_new_model()
 void GenExecutive::del_first_model()
 {
     if (m_stacknames.empty()) {
-        throw utils::InternalError(boost::format(
+        throw utils::InternalError(fmt(
                 "Cannot delete any model, the executive have no "
                 "element.").str());
     }

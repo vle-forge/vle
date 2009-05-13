@@ -28,6 +28,7 @@
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Socket.hpp>
 #include <vle/utils/Path.hpp>
+#include <vle/utils/i18n.hpp>
 #include <vle/version.hpp>
 
 #include <glibconfig.h>
@@ -79,8 +80,8 @@ std::string write_to_temp(const std::string& prefix,
     else
         fd = Glib::file_open_tmp(filename);
 
-    Assert(fd != -1, boost::format(
-            "Cannot open file %2% with prefix %1% in tempory directory\n") %
+    Assert(fd != -1, fmt(_(
+            "Cannot open file %2% with prefix %1% in tempory directory\n")) %
         prefix % filename);
 
 #ifdef G_OS_WIN32
@@ -89,9 +90,9 @@ std::string write_to_temp(const std::string& prefix,
     ssize_t sz = ::write(fd, buffer.c_str(), buffer.size());
 #endif
 
-    Assert(sz != -1 and sz != 0,
-           boost::format("Cannot write buffer in file %1% in tempory "
-                         "directory\n") % filename);
+    Assert(sz != -1 and sz != 0, fmt(_(
+                "Cannot write buffer in file %1% in tempory directory\n")) %
+            filename);
 
 #ifdef G_OS_WIN32
     ::_close(fd);
@@ -238,12 +239,10 @@ bool buildDirectory(const std::string& dirname)
 #else
         if (g_mkdir(dirname.c_str(), 0755) == -1) {
 #endif
-            TraceImportant(boost::format(
-                    "Building directory %1% failed\n") % dirname);
+            TraceImportant(fmt(_("Building directory %1% failed\n")) % dirname);
             return false;
         } else {
-            TraceImportant(boost::format(
-                    "Make directory %1% success\n") % dirname);
+            TraceImportant(fmt(_("Make directory %1% success\n")) % dirname);
             return true;
         }
     }
@@ -265,8 +264,7 @@ std::string getUserDirectory()
 #else
         if (g_mkdir(home.c_str(), 0755) == -1) {
 #endif
-            TraceImportant(boost::format(
-                    "Error mkdir %1% directory user\n") % home);
+            TraceImportant(fmt(_("Error mkdir %1% directory user\n")) % home);
             return std::string();
         }
     }
@@ -304,6 +302,12 @@ void init()
     utils::install_signal();
     utils::initUserDirectory();
     utils::net::Base::init();
+
+#ifdef VLE_HAVE_NLS
+    setlocale(LC_ALL, "");
+    bindtextdomain(VLE_LOCALE_NAME, utils::Path::path().getLocaleDir().c_str());
+    textdomain(VLE_LOCALE_NAME);
+#endif
 }
 
 void finalize()
@@ -315,11 +319,7 @@ void finalize()
 void printInformations(std::ostream& out)
 {
     utils::printVersion(out);
-
-    out << "* Simulator paths:\n" << Path::path().getSimulatorDirs();
-    out << "* Stream paths:\n" << Path::path().getStreamDirs();
-    out << "* Output paths:\n" << Path::path().getOutputDirs();
-    out << "* Conditions paths:\n" << Path::path().getConditionDirs();
+    out << "\n" << Path::path() << "\n" << std::endl;
 }
 
 void printVersion(std::ostream& out)
@@ -329,16 +329,16 @@ void printVersion(std::ostream& out)
         extra = "(" + extra + ")";
     }
 
-    out << boost::format(
+    out << fmt(_(
         "Virtual Laboratory Environment - "
         "%1%.%2%.%3% %4%\n"
         "Copyright (C) 2003 - 2008 The VLE Development Team.\n"
         "VLE comes with ABSOLUTELY NO WARRANTY.\n"
         "You may redistribute copies of VLE\n"
         "under the terms of the GNU General Public License.\n"
-        "For more information about these matters, see the file named COPYING.")
-        % VLE_MAJOR_VERSION % VLE_MINOR_VERSION % VLE_PATCH_VERSION % extra
-        << std::endl;
+        "For more information about these matters, see the file named "
+        "COPYING.\n")) % VLE_MAJOR_VERSION % VLE_MINOR_VERSION %
+        VLE_PATCH_VERSION % extra << std::endl;
 }
 
 }} // namespace vle utils

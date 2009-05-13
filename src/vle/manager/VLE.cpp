@@ -65,24 +65,24 @@ bool VLE::runManager(bool allInLocal, bool savevpz, int nbProcessor, const
     try {
         if (allInLocal) {
             if (nbProcessor == 1) {
-                std::cerr << boost::format(
-                    "Manager all simulations in one thread\n");
+                std::cerr << fmt(_(
+                    "Manager all simulations in one thread\n"));
                 ManagerRunMono r(std::cerr, savevpz);
                 r.start(args.front());
             } else {
-                std::cerr << boost::format(
-                    "Manager all simulations in %1% processor\n") % nbProcessor;
+                std::cerr << fmt(_(
+                    "Manager all simulations in %1% processor\n")) % nbProcessor;
                 ManagerRunThread r(std::cerr, savevpz, nbProcessor);
                 r.start(args.front());
             }
         } else {
-            std::cerr << "Manager with distant simulator\n";
+            std::cerr << _("Manager with distant simulator\n");
             ManagerRunDistant r(std::cerr, savevpz);
             r.start(args.front());
         }
     } catch(const std::exception& e) {
-        std::cerr << "\n/!\\ vle manager error reported: "
-            << utils::demangle(typeid(e)) << "\n" << e.what();
+        std::cerr << fmt(_("\n/!\\ vle manager error reported: %1%\n")) %
+            utils::demangle(typeid(e)) << e.what();
         return false;
     }
     return true;
@@ -91,21 +91,22 @@ bool VLE::runManager(bool allInLocal, bool savevpz, int nbProcessor, const
 bool VLE::runSimulator(int process)
 {
     try {
-        std::cerr << "Simulator start in daemon mode\n";
+        std::cerr << _("Simulator start in daemon mode\n");
 
         if (utils::Trace::trace().getLevel() != utils::Trace::DEBUG) {
             utils::buildDaemon();
         }
 
         utils::Trace::trace().setLogFile(
-            utils::Trace::getLogFilename(boost::str(boost::format(
+            utils::Trace::getLogFilename(boost::str(fmt(
                     "distant-%1%") % utils::get_simple_current_date())));
 
         SimulatorDistant sim(utils::Trace::trace().output(), process, mPort);
         sim.start();
     } catch(const std::exception& e) {
-            std::cerr << "\n/!\\ vle distant simulator error reported: "
-                << utils::demangle(typeid(e)) << "\n" << e.what();
+        std::cerr << fmt(_("\n/!\\ vle distant simulator error "
+                           " reported: %1%")) % utils::demangle(typeid(e)) <<
+                e.what();
         return false;
     }
     return true;
@@ -118,8 +119,8 @@ bool VLE::justRun(int nbProcessor, const CmdArgs& args)
             JustRunMono jrm(std::cerr);
             jrm.operator()(args);
         } catch(const std::exception& e) {
-            std::cerr << "\n/!\\ vle mono simulator error reported: "
-                << utils::demangle(typeid(e)) << "\n" << e.what();
+            std::cerr << fmt(_("\n/!\\ vle mono simulator error reported: %1%"))
+                % utils::demangle(typeid(e)) << e.what();
             return false;
         }
     } else {
@@ -127,8 +128,8 @@ bool VLE::justRun(int nbProcessor, const CmdArgs& args)
             JustRunThread jrt(std::cerr, nbProcessor);
             jrt.operator()(args);
         } catch(const std::exception& e) {
-            std::cerr << "\n/!\\ vle thread simulator error reported: "
-                << utils::demangle(typeid(e)) << "\n" << e.what();
+            std::cerr << fmt(_("\n/!\\ vle thread simulator error reported: "
+                               " %1%")) % utils::demangle(typeid(e)) << e.what();
             return false;
         }
     }

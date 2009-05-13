@@ -37,17 +37,17 @@ namespace vle { namespace gvle {
 ConnectionBox::ConnectionBox(graph::CoupledModel* parent,
                              graph::Model* src,
                              graph::Model* dst) :
-        Gtk::Dialog("Connection Box", true, true),
+        Gtk::Dialog(_("Connection Box"), true, true),
         m_vbox(false),
         m_hbox(true),
-        m_left("Source model"),
+        m_left(_("Source model")),
         m_left2(false),
-        m_right("Destination model"),
+        m_right(_("Destination model")),
         m_right2(false)
 {
     assert(parent and src and dst);
 
-    m_label.set_markup("<big><b>Connection</b></big>");
+    m_label.set_markup(_("<big><b>Connection</b></big>"));
     m_labelInput.set_markup(src->getName());
     m_labelOutput.set_markup(dst->getName());
 

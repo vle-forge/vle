@@ -118,8 +118,8 @@ void PluginTable::makeButtonsPlugins()
             m_radioButtons[(*it).second->getFormalismName()] = button;
         } catch (const std::exception& e) {
             gvle::Error(
-                (boost::format(
-                     "An error occured during plugin make button.\n%1%") %
+                (fmt(
+                     _("An error occured during plugin make button.\n%1%")) %
                  e.what()).str());
         }
         ++it;

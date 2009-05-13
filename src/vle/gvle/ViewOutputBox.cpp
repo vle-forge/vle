@@ -133,7 +133,7 @@ void ViewOutputBox::run()
 void ViewOutputBox::initViews()
 {
     m_model = Gtk::ListStore::create(m_viewscolumnrecord);
-    m_views->append_column("Name", m_viewscolumnrecord.name);
+    m_views->append_column(_("Name"), m_viewscolumnrecord.name);
     m_views->set_model(m_model);
 }
 
@@ -156,21 +156,21 @@ void ViewOutputBox::initMenuPopupViews()
 
     menulist.push_back(
         Gtk::Menu_Helpers::MenuElem(
-            "_Add", sigc::mem_fun(
+            _("_Add"), sigc::mem_fun(
                 *this, &ViewOutputBox::onAddViews)));
 
     menulist.push_back(
 	Gtk::Menu_Helpers::MenuElem(
-	    "_Copy", sigc::mem_fun(
+	    _("_Copy"), sigc::mem_fun(
 		*this, &ViewOutputBox::onCopyViews)));
 
     menulist.push_back(
         Gtk::Menu_Helpers::MenuElem(
-            "_Remove", sigc::mem_fun(
+            _("_Remove"), sigc::mem_fun(
                 *this, &ViewOutputBox::onRemoveViews)));
     menulist.push_back(
 	Gtk::Menu_Helpers::MenuElem(
-            "_Rename", sigc::mem_fun(
+            _("_Rename"), sigc::mem_fun(
                 *this, &ViewOutputBox::onRenameViews)));
 
     m_menu.accelerate(*m_views);
@@ -181,7 +181,7 @@ void ViewOutputBox::onAddViews()
     storePrevious();
     sensitive(true);
 
-    SimpleTypeBox box("Name of the view ?");
+    SimpleTypeBox box(_("Name of the view ?"));
     std::string name = boost::trim_copy(box.run());
     if (box.valid() and not name.empty() and not m_viewscopy.exist(name)) {
         Gtk::TreeIter iter = m_model->append();
@@ -238,7 +238,7 @@ void ViewOutputBox::onRenameViews()
         if (iter) {
             Gtk::TreeModel::Row row = *iter;
             std::string oldname(row.get_value(m_viewscolumnrecord.name));
-	    SimpleTypeBox box("Name of the view ?");
+	    SimpleTypeBox box(_("Name of the view ?"));
 	    std::string newname = boost::trim_copy(box.run());
 	    if (box.valid() and not newname.empty() and not m_viewscopy.exist(newname)) {
 		row[m_viewscolumnrecord.name] = newname;
@@ -325,7 +325,7 @@ void ViewOutputBox::onChangedFormat()
 void ViewOutputBox::onClickedDirectory()
 {
     Gtk::FileChooserDialog* box;
-    m_xml->get_widget("DialogDirectoryChooser", box);
+    m_xml->get_widget(_("DialogDirectoryChooser"), box);
 
     if (box->run() == Gtk::RESPONSE_OK) {
         m_location->set_text(box->get_current_folder());
@@ -379,17 +379,17 @@ void ViewOutputBox::storePrevious()
 void ViewOutputBox::fillCombobox()
 {
     Gtk::HBox* box;
-    m_xml->get_widget("comboboxTypeDialogViewOutput", box);
+    m_xml->get_widget(("comboboxTypeDialogViewOutput"), box);
     m_type = new Gtk::ComboBoxText();
     m_type->show_all();
     box->pack_start(*m_type, true, true, 0);
 
-    m_xml->get_widget("comboboxFormatDialogViewOutput", box);
+    m_xml->get_widget(_("comboboxFormatDialogViewOutput"), box);
     m_format = new Gtk::ComboBoxText();
     m_format->show_all();
     box->pack_start(*m_format, true, true, 0);
 
-    m_xml->get_widget("comboboxPluginDialogViewOutput", box);
+    m_xml->get_widget(_("comboboxPluginDialogViewOutput"), box);
     m_plugin = new Gtk::ComboBoxText();
     m_plugin->show_all();
     box->pack_start(*m_plugin, true, true, 0);
@@ -478,7 +478,7 @@ std::string ViewOutputBox::buildOutputName(const std::string& name) const
     long nb = 0;
 
     while (m_viewscopy.outputs().exist(result)) {
-        result.assign(boost::str(boost::format("%1%%2%") % name % nb));
+        result.assign(boost::str(fmt("%1%%2%") % name % nb));
         ++nb;
     }
 

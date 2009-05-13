@@ -41,7 +41,7 @@ namespace gvle {
 
 ModelDescriptionBox::ModelDescriptionBox(const set < string > & lst,
         graph::Model * model) :
-        Gtk::Dialog("Model Description", true, true),
+        Gtk::Dialog(_("Model Description"), true, true),
         m_lst(lst),
         m_model(model)
 {
@@ -52,7 +52,7 @@ ModelDescriptionBox::ModelDescriptionBox(const set < string > & lst,
 
     m_entry = Gtk::manage(new Gtk::Entry());
 
-    Gtk::Frame * frameNorth = Gtk::manage(new Gtk::Frame("Model name"));
+    Gtk::Frame * frameNorth = Gtk::manage(new Gtk::Frame(_("Model name")));
     frameNorth->set_border_width(5);
     frameNorth->set_shadow_type(Gtk::SHADOW_NONE);
     frameNorth->add(*m_entry);
@@ -82,13 +82,13 @@ bool ModelDescriptionBox::run()
 
         if (response == Gtk::RESPONSE_OK) {
             if (m_lst.find(getName()) != m_lst.end())
-                gvle::Error((boost::format(
-                                 "'%1%' already a model name") % getName()).str());
+                gvle::Error((fmt(
+                            _("'%1%' already a model name")) % getName()).str());
             else if (m_entry->get_text().is_ascii() == false)
-                gvle::Error((boost::format(
-                                 "'%1%' have no-ascii char") % getName()).str());
+                gvle::Error((fmt(
+                            _("'%1%' have no-ascii char")) % getName()).str());
             else if (m_entry->get_text().empty() == true)
-                gvle::Error("Empty model name ?");
+                gvle::Error(_("Empty model name ?"));
             else {
                 hide();
                 return true;

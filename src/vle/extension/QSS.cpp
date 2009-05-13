@@ -244,8 +244,8 @@ void Multiple::output(const Time& time, ExternalEventList& output) const
         it = mVariableName.find(mCurrentModel);
 
         if (it == mVariableName.end()) {
-            throw utils::ModellingError(boost::format(
-                    "QSS::Multiple: unknown variable: '%1%'") % it->second);
+            throw utils::ModellingError(fmt(_(
+                    "QSS::Multiple: unknown variable: '%1%'")) % it->second);
         }
 
         ExternalEvent* ee = new ExternalEvent(it->second);
@@ -389,8 +389,8 @@ void Multiple::externalTransition(const ExternalEventList& event,
             if ((*it)->onPort("update")) {
 
                 if (mVariableIndex.find(name) == mVariableIndex.end()) {
-                   throw utils::ModellingError(boost::format(
-                           "QSS::Multiple update, invalid variable name: '%1%'")
+                   throw utils::ModellingError(fmt(_(
+                           "QSS::Multiple update, invalid variable name: '%1%'"))
                        % name);
                 }
 
@@ -403,8 +403,8 @@ void Multiple::externalTransition(const ExternalEventList& event,
             if ((*it)->onPort("perturb")) {
 
                 if (mVariableIndex.find(name) == mVariableIndex.end()) {
-                    throw utils::InternalError(boost::format(
-                            "QSS::Multiple update, invalid variable name: %1%")
+                    throw utils::InternalError(fmt(_(
+                            "QSS::Multiple update, invalid variable name: %1%"))
                         % name);
                 }
 
@@ -479,8 +479,8 @@ const std::string& Multiple::getVariable(unsigned int index) const
     it = mVariableName.find(index);
 
     if (it == mVariableName.end()) {
-        throw utils::InternalError(boost::format(
-                "QSS::Multiple model, unknow variable index '%1%'") % index);
+        throw utils::InternalError(fmt(_(
+                "QSS::Multiple model, unknow variable index '%1%'")) % index);
     }
 
     return it->second;

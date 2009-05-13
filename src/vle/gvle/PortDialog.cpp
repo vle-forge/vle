@@ -36,8 +36,8 @@ namespace vle
 namespace gvle {
 
 PortDialog::PortDialog(graph::Model* model, PortDialog::PortType type) :
-        Gtk::Dialog("Port", true, true),
-        mLabelEntry("New port:"),
+        Gtk::Dialog(_("Port"), true, true),
+        mLabelEntry(_("New port:")),
         mModel(model),
         mPortType(type)
 {
@@ -48,19 +48,19 @@ PortDialog::PortDialog(graph::Model* model, PortDialog::PortType type) :
 
     switch (mPortType) {
     case PortDialog::INPUT :
-        mLabelDialogName.set_markup("<b>Add input port</b>");
+        mLabelDialogName.set_markup(_("<b>Add input port</b>"));
         break;
     case PortDialog::OUTPUT :
-        mLabelDialogName.set_markup("<b>Add output port</b>");
+        mLabelDialogName.set_markup(_("<b>Add output port</b>"));
         break;
     }
 
-    Glib::ustring name = "Model name:" + model->getName();
+    Glib::ustring name = _("Model name:") + model->getName();
     mLabelModelName.set_text(name);
 
     mListStore = Gtk::ListStore::create(mColumn);
     mTreeViewPorts.set_model(mListStore);
-    mTreeViewPorts.append_column("Name", mColumn.mName);
+    mTreeViewPorts.append_column(_("Name"), mColumn.mName);
     mScrolledWindow.add(mTreeViewPorts);
     mScrolledWindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
 
@@ -81,7 +81,7 @@ PortDialog::PortDialog(graph::Model* model, PortDialog::PortType type) :
 
 void PortDialog::fillTreeView()
 {
-    throw utils::NotYetImplemented("PortDialog::fillTreeView");
+    throw utils::NotYetImplemented(_("PortDialog::fillTreeView"));
     //const graph::MapStringPort& lst =
     //(mPortType == PortDialog::INPUT) ? mModel->getInputPortList() :
     //(mPortType == PortDialog::OUTPUT) ? mModel->getOutputPortList() :
@@ -105,13 +105,13 @@ bool PortDialog::run()
         if (response == Gtk::RESPONSE_OK) {
             Glib::ustring name = mEntryPortName.get_text();
             if (name.empty()) {
-                gvle::Error("Empty port name ?");
+                gvle::Error(_("Empty port name ?"));
             } else if (name.is_ascii() == false) {
                 gvle::Error(
-                    (boost::format("'%1%' have no-ascii char") % name).str());
+                    (fmt(_("'%1%' have no-ascii char")) % name).str());
             } else if (mSet.find(name) != mSet.end()) {
                 gvle::Error(
-                    (boost::format("'%1%' already a port") % name).str());
+                    (fmt(_("'%1%' already a port")) % name).str());
             } else {
                 switch (mPortType) {
                 case PortDialog::INPUT :

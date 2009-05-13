@@ -39,7 +39,7 @@ ModelTreeBox::ModelTreeBox(Modeling* m) :
 {
     assert(m);
 
-    set_title("Models tree");
+    set_title(_("Models tree"));
     set_border_width(5);
     set_default_size(200, 350);
 
@@ -49,7 +49,7 @@ ModelTreeBox::ModelTreeBox(Modeling* m) :
     m_refTreeModel = Gtk::TreeStore::create(m_Columns);
     m_TreeView.set_model(m_refTreeModel);
 
-    m_TreeView.append_column("Name", m_Columns.mName);
+    m_TreeView.append_column(_("Name"), m_Columns.mName);
 
     m_TreeView.signal_row_activated().connect(
         sigc::mem_fun(*this, &ModelTreeBox::row_activated));
@@ -69,7 +69,7 @@ void ModelTreeBox::initMenuPopupModels()
 
     menulist.push_back(
         Gtk::Menu_Helpers::MenuElem(
-            "_Rename", sigc::mem_fun(
+            _("_Rename"), sigc::mem_fun(
 		*this, &ModelTreeBox::onRenameModels)));
     m_menu.accelerate(m_TreeView);
 }
@@ -90,7 +90,7 @@ void ModelTreeBox::onRenameModels()
         if (iter) {
             Gtk::TreeModel::Row row = *iter;
             std::string oldname(row.get_value(m_modelscolumnrecord.name));
-	    SimpleTypeBox box("New name of this model?");
+	    SimpleTypeBox box(_("New name of this model?"));
 	    std::string newname = boost::trim_copy(box.run());
 	    if (box.valid() and not newname.empty()) {
 		try {

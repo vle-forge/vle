@@ -57,7 +57,7 @@ ReplicasBox::ReplicasBox(Glib::RefPtr < Gnome::Glade::Xml > ref) :
 
     mListStore = Gtk::ListStore::create(mColumn);
     mTreeViewValue->set_model(mListStore);
-    mTreeViewValue->append_column_editable("Value", mColumn.mValue);
+    mTreeViewValue->append_column_editable(_("Value"), mColumn.mValue);
 
     mRand = new vle::utils::Rand();
 }

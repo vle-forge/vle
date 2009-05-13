@@ -33,6 +33,7 @@
 #include <string>
 #include <sstream>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -122,7 +123,7 @@ namespace vle { namespace utils {
     inline void assert_exist_file(const std::string& filename)
     {
         if (not exist_file(filename)) {
-            throw FileError((boost::format("File %1% does not exist\n") %
+            throw FileError((fmt(_("File %1% does not exist\n")) %
                             filename).str());
         }
     }
@@ -355,8 +356,7 @@ namespace vle { namespace utils {
         in >> d;
 
         if (in.fail() == true) {
-            throw ArgError((boost::format("Cannot clean '%1%' into an double\n")
-                            % str).str());
+            throw ArgError(fmt(_("Cannot clean '%1%' into an double\n")) % str);
         }
 
         std::ostringstream out;
@@ -378,8 +378,7 @@ namespace vle { namespace utils {
         in >> i;
 
         if (in.fail() == true) {
-            throw ArgError((boost::format("cannot clean '%1%' into an int\n") %
-                            str).str());
+            throw ArgError(fmt(_("cannot clean '%1%' into an int\n")) % str);
         }
 
         std::ostringstream out;
@@ -401,8 +400,7 @@ namespace vle { namespace utils {
         in >> d;
 
         if (in.fail() == true) {
-            throw ArgError((boost::format("cannot clean '%1%' into an double\n") %
-                            str).str());
+            throw ArgError(fmt(_("cannot clean '%1%' into an double\n")) % str);
         }
 
         std::ostringstream out;
@@ -427,8 +425,7 @@ namespace vle { namespace utils {
         in >> i;
 
         if (in.fail() == true) {
-            throw ArgError((boost::format("cannot clean '%1%' into an int\n") %
-                            str).str());
+            throw ArgError(fmt(_("cannot clean '%1%' into an int\n")) % str);
         }
 
         std::ostringstream out;

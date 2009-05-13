@@ -39,7 +39,7 @@ using namespace vle;
 
 void print_help()
 {
-    std::cerr << "vlemodeltest modelname [xml dynamics files]" << std::endl;
+    std::cerr << _("vlemodeltest modelname [xml dynamics files]") << std::endl;
 }
 
 void build_vpz(const std::string& modelname, vpz::Vpz& vpz)

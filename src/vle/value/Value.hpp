@@ -285,13 +285,13 @@ namespace vle { namespace value {
 
     inline const Value& reference(const Value* value)
     {
-        if (not value) throw utils::ArgError("Null value");
+        if (not value) throw utils::ArgError(_("Null value"));
         return *value;
     }
 
     inline Value& reference(Value* value)
     {
-        if (not value) throw utils::ArgError("Null value");
+        if (not value) throw utils::ArgError(_("Null value"));
         return *value;
     }
 

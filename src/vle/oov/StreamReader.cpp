@@ -40,7 +40,7 @@ namespace vle { namespace oov {
 PluginPtr StreamReader::plugin() const
 {
     Assert < utils::InternalError >(m_plugin.get(),
-            "Plugin are not loaded and cannot respond to the StreamReader");
+            _("Plugin are not loaded and cannot respond to the StreamReader"));
 
     return m_plugin;
 }
@@ -51,8 +51,8 @@ void StreamReader::initPlugin(const std::string& plugin,
     utils::Path::PathList lst(utils::Path::path().getStreamDirs());
     utils::Path::PathList::const_iterator it;
 
-    std::string error((boost::format(
-                "Error opening oov plugin '%1%' in:") % plugin).str());
+    std::string error((fmt(
+                _("Error opening oov plugin '%1%' in:")) % plugin).str());
 
     for (it = lst.begin(); it != lst.end(); ++it) {
         try {

@@ -39,7 +39,7 @@ Ladybirdplantlouse::Ladybirdplantlouse(const graph::AtomicModel& model,
     e = value::toDouble(events.get("e"));
 
     x = createVar(0, "x");
-    y = createVar(1, "y");    
+    y = createVar(1, "y");
 }
 
 Ladybirdplantlouse::~Ladybirdplantlouse()
@@ -55,8 +55,8 @@ double Ladybirdplantlouse::compute(unsigned int i,
     case 1: // y
         return b * d * x() * y() - e * y();
     default:
-        throw utils::InternalError(boost::format(
-                "Compute problem with Ladybirdplantlouse, i == %1%") % i );
+        throw utils::InternalError(fmt(
+                _("Compute problem with Ladybirdplantlouse, i == %1%")) % i );
     }
 }
 

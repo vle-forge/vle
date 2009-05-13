@@ -64,7 +64,7 @@ MainWindow::MainWindow(Glib::RefPtr < Gnome::Glade::Xml > refXml, int port)
 Gtk::Window& MainWindow::window()
 {
     if (mWindow == 0) {
-        throw utils::InternalError("EOV main window is not initialized");
+        throw utils::InternalError(_("EOV main window is not initialized"));
     }
     return *mWindow;
 }
@@ -122,15 +122,15 @@ void MainWindow::onNew()
 				    &MainWindow::isStreamReaderFinish), 500);
 	    hideMenu();
         } catch(const std::exception& e) {
-            Gtk::MessageDialog a("Cannot open an Eov stream", false,
+            Gtk::MessageDialog a(_("Cannot open an Eov stream"), false,
                                  Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
             a.run();
             return;
         }
 
         Glib::RefPtr < Gtk::TextBuffer > buffer = mTextview->get_buffer();
-        buffer->insert(buffer->begin(), (boost::format(
-                    "%1%: Eov Stream listen on port %2% at %3%ms\n") %
+        buffer->insert(buffer->begin(), (fmt(_(
+                    "%1%: Eov Stream listen on port %2% at %3%ms\n")) %
 		   utils::get_current_date() % mPort % mRefresh).str());
         mTextview->set_editable(false);
         mTextview->show_all();
@@ -142,7 +142,7 @@ void MainWindow::onAbout()
     if (not mAbout) {
         mRefXml->get_widget("aboutdialog_eov", mAbout);
         if (not mAbout) {
-            throw utils::InternalError("EOV Glade file have problem");
+            throw utils::InternalError(_("EOV Glade file have problem"));
         }
         mAbout->signal_response().connect(
             sigc::mem_fun(*this, &MainWindow::onAboutClose));
@@ -202,14 +202,12 @@ bool MainWindow::isStreamReaderFinish()
 
 	Glib::RefPtr < Gtk::TextBuffer > buffer = mTextview->get_buffer();
 	if (not mNet->finishError().empty()) {
-	    buffer->insert(buffer->begin(), (boost::format(
-			    "/!\\ Error: %1%\n") %
-		mNet->finishError()).str());
+            buffer->insert(buffer->begin(), (fmt(_("/!\\ Error: %1%\n")) %
+                                             mNet->finishError()).str());
 	}
 
-	buffer->insert(buffer->begin(), (boost::format(
-			"%1%: Eov Stream close\n") %
-		    utils::get_current_date()).str());
+        buffer->insert(buffer->begin(), (fmt(_( "%1%: Eov Stream close\n")) %
+                                         utils::get_current_date()).str());
 	showMenu();
 	return false;
     }

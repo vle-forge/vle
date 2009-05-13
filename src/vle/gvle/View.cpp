@@ -201,7 +201,7 @@ bool View::existInSelectedModels(graph::Model* m)
 
 void View::clearCurrentModel()
 {
-    if (gvle::Question("All children model will be deleted, continue ?")) {
+    if (gvle::Question(_("All children model will be deleted, continue ?"))) {
         mCurrent->delAllConnection();
         mCurrent->delAllModel();
         mModeling->redrawModelTreeBox();
@@ -212,7 +212,7 @@ void View::exportCurrentModel()
 {
     vpz::Experiment& experiment = mModeling->vpz().project().experiment();
     if (experiment.name().empty() || experiment.duration() == 0) {
-        Error("Fix a Value to the name and the duration of the experiment before exportation.");
+        Error(_("Fix a Value to the name and the duration of the experiment before exportation."));
         return;
     }
 
@@ -221,7 +221,7 @@ void View::exportCurrentModel()
     file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
     Gtk::FileFilter filter;
-    filter.set_name("Vle Project gZipped");
+    filter.set_name(_("Vle Project gZipped"));
     filter.add_pattern("*.vpz");
     file.add_filter(filter);
 
@@ -244,22 +244,22 @@ void View::exportGraphic()
 {
     vpz::Experiment& experiment = mModeling->vpz().project().experiment();
     if (experiment.name().empty() || experiment.duration() == 0) {
-        Error("Fix a Value to the name and the duration of the experiment before exportation.");
+        Error(_("Fix a Value to the name and the duration of the experiment before exportation."));
         return;
     }
 
-    Gtk::FileChooserDialog file("Image file", Gtk::FILE_CHOOSER_ACTION_SAVE);
+    Gtk::FileChooserDialog file(_("Image file"), Gtk::FILE_CHOOSER_ACTION_SAVE);
     file.set_transient_for(*this);
     file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
     Gtk::FileFilter filterPng;
     Gtk::FileFilter filterPdf;
     Gtk::FileFilter filterSvg;
-    filterPng.set_name("Portable Newtork Graphics (.png)");
+    filterPng.set_name(_("Portable Newtork Graphics (.png)"));
     filterPng.add_pattern("*.png");
-    filterPdf.set_name("Portable Format Document (.pdf)");
+    filterPdf.set_name(_("Portable Format Document (.pdf)"));
     filterPdf.add_pattern("*.pdf");
-    filterSvg.set_name("Scalable Vector Graphics (.svg)");
+    filterSvg.set_name(_("Scalable Vector Graphics (.svg)"));
     filterSvg.add_pattern("*.svg");
     file.add_filter(filterPng);
     file.add_filter(filterPdf);
@@ -270,23 +270,23 @@ void View::exportGraphic()
         std::string filename(file.get_filename());
 	std::string extension(file.get_filter()->get_name());
 
-	if (extension == "Portable Newtork Graphics (.png)")
+	if (extension == _("Portable Newtork Graphics (.png)"))
 	    mDrawing->exportPng(filename);
-	else if (extension == "Portable Format Document (.pdf)")
+	else if (extension == _("Portable Format Document (.pdf)"))
 	    mDrawing->exportPdf(filename);
-	else if (extension == "Scalable Vector Graphics (.svg)")
+	else if (extension == _("Scalable Vector Graphics (.svg))"))
 	    mDrawing->exportSvg(filename);
     }
 }
 
 void View::importModel()
 {
-    Gtk::FileChooserDialog file("VPZ file", Gtk::FILE_CHOOSER_ACTION_OPEN);
+    Gtk::FileChooserDialog file(_("VPZ file"), Gtk::FILE_CHOOSER_ACTION_OPEN);
     file.set_transient_for(*this);
     file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
     Gtk::FileFilter filter;
-    filter.set_name("Vle Project gZipped");
+    filter.set_name(_("Vle Project gZipped"));
     filter.add_pattern("*.vpz");
     file.add_filter(filter);
 
@@ -400,7 +400,7 @@ void View::delModel(graph::Model* model)
 {
     mModeling->setModified(true);
     if (model) {
-        if (gvle::Question("Do you really want destroy model ?")) {
+        if (gvle::Question(_("Do you really want destroy model ?"))) {
             if (model->isCoupled()) {
                 mModeling->delViewOnModel((graph::CoupledModel*)model);
             }
@@ -438,8 +438,8 @@ void View::makeConnection(graph::Model* src, graph::Model* dst)
         PortDialog box(src, PortDialog::INPUT);
         if (box.run() == false) {
             gvle::Error(
-                (boost::format("Connection problem:\nSource %1%, a coupled "
-                               "model does not have input port") %
+                (fmt(_("Connection problem:\nSource %1%, a coupled "
+                       "model does not have input port")) %
                  src->getName()).str());
             return;
         }
@@ -448,8 +448,8 @@ void View::makeConnection(graph::Model* src, graph::Model* dst)
         PortDialog box(dst, PortDialog::OUTPUT);
         if (box.run() == false) {
             gvle::Error(
-                (boost::format("Connection problem:\nDestination %1% a "
-                               "coupled model does not have output port") %
+                (fmt(_("Connection problem:\nDestination %1% a "
+                       "coupled model does not have output port")) %
                  dst->getName()).str());
             return;
         }
@@ -458,8 +458,8 @@ void View::makeConnection(graph::Model* src, graph::Model* dst)
         PortDialog box(src, PortDialog::OUTPUT);
         if (box.run() == false) {
             gvle::Error(
-                (boost::format("Connection problem:\nSource %1% "
-                               "does not have output port") %
+                (fmt(_("Connection problem:\nSource %1% "
+                       "does not have output port")) %
                  src->getName()).str());
             return;
         }
@@ -468,8 +468,8 @@ void View::makeConnection(graph::Model* src, graph::Model* dst)
         PortDialog box(dst, PortDialog::INPUT);
         if (box.run() == false) {
             gvle::Error(
-                (boost::format("Connection problem:\nDestination %1% "
-                               "does not have input port") %
+                (fmt(_("Connection problem:\nDestination %1% "
+                       "does not have input port")) %
                  dst->getName()).str());
             return;
         }

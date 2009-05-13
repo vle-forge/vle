@@ -33,32 +33,32 @@ void RunVerbose::operator()(vpz::Vpz* vpz)
     try {
         m_out << "[" << vpz->filename() << "]\n";
 
-        m_out << " - Coordinator load models ......: ";
+        m_out << _(" - Coordinator load models ......: ");
         m_root.load(*vpz);
-        m_out << "ok\n";
+        m_out << _("ok\n");
 
-        m_out << " - Clean project file ...........: ";
+        m_out << _(" - Clean project file ...........: ");
         vpz->clear();
         delete vpz;
-        m_out << "ok\n";
+        m_out << _("ok\n");
 
-        m_out << " - Coordinator initializing .....: ";
+        m_out << _(" - Coordinator initializing .....: ");
         m_root.init();
-        m_out << "ok\n";
+        m_out << _("ok\n");
 
-        m_out << " - Simulation run................: ";
+        m_out << _(" - Simulation run................: ");
         while (m_root.run()) {}
-        m_out << "ok\n";
+        m_out << _("ok\n");
 
-        m_out << " - Coordinator cleaning .........: ";
+        m_out << _(" - Coordinator cleaning .........: ");
         m_root.finish();
-        m_out << "ok\n";
+        m_out << _("ok\n");
     } catch(const std::exception& e) {
-        m_out << "\n/!\\ vle error reported: " <<
+        m_out << _("\n/!\\ vle error reported: ") <<
             utils::demangle(typeid(e)) << "\n" << e.what();
         m_error = true;
     } catch(const Glib::Exception& e) {
-        m_out << "\n/!\\ vle Glib error reported: " <<
+        m_out << _("\n/!\\ vle Glib error reported: ") <<
             utils::demangle(typeid(e)) << "\n" << e.what();
         m_error = true;
     }
@@ -71,35 +71,35 @@ void RunVerbose::operator()(const std::string& filename)
     try {
         m_out << "[" << filename << "]\n";
         {
-            m_out << " - Open file.....................: ";
+            m_out << _(" - Open file.....................: ");
             vpz::Vpz vpz(filename);
-            m_out << "ok\n";
+            m_out << _("ok\n");
 
-            m_out << " - Coordinator load models ......: ";
+            m_out << _(" - Coordinator load models ......: ");
             m_root.load(vpz);
-            m_out << "ok\n";
+            m_out << _("ok\n");
 
-            m_out << " - Clean project file ...........: ";
+            m_out << _(" - Clean project file ...........: ");
         }
-        m_out << "ok\n";
+        m_out << _("ok\n");
 
-        m_out << " - Coordinator initializing .....: ";
+        m_out << _(" - Coordinator initializing .....: ");
         m_root.init();
-        m_out << "ok\n";
+        m_out << _("ok\n");
 
-        m_out << " - Simulation run................: ";
+        m_out << _(" - Simulation run................: ");
         while (m_root.run()) {}
-        m_out << "ok\n";
+        m_out << _("ok\n");
 
-        m_out << " - Coordinator cleaning .........: ";
+        m_out << _(" - Coordinator cleaning .........: ");
         m_root.finish();
-        m_out << "ok\n";
+        m_out << _("ok\n");
     } catch(const std::exception& e) {
-        m_out << "\n/!\\ vle error reported: " <<
+        m_out << _("\n/!\\ vle error reported: ") <<
             utils::demangle(typeid(e)) << "\n" << e.what();
         m_error = true;
     } catch(const Glib::Exception& e) {
-        m_out << "\n/!\\ vle Glib error reported: " <<
+        m_out << _("\n/!\\ vle Glib error reported: ") <<
             utils::demangle(typeid(e)) << "\n" << e.what();
         m_error = true;
     }
@@ -114,31 +114,31 @@ void RunVerbose::operator()(const vpz::Vpz& vpz)
             vpz::Vpz copy(vpz);
             m_out << "[" << copy.filename() << "]\n";
 
-            m_out << " - Coordinator load models ......: ";
+            m_out << _(" - Coordinator load models ......: ");
             m_root.load(copy);
-            m_out << "ok\n";
+            m_out << _("ok\n");
 
-            m_out << " - Clean project file ...........: ";
+            m_out << _(" - Clean project file ...........: ");
         }
-        m_out << "ok\n";
+        m_out << _("ok\n");
 
-        m_out << " - Coordinator initializing .....: ";
+        m_out << _(" - Coordinator initializing .....: ");
         m_root.init();
-        m_out << "ok\n";
+        m_out << _("ok\n");
 
-        m_out << " - Simulation run................: ";
+        m_out << _(" - Simulation run................: ");
         while (m_root.run()) {}
-        m_out << "ok\n";
+        m_out << _("ok\n");
 
-        m_out << " - Coordinator cleaning .........: ";
+        m_out << _(" - Coordinator cleaning .........: ");
         m_root.finish();
-        m_out << "ok\n";
+        m_out << _("ok\n");
     } catch(const std::exception& e) {
-        m_out << "\n/!\\ vle error reported: " <<
+        m_out << _("\n/!\\ vle error reported: ") <<
             utils::demangle(typeid(e)) << "\n" << e.what();
         m_error = true;
     } catch(const Glib::Exception& e) {
-        m_out << "\n/!\\ vle Glib error reported: " <<
+        m_out << _("\n/!\\ vle Glib error reported: ") <<
             utils::demangle(typeid(e)) << "\n" << e.what();
         m_error = true;
     }
@@ -157,12 +157,12 @@ void RunQuiet::operator()(vpz::Vpz* vpz)
         while (m_root.run()) {}
         m_root.finish();
     } catch(const std::exception& e) {
-        m_stringerror.assign(boost::str(boost::format(
-                "/!\\ vle error reported: %1%\n") % e.what()));
+        m_stringerror.assign(boost::str(fmt(_(
+                "/!\\ vle error reported: %1%\n")) % e.what()));
         m_error = true;
     } catch(const Glib::Exception& e) {
-        m_stringerror.assign(boost::str(boost::format(
-                "/!\\ vle Glib error reported: %1%\n") % e.what()));
+        m_stringerror.assign(boost::str(fmt(_(
+                "/!\\ vle Glib error reported: %1%\n")) % e.what()));
         m_error = true;
     }
 }
@@ -180,12 +180,12 @@ void RunQuiet::operator()(const std::string& filename)
         while (m_root.run()) {}
         m_root.finish();
     } catch(const std::exception& e) {
-        m_stringerror.assign(boost::str(boost::format(
-                "/!\\ vle error reported: %1%\n") % e.what()));
+        m_stringerror.assign(boost::str(fmt(_(
+                "/!\\ vle error reported: %1%\n")) % e.what()));
         m_error = true;
     } catch(const Glib::Exception& e) {
-        m_stringerror.assign(boost::str(boost::format(
-                "/!\\ vle Glib error reported: %1%\n") % e.what()));
+        m_stringerror.assign(boost::str(fmt(_(
+                "/!\\ vle Glib error reported: %1%\n")) % e.what()));
         m_error = true;
     }
 }
@@ -203,15 +203,14 @@ void RunQuiet::operator()(const vpz::Vpz& vpz)
         while (m_root.run()) {}
         m_root.finish();
     } catch(const std::exception& e) {
-        m_stringerror.assign(boost::str(boost::format(
-                "/!\\ vle error reported: %1%\n") % e.what()));
+        m_stringerror.assign(boost::str(fmt(_(
+                "/!\\ vle error reported: %1%\n")) % e.what()));
         m_error = true;
     } catch(const Glib::Exception& e) {
-        m_stringerror.assign(boost::str(boost::format(
-                "/!\\ vle Glib error reported: %1%\n") % e.what()));
+        m_stringerror.assign(boost::str(fmt(_(
+                "/!\\ vle Glib error reported: %1%\n")) % e.what()));
         m_error = true;
     }
 }
-
 
 }} // namespace vle manager

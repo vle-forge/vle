@@ -30,6 +30,7 @@
 #include <vle/gvle/TreeViewValue.hpp>
 #include <vle/gvle/ValueBox.hpp>
 #include <vle/gvle/XmlTypeBox.hpp>
+#include <vle/utils/i18n.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
 using namespace vle;
@@ -49,37 +50,37 @@ TreeViewValue::TreeViewValue()
         //Fill popup menu:
         Gtk::Menu::MenuList& items = mMenu.items();
 
-        items.push_back(MenuElem("Insert"));
+        items.push_back(MenuElem(_("Insert")));
 
         Gtk::MenuItem* pMenuItem = &items.back();
         Gtk::Menu* pMenu = Gtk::manage(new Gtk::Menu());
         MenuList insert = pMenu->items();
-        insert.push_back(Gtk::Menu_Helpers::MenuElem("Boolean", sigc::bind(
+        insert.push_back(Gtk::Menu_Helpers::MenuElem(_("Boolean"), sigc::bind(
                              sigc::mem_fun(*this, &TreeViewValue::on_menu_insert), Value::BOOLEAN)));
-        insert.push_back(Gtk::Menu_Helpers::MenuElem("Double", sigc::bind(
+        insert.push_back(Gtk::Menu_Helpers::MenuElem(_("Double"), sigc::bind(
                              sigc::mem_fun(*this, &TreeViewValue::on_menu_insert), Value::DOUBLE)));
-        insert.push_back(Gtk::Menu_Helpers::MenuElem("Integer", sigc::bind(
+        insert.push_back(Gtk::Menu_Helpers::MenuElem(_("Integer"), sigc::bind(
                              sigc::mem_fun(*this, &TreeViewValue::on_menu_insert), Value::INTEGER)));
-        insert.push_back(Gtk::Menu_Helpers::MenuElem("Map", sigc::bind(
+        insert.push_back(Gtk::Menu_Helpers::MenuElem(_("Map"), sigc::bind(
                              sigc::mem_fun(*this, &TreeViewValue::on_menu_insert), Value::MAP)));
-        insert.push_back(Gtk::Menu_Helpers::MenuElem("Matrix", sigc::bind(
+        insert.push_back(Gtk::Menu_Helpers::MenuElem(_("Matrix"), sigc::bind(
                              sigc::mem_fun(*this, &TreeViewValue::on_menu_insert), Value::MATRIX)));
-        insert.push_back(Gtk::Menu_Helpers::MenuElem("Null", sigc::bind(
+        insert.push_back(Gtk::Menu_Helpers::MenuElem(_("Null"), sigc::bind(
                              sigc::mem_fun(*this, &TreeViewValue::on_menu_insert), Value::NIL)));
-        insert.push_back(Gtk::Menu_Helpers::MenuElem("Set", sigc::bind(
+        insert.push_back(Gtk::Menu_Helpers::MenuElem(_("Set"), sigc::bind(
                              sigc::mem_fun(*this, &TreeViewValue::on_menu_insert), Value::SET)));
-        insert.push_back(Gtk::Menu_Helpers::MenuElem("String", sigc::bind(
+        insert.push_back(Gtk::Menu_Helpers::MenuElem(_("String"), sigc::bind(
                              sigc::mem_fun(*this, &TreeViewValue::on_menu_insert), Value::STRING)));
-        insert.push_back(Gtk::Menu_Helpers::MenuElem("Table", sigc::bind(
+        insert.push_back(Gtk::Menu_Helpers::MenuElem(_("Table"), sigc::bind(
                              sigc::mem_fun(*this, &TreeViewValue::on_menu_insert), Value::TABLE)));
-        insert.push_back(Gtk::Menu_Helpers::MenuElem("Tuple", sigc::bind(
+        insert.push_back(Gtk::Menu_Helpers::MenuElem(_("Tuple"), sigc::bind(
                              sigc::mem_fun(*this, &TreeViewValue::on_menu_insert), Value::TUPLE)));
-        insert.push_back(Gtk::Menu_Helpers::MenuElem("Xml", sigc::bind(
+        insert.push_back(Gtk::Menu_Helpers::MenuElem(_("Xml"), sigc::bind(
                              sigc::mem_fun(*this, &TreeViewValue::on_menu_insert), Value::XMLTYPE)));
 
         pMenuItem->set_submenu(*pMenu);
 
-        items.push_back(Gtk::Menu_Helpers::MenuElem("Remove",
+        items.push_back(Gtk::Menu_Helpers::MenuElem(_("Remove"),
                         sigc::mem_fun(*this, &TreeViewValue::on_menu_remove)));
     }
 }
@@ -95,8 +96,8 @@ void TreeViewValue::makeTreeView(value::Set& set)
     m_refTreeModel->clear();
     remove_all_columns();
     //Add the TreeView's view columns:
-    append_column("Type", m_Columns.m_col_type);
-    append_column("Overview", m_Columns.m_col_view);
+    append_column(_("Type"), m_Columns.m_col_type);
+    append_column(_("Overview"), m_Columns.m_col_view);
 
     value::VectorValue vector = set.value();
     value::VectorValue::iterator it = vector.begin();
@@ -106,37 +107,37 @@ void TreeViewValue::makeTreeView(value::Set& set)
 
         switch ((*it)->getType()) {
         case value::Value::BOOLEAN:
-            row[m_Columns.m_col_type] = "boolean";
+            row[m_Columns.m_col_type] = _("boolean");
             break;
         case value::Value::INTEGER:
-            row[m_Columns.m_col_type] = "integer";
+            row[m_Columns.m_col_type] = _("integer");
             break;
         case value::Value::DOUBLE:
-            row[m_Columns.m_col_type] = "double";
+            row[m_Columns.m_col_type] = _("double");
             break;
         case value::Value::STRING:
-            row[m_Columns.m_col_type] = "string";
+            row[m_Columns.m_col_type] = _("string");
             break;
         case value::Value::SET:
-            row[m_Columns.m_col_type] = "set";
+            row[m_Columns.m_col_type] = _("set");
             break;
         case value::Value::MAP:
-            row[m_Columns.m_col_type] = "map";
+            row[m_Columns.m_col_type] = _("map");
             break;
         case value::Value::TUPLE:
-            row[m_Columns.m_col_type] = "tuple";
+            row[m_Columns.m_col_type] = _("tuple");
             break;
         case value::Value::TABLE:
-            row[m_Columns.m_col_type] = "table";
+            row[m_Columns.m_col_type] = _("table");
             break;
         case value::Value::XMLTYPE:
-            row[m_Columns.m_col_type] = "xml";
+            row[m_Columns.m_col_type] = _("xml");
             break;
         case value::Value::NIL:
-            row[m_Columns.m_col_type] = "null";
+            row[m_Columns.m_col_type] = _("null");
             break;
         case value::Value::MATRIX:
-            row[m_Columns.m_col_type] = "matrix";
+            row[m_Columns.m_col_type] = _("matrix");
             break;
         default:
             break;
@@ -155,9 +156,9 @@ void TreeViewValue::makeTreeView(value::Map& map)
     m_refTreeModel->clear();
     remove_all_columns();
     //Add the TreeView's view columns:
-    append_column("Key", m_Columns.m_col_name);
-    append_column("Type", m_Columns.m_col_type);
-    append_column("Overview", m_Columns.m_col_view);
+    append_column(_("Key"), m_Columns.m_col_name);
+    append_column(_("Type"), m_Columns.m_col_type);
+    append_column(_("Overview"), m_Columns.m_col_view);
 
     const value::MapValue& values = map.value();
     value::MapValue::const_iterator it = values.begin();
@@ -168,37 +169,37 @@ void TreeViewValue::makeTreeView(value::Map& map)
         switch (it->second->getType()) {
             using namespace value;
         case Value::BOOLEAN:
-            row[m_Columns.m_col_type] = "boolean";
+            row[m_Columns.m_col_type] = _("boolean");
             break;
         case Value::INTEGER:
-            row[m_Columns.m_col_type] = "integer";
+            row[m_Columns.m_col_type] = _("integer");
             break;
         case Value::DOUBLE:
-            row[m_Columns.m_col_type] = "double";
+            row[m_Columns.m_col_type] = _("double");
             break;
         case Value::STRING:
-            row[m_Columns.m_col_type] = "string";
+            row[m_Columns.m_col_type] = _("string");
             break;
         case Value::SET:
-            row[m_Columns.m_col_type] = "set";
+            row[m_Columns.m_col_type] = _("set");
             break;
         case Value::MAP:
-            row[m_Columns.m_col_type] = "map";
+            row[m_Columns.m_col_type] = _("map");
             break;
         case Value::TUPLE:
-            row[m_Columns.m_col_type] = "tuple";
+            row[m_Columns.m_col_type] = _("tuple");
             break;
         case Value::TABLE:
-            row[m_Columns.m_col_type] = "table";
+            row[m_Columns.m_col_type] = _("table");
             break;
         case Value::XMLTYPE:
-            row[m_Columns.m_col_type] = "xmltype";
+            row[m_Columns.m_col_type] = _("xmltype");
             break;
         case Value::NIL:
-            row[m_Columns.m_col_type] = "null";
+            row[m_Columns.m_col_type] = _("null");
             break;
         case Value::MATRIX:
-            row[m_Columns.m_col_type] = "matrix";
+            row[m_Columns.m_col_type] = _("matrix");
             break;
         default:
             break;
@@ -226,33 +227,33 @@ void TreeViewValue::on_row_activated(const Gtk::TreeModel::Path& path,
         Gtk::TreeModel::Row row = *iter;
         value::Value* v =  &*row.get_value(m_Columns.m_col_value);
 
-        if (row[m_Columns.m_col_type] == "map") {
+        if (row[m_Columns.m_col_type] == _("map")) {
             value::Map* map = dynamic_cast<value::Map*>(v);
             ValueBox box(map);
             box.run();
-        } else if (row[m_Columns.m_col_type] == "set") {
+        } else if (row[m_Columns.m_col_type] == _("set")) {
             value::Set* set = dynamic_cast<value::Set*>(v);
             ValueBox box(set);
             box.run();
-        } else if (row[m_Columns.m_col_type] == "boolean") {
+        } else if (row[m_Columns.m_col_type] == _("boolean")) {
             value::Boolean* boolean = dynamic_cast<value::Boolean*>(v);
             BooleanBox box(boolean);
             box.run();
-        } else if (row[m_Columns.m_col_type] == "integer" or
-                   row[m_Columns.m_col_type] == "double" or
-                   row[m_Columns.m_col_type] == "string" or
-                   row[m_Columns.m_col_type] == "tuple") {
+        } else if (row[m_Columns.m_col_type] == _("integer") or
+                   row[m_Columns.m_col_type] == _("double") or
+                   row[m_Columns.m_col_type] == _("string") or
+                   row[m_Columns.m_col_type] == _("tuple")) {
             SimpleTypeBox box(v);
             box.run();
-        } else if (row[m_Columns.m_col_type] == "table") {
+        } else if (row[m_Columns.m_col_type] == _("table")) {
             value::Table* table = dynamic_cast<value::Table*>(v);
             TableBox box(table);
             box.run();
-        } else if (row[m_Columns.m_col_type] == "matrix") {
+        } else if (row[m_Columns.m_col_type] == _("matrix")) {
             value::Matrix* matrix = dynamic_cast<value::Matrix*>(v);
             MatrixBox box(matrix);
             box.run();
-        } else if (row[m_Columns.m_col_type] == "xml") {
+        } else if (row[m_Columns.m_col_type] == _("xml")) {
             value::Xml* xml = dynamic_cast<value::Xml*>(v);
             XmlTypeBox box(xml);
             box.run();
@@ -305,9 +306,9 @@ void TreeViewValue::on_menu_insert(value::Value::type type)
                         vector.insert(it, Tuple::create());
             break;
         case(Value::TABLE): {
-            SimpleTypeBox box("Width ?");
+            SimpleTypeBox box(_("Width ?"));
             int w = utils::to_int(box.run());
-            SimpleTypeBox box2("Height ?");
+            SimpleTypeBox box2(_("Height ?)"));
             int h = utils::to_int(box2.run());
             vector.insert(it, Table::create(w, h));
         }
@@ -319,9 +320,9 @@ void TreeViewValue::on_menu_insert(value::Value::type type)
                         vector.insert(it, Null::create());
             break;
         case(Value::MATRIX): {
-            SimpleTypeBox box("columns ?");
+            SimpleTypeBox box(_("columns ?"));
             int cols = utils::to_int(box.run());
-            SimpleTypeBox box2("rows ?");
+            SimpleTypeBox box2(_("rows ?"));
             int rows = utils::to_int(box2.run());
             Matrix* matrix = Matrix::create(cols, rows, cols*2, rows*2, cols/5, rows/5);
             vector.insert(it, matrix);
@@ -331,7 +332,7 @@ void TreeViewValue::on_menu_insert(value::Value::type type)
         refresh();
     } else if (mValue->getType() ==  value::Value::MAP) {
         value::Map* map = dynamic_cast<value::Map*>(mValue);
-        SimpleTypeBox box("name ?");
+        SimpleTypeBox box(_("name ?"));
         std::string name;
         do {
             name = box.run();
@@ -361,9 +362,9 @@ void TreeViewValue::on_menu_insert(value::Value::type type)
                         map->addClone(name, Tuple::create());
             break;
         case(Value::TABLE): {
-            SimpleTypeBox box("width ?");
+            SimpleTypeBox box(_("width ?"));
             int w = utils::to_int(box.run());
-            SimpleTypeBox box2("Height ?");
+            SimpleTypeBox box2(_("Height ?"));
             int h = utils::to_int(box2.run());
             map->addClone(name, Table::create(w, h));
         }
@@ -375,9 +376,9 @@ void TreeViewValue::on_menu_insert(value::Value::type type)
             map->addClone(name, Null::create());
             break;
         case(Value::MATRIX): {
-            SimpleTypeBox box("columns ?");
+            SimpleTypeBox box(_("columns ?"));
             int cols = utils::to_int(box.run());
-            SimpleTypeBox box2("rows ?");
+            SimpleTypeBox box2(_("rows ?"));
             int rows = utils::to_int(box2.run());
             Matrix* matrix = Matrix::create(cols, rows, cols*2, rows*2, cols/5, rows/5);
             map->addClone(name, matrix);

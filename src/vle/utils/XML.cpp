@@ -34,12 +34,12 @@ namespace vle { namespace utils { namespace xml {
 Glib::ustring get_attribute(xmlpp::Element* elt,
 			    const Glib::ustring& name)
 {
-    Assert < ParseError >(elt, "xml node not found");
+    Assert < ParseError >(elt, _("xml node not found"));
 
     xmlpp::Attribute* att = elt->get_attribute(name);
 
-    Assert < ParseError >(att, boost::format(
-            "[%1%] tag not found line %2% for node [%3%]\n") %
+    Assert < ParseError >(att, fmt(
+            _("[%1%] tag not found line %2% for node [%3%]\n")) %
         name % elt->get_line() % elt->get_name());
 
     return att->get_value();
@@ -48,7 +48,7 @@ Glib::ustring get_attribute(xmlpp::Element* elt,
 Glib::ustring get_attribute(xmlpp::Node* node,
 			    const Glib::ustring& name)
 {
-    Assert < ParseError >(node, "xml node not found");
+    Assert < ParseError >(node, _("xml node not found"));
 
     xmlpp::Element* elt = cast_node_element(node);
 
@@ -58,7 +58,7 @@ Glib::ustring get_attribute(xmlpp::Node* node,
 Glib::ustring get_attribute_from_children(xmlpp::Element* elt,
         const Glib::ustring& children, const Glib::ustring& attribute)
 {
-    Assert < ParseError >(elt, "xml node not found");
+    Assert < ParseError >(elt, _("xml node not found"));
 
     xmlpp::Element* child = get_children(elt, children);
 
@@ -85,7 +85,7 @@ size_t get_size_t_attribute(xmlpp::Element* elt,
 
 bool exist_attribute(xmlpp::Element* elt, const Glib::ustring& name)
 {
-    Assert < ParseError >(elt, "xml node not found");
+    Assert < ParseError >(elt, _("xml node not found"));
 
     return elt->get_attribute(name) != NULL;
 }
@@ -93,12 +93,12 @@ bool exist_attribute(xmlpp::Element* elt, const Glib::ustring& name)
 xmlpp::Element* get_children(xmlpp::Node* node, const
         Glib::ustring& name)
 {
-    Assert < ParseError >(node, "xml node not found");
+    Assert < ParseError >(node, _("xml node not found"));
 
     xmlpp::Node::NodeList lst = node->get_children(name);
 
-    Assert < ParseError >(lst.empty() == false, boost::format(
-                "[%1%] node not found line %2% for node\n") %
+    Assert < ParseError >(lst.empty() == false, fmt(
+                _("[%1%] node not found line %2% for node\n")) %
             name % node->get_line());
 
     return cast_node_element(*lst.begin());
@@ -106,14 +106,14 @@ xmlpp::Element* get_children(xmlpp::Node* node, const
 
 bool exist_children(xmlpp::Node* node, const Glib::ustring& name)
 {
-    Assert < ParseError >(node != NULL, "xml node not found");
+    Assert < ParseError >(node != NULL, _("xml node not found"));
 
     return ! node->get_children(name).empty();
 }
 
 bool has_children(xmlpp::Node* node)
 {
-    Assert < ParseError >(node != NULL, "xml node not found");
+    Assert < ParseError >(node != NULL, _("xml node not found"));
 
     return ! node->get_children().empty();
 }
@@ -128,12 +128,12 @@ bool is_element(xmlpp::Node* node)
 
 xmlpp::Element* cast_node_element(xmlpp::Node* node)
 {
-    Assert < ParseError >(node != NULL, "xml node not found");
+    Assert < ParseError >(node != NULL, _("xml node not found"));
 
     xmlpp::Element* elt = dynamic_cast<xmlpp::Element*>(node);
 
-    Assert < ParseError >(elt != NULL, boost::format(
-           "cast NODE to ELEMENT problem line %1% node\n") % node->get_line());
+    Assert < ParseError >(elt != NULL, fmt(
+           _("cast NODE to ELEMENT problem line %1% node\n")) % node->get_line());
 
     return elt;
 }
@@ -142,13 +142,13 @@ xmlpp::Element* get_root_node(xmlpp::DomParser& dom, const
         Glib::ustring& name)
 {
     xmlpp::Document* doc = dom.get_document();
-    Assert < ParseError >(doc, "no document in xml");
+    Assert < ParseError >(doc, _("no document in xml"));
 
     xmlpp::Element* root = doc->get_root_node();
-    Assert < ParseError >(root, "No root element in document");
+    Assert < ParseError >(root, _("No root element in document"));
 
-    Assert < ParseError >(root->get_name() == name, boost::format(
-            "[%1%] not corresponding to root element line %2% node [%3%]\n") %
+    Assert < ParseError >(root->get_name() == name, fmt(
+            _("[%1%] not corresponding to root element line %2% node [%3%]\n")) %
         name % root->get_line() % root->get_name());
 
     return root;
@@ -157,38 +157,38 @@ xmlpp::Element* get_root_node(xmlpp::DomParser& dom, const
 void add_child_file(xmlpp::Element* current,
 				const Glib::ustring& filename)
 {
-    Assert < ParseError >(current, "bad argument");
+    Assert < ParseError >(current, _("bad argument"));
 
     xmlpp::DomParser dom(filename);
     xmlpp::Element* root = dom.get_document()->get_root_node();
 
-    Assert < ParseError >(root, "Bad root node");
+    Assert < ParseError >(root, _("Bad root node"));
 
     xmlpp::Node* newly = current->import_node(root, true);
 
-    Assert < ParseError >(newly, "Bad import node");
+    Assert < ParseError >(newly, _("Bad import node"));
 }
 
 void add_child_string(xmlpp::Element* current, const Glib::ustring &
         xml)
 {
-    Assert < ParseError >(current, "Bad argument");
+    Assert < ParseError >(current, _("Bad argument"));
 
     xmlpp::DomParser dom;
     dom.parse_memory(xml);
     xmlpp::Element* root = dom.get_document()->get_root_node();
 
-    Assert < ParseError >(root, "Bad root node");
+    Assert < ParseError >(root, _("Bad root node"));
 
     xmlpp::Node* newly = current->import_node(root, true);
 
-    Assert < ParseError >(newly, "Bad import node");
+    Assert < ParseError >(newly, _("Bad import node"));
 }
 
 void write_to_file(xmlpp::Element* current, const Glib::ustring &
         filename)
 {
-    Assert < ParseError >(current, "Bad argument");
+    Assert < ParseError >(current, _("Bad argument"));
 
     xmlpp::Document doc;
     xmlpp::Element* root = doc.create_root_node(current->get_name());
@@ -214,7 +214,7 @@ void write_to_file(xmlpp::Element* current, const Glib::ustring &
 
 Glib::ustring write_to_string(xmlpp::Element* current)
 {
-    Assert < ParseError >(current, "Bad argument");
+    Assert < ParseError >(current, _("Bad argument"));
 
     xmlpp::Document doc;
     xmlpp::Element* root = doc.create_root_node(current->get_name());
@@ -241,7 +241,7 @@ Glib::ustring write_to_string(xmlpp::Element* current)
 void import_children_nodes(xmlpp::Element* destination,
                                        xmlpp::Element* origin)
 {
-    Assert < ParseError >(destination and origin, "bad import");
+    Assert < ParseError >(destination and origin, _("bad import"));
 
     const xmlpp::Node::NodeList lst = origin->get_children();
     xmlpp::Node::NodeList::const_iterator it = lst.begin();
@@ -255,7 +255,7 @@ void import_children_nodes_without_parent(
                 xmlpp::Element* dest,
                 const Glib::ustring& xml)
 {
-    Assert < ParseError >(dest, "bad import");
+    Assert < ParseError >(dest, _("bad import"));
 
     try {
 	xmlpp::DomParser dom;
@@ -270,7 +270,7 @@ void import_children_nodes_without_parent(
 void import_children_nodes(xmlpp::Element* destination,
                                        const Glib::ustring& xml_content)
 {
-    Assert < ParseError >(destination, "bad import");
+    Assert < ParseError >(destination, _("bad import"));
     try {
 	xmlpp::DomParser dom;
 	dom.parse_memory(xml_content);

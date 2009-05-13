@@ -41,15 +41,15 @@ Glib::RefPtr < Gdk::Pixbuf > OutputPlugin::icon() const
         try {
             m_icon = Gdk::Pixbuf::create_from_file(file);
         } catch(const Glib::FileError& e) {
-            throw utils::FileError(boost::format(
-                    "OutputPlugin '%1%': FileError, %2%") % m_name % e.what());
+            throw utils::FileError(fmt(_(
+                    "OutputPlugin '%1%': FileError, %2%")) % m_name % e.what());
         } catch(const Gdk::PixbufError& e) {
-            throw utils::FileError(boost::format(
-                    "OutputPlugin '%1%': PixbufError, %2%") % m_name %
+            throw utils::FileError(fmt(_(
+                    "OutputPlugin '%1%': PixbufError, %2%")) % m_name %
                 e.what());
         } catch(...) {
-            throw utils::FileError(boost::format(
-                    "OutputPlugin '%1%': Unknow error") % m_name);
+            throw utils::FileError(fmt(_(
+                    "OutputPlugin '%1%': Unknow error")) % m_name);
         }
     }
     return m_icon;

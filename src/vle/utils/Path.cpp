@@ -29,6 +29,7 @@
 
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 #include <vle/version.hpp>
 
 #include <boost/format.hpp>
@@ -56,6 +57,15 @@ std::string Path::getExamplesDir() const
 std::string Path::getExampleFile(const std::string& file) const
 {
     return buildSharePath("examples", file);
+}
+
+std::string Path::getLocaleDir() const
+{
+    std::list < std::string > lst;
+    lst.push_front(m_prefix);
+    lst.push_back("share");
+    lst.push_back("locale");
+    return Glib::build_path(G_DIR_SEPARATOR_S, lst);
 }
 
 std::string Path::getStreamDir() const
@@ -449,8 +459,8 @@ void Path::readHomeDir()
         if (isDirectory(path)) {
             m_home = path;
         } else {
-            throw FileError(boost::format(
-                    "Path: VLE_HOME ('%1%') does not exist") % path);
+            throw FileError(fmt(_(
+                    "Path: VLE_HOME '%1%' does not exist")) % path);
         }
     } else {
         m_home.clear();
@@ -460,7 +470,7 @@ void Path::readHomeDir()
 Path::Path()
 {
     if (initPath() == false) {
-        throw InternalError("Path initialization failed.");
+        throw InternalError(_("Path initialization failed."));
     }
 }
 
@@ -504,7 +514,13 @@ std::ostream& operator<<(std::ostream& out, const Path& p)
         << "condition home........: " << p.getHomeConditionDir() << "\n"
         << "condition home pixmap.: " << p.getHomeConditionPixmapDir() << "\n"
         << "condition home glade..: " << p.getHomeConditionGladeDir() << "\n"
-        << "condition home doc....: " << p.getHomeConditionDocDir() << "\n";
+        << "condition home doc....: " << p.getHomeConditionDocDir() << "\n"
+        << "\n"
+        << "Real simulators list..:\n" << p.getSimulatorDirs() << "\n"
+        << "Real output list......:\n" << p.getOutputDirs() << "\n"
+        << "Real condition list...:\n" << p.getConditionDirs() << "\n"
+        << "Real stream list......:\n" << p.getStreamDirs() << "\n"
+        << std::endl;
 }
 
 }} // namespace vle utils

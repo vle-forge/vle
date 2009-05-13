@@ -1,5 +1,5 @@
 /**
- * @file src/examples/qss/ladybirdplantlouse.hpp
+ * @file vle/utils/i18n.hpp
  * @author The VLE Development Team
  */
 
@@ -23,32 +23,29 @@
  */
 
 
-#ifndef VLE_TUTORIAL_0_LADYBIRD_PLANT_LOUSE_HPP
-#define VLE_TUTORIAL_0_LADYBIRD_PLANT_LOUSE_HPP
+#ifndef VLE_UTILS_I18N_HPP
+#define VLE_UTILS_I18N_HPP
 
-#include <vle/extension/QSS.hpp>
+#include <vle/version.hpp>
+#include <boost/format.hpp>
 
-namespace vle { namespace examples { namespace qss {
+namespace vle {
 
-class Ladybirdplantlouse : public extension::QSS::Multiple
-{
-public:
-    Ladybirdplantlouse(const graph::AtomicModel& model,
-		       const devs::InitEventList& events);
+    typedef boost::format fmt;
 
-    virtual ~Ladybirdplantlouse();
+}
 
-    virtual double compute(unsigned int i, const devs::Time& time) const;
 
-private:
-    double a;
-    double b;
-    double d;
-    double e;
+#ifdef VLE_HAVE_NLS
+#   define ENABLE_NLS
+#   include <libintl.h>
+#   include <locale.h>
+#   define _(x) gettext(x)
+#   define gettext_noop(x) x
+#   define N_(x) gettext_noop(x)
+#else
+#   define _(x) x
+#   define N_(x) x
+#endif
 
-    Var x;
-    Var y;
-};
-
-}}} // namespace vle examples qss
 #endif

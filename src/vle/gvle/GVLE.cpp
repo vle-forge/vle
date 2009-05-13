@@ -159,7 +159,7 @@ if (!Glib::Module::get_supported()) {
     gvle::Error("Your system don't allow dynamic class loading.\n"
                    "Try GNU/Linux");
 } else if (!Glib::file_test(rep, Glib::FILE_TEST_IS_DIR)) {
-    gvle::Error((boost::format("%1% is not a directory") % rep).str());
+    gvle::Error((fmt("%1% is not a directory") % rep).str());
 } else {
     Glib::Dir repertoire(rep);
     Glib::DirIterator it = repertoire.begin();
@@ -191,7 +191,7 @@ if (!Glib::Module::get_supported()) {
    gvle::Error("Your system don't allow dynamic class loading.\n"
                   "Try GNU/Linux");
 } else if (!Glib::file_test(rep, Glib::FILE_TEST_IS_DIR)) {
-   gvle::Error((boost::format("%1% is not a directory") % rep).str());
+   gvle::Error((fmt("%1% is not a directory") % rep).str());
 } else {
    Glib::Dir repertoire(rep);
    Glib::DirIterator it = repertoire.begin();
@@ -225,19 +225,19 @@ Plugin* call = NULL;
 
 Glib::Module mod(file);
 if (mod == false) {
-  TraceImportant((boost::format("Error opening file %1%, %2%") % file %
+  TraceImportant((fmt("Error opening file %1%, %2%") % file %
                   Glib::Module::get_last_error()).str());
 } else {
   mod.make_resident();
   if (mod.get_symbol("makeNewPlugin", makeNewPlugin) == false) {
-      TraceImportant((boost::format(
+      TraceImportant((fmt(
           "Error in file %1%, function 'makeNewPlugin' not found: %2%") %
               file % Glib::Module::get_last_error()).str());
   } else {
       try {
           call = ((Plugin*(*)())(makeNewPlugin))();
           if (call == NULL) {
-              TraceImportant((boost::format(
+              TraceImportant((fmt(
                   "Error in file %1%, function 'makeNewPlugin':"
                   "problem allocation a new Plugin: %2%") %
                   file % Glib::Module::get_last_error()).str());
@@ -247,7 +247,7 @@ if (mod == false) {
                   pp->setModeling(m_modeling);
               }
               if (call->init() == false) {
-                  TraceImportant((boost::format(
+                  TraceImportant((fmt(
                       "Error in file %1%, function 'init' return false")
                          % file).str());
                   delete call;
@@ -270,25 +270,25 @@ ObserverPlugin* call = NULL;
 
 Glib::Module mod(file);
 if (mod == false) {
- TraceImportant((boost::format("Error opening file %1%, %2%") %
+ TraceImportant((fmt("Error opening file %1%, %2%") %
      file % Glib::Module::get_last_error()).str());
 } else {
  mod.make_resident();
  if (mod.get_symbol("makeNewPlugin", makeNewPlugin) == false) {
-     TraceImportant((boost::format(
+     TraceImportant((fmt(
          "Error in file %1%, function 'makeNewPlugin' not found: %2%") %
              file % Glib::Module::get_last_error()).str());
  } else {
      try {
          call = ((ObserverPlugin*(*)())(makeNewPlugin))();
          if (call == NULL) {
-             TraceImportant((boost::format(
+             TraceImportant((fmt(
                  "Error in file %1%, function 'makeNewPlugin':"
                  "problem allocation a new Plugin: %2%") %
                  file % Glib::Module::get_last_error()).str());
          } else {
              if (call->init() == false) {
-                 TraceImportant((boost::format(
+                 TraceImportant((fmt(
                      "Error in file %1%, function 'init' return false")
                         % file).str());
                  delete call;
@@ -376,24 +376,25 @@ void GVLE::makeButtons()
     }
 
     m_arrow.set_relief(Gtk::RELIEF_NONE);
-    m_tooltips.set_tip(m_arrow, "Move models, open coupled models, show"
-                       " dynamics of models. (F1)");
+    m_tooltips.set_tip(m_arrow, _("Move models, open coupled models, show "
+                                  "dynamics of models. (F1)"));
     m_addModels.set_relief(Gtk::RELIEF_NONE);
-    m_tooltips.set_tip(m_addModels, "Add empty atomics models. You can"
-                       " specify inputs, outputs, inits and states ports."
-                       " Select dynamics plugins file and XML write your"
-                       " XML Dynamics. (F2)");
+    m_tooltips.set_tip(m_addModels, _("Add empty atomics models. You can "
+                                      "specify inputs, outputs, inits and states "
+                                      "ports. Select dynamics plugins file and "
+                                      "XML write your XML Dynamics. (F2)"));
     m_addLinks.set_relief(Gtk::RELIEF_NONE);
-    m_tooltips.set_tip(m_addLinks, "Add connections between models. (F3)");
+    m_tooltips.set_tip(m_addLinks, _("Add connections between models. (F3)"));
     m_addCoupled.set_relief(Gtk::RELIEF_NONE);
-    m_tooltips.set_tip(m_addCoupled, "Add coupled models. (F4)");
+    m_tooltips.set_tip(m_addCoupled, _("Add coupled models. (F4)"));
     m_delete.set_relief(Gtk::RELIEF_NONE);
-    m_tooltips.set_tip(m_delete, "Delete connections or models. (F5)");
+    m_tooltips.set_tip(m_delete, _("Delete connections or models. (F5)"));
     m_zoom.set_relief(Gtk::RELIEF_NONE);
-    m_tooltips.set_tip(m_zoom, "Zoom into coupled models. (F6)");
+    m_tooltips.set_tip(m_zoom, _("Zoom into coupled models. (F6)"));
     m_question.set_relief(Gtk::RELIEF_NONE);
-    m_tooltips.set_tip(m_question, "Show XML Dynamics if atomic model is"
-                       " selected, show XML Structures if coupled model. (F7)");
+    m_tooltips.set_tip(m_question, _("Show XML Dynamics if atomic model is "
+                                     "selected, show XML Structures if coupled "
+                                     "model. (F7)"));
 
     m_arrow.set_mode(false);
     m_addModels.set_mode(false);
@@ -493,43 +494,43 @@ m_currentButton = PLUGINMODEL;
 void GVLE::onArrow()
 {
     m_currentButton = POINTER;
-    m_status.push("Selection");
+    m_status.push(_("Selection"));
 }
 
 void GVLE::onAddModels()
 {
     m_currentButton = ADDMODEL;
-    m_status.push("Add models");
+    m_status.push(_("Add models"));
 }
 
 void GVLE::onAddLinks()
 {
     m_currentButton = ADDLINK;
-    m_status.push("Add links");
+    m_status.push(_("Add links"));
 }
 
 void GVLE::onDelete()
 {
     m_currentButton = DELETE;
-    m_status.push("Delete object");
+    m_status.push(_("Delete object"));
 }
 
 void GVLE::onAddCoupled()
 {
     m_currentButton = ADDCOUPLED;
-    m_status.push("Coupled Model");
+    m_status.push(_("Coupled Model"));
 }
 
 void GVLE::onZoom()
 {
     m_currentButton = ZOOM;
-    m_status.push("Zoom");
+    m_status.push(_("Zoom"));
 }
 
 void GVLE::onQuestion()
 {
     m_currentButton = QUESTION;
-    m_status.push("Question");
+    m_status.push(_("Question"));
 }
 
 void GVLE::onMenuNew()
@@ -538,7 +539,7 @@ void GVLE::onMenuNew()
         m_modeling->delNames();
         m_modeling->start();
         m_modeling->redrawModelTreeBox();
-    } else if (gvle::Question("Do you really want destroy model ?")) {
+    } else if (gvle::Question(_("Do you really want destroy model ?"))) {
         m_modeling->delNames();
         m_modeling->start();
         m_modeling->redrawModelTreeBox();
@@ -548,14 +549,14 @@ void GVLE::onMenuNew()
 void GVLE::onMenuLoad()
 {
     if (m_modeling->isModified() == false or
-            gvle::Question("Do you really want load a new Model ?\n"
-                           "Current model will be destroy and not save")) {
+            gvle::Question(_("Do you really want load a new Model ?\nCurrent"
+                             "model will be destroy and not save"))) {
         Gtk::FileChooserDialog file("VPZ file", Gtk::FILE_CHOOSER_ACTION_OPEN);
         file.set_transient_for(*this);
         file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
         file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
         Gtk::FileFilter filter;
-        filter.set_name("Vle Project gZipped");
+        filter.set_name(_("Vle Project gZipped"));
         filter.add_pattern("*.vpz");
         file.add_filter(filter);
 
@@ -581,7 +582,7 @@ void GVLE::onMenuSave()
         }
     } else {
         //vpz is incorrect
-        std::string error = "Vpz incorrect :\n";
+        std::string error = _("Vpz incorrect :\n");
         std::vector<std::string>::const_iterator it = vec.begin();
         while (it != vec.end()) {
             error += *it + "\n";
@@ -599,7 +600,7 @@ void GVLE::onMenuSaveAs()
 
     if (vec.size() != 0) {
         //vpz is correct
-        std::string error = "Vpz incorrect :\n";
+        std::string error = _("Vpz incorrect :\n");
         std::vector<std::string>::const_iterator it = vec.begin();
         while (it != vec.end()) {
             error += *it + "\n";
@@ -610,12 +611,12 @@ void GVLE::onMenuSaveAs()
         return;
     }
 
-    Gtk::FileChooserDialog file("VPZ file", Gtk::FILE_CHOOSER_ACTION_SAVE);
+    Gtk::FileChooserDialog file(_("VPZ file"), Gtk::FILE_CHOOSER_ACTION_SAVE);
     file.set_transient_for(*this);
     file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
     Gtk::FileFilter filter;
-    filter.set_name("Vle Project gZipped");
+    filter.set_name(_("Vle Project gZipped"));
     filter.add_pattern("*.vpz");
     file.add_filter(filter);
 
@@ -629,13 +630,13 @@ void GVLE::onMenuSaveAs()
 void GVLE::onMenuQuit()
 {
     if (m_modeling->isModified() == true and
-	gvle::Question("Changes have been made,\n"
-		       "Do you want the model to be saved?")) {
+	gvle::Question(_("Changes have been made,\n"
+                         "Do you want the model to be saved?"))) {
 	std::vector<std::string> vec;
 	m_modeling->vpz_is_correct(vec);
 	if (vec.size() != 0) {
 	    //vpz is correct
-	    std::string error = "incorrect VPZ:\n";
+	    std::string error = _("incorrect VPZ:\n");
 	    std::vector<std::string>::const_iterator it = vec.begin();
 	    while (it != vec.end()) {
 		error += *it + "\n";
@@ -692,7 +693,7 @@ void GVLE::onSimulationBox()
     if (m_modeling->isSaved()) {
         mSimulationBox->show();
     } else {
-        gvle::Error("Save or load a project before simulation");
+        gvle::Error(_("Save or load a project before simulation"));
     }
 }
 

@@ -35,6 +35,7 @@
 #define VLE_EXTRA_VERSION   ("@VLE_EXTRA@")
 #define VLE_VERSION         ("@VLE_VERSION@")
 #define VLE_NAME_COMPLETE   ("@VLE_NAME_COMPLETE@")
+#define VLE_LOCALE_NAME     ("@VLE_LOCALE_NAME@")
 
 /* install prefix */
 #define VLE_PREFIX_DIR      ("${CMAKE_INSTALL_PREFIX}")
@@ -52,6 +53,7 @@
 #cmakedefine VLE_HAVE_SIGNAL
 #cmakedefine VLE_HAVE_CAIRO
 #cmakedefine VLE_HAVE_POOL
+#cmakedefine VLE_HAVE_NLS
 
 /**
  * @brief Check whether a VLE version equal to or greather than major.mino.patch

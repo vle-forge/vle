@@ -31,6 +31,7 @@
 #include <stdexcept>
 #include <libxml++/exceptions/exception.h>
 #include <boost/format.hpp>
+#include <vle/utils/i18n.hpp>
 
 
 

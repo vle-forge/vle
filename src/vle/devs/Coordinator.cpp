@@ -227,15 +227,15 @@ void Coordinator::addObservableToView(graph::AtomicModel* model,
     ViewList::iterator it = m_viewList.find(view);
 
     if (it == m_viewList.end()) {
-        throw utils::InternalError(boost::format(
-            "The view '%1%' is unknow of coordinator view list") % view);
+        throw utils::InternalError(fmt(_(
+            "The view '%1%' is unknow of coordinator view list")) % view);
     }
 
     Simulator* simulator = getModel(model);
 
     if (not simulator) {
-        throw utils::InternalError(boost::format(
-                "The simulator of the model '%1%' does not exist") %
+        throw utils::InternalError(fmt(_(
+                "The simulator of the model '%1%' does not exist")) %
             simulator->getStructure()->getName());
     }
 
@@ -252,8 +252,8 @@ void Coordinator::delModel(graph::CoupledModel* parent,
     graph::Model* mdl = parent->findModel(modelname);
 
     if (not mdl) {
-        throw utils::InternalError(boost::format(
-                "Cannot delete an unknow model '%1%'") % modelname);
+        throw utils::InternalError(fmt(_(
+                "Cannot delete an unknow model '%1%'")) % modelname);
     }
 
     if (mdl->isCoupled()) {
@@ -276,8 +276,8 @@ void Coordinator::delModel(graph::CoupledModel* parent,
 void Coordinator::addModel(graph::AtomicModel* model, Simulator* simulator)
 {
     if (m_modelList.find(model) != m_modelList.end()) {
-        throw utils::InternalError(boost::format(
-                "The Atomic model node '%1% have already a simulator")
+        throw utils::InternalError(fmt(_(
+                "The Atomic model node '%1% have already a simulator"))
             % model->getName());
     }
 
@@ -327,14 +327,14 @@ void Coordinator::delAtomicModel(graph::CoupledModel* parent,
                                  graph::AtomicModel* atom)
 {
     if (not parent or not atom) {
-        throw utils::DevsGraphError(
-            "Cannot delete an atomic model without parent");
+        throw utils::DevsGraphError(_(
+            "Cannot delete an atomic model without parent"));
     }
 
     SimulatorMap::iterator it = m_modelList.find(atom);
     if (it == m_modelList.end()) {
-        throw utils::ModellingError(
-            "Cannot delete an unknow atomic model");
+        throw utils::ModellingError(_(
+            "Cannot delete an unknow atomic model"));
     }
 
     Simulator* satom = (*it).second;
@@ -360,8 +360,8 @@ void Coordinator::delCoupledModel(graph::CoupledModel* parent,
                                   graph::CoupledModel* mdl)
 {
     if (not parent or not mdl) {
-        throw utils::DevsGraphError(
-            "Cannot delete an atomic model without parent");
+        throw utils::DevsGraphError(_(
+            "Cannot delete an atomic model without parent"));
     }
 
     graph::ModelList& lst = mdl->getModelList();
@@ -384,7 +384,7 @@ void Coordinator::addModels(const vpz::Model& model)
 void Coordinator::addView(View* view)
 {
     if (not view) {
-        throw utils::InternalError("Empty reference");
+        throw utils::InternalError(_("Empty reference"));
     }
 
     ViewList::iterator it = m_viewList.find(view->getName());
@@ -478,7 +478,7 @@ StreamWriter* Coordinator::buildOutput(const vpz::View& view,
         break;
     }
 
-    std::string file((boost::format("%1%_%2%") %
+    std::string file((fmt("%1%_%2%") %
                       m_modelFactory.experiment().name() %
                       view.name()).str());
     stream->open(output.plugin(), output.location(), file,

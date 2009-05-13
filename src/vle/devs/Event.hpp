@@ -378,7 +378,7 @@ namespace vle { namespace devs {
         const value::Map& attributes() const
         {
             if (m_attributes == 0) {
-                throw utils::ArgError("No attribute in this event");
+                throw utils::ArgError(_("No attribute in this event"));
             }
             return *m_attributes;
         }

@@ -45,8 +45,8 @@ DSDevs::DSDevs(const graph::AtomicModel& model,
     m_coupledModel(0)
 {
     if (not model.getParent()) {
-        throw utils::ModellingError(
-            "DSDevs ext.: not in a coupeld model");
+        throw utils::ModellingError(_(
+            "DSDevs ext.: not in a coupeld model"));
     }
 
     m_coupledModel = model.getParent();
@@ -473,8 +473,8 @@ bool DSDevs::processSwitch(const std::string& action, const value::Map& val)
     } else if (action == "bag") {
         return processBag(val);
     } else {
-        throw utils::InternalError(boost::format(
-                "DSDevs ext.: unknow action '%1%'") % action);
+        throw utils::InternalError(fmt(_(
+                "DSDevs ext.: unknow action '%1%'")) % action);
     }
 }
 
@@ -725,7 +725,7 @@ bool DSDevs::addModel(const std::string& /* prefixModelName */,
         //vpz::Observable obs("FIXME");
         //coordinator().createModelFromClass(m_coupledModel, className);
     //} catch (const std::exception& e) {
-        //std::cerr << boost::format(
+        //std::cerr << fmt(
             //"Warning: Unable to dynamic add model, with prefixname '%1%' "
             //"class name '%2%'. Error reported is: '%3%\n'") %
             //prefixModelName % className % e.what();
@@ -763,8 +763,8 @@ bool DSDevs::addModel(const std::string& /* prefixModelName */,
          //}
          //return true;
 
-    throw utils::NotYetImplemented(
-        "DSDevs ext.: addModel from class not allowed");
+    throw utils::NotYetImplemented(_(
+        "DSDevs ext.: addModel from class not allowed"));
 }
 
 bool DSDevs::removeModel(const std::string& /* modelName */)
@@ -774,31 +774,24 @@ bool DSDevs::removeModel(const std::string& /* modelName */)
     return true;
 }
 
-bool DSDevs::changeModel(const std::string& modelName,
-                         const std::string& className,
-                         const std::string& newClassName)
+bool DSDevs::changeModel(const std::string& /*modelName*/,
+                         const std::string& /*className*/,
+                         const std::string& /*newClassName*/)
 {
-    std::cerr << "ChangeModel Not yet implemented " << modelName
-        << " " << className << " " << newClassName << "\n";
+    throw utils::NotYetImplemented(_(
+            "DSDevs ext.: changeModel not allowed"));
 
     return false;
 }
 
-bool DSDevs::buildModel(const std::string& prefixModelName,
-                        const std::string& className,
-                        const std::string& xmlCode,
-                        const std::string& xmlDynamics,
-                        const std::string& xmlInits)
+bool DSDevs::buildModel(const std::string& /*prefixModelName*/,
+                        const std::string& /*className*/,
+                        const std::string& /*xmlCode*/,
+                        const std::string& /*xmlDynamics*/,
+                        const std::string& /*xmlInits*/)
 {
-    // FIXME
-    // 1 - Decoupe xmlCode en code source.
-    // 2 - selection  le compilateur.
-    // 3 - Compile le source.
-    // 4 - Installe le plugin.
-    // addModel(prefixModelName, className, xmlDynamics, xmlInits);
-    std::cerr << "BuildModel Not yet implemented " << prefixModelName
-        << " " << className << " " << " " << xmlCode << " "
-        << xmlDynamics << " " << xmlInits << "\n";
+    throw utils::NotYetImplemented(_(
+            "DSDevs ext.: buildModel Not yet available"));
 
     return false;
 }

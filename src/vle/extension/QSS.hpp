@@ -112,8 +112,8 @@ namespace vle { namespace extension { namespace QSS {
 	    virtual double operator()() const
 		{
                     if (not mEquation) {
-                        throw utils::InternalError(
-                            "QSS::Multiple - variable not create");
+                        throw utils::InternalError(_(
+                            "QSS::Multiple - variable not create"));
                     }
 		    return mEquation->getValue(mIndex);
 		}
@@ -150,8 +150,8 @@ namespace vle { namespace extension { namespace QSS {
 	    virtual double operator()() const
 		{
                     if (not mEquation) {
-                        throw utils::InternalError(
-                            "QSS::Multiple - variable not create");
+                        throw utils::InternalError(_(
+                            "QSS::Multiple - variable not create"));
                     }
 		    return mEquation->getExternalValue(mName);
 		}

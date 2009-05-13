@@ -77,7 +77,7 @@ void DynamicBox::show(vpz::Dynamic* dyn)
 {
     mDyn = dyn;
 
-    mDialog->set_title((boost::format("Dynamics: %1%") % dyn->name()).str());
+    mDialog->set_title((fmt(_("Dynamics: %1%")) % dyn->name()).str());
     makeCombo();
 
     if (not mDyn->location().empty()) {
@@ -140,7 +140,7 @@ void DynamicBox::on_apply()
 {
     mValid = true;
     if (mCombo->get_active_text().empty()) {
-        Error("Set a library to this Dynamic");
+        Error(_("Set a library to this Dynamic"));
         mValid = false;
         return;
     }

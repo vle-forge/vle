@@ -144,17 +144,18 @@ void SaxStackVpz::pushModel(const AttributeList& att)
         }
     }
 
-    Assert < utils::SaxParserError >(not name.empty(),
-           "Attribute name not defined");
-    Assert < utils::SaxParserError >(not type.empty(), boost::format(
-            "Attribute type not defined for model '%1%'") % name);
+    Assert < utils::SaxParserError >(
+        not name.empty(), _("Attribute name not defined"));
+    Assert < utils::SaxParserError >(
+        not type.empty(), fmt(_("Attribute type not defined for model '%1%'"))
+        % name);
 
     if (type == "atomic") {
         try {
             gmdl = new graph::AtomicModel(name, cplparent);
         } catch(const utils::DevsGraphError& e) {
-            throw(utils::SaxParserError(boost::format(
-                    "Error build atomic model '%1%' with error: %2%") % name %
+            throw(utils::SaxParserError(fmt(_(
+                    "Error build atomic model '%1%' with error: %2%")) % name %
                 e.what()));
         }
 
@@ -172,13 +173,13 @@ void SaxStackVpz::pushModel(const AttributeList& att)
         try {
             gmdl = new graph::CoupledModel(name, cplparent);
         } catch(const utils::DevsGraphError& e) {
-            throw(utils::SaxParserError(boost::format(
-                    "Error build coupled model '%1%' with error: %2%") % name %
+            throw(utils::SaxParserError(fmt(_(
+                    "Error build coupled model '%1%' with error: %2%")) % name %
                 e.what()));
         }
     } else {
-        throw(utils::SaxParserError(boost::format(
-                        "Unknow model type %1%") % type));
+        throw(utils::SaxParserError(fmt(_(
+                        "Unknow model type %1%")) % type));
     }
 
     vpz::Model* mdl = new vpz::Model();
@@ -205,8 +206,8 @@ void SaxStackVpz::buildModelGraphics(graph::Model* mdl,
             mdl->setX(boost::lexical_cast < int >(x));
             mdl->setY(boost::lexical_cast < int >(y));
         } catch (boost::bad_lexical_cast& e) {
-            throw(utils::SaxParserError(boost::format(
-                    "Cannot convert x or y position for model %1%") %
+            throw(utils::SaxParserError(fmt(_(
+                    "Cannot convert x or y position for model %1%")) %
                 mdl->getName()));
         }
     }
@@ -216,8 +217,8 @@ void SaxStackVpz::buildModelGraphics(graph::Model* mdl,
             mdl->setWidth(boost::lexical_cast < int >(width));
             mdl->setHeight(boost::lexical_cast < int >(height));
         } catch (boost::bad_lexical_cast& e) {
-            throw(utils::SaxParserError(boost::format(
-                    "Cannot convert width or height for model %1%") %
+            throw(utils::SaxParserError(fmt(_(
+                    "Cannot convert width or height for model %1%")) %
                 mdl->getName()));
         }
     }
@@ -268,8 +269,8 @@ void SaxStackVpz::pushPortType(const Glib::ustring& name)
     } else if (name == "init") {
         prt = new vpz::Init();
     } else {
-        throw(utils::SaxParserError(boost::format(
-                    "Unknow port type %1%.") % name));
+        throw(utils::SaxParserError(fmt(_(
+                    "Unknow port type %1%.")) % name));
     }
     push(prt);
 }
@@ -307,8 +308,8 @@ void SaxStackVpz::pushConnection(const AttributeList& att)
     } else if (type == "output") {
         cnt = new vpz::OutputConnection();
     } else {
-        throw(utils::SaxParserError(boost::format(
-                    "Unknow connection type %1%") % type));
+        throw(utils::SaxParserError(fmt(_(
+                    "Unknow connection type %1%")) % type));
     }
     push(cnt);
 }
@@ -457,8 +458,8 @@ void SaxStackVpz::pushReplicas(const AttributeList& att)
                 rep.setSeed(boost::lexical_cast < guint32 >((*it).value));
                 haveseed = true;
             } catch(const boost::bad_lexical_cast& ) {
-                throw(utils::ArgError(boost::format(
-                        "Cannot convert replicas's tag seed: '%1%'") %
+                throw(utils::ArgError(fmt(_(
+                        "Cannot convert replicas's tag seed: '%1%'")) %
                     (*it).value));
             }
         } else if ((*it).name == "number") {
@@ -466,18 +467,18 @@ void SaxStackVpz::pushReplicas(const AttributeList& att)
                 rep.setNumber(boost::lexical_cast < size_t >((*it).value));
                 havenumber = true;
             } catch(const boost::bad_lexical_cast& ) {
-                throw(utils::ArgError(boost::format(
-                        "Cannot convert replicas's tag number: '%1%'") %
+                throw(utils::ArgError(fmt(_(
+                        "Cannot convert replicas's tag number: '%1%'")) %
                     (*it).value));
             }
         }
     }
 
     Assert < utils::ArgError >(haveseed,
-           "The replicas's tag does not define a seed");
+                               _("The replicas's tag does not define a seed"));
 
     Assert < utils::ArgError >(havenumber,
-           "The replica's tag does not define a number");
+                               _("The replica's tag does not define a number"));
 }
 
 void SaxStackVpz::pushConditions()
@@ -566,8 +567,9 @@ void SaxStackVpz::pushOutput(const AttributeList& att)
     } else if (format == "distant") {
         push(&outs.addDistantStream(name, location, plugin));
     } else {
-        throw(utils::SaxParserError(boost::format(
-                    "Unknow format '%1%' for the output %2%") % format % name));
+        throw(utils::SaxParserError(fmt(_(
+                    "Unknow format '%1%' for the output %2%")) % format %
+                name));
     }
 }
 
@@ -584,7 +586,7 @@ void SaxStackVpz::pushView(const AttributeList& att)
 
     if (type == "timed") {
         Assert < utils::SaxParserError >(existAttribute(att, "timestep"),
-               (boost::format("View %1% have no timestep attribute.") %
+               (fmt(_("View %1% have no timestep attribute.")) %
                 name));
 
         double ts(getAttribute < double >(att, "timestep"));
@@ -594,8 +596,8 @@ void SaxStackVpz::pushView(const AttributeList& att)
     } else if (type == "finish") {
         views.addFinishView(name, out);
     } else {
-        throw(utils::SaxParserError(boost::format(
-                    "Unknow type '%1%' for the view %1%") % type % name));
+        throw(utils::SaxParserError(fmt(_(
+                    "Unknow type '%1%' for the view %1%")) % type % name));
     }
 }
 

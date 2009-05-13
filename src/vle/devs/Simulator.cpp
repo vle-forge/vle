@@ -42,8 +42,8 @@ Simulator::Simulator(graph::AtomicModel* atomic) :
     m_atomicModel(atomic)
 {
     if (not atomic) {
-        throw utils::InternalError(
-            "Simulator is not connected to an atomic model.");
+        throw utils::InternalError(_(
+            "Simulator is not connected to an atomic model."));
     }
 }
 
@@ -68,7 +68,7 @@ void Simulator::addDynamics(Dynamics* dynamics)
 const std::string& Simulator::getName() const
 {
     if (not m_atomicModel) {
-        throw utils::InternalError("Simulator destroyed");
+        throw utils::InternalError(_("Simulator destroyed"));
     }
 
     return m_atomicModel->getName();
@@ -77,7 +77,7 @@ const std::string& Simulator::getName() const
 const std::string& Simulator::getParent()
 {
     if (not m_atomicModel) {
-        throw utils::InternalError("Simulator destroyed");
+        throw utils::InternalError(_("Simulator destroyed"));
     }
 
     if (m_parents.empty()) {
@@ -124,7 +124,7 @@ InternalEvent * Simulator::buildInternalEvent(const Time& currentTime)
 
 void Simulator::finish()
 {
-    DTraceDebug(boost::format("                     %1% finish") %
+    DTraceDebug(fmt(_("                     %1% finish")) %
                 getName());
 
     m_dynamics->finish();
@@ -132,7 +132,7 @@ void Simulator::finish()
 
 void Simulator::output(const Time& currentTime, ExternalEventList& output)
 {
-    DTraceDebug(boost::format("%1$20.10g %2% output") % currentTime %
+    DTraceDebug(fmt(_("%1$20.10g %2% output")) % currentTime %
                 getName());
 
     m_dynamics->output(currentTime, output);
@@ -140,7 +140,7 @@ void Simulator::output(const Time& currentTime, ExternalEventList& output)
 
 Time Simulator::timeAdvance()
 {
-    DTraceDebug(boost::format("                     %1% ta") %
+    DTraceDebug(fmt(_("                     %1% ta")) %
                 getName());
 
     return m_dynamics->timeAdvance();
@@ -148,7 +148,7 @@ Time Simulator::timeAdvance()
 
 InternalEvent* Simulator::init(const Time& time)
 {
-    DTraceDebug(boost::format("%1$20.10g %2% init") % time %
+    DTraceDebug(fmt(_("%1$20.10g %2% init")) % time %
                 getName());
 
     return new InternalEvent(m_dynamics->init(time) + time, this);
@@ -158,7 +158,7 @@ Event::EventType Simulator::confluentTransitions(
     const InternalEvent& internal,
     const ExternalEventList& extEventlist) const
 {
-    DTraceDebug(boost::format("%1$20.10g %2% confluent transition: [%3%]") %
+    DTraceDebug(fmt(_("%1$20.10g %2% confluent transition: [%3%]")) %
                 internal.getTime() % getName() % extEventlist);
 
     return m_dynamics->confluentTransitions(internal.getTime(), extEventlist);
@@ -166,7 +166,7 @@ Event::EventType Simulator::confluentTransitions(
 
 InternalEvent* Simulator::internalTransition(const InternalEvent& event)
 {
-    DTraceDebug(boost::format("%1$20.10g %2% internal transition") %
+    DTraceDebug(fmt(_("%1$20.10g %2% internal transition")) %
                 event.getTime() % getName());
 
     m_dynamics->internalTransition(event.getTime());
@@ -177,14 +177,14 @@ InternalEvent* Simulator::externalTransition(
     const ExternalEventList& event,
     const Time& time)
 {
-    DTraceDebug(boost::format("%1$20.10g %2% external transition: [%3%]") % time
+    DTraceDebug(fmt(_("%1$20.10g %2% external transition: [%3%]")) % time
                 % getName() % event);
 
     try {
         m_dynamics->externalTransition(event, time);
     } catch(const std::exception& e) {
-        throw utils::ModellingError(boost::format(
-                    "%1% in external: %2%") % getName() % e.what());
+        throw utils::ModellingError(fmt(_(
+                    "%1% in external: %2%")) % getName() % e.what());
     }
     return buildInternalEvent(time);
 }
@@ -210,20 +210,20 @@ InternalEvent* Simulator::externalTransitionConflit(
 void Simulator::request(const RequestEvent& event, const Time& time,
                         ExternalEventList& output)
 {
-    DTraceDebug(boost::format("%1$20.10g %2% request: [%3%]") % time %
+    DTraceDebug(fmt(_("%1$20.10g %2% request: [%3%]")) % time %
                 getName() % event);
 
     try {
         m_dynamics->request(event, time, output);
     } catch(const std::exception& e) {
-        throw utils::ModellingError(boost::format(
-                    "%1% in request: %2%") % getName() % e.what());
+        throw utils::ModellingError(fmt(_(
+                    "%1% in request: %2%")) % getName() % e.what());
     }
 }
 
 ObservationEvent* Simulator::observation(const ObservationEvent& event) const
 {
-    DTraceDebug(boost::format("%1$20.10g %2% observation: [%3%]") %
+    DTraceDebug(fmt(_("%1$20.10g %2% observation: [%3%]")) %
                 event.getTime() % getName() % event);
 
     value::Value* val;
@@ -234,8 +234,8 @@ ObservationEvent* Simulator::observation(const ObservationEvent& event) const
         nevent = new ObservationEvent(event);
 
         if (not val) {
-            TraceAlways((boost::format(
-                        "Simulator %1% return an empty value on event %2%") %
+            TraceAlways((fmt(_(
+                        "Simulator %1% return an empty value on event %2%")) %
                     getName() % event));
         } else {
             nevent->putAttribute(event.getPortName(), val);

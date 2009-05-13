@@ -39,7 +39,7 @@ TreeViewObservable::TreeViewObservable()
     set_model(m_refTreeModel);
 
     remove_all_columns();
-    append_column("name", m_Columns.m_col_name);
+    append_column(_("name"), m_Columns.m_col_name);
 
     //makeTreeView();
     /*

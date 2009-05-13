@@ -46,39 +46,39 @@ CommandOptionGroup::CommandOptionGroup() :
         Glib::OptionEntry en;
         en.set_long_name("daemon");
         en.set_short_name('d');
-        en.set_description("Run in daemon mode.");
+        en.set_description(_("Run in daemon mode."));
         add_entry(en, mDaemon);
     }
     {
         Glib::OptionEntry en;
         en.set_long_name("port");
         en.set_short_name('p');
-        en.set_description("Port to listening .");
+        en.set_description(_("Port to listening ."));
         add_entry(en, mPort);
     }
     {
         Glib::OptionEntry en;
         en.set_long_name("infos");
         en.set_short_name('i');
-        en.set_description("Informations of OOV.");
+        en.set_description(_("Informations of OOV."));
         add_entry(en, mInfos);
     }
     {
         Glib::OptionEntry en;
         en.set_long_name("version");
-        en.set_description("The OOV Version.");
+        en.set_description(_("The OOV Version."));
         add_entry(en, mVersion);
     }
     {
         Glib::OptionEntry en;
         en.set_long_name("verbose");
         en.set_short_name('v');
-        en.set_description(
+        en.set_description(_(
             "Verbose mode 0 - 3. [default 0]\n"
             "\t(0) no trace and no long exception\n"
             "\t(1) small simulation trace and long exception\n"
             "\t(2) long simulation trace\n"
-            "\t(3) all simulation trace\n");
+            "\t(3) all simulation trace\n"));
         add_entry(en, mVerbose);
     }
 }
@@ -88,8 +88,8 @@ void CommandOptionGroup::check()
     if (mPort == 0) {
         mPort = 8000;
     } else if (mPort > 65535 or mPort < 0) {
-        throw utils::InternalError(boost::format(
-                "Invalid port %1%. Choose a correct port ie. [1 - 65535]\n") %
+        throw utils::InternalError(fmt(
+                _("Invalid port %1%. Choose a correct port ie. [1 - 65535]\n")) %
             mPort);
     }
 }

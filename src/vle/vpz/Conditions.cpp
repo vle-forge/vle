@@ -68,8 +68,8 @@ Condition& Conditions::add(const Condition& condition)
     x = m_list.insert(std::make_pair < std::string, Condition >(
             condition.name(), condition));
 
-    Assert < utils::ArgError >(x.second, boost::format(
-            "The condition '%1%' already exists") % condition.name());
+    Assert < utils::ArgError >(x.second, fmt(_(
+            "The condition '%1%' already exists")) % condition.name());
 
     return x.first->second;
 }
@@ -102,8 +102,8 @@ void Conditions::copy(const std::string& conditionname,
 const Condition& Conditions::get(const std::string& condition) const
 {
     const_iterator it = m_list.find(condition);
-    Assert < utils::ArgError >(it != end(), boost::format(
-            "The condition '%1%' does not exists") % condition);
+    Assert < utils::ArgError >(it != end(), fmt(_(
+            "The condition '%1%' does not exists")) % condition);
 
     return it->second;
 }
@@ -111,8 +111,8 @@ const Condition& Conditions::get(const std::string& condition) const
 Condition& Conditions::get(const std::string& condition)
 {
     iterator it = m_list.find(condition);
-    Assert < utils::ArgError >(it != end(), boost::format(
-            "The condition '%1%' does not exists") % condition);
+    Assert < utils::ArgError >(it != end(), fmt(_(
+            "The condition '%1%' does not exists")) % condition);
 
     return it->second;
 }

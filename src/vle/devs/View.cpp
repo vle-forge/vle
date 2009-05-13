@@ -47,8 +47,8 @@ ObservationEvent* View::addObservable(Simulator* model,
                                     const Time& currenttime)
 {
     if (not model) {
-        throw utils::InternalError(
-           "Cannot add an empty simulator to observe");
+        throw utils::InternalError(_(
+           "Cannot add an empty simulator to observe"));
     }
 
     if (not exist(model, portname)) {

@@ -43,7 +43,7 @@ public:
 private:
     Ext x;
     Var y;
-    
+
     double b;
     double d;
     double e;

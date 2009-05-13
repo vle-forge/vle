@@ -41,14 +41,14 @@ TreeViewConditions::TreeViewConditions(vpz::Conditions& cond, const vpz::AtomicM
     set_model(m_refTreeModel);
 
     //Add the TreeView's view columns:
-    append_column("Name", m_Columns.m_col_name);
-    append_column_editable("In", m_Columns.m_col_activ);
+    append_column(_("Name"), m_Columns.m_col_name);
+    append_column_editable(_("In"), m_Columns.m_col_activ);
     {
         using namespace Gtk::Menu_Helpers;
         Gtk::Menu::MenuList* items = &mMenu.items();
-        items->push_back(Gtk::Menu_Helpers::MenuElem("Insert",
+        items->push_back(Gtk::Menu_Helpers::MenuElem(_("Insert"),
                          sigc::mem_fun(*this, &TreeViewConditions::on_menu_insert)));
-        items->push_back(Gtk::Menu_Helpers::MenuElem("Remove",
+        items->push_back(Gtk::Menu_Helpers::MenuElem(_("Remove"),
                          sigc::mem_fun(*this, &TreeViewConditions::on_menu_remove)));
     }
 }
@@ -109,7 +109,7 @@ void TreeViewConditions::makeTreeView()
 
 void TreeViewConditions::on_menu_insert()
 {
-    SimpleTypeBox box("Name of the port ?");
+    SimpleTypeBox box(_("Name of the port ?"));
     std::string name = boost::trim_copy(box.run());
 
     if (box.valid() and not name.empty()) {

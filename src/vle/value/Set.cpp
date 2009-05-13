@@ -173,11 +173,11 @@ const std::string& Set::getXml(const size_type i) const
 const Value& Set::get(const size_type i) const
 {
     if (i >= size()) {
-        throw std::out_of_range("Set: too big index");
+        throw std::out_of_range(_("Set: too big index"));
     }
 
     if (m_value[i] == 0) {
-        throw utils::ArgError("Set: no value in this cell");
+        throw utils::ArgError(_("Set: no value in this cell"));
     }
 
     return *m_value[i];
@@ -186,11 +186,11 @@ const Value& Set::get(const size_type i) const
 Value& Set::get(const size_type i)
 {
     if (i >= size()) {
-        throw std::out_of_range("Set: too big index");
+        throw std::out_of_range(_("Set: too big index"));
     }
 
     if (m_value[i] == 0) {
-        throw utils::ArgError("Set: no value in this cell");
+        throw utils::ArgError(_("Set: no value in this cell"));
     }
 
     return *m_value[i];
@@ -199,7 +199,7 @@ Value& Set::get(const size_type i)
 Value* Set::give(const size_type& i)
 {
     if (i >= size()) {
-        throw std::out_of_range("Set: too big index");
+        throw std::out_of_range(_("Set: too big index"));
     }
 
     Value* result = m_value[i];
@@ -210,7 +210,7 @@ Value* Set::give(const size_type& i)
 void Set::del(const size_type i)
 {
     if (i >= size()) {
-        throw std::out_of_range("Set: too big index");
+        throw std::out_of_range(_("Set: too big index"));
     }
 
     delete m_value[i];
@@ -241,8 +241,8 @@ void Set::serializeTxtFile(const Set& set, const std::string& filename)
 {
     std::ofstream out(filename.c_str());
     if (not out.is_open()) {
-        throw utils::ArgError(boost::format(
-                "serialize error: cannot open file '%1%'") % filename);
+        throw utils::ArgError(fmt(_(
+                "serialize error: cannot open file '%1%'")) % filename);
     }
 
     boost::archive::text_oarchive oa(out);
@@ -267,8 +267,8 @@ void Set::serializeBinaryFile(const Set& set, const std::string& filename)
 {
     std::ofstream out(filename.c_str(), std::ofstream::binary);
     if (not out.is_open()) {
-        throw utils::ArgError(boost::format(
-                "serialize error: cannot open file '%1%'") % filename);
+        throw utils::ArgError(fmt(_(
+                "serialize error: cannot open file '%1%'")) % filename);
     }
 
     boost::archive::text_oarchive oa(out);
@@ -293,8 +293,8 @@ void Set::deserializeTxtFile(Set& set, const std::string& filename)
 {
     std::ifstream out(filename.c_str());
     if (not out.is_open()) {
-        throw utils::ArgError(boost::format(
-                "deserialize error: can not open file '%1%'") % filename);
+        throw utils::ArgError(fmt(_(
+                "deserialize error: can not open file '%1%'")) % filename);
     }
 
     boost::archive::text_iarchive ia(out);
@@ -317,8 +317,8 @@ void Set::deserializeBinaryFile(Set& set, const std::string& filename)
 {
     std::ifstream out(filename.c_str(), std::ifstream::binary);
     if (not out.is_open()) {
-        throw utils::ArgError(boost::format(
-                "deserialize error: can not open file '%1%'") % filename);
+        throw utils::ArgError(fmt(_(
+                "deserialize error: can not open file '%1%'")) % filename);
     }
 
     boost::archive::text_iarchive ia(out);

@@ -24,6 +24,7 @@
 
 
 #include <vle/gvle/HelpBox.hpp>
+#include <vle/utils/i18n.hpp>
 
 namespace vle
 {
@@ -52,7 +53,7 @@ HelpBox::HelpBox()
     set_value(Gtk::CORNER_TOP_LEFT);
     mScrolledWindow->add(*mTextView);
 
-    set_title("Help");
+    set_title(_("Help"));
     set_modal(false);
     property_window_position().set_value(Gtk::WIN_POS_NONE);
     set_resizable(true);

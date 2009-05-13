@@ -45,7 +45,7 @@ NetStreamReader::NetStreamReader(int port) :
     m_image(0)
 {
     setBufferSize(4096);
-    TraceAlways(boost::format("Build a NetStreamReader on port %1%") % port);
+    TraceAlways(fmt(_("Build a NetStreamReader on port %1%")) % port);
 }
 
 NetStreamReader::~NetStreamReader()
@@ -65,8 +65,8 @@ void NetStreamReader::process()
 void NetStreamReader::waitConnection()
 {
     m_server->accept_client("vle");
-    TraceAlways(boost::format(
-            "NetStreamReader connection with client %1%") % "vle");
+    TraceAlways(fmt(
+            _("NetStreamReader connection with client %1%")) % "vle");
 }
 
 void NetStreamReader::readConnection()
@@ -78,7 +78,7 @@ void NetStreamReader::readConnection()
             guint32 val = m_server->recv_int("vle");
 
             Assert <utils::InternalError >(val > 0,
-                   "NetStreamReader: bad size for package");
+                   _("NetStreamReader: bad size for package"));
 
             m_buffer = m_server->recv_buffer("vle", val);
 
@@ -86,8 +86,8 @@ void NetStreamReader::readConnection()
             value::Set::deserializeBinaryBuffer(frame, m_buffer);
             stop = dispatch(frame);
         } catch (const std::exception& e) {
-            throw(utils::InternalError(boost::format(
-                    "NetStreamReader: %1%") % e.what()));
+            throw(utils::InternalError(fmt(
+                    _("NetStreamReader: %1%")) % e.what()));
         }
     }
 }
@@ -135,8 +135,8 @@ bool NetStreamReader::dispatch(value::Set& frame)
         serializePlugin();
         break;
     default:
-        throw(utils::InternalError(boost::format(
-                "NetStreamReader: unknow tag '%1%'") %
+        throw(utils::InternalError(fmt(
+                _("NetStreamReader: unknow tag '%1%'")) %
             frame.get(0).toInteger().value()));
     }
     return end;
@@ -168,7 +168,7 @@ void NetStreamReader::onValue(const std::string& simulator,
         if (plg->isCopyDone()) {
             plg->stored()->write_to_png(
                 Glib::build_filename(plg->location(),
-                                     (boost::format("img-%1$08d.png") %
+                                     (fmt("img-%1$08d.png") %
                                       m_image).str()));
             m_image++;
         }
@@ -206,10 +206,10 @@ void NetStreamReader::serializePlugin()
 void NetStreamReader::setBufferSize(size_t buffer)
 {
     Assert < utils::InternalError >(buffer != 0,
-           "Cannot build a buffer with an empty size");
+           _("Cannot build a buffer with an empty size"));
 
-    Assert < utils::InternalError >(buffer < m_buffer.max_size(), boost::format(
-            "Cannot allocate a buffer of size %1%") % buffer);
+    Assert < utils::InternalError >(buffer < m_buffer.max_size(), fmt(
+            _("Cannot allocate a buffer of size %1%")) % buffer);
 
     m_buffer.reserve(buffer);
 }

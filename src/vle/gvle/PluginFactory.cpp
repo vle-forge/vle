@@ -25,6 +25,7 @@
 #include <vle/gvle/PluginFactory.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Algo.hpp>
+#include <vle/utils/i18n.hpp>
 #include <glibmm/module.h>
 #include <boost/checked_delete.hpp>
 #include <cassert>
@@ -117,8 +118,8 @@ const ConditionPlugin& PluginFactory::getCondition(const std::string& name) cons
     ConditionPluginList::const_iterator it = getC(name);
 
     if (not it->second) {
-        throw utils::InternalError(boost::format(
-                "ConditionPlugin '%1%' is not initialized") % name);
+        throw utils::InternalError(fmt(_(
+                "ConditionPlugin '%1%' is not initialized")) % name);
     }
 
     return *it->second;
@@ -129,8 +130,8 @@ const OutputPlugin& PluginFactory::getOutput(const std::string& name) const
     OutputPluginList::const_iterator it = getO(name);
 
     if (not it->second) {
-        throw utils::InternalError(boost::format(
-                "Outputplugin '%1%' is not initialized") % name);
+        throw utils::InternalError(fmt(_(
+                "Outputplugin '%1%' is not initialized")) % name);
     }
 
     return *it->second;
@@ -140,8 +141,8 @@ OutputPluginList::iterator PluginFactory::getO(const std::string& name)
 {
     OutputPluginList::iterator it = m_outs.find(name);
     if (it == m_outs.end()) {
-        throw utils::InternalError(boost::format(
-                "Outputplugin '%1%' is not available") % name);
+        throw utils::InternalError(fmt(_(
+                "Outputplugin '%1%' is not available")) % name);
     }
     return it;
 }
@@ -150,8 +151,8 @@ ConditionPluginList::iterator PluginFactory::getC(const std::string& name)
 {
     ConditionPluginList::iterator it = m_cnds.find(name);
     if (it == m_cnds.end()) {
-        throw utils::InternalError(boost::format(
-                "Condition plugin '%1%' is not available") % name);
+        throw utils::InternalError(fmt(_(
+                "Condition plugin '%1%' is not available")) % name);
     }
     return it;
 }
@@ -161,8 +162,8 @@ OutputPluginList::const_iterator PluginFactory::getO(
 {
     OutputPluginList::const_iterator it = m_outs.find(name);
     if (it == m_outs.end()) {
-        throw utils::InternalError(boost::format(
-                "Outputplugin '%1%' is not available") % name);
+        throw utils::InternalError(fmt(_(
+                "Outputplugin '%1%' is not available")) % name);
     }
     return it;
 }
@@ -172,8 +173,8 @@ ConditionPluginList::const_iterator PluginFactory::getC(
 {
     ConditionPluginList::const_iterator it = m_cnds.find(name);
     if (it == m_cnds.end()) {
-        throw utils::InternalError(boost::format(
-                "Condition plugin '%1%' is not available") % name);
+        throw utils::InternalError(fmt(_(
+                "Condition plugin '%1%' is not available")) % name);
     }
     return it;
 }
@@ -255,17 +256,17 @@ void PluginFactory::loadConditionPlugin(ConditionPluginList::iterator it)
                 function fct(utils::pointer_to_function < function >(fctptr));
                 plg = fct(it->first);
             } else {
-                throw utils::InternalError(boost::format(
-                        "ConditionPlugin '%1%': error opening, %2%") % it->first
-                    % Glib::Module::get_last_error());
+                throw utils::InternalError(fmt(_(
+                        "ConditionPlugin '%1%': error opening, %2%")) %
+                    it->first % Glib::Module::get_last_error());
             }
 
             it->second = plg;
             return;
         }
     }
-    throw utils::InternalError(boost::format(
-            "ConditionPlugin '%1%': plug-in not found") % it->first);
+    throw utils::InternalError(fmt(_(
+            "ConditionPlugin '%1%': plug-in not found")) % it->first);
 }
 
 void PluginFactory::loadOutputPlugin(OutputPluginList::iterator it)
@@ -289,7 +290,7 @@ void PluginFactory::loadOutputPlugin(OutputPluginList::iterator it)
                 function fct(utils::pointer_to_function < function >(fctptr));
                 plg = fct(it->first);
             } else {
-                throw utils::InternalError(boost::format(
+                throw utils::InternalError(fmt(
                         "OutputPlugin '%1%': error opening, %2%") % it->first %
                     Glib::Module::get_last_error());
             }
@@ -298,7 +299,7 @@ void PluginFactory::loadOutputPlugin(OutputPluginList::iterator it)
             return;
         }
     }
-    throw utils::InternalError(boost::format(
+    throw utils::InternalError(fmt(
             "OutputPlugin '%1%': plug-in not found") % it->first);
 }
 

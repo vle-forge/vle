@@ -62,7 +62,7 @@ ExperimentGenerator* ManagerRun::getCombinationPlan(
 
 void ManagerRunMono::operator()(const vpz::Vpz& file)
 {
-    m_out << "Manager: run experimental frames in one thread\n";
+    m_out << _("Manager: run experimental frames in one thread\n");
 
     initRandomGenerator(file);
     m_exp = getCombinationPlan(file, m_out);
@@ -96,8 +96,8 @@ void ManagerRunMono::operator()(const std::string& filename)
 
 void ManagerRunThread::operator()(const vpz::Vpz& file)
 {
-    m_out << boost::format(
-        "Manager: run experimental frames in %1% threads\n") % m_process;
+    m_out << fmt(_("Manager: run experimental frames in %1% threads\n")) %
+        m_process;
 
     initRandomGenerator(file);
     m_exp = getCombinationPlan(file, m_out);
@@ -114,8 +114,8 @@ void ManagerRunThread::operator()(const vpz::Vpz& file)
     m_pool.shutdown();
 
     if (utils::Trace::trace().haveWarning()) {
-        m_out << boost::format(
-            "\n/!\\ Some warnings during simulation: See file %1%\n") %
+        m_out << fmt(_(
+            "\n/!\\ Some warnings during simulation: See file %1%\n")) %
             utils::Trace::trace().getLogFile();
     }
 
@@ -199,8 +199,7 @@ ManagerRunDistant::ManagerRunDistant(std::ostream& out, bool writefile,
     try {
         mHost.read_file();
     } catch(const std::exception& e) {
-        m_out << boost::format("manager parsing host file error: %1%\n")
-            % e.what();
+        m_out << fmt(_("manager parsing host file error: %1%\n")) % e.what();
     }
 }
 
@@ -249,7 +248,7 @@ void ManagerRunDistant::operator()(const std::string& filename)
 
 void ManagerRunDistant::operator()(const vpz::Vpz& file)
 {
-    m_out << boost::format("Manager: run experimental frames in distant\n");
+    m_out << fmt(_("Manager: run experimental frames in distant\n"));
     initRandomGenerator(file);
 
     m_exp = getCombinationPlan(file, m_out);
@@ -264,8 +263,8 @@ void ManagerRunDistant::operator()(const vpz::Vpz& file)
     cond->join();
 
     if (utils::Trace::trace().haveWarning()) {
-        m_out << boost::format(
-            "\n/!\\ Some warnings during simulation: See file %1%\n") %
+        m_out << fmt(_(
+            "\n/!\\ Some warnings during simulation: See file %1%\n")) %
             utils::Trace::trace().getLogFile();
     }
 }
@@ -286,7 +285,7 @@ void ManagerRunDistant::send()
 {
     openConnectionWithSimulators();
     Assert < utils::InternalError >(not mClients.empty(),
-           "Manager have no simulator connection.");
+           _("Manager have no simulator connection."));
 
     const utils::Hosts::SetHosts hosts = mHost.hosts();
 
@@ -295,8 +294,7 @@ void ManagerRunDistant::send()
     ithost = hosts.begin();
     itclient = mClients.begin();
 
-    m_out << boost::format("Manager: use %1% distant simulator\n") %
-        mClients.size();
+    m_out << fmt(_("Manager: use %1% distant simulator\n")) % mClients.size();
 
     while (getVpzNumber() > 0) {
         if (ithost != hosts.end()) {
@@ -327,22 +325,22 @@ void ManagerRunDistant::openConnectionWithSimulators()
     const utils::Hosts::SetHosts hosts = mHost.hosts();
     utils::Hosts::SetHosts::const_iterator ithost = hosts.begin();
 
-    m_out << boost::format(
-        "Manager: try to open connection with %1% simulators\n") %
+    m_out << fmt(_(
+        "Manager: try to open connection with %1% simulators\n")) %
         mHost.hosts().size();
 
     while (ithost != hosts.end()) {
         utils::net::Client* client = 0;
         try {
-            m_out << boost::format("Manager: try to open %1% on %2%\n") %
+            m_out << fmt(_("Manager: try to open %1% on %2%\n")) %
                 (*ithost).hostname() % (*ithost).port();
 
             client = new utils::net::Client((*ithost).hostname(),
                                             (*ithost).port());
             mClients.push_back(client);
         } catch (const std::exception& e) {
-            m_out << boost::format(
-                "Manager: Can not connect %1% simulator on port %2%: %3%\n") %
+            m_out << fmt(_(
+                "Manager: Can not connect %1% simulator on port %2%: %3%\n")) %
                 (*ithost).hostname() % (*ithost).port() % e.what();
         }
         ++ithost;
@@ -369,8 +367,7 @@ gint32 ManagerRunDistant::getMaxProcessor(utils::net::Client& cl)
         cl.send_string("proc");
         maxprocess = cl.recv_int();
     } catch (const std::exception& e) {
-        m_out << boost::format(
-            "Manager: error get max processor: %1%\n") % e.what();
+        m_out << fmt(_("Manager: error get max processor: %1%\n")) % e.what();
     }
     return maxprocess;
 }
@@ -382,8 +379,7 @@ gint32 ManagerRunDistant::getCurrentNumberVpzi(utils::net::Client& cl)
         cl.send_string("size");
         current = cl.recv_int();
     } catch (const std::exception& e) {
-        m_out << boost::format(
-            "Manager: error get number vpz: %1%\n") % e.what();
+        m_out << fmt(_("Manager: error get number vpz: %1%\n")) % e.what();
     }
     return current;
 }
@@ -427,7 +423,7 @@ void ManagerRunDistant::getResult(utils::net::Client& cl)
             }
         }
     } catch (const std::exception& e) {
-        m_out << boost::format("Manager: error get result: %1%") % e.what();
+        m_out << fmt(_("Manager: error get result: %1%")) % e.what();
     }
 }
 
@@ -440,20 +436,19 @@ void ManagerRunDistant::sendVpzi(utils::net::Client& cl,
         std::string tmp = cl.recv_string();
         cl.send_buffer(file);
     } catch (const std::exception& e) {
-        m_out << boost::format(
-            "Manager: error send vpz %1%: %2%\n") % file % e.what();
+        m_out << fmt(_("Manager: error send vpz %1%: %2%\n")) % file % e.what();
     }
 }
 
 void ManagerRun::initRandomGenerator(const vpz::Vpz& file)
 {
     if (m_rand.get() == 0) {
-        m_out << "Use the seed from vpz::Vpz replicas tags\n";
+        m_out << _("Use the seed from vpz::Vpz replicas tags\n");
         m_rand = boost::shared_ptr < utils::Rand >(new utils::Rand());
 
         Assert < utils::ArgError >(
                file.project().experiment().replicas().number() > 0,
-               boost::format("The replicas's tag does not defined"));
+               fmt(_("The replicas's tag does not defined")));
 
         m_rand->seed(file.project().experiment().replicas().seed());
     }

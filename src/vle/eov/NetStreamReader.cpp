@@ -45,7 +45,7 @@ void NetStreamReader::process()
     } catch (std::exception& e) {
 	m_finisherror.assign(e.what());
     } catch (...) {
-	m_finisherror.assign("unknown error");
+	m_finisherror.assign(_("unknown error"));
     }
     try {
 	oov::NetStreamReader::close();
@@ -69,8 +69,8 @@ void NetStreamReader::onParameter(const std::string& pluginname,
     oov::PluginPtr poov = plugin();
 
     if (not poov->isCairo()) {
-        throw utils::InternalError(boost::format(
-                "Eov: plugin '%1%' is not a oov::CairoPlugin") %
+        throw utils::InternalError(fmt(_(
+                "Eov: plugin '%1%' is not a oov::CairoPlugin")) %
             pluginname);
     }
 
@@ -132,14 +132,15 @@ void NetStreamReader::getGtkPlugin(const std::string& pluginname)
     utils::Path::PathList lst(utils::Path::path().getStreamDirs());
     utils::Path::PathList::const_iterator it;
 
-    std::string error((boost::format(
-                "Error opening eov plugin '%1%' in:") % pluginname).str());
+    std::string error((fmt(_(
+                "Error opening eov plugin '%1%' in:")) % pluginname).str());
 
     std::string newfilename(pluginname);
 
     if (pluginname.size() <= 6 or pluginname.compare(0, 5, "cairo") != 0) {
-        throw utils::InternalError(boost::format(
-                "oov plugin must begin by string 'cairo': '%1%'") % pluginname);
+        throw utils::InternalError(fmt(_(
+                "oov plugin must begin by string 'cairo': '%1%'")) %
+            pluginname);
     }
 
     newfilename.replace(0, 5, "gtk");
@@ -162,8 +163,7 @@ void NetStreamReader::getDefaultPlugin()
     utils::Path::PathList lst(utils::Path::path().getStreamDirs());
     utils::Path::PathList::const_iterator it;
 
-    std::string error((boost::format(
-                "Error opening eov default plugin:")).str());
+    std::string error(_("Error opening eov default plugin:"));
 
     for (it = lst.begin(); it != lst.end(); ++it) {
         try {
@@ -208,8 +208,8 @@ NetStreamReader::PluginFactory::PluginFactory(const std::string& plugin,
     if (not (*m_module)) {
         delete m_module;
         m_module = 0;
-        throw utils::InternalError(boost::format(
-                "\n[%1%]: %2%") % pathname % Glib::Module::get_last_error());
+        throw utils::InternalError(fmt(_(
+                "\n[%1%]: %2%")) % pathname % Glib::Module::get_last_error());
     }
     m_module->make_resident();
 }
@@ -231,8 +231,8 @@ PluginPtr NetStreamReader::PluginFactory::build(oov::PluginPtr oovplugin,
     void*   makeNewEovPlugin = 0;
 
     if (not m_module->get_symbol("makeNewEovPlugin", makeNewEovPlugin)) {
-        throw utils::InternalError(boost::format(
-                "Error when searching makeNewEovPlugin function in plugin %1%")
+        throw utils::InternalError(fmt(_(
+                "Error when searching makeNewEovPlugin function in plugin %1%"))
             % m_plugin);
     }
 
@@ -240,8 +240,8 @@ PluginPtr NetStreamReader::PluginFactory::build(oov::PluginPtr oovplugin,
     call = fct(oovplugin, net);
 
     if (not call) {
-        throw utils::InternalError(boost::format(
-                "Error when calling makeNewEovPlugin function in plugin %1%")
+        throw utils::InternalError(fmt(_(
+                "Error when calling makeNewEovPlugin function in plugin %1%"))
             % m_plugin);
     }
 

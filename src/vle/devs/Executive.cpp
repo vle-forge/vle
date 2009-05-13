@@ -55,9 +55,9 @@ graph::CoupledModel& Executive::coupledmodel()
 void Executive::isInitialized() const
 {
     if (not m_coordinator) {
-        throw utils::ModellingError(boost::format(
+        throw utils::ModellingError(fmt(_(
                 "Executive model: do not use constructor to manage " \
-                "the DEVS graph (model '%1%')") % getModel().getName());
+                "the DEVS graph (model '%1%')")) % getModel().getName());
     }
 }
 

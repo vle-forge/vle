@@ -78,6 +78,12 @@ namespace vle { namespace utils {
 
         std::string getHomeFile(const std::string& name) const;
 
+        /**
+         * @brief Get the locale directory.
+         * @return
+         */
+        std::string getLocaleDir() const;
+
         /*
          * pixmap path
          */

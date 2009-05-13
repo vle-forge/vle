@@ -67,7 +67,7 @@ double seir::compute(unsigned int i, const devs::Time& time) const
     case 3: // R
 	return g * I() - m * R();
     default:
-	throw utils::InternalError(boost::format(
+	throw utils::InternalError(fmt(
 		  "Compute problem with seir model, i == %1%") % i );
     }
 }

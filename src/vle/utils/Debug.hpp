@@ -52,7 +52,7 @@ namespace vle {
         }
 
     template < typename X >
-        inline void Assert(bool test, const boost::format& error)
+        inline void Assert(bool test, const fmt& error)
         {
             if (not test) {
                 throw X(error);
@@ -73,7 +73,7 @@ namespace vle {
         }
     }
 
-    inline void Assert(bool test, const boost::format& error)
+    inline void Assert(bool test, const fmt& error)
     {
         if (not test) {
             throw utils::InternalError(error);

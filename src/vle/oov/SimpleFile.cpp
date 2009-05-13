@@ -58,8 +58,8 @@ void SimpleFile::onParameter(const std::string& plugin,
     m_file.open(m_filenametmp.c_str());
 
     if (not m_file.is_open()) {
-        throw utils::ArgError(boost::format(
-                "Output plug-in '%1%': cannot open file '%2%'") % plugin %
+        throw utils::ArgError(fmt(
+                _("Output plug-in '%1%': cannot open file '%2%'")) % plugin %
             m_filenametmp);
     }
 
@@ -76,21 +76,21 @@ void SimpleFile::onParameter(const std::string& plugin,
                     m_file.imbue(selected);
                 }
             } catch (...) {
-                throw utils::ArgError(boost::format(
-                        "Output plug-in '%1%': unknow locale '%2%'") % plugin %
+                throw utils::ArgError(fmt(
+                        _("Output plug-in '%1%': unknow locale '%2%'")) % plugin %
                     locale);
             }
         }
 
-        if (map->existValue("output")) {
-            std::string type(map->getString("output"));
-            if (type == "out") {
+        if (map->existValue(_("output"))) {
+            std::string type(map->getString(_("output")));
+            if (type == _("out")) {
                 m_type = SimpleFile::STANDARD_OUT;
-            } else if (type == "error") {
+            } else if (type == _("error")) {
                 m_type = SimpleFile::STANDARD_ERROR;
             } else {
-                throw utils::ArgError(boost::format(
-                        "Output plug-in '%1%': unknow type '%2%'") % plugin %
+                throw utils::ArgError(fmt(
+                        _("Output plug-in '%1%': unknow type '%2%'")) % plugin %
                     type);
             }
         }
@@ -119,8 +119,8 @@ void SimpleFile::onNewObservable(const std::string& simulator,
     std::string name(buildname(parent, simulator, portname));
 
     if (m_columns.find(name) != m_columns.end()) {
-        throw utils::InternalError(boost::format(
-           "Output plug-in: observable '%1%' already exist") % name);
+        throw utils::InternalError(fmt(
+           _("Output plug-in: observable '%1%' already exist")) % name);
     }
 
     m_columns[name] = m_buffer.size();
@@ -157,8 +157,8 @@ void SimpleFile::onValue(const std::string& simulator,
     std::string name(buildname(parent, simulator, port));
     Columns::iterator it = m_columns.find(name);
 
-    Assert < utils::InternalError >(it != m_columns.end(), boost::format(
-            "SimpleFile: columns '%1%' does not exist. No new Observable ?") %
+    Assert < utils::InternalError >(it != m_columns.end(), fmt(
+            _("SimpleFile: columns '%1%' does not exist. No new Observable ?")) %
             name);
 
     m_buffer[it->second] = value;

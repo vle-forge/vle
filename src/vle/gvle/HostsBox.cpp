@@ -76,7 +76,7 @@ bool HostInformation::run(utils::Host& host)
         mTimer = Glib::signal_timeout().connect(myslot, 2000);
 
     } catch (const Glib::ThreadError& e) {
-        gvle::Error((boost::format(
+        gvle::Error((fmt(
                          "Thread building error: %1%") % e.what()).str());
     }
 
@@ -246,12 +246,12 @@ void HostsBox::init_hosts()
     try {
         mHosts.read_file();
     } catch (const utils::InternalError& e) {
-        gvle::Error((boost::format(
+        gvle::Error((fmt(
                          "Error parsing file %1%\n%2%.") %
                      utils::Hosts::get_hosts_filename() %
                      e.what()).str());
     } catch (const xmlpp::exception& e) {
-        gvle::Error((boost::format(
+        gvle::Error((fmt(
                          "Error reading file %1%\n%2%.") %
                      utils::Hosts::get_hosts_filename() %
                      e.what()).str());
