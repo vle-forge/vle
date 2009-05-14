@@ -661,7 +661,7 @@ void Modeling::setModified(bool modified)
     }
 }
 
-void Modeling::exportCoupledModel(graph::CoupledModel* model, vpz::Vpz* dst)
+void Modeling::exportCoupledModel(graph::CoupledModel* model, vpz::Vpz* dst, std::string className)
 {
     vpz::Project& project = dst->project();
     project.setAuthor(vpz().project().author());
@@ -671,7 +671,7 @@ void Modeling::exportCoupledModel(graph::CoupledModel* model, vpz::Vpz* dst)
     experiment.setName(vpz().project().experiment().name());
     experiment.setDuration(vpz().project().experiment().duration());
 
-    export_coupled_model(dst, model);
+    export_coupled_model(dst, model, className);
     dst->project().model().setModel(model);
     dst->write();
 }

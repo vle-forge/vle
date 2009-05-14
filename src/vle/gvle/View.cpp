@@ -235,7 +235,7 @@ void View::exportCurrentModel()
         }
         save->setFilename(filename);
 
-        mModeling->exportCoupledModel(mCurrent, save);
+        mModeling->exportCoupledModel(mCurrent, save, mCurrentClass);
         delete save;
     }
 }

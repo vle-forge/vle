@@ -643,7 +643,7 @@ public:
         mIsCompressed = compress;
     }
 
-    void exportCoupledModel(graph::CoupledModel* model, vpz::Vpz* dst);
+    void exportCoupledModel(graph::CoupledModel* model, vpz::Vpz* dst, std::string className);
 
     void importCoupledModel(graph::CoupledModel* parent, vpz::Vpz* src);
 
