@@ -571,13 +571,6 @@ void ViewDrawingArea::drawChildrenModels()
 void ViewDrawingArea::drawChildrenModel(graph::Model* model,
                                         Color color)
 {
-    setColor(mModeling->getForegroundColor());
-    mContext->rectangle((mZoom * model->x()) + mOffset,
-			(mZoom * model->y()) + mOffset,
-			(mZoom * model->width()),
-			(mZoom * model->height()));
-    mContext->stroke();
-
     setColor(color);
     mContext->rectangle((mZoom * model->x()) + mOffset,
 			(mZoom * model->y()) + mOffset,
