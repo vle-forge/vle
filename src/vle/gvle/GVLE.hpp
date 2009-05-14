@@ -91,6 +91,8 @@ public:
      */
     virtual ~GVLE();
 
+    bool on_delete_event(GdkEventAny* event);
+
     /**
      * return the current selectionned button.
      *
@@ -293,6 +295,12 @@ public:
      *
      */
     void onMenuSaveAs();
+
+    /**
+     * Whien click on quit as menu
+     *
+     */
+    void onMenuQuit();
 
 
     /********************************************************************

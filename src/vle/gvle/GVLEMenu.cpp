@@ -75,7 +75,9 @@ void GVLEMenu::makeMenuFile(GVLE* gvle)
                            Gtk::Stock::QUIT,
                            Gtk::AccelKey(GDK_Q, Gdk::CONTROL_MASK |
 					 Gdk::SHIFT_MASK),
-                           sigc::mem_fun(gvle, &Gtk::Window::hide)));
+                           //sigc::mem_fun(gvle,
+                           //&Gtk::Window::hide)));
+			   sigc::mem_fun(gvle, &GVLE::onMenuQuit)));
 }
 
 void GVLEMenu::makeMenuView(GVLE* gvle)

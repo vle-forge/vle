@@ -120,6 +120,15 @@ GVLE::~GVLE()
     delete mPreferencesBox;
 }
 
+bool GVLE::on_delete_event(GdkEventAny* event)
+{
+    if (event->type == GDK_DELETE) {
+	onMenuQuit();
+	return true;
+    }
+    return false;
+}
+
 Gtk::RadioButton* GVLE::getButtonRef(ButtonType button)
 {
     switch (button)
@@ -616,6 +625,37 @@ void GVLE::onMenuSaveAs()
         m_modeling->saveXML(filename);
     }
 }
+
+void GVLE::onMenuQuit()
+{
+    if (m_modeling->isModified() == true and
+	gvle::Question("Changes have been made,\n"
+		       "Do you want the model to be saved?")) {
+	std::vector<std::string> vec;
+	m_modeling->vpz_is_correct(vec);
+	if (vec.size() != 0) {
+	    //vpz is correct
+	    std::string error = "incorrect VPZ:\n";
+	    std::vector<std::string>::const_iterator it = vec.begin();
+	    while (it != vec.end()) {
+		error += *it + "\n";
+
+		++it;
+	    }
+	    Error(error);
+	    return;
+	} else {
+	    if (m_modeling->isSaved()) {
+		m_modeling->saveXML(m_modeling->getFileName());
+	    }
+	    else {
+	       onMenuSaveAs();
+	    }
+	}
+    }
+    hide();
+}
+
 
 void GVLE::onShowModelTreeView()
 {
