@@ -1,0 +1,154 @@
+VLE 0.7.1
+=========
+
+* vle:
+  * Fix crash in ExperimentGenerator with empty condition list.
+
+* win32:
+  * Fix a bad environment variable for Boost 1.38
+
+
+
+VLE 0.7.0
+=========
+
+* vle:
+  * Remove the boost shared pointer around value::Value. This change break API
+    for the observation function in the devs::Dynamics class.
+  * Optimise the allocation / deallocation of the objects from class
+    vle::value::Value using the boost pool memory allocation. This change
+    improve simulation by 10 or 20%.
+  * Add serialization function in class vle::value::Value. This change
+    allow the building of binary stream between component Eov - Vle and for the
+    next DEVS kernel with parallelization base on thread and MPI.
+  * Change the pseudo random generator Glib::Rand to the boost::mersenne19937.
+  * Update differential equation order 1
+  * Update difference equation: new clearly syntax and improve speed for a
+    common API.
+  * Clean the API of the devs::Executive class. Break completely API
+    for models based on this class (translators and classical models).
+
+* eov:
+  * Remove the XML stream by the new binary stream provides by the value::Value
+    library.
+  * Change behaviours of the Eov and Oov with graphics outputs plug-ins:
+    - Eov and Oov can now produces png files.
+    - Eov provides a newly thread system that correct bugs on Win32 port.
+  * Add a new visualization graph plug-in.
+
+* win32 :
+  * Use the newly Boost 1.38 libraries.
+  * Use the Gtkmm 2.14 libraries.
+  * Build chm files instead of classical doxygen html files.
+
+
+
+VLE 0.6.2
+=========
+
+* vle:
+  * Bug fix.
+
+
+
+VLE 0.6.1
+=========
+
+* vle:
+  * Big fix in PetriNet.
+  * Bug fix.
+
+* gvle:
+  * Show the filename into windows title.
+  * Bug fix.
+
+
+
+VLE 0.6.0
+=========
+
+* project:
+  * Merge repository of vle, gvle, eov and examples.
+  * Use CPack to build Debian, RPM and Win32 packages.
+  * Add soversion to the dynamic libraries.
+
+* vle:
+  * Add a command line option -i or --infos to show the set of paths used by
+    the project.
+  * Add DifferenceEquation DEVS extension.
+  * Update PetriNet DEVS extension.
+  * Update DifferencialEquation DEVS extension.
+  * Add DESS extension with Runge Kutta (order 4) and Euler.
+
+* gvle:
+  * Improve the usability of the GUI.
+
+* rvle:
+  * Add two function to manage the seed of the simulation.
+
+* eov:
+  * Remove the daemon mode.
+
+
+
+VLE 0.5.2
+=========
+
+* vle:
+  * Add environment variable to manage the paths of plug-ins:
+    VLE_SIMULATOR_PATH, VLE_OOV_PATH, VLE_MODEL_PATH.
+  * Bug fix.
+
+
+
+VLE 0.5.1
+=========
+
+* vle:
+  * Add method for the GVLE application.
+  * Bug fix.
+
+* gvle:
+  * First release.
+  * Bug fix.
+
+
+
+VLE 0.5.0
+=========
+
+* project:
+  * Switch the VLE application to GPL v3.0.
+
+* vle:
+  * Add an API to get results of simulations by using a special plug-in
+    called 'storage'. This function allows a complete use of scripting language
+    like R, Python.
+  * Update the API of the translator library.
+  * Add a finish view to get results only at the end of a simulation.
+  * Add multiples conditions for atomic model.
+  * Update the API of the devs::Dynamic class:
+     - change processInitEvent to constructor.
+     - change processExternalEvent to externalTransition which receives the
+       lists of external events.
+     - change getOutputFunction to output.
+     - remove the parseXML function. Use the InitEventList now.
+     - simplify confluentTransitions which merge with externalTransition and a
+       confluentTransition.
+  * Add a new value XML.
+  * Update algorithms in libgraph to improve speed of events routing.
+  * Change values from objects to the boost shared pointer.
+  * Clean source code: delete sModel and sCoupledModel and rename sAtomicModel
+    to simulator, simulator to coordinator and coordinator to root-coordinator.
+  * Add the possibility to develop multiples dynamics into the same dynamic
+    library (.so, .dll, .dylib) by using a new macro DECLARE_NAMED_DYNAMICS.
+  * Change the VPZ format and add a dtd.
+  * Change the XML format between eov / vle.
+
+* oov:
+  * Add a new library 'liboov'.
+  * Add a new plug-in 'storage' to store result in memory.
+  * Add an API to develop Cairo oov plug-ins.
+
+* rvle:
+  * Add R package.
