@@ -776,16 +776,18 @@ void Modeling::export_coupled_model(vpz::Vpz* dst, graph::CoupledModel* model, s
     }
 }
 
-void Modeling::importCoupledModel(graph::CoupledModel* parent, vpz::Vpz* src)
+void Modeling::importModel(graph::CoupledModel* parent, vpz::Vpz* src)
 {
     using namespace vpz;
     assert(parent);
     assert(src);
-
     if (mImportBox && mImportBox->show(src)) {
         graph::Model* import = src->project().model().model();
         parent->addModel(import);
-        import_coupled_model(src, dynamic_cast<graph::CoupledModel*>(import));
+	if (import->isAtomic())
+	    import_atomic_model(src, graph::Model::toAtomic(import));
+	else
+	    import_coupled_model(src, graph::Model::toCoupled(import));
         dynamics().add(src->project().dynamics());
         conditions().add(src->project().experiment().conditions());
         views().add(src->project().experiment().views());
@@ -809,9 +811,9 @@ void Modeling::import_coupled_model(vpz::Vpz* src, graph::CoupledModel* model)
         graph::ModelList::const_iterator it = list.begin();
         while (it!= list.end()) {
             if (it->second->isAtomic()) {
-                import_atomic_model(src, dynamic_cast<graph::AtomicModel*>(it->second));
+                import_atomic_model(src, graph::Model::toAtomic(it->second));
             } else {
-                import_coupled_model(src, dynamic_cast<graph::CoupledModel*>(it->second));
+		import_coupled_model(src, graph::Model::toCoupled(it->second));
             }
 
             ++it;
@@ -822,7 +824,7 @@ void Modeling::import_coupled_model(vpz::Vpz* src, graph::CoupledModel* model)
 void parse_recurs(graph::Model* m, vpz::Vpz* vpz, int level)
 {
     if (m->isAtomic()) {
-        vpz::AtomicModel& atom = vpz->project().model().atomicModels().get(dynamic_cast<graph::AtomicModel*>(m));
+        vpz::AtomicModel& atom = vpz->project().model().atomicModels().get(graph::Model::toAtomic(m));
         for (int i = 0; i < level; ++i)
             std::cout << "\t";
         std::cout << m->getName()
@@ -839,7 +841,7 @@ void parse_recurs(graph::Model* m, vpz::Vpz* vpz, int level)
         for (int i = 0; i < level; ++i)
             std::cout << "\t";
         std::cout << m->getName() << "\n";
-        graph::ModelList ml = (dynamic_cast<graph::CoupledModel*>(m))->getModelList();
+        graph::ModelList ml = (graph::Model::toCoupled(m))->getModelList();
         graph::ModelList::iterator it;
         for (it = ml.begin(); it != ml.end(); ++it) {
             parse_recurs(it->second, vpz, level+1);

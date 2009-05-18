@@ -121,7 +121,6 @@ void Output::setDistantStream(const std::string& location,
 void Output::setData(value::Value* value)
 {
     clearData();
-
     m_data = value;
 }
 

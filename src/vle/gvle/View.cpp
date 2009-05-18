@@ -298,9 +298,7 @@ void View::importModel()
         string project_file = file.get_filename();
         try {
             vpz::Vpz* import = new vpz::Vpz(project_file);
-
-            mModeling->importCoupledModel(mCurrent, import);
-
+            mModeling->importModel(mCurrent, import);
             delete import;
         } catch (std::exception& E) {
             std::cout << "Exception :\n" << E.what() << "\n";

@@ -557,7 +557,8 @@ void ImportModelBox::on_apply()
             it != mListModels.end();
             ++it) {
         widget = *it;
-        rename_model(mSrc, widget->get_model(), widget->get_text());
+	if (widget->get_model()->getName() != widget->get_text())
+	    rename_model(mSrc, widget->get_model(), widget->get_text());
     }
 
     mReturn = true;
@@ -567,6 +568,7 @@ void ImportModelBox::on_cancel()
 {
     mDialog->hide_all();
     mReturn = false;
+    mNbWidgetIncorrect = 0;
 }
 
 void ImportModelBox::rename_dynamic(vpz::Vpz* src, std::string old_name, std::string new_name)
@@ -615,13 +617,9 @@ void ImportModelBox::rename_condition(vpz::Vpz* src, std::string old_name, std::
 
     Conditions& conds = src->project().experiment().conditions();
     Condition& cond = conds.get(old_name);
-    Condition* new_cond = new Condition(new_name);
-    const ConditionValues& values = cond.conditionvalues();
-    ConditionValues::const_iterator it_value = values.begin();
-    while (it_value != values.end()) {
-        new_cond->addValueToPort(it_value->first, it_value->second);
-        ++it_value;
-    }
+    Condition* new_cond = new Condition(cond);
+    new_cond->setName(new_name);
+
     conds.del(old_name);
     conds.add(*new_cond);
 }
@@ -630,18 +628,10 @@ void ImportModelBox::rename_output(vpz::Vpz* src, std::string old_name,
                                    std::string new_name)
 {
     src->project().experiment().views().renameOutput(old_name, new_name);
-
     Outputs& outs = src->project().experiment().views().outputs();
     Output& output = outs.get(old_name);
-    Output* new_output = new Output();
+    Output* new_output = new Output(output);
     new_output->setName(new_name);
-    if (output.format() == Output::LOCAL) {
-        new_output->setLocalStream(output.location(), output.plugin());
-    } else {
-        new_output->setDistantStream(output.location(), output.plugin());
-    }
-    new_output->setData(output.data()->clone());
-
     outs.del(old_name);
     outs.add(*new_output);
 }

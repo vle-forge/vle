@@ -645,7 +645,7 @@ public:
 
     void exportCoupledModel(graph::CoupledModel* model, vpz::Vpz* dst, std::string className);
 
-    void importCoupledModel(graph::CoupledModel* parent, vpz::Vpz* src);
+    void importModel(graph::CoupledModel* parent, vpz::Vpz* src);
 
     void exportClass(graph::Model* model, vpz::Class classe, vpz::Vpz* dst);
 
