@@ -223,32 +223,6 @@ std::string demangle(const std::string& in)
     return result;
 }
 
-void initUserDirectory()
-{
-    buildDirectory(Glib::build_filename(getUserDirectory(), "simulator"));
-    buildDirectory(Glib::build_filename(getUserDirectory(), "stream"));
-    buildDirectory(Glib::build_filename(getUserDirectory(), "model"));
-}
-
-bool buildDirectory(const std::string& dirname)
-{
-    if (!Glib::file_test(dirname, Glib::FILE_TEST_IS_DIR |
-                         Glib::FILE_TEST_EXISTS)) {
-#ifdef G_OS_WIN32
-        if (_mkdir(dirname.c_str()) == -1) {
-#else
-        if (g_mkdir(dirname.c_str(), 0755) == -1) {
-#endif
-            TraceImportant(fmt(_("Building directory %1% failed\n")) % dirname);
-            return false;
-        } else {
-            TraceImportant(fmt(_("Make directory %1% success\n")) % dirname);
-            return true;
-        }
-    }
-    return true;
-}
-
 std::string getUserDirectory()
 {
 #ifdef G_OS_WIN32
@@ -300,7 +274,6 @@ void init()
     utils::Trace::init();
 
     utils::install_signal();
-    utils::initUserDirectory();
     utils::net::Base::init();
 
 #ifdef VLE_HAVE_NLS

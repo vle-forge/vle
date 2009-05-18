@@ -48,8 +48,8 @@ PluginPtr StreamReader::plugin() const
 void StreamReader::initPlugin(const std::string& plugin,
                               const std::string& location)
 {
-    utils::Path::PathList lst(utils::Path::path().getStreamDirs());
-    utils::Path::PathList::const_iterator it;
+    utils::PathList lst(utils::Path::path().getStreamDirs());
+    utils::PathList::const_iterator it;
 
     std::string error((fmt(
                 _("Error opening oov plugin '%1%' in:")) % plugin).str());

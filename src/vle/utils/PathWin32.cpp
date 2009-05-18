@@ -35,7 +35,7 @@
 
 namespace vle { namespace utils {
 
-std::string Path::initHomeDir()
+void Path::initHomeDir()
 {
     m_home.clear();
 

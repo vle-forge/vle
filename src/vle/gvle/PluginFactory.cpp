@@ -181,8 +181,8 @@ ConditionPluginList::const_iterator PluginFactory::getC(
 
 void PluginFactory::readConditionPlugins()
 {
-    utils::Path::PathList paths = utils::Path::path().getConditionDirs();
-    utils::Path::PathList::iterator it = paths.begin();
+    utils::PathList paths = utils::Path::path().getConditionDirs();
+    utils::PathList::iterator it = paths.begin();
 
     while (it != paths.end()) {
         if (Glib::file_test(*it, Glib::FILE_TEST_EXISTS)) {
@@ -209,8 +209,8 @@ void PluginFactory::readConditionPlugins()
 
 void PluginFactory::readOutputPlugins()
 {
-    utils::Path::PathList paths = utils::Path::path().getOutputDirs();
-    utils::Path::PathList::iterator it = paths.begin();
+    utils::PathList paths = utils::Path::path().getOutputDirs();
+    utils::PathList::iterator it = paths.begin();
 
     while (it != paths.end()) {
         if (Glib::file_test(*it, Glib::FILE_TEST_EXISTS)) {
@@ -239,7 +239,7 @@ void PluginFactory::loadConditionPlugin(ConditionPluginList::iterator it)
 {
     assert(it != m_cnds.end());
 
-    for (utils::Path::PathList::const_iterator jt =
+    for (utils::PathList::const_iterator jt =
          utils::Path::path().getConditionDirs().begin(); jt !=
          utils::Path::path().getConditionDirs().end(); ++jt) {
 
@@ -273,7 +273,7 @@ void PluginFactory::loadOutputPlugin(OutputPluginList::iterator it)
 {
     assert(it != m_outs.end());
 
-    for (utils::Path::PathList::const_iterator jt =
+    for (utils::PathList::const_iterator jt =
          utils::Path::path().getOutputDirs().begin(); jt !=
          utils::Path::path().getOutputDirs().end(); ++jt) {
 

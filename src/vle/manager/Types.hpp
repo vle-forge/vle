@@ -44,7 +44,7 @@ namespace vle { namespace manager  {
      * @brief Define a list of filename from command line arguments argv and
      * argc.
      */
-    typedef std::vector < const char* > CmdArgs;
+    typedef std::list < std::string > CmdArgs;
 
     //
     // JustRun output types

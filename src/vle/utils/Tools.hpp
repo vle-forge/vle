@@ -500,22 +500,6 @@ namespace vle { namespace utils {
     std::string demangle(const std::string& in);
 
     /**
-     * Build the user directories .vle, .vle/plugins, .vle/models etc.  in
-     * $HOME/.vle. All loading error are store into log file.
-     *
-     */
-    void initUserDirectory();
-
-    /**
-     * @brief Make a new directory. All error are reported to log file.
-     *
-     * @param dirname The new directory.
-     *
-     * @return true if success, otherwise false.
-     */
-    bool buildDirectory(const std::string& dirname);
-
-    /**
      * @brief Get the user vle directory, $HOME/.vle and build it if necessary.
      * All error are reported to log file.
      *

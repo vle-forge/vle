@@ -40,6 +40,7 @@
 #include <iostream>
 #include <numeric>
 #include <vle/utils/Algo.hpp>
+#include <vle/utils/Package.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Rand.hpp>
 
@@ -231,5 +232,35 @@ BOOST_AUTO_TEST_CASE(test_normal)
 
 BOOST_AUTO_TEST_CASE(show_path)
 {
-    std::cout << vle::utils::Path::path() << "\n";
+    using vle::utils::Path;
+    using vle::utils::PathList;
+
+    std::cout << Path::path();
+    BOOST_REQUIRE_EQUAL((PathList::size_type)2,
+                        Path::path().getSimulatorDirs().size());
+
+    Path::path().setPackage("x");
+    std::cout << Path::path();
+}
+
+BOOST_AUTO_TEST_CASE(show_package)
+{
+    using vle::utils::Path;
+    using vle::utils::PathList;
+    using vle::utils::CMakePackage;
+
+    vle::utils::CMakePackage p("tmp");
+    std::string out, err;
+
+    vle::utils::CMakePackage::create(out, err);
+
+    std::cout << "Packages:\n";
+    PathList lst = CMakePackage::getInstalledPackages();
+    std::copy(lst.begin(), lst.end(), std::ostream_iterator < std::string >(
+           std::cout, "\n"));
+
+    std::cout << "Vpz:\n";
+    PathList vpz = CMakePackage::getInstalledExperiments();
+    std::copy(vpz.begin(), vpz.end(), std::ostream_iterator < std::string >(
+           std::cout, "\n"));
 }

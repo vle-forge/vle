@@ -109,8 +109,8 @@ void DynamicBox::makeCombo()
 {
     mCombo->clear();
 
-    utils::Path::PathList paths = utils::Path::path().getSimulatorDirs();
-    utils::Path::PathList::iterator it = paths.begin();
+    utils::PathList paths = utils::Path::path().getSimulatorDirs();
+    utils::PathList::iterator it = paths.begin();
 
     while (it != paths.end()) {
         if (Glib::file_test(*it, Glib::FILE_TEST_EXISTS)) {

@@ -401,8 +401,8 @@ void ViewOutputBox::fillCombobox()
     m_format->append_text("local");
     {
         using namespace utils;
-        Path::PathList paths = Path::path().getStreamDirs();
-        for (Path::PathList::iterator it = paths.begin();
+        PathList paths = Path::path().getStreamDirs();
+        for (PathList::iterator it = paths.begin();
              it != paths.end(); ++it) {
             if (Glib::file_test(*it, Glib::FILE_TEST_EXISTS)) {
                 Glib::Dir rep(*it);

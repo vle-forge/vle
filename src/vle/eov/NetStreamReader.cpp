@@ -129,8 +129,8 @@ void NetStreamReader::onClose(const double& time)
 
 void NetStreamReader::getGtkPlugin(const std::string& pluginname)
 {
-    utils::Path::PathList lst(utils::Path::path().getStreamDirs());
-    utils::Path::PathList::const_iterator it;
+    utils::PathList lst(utils::Path::path().getStreamDirs());
+    utils::PathList::const_iterator it;
 
     std::string error((fmt(_(
                 "Error opening eov plugin '%1%' in:")) % pluginname).str());
@@ -160,8 +160,8 @@ void NetStreamReader::getGtkPlugin(const std::string& pluginname)
 
 void NetStreamReader::getDefaultPlugin()
 {
-    utils::Path::PathList lst(utils::Path::path().getStreamDirs());
-    utils::Path::PathList::const_iterator it;
+    utils::PathList lst(utils::Path::path().getStreamDirs());
+    utils::PathList::const_iterator it;
 
     std::string error(_("Error opening eov default plugin:"));
 

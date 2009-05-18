@@ -26,6 +26,12 @@
 #include <glibmm/fileutils.h>
 #include <glibmm/miscutils.h>
 #include <list>
+#include <glib.h>
+#include <glib/gstdio.h>
+
+#ifdef G_OS_WIN32
+#include <io.h>
+#endif
 
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Exception.hpp>
@@ -34,6 +40,7 @@
 
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/filesystem.hpp>
 
 namespace vle { namespace utils {
 
@@ -41,66 +48,62 @@ Path* Path::mPath = 0;
 
 std::string Path::getSimulatorDir() const
 {
-    return buildLibrariesPath("simulator");
+    return buildDirname(m_prefix, VLE_LIBRARY_DIRS, "simulator");
 }
 
 std::string Path::getHomeSimulatorDir() const
 {
-    return buildHomePath("simulator");
+    return buildDirname(m_home, "simulator");
 }
 
 std::string Path::getExamplesDir() const
 {
-    return buildSharePath("examples");
+    return buildDirname(m_prefix, "examples");
 }
 
 std::string Path::getExampleFile(const std::string& file) const
 {
-    return buildSharePath("examples", file);
+    return buildDirname(m_prefix, VLE_SHARE_DIRS, "examples", file);
 }
 
 std::string Path::getLocaleDir() const
 {
-    std::list < std::string > lst;
-    lst.push_front(m_prefix);
-    lst.push_back("share");
-    lst.push_back("locale");
-    return Glib::build_path(G_DIR_SEPARATOR_S, lst);
+    return buildDirname(m_prefix, "share", "locale");
 }
 
 std::string Path::getStreamDir() const
 {
-    return buildLibrariesPath("stream");
+    return buildDirname(m_prefix, VLE_LIBRARY_DIRS, "stream");
 }
 
 std::string Path::getHomeStreamDir() const
 {
-    return buildHomePath("stream");
+    return buildDirname(m_home, "stream");
 }
 
 std::string Path::getHomeFile(const std::string& name) const
 {
-    return Glib::build_filename(getHomeDir(), name);
+    return buildFilename(m_home, name);
 }
 
 std::string Path::getPixmapDir() const
 {
-    return buildSharePath("pixmaps");
+    return buildDirname(m_prefix, VLE_SHARE_DIRS,"pixmaps");
 }
 
 std::string Path::getPixmapFile(const std::string& file) const
 {
-    return buildSharePath("pixmaps", file);
+    return buildFilename(m_prefix, VLE_SHARE_DIRS, "pixmaps", file);
 }
 
 std::string Path::getGladeDir() const
 {
-    return buildSharePath("glade");
+    return buildDirname(m_prefix, VLE_SHARE_DIRS,"glade");
 }
 
 std::string Path::getGladeFile(const std::string& file) const
 {
-    return buildSharePath("glade", file);
+    return buildFilename(m_prefix, VLE_SHARE_DIRS,"glade", file);
 }
 
 /*
@@ -109,82 +112,82 @@ std::string Path::getGladeFile(const std::string& file) const
 
 std::string Path::getOutputDir() const
 {
-    return buildLibrariesPath("outputs");
+    return buildDirname(m_prefix, VLE_LIBRARY_DIRS, "outputs");
 }
 
 std::string Path::getHomeOutputDir() const
 {
-    return buildHomePath("outputs");
+    return buildDirname(m_home, "outputs");
 }
 
 std::string Path::getOutputFile(const std::string& file) const
 {
-    return buildSharePath("outputs", file);
+    return buildDirname(m_prefix, VLE_SHARE_DIRS,"outputs", file);
 }
 
 std::string Path::getHomeOutputFile(const std::string& file) const
 {
-    return buildHomePath("outputs", file);
+    return buildDirname(m_home,"outputs", file);
 }
 
 std::string Path::getOutputPixmapDir() const
 {
-    return buildSharePath("outputs", "pixmaps");
+    return buildDirname(m_prefix, VLE_SHARE_DIRS,"outputs", "pixmaps");
 }
 
 std::string Path::getHomeOutputPixmapDir() const
 {
-    return buildHomePath("outputs", "pixmaps");
+    return buildDirname(m_home,"outputs", "pixmaps");
 }
 
 std::string Path::getOutputPixmapFile(const std::string& file) const
 {
-    return buildSharePath("outputs", "pixmaps", file);
+    return buildFilename(m_prefix, VLE_SHARE_DIRS, "outputs", "pixmaps", file);
 }
 
 std::string Path::getHomeOutputPixmapFile(const std::string& file) const
 {
-    return buildHomePath("outputs", "pixmaps", file);
+    return buildDirname(m_home,"outputs", "pixmaps", file);
 }
 
 std::string Path::getOutputGladeDir() const
 {
-    return buildSharePath("outputs", "glade");
+    return buildDirname(m_prefix, VLE_SHARE_DIRS,"outputs", "glade");
 }
 
 std::string Path::getHomeOutputGladeDir() const
 {
-    return buildHomePath("outputs", "glade");
+    return buildDirname(m_home,"outputs", "glade");
 }
 
 std::string Path::getOutputGladeFile(const std::string& file) const
 {
-    return buildSharePath("outputs", "glade", file);
+    return buildFilename(m_prefix, VLE_SHARE_DIRS, "outputs", "glade", file);
 }
 
 std::string Path::getHomeOutputGladeFile(const std::string& file) const
 {
-    return buildHomePath("outputs", "glade", file);
+    return buildDirname(m_home,"outputs", "glade", file);
 }
 
 std::string Path::getOutputDocDir() const
 {
-    return buildSharePath("outputs", "doc");
+    return buildDirname(m_prefix, VLE_SHARE_DIRS,"outputs", "doc");
 }
 
 std::string Path::getHomeOutputDocDir() const
 {
-    return buildHomePath("outputs", "doc");
+    return buildDirname(m_home,"outputs", "doc");
 }
 
 std::string Path::getOutputDocFile(const std::string& file) const
 {
-    return buildSharePath("outputs", "doc", file);
+    return buildFilename(m_prefix, VLE_SHARE_DIRS,"outputs", "doc", file);
 }
 
 std::string Path::getHomeOutputDocFile(const std::string& file) const
 {
-    return buildHomePath("outputs", "doc", file);
+    return buildFilename(m_home,"outputs", "doc", file);
 }
 
 /*
@@ -193,116 +196,181 @@ std::string Path::getHomeOutputDocFile(const std::string& file) const
 
 std::string Path::getConditionDir() const
 {
-    return buildLibrariesPath("conditions");
+    return buildDirname(m_prefix, VLE_LIBRARY_DIRS, "conditions");
 }
 
 std::string Path::getHomeConditionDir() const
 {
-    return buildHomePath("conditions");
+    return buildDirname(m_home,"conditions");
 }
 
 std::string Path::getConditionFile(const std::string& file) const
 {
-    return buildSharePath("conditions", file);
+    return buildDirname(m_prefix, VLE_SHARE_DIRS,"conditions", file);
 }
 
 std::string Path::getHomeConditionFile(const std::string& file) const
 {
-    return buildHomePath("conditions", file);
+    return buildDirname(m_home,"conditions", file);
 }
 
 std::string Path::getConditionPixmapDir() const
 {
-    return buildSharePath("conditions", "pixmaps");
+    return buildDirname(m_prefix, VLE_SHARE_DIRS,"conditions", "pixmaps");
 }
 
 std::string Path::getHomeConditionPixmapDir() const
 {
-    return buildHomePath("conditions", "pixmaps");
+    return buildDirname(m_home,"conditions", "pixmaps");
 }
 
 std::string Path::getConditionPixmapFile(const std::string& file) const
 {
-    return buildSharePath("conditions", "pixmaps", file);
+    return buildFilename(m_prefix, VLE_SHARE_DIRS,"conditions", "pixmaps", file);
 }
 
 std::string Path::getHomeConditionPixmapFile(const std::string& file) const
 {
-    return buildHomePath("conditions", "pixmaps", file);
+    return buildFilename(m_home,"conditions", "pixmaps", file);
 }
 
 std::string Path::getConditionGladeDir() const
 {
-    return buildSharePath("conditions", "glade");
+    return buildDirname(m_prefix, VLE_SHARE_DIRS,"conditions", "glade");
 }
 
 std::string Path::getHomeConditionGladeDir() const
 {
-    return buildHomePath("conditions", "glade");
+    return buildDirname(m_home,"conditions", "glade");
 }
 
 std::string Path::getConditionGladeFile(const std::string& file) const
 {
-    return buildSharePath("conditions", "glade", file);
+    return buildFilename(m_prefix, VLE_SHARE_DIRS,"conditions", "glade", file);
 }
 
 std::string Path::getHomeConditionGladeFile(const std::string& file) const
 {
-    return buildHomePath("conditions", "glade", file);
+    return buildFilename(m_home,"conditions", "glade", file);
 }
 
 std::string Path::getConditionDocDir() const
 {
-    return buildSharePath("conditions", "doc");
+    return buildDirname(m_prefix, VLE_SHARE_DIRS,"conditions", "doc");
 }
 
 std::string Path::getHomeConditionDocDir() const
 {
-    return buildHomePath("conditions", "doc");
+    return buildDirname(m_home,"conditions", "doc");
 }
 
 std::string Path::getConditionDocFile(const std::string& file) const
 {
-    return buildSharePath("conditions", "doc", file);
+    return buildFilename(m_prefix, VLE_SHARE_DIRS,"conditions", "doc", file);
 }
 
 std::string Path::getHomeConditionDocFile(const std::string& file) const
 {
-    return buildHomePath("conditions", "doc", file);
+    return buildFilename(m_home,"conditions", "doc", file);
 }
 
 /*
  * packages path
  */
 
+void Path::setPackage(const std::string& name)
+{
+    if (name.empty()) {
+        m_simulator.clear();
+        initPath();
+    } else {
+        m_currentPackage = name;
+        m_currentPackagePath = buildDirname(m_home, "pkgs", name);
+        m_simulator.clear();
+        m_simulator.push_back(getPackageLibDir());
+    }
+}
+
 std::string Path::getPackagesDir() const
 {
-    return buildHomePath("packages");
+    return buildDirname(m_home,"pkgs");
 }
 
-std::string Path::getPackageDir(const std::string& name) const
+std::string Path::getPackageDir() const
 {
-    return buildHomePath("packages", name);
+    return m_currentPackagePath;
 }
 
-std::string Path::getPackageSimulatorsDir(const std::string& name) const
+std::string Path::getPackageLibDir() const
 {
-    return buildHomePath("packages", name, "lib");
+    return buildDirname(m_currentPackagePath, "lib");
 }
 
-std::string Path::getPackageSourcesDir(const std::string& name) const
+std::string Path::getPackageSrcDir() const
 {
-    return buildHomePath("packages", name, "src");
+    return buildDirname(m_currentPackagePath, "src");
 }
 
-std::string Path::getPackageDatasDir(const std::string& name) const
+std::string Path::getPackageDataDir() const
 {
-    return buildHomePath("packages", name, "data");
+    return buildDirname(m_currentPackagePath, "data");
 }
 
-std::string Path::getPackageExperimentDir(const std::string& name) const
+std::string Path::getPackageExpDir() const
 {
-    return buildHomePath("packages", name, "exp");
+    return buildDirname(m_currentPackagePath, "exp");
+}
+
+std::string Path::getPackageBuildDir() const
+{
+    return buildDirname(m_currentPackagePath, "build");
+}
+
+std::string Path::getPackageDocDir() const
+{
+    return buildDirname(m_currentPackagePath, "doc");
+}
+
+std::string Path::getPackageFile(const std::string& name) const
+{
+    return buildFilename(getPackageDir(), name);
+}
+
+std::string Path::getPackageLibFile(const std::string& name) const
+{
+    return buildFilename(getPackageLibDir(), name);
+}
+
+std::string Path::getPackageSrcFile(const std::string& name) const
+{
+    return buildFilename(getPackageSrcDir(), name);
+}
+
+std::string Path::getPackageDataFile(const std::string& name) const
+{
+    return buildFilename(getPackageDataDir(), name);
+}
+
+std::string Path::getPackageExpFile(const std::string& name) const
+{
+    return buildFilename(getPackageExpDir(), name);
+}
+
+std::string Path::getPackageDocFile(const std::string& name) const
+{
+    return buildFilename(getPackageDocDir(), name);
+}
+
+void Path::initVleHomeDirectory()
+{
+    namespace fs = boost::filesystem;
+
+    fs::create_directory(getHomeDir());
+    fs::create_directory(getHomeStreamDir());
+    fs::create_directory(getHomeOutputDir());
+    fs::create_directory(getHomeConditionDir());
+    fs::create_directory(getHomeSimulatorDir());
+    fs::create_directory(getPackagesDir());
 }
 
 /*
@@ -335,102 +403,6 @@ void Path::addConditionDir(const std::string& dirname)
     if (isDirectory(dirname)) {
         m_condition.push_back(dirname);
     }
-}
-
-std::string Path::buildHomePath(const std::string& name) const
-{
-    std::list < std::string > lst;
-    lst.push_front(m_home);
-    lst.push_back(name);
-    return Glib::build_path(G_DIR_SEPARATOR_S, lst);
-}
-
-std::string Path::buildHomePath(const std::string& directory,
-                                const std::string& name) const
-{
-    std::list < std::string > lst;
-    lst.push_front(m_home);
-    lst.push_back(directory);
-    lst.push_back(name);
-    return Glib::build_path(G_DIR_SEPARATOR_S, lst);
-}
-
-std::string Path::buildHomePath(const std::string& dir1,
-                                const std::string& dir2,
-                                const std::string& name) const
-{
-    std::list < std::string > lst;
-    lst.push_front(m_home);
-    lst.push_back(dir1);
-    lst.push_back(dir2);
-    lst.push_back(name);
-    return Glib::build_path(G_DIR_SEPARATOR_S, lst);
-}
-
-std::string Path::buildLibrariesPath(const std::string& name) const
-{
-    std::list < std::string > lst;
-    lst.push_back(m_prefix);
-    lst.push_back(VLE_LIBRARY_DIRS);
-    lst.push_back(name);
-    return Glib::build_path(G_DIR_SEPARATOR_S, lst);
-}
-
-std::string Path::buildLibrariesPath(const std::string& directory,
-                                     const std::string& name) const
-{
-    std::list < std::string > lst;
-    lst.push_back(m_prefix);
-    lst.push_back(VLE_LIBRARY_DIRS);
-    lst.push_back(directory);
-    lst.push_back(name);
-    return Glib::build_path(G_DIR_SEPARATOR_S, lst);
-}
-
-std::string Path::buildLibrariesPath(const std::string& dir1,
-                                     const std::string& dir2,
-                                     const std::string& name) const
-{
-    std::list < std::string > lst;
-    lst.push_back(m_prefix);
-    lst.push_back(VLE_LIBRARY_DIRS);
-    lst.push_back(dir1);
-    lst.push_back(dir2);
-    lst.push_back(name);
-    return Glib::build_path(G_DIR_SEPARATOR_S, lst);
-}
-
-std::string Path::buildSharePath(const std::string& name) const
-{
-    std::list < std::string > lst;
-    lst.push_front(m_prefix);
-    lst.push_back(VLE_SHARE_DIRS);
-    lst.push_back(name);
-    return Glib::build_path(G_DIR_SEPARATOR_S, lst);
-}
-
-std::string Path::buildSharePath(const std::string& directory,
-                                 const std::string& name) const
-{
-    std::list < std::string > lst;
-    lst.push_front(m_prefix);
-    lst.push_back(VLE_SHARE_DIRS);
-    lst.push_back(directory);
-    lst.push_back(name);
-    return Glib::build_path(G_DIR_SEPARATOR_S, lst);
-}
-
-std::string Path::buildSharePath(const std::string& dir1,
-                                 const std::string& dir2,
-                                 const std::string& name) const
-{
-    std::list < std::string > lst;
-    lst.push_front(m_prefix);
-    lst.push_back(VLE_SHARE_DIRS);
-    lst.push_back(dir1);
-    lst.push_back(dir2);
-    lst.push_back(name);
-    return Glib::build_path(G_DIR_SEPARATOR_S, lst);
 }
 
 bool Path::readEnv(const std::string& variable, PathList& out)
@@ -472,11 +444,12 @@ Path::Path()
     if (initPath() == false) {
         throw InternalError(_("Path initialization failed."));
     }
+    initVleHomeDirectory();
 }
 
-std::ostream& operator<<(std::ostream& out, const Path::PathList& paths)
+std::ostream& operator<<(std::ostream& out, const PathList& paths)
 {
-    Path::PathList::const_iterator it = paths.begin();
+    PathList::const_iterator it = paths.begin();
     while (it != paths.end()) {
         out << "\t" << *it << "\n";
         ++it;
@@ -484,10 +457,96 @@ std::ostream& operator<<(std::ostream& out, const Path::PathList& paths)
     return out;
 }
 
+std::string Path::buildFilename(const std::string& dir,
+                                const std::string& file)
+{
+    return Glib::build_filename(dir, file);
+}
+
+std::string Path::buildFilename(const std::string& dir1,
+                                const std::string& dir2,
+                                const std::string& file)
+{
+    std::list < std::string > lst;
+    lst.push_back(dir1);
+    lst.push_back(dir2);
+
+    std::string path = Glib::build_path(G_DIR_SEPARATOR_S, lst);
+
+    return Glib::build_filename(path, file);
+}
+
+std::string Path::buildFilename(const std::string& dir1,
+                                const std::string& dir2,
+                                const std::string& dir3,
+                                const std::string& file)
+{
+    std::list < std::string > lst;
+    lst.push_back(dir1);
+    lst.push_back(dir2);
+    lst.push_back(dir3);
+
+    std::string path = Glib::build_path(G_DIR_SEPARATOR_S, lst);
+
+    return Glib::build_filename(path, file);
+}
+
+std::string Path::buildFilename(const std::string& dir1,
+                                const std::string& dir2,
+                                const std::string& dir3,
+                                const std::string& dir4,
+                                const std::string& file)
+{
+    std::list < std::string > lst;
+    lst.push_back(dir1);
+    lst.push_back(dir2);
+    lst.push_back(dir3);
+    lst.push_back(dir4);
+
+    std::string path = Glib::build_path(G_DIR_SEPARATOR_S, lst);
+
+    return Glib::build_filename(path, file);
+}
+
+std::string Path::buildDirname(const std::string& dir1,
+                               const std::string& dir2)
+{
+    std::list < std::string > lst;
+    lst.push_back(dir1);
+    lst.push_back(dir2);
+
+    return Glib::build_path(G_DIR_SEPARATOR_S, lst);
+}
+
+std::string Path::buildDirname(const std::string& dir1,
+                               const std::string& dir2,
+                               const std::string& dir3)
+{
+    std::list < std::string > lst;
+    lst.push_back(dir1);
+    lst.push_back(dir2);
+    lst.push_back(dir3);
+
+    return Glib::build_path(G_DIR_SEPARATOR_S, lst);
+}
+
+std::string Path::buildDirname(const std::string& dir1,
+                               const std::string& dir2,
+                               const std::string& dir3,
+                               const std::string& dir4)
+{
+    std::list < std::string > lst;
+    lst.push_back(dir1);
+    lst.push_back(dir2);
+    lst.push_back(dir3);
+    lst.push_back(dir4);
+
+    return Glib::build_path(G_DIR_SEPARATOR_S, lst);
+}
+
 std::ostream& operator<<(std::ostream& out, const Path& p)
 {
-    return out
-        << "prefix................: " << p.getPrefixDir() << "\n"
+    out << "prefix................: " << p.getPrefixDir() << "\n"
         << "\n"
         << "simulator.............: " << p.getSimulatorDir() << "\n"
         << "output................: " << p.getOutputDir() << "\n"
@@ -515,12 +574,26 @@ std::ostream& operator<<(std::ostream& out, const Path& p)
         << "condition home pixmap.: " << p.getHomeConditionPixmapDir() << "\n"
         << "condition home glade..: " << p.getHomeConditionGladeDir() << "\n"
         << "condition home doc....: " << p.getHomeConditionDocDir() << "\n"
-        << "\n"
-        << "Real simulators list..:\n" << p.getSimulatorDirs() << "\n"
+        << "\n";
+
+    if (not p.package().empty()) {
+        out << "Package dir...........: " << p.getPackageDir() << "\n"
+            << "Package lib dir.......: " << p.getPackageLibDir() << "\n"
+            << "Package scr dir.......: " << p.getPackageSrcDir() << "\n"
+            << "Package data dir......: " << p.getPackageDataDir() << "\n"
+            << "Package doc dir.......: " << p.getPackageDocDir() << "\n"
+            << "Package exp dir.......: " << p.getPackageExpDir() << "\n"
+            << "Package build dir.....: " << p.getPackageBuildDir() << "\n"
+            << "\n";
+    }
+
+    out << "Real simulators list..:\n" << p.getSimulatorDirs() << "\n"
         << "Real output list......:\n" << p.getOutputDirs() << "\n"
         << "Real condition list...:\n" << p.getConditionDirs() << "\n"
         << "Real stream list......:\n" << p.getStreamDirs() << "\n"
         << std::endl;
+
+    return out;
 }
 
 }} // namespace vle utils

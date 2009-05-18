@@ -31,17 +31,13 @@
 #include <glibmm/optioncontext.h>
 
 
-
 namespace vle { namespace apps {
 
-CommandOptionGroup::CommandOptionGroup() :
-    VLEOptionGroup("commandgroup", "Commands of VLE",
-                   "Description of commands"),
-    mManager(false),
-    mSimulator(false),
-    mJustrun(false),
-    mPort(8000),
-    mProcess(1)
+OptionGroup::OptionGroup()
+    : Glib::OptionGroup(_("Commands"), _("Descriptions of commands")),
+    mManager(false), mSimulator(false), mJustrun(false), mPort(8000),
+    mProcess(1), mAllinlocal(false), mSaveVpz(false), mInfos(false),
+    mVersion(false), mVerbose(0)
 {
     {
         Glib::OptionEntry en;
@@ -79,43 +75,13 @@ CommandOptionGroup::CommandOptionGroup() :
         en.set_description(_("Number of process to run VPZ."));
         add_entry(en, mProcess);
     }
-}
-
-void CommandOptionGroup::check()
-{
-    if ((mManager and mSimulator) or (mManager and mJustrun) or
-        (mSimulator and mJustrun)) {
-        throw utils::InternalError(
-            _("Cannot start vle in simulator, manager and just run mode"));
+    {
+        Glib::OptionEntry en;
+        en.set_long_name(_("package"));
+        en.set_short_name('P');
+        en.set_description(_("Select the package."));
+        add_entry(en, mPackage);
     }
-
-    if (not mManager and not mSimulator and not mJustrun)
-        mJustrun = true;
-
-    if (mPort == 0) {
-        mPort = 8000;
-    } else if (mPort > 65535 or mPort < 0) {
-        throw utils::InternalError(fmt(
-                _("Invalid port %1%. " \
-                  "Choose a correct port ie. [1 - 65535]\n")) % mPort);
-    }
-
-    if (mProcess == 0) {
-        mProcess = 1;
-    } else if (mProcess <= 0) {
-        throw utils::InternalError(fmt(
-                _("Invalid number of process %1%. " \
-                  "Choose a correct number of process ie. > 0\n")) % mProcess);
-    }
-}
-
-ManagerOptionGroup::ManagerOptionGroup() :
-    VLEOptionGroup("mangroup",
-                   "Manager options",
-                   "Description of manager options"),
-    mAllinlocal(false),
-    mSaveVpz(false)
-{
     {
         Glib::OptionEntry en;
         en.set_long_name("allinlocal");
@@ -131,19 +97,6 @@ ManagerOptionGroup::ManagerOptionGroup() :
         en.set_description(_("Save all VPZ instance file."));
         add_entry(en, mSaveVpz);
     }
-}
-
-void ManagerOptionGroup::check()
-{
-}
-
-GlobalOptionGroup::GlobalOptionGroup() :
-    VLEOptionGroup("globalgroup", "Global options",
-                   "Description of global options"),
-    mInfos(false),
-    mVersion(false),
-    mVerbose(0)
-{
     {
         Glib::OptionEntry en;
         en.set_long_name("infos");
@@ -171,8 +124,33 @@ GlobalOptionGroup::GlobalOptionGroup() :
     }
 }
 
-void GlobalOptionGroup::check()
+void OptionGroup::check()
 {
+    if ((mManager and mSimulator) or (mManager and mJustrun) or
+        (mSimulator and mJustrun)) {
+        throw utils::InternalError(
+            _("Cannot start vle in simulator, manager and just run mode"));
+    }
+
+    if (not mManager and not mSimulator and not mJustrun)
+        mJustrun = true;
+
+    if (mPort == 0) {
+        mPort = 8000;
+    } else if (mPort > 65535 or mPort < 0) {
+        throw utils::InternalError(fmt(
+                _("Invalid port %1%. " \
+                  "Choose a correct port ie. [1 - 65535]\n")) % mPort);
+    }
+
+    if (mProcess == 0) {
+        mProcess = 1;
+    } else if (mProcess <= 0) {
+        throw utils::InternalError(fmt(
+                _("Invalid number of process %1%. " \
+                  "Choose a correct number of process ie. > 0\n")) % mProcess);
+    }
+
     if (mVerbose < 0 or mVerbose > 3) {
         throw utils::InternalError(fmt(
                 _("Invalid verbose %1%. Choose a correcte number [0 - 3]\n")) %

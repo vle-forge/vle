@@ -221,8 +221,8 @@ oov::PluginPtr NetStreamWriter::getPlugin() const
 
         const std::string& name(vals.get(0).toString().value());
 
-        utils::Path::PathList lst(utils::Path::path().getStreamDirs());
-        utils::Path::PathList::const_iterator it;
+        utils::PathList lst(utils::Path::path().getStreamDirs());
+        utils::PathList::const_iterator it;
         oov::PluginPtr plugin;
         std::string error;
 

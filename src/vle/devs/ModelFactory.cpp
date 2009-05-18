@@ -254,8 +254,8 @@ graph::Model* ModelFactory::createModelFromClass(Coordinator& coordinator,
 
 Glib::Module* ModelFactory::buildPlugin(const vpz::Dynamic& dyn)
 {
-    utils::Path::PathList lst(utils::Path::path().getSimulatorDirs());
-    utils::Path::PathList::const_iterator it;
+    utils::PathList lst(utils::Path::path().getSimulatorDirs());
+    utils::PathList::const_iterator it;
 
     std::string error((fmt(_(
                 "Error opening simulator plugin '%1%' in:")) %

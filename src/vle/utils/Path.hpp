@@ -28,10 +28,16 @@
 
 #include <string>
 #include <list>
+#include <ostream>
 #include <glibmm/fileutils.h>
 
 
 namespace vle { namespace utils {
+
+    /**
+     * @brief Define a list of directories.
+     */
+    typedef std::list < std::string > PathList;
 
     /**
      * @brief Portable way, i.e. Linux/Unix/Windows to get VLE paths. Linux
@@ -54,11 +60,6 @@ namespace vle { namespace utils {
     {
     public:
         /**
-         * @brief Define a list of directories.
-         */
-        typedef std::list < std::string > PathList;
-
-        /**
          * @brief Return the prefix of the compilation on Unix or installation
          * directory taken from registry on Windows.
          * @return A string path.
@@ -76,11 +77,14 @@ namespace vle { namespace utils {
         const std::string& getHomeDir() const
         { return m_home; }
 
+        /**
+         * @brief Get a file from the getHomeDir() directory.
+         * @param name The filename to concat.
+         */
         std::string getHomeFile(const std::string& name) const;
 
         /**
-         * @brief Get the locale directory.
-         * @return
+         * @brief Get the locale directory (/usr/share/locale).
          */
         std::string getLocaleDir() const;
 
@@ -167,16 +171,48 @@ namespace vle { namespace utils {
         std::string getConditionDocFile(const std::string& file) const;
         std::string getHomeConditionDocFile(const std::string& file) const;
 
-        /*
-         * packages path
-         */
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Manage package
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+        /**
+         * @brief Assign a new package name.
+         * @param name the new package name to assign.
+         */
+        void setPackage(const std::string& name);
+
+        /**
+         * @brief Get the current selected package.
+         * @return Return the current pacakge or empty string if no package.
+         */
+        const std::string& package() const
+        { return m_currentPackage; }
+
+        /**
+         * @brief Return the $VLE_HOME/packages dirname.
+         * @return A string.
+         */
         std::string getPackagesDir() const;
-        std::string getPackageDir(const std::string& name) const;
-        std::string getPackageSimulatorsDir(const std::string& name) const;
-        std::string getPackageSourcesDir(const std::string& name) const;
-        std::string getPackageDatasDir(const std::string& name) const;
-        std::string getPackageExperimentDir(const std::string& name) const;
+
+        /**
+         * @brief Return the $VLE_HOME/packages/current_package dirname.
+         * @return A string.
+         */
+        std::string getPackageDir() const;
+        std::string getPackageLibDir() const;
+        std::string getPackageSrcDir() const;
+        std::string getPackageDataDir() const;
+        std::string getPackageDocDir() const;
+        std::string getPackageExpDir() const;
+        std::string getPackageBuildDir() const;
+        std::string getPackageFile(const std::string& name) const;
+        std::string getPackageLibFile(const std::string& name) const;
+        std::string getPackageSrcFile(const std::string& name) const;
+        std::string getPackageDataFile(const std::string& name) const;
+        std::string getPackageDocFile(const std::string& name) const;
+        std::string getPackageExpFile(const std::string& name) const;
 
         /**
          * @brief Get the list of simulator's directories.
@@ -231,6 +267,12 @@ namespace vle { namespace utils {
         inline static void kill()
         { delete mPath; mPath = 0; }
 
+        /**
+         * @brief Build the VLE_HOME directories:
+         * VLE_HOME/lib, doc, src, build, exp.
+         */
+        void initVleHomeDirectory();
+
     private:
         void addSimulatorDir(const std::string& dirname);
 
@@ -240,26 +282,39 @@ namespace vle { namespace utils {
 
         void addConditionDir(const std::string& dirname);
 
-        std::string buildHomePath(const std::string& name) const;
-        std::string buildHomePath(const std::string& directory,
-                                  const std::string& name) const;
-        std::string buildHomePath(const std::string& dir1,
-                                  const std::string& dir2,
-                                  const std::string& name) const;
+        std::string buildPackageDir(const std::string& name) const;
+        std::string buildPackageFile(const std::string& name) const;
+        std::string buildPackageFile(const std::string& dir,
+                                     const std::string& name) const;
+        std::string buildPackageFile(const std::string& dir1,
+                                     const std::string& dir2,
+                                     const std::string& name) const;
 
-        std::string buildLibrariesPath(const std::string& name) const;
-        std::string buildLibrariesPath(const std::string& directory,
-                                       const std::string& name) const;
-        std::string buildLibrariesPath(const std::string& dir1,
-                                       const std::string& dir2,
-                                       const std::string& name) const;
+        static std::string buildFilename(const std::string& dir,
+                                         const std::string& file);
+        static std::string buildFilename(const std::string& dir1,
+                                         const std::string& dir2,
+                                         const std::string& file);
+        static std::string buildFilename(const std::string& dir1,
+                                         const std::string& dir2,
+                                         const std::string& dir3,
+                                         const std::string& file);
+        static std::string buildFilename(const std::string& dir1,
+                                         const std::string& dir2,
+                                         const std::string& dir3,
+                                         const std::string& dir4,
+                                         const std::string& file);
 
-        std::string buildSharePath(const std::string& name) const;
-        std::string buildSharePath(const std::string& directory,
-                                   const std::string& name) const;
-        std::string buildSharePath(const std::string& dir1,
-                                   const std::string& dir2,
-                                   const std::string& name) const;
+        static std::string buildDirname(const std::string& dir1,
+                                        const std::string& dir2);
+
+        static std::string buildDirname(const std::string& dir1,
+                                        const std::string& dir2,
+                                        const std::string& dir3);
+        static std::string buildDirname(const std::string& dir1,
+                                        const std::string& dir2,
+                                        const std::string& dir3,
+                                        const std::string& dir4);
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
@@ -303,6 +358,8 @@ namespace vle { namespace utils {
 
         std::string m_prefix; /*!< the $prefix of installation */
         std::string m_home; /*!< the $VLE_HOME */
+        std::string m_currentPackage; /*< the current package selected */
+        std::string m_currentPackagePath; /*< the current package path */
 
         /**
          * @brief A default constructor that call the initPath member.
@@ -348,7 +405,7 @@ namespace vle { namespace utils {
      * @param paths The list of path.
      * @return The output stream.
      */
-    std::ostream& operator<<(std::ostream& out, const Path::PathList& paths);
+    std::ostream& operator<<(std::ostream& out, const PathList& paths);
 
     /**
      * @brief Stream operator to show the content of the Path class.
