@@ -20,7 +20,7 @@ SET(UTILS_CPP Host.cpp Path.cpp Preferences.cpp Rand.cpp Simpson.cpp Socket.cpp
 
 SET(UTILS_HPP Algo.hpp Debug.hpp Exception.hpp Host.hpp Path.hpp Pool.hpp
   Preferences.hpp Rand.hpp Simpson.hpp SocketImpl.h Socket.hpp Tools.hpp
-  Trace.hpp XML.hpp)
+  Trace.hpp XML.hpp i18n.hpp)
 
 ADD_LIBRARY(vleutils SHARED ${UTILS_CPP};${UTILS_HPP})
 
