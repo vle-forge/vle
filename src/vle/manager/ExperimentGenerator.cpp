@@ -124,11 +124,17 @@ void ExperimentGenerator::buildConditionsList()
         const vpz::Condition& cnd(it->second);
         vpz::ConditionValues::const_iterator jt;
 
-        for (jt = cnd.conditionvalues().begin();
-             jt != cnd.conditionvalues().end(); ++jt) {
-            mCondition.push_back(cond_t());
+        if (not cnd.conditionvalues().empty()) {
+            for (jt = cnd.conditionvalues().begin();
+                 jt != cnd.conditionvalues().end(); ++jt) {
+                mCondition.push_back(cond_t());
 
-            mCondition[mCondition.size() - 1].sz = jt->second->size();
+                mCondition[mCondition.size() - 1].sz = jt->second->size();
+                mCondition[mCondition.size() - 1].pos = 0;
+            }
+        } else {
+            mCondition.push_back(cond_t());
+            mCondition[mCondition.size() - 1].sz = 1;
             mCondition[mCondition.size() - 1].pos = 0;
         }
     }
@@ -163,20 +169,27 @@ void ExperimentGenerator::buildCombinationsFromReplicas(size_t cmbnumber)
            orig.conditionlist().size() % mCondition.size());
 
     for (size_t jcom = 0; jcom < mCondition.size(); ++jcom) {
-        size_t index = mCondition[jcom].pos;
-        value::Value& val = itValueOrig->second->get(index);
-        itValueDest->second->clear();
-        itValueDest->second->add(val);
+        if (not itOrig->second.conditionvalues().empty()) {
+            size_t index = mCondition[jcom].pos;
+            value::Value& val = itValueOrig->second->get(index);
+            itValueDest->second->clear();
+            itValueDest->second->add(val);
 
-        itValueDest++;
-        itValueOrig++;
+            itValueDest++;
+            itValueOrig++;
 
-        if (itValueDest == itDest->second.conditionvalues().end()) {
-            Assert(utils::InternalError, itValueOrig ==
-                   itOrig->second.conditionvalues().end(),
-                   boost::format("Error: %1% %2%\n") %
-                   itDest->second.conditionvalues().size() %
-                   itOrig->second.conditionvalues().size());
+            if (itValueDest == itDest->second.conditionvalues().end()) {
+                Assert(utils::InternalError, itValueOrig ==
+                                                itOrig->second.conditionvalues().end(),
+                                                boost::format("Error: %1% %2%\n") %
+                                                itDest->second.conditionvalues().size() %
+                                                itOrig->second.conditionvalues().size());
+                itDest++;
+                itOrig++;
+                itValueDest = itDest->second.conditionvalues().begin();
+                itValueOrig = itOrig->second.conditionvalues().begin();
+            }
+        } else {
             itDest++;
             itOrig++;
             itValueDest = itDest->second.conditionvalues().begin();
