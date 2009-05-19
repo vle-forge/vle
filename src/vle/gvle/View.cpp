@@ -274,7 +274,7 @@ void View::exportGraphic()
 	    mDrawing->exportPng(filename);
 	else if (extension == _("Portable Format Document (.pdf)"))
 	    mDrawing->exportPdf(filename);
-	else if (extension == _("Scalable Vector Graphics (.svg))"))
+	else if (extension == _("Scalable Vector Graphics (.svg)"))
 	    mDrawing->exportSvg(filename);
     }
 }
