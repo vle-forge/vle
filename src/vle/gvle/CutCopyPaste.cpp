@@ -98,7 +98,9 @@ void CutCopyPaste::copy(graph::ModelList& l, graph::CoupledModel* parent,
         mType = COPY;
 
         // to keep connections
-        mCnts = parent->getBasicConnections(l);
+	if (parent != NULL) {
+	    mCnts = parent->getBasicConnections(l);
+	}
 
         for (graph::ModelList::iterator it = l.begin();
                 it != l.end();

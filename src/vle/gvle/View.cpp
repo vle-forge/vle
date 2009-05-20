@@ -185,6 +185,10 @@ void View::addModelInListModel(graph::Model* model, bool shiftorcontrol)
 void View::addModelToSelectedModels(graph::Model* m)
 {
     if (not existInSelectedModels(m)) {
+	if (existInSelectedModels(mCurrent) or m == mCurrent) {
+	    clearSelectedModels();
+	}
+
         mSelectedModels[m->getName()] = m;
     }
 }
@@ -318,7 +322,11 @@ void View::onCutModel()
 void View::onCopyModel()
 {
     //TODO
-    mModeling->copy(mSelectedModels, mCurrent, mCurrentClass);
+    if (existInSelectedModels(mCurrent)) {
+	mModeling->copy(mSelectedModels, mCurrent->getParent(), mCurrentClass);
+    } else {
+	mModeling->copy(mSelectedModels, mCurrent, mCurrentClass);
+    }
     mSelectedModels.clear();
     mDrawing->queue_draw();
 }
