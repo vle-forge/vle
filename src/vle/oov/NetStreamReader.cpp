@@ -64,9 +64,8 @@ void NetStreamReader::process()
 
 void NetStreamReader::waitConnection()
 {
-    m_server->accept_client("vle");
-    TraceAlways(fmt(
-            _("NetStreamReader connection with client %1%")) % "vle");
+    m_server->acceptClient("vle");
+    TraceAlways(fmt(_("NetStreamReader connection with client %1%")) % "vle");
 }
 
 void NetStreamReader::readConnection()
@@ -75,12 +74,12 @@ void NetStreamReader::readConnection()
 
     while (not stop) {
         try {
-            guint32 val = m_server->recv_int("vle");
+            boost::int32_t val = m_server->recvInteger("vle");
 
             Assert <utils::InternalError >(val > 0,
                    _("NetStreamReader: bad size for package"));
 
-            m_buffer = m_server->recv_buffer("vle", val);
+            m_buffer = m_server->recvBuffer("vle", val);
 
             value::Set frame;
             value::Set::deserializeBinaryBuffer(frame, m_buffer);
@@ -144,7 +143,7 @@ bool NetStreamReader::dispatch(value::Set& frame)
 
 void NetStreamReader::closeConnection()
 {
-    m_server->close_client("vle");
+    m_server->closeClient("vle");
 }
 
 void NetStreamReader::close()
@@ -183,8 +182,8 @@ void NetStreamReader::onValue(const std::string& simulator,
 void NetStreamReader::serializePlugin()
 {
     if (plugin()->isSerializable()) {
-        m_server->send_buffer("vle", "ok");
-        m_server->recv_string("vle");
+        m_server->sendBuffer("vle", "ok");
+        m_server->recvString("vle");
 
         value::Set* vals = value::Set::create();
         vals->add(value::String::create(plugin()->name()));
@@ -194,12 +193,12 @@ void NetStreamReader::serializePlugin()
         value::Set::serializeBinaryBuffer(*vals, out);
         delete vals;
 
-        m_server->send_int("vle", out.size());
-        m_server->recv_string("vle");
-        m_server->send_buffer("vle", out);
-        m_server->recv_string("vle");
+        m_server->sendInteger("vle", out.size());
+        m_server->recvString("vle");
+        m_server->sendBuffer("vle", out);
+        m_server->recvString("vle");
     } else {
-        m_server->send_buffer("vle", "no");
+        m_server->sendBuffer("vle", "no");
     }
 }
 

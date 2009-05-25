@@ -123,7 +123,7 @@ void HostInformation::thread()
 
         try {
             client = new utils::net::Client(mIP, mPort);
-            client->send_buffer("exit");
+            client->sendBuffer("exit");
             client->close();
             delete client;
             mPing = true;

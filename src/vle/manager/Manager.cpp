@@ -351,9 +351,9 @@ void ManagerRunDistant::closeConnectionWithSimulators()
 {
     std::list < utils::net::Client* >::iterator it = mClients.begin();
     while (it != mClients.end()) {
-        (*it)->send_string("exit");
+        (*it)->sendString("exit");
         getResult(*(*it));
-        (*it)->recv_string();
+        (*it)->recvString();
         delete (*it);
         ++it;
     }
@@ -364,8 +364,8 @@ gint32 ManagerRunDistant::getMaxProcessor(utils::net::Client& cl)
 {
     gint32 maxprocess = 0;
     try {
-        cl.send_string("proc");
-        maxprocess = cl.recv_int();
+        cl.sendString("proc");
+        maxprocess = cl.recvInteger();
     } catch (const std::exception& e) {
         m_out << fmt(_("Manager: error get max processor: %1%\n")) % e.what();
     }
@@ -376,8 +376,8 @@ gint32 ManagerRunDistant::getCurrentNumberVpzi(utils::net::Client& cl)
 {
     gint32 current = 0;
     try {
-        cl.send_string("size");
-        current = cl.recv_int();
+        cl.sendString("size");
+        current = cl.recvInteger();
     } catch (const std::exception& e) {
         m_out << fmt(_("Manager: error get number vpz: %1%\n")) % e.what();
     }
@@ -387,28 +387,28 @@ gint32 ManagerRunDistant::getCurrentNumberVpzi(utils::net::Client& cl)
 void ManagerRunDistant::getResult(utils::net::Client& cl)
 {
     try {
-        cl.send_string("fini");
-        int nb = cl.recv_int();
+        cl.sendString("fini");
+        int nb = cl.recvInteger();
 
         for (int i = 0; i < nb; ++i) {
-            cl.send_string("ok");
-            int sz = cl.recv_int();
-            cl.send_string("ok");
-            std::string result = cl.recv_buffer(sz);
+            cl.sendString("ok");
+            int sz = cl.recvInteger();
+            cl.sendString("ok");
+            std::string result = cl.recvBuffer(sz);
 
             value::Set* vals = value::toSetValue(vpz::Vpz::parseValue(result));
             int nbview = value::toInteger(vals->get(0));
             int instance = value::toInteger(vals->get(1));
             int replica = value::toInteger(vals->get(2));
-            cl.send_string("ok");
+            cl.sendString("ok");
 
             for (int j = 0; j < nbview; ++j) {
-                int sz = cl.recv_int();
-                cl.send_string("ok");
-                result = cl.recv_buffer(sz);
+                int sz = cl.recvInteger();
+                cl.sendString("ok");
+                result = cl.recvBuffer(sz);
 
                 vals = value::toSetValue(vpz::Vpz::parseValue(result));
-                cl.send_string("ok");
+                cl.sendString("ok");
 
                 std::string view = value::toString(vals->get(0));
 
@@ -431,10 +431,10 @@ void ManagerRunDistant::sendVpzi(utils::net::Client& cl,
                                  const Glib::ustring& file)
 {
     try {
-        cl.send_string("file");
-        cl.send_int(file.size());
-        std::string tmp = cl.recv_string();
-        cl.send_buffer(file);
+        cl.sendString("file");
+        cl.sendInteger(file.size());
+        std::string tmp = cl.recvString();
+        cl.sendBuffer(file);
     } catch (const std::exception& e) {
         m_out << fmt(_("Manager: error send vpz %1%: %2%\n")) % file % e.what();
     }

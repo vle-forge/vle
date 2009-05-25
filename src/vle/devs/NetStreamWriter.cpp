@@ -75,8 +75,8 @@ void NetStreamWriter::open(const std::string& plugin,
 
         value::Set::serializeBinaryBuffer(*m_paramFrame, out);
 
-        m_client->send_int(out.size());
-        m_client->send_buffer(out);
+        m_client->sendInteger(out.size());
+        m_client->sendBuffer(out);
     } catch(const std::exception& e) {
         throw utils::InternalError(fmt(_(
                 "NetStreamWriter open: error opening the client connection "
@@ -98,8 +98,8 @@ void NetStreamWriter::processNewObservable(Simulator* simulator,
     value::Set::serializeBinaryBuffer(*m_newObsFrame, out);
 
     try {
-        m_client->send_int(out.size());
-        m_client->send_buffer(out);
+        m_client->sendInteger(out.size());
+        m_client->sendBuffer(out);
     } catch(const std::exception& e) {
         throw utils::InternalError(fmt(_(
                 "NetStreamWriter new observable: error writing new observable. "
@@ -119,8 +119,8 @@ void NetStreamWriter::processRemoveObservable(Simulator* simulator,
     value::Set::serializeBinaryBuffer(*m_delObsFrame, out);
 
     try {
-        m_client->send_int(out.size());
-        m_client->send_buffer(out);
+        m_client->sendInteger(out.size());
+        m_client->sendBuffer(out);
     } catch(const std::exception& e) {
         throw utils::InternalError(fmt(_(
                 "NetStreamWriter delete observable: error writing new"
@@ -149,8 +149,8 @@ void NetStreamWriter::process(ObservationEvent& event)
     value::Set::serializeBinaryBuffer(*m_valueFrame, out);
 
     try {
-        m_client->send_int(out.size());
-        m_client->send_buffer(out);
+        m_client->sendInteger(out.size());
+        m_client->sendBuffer(out);
     } catch(const std::exception& e) {
         throw utils::InternalError(fmt(_(
                 "NetStreamWriter process state event: error writing a state"
@@ -166,8 +166,8 @@ oov::PluginPtr NetStreamWriter::close(const devs::Time& time)
     value::Set::serializeBinaryBuffer(*m_closeFrame, out);
 
     try {
-        m_client->send_int(out.size());
-        m_client->send_buffer(out);
+        m_client->sendInteger(out.size());
+        m_client->sendBuffer(out);
 
         oov::PluginPtr plugin = getPlugin();
 
@@ -192,8 +192,8 @@ oov::PluginPtr NetStreamWriter::refreshPlugin()
     try {
         oov::PluginPtr plugin;
         if (m_client) {
-            m_client->send_int(out.size());
-            m_client->send_buffer(out);
+            m_client->sendInteger(out.size());
+            m_client->sendBuffer(out);
             plugin = getPlugin();
         }
         return plugin;
@@ -206,15 +206,15 @@ oov::PluginPtr NetStreamWriter::refreshPlugin()
 
 oov::PluginPtr NetStreamWriter::getPlugin() const
 {
-    std::string result = m_client->recv_string();
+    std::string result = m_client->recvString();
     if (result == "ok") {
-        m_client->send_buffer("ok");
+        m_client->sendBuffer("ok");
 
-        int sz = m_client->recv_int();
-        m_client->send_buffer("ok");
+        int sz = m_client->recvInteger();
+        m_client->sendBuffer("ok");
 
-        result = m_client->recv_buffer(sz);
-        m_client->send_buffer("ok");
+        result = m_client->recvBuffer(sz);
+        m_client->sendBuffer("ok");
 
         value::Set vals;
         value::Set::deserializeBinaryBuffer(vals, result);

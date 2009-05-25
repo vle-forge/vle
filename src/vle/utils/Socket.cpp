@@ -25,12 +25,10 @@
 
 #include <vle/utils/Socket.hpp>
 #include <vle/utils/SocketImpl.h>
-#include <glib/gtypes.h>
 #include <vle/utils/Debug.hpp>
 #include <glibmm/stringutils.h>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/lexical_cast.hpp>
-
 
 namespace vle { namespace utils { namespace net {
 
@@ -51,7 +49,8 @@ void explodeStringNet(const std::string& input, std::string& ip, int& port)
             }
 
             if (position + 1 < input.size()) {
-                std::string tmp(input, position + 1, input.size() - position + 1);
+                std::string tmp(input, position + 1, input.size() - position +
+                                1);
                 if (utils::is_int(tmp)) {
                     port = utils::to_int(tmp);
                 }
@@ -69,8 +68,10 @@ void explodeStringNet(const std::string& input, std::string& ip, int& port,
     std::vector < std::string > lst;
     boost::algorithm::split(lst, input, boost::is_any_of(":"));
 
-    Assert < utils::ArgError >(lst.size() == 3, fmt(_(
-            "Cannot find IP:port:directory from [%1%]")) % input);
+    if (lst.size() != 3) {
+        throw utils::ArgError(fmt(
+                _("Cannot find IP:port:directory from [%1%]")) % input);
+    }
 
     if (not lst[0].empty()) {
         ip.assign(lst[0]);
@@ -79,12 +80,13 @@ void explodeStringNet(const std::string& input, std::string& ip, int& port,
     try {
         port = boost::lexical_cast < int >(lst[1]);
     } catch(const boost::bad_lexical_cast& e) {
-        throw InternalError(fmt(_("Cannot convert '%1%' in TCP/IP port")) %
-                            lst[1]);
+        throw InternalError(fmt(
+                _("Cannot convert '%1%' in TCP/IP port")) % lst[1]);
     }
 
-    Assert < utils::ArgError >(port > 0 and port < 65535, fmt(_(
-                "Bad TCP/IP port value: %1%")) % port);
+    if (port <= 0 or port > 65535) {
+        throw utils::ArgError(fmt(_("Bad TCP/IP port value: %1%")) % port);
+    }
 
     directory.assign(lst[2]);
 }
@@ -105,16 +107,18 @@ Base::Base() :
     mSocket(-1)
 {
     int r = vleSocketOpen();
-    Assert < utils::ArgError >(r != -1, fmt(_("Error acquiring socket: %1%\n")) %
-           Glib::strerror(vleSocketErrno()));
+
+    if (r == -1) {
+        throw ArgError(fmt(_("Error acquiring socket: %1%\n")) %
+                       Glib::strerror(vleSocketErrno()));
+    }
 
     mSocket = r;
 
     if (vleSocketOptLinger(mSocket) == -1) {
         vleSocketClose(mSocket);
-        throw InternalError(fmt(_(
-                    "Error setsockopt socket: %1%\n")) %
-              Glib::strerror(vleSocketErrno()));
+        throw InternalError(fmt(_("Error setsockopt socket: %1%\n")) %
+                            Glib::strerror(vleSocketErrno()));
     }
 
     mRunning = true;
@@ -130,12 +134,19 @@ Base::~Base()
 
 void Base::send(int dst, const void* buffer, int size)
 {
-    Assert < utils::ArgError >(
-        mRunning, _("Cannot send message, socket is not initialised."));
-    Assert < utils::ArgError >(
-        buffer, _("Cannot send message, buffer is null."));
-    Assert < utils::ArgError >(
-        size > 0, _("Cannot send message, size must be superior to 0."));
+    if (not mRunning) {
+        throw InternalError(_("Cannot send message, socket is not "
+                              "initialised."));
+    }
+
+    if (buffer == 0) {
+        throw InternalError(_("Cannot send message, buffer is null."));
+    }
+
+    if (size <= 0) {
+        throw InternalError(_("Cannot send message, size must be superior "
+                              " to 0."));
+    }
 
     int position = 0;
     while (size > 0) {
@@ -143,50 +154,69 @@ void Base::send(int dst, const void* buffer, int size)
 	if (szcurrent == 0)
 	    break;
 
-        Assert < utils::InternalError >(
-            szcurrent != -1, fmt(_("Cannot send message, %1%\n")) %
-               Glib::strerror(vleSocketErrno()));
+        if (szcurrent == -1) {
+            throw InternalError(fmt(
+                    _("Cannot send message, %1%\n")) %
+                Glib::strerror(vleSocketErrno()));
+        }
 
 	position += szcurrent;
 	size -= szcurrent;
     }
 }
 
-void Base::send_string(int dst, const Glib::ustring& buffer)
+void Base::sendString(int dst, const std::string& buffer)
 {
     vleSocketSend(dst, buffer.c_str(), std::strlen(buffer.c_str()));
 }
 
-void Base::send_buffer(int dst, const std::string& buffer)
+void Base::sendBuffer(int dst, const std::string& buffer)
 {
     vleSocketSend(dst, buffer.c_str(), buffer.size());
 }
 
-void Base::send_int(int dst, gint32 buffer)
+void Base::sendInteger(int dst, boost::int32_t buffer)
 {
-    vleSocketSend(dst, &buffer, sizeof(gint32));
+    vleSocketSend(dst, &buffer, sizeof(boost::int32_t));
 }
 
 int  Base::recv(int src, void* buffer, size_t size)
 {
-    Assert(mRunning, _("Client cannot receive message, socket is not initialised."));
-    Assert(buffer, _("Client cannot receive message, buffer is null."));
-    Assert(size > 0, _("Client cannot receive message, size equal to 0."));
+    if (not mRunning) {
+        throw InternalError(
+            _("Client cannot receive message, socket is not initialised."));
+    }
+
+    if (not buffer) {
+        throw InternalError(
+            _("Client cannot receive message, buffer is null."));
+    }
+
+    if (size <= 0) {
+        throw InternalError(
+            _("Client cannot receive message, size equal to 0."));
+    }
 
     int current = vleSocketReceive(src, buffer, size);
-    Assert(current != -1, fmt(_("Client cannot receive message, %1%\n"))
-           % Glib::strerror(vleSocketErrno()));
+    if (current == -1) {
+        throw InternalError(fmt(
+                _("Client cannot receive message, %1%\n")) %
+            Glib::strerror(vleSocketErrno()));
+    }
 
     ((char*)buffer)[current] = '\0';
     return current;
 }
 
-Glib::ustring Base::recv_string(int src)
+std::string Base::recvString(int src)
 {
-    Assert(mRunning, _("Client cannot receive message client is not connected."));
+    if (not mRunning) {
+        throw InternalError(
+            _("Client cannot receive message client is not " "connected."));
+    }
 
     char* buffer = new char[1024];
-    Glib::ustring finished_buffer;
+    std::string finished_buffer;
 
     int size = vleSocketReceive(src, buffer, 1023);
 
@@ -208,7 +238,7 @@ Glib::ustring Base::recv_string(int src)
     return finished_buffer;
 }
 
-std::string Base::recv_buffer(int src, size_t size)
+std::string Base::recvBuffer(int src, size_t size)
 {
     std::string finished_buffer;
     char* buffer = new char[1024];
@@ -238,16 +268,21 @@ std::string Base::recv_buffer(int src, size_t size)
     return finished_buffer;
 }
 
-gint32 Base::recv_int(int src)
+boost::uint32_t Base::recvInteger(boost::int32_t src)
 {
-    Assert(mRunning, _("Socket cannot receive message, socket not initialised."));
+    if (not mRunning) {
+        throw InternalError(
+            _("Socket cannot receive message, socket not initialised."));
+    }
 
-    gint32 buffer;
-    int current = vleSocketReceive(src, &buffer, sizeof(gint32));
+    boost::uint32_t buffer;
+    int current = vleSocketReceive(src, &buffer, sizeof(boost::uint32_t));
 
-    Assert(current == sizeof(gint32), fmt(_(
-                "Client cannot receive message, %1%\n")) %
-        Glib::strerror(vleSocketErrno()));
+    if (current != sizeof(boost::uint32_t)) {
+        throw utils::InternalError(fmt(
+                _("Client cannot receive message, %1%\n")) %
+            Glib::strerror(vleSocketErrno()));
+    }
 
     return buffer;
 }
@@ -261,11 +296,17 @@ gint32 Base::recv_int(int src)
 
 Client::Client(const std::string& server, int port)
 {
-    Assert(mRunning, _("Cannot open server, socket failed."));
+    if (not mRunning) {
+        throw InternalError(_("Cannot open server, socket failed."));
+    }
 
     int r = vleSocketConnect(mSocket, server.c_str(), port);
-    Assert(r == 0, fmt(_("Error connection with server, %1%\n")) %
-           Glib::strerror(vleSocketErrno()));
+
+    if (r != 0) {
+        throw InternalError(fmt(
+                _("Error connection with server, %1%\n")) %
+            Glib::strerror(vleSocketErrno()));
+    }
 
     mRunning = true;
 }
@@ -275,8 +316,13 @@ void Client::close()
     if (mRunning) {
         vleSocketShutdown(mSocket);
         int r = vleSocketClose(mSocket);
-        Assert(r == 0, fmt(_("Cannot close client socket properly, %1%\n")) %
-               Glib::strerror(vleSocketErrno()));
+
+        if (r != 0) {
+            throw InternalError(fmt(
+                    _("Cannot close client socket properly, %1%\n")) %
+                Glib::strerror(vleSocketErrno()));
+        }
+
         mRunning = false;
     }
 }
@@ -290,20 +336,31 @@ void Client::close()
 
 Server::Server(int port)
 {
-    Assert(mRunning, _("Cannot open server, socket failed"));
+    if (not mRunning) {
+        throw InternalError(_("Cannot open server, socket failed"));
+    }
 
     int r;
     r = vleSocketBind(mSocket, port);
-    Assert(r == 0, fmt(_("Bind error %1%\n")) %
-           Glib::strerror(vleSocketErrno()));
+
+    if (r != 0) {
+        throw InternalError(fmt(_("Bind error %1%\n")) %
+                            Glib::strerror(vleSocketErrno()));
+    }
 
     r = vleSocketOptReuseAddr(mSocket);
-    Assert(r == 0, fmt(_("Setsockopt error %1%\n")) %
-           Glib::strerror(vleSocketErrno()));
+
+    if (r != 0) {
+        throw InternalError(fmt(_("Setsockopt error %1%\n")) %
+            Glib::strerror(vleSocketErrno()));
+    }
 
     r = vleSocketListen(mSocket, 4);
-    Assert(r == 0, fmt(_("Listen error %1%\n")) %
-           Glib::strerror(vleSocketErrno()));
+
+    if (r != 0) {
+        throw InternalError(fmt(_("Listen error %1%\n")) %
+                            Glib::strerror(vleSocketErrno()));
+    }
 }
 
 Server::~Server()
@@ -315,53 +372,68 @@ Server::~Server()
 	     it != mClientsSocket.end(); ++it) {
             vleSocketShutdown(mSocket);
             r = vleSocketClose(mSocket);
-            Assert(r == 0, fmt(_("Cannot close client socket properly, %1%\n"))
-                   % Glib::strerror(vleSocketErrno()));
+
+            if (r != 0) {
+                throw InternalError(fmt(
+                        _("Cannot close client socket properly, %1%\n")) %
+                    Glib::strerror(vleSocketErrno()));
+            }
 	}
     }
 }
 
-int Server::accept_client(const Glib::ustring& name)
+int Server::acceptClient(const std::string& name)
 {
-    Assert(mClientsSocket.find(name) == mClientsSocket.end(),
-           _("A client with this name already exist."));
+    if (mClientsSocket.find(name) != mClientsSocket.end()) {
+        throw InternalError(_("A client with this name already exist."));
+    }
 
     int r = vleSocketAccept(mSocket);
-    Assert(r != -1, fmt(_("Bad accept client '%1%', %2%\n")) % name %
-           Glib::strerror(vleSocketErrno()));
+
+    if (r == -1) {
+        throw InternalError(fmt(_("Bad accept client '%1%', %2%\n")) % name %
+                            Glib::strerror(vleSocketErrno()));
+    }
 
     mClientsSocket[name] = r;
 
     return r;
 }
 
-int Server::get_socket_client(const Glib::ustring& name) const
+int Server::getSocketClient(const std::string& name) const
 {
     ClientsSocket::const_iterator it = mClientsSocket.find(name);
 
-    Assert(it != mClientsSocket.end(), fmt(_("Unknow client name '%1%'\n")) %
-           name);
+    if (it == mClientsSocket.end()) {
+        throw utils::ArgError(fmt(_("Unknow client name '%1%'\n")) % name);
+    }
 
     return (*it).second;
 }
 
-void Server::close_client(const Glib::ustring& name)
+void Server::closeClient(const std::string& name)
 {
     if (mRunning) {
         ClientsSocket::iterator it = mClientsSocket.find(name);
 
-        Assert(it != mClientsSocket.end(),
-               fmt(_("Unknow client name '%1%'\n")) % name);
+        if (it == mClientsSocket.end()) {
+            throw utils::ArgError(fmt(_("Unknow client name '%1%'\n")) % name);
+        }
 
         vleSocketClose((*it).second);
         mClientsSocket.erase(it);
     }
 }
 
-int Server::get_socket_single_client() const
+int Server::getSocketSingleClient() const
 {
-    Assert(mClientsSocket.size() != 0, _("No client are connected."));
-    Assert(mClientsSocket.size() == 1, _("Too many client are connected."));
+    if (mClientsSocket.size() == 0) {
+        throw InternalError(_("No client connected."));
+    }
+
+    if (mClientsSocket.size() == 1) {
+        throw InternalError(_("Too many client connected."));
+    }
 
     return (*mClientsSocket.begin()).second;
 }

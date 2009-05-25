@@ -23,20 +23,21 @@
  */
 
 
-#ifndef UTILS_SOCKET_HPP
-#define UTILS_SOCKET_HPP
+#ifndef VLE_UTILS_SOCKET_HPP
+#define VLE_UTILS_SOCKET_HPP
 
 #include <string>
 #include <map>
-#include <glibmm/ustring.h>
+#include <boost/cstdint.hpp> // for boost::int32_t
 
 
 
 namespace vle { namespace utils {
 
     /**
-     * @brief This namespace provides two public classes of portable and object
-     * oriented unix socket API.
+     * @brief This namespace provides a simple API to use Win32 or POSIX
+     * sockets. Two classes are proposed, server, which accept client, and
+     * client which dialog with server.
      */
     namespace net {
 
@@ -86,8 +87,7 @@ namespace vle { namespace utils {
                           std::string& directory);
 
     /**
-     * @brief Define base class of socket Client and Server.
-     *
+     * @brief Define base class of socket Client and Server classes.
      */
     class Base
     {
@@ -103,14 +103,14 @@ namespace vle { namespace utils {
          *
          * @return true if connection successful, false otherwise.
          */
-        bool is_running() const;
+        bool isRunning() const;
 
         /**
          * Get socket value.
          *
-         * @return socket value or -1 if is_running = false.
+         * @return socket value or -1 if isRunning = false.
          */
-        inline int socket() const { return mSocket; }
+        int socket() const { return mSocket; }
 
         /**
          * Send a buffer message to specified socket.
@@ -124,13 +124,13 @@ namespace vle { namespace utils {
         void send(int dst, const void* buffer, int size);
 
         /**
-         * Send an UTF-8 string message to specified socket.
+         * Send an string message to specified socket.
          *
          * @param dst socket destination.
          * @param buffer string message to send.
          * @throw Internal if socket is close or network error.
          */
-        void send_string(int dst, const Glib::ustring& buffer);
+        void sendString(int dst, const std::string& buffer);
 
         /**
          * Send a buffer to specified socket.
@@ -139,16 +139,16 @@ namespace vle { namespace utils {
          * @param buffer message to send.
          * @throw Internal if socket is close or network error.
          */
-        void send_buffer(int dst, const std::string& buffer);
+        void sendBuffer(int dst, const std::string& buffer);
 
         /**
-         * Send a integer to specified socket.
+         * Send an integer to specified socket.
          *
          * @param dst socket destination.
          * @param buffer integer to send.
          * @throw Internal if socket is close or network error.
          */
-        void send_int(int dst, gint32 buffer);
+        void sendInteger(int dst, boost::int32_t buffer);
 
         /**
          * Receive a buffer from specified socket.
@@ -163,13 +163,13 @@ namespace vle { namespace utils {
         int recv(int src, void* buffer, size_t size);
 
         /**
-         * Receive an UTF-8 string from specified socket.
+         * Receive an string from specified socket.
          *
          * @param src socket source.
          * @return string read from server.
          * @throw Internal if socket is close or network error.
          */
-        Glib::ustring recv_string(int src);
+        std::string recvString(int src);
 
         /**
          * Receive data from specified socket and fill a string buffer.
@@ -179,17 +179,17 @@ namespace vle { namespace utils {
          * @return string buffer read.
          * @throw Internal if socket is close or network error.
          */
-        std::string recv_buffer(int src, size_t size);
+        std::string recvBuffer(int src, size_t size);
 
         /**
-         * Receive a gint32 from specified socket.
+         * Receive a boost::uint32_t from specified socket.
          *
          * @param src socket source.
          * @return an integer.
          * @throw Internal if socket is close, buffer null, size is null or if
          * error during reception of data.
          */
-        gint32 recv_int(int src);
+        boost::uint32_t recvInteger(int src);
 
     protected:
         bool    mRunning;
@@ -229,7 +229,7 @@ namespace vle { namespace utils {
          * @param size Size of buffer to send.
          * @throw Internal if socket is close, buffer is null or size equal 0.
          */
-        inline void send(const void* buffer, int size)
+        void send(const void* buffer, int size)
         { Base::send(mSocket, buffer, size); }
 
         /**
@@ -238,8 +238,8 @@ namespace vle { namespace utils {
          * @param buffer Buffer to send.
          * @throw Internal if socket is close, buffer is null or size equal 0.
          */
-        inline void send_string(const Glib::ustring& buffer)
-        { Base::send_string(mSocket, buffer); }
+        void sendString(const std::string& buffer)
+        { Base::sendString(mSocket, buffer); }
 
         /**
          * Send a buffer message to server.
@@ -247,8 +247,8 @@ namespace vle { namespace utils {
          * @param buffer Buffer to send.
          * @throw Internal if socket is close, buffer is null or size equal 0.
          */
-        void send_buffer(const std::string& buffer)
-        { Base::send_buffer(mSocket, buffer); }
+        void sendBuffer(const std::string& buffer)
+        { Base::sendBuffer(mSocket, buffer); }
 
         /**
          * Send an integer message to server.
@@ -256,8 +256,8 @@ namespace vle { namespace utils {
          * @param buffer integer to send.
          * @throw Internal if socket is close, buffer is null or size equal 0.
          */
-        void send_int(gint32 buffer)
-        { Base::send_int(mSocket, buffer); }
+        void sendInteger(boost::uint32_t buffer)
+        { Base::sendInteger(mSocket, buffer); }
 
         /**
          * Receive a buffer from server.
@@ -272,14 +272,14 @@ namespace vle { namespace utils {
         { return Base::recv(mSocket, buffer, size); }
 
         /**
-         * Receive an UTF-8 string from server.
+         * Receive an string from server.
          *
          * @return string read from server.
          * @throw Internal if socket is close, buffer null, size is null or if
          * error during reception of data.
          */
-        Glib::ustring recv_string()
-        { return Base::recv_string(mSocket); }
+        std::string recvString()
+        { return Base::recvString(mSocket); }
 
         /**
          * Receive data from server and fill a string buffer.
@@ -289,24 +289,24 @@ namespace vle { namespace utils {
          * @throw Internal if socket is close, buffer null, size is null or if
          * error during reception of data.
          */
-        std::string recv_buffer(size_t size)
-        { return Base::recv_buffer(mSocket, size); }
+        std::string recvBuffer(size_t size)
+        { return Base::recvBuffer(mSocket, size); }
 
 
         /**
-         * Receive a gint32 from server.
+         * Receive a boost::uint32_t from server.
          *
          * @return an integer.
          * @throw Internal if socket is close, buffer null, size is null or if
          * error during reception of data.
          */
-        inline gint32 recv_int()
-        { return Base::recv_int(mSocket); }
+        boost::uint32_t recvInteger()
+        { return Base::recvInteger(mSocket); }
 
         /**
          * Close the connection with server.
          *
-         * @throw Enternal if socket close error.
+         * @throw InternalError if socket close error.
          */
         void close();
     };
@@ -325,7 +325,7 @@ namespace vle { namespace utils {
         Server(int port);
 
         /**
-         * First, close connection with all client, secondd socket of server.
+         * First, close connection with all client, second socket of server.
          *
          */
         virtual ~Server();
@@ -338,7 +338,7 @@ namespace vle { namespace utils {
          * @return socket id of client.
          * @throw Internal if error connection, if name already exist.
          */
-        int accept_client(const Glib::ustring& name);
+        int acceptClient(const std::string& name);
 
         /**
          * Retrieve the client socket id from client connection list.
@@ -347,14 +347,14 @@ namespace vle { namespace utils {
          * @return socket id of client.
          * @throw Internal client doesn't exist.
          */
-        int get_socket_client(const Glib::ustring& name) const;
+        int getSocketClient(const std::string& name) const;
 
         /**
          * Close the client socket id from client connection list.
          *
          * @param name of client to find and close.
          */
-        void close_client(const Glib::ustring& name);
+        void closeClient(const std::string& name);
 
         /**
          * Retrieve the first client socket id from client connection list.
@@ -362,7 +362,7 @@ namespace vle { namespace utils {
          * @return socket id of first client.
          * @throw Internal if no client connected or too many client.
          */
-        int get_socket_single_client() const;
+        int getSocketSingleClient() const;
 
         /**
          * Send a message to specified client.
@@ -371,23 +371,21 @@ namespace vle { namespace utils {
          * @param buffer Buffer to send.
          * @param size Size of buffer to send.
          * @throw Internal if socket is close, buffer is null or size equal 0,
-         * if client destination is unknow.
+         * if client destination is unknown.
          */
-        inline void send(const Glib::ustring& dest, const void* buffer,
-                         int size)
-        { Base::send(get_socket_client(dest), buffer, size); }
+        void send(const std::string& dest, const void* buffer, int size)
+        { Base::send(getSocketClient(dest), buffer, size); }
 
         /**
          * Send a message to specified client.
          *
          * @param dest client name.
-         * @param buffer UTF-8 string to send.
+         * @param buffer string to send.
          * @throw Internal if socket is close, buffer is null or size equal 0,
-         * if client destination is unknow.
+         * if client destination is unknown.
          */
-        inline void send_string(const Glib::ustring& dest,
-                                const Glib::ustring& buffer)
-        { Base::send_string(get_socket_client(dest), buffer); }
+        void sendString(const std::string& dest, const std::string& buffer)
+        { Base::sendString(getSocketClient(dest), buffer); }
 
         /**
          * Send a buffer to specified client.
@@ -395,22 +393,21 @@ namespace vle { namespace utils {
          * @param dest client name.
          * @param buffer to send.
          * @throw Internal if socket is close, buffer is null or size equal 0,
-         * if client destination is unknow.
+         * if client destination is unknown.
          */
-        inline void send_buffer(const Glib::ustring& dest,
-                                const std::string& buffer)
-        { Base::send_buffer(get_socket_client(dest), buffer); }
+        void sendBuffer(const std::string& dest, const std::string& buffer)
+        { Base::sendBuffer(getSocketClient(dest), buffer); }
 
         /**
-         * Send a integer to specified client.
+         * Send an integer to specified client.
          *
          * @param dest client name.
          * @param buffer integer to send.
          * @throw Internal if socket is close, buffer is null or size equal 0,
-         * if client destination is unknow.
+         * if client destination is unknown.
          */
-        inline void send_int(const Glib::ustring& dest, gint32 buffer)
-        { Base::send_int(get_socket_client(dest), buffer); }
+        void sendInteger(const std::string& dest, boost::uint32_t buffer)
+        { Base::sendInteger(getSocketClient(dest), buffer); }
 
         /**
          * Receive a buffer from specified client.
@@ -420,45 +417,49 @@ namespace vle { namespace utils {
          * @param size of buffer to receive message.
          * @return size of message received.
          * @throw Internal if socket is close, buffer null, size is null or if
-         * error during reception of data or if client destination if unknow.
+         * error during reception of data or if client destination if unknown.
          */
-	inline int recv(const Glib::ustring& src, void* buffer, size_t size)
-        { return Base::recv(get_socket_client(src), buffer, size); }
+	int recv(const std::string& src, void* buffer, size_t size)
+        { return Base::recv(getSocketClient(src), buffer, size); }
 
         /**
-         * Receive a UTF-8 string from specified client.
+         * Receive a string from specified client.
          *
          * @return string read from server.
          * @throw Internal if socket is close, buffer null, size is null or if
-         * error during reception of data or if client destination if unknow.
+         * error during reception of data or if client destination if unknown.
          */
-        inline Glib::ustring recv_string(const Glib::ustring& src)
-        { return Base::recv_string(get_socket_client(src)); }
+        std::string recvString(const std::string& src)
+        { return Base::recvString(getSocketClient(src)); }
 
         /**
          * Receive a buffer from specified client.
          *
          * @return buffer read from server.
          * @throw Internal if socket is close, buffer null, size is null or if
-         * error during reception of data or if client destination if unknow.
+         * error during reception of data or if client destination if unknown.
          */
-        inline std::string recv_buffer(const Glib::ustring& src, size_t size)
-        { return Base::recv_buffer(get_socket_client(src), size); }
+        std::string recvBuffer(const std::string& src, size_t size)
+        { return Base::recvBuffer(getSocketClient(src), size); }
 
         /**
-         * Receive a integer from specified client.
+         * Receive an integer from specified client.
          *
          * @return integer read from server.
          * @throw Internal if socket is close, buffer null, size is null or if
-         * error during reception of data or if client destination if unknow.
+         * error during reception of data or if client destination if unknown.
          */
-        inline gint32 recv_int(const Glib::ustring& src)
-        { return Base::recv_int(get_socket_client(src)); }
+        boost::uint32_t recvInteger(const std::string& src)
+        { return Base::recvInteger(getSocketClient(src)); }
 
     private:
-        typedef std::map < Glib::ustring, int > ClientsSocket;
+        /**
+         * @brief Define an associative table between a client' name and is
+         * socket.
+         */
+        typedef std::map < std::string, int > ClientsSocket;
 
-        ClientsSocket   mClientsSocket;
+        ClientsSocket   mClientsSocket; /*!< the client objects. */
     };
 
 }}} // namespace vle utils net

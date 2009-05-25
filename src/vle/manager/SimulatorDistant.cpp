@@ -69,12 +69,12 @@ void SimulatorDistant::start()
 void SimulatorDistant::wait()
 {
     for (;;) {
-        mServer->accept_client("manager");
+        mServer->acceptClient("manager");
         m_out << fmt(_("Simulator: connection sucess\n"));
         std::string msg;
 
         for (;;) {
-            msg = mServer->recv_buffer("manager", 4);
+            msg = mServer->recvBuffer("manager", 4);
 
             if  (msg == "proc") {
                 daemonSendMaxProcessor();
@@ -94,7 +94,7 @@ void SimulatorDistant::wait()
 
 void SimulatorDistant::daemonSendMaxProcessor()
 {
-    mServer->send_int("manager", mNbCPU);
+    mServer->sendInteger("manager", mNbCPU);
 }
 
 void SimulatorDistant::daemonSendNumberVpzi()
@@ -107,14 +107,14 @@ void SimulatorDistant::daemonSendNumberVpzi()
         mCondWait.signal();
     }
 
-    mServer->send_int("manager", nb);
+    mServer->sendInteger("manager", nb);
 }
 
 void SimulatorDistant::daemonRecvFile()
 {
-    gint32 sz = mServer->recv_int("manager");
-    mServer->send_string("manager", "ok");
-    std::string msg = mServer->recv_buffer("manager", sz);
+    boost::int32_t sz = mServer->recvInteger("manager");
+    mServer->sendString("manager", "ok");
+    std::string msg = mServer->recvBuffer("manager", sz);
     std::string filename(utils::write_to_temp("vledae", msg));
 
     {
@@ -129,12 +129,12 @@ void SimulatorDistant::sendResult()
 {
     {
         Glib::Mutex::Lock lock(mMutex);
-        mServer->send_int("manager", mOutputs.size());
+        mServer->sendInteger("manager", mOutputs.size());
 
         for (OutputSimulationDistantList::iterator it = mOutputs.begin();
              it != mOutputs.end(); ++it) {
 
-            std::string result = mServer->recv_string("manager");
+            std::string result = mServer->recvString("manager");
 
             value::Set* vals = value::Set::create();
             vals->add(value::Integer::create(it->outputs.size()));
@@ -143,10 +143,10 @@ void SimulatorDistant::sendResult()
 
             result = vals->writeToXml();
 
-            mServer->send_int("manager", result.size());
-            mServer->recv_string("manager");
-            mServer->send_string("manager", result);
-            result = mServer->recv_string("manager");
+            mServer->sendInteger("manager", result.size());
+            mServer->recvString("manager");
+            mServer->sendString("manager", result);
+            result = mServer->recvString("manager");
 
             for (oov::OutputMatrixViewList::iterator jt = it->outputs.begin();
                  jt != it->outputs.end(); ++jt) {
@@ -156,10 +156,10 @@ void SimulatorDistant::sendResult()
                 vals->add(jt->second.serialize());
 
                 result = vals->writeToXml();
-                mServer->send_int("manager", result.size());
-                mServer->recv_string("manager");
-                mServer->send_string("manager", result);
-                result = mServer->recv_string("manager");
+                mServer->sendInteger("manager", result.size());
+                mServer->recvString("manager");
+                mServer->sendString("manager", result);
+                result = mServer->recvString("manager");
             }
         }
         mOutputs.clear();
@@ -180,8 +180,8 @@ void SimulatorDistant::daemonExit()
                               // the simulations are finished.
     }
     sendResult();
-    mServer->send_string("manager", "closed");
-    mServer->close_client("manager");
+    mServer->sendString("manager", "closed");
+    mServer->closeClient("manager");
 }
 
 void SimulatorDistant::run()
