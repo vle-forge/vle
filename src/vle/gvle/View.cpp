@@ -371,15 +371,20 @@ void View::addCoupledModel(int x, int y)
     ModelDescriptionBox* box;
     box = new ModelDescriptionBox(mModeling->getNames());
     if (box->run()) {
-        graph::CoupledModel* new_gc =
-            mModeling->newCoupledModel(mCurrent, box->getName(),
-                                       "", x, y);
-        new_gc->setSize(ViewDrawingArea::MODEL_WIDTH,
-                        ViewDrawingArea::MODEL_HEIGHT);
-        mCurrent->displace(mSelectedModels, new_gc);
-        mModeling->redrawModelTreeBox();
+	graph::CoupledModel* new_gc = mModeling->newCoupledModel(
+	    mCurrent, box->getName(), "", x, y);
+	new_gc->setSize(ViewDrawingArea::MODEL_WIDTH,
+			ViewDrawingArea::MODEL_HEIGHT);
+	try {
+	    mCurrent->displace(mSelectedModels, new_gc);
+	} catch(std::exception& e) {
+	    std::cout << e.what() << std::endl;
+	    mModeling->delViewOnModel(new_gc);
+	    mCurrent->delModel(new_gc);
+	}
+	mModeling->redrawModelTreeBox();
 	mModeling->redrawModelClassBox();
-        mSelectedModels.clear();
+	mSelectedModels.clear();
     }
     delete box;
 }
