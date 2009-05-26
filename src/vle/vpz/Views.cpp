@@ -171,10 +171,13 @@ View& Views::get(const std::string& name)
 void Views::renameOutput(const std::string& oldname,
                          const std::string& newname)
 {
+    iterator prec;
     for (iterator it = begin(); it != end(); ++it) {
+        prec = it;
         if (it->second.output() == oldname) {
             vpz::View copy(get(it->first));
             del(it->first);
+	    it = prec;
             switch (copy.type()) {
             case vpz::View::TIMED:
                 addTimedView(copy.name(), copy.timestep(), newname);

@@ -1065,6 +1065,15 @@ void Modeling::delModel(graph::Model* model, std::string className)
 	vpz::AtomicModelList& list = getAtomicModelClass(className);
         list.del(model);
         setModified(true);
+    } else {
+	graph::ModelList& graphlist =
+	    graph::Model::toCoupled(model)->getModelList();
+	vpz::AtomicModelList& vpzlist = getAtomicModelClass(className);
+	graph::ModelList::iterator it;
+	for (it = graphlist.begin(); it!= graphlist.end(); ++it) {
+	    vpzlist.del(it->second);
+	}
+	setModified(true);
     }
 }
 

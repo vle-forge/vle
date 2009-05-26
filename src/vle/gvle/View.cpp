@@ -208,6 +208,7 @@ void View::clearCurrentModel()
     if (gvle::Question(_("All children model will be deleted, continue ?"))) {
         mCurrent->delAllConnection();
         mCurrent->delAllModel();
+	mModeling->vpz().project().model().atomicModels().clear();
         mModeling->redrawModelTreeBox();
     }
 }
