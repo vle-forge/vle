@@ -94,10 +94,17 @@ public:
     void dec_nb_widget_incorrect();
     void inc_nb_widget_incorrect();
 
+    inline void setGCoupled(graph::CoupledModel* parent)
+	{ mParent = parent; }
+
+    inline graph::CoupledModel* getGCoupled()
+	{ return mParent; }
+
 private:
     Glib::RefPtr<Gnome::Glade::Xml>      mXml;
     Modeling*                            mModeling;
     vpz::Vpz*                            mSrc;
+    graph::CoupledModel*                 mParent;
 
     Gtk::Dialog*                         mDialog;
 

@@ -307,19 +307,15 @@ bool ImportModelBox::is_valid_view(std::string view)
 
 bool ImportModelBox::is_valid_model(std::string model)
 {
-    std::string s = boost::trim_copy(model);
+    if (mSrc->project().model().model()->isCoupled())
+	return true;
 
+    std::string s = boost::trim_copy(model);
     if (s.empty())
         return false;
 
-    AtomicModelList& list = mModeling->vpz().project().model().atomicModels();
-    AtomicModelList::iterator it = list.begin();
-    while (it != list.end()) {
-        if (it->first->getName() == model)
-            return false;
-
-        ++it;
-    }
+    if (mParent->exist(model))
+	return false;
 
     int nb = 0;
     list_widget::iterator it_widget = mListModels.begin();

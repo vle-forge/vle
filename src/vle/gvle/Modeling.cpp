@@ -781,18 +781,21 @@ void Modeling::importModel(graph::CoupledModel* parent, vpz::Vpz* src)
     using namespace vpz;
     assert(parent);
     assert(src);
-    if (mImportBox && mImportBox->show(src)) {
-        graph::Model* import = src->project().model().model();
-        parent->addModel(import);
-	if (import->isAtomic())
-	    import_atomic_model(src, graph::Model::toAtomic(import));
-	else
-	    import_coupled_model(src, graph::Model::toCoupled(import));
-        dynamics().add(src->project().dynamics());
-        conditions().add(src->project().experiment().conditions());
-        views().add(src->project().experiment().views());
-        mModelTreeBox->parseModel(mTop);
-        setModified(true);
+    if (mImportBox) {
+	mImportBox->setGCoupled(parent);
+	if (mImportBox->show(src)) {
+	    graph::Model* import = src->project().model().model();
+	    parent->addModel(import);
+	    if (import->isAtomic())
+		import_atomic_model(src, graph::Model::toAtomic(import));
+	    else
+		import_coupled_model(src, graph::Model::toCoupled(import));
+	    dynamics().add(src->project().dynamics());
+	    conditions().add(src->project().experiment().conditions());
+	    views().add(src->project().experiment().views());
+	    mModelTreeBox->parseModel(mTop);
+	    setModified(true);
+	}
     }
 }
 
@@ -1071,7 +1074,10 @@ void Modeling::delModel(graph::Model* model, std::string className)
 	vpz::AtomicModelList& vpzlist = getAtomicModelClass(className);
 	graph::ModelList::iterator it;
 	for (it = graphlist.begin(); it!= graphlist.end(); ++it) {
-	    vpzlist.del(it->second);
+	    if (it->second->isCoupled())
+		delModel(it->second, className);
+	    else
+		vpzlist.del(it->second);
 	}
 	setModified(true);
     }
