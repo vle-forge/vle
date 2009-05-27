@@ -25,6 +25,7 @@
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Exception.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/version.hpp>
 #include <glibmm/spawn.h>
 #include <glibmm/miscutils.h>
 #include <iostream>
@@ -199,8 +200,13 @@ PathList CMakePackage::getInstalledExperiments()
 
     PathList result;
     for (fs::directory_iterator it(pkgs), end; it != end; ++it) {
+#if BOOST_VERSION > 103600
         if (fs::is_regular_file(it->status())) {
             fs::path::string_type ext = it->path().extension();
+#else
+        if (fs::is_regular(it->status())) {
+            fs::path::string_type ext = fs::extension(it->path());
+#endif
             if (ext == ".vpz") {
                 result.push_back(it->path().file_string());
             }
@@ -226,8 +232,13 @@ PathList CMakePackage::getInstalledLibraries()
         }
 
         for (fs::directory_iterator jt(dir), end; jt != end; ++jt) {
+#if BOOST_VERSION > 103600
             if (fs::is_regular_file(jt->status())) {
                 fs::path::string_type ext = jt->path().extension();
+#else
+            if (fs::is_regular(jt->status())) {
+                fs::path::string_type ext = fs::extension(jt->path());
+#endif
 #ifdef G_OS_WINDOWS
                 if (ext == ".dll") {
                     result.push_back(jt->path().file_string());

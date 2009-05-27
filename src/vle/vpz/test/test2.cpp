@@ -370,7 +370,7 @@ BOOST_AUTO_TEST_CASE(experiment_measures_vpz)
         const vpz::Output& out(outputs.outputlist().find("x")->second);
         BOOST_REQUIRE_EQUAL(out.name(), "x");
         BOOST_REQUIRE_EQUAL(out.format(), vpz::Output::LOCAL);
-        BOOST_REQUIRE_NE(out.data(), (value::Value*)0);
+        BOOST_REQUIRE(out.data() != (value::Value*)0);
         BOOST_REQUIRE_EQUAL(out.data()->isString(), true);
         BOOST_REQUIRE_EQUAL(value::toString(out.data()), "test");
     }

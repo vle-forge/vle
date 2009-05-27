@@ -250,7 +250,7 @@ void check_experiment_unittest_vpz(const vpz::Experiment& exp)
             BOOST_REQUIRE_EQUAL(o.format(), vpz::Output::LOCAL);
             BOOST_REQUIRE_EQUAL(o.plugin(), "storage");
 
-            BOOST_REQUIRE_NE(o.data(), (value::Value*)0);
+            BOOST_REQUIRE(o.data() != (value::Value*)0);
             BOOST_REQUIRE(o.data()->isMap());
 
             const value::Map* map(value::toMapValue(o.data()));

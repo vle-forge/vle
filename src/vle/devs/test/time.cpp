@@ -44,18 +44,18 @@ BOOST_AUTO_TEST_CASE(compare)
     devs::Time a(1.0);
     devs::Time b(2.0);
 
-    BOOST_REQUIRE_GT(b, a);
-    BOOST_REQUIRE_GT(b, 1.0);
-    BOOST_REQUIRE_GT(2.0, a);
-    BOOST_REQUIRE_GT(b, 1);
-    BOOST_REQUIRE_GT(2, a);
+    BOOST_REQUIRE(b > a);
+    BOOST_REQUIRE(b > 1.0);
+    BOOST_REQUIRE(2.0 > a);
+    BOOST_REQUIRE(b > 1);
+    BOOST_REQUIRE(2 > a);
 
     devs::Time c(devs::Time::infinity);
 
-    BOOST_REQUIRE_GT(c, a);
-    BOOST_REQUIRE_GT(c, b);
-    BOOST_REQUIRE_GT(c, 2.0);
-    BOOST_REQUIRE_GT(c, 0.0);
+    BOOST_REQUIRE(c > a);
+    BOOST_REQUIRE(c > b);
+    BOOST_REQUIRE(c > 2.0);
+    BOOST_REQUIRE(c > 0.0);
 
     BOOST_REQUIRE_EQUAL(a, devs::Time(1.0));
     BOOST_REQUIRE_EQUAL(a, 1.0);
@@ -92,9 +92,9 @@ BOOST_AUTO_TEST_CASE(modify)
     x = c - b - a;
     BOOST_REQUIRE_EQUAL(x, 0.0);
     BOOST_REQUIRE_EQUAL(a + b, c);
-    BOOST_REQUIRE_GE(c, a + b);
+    BOOST_REQUIRE(c >= a + b);
     BOOST_REQUIRE_EQUAL(1.0 + b, c);
-    BOOST_REQUIRE_GE(c, a + 2.0);
+    BOOST_REQUIRE(c >= a + 2.0);
 
     a += b;
     BOOST_REQUIRE_EQUAL(a, c);

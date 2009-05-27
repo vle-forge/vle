@@ -31,6 +31,7 @@
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/i18n.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/version.hpp>
 #include <iostream>
 
 namespace vle {
@@ -40,12 +41,20 @@ void appendToCommandLineList(const char* param, manager::CmdArgs& out)
     namespace fs = boost::filesystem;
 
     fs::path p(param);
+#if BOOST_VERSION > 103600
     if (fs::is_regular_file(p)) {
+#else
+    if (fs::is_regular(p)) {
+#endif
         out.push_back(p.file_string().c_str());
         return;
     } else if (not utils::Path::path().package().empty()) {
         fs::path np(utils::Path::path().getPackageExpFile(param));
+#if BOOST_VERSION > 103600
         if (fs::is_regular_file(np)) {
+#else
+        if (fs::is_regular(np)) {
+#endif
             out.push_back(np.file_string().c_str());
             return;
         }
