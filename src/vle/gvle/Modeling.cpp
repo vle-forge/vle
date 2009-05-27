@@ -954,13 +954,10 @@ graph::CoupledModel* Modeling::newCoupledModel(graph::CoupledModel* parent,
         const string& /* description */,
         int x, int y)
 {
-    if (not parent or not parent->exist(name)) {
-        setModified(true);
-        graph::CoupledModel* tmp = new graph::CoupledModel(name, parent);
-        tmp->setPosition(x, y);
-        return tmp;
-    }
-    return 0;
+    setModified(true);
+    graph::CoupledModel* tmp = new graph::CoupledModel(name, parent);
+    tmp->setPosition(x, y);
+    return tmp;
 }
 
 graph::AtomicModel* Modeling::newAtomicModel(graph::CoupledModel* parent,
