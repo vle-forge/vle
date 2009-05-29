@@ -781,6 +781,7 @@ void Modeling::importModel(graph::CoupledModel* parent, vpz::Vpz* src)
     using namespace vpz;
     assert(parent);
     assert(src);
+
     if (mImportBox) {
 	mImportBox->setGCoupled(parent);
 	if (mImportBox->show(src)) {
@@ -799,24 +800,54 @@ void Modeling::importModel(graph::CoupledModel* parent, vpz::Vpz* src)
     }
 }
 
-void Modeling::import_atomic_model(vpz::Vpz* src, graph::AtomicModel* atom)
+void Modeling::importModelToClass(vpz::Vpz* src, std::string& className)
+{
+    using namespace vpz;
+    assert(src);
+    boost::trim(className);
+
+    if (mImportBox) {
+	if (mImportBox->show(src)) {
+	    Classes& classes = vpz().project().classes();
+	    Class& new_class = classes.add(className);
+	    graph::Model* import = src->project().model().model();
+	    if (import->isAtomic()) {
+		new_class.setModel(graph::Model::toAtomic(import));
+		import_atomic_model(src, graph::Model::toAtomic(import), className);
+	    } else {
+		new_class.setModel(graph::Model::toCoupled(import));
+		import_coupled_model(src, graph::Model::toCoupled(import), className);
+	    }
+	    dynamics().add(src->project().dynamics());
+	    conditions().add(src->project().experiment().conditions());
+	    views().add(src->project().experiment().views());
+	    mModelClassBox->parseClass();
+	    setModified(true);
+	}
+    }
+}
+
+void Modeling::import_atomic_model(vpz::Vpz* src, graph::AtomicModel* atom, std::string className)
 {
     using namespace vpz;
 
     AtomicModel& vpz_atom = src->project().model().atomicModels().get(atom);
-    vpz().project().model().atomicModels().add(atom, vpz_atom);
+    if (className.empty())
+	vpz().project().model().atomicModels().add(atom, vpz_atom);
+    else
+	vpz().project().classes().get(className).atomicModels().add(atom, vpz_atom);
 }
 
-void Modeling::import_coupled_model(vpz::Vpz* src, graph::CoupledModel* model)
+void Modeling::import_coupled_model(vpz::Vpz* src, graph::CoupledModel* model, std::string className)
 {
     graph::ModelList& list = model->getModelList();
     if (!list.empty()) {
         graph::ModelList::const_iterator it = list.begin();
         while (it!= list.end()) {
             if (it->second->isAtomic()) {
-                import_atomic_model(src, graph::Model::toAtomic(it->second));
+                import_atomic_model(src, graph::Model::toAtomic(it->second), className);
             } else {
-		import_coupled_model(src, graph::Model::toCoupled(it->second));
+		import_coupled_model(src, graph::Model::toCoupled(it->second), className);
             }
 
             ++it;

@@ -647,6 +647,8 @@ public:
 
     void importModel(graph::CoupledModel* parent, vpz::Vpz* src);
 
+    void importModelToClass(vpz::Vpz* src, std::string& className);
+
     void exportClass(graph::Model* model, vpz::Class classe, vpz::Vpz* dst);
 
     /********************************************************************
@@ -957,8 +959,8 @@ private:
     void export_atomic_model(vpz::Vpz* dst, graph::AtomicModel* atom, std::string className = "");
     void export_coupled_model(vpz::Vpz* dst, graph::CoupledModel* atom, std::string className = "");
 
-    void import_atomic_model(vpz::Vpz* src, graph::AtomicModel* atom);
-    void import_coupled_model(vpz::Vpz* src, graph::CoupledModel* atom);
+    void import_atomic_model(vpz::Vpz* src, graph::AtomicModel* atom, std::string className = "");
+    void import_coupled_model(vpz::Vpz* src, graph::CoupledModel* atom, std::string className = "");
 };
 
 void parse_recurs(graph::Model*, vpz::Vpz*, int level = 0);

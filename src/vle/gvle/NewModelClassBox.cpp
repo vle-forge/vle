@@ -105,6 +105,7 @@ void NewModelClassBox::on_apply()
         new_class.setModel(new graph::CoupledModel(model_name, NULL));
     }
 
+    mModeling->redrawModelClassBox();
     mDialog->hide_all();
 }
 

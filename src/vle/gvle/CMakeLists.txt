@@ -17,7 +17,7 @@ SET(GVLE_HPP About.hpp AtomicModelBox.hpp BooleanBox.hpp CalendarBox.hpp
   ClassModelTreeBox.hpp ComboboxString.hpp ConditionsBox.hpp ConditionPlugin.hpp
   ConnectionBox.hpp CoupledModelBox.hpp CutCopyPaste.hpp Data.hpp
   DialogString.hpp DynamicBox.hpp ExecutionBox.hpp ExperimentBox.hpp GVLE.hpp
-  GVLEMenu.hpp HelpBox.hpp HostsBox.hpp ImportModelBox.hpp
+  GVLEMenu.hpp HelpBox.hpp HostsBox.hpp ImportModelBox.hpp InteractiveTypeBox.hpp
   LaunchSimulationBox.hpp MatrixBox.hpp Message.hpp ModelClassBox.hpp
   ModelDescriptionBox.hpp ModelTreeBox.hpp Modeling.hpp NewModelClassBox.hpp
   NewTypeBox.hpp ObsAndViewBox.hpp ObservableBox.hpp ObserverPlugin.hpp
@@ -32,8 +32,8 @@ SET(GVLE_CPP About.cpp AtomicModelBox.cpp BooleanBox.cpp CalendarBox.cpp
   ClassModelTreeBox.cpp ConditionsBox.cpp ConditionPlugin.cpp ConnectionBox.cpp
   CoupledModelBox.cpp CutCopyPaste.cpp Data.cpp DialogString.cpp DynamicBox.cpp
   ExecutionBox.cpp ExperimentBox.cpp GVLE.cpp GVLEMenu.cpp HelpBox.cpp
-  HostsBox.cpp ImportModelBox.cpp LaunchSimulationBox.cpp MatrixBox.cpp
-  Message.cpp ModelClassBox.cpp ModelDescriptionBox.cpp ModelTreeBox.cpp
+  HostsBox.cpp ImportModelBox.cpp InteractiveTypeBox.cpp LaunchSimulationBox.cpp
+  MatrixBox.cpp Message.cpp ModelClassBox.cpp ModelDescriptionBox.cpp ModelTreeBox.cpp
   Modeling.cpp NewModelClassBox.cpp NewTypeBox.cpp ObsAndViewBox.cpp
   PluginFactory.cpp ObservableBox.cpp OutputPlugin.cpp ParameterExecutionBox.cpp
   PluginSelection.cpp PluginTable.cpp PortDialog.cpp PreferencesBox.cpp

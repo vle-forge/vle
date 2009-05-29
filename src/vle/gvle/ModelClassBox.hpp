@@ -64,6 +64,7 @@ public:
     virtual void onRemove();
     virtual void onRename();
     virtual void onExportVpz();
+    virtual void onImportModelAsClass();
 
     void showRow(const std::string& model_name);
 

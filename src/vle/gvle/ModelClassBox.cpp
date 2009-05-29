@@ -28,6 +28,8 @@
 #include <boost/algorithm/string/detail/trim.hpp>
 #include <boost/algorithm/string.hpp>
 #include <vle/gvle/View.hpp>
+#include <vle/gvle/InteractiveTypeBox.hpp>
+#include <iostream>
 
 namespace vle
 {
@@ -92,6 +94,13 @@ void ModelClassBox::initMenuPopupModels()
 		    *this,
 		    &ModelClassBox::onExportVpz)));
 
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		_("Import Model as _Class"),
+		sigc::mem_fun(
+		    *this,
+		    &ModelClassBox::onImportModelAsClass)));
+
     mMenuPopup.accelerate(mTreeView);
 }
 
@@ -144,7 +153,7 @@ void ModelClassBox::onRemove()
 
 void ModelClassBox::onRename()
 {
-   SimpleTypeBox box(_("Name of the Classe ?"));
+   SimpleTypeBox box(_("Name of the Class ?"));
    std::string name = boost::trim_copy(box.run());
    Glib::RefPtr<Gtk::TreeView::Selection> refSelection =  mTreeView.get_selection();
    if (refSelection and box.valid() and not name.empty()) {
@@ -205,6 +214,33 @@ void ModelClassBox::onExportVpz()
 		delete save;
 	    }
 	}
+    }
+}
+
+void ModelClassBox::onImportModelAsClass()
+{
+    Gtk::FileChooserDialog file(_("VPZ file"), Gtk::FILE_CHOOSER_ACTION_OPEN);
+    file.set_transient_for(*this);
+    file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+    file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+    Gtk::FileFilter filter;
+    filter.set_name(_("Vle Project gZipped"));
+    filter.add_pattern("*.vpz");
+    file.add_filter(filter);
+
+    if (file.run() == Gtk::RESPONSE_OK) {
+	std::string project_file = file.get_filename();
+        try {
+            vpz::Vpz* import = new vpz::Vpz(project_file);
+	    InteractiveTypeBox box(_("Name of the Class ?"),
+				   &mModeling->vpz().project().classes());
+	    std::string name = boost::trim_copy(box.run());
+            if (not name.empty())
+		mModeling->importModelToClass(import, name);
+            delete import;
+        } catch (std::exception& E) {
+            std::cout << "Exception :\n" << E.what() << "\n";
+        }
     }
 }
 
