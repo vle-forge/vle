@@ -77,13 +77,16 @@ ViewDrawingArea::ViewDrawingArea(View* view) :
 void ViewDrawingArea::draw()
 {
     if (mIsRealized and mBuffer) {
-        drawCurrentCoupledModel();
+	mContext->save();
+	mContext->scale(mZoom, mZoom);
+	drawCurrentCoupledModel();
         drawCurrentModelPorts();
         drawConnection();
         drawChildrenModels();
         drawLink();
         drawZoomFrame();
         drawHighlightConnection();
+	mContext->restore();
     }
 }
 
@@ -92,38 +95,38 @@ void ViewDrawingArea::drawCurrentCoupledModel()
     if (mView->existInSelectedModels(mCurrent)) {
 	setColor(mModeling->getSelectedColor());
 	mContext->rectangle(0 + mOffset, 0 + mOffset,
-			    (mWidth * mZoom),
-			    (mHeight * mZoom));
+			    mWidth,
+			    mHeight);
 	mContext->fill();
 	mContext->stroke();
 
 	setColor(mModeling->getBackgroundColor());
-	mContext->rectangle((MODEL_PORT * mZoom) + mOffset,
-			    (MODEL_PORT * mZoom) + mOffset,
-			    ((mWidth - 2 * MODEL_PORT) * mZoom),
-			    ((mHeight - 2 * MODEL_PORT) * mZoom));
+	mContext->rectangle(MODEL_PORT + mOffset,
+			    MODEL_PORT + mOffset,
+			    (mWidth - 2 * MODEL_PORT),
+			    (mHeight - 2 * MODEL_PORT));
 	mContext->fill();
 	mContext->stroke();
 
 	setColor(mModeling->getForegroundColor());
-	mContext->rectangle((MODEL_PORT * mZoom) + mOffset,
-			    (MODEL_PORT * mZoom) + mOffset,
-			    ((mWidth - 2 * MODEL_PORT) * mZoom),
-			    ((mHeight - 2 * MODEL_PORT) * mZoom));
+	mContext->rectangle(MODEL_PORT + mOffset,
+			    MODEL_PORT + mOffset,
+			    (mWidth - 2 * MODEL_PORT),
+			    (mHeight - 2 * MODEL_PORT));
 	mContext->stroke();
     } else {
 	setColor(mModeling->getBackgroundColor());
 	mContext->rectangle(0 + mOffset, 0 + mOffset,
-			    (mWidth * mZoom),
-			    (mHeight * mZoom));
+			    mWidth,
+			    mHeight);
 	mContext->fill();
 	mContext->stroke();
 
 	setColor(mModeling->getForegroundColor());
-	mContext->rectangle((MODEL_PORT * mZoom) + mOffset,
-			    (MODEL_PORT * mZoom) + mOffset,
-			    ((mWidth - 2 * MODEL_PORT) * mZoom),
-			    ((mHeight - 2 * MODEL_PORT) * mZoom));
+	mContext->rectangle(MODEL_PORT + mOffset,
+			    MODEL_PORT + mOffset,
+			    (mWidth - 2 * MODEL_PORT),
+			    (mHeight - 2 * MODEL_PORT));
 	mContext->stroke();
     }
 }
@@ -137,13 +140,13 @@ void ViewDrawingArea::drawCurrentModelPorts()
 
     const size_t maxInput = ipl.size();
     const size_t maxOutput = opl.size();
-    const size_t stepInput = (int)((mHeight * mZoom) / (maxInput + 1));
-    const size_t stepOutput = (int)((mHeight * mZoom) / (maxOutput + 1));
+    const size_t stepInput = (int)(mHeight / (maxInput + 1));
+    const size_t stepOutput = (int)(mHeight / (maxOutput + 1));
 
     mContext->select_font_face(mModeling->getFont(),
 			  Cairo::FONT_SLANT_OBLIQUE,
 			  Cairo::FONT_WEIGHT_NORMAL);
-    mContext->set_font_size(mModeling->getFontSize() * mZoom);
+    mContext->set_font_size(mModeling->getFontSize());
 
     itl = ipl.begin();
 
@@ -151,13 +154,13 @@ void ViewDrawingArea::drawCurrentModelPorts()
 
         // to draw the port
 	setColor(mModeling->getForegroundColor());
-	mContext->move_to((mZoom * (MODEL_PORT)),
+	mContext->move_to((MODEL_PORT),
 			  (stepInput * (i + 1) - MODEL_PORT));
-	mContext->line_to((mZoom * (MODEL_PORT)),
+	mContext->line_to((MODEL_PORT),
 			  (stepInput * (i + 1) + MODEL_PORT));
-	mContext->line_to((mZoom * (MODEL_PORT + MODEL_PORT)),
+	mContext->line_to((MODEL_PORT + MODEL_PORT),
 			  (stepInput * (i + 1)));
-	mContext->line_to((mZoom * (MODEL_PORT)),
+	mContext->line_to((MODEL_PORT),
 			  (stepInput * (i + 1) - MODEL_PORT));
 	mContext->fill();
 	mContext->stroke();
@@ -165,7 +168,7 @@ void ViewDrawingArea::drawCurrentModelPorts()
 
         // to draw the label of the port
 	setColor(mModeling->getForegroundColor());
-	mContext->move_to((mZoom * (MODEL_PORT + MODEL_PORT_SPACING_LABEL)),
+	mContext->move_to((MODEL_PORT + MODEL_PORT_SPACING_LABEL),
 			  (stepInput * (i + 1) + 10));
 	mContext->show_text(itl->first);
 	mContext->stroke();
@@ -179,20 +182,20 @@ void ViewDrawingArea::drawCurrentModelPorts()
 
         // to draw the port
 	setColor(mModeling->getForegroundColor());
-	mContext->move_to((mZoom * (mWidth - MODEL_PORT)),
+	mContext->move_to((mWidth - MODEL_PORT),
 			  (stepOutput * (i + 1) - MODEL_PORT));
-	mContext->line_to((mZoom * (mWidth - MODEL_PORT)),
+	mContext->line_to((mWidth - MODEL_PORT),
 			  (stepOutput * (i + 1) + MODEL_PORT));
-	mContext->line_to((mZoom * (MODEL_PORT + mWidth - MODEL_PORT)),
+	mContext->line_to((MODEL_PORT + mWidth - MODEL_PORT),
 			  (stepOutput * (i + 1)));
-	mContext->line_to((mZoom * (mWidth - MODEL_PORT)),
+	mContext->line_to((mWidth - MODEL_PORT),
 			  (stepOutput * (i + 1) - MODEL_PORT));
 	mContext->fill();
 	mContext->stroke();
 
         // to draw the label of the port
-	mContext->move_to((mZoom * (mWidth - MODEL_PORT
-					 - MODEL_PORT_SPACING_LABEL) - 15),
+	mContext->move_to((mWidth - MODEL_PORT
+			   - MODEL_PORT_SPACING_LABEL - 15),
 			  (stepOutput * (i + 1) + 10));
 	mContext->show_text(itl->first);
 	mContext->stroke();
@@ -367,32 +370,32 @@ ViewDrawingArea::StraightLine ViewDrawingArea::computeConnection(
     Point inpt(xd, yd);
     Point outpt(xs, ys);
 
-    list.push_back(Point((int)(xs * mZoom),
-			 (int)(ys * mZoom)));
-    list.push_back(Point((int)((xs + SPACING_MODEL_PORT) * mZoom),
-			 (int)(ys * mZoom)));
+    list.push_back(Point((int)(xs),
+			 (int)(ys)));
+    list.push_back(Point((int)((xs + SPACING_MODEL_PORT)),
+			 (int)(ys)));
     if (con.x2 >= con.x1) {
-	list.push_back(Point((int)(con.x1 * mZoom),
-			     (int)(con.y4 * mZoom)));
+	list.push_back(Point((int)(con.x1),
+			     (int)(con.y4)));
 
 	if (con.x2 > con.x1) {
-	    list.push_back(Point((int)(con.x1 * mZoom),
-				 (int)(con.y3 * mZoom)));
+	    list.push_back(Point((int)(con.x1),
+				 (int)(con.y3)));
 	}
     } else {
-	list.push_back(Point((int)(con.x1 * mZoom),
-			     (int)(con.y4 * mZoom)));
-	list.push_back(Point((int)(con.x1 * mZoom),
-			     (int)(con.y1 * mZoom)));
-	list.push_back(Point((int)(con.x2 * mZoom),
-			     (int)(con.y1 * mZoom)));
+	list.push_back(Point((int)(con.x1),
+			     (int)(con.y4)));
+	list.push_back(Point((int)(con.x1),
+			     (int)(con.y1)));
+	list.push_back(Point((int)(con.x2),
+			     (int)(con.y1)));
     }
-    list.push_back(Point((int)(con.x2 * mZoom),
-			 (int)(con.y3 * mZoom)));
-    list.push_back(Point((int)((xd - SPACING_MODEL_PORT) * mZoom),
-			 (int)(yd * mZoom)));
-    list.push_back(Point((int)(xd * mZoom),
-			 (int)(yd * mZoom)));
+    list.push_back(Point((int)(con.x2),
+			 (int)(con.y3)));
+    list.push_back(Point((int)(xd - SPACING_MODEL_PORT),
+			 (int)(yd)));
+    list.push_back(Point((int)(xd),
+			 (int)(yd)));
     return list;
 }
 
@@ -517,27 +520,27 @@ void ViewDrawingArea::drawHighlightConnection()
 	mContext->select_font_face(mModeling->getFont(),
 				   Cairo::FONT_SLANT_NORMAL,
 				   Cairo::FONT_WEIGHT_NORMAL);
-	mContext->set_font_size(mModeling->getFontSize() * mZoom);
+	mContext->set_font_size(mModeling->getFontSize());
 
 	Cairo::TextExtents textExtents;
 	mContext->get_text_extents(mText[mHighlightLine],textExtents);
 	Color c(1.0, 1.0, 0.25);
 	setColor(c);
-	mContext->rectangle((mZoom * mMouse.get_x()),
-			    (mZoom * mMouse.get_y() - textExtents.height - 6),
+	mContext->rectangle(mMouse.get_x(),
+			    (mMouse.get_y() - textExtents.height - 6),
 			    (textExtents.width + 5),
 			    (textExtents.height + 5));
 	mContext->fill();
 	mContext->stroke();
 
 	setColor(mModeling->getForegroundColor());
-	mContext->rectangle((mZoom * (mMouse.get_x())),
-			    (mZoom * mMouse.get_y() - textExtents.height - 6),
+	mContext->rectangle((mMouse.get_x()),
+			    (mMouse.get_y() - textExtents.height - 6),
 			    (textExtents.width + 5),
 			    (textExtents.height + 5));
 
-	mContext->move_to((mZoom * mMouse.get_x() + 2),
-			  (mZoom * mMouse.get_y() - textExtents.height + 5));
+	mContext->move_to((mMouse.get_x() + 2),
+			  (mMouse.get_y() - textExtents.height + 5));
 	mContext->show_text(mText[mHighlightLine]);
 
 	mContext->stroke();
@@ -572,10 +575,10 @@ void ViewDrawingArea::drawChildrenModel(graph::Model* model,
                                         Color color)
 {
     setColor(color);
-    mContext->rectangle((mZoom * model->x()) + mOffset,
-			(mZoom * model->y()) + mOffset,
-			(mZoom * model->width()),
-			(mZoom * model->height()));
+    mContext->rectangle(model->x() + mOffset,
+			(model->y()) + mOffset,
+			(model->width()),
+			(model->height()));
     mContext->stroke();
 
     model->setWidth(100);
@@ -599,7 +602,7 @@ void ViewDrawingArea::drawChildrenPorts(graph::Model* model,
     mContext->select_font_face(mModeling->getFont(),
 			       Cairo::FONT_SLANT_OBLIQUE,
 			       Cairo::FONT_WEIGHT_NORMAL);
-    mContext->set_font_size(mModeling->getFontSize() * mZoom);
+    mContext->set_font_size(mModeling->getFontSize());
 
     itl = ipl.begin();
 
@@ -607,23 +610,23 @@ void ViewDrawingArea::drawChildrenPorts(graph::Model* model,
 
         // to draw the port
 	setColor(color);
-	mContext->move_to((mZoom * (mX)),
-			  (mZoom * (mY + stepInput * (i + 1) -
-					 MODEL_SPACING_PORT)));
-	mContext->line_to((mZoom * (mX)),
-			  (mZoom * (mY + stepInput * (i + 1) +
-					 MODEL_SPACING_PORT)));
-	mContext->line_to((mZoom * (mX + MODEL_SPACING_PORT)),
-			  (mZoom * (mY + stepInput * (i + 1))));
-	mContext->line_to((mZoom * (mX)),
-			  (mZoom * (mY + stepInput * (i + 1) -
-					 MODEL_SPACING_PORT)));
+	mContext->move_to(mX,
+			  (mY + stepInput * (i + 1) -
+			   MODEL_SPACING_PORT));
+	mContext->line_to((mX),
+			  (mY + stepInput * (i + 1) +
+			   MODEL_SPACING_PORT));
+	mContext->line_to((mX + MODEL_SPACING_PORT),
+			  (mY + stepInput * (i + 1)));
+	mContext->line_to(mX,
+			  (mY + stepInput * (i + 1) -
+					 MODEL_SPACING_PORT));
 	mContext->fill();
 	mContext->stroke();
 
 	// to draw the label of the port
-	mContext->move_to((mZoom * (mX + PORT_SPACING_LABEL)),
-			  (mZoom * (mY + stepInput * (i + 1) + 10)));
+	mContext->move_to((mX + PORT_SPACING_LABEL),
+			  (mY + stepInput * (i + 1) + 10));
 	mContext->show_text(itl->first);
 	mContext->stroke();
 
@@ -636,26 +639,26 @@ void ViewDrawingArea::drawChildrenPorts(graph::Model* model,
 
         // to draw the port
 	setColor(color);
-	mContext->move_to((mZoom * (mX + model->width())),
-			  (mZoom * (mY + stepOutput * (i + 1) -
-					 MODEL_SPACING_PORT)));
-	mContext->line_to((mZoom * (mX + model->width())),
-			  (mZoom * (mY + stepOutput * (i + 1) +
-					 MODEL_SPACING_PORT)));
-	mContext->line_to((mZoom * (mX + MODEL_SPACING_PORT +
-					 model->width())),
-			  (mZoom * (mY + stepOutput * (i + 1))));
-	mContext->line_to((mZoom * (mX + model->width())),
-			  (mZoom * (mY + stepOutput * (i + 1) -
-					 MODEL_SPACING_PORT)));
+	mContext->move_to((mX + model->width()),
+			  (mY + stepOutput * (i + 1) -
+			   MODEL_SPACING_PORT));
+	mContext->line_to((mX + model->width()),
+			  (mY + stepOutput * (i + 1) +
+			   MODEL_SPACING_PORT));
+	mContext->line_to((mX + MODEL_SPACING_PORT +
+			   model->width()),
+			  (mY + stepOutput * (i + 1)));
+	mContext->line_to((mX + model->width()),
+			  (mY + stepOutput * (i + 1) -
+			    MODEL_SPACING_PORT));
 	mContext->fill();
 	mContext->stroke();
 
 	// to draw the label of the port
 	setColor(color);
-	mContext->move_to((mZoom * (mX + model->width() +
-					 PORT_SPACING_LABEL)),
-			  (mZoom * (mY + stepOutput * (i + 1) + 10)));
+	mContext->move_to((mX + model->width() +
+			   PORT_SPACING_LABEL),
+			  (mY + stepOutput * (i + 1) + 10));
 	mContext->show_text(itl->first);
 	mContext->stroke();
 
@@ -665,11 +668,11 @@ void ViewDrawingArea::drawChildrenPorts(graph::Model* model,
     mContext->select_font_face(mModeling->getFont(),
 			       Cairo::FONT_SLANT_NORMAL,
 			       Cairo::FONT_WEIGHT_NORMAL);
-    mContext->set_font_size(mModeling->getFontSize() * mZoom);
+    mContext->set_font_size(mModeling->getFontSize());
 
-    mContext->move_to(((model->x() + (model->width() / 2)) * mZoom),
-		      ((model->y() + (model->height() * 1) +
-			     MODEL_SPACING_PORT) * mZoom + 10));
+    mContext->move_to((model->x() + (model->width() / 2)),
+		      (model->y() + (model->height() * 1) +
+			MODEL_SPACING_PORT) + 10);
     mContext->show_text(model->getName());
 }
 
@@ -680,10 +683,10 @@ void ViewDrawingArea::drawLink()
         graph::Model* src = mView->getFirstSelectedModels();
 	setColor(mModeling->getForegroundColor());
         if (src == mCurrent) {
-	    mContext->move_to((MODEL_PORT * mZoom),
-			      (mZoom * mHeight / 2));
-	    mContext->line_to((mMouse.get_x() * mZoom),
-			      (mZoom * mMouse.get_y()));
+	    mContext->move_to(MODEL_PORT,
+			      (mHeight / 2));
+	    mContext->line_to(mMouse.get_x(),
+			      mMouse.get_y());
 
         } else {
             int w = src->width();
@@ -691,10 +694,10 @@ void ViewDrawingArea::drawLink()
             int x = src->x();
             int y = src->y();
 
-	    mContext->move_to((mZoom * (x + w / 2)) + mOffset,
-			      (mZoom * (y + h / 2)) + mOffset);
-	    mContext->line_to((mMouse.get_x() * mZoom) + mOffset,
-			      (mMouse.get_y() * mZoom) + mOffset);
+	    mContext->move_to((x + w / 2) + mOffset,
+			      (y + h / 2) + mOffset);
+	    mContext->line_to(mMouse.get_x() + mOffset,
+			      mMouse.get_y() + mOffset);
         }
 	mContext->stroke();
     }
@@ -710,10 +713,10 @@ void ViewDrawingArea::drawZoomFrame()
         int ymax = std::max(mMouse.get_y(), mPrecMouse.get_y());
 
 	setColor(mModeling->getForegroundColor());
-	mContext->rectangle((mZoom * xmin),
-			    (mZoom * ymin),
-			    (mZoom * (xmax - xmin)),
-			    (mZoom * (ymax - ymin)));
+	mContext->rectangle(xmin,
+			    ymin,
+			    (xmax - xmin),
+			    (ymax - ymin));
 	mContext->stroke();
     }
 }
@@ -948,7 +951,7 @@ bool ViewDrawingArea::on_motion_notify_event(GdkEventMotion* event)
                                  mMouse.get_x(), mMouse.get_y());
             queueRedraw();
         } else {
-            highlightLine((int)event->x, (int)event->y);
+            highlightLine((int)mMouse.get_x(), (int)mMouse.get_y());
         }
         mPrecMouse = mMouse;
         break;

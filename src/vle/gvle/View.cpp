@@ -541,11 +541,11 @@ void View::selectedWindow()
 
 void  View::updateAdjustment(double h, double v)
 {
+    mViewport.get_hadjustment()->set_lower(h);
     mViewport.get_hadjustment()->set_value(h);
-    mViewport.get_hadjustment()->value_changed();
 
+    mViewport.get_vadjustment()->set_lower(v);
     mViewport.get_vadjustment()->set_value(v);
-    mViewport.get_vadjustment()->value_changed();
 }
 
 }} // namespace vle gvle
