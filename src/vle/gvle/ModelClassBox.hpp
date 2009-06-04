@@ -65,7 +65,7 @@ public:
     virtual void onRename();
     virtual void onExportVpz();
     virtual void onImportModelAsClass();
-
+    virtual void onImportClassesFromVpz();
     void showRow(const std::string& model_name);
 
 protected:

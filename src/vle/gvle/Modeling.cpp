@@ -57,7 +57,8 @@ Modeling::Modeling(GVLE* gvle, const string& filename) :
     mIsSaved(false),
     mSocketPort(8000),
     mAtomicBox(0),
-    mImportBox(0),
+    mImportModelBox(0),
+    mImportClassesBox(0),
     mCoupledBox(0)
 {
     assert(gvle);
@@ -98,7 +99,8 @@ Modeling::~Modeling()
     delete mModelTreeBox;
     delViews();
     delete mAtomicBox;
-    delete mImportBox;
+    delete mImportModelBox;
+    delete mImportClassesBox;
     delete mCoupledBox;
     delete mModelClassBox;
 }
@@ -118,7 +120,8 @@ void Modeling::setGlade(Glib::RefPtr < Gnome::Glade::Xml > xml)
 {
     mRefXML = xml;
     mAtomicBox = new AtomicModelBox(xml, this);
-    mImportBox = new ImportModelBox(xml, this);
+    mImportModelBox = new ImportModelBox(xml, this);
+    mImportClassesBox = new ImportClassesBox(xml, this);
     mCoupledBox = new CoupledModelBox(xml, this);
     mModelClassBox = new ModelClassBox(xml, this);
 }
@@ -782,9 +785,9 @@ void Modeling::importModel(graph::CoupledModel* parent, vpz::Vpz* src)
     assert(parent);
     assert(src);
 
-    if (mImportBox) {
-	mImportBox->setGCoupled(parent);
-	if (mImportBox->show(src)) {
+    if (mImportModelBox) {
+	mImportModelBox->setGCoupled(parent);
+	if (mImportModelBox->show(src)) {
 	    graph::Model* import = src->project().model().model();
 	    parent->addModel(import);
 	    if (import->isAtomic())
@@ -806,8 +809,8 @@ void Modeling::importModelToClass(vpz::Vpz* src, std::string& className)
     assert(src);
     boost::trim(className);
 
-    if (mImportBox) {
-	if (mImportBox->show(src)) {
+    if (mImportModelBox) {
+	if (mImportModelBox->show(src)) {
 	    Classes& classes = vpz().project().classes();
 	    Class& new_class = classes.add(className);
 	    graph::Model* import = src->project().model().model();
@@ -824,6 +827,16 @@ void Modeling::importModelToClass(vpz::Vpz* src, std::string& className)
 	    mModelClassBox->parseClass();
 	    setModified(true);
 	}
+    }
+}
+
+void Modeling::importClasses(vpz::Vpz* src)
+{
+    using namespace vpz;
+    assert(src);
+
+    if (mImportClassesBox) {
+	mImportClassesBox->show(src);
     }
 }
 

@@ -32,6 +32,7 @@
 #include <vle/gvle/CoupledModelBox.hpp>
 #include <vle/gvle/CutCopyPaste.hpp>
 #include <vle/gvle/ImportModelBox.hpp>
+#include <vle/gvle/ImportClassesBox.hpp>
 #include <vle/gvle/ViewDrawingArea.hpp>
 #include <vle/gvle/PluginFactory.hpp>
 #include <vle/vpz/Vpz.hpp>
@@ -649,6 +650,8 @@ public:
 
     void importModelToClass(vpz::Vpz* src, std::string& className);
 
+    void importClasses(vpz::Vpz* src);
+
     void exportClass(graph::Model* model, vpz::Class classe, vpz::Vpz* dst);
 
     /********************************************************************
@@ -940,7 +943,8 @@ private:
     SetString                   mModelsNames;
     int                         mSocketPort;
     AtomicModelBox*             mAtomicBox;
-    ImportModelBox*             mImportBox;
+    ImportModelBox*             mImportModelBox;
+    ImportClassesBox*           mImportClassesBox;
     CoupledModelBox*            mCoupledBox;
     PluginFactory               mPluginFactory;
 

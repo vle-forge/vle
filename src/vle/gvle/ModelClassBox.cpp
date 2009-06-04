@@ -101,6 +101,13 @@ void ModelClassBox::initMenuPopupModels()
 		    *this,
 		    &ModelClassBox::onImportModelAsClass)));
 
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		_("Import Classes from Vpz"),
+		sigc::mem_fun(
+		    *this,
+		    &ModelClassBox::onImportClassesFromVpz)));
+
     mMenuPopup.accelerate(mTreeView);
 }
 
@@ -239,6 +246,29 @@ void ModelClassBox::onImportModelAsClass()
 		mModeling->importModelToClass(import, name);
             delete import;
         } catch (std::exception& E) {
+            std::cout << "Exception :\n" << E.what() << "\n";
+        }
+    }
+}
+
+void ModelClassBox::onImportClassesFromVpz()
+{
+    Gtk::FileChooserDialog file(_("VPZ file"), Gtk::FILE_CHOOSER_ACTION_OPEN);
+    file.set_transient_for(*this);
+    file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+    file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+    Gtk::FileFilter filter;
+    filter.set_name(_("Vle Project gZipped"));
+    filter.add_pattern("*.vpz");
+    file.add_filter(filter);
+
+    if (file.run() == Gtk::RESPONSE_OK) {
+	std::string project_file = file.get_filename();
+        try {
+            vpz::Vpz* import = new vpz::Vpz(project_file);
+	    mModeling->importClasses(import);
+            delete import;
+	} catch (std::exception& E) {
             std::cout << "Exception :\n" << E.what() << "\n";
         }
     }
