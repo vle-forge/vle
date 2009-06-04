@@ -130,4 +130,12 @@ void Output::clearData()
     m_data = 0;
 }
 
+bool Output::operator==(const Output& output) const
+{
+    return m_format == output.format() and m_name == output.name()
+	and m_plugin == output.plugin() and m_location == output.location()
+	and m_data == output.data();
+
+}
+
 }} // namespace vle vpz

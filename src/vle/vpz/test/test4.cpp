@@ -412,6 +412,38 @@ void check_copy_views_unittest_vpz(vpz::Views& views)
 
 }
 
+void check_equal_views_unittest_vpz(vpz::Views views)
+{
+    BOOST_REQUIRE(views.exist("view1"));
+    BOOST_REQUIRE(views.exist("view2"));
+
+    BOOST_REQUIRE_EQUAL(views.get("view1") == views.get("view2"), false);
+    BOOST_REQUIRE_EQUAL(views.get("view1") == views.get("view1"), true);
+
+    BOOST_REQUIRE_NO_THROW(views.copyView("view1", "view1_1"));
+    BOOST_REQUIRE_EQUAL(views.get("view1") == views.get("view1_1"), false);
+}
+
+
+void check_equal_dynamics_unittest_vpz(vpz::Dynamics dynamics)
+{
+    BOOST_REQUIRE(dynamics.exist("a"));
+    BOOST_REQUIRE(dynamics.exist("b"));
+    BOOST_REQUIRE(dynamics.exist("unittest"));
+
+    BOOST_REQUIRE_EQUAL(dynamics.get("a") == dynamics.get("b"), false);
+    BOOST_REQUIRE_EQUAL(dynamics.get("unittest") == dynamics.get("unittest"), true);
+}
+
+void check_equal_outputs_unittest_vpz(vpz::Outputs outputs)
+{
+    BOOST_REQUIRE(outputs.exist("view1"));
+    BOOST_REQUIRE(outputs.exist("view2"));
+
+    BOOST_REQUIRE_EQUAL(outputs.get("view1") == outputs.get("view2"), false);
+    BOOST_REQUIRE_EQUAL(outputs.get("view1") == outputs.get("view1"), true);
+}
+
 BOOST_AUTO_TEST_CASE(test_rename_conds)
 {
     vpz::Vpz vpz;
@@ -525,3 +557,43 @@ BOOST_AUTO_TEST_CASE(test_copy_del_views)
 
     delete vpz.project().model().model();
 }
+
+BOOST_AUTO_TEST_CASE(test_equal_dynamics)
+{
+    vpz::Vpz vpz;
+    vpz.parseFile(utils::Path::path().getExampleFile("unittest.vpz"));
+
+    BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
+    BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
+
+    vpz::Dynamics& dynamics(vpz.project().dynamics());
+    check_equal_dynamics_unittest_vpz(dynamics);
+    delete vpz.project().model().model();
+}
+
+BOOST_AUTO_TEST_CASE(test_equal_outputs)
+{
+    vpz::Vpz vpz;
+    vpz.parseFile(utils::Path::path().getExampleFile("unittest.vpz"));
+
+    BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
+    BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
+
+    vpz::Outputs& outputs(vpz.project().experiment().views().outputs());
+    check_equal_outputs_unittest_vpz(outputs);
+    delete vpz.project().model().model();
+}
+
+BOOST_AUTO_TEST_CASE(test_equal_views)
+{
+    vpz::Vpz vpz;
+    vpz.parseFile(utils::Path::path().getExampleFile("unittest.vpz"));
+
+    BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
+    BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
+
+    vpz::Views& views(vpz.project().experiment().views());
+    check_equal_views_unittest_vpz(views);
+    delete vpz.project().model().model();
+}
+

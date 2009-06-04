@@ -168,6 +168,13 @@ namespace vle { namespace vpz {
         inline void setData(const std::string& data)
         { m_data = data; }
 
+	/**
+	 * @brief A operator to compare two Views
+	 * @param view The View to compare
+	 * @return True if the views are equals
+	 */
+	bool operator==(const View& view) const;
+
     private:
         std::string     m_name;
         Type            m_type;

@@ -64,4 +64,12 @@ void Dynamic::setLocalDynamics()
     m_type = LOCAL;
 }
 
+bool Dynamic::operator==(const Dynamic& dynamic) const
+{
+    return m_name == dynamic.name() and m_library == dynamic.library()
+	and m_model == dynamic.model() and m_language == dynamic.language()
+	and m_location == dynamic.location() and m_type == dynamic.type()
+	and m_ispermanent == dynamic.isPermanent();
+}
+
 }} // namespace vle vpz

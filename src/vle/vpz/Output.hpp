@@ -200,6 +200,13 @@ namespace vle {
         void setName(const std::string& name)
         { m_name.assign(name); }
 
+	/**
+	 * @brief A operator to compare two Views
+	 * @param view The View to compare
+	 * @return True if the views are equals
+	 */
+	bool operator==(const Output& output) const;
+
     private:
         Format          m_format;
         std::string     m_name;

@@ -185,6 +185,13 @@ namespace vle { namespace vpz {
         bool operator<(const Dynamic& dynamic) const
         { return m_name < dynamic.m_name; }
 
+	/**
+	 * @brief An operator to compare two dynamics.
+	 * @param dynamic The dynamic to compare.
+	 * @return True if the dynamics are equals.
+	 */
+	bool operator==(const Dynamic& dynamic) const;
+
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
         /**

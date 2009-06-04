@@ -82,4 +82,12 @@ void View::setTimestep(double time)
     m_timestep = time;
 }
 
+bool View::operator==(const View& view) const
+{
+    return m_name == view.name() and m_type == view.type()
+	and m_output == view.output()
+	and m_timestep == view.timestep() and m_data == view.data();
+}
+
+
 }} // namespace vle vpz
