@@ -73,7 +73,8 @@ ExperimentBox::ExperimentBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
 
 ExperimentBox::~ExperimentBox()
 {
-    delete mComboCombi;
+    delete mRadioButtonLinear;
+    delete mRadioButtonTotal;
 }
 
 void ExperimentBox::initExperiment()
@@ -126,14 +127,23 @@ void ExperimentBox::initExperiment()
 
     // Plan frame
     {
-	mComboCombi = new Gtk::ComboBoxText();
-	mComboCombi->append_text("linear");
-	mComboCombi->append_text("total");
-	mHboxCombi->pack_start(*mComboCombi, true, true, 5);
+	mRadioButtonLinear = new Gtk::RadioButton("linear");
+        mRadioButtonTotal = new Gtk::RadioButton("total");
+        Gtk::RadioButton::Group group = mRadioButtonLinear->get_group();
+	mRadioButtonTotal->set_group(group);
+	
 	if (mModeling->experiment().combination().empty()) {
 	    mModeling->experiment().setCombination("linear");
 	}
-	mComboCombi->set_active_text(mModeling->experiment().combination());
+
+	if (mModeling->experiment().combination() == "linear") {
+	  mRadioButtonLinear->set_active();
+	} else {
+	  mRadioButtonTotal->set_active();
+	}
+
+	mHboxCombi->pack_start(*mRadioButtonLinear, true, false, 5);
+	mHboxCombi->pack_start(*mRadioButtonTotal, true, false, 5);
 
 	mSpinPlanSeed->set_range(0, std::numeric_limits < guint32 >::max());
 	if (mModeling->experiment().replicas().seed() != 0) {
@@ -208,7 +218,7 @@ bool ExperimentBox::apply()
     {
         long seed = (long)std::floor(std::abs(mSpinPlanSeed->get_value()));
         long number = (long)std::floor(std::abs(mButtonNumber->get_value()));
-	exp.setCombination(mComboCombi->get_active_text());
+        exp.setCombination(mRadioButtonLinear->get_active()?"linear":"total");
 	rep.setSeed(seed);
 	rep.setNumber(number);
     }

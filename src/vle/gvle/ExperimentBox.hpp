@@ -77,7 +77,8 @@ namespace vle { namespace gvle {
         Gtk::SpinButton*    mSpinSimuSeed;
         Gtk::Button*        mButtonSimuSeed;
         Gtk::HBox*          mHboxCombi;
-        Gtk::ComboBoxText*  mComboCombi;
+	Gtk::RadioButton*   mRadioButtonLinear;
+	Gtk::RadioButton*   mRadioButtonTotal;
         Gtk::SpinButton*    mSpinPlanSeed;
         Gtk::Button*        mButtonPlanSeed;
         Gtk::SpinButton*    mButtonNumber;
