@@ -165,17 +165,17 @@ void ViewDrawingArea::drawCurrentModelPorts()
 	mContext->fill();
 	mContext->stroke();
 
-
         // to draw the label of the port
-	setColor(mModeling->getForegroundColor());
-	mContext->move_to((MODEL_PORT + MODEL_PORT_SPACING_LABEL),
-			  (stepInput * (i + 1) + 10));
-	mContext->show_text(itl->first);
-	mContext->stroke();
-
+	if (mZoom >= 1.0) {
+	    setColor(mModeling->getForegroundColor());
+	    mContext->move_to((MODEL_PORT + MODEL_PORT_SPACING_LABEL),
+			      (stepInput * (i + 1) + 10));
+	    mContext->show_text(itl->first);
+	    mContext->stroke();
+	}	
 	itl++;
     }
-
+    
     itl = opl.begin();
 
     for (guint i = 0; i < maxOutput; ++i) {
@@ -194,13 +194,16 @@ void ViewDrawingArea::drawCurrentModelPorts()
 	mContext->stroke();
 
         // to draw the label of the port
-	mContext->move_to((mWidth - MODEL_PORT
-			   - MODEL_PORT_SPACING_LABEL - 15),
-			  (stepOutput * (i + 1) + 10));
-	mContext->show_text(itl->first);
-	mContext->stroke();
-
+	if (mZoom >= 1.0) {
+	    mContext->move_to((mWidth - MODEL_PORT
+			       - MODEL_PORT_SPACING_LABEL - 15),
+			      (stepOutput * (i + 1) + 10));
+	    mContext->show_text(itl->first);
+	    mContext->stroke();
+	}
+	
 	itl++;
+
     }
 }
 
@@ -625,12 +628,13 @@ void ViewDrawingArea::drawChildrenPorts(graph::Model* model,
 	mContext->stroke();
 
 	// to draw the label of the port
-	mContext->move_to((mX + PORT_SPACING_LABEL),
-			  (mY + stepInput * (i + 1) + 10));
-	mContext->show_text(itl->first);
-	mContext->stroke();
-
-        itl++;
+	if (mZoom >= 1.0) {
+	    mContext->move_to((mX + PORT_SPACING_LABEL),
+			      (mY + stepInput * (i + 1) + 10));
+	    mContext->show_text(itl->first);
+	    mContext->stroke();
+	}
+	itl++;
     }
 
     itl = opl.begin();
@@ -655,14 +659,15 @@ void ViewDrawingArea::drawChildrenPorts(graph::Model* model,
 	mContext->stroke();
 
 	// to draw the label of the port
-	setColor(color);
-	mContext->move_to((mX + model->width() +
-			   PORT_SPACING_LABEL),
-			  (mY + stepOutput * (i + 1) + 10));
-	mContext->show_text(itl->first);
-	mContext->stroke();
-
-        itl++;
+	if (mZoom >= 1.0) {
+	    setColor(color);
+	    mContext->move_to((mX + model->width() +
+			       PORT_SPACING_LABEL),
+			      (mY + stepOutput * (i + 1) + 10));
+	    mContext->show_text(itl->first);
+	    mContext->stroke();
+	}
+	itl++;
     }
 
     mContext->select_font_face(mModeling->getFont(),
@@ -672,8 +677,10 @@ void ViewDrawingArea::drawChildrenPorts(graph::Model* model,
 
     mContext->move_to((model->x() + (model->width() / 2)),
 		      (model->y() + (model->height() * 1) +
-			MODEL_SPACING_PORT) + 10);
-    mContext->show_text(model->getName());
+		       MODEL_SPACING_PORT) + 10);
+    if (mZoom >= 1.0) {
+	mContext->show_text(model->getName());
+    }
 }
 
 void ViewDrawingArea::drawLink()
