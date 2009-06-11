@@ -99,6 +99,7 @@ void OpenPackageBox::onApply()
 	    Gtk::TreeModel::Row row = *iter;
 	    std::string name = row.get_value(mColumns.mName);
 	    utils::Path::path().setPackage(name);
+	    mModeling->getGVLE()->showPackageBrowserWindow();
 	}
     }
     mDialog->hide_all();

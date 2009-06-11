@@ -105,6 +105,10 @@ void GVLEMenu::makeMenuView(GVLE* gvle)
                        Gtk::AccelKey(GDK_M, Gdk::CONTROL_MASK),
                        sigc::mem_fun(gvle, &GVLE::onShowModelClassView)));
 
+    menulist.push_back(Gtk::Menu_Helpers::MenuElem(_("_Package Browser"),
+                       Gtk::AccelKey(GDK_P, Gdk::CONTROL_MASK),
+                       sigc::mem_fun(gvle, &GVLE::onShowPackageBrowserWindow)));
+
     menulist.push_back(Gtk::Menu_Helpers::SeparatorElem());
 
     menulist.push_back(

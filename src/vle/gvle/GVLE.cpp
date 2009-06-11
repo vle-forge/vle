@@ -33,6 +33,7 @@
 #include <vle/gvle/HostsBox.hpp>
 #include <vle/gvle/PluginTable.hpp>
 #include <vle/gvle/GVLEMenu.hpp>
+#include <vle/gvle/PackageBrowserWindow.hpp>
 #include <vle/gvle/PluginPlus.hpp>
 #include <vle/gvle/PreferencesBox.hpp>
 #include <vle/gvle/ViewOutputBox.hpp>
@@ -76,6 +77,7 @@ GVLE::GVLE(const std::string& filename) :
     mOpenVpzBox = new OpenVpzBox(mRefXML, m_modeling);
     mNewProjectBox = new NewProjectBox(mRefXML, m_modeling);
     mSaveVpzBox = new SaveVpzBox(mRefXML, m_modeling);
+    mPackageBrowserWindow = new PackageBrowserWindow(mRefXML, m_modeling);
 
     //loadObserverPlugins(utils::Path::path().getDefaultObserverPluginDir());
     //loadObserverPlugins(utils::Path::path().getUserObserverPluginDir());
@@ -121,6 +123,7 @@ GVLE::~GVLE()
 
     delete mConditionsBox;
     delete mSimulationBox;
+    delete mPackageBrowserWindow;
     delete mPreferencesBox;
     delete mOpenPackageBox;
     delete mOpenVpzBox;
@@ -678,6 +681,11 @@ void GVLE::onShowModelClassView()
     m_modeling->toggleModelClassBox();
 }
 
+void GVLE::onShowPackageBrowserWindow()
+{
+    togglePackageBrowserWindow();
+}
+
 void GVLE::onCloseAllViews()
 {
     m_modeling->delViews();
@@ -696,6 +704,27 @@ void GVLE::onDeiconifyAllViews()
 void GVLE::onPreferences()
 {
     mPreferencesBox->show();
+}
+
+void GVLE::showPackageBrowserWindow()
+{
+    if(not vle::utils::Path::path().package().empty()) {
+	mPackageBrowserWindow->show();
+    }
+}
+
+void GVLE::hidePackageBrowserWindow()
+{
+    mPackageBrowserWindow->hide();
+}
+
+void GVLE::togglePackageBrowserWindow()
+{
+    if (mPackageBrowserWindow->is_visible()) {
+	hidePackageBrowserWindow();
+    } else {
+	showPackageBrowserWindow();
+    }
 }
 
 void GVLE::onSimulationBox()

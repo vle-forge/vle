@@ -61,6 +61,7 @@ class GVLEMenu;
 class Modeling;
 class PluginTable;
 class PreferencesBox;
+class PackageBrowserWindow;
 
 /**
  * @brief GVLE is a Gtk::Window use to build the main window with all button
@@ -340,6 +341,12 @@ public:
     void onShowModelClassView();
 
     /**
+     * When click on Show PackageBrowser
+     *
+     */
+    void onShowPackageBrowserWindow();
+
+    /**
      * @brief Delete all gvle::View from the gvle::Modeling object.
      */
     void onCloseAllViews();
@@ -358,6 +365,27 @@ public:
      * @brief Show the PreferencesBox
      */
     void onPreferences();
+
+    /********************************************************************
+     *
+     * PACKAGE BROWSER
+     *
+     ********************************************************************/
+
+    /**
+     * Show the Package Browser Window
+     */
+    void showPackageBrowserWindow();
+
+    /**
+     * Hide the Package Browser Window
+     */
+    void hidePackageBrowserWindow();
+
+    /**
+     * toggle show/hide Package Browser Window
+     */
+    void togglePackageBrowserWindow();
 
     /*********************************************************************
      *
@@ -472,6 +500,7 @@ private:
     PreferencesBox*       mPreferencesBox;
     OpenPackageBox*       mOpenPackageBox;
     OpenVpzBox*           mOpenVpzBox;
+    PackageBrowserWindow* mPackageBrowserWindow;
     NewProjectBox*        mNewProjectBox;
     SaveVpzBox*           mSaveVpzBox;
 };

@@ -74,6 +74,7 @@ void NewProjectBox::onApply()
 	    std::string err;
 	    utils::Path::path().setPackage(mEntryName->get_text());
 	    vle::utils::CMakePackage::create(out, err);
+	    mModeling->getGVLE()->showPackageBrowserWindow();
 	    mDialog->hide_all();
 	} else {
 	    Error(_("The Project ") +
