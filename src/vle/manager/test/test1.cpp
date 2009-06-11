@@ -38,6 +38,7 @@
 #include <vle/manager/VLE.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
+#include <vle/utils/Path.hpp>
 
 struct F
 {

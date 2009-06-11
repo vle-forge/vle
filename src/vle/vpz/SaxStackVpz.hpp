@@ -27,7 +27,7 @@
 #define VLE_VPZ_SAXSTACKVPZ_HPP
 
 #include <vle/value/Value.hpp>
-#include <libxml++/libxml++.h>
+#include <libxml/xmlstring.h>
 #include <list>
 
 namespace vle {
@@ -39,11 +39,6 @@ namespace vle {
     } // namespace graph
 
     namespace vpz {
-
-    /**
-     *  Typedef the libxml++ sax AttributList
-     */
-    typedef xmlpp::SaxParser::AttributeList AttributeList;
 
     class Base;
     class Vpz;
@@ -86,7 +81,7 @@ namespace vle {
          * @return A reference to the vpz::Vpz.
          * @throw utils::SaxParserError if stack is not empty.
          */
-        vpz::Vpz* pushVpz(const AttributeList& name);
+        vpz::Vpz* pushVpz(const xmlChar** name);
 
         /**
          * @brief Push the structure into the stack.
@@ -100,7 +95,7 @@ namespace vle {
          * @throw utils::SaxParserError if stack is empty and parent it not
          * Structures, Submodels or Class.
          */
-        void pushModel(const AttributeList& att);
+        void pushModel(const xmlChar** att);
 
         /**
          * @brief Push Port (condition or observation) into the stack.
@@ -108,7 +103,7 @@ namespace vle {
          * @throw utils::SaxParserError if stack is empty and parent it not
          * Conditions, Observables or Connection (In or Out).
          */
-        void pushPort(const AttributeList& att);
+        void pushPort(const xmlChar** att);
 
         /**
          * @brief Push the type of port.
@@ -139,7 +134,7 @@ namespace vle {
          * @throw utils::SaxParserError if stack is empty or parent is not
          * Connections.
          */
-        void pushConnection(const AttributeList& att);
+        void pushConnection(const xmlChar** att);
 
         /**
          * @brief Push an Origin of Connection into the stack.
@@ -147,7 +142,7 @@ namespace vle {
          * @throw utils::SaxParserError if stack is empty or parent is not
          * InternalConnection, InputConnection or OutputConnection.
          */
-        void pushOrigin(const AttributeList& att);
+        void pushOrigin(const xmlChar** att);
 
         /**
          * @brief Push an Destination of Connection into the stack.
@@ -155,7 +150,7 @@ namespace vle {
          * @throw utils::SaxParserError if stack is empty or parent is not
          * InternalConnection, InputConnection or OutputConnection.
          */
-        void pushDestination(const AttributeList& att);
+        void pushDestination(const xmlChar** att);
 
         /**
          * @brief Push a Dynamics into the stack.
@@ -169,14 +164,14 @@ namespace vle {
          * @throw utils::SaxParserError if stack is empty or parent is not a
          * Dynamics.
          */
-        void pushDynamic(const AttributeList& att);
+        void pushDynamic(const xmlChar** att);
 
         /**
          * @brief Push an Experiment into the stack.
          * @param att The attribute list.
          * @throw utils::SaxParserError if stack is empty or parent is not Vpz.
          */
-        void pushExperiment(const AttributeList& att);
+        void pushExperiment(const xmlChar** att);
 
         /**
          * @brief Push a Replicas into the stack.
@@ -184,7 +179,7 @@ namespace vle {
          * @throw utils::SaxParserError if stack is empty or parent is not
          * Experiment.
          */
-        void pushReplicas(const AttributeList& att);
+        void pushReplicas(const xmlChar** att);
 
         /**
          * @brief Push a Conditions into th stack.
@@ -199,7 +194,7 @@ namespace vle {
          * @throw utils::SaxParserError if stack is empty or parent is not
          * Conditions.
          */
-        void pushCondition(const AttributeList& att);
+        void pushCondition(const xmlChar** att);
 
         /**
          * @brief Push a ConditionPort into a Condition.
@@ -207,7 +202,7 @@ namespace vle {
          * @throw utils::SaxParserError if stack is empty or parent is not
          * Condition.
          */
-        void pushConditionPort(const AttributeList& att);
+        void pushConditionPort(const xmlChar** att);
 
         /**
          * @brief Push a Views into th stack.
@@ -229,7 +224,7 @@ namespace vle {
          * @throw utils::SaxParserError if stack is empty or parent is not
          * Outputs.
          */
-        void pushOutput(const AttributeList& att);
+        void pushOutput(const xmlChar** att);
 
         /**
          * @brief Push an View into th stack.
@@ -237,7 +232,7 @@ namespace vle {
          * @throw utils::SaxParserError if stack is empty or parent is not
          * Views.
          */
-        void pushView(const AttributeList& att);
+        void pushView(const xmlChar** att);
 
         /**
          * @brief Push an attachedview into th stack.
@@ -245,7 +240,7 @@ namespace vle {
          * @throw utils::SaxParserError if stack is empty or parent is not
          * ObservablePort.
          */
-        void pushAttachedView(const AttributeList& att);
+        void pushAttachedView(const xmlChar** att);
 
         /**
          * @brief Push an Observables into th stack.
@@ -260,7 +255,7 @@ namespace vle {
          * @throw utils::SaxParserError if stack is empty or parent is not
          * Observables.
          */
-        void pushObservable(const AttributeList& att);
+        void pushObservable(const xmlChar** att);
 
         /**
          * @brief Push an ObservablePort into th stack.
@@ -268,7 +263,7 @@ namespace vle {
          * @throw utils::SaxParserError if stack is empty or parent is not
          * Observable.
          */
-        void pushObservablePort(const AttributeList& att);
+        void pushObservablePort(const xmlChar** att);
 
         /**
          * @brief Push a View to an ObservablePort.
@@ -276,7 +271,7 @@ namespace vle {
          * @throw utils::SaxParserError if stack is empty or parent is not
          * ObservablePort.
          */
-        void pushObservablePortOnView(const AttributeList& att);
+        void pushObservablePortOnView(const xmlChar** att);
 
         /**
          * @brief Push a Classes into the stack.
@@ -291,7 +286,7 @@ namespace vle {
          * @throw utils::SaxParserError if stack is empty or parent is not
          * Classes.
          */
-        void pushClass(const AttributeList& att);
+        void pushClass(const xmlChar** att);
 
         /**
          * @brief Pop the Classes
@@ -416,6 +411,21 @@ namespace vle {
          * stack.
          */
         vpz::Class* getLastClass() const;
+
+    private:
+        inline void checkEmptyStack() const
+        { if (not m_stack.empty()) throw utils::SaxParserError(
+                "Not empty vpz stack"); }
+
+        inline void checkNotEmptyStack() const
+        { if (m_stack.empty()) throw utils::SaxParserError(
+                "Empty vpz stack"); }
+
+        void checkParentIsVpz() const;
+        void checkParentIsClass() const;
+        void checkParentIsSubmodels() const;
+        void checkParentIsStructures() const;
+        void checkParentOfModel() const;
     };
 
 }} // namespace vle vpz

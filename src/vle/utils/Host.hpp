@@ -23,14 +23,11 @@
  */
 
 
-#ifndef UTILS_HOSTS_HPP
-#define UTILS_HOSTS_HPP
+#ifndef VLE_UTILS_HOSTS_HPP
+#define VLE_UTILS_HOSTS_HPP
 
-#include <glibmm/ustring.h>
-#include <libxml++/libxml++.h>
 #include <set>
-#include <vle/utils/Path.hpp>
-
+#include <string>
 
 
 namespace vle { namespace utils {
@@ -56,62 +53,54 @@ namespace vle { namespace utils {
          * @param port
          * @param process
          */
-        Host(const std::string& hostname, int port, int process) :
-            mHostname(hostname),
-            mPort(port),
-            mProcess(process) { }
+        Host(const std::string& hostname, int port, int process)
+            : mHostname(hostname), mPort(port), mProcess(process)
+        {}
+
+        Host(const std::string& hostname, const std::string& port,
+             const std::string& process);
+
+        Host()
+        {}
 
         /**
-         * Build an empty entry of simulator host.
-         *
+         * @return hostname to contact.
          */
-        Host() { }
-
-        /**
-         * Write XML syntax under the root node.
-         *
-         * @param root the node above new node for instance HOSTS.
-         */
-        void write(xmlpp::Element* root) const;
-
-        /**
-         * Read XML syntax node.
-         *
-         * @param root the host node to read.
-         */
-        void read(xmlpp::Element* root);
-
-        /** @return hostname to contact. */
         inline const std::string& hostname() const
-	    { return mHostname; }
+        { return mHostname; }
 
         /**
-         * Set the current hostname.
-         *
+         * @brief Set the current hostname.
          * @param hostname the new hostname.
          */
         inline void hostname(const std::string& hostname)
-	    { mHostname.assign(hostname); }
-
-        /** @return host port to listen. */
-        inline int port() const { return mPort; }
+        { mHostname.assign(hostname); }
 
         /**
-         * Set the current port.
-         *
+         * @return host port to listen.
+         */
+        inline int port() const
+        { return mPort; }
+
+        /**
+         * @brief Set the current port.
          * @param port the new port.
          */
-        inline void port(int port) { mPort = port; }
-
-        /** @return number of authorized process on host. */
-        inline int process() const { return mProcess; }
+        inline void port(int port)
+        { mPort = port; }
 
         /**
-         * Set the current process.
-         *
+         * @return number of authorized process on host.
+         */
+        inline int process() const
+        { return mProcess; }
+
+        /**
+         * @brief Set the current process.
          * @param process the new process.
          */
-        inline void process(int process) { mProcess = process; }
+        inline void process(int process)
+        { mProcess = process; }
 
         /**
          * Compare two host, all member must be the same using only the
@@ -121,7 +110,7 @@ namespace vle { namespace utils {
          * @return true if host equal *this.
          */
         inline bool operator==(const Host& host) const
-	    { return mHostname == host.hostname(); }
+        { return mHostname == host.hostname(); }
 
         /**
          * Compare two host and return the mimum using only the hostname.
@@ -130,7 +119,7 @@ namespace vle { namespace utils {
          * @return true if *this < host.
          */
         inline bool operator<(const Host& host) const
-	    { return mHostname < host.hostname(); }
+        { return mHostname < host.hostname(); }
 
     private:
         std::string mHostname; /// An ascii hostname or ip address.
@@ -147,17 +136,20 @@ namespace vle { namespace utils {
     {
     public:
         typedef std::set < Host > SetHosts;
+        typedef SetHosts::const_iterator const_iterator;
+        typedef SetHosts::iterator iterator;
+        typedef SetHosts::size_type size_type;
 
         /**
-         * Construct a new hosts with empty hosts set.
-         *
+         * @brief Construct a new hosts with empty hosts set.
          */
-        Hosts() : mIsModified(false) { }
+        Hosts()
+            : mIsModified(false)
+        {}
 
         /**
-         * If use modify the hosts set, then it is deleted in descructor
+         * @brief If use modify the hosts set, then it is deleted in descructor
          * function.
-         *
          */
         ~Hosts();
 
@@ -165,43 +157,44 @@ namespace vle { namespace utils {
          * Parse XML hosts file.
          *
          */
-        void read_file();
+        void read();
 
         /**
          * Write XML hosts file.
-         *
          */
-        void write_file();
+        void write();
 
         /**
-         * Push a new host into the set.
-         *
+         * @brief Push a new host into the set.
          * @param host a new host to push into list.
          */
-        void push_host(const Host& host);
+        void add(const Host& host);
 
         /**
-         * Remove a host with hostname equivalent.
-         *
+         * @brief Remove a host with hostname equivalent.
          * @param hostname the name of host to delete.
          */
-        void remove_host(const std::string& hostname);
+        void del(const std::string& hostname);
 
         /**
-         * Get a host with specified hostname.
-         *
+         * @brief Get a host with specified hostname.
          * @param hostname the name of host to find.
          * @return Host reasearch.
-         * @throw Exception::Interal if host not found.
+         * @throw utils::InternalError if host not found.
          */
-        const Host& get_host(const std::string& hostname) const;
+        const Host& get(const std::string& hostname) const;
 
-        /** @return user hosts filename. */
-        static Glib::ustring get_hosts_filename();
-
-        /** @return hosts bases. */
+        /**
+         *  @return hosts bases.
+         */
         inline const SetHosts& hosts() const
-	    { return mHosts; }
+        { return mHosts; }
+
+        const_iterator begin() const { return mHosts.begin(); }
+        iterator end() const { return mHosts.end(); }
+        const_iterator begin() { return mHosts.begin(); }
+        iterator end() { return mHosts.end(); }
+        size_type size() const { return mHosts.size(); }
 
     private:
         SetHosts        mHosts;

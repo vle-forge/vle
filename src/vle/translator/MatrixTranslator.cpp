@@ -35,6 +35,7 @@
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/graph/CoupledModel.hpp>
 #include <boost/format.hpp>
+#include <boost/cast.hpp>
 
 namespace vle { namespace translator {
 
@@ -65,11 +66,6 @@ unsigned int MatrixTranslator::getSize(unsigned int i) const
             "MatrixTranslator: unknow size '%1%'")) % i);
 
     return it->second;
-}
-
-xmlpp::Element* MatrixTranslator::getRoot() const
-{
-    return m_root;
 }
 
 bool MatrixTranslator::existModel(unsigned int i, unsigned int j)
@@ -116,114 +112,93 @@ std::string MatrixTranslator::getName(unsigned int i, unsigned int j) const
     return std::string();
 }
 
-void MatrixTranslator::parseXML(const std::string& buffer)
+void MatrixTranslator::parseXML(const value::Value& value)
 {
-    m_parser.parse_memory(buffer);
-    m_root = utils::xml::get_root_node(m_parser, "celldevs");
+    const value::Map& root = value::toMapValue(value);
 
-    xmlpp::Element* grid = utils::xml::get_children(m_root, "grid");
-    xmlpp::Node::NodeList lst = grid->get_children("dim");
-    xmlpp::Node::NodeList::iterator it;
-
-    for (it = lst.begin(); it != lst.end(); ++it) {
-        unsigned int dim = boost::lexical_cast < unsigned int
-            >((utils::xml::get_attribute((xmlpp::Element*)(*it), "axe")));
-        unsigned int number = boost::lexical_cast < unsigned int
-            >((utils::xml::get_attribute((xmlpp::Element*)(*it), "number")));
-
-        m_size[dim] = number;
-
-        if (m_dimension < dim) m_dimension = dim;
+    {
+        const value::Tuple& grid = value::toTupleValue(root.get("grid"));
+        m_dimension = grid.size() - 1;
+        int dim = 0;
+        for (value::Tuple::const_iterator it = grid.value().begin(); it !=
+             grid.value().end(); ++it, ++dim) {
+            m_size[dim] = boost::numeric_cast < int >(*it);
+        }
     }
 
-    xmlpp::Element* cells = utils::xml::get_children(m_root, "cells");
-
-    if (utils::xml::exist_attribute(cells , "connectivity")) {
-        std::string s = utils::xml::get_attribute(cells , "connectivity");
-
-        if (s == "von neumann")
+    {
+        const value::Map& cells = value::toMapValue(root.get("cells"));
+        const std::string& connectivity = cells.getString("connectivity");
+        if (connectivity == "von neumann") {
             m_connectivity = VON_NEUMANN;
-        else if (s == "moore")
+        } else if (connectivity == "moore") {
             m_connectivity = MOORE;
-    } else
-        m_connectivity = LINEAR;
-
-    if (utils::xml::exist_attribute(cells, "symmetricport")) {
-        m_symmetricport = utils::to_boolean(
-            utils::xml::get_attribute(cells, "symmetricport"));
-    } else {
-        m_symmetricport = false;
-    }
-
-    if (utils::xml::exist_attribute(cells , "library")) {
-        m_library = utils::xml::get_attribute(cells , "library");
-
-        if (utils::xml::exist_attribute(cells , "model"))
-            m_model = utils::xml::get_attribute(cells , "model");
-
-        m_multipleLibrary = false;
-    } else {
-        xmlpp::Element* libraries = utils::xml::get_children(cells,
-                                                             "libraries");
-        xmlpp::Node::NodeList lst = libraries->get_children("library");
-        xmlpp::Node::NodeList::iterator it;
-
-        for (it = lst.begin(); it != lst.end(); ++it) {
-            unsigned int index = boost::lexical_cast < unsigned int >(
-                (utils::xml::get_attribute((xmlpp::Element*)(*it)
-                                           , "index")));
-            std::string name = utils::xml::get_attribute(
-                (xmlpp::Element*)(*it), "name").c_str();
-            std::string model;
-
-            if (utils::xml::exist_attribute((xmlpp::Element*)(*it), "model"))
-                model = utils::xml::get_attribute(
-                    (xmlpp::Element*)(*it), "model").c_str();
-
-            m_libraries[index] = std::pair < std::string, std::string >(name,
-                                                                        model);
+        } else {
+            m_connectivity = LINEAR;
         }
 
-        m_multipleLibrary = true;
-    }
+        if (cells.existValue("symmetricport")) {
+            m_symmetricport = cells.getBoolean("symmetricport");
+        }
+        m_prefix = cells.getString("prefix");
 
-    xmlpp::Element* prefix = utils::xml::get_children(cells, "prefix");
+        if (cells.existValue("library")) {
+            m_library = cells.getString("library");
 
-    m_prefix = prefix->get_child_text()->get_content();
+            if (cells.existValue("model")) {
+                m_model = cells.getString("model");
+            }
+            m_multipleLibrary = false;
+        } else if (cells.existValue("libraries")) {
+            int index = 0;
+            const value::Set& libraries = cells.getSet("libraries");
+            for (value::Set::const_iterator it = libraries.begin();
+                 it != libraries.end(); ++it, ++index) {
+                const value::Map* library = value::toMapValue(*it);
 
-    if (utils::xml::exist_children(cells , "init")) {
-        if (m_dimension == 0) m_init = new unsigned int[m_size[0]];
-        else m_init = new unsigned int[m_size[0]*m_size[1]];
+                const std::string& lib = library->getString("library");
 
-        std::string init = utils::xml::get_children(cells, "init")
-            ->get_child_text()->get_content();
+                if (library->existValue("model")) {
+                    const std::string& model = library->getString("model");
+                    m_libraries[index] = std::make_pair(lib, model);
+                } else {
+                    m_libraries[index] = std::make_pair(lib, "");
+                }
+            }
+            m_multipleLibrary = true;
+        }
 
-        std::vector < std:: string > lst;
+        if (cells.existValue("init")) {
+            if (m_dimension == 0) {
+                m_init = new unsigned int[m_size[0]];
+            } else {
+                m_init = new unsigned int[m_size[0]*m_size[1]];
+            }
 
-        boost::trim(init);
+            const value::Tuple& init = value::toTupleValue(cells.get("init"));
+            unsigned int i = 0;
 
-        boost::split(lst, init, boost::is_any_of(" \n\t"),
-                     boost::algorithm::token_compress_on);
-
-        std::vector < std:: string >::const_iterator it = lst.begin();
-
-        unsigned int i = 0;
-
-        while (it != lst.end()) {
-            m_init[i] = boost::lexical_cast < unsigned int >(*it);
-            ++it;
-            ++i;
+            for (value::Tuple::const_iterator it = init.value().begin(); it !=
+                 init.value().end(); ++it) {
+                m_init[i] = boost::numeric_cast < unsigned int >(*it);
+                ++i;
+            }
         }
     }
 }
 
-void MatrixTranslator::translate(const std::string& buffer)
+void MatrixTranslator::translate(const value::Value& buffer)
 {
-    parseXML(buffer);
+    try {
+        parseXML(buffer);
 
-    translateDynamics();
-    translateConditions();
-    translateStructures();
+        translateDynamics();
+        translateConditions();
+        translateStructures();
+    } catch (const std::exception& e) {
+        throw utils::InternalError(fmt(
+                _("Matrix translator error: %1%")) % e.what());
+    }
 }
 
 void MatrixTranslator::translateModel(unsigned int i,

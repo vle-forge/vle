@@ -34,7 +34,6 @@
 #include <vle/value/Boolean.hpp>
 #include <vle/value/String.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/utils/XML.hpp>
 
 
 namespace vle { namespace devs {

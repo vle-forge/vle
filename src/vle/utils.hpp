@@ -39,7 +39,6 @@
 #include <vle/utils/Socket.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
-#include <vle/utils/XML.hpp>
 
 
 

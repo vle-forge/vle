@@ -31,7 +31,6 @@
 #include <vle/manager/TotalExperimentGenerator.hpp>
 #include <vle/manager/LinearExperimentGenerator.hpp>
 #include <vle/oov/PluginFactory.hpp>
-#include <vle/utils/XML.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Socket.hpp>
 #include <vle/utils/Trace.hpp>
@@ -197,7 +196,7 @@ ManagerRunDistant::ManagerRunDistant(std::ostream& out, bool writefile,
     ManagerRun(out, writefile, rnd)
 {
     try {
-        mHost.read_file();
+        mHost.read();
     } catch(const std::exception& e) {
         m_out << fmt(_("manager parsing host file error: %1%\n")) % e.what();
     }

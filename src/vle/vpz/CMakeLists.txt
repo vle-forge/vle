@@ -3,11 +3,11 @@ INCLUDE_DIRECTORIES(
   ${VLE_SOURCE_DIR}/src
   ${Boost_INCLUDE_DIRS}
   ${GLIBMM_INCLUDE_DIRS}
-  ${LIBXMLPP_INCLUDE_DIRS})
+  ${LIBXML_INCLUDE_DIRS})
 
 LINK_DIRECTORIES(
   ${GLIBMM_LIBRARY_DIRS}
-  ${LIBXMLPP_LIBRARY_DIR})
+  ${LIBXML_LIBRARY_DIR})
 
 SET(VPZ_CPP AtomicModels.cpp Class.cpp Classes.cpp Condition.cpp Conditions.cpp
   Dynamic.cpp Dynamics.cpp Experiment.cpp Model.cpp Observable.cpp
@@ -28,7 +28,7 @@ SET_TARGET_PROPERTIES(vlevpz PROPERTIES OUTPUT_NAME
 
 TARGET_LINK_LIBRARIES(vlevpz
   ${GLIBMM_LIBRARIES}
-  ${LIBXMLPP_LIBRARIES}
+  ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   vlegeometry
   vleutils

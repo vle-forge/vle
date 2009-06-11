@@ -25,7 +25,6 @@
 
 #include <vle/manager/ExperimentGenerator.hpp>
 #include <vle/vpz/Conditions.hpp>
-#include <vle/utils/XML.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/value/Set.hpp>
 #include <fstream>

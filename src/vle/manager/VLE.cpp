@@ -36,6 +36,7 @@
 #include <vle/vpz/Vpz.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/devs/Event.hpp>
+#include <vle/utils/Path.hpp>
 
 #include <glibmm/optioncontext.h>
 #include <iostream>

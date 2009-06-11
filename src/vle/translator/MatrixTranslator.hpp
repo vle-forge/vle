@@ -27,7 +27,6 @@
 #define VLE_TRANSLATOR_MATRIXTRANSLATOR_HPP
 
 #include <vle/devs/Executive.hpp>
-#include <vle/utils/XML.hpp>
 #include <string>
 #include <vector>
 
@@ -38,6 +37,44 @@ namespace vle { namespace translator {
      * specific libraries.
      *
      * @code
+     * <map>
+     *  <key name="grid">
+     *   <tuple>11 7</tuple>
+     *  </key>
+     *  <key name="cells">
+     *   <map>
+     *    <key name="connectivity"><string>neuman|moore</string></key>
+     *    <key name="symmetricport"><boolean>0|1</boolean></key>
+     *    <key name="prefix"><string>cell</string></key>
+     *    <key name="library"><string>libcellule</string>/key>
+     *    <key name="model"><string>model</string>/key>
+     *    <!-- or -->
+     *    <key name="libraries">
+     *     <set>
+     *      <map>
+     *       <key name="library"><string>lib1</string></key>
+     *      </map>
+     *      <map>
+     *       <key name="library"><string>lib2</string></key>
+     *       <key name="model"><string>model</string></key>
+     *      </map>
+     *     </set>
+     *    </key>
+     *    <key name="init">
+     *     <tuple>
+     *    0 0 0 1 1 2 2 2 1 1 0
+     *    0 0 0 0 1 1 2 1 1 1 0
+     *    0 0 0 0 0 1 1 1 1 0 0
+     *    0 0 0 0 0 0 1 1 0 0 0
+     *    0 0 0 0 0 0 0 0 0 0 0
+     *    0 0 0 0 0 0 0 0 0 0 0
+     *    0 0 0 0 0 0 0 0 0 0 0
+     *     </tuple>
+     *    </key>
+     *   </map>
+     *  </key>
+     * </map>
+     *
      * <?xml version="1.0" ?>
      * <celldevs>
      *  <grid>
@@ -78,8 +115,7 @@ namespace vle { namespace translator {
 	std::string getName(unsigned int i, unsigned int j = 0) const;
 	graph::AtomicModel* getModel(const std::string& name) const;
 	unsigned int getSize(unsigned int i) const;
-	xmlpp::Element* getRoot() const;
-        void translate(const std::string& buffer);
+        void translate(const value::Value& buffer);
 
     private:
         typedef enum { VON_NEUMANN, MOORE, LINEAR } connectivity_type;
@@ -99,13 +135,11 @@ namespace vle { namespace translator {
         unsigned int* m_init;
         std::map < std::string , graph::AtomicModel* > m_models;
         bool m_symmetricport;
-        xmlpp::Element* m_root;
-        xmlpp::DomParser m_parser;
 
         bool existModel(unsigned int i, unsigned int j = 0);
         std::string getDynamics(unsigned int i, unsigned int j = 0);
 
-        void parseXML(const std::string& buffer);
+        void parseXML(const value::Value& value);
         void translateModel(unsigned int i,
                             unsigned int j);
         void translateSymmetricConnection2D(unsigned int i,

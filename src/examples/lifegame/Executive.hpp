@@ -44,7 +44,7 @@ namespace vle { namespace examples { namespace lifegame {
         virtual vle::devs::Time init(const vle::devs::Time& time);
 
     private:
-        std::string m_buffer;
+        value::Value* m_buffer;
     };
 
 }}} // namespace vle examples lifegame

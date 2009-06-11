@@ -57,7 +57,7 @@ public:
      * @return The value of the attribute
      */
     std::string getAttributes(const std::string& section,
-			      const std::string& key);
+                              const std::string& key);
 
     /**
      * @brief Set the value of an attribute
@@ -66,8 +66,8 @@ public:
      * @param value The value of the attribute
      */
     void setAttributes(const std::string& section,
-			      const std::string& key,
-			      const std::string& value);
+                       const std::string& key,
+                       const std::string& value);
 
 private:
     std::fstream      m_file;

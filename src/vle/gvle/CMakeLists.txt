@@ -5,19 +5,19 @@ INCLUDE_DIRECTORIES(
   ${GLADEMM_INCLUDE_DIRS}
   ${GTKMM_INCLUDE_DIRS}
   ${GTHREAD_INCLUDE_DIRS}
-  ${LIBXMLPP_INCLUDE_DIRS}
+  ${LIBXML_INCLUDE_DIRS}
   ${GTKSOURCEVIEWMM_INCLUDE_DIRS})
 
 LINK_DIRECTORIES(
   ${GLADEMM_LIBRARY_DIRS}
   ${GTKMM_LIBRARY_DIRS}
   ${GTHREAD_LIBRARY_DIRS}
-  ${LIBXMLPP_LIBRARY_DIR}
+  ${LIBXML_LIBRARY_DIR}
   ${GTKSOURCEVIEWMM_LIBRARY_DIRS})
 
 SET(GVLE_HPP About.hpp AtomicModelBox.hpp BooleanBox.hpp CalendarBox.hpp
   ComboboxString.hpp ConditionsBox.hpp ConditionPlugin.hpp ConnectionBox.hpp
-  CoupledModelBox.hpp CutCopyPaste.hpp Data.hpp DialogString.hpp DynamicBox.hpp
+  CoupledModelBox.hpp CutCopyPaste.hpp DialogString.hpp DynamicBox.hpp
   ExecutionBox.hpp ExperimentBox.hpp GVLE.hpp GVLEMenuAndToolbar.hpp
   HelpBox.hpp HostsBox.hpp ImportClassesBox.hpp ImportModelBox.hpp
   InteractiveTypeBox.hpp LaunchSimulationBox.hpp MatrixBox.hpp Message.hpp
@@ -33,7 +33,7 @@ SET(GVLE_HPP About.hpp AtomicModelBox.hpp BooleanBox.hpp CalendarBox.hpp
 
 SET(GVLE_CPP About.cpp AtomicModelBox.cpp BooleanBox.cpp CalendarBox.cpp
   ConditionsBox.cpp ConditionPlugin.cpp ConnectionBox.cpp CoupledModelBox.cpp
-  CutCopyPaste.cpp Data.cpp DialogString.cpp DynamicBox.cpp ExecutionBox.cpp
+  CutCopyPaste.cpp DialogString.cpp DynamicBox.cpp ExecutionBox.cpp
   ExperimentBox.cpp GVLE.cpp GVLEMenuAndToolbar.cpp HelpBox.cpp HostsBox.cpp
   ImportClassesBox.cpp ImportModelBox.cpp InteractiveTypeBox.cpp
   LaunchSimulationBox.cpp MatrixBox.cpp Message.cpp ModelClassBox.cpp

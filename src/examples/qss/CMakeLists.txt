@@ -3,12 +3,12 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_SOURCE_DIR}/src
   ${Boost_INCLUDE_DIRS}
   ${GLIBMM_INCLUDE_DIRS}
-  ${LIBXMLPP_INCLUDE_DIRS}
+  ${LIBXML_INCLUDE_DIRS}
   ${CMAKE_SOURCE_DIR}/src/examples/qss)
 
 LINK_DIRECTORIES(
   ${GLIBMM_LIBRARY_DIRS}
-  ${LIBXMLPP_LIBRARY_DIR}
+  ${LIBXML_LIBRARY_DIR}
   ${Boost_LIBRARY_DIRS})
 
 SET(SOURCES_CPP ladybirdplantlouse.cpp ladybirdplantlouse.hpp plantlouse.cpp
@@ -20,7 +20,7 @@ ADD_LIBRARY(ladybirdplantlouse SHARED ${SOURCES_CPP})
 
 TARGET_LINK_LIBRARIES(ladybirdplantlouse
   ${GLIBMM_LIBRARIES}
-  ${LIBXMLPP_LIBRARIES}
+  ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   vlegeometry
   vleutils

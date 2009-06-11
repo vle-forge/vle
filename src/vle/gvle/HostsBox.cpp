@@ -25,10 +25,8 @@
 
 #include <vle/gvle/HostsBox.hpp>
 #include <vle/gvle/Message.hpp>
-#include <vle/utils/XML.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Socket.hpp>
-#include <libxml++/libxml++.h>
 #include <glibmm/thread.h>
 #include <gtkmm/stock.h>
 
@@ -210,7 +208,7 @@ HostsBox::~HostsBox()
 void HostsBox::run()
 {
     if (mDialog->run() == Gtk::RESPONSE_OK) {
-        mHosts.write_file();
+        mHosts.write();
     }
 }
 
@@ -218,22 +216,6 @@ int HostsBox::test_vle_existence(const Glib::ustring&, int)
 {
     // FIXME
     return -1;
-}
-
-bool HostsBox::build_only_localhost_user_hosts_file()
-{
-    Glib::ustring filename(get_hosts_filename());
-    if (utils::exist_file(filename) == false) {
-        xmlpp::Document doc;
-        xmlpp::Element* root = doc.create_root_node("HOSTS");
-        xmlpp::Element* host = root->add_child("HOST");
-        host->set_attribute("HOSTNAME", "localhost");
-        host->set_attribute("PORT", "8000");
-        host->set_attribute("PROCESS", "1");
-        doc.write_to_file_formatted(filename);
-        return true;
-    }
-    return false;
 }
 
 Glib::ustring HostsBox::get_hosts_filename()
@@ -244,16 +226,9 @@ Glib::ustring HostsBox::get_hosts_filename()
 void HostsBox::init_hosts()
 {
     try {
-        mHosts.read_file();
+        mHosts.read();
     } catch (const utils::InternalError& e) {
-        gvle::Error((fmt(
-                         "Error parsing file %1%\n%2%.") %
-                     utils::Hosts::get_hosts_filename() %
-                     e.what()).str());
-    } catch (const xmlpp::exception& e) {
-        gvle::Error((fmt(
-                         "Error reading file %1%\n%2%.") %
-                     utils::Hosts::get_hosts_filename() %
+        gvle::Error((fmt("Error parsing conf file\n%1%.") %
                      e.what()).str());
     }
     redraw();
@@ -264,7 +239,7 @@ void HostsBox::addHost()
     utils::Host newhost;
     mHostInformation.clear();
     if (mHostInformation.run(newhost) == true) {
-        mHosts.push_host(newhost);
+        mHosts.add(newhost);
         redraw();
     }
 }
@@ -276,11 +251,11 @@ void HostsBox::modifyHost(const Gtk::TreeModel::Path& /*path*/,
     Gtk::TreeModel::iterator it = selection->get_selected();
     if (it) {
         Gtk::TreeModel::Row row = *it;
-        utils::Host newhost(mHosts.get_host(row[mColumn.mHostname]));
-        mHosts.remove_host(row[mColumn.mHostname]);
+        utils::Host newhost(mHosts.get(row[mColumn.mHostname]));
+        mHosts.del(row[mColumn.mHostname]);
         mHostInformation.init(newhost);
         mHostInformation.run(newhost);
-        mHosts.push_host(newhost);
+        mHosts.add(newhost);
         redraw();
     }
 }
@@ -291,7 +266,7 @@ void HostsBox::delHost()
     Gtk::TreeModel::iterator it = selection->get_selected();
     if (it) {
         Gtk::TreeModel::Row row = *it;
-        mHosts.remove_host(row[mColumn.mHostname]);
+        mHosts.del(row[mColumn.mHostname]);
         mListStore->erase(it);
     }
     redraw();

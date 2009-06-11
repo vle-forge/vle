@@ -26,8 +26,7 @@
 #ifndef VLE_VPZ_SAXPARSER_HPP
 #define VLE_VPZ_SAXPARSER_HPP
 
-#include <stack>
-#include <libxml++/libxml++.h>
+#include <libxml/SAX2.h>
 #include <vle/vpz/Base.hpp>
 #include <vle/vpz/SaxStackValue.hpp>
 #include <vle/vpz/SaxStackVpz.hpp>
@@ -40,10 +39,10 @@ namespace vle { namespace vpz {
     class Vpz;
 
     /**
-     * @brief The SaxParser inherits from the xmlpp::SaxParser class of the
-     * libxml++ library which implements a SAX2 parser.
+     * @brief The SaxParser is a C/C++ interface between the libxml-2.0 and the
+     * VLE classes vpz.
      */
-    class SaxParser : public xmlpp::SaxParser
+    class SaxParser
     {
     public:
         /**
@@ -55,86 +54,27 @@ namespace vle { namespace vpz {
         /**
          * @brief Nothing to delete.
          */
-        virtual ~SaxParser()
-        {}
+        virtual ~SaxParser() {}
+
+        /**
+         * @brief Open the VPZ file and parse it with libxml2 SAX2 interface.
+         * @param filename The name of the file to parse.
+         * @throw utils::SaxError if the file is not readable.
+         */
+        void parseFile(const std::string& filename);
+
+        /**
+         * @brief Open the VPZ file and parse it with libxml2 SAX2 interface.
+         * @param buffer the buffer to process.
+         * @throw utils::SaxError if the buffer is not readable.
+         */
+        void parseMemory(const std::string& buffer);
 
         /**
          * @brief Delete all information from Sax parser like stack, etc. Use it
          * before restart a new parse.
          */
         void clearParserState();
-
-        /**
-         * @brief When read a start document tag.
-         */
-        virtual void on_start_document();
-
-        /**
-         * @brief When read a end document tag.
-         */
-        virtual void on_end_document();
-
-        /**
-         * @brief When read a start element.
-         * @param name the name of the element.
-         * @param attributes the list of attributes.
-         */
-        virtual void on_start_element(const Glib::ustring& name,
-                                      const AttributeList& attributes);
-
-        /**
-         * @brief When read an end element.
-         * @param name the name if the element.
-         */
-        virtual void on_end_element(const Glib::ustring& name);
-
-        /**
-         * @brief When read characters in an element.
-         * @param characters all data in characters.
-         */
-        virtual void on_characters(const Glib::ustring& characters);
-
-        /**
-         * @brief When read a comment.
-         * @param text the comment.
-         */
-        virtual void on_comment(const Glib::ustring& text);
-
-        /**
-         * @brief When a warning appear in Sax parser.
-         * @param text the comment.
-         */
-        virtual void on_warning(const Glib::ustring& text);
-
-        /**
-         * @brief When an error appear in Sax parser.
-         * @param text the comment.
-         */
-        virtual void on_error(const Glib::ustring& text);
-
-        /**
-         * @brief When an fatal error appear in Sax parser.
-         * @param text the comment.
-         */
-        virtual void on_fatal_error(const Glib::ustring& text);
-
-        /**
-         * @brief When a cdata is readed.
-         * @param text the comment.
-         */
-        virtual void on_cdata_block(const Glib::ustring& text);
-
-        /**
-         * @brief When a validity error appear in Sax parser.
-         * @param text the comment.
-         */
-        virtual void on_validity_error(const Glib::ustring& text);
-
-        /**
-         * @brief When an validity warning appear in Sax parser.
-         * @param text the comment.
-         */
-        virtual void on_validity_warning(const Glib::ustring& text);
 
         /**
          * @brief Return true if the SaxParser have read a value.
@@ -184,6 +124,25 @@ namespace vle { namespace vpz {
         { return m_vpz; }
 
     private:
+        static void onStartDocument(void* ctx);
+
+        static void onEndDocument(void* ctx);
+
+        static void onStartElement(void* ctx, const xmlChar* name,
+                                   const xmlChar** atts);
+
+        static void onEndElement(void* ctx, const xmlChar* att);
+
+        static void onCharacters(void* ctx, const xmlChar* ch, int len);
+
+        static void onCDataBlock(void* ctx, const xmlChar* value, int len);
+
+        static void onWarning(void *user_data, const char *msg, ...);
+
+        static void onError(void *user_data, const char *msg, ...);
+
+        static void onFatalError(void *user_data, const char *msg, ...);
+
         /**
          * @brief Get the last characters from internal buffer.
          * @return A characters buffer.
@@ -197,61 +156,73 @@ namespace vle { namespace vpz {
 
         void addToCharacters(const Glib::ustring& characters);
 
-        SaxStackVpz                     m_vpzstack;
-        ValueStackSax                   m_valuestack;
-        Glib::ustring                   m_lastCharacters;
-        Glib::ustring                   m_cdata;
-        Vpz&                            m_vpz;
+        void stopParser(const std::string& error);
+        bool isStopped() const { return m_stop; }
 
-        bool                            m_isValue;
-        bool                            m_isVPZ;
+        xmlSAXHandler m_sax;
+        bool          m_stop;
+        std::string   m_error;
+        SaxStackVpz   m_vpzstack;
+        ValueStackSax m_valuestack;
+        Glib::ustring m_lastCharacters;
+        Glib::ustring m_cdata;
+        Vpz&          m_vpz;
 
-        typedef void (SaxParser::* startfunc)(const AttributeList&);
+        bool          m_isValue;
+        bool          m_isVPZ;
+
+        struct XmlCompare
+        {
+            inline bool operator()(const xmlChar* s1, const xmlChar* s2) const
+            { return xmlStrcmp(s1, s2) < 0; }
+        };
+
+        typedef void (SaxParser::* startfunc)(const xmlChar**);
         typedef void (SaxParser::* endfunc)();
-        typedef std::map < std::string, startfunc > StartFuncList;
-        typedef std::map < std::string, endfunc > EndFuncList;
+        typedef std::map < const xmlChar*, startfunc, XmlCompare > StartFuncList;
+        typedef std::map < const xmlChar*, endfunc, XmlCompare > EndFuncList;
 
         StartFuncList   m_starts;
         EndFuncList     m_ends;
 
-        void onBoolean(const AttributeList& att);
-        void onInteger(const AttributeList& att);
-        void onDouble(const AttributeList& att);
-        void onString(const AttributeList& att);
-        void onSet(const AttributeList& att);
-        void onMatrix(const AttributeList& att);
-        void onMap(const AttributeList& att);
-        void onKey(const AttributeList& att);
-        void onTuple(const AttributeList& att);
-        void onTable(const AttributeList& att);
-        void onXML(const AttributeList& att);
-        void onNull(const AttributeList& att);
-        void onVLEProject(const AttributeList& att);
-        void onStructures(const AttributeList& att);
-        void onModel(const AttributeList& att);
-        void onIn(const AttributeList& att);
-        void onOut(const AttributeList& att);
-        void onPort(const AttributeList& att);
-        void onSubModels(const AttributeList& att);
-        void onConnections(const AttributeList& att);
-        void onConnection(const AttributeList& att);
-        void onOrigin(const AttributeList& att);
-        void onDestination(const AttributeList& att);
-        void onDynamics(const AttributeList& att);
-        void onDynamic(const AttributeList& att);
-        void onExperiment(const AttributeList& att);
-        void onReplicas(const AttributeList& att);
-        void onConditions(const AttributeList& att);
-        void onCondition(const AttributeList& att);
-        void onViews(const AttributeList& att);
-        void onOutputs(const AttributeList& att);
-        void onOutput(const AttributeList& att);
-        void onView(const AttributeList& att);
-        void onObservables(const AttributeList& att);
-        void onObservable(const AttributeList& att);
-        void onAttachedView(const AttributeList& att);
-        void onClasses(const AttributeList& att);
-        void onClass(const AttributeList& att);
+        void onBoolean(const xmlChar** att);
+        void onInteger(const xmlChar** att);
+        void onDouble(const xmlChar** att);
+        void onString(const xmlChar** att);
+        void onSet(const xmlChar** att);
+        void onMatrix(const xmlChar** att);
+        void onMap(const xmlChar** att);
+        void onKey(const xmlChar** att);
+        void onTuple(const xmlChar** att);
+        void onTable(const xmlChar** att);
+        void onXML(const xmlChar** att);
+        void onNull(const xmlChar** att);
+        void onVLEProject(const xmlChar** att);
+        void onStructures(const xmlChar** att);
+        void onModel(const xmlChar** att);
+        void onIn(const xmlChar** att);
+        void onOut(const xmlChar** att);
+        void onPort(const xmlChar** att);
+        void onSubModels(const xmlChar** att);
+        void onConnections(const xmlChar** att);
+        void onConnection(const xmlChar** att);
+        void onOrigin(const xmlChar** att);
+        void onDestination(const xmlChar** att);
+        void onDynamics(const xmlChar** att);
+        void onDynamic(const xmlChar** att);
+        void onExperiment(const xmlChar** att);
+        void onReplicas(const xmlChar** att);
+        void onConditions(const xmlChar** att);
+        void onCondition(const xmlChar** att);
+        void onViews(const xmlChar** att);
+        void onOutputs(const xmlChar** att);
+        void onOutput(const xmlChar** att);
+        void onView(const xmlChar** att);
+        void onObservables(const xmlChar** att);
+        void onObservable(const xmlChar** att);
+        void onAttachedView(const xmlChar** att);
+        void onClasses(const xmlChar** att);
+        void onClass(const xmlChar** att);
 
         void onEndBoolean();
         void onEndInteger();
@@ -292,10 +263,10 @@ namespace vle { namespace vpz {
         void onEndClasses();
         void onEndClass();
 
-        void add(const std::string& name, startfunc fct, endfunc efct)
+        void add(const char* name, startfunc fct, endfunc efct)
         {
-            m_starts[name] = fct;
-            m_ends[name] = efct;
+            m_starts[(const xmlChar*)name] = fct;
+            m_ends[(const xmlChar*)name] = efct;
         }
 
         void fillTagList()
@@ -353,85 +324,30 @@ namespace vle { namespace vpz {
     };
 
     /**
-     * @brief A template function de get a value of an attribute from an
-     * attribute list. The value of the attribute found is casted in template by
-     * the boost::lexical_cast function.
-     * @param lst the list of attribute to search an attribute
-     * @param name the name of the attribute to get value
-     * @return the value of the attribute.
-     * @throw utils::SaxParserError if the attribute was not found or if the
-     * boost::lexical_cast failed.
+     * @brief Convert the xmlChar pointer to a char pointer.
+     * @param str The constant xmlChar pointer to cast.
+     * @return A constant char pointer to cast.
      */
-    template < typename T >
-        inline T getAttribute(const AttributeList& lst,
-                              const Glib::ustring& name)
-        {
-            AttributeList::const_iterator it;
-            it = std::find_if(lst.begin(), lst.end(),
-                              xmlpp::SaxParser::AttributeHasName(name));
-            Assert < utils::SaxParserError >(it != lst.end(),
-                   (fmt(_("Unknow attribute '%1%'")) % name).str());
-
-            T result;
-            try {
-                result = boost::lexical_cast < T >((*it).value);
-            } catch(const std::exception& e) {
-                throw(utils::SaxParserError(fmt(_(
-                                "Cannot convert '%1%' into desired type: %2%")) %
-                        name % e.what()));
-            }
-            return result;
-        }
+    inline const char* xmlCharToString(const xmlChar* str)
+    { return (const char*)str; }
 
     /**
-     * @brief A template specialization function de get a Glib::ustring value of
-     * an attribute from an attribute list.
-     * @param lst the list of attribute to search an attribute
-     * @param name the name of the attribute to get value
-     * @return the value of the attribute.
-     * @throw utils::SaxParserError if the attribute was not found.
+     * @brief Convert the xmlChar pointer to a long integer.
+     * @param str The constant xmlChat pointer to translate.
+     * @throw utils::SaxParserError if the xmlChar can not be translated into a
+     * long integer.
+     * @return The long integer.
      */
-    template <>
-        inline Glib::ustring getAttribute < Glib::ustring >(
-            const AttributeList& lst, const Glib::ustring& name)
-        {
-            AttributeList::const_iterator it;
-            it = std::find_if(lst.begin(), lst.end(),
-                              xmlpp::SaxParser::AttributeHasName(name));
-            Assert < utils::SaxParserError >(it != lst.end(),
-                   (fmt(_("Unknow attribute '%1%'")) % name).str());
-
-            return it->value;
-        }
+    long int xmlCharToInt(const xmlChar* str);
 
     /**
-     * @brief A template specialization function de get a std::string value of
-     * an attribute from an attribute list.
-     * @param lst the list of attribute to search an attribute
-     * @param name the name of the attribute to get value
-     * @return the value of the attribute.
-     * @throw utils::SaxParserError if the attribute was not found.
+     * @brief Convert the xmlChar pointer to a double.
+     * @param str The constant xmlChat pointer to translate.
+     * @throw utils::SaxParserError if the xmlChar can not be translated into a
+     * double
+     * @return The double.
      */
-    template <>
-        inline std::string getAttribute < std::string >(
-            const AttributeList& lst, const Glib::ustring& name)
-        {
-            AttributeList::const_iterator it;
-            it = std::find_if(lst.begin(), lst.end(),
-                              xmlpp::SaxParser::AttributeHasName(name));
-            Assert < utils::SaxParserError >(it != lst.end(),
-                   (fmt(_("Unknow attribute '%1%'")) % name).str());
-
-            return it->value;
-        }
-
-    /**
-     * @brief Search an attribute in an attribute list.
-     * @param lst the list of attribute to search an attribute.
-     * @param name the attribute to search in attribute list.
-     * @return true if the attribute exist in attribute list.
-     */
-    bool existAttribute(const AttributeList& lst, const Glib::ustring& name);
+    double xmlCharToDouble(const xmlChar* str);
 
 }} // namespace vle vpz
 

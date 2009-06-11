@@ -43,6 +43,7 @@
 #include <cstring>
 #include <iomanip>
 #include <iostream>
+#include <libxml/parser.h>
 
 #include <glib.h>
 #include <glib/gstdio.h>
@@ -266,6 +267,8 @@ void buildDaemon()
 
 void init()
 {
+    xmlDefaultSAXHandlerInit();
+
     if (not Glib::thread_supported()) {
         Glib::thread_init();
     }
@@ -287,6 +290,7 @@ void finalize()
 {
     utils::Path::kill();
     utils::Trace::kill();
+    xmlCleanupParser();
 }
 
 void printInformations(std::ostream& out)

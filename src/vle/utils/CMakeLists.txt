@@ -3,11 +3,11 @@ INCLUDE_DIRECTORIES(
   ${VLE_SOURCE_DIR}/src
   ${Boost_INCLUDE_DIRS}
   ${GLIBMM_INCLUDE_DIRS}
-  ${LIBXMLPP_INCLUDE_DIRS})
+  ${LIBXML_INCLUDE_DIRS})
 
 LINK_DIRECTORIES(
   ${GLIBMM_LIBRARY_DIRS}
-  ${LIBXMLPP_LIBRARY_DIR}
+  ${LIBXML_LIBRARY_DIR}
   ${Boost_LIBRARY_DIRS})
 
 IF(WIN32 AND NOT UNIX)
@@ -17,11 +17,11 @@ ELSE(WIN32 AND NOT UNIX)
 ENDIF(WIN32 AND NOT UNIX)
 
 SET(UTILS_CPP Host.cpp Package.cpp Path.cpp Preferences.cpp Rand.cpp Simpson.cpp
-  Socket.cpp SocketImpl.c Tools.cpp Trace.cpp XML.cpp ${OS_SPECIFIC_PATH_IMPL})
+  Socket.cpp SocketImpl.c Tools.cpp Trace.cpp ${OS_SPECIFIC_PATH_IMPL})
 
 SET(UTILS_HPP Algo.hpp Debug.hpp Exception.hpp Host.hpp i18n.hpp Package.hpp
   Path.hpp Pool.hpp Preferences.hpp Rand.hpp Simpson.hpp Socket.hpp Tools.hpp
-  Trace.hpp XML.hpp)
+  Trace.hpp)
 
 ADD_LIBRARY(vleutils SHARED ${UTILS_CPP};${UTILS_HPP})
 
@@ -31,7 +31,7 @@ SET_TARGET_PROPERTIES(vleutils PROPERTIES OUTPUT_NAME
 
 TARGET_LINK_LIBRARIES(vleutils
   ${GLIBMM_LIBRARIES}
-  ${LIBXMLPP_LIBRARIES}
+  ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   ${Boost_FILESYSTEM_LIBRARY}
   ${OS_SPECIFIC_LIBRARIES})

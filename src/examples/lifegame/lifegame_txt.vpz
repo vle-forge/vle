@@ -16,29 +16,19 @@
   <conditions>
    <condition name="cond_executive">
     <port name="translate">
-     <xml><![CDATA[
-	    <celldevs>
-	      <grid>
-		<dim axe="0" number="30" />
-		<dim axe="1" number="30" />
-	      </grid>
-	      <cells connectivity="von neumann" library="lifegame" model="cell">
-		<prefix>cell</prefix>
-<!--		<init>
-		  1 1 1 1 1 1 1 1 1 1
-		  1 1 1 1 1 1 1 1 1 1
-		  1 1 1 1 1 1 1 1 1 1
-		  1 1 1 1 1 1 1 1 1 1
-		  1 1 1 1 1 1 1 1 1 1
-		  1 1 1 1 1 1 1 1 1 1
-		  1 1 1 1 1 1 1 1 1 1
-		  1 1 1 1 1 1 1 1 1 1
-		  1 1 1 1 1 1 1 1 1 1
-		  1 1 1 1 1 1 1 1 1 1
-		</init> !-->
-	      </cells>
-	    </celldevs>
-	    ]]></xml>
+					<map>
+						<key name="grid">
+							<tuple>30 30</tuple>
+						</key>
+						<key name="cells">
+							<map>
+								<key name="connectivity"><string>von neumann</string></key>
+								<key name="library"><string>lifegame</string></key>
+								<key name="model"><string>cell</string></key>
+								<key name="prefix"><string>cell</string></key>
+							</map>
+						</key>
+					</map>
     </port>
    </condition>
    <condition name="cond_cell">

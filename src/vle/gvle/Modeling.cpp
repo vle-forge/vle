@@ -32,13 +32,11 @@
 #include <vle/gvle/ModelDescriptionBox.hpp>
 #include <vle/gvle/DialogString.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/utils/XML.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/graph/Model.hpp>
 #include <vle/graph/CoupledModel.hpp>
-#include <libxml++/libxml++.h>
 #include <gtkmm/stock.h>
 #include <iostream>
 

@@ -154,14 +154,6 @@ public:
                                   int port);
 
     /**
-     * Create user hosts file and fill it with only localhost information.
-     * If a file already exist, do nothing.
-     *
-     * @return true user hosts file is created, false otherwise.
-     */
-    static bool build_only_localhost_user_hosts_file();
-
-    /**
      * Return the user hosts filename.
      *
      * @return user hosts filename.

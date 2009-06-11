@@ -154,20 +154,20 @@ namespace vle { namespace vpz {
         static void fixExtension(std::string& filename);
 
         /**
-         * @brief Use the libxml++ DOM parser to check the validation of the VPZ
-         * file.
+         * @brief Use the libxml-2.0 DOM parser to check the validation of the
+         * VPZ file.
          * @param filename the file name to test.
          * @throw std::exception on error.
          */
         static void validateFile(const std::string& filename);
 
         /**
-         * @brief Use the libxml++ DOM parser to check the validation of the VPZ
-         * buffer.
+         * @brief Use the libxml-2.0 DOM parser to check the validation of the
+         * VPZ buffer.
          * @param buffer the content of the XML.
          * @throw std::exception on error.
          */
-        static void validateMemory(const Glib::ustring& buffer);
+        static void validateMemory(const std::string& buffer);
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *

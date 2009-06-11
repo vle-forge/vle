@@ -3,11 +3,11 @@ INCLUDE_DIRECTORIES(
   ${VLE_SOURCE_DIR}/src
   ${Boost_INCLUDE_DIRS}
   ${GLIBMM_INCLUDE_DIRS}
-  ${LIBXMLPP_INCLUDE_DIRS})
+  ${LIBXML_INCLUDE_DIRS})
 
 LINK_DIRECTORIES(
   ${GLIBMM_LIBRARY_DIRS}
-  ${LIBXMLPP_LIBRARY_DIR})
+  ${LIBXML_LIBRARY_DIR})
 
 SET(DEVS_CPP Coordinator.cpp Dynamics.cpp Event.cpp EventTable.cpp EventView.cpp
   ExternalEvent.cpp Executive.cpp RequestEvent.cpp FinishView.cpp
@@ -30,7 +30,7 @@ SET_TARGET_PROPERTIES(vledevs PROPERTIES OUTPUT_NAME
 
 TARGET_LINK_LIBRARIES(vledevs
   ${GLIBMM_LIBRARIES}
-  ${LIBXMLPP_LIBRARIES}
+  ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   vlegeometry
   vleutils

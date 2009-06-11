@@ -34,15 +34,15 @@ Executive::Executive(const graph::AtomicModel& model,
                      const devs::InitEventList& events) :
     devs::Executive(model, events)
 {
-    m_buffer = value::toXml(events.get("translate"));
+    m_buffer = events.get("translate").clone();
 }
 
 devs::Time Executive::init(const devs::Time& /* time */)
 {
     translator::MatrixTranslator tr(*this);
 
-    tr.translate(m_buffer);
-    m_buffer.clear();
+    tr.translate(*m_buffer);
+    delete m_buffer;
 
     return devs::Time::infinity;
 }

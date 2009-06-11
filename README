@@ -2,7 +2,7 @@ Requirements
 ============
 
 glibmm		2.4.0 http://www.gtkmm.org
-libxml++	2.6.0 http://libxmlplusplus.sourceforge.net
+libxml-2.0      2.0.0 http://xmlsoft.org
 boost		1.32  http://www.boost.org
 cmake		2.4.0 http://www.cmake.org
 

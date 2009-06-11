@@ -27,6 +27,8 @@
 #include <vle/utils/Debug.hpp>
 #include <fstream>
 #include <vle/version.hpp>
+#include <libxml/parser.h>
+#include <libxml/tree.h>
 
 namespace vle { namespace vpz {
 
@@ -57,22 +59,21 @@ void Vpz::write(std::ostream& out) const
 void Vpz::parseFile(const std::string& filename)
 {
     m_filename.assign(filename);
-
     vpz::SaxParser saxparser(*this);
+
     try {
-        saxparser.parse_file(filename);
+        saxparser.parseFile(filename);
     } catch(const std::exception& sax) {
         try {
-            Vpz::validateFile(m_filename);
-        } catch(const xmlpp::exception& dom) {
+            validateFile(filename);
+        } catch(const std::exception& dom) {
             saxparser.clearParserState();
-            throw(utils::ArgError(fmt(_(
-                    "Parse file '%1%':\n[--libxml--]\n%2%[--libvpz--]\n%3%")) %
-                    filename % dom.what() % sax.what()));
+            throw utils::SaxParserError(fmt(_("%2%\n\n%1%")) % dom.what() %
+                                        sax.what());
         }
+        throw utils::SaxParserError(sax.what());
     }
 }
-
 
 void Vpz::parseMemory(const std::string& buffer)
 {
@@ -80,18 +81,15 @@ void Vpz::parseMemory(const std::string& buffer)
 
     vpz::SaxParser saxparser(*this);
     try {
-        saxparser.parse_memory(buffer);
+        saxparser.parseMemory(buffer);
     } catch(const std::exception& sax) {
         try {
-            saxparser.clearParserState();
-            Vpz::validateMemory(buffer);
+            validateMemory(buffer);
         } catch(const std::exception& dom) {
-            throw(utils::ArgError(fmt(_(
-                    "Parse memory:\n[--libxml--]\n%1%[--libvpz--]\n%2%")) %
-                    dom.what() % sax.what()));
+            throw utils::SaxParserError(fmt(_("%2%\n\n%1%")) % dom.what() %
+                                        sax.what());
         }
-        throw(utils::ArgError(fmt(_(
-                "Parse memory:\n[--libvpz--]\n%1%")) % sax.what()));
+        throw utils::SaxParserError(sax.what());
     }
 }
 
@@ -99,7 +97,7 @@ value::Value* Vpz::parseValue(const std::string& buffer)
 {
     Vpz vpz;
     SaxParser sax(vpz);
-    sax.parse_memory(buffer);
+    sax.parseMemory(buffer);
 
     Assert < utils::ArgError >(sax.isValue(), fmt(_(
                 "The buffer [%1%] is not a value.")) % buffer);
@@ -111,7 +109,7 @@ std::vector < value::Value* > Vpz::parseValues(const std::string& buffer)
 {
     Vpz vpz;
     SaxParser sax(vpz);
-    sax.parse_memory(buffer);
+    sax.parseMemory(buffer);
 
     Assert < utils::ArgError >(sax.isValue(),
            fmt(_("The buffer [%1%] is not a value.")) % buffer);
@@ -171,16 +169,56 @@ void Vpz::fixExtension(std::string& filename)
 
 void Vpz::validateFile(const std::string& filename)
 {
-    xmlpp::DomParser dom;
-    dom.set_validate(true);
-    dom.parse_file(filename);
+    xmlParserCtxtPtr ctxt;
+    xmlDocPtr doc;
+
+    ctxt = xmlNewParserCtxt();
+    if (ctxt == NULL) {
+        throw utils::SaxParserError(_("Failed to allocate parser context\n"));
+    }
+
+    doc = xmlCtxtReadFile(ctxt, filename.c_str(), NULL, XML_PARSE_DTDVALID);
+    if (not doc) {
+        xmlFreeParserCtxt(ctxt);
+        throw utils::SaxParserError(fmt(_("Failed to parse '%1%': %2%")) %
+                                        filename % (ctxt->lastError.message ?
+                                                    ctxt->lastError.message :
+                                                    ""));
+    }
+
+    if (ctxt->valid == 0) {
+        xmlFreeDoc(doc);
+        xmlFreeParserCtxt(ctxt);
+        throw utils::SaxParserError(fmt(
+                _("Failed to validate '%1%': %2%")) % filename %
+            (ctxt->lastError.message ? ctxt->lastError.message : ""));
+    }
+    xmlFreeParserCtxt(ctxt);
 }
 
-void Vpz::validateMemory(const Glib::ustring& buffer)
+void Vpz::validateMemory(const std::string& buffer)
 {
-    xmlpp::DomParser dom;
-    dom.set_validate(true);
-    dom.parse_memory(buffer);
+    xmlParserCtxtPtr ctxt;
+    xmlDocPtr doc;
+
+    ctxt = xmlNewParserCtxt();
+    if (ctxt == NULL) {
+        throw utils::SaxParserError(_("Failed to allocate parser context\n"));
+    }
+
+    doc = xmlCtxtReadMemory(ctxt, buffer.c_str(), buffer.size(), NULL, NULL,
+                            XML_PARSE_DTDVALID);
+    if (not doc) {
+        xmlFreeParserCtxt(ctxt);
+        throw utils::SaxParserError(_("Failed to parse memory '%1%'"));
+    }
+
+    if (ctxt->valid == 0) {
+        xmlFreeDoc(doc);
+        xmlFreeParserCtxt(ctxt);
+        throw utils::SaxParserError(_("Failed to validate memory"));
+    }
+    xmlFreeParserCtxt(ctxt);
 }
 
 }} // namespace vle vpz

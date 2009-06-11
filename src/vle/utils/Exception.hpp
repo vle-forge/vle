@@ -29,7 +29,6 @@
 #include <string>
 #include <exception>
 #include <stdexcept>
-#include <libxml++/exceptions/exception.h>
 #include <boost/format.hpp>
 #include <vle/utils/i18n.hpp>
 
@@ -173,23 +172,14 @@ namespace vle { namespace utils {
     /**
      * @brief Throw to report an error in SaxParser.
      */
-    class SaxParserError : public xmlpp::exception
+    class SaxParserError : public BaseError
     {
     public:
-        explicit SaxParserError(const Glib::ustring& argv = std::string())
-            : xmlpp::exception(argv) {}
+        explicit SaxParserError(const std::string& argv = std::string())
+            : BaseError(argv) {}
 
         explicit SaxParserError(const boost::format& argv)
-            : xmlpp::exception(argv.str()) {}
-
-        virtual ~SaxParserError() throw()
-        {}
-
-        virtual void Raise() const
-        { throw *this; }
-
-        virtual xmlpp::exception* Clone() const
-        { return new SaxParserError(*this); }
+            : BaseError(argv) {}
     };
 
 }} // namespace vle utils

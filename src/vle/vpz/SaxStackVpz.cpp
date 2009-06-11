@@ -70,43 +70,40 @@ void SaxStackVpz::clear()
     }
 }
 
-vpz::Vpz* SaxStackVpz::pushVpz(const AttributeList& att)
+vpz::Vpz* SaxStackVpz::pushVpz(const xmlChar** att)
 {
-    Assert < utils::SaxParserError >(m_stack.empty());
+    checkEmptyStack();
 
-    if (existAttribute(att, "date")) {
-        m_vpz.project().setDate(getAttribute < std::string >(att, "date"));
-    }
-
-    m_vpz.project().setAuthor(getAttribute < std::string >(att, "author"));
-    m_vpz.project().setVersion(getAttribute < std::string >(att, "version"));
-
-    if (existAttribute(att, "instance")) {
-        m_vpz.project().setInstance(getAttribute < int >(att, "instance"));
-    }
-
-    if (existAttribute(att, "replica")) {
-        m_vpz.project().setReplica(getAttribute < int >(att, "replica"));
+    for (int i = 0; att[i] != NULL; i += 2) {
+        if (xmlStrcmp(att[i], (const xmlChar*)"date") == 0) {
+            m_vpz.project().setDate(xmlCharToString(att[i + 1]));
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"author") == 0) {
+            m_vpz.project().setAuthor(xmlCharToString(att[i + 1]));
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"version") == 0) {
+            m_vpz.project().setVersion(xmlCharToString(att[i + 1]));
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"instance") == 0) {
+            m_vpz.project().setInstance(xmlCharToInt(att[i + 1]));
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"replica") == 0) {
+            m_vpz.project().setReplica(xmlCharToInt(att[i + 1]));
+        }
     }
 
     push(&m_vpz);
-
     return &m_vpz;
 }
 
 void SaxStackVpz::pushStructure()
 {
-    Assert < utils::SaxParserError >(not m_stack.empty());
-    Assert < utils::SaxParserError >(parent()->isVpz());
+    checkNotEmptyStack();
+    checkParentIsVpz();
 
     push(new vpz::Structures());
 }
 
-void SaxStackVpz::pushModel(const AttributeList& att)
+void SaxStackVpz::pushModel(const xmlChar** att)
 {
-    Assert < utils::SaxParserError >(not m_stack.empty());
-    Assert < utils::SaxParserError >(parent()->isStructures() or
-            parent()->isSubmodels() or parent()->isClass());
+    checkNotEmptyStack();
+    checkParentOfModel();
 
     graph::CoupledModel* cplparent = 0;
 
@@ -118,41 +115,44 @@ void SaxStackVpz::pushModel(const AttributeList& att)
     }
 
     graph::Model* gmdl = 0;
-    std::string type, name, conditions, dynamics, observables;
-    std::string x, y, width, height;
+    const xmlChar* conditions = 0, *dynamics = 0, *observables = 0;
+    const xmlChar* x = 0, *y = 0, *width = 0, *height = 0;
+    const xmlChar* type = 0, *name = 0;
 
-    for (AttributeList::const_iterator it = att.begin(); it != att.end();
-         ++it) {
-        if ((it->name) == "type") {
-            type = it->value;
-        } else if ((it->name) == "name") {
-            name = it->value;
-        } else if ((it->name) == "conditions") {
-            conditions = it->value;
-        } else if ((it->name) == "dynamics") {
-            dynamics = it->value;
-        } else if ((it->name) == "observables") {
-            observables = it->value;
-        } else if ((it->name) == "x") {
-            x = it->value;
-        } else if ((it->name) == "y") {
-            y = it->value;
-        } else if ((it->name) == "width") {
-            width = it->value;
-        } else if ((it->name) == "height") {
-            height = it->value;
+    for (int i = 0; att[i] != NULL; i+=2) {
+        if (xmlStrcmp(att[i], (const xmlChar*)"type") == 0) {
+            type = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"name") == 0) {
+            name = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"conditions") == 0) {
+            conditions = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"dynamics") == 0) {
+            dynamics = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"observables") == 0) {
+            observables = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"x") == 0) {
+            x = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"y") == 0) {
+            y = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"width") == 0) {
+            width = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"height") == 0) {
+            height = att[i + 1];
         }
     }
 
-    Assert < utils::SaxParserError >(
-        not name.empty(), _("Attribute name not defined"));
-    Assert < utils::SaxParserError >(
-        not type.empty(), fmt(_("Attribute type not defined for model '%1%'"))
-        % name);
+    if (name == 0) {
+        throw utils::SaxParserError(_("Attribute name not defined"));
+    }
 
-    if (type == "atomic") {
+    if (type == 0) {
+        throw utils::SaxParserError(fmt(
+                _("Attribute type not defined for model '%1%'")) % name);
+    }
+
+    if (xmlStrcmp(type, (const xmlChar*)"atomic") == 0) {
         try {
-            gmdl = new graph::AtomicModel(name, cplparent);
+            gmdl = new graph::AtomicModel((const char*)name, cplparent);
         } catch(const utils::DevsGraphError& e) {
             throw(utils::SaxParserError(fmt(_(
                     "Error build atomic model '%1%' with error: %2%")) % name %
@@ -163,28 +163,39 @@ void SaxStackVpz::pushModel(const AttributeList& att)
         if (clsparent == 0) {
             vpz().project().model().atomicModels().add(
                 reinterpret_cast < graph::Model* >(gmdl),
-                AtomicModel(conditions, dynamics, observables));
+                AtomicModel(
+                    conditions ? xmlCharToString(conditions) : "",
+                    dynamics ? xmlCharToString(dynamics) : "",
+                    observables ? xmlCharToString(observables) : ""));
         } else {
             clsparent->atomicModels().add(
                 reinterpret_cast < graph::Model* >(gmdl),
-                AtomicModel(conditions, dynamics, observables));
+                AtomicModel(
+                    conditions ? xmlCharToString(conditions) : "",
+                    dynamics ? xmlCharToString(dynamics) : "",
+                    observables ? xmlCharToString(observables) : ""));
         }
-    } else if (type == "coupled") {
+    } else if (xmlStrcmp(type, (const xmlChar*)"coupled") == 0) {
         try {
-            gmdl = new graph::CoupledModel(name, cplparent);
+            gmdl = new graph::CoupledModel(
+                reinterpret_cast < const char* >(name), cplparent);
         } catch(const utils::DevsGraphError& e) {
             throw(utils::SaxParserError(fmt(_(
                     "Error build coupled model '%1%' with error: %2%")) % name %
                 e.what()));
         }
     } else {
-        throw(utils::SaxParserError(fmt(_(
-                        "Unknow model type %1%")) % type));
+        throw(utils::SaxParserError(fmt(
+                    _("Unknow model type %1%")) % (const char*)type));
     }
 
     vpz::Model* mdl = new vpz::Model();
     mdl->setModel(gmdl);
-    buildModelGraphics(gmdl, x, y, width, height);
+    buildModelGraphics(gmdl,
+                       x ? xmlCharToString(x) : "",
+                       y ? xmlCharToString(y) : "",
+                       width ? xmlCharToString(width) : "",
+                       height ? xmlCharToString(height) : "");
 
     if (parent()->isStructures()) {
         vpz().project().model().setModel(gmdl);
@@ -224,7 +235,7 @@ void SaxStackVpz::buildModelGraphics(graph::Model* mdl,
     }
 }
 
-void SaxStackVpz::pushPort(const AttributeList& att)
+void SaxStackVpz::pushPort(const xmlChar** att)
 {
     Assert < utils::SaxParserError >(not m_stack.empty());
 
@@ -242,8 +253,17 @@ void SaxStackVpz::pushPort(const AttributeList& att)
 
         vpz::Model* mdl = static_cast < vpz::Model* >(parent());
         graph::Model* gmdl = mdl->model();
+        std::string name;
 
-        std::string name(getAttribute < std::string >(att, "name"));
+        for (int i = 0; att[i] != NULL; i += 2) {
+            if (xmlStrcmp(att[i], (const xmlChar*)"name") == 0) {
+                name = xmlCharToString(att[i + 1]);
+            }
+        }
+
+        if (name.empty()) {
+            throw utils::SaxParserError(_("Port without name"));
+        }
 
         if (type->isIn()) {
             gmdl->addInputPort(name);
@@ -293,50 +313,87 @@ void SaxStackVpz::pushConnections()
     push(cnts);
 }
 
-void SaxStackVpz::pushConnection(const AttributeList& att)
+void SaxStackVpz::pushConnection(const xmlChar** att)
 {
     Assert < utils::SaxParserError >(not m_stack.empty());
     Assert < utils::SaxParserError >(parent()->isConnections());
 
-    std::string type(getAttribute < std::string >(att, "type"));
-    vpz::Base* cnt = 0;
+    const xmlChar* type = 0;
 
-    if (type == "internal") {
+    for (int i = 0; att[i] != 0; i += 2) {
+        if (xmlStrcmp(att[i], (const xmlChar*)"type") == 0) {
+            type = att[i + 1];
+        }
+    }
+
+    if (type == 0) {
+        throw utils::SaxParserError(
+            _("Connection tag does not have an attribue 'type'"));
+    }
+
+    vpz::Base* cnt = 0;
+    if (xmlStrcmp(type, (const xmlChar*)"internal") == 0) {
         cnt = new vpz::InternalConnection();
-    } else if (type == "input") {
+    } else if (xmlStrcmp(type, (const xmlChar*)"input") == 0) {
         cnt = new vpz::InputConnection();
-    } else if (type == "output") {
+    } else if (xmlStrcmp(type, (const xmlChar*)"output") == 0) {
         cnt = new vpz::OutputConnection();
     } else {
-        throw(utils::SaxParserError(fmt(_(
-                    "Unknow connection type %1%")) % type));
+        throw utils::SaxParserError(fmt(
+                _( "Unknow connection type %1%")) % type);
     }
     push(cnt);
 }
 
-void SaxStackVpz::pushOrigin(const AttributeList& att)
+void SaxStackVpz::pushOrigin(const xmlChar** att)
 {
     Assert < utils::SaxParserError >(not m_stack.empty());
     Assert < utils::SaxParserError >(parent()->isInternalConnection() or
             parent()->isInputConnection() or
             parent()->isOutputConnection());
 
-    std::string mdl(getAttribute < std::string >(att, "model"));
-    std::string port(getAttribute < std::string >(att, "port"));
+    const xmlChar* model = 0;
+    const xmlChar* port = 0;
 
-    vpz::Base* orig = new vpz::Origin(mdl, port);
+    for (int i = 0; att[i] != NULL; i += 2) {
+        if (xmlStrcmp(att[i], (const xmlChar*)"model") == 0) {
+            model = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"port") == 0) {
+            port = att[i + 1];
+        }
+    }
+
+    if (not model or not port) {
+        throw utils::SaxParserError(
+            _("Origin tag does not have attributes 'model' or 'port'"));
+    }
+
+    vpz::Base* orig = new vpz::Origin((const char*)model, (const char*)port);
     push(orig);
 }
 
-void SaxStackVpz::pushDestination(const AttributeList& att)
+void SaxStackVpz::pushDestination(const xmlChar** att)
 {
     Assert < utils::SaxParserError >(not m_stack.empty());
     Assert < utils::SaxParserError >(parent()->isOrigin());
 
-    std::string mdl(getAttribute < std::string >(att, "model"));
-    std::string port(getAttribute < std::string >(att, "port"));
+    const xmlChar* model = 0;
+    const xmlChar* port = 0;
 
-    vpz::Base* dest = new vpz::Destination(mdl, port);
+    for (int i = 0; att[i] != 0; i += 2) {
+        if (xmlStrcmp(att[i], (const xmlChar*)"model") == 0) {
+            model = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"port") == 0) {
+            port = att[i + 1];
+        }
+    }
+
+    if (not model or not port) {
+        throw utils::SaxParserError(
+            _("Destination tag does not have attributes 'model' or 'port'"));
+    }
+
+    vpz::Base* dest = new vpz::Destination((const char*)model, (const char*)port);
     push(dest);
 }
 
@@ -387,30 +444,64 @@ void SaxStackVpz::pushDynamics()
     push(&m_vpz.project().dynamics());
 }
 
-void SaxStackVpz::pushDynamic(const AttributeList& att)
+void SaxStackVpz::pushDynamic(const xmlChar** att)
 {
     Assert < utils::SaxParserError >(not m_stack.empty());
     Assert < utils::SaxParserError >(parent()->isDynamics());
 
-    vpz::Dynamic dyn(getAttribute < std::string >(att, "name"));
-    dyn.setLibrary(getAttribute < std::string >(att, "library"));
+    const xmlChar* name = 0;
+    const xmlChar* library = 0;
+    const xmlChar* model = 0;
+    const xmlChar* language = 0;
+    const xmlChar* type = 0;
+    const xmlChar* location = 0;
 
-    if (existAttribute(att, "model"))
-        dyn.setModel(getAttribute < std::string >(att, "model"));
-    else
+    for (int i = 0; att[i] != 0; i += 2) {
+        if (xmlStrcmp(att[i], (const xmlChar*)"name") == 0) {
+            name = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"library") == 0) {
+            library = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"model") == 0) {
+            model = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"language") == 0) {
+            language = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"type") == 0) {
+            type = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"location") == 0) {
+            location = att[i + 1];
+        }
+    }
+
+    if (not name or not library) {
+        throw utils::SaxParserError(
+            _("Dynamic tag does not have 'name' or 'library' attribute"));
+    }
+
+    vpz::Dynamic dyn(xmlCharToString(name));
+    dyn.setLibrary(xmlCharToString(library));
+
+    if (model) {
+        dyn.setModel(xmlCharToString(model));
+    } else {
         dyn.setModel("");
+    }
 
-    if (existAttribute(att, "language"))
-        dyn.setLanguage(getAttribute < std::string >(att, "language"));
-    else
+    if (language) {
+        dyn.setLanguage(xmlCharToString(language));
+    } else {
         dyn.setLanguage("");
+    }
 
-    if (existAttribute(att, "type")) {
-        std::string type(getAttribute < std::string >(att, "type"));
-        if (type == "local") {
+    if (type) {
+        if (xmlStrcmp(type, (xmlChar*)"local") == 0) {
             dyn.setLocalDynamics();
         } else {
-            std::string loc(getAttribute < std::string >(att, "location"));
+            if (location == 0) {
+                throw utils::SaxParserError(
+                    _("Dynamic tag define distant dynamic without location"));
+            }
+
+            std::string loc(xmlCharToString(location));
             std::string ip;
             int port;
             utils::net::explodeStringNet(loc, ip, port);
@@ -424,7 +515,7 @@ void SaxStackVpz::pushDynamic(const AttributeList& att)
     dyns->add(dyn);
 }
 
-void SaxStackVpz::pushExperiment(const AttributeList& att)
+void SaxStackVpz::pushExperiment(const xmlChar** att)
 {
     Assert < utils::SaxParserError >(not m_stack.empty());
     Assert < utils::SaxParserError >(parent()->isVpz());
@@ -432,59 +523,84 @@ void SaxStackVpz::pushExperiment(const AttributeList& att)
     vpz::Experiment& exp(m_vpz.project().experiment());
     push(&exp);
 
-    exp.setName(getAttribute < std::string >(att, "name"));
-    exp.setDuration(getAttribute < double >(att, "duration"));
-    exp.setSeed(getAttribute < guint32 >(att, "seed"));
+    const xmlChar* name = 0;
+    const xmlChar* duration = 0;
+    const xmlChar* seed = 0;
+    const xmlChar* begin = 0;
+    const xmlChar* combination = 0;
 
-    if (existAttribute(att, "begin")) {
-        exp.setBegin(getAttribute < double >(att, "begin"));
+    for (int i = 0; att[i] != 0; i += 2) {
+        if (xmlStrcmp(att[i], (const xmlChar*)"name") == 0) {
+            name = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"duration") == 0) {
+            duration = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"seed") == 0) {
+            seed = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"begin") == 0) {
+            begin = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"begin") == 0) {
+            begin = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"combination") == 0) {
+            combination = att[i + 1];
+        }
+    }
+
+    if (not name or not duration or not seed) {
+        throw utils::SaxParserError(
+            _("Experiment tag does not have 'name', 'duration' or 'seed'"
+              " attributes"));
+    }
+
+    exp.setName(xmlCharToString(name));
+    exp.setDuration(xmlCharToDouble(duration));
+    exp.setSeed(xmlCharToInt(seed));
+
+    if (begin) {
+        exp.setBegin(xmlCharToDouble(begin));
     } else {
         exp.setBegin(0.0);
     }
 
-    if (existAttribute(att, "combination")) {
-        exp.setCombination(getAttribute < std::string >(att, "combination"));
+    if (combination) {
+        exp.setCombination(xmlCharToString(combination));
     }
 }
 
-void SaxStackVpz::pushReplicas(const AttributeList& att)
+void SaxStackVpz::pushReplicas(const xmlChar** att)
 {
     Assert < utils::SaxParserError >(not m_stack.empty());
     Assert < utils::SaxParserError >(parent()->isExperiment());
 
     vpz::Replicas& rep(m_vpz.project().experiment().replicas());
 
-    bool haveseed = false;
-    bool havenumber = false;
+    const xmlChar* seed = 0;
+    const xmlChar* number = 0;
 
-    for (AttributeList::const_iterator it = att.begin();
-         it != att.end(); ++it) {
-        if ((*it).name == "seed") {
-            try {
-                rep.setSeed(boost::lexical_cast < guint32 >((*it).value));
-                haveseed = true;
-            } catch(const boost::bad_lexical_cast& ) {
-                throw(utils::ArgError(fmt(_(
-                        "Cannot convert replicas's tag seed: '%1%'")) %
-                    (*it).value));
-            }
-        } else if ((*it).name == "number") {
-            try {
-                rep.setNumber(boost::lexical_cast < size_t >((*it).value));
-                havenumber = true;
-            } catch(const boost::bad_lexical_cast& ) {
-                throw(utils::ArgError(fmt(_(
-                        "Cannot convert replicas's tag number: '%1%'")) %
-                    (*it).value));
-            }
+    for (int i = 0; att[i] != 0; i += 2) {
+        if (xmlStrcmp(att[i], (const xmlChar*)"seed") == 0) {
+            seed = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"number") == 0) {
+            number = att[i + 1];
         }
     }
 
-    Assert < utils::ArgError >(haveseed,
-                               _("The replicas's tag does not define a seed"));
+    if (not seed or not number) {
+        throw utils::SaxParserError(
+            _("Replicas tag does not have 'seed' or 'number' attribute"));
+    }
 
-    Assert < utils::ArgError >(havenumber,
-                               _("The replica's tag does not define a number"));
+    try {
+        if (seed) {
+            rep.setSeed(xmlCharToInt(seed));
+        }
+
+        if (number) {
+            rep.setNumber(xmlCharToInt(number));
+        }
+    } catch (const std::exception& e) {
+        throw utils::SaxParserError(fmt(
+                _("Replicas tag: error converting attribute: %1%")) % e.what());
+    }
 }
 
 void SaxStackVpz::pushConditions()
@@ -495,28 +611,51 @@ void SaxStackVpz::pushConditions()
     push(&m_vpz.project().experiment().conditions());
 }
 
-void SaxStackVpz::pushCondition(const AttributeList& att)
+void SaxStackVpz::pushCondition(const xmlChar** att)
 {
     Assert < utils::SaxParserError >(not m_stack.empty());
     Assert < utils::SaxParserError >(parent()->isConditions());
 
     vpz::Conditions& cnds(m_vpz.project().experiment().conditions());
-    std::string name(getAttribute < std::string >(att, "name"));
 
-    vpz::Condition newcondition(name);
+    const xmlChar* name = 0;
+
+    for (int i = 0; att[i] != 0; i += 2) {
+        if (xmlStrcmp(att[i], (const xmlChar*)"name") == 0) {
+            name = att[i + 1];
+        }
+    }
+
+    if (not name) {
+        throw utils::SaxParserError(
+            _("Condition tag does not have attribute 'name'"));
+    }
+
+    vpz::Condition newcondition(xmlCharToString(name));
     vpz::Condition& cnd(cnds.add(newcondition));
     push(&cnd);
 }
 
-void SaxStackVpz::pushConditionPort(const AttributeList& att)
+void SaxStackVpz::pushConditionPort(const xmlChar** att)
 {
     Assert < utils::SaxParserError >(not m_stack.empty());
     Assert < utils::SaxParserError >(parent()->isCondition());
 
-    std::string name(getAttribute < std::string >(att, "name"));
+    const xmlChar* name = 0;
+
+    for (int i = 0; att[i] != 0; i += 2) {
+        if (xmlStrcmp(att[i], (const xmlChar*)"name") == 0) {
+            name = att[i + 1];
+        }
+    }
+
+    if (not name) {
+        throw utils::SaxParserError(
+            _("Condition port tag does not have attribute 'name'"));
+    }
 
     vpz::Condition* cnd(static_cast < vpz::Condition* >(parent()));
-    cnd->add(name);
+    cnd->add(xmlCharToString(name));
 }
 
 value::Set& SaxStackVpz::popConditionPort()
@@ -554,60 +693,87 @@ void SaxStackVpz::popOutput()
     pop();
 }
 
-void SaxStackVpz::pushOutput(const AttributeList& att)
+void SaxStackVpz::pushOutput(const xmlChar** att)
 {
     Assert < utils::SaxParserError >(not m_stack.empty());
     Assert < utils::SaxParserError >(parent()->isOutputs());
 
-    std::string name(getAttribute < std::string >(att, "name"));
-    std::string format(getAttribute < std::string >(att, "format"));
-    std::string plugin(getAttribute < std::string >(att, "plugin"));
+    const xmlChar* name = 0;
+    const xmlChar* format = 0;
+    const xmlChar* plugin = 0;
+    const xmlChar* location = 0;
 
-    std::string location;
-    if (existAttribute(att, "location"))
-        location = getAttribute < std::string >(att, "location");
+    for (int i = 0; att[i] != 0; i += 2) {
+        if (xmlStrcmp(att[i], (const xmlChar*)"name") == 0) {
+            name = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"format") == 0) {
+            format = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"plugin") == 0) {
+            plugin = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"location") == 0) {
+            location = att[i + 1];
+        }
+    }
 
     Outputs& outs(m_vpz.project().experiment().views().outputs());
-    if (format == "local") {
-        push(&outs.addLocalStream(name, location, plugin));
-    } else if (format == "distant") {
-        push(&outs.addDistantStream(name, location, plugin));
+
+    if (xmlStrcmp(format, (const xmlChar*)"local") == 0) {
+        push(&outs.addLocalStream(xmlCharToString(name),
+                                  location ? xmlCharToString(location) : "",
+                                  xmlCharToString(plugin)));
+    } else if (xmlStrcmp(format, (const xmlChar*)"distant") == 0) {
+        push(&outs.addDistantStream(xmlCharToString(name),
+                                    location ? xmlCharToString(location) : "",
+                                    xmlCharToString(plugin)));
     } else {
-        throw(utils::SaxParserError(fmt(_(
-                    "Unknow format '%1%' for the output %2%")) % format %
-                name));
+        throw utils::SaxParserError(fmt(
+                _("Output tag does not define a '%1%' format")) % name);
     }
 }
 
-void SaxStackVpz::pushView(const AttributeList& att)
+void SaxStackVpz::pushView(const xmlChar** att)
 {
     Assert < utils::SaxParserError >(not m_stack.empty());
     Assert < utils::SaxParserError >(parent()->isViews());
 
-    std::string name(getAttribute< std::string >(att, "name"));
-    std::string type(getAttribute< std::string >(att, "type"));
-    std::string out(getAttribute< std::string >(att, "output"));
+    const xmlChar* name = 0;
+    const xmlChar* type = 0;
+    const xmlChar* output = 0;
+    const xmlChar* timestep = 0;
+
+    for (int i = 0; att[i] != 0; i += 2) {
+        if (xmlStrcmp(att[i], (const xmlChar*)"name") == 0) {
+            name = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"type") == 0) {
+            type = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"output") == 0) {
+            output = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"timestep") == 0) {
+            timestep = att[i + 1];
+        }
+    }
 
     Views& views(m_vpz.project().experiment().views());
 
-    if (type == "timed") {
-        Assert < utils::SaxParserError >(existAttribute(att, "timestep"),
-               (fmt(_("View %1% have no timestep attribute.")) %
-                name));
-
-        double ts(getAttribute < double >(att, "timestep"));
-        views.addTimedView(name, ts, out);
-    } else if (type == "event") {
-        views.addEventView(name, out);
-    } else if (type == "finish") {
-        views.addFinishView(name, out);
+    if (xmlStrcmp(type, (const xmlChar*)"timed") == 0) {
+        if (not timestep) {
+            throw utils::SaxParserError(
+                _("View tag does not have a timestep attribute"));
+        }
+        views.addTimedView(xmlCharToString(name),
+                           xmlCharToDouble(timestep),
+                           xmlCharToString(output));
+    } else if (xmlStrcmp(type, (const xmlChar*)"event") == 0) {
+        views.addEventView(xmlCharToString(name), xmlCharToString(output));
+    } else if (xmlStrcmp(type, (const xmlChar*)"finish") == 0) {
+        views.addFinishView(xmlCharToString(name), xmlCharToString(output));
     } else {
-        throw(utils::SaxParserError(fmt(_(
-                    "Unknow type '%1%' for the view %1%")) % type % name));
+        throw utils::SaxParserError(fmt(
+                _("View tag does not accept type '%1%'")) % type);
     }
 }
 
-void SaxStackVpz::pushAttachedView(const AttributeList& att)
+void SaxStackVpz::pushAttachedView(const xmlChar** att)
 {
     Assert < utils::SaxParserError >(not m_stack.empty());
     Assert < utils::SaxParserError >(parent()->isObservablePort());
@@ -624,40 +790,72 @@ void SaxStackVpz::pushObservables()
     push(&obs);
 }
 
-void SaxStackVpz::pushObservable(const AttributeList& att)
+void SaxStackVpz::pushObservable(const xmlChar** att)
 {
     Assert < utils::SaxParserError >(not m_stack.empty());
     Assert < utils::SaxParserError >(parent()->isObservables());
 
-    Views& views(m_vpz.project().experiment().views());
+    const xmlChar* name = 0;
 
-    std::string name(getAttribute < std::string >(att, "name"));
-    Observable& obs(views.addObservable(name));
+    for (int i = 0; att[i] != 0; i += 2) {
+        if (xmlStrcmp(att[i], (const xmlChar*)"name") == 0) {
+            name = att[i + 1];
+        }
+    }
+
+    if (not name) {
+        throw utils::SaxParserError(
+            _("Observable tag does not have attribute 'name'"));
+    }
+
+    Views& views(m_vpz.project().experiment().views());
+    Observable& obs(views.addObservable(xmlCharToString(name)));
     push(&obs);
 }
 
-void SaxStackVpz::pushObservablePort(const AttributeList& att)
+void SaxStackVpz::pushObservablePort(const xmlChar** att)
 {
     Assert < utils::SaxParserError >(not m_stack.empty());
     Assert < utils::SaxParserError >(parent()->isObservable());
 
-    std::string name(getAttribute < std::string >(att, "name"));
+    const xmlChar* name = 0;
+
+    for (int i = 0; att[i] != 0; i += 2) {
+        if (xmlStrcmp(att[i], (const xmlChar*)"name") == 0) {
+            name = att[i + 1];
+        }
+    }
+
+    if (not name) {
+        throw utils::SaxParserError(
+            _("Observable port tag does not have attribute 'name'"));
+    }
 
     vpz::Observable* out(static_cast < vpz::Observable* >(parent()));
-    vpz::ObservablePort& ports(out->add(name));
+    vpz::ObservablePort& ports(out->add(xmlCharToString(name)));
     push(&ports);
 }
 
-void SaxStackVpz::pushObservablePortOnView(const AttributeList& att)
+void SaxStackVpz::pushObservablePortOnView(const xmlChar** att)
 {
     Assert < utils::SaxParserError >(not m_stack.empty());
     Assert < utils::SaxParserError >(parent()->isObservablePort());
 
-    std::string name(getAttribute < std::string >(att, "name"));
+    const xmlChar* name = 0;
 
-    vpz::ObservablePort* port(static_cast < vpz::ObservablePort* >(
-            parent()));
-    port->add(name);
+    for (int i = 0; att[i] != 0; i += 2) {
+        if (xmlStrcmp(att[i], (const xmlChar*)"name") == 0) {
+            name = att[i + 1];
+        }
+    }
+
+    if (not name) {
+        throw utils::SaxParserError(
+            _("Observable port view tag does not have attribute 'name'"));
+    }
+
+    vpz::ObservablePort* port(static_cast < vpz::ObservablePort* >(parent()));
+    port->add(xmlCharToString(name));
 }
 
 void SaxStackVpz::pushClasses()
@@ -668,14 +866,25 @@ void SaxStackVpz::pushClasses()
     push(&m_vpz.project().classes());
 }
 
-void SaxStackVpz::pushClass(const AttributeList& att)
+void SaxStackVpz::pushClass(const xmlChar** att)
 {
     Assert < utils::SaxParserError >(not m_stack.empty());
     Assert < utils::SaxParserError >(parent()->isClasses());
 
-    std::string name(getAttribute < std::string >(att, "name"));
+    const xmlChar* name = 0;
 
-    Class& cls = m_vpz.project().classes().add(name);
+    for (int i = 0; att[i] != 0; i += 2) {
+        if (xmlStrcmp(att[i], (const xmlChar*)"name") == 0) {
+            name = att[i + 1];
+        }
+    }
+
+    if (not name) {
+        throw utils::SaxParserError(
+            _("Class tag does not have attribute 'name'"));
+    }
+
+    Class& cls = m_vpz.project().classes().add(xmlCharToString(name));
     push(&cls);
 }
 
@@ -720,6 +929,47 @@ Class* SaxStackVpz::getLastClass() const
 
     it = std::find_if(m_stack.begin(), m_stack.end(), Base::IsClass());
     return (it != m_stack.end()) ? reinterpret_cast < Class* >(*it) : 0;
+}
+
+void SaxStackVpz::checkParentIsVpz() const
+{
+    if (not parent()->isVpz()) {
+        throw utils::SaxParserError(
+            _("Parent is not Vpz element"));
+    }
+}
+
+void SaxStackVpz::checkParentIsClass() const
+{
+    if (not parent()->isClass()) {
+        throw utils::SaxParserError(
+            _("Parent is not Class element"));
+    }
+}
+
+void SaxStackVpz::checkParentIsSubmodels() const
+{
+    if (not parent()->isSubmodels()) {
+        throw utils::SaxParserError(
+            _("Parent is not Submodels element"));
+    }
+}
+
+void SaxStackVpz::checkParentIsStructures() const
+{
+    if (not parent()->isStructures()) {
+        throw utils::SaxParserError(
+            _("Parent is not Structures element"));
+    }
+}
+
+void SaxStackVpz::checkParentOfModel() const
+{
+    if (not parent()->isClass() and not parent()->isSubmodels() and not
+        parent()->isStructures()) {
+        throw utils::SaxParserError(
+            _("Parent of model is not class, submodel or structure"));
+    }
 }
 
 }} // namespace vle vpz

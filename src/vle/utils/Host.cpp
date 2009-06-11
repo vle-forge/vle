@@ -24,109 +24,129 @@
 
 
 #include <vle/utils/Host.hpp>
-#include <vle/utils/Tools.hpp>
+#include <vle/utils/Preferences.hpp>
 #include <vle/utils/Debug.hpp>
-#include <vle/utils/XML.hpp>
+#include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
-
 
 
 namespace vle { namespace utils {
 
-void Host::write(xmlpp::Element* root) const
+Host::Host(const std::string& hostname, const std::string& port,
+           const std::string& process)
+    : mHostname(hostname), mPort(0), mProcess(0)
 {
-    if (mHostname.size()) {
-        xmlpp::Element* elt = root->add_child("HOST");
-        elt->set_attribute("HOSTNAME", mHostname);
-        elt->set_attribute("PORT", utils::to_string(mPort));
-        elt->set_attribute("PROCESS", utils::to_string(mProcess));
+    if (hostname.empty()) {
+        throw utils::InternalError(_("Host error: empty host name"));
     }
-}
 
-void Host::read(xmlpp::Element* root)
-{
-    mHostname = utils::xml::get_attribute(root, "HOSTNAME");
-    mPort = utils::to_int(utils::xml::get_attribute(root, "PORT"));
-    mProcess = utils::to_int(utils::xml::get_attribute(root, "PROCESS"));
+    try {
+        mPort = boost::lexical_cast < int >(port);
+        mProcess = boost::lexical_cast < int >(process);
+    } catch (const std::exception& e) {
+        throw utils::InternalError(_("Host error: bad port or process"));
+    }
 }
 
 Hosts::~Hosts()
 {
-    if (mIsModified)
-        write_file();
+    if (mIsModified) {
+        write();
+    }
 }
 
-void Hosts::read_file()
+void Hosts::read()
 {
-    Glib::ustring filename(get_hosts_filename());
-    if (utils::exist_file(filename) == false) {
-        xmlpp::Document doc;
-        xmlpp::Element* root = doc.create_root_node("HOSTS");
-        xmlpp::Element* host = root->add_child("HOST");
-        host->set_attribute("HOSTNAME", "localhost");
-        host->set_attribute("PORT", "8000");
-        host->set_attribute("PROCESS", "1");
-        doc.write_to_file_formatted(filename);
+    std::string hosts, ports, processes;
+
+    {
+        Preferences prefs;
+        prefs.load();
+        hosts = prefs.getAttributes("vle.daemon", "hosts");
+        ports = prefs.getAttributes("vle.daemon", "ports");
+        processes = prefs.getAttributes("vle.daemon", "processes");
+    }
+
+    std::vector < std::string > hostsl, portsl, processesl;
+
+    boost::split(hostsl, hosts, boost::is_any_of(","));
+    boost::split(portsl, ports, boost::is_any_of(","));
+    boost::split(processesl, processes, boost::is_any_of(","));
+
+    if (hostsl.size() != portsl.size() or hostsl.size() != processes.size() or
+        portsl.size() != processes.size()) {
+        throw utils::InternalError(_("Bad format in vle.daemon section"));
+    }
+
+    const std::vector < std::string >::size_type end = mHosts.size();
+    if (end) {
+        for (std::vector < std::string >::size_type i = 0; i < end; ++i) {
+            boost::trim(hostsl[i]);
+            boost::trim(portsl[i]);
+            boost::trim(processesl[i]);
+            mHosts.insert(Host(hostsl[i], portsl[i], processesl[i]));
+        }
     } else {
-        Host tmp;
-        xmlpp::DomParser dom(get_hosts_filename());
-        xmlpp::Element* elt = utils::xml::get_root_node(dom, "HOSTS");
-        xmlpp::Node::NodeList lst = elt->get_children("HOST");
-        xmlpp::Node::NodeList::iterator it = lst.begin();
-        while (it != lst.end()) {
-            tmp.read(utils::xml::cast_node_element(*it));
-            mHosts.insert(tmp);
-            ++it;
+        mHosts.insert(Host("localhost", 8000, 1));
+    }
+
+    mIsModified = false;
+}
+
+void Hosts::write()
+{
+    std::string hosts, ports, processes;
+
+    const_iterator it = begin();
+    while (it != end()) {
+        hosts += it->hostname();
+        ports += boost::lexical_cast < std::string >(it->port());
+        processes += boost::lexical_cast < std::string >(it->process());
+        ++it;
+
+        if (it != end()) {
+            hosts += ',';
+            ports += ',';
+            processes += ',';
         }
     }
 
-    mIsModified = false;
-}
+    Preferences prefs;
+    prefs.load();
 
-void Hosts::write_file()
-{
-    xmlpp::Document doc;
-    xmlpp::Element* root = doc.create_root_node("HOSTS");
+    prefs.setAttributes("vle.daemon", "host", hosts);
+    prefs.setAttributes("vle.daemon", "ports", ports);
+    prefs.setAttributes("vle.daemon", "processes", processes);
 
-    SetHosts::const_iterator it = mHosts.begin();
-    while (it != mHosts.end()) {
-        (*it).write(root);
-         ++it;
-    }
-    doc.write_to_file_formatted(get_hosts_filename());
+    prefs.save();
 
     mIsModified = false;
 }
 
-void Hosts::push_host(const Host& host)
+void Hosts::add(const Host& host)
 {
     mIsModified = true;
     mHosts.insert(host);
 }
 
-void Hosts::remove_host(const std::string& hostname)
+void Hosts::del(const std::string& hostname)
 {
-    SetHosts::iterator it = mHosts.find(Host(hostname, 0, 0));
+    const_iterator it = mHosts.find(Host(hostname, 0, 0));
     if (it != mHosts.end()) {
         mIsModified = true;
         mHosts.erase(it);
     }
 }
 
-const Host& Hosts::get_host(const std::string& hostname) const
+const Host& Hosts::get(const std::string& hostname) const
 {
-    SetHosts::iterator it = mHosts.find(Host(hostname, 0, 0));
+    const_iterator it = mHosts.find(Host(hostname, 0, 0));
 
-    Assert < utils::ArgError >(it != mHosts.end(), fmt(
-                _("Cannot delete hostname '%1%")) % hostname);
+    if (it == mHosts.end()) {
+        throw utils::ArgError(fmt(_("Cannot get the host '%1%'")) % hostname);
+    }
 
     return (*it);
-}
-
-Glib::ustring Hosts::get_hosts_filename()
-{
-    return Glib::build_filename(
-        utils::Path::path().Path::getHomeDir(), "hosts.xml");
 }
 
 }} // namespace vle utils

@@ -26,7 +26,6 @@
 #ifndef VLE_SAX_STACK_VALUE_HPP
 #define VLE_SAX_STACK_VALUE_HPP
 
-#include <libxml++/libxml++.h>
 #include <stack>
 #include <vle/value/Value.hpp>
 #include <vle/value/Set.hpp>
