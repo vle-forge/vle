@@ -56,6 +56,8 @@ void CMakePackage::configure(std::string& out, std::string& err)
 {
     Path& p = utils::Path::path();
 
+    boost::filesystem::create_directory(p.getPackageBuildDir());
+
     std::string prg = Glib::find_program_in_path("cmake");
 
     std::list < std::string > argv;
