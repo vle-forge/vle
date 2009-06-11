@@ -1,8 +1,22 @@
 VLE 0.8.0
 =========
 
+Switch to the package system.
+
 * project:
   * Add the Gettext functionality.
+  * Update the soversion of dynamic libraries: (libvleutils.so.0.8 to
+    libvleutils-0.8.so.0).
+  * To simplify the source, we add the boost::filesystem (and boost::system for
+    Boost >= 1.35) to the vle dependencies and we remove all references to the
+    Glib fileutils functions.
+  * To manage the date correctly, we append the boost::date_time library to the
+    vle dependencies.
+  * Remove Assert and Throw macros from the API to remove conflict with the C
+    API of scripting language like Python.
+  * Remove the libxml++ dependency and replace it with the libxml2.
+    * Update the SaxParser with the new libxml2 sax parser.
+    * Move the configuration from the host.xml file to the vle.conf.
 
 * vle:
   * Update the path management in VLE:
@@ -12,18 +26,45 @@ VLE 0.8.0
       plug-ins of VLE. If this variable is not defined, the $HOME/.vle or
       %HOMEDRIVE%%HOMEPATH%/vle is used.
     - Remove optional path and program option from vle, eov, etc.
+  * Add the packaging system:
+    - Add packages functions in utils::Path class to manage the directories of
+      packages in the VLE_HOME path.
+    - Add a Package class to list the available package in VLE_HOME, create a
+      new empty package, configure, build and install package.
+    - Reduce the number of class to manage the command line interface.
+    - Add the -P or --package parameter to the command line interface to
+      select current package to edit.
   * Change the VPZ format: replace the #PCDATA by vle::value in the vpz
     format and build a new DTD (vle-0.8.0.dtd).
-  * Remove Assert and Throw macros from the API to remove conflict with the C
-    API of scripting language like Python.
+  * Add a 'begin' attribute into the vpz tag 'experiment' to start the
+    simulation at any time. Update the DTD (vle-0.8.0.dtd) with this new
+    attribute.
+  * Update the MatrixTranslator with value instead of XML.
+  * Add a Julian date class into libutils to convert string, double into year,
+    month, day, hour, minutes, seconds.
 
 * gvle:
   * Big update, see changelog for the details.
+    * New conditions plug-ins management.
+    * New outputs plug-ins management.
+    * Merge all Gtk::Window into an only Gtk::Window.
+    * Update GVLE to manage source code of VLE packages.
+    * Add the Gtksourceviewmm library to show text, c++, cmake files.
 
 * oov:
   * SimpleFile, the super class of txt, rdata, csv plug-ins, can now use the
     standard output and error and can be configured to select localized value.
+  * Update oov plug-ins parametrization function from XML to value.
 
+
+VLE 0.7.1
+=========
+
+* vle:
+  * Fix crash in ExperimentGenerator with empty condition list.
+
+* win32:
+  * Fix a bad environment variable for Boost 1.38
 
 
 VLE 0.7.0
