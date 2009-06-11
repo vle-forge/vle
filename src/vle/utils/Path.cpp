@@ -281,6 +281,8 @@ std::string Path::getHomeConditionDocFile(const std::string& file) const
 void Path::setPackage(const std::string& name)
 {
     if (name.empty()) {
+	m_currentPackage.clear();
+	m_currentPackagePath.clear();
         m_simulator.clear();
         initPath();
     } else {

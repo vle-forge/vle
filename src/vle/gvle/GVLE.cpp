@@ -72,6 +72,10 @@ GVLE::GVLE(const std::string& filename) :
     mConditionsBox = new ConditionsBox(mRefXML, m_modeling);
     mSimulationBox = new LaunchSimulationBox(mRefXML, m_modeling);
     mPreferencesBox = new PreferencesBox(mRefXML, m_modeling);
+    mOpenPackageBox = new OpenPackageBox(mRefXML, m_modeling);
+    mOpenVpzBox = new OpenVpzBox(mRefXML, m_modeling);
+    mNewProjectBox = new NewProjectBox(mRefXML, m_modeling);
+    mSaveVpzBox = new SaveVpzBox(mRefXML, m_modeling);
 
     //loadObserverPlugins(utils::Path::path().getDefaultObserverPluginDir());
     //loadObserverPlugins(utils::Path::path().getUserObserverPluginDir());
@@ -118,6 +122,10 @@ GVLE::~GVLE()
     delete mConditionsBox;
     delete mSimulationBox;
     delete mPreferencesBox;
+    delete mOpenPackageBox;
+    delete mOpenVpzBox;
+    delete mNewProjectBox;
+    delete mSaveVpzBox;
 }
 
 bool GVLE::on_delete_event(GdkEventAny* event)
@@ -546,6 +554,32 @@ void GVLE::onMenuNew()
     }
 }
 
+void GVLE::onMenuNewProject()
+{
+    mNewProjectBox->show();
+}
+
+void GVLE::onMenuOpenPackage()
+{
+    mOpenPackageBox->show();
+    if (utils::Path::path().package() != "")
+      m_menu->onPackageMode();
+}
+
+void GVLE::onMenuOpenVpz()
+{
+    if (m_modeling->isModified() == false or
+	gvle::Question(_("Do you really want load a new Model ?\nCurrent"
+			 "model will be destroy and not save"))) {
+	try {
+	    mOpenVpzBox->show();
+	} catch(utils::InternalError) {
+	    Error(_("No experiments in the package ") +
+		    utils::Path::path().package());
+	}
+    }
+}
+
 void GVLE::onMenuLoad()
 {
     if (m_modeling->isModified() == false or
@@ -562,38 +596,13 @@ void GVLE::onMenuLoad()
 
         if (file.run() == Gtk::RESPONSE_OK) {
             m_modeling->parseXML(file.get_filename());
+	    utils::Path::path().setPackage("");
+	    m_menu->onGlobalMode();
         }
     }
 }
 
 void GVLE::onMenuSave()
-{
-    std::vector<std::string> vec;
-    m_modeling->vpz_is_correct(vec);
-
-    if (vec.size() == 0) {
-        //if (m_modeling->isModified()) {
-        if (m_modeling->isSaved()) {
-            m_modeling->saveXML(m_modeling->getFileName());
-        }
-        //}
-        else {
-            onMenuSaveAs();
-        }
-    } else {
-        //vpz is incorrect
-        std::string error = _("Vpz incorrect :\n");
-        std::vector<std::string>::const_iterator it = vec.begin();
-        while (it != vec.end()) {
-            error += *it + "\n";
-
-            ++it;
-        }
-        Error(error);
-    }
-}
-
-void GVLE::onMenuSaveAs()
 {
     std::vector<std::string> vec;
     m_modeling->vpz_is_correct(vec);
@@ -611,19 +620,25 @@ void GVLE::onMenuSaveAs()
         return;
     }
 
-    Gtk::FileChooserDialog file(_("VPZ file"), Gtk::FILE_CHOOSER_ACTION_SAVE);
-    file.set_transient_for(*this);
-    file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-    file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
-    Gtk::FileFilter filter;
-    filter.set_name(_("Vle Project gZipped"));
-    filter.add_pattern("*.vpz");
-    file.add_filter(filter);
+    if (m_modeling->isSaved()) {
+	m_modeling->saveXML(m_modeling->getFileName());
+    } else if (utils::Path::path().package() != "") {
+	mSaveVpzBox->show();
+    } else {
+	Gtk::FileChooserDialog file(_("VPZ file"), Gtk::FILE_CHOOSER_ACTION_SAVE);
+	file.set_transient_for(*this);
+	file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+	file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+	Gtk::FileFilter filter;
+	filter.set_name(_("Vle Project gZipped"));
+	filter.add_pattern("*.vpz");
+	file.add_filter(filter);
 
-    if (file.run() == Gtk::RESPONSE_OK) {
-        std::string filename(file.get_filename());
-        vpz::Vpz::fixExtension(filename);
-        m_modeling->saveXML(filename);
+	if (file.run() == Gtk::RESPONSE_OK) {
+	    std::string filename(file.get_filename());
+	    vpz::Vpz::fixExtension(filename);
+	    m_modeling->saveXML(filename);
+	}
     }
 }
 
@@ -646,12 +661,7 @@ void GVLE::onMenuQuit()
 	    Error(error);
 	    return;
 	} else {
-	    if (m_modeling->isSaved()) {
-		m_modeling->saveXML(m_modeling->getFileName());
-	    }
-	    else {
-	       onMenuSaveAs();
-	    }
+	    onMenuSave();
 	}
     }
     hide();

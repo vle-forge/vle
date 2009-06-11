@@ -43,36 +43,49 @@ GVLEMenu::GVLEMenu(GVLE* gvle)
     items().push_back(Gtk::Menu_Helpers::MenuElem(_("_Help"), mMenuHelp));
 }
 
+GVLEMenu::~GVLEMenu()
+{
+    delete mMenuFileOpenVpz;
+}
+
 void GVLEMenu::makeMenuFile(GVLE* gvle)
 {
     Gtk::Menu::MenuList& menulist = mMenuFile.items();
 
-    menulist.push_back(Gtk::Menu_Helpers::StockMenuElem(
-                           Gtk::Stock::NEW,
+    menulist.push_back(Gtk::Menu_Helpers::MenuElem(_("_New Vpz"),
                            Gtk::AccelKey(GDK_N, Gdk::CONTROL_MASK),
                            sigc::mem_fun(gvle,&GVLE::onMenuNew)));
 
+    menulist.push_back(Gtk::Menu_Helpers::MenuElem(_("_New Package"),
+                           Gtk::AccelKey(GDK_N, Gdk::CONTROL_MASK |
+					 Gdk::SHIFT_MASK),
+                           sigc::mem_fun(gvle, &GVLE::onMenuNewProject)));
+
     menulist.push_back(Gtk::Menu_Helpers::SeparatorElem());
 
-    menulist.push_back(Gtk::Menu_Helpers::StockMenuElem(
-                           Gtk::Stock::OPEN,
+    menulist.push_back(Gtk::Menu_Helpers::MenuElem(_("_Open Package"),
+			   Gtk::AccelKey(GDK_O, Gdk::CONTROL_MASK |
+					 Gdk::SHIFT_MASK),
+                           sigc::mem_fun(gvle, &GVLE::onMenuOpenPackage)));
+
+    mMenuFileOpenVpz = new Gtk::MenuItem(_("Open Vpz"));
+    mMenuFileOpenVpz->set_sensitive(false);
+    menulist.push_back(Gtk::Menu_Helpers::MenuElem(*mMenuFileOpenVpz));
+    mMenuFileOpenVpz->signal_activate().connect(
+	sigc::mem_fun(gvle, &GVLE::onMenuOpenVpz));
+
+    menulist.push_back(Gtk::Menu_Helpers::MenuElem(_("_Open Global Vpz"),
                            Gtk::AccelKey(GDK_O, Gdk::CONTROL_MASK),
-                           sigc::mem_fun(gvle, &GVLE::onMenuLoad)));
+			   sigc::mem_fun(gvle, &GVLE::onMenuLoad)));
 
-    menulist.push_back(Gtk::Menu_Helpers::StockMenuElem(
-                           Gtk::Stock::SAVE,
-                           Gtk::AccelKey(GDK_S, Gdk::CONTROL_MASK),
-                           sigc::mem_fun(gvle, &GVLE::onMenuSave)));
+    menulist.push_back(Gtk::Menu_Helpers::MenuElem(_("_Save"),
+			   Gtk::AccelKey(GDK_S, Gdk::CONTROL_MASK),
+			   sigc::mem_fun(gvle, &GVLE::onMenuSave)));
 
-    menulist.push_back(Gtk::Menu_Helpers::StockMenuElem(
-                           Gtk::Stock::SAVE_AS,
-                           Gtk::AccelKey(GDK_S, Gdk::CONTROL_MASK),
-                           sigc::mem_fun(gvle, &GVLE::onMenuSaveAs)));
 
     menulist.push_back(Gtk::Menu_Helpers::SeparatorElem());
 
-    menulist.push_back(Gtk::Menu_Helpers::StockMenuElem(
-                           Gtk::Stock::QUIT,
+    menulist.push_back(Gtk::Menu_Helpers::MenuElem(_("_Quit"),
                            Gtk::AccelKey(GDK_Q, Gdk::CONTROL_MASK |
 					 Gdk::SHIFT_MASK),
                            //sigc::mem_fun(gvle,
@@ -155,6 +168,16 @@ void GVLEMenu::makeMenuHelp(GVLE* gvle)
     menulist.push_back(
 	Gtk::Menu_Helpers::MenuElem(_("About"),
 				    sigc::mem_fun(gvle, &GVLE::onShowAbout)));
+}
+
+void GVLEMenu::onPackageMode()
+{
+   mMenuFileOpenVpz->set_sensitive(true);
+}
+
+void GVLEMenu::onGlobalMode()
+{
+    mMenuFileOpenVpz->set_sensitive(false);
 }
 
 } } // namespace vle gvle

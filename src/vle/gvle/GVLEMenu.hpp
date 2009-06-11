@@ -48,8 +48,22 @@ public:
      */
     GVLEMenu(GVLE* gvle);
 
-    /** Nothing to delete. */
-    virtual ~GVLEMenu() {}
+    /** Delete the item. */
+    virtual ~GVLEMenu();
+
+    /**
+     *
+     * Change to Package Mode to access to the Menu item
+     *
+     */
+    void onPackageMode();
+
+    /**
+     *
+     * Change to Gobal Mode to lock the Menu item
+     *
+     */
+    void onGlobalMode();
 
 private:
     /**
@@ -84,6 +98,8 @@ private:
     Gtk::Menu   mMenuView;
     Gtk::Menu   mMenuSimulation;
     Gtk::Menu   mMenuHelp;
+
+    Gtk::MenuItem* mMenuFileOpenVpz;
 };
 
 }

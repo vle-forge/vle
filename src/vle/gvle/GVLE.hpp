@@ -29,9 +29,13 @@
 #include <vle/gvle/ConditionsBox.hpp>
 #include <vle/gvle/HelpBox.hpp>
 #include <vle/gvle/LaunchSimulationBox.hpp>
+#include <vle/gvle/NewProjectBox.hpp>
 #include <vle/gvle/ObserverPlugin.hpp>
+#include <vle/gvle/OpenPackageBox.hpp>
+#include <vle/gvle/OpenVpzBox.hpp>
 #include <vle/gvle/ParameterExecutionBox.hpp>
 #include <vle/gvle/Plugin.hpp>
+#include <vle/gvle/SaveVpzBox.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/gvle/ComboboxString.hpp>
 #include <vle/utils/Path.hpp>
@@ -279,6 +283,24 @@ public:
     void onMenuNew();
 
     /**
+     * When click on new project menu
+     *
+     */
+    void onMenuNewProject();
+
+    /**
+     * When click on open package menu
+     *
+     */
+    void onMenuOpenPackage();
+
+    /**
+     * When clinck on open vpz menu
+     *
+     */
+    void onMenuOpenVpz();
+
+    /**
      * When click on load menu.
      *
      */
@@ -289,12 +311,6 @@ public:
      *
      */
     void onMenuSave();
-
-    /**
-     * When click on save as menu.
-     *
-     */
-    void onMenuSaveAs();
 
     /**
      * Whien click on quit as menu
@@ -454,6 +470,10 @@ private:
     ConditionsBox*        mConditionsBox;
     LaunchSimulationBox*  mSimulationBox;
     PreferencesBox*       mPreferencesBox;
+    OpenPackageBox*       mOpenPackageBox;
+    OpenVpzBox*           mOpenVpzBox;
+    NewProjectBox*        mNewProjectBox;
+    SaveVpzBox*           mSaveVpzBox;
 };
 
 std::string valuetype_to_string(value::Value::type type);
