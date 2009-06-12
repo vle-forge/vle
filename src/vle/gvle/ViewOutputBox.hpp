@@ -105,6 +105,7 @@ namespace vle { namespace gvle {
         sigc::connection m_cntFormatChanged;
         sigc::connection m_cntDirectoryClicked;
         sigc::connection m_cntEditPluginClicked;
+	sigc::connection m_cntPluginClicked;
 
         Glib::RefPtr < Gtk::ListStore > m_model;
         Gtk::Menu           m_menu;
@@ -121,6 +122,7 @@ namespace vle { namespace gvle {
         void onChangedFormat();
         void onClickedDirectory();
         void onEditPlugin();
+	void onChangedPlugin();
 
         void fillCombobox();
         void assignView(const std::string& name);

@@ -73,6 +73,8 @@ ViewOutputBox::ViewOutputBox(Modeling& modeling,
         sigc::mem_fun( *this, &ViewOutputBox::onClickedDirectory));
     m_cntEditPluginClicked = m_editplugin->signal_clicked().connect(
         sigc::mem_fun( *this, &ViewOutputBox::onEditPlugin));
+    m_cntPluginClicked = m_plugin->signal_changed().connect(
+	sigc::mem_fun( *this, &ViewOutputBox::onChangedPlugin));
 }
 
 ViewOutputBox::~ViewOutputBox()
@@ -90,6 +92,7 @@ ViewOutputBox::~ViewOutputBox()
     m_cntFormatChanged.disconnect();
     m_cntDirectoryClicked.disconnect();
     m_cntEditPluginClicked.disconnect();
+    m_cntPluginClicked.disconnect();
 }
 
 void ViewOutputBox::run()
@@ -148,6 +151,7 @@ void ViewOutputBox::fillViews()
             }
     }
     sensitive(false);
+    m_editplugin->set_sensitive(false);
 }
 
 void ViewOutputBox::initMenuPopupViews()
@@ -362,6 +366,17 @@ void ViewOutputBox::onEditPlugin()
         } catch(const std::exception& e) {
             Error(e.what());
         }
+    }
+}
+
+void ViewOutputBox::onChangedPlugin()
+{
+    OutputPluginList list = m_modeling.pluginFactory().outputPlugins();
+    OutputPluginList::iterator it = list.find(m_plugin->get_active_text());
+    if( it != list.end()) {
+	m_editplugin->set_sensitive(true);
+    } else {
+	m_editplugin->set_sensitive(false);
     }
 }
 
