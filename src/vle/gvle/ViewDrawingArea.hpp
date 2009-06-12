@@ -108,6 +108,14 @@ namespace vle { namespace gvle {
         /** restore zoom to default value 1.0 */
         void restoreZoom();
 
+	/*
+	 * set a new coefficient to the zoom
+	 * @parm coef the new coefficient
+	 *
+	 */
+	void setCoefZoom(double coef);
+
+
         /**
          * Calculate a new Zoom factor using 2 points and apply to the
          * DrawingArea.

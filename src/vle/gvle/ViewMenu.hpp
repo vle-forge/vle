@@ -76,6 +76,12 @@ private:
     void makeMenuTools();
 
     /**
+     * Make menu zoom and connect signals
+     *
+     */
+    void makeMenuZoom(View* v);
+
+    /**
      * When select arrow menu item.
      *
      */
@@ -121,7 +127,10 @@ private:
     Gtk::Menu   mMenuFile;
     Gtk::Menu   mMenuEdit;
     Gtk::Menu   mMenuTools;
+    Gtk::Menu   mMenuZoom;
     View*       m_view;
+
+    Gtk::MenuItem* mMenuZoomPlus;
 };
 
 }

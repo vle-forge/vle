@@ -132,14 +132,6 @@ public:
      */
     bool on_focus_in_event(GdkEventFocus* event);
 
-    /**
-     * When user release an event key
-     *
-     * @param event key typed structure
-     * @return true
-     */
-    bool on_key_release_event(GdkEventKey* event);
-
     //
     //
     // MANAGE CURRENT SELECTED MODELS
@@ -329,6 +321,25 @@ public:
      * To update the adjustment.
      */
     void updateAdjustment(double h, double v);
+
+    /**
+     * To zoom more
+     *
+     */
+    void addCoefZoom();
+
+    /**
+     * To zoom less
+     *
+     */
+    void delCoefZoom();
+
+    /**
+     * To set a coefficient to the zoom
+     *
+     * @param coef the coefficient
+     */
+    void setCoefZoom(double coef);
 
 private:
     Modeling*                   mModeling;

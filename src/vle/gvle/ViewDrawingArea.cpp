@@ -1251,6 +1251,12 @@ void ViewDrawingArea::selectZoom(int xmin, int ymin, int xmax, int ymax)
     mView->updateAdjustment(xmin * mZoom, ymin * mZoom);
 }
 
+void ViewDrawingArea::setCoefZoom(double coef)
+{
+    mZoom = coef;
+    newSize();
+}
+
 void ViewDrawingArea::setColor(Color color)
 {
     mContext->set_source_rgb(color.m_r, color.m_g, color.m_b);

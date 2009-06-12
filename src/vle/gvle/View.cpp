@@ -156,22 +156,6 @@ bool View::on_focus_in_event(GdkEventFocus* event)
     return true;
 }
 
-bool View::on_key_release_event(GdkEventKey* event)
-{
-    switch (event->keyval) {
-    case GDK_plus:
-        mDrawing->addCoefZoom();
-        break;
-    case GDK_minus:
-        mDrawing->delCoefZoom();
-        break;
-    case GDK_equal:
-        mDrawing->restoreZoom();
-        break;
-    }
-    return true;
-}
-
 void View::addModelInListModel(graph::Model* model, bool shiftorcontrol)
 {
     if (model) {
@@ -547,5 +531,21 @@ void  View::updateAdjustment(double h, double v)
     mViewport.get_vadjustment()->set_lower(v);
     mViewport.get_vadjustment()->set_value(v);
 }
+
+void View::addCoefZoom()
+{
+    mDrawing->addCoefZoom();
+}
+
+void View::delCoefZoom()
+{
+    mDrawing->delCoefZoom();
+}
+
+void View::setCoefZoom(double coef)
+{
+    mDrawing->setCoefZoom(coef);
+}
+
 
 }} // namespace vle gvle

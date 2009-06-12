@@ -40,10 +40,12 @@ ViewMenu::ViewMenu(View* v) :
     makeMenuFile(v);
     makeMenuEdit(v);
     makeMenuTools();
+    makeMenuZoom(v);
 
     items().push_back(Gtk::Menu_Helpers::MenuElem(_("_File"), mMenuFile));
     items().push_back(Gtk::Menu_Helpers::MenuElem(_("Edit"), mMenuEdit));
     items().push_back(Gtk::Menu_Helpers::MenuElem(_("_Tools"), mMenuTools));
+    items().push_back(Gtk::Menu_Helpers::MenuElem(_("Zoom"), mMenuZoom));
 }
 
 void ViewMenu::makeMenuFile(View* v)
@@ -139,6 +141,41 @@ void ViewMenu::makeMenuTools()
 			   _("_Question"),
 			   Gtk::AccelKey("F7"),
 			   sigc::mem_fun(this, &ViewMenu::onQuestion)));
+}
+
+void ViewMenu::makeMenuZoom(View* v)
+{
+    Gtk::Menu::MenuList& menuList = mMenuZoom.items();
+    menuList.push_back(Gtk::Menu_Helpers::MenuElem(
+			   _("Zoom +"),
+			   Gtk::AccelKey(GDK_plus, Gdk::CONTROL_MASK),
+			   sigc::mem_fun(v, &View::addCoefZoom)));
+
+
+    menuList.push_back(Gtk::Menu_Helpers::MenuElem(
+			   _("Zoom -"),
+			   Gtk::AccelKey(GDK_minus, Gdk::CONTROL_MASK),
+			   sigc::mem_fun(v, &View::delCoefZoom)));
+
+    menuList.push_back(Gtk::Menu_Helpers::SeparatorElem());
+
+    menuList.push_back(Gtk::Menu_Helpers::MenuElem(
+			   _("Zoom 1:1"),
+			   Gtk::AccelKey(GDK_equal, Gdk::CONTROL_MASK),
+			   sigc::bind(sigc::mem_fun(
+					  v, &View::setCoefZoom), 1.0)));
+
+    menuList.push_back(Gtk::Menu_Helpers::MenuElem(
+			   _("Zoom 1:2"),
+			   Gtk::AccelKey(GDK_1, Gdk::CONTROL_MASK),
+			   sigc::bind(sigc::mem_fun(
+					  v, &View::setCoefZoom), 0.5)));
+
+    menuList.push_back(Gtk::Menu_Helpers::MenuElem(
+			   _("Zoom 2:1"),
+			   Gtk::AccelKey(GDK_2, Gdk::CONTROL_MASK),
+			   sigc::bind(sigc::mem_fun(
+					  v, &View::setCoefZoom), 2)));
 }
 
 void ViewMenu::onArrow()
