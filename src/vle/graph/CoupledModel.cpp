@@ -317,6 +317,51 @@ int CoupledModel::nbOutputConnection(const std::string& src,
     return nbConnections;
 }
 
+int CoupledModel::nbInternalConnection(const std::string& src,
+				       const std::string& portsrc,
+				       const std::string& dst,
+				       const std::string& portdst)
+{
+    Model* msrc = findModel(src);
+    Model* mdst = findModel(dst);
+    int nbConnections=0;
+
+    if (msrc == 0 or mdst == 0) {
+        return 0;
+    }
+
+    if (not msrc->existOutputPort(portsrc)) {
+        return 0;
+    }
+
+    if (not mdst->existInputPort(portdst)) {
+        return 0;
+    }
+
+    const ModelPortList& mp_src = msrc->getOutPort(portsrc);
+    const ModelPortList& mp_dst = mdst->getInPort(portdst);
+
+    if (not mp_src.exist(mdst, portdst)) {
+        return 0;
+    }
+
+
+    if (not mp_dst.exist(msrc, portsrc)) {
+        return 0;
+    }
+
+    ConnectionList::iterator iter = msrc->getOutputPortList().find(portsrc);
+    ModelPortList model(iter->second);
+    for (ModelPortList::iterator it = model.begin(); it != model.end(); ++it) {
+	if (it->first == mdst and it->second == portdst) {
+	    nbConnections++;
+	}
+    }
+
+    return nbConnections;
+}
+
+
 void CoupledModel::addInputConnection(const std::string& portSrc,
                                       const std::string& dst,
                                       const std::string& portDst)
@@ -555,10 +600,8 @@ void CoupledModel::displace(ModelList& models, CoupledModel* destination)
     Assert < utils::DevsGraphError >(not hasConnectionProblem(models),
            _("One or more models are connected to another model"));
 
-    std::vector < std::string > cnts(getBasicConnections(models));
     detachModels(models);
     destination->attachModels(models);
-    destination->setBasicConnections(cnts);
 }
 
 bool CoupledModel::hasConnectionProblem(const ModelList& lst) const

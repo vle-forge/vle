@@ -239,6 +239,11 @@ namespace vle { namespace graph {
 	int nbOutputConnection(const std::string& src,
 			       const std::string& portsrc,
 			       const std::string& portdst);
+
+	int nbInternalConnection(const std::string& src,
+				 const std::string& portsrc,
+				 const std::string& dst,
+				 const std::string& portdst);
         /**
          * @brief Delete all connection around model m.
          *

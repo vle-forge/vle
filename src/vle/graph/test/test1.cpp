@@ -550,3 +550,38 @@ BOOST_AUTO_TEST_CASE(test_bug_rename_port)
     BOOST_REQUIRE_EQUAL(top->existInternalConnection("top2", "out", "top1",
                                                      "in"), false);
 }
+
+BOOST_AUTO_TEST_CASE(test_bug_duplication_connections)
+{
+    vpz::Vpz file(utils::Path::path().getExampleFile("unittest.vpz"));
+
+    CoupledModel* top =
+        dynamic_cast<CoupledModel*>(file.project().model().model());
+    BOOST_REQUIRE(top);
+
+    AtomicModel* atom1(top->addAtomicModel("atom1"));
+    AtomicModel* atom2(top->addAtomicModel("atom2"));
+    CoupledModel* coupled = new CoupledModel("coupled", top);
+    ModelList mSelectedModels;
+
+    BOOST_REQUIRE(atom1);
+    BOOST_REQUIRE(atom2);
+    BOOST_REQUIRE(coupled);
+
+    atom1->addOutputPort("out");
+    atom2->addInputPort("in");
+
+    BOOST_REQUIRE_EQUAL(atom1->existOutputPort("out"), true);
+    BOOST_REQUIRE_EQUAL(atom2->existInputPort("in"), true);
+
+    top->addInternalConnection("atom1", "out", "atom2", "in");
+    BOOST_REQUIRE_EQUAL(top->existInternalConnection("atom1", "out", "atom2", "in"),
+						     true);
+
+    mSelectedModels[atom1->getName()] = atom1;
+    mSelectedModels[atom2->getName()] = atom2;
+    BOOST_REQUIRE_EQUAL(top->nbInternalConnection("atom1", "out", "atom2", "in"), 1);
+
+    top->displace(mSelectedModels, coupled);
+    BOOST_REQUIRE_EQUAL(coupled->nbInternalConnection("atom1", "out", "atom2", "in"), 1);
+}
