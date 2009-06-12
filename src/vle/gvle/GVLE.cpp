@@ -112,6 +112,7 @@ GVLE::GVLE(const std::string& filename) :
     if (filename.empty() == false) {
         m_modeling->parseXML(filename);
     }
+    m_modeling->setModified(false);
 }
 
 GVLE::~GVLE()
