@@ -172,10 +172,10 @@ void ViewDrawingArea::drawCurrentModelPorts()
 			      (stepInput * (i + 1) + 10));
 	    mContext->show_text(itl->first);
 	    mContext->stroke();
-	}	
+	}
 	itl++;
     }
-    
+
     itl = opl.begin();
 
     for (guint i = 0; i < maxOutput; ++i) {
@@ -201,7 +201,7 @@ void ViewDrawingArea::drawCurrentModelPorts()
 	    mContext->show_text(itl->first);
 	    mContext->stroke();
 	}
-	
+
 	itl++;
 
     }
@@ -1072,7 +1072,7 @@ void ViewDrawingArea::calcSize(graph::Model* m)
 
 void ViewDrawingArea::addLinkOnButtonPress(int x, int y)
 {
-    if (mView->isEmptySelectedModels()) {
+    if (not mView->isEmptySelectedModels()) {
         mView->clearSelectedModels();
     }
 
