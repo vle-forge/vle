@@ -52,37 +52,37 @@ void PackageBrowserMenu::makeMenuFile()
 
     menuList.push_back(Gtk::Menu_Helpers::StockMenuElem(
                            Gtk::Stock::NEW,
-                           Gtk::AccelKey(GDK_N, Gdk::CONTROL_MASK),
-                           sigc::mem_fun(mParent, &PackageBrowserWindow::newFile)));
+                           Gtk::AccelKey(GDK_N, Gdk::CONTROL_MASK)/*,
+			   sigc::mem_fun(mParent, &PackageBrowserWindow::newFile)*/));
 
     menuList.push_back(Gtk::Menu_Helpers::SeparatorElem());
 
     menuList.push_back(Gtk::Menu_Helpers::StockMenuElem(
                            Gtk::Stock::OPEN,
-                           Gtk::AccelKey(GDK_O, Gdk::CONTROL_MASK),
-                           sigc::mem_fun(mParent, &PackageBrowserWindow::openFile)));
+                           Gtk::AccelKey(GDK_O, Gdk::CONTROL_MASK)/*,
+                           sigc::mem_fun(mParent, &PackageBrowserWindow::openFile)*/));
 
     menuList.push_back(Gtk::Menu_Helpers::StockMenuElem(
                            Gtk::Stock::SAVE,
-                           Gtk::AccelKey(GDK_S, Gdk::CONTROL_MASK),
-                           sigc::mem_fun(mParent, &PackageBrowserWindow::saveFile)));
+                           Gtk::AccelKey(GDK_S, Gdk::CONTROL_MASK)/*,
+                           sigc::mem_fun(mParent, &PackageBrowserWindow::saveFile)*/));
 
     menuList.push_back(Gtk::Menu_Helpers::StockMenuElem(
                            Gtk::Stock::SAVE_AS,
-                           Gtk::AccelKey(GDK_S, Gdk::CONTROL_MASK),
-                           sigc::mem_fun(mParent, &PackageBrowserWindow::saveFileAs)));
+                           Gtk::AccelKey(GDK_S, Gdk::CONTROL_MASK)/*,
+                           sigc::mem_fun(mParent, &PackageBrowserWindow::saveFileAs)*/));
 
     menuList.push_back(Gtk::Menu_Helpers::StockMenuElem(
                            Gtk::Stock::CLOSE,
-                           Gtk::AccelKey(GDK_W, Gdk::CONTROL_MASK),
-			   sigc::mem_fun(mParent, &PackageBrowserWindow::closeFile)));
+                           Gtk::AccelKey(GDK_W, Gdk::CONTROL_MASK)/*,
+			   sigc::mem_fun(mParent, &PackageBrowserWindow::closeFile)*/));
 
     menuList.push_back(Gtk::Menu_Helpers::SeparatorElem());
 
     menuList.push_back(Gtk::Menu_Helpers::StockMenuElem(
                            Gtk::Stock::QUIT,
-                           Gtk::AccelKey(GDK_Q, Gdk::CONTROL_MASK),
-			   sigc::mem_fun(mParent, &PackageBrowserWindow::hide)));
+                           Gtk::AccelKey(GDK_Q, Gdk::CONTROL_MASK)/*,
+			   sigc::mem_fun(mParent, &PackageBrowserWindow::hide)*/));
 }
 
 void PackageBrowserMenu::makeMenuPackage()
@@ -90,20 +90,20 @@ void PackageBrowserMenu::makeMenuPackage()
     Gtk::Menu::MenuList& menuList = mMenuPackage.items();
 
     menuList.push_back(Gtk::Menu_Helpers::MenuElem(
-			   _("_Configure project"),
-			   sigc::mem_fun(mParent, &PackageBrowserWindow::configureProject)));
+			   _("_Configure project")/*,
+			   sigc::mem_fun(mParent, &PackageBrowserWindow::configureProject)*/));
 
     menuList.push_back(Gtk::Menu_Helpers::MenuElem(
-			   _("_Build project"),
-			   sigc::mem_fun(mParent, &PackageBrowserWindow::buildProject)));
+			   _("_Build project")/*,
+			   sigc::mem_fun(mParent, &PackageBrowserWindow::buildProject)*/));
 
     menuList.push_back(Gtk::Menu_Helpers::MenuElem(
-			   _("_C_lean project"),
-			   sigc::mem_fun(mParent, &PackageBrowserWindow::cleanProject)));
+			   _("_C_lean project")/*,
+			   sigc::mem_fun(mParent, &PackageBrowserWindow::cleanProject)*/));
 
     menuList.push_back(Gtk::Menu_Helpers::MenuElem(
-			   _("Create project _package"),
-			   sigc::mem_fun(mParent, &PackageBrowserWindow::packageProject)));
+			   _("Create project _package")/*,
+			   sigc::mem_fun(mParent, &PackageBrowserWindow::packageProject)*/));
 }
 
 }}

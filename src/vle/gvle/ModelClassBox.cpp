@@ -35,31 +35,30 @@ namespace vle
 {
 namespace gvle {
 
-ModelClassBox::ModelClassBox(Glib::RefPtr < Gnome::Glade::Xml > xml,
-			     Modeling* m):
-        mModeling(m),
-	mNewModelBox(new NewModelClassBox(xml,m)),
-        mClasses_backup(0)
+ModelClassBox::ModelClassBox(BaseObjectType* cobject,
+			     Glib::RefPtr < Gnome::Glade::Xml > xml):
+    Gtk::TreeView(cobject),
+    mXml(xml),
+    mClasses_backup(0)
 {
-    set_title(_("Model Class Tree"));
-    set_default_size(200, 350);
-    set_border_width(5);
-    mScrolledWindow.add(mTreeView);
-    mScrolledWindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
-
     mRefTreeModel = Gtk::TreeStore::create(mColumns);
-    mTreeView.set_model(mRefTreeModel);
-    mTreeView.append_column(_("Name"), mColumns.mName);
+    set_model(mRefTreeModel);
+    append_column(_("Class"), mColumns.mName);
 
-    mTreeView.signal_row_activated().connect(
+    signal_row_activated().connect(
 	sigc::mem_fun(*this, &ModelClassBox::row_activated));
-    mTreeView.signal_button_release_event().connect(
+    signal_button_release_event().connect(
 	sigc::mem_fun(*this, &ModelClassBox::onButtonRealeaseModels));
 
-    mTreeView.expand_all();
-    mTreeView.set_rules_hint(true);
-    add(mScrolledWindow);
+    expand_all();
+    set_rules_hint(true);
     initMenuPopupModels();
+}
+
+void ModelClassBox::createNewModelBox(Modeling* m)
+{
+    mModeling = m;
+    mNewModelBox = new NewModelClassBox(mXml,m);
 }
 
 void ModelClassBox::initMenuPopupModels()
@@ -108,7 +107,7 @@ void ModelClassBox::initMenuPopupModels()
 		    *this,
 		    &ModelClassBox::onImportClassesFromVpz)));
 
-    mMenuPopup.accelerate(mTreeView);
+    mMenuPopup.accelerate(*this);
 }
 
 ModelClassBox::~ModelClassBox()
@@ -138,7 +137,7 @@ void ModelClassBox::onAdd()
 
 void ModelClassBox::onRemove()
 {
-    Glib::RefPtr<Gtk::TreeView::Selection> refSelection =  mTreeView.get_selection();
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection =  get_selection();
     if (refSelection) {
         Gtk::TreeModel::iterator iter = refSelection->get_selected();
         if (iter and (mRefTreeModel->iter_depth(iter) == 0)) {
@@ -162,7 +161,7 @@ void ModelClassBox::onRename()
 {
    SimpleTypeBox box(_("Name of the Class ?"));
    std::string name = boost::trim_copy(box.run());
-   Glib::RefPtr<Gtk::TreeView::Selection> refSelection =  mTreeView.get_selection();
+   Glib::RefPtr<Gtk::TreeView::Selection> refSelection =  get_selection();
    if (refSelection and box.valid() and not name.empty()) {
        Gtk::TreeModel::iterator iter = refSelection->get_selected();
        if (iter and (mRefTreeModel->iter_depth(iter) == 0)) {
@@ -190,7 +189,7 @@ void ModelClassBox::onRename()
 
 void ModelClassBox::onExportVpz()
 {
-    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = mTreeView.get_selection();
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
     if (refSelection) {
 	Gtk::TreeModel::iterator iter = refSelection->get_selected();
 	if (iter and (mRefTreeModel->iter_depth(iter) == 0)) {
@@ -227,7 +226,6 @@ void ModelClassBox::onExportVpz()
 void ModelClassBox::onImportModelAsClass()
 {
     Gtk::FileChooserDialog file(_("VPZ file"), Gtk::FILE_CHOOSER_ACTION_OPEN);
-    file.set_transient_for(*this);
     file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
     Gtk::FileFilter filter;
@@ -254,7 +252,6 @@ void ModelClassBox::onImportModelAsClass()
 void ModelClassBox::onImportClassesFromVpz()
 {
     Gtk::FileChooserDialog file(_("VPZ file"), Gtk::FILE_CHOOSER_ACTION_OPEN);
-    file.set_transient_for(*this);
     file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
     Gtk::FileFilter filter;
@@ -289,7 +286,7 @@ void ModelClassBox::parseClass()
 	}
 	++iter;
     }
-    mTreeView.expand_all();
+    expand_all();
 }
 
 Gtk::TreeModel::Row
@@ -328,7 +325,7 @@ bool ModelClassBox::on_key_release_event(GdkEventKey* event)
 {
     if (((event->state & GDK_CONTROL_MASK) and event->keyval == GDK_w) or
             (event->keyval == GDK_Escape)) {
-        mModeling->hideModelClassBox();
+        //mModeling->hideModelClassBox();
     }
     return true;
 }
@@ -365,7 +362,7 @@ bool ModelClassBox::on_foreach(const Gtk::TreeModel::Path&,
                               const Gtk::TreeModel::iterator& iter)
 {
     if ((*iter).get_value(mColumns.mName) == mSearch) {
-        mTreeView.set_cursor(mRefTreeModel->get_path(iter));
+	set_cursor(mRefTreeModel->get_path(iter));
         return true;
     }
     return false;

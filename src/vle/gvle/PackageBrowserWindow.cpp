@@ -33,7 +33,7 @@
 
 namespace vle { namespace gvle {
 
-Document::Document(const std::string& filepath, bool newfile) :
+/*Document::Document(const std::string& filepath, bool newfile) :
     Gtk::ScrolledWindow(),
     mFilePath(filepath),
     mModified(false),
@@ -81,11 +81,11 @@ void Document::init()
     } else {
 	add(mView);
     }
-}
+    }*/
 
-PackageBrowserWindow::FileTreeView::FileTreeView(
+/*PackageBrowserWindow::FileTreeView::FileTreeView(
     BaseObjectType* cobject,
-    const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/) :
+    const Glib::RefPtr<Gnome::Glade::Xml>& refGlade) :
     Gtk::TreeView(cobject)
 {
     mRefTreeModel = Gtk::TreeStore::create(mColumns);
@@ -168,10 +168,10 @@ std::list<std::string>* PackageBrowserWindow::FileTreeView::projectFilePath(
     } else {
 	return new std::list<std::string>();
     }
-}
+    }*/
 
 /* PackageBrowserWindow */
-PackageBrowserWindow::PackageBrowserWindow(Glib::RefPtr<Gnome::Glade::Xml> xml,
+/*PackageBrowserWindow::PackageBrowserWindow(Glib::RefPtr<Gnome::Glade::Xml> xml,
 			       Modeling* modeling) :
     mXml(xml),
     mModeling(modeling)
@@ -355,6 +355,6 @@ void PackageBrowserWindow::buildPackageHierarchy()
     mFileTreeView->clear();
     mFileTreeView->setPackage(mPackage);
     mFileTreeView->build();
-}
+}*/
 
 }}

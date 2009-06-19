@@ -37,7 +37,7 @@ namespace vle { namespace gvle {
 /**
  * @brief Document class used within Gtk::Notebook
  */
-class Document : public Gtk::ScrolledWindow {
+/*class Document : public Gtk::ScrolledWindow {
 public:
     Document(const std::string& filePath, bool newfile = false);
     ~Document();
@@ -62,12 +62,12 @@ private:
     bool           mNew;
 
     void init();
-};
+    };*/
 
 class PackageBrowserWindow {
 public:
     /* define a map with a file path and its buffer */
-    typedef std::map < std::string, Document* > Documents;
+    //typedef std::map < std::string, Document* > Documents;
 
     /* Constructor */
     PackageBrowserWindow(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* modeling);
@@ -157,7 +157,7 @@ private:
     Gtk::Notebook*                       mNotebook;
     PackageBrowserMenu*                  mMenuBar;
     std::string                          mPackage;
-    Documents                            mDocuments;
+    //Documents                            mDocuments;
 
     void buildPackageHierarchy();
 };

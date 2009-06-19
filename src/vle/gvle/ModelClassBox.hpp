@@ -40,15 +40,15 @@ class Modeling;
 /**
  * @brief A Gtk::Window to show the vpz::Class hierarchy into a window.
  */
-class ModelClassBox : public Gtk::Window
+class ModelClassBox : public Gtk::TreeView
 {
 public:
     /**
      * make a new Window show complete class and model tree read from Modeling
      *
-     * @param m where to get model information
      */
-    ModelClassBox(Glib::RefPtr < Gnome::Glade::Xml > xml, Modeling* m);
+    ModelClassBox(BaseObjectType* cobject,
+		  Glib::RefPtr < Gnome::Glade::Xml > xml);
 
     ~ModelClassBox();
 
@@ -67,6 +67,12 @@ public:
     virtual void onImportModelAsClass();
     virtual void onImportClassesFromVpz();
     void showRow(const std::string& model_name);
+
+    /**
+     * @brief init the NewModelClassBox
+     *
+     */
+    void createNewModelBox(Modeling* m);
 
 protected:
     /**
@@ -144,9 +150,7 @@ private:
 
     //Backup
     vpz::ClassList*                      mClasses_backup;
-    Gtk::TreeView                        mTreeView;
     Glib::RefPtr<Gtk::TreeStore>         mRefTreeModel;
-    Gtk::ScrolledWindow                  mScrolledWindow;
     std::string                          mSearch;
 };
 

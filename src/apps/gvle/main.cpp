@@ -75,6 +75,10 @@ int main(int argc, char** argv)
     Gtk::Main application(&argc, &argv);
     vle::manager::init();
 
+    Glib::RefPtr < Gnome::Glade::Xml >  mRefXML =
+	Gnome::Glade::Xml::create(
+	    vle::utils::Path::path().getGladeFile("gvle.glade"));
+
     Glib::OptionContext context;
     vle::gvle::GVLEOptionGroup group;
     context.set_main_group(group);
@@ -107,10 +111,9 @@ int main(int argc, char** argv)
     } else {
 	try {
 	    vle::gvle::GVLE* g = 0;
+	    mRefXML->get_widget_derived("WindowPackageBrowser", g);
 	    if (argc > 1)
-		g = new vle::gvle::GVLE(argv[1]);
-	    else
-		g = new vle::gvle::GVLE;
+		g->setFileName(argv[1]);
 	    application.run(*g);
 	    delete g;
         } catch(const Glib::Exception& e) {

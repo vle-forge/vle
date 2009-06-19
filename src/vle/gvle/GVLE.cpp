@@ -33,24 +33,190 @@
 #include <vle/gvle/HostsBox.hpp>
 #include <vle/gvle/PluginTable.hpp>
 #include <vle/gvle/GVLEMenu.hpp>
-#include <vle/gvle/PackageBrowserWindow.hpp>
 #include <vle/gvle/PluginPlus.hpp>
 #include <vle/gvle/PreferencesBox.hpp>
 #include <vle/gvle/ViewOutputBox.hpp>
+#include <vle/gvle/View.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Debug.hpp>
+#include <vle/utils/Package.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
+#include <boost/filesystem.hpp>
 #include <gtkmm/filechooserdialog.h>
 #include <glibmm/miscutils.h>
 
 namespace vle { namespace gvle {
 
-GVLE::GVLE(const std::string& filename) :
+Document::Document() :
+    Gtk::ScrolledWindow()
+{
+
+}
+
+DocumentText::DocumentText(const std::string& filepath, bool newfile) :
+    Document(),
+    mFilePath(filepath),
+    mModified(false),
+    mNew(newfile)
+{
+    mFileName = boost::filesystem::basename(filepath);
+    init();
+}
+
+DocumentText::~DocumentText()
+{
+}
+
+void DocumentText::save()
+{
+    try {
+	std::ofstream file(mFilePath.c_str());
+	file << mView.get_buffer()->get_text();
+	file.close();
+	mNew = mModified = false;
+    } catch(std::exception& e) {
+	throw _("Error while saving file.");
+    }
+}
+
+void DocumentText::saveAs(const std::string& filename)
+{
+    mFilePath = filename;
+    save();
+}
+
+void DocumentText::init()
+{
+    if (not mNew) {
+	std::ifstream file(mFilePath.c_str());
+	if (file) {
+	    std::stringstream filecontent;
+	    filecontent << file.rdbuf();
+	    file.close();
+	    mView.get_buffer()->insert(mView.get_buffer()->end(), filecontent.str());
+	    add(mView);
+	} else {
+	    throw std::string("cannot open: " + mFileName);
+	}
+    } else {
+	add(mView);
+    }
+}
+
+DocumentDrawingArea::DocumentDrawingArea(const std::string& filepath,
+					 View* view,
+					 graph::Model* model) :
+    Document(),
+    mFilePath(filepath),
+    mView(view),
+    mModel(model)
+{
+    mArea = new ViewDrawingArea(mView);
+}
+
+DocumentDrawingArea::~DocumentDrawingArea()
+{
+    delete mModel;
+    delete mArea;
+}
+
+GVLE::FileTreeView::FileTreeView(
+    BaseObjectType* cobject,
+    const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/) :
+    Gtk::TreeView(cobject)
+{
+
+    mRefTreeModel = Gtk::TreeStore::create(mColumns);
+    set_model(mRefTreeModel);
+    append_column(_("Files"), mColumns.m_col_name);
+    mRefTreeSelection = get_selection();
+}
+
+GVLE::FileTreeView::~FileTreeView()
+{
+}
+
+void GVLE::FileTreeView::buildHierarchy(
+    const Gtk::TreeModel::Row& parent, const std::string& dirname)
+{
+    Glib::Dir dir(dirname);
+    Glib::Dir::iterator it;
+    for (it = dir.begin(); it != dir.end(); ++it) {
+	if ((*it)[0] != '.') { //Don't show hidden files
+	    Gtk::TreeModel::Row row = *(mRefTreeModel->append(parent.children()));
+	    row[mColumns.m_col_name] = *it;
+	    std::string nextpath = Glib::build_filename(dirname, *it);
+	    if (isDirectory(nextpath)) {
+		buildHierarchy(*row, nextpath);
+	    }
+	}
+    }
+}
+
+void GVLE::FileTreeView::clear()
+{
+    mRefTreeModel->clear();
+}
+
+void GVLE::FileTreeView::build()
+{
+    if (not mPackage.empty()) {
+	Gtk::TreeIter iter = mRefTreeModel->append();
+	Gtk::TreeModel::Row row = *iter;
+	row[mColumns.m_col_name] = boost::filesystem::basename(mPackage);
+	buildHierarchy(*row, mPackage);
+	expand_row(Gtk::TreePath(iter), false);
+    }
+}
+
+bool GVLE::FileTreeView::isDirectory(const std::string& dirname)
+{
+    return Glib::file_test(dirname, Glib::FILE_TEST_IS_DIR);
+}
+
+void GVLE::FileTreeView::on_row_activated(
+    const Gtk::TreeModel::Path&,
+    Gtk::TreeViewColumn*)
+{
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection	= get_selection();
+    Gtk::TreeModel::const_iterator it = refSelection->get_selected();
+    const Gtk::TreeModel::Row row = *it;
+    const std::list<std::string>* lstpath = projectFilePath(row);
+
+    std::string absolute_path =
+	Glib::build_filename(mPackage, Glib::build_filename(*lstpath));
+    if (not isDirectory(absolute_path)) {
+	mParent->openTab(absolute_path);
+    }
+    else {
+	if (not row_expanded(Gtk::TreePath(it)))
+	    expand_row(Gtk::TreePath(it), false);
+	else
+	    collapse_row(Gtk::TreePath(it));
+    }
+}
+
+std::list<std::string>* GVLE::FileTreeView::projectFilePath(
+    const Gtk::TreeRow& row)
+{
+    if (row.parent()) {
+	std::list<std::string>* lst =
+	    projectFilePath(*row.parent());
+	lst->push_back(std::string(row.get_value(mColumns.m_col_name)));
+	return lst;
+    } else {
+	return new std::list<std::string>();
+    }
+}
+
+GVLE::GVLE(BaseObjectType* cobject,
+	   const Glib::RefPtr<Gnome::Glade::Xml> xml):
+       Gtk::Window(cobject),
         m_vbox(false, 2),
         m_buttons(2, 4, true),
         //m_labelName("Plugins / Category"),
@@ -63,11 +229,10 @@ GVLE::GVLE(const std::string& filename) :
         m_question(m_buttonGroup),
         m_modeling(new Modeling(this)),
         m_currentButton(POINTER),
-        m_helpbox(0)
+        m_helpbox(0),
+        mCurrentView(0)
 {
-    mRefXML = Gnome::Glade::Xml::create(
-                  utils::Path::path().getGladeFile("gvle.glade"));
-
+    mRefXML = xml;
     m_modeling->setGlade(mRefXML);
 
     mConditionsBox = new ConditionsBox(mRefXML, m_modeling);
@@ -77,7 +242,32 @@ GVLE::GVLE(const std::string& filename) :
     mOpenVpzBox = new OpenVpzBox(mRefXML, m_modeling);
     mNewProjectBox = new NewProjectBox(mRefXML, m_modeling);
     mSaveVpzBox = new SaveVpzBox(mRefXML, m_modeling);
-    mPackageBrowserWindow = new PackageBrowserWindow(mRefXML, m_modeling);
+
+    mRefXML->get_widget("StatusBarPackageBrowser", mStatusbar);
+    mRefXML->get_widget("TextViewLogPackageBrowser", mLog);
+    mRefXML->get_widget_derived("FileTreeViewPackageBrowser", mFileTreeView);
+    mFileTreeView->setParent(this);
+    mRefXML->get_widget("NotebookPackageBrowser", mNotebook);
+    mRefXML->get_widget_derived("MenuBarPackageBrowser", m_menu);
+    m_menu->setParent(this);
+    m_menu->makeMenus();
+    m_menu->onFileMode();
+    mRefXML->get_widget("ToolBar", mToolBar);
+    mToolBar->insert(m_arrow, 0);
+    mToolBar->insert(m_addModels, -1);
+    mToolBar->insert(m_addLinks, -1);
+    mToolBar->insert(m_addCoupled, -1);
+    mToolBar->insert(m_delete, -1);
+    mToolBar->insert(m_zoom, -1);
+    mToolBar->insert(m_question,-1);
+    mRefXML->get_widget_derived("TreeViewModel", mModelTreeBox);
+    mModelTreeBox->setModeling(m_modeling);
+    mRefXML->get_widget_derived("TreeViewClass", mModelClassBox);
+    mModelClassBox->createNewModelBox(m_modeling);
+    show();
+
+    mNotebook->signal_switch_page().connect(
+	sigc::mem_fun(this, &GVLE::changeTab));
 
     //loadObserverPlugins(utils::Path::path().getDefaultObserverPluginDir());
     //loadObserverPlugins(utils::Path::path().getUserObserverPluginDir());
@@ -87,15 +277,13 @@ GVLE::GVLE(const std::string& filename) :
 
     makeButtons();
 
-    m_menu = new GVLEMenu(this);
-
     //m_pluginTable = new PluginTable(this, m_buttonGroup, m_category,
     //       m_plugins);
 
     //makeComboCategory();
 
     m_arrow.set_active(true);
-    m_status.push("Selection");
+    /*m_status.push("Selection");
     //m_scrolledPlugins.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
     //m_scrolledPlugins.add(*m_pluginTable);
     m_vbox.pack_start(*m_menu, false, false);
@@ -111,7 +299,8 @@ GVLE::GVLE(const std::string& filename) :
 
     if (filename.empty() == false) {
         m_modeling->parseXML(filename);
-    }
+	}*/
+
     m_modeling->setModified(false);
 }
 
@@ -124,12 +313,49 @@ GVLE::~GVLE()
 
     delete mConditionsBox;
     delete mSimulationBox;
-    delete mPackageBrowserWindow;
     delete mPreferencesBox;
     delete mOpenPackageBox;
     delete mOpenVpzBox;
     delete mNewProjectBox;
     delete mSaveVpzBox;
+}
+
+void GVLE::show()
+{
+    mPackage = vle::utils::Path::path().getPackageDir();
+    set_title(std::string(_("Browsing package: ")).append(
+			   boost::filesystem::basename(mPackage)));
+    buildPackageHierarchy();
+    show_all();
+}
+
+void GVLE::buildPackageHierarchy()
+{
+    mPackage = vle::utils::Path::path().getPackageDir();
+    mFileTreeView->clear();
+    mFileTreeView->setPackage(mPackage);
+    mFileTreeView->build();
+}
+
+void GVLE::setFileName(std::string name)
+{
+    if (not name.empty() and
+	boost::filesystem::extension(name) == ".vpz") {
+	m_modeling->parseXML(name);
+	m_menu->onViewMode();
+    }
+    m_modeling->setModified(false);
+}
+
+void GVLE::redrawModelTreeBox()
+{
+    assert(m_modeling->getTopModel());
+    mModelTreeBox->parseModel(m_modeling->getTopModel());
+}
+
+void GVLE::redrawModelClassBox()
+{
+    mModelClassBox->parseClass();
 }
 
 bool GVLE::on_delete_event(GdkEventAny* event)
@@ -141,7 +367,7 @@ bool GVLE::on_delete_event(GdkEventAny* event)
     return false;
 }
 
-Gtk::RadioButton* GVLE::getButtonRef(ButtonType button)
+Gtk::RadioToolButton* GVLE::getButtonRef(ButtonType button)
 {
     switch (button)
     {
@@ -358,63 +584,63 @@ void GVLE::makeButtons()
         r = Gdk::Pixbuf::create_from_file(
             utils::Path::path().getPixmapFile("arrow.png"));
         img = Gtk::manage(new Gtk::Image(r));
-        m_arrow.add(*img);
+        m_arrow.set_icon_widget(*img);
         r = Gdk::Pixbuf::create_from_file(
             utils::Path::path().getPixmapFile("model.png"));
         img = Gtk::manage(new Gtk::Image(r));
-        m_addModels.add(*img);
+	m_addModels.set_icon_widget(*img);
         r = Gdk::Pixbuf::create_from_file(
             utils::Path::path().getPixmapFile("coupled.png"));
         img = Gtk::manage(new Gtk::Image(r));
-        m_addCoupled.add(*img);
+	m_addCoupled.set_icon_widget(*img);
         r = Gdk::Pixbuf::create_from_file(
             utils::Path::path().getPixmapFile("links.png"));
         img = Gtk::manage(new Gtk::Image(r));
-        m_addLinks.add(*img);
+	m_addLinks.set_icon_widget(*img);
         r = Gdk::Pixbuf::create_from_file(
             utils::Path::path().getPixmapFile("delete.png"));
         img = Gtk::manage(new Gtk::Image(r));
-        m_delete.add(*img);
+	m_delete.set_icon_widget(*img);
         r = Gdk::Pixbuf::create_from_file(
             utils::Path::path().getPixmapFile("zoom.png"));
         img = Gtk::manage(new Gtk::Image(r));
-        m_zoom.add(*img);
+	m_zoom.set_icon_widget(*img);
         r = Gdk::Pixbuf::create_from_file(
             utils::Path::path().getPixmapFile("question.png"));
         img = Gtk::manage(new Gtk::Image(r));
-        m_question.add(*img);
+	m_question.set_icon_widget(*img);
     } catch (const Glib::FileError& e) {
         gvle::Error(e.what());
     }
 
-    m_arrow.set_relief(Gtk::RELIEF_NONE);
+    //m_arrow.set_relief(Gtk::RELIEF_NONE);
     m_tooltips.set_tip(m_arrow, _("Move models, open coupled models, show "
                                   "dynamics of models. (F1)"));
-    m_addModels.set_relief(Gtk::RELIEF_NONE);
+    //m_addModels.set_relief(Gtk::RELIEF_NONE);
     m_tooltips.set_tip(m_addModels, _("Add empty atomics models. You can "
                                       "specify inputs, outputs, inits and states "
                                       "ports. Select dynamics plugins file and "
                                       "XML write your XML Dynamics. (F2)"));
-    m_addLinks.set_relief(Gtk::RELIEF_NONE);
+    //m_addLinks.set_relief(Gtk::RELIEF_NONE);
     m_tooltips.set_tip(m_addLinks, _("Add connections between models. (F3)"));
-    m_addCoupled.set_relief(Gtk::RELIEF_NONE);
+    //m_addCoupled.set_relief(Gtk::RELIEF_NONE);
     m_tooltips.set_tip(m_addCoupled, _("Add coupled models. (F4)"));
-    m_delete.set_relief(Gtk::RELIEF_NONE);
+    //m_delete.set_relief(Gtk::RELIEF_NONE);
     m_tooltips.set_tip(m_delete, _("Delete connections or models. (F5)"));
-    m_zoom.set_relief(Gtk::RELIEF_NONE);
+    //m_zoom.set_relief(Gtk::RELIEF_NONE);
     m_tooltips.set_tip(m_zoom, _("Zoom into coupled models. (F6)"));
-    m_question.set_relief(Gtk::RELIEF_NONE);
+    //m_question.set_relief(Gtk::RELIEF_NONE);
     m_tooltips.set_tip(m_question, _("Show XML Dynamics if atomic model is "
                                      "selected, show XML Structures if coupled "
                                      "model. (F7)"));
 
-    m_arrow.set_mode(false);
-    m_addModels.set_mode(false);
-    m_addLinks.set_mode(false);
-    m_addCoupled.set_mode(false);
-    m_delete.set_mode(false);
-    m_zoom.set_mode(false);
-    m_question.set_mode(false);
+    m_arrow.set_active(false);
+    m_addModels.set_active(false);
+    m_addLinks.set_active(false);
+    m_addCoupled.set_active(false);
+    m_delete.set_active(false);
+    m_zoom.set_active(false);
+    m_question.set_active(false);
 
     m_arrow.add_accelerator("clicked", this->get_accel_group(),
 			    Gtk::AccelKey("F1").get_key(),
@@ -545,6 +771,19 @@ void GVLE::onQuestion()
     m_status.push(_("Question"));
 }
 
+void GVLE::newFile()
+{
+    try {
+	DocumentText* doc = new DocumentText(_("untitled file"), true);
+	mDocuments.insert(
+	    std::make_pair < std::string, DocumentText* >(_("untitled file"), doc));
+	mNotebook->append_page(*doc, doc->filename());
+    } catch (std::exception& e) {
+	std::cout << e.what() << std::endl;
+    }
+    show_all_children();
+}
+
 void GVLE::onMenuNew()
 {
     if (m_modeling->isModified() == false) {
@@ -563,8 +802,22 @@ void GVLE::onMenuNewProject()
     mNewProjectBox->show();
 }
 
+
+void GVLE::openFile()
+{
+    Gtk::FileChooserDialog file(_("Choose a file"), Gtk::FILE_CHOOSER_ACTION_OPEN);
+    file.set_transient_for(*this);
+    file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+    file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+
+    if (file.run() == Gtk::RESPONSE_OK) {
+	std::string selected_file = file.get_filename();
+	openTab(selected_file);
+    }
+}
 void GVLE::onMenuOpenPackage()
 {
+    closeAllTab();
     mOpenPackageBox->show();
     if (utils::Path::path().package() != "")
       m_menu->onPackageMode();
@@ -599,10 +852,33 @@ void GVLE::onMenuLoad()
         file.add_filter(filter);
 
         if (file.run() == Gtk::RESPONSE_OK) {
+	    closeAllTab();
             m_modeling->parseXML(file.get_filename());
 	    utils::Path::path().setPackage("");
 	    m_menu->onGlobalMode();
         }
+    }
+}
+
+void GVLE::saveFile()
+{
+    int page = mNotebook->get_current_page();
+    if (page != -1) {
+	DocumentText* doc = dynamic_cast < DocumentText* >(
+	    mNotebook->get_nth_page(page));
+	if (not doc->isNew()) {
+	    doc->save();
+	} else {
+	    Gtk::FileChooserDialog file(_("VPZ file"), Gtk::FILE_CHOOSER_ACTION_SAVE);
+	    file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+	    file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+
+	    if (file.run() == Gtk::RESPONSE_OK) {
+		std::string filename(file.get_filename());
+		doc->saveAs(filename);
+	    }
+	}
+	buildPackageHierarchy();
     }
 }
 
@@ -642,6 +918,49 @@ void GVLE::onMenuSave()
 	    std::string filename(file.get_filename());
 	    vpz::Vpz::fixExtension(filename);
 	    m_modeling->saveXML(filename);
+	}
+    }
+}
+
+void GVLE::saveFileAs()
+{
+    int page = mNotebook->get_current_page();
+    if (page != -1) {
+	DocumentText* doc = dynamic_cast < DocumentText* >(
+	    mNotebook->get_nth_page(page));
+	Gtk::FileChooserDialog file(_("VPZ file"), Gtk::FILE_CHOOSER_ACTION_SAVE);
+	file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+	file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+
+	if (file.run() == Gtk::RESPONSE_OK) {
+	    std::string filename(file.get_filename());
+	    doc->saveAs(filename);
+	}
+	buildPackageHierarchy();
+    }
+}
+
+void GVLE::closeFile()
+{
+    int page = mNotebook->get_current_page();
+    if (page != -1) {
+	Gtk::Widget* tab = mNotebook->get_nth_page(page);
+	Documents::iterator it = mDocuments.begin();
+	while (it != mDocuments.end()) {
+	    if (it->second->isDrawingArea())
+	    {
+		if (dynamic_cast<DocumentDrawingArea*>(
+			it->second)->getDrawingArea() == tab) {
+		    closeTab(it->first);
+		    break;
+		}
+	    } else {
+		if (it->second == tab) {
+		    closeTab(it->first);
+		    break;
+		}
+	    }
+	    ++it;
 	}
     }
 }
@@ -709,23 +1028,23 @@ void GVLE::onPreferences()
 
 void GVLE::showPackageBrowserWindow()
 {
-    if(not vle::utils::Path::path().package().empty()) {
+    /*if(not vle::utils::Path::path().package().empty()) {
 	mPackageBrowserWindow->show();
-    }
+	}*/
 }
 
 void GVLE::hidePackageBrowserWindow()
 {
-    mPackageBrowserWindow->hide();
+    // mPackageBrowserWindow->hide();
 }
 
 void GVLE::togglePackageBrowserWindow()
 {
-    if (mPackageBrowserWindow->is_visible()) {
+    /*if (mPackageBrowserWindow->is_visible()) {
 	hidePackageBrowserWindow();
     } else {
 	showPackageBrowserWindow();
-    }
+	}*/
 }
 
 void GVLE::onSimulationBox()
@@ -840,6 +1159,213 @@ std::string valuetype_to_string(value::Value::type type)
         return "(no value)";
         break;
     }
+}
+
+void GVLE::focusTab(const std::string& filepath)
+{
+    int page = mNotebook->page_num(*mDocuments.find(filepath)->second);
+    mNotebook->set_current_page(page);
+}
+
+void GVLE::openTab(const std::string& filepath)
+{
+    if(boost::filesystem::extension(filepath) != ".vpz") {
+	try {
+	    if (mDocuments.find(filepath) == mDocuments.end()) {
+		DocumentText* doc = new DocumentText(filepath);
+		mDocuments.insert(
+		    std::make_pair < std::string, DocumentText* >(filepath, doc));
+		int page = mNotebook->append_page(*doc, doc->filename());
+		mNotebook->set_current_page(page);
+	    } else {
+		focusTab(filepath);
+	    }
+	} catch (std::exception& e) {
+	    mLog->get_buffer()->insert(
+		mLog->get_buffer()->end(), e.what());
+	}
+	m_menu->onFileMode();
+	show_all_children();
+    } else {
+	m_modeling->parseXML(filepath);
+    }
+}
+
+void GVLE::openTabVpz(const std::string& filepath, graph::CoupledModel* model)
+{
+    if (model != NULL) {
+	DocumentDrawingArea* doc = new DocumentDrawingArea(filepath,
+							  m_modeling->findView(model),
+							  model);
+	mCurrentView = doc->getView();
+	ViewDrawingArea* area = doc->getDrawingArea();
+	std::string tabName = model->getName();
+	graph::Model* parent = model->getParent();
+	while (parent != NULL) {
+	    tabName += "/" + parent->getName();
+	    parent = parent->getParent();
+	}
+	mDocuments.insert(
+	  std::make_pair < std::string, DocumentDrawingArea* >(tabName, doc));
+	int page = mNotebook->append_page(*area, model->getName());
+	mNotebook->set_current_page(page);
+    } else {
+	DocumentDrawingArea* doc = new DocumentDrawingArea(filepath,
+							  m_modeling->findView(model),
+							  m_modeling->getTopModel());
+	mCurrentView = doc->getView();
+	ViewDrawingArea* area = doc->getDrawingArea();
+	std::string tabName = m_modeling->getTopModel()->getName();
+	mDocuments.insert(
+	  std::make_pair < std::string, DocumentDrawingArea* >(tabName, doc));
+	int page = mNotebook->append_page(*area,
+					  m_modeling->getTopModel()->getName());
+	mNotebook->set_current_page(page);
+    }
+    m_menu->onViewMode();
+    show_all_children();
+}
+
+
+void GVLE::closeTab(const std::string& filepath)
+{
+    Documents::iterator it = mDocuments.find(filepath);
+    if (it != mDocuments.end()) {
+	int page = mNotebook->page_num(*it->second);
+	mNotebook->remove_page(page);
+	mDocuments.erase(filepath);
+
+	mNotebook->set_current_page(--page);
+	redrawModelTreeBox();
+	redrawModelClassBox();
+    }
+}
+
+void GVLE::closeAllTab()
+{
+    Documents::iterator it = mDocuments.begin();
+    while (it != mDocuments.end()) {
+	int page = mNotebook->page_num(*it->second);
+	mNotebook->remove_page(page);
+	mDocuments.erase(it->first);
+
+	mNotebook->set_current_page(--page);
+	++it;
+    }
+}
+
+void GVLE::changeTab(GtkNotebookPage* /*page*/, int num)
+{
+    Gtk::Widget* tab = mNotebook->get_nth_page(num);
+    Documents::iterator it = mDocuments.begin();
+    while (it != mDocuments.end()) {
+	if (it->second->isDrawingArea()) {
+	    DocumentDrawingArea* area =
+		    dynamic_cast< DocumentDrawingArea *>(it->second);
+	    if (tab == dynamic_cast< DocumentDrawingArea *>(it->second)->getDrawingArea())
+	    {
+		std::cout << "Couc\n";
+		fflush(stdout);
+		mCurrentView = area->getView();
+		m_menu->onViewMode();
+		break;
+	    }
+	}
+	else{
+	    if (it->second == tab) {
+		mCurrentView = 0;
+		m_menu->onFileMode();
+		break;
+	    }
+	}
+	++it;
+    }
+}
+
+void GVLE::configureProject()
+{
+    std::string out, err;
+    utils::CMakePackage::configure(out, err);
+    mLog->get_buffer()->insert(mLog->get_buffer()->end(), out);
+    if (not err.empty())
+	mLog->get_buffer()->insert(mLog->get_buffer()->end(), err);
+}
+
+void GVLE::buildProject()
+{
+    std::string out, err;
+    utils::CMakePackage::build(out, err);
+    mLog->get_buffer()->insert(mLog->get_buffer()->end(), out);
+    if (not err.empty())
+	mLog->get_buffer()->insert(mLog->get_buffer()->end(), err);
+}
+
+void GVLE::cleanProject()
+{
+    std::string out, err;
+    utils::CMakePackage::clean(out, err);
+    mLog->get_buffer()->insert(mLog->get_buffer()->end(), out);
+    if (not err.empty())
+	mLog->get_buffer()->insert(mLog->get_buffer()->end(), err);
+}
+
+void GVLE::packageProject()
+{
+    std::string out, err;
+    utils::CMakePackage::package(out, err);
+    mLog->get_buffer()->insert(mLog->get_buffer()->end(), out);
+    if (not err.empty())
+	mLog->get_buffer()->insert(mLog->get_buffer()->end(), err);
+}
+
+void GVLE::onCutModel()
+{
+    mCurrentView->onCutModel();
+}
+
+void GVLE::onCopyModel()
+{
+    mCurrentView->onCopyModel();
+}
+
+void GVLE::onPasteModel()
+{
+    mCurrentView->onPasteModel();
+}
+
+void GVLE::clearCurrentModel()
+{
+    mCurrentView->clearCurrentModel();
+}
+
+void GVLE::importModel()
+{
+    mCurrentView->importModel();
+}
+
+void GVLE::exportCurrentModel()
+{
+    mCurrentView->exportCurrentModel();
+}
+
+void GVLE::exportGraphic()
+{
+    mCurrentView->exportGraphic();
+}
+
+void GVLE::addCoefZoom()
+{
+    mCurrentView->addCoefZoom();
+}
+
+void GVLE::delCoefZoom()
+{
+    mCurrentView->delCoefZoom();
+}
+
+void GVLE::setCoefZoom(double coef)
+{
+    mCurrentView->setCoefZoom(coef);
 }
 
 }} // namespace vle gvle

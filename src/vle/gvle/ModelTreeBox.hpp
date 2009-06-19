@@ -28,9 +28,8 @@
 
 #include <vle/gvle/SimpleTypeBox.hpp>
 #include <gtkmm/window.h>
-#include <gtkmm/scrolledwindow.h>
-#include <gtkmm/treeview.h>
-#include <gtkmm/treestore.h>
+#include <libglademm.h>
+#include <gtkmm.h>
 
 namespace vle
 {
@@ -51,15 +50,15 @@ class Modeling;
 /**
  * @brief A Gtk::Window to show the graph::Model hierarchy into a window.
  */
-class ModelTreeBox : public Gtk::Window
+class ModelTreeBox : public Gtk::TreeView
 {
 public:
     /**
-     * make a new Window show complete model tree read from Modeling
+     * make a new treeview
      *
-     * @param m where to get model information
      */
-    ModelTreeBox(Modeling* m);
+    ModelTreeBox(BaseObjectType* cobject,
+		 const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
 
     /**
      * Show in the TextView the model tree with head 'top'
@@ -79,6 +78,15 @@ public:
      * @brief Rename a model with the specified name
      */
     void onRenameModels();
+
+    /**
+     * @brief Set a value to modeling
+     *
+     * @param modeling the new value
+     *
+     */
+    inline void setModeling(Modeling* modeling)
+	{ m_modeling = modeling; }
 
 protected:
     /**
@@ -160,8 +168,6 @@ class ModelTreeColumn : public Gtk::TreeModel::ColumnRecord
     };
 
     ModelTreeColumn              m_Columns;
-    Gtk::ScrolledWindow          m_ScrolledWindow;
-    Gtk::TreeView                m_TreeView;
     Glib::RefPtr<Gtk::TreeStore> m_refTreeModel;
     Gtk::Menu                    m_menu;
     Modeling*                    m_modeling;

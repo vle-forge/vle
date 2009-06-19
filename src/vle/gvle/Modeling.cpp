@@ -51,8 +51,6 @@ namespace gvle {
 Modeling::Modeling(GVLE* gvle, const string& filename) :
     mTop(NULL),
     mGVLE(gvle),
-    mModelTreeBox(new ModelTreeBox(this)),
-    mModelClassBox(0),
     mIsModified(false),
     mIsSaved(false),
     mSocketPort(8000),
@@ -90,19 +88,16 @@ Modeling::Modeling(GVLE* gvle, const string& filename) :
     std::string name = "";
     View* v = new View(this, mTop, mListView.size());
     mListView.push_back(v);
-    mModelTreeBox->parseModel(mTop);
     setModified(false);
 }
 
 Modeling::~Modeling()
 {
-    delete mModelTreeBox;
     delViews();
     delete mAtomicBox;
     delete mImportModelBox;
     delete mImportClassesBox;
     delete mCoupledBox;
-    delete mModelClassBox;
 }
 
 void Modeling::clearModeling()
@@ -123,7 +118,6 @@ void Modeling::setGlade(Glib::RefPtr < Gnome::Glade::Xml > xml)
     mImportModelBox = new ImportModelBox(xml, this);
     mImportClassesBox = new ImportClassesBox(xml, this);
     mCoupledBox = new CoupledModelBox(xml, this);
-    mModelClassBox = new ModelClassBox(xml, this);
 }
 
 Glib::RefPtr < Gnome::Glade::Xml > Modeling::getGlade() const
@@ -160,11 +154,12 @@ void Modeling::parseXML(const string& filename)
         } else {
             mTop = (graph::CoupledModel*)(mVpz.project().model().model());
         }
-        mModelTreeBox->parseModel(mTop);
+        mGVLE->redrawModelTreeBox();
+	mGVLE->redrawModelClassBox();
+	mFileName.assign(filename);
         addView(mTop);
         mIsSaved = true;
         mIsModified = false;
-        mFileName.assign(filename);
         setTitles();
     } catch (const utils::ParseError& p) {
         gvle::Error((fmt(_("Error parsing file, %1%")) %
@@ -347,6 +342,7 @@ void Modeling::addView(graph::CoupledModel* model)
         search->selectedWindow();
     } else {
         mListView.push_back(new View(this, model, szView));
+	mGVLE->openTabVpz(mFileName, model);
     }
 }
 
@@ -379,6 +375,7 @@ void Modeling::addViewClass(graph::CoupledModel* model, std::string name)
 	View* v = new View(this, model, szView);
 	v->setCurrentClass(name);
         mListView.push_back(v);
+	mGVLE->openTabVpz(mFileName, model);
     }
 }
 
@@ -433,22 +430,22 @@ void Modeling::delViews()
 
 void Modeling::iconifyViews()
 {
-    for (ListView::const_iterator it = mListView.begin();
+    /*for (ListView::const_iterator it = mListView.begin();
          it != mListView.end(); ++it) {
         if (*it) {
             (*it)->iconify();
         }
-    }
+	}*/
 }
 
 void Modeling::deiconifyViews()
 {
-    for (ListView::const_iterator it = mListView.begin();
+    /*for (ListView::const_iterator it = mListView.begin();
          it != mListView.end(); ++it) {
         if (*it) {
             (*it)->deiconify();
         }
-    }
+	}*/
 }
 
 void Modeling::refreshViews()
@@ -536,7 +533,7 @@ void Modeling::setModifiedTitles()
 void Modeling::redrawModelTreeBox()
 {
     assert(mTop);
-    mModelTreeBox->parseModel(mTop);
+    mGVLE->redrawModelTreeBox();
 }
 
 void Modeling::showModelTreeBox()
@@ -546,22 +543,16 @@ void Modeling::showModelTreeBox()
     //std::cout << "--------------------\n";
     //mCutCopyPaste.state();
     redrawModelTreeBox();
-    mModelTreeBox->show_all();
 }
 
 void Modeling::hideModelTreeBox()
 {
     redrawModelTreeBox();
-    mModelTreeBox->hide();
 }
 
 void Modeling::toggleModelTreeBox()
 {
-    if (mModelTreeBox->is_visible()) {
-        hideModelTreeBox();
-    } else {
-        showModelTreeBox();
-    }
+
 }
 
 void Modeling::showRowTreeBox(const std::string& name)
@@ -572,7 +563,7 @@ void Modeling::showRowTreeBox(const std::string& name)
 
 void Modeling::redrawModelClassBox()
 {
-    mModelClassBox->parseClass();
+    mGVLE->redrawModelClassBox();
 }
 
 void Modeling::showModelClassBox()
@@ -589,16 +580,10 @@ void Modeling::hideClassModelTreeBox()
 void Modeling::hideModelClassBox()
 {
     redrawModelClassBox();
-    mModelClassBox->hide();
 }
 
 void Modeling::toggleModelClassBox()
 {
-    if (mModelClassBox->is_visible()) {
-        hideModelClassBox();
-    } else {
-        showModelClassBox();
-    }
 }
 
 void Modeling::showRowModelClassBox(const std::string& name)

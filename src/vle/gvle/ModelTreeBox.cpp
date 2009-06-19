@@ -34,33 +34,23 @@ namespace vle
 {
 namespace gvle {
 
-ModelTreeBox::ModelTreeBox(Modeling* m) :
-        m_modeling(m)
+ModelTreeBox::ModelTreeBox(BaseObjectType* cobject,
+			   const Glib::RefPtr<Gnome::Glade::Xml>&) :
+    Gtk::TreeView(cobject)
 {
-    assert(m);
-
-    set_title(_("Models tree"));
-    set_border_width(5);
-    set_default_size(200, 350);
-
-    m_ScrolledWindow.add(m_TreeView);
-    m_ScrolledWindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
-
     m_refTreeModel = Gtk::TreeStore::create(m_Columns);
-    m_TreeView.set_model(m_refTreeModel);
+    set_model(m_refTreeModel);
 
-    m_TreeView.append_column(_("Name"), m_Columns.mName);
+    append_column(_("Name"), m_Columns.mName);
 
-    m_TreeView.signal_row_activated().connect(
+    signal_row_activated().connect(
         sigc::mem_fun(*this, &ModelTreeBox::row_activated));
-    m_TreeView.signal_button_release_event().connect(
+    signal_button_release_event().connect(
         sigc::mem_fun(*this, &ModelTreeBox::onButtonRealeaseModels));
 
-    m_TreeView.expand_all();
-    m_TreeView.set_rules_hint(true);
-    add(m_ScrolledWindow);
+    expand_all();
+    set_rules_hint(true);
     initMenuPopupModels();
-    show_all();
 }
 
 void ModelTreeBox::initMenuPopupModels()
@@ -71,7 +61,7 @@ void ModelTreeBox::initMenuPopupModels()
         Gtk::Menu_Helpers::MenuElem(
             _("_Rename"), sigc::mem_fun(
 		*this, &ModelTreeBox::onRenameModels)));
-    m_menu.accelerate(m_TreeView);
+    m_menu.accelerate(*this);
 }
 
 bool ModelTreeBox::onButtonRealeaseModels(GdkEventButton* event)
@@ -84,7 +74,7 @@ bool ModelTreeBox::onButtonRealeaseModels(GdkEventButton* event)
 
 void ModelTreeBox::onRenameModels()
 {
-    Glib::RefPtr < Gtk::TreeView::Selection > ref = m_TreeView.get_selection();
+    Glib::RefPtr < Gtk::TreeView::Selection > ref = get_selection();
     if (ref) {
         Gtk::TreeModel::iterator iter = ref->get_selected();
         if (iter) {
@@ -122,7 +112,7 @@ void ModelTreeBox::parseModel(graph::Model* top)
         }
         it++;
     }
-    m_TreeView.expand_all();
+    expand_all();
 }
 
 void ModelTreeBox::showRow(const std::string& model_name)
@@ -136,7 +126,7 @@ bool ModelTreeBox::on_key_release_event(GdkEventKey* event)
 {
     if (((event->state & GDK_CONTROL_MASK) and event->keyval == GDK_w) or
             (event->keyval == GDK_Escape)) {
-        m_modeling->hideModelTreeBox();
+        //m_modeling->hideModelTreeBox();
     }
     return true;
 }
@@ -188,7 +178,7 @@ bool ModelTreeBox::on_foreach(const Gtk::TreeModel::Path&,
                               const Gtk::TreeModel::iterator& iter)
 {
     if ((*iter).get_value(m_Columns.mName) == m_search) {
-        m_TreeView.set_cursor(m_refTreeModel->get_path(iter));
+        set_cursor(m_refTreeModel->get_path(iter));
         return true;
     }
     return false;

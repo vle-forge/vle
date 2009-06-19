@@ -26,8 +26,8 @@
 #ifndef GUI_GVLEMENU_HPP
 #define GUI_GVLEMENU_HPP
 
-#include <gtkmm/menubar.h>
-#include <gtkmm/menu.h>
+#include <gtkmm.h>
+#include <libglademm.h>
 
 namespace vle
 {
@@ -41,12 +41,14 @@ class GVLE;
 class GVLEMenu : public Gtk::MenuBar
 {
 public:
+
     /**
      * Create menubar for GVLE with menus file, view, simulation and help.
      *
      * @param gvle a ptr to GVLE to connect signals
      */
-    GVLEMenu(GVLE* gvle);
+    GVLEMenu(BaseObjectType* cobject,
+	     const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
 
     /** Delete the item. */
     virtual ~GVLEMenu();
@@ -65,41 +67,88 @@ public:
      */
     void onGlobalMode();
 
+
+    /**
+     *
+     * Change to View Mode to access to the Menu Edit
+     *
+     */
+    void onViewMode();
+
+    /**
+     *
+     * Change to File Mode to access to the Menu Edit
+     *
+     */
+
+    void onFileMode();
+
+
+    inline void setParent(GVLE* parent)
+    { mParent = parent; }
+
+    void makeMenus();
+
+
 private:
     /**
      * Make menu file and connect signals.
      *
-     * @param gvle a ptr to GVLE to connect signals.
      */
-    void makeMenuFile(GVLE* gvle);
+    void makeMenuFile();
+
+     /**
+     * Make menu edit and connect signals.
+     *
+     */
+    void makeMenuEdit();
+
+    /**
+     * Make menu package and connect signals.
+     *
+     */
+    void makeMenuPackage();
 
     /**
      * Make menu view and connect signals.
      *
-     * @param gvle a ptr to GVLE to connect signals.
      */
-    void makeMenuView(GVLE* gvle);
+    void makeMenuView();
 
     /**
      * Make menu simulation and connect signals.
      *
-     * @param gvle a ptr to GVLE to connect signals.
      */
-    void makeMenuSimulation(GVLE* gvle);
+    void makeMenuSimulation();
+
+    /**
+     * Make menu zoom and connect signals.
+     *
+     */
+    void makeMenuZoom();
 
     /**
      * Make menu help and connect signals.
      *
-     * @param gvle a ptr to GVLE to connect signals.
      */
-    void makeMenuHelp(GVLE* gvle);
+    void makeMenuHelp();
+
+    GVLE*       mParent;
 
     Gtk::Menu   mMenuFile;
+    Gtk::Menu   mMenuEdit;
+    Gtk::Menu   mMenuPackage;
     Gtk::Menu   mMenuView;
     Gtk::Menu   mMenuSimulation;
+    Gtk::Menu   mMenuZoom;
     Gtk::Menu   mMenuHelp;
 
     Gtk::MenuItem* mMenuFileOpenVpz;
+    Gtk::MenuItem* mMenuFileClear;
+    Gtk::MenuItem* mMenuFileImportModel;
+    Gtk::MenuItem* mMenuFileExportModel;
+    Gtk::MenuItem* mMenuFileExportGraphic;
+
 };
 
 }

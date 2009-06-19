@@ -79,7 +79,7 @@ View::View(Modeling* m, graph::CoupledModel* c, size_t index) :
     mDrawing->set_size_request(mCurrent->width(), mCurrent->height());
     resize(450, 350);
 
-    show_all();
+    //show_all();
 }
 
 View::~View()
@@ -193,7 +193,7 @@ void View::clearCurrentModel()
         mCurrent->delAllConnection();
         mCurrent->delAllModel();
 	mModeling->vpz().project().model().atomicModels().clear();
-        mModeling->redrawModelTreeBox();
+        mModeling->getGVLE()->redrawModelTreeBox();
     }
 }
 
@@ -348,8 +348,8 @@ void View::addAtomicModel(int x, int y)
         }
     }
     delete box;
-    mModeling->redrawModelTreeBox();
-    mModeling->redrawModelClassBox();
+    mModeling->getGVLE()->redrawModelTreeBox();
+    mModeling->getGVLE()->redrawModelClassBox();
 }
 
 void View::addPluginModel(int /*x*/, int /*y*/)
@@ -370,8 +370,8 @@ void View::addCoupledModel(int x, int y)
 	    new_gc->setSize(ViewDrawingArea::MODEL_WIDTH,
 			    ViewDrawingArea::MODEL_HEIGHT);
 	    mCurrent->displace(mSelectedModels, new_gc);
-	    mModeling->redrawModelTreeBox();
-	    mModeling->redrawModelClassBox();
+	    mModeling->getGVLE()->redrawModelTreeBox();
+	    mModeling->getGVLE()->redrawModelClassBox();
 	    mSelectedModels.clear();
 
 	} else {
@@ -394,8 +394,8 @@ void View::addCoupledModel(int x, int y)
 		    new_gc->setParent(mCurrent);
 		    mCurrent->addModel(new_gc);
 		}
-		mModeling->redrawModelTreeBox();
-		mModeling->redrawModelClassBox();
+		mModeling->getGVLE()->redrawModelTreeBox();
+		mModeling->getGVLE()->redrawModelClassBox();
 		mSelectedModels.clear();
 	    }
 	}
@@ -425,8 +425,8 @@ void View::delModel(graph::Model* model)
             }
             mModeling->delModel(model, mCurrentClass);
             mCurrent->delModel(model);
-            mModeling->redrawModelTreeBox();
-	    mModeling->redrawModelClassBox();
+            mModeling->getGVLE()->redrawModelTreeBox();
+	    mModeling->getGVLE()->redrawModelClassBox();
         }
     }
 }
@@ -519,8 +519,8 @@ void View::makeConnection(graph::Model* src, graph::Model* dst)
 
 void View::selectedWindow()
 {
-    present();
-    mDrawing->show();
+    //present();
+    //mDrawing->show();
 }
 
 void  View::updateAdjustment(double h, double v)
