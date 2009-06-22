@@ -272,6 +272,7 @@ public:
 	std::string                      mPackage;
 	Glib::RefPtr<Gtk::TreeStore>     mRefTreeModel;
 	Glib::RefPtr<Gtk::TreeSelection> mRefTreeSelection;
+	std::list<std::string>           mIgnoredFilesList;
     };
 
     /*********************************************************************

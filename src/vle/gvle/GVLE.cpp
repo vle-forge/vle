@@ -135,6 +135,7 @@ GVLE::FileTreeView::FileTreeView(
     set_model(mRefTreeModel);
     append_column(_("Files"), mColumns.m_col_name);
     mRefTreeSelection = get_selection();
+    mIgnoredFilesList.push_front("build");
 }
 
 GVLE::FileTreeView::~FileTreeView()
@@ -147,7 +148,9 @@ void GVLE::FileTreeView::buildHierarchy(
     Glib::Dir dir(dirname);
     Glib::Dir::iterator it;
     for (it = dir.begin(); it != dir.end(); ++it) {
-	if ((*it)[0] != '.') { //Don't show hidden files
+	if (((*it)[0] != '.') //Don't show hidden files
+	    and (std::find(mIgnoredFilesList.begin(), mIgnoredFilesList.end(), *it)
+	         == mIgnoredFilesList.end())) {
 	    Gtk::TreeModel::Row row = *(mRefTreeModel->append(parent.children()));
 	    row[mColumns.m_col_name] = *it;
 	    std::string nextpath = Glib::build_filename(dirname, *it);
