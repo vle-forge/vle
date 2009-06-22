@@ -1175,7 +1175,9 @@ void GVLE::openTab(const std::string& filepath)
 		DocumentText* doc = new DocumentText(filepath);
 		mDocuments.insert(
 		    std::make_pair < std::string, DocumentText* >(filepath, doc));
-		int page = mNotebook->append_page(*doc, doc->filename());
+		int page = mNotebook->append_page(*doc,
+			doc->filename() + boost::filesystem::extension(filepath));
+		show_all_children();
 		mNotebook->set_current_page(page);
 	    } else {
 		focusTab(filepath);
@@ -1185,7 +1187,6 @@ void GVLE::openTab(const std::string& filepath)
 		mLog->get_buffer()->end(), e.what());
 	}
 	m_menu->onFileMode();
-	show_all_children();
     } else {
 	m_modeling->parseXML(filepath);
     }
@@ -1208,6 +1209,7 @@ void GVLE::openTabVpz(const std::string& filepath, graph::CoupledModel* model)
 	mDocuments.insert(
 	  std::make_pair < std::string, DocumentDrawingArea* >(tabName, doc));
 	int page = mNotebook->append_page(*area, model->getName());
+	show_all_children();
 	mNotebook->set_current_page(page);
     } else {
 	DocumentDrawingArea* doc = new DocumentDrawingArea(filepath,
@@ -1220,10 +1222,10 @@ void GVLE::openTabVpz(const std::string& filepath, graph::CoupledModel* model)
 	  std::make_pair < std::string, DocumentDrawingArea* >(tabName, doc));
 	int page = mNotebook->append_page(*area,
 					  m_modeling->getTopModel()->getName());
+	show_all_children();
 	mNotebook->set_current_page(page);
     }
     m_menu->onViewMode();
-    show_all_children();
 }
 
 
