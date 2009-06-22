@@ -1,1 +1,2 @@
-# No plug-in in vle/src/vle/gvle/conditions
+ADD_SUBDIRECTORY(file)
+ADD_SUBDIRECTORY(filechooser)

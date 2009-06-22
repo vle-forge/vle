@@ -76,6 +76,9 @@ ConditionsBox::ConditionsTreeView::ConditionsTreeView(
 		sigc::mem_fun(
 		    *this,
 		    &ConditionsBox::ConditionsTreeView::onCopy)));
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		_("_Edit"), mMenuEdit));
     }
     mMenuPopup.accelerate(*this);
 }
@@ -83,6 +86,28 @@ ConditionsBox::ConditionsTreeView::ConditionsTreeView(
 ConditionsBox::ConditionsTreeView::~ConditionsTreeView()
 {
 }
+
+void ConditionsBox::ConditionsTreeView::makeMenuEdit()
+{
+    Gtk::Menu::MenuList& menulist = mMenuEdit.items();
+
+    PluginFactory& plf = mParent->getModeling()->pluginFactory();
+
+    const ConditionPluginList& pll = plf.conditionPlugins();
+
+    for (ConditionPluginList::const_iterator it = pll.begin();
+	 it != pll.end(); ++it) {
+
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		it->first,
+		sigc::bind<std::string>(sigc::mem_fun(
+					    *this,
+					    &ConditionsBox::ConditionsTreeView::onEdit),
+					it->first)));
+    }
+}
+
 
 bool ConditionsBox::ConditionsTreeView::on_button_press_event(
     GdkEventButton* event)
@@ -192,7 +217,29 @@ void ConditionsBox::ConditionsTreeView::onCopy()
 
 }
 
+void ConditionsBox::ConditionsTreeView::onEdit(std::string pluginName)
+{
 
+    Gtk::TreeModel::iterator it = mRefTreeSelection->get_selected();
+
+    if (it) {
+
+    std::string conditionName = Glib::ustring((*it)[mColumns.m_col_name]);
+
+    PluginFactory& plf = mParent->getModeling()->pluginFactory();
+
+    try {
+	ConditionPlugin& plugin = plf.getCondition(pluginName);
+	vpz::Condition& cond = mConditions->get(conditionName);
+	plugin.start(cond);
+
+	mParent->buildTreePorts(conditionName);
+
+    } catch(const std::exception& e) {
+	// Error(e.what());
+    }
+    }
+}
 
 
 ////
@@ -235,12 +282,36 @@ ConditionsBox::PortsTreeView::PortsTreeView(
 		sigc::mem_fun(
 		    *this,
 		    &ConditionsBox::PortsTreeView::onRename)));
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		_("_Edit"), mMenuEdit));
     }
     mMenuPopup.accelerate(*this);
 }
 
 ConditionsBox::PortsTreeView::~PortsTreeView()
 {
+}
+
+void ConditionsBox::PortsTreeView::makeMenuEdit()
+{
+    Gtk::Menu::MenuList& menulist = mMenuEdit.items();
+
+    PluginFactory& plf = mParent->getModeling()->pluginFactory();
+
+    const ConditionPluginList& pll = plf.conditionPlugins();
+
+    for (ConditionPluginList::const_iterator it = pll.begin();
+	 it != pll.end(); ++it) {
+
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		it->first,
+		sigc::bind<std::string>(sigc::mem_fun(
+					    *this,
+					    &ConditionsBox::PortsTreeView::onEdit),
+					it->first)));
+    }
 }
 
 bool ConditionsBox::PortsTreeView::on_button_press_event(
@@ -338,6 +409,27 @@ void ConditionsBox::PortsTreeView::onRename()
     }
 }
 
+void ConditionsBox::PortsTreeView::onEdit(std::string pluginName)
+{
+
+    Gtk::TreeModel::iterator it = mRefTreeSelection->get_selected();
+
+    if(it) {
+
+	std::string name = Glib::ustring((*it)[mColumns.m_col_name]);
+
+	PluginFactory& plf = mParent->getModeling()->pluginFactory();
+
+	try {
+	    ConditionPlugin& plugin = plf.getCondition(pluginName);
+	    plugin.start(*mCondition, name);
+	    mParent->buildTreeValues(mCondition->name(), name);
+	} catch(const std::exception& e) {
+	    // Error(e.what());
+	}
+    }
+}
+
 ////
 // ConditionsBox
 ////
@@ -356,8 +448,12 @@ ConditionsBox::ConditionsBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
     m_xml->get_widget_derived("simuTreeConditions", m_treeConditions);
     m_treeConditions->setParent(this);
 
+    m_treeConditions->makeMenuEdit();
+
     m_xml->get_widget_derived("simuTreePorts", m_treePorts);
     m_treePorts->setParent(this);
+
+    m_treePorts->makeMenuEdit();
 
     m_xml->get_widget_derived("simuTreeValues", m_treeValues);
 

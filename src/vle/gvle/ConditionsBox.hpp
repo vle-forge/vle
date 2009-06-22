@@ -29,6 +29,7 @@
 #include <libglademm.h>
 #include <vle/gvle/ValuesTreeView.hpp>
 #include <vle/vpz/Conditions.hpp>
+#include <vle/gvle/ConditionPlugin.hpp>
 
 namespace vle { namespace gvle {
 
@@ -66,6 +67,8 @@ private:
         void setParent(ConditionsBox* parent)
         { mParent = parent; }
 
+	void makeMenuEdit();
+
     protected:
 	// Override Signal handler:
 	// Alternatively, use signal_button_press_event().connect_notify()
@@ -77,10 +80,13 @@ private:
 	virtual void on_remove();
 	virtual void onRename();
 	virtual void onCopy();
+	void onEdit(std::string pluginName);
 
     private:
+
 	ConditionsBox* mParent;
 	vpz::Conditions* mConditions;
+	Gtk::Menu mMenuEdit;
 	Gtk::Menu mMenuPopup;
 	ModelColumnsConditions mColumns;
 	Glib::RefPtr<Gtk::ListStore> mRefTreeModel;
@@ -115,6 +121,8 @@ private:
 	void setParent(ConditionsBox* parent)
 	    { mParent = parent; }
 
+	void makeMenuEdit();
+
     protected:
 	// Override Signal handler:
 	// Alternatively, use signal_button_press_event().connect_notify()
@@ -125,10 +133,12 @@ private:
 	virtual void on_add();
 	virtual void on_remove();
 	virtual void onRename();
+	void onEdit(std::string pluginName);
 
     private:
 	ConditionsBox* mParent;
 	vpz::Condition* mCondition;
+	Gtk::Menu mMenuEdit;
 	Gtk::Menu mMenuPopup;
 	ModelColumnsPorts mColumns;
 	Glib::RefPtr<Gtk::ListStore> mRefTreeModel;

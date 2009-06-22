@@ -94,7 +94,7 @@ private:
 
 #define DECLARE_GVLE_CONDITIONPLUGIN(x) \
     extern "C" { \
-        vle::gvle::ConditionPlugin* makeNewConditionPlugin( \
+        vle::gvle::ConditionPlugin* makeNewConditionPlugin( \
             const std::string& name) \
         { return new x(name); } \
     }
