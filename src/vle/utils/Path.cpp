@@ -88,7 +88,7 @@ std::string Path::getHomeFile(const std::string& name) const
 
 std::string Path::getPixmapDir() const
 {
-    return buildDirname(m_prefix, VLE_SHARE_DIRS,"pixmaps");
+    return buildDirname(m_prefix, VLE_SHARE_DIRS, "pixmaps");
 }
 
 std::string Path::getPixmapFile(const std::string& file) const
@@ -98,12 +98,12 @@ std::string Path::getPixmapFile(const std::string& file) const
 
 std::string Path::getGladeDir() const
 {
-    return buildDirname(m_prefix, VLE_SHARE_DIRS,"glade");
+    return buildDirname(m_prefix, VLE_SHARE_DIRS, "glade");
 }
 
 std::string Path::getGladeFile(const std::string& file) const
 {
-    return buildFilename(m_prefix, VLE_SHARE_DIRS,"glade", file);
+    return buildFilename(m_prefix, VLE_SHARE_DIRS, "glade", file);
 }
 
 /*
@@ -122,22 +122,22 @@ std::string Path::getHomeOutputDir() const
 
 std::string Path::getOutputFile(const std::string& file) const
 {
-    return buildDirname(m_prefix, VLE_SHARE_DIRS,"outputs", file);
+    return buildDirname(m_prefix, VLE_SHARE_DIRS, "outputs", file);
 }
 
 std::string Path::getHomeOutputFile(const std::string& file) const
 {
-    return buildDirname(m_home,"outputs", file);
+    return buildDirname(m_home, "outputs", file);
 }
 
 std::string Path::getOutputPixmapDir() const
 {
-    return buildDirname(m_prefix, VLE_SHARE_DIRS,"outputs", "pixmaps");
+    return buildDirname(m_prefix, VLE_SHARE_DIRS, "outputs", "pixmaps");
 }
 
 std::string Path::getHomeOutputPixmapDir() const
 {
-    return buildDirname(m_home,"outputs", "pixmaps");
+    return buildDirname(m_home, "outputs", "pixmaps");
 }
 
 std::string Path::getOutputPixmapFile(const std::string& file) const
@@ -147,17 +147,17 @@ std::string Path::getOutputPixmapFile(const std::string& file) const
 
 std::string Path::getHomeOutputPixmapFile(const std::string& file) const
 {
-    return buildDirname(m_home,"outputs", "pixmaps", file);
+    return buildDirname(m_home, "outputs", "pixmaps", file);
 }
 
 std::string Path::getOutputGladeDir() const
 {
-    return buildDirname(m_prefix, VLE_SHARE_DIRS,"outputs", "glade");
+    return buildDirname(m_prefix, VLE_SHARE_DIRS, "outputs", "glade");
 }
 
 std::string Path::getHomeOutputGladeDir() const
 {
-    return buildDirname(m_home,"outputs", "glade");
+    return buildDirname(m_home, "outputs", "glade");
 }
 
 std::string Path::getOutputGladeFile(const std::string& file) const
@@ -167,27 +167,27 @@ std::string Path::getOutputGladeFile(const std::string& file) const
 
 std::string Path::getHomeOutputGladeFile(const std::string& file) const
 {
-    return buildDirname(m_home,"outputs", "glade", file);
+    return buildDirname(m_home, "outputs", "glade", file);
 }
 
 std::string Path::getOutputDocDir() const
 {
-    return buildDirname(m_prefix, VLE_SHARE_DIRS,"outputs", "doc");
+    return buildDirname(m_prefix, VLE_SHARE_DIRS, "outputs", "doc");
 }
 
 std::string Path::getHomeOutputDocDir() const
 {
-    return buildDirname(m_home,"outputs", "doc");
+    return buildDirname(m_home, "outputs", "doc");
 }
 
 std::string Path::getOutputDocFile(const std::string& file) const
 {
-    return buildFilename(m_prefix, VLE_SHARE_DIRS,"outputs", "doc", file);
+    return buildFilename(m_prefix, VLE_SHARE_DIRS, "outputs", "doc", file);
 }
 
 std::string Path::getHomeOutputDocFile(const std::string& file) const
 {
-    return buildFilename(m_home,"outputs", "doc", file);
+    return buildFilename(m_home, "outputs", "doc", file);
 }
 
 /*
@@ -201,77 +201,77 @@ std::string Path::getConditionDir() const
 
 std::string Path::getHomeConditionDir() const
 {
-    return buildDirname(m_home,"conditions");
+    return buildDirname(m_home, "conditions");
 }
 
 std::string Path::getConditionFile(const std::string& file) const
 {
-    return buildDirname(m_prefix, VLE_SHARE_DIRS,"conditions", file);
+    return buildDirname(m_prefix, VLE_SHARE_DIRS, "conditions", file);
 }
 
 std::string Path::getHomeConditionFile(const std::string& file) const
 {
-    return buildDirname(m_home,"conditions", file);
+    return buildDirname(m_home, "conditions", file);
 }
 
 std::string Path::getConditionPixmapDir() const
 {
-    return buildDirname(m_prefix, VLE_SHARE_DIRS,"conditions", "pixmaps");
+    return buildDirname(m_prefix, VLE_SHARE_DIRS, "conditions", "pixmaps");
 }
 
 std::string Path::getHomeConditionPixmapDir() const
 {
-    return buildDirname(m_home,"conditions", "pixmaps");
+    return buildDirname(m_home, "conditions", "pixmaps");
 }
 
 std::string Path::getConditionPixmapFile(const std::string& file) const
 {
-    return buildFilename(m_prefix, VLE_SHARE_DIRS,"conditions", "pixmaps", file);
+    return buildFilename(m_prefix, VLE_SHARE_DIRS, "conditions", "pixmaps", file);
 }
 
 std::string Path::getHomeConditionPixmapFile(const std::string& file) const
 {
-    return buildFilename(m_home,"conditions", "pixmaps", file);
+    return buildFilename(m_home, "conditions", "pixmaps", file);
 }
 
 std::string Path::getConditionGladeDir() const
 {
-    return buildDirname(m_prefix, VLE_SHARE_DIRS,"conditions", "glade");
+    return buildDirname(m_prefix, VLE_SHARE_DIRS, "conditions", "glade");
 }
 
 std::string Path::getHomeConditionGladeDir() const
 {
-    return buildDirname(m_home,"conditions", "glade");
+    return buildDirname(m_home, "conditions", "glade");
 }
 
 std::string Path::getConditionGladeFile(const std::string& file) const
 {
-    return buildFilename(m_prefix, VLE_SHARE_DIRS,"conditions", "glade", file);
+    return buildFilename(m_prefix, VLE_SHARE_DIRS, "conditions", "glade", file);
 }
 
 std::string Path::getHomeConditionGladeFile(const std::string& file) const
 {
-    return buildFilename(m_home,"conditions", "glade", file);
+    return buildFilename(m_home, "conditions", "glade", file);
 }
 
 std::string Path::getConditionDocDir() const
 {
-    return buildDirname(m_prefix, VLE_SHARE_DIRS,"conditions", "doc");
+    return buildDirname(m_prefix, VLE_SHARE_DIRS, "conditions", "doc");
 }
 
 std::string Path::getHomeConditionDocDir() const
 {
-    return buildDirname(m_home,"conditions", "doc");
+    return buildDirname(m_home, "conditions", "doc");
 }
 
 std::string Path::getConditionDocFile(const std::string& file) const
 {
-    return buildFilename(m_prefix, VLE_SHARE_DIRS,"conditions", "doc", file);
+    return buildFilename(m_prefix, VLE_SHARE_DIRS, "conditions", "doc", file);
 }
 
 std::string Path::getHomeConditionDocFile(const std::string& file) const
 {
-    return buildFilename(m_home,"conditions", "doc", file);
+    return buildFilename(m_home, "conditions", "doc", file);
 }
 
 /*
@@ -295,8 +295,90 @@ void Path::setPackage(const std::string& name)
 
 std::string Path::getPackagesDir() const
 {
-    return buildDirname(m_home,"pkgs");
+    return buildDirname(m_home, "pkgs");
 }
+
+std::string Path::getTemplateDir() const
+{
+    return buildFilename(m_prefix, VLE_SHARE_DIRS, "template");
+}
+
+std::string Path::getTemplate(const std::string& name) const
+{
+    return buildFilename(m_prefix, VLE_SHARE_DIRS, "template", name);
+}
+
+void Path::copyTemplate(const std::string& name, const std::string& to) const
+{
+    namespace fs = boost::filesystem;
+
+    const std::string& dirname(getTemplate("package"));
+    fs::path source(dirname);
+
+    if (not fs::exists(source)) {
+        throw utils::InternalError(fmt(
+                _("Can not copy '%1%' into '%2%'. '%1%' does not exist in '%3%'"))
+            % name % to % dirname);
+    }
+
+    if (fs::is_directory(source)) {
+        try {
+            std::list < std::string > buildeddir;
+            for (fs::recursive_directory_iterator it(source), end; it != end; ++it) {
+                std::list < std::string > store;
+                {
+                    fs::path tmp(it->path());
+                    for (int i = it.level(); i >= 0; --i) {
+                        store.push_back(tmp.leaf());
+                        tmp = tmp.branch_path();
+                    }
+                }
+
+                fs::path dst(to);
+                {
+                    for (std::list < std::string >::const_reverse_iterator jt =
+                         store.rbegin(); jt != store.rend(); ++jt) {
+                        dst /= *jt;
+                    }
+                }
+
+                fs::path dir(dst.branch_path());
+
+                if (std::find(buildeddir.rbegin(), buildeddir.rend(),
+                              dir.string()) == buildeddir.rend()) {
+                    if (not fs::exists(dir)) {
+                        fs::create_directories(dir);
+                        buildeddir.push_back(dir.string());
+                    }
+                }
+                fs::path src(it->path());
+                dir /= src.leaf();
+
+                if (not fs::is_directory(src) and not fs::exists(dir)) {
+                    fs::copy_file(src, dir);
+                }
+            }
+        } catch (const std::exception& e) {
+            throw utils::InternalError(fmt(
+                    _("Error when copy template '%1%' into '%2%: %3%")) % name % to %
+                e.what());
+        }
+    } else {
+        try {
+            fs::path src(source);
+            fs::path dst(to);
+            dst /= src.leaf();
+            if (fs::exists(src) and not fs::exists(dst)) {
+                fs::copy_file(src, dst);
+            }
+        } catch (const std::exception& e) {
+            throw utils::InternalError(fmt(
+                    _("Can not copy '%1%' into '%2%': %3%")) % name % to %
+                e.what());
+        }
+    }
+}
+
 
 std::string Path::getPackageDir() const
 {
@@ -544,6 +626,26 @@ std::string Path::buildDirname(const std::string& dir1,
     lst.push_back(dir4);
 
     return Glib::build_path(G_DIR_SEPARATOR_S, lst);
+}
+
+bool Path::existFile(const std::string& filename)
+{
+    namespace fs = boost::filesystem;
+
+    fs::path p(filename);
+    return fs::exists(p) and fs::is_directory(p);
+}
+
+bool Path::existDirectory(const std::string& filename)
+{
+    namespace fs = boost::filesystem;
+
+    fs::path p(filename);
+#if BOOST_VERSION > 103600
+    return fs::exists(p) and fs::is_regular_file(p);
+#else
+    return fs::exists(p) and fs::is_regular(p);
+#endif
 }
 
 std::ostream& operator<<(std::ostream& out, const Path& p)

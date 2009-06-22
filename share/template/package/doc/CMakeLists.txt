@@ -1,0 +1,2 @@
+INSTALL(FILES file.doc DESTINATION doc)
+

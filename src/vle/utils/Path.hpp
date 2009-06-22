@@ -214,6 +214,40 @@ namespace vle { namespace utils {
         std::string getPackageDocFile(const std::string& name) const;
         std::string getPackageExpFile(const std::string& name) const;
 
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Manage template
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+        /**
+         * @brief Get the $PREFIX/share/vle-x.y.z/template directory name.
+         * @return A string.
+         */
+        std::string getTemplateDir() const;
+
+        /**
+         * @brief Return the $PREFIX/share/vle-x.y.z/template/name directory
+         * name.
+         * @path The name of the template.
+         * @return A string.
+         */
+        std::string getTemplate(const std::string& name) const;
+
+        /**
+         * @brief Copy the file or directory name from the
+         * $PREFIX/share/vle-x.y.z/template/name into the output directory.
+         * @param name The name of the template to copy.
+         * @param to The destination of the template.
+         */
+        void copyTemplate(const std::string& name, const std::string& to) const;
+
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Manage plug-ins lists
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
         /**
          * @brief Get the list of simulator's directories.
          * @return A list of directory name.
@@ -272,6 +306,26 @@ namespace vle { namespace utils {
          * VLE_HOME/lib, doc, src, build, exp.
          */
         void initVleHomeDirectory();
+
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         *
+         * Usefull functions
+         *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+        /**
+         * @brief Check if the current filename corresponds to a regular file.
+         * @param filename The name of the file to check.
+         * @return True if the file is a regular file.
+         */
+        bool existFile(const std::string& filename);
+
+        /**
+         * @brief Check if the current filename corresponds to a directory.
+         * @param filename The name of the directory to check.
+         * @return True if the file is a directory.
+         */
+        bool existDirectory(const std::string& filename);
 
     private:
         void addSimulatorDir(const std::string& dirname);

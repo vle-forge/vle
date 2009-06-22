@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE vle_project SYSTEM "http://vle.univ-littoral.fr/vle-0.8.0.dtd">
+<vle_project version="1.0" date="" author="Gauthier Quesnel">
+ <structures>
+ </structures>
+ <dynamics>
+ </dynamics>
+  <experiment name="test" begin="0.0" duration="1.0" seed="123456789">
+  </experiment>
+</vle_project>

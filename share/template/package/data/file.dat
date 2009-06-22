@@ -1,0 +1,3 @@
+# an example of data file accessible from the VLE package function:
+# using namespace vle;
+# std::string filename = utils::Path::path().getPackageDataFile("file.dat");

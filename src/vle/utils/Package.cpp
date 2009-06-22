@@ -40,16 +40,10 @@ CMakePackage::CMakePackage(const std::string& package)
 
 void CMakePackage::create(std::string& /* out */, std::string& /* err */)
 {
-    namespace fs = boost::filesystem;
-
     Path& p = utils::Path::path();
-    fs::create_directory(p.getPackageDir());
-    fs::create_directory(p.getPackageDir());
-    fs::create_directory(p.getPackageLibDir());
-    fs::create_directory(p.getPackageDocDir());
-    fs::create_directory(p.getPackageDataDir());
-    fs::create_directory(p.getPackageExpDir());
-    fs::create_directory(p.getPackageBuildDir());
+
+    boost::filesystem::create_directory(p.getPackageDir());
+    p.copyTemplate("package", p.getPackageDir());
 }
 
 void CMakePackage::configure(std::string& out, std::string& err)
