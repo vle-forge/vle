@@ -807,6 +807,8 @@ private:
     ModelClassBox*                  mModelClassBox;
     std::string                     mPackage;
     View*                           mCurrentView;
+    int                             mCurrentTab;
+
 };
 
 std::string valuetype_to_string(value::Value::type type);

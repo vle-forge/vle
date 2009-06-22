@@ -1269,8 +1269,7 @@ void GVLE::changeTab(GtkNotebookPage* /*page*/, int num)
 		    dynamic_cast< DocumentDrawingArea *>(it->second);
 	    if (tab == dynamic_cast< DocumentDrawingArea *>(it->second)->getDrawingArea())
 	    {
-		std::cout << "Couc\n";
-		fflush(stdout);
+		mCurrentTab = num;
 		mCurrentView = area->getView();
 		m_menu->onViewMode();
 		break;
@@ -1278,6 +1277,7 @@ void GVLE::changeTab(GtkNotebookPage* /*page*/, int num)
 	}
 	else{
 	    if (it->second == tab) {
+		mCurrentTab = num;
 		mCurrentView = 0;
 		m_menu->onFileMode();
 		break;
@@ -1355,7 +1355,43 @@ void GVLE::exportCurrentModel()
 
 void GVLE::exportGraphic()
 {
-    mCurrentView->exportGraphic();
+    ViewDrawingArea* tab = dynamic_cast<ViewDrawingArea*>(
+	mNotebook->get_nth_page(mCurrentTab));
+    vpz::Experiment& experiment = m_modeling->vpz().project().experiment();
+    if (experiment.name().empty() || experiment.duration() == 0) {
+        Error(_("Fix a Value to the name and the duration of the experiment before exportation."));
+        return;
+    }
+
+    Gtk::FileChooserDialog file(_("Image file"), Gtk::FILE_CHOOSER_ACTION_SAVE);
+    file.set_transient_for(*this);
+    file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+    file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+    Gtk::FileFilter filterPng;
+    Gtk::FileFilter filterPdf;
+    Gtk::FileFilter filterSvg;
+    filterPng.set_name(_("Portable Newtork Graphics (.png)"));
+    filterPng.add_pattern("*.png");
+    filterPdf.set_name(_("Portable Format Document (.pdf)"));
+    filterPdf.add_pattern("*.pdf");
+    filterSvg.set_name(_("Scalable Vector Graphics (.svg)"));
+    filterSvg.add_pattern("*.svg");
+    file.add_filter(filterPng);
+    file.add_filter(filterPdf);
+    file.add_filter(filterSvg);
+
+
+    if (file.run() == Gtk::RESPONSE_OK) {
+        std::string filename(file.get_filename());
+	std::string extension(file.get_filter()->get_name());
+
+	if (extension == _("Portable Newtork Graphics (.png)"))
+	    tab->exportPng(filename);
+	else if (extension == _("Portable Format Document (.pdf)"))
+	    tab->exportPdf(filename);
+	else if (extension == _("Scalable Vector Graphics (.svg)"))
+	    tab->exportSvg(filename);
+    }
 }
 
 void GVLE::addCoefZoom()
