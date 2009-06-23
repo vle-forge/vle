@@ -1396,17 +1396,23 @@ void GVLE::exportGraphic()
 
 void GVLE::addCoefZoom()
 {
-    mCurrentView->addCoefZoom();
+    ViewDrawingArea* tab = dynamic_cast<ViewDrawingArea*>(
+	mNotebook->get_nth_page(mCurrentTab));
+    tab->addCoefZoom();
 }
 
 void GVLE::delCoefZoom()
 {
-    mCurrentView->delCoefZoom();
+    ViewDrawingArea* tab = dynamic_cast<ViewDrawingArea*>(
+	mNotebook->get_nth_page(mCurrentTab));
+    tab->delCoefZoom();
 }
 
 void GVLE::setCoefZoom(double coef)
 {
-    mCurrentView->setCoefZoom(coef);
+    ViewDrawingArea* tab = dynamic_cast<ViewDrawingArea*>(
+	mNotebook->get_nth_page(mCurrentTab));
+    tab->setCoefZoom(coef);
 }
 
 }} // namespace vle gvle
