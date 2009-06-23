@@ -142,23 +142,53 @@ GVLE::FileTreeView::~FileTreeView()
 {
 }
 
-void GVLE::FileTreeView::buildHierarchy(
+void GVLE::FileTreeView::buildHierarchyDirectory(
     const Gtk::TreeModel::Row& parent, const std::string& dirname)
 {
     Glib::Dir dir(dirname);
-    Glib::Dir::iterator it;
-    for (it = dir.begin(); it != dir.end(); ++it) {
+    std::list<std::string> entries (dir.begin(), dir.end());
+    entries.sort();
+    std::list <std::string> ::iterator it;
+    for (it = entries.begin(); it != entries.end(); ++it) {
 	if (((*it)[0] != '.') //Don't show hidden files
 	    and (std::find(mIgnoredFilesList.begin(), mIgnoredFilesList.end(), *it)
 	         == mIgnoredFilesList.end())) {
-	    Gtk::TreeModel::Row row = *(mRefTreeModel->append(parent.children()));
-	    row[mColumns.m_col_name] = *it;
 	    std::string nextpath = Glib::build_filename(dirname, *it);
 	    if (isDirectory(nextpath)) {
+		Gtk::TreeModel::Row row = *(mRefTreeModel->append(parent.children()));
+		row[mColumns.m_col_name] = *it;
 		buildHierarchy(*row, nextpath);
 	    }
 	}
     }
+}
+
+void GVLE::FileTreeView::buildHierarchyFile(
+    const Gtk::TreeModel::Row& parent, const std::string& dirname)
+{
+    Glib::Dir dir(dirname);
+    std::list<std::string> entries (dir.begin(), dir.end());
+    entries.sort();
+    std::list<std::string>::iterator it;
+    for (it = entries.begin(); it != entries.end(); ++it) {
+	if (((*it)[0] != '.') //Don't show hidden files
+	    and (std::find(mIgnoredFilesList.begin(), mIgnoredFilesList.end(), *it)
+	         == mIgnoredFilesList.end())) {
+	    std::string nextpath = Glib::build_filename(dirname, *it);
+	    if (not isDirectory(nextpath)) {
+		Gtk::TreeModel::Row row = *(mRefTreeModel->append(parent.children()));
+		row[mColumns.m_col_name] = *it;
+	    }
+	}
+    }
+}
+
+
+void GVLE::FileTreeView::buildHierarchy(
+    const Gtk::TreeModel::Row& parent, const std::string& dirname)
+{
+    buildHierarchyDirectory(parent, dirname);
+    buildHierarchyFile(parent, dirname);
 }
 
 void GVLE::FileTreeView::clear()

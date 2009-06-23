@@ -260,6 +260,27 @@ public:
         Glib::ustring getSelected()
         { return (*mRefTreeSelection->get_selected())[mColumns.m_col_name]; }
     private:
+
+	/**
+	 * Create the hierarchy with the directories
+	 *
+	 * @param parent the parent's of the current row
+	 * @param dirname the name of the parent directory
+	 *
+	 */
+	void buildHierarchyDirectory(const Gtk::TreeModel::Row& parent,
+				     const std::string& dirname);
+
+	/**
+	 * Create the hierarchy with the files
+	 *
+	 * @param parent the parent's of the current row
+	 * @param dirname the name of the parent directory
+	 *
+	 */
+	void buildHierarchyFile(const Gtk::TreeModel::Row& parent,
+				const std::string& dirname);
+
 	void buildHierarchy(const Gtk::TreeModel::Row& parent,
 			    const std::string& dirname);
 	bool isDirectory(const std::string& dirname);
