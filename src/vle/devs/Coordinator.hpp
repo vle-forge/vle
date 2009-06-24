@@ -66,7 +66,7 @@ namespace vle { namespace devs {
          * @throw Exception::Internal if a condition have no model port name
          * associed.
          */
-        void init(const vpz::Model& mdls);
+        void init(const vpz::Model& mdls, const Time& current);
 
         /**
          * @brief Return the top devs::Time of the devs::EventTable.

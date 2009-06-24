@@ -36,6 +36,7 @@ SimpleFile::SimpleFile(const std::string& location) :
     Plugin(location),
     m_time(-1.0),
     m_isstart(false),
+    m_havefirstevent(false),
     m_type(SimpleFile::FILE)
 {
 }
@@ -108,8 +109,9 @@ void SimpleFile::onNewObservable(const std::string& simulator,
     if (m_isstart) {
         flush(time);
     } else {
-        if (m_time < .0) {
+        if (not m_havefirstevent) {
             m_time = time;
+            m_havefirstevent = true;
         } else {
             flush(time);
             m_isstart = true;
@@ -146,8 +148,9 @@ void SimpleFile::onValue(const std::string& simulator,
     if (m_isstart) {
         flush(time);
     } else {
-        if (m_time < .0) {
+        if (not m_havefirstevent) {
             m_time = time;
+            m_havefirstevent = true;
         } else {
             flush(time);
             m_isstart = true;
@@ -157,9 +160,11 @@ void SimpleFile::onValue(const std::string& simulator,
     std::string name(buildname(parent, simulator, port));
     Columns::iterator it = m_columns.find(name);
 
-    Assert < utils::InternalError >(it != m_columns.end(), fmt(
-            _("SimpleFile: columns '%1%' does not exist. No new Observable ?")) %
-            name);
+    if (it == m_columns.end()) {
+        throw utils::InternalError(fmt(
+                _("SimpleFile: columns '%1%' does not exist. No observable ?"))
+            % name);
+    }
 
     m_buffer[it->second] = value;
     m_valid[it->second] = true;

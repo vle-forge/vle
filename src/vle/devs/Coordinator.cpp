@@ -76,8 +76,9 @@ Coordinator::~Coordinator()
     }
 }
 
-void Coordinator::init(const vpz::Model& mdls)
+void Coordinator::init(const vpz::Model& mdls, const Time& current)
 {
+    m_currentTime = current;
     addModels(mdls);
     m_toDelete = 0;
 }

@@ -29,9 +29,9 @@
 #include <vle/devs/Dynamics.hpp>
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/devs/Time.hpp>
-#include <vle/utils/XML.hpp>
 #include <vle/utils/Rand.hpp>
 #include <vle/graph/Model.hpp>
+#include <cmath>
 
 namespace vle { namespace devs {
 
@@ -59,7 +59,9 @@ void RootCoordinator::load(const vpz::Vpz& io)
     }
 
     m_rand.seed(io.project().experiment().seed());
-    m_duration = io.project().experiment().duration();
+    m_begin = io.project().experiment().begin();
+    m_end = m_begin + io.project().experiment().duration();
+    m_currentTime = m_begin;
 
     m_modelfactory = new ModelFactory(io.project().dynamics(),
                                       io.project().classes(),
@@ -68,22 +70,23 @@ void RootCoordinator::load(const vpz::Vpz& io)
                                       *this);
 
     m_coordinator = new Coordinator(*m_modelfactory);
-    m_coordinator->init(io.project().model());
+    m_coordinator->init(io.project().model(), m_currentTime);
 
     m_root = io.project().model().model();
 }
 
 void RootCoordinator::init()
 {
-    m_currentTime = devs::Time(0);
+    m_currentTime = m_begin;
 }
 
 bool RootCoordinator::run()
 {
     m_currentTime = m_coordinator->getNextTime();
+
     if (m_currentTime == Time::infinity) {
         return false;
-    } else if (m_currentTime > m_duration) {
+    } else if ((m_end - m_currentTime) < 0) {
         return false;
     }
 

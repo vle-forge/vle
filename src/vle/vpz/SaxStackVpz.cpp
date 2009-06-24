@@ -436,6 +436,12 @@ void SaxStackVpz::pushExperiment(const AttributeList& att)
     exp.setDuration(getAttribute < double >(att, "duration"));
     exp.setSeed(getAttribute < guint32 >(att, "seed"));
 
+    if (existAttribute(att, "begin")) {
+        exp.setBegin(getAttribute < double >(att, "begin"));
+    } else {
+        exp.setBegin(0.0);
+    }
+
     if (existAttribute(att, "combination")) {
         exp.setCombination(getAttribute < std::string >(att, "combination"));
     }

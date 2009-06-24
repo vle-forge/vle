@@ -80,6 +80,7 @@
 
 <!ATTLIST experiment
   name CDATA #REQUIRED
+  begin CDATA #IMPLIED
   duration CDATA #REQUIRED
   seed CDATA #IMPLIED
   combination (linear|total) #IMPLIED >

@@ -41,11 +41,11 @@ namespace vle { namespace vpz {
     {
     public:
         /**
-         * @brief Build an empty experiment with null duration and seed to 1.
+         * @brief Build an empty experiment with null duration an beginning date
+         * and seed to 1.
          */
-        Experiment() :
-            m_duration(0),
-            m_seed(1)
+        Experiment()
+            : m_duration(0), m_begin(0.0), m_seed(1)
         {}
 
         /**
@@ -59,7 +59,7 @@ namespace vle { namespace vpz {
          * including Replicas, ExperimentalCondition and Views.
          * @param out Output stream.
          * @code
-         * <experiment name="exp1" duration="0.33" seed="65431">
+         * <experiment name="exp1" duration="0.33" begin="0.0" seed="65431">
          *   [...]
          * </experiment>
          * @endcode
@@ -181,6 +181,20 @@ namespace vle { namespace vpz {
         { return m_duration; }
 
         /**
+         * @brief Assign a new beginning date to the simulation.
+         * @param begin The new beginning date of the simulation.
+         */
+        void setBegin(const double& begin)
+        { m_begin = begin; }
+
+        /**
+         * @brief Get the beginning date of the simulation.
+         * @return A real [0.0..max double[
+         */
+        const double& begin() const
+        { return m_begin; }
+
+        /**
          * @brief Set the seed of the Experiment file.
          * @param seed The new seed to initialise the random generator.
          */
@@ -210,6 +224,7 @@ namespace vle { namespace vpz {
     private:
         std::string         m_name;
         double              m_duration;
+        double              m_begin;
         guint32             m_seed;
         std::string         m_combination;
         Replicas            m_replicas;

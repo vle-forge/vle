@@ -112,8 +112,16 @@ namespace vle { namespace devs {
 
     private:
         utils::Rand         m_rand;
-	devs::Time          m_currentTime;
-        devs::Time          m_duration;
+
+        /** @brief Store the beginning of the simulation. */
+        devs::Time          m_begin;
+
+        /** @brief Store the current date of the simulator. */
+        devs::Time          m_currentTime;
+
+        /** @brief Store the end date of the simulation. */
+        devs::Time          m_end;
+
 	Coordinator*        m_coordinator;
 	ModelFactory*       m_modelfactory;
         graph::Model*       m_root;

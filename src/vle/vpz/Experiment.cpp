@@ -32,7 +32,8 @@ void Experiment::write(std::ostream& out) const
 {
     out << "<experiment "
         << "name=\"" << m_name.c_str() << "\" "
-        << "duration=\"" << m_duration << "\" ";
+        << "duration=\"" << m_duration << "\" "
+        << "begin=\"" << m_begin << "\" ";
 
     if (not m_combination.empty()) {
         out << "combination=\"" << m_combination.c_str()
@@ -52,6 +53,7 @@ void Experiment::clear()
 {
     m_name.clear();
     m_duration = 0;
+    m_begin = 0;
     m_seed = 1;
 
     m_conditions.clear();

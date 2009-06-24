@@ -130,6 +130,7 @@ namespace vle { namespace oov { namespace plugin {
         std::string     m_filename;
         std::string     m_filenametmp;
         bool            m_isstart;
+        bool            m_havefirstevent;
         OutputType      m_type;
 
         void flush(double trame_time);
