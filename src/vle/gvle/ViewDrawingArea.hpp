@@ -137,6 +137,7 @@ namespace vle { namespace gvle {
         void getModelOutPosition(graph::Model* model, const std::string& p,
                                  int& x, int& y);
         void calcSize(graph::Model* m);
+        void calcRectSize();
 
 	/**
 	 * Export the view in image
@@ -240,6 +241,8 @@ namespace vle { namespace gvle {
 
         int                             mHeight;
         int                             mWidth;
+        int                             mRectHeight;
+        int                             mRectWidth;
         double                          mZoom;
 	double                          mOffset;
         Glib::RefPtr < Gdk::Pixmap >    mBuffer;
