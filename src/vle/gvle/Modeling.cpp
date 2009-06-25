@@ -342,8 +342,8 @@ void Modeling::addView(graph::CoupledModel* model)
         search->selectedWindow();
     } else {
         mListView.push_back(new View(this, model, szView));
-	mGVLE->openTabVpz(mFileName, model);
     }
+    mGVLE->openTabVpz(mFileName, model);
 }
 
 void Modeling::addViewClass(graph::Model* model, std::string name)
@@ -375,8 +375,8 @@ void Modeling::addViewClass(graph::CoupledModel* model, std::string name)
 	View* v = new View(this, model, szView);
 	v->setCurrentClass(name);
         mListView.push_back(v);
-	mGVLE->openTabVpz(mFileName, model);
     }
+    mGVLE->openTabVpz(mFileName, model);
 }
 
 bool Modeling::existView(graph::CoupledModel* model)

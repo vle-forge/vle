@@ -71,10 +71,26 @@ class PackageBrowserWindow;
 class Document : public Gtk::ScrolledWindow {
 public:
 
-    Document();
+    Document(const std::string& filepath);
+
+    ~Document();
 
     virtual inline bool isDrawingArea()
 	{ return false; }
+
+    inline std::string filename()
+	{ return mFileName; }
+
+    inline const std::string filepath() const
+	{ return mFilePath; }
+
+    inline void setFilePath(std::string filepath)
+	{ mFilePath = filepath; }
+
+
+private:
+    std::string    mFilePath;
+    std::string    mFileName;
 };
 
 class DocumentText : public Document {
@@ -85,19 +101,11 @@ public:
     void save();
     void saveAs(const std::string& filename);
 
-    inline const std::string filename() const
-    { return mFileName; }
-
-    inline const std::string filepath() const
-    { return mFilePath; }
-
     inline bool isNew() const
     { return mNew == true; }
 
 private:
     Gtk::TextView  mView;
-    std::string    mFilePath;
-    std::string    mFileName;
     bool           mModified;
     bool           mNew;
 
@@ -111,18 +119,20 @@ public:
 			graph::Model* model);
     ~DocumentDrawingArea();
 
-     inline View* getView()
+     inline View* getView() const
 	{ return mView; }
 
-    inline ViewDrawingArea* getDrawingArea()
+    inline ViewDrawingArea* getDrawingArea() const
 	{ return mArea; }
 
-    virtual inline bool isDrawingArea()
+    inline graph::Model* getModel() const
+	{ return mModel; }
+
+    virtual inline bool isDrawingArea() const
 	{ return true; }
 
 
 private:
-    std::string         mFilePath;
     View*               mView;
     ViewDrawingArea*    mArea;
     graph::Model*       mModel;
@@ -218,6 +228,7 @@ public:
     void openTab(const std::string& filepath);
     void openTabVpz(const std::string& filepath, graph::CoupledModel* model);
     void closeTab(const std::string& filepath);
+    void closeVpzTab();
     void closeAllTab();
     void changeTab(GtkNotebookPage* page, int num);
 

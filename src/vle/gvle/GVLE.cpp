@@ -50,19 +50,22 @@
 
 namespace vle { namespace gvle {
 
-Document::Document() :
-    Gtk::ScrolledWindow()
+Document::Document(const std::string& filepath) :
+    Gtk::ScrolledWindow(),
+    mFilePath(filepath)
 {
+    mFileName = boost::filesystem::basename(filepath);
+}
 
+Document::~Document()
+{
 }
 
 DocumentText::DocumentText(const std::string& filepath, bool newfile) :
-    Document(),
-    mFilePath(filepath),
+    Document(filepath),
     mModified(false),
     mNew(newfile)
 {
-    mFileName = boost::filesystem::basename(filepath);
     init();
 }
 
@@ -73,7 +76,7 @@ DocumentText::~DocumentText()
 void DocumentText::save()
 {
     try {
-	std::ofstream file(mFilePath.c_str());
+	std::ofstream file(filepath().c_str());
 	file << mView.get_buffer()->get_text();
 	file.close();
 	mNew = mModified = false;
@@ -84,14 +87,14 @@ void DocumentText::save()
 
 void DocumentText::saveAs(const std::string& filename)
 {
-    mFilePath = filename;
+    setFilePath(filename);
     save();
 }
 
 void DocumentText::init()
 {
     if (not mNew) {
-	std::ifstream file(mFilePath.c_str());
+	std::ifstream file(filepath().c_str());
 	if (file) {
 	    std::stringstream filecontent;
 	    filecontent << file.rdbuf();
@@ -99,7 +102,7 @@ void DocumentText::init()
 	    mView.get_buffer()->insert(mView.get_buffer()->end(), filecontent.str());
 	    add(mView);
 	} else {
-	    throw std::string("cannot open: " + mFileName);
+	    throw std::string("cannot open: " + filename());
 	}
     } else {
 	add(mView);
@@ -109,8 +112,7 @@ void DocumentText::init()
 DocumentDrawingArea::DocumentDrawingArea(const std::string& filepath,
 					 View* view,
 					 graph::Model* model) :
-    Document(),
-    mFilePath(filepath),
+    Document(filepath),
     mView(view),
     mModel(model)
 {
@@ -222,6 +224,8 @@ void GVLE::FileTreeView::on_row_activated(
     std::string absolute_path =
 	Glib::build_filename(mPackage, Glib::build_filename(*lstpath));
     if (not isDirectory(absolute_path)) {
+	if (boost::filesystem::extension(absolute_path) == ".vpz")
+	    mParent->closeVpzTab();
 	mParent->openTab(absolute_path);
     }
     else {
@@ -567,8 +571,7 @@ void GVLE::closeFile()
 	Gtk::Widget* tab = mNotebook->get_nth_page(page);
 	Documents::iterator it = mDocuments.begin();
 	while (it != mDocuments.end()) {
-	    if (it->second->isDrawingArea())
-	    {
+	    if (boost::filesystem::extension(it->first) == ".vpz") {
 		if (dynamic_cast<DocumentDrawingArea*>(
 			it->second)->getDrawingArea() == tab) {
 		    closeTab(it->first);
@@ -757,7 +760,12 @@ std::string valuetype_to_string(value::Value::type type)
 
 void GVLE::focusTab(const std::string& filepath)
 {
-    int page = mNotebook->page_num(*mDocuments.find(filepath)->second);
+    int page;
+    if (boost::filesystem::extension(filepath) == ".vpz")
+	page = mNotebook->page_num(*(dynamic_cast<DocumentDrawingArea*>(
+					 mDocuments.find(filepath)->second)->getDrawingArea()));
+    else
+	page = mNotebook->page_num(*mDocuments.find(filepath)->second);
     mNotebook->set_current_page(page);
 }
 
@@ -788,34 +796,44 @@ void GVLE::openTab(const std::string& filepath)
 
 void GVLE::openTabVpz(const std::string& filepath, graph::CoupledModel* model)
 {
-    if (model != NULL) {
-	DocumentDrawingArea* doc = new DocumentDrawingArea(filepath,
-							  m_modeling->findView(model),
-							  model);
-	mCurrentView = doc->getView();
-	ViewDrawingArea* area = doc->getDrawingArea();
-	std::string tabName = model->getName();
-	graph::Model* parent = model->getParent();
-	while (parent != NULL) {
-	    tabName += "/" + parent->getName();
-	    parent = parent->getParent();
+    Documents::iterator it = mDocuments.find(filepath);
+    if (it != mDocuments.end()) {
+	if (dynamic_cast<DocumentDrawingArea*>(it->second)->getModel()
+	    != model) {
+	    focusTab(filepath);
+	    int page = mNotebook->get_current_page();
+	    closeTab(filepath);
+
+	    DocumentDrawingArea* doc = new DocumentDrawingArea(
+		filepath,
+		m_modeling->findView(model),
+		model);
+	    mCurrentView = doc->getView();
+	    ViewDrawingArea* area = doc->getDrawingArea();
+	    mDocuments.insert(
+		std::make_pair < std::string, DocumentDrawingArea* >(
+		    filepath, doc));
+	    mNotebook->append_page(*area, doc->filename() +
+				   boost::filesystem::extension(filepath)
+				   + " - " + model->getName());
+
+	    mNotebook->reorder_child(*area, page);
+	    show_all_children();
+	    mNotebook->set_current_page(page);
 	}
-	mDocuments.insert(
-	  std::make_pair < std::string, DocumentDrawingArea* >(tabName, doc));
-	int page = mNotebook->append_page(*area, model->getName());
-	show_all_children();
-	mNotebook->set_current_page(page);
     } else {
-	DocumentDrawingArea* doc = new DocumentDrawingArea(filepath,
-							  m_modeling->findView(model),
-							  m_modeling->getTopModel());
+	DocumentDrawingArea* doc = new DocumentDrawingArea(
+	    filepath,
+	    m_modeling->findView(model),
+	    model);
 	mCurrentView = doc->getView();
 	ViewDrawingArea* area = doc->getDrawingArea();
-	std::string tabName = m_modeling->getTopModel()->getName();
 	mDocuments.insert(
-	  std::make_pair < std::string, DocumentDrawingArea* >(tabName, doc));
+	  std::make_pair < std::string, DocumentDrawingArea* >(filepath, doc));
 	int page = mNotebook->append_page(*area,
-					  m_modeling->getTopModel()->getName());
+					  doc->filename() +
+					  boost::filesystem::extension(filepath)
+					  + " - " + model->getName());
 	show_all_children();
 	mNotebook->set_current_page(page);
     }
@@ -827,21 +845,53 @@ void GVLE::closeTab(const std::string& filepath)
 {
     Documents::iterator it = mDocuments.find(filepath);
     if (it != mDocuments.end()) {
-	int page = mNotebook->page_num(*it->second);
-	mNotebook->remove_page(page);
-	mDocuments.erase(filepath);
+	int page;
+	if (boost::filesystem::extension(filepath) == ".vpz")
+	    page = mNotebook->page_num(
+		*(dynamic_cast<DocumentDrawingArea*>(it->second)
+		  ->getDrawingArea()));
+	else
+	    page = mNotebook->page_num(*it->second);
+	if (page != -1) {
+	    mNotebook->remove_page(page);
+	    mDocuments.erase(filepath);
 
-	mNotebook->set_current_page(--page);
-	redrawModelTreeBox();
-	redrawModelClassBox();
+	    mNotebook->set_current_page(--page);
+	    redrawModelTreeBox();
+	    redrawModelClassBox();
+	}
+    }
+}
+
+void GVLE::closeVpzTab()
+{
+    int page;
+    Documents::iterator it = mDocuments.begin();
+    while (it != mDocuments.end()) {
+	if (boost::filesystem::extension(it->first) == ".vpz") {
+	    page = mNotebook->page_num(
+		*(dynamic_cast<DocumentDrawingArea*>(it->second)
+		  ->getDrawingArea()));
+	    mNotebook->remove_page(page);
+	    mDocuments.erase(it->first);
+
+	    mNotebook->set_current_page(--page);
+	}
+	++it;
     }
 }
 
 void GVLE::closeAllTab()
 {
+    int page;
     Documents::iterator it = mDocuments.begin();
     while (it != mDocuments.end()) {
-	int page = mNotebook->page_num(*it->second);
+	if (boost::filesystem::extension(it->first) == ".vpz")
+	    page = mNotebook->page_num(
+		*(dynamic_cast<DocumentDrawingArea*>(it->second)
+		  ->getDrawingArea()));
+	else
+	    page = mNotebook->page_num(*it->second);
 	mNotebook->remove_page(page);
 	mDocuments.erase(it->first);
 
@@ -855,7 +905,7 @@ void GVLE::changeTab(GtkNotebookPage* /*page*/, int num)
     Gtk::Widget* tab = mNotebook->get_nth_page(num);
     Documents::iterator it = mDocuments.begin();
     while (it != mDocuments.end()) {
-	if (it->second->isDrawingArea()) {
+	if (boost::filesystem::extension(it->first) == ".vpz") {
 	    DocumentDrawingArea* area =
 		    dynamic_cast< DocumentDrawingArea *>(it->second);
 	    if (tab == dynamic_cast< DocumentDrawingArea *>(it->second)->getDrawingArea())
