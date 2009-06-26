@@ -60,12 +60,10 @@ namespace vle
 {
 namespace gvle {
 
-class GVLEMenu;
+class GVLEMenuAndToolbar;
 class Modeling;
-class PluginTable;
 class PreferencesBox;
 class PackageBrowserWindow;
-//class View;
 
 /**
  * @brief Document class used within Gtk::Notebook
@@ -215,8 +213,6 @@ public:
     inline ModelClassBox* getModelClassBox()
 	{ return mModelClassBox; }
 
-    Gtk::RadioToolButton* getButtonRef(ButtonType button);
-
     /* methodes to manage tabs */
     void focusTab(const std::string& filepath);
     void openTab(const std::string& filepath);
@@ -296,108 +292,7 @@ public:
 	std::list<std::string>           mIgnoredFilesList;
     };
 
-    /*********************************************************************
-     *
-     * PLUGIN
-     *
-     *********************************************************************/
-
-    /**
-     * recursive show plugin path and all file.
-     *
-     * @param path load plugin file from this directory
-     */
-    //void loadPlugins(const std::string& path);
-
-    /**
-     * recursive show observer plugin path and all file.
-     *
-     * @param path load observer plugin file from this directory
-     */
-    //void loadObserverPlugins(const std::string& path);
-
-    /**
-     * Open plugin, add icons and button into button group.
-     *
-     * @param name filename of plugin file to load
-     */
-    //Plugin* loadPlugin(const std::string& name);
-
-    /**
-     * Open observer plugin.
-     *
-     * @param name filename of observer plugin file to load
-     */
-    //ObserverPlugin* loadObserverPlugin(const std::string& name);
-
-    /**
-     * return a plugin from plugin list.
-     *
-     * @param name formalism name of plugin to find
-     * @return a ptr to plugin, otherwise 0
-     */
-    //Plugin* getPlugin(const std::string& name);
-
-    /**
-     * return a observer plugin from observer plugin list.
-     *
-     * @param name observer name of plugin to find
-     * @return a ptr to plugin, otherwise 0
-     */
-    //ObserverPlugin* getObserverPlugin(const std::string& name);
-
-    //const MapObserverPlugin & getObserverPluginList() const
-    //  { return m_observerPlugins; }
-
-    /**
-     * Delete all plugins and togglebutton loaded.
-     *
-     */
-    //void delPlugins();
-
-    /**
-     * When select a plugin button, we change current selection.
-     *
-     * @param name formalism name (or plugin name) of selected plugin.
-     */
-    //void onPluginButton(const std::string& name);
-
-    /**
-     * Get current plugin name selected in GVLE plugin table.
-     *
-     * @return current plugin name.
-     */
-    //inline const std::string& getCurrentPluginName() const
-    //{ return m_pluginSelected; }
-
-
-private:
-    /*********************************************************************
-     *
-     * MAKING GRAPHICS INTERFACE
-     *
-     *********************************************************************/
-
-    /**
-     * Buttons creating and connect events.
-     *
-     */
-    void makeButtons();
-
-    /**
-     * Assign to this comboboxstring, all category read from plugins ;
-     * Before call this function, comboboxstring default choice is 'All' ;
-     * This function connect comboCategory to his function changed.
-     */
-    void makeComboCategory();
-
-    /**
-     * When user select a new category from ComboBoxString comboCategory.
-     *
-     */
-    void on_combocategory_changed();
-
-
+public:
     /*********************************************************************
      *
      * WHEN SELECT A MENU FROM GVLEMenu
@@ -454,8 +349,6 @@ private:
      *
      *********************************************************************/
 
-
-public:
 
     /**
      * When click on new file menu
@@ -624,12 +517,6 @@ public:
     void onShowModelClassView();
 
     /**
-     * When click on Show PackageBrowser
-     *
-     */
-    void onShowPackageBrowserWindow();
-
-    /**
      * @brief Delete all gvle::View from the gvle::Modeling object.
      */
     void onCloseAllViews();
@@ -654,21 +541,6 @@ public:
      * PACKAGE BROWSER
      *
      ********************************************************************/
-
-    /**
-     * Show the Package Browser Window
-     */
-    void showPackageBrowserWindow();
-
-    /**
-     * Hide the Package Browser Window
-     */
-    void hidePackageBrowserWindow();
-
-    /**
-     * toggle show/hide Package Browser Window
-     */
-    void togglePackageBrowserWindow();
 
     /**
      * Build the hierarchy in the Package Browser
@@ -776,39 +648,25 @@ public:
     void setModifiedTitle();
 
 private:
-    Gtk::VBox                       m_vbox;
-    GVLEMenu*                       m_menu;
-    Gtk::HSeparator                 m_separator;
-    Gtk::Table                      m_buttons;
-    //widgets::ComboBoxString         m_comboCategory;
-    //Gtk::ScrolledWindow             m_scrolledPlugins;
-    //PluginTable*                    m_pluginTable;
-    //Gtk::Label                      m_labelName;
-    Gtk::RadioButton::Group         m_buttonGroup;
-    Gtk::RadioToolButton                m_arrow;
-    Gtk::RadioToolButton                m_addModels;
-    Gtk::RadioToolButton                m_addLinks;
-    Gtk::RadioToolButton                m_addCoupled;
-    Gtk::RadioToolButton                m_delete;
-    Gtk::RadioToolButton                m_zoom;
-    Gtk::RadioToolButton                m_question;
-    Gtk::Tooltips                   m_tooltips;
-    Gtk::Statusbar                  m_status;
-    Modeling*                       m_modeling;
-
-    MapCategory                     m_category;
-    MapObserverCategory             m_observerCategory;
-    MapPlugin                       m_plugins;
-    MapObserverPlugin               m_observerPlugins;
-
-    ButtonType                      m_currentButton;
-    HelpBox*                        m_helpbox;
-
-    //std::string                     m_pluginSelected;
-
     Glib::RefPtr < Gnome::Glade::Xml >  mRefXML;
 
-    //Menu
+    /* Widgets */
+    Gtk::VBox*                      mMenuAndToolbarVbox;
+    GVLEMenuAndToolbar*             mMenuAndToolbar;
+    Gtk::Statusbar                  m_status;
+    Gtk::TextView*                  mLog;
+    Gtk::Statusbar*                 mStatusbar;
+    Gtk::Notebook*                  mNotebook;
+    FileTreeView*                   mFileTreeView;
+
+    /* class members */
+    Modeling*                       m_modeling;
+    ButtonType                      m_currentButton;
+    Documents                       mDocuments;
+    std::string                     mPackage;
+    View*                           mCurrentView;
+
+    /* Dialog boxes */
     ConditionsBox*                  mConditionsBox;
     LaunchSimulationBox*            mSimulationBox;
     PreferencesBox*                 mPreferencesBox;
@@ -817,19 +675,10 @@ private:
     PackageBrowserWindow*           mPackageBrowserWindow;
     NewProjectBox*                  mNewProjectBox;
     SaveVpzBox*                     mSaveVpzBox;
-
-    Gtk::TextView*                  mLog;
-    Gtk::Statusbar*                 mStatusbar;
-    Gtk::Notebook*                  mNotebook;
-    Gtk::Toolbar*                   mToolBar;
-    FileTreeView*                   mFileTreeView;
-    Documents                       mDocuments;
+    HelpBox*                        m_helpbox;
     ModelTreeBox*                   mModelTreeBox;
     ModelClassBox*                  mModelClassBox;
-    std::string                     mPackage;
-    View*                           mCurrentView;
     int                             mCurrentTab;
-
 };
 
 std::string valuetype_to_string(value::Value::type type);

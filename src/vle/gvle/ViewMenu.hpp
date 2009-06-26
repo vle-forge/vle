@@ -69,64 +69,14 @@ private:
     void makeMenuEdit(View* v);
 
     /**
-     * Make menu tools and connect signals
-     *
-     * @param v a ptr to View to connect signals
-     */
-    void makeMenuTools();
-
-    /**
      * Make menu zoom and connect signals
      *
      */
     void makeMenuZoom(View* v);
 
-    /**
-     * When select arrow menu item.
-     *
-     */
-    void onArrow();
-
-    /**
-     * When select atomic models menu item.
-     *
-     */
-    void onAddModels();
-
-    /**
-     * When select connection menu item.
-     *
-     */
-    void onAddLinks();
-
-    /**
-     * When select coupled menu item.
-     *
-     */
-    void onAddCoupled();
-
-    /**
-     * When select delete menu item.
-     *
-     */
-    void onDelete();
-
-    /**
-     * When select zoom menu item.
-     *
-     */
-    void onZoom();
-
-    /**
-     * When select question menu item.
-     *
-     */
-    void onQuestion();
-
 
     Gtk::Menu   mMenuFile;
     Gtk::Menu   mMenuEdit;
-    Gtk::Menu   mMenuTools;
     Gtk::Menu   mMenuZoom;
     View*       m_view;
 

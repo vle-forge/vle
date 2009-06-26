@@ -26,6 +26,7 @@
 #include <vle/gvle/ViewMenu.hpp>
 #include <vle/gvle/View.hpp>
 #include <vle/utils/Debug.hpp>
+#include <vle/gvle/Message.hpp>
 #include <gtkmm/stock.h>
 
 namespace vle
@@ -39,12 +40,10 @@ ViewMenu::ViewMenu(View* v) :
 
     makeMenuFile(v);
     makeMenuEdit(v);
-    makeMenuTools();
     makeMenuZoom(v);
 
     items().push_back(Gtk::Menu_Helpers::MenuElem(_("_File"), mMenuFile));
     items().push_back(Gtk::Menu_Helpers::MenuElem(_("Edit"), mMenuEdit));
-    items().push_back(Gtk::Menu_Helpers::MenuElem(_("_Tools"), mMenuTools));
     items().push_back(Gtk::Menu_Helpers::MenuElem(_("Zoom"), mMenuZoom));
 }
 
@@ -103,46 +102,6 @@ void ViewMenu::makeMenuEdit(View* v)
                            sigc::mem_fun(v, &View::onPasteModel)));
 }
 
-void ViewMenu::makeMenuTools()
-{
-    Gtk::Menu::MenuList& menuList = mMenuTools.items();
-
-    menuList.push_back(Gtk::Menu_Helpers::MenuElem(
-			   _("_Selection"),
-			   Gtk::AccelKey("F1"),
-			   sigc::mem_fun(this, &ViewMenu::onArrow)));
-
-    menuList.push_back(Gtk::Menu_Helpers::MenuElem(
-			   _("_AtomicModel"),
-			   Gtk::AccelKey("F2"),
-			   sigc::mem_fun(this, &ViewMenu::onAddModels)));
-
-    menuList.push_back(Gtk::Menu_Helpers::MenuElem(
-			   _("Add _links"),
-			   Gtk::AccelKey("F3"),
-			   sigc::mem_fun(this, &ViewMenu::onAddLinks)));
-
-    menuList.push_back(Gtk::Menu_Helpers::MenuElem(
-			   _("_CoupledModel"),
-			   Gtk::AccelKey("F4"),
-			   sigc::mem_fun(this, &ViewMenu::onAddCoupled)));
-
-    menuList.push_back(Gtk::Menu_Helpers::MenuElem(
-			   _("_Delete"),
-			   Gtk::AccelKey("F5"),
-			   sigc::mem_fun(this, &ViewMenu::onDelete)));
-
-    menuList.push_back(Gtk::Menu_Helpers::MenuElem(
-			   _("_Zoom"),
-			   Gtk::AccelKey("F6"),
-			   sigc::mem_fun(this, &ViewMenu::onZoom)));
-
-    menuList.push_back(Gtk::Menu_Helpers::MenuElem(
-			   _("_Question"),
-			   Gtk::AccelKey("F7"),
-			   sigc::mem_fun(this, &ViewMenu::onQuestion)));
-}
-
 void ViewMenu::makeMenuZoom(View* v)
 {
     Gtk::Menu::MenuList& menuList = mMenuZoom.items();
@@ -176,48 +135,6 @@ void ViewMenu::makeMenuZoom(View* v)
 			   Gtk::AccelKey(GDK_2, Gdk::CONTROL_MASK),
 			   sigc::bind(sigc::mem_fun(
 					  v, &View::setCoefZoom), 2)));
-}
-
-void ViewMenu::onArrow()
-{
-    GVLE* gvle = m_view->getModeling()->getGVLE();
-    gvle->getButtonRef(GVLE::POINTER)->set_active(true);
-}
-
-void ViewMenu::onAddModels()
-{
-    GVLE* gvle = m_view->getModeling()->getGVLE();
-    gvle->getButtonRef(GVLE::ADDMODEL)->set_active(true);
-}
-
-void ViewMenu::onAddLinks()
-{
-    GVLE* gvle = m_view->getModeling()->getGVLE();
-    gvle->getButtonRef(GVLE::ADDLINK)->set_active(true);
-}
-
-void ViewMenu::onDelete()
-{
-    GVLE* gvle = m_view->getModeling()->getGVLE();
-    gvle->getButtonRef(GVLE::DELETE)->set_active(true);
-}
-
-void ViewMenu::onAddCoupled()
-{
-    GVLE* gvle = m_view->getModeling()->getGVLE();
-    gvle->getButtonRef(GVLE::ADDCOUPLED)->set_active(true);
-}
-
-void ViewMenu::onZoom()
-{
-    GVLE* gvle = m_view->getModeling()->getGVLE();
-    gvle->getButtonRef(GVLE::ZOOM)->set_active(true);
-}
-
-void ViewMenu::onQuestion()
-{
-    GVLE* gvle = m_view->getModeling()->getGVLE();
-    gvle->getButtonRef(GVLE::QUESTION)->set_active(true);
 }
 
 }
