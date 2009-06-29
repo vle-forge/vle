@@ -520,7 +520,7 @@ void Modeling::setTitles()
 
 void Modeling::setModifiedTitles()
 {
-    mGVLE->setModifiedTitle();
+    mGVLE->setModifiedTitle(mFileName);
 
     for (ListView::iterator it = mListView.begin(); it != mListView.end(); ++it)
     {

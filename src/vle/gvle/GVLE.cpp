@@ -47,26 +47,51 @@
 #include <boost/filesystem.hpp>
 #include <gtkmm/filechooserdialog.h>
 #include <glibmm/miscutils.h>
+#include <gtkmm/stock.h>
 
 namespace vle { namespace gvle {
 
-Document::Document(const std::string& filepath) :
+Document::Document(GVLE* gvle, const std::string& filepath) :
     Gtk::ScrolledWindow(),
-    mFilePath(filepath)
+    mGVLE(gvle)
 {
+    mModified = false;
+    mFilePath = filepath;
     mFileName = boost::filesystem::basename(filepath);
 }
 
 Document::~Document()
 {
+    delete mGVLE;
 }
 
-DocumentText::DocumentText(const std::string& filepath, bool newfile) :
-    Document(filepath),
-    mModified(false),
+void Document::setTitle(std::string title, graph::Model* model,
+			bool modified)
+{
+    if (boost::filesystem::extension(title) == ".vpz") {
+	mTitle = boost::filesystem::basename(title) +
+	    boost::filesystem::extension(title) + " - " +
+	    model->getName();
+	if (modified) {
+	    mTitle = "* " + mTitle;
+	    mModified = true;
+	} else {
+	    mModified = false;
+	}
+	mGVLE->setModifiedTab(mTitle, mFilePath);
+    }
+}
+
+DocumentText::DocumentText(GVLE* gvle,
+			   const std::string& filepath, bool newfile) :
+    Document(gvle, filepath),
     mNew(newfile)
 {
+    mTitle = filename() + boost::filesystem::extension(filepath);
+
     init();
+    signal_event().connect(
+      sigc::mem_fun(this, &DocumentText::event));
 }
 
 DocumentText::~DocumentText()
@@ -80,6 +105,8 @@ void DocumentText::save()
 	file << mView.get_buffer()->get_text();
 	file.close();
 	mNew = mModified = false;
+	mTitle = filename() + boost::filesystem::extension(filepath());
+	mGVLE->setModifiedTab(mTitle, filepath());
     } catch(std::exception& e) {
 	throw _("Error while saving file.");
     }
@@ -109,13 +136,29 @@ void DocumentText::init()
     }
 }
 
-DocumentDrawingArea::DocumentDrawingArea(const std::string& filepath,
-					 View* view,
-					 graph::Model* model) :
-    Document(filepath),
+bool DocumentText::event(GdkEvent* event)
+{
+    if (event->type == GDK_KEY_RELEASE
+	and event->key.state != GDK_CONTROL_MASK
+	and mModified == false) {
+	mModified = true;
+	mTitle = "* "+ mTitle;
+	mGVLE->setModifiedTab(mTitle, filepath());
+	return true;
+
+    }
+    return false;
+}
+
+DocumentDrawingArea::DocumentDrawingArea(GVLE* gvle,
+					 const std::string& filepath,
+					 View* view, graph::Model* model) :
+    Document(gvle, filepath),
     mView(view),
     mModel(model)
 {
+    mTitle = filename() + boost::filesystem::extension(filepath)
+	+ " - " + model->getName();
     mArea = new ViewDrawingArea(mView);
 }
 
@@ -224,7 +267,8 @@ void GVLE::FileTreeView::on_row_activated(
     std::string absolute_path =
 	Glib::build_filename(mPackage, Glib::build_filename(*lstpath));
     if (not isDirectory(absolute_path)) {
-	if (boost::filesystem::extension(absolute_path) == ".vpz")
+	if (boost::filesystem::extension(absolute_path) == ".vpz"
+	    and not mParent->existTab(absolute_path))
 	    mParent->closeVpzTab();
 	mParent->openTab(absolute_path);
     }
@@ -396,10 +440,11 @@ void GVLE::onQuestion()
 void GVLE::newFile()
 {
     try {
-	DocumentText* doc = new DocumentText(_("untitled file"), true);
+	DocumentText* doc = new DocumentText(this, _("untitled file"), true);
 	mDocuments.insert(
 	    std::make_pair < std::string, DocumentText* >(_("untitled file"), doc));
-	mNotebook->append_page(*doc, doc->filename());
+	mNotebook->append_page(*doc, *(addLabel(doc->filename(),
+						_("untitled file"))));
     } catch (std::exception& e) {
 	std::cout << e.what() << std::endl;
     }
@@ -526,6 +571,10 @@ void GVLE::onMenuSave()
 
     if (m_modeling->isSaved()) {
 	m_modeling->saveXML(m_modeling->getFileName());
+	Documents::iterator it = mDocuments.find(m_modeling->getFileName());
+	if (it != mDocuments.end())
+	    it->second->setTitle(m_modeling->getFileName(),
+		      m_modeling->getTopModel(), false);
     } else if (utils::Path::path().package() != "") {
 	mSaveVpzBox->show();
     } else {
@@ -542,6 +591,10 @@ void GVLE::onMenuSave()
 	    std::string filename(file.get_filename());
 	    vpz::Vpz::fixExtension(filename);
 	    m_modeling->saveXML(filename);
+	    Documents::iterator it = mDocuments.find(filename);
+	    if (it != mDocuments.end())
+	    it->second->setTitle(filename,
+		      m_modeling->getTopModel(), false);
 	}
     }
 }
@@ -708,12 +761,21 @@ void GVLE::setTitle(const Glib::ustring& name)
     set_title(title);
 }
 
-void GVLE::setModifiedTitle()
+void GVLE::setModifiedTitle(const std::string& name)
 {
     Glib::ustring current("* ");
     current += get_title();
 
     set_title(current);
+
+    if (not name.empty() and
+	boost::filesystem::extension(name) == ".vpz") {
+	Documents::iterator it = mDocuments.find(name);
+	if (it != mDocuments.end())
+	    it->second->setTitle(name,
+				 m_modeling->getTopModel(),
+				 true);
+    }
 }
 
 std::string valuetype_to_string(value::Value::type type)
@@ -769,16 +831,38 @@ void GVLE::focusTab(const std::string& filepath)
     mNotebook->set_current_page(page);
 }
 
+Gtk::HBox* GVLE::addLabel(const std::string& title,
+			const std::string& filepath)
+{
+    Gtk::HBox* tabLabel = new Gtk::HBox(false, 0);
+    Gtk::Label* label = new Gtk::Label(title);
+    tabLabel->pack_start(*label, true, true, 0);
+    Gtk::Button* closeButton = new Gtk::Button();
+    Gtk::Image* imgButton = new Gtk::Image(Gtk::Stock::CLOSE,
+					   Gtk::IconSize(Gtk::ICON_SIZE_MENU));
+    closeButton->set_image(*imgButton);
+    closeButton->set_focus_on_click(false);
+    closeButton->set_relief(Gtk::RELIEF_NONE);
+    closeButton->set_tooltip_text(_("Close Tab"));
+    closeButton->signal_clicked().connect(
+	sigc::bind(sigc::mem_fun(*this, &GVLE::closeTab), filepath));
+
+    tabLabel->pack_start(*closeButton, false, false, 0);
+    tabLabel->show_all();
+    return tabLabel;
+}
+
 void GVLE::openTab(const std::string& filepath)
 {
     if(boost::filesystem::extension(filepath) != ".vpz") {
 	try {
 	    if (mDocuments.find(filepath) == mDocuments.end()) {
-		DocumentText* doc = new DocumentText(filepath);
+		DocumentText* doc = new DocumentText(this, filepath);
 		mDocuments.insert(
 		    std::make_pair < std::string, DocumentText* >(filepath, doc));
 		int page = mNotebook->append_page(*doc,
-			doc->filename() + boost::filesystem::extension(filepath));
+						  *(addLabel(doc->getTitle(),
+							     filepath)));
 		show_all_children();
 		mNotebook->set_current_page(page);
 	    } else {
@@ -797,32 +881,35 @@ void GVLE::openTab(const std::string& filepath)
 void GVLE::openTabVpz(const std::string& filepath, graph::CoupledModel* model)
 {
     Documents::iterator it = mDocuments.find(filepath);
+    int page;
     if (it != mDocuments.end()) {
 	if (dynamic_cast<DocumentDrawingArea*>(it->second)->getModel()
 	    != model) {
 	    focusTab(filepath);
-	    int page = mNotebook->get_current_page();
-	    closeTab(filepath);
+	    page = mNotebook->get_current_page();
+	    mNotebook->remove_page(page);
+	    mDocuments.erase(filepath);
+	    mNotebook->set_current_page(--page);
 
 	    DocumentDrawingArea* doc = new DocumentDrawingArea(
+		this,
 		filepath,
 		m_modeling->findView(model),
 		model);
+	    doc->setTitle(filepath, model, true);
 	    mCurrentView = doc->getView();
 	    ViewDrawingArea* area = doc->getDrawingArea();
 	    mDocuments.insert(
 		std::make_pair < std::string, DocumentDrawingArea* >(
 		    filepath, doc));
-	    mNotebook->append_page(*area, doc->filename() +
-				   boost::filesystem::extension(filepath)
-				   + " - " + model->getName());
+	    mNotebook->append_page(*area, *(addLabel(doc->getTitle(),
+						     filepath)));
 
 	    mNotebook->reorder_child(*area, page);
-	    show_all_children();
-	    mNotebook->set_current_page(page);
 	}
     } else {
 	DocumentDrawingArea* doc = new DocumentDrawingArea(
+	    this,
 	    filepath,
 	    m_modeling->findView(model),
 	    model);
@@ -830,13 +917,11 @@ void GVLE::openTabVpz(const std::string& filepath, graph::CoupledModel* model)
 	ViewDrawingArea* area = doc->getDrawingArea();
 	mDocuments.insert(
 	  std::make_pair < std::string, DocumentDrawingArea* >(filepath, doc));
-	int page = mNotebook->append_page(*area,
-					  doc->filename() +
-					  boost::filesystem::extension(filepath)
-					  + " - " + model->getName());
-	show_all_children();
-	mNotebook->set_current_page(page);
+	page = mNotebook->append_page(*area, *(addLabel(doc->getTitle(),
+							    filepath)));
     }
+    show_all_children();
+    mNotebook->set_current_page(page);
     mMenuAndToolbar->onViewMode();
 }
 
@@ -845,20 +930,24 @@ void GVLE::closeTab(const std::string& filepath)
 {
     Documents::iterator it = mDocuments.find(filepath);
     if (it != mDocuments.end()) {
-	int page;
-	if (boost::filesystem::extension(filepath) == ".vpz")
-	    page = mNotebook->page_num(
-		*(dynamic_cast<DocumentDrawingArea*>(it->second)
-		  ->getDrawingArea()));
-	else
-	    page = mNotebook->page_num(*it->second);
-	if (page != -1) {
-	    mNotebook->remove_page(page);
-	    mDocuments.erase(filepath);
+	if (not it->second->isModified() or
+            gvle::Question(_("The current tab is not saved\n"
+			     "Do you really want to close this file ?"))) {
+	    int page;
+	    if (boost::filesystem::extension(filepath) == ".vpz")
+		page = mNotebook->page_num(
+		    *(dynamic_cast<DocumentDrawingArea*>(it->second)
+		      ->getDrawingArea()));
+	    else
+		page = mNotebook->page_num(*it->second);
+	    if (page != -1) {
+		mNotebook->remove_page(page);
+		mDocuments.erase(filepath);
 
-	    mNotebook->set_current_page(--page);
-	    redrawModelTreeBox();
-	    redrawModelClassBox();
+		mNotebook->set_current_page(--page);
+		redrawModelTreeBox();
+		redrawModelClassBox();
+	    }
 	}
     }
 }
@@ -925,6 +1014,16 @@ void GVLE::changeTab(GtkNotebookPage* /*page*/, int num)
 	    }
 	}
 	++it;
+    }
+}
+
+void GVLE::setModifiedTab(const std::string title, const std::string filepath)
+{
+    if (mDocuments.find(filepath) != mDocuments.end()) {
+	int page = mNotebook->get_current_page();
+	Gtk::Widget* tab = mNotebook->get_nth_page(page);
+
+	mNotebook->set_tab_label(*tab, *(addLabel(title, filepath)));
     }
 }
 

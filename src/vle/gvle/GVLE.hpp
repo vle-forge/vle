@@ -60,6 +60,7 @@ namespace vle
 {
 namespace gvle {
 
+class GVLE;
 class GVLEMenuAndToolbar;
 class Modeling;
 class PreferencesBox;
@@ -71,7 +72,7 @@ class PackageBrowserWindow;
 class Document : public Gtk::ScrolledWindow {
 public:
 
-    Document(const std::string& filepath);
+    Document(GVLE* gvle, const std::string& filepath);
 
     ~Document();
 
@@ -87,6 +88,22 @@ public:
     inline void setFilePath(std::string filepath)
 	{ mFilePath = filepath; }
 
+    inline bool isModified()
+	{ return mModified; }
+
+    inline void setModified(bool modified)
+	{ mModified = modified; }
+
+    inline std::string getTitle()
+	{ return mTitle; }
+
+    void setTitle(std::string title, graph::Model* model,
+		  bool modified);
+
+protected:
+    GVLE*          mGVLE;
+    bool           mModified;
+    std::string    mTitle;
 
 private:
     std::string    mFilePath;
@@ -95,7 +112,7 @@ private:
 
 class DocumentText : public Document {
 public:
-    DocumentText(const std::string& filePath, bool newfile = false);
+    DocumentText(GVLE* gvle, const std::string& filePath, bool newfile = false);
     ~DocumentText();
 
     void save();
@@ -106,17 +123,16 @@ public:
 
 private:
     Gtk::TextView  mView;
-    bool           mModified;
     bool           mNew;
 
     void init();
+    bool event(GdkEvent* event);
 };
 
 class DocumentDrawingArea : public Document {
 public:
-    DocumentDrawingArea(const std::string& filePath,
-			View* view,
-			graph::Model* model);
+    DocumentDrawingArea(GVLE* gvle, const std::string& filePath,
+			View* view, graph::Model* model);
     ~DocumentDrawingArea();
 
      inline View* getView() const
@@ -231,6 +247,33 @@ public:
     void closeVpzTab();
     void closeAllTab();
     void changeTab(GtkNotebookPage* page, int num);
+
+    /**
+     * @brief check if the tab is already openend
+     */
+    inline bool existTab(const std::string& name)
+	{ return mDocuments.find(name) != mDocuments.end(); }
+
+    /**
+     * @brief Modify the title of the tab
+     *
+     * @param title the new title
+     * @param filepath the key in the document map
+     *
+     */
+    void setModifiedTab(const std::string title, const std::string filepath);
+
+    /**
+     * @brief add a label for a new tab
+     *
+     * @param title the title of the label
+     * @param filepath the tab's key on the map mDocuments
+     *
+     * @return a pointeur of the new label
+     */
+    Gtk::HBox* addLabel(const std::string& title,
+			const std::string& filepath);
+
 
     /**
      * @brief Tree model columns used in FileTreeView
@@ -656,7 +699,7 @@ public:
     /**
      * @brief Append an asterisk to the Gtk::Window's title with an asterick.
      */
-    void setModifiedTitle();
+    void setModifiedTitle(const std::string& name);
 
 private:
     Glib::RefPtr < Gnome::Glade::Xml >  mRefXML;
