@@ -49,7 +49,7 @@ class ViewDrawingArea;
  * gui::View manage event from gui::Modeling class and use the
  * gui::ViewDrawingArea to draw on screen small box and line.
  */
-class View : public Gtk::Window
+class View
 {
 public:
     View(Modeling* m, graph::CoupledModel* c, size_t index);
@@ -219,9 +219,6 @@ public:
     /** export the current model into XML file. */
     void exportCurrentModel();
 
-    /** export the current model into an image */
-    void exportGraphic();
-
     /** import a model into current GCoupledModel. */
     void importModel();
 
@@ -317,41 +314,12 @@ public:
      */
     void selectedWindow();
 
-    /**
-     * To update the adjustment.
-     */
-    void updateAdjustment(double h, double v);
-
-    /**
-     * To zoom more
-     *
-     */
-    void addCoefZoom();
-
-    /**
-     * To zoom less
-     *
-     */
-    void delCoefZoom();
-
-    /**
-     * To set a coefficient to the zoom
-     *
-     * @param coef the coefficient
-     */
-    void setCoefZoom(double coef);
-
 private:
     Modeling*                   mModeling;
     graph::CoupledModel*        mCurrent;
     std::string                 mCurrentClass;
     size_t                      mIndex;
 
-    Gtk::VBox                   mVbox;
-    Gtk::Adjustment             mAdjustWidth;
-    Gtk::Adjustment             mAdjustHeigth;
-    Gtk::Viewport               mViewport;
-    Gtk::ScrolledWindow         mScrolledWindow;
     ViewDrawingArea*            mDrawing;
     ViewMenu*                   mMenuBar;
 

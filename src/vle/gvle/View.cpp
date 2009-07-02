@@ -50,11 +50,6 @@ View::View(Modeling* m, graph::CoupledModel* c, size_t index) :
         mModeling(m),
         mCurrent(c),
         mIndex(index),
-        mVbox(false, 0),
-        mAdjustWidth(0,0,1),
-        mAdjustHeigth(0,0,1),
-        mViewport(mAdjustWidth, mAdjustHeigth),
-        mScrolledWindow(),
         mDestinationModel(NULL)
 {
     assert(m);
@@ -62,24 +57,6 @@ View::View(Modeling* m, graph::CoupledModel* c, size_t index) :
 
     mMenuBar = new ViewMenu(this);
     mDrawing = new ViewDrawingArea(this);
-    mViewport.add(*mDrawing);
-    mViewport.set_shadow_type(Gtk::SHADOW_NONE);
-    mViewport.set_border_width(0);
-
-    mScrolledWindow.set_policy(Gtk::POLICY_ALWAYS, Gtk::POLICY_ALWAYS);
-    mScrolledWindow.set_flags(Gtk::CAN_FOCUS);
-    mScrolledWindow.add(mViewport);
-    mScrolledWindow.set_shadow_type(Gtk::SHADOW_NONE);
-    mScrolledWindow.set_border_width(0);
-
-    mVbox.pack_start(*mMenuBar, Gtk::PACK_SHRINK);
-    mVbox.pack_start(mScrolledWindow, Gtk::PACK_EXPAND_WIDGET);
-
-    add(mVbox);
-    mDrawing->set_size_request(mCurrent->width(), mCurrent->height());
-    resize(450, 350);
-
-    //show_all();
 }
 
 View::~View()
@@ -93,25 +70,6 @@ void View::redraw()
     mDrawing->draw();
 }
 
-void View::setTitle(const Glib::ustring& name)
-{
-    if (mCurrent) {
-        Glib::ustring title(name);
-        title += " - ";
-        title += mCurrent->getName();
-
-        set_title(title);
-    }
-}
-
-void View::setModifiedTitle()
-{
-    Glib::ustring current("* ");
-    current += get_title();
-
-    set_title(current);
-}
-
 void View::initAllOptions()
 {
     clearSelectedModels();
@@ -121,7 +79,7 @@ void View::initAllOptions()
 
     switch (current) {
     case GVLE::POINTER:
-        get_window()->set_cursor(Gdk::Cursor(Gdk::ARROW));
+        //get_window()->set_cursor(Gdk::Cursor(Gdk::ARROW));
         break;
     case GVLE::ADDMODEL:
     case GVLE::GRID:
@@ -130,10 +88,10 @@ void View::initAllOptions()
     case GVLE::ZOOM:
     case GVLE::QUESTION:
     case GVLE::PLUGINMODEL:
-        get_window()->set_cursor(Gdk::Cursor(Gdk::CROSSHAIR));
+        //get_window()->set_cursor(Gdk::Cursor(Gdk::CROSSHAIR));
         break;
     case GVLE::DELETE:
-        get_window()->set_cursor(Gdk::Cursor(Gdk::PIRATE));
+        //get_window()->set_cursor(Gdk::Cursor(Gdk::PIRATE));
         break;
     }
 }
@@ -206,7 +164,6 @@ void View::exportCurrentModel()
     }
 
     Gtk::FileChooserDialog file("VPZ file", Gtk::FILE_CHOOSER_ACTION_SAVE);
-    file.set_transient_for(*this);
     file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
     Gtk::FileFilter filter;
@@ -229,68 +186,9 @@ void View::exportCurrentModel()
     }
 }
 
-void View::exportGraphic()
-{
-    vpz::Experiment& experiment = mModeling->vpz().project().experiment();
-    if (experiment.name().empty() || experiment.duration() == 0) {
-        Error(_("Fix a Value to the name and the duration of the experiment before exportation."));
-        return;
-    }
-
-    Gtk::FileChooserDialog file(_("Image file"), Gtk::FILE_CHOOSER_ACTION_SAVE);
-    file.set_transient_for(*this);
-    file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-    file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
-    Gtk::FileFilter filterAuto;
-    Gtk::FileFilter filterPng;
-    Gtk::FileFilter filterPdf;
-    Gtk::FileFilter filterSvg;
-    filterAuto.set_name(_("Guess type from file name"));
-    filterAuto.add_pattern("*");
-    filterPng.set_name(_("Portable Newtork Graphics (.png)"));
-    filterPng.add_pattern("*.png");
-    filterPdf.set_name(_("Portable Format Document (.pdf)"));
-    filterPdf.add_pattern("*.pdf");
-    filterSvg.set_name(_("Scalable Vector Graphics (.svg)"));
-    filterSvg.add_pattern("*.svg");
-    file.add_filter(filterAuto);
-    file.add_filter(filterPng);
-    file.add_filter(filterPdf);
-    file.add_filter(filterSvg);
-
-
-    if (file.run() == Gtk::RESPONSE_OK) {
-        std::string filename(file.get_filename());
-	std::string extension(file.get_filter()->get_name());
-
-	if (extension == _("Guess type from file name")) {
-	    size_t ext_pos = filename.find_last_of('.');
-	    if (ext_pos != std::string::npos) {
-	        std::string type(filename, ext_pos+1);
-	        filename.resize(ext_pos);
-	        if (type == "png")
-		        mDrawing->exportPng(filename);
-	        else if (type == "pdf")
-		        mDrawing->exportPdf(filename);
-	        else if (type == "svg")
-		        mDrawing->exportSvg(filename);
-		    else
-		        Error(_("Unsupported file format"));
-		}
-	}
-	else if (extension == _("Portable Newtork Graphics (.png)"))
-	    mDrawing->exportPng(filename);
-	else if (extension == _("Portable Format Document (.pdf)"))
-	    mDrawing->exportPdf(filename);
-	else if (extension == _("Scalable Vector Graphics (.svg)"))
-	    mDrawing->exportSvg(filename);
-    }
-}
-
 void View::importModel()
 {
     Gtk::FileChooserDialog file(_("VPZ file"), Gtk::FILE_CHOOSER_ACTION_OPEN);
-    file.set_transient_for(*this);
     file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
     Gtk::FileFilter filter;
@@ -540,30 +438,6 @@ void View::selectedWindow()
 {
     //present();
     //mDrawing->show();
-}
-
-void  View::updateAdjustment(double h, double v)
-{
-    mViewport.get_hadjustment()->set_lower(h);
-    mViewport.get_hadjustment()->set_value(h);
-
-    mViewport.get_vadjustment()->set_lower(v);
-    mViewport.get_vadjustment()->set_value(v);
-}
-
-void View::addCoefZoom()
-{
-    mDrawing->addCoefZoom();
-}
-
-void View::delCoefZoom()
-{
-    mDrawing->delCoefZoom();
-}
-
-void View::setCoefZoom(double coef)
-{
-    mDrawing->setCoefZoom(coef);
 }
 
 

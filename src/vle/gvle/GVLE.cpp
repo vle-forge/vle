@@ -155,17 +155,43 @@ DocumentDrawingArea::DocumentDrawingArea(GVLE* gvle,
 					 View* view, graph::Model* model) :
     Document(gvle, filepath),
     mView(view),
-    mModel(model)
+    mModel(model),
+    mAdjustWidth(0,0,1),
+    mAdjustHeight(0,0,1)
 {
     mTitle = filename() + boost::filesystem::extension(filepath)
 	+ " - " + model->getName();
     mArea = new ViewDrawingArea(mView);
+    mViewport = new Gtk::Viewport(mAdjustWidth, mAdjustHeight);
+    mTitle = filename() + boost::filesystem::extension(filepath)
+	+ " - " + model->getName();
+
+    mViewport->add(*mArea);
+    mViewport->set_shadow_type(Gtk::SHADOW_NONE);
+    mViewport->set_border_width(0);
+    set_policy(Gtk::POLICY_ALWAYS, Gtk::POLICY_ALWAYS);
+    set_flags(Gtk::CAN_FOCUS);
+    add(*mViewport);
+    set_shadow_type(Gtk::SHADOW_NONE);
+    set_border_width(0);
 }
 
 DocumentDrawingArea::~DocumentDrawingArea()
 {
     delete mModel;
     delete mArea;
+}
+
+void DocumentDrawingArea::setHadjustment(double h)
+{
+    mViewport->get_hadjustment()->set_lower(h);
+    mViewport->get_hadjustment()->set_value(h);
+}
+
+void DocumentDrawingArea::setVadjustment(double v)
+{
+    mViewport->get_vadjustment()->set_lower(v);
+    mViewport->get_vadjustment()->set_value(v);
 }
 
 GVLE::FileTreeView::FileTreeView(
@@ -332,6 +358,7 @@ GVLE::GVLE(BaseObjectType* cobject,
 	sigc::mem_fun(this, &GVLE::changeTab));
 
     m_modeling->setModified(false);
+    resize(900, 550);
     show();
 }
 
@@ -624,17 +651,9 @@ void GVLE::closeFile()
 	Gtk::Widget* tab = mNotebook->get_nth_page(page);
 	Documents::iterator it = mDocuments.begin();
 	while (it != mDocuments.end()) {
-	    if (boost::filesystem::extension(it->first) == ".vpz") {
-		if (dynamic_cast<DocumentDrawingArea*>(
-			it->second)->getDrawingArea() == tab) {
-		    closeTab(it->first);
-		    break;
-		}
-	    } else {
-		if (it->second == tab) {
-		    closeTab(it->first);
-		    break;
-		}
+	    if (it->second == tab) {
+		closeTab(it->first);
+		break;
 	    }
 	    ++it;
 	}
@@ -822,12 +841,7 @@ std::string valuetype_to_string(value::Value::type type)
 
 void GVLE::focusTab(const std::string& filepath)
 {
-    int page;
-    if (boost::filesystem::extension(filepath) == ".vpz")
-	page = mNotebook->page_num(*(dynamic_cast<DocumentDrawingArea*>(
-					 mDocuments.find(filepath)->second)->getDrawingArea()));
-    else
-	page = mNotebook->page_num(*mDocuments.find(filepath)->second);
+    int page = mNotebook->page_num(*(mDocuments.find(filepath)->second));
     mNotebook->set_current_page(page);
 }
 
@@ -898,14 +912,13 @@ void GVLE::openTabVpz(const std::string& filepath, graph::CoupledModel* model)
 		model);
 	    doc->setTitle(filepath, model, true);
 	    mCurrentView = doc->getView();
-	    ViewDrawingArea* area = doc->getDrawingArea();
 	    mDocuments.insert(
 		std::make_pair < std::string, DocumentDrawingArea* >(
 		    filepath, doc));
-	    mNotebook->append_page(*area, *(addLabel(doc->getTitle(),
-						     filepath)));
+	    mNotebook->append_page(*doc, *(addLabel(doc->getTitle(),
+	    filepath)));
 
-	    mNotebook->reorder_child(*area, page);
+	    mNotebook->reorder_child(*doc, ++page);
 	}
     } else {
 	DocumentDrawingArea* doc = new DocumentDrawingArea(
@@ -914,11 +927,10 @@ void GVLE::openTabVpz(const std::string& filepath, graph::CoupledModel* model)
 	    m_modeling->findView(model),
 	    model);
 	mCurrentView = doc->getView();
-	ViewDrawingArea* area = doc->getDrawingArea();
 	mDocuments.insert(
 	  std::make_pair < std::string, DocumentDrawingArea* >(filepath, doc));
-	page = mNotebook->append_page(*area, *(addLabel(doc->getTitle(),
-							    filepath)));
+	page = mNotebook->append_page(*doc, *(addLabel(doc->getTitle(),
+						       filepath)));
     }
     show_all_children();
     mNotebook->set_current_page(page);
@@ -933,13 +945,7 @@ void GVLE::closeTab(const std::string& filepath)
 	if (not it->second->isModified() or
             gvle::Question(_("The current tab is not saved\n"
 			     "Do you really want to close this file ?"))) {
-	    int page;
-	    if (boost::filesystem::extension(filepath) == ".vpz")
-		page = mNotebook->page_num(
-		    *(dynamic_cast<DocumentDrawingArea*>(it->second)
-		      ->getDrawingArea()));
-	    else
-		page = mNotebook->page_num(*it->second);
+	    int page = mNotebook->page_num(*it->second);
 	    if (page != -1) {
 		mNotebook->remove_page(page);
 		mDocuments.erase(filepath);
@@ -959,8 +965,7 @@ void GVLE::closeVpzTab()
     while (it != mDocuments.end()) {
 	if (boost::filesystem::extension(it->first) == ".vpz") {
 	    page = mNotebook->page_num(
-		*(dynamic_cast<DocumentDrawingArea*>(it->second)
-		  ->getDrawingArea()));
+		*(dynamic_cast<DocumentDrawingArea*>(it->second)));
 	    mNotebook->remove_page(page);
 	    mDocuments.erase(it->first);
 
@@ -972,15 +977,9 @@ void GVLE::closeVpzTab()
 
 void GVLE::closeAllTab()
 {
-    int page;
     Documents::iterator it = mDocuments.begin();
     while (it != mDocuments.end()) {
-	if (boost::filesystem::extension(it->first) == ".vpz")
-	    page = mNotebook->page_num(
-		*(dynamic_cast<DocumentDrawingArea*>(it->second)
-		  ->getDrawingArea()));
-	else
-	    page = mNotebook->page_num(*it->second);
+	int page = mNotebook->page_num(*it->second);
 	mNotebook->remove_page(page);
 	mDocuments.erase(it->first);
 
@@ -994,24 +993,19 @@ void GVLE::changeTab(GtkNotebookPage* /*page*/, int num)
     Gtk::Widget* tab = mNotebook->get_nth_page(num);
     Documents::iterator it = mDocuments.begin();
     while (it != mDocuments.end()) {
-	if (boost::filesystem::extension(it->first) == ".vpz") {
-	    DocumentDrawingArea* area =
+	if (it->second == tab) {
+	    if (boost::filesystem::extension(it->first) == ".vpz") {
+		DocumentDrawingArea* area =
 		    dynamic_cast< DocumentDrawingArea *>(it->second);
-	    if (tab == dynamic_cast< DocumentDrawingArea *>(it->second)->getDrawingArea())
-	    {
 		mCurrentTab = num;
 		mCurrentView = area->getView();
 		mMenuAndToolbar->onViewMode();
-		break;
-	    }
-	}
-	else{
-	    if (it->second == tab) {
+	    } else{
 		mCurrentTab = num;
 		mCurrentView = 0;
 		mMenuAndToolbar->onFileMode();
-		break;
 	    }
+	    break;
 	}
 	++it;
     }
@@ -1095,8 +1089,8 @@ void GVLE::exportCurrentModel()
 
 void GVLE::exportGraphic()
 {
-    ViewDrawingArea* tab = dynamic_cast<ViewDrawingArea*>(
-	mNotebook->get_nth_page(mCurrentTab));
+    ViewDrawingArea* tab = dynamic_cast<DocumentDrawingArea*>(
+	mNotebook->get_nth_page(mCurrentTab))->getDrawingArea();
     vpz::Experiment& experiment = m_modeling->vpz().project().experiment();
     if (experiment.name().empty() || experiment.duration() == 0) {
         Error(_("Fix a Value to the name and the duration of the experiment before exportation."));
@@ -1136,23 +1130,31 @@ void GVLE::exportGraphic()
 
 void GVLE::addCoefZoom()
 {
-    ViewDrawingArea* tab = dynamic_cast<ViewDrawingArea*>(
-	mNotebook->get_nth_page(mCurrentTab));
+    ViewDrawingArea* tab = dynamic_cast<DocumentDrawingArea*>(
+	mNotebook->get_nth_page(mCurrentTab))->getDrawingArea();
     tab->addCoefZoom();
 }
 
 void GVLE::delCoefZoom()
 {
-    ViewDrawingArea* tab = dynamic_cast<ViewDrawingArea*>(
-	mNotebook->get_nth_page(mCurrentTab));
+    ViewDrawingArea* tab = dynamic_cast<DocumentDrawingArea*>(
+	mNotebook->get_nth_page(mCurrentTab))->getDrawingArea();
     tab->delCoefZoom();
 }
 
 void GVLE::setCoefZoom(double coef)
 {
-    ViewDrawingArea* tab = dynamic_cast<ViewDrawingArea*>(
-	mNotebook->get_nth_page(mCurrentTab));
+    ViewDrawingArea* tab = dynamic_cast<DocumentDrawingArea*>(
+	mNotebook->get_nth_page(mCurrentTab))->getDrawingArea();
     tab->setCoefZoom(coef);
+}
+
+void  GVLE::updateAdjustment(double h, double v)
+{
+    DocumentDrawingArea* tab = dynamic_cast<DocumentDrawingArea*>(
+	mNotebook->get_nth_page(mCurrentTab));
+    tab->setHadjustment(h);
+    tab->setVadjustment(v);
 }
 
 }} // namespace vle gvle

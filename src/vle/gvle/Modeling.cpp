@@ -510,24 +510,24 @@ void Modeling::setTitles()
 {
     mGVLE->setTitle(mFileName);
 
-    for (ListView::iterator it = mListView.begin(); it != mListView.end(); ++it)
+    /*for (ListView::iterator it = mListView.begin(); it != mListView.end(); ++it)
     {
         if (*it) {
             (*it)->setTitle(mFileName);
         }
-    }
+	}*/
 }
 
 void Modeling::setModifiedTitles()
 {
     mGVLE->setModifiedTitle(mFileName);
 
-    for (ListView::iterator it = mListView.begin(); it != mListView.end(); ++it)
+    /*for (ListView::iterator it = mListView.begin(); it != mListView.end(); ++it)
     {
         if (*it) {
             (*it)->setModifiedTitle();
         }
-    }
+	}*/
 }
 
 void Modeling::redrawModelTreeBox()

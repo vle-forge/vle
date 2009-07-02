@@ -147,11 +147,18 @@ public:
     virtual inline bool isDrawingArea() const
 	{ return true; }
 
+    void setHadjustment(double h);
+
+    void setVadjustment(double v);
+
 
 private:
     View*               mView;
     ViewDrawingArea*    mArea;
     graph::Model*       mModel;
+    Gtk::Viewport*      mViewport;
+    Gtk::Adjustment     mAdjustWidth;
+    Gtk::Adjustment     mAdjustHeight;
 };
 
 /**
@@ -273,6 +280,11 @@ public:
      */
     Gtk::HBox* addLabel(const std::string& title,
 			const std::string& filepath);
+
+    /**
+     * To update the adjustment.
+     */
+    void updateAdjustment(double h, double v);
 
 
     /**

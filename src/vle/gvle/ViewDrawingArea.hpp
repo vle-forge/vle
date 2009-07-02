@@ -37,6 +37,7 @@ namespace vle { namespace graph {
 
 namespace vle { namespace gvle {
 
+    class GVLE;
     class View;
     class Modeling;
 
@@ -232,6 +233,7 @@ namespace vle { namespace gvle {
         void queueRedraw()
         { mNeedRedraw = true; queue_draw(); }
 
+	GVLE*                           mGVLE;
         View*                           mView;
         graph::CoupledModel*            mCurrent;
         Modeling*                       mModeling;

@@ -68,17 +68,17 @@ void ViewMenu::makeMenuFile(View* v)
                            Gtk::AccelKey(GDK_E, Gdk::CONTROL_MASK),
                            sigc::mem_fun(v, &View::exportCurrentModel)));
 
-    menuList.push_back(Gtk::Menu_Helpers::MenuElem(
+    /*menuList.push_back(Gtk::Menu_Helpers::MenuElem(
 			   _("_Export Graphic"),
 			   Gtk::AccelKey(GDK_L, Gdk::CONTROL_MASK),
-			   sigc::mem_fun(v, &View::exportGraphic)));
+			   sigc::mem_fun(v, &View::exportGraphic)));*/
 
     menuList.push_back(Gtk::Menu_Helpers::SeparatorElem());
 
-    menuList.push_back(Gtk::Menu_Helpers::StockMenuElem(
+    /*menuList.push_back(Gtk::Menu_Helpers::StockMenuElem(
                            Gtk::Stock::CLOSE,
                            Gtk::AccelKey(GDK_W, Gdk::CONTROL_MASK),
-                           sigc::mem_fun(v, &View::hide)));
+                           sigc::mem_fun(v, &View::hide)));*/
 
 }
 
@@ -104,7 +104,7 @@ void ViewMenu::makeMenuEdit(View* v)
 
 void ViewMenu::makeMenuZoom(View* v)
 {
-    Gtk::Menu::MenuList& menuList = mMenuZoom.items();
+    /*Gtk::Menu::MenuList& menuList = mMenuZoom.items();
     menuList.push_back(Gtk::Menu_Helpers::MenuElem(
 			   _("Zoom +"),
 			   Gtk::AccelKey(GDK_plus, Gdk::CONTROL_MASK),
@@ -134,7 +134,7 @@ void ViewMenu::makeMenuZoom(View* v)
 			   _("Zoom 2:1"),
 			   Gtk::AccelKey(GDK_2, Gdk::CONTROL_MASK),
 			   sigc::bind(sigc::mem_fun(
-					  v, &View::setCoefZoom), 2)));
+			   v, &View::setCoefZoom), 2)));*/
 }
 
 }
