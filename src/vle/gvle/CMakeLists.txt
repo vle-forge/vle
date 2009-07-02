@@ -5,19 +5,21 @@ INCLUDE_DIRECTORIES(
   ${GLADEMM_INCLUDE_DIRS}
   ${GTKMM_INCLUDE_DIRS}
   ${GTHREAD_INCLUDE_DIRS}
-  ${LIBXMLPP_INCLUDE_DIRS})
+  ${LIBXMLPP_INCLUDE_DIRS}
+  ${GTKSOURCEVIEWMM_INCLUDE_DIRS})
 
 LINK_DIRECTORIES(
   ${GLADEMM_LIBRARY_DIRS}
   ${GTKMM_LIBRARY_DIRS}
   ${GTHREAD_LIBRARY_DIRS}
-  ${LIBXMLPP_LIBRARY_DIR})
+  ${LIBXMLPP_LIBRARY_DIR}
+  ${GTKSOURCEVIEWMM_LIBRARY_DIRS})
 
 SET(GVLE_HPP About.hpp AtomicModelBox.hpp BooleanBox.hpp CalendarBox.hpp
   ClassModelTreeBox.hpp ComboboxString.hpp ConditionsBox.hpp ConditionPlugin.hpp
   ConnectionBox.hpp CoupledModelBox.hpp CutCopyPaste.hpp Data.hpp
-  DialogString.hpp DynamicBox.hpp ExecutionBox.hpp ExperimentBox.hpp
-  GVLE.hpp GVLEMenuAndToolbar.hpp HelpBox.hpp HostsBox.hpp ImportClassesBox.hpp
+  DialogString.hpp DynamicBox.hpp ExecutionBox.hpp ExperimentBox.hpp GVLE.hpp
+  GVLEMenuAndToolbar.hpp HelpBox.hpp HostsBox.hpp ImportClassesBox.hpp
   ImportModelBox.hpp InteractiveTypeBox.hpp LaunchSimulationBox.hpp
   MatrixBox.hpp Message.hpp ModelClassBox.hpp ModelDescriptionBox.hpp
   ModelTreeBox.hpp Modeling.hpp NewModelClassBox.hpp NewProjectBox.hpp
@@ -40,11 +42,11 @@ SET(GVLE_CPP About.cpp AtomicModelBox.cpp BooleanBox.cpp CalendarBox.cpp
   NewProjectBox.cpp NewTypeBox.cpp ObsAndViewBox.cpp PluginFactory.cpp
   ObservableBox.cpp OpenPackageBox.cpp OpenVpzBox.cpp OutputPlugin.cpp
   PackageBrowserMenu.cpp PackageBrowserWindow.cpp ParameterExecutionBox.cpp
-  PluginSelection.cpp PortDialog.cpp
-  PreferencesBox.cpp ReplicasBox.cpp SaveVpzBox.cpp SimpleTypeBox.cpp
-  TableBox.cpp TreeViewConditions.cpp TreeViewObservable.cpp TreeViewValue.cpp
-  UndoRedo.cpp ValueBox.cpp ValuesTreeView.cpp View.cpp ViewDrawingArea.cpp
-  ViewMenu.cpp ViewOutputBox.cpp XmlTypeBox.cpp)
+  PluginSelection.cpp PortDialog.cpp PreferencesBox.cpp ReplicasBox.cpp
+  SaveVpzBox.cpp SimpleTypeBox.cpp TableBox.cpp TreeViewConditions.cpp
+  TreeViewObservable.cpp TreeViewValue.cpp UndoRedo.cpp ValueBox.cpp
+  ValuesTreeView.cpp View.cpp ViewDrawingArea.cpp ViewMenu.cpp ViewOutputBox.cpp
+  XmlTypeBox.cpp)
 
 ADD_LIBRARY(vlegvle SHARED ${GVLE_CPP};${GVLE_HPP})
 
@@ -58,6 +60,7 @@ TARGET_LINK_LIBRARIES(vlegvle
   ${GLIBMM_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   ${OS_SPECIFIC_LIBRARIES}
+  ${GTKSOURCEVIEWMM_LIBRARIES}
   vlegeometry
   vleutils
   vledata

@@ -908,6 +908,65 @@ public:
 
     /********************************************************************
      *
+     * MANAGE THE EDITOR SETTINGS
+     *
+     ********************************************************************/
+    inline void setHighlightSyntax(bool syntax)
+    { mHighlightSyntax = syntax; }
+
+    inline bool getHighlightSyntax()
+    { return mHighlightSyntax; }
+
+    inline void setHighlightBrackets(bool brackets)
+    { mHighlightBrackets = brackets; }
+
+    inline bool getHighlightBrackets()
+    { return mHighlightBrackets; }
+
+    inline void setHighlightLine(bool line)
+    { mHighlightLine = line; }
+
+    inline bool getHighlightLine()
+    { return mHighlightLine; }
+
+    inline void setLineNumbers(bool numbers)
+    { mLineNumbers = numbers; }
+
+    inline bool getLineNumbers()
+    { return mLineNumbers; }
+
+    inline void setRightMargin(bool margin)
+    { mRightMargin = margin; }
+
+    inline bool getRightMargin()
+    { return mRightMargin; }
+
+    inline void setAutoIndent(bool auto_indent)
+    { mAutoIndent = auto_indent; }
+
+    inline bool getAutoIndent()
+    { return mAutoIndent; }
+
+    inline void setIndentOnTab(bool indent_tab)
+    { mIndentOnTab = indent_tab; }
+
+    inline bool getIndentOnTab()
+    { return mIndentOnTab; }
+
+    inline void setIndentSize(int size)
+    { mIndentSize = size; }
+
+    inline int getIndentSize()
+    { return mIndentSize; }
+
+    inline void setSmartHomeEnd(bool smart)
+    { mSmartHomeEnd = smart; }
+
+    inline bool getSmartHomeEnd()
+    { return mSmartHomeEnd; }
+
+    /********************************************************************
+     *
      * MANAGE OUTPUT AND CONDITION PLUG-INS
      *
      ********************************************************************/
@@ -957,6 +1016,17 @@ private:
     std::string                 mFont;
     double                      mFontSize;
     double                      mLineWidth;
+
+    // Editor attributes
+    bool mHighlightSyntax;
+    bool mHighlightBrackets;
+    bool mHighlightLine;
+    bool mLineNumbers;
+    bool mRightMargin;
+    bool mAutoIndent;
+    bool mIndentOnTab;
+    int  mIndentSize;
+    bool mSmartHomeEnd;
 
     Glib::RefPtr < Gnome::Glade::Xml >  mRefXML;
 

@@ -39,6 +39,7 @@ PreferencesBox::PreferencesBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m)
 {
     xml->get_widget("DialogPreferences", mDialog);
 
+    // Graphics tab
     xml->get_widget("ButtonPreferencesFgColor", mForegroundColor);
     mForegroundColor->signal_color_set().connect(
 	sigc::mem_fun(*this, &PreferencesBox::onButtonForegroundColorChange));
@@ -57,11 +58,40 @@ PreferencesBox::PreferencesBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m)
     xml->get_widget("ButtonPreferencesSelectFont", mFont);
     mFont->signal_font_set().connect(
 	sigc::mem_fun(*this, &PreferencesBox::onButtonFontChange));
-
     xml->get_widget("HScalePreferencesLineWidth", mLineWidth);
     mLineWidth->signal_value_changed().connect(
 	sigc::mem_fun(*this, &PreferencesBox::onLineWidthChange));
 
+    // Editor tab
+    xml->get_widget("CheckPreferencesHighlightSyntax", mHighlightSyntax);
+    mHighlightSyntax->signal_clicked().connect(
+	sigc::mem_fun(*this, &PreferencesBox::onHighlightSyntax));
+    xml->get_widget("CheckPreferencesHighlightMatchingBrackets", mHighlightMatchingBrackets);
+    mHighlightMatchingBrackets->signal_clicked().connect(
+	sigc::mem_fun(*this, &PreferencesBox::onHighlightMatchingBrackets));
+    xml->get_widget("CheckPreferencesHighlightCurrentLine", mHighlightCurrentLine);
+    mHighlightCurrentLine->signal_clicked().connect(
+	sigc::mem_fun(*this, &PreferencesBox::onHighlightCurrentLine));
+    xml->get_widget("CheckPreferencesLineNumbers", mLineNumbers);
+    mLineNumbers->signal_clicked().connect(
+	sigc::mem_fun(*this, &PreferencesBox::onShowLineNumbers));
+    xml->get_widget("CheckPreferencesRightMargin", mRightMargin);
+    mRightMargin->signal_clicked().connect(
+	sigc::mem_fun(*this, &PreferencesBox::onShowRightMargin));
+    xml->get_widget("CheckPreferencesAutoIndent", mAutoIndent);
+    mAutoIndent->signal_clicked().connect(
+	sigc::mem_fun(*this, &PreferencesBox::onAutoIndent));
+    xml->get_widget("CheckPreferencesIndentOnTab", mIndentOnTab);
+    mIndentOnTab->signal_clicked().connect(
+	sigc::mem_fun(*this, &PreferencesBox::onIndentOnTab));
+    xml->get_widget("SpinButtonPreferencesIndentSize", mIndentSize);
+    mIndentSize->signal_value_changed().connect(
+	sigc::mem_fun(*this, &PreferencesBox::onIndentSizeChange));
+    xml->get_widget("CheckPreferencesSmartHomeEnd", mSmartHomeEnd);
+    mSmartHomeEnd->signal_clicked().connect(
+	sigc::mem_fun(*this, &PreferencesBox::onSmartHomeEnd));
+
+    // Action area
     xml->get_widget("ButtonPreferencesApply", mButtonApply);
     mButtonApply->signal_clicked().connect(
 	sigc::mem_fun(*this, &PreferencesBox::onApply));
@@ -86,6 +116,7 @@ void PreferencesBox::show()
     mDialog->run();
 }
 
+// Actions
 void PreferencesBox::onApply()
 {
     activate(currentSettings);
@@ -98,6 +129,7 @@ void PreferencesBox::onApply()
 void PreferencesBox::onCancel()
 {
     copy(backupSettings, currentSettings);
+    // Graphics
     mBackgroundColor->set_color(backupSettings.background);
     mForegroundColor->set_color(backupSettings.foreground);
     mAtomicColor->set_color(backupSettings.atomic);
@@ -107,6 +139,17 @@ void PreferencesBox::onCancel()
     oss << backupSettings.font.c_str() << " " << backupSettings.fontSize;
     mFont->set_font_name(oss.str());
     mLineWidth->set_value(backupSettings.lineWidth);
+    //Editor
+    mHighlightSyntax->set_active(backupSettings.highlightSyntax);
+    mHighlightMatchingBrackets->set_active(backupSettings.highlightBrackets);
+    mHighlightCurrentLine->set_active(backupSettings.highlightLine);
+    mLineNumbers->set_active(backupSettings.lineNumbers);
+    mRightMargin->set_active(backupSettings.rightMargin);
+    mAutoIndent->set_active(backupSettings.autoIndent);
+    mIndentOnTab->set_active(backupSettings.indentOnTab);
+    mIndentSize->set_value(backupSettings.indentSize);
+    mSmartHomeEnd->set_active(backupSettings.smartHomeEnd);
+
     mDialog->hide_all();
 }
 
@@ -115,6 +158,7 @@ void PreferencesBox::onRestore()
     init();
 }
 
+// Graphics
 void PreferencesBox::onButtonBackgroundColorChange()
 {
     currentSettings.background = mBackgroundColor->get_color();
@@ -166,6 +210,54 @@ void PreferencesBox::onLineWidthChange()
     currentSettings.lineWidth = mLineWidth->get_value();
 }
 
+// Editor
+void PreferencesBox::onHighlightSyntax()
+{
+    currentSettings.highlightSyntax = mHighlightSyntax->get_active();
+}
+
+void PreferencesBox::onHighlightMatchingBrackets()
+{
+    currentSettings.highlightBrackets =
+	mHighlightMatchingBrackets->get_active();
+}
+
+void PreferencesBox::onHighlightCurrentLine()
+{
+    currentSettings.highlightLine = mHighlightCurrentLine->get_active();
+}
+
+void PreferencesBox::onShowLineNumbers()
+{
+    currentSettings.lineNumbers = mLineNumbers->get_active();
+}
+
+void PreferencesBox::onShowRightMargin()
+{
+    currentSettings.rightMargin = mRightMargin->get_active();
+}
+
+void PreferencesBox::onAutoIndent()
+{
+    currentSettings.autoIndent = mAutoIndent->get_active();
+}
+
+void PreferencesBox::onIndentOnTab()
+{
+    currentSettings.indentOnTab = mIndentOnTab->get_active();
+}
+
+void PreferencesBox::onIndentSizeChange()
+{
+    currentSettings.indentSize = mIndentSize->get_value_as_int();
+}
+
+void PreferencesBox::onSmartHomeEnd()
+{
+    currentSettings.smartHomeEnd = mSmartHomeEnd->get_active();
+}
+
+// private
 void PreferencesBox::init()
 {
     loadSettings();
@@ -174,6 +266,7 @@ void PreferencesBox::init()
 
 void PreferencesBox::activate(const Settings& settings)
 {
+    // Graphics
     Color color;
 
     color.m_r = settings.foreground.get_red_p();
@@ -215,10 +308,39 @@ void PreferencesBox::activate(const Settings& settings)
     oss << settings.font.c_str() << " " << settings.fontSize;
     mFont->set_font_name(oss.str());
     mLineWidth->set_value(settings.lineWidth);
+
+    // Editor
+    mHighlightSyntax->set_active(settings.highlightSyntax);
+    mModeling->setHighlightSyntax(settings.highlightSyntax);
+
+    mHighlightMatchingBrackets->set_active(settings.highlightBrackets);
+    mModeling->setHighlightBrackets(settings.highlightBrackets);
+
+    mHighlightCurrentLine->set_active(settings.highlightLine);
+    mModeling->setHighlightLine(settings.highlightLine);
+
+    mLineNumbers->set_active(settings.lineNumbers);
+    mModeling->setLineNumbers(settings.lineNumbers);
+
+    mRightMargin->set_active(settings.rightMargin);
+    mModeling->setRightMargin(settings.rightMargin);
+
+    mAutoIndent->set_active(settings.autoIndent);
+    mModeling->setAutoIndent(settings.autoIndent);
+
+    mIndentOnTab->set_active(settings.indentOnTab);
+    mModeling->setIndentOnTab(settings.indentOnTab);
+
+    mIndentSize->set_value(settings.indentSize);
+    mModeling->setIndentSize(settings.indentSize);
+
+    mSmartHomeEnd->set_active(settings.smartHomeEnd);
+    mModeling->setSmartHomeEnd(settings.smartHomeEnd);
 }
 
 void PreferencesBox::copy(const Settings& src, Settings& dest)
 {
+    // Graphics
     dest.foreground = src.foreground;
     dest.background = src.background;
     dest.selected   = src.selected;
@@ -227,6 +349,17 @@ void PreferencesBox::copy(const Settings& src, Settings& dest)
     dest.font       = src.font;
     dest.fontSize   = src.fontSize;
     dest.lineWidth  = src.lineWidth;
+
+    // Editor
+    dest.highlightSyntax   = src.highlightSyntax;
+    dest.highlightBrackets = src.highlightBrackets;
+    dest.highlightLine     = src.highlightLine;
+    dest.lineNumbers       = src.lineNumbers;
+    dest.rightMargin       = src.rightMargin;
+    dest.autoIndent        = src.autoIndent;
+    dest.indentOnTab       = src.indentOnTab;
+    dest.indentSize        = src.indentSize;
+    dest.smartHomeEnd      = src.smartHomeEnd;
 }
 
 
@@ -235,6 +368,7 @@ void PreferencesBox::saveSettings()
     vle::utils::Preferences prefs;
     prefs.load();
 
+    // Graphics
     prefs.setAttributes("gvle.graphics",
 			"foreground",
 			makeStringFromColor(currentSettings.foreground));
@@ -261,6 +395,34 @@ void PreferencesBox::saveSettings()
     oss << currentSettings.lineWidth;
     prefs.setAttributes("gvle.graphics", "lineWidth", oss.str());
 
+    // Editor
+    prefs.setAttributes("gvle.editor",
+			"highlightSyntax",
+			currentSettings.highlightSyntax ? "1" : "0");
+    prefs.setAttributes("gvle.editor",
+			"highlightBrackets",
+			currentSettings.highlightBrackets ? "1" : "0");
+    prefs.setAttributes("gvle.editor",
+			"highlightLine",
+			currentSettings.highlightLine ? "1" : "0");
+    prefs.setAttributes("gvle.editor",
+			"lineNumbers",
+			currentSettings.lineNumbers ? "1" : "0");
+    prefs.setAttributes("gvle.editor",
+			"rightMargin",
+			currentSettings.rightMargin ? "1" : "0");
+    prefs.setAttributes("gvle.editor",
+			"autoIndent",
+			currentSettings.autoIndent ? "1" : "0");
+    prefs.setAttributes("gvle.editor",
+			"indentOnTab",
+			currentSettings.indentOnTab ? "1" : "0");
+    prefs.setAttributes("gvle.editor",
+			"indentSize",
+			boost::lexical_cast<std::string>(currentSettings.indentSize));
+    prefs.setAttributes("gvle.editor",
+			"smartHomeEnd",
+			currentSettings.smartHomeEnd ? "1" : "0");
     prefs.save();
 }
 
@@ -272,6 +434,7 @@ void PreferencesBox::loadSettings()
 
     prefs.load();
 
+    // Graphics
     value = prefs.getAttributes("gvle.graphics", "background");
     currentSettings.background = (value.empty() ? mBackgroundColor->get_color()
 				  : makeColorFromString(value));
@@ -303,6 +466,44 @@ void PreferencesBox::loadSettings()
     value = prefs.getAttributes("gvle.graphics", "lineWidth");
     currentSettings.lineWidth = (value.empty() ? mLineWidth->get_value()
 			    : boost::lexical_cast<double>(value));
+
+    // Editor
+    value = prefs.getAttributes("gvle.editor", "highlightSyntax");
+    currentSettings.highlightSyntax =
+	(value.empty() ? mHighlightSyntax->get_active()
+	 : boost::lexical_cast<bool>(value));
+    value = prefs.getAttributes("gvle.editor", "highlightBrackets");
+    currentSettings.highlightBrackets =
+	(value.empty() ? mHighlightMatchingBrackets->get_active()
+	 : boost::lexical_cast<bool>(value));
+    value = prefs.getAttributes("gvle.editor", "highlightLine");
+    currentSettings.highlightLine =
+	(value.empty() ? mHighlightCurrentLine->get_active()
+	 : boost::lexical_cast<bool>(value));
+    value = prefs.getAttributes("gvle.editor", "lineNumbers");
+    currentSettings.lineNumbers =
+	(value.empty() ? mLineNumbers->get_active()
+	 : boost::lexical_cast<bool>(value));
+    value = prefs.getAttributes("gvle.editor", "rightMargin");
+    currentSettings.rightMargin =
+	(value.empty() ? mRightMargin->get_active()
+	 : boost::lexical_cast<bool>(value));
+    value = prefs.getAttributes("gvle.editor", "autoIndent");
+    currentSettings.autoIndent =
+	(value.empty() ? mAutoIndent->get_active()
+	 : boost::lexical_cast<bool>(value));
+    value = prefs.getAttributes("gvle.editor", "indentOnTab");
+    currentSettings.indentOnTab =
+	(value.empty() ? mIndentOnTab->get_active()
+	 : boost::lexical_cast<bool>(value));
+    value = prefs.getAttributes("gvle.editor", "indentSize");
+    currentSettings.indentSize =
+	(value.empty() ? mIndentSize->get_value_as_int()
+	 : boost::lexical_cast<int>(value));
+    value = prefs.getAttributes("gvle.editor", "smartHomeEnd");
+    currentSettings.smartHomeEnd =
+	(value.empty() ? mSmartHomeEnd->get_active()
+	 : boost::lexical_cast<bool>(value));
 
     copy(currentSettings, backupSettings);
 }

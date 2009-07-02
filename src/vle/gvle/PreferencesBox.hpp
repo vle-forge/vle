@@ -38,24 +38,35 @@ class PreferencesBox
 {
 public:
     PreferencesBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m);
-    virtual ~PreferencesBox();
+    ~PreferencesBox();
 
     void show();
 
 protected:
-    virtual void onApply();
-    virtual void onCancel();
-    virtual void onRestore();
+    // Actions
+    void onApply();
+    void onCancel();
+    void onRestore();
 
-    virtual void onButtonBackgroundColorChange();
-    virtual void onButtonForegroundColorChange();
-    virtual void onButtonAtomicColorChange();
-    virtual void onButtonCoupledColorChange();
-    virtual void onButtonSelectedColorChange();
+    // Graphics
+    void onButtonBackgroundColorChange();
+    void onButtonForegroundColorChange();
+    void onButtonAtomicColorChange();
+    void onButtonCoupledColorChange();
+    void onButtonSelectedColorChange();
+    void onButtonFontChange();
+    void onLineWidthChange();
 
-    virtual void onButtonFontChange();
-
-    virtual void onLineWidthChange();
+    // Editor
+    void onHighlightSyntax();
+    void onHighlightMatchingBrackets();
+    void onHighlightCurrentLine();
+    void onShowLineNumbers();
+    void onShowRightMargin();
+    void onAutoIndent();
+    void onIndentOnTab();
+    void onIndentSizeChange();
+    void onSmartHomeEnd();
 
 private:
     /**
@@ -70,6 +81,15 @@ private:
 	std::string font;
 	double fontSize;
 	double lineWidth;
+	bool highlightSyntax;
+	bool highlightBrackets;
+	bool highlightLine;
+	bool lineNumbers;
+	bool rightMargin;
+	bool autoIndent;
+	bool indentOnTab;
+	int  indentSize;
+	bool smartHomeEnd;
     };
 
     //Class members
@@ -79,17 +99,28 @@ private:
     Settings     currentSettings;
     Settings     backupSettings;
 
-    //Dialog widgets
+    //Dialog widgets - Action
     Gtk::Button* mButtonApply;
     Gtk::Button* mButtonCancel;
     Gtk::Button* mButtonRestore;
+    //Dialog widgets - Graphics
     Gtk::ColorButton* mBackgroundColor;
     Gtk::ColorButton* mForegroundColor;
     Gtk::ColorButton* mAtomicColor;
     Gtk::ColorButton* mCoupledColor;
     Gtk::ColorButton* mSelectedColor;
-    Gtk::FontButton* mFont;
-    Gtk::HScale* mLineWidth;
+    Gtk::FontButton*  mFont;
+    Gtk::HScale*      mLineWidth;
+    //Dialog widgets - Editor
+    Gtk::CheckButton* mHighlightSyntax;
+    Gtk::CheckButton* mHighlightMatchingBrackets;
+    Gtk::CheckButton* mHighlightCurrentLine;
+    Gtk::CheckButton* mLineNumbers;
+    Gtk::CheckButton* mRightMargin;
+    Gtk::CheckButton* mAutoIndent;
+    Gtk::CheckButton* mIndentOnTab;
+    Gtk::SpinButton*  mIndentSize;
+    Gtk::CheckButton* mSmartHomeEnd;
 
     //Methods
     void init();

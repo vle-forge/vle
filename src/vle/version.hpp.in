@@ -54,6 +54,7 @@
 #cmakedefine VLE_HAVE_CAIRO
 #cmakedefine VLE_HAVE_POOL
 #cmakedefine VLE_HAVE_NLS
+#cmakedefine VLE_HAVE_GTKSOURCEVIEWMM
 
 /**
  * @brief Check whether a VLE version equal to or greather than major.mino.patch

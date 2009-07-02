@@ -62,7 +62,6 @@ Document::Document(GVLE* gvle, const std::string& filepath) :
 
 Document::~Document()
 {
-    delete mGVLE;
 }
 
 void Document::setTitle(std::string title, graph::Model* model,
@@ -88,10 +87,12 @@ DocumentText::DocumentText(GVLE* gvle,
     mNew(newfile)
 {
     mTitle = filename() + boost::filesystem::extension(filepath);
-
+#ifdef VLE_HAVE_GTKSOURCEVIEWMM
+    gtksourceview::init();
+#endif
     init();
     signal_event().connect(
-      sigc::mem_fun(this, &DocumentText::event));
+	sigc::mem_fun(this, &DocumentText::event));
 }
 
 DocumentText::~DocumentText()
@@ -120,20 +121,87 @@ void DocumentText::saveAs(const std::string& filename)
 
 void DocumentText::init()
 {
+#ifdef VLE_HAVE_GTKSOURCEVIEWMM
+    Glib::RefPtr<gtksourceview::SourceLanguageManager> manager
+	= gtksourceview::SourceLanguageManager::create();
+    Glib::RefPtr<gtksourceview::SourceLanguage> language =
+	manager->get_language(getIdLanguage());
+    Glib::RefPtr<gtksourceview::SourceBuffer> buffer =
+	gtksourceview::SourceBuffer::create(language);
+#else
+    Glib::RefPtr<Gtk::TextBuffer> buffer = mView.get_buffer();
+#endif
     if (not mNew) {
 	std::ifstream file(filepath().c_str());
 	if (file) {
 	    std::stringstream filecontent;
 	    filecontent << file.rdbuf();
 	    file.close();
-	    mView.get_buffer()->insert(mView.get_buffer()->end(), filecontent.str());
-	    add(mView);
+#ifdef VLE_HAVE_GTKSOURCEVIEWMM
+	    buffer->begin_not_undoable_action();
+	    buffer->insert(buffer->end(), filecontent.str());
+	    buffer->end_not_undoable_action();
+#else
+	    buffer->insert(buffer->end(), filecontent.str());
+#endif
 	} else {
 	    throw std::string("cannot open: " + filename());
 	}
-    } else {
-	add(mView);
     }
+#ifdef VLE_HAVE_GTKSOURCEVIEWMM
+    mView.set_source_buffer(buffer);
+    applyEditingProperties();
+#endif
+    add(mView);
+}
+
+std::string DocumentText::getIdLanguage()
+{
+    std::string ext(boost::filesystem::extension(filepath()));
+    std::string idLang;
+
+    if ((ext == ".cpp") or (ext == ".hpp") or (ext == ".cc"))
+	idLang = "cpp";
+    else if (ext == ".py")
+	idLang = "python";
+    else
+	idLang = "cmake";
+
+    return idLang;
+}
+
+#ifdef VLE_HAVE_GTKSOURCEVIEWMM
+void DocumentText::applyEditingProperties()
+{
+    Modeling* modeling = mGVLE->getModeling();
+
+    mView.get_source_buffer()->
+	set_highlight_syntax(modeling->getHighlightSyntax());
+    mView.get_source_buffer()->
+	set_highlight_matching_brackets(modeling->getHighlightBrackets());
+    mView.set_highlight_current_line(modeling->getHighlightLine());
+    mView.set_show_line_numbers(modeling->getLineNumbers());
+    mView.set_show_right_margin(modeling->getRightMargin());
+    mView.set_auto_indent(modeling->getAutoIndent());
+    mView.set_indent_on_tab(modeling->getIndentOnTab());
+    mView.set_indent_width(modeling->getIndentSize());
+    if (modeling->getSmartHomeEnd())
+	mView.set_smart_home_end(gtksourceview::SOURCE_SMART_HOME_END_ALWAYS);
+}
+#endif
+
+void DocumentText::undo()
+{
+#ifdef VLE_HAVE_GTKSOURCEVIEWMM
+    mView.get_source_buffer()->undo();
+#endif
+}
+
+void DocumentText::redo()
+{
+#ifdef VLE_HAVE_GTKSOURCEVIEWMM
+    mView.get_source_buffer()->redo();
+#endif
 }
 
 bool DocumentText::event(GdkEvent* event)
@@ -192,6 +260,16 @@ void DocumentDrawingArea::setVadjustment(double v)
 {
     mViewport->get_vadjustment()->set_lower(v);
     mViewport->get_vadjustment()->set_value(v);
+}
+
+void DocumentDrawingArea::undo()
+{
+    //TODO
+}
+
+void DocumentDrawingArea::redo()
+{
+    //TODO
 }
 
 GVLE::FileTreeView::FileTreeView(
@@ -916,9 +994,11 @@ void GVLE::openTabVpz(const std::string& filepath, graph::CoupledModel* model)
 		std::make_pair < std::string, DocumentDrawingArea* >(
 		    filepath, doc));
 	    mNotebook->append_page(*doc, *(addLabel(doc->getTitle(),
-	    filepath)));
+						    filepath)));
 
 	    mNotebook->reorder_child(*doc, ++page);
+	} else {
+	    return;
 	}
     } else {
 	DocumentDrawingArea* doc = new DocumentDrawingArea(
@@ -1055,6 +1135,26 @@ void GVLE::packageProject()
     mLog->get_buffer()->insert(mLog->get_buffer()->end(), out);
     if (not err.empty())
 	mLog->get_buffer()->insert(mLog->get_buffer()->end(), err);
+}
+
+void GVLE::onUndo()
+{
+    int page = mNotebook->get_current_page();
+    if (page != -1) {
+	Document* doc = dynamic_cast < Document* >(
+	    mNotebook->get_nth_page(page));
+	doc->undo();
+    }
+}
+
+void GVLE::onRedo()
+{
+    int page = mNotebook->get_current_page();
+    if (page != -1) {
+	Document* doc = dynamic_cast < Document* >(
+	    mNotebook->get_nth_page(page));
+	doc->redo();
+    }
 }
 
 void GVLE::onCutModel()

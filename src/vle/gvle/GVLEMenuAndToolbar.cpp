@@ -58,6 +58,9 @@ const Glib::ustring GVLEMenuAndToolbar::UI_DEFINITION =
     "            <menuitem action='Quit'/>"
     "        </menu>"
     "        <menu action='MenuEdit'>"
+    "            <menuitem action='Undo' />"
+    "            <menuitem action='Redo' />"
+    "            <separator />"
     "            <menuitem action='Cut' />"
     "            <menuitem action='Copy' />"
     "            <menuitem action='Paste' />"
@@ -108,6 +111,9 @@ const Glib::ustring GVLEMenuAndToolbar::UI_DEFINITION =
     "        </menu>"
     "    </menubar>"
     "    <toolbar name='Toolbar'>"
+    "        <toolitem action='Undo' />"
+    "        <toolitem action='Redo' />"
+    "        <separator />"
     "        <toolitem action='ArrowTool' />"
     "        <toolitem action='AddModelsTool' />"
     "        <toolitem action='AddLinksTool' />"
@@ -298,6 +304,12 @@ void GVLEMenuAndToolbar::createEditActions()
 {
     m_refActionGroup->add(Gtk::Action::create("MenuEdit", _("_Edit")));
 
+    m_refActionGroup->add(
+	Gtk::Action::create("Undo", Gtk::Stock::UNDO),
+	sigc::mem_fun(mParent, &GVLE::onUndo));
+    m_refActionGroup->add(
+	Gtk::Action::create("Redo", Gtk::Stock::REDO),
+	sigc::mem_fun(mParent, &GVLE::onRedo));
     m_refActionGroup->add(
 	Gtk::Action::create("Cut", Gtk::Stock::CUT),
 	sigc::mem_fun(mParent, &GVLE::onCutModel));

@@ -55,6 +55,9 @@
 #include <list>
 #include <map>
 
+#ifdef VLE_HAVE_GTKSOURCEVIEWMM
+#include <gtksourceviewmm-2.0/gtksourceviewmm.h>
+#endif
 
 namespace vle
 {
@@ -74,7 +77,7 @@ public:
 
     Document(GVLE* gvle, const std::string& filepath);
 
-    ~Document();
+    virtual ~Document();
 
     virtual inline bool isDrawingArea()
 	{ return false; }
@@ -100,6 +103,9 @@ public:
     void setTitle(std::string title, graph::Model* model,
 		  bool modified);
 
+    virtual void undo() = 0;
+    virtual void redo() = 0;
+
 protected:
     GVLE*          mGVLE;
     bool           mModified;
@@ -121,12 +127,25 @@ public:
     inline bool isNew() const
     { return mNew == true; }
 
+    void undo();
+    void redo();
+
 private:
+#ifdef VLE_HAVE_GTKSOURCEVIEWMM
+    gtksourceview::SourceView mView;
+#else
     Gtk::TextView  mView;
+#endif
+    bool           mModified;
     bool           mNew;
 
     void init();
     bool event(GdkEvent* event);
+    std::string getIdLanguage();
+
+#ifdef VLE_HAVE_GTKSOURCEVIEWMM
+    void applyEditingProperties();
+#endif
 };
 
 class DocumentDrawingArea : public Document {
@@ -148,9 +167,10 @@ public:
 	{ return true; }
 
     void setHadjustment(double h);
-
     void setVadjustment(double v);
 
+    void undo();
+    void redo();
 
 private:
     View*               mView;
@@ -245,6 +265,13 @@ public:
      */
     inline ModelClassBox* getModelClassBox()
 	{ return mModelClassBox; }
+
+    /**
+     * return the Modeling instance
+     * @return Modeling instance
+     */
+    inline Modeling* getModeling()
+    { return m_modeling; }
 
     /* methodes to manage tabs */
     void focusTab(const std::string& filepath);
@@ -518,6 +545,12 @@ public:
      * MENU EDIT
      *
      ********************************************************************/
+
+    /** Perform undo operation */
+    void onUndo();
+
+    /** Perform redo operation */
+    void onRedo();
 
     /** Cut selected model list into CutCopyPaste. */
     void onCutModel();
