@@ -75,6 +75,9 @@ protected:
 
     void onApply();
     void onCancel();
+
+    void onRowActivated(const Gtk::TreeModel::Path& path,
+                         Gtk::TreeViewColumn *column);
 };
 
 }

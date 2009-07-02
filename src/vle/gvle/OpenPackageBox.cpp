@@ -43,6 +43,8 @@ OpenPackageBox::OpenPackageBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
     mRefTreePackage = Gtk::TreeStore::create(mColumns);
     mTreeView->append_column(_("Name"), mColumns.mName);
     mTreeView->set_model(mRefTreePackage);
+    mTreeView->signal_row_activated().connect(
+        sigc::mem_fun(*this, &OpenPackageBox::onRowActivated));
 
     xml->get_widget("ButtonPackageApply", mButtonApply);
     mButtonApply->signal_clicked().connect(
@@ -107,6 +109,22 @@ void OpenPackageBox::onApply()
 
 void OpenPackageBox::onCancel()
 {
+    mDialog->hide_all();
+}
+
+void OpenPackageBox::onRowActivated(const Gtk::TreeModel::Path& path,
+                                     Gtk::TreeViewColumn* column)
+{
+    if (column) {
+        Gtk::TreeIter iter = mRefTreePackage->get_iter(path);
+
+        if (iter) {
+	    Gtk::TreeRow row = *iter;
+	    std::string name = row.get_value(mColumns.mName);
+	    utils::Path::path().setPackage(name);
+	    mModeling->getGVLE()->buildPackageHierarchy();
+        }
+    }
     mDialog->hide_all();
 }
 
