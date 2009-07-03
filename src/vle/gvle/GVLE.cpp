@@ -654,6 +654,7 @@ void GVLE::onMenuLoad()
 	    utils::Path::path().setPackage("");
 	    mMenuAndToolbar->onGlobalMode();
 	    mMenuAndToolbar->onViewMode();
+	    mFileTreeView->clear();
         }
     }
 }

@@ -154,7 +154,7 @@ void GVLEMenuAndToolbar::init()
 
 void GVLEMenuAndToolbar::onPackageMode()
 {
-    m_refActionGroup->get_action("OpenGlobalVpz")->set_sensitive(false);
+    m_refActionGroup->get_action("OpenFile")->set_sensitive(true);
     m_refActionGroup->get_action("OpenVpz")->set_sensitive(true);
     m_refActionGroup->get_action("MenuEdit")->set_sensitive(false);
     m_refActionGroup->get_action("MenuZoom")->set_sensitive(false);
@@ -163,7 +163,7 @@ void GVLEMenuAndToolbar::onPackageMode()
 
 void GVLEMenuAndToolbar::onGlobalMode()
 {
-    m_refActionGroup->get_action("OpenGlobalVpz")->set_sensitive(true);
+    m_refActionGroup->get_action("OpenFile")->set_sensitive(false);
     m_refActionGroup->get_action("OpenVpz")->set_sensitive(false);
     m_refActionGroup->get_action("MenuEdit")->set_sensitive(false);
     m_refActionGroup->get_action("MenuZoom")->set_sensitive(false);
