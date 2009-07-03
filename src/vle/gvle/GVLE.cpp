@@ -380,10 +380,13 @@ void GVLE::FileTreeView::on_row_activated(
 	if (mParent->existTab(absolute_path)) {
 	    mParent->focusTab(absolute_path);
 	} else {
-	    if (boost::filesystem::extension(absolute_path) == ".vpz")
+	    if (boost::filesystem::extension(absolute_path) == ".vpz") {
 		mParent->closeVpzTab();
-	    if (not mParent->existVpzTab())
+		if (not mParent->existVpzTab())
+		    mParent->openTab(absolute_path);
+	    } else {
 		mParent->openTab(absolute_path);
+	    }
 	}
     }
     else {
