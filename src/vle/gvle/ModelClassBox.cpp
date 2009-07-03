@@ -289,6 +289,11 @@ void ModelClassBox::parseClass()
     expand_all();
 }
 
+void ModelClassBox::clear()
+{
+    mRefTreeModel->clear();
+}
+
 Gtk::TreeModel::Row
 ModelClassBox::addClass(vpz::Class& classe)
 {

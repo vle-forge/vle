@@ -74,6 +74,11 @@ public:
      */
     void createNewModelBox(Modeling* m);
 
+    /**
+     * @brief Clear the current Treeview
+     */
+    void clear();
+
 protected:
     /**
      * When user press ECHAP or CTRL-W, we close window

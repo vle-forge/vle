@@ -121,6 +121,10 @@ void ModelTreeBox::showRow(const std::string& model_name)
     m_refTreeModel->foreach(sigc::mem_fun(*this, &ModelTreeBox::on_foreach));
 }
 
+void ModelTreeBox::clear()
+{
+    m_refTreeModel->clear();
+}
 
 bool ModelTreeBox::on_key_release_event(GdkEventKey* event)
 {

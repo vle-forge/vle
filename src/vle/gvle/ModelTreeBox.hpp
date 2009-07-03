@@ -88,6 +88,11 @@ public:
     inline void setModeling(Modeling* modeling)
 	{ m_modeling = modeling; }
 
+    /**
+     * @brief Clear the current Treeview
+     */
+    void clear();
+
 protected:
     /**
      * When user press ECHAP or CTRL-W, we close window

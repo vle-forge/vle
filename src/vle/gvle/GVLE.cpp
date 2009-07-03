@@ -459,16 +459,17 @@ GVLE::~GVLE()
 
 void GVLE::show()
 {
-    mPackage = vle::utils::Path::path().getPackageDir();
-    set_title(std::string(_("Browsing package: ")).append(
-			   boost::filesystem::basename(mPackage)));
     buildPackageHierarchy();
     show_all();
 }
 
 void GVLE::buildPackageHierarchy()
 {
+    mModelTreeBox->clear();
+    mModelClassBox->clear();
     mPackage = vle::utils::Path::path().getPackageDir();
+    set_title(std::string(_("GVLE - package: ")).append(
+		  boost::filesystem::basename(mPackage)));
     mFileTreeView->clear();
     mFileTreeView->setPackage(mPackage);
     mFileTreeView->build();
@@ -1010,19 +1011,21 @@ void GVLE::openTabVpz(const std::string& filepath, graph::CoupledModel* model)
 
 void GVLE::closeTab(const std::string& filepath)
 {
-    Documents::iterator it = mDocuments.find(filepath);
-    if (it != mDocuments.end()) {
-	if (not it->second->isModified() or
-            gvle::Question(_("The current tab is not saved\n"
-			     "Do you really want to close this file ?"))) {
-	    int page = mNotebook->page_num(*it->second);
-	    if (page != -1) {
-		mNotebook->remove_page(page);
-		mDocuments.erase(filepath);
+    if (boost::filesystem::extension(filepath) == ".vpz")
+	closeVpzTab();
+    else {
+	Documents::iterator it = mDocuments.find(filepath);
+	if (it != mDocuments.end()) {
+	    if (not it->second->isModified() or
+		gvle::Question(_("The current tab is not saved\n"
+				 "Do you really want to close this file ?"))) {
+		int page = mNotebook->page_num(*it->second);
+		if (page != -1) {
+		    mNotebook->remove_page(page);
+		    mDocuments.erase(filepath);
 
-		mNotebook->set_current_page(--page);
-		redrawModelTreeBox();
-		redrawModelClassBox();
+		    mNotebook->set_current_page(--page);
+		}
 	    }
 	}
     }
@@ -1033,18 +1036,20 @@ void GVLE::closeVpzTab()
     int page;
     Documents::iterator it = mDocuments.begin();
     while (it != mDocuments.end()) {
-	if (boost::filesystem::extension(it->first) == ".vpz") {
-	    if (not it->second->isModified() or
-            gvle::Question(_("The current tab is not saved\n"
-			     "Do you really want to close this file ?"))) {
-		page = mNotebook->page_num(
-		    *(dynamic_cast<DocumentDrawingArea*>(it->second)));
-		mNotebook->remove_page(page);
-		mDocuments.erase(it->first);
+        if (boost::filesystem::extension(it->first) == ".vpz") {
+            if (not it->second->isModified() or
+                gvle::Question(_("The current tab is not saved\n"
+                                 "Do you really want to close this file ?"))) {
+                mModelTreeBox->clear();
+                mModelClassBox->clear();
+                page = mNotebook->page_num(
+                    *(dynamic_cast<DocumentDrawingArea*>(it->second)));
+                mNotebook->remove_page(page);
+                mDocuments.erase(it->first);
 
-		mNotebook->set_current_page(--page);
-	    }
-	}
+                mNotebook->set_current_page(--page);
+            }
+        }
 	++it;
     }
 }
