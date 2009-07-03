@@ -111,7 +111,7 @@ namespace vle {
          * @throw utils::SaxParserError if stack is empty or parent is not a
          * model.
          */
-        void pushPortType(const Glib::ustring& name);
+        void pushPortType(const char* name);
 
         /**
          * @brief Push a Submodels into the stack.

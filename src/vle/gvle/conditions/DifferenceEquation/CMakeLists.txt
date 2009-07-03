@@ -20,7 +20,6 @@ ADD_LIBRARY(input-simple MODULE Simple.hpp Simple.cpp
 SET_TARGET_PROPERTIES(input-simple PROPERTIES OUTPUT_NAME
   "DifferenceEquationSimple")
 
-
 ADD_LIBRARY(input-multiple MODULE Multiple.hpp Multiple.cpp
   Mapping.hpp Mapping.cpp)
 SET_TARGET_PROPERTIES(input-multiple PROPERTIES OUTPUT_NAME
@@ -32,6 +31,50 @@ SET_TARGET_PROPERTIES(input-generic PROPERTIES OUTPUT_NAME
   "DifferenceEquationGeneric")
 
 TARGET_LINK_LIBRARIES(input-simple
+  ${GLIBMM_LIBRARIES}
+  ${LIBXML_LIBRARIES}
+  ${CAIROMM_LIBRARIES}
+  ${GLADEMM_LIBRARIES}
+  ${GTKMM_LIBRARIES}
+  ${GTHREAD_LIBRARIES}
+  ${OS_SPECIFIC_LIBRARIES}
+  vlemanager
+  vleutils
+  vledata
+  vlevalue
+  vlegraph
+  vlevpz
+  vleoov
+  vlevpz
+  vledevs
+  vleextension
+  vlemanager
+  vletranslator
+  vlegvle)
+
+TARGET_LINK_LIBRARIES(input-multiple
+  ${GLIBMM_LIBRARIES}
+  ${LIBXML_LIBRARIES}
+  ${CAIROMM_LIBRARIES}
+  ${GLADEMM_LIBRARIES}
+  ${GTKMM_LIBRARIES}
+  ${GTHREAD_LIBRARIES}
+  ${OS_SPECIFIC_LIBRARIES}
+  vlemanager
+  vleutils
+  vledata
+  vlevalue
+  vlegraph
+  vlevpz
+  vleoov
+  vlevpz
+  vledevs
+  vleextension
+  vlemanager
+  vletranslator
+  vlegvle)
+
+TARGET_LINK_LIBRARIES(input-generic
   ${GLIBMM_LIBRARIES}
   ${LIBXML_LIBRARIES}
   ${CAIROMM_LIBRARIES}
@@ -65,4 +108,5 @@ INSTALL(TARGETS input-generic
   RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/conditions"
   LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/conditions")
 
-INSTALL(FILES DifferenceEquation.glade DESTINATION ${VLE_SHARE_DIRS}/conditions/glade)
+INSTALL(FILES DifferenceEquation.glade DESTINATION
+  ${VLE_SHARE_DIRS}/conditions/glade)

@@ -276,23 +276,24 @@ void SaxStackVpz::pushPort(const xmlChar** att)
     }
 }
 
-void SaxStackVpz::pushPortType(const Glib::ustring& name)
+void SaxStackVpz::pushPortType(const char* att)
 {
     Assert < utils::SaxParserError >(not m_stack.empty());
     Assert < utils::SaxParserError >(parent()->isModel());
 
     vpz::Base* prt = 0;
-    if (name == "in") {
+
+    if (strcmp(att, "in") == 0) {
         prt = new vpz::In();
-    } else if (name == "out") {
+    } else if (strcmp(att, "out") == 0) {
         prt = new vpz::Out();
-    } else if (name == "state") {
+    } else if (strcmp(att, "state") == 0) {
         prt = new vpz::State();
-    } else if (name == "init") {
+    } else if (strcmp(att, "init") == 0) {
         prt = new vpz::Init();
     } else {
         throw(utils::SaxParserError(fmt(_(
-                    "Unknow port type %1%.")) % name));
+                    "Unknow port type %1%.")) % att));
     }
     push(prt);
 }
