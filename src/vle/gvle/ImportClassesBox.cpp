@@ -194,7 +194,7 @@ void ImportClassesBox::add_coupled_model_to_class(graph::CoupledModel* model,
 void ImportClassesBox::onClose()
 {
     mDialog->hide_all();
-    mModeling->redrawModelClassBox();
+    mModeling->getGVLE()->redrawModelClassBox();
 }
 
 }}

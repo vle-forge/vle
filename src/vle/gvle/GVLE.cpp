@@ -495,6 +495,16 @@ void GVLE::redrawModelClassBox()
     mModelClassBox->parseClass();
 }
 
+void GVLE::showRowTreeBox(const std::string& name)
+{
+    mModelTreeBox->showRow(name);
+}
+
+void GVLE::showRowModelClassBox(const std::string& name)
+{
+    mModelClassBox->showRow(name);
+}
+
 bool GVLE::on_delete_event(GdkEventAny* event)
 {
     if (event->type == GDK_DELETE) {
@@ -565,11 +575,11 @@ void GVLE::onMenuNew()
     if (m_modeling->isModified() == false) {
         m_modeling->delNames();
         m_modeling->start();
-        m_modeling->redrawModelTreeBox();
+        redrawModelTreeBox();
     } else if (gvle::Question(_("Do you really want destroy model ?"))) {
         m_modeling->delNames();
         m_modeling->start();
-        m_modeling->redrawModelTreeBox();
+        redrawModelTreeBox();
     }
 }
 
@@ -767,31 +777,6 @@ void GVLE::onMenuQuit()
     hide();
 }
 
-
-void GVLE::onShowModelTreeView()
-{
-    m_modeling->toggleModelTreeBox();
-}
-
-void GVLE::onShowModelClassView()
-{
-    m_modeling->toggleModelClassBox();
-}
-
-void GVLE::onCloseAllViews()
-{
-    m_modeling->delViews();
-}
-
-void GVLE::onIconifyAllViews()
-{
-    m_modeling->iconifyViews();
-}
-
-void GVLE::onDeiconifyAllViews()
-{
-    m_modeling->deiconifyViews();
-}
 
 void GVLE::onPreferences()
 {

@@ -32,7 +32,6 @@
 #include <vle/gvle/Plugin.hpp>
 #include <vle/gvle/View.hpp>
 #include <vle/gvle/ViewDrawingArea.hpp>
-#include <vle/gvle/ViewMenu.hpp>
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Debug.hpp>
@@ -55,13 +54,11 @@ View::View(Modeling* m, graph::CoupledModel* c, size_t index) :
     assert(m);
     assert(c);
 
-    mMenuBar = new ViewMenu(this);
     mDrawing = new ViewDrawingArea(this);
 }
 
 View::~View()
 {
-    delete mMenuBar;
     delete mDrawing;
 }
 
@@ -79,7 +76,8 @@ void View::initAllOptions()
 
     switch (current) {
     case GVLE::POINTER:
-        //get_window()->set_cursor(Gdk::Cursor(Gdk::ARROW));
+        mModeling->getGVLE()->
+	    get_window()->set_cursor(Gdk::Cursor(Gdk::ARROW));
         break;
     case GVLE::ADDMODEL:
     case GVLE::GRID:
@@ -88,10 +86,12 @@ void View::initAllOptions()
     case GVLE::ZOOM:
     case GVLE::QUESTION:
     case GVLE::PLUGINMODEL:
-        //get_window()->set_cursor(Gdk::Cursor(Gdk::CROSSHAIR));
+        mModeling->getGVLE()->
+	    get_window()->set_cursor(Gdk::Cursor(Gdk::CROSSHAIR));
         break;
     case GVLE::DELETE:
-        //get_window()->set_cursor(Gdk::Cursor(Gdk::PIRATE));
+        mModeling->getGVLE()->
+	    get_window()->set_cursor(Gdk::Cursor(Gdk::PIRATE));
         break;
     }
 }
@@ -109,7 +109,8 @@ bool View::on_delete_event(GdkEventAny* event)
 bool View::on_focus_in_event(GdkEventFocus* event)
 {
     if (event->in == TRUE) {
-        mModeling->showRowTreeBox(mCurrent->getName());
+        mModeling->getGVLE()->
+	    showRowTreeBox(mCurrent->getName());
     }
     return true;
 }
@@ -213,8 +214,8 @@ void View::onCutModel()
     // TODO
     mModeling->setModified(true);
     mModeling->cut(mSelectedModels, mCurrent, mCurrentClass);
-    mModeling->redrawModelTreeBox();
-    mModeling->redrawModelClassBox();
+    mModeling->getGVLE()->redrawModelTreeBox();
+    mModeling->getGVLE()->redrawModelClassBox();
     mSelectedModels.clear();
     mDrawing->queue_draw();
 }
@@ -236,8 +237,8 @@ void View::onPasteModel()
     //TODO
     mModeling->setModified(true);
     mModeling->paste(mCurrent, mCurrentClass);
-    mModeling->redrawModelTreeBox();
-    mModeling->redrawModelClassBox();
+    mModeling->getGVLE()->redrawModelTreeBox();
+    mModeling->getGVLE()->redrawModelClassBox();
     mDrawing->queue_draw();
 }
 

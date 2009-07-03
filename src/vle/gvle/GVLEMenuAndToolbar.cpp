@@ -81,13 +81,6 @@ const Glib::ustring GVLEMenuAndToolbar::UI_DEFINITION =
     "            <menuitem action='CreateProjectPackage' />"
     "        </menu>"
     "        <menu action='MenuView'>"
-    "            <menuitem action='RootTree' />"
-    "            <menuitem action='ClassModel' />"
-    "            <separator />"
-    "            <menuitem action='IconifyAllViews' />"
-    "            <menuitem action='DeiconifyAllViews' />"
-    "            <menuitem action='CloseAllViews' />"
-    "            <separator />"
     "            <menuitem action='Preferences' />"
     "        </menu>"
     "        <menu action='MenuSimulation'>"
@@ -403,26 +396,6 @@ void GVLEMenuAndToolbar::createViewActions()
 {
     m_refActionGroup->add(Gtk::Action::create("MenuView", _("_View")));
 
-    m_refActionGroup->add(
-	Gtk::Action::create("RootTree", _("Root Tree"),
-			    _("Configure the project")),
-	sigc::mem_fun(mParent, &GVLE::onShowModelTreeView));
-    m_refActionGroup->add(
-	Gtk::Action::create("ClassModel", _("Class Model"),
-			    _("Build the project")),
-	sigc::mem_fun(mParent, &GVLE::onShowModelClassView));
-    m_refActionGroup->add(
-	Gtk::Action::create("IconifyAllViews", _("Iconify All Views"),
-			    _("Create the project package")),
-	sigc::mem_fun(mParent, &GVLE::onIconifyAllViews));
-    m_refActionGroup->add(
-	Gtk::Action::create("DeiconifyAllViews", _("Deiconify All Views"),
-			    _("Build the project")),
-	sigc::mem_fun(mParent, &GVLE::onDeiconifyAllViews));
-    m_refActionGroup->add(
-	Gtk::Action::create("CloseAllViews", _("Close All Views"),
-			    _("Clean the project")),
-	sigc::mem_fun(mParent, &GVLE::onCloseAllViews));
     m_refActionGroup->add(
 	Gtk::Action::create("Preferences", Gtk::Stock::PREFERENCES,
 			    _("Preferences"), _("Create the project package")),

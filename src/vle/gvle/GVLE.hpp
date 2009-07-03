@@ -245,6 +245,22 @@ public:
     void redrawModelClassBox();
 
     /**
+     * active a row into TreeBox for a particular string, all activated row
+     * area hide.
+     *
+     * @param name model name to activate.
+     */
+    void showRowTreeBox(const std::string& name);
+
+    /**
+     * active a row into ModelClassBox for a particular string, all activated
+     * row area hide.
+     *
+     * @param name class name to activate.
+     */
+    void showRowModelClassBox(const std::string& name);
+
+    /**
      * return the ConditionBox
      * @return ConditionBox instance of ConditionBox
      */
@@ -606,35 +622,6 @@ public:
      * MENU SHOW
      *
      ********************************************************************/
-
-
-    /**
-     * When click on Show Model TreeView menu.
-     *
-     */
-    void onShowModelTreeView();
-
-
-    /**
-     * When click on Show deconnected models Treeview menu.
-     *
-     */
-    void onShowModelClassView();
-
-    /**
-     * @brief Delete all gvle::View from the gvle::Modeling object.
-     */
-    void onCloseAllViews();
-
-    /**
-     * @brief Iconify all gvle::View from the gvle::Modeling object.
-     */
-    void onIconifyAllViews();
-
-    /**
-     * @brief Deiconify all gvle::View from the gvle::Modeling object.
-     */
-    void onDeiconifyAllViews();
 
     /**
      * @brief Show the PreferencesBox

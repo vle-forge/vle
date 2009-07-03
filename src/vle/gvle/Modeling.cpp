@@ -68,12 +68,10 @@ Modeling::Modeling(GVLE* gvle, const string& filename) :
                 (fmt(_("Problem loading file %1%, empty structure.")) %
                  filename).str());
             mTop = newCoupledModel(0, "Top model", "", 0, 0);
-            //mTop->setParent(NULL);
             mVpz.project().model().setModel(mTop);
         } else if (mVpz.project().model().model()->isAtomic()) {
             graph::CoupledModel* t = newCoupledModel(0, "Top model", "", 0,
                                      0);
-            //t->setParent(NULL);
             t->addModel(mVpz.project().model().model());
             mVpz.project().model().setModel(t);
             mTop = t;
@@ -81,7 +79,6 @@ Modeling::Modeling(GVLE* gvle, const string& filename) :
         }
     } else {
         mTop = newCoupledModel(0, "Top model", "", 0, 0);
-        //mTop->setParent(NULL);
         mVpz.project().model().setModel(mTop);
         setTitles();
     }
@@ -217,59 +214,10 @@ vpz::AtomicModelList& Modeling::getAtomicModelClass(std::string className)
     }
 }
 
-
-/*
-  graph::CoupledModel* Modeling::getClassModel(const std::string& name)
-  {
-  graph::CoupledModel* result = 0;
-  ;
-  MapStringGCoupledModel::iterator it = mClassModel.find(name);
-  if (it != mClassModel.end()) {
-  result = (*it).second;
-  }
-  return result;
-  }
-
-  void Modeling::addClassModel(const std::string& name)
-  {
-  GCoupledModel* result = getClassModel(name);
-  if (result == NULL) {
-  result = new GCoupledModel(0, new graph::CoupledModel(NULL), 0, 0);
-  result->setName(name);
-  result->setDescription("class model");
-  mModelsNames.insert(name);
-  mClassModel[name] = result;
-  } else {
-  g_print("model %s existant\n", name.c_str());
-  }
-  }
-
-  void Modeling::delClassModel(const std::string& name)
-  {
-  MapStringGCoupledModel::iterator it = mClassModel.find(name);
-  if (it != mClassModel.end()) {
-  delete (*it).second;
-  mClassModel.erase(it);
-  }
-  }
-*/
-
 void Modeling::showDynamics(const std::string& /* name */)
 {
     Error(_("This function is not yet implemented"));
 }
-
-/*void Modeling::addView(const string& name)
-  {
-  graph::Model* model = 0;
-  model = mTop->findModel(name);
-  if (model == NULL) {
-  //model = getClassModel(name);
-  //std::cout << "find Model '"<<name<<"' non trouvé\n";
-  } else {
-  addView(model);
-  }
-  }*/
 
 void Modeling::addView(graph::Model* model)
 {
@@ -285,30 +233,6 @@ void Modeling::addView(graph::Model* model)
         } catch (utils::SaxParserError& E) {
             parse_model(mVpz.project().model().atomicModels());
         }
-
-        //graph::AtomicModel* m = (graph::AtomicModel*)(model);
-        /*Plugin* p = getPlugin(
-        mVpz.project().dynamics().get(model->getName()).model());
-        if (p) {
-        //            std::string structure(gui::Save::saveStructures(m->getModel()));
-        //            std::string dynamic(((GAtomicModel*)m)->getDynamic());
-        //
-        std::string structure("TODO");
-        std::string dynamic("TODO");
-
-        //          if (p->getNextXML(structure, dynamic)) {
-        //                ((graph::AtomicModel*)m)->setDynamic(dynamic);
-        //                ((graph::AtocmiModel*)m)->setPixBuf(p->getImage());
-        //                gui::Load::attachPortToStructure(m->getModel(), structure);
-        }
-        } else {
-        //AtomicModelBox* box = new AtomicModelBox(m);
-        //if (box->run() == Gtk::RESPONSE_OK) {
-        //box->adoptModification(this);
-        //}
-        //delete box;
-        }
-        */
     }
     refreshViews();
 }
@@ -316,27 +240,7 @@ void Modeling::addView(graph::Model* model)
 void Modeling::addView(graph::CoupledModel* model)
 {
     const size_t szView = mListView.size();
-    /*size_t firstEmpty = 0;
-    size_t foundedModel = 0;
 
-    for (size_t i = 0; i < szView; ++i) {
-      if (mListView[i] == 0) {
-    if (mListView[firstEmpty] != 0) {
-    firstEmpty = i;
-    }
-      } else {
-    if (mListView[i]->getGCoupledModel() == model) {
-    mListView[i]->selectedWindow();
-    return;
-    }
-      }
-    }
-    if (firstEmpty == 0 and mListView[firstEmpty] == 0) {
-      mListView[foundedModel] = new View(this, model, foundedModel);
-    } else {
-      mListView.push_back(new View(this, model, szView));
-    }
-    */
     View* search = findView(model);
     if (search != NULL) {
         search->selectedWindow();
@@ -428,26 +332,6 @@ void Modeling::delViews()
         delViewIndex(i);
 }
 
-void Modeling::iconifyViews()
-{
-    /*for (ListView::const_iterator it = mListView.begin();
-         it != mListView.end(); ++it) {
-        if (*it) {
-            (*it)->iconify();
-        }
-	}*/
-}
-
-void Modeling::deiconifyViews()
-{
-    /*for (ListView::const_iterator it = mListView.begin();
-         it != mListView.end(); ++it) {
-        if (*it) {
-            (*it)->deiconify();
-        }
-	}*/
-}
-
 void Modeling::refreshViews()
 {
     ListView::iterator it = mListView.begin();
@@ -458,48 +342,6 @@ void Modeling::refreshViews()
     }
 }
 
-/*
-  Modeling::SetString Modeling::getSimulationPlugin() const
-  {
-  std::set < std::string > modelNames;
-
-  //{
-  //Glib::Dir repertoire(utils::Path::path().getDefaultModelDir());
-  //Glib::DirIterator it = repertoire.begin();
-  //while (it != repertoire.end()) {
-  //if ((*it).find("-tr", 0) == std::string::npos) {
-  //std::string selected(*it);
-  //if (selected.rfind('.') != std::string::npos) {
-  //selected.assign(selected, 0, selected.rfind('.'));
-  //}
-  //if (selected.find("lib") == 0) {
-  //selected.assign(selected, 3, selected.size());
-  //}
-  //modelNames.insert(selected);
-  //}
-  //++it;
-  //}
-  //}
-  //{
-  //Glib::Dir repertoire(utils::Path::path().getUserModelDir());
-  //Glib::DirIterator it = repertoire.begin();
-  //while (it != repertoire.end()) {
-  //if ((*it).find("-tr", 0) == std::string::npos) {
-  //std::string selected(*it);
-  //if (selected.rfind('.') != std::string::npos) {
-  //selected.assign(selected, 0, selected.rfind('.'));
-  //}
-  //if (selected.find("lib") == 0) {
-  //selected.assign(selected, 3, selected.size());
-  //}
-  //modelNames.insert(selected);
-  //}
-  //++it;
-  //}
-  //}
-  return modelNames;
-  }*/
-
 void Modeling::EditCoupledModel(graph::CoupledModel* model)
 {
     assert(model);
@@ -509,86 +351,11 @@ void Modeling::EditCoupledModel(graph::CoupledModel* model)
 void Modeling::setTitles()
 {
     mGVLE->setTitle(mFileName);
-
-    /*for (ListView::iterator it = mListView.begin(); it != mListView.end(); ++it)
-    {
-        if (*it) {
-            (*it)->setTitle(mFileName);
-        }
-	}*/
 }
 
 void Modeling::setModifiedTitles()
 {
     mGVLE->setModifiedTitle(mFileName);
-
-    /*for (ListView::iterator it = mListView.begin(); it != mListView.end(); ++it)
-    {
-        if (*it) {
-            (*it)->setModifiedTitle();
-        }
-	}*/
-}
-
-void Modeling::redrawModelTreeBox()
-{
-    assert(mTop);
-    mGVLE->redrawModelTreeBox();
-}
-
-void Modeling::showModelTreeBox()
-{
-    //std::cout << "--- PARSE MODEL ----\n";
-    //parse_model( mVpz.project().model().atomicModels() );
-    //std::cout << "--------------------\n";
-    //mCutCopyPaste.state();
-    redrawModelTreeBox();
-}
-
-void Modeling::hideModelTreeBox()
-{
-    redrawModelTreeBox();
-}
-
-void Modeling::toggleModelTreeBox()
-{
-
-}
-
-void Modeling::showRowTreeBox(const std::string& name)
-{
-    mModelTreeBox->showRow(name);
-}
-
-
-void Modeling::redrawModelClassBox()
-{
-    mGVLE->redrawModelClassBox();
-}
-
-void Modeling::showModelClassBox()
-{
-    redrawModelClassBox();
-    mModelClassBox->show_all();
-}
-
-void Modeling::hideClassModelTreeBox()
-{
-    //mClassModelTreeBox->hide();
-}
-
-void Modeling::hideModelClassBox()
-{
-    redrawModelClassBox();
-}
-
-void Modeling::toggleModelClassBox()
-{
-}
-
-void Modeling::showRowModelClassBox(const std::string& name)
-{
-    mModelClassBox->showRow(name);
 }
 
 bool Modeling::exist(const std::string& name) const
@@ -626,16 +393,6 @@ void Modeling::paste(graph::CoupledModel* gc, std::string className)
     } else {
 	mCutCopyPaste.paste(gc, mVpz.project().classes().get(className).atomicModels());
     }
-    /*
-    std::cout << "Atomic List :\n";
-    const vpz::AtomicModelList& list = mVpz.project().model().atomicModels();
-    vpz::AtomicModelList::const_iterator it = list.begin();
-    while(it != list.end()) {
-    std::cout << "\t" << it->first->getName() << "\n";
-
-    ++it;
-    }
-    */
 }
 
 void Modeling::setModified(bool modified)
@@ -782,7 +539,7 @@ void Modeling::importModel(graph::CoupledModel* parent, vpz::Vpz* src)
 	    dynamics().add(src->project().dynamics());
 	    conditions().add(src->project().experiment().conditions());
 	    views().add(src->project().experiment().views());
-	    mModelTreeBox->parseModel(mTop);
+	    mGVLE->redrawModelTreeBox();
 	    setModified(true);
 	}
     }
@@ -809,7 +566,7 @@ void Modeling::importModelToClass(vpz::Vpz* src, std::string& className)
 	    dynamics().add(src->project().dynamics());
 	    conditions().add(src->project().experiment().conditions());
 	    views().add(src->project().experiment().views());
-	    mModelClassBox->parseClass();
+	    mGVLE->redrawModelClassBox();
 	    setModified(true);
 	}
     }
@@ -952,27 +709,7 @@ const Modeling::SetString& Modeling::getNames() const
 {
     return mModelsNames;
 }
-/*
-  vpz::Observable* Modeling::get_observables(graph::AtomicModel* atom){
-  assert(atom);
 
-  vpz::AtomicModel a = mVpz.project().model().atomicModels().get(atom);
-  if (a.observables() != "") {
-  vpz::Observable obs = observables().get(a.observables());
-
-  vpz::ObservableList list = observables().observablelist();
-  vpz::ObservableList::iterator it = list.begin();
-
-  while ( it != list.end() ) {
-  if ( it->first == a.observables() ) {
-  return &it->second;
-  }
-  it++;
-  }
-  }
-  return NULL;
-  }
-*/
 
 const vpz::Strings* Modeling::get_conditions(graph::AtomicModel* atom)
 {
@@ -1008,74 +745,6 @@ graph::AtomicModel* Modeling::newAtomicModel(graph::CoupledModel* parent,
     return 0;
 }
 
-graph::Model* Modeling::newPluginModel(graph::CoupledModel* /*parent*/,
-                                       const string& /*name*/,
-                                       const string& /*description*/,
-                                       int /*x*/, int /*y*/)
-{
-    throw utils::NotYetImplemented("Modeling::newPluginModel");
-    ////assert(parent);
-    //assert(not name.empty());
-    //assert(getPlugin());
-    //
-    //graph::Model* new_plugin = 0;
-    //
-    //try {
-    //std::string xmlstructure;
-    //std::string xmldynamics;
-    //
-    //vpz::Model mdl;
-    //vpz::Dynamics dyn;
-    //
-    //if (getPlugin()->getXML(xmlstructure, xmldynamics)) {
-    //
-    //{
-    //xmlpp::DomParser dom;
-    //dom.get_document()->create_root_node("STRUCTURES");
-    //utils::xml::import_children_nodes(
-    //dom.get_document()->get_root_node(), xmlstructure);
-    //xmlpp::Element* root = dom.get_document()->get_root_node();
-    //xmlpp::Element* model = utils::xml::get_children(root, "MODEL");
-    //assert(model);
-    //model->set_attribute("NAME", name);
-    //mdl.init(utils::xml::get_root_node(dom, "STRUCTURES"));
-    //}
-    //
-    //{
-    //xmlpp::DomParser dom;
-    //xmlpp::Element* root;
-    //root = dom.get_document()->create_root_node("DYNAMICS");
-    //root = root->add_child("MODELS");
-    //utils::xml::import_children_nodes(root, xmldynamics);
-    //xmlpp::Element* model = utils::xml::get_children(root, "MODEL");
-    //assert(model);
-    //model->set_attribute("NAME", name);
-    //dyn.init(utils::xml::get_root_node(dom, "DYNAMICS"));
-    //}
-    //
-    //if (mdl.modelRef()) {
-    //std::cerr << xmldynamics << std::endl;
-    //graph::Model* newmdl = mdl.model();
-    //newmdl->setPosition(x, y);
-    //newmdl->setName(name);
-    //newmdl->setDescription(description);
-    //parent->addModel(newmdl);
-    //
-    //mVpz.project().dynamics().addDynamics(dyn);
-    //// FIXME image
-    //redrawModelTreeBox();
-    //mModelsNames.insert(name);
-    //}
-    //}
-    //} catch(const std::exception& e) {
-    //gvle::Error((fmt(
-    //"Failed to build the new plugin '%1%':\n%2%") % name %
-    //e.what()).str());
-    //}
-    //
-    //return new_plugin;
-}
-
 void Modeling::renameModel(graph::Model* model,
                            const string& name,
                            const string& /* description */)
@@ -1088,7 +757,7 @@ void Modeling::renameModel(graph::Model* model,
     }
 
     mModelsNames.insert(name);
-    redrawModelTreeBox();
+    mGVLE->redrawModelTreeBox();
 }
 
 void Modeling::delModel(graph::Model* model, std::string className)

@@ -58,10 +58,6 @@ public:
 
     void redraw();
 
-    void setTitle(const Glib::ustring& name);
-
-    void setModifiedTitle();
-
     /**
      * Get current button type from GVLE GUI.
      *
@@ -321,7 +317,6 @@ private:
     size_t                      mIndex;
 
     ViewDrawingArea*            mDrawing;
-    ViewMenu*                   mMenuBar;
 
     graph::ModelList            mSelectedModels;
     graph::Model*               mDestinationModel;

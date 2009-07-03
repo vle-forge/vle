@@ -168,24 +168,6 @@ public:
     inline graph::Model* getClassModel(const std::string& name)
 	{ return mVpz.project().classes().get(name).model(); }
 
-
-    /**
-     * add a new empty class model into modeling ; if name already exist in
-     * class models, then class model is not add.
-     *
-     * @param name of class model to add.
-     */
-    //inline void addClassModel(const std::string& name)
-    //{ mVpz.project().classes().addClass(name, vpz::Class()); }
-
-    /**
-     * del class model from modeling ; instance class are not deleted.
-     *
-     * @param name of class model to delete.
-     */
-    //inline void delClassModel(const std::string& name)
-    //{ mVpz.project().classes().delClass(name); }
-
     /**
      * get the AtomicModelList associate to the class
      *
@@ -247,13 +229,6 @@ public:
      * @param name the name of GModel dynamics to show.
      */
     void showDynamics(const std::string& name);
-
-    /**
-     * add a view to the GCoupledModel who name is name.
-     *
-     * @param name the name of GCoupledModel to show in a new view.
-     */
-    //void addView(const std::string& name);
 
     /**
      * add a view to modeling for the GModel model.
@@ -318,15 +293,6 @@ public:
      */
     void delViews();
 
-    /**
-     * @brief Iconify all gvle::View attached.
-     */
-    void iconifyViews();
-
-    /**
-     * @brief Deiconify all gvle::View attached.
-     */
-    void deiconifyViews();
 
     void refreshViews();
 
@@ -360,14 +326,6 @@ public:
 	{ return mGVLE->getCurrentButton(); }
 
     /**
-     * get current plugin selected in GVLE panel.
-     *
-     * @return selected plugin name.
-     */
-    //inline std::string getCurrentPluginName() const
-    //{ return mGVLE->getCurrentPluginName(); }
-
-    /**
      * return a ptr to application GVLE.
      *
      * @return ptr to application GVLE.
@@ -376,140 +334,6 @@ public:
     { setModified(true); return mGVLE; }
 
 
-    /********************************************************************
-     *
-     * MANAGE MODELING PLUGIN
-     *
-     ********************************************************************/
-
-
-    /**
-     * return current plugin name.
-     *
-     * @return a string.
-     */
-    //inline const std::string& getPluginName() const
-    //{ return mGVLE->getCurrentPluginName(); }
-
-    /**
-     * return current plugin.
-     *
-     * @return a ptr to current plugin, otherwise NULL.
-     */
-    //inline Plugin* getPlugin()
-    //{ return mGVLE->getPlugin(mGVLE->getCurrentPluginName()); }
-
-    /**
-     * return a plugin for a formalism name.
-     *
-     * @param name a formalism name.
-     * @return a ptr to current plugin, otherwise NULL.
-     */
-    //inline Plugin* getPlugin(const std::string& name)
-    //{ return mGVLE->getPlugin(name); }
-
-    /**
-     * return a observer plugin for a observer name.
-     *
-     * @param name a observer name.
-     * @return a ptr to current plugin, otherwise NULL.
-     */
-    //inline ObserverPlugin* getObserverPlugin(const std::string& name)
-    //{ return mGVLE->getObserverPlugin(name); }
-
-    //inline const GVLE::MapObserverPlugin & getObserverPluginList() const
-    //{ return mGVLE->getObserverPluginList(); }
-
-
-    /********************************************************************
-     *
-     * MANAGE SIMULING PLUGIN
-     *
-     ********************************************************************/
-
-
-    /**
-     * return a list of all Simulation plugin in VLE system.
-     *
-     * @return a set of string represent list of all simulation plugin.
-     */
-    //SetString getSimulationPlugin() const;
-
-
-    /********************************************************************
-     *
-     * MODELTREEBOX
-     *
-     ********************************************************************/
-
-
-    /**
-     * need to redraw ModelTreeBox if exist.
-     */
-    void redrawModelTreeBox();
-
-    /**
-     * show ModelTreeBox window.
-     */
-    void showModelTreeBox();
-
-    /**
-     * hide ModelTreeBox window.
-     */
-    void hideModelTreeBox();
-
-    /**
-     * toggle show/hide ModelTreeBox window.
-     */
-    void toggleModelTreeBox();
-
-    /**
-     * active a row into TreeBox for a particular string, all activated row
-     * area hide.
-     *
-     * @param name model name to activate.
-     */
-    void showRowTreeBox(const std::string& name);
-
-
-    /********************************************************************
-     *
-     * CLASSMODELTREEBOX
-     *
-     *******************************************************************/
-
-    /**
-     * need to redraw ModelClassBox if exist.
-     */
-    void redrawModelClassBox();
-
-    /**
-     * show ModelClassBox window.
-     */
-    void showModelClassBox();
-
-    /**
-     * hide ModelClassBox window.
-     */
-    void hideModelClassBox();
-
-    /**
-     * hide ClassModelTreeBox window.
-     */
-    void hideClassModelTreeBox();
-
-    /**
-     * toggle show/hide ModelClassBox window.
-     */
-    void toggleModelClassBox();
-
-    /**
-     * active a row into ModelClassBox for a particular string, all activated
-     * row area hide.
-     *
-     * @param name class name to activate.
-     */
-    void showRowModelClassBox(const std::string& name);
 
     /********************************************************************
      *
@@ -991,11 +815,8 @@ private:
     std::string                 mCurrentClass;
     GVLE*                       mGVLE;
     ListView                    mListView;
-    ModelTreeBox*               mModelTreeBox;
-    //ClassModelTreeBox*          mClassModelTreeBox;
-    ModelClassBox*              mModelClassBox;
     CutCopyPaste                mCutCopyPaste;
-    bool                   mIsModified;
+    bool                        mIsModified;
     bool                        mIsSaved;
     bool                        mIsCompressed;
     std::string                 mFileName;
