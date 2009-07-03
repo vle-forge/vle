@@ -216,8 +216,7 @@ void ViewDrawingArea::drawCurrentModelPorts()
 
         // to draw the label of the port
 	if (mZoom >= 1.0) {
-	    mContext->move_to((mRectWidth - MODEL_PORT
-			       - MODEL_PORT_SPACING_LABEL - 15),
+	    mContext->move_to((mRectWidth),
 			      (stepOutput * (i + 1) + 10));
 	    mContext->show_text(itl->first);
 	    mContext->stroke();
