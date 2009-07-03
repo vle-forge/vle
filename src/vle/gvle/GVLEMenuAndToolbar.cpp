@@ -353,18 +353,18 @@ void GVLEMenuAndToolbar::createToolsActions()
     m_refActionGroup->add(
 	Gtk::RadioAction::create(toolsGroup, "AddCoupledTool",
 				 Gtk::Stock::LEAVE_FULLSCREEN, _("Add Coupled"),
-				 _("Add coupled models (F4)")),
+				 _("Add coupled models. (F4)")),
 	Gtk::AccelKey("F4"),
 	sigc::mem_fun(mParent, &GVLE::onAddCoupled));
     m_refActionGroup->add(
 	Gtk::RadioAction::create(toolsGroup, "DeleteTool", Gtk::Stock::DELETE,
-				 _("Delete"), _("Add connections between "
-						"models. (F3)")),
+				 _("Delete"), _("Delete models or connections. "
+						"(F5)")),
 	Gtk::AccelKey("F5"),
 	sigc::mem_fun(mParent, &GVLE::onDelete));
     m_refActionGroup->add(
 	Gtk::RadioAction::create(toolsGroup, "ZoomTool", Gtk::Stock::ZOOM_FIT,
-				 _("Zoom"), _("Delete models or connections")),
+				 _("Zoom"), _("Zoom. (F6)")),
 	Gtk::AccelKey("F6"),
 	sigc::mem_fun(mParent, &GVLE::onZoom));
     m_refActionGroup->add(
