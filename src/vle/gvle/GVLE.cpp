@@ -137,12 +137,18 @@ void DocumentText::init()
 	    std::stringstream filecontent;
 	    filecontent << file.rdbuf();
 	    file.close();
+	    Glib::ustring buffer_content = filecontent.str();
+	    if (not buffer_content.validate()) {
+		throw utils::FileError(_("This file isn't UTF-8 valid. Please"
+					 " convert this file with your source"
+					 " code editor."));
+	    }
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
 	    buffer->begin_not_undoable_action();
-	    buffer->insert(buffer->end(), filecontent.str());
+	    buffer->insert(buffer->end(), buffer_content);
 	    buffer->end_not_undoable_action();
 #else
-	    buffer->insert(buffer->end(), filecontent.str());
+	    buffer->insert(buffer->end(), buffer_content);
 #endif
 	} else {
 	    throw std::string("cannot open: " + filename());
@@ -951,6 +957,8 @@ void GVLE::openTab(const std::string& filepath)
 	    } else {
 		focusTab(filepath);
 	    }
+	} catch(utils::FileError& fe) {
+	    Error(fe.what());
 	} catch (std::exception& e) {
 	    mLog->get_buffer()->insert(
 		mLog->get_buffer()->end(), e.what());
