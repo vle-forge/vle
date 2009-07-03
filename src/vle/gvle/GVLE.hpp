@@ -289,6 +289,12 @@ public:
 	{ return mDocuments.find(name) != mDocuments.end(); }
 
     /**
+     * @brief check if a vpz tab is already opened
+     */
+    bool existVpzTab();
+
+
+    /**
      * @brief Modify the title of the tab
      *
      * @param title the new title

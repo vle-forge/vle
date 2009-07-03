@@ -371,10 +371,14 @@ void GVLE::FileTreeView::on_row_activated(
     std::string absolute_path =
 	Glib::build_filename(mPackage, Glib::build_filename(*lstpath));
     if (not isDirectory(absolute_path)) {
-	if (boost::filesystem::extension(absolute_path) == ".vpz"
-	    and not mParent->existTab(absolute_path))
-	    mParent->closeVpzTab();
-	mParent->openTab(absolute_path);
+	if (mParent->existTab(absolute_path)) {
+	    mParent->focusTab(absolute_path);
+	} else {
+	    if (boost::filesystem::extension(absolute_path) == ".vpz")
+		mParent->closeVpzTab();
+	    if (not mParent->existVpzTab())
+		mParent->openTab(absolute_path);
+	}
     }
     else {
 	if (not row_expanded(Gtk::TreePath(it)))
@@ -946,6 +950,7 @@ Gtk::HBox* GVLE::addLabel(const std::string& title,
 
 void GVLE::openTab(const std::string& filepath)
 {
+
     if(boost::filesystem::extension(filepath) != ".vpz") {
 	try {
 	    if (mDocuments.find(filepath) == mDocuments.end()) {
@@ -1044,15 +1049,30 @@ void GVLE::closeVpzTab()
     Documents::iterator it = mDocuments.begin();
     while (it != mDocuments.end()) {
 	if (boost::filesystem::extension(it->first) == ".vpz") {
-	    page = mNotebook->page_num(
-		*(dynamic_cast<DocumentDrawingArea*>(it->second)));
-	    mNotebook->remove_page(page);
-	    mDocuments.erase(it->first);
+	    if (not it->second->isModified() or
+            gvle::Question(_("The current tab is not saved\n"
+			     "Do you really want to close this file ?"))) {
+		page = mNotebook->page_num(
+		    *(dynamic_cast<DocumentDrawingArea*>(it->second)));
+		mNotebook->remove_page(page);
+		mDocuments.erase(it->first);
 
-	    mNotebook->set_current_page(--page);
+		mNotebook->set_current_page(--page);
+	    }
 	}
 	++it;
     }
+}
+
+bool GVLE::existVpzTab()
+{
+    Documents::iterator it = mDocuments.begin();
+    while (it != mDocuments.end()) {
+	if (boost::filesystem::extension(it->first) == ".vpz")
+	    return true;
+	++it;
+    }
+    return false;
 }
 
 void GVLE::closeAllTab()
