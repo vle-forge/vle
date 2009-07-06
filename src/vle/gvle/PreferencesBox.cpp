@@ -90,6 +90,9 @@ PreferencesBox::PreferencesBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m)
     xml->get_widget("CheckPreferencesSmartHomeEnd", mSmartHomeEnd);
     mSmartHomeEnd->signal_clicked().connect(
 	sigc::mem_fun(*this, &PreferencesBox::onSmartHomeEnd));
+    xml->get_widget("FontButtonPreferencesEditor", mFontEditor);
+    mFontEditor->signal_font_set().connect(
+	sigc::mem_fun(*this, &PreferencesBox::onEditorFontChange));
 
     // Action area
     xml->get_widget("ButtonPreferencesApply", mButtonApply);
@@ -149,6 +152,7 @@ void PreferencesBox::onCancel()
     mIndentOnTab->set_active(backupSettings.indentOnTab);
     mIndentSize->set_value(backupSettings.indentSize);
     mSmartHomeEnd->set_active(backupSettings.smartHomeEnd);
+    mFontEditor->set_font_name(backupSettings.fontEditor);
 
     mDialog->hide_all();
 }
@@ -257,6 +261,11 @@ void PreferencesBox::onSmartHomeEnd()
     currentSettings.smartHomeEnd = mSmartHomeEnd->get_active();
 }
 
+void PreferencesBox::onEditorFontChange()
+{
+    currentSettings.fontEditor = mFontEditor->get_font_name();
+}
+
 // private
 void PreferencesBox::init()
 {
@@ -336,6 +345,9 @@ void PreferencesBox::activate(const Settings& settings)
 
     mSmartHomeEnd->set_active(settings.smartHomeEnd);
     mModeling->setSmartHomeEnd(settings.smartHomeEnd);
+
+    mFontEditor->set_font_name(settings.fontEditor);
+    mModeling->setFontEditor(settings.fontEditor);
 }
 
 void PreferencesBox::copy(const Settings& src, Settings& dest)
@@ -360,6 +372,7 @@ void PreferencesBox::copy(const Settings& src, Settings& dest)
     dest.indentOnTab       = src.indentOnTab;
     dest.indentSize        = src.indentSize;
     dest.smartHomeEnd      = src.smartHomeEnd;
+    dest.fontEditor        = src.fontEditor;
 }
 
 
@@ -423,6 +436,9 @@ void PreferencesBox::saveSettings()
     prefs.setAttributes("gvle.editor",
 			"smartHomeEnd",
 			currentSettings.smartHomeEnd ? "1" : "0");
+    prefs.setAttributes("gvle.editor",
+			"fontEditor",
+			currentSettings.fontEditor);
     prefs.save();
 }
 
@@ -504,6 +520,9 @@ void PreferencesBox::loadSettings()
     currentSettings.smartHomeEnd =
 	(value.empty() ? mSmartHomeEnd->get_active()
 	 : boost::lexical_cast<bool>(value));
+    value = prefs.getAttributes("gvle.editor", "fontEditor");
+    currentSettings.fontEditor =
+	(value.empty() ? std::string(mFontEditor->get_font_name()) : value);
 
     copy(currentSettings, backupSettings);
 }

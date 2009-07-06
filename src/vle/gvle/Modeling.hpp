@@ -789,6 +789,12 @@ public:
     inline bool getSmartHomeEnd()
     { return mSmartHomeEnd; }
 
+    inline void setFontEditor(const std::string& font)
+    { mFontEditor = font; }
+
+    inline std::string& getFontEditor()
+    { return mFontEditor; }
+
     /********************************************************************
      *
      * MANAGE OUTPUT AND CONDITION PLUG-INS
@@ -848,6 +854,7 @@ private:
     bool mIndentOnTab;
     int  mIndentSize;
     bool mSmartHomeEnd;
+    std::string mFontEditor;
 
     Glib::RefPtr < Gnome::Glade::Xml >  mRefXML;
 

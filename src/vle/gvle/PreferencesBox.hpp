@@ -67,6 +67,7 @@ protected:
     void onIndentOnTab();
     void onIndentSizeChange();
     void onSmartHomeEnd();
+    void onEditorFontChange();
 
 private:
     /**
@@ -90,6 +91,7 @@ private:
 	bool indentOnTab;
 	int  indentSize;
 	bool smartHomeEnd;
+	std::string fontEditor;
     };
 
     //Class members
@@ -121,6 +123,7 @@ private:
     Gtk::CheckButton* mIndentOnTab;
     Gtk::SpinButton*  mIndentSize;
     Gtk::CheckButton* mSmartHomeEnd;
+    Gtk::FontButton*  mFontEditor;
 
     //Methods
     void init();

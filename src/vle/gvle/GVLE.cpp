@@ -193,6 +193,10 @@ void DocumentText::applyEditingProperties()
     mView.set_indent_width(modeling->getIndentSize());
     if (modeling->getSmartHomeEnd())
 	mView.set_smart_home_end(gtksourceview::SOURCE_SMART_HOME_END_ALWAYS);
+
+    Pango::FontDescription font = Pango::FontDescription(
+	modeling->getFontEditor());
+    mView.modify_font(font);
 }
 #endif
 

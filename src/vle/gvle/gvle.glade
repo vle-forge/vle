@@ -4217,6 +4217,30 @@ Geoffroy Weisenhorn &lt;geoffroy.weisenhorn@gmail.com&gt;</property>
                             <property name="x_padding">10</property>
                           </packing>
                         </child>
+                        <child>
+                          <widget class="GtkLabel" id="label1">
+                            <property name="visible">True</property>
+                            <property name="xalign">0</property>
+                            <property name="label" translatable="yes">&lt;b&gt;Font&lt;/b&gt;</property>
+                            <property name="use_markup">True</property>
+                          </widget>
+                          <packing>
+                            <property name="top_attach">13</property>
+                            <property name="bottom_attach">14</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="GtkFontButton" id="FontButtonPreferencesEditor">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">True</property>
+                          </widget>
+                          <packing>
+                            <property name="top_attach">14</property>
+                            <property name="bottom_attach">15</property>
+                            <property name="x_padding">10</property>
+                          </packing>
+                        </child>
                       </widget>
                     </child>
                   </widget>
