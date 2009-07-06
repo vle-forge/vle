@@ -25,12 +25,7 @@
 
 #include <vle/oov/plugins/cairo/gauge/CairoGauge.hpp>
 #include <vle/utils/Debug.hpp>
-#include <vle/utils/Tools.hpp>
-#include <vle/utils/XML.hpp>
 #include <vle/value/Double.hpp>
-#include <vle/value/Integer.hpp>
-#include <vle/value/String.hpp>
-#include <vle/value/XML.hpp>
 
 namespace vle { namespace oov { namespace plugin {
 
@@ -59,15 +54,15 @@ void CairoGauge::onParameter(const std::string& /* plugin */,
 {
     Assert < utils::InternalError >(m_ctx, _("Cairo gauge drawing error"));
 
-    xmlpp::DomParser parser;
+    if (parameters) {
+        if (not parameters->isMap()) {
+            throw utils::ArgError(
+                _("Gauge: initialization failed, bad parameters"));
+        }
+        value::Map* init = dynamic_cast < value::Map* >(parameters);
 
-    if (parameters and parameters->isXml()) {
-        parser.parse_memory(value::toXml(parameters));
-        xmlpp::Element* root = utils::xml::get_root_node(parser, "parameters");
-        xmlpp::Element * elt = utils::xml::get_children(root,"min");
-        mMin = utils::to_double(utils::xml::get_attribute(elt,"value").c_str());
-        xmlpp::Element * elt2 = utils::xml::get_children(root,"max");
-        mMax = utils::to_double(utils::xml::get_attribute(elt2,"value").c_str());
+	mMin = value::toDouble(init->get("min"));
+	mMax = value::toDouble(init->get("max"));
 
         delete parameters;
     }

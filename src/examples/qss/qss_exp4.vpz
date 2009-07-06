@@ -176,43 +176,73 @@
   </conditions>
   <views>
    <outputs>
-    <output name="o1" format="distant" plugin="cairoplot" location="localhost:8000:.">
-     <xml>
-					<![CDATA[
-            <parameters>
-	      <curves>
-		<curve name="x" type="real" color_red="0"
-		       color_green="65535" color_blue="0" />
-	      </curves>
-	      <window size="20" />
-	      <value min="0" max="5200" />
-	      <scrolling value="true" />
-	      <limits>
-		<limit value="2000" color_red="65535"
-		       color_green="0" color_blue="0" />
-	      </limits>
-	    </parameters>
-					]]>
-			</xml>
+    <output name="o1" format="distant" plugin="cairoplot"
+	    location="localhost:8000:.">
+      <map>
+	<key name="curves">
+	  <set>
+	    <map>
+	      <key name="name"><string>x</string></key>
+	      <key name="type"><string>real</string></key>
+	      <key name="color_red"><integer>0</integer></key>
+	      <key name="color_green"><integer>65535</integer></key>
+	      <key name="color_blue"><integer>0</integer></key>
+	    </map>
+	  </set>
+	</key>
+	<key name="window"><double>20</double></key>
+	<key name="scrolling"><boolean>true</boolean></key>
+	<key name="value">
+	  <map>
+	    <key name="min"><double>0</double></key>
+	    <key name="max"><double>5200</double></key>
+	  </map>
+	</key>
+	<key name="limits">
+	  <set>
+	    <map>
+	      <key name="value"><double>2000</double></key>
+	      <key name="color_red"><integer>65535</integer></key>
+	      <key name="color_green"><integer>0</integer></key>
+	      <key name="color_blue"><integer>0</integer></key>
+	    </map>
+	  </set>
+	</key>
+      </map>
     </output>
-    <output name="o2" format="distant" plugin="cairoplot" location="localhost:8001:.">
-     <xml>
-				<![CDATA[
-            <parameters>
-	      <curves>
-		<curve name="y" type="real" color_red="0"
-		       color_green="0" color_blue="65535" />
-	      </curves>
-	      <window size="20" />
-	      <value min="0" max="100" />
-	      <scrolling value="false" />
-	      <limits>
-		<limit value="100" color_red="65535"
-		       color_green="0" color_blue="0" />
-	      </limits>
-	    </parameters>
-					]]>
-				 </xml>
+    <output name="o2" format="distant" plugin="cairoplot"
+	    location="localhost:8001:.">
+      <map>
+	<key name="curves">
+	  <set>
+	    <map>
+	      <key name="name"><string>y</string></key>
+	      <key name="type"><string>real</string></key>
+	      <key name="color_red"><integer>0</integer></key>
+	      <key name="color_green"><integer>0</integer></key>
+	      <key name="color_blue"><integer>65535</integer></key>
+	    </map>
+	  </set>
+	</key>
+	<key name="window"><double>20</double></key>
+	<key name="scrolling"><boolean>true</boolean></key>
+	<key name="value">
+	  <map>
+	    <key name="min"><double>0</double></key>
+	    <key name="max"><double>100</double></key>
+	  </map>
+	</key>
+	<key name="limits">
+	  <set>
+	    <map>
+	      <key name="value"><double>100</double></key>
+	      <key name="color_red"><integer>65535</integer></key>
+	      <key name="color_green"><integer>0</integer></key>
+	      <key name="color_blue"><integer>0</integer></key>
+	    </map>
+	  </set>
+	</key>
+      </map>
     </output>
    </outputs>
    <observables>

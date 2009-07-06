@@ -52,21 +52,40 @@
   </conditions>
   <views>
    <outputs>
-    <output name="o" format="distant" plugin="cairocaview" location="localhost:8000:.">
-     <xml>
-<![CDATA[
-            <parameters>
-	      <size x="30" y="30" />
-	      <geometry type="square" />
-	      <cell name="cell" />
-	      <states type="boolean" name="state">
-		<state red_true="0" blue_true="65535" green_true="0" 
-		       red_false="65535" blue_false="65535" green_false="65535" />
-	      </states>
-	      <objects />
-	    </parameters>
-]]>
-				 </xml>
+    <output name="o" format="distant" plugin="cairocaview"
+	    location="localhost:8000:.">
+      <map>
+	<key name="size">
+	  <map>
+	    <key name="x"><integer>30</integer></key>
+	    <key name="y"><integer>30</integer></key>
+	  </map>
+	</key>
+	<key name="geometry">
+	  <map>
+	    <key name="type"><string>square</string></key>
+	  </map>
+	</key>
+	<key name="cellName"><string>cell</string></key>
+	<key name="states">
+	  <map>
+	    <key name="name"><string>state</string></key>
+	    <key name="type"><string>boolean</string></key>
+	    <key name="values">
+	      <set>
+		<map>
+		  <key name="red_false"><integer>65535</integer></key>
+		  <key name="green_false"><integer>65535</integer></key>
+		  <key name="blue_false"><integer>65535</integer></key>
+		  <key name="red_true"><integer>0</integer></key>
+		  <key name="green_true"><integer>65535</integer></key>
+		  <key name="blue_true"><integer>0</integer></key>
+		</map>
+	      </set>
+	    </key>
+	  </map>
+	</key>
+      </map>
     </output>
    </outputs>
    <observables>

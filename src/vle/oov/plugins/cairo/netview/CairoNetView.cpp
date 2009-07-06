@@ -25,15 +25,7 @@
 
 #include <vle/oov/plugins/cairo/netview/CairoNetView.hpp>
 #include <vle/utils/Debug.hpp>
-#include <vle/utils/Tools.hpp>
-#include <vle/utils/XML.hpp>
-#include <vle/value/Double.hpp>
-#include <vle/value/Integer.hpp>
-#include <vle/value/String.hpp>
-#include <vle/value/Set.hpp>
-#include <vle/value/XML.hpp>
-#include <iostream>
-
+#include <vle/value.hpp>
 
 namespace vle { namespace oov { namespace plugin {
 
@@ -44,13 +36,13 @@ CairoNetView::CairoNetView(const std::string& location) :
     mWindowHeight(605),
     mTime(-1.0),
     mReceiveCell(0),
-    m_G(0)
+    mGraph(0)
 {
 }
 
 CairoNetView::~CairoNetView()
 {
-    delete m_G;
+    delete mGraph;
 }
 
 void CairoNetView::onParameter(const std::string& /* plugin */,
@@ -61,65 +53,68 @@ void CairoNetView::onParameter(const std::string& /* plugin */,
 {
     m_display_node_names = false;
 
-    Assert < utils::InternalError >(m_ctx, _("Cairo caview drawing error"));
-    xmlpp::DomParser parser;
+    Assert < utils::InternalError >(m_ctx, _("Cairo netview drawing error"));
 
-    if (not parameters and not parameters->isXml()) {
-        throw utils::ArgError(
-            _("NetView: Initialization failed, bad parameters"));
-    }
+    if (parameters) {
+        if (not parameters->isMap()) {
+            throw utils::ArgError(
+                _("NetView: initialization failed, bad parameters"));
+        }
 
-    parser.parse_memory(value::toXml(parameters));
-    xmlpp::Element* root = utils::xml::get_root_node(parser, "parameters");
+        value::Map* init = dynamic_cast < value::Map* >(parameters);
 
-    xmlpp::Element *elt = utils::xml::get_children(root,"dimensions");
-    mMaxX = utils::to_double(utils::xml::get_attribute(elt,"x").c_str());
-    mMaxY = utils::to_double(utils::xml::get_attribute(elt,"y").c_str());
+	const value::Map& dimensions = toMapValue(init->get("dimensions"));
 
-    elt = utils::xml::get_children(root,"executive");
-    mExecutiveName = utils::xml::get_attribute(elt,"name");
+	mMaxX = toDouble(dimensions.get("x"));
+	mMaxY = toDouble(dimensions.get("y"));
 
-    elt = utils::xml::get_children(root, "nodes");
-    std::string node_names;
-    xmlpp::TextNode* tn;
-    if ("set" == utils::xml::get_attribute(elt,"type")) {
-        tn = elt->get_child_text();
-        node_names = tn->get_content();
-    } else {
-        node_names = utils::xml::get_attribute(elt,"prefix").c_str();
-    }
+	mExecutiveName = toString(init->get("executiveName"));
 
-    elt = utils::xml::get_children(root,"adjacency_matrix");
-    tn = elt->get_child_text();
-    std::string matrix = tn->get_content();
+	const value::Map& nodes = toMapValue(init->get("nodes"));
 
-    // create the graph
-    m_G = new Graph(node_names, matrix);
+	std::string node_names;
+	if (toString(nodes.get("type")) == "set") {
+	    node_names = toString(nodes.get("names"));
+	} else {
+	    node_names = toString(nodes.get("prefix"));
+	}
 
-    // set the positions
-    elt = utils::xml::get_children(root,"positions");
-    if ("set" == utils::xml::get_attribute(elt,"type")) {
-        xmlpp::TextNode* tn = elt->get_child_text();
-        m_G->set_positions(tn->get_content());
-    } else {
-        m_G->set_positions();
-        mMaxX = 300; // arbitrary dimensions to scale the graph
-        mMaxY = 300;
-    }
-    m_G->scale_positions(mWindowWidth / mMaxX, mWindowHeight / mMaxY);
+	std::string matrix = toString(init->get("adjacency_matrix"));
 
-    elt = utils::xml::get_children(root, "states");
-    if (utils::xml::exist_attribute(elt, "name"))
-        mStateName = utils::xml::get_attribute(elt, "name");
+	// create the graph
+	mGraph = new Graph(node_names, matrix);
 
-    std::string type = utils::xml::get_attribute(elt, "type");
-    xmlpp::Node::NodeList lst = elt->get_children("state");
-    mColors.build_color_list(type, lst);
+	// set the positions
+	const value::Map& positions = toMapValue(init->get("positions"));
 
-    if (utils::xml::exist_children(root, "display_names")) {
-        elt = utils::xml::get_children(root, "display_names");
-        if (utils::xml::get_attribute(elt,"activate") == "yes")
-            m_display_node_names = true;
+	if (toString(nodes.get("positions")) == "set") {
+	    mGraph->set_positions(toString(positions.get("values")));
+	} else {
+	    mGraph->set_positions();
+	    mMaxX = 300; // arbitrary dimensions to scale the graph
+	    mMaxY = 300;
+	}
+
+	mGraph->scale_positions(mWindowWidth / mMaxX, mWindowHeight / mMaxY);
+
+	const value::Map& states = toMapValue(init->get("states"));
+
+	if (states.existValue("name")) {
+	    mStateName = toString(states.get("name"));
+	}
+
+	std::string type = toString(states.get("type"));
+	const value::Set& values = toSetValue(states.get("values"));
+
+	mColors.build_color_list(type, values);
+
+	if (init->existValue("display_names")) {
+	    const value::Map& display_names =
+		toMapValue(init->get("display_names"));
+	    if (toString(display_names.get("activate")) == "yes") {
+		m_display_node_names = true;
+	    }
+	}
     }
 
     delete parameters;
@@ -164,7 +159,7 @@ void CairoNetView::onValue(const std::string& simulator,
             tokenizer::iterator val_it = values_tok.begin();
             for (tokenizer::iterator v_it = vertices_tok.begin();
                  v_it != vertices_tok.end(); ++v_it) {
-                m_G->add_node(*v_it);
+                mGraph->add_node(*v_it);
                 mValues[*v_it] = *val_it;
                 ++val_it;
             }
@@ -174,7 +169,7 @@ void CairoNetView::onValue(const std::string& simulator,
             while (it != edges_tok.end()) {
                 tokenizer::iterator it_origin = it;
                 ++it;
-                m_G->push_back_edge(*it_origin, *it);
+                mGraph->push_back_edge(*it_origin, *it);
                 ++it;
             }
 
@@ -183,21 +178,21 @@ void CairoNetView::onValue(const std::string& simulator,
 
             for (tokenizer::iterator it = vertices_tok.begin();
                  it != vertices_tok.end(); ++it) {
-                m_G->remove_node(*it);
+                mGraph->remove_node(*it);
                 mValues.erase(*it);
             }
         }
 
-        m_G->set_positions();
+        mGraph->set_positions();
         mMaxX = 300;
         mMaxY = 300;
-        m_G->scale_positions(mWindowWidth / mMaxX, mWindowHeight / mMaxY);
+        mGraph->scale_positions(mWindowWidth / mMaxX, mWindowHeight / mMaxY);
         draw();
         copy();
     } else { // receive a node value
         mValues[simulator] = value->writeToString();
         ++mReceiveCell;
-        if (mReceiveCell == m_G->num_nodes()) {
+        if (mReceiveCell == mGraph->num_nodes()) {
             draw();
             copy();
             mReceiveCell = 0;
@@ -208,8 +203,8 @@ void CairoNetView::onValue(const std::string& simulator,
 
 void CairoNetView::close(const double& /* time */)
 {
-    delete m_G;
-    m_G = 0;
+    delete mGraph;
+    mGraph = 0;
 }
 
 void CairoNetView::preferredSize(int& width, int& height)
@@ -225,7 +220,7 @@ void CairoNetView::onSize(int width, int height)
     mMaxY = mWindowHeight;
     mWindowWidth = width;
     mWindowHeight = height;
-    m_G->scale_positions(mWindowWidth / mMaxX, mWindowHeight / mMaxY);
+    mGraph->scale_positions(mWindowWidth / mMaxX, mWindowHeight / mMaxY);
 }
 
 
@@ -236,27 +231,27 @@ void CairoNetView::draw()
     m_ctx->set_source_rgb(0.74, 0.74, 0.74);
     m_ctx->fill();
 
-    int rayon = mWindowWidth / (3 * m_G->num_nodes());
+    int rayon = mWindowWidth / (3 * mGraph->num_nodes());
     if (rayon < 2) rayon = 2;
 
     double xx, yy;
     Graph::p_vertex_it pv_it;
-    for (pv_it = m_G->get_first_last_vertice_iterators();
+    for (pv_it = mGraph->get_first_last_vertice_iterators();
          pv_it.first != pv_it.second; ++pv_it.first) {
         Graph::p_adjacency_it pa_it;
-        for (pa_it = m_G->get_first_last_adjacent_iterators(pv_it.first);
+        for (pa_it = mGraph->get_first_last_adjacent_iterators(pv_it.first);
              pa_it.first != pa_it.second; ++pa_it.first){
             double Ax, Ay, Bx, By;
-            m_G->get_vertex_position(pv_it.first, Ax, Ay);
-            m_G->get_vertex_position(pa_it.first, Bx, By);
+            mGraph->get_vertex_position(pv_it.first, Ax, Ay);
+            mGraph->get_vertex_position(pa_it.first, Bx, By);
             draw_arrow(static_cast<int>(Ax), static_cast<int>(Ay),
                        static_cast<int>(Bx), static_cast<int>(By),
                        rayon);
         }
-        std::string node_name = m_G->get_vertex_name(pv_it.first);
+        std::string node_name = mGraph->get_vertex_name(pv_it.first);
         mColors.build_color(mValues[node_name]);
         m_ctx->set_source_rgb(mColors.r, mColors.g, mColors.b);
-        m_G->get_vertex_position(pv_it.first, xx ,yy);
+        mGraph->get_vertex_position(pv_it.first, xx ,yy);
         int x = static_cast<int>(xx);
         int y = static_cast<int>(yy);
         m_ctx->arc(x, y, rayon, 0, 2*M_PI);

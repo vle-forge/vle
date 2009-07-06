@@ -111,7 +111,7 @@ namespace vle { namespace oov { namespace plugin {
         typedef std::map<std::string, std::string> map_strings;
         map_strings mValues;
 
-        Graph *m_G;
+        Graph *mGraph;
     };
 
     DECLARE_OOV_PLUGIN(oov::plugin::CairoNetView)

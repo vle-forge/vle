@@ -25,7 +25,7 @@
 #ifndef VLE_OOV_PLUGINS_CAIRO_COLORS_HPP
 #define VLE_OOV_PLUGINS_CAIRO_COLORS_HPP
 
-#include <libxml++/libxml++.h>
+#include <vle/value.hpp>
 
 namespace vle { namespace oov { namespace plugin {
 
@@ -66,8 +66,8 @@ namespace vle { namespace oov { namespace plugin {
 
         void build_color(const std::string& value);
 
-        void build_color_list(const std::string &type, xmlpp::Node::NodeList&
-                              lst);
+        void build_color_list(const std::string &type,
+			      const value::Set& values);
 
         double r; double g; double b;
 

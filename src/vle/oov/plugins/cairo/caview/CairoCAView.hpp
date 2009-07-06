@@ -114,7 +114,7 @@ namespace vle { namespace oov { namespace plugin {
         virtual void onSize(int width, int height);
 
     private:
-        cairo_color build_color(const std::string & p_value);
+        cairo_color build_color(value::Value* p_value);
         void draw();
         void draw_hexa(Cairo::RefPtr < Cairo::Context > ctx, int x, int p_y);
         void draw_objects(Cairo::RefPtr < Cairo::Context > ctx);
@@ -153,7 +153,7 @@ namespace vle { namespace oov { namespace plugin {
         unsigned int mReceiveObject;
         unsigned int mObjectNumber;
 
-        typedef boost::multi_array < std::string, 2> array_type;
+        typedef boost::multi_array < value::Value*, 2> array_type;
         typedef array_type::index index;
         array_type* mValues;
 

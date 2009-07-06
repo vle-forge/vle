@@ -25,12 +25,8 @@
 
 #include <vle/oov/plugins/cairo/level/CairoLevel.hpp>
 #include <vle/utils/Debug.hpp>
-#include <vle/utils/Tools.hpp>
-#include <vle/utils/XML.hpp>
-#include <vle/value/Double.hpp>
-#include <vle/value/Integer.hpp>
-#include <vle/value/String.hpp>
-#include <vle/value/XML.hpp>
+#include <vle/value.hpp>
+#include <gdkmm/color.h>
 
 namespace vle { namespace oov { namespace plugin {
 
@@ -81,7 +77,7 @@ void CairoLevel::onValue(const std::string& simulator,
     m_time = time;
 
     std::string name(buildname(parent, simulator));
-    std::map < std::string,int >::iterator it = m_columns2.find(name);
+    std::map < std::string, int >::iterator it = m_columns2.find(name);
 
     if (it == m_columns2.end()) {
         throw utils::InternalError(fmt(
@@ -108,37 +104,35 @@ void CairoLevel::onParameter(const std::string& /* plugin */,
     m_minY = 1;
     m_maxY = 306;
 
-    if (parameters and parameters->isXml()) {
-        xmlpp::DomParser parser;
-        parser.parse_memory(value::toXml(parameters));
-
-	xmlpp::Element* root = utils::xml::get_root_node(parser, "parameters");
-
-        if (root) {
-	    xmlpp::Element* elt = utils::xml::get_children(root, "curves");
-	    xmlpp::Node::NodeList lst = elt->get_children("curve");
-	    xmlpp::Node::NodeList::iterator it = lst.begin();
-	    int i = 0;
-
-	    while (it != lst.end()) {
-		xmlpp::Element * elt2 = ( xmlpp::Element* )( *it );
-		std::string name = utils::xml::get_attribute(elt2,"name");
-
-//		m_colorList[name] = Gdk::Color(utils::xml::get_attribute(elt2,"color"));
-		m_minList[i] = utils::to_double(utils::xml::get_attribute(elt2,"min"));
-		m_maxList[i] = utils::to_double(utils::xml::get_attribute(elt2,"max"));
-		++it;
-		++i;
-	    }
-
-	    elt = utils::xml::get_children(root, "size");
-            using boost::lexical_cast;
-            using utils::xml::get_attribute;
-            m_minX = lexical_cast < int >(get_attribute(elt, "minx"));
-            m_maxX = lexical_cast < int >(get_attribute(elt, "maxx"));
-            m_minY = lexical_cast < int >(get_attribute(elt, "miny"));
-            m_maxY = lexical_cast < int >(get_attribute(elt, "maxy"));
+    if (parameters) {
+        if (not parameters->isMap()) {
+            throw utils::ArgError(
+                _("Level: initialization failed, bad parameters"));
         }
+        value::Map* init = dynamic_cast < value::Map* >(parameters);
+
+	const value::Set& curves = toSetValue(init->get("curves"));
+	int i = 0;
+
+	for(value::Set::const_iterator it = curves.begin();
+	    it != curves.end(); ++it, ++i) {
+	    value::Map* curve = toMapValue(*it);
+	    Gdk::Color color = Gdk::Color(toString(curve->get("color")));
+
+	    m_colorList[i][0] = color.get_red();
+	    m_colorList[i][1] = color.get_green();
+	    m_colorList[i][2] = color.get_blue();
+	    m_minList[i] = toDouble(curve->get("min"));
+	    m_maxList[i] = toDouble(curve->get("max"));
+	}
+
+	const value::Map& size = toMapValue(init->get("size"));
+
+	m_minX = toInteger(size.get("minx"));
+	m_maxX = toInteger(size.get("maxx"));
+	m_minY = toInteger(size.get("miny"));
+	m_maxY = toInteger(size.get("maxy"));
+
         delete parameters;
     }
 

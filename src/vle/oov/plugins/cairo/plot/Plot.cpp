@@ -25,12 +25,7 @@
 
 #include <vle/oov/plugins/cairo/plot/Plot.hpp>
 #include <vle/utils/Debug.hpp>
-#include <vle/utils/Tools.hpp>
-#include <vle/utils/XML.hpp>
-#include <vle/value/Double.hpp>
-#include <vle/value/Integer.hpp>
-#include <vle/value/String.hpp>
-#include <vle/value/XML.hpp>
+#include <vle/value.hpp>
 
 namespace vle { namespace oov { namespace plugin {
 
@@ -92,7 +87,7 @@ void Plot::onValue(const std::string& simulator,
 
     if (it == mColumns2.end()) {
         throw utils::InternalError(fmt(
-            _("Plot: columns '%1%' does not exist")) % name);
+                _("Plot: columns '%1%' does not exist")) % name);
     }
 
     if (value->isDouble()) {
@@ -106,101 +101,101 @@ void Plot::onValue(const std::string& simulator,
     mReceive++;
 
     if (mReceive == mColumns.size()) {
-	mReceive = 0;
-	mParameter.inc_max_draw_index();
+        mReceive = 0;
+        mParameter.inc_max_draw_index();
 
-	m_it_dble = mRealCurveList.begin();
-	m_it_int = mIntCurveList.begin();
+        m_it_dble = mRealCurveList.begin();
+        m_it_int = mIntCurveList.begin();
 
-	{
-	    int v_int;
-	    std::list < IntCurve * >::const_iterator it_int_show;
-	    for (it_int_show = mShowIntCurveList.begin();
-		 it_int_show != mShowIntCurveList.end(); ++it_int_show) {
-		v_int = (*it_int_show)->get_value(mParameter.get_max_draw_index()-1);
-		if (mParameter.is_smaller(v_int))
-		    mParameter.set_min_value(v_int);
-		if (mParameter.is_higher(v_int))
-		    mParameter.set_max_value(v_int);
-	    }
+        {
+            int v_int;
+            std::list < IntCurve * >::const_iterator it_int_show;
+            for (it_int_show = mShowIntCurveList.begin();
+                 it_int_show != mShowIntCurveList.end(); ++it_int_show) {
+                v_int = (*it_int_show)->get_value(mParameter.get_max_draw_index()-1);
+                if (mParameter.is_smaller(v_int))
+                    mParameter.set_min_value(v_int);
+                if (mParameter.is_higher(v_int))
+                    mParameter.set_max_value(v_int);
+            }
 
-	    double v_dble;
-	    std::list < RealCurve * >::const_iterator it_dble_show;
-	    for (it_dble_show = mShowRealCurveList.begin();
-		 it_dble_show != mShowRealCurveList.end(); ++it_dble_show) {
-		v_dble = (*it_dble_show)->get_value(mParameter.get_max_draw_index()-1);
-		if (mParameter.is_smaller(v_dble))
-		    mParameter.set_min_value(v_dble);
-		if (mParameter.is_higher(v_dble))
-		    mParameter.set_max_value(v_dble);
-	    }
-	}
+            double v_dble;
+            std::list < RealCurve * >::const_iterator it_dble_show;
+            for (it_dble_show = mShowRealCurveList.begin();
+                 it_dble_show != mShowRealCurveList.end(); ++it_dble_show) {
+                v_dble = (*it_dble_show)->get_value(mParameter.get_max_draw_index()-1);
+                if (mParameter.is_smaller(v_dble))
+                    mParameter.set_min_value(v_dble);
+                if (mParameter.is_higher(v_dble))
+                    mParameter.set_max_value(v_dble);
+            }
+        }
 
-	//recalcul la valeur de la 1ere date affichée
-	if ((mTime - mParameter.get_min_draw_date()) >=
-	    mParameter.get_number_drawn_date()) {
-	    if (mParameter.get_scrolling())
-		mParameter.set_min_draw_date(
-		    mTime - mParameter.get_number_drawn_date());
-	    else {
-		mParameter.set_min_draw_date(mTime);
-		calcul_new_min_max_no_scroll = true;
-	    }
-	}
+        //recalcul la valeur de la 1ere date affichée
+        if ((mTime - mParameter.get_min_draw_date()) >=
+            mParameter.get_number_drawn_date()) {
+            if (mParameter.get_scrolling())
+                mParameter.set_min_draw_date(
+                    mTime - mParameter.get_number_drawn_date());
+            else {
+                mParameter.set_min_draw_date(mTime);
+                calcul_new_min_max_no_scroll = true;
+            }
+        }
 
-	mParameter.set_max_draw_date(mTime);
+        mParameter.set_max_draw_date(mTime);
 
-	//recalcul l'index de la 1ere valeur affichée
-	double min_draw_date;
+        //recalcul l'index de la 1ere valeur affichée
+        double min_draw_date;
         double min_date_curve;
-	int min_index = mParameter.get_min_draw_index();
+        int min_index = mParameter.get_min_draw_index();
 
-	if (!mRealCurveList.empty()) {
-	    std::vector < RealCurve * >::iterator it_dble = mRealCurveList.begin();
-	    min_draw_date = mParameter.get_min_draw_date();
-	    while( (*it_dble)->get_date(min_index) < min_draw_date) {
-		min_index++;
-		nb_check_min_max++;
-	    }
-	    min_date_curve = (*it_dble)->get_date(min_index);
-	} else if (!mIntCurveList.empty()) {
-	    std::vector < IntCurve * > :: iterator it_int = mIntCurveList.begin();
-	    min_draw_date = mParameter.get_min_draw_date();
-	    while( (*it_int)->get_date(min_index) < min_draw_date) {
-		min_index++;
-		nb_check_min_max++;
-	    }
-	    min_date_curve = (*it_int)->get_date(min_index);
-	}
-	mParameter.set_min_draw_index(min_index);
+        if (!mRealCurveList.empty()) {
+            std::vector < RealCurve * >::iterator it_dble = mRealCurveList.begin();
+            min_draw_date = mParameter.get_min_draw_date();
+            while( (*it_dble)->get_date(min_index) < min_draw_date) {
+                min_index++;
+                nb_check_min_max++;
+            }
+            min_date_curve = (*it_dble)->get_date(min_index);
+        } else if (!mIntCurveList.empty()) {
+            std::vector < IntCurve * > :: iterator it_int = mIntCurveList.begin();
+            min_draw_date = mParameter.get_min_draw_date();
+            while( (*it_int)->get_date(min_index) < min_draw_date) {
+                min_index++;
+                nb_check_min_max++;
+            }
+            min_date_curve = (*it_int)->get_date(min_index);
+        }
+        mParameter.set_min_draw_index(min_index);
 
-	// verifie si l'on ne doit pas mettre a jour les valeur max et min
-	// verifie que les n valeur passé (a cause du scroll) n'etait pas soit
-	// la plus haute soit la moins haute
-	if (calcul_new_min_max_no_scroll) {
-	    // comme on efface tout on recalcule le min & max
-	    // par rapport a la dernière valeur de chaque courbe
-	    mParameter.set_min_value(getMinValueN(nb_check_min_max));
-	    mParameter.set_max_value(getMaxValueN(nb_check_min_max));
-	} else {
-	    // on verifie que les n valeur passé a cause du scroll
-	    // n'etaient pas les valeurs min et/ou max
-	    double min, max;
+        // verifie si l'on ne doit pas mettre a jour les valeur max et min
+        // verifie que les n valeur passé (a cause du scroll) n'etait pas soit
+        // la plus haute soit la moins haute
+        if (calcul_new_min_max_no_scroll) {
+            // comme on efface tout on recalcule le min & max
+            // par rapport a la dernière valeur de chaque courbe
+            mParameter.set_min_value(getMinValueN(nb_check_min_max));
+            mParameter.set_max_value(getMaxValueN(nb_check_min_max));
+        } else {
+            // on verifie que les n valeur passé a cause du scroll
+            // n'etaient pas les valeurs min et/ou max
+            double min, max;
 
-	    min = getMinValueN(nb_check_min_max);
-	    max = getMaxValueN(nb_check_min_max);
+            min = getMinValueN(nb_check_min_max);
+            max = getMaxValueN(nb_check_min_max);
 
-	    // on doit mettre a jour la valeur minimal
-	    if (min == mParameter.get_min_back_value()) {
-		updateMinValueDrawn();
-	    }
-	    // on doit mettre a jour la valeur maximal
-	    if (max == mParameter.get_max_back_value()) {
-		updateMaxValueDrawn();
-	    }
-	}
-	updateStepHeight();
-	draw();
+            // on doit mettre a jour la valeur minimal
+            if (min == mParameter.get_min_back_value()) {
+                updateMinValueDrawn();
+            }
+            // on doit mettre a jour la valeur maximal
+            if (max == mParameter.get_max_back_value()) {
+                updateMaxValueDrawn();
+            }
+        }
+        updateStepHeight();
+        draw();
         copy();
     }
 }
@@ -223,81 +218,78 @@ void Plot::onParameter(const std::string& /* plugin */,
     mParameter.set_text_height((int)(mExtents.height * 5));
     updateStepHeight();
 
-    if (parameters and parameters->isXml()) {
-        xmlpp::DomParser parser;
+    if (parameters) {
+        if (not parameters->isMap()) {
+            throw utils::ArgError(
+                _("Level: initialization failed, bad parameters"));
+        }
+        value::Map* init = dynamic_cast < value::Map* >(parameters);
 
-        parser.parse_memory(value::toXml(parameters));
-	xmlpp::Element* root = utils::xml::get_root_node(parser, "parameters");
-	IntCurve *ic;
-	RealCurve *rc;
+        const value::Set& curves = toSetValue(init->get("curves"));
 
-	if (utils::xml::exist_children(root,"curves")) {
-	    xmlpp::Element* elt = utils::xml::get_children(root,"curves");
-	    xmlpp::Node::NodeList lst = elt->get_children("curve");
-	    xmlpp::Node::NodeList::iterator it = lst.begin();
+        IntCurve* ic = 0;
+        RealCurve* rc = 0;
 
-	    while (it != lst.end()) {
-		xmlpp::Element * elt2 = ( xmlpp::Element* )( *it );
-		std::string v_type = utils::xml::get_attribute(elt2,"type");
+        for(value::Set::const_iterator it = curves.begin();
+            it != curves.end(); ++it) {
+            value::Map* curve = toMapValue(*it);
+            std::string type = toString(curve->get("type"));
 
-		if (v_type == "real") {
-		    rc = new RealCurve(utils::xml::get_attribute(elt2,"name"),
-				       utils::to_int(utils::xml::get_attribute(elt2,"color_red")),
-				       utils::to_int(utils::xml::get_attribute(elt2,"color_green")),
-				       utils::to_int(utils::xml::get_attribute(elt2,"color_blue")));
-		    mRealCurveList.push_back(rc);
-		    mShowRealCurveList.push_back(rc);
-		} else if (v_type == "integer") {
-		    ic = new IntCurve(utils::xml::get_attribute(elt2,"name"),
-				      utils::to_int(utils::xml::get_attribute(elt2,"color_red")),
-				      utils::to_int(utils::xml::get_attribute(elt2,"color_green")),
-				      utils::to_int(utils::xml::get_attribute(elt2,"color_blue")));
-		    mIntCurveList.push_back(ic);
-		    mShowIntCurveList.push_back(ic);
-		}
-		++it;
-	    }
-	}
+            if (type == "real") {
+                rc = new RealCurve(toString(curve->get("name")),
+                                   toInteger(curve->get("color_red")),
+                                   toInteger(curve->get("color_green")),
+                                   toInteger(curve->get("color_blue")));
+                mRealCurveList.push_back(rc);
+                mShowRealCurveList.push_back(rc);
+            } else if (type == "integer") {
+                ic = new IntCurve(toString(curve->get("name")),
+                                  toInteger(curve->get("color_red")),
+                                  toInteger(curve->get("color_green")),
+                                  toInteger(curve->get("color_blue")));
+                mIntCurveList.push_back(ic);
+                mShowIntCurveList.push_back(ic);
+            }
+        }
 
-	if (utils::xml::exist_children(root, "window")) {
-	    xmlpp::Element* elt = utils::xml::get_children(root, "window");
-	    mParameter.set_min_draw_date(0.0f);
-	    mParameter.set_max_draw_date(utils::to_double(utils::xml::get_attribute(elt, "size")));
-	    mParameter.set_number_drawn_date((int)mParameter.get_max_draw_date());
-	}
+        if (init->existValue("window")) {
+            double windowSize = toDouble(init->get("window"));
 
-	if (utils::xml::exist_children(root, "value")) {
-	    xmlpp::Element* elt = utils::xml::get_children(root, "value");
-	    if (utils::xml::exist_attribute(elt, "min"))
-		mParameter.set_min_value(utils::to_double(utils::xml::get_attribute(elt, "min")),
-					 true);
-	    if (utils::xml::exist_attribute(elt, "max"))
-		mParameter.set_max_value(utils::to_double(utils::xml::get_attribute(elt, "max")),
-					 true);
-	}
+            mParameter.set_min_draw_date(0.0f);
+            mParameter.set_max_draw_date(windowSize);
+            mParameter.set_number_drawn_date(
+                (int)mParameter.get_max_draw_date());
+        }
 
-	if (utils::xml::exist_children(root, "scrolling")) {
-	    xmlpp::Element* elt = utils::xml::get_children(root,"scrolling");
-	    mParameter.set_scrolling(utils::to_boolean(utils::xml::get_attribute(elt,"value")));
-	}
+        if (init->existValue("value")) {
+            const value::Map& value = toMapValue(init->get("value"));
 
-	if (utils::xml::exist_children(root, "limits")) {
-	    xmlpp::Element* elt = utils::xml::get_children(root, "limits");
-	    xmlpp::Node::NodeList lst = elt->get_children("limit");
-	    xmlpp::Node::NodeList::iterator it = lst.begin();
+            if (value.existValue("min")) {
+                mParameter.set_min_value(toDouble(value.get("min")));
+            }
+            if (value.existValue("max")) {
+                mParameter.set_max_value(toDouble(value.get("max")));
+            }
+        }
 
-	    double valueLimit;
-	    while (it != lst.end()) {
-		xmlpp::Element * elt2 = ( xmlpp::Element* )( *it );
+        if (init->existValue("scrolling")) {
+            mParameter.set_scrolling(toBoolean(init->get("scrolling")));
+        }
 
-		valueLimit = utils::to_double(utils::xml::get_attribute(elt2,"value"));
-		mLimitList.push_back(new Limit(valueLimit,
-					       utils::to_int(utils::xml::get_attribute(elt2,"color_red")),
-					       utils::to_int(utils::xml::get_attribute(elt2,"color_green")),
-					       utils::to_int(utils::xml::get_attribute(elt2,"color_blue"))));
-		++it;
-	    }
-	}
+        if (init->existValue("limits")) {
+            const value::Set& limits = toSetValue(init->get("limits"));
+
+            for(value::Set::const_iterator it = limits.begin();
+                it != limits.end(); ++it) {
+                value::Map* limit = toMapValue(*it);
+
+                mLimitList.push_back(
+                    new Limit(toDouble(limit->get("value")),
+                              toInteger(limit->get("color_red")),
+                              toInteger(limit->get("color_green")),
+                              toInteger(limit->get("color_blue"))));
+            }
+        }
 
         delete parameters;
     }
@@ -362,14 +354,14 @@ void Plot::drawVerticalStep(Cairo::RefPtr < Cairo::Context > m_ctx)
     while(date <= m_lastDate) {
         v_x = mParameter.to_pixel_width(date);
 
-	m_ctx->begin_new_path();
-	m_ctx->move_to(v_x, m_minY);
-	m_ctx->line_to(v_x, m_maxY);
-	m_ctx->close_path();
-	m_ctx->stroke();
+        m_ctx->begin_new_path();
+        m_ctx->move_to(v_x, m_minY);
+        m_ctx->line_to(v_x, m_maxY);
+        m_ctx->close_path();
+        m_ctx->stroke();
 
-	m_ctx->move_to(v_x +1, m_minY);
-	m_ctx->show_text(utils::to_string(date));
+        m_ctx->move_to(v_x +1, m_minY);
+        m_ctx->show_text(utils::to_string(date));
 
         date += m_stepX;
     }
@@ -390,14 +382,14 @@ void Plot::drawHorizontalStep(Cairo::RefPtr < Cairo::Context > m_ctx)
     y = y_bottom;
 
     while(value_show <= max_value_show) {
-	m_ctx->set_source_rgb(0., 0., 0.);
-	m_ctx->move_to(x_left, y);
-	m_ctx->line_to(x_right, y);
-	m_ctx->set_line_width(1);
+        m_ctx->set_source_rgb(0., 0., 0.);
+        m_ctx->move_to(x_left, y);
+        m_ctx->line_to(x_right, y);
+        m_ctx->set_line_width(1);
 
-	m_ctx->move_to(0, y - 1);
-	m_ctx->show_text(utils::to_string(value_show));
-	m_ctx->stroke();
+        m_ctx->move_to(0, y - 1);
+        m_ctx->show_text(utils::to_string(value_show));
+        m_ctx->stroke();
 
         y -= mParameter.get_text_height();
         value_show += mStepHeight;
@@ -446,37 +438,37 @@ void Plot::drawLimits(Cairo::RefPtr < Cairo::Context > m_ctx)
     x_right = mParameter.get_shift_left() + mParameter.get_graph_zone_width();
 
     for (std::list < Limit * >::const_iterator it = mLimitList.begin();
-	 it != mLimitList.end(); ++it) {
+         it != mLimitList.end(); ++it) {
         if (mParameter.is_inside_min_max((*it)->get_value())) {
 
             y_limit = mParameter.to_pixel_height((*it)->get_value());
-	    m_ctx->get_text_extents(utils::to_string((*it)->get_value()), mExtents);
+            m_ctx->get_text_extents(utils::to_string((*it)->get_value()), mExtents);
 
-	    m_ctx->set_source_rgba(1, 1, 0, 0.5);
-	    m_ctx->begin_new_path();
-	    m_ctx->move_to(x_left + 2, y_limit - 2);
-	    m_ctx->rel_line_to(0, -mExtents.height - 4);
-	    m_ctx->rel_line_to(mExtents.width + 4, 0);
-	    m_ctx->rel_line_to(0, mExtents.height + 4);
-	    m_ctx->rel_line_to(-mExtents.width - 4, 0);
-	    m_ctx->close_path();
-	    m_ctx->fill();
-	    m_ctx->stroke();
+            m_ctx->set_source_rgba(1, 1, 0, 0.5);
+            m_ctx->begin_new_path();
+            m_ctx->move_to(x_left + 2, y_limit - 2);
+            m_ctx->rel_line_to(0, -mExtents.height - 4);
+            m_ctx->rel_line_to(mExtents.width + 4, 0);
+            m_ctx->rel_line_to(0, mExtents.height + 4);
+            m_ctx->rel_line_to(-mExtents.width - 4, 0);
+            m_ctx->close_path();
+            m_ctx->fill();
+            m_ctx->stroke();
 
-	    m_ctx->set_source_rgba(0., 0., 0., 1.);
-	    m_ctx->move_to(x_left + 4, y_limit - 4);
-	    m_ctx->show_text(utils::to_string((*it)->get_value()));
+            m_ctx->set_source_rgba(0., 0., 0., 1.);
+            m_ctx->move_to(x_left + 4, y_limit - 4);
+            m_ctx->show_text(utils::to_string((*it)->get_value()));
 
-	    m_ctx->set_source_rgba((*it)->get_red_color()/65535.,
-				 (*it)->get_green_color()/65535.,
-				 (*it)->get_blue_color()/65535.,
-				 0.5);
-	    m_ctx->set_line_width(1);
-	    m_ctx->begin_new_path();
-	    m_ctx->move_to(x_left, y_limit);
-	    m_ctx->line_to(x_right, y_limit);
-	    m_ctx->close_path();
-	    m_ctx->stroke();
+            m_ctx->set_source_rgba((*it)->get_red_color()/65535.,
+                                   (*it)->get_green_color()/65535.,
+                                   (*it)->get_blue_color()/65535.,
+                                   0.5);
+            m_ctx->set_line_width(1);
+            m_ctx->begin_new_path();
+            m_ctx->move_to(x_left, y_limit);
+            m_ctx->line_to(x_right, y_limit);
+            m_ctx->close_path();
+            m_ctx->stroke();
         }
     }
 }
@@ -644,7 +636,7 @@ double Plot::getMinValueN(int nb_check_value)
 void Plot::updateStepHeight()
 {
     mStepHeight = (5. * mExtents.height) * (mParameter.get_max_value() - mParameter.get_min_value())
-	/ mParameter.get_graph_zone_height();
+        / mParameter.get_graph_zone_height();
 }
 
 }}} // namespace vle oov plugin

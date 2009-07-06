@@ -23,8 +23,7 @@
  */
 
 #include <vle/oov/plugins/cairo/netview/Colors.hpp>
-#include <vle/utils/Tools.hpp>
-#include <vle/utils/XML.hpp>
+#include <boost/lexical_cast.hpp>
 #include <cmath>
 
 namespace vle { namespace oov { namespace plugin {
@@ -33,13 +32,13 @@ void cairo_color::build_color(const std::string & value)
 {
     switch (mType) {
     case INTEGER: {
-        r = mColorList[utils::to_int(value)].r / 65535.;
-        g = mColorList[utils::to_int(value)].g / 65535.;
-        b = mColorList[utils::to_int(value)].b / 65535.;
+        r = mColorList[boost::lexical_cast < int >(value)].r / 65535.;
+        g = mColorList[boost::lexical_cast < int >(value)].g / 65535.;
+        b = mColorList[boost::lexical_cast < int >(value)].b / 65535.;
         break;
     }
     case REAL: {
-        double v_value = utils::to_double(value);
+        double v_value = boost::lexical_cast < double >(value);
         std::list < RealColor >::iterator it = mRealColorList.begin();
         bool v_found = false;
 
@@ -109,89 +108,72 @@ void cairo_color::build_color(const std::string & value)
 }
 
 void cairo_color::build_color_list(const std::string &type,
-                                   xmlpp::Node::NodeList &lst)
+				   const value::Set& values)
 {
-    if (type == "integer")
-        mType = INTEGER;
-    else if (type == "real")
+    if (type == "integer") {
+	mType = INTEGER;
+    } else if (type == "real") {
         mType = REAL;
-    else if (type == "boolean")
+    } else if (type == "boolean") {
         mType = BOOLEAN;
-
-    xmlpp::Node::NodeList::iterator it = lst.begin();
+    }
 
     switch (mType) {
     case INTEGER: {
-        while (it != lst.end()) {
-            xmlpp::Element * v_valueNode = (xmlpp::Element*)(*it);
-            int v_value(utils::to_int(utils::xml::get_attribute(
-                        v_valueNode, "value")));
-            int red = utils::to_int(utils::xml::get_attribute(
-                    v_valueNode, "red"));
-            int green = utils::to_int(utils::xml::get_attribute(
-                    v_valueNode, "green"));
-            int blue = utils::to_int(utils::xml::get_attribute(
-                    v_valueNode, "blue"));
-            mColorList[v_value] = color(red, green, blue);
-            ++it;
-        }
+	for(value::Set::const_iterator it = values.begin();
+	    it != values.end(); ++it) {
+	    value::Map* value = toMapValue(*it);
+
+	    mColorList[toInteger(value->get("value"))] =
+		color(toInteger(value->get("red")),
+		      toInteger(value->get("green")),
+		      toInteger(value->get("blue")));
+	}
         break;
     }
     case REAL: {
-        while (it != lst.end()) {
-            xmlpp::Element * v_valueNode = (xmlpp::Element*)(*it);
-            double v_minValue =
-                utils::to_double(
-                    utils::xml::get_attribute(v_valueNode, "min"));
-            double v_maxValue =
-                utils::to_double(
-                    utils::xml::get_attribute(v_valueNode, "max"));
-            std::string v_color =
-                utils::xml::get_attribute(v_valueNode, "color");
-            RealColor::color_type v_type = RealColor::LINEAR;
-            double v_coef = 0.;
+	for(value::Set::const_iterator it = values.begin();
+	    it != values.end(); ++it) {
+	    value::Map* value = toMapValue(*it);
 
-            if (utils::xml::get_attribute(
-                    v_valueNode, "type") == "linear")
-                v_type = RealColor::LINEAR;
-            if (utils::xml::get_attribute(
-                    v_valueNode, "type") == "highvalue")
-                v_type = RealColor::HIGHVALUE;
-            if (utils::xml::get_attribute(
-                    v_valueNode, "type") == "lowvalue")
-                v_type = RealColor::LOWVALUE;
-            if (v_type == RealColor::HIGHVALUE or
-                v_type == RealColor::LOWVALUE)
-                v_coef = utils::to_double(
-                    utils::xml::get_attribute(v_valueNode, "coef"));
+	    double v_minValue = toDouble(value->get("min"));
+	    double v_maxValue = toDouble(value->get("max"));
+	    std::string v_color = toString(value->get("color"));
+	    RealColor::color_type v_type = RealColor::LINEAR;
+	    double v_coef = 0.;
 
-            mRealColorList.push_back( RealColor(
-                    v_minValue, v_maxValue, v_color, v_type, v_coef));
-            ++it;
-        }
+	    if (toString(value->get("type")) == "linear") {
+		v_type = RealColor::LINEAR;
+	    } else if (toString(value->get("type")) == "highvalue") {
+		v_type = RealColor::HIGHVALUE;
+	    } else if (toString(value->get("type")) == "lowvalue") {
+		v_type = RealColor::LOWVALUE;
+	    }
+	    if (v_type == RealColor::HIGHVALUE or
+		v_type == RealColor::LOWVALUE) {
+		v_coef = toDouble(value->get("coef"));
+
+		mRealColorList.push_back(
+		    RealColor(v_minValue, v_maxValue, v_color,
+			      v_type, v_coef));
+	    }
+	}
         break;
     }
     case BOOLEAN: {
-        while (it != lst.end()) {
-            xmlpp::Element * v_valueNode = (xmlpp::Element*)(*it);
-            int red_true = utils::to_int(
-                utils::xml::get_attribute(v_valueNode, "red_true"));
-            int green_true = utils::to_int(
-                utils::xml::get_attribute(v_valueNode, "green_true"));
-            int blue_true = utils::to_int(
-                utils::xml::get_attribute(v_valueNode, "blue_true"));
-            int red_false = utils::to_int(
-                utils::xml::get_attribute(v_valueNode, "red_false"));
-            int green_false = utils::to_int(
-                utils::xml::get_attribute(v_valueNode,
-                                          "green_false"));
-            int blue_false = utils::to_int(
-                utils::xml::get_attribute(v_valueNode, "blue_false"));
+	for(value::Set::const_iterator it = values.begin();
+	    it != values.end(); ++it) {
+	    value::Map* value = toMapValue(*it);
 
-            mColorList[0] = color(red_false, green_false, blue_false);
-            mColorList[1] = color(red_true, green_true, blue_true);
-            ++it;
-        }
+	    mColorList[0] =
+		color(toInteger(value->get("red_false")),
+		      toInteger(value->get("green_false")),
+		      toInteger(value->get("blue_false")));
+	    mColorList[1] =
+		color(toInteger(value->get("red_true")),
+		      toInteger(value->get("green_true")),
+		      toInteger(value->get("blue_true")));
+	}
         break;
     }
     }
