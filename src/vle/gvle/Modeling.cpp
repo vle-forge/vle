@@ -25,6 +25,7 @@
 
 #include <vle/gvle/AtomicModelBox.hpp>
 #include <vle/gvle/Modeling.hpp>
+#include <vle/gvle/Editor.hpp>
 #include <vle/gvle/GVLE.hpp>
 #include <vle/gvle/View.hpp>
 #include <vle/gvle/AtomicModelBox.hpp>
@@ -247,7 +248,7 @@ void Modeling::addView(graph::CoupledModel* model)
     } else {
         mListView.push_back(new View(this, model, szView));
     }
-    mGVLE->openTabVpz(mFileName, model);
+    mGVLE->getEditor()->openTabVpz(mFileName, model);
 }
 
 void Modeling::addViewClass(graph::Model* model, std::string name)
@@ -280,7 +281,7 @@ void Modeling::addViewClass(graph::CoupledModel* model, std::string name)
 	v->setCurrentClass(name);
         mListView.push_back(v);
     }
-    mGVLE->openTabVpz(mFileName, model);
+    mGVLE->getEditor()->openTabVpz(mFileName, model);
 }
 
 bool Modeling::existView(graph::CoupledModel* model)

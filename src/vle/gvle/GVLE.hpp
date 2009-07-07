@@ -55,131 +55,15 @@
 #include <list>
 #include <map>
 
-#ifdef VLE_HAVE_GTKSOURCEVIEWMM
-#include <gtksourceviewmm-2.0/gtksourceviewmm.h>
-#endif
-
 namespace vle
 {
 namespace gvle {
 
-class GVLE;
+class Editor;
 class GVLEMenuAndToolbar;
 class Modeling;
 class PreferencesBox;
 class PackageBrowserWindow;
-
-/**
- * @brief Document class used within Gtk::Notebook
- */
-class Document : public Gtk::ScrolledWindow {
-public:
-
-    Document(GVLE* gvle, const std::string& filepath);
-
-    virtual ~Document();
-
-    virtual inline bool isDrawingArea()
-	{ return false; }
-
-    inline std::string filename()
-	{ return mFileName; }
-
-    inline const std::string filepath() const
-	{ return mFilePath; }
-
-    inline void setFilePath(std::string filepath)
-	{ mFilePath = filepath; }
-
-    inline bool isModified()
-	{ return mModified; }
-
-    inline void setModified(bool modified)
-	{ mModified = modified; }
-
-    inline std::string getTitle()
-	{ return mTitle; }
-
-    void setTitle(std::string title, graph::Model* model,
-		  bool modified);
-
-    virtual void undo() = 0;
-    virtual void redo() = 0;
-
-protected:
-    GVLE*          mGVLE;
-    bool           mModified;
-    std::string    mTitle;
-
-private:
-    std::string    mFilePath;
-    std::string    mFileName;
-};
-
-class DocumentText : public Document {
-public:
-    DocumentText(GVLE* gvle, const std::string& filePath, bool newfile = false);
-    ~DocumentText();
-
-    void save();
-    void saveAs(const std::string& filename);
-
-    inline bool isNew() const
-    { return mNew == true; }
-
-    void undo();
-    void redo();
-
-private:
-#ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    gtksourceview::SourceView mView;
-#else
-    Gtk::TextView  mView;
-#endif
-    bool           mModified;
-    bool           mNew;
-
-    void init();
-    bool event(GdkEvent* event);
-    std::string getIdLanguage();
-
-#ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    void applyEditingProperties();
-#endif
-};
-
-class DocumentDrawingArea : public Document {
-public:
-    DocumentDrawingArea(GVLE* gvle, const std::string& filePath,
-			View* view, graph::Model* model);
-    ~DocumentDrawingArea();
-
-     inline View* getView() const
-	{ return mView; }
-
-    inline ViewDrawingArea* getDrawingArea() const
-	{ return mArea; }
-
-    inline graph::Model* getModel() const
-	{ return mModel; }
-
-    virtual inline bool isDrawingArea() const
-	{ return true; }
-
-    void setHadjustment(double h);
-    void setVadjustment(double v);
-
-    void undo();
-    void redo();
-
-private:
-    View*               mView;
-    ViewDrawingArea*    mArea;
-    graph::Model*       mModel;
-    Gtk::Viewport*      mViewport;
-    Gtk::Adjustment     mAdjustWidth;
-    Gtk::Adjustment     mAdjustHeight;
-};
 
 /**
  * @brief GVLE is a Gtk::Window use to build the main window with all button
@@ -192,7 +76,6 @@ public:
     typedef std::multimap < std::string, std::string > MapObserverCategory;
     typedef std::map < std::string, Plugin * > MapPlugin;
     typedef std::map < std::string, ObserverPlugin * > MapObserverPlugin;
-    typedef std::map < std::string, Document* > Documents;
 
     /** list off all available buttons. */
     enum ButtonType { POINTER, ADDMODEL, ADDLINK, ADDCOUPLED, DELETE, ZOOM,
@@ -232,6 +115,11 @@ public:
     void show();
 
     /**
+     * @brief Append an asterisk to the Gtk::Window's title with an asterick.
+     */
+    void setModifiedTitle(const std::string& name);
+
+    /**
      * Assign a file to the window
      *
      * @param name the file name
@@ -239,10 +127,22 @@ public:
     void setFileName(std::string name);
 
     /**
+     * @brief Insert text into Log area
+     * @param text Text to insert into the log area
+     */
+    void insertLog(const std::string& text);
+
+    /**
      * Redraw the TreeViews
      */
     void redrawModelTreeBox();
     void redrawModelClassBox();
+
+    /**
+     * Clear the TreeViews
+     */
+    void clearModelTreeBox();
+    void clearModelClassBox();
 
     /**
      * active a row into TreeBox for a particular string, all activated row
@@ -289,52 +189,32 @@ public:
     inline Modeling* getModeling()
     { return m_modeling; }
 
-    /* methodes to manage tabs */
-    void focusTab(const std::string& filepath);
-    void openTab(const std::string& filepath);
-    void openTabVpz(const std::string& filepath, graph::CoupledModel* model);
-    void closeTab(const std::string& filepath);
-    void closeVpzTab();
-    void closeAllTab();
-    void changeTab(GtkNotebookPage* page, int num);
-
     /**
-     * @brief check if the tab is already openend
+     * @brief return the MenuAndToolbar instance
+     * @return MenuAndToolbar instance
      */
-    inline bool existTab(const std::string& name)
-	{ return mDocuments.find(name) != mDocuments.end(); }
-
-    /**
-     * @brief check if a vpz tab is already opened
-     */
-    bool existVpzTab();
+    inline GVLEMenuAndToolbar* getMenu()
+	{ return mMenuAndToolbar; }
 
 
     /**
-     * @brief Modify the title of the tab
-     *
-     * @param title the new title
-     * @param filepath the key in the document map
-     *
+     * @brief return the Editor
+     * @return Editor instance
      */
-    void setModifiedTab(const std::string title, const std::string filepath);
-
-    /**
-     * @brief add a label for a new tab
-     *
-     * @param title the title of the label
-     * @param filepath the tab's key on the map mDocuments
-     *
-     * @return a pointeur of the new label
-     */
-    Gtk::HBox* addLabel(const std::string& title,
-			const std::string& filepath);
+    inline Editor* getEditor()
+    { return mEditor; }
 
     /**
      * To update the adjustment.
      */
     void updateAdjustment(double h, double v);
 
+
+    void setCurrentView(View* view)
+    { mCurrentView = view; }
+
+    void setCurrentTab(int n)
+    { mCurrentTab = n; }
 
     /**
      * @brief Tree model columns used in FileTreeView
@@ -568,21 +448,13 @@ public:
      *
      ********************************************************************/
 
-    /** Perform undo operation */
-    void onUndo();
-
-    /** Perform redo operation */
-    void onRedo();
-
     /** Cut selected model list into CutCopyPaste. */
     void onCutModel();
 
     /** Copy selected model list into CutCopyPaste. */
     void onCopyModel();
 
-    /**
-     * Paste selected model list from CutCopyPaste into this GCoupledModel.
-     */
+    /** Paste selected model list from CutCopyPaste into this GCoupledModel.  */
     void onPasteModel();
 
     /********************************************************************
@@ -739,11 +611,6 @@ public:
      */
     void setTitle(const Glib::ustring& name);
 
-    /**
-     * @brief Append an asterisk to the Gtk::Window's title with an asterick.
-     */
-    void setModifiedTitle(const std::string& name);
-
 private:
     Glib::RefPtr < Gnome::Glade::Xml >  mRefXML;
 
@@ -753,15 +620,19 @@ private:
     Gtk::Statusbar                  m_status;
     Gtk::TextView*                  mLog;
     Gtk::Statusbar*                 mStatusbar;
-    Gtk::Notebook*                  mNotebook;
+    Editor*                         mEditor;
     FileTreeView*                   mFileTreeView;
 
     /* class members */
     Modeling*                       m_modeling;
     ButtonType                      m_currentButton;
-    Documents                       mDocuments;
     std::string                     mPackage;
     View*                           mCurrentView;
+    int                             mCurrentTab;
+    /* File chooser */
+    Glib::ustring                   mGlobalVpzPrevDirPath; /* the previous
+                                    directory where a vpz was chosen
+                                    in global mode */
 
     /* Dialog boxes */
     ConditionsBox*                  mConditionsBox;
@@ -775,12 +646,8 @@ private:
     HelpBox*                        m_helpbox;
     ModelTreeBox*                   mModelTreeBox;
     ModelClassBox*                  mModelClassBox;
-    int                             mCurrentTab;
 
-    /* File chooser */
-    Glib::ustring                   mGlobalVpzPrevDirPath; /* the previous
-                                    directory where a vpz was chosen
-                                    in global mode */
+
 };
 
 std::string valuetype_to_string(value::Value::type type);

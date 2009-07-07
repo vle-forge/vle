@@ -26,6 +26,7 @@
 #include <vle/gvle/GVLE.hpp>
 #include <vle/gvle/About.hpp>
 #include <vle/gvle/Message.hpp>
+#include <vle/gvle/Editor.hpp>
 #include <vle/gvle/ExecutionBox.hpp>
 #include <vle/gvle/ExperimentBox.hpp>
 #include <vle/gvle/Modeling.hpp>
@@ -50,237 +51,6 @@
 #include <gtkmm/stock.h>
 
 namespace vle { namespace gvle {
-
-Document::Document(GVLE* gvle, const std::string& filepath) :
-    Gtk::ScrolledWindow(),
-    mGVLE(gvle)
-{
-    mModified = false;
-    mFilePath = filepath;
-    mFileName = boost::filesystem::basename(filepath);
-}
-
-Document::~Document()
-{
-}
-
-void Document::setTitle(std::string title, graph::Model* model,
-			bool modified)
-{
-    if (boost::filesystem::extension(title) == ".vpz") {
-	mTitle = boost::filesystem::basename(title) +
-	    boost::filesystem::extension(title) + " - " +
-	    model->getName();
-	if (modified) {
-	    mTitle = "* " + mTitle;
-	    mModified = true;
-	} else {
-	    mModified = false;
-	}
-	mGVLE->setModifiedTab(mTitle, mFilePath);
-    }
-}
-
-DocumentText::DocumentText(GVLE* gvle,
-			   const std::string& filepath, bool newfile) :
-    Document(gvle, filepath),
-    mNew(newfile)
-{
-    mTitle = filename() + boost::filesystem::extension(filepath);
-#ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    gtksourceview::init();
-#endif
-    init();
-    signal_event().connect(
-	sigc::mem_fun(this, &DocumentText::event));
-}
-
-DocumentText::~DocumentText()
-{
-}
-
-void DocumentText::save()
-{
-    try {
-	std::ofstream file(filepath().c_str());
-	file << mView.get_buffer()->get_text();
-	file.close();
-	mNew = mModified = false;
-	mTitle = filename() + boost::filesystem::extension(filepath());
-	mGVLE->setModifiedTab(mTitle, filepath());
-    } catch(std::exception& e) {
-	throw _("Error while saving file.");
-    }
-}
-
-void DocumentText::saveAs(const std::string& filename)
-{
-    setFilePath(filename);
-    save();
-}
-
-void DocumentText::init()
-{
-#ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    Glib::RefPtr<gtksourceview::SourceLanguageManager> manager
-	= gtksourceview::SourceLanguageManager::create();
-    Glib::RefPtr<gtksourceview::SourceLanguage> language =
-	manager->get_language(getIdLanguage());
-    Glib::RefPtr<gtksourceview::SourceBuffer> buffer =
-	gtksourceview::SourceBuffer::create(language);
-#else
-    Glib::RefPtr<Gtk::TextBuffer> buffer = mView.get_buffer();
-#endif
-    if (not mNew) {
-	std::ifstream file(filepath().c_str());
-	if (file) {
-	    std::stringstream filecontent;
-	    filecontent << file.rdbuf();
-	    file.close();
-	    Glib::ustring buffer_content = filecontent.str();
-	    if (not buffer_content.validate()) {
-		throw utils::FileError(_("This file isn't UTF-8 valid. Please"
-					 " convert this file with your source"
-					 " code editor."));
-	    }
-#ifdef VLE_HAVE_GTKSOURCEVIEWMM
-	    buffer->begin_not_undoable_action();
-	    buffer->insert(buffer->end(), buffer_content);
-	    buffer->end_not_undoable_action();
-#else
-	    buffer->insert(buffer->end(), buffer_content);
-#endif
-	} else {
-	    throw std::string("cannot open: " + filename());
-	}
-    }
-#ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    mView.set_source_buffer(buffer);
-    applyEditingProperties();
-#endif
-    add(mView);
-}
-
-std::string DocumentText::getIdLanguage()
-{
-    std::string ext(boost::filesystem::extension(filepath()));
-    std::string idLang;
-
-    if ((ext == ".cpp") or (ext == ".hpp") or (ext == ".cc"))
-	idLang = "cpp";
-    else if (ext == ".py")
-	idLang = "python";
-    else
-	idLang = "cmake";
-
-    return idLang;
-}
-
-#ifdef VLE_HAVE_GTKSOURCEVIEWMM
-void DocumentText::applyEditingProperties()
-{
-    Modeling* modeling = mGVLE->getModeling();
-
-    mView.get_source_buffer()->
-	set_highlight_syntax(modeling->getHighlightSyntax());
-    mView.get_source_buffer()->
-	set_highlight_matching_brackets(modeling->getHighlightBrackets());
-    mView.set_highlight_current_line(modeling->getHighlightLine());
-    mView.set_show_line_numbers(modeling->getLineNumbers());
-    mView.set_show_right_margin(modeling->getRightMargin());
-    mView.set_auto_indent(modeling->getAutoIndent());
-    mView.set_indent_on_tab(modeling->getIndentOnTab());
-    mView.set_indent_width(modeling->getIndentSize());
-    if (modeling->getSmartHomeEnd())
-	mView.set_smart_home_end(gtksourceview::SOURCE_SMART_HOME_END_ALWAYS);
-
-    Pango::FontDescription font = Pango::FontDescription(
-	modeling->getFontEditor());
-    mView.modify_font(font);
-}
-#endif
-
-void DocumentText::undo()
-{
-#ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    mView.get_source_buffer()->undo();
-#endif
-}
-
-void DocumentText::redo()
-{
-#ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    mView.get_source_buffer()->redo();
-#endif
-}
-
-bool DocumentText::event(GdkEvent* event)
-{
-    if (event->type == GDK_KEY_RELEASE
-	and event->key.state != GDK_CONTROL_MASK
-	and mModified == false) {
-	mModified = true;
-	mTitle = "* "+ mTitle;
-	mGVLE->setModifiedTab(mTitle, filepath());
-	return true;
-
-    }
-    return false;
-}
-
-DocumentDrawingArea::DocumentDrawingArea(GVLE* gvle,
-					 const std::string& filepath,
-					 View* view, graph::Model* model) :
-    Document(gvle, filepath),
-    mView(view),
-    mModel(model),
-    mAdjustWidth(0,0,1),
-    mAdjustHeight(0,0,1)
-{
-    mTitle = filename() + boost::filesystem::extension(filepath)
-	+ " - " + model->getName();
-    mArea = new ViewDrawingArea(mView);
-    mViewport = new Gtk::Viewport(mAdjustWidth, mAdjustHeight);
-    mTitle = filename() + boost::filesystem::extension(filepath)
-	+ " - " + model->getName();
-
-    mViewport->add(*mArea);
-    mViewport->set_shadow_type(Gtk::SHADOW_NONE);
-    mViewport->set_border_width(0);
-    set_policy(Gtk::POLICY_ALWAYS, Gtk::POLICY_ALWAYS);
-    set_flags(Gtk::CAN_FOCUS);
-    add(*mViewport);
-    set_shadow_type(Gtk::SHADOW_NONE);
-    set_border_width(0);
-}
-
-DocumentDrawingArea::~DocumentDrawingArea()
-{
-    delete mModel;
-    delete mArea;
-}
-
-void DocumentDrawingArea::setHadjustment(double h)
-{
-    mViewport->get_hadjustment()->set_lower(h);
-    mViewport->get_hadjustment()->set_value(h);
-}
-
-void DocumentDrawingArea::setVadjustment(double v)
-{
-    mViewport->get_vadjustment()->set_lower(v);
-    mViewport->get_vadjustment()->set_value(v);
-}
-
-void DocumentDrawingArea::undo()
-{
-    //TODO
-}
-
-void DocumentDrawingArea::redo()
-{
-    //TODO
-}
 
 GVLE::FileTreeView::FileTreeView(
     BaseObjectType* cobject,
@@ -381,15 +151,15 @@ void GVLE::FileTreeView::on_row_activated(
     std::string absolute_path =
 	Glib::build_filename(mPackage, Glib::build_filename(*lstpath));
     if (not isDirectory(absolute_path)) {
-	if (mParent->existTab(absolute_path)) {
-	    mParent->focusTab(absolute_path);
+	if (mParent->getEditor()->existTab(absolute_path)) {
+	    mParent->getEditor()->focusTab(absolute_path);
 	} else {
 	    if (boost::filesystem::extension(absolute_path) == ".vpz") {
-		mParent->closeVpzTab();
-		if (not mParent->existVpzTab())
-		    mParent->openTab(absolute_path);
+		mParent->getEditor()->closeVpzTab();
+		if (not mParent->getEditor()->existVpzTab())
+		    mParent->getEditor()->openTab(absolute_path);
 	    } else {
-		mParent->openTab(absolute_path);
+		mParent->getEditor()->openTab(absolute_path);
 	    }
 	}
     }
@@ -419,7 +189,6 @@ GVLE::GVLE(BaseObjectType* cobject,
     Gtk::Window(cobject),
     m_modeling(new Modeling(this)),
     m_currentButton(POINTER),
-    mCurrentView(0),
     m_helpbox(0)
 {
     mRefXML = xml;
@@ -440,7 +209,8 @@ GVLE::GVLE(BaseObjectType* cobject,
     mRefXML->get_widget("TextViewLogPackageBrowser", mLog);
     mRefXML->get_widget_derived("FileTreeViewPackageBrowser", mFileTreeView);
     mFileTreeView->setParent(this);
-    mRefXML->get_widget("NotebookPackageBrowser", mNotebook);
+    mRefXML->get_widget_derived("NotebookPackageBrowser", mEditor);
+    mEditor->setParent(this);
     mRefXML->get_widget_derived("TreeViewModel", mModelTreeBox);
     mModelTreeBox->setModeling(m_modeling);
     mRefXML->get_widget_derived("TreeViewClass", mModelClassBox);
@@ -450,9 +220,6 @@ GVLE::GVLE(BaseObjectType* cobject,
     mMenuAndToolbarVbox->pack_start(*mMenuAndToolbar->getMenuBar());
     mMenuAndToolbarVbox->pack_start(*mMenuAndToolbar->getToolbar());
     mMenuAndToolbar->getToolbar()->set_toolbar_style(Gtk::TOOLBAR_BOTH);
-
-    mNotebook->signal_switch_page().connect(
-	sigc::mem_fun(this, &GVLE::changeTab));
 
     m_modeling->setModified(false);
     resize(900, 550);
@@ -478,6 +245,22 @@ void GVLE::show()
     show_all();
 }
 
+void GVLE::setModifiedTitle(const std::string& name)
+{
+    Glib::ustring current("* ");
+    current += get_title();
+    set_title(current);
+    if (not name.empty() and
+	boost::filesystem::extension(name) == ".vpz") {
+	Editor::Documents::iterator it =
+	    mEditor->getDocumentsList().find(name);
+	if (it != mEditor->getDocumentsList().end())
+	    it->second->setTitle(name,
+				 getModeling()->getTopModel(),
+				 true);
+    }
+}
+
 void GVLE::buildPackageHierarchy()
 {
     mModelTreeBox->clear();
@@ -500,6 +283,12 @@ void GVLE::setFileName(std::string name)
     m_modeling->setModified(false);
 }
 
+void GVLE::insertLog(const std::string& text)
+{
+    mLog->get_buffer()->insert(
+	mLog->get_buffer()->end(), text);
+}
+
 void GVLE::redrawModelTreeBox()
 {
     assert(m_modeling->getTopModel());
@@ -509,6 +298,16 @@ void GVLE::redrawModelTreeBox()
 void GVLE::redrawModelClassBox()
 {
     mModelClassBox->parseClass();
+}
+
+void GVLE::clearModelTreeBox()
+{
+    mModelTreeBox->clear();
+}
+
+void GVLE::clearModelClassBox()
+{
+    mModelClassBox->clear();
 }
 
 void GVLE::showRowTreeBox(const std::string& name)
@@ -574,16 +373,7 @@ void GVLE::onQuestion()
 
 void GVLE::newFile()
 {
-    try {
-	DocumentText* doc = new DocumentText(this, _("untitled file"), true);
-	mDocuments.insert(
-	    std::make_pair < std::string, DocumentText* >(_("untitled file"), doc));
-	mNotebook->append_page(*doc, *(addLabel(doc->filename(),
-						_("untitled file"))));
-    } catch (std::exception& e) {
-	std::cout << e.what() << std::endl;
-    }
-    show_all_children();
+    mEditor->createBlankNewFile();
 }
 
 void GVLE::onMenuNew()
@@ -614,12 +404,12 @@ void GVLE::openFile()
 
     if (file.run() == Gtk::RESPONSE_OK) {
 	std::string selected_file = file.get_filename();
-	openTab(selected_file);
+	mEditor->openTab(selected_file);
     }
 }
 void GVLE::onMenuOpenPackage()
 {
-    closeAllTab();
+    mEditor->closeAllTab();
     mOpenPackageBox->show();
     if (utils::Path::path().package() != "")
 	mMenuAndToolbar->onPackageMode();
@@ -659,7 +449,7 @@ void GVLE::onMenuLoad()
 
         if (file.run() == Gtk::RESPONSE_OK) {
 	    mGlobalVpzPrevDirPath = file.get_current_folder();
-	    closeAllTab();
+	    mEditor->closeAllTab();
             m_modeling->parseXML(file.get_filename());
 	    utils::Path::path().setPackage("");
 	    mMenuAndToolbar->onGlobalMode();
@@ -671,10 +461,10 @@ void GVLE::onMenuLoad()
 
 void GVLE::saveFile()
 {
-    int page = mNotebook->get_current_page();
+    int page = mEditor->get_current_page();
     if (page != -1) {
 	DocumentText* doc = dynamic_cast < DocumentText* >(
-	    mNotebook->get_nth_page(page));
+	    mEditor->get_nth_page(page));
 	if (not doc->isNew()) {
 	    doc->save();
 	} else {
@@ -711,10 +501,11 @@ void GVLE::onMenuSave()
 
     if (m_modeling->isSaved()) {
 	m_modeling->saveXML(m_modeling->getFileName());
-	Documents::iterator it = mDocuments.find(m_modeling->getFileName());
-	if (it != mDocuments.end())
+	Editor::Documents::iterator it =
+	    mEditor->getDocumentsList().find(m_modeling->getFileName());
+	if (it != mEditor->getDocumentsList().end())
 	    it->second->setTitle(m_modeling->getFileName(),
-		      m_modeling->getTopModel(), false);
+				 m_modeling->getTopModel(), false);
     } else if (utils::Path::path().package() != "") {
 	mSaveVpzBox->show();
     } else {
@@ -731,20 +522,21 @@ void GVLE::onMenuSave()
 	    std::string filename(file.get_filename());
 	    vpz::Vpz::fixExtension(filename);
 	    m_modeling->saveXML(filename);
-	    Documents::iterator it = mDocuments.find(filename);
-	    if (it != mDocuments.end())
-	    it->second->setTitle(filename,
-		      m_modeling->getTopModel(), false);
+	    Editor::Documents::iterator it =
+		mEditor->getDocumentsList().find(filename);
+	    if (it != mEditor->getDocumentsList().end())
+		it->second->setTitle(filename,
+				     m_modeling->getTopModel(), false);
 	}
     }
 }
 
 void GVLE::saveFileAs()
 {
-    int page = mNotebook->get_current_page();
+    int page = mEditor->get_current_page();
     if (page != -1) {
 	DocumentText* doc = dynamic_cast < DocumentText* >(
-	    mNotebook->get_nth_page(page));
+	    mEditor->get_nth_page(page));
 	Gtk::FileChooserDialog file(_("VPZ file"), Gtk::FILE_CHOOSER_ACTION_SAVE);
 	file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
 	file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
@@ -759,13 +551,13 @@ void GVLE::saveFileAs()
 
 void GVLE::closeFile()
 {
-    int page = mNotebook->get_current_page();
+    int page = mEditor->get_current_page();
     if (page != -1) {
-	Gtk::Widget* tab = mNotebook->get_nth_page(page);
-	Documents::iterator it = mDocuments.begin();
-	while (it != mDocuments.end()) {
+	Gtk::Widget* tab = mEditor->get_nth_page(page);
+	Editor::Documents::iterator it = mEditor->getDocumentsList().begin();
+	while (it != mEditor->getDocumentsList().end()) {
 	    if (it->second == tab) {
-		closeTab(it->first);
+		mEditor->closeTab(it->first);
 		break;
 	    }
 	    ++it;
@@ -868,23 +660,6 @@ void GVLE::setTitle(const Glib::ustring& name)
     set_title(title);
 }
 
-void GVLE::setModifiedTitle(const std::string& name)
-{
-    Glib::ustring current("* ");
-    current += get_title();
-
-    set_title(current);
-
-    if (not name.empty() and
-	boost::filesystem::extension(name) == ".vpz") {
-	Documents::iterator it = mDocuments.find(name);
-	if (it != mDocuments.end())
-	    it->second->setTitle(name,
-				 m_modeling->getTopModel(),
-				 true);
-    }
-}
-
 std::string valuetype_to_string(value::Value::type type)
 {
     switch (type) {
@@ -927,212 +702,6 @@ std::string valuetype_to_string(value::Value::type type)
     }
 }
 
-void GVLE::focusTab(const std::string& filepath)
-{
-    int page = mNotebook->page_num(*(mDocuments.find(filepath)->second));
-    mNotebook->set_current_page(page);
-}
-
-Gtk::HBox* GVLE::addLabel(const std::string& title,
-			const std::string& filepath)
-{
-    Gtk::HBox* tabLabel = new Gtk::HBox(false, 0);
-    Gtk::Label* label = new Gtk::Label(title);
-    tabLabel->pack_start(*label, true, true, 0);
-    Gtk::Button* closeButton = new Gtk::Button();
-    Gtk::Image* imgButton = new Gtk::Image(Gtk::Stock::CLOSE,
-					   Gtk::IconSize(Gtk::ICON_SIZE_MENU));
-    closeButton->set_image(*imgButton);
-    closeButton->set_focus_on_click(false);
-    closeButton->set_relief(Gtk::RELIEF_NONE);
-    closeButton->set_tooltip_text(_("Close Tab"));
-    closeButton->signal_clicked().connect(
-	sigc::bind(sigc::mem_fun(*this, &GVLE::closeTab), filepath));
-
-    tabLabel->pack_start(*closeButton, false, false, 0);
-    tabLabel->show_all();
-    return tabLabel;
-}
-
-void GVLE::openTab(const std::string& filepath)
-{
-
-    if(boost::filesystem::extension(filepath) != ".vpz") {
-	try {
-	    if (mDocuments.find(filepath) == mDocuments.end()) {
-		DocumentText* doc = new DocumentText(this, filepath);
-		mDocuments.insert(
-		    std::make_pair < std::string, DocumentText* >(filepath, doc));
-		int page = mNotebook->append_page(*doc,
-						  *(addLabel(doc->getTitle(),
-							     filepath)));
-		show_all_children();
-		mNotebook->set_current_page(page);
-	    } else {
-		focusTab(filepath);
-	    }
-	} catch(utils::FileError& fe) {
-	    Error(fe.what());
-	} catch (std::exception& e) {
-	    mLog->get_buffer()->insert(
-		mLog->get_buffer()->end(), e.what());
-	}
-	mMenuAndToolbar->onFileMode();
-    } else {
-	m_modeling->parseXML(filepath);
-    }
-}
-
-void GVLE::openTabVpz(const std::string& filepath, graph::CoupledModel* model)
-{
-    Documents::iterator it = mDocuments.find(filepath);
-    int page;
-    if (it != mDocuments.end()) {
-	if (dynamic_cast<DocumentDrawingArea*>(it->second)->getModel()
-	    != model) {
-	    focusTab(filepath);
-	    page = mNotebook->get_current_page();
-	    mNotebook->remove_page(page);
-	    mDocuments.erase(filepath);
-	    mNotebook->set_current_page(--page);
-
-	    DocumentDrawingArea* doc = new DocumentDrawingArea(
-		this,
-		filepath,
-		m_modeling->findView(model),
-		model);
-	    doc->setTitle(filepath, model, true);
-	    mCurrentView = doc->getView();
-	    mDocuments.insert(
-		std::make_pair < std::string, DocumentDrawingArea* >(
-		    filepath, doc));
-	    mNotebook->append_page(*doc, *(addLabel(doc->getTitle(),
-						    filepath)));
-
-	    mNotebook->reorder_child(*doc, ++page);
-	} else {
-	    return;
-	}
-    } else {
-	DocumentDrawingArea* doc = new DocumentDrawingArea(
-	    this,
-	    filepath,
-	    m_modeling->findView(model),
-	    model);
-	mCurrentView = doc->getView();
-	mDocuments.insert(
-	  std::make_pair < std::string, DocumentDrawingArea* >(filepath, doc));
-	page = mNotebook->append_page(*doc, *(addLabel(doc->getTitle(),
-						       filepath)));
-    }
-    show_all_children();
-    mNotebook->set_current_page(page);
-    mMenuAndToolbar->onViewMode();
-}
-
-
-void GVLE::closeTab(const std::string& filepath)
-{
-    if (boost::filesystem::extension(filepath) == ".vpz")
-	closeVpzTab();
-    else {
-	Documents::iterator it = mDocuments.find(filepath);
-	if (it != mDocuments.end()) {
-	    if (not it->second->isModified() or
-		gvle::Question(_("The current tab is not saved\n"
-				 "Do you really want to close this file ?"))) {
-		int page = mNotebook->page_num(*it->second);
-		if (page != -1) {
-		    mNotebook->remove_page(page);
-		    mDocuments.erase(filepath);
-
-		    mNotebook->set_current_page(--page);
-		}
-	    }
-	}
-    }
-}
-
-void GVLE::closeVpzTab()
-{
-    int page;
-    Documents::iterator it = mDocuments.begin();
-    while (it != mDocuments.end()) {
-        if (boost::filesystem::extension(it->first) == ".vpz") {
-            if (not it->second->isModified() or
-                gvle::Question(_("The current tab is not saved\n"
-                                 "Do you really want to close this file ?"))) {
-                mModelTreeBox->clear();
-                mModelClassBox->clear();
-                page = mNotebook->page_num(
-                    *(dynamic_cast<DocumentDrawingArea*>(it->second)));
-                mNotebook->remove_page(page);
-                mDocuments.erase(it->first);
-
-                mNotebook->set_current_page(--page);
-            }
-        }
-	++it;
-    }
-}
-
-bool GVLE::existVpzTab()
-{
-    Documents::iterator it = mDocuments.begin();
-    while (it != mDocuments.end()) {
-	if (boost::filesystem::extension(it->first) == ".vpz")
-	    return true;
-	++it;
-    }
-    return false;
-}
-
-void GVLE::closeAllTab()
-{
-    Documents::iterator it = mDocuments.begin();
-    while (it != mDocuments.end()) {
-	int page = mNotebook->page_num(*it->second);
-	mNotebook->remove_page(page);
-	mDocuments.erase(it->first);
-
-	mNotebook->set_current_page(--page);
-	++it;
-    }
-}
-
-void GVLE::changeTab(GtkNotebookPage* /*page*/, int num)
-{
-    Gtk::Widget* tab = mNotebook->get_nth_page(num);
-    Documents::iterator it = mDocuments.begin();
-    while (it != mDocuments.end()) {
-	if (it->second == tab) {
-	    if (boost::filesystem::extension(it->first) == ".vpz") {
-		DocumentDrawingArea* area =
-		    dynamic_cast< DocumentDrawingArea *>(it->second);
-		mCurrentTab = num;
-		mCurrentView = area->getView();
-		mMenuAndToolbar->onViewMode();
-	    } else{
-		mCurrentTab = num;
-		mCurrentView = 0;
-		mMenuAndToolbar->onFileMode();
-	    }
-	    break;
-	}
-	++it;
-    }
-}
-
-void GVLE::setModifiedTab(const std::string title, const std::string filepath)
-{
-    if (mDocuments.find(filepath) != mDocuments.end()) {
-	int page = mNotebook->get_current_page();
-	Gtk::Widget* tab = mNotebook->get_nth_page(page);
-
-	mNotebook->set_tab_label(*tab, *(addLabel(title, filepath)));
-    }
-}
-
 void GVLE::configureProject()
 {
     std::string out, err;
@@ -1169,26 +738,6 @@ void GVLE::packageProject()
 	mLog->get_buffer()->insert(mLog->get_buffer()->end(), err);
 }
 
-void GVLE::onUndo()
-{
-    int page = mNotebook->get_current_page();
-    if (page != -1) {
-	Document* doc = dynamic_cast < Document* >(
-	    mNotebook->get_nth_page(page));
-	doc->undo();
-    }
-}
-
-void GVLE::onRedo()
-{
-    int page = mNotebook->get_current_page();
-    if (page != -1) {
-	Document* doc = dynamic_cast < Document* >(
-	    mNotebook->get_nth_page(page));
-	doc->redo();
-    }
-}
-
 void GVLE::onCutModel()
 {
     mCurrentView->onCutModel();
@@ -1222,7 +771,7 @@ void GVLE::exportCurrentModel()
 void GVLE::exportGraphic()
 {
     ViewDrawingArea* tab = dynamic_cast<DocumentDrawingArea*>(
-	mNotebook->get_nth_page(mCurrentTab))->getDrawingArea();
+	mEditor->get_nth_page(mCurrentTab))->getDrawingArea();
     vpz::Experiment& experiment = m_modeling->vpz().project().experiment();
     if (experiment.name().empty() || experiment.duration() == 0) {
         Error(_("Fix a Value to the name and the duration of the experiment before exportation."));
@@ -1282,28 +831,28 @@ void GVLE::exportGraphic()
 void GVLE::addCoefZoom()
 {
     ViewDrawingArea* tab = dynamic_cast<DocumentDrawingArea*>(
-	mNotebook->get_nth_page(mCurrentTab))->getDrawingArea();
+	mEditor->get_nth_page(mCurrentTab))->getDrawingArea();
     tab->addCoefZoom();
 }
 
 void GVLE::delCoefZoom()
 {
     ViewDrawingArea* tab = dynamic_cast<DocumentDrawingArea*>(
-	mNotebook->get_nth_page(mCurrentTab))->getDrawingArea();
+	mEditor->get_nth_page(mCurrentTab))->getDrawingArea();
     tab->delCoefZoom();
 }
 
 void GVLE::setCoefZoom(double coef)
 {
     ViewDrawingArea* tab = dynamic_cast<DocumentDrawingArea*>(
-	mNotebook->get_nth_page(mCurrentTab))->getDrawingArea();
+	mEditor->get_nth_page(mCurrentTab))->getDrawingArea();
     tab->setCoefZoom(coef);
 }
 
 void  GVLE::updateAdjustment(double h, double v)
 {
     DocumentDrawingArea* tab = dynamic_cast<DocumentDrawingArea*>(
-	mNotebook->get_nth_page(mCurrentTab));
+	mEditor->get_nth_page(mCurrentTab));
     tab->setHadjustment(h);
     tab->setVadjustment(v);
 }
@@ -1311,7 +860,7 @@ void  GVLE::updateAdjustment(double h, double v)
 void GVLE::onRandomOrder()
 {
     ViewDrawingArea* tab = dynamic_cast<DocumentDrawingArea*>(
-	mNotebook->get_nth_page(mCurrentTab))->getDrawingArea();
+	mEditor->get_nth_page(mCurrentTab))->getDrawingArea();
     tab->onRandomOrder();
 }
 

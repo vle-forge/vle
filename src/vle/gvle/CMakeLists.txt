@@ -18,7 +18,7 @@ LINK_DIRECTORIES(
 SET(GVLE_HPP About.hpp AtomicModelBox.hpp BooleanBox.hpp CalendarBox.hpp
   ComboboxString.hpp ConditionsBox.hpp ConditionPlugin.hpp ConnectionBox.hpp
   CoupledModelBox.hpp CutCopyPaste.hpp DialogString.hpp DynamicBox.hpp
-  ExecutionBox.hpp ExperimentBox.hpp GVLE.hpp GVLEMenuAndToolbar.hpp
+  Editor.hpp ExecutionBox.hpp ExperimentBox.hpp GVLE.hpp GVLEMenuAndToolbar.hpp
   HelpBox.hpp HostsBox.hpp ImportClassesBox.hpp ImportModelBox.hpp
   InteractiveTypeBox.hpp LaunchSimulationBox.hpp MatrixBox.hpp Message.hpp
   ModelClassBox.hpp ModelDescriptionBox.hpp ModelTreeBox.hpp Modeling.hpp
@@ -33,7 +33,7 @@ SET(GVLE_HPP About.hpp AtomicModelBox.hpp BooleanBox.hpp CalendarBox.hpp
 
 SET(GVLE_CPP About.cpp AtomicModelBox.cpp BooleanBox.cpp CalendarBox.cpp
   ConditionsBox.cpp ConditionPlugin.cpp ConnectionBox.cpp CoupledModelBox.cpp
-  CutCopyPaste.cpp DialogString.cpp DynamicBox.cpp ExecutionBox.cpp
+  CutCopyPaste.cpp DialogString.cpp DynamicBox.cpp Editor.cpp ExecutionBox.cpp
   ExperimentBox.cpp GVLE.cpp GVLEMenuAndToolbar.cpp HelpBox.cpp HostsBox.cpp
   ImportClassesBox.cpp ImportModelBox.cpp InteractiveTypeBox.cpp
   LaunchSimulationBox.cpp MatrixBox.cpp Message.cpp ModelClassBox.cpp

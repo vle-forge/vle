@@ -24,6 +24,7 @@
 
 
 #include <vle/gvle/GVLEMenuAndToolbar.hpp>
+#include <vle/gvle/Editor.hpp>
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/GVLE.hpp>
 #include <vle/utils/Debug.hpp>
@@ -311,10 +312,10 @@ void GVLEMenuAndToolbar::createEditActions()
 
     m_refActionGroup->add(
 	Gtk::Action::create("Undo", Gtk::Stock::UNDO),
-	sigc::mem_fun(mParent, &GVLE::onUndo));
+	sigc::mem_fun(mParent->getEditor(), &Editor::onUndo));
     m_refActionGroup->add(
 	Gtk::Action::create("Redo", Gtk::Stock::REDO),
-	sigc::mem_fun(mParent, &GVLE::onRedo));
+	sigc::mem_fun(mParent->getEditor(), &Editor::onRedo));
     m_refActionGroup->add(
 	Gtk::Action::create("Cut", Gtk::Stock::CUT),
 	sigc::mem_fun(mParent, &GVLE::onCutModel));
