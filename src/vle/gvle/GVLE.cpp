@@ -425,6 +425,8 @@ GVLE::GVLE(BaseObjectType* cobject,
     mRefXML = xml;
     m_modeling->setGlade(mRefXML);
 
+    mGlobalVpzPrevDirPath = "";
+
     mConditionsBox = new ConditionsBox(mRefXML, m_modeling);
     mSimulationBox = new LaunchSimulationBox(mRefXML, m_modeling);
     mPreferencesBox = new PreferencesBox(mRefXML, m_modeling);
@@ -651,8 +653,12 @@ void GVLE::onMenuLoad()
         filter.set_name(_("Vle Project gZipped"));
         filter.add_pattern("*.vpz");
         file.add_filter(filter);
+	if (mGlobalVpzPrevDirPath != "") {
+	    file.set_current_folder(mGlobalVpzPrevDirPath);
+        }
 
         if (file.run() == Gtk::RESPONSE_OK) {
+	    mGlobalVpzPrevDirPath = file.get_current_folder();
 	    closeAllTab();
             m_modeling->parseXML(file.get_filename());
 	    utils::Path::path().setPackage("");

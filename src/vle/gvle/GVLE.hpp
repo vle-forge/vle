@@ -776,6 +776,11 @@ private:
     ModelTreeBox*                   mModelTreeBox;
     ModelClassBox*                  mModelClassBox;
     int                             mCurrentTab;
+
+    /* File chooser */
+    Glib::ustring                   mGlobalVpzPrevDirPath; /* the previous
+                                    directory where a vpz was chosen
+                                    in global mode */
 };
 
 std::string valuetype_to_string(value::Value::type type);
