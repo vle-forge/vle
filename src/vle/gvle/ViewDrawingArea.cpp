@@ -1370,5 +1370,42 @@ void ViewDrawingArea::exportSvg(const std::string& filename)
     surface->finish();
 }
 
+void ViewDrawingArea::onRandomOrder()
+{
+    mGrid.clear();
+
+    int xMax = 0, yMax = 0;
+    std::string key;
+    int x, y;
+    graph::ModelList::const_iterator it =
+	mCurrent->getModelList().begin();
+
+    while (it != mCurrent->getModelList().end()) {
+	if (it->second->width() > xMax)
+	    xMax = it->second->width();
+	if (it->second->height() > yMax)
+	    yMax = it->second->height();
+	++it;
+    }
+
+    mCasesWidth = (mWidth - (MODEL_PORT + mOffset)) / (xMax + 15);
+    mCasesHeight = (mHeight - (MODEL_PORT + mOffset)) / (yMax + 15);
+
+    it = mCurrent->getModelList().begin();
+    while (it != mCurrent->getModelList().end()) {
+	do {
+	    x = mModeling->getRand()->getInt(0, mCasesWidth - 1);
+	    y = mModeling->getRand()->getInt(0, mCasesHeight - 1);
+	    key = boost::lexical_cast < std::string > (x) + ":" +
+		boost::lexical_cast < std::string > (y);
+	} while (std::find(mGrid.begin(), mGrid.end(), key) != mGrid.end());
+	mGrid.push_back(key);
+	it->second->setX((x * (xMax + 15)) + MODEL_PORT + mOffset + 15);
+	it->second->setY((y * (yMax + 15)) + MODEL_PORT + mOffset + 15);
+	++it;
+    }
+    queueRedraw();
+}
+
 
 }} // namespace vle gvle

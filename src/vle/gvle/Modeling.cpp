@@ -59,6 +59,7 @@ Modeling::Modeling(GVLE* gvle, const string& filename) :
 {
     assert(gvle);
 
+    mRand = new utils::Rand();
     if (filename.empty() == false) {
         mVpz.parseFile(filename);
         if (mVpz.project().model().model() == 0) {
@@ -93,6 +94,7 @@ Modeling::~Modeling()
     delete mImportModelBox;
     delete mImportClassesBox;
     delete mCoupledBox;
+    delete mRand;
 }
 
 void Modeling::clearModeling()

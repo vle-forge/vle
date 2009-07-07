@@ -40,6 +40,7 @@
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/utils/Debug.hpp>
+#include <vle/utils/Rand.hpp>
 #include <libglademm/xml.h>
 #include <map>
 #include <string>
@@ -730,6 +731,10 @@ public:
     inline double getLineWidth() const
     { return mLineWidth; }
 
+    inline utils::Rand* getRand() const
+    { return mRand; }
+
+
     /********************************************************************
      *
      * MANAGE THE EDITOR SETTINGS
@@ -820,6 +825,7 @@ private:
     graph::CoupledModel*        mTop;
     std::string                 mCurrentClass;
     GVLE*                       mGVLE;
+    utils::Rand*                mRand;
     ListView                    mListView;
     CutCopyPaste                mCutCopyPaste;
     bool                        mIsModified;

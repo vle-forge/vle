@@ -81,6 +81,8 @@ const Glib::ustring GVLEMenuAndToolbar::UI_DEFINITION =
     "            <menuitem action='CreateProjectPackage' />"
     "        </menu>"
     "        <menu action='MenuView'>"
+    "            <menuitem action='Random Order' />"
+    "            <separator />"
     "            <menuitem action='Preferences' />"
     "        </menu>"
     "        <menu action='MenuSimulation'>"
@@ -159,6 +161,7 @@ void GVLEMenuAndToolbar::onPackageMode()
     m_refActionGroup->get_action("MenuEdit")->set_sensitive(false);
     m_refActionGroup->get_action("MenuZoom")->set_sensitive(false);
     m_refActionGroup->get_action("MenuSimulation")->set_sensitive(false);
+    m_refActionGroup->get_action("Random Order")->set_sensitive(false);
 }
 
 void GVLEMenuAndToolbar::onGlobalMode()
@@ -168,6 +171,7 @@ void GVLEMenuAndToolbar::onGlobalMode()
     m_refActionGroup->get_action("MenuEdit")->set_sensitive(false);
     m_refActionGroup->get_action("MenuZoom")->set_sensitive(false);
     m_refActionGroup->get_action("MenuSimulation")->set_sensitive(false);
+    m_refActionGroup->get_action("Random Order")->set_sensitive(false);
 }
 
 void GVLEMenuAndToolbar::onViewMode()
@@ -185,6 +189,7 @@ void GVLEMenuAndToolbar::onViewMode()
     m_refActionGroup->get_action("SaveVpz")->set_sensitive(true);
     m_refActionGroup->get_action("SaveFile")->set_sensitive(false);
     m_refActionGroup->get_action("SaveFileAs")->set_sensitive(false);
+    m_refActionGroup->get_action("Random Order")->set_sensitive(true);
 }
 
 void GVLEMenuAndToolbar::onFileMode()
@@ -202,6 +207,7 @@ void GVLEMenuAndToolbar::onFileMode()
     m_refActionGroup->get_action("SaveVpz")->set_sensitive(false);
     m_refActionGroup->get_action("SaveFile")->set_sensitive(true);
     m_refActionGroup->get_action("SaveFileAs")->set_sensitive(true);
+    m_refActionGroup->get_action("Random Order")->set_sensitive(false);
 }
 
 void GVLEMenuAndToolbar::createUI()
@@ -401,6 +407,11 @@ void GVLEMenuAndToolbar::createPackageActions()
 void GVLEMenuAndToolbar::createViewActions()
 {
     m_refActionGroup->add(Gtk::Action::create("MenuView", _("_View")));
+
+    m_refActionGroup->add(
+	Gtk::Action::create("Random Order", _("Random Order"),
+			    _("Arrange the model with randomly")),
+	sigc::mem_fun(mParent, &GVLE::onRandomOrder));
 
     m_refActionGroup->add(
 	Gtk::Action::create("Preferences", Gtk::Stock::PREFERENCES,

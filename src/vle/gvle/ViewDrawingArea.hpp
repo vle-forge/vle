@@ -147,6 +147,11 @@ namespace vle { namespace gvle {
 	void exportPdf(const std::string& filename);
 	void exportSvg(const std::string& filename);
 
+	/**
+	 * Order the models
+	 */
+	void onRandomOrder();
+
     private:
 
 	typedef std::pair < int, int > Point;
@@ -266,6 +271,11 @@ namespace vle { namespace gvle {
         std::vector < StraightLine > mLines;
         std::vector < std::string > mText;
         int mHighlightLine;
+
+	// Grid
+	std::list < std::string > mGrid;
+	int                       mCasesWidth;
+	int                       mCasesHeight;
     };
 
 }} // namespace vle gvle

@@ -624,6 +624,11 @@ public:
      ********************************************************************/
 
     /**
+     * @brief Order the models
+     */
+    void onRandomOrder();
+
+    /**
      * @brief Show the PreferencesBox
      */
     void onPreferences();

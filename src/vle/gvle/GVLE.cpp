@@ -1283,4 +1283,11 @@ void  GVLE::updateAdjustment(double h, double v)
     tab->setVadjustment(v);
 }
 
+void GVLE::onRandomOrder()
+{
+    ViewDrawingArea* tab = dynamic_cast<DocumentDrawingArea*>(
+	mNotebook->get_nth_page(mCurrentTab))->getDrawingArea();
+    tab->onRandomOrder();
+}
+
 }} // namespace vle gvle
