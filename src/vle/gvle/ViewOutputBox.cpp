@@ -138,6 +138,7 @@ void ViewOutputBox::initViews()
     m_model = Gtk::ListStore::create(m_viewscolumnrecord);
     m_views->append_column(_("Name"), m_viewscolumnrecord.name);
     m_views->set_model(m_model);
+    m_data->get_buffer()->set_text("");
 }
 
 void ViewOutputBox::fillViews()
@@ -371,12 +372,31 @@ void ViewOutputBox::onEditPlugin()
 
 void ViewOutputBox::onChangedPlugin()
 {
+    std::string name;
+    Glib::RefPtr < Gtk::TreeView::Selection > ref =
+	m_views->get_selection();
+    if (ref) {
+	Gtk::TreeModel::iterator iter = ref->get_selected();
+	if (ref->get_selected()) {
+	    Gtk::TreeModel::Row row = *iter;
+	    name.assign(row.get_value(m_viewscolumnrecord.name));
+	}
+    }
+
     OutputPluginList list = m_modeling.pluginFactory().outputPlugins();
     OutputPluginList::iterator it = list.find(m_plugin->get_active_text());
     if( it != list.end()) {
 	m_editplugin->set_sensitive(true);
     } else {
 	m_editplugin->set_sensitive(false);
+    }
+
+    vpz::View& view(m_viewscopy.get(name));
+    vpz::Output& output(m_viewscopy.outputs().get(view.output()));
+    if (output.format() == vpz::Output::LOCAL) {
+	output.setLocalStream(output.location(), m_plugin->get_active_text());
+    } else {
+	output.setDistantStream(output.location(), m_plugin->get_active_text());
     }
 }
 
@@ -474,6 +494,12 @@ void ViewOutputBox::updateView(const std::string& name)
     vpz::View& view(m_viewscopy.get(name));
     vpz::Output& output(m_viewscopy.outputs().get(view.output()));
 
+    if (output.data()) {
+        m_data->get_buffer()->set_text(output.data()->writeToXml());
+    } else {
+	m_data->get_buffer()->set_text("");
+    }
+
     m_type->set_active_text(view.streamtype());
     m_timestep->set_sensitive(view.type() == vpz::View::TIMED);
     m_timestep->set_value(view.timestep());
@@ -481,10 +507,6 @@ void ViewOutputBox::updateView(const std::string& name)
     m_location->set_text(output.location());
     m_directory->set_sensitive(output.format() == vpz::Output::LOCAL);
     m_plugin->set_active_text(output.plugin());
-
-    if (output.data()) {
-        m_data->get_buffer()->set_text(output.data()->writeToXml());
-    }
 }
 
 std::string ViewOutputBox::buildOutputName(const std::string& name) const
