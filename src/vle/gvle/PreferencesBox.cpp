@@ -24,6 +24,7 @@
 
 
 #include <vle/gvle/PreferencesBox.hpp>
+#include <vle/gvle/Editor.hpp>
 #include <vle/utils/Preferences.hpp>
 #include <vector>
 #include <string>
@@ -126,6 +127,7 @@ void PreferencesBox::onApply()
     saveSettings();
     copy(currentSettings, backupSettings);
     mModeling->refreshViews();
+    mModeling->getGVLE()->getEditor()->refreshViews();
     mDialog->hide_all();
 }
 
