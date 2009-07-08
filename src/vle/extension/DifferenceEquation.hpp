@@ -27,6 +27,7 @@
 #define VLE_EXTENSION_DIFFERENCE_EQUATION_HPP
 
 #include <vle/devs/Dynamics.hpp>
+#include <vle/utils/DateTime.hpp>
 #include <set>
 
 namespace vle { namespace extension { namespace DifferenceEquation {
@@ -211,7 +212,15 @@ namespace vle { namespace extension { namespace DifferenceEquation {
          * @brief Returns the time step of equation.
          * @return the time step of equation.
          */
-        double timeStep() const { return mTimeStep; }
+        double timeStep(const devs::Time& time) const
+        {
+	    if (mTimeStepUnit == vle::utils::DateTime::None) {
+		return mTimeStep;
+	    } else {
+		return vle::utils::DateTime::duration(
+		    time, mTimeStep, mTimeStepUnit);
+	    }
+	}
 
     protected:
         typedef Values::const_iterator ValuesIterator;
@@ -293,7 +302,7 @@ namespace vle { namespace extension { namespace DifferenceEquation {
             const devs::ExternalEventList& extEventlist) const;
 
         virtual void internalTransition(
-            const devs::Time& event);
+            const devs::Time& time);
 
         virtual void externalTransition(
             const devs::ExternalEventList& event,
@@ -303,6 +312,7 @@ namespace vle { namespace extension { namespace DifferenceEquation {
 
         state mState;
         double mTimeStep;
+	vle::utils::DateTime::Unit mTimeStepUnit;
 
         // external variable info section
         ValuesMap mExternalValues;

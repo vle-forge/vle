@@ -39,6 +39,7 @@ Base::Base(const AtomicModel& model,
 	   bool control) :
     Dynamics(model, events),
     mTimeStep(0),
+    mTimeStepUnit(vle::utils::DateTime::None),
     mMode(NAME),
     mControl(control),
     mSynchro(false),
@@ -46,7 +47,21 @@ Base::Base(const AtomicModel& model,
     mWaiting(0)
 {
     if (events.exist("time-step")) {
-        mTimeStep = toDouble(events.get("time-step"));
+	if (events.get("time-step").isDouble()) {
+	    mTimeStep = toDouble(events.get("time-step"));
+        } else if (events.get("time-step").isMap()) {
+	    const value::Map& timeStep = toMapValue(events.get("time-step"));
+
+	    mTimeStep = toDouble(timeStep.get("value"));
+	    mTimeStepUnit = vle::utils::DateTime::convertUnit(
+		toString(timeStep.get("unit")));
+	} else {
+            throw utils::InternalError(fmt(_(
+                    "[%1%] DifferenceEquation - bad type "\
+		    "for value of time-step port"))
+                   % getModelName());
+	}
+
     } else {
         if (not events.exist("time-step")) {
             throw utils::InternalError(fmt(_(
@@ -429,7 +444,7 @@ void Base::internalTransition(const Time& time)
                 } else {
                     clearReceivedValues();
                     mState = RUN;
-                    mSigma = mTimeStep;
+                    mSigma = timeStep(time);
                 }
             }
         } else {
@@ -448,7 +463,7 @@ void Base::internalTransition(const Time& time)
             } else {
                 mState = RUN;
             }
-            mSigma = mTimeStep;
+            mSigma = timeStep(time);
         }
         break;
     case PRE_INIT2:
@@ -457,7 +472,7 @@ void Base::internalTransition(const Time& time)
         } else {
             mState = RUN;
         }
-        mSigma = mTimeStep;
+        mSigma = timeStep(time);
         break;
     case INIT:
         break;
@@ -476,7 +491,7 @@ void Base::internalTransition(const Time& time)
             } else {
                 mState = RUN;
             }
-            mSigma = mTimeStep;
+            mSigma = timeStep(time);
         }
         break;
     case POST:
@@ -489,7 +504,7 @@ void Base::internalTransition(const Time& time)
         } else {
             mState = RUN;
         }
-        mSigma = mTimeStep;
+        mSigma = timeStep(time);
         break;
     case POST2:
         mState = RUN;
@@ -551,7 +566,7 @@ void Base::externalTransition(const ExternalEventList& event,
                 clearReceivedValues();
             } else {
                 clearReceivedValues();
-                mSigma = mTimeStep;
+                mSigma = timeStep(time);
                 mState = PRE;
             }
             if (mReceive == mSyncs) {

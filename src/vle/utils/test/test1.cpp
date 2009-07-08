@@ -40,6 +40,7 @@
 #include <iostream>
 #include <numeric>
 #include <vle/utils/Algo.hpp>
+#include <vle/utils/DateTime.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Rand.hpp>
@@ -263,4 +264,91 @@ BOOST_AUTO_TEST_CASE(show_package)
     PathList vpz = CMakePackage::getInstalledExperiments();
     std::copy(vpz.begin(), vpz.end(), std::ostream_iterator < std::string >(
            std::cout, "\n"));
+}
+
+BOOST_AUTO_TEST_CASE(date_time)
+{
+    BOOST_REQUIRE_EQUAL(vle::utils::DateTime::year((2451545)),
+			2000);
+    BOOST_REQUIRE_EQUAL(vle::utils::DateTime::month((2451545)),
+			1);
+    BOOST_REQUIRE_EQUAL(
+	vle::utils::DateTime::dayOfMonth((2451545)), 1);
+    BOOST_REQUIRE_EQUAL(
+	vle::utils::DateTime::dayOfYear((2451545)), 1);
+    BOOST_REQUIRE_EQUAL(
+	vle::utils::DateTime::dayOfWeek((2451545)), 6);
+    BOOST_REQUIRE_EQUAL(
+	vle::utils::DateTime::weekOfYear((2451547)), 1);
+
+    BOOST_REQUIRE(vle::utils::DateTime::isLeapYear((2451545)));
+    BOOST_REQUIRE(not vle::utils::DateTime::isLeapYear(
+		      (2451911)));
+
+    BOOST_REQUIRE_EQUAL(
+	vle::utils::DateTime::aYear((2451545)), 366);
+    BOOST_REQUIRE_EQUAL(
+	vle::utils::DateTime::aMonth((2451545)), 31);
+    BOOST_REQUIRE_EQUAL(
+	vle::utils::DateTime::aMonth((2451576)), 29);
+    BOOST_REQUIRE_EQUAL(
+	vle::utils::DateTime::aMonth((2451942)), 28);
+    BOOST_REQUIRE_EQUAL(
+	vle::utils::DateTime::aWeek(), 7);
+    BOOST_REQUIRE_EQUAL(
+	vle::utils::DateTime::aDay(), 1);
+
+    BOOST_REQUIRE_EQUAL(
+	vle::utils::DateTime::years((2451545), 1), 366);
+    BOOST_REQUIRE_EQUAL(
+	vle::utils::DateTime::months((2451545), 2), 60);
+    BOOST_REQUIRE_EQUAL(
+	vle::utils::DateTime::weeks(2), 14);
+    BOOST_REQUIRE_EQUAL(
+	vle::utils::DateTime::days(2), 2);
+
+    BOOST_REQUIRE_EQUAL(
+	vle::utils::DateTime::convertUnit("year"), vle::utils::DateTime::Year);
+    BOOST_REQUIRE_EQUAL(
+	vle::utils::DateTime::convertUnit("month"),
+	vle::utils::DateTime::Month);
+    BOOST_REQUIRE_EQUAL(
+	vle::utils::DateTime::convertUnit("week"), vle::utils::DateTime::Week);
+    BOOST_REQUIRE_EQUAL(
+	vle::utils::DateTime::convertUnit("day"), vle::utils::DateTime::Day);
+
+    BOOST_REQUIRE_EQUAL(
+	vle::utils::DateTime::duration((2451545),
+				       1, vle::utils::DateTime::Year), 366);
+    BOOST_REQUIRE_EQUAL(
+	vle::utils::DateTime::duration((2451545),
+				       1, vle::utils::DateTime::Month), 31);
+    BOOST_REQUIRE_EQUAL(
+	vle::utils::DateTime::duration((2451545),
+				       1, vle::utils::DateTime::Week), 7);
+    BOOST_REQUIRE_EQUAL(
+	vle::utils::DateTime::duration((2451545),
+				       1, vle::utils::DateTime::Day), 1);
+}
+
+BOOST_AUTO_TEST_CASE(julian_date)
+{
+    BOOST_TEST_MESSAGE("\nJulian day number\n");
+    BOOST_REQUIRE_EQUAL(2452192,
+			vle::utils::DateTime::toJulianDayNumber("2001-10-9"));
+
+    BOOST_TEST_MESSAGE("\nJulian day\n");
+    BOOST_REQUIRE_EQUAL(vle::utils::DateTime::toJulianDay(2454115.05486),
+                        vle::utils::DateTime::toJulianDay(
+			    vle::utils::DateTime::toJulianDay(
+                                vle::utils::DateTime::toJulianDay(
+				    2454115.05486))));
+
+    BOOST_REQUIRE_EQUAL(vle::utils::DateTime::toJulianDay(
+			    vle::utils::DateTime::toJulianDay(2454115.05486)),
+                        vle::utils::DateTime::toJulianDay(
+			    vle::utils::DateTime::toJulianDay(
+                                vle::utils::DateTime::toJulianDay(
+				    vle::utils::DateTime::toJulianDay(
+					2454115.05486)))));
 }

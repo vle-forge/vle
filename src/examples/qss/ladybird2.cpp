@@ -43,9 +43,9 @@ Ladybird2::~Ladybird2()
 {
 }
 
-double Ladybird2::compute(const vle::devs::Time& /*time*/)
+double Ladybird2::compute(const vle::devs::Time& time)
 {
-    return y(-1) + timeStep() * (b * d * x(0) * y(-1) - e * y(-1));
+    return y(-1) + timeStep(time) * (b * d * x(0) * y(-1) - e * y(-1));
 }
 
 }}} // namespace vle examples qss

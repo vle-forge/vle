@@ -42,9 +42,9 @@ Plantlouse2::~Plantlouse2()
 {
 }
 
-double Plantlouse2::compute(const vle::devs::Time& /* time */)
+double Plantlouse2::compute(const vle::devs::Time& time)
 {
-    return x(-1) + timeStep() * (a * x(-1) - b * y(0) * x(-1));
+    return x(-1) + timeStep(time) * (a * x(-1) - b * y(0) * x(-1));
 }
 
 }}} // namespace vle examples qss

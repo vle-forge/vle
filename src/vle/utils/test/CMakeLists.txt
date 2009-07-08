@@ -17,6 +17,7 @@ TARGET_LINK_LIBRARIES(test_algo
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
+  ${Boost_DATE_TIME_LIBRARY}
   vlegeometry
   vleutils
   vledata

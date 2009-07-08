@@ -16,12 +16,13 @@ ELSE(WIN32 AND NOT UNIX)
   SET(OS_SPECIFIC_PATH_IMPL PathUnix.cpp)
 ENDIF(WIN32 AND NOT UNIX)
 
-SET(UTILS_CPP Host.cpp Package.cpp Path.cpp Preferences.cpp Rand.cpp Simpson.cpp
-  Socket.cpp SocketImpl.c Tools.cpp Trace.cpp ${OS_SPECIFIC_PATH_IMPL})
+SET(UTILS_CPP DateTime.cpp Host.cpp Package.cpp Path.cpp Preferences.cpp
+  Rand.cpp Simpson.cpp Socket.cpp SocketImpl.c Tools.cpp Trace.cpp
+  ${OS_SPECIFIC_PATH_IMPL})
 
-SET(UTILS_HPP Algo.hpp Debug.hpp Exception.hpp Host.hpp i18n.hpp Package.hpp
-  Path.hpp Pool.hpp Preferences.hpp Rand.hpp Simpson.hpp Socket.hpp Tools.hpp
-  Trace.hpp)
+SET(UTILS_HPP Algo.hpp DateTime.hpp Debug.hpp Exception.hpp Host.hpp
+  i18n.hpp Package.hpp Path.hpp Pool.hpp Preferences.hpp Rand.hpp
+  Simpson.hpp Socket.hpp Tools.hpp Trace.hpp)
 
 ADD_LIBRARY(vleutils SHARED ${UTILS_CPP};${UTILS_HPP})
 
@@ -35,6 +36,7 @@ TARGET_LINK_LIBRARIES(vleutils
   ${GTHREAD_LIBRARIES}
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
+  ${Boost_DATE_TIME_LIBRARY}
   ${OS_SPECIFIC_LIBRARIES})
 
 INSTALL(TARGETS vleutils
