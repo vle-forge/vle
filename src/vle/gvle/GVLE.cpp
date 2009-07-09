@@ -1233,15 +1233,19 @@ void GVLE::exportGraphic()
     file.set_transient_for(*this);
     file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+    Gtk::FileFilter filterAuto;
     Gtk::FileFilter filterPng;
     Gtk::FileFilter filterPdf;
     Gtk::FileFilter filterSvg;
+    filterAuto.set_name(_("Guess type from file name"));
+    filterAuto.add_pattern("*");
     filterPng.set_name(_("Portable Newtork Graphics (.png)"));
     filterPng.add_pattern("*.png");
     filterPdf.set_name(_("Portable Format Document (.pdf)"));
     filterPdf.add_pattern("*.pdf");
     filterSvg.set_name(_("Scalable Vector Graphics (.svg)"));
     filterSvg.add_pattern("*.svg");
+    file.add_filter(filterAuto);
     file.add_filter(filterPng);
     file.add_filter(filterPdf);
     file.add_filter(filterSvg);
@@ -1251,7 +1255,22 @@ void GVLE::exportGraphic()
         std::string filename(file.get_filename());
 	std::string extension(file.get_filter()->get_name());
 
-	if (extension == _("Portable Newtork Graphics (.png)"))
+	if (extension == _("Guess type from file name")) {
+	    size_t ext_pos = filename.find_last_of('.');
+	    if (ext_pos != std::string::npos) {
+		std::string type(filename, ext_pos+1);
+		filename.resize(ext_pos);
+		if (type == "png")
+		    tab->exportPng(filename);
+		else if (type == "pdf")
+		    tab->exportPdf(filename);
+		else if (type == "svg")
+		    tab->exportSvg(filename);
+		else
+		    Error(_("Unsupported file format"));
+	    }
+	}
+	else if (extension == _("Portable Newtork Graphics (.png)"))
 	    tab->exportPng(filename);
 	else if (extension == _("Portable Format Document (.pdf)"))
 	    tab->exportPdf(filename);
