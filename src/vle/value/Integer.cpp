@@ -24,12 +24,19 @@
 
 
 #include <vle/value/Integer.hpp>
+#include <iomanip>
+#include <limits>
 
 namespace vle { namespace value {
 
 void Integer::writeFile(std::ostream& out) const
 {
-    out << m_value;
+    std::streamsize old = out.precision();
+
+    out << std::setprecision(std::numeric_limits < long >::digits10)
+        << m_value;
+
+    out.precision(old);
 }
 
 void Integer::writeString(std::ostream& out) const
@@ -39,7 +46,14 @@ void Integer::writeString(std::ostream& out) const
 
 void Integer::writeXml(std::ostream& out) const
 {
-    out << "<integer>" << m_value << "</integer>";
+    std::streamsize old = out.precision();
+
+    out << "<integer>"
+        << std::setprecision(std::numeric_limits < long >::digits10)
+        << m_value
+        << "</integer>";
+
+    out.precision(old);
 }
 
 }} // namespace vle value

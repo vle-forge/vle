@@ -26,6 +26,8 @@
 #include <vle/vpz/Vpz.hpp>
 #include <vle/utils/Debug.hpp>
 #include <fstream>
+#include <iomanip>
+#include <limits>
 #include <vle/version.hpp>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
@@ -127,7 +129,10 @@ void Vpz::write()
             % m_filename);
     }
 
-    out << *this;
+    out << std::showpoint
+        << std::fixed
+        << std::setprecision(std::numeric_limits < double >::digits10)
+        << *this;
 }
 
 void Vpz::write(const std::string& filename)
@@ -139,7 +144,12 @@ void Vpz::write(const std::string& filename)
 std::string Vpz::writeToString() const
 {
     std::ostringstream out;
-    out << *this;
+
+    out << std::showpoint
+        << std::fixed
+        << std::setprecision(std::numeric_limits < double >::digits10)
+        << *this;
+
     return out.str();
 }
 
