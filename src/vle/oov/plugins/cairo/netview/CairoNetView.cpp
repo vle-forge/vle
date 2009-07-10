@@ -56,6 +56,7 @@ void CairoNetView::onParameter(const std::string& /* plugin */,
     Assert < utils::InternalError >(m_ctx, _("Cairo netview drawing error"));
 
     if (parameters) {
+
         if (not parameters->isMap()) {
             throw utils::ArgError(
                 _("NetView: initialization failed, bad parameters"));
@@ -63,58 +64,64 @@ void CairoNetView::onParameter(const std::string& /* plugin */,
 
         value::Map* init = dynamic_cast < value::Map* >(parameters);
 
-	const value::Map& dimensions = toMapValue(init->get("dimensions"));
+        const value::Map& dimensions = toMapValue(init->get("dimensions"));
 
-	mMaxX = toDouble(dimensions.get("x"));
-	mMaxY = toDouble(dimensions.get("y"));
+        mMaxX = toDouble(dimensions.get("x"));
+        mMaxY = toDouble(dimensions.get("y"));
 
-	mExecutiveName = toString(init->get("executiveName"));
+        mExecutiveName = toString(init->get("executiveName"));
 
-	const value::Map& nodes = toMapValue(init->get("nodes"));
+        const value::Map& nodes = toMapValue(init->get("nodes"));
 
-	std::string node_names;
-	if (toString(nodes.get("type")) == "set") {
-	    node_names = toString(nodes.get("names"));
-	} else {
-	    node_names = toString(nodes.get("prefix"));
-	}
+        std::string node_names;
+        if (toString(nodes.get("type")) == "set") {
+            node_names = toString(nodes.get("names"));
+        } else {
+            node_names = toString(nodes.get("prefix"));
+        }
 
-	std::string matrix = toString(init->get("adjacency_matrix"));
+        std::string matrix = toString(init->get("adjacency_matrix"));
 
-	// create the graph
-	mGraph = new Graph(node_names, matrix);
+        // create the graph
+        mGraph = new Graph(node_names, matrix);
 
-	// set the positions
-	const value::Map& positions = toMapValue(init->get("positions"));
+        // set the positions
+        const value::Map& positions = toMapValue(init->get("positions"));
+        if (toString(positions.get("type")) == "set") {
+            mGraph->set_positions(toString(positions.get("values")));
+        } else {
+            mGraph->set_positions();
+            mMaxX = 300; // arbitrary dimensions to scale the graph
+            mMaxY = 300;
+        }
 
-	if (toString(nodes.get("positions")) == "set") {
-	    mGraph->set_positions(toString(positions.get("values")));
-	} else {
-	    mGraph->set_positions();
-	    mMaxX = 300; // arbitrary dimensions to scale the graph
-	    mMaxY = 300;
-	}
+        mGraph->scale_positions(mWindowWidth / mMaxX, mWindowHeight / mMaxY);
 
-	mGraph->scale_positions(mWindowWidth / mMaxX, mWindowHeight / mMaxY);
+        const value::Map& states = toMapValue(init->get("states"));
 
-	const value::Map& states = toMapValue(init->get("states"));
+        if (states.existValue("name")) {
+            mStateName = toString(states.get("name"));
+        }
 
-	if (states.existValue("name")) {
-	    mStateName = toString(states.get("name"));
-	}
+        std::string type = toString(states.get("type"));
+        const value::Set& values = toSetValue(states.get("values"));
 
-	std::string type = toString(states.get("type"));
-	const value::Set& values = toSetValue(states.get("values"));
+        mColors.build_color_list(type, values);
 
-	mColors.build_color_list(type, values);
-
-	if (init->existValue("display_names")) {
-	    const value::Map& display_names =
-		toMapValue(init->get("display_names"));
-	    if (toString(display_names.get("activate")) == "yes") {
-		m_display_node_names = true;
-	    }
-	}
+        if (init->existValue("display_names")) {
+            const value::Map& display_names =
+                toMapValue(init->get("display_names"));
+            if (toString(display_names.get("activate")) == "yes") {
+                m_display_node_names = true;
+            }
+        }
+        //
+        //// default color value for all vertices
+        //
+        std::vector<std::string> nodes_names = mGraph->get_all_vertice_names();
+        for (unsigned int i = 0; i < nodes_names.size(); ++i){
+            mValues[nodes_names[i]] = "0";
+        }
     }
 
     delete parameters;

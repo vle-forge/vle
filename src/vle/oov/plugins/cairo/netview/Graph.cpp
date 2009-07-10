@@ -116,10 +116,12 @@ Graph::push_back_edge(const std::string &source,
 
     Graph::p_vertex_it pv_it = vertices(m_G);
     while (pv_it.first != pv_it.second) {
-        if(m_G[*pv_it.first].name == source)
+        if(m_G[*pv_it.first].name == source){
             v1 = *pv_it.first;
-        else if (m_G[*pv_it.first].name == out_edge)
+        }
+        else if (m_G[*pv_it.first].name == out_edge){
             v2 = *pv_it.first;
+        }
         ++pv_it.first;
     }
     add_edge(v1,v2,m_G);

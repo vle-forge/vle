@@ -23,52 +23,123 @@
  <experiment name="generatorexecutive" duration="100.0" seed="123">
   <views>
    <outputs>
-    <output name="o" format="local" plugin="caironetview" location="">
-     <xml>
-<![CDATA[
-                <parameters>
-                <!-- dimension of the modeled space if any -->
-                    <dimensions x="10" y="10" />
-
-                <!-- the type of positions can be "set" (defined
+    <output name="o" format="distant" plugin="caironetview" location="localhost:8000:.">
+     <map>
+      <!-- dimension of the modeled space if any -->
+      <key name="dimensions">
+       <map>
+        <key name="x">
+         <double>10</double>
+        </key>
+        <key name="y">
+         <double>10</double>
+        </key>
+       </map>
+      </key>
+      <!-- the "type" of positions can be "set" (defined
                 by the user) or "auto" automatically
                 generated -->
-                    <positions type="set">
-                        2 2 4 4
-                    </positions>
-
-                <!-- a line define an edge, columns with 1 the
-                vertex (node) the edge the vertex is conected
-                with -->
-                    <adjacency_matrix>
-                        0 0 0 0
-                    </adjacency_matrix>
-
-                <!-- if the name of the executive is empty,
+      <key name="positions">
+       <map>
+        <key name="type">
+         <string>set</string>
+        </key>
+        <key name="values">
+         <string> 2 2 4 4 </string>
+        </key>
+       </map>
+      </key>
+      <key name="executiveName">
+       <!-- if the name of the executive is empty,
                 the changes in model structure are not displayed  -->
-                    <executive name="executive"/>
-
-                <!-- if the type of nodes is "auto", then a prefix must
-                be given to automatically generate models name. Otherwise
-                the user must give the list of models names. The order in the
-                list is the same than lines in the adjacency matrix. -->
-                    <nodes type="set" prefix="">
-                    executive counter
-                    </nodes>
-
-                <!-- the type of values tha vertex displayed (integer, real,
-                                                              bool)  -->
-                    <states type="integer" name="status">
-                        <state value="0" red="1" green="1"
-                            blue="65000"/>
-                        <state value="1" red="65000" green="1"
-                            blue="1"/>
-			<state value="2" red="0" green="65000"
-                            blue="1"/>
-                    </states>
-                </parameters>
-]]>
-     </xml>
+       <string>executive</string>
+      </key>
+      <key name="adjacency_matrix">
+       <!-- A line define edges (connections between vertex).
+              Columns with 1 specify a directed connection between line-vertex
+              toward column vertex. -->
+       <string>0 0 0 0</string>
+      </key>
+      <key name="nodes">
+       <!-- if the type of nodes is "auto", then a prefix must
+              be given to automatically generate models name. Otherwise
+              the user must give the list of models names. The order in the
+              list is the same than lines in the adjacency matrix. -->
+       <map>
+        <key name="type">
+         <string>set</string>
+        </key>
+        <key name="names">
+         <string> executive counter </string>
+        </key>
+       </map>
+      </key>
+      <key name="states">
+       <map>
+        <!-- the name, type and scales of values that vertex display
+          (integer, real, bool) -->
+        <key name="name">
+         <string>status</string>
+        </key>
+        <key name="type">
+         <string>integer</string>
+        </key>
+        <key name="values">
+         <set>
+          <map>
+           <key name="value">
+            <integer>0</integer>
+           </key>
+           <key name="red">
+            <integer>0</integer>
+           </key>
+           <key name="green">
+            <integer>65000</integer>
+           </key>
+           <key name="blue">
+            <integer>65000</integer>
+           </key>
+          </map>
+          <map>
+           <key name="value">
+            <integer>1</integer>
+           </key>
+           <key name="red">
+            <integer>65000</integer>
+           </key>
+           <key name="green">
+            <integer>0</integer>
+           </key>
+           <key name="blue">
+            <integer>65000</integer>
+           </key>
+          </map>
+          <map>
+           <key name="value">
+            <integer>2</integer>
+           </key>
+           <key name="red">
+            <integer>65000</integer>
+           </key>
+           <key name="green">
+            <integer>65000</integer>
+           </key>
+           <key name="blue">
+            <integer>0</integer>
+           </key>
+          </map>
+         </set>
+        </key>
+       </map>
+      </key>
+      <key name="display_names">
+       <map>
+        <key name="activate">
+         <string>yes</string>
+        </key>
+       </map>
+      </key>
+     </map>
     </output>
    </outputs>
    <observables>
