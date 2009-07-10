@@ -117,7 +117,7 @@ private:
     bool           mNew;
 
     void init();
-    bool event(GdkEvent* event);
+    void onChanged();
     std::string getIdLanguage();
     void applyEditingProperties();
 };

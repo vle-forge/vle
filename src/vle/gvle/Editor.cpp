@@ -77,8 +77,8 @@ DocumentText::DocumentText(GVLE* gvle,
     gtksourceview::init();
 #endif
     init();
-    signal_event().connect(
-	sigc::mem_fun(this, &DocumentText::event));
+    mView.get_buffer()->signal_changed().connect(
+	sigc::mem_fun(this, &DocumentText::onChanged));
 }
 
 DocumentText::~DocumentText()
@@ -204,18 +204,13 @@ void DocumentText::redo()
 #endif
 }
 
-bool DocumentText::event(GdkEvent* event)
+void DocumentText::onChanged()
 {
-    if (event->type == GDK_KEY_RELEASE
-	and event->key.state != GDK_CONTROL_MASK
-	and mModified == false) {
+    if (not mModified) {
 	mModified = true;
 	mTitle = "* "+ mTitle;
 	mGVLE->getEditor()->setModifiedTab(mTitle, filepath());
-	return true;
-
     }
-    return false;
 }
 
 DocumentDrawingArea::DocumentDrawingArea(GVLE* gvle,
