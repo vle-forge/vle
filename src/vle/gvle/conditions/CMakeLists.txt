@@ -1,2 +1,3 @@
 ADD_SUBDIRECTORY(file)
 ADD_SUBDIRECTORY(filechooser)
+ADD_SUBDIRECTORY(DifferenceEquation)
