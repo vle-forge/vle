@@ -925,7 +925,7 @@ bool ViewDrawingArea::on_configure_event(GdkEventConfigure* event)
     }
 
     if (change and mIsRealized) {
-        set_size_request((int)(mWidth * mZoom), (int)(mHeight * mZoom));
+	set_size_request(mRectWidth, mRectHeight);
         mBuffer = Gdk::Pixmap::create(mWin, (int)(mWidth * mZoom),
                                       (int)(mHeight * mZoom), -1);
         queueRedraw();
