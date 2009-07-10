@@ -810,6 +810,31 @@ long int xmlCharToInt(const xmlChar* str)
     return r;
 }
 
+unsigned long int xmlCharToUnsignedInt(const xmlChar* str)
+{
+    char* res = 0;
+
+    setlocale(LC_ALL, "C");
+    errno = 0;
+    unsigned long int r = strtoul((const char*)str, &res, 10);
+    int err = errno;
+    setlocale(LC_ALL, "");
+
+    if ((err == ERANGE and (r == ULONG_MAX)) or
+        (err != 0 and r == 0)) {
+        throw utils::SaxParserError(fmt(
+                _("error to convert '%1%' to unsigned integer: %2%")) % str %
+            strerror(err));
+    }
+
+    if (res == (const char*)str) {
+        throw utils::SaxParserError(fmt(
+                _("error to convert '%1%' to unsigned integer")) % str);
+    }
+
+    return r;
+}
+
 double xmlCharToDouble(const xmlChar* str)
 {
     char* res = 0;

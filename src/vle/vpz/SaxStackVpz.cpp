@@ -31,6 +31,8 @@
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/utils/Socket.hpp>
 #include <vle/utils/Debug.hpp>
+#include <boost/cstdint.hpp>
+#include <boost/cast.hpp>
 
 namespace vle { namespace vpz {
 
@@ -538,8 +540,6 @@ void SaxStackVpz::pushExperiment(const xmlChar** att)
             seed = att[i + 1];
         } else if (xmlStrcmp(att[i], (const xmlChar*)"begin") == 0) {
             begin = att[i + 1];
-        } else if (xmlStrcmp(att[i], (const xmlChar*)"begin") == 0) {
-            begin = att[i + 1];
         } else if (xmlStrcmp(att[i], (const xmlChar*)"combination") == 0) {
             combination = att[i + 1];
         }
@@ -553,7 +553,17 @@ void SaxStackVpz::pushExperiment(const xmlChar** att)
 
     exp.setName(xmlCharToString(name));
     exp.setDuration(xmlCharToDouble(duration));
-    exp.setSeed(xmlCharToInt(seed));
+
+    {
+        unsigned long int t = xmlCharToUnsignedInt(seed);
+        try {
+            boost::uint32_t res = boost::numeric_cast < boost::uint32_t >(t);
+            exp.setSeed(res);
+        } catch (const std::exception& e) {
+            throw utils::SaxParserError(fmt(
+                _("Experiment tag can not uses the seed '%1%'")) % seed);
+        }
+    }
 
     if (begin) {
         exp.setBegin(xmlCharToDouble(begin));
@@ -586,12 +596,19 @@ void SaxStackVpz::pushReplicas(const xmlChar** att)
 
     if (not seed or not number) {
         throw utils::SaxParserError(
-            _("Replicas tag does not have 'seed' or 'number' attribute"));
+            _("Replicas tag does not have 'seed' or 'number' attributes"));
     }
 
     try {
         if (seed) {
-            rep.setSeed(xmlCharToInt(seed));
+            unsigned long int t = xmlCharToUnsignedInt(seed);
+            try {
+                boost::uint32_t res = boost::numeric_cast < boost::uint32_t >(t);
+                rep.setSeed(res);
+            } catch (const std::exception& e) {
+                throw utils::SaxParserError(fmt(
+                        _("cannot convert '%1%' into a correct integer")) % seed);
+            }
         }
 
         if (number) {

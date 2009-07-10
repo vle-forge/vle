@@ -341,6 +341,15 @@ namespace vle { namespace vpz {
     long int xmlCharToInt(const xmlChar* str);
 
     /**
+     * @brief Convert the xmlChar pointer to an unsigned long integer.
+     * @param str The constant xmlChat pointer to translate.
+     * @throw utils::SaxParserError if the xmlChar can not be translated into an
+     * unsigned long integer.
+     * @return The unsigned long integer.
+     */
+    unsigned long int xmlCharToUnsignedInt(const xmlChar* str);
+
+    /**
      * @brief Convert the xmlChar pointer to a double.
      * @param str The constant xmlChat pointer to translate.
      * @throw utils::SaxParserError if the xmlChar can not be translated into a

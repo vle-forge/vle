@@ -30,6 +30,7 @@
 #include <vle/vpz/Replicas.hpp>
 #include <vle/vpz/Conditions.hpp>
 #include <vle/vpz/Views.hpp>
+#include <boost/cstdint.hpp>
 
 namespace vle { namespace vpz {
 
@@ -198,14 +199,14 @@ namespace vle { namespace vpz {
          * @brief Set the seed of the Experiment file.
          * @param seed The new seed to initialise the random generator.
          */
-        void setSeed(guint32 seed)
+        void setSeed(boost::uint32_t seed)
         { m_seed = seed; }
 
         /**
          * @brief Get the seed of the Experiment file.
          * @return The seed to initialise to random generator.
          */
-        guint32 seed() const
+        boost::uint32_t seed() const
         { return m_seed; }
 
         /**
@@ -225,7 +226,7 @@ namespace vle { namespace vpz {
         std::string         m_name;
         double              m_duration;
         double              m_begin;
-        guint32             m_seed;
+        boost::uint32_t     m_seed;
         std::string         m_combination;
         Replicas            m_replicas;
         Conditions          m_conditions;
