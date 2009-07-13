@@ -52,6 +52,11 @@
 
 namespace vle { namespace gvle {
 
+const std::string GVLE::WINDOW_TITLE =
+    "GVLE  " +
+    std::string(VLE_VERSION) +
+    std::string(VLE_EXTRA_VERSION);
+
 GVLE::FileTreeView::FileTreeView(
     BaseObjectType* cobject,
     const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/) :
@@ -222,6 +227,7 @@ GVLE::GVLE(BaseObjectType* cobject,
     mMenuAndToolbar->getToolbar()->set_toolbar_style(Gtk::TOOLBAR_BOTH);
 
     m_modeling->setModified(false);
+    set_title(WINDOW_TITLE);
     resize(900, 550);
     show();
 }
@@ -247,15 +253,12 @@ void GVLE::show()
 
 void GVLE::setModifiedTitle(const std::string& name)
 {
-    Glib::ustring current("* ");
-    current += get_title();
-    set_title(current);
     if (not name.empty() and
 	boost::filesystem::extension(name) == ".vpz") {
 	Editor::Documents::iterator it =
 	    mEditor->getDocumentsList().find(name);
 	if (it != mEditor->getDocumentsList().end())
-	    it->second->setTitle(name,
+	    it->second->setTitle(Glib::path_get_basename(name),
 				 getModeling()->getTopModel(),
 				 true);
     }
@@ -266,8 +269,7 @@ void GVLE::buildPackageHierarchy()
     mModelTreeBox->clear();
     mModelClassBox->clear();
     mPackage = vle::utils::Path::path().getPackageDir();
-    set_title(std::string(_("GVLE - package: ")).append(
-		  boost::filesystem::basename(mPackage)));
+    setTitle();
     mFileTreeView->clear();
     mFileTreeView->setPackage(mPackage);
     mFileTreeView->build();
@@ -660,10 +662,12 @@ void GVLE::onShowAbout()
 
 void GVLE::setTitle(const Glib::ustring& name)
 {
-    Glib::ustring title("gvle");
+    Glib::ustring title(WINDOW_TITLE);
+
+    if (not utils::Path::path().package().empty())
+	title += " - " + utils::Path::path().package();
     if (not name.empty()) {
-        title += " - ";
-        title += Glib::path_get_basename(name);
+        title += " - " + Glib::path_get_basename(name);
     }
     set_title(title);
 }

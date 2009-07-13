@@ -83,6 +83,7 @@ public:
                     };
 
     static const int overview_max = 60;
+    static const std::string WINDOW_TITLE;
 
     /**
      * Create a new window GVLE, if parameter filename is not empty, try to
@@ -616,7 +617,7 @@ public:
      * class.
      * @param name The name to assign.
      */
-    void setTitle(const Glib::ustring& name);
+    void setTitle(const Glib::ustring& name = "");
 
 private:
     Glib::RefPtr < Gnome::Glade::Xml >  mRefXML;

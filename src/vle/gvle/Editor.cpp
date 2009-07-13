@@ -226,8 +226,6 @@ DocumentDrawingArea::DocumentDrawingArea(GVLE* gvle,
 	+ " - " + model->getName();
     mArea = new ViewDrawingArea(mView);
     mViewport = new Gtk::Viewport(mAdjustWidth, mAdjustHeight);
-    mTitle = filename() + boost::filesystem::extension(filepath)
-	+ " - " + model->getName();
 
     mViewport->add(*mArea);
     mViewport->set_shadow_type(Gtk::SHADOW_NONE);
@@ -454,6 +452,8 @@ void Editor::changeTab(GtkNotebookPage* /*page*/, int num)
 		mGVLE->setCurrentTab(num);
 		mGVLE->getMenu()->onFileMode();
 	    }
+	    mGVLE->setTitle(boost::filesystem::basename(it->first) +
+			    boost::filesystem::extension(it->first));
 	    break;
 	}
 	++it;
