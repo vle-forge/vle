@@ -380,23 +380,23 @@ void ViewOutputBox::onChangedPlugin()
 	if (ref->get_selected()) {
 	    Gtk::TreeModel::Row row = *iter;
 	    name.assign(row.get_value(m_viewscolumnrecord.name));
+
+	    OutputPluginList list = m_modeling.pluginFactory().outputPlugins();
+	    OutputPluginList::iterator it = list.find(m_plugin->get_active_text());
+	    if( it != list.end()) {
+		m_editplugin->set_sensitive(true);
+	    } else {
+		m_editplugin->set_sensitive(false);
+	    }
+
+	    vpz::View& view(m_viewscopy.get(name));
+	    vpz::Output& output(m_viewscopy.outputs().get(view.output()));
+	    if (output.format() == vpz::Output::LOCAL) {
+		output.setLocalStream(output.location(), m_plugin->get_active_text());
+	    } else {
+		output.setDistantStream(output.location(), m_plugin->get_active_text());
+	    }
 	}
-    }
-
-    OutputPluginList list = m_modeling.pluginFactory().outputPlugins();
-    OutputPluginList::iterator it = list.find(m_plugin->get_active_text());
-    if( it != list.end()) {
-	m_editplugin->set_sensitive(true);
-    } else {
-	m_editplugin->set_sensitive(false);
-    }
-
-    vpz::View& view(m_viewscopy.get(name));
-    vpz::Output& output(m_viewscopy.outputs().get(view.output()));
-    if (output.format() == vpz::Output::LOCAL) {
-	output.setLocalStream(output.location(), m_plugin->get_active_text());
-    } else {
-	output.setDistantStream(output.location(), m_plugin->get_active_text());
     }
 }
 
