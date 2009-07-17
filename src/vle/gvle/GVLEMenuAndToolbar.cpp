@@ -161,7 +161,15 @@ void GVLEMenuAndToolbar::onPackageMode()
     m_refActionGroup->get_action("OpenVpz")->set_sensitive(true);
     m_refActionGroup->get_action("MenuEdit")->set_sensitive(false);
     m_refActionGroup->get_action("MenuZoom")->set_sensitive(false);
+    m_refActionGroup->get_action("MenuPackage")->set_sensitive(true);
     m_refActionGroup->get_action("MenuSimulation")->set_sensitive(false);
+    m_refActionGroup->get_action("ClearModel")->set_sensitive(false);
+    m_refActionGroup->get_action("ImportModel")->set_sensitive(false);
+    m_refActionGroup->get_action("ExportModel")->set_sensitive(false);
+    m_refActionGroup->get_action("ExportGraphic")->set_sensitive(false);
+    m_refActionGroup->get_action("SaveVpz")->set_sensitive(false);
+    m_refActionGroup->get_action("SaveFile")->set_sensitive(false);
+    m_refActionGroup->get_action("SaveFileAs")->set_sensitive(false);
     m_refActionGroup->get_action("Random Order")->set_sensitive(false);
 }
 
@@ -171,7 +179,15 @@ void GVLEMenuAndToolbar::onGlobalMode()
     m_refActionGroup->get_action("OpenVpz")->set_sensitive(false);
     m_refActionGroup->get_action("MenuEdit")->set_sensitive(false);
     m_refActionGroup->get_action("MenuZoom")->set_sensitive(false);
+    m_refActionGroup->get_action("MenuPackage")->set_sensitive(false);
     m_refActionGroup->get_action("MenuSimulation")->set_sensitive(false);
+    m_refActionGroup->get_action("ClearModel")->set_sensitive(false);
+    m_refActionGroup->get_action("ImportModel")->set_sensitive(false);
+    m_refActionGroup->get_action("ExportModel")->set_sensitive(false);
+    m_refActionGroup->get_action("ExportGraphic")->set_sensitive(false);
+    m_refActionGroup->get_action("SaveVpz")->set_sensitive(false);
+    m_refActionGroup->get_action("SaveFile")->set_sensitive(false);
+    m_refActionGroup->get_action("SaveFileAs")->set_sensitive(false);
     m_refActionGroup->get_action("Random Order")->set_sensitive(false);
 }
 

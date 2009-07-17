@@ -565,6 +565,14 @@ void GVLE::closeFile()
     }
 }
 
+void GVLE::tabClosed()
+{
+    if (utils::Path::path().package() == "")
+	mMenuAndToolbar->onGlobalMode();
+    else
+	mMenuAndToolbar->onPackageMode();
+}
+
 void GVLE::onMenuQuit()
 {
     if (m_modeling->isModified() == true and

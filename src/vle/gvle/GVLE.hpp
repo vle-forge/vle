@@ -604,6 +604,13 @@ public:
      */
     void onShowAbout();
 
+
+    /**
+     * @brief change the mode when all tabs are closed to block some
+     * menus
+     */
+    void tabClosed();
+
     /**
      * @brief Assign a new title to Gtk::Window managed by the GVLE
      * class.

@@ -385,6 +385,9 @@ void Editor::closeTab(const std::string& filepath)
 	    }
 	}
     }
+
+    if (getDocumentsList().size() == 0)
+	mGVLE->tabClosed();
 }
 
 void Editor::closeVpzTab()
