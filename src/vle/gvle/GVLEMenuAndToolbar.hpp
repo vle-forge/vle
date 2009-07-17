@@ -83,7 +83,7 @@ private:
     void createFileActions();
     void createEditActions();
     void createToolsActions();
-    void createPackageActions();
+    void createProjectActions();
     void createViewActions();
     void createSimulationActions();
     void createZoomActions();

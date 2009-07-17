@@ -39,10 +39,10 @@ const Glib::ustring GVLEMenuAndToolbar::UI_DEFINITION =
     "        <menu action='MenuFile'>"
     "            <menuitem action='NewFile'/>"
     "            <menuitem action='NewVpz'/>"
-    "            <menuitem action='NewPackage'/>"
+    "            <menuitem action='NewProject'/>"
     "            <separator/>"
     "            <menuitem action='OpenFile'/>"
-    "            <menuitem action='OpenPackage'/>"
+    "            <menuitem action='OpenProject'/>"
     "            <menuitem action='OpenVpz'/>"
     "            <menuitem action='OpenGlobalVpz'/>"
     "            <separator/>"
@@ -75,7 +75,7 @@ const Glib::ustring GVLEMenuAndToolbar::UI_DEFINITION =
     "            <menuitem action='ZoomTool' />"
     "            <menuitem action='QuestionTool' />"
     "        </menu>"
-    "        <menu action='MenuPackage'>"
+    "        <menu action='MenuProject'>"
     "            <menuitem action='ConfigureProject' />"
     "            <menuitem action='BuildProject' />"
     "            <menuitem action='CleanProject' />"
@@ -137,7 +137,7 @@ void GVLEMenuAndToolbar::init()
     createFileActions();
     createEditActions();
     createToolsActions();
-    createPackageActions();
+    createProjectActions();
     createViewActions();
     createSimulationActions();
     createZoomActions();
@@ -161,7 +161,7 @@ void GVLEMenuAndToolbar::onPackageMode()
     m_refActionGroup->get_action("OpenVpz")->set_sensitive(true);
     m_refActionGroup->get_action("MenuEdit")->set_sensitive(false);
     m_refActionGroup->get_action("MenuZoom")->set_sensitive(false);
-    m_refActionGroup->get_action("MenuPackage")->set_sensitive(true);
+    m_refActionGroup->get_action("MenuProject")->set_sensitive(true);
     m_refActionGroup->get_action("MenuSimulation")->set_sensitive(false);
     m_refActionGroup->get_action("ClearModel")->set_sensitive(false);
     m_refActionGroup->get_action("ImportModel")->set_sensitive(false);
@@ -179,7 +179,7 @@ void GVLEMenuAndToolbar::onGlobalMode()
     m_refActionGroup->get_action("OpenVpz")->set_sensitive(false);
     m_refActionGroup->get_action("MenuEdit")->set_sensitive(false);
     m_refActionGroup->get_action("MenuZoom")->set_sensitive(false);
-    m_refActionGroup->get_action("MenuPackage")->set_sensitive(false);
+    m_refActionGroup->get_action("MenuProject")->set_sensitive(false);
     m_refActionGroup->get_action("MenuSimulation")->set_sensitive(false);
     m_refActionGroup->get_action("ClearModel")->set_sensitive(false);
     m_refActionGroup->get_action("ImportModel")->set_sensitive(false);
@@ -258,7 +258,7 @@ void GVLEMenuAndToolbar::createFileActions()
 			    _("New _Vpz"), _("Create a new Vpz")),
 	sigc::mem_fun(mParent, &GVLE::onMenuNew));
     m_refActionGroup->add(
-	Gtk::Action::create("NewPackage", Gtk::Stock::DIRECTORY,
+	Gtk::Action::create("NewProject", Gtk::Stock::DIRECTORY,
 			    _("New Project"), _("Create a new project")),
 	sigc::mem_fun(mParent, &GVLE::onMenuNewProject));
     m_refActionGroup->add(
@@ -268,8 +268,8 @@ void GVLEMenuAndToolbar::createFileActions()
 	Gtk::AccelKey(""),
 	sigc::mem_fun(mParent, &GVLE::openFile));
     m_refActionGroup->add(
-	Gtk::Action::create("OpenPackage", Gtk::Stock::OPEN,
-			    _("Open P_ackage"), _("Open a Package")),
+	Gtk::Action::create("OpenProject", Gtk::Stock::OPEN,
+			    _("Open P_roject"), _("Open a Package")),
 	Gtk::AccelKey("<control><alt>o"),
 	sigc::mem_fun(mParent, &GVLE::onMenuOpenPackage));
     m_refActionGroup->add(
@@ -399,9 +399,9 @@ void GVLEMenuAndToolbar::createToolsActions()
 	sigc::mem_fun(mParent, &GVLE::onQuestion));
 }
 
-void GVLEMenuAndToolbar::createPackageActions()
+void GVLEMenuAndToolbar::createProjectActions()
 {
-    m_refActionGroup->add(Gtk::Action::create("MenuPackage", _("_Package")));
+    m_refActionGroup->add(Gtk::Action::create("MenuProject", _("_Project")));
 
     m_refActionGroup->add(
 	Gtk::Action::create("ConfigureProject", _("Configure Project"),
