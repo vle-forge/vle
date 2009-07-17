@@ -90,7 +90,7 @@ void ViewDrawingArea::draw()
         drawLink();
         drawZoomFrame();
         drawHighlightConnection();
-	set_size_request(mRectWidth, mRectHeight);
+	set_size_request(mRectWidth * mZoom, mRectHeight * mZoom);
 	mContext->restore();
     }
 }
@@ -924,8 +924,20 @@ bool ViewDrawingArea::on_configure_event(GdkEventConfigure* event)
         mCurrent->setHeight(mHeight);
     }
 
+    if (mRectWidth > mWidth * mZoom) {
+        change = true;
+        mWidth = mRectWidth;
+        mCurrent->setWidth(mWidth);
+    }
+
+    if (mRectHeight > mHeight * mZoom) {
+        change = true;
+        mHeight = mRectHeight;
+        mCurrent->setHeight(mHeight);
+    }
+
     if (change and mIsRealized) {
-	set_size_request(mRectWidth, mRectHeight);
+	set_size_request(mRectWidth * mZoom, mRectHeight * mZoom);
         mBuffer = Gdk::Pixmap::create(mWin, (int)(mWidth * mZoom),
                                       (int)(mHeight * mZoom), -1);
         queueRedraw();
