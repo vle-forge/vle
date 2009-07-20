@@ -29,6 +29,7 @@
 #include <vle/utils/Path.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <boost/filesystem.hpp>
 
 namespace vle { namespace gvle {
 
@@ -385,6 +386,9 @@ AtomicModelBox::DynamicTreeView::DynamicTreeView(
     append_column(_("Name"), mColumnsDyn.m_col_name);
     append_column(_("Library"), mColumnsDyn.m_dyn);
 
+    signal_row_activated().connect(
+      sigc::mem_fun(*this, &AtomicModelBox::DynamicTreeView::onRowActivated));
+
     //Fill popup menu:
     {
 	Gtk::Menu::MenuList& menulist = mMenuPopup.items();
@@ -458,6 +462,64 @@ bool AtomicModelBox::DynamicTreeView::on_button_press_event(GdkEventButton *even
   }
 
   return return_value;
+}
+
+std::string AtomicModelBox::DynamicTreeView::pathFileSearch(
+    const std::string& path, const std::string& filename)
+{
+    Glib::Dir dir(path);
+    Glib::Dir::iterator it;
+    for (it = dir.begin(); it != dir.end(); ++it) {
+	if ((*it)[0] != '.') {
+	    std::string name = Glib::build_filename(path, (*it));
+	    std::transform(name.begin(), name.end(), name.begin(), tolower);
+	    if (Glib::file_test((name), Glib::FILE_TEST_IS_DIR)) {
+		pathFileSearch(Glib::build_filename(path, (*it)),
+			       filename);
+	    }
+	    if (boost::filesystem::basename(name) == filename
+		and boost::filesystem::extension(name) == ".cpp") {
+		return Glib::build_filename(
+		  utils::Path::path().getPackageSrcDir(), (*it));
+	    }
+	}
+    }
+    return "";
+}
+
+void AtomicModelBox::DynamicTreeView::onRowActivated(
+    const Gtk::TreeModel::Path& path,
+    Gtk::TreeViewColumn* column)
+{
+    if (column
+	and not vle::utils::Path::path().getPackageDir().empty()
+	and boost::filesystem::exists(
+	    vle::utils::Path::path().getPackageSrcDir())) {
+	Gtk::TreeRow row = (*mRefTreeModelDyn->get_iter(path));
+	vpz::Dynamic& dynamic = mModeling->dynamics().get(
+	    row.get_value(mColumnsDyn.m_col_name));
+
+	std::string searchFile;
+	if (dynamic.model() != "")
+	    searchFile = dynamic.model();
+	else
+	    searchFile = row.get_value(mColumnsDyn.m_dyn);
+	std::transform(searchFile.begin(), searchFile.end(),
+		       searchFile.begin(), tolower);
+
+	std::string newTab = pathFileSearch(
+	    utils::Path::path().getPackageSrcDir(), searchFile);
+	if (not newTab.empty()) {
+	    mParent->on_apply();
+	    mModeling->getGVLE()->
+		getEditor()->openTab(newTab);
+	} else {
+	    std::string message = _("The source file ")
+		+ searchFile
+		+ _(".cpp does not exist");
+	    Error(message);
+	}
+    }
 }
 
 void AtomicModelBox::DynamicTreeView::onAdd()
@@ -805,6 +867,7 @@ void AtomicModelBox::show(vpz::AtomicModel& atom,  graph::AtomicModel& model)
     mDynamics->setModel(&atom);
     mDynamics->setModeling(mModeling);
     mDynamics->setLabel(mLabelDynamics);
+    mDynamics->setParent(this);
     mDynamics->build();
 
     mObservables->setModel(&atom);

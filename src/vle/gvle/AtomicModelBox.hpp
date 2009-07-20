@@ -29,6 +29,7 @@
 #include <gtkmm.h>
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/gvle/DynamicBox.hpp>
+#include <vle/gvle/Editor.hpp>
 #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/ObsAndViewBox.hpp>
 #include <vle/gvle/TreeViewConditions.hpp>
@@ -202,12 +203,19 @@ private:
 	    { mModel = model; }
 	void setLabel(Gtk::Label* label)
 	    { mLabel = label; }
+	void setParent(AtomicModelBox* parent)
+	  { mParent = parent; }
 	std::string getDynamic();
 
     protected:
 	// Override Signal handler:
 	// Alternatively, use signal_button_press_event().connect_notify()
 	virtual bool on_button_press_event(GdkEventButton *event);
+	void onRowActivated(const Gtk::TreeModel::Path& path,
+			    Gtk::TreeViewColumn* column);
+
+	std::string pathFileSearch(const std::string& path,
+				   const std::string& filename);
 
 	//Signal handler for popup menu items:
 	virtual void onAdd();
@@ -216,6 +224,7 @@ private:
 
     private:
 	vpz::AtomicModel* mModel;
+	AtomicModelBox* mParent;
 	Modeling* mModeling;
 	Gtk::Menu mMenuPopup;
 	ModelColumnsDyn mColumnsDyn;
