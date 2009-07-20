@@ -1,0 +1,48 @@
+INCLUDE_DIRECTORIES(
+  ${VLE_BINARY_DIR}/src
+  ${VLE_SOURCE_DIR}/src
+  ${Boost_INCLUDE_DIRS}
+  ${GLIBMM_INCLUDE_DIRS}
+  ${LIBXML_INCLUDE_DIRS}
+  ${GLADEMM_INCLUDE_DIRS}
+  ${GTKMM_INCLUDE_DIRS}
+  ${GTHREAD_INCLUDE_DIRS})
+
+LINK_DIRECTORIES(
+  ${GLIBMM_LIBRARY_DIRS}
+  ${LIBXML_LIBRARY_DIR}
+  ${GLADEMM_LIBRARY_DIRS}
+  ${GTKMM_LIBRARY_DIRS}
+  ${GTHREAD_LIBRARY_DIRS})
+
+ADD_LIBRARY(output-cairolevel MODULE CairoLevel.hpp CairoLevel.cpp)
+SET_TARGET_PROPERTIES(output-cairolevel PROPERTIES OUTPUT_NAME "cairolevel")
+
+TARGET_LINK_LIBRARIES(output-cairolevel
+  ${GLIBMM_LIBRARIES}
+  ${LIBXML_LIBRARIES}
+  ${CAIROMM_LIBRARIES}
+  ${GLADEMM_LIBRARIES}
+  ${GTKMM_LIBRARIES}
+  ${GTHREAD_LIBRARIES}
+  ${OS_SPECIFIC_LIBRARIES}
+  vlemanager
+  vleutils
+  vledata
+  vlevalue
+  vlegraph
+  vlevpz
+  vleoov
+  vlevpz
+  vledevs
+  vleextension
+  vlemanager
+  vletranslator
+  vlegvle)
+
+INSTALL(TARGETS output-cairolevel
+  RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/outputs"
+  LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/outputs")
+
+INSTALL(FILES cairolevel.glade DESTINATION ${VLE_SHARE_DIRS}/outputs/glade)
+

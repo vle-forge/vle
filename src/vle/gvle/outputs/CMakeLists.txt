@@ -1,2 +1,3 @@
 ADD_SUBDIRECTORY(storage)
 ADD_SUBDIRECTORY(cairogauge)
+ADD_SUBDIRECTORY(cairolevel)
