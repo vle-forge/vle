@@ -35,43 +35,42 @@ CalendarBox::CalendarBox(Glib::RefPtr<Gnome::Glade::Xml> xml):
 {
     xml->get_widget("DialogCalendar", mDialog);
     xml->get_widget("Calendar", mCalendar);
-
-    xml->get_widget("ButtonCalendarApply", mApply);
-    mApply->signal_clicked().connect(
-        sigc::mem_fun(*this, &CalendarBox::on_apply));
-
-    xml->get_widget("ButtonCalendarCancel", mCancel);
-    mCancel->signal_clicked().connect(
-        sigc::mem_fun(*this, &CalendarBox::on_cancel));
 }
 
 void CalendarBox::get_date(std::string& date)
 {
-    mDialog->show_all();
-    mDialog->run();
-
+    if (mDialog->run() == Gtk::RESPONSE_OK) {
 #if GTKMM_MAJOR_VERSION == 2 && GTKMM_MINOR_VERSION <= 10
-    guint year, month, day;
-    mCalendar->get_date(year, month, day);
-    Glib::Date d((Glib::Date::Day)day, (Glib::Date::Month)month,
-                 (Glib::Date::Year)year);
+        guint year, month, day;
+        mCalendar->get_date(year, month, day);
+        Glib::Date d((Glib::Date::Day)day, (Glib::Date::Month)month,
+                     (Glib::Date::Year)year);
 #else
-    Glib::Date d;
-    mCalendar->get_date(d);
+        Glib::Date d;
+        mCalendar->get_date(d);
 #endif
-
-    Glib::ustring format = "%a, %d %b %Y";
-    date = d.format_string(format);
+        Glib::ustring format = "%a, %d %b %Y";
+        date = d.format_string(format);
+    }
+    mDialog->hide();
 }
 
-void CalendarBox::on_apply()
+void CalendarBox::get_dateBegin(std::string& date)
 {
-    mDialog->hide_all();
-}
-
-void CalendarBox::on_cancel()
-{
-    mDialog->hide_all();
+    if (mDialog->run() == Gtk::RESPONSE_OK) {
+#if GTKMM_MAJOR_VERSION == 2 && GTKMM_MINOR_VERSION <= 10
+        guint year, month, day;
+        mCalendar->get_date(year, month, day);
+        Glib::Date d((Glib::Date::Day)day, (Glib::Date::Month)month,
+                     (Glib::Date::Year)year);
+#else
+        Glib::Date d;
+        mCalendar->get_date(d);
+#endif
+        Glib::ustring format = "%Y-%m-%d";
+        date = d.format_string(format);
+    }
+    mDialog->hide();
 }
 
 }

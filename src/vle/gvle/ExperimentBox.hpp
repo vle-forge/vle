@@ -74,6 +74,15 @@ namespace vle { namespace gvle {
         Gtk::Dialog*        mDialog;
         Gtk::Entry*         mEntryName;
         Gtk::SpinButton*    mSpinDuration;
+        Gtk::SpinButton*    mSpinBeginReal;
+        Gtk::Entry*         mEntryBeginDate;
+        Gtk::Button*        mButtonCalendarBegin;
+        CalendarBox         mCalendarBegin;
+        Gtk::SpinButton*    mSpinBeginH;
+        Gtk::SpinButton*    mSpinBeginM;
+        Gtk::SpinButton*    mSpinBeginS;
+        double              mBeginRealMin, mBeginRealMax;
+        bool                mRealUpdated, mTimeUpdated;
         Gtk::SpinButton*    mSpinSimuSeed;
         Gtk::Button*        mButtonSimuSeed;
         Gtk::HBox*          mHboxCombi;
@@ -83,6 +92,8 @@ namespace vle { namespace gvle {
         Gtk::Button*        mButtonPlanSeed;
         Gtk::SpinButton*    mButtonNumber;
 
+        std::list < sigc::connection > mSigcConnection;
+
         utils::Rand         mRand;
 
         bool apply();
@@ -90,6 +101,13 @@ namespace vle { namespace gvle {
 
 	void on_calendar();
 	void on_now();
+
+        void on_calendarBegin();
+        void on_julianDate_changed();
+        void on_time_changed();
+        void updateBeginReal();
+        void updateBeginDate();
+        void updateBeginTime();
 
         void on_random_simu();
         void on_random_plan();

@@ -39,17 +39,13 @@ public:
     CalendarBox(Glib::RefPtr<Gnome::Glade::Xml> xml);
 
     void get_date(std::string& date);
+    void get_dateBegin(std::string& date);
 
 private:
     Glib::RefPtr<Gnome::Glade::Xml>     mXml;
 
     Gtk::Dialog*                        mDialog;
     Gtk::Calendar*                      mCalendar;
-    Gtk::Button*                        mApply;
-    Gtk::Button*                        mCancel;
-
-    void on_apply();
-    void on_cancel();
 };
 
 }
