@@ -42,7 +42,7 @@ ViewOutputBox::ViewOutputBox(Modeling& modeling,
                              Glib::RefPtr < Gnome::Glade::Xml > ref,
                              vpz::Views& views)
     : m_modeling(modeling), m_viewsorig(views), m_viewscopy(views), m_xml(ref),
-    m_type(0), m_format(0), m_plugin(0), m_views(0)
+      m_type(0), m_format(0), m_plugin(0), m_views(0), m_changedView(false)
 {
     m_xml->get_widget("DialogViewOutput", m_dialog);
     m_xml->get_widget("spinbuttonTimestepDialogViewOutput", m_timestep);
@@ -389,12 +389,19 @@ void ViewOutputBox::onChangedPlugin()
 		m_editplugin->set_sensitive(false);
 	    }
 
-	    vpz::View& view(m_viewscopy.get(name));
-	    vpz::Output& output(m_viewscopy.outputs().get(view.output()));
-	    if (output.format() == vpz::Output::LOCAL) {
-		output.setLocalStream(output.location(), m_plugin->get_active_text());
+	    if (m_changedView) {
+		m_changedView = false;
 	    } else {
-		output.setDistantStream(output.location(), m_plugin->get_active_text());
+		vpz::View& view(m_viewscopy.get(name));
+		vpz::Output& output(m_viewscopy.outputs().get(view.output()));
+		if (output.format() == vpz::Output::LOCAL) {
+		    output.setLocalStream(output.location(),
+					  m_plugin->get_active_text());
+		} else {
+		    output.setDistantStream(output.location(),
+					    m_plugin->get_active_text());
+		}
+		updateView(name);
 	    }
 	}
     }
@@ -491,6 +498,8 @@ void ViewOutputBox::assignView(const std::string& name)
 
 void ViewOutputBox::updateView(const std::string& name)
 {
+    std::string plugin = m_plugin->get_active_text();
+
     vpz::View& view(m_viewscopy.get(name));
     vpz::Output& output(m_viewscopy.outputs().get(view.output()));
 
@@ -499,6 +508,9 @@ void ViewOutputBox::updateView(const std::string& name)
     } else {
 	m_data->get_buffer()->set_text("");
     }
+
+    if (plugin != output.plugin())
+	m_changedView = true;
 
     m_type->set_active_text(view.streamtype());
     m_timestep->set_sensitive(view.type() == vpz::View::TIMED);
