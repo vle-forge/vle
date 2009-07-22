@@ -695,11 +695,14 @@ void ViewDrawingArea::drawChildrenPorts(graph::Model* model,
 			       Cairo::FONT_WEIGHT_NORMAL);
     mContext->set_font_size(mModeling->getFontSize());
 
-    mContext->move_to((model->x() + (model->width() / 2)),
-		      (model->y() + (model->height() * 1) +
-		       MODEL_SPACING_PORT) + 10);
     if (mZoom >= 1.0) {
-	mContext->show_text(model->getName());
+        Cairo::TextExtents textExtents;
+        mContext->get_text_extents(model->getName(), textExtents);
+        mContext->move_to((model->x() + (model->width() / 2) -
+                           (textExtents.width / 2)),
+			  (model->y() + model->height() +
+			   MODEL_SPACING_PORT) + 10);
+        mContext->show_text(model->getName());
     }
 }
 
