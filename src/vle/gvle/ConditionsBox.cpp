@@ -38,11 +38,27 @@ ConditionsBox::ConditionsTreeView::ConditionsTreeView(
     BaseObjectType* cobject,
     const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/) :
     Gtk::TreeView(cobject),
-    mConditions(0)
+    mConditions(0),
+    mValidateRetry(false)
 {
     mRefTreeModel = Gtk::ListStore::create(mColumns);
     set_model(mRefTreeModel);
-    append_column(_("Initial conditions"), mColumns.m_col_name);
+
+    mColumn = append_column_editable(_("Initial conditions"),
+				     mColumns.m_col_name);
+    mCellRenderer = dynamic_cast<Gtk::CellRendererText*>(
+	get_column_cell_renderer(mColumn - 1));
+    mCellRenderer->property_editable() = true;
+
+    mCellRenderer->signal_editing_started().connect(
+	sigc::mem_fun(*this,
+		      &ConditionsBox::ConditionsTreeView::
+		      onEditionStarted));
+    mCellRenderer->signal_edited().connect(
+	sigc::mem_fun(*this,
+		      &ConditionsBox::ConditionsTreeView::
+		      onEdition));
+
     mRefTreeSelection = get_selection();
     mRefTreeSelection->signal_changed().connect(
         sigc::mem_fun(*this,
@@ -241,6 +257,47 @@ void ConditionsBox::ConditionsTreeView::onEdit(std::string pluginName)
     }
 }
 
+void ConditionsBox::ConditionsTreeView::onEditionStarted(
+    Gtk::CellEditable* cellEditable, const Glib::ustring& /* path */)
+{
+    Gtk::TreeModel::iterator it = mRefTreeSelection->get_selected();
+
+    if (it) {
+	mOldName = (*it)[mColumns.m_col_name];
+    }
+
+    if(mValidateRetry)
+    {
+	Gtk::CellEditable* celleditable_validated = cellEditable;
+	Gtk::Entry* pEntry = dynamic_cast<Gtk::Entry*>(celleditable_validated);
+	if(pEntry)
+	{
+	    pEntry->set_text(mInvalidTextForRetry);
+	    mValidateRetry = false;
+	    mInvalidTextForRetry.clear();
+	}
+    }
+}
+
+void ConditionsBox::ConditionsTreeView::onEdition(
+        const Glib::ustring& pathString,
+        const Glib::ustring& newName)
+{
+    Gtk::TreePath path(pathString);
+
+    vpz::ConditionList& list = mConditions->conditionlist();
+
+    if (list.find(newName) == list.end() and newName != "") {
+	mConditions->rename(mOldName, newName);
+	mParent->buildTreeConditions();
+
+	vpz::AtomicModelList& atomlist(
+	    mParent->getModeling()->vpz().project().model().atomicModels());
+	atomlist.updateCondition(mOldName, newName);
+    }
+    build();
+}
+
 
 ////
 //  PortsTreeView
@@ -250,11 +307,28 @@ ConditionsBox::PortsTreeView::PortsTreeView(
     BaseObjectType* cobject,
     const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/) :
     Gtk::TreeView(cobject),
-    mCondition(0)
+    mCondition(0),
+    mValidateRetry(false)
 {
     mRefTreeModel = Gtk::ListStore::create(mColumns);
     set_model(mRefTreeModel);
-    append_column(_("Parameters"), mColumns.m_col_name);
+
+    mColumn = append_column_editable(_("Parameters"),
+			   mColumns.m_col_name);
+    mCellRenderer = dynamic_cast<Gtk::CellRendererText*>(
+	get_column_cell_renderer(mColumn - 1));
+    mCellRenderer->property_editable() = true;
+
+    mCellRenderer->signal_editing_started().connect(
+	sigc::mem_fun(*this,
+		      &ConditionsBox::PortsTreeView::
+		      onEditionStarted));
+
+    mCellRenderer->signal_edited().connect(
+	sigc::mem_fun(*this,
+		      &ConditionsBox::PortsTreeView::
+		      onEdition));
+
     mRefTreeSelection = get_selection();
     mRefTreeSelection->signal_changed().connect(
         sigc::mem_fun(*this,
@@ -429,6 +503,49 @@ void ConditionsBox::PortsTreeView::onEdit(std::string pluginName)
 	}
     }
 }
+
+void ConditionsBox::PortsTreeView::onEditionStarted(
+    Gtk::CellEditable* cellEditable, const Glib::ustring& /* path */)
+{
+    Gtk::TreeModel::iterator it_select = mRefTreeSelection->get_selected();
+    if (it_select) {
+	mOldName = (*it_select)[mColumns.m_col_name];
+    }
+
+    if(mValidateRetry)
+    {
+	Gtk::CellEditable* celleditable_validated = cellEditable;
+	Gtk::Entry* pEntry = dynamic_cast<Gtk::Entry*>(celleditable_validated);
+	if(pEntry)
+	{
+	    pEntry->set_text(mInvalidTextForRetry);
+	    mValidateRetry = false;
+	    mInvalidTextForRetry.clear();
+	}
+    }
+}
+
+void ConditionsBox::PortsTreeView::onEdition(
+        const Glib::ustring& pathString,
+        const Glib::ustring& newName)
+{
+    Gtk::TreePath path(pathString);
+
+    Gtk::TreeModel::iterator it_select = mRefTreeSelection->get_selected();
+    std::list < std::string > list;
+    mCondition->portnames(list);
+    if (it_select) {
+        std::list < std::string >::const_iterator it_find =
+            std::find(list.begin(), list.end(), newName);
+        if (it_find == list.end() and newName != ""){
+            mCondition->rename(mOldName, newName);
+            mParent->buildTreePorts(mCondition->name());
+        }
+    }
+    build();
+}
+
+
 
 ////
 // ConditionsBox

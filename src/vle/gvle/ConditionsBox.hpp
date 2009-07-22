@@ -82,6 +82,14 @@ private:
 	virtual void onCopy();
 	void onEdit(std::string pluginName);
 
+	// Signal handler for text area
+	virtual void onEditionStarted(
+	    Gtk::CellEditable* cellEditatble,
+	    const Glib::ustring& path);
+	virtual void onEdition(
+	    const Glib::ustring& pathString,
+	    const Glib::ustring& newName);
+
     private:
 
 	ConditionsBox* mParent;
@@ -91,6 +99,12 @@ private:
 	ModelColumnsConditions mColumns;
 	Glib::RefPtr<Gtk::ListStore> mRefTreeModel;
 	Glib::RefPtr<Gtk::TreeSelection> mRefTreeSelection;
+
+	int mColumn;
+	bool mValidateRetry;
+	Glib::ustring mOldName;
+	Gtk::CellRendererText* mCellRenderer;
+	Glib::ustring mInvalidTextForRetry;
     };
 
     class ModelColumnsPorts : public Gtk::TreeModel::ColumnRecord
@@ -135,6 +149,14 @@ private:
 	virtual void onRename();
 	void onEdit(std::string pluginName);
 
+	// Signal handler for text area
+	virtual void onEditionStarted(
+	    Gtk::CellEditable* cellEditatble,
+	    const Glib::ustring& path);
+	virtual void onEdition(
+	    const Glib::ustring& pathString,
+	    const Glib::ustring& newName);
+
     private:
 	ConditionsBox* mParent;
 	vpz::Condition* mCondition;
@@ -143,6 +165,12 @@ private:
 	ModelColumnsPorts mColumns;
 	Glib::RefPtr<Gtk::ListStore> mRefTreeModel;
 	Glib::RefPtr<Gtk::TreeSelection> mRefTreeSelection;
+
+	int mColumn;
+	bool mValidateRetry;
+	Glib::ustring mOldName;
+	Gtk::CellRendererText* mCellRenderer;
+	Glib::ustring mInvalidTextForRetry;
     };
 
 public:

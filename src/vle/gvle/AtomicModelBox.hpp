@@ -121,11 +121,25 @@ private:
 	virtual void onRemove();
 	virtual void onRename();
 
+	// Signal handler for text area
+	virtual void onEditionStarted(
+	    Gtk::CellEditable* cellEditatble,
+	    const Glib::ustring& path);
+	virtual void onEdition(
+	    const Glib::ustring& pathString,
+	    const Glib::ustring& newText);
+
     private:
 	graph::AtomicModel* mModel;
 	Gtk::Menu mMenuPopup;
 	ModelColumnsPort mColumnsInputPort;
 	Glib::RefPtr<Gtk::ListStore> mRefTreeModelInputPort;
+
+	int mColumnName;
+	bool mValidateRetry;
+	std::string mOldName;
+	Gtk::CellRendererText* mCellrendererValidated;
+	Glib::ustring mInvalidTextForRetry;
     };
 
     class OutputPortTreeView : public Gtk::TreeView
@@ -149,11 +163,25 @@ private:
 	virtual void onRemove();
 	virtual void onRename();
 
+	// Signal handler for text area
+	virtual void onEditionStarted(
+	    Gtk::CellEditable* cellEditatble,
+	    const Glib::ustring& path);
+	virtual void onEdition(
+	    const Glib::ustring& pathString,
+	    const Glib::ustring& newText);
+
     private:
 	graph::AtomicModel* mModel;
 	Gtk::Menu mMenuPopup;
 	ModelColumnsPort mColumnsOutputPort;
 	Glib::RefPtr<Gtk::ListStore> mRefTreeModelOutputPort;
+
+	int mColumnName;
+	bool mValidateRetry;
+	std::string mOldName;
+	Gtk::CellRendererText* mCellrendererValidated;
+	Glib::ustring mInvalidTextForRetry;
     };
 
     class ConditionTreeView : public Gtk::TreeView

@@ -79,6 +79,14 @@ public:
      */
     void onRenameModels();
 
+    // Signal handler for text area
+    virtual void onEditionStarted(
+	Gtk::CellEditable* cellEditatble,
+	const Glib::ustring& path);
+    virtual void onEdition(
+	const Glib::ustring& pathString,
+	const Glib::ustring& newName);
+
     /**
      * @brief Set a value to modeling
      *
@@ -94,14 +102,6 @@ public:
     void clear();
 
 protected:
-    /**
-     * When user press ECHAP or CTRL-W, we close window
-     *
-     * @param event to select key press
-     * @return true
-     */
-    bool on_key_release_event(GdkEventKey* event);
-
     /**
      * a recursive function to complete tree
      *
@@ -156,6 +156,14 @@ protected:
                     const Gtk::TreeModel::iterator& iter);
 
     /**
+     * When user clicks, an editable text area appears if it is not
+     * a double clic
+     *
+     * @param event to select mouse button
+     */
+    bool onExposeEvent(GdkEvent* event);
+
+    /**
      * Describe ColumnRead of ModelTree with to string, name and
      * description.
      *
@@ -177,6 +185,14 @@ class ModelTreeColumn : public Gtk::TreeModel::ColumnRecord
     Gtk::Menu                    m_menu;
     Modeling*                    m_modeling;
     std::string                  m_search;
+
+    // Cell
+    int                          m_ColumnName;
+    Gtk::CellRendererText*       m_CellRenderer;
+    std::string                  m_OldName;
+    bool                         m_ValidateRetry;
+    Glib::ustring                m_InvalidTextForRetry;
+    guint32                      m_delayTime;
 
 private:
     void initMenuPopupModels();

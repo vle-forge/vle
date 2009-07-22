@@ -38,11 +38,26 @@ namespace vle { namespace gvle {
 AtomicModelBox::InputPortTreeView::InputPortTreeView(
     BaseObjectType* cobject,
     const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/) :
-    Gtk::TreeView(cobject)
+    Gtk::TreeView(cobject),
+    mValidateRetry(false)
 {
     mRefTreeModelInputPort = Gtk::ListStore::create(mColumnsInputPort);
     set_model(mRefTreeModelInputPort);
-    append_column(_("Name"), mColumnsInputPort.m_col_name);
+    //append_column(_("Name"), mColumnsInputPort.m_col_name);
+    mColumnName = append_column_editable(_("Name"),
+					 mColumnsInputPort.m_col_name);
+    mCellrendererValidated = dynamic_cast<Gtk::CellRendererText*>(
+	get_column_cell_renderer(mColumnName - 1));
+    mCellrendererValidated->property_editable() = true;
+    mCellrendererValidated->signal_editing_started().connect(
+	sigc::mem_fun(*this,
+		      &AtomicModelBox::InputPortTreeView::
+		      onEditionStarted) );
+
+    mCellrendererValidated->signal_edited().connect(
+	sigc::mem_fun(*this,
+		      &AtomicModelBox::InputPortTreeView::
+		      onEdition) );
 
     //Fill popup menu:
     {
@@ -163,16 +178,79 @@ void AtomicModelBox::InputPortTreeView::onRename()
     }
 }
 
+void AtomicModelBox::InputPortTreeView::onEditionStarted(
+    Gtk::CellEditable* cell_editable, const Glib::ustring& /* path */)
+{
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+    Gtk::TreeModel::iterator iter = refSelection->get_selected();
+
+    if (iter) {
+	Gtk::TreeModel::Row row = *iter;
+	mOldName = row.get_value(mColumnsInputPort.m_col_name);
+    }
+
+    if(mValidateRetry) {
+	Gtk::CellEditable* celleditable_validated = cell_editable;
+	Gtk::Entry* pEntry = dynamic_cast<Gtk::Entry*>(celleditable_validated);
+	if(pEntry) {
+	    pEntry->set_text(mInvalidTextForRetry);
+	    mValidateRetry = false;
+	    mInvalidTextForRetry.clear();
+	}
+    }
+}
+
+void AtomicModelBox::InputPortTreeView::onEdition(
+        const Glib::ustring& pathString,
+        const Glib::ustring& newName)
+{
+    Gtk::TreePath path(pathString);
+
+    graph::ConnectionList& list = mModel->getInputPortList();
+
+    if (list.find(newName) == list.end() and newName != "") {
+	Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+	Gtk::TreeModel::iterator iter = refSelection->get_selected();
+
+	if (iter) {
+	    Gtk::TreeModel::Row row = *iter;
+	    row.set_value(mColumnsInputPort.m_col_name, newName);
+
+	    if (mModel->existInputPort(mOldName)) {
+		mModel->renameInputPort(mOldName, newName);
+	    }
+	    mValidateRetry = true;
+	}
+    }
+    build();
+}
+
+
 // OutputPortTreeView
 
 AtomicModelBox::OutputPortTreeView::OutputPortTreeView(
     BaseObjectType* cobject,
     const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/) :
-    Gtk::TreeView(cobject)
+    Gtk::TreeView(cobject),
+    mValidateRetry(false)
 {
     mRefTreeModelOutputPort = Gtk::ListStore::create(mColumnsOutputPort);
     set_model(mRefTreeModelOutputPort);
-    append_column(_("Name"), mColumnsOutputPort.m_col_name);
+
+    mColumnName = append_column_editable(_("Name"),
+				     mColumnsOutputPort.m_col_name);
+    mCellrendererValidated = dynamic_cast<Gtk::CellRendererText*>(
+	get_column_cell_renderer(mColumnName - 1));
+    mCellrendererValidated->property_editable() = true;
+    mCellrendererValidated->signal_editing_started().connect(
+	sigc::mem_fun(*this,
+		      &AtomicModelBox::OutputPortTreeView::
+		      onEditionStarted) );
+
+    mCellrendererValidated->signal_edited().connect(
+	sigc::mem_fun(*this,
+		      &AtomicModelBox::OutputPortTreeView::
+		      onEdition) );
 
     //Fill popup menu:
     {
@@ -292,6 +370,54 @@ void AtomicModelBox::OutputPortTreeView::onRename()
 	}
     }
 }
+
+void AtomicModelBox::OutputPortTreeView::onEditionStarted(
+    Gtk::CellEditable* cell_editable, const Glib::ustring& /* path */)
+{
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+    Gtk::TreeModel::iterator iter = refSelection->get_selected();
+
+    if (iter) {
+	Gtk::TreeModel::Row row = *iter;
+	mOldName = row.get_value(mColumnsOutputPort.m_col_name);
+    }
+
+    if(mValidateRetry) {
+	Gtk::CellEditable* celleditable_validated = cell_editable;
+	Gtk::Entry* pEntry = dynamic_cast<Gtk::Entry*>(celleditable_validated);
+	if(pEntry) {
+	    pEntry->set_text(mInvalidTextForRetry);
+	    mValidateRetry = false;
+	    mInvalidTextForRetry.clear();
+	}
+    }
+}
+
+void AtomicModelBox::OutputPortTreeView::onEdition(
+        const Glib::ustring& pathString,
+        const Glib::ustring& newName)
+{
+    Gtk::TreePath path(pathString);
+
+    graph::ConnectionList& list = mModel->getOutputPortList();
+
+    if (list.find(newName) == list.end() and newName != "") {
+	Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+	Gtk::TreeModel::iterator iter = refSelection->get_selected();
+
+	if (iter) {
+	    Gtk::TreeModel::Row row = *iter;
+	    row.set_value(mColumnsOutputPort.m_col_name, newName);
+
+	    if (mModel->existOutputPort(mOldName)) {
+		mModel->renameOutputPort(mOldName, newName);
+	    }
+	    mValidateRetry = true;
+	}
+    }
+    build();
+}
+
 
 // ConditionTreeView
 

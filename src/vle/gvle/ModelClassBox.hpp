@@ -68,6 +68,14 @@ public:
     virtual void onImportClassesFromVpz();
     void showRow(const std::string& model_name);
 
+    // Signal handler for text area
+    virtual void onEditionStarted(
+	Gtk::CellEditable* cellEditatble,
+	const Glib::ustring& path);
+    virtual void onEdition(
+	const Glib::ustring& pathString,
+	const Glib::ustring& newName);
+
     /**
      * @brief init the NewModelClassBox
      *
@@ -80,14 +88,6 @@ public:
     void clear();
 
 protected:
-    /**
-     * When user press ECHAP or CTRL-W, we close window
-     *
-     * @param event to select key press
-     * @return true
-     */
-    bool on_key_release_event(GdkEventKey* event);
-
     /**
      * a recursive function to complete tree
      *
@@ -116,6 +116,14 @@ protected:
      */
     bool on_foreach(const Gtk::TreeModel::Path&,
                     const Gtk::TreeModel::iterator& iter);
+
+    /**
+     * When user clicks, an editable text area appears if it is not a
+     * double clic
+     *
+     * @param event to select mouse button
+     */
+    bool onExposeEvent(GdkEvent* event);
 
     /**
      * on activated a row, Modeling is all to show a new View centered on
@@ -157,6 +165,14 @@ private:
     vpz::ClassList*                      mClasses_backup;
     Glib::RefPtr<Gtk::TreeStore>         mRefTreeModel;
     std::string                          mSearch;
+
+    //Cell
+    int                                  mColumnName;
+    Gtk::CellRendererText*               mCellRenderer;
+    std::string                          mOldName;
+    bool                                 mValidateRetry;
+    Glib::ustring                        mInvalidTextForRetry;
+    guint32                              mDelayTime;
 };
 
 }

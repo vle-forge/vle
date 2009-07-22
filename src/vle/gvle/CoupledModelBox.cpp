@@ -44,7 +44,21 @@ CoupledModelBox::InputPortTreeView::InputPortTreeView(
 {
     mRefTreeModelInputPort = Gtk::ListStore::create(mColumnsInputPort);
     set_model(mRefTreeModelInputPort);
-    append_column(_("Input Ports"), mColumnsInputPort.m_col_name);
+
+    mColumnIn = append_column_editable(_("Input Ports"),
+				   mColumnsInputPort.m_col_name);
+    mCellRenderer = dynamic_cast<Gtk::CellRendererText*>(
+	get_column_cell_renderer(mColumnIn - 1));
+    mCellRenderer->property_editable() = true;
+
+    mCellRenderer->signal_editing_started().connect(
+	sigc::mem_fun(*this,
+	&CoupledModelBox::InputPortTreeView::onEditionStarted));
+
+    mCellRenderer->signal_edited().connect(
+	sigc::mem_fun(*this,
+		      &CoupledModelBox::InputPortTreeView::
+		      onEdition));
 
     {
 	Gtk::Menu::MenuList& menulist = mMenuPopup.items();
@@ -153,6 +167,55 @@ void CoupledModelBox::InputPortTreeView::onRename()
     }
 }
 
+void CoupledModelBox::InputPortTreeView::onEditionStarted(
+    Gtk::CellEditable* cellEditable, const Glib::ustring& /* path */)
+{
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+    Gtk::TreeModel::iterator iter = refSelection->get_selected();
+
+    if (iter) {
+	Gtk::TreeModel::Row row = *iter;
+	mOldName = row.get_value(mColumnsInputPort.m_col_name);
+    }
+
+    if(mValidateRetry) {
+	Gtk::CellEditable* celleditable_validated = cellEditable;
+	Gtk::Entry* pEntry = dynamic_cast<Gtk::Entry*>(celleditable_validated);
+	if(pEntry)
+	{
+	    pEntry->set_text(mInvalidTextForRetry);
+	    mValidateRetry = false;
+	    mInvalidTextForRetry.clear();
+	}
+    }
+}
+
+void CoupledModelBox::InputPortTreeView::onEdition(
+        const Glib::ustring& pathString,
+        const Glib::ustring& newName)
+{
+    Gtk::TreePath path(pathString);
+
+    graph::ConnectionList& list = mModel->getInputPortList();
+
+    if (list.find(newName) == list.end() and newName != "") {
+	Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+	Gtk::TreeModel::iterator iter = refSelection->get_selected();
+
+	if (iter) {
+	    Gtk::TreeModel::Row row = *iter;
+	    row.set_value(mColumnsInputPort.m_col_name, newName);
+
+	    if (mModel->existInputPort(mOldName)) {
+		mModel->renameInputPort(mOldName, newName);
+	    }
+	    mValidateRetry = true;
+	}
+    }
+    build();
+}
+
+
 
 CoupledModelBox::OutputPortTreeView::OutputPortTreeView(
     BaseObjectType* cobject,
@@ -161,7 +224,21 @@ CoupledModelBox::OutputPortTreeView::OutputPortTreeView(
 {
     mRefTreeModelOutputPort = Gtk::ListStore::create(mColumnsOutputPort);
     set_model(mRefTreeModelOutputPort);
-    append_column(_("Output Ports"), mColumnsOutputPort.m_col_name);
+
+    mColumnOut = append_column_editable(_("Output Ports"),
+				     mColumnsOutputPort.m_col_name);
+    mCellRenderer = dynamic_cast<Gtk::CellRendererText*>(
+	get_column_cell_renderer(mColumnOut - 1));
+    mCellRenderer->property_editable() = true;
+    mCellRenderer->signal_editing_started().connect(
+	sigc::mem_fun(*this,
+		      &CoupledModelBox::OutputPortTreeView::
+		      onEditionStarted) );
+
+    mCellRenderer->signal_edited().connect(
+	sigc::mem_fun(*this,
+		      &CoupledModelBox::OutputPortTreeView::
+		      onEdition) );
 
     //Fill popup menu:
     {
@@ -269,6 +346,54 @@ void CoupledModelBox::OutputPortTreeView::onRename()
 	    build();
 	}
     }
+}
+
+void CoupledModelBox::OutputPortTreeView::onEditionStarted(
+    Gtk::CellEditable* cellEditable, const Glib::ustring& /* path */)
+{
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+    Gtk::TreeModel::iterator iter = refSelection->get_selected();
+
+    if (iter) {
+	Gtk::TreeModel::Row row = *iter;
+	mOldName = row.get_value(mColumnsOutputPort.m_col_name);
+    }
+
+    if(mValidateRetry) {
+	Gtk::CellEditable* celleditable_validated = cellEditable;
+	Gtk::Entry* pEntry = dynamic_cast<Gtk::Entry*>(celleditable_validated);
+	if(pEntry)
+	{
+	    pEntry->set_text(mInvalidTextForRetry);
+	    mValidateRetry = false;
+	    mInvalidTextForRetry.clear();
+	}
+    }
+}
+
+void CoupledModelBox::OutputPortTreeView::onEdition(
+        const Glib::ustring& pathString,
+        const Glib::ustring& newName)
+{
+    Gtk::TreePath path(pathString);
+
+    graph::ConnectionList& list = mModel->getOutputPortList();
+
+    if (list.find(newName) == list.end() and newName != "") {
+	Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+	Gtk::TreeModel::iterator iter = refSelection->get_selected();
+
+	if (iter) {
+	    Gtk::TreeModel::Row row = *iter;
+	    row.set_value(mColumnsOutputPort.m_col_name, newName);
+
+	    if (mModel->existOutputPort(mOldName)) {
+		mModel->renameOutputPort(mOldName, newName);
+	    }
+	    mValidateRetry = true;
+	}
+    }
+    build();
 }
 
 CoupledModelBox::CoupledModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m):

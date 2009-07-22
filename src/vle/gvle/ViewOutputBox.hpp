@@ -75,6 +75,13 @@ namespace vle { namespace gvle {
 	 */
 	void onCopyViews();
 
+	// Signal handler for text area
+	virtual void onEditionStarted(
+	    Gtk::CellEditable* cellEditatble,
+	    const Glib::ustring& path);
+	virtual void onEdition(
+	    const Glib::ustring& pathString,
+	    const Glib::ustring& newName);
 
     private:
         Modeling&      m_modeling;
@@ -100,6 +107,12 @@ namespace vle { namespace gvle {
         Gtk::TextView*      m_data;
 
 	bool                m_changedView;
+
+	Gtk::CellRendererText* m_cellrenderer;
+	int                    m_columnName;
+	std::string            m_oldName;
+	bool                   m_validateRetry;
+	Glib::ustring          m_invalidTextForRetry;
 
         sigc::connection m_cntViewButtonRelease;
         sigc::connection m_cntViewCursorChanged;

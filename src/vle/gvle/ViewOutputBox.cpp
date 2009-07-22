@@ -42,7 +42,8 @@ ViewOutputBox::ViewOutputBox(Modeling& modeling,
                              Glib::RefPtr < Gnome::Glade::Xml > ref,
                              vpz::Views& views)
     : m_modeling(modeling), m_viewsorig(views), m_viewscopy(views), m_xml(ref),
-      m_type(0), m_format(0), m_plugin(0), m_views(0), m_changedView(false)
+      m_type(0), m_format(0), m_plugin(0), m_views(0), m_changedView(false),
+      m_validateRetry(false)
 {
     m_xml->get_widget("DialogViewOutput", m_dialog);
     m_xml->get_widget("spinbuttonTimestepDialogViewOutput", m_timestep);
@@ -136,7 +137,21 @@ void ViewOutputBox::run()
 void ViewOutputBox::initViews()
 {
     m_model = Gtk::ListStore::create(m_viewscolumnrecord);
-    m_views->append_column(_("Name"), m_viewscolumnrecord.name);
+
+    m_columnName = m_views->append_column_editable(_("Name"),
+						   m_viewscolumnrecord.name);
+    m_cellrenderer = dynamic_cast<Gtk::CellRendererText*>(
+	m_views->get_column_cell_renderer(m_columnName - 1));
+    m_cellrenderer->property_editable() = true;
+
+    m_cellrenderer->signal_editing_started().connect(
+	sigc::mem_fun(*this,
+		      &ViewOutputBox::onEditionStarted));
+
+    m_cellrenderer->signal_edited().connect(
+	sigc::mem_fun(*this,
+		      &ViewOutputBox::onEdition) );
+
     m_views->set_model(m_model);
     m_data->get_buffer()->set_text("");
 }
@@ -277,6 +292,56 @@ void ViewOutputBox::onCopyViews()
 	    updateView(copy);
             m_views->set_cursor(m_model->get_path(iter));
             m_deletedView.erase(copy);
+	}
+    }
+}
+
+void ViewOutputBox::onEditionStarted(
+    Gtk::CellEditable* cellEditable, const Glib::ustring& /* path */)
+{
+    storePrevious();
+
+    Glib::RefPtr < Gtk::TreeView::Selection > ref = m_views->get_selection();
+    if (ref) {
+        Gtk::TreeModel::iterator iter = ref->get_selected();
+        if (iter) {
+            Gtk::TreeModel::Row row = *iter;
+            m_oldName = row.get_value(m_viewscolumnrecord.name);
+	}
+    }
+
+    if(m_validateRetry)
+    {
+	Gtk::CellEditable* celleditable_validated = cellEditable;
+	Gtk::Entry* pEntry = dynamic_cast<Gtk::Entry*>(celleditable_validated);
+	if(pEntry)
+	{
+	    pEntry->set_text(m_invalidTextForRetry);
+	    m_validateRetry = false;
+	    m_invalidTextForRetry.clear();
+	}
+    }
+}
+
+void ViewOutputBox::onEdition(
+        const Glib::ustring& pathString,
+        const Glib::ustring& newName)
+{
+    Gtk::TreePath path(pathString);
+
+    if (not m_viewscopy.exist(newName) and newName != "") {
+	Glib::RefPtr < Gtk::TreeView::Selection > ref =
+	    m_views->get_selection();
+	if (ref) {
+	    Gtk::TreeModel::iterator iter = ref->get_selected();
+	    if (iter) {
+		Gtk::TreeModel::Row row = *iter;
+		row[m_viewscolumnrecord.name] = newName;
+		m_viewscopy.renameView(m_oldName, newName);
+		m_viewscopy.observables().updateView(m_oldName, newName);
+
+		m_validateRetry = true;
+	    }
 	}
     }
 }

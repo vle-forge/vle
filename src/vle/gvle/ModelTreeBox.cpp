@@ -36,17 +36,28 @@ namespace gvle {
 
 ModelTreeBox::ModelTreeBox(BaseObjectType* cobject,
 			   const Glib::RefPtr<Gnome::Glade::Xml>&) :
-    Gtk::TreeView(cobject)
+    Gtk::TreeView(cobject), m_delayTime(0)
 {
     m_refTreeModel = Gtk::TreeStore::create(m_Columns);
     set_model(m_refTreeModel);
 
-    append_column(_("Name"), m_Columns.mName);
+    m_ColumnName = append_column_editable(_("Model"),
+						     m_Columns.mName);
 
-    signal_row_activated().connect(
-        sigc::mem_fun(*this, &ModelTreeBox::row_activated));
+    m_CellRenderer = dynamic_cast<Gtk::CellRendererText*>(
+	get_column_cell_renderer(m_ColumnName - 1));
+    m_CellRenderer->property_editable() = true;
+    m_CellRenderer->signal_editing_started().connect(
+	sigc::mem_fun(*this,
+		      &ModelTreeBox::onEditionStarted));
+    m_CellRenderer->signal_edited().connect(
+	sigc::mem_fun(*this,
+		      &ModelTreeBox::onEdition));
+
+    signal_event().connect(
+      sigc::mem_fun(*this, &ModelTreeBox::onExposeEvent));
     signal_button_release_event().connect(
-        sigc::mem_fun(*this, &ModelTreeBox::onButtonRealeaseModels));
+    sigc::mem_fun(*this, &ModelTreeBox::onButtonRealeaseModels));
 
     expand_all();
     set_rules_hint(true);
@@ -126,15 +137,6 @@ void ModelTreeBox::clear()
     m_refTreeModel->clear();
 }
 
-bool ModelTreeBox::on_key_release_event(GdkEventKey* event)
-{
-    if (((event->state & GDK_CONTROL_MASK) and event->keyval == GDK_w) or
-            (event->keyval == GDK_Escape)) {
-        //m_modeling->hideModelTreeBox();
-    }
-    return true;
-}
-
 Gtk::TreeModel::Row
 ModelTreeBox::addModel(graph::Model* model)
 {
@@ -168,6 +170,29 @@ void ModelTreeBox::parseModel(Gtk::TreeModel::Row row,
     }
 }
 
+bool ModelTreeBox::onExposeEvent(GdkEvent* event)
+{
+    if (event->type == GDK_2BUTTON_PRESS) {
+	m_delayTime = event->button.time;
+	Gtk::TreeModel::Path path;
+	Gtk::TreeViewColumn* column;
+	get_cursor(path, column);
+	row_activated(path, column);
+	return true;
+    }
+    if (event->type == GDK_BUTTON_PRESS) {
+	if (m_delayTime + 250 < event->button.time) {
+	    m_delayTime = event->button.time;
+	    m_CellRenderer->property_editable() = true;
+	} else {
+	    m_delayTime = event->button.time;
+	    m_CellRenderer->property_editable() = false;
+	}
+    }
+    return false;
+
+}
+
 void ModelTreeBox::row_activated(const Gtk::TreeModel::Path& path,
                                  Gtk::TreeViewColumn* column)
 {
@@ -186,6 +211,54 @@ bool ModelTreeBox::on_foreach(const Gtk::TreeModel::Path&,
         return true;
     }
     return false;
+}
+
+void ModelTreeBox::onEditionStarted(
+    Gtk::CellEditable* cellEditable, const Glib::ustring& /* path */)
+{
+    Glib::RefPtr < Gtk::TreeView::Selection > ref = get_selection();
+    if (ref) {
+        Gtk::TreeModel::iterator iter = ref->get_selected();
+        if (iter) {
+            Gtk::TreeModel::Row row = *iter;
+            m_OldName = row.get_value(m_modelscolumnrecord.name);
+	}
+    }
+
+    if(m_ValidateRetry)
+    {
+	Gtk::CellEditable* celleditable_validated = cellEditable;
+	Gtk::Entry* pEntry = dynamic_cast<Gtk::Entry*>(celleditable_validated);
+	if(pEntry)
+	{
+	    pEntry->set_text(m_InvalidTextForRetry);
+	    m_ValidateRetry = false;
+	    m_InvalidTextForRetry.clear();
+	}
+    }
+}
+
+void ModelTreeBox::onEdition(
+    const Glib::ustring& pathString,
+    const Glib::ustring& newName)
+{
+    Gtk::TreePath path(pathString);
+
+    if (newName != "") {
+	Glib::RefPtr < Gtk::TreeView::Selection > ref = get_selection();
+	if (ref) {
+	    Gtk::TreeModel::iterator iter = ref->get_selected();
+	    if (iter) {
+		Gtk::TreeModel::Row row = *iter;
+		try {
+		    row[m_modelscolumnrecord.name] = newName;
+		    graph::Model::rename(row[m_Columns.mModel], newName);
+		} catch(utils::DevsGraphError dge) {
+		    row[m_modelscolumnrecord.name] = m_OldName;
+		}
+	    }
+	}
+    }
 }
 
 }

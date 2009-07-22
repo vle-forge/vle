@@ -39,14 +39,25 @@ ModelClassBox::ModelClassBox(BaseObjectType* cobject,
 			     Glib::RefPtr < Gnome::Glade::Xml > xml):
     Gtk::TreeView(cobject),
     mXml(xml),
-    mClasses_backup(0)
+    mClasses_backup(0),
+    mDelayTime(0)
 {
     mRefTreeModel = Gtk::TreeStore::create(mColumns);
     set_model(mRefTreeModel);
-    append_column(_("Class"), mColumns.mName);
+    mColumnName = append_column_editable(_("Class"), mColumns.mName);
 
-    signal_row_activated().connect(
-	sigc::mem_fun(*this, &ModelClassBox::row_activated));
+    mCellRenderer = dynamic_cast<Gtk::CellRendererText*>(
+	get_column_cell_renderer(mColumnName - 1));
+    mCellRenderer->property_editable() = true;
+    mCellRenderer->signal_editing_started().connect(
+	sigc::mem_fun(*this,
+		      &ModelClassBox::onEditionStarted));
+    mCellRenderer->signal_edited().connect(
+	sigc::mem_fun(*this,
+		      &ModelClassBox::onEdition));
+
+    signal_event().connect(
+      sigc::mem_fun(*this, &ModelClassBox::onExposeEvent));
     signal_button_release_event().connect(
 	sigc::mem_fun(*this, &ModelClassBox::onButtonRealeaseModels));
 
@@ -326,19 +337,33 @@ void ModelClassBox::parseModel(Gtk::TreeModel::Row row,
     }
 }
 
-bool ModelClassBox::on_key_release_event(GdkEventKey* event)
-{
-    if (((event->state & GDK_CONTROL_MASK) and event->keyval == GDK_w) or
-            (event->keyval == GDK_Escape)) {
-        //mModeling->hideModelClassBox();
-    }
-    return true;
-}
-
 void ModelClassBox::showRow(const std::string& model_name)
 {
     mSearch.assign(model_name);
     mRefTreeModel->foreach(sigc::mem_fun(*this, &ModelClassBox::on_foreach));
+}
+
+bool ModelClassBox::onExposeEvent(GdkEvent* event)
+{
+    if (event->type == GDK_2BUTTON_PRESS) {
+	mDelayTime = event->button.time;
+	Gtk::TreeModel::Path path;
+	Gtk::TreeViewColumn* column;
+	get_cursor(path, column);
+	row_activated(path, column);
+	return true;
+    }
+    if (event->type == GDK_BUTTON_PRESS) {
+	if (mDelayTime + 250 < event->button.time) {
+	    mDelayTime = event->button.time;
+	    mCellRenderer->property_editable() = true;
+	} else {
+	    mDelayTime = event->button.time;
+	    mCellRenderer->property_editable() = false;
+	}
+    }
+    return false;
+
 }
 
 void ModelClassBox::row_activated(const Gtk::TreeModel::Path& path,
@@ -371,6 +396,67 @@ bool ModelClassBox::on_foreach(const Gtk::TreeModel::Path&,
         return true;
     }
     return false;
+}
+
+void ModelClassBox::onEditionStarted(
+    Gtk::CellEditable* cell_editable, const Glib::ustring& /* path */)
+{
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+    if (refSelection) {
+	Gtk::TreeModel::iterator iter = refSelection->get_selected();
+	if (iter) {
+	    Gtk::TreeModel::Row row = *iter;
+	    mOldName = row.get_value(mColumns.mName);
+	}
+    }
+
+    if(mValidateRetry)
+    {
+	Gtk::CellEditable* celleditable_validated = cell_editable;
+	Gtk::Entry* pEntry = dynamic_cast<Gtk::Entry*>(
+	    celleditable_validated);
+	if(pEntry)
+	{
+	    pEntry->set_text(mInvalidTextForRetry);
+	    mValidateRetry = false;
+	    mInvalidTextForRetry.clear();
+	}
+    }
+}
+
+void ModelClassBox::onEdition(
+        const Glib::ustring& pathString,
+        const Glib::ustring& newName)
+{
+    Gtk::TreePath path(pathString);
+
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+   if (refSelection and newName != mOldName) {
+       Gtk::TreeModel::iterator iter = refSelection->get_selected();
+       if (iter and (mRefTreeModel->iter_depth(iter) == 0)
+	   and (newName != "")) {
+	   Gtk::TreeModel::Row row = *iter;
+	   vpz::Class& oldClass = mModeling->vpz().project().classes()
+	       .get(mOldName);
+	   graph::Model* model = oldClass.model();
+	   vpz::AtomicModelList& atomicModel = oldClass.atomicModels();
+	   mModeling->vpz().project().classes().add(newName);
+	   mModeling->vpz().project().classes().get(newName).setModel(model);
+	   mModeling->vpz().project().classes().get(newName).
+	       setAtomicModel(atomicModel);
+
+	   if (oldClass.model()->isCoupled()) {
+	       graph::CoupledModel* c_model =
+		   dynamic_cast<graph::CoupledModel*>(oldClass.model());
+	       if (mModeling->existView(c_model)) {
+		   mModeling->delViewOnModel(c_model);
+	       }
+	   }
+	   mModeling->vpz().project().classes().get(mOldName).setModel(0);
+	   mModeling->vpz().project().classes().del(mOldName);
+       }
+       parseClass();
+   }
 }
 
 }
