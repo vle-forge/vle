@@ -509,11 +509,19 @@ AtomicModelBox::DynamicTreeView::DynamicTreeView(
 {
     mRefTreeModelDyn = Gtk::ListStore::create(mColumnsDyn);
     set_model(mRefTreeModelDyn);
-    append_column(_("Name"), mColumnsDyn.m_col_name);
+    mColumnName = append_column_editable(_("Name"), mColumnsDyn.m_col_name);
+
+    mCellRenderer = dynamic_cast<Gtk::CellRendererText*>(
+	get_column_cell_renderer(mColumnName - 1));
+    mCellRenderer->property_editable() = true;
+    mCellRenderer->signal_editing_started().connect(
+	sigc::mem_fun(*this,
+		      &AtomicModelBox::DynamicTreeView::onEditionStarted));
+    mCellRenderer->signal_edited().connect(
+	sigc::mem_fun(*this,
+		      &AtomicModelBox::DynamicTreeView::onEdition));
     append_column(_("Library"), mColumnsDyn.m_dyn);
 
-    signal_row_activated().connect(
-      sigc::mem_fun(*this, &AtomicModelBox::DynamicTreeView::onRowActivated));
 
     //Fill popup menu:
     {
@@ -537,6 +545,12 @@ AtomicModelBox::DynamicTreeView::DynamicTreeView(
 		sigc::mem_fun(
 		    *this,
 		    &AtomicModelBox::DynamicTreeView::onRemove)));
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		_("_Rename"),
+		sigc::mem_fun(
+		    *this,
+		    &AtomicModelBox::DynamicTreeView::onRename)));
     }
     mMenuPopup.accelerate(*this);
 }
@@ -585,6 +599,23 @@ bool AtomicModelBox::DynamicTreeView::on_button_press_event(GdkEventButton *even
   if( (event->type == GDK_BUTTON_PRESS) && (event->button == 3) )
   {
       mMenuPopup.popup(event->button, event->time);
+  }
+
+  if (event->type == GDK_2BUTTON_PRESS) {
+      mDelayTime = event->time;
+      Gtk::TreeModel::Path path;
+      Gtk::TreeViewColumn* column;
+      get_cursor(path, column);
+      onRowActivated(path, column);
+  }
+  if (event->type == GDK_BUTTON_PRESS) {
+      if (mDelayTime + 250 < event->time) {
+	  mDelayTime = event->time;
+	  mCellRenderer->property_editable() = true;
+      } else {
+	  mDelayTime = event->time;
+	  mCellRenderer->property_editable() = false;
+      }
   }
 
   return return_value;
@@ -715,6 +746,116 @@ void AtomicModelBox::DynamicTreeView::onRemove()
         mModeling->dynamics().del(dyn);
 	build();
     }
+}
+
+void AtomicModelBox::DynamicTreeView::onRename()
+{
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+    Gtk::TreeModel::iterator it = refSelection->get_selected();
+    Glib::ustring oldName = (*it)[mColumnsDyn.m_col_name];
+
+    if (oldName != "") {
+	SimpleTypeBox box(_("Name of the Dynamic ?"));
+
+	std::string newName = box.run();
+	if (box.valid() and not newName.empty()) {
+	    box.hide_all();
+	    newName = boost::trim_copy(newName);
+	    if (mModeling->dynamics().exist(newName)) {
+		Error(
+		    boost::str(
+			fmt(_("The Dynamics '%1%' already exists")) % newName));
+	    } else {
+		vpz::Dynamic* newDynamic = new vpz::Dynamic(newName);
+		vpz::Dynamic oldDynamic = mModeling->dynamics().get(oldName);
+		newDynamic->setLibrary(oldDynamic.library());
+		newDynamic->setModel(oldDynamic.model());
+		newDynamic->setLanguage(oldDynamic.language());
+		if (oldDynamic.location().empty()) {
+		    newDynamic->setLocalDynamics();
+		} else {
+		    std::vector<std::string> vec;
+		    boost::split(vec, oldDynamic.location(),
+				 boost::is_any_of(":"));
+		    std::string location =
+			oldDynamic.location().substr(
+			    0, oldDynamic.location().size()
+			    - vec[vec.size() - 1].size() - 1);
+		    int port = boost::lexical_cast<int>(vec[vec.size() - 1]);
+
+		    newDynamic->setDistantDynamics(location, port);
+
+		}
+		mModeling->dynamics().add(*newDynamic);
+		mModeling->dynamics().del(oldName);
+		build();
+	    }
+	}
+    }
+}
+
+void AtomicModelBox::DynamicTreeView::onEditionStarted(
+    Gtk::CellEditable* cell_editable, const Glib::ustring& /* path */)
+{
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+    if (refSelection) {
+	Gtk::TreeModel::iterator iter = refSelection->get_selected();
+	if (iter) {
+	    Gtk::TreeModel::Row row = *iter;
+	    mOldName = row.get_value(mColumnsDyn.m_col_name);
+	}
+    }
+
+    if(mValidateRetry)
+    {
+	Gtk::CellEditable* celleditable_validated = cell_editable;
+	Gtk::Entry* pEntry = dynamic_cast<Gtk::Entry*>(
+	    celleditable_validated);
+	if(pEntry)
+	{
+	    pEntry->set_text(mInvalidTextForRetry);
+	    mValidateRetry = false;
+	    mInvalidTextForRetry.clear();
+	}
+    }
+}
+
+void AtomicModelBox::DynamicTreeView::onEdition(
+        const Glib::ustring& pathString,
+        const Glib::ustring& newName)
+{
+    Gtk::TreePath path(pathString);
+
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+    if (refSelection and newName != mOldName) {
+	Gtk::TreeModel::iterator it = refSelection->get_selected();
+	if (not newName.empty() and not mModeling->dynamics().exist(newName)) {
+	    vpz::Dynamic* newDynamic = new vpz::Dynamic(newName);
+	    vpz::Dynamic oldDynamic = mModeling->dynamics().get(mOldName);
+	    newDynamic->setLibrary(oldDynamic.library());
+	    newDynamic->setModel(oldDynamic.model());
+	    newDynamic->setLanguage(oldDynamic.language());
+	    if (oldDynamic.location().empty()) {
+		newDynamic->setLocalDynamics();
+	    } else {
+		std::vector<std::string> vec;
+		boost::split(vec, oldDynamic.location(),
+			     boost::is_any_of(":"));
+		std::string location =
+		    oldDynamic.location().substr(
+			0, oldDynamic.location().size()
+			- vec[vec.size() - 1].size() - 1);
+		int port = boost::lexical_cast<int>(vec[vec.size() - 1]);
+
+		newDynamic->setDistantDynamics(location, port);
+
+	    }
+	    mModeling->dynamics().add(*newDynamic);
+	    mModeling->dynamics().del(mOldName);
+	}
+    }
+    build();
+
 }
 
 std::string AtomicModelBox::DynamicTreeView::getDynamic()
