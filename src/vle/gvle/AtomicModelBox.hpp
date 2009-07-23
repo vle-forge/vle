@@ -49,6 +49,9 @@ public:
 
     void show(vpz::AtomicModel& atom,  graph::AtomicModel& model);
 
+    inline Modeling* getModeling()
+    { return mModeling; }
+
 protected:
     class ModelColumnsPort : public Gtk::TreeModel::ColumnRecord
     {
@@ -202,6 +205,17 @@ private:
 	void setLabel(Gtk::Label* label)
 	    { mLabel = label; }
 
+    protected:
+	virtual void onRename();
+
+	// Signal handler for text area
+	virtual void onEditionStarted(
+	    Gtk::CellEditable* cellEditatble,
+	    const Glib::ustring& path);
+	virtual void onEdition(
+	    const Glib::ustring& pathString,
+	    const Glib::ustring& newText);
+
     private:
 	void on_row_activated(const Gtk::TreeModel::Path& path,
 			      Gtk::TreeViewColumn*  column);
@@ -216,6 +230,13 @@ private:
 	Glib::RefPtr < Gtk::ListStore > mRefTreeModel;
 	//Label
 	Gtk::Label* mLabel;
+
+	//Cell
+	int mColumnName;
+	bool mValidateRetry;
+	std::string mOldName;
+	Gtk::CellRendererText* mCellrendererValidated;
+	Glib::ustring mInvalidTextForRetry;
     };
 
     class DynamicTreeView : public Gtk::TreeView

@@ -429,7 +429,33 @@ AtomicModelBox::ConditionTreeView::ConditionTreeView(
     mRefTreeModel = Gtk::ListStore::create(mColumns);
     set_model(mRefTreeModel);
     append_column_editable(_("In"), mColumns.m_col_activ);
-    append_column(_("Name"), mColumns.m_col_name);
+    mColumnName = append_column_editable(_("Name"), mColumns.m_col_name);
+
+    mCellrendererValidated = dynamic_cast<Gtk::CellRendererText*>(
+	get_column_cell_renderer(mColumnName - 1));
+    mCellrendererValidated->property_editable() = true;
+    mCellrendererValidated->signal_editing_started().connect(
+	sigc::mem_fun(*this,
+		      &AtomicModelBox::ConditionTreeView::
+		      onEditionStarted) );
+
+    mCellrendererValidated->signal_edited().connect(
+	sigc::mem_fun(*this,
+		      &AtomicModelBox::ConditionTreeView::
+		      onEdition) );
+
+    //Fill popup menu
+    {
+	Gtk::Menu::MenuList& menulist = mMenuPopup.items();
+
+	menulist.push_back(Gtk::Menu_Helpers::MenuElem(
+		_("_Rename"),
+		sigc::mem_fun(
+		    *this,
+		    &AtomicModelBox::ConditionTreeView::onRename)));
+    }
+    mMenuPopup.accelerate(*this);
+
 }
 
 AtomicModelBox::ConditionTreeView::~ConditionTreeView()
@@ -489,14 +515,82 @@ void AtomicModelBox::ConditionTreeView::on_row_activated(
 bool AtomicModelBox::ConditionTreeView::on_button_press_event(
     GdkEventButton* event)
 {
+    bool return_value = TreeView::on_button_press_event(event);
+    if (event->type == GDK_BUTTON_PRESS and event->button == 3) {
+	mMenuPopup.popup(event->button, event->time);
+    }
     if (event->type == GDK_2BUTTON_PRESS && event->button == 1) {
 	mModeling->getGVLE()->getConditionsBox()->show();
-	build();
-	return true;
-    } else {
-	return Gtk::Widget::on_button_press_event(event);
+    }
+    return return_value;
+}
+
+void AtomicModelBox::ConditionTreeView::onRename()
+{
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+    Gtk::TreeModel::iterator it = refSelection->get_selected();
+
+    if (it) {
+	Glib::ustring oldname = (*it)[mColumns.m_col_name];
+	SimpleTypeBox box(_("New name of the condition ?"));
+        std::string newname = boost::trim_copy(box.run());
+	vpz::ConditionList& list = mConditions->conditionlist();
+
+	if (box.valid() and not newname.empty()
+	   and list.find(newname) == list.end()) {
+	    mConditions->rename(oldname, newname);
+
+	    vpz::AtomicModelList& atomlist(
+		mModeling->vpz().project().model().atomicModels());
+	    atomlist.updateCondition(oldname, newname);
+	    build();
+	}
+    }
+}
+
+void AtomicModelBox::ConditionTreeView::onEditionStarted(
+    Gtk::CellEditable* cell_editable, const Glib::ustring& /* path */)
+{
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+    Gtk::TreeModel::iterator iter = refSelection->get_selected();
+
+    if (iter) {
+	Gtk::TreeModel::Row row = *iter;
+	mOldName = row.get_value(mColumns.m_col_name);
     }
 
+    if(mValidateRetry) {
+	Gtk::CellEditable* celleditable_validated = cell_editable;
+	Gtk::Entry* pEntry = dynamic_cast<Gtk::Entry*>(celleditable_validated);
+	if(pEntry) {
+	    pEntry->set_text(mInvalidTextForRetry);
+	    mValidateRetry = false;
+	    mInvalidTextForRetry.clear();
+	}
+    }
+}
+
+void AtomicModelBox::ConditionTreeView::onEdition(
+        const Glib::ustring& pathString,
+        const Glib::ustring& newName)
+{
+    Gtk::TreePath path(pathString);
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+    Gtk::TreeModel::iterator it = refSelection->get_selected();
+
+    if (it) {
+	vpz::ConditionList& list = mConditions->conditionlist();
+
+	if (not newName.empty() and list.find(newName) == list.end()) {
+	    mConditions->rename(mOldName, newName);
+
+	    vpz::AtomicModelList& atomlist(
+		mModeling->vpz().project().model().atomicModels());
+	    atomlist.updateCondition(mOldName, newName);
+	}
+    }
+
+    build();
 }
 
 //DynamicTreeView
