@@ -61,6 +61,8 @@ ExperimentBox::ExperimentBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
     xml->get_widget("SpinSimuSeed", mSpinSimuSeed);
     xml->get_widget("ButtonSimuSeed", mButtonSimuSeed);
     xml->get_widget("HBoxCombi", mHboxCombi);
+    xml->get_widget("RadioButtonLinear", mRadioButtonLinear);
+    xml->get_widget("RadioButtonTotal", mRadioButtonTotal);
     xml->get_widget("SpinPlanSeed", mSpinPlanSeed);
     xml->get_widget("ButtonPlanSeed", mButtonPlanSeed);
     xml->get_widget("SpinButtonNumber", mButtonNumber);
@@ -95,12 +97,9 @@ ExperimentBox::ExperimentBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
 ExperimentBox::~ExperimentBox()
 {
     for (std::list < sigc::connection >::iterator it = mSigcConnection.begin();
-         it != mSigcConnection.end(); ++it) {
+        it != mSigcConnection.end(); ++it) {
         it->disconnect();
     }
-
-    delete mRadioButtonLinear;
-    delete mRadioButtonTotal;
 }
 
 void ExperimentBox::initExperiment()
@@ -161,23 +160,15 @@ void ExperimentBox::initExperiment()
 
     // Plan frame
     {
-	mRadioButtonLinear = new Gtk::RadioButton("linear");
-        mRadioButtonTotal = new Gtk::RadioButton("total");
-        Gtk::RadioButton::Group group = mRadioButtonLinear->get_group();
-	mRadioButtonTotal->set_group(group);
-	
 	if (mModeling->experiment().combination().empty()) {
 	    mModeling->experiment().setCombination("linear");
 	}
 
 	if (mModeling->experiment().combination() == "linear") {
-	  mRadioButtonLinear->set_active();
+	    mRadioButtonLinear->set_active();
 	} else {
-	  mRadioButtonTotal->set_active();
+	    mRadioButtonTotal->set_active();
 	}
-
-	mHboxCombi->pack_start(*mRadioButtonLinear, true, false, 5);
-	mHboxCombi->pack_start(*mRadioButtonTotal, true, false, 5);
 
 	mSpinPlanSeed->set_range(0, std::numeric_limits < guint32 >::max());
 	if (mModeling->experiment().replicas().seed() != 0) {
