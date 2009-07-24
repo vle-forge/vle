@@ -63,6 +63,7 @@ public:
     virtual void onAdd();
     virtual void onRemove();
     virtual void onRename();
+    virtual void onRenameClass(const std::string& newName);
     virtual void onExportVpz();
     virtual void onImportModelAsClass();
     virtual void onImportClassesFromVpz();

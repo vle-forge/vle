@@ -25,6 +25,7 @@
 
 #include <vle/gvle/ModelClassBox.hpp>
 #include <vle/gvle/Modeling.hpp>
+#include <vle/gvle/Editor.hpp>
 #include <boost/algorithm/string/detail/trim.hpp>
 #include <boost/algorithm/string.hpp>
 #include <vle/gvle/View.hpp>
@@ -170,32 +171,58 @@ void ModelClassBox::onRemove()
 
 void ModelClassBox::onRename()
 {
-   SimpleTypeBox box(_("Name of the Class ?"));
-   std::string name = boost::trim_copy(box.run());
    Glib::RefPtr<Gtk::TreeView::Selection> refSelection =  get_selection();
-   if (refSelection and box.valid() and not name.empty()) {
+   if (refSelection) {
        Gtk::TreeModel::iterator iter = refSelection->get_selected();
-       if (iter and (mRefTreeModel->iter_depth(iter) == 0)) {
-	   Gtk::TreeModel::Row row = *iter;
-	   vpz::Class& oldClass = mModeling->vpz().project().classes().get(
-	       row.get_value(mColumns.mName));
-	   graph::Model* model = oldClass.model();
-	   vpz::AtomicModelList& atomicModel = oldClass.atomicModels();
-	   mModeling->vpz().project().classes().add(name);
-	   mModeling->vpz().project().classes().get(name).setModel(model);
-	   mModeling->vpz().project().classes().get(name).setAtomicModel(atomicModel);
-
-	   if (oldClass.model()->isCoupled()) {
-	       graph::CoupledModel* c_model = dynamic_cast<graph::CoupledModel*>(oldClass.model());
-	       if (mModeling->existView(c_model)) {
-		   mModeling->delViewOnModel(c_model);
+       if (iter) {
+	   if (mRefTreeModel->iter_depth(iter) == 0) {
+	       SimpleTypeBox box(_("Name of the Class ?"));
+	       std::string name = boost::trim_copy(box.run());
+	       if (box.valid() and not name.empty()) {
+		   Gtk::TreeModel::Row row = *iter;
+		   mOldName = row.get_value(mColumns.mName);
+		   onRenameClass(name);
+	       }
+	   } else {
+	       Gtk::TreeModel::Row row = *iter;
+	       std::string oldname(row.get_value(mColumns.mName));
+	       SimpleTypeBox box(_("New name of this model?"));
+	       std::string newname = boost::trim_copy(box.run());
+	       if (box.valid() and not newname.empty()) {
+		   try {
+		       row[mColumns.mName] = newname;
+		       graph::Model::rename(row[mColumns.mModel], newname);
+		   } catch(utils::DevsGraphError dge) {
+		       row[mColumns.mName] = oldname;
+		   }
 	       }
 	   }
-	   mModeling->vpz().project().classes().get(row.get_value(mColumns.mName)).setModel(0);
-	   mModeling->vpz().project().classes().del(row.get_value(mColumns.mName));
 	   parseClass();
        }
    }
+}
+
+void ModelClassBox::onRenameClass(const std::string& newName)
+{
+    vpz::Class& oldClass = mModeling->vpz().project().classes().get(mOldName);
+    graph::Model* model = oldClass.model();
+    vpz::AtomicModelList& atomicModel = oldClass.atomicModels();
+    mModeling->vpz().project().classes().add(newName);
+    mModeling->vpz().project().classes().get(newName).setModel(model);
+    mModeling->vpz().project().classes().get(newName).
+	setAtomicModel(atomicModel);
+
+    if (oldClass.model()->isCoupled()) {
+	graph::CoupledModel* c_model =
+	    dynamic_cast<graph::CoupledModel*>(oldClass.model());
+
+	if (mModeling->existView(c_model)) {
+	    mModeling->delViewOnModel(c_model);
+	    mModeling->addViewClass(c_model, newName);
+	}
+    }
+    mModeling->vpz().project().classes().get(mOldName).setModel(0);
+    mModeling->vpz().project().classes().del(mOldName);
 }
 
 void ModelClassBox::onExportVpz()
@@ -431,32 +458,27 @@ void ModelClassBox::onEdition(
     Gtk::TreePath path(pathString);
 
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
-   if (refSelection and newName != mOldName) {
-       Gtk::TreeModel::iterator iter = refSelection->get_selected();
-       if (iter and (mRefTreeModel->iter_depth(iter) == 0)
-	   and (newName != "")) {
-	   Gtk::TreeModel::Row row = *iter;
-	   vpz::Class& oldClass = mModeling->vpz().project().classes()
-	       .get(mOldName);
-	   graph::Model* model = oldClass.model();
-	   vpz::AtomicModelList& atomicModel = oldClass.atomicModels();
-	   mModeling->vpz().project().classes().add(newName);
-	   mModeling->vpz().project().classes().get(newName).setModel(model);
-	   mModeling->vpz().project().classes().get(newName).
-	       setAtomicModel(atomicModel);
-
-	   if (oldClass.model()->isCoupled()) {
-	       graph::CoupledModel* c_model =
-		   dynamic_cast<graph::CoupledModel*>(oldClass.model());
-	       if (mModeling->existView(c_model)) {
-		   mModeling->delViewOnModel(c_model);
-	       }
-	   }
-	   mModeling->vpz().project().classes().get(mOldName).setModel(0);
-	   mModeling->vpz().project().classes().del(mOldName);
-       }
-       parseClass();
-   }
+    if (refSelection and newName != mOldName) {
+	Gtk::TreeModel::iterator iter = refSelection->get_selected();
+	if (iter) {
+	    if ((mRefTreeModel->iter_depth(iter) == 0)
+		and (newName != "")
+		and not mModeling->vpz().project().classes().exist(newName)) {
+		onRenameClass(newName);
+	    } else {
+		if (not newName.empty()) {
+		    Gtk::TreeModel::Row row = *iter;
+		    try {
+			row[mColumns.mName] = newName;
+			graph::Model::rename(row[mColumns.mModel], newName);
+		    } catch(utils::DevsGraphError dge) {
+			row[mColumns.mName] = mOldName;
+		    }
+		}
+	    }
+	}
+	parseClass();
+    }
 }
 
 }
