@@ -2,3 +2,5 @@ ADD_SUBDIRECTORY(storage)
 ADD_SUBDIRECTORY(cairogauge)
 ADD_SUBDIRECTORY(cairolevel)
 ADD_SUBDIRECTORY(cairoplot)
+ADD_SUBDIRECTORY(cairocaview)
+
