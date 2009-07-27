@@ -31,6 +31,7 @@
 #include <vle/value/String.hpp>
 #include <vle/utils/Path.hpp>
 #include <libglademm/xml.h>
+#include <gtkmm/base.h>
 #include <cassert>
 #include <boost/lexical_cast.hpp>
 #include <boost/assign/std/vector.hpp>
@@ -228,8 +229,26 @@ void CairoLevel::assign(vpz::Output& output)
 	if (it->second->get_min() > it->second->get_max()) {
 	    Error((fmt(_("Curve %1%: Min must be inferior to Max")) %
 		   m_counter).str());
+
 	} else {
+#if GTK_VERSION_GE(2, 14)
 	    cMap->addString("color", it->second->get_color().to_string());
+#else
+	    {
+		using boost::io::group;
+		using std::setfill;
+		using std::setw;
+		using std::hex;
+
+		const Gdk::Color& col = it->second->get_color();
+		std::string result = boost::str(fmt("#%1%%2%%3%") %
+			group(hex, setfill('0'), setw(4), col.get_red()) %
+			group(hex, setfill('0'), setw(4), col.get_green()) %
+			group(hex, setfill('0'), setw(4), col.get_blue()));
+
+		cMap->addString("color", result);
+	    }
+#endif
 	    cMap->addDouble("min", it->second->get_min());
 	    cMap->addDouble("max", it->second->get_max());
 	    setCurves->add(*cMap);
