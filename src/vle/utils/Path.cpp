@@ -41,6 +41,7 @@
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/lexical_cast.hpp>
 
 namespace vle { namespace utils {
 
@@ -698,6 +699,13 @@ std::ostream& operator<<(std::ostream& out, const Path& p)
         << std::endl;
 
     return out;
+}
+
+std::string Path::getParentPath(const std::string& pathfile)
+{
+    boost::filesystem::path path(pathfile);
+    std::string parent = boost::lexical_cast<std::string>(path.parent_path());
+    return parent;
 }
 
 }} // namespace vle utils

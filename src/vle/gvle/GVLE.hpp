@@ -251,6 +251,24 @@ public:
 
         Glib::ustring getSelected()
         { return (*mRefTreeSelection->get_selected())[mColumns.m_col_name]; }
+
+    protected:
+	bool on_button_press_event(GdkEventButton* event);
+	void onOpen();
+	void onNewFile();
+	void onNewDirectory();
+	void onRemove();
+	void onRename();
+
+	// Signal handler for text area
+	virtual void onEditionStarted(
+	    Gtk::CellEditable* cellEditatble,
+	    const Glib::ustring& path);
+	virtual void onEdition(
+	    const Glib::ustring& pathString,
+	    const Glib::ustring& newText);
+
+
     private:
 
 	/**
@@ -277,15 +295,24 @@ public:
 			    const std::string& dirname);
 	bool isDirectory(const std::string& dirname);
 	void on_row_activated(const Gtk::TreeModel::Path& path,
-			      Gtk::TreeViewColumn*  column);
+			    Gtk::TreeViewColumn*  column);
 	std::list<std::string>* projectFilePath(const Gtk::TreeRow& row);
 
 	GVLE*                            mParent;
+	Gtk::Menu                        mMenuPopup;
 	FileModelColumns                 mColumns;
 	std::string                      mPackage;
 	Glib::RefPtr<Gtk::TreeStore>     mRefTreeModel;
 	Glib::RefPtr<Gtk::TreeSelection> mRefTreeSelection;
 	std::list<std::string>           mIgnoredFilesList;
+
+	//Cell
+	int                              mColumnName;
+	bool                             mValidateRetry;
+	std::string                      mOldAbsolutePath;
+	Gtk::CellRendererText*           mCellrenderer;
+	Glib::ustring                    mInvalidTextForRetry;
+	guint32                          mDelayTime;
     };
 
 public:

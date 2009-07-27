@@ -47,6 +47,7 @@
 #include <errno.h>
 #include <boost/filesystem.hpp>
 #include <gtkmm/filechooserdialog.h>
+#include <glibmm/spawn.h>
 #include <glibmm/miscutils.h>
 #include <gtkmm/stock.h>
 
@@ -60,14 +61,62 @@ const std::string GVLE::WINDOW_TITLE =
 GVLE::FileTreeView::FileTreeView(
     BaseObjectType* cobject,
     const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/) :
-    Gtk::TreeView(cobject)
+    Gtk::TreeView(cobject), mDelayTime(0)
 {
 
     mRefTreeModel = Gtk::TreeStore::create(mColumns);
     set_model(mRefTreeModel);
-    append_column(_("Files"), mColumns.m_col_name);
+    mColumnName = append_column_editable(_("Files"), mColumns.m_col_name);
+
+    mCellrenderer = dynamic_cast<Gtk::CellRendererText*>(
+	get_column_cell_renderer(mColumnName - 1));
+    mCellrenderer->property_editable() = true;
+    mCellrenderer->signal_editing_started().connect(
+	sigc::mem_fun(*this,
+		      &GVLE::FileTreeView::onEditionStarted) );
+
+    mCellrenderer->signal_edited().connect(
+	sigc::mem_fun(*this,
+		      &GVLE::FileTreeView::onEdition) );
+
     mRefTreeSelection = get_selection();
     mIgnoredFilesList.push_front("build");
+
+    {
+	Gtk::Menu::MenuList& menulist = mMenuPopup.items();
+
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		_("_Open with..."),
+		sigc::mem_fun(
+		    *this,
+		    &GVLE::FileTreeView::onOpen)));
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		_("New _Directory"),
+		sigc::mem_fun(
+		    *this,
+		    &GVLE::FileTreeView::onNewDirectory)));
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		_("New _File"),
+		sigc::mem_fun(
+		    *this,
+		    &GVLE::FileTreeView::onNewFile)));
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		_("_Remove"),
+		sigc::mem_fun(
+		    *this,
+		    &GVLE::FileTreeView::onRemove)));
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		_("_Rename"),
+		sigc::mem_fun(
+		    *this,
+		    &GVLE::FileTreeView::onRename)));
+    }
+    mMenuPopup.accelerate(*this);
 }
 
 GVLE::FileTreeView::~FileTreeView()
@@ -144,9 +193,8 @@ bool GVLE::FileTreeView::isDirectory(const std::string& dirname)
     return Glib::file_test(dirname, Glib::FILE_TEST_IS_DIR);
 }
 
-void GVLE::FileTreeView::on_row_activated(
-    const Gtk::TreeModel::Path&,
-    Gtk::TreeViewColumn*)
+void GVLE::FileTreeView::on_row_activated(const Gtk::TreeModel::Path&,
+					  Gtk::TreeViewColumn*)
 {
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection	= get_selection();
     Gtk::TreeModel::const_iterator it = refSelection->get_selected();
@@ -187,6 +235,167 @@ std::list<std::string>* GVLE::FileTreeView::projectFilePath(
     } else {
 	return new std::list<std::string>();
     }
+}
+
+bool GVLE::FileTreeView::on_button_press_event(GdkEventButton* event)
+{
+    bool return_value = TreeView::on_button_press_event(event);
+    if (event->type == GDK_BUTTON_PRESS and event->button == 3
+	and not vle::utils::Path::path().getPackageDir().empty()) {
+	mMenuPopup.popup(event->button, event->time);
+    }
+
+    if (event->type == GDK_BUTTON_PRESS) {
+	if (mDelayTime + 250 < event->time) {
+	    mDelayTime = event->time;
+	    mCellrenderer->property_editable() = true;
+	} else {
+	    mDelayTime = event->time;
+	    mCellrenderer->property_editable() = false;
+	    Gtk::TreeModel::Path path;
+	    Gtk::TreeViewColumn* column;
+	    get_cursor(path, column);
+	    on_row_activated(path, column);
+	}
+    }
+    return return_value;
+}
+
+void GVLE::FileTreeView::onOpen()
+{
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection =  get_selection();
+    SimpleTypeBox box(_("Path of the program ?"));
+    std::string prg = Glib::find_program_in_path(boost::trim_copy(box.run()));
+    if (refSelection and box.valid() and not prg.empty()) {
+	Gtk::TreeModel::Row row = *refSelection->get_selected();
+	std::list < std::string > argv;
+	argv.push_back(prg);
+	std::string filepath = Glib::build_filename(
+	    mPackage, Glib::build_filename(*projectFilePath(row)));
+	argv.push_back(filepath);
+
+	try {
+	    Glib::spawn_async(utils::Path::path().getParentPath(filepath),
+			     argv,
+			     Glib::SpawnFlags(0),
+			     sigc::slot < void >());
+	} catch(const Glib::SpawnError& e) {
+	    Error(_("The program can not be lanched"));
+	}
+    }
+}
+
+void GVLE::FileTreeView::onNewFile()
+{
+    SimpleTypeBox box(_("Name of the File ?"));
+    std::string name = boost::trim_copy(box.run());
+    std::string filepath;
+    if (box.valid() and not name.empty()) {
+	Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+	if (refSelection) {
+	    Gtk::TreeModel::const_iterator it = refSelection->get_selected();
+	    const Gtk::TreeModel::Row row = *it;
+	    const std::list<std::string>* lstpath = projectFilePath(row);
+	    filepath = Glib::build_filename(
+		mPackage, Glib::build_filename(*lstpath));
+	    if (not isDirectory(filepath)) {
+		boost::filesystem::path path(filepath);
+		filepath = boost::lexical_cast<std::string>(path);
+	    }
+	} else {
+	    filepath = mPackage;
+	}
+	utils::CMakePackage::addFile(filepath, name);
+    }
+    mParent->buildPackageHierarchy();
+}
+
+void GVLE::FileTreeView::onNewDirectory()
+{
+    SimpleTypeBox box(_("Name of the Directory ?"));
+    std::string name = boost::trim_copy(box.run());
+    std::string directorypath;
+    if (box.valid() and not name.empty()) {
+	Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+	if (refSelection) {
+	    Gtk::TreeModel::const_iterator it = refSelection->get_selected();
+	    const Gtk::TreeModel::Row row = *it;
+	    const std::list<std::string>* lstpath = projectFilePath(row);
+	    directorypath = Glib::build_filename(
+		mPackage, Glib::build_filename(*lstpath));
+	    if (not isDirectory(directorypath)) {
+		boost::filesystem::path path(directorypath);
+		directorypath = boost::lexical_cast<std::string>(path);
+	    }
+	} else {
+	    directorypath = mPackage;
+	}
+	utils::CMakePackage::addDirectory(directorypath, name);
+    }
+    mParent->buildPackageHierarchy();
+}
+
+
+void GVLE::FileTreeView::onRemove()
+{
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection	= get_selection();
+    if (refSelection) {
+	Gtk::TreeModel::const_iterator it = refSelection->get_selected();
+	const Gtk::TreeModel::Row row = *it;
+	const std::list<std::string>* lstpath = projectFilePath(row);
+
+	if (gvle::Question(_("Do you really want remove this file ?\n")))
+	    utils::CMakePackage::removeFile(Glib::build_filename(*lstpath));
+    }
+    mParent->buildPackageHierarchy();
+}
+
+void GVLE::FileTreeView::onRename()
+{
+    SimpleTypeBox box(_("Name of the file ?"));
+    std::string name = boost::trim_copy(box.run());
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+    if (box.valid() and not name.empty() and refSelection) {
+	Gtk::TreeModel::const_iterator it = refSelection->get_selected();
+	const Gtk::TreeModel::Row row = *it;
+	const std::list<std::string>* lstpath = projectFilePath(row);
+
+	utils::CMakePackage::renameFile(Glib::build_filename(*lstpath),
+					name);
+    }
+    mParent->buildPackageHierarchy();
+}
+
+void GVLE::FileTreeView::onEditionStarted(Gtk::CellEditable* cell_editable,
+					  const Glib::ustring& /* path */)
+{
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+    Gtk::TreeModel::iterator iter = refSelection->get_selected();
+
+    if (iter) {
+	Gtk::TreeModel::Row row = *iter;
+	const std::list<std::string>* lstpath = projectFilePath(row);
+
+	mOldAbsolutePath = Glib::build_filename(*lstpath);
+    }
+
+    if(mValidateRetry) {
+	Gtk::CellEditable* celleditable_validated = cell_editable;
+	Gtk::Entry* pEntry = dynamic_cast<Gtk::Entry*>(celleditable_validated);
+	if(pEntry) {
+	    pEntry->set_text(mInvalidTextForRetry);
+	    mValidateRetry = false;
+	    mInvalidTextForRetry.clear();
+	}
+    }
+}
+
+void GVLE::FileTreeView::onEdition(const Glib::ustring& /*pathString*/,
+				   const Glib::ustring& newName)
+{
+    std::string name(newName);
+    utils::CMakePackage::renameFile(mOldAbsolutePath, name);
+    mParent->buildPackageHierarchy();
 }
 
 GVLE::GVLE(BaseObjectType* cobject,

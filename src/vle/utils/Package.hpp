@@ -55,6 +55,14 @@ namespace vle { namespace utils {
         static PathList getInstalledExperiments();
         static PathList getInstalledLibraries();
 
+	static void addFile(const std::string& path,
+			    const std::string& name);
+	static void addDirectory(const std::string& path,
+				 const std::string& name);
+	static void removeFile(const std::string& pathFile);
+	static void renameFile(const std::string& oldFile,
+			       std::string& newName);
+
     private:
         enum Type { Debug, Release };
 

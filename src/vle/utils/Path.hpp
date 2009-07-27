@@ -327,6 +327,13 @@ namespace vle { namespace utils {
          */
         bool existDirectory(const std::string& filename);
 
+	/**
+	 * @brief return the parent directory of a file or directory
+	 * @param path the absolute filepath
+	 * @return a string with the new path
+	 */
+	std::string getParentPath(const std::string& path);
+
     private:
         void addSimulatorDir(const std::string& dirname);
 

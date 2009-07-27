@@ -29,6 +29,7 @@
 #include <glibmm/spawn.h>
 #include <glibmm/miscutils.h>
 #include <iostream>
+#include <fstream>
 
 
 namespace vle { namespace utils {
@@ -252,6 +253,45 @@ PathList CMakePackage::getInstalledLibraries()
         }
     }
     return result;
+}
+
+void CMakePackage::addFile(const std::string& path,
+			   const std::string& name)
+{
+    if (not boost::filesystem::exists(Glib::build_filename(path, name)))
+	std::ofstream file(Glib::build_filename(path, name).c_str());
+}
+
+void CMakePackage::addDirectory(const std::string& path,
+				const std::string& name)
+{
+    if (not boost::filesystem::exists(Glib::build_filename(path, name)))
+	boost::filesystem::create_directory(
+	    Glib::build_filename(path, name));
+}
+
+void CMakePackage::removeFile(const std::string& pathFile)
+{
+    std::string path = Glib::build_filename(
+	Path::path().getPackageDir(), pathFile);
+    boost::filesystem::remove_all(path);
+    boost::filesystem::remove(path);
+}
+
+void CMakePackage::renameFile(const std::string& oldFile,
+			      std::string& newName)
+{
+    std::string oldAbsolutePath =
+	Glib::build_filename(Path::path().getPackageDir(), oldFile);
+
+    if (boost::filesystem::extension(newName) == "")
+	newName += boost::filesystem::extension(oldAbsolutePath);
+    std::string newAbsolutePath =
+	Glib::build_filename(
+	    Path::path().getParentPath(oldAbsolutePath), newName);
+
+    if (not boost::filesystem::exists(newAbsolutePath))
+	boost::filesystem::rename(oldAbsolutePath, newAbsolutePath);
 }
 
 }} // namespace vle utils
