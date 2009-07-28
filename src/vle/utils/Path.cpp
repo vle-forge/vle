@@ -704,8 +704,12 @@ std::ostream& operator<<(std::ostream& out, const Path& p)
 std::string Path::getParentPath(const std::string& pathfile)
 {
     boost::filesystem::path path(pathfile);
-    std::string parent = boost::lexical_cast<std::string>(path.parent_path());
-    return parent;
+
+#if BOOST_VERSION > 103600
+    return path.parent_path().string();
+#else
+    return path.branch_path().string();
+#endif
 }
 
 }} // namespace vle utils
