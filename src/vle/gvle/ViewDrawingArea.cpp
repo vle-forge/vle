@@ -735,8 +735,9 @@ void ViewDrawingArea::drawLink()
 
 void ViewDrawingArea::drawZoomFrame()
 {
-    if (mView->getCurrentButton() == GVLE::ZOOM and mPrecMouse.get_x() != -1
-        and mPrecMouse.get_y() != -1) {
+    if ((mView->getCurrentButton() == GVLE::ZOOM
+	 or mView->getCurrentButton() == GVLE::POINTER)
+	 and mPrecMouse.get_x() != -1 and mPrecMouse.get_y() != -1) {
         int xmin = std::min(mMouse.get_x(), mPrecMouse.get_x());
         int xmax = std::max(mMouse.get_x(), mPrecMouse.get_x());
         int ymin = std::min(mMouse.get_y(), mPrecMouse.get_y());
@@ -824,6 +825,7 @@ bool ViewDrawingArea::on_button_press_event(GdkEventButton* event)
     case GVLE::POINTER:
         if (event->type == GDK_BUTTON_PRESS and event->button == 1) {
             on_gvlepointer_button_1(model, shiftOrControl);
+            queueRedraw();
         } else if (event->type == GDK_2BUTTON_PRESS and event->button == 1) {
             mView->showModel(model);
         } else if (event->button == 2) {
@@ -881,6 +883,25 @@ bool ViewDrawingArea::on_button_release_event(GdkEventButton* event)
     mMouse.set_y((int)(event->y / mZoom));
 
     switch (mView->getCurrentButton()) {
+    case GVLE::POINTER:
+	if (event->button == 1) {
+	    for(int x = std::min(mMouse.get_x(), mPrecMouse.get_x());
+		x <= std::max(mMouse.get_x(), mPrecMouse.get_x());
+		++x) {
+		for (int y = std::min(mMouse.get_y(), mPrecMouse.get_y());
+		     y <= std::max(mMouse.get_y(), mPrecMouse.get_y());
+		     ++y) {
+		    graph::Model* model = mCurrent->find(x, y);
+		    if (model)
+			if (not mView->existInSelectedModels(model))
+			    mView->addModelToSelectedModels(model);
+		}
+	    }
+	    queueRedraw();
+	}
+	mPrecMouse.set_x(-1);
+	mPrecMouse.set_y(-1);
+	break;
     case GVLE::ADDLINK:
         addLinkOnButtonRelease(mMouse.get_x(), mMouse.get_y());
         queueRedraw();
@@ -989,13 +1010,18 @@ bool ViewDrawingArea::on_motion_notify_event(GdkEventMotion* event)
     switch (mView->getCurrentButton()) {
     case GVLE::POINTER :
         if (button == 1) {
-            mView->displaceModel(mPrecMouse.get_x(), mPrecMouse.get_y(),
-                                 mMouse.get_x(), mMouse.get_y());
-            queueRedraw();
+	    if (not mView->isEmptySelectedModels()) {
+		mView->displaceModel(mPrecMouse.get_x(), mPrecMouse.get_y(),
+				     mMouse.get_x(), mMouse.get_y());
+		mPrecMouse = mMouse;
+		queueRedraw();
+	    } else {
+		queueRedraw();
+	    }
         } else {
             highlightLine((int)mMouse.get_x(), (int)mMouse.get_y());
+	    mPrecMouse = mMouse;
         }
-        mPrecMouse = mMouse;
         break;
     case GVLE::ZOOM:
         if (button == 1) {
@@ -1038,13 +1064,11 @@ void ViewDrawingArea::on_gvlepointer_button_1(graph::Model* mdl,
                 mView->clearSelectedModels();
             }
             mView->addModelToSelectedModels(mdl);
-        }
+	}
     } else {
-        if (mView->isEmptySelectedModels()) {
-            mView->addModelToSelectedModels(mCurrent);
-        } else {
-            mView->clearSelectedModels();
-        }
+	mView->clearSelectedModels();
+	mPrecMouse = mMouse;
+	queueRedraw();
     }
     queueRedraw();
 }
