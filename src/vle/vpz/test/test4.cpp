@@ -122,6 +122,35 @@ void check_rename_views_unittest_vpz(vpz::Views& views)
     BOOST_CHECK(views.get("new_view2").output() == "new_view2");
 }
 
+void check_rename_observables_unittest_vpz(vpz::Project& project)
+{
+    vpz::Observables& obs_list = project.experiment().views().observables();
+    BOOST_REQUIRE_NO_THROW(obs_list.rename("obs1", "new_obs1"));
+    BOOST_REQUIRE_NO_THROW(obs_list.rename("obs2", "new_obs2"));
+
+    BOOST_REQUIRE(obs_list.exist("new_obs1"));
+    BOOST_REQUIRE(obs_list.exist("new_obs2"));
+
+    BOOST_REQUIRE(not obs_list.exist("obs1"));
+    BOOST_REQUIRE(not obs_list.exist("obs2"));
+
+    vpz::AtomicModelList& atom_list = project.model().atomicModels();
+    atom_list.updateObservable("obs1", "new_obs1");
+    atom_list.updateObservable("obs2", "new_obs2");
+
+    graph::CoupledModel* top = graph::Model::toCoupled(project.model().model());
+    graph::CoupledModel* top1 = graph::Model::toCoupled(top->findModel("top1"));
+
+    BOOST_REQUIRE_EQUAL(atom_list.get(
+			    top1->findModel("x")).observables(), "new_obs1");
+    BOOST_REQUIRE_EQUAL(atom_list.get(
+			    top1->findModel("a")).observables(), "new_obs2");
+    BOOST_REQUIRE_EQUAL(atom_list.get(
+			    top1->findModel("b")).observables(), "new_obs2");
+    BOOST_REQUIRE_EQUAL(atom_list.get(
+			    top1->findModel("c")).observables(), "new_obs2");
+}
+
 
 void check_model_unittest_vpz(const vpz::Model& model)
 {
@@ -474,6 +503,24 @@ BOOST_AUTO_TEST_CASE(test_rename_views)
     check_rename_views_unittest_vpz(views);
 
     delete vpz.project().model().model();
+}
+
+BOOST_AUTO_TEST_CASE(test_rename_observables)
+{
+    vpz::Vpz vpz;
+    vpz.parseFile(utils::Path::path().getExampleFile("unittest.vpz"));
+
+    BOOST_REQUIRE_EQUAL(vpz.project().author(), "Gauthier Quesnel");
+    BOOST_REQUIRE_EQUAL(vpz.project().version(), "0.6");
+
+    vpz::Project proj(vpz.project());
+    check_rename_observables_unittest_vpz(proj);
+
+    std::string str(vpz.writeToString());
+    delete vpz.project().model().model();
+    vpz.clear();
+
+    vpz.parseMemory(str);
 }
 
 

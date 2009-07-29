@@ -79,6 +79,21 @@ const Observable& Observables::get(const std::string& name) const
     return it->second;
 }
 
+void Observables::rename(const std::string& old_name,
+			 const std::string& new_name)
+{
+    Observable& obs = get(old_name);
+    Observable new_obs(new_name);
+    const ObservablePortList& port_list = obs.observableportlist();
+    ObservablePortList::const_iterator it_port = port_list.begin();
+    while (it_port != port_list.end()) {
+        new_obs.add(it_port->second);
+        ++it_port;
+    }
+    del(old_name);
+    add(new_obs);
+}
+
 void Observables::cleanNoPermanent()
 {
     iterator it = m_list.begin();

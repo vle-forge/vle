@@ -153,6 +153,15 @@ void AtomicModelList::updateCondition(const std::string& oldname,
     }
 }
 
+void AtomicModelList::updateObservable(const std::string& oldname,
+				      const std::string& newname)
+{
+    for (iterator it = m_lst.begin(); it != m_lst.end(); ++it) {
+	if (it->second.observables() == oldname)
+	    it->second.setObservables(newname);
+    }
+}
+
 //
 ///
 //// Write graph information to stream.

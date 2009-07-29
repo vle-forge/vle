@@ -325,6 +325,15 @@ private:
 	virtual void onAdd();
 	virtual void onEdit();
 	virtual void onRemove();
+	virtual void onRename();
+
+	// Signal handler for text area
+	virtual void onEditionStarted(
+	    Gtk::CellEditable* cellEditable,
+	    const Glib::ustring& path);
+	virtual void onEdition(
+	    const Glib::ustring& pathString,
+	    const Glib::ustring& newName);
 
     private:
 	vpz::AtomicModel* mModel;
@@ -336,6 +345,13 @@ private:
 	ObsAndViewBox mObsAndViewBox;
 	//Label
 	Gtk::Label* mLabel;
+	 //Cell
+	int                      mColumnName;
+	Gtk::CellRendererText*   mCellRenderer;
+	std::string              mOldName;
+	bool                     mValidateRetry;
+	Glib::ustring            mInvalidTextForRetry;
+	guint32                  mDelayTime;
     };
 
     Glib::RefPtr<Gnome::Glade::Xml>      mXml;

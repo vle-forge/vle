@@ -130,6 +130,14 @@ namespace vle { namespace vpz {
         inline void del(const std::string& name)
         { m_list.erase(name); }
 
+	/**
+	  * @brief Rename the specified observable.
+	  * @param old_name The current observable name
+	  * @param new_name The new name for the observable
+	  */
+	void rename(const std::string& old_name,
+		    const std::string& new_name);
+
         /**
          * @brief Return true if the name already exist in the ObservableList.
          * @param name The name to check in ObservableList.

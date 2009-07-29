@@ -221,6 +221,15 @@ namespace vle { namespace vpz {
 	void updateCondition(const std::string& oldname,
 			     const std::string& newname);
 
+	/**
+	 * @brief Update the observable of each AtomicModel
+	 * where an oldname became newname.
+	 * @param oldname the old name of the observable.
+	 * @param newname the new name of the observable.
+	 */
+	void updateObservable(const std::string& oldname,
+			     const std::string& newname);
+
         /**
          * @brief Check if the graph::AtomicModel exist into the
          * AtomicModelList.

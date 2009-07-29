@@ -26,6 +26,7 @@
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/ObservableBox.hpp>
 #include <vle/gvle/SimpleTypeBox.hpp>
+#include <vle/gvle/InteractiveTypeBox.hpp>
 #include <vle/utils/Path.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -971,7 +972,21 @@ AtomicModelBox::ObservableTreeView::ObservableTreeView(
 {
     mRefTreeModelObs = Gtk::ListStore::create(mColumnsObs);
     set_model(mRefTreeModelObs);
-    append_column(_("Name"), mColumnsObs.m_col_name);
+    mColumnName = append_column_editable(_("Name"),
+					 mColumnsObs.m_col_name);
+    mCellRenderer = dynamic_cast<Gtk::CellRendererText*>(
+	get_column_cell_renderer(mColumnName - 1));
+    mCellRenderer->property_editable() = true;
+    mCellRenderer->signal_editing_started().connect(
+	sigc::mem_fun(*this,
+		      &AtomicModelBox::ObservableTreeView::
+		      onEditionStarted) );
+
+    mCellRenderer->signal_edited().connect(
+	sigc::mem_fun(*this,
+		      &AtomicModelBox::ObservableTreeView::
+		      onEdition) );
+
 
     //Fill popup menu:
     {
@@ -995,6 +1010,12 @@ AtomicModelBox::ObservableTreeView::ObservableTreeView(
 		sigc::mem_fun(
 		    *this,
 		    &AtomicModelBox::ObservableTreeView::onRemove)));
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		_("_Rename"),
+		sigc::mem_fun(
+		    *this,
+		    &AtomicModelBox::ObservableTreeView::onRename)));
     }
     mMenuPopup.accelerate(*this);
 }
@@ -1105,6 +1126,76 @@ void AtomicModelBox::ObservableTreeView::onRemove()
         mModeling->observables().del(obs);
 	build();
     }
+}
+
+void AtomicModelBox::ObservableTreeView::onRename()
+{
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection	= get_selection();
+    Gtk::TreeModel::iterator it = refSelection->get_selected();
+    Glib::ustring oldName = (*it)[mColumnsObs.m_col_name];
+
+    if (not oldName.empty()) {
+	InteractiveTypeBox box(_("New name for this observable ?"),
+			       &(mModeling->observables()),
+			       oldName);
+	std::string newName = box.run();
+	if (box.valid() and not newName.empty()) {
+	    box.hide_all();
+	    newName = boost::trim_copy(newName);
+
+	    mModeling->observables().rename(oldName, newName);
+	    vpz::AtomicModelList& atomlist(
+		mModeling->vpz().project().model().atomicModels());
+	    atomlist.updateObservable(oldName, newName);
+	    build();
+	}
+    }
+}
+
+void AtomicModelBox::ObservableTreeView::onEditionStarted(
+    Gtk::CellEditable* cellEditable,
+    const Glib::ustring& path)
+{
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+    Gtk::TreeModel::iterator iter = refSelection->get_selected();
+
+    if (iter) {
+	Gtk::TreeModel::Row row = *iter;
+	mOldName = row.get_value(mColumnsObs.m_col_name);
+    }
+
+    if(mValidateRetry) {
+	Gtk::CellEditable* celleditable_validated = cellEditable;
+	Gtk::Entry* pEntry = dynamic_cast<Gtk::Entry*>(celleditable_validated);
+	if(pEntry) {
+	    pEntry->set_text(mInvalidTextForRetry);
+	    mValidateRetry = false;
+	    mInvalidTextForRetry.clear();
+	}
+    }
+}
+
+void AtomicModelBox::ObservableTreeView::onEdition(
+    const Glib::ustring& pathString,
+    const Glib::ustring& newName)
+{
+    Gtk::TreePath path(pathString);
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+    Gtk::TreeModel::iterator it = refSelection->get_selected();
+
+    if (it) {
+	vpz::Observables& listobs = mModeling->observables();
+
+	if (not newName.empty() and (not listobs.exist(newName))) {
+	    listobs.rename(mOldName, newName);
+
+	    vpz::AtomicModelList& atomlist(
+		mModeling->vpz().project().model().atomicModels());
+	    atomlist.updateObservable(mOldName, newName);
+	}
+    }
+
+    build();
 }
 
 std::string AtomicModelBox::ObservableTreeView::getObservable()
