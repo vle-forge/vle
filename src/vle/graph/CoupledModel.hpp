@@ -41,6 +41,7 @@ namespace vle { namespace graph {
     {
     public:
         typedef std::vector < std::string > StringList;
+	typedef std::map <std::string, ConnectionList> ModelConnections;
 
         /**
          * @brief Constructor to intialize parent, position (0,0), size (0,0)
@@ -321,6 +322,49 @@ namespace vle { namespace graph {
         void setBasicConnections(const StringList& lst);
 
         void displace(ModelList& models, CoupledModel* destination);
+
+	/**
+	 * @brief save all the input connections in relation with
+	 * selected models
+	 * @param models the selected models
+	 * @return a list of the connections
+	 *
+	 */
+	ModelConnections saveInputConnections(
+	    ModelList& models);
+
+	/**
+	 * @brief save all the output connections in relation with
+	 * selected models
+	 * @param models the selected models
+	 * @return a list of the connections
+	 *
+	 */
+	ModelConnections  saveOutputConnections(
+	    ModelList& models);
+
+	/**
+	 * @brief restore the input connections in relation with the
+	 * selected models, with a new Coupled model
+	 * @param models the selected models
+	 * @param destination the new coupled model
+	 * @param conenction the old connections
+	 *
+	 */
+	void restoreInputConnections(ModelList& models,
+				     CoupledModel* destination,
+				     ModelConnections connection);
+	/**
+	 * @brief restore the output connections in relation with the
+	 * selected models, with a new Coupled model
+	 * @param models the selected models
+	 * @param destination the new coupled model
+	 * @param conenction the old connections
+	 *
+	 */
+	void restoreOutputConnections(ModelList& models,
+				      CoupledModel* destination,
+				      ModelConnections connections);
 
         /**
          * @brief return true if the model list has no connection with another

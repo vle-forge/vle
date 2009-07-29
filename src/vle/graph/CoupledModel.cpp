@@ -596,11 +596,17 @@ void CoupledModel::setBasicConnections(const std::vector < std::string >& lst)
 
 void CoupledModel::displace(ModelList& models, CoupledModel* destination)
 {
+    ModelConnections listInput = saveInputConnections(models);
+    ModelConnections listOutput = saveOutputConnections(models);
+
     Assert < utils::DevsGraphError >(not hasConnectionProblem(models),
            _("One or more models are connected to another model"));
 
     detachModels(models);
     destination->attachModels(models);
+
+    restoreOutputConnections(models, destination, listOutput);
+    restoreInputConnections(models, destination, listInput);
 }
 
 bool CoupledModel::hasConnectionProblem(const ModelList& lst) const
@@ -916,6 +922,135 @@ void CoupledModel::copyPort(const ModelPortList& src, ModelPortList& dst)
                 _("Destination model %1% not found in copy port")) % srcmodelname);
 
         dst.add(dstmodel, it->second);
+    }
+}
+
+CoupledModel::ModelConnections CoupledModel::saveInputConnections(
+    ModelList& models)
+{
+    ModelConnections listModel;
+    ModelList::iterator it = models.begin();
+    while (it != models.end()) {
+
+	ConnectionList connectIn;
+	ConnectionList::iterator iter =
+	    it->second->getInputPortList().begin();
+	while (iter != it->second->getInputPortList().end()) {
+
+	    ModelPortList lst(it->second->getInPort(iter->first));
+	    connectIn[iter->first] = lst;
+	    ConnectionList::iterator iterPrec = iter;
+	    ++iter;
+	    it->second->delInputPort(iterPrec->first);
+	}
+
+	listModel[it->first] = connectIn;
+	++it;
+    }
+    return listModel;
+}
+
+CoupledModel::ModelConnections CoupledModel::saveOutputConnections(
+    ModelList& models)
+{
+    ModelConnections listModel;
+    ModelList::iterator it = models.begin();
+    while (it != models.end()) {
+
+	ConnectionList connectOut;
+	ConnectionList::iterator iter =
+	    it->second->getOutputPortList().begin();
+	while (iter != it->second->getOutputPortList().end()) {
+	    ModelPortList lst(it->second->getOutPort(iter->first));
+	    connectOut[iter->first] = lst;
+	    ConnectionList::iterator iterPrec = iter;
+	    ++iter;
+	    it->second->delOutputPort(iterPrec->first);
+	}
+	listModel[it->first] = connectOut;
+	++it;
+    }
+    return listModel;
+}
+
+void CoupledModel::restoreInputConnections(ModelList& models,
+					   CoupledModel* destination,
+					   ModelConnections connections)
+{
+    CoupledModel::ModelConnections::iterator iterConnection =
+	connections.begin();
+    ModelPortList::iterator iterModel;
+    while (iterConnection != connections.end()) {
+	ConnectionList connectIn = iterConnection->second;
+	ConnectionList::iterator iterPort = connectIn.begin();
+
+	while (iterPort != connectIn.end()) {
+	    models[iterConnection->first]->addInputPort(iterPort->first);
+
+	    for (iterModel = connectIn[iterPort->first].begin();
+		 iterModel != connectIn[iterPort->first].end();
+		 ++iterModel) {
+
+		if (models.find(iterModel->first->getName()) == models.end()
+		    and destination != NULL) {
+
+		    destination->addInputPort(iterPort->first);
+
+		    addInternalConnection(
+			iterModel->first, iterModel->second,
+			destination, iterPort->first);
+
+		    destination->addInputConnection(
+			iterPort->first,
+			models[iterConnection->first], iterPort->first);
+
+		} else {
+		    destination->addInternalConnection(
+			iterModel->first, iterModel->second,
+			models[iterConnection->first], iterPort->first);
+		}
+	    }
+	    ++iterPort;
+	}
+	++iterConnection;
+    }
+}
+
+
+void CoupledModel::restoreOutputConnections(ModelList& models,
+					    CoupledModel* destination,
+					    ModelConnections connections)
+{
+    CoupledModel::ModelConnections::iterator iterConnection =
+	connections.begin();
+    ModelPortList::iterator iterModel;
+    while (iterConnection != connections.end()) {
+	ConnectionList connectOut = iterConnection->second;
+	ConnectionList::iterator iterPort = connectOut.begin();
+	while (iterPort != connectOut.end()) {
+	    models[iterConnection->first]->addOutputPort(iterPort->first);
+
+	    for (iterModel = connectOut[iterPort->first].begin();
+		 iterModel != connectOut[iterPort->first].end();
+		 ++iterModel) {
+
+		if (models.find(iterModel->first->getName()) == models.end()
+		    and destination != NULL) {
+
+		    destination->addOutputPort(iterPort->first);
+
+		    addInternalConnection(
+			destination, iterPort->first,
+			iterModel->first, iterModel->second);
+
+		    destination->addOutputConnection(
+			models[iterConnection->first], iterPort->first,
+			iterPort->first);
+		}
+	    }
+	    ++iterPort;
+	}
+	++iterConnection;
     }
 }
 

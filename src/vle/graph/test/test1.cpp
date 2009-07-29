@@ -165,7 +165,7 @@ BOOST_AUTO_TEST_CASE(test_displace)
     delete newtop;
 }
 
-BOOST_AUTO_TEST_CASE(test_prohibited_displace)
+BOOST_AUTO_TEST_CASE(test_complex_displace)
 {
     CoupledModel* top = new CoupledModel("top", 0);
 
@@ -188,21 +188,25 @@ BOOST_AUTO_TEST_CASE(test_prohibited_displace)
     BOOST_REQUIRE_EQUAL(top->getModelList().size(),
                         (ModelList::size_type)3);
 
-    CoupledModel* newtop = new CoupledModel("newtop", 0);
+    CoupledModel* newtop = new CoupledModel("newtop", top);
 
     ModelList lst;
     lst["a"] = a;
     lst["b"] = b;
 
-    BOOST_REQUIRE_THROW(top->displace(lst, newtop), utils::DevsGraphError);
+    BOOST_REQUIRE_NO_THROW(top->displace(lst, newtop));
 
     BOOST_REQUIRE_EQUAL(top->getModelList().size(),
-                        (ModelList::size_type)3);
+                        (ModelList::size_type)2);
     BOOST_REQUIRE_EQUAL(newtop->getModelList().size(),
-                        (ModelList::size_type)0);
+			(ModelList::size_type)2);
+
+    newtop->existInternalConnection("a", "out", "b", "in");
+    newtop->existInternalConnection("b", "out", "a", "in");
+    newtop->existOutputPort("out");
+    top->existInternalConnection("newtop", "out", "c", "in");
 
     delete top;
-    delete newtop;
 }
 
 BOOST_AUTO_TEST_CASE(test_delinput_port)
