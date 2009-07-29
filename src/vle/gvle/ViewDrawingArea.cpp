@@ -507,7 +507,7 @@ void ViewDrawingArea::drawLines()
     while (itl != mLines.end()) {
         if (i != mHighlightLine) {
 	    mContext->set_line_join(Cairo::LINE_JOIN_ROUND);
-	    setColor(mModeling->getForegroundColor());
+	    setColor(mModeling->getConnectionColor());
         }
 	mContext->move_to(itl->begin()->first + mOffset, itl->begin()->second + mOffset);
 	std::vector <Point>::const_iterator iter = itl->begin();

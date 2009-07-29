@@ -54,6 +54,7 @@ protected:
     void onButtonAtomicColorChange();
     void onButtonCoupledColorChange();
     void onButtonSelectedColorChange();
+    void onButtonConnectionColorChange();
     void onButtonFontChange();
     void onLineWidthChange();
 
@@ -79,6 +80,7 @@ private:
 	Gdk::Color atomic;
 	Gdk::Color coupled;
 	Gdk::Color selected;
+        Gdk::Color connection;
 	std::string font;
 	double fontSize;
 	double lineWidth;
@@ -111,6 +113,7 @@ private:
     Gtk::ColorButton* mAtomicColor;
     Gtk::ColorButton* mCoupledColor;
     Gtk::ColorButton* mSelectedColor;
+    Gtk::ColorButton* mConnectionColor;
     Gtk::FontButton*  mFont;
     Gtk::HScale*      mLineWidth;
     //Dialog widgets - Editor

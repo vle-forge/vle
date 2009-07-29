@@ -713,6 +713,12 @@ public:
     inline const Color getAtomicColor() const
     { return mAtomicColor; }
 
+    inline void setConnectionColor(const Color color)
+    { mConnectionColor = color; }
+
+    inline const Color getConnectionColor() const
+    { return mConnectionColor; }
+
     inline void setFont(const std::string font)
     { mFont = font; }
 
@@ -846,6 +852,7 @@ private:
     Color                       mSelectedColor;
     Color                       mCoupledColor;
     Color                       mAtomicColor;
+    Color                       mConnectionColor;
     std::string                 mFont;
     double                      mFontSize;
     double                      mLineWidth;

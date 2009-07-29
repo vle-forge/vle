@@ -56,6 +56,9 @@ PreferencesBox::PreferencesBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m)
     xml->get_widget("ButtonPreferencesSelectedColor", mSelectedColor);
     mSelectedColor->signal_color_set().connect(
 	sigc::mem_fun(*this, &PreferencesBox::onButtonSelectedColorChange));
+    xml->get_widget("ButtonPreferencesConnectionColor", mConnectionColor);
+    mConnectionColor->signal_color_set().connect(
+        sigc::mem_fun(*this, &PreferencesBox::onButtonConnectionColorChange));
     xml->get_widget("ButtonPreferencesSelectFont", mFont);
     mFont->signal_font_set().connect(
 	sigc::mem_fun(*this, &PreferencesBox::onButtonFontChange));
@@ -140,6 +143,7 @@ void PreferencesBox::onCancel()
     mAtomicColor->set_color(backupSettings.atomic);
     mCoupledColor->set_color(backupSettings.coupled);
     mSelectedColor->set_color(backupSettings.selected);
+    mConnectionColor->set_color(backupSettings.connection);
     std::ostringstream oss;
     oss << backupSettings.font.c_str() << " " << backupSettings.fontSize;
     mFont->set_font_name(oss.str());
@@ -188,6 +192,11 @@ void PreferencesBox::onButtonCoupledColorChange()
 void PreferencesBox::onButtonSelectedColorChange()
 {
     currentSettings.selected = mSelectedColor->get_color();
+}
+
+void PreferencesBox::onButtonConnectionColorChange()
+{
+    currentSettings.connection = mConnectionColor->get_color();
 }
 
 void PreferencesBox::onButtonFontChange()
@@ -305,6 +314,11 @@ void PreferencesBox::activate(const Settings& settings)
     color.m_b = settings.atomic.get_blue_p();
     mModeling->setAtomicColor(color);
 
+    color.m_r = settings.connection.get_red_p();
+    color.m_g = settings.connection.get_green_p();
+    color.m_b = settings.connection.get_blue_p();
+    mModeling->setConnectionColor(color);
+
     mModeling->setFont(settings.font);
     mModeling->setFontSize(settings.fontSize);
 
@@ -315,6 +329,7 @@ void PreferencesBox::activate(const Settings& settings)
     mAtomicColor->set_color(settings.atomic);
     mCoupledColor->set_color(settings.coupled);
     mSelectedColor->set_color(settings.selected);
+    mConnectionColor->set_color(settings.connection);
     std::ostringstream oss;
     oss << settings.font.c_str() << " " << settings.fontSize;
     mFont->set_font_name(oss.str());
@@ -360,6 +375,7 @@ void PreferencesBox::copy(const Settings& src, Settings& dest)
     dest.selected   = src.selected;
     dest.coupled    = src.coupled;
     dest.atomic     = src.atomic;
+    dest.connection = src.connection;
     dest.font       = src.font;
     dest.fontSize   = src.fontSize;
     dest.lineWidth  = src.lineWidth;
@@ -399,6 +415,9 @@ void PreferencesBox::saveSettings()
     prefs.setAttributes("gvle.graphics",
 			"selected",
 			makeStringFromColor(currentSettings.selected));
+    prefs.setAttributes("gvle.graphics",
+			"connection",
+			makeStringFromColor(currentSettings.connection));
     prefs.setAttributes("gvle.graphics",
 			"font",
 			currentSettings.font);
@@ -471,6 +490,10 @@ void PreferencesBox::loadSettings()
 
     value = prefs.getAttributes("gvle.graphics", "selected");
     currentSettings.selected = (value.empty() ? mSelectedColor->get_color()
+				: makeColorFromString(value));
+
+    value = prefs.getAttributes("gvle.graphics", "connection");
+    currentSettings.connection = (value.empty() ? mConnectionColor->get_color()
 				: makeColorFromString(value));
 
     value = prefs.getAttributes("gvle.graphics", "font");
