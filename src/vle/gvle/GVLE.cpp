@@ -390,12 +390,13 @@ void GVLE::FileTreeView::onEditionStarted(Gtk::CellEditable* cell_editable,
     }
 }
 
-void GVLE::FileTreeView::onEdition(const Glib::ustring& /*pathString*/,
+void GVLE::FileTreeView::onEdition(const Glib::ustring& pathString,
 				   const Glib::ustring& newName)
 {
     std::string name(newName);
     utils::CMakePackage::renameFile(mOldAbsolutePath, name);
-    mParent->buildPackageHierarchy();
+    Gtk::TreeModel::Row row = *(mRefTreeModel->get_iter(pathString));
+    row[mColumns.m_col_name] = newName;
 }
 
 GVLE::GVLE(BaseObjectType* cobject,
