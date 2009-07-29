@@ -245,7 +245,8 @@ value::Map* CairoNetView::RealSettings::toMap()
 }
 
 CairoNetView::CairoNetView(const std::string& name)
-    : OutputPlugin(name), m_dialog(0), m_counter_values(0)
+    : OutputPlugin(name), m_dialogPlugin(0),
+      m_dialogMatrix(0), m_counter_values(0)
 {
     using namespace boost::assign;
 
@@ -267,7 +268,11 @@ bool CairoNetView::start(vpz::Output& output, vpz::View& /* view */)
 	utils::Path::path().getOutputGladeFile("caironetview.glade");
     Glib::RefPtr<Gnome::Glade::Xml> ref = Gnome::Glade::Xml::create(glade);
 
-    ref->get_widget("dialog", m_dialog);
+    ref->get_widget("dialogPlugin", m_dialogPlugin);
+    ref->get_widget("dialogMatrix", m_dialogMatrix);
+    ref->get_widget("dialogPositions", m_dialogPositions);
+    ref->get_widget("textviewMatrix", m_textviewMatrix);
+    ref->get_widget("textviewPositions", m_textviewPositions);
     ref->get_widget("hboxNodes", m_hboxNodes);
     ref->get_widget("hboxPositions", m_hboxPositions);
     ref->get_widget("hboxStates", m_hboxStates);
@@ -276,16 +281,20 @@ bool CairoNetView::start(vpz::Output& output, vpz::View& /* view */)
     ref->get_widget("entryExecutiveName", m_entryExecutiveName);
     ref->get_widget("entryNodesNames", m_entryNodesNames);
     ref->get_widget("entryNodesPrefix", m_entryNodesPrefix);
-    ref->get_widget("entryMatrix", m_entryMatrix);
-    ref->get_widget("entryPositionsValues", m_entryPositionsValues);
     ref->get_widget("entryStateName", m_entryStateName);
     ref->get_widget("useDisplayNames", m_useDisplayNames);
     ref->get_widget("chekDisplayNames", m_chekDisplayNames);
     ref->get_widget("useStatesName", m_useStatesName);
     ref->get_widget("buttonAddValue", m_buttonAddValue);
+    ref->get_widget("buttonEditMatrix", m_buttonEditMatrix);
+    ref->get_widget("buttonEditPositions", m_buttonEditPositions);
     ref->get_widget("vboxValues", m_vboxValues);
 
-    assert(m_dialog);
+    assert(m_dialogPlugin);
+    assert(m_dialogMatrix);
+    assert(m_dialogPositions);
+    assert(m_textviewMatrix);
+    assert(m_textviewPositions);
     assert(m_hboxNodes);
     assert(m_hboxPositions);
     assert(m_hboxStates);
@@ -294,13 +303,13 @@ bool CairoNetView::start(vpz::Output& output, vpz::View& /* view */)
     assert(m_entryExecutiveName);
     assert(m_entryNodesNames);
     assert(m_entryNodesPrefix);
-    assert(m_entryMatrix);
-    assert(m_entryPositionsValues);
     assert(m_entryStateName);
     assert(m_useDisplayNames);
     assert(m_chekDisplayNames);
     assert(m_useStatesName);
     assert(m_buttonAddValue);
+    assert(m_buttonEditMatrix);
+    assert(m_buttonEditPositions);
     assert(m_vboxValues);
 
     m_comboNodesType = new Gtk::ComboBoxText();
@@ -328,6 +337,11 @@ bool CairoNetView::start(vpz::Output& output, vpz::View& /* view */)
 
     m_buttonAddValue->signal_clicked().connect(
 	sigc::mem_fun(*this, &CairoNetView::onAddValue));
+    m_buttonEditMatrix->signal_clicked().connect(
+	sigc::mem_fun(*this, &CairoNetView::onEditMatrix));
+    m_buttonEditPositions->signal_clicked().connect(
+	sigc::mem_fun(*this, &CairoNetView::onEditPositions));
+
     m_comboStateType->signal_changed().connect(
 	sigc::mem_fun(*this, &CairoNetView::onStatesTypeChanged));
     m_comboNodesType->signal_changed().connect(
@@ -335,6 +349,7 @@ bool CairoNetView::start(vpz::Output& output, vpz::View& /* view */)
     m_comboPositionsType->signal_changed().connect(
 	sigc::bind(
 	    sigc::mem_fun(*this, &CairoNetView::sensitiveArea), POSITIONS));
+
     m_useDisplayNames->signal_toggled().connect(
 	sigc::bind(
 	    sigc::mem_fun(*this, &CairoNetView::sensitiveArea), DISPLAY));
@@ -343,11 +358,11 @@ bool CairoNetView::start(vpz::Output& output, vpz::View& /* view */)
 
     init(output);
 
-    if (m_dialog->run() == Gtk::RESPONSE_ACCEPT) {
+    if (m_dialogPlugin->run() == Gtk::RESPONSE_ACCEPT) {
         assign(output);
     }
 
-    m_dialog->hide();
+    m_dialogPlugin->hide();
     return true;
 }
 
@@ -384,7 +399,8 @@ void CairoNetView::init(vpz::Output& output)
 	}
 
 	if (map->existValue("adjacency_matrix")) {
-	    m_entryMatrix->set_text(map->getString("adjacency_matrix"));
+	    m_textviewMatrix->get_buffer()->set_text(
+		map->getString("adjacency_matrix"));
 	}
 
 	if (map->existValue("positions")) {
@@ -394,7 +410,7 @@ void CairoNetView::init(vpz::Output& output)
 		    positionsMap.getString("type"));
 		if (positionsMap.getString("type") == "set") {
 		    if (positionsMap.existValue("values")) {
-			m_entryPositionsValues->set_text(
+			m_textviewPositions->get_buffer()->set_text(
 			    positionsMap.getString("values"));
 		    }
 		}
@@ -567,12 +583,14 @@ void CairoNetView::assign(vpz::Output& output)
 	mapNodes->addString("prefix", m_entryNodesPrefix->get_text());
     map->add("nodes", mapNodes);
 
-    map->addString("adjacency_matrix", m_entryMatrix->get_text());
+    map->addString("adjacency_matrix",
+		   m_textviewMatrix->get_buffer()->get_text());
 
     value::Map* mapPositions = new value::Map();
     mapPositions->addString("type", m_comboPositionsType->get_active_text());
     if (m_comboPositionsType->get_active_text() == "set")
-	mapPositions->addString("values", m_entryPositionsValues->get_text());
+	mapPositions->addString("values",
+				m_textviewPositions->get_buffer()->get_text());
     map->add("positions", mapPositions);
 
     value::Map* mapStates = new value::Map();
@@ -594,6 +612,28 @@ void CairoNetView::assign(vpz::Output& output)
     }
 
     output.setData(map);
+}
+
+void CairoNetView::onEditMatrix()
+{
+    Glib::ustring previous_content = m_textviewMatrix->get_buffer()->get_text();
+
+    m_dialogMatrix->show();
+    if (m_dialogMatrix->run() != Gtk::RESPONSE_ACCEPT) {
+	m_textviewMatrix->get_buffer()->set_text(previous_content);
+    }
+    m_dialogMatrix->hide();
+}
+
+void CairoNetView::onEditPositions()
+{
+    Glib::ustring previous_content = m_textviewPositions->get_buffer()->get_text();
+
+    m_dialogPositions->show();
+    if (m_dialogPositions->run() != Gtk::RESPONSE_ACCEPT) {
+	m_textviewPositions->get_buffer()->set_text(previous_content);
+    }
+    m_dialogPositions->hide();
 }
 
 void CairoNetView::onAddValue()
@@ -662,9 +702,9 @@ void CairoNetView::sensitiveArea(const Area& area)
 	break;
     case POSITIONS:
 	if (m_comboPositionsType->get_active_text() == "auto") {
-	    m_entryPositionsValues->set_sensitive(false);
+	    m_buttonEditPositions->set_sensitive(false);
 	} else {
-	    m_entryPositionsValues->set_sensitive(true);
+	    m_buttonEditPositions->set_sensitive(true);
 	}
 	break;
     case DISPLAY:

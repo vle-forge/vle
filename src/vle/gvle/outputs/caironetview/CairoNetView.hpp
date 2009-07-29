@@ -114,7 +114,11 @@ private:
     };
 
     // Gtk Widgets
-    Gtk::Dialog*        m_dialog;
+    Gtk::Dialog*        m_dialogPlugin;
+    Gtk::Dialog*        m_dialogMatrix;
+    Gtk::Dialog*        m_dialogPositions;
+    Gtk::TextView*      m_textviewMatrix;
+    Gtk::TextView*      m_textviewPositions;
     Gtk::HBox*          m_hboxNodes;
     Gtk::HBox*          m_hboxPositions;
     Gtk::HBox*          m_hboxStates;
@@ -126,13 +130,13 @@ private:
     Gtk::Entry*         m_entryExecutiveName;
     Gtk::Entry*         m_entryNodesNames;
     Gtk::Entry*         m_entryNodesPrefix;
-    Gtk::Entry*         m_entryMatrix;
-    Gtk::Entry*         m_entryPositionsValues;
     Gtk::Entry*         m_entryStateName;
     Gtk::CheckButton*   m_useDisplayNames;
     Gtk::CheckButton*   m_chekDisplayNames;
     Gtk::CheckButton*   m_useStatesName;
     Gtk::Button*        m_buttonAddValue;
+    Gtk::Button*        m_buttonEditMatrix;
+    Gtk::Button*        m_buttonEditPositions;
     Gtk::VBox*          m_vboxValues;
 
     // Class attributes
@@ -144,6 +148,9 @@ private:
     // Class methods
     void init(vpz::Output& output);
     void assign(vpz::Output& output);
+
+    void onEditMatrix();
+    void onEditPositions();
 
     void onAddValue();
     void addValue(ValueSettings* value);
