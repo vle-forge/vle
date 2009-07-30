@@ -602,9 +602,16 @@ AtomicModelBox::DynamicTreeView::DynamicTreeView(
     Gtk::TreeView(cobject),
     mDynamicBox(xml)
 {
-    mRefTreeModelDyn = Gtk::ListStore::create(mColumnsDyn);
+    mRefListDyn = Gtk::ListStore::create(mColumnsDyn);
+    mRefTreeModelDyn = Gtk::TreeModelSort::create(mRefListDyn);
     set_model(mRefTreeModelDyn);
     mColumnName = append_column_editable(_("Name"), mColumnsDyn.m_col_name);
+    Gtk::TreeViewColumn* nameCol = get_column(mColumnName - 1);
+    nameCol->set_clickable(true);
+    nameCol->signal_clicked().connect(
+	sigc::bind(sigc::mem_fun(*this,
+		&AtomicModelBox::DynamicTreeView::onClickColumn), mColumnName));
+    nameCol->set_sort_order(Gtk::SORT_DESCENDING);
 
     mCellRenderer = dynamic_cast<Gtk::CellRendererText*>(
 	get_column_cell_renderer(mColumnName - 1));
@@ -615,8 +622,23 @@ AtomicModelBox::DynamicTreeView::DynamicTreeView(
     mCellRenderer->signal_edited().connect(
 	sigc::mem_fun(*this,
 		      &AtomicModelBox::DynamicTreeView::onEdition));
-    append_column(_("Library"), mColumnsDyn.m_dyn);
 
+    mColumnDyn = append_column(_("Library"), mColumnsDyn.m_dyn);
+    Gtk::TreeViewColumn* dynCol = get_column(mColumnDyn - 1);
+    dynCol->set_clickable(true);
+    dynCol->signal_clicked().connect(
+	sigc::bind(sigc::mem_fun(*this,
+		&AtomicModelBox::DynamicTreeView::onClickColumn), mColumnDyn));
+    dynCol->set_sort_order(Gtk::SORT_DESCENDING);
+
+    mColumnModel = append_column(_("Model"), mColumnsDyn.m_model);
+    Gtk::TreeViewColumn* modelCol = get_column(mColumnModel - 1);
+    modelCol->set_clickable(true);
+    modelCol->signal_clicked().connect(
+	sigc::bind(sigc::mem_fun(*this,
+		&AtomicModelBox::DynamicTreeView::onClickColumn),
+		   mColumnModel));
+    modelCol->set_sort_order(Gtk::SORT_DESCENDING);
 
     //Fill popup menu:
     {
@@ -660,14 +682,15 @@ void AtomicModelBox::DynamicTreeView::build()
     assert(mModeling);
     using namespace vpz;
 
-    mRefTreeModelDyn->clear();
+    mRefListDyn->clear();
 
     const DynamicList& list = mModeling->dynamics().dynamiclist();
     DynamicList::const_iterator it = list.begin();
     while (it != list.end()) {
-        Gtk::TreeModel::Row row = *(mRefTreeModelDyn->append());
+        Gtk::TreeModel::Row row = *(mRefListDyn->append());
         row[mColumnsDyn.m_col_name] = it->first;
         row[mColumnsDyn.m_dyn] = it->second.library();
+	row[mColumnsDyn.m_model] = it->second.model();
 
         ++it;
     }
@@ -714,6 +737,29 @@ bool AtomicModelBox::DynamicTreeView::on_button_press_event(GdkEventButton *even
   }
 
   return return_value;
+}
+
+void AtomicModelBox::DynamicTreeView::onClickColumn(int numColumn)
+{
+    if (get_column(numColumn - 1)->get_sort_order() == Gtk::SORT_ASCENDING) {
+	mRefTreeModelDyn->set_sort_column(numColumn - 1,
+					  Gtk::SORT_DESCENDING);
+	get_column(numColumn - 1)->set_sort_order(Gtk::SORT_DESCENDING);
+    } else {
+	mRefTreeModelDyn->set_sort_column_id(numColumn - 1,
+					     Gtk::SORT_ASCENDING);
+	get_column(numColumn - 1)->set_sort_order(Gtk::SORT_ASCENDING);
+    }
+    if (numColumn == 1) {
+	get_column(mColumnDyn - 1)->set_sort_order(Gtk::SORT_DESCENDING);
+	get_column(mColumnModel - 1)->set_sort_order(Gtk::SORT_DESCENDING);
+    } else if (numColumn == 2) {
+	get_column(mColumnName - 1)->set_sort_order(Gtk::SORT_DESCENDING);
+	get_column(mColumnModel - 1)->set_sort_order(Gtk::SORT_DESCENDING);
+    } else {
+	get_column(mColumnName - 1)->set_sort_order(Gtk::SORT_DESCENDING);
+	get_column(mColumnDyn - 1)->set_sort_order(Gtk::SORT_DESCENDING);
+    }
 }
 
 std::string AtomicModelBox::DynamicTreeView::pathFileSearch(

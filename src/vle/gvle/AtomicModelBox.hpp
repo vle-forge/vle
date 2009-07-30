@@ -71,10 +71,12 @@ protected:
         ModelColumnsDyn() {
             add(m_col_name);
 	    add(m_dyn);
+	    add(m_model);
         }
 
         Gtk::TreeModelColumn<Glib::ustring> m_col_name;
         Gtk::TreeModelColumn<Glib::ustring> m_dyn;
+	Gtk::TreeModelColumn<Glib::ustring> m_model;
     };
 
     class ModelColumnsCond : public Gtk::TreeModel::ColumnRecord
@@ -280,13 +282,17 @@ private:
 	    const Glib::ustring& pathString,
 	    const Glib::ustring& newName);
 
+	void onClickColumn(int numColum);
+
     private:
 	vpz::AtomicModel* mModel;
 	AtomicModelBox* mParent;
 	Modeling* mModeling;
 	Gtk::Menu mMenuPopup;
 	ModelColumnsDyn mColumnsDyn;
-	Glib::RefPtr<Gtk::ListStore> mRefTreeModelDyn;
+	Glib::RefPtr<Gtk::ListStore> mRefListDyn;
+	Glib::RefPtr<Gtk::TreeModelSort> mRefTreeModelDyn;
+
 	//Dialog Box
 	DynamicBox mDynamicBox;
 	//Label
@@ -299,6 +305,9 @@ private:
 	bool                     mValidateRetry;
 	Glib::ustring            mInvalidTextForRetry;
 	guint32                  mDelayTime;
+	int                      mColumnDyn;
+	int                      mColumnModel;
+
     };
 
     class ObservableTreeView : public Gtk::TreeView
