@@ -334,7 +334,6 @@ void Editor::openTabVpz(const std::string& filepath, graph::CoupledModel* model)
 		mGVLE->getModeling()->findView(model),
 		model);
 	    doc->setTitle(filepath, model, true);
-	    mGVLE->setCurrentView(doc->getView());
 	    mDocuments.insert(
 		std::make_pair < std::string, DocumentDrawingArea* >(
 		    filepath, doc));
@@ -351,7 +350,6 @@ void Editor::openTabVpz(const std::string& filepath, graph::CoupledModel* model)
 	    filepath,
 	    mGVLE->getModeling()->findView(model),
 	    model);
-	mGVLE->setCurrentView(doc->getView());
 	mDocuments.insert(
 	  std::make_pair < std::string, DocumentDrawingArea* >(filepath, doc));
 	page = append_page(*doc, *(addLabel(doc->getTitle(),
@@ -433,6 +431,11 @@ void Editor::closeAllTab()
 	set_current_page(--page);
 	++it;
     }
+
+    if (not vle::utils::Path::path().getPackageDir().empty())
+	mGVLE->getMenu()->onPackageMode();
+    else
+	mGVLE->getMenu()->onGlobalMode();
 }
 
 void Editor::changeTab(GtkNotebookPage* /*page*/, int num)
@@ -442,13 +445,9 @@ void Editor::changeTab(GtkNotebookPage* /*page*/, int num)
     while (it != mDocuments.end()) {
 	if (it->second == tab) {
 	    if (boost::filesystem::extension(it->first) == ".vpz") {
-		DocumentDrawingArea* area =
-		    dynamic_cast< DocumentDrawingArea *>(it->second);
-		mGVLE->setCurrentView(area->getView());
 		mGVLE->setCurrentTab(num);
 		mGVLE->getMenu()->onViewMode();
 	    } else{
-		mGVLE->setCurrentView(0);
 		mGVLE->setCurrentTab(num);
 		mGVLE->getMenu()->onFileMode();
 	    }

@@ -210,10 +210,6 @@ public:
      */
     void updateAdjustment(double h, double v);
 
-
-    void setCurrentView(View* view)
-    { mCurrentView = view; }
-
     void setCurrentTab(int n)
     { mCurrentTab = n; }
 
@@ -662,8 +658,8 @@ private:
     Modeling*                       m_modeling;
     ButtonType                      m_currentButton;
     std::string                     mPackage;
-    View*                           mCurrentView;
     int                             mCurrentTab;
+
     /* File chooser */
     Glib::ustring                   mGlobalVpzPrevDirPath; /* the previous
                                     directory where a vpz was chosen

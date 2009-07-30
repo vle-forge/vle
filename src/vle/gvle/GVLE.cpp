@@ -962,32 +962,44 @@ void GVLE::packageProject()
 
 void GVLE::onCutModel()
 {
-    mCurrentView->onCutModel();
+    View* currentView = dynamic_cast<DocumentDrawingArea*>(
+	mEditor->get_nth_page(mCurrentTab))->getView();
+    currentView->onCutModel();
 }
 
 void GVLE::onCopyModel()
 {
-    mCurrentView->onCopyModel();
+    View* currentView = dynamic_cast<DocumentDrawingArea*>(
+	mEditor->get_nth_page(mCurrentTab))->getView();
+    currentView->onCopyModel();
 }
 
 void GVLE::onPasteModel()
 {
-    mCurrentView->onPasteModel();
+    View* currentView = dynamic_cast<DocumentDrawingArea*>(
+	mEditor->get_nth_page(mCurrentTab))->getView();
+    currentView->onPasteModel();
 }
 
 void GVLE::clearCurrentModel()
 {
-    mCurrentView->clearCurrentModel();
+    View* currentView = dynamic_cast<DocumentDrawingArea*>(
+	mEditor->get_nth_page(mCurrentTab))->getView();
+    currentView->clearCurrentModel();
 }
 
 void GVLE::importModel()
 {
-    mCurrentView->importModel();
+    View* currentView = dynamic_cast<DocumentDrawingArea*>(
+	mEditor->get_nth_page(mCurrentTab))->getView();
+    currentView->importModel();
 }
 
 void GVLE::exportCurrentModel()
 {
-    mCurrentView->exportCurrentModel();
+    View* currentView = dynamic_cast<DocumentDrawingArea*>(
+	mEditor->get_nth_page(mCurrentTab))->getView();
+    currentView->exportCurrentModel();
 }
 
 void GVLE::exportGraphic()
