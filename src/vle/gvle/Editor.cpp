@@ -33,6 +33,7 @@
 #include <vle/utils/Path.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/lexical_cast.hpp>
 
 namespace vle { namespace gvle {
 
@@ -41,7 +42,7 @@ Document::Document(GVLE* gvle, const std::string& filepath) :
     Gtk::ScrolledWindow(),
     mGVLE(gvle)
 {
-    mModified = false;
+    setModified(false);
     mFilePath = filepath;
     mFileName = boost::filesystem::basename(filepath);
 }
@@ -59,9 +60,9 @@ void Document::setTitle(std::string title, graph::Model* model,
 	    model->getName();
 	if (modified) {
 	    mTitle = "* " + mTitle;
-	    mModified = true;
+	    setModified(true);
 	} else {
-	    mModified = false;
+	    setModified(false);
 	}
 	mGVLE->getEditor()->setModifiedTab(mTitle, mFilePath);
     }
@@ -91,7 +92,8 @@ void DocumentText::save()
 	std::ofstream file(filepath().c_str());
 	file << mView.get_buffer()->get_text();
 	file.close();
-	mNew = mModified = false;
+	mNew = false;
+	setModified(false);
 	mTitle = filename() + boost::filesystem::extension(filepath());
 	mGVLE->getEditor()->setModifiedTab(mTitle, filepath());
     } catch(std::exception& e) {
@@ -206,8 +208,8 @@ void DocumentText::redo()
 
 void DocumentText::onChanged()
 {
-    if (not mModified) {
-	mModified = true;
+    if (not isModified()) {
+	setModified(true);
 	mTitle = "* "+ mTitle;
 	mGVLE->getEditor()->setModifiedTab(mTitle, filepath());
     }
@@ -465,12 +467,24 @@ void Editor::setModifiedTab(const std::string title, const std::string filepath)
 
 void Editor::createBlankNewFile()
 {
+    std::string name = _("untitled file");
+    std::string nameTmp;
+    int compteur = 0;
+    do {
+	if (compteur != 0)
+	    nameTmp = name + boost::lexical_cast
+		<std::string>(compteur);
+	else
+	    nameTmp = name;
+	++compteur;
+    } while (existTab(nameTmp));
+    name = nameTmp;
     try {
-	DocumentText* doc = new DocumentText(mGVLE, _("untitled file"), true);
+	DocumentText* doc = new DocumentText(mGVLE, nameTmp, true);
 	mDocuments.insert(
-	    std::make_pair < std::string, DocumentText* >(_("untitled file"), doc));
+	    std::make_pair < std::string, DocumentText* >(nameTmp, doc));
 	append_page(*doc, *(addLabel(doc->filename(),
-				     _("untitled file"))));
+				     nameTmp)));
     } catch (std::exception& e) {
 	std::cout << e.what() << std::endl;
     }

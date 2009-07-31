@@ -26,7 +26,7 @@ SET(GVLE_HPP About.hpp AtomicModelBox.hpp BooleanBox.hpp CalendarBox.hpp
   ObservableBox.hpp ObserverPlugin.hpp OpenPackageBox.hpp OpenVpzBox.hpp
   OutputPlugin.hpp Paned.hpp ParameterExecutionBox.hpp Plugin.hpp
   PluginFactory.hpp PluginSelection.hpp PortDialog.hpp PreferencesBox.hpp
-  ReplicasBox.hpp SaveVpzBox.hpp SimpleTypeBox.hpp TableBox.hpp
+  QuitBox.hpp ReplicasBox.hpp SaveVpzBox.hpp SimpleTypeBox.hpp TableBox.hpp
   TreeViewConditions.hpp TreeViewObservable.hpp TreeViewValue.hpp UndoRedo.hpp
   ValueBox.hpp ValuesTreeView.hpp View.hpp ViewDrawingArea.hpp
   ViewOutputBox.hpp XmlTypeBox.hpp)
@@ -41,10 +41,10 @@ SET(GVLE_CPP About.cpp AtomicModelBox.cpp BooleanBox.cpp CalendarBox.cpp
   NewProjectBox.cpp NewTypeBox.cpp ObsAndViewBox.cpp PluginFactory.cpp
   ObservableBox.cpp OpenPackageBox.cpp OpenVpzBox.cpp OutputPlugin.cpp
   ParameterExecutionBox.cpp PluginSelection.cpp PortDialog.cpp
-  PreferencesBox.cpp ReplicasBox.cpp SaveVpzBox.cpp SimpleTypeBox.cpp
-  TableBox.cpp TreeViewConditions.cpp TreeViewObservable.cpp TreeViewValue.cpp
-  UndoRedo.cpp ValueBox.cpp ValuesTreeView.cpp View.cpp ViewDrawingArea.cpp
-  ViewOutputBox.cpp XmlTypeBox.cpp)
+  PreferencesBox.cpp ReplicasBox.cpp QuitBox.cpp SaveVpzBox.cpp
+  SimpleTypeBox.cpp TableBox.cpp TreeViewConditions.cpp TreeViewObservable.cpp
+  TreeViewValue.cpp UndoRedo.cpp ValueBox.cpp ValuesTreeView.cpp View.cpp
+  ViewDrawingArea.cpp ViewOutputBox.cpp XmlTypeBox.cpp)
 
 ADD_LIBRARY(vlegvle SHARED ${GVLE_CPP};${GVLE_HPP})
 

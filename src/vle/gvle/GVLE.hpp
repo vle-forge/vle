@@ -37,6 +37,7 @@
 #include <vle/gvle/OpenVpzBox.hpp>
 #include <vle/gvle/ParameterExecutionBox.hpp>
 #include <vle/gvle/Plugin.hpp>
+#include <vle/gvle/QuitBox.hpp>
 #include <vle/gvle/SaveVpzBox.hpp>
 #include <vle/gvle/ViewDrawingArea.hpp>
 #include <vle/value/Value.hpp>
@@ -677,6 +678,7 @@ private:
     HelpBox*                        m_helpbox;
     ModelTreeBox*                   mModelTreeBox;
     ModelClassBox*                  mModelClassBox;
+    QuitBox*                        mQuitBox;
 
 
 };

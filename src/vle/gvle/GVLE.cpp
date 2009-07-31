@@ -418,6 +418,7 @@ GVLE::GVLE(BaseObjectType* cobject,
     mOpenVpzBox = new OpenVpzBox(mRefXML, m_modeling);
     mNewProjectBox = new NewProjectBox(mRefXML, m_modeling);
     mSaveVpzBox = new SaveVpzBox(mRefXML, m_modeling);
+    mQuitBox = new QuitBox(mRefXML, m_modeling);
 
     mRefXML->get_widget("MenuAndToolbarVbox", mMenuAndToolbarVbox);
     mRefXML->get_widget("StatusBarPackageBrowser", mStatusbar);
@@ -787,27 +788,7 @@ void GVLE::tabClosed()
 
 void GVLE::onMenuQuit()
 {
-    if (m_modeling->isModified() == true and
-	gvle::Question(_("Changes have been made,\n"
-                         "Do you want the model to be saved?"))) {
-	std::vector<std::string> vec;
-	m_modeling->vpz_is_correct(vec);
-	if (vec.size() != 0) {
-	    //vpz is correct
-	    std::string error = _("incorrect VPZ:\n");
-	    std::vector<std::string>::const_iterator it = vec.begin();
-	    while (it != vec.end()) {
-		error += *it + "\n";
-
-		++it;
-	    }
-	    Error(error);
-	    return;
-	} else {
-	    onMenuSave();
-	}
-    }
-    hide();
+    mQuitBox->show();
 }
 
 
