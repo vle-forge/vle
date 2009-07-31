@@ -141,6 +141,12 @@ namespace vle { namespace gvle {
         void calcRectSize();
 
 	/**
+	 * @brief search the size of the widest and highest model
+	 *
+	 */
+	void maxModelWidthHeight();
+
+	/**
 	 * Export the view in image
 	 */
 	void exportPng(const std::string& filename);
@@ -226,7 +232,7 @@ namespace vle { namespace gvle {
 	 */
 	void setColor(Color color);
 
-        /**
+	/**
          * Return nearest connection between all connection and mouse position
          */
         void delConnection();
@@ -276,6 +282,9 @@ namespace vle { namespace gvle {
 	std::list < std::string > mGrid;
 	int                       mCasesWidth;
 	int                       mCasesHeight;
+
+	int                       mMaxWidth;
+	int                       mMaxHeight;
     };
 
 }} // namespace vle gvle

@@ -80,6 +80,7 @@ ViewDrawingArea::ViewDrawingArea(View* view) :
 void ViewDrawingArea::draw()
 {
     if (mIsRealized and mBuffer) {
+	maxModelWidthHeight();
         calcRectSize();
 	mContext->save();
 	mContext->scale(mZoom, mZoom);
@@ -1413,37 +1414,58 @@ void ViewDrawingArea::onRandomOrder()
 {
     mGrid.clear();
 
-    int xMax = 0, yMax = 0;
     std::string key;
     int x, y;
+    int compteur = 0;
+
+    mCasesWidth = (mRectWidth - (MODEL_PORT + mOffset)) / (mMaxWidth + 15);
+    mCasesHeight = (mRectHeight - (MODEL_PORT + mOffset)) / (mMaxHeight + 15);
+
     graph::ModelList::const_iterator it =
 	mCurrent->getModelList().begin();
-
-    while (it != mCurrent->getModelList().end()) {
-	if (it->second->width() > xMax)
-	    xMax = it->second->width();
-	if (it->second->height() > yMax)
-	    yMax = it->second->height();
-	++it;
-    }
-
-    mCasesWidth = (mWidth - (MODEL_PORT + mOffset)) / (xMax + 15);
-    mCasesHeight = (mHeight - (MODEL_PORT + mOffset)) / (yMax + 15);
-
     it = mCurrent->getModelList().begin();
     while (it != mCurrent->getModelList().end()) {
+
 	do {
+	    ++compteur;
 	    x = mModeling->getRand()->getInt(0, mCasesWidth - 1);
 	    y = mModeling->getRand()->getInt(0, mCasesHeight - 1);
 	    key = boost::lexical_cast < std::string > (x) + ":" +
 		boost::lexical_cast < std::string > (y);
+	    if (compteur == 1000) {
+		mRectWidth += mMaxWidth + 15;
+		mRectHeight += mMaxHeight + 15;
+		mCasesWidth = (mRectWidth - (MODEL_PORT + mOffset)) /
+		    (mMaxWidth + 15);
+		mCasesHeight = (mRectHeight - (MODEL_PORT + mOffset)) /
+		    (mMaxHeight + 15);
+		compteur = 0;
+	    }
 	} while (std::find(mGrid.begin(), mGrid.end(), key) != mGrid.end());
+
+	compteur = 0;
 	mGrid.push_back(key);
-	it->second->setX((x * (xMax + 15)) + MODEL_PORT + mOffset + 15);
-	it->second->setY((y * (yMax + 15)) + MODEL_PORT + mOffset + 15);
+	it->second->setX((x * (mMaxWidth + 15)) + MODEL_PORT + mOffset + 15);
+	it->second->setY((y * (mMaxHeight + 15)) + MODEL_PORT + mOffset + 15);
 	++it;
     }
     queueRedraw();
+}
+
+void ViewDrawingArea::maxModelWidthHeight()
+{
+    mMaxWidth = 0;
+    mMaxHeight = 0;
+
+    graph::ModelList::const_iterator it =
+	mCurrent->getModelList().begin();
+    while(it != mCurrent->getModelList().end()) {
+	if (it->second->width() > mMaxWidth)
+	    mMaxWidth = it->second->width();
+	if (it->second->height() > mMaxHeight)
+	    mMaxHeight = it->second->height();
+	++it;
+    }
 }
 
 
