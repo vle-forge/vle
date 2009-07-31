@@ -663,8 +663,9 @@ void GVLE::onMenuLoad()
         if (file.run() == Gtk::RESPONSE_OK) {
 	    mGlobalVpzPrevDirPath = file.get_current_folder();
 	    mEditor->closeAllTab();
-            m_modeling->parseXML(file.get_filename());
 	    utils::Path::path().setPackage("");
+	    mPackage = "";
+            m_modeling->parseXML(file.get_filename());
 	    mMenuAndToolbar->onGlobalMode();
 	    mMenuAndToolbar->onViewMode();
 	    mFileTreeView->clear();
