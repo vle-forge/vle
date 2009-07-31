@@ -326,7 +326,6 @@ void Editor::openTabVpz(const std::string& filepath, graph::CoupledModel* model)
 	    page = get_current_page();
 	    remove_page(page);
 	    mDocuments.erase(filepath);
-	    set_current_page(--page);
 
 	    DocumentDrawingArea* doc = new DocumentDrawingArea(
 		mGVLE,
@@ -340,7 +339,7 @@ void Editor::openTabVpz(const std::string& filepath, graph::CoupledModel* model)
 	    append_page(*doc, *(addLabel(doc->getTitle(),
 						    filepath)));
 
-	    reorder_child(*doc, ++page);
+	    reorder_child(*doc, page);
 	} else {
 	    return;
 	}
@@ -375,8 +374,6 @@ void Editor::closeTab(const std::string& filepath)
 		if (page != -1) {
 		    remove_page(page);
 		    mDocuments.erase(filepath);
-
-		    set_current_page(--page);
 		}
 	    }
 	}
@@ -401,8 +398,6 @@ void Editor::closeVpzTab()
                     *(dynamic_cast<DocumentDrawingArea*>(it->second)));
                 remove_page(page);
                 mDocuments.erase(it->first);
-
-                set_current_page(--page);
             }
         }
 	++it;
@@ -428,7 +423,6 @@ void Editor::closeAllTab()
 	remove_page(page);
 	mDocuments.erase(it->first);
 
-	set_current_page(--page);
 	++it;
     }
 
