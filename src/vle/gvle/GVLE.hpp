@@ -36,7 +36,6 @@
 #include <vle/gvle/OpenPackageBox.hpp>
 #include <vle/gvle/OpenVpzBox.hpp>
 #include <vle/gvle/ParameterExecutionBox.hpp>
-#include <vle/gvle/Plugin.hpp>
 #include <vle/gvle/QuitBox.hpp>
 #include <vle/gvle/SaveVpzBox.hpp>
 #include <vle/gvle/ViewDrawingArea.hpp>
@@ -75,7 +74,6 @@ class GVLE : public Gtk::Window
 public:
     typedef std::multimap < std::string, std::string > MapCategory;
     typedef std::multimap < std::string, std::string > MapObserverCategory;
-    typedef std::map < std::string, Plugin * > MapPlugin;
     typedef std::map < std::string, ObserverPlugin * > MapObserverPlugin;
 
     /** list off all available buttons. */

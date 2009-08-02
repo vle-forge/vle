@@ -24,12 +24,11 @@ SET(GVLE_HPP About.hpp AtomicModelBox.hpp BooleanBox.hpp CalendarBox.hpp
   ModelClassBox.hpp ModelDescriptionBox.hpp ModelTreeBox.hpp Modeling.hpp
   NewModelClassBox.hpp NewProjectBox.hpp NewTypeBox.hpp ObsAndViewBox.hpp
   ObservableBox.hpp ObserverPlugin.hpp OpenPackageBox.hpp OpenVpzBox.hpp
-  OutputPlugin.hpp Paned.hpp ParameterExecutionBox.hpp Plugin.hpp
-  PluginFactory.hpp PluginSelection.hpp PortDialog.hpp PreferencesBox.hpp
-  QuitBox.hpp ReplicasBox.hpp SaveVpzBox.hpp SimpleTypeBox.hpp TableBox.hpp
-  TreeViewConditions.hpp TreeViewObservable.hpp TreeViewValue.hpp UndoRedo.hpp
-  ValueBox.hpp ValuesTreeView.hpp View.hpp ViewDrawingArea.hpp
-  ViewOutputBox.hpp XmlTypeBox.hpp)
+  OutputPlugin.hpp ParameterExecutionBox.hpp PluginFactory.hpp PortDialog.hpp
+  PreferencesBox.hpp QuitBox.hpp ReplicasBox.hpp SaveVpzBox.hpp
+  SimpleTypeBox.hpp TableBox.hpp TreeViewConditions.hpp TreeViewObservable.hpp
+  TreeViewValue.hpp UndoRedo.hpp ValueBox.hpp ValuesTreeView.hpp View.hpp
+  ViewDrawingArea.hpp ViewOutputBox.hpp XmlTypeBox.hpp)
 
 SET(GVLE_CPP About.cpp AtomicModelBox.cpp BooleanBox.cpp CalendarBox.cpp
   ConditionsBox.cpp ConditionPlugin.cpp ConnectionBox.cpp CoupledModelBox.cpp
@@ -40,15 +39,15 @@ SET(GVLE_CPP About.cpp AtomicModelBox.cpp BooleanBox.cpp CalendarBox.cpp
   ModelDescriptionBox.cpp ModelTreeBox.cpp Modeling.cpp NewModelClassBox.cpp
   NewProjectBox.cpp NewTypeBox.cpp ObsAndViewBox.cpp PluginFactory.cpp
   ObservableBox.cpp OpenPackageBox.cpp OpenVpzBox.cpp OutputPlugin.cpp
-  ParameterExecutionBox.cpp PluginSelection.cpp PortDialog.cpp
-  PreferencesBox.cpp ReplicasBox.cpp QuitBox.cpp SaveVpzBox.cpp
-  SimpleTypeBox.cpp TableBox.cpp TreeViewConditions.cpp TreeViewObservable.cpp
-  TreeViewValue.cpp UndoRedo.cpp ValueBox.cpp ValuesTreeView.cpp View.cpp
-  ViewDrawingArea.cpp ViewOutputBox.cpp XmlTypeBox.cpp)
+  ParameterExecutionBox.cpp PortDialog.cpp PreferencesBox.cpp ReplicasBox.cpp
+  QuitBox.cpp SaveVpzBox.cpp SimpleTypeBox.cpp TableBox.cpp
+  TreeViewConditions.cpp TreeViewObservable.cpp TreeViewValue.cpp UndoRedo.cpp
+  ValueBox.cpp ValuesTreeView.cpp View.cpp ViewDrawingArea.cpp
+  ViewOutputBox.cpp XmlTypeBox.cpp)
 
 ADD_LIBRARY(vlegvle SHARED ${GVLE_CPP};${GVLE_HPP})
 
-SET_TARGET_PROPERTIES(vlegvle PROPERTIES ${VLE_APP_PROPERTIES})
+SET_TARGET_PROPERTIES(vlegvle PROPERTIES ${VLE_LIBRARY_PROPERTIES})
 SET_TARGET_PROPERTIES(vlegvle PROPERTIES OUTPUT_NAME
   "vlegvle-${VLE_VERSION_SHORT}")
 
@@ -77,6 +76,8 @@ INSTALL(TARGETS vlegvle DESTINATION
   ARCHIVE DESTINATION lib)
 
 INSTALL(FILES gvle.glade DESTINATION ${VLE_SHARE_DIRS}/glade)
+
+INSTALL(FILES ${GVLE_HPP} DESTINATION ${VLE_INCLUDE_DIRS}/gvle)
 
 ADD_SUBDIRECTORY(outputs)
 ADD_SUBDIRECTORY(conditions)

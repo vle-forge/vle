@@ -29,7 +29,6 @@
 #include <vle/gvle/ModelDescriptionBox.hpp>
 #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/PortDialog.hpp>
-#include <vle/gvle/Plugin.hpp>
 #include <vle/gvle/View.hpp>
 #include <vle/gvle/ViewDrawingArea.hpp>
 #include <vle/graph/CoupledModel.hpp>

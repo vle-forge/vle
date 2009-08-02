@@ -1200,7 +1200,7 @@ void AtomicModelBox::ObservableTreeView::onRename()
 
 void AtomicModelBox::ObservableTreeView::onEditionStarted(
     Gtk::CellEditable* cellEditable,
-    const Glib::ustring& path)
+    const Glib::ustring& /* path */)
 {
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
     Gtk::TreeModel::iterator iter = refSelection->get_selected();
