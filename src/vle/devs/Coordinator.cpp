@@ -538,14 +538,20 @@ void Coordinator::processConflictEvents(
     Simulator* sim,
     const EventBagModel& modelbag)
 {
+    {
+        ExternalEventList result;
+        sim->output(m_currentTime, result);
+        dispatchExternalEvent(result, sim);
+    }
+
     InternalEvent* internal;
 
     if (sim->confluentTransitions(*modelbag.internal(), modelbag.externals())
         == Event::INTERNAL) {
-        internal = sim->externalTransitionConflit(
+        internal = sim->internalTransitionConflict(
             *modelbag.internal(), modelbag.externals());
     } else {
-        internal = sim->externalTransitionConflit(
+        internal = sim->externalTransitionConflict(
             *modelbag.internal(), modelbag.externals());
     }
 

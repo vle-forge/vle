@@ -60,6 +60,11 @@ namespace vle { namespace devs {
          */
 	~Simulator();
 
+        /**
+         * @brief Assign a new dynamics to the current Simulator. If a dynamic
+         * already exists, it will be delete.
+         * @param dynamics The new dynamics.
+         */
 	void addDynamics(Dynamics* dynamics);
 
         /**
@@ -77,11 +82,17 @@ namespace vle { namespace devs {
          * the model is destroy before observed.
          */
         const std::string& getParent();
-	Time getLastTime() const;
-	graph::AtomicModel* getStructure() const;
-        graph::Model* findModel(const std::string & name) const;
-	void setLastTime(const Time& time);
 
+        /**
+         * @brief Get the atomic model attached to the Simulator.
+         * @return A reference.
+         */
+        inline graph::AtomicModel* getStructure() const
+        { return m_atomicModel; }
+
+        /**
+         * @brief Delete the dynamics and erase reference to the AtomicModel.
+         */
         void clear();
 
         /**
@@ -91,7 +102,7 @@ namespace vle { namespace devs {
         inline const Dynamics* dynamics() const
         { return m_dynamics; }
 
-        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                             /*-*-*-*-*-*-*-*-*-*/
 
         /**
          * @brief Call the init function of the Dynamics plugin and add the time
@@ -119,7 +130,7 @@ namespace vle { namespace devs {
                                           const Time& time);
 
         /**
-         * @brief Call to produce the conflict function with a priority to
+         * @brief Call to produce the conflict function with a priority to the
          * external event.
          * \f[
          * \delta_{conf}=\delta_{ext}(..,\delta_{int}, ..)
@@ -133,7 +144,7 @@ namespace vle { namespace devs {
             const ExternalEventList& events);
 
         /**
-         * @brief Call to produce the conflict function with a priority to
+         * @brief Call to produce the conflict function with a priority to the
          * internal event.
          * \f[
          * \delta_{conf}=\delta_{int}(..,\delta_{ext}, ..)
@@ -142,7 +153,7 @@ namespace vle { namespace devs {
          * @param events the externals events.
          * @return the new internal event.
          */
-        InternalEvent* externalTransitionConflit(
+        InternalEvent* externalTransitionConflict(
             const InternalEvent& event,
             const ExternalEventList& events);
 
@@ -152,14 +163,12 @@ namespace vle { namespace devs {
 
         ObservationEvent* observation(const ObservationEvent& event) const;
 
-    protected:
-	InternalEvent* buildInternalEvent(const Time& currentTime);
-
     private:
-	Time                    m_lastTime;
-	Dynamics*               m_dynamics;
-        graph::AtomicModel*     m_atomicModel;
-        std::string             m_parents;
+	Dynamics            *m_dynamics;
+	graph::AtomicModel  *m_atomicModel;
+	std::string          m_parents;
+
+	InternalEvent* buildInternalEvent(const Time& currentTime);
     };
 
 }} // namespace vle devs
