@@ -720,6 +720,8 @@ void PetriNet::externalTransition(const devs::ExternalEventList& event,
     devs::ExternalEventList::const_iterator it = event.begin();
     bool ok = false;
 
+    disableOutTransition();
+    disableOutPlace(time);
     while (it != event.end()) {
         const std::string& port = (*it)->getPortName();
 

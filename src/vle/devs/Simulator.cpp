@@ -37,7 +37,6 @@
 namespace vle { namespace devs {
 
 Simulator::Simulator(graph::AtomicModel* atomic) :
-    m_lastTime(0),
     m_dynamics(0),
     m_atomicModel(atomic)
 {
@@ -87,30 +86,6 @@ const std::string& Simulator::getParent()
     return m_parents;
 }
 
-Time Simulator::getLastTime() const
-{
-    return m_lastTime;
-}
-
-graph::AtomicModel* Simulator::getStructure() const
-{
-    return m_atomicModel;
-}
-
-graph::Model * Simulator::findModel(const std::string & name) const
-{
-    if (m_atomicModel and m_atomicModel->getName() == name) {
-        return (graph::Model *)m_atomicModel;
-    } else {
-        return 0;
-    }
-}
-
-void Simulator::setLastTime(const Time& time)
-{
-    m_lastTime = time;
-}
-
 InternalEvent * Simulator::buildInternalEvent(const Time& currentTime)
 {
     Time time(timeAdvance());
@@ -143,7 +118,15 @@ Time Simulator::timeAdvance()
     DTraceDebug(fmt(_("                     %1% ta")) %
                 getName());
 
-    return m_dynamics->timeAdvance();
+    Time result = m_dynamics->timeAdvance();
+    /*
+    if (result < 0.0) {
+        throw utils::ModellingError(fmt(
+                _("Negative time advance in '%1%' (%2%)")) % getName() %
+            result);
+    }
+    */
+    return result;
 }
 
 InternalEvent* Simulator::init(const Time& time)
@@ -193,17 +176,28 @@ InternalEvent* Simulator::internalTransitionConflict(
     const InternalEvent& event,
     const ExternalEventList& events)
 {
+    DTraceDebug(fmt(_("                .... %1% internal transition")) %
+                getName());
     m_dynamics->internalTransition(event.getTime());
+
+    DTraceDebug(fmt(_("                .... %1% external transition: [%2%]")) %
+                getName() % events);
     m_dynamics->externalTransition(events, event.getTime());
     return buildInternalEvent(event.getTime());
 }
 
-InternalEvent* Simulator::externalTransitionConflit(
+InternalEvent* Simulator::externalTransitionConflict(
     const InternalEvent& event,
     const ExternalEventList& events)
 {
+    DTraceDebug(fmt(_("                .... %1% external transition: [%2%]")) %
+                getName() % events);
     m_dynamics->externalTransition(events, event.getTime());
+
+    DTraceDebug(fmt(_("                .... %1% internal transition")) %
+                getName());
     m_dynamics->internalTransition(event.getTime());
+
     return buildInternalEvent(event.getTime());
 }
 
