@@ -52,6 +52,8 @@ BOOST_AUTO_TEST_CASE(compare)
 
     devs::Time c(devs::Time::infinity);
 
+    BOOST_REQUIRE((a >= 2.0) == false);
+
     BOOST_REQUIRE(c > a);
     BOOST_REQUIRE(c > b);
     BOOST_REQUIRE(c > 2.0);
@@ -78,7 +80,7 @@ BOOST_AUTO_TEST_CASE(compare)
     BOOST_REQUIRE(a <= 1);
 
     BOOST_REQUIRE(a <= devs::Time(devs::Time::infinity));
-    BOOST_REQUIRE(a <= -1.0);
+    BOOST_REQUIRE(a >= -1.0);
 }
 
 BOOST_AUTO_TEST_CASE(modify)

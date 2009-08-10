@@ -142,10 +142,10 @@ public:
     { return (m_value <= time.m_value and !isInfinity()) or time.isInfinity(); }
 
     inline bool operator<=(const double& time) const
-    { return (m_value <= m_value and !isInfinity()) or isInfinity(time); }
+    { return (m_value <= time and !isInfinity()) or isInfinity(time); }
 
     inline bool operator<=(const int& time) const
-    { return (m_value <= m_value and !isInfinity()) or isInfinity(time); }
+    { return (m_value <= time and !isInfinity()) or isInfinity(time); }
 
 
     inline bool operator>(const Time& time) const
@@ -166,7 +166,7 @@ public:
         (isInfinity() and !time.isInfinity()); }
 
     inline bool operator>=(const double& time) const
-    { return (m_value >= m_value and not isInfinity(time)) or
+    { return (m_value >= time and not isInfinity(time)) or
         (isInfinity() and not isInfinity(time)); }
 
     inline bool operator>=(const int& time) const
