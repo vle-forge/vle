@@ -89,7 +89,7 @@ void SaveVpzBox::onCancel()
 
 bool SaveVpzBox::exist(std::string name)
 {
-    utils::PathList list = utils::CMakePackage::getInstalledExperiments();
+    utils::PathList list = utils::Path::path().getInstalledExperiments();
     utils::PathList::const_iterator it = list.begin();
     while (it != list.end()) {
 	if (boost::filesystem::basename(*it) == name) {

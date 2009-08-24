@@ -26,51 +26,180 @@
 #ifndef VLE_UTILS_PACKAGE_HPP
 #define VLE_UTILS_PACKAGE_HPP
 
-#include <vle/utils/Path.hpp>
+#include <glibmm/spawn.h>
+#include <glibmm/thread.h>
 #include <string>
 #include <list>
 
 namespace vle { namespace utils {
 
-    class CMakePackage
+    /**
+     * @brief A class to manage VLE packages, ie. to build a new package, to
+     * configure, build, clean or to make tarball.
+     *
+     * This class is a singleton. To use it:
+     * @code
+     * std::string name = utils::Package::package().name();
+     * std::string path = utils::Package::package().path();
+     *
+     * utils::Package::package().select("firemanqss");
+     * utils::Package::Package().configure(std::cout, std::cerr);
+     * @encode
+     */
+    class Package
     {
     public:
-        CMakePackage(const std::string& package);
+        /**
+         * @brief Build the package.
+         */
+        void create();
 
-        static void create(std::string& out, std::string& err);
+                          /*   threaded commands   */
 
-        static void configure(std::string& out, std::string& err);
+        /**
+         * @brief Configure the package by running the 'cmake' command.
+         */
+        void configure();
 
-        static void build(std::string& out, std::string& err);
+        /**
+         * @brief Build the package by running the 'make all' command.
+         */
+        void build();
 
-        static void clean(std::string& out, std::string& err);
+        /**
+         * @brief Install the package by running the 'make install' command from
+         * src directory.
+         */
+        void install();
 
-        static void package(std::string& out, std::string& err);
+        /**
+         * @brief Clean the package by runngin the 'make clean' command.
+         */
+        void clean();
 
-        void setDebugMode() { m_type = Debug; }
-        void setReleaseMode() { m_type = Release; }
-        void setProcess(unsigned int nb) { m_process = nb; }
+        /**
+         * @brief Pack the package by runngin the 'make package' and 'make
+         * package_source' command.
+         */
+        void pack();
 
-        static PathList getInstalledPackages();
-        static PathList getInstalledExperiments();
-        static PathList getInstalledLibraries();
+        /**
+         * @brief Return true if the current process is finished.
+         * @return True if finish, false otherwise.
+         */
+        inline bool isFinish() const { return m_stop; }
 
-	static void addFile(const std::string& path,
-			    const std::string& name);
-	static void addDirectory(const std::string& path,
-				 const std::string& name);
-	static void removeFile(const std::string& pathFile);
-	static void renameFile(const std::string& oldFile,
-			       std::string& newName);
+        /**
+         * @brief Wait the end of the current process and flush all data from
+         * the process to the std::ostream object.
+         *
+         * @param out Standard output stream.
+         * @param err Standard error stream.
+         */
+        void wait(std::ostream& out, std::ostream& err);
+
+        void getOutput(std::string& str) const;
+        void getError(std::string& str) const;
+        void getOutputAndClear(std::string& str);
+        void getErrorAndClear(std::string& str);
+
+        void addFile(const std::string& path, const std::string& name);
+        void addDirectory(const std::string& path, const std::string& name);
+	void removeFile(const std::string& pathFile);
+        void renameFile(const std::string& oldFile, std::string& newName);
+
+        /**
+         * @brief Get the name of the current selected Package. Get the current
+         * selected Package. If the name is empty, no package is selected.
+         * @return The current selected Package.
+         */
+        const std::string& name() const
+        { return m_name; }
+
+        /**
+         * @brief Is a package selected.
+         * @return Return true if a Package is selected, false otherwise.
+         */
+        bool selected() const
+        { return not m_name.empty(); }
+
+        /**
+         * @brief Select a new Package.
+         * @param name The new Package.
+         */
+        void select(const std::string& name);
+
+                           /*   manage singleton   */
+
+        /**
+         * @brief Return a instance of Package using the singleton system.
+         * @return A reference to the singleton object.
+         */
+        inline static Package& package()
+        { if (m_package == 0) m_package = new Package; return *m_package; }
+
+        /**
+         * @brief Initialise the Package singleton.
+         */
+        inline static void init()
+        { package(); }
+
+        /**
+         * @brief Delete the Package singleton.
+         */
+        inline static void kill()
+        { delete m_package; m_package = 0; }
 
     private:
-        enum Type { Debug, Release };
+        /**
+         * @brief Hide constructor.
+         */
+        Package()
+            : m_stop(true), m_out(0), m_err(0), m_wait(0), m_pid(0)
+        {}
 
-        Type m_type;
-        unsigned int m_process;
+        static Package* m_package; ///< singleton attribute.
+        std::string m_name; ///< the current Package selected.
+        bool m_stop; ///< true if process is stopped.
+        Glib::Thread* m_out; ///< standard output stream reader thread.
+        Glib::Thread* m_err; ///< standard error stream reader thread.
+        Glib::Thread* m_wait; ///< wait process thread.
+        mutable Glib::Mutex m_mutex; ///< mutex to access to strerr and strout.
+        Glib::Pid m_pid; ///< pid of the current process.
+        std::string m_strout; ///< standard output string.
+        std::string m_strerr; ///< standard error string.
 
-        std::string m_out;
-        std::string m_err;
+        /**
+         * @brief Start the process taken from the list of argument in the
+         * working directory. Launch the process asynchronously an start two
+         * threads to read output and error standard stream and move data into
+         * stream.
+         * @param workingDir The directory to start the process.
+         * @param lst The command line argument.
+         */
+        void process(const std::string& workingDir,
+                     const std::list < std::string >& lst);
+
+        /**
+         * @brief A threaded method to read the stream and fill the output.
+         * @param stream The stream (ie. a file) to read error.
+         * @param output A string filled by the stream.
+         */
+        void readStandardOutputStream(int stream);
+
+        /**
+         * @brief A threaded method to read the stream and fill the output.
+         * @param stream The stream (ie. a file) to read error.
+         * @param output A string filled by the stream.
+         */
+        void readStandardErrorStream(int stream);
+
+        void waitProcess();
+
+        void appendOutput(const char* str);
+        void appendError(const char* str);
+        void appendOutput(const std::string& str);
+        void appendError(const std::string& str);
     };
 
 }} // namespace vle utils

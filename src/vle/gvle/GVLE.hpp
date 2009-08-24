@@ -194,8 +194,7 @@ public:
      * @return MenuAndToolbar instance
      */
     inline GVLEMenuAndToolbar* getMenu()
-	{ return mMenuAndToolbar; }
-
+    { return mMenuAndToolbar; }
 
     /**
      * @brief return the Editor
@@ -484,7 +483,11 @@ public:
      *
      * MENU PACKAGE
      *
+     *
      ********************************************************************/
+
+    bool packageTimer();
+    bool packageBuildTimer();
 
     /**
      * When click on configure project menu
@@ -497,6 +500,11 @@ public:
      *
      */
     void buildProject();
+
+    /**
+     * @brief When click on install project menu.
+     */
+    void installProject();
 
     /**
      * When click on clean project menu

@@ -44,8 +44,17 @@
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Rand.hpp>
+#include <vle/utils/Tools.hpp>
 
 using namespace vle;
+
+struct F
+{
+    F() { utils::init(); }
+    ~F() { utils::finalize(); }
+};
+
+BOOST_GLOBAL_FIXTURE(F)
 
 struct is_odd
 {
@@ -233,6 +242,7 @@ BOOST_AUTO_TEST_CASE(test_normal)
 
 BOOST_AUTO_TEST_CASE(show_path)
 {
+    using vle::utils::Package;
     using vle::utils::Path;
     using vle::utils::PathList;
 
@@ -240,7 +250,7 @@ BOOST_AUTO_TEST_CASE(show_path)
     BOOST_REQUIRE_EQUAL((PathList::size_type)2,
                         Path::path().getSimulatorDirs().size());
 
-    Path::path().setPackage("x");
+    Package::package().select("x");
     std::cout << Path::path();
 }
 
@@ -248,20 +258,20 @@ BOOST_AUTO_TEST_CASE(show_package)
 {
     using vle::utils::Path;
     using vle::utils::PathList;
-    using vle::utils::CMakePackage;
+    using vle::utils::Package;
 
-    vle::utils::CMakePackage p("tmp");
-    std::string out, err;
+    std::ostringstream out, err;
 
-    vle::utils::CMakePackage::create(out, err);
+    vle::utils::Package::package().select("tmp");
+    vle::utils::Package::package().create();
 
     std::cout << "Packages:\n";
-    PathList lst = CMakePackage::getInstalledPackages();
+    PathList lst = Path::path().getInstalledPackages();
     std::copy(lst.begin(), lst.end(), std::ostream_iterator < std::string >(
            std::cout, "\n"));
 
     std::cout << "Vpz:\n";
-    PathList vpz = CMakePackage::getInstalledExperiments();
+    PathList vpz = Path::path().getInstalledExperiments();
     std::copy(vpz.begin(), vpz.end(), std::ostream_iterator < std::string >(
            std::cout, "\n"));
 }

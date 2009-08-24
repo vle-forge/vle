@@ -41,6 +41,9 @@ void Path::initHomeDir()
 
     readHomeDir();
 
+    /*
+     * If no VLE_HOME, we build %HOMEDRIVE%%HOMEPATH%\vle directory.
+     */
     if (m_home.empty()) {
         std::list < std::string > lst;
         lst.push_back(Glib::get_home_dir());
@@ -49,52 +52,38 @@ void Path::initHomeDir()
     }
 }
 
-bool Path::initPath()
+void Path::initPrefixDir()
 {
-    initHomeDir();
+    m_prefix.clear();
 
-    {
-        LONG result;
-        HKEY hkey;
-        std::string key(boost::str(fmt("%1% %2%.%3%.0") %
-                    "SOFTWARE\\VLE Development Team\\VLE" %
-                    VLE_MAJOR_VERSION % VLE_MINOR_VERSION));
+    LONG result;
+    HKEY hkey;
+    std::string key(boost::str(fmt("%1% %2%.%3%.0") %
+                               "SOFTWARE\\VLE Development Team\\VLE" %
+                               VLE_MAJOR_VERSION % VLE_MINOR_VERSION));
 
-        if ((result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, key.c_str(), 0,
-                        KEY_QUERY_VALUE, &hkey)) != ERROR_SUCCESS) {
-            result = RegOpenKeyEx(HKEY_CURRENT_USER, key.c_str(),
-                    0, KEY_QUERY_VALUE, &hkey);
-        }
-
-        if (result == ERROR_SUCCESS) {
-            DWORD sz = 256;
-            char* buf = new char[sz];
-
-            if (RegQueryValueEx(hkey, (LPCTSTR)"", NULL, NULL,
-                        (LPBYTE)buf, &sz) == ERROR_SUCCESS) {
-                m_prefix.assign(buf);
-            } else {
-                sz = 256;
-                if (RegQueryValueEx(hkey, (LPCTSTR)"Path", NULL, NULL,
-                            (LPBYTE)buf, &sz) == ERROR_SUCCESS) {
-                    m_prefix.assign(buf);
-                }
-            }
-            delete[] buf;
-        }
+    if ((result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, key.c_str(), 0,
+                               KEY_QUERY_VALUE, &hkey)) != ERROR_SUCCESS) {
+        result = RegOpenKeyEx(HKEY_CURRENT_USER, key.c_str(),
+                              0, KEY_QUERY_VALUE, &hkey);
     }
 
-    addSimulatorDir(getSimulatorDir());
-    addStreamDir(getStreamDir());
-    addOutputDir(getOutputDir());
-    addConditionDir(getConditionDir());
+    if (result == ERROR_SUCCESS) {
+        DWORD sz = 256;
+        char* buf = new char[sz];
 
-    addSimulatorDir(getHomeSimulatorDir());
-    addStreamDir(getHomeStreamDir());
-    addOutputDir(getHomeOutputDir());
-    addConditionDir(getHomeConditionDir());
-
-    return true;
+        if (RegQueryValueEx(hkey, (LPCTSTR)"", NULL, NULL,
+                            (LPBYTE)buf, &sz) == ERROR_SUCCESS) {
+            m_prefix.assign(buf);
+        } else {
+            sz = 256;
+            if (RegQueryValueEx(hkey, (LPCTSTR)"Path", NULL, NULL,
+                                (LPBYTE)buf, &sz) == ERROR_SUCCESS) {
+                m_prefix.assign(buf);
+            }
+        }
+        delete[] buf;
+    }
 }
 
 }} // namespace vle utils

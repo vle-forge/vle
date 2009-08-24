@@ -68,7 +68,7 @@ void OpenVpzBox::build()
 
     mRefTreeVpz->clear();
 
-    PathList list = CMakePackage::getInstalledExperiments();
+    PathList list = Path::path().getInstalledExperiments();
     PathList::const_iterator it = list.begin();
     while (it != list.end()) {
 	Gtk::TreeModel::Row row = *(mRefTreeVpz->append());

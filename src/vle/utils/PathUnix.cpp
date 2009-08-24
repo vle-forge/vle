@@ -28,6 +28,7 @@
 #include <list>
 
 #include <vle/utils/Path.hpp>
+#include <vle/utils/Package.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/version.hpp>
 
@@ -42,6 +43,9 @@ void Path::initHomeDir()
 
     readHomeDir();
 
+    /*
+     * If no VLE_HOME directory, we build $HOME/.vle directory.
+     */
     if (m_home.empty()) {
         std::list < std::string > lst;
         lst.push_back(Glib::get_home_dir());
@@ -50,23 +54,9 @@ void Path::initHomeDir()
     }
 }
 
-bool Path::initPath()
+void Path::initPrefixDir()
 {
-    initHomeDir();
-
     m_prefix.assign(VLE_PREFIX_DIR);
-
-    addSimulatorDir(getSimulatorDir());
-    addStreamDir(getStreamDir());
-    addOutputDir(getOutputDir());
-    addConditionDir(getConditionDir());
-
-    addSimulatorDir(getHomeSimulatorDir());
-    addStreamDir(getHomeStreamDir());
-    addOutputDir(getHomeOutputDir());
-    addConditionDir(getHomeConditionDir());
-
-    return true;
 }
 
 }} // namespace vle utils

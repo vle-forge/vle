@@ -28,6 +28,7 @@
 #include <vle/value/Integer.hpp>
 #include <vle/value/String.hpp>
 #include <vle/utils/Path.hpp>
+#include <vle/utils/Package.hpp>
 #include <gtkmm/filechooserdialog.h>
 #include <gdkmm/cursor.h>
 #include <gtkmm/stock.h>
@@ -133,7 +134,7 @@ void FileLoc::onClickedFileChooserButton()
     }
 
     // set the current folder depending on the mode of gvle
-    string packageName = utils::Path::path().package();
+    string packageName = utils::Package::package().name();
 
     if (not packageName.empty()){
 	string packageDataDirName = utils::Path::path().getPackageDataDir();

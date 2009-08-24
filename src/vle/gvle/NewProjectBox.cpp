@@ -70,10 +70,9 @@ void NewProjectBox::onApply()
 {
     if (not mEntryName->get_text().empty()) {
 	if (not exist(mEntryName->get_text())) {
-	    std::string out;
-	    std::string err;
-	    utils::Path::path().setPackage(mEntryName->get_text());
-	    vle::utils::CMakePackage::create(out, err);
+            std::ostringstream sout, serr;
+	    utils::Package::package().select(mEntryName->get_text());
+	    vle::utils::Package::package().create();
 	    mModeling->getGVLE()->buildPackageHierarchy();
 	    mDialog->hide_all();
 	} else {
@@ -91,7 +90,7 @@ void NewProjectBox::onCancel()
 
 bool NewProjectBox::exist(std::string name)
 {
-    utils::PathList list = utils::CMakePackage::getInstalledPackages();
+    utils::PathList list = utils::Path::path().getInstalledPackages();
     utils::PathList::const_iterator it = list.begin();
     while (it != list.end()) {
 	if (boost::filesystem::basename(*it) == name) {

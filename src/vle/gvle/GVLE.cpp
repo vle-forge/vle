@@ -305,7 +305,7 @@ void GVLE::FileTreeView::onNewFile()
 	} else {
 	    filepath = mPackage;
 	}
-	utils::CMakePackage::addFile(filepath, name);
+	utils::Package::package().addFile(filepath, name);
     }
     mParent->buildPackageHierarchy();
 }
@@ -330,7 +330,7 @@ void GVLE::FileTreeView::onNewDirectory()
 	} else {
 	    directorypath = mPackage;
 	}
-	utils::CMakePackage::addDirectory(directorypath, name);
+	utils::Package::package().addDirectory(directorypath, name);
     }
     mParent->buildPackageHierarchy();
 }
@@ -345,7 +345,7 @@ void GVLE::FileTreeView::onRemove()
 	const std::list<std::string>* lstpath = projectFilePath(row);
 
 	if (gvle::Question(_("Do you really want remove this file ?\n")))
-	    utils::CMakePackage::removeFile(Glib::build_filename(*lstpath));
+	    utils::Package::package().removeFile(Glib::build_filename(*lstpath));
     }
     mParent->buildPackageHierarchy();
 }
@@ -360,7 +360,7 @@ void GVLE::FileTreeView::onRename()
 	const Gtk::TreeModel::Row row = *it;
 	const std::list<std::string>* lstpath = projectFilePath(row);
 
-	utils::CMakePackage::renameFile(Glib::build_filename(*lstpath),
+	utils::Package::package().renameFile(Glib::build_filename(*lstpath),
 					name);
     }
     mParent->buildPackageHierarchy();
@@ -394,7 +394,7 @@ void GVLE::FileTreeView::onEdition(const Glib::ustring& pathString,
 				   const Glib::ustring& newName)
 {
     std::string name(newName);
-    utils::CMakePackage::renameFile(mOldAbsolutePath, name);
+    utils::Package::package().renameFile(mOldAbsolutePath, name);
     Gtk::TreeModel::Row row = *(mRefTreeModel->get_iter(pathString));
     row[mColumns.m_col_name] = newName;
 }
@@ -624,7 +624,7 @@ void GVLE::onMenuOpenPackage()
 {
     mEditor->closeAllTab();
     mOpenPackageBox->show();
-    if (utils::Path::path().package() != "")
+    if (not utils::Package::package().name().empty())
 	mMenuAndToolbar->onPackageMode();
 }
 
@@ -637,8 +637,8 @@ void GVLE::onMenuOpenVpz()
 	    mOpenVpzBox->show();
 	    mMenuAndToolbar->onViewMode();
 	} catch(utils::InternalError) {
-	    Error(_("No experiments in the package ") +
-		    utils::Path::path().package());
+            Error((fmt(_("No experiments in the package '%1%'")) %
+                  utils::Package::package().name()).str());
 	}
     }
 }
@@ -663,7 +663,7 @@ void GVLE::onMenuLoad()
         if (file.run() == Gtk::RESPONSE_OK) {
 	    mGlobalVpzPrevDirPath = file.get_current_folder();
 	    mEditor->closeAllTab();
-	    utils::Path::path().setPackage("");
+	    utils::Package::package().select("");
 	    mPackage = "";
             m_modeling->parseXML(file.get_filename());
 	    mMenuAndToolbar->onGlobalMode();
@@ -720,7 +720,7 @@ void GVLE::onMenuSave()
 	if (it != mEditor->getDocumentsList().end())
 	    it->second->setTitle(m_modeling->getFileName(),
 				 m_modeling->getTopModel(), false);
-    } else if (utils::Path::path().package() != "") {
+    } else if (not utils::Package::package().name().empty()) {
 	mSaveVpzBox->show();
     } else {
 	Gtk::FileChooserDialog file(_("VPZ file"), Gtk::FILE_CHOOSER_ACTION_SAVE);
@@ -781,10 +781,11 @@ void GVLE::closeFile()
 
 void GVLE::tabClosed()
 {
-    if (utils::Path::path().package() == "")
+    if (not utils::Package::package().selected()) {
 	mMenuAndToolbar->onGlobalMode();
-    else
+    } else {
 	mMenuAndToolbar->onPackageMode();
+    }
 }
 
 void GVLE::onMenuQuit()
@@ -856,8 +857,10 @@ void GVLE::setTitle(const Glib::ustring& name)
 {
     Glib::ustring title(WINDOW_TITLE);
 
-    if (not utils::Path::path().package().empty())
-	title += " - " + utils::Path::path().package();
+    if (utils::Package::package().selected()) {
+	title += " - " + utils::Package::package().name();
+    }
+
     if (not name.empty()) {
         title += " - " + Glib::path_get_basename(name);
     }
@@ -906,40 +909,146 @@ std::string valuetype_to_string(value::Value::type type)
     }
 }
 
+bool GVLE::packageTimer()
+{
+    std::string o, e;
+    utils::Package::package().getOutputAndClear(o);
+    utils::Package::package().getErrorAndClear(e);
+
+    if (not o.empty()) {
+        mLog->get_buffer()->insert(mLog->get_buffer()->end(), o);
+    }
+
+    if (not e.empty()) {
+        mLog->get_buffer()->insert(mLog->get_buffer()->end(), e);
+    }
+
+    Gtk::TextBuffer::iterator iter = mLog->get_buffer()->end();
+    mLog->get_buffer()->place_cursor(iter);
+    mLog->scroll_to(iter, 0.0, 0.0, 1.0);
+
+    if (utils::Package::package().isFinish()) {
+        getMenu()->showPackageMenu();
+        return false;
+    } else {
+        return true;
+    }
+}
+
+bool GVLE::packageBuildTimer()
+{
+    std::string o, e;
+    utils::Package::package().getOutputAndClear(o);
+    utils::Package::package().getErrorAndClear(e);
+
+    if (not o.empty()) {
+        mLog->get_buffer()->insert(mLog->get_buffer()->end(), o);
+    }
+
+    if (not e.empty()) {
+        mLog->get_buffer()->insert(mLog->get_buffer()->end(), e);
+    }
+
+    Gtk::TextBuffer::iterator iter = mLog->get_buffer()->end();
+    mLog->get_buffer()->place_cursor(iter);
+    mLog->scroll_to(iter, 0.0, 0.0, 1.0);
+
+    if (utils::Package::package().isFinish()) {
+        installProject();
+        return false;
+    } else {
+        return true;
+    }
+}
+
 void GVLE::configureProject()
 {
-    std::string out, err;
-    utils::CMakePackage::configure(out, err);
-    mLog->get_buffer()->insert(mLog->get_buffer()->end(), out);
-    if (not err.empty())
-	mLog->get_buffer()->insert(mLog->get_buffer()->end(), err);
+    mLog->get_buffer()->insert(mLog->get_buffer()->end(),
+                               "configure package\n");
+    getMenu()->hidePackageMenu();
+    try {
+        utils::Package::package().configure();
+    } catch (const std::exception& e) {
+        getMenu()->showPackageMenu();
+        gvle::Error(e.what());
+    } catch (const Glib::Exception& e) {
+        getMenu()->showPackageMenu();
+        gvle::Error(e.what());
+    }
+    Glib::signal_timeout().connect(
+        sigc::mem_fun(*this, &GVLE::packageTimer), 250);
 }
 
 void GVLE::buildProject()
 {
-    std::string out, err;
-    utils::CMakePackage::build(out, err);
-    mLog->get_buffer()->insert(mLog->get_buffer()->end(), out);
-    if (not err.empty())
-	mLog->get_buffer()->insert(mLog->get_buffer()->end(), err);
+    mLog->get_buffer()->insert(mLog->get_buffer()->end(),
+                               "build package\n");
+    getMenu()->hidePackageMenu();
+    try {
+        utils::Package::package().build();
+    } catch (const std::exception& e) {
+        getMenu()->showPackageMenu();
+        gvle::Error(e.what());
+    } catch (const Glib::Exception& e) {
+        getMenu()->showPackageMenu();
+        gvle::Error(e.what());
+    }
+    Glib::signal_timeout().connect(
+        sigc::mem_fun(*this, &GVLE::packageBuildTimer), 250);
+}
+
+void GVLE::installProject()
+{
+    mLog->get_buffer()->insert(mLog->get_buffer()->end(),
+                               "build package\n");
+    getMenu()->hidePackageMenu();
+    try {
+        utils::Package::package().install();
+    } catch (const std::exception& e) {
+        getMenu()->showPackageMenu();
+        gvle::Error(e.what());
+    } catch (const Glib::Exception& e) {
+        getMenu()->showPackageMenu();
+        gvle::Error(e.what());
+    }
+    Glib::signal_timeout().connect(
+        sigc::mem_fun(*this, &GVLE::packageTimer), 250);
 }
 
 void GVLE::cleanProject()
 {
-    std::string out, err;
-    utils::CMakePackage::clean(out, err);
-    mLog->get_buffer()->insert(mLog->get_buffer()->end(), out);
-    if (not err.empty())
-	mLog->get_buffer()->insert(mLog->get_buffer()->end(), err);
+    mLog->get_buffer()->insert(mLog->get_buffer()->end(),
+                               "clean package\n");
+    getMenu()->hidePackageMenu();
+    try {
+        utils::Package::package().clean();
+    } catch (const std::exception& e) {
+        getMenu()->showPackageMenu();
+        gvle::Error(e.what());
+    } catch (const Glib::Exception& e) {
+        getMenu()->showPackageMenu();
+        gvle::Error(e.what());
+    }
+    Glib::signal_timeout().connect(
+        sigc::mem_fun(*this, &GVLE::packageTimer), 250);
 }
 
 void GVLE::packageProject()
 {
-    std::string out, err;
-    utils::CMakePackage::package(out, err);
-    mLog->get_buffer()->insert(mLog->get_buffer()->end(), out);
-    if (not err.empty())
-	mLog->get_buffer()->insert(mLog->get_buffer()->end(), err);
+    mLog->get_buffer()->insert(mLog->get_buffer()->end(),
+                               "make tarball\n");
+    getMenu()->hidePackageMenu();
+    try {
+        utils::Package::package().clean();
+    } catch (const std::exception& e) {
+        getMenu()->showPackageMenu();
+        gvle::Error(e.what());
+    } catch (const Glib::Exception& e) {
+        getMenu()->showPackageMenu();
+        gvle::Error(e.what());
+    }
+    Glib::signal_timeout().connect(
+        sigc::mem_fun(*this, &GVLE::packageTimer), 250);
 }
 
 void GVLE::onCutModel()

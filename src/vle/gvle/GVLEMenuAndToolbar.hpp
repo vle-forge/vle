@@ -46,13 +46,13 @@ public:
     ~GVLEMenuAndToolbar();
 
     void setParent(GVLE* gvle)
-	{ mParent = gvle; }
+    { mParent = gvle; }
 
     Gtk::Toolbar* getToolbar()
-	{ return mToolbar; }
+    { return mToolbar; }
 
     Gtk::MenuBar* getMenuBar()
-	{ return mMenuBar; }
+    { return mMenuBar; }
 
     /**
      * @brief Change to Package Mode to access to the Menu item
@@ -73,6 +73,9 @@ public:
      * @brief Change to File Mode to access to the Menu Edit
      */
     void onFileMode();
+
+    void hidePackageMenu();
+    void showPackageMenu();
 
 private:
     void init();

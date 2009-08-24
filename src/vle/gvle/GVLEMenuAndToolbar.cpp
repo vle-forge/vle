@@ -227,6 +227,22 @@ void GVLEMenuAndToolbar::onFileMode()
     m_refActionGroup->get_action("Random Order")->set_sensitive(false);
 }
 
+void GVLEMenuAndToolbar::hidePackageMenu()
+{
+    m_refActionGroup->get_action("ConfigureProject")->set_sensitive(false);
+    m_refActionGroup->get_action("BuildProject")->set_sensitive(false);
+    m_refActionGroup->get_action("CleanProject")->set_sensitive(false);
+    m_refActionGroup->get_action("CreateProjectPackage")->set_sensitive(false);
+}
+
+void GVLEMenuAndToolbar::showPackageMenu()
+{
+    m_refActionGroup->get_action("ConfigureProject")->set_sensitive(true);
+    m_refActionGroup->get_action("BuildProject")->set_sensitive(true);
+    m_refActionGroup->get_action("CleanProject")->set_sensitive(true);
+    m_refActionGroup->get_action("CreateProjectPackage")->set_sensitive(true);
+}
+
 void GVLEMenuAndToolbar::createUI()
 {
 #ifdef GLIBMM_EXCEPTIONS_ENABLED

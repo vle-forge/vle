@@ -81,7 +81,7 @@ void OpenPackageBox::build()
 
     mRefTreePackage->clear();
 
-    PathList list = CMakePackage::getInstalledPackages();
+    PathList list = Path::path().getInstalledPackages();
     PathList::const_iterator it = list.begin();
     while (it != list.end()) {
 	Gtk::TreeModel::Row row = *(mRefTreePackage->append());
@@ -100,7 +100,7 @@ void OpenPackageBox::onApply()
 	if (iter) {
 	    Gtk::TreeModel::Row row = *iter;
 	    std::string name = row.get_value(mColumns.mName);
-	    utils::Path::path().setPackage(name);
+	    utils::Package::package().select(name);
 	    mModeling->getGVLE()->buildPackageHierarchy();
 	}
     }
@@ -121,7 +121,7 @@ void OpenPackageBox::onRowActivated(const Gtk::TreeModel::Path& path,
         if (iter) {
 	    Gtk::TreeRow row = *iter;
 	    std::string name = row.get_value(mColumns.mName);
-	    utils::Path::path().setPackage(name);
+	    utils::Package::package().select(name);
 	    mModeling->getGVLE()->buildPackageHierarchy();
         }
     }

@@ -26,10 +26,10 @@
 #ifndef VLE_UTILS_PATH_HPP
 #define VLE_UTILS_PATH_HPP
 
+#include <glibmm/fileutils.h>
 #include <string>
 #include <list>
 #include <ostream>
-#include <glibmm/fileutils.h>
 
 
 namespace vle { namespace utils {
@@ -178,23 +178,17 @@ namespace vle { namespace utils {
          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
         /**
-         * @brief Assign a new package name.
-         * @param name the new package name to assign.
-         */
-        void setPackage(const std::string& name);
-
-        /**
-         * @brief Get the current selected package.
-         * @return Return the current pacakge or empty string if no package.
-         */
-        const std::string& package() const
-        { return m_currentPackage; }
-
-        /**
          * @brief Return the $VLE_HOME/packages dirname.
          * @return A string.
          */
         std::string getPackagesDir() const;
+
+        /**
+         * @brief Update the packages variables. Assign the current package path
+         * and the simulator plug-ins list. If the package is empty then, we use
+         * global simlutor, otherwise, we use the package lib directory.
+         */
+        void updatePackageDirs();
 
         /**
          * @brief Return the $VLE_HOME/packages/current_package dirname.
@@ -213,6 +207,11 @@ namespace vle { namespace utils {
         std::string getPackageDataFile(const std::string& name) const;
         std::string getPackageDocFile(const std::string& name) const;
         std::string getPackageExpFile(const std::string& name) const;
+
+        PathList getInstalledPackages();
+        PathList getInstalledExperiments();
+        PathList getInstalledLibraries();
+
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
@@ -419,21 +418,7 @@ namespace vle { namespace utils {
 
         std::string m_prefix; /*!< the $prefix of installation */
         std::string m_home; /*!< the $VLE_HOME */
-        std::string m_currentPackage; /*< the current package selected */
         std::string m_currentPackagePath; /*< the current package path */
-
-        /**
-         * @brief A default constructor that call the initPath member.
-         * @throw utils::InternalError if Initialisation of the class failed.
-         */
-        Path();
-
-        /**
-         * @brief Build the paths. This function exist in two part of the file,
-         * on for Unix/Linux another for Windows for registry access.
-         * @return true if success, false otherwise.
-         */
-        bool initPath();
 
         /**
          * @brief Build the paths from environment variables.
@@ -444,6 +429,21 @@ namespace vle { namespace utils {
         bool readEnv(const std::string& variable, PathList& out);
 
         /**
+         * @brief Assign to the m_home attribute the content of the VLE_HOME
+         * variable if it exist.
+         */
+        void readHomeDir();
+
+        /**
+         * @brief A default constructor. This function clear the default
+         * directories, initialize the home, prefix, plug-ins and package
+         * directories.
+         *
+         * @throw utils::InternalError if Initialisation of the class failed.
+         */
+        Path();
+
+        /**
          * @brief Assign to the m_home attribut the content of the VLE_HOME
          * variable. If this variable does not exist, m_home is initialized with
          * the $HOME/.vle on Unix and %HOMEDRIVE%%HOMEPATH%\vle on Win.
@@ -451,12 +451,26 @@ namespace vle { namespace utils {
         void initHomeDir();
 
         /**
-         * @brief Assign to the m_home attribute the content of the VLE_HOME
-         * variable if it exist.
+         * @brief Assign to the m_prefix attribut the prefix of VLE
+         * installation. On Unix, we use the install path, (ie. DESTDIR or
+         * CMAKE_INSTALL_PREFIX directories) and the install path on Win readed
+         * from the registry.
          */
-        void readHomeDir();
+        void initPrefixDir();
 
-        static Path* mPath; /*!< The static variable Path for singleton design
+        /**
+         * @brief Assign to the plug-ins directories lists paths from prefix and
+         * home directory.
+         */
+        void initPluginDirs();
+
+        /**
+         * @brief Assign the current package path and simulator packages lists
+         * paths from prefix or vle user dir.
+         */
+        void initPackageDirs();
+
+        static Path* mPath; /**< The static variable Path for singleton design
                               pattern. */
     };
 

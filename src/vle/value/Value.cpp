@@ -35,6 +35,7 @@
 #include <vle/value/XML.hpp>
 #include <vle/value/Null.hpp>
 #include <vle/value/Matrix.hpp>
+#include <vle/utils/Tools.hpp>
 #include <sstream>
 #include <boost/serialization/export.hpp>
 
@@ -240,10 +241,8 @@ Matrix& Value::toMatrix()
 
 void init()
 {
+    utils::init();
 #ifdef VLE_HAVE_POOL
-    if (not Glib::thread_supported()) {
-        Glib::thread_init();
-    }
     value::Pools::init();
 #endif
 

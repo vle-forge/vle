@@ -23,78 +23,100 @@
  */
 
 #include <vle/utils/Package.hpp>
+#include <vle/utils/Path.hpp>
 #include <vle/utils/Exception.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/version.hpp>
-#include <glibmm/spawn.h>
+#include <glibmm/timer.h>
 #include <glibmm/miscutils.h>
-#include <iostream>
+#include <glibmm/fileutils.h>
+#include <glibmm/stringutils.h>
 #include <fstream>
+#include <ostream>
+#include <iostream>
+#include <cstring>
+
+#ifdef G_OS_WIN32
+#include    <Windows.h>
+#include    <io.h>
+#else
+#   include <sys/wait.h>
+#   include <unistd.h>
+#   include <errno.h>
+#endif
 
 
 namespace vle { namespace utils {
 
-CMakePackage::CMakePackage(const std::string& package)
-{
-    Path::path().setPackage(package);
-}
+Package* Package::m_package = 0;
 
-void CMakePackage::create(std::string& /* out */, std::string& /* err */)
+void Package::create()
 {
     Path& p = utils::Path::path();
 
     boost::filesystem::create_directory(p.getPackageDir());
     p.copyTemplate("package", p.getPackageDir());
+
+    appendOutput(_("Package creating - done\n"));
 }
 
-void CMakePackage::configure(std::string& out, std::string& err)
+void Package::configure()
 {
     Path& p = utils::Path::path();
 
     boost::filesystem::create_directory(p.getPackageBuildDir());
 
-    std::string prg = Glib::find_program_in_path("cmake");
-
     std::list < std::string > argv;
-    argv.push_back(prg);
-    argv.push_back((fmt("-DCMAKE_INSTALL_PREFIX=\'%1%\'") %
+#ifdef G_OS_WIN32
+    argv.push_back(Glib::find_program_in_path("cmake.exe"));;
+    argv.push_back("-G");
+    argv.push_back("MinGW Makefiles");
+#else
+    argv.push_back(Glib::find_program_in_path("cmake"));;
+#endif
+    argv.push_back((fmt("-DCMAKE_INSTALL_PREFIX=%1%") %
                     p.getPackageDir()).str());
     argv.push_back("-DCMAKE_BUILD_TYPE=RelWithDebInfo");
     argv.push_back("..");
 
-    std::copy(argv.begin(), argv.end(),
-              std::ostream_iterator < std::string >(std::cout, " "));
-
-    int status;
     try {
-        Glib::spawn_sync(p.getPackageBuildDir(), argv, Glib::SpawnFlags(0),
-                         sigc::slot < void >(), &out, &err, &status);
-    } catch(const Glib::SpawnError& e) {
+        process(p.getPackageBuildDir(), argv);
+    } catch(const std::exception& e) {
         throw utils::InternalError(fmt(
                 _("Pkg configure error: configure failed %1%")) % e.what());
     }
 }
 
-void CMakePackage::build(std::string& out, std::string& err)
+void Package::build()
 {
     Path& p = utils::Path::path();
 
     std::list < std::string > argv;
-    std::string prg = Glib::find_program_in_path("make");
-    argv.push_back(prg);
+#ifdef G_OS_WIN32
+    argv.push_back(Glib::find_program_in_path("mingw32-make.exe"));
+#else
+    argv.push_back(Glib::find_program_in_path("make"));
+#endif
     argv.push_back("all");
 
-    int status;
     try {
-        Glib::spawn_sync(p.getPackageBuildDir(), argv, Glib::SpawnFlags(0),
-                         sigc::slot < void >(), &out, &err, &status);
+        process(p.getPackageBuildDir(), argv);
     } catch(const Glib::SpawnError& e) {
         throw utils::InternalError(fmt(
                 _("Pkg build error: build failed %1%")) % e.what());
     }
+}
 
-    argv.clear();
-    argv.push_back(prg);
+void Package::install()
+{
+    Path& p = utils::Path::path();
+
+    std::list < std::string > argv;
+#ifdef G_OS_WIN32
+    argv.push_back(Glib::find_program_in_path("mingw32-make.exe"));
+#else
+    argv.push_back(Glib::find_program_in_path("make"));
+#endif
     argv.push_back("install");
 
     namespace fs = boost::filesystem;
@@ -114,163 +136,123 @@ void CMakePackage::build(std::string& out, std::string& err)
     }
 
     try {
-        Glib::spawn_sync(src.file_string(), argv, Glib::SpawnFlags(0),
-                         sigc::slot < void >(), &out, &err, &status);
+        process(src.file_string(), argv);
     } catch(const Glib::SpawnError& e) {
         throw utils::InternalError(fmt(
                 _("Pkg build error: install lib failed %1%")) % e.what());
     }
 }
 
-void CMakePackage::clean(std::string& out, std::string& err)
+void Package::clean()
 {
     Path& p = utils::Path::path();
 
-    std::string prg = Glib::find_program_in_path("make");
     std::list < std::string > argv;
-    argv.push_back(prg);
+#ifdef G_OS_WIN32
+    argv.push_back(Glib::find_program_in_path("mingw32-make.exe"));
+#else
+    argv.push_back(Glib::find_program_in_path("make"));
+#endif
     argv.push_back("clean");
 
-    int status;
     try {
-        Glib::spawn_sync(p.getPackageBuildDir(), argv, Glib::SpawnFlags(0),
-                         sigc::slot < void >(), &out, &err, &status);
+        process(p.getPackageBuildDir(), argv);
     } catch(const Glib::SpawnError& e) {
         throw utils::InternalError(fmt(
                 _("Pkg clean error: clean failed %1%")) % e.what());
     }
 }
 
-void CMakePackage::package(std::string& out, std::string& err)
+void Package::pack()
 {
     Path& p = utils::Path::path();
 
     std::list < std::string > argv;
-    std::string prg = Glib::find_program_in_path("make");
-    argv.push_back(prg);
+#ifdef G_OS_WIN32
+    argv.push_back(Glib::find_program_in_path("mingw32-make.exe"));
+#else
+    argv.push_back(Glib::find_program_in_path("make"));
+#endif
     argv.push_back("package");
     argv.push_back("package_source");
 
-    int status;
     try {
-        Glib::spawn_sync(p.getPackageBuildDir(), argv, Glib::SpawnFlags(0),
-                         sigc::slot < void >(), &out, &err, &status);
+        process(p.getPackageBuildDir(), argv);
     } catch(const Glib::SpawnError& e) {
         throw utils::InternalError(fmt(
                 _("Pkg packaging error: package failed %1%")) % e.what());
     }
 }
 
-PathList CMakePackage::getInstalledPackages()
+void Package::waitProcess()
 {
-    namespace fs = boost::filesystem;
+#ifdef __WIN32__
+    /* WaitFor*() functions, or examine its exit code with GetExitCodeProcess */
+    DWORD status = 0;
 
-    fs::path pkgs(Path::path().getPackagesDir());
+    WaitForSingleObject(m_pid, INFINITE);
+    GetExitCodeProcess(m_pid, &status);
+#else
+    int status;
+    int result;
 
-    if (not fs::exists(pkgs) or not fs::is_directory(pkgs)) {
-        throw utils::InternalError(fmt(
-                _("Package error: '%1%' is not a directory")) %
-            Path::path().getPackagesDir());
+    result = waitpid(m_pid, &status, 0);
+    if (result == -1) {
+        int e = errno;
+        appendError((fmt(_("Error waiting process: %1%")) %
+                 Glib::strerror(e)).str());
     }
+#endif
 
-    PathList result;
-    for (fs::directory_iterator it(pkgs), end; it != end; ++it) {
-        if (fs::is_directory(it->status())) {
-            result.push_back(it->path().file_string());
-        }
-    }
+    m_out->join();  /* we wait the end of data readed from thread */
+    m_err->join();
+    Glib::spawn_close_pid(m_pid); /* we close process (win32 requirement) */
 
-    return result;
+    m_out = 0;
+    m_err = 0;
+    m_stop = true;
 }
 
-PathList CMakePackage::getInstalledExperiments()
+void Package::wait(std::ostream& out, std::ostream& err)
 {
-    namespace fs = boost::filesystem;
+    std::string o, e;
 
-    fs::path pkgs(Path::path().getPackageExpDir());
-
-    if (not fs::exists(pkgs) or not fs::is_directory(pkgs)) {
-        throw utils::InternalError(fmt(
-                _("Pkg list error: '%1%' is not an experiments directory")) %
-            pkgs.file_string());
+    while (m_stop == false) {
+        getOutputAndClear(o);
+        getErrorAndClear(e);
+        out << o;
+        err << e;
+        Glib::usleep(100000);
+        o.clear();
+        e.clear();
     }
 
-    PathList result;
-    for (fs::directory_iterator it(pkgs), end; it != end; ++it) {
-#if BOOST_VERSION > 103600
-        if (fs::is_regular_file(it->status())) {
-            fs::path::string_type ext = it->path().extension();
-#else
-        if (fs::is_regular(it->status())) {
-            fs::path::string_type ext = fs::extension(it->path());
-#endif
-            if (ext == ".vpz") {
-                result.push_back(it->path().file_string());
-            }
-        }
+    getOutputAndClear(o);
+    getErrorAndClear(e);
+
+    if (not o.empty()) {
+        out << o;
     }
-    return result;
+
+    if (not e.empty()) {
+        err << e;
+    }
 }
 
-PathList CMakePackage::getInstalledLibraries()
-{
-    namespace fs = boost::filesystem;
-
-    PathList result;
-    const PathList& dirs = Path::path().getSimulatorDirs();
-
-    for (PathList::const_iterator it = dirs.begin(); it != dirs.end(); ++it) {
-        fs::path dir(*it);
-
-        if (not fs::exists(dir) or not fs::is_directory(dir)) {
-            throw utils::InternalError(fmt(
-                    _("Pkg list error: '%1%' is not a library directory")) %
-                dir.file_string());
-        }
-
-        for (fs::directory_iterator jt(dir), end; jt != end; ++jt) {
-#if BOOST_VERSION > 103600
-            if (fs::is_regular_file(jt->status())) {
-                fs::path::string_type ext = jt->path().extension();
-#else
-            if (fs::is_regular(jt->status())) {
-                fs::path::string_type ext = fs::extension(jt->path());
-#endif
-#ifdef G_OS_WINDOWS
-                if (ext == ".dll") {
-                    result.push_back(jt->path().file_string());
-                }
-#elif G_OS_MACOS
-                if (ext == ".dylib") {
-                    result.push_back(jt->path().file_string());
-                }
-#else
-                if (ext == ".so") {
-                    result.push_back(jt->path().file_string());
-                }
-#endif
-            }
-        }
-    }
-    return result;
-}
-
-void CMakePackage::addFile(const std::string& path,
-			   const std::string& name)
+void Package::addFile(const std::string& path, const std::string& name)
 {
     if (not boost::filesystem::exists(Glib::build_filename(path, name)))
 	std::ofstream file(Glib::build_filename(path, name).c_str());
 }
 
-void CMakePackage::addDirectory(const std::string& path,
-				const std::string& name)
+void Package::addDirectory(const std::string& path, const std::string& name)
 {
     if (not boost::filesystem::exists(Glib::build_filename(path, name)))
 	boost::filesystem::create_directory(
 	    Glib::build_filename(path, name));
 }
 
-void CMakePackage::removeFile(const std::string& pathFile)
+void Package::removeFile(const std::string& pathFile)
 {
     std::string path = Glib::build_filename(
 	Path::path().getPackageDir(), pathFile);
@@ -278,8 +260,7 @@ void CMakePackage::removeFile(const std::string& pathFile)
     boost::filesystem::remove(path);
 }
 
-void CMakePackage::renameFile(const std::string& oldFile,
-			      std::string& newName)
+void Package::renameFile(const std::string& oldFile, std::string& newName)
 {
     std::string oldAbsolutePath =
 	Glib::build_filename(Path::path().getPackageDir(), oldFile);
@@ -292,6 +273,183 @@ void CMakePackage::renameFile(const std::string& oldFile,
 
     if (not boost::filesystem::exists(newAbsolutePath))
 	boost::filesystem::rename(oldAbsolutePath, newAbsolutePath);
+}
+
+void Package::select(const std::string& name)
+{
+    if (name.empty()) {
+        m_name.clear();
+    } else {
+        m_name.assign(name);
+    }
+    Path::path().updatePackageDirs();
+}
+
+                            /*   manage thread   */
+
+void Package::process(const std::string& workingDir,
+                      const std::list < std::string >& lst)
+{
+    if (m_out != 0 or m_err != 0) {
+        throw utils::InternalError("Package error: wait an unknow process");
+    }
+
+    m_stop = false;
+
+    try {
+        int out, err;
+
+        Glib::spawn_async_with_pipes(workingDir,
+                                     lst,
+				     Glib::SPAWN_SEARCH_PATH,
+                                     sigc::slot < void >(),
+                                     &m_pid,
+                                     0, &out, &err);
+
+        m_out = Glib::Thread::create(
+            sigc::bind(sigc::mem_fun(*this, &Package::readStandardOutputStream),
+                       out), true);
+
+        m_err = Glib::Thread::create(
+            sigc::bind(sigc::mem_fun(*this, &Package::readStandardErrorStream),
+                       err), true);
+
+        m_wait = Glib::Thread::create(
+            sigc::mem_fun(*this, &Package::waitProcess), false);
+
+    } catch(const std::exception& e) {
+        appendError((fmt(_("Std exception: '%1%'")) % e.what()).str());
+	throw utils::InternalError(e.what());
+    } catch(const Glib::Exception& e) {
+        appendError((fmt(_("Glib exception: '%1%'")) % e.what()).str());
+	throw utils::InternalError(e.what());
+    }
+}
+
+void Package::readStandardOutputStream(int stream)
+{
+    const size_t bufferSize = 64;
+    char* buffer = new char[bufferSize];
+    int result;
+
+    do {
+        std::memset(buffer, 0, bufferSize);
+#ifdef G_OS_WIN32
+        result = ::_read(stream, buffer, bufferSize - 1);
+#else
+        result = ::read(stream, buffer, bufferSize - 1);
+#endif
+
+        if (result == -1) {
+            appendOutput(_("Error reading stream"));
+            if (m_stop) {
+                result = 0;
+            }
+        } else if (result == 0) {
+            appendOutput("\n");
+        } else {
+            appendOutput(buffer);
+        }
+    } while (result);
+
+    delete[] buffer;
+#ifdef G_OS_WIN32
+    ::_close(stream);
+#else
+    ::close(stream);
+#endif
+}
+
+void Package::readStandardErrorStream(int stream)
+{
+    const size_t bufferSize = 64;
+    char* buffer = new char[bufferSize];
+    int result;
+
+    do {
+        std::memset(buffer, 0, bufferSize);
+#ifdef G_OS_WIN32
+        result = ::_read(stream, buffer, bufferSize - 1);
+#else
+        result = ::read(stream, buffer, bufferSize - 1);
+#endif
+
+        if (result == -1) {
+            appendError(_("Error reading stream"));
+            if (m_stop) {
+                result = 0;
+            }
+        } else if (result == 0) {
+            appendError("\n");
+        } else {
+            appendError(buffer);
+        }
+    } while (result);
+
+    delete[] buffer;
+#ifdef G_OS_WIN32
+    ::_close(stream);
+#else
+    ::close(stream);
+#endif
+}
+
+void Package::getOutput(std::string& str) const
+{
+    Glib::Mutex::Lock lock(m_mutex);
+
+    str.append(m_strout);
+}
+
+void Package::getError(std::string& str) const
+{
+    Glib::Mutex::Lock lock(m_mutex);
+
+    str.append(m_strerr);
+}
+
+void Package::getOutputAndClear(std::string& str)
+{
+    Glib::Mutex::Lock lock(m_mutex);
+
+    str.append(m_strout);
+    m_strout.clear();
+}
+
+void Package::getErrorAndClear(std::string& str)
+{
+    Glib::Mutex::Lock lock(m_mutex);
+
+    str.append(m_strerr);
+    m_strerr.clear();
+}
+
+void Package::appendOutput(const char* str)
+{
+    Glib::Mutex::Lock lock(m_mutex);
+
+    m_strout.append(str);
+}
+
+void Package::appendError(const char* str)
+{
+    Glib::Mutex::Lock lock(m_mutex);
+
+    m_strerr.append(str);
+}
+
+void Package::appendOutput(const std::string& str)
+{
+    Glib::Mutex::Lock lock(m_mutex);
+
+    m_strout.append(str);
+}
+
+void Package::appendError(const std::string& str)
+{
+    Glib::Mutex::Lock lock(m_mutex);
+
+    m_strerr.append(str);
 }
 
 }} // namespace vle utils

@@ -27,6 +27,7 @@
 #include <vle/manager/VLE.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
+#include <vle/utils/Path.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/i18n.hpp>
@@ -48,7 +49,7 @@ void appendToCommandLineList(const char* param, manager::CmdArgs& out)
 #endif
         out.push_back(p.file_string().c_str());
         return;
-    } else if (not utils::Path::path().package().empty()) {
+    } else if (not utils::Package::package().name().empty()) {
         fs::path np(utils::Path::path().getPackageExpFile(param));
 #if BOOST_VERSION > 103600
         if (fs::is_regular_file(np)) {
@@ -64,39 +65,44 @@ void appendToCommandLineList(const char* param, manager::CmdArgs& out)
 
 void buildCommandLineList(int argc, char* argv[], manager::CmdArgs& lst)
 {
-    int i = 1;
-    std::string out, err;
+    using utils::Package;
+    using utils::Path;
+    using utils::PathList;
 
-    if (not utils::Path::path().package().empty()) {
+    int i = 1;
+
+    if (not Package::package().name().empty()) {
         for (; i < argc; ++i) {
             if (strcmp(argv[i], "create") == 0) {
-                utils::CMakePackage::create(out, err);
+                Package::package().create();
             } else if (strcmp(argv[i], "configure") == 0) {
-                utils::CMakePackage::configure(out, err);
+                Package::package().configure();
+                Package::package().wait(std::cout, std::cerr);
             } else if (strcmp(argv[i], "build") == 0) {
-                utils::CMakePackage::build(out, err);
+                Package::package().build();
+                Package::package().wait(std::cout, std::cerr);
+                Package::package().install();
+                Package::package().wait(std::cout, std::cerr);
+            } else if (strcmp(argv[i], "install") == 0) {
+                Package::package().install();
+                Package::package().wait(std::cout, std::cerr);
             } else if (strcmp(argv[i], "clean") == 0) {
-                utils::CMakePackage::clean(out, err);
+                Package::package().clean();
+                Package::package().wait(std::cout, std::cerr);
             } else if (strcmp(argv[i], "package") == 0) {
-                utils::CMakePackage::package(out, err);
+                Package::package().pack();
+                Package::package().wait(std::cout, std::cerr);
             } else if (strcmp(argv[i], "list") == 0) {
-                utils::PathList vpz =
-                    utils::CMakePackage::getInstalledExperiments();
+                PathList vpz(Path::path().getInstalledExperiments());
                 std::copy(vpz.begin(), vpz.end(), std::ostream_iterator
                           < std::string >(std::cout, "\n"));
-                utils::PathList libs =
-                    utils::CMakePackage::getInstalledLibraries();
+                PathList libs(utils::Path::path().getInstalledLibraries());
                 std::copy(libs.begin(), libs.end(), std::ostream_iterator
                           < std::string >(std::cout, "\n"));
             } else {
                 appendToCommandLineList(argv[i], lst);
                 ++i;
                 break;
-            }
-            if (not out.empty() or not err.empty()) {
-                std::cout << out << "\n" << err << "\n";
-                out.clear();
-                err.clear();
             }
         }
     }
@@ -122,7 +128,7 @@ int main(int argc, char* argv[])
         command.check();
         utils::Trace::trace().setLevel(static_cast < utils::Trace::Level >(
                 command.verbose()));
-        utils::Path::path().setPackage(command.package());
+        utils::Package::package().select(command.package());
     } catch(const Glib::Error& e) {
         std::cerr << fmt(_("Command line error: %1%\n")) % e.what();
         manager::finalize();

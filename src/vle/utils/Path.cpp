@@ -34,6 +34,7 @@
 #endif
 
 #include <vle/utils/Path.hpp>
+#include <vle/utils/Package.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/version.hpp>
@@ -279,24 +280,14 @@ std::string Path::getHomeConditionDocFile(const std::string& file) const
  * packages path
  */
 
-void Path::setPackage(const std::string& name)
-{
-    if (name.empty()) {
-	m_currentPackage.clear();
-	m_currentPackagePath.clear();
-        m_simulator.clear();
-        initPath();
-    } else {
-        m_currentPackage = name;
-        m_currentPackagePath = buildDirname(m_home, "pkgs", name);
-        m_simulator.clear();
-        m_simulator.push_back(getPackageLibDir());
-    }
-}
-
 std::string Path::getPackagesDir() const
 {
     return buildDirname(m_home, "pkgs");
+}
+
+void Path::updatePackageDirs()
+{
+    initPackageDirs();
 }
 
 std::string Path::getTemplateDir() const
@@ -446,6 +437,100 @@ std::string Path::getPackageDocFile(const std::string& name) const
     return buildFilename(getPackageDocDir(), name);
 }
 
+PathList Path::getInstalledPackages()
+{
+    namespace fs = boost::filesystem;
+
+    fs::path pkgs(Path::path().getPackagesDir());
+
+    if (not fs::exists(pkgs) or not fs::is_directory(pkgs)) {
+        throw utils::InternalError(fmt(
+                _("Package error: '%1%' is not a directory")) %
+            Path::path().getPackagesDir());
+    }
+
+    PathList result;
+    for (fs::directory_iterator it(pkgs), end; it != end; ++it) {
+        if (fs::is_directory(it->status())) {
+            result.push_back(it->path().file_string());
+        }
+    }
+
+    return result;
+}
+
+PathList Path::getInstalledExperiments()
+{
+    namespace fs = boost::filesystem;
+
+    fs::path pkgs(Path::path().getPackageExpDir());
+
+    if (not fs::exists(pkgs) or not fs::is_directory(pkgs)) {
+        throw utils::InternalError(fmt(
+                _("Pkg list error: '%1%' is not an experiments directory")) %
+            pkgs.file_string());
+    }
+
+    PathList result;
+    for (fs::directory_iterator it(pkgs), end; it != end; ++it) {
+#if BOOST_VERSION > 103600
+        if (fs::is_regular_file(it->status())) {
+            fs::path::string_type ext = it->path().extension();
+#else
+        if (fs::is_regular(it->status())) {
+            fs::path::string_type ext = fs::extension(it->path());
+#endif
+            if (ext == ".vpz") {
+                result.push_back(it->path().file_string());
+            }
+        }
+    }
+    return result;
+}
+
+PathList Path::getInstalledLibraries()
+{
+    namespace fs = boost::filesystem;
+
+    PathList result;
+    const PathList& dirs = Path::path().getSimulatorDirs();
+
+    for (PathList::const_iterator it = dirs.begin(); it != dirs.end(); ++it) {
+        fs::path dir(*it);
+
+        if (not fs::exists(dir) or not fs::is_directory(dir)) {
+            throw utils::InternalError(fmt(
+                    _("Pkg list error: '%1%' is not a library directory")) %
+                dir.file_string());
+        }
+
+        for (fs::directory_iterator jt(dir), end; jt != end; ++jt) {
+#if BOOST_VERSION > 103600
+            if (fs::is_regular_file(jt->status())) {
+                fs::path::string_type ext = jt->path().extension();
+#else
+            if (fs::is_regular(jt->status())) {
+                fs::path::string_type ext = fs::extension(jt->path());
+#endif
+#ifdef G_OS_WINDOWS
+                if (ext == ".dll") {
+                    result.push_back(jt->path().file_string());
+                }
+#elif G_OS_MACOS
+                if (ext == ".dylib") {
+                    result.push_back(jt->path().file_string());
+                }
+#else
+                if (ext == ".so") {
+                    result.push_back(jt->path().file_string());
+                }
+#endif
+            }
+        }
+    }
+    return result;
+}
+
 void Path::initVleHomeDirectory()
 {
     namespace fs = boost::filesystem;
@@ -526,10 +611,39 @@ void Path::readHomeDir()
 
 Path::Path()
 {
-    if (initPath() == false) {
-        throw InternalError(_("Path initialization failed."));
-    }
+    initHomeDir();
+    initPrefixDir();
+
+    initPluginDirs();
+    initPackageDirs();
+
     initVleHomeDirectory();
+}
+
+void Path::initPluginDirs()
+{
+    addStreamDir(getStreamDir());
+    addOutputDir(getOutputDir());
+    addConditionDir(getConditionDir());
+
+    addStreamDir(getHomeStreamDir());
+    addOutputDir(getHomeOutputDir());
+    addConditionDir(getHomeConditionDir());
+}
+
+void Path::initPackageDirs()
+{
+    m_simulator.clear();
+
+    if (utils::Package::package().name().empty()) {
+        m_currentPackagePath.clear();
+        addSimulatorDir(getSimulatorDir());
+        addSimulatorDir(getHomeSimulatorDir());
+    } else {
+        m_currentPackagePath.assign(buildDirname(
+                m_home, "pkgs", utils::Package::package().name()));
+        addSimulatorDir(getPackageLibDir());
+    }
 }
 
 std::ostream& operator<<(std::ostream& out, const PathList& paths)
@@ -681,16 +795,14 @@ std::ostream& operator<<(std::ostream& out, const Path& p)
         << "condition home doc....: " << p.getHomeConditionDocDir() << "\n"
         << "\n";
 
-    if (not p.package().empty()) {
-        out << "Package dir...........: " << p.getPackageDir() << "\n"
-            << "Package lib dir.......: " << p.getPackageLibDir() << "\n"
-            << "Package scr dir.......: " << p.getPackageSrcDir() << "\n"
-            << "Package data dir......: " << p.getPackageDataDir() << "\n"
-            << "Package doc dir.......: " << p.getPackageDocDir() << "\n"
-            << "Package exp dir.......: " << p.getPackageExpDir() << "\n"
-            << "Package build dir.....: " << p.getPackageBuildDir() << "\n"
-            << "\n";
-    }
+    out << "Package dir...........: " << p.getPackageDir() << "\n"
+        << "Package lib dir.......: " << p.getPackageLibDir() << "\n"
+        << "Package scr dir.......: " << p.getPackageSrcDir() << "\n"
+        << "Package data dir......: " << p.getPackageDataDir() << "\n"
+        << "Package doc dir.......: " << p.getPackageDocDir() << "\n"
+        << "Package exp dir.......: " << p.getPackageExpDir() << "\n"
+        << "Package build dir.....: " << p.getPackageBuildDir() << "\n"
+        << "\n";
 
     out << "Real simulators list..:\n" << p.getSimulatorDirs() << "\n"
         << "Real output list......:\n" << p.getOutputDirs() << "\n"
