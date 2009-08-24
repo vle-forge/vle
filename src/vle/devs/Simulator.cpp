@@ -119,13 +119,11 @@ Time Simulator::timeAdvance()
                 getName());
 
     Time result = m_dynamics->timeAdvance();
-    /*
     if (result < 0.0) {
         throw utils::ModellingError(fmt(
                 _("Negative time advance in '%1%' (%2%)")) % getName() %
             result);
     }
-    */
     return result;
 }
 

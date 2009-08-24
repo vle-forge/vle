@@ -601,6 +601,9 @@ void Base::externalTransition(const ExternalEventList& event,
                 } else {
                     mLastTime = time;
                     mSigma -= e;
+                    if (mSigma < 0.0) {
+                        mSigma = 0.0;
+                    }
                 }
             }
         }
