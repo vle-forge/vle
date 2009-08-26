@@ -530,6 +530,13 @@ namespace vle { namespace utils {
     void finalize();
 
     /**
+     * @brief Print the VLE version, copyright and an help message.
+     *
+     * @param out The stream where push the information.
+     */
+    void printHelp(std::ostream& out);
+
+    /**
      * @brief Return the VLE version, copyright and the licences.
      *
      * @param out The stream where push the informations.

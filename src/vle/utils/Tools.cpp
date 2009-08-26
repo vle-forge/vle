@@ -293,29 +293,33 @@ void finalize()
     xmlCleanupParser();
 }
 
+void printHelp(std::ostream& out)
+{
+    out << fmt(_("Virtual Laboratory Environment - %1%%2%\n"
+                 "Copyright (C) 2003 - 2008 The VLE Development Team.\n"
+                 "VLE is a multi-modeling environment to build,\nsimulate "
+                 "and analyse models of dynamic complex systems.\n"
+                 "For more information, see manuals with 'man vle' or\n"
+                 "the VLE website http://sourceforge.net/projects/vle/\n")) %
+        VLE_VERSION % VLE_EXTRA_VERSION << std::endl;
+}
+
 void printInformations(std::ostream& out)
 {
-    utils::printVersion(out);
-    out << "\n" << Path::path() << "\n" << std::endl;
+    out << fmt(_("Virtual Laboratory Environment - %1%%2%\n"
+                 "Copyright (C) 2003 - 2008 The VLE Development Team.\n")) %
+        VLE_VERSION % VLE_EXTRA_VERSION << Path::path() << "\n" << std::endl;
 }
 
 void printVersion(std::ostream& out)
 {
-    std::string extra(VLE_EXTRA_VERSION);
-    if (not extra.empty()) {
-        extra = "(" + extra + ")";
-    }
-
-    out << fmt(_(
-        "Virtual Laboratory Environment - "
-        "%1%.%2%.%3% %4%\n"
-        "Copyright (C) 2003 - 2008 The VLE Development Team.\n"
-        "VLE comes with ABSOLUTELY NO WARRANTY.\n"
-        "You may redistribute copies of VLE\n"
-        "under the terms of the GNU General Public License.\n"
-        "For more information about these matters, see the file named "
-        "COPYING.\n")) % VLE_MAJOR_VERSION % VLE_MINOR_VERSION %
-        VLE_PATCH_VERSION % extra << std::endl;
+    out << fmt(_("Virtual Laboratory Environment - %1%%2%\n"
+                 "Copyright (C) 2003 - 2008 The VLE Development Team.\n"
+                 "VLE comes with ABSOLUTELY NO WARRANTY.\n"
+                 "You may redistribute copies of VLE\n"
+                 "under the terms of the GNU General Public License.\n"
+                 "For more information about these matters, see the file named "
+                 "COPYING.\n")) % VLE_VERSION % VLE_EXTRA_VERSION << std::endl;
 }
 
 }} // namespace vle utils

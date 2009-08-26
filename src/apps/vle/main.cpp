@@ -149,6 +149,11 @@ int main(int argc, char* argv[])
         return EXIT_SUCCESS;
     }
 
+    if (argc == 1) {
+        utils::printHelp(std::cerr);
+        return EXIT_SUCCESS;
+    }
+
     manager::CmdArgs lst;
 
     try {
