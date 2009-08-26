@@ -1,15 +1,29 @@
 VLE development team
+====================
 
-Main programmer and founder:
-----------------------------
+
+Main programmer and founder
+---------------------------
+
 - Gauthier Quesnel <quesnel@users.sourceforge.net>
 - Eric Ramat <eramat@users.sourceforge.net>
 
-Contributors:
--------------
-- Raphael Duboz <duboz@users.sourceforge.net>
-- David Versmisse <versmisse@users.sourceforge.net>
-- Philippe Blangi <blangi@users.sourceforge.net>
-- Patrick Chabrier <pchabrier@toulouse.inra.fr>
-- Hennuyer Romain <romain.hennuyer@gmail.com>
+
+Contributors
+------------
+
 - Aurélien Ansel <camumus@gmail.com>
+- Guillaume Ansel <anselg@users.sourceforge.net>
+- Raphael Duboz <duboz@users.sourceforge.net>
+- Patrick Chabrier <patrick.chabrier@toulouse.inra.fr>
+- Cyril Marcq <cmarcq@users.sourceforge.net>
+- Daniel Salomé <dansal62@users.sourceforge.net>
+- Geoffroy Weisenhorn <geoffroy.weisenhorn@gmail.com>
+
+
+Old Contributors
+----------------
+
+- Philippe Blangi <blangi@users.sourceforge.net>
+- Romain Hennuyer <romain.hennuyer@gmail.com>
+- David Versmisse <versmisse@users.sourceforge.net>
