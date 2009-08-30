@@ -25,6 +25,7 @@ TARGET_LINK_LIBRARIES(gtkdefault
   ${GTKMM_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   ${OS_SPECIFIC_LIBRARIES}
+  vleeov
   vlemanager
   vleutils
   vledata

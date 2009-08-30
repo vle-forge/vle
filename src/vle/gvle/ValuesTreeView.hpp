@@ -72,6 +72,7 @@ private:
     ModelColumns m_Columns;
     Glib::RefPtr<Gtk::ListStore> m_refTreeModel;
     Gtk::Menu mMenu;
+    Gtk::Menu mSubmenuAdd;
 
     value::Value* mValue;
 

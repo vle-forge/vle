@@ -26,6 +26,7 @@
 #ifndef VLE_DEVS_TIME_HPP
 #define VLE_DEVS_TIME_HPP
 
+#include <vle/devs/DllDefines.hpp>
 #include <vle/utils/Exception.hpp>
 #include <ostream>
 #include <limits>
@@ -38,7 +39,7 @@ namespace vle { namespace devs {
  * - The infinity is represented by std::numeric_limits < double >::max().
  * - The infinity constant static object is used to simplify the source code.
  */
-class Time
+class VLE_DEVS_EXPORT Time
 {
 public:
     /**
@@ -353,7 +354,7 @@ private:
  * }
  * @endcode
  */
-struct IsInfinity
+struct VLE_DEVS_EXPORT IsInfinity
 {
     inline bool operator()(const Time& time) const
     { return time.isInfinity(); }

@@ -27,6 +27,7 @@
 #define VLE_VPZ_PROJECT_HPP
 
 #include <vle/vpz/Base.hpp>
+#include <vle/vpz/DllDefines.hpp>
 #include <vle/vpz/Model.hpp>
 #include <vle/vpz/Dynamics.hpp>
 #include <vle/vpz/Experiment.hpp>
@@ -39,7 +40,7 @@ namespace vle { namespace vpz {
      * date, version and the hierachy of models, the list of dynamics, the
      * experiment conditions and observables, and the classes availables.
      */
-    class Project : public Base
+    class VLE_VPZ_EXPORT Project : public Base
     {
     public:
         /**

@@ -26,6 +26,7 @@
 #ifndef VLE_VPZ_VIEW_HPP
 #define VLE_VPZ_VIEW_HPP
 
+#include <vle/vpz/DllDefines.hpp>
 #include <vle/vpz/Base.hpp>
 #include <string>
 
@@ -36,7 +37,7 @@ namespace vle { namespace vpz {
      * plug-in. This View can be timed by a timestep, finish or completely
      * event and make link with Output by name.
      */
-    class View : public Base
+    class VLE_VPZ_EXPORT View : public Base
     {
     public:
         /**

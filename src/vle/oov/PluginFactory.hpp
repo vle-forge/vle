@@ -26,12 +26,11 @@
 #ifndef VLE_OOV_PLUGINFACTORY_HPP
 #define VLE_OOV_PLUGINFACTORY_HPP
 
+#include <vle/oov/DllDefines.hpp>
+#include <vle/oov/Plugin.hpp>
 #include <boost/noncopyable.hpp>
 #include <glibmm/module.h>
-#include <vle/oov/Plugin.hpp>
 #include <string>
-
-
 
 namespace vle { namespace oov {
 
@@ -40,7 +39,7 @@ namespace vle { namespace oov {
      * Plugin load dynamically from the dynamics libraries.
      *
      */
-    class PluginFactory
+    class VLE_OOV_EXPORT PluginFactory
     {
     public:
         /**

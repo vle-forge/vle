@@ -26,6 +26,7 @@
 #ifndef VLE_EOV_PLUGIN_HPP
 #define VLE_EOV_PLUGIN_HPP
 
+#include <vle/eov/DllDefines.hpp>
 #include <sigc++/trackable.h>
 #include <gdkmm/window.h>
 #include <gtkmm/widget.h>
@@ -42,7 +43,7 @@ namespace vle { namespace eov {
      * interface around a vle::oov::CairoPlugin. Use the DECLARE_EOV_PLUGIN
      * macro to develop a plugin.
      */
-    class Plugin : public sigc::trackable
+    class VLE_EOV_EXPORT Plugin : public sigc::trackable
     {
     public:
         /**
@@ -126,10 +127,17 @@ namespace vle { namespace eov {
     typedef boost::shared_ptr < Plugin > PluginPtr ;
 
 
+#if defined(__WIN32__)
+#define DECLARE_EOV_PLUGIN(x) \
+    extern "C" { __declspec(dllexport) vle::eov::Plugin* makeNewEovPlugin( \
+        vle::oov::CairoPluginPtr cairoplg, vle::eov::NetStreamReader* netsr) { \
+            return new x(cairoplg, netsr); } }
+#else
 #define DECLARE_EOV_PLUGIN(x) \
     extern "C" { vle::eov::Plugin* makeNewEovPlugin( \
         vle::oov::CairoPluginPtr cairoplg, vle::eov::NetStreamReader* netsr) { \
             return new x(cairoplg, netsr); } }
+#endif
 
 }} // namespace vle eov
 

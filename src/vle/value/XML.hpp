@@ -27,6 +27,7 @@
 #define VLE_VALUE_XML_HPP
 
 #include <vle/value/Value.hpp>
+#include <vle/value/DllDefines.hpp>
 #include <boost/serialization/string.hpp>
 
 namespace vle { namespace value {
@@ -35,7 +36,7 @@ namespace vle { namespace value {
      * @brief Xml Value encapsulates a C++ std::string type into a class to
      * perform serialization, pool of memory etc.
      */
-    class Xml : public Value
+    class VLE_VALUE_EXPORT Xml : public Value
     {
     public:
         /**

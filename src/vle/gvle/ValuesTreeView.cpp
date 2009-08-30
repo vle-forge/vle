@@ -38,7 +38,6 @@ ValuesTreeView::ValuesTreeView(
     const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/) :
     Gtk::TreeView(cobject)
 {
-    //Create the Tree model:
     m_refTreeModel = Gtk::ListStore::create(m_Columns);
     set_model(m_refTreeModel);
     buildMenu();
@@ -50,75 +49,60 @@ ValuesTreeView::~ValuesTreeView()
 
 void ValuesTreeView::buildMenu()
 {
-    Gtk::Menu::MenuList& items = mMenu.items();
-
-    items.push_back(Gtk::Menu_Helpers::MenuElem("Add"));
-
-    Gtk::MenuItem* pMenuItem = &items.back();
-    Gtk::Menu* pMenu = Gtk::manage(new Gtk::Menu());
-    Gtk::Menu_Helpers::MenuList insert = pMenu->items();
-    insert.push_back(Gtk::Menu_Helpers::MenuElem(
-			 "Boolean", sigc::bind(
-			     sigc::mem_fun(*this,
-					   &ValuesTreeView::on_menu_insert),
-			     value::Value::BOOLEAN)));
-    insert.push_back(Gtk::Menu_Helpers::MenuElem(
-			 "Double", sigc::bind(
-			     sigc::mem_fun(*this,
-					   &ValuesTreeView::on_menu_insert),
-			     value::Value::DOUBLE)));
-    insert.push_back(Gtk::Menu_Helpers::MenuElem(
-			 "Integer", sigc::bind(
-                             sigc::mem_fun(*this,
-					   &ValuesTreeView::on_menu_insert),
-			     value::Value::INTEGER)));
-    insert.push_back(Gtk::Menu_Helpers::MenuElem(
-			 "Map", sigc::bind(
-			     sigc::mem_fun(*this,
-					   &ValuesTreeView::on_menu_insert),
-			     value::Value::MAP)));
-    insert.push_back(Gtk::Menu_Helpers::MenuElem(
-			 "Matrix", sigc::bind(
-                             sigc::mem_fun(*this,
-					   &ValuesTreeView::on_menu_insert),
-			     value::Value::MATRIX)));
-    insert.push_back(Gtk::Menu_Helpers::MenuElem(
-			 "Null", sigc::bind(
-			     sigc::mem_fun(*this,
-					   &ValuesTreeView::on_menu_insert),
-			     value::Value::NIL)));
-    insert.push_back(Gtk::Menu_Helpers::MenuElem(
-			 "Set", sigc::bind(
-			     sigc::mem_fun(*this,
-					   &ValuesTreeView::on_menu_insert),
-			     value::Value::SET)));
-    insert.push_back(Gtk::Menu_Helpers::MenuElem(
-			 "String", sigc::bind(
-			     sigc::mem_fun(*this,
-					   &ValuesTreeView::on_menu_insert),
-			     value::Value::STRING)));
-    insert.push_back(Gtk::Menu_Helpers::MenuElem(
-			 "Table", sigc::bind(
-			     sigc::mem_fun(*this,
-					   &ValuesTreeView::on_menu_insert),
-			     value::Value::TABLE)));
-    insert.push_back(Gtk::Menu_Helpers::MenuElem(
-			 "Tuple", sigc::bind(
-			     sigc::mem_fun(*this,
-					   &ValuesTreeView::on_menu_insert),
-			     value::Value::TUPLE)));
-    insert.push_back(Gtk::Menu_Helpers::MenuElem(
-			 "Xml", sigc::bind(
-			     sigc::mem_fun(*this,
-					   &ValuesTreeView::on_menu_insert),
-			     value::Value::XMLTYPE)));
-
-    pMenuItem->set_submenu(*pMenu);
-
+    Gtk::Menu::MenuList& items(mMenu.items());
+    items.push_back(Gtk::Menu_Helpers::MenuElem(_("Add")));
     items.push_back(Gtk::Menu_Helpers::MenuElem(
-			"Remove",
-			sigc::mem_fun(*this,
-				      &ValuesTreeView::on_menu_remove)));
+            _("Remove"), sigc::mem_fun(
+                *this, &ValuesTreeView::on_menu_remove)));
+
+    Gtk::Menu_Helpers::MenuList& insert = mSubmenuAdd.items();
+    insert.push_back(Gtk::Menu_Helpers::MenuElem(
+            _("Boolean"), sigc::bind(
+                sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert),
+                value::Value::BOOLEAN)));
+    insert.push_back(Gtk::Menu_Helpers::MenuElem(
+            _("Double"), sigc::bind(
+                sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert),
+                value::Value::DOUBLE)));
+    insert.push_back(Gtk::Menu_Helpers::MenuElem(
+            _("Integer"), sigc::bind(
+                sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert),
+                value::Value::INTEGER)));
+    insert.push_back(Gtk::Menu_Helpers::MenuElem(
+            _("Map"), sigc::bind(
+                sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert),
+                value::Value::MAP)));
+    insert.push_back(Gtk::Menu_Helpers::MenuElem(
+            _("Matrix"), sigc::bind(
+                sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert),
+                value::Value::MATRIX)));
+    insert.push_back(Gtk::Menu_Helpers::MenuElem(
+            _("Null"), sigc::bind(
+                sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert),
+                value::Value::NIL)));
+    insert.push_back(Gtk::Menu_Helpers::MenuElem(
+            _("Set"), sigc::bind(
+                sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert),
+                value::Value::SET)));
+    insert.push_back(Gtk::Menu_Helpers::MenuElem(
+            _("String"), sigc::bind(
+                sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert),
+                value::Value::STRING)));
+    insert.push_back(Gtk::Menu_Helpers::MenuElem(
+            _("Table"), sigc::bind(
+                sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert),
+                value::Value::TABLE)));
+    insert.push_back(Gtk::Menu_Helpers::MenuElem(
+            _("Tuple"), sigc::bind(
+                sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert),
+                value::Value::TUPLE)));
+    insert.push_back(Gtk::Menu_Helpers::MenuElem(
+            _("Xml"), sigc::bind(
+                sigc::mem_fun(*this, &ValuesTreeView::on_menu_insert),
+                value::Value::XMLTYPE)));
+
+    items[0].set_submenu(mSubmenuAdd);
+    mMenu.show_all();
 }
 
 void ValuesTreeView::clear()

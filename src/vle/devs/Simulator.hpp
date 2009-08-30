@@ -26,6 +26,7 @@
 #ifndef DEVS_SIMULATOR_HPP
 #define DEVS_SIMULATOR_HPP
 
+#include <vle/devs/DllDefines.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/devs/InternalEvent.hpp>
 #include <vle/devs/ExternalEventList.hpp>
@@ -44,7 +45,7 @@ namespace vle { namespace devs {
      * represent the DEVS simulator.
      *
      */
-    class Simulator
+    class VLE_DEVS_EXPORT Simulator
     {
     public:
         /**

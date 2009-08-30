@@ -27,54 +27,55 @@
 #define VLE_UTILS_DATETIME_HPP
 
 #include <boost/date_time.hpp>
+#include <vle/utils/DllDefines.hpp>
 
 namespace vle { namespace utils {
 
-    struct DateTime
+struct VLE_UTILS_EXPORT DateTime
+{
+    enum Unit { None, Day, Week, Month, Year };
+
+    static unsigned int year(const double& time);
+    static unsigned int month(const double& time);
+    static unsigned int dayOfMonth(const double& time);
+    static unsigned int dayOfWeek(const double& time);
+    static unsigned int dayOfYear(const double& time);
+    static unsigned int weekOfYear(const double& time);
+
+    static bool isLeapYear(const double& time);
+
+    static double aYear(const double& time);
+    static double aMonth(const double& time);
+
+    static inline double aWeek()
     {
-        enum Unit { None, Day, Week, Month, Year };
+        return 7;
+    }
 
-        static unsigned int year(const double& time);
-        static unsigned int month(const double& time);
-        static unsigned int dayOfMonth(const double& time);
-        static unsigned int dayOfWeek(const double& time);
-        static unsigned int dayOfYear(const double& time);
-        static unsigned int weekOfYear(const double& time);
+    static inline double aDay()
+    {
+        return 1;
+    }
 
-        static bool isLeapYear(const double& time);
+    static double years(const double& time, unsigned int n);
+    static double months(const double& time, unsigned int n);
+    static inline double weeks(unsigned int n)
+    {
+        return (int)(7 * n);
+    }
 
-        static double aYear(const double& time);
-        static double aMonth(const double& time);
+    static inline double days(unsigned int n)
+    {
+        return (int)n;
+    }
 
-        static inline double aWeek()
-        {
-            return 7;
-        }
-
-        static inline double aDay()
-        {
-            return 1;
-        }
-
-        static double years(const double& time, unsigned int n);
-        static double months(const double& time, unsigned int n);
-        static inline double weeks(unsigned int n)
-        {
-            return (int)(7 * n);
-        }
-
-        static inline double days(unsigned int n)
-        {
-            return (int)n;
-        }
-
-        static DateTime::Unit convertUnit(const std::string& unit);
-        static double duration(const double& time, double duration, DateTime::Unit unit);
-        static std::string toJulianDayNumber(unsigned long date);
-        static long toJulianDayNumber(const std::string& date);
-        static std::string toJulianDay(double date);
-        static double toJulianDay(const std::string& date);
-
+    static DateTime::Unit convertUnit(const std::string& unit);
+    static double duration(const double& time, double duration,
+                                            DateTime::Unit unit);
+    static std::string toJulianDayNumber(unsigned long date);
+    static long toJulianDayNumber(const std::string& date);
+    static std::string toJulianDay(double date);
+    static double toJulianDay(const std::string& date);
 };
 
 }} // namespace vle utils

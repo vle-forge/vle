@@ -26,8 +26,9 @@
 #ifndef VLE_VALUE_POOLS_HPP
 #define VLE_VALUE_POOLS_HPP
 
-#include <vle/version.hpp>
 #include <vle/utils/Pool.hpp>
+#include <vle/value/DllDefines.hpp>
+#include <vle/version.hpp>
 
 #ifdef VLE_HAVE_POOL
 namespace vle { namespace value {
@@ -38,7 +39,7 @@ namespace vle { namespace value {
      * @brief A thread-safe singleton to manage a set of boost::pools defined in
      * the utils::Pools class.
      */
-    class Pools
+    class VLE_VALUE_EXPORT Pools
     {
     public:
         /**

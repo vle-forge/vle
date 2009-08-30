@@ -26,6 +26,7 @@
 #ifndef VLE_DEVS_EXTERNALEVENT_HPP
 #define VLE_DEVS_EXTERNALEVENT_HPP
 
+#include <vle/devs/DllDefines.hpp>
 #include <vle/devs/Event.hpp>
 #include <string>
 
@@ -38,7 +39,7 @@ namespace vle { namespace devs {
      * graph::Model when output function are called.
      *
      */
-    class ExternalEvent : public Event
+    class VLE_DEVS_EXPORT ExternalEvent : public Event
     {
     public:
         ExternalEvent(const std::string& sourcePortName) :

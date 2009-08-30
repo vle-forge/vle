@@ -26,6 +26,7 @@
 #ifndef DEVS_MODELFACTORY_HPP
 #define DEVS_MODELFACTORY_HPP
 
+#include <vle/devs/DllDefines.hpp>
 #include <vle/graph/Model.hpp>
 #include <vle/vpz/Classes.hpp>
 #include <vle/vpz/Model.hpp>
@@ -54,7 +55,7 @@ namespace vle { namespace devs {
      * Usefull to only store unique Glib::Module when using multiples instances
      * of a devs::Dynamics.
      */
-    class ModuleCache
+    class VLE_DEVS_EXPORT ModuleCache
     {
     public:
         /**
@@ -104,7 +105,7 @@ namespace vle { namespace devs {
      * @brief Read simulations plugin from models directories and manage models
      * classes.
      */
-    class ModelFactory : boost::noncopyable
+    class VLE_DEVS_EXPORT ModelFactory : boost::noncopyable
     {
     public:
         /**

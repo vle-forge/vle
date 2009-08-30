@@ -26,13 +26,12 @@
 #ifndef VLE_OOV_OUTPUTMATRIX_HPP
 #define VLE_OOV_OUTPUTMATRIX_HPP
 
+#include <vle/oov/DllDefines.hpp>
 #include <vle/value/Matrix.hpp>
 #include <boost/utility.hpp>
 #include <list>
 #include <string>
 #include <map>
-
-
 
 namespace vle { namespace oov {
 
@@ -42,7 +41,7 @@ namespace vle { namespace oov {
      * name) stored into a std::map to get the index of a value. The column 0 is
      * use for store a representation of the Time.
      */
-    class OutputMatrix
+    class VLE_OOV_EXPORT OutputMatrix
     {
     public:
         ///! @brief define a list of string to define list of port.

@@ -26,9 +26,8 @@
 #ifndef VLE_GRAPH_MODELPORT_HPP
 #define VLE_GRAPH_MODELPORT_HPP
 
+#include <vle/graph/DllDefines.hpp>
 #include <string>
-
-
 
 namespace vle { namespace graph {
 
@@ -38,7 +37,7 @@ namespace vle { namespace graph {
      * @brief ModelPort represents the relation between a Model and an input or
      * output port specified by a constant string.
      */
-    class ModelPort
+    class VLE_GRAPH_EXPORT ModelPort
     {
     public:
         /**

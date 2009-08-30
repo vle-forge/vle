@@ -27,6 +27,7 @@
 #define VLE_VALUE_INTEGER_HPP
 
 #include <vle/value/Value.hpp>
+#include <vle/value/DllDefines.hpp>
 #include <boost/cast.hpp>
 
 namespace vle { namespace value {
@@ -35,7 +36,7 @@ namespace vle { namespace value {
      * @brief Integer Value encapsulate a C++ 'long' type into a class to
      * perform serialization, pool of memory etc.
      */
-    class Integer : public Value
+    class VLE_VALUE_EXPORT Integer : public Value
     {
     public:
         /**

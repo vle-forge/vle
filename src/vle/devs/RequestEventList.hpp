@@ -26,6 +26,7 @@
 #ifndef DEVS_REQUESTEVENTLIST_HPP
 #define DEVS_REQUESTEVENTLIST_HPP
 
+#include <vle/devs/DllDefines.hpp>
 #include <vle/devs/EventList.hpp>
 #include <vle/devs/RequestEvent.hpp>
 

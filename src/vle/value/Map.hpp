@@ -27,8 +27,9 @@
 #define VLE_VALUE_MAP_HPP
 
 #include <vle/value/Value.hpp>
-#include <map>
+#include <vle/value/DllDefines.hpp>
 #include <boost/serialization/map.hpp>
+#include <map>
 
 namespace vle { namespace value {
 
@@ -41,7 +42,7 @@ namespace vle { namespace value {
      * @brief Map Value a container to a pair of std::string, Value pointer. The
      * map can not contains null data. .
      */
-    class Map : public Value
+    class VLE_VALUE_EXPORT Map : public Value
     {
     public:
         typedef MapValue::size_type size_type;

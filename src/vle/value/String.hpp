@@ -27,6 +27,7 @@
 #define VLE_VALUE_STRING_HPP
 
 #include <vle/value/Value.hpp>
+#include <vle/value/DllDefines.hpp>
 #include <boost/serialization/string.hpp>
 
 namespace vle { namespace value {
@@ -35,7 +36,7 @@ namespace vle { namespace value {
      * @brief String Value encapsulates a C++ std::string type into a class to
      * perform serialization, pool of memory etc.
      */
-    class String : public Value
+    class VLE_VALUE_EXPORT String : public Value
     {
     public:
         /**

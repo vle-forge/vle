@@ -13,11 +13,11 @@ IF (HAVE_SQLXX)
   SET(DATA_CPP CSVReader.cpp CSVResult.cpp DataReader.cpp DataWriter.cpp
     SQLReader.cpp SQLResult.cpp SQLWriter.cpp)
   SET(DATA_HPP CSVReader.hpp CSVResult.hpp DataReader.hpp DataWriter.hpp
-    Result.hpp SQLReader.hpp SQLResult.hpp SQLWriter.hpp)
+    DllDefines.hpp Result.hpp SQLReader.hpp SQLResult.hpp SQLWriter.hpp)
 ELSE (HAVE_SQLXX)
   SET(DATA_CPP CSVReader.cpp CSVResult.cpp DataReader.cpp DataWriter.cpp)
   SET(DATA_HPP CSVReader.hpp CSVResult.hpp DataReader.hpp DataWriter.hpp
-    Result.hpp)
+    DllDefines.hpp Result.hpp)
 ENDIF (HAVE_SQLXX)
 
 ADD_LIBRARY(vledata SHARED ${DATA_HPP};${DATA_CPP})
@@ -31,6 +31,7 @@ TARGET_LINK_LIBRARIES(vledata
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   ${LIBSQLXX_LIBRARIES}
+  ${OS_SPECIFIC_LIBRARIES}
   vlegeometry
   vleutils)
 

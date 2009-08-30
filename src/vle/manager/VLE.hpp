@@ -26,11 +26,10 @@
 #ifndef VLE_MANAGER_VLE_HPP
 #define VLE_MANAGER_VLE_HPP
 
-#include <vle/vpz/Vpz.hpp>
+#include <vle/manager/DllDefines.hpp>
 #include <vle/manager/Types.hpp>
+#include <vle/vpz/Vpz.hpp>
 #include <vector>
-
-
 
 namespace vle { namespace manager {
 
@@ -39,7 +38,7 @@ namespace vle { namespace manager {
      * the user directory and install signal. The desctructor clear all
      * singleton classes.
      */
-    class VLE
+    class VLE_MANAGER_EXPORT VLE
     {
     public:
         /**
@@ -97,7 +96,7 @@ namespace vle { namespace manager {
      * - initialize the singleton utils::Trace system.
      * - initialize the singleton \c boost::pool devs::Pools and value::Pools.
      */
-    void init();
+    VLE_MANAGER_EXPORT void init();
 
     /**
      * @brief Delete all singleton from VLE system.
@@ -106,13 +105,13 @@ namespace vle { namespace manager {
      * - kill the value::Pools singleton.
      * - kill the devs::Pools singleton.
      */
-    void finalize();
+    VLE_MANAGER_EXPORT void finalize();
 
     /**
      * @brief A simple functor to produce a vpz::Vpz object from the std::string
      * filename. To use with std::transform for example.
      */
-    struct BuildVPZ
+    struct VLE_MANAGER_EXPORT BuildVPZ
     {
         vpz::Vpz* operator()(const std::string& filename) const
         { return new vpz::Vpz(filename); }

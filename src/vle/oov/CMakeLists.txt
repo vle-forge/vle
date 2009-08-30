@@ -14,8 +14,8 @@ LINK_DIRECTORIES(
 SET(OOV_CPP LocalStreamReader.cpp NetStreamReader.cpp OOV.cpp OutputMatrix.cpp
   Plugin.cpp PluginFactory.cpp SimpleFile.cpp StreamReader.cpp)
 
-SET(OOV_HPP LocalStreamReader.hpp NetStreamReader.hpp OOV.hpp OutputMatrix.hpp
-  Plugin.hpp PluginFactory.hpp SimpleFile.hpp StreamReader.hpp)
+SET(OOV_HPP DllDefines.hpp LocalStreamReader.hpp NetStreamReader.hpp OOV.hpp
+  OutputMatrix.hpp Plugin.hpp PluginFactory.hpp SimpleFile.hpp StreamReader.hpp)
 
 IF (VLE_HAVE_CAIRO)
  SET(OOV_HPP ${OOV_HPP} CairoPlugin.hpp)
@@ -33,6 +33,7 @@ TARGET_LINK_LIBRARIES(vleoov
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
   ${CAIROMM_LIBRARIES}
+  ${OS_SPECIFIC_LIBRARIES}
   vlegeometry
   vleutils
   vledata

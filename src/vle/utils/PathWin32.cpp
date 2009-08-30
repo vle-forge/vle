@@ -30,7 +30,7 @@
 #include <vle/version.hpp>
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
-#include <Windows.h>
+#include <windows.h>
 #include <winreg.h>
 
 namespace vle { namespace utils {

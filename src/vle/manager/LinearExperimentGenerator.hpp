@@ -27,15 +27,14 @@
 #define VLE_MANAGER_LINEAREXPERIMENTGENERATOR_HPP
 
 #include <vle/manager/ExperimentGenerator.hpp>
-
-
+#include <vle/manager/DllDefines.hpp>
 
 namespace vle { namespace manager {
 
     /**
      * @brief A class to translate Experiment file into Instance of Experiment.
      */
-    class LinearExperimentGenerator : public ExperimentGenerator
+    class VLE_MANAGER_EXPORT LinearExperimentGenerator : public ExperimentGenerator
     {
     public:
         /**

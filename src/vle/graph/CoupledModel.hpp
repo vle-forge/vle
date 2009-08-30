@@ -27,9 +27,8 @@
 #define VLE_GRAPH_COUPLED_MODEL_HPP
 
 #include <vle/graph/Model.hpp>
+#include <vle/graph/DllDefines.hpp>
 #include <vector>
-
-
 
 namespace vle { namespace graph {
 
@@ -37,7 +36,7 @@ namespace vle { namespace graph {
      * @brief Represent the DEVS coupled model. This class have a list of
      * children models, three list of input, output and state connections.
      */
-    class CoupledModel : public Model
+    class VLE_GRAPH_EXPORT CoupledModel : public Model
     {
     public:
         typedef std::vector < std::string > StringList;

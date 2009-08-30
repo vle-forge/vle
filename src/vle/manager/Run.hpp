@@ -26,6 +26,7 @@
 #ifndef VLE_MANAGER_RUN_HPP
 #define VLE_MANAGER_RUN_HPP
 
+#include <vle/manager/DllDefines.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
@@ -39,7 +40,7 @@ namespace vle { namespace manager {
      * object in a verbose mode or a quiet mode. It provides an access to
      * RootCoordinator builded for this simulation.
      */
-    class Run
+    class VLE_MANAGER_EXPORT Run
     {
     public:
         /**
@@ -90,7 +91,7 @@ namespace vle { namespace manager {
      * specified vpz::Vpz object with verbose mode to standard error. This
      * class is a functor to be use with std::for_each.
      */
-    class RunVerbose : public Run
+    class VLE_MANAGER_EXPORT RunVerbose : public Run
     {
     public:
         RunVerbose(std::ostream& out);
@@ -148,7 +149,7 @@ namespace vle { namespace manager {
      * specified vpz::Vpz object with verbose mode into std::string and a member
      * to access it. This class is a functor to be use with std::for_each.
      */
-    class RunQuiet : public Run
+    class VLE_MANAGER_EXPORT RunQuiet : public Run
     {
     public:
         /**

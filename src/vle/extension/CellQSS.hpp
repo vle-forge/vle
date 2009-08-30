@@ -26,12 +26,13 @@
 #ifndef VLE_EXTENSION_CELLQSS_HPP
 #define VLE_EXTENSION_CELLQSS_HPP
 
+#include <vle/extension/DllDefines.hpp>
 #include <vle/extension/CellDevs.hpp>
 #include <vle/devs/Dynamics.hpp>
 
 namespace vle { namespace extension {
 
-    class CellQSS : public CellDevs
+    class VLE_EXTENSION_EXPORT CellQSS : public CellDevs
     {
     public:
         CellQSS(const graph::AtomicModel& model,
@@ -99,6 +100,7 @@ namespace vle { namespace extension {
         inline void setState(unsigned int i,state p_state);
 
     };
+
 }} // namespace vle extension
 
 #endif

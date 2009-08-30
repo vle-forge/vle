@@ -26,12 +26,13 @@
 #ifndef VLE_VPZ_CONDITION_HPP
 #define VLE_VPZ_CONDITION_HPP
 
+#include <vle/vpz/Base.hpp>
+#include <vle/vpz/DllDefines.hpp>
+#include <vle/value/Map.hpp>
+#include <vle/value/Set.hpp>
 #include <string>
 #include <map>
 #include <list>
-#include <vle/vpz/Base.hpp>
-#include <vle/value/Map.hpp>
-#include <vle/value/Set.hpp>
 
 namespace vle { namespace vpz {
 
@@ -49,7 +50,7 @@ namespace vle { namespace vpz {
      * @brief Define the ValueList, a wrapper to the ConditionValue which
      * represents the (portname, value) list.
      */
-    class ValueList
+    class VLE_VPZ_EXPORT ValueList
     {
     public:
         /**
@@ -136,7 +137,7 @@ namespace vle { namespace vpz {
      * @brief A condition define a couple model name, port name and a Value.
      * This class allow loading and writing a condition.
      */
-    class Condition : public Base
+    class VLE_VPZ_EXPORT Condition : public Base
     {
     public:
         /**

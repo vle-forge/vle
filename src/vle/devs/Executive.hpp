@@ -26,6 +26,7 @@
 #ifndef VLE_DEVS_EXECUTIVE_HPP
 #define VLE_DEVS_EXECUTIVE_HPP
 
+#include <vle/devs/DllDefines.hpp>
 #include <vle/devs/Coordinator.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/graph/CoupledModel.hpp>
@@ -43,7 +44,7 @@ namespace vle { namespace devs {
      * default, this model does nothing and it will be inherit to build
      * simulation components.
      */
-    class Executive : public Dynamics
+    class VLE_DEVS_EXPORT Executive : public Dynamics
     {
     public:
 	/**

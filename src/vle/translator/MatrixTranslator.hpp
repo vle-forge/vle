@@ -26,6 +26,7 @@
 #ifndef VLE_TRANSLATOR_MATRIXTRANSLATOR_HPP
 #define VLE_TRANSLATOR_MATRIXTRANSLATOR_HPP
 
+#include <vle/translator/DllDefines.hpp>
 #include <vle/devs/Executive.hpp>
 #include <string>
 #include <vector>
@@ -103,7 +104,7 @@ namespace vle { namespace translator {
      * Mmoore = 4
      * @endcode
      */
-    class MatrixTranslator
+    class VLE_TRANSLATOR_EXPORT MatrixTranslator
     {
     public:
         MatrixTranslator(devs::Executive& exe)

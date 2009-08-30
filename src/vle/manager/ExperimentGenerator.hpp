@@ -29,19 +29,18 @@
 #include <vle/value/Value.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/manager/Types.hpp>
+#include <vle/manager/DllDefines.hpp>
 #include <string>
 #include <vector>
 #include <list>
 #include <glibmm/thread.h>
-
-
 
 namespace vle { namespace manager {
 
     /**
      * @brief A class to translate Experiment file into Instance of Experiment.
      */
-    class ExperimentGenerator
+    class VLE_MANAGER_EXPORT ExperimentGenerator
     {
     public:
         /**

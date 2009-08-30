@@ -26,6 +26,7 @@
 #ifndef DEVS_EVENTTABLE_HPP
 #define DEVS_EVENTTABLE_HPP
 
+#include <vle/devs/DllDefines.hpp>
 #include <vle/devs/Event.hpp>
 #include <vle/devs/InternalEvent.hpp>
 #include <vle/devs/ExternalEvent.hpp>
@@ -71,7 +72,7 @@ namespace vle { namespace devs {
      * Request event if exist.
      *
      */
-    class EventBagModel
+    class VLE_DEVS_EXPORT EventBagModel
     {
     public:
 	inline EventBagModel() :
@@ -163,7 +164,7 @@ namespace vle { namespace devs {
      * @brief Represent a set of event bags for all model.
      *
      */
-    class CompleteEventBagModel
+    class VLE_DEVS_EXPORT CompleteEventBagModel
     {
     public:
 	CompleteEventBagModel()
@@ -267,7 +268,7 @@ namespace vle { namespace devs {
      * @brief Scheduller class to manage internal, external and state events.
      *
      */
-    class EventTable
+    class VLE_DEVS_EXPORT EventTable
     {
     public:
         /**

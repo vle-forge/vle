@@ -26,6 +26,7 @@
 #ifndef DEVS_ATTRIBUTE_HPP
 #define DEVS_ATTRIBUTE_HPP
 
+#include <vle/devs/DllDefines.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/value/Integer.hpp>
 #include <vle/value/Double.hpp>

@@ -27,13 +27,12 @@
 #define VLE_GRAPH_MODEL_HPP
 
 #include <vle/graph/ModelPortList.hpp>
+#include <vle/graph/DllDefines.hpp>
 #include <ostream>
 #include <vector>
 #include <map>
 #include <list>
 #include <set>
-
-
 
 namespace vle { namespace graph {
 
@@ -52,7 +51,7 @@ namespace vle { namespace graph {
      * @brief The DEVS model base class.
      *
      */
-    class Model
+    class VLE_GRAPH_EXPORT Model
     {
     public:
         /**

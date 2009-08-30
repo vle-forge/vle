@@ -29,9 +29,8 @@
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
+#include <vle/utils/DllDefines.hpp>
 #include <boost/format.hpp>
-
-
 
 namespace vle {
 

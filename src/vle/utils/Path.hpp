@@ -30,7 +30,7 @@
 #include <string>
 #include <list>
 #include <ostream>
-
+#include <vle/utils/DllDefines.hpp>
 
 namespace vle { namespace utils {
 
@@ -56,7 +56,7 @@ namespace vle { namespace utils {
      * //  - $VLE_HOME/toto if VLE_HOME is defined.
      * @endcode
      */
-    class Path
+    class VLE_UTILS_EXPORT Path
     {
     public:
         /**
@@ -470,8 +470,8 @@ namespace vle { namespace utils {
          */
         void initPackageDirs();
 
-        static Path* mPath; /**< The static variable Path for singleton design
-                              pattern. */
+        static Path* VLE_UTILS_EXPORT mPath; /**< The static variable Path for
+                                               singleton design pattern. */
     };
 
     /**
@@ -480,7 +480,8 @@ namespace vle { namespace utils {
      * @param paths The list of path.
      * @return The output stream.
      */
-    std::ostream& operator<<(std::ostream& out, const PathList& paths);
+    std::ostream& VLE_UTILS_EXPORT operator<<(std::ostream& out,
+                                              const PathList& paths);
 
     /**
      * @brief Stream operator to show the content of the Path class.
@@ -488,7 +489,7 @@ namespace vle { namespace utils {
      * @param p The Path to show.
      * @return The output stream.
      */
-    std::ostream& operator<<(std::ostream& out, const Path& p);
+    std::ostream& VLE_UTILS_EXPORT operator<<(std::ostream& out, const Path& p);
 
 }} // namespace vle utils
 

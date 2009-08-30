@@ -28,7 +28,7 @@
 
 #include <set>
 #include <string>
-
+#include <vle/utils/DllDefines.hpp>
 
 namespace vle { namespace utils {
 
@@ -43,7 +43,7 @@ namespace vle { namespace utils {
      * The hostname value is a string and it accepts IP address or complete
      * hostname.
      */
-    class Host
+    class VLE_UTILS_EXPORT Host
     {
     public:
         /**
@@ -132,7 +132,7 @@ namespace vle { namespace utils {
      * class can write XML hosts file and add/remove host.
      *
      */
-    class Hosts
+    class VLE_UTILS_EXPORT Hosts
     {
     public:
         typedef std::set < Host > SetHosts;

@@ -26,6 +26,7 @@
 #ifndef DEVS_COORDINATOR_HPP
 #define DEVS_COORDINATOR_HPP
 
+#include <vle/devs/DllDefines.hpp>
 #include <vle/devs/Simulator.hpp>
 #include <vle/devs/EventView.hpp>
 #include <vle/devs/EventTable.hpp>
@@ -50,7 +51,7 @@ namespace vle { namespace devs {
      * model.
      *
      */
-    class Coordinator
+    class VLE_DEVS_EXPORT Coordinator
     {
     public:
         Coordinator(ModelFactory& modelfactory);

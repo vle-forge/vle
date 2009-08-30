@@ -17,7 +17,8 @@ LINK_DIRECTORIES(
 
 SET(EOV_CPP NetStreamReader.cpp Plugin.cpp Window.cpp MainWindow.cpp)
 
-SET(EOV_HPP NetStreamReader.hpp Plugin.hpp Window.hpp MainWindow.hpp)
+SET(EOV_HPP DllDefines.hpp NetStreamReader.hpp Plugin.hpp Window.hpp
+  MainWindow.hpp)
 
 ADD_LIBRARY(vleeov SHARED ${EOV_CPP};${EOV_HPP})
 

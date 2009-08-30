@@ -27,8 +27,7 @@
 #define UTILS_TRACE_HPP
 
 #include <fstream>
-
-
+#include <vle/utils/DllDefines.hpp>
 
 namespace vle { namespace utils {
 
@@ -46,7 +45,7 @@ namespace vle { namespace utils {
      * DTrace2("Clear file");
      * @endcode
      */
-    class Trace
+    class VLE_UTILS_EXPORT Trace
     {
     public:
 	enum Level { ALWAYS, IMPORTANT, INFORMATION, DEBUG };
@@ -166,11 +165,11 @@ namespace vle { namespace utils {
 
         ~Trace();
 
-        std::ofstream*  m_file;
-	std::string     m_filename;
-	Level           m_minlevel;
-        static Trace*   m_trace;
-        unsigned int    m_warnings;
+        std::ofstream* m_file;
+	std::string    m_filename;
+	Level          m_minlevel;
+        static Trace*  m_trace;
+        unsigned int   m_warnings;
     };
 
 }} // namespace vle utils

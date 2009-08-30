@@ -28,6 +28,7 @@
 
 #include <vle/data/Result.hpp>
 #include <vle/data/CSVReader.hpp>
+#include <vle/data/DllDefines.hpp>
 #include <map>
 #include <string>
 #include <list>
@@ -35,7 +36,7 @@
 
 namespace vle { namespace data {
 
-    class CSVResult:public Result
+    class VLE_DATA_EXPORT CSVResult : public Result
     {
     public:
         virtual ~CSVResult();

@@ -28,13 +28,14 @@
 #include <fstream>
 #include <map>
 #include <string>
+#include <vle/utils/DllDefines.hpp>
 
 namespace vle { namespace utils {
 
 typedef std::map < std::string, std::string > KeyValue;
 typedef std::map < std::string, KeyValue > Settings;
 
-class Preferences
+class VLE_UTILS_EXPORT Preferences
 {
 public:
     Preferences(const std::string& file = "vle.conf");

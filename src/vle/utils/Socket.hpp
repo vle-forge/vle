@@ -29,8 +29,7 @@
 #include <string>
 #include <map>
 #include <boost/cstdint.hpp> // for boost::int32_t
-
-
+#include <vle/utils/DllDefines.hpp>
 
 namespace vle { namespace utils {
 
@@ -58,9 +57,9 @@ namespace vle { namespace utils {
      * is localhost.
      * @param port output parameter to receive TCP/IP port. Default is 8000.
      */
-    void explodeStringNet(const std::string& input,
-                          std::string& ip,
-                          int& port);
+    VLE_UTILS_EXPORT void explodeStringNet(const std::string& input,
+                                           std::string& ip,
+                                           int& port);
 
     /**
      * @brief Parse the input string to find correct TCP/IP address, port and
@@ -81,15 +80,15 @@ namespace vle { namespace utils {
      * @param port output parameter to receive TCP/IP port. Default is 8000.
      * @param directory output parameter to receive directory. Default is empty.
      */
-    void explodeStringNet(const std::string& input,
-                          std::string& ip,
-                          int& port,
-                          std::string& directory);
+    VLE_UTILS_EXPORT void explodeStringNet(const std::string& input,
+                                           std::string& ip,
+                                           int& port,
+                                           std::string& directory);
 
     /**
      * @brief Define base class of socket Client and Server classes.
      */
-    class Base
+    class VLE_UTILS_EXPORT Base
     {
     public:
         Base();
@@ -204,7 +203,7 @@ namespace vle { namespace utils {
      * utils::net::Client c("vle.univ-littoral.fr", 8000);
      * @endcode
      */
-    class Client : public Base
+    class VLE_UTILS_EXPORT Client : public Base
     {
     public:
         /**
@@ -319,7 +318,7 @@ namespace vle { namespace utils {
      * utils::net::Server s(8000);
      * @endcode
      */
-    class Server : public Base
+    class VLE_UTILS_EXPORT Server : public Base
     {
     public:
         Server(int port);

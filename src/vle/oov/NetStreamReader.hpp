@@ -27,9 +27,8 @@
 #define VLE_OOV_NETSTREAMREADER_HPP
 
 #include <vle/oov/StreamReader.hpp>
+#include <vle/oov/DllDefines.hpp>
 #include <vle/utils/Socket.hpp>
-
-
 
 namespace vle { namespace oov {
 
@@ -38,7 +37,7 @@ namespace vle { namespace oov {
      * an TCP/IP access to the observations information produced by models and
      * sends via the devs::NetStreamWriter.
      */
-    class NetStreamReader : public StreamReader
+    class VLE_OOV_EXPORT NetStreamReader : public StreamReader
     {
     public:
         /**
@@ -189,7 +188,6 @@ namespace vle { namespace oov {
 
     inline const std::string& NetStreamReader::buffer() const
     { return m_buffer; }
-
 
 }} // namespace vle oov
 

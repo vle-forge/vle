@@ -26,6 +26,7 @@
 #ifndef VLE_DEVS_EVENT_HPP
 #define VLE_DEVS_EVENT_HPP
 
+#include <vle/devs/DllDefines.hpp>
 #include <vle/version.hpp>
 #include <vle/devs/Pools.hpp>
 #include <vle/devs/Time.hpp>
@@ -43,7 +44,7 @@ namespace vle { namespace devs {
      * initialisation, state and external events.
      *
      */
-    class Event
+    class VLE_DEVS_EXPORT Event
     {
     public:
         /** Define an enumeration to type event in conflict function.
@@ -392,12 +393,12 @@ namespace vle { namespace devs {
     /**
      * @brief Initialize the Pools singleton.
      */
-    void init();
+    VLE_DEVS_EXPORT void init();
 
     /**
      * @brief Kill the Pools singleton.
      */
-    void finalize();
+    VLE_DEVS_EXPORT void finalize();
 
 }} // namespace vle devs
 

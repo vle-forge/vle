@@ -13,7 +13,7 @@ SET(MANAGER_CPP ExperimentGenerator.cpp JustRun.cpp
   LinearExperimentGenerator.cpp Manager.cpp Run.cpp SimulatorDistant.cpp
   TotalExperimentGenerator.cpp VLE.cpp)
 
-SET(MANAGER_HPP ExperimentGenerator.hpp JustRun.hpp
+SET(MANAGER_HPP DllDefines.hpp ExperimentGenerator.hpp JustRun.hpp
   LinearExperimentGenerator.hpp Manager.hpp Run.hpp SimulatorDistant.hpp
   TotalExperimentGenerator.hpp Types.hpp VLE.hpp)
 
@@ -27,6 +27,7 @@ TARGET_LINK_LIBRARIES(vlemanager
   ${GLIBMM_LIBRARIES}
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
+  ${OS_SPECIFIC_LIBRARIES}
   vlegeometry
   vleutils
   vledata

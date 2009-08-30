@@ -26,6 +26,7 @@
 #ifndef VLE_DEVS_TIMED_VIEW_HPP
 #define VLE_DEVS_TIMED_VIEW_HPP
 
+#include <vle/devs/DllDefines.hpp>
 #include <vle/devs/View.hpp>
 #include <vle/devs/ObservationEvent.hpp>
 
@@ -36,7 +37,7 @@ namespace vle { namespace devs {
      * build state event with timed clock.
      *
      */
-    class TimedView : public View
+    class VLE_DEVS_EXPORT TimedView : public View
     {
     public:
         TimedView(const std::string& name, StreamWriter* stream,
@@ -47,7 +48,8 @@ namespace vle { namespace devs {
         virtual bool isTimed() const
         { return true; }
 
-	virtual devs::ObservationEvent* processObservationEvent(devs::ObservationEvent* event);
+        virtual devs::ObservationEvent*
+            processObservationEvent(devs::ObservationEvent* event);
 
     private:
 	Time                    m_timeStep;

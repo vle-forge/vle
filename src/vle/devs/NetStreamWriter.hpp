@@ -26,14 +26,13 @@
 #ifndef VLE_DEVS_NETSTREAMWRITER_HPP
 #define VLE_DEVS_NETSTREAMWRITER_HPP
 
+#include <vle/devs/DllDefines.hpp>
 #include <vle/devs/StreamWriter.hpp>
 #include <vle/utils/Socket.hpp>
 
-
-
 namespace vle { namespace devs {
 
-    class NetStreamWriter : public StreamWriter
+    class VLE_DEVS_EXPORT NetStreamWriter : public StreamWriter
     {
     public:
         NetStreamWriter();

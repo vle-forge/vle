@@ -28,30 +28,32 @@
 
 #include <vle/data/DataReader.hpp>
 #include <vle/data/Result.hpp>
+#include <vle/data/DllDefines.hpp>
 #include <sqlxx.h>
 #include <strutilsxx.h>
 #include <map>
 
 namespace vle { namespace data {
 
-    class SQLReader:public DataReader
+    class VLE_DATA_EXPORT SQLReader : public DataReader
     {
     public:
         enum type { MYSQL, POSTGRES, ODBC };
 
-        static SQLReader* open(const std::string & databaseName,
-                               type type = MYSQL,
-                               const std::string & userName = "",
-                               const std::string & password = "",
-                               const std::string & hostName = "",
-                               unsigned int port = 0);
+        static SQLReader* VLE_DATA_EXPORT open(
+            const std::string & databaseName,
+            type type = MYSQL,
+            const std::string & userName = "",
+            const std::string & password = "",
+            const std::string & hostName = "",
+            unsigned int port = 0);
 
         virtual ~SQLReader() { }
         virtual void close();
         virtual Result* exec(const std::string&);
 
     private:
-        static std::map < std::string , SQLReader* > databases;
+        static std::map < std::string , SQLReader* > VLE_DATA_EXPORT databases;
         sqlxx::CSQL SQL;
 
         SQLReader(const std::string & databaseName,

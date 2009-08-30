@@ -26,8 +26,9 @@
 #ifndef VLE_VPZ_DYNAMICS_HPP
 #define VLE_VPZ_DYNAMICS_HPP
 
-#include <map>
+#include <vle/vpz/DllDefines.hpp>
 #include <vle/vpz/Dynamic.hpp>
+#include <map>
 
 namespace vle { namespace vpz {
 
@@ -40,7 +41,7 @@ namespace vle { namespace vpz {
      * @brief The vpz::Dynamics class wrap the DynamicList and provides
      * functions to access it.
      */
-    class Dynamics : public Base
+    class VLE_VPZ_EXPORT Dynamics : public Base
     {
     public:
         /**

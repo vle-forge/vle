@@ -27,6 +27,7 @@
 #define VLE_VALUE_DOUBLE_HPP
 
 #include <vle/value/Value.hpp>
+#include <vle/value/DllDefines.hpp>
 
 namespace vle { namespace value {
 
@@ -34,7 +35,7 @@ namespace vle { namespace value {
      * @brief Double Value encapsulate a C++ 'double' type into a class to
      * perform serialization, pool of memory etc.
      */
-    class Double : public Value
+    class VLE_VALUE_EXPORT Double : public Value
     {
     public:
         /**

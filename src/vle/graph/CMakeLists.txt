@@ -12,8 +12,8 @@ LINK_DIRECTORIES(
 SET(GRAPH_CPP AtomicModel.cpp CoupledModel.cpp Model.cpp ModelPort.cpp
   ModelPortList.cpp)
 
-SET(GRAPH_HPP AtomicModel.hpp CoupledModel.hpp Model.hpp ModelPort.hpp
-  ModelPortList.hpp)
+SET(GRAPH_HPP AtomicModel.hpp CoupledModel.hpp DllDefines.hpp Model.hpp
+  ModelPort.hpp ModelPortList.hpp)
 
 ADD_LIBRARY(vlegraph SHARED ${GRAPH_CPP};${GRAPH_HPP})
 
@@ -25,6 +25,7 @@ TARGET_LINK_LIBRARIES(vlegraph
   ${GLIBMM_LIBRARIES}
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
+  ${OS_SPECIFIC_LIBRARIES}
   vlegeometry
   vleutils
   vledata

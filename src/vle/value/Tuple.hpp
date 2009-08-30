@@ -27,8 +27,9 @@
 #define VLE_VALUE_TUPLE_HPP
 
 #include <vle/value/Value.hpp>
-#include <vector>
+#include <vle/value/DllDefines.hpp>
 #include <boost/serialization/vector.hpp>
+#include <vector>
 
 namespace vle { namespace value {
 
@@ -41,7 +42,7 @@ namespace vle { namespace value {
      * @brief A Tuple Value is a container to store a list of double value into
      * an std::vector standard container.
      */
-    class Tuple : public Value
+    class VLE_VALUE_EXPORT Tuple : public Value
     {
     public:
         typedef TupleValue::size_type size_type;

@@ -26,6 +26,7 @@
 #ifndef VLE_VPZ_OBSERVABLES_HPP
 #define VLE_VPZ_OBSERVABLES_HPP
 
+#include <vle/vpz/DllDefines.hpp>
 #include <vle/vpz/Base.hpp>
 #include <vle/vpz/Observable.hpp>
 #include <map>
@@ -42,7 +43,7 @@ namespace vle { namespace vpz {
      * @brief Observables is a container based on ObservableList to build a list
      * of Observable using the Observable's name as key.
      */
-    class Observables : public Base
+    class VLE_VPZ_EXPORT Observables : public Base
     {
     public:
         /**

@@ -26,6 +26,7 @@
 #ifndef VLE_DEVS_OBSERVABLE_HPP
 #define VLE_DEVS_OBSERVABLE_HPP
 
+#include <vle/devs/DllDefines.hpp>
 #include <map>
 #include <string>
 

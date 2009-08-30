@@ -26,11 +26,12 @@
 #ifndef VLE_DATA_RESULT_HPP
 #define VLE_DATA_RESULT_HPP
 
+#include <vle/data/DllDefines.hpp>
 #include <string>
 
 namespace vle { namespace data {
 
-    class Result
+    class VLE_DATA_EXPORT Result
     {
     public:
         Result() { }

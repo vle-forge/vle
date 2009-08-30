@@ -22,14 +22,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 #ifndef VLE_EXTENSION_DIFFERENTIAL_EQUATION_HPP
 #define VLE_EXTENSION_DIFFERENTIAL_EQUATION_HPP
 
+#include <vle/extension/DllDefines.hpp>
 #include <vle/devs/Dynamics.hpp>
 
 namespace vle { namespace extension {
 
-    class DifferentialEquation : public vle::devs::Dynamics
+    class VLE_EXTENSION_EXPORT DifferentialEquation : public vle::devs::Dynamics
     {
     protected:
 

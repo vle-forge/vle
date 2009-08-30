@@ -30,6 +30,7 @@
 #include <glibmm/thread.h>
 #include <string>
 #include <list>
+#include <vle/utils/DllDefines.hpp>
 
 namespace vle { namespace utils {
 
@@ -46,7 +47,7 @@ namespace vle { namespace utils {
      * utils::Package::Package().configure(std::cout, std::cerr);
      * @encode
      */
-    class Package
+    class VLE_UTILS_EXPORT Package
     {
     public:
         /**

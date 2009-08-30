@@ -26,11 +26,12 @@
 #ifndef VLE_OOV_OOV_HPP
 #define VLE_OOV_OOV_HPP
 
+#include <vle/oov/DllDefines.hpp>
 #include <ostream>
 
 namespace vle { namespace oov {
 
-    class OOV
+    class VLE_OOV_EXPORT OOV
     {
     public:
         /**

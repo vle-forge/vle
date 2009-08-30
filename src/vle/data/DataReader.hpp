@@ -27,10 +27,11 @@
 #define VLE_DATA_DATA_READER_HPP
 
 #include <vle/data/Result.hpp>
+#include <vle/data/DllDefines.hpp>
 
 namespace vle { namespace data {
 
-    class DataReader
+    class VLE_DATA_EXPORT DataReader
     {
     public:
         DataReader() { }

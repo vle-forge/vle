@@ -36,6 +36,7 @@
 #include <vle/utils/Socket.hpp>
 #include <vle/utils/Rand.hpp>
 #include <vle/manager/ExperimentGenerator.hpp>
+#include <vle/manager/DllDefines.hpp>
 #include <boost/noncopyable.hpp>
 
 namespace vle { namespace manager {
@@ -48,7 +49,7 @@ namespace vle { namespace manager {
      * ManagerRun provides and access to the oov::PluginPtr object of the
      * simulation.
      */
-    class ManagerRun : public boost::noncopyable
+    class VLE_MANAGER_EXPORT ManagerRun : public boost::noncopyable
     {
     public:
         /**
@@ -114,7 +115,7 @@ namespace vle { namespace manager {
      * @brief ManagerRunMono is the class for running experimental frames onto
      * the same host with only one thread.
      */
-    class ManagerRunMono : public ManagerRun
+    class VLE_MANAGER_EXPORT ManagerRunMono : public ManagerRun
     {
     public:
         /**
@@ -172,7 +173,7 @@ namespace vle { namespace manager {
      * @brief ManagerRunThread is the class for running experimental frames onto
      * the same host with a specific number of threads.
      */
-    class ManagerRunThread : public ManagerRun
+    class VLE_MANAGER_EXPORT ManagerRunThread : public ManagerRun
     {
     public:
         /**
@@ -247,7 +248,7 @@ namespace vle { namespace manager {
      * onto distant nodes. It parses the user hosts file to get Simulator
      * position and lauch simulation on hosts in immediate mode.
      */
-    class ManagerRunDistant : public ManagerRun
+    class VLE_MANAGER_EXPORT ManagerRunDistant : public ManagerRun
     {
     public:
         /**

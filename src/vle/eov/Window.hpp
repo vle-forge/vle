@@ -26,6 +26,7 @@
 #ifndef VLE_EOV_WINDOW_HPP
 #define VLE_EOV_WINDOW_HPP
 
+#include <vle/eov/DllDefines.hpp>
 #include <gtkmm/window.h>
 #include <gtkmm/box.h>
 #include <glibmm/timer.h>
@@ -33,7 +34,7 @@
 
 namespace vle { namespace eov {
 
-    class Window : public Gtk::Window
+    class VLE_EOV_EXPORT Window : public Gtk::Window
     {
     public:
         Window(Glib::Mutex& mutex, int time);

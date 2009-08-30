@@ -26,12 +26,12 @@
 #ifndef VLE_MANAGER_SIMULATORDISTANT_HPP
 #define VLE_MANAGER_SIMULATORDISTANT_HPP
 
+#include <vle/manager/DllDefines.hpp>
 #include <glibmm/thread.h>
 #include <glibmm/threadpool.h>
 #include <queue>
 #include <vle/utils/Socket.hpp>
 #include <vle/manager/JustRun.hpp>
-
 
 namespace vle { namespace vpz {
 
@@ -48,7 +48,7 @@ namespace vle { namespace manager {
      * simulator daemon are, "proc" for max processor, "size" the number of vpzi
      * to run, "file" to send a buffer size and "exit" to close connection.
      */
-    class SimulatorDistant
+    class VLE_MANAGER_EXPORT SimulatorDistant
     {
     public:
         /**

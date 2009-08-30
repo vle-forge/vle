@@ -279,9 +279,9 @@ BOOST_AUTO_TEST_CASE(show_package)
 BOOST_AUTO_TEST_CASE(date_time)
 {
     BOOST_REQUIRE_EQUAL(vle::utils::DateTime::year((2451545)),
-			2000);
+			2000u);
     BOOST_REQUIRE_EQUAL(vle::utils::DateTime::month((2451545)),
-			1);
+			1u);
     BOOST_REQUIRE_EQUAL(
 	vle::utils::DateTime::dayOfMonth((2451545)), 1);
     BOOST_REQUIRE_EQUAL(

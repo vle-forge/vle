@@ -26,27 +26,30 @@
 #ifndef VLE_EXTENSION_QSS2_HPP
 #define VLE_EXTENSION_QSS2_HPP
 
+#include <vle/extension/DllDefines.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vector>
 #include <map>
 
 namespace vle { namespace extension {
 
-    struct Couple {
+    struct VLE_EXTENSION_EXPORT Couple
+    {
         double value;
         double derivative;
     };
 
     class qss2;
 
-    class mfi
+    class VLE_EXTENSION_EXPORT mfi
     {
     public:
         mfi(qss2*,unsigned int,unsigned int);
         virtual ~mfi();
 
         Couple init();
-        Couple ext(const vle::devs::Time& p_time, unsigned int i,const Couple & couple);
+        Couple ext(const vle::devs::Time& time, unsigned int i,
+                   const Couple& couple);
 
     private:
         qss2* m_qss;
@@ -63,7 +66,7 @@ namespace vle { namespace extension {
 
     typedef mfi* pmfi;
 
-    class qss2:public devs::Dynamics
+    class VLE_EXTENSION_EXPORT qss2 : public devs::Dynamics
     {
         friend class mfi;
 

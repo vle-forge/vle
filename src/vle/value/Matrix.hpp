@@ -27,6 +27,7 @@
 #define VLE_VALUE_MATRIX_HPP
 
 #include <vle/value/Value.hpp>
+#include <vle/value/DllDefines.hpp>
 #include <boost/multi_array.hpp>
 
 namespace vle { namespace value {
@@ -51,7 +52,7 @@ namespace vle { namespace value {
      * Boost library (http://www.boost.org) class of two dimension of
      * value::Value.
      */
-    class Matrix : public Value
+    class VLE_VALUE_EXPORT Matrix : public Value
     {
     public:
         /// Define indices of Matrix.
@@ -466,7 +467,7 @@ namespace vle { namespace value {
      * @brief A functor to test is a Value is a Matrix. To use with algorithms
      * of test.
      */
-    struct IsMatrixValue
+    struct VLE_VALUE_EXPORT IsMatrixValue
     {
         bool operator()(const value::Value& value) const
         { return value.getType() == Value::MATRIX; }

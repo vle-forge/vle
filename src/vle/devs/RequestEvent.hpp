@@ -26,6 +26,7 @@
 #ifndef DEVS_REQUESTEVENT_HPP
 #define DEVS_REQUESTEVENT_HPP
 
+#include <vle/devs/DllDefines.hpp>
 #include <vle/devs/ExternalEvent.hpp>
 
 namespace vle { namespace devs {
@@ -35,7 +36,7 @@ namespace vle { namespace devs {
      * build by graph::Model to precess Request event.
      *
      */
-    class RequestEvent : public ExternalEvent
+    class VLE_DEVS_EXPORT RequestEvent : public ExternalEvent
     {
     public:
 	RequestEvent(const std::string& sourcePortName) :

@@ -151,7 +151,7 @@ namespace vle { namespace geometry {
          */
         inline Class distance(const Point<n, Class>& p) const
         {
-            return (Class)sqrt((double)distanceSquared(p));
+            return (Class)std::sqrt(distanceSquared(p));
         }
 
         /**

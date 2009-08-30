@@ -26,11 +26,11 @@
 #ifndef VLE_OOV_SIMPLEFILE_HPP
 #define VLE_OOV_SIMPLEFILE_HPP
 
+#include <vle/oov/DllDefines.hpp>
 #include <vle/oov/Plugin.hpp>
 #include <fstream>
 #include <map>
 #include <vector>
-
 
 namespace vle { namespace oov { namespace plugin {
 
@@ -57,7 +57,7 @@ namespace vle { namespace oov { namespace plugin {
      *  </key>
      * </map>
      */
-    class SimpleFile : public Plugin
+    class VLE_OOV_EXPORT SimpleFile : public Plugin
     {
     public:
         SimpleFile(const std::string& location);

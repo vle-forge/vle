@@ -28,6 +28,7 @@
 
 #include <glib/gtypes.h>
 #include <vle/vpz/Base.hpp>
+#include <vle/vpz/DllDefines.hpp>
 
 namespace vle { namespace vpz {
 
@@ -35,7 +36,7 @@ namespace vle { namespace vpz {
      * @brief This class allow load and writing REPLICAS tag into project file
      * VPZ.
      */
-    class Replicas : public Base
+    class VLE_VPZ_EXPORT Replicas : public Base
     {
     public:
         /**

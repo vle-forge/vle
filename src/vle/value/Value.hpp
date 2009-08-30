@@ -29,6 +29,7 @@
 #include <vle/version.hpp>
 #include <vle/value/Pools.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/value/DllDefines.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
@@ -54,7 +55,7 @@ namespace vle { namespace value {
     /**
      * @brief Virtual class to assign Value into Event object.
      */
-    class Value
+    class VLE_VALUE_EXPORT Value
     {
     public:
         enum type { BOOLEAN, INTEGER, DOUBLE, STRING, SET, MAP, TUPLE, TABLE,
@@ -323,7 +324,7 @@ namespace vle { namespace value {
      * iterator it = std::find_if(begin(), end(), IsComposite());
      * @endcode
      */
-    struct IsComposite
+    struct VLE_VALUE_EXPORT IsComposite
     {
         bool operator()(const Value& val) const
         { return Value::isComposite(&val); }
@@ -339,7 +340,7 @@ namespace vle { namespace value {
      * std::transform(vec.begin(), vec.end(), out.begin(), CloneValue());
      * @endcode
      */
-    struct CloneValue
+    struct VLE_VALUE_EXPORT CloneValue
     {
 	Value* operator()(const Value& val) const
 	{ return val.clone(); }
@@ -351,12 +352,12 @@ namespace vle { namespace value {
     /**
      * @brief Initialize the Pools singleton.
      */
-    void init();
+    VLE_VALUE_EXPORT void init();
 
     /**
      * @brief Kill the Pools singleton.
      */
-    void finalize();
+    VLE_VALUE_EXPORT void finalize();
 
 }} // namespace vle
 

@@ -26,6 +26,7 @@
 #ifndef VLE_VPZ_ATOMICMODELS_HPP
 #define VLE_VPZ_ATOMICMODELS_HPP
 
+#include <vle/vpz/DllDefines.hpp>
 #include <vle/graph/Model.hpp>
 #include <iterator>
 #include <string>
@@ -42,7 +43,7 @@ namespace vle { namespace vpz {
      * @brief The AtomicModel class is used by the AtomicModelList to attach an
      * atomic model to his conditions, observables and dynamics names.
      */
-    class AtomicModel
+    class VLE_VPZ_EXPORT AtomicModel
     {
     public:
         /**
@@ -144,7 +145,7 @@ namespace vle { namespace vpz {
      * @brief The AtomicModelList class is a dictionary used to attach atomic
      * model to conditions and dynamics names.
      */
-    class AtomicModelList
+    class VLE_VPZ_EXPORT AtomicModelList
     {
     public:
         /**
@@ -331,7 +332,7 @@ namespace vle { namespace vpz {
      *               *newmygraph));
      * @endcode
      */
-    struct CopyAtomicModel
+    struct VLE_VPZ_EXPORT CopyAtomicModel
     {
         /**
          * @brief The constructor.

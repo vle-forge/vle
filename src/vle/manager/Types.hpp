@@ -26,6 +26,7 @@
 #ifndef VLE_MANAGER_TYPE_HPP
 #define VLE_MANAGER_TYPE_HPP
 
+#include <vle/manager/DllDefines.hpp>
 #include <boost/multi_array.hpp>
 #include <vle/oov/Plugin.hpp>
 #include <vle/oov/OutputMatrix.hpp>
@@ -69,7 +70,7 @@ namespace vle { namespace manager  {
     /**
      * @brief
      */
-    struct OutputSimulationDistant
+    struct VLE_MANAGER_EXPORT OutputSimulationDistant
     {
         OutputSimulationDistant(int instance, int replica,
                                 const oov::OutputMatrixViewList& outputs) :

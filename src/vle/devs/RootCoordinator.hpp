@@ -26,6 +26,7 @@
 #ifndef DEVS_ROOTCOORDINATOR_HPP
 #define DEVS_ROOTCOORDINATOR_HPP
 
+#include <vle/devs/DllDefines.hpp>
 #include <vle/utils/Rand.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/vpz/Vpz.hpp>
@@ -48,7 +49,7 @@ namespace vle { namespace devs {
      * Coordinators.
      *
      */
-    class RootCoordinator
+    class VLE_DEVS_EXPORT RootCoordinator
     {
     public:
 	RootCoordinator();

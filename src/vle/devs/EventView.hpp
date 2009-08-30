@@ -26,6 +26,7 @@
 #ifndef VLE_DEVS_EVENT_VIEW_HPP
 #define VLE_DEVS_EVENT_VIEW_HPP
 
+#include <vle/devs/DllDefines.hpp>
 #include <vle/devs/View.hpp>
 #include <vle/devs/ObservationEvent.hpp>
 
@@ -35,7 +36,7 @@ namespace vle { namespace devs {
      * @brief Define a Event View base on devs::View class. This class
      * build state event when event are push.
      */
-    class EventView : public View
+    class VLE_DEVS_EXPORT EventView : public View
     {
     public:
         EventView(const std::string& name, StreamWriter* stream);

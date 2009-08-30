@@ -9,7 +9,7 @@ LINK_DIRECTORIES(
   ${GLIBMM_LIBRARY_DIRS}
   ${LIBXML_LIBRARY_DIR})
 
-SET(TRANSLATOR_HPP MatrixTranslator.hpp)
+SET(TRANSLATOR_HPP DllDefines.hpp MatrixTranslator.hpp)
 
 SET(TRANSLATOR_CPP MatrixTranslator.cpp)
 
@@ -23,6 +23,7 @@ TARGET_LINK_LIBRARIES(vletranslator
   ${GLIBMM_LIBRARIES}
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
+  ${OS_SPECIFIC_LIBRARIES}
   vlegeometry
   vleutils
   vledata

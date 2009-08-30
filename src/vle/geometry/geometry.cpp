@@ -27,6 +27,7 @@
 #include <vle/geometry/Point.hpp>
 #include <vle/geometry/Tuple.hpp>
 #include <vle/geometry/Vector.hpp>
+#include <cstring>
 
 namespace vle {
 

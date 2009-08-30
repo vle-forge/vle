@@ -26,6 +26,7 @@
 #ifndef VLE_DEVS_VIEW_HPP
 #define VLE_DEVS_VIEW_HPP
 
+#include <vle/devs/DllDefines.hpp>
 #include <vle/devs/Observable.hpp>
 #include <vle/devs/ObservationEvent.hpp>
 #include <vle/oov/Plugin.hpp>
@@ -45,7 +46,7 @@ namespace vle { namespace devs {
      * @brief Represent a View on a devs::Simulator and a port name.
      *
      */
-    class View
+    class VLE_DEVS_EXPORT View
     {
     public:
         View(const std::string& name, StreamWriter* stream);

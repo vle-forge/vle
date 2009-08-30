@@ -37,6 +37,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <vle/utils/DllDefines.hpp>
 
 namespace vle { namespace utils {
 
@@ -88,7 +89,7 @@ namespace vle { namespace utils {
      * @param buffer buffer to write.
      * @return filename of the new tempory file.
      */
-    std::string write_to_temp(const std::string& prefix,
+    VLE_UTILS_EXPORT std::string write_to_temp(const std::string& prefix,
                               const std::string& buffer);
 
     /**
@@ -242,7 +243,8 @@ namespace vle { namespace utils {
      * @param def default value to return.
      * @return result of convertion, default if error.
      */
-    inline double to_double(const std::string& str, double def = 0.0)
+    inline double to_double(const std::string& str,
+                                             double def = 0.0)
     {
         try {
             return boost::lexical_cast < double >(str);
@@ -293,7 +295,8 @@ namespace vle { namespace utils {
      * @param def default value to return.
      * @return result of convertion, default if error.
      */
-    inline unsigned int to_uint(const std::string& str, unsigned int def = 0)
+    inline unsigned int to_uint(const std::string& str,
+                                                 unsigned int def = 0)
     {
         try {
             return boost::lexical_cast < unsigned int >(str);
@@ -310,7 +313,8 @@ namespace vle { namespace utils {
      * @param def default value to return.
      * @return result of convertion, default if error.
      */
-    inline size_t to_size_t(const std::string& str, size_t def = 0)
+    inline size_t to_size_t(const std::string& str,
+                                             size_t def = 0)
     {
         try {
             return boost::lexical_cast < size_t >(str);
@@ -327,7 +331,8 @@ namespace vle { namespace utils {
      * @param def default value to return.
      * @return result of convertion, default if error.
      */
-    inline bool to_boolean(const std::string& str, bool def = false)
+    inline bool to_boolean(const std::string& str,
+                                            bool def = false)
     {
         if (str == "true") {
             return true;
@@ -439,8 +444,7 @@ namespace vle { namespace utils {
      *
      * @return string representation of date.
      */
-    std::string get_current_date();
-
+    VLE_UTILS_EXPORT std::string get_current_date();
 
     /**
      * @brief Write the current date and time in the format:
@@ -451,7 +455,7 @@ namespace vle { namespace utils {
      *
      * @return string representation of the date.
      */
-    std::string get_simple_current_date();
+    VLE_UTILS_EXPORT std::string get_simple_current_date();
 
     /**
      * Return true if unicode string str is an ascii string with only
@@ -460,24 +464,24 @@ namespace vle { namespace utils {
      * @param str unicode string to test validity in VLE name
      * @return true if str is correct, otherwise, false.
      */
-    bool is_vle_string(const Glib::ustring& str);
+    VLE_UTILS_EXPORT bool is_vle_string(const Glib::ustring& str);
 
     /**
      * @Return the stirng representation of error. This string begin with ten
      * minus characters.
      *
      */
-    Glib::ustring print_trace_report();
+    VLE_UTILS_EXPORT Glib::ustring print_trace_report();
 
     /**
      * Slot of lauched signals.
      *
      * @param signal_number signal description.
      */
-    void print_trace_signals(int signal_number);
+    VLE_UTILS_EXPORT void print_trace_signals(int signal_number);
 
     /** Connection signal to print_trace_signals. */
-    void install_signal();
+    VLE_UTILS_EXPORT void install_signal();
 
     /**
      * @brief Demangle the input type info from C++ compiler.
@@ -487,7 +491,7 @@ namespace vle { namespace utils {
      *
      * @return the demangled string or the same if libcwd is not linked.
      */
-    std::string demangle(const std::type_info& in);
+    VLE_UTILS_EXPORT std::string demangle(const std::type_info& in);
 
     /**
      * @brief Demangle the input string from C++ compiler.
@@ -497,7 +501,7 @@ namespace vle { namespace utils {
      *
      * @return the demangled string or the same if libcwd is not linked.
      */
-    std::string demangle(const std::string& in);
+    VLE_UTILS_EXPORT std::string demangle(const std::string& in);
 
     /**
      * @brief Get the user vle directory, $HOME/.vle and build it if necessary.
@@ -505,14 +509,14 @@ namespace vle { namespace utils {
      *
      * @return The string $HOME/.vle or empty string if error.
      */
-    std::string getUserDirectory();
+    VLE_UTILS_EXPORT std::string getUserDirectory();
 
     /**
      * @brief Change the current process to daemon. Current path is reset to
      * '/' on Linux/Unix and 'c://' to Windows, adjust the session and
      * close all opened files.
      */
-    void buildDaemon();
+    VLE_UTILS_EXPORT void buildDaemon();
 
     /**
      * @brief Initialize the VLE system by:
@@ -522,33 +526,33 @@ namespace vle { namespace utils {
      * - initialize the WinSock
      * - initialize the thread system.
      */
-    void init();
+    VLE_UTILS_EXPORT void init();
 
     /**
      * @brief Destroy all singleton and close systems.
      */
-    void finalize();
+    VLE_UTILS_EXPORT void finalize();
 
     /**
      * @brief Print the VLE version, copyright and an help message.
      *
      * @param out The stream where push the information.
      */
-    void printHelp(std::ostream& out);
+    VLE_UTILS_EXPORT void printHelp(std::ostream& out);
 
     /**
      * @brief Return the VLE version, copyright and the licences.
      *
      * @param out The stream where push the informations.
      */
-    void printInformations(std::ostream& out);
+    VLE_UTILS_EXPORT void printInformations(std::ostream& out);
 
     /**
      * @brief Return the VLE version
      *
      * @param out
      */
-    void printVersion(std::ostream& out);
+    VLE_UTILS_EXPORT void printVersion(std::ostream& out);
 
 }} // namespace vle utils
 

@@ -26,6 +26,7 @@
 #ifndef VLE_VPZ_EXPERIMENT_HPP
 #define VLE_VPZ_EXPERIMENT_HPP
 
+#include <vle/vpz/DllDefines.hpp>
 #include <vle/vpz/Base.hpp>
 #include <vle/vpz/Replicas.hpp>
 #include <vle/vpz/Conditions.hpp>
@@ -38,7 +39,7 @@ namespace vle { namespace vpz {
      * @brief The experiment class stores information about experimental
      * conditions (initials values), observations, replicas, etc.
      */
-    class Experiment : public Base
+    class VLE_VPZ_EXPORT Experiment : public Base
     {
     public:
         /**

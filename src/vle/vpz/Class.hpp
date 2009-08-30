@@ -26,8 +26,9 @@
 #ifndef VLE_VPZ_CLASS_HPP
 #define VLE_VPZ_CLASS_HPP
 
-#include <vle/vpz/Base.hpp>
 #include <vle/vpz/AtomicModels.hpp>
+#include <vle/vpz/Base.hpp>
+#include <vle/vpz/DllDefines.hpp>
 
 namespace vle { namespace vpz {
 
@@ -36,7 +37,7 @@ namespace vle { namespace vpz {
      * new graph::Model hierarchy and a vpz::AtomicModels class to build easily
      * new structure of models.
      */
-    class Class : public Base
+    class VLE_VPZ_EXPORT Class : public Base
     {
     public:
         /**

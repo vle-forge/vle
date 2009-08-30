@@ -27,6 +27,7 @@
 #define VLE_VALUE_TABLE_HPP
 
 #include <vle/value/Value.hpp>
+#include <vle/value/DllDefines.hpp>
 #include <boost/multi_array.hpp>
 
 namespace vle { namespace value {
@@ -40,7 +41,7 @@ namespace vle { namespace value {
      * @brief A table is a container for double value into an
      * boost::multi_array < double, 2 >. The XML format is:
      */
-    class Table : public Value
+    class VLE_VALUE_EXPORT Table : public Value
     {
     public:
         typedef TableValue::index index;

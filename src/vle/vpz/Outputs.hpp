@@ -28,6 +28,7 @@
 
 #include <vle/vpz/Base.hpp>
 #include <vle/vpz/Output.hpp>
+#include <vle/vpz/DllDefines.hpp>
 #include <map>
 #include <vector>
 #include <string>
@@ -43,7 +44,7 @@ namespace vle { namespace vpz {
      * @brief Outputs is a container based on OutputList to build a list of
      * Output using the Output's name as key.
      */
-    class Outputs : public Base
+    class VLE_VPZ_EXPORT Outputs : public Base
     {
     public:
         /**

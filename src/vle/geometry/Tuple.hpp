@@ -28,6 +28,7 @@
 
 #include <ostream>
 #include <valarray>
+#include <cmath>
 
 namespace vle { namespace geometry {
 
@@ -213,7 +214,7 @@ namespace vle { namespace geometry {
         {
             Tuple<n, Class> valAvg(this->average());
             Tuple<n, Class> diff((*this) - valAvg);
-            return sqrt((diff * diff).sum() / (Class) n);
+            return std::sqrt((diff * diff).sum() / (Class) n);
         }
     };
 

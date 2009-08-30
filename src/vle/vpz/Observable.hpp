@@ -26,6 +26,7 @@
 #ifndef VLE_VPZ_OBSERVABLE_HPP
 #define VLE_VPZ_OBSERVABLE_HPP
 
+#include <vle/vpz/DllDefines.hpp>
 #include <vle/vpz/Base.hpp>
 #include <map>
 #include <list>
@@ -53,7 +54,7 @@ namespace vle { namespace vpz {
      * </port>
      * @endcode
      */
-    class ObservablePort : public Base
+    class VLE_VPZ_EXPORT ObservablePort : public Base
     {
     public:
         /**
@@ -204,7 +205,7 @@ namespace vle { namespace vpz {
      * </observable>
      * @endcode
      */
-    class Observable : public Base
+    class VLE_VPZ_EXPORT Observable : public Base
     {
     public:
         /**

@@ -26,6 +26,7 @@
 #ifndef VLE_DEVS_POOLS_HPP
 #define VLE_DEVS_POOLS_HPP
 
+#include <vle/devs/DllDefines.hpp>
 #include <vle/version.hpp>
 #include <vle/utils/Pool.hpp>
 
@@ -34,7 +35,7 @@ namespace vle { namespace devs {
 
     class Event;
 
-    class Pools
+    class VLE_DEVS_EXPORT Pools
     {
     public:
         /**

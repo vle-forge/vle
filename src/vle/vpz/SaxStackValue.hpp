@@ -34,6 +34,7 @@
 #include <vle/value/Tuple.hpp>
 #include <vle/value/Table.hpp>
 #include <vle/utils/Debug.hpp>
+#include <vle/vpz/DllDefines.hpp>
 
 namespace vle { namespace vpz {
 
@@ -42,7 +43,7 @@ namespace vle { namespace vpz {
      * more particulary, the complex value::Value like value::Set, value::Map,
      * value::Matrix.
      */
-    class ValueStackSax
+    class VLE_VPZ_EXPORT ValueStackSax
     {
     public:
         /**

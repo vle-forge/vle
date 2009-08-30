@@ -37,7 +37,7 @@
 #include <cstring>
 
 #ifdef G_OS_WIN32
-#include    <Windows.h>
+#include    <windows.h>
 #include    <io.h>
 #else
 #   include <sys/wait.h>
@@ -186,7 +186,7 @@ void Package::pack()
 
 void Package::waitProcess()
 {
-#ifdef __WIN32__
+#ifdef G_OS_WIN32
     /* WaitFor*() functions, or examine its exit code with GetExitCodeProcess */
     DWORD status = 0;
 
@@ -198,9 +198,11 @@ void Package::waitProcess()
 
     result = waitpid(m_pid, &status, 0);
     if (result == -1) {
-        int e = errno;
-        appendError((fmt(_("Error waiting process: %1%")) %
-                 Glib::strerror(e)).str());
+        if (not WIFEXITED(status)) {
+            int e = errno;
+            appendError((fmt(_("Error waiting process: %1%")) %
+                         Glib::strerror(e)).str());
+        }
     }
 #endif
 
@@ -301,7 +303,8 @@ void Package::process(const std::string& workingDir,
 
         Glib::spawn_async_with_pipes(workingDir,
                                      lst,
-				     Glib::SPAWN_SEARCH_PATH,
+				     Glib::SPAWN_SEARCH_PATH |
+                                     Glib::SPAWN_DO_NOT_REAP_CHILD,
                                      sigc::slot < void >(),
                                      &m_pid,
                                      0, &out, &err);

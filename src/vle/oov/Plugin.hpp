@@ -26,6 +26,7 @@
 #ifndef VLE_OOV_PLUGIN_HPP
 #define VLE_OOV_PLUGIN_HPP
 
+#include <vle/oov/DllDefines.hpp>
 #include <vle/oov/OutputMatrix.hpp>
 #include <vle/value/Set.hpp>
 
@@ -46,7 +47,7 @@ namespace vle { namespace oov {
      * DECLARE_OOV_PLUGIN(Gnuplot);
      * @endcode
      */
-    class Plugin
+    class VLE_OOV_EXPORT Plugin
     {
     public:
         /**

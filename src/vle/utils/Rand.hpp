@@ -34,6 +34,7 @@
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/lognormal_distribution.hpp>
 #include <boost/random/exponential_distribution.hpp>
+#include <vle/utils/DllDefines.hpp>
 
 namespace vle { namespace utils {
 
@@ -58,7 +59,7 @@ namespace vle { namespace utils {
      * r.lognormal(1.0, 0.0);
      * @endcode
      */
-    class Rand
+    class VLE_UTILS_EXPORT Rand
     {
     public:
         typedef boost::mt19937::result_type result_type;

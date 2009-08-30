@@ -26,16 +26,15 @@
 #ifndef VLE_MANAGER_TOTALEXPERIMENTGENERATOR_HPP
 #define VLE_MANAGER_TOTALEXPERIMENTGENERATOR_HPP
 
+#include <vle/manager/DllDefines.hpp>
 #include <vle/manager/ExperimentGenerator.hpp>
-
-
 
 namespace vle { namespace manager {
 
     /**
      * @brief A class to translate Experiment file into Instance of Experiment.
      */
-    class TotalExperimentGenerator : public ExperimentGenerator
+    class VLE_MANAGER_EXPORT TotalExperimentGenerator : public ExperimentGenerator
     {
     public:
         /**

@@ -27,6 +27,7 @@
 #define VLE_UTILS_POOL_HPP
 
 #include <vle/version.hpp>
+#include <vle/utils/DllDefines.hpp>
 
 #ifdef VLE_HAVE_POOL
 #include <glibmm/thread.h>

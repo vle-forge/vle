@@ -35,7 +35,7 @@ Output::Output()
 }
 
 Output::Output(const Output& output)
-    : m_format(output.m_format), m_name(output.m_name),
+    : Base(output), m_format(output.m_format), m_name(output.m_name),
     m_plugin(output.m_plugin), m_location(output.m_location)
 {
     if (output.m_data) {

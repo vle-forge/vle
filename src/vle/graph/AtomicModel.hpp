@@ -27,8 +27,7 @@
 #define VLE_GRAPH_ATOMIC_MODEL_HPP
 
 #include <vle/graph/Model.hpp>
-
-
+#include <vle/graph/DllDefines.hpp>
 
 namespace vle { namespace graph {
 
@@ -36,7 +35,7 @@ namespace vle { namespace graph {
      * @brief Represent the Atomic Model in DEVS formalism. This class just
      * represent the graph not the DEVS Simulator.
      */
-    class AtomicModel : public Model
+    class VLE_GRAPH_EXPORT AtomicModel : public Model
     {
     public:
         /**

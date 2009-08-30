@@ -26,6 +26,7 @@
 #ifndef VLE_EXTENSION_DIFFERENCE_EQUATION_HPP
 #define VLE_EXTENSION_DIFFERENCE_EQUATION_HPP
 
+#include <vle/extension/DllDefines.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/utils/DateTime.hpp>
 #include <set>
@@ -36,7 +37,7 @@ namespace vle { namespace extension { namespace DifferenceEquation {
      * @brief Base The class Base encapsules the general
      * mecanisms of DifferenceEquation extension.
      */
-    class Base : public devs::Dynamics
+    class VLE_EXTENSION_EXPORT Base : public devs::Dynamics
     {
     protected:
         typedef std::deque < double > Values;
@@ -340,7 +341,7 @@ namespace vle { namespace extension { namespace DifferenceEquation {
         int mWaiting;
     };
 
-    class Simple : public Base
+    class VLE_EXTENSION_EXPORT Simple : public Base
     {
     public:
         /**
@@ -470,7 +471,7 @@ namespace vle { namespace extension { namespace DifferenceEquation {
         int mSize;
     };
 
-    class Multiple : public Base
+    class VLE_EXTENSION_EXPORT Multiple : public Base
     {
         typedef std::map < std::string, bool > SetValuesMap;
 
@@ -685,7 +686,7 @@ namespace vle { namespace extension { namespace DifferenceEquation {
         SetValuesMap mSetValues;
     };
 
-    class Generic : public Simple
+    class VLE_EXTENSION_EXPORT Generic : public Simple
     {
     public:
         /**
@@ -760,7 +761,6 @@ namespace vle { namespace extension { namespace DifferenceEquation {
         ValuesMapIterator mValuesIt;
         ValuesMapIterator mNamesIt;
     };
-
 
 }}} // namespace vle extension DifferenceEquation
 

@@ -22,14 +22,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 #ifndef VLE_EXTENSION_QSS_HPP
 #define VLE_EXTENSION_QSS_HPP
 
+#include <vle/extension/DllDefines.hpp>
 #include <vle/extension/DifferentialEquation.hpp>
 
 namespace vle { namespace extension { namespace QSS {
 
-    class Simple : public vle::extension::DifferentialEquation
+    class VLE_EXTENSION_EXPORT Simple : public vle::extension::DifferentialEquation
     {
     public:
         Simple(const vle::graph::AtomicModel& model,
@@ -55,7 +57,7 @@ namespace vle { namespace extension { namespace QSS {
         { return x * mPrecision; }
     };
 
-    class Multiple : public devs::Dynamics
+    class VLE_EXTENSION_EXPORT Multiple : public devs::Dynamics
     {
     protected:
 

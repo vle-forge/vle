@@ -76,6 +76,7 @@ private:
     Glib::RefPtr<Gtk::ListStore> m_refTreeModel;
 
     Gtk::Menu mMenu;
+    Gtk::Menu mSubmenuInsert;
 
     value::Value* mValue;
 

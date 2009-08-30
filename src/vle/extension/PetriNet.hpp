@@ -26,6 +26,7 @@
 #ifndef VLE_EXTENSION_PETRINET_HPP
 #define VLE_EXTENSION_PETRINET_HPP
 
+#include <vle/extension/DllDefines.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vector>
 #include <map>
@@ -81,7 +82,7 @@ namespace vle { namespace extension {
      * </port>
      * @endcode
      */
-    class PetriNet : public devs::Dynamics
+    class VLE_EXTENSION_EXPORT PetriNet : public devs::Dynamics
     {
     public:
         /**
@@ -488,8 +489,9 @@ namespace vle { namespace extension {
                               const pairTimeTransition& y);
     };
 
-    bool operator<(const PetriNet::pairTimeTransition& x,
-                   const PetriNet::pairTimeTransition& y);
+    VLE_EXTENSION_EXPORT bool operator<(
+        const PetriNet::pairTimeTransition& x,
+        const PetriNet::pairTimeTransition& y);
 
 }} // namespace vle extension
 

@@ -22,16 +22,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 #ifndef VLE_EXTENSION_DESS_HPP
 #define VLE_EXTENSION_DESS_HPP
 
 #include <vle/extension/DifferentialEquation.hpp>
+#include <vle/extension/DllDefines.hpp>
 
 namespace vle { namespace extension {
 
     class DESS;
 
-    class Method
+    class VLE_EXTENSION_EXPORT Method
     {
     public:
         Method(DESS& dess):dess(dess) {}
@@ -44,7 +46,7 @@ namespace vle { namespace extension {
         DESS& dess;
     };
 
-    class DESS : public vle::extension::DifferentialEquation
+    class VLE_EXTENSION_EXPORT DESS : public vle::extension::DifferentialEquation
     {
     public:
         DESS(const vle::graph::AtomicModel& model,
@@ -69,7 +71,7 @@ namespace vle { namespace extension {
         friend struct Euler;
     };
 
-    class RK4 : public Method
+    class VLE_EXTENSION_EXPORT RK4 : public Method
     {
     public:
         RK4(DESS& dess) : Method(dess) {}
@@ -79,7 +81,7 @@ namespace vle { namespace extension {
         virtual void operator()(const vle::devs::Time& time);
     };
 
-    class Euler : public Method
+    class VLE_EXTENSION_EXPORT Euler : public Method
     {
     public:
         Euler(DESS& dess):Method(dess) {}

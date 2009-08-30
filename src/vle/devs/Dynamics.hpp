@@ -26,6 +26,7 @@
 #ifndef DEVS_DYNAMICS_HPP
 #define DEVS_DYNAMICS_HPP
 
+#include <vle/devs/DllDefines.hpp>
 #include <vle/devs/RootCoordinator.hpp>
 #include <vle/devs/Event.hpp>
 #include <vle/devs/Time.hpp>
@@ -70,7 +71,7 @@ namespace vle { namespace devs {
      * must be inherits to build simulation components.
      *
      */
-    class Dynamics
+    class VLE_DEVS_EXPORT Dynamics
     {
     public:
 	/**

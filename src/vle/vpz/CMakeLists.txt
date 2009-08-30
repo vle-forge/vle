@@ -15,10 +15,10 @@ SET(VPZ_CPP AtomicModels.cpp Class.cpp Classes.cpp Condition.cpp Conditions.cpp
   SaxStackValue.cpp SaxStackVpz.cpp View.cpp Views.cpp Vpz.cpp SaxParser.cpp)
 
 SET(VPZ_HPP AtomicModels.hpp Base.hpp Classes.hpp Class.hpp Condition.hpp
-  Conditions.hpp Dynamic.hpp Dynamics.hpp Experiment.hpp Model.hpp
-  Observable.hpp Observables.hpp Output.hpp Outputs.hpp Port.hpp Project.hpp
-  Replicas.hpp SaxStackValue.hpp SaxStackVpz.hpp Structures.hpp View.hpp
-  Views.hpp Vpz.hpp SaxParser.hpp)
+  Conditions.hpp DllDefines.hpp Dynamic.hpp Dynamics.hpp Experiment.hpp
+  Model.hpp Observable.hpp Observables.hpp Output.hpp Outputs.hpp Port.hpp
+  Project.hpp Replicas.hpp SaxStackValue.hpp SaxStackVpz.hpp Structures.hpp
+  View.hpp Views.hpp Vpz.hpp SaxParser.hpp)
 
 ADD_LIBRARY(vlevpz SHARED ${VPZ_HPP};${VPZ_CPP})
 
@@ -30,6 +30,7 @@ TARGET_LINK_LIBRARIES(vlevpz
   ${GLIBMM_LIBRARIES}
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
+  ${OS_SPECIFIC_LIBRARIES}
   vlegeometry
   vleutils
   vledata

@@ -27,10 +27,11 @@
 #define UTILS_SIMPSON_HPP
 
 #include <cstddef>
+#include <vle/utils/DllDefines.hpp>
 
 namespace vle { namespace utils {
 
-    class Simpson
+    class VLE_UTILS_EXPORT Simpson
     {
     public:
         Simpson() :

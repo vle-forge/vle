@@ -176,7 +176,7 @@ namespace vle { namespace geometry {
          */
         inline Class length() const
         {
-            return (Class)sqrt((double)lengthSquared());
+            return (Class)std::sqrt(lengthSquared());
         }
 
         /**

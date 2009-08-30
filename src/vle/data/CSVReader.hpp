@@ -28,6 +28,7 @@
 
 #include <vle/data/DataReader.hpp>
 #include <vle/data/Result.hpp>
+#include <vle/data/DllDefines.hpp>
 #include <fstream>
 #include <map>
 #include <string>
@@ -35,15 +36,16 @@
 
 namespace vle { namespace data {
 
-    class CSVReader:public DataReader
+    class VLE_DATA_EXPORT CSVReader : public DataReader
     {
     public:
         enum t_type { NO_TITLE, TITLE, MATRIX };
 
-        static CSVReader& open(const std::string& fileName,
-                               const std::string& separator = ";",
-                               t_type type = TITLE,
-                               unsigned int columnNumber = 0);
+        static VLE_DATA_EXPORT CSVReader& open(
+            const std::string& fileName,
+            const std::string& separator = ";",
+            t_type type = TITLE,
+            unsigned int columnNumber = 0);
 
         virtual ~CSVReader();
 
@@ -101,7 +103,7 @@ namespace vle { namespace data {
                 std::pair < unsigned int, CSVReader* > > readers;
         };
 
-        static CSVReaderMap map;
+        static CSVReaderMap VLE_DATA_EXPORT map;
         std::string name;
         t_type type;
         std::ifstream file;

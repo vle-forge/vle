@@ -26,6 +26,7 @@
 #ifndef VLE_DEVS_FINISH_VIEW_HPP
 #define VLE_DEVS_FINISH_VIEW_HPP
 
+#include <vle/devs/DllDefines.hpp>
 #include <vle/devs/View.hpp>
 #include <vle/devs/ObservationEvent.hpp>
 
@@ -35,7 +36,7 @@ namespace vle { namespace devs {
      * @brief Define a Finish view based on devs::View class. This class build
      * state event only at the end of the simulation.
      */
-    class FinishView : public View
+    class VLE_DEVS_EXPORT FinishView : public View
     {
     public:
         FinishView(const std::string& name, StreamWriter* stream);

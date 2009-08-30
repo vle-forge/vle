@@ -26,6 +26,7 @@
 #ifndef DEVS_INTERNALEVENT_HPP
 #define DEVS_INTERNALEVENT_HPP
 
+#include <vle/devs/DllDefines.hpp>
 #include <vle/devs/Event.hpp>
 
 namespace vle { namespace devs {
@@ -37,7 +38,7 @@ namespace vle { namespace devs {
      * EventTable), to manager the internal transition and the time advance
      * function.
      */
-    class InternalEvent : public Event
+    class VLE_DEVS_EXPORT InternalEvent : public Event
     {
     public:
 	InternalEvent(const Time& time, Simulator* model) :

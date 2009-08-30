@@ -26,6 +26,7 @@
 #ifndef DEVS_DYNAMICSWRAPPER_HPP
 #define DEVS_DYNAMICSWRAPPER_HPP
 
+#include <vle/devs/DllDefines.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <string>
 
@@ -37,7 +38,7 @@ namespace vle { namespace devs {
      * programming language.
      *
      */
-    class DynamicsWrapper: public Dynamics
+    class VLE_DEVS_EXPORT DynamicsWrapper : public Dynamics
     {
     public:
 	/**

@@ -11,7 +11,7 @@ LINK_DIRECTORIES(
 
 SET(GEOMETRY_CPP geometry.cpp)
 
-SET(GEOMETRY_HPP Box.hpp Point.hpp Tuple.hpp Vector.hpp)
+SET(GEOMETRY_HPP Box.hpp Point.hpp Tuple.hpp Vector.hpp DllDefines.hpp)
 
 ADD_LIBRARY(vlegeometry SHARED ${GEOMETRY_HPP};${GEOMETRY_CPP})
 

@@ -28,13 +28,14 @@
 
 #include <vle/data/Result.hpp>
 #include <vle/data/SQLReader.hpp>
+#include <vle/data/DllDefines.hpp>
 #include <string>
 #include <sqlxx.h>
 #include <strutilsxx.h>
 
 namespace vle { namespace data {
 
-    class SQLResult:public Result
+    class VLE_DATA_EXPORT SQLResult : public Result
     {
     private:
         sqlxx::CSQLResult *value;
@@ -52,7 +53,6 @@ namespace vle { namespace data {
         virtual unsigned int getRowNumber() const;
 
         friend class SQLReader;
-
     };
 
 }} // namespace vle data

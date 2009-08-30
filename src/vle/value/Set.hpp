@@ -27,8 +27,9 @@
 #define VLE_VALUE_SET_HPP
 
 #include <vle/value/Value.hpp>
-#include <vector>
+#include <vle/value/DllDefines.hpp>
 #include <boost/serialization/vector.hpp>
+#include <vector>
 
 namespace vle { namespace value {
 
@@ -41,7 +42,7 @@ namespace vle { namespace value {
      * @brief Set Value is a container of Value object and can not contains null
      * pointer.
      */
-    class Set : public Value
+    class VLE_VALUE_EXPORT Set : public Value
     {
     public:
 	typedef VectorValue::size_type size_type;

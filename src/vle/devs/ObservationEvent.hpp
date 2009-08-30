@@ -26,6 +26,7 @@
 #ifndef DEVS_OBSERVATION_EVENT_HPP
 #define DEVS_OBSERVATION_EVENT_HPP
 
+#include <vle/devs/DllDefines.hpp>
 #include <vle/devs/Event.hpp>
 #include <vector>
 
@@ -36,7 +37,7 @@ namespace vle { namespace devs {
      * TimedView or EventView.
      *
      */
-    class ObservationEvent : public Event
+    class VLE_DEVS_EXPORT ObservationEvent : public Event
     {
     public:
 	ObservationEvent(const Time& time,

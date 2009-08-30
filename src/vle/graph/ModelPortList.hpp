@@ -27,14 +27,12 @@
 #define VLE_GRAPH_MODELPORTLIST_HPP
 
 #include <vle/graph/ModelPort.hpp>
+#include <vle/graph/DllDefines.hpp>
 #include <map>
-
-
 
 namespace vle { namespace graph {
 
-
-    class ModelPortList
+    class VLE_GRAPH_EXPORT ModelPortList
     {
     public:
         typedef std::multimap < Model*, std::string > value_type;

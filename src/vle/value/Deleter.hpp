@@ -39,6 +39,7 @@
 #include <vle/value/Tuple.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/value/XML.hpp>
+#include <vle/value/DllDefines.hpp>
 #include <stack>
 
 namespace vle { namespace value {
