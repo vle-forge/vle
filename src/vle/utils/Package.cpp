@@ -37,14 +37,13 @@
 #include <cstring>
 
 #ifdef G_OS_WIN32
-#include    <windows.h>
-#include    <io.h>
+#   include <windows.h>
+#   include <io.h>
 #else
 #   include <sys/wait.h>
 #   include <unistd.h>
 #   include <errno.h>
 #endif
-
 
 namespace vle { namespace utils {
 
@@ -279,11 +278,7 @@ void Package::renameFile(const std::string& oldFile, std::string& newName)
 
 void Package::select(const std::string& name)
 {
-    if (name.empty()) {
-        m_name.clear();
-    } else {
-        m_name.assign(name);
-    }
+    m_table.current(name);
     Path::path().updatePackageDirs();
 }
 

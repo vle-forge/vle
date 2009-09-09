@@ -1,5 +1,5 @@
 /**
- * @file vle/utils.hpp
+ * @file vle/utils/PackageTable.cpp
  * @author The VLE Development Team
  */
 
@@ -22,38 +22,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#ifndef VLE_UTILS_UTILS_HPP
-#define VLE_UTILS_UTILS_HPP
-
-#include <vle/utils/Algo.hpp>
-#include <vle/utils/DateTime.hpp>
-#include <vle/utils/Debug.hpp>
-#include <vle/utils/Exception.hpp>
-#include <vle/utils/Host.hpp>
-#include <vle/utils/i18n.hpp>
-#include <vle/utils/Package.hpp>
 #include <vle/utils/PackageTable.hpp>
-#include <vle/utils/Path.hpp>
-#include <vle/utils/Pool.hpp>
-#include <vle/utils/Preferences.hpp>
-#include <vle/utils/Rand.hpp>
-#include <vle/utils/Simpson.hpp>
-#include <vle/utils/Socket.hpp>
-#include <vle/utils/Tools.hpp>
-#include <vle/utils/Trace.hpp>
+#include <vle/utils/Exception.hpp>
 
-namespace vle {
+namespace vle { namespace utils {
 
-    /**
-     * @brief A complete library to provide tools like string utilities, dates,
-     * paths, XML parsing, debugging, exception, trace etc.
-     *
-     */
-    namespace utils {
+PackageTable::PackageTable()
+{
+    m_current = m_table.insert(std::string()).first;
+}
 
-    } // namespace utils
+void PackageTable::current(const std::string& package)
+{
+    std::pair < const_iterator, bool > r = m_table.insert(package);
+    if (r.second) {
+        m_current = r.first;
+    }
+}
 
-} // namespace vle
+PackageTable::index PackageTable::get(const std::string& package)
+{
+    if (package.empty()) {
+        throw utils::ArgError("PackageTable: Cannot get empty package");
+    }
 
-#endif
+    return m_table.insert(package).first;
+}
+
+void PackageTable::remove(index i)
+{
+    if (m_current == i) {
+        throw utils::ArgError("PackageTable: Cannot remove currrent package");
+    }
+
+    m_table.erase(i);
+}
+
+}} // namespace vle utils

@@ -16,13 +16,13 @@ ELSE(WIN32 AND NOT UNIX)
   SET(OS_SPECIFIC_PATH_IMPL PathUnix.cpp)
 ENDIF(WIN32 AND NOT UNIX)
 
-SET(UTILS_CPP DateTime.cpp Host.cpp Package.cpp Path.cpp Preferences.cpp
-  Rand.cpp Simpson.cpp Socket.cpp SocketImpl.c Tools.cpp Trace.cpp
-  ${OS_SPECIFIC_PATH_IMPL})
+SET(UTILS_CPP DateTime.cpp Host.cpp Package.cpp PackageTable.cpp Path.cpp
+  Preferences.cpp Rand.cpp Simpson.cpp Socket.cpp SocketImpl.c Tools.cpp
+  Trace.cpp ${OS_SPECIFIC_PATH_IMPL})
 
 SET(UTILS_HPP Algo.hpp DateTime.hpp Debug.hpp DllDefines.hpp Exception.hpp
-  Host.hpp i18n.hpp Package.hpp Path.hpp Pool.hpp Preferences.hpp Rand.hpp
-  Simpson.hpp Socket.hpp Tools.hpp Trace.hpp)
+  Host.hpp i18n.hpp Package.hpp PackageTable.hpp Path.hpp Pool.hpp
+  Preferences.hpp Rand.hpp Simpson.hpp Socket.hpp Tools.hpp Trace.hpp)
 
 ADD_LIBRARY(vleutils SHARED ${UTILS_CPP};${UTILS_HPP})
 

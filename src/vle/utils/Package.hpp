@@ -26,11 +26,12 @@
 #ifndef VLE_UTILS_PACKAGE_HPP
 #define VLE_UTILS_PACKAGE_HPP
 
+#include <vle/utils/DllDefines.hpp>
+#include <vle/utils/PackageTable.hpp>
 #include <glibmm/spawn.h>
 #include <glibmm/thread.h>
 #include <string>
 #include <list>
-#include <vle/utils/DllDefines.hpp>
 
 namespace vle { namespace utils {
 
@@ -115,14 +116,14 @@ namespace vle { namespace utils {
          * @return The current selected Package.
          */
         const std::string& name() const
-        { return m_name; }
+        { return m_table.current(); }
 
         /**
          * @brief Is a package selected.
          * @return Return true if a Package is selected, false otherwise.
          */
         bool selected() const
-        { return not m_name.empty(); }
+        { return not m_table.current().empty(); }
 
         /**
          * @brief Select a new Package.
@@ -160,7 +161,7 @@ namespace vle { namespace utils {
         {}
 
         static Package* m_package; ///< singleton attribute.
-        std::string m_name; ///< the current Package selected.
+        PackageTable m_table; ///< the list of package available.
         bool m_stop; ///< true if process is stopped.
         Glib::Thread* m_out; ///< standard output stream reader thread.
         Glib::Thread* m_err; ///< standard error stream reader thread.
