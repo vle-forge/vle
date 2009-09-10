@@ -28,13 +28,13 @@
 
 #include <vle/extension/DllDefines.hpp>
 #include <vle/devs/Dynamics.hpp>
+#include <deque>
 
 namespace vle { namespace extension {
 
     class VLE_EXTENSION_EXPORT DifferentialEquation : public vle::devs::Dynamics
     {
     protected:
-
         /**
          * @brief Variable The class represents a variable of
          * differential equation.
@@ -228,7 +228,7 @@ namespace vle { namespace extension {
         }
 
     protected:
-        DifferentialEquation(const vle::graph::AtomicModel& model,
+        DifferentialEquation(const vle::devs::DynamicsInit& model,
                              const vle::devs::InitEventList& events);
 
         virtual ~DifferentialEquation() {}

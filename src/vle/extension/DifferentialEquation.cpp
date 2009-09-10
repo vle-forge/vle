@@ -33,7 +33,7 @@ using namespace devs;
 using namespace graph;
 using namespace value;
 
-DifferentialEquation::DifferentialEquation(const AtomicModel& model,
+DifferentialEquation::DifferentialEquation(const DynamicsInit& model,
 					   const InitEventList& events) :
     Dynamics(model, events),
     mUseGradient(true),

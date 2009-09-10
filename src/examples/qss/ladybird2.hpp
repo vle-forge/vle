@@ -33,7 +33,7 @@ namespace vle { namespace examples { namespace qss {
 class Ladybird2 : public vle::extension::DifferenceEquation::Simple
 {
 public:
-    Ladybird2(const vle::graph::AtomicModel& model,
+    Ladybird2(const vle::devs::DynamicsInit& model,
 	      const vle::devs::InitEventList& events);
 
     virtual ~Ladybird2();

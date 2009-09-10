@@ -70,6 +70,7 @@
 <!ATTLIST dynamic
   name CDATA #REQUIRED
   library CDATA #REQUIRED
+  package CDATA #IMPLIED
   location CDATA #IMPLIED
   model CDATA #IMPLIED
   type CDATA #IMPLIED

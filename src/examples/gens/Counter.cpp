@@ -28,7 +28,7 @@
 
 namespace vle { namespace examples { namespace gens {
 
-Counter::Counter(const graph::AtomicModel& model,
+Counter::Counter(const devs::DynamicsInit& model,
                  const devs::InitEventList& events) :
     devs::Dynamics(model, events),
     m_counter(0),

@@ -34,7 +34,7 @@ namespace vle { namespace examples { namespace lifegame {
 class Cell : public vle::extension::CellDevs
 {
 public:
-    Cell(const vle::graph::AtomicModel& model,
+    Cell(const vle::devs::DynamicsInit& model,
          const vle::devs::InitEventList& events) :
         vle::extension::CellDevs(model, events)
     { }

@@ -34,6 +34,8 @@
 #include <vle/value/Boolean.hpp>
 #include <vle/value/String.hpp>
 #include <vle/utils/Tools.hpp>
+#include <vle/utils/Path.hpp>
+#include <vle/utils/Package.hpp>
 
 
 namespace vle { namespace devs {
@@ -88,6 +90,128 @@ ExternalEvent* Dynamics::buildEventWithAString(
     event->putAttribute(attributeName,
                         value::String::create(attributeValue));
     return event;
+}
+
+std::string Dynamics::getPackageDir() const
+{
+    if (utils::Package::package().name() == *m_packageid) {
+        return utils::Path::path().getPackageDir();
+    } else {
+        return utils::Path::path().getExternalPackageDir(*m_packageid);
+    }
+}
+
+std::string Dynamics::getPackageLibDir() const
+{
+    if (utils::Package::package().name() == *m_packageid) {
+        return utils::Path::path().getPackageLibDir();
+    } else {
+        return utils::Path::path().getExternalPackageLibDir(*m_packageid);
+    }
+}
+
+std::string Dynamics::getPackageSrcDir() const
+{
+    if (utils::Package::package().name() == *m_packageid) {
+        return utils::Path::path().getPackageSrcDir();
+    } else {
+        return utils::Path::path().getExternalPackageSrcDir(*m_packageid);
+    }
+}
+
+std::string Dynamics::getPackageDataDir() const
+{
+    if (utils::Package::package().name() == *m_packageid) {
+        return utils::Path::path().getPackageDataDir();
+    } else {
+        return utils::Path::path().getExternalPackageDataDir(*m_packageid);
+    }
+}
+
+std::string Dynamics::getPackageDocDir() const
+{
+    if (utils::Package::package().name() == *m_packageid) {
+        return utils::Path::path().getPackageDocDir();
+    } else {
+        return utils::Path::path().getExternalPackageDocDir(*m_packageid);
+    }
+}
+
+std::string Dynamics::getPackageExpDir() const
+{
+    if (utils::Package::package().name() == *m_packageid) {
+        return utils::Path::path().getPackageExpDir();
+    } else {
+        return utils::Path::path().getExternalPackageExpDir(*m_packageid);
+    }
+}
+
+std::string Dynamics::getPackageBuildDir() const
+{
+    if (utils::Package::package().name() == *m_packageid) {
+        return utils::Path::path().getPackageDir();
+    } else {
+        return utils::Path::path().getExternalPackageExpDir(*m_packageid);
+    }
+}
+
+std::string Dynamics::getPackageFile(const std::string& name) const
+{
+    if (utils::Package::package().name() == *m_packageid) {
+        return utils::Path::path().getPackageFile(name);
+    } else {
+        return utils::Path::path().getExternalPackageFile(*m_packageid, name);
+    }
+}
+
+std::string Dynamics::getPackageLibFile(const std::string& name) const
+{
+    if (utils::Package::package().name() == *m_packageid) {
+        return utils::Path::path().getPackageLibFile(name);
+    } else {
+        return utils::Path::path().getExternalPackageLibFile(*m_packageid,
+                                                             name);
+    }
+}
+
+std::string Dynamics::getPackageSrcFile(const std::string& name) const
+{
+    if (utils::Package::package().name() == *m_packageid) {
+        return utils::Path::path().getPackageSrcFile(name);
+    } else {
+        return utils::Path::path().getExternalPackageSrcFile(*m_packageid,
+                                                             name);
+    }
+}
+
+std::string Dynamics::getPackageDataFile(const std::string& name) const
+{
+    if (utils::Package::package().name() == *m_packageid) {
+        return utils::Path::path().getPackageDataFile(name);
+    } else {
+        return utils::Path::path().getExternalPackageDataFile(*m_packageid,
+                                                              name);
+    }
+}
+
+std::string Dynamics::getPackageDocFile(const std::string& name) const
+{
+    if (utils::Package::package().name() == *m_packageid) {
+        return utils::Path::path().getPackageDocFile(name);
+    } else {
+        return utils::Path::path().getExternalPackageDocFile(*m_packageid,
+                                                             name);
+    }
+}
+
+std::string Dynamics::getPackageExpFile(const std::string& name) const
+{
+    if (utils::Package::package().name() == *m_packageid) {
+        return utils::Path::path().getPackageExpFile(name);
+    } else {
+        return utils::Path::path().getExternalPackageExpFile(*m_packageid,
+                                                             name);
+    }
 }
 
 }} // namespace vle devs

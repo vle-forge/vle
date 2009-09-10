@@ -33,7 +33,7 @@ namespace vle { namespace examples { namespace equation {
     class Executive : public devs::Executive
     {
     public:
-        Executive(const graph::AtomicModel& model,
+        Executive(const devs::ExecutiveInit& model,
                   const devs::InitEventList& events);
 
         virtual ~Executive() { }
@@ -98,6 +98,6 @@ namespace vle { namespace examples { namespace equation {
 
 }}} // namespace vle examples equation
 
-DECLARE_NAMED_DYNAMICS(Executive, vle::examples::equation::Executive)
+DECLARE_NAMED_EXECUTIVE(Executive, vle::examples::equation::Executive)
 
 #endif

@@ -35,6 +35,10 @@ void Dynamic::write(std::ostream& out) const
         << "library=\"" << m_library.c_str() << "\" "
         << "model=\"" << m_model.c_str() << "\" ";
 
+    if (not m_package.empty()) {
+        out << "package=\"" << m_package.c_str() << "\" ";
+    }
+
     if (not m_language.empty()) {
         out << "language=\"" << m_language.c_str() << "\" ";
     }

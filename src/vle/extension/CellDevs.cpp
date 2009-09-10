@@ -57,7 +57,7 @@ using namespace vle::value;
 //
 /***********************************************************************/
 
-CellDevs::CellDevs(const vle::graph::AtomicModel& model,
+CellDevs::CellDevs(const vle::devs::DynamicsInit& model,
                    const vle::devs::InitEventList& events) :
     vle::devs::Dynamics(model, events),
     m_modified(false)

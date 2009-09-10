@@ -208,6 +208,26 @@ namespace vle { namespace utils {
         std::string getPackageDocFile(const std::string& name) const;
         std::string getPackageExpFile(const std::string& name) const;
 
+        std::string getExternalPackageDir(const std::string& name) const;
+        std::string getExternalPackageLibDir(const std::string& name) const;
+        std::string getExternalPackageSrcDir(const std::string& name) const;
+        std::string getExternalPackageDataDir(const std::string& name) const;
+        std::string getExternalPackageDocDir(const std::string& name) const;
+        std::string getExternalPackageExpDir(const std::string& name) const;
+        std::string getExternalPackageBuildDir(const std::string& name) const;
+        std::string getExternalPackageFile(const std::string& name,
+                                           const std::string& file) const;
+        std::string getExternalPackageLibFile(const std::string& name,
+                                              const std::string& file) const;
+        std::string getExternalPackageSrcFile(const std::string& name,
+                                              const std::string& file) const;
+        std::string getExternalPackageDataFile(const std::string& name,
+                                               const std::string& file) const;
+        std::string getExternalPackageDocFile(const std::string& name,
+                                              const std::string& file) const;
+        std::string getExternalPackageExpFile(const std::string& name,
+                                              const std::string& file) const;
+
         PathList getInstalledPackages();
         PathList getInstalledExperiments();
         PathList getInstalledLibraries();

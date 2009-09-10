@@ -24,6 +24,7 @@
 
 
 #include <vle/extension/DifferenceEquation.hpp>
+#include <vle/value/Tuple.hpp>
 #include <cmath>
 
 namespace vle { namespace extension { namespace DifferenceEquation {
@@ -34,7 +35,7 @@ using namespace value;
 
 const unsigned int Base::DEFAULT_SIZE = 2;
 
-Base::Base(const AtomicModel& model,
+Base::Base(const DynamicsInit& model,
 	   const InitEventList& events,
 	   bool control) :
     Dynamics(model, events),
@@ -612,7 +613,7 @@ void Base::externalTransition(const ExternalEventList& event,
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-Simple::Simple(const graph::AtomicModel& model,
+Simple::Simple(const devs::DynamicsInit& model,
                const devs::InitEventList& events,
                bool control) :
     Base(model, events, control),
@@ -763,7 +764,7 @@ void Simple::request(const RequestEvent& event,
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-Multiple::Multiple(const graph::AtomicModel& model,
+Multiple::Multiple(const devs::DynamicsInit& model,
                    const devs::InitEventList& events,
                    bool control) :
     Base(model, events, control)
@@ -1041,7 +1042,7 @@ void Multiple::request(const RequestEvent& event,
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-Generic::Generic(const graph::AtomicModel& model,
+Generic::Generic(const devs::DynamicsInit& model,
                  const devs::InitEventList& events) :
     Simple(model, events, false)
 {

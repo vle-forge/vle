@@ -93,7 +93,7 @@ namespace vle { namespace extension {
          * @param model the atomic model to which belongs the dynamics.
          * @param event the init event list.
          */
-        PetriNet(const graph::AtomicModel& model,
+        PetriNet(const devs::DynamicsInit& model,
                  const devs::InitEventList& events);
 
         /**

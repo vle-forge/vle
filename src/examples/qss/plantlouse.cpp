@@ -29,7 +29,7 @@
 
 namespace vle { namespace examples { namespace qss {
 
-Plantlouse::Plantlouse(const graph::AtomicModel& model,
+Plantlouse::Plantlouse(const devs::DynamicsInit& model,
                        const devs::InitEventList& events) :
     extension::QSS::Simple(model, events)
 {

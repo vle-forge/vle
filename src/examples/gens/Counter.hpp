@@ -33,7 +33,7 @@ namespace vle { namespace examples { namespace gens {
     class Counter : public devs::Dynamics
     {
     public:
-        Counter(const graph::AtomicModel& model,
+        Counter(const devs::DynamicsInit& model,
                 const devs::InitEventList& event);
 
         virtual ~Counter() { }

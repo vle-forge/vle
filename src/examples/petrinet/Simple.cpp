@@ -36,7 +36,7 @@ namespace vle { namespace examples { namespace petrinet {
     class PetrinetBeep : public devs::Dynamics
     {
     public:
-        PetrinetBeep(const graph::AtomicModel& model,
+        PetrinetBeep(const devs::DynamicsInit& model,
                      const devs::InitEventList& events) :
             devs::Dynamics(model, events)
         {
@@ -68,7 +68,7 @@ namespace vle { namespace examples { namespace petrinet {
     class PetrinetCounter : public devs::Dynamics
     {
     public:
-        PetrinetCounter(const graph::AtomicModel& model,
+        PetrinetCounter(const devs::DynamicsInit& model,
                         const devs::InitEventList& events) :
             devs::Dynamics(model, events),
             mDate(0),
@@ -98,7 +98,7 @@ namespace vle { namespace examples { namespace petrinet {
     class PetrinetOrdinary : public extension::PetriNet
     {
     public:
-        PetrinetOrdinary(const graph::AtomicModel& model,
+        PetrinetOrdinary(const devs::DynamicsInit& model,
                          const devs::InitEventList& events) :
             extension::PetriNet(model, events)
         { }
@@ -115,7 +115,7 @@ namespace vle { namespace examples { namespace petrinet {
     class Meteo : public devs::Dynamics
     {
     public:
-        Meteo(const graph::AtomicModel& model,
+        Meteo(const devs::DynamicsInit& model,
               const devs::InitEventList& events) :
             devs::Dynamics(model, events)
         {
@@ -183,7 +183,7 @@ namespace vle { namespace examples { namespace petrinet {
     class Trigger : public extension::PetriNet
     {
     public:
-        Trigger(const graph::AtomicModel& model,
+        Trigger(const devs::DynamicsInit& model,
                 const devs::InitEventList& events) :
             extension::PetriNet(model, events)
         {
@@ -249,7 +249,7 @@ namespace vle { namespace examples { namespace petrinet {
     class InOut : public extension::PetriNet
     {
     public:
-        InOut(const graph::AtomicModel& model,
+        InOut(const devs::DynamicsInit& model,
               const devs::InitEventList& events) :
             extension::PetriNet(model, events)
         {
@@ -274,7 +274,7 @@ namespace vle { namespace examples { namespace petrinet {
     class Conflict : public extension::PetriNet
     {
     public:
-        Conflict(const graph::AtomicModel& model,
+        Conflict(const devs::DynamicsInit& model,
                  const devs::InitEventList& events) :
             extension::PetriNet(model, events)
         {

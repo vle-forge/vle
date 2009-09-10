@@ -33,7 +33,7 @@ namespace vle { namespace unittest {
     class Transform : public devs::Dynamics
     {
     public:
-        Transform(const graph::AtomicModel& atom,
+        Transform(const devs::DynamicsInit& atom,
                   const devs::InitEventList& events) :
             devs::Dynamics(atom, events)
         { }

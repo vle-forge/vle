@@ -33,7 +33,7 @@ using namespace devs;
 using namespace graph;
 using namespace value;
 
-DESS::DESS(const AtomicModel& model,
+DESS::DESS(const DynamicsInit& model,
 	   const InitEventList& events) :
     DifferentialEquation(model, events),
     mMethod(0)

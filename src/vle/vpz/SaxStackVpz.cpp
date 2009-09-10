@@ -453,6 +453,7 @@ void SaxStackVpz::pushDynamic(const xmlChar** att)
     Assert < utils::SaxParserError >(parent()->isDynamics());
 
     const xmlChar* name = 0;
+    const xmlChar* package = 0;
     const xmlChar* library = 0;
     const xmlChar* model = 0;
     const xmlChar* language = 0;
@@ -462,6 +463,8 @@ void SaxStackVpz::pushDynamic(const xmlChar** att)
     for (int i = 0; att[i] != 0; i += 2) {
         if (xmlStrcmp(att[i], (const xmlChar*)"name") == 0) {
             name = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"package") == 0) {
+            package = att[i + 1];
         } else if (xmlStrcmp(att[i], (const xmlChar*)"library") == 0) {
             library = att[i + 1];
         } else if (xmlStrcmp(att[i], (const xmlChar*)"model") == 0) {
@@ -487,6 +490,12 @@ void SaxStackVpz::pushDynamic(const xmlChar** att)
         dyn.setModel(xmlCharToString(model));
     } else {
         dyn.setModel("");
+    }
+
+    if (package) {
+        dyn.setPackage(xmlCharToString(package));
+    } else {
+        dyn.setPackage("");
     }
 
     if (language) {

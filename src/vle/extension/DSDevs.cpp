@@ -37,19 +37,13 @@
 
 namespace vle { namespace extension {
 
-DSDevs::DSDevs(const graph::AtomicModel& model,
+DSDevs::DSDevs(const devs::ExecutiveInit& model,
                const devs::InitEventList& events) :
     devs::Executive(model, events),
     m_state(IDLE),
-    m_response(false),
-    m_coupledModel(0)
+    m_response(false)
 {
-    if (not model.getParent()) {
-        throw utils::ModellingError(_(
-            "DSDevs ext.: not in a coupeld model"));
-    }
-
-    m_coupledModel = model.getParent();
+    assert(model.model().getParent());
 }
 
 devs::Time DSDevs::init(const devs::Time& /* time */)
@@ -134,11 +128,11 @@ value::Value* DSDevs::observation(const devs::ObservationEvent& event) const
     std::ostringstream out;
 
     if (event.onPort("coupled")) {
-        m_coupledModel->writeXML(out);
+        coupledmodel().writeXML(out);
     } else if (event.onPort("hierarchy")) {
-        m_coupledModel->writeXML(out);
+        coupledmodel().writeXML(out);
     } else if (event.onPort("complete")) {
-        m_coupledModel->writeXML(out);
+        coupledmodel().writeXML(out);
     }
 
     return buildString(out.str());
@@ -619,22 +613,22 @@ bool DSDevs::addConnection(const std::string& srcModelName,
                            const std::string& dstModelName,
                            const std::string& dstPortName)
 {
-    const std::string& modelName = m_coupledModel->getName();
+    const std::string& modelName = coupledmodel().getName();
     graph::Model* srcModel = (modelName == srcModelName)?
-        m_coupledModel : m_coupledModel->findModel(srcModelName);
+        &coupledmodel() : coupledmodel().findModel(srcModelName);
     graph::Model* dstModel = (modelName == dstModelName)?
-        m_coupledModel:m_coupledModel->findModel(dstModelName);
+        &coupledmodel() : coupledmodel().findModel(dstModelName);
 
     if (srcModel and dstModel) {
         if (modelName == srcModelName) {
-            m_coupledModel->addInputConnection(srcPortName,
+            coupledmodel().addInputConnection(srcPortName,
                                                dstModel, dstPortName);
         } else {
             if (modelName == dstModelName) {
-                m_coupledModel->addOutputConnection(srcModel, srcPortName,
+                coupledmodel().addOutputConnection(srcModel, srcPortName,
                                                     dstPortName);
             } else {
-                m_coupledModel->addInternalConnection(srcModel, srcPortName,
+                coupledmodel().addInternalConnection(srcModel, srcPortName,
                                                       dstModel, dstPortName);
             }
         }
@@ -650,30 +644,30 @@ bool DSDevs::changeConnection(const std::string& srcModelName,
                               const std::string& newDstModelName,
                               const std::string& newDstPortName)
 {
-    const std::string& modelName = m_coupledModel->getName();
+    const std::string& modelName = coupledmodel().getName();
     graph::Model* srcModel = (modelName == srcModelName)?
-        m_coupledModel : m_coupledModel->findModel(srcModelName);
+        &coupledmodel() : coupledmodel().findModel(srcModelName);
     graph::Model* oldDstModel = (modelName == oldDstModelName)?
-        m_coupledModel : m_coupledModel->findModel(oldDstModelName);
+        &coupledmodel() : coupledmodel().findModel(oldDstModelName);
     graph::Model* newDstModel = (modelName == newDstModelName)?
-        m_coupledModel : m_coupledModel->findModel(newDstModelName);
+        &coupledmodel() : coupledmodel().findModel(newDstModelName);
 
     if (newDstModel) {
         if (modelName == srcModelName) {
-            m_coupledModel->delInputConnection(srcPortName,
+            coupledmodel().delInputConnection(srcPortName,
                                                oldDstModel, oldDstPortName);
-            m_coupledModel->addInputConnection(srcPortName,
+            coupledmodel().addInputConnection(srcPortName,
                                                newDstModel, newDstPortName);
         } else {
             if (modelName == oldDstModelName) {
-                m_coupledModel->delOutputConnection(
+                coupledmodel().delOutputConnection(
                     srcModel, srcPortName, oldDstPortName);
-                m_coupledModel->addOutputConnection(
+                coupledmodel().addOutputConnection(
                     srcModel, srcPortName, newDstPortName);
             } else {
-                m_coupledModel->delInternalConnection(
+                coupledmodel().delInternalConnection(
                     srcModel, srcPortName, oldDstModel, oldDstPortName);
-                m_coupledModel->addInternalConnection(
+                coupledmodel().addInternalConnection(
                     srcModel, srcPortName, newDstModel, newDstPortName);
             }
         }
@@ -688,22 +682,22 @@ bool DSDevs::removeConnection(const std::string& srcModelName,
                               const std::string& dstModelName,
                               const std::string& dstPortName)
 {
-    const std::string& modelName = m_coupledModel->getName();
+    const std::string& modelName = coupledmodel().getName();
     graph::Model* srcModel = (modelName == srcModelName)?
-        m_coupledModel : m_coupledModel->findModel(srcModelName);
+        &coupledmodel() : coupledmodel().findModel(srcModelName);
     graph::Model* dstModel = (modelName == dstModelName)?
-        m_coupledModel : m_coupledModel->findModel(dstModelName);
+        &coupledmodel() : coupledmodel().findModel(dstModelName);
 
     if (srcModel and dstModel) {
         if (modelName == srcModelName) {
-            m_coupledModel->delInputConnection(srcPortName, dstModel,
+            coupledmodel().delInputConnection(srcPortName, dstModel,
                                                dstPortName);
         } else {
             if (modelName == dstModelName) {
-                m_coupledModel->delOutputConnection(srcModel, srcPortName,
+                coupledmodel().delOutputConnection(srcModel, srcPortName,
                                                     dstPortName);
             } else {
-                m_coupledModel->delInternalConnection(srcModel, srcPortName,
+                coupledmodel().delInternalConnection(srcModel, srcPortName,
                                                       dstModel, dstPortName);
             }
         }
@@ -716,14 +710,14 @@ bool DSDevs::addModel(const std::string& /* prefixModelName */,
                       const std::string& /* className */,
                       const value::Set* /* connection */)
 {
-    //std::string newname(m_coupledModel->buildNewName(prefixModelName));
+    //std::string newname(coupledmodel().buildNewName(prefixModelName));
     //m_newName.push_back(newname);
 
     //try {
         //vpz::Dynamic dyn("FIXME");
         //vpz::Condition cond("FIXME");
         //vpz::Observable obs("FIXME");
-        //coordinator().createModelFromClass(m_coupledModel, className);
+        //coordinator().createModelFromClass(&coupledmodel(), className);
     //} catch (const std::exception& e) {
         //std::cerr << fmt(
             //"Warning: Unable to dynamic add model, with prefixname '%1%' "
@@ -770,7 +764,7 @@ bool DSDevs::addModel(const std::string& /* prefixModelName */,
 bool DSDevs::removeModel(const std::string& /* modelName */)
 {
     // FIX ME
-    //    getModel().getSimulator()->delModel(m_coupledModel, modelName);
+    //    getModel().getSimulator()->delModel(&coupledmodel(), modelName);
     return true;
 }
 
@@ -799,7 +793,7 @@ bool DSDevs::buildModel(const std::string& /*prefixModelName*/,
 bool DSDevs::addInputPort(const std::string& modelName,
                           const std::string& portName)
 {
-    graph::Model* mdl = m_coupledModel->findModel(modelName);
+    graph::Model* mdl = coupledmodel().findModel(modelName);
     mdl->addInputPort(portName);
     return true;
 }
@@ -807,7 +801,7 @@ bool DSDevs::addInputPort(const std::string& modelName,
 bool DSDevs::addOutputPort(const std::string& modelName,
                            const std::string& portName)
 {
-    graph::Model* mdl = m_coupledModel->findModel(modelName);
+    graph::Model* mdl = coupledmodel().findModel(modelName);
     mdl->addOutputPort(portName);
     return true;
 }
@@ -815,7 +809,7 @@ bool DSDevs::addOutputPort(const std::string& modelName,
 bool DSDevs::removeInputPort(const std::string& modelName,
                              const std::string& portName)
 {
-    graph::Model* mdl = m_coupledModel->findModel(modelName);
+    graph::Model* mdl = coupledmodel().findModel(modelName);
     mdl->delInputPort(portName);
     return true;
 }
@@ -823,14 +817,14 @@ bool DSDevs::removeInputPort(const std::string& modelName,
 bool DSDevs::removeOutputPort(const std::string& modelName,
                               const std::string& portName)
 {
-    graph::Model* mdl = m_coupledModel->findModel(modelName);
+    graph::Model* mdl = coupledmodel().findModel(modelName);
     mdl->delOutputPort(portName);
     return true;
 }
 
-graph::ModelList& DSDevs::getModelList() const
+const graph::ModelList& DSDevs::getModelList() const
 {
-    return  m_coupledModel->getModelList();
+    return coupledmodel().getModelList();
 }
 
 }} // namespace vle extension

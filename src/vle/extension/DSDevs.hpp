@@ -122,7 +122,7 @@ namespace vle { namespace extension {
             ADD_CONNECTION, REMOVE_CONNECTION, CHANGE_CONNECTION, ADD_INPUTPORT,
             REMOVE_INPUTPORT, ADD_OUTPUTPORT, REMOVE_OUTPUTPORT, BAG };
 
-        DSDevs(const graph::AtomicModel& model,
+        DSDevs(const devs::ExecutiveInit& model,
                const devs::InitEventList& events);
 
         virtual ~DSDevs() { }
@@ -333,7 +333,7 @@ namespace vle { namespace extension {
         bool removeOutputPort(const std::string& modelName,
                               const std::string& portName);
 
-        graph::ModelList& getModelList() const;
+        const graph::ModelList& getModelList() const;
 
         state                       m_state;
         std::list < std::string >   m_nameList;
@@ -353,8 +353,6 @@ namespace vle { namespace extension {
         bool processRemoveConnection(const value::Map& event);
         bool processChangeConnection(const value::Map& event);
         bool processBag(const value::Map& event);
-
-        graph::CoupledModel*         m_coupledModel;
     };
 
 }} // namespace vle extension

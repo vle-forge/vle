@@ -31,7 +31,7 @@
 
 namespace vle { namespace examples { namespace gens {
 
-GenExecutiveClass::GenExecutiveClass(const graph::AtomicModel& mdl,
+GenExecutiveClass::GenExecutiveClass(const devs::ExecutiveInit& mdl,
                                      const devs::InitEventList& events) :
     devs::Executive(mdl, events)
 {

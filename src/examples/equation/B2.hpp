@@ -37,7 +37,7 @@ namespace vle { namespace examples { namespace equation {
         Nosync c;
 
     public:
-        B2(const graph::AtomicModel& model,
+        B2(const devs::DynamicsInit& model,
            const devs::InitEventList& events);
         virtual ~B2() { }
 

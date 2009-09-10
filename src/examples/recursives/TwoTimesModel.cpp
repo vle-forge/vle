@@ -32,7 +32,7 @@ namespace vle { namespace examples { namespace recursives {
     class TwoTimesModel : public devs::Dynamics
     {
     public:
-        TwoTimesModel(const graph::AtomicModel& mdl,
+        TwoTimesModel(const devs::DynamicsInit& mdl,
                              const devs::InitEventList& lst)
             : devs::Dynamics(mdl, lst), m_stop(false)
         {}

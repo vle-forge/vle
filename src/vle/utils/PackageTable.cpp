@@ -42,10 +42,6 @@ void PackageTable::current(const std::string& package)
 
 PackageTable::index PackageTable::get(const std::string& package)
 {
-    if (package.empty()) {
-        throw utils::ArgError("PackageTable: Cannot get empty package");
-    }
-
     return m_table.insert(package).first;
 }
 

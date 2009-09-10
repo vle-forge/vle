@@ -35,7 +35,7 @@ namespace vle { namespace examples { namespace qss {
     public:
         enum State { INIT, IDLE, PEST };
 
-        Smartgardener2(const graph::AtomicModel& model,
+        Smartgardener2(const devs::DynamicsInit& model,
                        const devs::InitEventList& events);
 
         virtual ~Smartgardener2();

@@ -34,7 +34,7 @@ namespace vle { namespace examples { namespace dess {
     class Counter : public devs::Dynamics
     {
     public:
-        Counter(const graph::AtomicModel& model,
+        Counter(const devs::DynamicsInit& model,
 		const devs::InitEventList& events) :
             devs::Dynamics(model, events),
             mDate(0),

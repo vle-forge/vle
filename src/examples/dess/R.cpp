@@ -28,7 +28,7 @@
 
 namespace vle { namespace examples { namespace dess {
 
-R::R(const graph::AtomicModel& model,
+R::R(const devs::DynamicsInit& model,
      const devs::InitEventList& events):
     extension::DESS(model, events)
 {

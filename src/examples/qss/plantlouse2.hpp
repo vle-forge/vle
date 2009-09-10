@@ -35,7 +35,7 @@ namespace vle { namespace examples { namespace qss {
 class Plantlouse2 : public extension::DifferenceEquation::Simple
 {
 public:
-    Plantlouse2(const graph::AtomicModel& model,
+    Plantlouse2(const devs::DynamicsInit& model,
 		const devs::InitEventList& events);
 
     virtual ~Plantlouse2();

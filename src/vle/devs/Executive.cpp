@@ -24,41 +24,8 @@
 
 
 #include <vle/devs/Executive.hpp>
-#include <vle/utils/Debug.hpp>
 
 namespace vle { namespace devs {
 
-const Coordinator& Executive::coordinator() const
-{
-    isInitialized();
-    return *m_coordinator;
-}
-
-const graph::CoupledModel& Executive::coupledmodel() const
-{
-    isInitialized();
-    return *getModel().getParent();
-}
-
-Coordinator& Executive::coordinator()
-{
-    isInitialized();
-    return *m_coordinator;
-}
-
-graph::CoupledModel& Executive::coupledmodel()
-{
-    isInitialized();
-    return *getModel().getParent();
-}
-
-void Executive::isInitialized() const
-{
-    if (not m_coordinator) {
-        throw utils::ModellingError(fmt(_(
-                "Executive model: do not use constructor to manage " \
-                "the DEVS graph (model '%1%')")) % getModel().getName());
-    }
-}
 
 }} // namespace vle devs

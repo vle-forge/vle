@@ -28,7 +28,7 @@
 
 namespace vle { namespace examples { namespace qss {
 
-Plantlouse2::Plantlouse2(const graph::AtomicModel& model,
+Plantlouse2::Plantlouse2(const devs::DynamicsInit& model,
                          const devs::InitEventList& events) :
     extension::DifferenceEquation::Simple(model, events)
 {

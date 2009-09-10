@@ -437,6 +437,76 @@ std::string Path::getPackageDocFile(const std::string& name) const
     return buildFilename(getPackageDocDir(), name);
 }
 
+std::string Path::getExternalPackageDir(const std::string& name) const
+{
+    return buildDirname(getPackagesDir(), name);
+}
+
+std::string Path::getExternalPackageLibDir(const std::string& name) const
+{
+    return buildDirname(getPackagesDir(), name, "lib");
+}
+
+std::string Path::getExternalPackageSrcDir(const std::string& name) const
+{
+    return buildDirname(getPackagesDir(), name, "src");
+}
+
+std::string Path::getExternalPackageDataDir(const std::string& name) const
+{
+    return buildDirname(getPackagesDir(), name, "data");
+}
+
+std::string Path::getExternalPackageDocDir(const std::string& name) const
+{
+    return buildDirname(getPackagesDir(), name, "doc");
+}
+
+std::string Path::getExternalPackageExpDir(const std::string& name) const
+{
+    return buildDirname(getPackagesDir(), name, "exp");
+}
+
+std::string Path::getExternalPackageBuildDir(const std::string& name) const
+{
+    return buildDirname(getPackagesDir(), name, "build");
+}
+
+std::string Path::getExternalPackageFile(const std::string& name,
+                                         const std::string& file) const
+{
+    return buildFilename(getPackagesDir(), name, file);
+}
+std::string Path::getExternalPackageLibFile(const std::string& name,
+                                            const std::string& file) const
+{
+    return buildFilename(getPackagesDir(), name, "lib", file);
+}
+
+std::string Path::getExternalPackageSrcFile(const std::string& name,
+                                            const std::string& file) const
+{
+    return buildFilename(getPackagesDir(), name, "src", file);
+}
+
+std::string Path::getExternalPackageDataFile(const std::string& name,
+                                             const std::string& file) const
+{
+    return buildFilename(getPackagesDir(), name, "data", file);
+}
+
+std::string Path::getExternalPackageDocFile(const std::string& name,
+                                            const std::string& file) const
+{
+    return buildFilename(getPackagesDir(), name, "doc", file);
+}
+
+std::string Path::getExternalPackageExpFile(const std::string& name,
+                                            const std::string& file) const
+{
+    return buildFilename(getPackagesDir(), name, "exp", file);
+}
+
 PathList Path::getInstalledPackages()
 {
     namespace fs = boost::filesystem;
@@ -452,7 +522,11 @@ PathList Path::getInstalledPackages()
     PathList result;
     for (fs::directory_iterator it(pkgs), end; it != end; ++it) {
         if (fs::is_directory(it->status())) {
-            result.push_back(it->path().file_string());
+#if BOOST_VERSION > 103600
+            result.push_back(it->path().filename());
+#else
+            result.push_back(it->path().leaf());
+#endif
         }
     }
 

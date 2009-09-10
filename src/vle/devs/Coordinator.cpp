@@ -620,9 +620,4 @@ void Coordinator::processTimedObservationEvents(ObservationEventList& bag)
     bag.clear();
 }
 
-void Coordinator::setCoordinator(Executive& exe)
-{
-    exe.m_coordinator = this;
-}
-
 }} // namespace vle devs

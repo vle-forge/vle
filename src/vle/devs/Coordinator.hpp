@@ -256,12 +256,6 @@ namespace vle { namespace devs {
 
         oov::OutputMatrixViewList outputs() const;
 
-        /**
-         * @brief Friend member to give Coordinator access to excutive model.
-         * @param exe The executive model.
-         */
-        void setCoordinator(Executive& exe);
-
     private:
         Time                        m_currentTime;
         SimulatorMap                m_modelList;

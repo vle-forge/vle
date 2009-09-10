@@ -87,6 +87,13 @@ namespace vle { namespace vpz {
         { return DYNAMIC; }
 
         /**
+         * @brief Assign a new package name to the dynamics.
+         * @param name new name of the package.
+         */
+        void setPackage(const std::string& name)
+        { m_package.assign(name); }
+
+        /**
          * @brief Assign a new library name to the dynamics.
          * @param name new name of the library.
          */
@@ -133,6 +140,13 @@ namespace vle { namespace vpz {
          */
         Dynamic::Type type() const
         { return m_type; }
+
+        /**
+         * @brief Return the package name of this dynamics.
+         * @return a string represnetion of the package.
+         */
+        const std::string& package() const
+        { return m_package; }
 
         /**
          * @brief Return the library name of dynamics.
@@ -223,6 +237,7 @@ namespace vle { namespace vpz {
         {}
 
         std::string     m_name;
+        std::string     m_package;
         std::string     m_library;
         std::string     m_model;
         std::string     m_language;

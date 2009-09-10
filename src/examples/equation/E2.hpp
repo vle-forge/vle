@@ -37,7 +37,7 @@ namespace vle { namespace examples { namespace equation {
         Var c;
 
     public:
-        E2(const graph::AtomicModel& model,
+        E2(const devs::DynamicsInit& model,
            const devs::InitEventList& events) :
             extension::DifferenceEquation::Multiple(model, events)
         {

@@ -41,6 +41,7 @@ namespace vle { namespace devs {
     class RootCoordinator;
     class Coordinator;
     class Simulator;
+    class Dynamics;
 
     /**
      * @brief ModuleList is a cache for store the Glib::Module a get only
@@ -325,6 +326,15 @@ namespace vle { namespace devs {
                             devs::Simulator* atom, const vpz::Dynamic& dyn,
                             Glib::Module* module,
                             const InitEventList& events);
+
+        Dynamics* getDynamicsObject(Coordinator& coordinator,
+                                      const graph::AtomicModel& atom,
+                                      const vpz::Dynamic& dyn,
+                                      Glib::Module* module,
+                                      const InitEventList& events,
+                                      const std::string& dynamicsSymbol,
+                                      const std::string& executiveSymbol,
+                                      const std::string& dynwrapperSymbol);
     };
 
 }} // namespace vle devs

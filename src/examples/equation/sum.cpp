@@ -33,7 +33,7 @@ namespace vle { namespace examples { namespace equation {
 class sum : public extension::DifferenceEquation::Generic
 {
 public:
-    sum(const graph::AtomicModel& model,
+    sum(const devs::DynamicsInit& model,
        const devs::InitEventList& events) :
 	extension::DifferenceEquation::Generic(model, events)
         {

@@ -28,7 +28,7 @@
 namespace vle { namespace examples { namespace equation {
 
 //A(t)=B(t-1)+1
-A2::A2(const graph::AtomicModel& model,
+A2::A2(const devs::DynamicsInit& model,
        const devs::InitEventList& events) :
     extension::DifferenceEquation::Simple(model, events)
 {

@@ -33,7 +33,7 @@ using namespace devs;
 using namespace graph;
 using namespace value;
 
-Simple::Simple(const AtomicModel& model,
+Simple::Simple(const DynamicsInit& model,
 	       const InitEventList& events) :
     DifferentialEquation(model, events)
 {
@@ -108,7 +108,7 @@ Time Simple::init(const devs::Time& time)
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-Multiple::Multiple(const AtomicModel& model,
+Multiple::Multiple(const DynamicsInit& model,
 		   const InitEventList& events) :
     Dynamics(model, events),
     mActive(true),

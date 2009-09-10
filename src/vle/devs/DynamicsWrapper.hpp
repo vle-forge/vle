@@ -30,7 +30,46 @@
 #include <vle/devs/Dynamics.hpp>
 #include <string>
 
+#define DECLARE_DYNAMICSWRAPPER(mdl) \
+    extern "C" { \
+        vle::devs::Dynamics* \
+        makeNewDynamicsWrapper(const vle::devs::DynamicsWrapperInit& init, \
+                               const vle::devs::InitEventList& events) \
+        { return new mdl(init, events); } \
+    }
+
+#define DECLARE_NAMED_DYNAMICSWRAPPER(name, mdl) \
+    extern "C" { \
+        vle::devs::Dynamics* \
+        makeNewDynamicsWrapper##name(const vle::devs::DynamicsWrapperInit& init, \
+                                     const vle::devs::InitEventList& events) \
+        { return new mdl(init, events); } \
+    }
+
 namespace vle { namespace devs {
+
+    class VLE_DEVS_EXPORT DynamicsWrapperInit : public DynamicsInit
+    {
+    public:
+        DynamicsWrapperInit(const graph::AtomicModel& atom,
+                            utils::Rand& rnd,
+                            PackageId packageid,
+                            const std::string& model,
+                            const std::string& library)
+            : DynamicsInit(atom, rnd, packageid), m_model(model),
+            m_library(library)
+        {}
+
+        virtual ~DynamicsWrapperInit()
+        {}
+
+        const std::string& model() const { return m_model; }
+        const std::string& library() const { return m_library; }
+
+    private:
+        const std::string& m_model;
+        const std::string& m_library;
+    };
 
     /**
      * @brief DynamicsWrapper class represent a part of the DEVS simulator. This
@@ -45,17 +84,17 @@ namespace vle { namespace devs {
 	 * @brief Constructor of the dynamics wrapper of an atomic model
 	 * @param model the atomic model to which belongs the dynamics
 	 */
-        DynamicsWrapper(const graph::AtomicModel& model,
+        DynamicsWrapper(const DynamicsWrapperInit& init,
                         const devs::InitEventList& events) :
-            Dynamics(model, events)
-        { }
+            Dynamics(init, events)
+        {}
 
 	/**
 	 * @brief Destructor (nothing to do).
 	 * @return none
 	 */
         virtual ~DynamicsWrapper()
-        { }
+        {}
 
         /**
          * @brief If this function return true, then a cast to a DynamicsWrapper
@@ -65,18 +104,6 @@ namespace vle { namespace devs {
          */
         inline virtual bool isWrapper() const
         { return true; }
-
-        /**
-         * @brief Set the name of library
-         */
-        inline virtual void setLibrary(const std::string& library)
-        { m_library = library; }
-
-        /**
-         * @brief Set the name of model
-         */
-        inline virtual void setModel(const std::string& model)
-        { m_model = model; }
 
     protected:
       std::string m_model;

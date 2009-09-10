@@ -28,7 +28,7 @@
 
 namespace vle { namespace examples { namespace equation {
 
-Executive::Executive(const graph::AtomicModel& model,
+Executive::Executive(const devs::ExecutiveInit& model,
 		     const devs::InitEventList& events) :
     devs::Executive(model, events)
 {

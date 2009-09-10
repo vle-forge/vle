@@ -32,7 +32,7 @@ namespace vle { namespace examples { namespace dess {
 class S3 : public extension::QSS::Simple
 {
 public:
-    S3(const graph::AtomicModel& model,
+    S3(const devs::DynamicsInit& model,
        const devs::InitEventList& events);
     virtual ~S3()
 	{ }

@@ -245,7 +245,7 @@ namespace vle { namespace extension { namespace DifferenceEquation {
 
         /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-        Base(const graph::AtomicModel& model,
+        Base(const devs::DynamicsInit& model,
              const devs::InitEventList& events,
              bool control = true);
 
@@ -393,7 +393,7 @@ namespace vle { namespace extension { namespace DifferenceEquation {
          * @param control if true then the external variables are
          * declared before use.
          */
-        Simple(const graph::AtomicModel& model,
+        Simple(const devs::DynamicsInit& model,
                const devs::InitEventList& events,
                bool control = true);
 
@@ -591,7 +591,7 @@ namespace vle { namespace extension { namespace DifferenceEquation {
          * @param control if true then the external variables are
          * declared before use.
          */
-        Multiple(const graph::AtomicModel& model,
+        Multiple(const devs::DynamicsInit& model,
                  const devs::InitEventList& events,
                  bool control = true);
 
@@ -699,7 +699,7 @@ namespace vle { namespace extension { namespace DifferenceEquation {
          * @param control if true then the external variables are
          * declared before use.
          */
-        Generic(const graph::AtomicModel& model,
+        Generic(const devs::DynamicsInit& model,
                 const devs::InitEventList& events);
 
         /**

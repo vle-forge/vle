@@ -43,7 +43,7 @@ namespace vle { namespace extension {
 using namespace devs;
 using namespace vle::value;
 
-CellQSS::CellQSS(const vle::graph::AtomicModel& model,
+CellQSS::CellQSS(const vle::devs::DynamicsInit& model,
                  const vle::devs::InitEventList& events) :
     CellDevs(model, events),
     m_gradient(0),

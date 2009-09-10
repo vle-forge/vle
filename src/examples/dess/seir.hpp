@@ -33,7 +33,7 @@ namespace vle { namespace examples { namespace dess {
 class seir : public vle::extension::QSS::Multiple
 {
 public:
-    seir(const vle::graph::AtomicModel&,
+    seir(const vle::devs::DynamicsInit&,
 	 const vle::devs::InitEventList&);
     virtual ~seir(){}
 

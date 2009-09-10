@@ -33,7 +33,7 @@ namespace vle { namespace examples { namespace equation {
     class Controller : public devs::Dynamics
     {
     public:
-        Controller(const graph::AtomicModel& model,
+        Controller(const devs::DynamicsInit& model,
                    const devs::InitEventList& events);
 
         virtual ~Controller()

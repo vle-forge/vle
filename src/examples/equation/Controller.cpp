@@ -27,7 +27,7 @@
 
 namespace vle { namespace examples { namespace equation {
 
-Controller::Controller(const graph::AtomicModel& model,
+Controller::Controller(const devs::DynamicsInit& model,
 		       const devs::InitEventList& events) :
     devs::Dynamics(model, events)
 {

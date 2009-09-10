@@ -28,7 +28,7 @@
 
 namespace vle { namespace examples { namespace qss {
 
-Ladybird2::Ladybird2(const graph::AtomicModel& model,
+Ladybird2::Ladybird2(const devs::DynamicsInit& model,
                      const devs::InitEventList& events) :
     extension::DifferenceEquation::Simple(model, events)
 {

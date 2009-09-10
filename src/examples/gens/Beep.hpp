@@ -33,7 +33,7 @@ namespace vle { namespace examples { namespace gens {
     class Beep : public devs::Dynamics
     {
     public:
-        Beep(const graph::AtomicModel& model,
+        Beep(const devs::DynamicsInit& model,
              const devs::InitEventList& events) :
             devs::Dynamics(model, events)
         { }

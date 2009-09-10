@@ -33,7 +33,7 @@ namespace vle { namespace examples { namespace qss {
 class Ladybirdplantlouse : public extension::QSS::Multiple
 {
 public:
-    Ladybirdplantlouse(const graph::AtomicModel& model,
+    Ladybirdplantlouse(const devs::DynamicsInit& model,
 		       const devs::InitEventList& events);
 
     virtual ~Ladybirdplantlouse();

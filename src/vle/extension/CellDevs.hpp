@@ -61,7 +61,7 @@ namespace vle { namespace extension {
 	std::map < std::string, value::Value* > m_parameters;
 
     public:
-        CellDevs(const vle::graph::AtomicModel& model,
+        CellDevs(const vle::devs::DynamicsInit& model,
                  const vle::devs::InitEventList& events);
 
         virtual ~CellDevs() { }

@@ -34,7 +34,7 @@
 
 namespace vle { namespace examples { namespace generator {
 
-GeneratorWrapper::GeneratorWrapper(const graph::AtomicModel& model,
+GeneratorWrapper::GeneratorWrapper(const devs::DynamicsInit& model,
                                    const devs::InitEventList& events) :
     devs::Dynamics(model, events),
     m_events(events),

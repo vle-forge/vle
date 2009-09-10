@@ -29,7 +29,7 @@
 
 namespace vle { namespace examples { namespace qss {
 
-Ladybird::Ladybird(const graph::AtomicModel& model,
+Ladybird::Ladybird(const devs::DynamicsInit& model,
                    const devs::InitEventList& events):
     extension::QSS::Simple(model, events)
 {

@@ -131,6 +131,15 @@ namespace vle { namespace utils {
          */
         void select(const std::string& name);
 
+        /**
+         * @brief Get an identifiant for the specified package. If the name is
+         * not defined in the table list, it will be add.
+         * @param name The package to get an Id.
+         * @return An id.
+         */
+        PackageTable::index getId(const std::string& package)
+        { return m_table.get(package); }
+
                            /*   manage singleton   */
 
         /**

@@ -33,7 +33,7 @@ namespace vle { namespace examples { namespace qss {
 class Ladybird : public extension::QSS::Simple
 {
 public:
-    Ladybird(const graph::AtomicModel& model,
+    Ladybird(const devs::DynamicsInit& model,
 	     const devs::InitEventList& events);
 
     virtual ~Ladybird();

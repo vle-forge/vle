@@ -52,9 +52,9 @@ namespace vle { namespace devs {
     class VLE_DEVS_EXPORT RootCoordinator
     {
     public:
-	RootCoordinator();
+        RootCoordinator();
 
-	~RootCoordinator();
+        ~RootCoordinator();
 
         /**
          * @brief initialiase a new Coordinator with the specified vpz::Vpz
@@ -67,20 +67,20 @@ namespace vle { namespace devs {
          * @brief Initialise RootCoordinator and his Coordinator: initiale time
          * is define, coordinator init function is call.
          */
-	void init();
+        void init();
 
         /**
          * @brief Call the coordinator run function and test if current time is
          * the end of the simulation.
          * @return false when simulation is finished, true otherwise.
          */
-	bool run();
+        bool run();
 
         /**
          * @brief Call the coordinator finish function and delete the
          * coordinator and all attached data.
          */
-	void finish();
+        void finish();
 
         /**
          * @brief Return the current time of the simulation.
@@ -109,7 +109,11 @@ namespace vle { namespace devs {
          */
         void refreshOutputs();
 
-        void setRand(Dynamics& dynamics);
+        /**
+         * @brief Return a reference to the random generator.
+         * @return Return a reference to the random generator.
+         */
+        utils::Rand& rand() { return m_rand; }
 
     private:
         utils::Rand         m_rand;
@@ -123,8 +127,8 @@ namespace vle { namespace devs {
         /** @brief Store the end date of the simulation. */
         devs::Time          m_end;
 
-	Coordinator*        m_coordinator;
-	ModelFactory*       m_modelfactory;
+        Coordinator*        m_coordinator;
+        ModelFactory*       m_modelfactory;
         graph::Model*       m_root;
 
         ///! the output of the simulation if plugin are Storage.

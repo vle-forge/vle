@@ -49,7 +49,7 @@ namespace vle { namespace extension {
     class VLE_EXTENSION_EXPORT DESS : public vle::extension::DifferentialEquation
     {
     public:
-        DESS(const vle::graph::AtomicModel& model,
+        DESS(const vle::devs::DynamicsInit& model,
              const vle::devs::InitEventList& events);
 
         virtual ~DESS() {}

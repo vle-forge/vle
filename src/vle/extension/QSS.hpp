@@ -34,7 +34,7 @@ namespace vle { namespace extension { namespace QSS {
     class VLE_EXTENSION_EXPORT Simple : public vle::extension::DifferentialEquation
     {
     public:
-        Simple(const vle::graph::AtomicModel& model,
+        Simple(const vle::devs::DynamicsInit& model,
             const vle::devs::InitEventList& events);
 	virtual ~Simple() { }
 
@@ -168,7 +168,7 @@ namespace vle { namespace extension { namespace QSS {
 
         /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-        Multiple(const graph::AtomicModel& model,
+        Multiple(const devs::DynamicsInit& model,
 		 const devs::InitEventList& event);
         virtual ~Multiple();
 

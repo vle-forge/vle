@@ -28,7 +28,7 @@
 
 namespace vle { namespace examples { namespace dess {
 
-sir::sir(const graph::AtomicModel& model,
+sir::sir(const devs::DynamicsInit& model,
 	 const devs::InitEventList &evList) :
     extension::QSS::Multiple(model,evList)
 {

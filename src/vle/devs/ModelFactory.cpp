@@ -36,6 +36,7 @@
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Path.hpp>
+#include <vle/utils/Package.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Algo.hpp>
 
@@ -253,36 +254,46 @@ graph::Model* ModelFactory::createModelFromClass(Coordinator& coordinator,
 
 Glib::Module* ModelFactory::buildPlugin(const vpz::Dynamic& dyn)
 {
-    utils::PathList lst(utils::Path::path().getSimulatorDirs());
-    utils::PathList::const_iterator it;
+    std::string path, error;
 
-    std::string error((fmt(_(
-                "Error opening simulator plugin '%1%' in:")) %
-            dyn.library()).str());
-
-    for (it = lst.begin(); it != lst.end(); ++it) {
-        std::string file;
-
-        if (dyn.language().empty()) {
-            file = Glib::Module::build_path(*it, dyn.library());
-        } else if (dyn.language() == "python") {
-            file = Glib::Module::build_path(*it, "pydynamics");
-        }
-
-        Glib::Module* module = new Glib::Module(file);
-        if (not (*module)) {
-            error += boost::str(fmt(_(
-                    "\n[%1%]: %2%")) % *it % Glib::Module::get_last_error());
-            delete module;
+    if (dyn.package().empty()) {
+        if (utils::Package::package().selected()) {
+            error = (fmt(_("Error opening simulator '%1%' from current package:"
+                           " '%2%'")) % dyn.library() %
+                     utils::Path::path().getPackageLibDir()).str();
+            path = utils::Path::path().getPackageLibDir();
         } else {
-#ifdef G_OS_WIN32
-            module->make_resident();
-#endif
-            mModule.add(
-                dyn.language() == "python" ? "pydynamics" : dyn.library(),
-                module);
-            return module;
+            error = (fmt(_("Error opening simulator '%1%' from global"
+                           " directory:")) % dyn.library()).str();
+            path = utils::Path::path().getSimulatorDir();
         }
+    } else {
+        error = (fmt(_("Error opening simulator '%1%' from package '%2%':")) %
+                 dyn.library() % dyn.package()).str();
+        path = utils::Path::path().getExternalPackageLibDir(dyn.package());
+    }
+
+    Glib::Module* module;
+
+    if (dyn.language().empty()) {
+        module = new Glib::Module(
+            Glib::Module::build_path(path, dyn.library()));
+    } else {
+        module = new Glib::Module(
+            Glib::Module::build_path(path, "pydynamics"));
+    }
+
+    if (not (*module)) {
+        error += "\n";
+        error += Glib::Module::get_last_error();
+        delete module;
+    } else {
+#ifdef G_OS_WIN32
+        module->make_resident();
+#endif
+        mModule.add(dyn.language() == "python" ? "pydynamics" : dyn.library(),
+                    module);
+        return module;
     }
     throw utils::FileError(error);
 }
@@ -306,80 +317,105 @@ void ModelFactory::attachDynamics(Coordinator& coordinator,
                                   Glib::Module* module,
                                   const InitEventList& events)
 {
-    /*
-     * Define the pointer to fonction of the devs::Dynamics plug-in.
-     */
-    typedef  Dynamics* (*function) (
-        const graph::Model&, const InitEventList&);
+    std::string dynamicsSymbolName("makeNewDynamics");
+    std::string executiveSymbolName("makeNewExecutive");
+    std::string dynamicsWrapperSymbolName("makeNewDynamicsWrapper");
+    devs::Dynamics* r = 0;
 
-    devs::Dynamics* call = 0;
-    void* makeNewDynamics = 0;
-
-    if (dyn.model().empty() or !dyn.language().empty()) {
-        bool getSymbol = module->get_symbol("makeNewDynamics", makeNewDynamics);
-
-        if (not getSymbol) {
-            throw utils::InternalError(fmt(_(
-                    "Error in '%1%', function 'makeNewDynamics' not found: '%2%'\n"))
-                % module->get_name() % Glib::Module::get_last_error());
-        }
-
-        function fct(utils::pointer_to_function < function >(makeNewDynamics));
+    if (dyn.model().empty() or not dyn.language().empty()) {
         try {
-            call = fct(*atom->getStructure(), events);
-        } catch(const std::exception& e) {
-            throw utils::ModellingError(fmt(_(
-                    "%1%: %2%")) % atom->getName() % e.what());
-        }
+            r = getDynamicsObject(coordinator, *atom->getStructure(),
+                                  dyn, module, events,
+                                  dynamicsSymbolName,
+                                  executiveSymbolName,
+                                  dynamicsWrapperSymbolName);
 
-        if (not call) {
-            throw utils::InternalError(fmt(_(
-                    "Error in '%1%', function 'makeNewDynamics':"
-                    "problem allocation a new Dynamics: '%2%'\n")) %
-                module->get_name() % Glib::Module::get_last_error());
+        } catch (const std::exception& e) {
+            throw utils::ModellingError(fmt(
+                    _("Dynamic library loading problem: cannot get dynamics"
+                      " '%1%' in module '%2%': %3%")) % dyn.name() %
+                module->get_name() % e.what());
         }
     } else {
-        std::string functionanme("makeNewDynamics");
-	functionanme += dyn.model();
-	bool getSymbol = module->get_symbol(functionanme , makeNewDynamics);
-
-        if (not getSymbol) {
-            throw utils::InternalError(fmt(_(
-                    "Error in '%1%', function '%2%' not found: '%3%'\n")) %
-                module->get_name() % functionanme %
-                Glib::Module::get_last_error());
-        }
-
-        function fct(utils::pointer_to_function < function >(makeNewDynamics));
         try {
-            call = fct(*atom->getStructure(), events);
+            r = getDynamicsObject(coordinator, *atom->getStructure(),
+                                  dyn, module, events,
+                                  dynamicsSymbolName + dyn.model(),
+                                  executiveSymbolName + dyn.model(),
+                                  dynamicsWrapperSymbolName + dyn.model());
+        } catch (const std::exception& e) {
+            throw utils::ModellingError(fmt(
+                    _("Dynamic library loading problem: cannot get dynamics"
+                      " '%1%', model '%2%' in module '%3%': %4%")) % dyn.name() %
+                dyn.model() % module->get_name() % e.what());
+        }
+    }
+    assert(r);
+    atom->addDynamics(r);
+}
+
+Dynamics* ModelFactory::getDynamicsObject(Coordinator& coordinator,
+                                          const graph::AtomicModel& atom,
+                                          const vpz::Dynamic& dyn,
+                                          Glib::Module* module,
+                                          const InitEventList& events,
+                                          const std::string& dynamicsSymbol,
+                                          const std::string& executiveSymbol,
+                                          const std::string& dynwrapperSymbol)
+{
+    typedef Dynamics* (*fctdyn) ( const DynamicsInit&, const InitEventList&);
+    typedef Dynamics* (*fctexe) ( const ExecutiveInit&, const InitEventList&);
+    typedef Dynamics* (*fctdw) ( const DynamicsWrapperInit&,
+                                 const InitEventList&);
+
+    Dynamics* dynamics;
+    void* symbol;
+
+    if (module->get_symbol(dynamicsSymbol, symbol)) {
+        fctdyn fct(utils::pointer_to_function < fctdyn >(symbol));
+        try {
+            dynamics = fct(DynamicsInit(atom, mRoot.rand(),
+                                       utils::Package::package().getId(dyn.package())),
+                           events);
         } catch(const std::exception& e) {
-            throw utils::ModellingError(fmt(_(
-                    "%1%: %2%")) % atom->getName() % e.what());
+            throw utils::ModellingError(fmt(
+                    _("dynamics '%1%' throw error: %2%")) % atom.getParentName() %
+                e.what());
         }
+        return dynamics;
+    }
 
-        if (not call) {
-            throw utils::InternalError(fmt(_(
-                    "Error in '%1%', function '%2%':"
-                    "problem allocation a new Dynamics: '%3%'\n")) %
-                module->get_name() % functionanme %
-                Glib::Module::get_last_error());
+    if (module->get_symbol(executiveSymbol, symbol)) {
+        fctexe fct(utils::pointer_to_function < fctexe >(symbol));
+        try {
+            dynamics = fct(ExecutiveInit(atom, mRoot.rand(),
+                                         utils::Package::package().getId(dyn.package()),
+                                         coordinator), events);
+        } catch(const std::exception& e) {
+            throw utils::ModellingError(fmt(
+                    _("executive '%1%' throw error: %2%")) % atom.getParentName() %
+                e.what());
         }
+        return dynamics;
     }
 
-    mRoot.setRand(*call);
-
-    if (call->isExecutive()) {
-        coordinator.setCoordinator(*(reinterpret_cast < Executive* >(call)));
+    if (module->get_symbol(dynwrapperSymbol, symbol)) {
+        fctdw fct(utils::pointer_to_function < fctdw >(symbol));
+        try {
+            dynamics = fct(
+                DynamicsWrapperInit(
+                    atom, mRoot.rand(),
+                    utils::Package::package().getId(dyn.package()),
+                dyn.library(), dyn.model()), events);
+        } catch(const std::exception& e) {
+            throw utils::ModellingError(fmt(
+                    _("dynamics wrapper '%1%' throw error: %2%")) % atom.getParentName() %
+                e.what());
+        }
+        return dynamics;
     }
-
-    if (call->isWrapper()) {
-        (reinterpret_cast < DynamicsWrapper*
-         >(call))->setLibrary(dyn.library());
-        (reinterpret_cast < DynamicsWrapper* >(call))->setModel(dyn.model());
-    }
-
-    atom->addDynamics(call);
+    throw utils::ArgError(_("Not a VLE dynamics, executive or dynamicswrapper"
+                            " plugin"));
 }
 
 }} // namespace vle devs

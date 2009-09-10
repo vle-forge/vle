@@ -32,7 +32,7 @@ namespace vle { namespace examples { namespace dess {
 class R2 : public extension::DESS
 {
 public:
-    R2(const graph::AtomicModel& model,
+    R2(const devs::DynamicsInit& model,
        const devs::InitEventList& events);
     virtual ~R2()
         { }

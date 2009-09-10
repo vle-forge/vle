@@ -34,7 +34,7 @@ namespace vle { namespace examples { namespace gens {
     class GenExecutiveClass : public devs::Executive
     {
     public:
-        GenExecutiveClass(const graph::AtomicModel& mdl,
+        GenExecutiveClass(const devs::ExecutiveInit& mdl,
                           const devs::InitEventList& events);
 
         virtual ~GenExecutiveClass() { }
@@ -63,6 +63,6 @@ namespace vle { namespace examples { namespace gens {
 
 }}} // namespace vle examples gens
 
-DECLARE_NAMED_DYNAMICS(executiveclass, vle::examples::gens::GenExecutiveClass)
+DECLARE_NAMED_EXECUTIVE(executiveclass, vle::examples::gens::GenExecutiveClass)
 
 #endif

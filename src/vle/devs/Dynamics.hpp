@@ -27,7 +27,6 @@
 #define DEVS_DYNAMICS_HPP
 
 #include <vle/devs/DllDefines.hpp>
-#include <vle/devs/RootCoordinator.hpp>
 #include <vle/devs/Event.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/devs/EventList.hpp>
@@ -43,23 +42,23 @@
 #include <vle/value/Boolean.hpp>
 #include <vle/value/String.hpp>
 #include <vle/utils/Rand.hpp>
+#include <vle/utils/PackageTable.hpp>
 #include <string>
-
 
 #define DECLARE_DYNAMICS(mdl) \
     extern "C" { \
         vle::devs::Dynamics* \
-        makeNewDynamics(const vle::graph::AtomicModel& model, \
+        makeNewDynamics(const vle::devs::DynamicsInit& init, \
                         const vle::devs::InitEventList& events) \
-        { return new mdl(model, events); } \
+        { return new mdl(init, events); } \
     }
 
 #define DECLARE_NAMED_DYNAMICS(name, mdl) \
     extern "C" { \
         vle::devs::Dynamics* \
-        makeNewDynamics##name(const vle::graph::AtomicModel& model, \
+        makeNewDynamics##name(const vle::devs::DynamicsInit& init, \
                               const vle::devs::InitEventList& events) \
-        { return new mdl(model, events); } \
+        { return new mdl(init, events); } \
     }
 
 namespace vle { namespace devs {
@@ -67,31 +66,57 @@ namespace vle { namespace devs {
     class RootCoordinator;
 
     /**
+     * @brief A PackageId defines a reference to an element of the
+     * vle::utils::PackageTable.
+     */
+    typedef utils::PackageTable::index PackageId;
+
+    class VLE_DEVS_EXPORT DynamicsInit
+    {
+    public:
+        DynamicsInit(const graph::AtomicModel& model,
+                     utils::Rand& rnd,
+                     PackageId packageid)
+            : m_model(model), m_rand(rnd), m_packageid(packageid)
+        {}
+
+        virtual ~DynamicsInit()
+        {}
+
+        const graph::AtomicModel& model() const { return m_model; }
+        utils::Rand& rand() const { return m_rand; }
+        PackageId packageid() const { return m_packageid; }
+
+    private:
+        const graph::AtomicModel&       m_model;
+        utils::Rand&                    m_rand;
+        PackageId                       m_packageid;
+    };
+
+    /**
      * @brief Dynamics class represent a part of the DEVS simulator. This class
      * must be inherits to build simulation components.
-     *
      */
     class VLE_DEVS_EXPORT Dynamics
     {
     public:
-	/**
-         * @brief Constructor of the dynamics of an atomic model. Process the
-         * init events: these events occurs only at the beginning of the
-         * simulation and initialize the state of the model.
-	 * @param model the atomic model to which belongs the dynamics
-	 * @param event the init event list.
-	 */
-        Dynamics(const vle::graph::AtomicModel& model,
-                 const vle::devs::InitEventList&  /* events */) :
-            m_model(model),
-            m_rand(0)
-        { }
+        /**
+         * @brief Constructor of Dynamics for an atomic model.
+         *
+         * @param init The initialiser of Dynamics.
+         * @param events The parameter from the experimental frame.
+         */
+        Dynamics(const DynamicsInit& init,
+                 const vle::devs::InitEventList&  /* events */)
+            : m_model(init.model()), m_rand(init.rand()),
+            m_packageid(init.packageid())
+        {}
 
 	/**
 	 * @brief Destructor (nothing to do)
 	 */
         virtual ~Dynamics()
-        { }
+        {}
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -354,21 +379,118 @@ namespace vle { namespace devs {
                            const std::string& attributeName,
                            const std::string& attributeValue) const;
 
-        /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+       /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
+        /**
+         * @brief Get the package directory.
+         * @return The package path.
+         */
+        std::string getPackageDir() const;
+
+        /**
+         * @brief Get the library package directory.
+         * @return The library package path.
+         */
+        std::string getPackageLibDir() const;
+
+        /**
+         * @brief Get the source package directory.
+         * @return The source package path.
+         */
+        std::string getPackageSrcDir() const;
+
+        /**
+         * @brief Get the data package directory.
+         * @return The data package path.
+         */
+        std::string getPackageDataDir() const;
+
+        /**
+         * @brief Get the document package directory.
+         * @return The document package path.
+         */
+        std::string getPackageDocDir() const;
+
+        /**
+         * @brief Get the experiment package directory.
+         * @return The experiment package path.
+         */
+        std::string getPackageExpDir() const;
+
+        /**
+         * @brief Get the build package directory.
+         * @return The build package path.
+         */
+        std::string getPackageBuildDir() const;
+
+        /**
+         * @brief Get the path of a package file.
+         * @param name The name of the file.
+         * @return The patch of the file.
+         */
+        std::string getPackageFile(const std::string& name) const;
+
+        /**
+         * @brief Get the path of a library package file.
+         * @param name The name of the file.
+         * @return The patch of the file.
+         */
+        std::string getPackageLibFile(const std::string& name) const;
+
+        /**
+         * @brief Get the path of a source package file.
+         * @param name The name of the file.
+         * @return The patch of the file.
+         */
+        std::string getPackageSrcFile(const std::string& name) const;
+
+        /**
+         * @brief Get the path of a data package file.
+         * @param name The name of the file.
+         * @return The patch of the file.
+         */
+        std::string getPackageDataFile(const std::string& name) const;
+
+        /**
+         * @brief Get the path of a document package file.
+         * @param name The name of the file.
+         * @return The patch of the file.
+         */
+        std::string getPackageDocFile(const std::string& name) const;
+
+        /**
+         * @brief Get the path of an experiment package file.
+         * @param name The name of the file.
+         * @return The patch of the file.
+         */
+        std::string getPackageExpFile(const std::string& name) const;
+
+       /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
         /**
          * @brief Return a reference to the RootCoordinator utils::Rand pseudo
          * random generator.
          * @return Return a reference to the utils::Rand object.
          */
-        inline utils::Rand& rand() const
-        { return *m_rand; }
+        inline utils::Rand& rand() const { return m_rand; }
 
-        friend void RootCoordinator::setRand(Dynamics& dyn);
+        /**
+         * @brief Get a constant reference to the element of the
+         * vle::utils::PackageTable string table.
+         * @return A consttant reference.
+         */
+        inline PackageId packageid() const { return m_packageid; }
 
     private:
-        const graph::AtomicModel&   m_model;
-        utils::Rand*                m_rand;
+        const graph::AtomicModel& m_model; /**< A constant reference to the
+                                             atomic model node of the graph.
+                                               */
+
+        utils::Rand& m_rand; /**< A reference to the global random number
+                               generator. */
+
+        PackageId m_packageid; /**< An iterator to std::set of the
+                                 vle::utils::PackageTable. */
     };
 
 }} // namespace vle devs

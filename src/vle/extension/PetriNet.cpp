@@ -24,6 +24,7 @@
 
 
 #include <vle/extension/PetriNet.hpp>
+#include <vle/utils/Debug.hpp>
 #include <boost/checked_delete.hpp>
 #include <algorithm>
 
@@ -344,7 +345,7 @@ PetriNet::Transition* PetriNet::selectTransition()
 }
 
 // Constructor and destructor
-PetriNet::PetriNet(const graph::AtomicModel& model,
+PetriNet::PetriNet(const devs::DynamicsInit& model,
                    const devs::InitEventList& events) :
     devs::Dynamics(model, events),
     mInitEvents(events),

@@ -35,7 +35,7 @@ namespace vle { namespace extension {
     class VLE_EXTENSION_EXPORT CellQSS : public CellDevs
     {
     public:
-        CellQSS(const graph::AtomicModel& model,
+        CellQSS(const devs::DynamicsInit& model,
                 const devs::InitEventList& event);
 
         virtual ~CellQSS() { }

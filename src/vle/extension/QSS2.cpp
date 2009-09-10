@@ -139,7 +139,7 @@ Couple mfi::ext(const Time& p_time, unsigned int i,const Couple & input)
     return ret;
 }
 
-qss2::qss2(const AtomicModel& p_model,
+qss2::qss2(const DynamicsInit& p_model,
            const InitEventList& events) :
     Dynamics(p_model, events),
     m_value(0),

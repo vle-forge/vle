@@ -28,7 +28,7 @@
 
 namespace vle { namespace examples { namespace qss {
 
-Smartgardener2::Smartgardener2(const graph::AtomicModel& model,
+Smartgardener2::Smartgardener2(const devs::DynamicsInit& model,
                                const devs::InitEventList& events) :
     devs::Dynamics(model, events)
 {

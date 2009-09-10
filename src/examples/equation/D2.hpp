@@ -36,7 +36,7 @@ namespace vle { namespace examples { namespace equation {
         Sync b;
 
     public:
-        D2(const graph::AtomicModel& model,
+        D2(const devs::DynamicsInit& model,
            const devs::InitEventList& events);
         virtual ~D2() { }
 

@@ -36,7 +36,7 @@ namespace vle { namespace examples { namespace lifegame {
     class Executive : public vle::devs::Executive
     {
     public :
-        Executive(const vle::graph::AtomicModel& model,
+        Executive(const vle::devs::ExecutiveInit& model,
                   const vle::devs::InitEventList& events);
 
         virtual ~Executive() { }
@@ -49,6 +49,6 @@ namespace vle { namespace examples { namespace lifegame {
 
 }}} // namespace vle examples lifegame
 
-DECLARE_NAMED_DYNAMICS(executive, vle::examples::lifegame::Executive)
+DECLARE_NAMED_EXECUTIVE(executive, vle::examples::lifegame::Executive)
 
 #endif

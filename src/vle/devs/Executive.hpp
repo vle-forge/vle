@@ -34,9 +34,44 @@
 #include <vle/vpz/Conditions.hpp>
 #include <vle/vpz/Observables.hpp>
 
+#define DECLARE_EXECUTIVE(mdl) \
+    extern "C" { \
+        vle::devs::Dynamics* \
+        makeNewExecutive(const vle::devs::ExecutiveInit& init, \
+                         const vle::devs::InitEventList& events) \
+        { return new mdl(init, events); } \
+    }
+
+#define DECLARE_NAMED_EXECUTIVE(name, mdl) \
+    extern "C" { \
+        vle::devs::Dynamics* \
+        makeNewExecutive##name(const vle::devs::ExecutiveInit& init, \
+                               const vle::devs::InitEventList& events) \
+        { return new mdl(init, events); } \
+    }
+
 namespace vle { namespace devs {
 
     class Simulator;
+
+    class VLE_DEVS_EXPORT ExecutiveInit : public DynamicsInit
+    {
+    public:
+        ExecutiveInit(const graph::AtomicModel& model,
+                      utils::Rand& rnd,
+                      PackageId packageid,
+                      Coordinator& coordinator)
+            : DynamicsInit(model, rnd, packageid), m_coordinator(coordinator)
+        {}
+
+        virtual ~ExecutiveInit()
+        {}
+
+        Coordinator& coordinator() const { return m_coordinator; }
+
+    private:
+        Coordinator& m_coordinator;
+    };
 
     /**
      * @brief Dynamics class for the Barros DEVS extension. Provite graph
@@ -51,18 +86,17 @@ namespace vle { namespace devs {
 	 * @brief Constructor of the Executive of an atomic model
 	 * @param model the atomic model to which belongs the dynamics
 	 */
-        Executive(const graph::AtomicModel& model,
-                  const devs::InitEventList& events) :
-            Dynamics(model, events),
-            m_coordinator(0)
-        { }
+        Executive(const ExecutiveInit& init,
+                  const InitEventList& events)
+            : Dynamics(init, events), m_coordinator(init.coordinator())
+        {}
 
 	/**
 	 * @brief Destructor (nothing to do)
 	 * @return none
 	 */
         virtual ~Executive()
-        { }
+        {}
 
         /**
          * @brief If this function return true, then a cast to an Executive
@@ -82,43 +116,41 @@ namespace vle { namespace devs {
          * @brief Get a constant reference to the list of vpz::Dynamics objects.
          * @return A constant reference to the list of vpz::Dynamics objects.
          */
-        const vpz::Dynamics& dynamics() const
-        { return coordinator().dynamics(); }
+        const vpz::Dynamics& dynamics() const { return m_coordinator.dynamics(); }
 
         /**
          * @brief Get a reference to the list of vpz::Dynamics objects.
          * @return A reference to the list of vpz::Dynamics objects.
          */
-        vpz::Dynamics& dynamics()
-        { return coordinator().dynamics(); }
+        vpz::Dynamics& dynamics() { return m_coordinator.dynamics(); }
 
         /**
          * @brief Get a constant reference to the list of vpz::Conditions objects.
          * @return A constant reference to the list of vpz::Conditions objects.
          */
         const vpz::Conditions& conditions() const
-        { return coordinator().conditions(); }
+        { return m_coordinator.conditions(); }
 
         /**
          * @brief Get a reference to the list of vpz::Conditions objects.
          * @return A reference to the list of vpz::Conditions objects.
          */
         vpz::Conditions& conditions()
-        { return coordinator().conditions(); }
+        { return m_coordinator.conditions(); }
 
         /**
          * @brief Get a constant reference to the list of vpz::Observables objects.
          * @return A constant reference to the list of vpz::Observables objects.
          */
         const vpz::Observables& observables() const
-        { return coordinator().observables(); }
+        { return m_coordinator.observables(); }
 
         /**
          * @brief Get a reference to the list of vpz::Conditions objects.
          * @return A reference to the list of vpz::Conditions objects.
          */
         vpz::Observables& observables()
-        { return coordinator().observables(); }
+        { return m_coordinator.observables(); }
 
         /**
          * @brief Build a new devs::Simulator from the dynamics library. Attach
@@ -133,7 +165,7 @@ namespace vle { namespace devs {
         void createModel(graph::AtomicModel* model, const std::string& dynamics,
                          const vpz::Strings& conditions,
                          const std::string& observable)
-        { return coordinator().createModel(model, dynamics, conditions, observable); }
+        { return m_coordinator.createModel(model, dynamics, conditions, observable); }
 
         /**
          * @brief Build a new devs::Simulator from the vpz::Classes information.
@@ -145,7 +177,7 @@ namespace vle { namespace devs {
         graph::Model* createModelFromClass(const std::string& classname,
                                            graph::CoupledModel* parent,
                                            const std::string& modelname)
-        { return coordinator().createModelFromClass(classname, parent, modelname); }
+        { return m_coordinator.createModelFromClass(classname, parent, modelname); }
 
         /**
          * @brief Add an observable, ie. a reference and a model to the
@@ -157,7 +189,7 @@ namespace vle { namespace devs {
         void addObservableToView(graph::AtomicModel* model,
                                  const std::string& portname,
                                  const std::string& view)
-        { coordinator().addObservableToView(model, portname, view); }
+        { m_coordinator.addObservableToView(model, portname, view); }
 
         /**
          * @brief Delete the specified model from coupled model. All
@@ -167,41 +199,26 @@ namespace vle { namespace devs {
          * @param modelname the name of model to delete.
          */
         void delModel(graph::CoupledModel* parent, const std::string& modelname)
-        { coordinator().delModel(parent, modelname); }
+        { m_coordinator.delModel(parent, modelname); }
 
         /**
          * @brief Get a reference to the current coupled model.
          * @return A constant reference to the coupled model.
          */
-        const graph::CoupledModel& coupledmodel() const;
+        const graph::CoupledModel& coupledmodel() const
+        { return *getModel().getParent(); }
 
         /**
          * @brief Get a reference to the current coupled model.
          * @return A reference to the coupled model.
          */
-        graph::CoupledModel& coupledmodel();
-
-        ////
-        //// Function to assign a coordinator reference to the executive object.
-        ////
-
-        /**
-         * @brief Assign a coordinator to the Executive model to give access to
-         * vle::graph, vle::devs and vle::vpz API.
-         * @param coordinator A reference to the coordinator.
-         */
-        friend void Coordinator::setCoordinator(Executive& exe);
+        graph::CoupledModel& coupledmodel()
+        { return *getModel().getParent(); }
 
     private:
-        Coordinator& coordinator();
-
-        const Coordinator& coordinator() const;
-
-        Coordinator*    m_coordinator; /** Reference to the coordinator object
-                                         to build, delete or construct new
-                                         models at runtime. */
-
-        void isInitialized() const;
+        Coordinator& m_coordinator; /**< A reference to the coordinator of this
+                                      executive to allow modification of
+                                      coupled model. */
     };
 
 }} // namespace vle devs

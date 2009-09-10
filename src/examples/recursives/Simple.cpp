@@ -31,7 +31,7 @@ namespace vle { namespace examples { namespace recursives {
     class SimpleSimulation : public devs::Dynamics
     {
     public:
-        SimpleSimulation(const graph::AtomicModel& mdl,
+        SimpleSimulation(const devs::DynamicsInit& mdl,
                          const devs::InitEventList& lst)
             : devs::Dynamics(mdl, lst)
         {}
@@ -72,7 +72,7 @@ namespace vle { namespace examples { namespace recursives {
     class RecursiveSimulation : public devs::Dynamics
     {
     public:
-        RecursiveSimulation(const graph::AtomicModel& mdl,
+        RecursiveSimulation(const devs::DynamicsInit& mdl,
                          const devs::InitEventList& lst)
             : devs::Dynamics(mdl, lst)
         {}

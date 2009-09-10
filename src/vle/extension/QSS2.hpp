@@ -71,7 +71,7 @@ namespace vle { namespace extension {
         friend class mfi;
 
     public:
-        qss2(const vle::graph::AtomicModel& model,
+        qss2(const vle::devs::DynamicsInit& model,
              const vle::devs::InitEventList& events);
 
         virtual ~qss2() { }

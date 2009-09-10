@@ -35,7 +35,7 @@ namespace vle { namespace examples { namespace qss {
 class Plantlouse : public extension::QSS::Simple
 {
 public:
-    Plantlouse(const graph::AtomicModel& model,
+    Plantlouse(const devs::DynamicsInit& model,
 	       const devs::InitEventList& events);
 
     virtual ~Plantlouse();

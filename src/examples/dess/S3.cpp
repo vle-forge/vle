@@ -28,7 +28,7 @@
 
 namespace vle { namespace examples { namespace dess {
 
-S3::S3(const graph::AtomicModel& model,
+S3::S3(const devs::DynamicsInit& model,
        const devs::InitEventList& events):
     extension::QSS::Simple(model, events)
 {
