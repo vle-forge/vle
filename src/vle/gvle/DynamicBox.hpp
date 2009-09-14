@@ -55,7 +55,8 @@ namespace vle { namespace gvle {
     private:
         Glib::RefPtr < Gnome::Glade::Xml >  mXml;
         Gtk::Dialog*                        mDialog;
-        Gtk::ComboBoxText*                  mCombo;
+        Gtk::ComboBoxText*                  mComboLibrary;
+        Gtk::ComboBoxText*                  mComboPackage;
         Gtk::Entry*                         mLocationHost;
         Gtk::SpinButton*                    mLocationPort;
         Gtk::Entry*                         mModel;
@@ -65,7 +66,14 @@ namespace vle { namespace gvle {
         vpz::Dynamic*                       mDyn;
         bool                                mValid;
 
-        void makeCombo();
+        void makeComboLibrary();
+        void makeComboPackage();
+
+        /**
+         * @brief When combobox package is changed, we update the combobox
+         * library.
+         */
+        void onComboPackageChange();
         void on_apply();
         void on_cancel();
     };

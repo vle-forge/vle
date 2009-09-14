@@ -40,8 +40,15 @@ DynamicBox::DynamicBox(Glib::RefPtr<Gnome::Glade::Xml> xml) :
     {
         Gtk::HBox* box;
         xml->get_widget("HBoxDynamicLibrary", box);
-        mCombo = new Gtk::ComboBoxText();
-        box->pack_start(*mCombo);
+        mComboLibrary = new Gtk::ComboBoxText();
+        box->pack_start(*mComboLibrary);
+    }
+
+    {
+        Gtk::HBox* box;
+        xml->get_widget("HBoxDynamicPackage", box);
+        mComboPackage = new Gtk::ComboBoxText();
+        box->pack_start(*mComboPackage);
     }
 
     xml->get_widget("EntryDynamicLocationHost", mLocationHost);
@@ -65,11 +72,14 @@ DynamicBox::DynamicBox(Glib::RefPtr<Gnome::Glade::Xml> xml) :
         sigc::mem_fun(*this, &DynamicBox::on_apply));
     mButtonCancel->signal_clicked().connect(
         sigc::mem_fun(*this, &DynamicBox::on_cancel));
+    mComboPackage->signal_changed().connect(
+        sigc::mem_fun(*this, &DynamicBox::onComboPackageChange));
 }
 
 DynamicBox::~DynamicBox()
 {
-    delete mCombo;
+    delete mComboLibrary;
+    delete mComboPackage;
     delete mLanguage;
 }
 
@@ -78,7 +88,8 @@ void DynamicBox::show(vpz::Dynamic* dyn)
     mDyn = dyn;
 
     mDialog->set_title((fmt(_("Dynamics: %1%")) % dyn->name()).str());
-    makeCombo();
+    makeComboPackage();
+    makeComboLibrary();
 
     if (not mDyn->location().empty()) {
         std::string ip;
@@ -105,11 +116,18 @@ void DynamicBox::show(vpz::Dynamic* dyn)
     mDialog->run();
 }
 
-void DynamicBox::makeCombo()
+void DynamicBox::makeComboLibrary()
 {
-    mCombo->clear();
+    mComboLibrary->clear();
 
-    utils::PathList paths = utils::Path::path().getSimulatorDirs();
+    utils::PathList paths;
+
+    if (mComboPackage->get_active_text().empty()) {
+        paths = utils::Path::path().getSimulatorDirs();
+    } else {
+        paths.push_back(utils::Path::path().getExternalPackageLibDir(
+                mComboPackage->get_active_text()));
+    }
     utils::PathList::iterator it = paths.begin();
 
     while (it != paths.end()) {
@@ -120,12 +138,12 @@ void DynamicBox::makeCombo()
 #ifdef G_OS_WIN32
                 if (((*in).find("lib") == 0) &&
                     ((*in).rfind(".dll") == (*in).size() - 4)) {
-                    mCombo->append_text((*in).substr(3, (*in).size() - 7));
+                    mComboLibrary->append_text((*in).substr(3, (*in).size() - 7));
                 }
 #else
                 if (((*in).find("lib") == 0) &&
                     ((*in).rfind(".so") == (*in).size() - 3)) {
-                    mCombo->append_text((*in).substr(3, (*in).size() - 6));
+                    mComboLibrary->append_text((*in).substr(3, (*in).size() - 6));
                 }
 #endif
                 in++;
@@ -133,19 +151,38 @@ void DynamicBox::makeCombo()
         }
         it++;
     }
-    mCombo->set_active_text(mDyn->library());
+    mComboLibrary->set_active_text(mDyn->library());
+}
+
+void DynamicBox::makeComboPackage()
+{
+    mComboPackage->clear();
+
+    utils::PathList paths = utils::Path::path().getInstalledPackages();
+    for (utils::PathList::const_iterator i = paths.begin(), e = paths.end();
+         i != e; ++i) {
+        mComboPackage->append_text(*i);
+    }
+
+    mComboPackage->set_active_text(mDyn->package());
+}
+
+void DynamicBox::onComboPackageChange()
+{
+    makeComboLibrary();
 }
 
 void DynamicBox::on_apply()
 {
     mValid = true;
-    if (mCombo->get_active_text().empty()) {
+    if (mComboLibrary->get_active_text().empty()) {
         Error(_("Set a library to this Dynamic"));
         mValid = false;
         return;
     }
 
-    mDyn->setLibrary(mCombo->get_active_text());
+    mDyn->setLibrary(mComboLibrary->get_active_text());
+    mDyn->setPackage(mComboPackage->get_active_text());
 
     if (mLocationHost->get_text().empty()) {
         mDyn->setLocalDynamics();

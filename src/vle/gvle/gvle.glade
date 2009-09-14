@@ -1486,6 +1486,28 @@
                   <widget class="GtkVBox" id="vbox22">
                     <property name="visible">True</property>
                     <child>
+                      <widget class="GtkHBox" id="HBoxDynamicPackage">
+                        <property name="visible">True</property>
+                        <child>
+                          <widget class="GtkLabel" id="label291">
+                            <property name="visible">True</property>
+                            <property name="label" translatable="yes">Package</property>
+                          </widget>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="padding">10</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                      </widget>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="padding">10</property>
+                      </packing>
+                    </child>
+                    <child>
                       <widget class="GtkHBox" id="HBoxDynamicLibrary">
                         <property name="visible">True</property>
                         <child>
@@ -1533,7 +1555,7 @@
                       <packing>
                         <property name="expand">False</property>
                         <property name="padding">10</property>
-                        <property name="position">1</property>
+                        <property name="position">2</property>
                       </packing>
                     </child>
                     <child>
@@ -1546,7 +1568,7 @@ containts your devs::Dynamics source code&lt;/span&gt;</property>
                         <property name="justify">GTK_JUSTIFY_RIGHT</property>
                       </widget>
                       <packing>
-                        <property name="position">2</property>
+                        <property name="position">3</property>
                       </packing>
                     </child>
                   </widget>
