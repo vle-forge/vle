@@ -623,6 +623,15 @@ AtomicModelBox::DynamicTreeView::DynamicTreeView(
 	sigc::mem_fun(*this,
 		      &AtomicModelBox::DynamicTreeView::onEdition));
 
+    mColumnPackage = append_column(_("Package"), mColumnsDyn.m_package);
+    Gtk::TreeViewColumn* packageCol = get_column(mColumnPackage - 1);
+    packageCol->set_clickable(true);
+    packageCol->signal_clicked().connect(
+        sigc::bind(sigc::mem_fun(*this,
+                                 &AtomicModelBox::DynamicTreeView::onClickColumn),
+                   mColumnPackage));
+    packageCol->set_sort_order(Gtk::SORT_DESCENDING);
+
     mColumnDyn = append_column(_("Library"), mColumnsDyn.m_dyn);
     Gtk::TreeViewColumn* dynCol = get_column(mColumnDyn - 1);
     dynCol->set_clickable(true);
@@ -640,34 +649,25 @@ AtomicModelBox::DynamicTreeView::DynamicTreeView(
 		   mColumnModel));
     modelCol->set_sort_order(Gtk::SORT_DESCENDING);
 
-    //Fill popup menu:
     {
 	Gtk::Menu::MenuList& menulist = mMenuPopup.items();
 
 	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		_("_Add"),
-		sigc::mem_fun(
-		    *this,
-		    &AtomicModelBox::DynamicTreeView::onAdd)));
+            Gtk::Menu_Helpers::MenuElem(
+                _("_Add"), sigc::mem_fun(
+                    *this, &AtomicModelBox::DynamicTreeView::onAdd)));
+	menulist.push_back(
+            Gtk::Menu_Helpers::MenuElem(
+                _("_Edit"), sigc::mem_fun(
+                    *this, &AtomicModelBox::DynamicTreeView::onEdit)));
+	menulist.push_back(
+            Gtk::Menu_Helpers::MenuElem(
+                _("_Remove"), sigc::mem_fun(
+                    *this, &AtomicModelBox::DynamicTreeView::onRemove)));
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-		_("_Edit"),
-		sigc::mem_fun(
-		    *this,
-		    &AtomicModelBox::DynamicTreeView::onEdit)));
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		_("_Remove"),
-		sigc::mem_fun(
-		    *this,
-		    &AtomicModelBox::DynamicTreeView::onRemove)));
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		_("_Rename"),
-		sigc::mem_fun(
-		    *this,
-		    &AtomicModelBox::DynamicTreeView::onRename)));
+                _("_Rename"), sigc::mem_fun(
+                    *this, &AtomicModelBox::DynamicTreeView::onRename)));
     }
     mMenuPopup.accelerate(*this);
 }
@@ -689,6 +689,7 @@ void AtomicModelBox::DynamicTreeView::build()
     while (it != list.end()) {
         Gtk::TreeModel::Row row = *(mRefListDyn->append());
         row[mColumnsDyn.m_col_name] = it->first;
+        row[mColumnsDyn.m_package] = it->second.package();
         row[mColumnsDyn.m_dyn] = it->second.library();
 	row[mColumnsDyn.m_model] = it->second.model();
 
@@ -742,22 +743,29 @@ bool AtomicModelBox::DynamicTreeView::on_button_press_event(GdkEventButton *even
 void AtomicModelBox::DynamicTreeView::onClickColumn(int numColumn)
 {
     if (get_column(numColumn - 1)->get_sort_order() == Gtk::SORT_ASCENDING) {
-	mRefTreeModelDyn->set_sort_column(numColumn - 1,
-					  Gtk::SORT_DESCENDING);
+        mRefTreeModelDyn->set_sort_column(numColumn - 1, Gtk::SORT_DESCENDING);
 	get_column(numColumn - 1)->set_sort_order(Gtk::SORT_DESCENDING);
     } else {
-	mRefTreeModelDyn->set_sort_column_id(numColumn - 1,
-					     Gtk::SORT_ASCENDING);
+        mRefTreeModelDyn->set_sort_column_id(numColumn - 1,
+                                             Gtk::SORT_ASCENDING);
 	get_column(numColumn - 1)->set_sort_order(Gtk::SORT_ASCENDING);
     }
+
     if (numColumn == 1) {
+	get_column(mColumnPackage - 1)->set_sort_order(Gtk::SORT_DESCENDING);
 	get_column(mColumnDyn - 1)->set_sort_order(Gtk::SORT_DESCENDING);
 	get_column(mColumnModel - 1)->set_sort_order(Gtk::SORT_DESCENDING);
     } else if (numColumn == 2) {
 	get_column(mColumnName - 1)->set_sort_order(Gtk::SORT_DESCENDING);
+	get_column(mColumnDyn - 1)->set_sort_order(Gtk::SORT_DESCENDING);
+	get_column(mColumnModel - 1)->set_sort_order(Gtk::SORT_DESCENDING);
+    } else if (numColumn == 3) {
+	get_column(mColumnName - 1)->set_sort_order(Gtk::SORT_DESCENDING);
+	get_column(mColumnPackage - 1)->set_sort_order(Gtk::SORT_DESCENDING);
 	get_column(mColumnModel - 1)->set_sort_order(Gtk::SORT_DESCENDING);
     } else {
 	get_column(mColumnName - 1)->set_sort_order(Gtk::SORT_DESCENDING);
+	get_column(mColumnPackage - 1)->set_sort_order(Gtk::SORT_DESCENDING);
 	get_column(mColumnDyn - 1)->set_sort_order(Gtk::SORT_DESCENDING);
     }
 }

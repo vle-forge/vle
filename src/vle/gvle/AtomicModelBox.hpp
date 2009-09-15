@@ -67,14 +67,16 @@ protected:
     class ModelColumnsDyn : public Gtk::TreeModel::ColumnRecord
     {
     public:
-
-        ModelColumnsDyn() {
+        ModelColumnsDyn()
+        {
             add(m_col_name);
+            add(m_package);
 	    add(m_dyn);
 	    add(m_model);
         }
 
         Gtk::TreeModelColumn<Glib::ustring> m_col_name;
+        Gtk::TreeModelColumn<Glib::ustring> m_package;
         Gtk::TreeModelColumn<Glib::ustring> m_dyn;
 	Gtk::TreeModelColumn<Glib::ustring> m_model;
     };
@@ -299,15 +301,15 @@ private:
 	Gtk::Label* mLabel;
 
 	 //Cell
-	int                      mColumnName;
 	Gtk::CellRendererText*   mCellRenderer;
 	std::string              mOldName;
 	bool                     mValidateRetry;
 	Glib::ustring            mInvalidTextForRetry;
 	guint32                  mDelayTime;
+	int                      mColumnName;
+	int                      mColumnPackage;
 	int                      mColumnDyn;
 	int                      mColumnModel;
-
     };
 
     class ObservableTreeView : public Gtk::TreeView
