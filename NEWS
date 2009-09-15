@@ -17,6 +17,10 @@ Switch to the package system.
   * Remove the libxml++ dependency and replace it with the libxml2.
     * Update the SaxParser with the new libxml2 sax parser.
     * Move the configuration from the host.xml file to the vle.conf.
+  * Add cross compilation system:
+     * update all API with the Win32 export symbols methods
+       __delspec(dllexport) and __delspec(dllimport) to allow the use of new
+       compiler and cross compilation.
 
 * vle:
   * Update the path management in VLE:
@@ -34,6 +38,12 @@ Switch to the package system.
     - Reduce the number of class to manage the command line interface.
     - Add the -P or --package parameter to the command line interface to
       select current package to edit.
+    - Add depends between package with 'package' attribute into the vpz dynamic
+      element. It allows to make link from a package to a another dynamics of a
+      another package.
+      - Change the VPZ format: add a 'package' attribute into the vpz dynamic
+        element.
+      - Break API of vle::devs::Dynamics classes by changing constructors.
   * Change the VPZ format: replace the #PCDATA by vle::value in the vpz
     format and build a new DTD (vle-0.8.0.dtd).
   * Add a 'begin' attribute into the vpz tag 'experiment' to start the
@@ -42,6 +52,17 @@ Switch to the package system.
   * Update the MatrixTranslator with value instead of XML.
   * Add a Julian date class into libutils to convert string, double into year,
     month, day, hour, minutes, seconds.
+  * Remove the libvledata library, no user, old code and perhaps a problem of
+    license.
+  * Remove the Simpson class in libvleutils library. Use GSL or Boost instead.
+
+* extension:
+  * Add the finite state automata extension with Moore, Mealy, FDDevs and
+    StateShart formalism.
+
+* manager:
+  * Store combinations inputs of experimentales frames into Manager classes.
+    User can access to the condition produce by ExperimentGenerator.
 
 * gvle:
   * Big update, see changelog for the details.
@@ -55,6 +76,14 @@ Switch to the package system.
   * SimpleFile, the super class of txt, rdata, csv plug-ins, can now use the
     standard output and error and can be configured to select localized value.
   * Update oov plug-ins parametrization function from XML to value.
+
+
+VLE 0.7.2
+=========
+
+* vle:
+  * Fix important bug in confluent function: a bug overrides the possibilities
+    to call the internal transition before the external transition.
 
 
 VLE 0.7.1
