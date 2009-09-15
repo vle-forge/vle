@@ -94,6 +94,21 @@ public:
     inline static bool isInfinity(const double& value)
     { return value == std::numeric_limits < double >::max(); }
 
+    /**
+     * @brief Test if the time represents the infinity.
+     * @return true if time is infinity, otherwise false.
+     */
+    inline bool isNegativeInfinity() const
+    { return m_value == std::numeric_limits < double >::min(); }
+
+    /**
+     * @brief Test if the time represents the infinity.
+     * @param value the value to ckeck.
+     * @return true if time is infinity, otherwise false.
+     */
+    inline static bool isNegativeInfinity(const double& value)
+    { return value == std::numeric_limits < double >::min(); }
+
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
@@ -340,6 +355,7 @@ public:
 
 
     static const Time infinity;
+    static const Time negativeInfinity;
 
     inline friend std::ostream& operator<<(std::ostream& out, const Time& t)
     {

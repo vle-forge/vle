@@ -1,5 +1,5 @@
 /**
- * @file vle/extension.hpp
+ * @file vle/extension/decision/Rule.hpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -29,34 +29,24 @@
  */
 
 
-#ifndef VLE_EXTENSION_EXTENSION_HPP
-#define VLE_EXTENSION_EXTENSION_HPP
+#ifndef VLE_EXTENSION_DECISION_RULE_HPP
+#define VLE_EXTENSION_DECISION_RULE_HPP
 
-#include <vle/extension/CellDevs.hpp>
-#include <vle/extension/CellQSS.hpp>
-#include <vle/extension/Decision.hpp>
-#include <vle/extension/DESS.hpp>
-#include <vle/extension/DifferenceEquation.hpp>
-#include <vle/extension/DifferentialEquation.hpp>
-#include <vle/extension/DSDevs.hpp>
-#include <vle/extension/PetriNet.hpp>
-#include <vle/extension/QSS2.hpp>
-#include <vle/extension/QSS.hpp>
+#include <vle/extension/decision/Predicates.hpp>
 
+namespace vle { namespace extension { namespace decision {
 
+    class Rule
+    {
+    public:
+        void add(const Predicate& pred) { m_predicats.add(pred); }
 
-namespace vle {
+        bool isAvailable() const { return m_predicats.isAvailable(); }
 
-    /**
-     * @brief The extension namespace represents the DEVS extensions provides
-     * by the VLE framework. We provide CellDEVS (cellular automata), CellQSS
-     * (cellular automata with QSS integration), QSS and QSS2 ordinary
-     * differential equation and DSdevs, a executive model.
-     */
-    namespace extension {
+    private:
+        Predicates m_predicats;
+    };
 
-    } // namespace extension
-
-} // namespace vle
+}}} // namespace vle model decision
 
 #endif

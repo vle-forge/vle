@@ -1,5 +1,5 @@
 /**
- * @file vle/extension.hpp
+ * @file vle/extension/decision/PrecedencesGraph.cpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -29,34 +29,16 @@
  */
 
 
-#ifndef VLE_EXTENSION_EXTENSION_HPP
-#define VLE_EXTENSION_EXTENSION_HPP
+#include <vle/extension/decision/PrecedencesGraph.hpp>
+#include <vle/utils/Algo.hpp>
+#include <vle/utils/i18n.hpp>
+#include <iterator>
 
-#include <vle/extension/CellDevs.hpp>
-#include <vle/extension/CellQSS.hpp>
-#include <vle/extension/Decision.hpp>
-#include <vle/extension/DESS.hpp>
-#include <vle/extension/DifferenceEquation.hpp>
-#include <vle/extension/DifferentialEquation.hpp>
-#include <vle/extension/DSDevs.hpp>
-#include <vle/extension/PetriNet.hpp>
-#include <vle/extension/QSS2.hpp>
-#include <vle/extension/QSS.hpp>
+namespace vle { namespace extension { namespace decision {
 
+void PrecedencesGraph::add(const PrecedenceConstraint& p)
+{
+    m_lstin.insert(p);
+}
 
-
-namespace vle {
-
-    /**
-     * @brief The extension namespace represents the DEVS extensions provides
-     * by the VLE framework. We provide CellDEVS (cellular automata), CellQSS
-     * (cellular automata with QSS integration), QSS and QSS2 ordinary
-     * differential equation and DSdevs, a executive model.
-     */
-    namespace extension {
-
-    } // namespace extension
-
-} // namespace vle
-
-#endif
+}}} // namespace vle model decision

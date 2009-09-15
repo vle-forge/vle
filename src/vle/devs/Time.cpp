@@ -34,5 +34,6 @@
 namespace vle { namespace devs {
 
 const Time Time::infinity(std::numeric_limits < double >::max());
+const Time Time::negativeInfinity(std::numeric_limits < double >::min());
 
 }} // namespace vle devs

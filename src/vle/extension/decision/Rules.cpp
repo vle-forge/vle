@@ -1,5 +1,5 @@
 /**
- * @file vle/extension.hpp
+ * @file vle/extension/decision/Rules.cpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -29,34 +29,51 @@
  */
 
 
-#ifndef VLE_EXTENSION_EXTENSION_HPP
-#define VLE_EXTENSION_EXTENSION_HPP
+#include <vle/extension/decision/Rules.hpp>
+#include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 
-#include <vle/extension/CellDevs.hpp>
-#include <vle/extension/CellQSS.hpp>
-#include <vle/extension/Decision.hpp>
-#include <vle/extension/DESS.hpp>
-#include <vle/extension/DifferenceEquation.hpp>
-#include <vle/extension/DifferentialEquation.hpp>
-#include <vle/extension/DSDevs.hpp>
-#include <vle/extension/PetriNet.hpp>
-#include <vle/extension/QSS2.hpp>
-#include <vle/extension/QSS.hpp>
+namespace vle { namespace extension { namespace decision {
 
+Rule& Rules::add(const std::string& name, const Rule& rule)
+{
+    const_iterator it(m_lst.find(name));
 
+    if (it != m_lst.end()) {
+        throw utils::ArgError("Decision: rule already exist");
+    }
 
-namespace vle {
+    return (*m_lst.insert(std::make_pair < std::string, Rule >(
+                name, rule)).first).second;
+}
 
-    /**
-     * @brief The extension namespace represents the DEVS extensions provides
-     * by the VLE framework. We provide CellDEVS (cellular automata), CellQSS
-     * (cellular automata with QSS integration), QSS and QSS2 ordinary
-     * differential equation and DSdevs, a executive model.
-     */
-    namespace extension {
+Rule& Rules::add(const std::string& name, const Predicate& pred)
+{
+    iterator it(m_lst.find(name));
 
-    } // namespace extension
+    if (it == m_lst.end()) {
+        Rule& r(add(name));
+        r.add(pred);
+        return r;
+    } else {
+        it->second.add(pred);
+        return it->second;
+    }
+}
 
-} // namespace vle
+Rules::result_t Rules::apply() const
+{
+    result_t result;
+    const_iterator it(m_lst.begin());
 
-#endif
+    while (it != m_lst.end()) {
+        if (it->second.isAvailable()) {
+            result.push_back(it);
+        }
+        ++it;
+    }
+    return result;
+}
+
+}}} // namespace vle model decision
+

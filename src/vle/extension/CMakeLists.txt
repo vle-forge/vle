@@ -20,16 +20,26 @@ ELSE(WIN32)
   SET(OS_SPECIFIC_PATH_IMPL)
 ENDIF(WIN32)
 
-SET(EXTENSION_CPP CellDevs.cpp CellQSS.cpp DESS.cpp
-  DifferenceEquation.cpp DifferentialEquation.cpp DSDevs.cpp PetriNet.cpp
-  QSS2.cpp QSS.cpp FSA.cpp Moore.cpp Mealy.cpp Statechart.cpp FDDevs.cpp
-  ${OS_SPECIFIC_PATH_IMPL})
+SET(EXTENSION_CPP CellDevs.cpp CellQSS.cpp DESS.cpp DifferenceEquation.cpp
+  DifferentialEquation.cpp DSDevs.cpp PetriNet.cpp QSS2.cpp QSS.cpp FSA.cpp
+  Moore.cpp Mealy.cpp Statechart.cpp FDDevs.cpp ${OS_SPECIFIC_PATH_IMPL})
 
-SET(EXTENSION_HPP CellDevs.hpp CellQSS.hpp DESS.hpp DllDefines.hpp
+SET(EXTENSION_HPP CellDevs.hpp CellQSS.hpp DESS.hpp Decision.hpp DllDefines.hpp
   DifferenceEquation.hpp DifferentialEquation.hpp DSDevs.hpp PetriNet.hpp
   QSS2.hpp QSS.hpp FSA.hpp Moore.hpp Mealy.hpp Statechart.hpp FDDevs.hpp)
 
-ADD_LIBRARY(vleextension SHARED ${EXTENSION_HPP};${EXTENSION_CPP})
+SET(EXT_DECISION_CPP decision/Activities.cpp decision/Activity.cpp
+  decision/Agent.cpp decision/Facts.cpp decision/KnowledgeBase.cpp
+  decision/PrecedenceConstraint.cpp decision/PrecedencesGraph.cpp
+  decision/Predicates.cpp decision/Rules.cpp)
+
+SET(EXT_DECISION_HPP decision/Activities.hpp decision/Activity.hpp
+  decision/Agent.hpp decision/Facts.hpp decision/KnowledgeBase.hpp
+  decision/PrecedenceConstraint.hpp decision/PrecedencesGraph.hpp
+  decision/Predicates.hpp decision/Rule.hpp decision/Rules.hpp)
+
+ADD_LIBRARY(vleextension SHARED ${EXTENSION_HPP};${EXTENSION_CPP};
+  ${EXT_DECISION_HPP};${EXT_DECISION_CPP})
 
 SET_TARGET_PROPERTIES(vleextension PROPERTIES ${VLE_LIBRARY_PROPERTIES})
 SET_TARGET_PROPERTIES(vleextension PROPERTIES OUTPUT_NAME
@@ -53,4 +63,9 @@ INSTALL(TARGETS vleextension
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
 
-INSTALL(FILES ${EXTENSION_HPP} DESTINATION ${VLE_INCLUDE_DIRS}/extension)
+INSTALL(FILES ${EXTENSION_HPP} DESTINATION
+  ${VLE_INCLUDE_DIRS}/extension)
+INSTALL(FILES ${EXT_DECISION_HPP} DESTINATION
+  ${VLE_INCLUDE_DIRS}/extension/decision)
+
+ADD_SUBDIRECTORY(decision)
