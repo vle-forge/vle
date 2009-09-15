@@ -30,9 +30,9 @@ class Simple : public devs::Dynamics
 {
 public:
     Simple(
-        const graph::AtomicModel& model,
+        const devs::DynamicsInit& init,
         const devs::InitEventList& events)
-        : devs::Dynamics(model, events)
+        : devs::Dynamics(init, events)
     {
     }
 
