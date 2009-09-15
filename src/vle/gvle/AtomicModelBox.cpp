@@ -1387,20 +1387,24 @@ void AtomicModelBox::show(vpz::AtomicModel& atom,  graph::AtomicModel& model)
 
 void AtomicModelBox::on_apply()
 {
-    Glib::RefPtr<Gtk::TreeView::Selection> refSelection
-	= mDynamics->get_selection();
-    if (not refSelection->get_selected()) {
-        Error("You Have to assign a dynamic.");
-    } else {
-	refSelection = mObservables->get_selection();
-	if (refSelection->get_selected()) {
-	    mAtom->setObservables(mObservables->getObservable());
-	}
-	mAtom->setDynamics(mDynamics->getDynamic());
-	mAtom->setConditions(mConditions->getConditions());
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection =
+	mObservables->get_selection();
 
-	mDialog->hide_all();
+    if (refSelection->get_selected()) {
+	mAtom->setObservables(mObservables->getObservable());
     }
+
+    refSelection = mDynamics->get_selection();
+    if (refSelection->get_selected()) {
+	mAtom->setDynamics(mDynamics->getDynamic());
+    }
+
+    refSelection = mConditions->get_selection();
+    if (refSelection->get_selected()) {
+	mAtom->setConditions(mConditions->getConditions());
+    }
+
+    mDialog->hide_all();
 }
 
 void AtomicModelBox::on_cancel()

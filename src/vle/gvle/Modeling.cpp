@@ -792,18 +792,6 @@ void Modeling::vpz_is_correct(std::vector<std::string>& vec)
         vec.push_back(_("The author is not mentioned."));
     }
 
-    const AtomicModelList& atomic_list = project.model().atomicModels();
-    AtomicModelList::const_iterator atomic_it = atomic_list.begin();
-    while (atomic_it != atomic_list.end()) {
-        if (atomic_it->second.dynamics() == "") {
-            vec.push_back((fmt(_("The Atomic Model %1% is not linked to a "
-                                 "dynamic.")) %
-                           atomic_it->first->getName()).str());
-
-        }
-        ++atomic_it;
-    }
-
     const DynamicList& dyn_list = project.dynamics().dynamiclist();
     DynamicList::const_iterator dyn_it = dyn_list.begin();
     while (dyn_it != dyn_list.end()) {
