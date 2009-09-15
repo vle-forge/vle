@@ -598,6 +598,8 @@ void ViewDrawingArea::drawChildrenModels()
 void ViewDrawingArea::drawChildrenModel(graph::Model* model,
                                         Color color)
 {
+    model->setWidth(100);
+
     setColor(color);
     mContext->rectangle(model->x() + mOffset,
 			(model->y()) + mOffset,
@@ -605,7 +607,6 @@ void ViewDrawingArea::drawChildrenModel(graph::Model* model,
 			(model->height()));
     mContext->stroke();
 
-    model->setWidth(100);
     drawChildrenPorts(model, color);
 }
 
