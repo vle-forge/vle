@@ -185,22 +185,39 @@ void Package::pack()
 
 void Package::waitProcess()
 {
+    m_success = false;
 #ifdef G_OS_WIN32
-    /* WaitFor*() functions, or examine its exit code with GetExitCodeProcess */
     DWORD status = 0;
 
+    /*
+     * WaitForSingleObject:
+     * http://msdn.microsoft.com/en-us/library/ms687032(VS.85).aspx
+     *
+     * GetExitCodeProcess:
+     * http://msdn.microsoft.com/en-us/library/ms683189(VS.85).aspx
+     */
     WaitForSingleObject(m_pid, INFINITE);
-    GetExitCodeProcess(m_pid, &status);
+    if (GetExitCodeProcess(m_pid, &status)) {
+        if (status > 0) {
+            appendError((fmt(_("Error '%1%' in subprocess")) %
+                         status).str());
+        } else {
+            m_success = true;
+        }
+    }
 #else
     int status;
     int result;
 
     result = waitpid(m_pid, &status, 0);
-    if (result == -1) {
-        if (not WIFEXITED(status)) {
-            int e = errno;
-            appendError((fmt(_("Error waiting process: %1%")) %
-                         Glib::strerror(e)).str());
+    if (result != -1) {
+        if (WIFEXITED(status)) {
+            if (WEXITSTATUS(status) > 0) {
+                appendError((fmt(_("Error '%1%' in subprocess")) %
+                             WEXITSTATUS(status)).str());
+            } else {
+                m_success = true;
+            }
         }
     }
 #endif

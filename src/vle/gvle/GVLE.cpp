@@ -954,7 +954,9 @@ bool GVLE::packageBuildTimer()
     mLog->scroll_to(iter, 0.0, 0.0, 1.0);
 
     if (utils::Package::package().isFinish()) {
-        installProject();
+        if (utils::Package::package().isSuccess()) {
+            installProject();
+        }
         return false;
     } else {
         return true;
@@ -1039,7 +1041,7 @@ void GVLE::packageProject()
                                "make tarball\n");
     getMenu()->hidePackageMenu();
     try {
-        utils::Package::package().clean();
+        utils::Package::package().pack();
     } catch (const std::exception& e) {
         getMenu()->showPackageMenu();
         gvle::Error(e.what());

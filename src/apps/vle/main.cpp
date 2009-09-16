@@ -70,28 +70,36 @@ void buildCommandLineList(int argc, char* argv[], manager::CmdArgs& lst)
     using utils::PathList;
 
     int i = 1;
+    bool stop = false;
 
     if (not Package::package().name().empty()) {
-        for (; i < argc; ++i) {
+        while (stop == false and i < argc) {
             if (strcmp(argv[i], "create") == 0) {
                 Package::package().create();
             } else if (strcmp(argv[i], "configure") == 0) {
                 Package::package().configure();
                 Package::package().wait(std::cout, std::cerr);
+                stop = not Package::package().isSuccess();
             } else if (strcmp(argv[i], "build") == 0) {
                 Package::package().build();
                 Package::package().wait(std::cout, std::cerr);
-                Package::package().install();
-                Package::package().wait(std::cout, std::cerr);
+                if (Package::package().isSuccess()) {
+                    Package::package().install();
+                    Package::package().wait(std::cout, std::cerr);
+                }
+                stop = not Package::package().isSuccess();
             } else if (strcmp(argv[i], "install") == 0) {
                 Package::package().install();
                 Package::package().wait(std::cout, std::cerr);
+                stop = not Package::package().isSuccess();
             } else if (strcmp(argv[i], "clean") == 0) {
                 Package::package().clean();
                 Package::package().wait(std::cout, std::cerr);
+                stop = not Package::package().isSuccess();
             } else if (strcmp(argv[i], "package") == 0) {
                 Package::package().pack();
                 Package::package().wait(std::cout, std::cerr);
+                stop = not Package::package().isSuccess();
             } else if (strcmp(argv[i], "list") == 0) {
                 PathList vpz(Path::path().getInstalledExperiments());
                 std::copy(vpz.begin(), vpz.end(), std::ostream_iterator
@@ -100,14 +108,15 @@ void buildCommandLineList(int argc, char* argv[], manager::CmdArgs& lst)
                 std::copy(libs.begin(), libs.end(), std::ostream_iterator
                           < std::string >(std::cout, "\n"));
             } else {
-                appendToCommandLineList(argv[i], lst);
-                ++i;
                 break;
             }
+            ++i;
         }
     }
-    for (; i < argc; ++i) {
-        appendToCommandLineList(argv[i], lst);
+    if (stop == false) {
+        for (; i < argc; ++i) {
+            appendToCommandLineList(argv[i], lst);
+        }
     }
 }
 

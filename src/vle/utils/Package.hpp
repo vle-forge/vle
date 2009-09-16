@@ -92,6 +92,14 @@ namespace vle { namespace utils {
         inline bool isFinish() const { return m_stop; }
 
         /**
+         * @brief Return true if the latest execution of a process returns true
+         * of false.
+         *
+         * @return True if latest process success, false otherwise.
+         */
+        bool isSuccess() const { return m_success; }
+
+        /**
          * @brief Wait the end of the current process and flush all data from
          * the process to the std::ostream object.
          *
@@ -166,12 +174,14 @@ namespace vle { namespace utils {
          * @brief Hide constructor.
          */
         Package()
-            : m_stop(true), m_out(0), m_err(0), m_wait(0), m_pid(0)
+            : m_stop(true), m_success(false), m_out(0), m_err(0), m_wait(0),
+            m_pid(0)
         {}
 
         static Package* m_package; ///< singleton attribute.
         PackageTable m_table; ///< the list of package available.
         bool m_stop; ///< true if process is stopped.
+        bool m_success; ///< true if process is successfull.
         Glib::Thread* m_out; ///< standard output stream reader thread.
         Glib::Thread* m_err; ///< standard error stream reader thread.
         Glib::Thread* m_wait; ///< wait process thread.
