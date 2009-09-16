@@ -45,6 +45,8 @@
 #   include <errno.h>
 #endif
 
+namespace fs = boost::filesystem;
+
 namespace vle { namespace utils {
 
 Package* Package::m_package = 0;
@@ -53,7 +55,7 @@ void Package::create()
 {
     Path& p = utils::Path::path();
 
-    boost::filesystem::create_directory(p.getPackageDir());
+    fs::create_directory(p.getPackageDir());
     p.copyTemplate("package", p.getPackageDir());
 
     appendOutput(_("Package creating - done\n"));
@@ -63,7 +65,7 @@ void Package::configure()
 {
     Path& p = utils::Path::path();
 
-    boost::filesystem::create_directory(p.getPackageBuildDir());
+    fs::create_directory(p.getPackageBuildDir());
 
     std::list < std::string > argv;
 #ifdef G_OS_WIN32
@@ -89,6 +91,7 @@ void Package::configure()
 void Package::build()
 {
     Path& p = utils::Path::path();
+    fs::create_directory(p.getPackageBuildDir());
 
     std::list < std::string > argv;
 #ifdef G_OS_WIN32
@@ -109,6 +112,7 @@ void Package::build()
 void Package::install()
 {
     Path& p = utils::Path::path();
+    fs::create_directory(p.getPackageBuildDir());
 
     std::list < std::string > argv;
 #ifdef G_OS_WIN32
@@ -118,7 +122,6 @@ void Package::install()
 #endif
     argv.push_back("install");
 
-    namespace fs = boost::filesystem;
     fs::path src = p.getPackageBuildDir();
     src /= "src";
 
@@ -145,6 +148,7 @@ void Package::install()
 void Package::clean()
 {
     Path& p = utils::Path::path();
+    fs::create_directory(p.getPackageBuildDir());
 
     std::list < std::string > argv;
 #ifdef G_OS_WIN32
@@ -152,7 +156,7 @@ void Package::clean()
 #else
     argv.push_back(Glib::find_program_in_path("make"));
 #endif
-    argv.push_back("clean");
+    argv.push_back("rebuild_cache");
 
     try {
         process(p.getPackageBuildDir(), argv);
@@ -165,6 +169,7 @@ void Package::clean()
 void Package::pack()
 {
     Path& p = utils::Path::path();
+    fs::create_directory(p.getPackageBuildDir());
 
     std::list < std::string > argv;
 #ifdef G_OS_WIN32
@@ -235,38 +240,40 @@ void Package::wait(std::ostream& out, std::ostream& err)
 {
     std::string o, e;
 
-    while (m_stop == false) {
+    if (not m_stop) {
+        while (m_stop == false) {
+            getOutputAndClear(o);
+            getErrorAndClear(e);
+            out << o;
+            err << e;
+            Glib::usleep(100000);
+            o.clear();
+            e.clear();
+        }
+
         getOutputAndClear(o);
         getErrorAndClear(e);
-        out << o;
-        err << e;
-        Glib::usleep(100000);
-        o.clear();
-        e.clear();
-    }
 
-    getOutputAndClear(o);
-    getErrorAndClear(e);
+        if (not o.empty()) {
+            out << o;
+        }
 
-    if (not o.empty()) {
-        out << o;
-    }
-
-    if (not e.empty()) {
-        err << e;
+        if (not e.empty()) {
+            err << e;
+        }
     }
 }
 
 void Package::addFile(const std::string& path, const std::string& name)
 {
-    if (not boost::filesystem::exists(Glib::build_filename(path, name)))
+    if (not fs::exists(Glib::build_filename(path, name)))
 	std::ofstream file(Glib::build_filename(path, name).c_str());
 }
 
 void Package::addDirectory(const std::string& path, const std::string& name)
 {
-    if (not boost::filesystem::exists(Glib::build_filename(path, name)))
-	boost::filesystem::create_directory(
+    if (not fs::exists(Glib::build_filename(path, name)))
+	fs::create_directory(
 	    Glib::build_filename(path, name));
 }
 
@@ -274,8 +281,8 @@ void Package::removeFile(const std::string& pathFile)
 {
     std::string path = Glib::build_filename(
 	Path::path().getPackageDir(), pathFile);
-    boost::filesystem::remove_all(path);
-    boost::filesystem::remove(path);
+    fs::remove_all(path);
+    fs::remove(path);
 }
 
 void Package::renameFile(const std::string& oldFile, std::string& newName)
@@ -283,14 +290,14 @@ void Package::renameFile(const std::string& oldFile, std::string& newName)
     std::string oldAbsolutePath =
 	Glib::build_filename(Path::path().getPackageDir(), oldFile);
 
-    if (boost::filesystem::extension(newName) == "")
-	newName += boost::filesystem::extension(oldAbsolutePath);
+    if (fs::extension(newName) == "")
+	newName += fs::extension(oldAbsolutePath);
     std::string newAbsolutePath =
 	Glib::build_filename(
 	    Path::path().getParentPath(oldAbsolutePath), newName);
 
-    if (not boost::filesystem::exists(newAbsolutePath))
-	boost::filesystem::rename(oldAbsolutePath, newAbsolutePath);
+    if (not fs::exists(newAbsolutePath))
+	fs::rename(oldAbsolutePath, newAbsolutePath);
 }
 
 void Package::select(const std::string& name)
@@ -305,7 +312,7 @@ void Package::process(const std::string& workingDir,
                       const std::list < std::string >& lst)
 {
     if (m_out != 0 or m_err != 0) {
-        throw utils::InternalError("Package error: wait an unknow process");
+        throw utils::InternalError(_("Package error: wait an unknow process"));
     }
 
     m_stop = false;

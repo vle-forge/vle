@@ -168,11 +168,11 @@ int main(int argc, char* argv[])
     try {
         buildCommandLineList(argc, argv, lst);
     } catch(const Glib::Error& e) {
-        std::cerr << fmt(_("Error processing command line: %1%\n")) % e.what();
+        std::cerr << fmt(_("Error: %1%\n")) % e.what();
         manager::finalize();
         return EXIT_FAILURE;
     } catch (const std::exception& e) {
-        std::cerr << fmt(_("Error processing command line: %1%\n")) % e.what();
+        std::cerr << fmt(_("Error: %1%\n")) % e.what();
         manager::finalize();
         return EXIT_FAILURE;
     }

@@ -956,6 +956,8 @@ bool GVLE::packageBuildTimer()
     if (utils::Package::package().isFinish()) {
         if (utils::Package::package().isSuccess()) {
             installProject();
+        } else {
+            getMenu()->showPackageMenu();
         }
         return false;
     } else {
@@ -973,9 +975,11 @@ void GVLE::configureProject()
     } catch (const std::exception& e) {
         getMenu()->showPackageMenu();
         gvle::Error(e.what());
+        return;
     } catch (const Glib::Exception& e) {
         getMenu()->showPackageMenu();
         gvle::Error(e.what());
+        return;
     }
     Glib::signal_timeout().connect(
         sigc::mem_fun(*this, &GVLE::packageTimer), 250);
@@ -991,9 +995,11 @@ void GVLE::buildProject()
     } catch (const std::exception& e) {
         getMenu()->showPackageMenu();
         gvle::Error(e.what());
+        return;
     } catch (const Glib::Exception& e) {
         getMenu()->showPackageMenu();
         gvle::Error(e.what());
+        return;
     }
     Glib::signal_timeout().connect(
         sigc::mem_fun(*this, &GVLE::packageBuildTimer), 250);
@@ -1009,9 +1015,11 @@ void GVLE::installProject()
     } catch (const std::exception& e) {
         getMenu()->showPackageMenu();
         gvle::Error(e.what());
+        return;
     } catch (const Glib::Exception& e) {
         getMenu()->showPackageMenu();
         gvle::Error(e.what());
+        return;
     }
     Glib::signal_timeout().connect(
         sigc::mem_fun(*this, &GVLE::packageTimer), 250);
@@ -1027,9 +1035,11 @@ void GVLE::cleanProject()
     } catch (const std::exception& e) {
         getMenu()->showPackageMenu();
         gvle::Error(e.what());
+        return;
     } catch (const Glib::Exception& e) {
         getMenu()->showPackageMenu();
         gvle::Error(e.what());
+        return;
     }
     Glib::signal_timeout().connect(
         sigc::mem_fun(*this, &GVLE::packageTimer), 250);
@@ -1045,9 +1055,11 @@ void GVLE::packageProject()
     } catch (const std::exception& e) {
         getMenu()->showPackageMenu();
         gvle::Error(e.what());
+        return;
     } catch (const Glib::Exception& e) {
         getMenu()->showPackageMenu();
         gvle::Error(e.what());
+        return;
     }
     Glib::signal_timeout().connect(
         sigc::mem_fun(*this, &GVLE::packageTimer), 250);
