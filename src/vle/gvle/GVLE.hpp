@@ -254,17 +254,7 @@ public:
 	void onRemove();
 	void onRename();
 
-	// Signal handler for text area
-	virtual void onEditionStarted(
-	    Gtk::CellEditable* cellEditatble,
-	    const Glib::ustring& path);
-	virtual void onEdition(
-	    const Glib::ustring& pathString,
-	    const Glib::ustring& newText);
-
-
     private:
-
 	/**
 	 * Create the hierarchy with the directories
 	 *
@@ -303,7 +293,6 @@ public:
 	//Cell
 	int                              mColumnName;
 	bool                             mValidateRetry;
-	std::string                      mOldAbsolutePath;
 	Gtk::CellRendererText*           mCellrenderer;
 	Glib::ustring                    mInvalidTextForRetry;
 	guint32                          mDelayTime;
@@ -685,8 +674,6 @@ private:
     ModelTreeBox*                   mModelTreeBox;
     ModelClassBox*                  mModelClassBox;
     QuitBox*                        mQuitBox;
-
-
 };
 
 std::string valuetype_to_string(value::Value::type type);

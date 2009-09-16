@@ -63,21 +63,12 @@ GVLE::FileTreeView::FileTreeView(
     const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/) :
     Gtk::TreeView(cobject), mDelayTime(0)
 {
-
     mRefTreeModel = Gtk::TreeStore::create(mColumns);
     set_model(mRefTreeModel);
-    mColumnName = append_column_editable(_("Files"), mColumns.m_col_name);
+    mColumnName = append_column(_("Files"), mColumns.m_col_name);
 
     mCellrenderer = dynamic_cast<Gtk::CellRendererText*>(
 	get_column_cell_renderer(mColumnName - 1));
-    mCellrenderer->property_editable() = true;
-    mCellrenderer->signal_editing_started().connect(
-	sigc::mem_fun(*this,
-		      &GVLE::FileTreeView::onEditionStarted) );
-
-    mCellrenderer->signal_edited().connect(
-	sigc::mem_fun(*this,
-		      &GVLE::FileTreeView::onEdition) );
 
     mRefTreeSelection = get_selection();
     mIgnoredFilesList.push_front("build");
@@ -244,20 +235,6 @@ bool GVLE::FileTreeView::on_button_press_event(GdkEventButton* event)
 	and not vle::utils::Path::path().getPackageDir().empty()) {
 	mMenuPopup.popup(event->button, event->time);
     }
-
-    if (event->type == GDK_BUTTON_PRESS) {
-	if (mDelayTime + 250 < event->time) {
-	    mDelayTime = event->time;
-	    mCellrenderer->property_editable() = true;
-	} else {
-	    mDelayTime = event->time;
-	    mCellrenderer->property_editable() = false;
-	    Gtk::TreeModel::Path path;
-	    Gtk::TreeViewColumn* column;
-	    get_cursor(path, column);
-	    on_row_activated(path, column);
-	}
-    }
     return return_value;
 }
 
@@ -364,39 +341,6 @@ void GVLE::FileTreeView::onRename()
 					name);
     }
     mParent->buildPackageHierarchy();
-}
-
-void GVLE::FileTreeView::onEditionStarted(Gtk::CellEditable* cell_editable,
-					  const Glib::ustring& /* path */)
-{
-    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
-    Gtk::TreeModel::iterator iter = refSelection->get_selected();
-
-    if (iter) {
-	Gtk::TreeModel::Row row = *iter;
-	const std::list<std::string>* lstpath = projectFilePath(row);
-
-	mOldAbsolutePath = Glib::build_filename(*lstpath);
-    }
-
-    if(mValidateRetry) {
-	Gtk::CellEditable* celleditable_validated = cell_editable;
-	Gtk::Entry* pEntry = dynamic_cast<Gtk::Entry*>(celleditable_validated);
-	if(pEntry) {
-	    pEntry->set_text(mInvalidTextForRetry);
-	    mValidateRetry = false;
-	    mInvalidTextForRetry.clear();
-	}
-    }
-}
-
-void GVLE::FileTreeView::onEdition(const Glib::ustring& pathString,
-				   const Glib::ustring& newName)
-{
-    std::string name(newName);
-    utils::Package::package().renameFile(mOldAbsolutePath, name);
-    Gtk::TreeModel::Row row = *(mRefTreeModel->get_iter(pathString));
-    row[mColumns.m_col_name] = newName;
 }
 
 GVLE::GVLE(BaseObjectType* cobject,
