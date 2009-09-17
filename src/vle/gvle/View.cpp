@@ -63,7 +63,7 @@ View::~View()
 
 void View::redraw()
 {
-    mDrawing->draw();
+    mDrawing->queueRedraw();
 }
 
 void View::initAllOptions()
@@ -216,7 +216,7 @@ void View::onCutModel()
     mModeling->getGVLE()->redrawModelTreeBox();
     mModeling->getGVLE()->redrawModelClassBox();
     mSelectedModels.clear();
-    mDrawing->queue_draw();
+    redraw();
 }
 
 void View::onCopyModel()
@@ -228,7 +228,7 @@ void View::onCopyModel()
 	mModeling->copy(mSelectedModels, mCurrent, mCurrentClass);
     }
     mSelectedModels.clear();
-    mDrawing->queue_draw();
+    redraw();
 }
 
 void View::onPasteModel()
@@ -238,7 +238,7 @@ void View::onPasteModel()
     mModeling->paste(mCurrent, mCurrentClass);
     mModeling->getGVLE()->redrawModelTreeBox();
     mModeling->getGVLE()->redrawModelClassBox();
-    mDrawing->queue_draw();
+    redraw();
 }
 
 void View::addAtomicModel(int x, int y)
@@ -258,7 +258,7 @@ void View::addAtomicModel(int x, int y)
 		} else {
 		    mModeling->addAtomicModelClass(mCurrentClass, new_atom);
 		}
-                mDrawing->draw();
+                redraw();
             } catch (utils::SaxParserError& e) {
                 Error(e.what());
             }

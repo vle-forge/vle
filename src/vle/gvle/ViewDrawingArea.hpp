@@ -137,7 +137,6 @@ namespace vle { namespace gvle {
                                 int& x, int& y);
         void getModelOutPosition(graph::Model* model, const std::string& p,
                                  int& x, int& y);
-        void calcSize(graph::Model* m);
         void calcRectSize();
 
 	/**
@@ -157,6 +156,13 @@ namespace vle { namespace gvle {
 	 * Order the models
 	 */
 	void onRandomOrder();
+
+        /**
+         * @brief Add to the Gdk stack a call to expose event function with the
+         * need to redraw the buffer with the draw() function.
+         */
+        void queueRedraw()
+        { mNeedRedraw = true; queue_draw(); }
 
     private:
 
@@ -236,13 +242,6 @@ namespace vle { namespace gvle {
          * Return nearest connection between all connection and mouse position
          */
         void delConnection();
-
-        /**
-         * @brief Add to the Gdk stack a call to expose event function with the
-         * need to redraw the buffer with the draw() function.
-         */
-        void queueRedraw()
-        { mNeedRedraw = true; queue_draw(); }
 
 	GVLE*                           mGVLE;
         View*                           mView;

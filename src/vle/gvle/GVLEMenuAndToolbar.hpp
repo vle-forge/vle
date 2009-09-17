@@ -28,6 +28,8 @@
 #include <gtkmm.h>
 #include <libglademm.h>
 
+#include <iostream>
+
 namespace vle {
 namespace gvle {
 
@@ -91,6 +93,8 @@ private:
     void createSimulationActions();
     void createZoomActions();
     void createHelpActions();
+
+    void on_my_post_activate(const Glib::RefPtr<Gtk::Action>& action);
 
     /* class members */
     GVLE*            mParent;

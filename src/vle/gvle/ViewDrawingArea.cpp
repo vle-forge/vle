@@ -35,7 +35,7 @@
 
 namespace vle { namespace gvle {
 
-const guint ViewDrawingArea::MODEL_WIDTH = 40;
+const guint ViewDrawingArea::MODEL_WIDTH = 100;
 const guint ViewDrawingArea::MODEL_DECAL = 20;
 const guint ViewDrawingArea::MODEL_PORT  = 10;
 const guint ViewDrawingArea::MODEL_PORT_SPACING_LABEL  = 10;
@@ -577,7 +577,6 @@ void ViewDrawingArea::drawChildrenModels()
     graph::ModelList::const_iterator it = children.begin();
     while (it != children.end()) {
         graph::Model* model = it->second;
-        calcSize(model);
         if (mView->existInSelectedModels(model)) {
             drawChildrenModel(model, mModeling->getSelectedColor());
         } else {
@@ -589,17 +588,16 @@ void ViewDrawingArea::drawChildrenModels()
         }
         ++it;
     }
-    if (mView->getDestinationModel() != NULL and mView->getDestinationModel() !=
-        mCurrent) {
-        drawChildrenModel(mView->getDestinationModel(), mModeling->getAtomicColor());
+    if (mView->getDestinationModel() != NULL and
+	mView->getDestinationModel() != mCurrent) {
+        drawChildrenModel(mView->getDestinationModel(),
+			  mModeling->getAtomicColor());
     }
 }
 
 void ViewDrawingArea::drawChildrenModel(graph::Model* model,
                                         Color color)
 {
-    model->setWidth(100);
-
     setColor(color);
     mContext->rectangle(model->x() + mOffset,
 			(model->y()) + mOffset,
@@ -988,10 +986,7 @@ bool ViewDrawingArea::on_expose_event(GdkEventExpose*)
             }
             mWin->draw_drawable(mWingc, mBuffer, 0, 0, 0, 0, -1, -1);
 	}
-
-
     }
-
     return true;
 }
 
@@ -1124,13 +1119,6 @@ void ViewDrawingArea::getModelOutPosition(graph::Model* model,
         (model->getOutputPortIndex(port) + 1);
 }
 
-void ViewDrawingArea::calcSize(graph::Model* m)
-{
-    m->setHeight(MODEL_HEIGHT +
-                 std::max(m->getInputPortNumber(), m->getOutputPortNumber()) *
-                 (MODEL_SPACING_PORT + MODEL_PORT));
-}
-
 void ViewDrawingArea::calcRectSize()
 {
     if ((mCurrent->getModelList()).size() != 0) {
@@ -1167,7 +1155,6 @@ void ViewDrawingArea::calcRectSize()
 	        }
 	    }
 	}
-
         mRectWidth = xMax + mOffset + 15;
         mRectHeight = yMax + mOffset + SPACING_MODEL + 15;
     }

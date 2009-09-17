@@ -193,7 +193,6 @@ void CutCopyPaste::paste(graph::CoupledModel* gc, vpz::AtomicModelList& dst)
 
 void CutCopyPaste::clear()
 {
-    //std::cout << "clear\n";
     for (graph::ModelList::iterator it = mList_graph.begin();
             it != mList_graph.end();
             ++it) {
@@ -209,7 +208,6 @@ void CutCopyPaste::clear()
 void CutCopyPaste::clone(graph::ModelList& lst_graph_clone,
                          vpz::AtomicModelList& lst_vpz_clone, int num)
 {
-    //std::cout << "clone ("<<num<<")\n";
     lst_graph_clone.clear();
     lst_vpz_clone.clear();
 
@@ -234,7 +232,7 @@ void CutCopyPaste::clone(graph::ModelList& lst_graph_clone,
                 ++it) {
             graph::Model* m = it->second->clone();
             m->setParent(NULL);
-            m->setPosition(m->x() + (num * 5), m->y() + (num * 5));
+            m->setPosition(m->x() + (num * 10), m->y() + (num * 10));
 
             lst_graph_clone.insert(make_pair(m->getName(), m));
             if (m->isCoupled()) {
@@ -244,9 +242,6 @@ void CutCopyPaste::clone(graph::ModelList& lst_graph_clone,
             }
         }
     }
-    //std::cout<< "Fin clone - CHECK :\n"
-    //   <<"\tGRAPH: "<<mList_graph.size()<<" - clone : "<<lst_graph_clone.size()<<"\n"
-    //   <<"\tVPZ: "<<mList_vpz.size()<<" - clone : "<<lst_vpz_clone.size()<<"\n";
 }
 
 void CutCopyPaste::state(vpz::AtomicModelList& list)
@@ -336,7 +331,7 @@ void CutCopyPaste::clone_atomic(graph::Model* model, graph::Model* clone,
                                 vpz::AtomicModelList& vpz_list)
 {
     const vpz::AtomicModel& atom(mList_vpz.get(model));
-    clone->setPosition(clone->x() + 5, clone->y() + 5);
+    clone->setPosition(clone->x() + 10, clone->y() + 10);
     vpz_list.add(clone, atom);
 }
 

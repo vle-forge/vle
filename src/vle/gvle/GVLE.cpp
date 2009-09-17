@@ -34,6 +34,7 @@
 #include <vle/gvle/HostsBox.hpp>
 #include <vle/gvle/GVLEMenuAndToolbar.hpp>
 #include <vle/gvle/PreferencesBox.hpp>
+#include <vle/gvle/ViewDrawingArea.hpp>
 #include <vle/gvle/ViewOutputBox.hpp>
 #include <vle/gvle/View.hpp>
 #include <vle/utils/Exception.hpp>
@@ -453,6 +454,13 @@ void GVLE::insertLog(const std::string& text)
 {
     mLog->get_buffer()->insert(
 	mLog->get_buffer()->end(), text);
+}
+
+void GVLE::redrawView()
+{
+    View* currentView = dynamic_cast<DocumentDrawingArea*>(
+	mEditor->get_nth_page(mCurrentTab))->getView();
+    currentView->redraw();
 }
 
 void GVLE::redrawModelTreeBox()

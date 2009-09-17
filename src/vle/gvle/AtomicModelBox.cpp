@@ -27,6 +27,7 @@
 #include <vle/gvle/ObservableBox.hpp>
 #include <vle/gvle/SimpleTypeBox.hpp>
 #include <vle/gvle/InteractiveTypeBox.hpp>
+#include <vle/gvle/ViewDrawingArea.hpp>
 #include <vle/utils/Path.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -131,7 +132,12 @@ void AtomicModelBox::InputPortTreeView::onAdd()
 
     if (box.valid() and not name.empty() and list.find(name) == list.end()) {
         mModel->addInputPort(name);
-        build();
+	mModel->setHeight(ViewDrawingArea::MODEL_HEIGHT +
+			  std::max(mModel->getInputPortNumber(),
+				   mModel->getOutputPortNumber()) *
+			  (ViewDrawingArea::MODEL_SPACING_PORT +
+			   ViewDrawingArea::MODEL_PORT));
+	build();
     }
 }
 
@@ -148,6 +154,11 @@ void AtomicModelBox::InputPortTreeView::onRemove()
 
             if (mModel->existInputPort(name)) {
                 mModel->delInputPort(name);
+		mModel->setHeight(ViewDrawingArea::MODEL_HEIGHT +
+				  std::max(mModel->getInputPortNumber(),
+					   mModel->getOutputPortNumber()) *
+				  (ViewDrawingArea::MODEL_SPACING_PORT +
+				   ViewDrawingArea::MODEL_PORT));
             }
             build();
         }
@@ -327,6 +338,11 @@ void AtomicModelBox::OutputPortTreeView::onAdd()
 
     if (box.valid() and not name.empty() and list.find(name) == list.end()) {
         mModel->addOutputPort(name);
+	mModel->setHeight(ViewDrawingArea::MODEL_HEIGHT +
+			  std::max(mModel->getInputPortNumber(),
+				   mModel->getOutputPortNumber()) *
+			  (ViewDrawingArea::MODEL_SPACING_PORT +
+			   ViewDrawingArea::MODEL_PORT));
         build();
     }
 }
@@ -344,6 +360,11 @@ void AtomicModelBox::OutputPortTreeView::onRemove()
 
             if (mModel->existOutputPort(name)) {
                 mModel->delOutputPort(name);
+		mModel->setHeight(ViewDrawingArea::MODEL_HEIGHT +
+				  std::max(mModel->getInputPortNumber(),
+					   mModel->getOutputPortNumber()) *
+				  (ViewDrawingArea::MODEL_SPACING_PORT +
+				   ViewDrawingArea::MODEL_PORT));
             }
             build();
         }

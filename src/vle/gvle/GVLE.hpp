@@ -38,7 +38,6 @@
 #include <vle/gvle/ParameterExecutionBox.hpp>
 #include <vle/gvle/QuitBox.hpp>
 #include <vle/gvle/SaveVpzBox.hpp>
-#include <vle/gvle/ViewDrawingArea.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/gvle/ComboboxString.hpp>
 #include <vle/utils/Path.hpp>
@@ -131,6 +130,11 @@ public:
      * @param text Text to insert into the log area
      */
     void insertLog(const std::string& text);
+
+    /**
+     * Redraw the VPZ view
+     */
+    void redrawView();
 
     /**
      * Redraw the TreeViews

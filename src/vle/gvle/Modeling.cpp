@@ -741,7 +741,9 @@ graph::AtomicModel* Modeling::newAtomicModel(graph::CoupledModel* parent,
         setModified(true);
         graph::AtomicModel* tmp = new graph::AtomicModel(name, parent);
         tmp->setPosition(x, y);
-        return tmp;
+	tmp->setWidth(ViewDrawingArea::MODEL_WIDTH);
+	tmp->setHeight(ViewDrawingArea::MODEL_HEIGHT);
+       return tmp;
     }
     return 0;
 }
