@@ -143,26 +143,27 @@ void CoupledModelBox::InputPortTreeView::onRemove()
 
 void CoupledModelBox::InputPortTreeView::onRename()
 {
-    SimpleTypeBox box(_("New name of the input port ?"));
-    graph::ConnectionList& list = mModel->getInputPortList();
-    Glib::ustring new_name = boost::trim_copy(box.run());
-
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
 
-    if (refSelection and box.valid() and not new_name.empty()
-	and list.find(new_name) == list.end()) {
-
+    if (refSelection) {
 	Gtk::TreeModel::iterator iter = refSelection->get_selected();
 
 	if (iter) {
 	    Gtk::TreeModel::Row row = *iter;
 	    std::string old_name = row.get_value(mColumnsInputPort.m_col_name);
-	    row.set_value(mColumnsInputPort.m_col_name, new_name);
+	    SimpleTypeBox box(_("New name of the input port ?"), old_name);
+	    graph::ConnectionList& list = mModel->getInputPortList();
+	    Glib::ustring new_name = boost::trim_copy(box.run());
 
-	    if (mModel->existInputPort(old_name)) {
-		mModel->renameInputPort(old_name, new_name);
+	    if (box.valid() and not new_name.empty()
+		and list.find(new_name) == list.end()) {
+		row.set_value(mColumnsInputPort.m_col_name, new_name);
+
+		if (mModel->existInputPort(old_name)) {
+		    mModel->renameInputPort(old_name, new_name);
+		}
+		build();
 	    }
-	    build();
 	}
     }
 }
@@ -324,26 +325,28 @@ void CoupledModelBox::OutputPortTreeView::onRemove()
 
 void CoupledModelBox::OutputPortTreeView::onRename()
 {
-    SimpleTypeBox box(_("New name of the input port ?"));
-    graph::ConnectionList& list = mModel->getOutputPortList();
-    Glib::ustring new_name = boost::trim_copy(box.run());
-
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
 
-    if (refSelection and box.valid() and not new_name.empty()
-	and list.find(new_name) == list.end()) {
-
+    if (refSelection) {
 	Gtk::TreeModel::iterator iter = refSelection->get_selected();
 
 	if (iter) {
 	    Gtk::TreeModel::Row row = *iter;
 	    std::string old_name = row.get_value(mColumnsOutputPort.m_col_name);
-	    row.set_value(mColumnsOutputPort.m_col_name, new_name);
+	    SimpleTypeBox box(_("New name of the input port ?"), old_name);
+	    graph::ConnectionList& list = mModel->getOutputPortList();
+	    Glib::ustring new_name = boost::trim_copy(box.run());
 
-	    if (mModel->existOutputPort(old_name)) {
-		mModel->renameOutputPort(old_name, new_name);
+	    if (box.valid() and not new_name.empty()
+		and list.find(new_name) == list.end()) {
+
+		row.set_value(mColumnsOutputPort.m_col_name, new_name);
+
+		if (mModel->existOutputPort(old_name)) {
+		    mModel->renameOutputPort(old_name, new_name);
+		}
+		build();
 	    }
-	    build();
 	}
     }
 }

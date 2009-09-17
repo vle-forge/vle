@@ -51,7 +51,8 @@ SimpleTypeBox::SimpleTypeBox(value::Value* b):
     show_all();
 }
 
-SimpleTypeBox::SimpleTypeBox(const std::string& title):
+SimpleTypeBox::SimpleTypeBox(const std::string& title,
+			     const std::string& value) :
     Gtk::Dialog(title,true,true),
     mBase(0),
     mValid(false)
@@ -60,6 +61,7 @@ SimpleTypeBox::SimpleTypeBox(const std::string& title):
     add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
     set_default_response(Gtk::RESPONSE_OK);
     makeDialog();
+    mEntry->set_text(value);
     show_all();
 }
 

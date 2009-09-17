@@ -170,7 +170,7 @@ void ConditionsBox::ConditionsTreeView::on_select()
 
 void ConditionsBox::ConditionsTreeView::on_add()
 {
-    SimpleTypeBox box(_("Name of the condition ?"));
+    SimpleTypeBox box(_("Name of the condition ?"), "");
     vpz::ConditionList& list = mConditions->conditionlist();
     std::string name = boost::trim_copy(box.run());
 
@@ -198,7 +198,7 @@ void ConditionsBox::ConditionsTreeView::onRename()
 
     if (it) {
         Glib::ustring oldname = (*it)[mColumns.m_col_name];
-        SimpleTypeBox box(_("New name of the condition ?"));
+        SimpleTypeBox box(_("New name of the condition ?"), oldname);
         std::string newname = boost::trim_copy(box.run());
 	vpz::ConditionList& list = mConditions->conditionlist();
 
@@ -439,7 +439,7 @@ void ConditionsBox::PortsTreeView::on_select()
 
 void ConditionsBox::PortsTreeView::on_add()
 {
-    SimpleTypeBox box(_("Name of the parameter ?"));
+    SimpleTypeBox box(_("Name of the parameter ?"), "");
     std::list < std::string > list;
 
     mCondition->portnames(list);
@@ -471,12 +471,12 @@ void ConditionsBox::PortsTreeView::onRename()
     std::list < std::string > list;
     mCondition->portnames(list);
     if (it_select) {
-        SimpleTypeBox box(_("Name of the condition ?"));
+	Glib::ustring oldname = (*it_select)[mColumns.m_col_name];
+        SimpleTypeBox box(_("Name of the condition ?"), oldname);
         std::string newname = boost::trim_copy(box.run());
         std::list < std::string >::const_iterator it_find =
             std::find(list.begin(), list.end(), newname);
         if (box.valid() and not newname.empty() and it_find == list.end()){
-            Glib::ustring oldname = (*it_select)[mColumns.m_col_name];
             mCondition->rename(oldname, newname);
             mParent->buildTreePorts(mCondition->name());
         }

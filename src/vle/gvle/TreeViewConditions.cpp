@@ -109,7 +109,7 @@ void TreeViewConditions::makeTreeView()
 
 void TreeViewConditions::on_menu_insert()
 {
-    SimpleTypeBox box(_("Name of the port ?"));
+    SimpleTypeBox box(_("Name of the port ?"), "");
     std::string name = boost::trim_copy(box.run());
 
     if (box.valid() and not name.empty()) {

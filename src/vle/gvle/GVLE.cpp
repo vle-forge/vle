@@ -241,7 +241,7 @@ bool GVLE::FileTreeView::on_button_press_event(GdkEventButton* event)
 void GVLE::FileTreeView::onOpen()
 {
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection =  get_selection();
-    SimpleTypeBox box(_("Path of the program ?"));
+    SimpleTypeBox box(_("Path of the program ?"), "");
     std::string prg = Glib::find_program_in_path(boost::trim_copy(box.run()));
     if (refSelection and box.valid() and not prg.empty()) {
 	Gtk::TreeModel::Row row = *refSelection->get_selected();
@@ -264,7 +264,7 @@ void GVLE::FileTreeView::onOpen()
 
 void GVLE::FileTreeView::onNewFile()
 {
-    SimpleTypeBox box(_("Name of the File ?"));
+    SimpleTypeBox box(_("Name of the File ?"), "");
     std::string name = boost::trim_copy(box.run());
     std::string filepath;
     if (box.valid() and not name.empty()) {
@@ -289,7 +289,7 @@ void GVLE::FileTreeView::onNewFile()
 
 void GVLE::FileTreeView::onNewDirectory()
 {
-    SimpleTypeBox box(_("Name of the Directory ?"));
+    SimpleTypeBox box(_("Name of the Directory ?"), "");
     std::string name = boost::trim_copy(box.run());
     std::string directorypath;
     if (box.valid() and not name.empty()) {
@@ -329,18 +329,27 @@ void GVLE::FileTreeView::onRemove()
 
 void GVLE::FileTreeView::onRename()
 {
-    SimpleTypeBox box(_("Name of the file ?"));
-    std::string name = boost::trim_copy(box.run());
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
-    if (box.valid() and not name.empty() and refSelection) {
-	Gtk::TreeModel::const_iterator it = refSelection->get_selected();
-	const Gtk::TreeModel::Row row = *it;
-	const std::list<std::string>* lstpath = projectFilePath(row);
 
-	utils::Package::package().renameFile(Glib::build_filename(*lstpath),
-					name);
+    if (refSelection) {
+	Gtk::TreeModel::const_iterator it = refSelection->get_selected();
+
+	if (it) {
+	    const Gtk::TreeModel::Row row = *it;
+	    std::string old_name = row.get_value(mColumns.m_col_name);
+	    SimpleTypeBox box(_("Name of the file ?"), old_name);
+	    std::string name = boost::trim_copy(box.run());
+
+	    if (box.valid() and not name.empty()) {
+		const std::list<std::string>* lstpath = projectFilePath(row);
+
+		utils::Package::package().renameFile(
+		    Glib::build_filename(*lstpath),
+		    name);
+	    }
+	    mParent->buildPackageHierarchy();
+	}
     }
-    mParent->buildPackageHierarchy();
 }
 
 GVLE::GVLE(BaseObjectType* cobject,

@@ -107,7 +107,7 @@ bool GenericPlugin::InitTreeView::on_button_press_event(GdkEventButton* event)
 
 void GenericPlugin::InitTreeView::onAdd()
 {
-    SimpleTypeBox box(_("Value of the init"));
+    SimpleTypeBox box(_("Value of the init"), "");
     try {
 	double value = boost::lexical_cast< double >(
 	    boost::trim_copy(box.run()));

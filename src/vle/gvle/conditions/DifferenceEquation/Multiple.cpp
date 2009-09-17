@@ -110,7 +110,7 @@ bool Multiple::ValuesTreeView::on_button_press_event(GdkEventButton* event)
 void Multiple::ValuesTreeView::onAdd()
 {
 
-    SimpleTypeBox box(_("Value"));
+    SimpleTypeBox box(_("Value"), "");
     try {
 	double value = boost::lexical_cast< double >(
 	    boost::trim_copy(box.run()));

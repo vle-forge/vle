@@ -176,17 +176,17 @@ void ModelClassBox::onRename()
        Gtk::TreeModel::iterator iter = refSelection->get_selected();
        if (iter) {
 	   if (mRefTreeModel->iter_depth(iter) == 0) {
-	       SimpleTypeBox box(_("Name of the Class ?"));
+	       Gtk::TreeModel::Row row = *iter;
+	       mOldName = row.get_value(mColumns.mName);
+	       SimpleTypeBox box(_("Name of the Class ?"), mOldName);
 	       std::string name = boost::trim_copy(box.run());
 	       if (box.valid() and not name.empty()) {
-		   Gtk::TreeModel::Row row = *iter;
-		   mOldName = row.get_value(mColumns.mName);
 		   onRenameClass(name);
 	       }
 	   } else {
 	       Gtk::TreeModel::Row row = *iter;
 	       std::string oldname(row.get_value(mColumns.mName));
-	       SimpleTypeBox box(_("New name of this model?"));
+	       SimpleTypeBox box(_("New name of this model?"), oldname);
 	       std::string newname = boost::trim_copy(box.run());
 	       if (box.valid() and not newname.empty()) {
 		   try {

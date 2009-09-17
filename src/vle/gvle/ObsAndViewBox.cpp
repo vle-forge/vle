@@ -249,7 +249,7 @@ void ObsAndViewBox::makeViews()
 
 void ObsAndViewBox::on_add_port()
 {
-    SimpleTypeBox box(_("Name of the Observable port ?"));
+    SimpleTypeBox box(_("Name of the Observable port ?"), "");
     std::string name = boost::trim_copy(box.run());
 
     if (box.valid() and not name.empty() and not mObs->exist(name)) {

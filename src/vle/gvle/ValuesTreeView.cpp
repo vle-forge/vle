@@ -332,9 +332,9 @@ void ValuesTreeView::on_menu_insert(value::Value::type type)
             vector.insert(it, Tuple::create());
             break;
         case(Value::TABLE): {
-            SimpleTypeBox box("Width ?");
+            SimpleTypeBox box("Width ?", "1");
             int w = utils::to_int(box.run());
-            SimpleTypeBox box2("Height ?");
+            SimpleTypeBox box2("Height ?", "1");
             int h = utils::to_int(box2.run());
             vector.insert(it, Table::create(w, h));
         }
@@ -346,9 +346,9 @@ void ValuesTreeView::on_menu_insert(value::Value::type type)
             vector.insert(it, Null::create());
             break;
         case(Value::MATRIX): {
-            SimpleTypeBox box("columns ?");
+            SimpleTypeBox box("Columns ?", "1");
             int cols = utils::to_int(box.run());
-            SimpleTypeBox box2("rows ?");
+            SimpleTypeBox box2("Rows ?", "1");
             int rows = utils::to_int(box2.run());
             Matrix* matrix = Matrix::create(cols, rows, cols * 2, rows * 2,
                                             cols / 5, rows / 5);
@@ -359,7 +359,7 @@ void ValuesTreeView::on_menu_insert(value::Value::type type)
         refresh();
     } else if (mValue->getType() ==  value::Value::MAP) {
         value::Map* map = dynamic_cast<value::Map*>(mValue);
-        SimpleTypeBox box("name ?");
+        SimpleTypeBox box("name ?", "");
         std::string name;
         do {
             name = box.run();
@@ -389,9 +389,9 @@ void ValuesTreeView::on_menu_insert(value::Value::type type)
                         map->addClone(name, Tuple::create());
             break;
         case(Value::TABLE): {
-            SimpleTypeBox box("width ?");
+            SimpleTypeBox box("Width ?", "1");
             int w = utils::to_int(box.run());
-            SimpleTypeBox box2("Height ?");
+            SimpleTypeBox box2("Height ?", "1");
             int h = utils::to_int(box2.run());
             map->addClone(name, Table::create(w, h));
         }
@@ -403,9 +403,9 @@ void ValuesTreeView::on_menu_insert(value::Value::type type)
         map->addClone(name, Null::create());
         break;
         case(Value::MATRIX): {
-            SimpleTypeBox box("columns ?");
+            SimpleTypeBox box("Columns ?", "1");
             int cols = utils::to_int(box.run());
-            SimpleTypeBox box2("rows ?");
+            SimpleTypeBox box2("Rows ?", "1");
             int rows = utils::to_int(box2.run());
             Matrix* matrix = Matrix::create(cols, rows,
                                            cols * 2, rows * 2,

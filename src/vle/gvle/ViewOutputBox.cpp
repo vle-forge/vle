@@ -201,7 +201,7 @@ void ViewOutputBox::onAddViews()
     storePrevious();
     sensitive(true);
 
-    SimpleTypeBox box(_("Name of the view ?"));
+    SimpleTypeBox box(_("Name of the view ?"), "");
     std::string name = boost::trim_copy(box.run());
     if (box.valid() and not name.empty() and not m_viewscopy.exist(name)) {
         Gtk::TreeIter iter = m_model->append();
@@ -258,7 +258,7 @@ void ViewOutputBox::onRenameViews()
         if (iter) {
             Gtk::TreeModel::Row row = *iter;
             std::string oldname(row.get_value(m_viewscolumnrecord.name));
-	    SimpleTypeBox box(_("Name of the view ?"));
+	    SimpleTypeBox box(_("Name of the view ?"), oldname);
 	    std::string newname = boost::trim_copy(box.run());
 	    if (box.valid() and not newname.empty() and not m_viewscopy.exist(newname)) {
 		row[m_viewscolumnrecord.name] = newname;

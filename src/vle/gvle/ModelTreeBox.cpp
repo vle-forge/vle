@@ -91,7 +91,7 @@ void ModelTreeBox::onRenameModels()
         if (iter) {
             Gtk::TreeModel::Row row = *iter;
             std::string oldname(row.get_value(m_modelscolumnrecord.name));
-	    SimpleTypeBox box(_("New name of this model?"));
+	    SimpleTypeBox box(_("New name of this model?"), oldname);
 	    std::string newname = boost::trim_copy(box.run());
 	    if (box.valid() and not newname.empty()) {
 		try {

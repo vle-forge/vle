@@ -39,7 +39,8 @@ namespace vle { namespace gvle {
     {
     public:
         SimpleTypeBox(value::Value* base);
-        SimpleTypeBox(const std::string& title);
+        SimpleTypeBox(const std::string& title,
+		      const std::string& value);
 
         virtual ~SimpleTypeBox();
 
