@@ -159,6 +159,8 @@ void DynamicBox::makeComboPackage()
     mComboPackage->clear();
 
     utils::PathList paths = utils::Path::path().getInstalledPackages();
+
+    paths.sort();
     for (utils::PathList::const_iterator i = paths.begin(), e = paths.end();
          i != e; ++i) {
         mComboPackage->append_text(*i);

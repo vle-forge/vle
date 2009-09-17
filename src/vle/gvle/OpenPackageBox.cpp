@@ -82,11 +82,12 @@ void OpenPackageBox::build()
     mRefTreePackage->clear();
 
     PathList list = Path::path().getInstalledPackages();
-    PathList::const_iterator it = list.begin();
-    while (it != list.end()) {
+
+    list.sort();
+    for (PathList::const_iterator it = list.begin();
+	 it != list.end(); ++it) {
 	Gtk::TreeModel::Row row = *(mRefTreePackage->append());
 	row[mColumns.mName] = boost::filesystem::basename(*it);
-	++it;
     }
 }
 
