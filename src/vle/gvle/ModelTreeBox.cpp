@@ -220,8 +220,7 @@ void ModelTreeBox::onEditionStarted(
     if (ref) {
         Gtk::TreeModel::iterator iter = ref->get_selected();
         if (iter) {
-            Gtk::TreeModel::Row row = *iter;
-            m_OldName = row.get_value(m_modelscolumnrecord.name);
+	    m_OldName = (*iter)[m_modelscolumnrecord.name];
 	}
     }
 
@@ -243,19 +242,20 @@ void ModelTreeBox::onEdition(
     const Glib::ustring& newName)
 {
     Gtk::TreePath path(pathString);
-
-    if (newName != "") {
-	Glib::RefPtr < Gtk::TreeView::Selection > ref = get_selection();
-	if (ref) {
-	    Gtk::TreeModel::iterator iter = ref->get_selected();
-	    if (iter) {
-		Gtk::TreeModel::Row row = *iter;
+    Glib::RefPtr < Gtk::TreeView::Selection > ref = get_selection();
+    if (ref) {
+	Gtk::TreeModel::iterator iter = ref->get_selected();
+	if (iter) {
+	    Gtk::TreeModel::Row row = *iter;
+	    if (not newName.empty()) {
 		try {
 		    row[m_modelscolumnrecord.name] = newName;
 		    graph::Model::rename(row[m_Columns.mModel], newName);
 		} catch(utils::DevsGraphError dge) {
 		    row[m_modelscolumnrecord.name] = m_OldName;
 		}
+	    } else {
+		row[m_modelscolumnrecord.name] = m_OldName;
 	    }
 	}
     }
