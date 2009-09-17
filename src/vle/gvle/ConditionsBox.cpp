@@ -287,7 +287,7 @@ void ConditionsBox::ConditionsTreeView::onEdition(
 
     vpz::ConditionList& list = mConditions->conditionlist();
 
-    if (list.find(newName) == list.end() and newName != "") {
+    if (list.find(newName) == list.end() and not newName.empty()) {
 	mConditions->rename(mOldName, newName);
 	mParent->buildTreeConditions();
 
@@ -475,7 +475,7 @@ void ConditionsBox::PortsTreeView::onRename()
         std::string newname = boost::trim_copy(box.run());
         std::list < std::string >::const_iterator it_find =
             std::find(list.begin(), list.end(), newname);
-        if (it_find == list.end()){
+        if (box.valid() and not newname.empty() and it_find == list.end()){
             Glib::ustring oldname = (*it_select)[mColumns.m_col_name];
             mCondition->rename(oldname, newname);
             mParent->buildTreePorts(mCondition->name());
@@ -537,7 +537,7 @@ void ConditionsBox::PortsTreeView::onEdition(
     if (it_select) {
         std::list < std::string >::const_iterator it_find =
             std::find(list.begin(), list.end(), newName);
-        if (it_find == list.end() and newName != ""){
+        if (it_find == list.end() and not newName.empty()){
             mCondition->rename(mOldName, newName);
             mParent->buildTreePorts(mCondition->name());
         }
