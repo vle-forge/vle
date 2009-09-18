@@ -266,7 +266,7 @@ public:
 	 * @param dirname the name of the parent directory
 	 *
 	 */
-	void buildHierarchyDirectory(const Gtk::TreeModel::Row& parent,
+	void buildHierarchyDirectory(const Gtk::TreeModel::Row* parent,
 				     const std::string& dirname);
 
 	/**
@@ -276,15 +276,16 @@ public:
 	 * @param dirname the name of the parent directory
 	 *
 	 */
-	void buildHierarchyFile(const Gtk::TreeModel::Row& parent,
+	void buildHierarchyFile(const Gtk::TreeModel::Row* parent,
 				const std::string& dirname);
 
-	void buildHierarchy(const Gtk::TreeModel::Row& parent,
+	void buildHierarchy(const Gtk::TreeModel::Row* parent,
 			    const std::string& dirname);
 	bool isDirectory(const std::string& dirname);
 	void on_row_activated(const Gtk::TreeModel::Path& path,
 			    Gtk::TreeViewColumn*  column);
-	std::list<std::string>* projectFilePath(const Gtk::TreeRow& row);
+	void projectFilePath(const Gtk::TreeRow& row,
+			     std::list<std::string>& lst);
 
 	GVLE*                            mParent;
 	Gtk::Menu                        mMenuPopup;

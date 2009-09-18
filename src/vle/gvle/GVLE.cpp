@@ -66,7 +66,7 @@ GVLE::FileTreeView::FileTreeView(
 {
     mRefTreeModel = Gtk::TreeStore::create(mColumns);
     set_model(mRefTreeModel);
-    mColumnName = append_column(_("Files"), mColumns.m_col_name);
+    mColumnName = append_column(_("Project"), mColumns.m_col_name);
 
     mCellrenderer = dynamic_cast<Gtk::CellRendererText*>(
 	get_column_cell_renderer(mColumnName - 1));
@@ -116,7 +116,7 @@ GVLE::FileTreeView::~FileTreeView()
 }
 
 void GVLE::FileTreeView::buildHierarchyDirectory(
-    const Gtk::TreeModel::Row& parent, const std::string& dirname)
+    const Gtk::TreeModel::Row* parent, const std::string& dirname)
 {
     Glib::Dir dir(dirname);
     std::list<std::string> entries (dir.begin(), dir.end());
@@ -124,20 +124,29 @@ void GVLE::FileTreeView::buildHierarchyDirectory(
     std::list <std::string> ::iterator it;
     for (it = entries.begin(); it != entries.end(); ++it) {
 	if (((*it)[0] != '.') //Don't show hidden files
-	    and (std::find(mIgnoredFilesList.begin(), mIgnoredFilesList.end(), *it)
+	    and (std::find(mIgnoredFilesList.begin(),
+			   mIgnoredFilesList.end(), *it)
 	         == mIgnoredFilesList.end())) {
 	    std::string nextpath = Glib::build_filename(dirname, *it);
 	    if (isDirectory(nextpath)) {
-		Gtk::TreeModel::Row row = *(mRefTreeModel->append(parent.children()));
-		row[mColumns.m_col_name] = *it;
-		buildHierarchy(*row, nextpath);
+		if (parent) {
+		    Gtk::TreeModel::Row row =
+			*(mRefTreeModel->append(parent->children()));
+		    row[mColumns.m_col_name] = *it;
+		    buildHierarchy(&(*row), nextpath);
+		} else {
+		    Gtk::TreeModel::Row row =
+			*(mRefTreeModel->append());
+		    row[mColumns.m_col_name] = *it;
+		    buildHierarchy(&(*row), nextpath);
+		}
 	    }
 	}
     }
 }
 
 void GVLE::FileTreeView::buildHierarchyFile(
-    const Gtk::TreeModel::Row& parent, const std::string& dirname)
+    const Gtk::TreeModel::Row* parent, const std::string& dirname)
 {
     Glib::Dir dir(dirname);
     std::list<std::string> entries (dir.begin(), dir.end());
@@ -145,12 +154,20 @@ void GVLE::FileTreeView::buildHierarchyFile(
     std::list<std::string>::iterator it;
     for (it = entries.begin(); it != entries.end(); ++it) {
 	if (((*it)[0] != '.') //Don't show hidden files
-	    and (std::find(mIgnoredFilesList.begin(), mIgnoredFilesList.end(), *it)
+	    and (std::find(mIgnoredFilesList.begin(),
+			   mIgnoredFilesList.end(), *it)
 	         == mIgnoredFilesList.end())) {
 	    std::string nextpath = Glib::build_filename(dirname, *it);
 	    if (not isDirectory(nextpath)) {
-		Gtk::TreeModel::Row row = *(mRefTreeModel->append(parent.children()));
-		row[mColumns.m_col_name] = *it;
+		if (parent) {
+		    Gtk::TreeModel::Row row =
+			*(mRefTreeModel->append(parent->children()));
+		    row[mColumns.m_col_name] = *it;
+		} else {
+		    Gtk::TreeModel::Row row =
+			*(mRefTreeModel->append());
+		    row[mColumns.m_col_name] = *it;
+		}
 	    }
 	}
     }
@@ -158,7 +175,7 @@ void GVLE::FileTreeView::buildHierarchyFile(
 
 
 void GVLE::FileTreeView::buildHierarchy(
-    const Gtk::TreeModel::Row& parent, const std::string& dirname)
+    const Gtk::TreeModel::Row* parent, const std::string& dirname)
 {
     buildHierarchyDirectory(parent, dirname);
     buildHierarchyFile(parent, dirname);
@@ -172,11 +189,13 @@ void GVLE::FileTreeView::clear()
 void GVLE::FileTreeView::build()
 {
     if (not mPackage.empty()) {
-	Gtk::TreeIter iter = mRefTreeModel->append();
-	Gtk::TreeModel::Row row = *iter;
-	row[mColumns.m_col_name] = boost::filesystem::basename(mPackage);
-	buildHierarchy(*row, mPackage);
-	expand_row(Gtk::TreePath(iter), false);
+	remove_all_columns();
+	mColumnName = append_column(
+	    _(boost::filesystem::basename(mPackage).c_str()),
+	    mColumns.m_col_name);
+	mCellrenderer = dynamic_cast<Gtk::CellRendererText*>(
+	    get_column_cell_renderer(mColumnName - 1));
+	buildHierarchy(0, mPackage);
     }
 }
 
@@ -191,10 +210,13 @@ void GVLE::FileTreeView::on_row_activated(const Gtk::TreeModel::Path&,
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection	= get_selection();
     Gtk::TreeModel::const_iterator it = refSelection->get_selected();
     const Gtk::TreeModel::Row row = *it;
-    const std::list<std::string>* lstpath = projectFilePath(row);
+    std::list<std::string> lstpath;
+
+    projectFilePath(row, lstpath);
 
     std::string absolute_path =
-	Glib::build_filename(mPackage, Glib::build_filename(*lstpath));
+	Glib::build_filename(mPackage, Glib::build_filename(lstpath));
+
     if (not isDirectory(absolute_path)) {
 	if (mParent->getEditor()->existTab(absolute_path)) {
 	    mParent->getEditor()->focusTab(absolute_path);
@@ -216,17 +238,13 @@ void GVLE::FileTreeView::on_row_activated(const Gtk::TreeModel::Path&,
     }
 }
 
-std::list<std::string>* GVLE::FileTreeView::projectFilePath(
-    const Gtk::TreeRow& row)
+void GVLE::FileTreeView::projectFilePath(const Gtk::TreeRow& row,
+					 std::list<std::string>& lst)
 {
     if (row.parent()) {
-	std::list<std::string>* lst =
-	    projectFilePath(*row.parent());
-	lst->push_back(std::string(row.get_value(mColumns.m_col_name)));
-	return lst;
-    } else {
-	return new std::list<std::string>();
+	projectFilePath(*row.parent(), lst);
     }
+    lst.push_back(std::string(row.get_value(mColumns.m_col_name)));
 }
 
 bool GVLE::FileTreeView::on_button_press_event(GdkEventButton* event)
@@ -247,9 +265,11 @@ void GVLE::FileTreeView::onOpen()
     if (refSelection and box.valid() and not prg.empty()) {
 	Gtk::TreeModel::Row row = *refSelection->get_selected();
 	std::list < std::string > argv;
+	std::list<std::string> lstpath;
 	argv.push_back(prg);
+	projectFilePath(row, lstpath);
 	std::string filepath = Glib::build_filename(
-	    mPackage, Glib::build_filename(*projectFilePath(row)));
+	    mPackage, Glib::build_filename(lstpath));
 	argv.push_back(filepath);
 
 	try {
@@ -273,9 +293,10 @@ void GVLE::FileTreeView::onNewFile()
 	if (refSelection) {
 	    Gtk::TreeModel::const_iterator it = refSelection->get_selected();
 	    const Gtk::TreeModel::Row row = *it;
-	    const std::list<std::string>* lstpath = projectFilePath(row);
+	    std::list<std::string> lstpath;
+	    projectFilePath(row, lstpath);
 	    filepath = Glib::build_filename(
-		mPackage, Glib::build_filename(*lstpath));
+		mPackage, Glib::build_filename(lstpath));
 	    if (not isDirectory(filepath)) {
 		boost::filesystem::path path(filepath);
 		filepath = boost::lexical_cast<std::string>(path);
@@ -298,9 +319,10 @@ void GVLE::FileTreeView::onNewDirectory()
 	if (refSelection) {
 	    Gtk::TreeModel::const_iterator it = refSelection->get_selected();
 	    const Gtk::TreeModel::Row row = *it;
-	    const std::list<std::string>* lstpath = projectFilePath(row);
+	    std::list<std::string> lstpath;
+	    projectFilePath(row, lstpath);
 	    directorypath = Glib::build_filename(
-		mPackage, Glib::build_filename(*lstpath));
+		mPackage, Glib::build_filename(lstpath));
 	    if (not isDirectory(directorypath)) {
 		boost::filesystem::path path(directorypath);
 		directorypath = boost::lexical_cast<std::string>(path);
@@ -320,10 +342,11 @@ void GVLE::FileTreeView::onRemove()
     if (refSelection) {
 	Gtk::TreeModel::const_iterator it = refSelection->get_selected();
 	const Gtk::TreeModel::Row row = *it;
-	const std::list<std::string>* lstpath = projectFilePath(row);
+	std::list<std::string> lstpath;
 
+	projectFilePath(row, lstpath);
 	if (gvle::Question(_("Do you really want remove this file ?\n")))
-	    utils::Package::package().removeFile(Glib::build_filename(*lstpath));
+	    utils::Package::package().removeFile(Glib::build_filename(lstpath));
     }
     mParent->buildPackageHierarchy();
 }
@@ -342,10 +365,11 @@ void GVLE::FileTreeView::onRename()
 	    std::string name = boost::trim_copy(box.run());
 
 	    if (box.valid() and not name.empty()) {
-		const std::list<std::string>* lstpath = projectFilePath(row);
+		std::list<std::string> lstpath;
 
+		projectFilePath(row, lstpath);
 		utils::Package::package().renameFile(
-		    Glib::build_filename(*lstpath),
+		    Glib::build_filename(lstpath),
 		    name);
 	    }
 	    mParent->buildPackageHierarchy();
