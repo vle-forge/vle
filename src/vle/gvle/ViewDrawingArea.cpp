@@ -1398,6 +1398,39 @@ void ViewDrawingArea::exportSvg(const std::string& filename)
     surface->finish();
 }
 
+void ViewDrawingArea::setUndefinedModels()
+{
+    graph::ModelList::const_iterator it = mCurrent->getModelList().begin();
+    bool found = false;
+
+    while (it != mCurrent->getModelList().end()) {
+	if (it->second->width() <= 0) {
+	    found = true;
+	    it->second->setWidth(100);
+	    if (mMaxWidth <= 0) {
+		mMaxWidth = 100;
+	    }
+	}
+	if (it->second->height() <= 0) {
+	    found = true;
+	    it->second->setHeight(MODEL_HEIGHT +
+				  std::max(it->second->getInputPortNumber(),
+					   it->second->getOutputPortNumber()) *
+				  (MODEL_SPACING_PORT + MODEL_PORT));
+	    if (mMaxHeight <= 0 or mMaxHeight < it->second->height()) {
+		mMaxHeight = it->second->height();
+	    }
+	}
+	++it;
+    }
+    if (found) {
+	mRectWidth = (mMaxWidth + SPACING_MODEL) *
+	    std::floor(std::sqrt(mCurrent->getModelList().size()) + 1);
+	mRectHeight = (mMaxHeight + SPACING_MODEL) *
+	    std::floor(std::sqrt(mCurrent->getModelList().size()) + 1);
+    }
+}
+
 void ViewDrawingArea::onRandomOrder()
 {
     mGrid.clear();
@@ -1406,21 +1439,21 @@ void ViewDrawingArea::onRandomOrder()
     int x, y;
     int compteur = 0;
 
+    setUndefinedModels();
+
     mCasesWidth = (mRectWidth - (MODEL_PORT + mOffset)) / (mMaxWidth + 15);
     mCasesHeight = (mRectHeight - (MODEL_PORT + mOffset)) / (mMaxHeight + 15);
 
-    graph::ModelList::const_iterator it =
-	mCurrent->getModelList().begin();
-    it = mCurrent->getModelList().begin();
-    while (it != mCurrent->getModelList().end()) {
+    graph::ModelList::const_iterator it = mCurrent->getModelList().begin();
 
+    while (it != mCurrent->getModelList().end()) {
 	do {
 	    ++compteur;
 	    x = mModeling->getRand()->getInt(0, mCasesWidth - 1);
 	    y = mModeling->getRand()->getInt(0, mCasesHeight - 1);
 	    key = boost::lexical_cast < std::string > (x) + ":" +
 		boost::lexical_cast < std::string > (y);
-	    if (compteur == 1000) {
+	    if (compteur == 100) {
 		mRectWidth += mMaxWidth + 15;
 		mRectHeight += mMaxHeight + 15;
 		mCasesWidth = (mRectWidth - (MODEL_PORT + mOffset)) /

@@ -213,6 +213,8 @@ namespace vle { namespace gvle {
         void drawLink();
         void drawZoomFrame();
 
+	void setUndefinedModels();
+
         bool on_button_press_event(GdkEventButton* event);
         bool on_button_release_event(GdkEventButton* event);
         bool on_configure_event(GdkEventConfigure* event);
