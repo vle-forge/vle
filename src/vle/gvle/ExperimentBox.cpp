@@ -37,12 +37,9 @@
 
 namespace vle { namespace gvle {
 
-ExperimentBox::ExperimentBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
-                             Modeling* modeling) :
-    mModeling(modeling),
-    mCalendar(xml),
-    mDialog(0),
-    mCalendarBegin(xml)
+ExperimentBox::ExperimentBox(Glib::RefPtr < Gnome::Glade::Xml > xml,
+                             Modeling* modeling)
+    : mModeling(modeling), mCalendar(xml), mDialog(0), mCalendarBegin(xml)
 {
     xml->get_widget("DialogExperiment", mDialog);
     xml->get_widget("EntryAuthor", mEntryAuthor);
@@ -80,6 +77,7 @@ ExperimentBox::ExperimentBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
         sigc::mem_fun(*this, &ExperimentBox::on_random_simu)));
     mSigcConnection.push_back(mButtonPlanSeed->signal_clicked().connect(
         sigc::mem_fun (*this, &ExperimentBox::on_random_plan)));
+
     mSigcConnection.push_back(mButtonCalendarBegin->signal_clicked().connect(
         sigc::mem_fun(*this, &ExperimentBox::on_calendarBegin)));
     mSigcConnection.push_back(mSpinBeginH->signal_value_changed().connect(
@@ -88,6 +86,7 @@ ExperimentBox::ExperimentBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
         sigc::mem_fun(*this, &ExperimentBox::on_time_changed)));
     mSigcConnection.push_back(mSpinBeginS->signal_value_changed().connect(
         sigc::mem_fun(*this, &ExperimentBox::on_time_changed)));
+
     mSigcConnection.push_back(mSpinBeginReal->signal_value_changed().connect(
         sigc::mem_fun(*this, &ExperimentBox::on_julianDate_changed)));
 
@@ -142,10 +141,7 @@ void ExperimentBox::initExperiment()
         mSpinBeginReal->set_range(std::numeric_limits < int >::min(),
                                   std::numeric_limits < int >::max());
         mSpinBeginReal->set_value(mModeling->experiment().begin());
-        mEntryBeginDate->set_text("");
-        mSpinBeginH->set_value(0);
-        mSpinBeginM->set_value(0);
-        mSpinBeginS->set_value(0);
+        updateBeginTime();
     }
 
     // Simulation frame
@@ -273,90 +269,58 @@ void ExperimentBox::on_calendar()
 
 void ExperimentBox::updateBeginReal()
 {
-    if (!mRealUpdated) {
-        std::string date;
-        if (mEntryBeginDate->get_text() != "") {
-            date = mEntryBeginDate->get_text();
-        } else {
-            date = "1400-01-01";
-        }
+    std::string date = mEntryBeginDate->get_text();
 
-        date += " ";
-        std::string h = boost::lexical_cast <
-               std::string >(mSpinBeginH->get_value());
-        date += h;
-        date += ":";
-        std::string m = boost::lexical_cast <
-               std::string >(mSpinBeginM->get_value());
-        date += m;
-        date += ":";
-        std::string s = boost::lexical_cast <
-               std::string >(mSpinBeginS->get_value());
-        date += s;
-        date += ".000";
-        double realDate = utils::DateTime::toJulianDay(date);
-        mSpinBeginReal->set_value(realDate);
+    if (date.empty()) {
+        mEntryBeginDate->set_text("1400-01-01");
+        date = mEntryBeginDate->get_text();
     }
-}
 
-void ExperimentBox::updateBeginDate()
-{
-    if (mSpinBeginReal->get_value() != mBeginRealMin) {
-        mEntryBeginDate->set_text(
-          utils::DateTime::toJulianDayNumber(
-             mSpinBeginReal->get_value()));
-    }
+    double begin = utils::DateTime::toJulianDayNumber(date);
+
+    begin += (mSpinBeginH->get_value() * 1 / 24);
+    begin += (mSpinBeginM->get_value() * 1 / (24 * 60));
+    begin += (mSpinBeginS->get_value() * 1 / (24 * 60 * 60));
+
+    mSpinBeginReal->set_value(begin);
 }
 
 void ExperimentBox::updateBeginTime()
 {
-    if (!mTimeUpdated) {
-        std::string d = utils::DateTime::toJulianDay
-           (mSpinBeginReal->get_value());
+    try {
+        long year, month, day, hours, minutes, seconds;
+        double remain;
 
-        std::string h;
-        h = d[12];
-        h += d[13];
-        mSpinBeginH->set_value(
-	   boost::lexical_cast <int>(h));
+        remain = utils::DateTime::toTime(mSpinBeginReal->get_value(), year,
+                                         month, day, hours, minutes, seconds);
 
-        std::string m;
-        m = d[15];
-        m += d[16];
-        mSpinBeginM->set_value(
-	   boost::lexical_cast <int>(m));
+        mSpinBeginH->set_value(hours);
+        mSpinBeginM->set_value(minutes);
 
-        std::string s;
-        s = d[12];
-        s += d[13];
-        mSpinBeginS->set_value(
-	   boost::lexical_cast <int>(s));
+        if (remain > .5) {
+            mSpinBeginS->set_value(seconds + 1);
+        } else {
+            mSpinBeginS->set_value(seconds);
+        }
+
+        mEntryBeginDate->set_text(
+            utils::DateTime::toJulianDayNumber(mSpinBeginReal->get_value()));
+    } catch (const std::exception& e) {
+        mSpinBeginH->set_value(0);
+        mSpinBeginM->set_value(0);
+        mSpinBeginS->set_value(0);
+        mEntryBeginDate->set_text("");
     }
 }
 
 void ExperimentBox::on_julianDate_changed()
 {
-    if (mSpinBeginReal->get_value() < mBeginRealMin or
-        mSpinBeginReal->get_value() > mBeginRealMax) {
-        mEntryBeginDate->set_text("");
-        mSpinBeginH->set_value(0);
-        mSpinBeginM->set_value(0);
-        mSpinBeginS->set_value(0);
-    } else {
-        mRealUpdated = true;
-        updateBeginDate();
-        updateBeginTime();
-        mRealUpdated = false;
-    }
+    updateBeginTime();
 }
 
 void ExperimentBox::on_time_changed()
 {
-    mTimeUpdated = true;
-    if (mSpinBeginReal->get_value() != 0.0) {
-        updateBeginReal();
-    }
-    mTimeUpdated = false;
+    updateBeginReal();
 }
 
 void ExperimentBox::on_calendarBegin()

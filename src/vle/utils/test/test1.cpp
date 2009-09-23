@@ -362,3 +362,19 @@ BOOST_AUTO_TEST_CASE(julian_date)
 				    vle::utils::DateTime::toJulianDay(
 					2454115.05486)))));
 }
+
+BOOST_AUTO_TEST_CASE(to_time_function)
+{
+    long year, month, day, hours, minutes, seconds;
+    double date = 2452192.191273148;
+
+    vle::utils::DateTime::toTime(date, year, month, day, hours, minutes,
+                                 seconds);
+
+    BOOST_REQUIRE_EQUAL(year, 2001);
+    BOOST_REQUIRE_EQUAL(month, 10);
+    BOOST_REQUIRE_EQUAL(day, 9);
+    BOOST_REQUIRE_EQUAL(hours, 4);
+    BOOST_REQUIRE_EQUAL(minutes, 35);
+    BOOST_REQUIRE_EQUAL(seconds, 26);
+}

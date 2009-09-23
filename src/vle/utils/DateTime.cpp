@@ -249,4 +249,40 @@ double DateTime::toJulianDay(const std::string& date)
     return -1.0;
 }
 
+double DateTime::toTime(const double& date, long& year,
+                        long& month, long& day,
+                        long& hours, long& minutes,
+                        long& seconds)
+{
+    try {
+        namespace bg = boost::gregorian;
+        bg::date d(boost::numeric_cast < bg::date::date_int_type >(date));
+
+        year = d.year();
+        month = d.month();
+        day = d.day();
+
+        double f, e;
+        f = std::modf(date, &e);
+
+        f *= 24.0;
+        hours = std::floor(f);
+        f -= hours;
+
+        f *= 60.0;
+        minutes = std::floor(f);
+        f -= minutes;
+
+        f *= 60.0;
+        seconds = std::floor(f);
+        f -= seconds;
+
+        return f;
+    } catch (const std::exception& e) {
+        throw utils::ArgError(fmt(
+                _("Can convert date '%1' to gregorian calendar: %2%")) % date %
+            e.what());
+    }
+}
+
 }} // namespace vle utils

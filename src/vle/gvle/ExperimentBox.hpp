@@ -82,7 +82,7 @@ namespace vle { namespace gvle {
         Gtk::SpinButton*    mSpinBeginM;
         Gtk::SpinButton*    mSpinBeginS;
         double              mBeginRealMin, mBeginRealMax;
-        bool                mRealUpdated, mTimeUpdated;
+        bool                mRealUpdated;
         Gtk::SpinButton*    mSpinSimuSeed;
         Gtk::Button*        mButtonSimuSeed;
         Gtk::HBox*          mHboxCombi;
@@ -106,7 +106,6 @@ namespace vle { namespace gvle {
         void on_julianDate_changed();
         void on_time_changed();
         void updateBeginReal();
-        void updateBeginDate();
         void updateBeginTime();
 
         void on_random_simu();

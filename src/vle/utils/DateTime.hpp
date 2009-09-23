@@ -76,6 +76,31 @@ struct VLE_UTILS_EXPORT DateTime
     static long toJulianDayNumber(const std::string& date);
     static std::string toJulianDay(double date);
     static double toJulianDay(const std::string& date);
+
+    /**
+     * @brief Explode the specified date attribute to year, month, day in the
+     * month, hours, minutes and seconds.
+     *
+     * @param date The date to convert.
+     * @param year Output parameter to represent year.
+     * @param month Output parameter to represent month.
+     * @param day Output parameter to represent day in a month (1..31).
+     * @param hours Output parameter to represent hours in date.
+     * @param minutes Output parameter to represent minutes in date.
+     * @param seconds Output parameter to represent seconds in date.
+     *
+     * @throw utils::ArgError error to convert the date.
+     *
+     * @return The remainder of the conversion.
+     */
+    static double
+        toTime(const double& date,
+               long& year,
+               long& month,
+               long& day,
+               long& hours,
+               long& minutes,
+               long& seconds);
 };
 
 }} // namespace vle utils
