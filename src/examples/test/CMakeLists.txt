@@ -86,8 +86,24 @@ TARGET_LINK_LIBRARIES(test_qss
   vlevpz
   vlemanager)
 
+ADD_EXECUTABLE(test_fsa testfsa.cpp)
+TARGET_LINK_LIBRARIES(test_fsa
+  ${GLIBMM_LIBRARIES}
+  ${LIBXML_LIBRARIES}
+  ${GTHREAD_LIBRARIES}
+  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
+  vlegeometry
+  vleutils
+  vledata
+  vlevalue
+  vlegraph
+  vledevs
+  vlevpz
+  vlemanager)
+
 ADD_TEST(exemples_generator test_gens)
 ADD_TEST(examples_petrinet test_petrinet)
 ADD_TEST(examples_dess test_dess)
 ADD_TEST(examples_equation test_equation)
 ADD_TEST(examples_qss test_qss)
+ADD_TEST(examples_fsa test_fsa)

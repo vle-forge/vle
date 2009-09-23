@@ -15,7 +15,8 @@ SET(EXTENSION_CPP CellDevs.cpp CellQSS.cpp DESS.cpp
 
 SET(EXTENSION_HPP CellDevs.hpp CellQSS.hpp DESS.hpp DllDefines.hpp
   DifferenceEquation.hpp DifferentialEquation.hpp DSDevs.hpp PetriNet.hpp
-  QSS2.hpp QSS.hpp)
+  QSS2.hpp QSS.hpp FSA.hpp FSA.cpp Moore.hpp Moore.cpp Mealy.hpp
+  Mealy.cpp Statechart.hpp Statechart.cpp FDDevs.hpp)
 
 ADD_LIBRARY(vleextension SHARED ${EXTENSION_HPP};${EXTENSION_CPP})
 

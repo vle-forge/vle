@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://vle.univ-littoral.fr/vle-0.8.0.dtd">
+<vle_project version="0.5" date="mer, 09 sep 2009" author="Eric Ramat, Gauthier Quesnel">
+<structures>
+<model name="m" type="coupled" width="468" height="360"  >
+<submodels>
+<model name="m1" type="atomic" dynamics="dyn1" observables="obs1" x="250" y="16" width="100" height="45" >
+<in>
+ <port name="in" />
+</in>
+<out>
+ <port name="out" />
+</out>
+</model>
+<model name="m2" type="atomic" dynamics="dyn2" observables="obs1" x="250" y="232" width="100" height="45" >
+<in>
+ <port name="in" />
+</in>
+<out>
+ <port name="out" />
+</out>
+</model>
+<model name="m3" type="atomic" dynamics="dyn3" observables="obs1" x="52" y="109" width="100" height="60" >
+<in>
+ <port name="in1" />
+ <port name="in2" />
+</in>
+<out>
+ <port name="out" />
+</out>
+</model>
+</submodels>
+<connections>
+<connection type="internal">
+ <origin model="m1" port="out" />
+ <destination model="m3" port="in1" />
+</connection>
+<connection type="internal">
+ <origin model="m2" port="out" />
+ <destination model="m3" port="in2" />
+</connection>
+<connection type="internal">
+ <origin model="m3" port="out" />
+ <destination model="m1" port="in" />
+</connection>
+<connection type="internal">
+ <origin model="m3" port="out" />
+ <destination model="m2" port="in" />
+</connection>
+</connections>
+</model>
+</structures>
+<dynamics>
+<dynamic name="dyn1" library="fddevs" model="devs1" type="local"  />
+<dynamic name="dyn2" library="fddevs" model="devs2" type="local"  />
+<dynamic name="dyn3" library="moore" model="moore1" type="local"  />
+</dynamics>
+<experiment name="exp2" duration="100.000000000000000" begin="0.000000000000000" seed="123456789" >
+<views>
+<outputs>
+<output name="o" location="" format="local" plugin="text" />
+
+</outputs>
+<observables>
+<observable name="obs1" >
+<port name="state" >
+ <attachedview name="view" />
+</port>
+
+</observable>
+
+</observables>
+<view name="view" output="o" type="timed" timestep="1.000000000000000" />
+
+</views>
+</experiment>
+</vle_project>
