@@ -577,6 +577,15 @@ void ViewDrawingArea::drawChildrenModels()
     graph::ModelList::const_iterator it = children.begin();
     while (it != children.end()) {
         graph::Model* model = it->second;
+
+        if (model->isCoupled()) {
+            model->setWidth(ViewDrawingArea::MODEL_WIDTH);
+            model->setHeight(MODEL_HEIGHT +
+                             std::max(model->getInputPortNumber(),
+                                      model->getOutputPortNumber())
+                             * (MODEL_SPACING_PORT + MODEL_PORT));
+        }
+
         if (mView->existInSelectedModels(model)) {
             drawChildrenModel(model, mModeling->getSelectedColor());
         } else {
