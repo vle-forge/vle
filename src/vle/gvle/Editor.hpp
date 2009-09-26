@@ -39,42 +39,44 @@
 
 namespace vle { namespace gvle {
 
-    class GVLE;
-    class View;
-    class ViewDrawingArea;
+class GVLE;
+class View;
+class ViewDrawingArea;
 
 /**
  * @brief Document class used within Gtk::Notebook
  */
 class Document : public Gtk::ScrolledWindow {
 public:
-
     Document(GVLE* gvle, const std::string& filepath);
+    virtual ~Document() { }
 
-    virtual ~Document();
-
-    virtual inline bool isDrawingArea()
+    virtual inline bool isDrawingArea() const
 	{ return false; }
 
-    inline std::string filename()
+    inline const std::string& filename() const
 	{ return mFileName; }
 
-    inline const std::string filepath() const
+    inline void setFileName(const std::string& filename)
+	{ mFileName = filename; }
+
+    inline const std::string& filepath() const
 	{ return mFilePath; }
 
-    inline void setFilePath(std::string filepath)
+    inline void setFilePath(const std::string& filepath)
 	{ mFilePath = filepath; }
 
-    inline bool isModified()
+    inline bool isModified() const
 	{ return mModified; }
 
     inline void setModified(bool modified)
 	{ mModified = modified; }
 
-    inline std::string getTitle()
+    inline const std::string& getTitle() const
 	{ return mTitle; }
 
-    void setTitle(std::string title, graph::Model* model,
+    void setTitle(const std::string& fileName,
+		  graph::Model* model,
 		  bool modified);
 
     virtual void updateView() = 0;
@@ -94,7 +96,7 @@ private:
 class DocumentText : public Document {
 public:
     DocumentText(GVLE* gvle, const std::string& filePath, bool newfile = false);
-    ~DocumentText();
+    virtual ~DocumentText() { }
 
     void save();
     void saveAs(const std::string& filename);
@@ -104,8 +106,8 @@ public:
 
     void updateView();
 
-    void undo();
-    void redo();
+    virtual void undo();
+    virtual void redo();
 
 private:
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
@@ -126,9 +128,9 @@ class DocumentDrawingArea : public Document {
 public:
     DocumentDrawingArea(GVLE* gvle, const std::string& filePath,
 			View* view, graph::Model* model);
-    ~DocumentDrawingArea();
+    virtual ~DocumentDrawingArea();
 
-     inline View* getView() const
+    inline View* getView() const
 	{ return mView; }
 
     inline ViewDrawingArea* getDrawingArea() const
@@ -145,8 +147,8 @@ public:
 
     void updateView();
 
-    void undo();
-    void redo();
+    virtual void undo();
+    virtual void redo();
 
 private:
     View*               mView;
@@ -165,9 +167,10 @@ public:
 
     Editor(BaseObjectType* cobject,
 		     const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
+    virtual ~Editor();
 
     void setParent(GVLE* gvle)
-    { mGVLE = gvle; }
+    { mApp = gvle; }
 
     /* methods to manage tabs */
     void focusTab(const std::string& filepath);
@@ -196,7 +199,10 @@ public:
      * @param filepath the key in the document map
      *
      */
-    void setModifiedTab(const std::string title, const std::string filepath);
+    void setModifiedTab(const std::string& title,
+			const std::string& newFilePath,
+			const std::string& oldFilePath);
+    void changeFile(const std::string& oldName, const std::string& newName);
 
     void createBlankNewFile();
     void closeFile();
@@ -210,12 +216,12 @@ public:
     void onUndo();
     void onRedo();
 
-    Documents& getDocumentsList()
+    const Documents& getDocuments() const
     { return mDocuments; }
 
 private:
     Documents   mDocuments;
-    GVLE*       mGVLE;
+    GVLE*       mApp;
 
     /**
      * @brief add a label for a new tab
@@ -227,9 +233,8 @@ private:
      */
     Gtk::HBox* addLabel(const std::string& title,
 			const std::string& filepath);
-
 };
 
-}}
+}} // namespace vle gvle
 
 #endif

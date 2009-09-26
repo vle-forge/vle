@@ -52,6 +52,8 @@
 #include <glibmm/miscutils.h>
 #include <gtkmm/stock.h>
 
+namespace fs = boost::filesystem;
+
 namespace vle { namespace gvle {
 
 const std::string GVLE::WINDOW_TITLE =
@@ -59,10 +61,13 @@ const std::string GVLE::WINDOW_TITLE =
     std::string(VLE_VERSION) +
     std::string(VLE_EXTRA_VERSION);
 
+/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
 GVLE::FileTreeView::FileTreeView(
     BaseObjectType* cobject,
     const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/) :
-    Gtk::TreeView(cobject), mDelayTime(0)
+    Gtk::TreeView(cobject),
+    mDelayTime(0)
 {
     mRefTreeModel = Gtk::TreeStore::create(mColumns);
     set_model(mRefTreeModel);
@@ -191,7 +196,7 @@ void GVLE::FileTreeView::build()
     if (not mPackage.empty()) {
 	remove_all_columns();
 	mColumnName = append_column(
-	    _(boost::filesystem::basename(mPackage).c_str()),
+	    _(fs::basename(mPackage).c_str()),
 	    mColumns.m_col_name);
 	mCellrenderer = dynamic_cast<Gtk::CellRendererText*>(
 	    get_column_cell_renderer(mColumnName - 1));
@@ -221,7 +226,7 @@ void GVLE::FileTreeView::on_row_activated(const Gtk::TreeModel::Path&,
 	if (mParent->getEditor()->existTab(absolute_path)) {
 	    mParent->getEditor()->focusTab(absolute_path);
 	} else {
-	    if (boost::filesystem::extension(absolute_path) == ".vpz") {
+	    if (fs::extension(absolute_path) == ".vpz") {
 		mParent->getEditor()->closeVpzTab();
 		if (not mParent->getEditor()->existVpzTab())
 		    mParent->getEditor()->openTab(absolute_path);
@@ -262,6 +267,7 @@ void GVLE::FileTreeView::onOpen()
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection =  get_selection();
     SimpleTypeBox box(_("Path of the program ?"), "");
     std::string prg = Glib::find_program_in_path(boost::trim_copy(box.run()));
+
     if (refSelection and box.valid() and not prg.empty()) {
 	Gtk::TreeModel::Row row = *refSelection->get_selected();
 	std::list < std::string > argv;
@@ -288,8 +294,10 @@ void GVLE::FileTreeView::onNewFile()
     SimpleTypeBox box(_("Name of the File ?"), "");
     std::string name = boost::trim_copy(box.run());
     std::string filepath;
+
     if (box.valid() and not name.empty()) {
 	Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+
 	if (refSelection) {
 	    Gtk::TreeModel::const_iterator it = refSelection->get_selected();
 	    const Gtk::TreeModel::Row row = *it;
@@ -298,7 +306,7 @@ void GVLE::FileTreeView::onNewFile()
 	    filepath = Glib::build_filename(
 		mPackage, Glib::build_filename(lstpath));
 	    if (not isDirectory(filepath)) {
-		boost::filesystem::path path(filepath);
+		fs::path path(filepath);
 		filepath = boost::lexical_cast<std::string>(path);
 	    }
 	} else {
@@ -314,8 +322,10 @@ void GVLE::FileTreeView::onNewDirectory()
     SimpleTypeBox box(_("Name of the Directory ?"), "");
     std::string name = boost::trim_copy(box.run());
     std::string directorypath;
+
     if (box.valid() and not name.empty()) {
 	Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+
 	if (refSelection) {
 	    Gtk::TreeModel::const_iterator it = refSelection->get_selected();
 	    const Gtk::TreeModel::Row row = *it;
@@ -324,7 +334,7 @@ void GVLE::FileTreeView::onNewDirectory()
 	    directorypath = Glib::build_filename(
 		mPackage, Glib::build_filename(lstpath));
 	    if (not isDirectory(directorypath)) {
-		boost::filesystem::path path(directorypath);
+		fs::path path(directorypath);
 		directorypath = boost::lexical_cast<std::string>(path);
 	    }
 	} else {
@@ -339,14 +349,23 @@ void GVLE::FileTreeView::onNewDirectory()
 void GVLE::FileTreeView::onRemove()
 {
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection	= get_selection();
+
     if (refSelection) {
 	Gtk::TreeModel::const_iterator it = refSelection->get_selected();
 	const Gtk::TreeModel::Row row = *it;
-	std::list<std::string> lstpath;
 
-	projectFilePath(row, lstpath);
-	if (gvle::Question(_("Do you really want remove this file ?\n")))
-	    utils::Package::package().removeFile(Glib::build_filename(lstpath));
+	if (gvle::Question(_("Do you really want remove this file ?\n"))) {
+	    std::list < std::string > lstpath;
+	    std::string oldName;
+
+	    projectFilePath(row, lstpath);
+	    oldName = Glib::build_filename(lstpath);
+	    utils::Package::package().removeFile(oldName);
+	    mParent->refreshEditor(oldName, "");
+	    if (mParent->getEditor()->getDocuments().empty()) {
+		mParent->setTitle();
+	    }
+	}
     }
     mParent->buildPackageHierarchy();
 }
@@ -360,43 +379,63 @@ void GVLE::FileTreeView::onRename()
 
 	if (it) {
 	    const Gtk::TreeModel::Row row = *it;
-	    std::string old_name = row.get_value(mColumns.m_col_name);
-	    SimpleTypeBox box(_("Name of the file ?"), old_name);
-	    std::string name = boost::trim_copy(box.run());
+	    std::string oldName = row.get_value(mColumns.m_col_name);
+	    SimpleTypeBox box(_("Name of the file ?"), oldName);
+	    std::string newName = boost::trim_copy(box.run());
 
-	    if (box.valid() and not name.empty()) {
-		std::list<std::string> lstpath;
+	    if (box.valid() and not newName.empty()) {
+		std::list < std::string > lstpath;
+		std::string oldName;
 
 		projectFilePath(row, lstpath);
-		utils::Package::package().renameFile(
-		    Glib::build_filename(lstpath),
-		    name);
+		oldName = Glib::build_filename(lstpath);
+
+		std::string oldAbsolutePath =
+		    Glib::build_filename(utils::Path::path().getPackageDir(),
+					 oldName);
+
+		if (fs::extension(newName) == "") {
+		    newName += fs::extension(oldAbsolutePath);
+		}
+
+		std::string newAbsolutePath =
+		    Glib::build_filename(
+			utils::Path::path().getParentPath(oldAbsolutePath),
+			newName);
+
+		if (not fs::exists(newAbsolutePath)) {
+		    utils::Package::package().renameFile(oldName, newName);
+
+		    mParent->refreshEditor(oldName, newName);
+		}
 	    }
 	    mParent->buildPackageHierarchy();
 	}
     }
 }
 
+/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
 GVLE::GVLE(BaseObjectType* cobject,
 	   const Glib::RefPtr<Gnome::Glade::Xml> xml):
     Gtk::Window(cobject),
-    m_modeling(new Modeling(this)),
-    m_currentButton(POINTER),
-    m_helpbox(0)
+    mModeling(new Modeling(this)),
+    mCurrentButton(POINTER),
+    mHelpBox(0)
 {
     mRefXML = xml;
-    m_modeling->setGlade(mRefXML);
+    mModeling->setGlade(mRefXML);
 
     mGlobalVpzPrevDirPath = "";
 
-    mConditionsBox = new ConditionsBox(mRefXML, m_modeling);
-    mSimulationBox = new LaunchSimulationBox(mRefXML, m_modeling);
-    mPreferencesBox = new PreferencesBox(mRefXML, m_modeling);
-    mOpenPackageBox = new OpenPackageBox(mRefXML, m_modeling);
-    mOpenVpzBox = new OpenVpzBox(mRefXML, m_modeling);
-    mNewProjectBox = new NewProjectBox(mRefXML, m_modeling);
-    mSaveVpzBox = new SaveVpzBox(mRefXML, m_modeling);
-    mQuitBox = new QuitBox(mRefXML, m_modeling);
+    mConditionsBox = new ConditionsBox(mRefXML, mModeling);
+    mSimulationBox = new LaunchSimulationBox(mRefXML, mModeling);
+    mPreferencesBox = new PreferencesBox(mRefXML, mModeling);
+    mOpenPackageBox = new OpenPackageBox(mRefXML, mModeling);
+    mOpenVpzBox = new OpenVpzBox(mRefXML, mModeling);
+    mNewProjectBox = new NewProjectBox(mRefXML, mModeling);
+    mSaveVpzBox = new SaveVpzBox(mRefXML, mModeling);
+    mQuitBox = new QuitBox(mRefXML, mModeling);
 
     mRefXML->get_widget("MenuAndToolbarVbox", mMenuAndToolbarVbox);
     mRefXML->get_widget("StatusBarPackageBrowser", mStatusbar);
@@ -406,16 +445,16 @@ GVLE::GVLE(BaseObjectType* cobject,
     mRefXML->get_widget_derived("NotebookPackageBrowser", mEditor);
     mEditor->setParent(this);
     mRefXML->get_widget_derived("TreeViewModel", mModelTreeBox);
-    mModelTreeBox->setModeling(m_modeling);
+    mModelTreeBox->setModeling(mModeling);
     mRefXML->get_widget_derived("TreeViewClass", mModelClassBox);
-    mModelClassBox->createNewModelBox(m_modeling);
+    mModelClassBox->createNewModelBox(mModeling);
 
     mMenuAndToolbar = new GVLEMenuAndToolbar(this);
     mMenuAndToolbarVbox->pack_start(*mMenuAndToolbar->getMenuBar());
     mMenuAndToolbarVbox->pack_start(*mMenuAndToolbar->getToolbar());
     mMenuAndToolbar->getToolbar()->set_toolbar_style(Gtk::TOOLBAR_BOTH);
 
-    m_modeling->setModified(false);
+    mModeling->setModified(false);
     set_title(WINDOW_TITLE);
     resize(900, 550);
     show();
@@ -423,7 +462,7 @@ GVLE::GVLE(BaseObjectType* cobject,
 
 GVLE::~GVLE()
 {
-    delete m_modeling;
+    delete mModeling;
 
     delete mConditionsBox;
     delete mSimulationBox;
@@ -443,10 +482,10 @@ void GVLE::show()
 void GVLE::setModifiedTitle(const std::string& name)
 {
     if (not name.empty() and
-	boost::filesystem::extension(name) == ".vpz") {
-	Editor::Documents::iterator it =
-	    mEditor->getDocumentsList().find(name);
-	if (it != mEditor->getDocumentsList().end())
+	fs::extension(name) == ".vpz") {
+	Editor::Documents::const_iterator it =
+	    mEditor->getDocuments().find(name);
+	if (it != mEditor->getDocuments().end())
 	    it->second->setTitle(Glib::path_get_basename(name),
 				 getModeling()->getTopModel(),
 				 true);
@@ -458,20 +497,36 @@ void GVLE::buildPackageHierarchy()
     mModelTreeBox->clear();
     mModelClassBox->clear();
     mPackage = vle::utils::Path::path().getPackageDir();
-    setTitle();
     mFileTreeView->clear();
     mFileTreeView->setPackage(mPackage);
     mFileTreeView->build();
 }
 
+void GVLE::refreshEditor(const std::string& oldName, const std::string& newName)
+{
+    if (newName.empty()) { // the file is removed
+	mEditor->closeTab(Glib::build_filename(
+			      mPackage, oldName));
+    } else {
+	fs::path filePath(
+	    Glib::build_filename(mPackage, oldName));
+	std::string newFilePath(
+	    Glib::build_filename(filePath.parent_path().string(), newName));
+
+	mEditor->changeFile(Glib::build_filename(mPackage, oldName),
+			    newFilePath);
+	mModeling->setFileName(newFilePath);
+    }
+}
+
 void GVLE::setFileName(std::string name)
 {
     if (not name.empty() and
-	boost::filesystem::extension(name) == ".vpz") {
-	m_modeling->parseXML(name);
+	fs::extension(name) == ".vpz") {
+	mModeling->parseXML(name);
 	mMenuAndToolbar->onViewMode();
     }
-    m_modeling->setModified(false);
+    mModeling->setModified(false);
 }
 
 void GVLE::insertLog(const std::string& text)
@@ -489,8 +544,8 @@ void GVLE::redrawView()
 
 void GVLE::redrawModelTreeBox()
 {
-    assert(m_modeling->getTopModel());
-    mModelTreeBox->parseModel(m_modeling->getTopModel());
+    assert(mModeling->getTopModel());
+    mModelTreeBox->parseModel(mModeling->getTopModel());
 }
 
 void GVLE::redrawModelClassBox()
@@ -529,44 +584,44 @@ bool GVLE::on_delete_event(GdkEventAny* event)
 
 void GVLE::onArrow()
 {
-    m_currentButton = POINTER;
-    m_status.push(_("Selection"));
+    mCurrentButton = POINTER;
+    mStatusBar.push(_("Selection"));
 }
 
 void GVLE::onAddModels()
 {
-    m_currentButton = ADDMODEL;
-    m_status.push(_("Add models"));
+    mCurrentButton = ADDMODEL;
+    mStatusBar.push(_("Add models"));
 }
 
 void GVLE::onAddLinks()
 {
-    m_currentButton = ADDLINK;
-    m_status.push(_("Add links"));
+    mCurrentButton = ADDLINK;
+    mStatusBar.push(_("Add links"));
 }
 
 void GVLE::onDelete()
 {
-    m_currentButton = DELETE;
-    m_status.push(_("Delete object"));
+    mCurrentButton = DELETE;
+    mStatusBar.push(_("Delete object"));
 }
 
 void GVLE::onAddCoupled()
 {
-    m_currentButton = ADDCOUPLED;
-    m_status.push(_("Coupled Model"));
+    mCurrentButton = ADDCOUPLED;
+    mStatusBar.push(_("Coupled Model"));
 }
 
 void GVLE::onZoom()
 {
-    m_currentButton = ZOOM;
-    m_status.push(_("Zoom"));
+    mCurrentButton = ZOOM;
+    mStatusBar.push(_("Zoom"));
 }
 
 void GVLE::onQuestion()
 {
-    m_currentButton = QUESTION;
-    m_status.push(_("Question"));
+    mCurrentButton = QUESTION;
+    mStatusBar.push(_("Question"));
 }
 
 void GVLE::newFile()
@@ -576,13 +631,13 @@ void GVLE::newFile()
 
 void GVLE::onMenuNew()
 {
-    if (m_modeling->isModified() == false) {
-        m_modeling->delNames();
-        m_modeling->start();
+    if (mModeling->isModified() == false) {
+        mModeling->delNames();
+        mModeling->start();
         redrawModelTreeBox();
     } else if (gvle::Question(_("Do you really want destroy model ?"))) {
-        m_modeling->delNames();
-        m_modeling->start();
+        mModeling->delNames();
+        mModeling->start();
         redrawModelTreeBox();
     }
 }
@@ -595,7 +650,8 @@ void GVLE::onMenuNewProject()
 
 void GVLE::openFile()
 {
-    Gtk::FileChooserDialog file(_("Choose a file"), Gtk::FILE_CHOOSER_ACTION_OPEN);
+    Gtk::FileChooserDialog file(_("Choose a file"),
+				Gtk::FILE_CHOOSER_ACTION_OPEN);
     file.set_transient_for(*this);
     file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
@@ -615,7 +671,7 @@ void GVLE::onMenuOpenPackage()
 
 void GVLE::onMenuOpenVpz()
 {
-    if (m_modeling->isModified() == false or
+    if (mModeling->isModified() == false or
 	gvle::Question(_("Do you really want load a new Model ?\nCurrent"
 			 "model will be destroy and not save"))) {
 	try {
@@ -630,8 +686,8 @@ void GVLE::onMenuOpenVpz()
 
 void GVLE::onMenuLoad()
 {
-    if (m_modeling->isModified() == false or
-            gvle::Question(_("Do you really want load a new Model ?\nCurrent"
+    if (mModeling->isModified() == false or
+            gvle::Question(_("Do you really want load a new Model ?\nCurrent" \
                              "model will be destroy and not save"))) {
         Gtk::FileChooserDialog file("VPZ file", Gtk::FILE_CHOOSER_ACTION_OPEN);
         file.set_transient_for(*this);
@@ -650,7 +706,7 @@ void GVLE::onMenuLoad()
 	    mEditor->closeAllTab();
 	    utils::Package::package().select("");
 	    mPackage = "";
-            m_modeling->parseXML(file.get_filename());
+            mModeling->parseXML(file.get_filename());
 	    mMenuAndToolbar->onGlobalMode();
 	    mMenuAndToolbar->onViewMode();
 	    mFileTreeView->clear();
@@ -661,19 +717,25 @@ void GVLE::onMenuLoad()
 void GVLE::saveFile()
 {
     int page = mEditor->get_current_page();
+
     if (page != -1) {
 	DocumentText* doc = dynamic_cast < DocumentText* >(
 	    mEditor->get_nth_page(page));
+
 	if (not doc->isNew()) {
 	    doc->save();
 	} else {
-	    Gtk::FileChooserDialog file(_("VPZ file"), Gtk::FILE_CHOOSER_ACTION_SAVE);
+	    Gtk::FileChooserDialog file(_("VPZ file"),
+					Gtk::FILE_CHOOSER_ACTION_SAVE);
+
 	    file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
 	    file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
-
+	    file.set_current_folder(utils::Path::path().getPackageDir());
 	    if (file.run() == Gtk::RESPONSE_OK) {
 		std::string filename(file.get_filename());
+
 		doc->saveAs(filename);
+		mModeling->setFileName(filename);
 	    }
 	}
 	buildPackageHierarchy();
@@ -683,32 +745,33 @@ void GVLE::saveFile()
 void GVLE::onMenuSave()
 {
     std::vector<std::string> vec;
-    m_modeling->vpz_is_correct(vec);
 
+    mModeling->vpz_is_correct(vec);
     if (vec.size() != 0) {
         //vpz is correct
         std::string error = _("Vpz incorrect :\n");
         std::vector<std::string>::const_iterator it = vec.begin();
+
         while (it != vec.end()) {
             error += *it + "\n";
-
             ++it;
         }
         Error(error);
         return;
     }
 
-    if (m_modeling->isSaved()) {
-	m_modeling->saveXML(m_modeling->getFileName());
-	Editor::Documents::iterator it =
-	    mEditor->getDocumentsList().find(m_modeling->getFileName());
-	if (it != mEditor->getDocumentsList().end())
-	    it->second->setTitle(m_modeling->getFileName(),
-				 m_modeling->getTopModel(), false);
+    if (mModeling->isSaved()) {
+	mModeling->saveXML(mModeling->getFileName());
+	Editor::Documents::const_iterator it =
+	    mEditor->getDocuments().find(mModeling->getFileName());
+	if (it != mEditor->getDocuments().end())
+	    it->second->setTitle(mModeling->getFileName(),
+				 mModeling->getTopModel(), false);
     } else if (not utils::Package::package().name().empty()) {
 	mSaveVpzBox->show();
     } else {
-	Gtk::FileChooserDialog file(_("VPZ file"), Gtk::FILE_CHOOSER_ACTION_SAVE);
+	Gtk::FileChooserDialog file(_("VPZ file"),
+				    Gtk::FILE_CHOOSER_ACTION_SAVE);
 	file.set_transient_for(*this);
 	file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
 	file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
@@ -720,12 +783,13 @@ void GVLE::onMenuSave()
 	if (file.run() == Gtk::RESPONSE_OK) {
 	    std::string filename(file.get_filename());
 	    vpz::Vpz::fixExtension(filename);
-	    m_modeling->saveXML(filename);
-	    Editor::Documents::iterator it =
-		mEditor->getDocumentsList().find(filename);
-	    if (it != mEditor->getDocumentsList().end())
+
+	    mModeling->saveXML(filename);
+	    Editor::Documents::const_iterator it =
+		mEditor->getDocuments().find(filename);
+	    if (it != mEditor->getDocuments().end())
 		it->second->setTitle(filename,
-				     m_modeling->getTopModel(), false);
+				     mModeling->getTopModel(), false);
 	}
     }
 }
@@ -733,16 +797,21 @@ void GVLE::onMenuSave()
 void GVLE::saveFileAs()
 {
     int page = mEditor->get_current_page();
+
     if (page != -1) {
 	DocumentText* doc = dynamic_cast < DocumentText* >(
 	    mEditor->get_nth_page(page));
-	Gtk::FileChooserDialog file(_("VPZ file"), Gtk::FILE_CHOOSER_ACTION_SAVE);
+	Gtk::FileChooserDialog file(_("VPZ file"),
+				    Gtk::FILE_CHOOSER_ACTION_SAVE);
+
 	file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
 	file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
-
+	file.set_current_folder(utils::Path::path().getPackageDir());
 	if (file.run() == Gtk::RESPONSE_OK) {
 	    std::string filename(file.get_filename());
+
 	    doc->saveAs(filename);
+	    mModeling->setFileName(filename);
 	}
 	buildPackageHierarchy();
     }
@@ -753,8 +822,8 @@ void GVLE::closeFile()
     int page = mEditor->get_current_page();
     if (page != -1) {
 	Gtk::Widget* tab = mEditor->get_nth_page(page);
-	Editor::Documents::iterator it = mEditor->getDocumentsList().begin();
-	while (it != mEditor->getDocumentsList().end()) {
+	Editor::Documents::const_iterator it = mEditor->getDocuments().begin();
+	while (it != mEditor->getDocuments().end()) {
 	    if (it->second == tab) {
 		mEditor->closeTab(it->first);
 		break;
@@ -786,7 +855,7 @@ void GVLE::onPreferences()
 
 void GVLE::onSimulationBox()
 {
-    if (m_modeling->isSaved()) {
+    if (mModeling->isSaved()) {
         mSimulationBox->show();
     } else {
         gvle::Error(_("Save or load a project before simulation"));
@@ -795,14 +864,14 @@ void GVLE::onSimulationBox()
 
 void GVLE::onParameterExecutionBox()
 {
-    ParameterExecutionBox* box = new ParameterExecutionBox(m_modeling);
+    ParameterExecutionBox* box = new ParameterExecutionBox(mModeling);
     box->run();
     delete box;
 }
 
 void GVLE::onExperimentsBox()
 {
-    ExperimentBox box(mRefXML, m_modeling);
+    ExperimentBox box(mRefXML, mModeling);
     box.run();
 }
 
@@ -820,15 +889,15 @@ void GVLE::onHostsBox()
 
 void GVLE::onHelpBox()
 {
-    if (m_helpbox == 0)
-        m_helpbox = new HelpBox;
+    if (mHelpBox == 0)
+        mHelpBox = new HelpBox;
 
-    m_helpbox->show_all();
+    mHelpBox->show_all();
 }
 
 void GVLE::onViewOutputBox()
 {
-    ViewOutputBox box(*m_modeling, mRefXML, m_modeling->views());
+    ViewOutputBox box(*mModeling, mRefXML, mModeling->views());
     box.run();
 }
 
@@ -1096,9 +1165,10 @@ void GVLE::exportGraphic()
 {
     ViewDrawingArea* tab = dynamic_cast<DocumentDrawingArea*>(
 	mEditor->get_nth_page(mCurrentTab))->getDrawingArea();
-    vpz::Experiment& experiment = m_modeling->vpz().project().experiment();
+    vpz::Experiment& experiment = mModeling->vpz().project().experiment();
     if (experiment.name().empty() || experiment.duration() == 0) {
-        Error(_("Fix a Value to the name and the duration of the experiment before exportation."));
+        Error(_("Fix a Value to the name and the duration " \
+		"of the experiment before exportation."));
         return;
     }
 

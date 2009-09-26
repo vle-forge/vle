@@ -37,7 +37,6 @@
 
 namespace vle { namespace gvle {
 
-
 Document::Document(GVLE* gvle, const std::string& filepath) :
     Gtk::ScrolledWindow(),
     mGVLE(gvle)
@@ -47,29 +46,33 @@ Document::Document(GVLE* gvle, const std::string& filepath) :
     mFileName = boost::filesystem::basename(filepath);
 }
 
-Document::~Document()
-{
-}
-
-void Document::setTitle(std::string title, graph::Model* model,
+void Document::setTitle(const std::string& filePath,
+			graph::Model* model,
 			bool modified)
 {
-    if (boost::filesystem::extension(title) == ".vpz") {
-	mTitle = boost::filesystem::basename(title) +
-	    boost::filesystem::extension(title) + " - " +
+    if (boost::filesystem::extension(filePath) == ".vpz") {
+	mTitle = boost::filesystem::basename(filePath) +
+	    boost::filesystem::extension(filePath) + " - " +
 	    model->getName();
-	if (modified) {
-	    mTitle = "* " + mTitle;
-	    setModified(true);
-	} else {
-	    setModified(false);
-	}
-	mGVLE->getEditor()->setModifiedTab(mTitle, mFilePath);
+    } else {
+	mTitle = boost::filesystem::basename(filePath) +
+	    boost::filesystem::extension(filePath);
     }
+    if (modified) {
+	mTitle = "* " + mTitle;
+	setModified(true);
+    } else {
+	setModified(false);
+    }
+    mGVLE->getEditor()->setModifiedTab(mTitle, filePath, mFilePath);
+    mFilePath = filePath;
 }
 
+/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
 DocumentText::DocumentText(GVLE* gvle,
-			   const std::string& filepath, bool newfile) :
+			   const std::string& filepath,
+			   bool newfile) :
     Document(gvle, filepath),
     mNew(newfile)
 {
@@ -82,10 +85,6 @@ DocumentText::DocumentText(GVLE* gvle,
 	sigc::mem_fun(this, &DocumentText::onChanged));
 }
 
-DocumentText::~DocumentText()
-{
-}
-
 void DocumentText::save()
 {
     try {
@@ -95,16 +94,28 @@ void DocumentText::save()
 	mNew = false;
 	setModified(false);
 	mTitle = filename() + boost::filesystem::extension(filepath());
-	mGVLE->getEditor()->setModifiedTab(mTitle, filepath());
+	mGVLE->getEditor()->setModifiedTab(mTitle, filepath(), filepath());
     } catch(std::exception& e) {
 	throw _("Error while saving file.");
     }
 }
 
-void DocumentText::saveAs(const std::string& filename)
+void DocumentText::saveAs(const std::string& newFilePath)
 {
-    setFilePath(filename);
-    save();
+    try {
+	std::string oldFilePath(filepath().c_str());
+	setFilePath(newFilePath);
+	setFileName(boost::filesystem::basename(newFilePath));
+	std::ofstream file(filepath().c_str());
+	file << mView.get_buffer()->get_text();
+	file.close();
+	mNew = false;
+	setModified(false);
+	mTitle = filename() + boost::filesystem::extension(filepath());
+	mGVLE->getEditor()->setModifiedTab(mTitle, newFilePath, oldFilePath);
+    } catch(std::exception& e) {
+	throw _("Error while saving file.");
+    }
 }
 
 void DocumentText::init()
@@ -211,9 +222,11 @@ void DocumentText::onChanged()
     if (not isModified()) {
 	setModified(true);
 	mTitle = "* "+ mTitle;
-	mGVLE->getEditor()->setModifiedTab(mTitle, filepath());
+	mGVLE->getEditor()->setModifiedTab(mTitle, filepath(), filepath());
     }
 }
+
+/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 DocumentDrawingArea::DocumentDrawingArea(GVLE* gvle,
 					 const std::string& filepath,
@@ -272,196 +285,147 @@ void DocumentDrawingArea::redo()
     //TODO
 }
 
-/*
- * Editor
- */
+/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 Editor::Editor(BaseObjectType* cobject,
 		     const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/) :
     Gtk::Notebook(cobject)
 {
-    signal_switch_page().connect(
-	sigc::mem_fun(this, &Editor::changeTab));
+    signal_switch_page().connect(sigc::mem_fun(this, &Editor::changeTab));
 }
 
-void Editor::focusTab(const std::string& filepath)
+Editor::~Editor()
 {
-    int page = page_num(*(mDocuments.find(filepath)->second));
-    set_current_page(page);
+    closeAllTab();
 }
 
-void Editor::openTab(const std::string& filepath)
+Gtk::HBox* Editor::addLabel(const std::string& title,
+			    const std::string& filepath)
 {
+    Gtk::HBox* tabLabel = new Gtk::HBox(false, 0);
+    Gtk::Label* label = new Gtk::Label(title);
 
-    if(boost::filesystem::extension(filepath) != ".vpz") {
-	try {
-	    if (mDocuments.find(filepath) == mDocuments.end()) {
-		DocumentText* doc = new DocumentText(mGVLE, filepath);
-		mDocuments.insert(
-		    std::make_pair <std::string, DocumentText*>(filepath, doc));
-		int page = append_page(
-		    *doc, *(addLabel(doc->getTitle(), filepath)));
-		show_all_children();
-		set_current_page(page);
-	    } else {
-		focusTab(filepath);
-	    }
-	} catch(utils::FileError& fe) {
-	    Error(fe.what());
-	} catch (std::exception& e) {
-	    mGVLE->insertLog(e.what());
-	}
-	mGVLE->getMenu()->onFileMode();
-    } else {
-	mGVLE->getModeling()->parseXML(filepath);
-    }
-}
+    tabLabel->pack_start(*label, true, true, 0);
 
-void Editor::openTabVpz(const std::string& filepath, graph::CoupledModel* model)
-{
-    Documents::iterator it = mDocuments.find(filepath);
-    int page;
-    if (it != mDocuments.end()) {
-	if (dynamic_cast<DocumentDrawingArea*>(it->second)->getModel()
-	    != model) {
-	    focusTab(filepath);
-	    page = get_current_page();
-	    remove_page(page);
-	    mDocuments.erase(filepath);
+    Gtk::Button* closeButton = new Gtk::Button();
+    Gtk::Image* imgButton = new Gtk::Image(Gtk::Stock::CLOSE,
+					   Gtk::IconSize(Gtk::ICON_SIZE_MENU));
 
-	    DocumentDrawingArea* doc = new DocumentDrawingArea(
-		mGVLE,
-		filepath,
-		mGVLE->getModeling()->findView(model),
-		model);
-	    doc->setTitle(filepath, model, true);
-	    mDocuments.insert(
-		std::make_pair < std::string, DocumentDrawingArea* >(
-		    filepath, doc));
-	    append_page(*doc, *(addLabel(doc->getTitle(),
-						    filepath)));
+    closeButton->set_image(*imgButton);
+    closeButton->set_focus_on_click(false);
+    closeButton->set_relief(Gtk::RELIEF_NONE);
+    closeButton->set_tooltip_text(_("Close Tab"));
+    closeButton->signal_clicked().connect(
+	sigc::bind(sigc::mem_fun(*this, &Editor::closeTab), filepath));
 
-	    reorder_child(*doc, page);
-	} else {
-	    return;
-	}
-    } else {
-	DocumentDrawingArea* doc = new DocumentDrawingArea(
-	    mGVLE,
-	    filepath,
-	    mGVLE->getModeling()->findView(model),
-	    model);
-	mDocuments.insert(
-	  std::make_pair < std::string, DocumentDrawingArea* >(filepath, doc));
-	page = append_page(*doc, *(addLabel(doc->getTitle(),
-						       filepath)));
-    }
-    show_all_children();
-    set_current_page(page);
-    mGVLE->getMenu()->onViewMode();
-}
-
-
-void Editor::closeTab(const std::string& filepath)
-{
-    if (boost::filesystem::extension(filepath) == ".vpz")
-	closeVpzTab();
-    else {
-	Documents::iterator it = mDocuments.find(filepath);
-	if (it != mDocuments.end()) {
-	    if (not it->second->isModified() or
-		gvle::Question(_("The current tab is not saved\n"
-				 "Do you really want to close this file ?"))) {
-		int page = page_num(*it->second);
-		if (page != -1) {
-		    remove_page(page);
-		    mDocuments.erase(filepath);
-		}
-	    }
-	}
-    }
-
-    if (getDocumentsList().size() == 0)
-	mGVLE->tabClosed();
-}
-
-void Editor::closeVpzTab()
-{
-    int page;
-    Documents::iterator it = mDocuments.begin();
-    while (it != mDocuments.end()) {
-        if (boost::filesystem::extension(it->first) == ".vpz") {
-            if (not it->second->isModified() or
-                gvle::Question(_("The current tab is not saved\n"
-                                 "Do you really want to close this file ?"))) {
-                mGVLE->clearModelTreeBox();
-                mGVLE->clearModelClassBox();
-                page = page_num(
-                    *(dynamic_cast<DocumentDrawingArea*>(it->second)));
-                remove_page(page);
-                mDocuments.erase(it->first);
-            }
-        }
-	++it;
-    }
-}
-
-bool Editor::existVpzTab()
-{
-    Documents::iterator it = mDocuments.begin();
-    while (it != mDocuments.end()) {
-	if (boost::filesystem::extension(it->first) == ".vpz")
-	    return true;
-	++it;
-    }
-    return false;
-}
-
-void Editor::closeAllTab()
-{
-    Documents::iterator it = mDocuments.begin();
-    while (it != mDocuments.end()) {
-	int page = page_num(*it->second);
-	remove_page(page);
-	mDocuments.erase(it->first);
-
-	++it;
-    }
-
-    if (not vle::utils::Path::path().getPackageDir().empty())
-	mGVLE->getMenu()->onPackageMode();
-    else
-	mGVLE->getMenu()->onGlobalMode();
+    tabLabel->pack_start(*closeButton, false, false, 0);
+    tabLabel->show_all();
+    return tabLabel;
 }
 
 void Editor::changeTab(GtkNotebookPage* /*page*/, int num)
 {
     Gtk::Widget* tab = get_nth_page(num);
     Documents::iterator it = mDocuments.begin();
+
     while (it != mDocuments.end()) {
 	if (it->second == tab) {
 	    if (boost::filesystem::extension(it->first) == ".vpz") {
-		mGVLE->setCurrentTab(num);
-		mGVLE->getMenu()->onViewMode();
-	    } else{
-		mGVLE->setCurrentTab(num);
-		mGVLE->getMenu()->onFileMode();
+		mApp->setCurrentTab(num);
+		mApp->getMenu()->onViewMode();
+	    } else {
+		mApp->setCurrentTab(num);
+		mApp->getMenu()->onFileMode();
 	    }
-	    mGVLE->setTitle(boost::filesystem::basename(it->first) +
-			    boost::filesystem::extension(it->first));
+	    mApp->setTitle(boost::filesystem::basename(it->first) +
+			   boost::filesystem::extension(it->first));
 	    break;
 	}
 	++it;
     }
 }
 
-void Editor::setModifiedTab(const std::string title, const std::string filepath)
+void Editor::changeFile(const std::string& oldName,
+			const std::string& newName)
 {
-    if (mDocuments.find(filepath) != mDocuments.end()) {
-	int page = get_current_page();
-	Gtk::Widget* tab = get_nth_page(page);
+    Documents::iterator it = mDocuments.find(oldName);
 
-	set_tab_label(*tab, *(addLabel(title, filepath)));
+    if (it != mDocuments.end()) {
+	graph::Model* model = 0;
+
+	if (boost::filesystem::extension(oldName) == ".vpz") {
+	    model = dynamic_cast < DocumentDrawingArea* >(
+		it->second)->getModel();
+	}
+	it->second->setTitle(newName, model, it->second->isModified());
+    }
+}
+
+void Editor::closeAllTab()
+{
+    Documents::iterator it = mDocuments.begin();
+
+    while (it != mDocuments.end()) {
+	int page = page_num(*it->second);
+
+	remove_page(page);
+	delete it->second;
+	mDocuments.erase(it->first);
+	++it;
+    }
+    if (not vle::utils::Path::path().getPackageDir().empty()) {
+	mApp->getMenu()->onPackageMode();
+    } else {
+	mApp->getMenu()->onGlobalMode();
+    }
+}
+
+void Editor::closeTab(const std::string& filepath)
+{
+    if (boost::filesystem::extension(filepath) == ".vpz") {
+	closeVpzTab();
+    } else {
+	Documents::iterator it = mDocuments.find(filepath);
+
+	if (it != mDocuments.end()) {
+	    if (not it->second->isModified() or
+		gvle::Question(_("The current tab is not saved\n"
+				 "Do you really want to close this file ?"))) {
+		int page = page_num(*it->second);
+
+		if (page != -1) {
+		    remove_page(page);
+		    delete it->second;
+		    mDocuments.erase(it->first);
+		}
+	    }
+	}
+    }
+    if (getDocuments().empty()) {
+	mApp->tabClosed();
+    }
+}
+
+void Editor::closeVpzTab()
+{
+    int page;
+    Documents::iterator it = mDocuments.begin();
+
+    while (it != mDocuments.end()) {
+        if (boost::filesystem::extension(it->first) == ".vpz") {
+            if (not it->second->isModified() or
+                gvle::Question(_("The current tab is not saved\n"
+                                 "Do you really want to close this file ?"))) {
+                mApp->clearModelTreeBox();
+                mApp->clearModelClassBox();
+                page = page_num(
+                    *(dynamic_cast<DocumentDrawingArea*>(it->second)));
+                remove_page(page);
+		delete it->second;
+                mDocuments.erase(it->first);
+           }
+        }
+	++it;
     }
 }
 
@@ -470,17 +434,19 @@ void Editor::createBlankNewFile()
     std::string name = _("untitled file");
     std::string nameTmp;
     int compteur = 0;
+
     do {
-	if (compteur != 0)
-	    nameTmp = name + boost::lexical_cast
-		<std::string>(compteur);
-	else
+	if (compteur != 0) {
+	    nameTmp = name + boost::lexical_cast < std::string >(compteur);
+	} else {
 	    nameTmp = name;
+	}
 	++compteur;
     } while (existTab(nameTmp));
     name = nameTmp;
     try {
-	DocumentText* doc = new DocumentText(mGVLE, nameTmp, true);
+	DocumentText* doc = new DocumentText(mApp, nameTmp, true);
+
 	mDocuments.insert(
 	    std::make_pair < std::string, DocumentText* >(nameTmp, doc));
 	append_page(*doc, *(addLabel(doc->filename(),
@@ -494,9 +460,11 @@ void Editor::createBlankNewFile()
 void Editor::closeFile()
 {
     int page = get_current_page();
+
     if (page != -1) {
 	Gtk::Widget* tab = get_nth_page(page);
 	Documents::iterator it = mDocuments.begin();
+
 	while (it != mDocuments.end()) {
 	    if (it->second == tab) {
 		closeTab(it->first);
@@ -507,6 +475,120 @@ void Editor::closeFile()
     }
 }
 
+bool Editor::existVpzTab()
+{
+    Documents::iterator it = mDocuments.begin();
+
+    while (it != mDocuments.end()) {
+	if (boost::filesystem::extension(it->first) == ".vpz")
+	    return true;
+	++it;
+    }
+    return false;
+}
+
+void Editor::focusTab(const std::string& filepath)
+{
+    int page = page_num(*(mDocuments.find(filepath)->second));
+
+    set_current_page(page);
+}
+
+void Editor::onUndo()
+{
+    int page = get_current_page();
+
+    if (page != -1) {
+	Document* doc = dynamic_cast < Document* >(get_nth_page(page));
+
+	doc->undo();
+    }
+}
+
+void Editor::onRedo()
+{
+    int page = get_current_page();
+
+    if (page != -1) {
+	Document* doc = dynamic_cast < Document* >(get_nth_page(page));
+
+	doc->redo();
+    }
+}
+
+void Editor::openTab(const std::string& filepath)
+{
+    if(boost::filesystem::extension(filepath) != ".vpz") {
+	try {
+	    if (mDocuments.find(filepath) == mDocuments.end()) {
+		DocumentText* doc = new DocumentText(mApp, filepath);
+		int page = append_page(*doc,
+				       *(addLabel(doc->getTitle(), filepath)));
+
+		mDocuments.insert(std::make_pair <std::string,
+				  DocumentText*>(filepath, doc));
+		show_all_children();
+		set_current_page(page);
+	    } else {
+		focusTab(filepath);
+	    }
+	} catch(utils::FileError& fe) {
+	    Error(fe.what());
+	} catch (std::exception& e) {
+	    mApp->insertLog(e.what());
+	}
+	mApp->getMenu()->onFileMode();
+    } else {
+	mApp->getModeling()->parseXML(filepath);
+    }
+}
+
+void Editor::openTabVpz(const std::string& filepath,
+			graph::CoupledModel* model)
+{
+    Documents::iterator it = mDocuments.find(filepath);
+    int page;
+
+    if (it != mDocuments.end()) {
+	if (dynamic_cast<DocumentDrawingArea*>(it->second)->getModel()
+	    != model) {
+	    focusTab(filepath);
+	    page = get_current_page();
+	    remove_page(page);
+	    mDocuments.erase(it->first);
+	    delete it->second;
+
+	    DocumentDrawingArea* doc = new DocumentDrawingArea(
+		mApp,
+		filepath,
+		mApp->getModeling()->findView(model),
+		model);
+	    doc->setTitle(filepath, model, true);
+	    mDocuments.insert(
+		std::make_pair < std::string, DocumentDrawingArea* >(
+		    filepath, doc));
+	    append_page(*doc, *(addLabel(doc->getTitle(),
+						    filepath)));
+	    reorder_child(*doc, page);
+	} else {
+	    return;
+	}
+    } else {
+	DocumentDrawingArea* doc = new DocumentDrawingArea(
+	    mApp,
+	    filepath,
+	    mApp->getModeling()->findView(model),
+	    model);
+	mDocuments.insert(
+	    std::make_pair < std::string, DocumentDrawingArea* >(filepath,
+								 doc));
+	page = append_page(*doc, *(addLabel(doc->getTitle(),
+					    filepath)));
+    }
+    show_all_children();
+    set_current_page(page);
+    mApp->getMenu()->onViewMode();
+}
 
 void Editor::refreshViews()
 {
@@ -516,45 +598,26 @@ void Editor::refreshViews()
     }
 }
 
-void Editor::onUndo()
+void Editor::setModifiedTab(const std::string& title,
+			    const std::string& newFilePath,
+			    const std::string& oldFilePath)
 {
-    int page = get_current_page();
-    if (page != -1) {
-	Document* doc = dynamic_cast < Document* >(
-	    get_nth_page(page));
-	doc->undo();
+    Documents::iterator it = mDocuments.find(oldFilePath);
+
+    if (it != mDocuments.end()) {
+	Document* doc = it->second;
+	int page = page_num(*doc);
+	Gtk::Widget* tab = get_nth_page(page);
+
+	set_tab_label(*tab, *(addLabel(title, newFilePath)));
+	if (boost::filesystem::basename(newFilePath) !=
+	    boost::filesystem::basename(oldFilePath)) {
+	    mDocuments.erase(it);
+	    mDocuments[newFilePath] = doc;
+	}
+	mApp->setTitle(boost::filesystem::basename(newFilePath) +
+		       boost::filesystem::extension(newFilePath));
     }
 }
 
-void Editor::onRedo()
-{
-    int page = get_current_page();
-    if (page != -1) {
-	Document* doc = dynamic_cast < Document* >(
-	    get_nth_page(page));
-	doc->redo();
-    }
-}
-
-Gtk::HBox* Editor::addLabel(const std::string& title,
-			const std::string& filepath)
-{
-    Gtk::HBox* tabLabel = new Gtk::HBox(false, 0);
-    Gtk::Label* label = new Gtk::Label(title);
-    tabLabel->pack_start(*label, true, true, 0);
-    Gtk::Button* closeButton = new Gtk::Button();
-    Gtk::Image* imgButton = new Gtk::Image(Gtk::Stock::CLOSE,
-					   Gtk::IconSize(Gtk::ICON_SIZE_MENU));
-    closeButton->set_image(*imgButton);
-    closeButton->set_focus_on_click(false);
-    closeButton->set_relief(Gtk::RELIEF_NONE);
-    closeButton->set_tooltip_text(_("Close Tab"));
-    closeButton->signal_clicked().connect(
-	sigc::bind(sigc::mem_fun(*this, &Editor::closeTab), filepath));
-
-    tabLabel->pack_start(*closeButton, false, false, 0);
-    tabLabel->show_all();
-    return tabLabel;
-}
-
-}}
+}} // namespace vle gvle

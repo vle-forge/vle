@@ -54,9 +54,7 @@
 #include <list>
 #include <map>
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
 class Editor;
 class GVLEMenuAndToolbar;
@@ -105,7 +103,7 @@ public:
      * @return ButtonType of current selected button.
      */
     inline ButtonType getCurrentButton() const {
-        return m_currentButton;
+        return mCurrentButton;
     }
 
     /**
@@ -191,7 +189,7 @@ public:
      * @return Modeling instance
      */
     inline Modeling* getModeling()
-    { return m_modeling; }
+    { return mModeling; }
 
     /**
      * @brief return the MenuAndToolbar instance
@@ -206,6 +204,9 @@ public:
      */
     inline Editor* getEditor()
     { return mEditor; }
+
+    inline const Editor& getEditor() const
+    { return *mEditor; }
 
     /**
      * To update the adjustment.
@@ -541,6 +542,11 @@ public:
      */
     void buildPackageHierarchy();
 
+    /**
+     * Refresh the editor
+     */
+    void refreshEditor(const std::string& name, const std::string& path);
+
     /*********************************************************************
      *
      * MENU EXECUTION
@@ -649,15 +655,15 @@ private:
     /* Widgets */
     Gtk::VBox*                      mMenuAndToolbarVbox;
     GVLEMenuAndToolbar*             mMenuAndToolbar;
-    Gtk::Statusbar                  m_status;
+    Gtk::Statusbar                  mStatusBar;
     Gtk::TextView*                  mLog;
     Gtk::Statusbar*                 mStatusbar;
     Editor*                         mEditor;
     FileTreeView*                   mFileTreeView;
 
     /* class members */
-    Modeling*                       m_modeling;
-    ButtonType                      m_currentButton;
+    Modeling*                       mModeling;
+    ButtonType                      mCurrentButton;
     std::string                     mPackage;
     int                             mCurrentTab;
 
@@ -675,7 +681,7 @@ private:
     PackageBrowserWindow*           mPackageBrowserWindow;
     NewProjectBox*                  mNewProjectBox;
     SaveVpzBox*                     mSaveVpzBox;
-    HelpBox*                        m_helpbox;
+    HelpBox*                        mHelpBox;
     ModelTreeBox*                   mModelTreeBox;
     ModelClassBox*                  mModelClassBox;
     QuitBox*                        mQuitBox;
@@ -683,7 +689,6 @@ private:
 
 std::string valuetype_to_string(value::Value::type type);
 
-}
-} // namespace vle gvle
+}} // namespace vle gvle
 
 #endif

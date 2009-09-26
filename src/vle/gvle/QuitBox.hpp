@@ -28,37 +28,32 @@
 #ifndef GUI_QUITBOX_HH
 #define GUI_QUITBOX_HH
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
 class Modeling;
 
 class QuitBox
 {
-
 public:
-
     QuitBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m);
-    ~QuitBox();
+    virtual ~QuitBox() { }
 
     void show();
     void build();
 
 protected:
-
     class FileTreeColumn : public Gtk::TreeModel::ColumnRecord
     {
     public:
-        FileTreeColumn() {
-            add(mName);
-        }
+        FileTreeColumn()
+	    {
+		add(mName);
+	    }
 
         Gtk::TreeModelColumn <Glib::ustring> mName;
     };
 
 private:
-
     Glib::RefPtr<Gnome::Glade::Xml> mXml;
 
     Gtk::Dialog*                    mDialog;
@@ -76,13 +71,11 @@ private:
 
     Gtk::Label*                     mMessage;
 
-
     void onSave();
     void onCancel();
     void onClose();
 };
 
-}
-}
+}} // namespace vle gvle
 
 #endif

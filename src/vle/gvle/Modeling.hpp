@@ -31,6 +31,7 @@
 #include <vle/gvle/ModelClassBox.hpp>
 #include <vle/gvle/CoupledModelBox.hpp>
 #include <vle/gvle/CutCopyPaste.hpp>
+#include <vle/gvle/Editor.hpp>
 #include <vle/gvle/ImportModelBox.hpp>
 #include <vle/gvle/ImportClassesBox.hpp>
 #include <vle/gvle/ViewDrawingArea.hpp>
@@ -47,9 +48,7 @@
 #include <vector>
 #include <set>
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
 class AtomicModelBox;
 class ImportModelBox;
@@ -332,9 +331,13 @@ public:
      * @return ptr to application GVLE.
      */
     inline GVLE* getGVLE()
-    { setModified(true); return mGVLE; }
+	{ setModified(true); return mGVLE; }
 
+    inline void hideGVLE()
+	{ mGVLE->hide(); }
 
+    inline const Editor::Documents& getDocuments() const
+	{ return mGVLE->getEditor()->getDocuments(); }
 
     /********************************************************************
      *
@@ -880,7 +883,7 @@ private:
 
 void parse_recurs(graph::Model*, vpz::Vpz*, int level = 0);
 void parse_model(vpz::AtomicModelList& list);
-}
-} // namespace vle gvle
+
+} } // namespace vle gvle
 
 #endif

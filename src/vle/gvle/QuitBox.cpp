@@ -27,11 +27,9 @@
 #include <boost/filesystem.hpp>
 #include <vle/gvle/Editor.hpp>
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
-QuitBox::QuitBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m):
+QuitBox::QuitBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m) :
     mXml(xml),
     mModeling(m)
 {
@@ -57,40 +55,40 @@ QuitBox::QuitBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m):
 	sigc::mem_fun(*this, &QuitBox::onClose));
 }
 
-QuitBox::~QuitBox()
-{
-}
-
 void QuitBox::show()
 {
     build();
-    if (mFileModified.size() != 0) {
-	mMessage->set_label(boost::lexical_cast<std::string>
-			   (mFileModified.size()) +
-			   _(" documents are not saved\n")
-			   + _("Do you want to saved before close ?"));
-
+    if (not mFileModified.empty()) {
+	if (mFileModified.size() == 1) {
+	    mMessage->set_label(_("One document is not saved.\n" \
+				  "Do you want to saved before close ?"));
+	} else {
+	    mMessage->set_label(boost::lexical_cast<std::string>
+				(mFileModified.size()) +
+				_(" documents are not saved.\n")
+				+ _("Do you want to saved before close ?"));
+	}
 	mDialog->set_title("Open Package");
 	mDialog->show_all();
 	mDialog->run();
     } else {
-	mModeling->getGVLE()->hide();
+	mModeling->hideGVLE();
     }
 }
 
 void QuitBox::build()
 {
+    const Editor::Documents& documents(mModeling->getDocuments());
+    Editor::Documents::const_iterator it = documents.begin();
+
     mRefTreeFile->clear();
     mFileModified.clear();
-    Editor::Documents documents = mModeling->getGVLE()->getEditor()
-	->getDocumentsList();
-    Editor::Documents::iterator it = documents.begin();
     while (it != documents.end()) {
-	int page = mModeling->getGVLE()->getEditor()->page_num(*it->second);
-	Document* tab = dynamic_cast<Document*>(
-	    mModeling->getGVLE()->getEditor()->get_nth_page(page));
+	const Document* tab = it->second;
+
 	if (tab->isModified()) {
 	    Gtk::TreeModel::Row row = *(mRefTreeFile->append());
+
 	    row[mColumns.mName] = boost::filesystem::basename(tab->filepath())
 		+ boost::filesystem::extension(tab->filepath());
 	    mFileModified.push_back(tab->filepath());
@@ -103,6 +101,7 @@ void QuitBox::onSave()
 {
     Editor* editor = mModeling->getGVLE()->getEditor();
     std::list < std::string >::iterator it = mFileModified.begin();
+
     while (it != mFileModified.end()) {
 	editor->focusTab(*it);
 	if (boost::filesystem::extension(*it) == ".vpz")
@@ -111,7 +110,7 @@ void QuitBox::onSave()
 	    mModeling->getGVLE()->saveFile();
 	++it;
     }
-    mModeling->getGVLE()->hide();
+    mModeling->hideGVLE();
 }
 
 void QuitBox::onCancel()
@@ -121,9 +120,7 @@ void QuitBox::onCancel()
 
 void QuitBox::onClose()
 {
-    mModeling->getGVLE()->hide();
+    mModeling->hideGVLE();
 }
 
-
-}
-} // namespace vle gvle
+}} // namespace vle gvle
