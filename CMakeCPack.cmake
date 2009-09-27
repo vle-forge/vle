@@ -74,7 +74,7 @@ IF (CPACK_GENERATOR MATCHES "NSIS")
     PATTERN "boost*.lib")
 
   INSTALL(FILES "${MINGW_BASE}/bin\\\\mingwm10.dll" DESTINATION bin)
-  INSTALL(DIRECTORY "${BOOST_INCLUDEDIR_NEW}/boost-1_39" DESTINATION include)
+  INSTALL(DIRECTORY "${BOOST_INCLUDEDIR_NEW}/boost" DESTINATION include)
 
   INSTALL(FILES "${GTK_BASE}/bin\\\\pkg-config.exe" DESTINATION bin)
   INSTALL(FILES "${GTK_BASE}/bin\\\\gspawn-win32-helper-console.exe" DESTINATION bin)
