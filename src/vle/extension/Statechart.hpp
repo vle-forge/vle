@@ -26,12 +26,11 @@
 #ifndef VLE_EXTENSION_STATECHART_HPP
 #define VLE_EXTENSION_STATECHART_HPP
 
+#include <vle/extension/DllDefines.hpp>
+#include <vle/extension/FSA.hpp>
+#include <vle/utils/DateTime.hpp>
 #include <boost/assign.hpp>
 #include <boost/bind.hpp>
-
-#include <vle/utils/DateTime.hpp>
-
-#include <vle/extension/FSA.hpp>
 
 namespace vle { namespace extension {
 
@@ -39,27 +38,27 @@ template < typename C >
 class Statechart : public Base < C >
 {
 public:
-    Statechart(const vle::devs::DynamicsInit& init,
-	       const vle::devs::InitEventList& events) :
-	Base < C >(init, events),
-	mTimeStep(vle::devs::Time::infinity),
-	mTransitionIndex(0) { }
+    Statechart(const devs::DynamicsInit& init,
+               const devs::InitEventList& events)
+        : Base < C >(init, events), mTimeStep(devs::Time::infinity),
+        mTransitionIndex(0)
+    {}
 
-    virtual ~Statechart() { }
+    virtual ~Statechart() {}
 
-    virtual vle::devs::ExternalEventList select(
-	const vle::devs::ExternalEventList& events)
-	{ return events; }
+    virtual devs::ExternalEventList select(
+        const devs::ExternalEventList& events)
+    { return events; }
 
-    void timeStep(const vle::devs::Time& t)
-	{ mTimeStep = t; }
+    void timeStep(const devs::Time& t)
+    { mTimeStep = t; }
 
 private:
     // action
-    typedef boost::function < void (const vle::devs::Time&) > Action;
+    typedef boost::function < void (const devs::Time&) > Action;
     typedef boost::function < void (
-	const vle::devs::Time&,
-	const vle::devs::ExternalEvent*) > EventAction;
+        const devs::Time&,
+        const devs::ExternalEvent*) > EventAction;
 
     // transition = guard + event + action + output
     typedef std::list < int > Transitions;
@@ -67,17 +66,17 @@ private:
     typedef std::map < int, C > NextStates;
 
     // guard on transition
-    typedef boost::function < bool (const vle::devs::Time&) > Guard;
+    typedef boost::function < bool (const devs::Time&) > Guard;
     typedef std::map < int, Guard > Guards;
 
     // event on transition
     typedef std::map < int, std::string > Events;
 
     // after on transition
-    typedef std::map < int, vle::devs::Time > Afters;
+    typedef std::map < int, devs::Time > Afters;
 
     // when on transition
-    typedef std::map < int, vle::devs::Time > Whens;
+    typedef std::map < int, devs::Time > Whens;
 
     // action on transition
     typedef std::map < int, EventAction > EventTransitionActions;
@@ -86,8 +85,8 @@ private:
     // output on transition
     typedef std::map < int, std::string > Outputs;
     typedef boost::function <
-	void (const vle::devs::Time&,
-	      vle::devs::ExternalEventList&) >  OutputFunc;
+        void (const devs::Time&,
+              devs::ExternalEventList&) >  OutputFunc;
     typedef std::map < int, OutputFunc > OutputFuncs;
 
     // in or out action
@@ -99,25 +98,25 @@ private:
 
     // event in state
     typedef boost::function <
-	void (const vle::devs::Time&,
-	      const vle::devs::ExternalEvent*) > EventInStateAction;
+        void (const devs::Time&,
+              const devs::ExternalEvent*) > EventInStateAction;
     typedef std::map < std::string, EventInStateAction > EventInStateActions;
     typedef std::map < C, EventInStateActions > EventInStateActionsMap;
 
     // activity
-    typedef boost::function < void (const vle::devs::Time&) > Activity;
+    typedef boost::function < void (const devs::Time&) > Activity;
     typedef std::map < C, Activity > Activities;
 
 public:
     Activities& activities() { return mActivities; }
 
     EventInStateActions& eventInStateActions(const C& c)
-	{
-	    if (mEventInStateActions.find(c) == mEventInStateActions.end()) {
-		mEventInStateActions[c] = EventInStateActions();
-	    }
-	    return mEventInStateActions.at(c);
-	}
+    {
+        if (mEventInStateActions.find(c) == mEventInStateActions.end()) {
+            mEventInStateActions[c] = EventInStateActions();
+        }
+        return mEventInStateActions.at(c);
+    }
 
     Actions& inActions() { return mInActions; }
     Actions& outActions() { return mOutActions; }
@@ -129,24 +128,24 @@ public:
     Outputs& outputs() { return mOutputs; }
     OutputFuncs& outputFuncs() { return mOutputFuncs; }
     EventTransitionActions& eventTransitionActions()
-	{ return mEventTransitionActions; }
+    { return mEventTransitionActions; }
     GuardTransitionActions& guardTransitionActions()
-	{ return mGuardTransitionActions; }
+    { return mGuardTransitionActions; }
 
     int addTransition(const C& state, const C& nextState)
-	{
-	    if (mTransitionsMap.find(state) == mTransitionsMap.end()) {
-		mTransitionsMap[state] = Transitions();
-	    }
-	    mTransitionsMap[state].push_back(++mTransitionIndex);
-	    mNextStates[mTransitionIndex] = nextState;
-	    return mTransitionIndex;
-	}
+    {
+        if (mTransitionsMap.find(state) == mTransitionsMap.end()) {
+            mTransitionsMap[state] = Transitions();
+        }
+        mTransitionsMap[state].push_back(++mTransitionIndex);
+        mNextStates[mTransitionIndex] = nextState;
+        return mTransitionIndex;
+    }
 
 private:
     typedef typename Actions::const_iterator ActionsIterator;
     typedef typename EventInStateActions::const_iterator
-    EventInStateActionsIterator;
+        EventInStateActionsIterator;
     typedef typename EventActionsMap::const_iterator EventActionsIterator;
     typedef typename Activities::const_iterator ActivitiesIterator;
     typedef typename Transitions::const_iterator TransitionsIterator;
@@ -157,15 +156,15 @@ private:
     typedef typename Afters::const_iterator AftersIterator;
     typedef typename Whens::const_iterator WhensIterator;
     typedef typename EventTransitionActions::const_iterator
-    EventTransitionActionsIterator;
+        EventTransitionActionsIterator;
     typedef typename GuardTransitionActions::const_iterator
-    GuardTransitionActionsIterator;
+        GuardTransitionActionsIterator;
     typedef typename Outputs::const_iterator OutputsIterator;
     typedef typename OutputFuncs::const_iterator OutputFuncsIterator;
-    typedef std::list < vle::devs::ExternalEventList* > EventListLILO;
+    typedef std::list < devs::ExternalEventList* > EventListLILO;
 
     // Time step for activities
-    vle::devs::Time mTimeStep;
+    devs::Time mTimeStep;
     // List of activities
     Activities mActivities;
     // List of actions
@@ -205,44 +204,44 @@ private:
     // (id -> output function)
     OutputFuncs mOutputFuncs;
 
-    bool checkGuard(int transition, const vle::devs::Time& time);
-    void checkGuards(const vle::devs::Time& time);
-    int findTransition(const vle::devs::ExternalEvent* event) const;
-    void process(const vle::devs::Time& time,
-		 const vle::devs::ExternalEvent* event);
-    void process(const vle::devs::Time& time,
-		 int transitionId, const C& nextState);
-    void processActivities(const vle::devs::Time& time);
-    void processEventInStateActions(const vle::devs::Time& time,
-				    const vle::devs::ExternalEvent* event);
-    void processInStateAction(const vle::devs::Time& time);
-    void processOutStateAction(const vle::devs::Time& time);
+    bool checkGuard(int transition, const devs::Time& time);
+    void checkGuards(const devs::Time& time);
+    int findTransition(const devs::ExternalEvent* event) const;
+    void process(const devs::Time& time,
+                 const devs::ExternalEvent* event);
+    void process(const devs::Time& time,
+                 int transitionId, const C& nextState);
+    void processActivities(const devs::Time& time);
+    void processEventInStateActions(const devs::Time& time,
+                                    const devs::ExternalEvent* event);
+    void processInStateAction(const devs::Time& time);
+    void processOutStateAction(const devs::Time& time);
     void processEventTransitionAction(int transition,
-				      const vle::devs::Time& time,
-				      const vle::devs::ExternalEvent* event);
+                                      const devs::Time& time,
+                                      const devs::ExternalEvent* event);
     void processGuardTransitionAction(int transition,
-				      const vle::devs::Time& time);
-    void setSigma(const vle::devs::Time& time);
-    void updateSigma(const vle::devs::Time& time);
+                                      const devs::Time& time);
+    void setSigma(const devs::Time& time);
+    void updateSigma(const devs::Time& time);
 
-    virtual vle::devs::Time init(const vle::devs::Time& time);
-    virtual void output(const vle::devs::Time& time,
-			vle::devs::ExternalEventList& output) const;
-    virtual vle::devs::Time timeAdvance() const;
-    virtual void internalTransition(const vle::devs::Time& time);
+    virtual devs::Time init(const devs::Time& time);
+    virtual void output(const devs::Time& time,
+                        devs::ExternalEventList& output) const;
+    virtual devs::Time timeAdvance() const;
+    virtual void internalTransition(const devs::Time& time);
     virtual void externalTransition(
-	const vle::devs::ExternalEventList& event,
-	const vle::devs::Time& time);
-    virtual vle::devs::Event::EventType confluentTransitions(
-	const vle::devs::Time& /* time */,
-	const vle::devs::ExternalEventList& /* extEventlist */) const
-        { return vle::devs::Event::EXTERNAL; }
+        const devs::ExternalEventList& event,
+        const devs::Time& time);
+    virtual devs::Event::EventType confluentTransitions(
+        const devs::Time& /* time */,
+        const devs::ExternalEventList& /* extEventlist */) const
+    { return devs::Event::EXTERNAL; }
 
     enum Phase { IDLE, PROCESSING };
 
     Phase mPhase;
-    vle::devs::Time mLastTime;
-    vle::devs::Time mSigma;
+    devs::Time mLastTime;
+    devs::Time mSigma;
     EventListLILO mToProcessEvents;
     std::pair < int, C > mToProcessGuard;
     std::pair < int, C > mToProcessAfterWhen;
@@ -253,93 +252,93 @@ private:
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 template < typename C >
-bool Statechart<C>::checkGuard(int transition, const vle::devs::Time& time)
+bool Statechart<C>::checkGuard(int transition, const devs::Time& time)
 {
     GuardsIterator itg = mGuards.find(transition);
     bool valid = true;
 
     if (itg != mGuards.end()) {
-	valid = (itg->second)(time);
+        valid = (itg->second)(time);
     }
     return valid;
 }
 
 template < typename C >
-void Statechart<C>::checkGuards(const vle::devs::Time& time)
+void Statechart<C>::checkGuards(const devs::Time& time)
 {
     TransitionsMapIterator it = mTransitionsMap.find(Base<C>::currentState());
 
     if (it != mTransitionsMap.end()) {
-	TransitionsIterator itt = it->second.begin();
+        TransitionsIterator itt = it->second.begin();
 
-	while (not mValidGuard and itt != it->second.end()) {
-	    GuardsIterator itg = mGuards.find(*itt);
+        while (not mValidGuard and itt != it->second.end()) {
+            GuardsIterator itg = mGuards.find(*itt);
 
-	    if (itg != mGuards.end()) {
-		if ((itg->second)(time)) {
-		    mToProcessGuard = std::make_pair(*itt, mNextStates[*itt]);
-		    mValidGuard = true;
-		    mPhase = PROCESSING;
-		}
-	    } else {
-		if (mEvents.find(*itt) == mEvents.end() and
-		    mAfters.find(*itt) == mAfters.end() and
-		    mWhens.find(*itt) == mWhens.end()) {
-		    mToProcessGuard = std::make_pair(*itt, mNextStates[*itt]);
-		    mValidGuard = true;
-		    mPhase = PROCESSING;
-		}
-	    }
-	    ++itt;
-	}
+            if (itg != mGuards.end()) {
+                if ((itg->second)(time)) {
+                    mToProcessGuard = std::make_pair(*itt, mNextStates[*itt]);
+                    mValidGuard = true;
+                    mPhase = PROCESSING;
+                }
+            } else {
+                if (mEvents.find(*itt) == mEvents.end() and
+                    mAfters.find(*itt) == mAfters.end() and
+                    mWhens.find(*itt) == mWhens.end()) {
+                    mToProcessGuard = std::make_pair(*itt, mNextStates[*itt]);
+                    mValidGuard = true;
+                    mPhase = PROCESSING;
+                }
+            }
+            ++itt;
+        }
     }
 }
 
 template < typename C >
-int Statechart<C>::findTransition(const vle::devs::ExternalEvent* event) const
+int Statechart<C>::findTransition(const devs::ExternalEvent* event) const
 {
     TransitionsMapIterator it = mTransitionsMap.find(Base<C>::currentState());
     int transition = -1;
 
     if (it != mTransitionsMap.end()) {
-	TransitionsIterator itt = it->second.begin();
+        TransitionsIterator itt = it->second.begin();
 
-	while (transition == -1 and itt != it->second.end()) {
-	    EventsIterator ite = mEvents.find(*itt);
+        while (transition == -1 and itt != it->second.end()) {
+            EventsIterator ite = mEvents.find(*itt);
 
-	    if (ite != mEvents.end() and ite->second == event->getPortName()) {
-		transition = ite->first;
-	    }
-	    ++itt;
-	}
+            if (ite != mEvents.end() and ite->second == event->getPortName()) {
+                transition = ite->first;
+            }
+            ++itt;
+        }
     }
     return transition;
 }
 
 template < typename C >
-void Statechart<C>::process(const vle::devs::Time& time,
-			    const vle::devs::ExternalEvent* event)
+void Statechart<C>::process(const devs::Time& time,
+                            const devs::ExternalEvent* event)
 {
     int transition = findTransition(event);
 
     if (transition != -1) {
-	C nextState = mNextStates[transition];
+        C nextState = mNextStates[transition];
 
-	if (checkGuard(transition, time)) {
-	    processOutStateAction(time);
-	    processEventTransitionAction(transition, time, event);
-	    Base<C>::currentState(nextState);
-	    processInStateAction(time);
-	    checkGuards(time);
-	}
+        if (checkGuard(transition, time)) {
+            processOutStateAction(time);
+            processEventTransitionAction(transition, time, event);
+            Base<C>::currentState(nextState);
+            processInStateAction(time);
+            checkGuards(time);
+        }
     } else {
-	processEventInStateActions(time, event);
+        processEventInStateActions(time, event);
     }
 }
 
 template < typename C >
-void Statechart<C>::process(const vle::devs::Time& time,
-			    int transitionId, const C& nextState)
+void Statechart<C>::process(const devs::Time& time,
+                            int transitionId, const C& nextState)
 {
     processOutStateAction(time);
     processGuardTransitionAction(transitionId, time);
@@ -349,125 +348,125 @@ void Statechart<C>::process(const vle::devs::Time& time,
 }
 
 template < typename C >
-void Statechart<C>::processActivities(const vle::devs::Time& time)
+void Statechart<C>::processActivities(const devs::Time& time)
 {
     ActivitiesIterator it = mActivities.find(Base<C>::currentState());
 
     if (it != mActivities.end()) {
-	(it->second)(time);
+        (it->second)(time);
     }
 }
 
 template < typename C >
-void Statechart<C>::processInStateAction(const vle::devs::Time& time)
+void Statechart<C>::processInStateAction(const devs::Time& time)
 {
     ActionsIterator it = mInActions.find(Base<C>::currentState());
 
     if (it != mInActions.end()) {
-	(it->second)(time);
+        (it->second)(time);
     }
 }
 
 template < typename C >
-void Statechart<C>::processOutStateAction(const vle::devs::Time& time)
+void Statechart<C>::processOutStateAction(const devs::Time& time)
 {
     ActionsIterator it = mOutActions.find(Base<C>::currentState());
 
     if (it != mOutActions.end()) {
-	(it->second)(time);
+        (it->second)(time);
     }
 }
 
 template < typename C >
 void Statechart<C>::processEventTransitionAction(
     int transition,
-    const vle::devs::Time& time,
-    const vle::devs::ExternalEvent* event)
+    const devs::Time& time,
+    const devs::ExternalEvent* event)
 {
     EventTransitionActionsIterator it =
-	mEventTransitionActions.find(transition);
+        mEventTransitionActions.find(transition);
 
     if (it != mEventTransitionActions.end()) {
-	(it->second)(time, event);
+        (it->second)(time, event);
     }
 }
 
 template < typename C >
 void Statechart<C>::processGuardTransitionAction(
     int transition,
-    const vle::devs::Time& time)
+    const devs::Time& time)
 {
     GuardTransitionActionsIterator it =
-	mGuardTransitionActions.find(transition);
+        mGuardTransitionActions.find(transition);
 
     if (it != mGuardTransitionActions.end()) {
-	(it->second)(time);
+        (it->second)(time);
     }
 }
 
 template < typename C >
 void Statechart<C>::processEventInStateActions(
-    const vle::devs::Time& time,
-    const vle::devs::ExternalEvent* event)
+    const devs::Time& time,
+    const devs::ExternalEvent* event)
 {
     if (mEventInStateActions.find(Base<C>::currentState()) !=
-	mEventInStateActions.end()) {
-	EventInStateActions& actions = eventInStateActions(
-	    Base<C>::currentState());
-	EventInStateActionsIterator it = actions.find(event->getPortName());
+        mEventInStateActions.end()) {
+        EventInStateActions& actions = eventInStateActions(
+            Base<C>::currentState());
+        EventInStateActionsIterator it = actions.find(event->getPortName());
 
-	if (it != actions.end()) {
-	    (it->second)(time, event);
-	}
-	checkGuards(time);
+        if (it != actions.end()) {
+            (it->second)(time, event);
+        }
+        checkGuards(time);
     }
 }
 
 template < typename C >
-void Statechart<C>::setSigma(const vle::devs::Time& time)
+void Statechart<C>::setSigma(const devs::Time& time)
 {
-    vle::devs::Time sigma = vle::devs::Time::infinity;
+    devs::Time sigma = devs::Time::infinity;
     int id = -1;
     TransitionsMapIterator it = mTransitionsMap.find(Base<C>::currentState());
 
     if (it != mTransitionsMap.end()) {
-	TransitionsIterator itt = it->second.begin();
+        TransitionsIterator itt = it->second.begin();
 
-	while (itt != it->second.end()) {
-	    AftersIterator ita = mAfters.find(*itt);
+        while (itt != it->second.end()) {
+            AftersIterator ita = mAfters.find(*itt);
 
-	    if (ita != mAfters.end()) {
-		if (ita->second < sigma) {
-		    sigma = ita->second;
-		    id = *itt;
-		}
-	    } else {
-		WhensIterator itw = mWhens.find(*itt);
+            if (ita != mAfters.end()) {
+                if (ita->second < sigma) {
+                    sigma = ita->second;
+                    id = *itt;
+                }
+            } else {
+                WhensIterator itw = mWhens.find(*itt);
 
-		if (itw != mWhens.end()) {
-		    vle::devs::Time duration = itw->second - time;
+                if (itw != mWhens.end()) {
+                    devs::Time duration = itw->second - time;
 
-		    if (duration > 0 and duration < sigma) {
-			sigma = duration;
-			id = *itt;
-		    }
-		}
-	    }
-	    ++itt;
-	}
+                    if (duration > 0 and duration < sigma) {
+                        sigma = duration;
+                        id = *itt;
+                    }
+                }
+            }
+            ++itt;
+        }
     }
     if (mTimeStep < sigma) {
-	mSigma = mTimeStep;
-	mValidAfterWhen = false;
+        mSigma = mTimeStep;
+        mValidAfterWhen = false;
     } else {
-	mSigma = sigma;
-	mToProcessAfterWhen = std::make_pair(id, mNextStates[id]);
-	mValidAfterWhen = true;
+        mSigma = sigma;
+        mToProcessAfterWhen = std::make_pair(id, mNextStates[id]);
+        mValidAfterWhen = true;
     }
 }
 
 template < typename C >
-void Statechart<C>::updateSigma(const vle::devs::Time& time)
+void Statechart<C>::updateSigma(const devs::Time& time)
 {
     mSigma -= time - mLastTime;
 }
@@ -475,39 +474,39 @@ void Statechart<C>::updateSigma(const vle::devs::Time& time)
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 template < typename C >
-void Statechart<C>::output(const vle::devs::Time& time,
-			   vle::devs::ExternalEventList& output) const
+void Statechart<C>::output(const devs::Time& time,
+                           devs::ExternalEventList& output) const
 {
     if (mPhase == PROCESSING) {
-    	if (not mToProcessEvents.empty()) {
-    	    const vle::devs::ExternalEventList* events =
-		mToProcessEvents.front();
-    	    const vle::devs::ExternalEvent* event = events->front();
-     	    int transition = findTransition(event);
+        if (not mToProcessEvents.empty()) {
+            const devs::ExternalEventList* events =
+                mToProcessEvents.front();
+            const devs::ExternalEvent* event = events->front();
+            int transition = findTransition(event);
 
-	    if (transition != -1) {
-		OutputFuncsIterator itof = mOutputFuncs.find(transition);
+            if (transition != -1) {
+                OutputFuncsIterator itof = mOutputFuncs.find(transition);
 
-		if (itof != mOutputFuncs.end()) {
-		    (itof->second)(time, output);
-		} else {
-		    OutputsIterator ito = mOutputs.find(transition);
+                if (itof != mOutputFuncs.end()) {
+                    (itof->second)(time, output);
+                } else {
+                    OutputsIterator ito = mOutputs.find(transition);
 
-		    if (ito != mOutputs.end()) {
-			output.addEvent(Base<C>::buildEvent(ito->second));
-		    }
-		}
-	    }
-    	}
+                    if (ito != mOutputs.end()) {
+                        output.addEvent(Base<C>::buildEvent(ito->second));
+                    }
+                }
+            }
+        }
     }
 }
 
 template < typename C >
-vle::devs::Time Statechart<C>::init(const vle::devs::Time& time)
+devs::Time Statechart<C>::init(const devs::Time& time)
 {
-    vle::Assert <vle::utils::InternalError>(
-	Base<C>::isInit(),
-	boost::format("FSA::Statechart model, initial state not defined"));
+    Assert <utils::InternalError>(
+        Base<C>::isInit(),
+        _("FSA::Statechart model, initial state not defined"));
 
     Base<C>::currentState(Base<C>::initialState());
 
@@ -524,27 +523,27 @@ vle::devs::Time Statechart<C>::init(const vle::devs::Time& time)
 
 template < typename C >
 void Statechart<C>::externalTransition(
-    const vle::devs::ExternalEventList& events,
-    const vle::devs::Time& time)
+    const devs::ExternalEventList& events,
+    const devs::Time& time)
 {
     if (events.size() > 1) {
-	vle::devs::ExternalEventList sortedEvents = select(events);
-	vle::devs::ExternalEventList* clonedEvents =
-	    new vle::devs::ExternalEventList;
-	vle::devs::ExternalEventList::const_iterator it = sortedEvents.begin();
+        devs::ExternalEventList sortedEvents = select(events);
+        devs::ExternalEventList* clonedEvents =
+            new devs::ExternalEventList;
+        devs::ExternalEventList::const_iterator it = sortedEvents.begin();
 
-	while (it != sortedEvents.end()) {
-	    clonedEvents->addEvent(Base<C>::cloneExternalEvent(*it));
-	    ++it;
-	}
-	mToProcessEvents.push_back(clonedEvents);
+        while (it != sortedEvents.end()) {
+            clonedEvents->addEvent(Base<C>::cloneExternalEvent(*it));
+            ++it;
+        }
+        mToProcessEvents.push_back(clonedEvents);
     } else {
-	vle::devs::ExternalEventList::const_iterator it = events.begin();
-	vle::devs::ExternalEventList* clonedEvents =
-	    new vle::devs::ExternalEventList;
+        devs::ExternalEventList::const_iterator it = events.begin();
+        devs::ExternalEventList* clonedEvents =
+            new devs::ExternalEventList;
 
-	clonedEvents->addEvent(Base<C>::cloneExternalEvent(*it));
-	mToProcessEvents.push_back(clonedEvents);
+        clonedEvents->addEvent(Base<C>::cloneExternalEvent(*it));
+        mToProcessEvents.push_back(clonedEvents);
     }
     updateSigma(time);
     mLastTime = time;
@@ -552,53 +551,53 @@ void Statechart<C>::externalTransition(
 }
 
 template < typename C >
-vle::devs::Time Statechart<C>::timeAdvance() const
+devs::Time Statechart<C>::timeAdvance() const
 {
     if (mPhase == IDLE) {
-	return mSigma;
+        return mSigma;
     } else {
-	return 0;
+        return 0;
     }
 }
 
 template < typename C >
-void Statechart<C>::internalTransition(const vle::devs::Time& time)
+void Statechart<C>::internalTransition(const devs::Time& time)
 {
     if (mPhase == PROCESSING) {
-	if (mValidGuard) {
-	    process(time, mToProcessGuard.first, mToProcessGuard.second);
-	    mValidGuard = false;
-	    if (mToProcessEvents.empty()) {
-		mPhase = IDLE;
-	    }
-	} else {
-	    if (not mToProcessEvents.empty()) {
-		vle::devs::ExternalEventList* events = mToProcessEvents.front();
-		vle::devs::ExternalEvent* event = events->front();
+        if (mValidGuard) {
+            process(time, mToProcessGuard.first, mToProcessGuard.second);
+            mValidGuard = false;
+            if (mToProcessEvents.empty()) {
+                mPhase = IDLE;
+            }
+        } else {
+            if (not mToProcessEvents.empty()) {
+                devs::ExternalEventList* events = mToProcessEvents.front();
+                devs::ExternalEvent* event = events->front();
 
-		process(time, event);
+                process(time, event);
 
-		events->erase(events->begin());
-		delete event;
+                events->erase(events->begin());
+                delete event;
 
-		if (events->empty()) {
-		    mToProcessEvents.pop_front();
-		    delete events;
-		}
-		if (mToProcessEvents.empty()) {
-		    mPhase = IDLE;
-		}
-	    }
-	}
+                if (events->empty()) {
+                    mToProcessEvents.pop_front();
+                    delete events;
+                }
+                if (mToProcessEvents.empty()) {
+                    mPhase = IDLE;
+                }
+            }
+        }
     } else if (mPhase == IDLE) {
-	if (mValidAfterWhen) {
-	    process(time, mToProcessAfterWhen.first,
-		    mToProcessAfterWhen.second);
-	    mValidAfterWhen = false;
-	} else {
-	    processActivities(time);
-	    checkGuards(time);
-	}
+        if (mValidAfterWhen) {
+            process(time, mToProcessAfterWhen.first,
+                    mToProcessAfterWhen.second);
+            mValidAfterWhen = false;
+        } else {
+            processActivities(time);
+            checkGuards(time);
+        }
     }
     setSigma(time);
     mLastTime = time;
@@ -623,7 +622,7 @@ template < typename C, typename X, typename I >
 InAction_t<X,I> operator>>(InAction_t<X,I> action, const C& state)
 {
     boost::assign::insert(action.obj->inActions())(
-	state, boost::bind(action.func, action.obj, _1));
+        state, boost::bind(action.func, action.obj, _1));
     return action;
 }
 
@@ -646,7 +645,7 @@ template < typename C, typename X, typename I >
 OutAction_t<X,I> operator>>(OutAction_t<X,I> action, const C& state)
 {
     boost::assign::insert(action.obj->outActions())(
-	state, boost::bind(action.func, action.obj, _1));
+        state, boost::bind(action.func, action.obj, _1));
     return action;
 }
 
@@ -669,7 +668,7 @@ template < typename C, typename X, typename I >
 Activity_t<X,I> operator>>(Activity_t<X,I> activity, const C& state)
 {
     boost::assign::insert(activity.obj->activities())(
-	state, boost::bind(activity.func, activity.obj, _1));
+        state, boost::bind(activity.func, activity.obj, _1));
     return activity;
 }
 
@@ -679,7 +678,7 @@ template < typename I, typename C >
 struct Transition_t
 {
     Transition_t(I obj, const C& state, const C& nextState, int id) :
-	obj(obj), state(state), nextState(nextState), id(id)  { }
+        obj(obj), state(state), nextState(nextState), id(id)  { }
 
     I obj;
     C state;
@@ -707,29 +706,29 @@ template < typename X >
 Guard_t<X> guard(X guard)
 { return Guard_t<X>(guard); }
 
-struct After_t
+struct VLE_EXTENSION_EXPORT After_t
 {
-    After_t(const vle::devs::Time& duration) : duration(duration)  { }
+    After_t(const devs::Time& duration) : duration(duration)  { }
 
-    vle::devs::Time duration;
+    devs::Time duration;
 };
 
-After_t after(const vle::devs::Time& duration);
+After_t VLE_EXTENSION_EXPORT after(const devs::Time& duration);
 
-struct When_t
+struct VLE_EXTENSION_EXPORT When_t
 {
-    When_t(const vle::devs::Time& date) : date(date)  { }
+    When_t(const devs::Time& date) : date(date)  { }
 
-    vle::devs::Time date;
+    devs::Time date;
 };
 
-When_t when(const vle::devs::Time& date);
+When_t VLE_EXTENSION_EXPORT when(const devs::Time& date);
 
 template < typename I, typename C, typename X >
 Transition_t<I,C> operator<<(Transition_t<I,C> transition, Guard_t<X> guard)
 {
     transition.obj->guards()[transition.id] =
-	boost::bind(guard.guard, transition.obj, _1);
+        boost::bind(guard.guard, transition.obj, _1);
     return transition;
 }
 
@@ -765,7 +764,7 @@ template < typename I, typename C, typename X >
 Transition_t<I,C> operator<<(Transition_t<I,C> transition, OutputFunc_t<X> func)
 {
     transition.obj->outputFuncs()[transition.id] =
-	boost::bind(func.func, transition.obj, _1);
+        boost::bind(func.func, transition.obj, _1);
     return transition;
 }
 
@@ -773,12 +772,12 @@ template < typename I, typename C, typename X >
 Transition_t<I,C> operator<<(Transition_t<I,C> transition, Action_t<X> action)
 {
     if (transition.obj->events().find(transition.id) !=
-	transition.obj->events().end()) {
-	transition.obj->eventTransitionActions()[transition.id] =
-	    boost::bind(action.action, transition.obj, _1);
+        transition.obj->events().end()) {
+        transition.obj->eventTransitionActions()[transition.id] =
+            boost::bind(action.action, transition.obj, _1);
     } else {
-	transition.obj->guardTransitionActions()[transition.id] =
-	    boost::bind(action.action, transition.obj, _1);
+        transition.obj->guardTransitionActions()[transition.id] =
+            boost::bind(action.action, transition.obj, _1);
     }
     return transition;
 }
@@ -789,7 +788,7 @@ template < typename I, typename X >
 struct EventInState_t
 {
     EventInState_t(I obj, const std::string& event, X func) :
-	obj(obj), event(event), func(func)  { }
+        obj(obj), event(event), func(func)  { }
 
     I obj;
     std::string event;
@@ -803,10 +802,8 @@ EventInState_t<I,X> eventInState(I obj, const std::string& event, X func)
 template < typename I, typename C, typename X >
 EventInState_t<I,X> operator>>(EventInState_t<I,X> event, const C& state)
 {
-    insert(event.obj->eventInStateActions(state))(event.event,
-						  boost::bind(event.func,
-							      event.obj,
-							      _1, _2));
+    insert(event.obj->eventInStateActions(state))(
+        event.event, boost::bind(event.func, event.obj, _1, _2));
     return event;
 }
 

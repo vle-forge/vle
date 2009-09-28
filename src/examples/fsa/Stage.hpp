@@ -40,62 +40,62 @@ public:
     Stage(const vd::DynamicsInit& init, const vd::InitEventList& lst);
 
     virtual ~Stage()
-	{ }
+    { }
 
 private:
     void activity1(const vd::Time& /* time */) // PS
-	{
-	    if (STiz > 0.0) {
-		CumST = CumST + STiz;
-	    }
-	}
+    {
+        if (STiz > 0.0) {
+            CumST = CumST + STiz;
+        }
+    }
     void activity2(const vd::Time& /* time */) // LV
-	{
-	    CumST = CumST + STiz;
-	    CumST_LV = CumST_LV + STiz ;
-	}
+    {
+        CumST = CumST + STiz;
+        CumST_LV = CumST_LV + STiz ;
+    }
     void activity3(const vd::Time& /* time */) // IF
-	{
-	    CumST = CumST + STiz;
-	    CumST_LV = CumST_LV + STiz ;
-	}
+    {
+        CumST = CumST + STiz;
+        CumST_LV = CumST_LV + STiz ;
+    }
     void activity4(const vd::Time& /* time */) // DF
-	{
-	    CumST = CumST + STiz;
-	    CumST_LV = CumST_LV + STiz ;
-	    CumST_DF = CumST_DF + STiz;
-	}
+    {
+        CumST = CumST + STiz;
+        CumST_LV = CumST_LV + STiz ;
+        CumST_DF = CumST_DF + STiz;
+    }
     void activity5(const vd::Time& /* time */) // DRG
-	{
-	    CumST = CumST + STiz;
-	    CumST_DRG = CumST_DRG + STiz;
-	    delta = CumST_LV - stdrg;
-	}
+    {
+        CumST = CumST + STiz;
+        CumST_DRG = CumST_DRG + STiz;
+        delta = CumST_LV - stdrg;
+    }
     void activity6(const vd::Time& /* time */) // FSLA
-	{
-	    CumST = CumST + STiz;
-	    CumST_FSLA = CumST_FSLA + STiz;
-	}
+    {
+        CumST = CumST + STiz;
+        CumST_FSLA = CumST_FSLA + STiz;
+    }
     void activity7(const vd::Time& /* time */) // MP
-	{
-	    CumST = CumST + STiz;
-	}
+    {
+        CumST = CumST + STiz;
+    }
 
     void action1(const vd::Time& /* time */)
-	{
-	    CumST_LV = 0.0;
-	    seuil = stif + stlv;
-	}
+    {
+        CumST_LV = 0.0;
+        seuil = stif + stlv;
+    }
     void action2(const vd::Time& /* time */)
-	{
-	    CumST_DF = 0.0;
-	    seuil = stdrg;
-	}
+    {
+        CumST_DF = 0.0;
+        seuil = stdrg;
+    }
     void action3(const vd::Time& /* time */)
-	{
-	    CumST_DRG = 0.0;
-	    stfsla = (NETpot - 1.0) * vdrg;
-	}
+    {
+        CumST_DRG = 0.0;
+        stfsla = (NETpot - 1.0) * vdrg;
+    }
     void action4(const vd::Time& /* time */) { CumST_FSLA = 0; }
 
     bool c2(const vd::Time& /* time */) { return CumST >= stlv; }
@@ -105,15 +105,15 @@ private:
     bool c7(const vd::Time& /* time */) { return CumST_FSLA >= seuil; }
 
     void in(const vd::Time& /* time */,
-	    const vd::ExternalEvent* event)
-	{
-	    STi << ve::Var("Tmoy", event);
-	    if (STi > 0.0) {
-		STiz = STi;
-	    } else {
-		STiz = 0.0;
-	    }
-	}
+            const vd::ExternalEvent* event)
+    {
+        STi << ve::Var("Tmoy", event);
+        if (STi > 0.0) {
+            STiz = STi;
+        } else {
+            STiz = 0.0;
+        }
+    }
 
     long date_sem;
     long date_DF;

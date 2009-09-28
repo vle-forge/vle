@@ -37,13 +37,13 @@ class statechart1 : public ve::Statechart < State >
 {
 public:
     statechart1(const vd::DynamicsInit& init,
-		const vd::InitEventList& events) :
-	ve::Statechart < State >(init, events)
-        {
-	    ve::states(this) << a;
+                const vd::InitEventList& events) :
+        ve::Statechart < State >(init, events)
+    {
+        ve::states(this) << a;
 
-	    initialState(a);
-	}
+        initialState(a);
+    }
 
     virtual ~statechart1() { }
 };
@@ -54,21 +54,21 @@ class statechart2 : public ve::Statechart < State2 >
 {
 public:
     statechart2(const vd::DynamicsInit& init,
-		const vd::InitEventList& events) :
-	ve::Statechart < State2 >(init, events)
-        {
-	    ve::states(this) << I << A << B << C;
+                const vd::InitEventList& events) :
+        ve::Statechart < State2 >(init, events)
+    {
+        ve::states(this) << I << A << B << C;
 
-	    ve::transition(this, I, A);
-	    ve::transition(this, A, B) << ve::event("in1");
-	    ve::transition(this, B, A) << ve::event("in2");
-	    ve::transition(this, B, C) << ve::event("in1");
-	    ve::transition(this, C, B) << ve::event("in2");
-	    ve::transition(this, C, A) << ve::event("in1");
-	    ve::transition(this, A, C) << ve::event("in2");
+        ve::transition(this, I, A);
+        ve::transition(this, A, B) << ve::event("in1");
+        ve::transition(this, B, A) << ve::event("in2");
+        ve::transition(this, B, C) << ve::event("in1");
+        ve::transition(this, C, B) << ve::event("in2");
+        ve::transition(this, C, A) << ve::event("in1");
+        ve::transition(this, A, C) << ve::event("in2");
 
-	    initialState(I);
-	}
+        initialState(I);
+    }
 
     virtual ~statechart2() { }
 };
@@ -77,24 +77,24 @@ class statechart3 : public ve::Statechart < State2 >
 {
 public:
     statechart3(const vd::DynamicsInit& init,
-		const vd::InitEventList& events) :
-	ve::Statechart < State2 >(init, events)
-        {
-	    ve::states(this) << I << A << B << C;
+                const vd::InitEventList& events) :
+        ve::Statechart < State2 >(init, events)
+    {
+        ve::states(this) << I << A << B << C;
 
-	    ve::transition(this, I, A);
-	    ve::transition(this, A, B) << ve::event("in1")
-				       << ve::output("out");
-	    ve::transition(this, B, A) << ve::event("in2");
-	    ve::transition(this, B, C) << ve::event("in1")
-				       << ve::output("out");
-	    ve::transition(this, C, B) << ve::event("in2");
-	    ve::transition(this, C, A) << ve::event("in1")
-				       << ve::output("out");
-	    ve::transition(this, A, C) << ve::event("in2");
+        ve::transition(this, I, A);
+        ve::transition(this, A, B) << ve::event("in1")
+            << ve::output("out");
+        ve::transition(this, B, A) << ve::event("in2");
+        ve::transition(this, B, C) << ve::event("in1")
+            << ve::output("out");
+        ve::transition(this, C, B) << ve::event("in2");
+        ve::transition(this, C, A) << ve::event("in1")
+            << ve::output("out");
+        ve::transition(this, A, C) << ve::event("in2");
 
-	    initialState(I);
-	}
+        initialState(I);
+    }
 
     virtual ~statechart3() { }
 };
@@ -103,52 +103,52 @@ class statechart4 : public ve::Statechart < State2 >
 {
 public:
     statechart4(const vd::DynamicsInit& init,
-		const vd::InitEventList& events) :
-	ve::Statechart < State2 >(init, events)
-        {
-	    ve::states(this) << I << A << B << C;
+                const vd::InitEventList& events) :
+        ve::Statechart < State2 >(init, events)
+    {
+        ve::states(this) << I << A << B << C;
 
-	    ve::transition(this, I, A);
-	    ve::transition(this, A, B) << ve::event("in1")
-				       << ve::output("out");
-	    ve::transition(this, B, A) << ve::event("in2")
-				       << ve::action(&statechart4::add);
-	    ve::transition(this, B, C) << ve::event("in1")
-				       << ve::output("out");
-	    ve::transition(this, C, B) << ve::event("in2")
-				       << ve::action(&statechart4::add);
-	    ve::transition(this, C, A) << ve::event("in1")
-				       << ve::output("out");
-	    ve::transition(this, A, C) << ve::event("in2")
-				       << ve::action(&statechart4::add);
+        ve::transition(this, I, A);
+        ve::transition(this, A, B) << ve::event("in1")
+            << ve::output("out");
+        ve::transition(this, B, A) << ve::event("in2")
+            << ve::action(&statechart4::add);
+        ve::transition(this, B, C) << ve::event("in1")
+            << ve::output("out");
+        ve::transition(this, C, B) << ve::event("in2")
+            << ve::action(&statechart4::add);
+        ve::transition(this, C, A) << ve::event("in1")
+            << ve::output("out");
+        ve::transition(this, A, C) << ve::event("in2")
+            << ve::action(&statechart4::add);
 
-	    ve::inAction(this, &statechart4::start) >> I;
-	    ve::outAction(this, &statechart4::add) >> B;
-	    ve::eventInState(this, "in3", &statechart4::in) >> C;
+        ve::inAction(this, &statechart4::start) >> I;
+        ve::outAction(this, &statechart4::add) >> B;
+        ve::eventInState(this, "in3", &statechart4::in) >> C;
 
-	    initialState(I);
-	}
+        initialState(I);
+    }
 
     virtual ~statechart4() { }
 
     virtual vle::value::Value* observation(
-	const vd::ObservationEvent& event) const
-	{
-	    if (event.onPort("a")) {
-		return vle::value::Double::create(a);
-	    } else {
-		return ve::Statechart < State2 >::observation(event);
-	    }
-	}
+        const vd::ObservationEvent& event) const
+    {
+        if (event.onPort("a")) {
+            return vle::value::Double::create(a);
+        } else {
+            return ve::Statechart < State2 >::observation(event);
+        }
+    }
 
 private:
     void add(const vd::Time& /* time */)
-	{ ++a; }
+    { ++a; }
     void in(const vd::Time& /* time */,
-	    const vd::ExternalEvent* /* event */)
-	{ ++a; }
+            const vd::ExternalEvent* /* event */)
+    { ++a; }
     void start(const vd::Time& /* time */)
-	{ a = 0; }
+    { a = 0; }
 
     int a;
 };
@@ -159,23 +159,23 @@ class statechart5 : public ve::Statechart < State3 >
 {
 public:
     statechart5(const vd::DynamicsInit& init,
-		const vd::InitEventList& events) :
-	ve::Statechart < State3 >(init, events)
-        {
-	    ve::states(this) << ii << aa << bb << cc << dd;
+                const vd::InitEventList& events) :
+        ve::Statechart < State3 >(init, events)
+    {
+        ve::states(this) << ii << aa << bb << cc << dd;
 
-	    ve::transition(this, ii, aa);
-	    ve::transition(this, aa, bb) << ve::event("in1");
-	    ve::transition(this, bb, aa) << ve::event("in2");
-	    ve::transition(this, bb, cc) << ve::event("in1");
-	    ve::transition(this, cc, bb) << ve::event("in2");
-	    ve::transition(this, cc, aa) << ve::event("in1");
-	    ve::transition(this, aa, cc) << ve::event("in2");
-	    ve::transition(this, cc, dd) << ve::after(2);
-	    ve::transition(this, dd, cc) << ve::after(2);
+        ve::transition(this, ii, aa);
+        ve::transition(this, aa, bb) << ve::event("in1");
+        ve::transition(this, bb, aa) << ve::event("in2");
+        ve::transition(this, bb, cc) << ve::event("in1");
+        ve::transition(this, cc, bb) << ve::event("in2");
+        ve::transition(this, cc, aa) << ve::event("in1");
+        ve::transition(this, aa, cc) << ve::event("in2");
+        ve::transition(this, cc, dd) << ve::after(2);
+        ve::transition(this, dd, cc) << ve::after(2);
 
-	    initialState(ii);
-	}
+        initialState(ii);
+    }
 
     virtual ~statechart5() { }
 };
@@ -184,24 +184,24 @@ class statechart6 : public ve::Statechart < State3 >
 {
 public:
     statechart6(const vd::DynamicsInit& init,
-		const vd::InitEventList& events) :
-	ve::Statechart < State3 >(init, events)
-        {
-	    ve::states(this) << ii << aa << bb << cc << dd;
+                const vd::InitEventList& events) :
+        ve::Statechart < State3 >(init, events)
+    {
+        ve::states(this) << ii << aa << bb << cc << dd;
 
-	    ve::transition(this, ii, aa);
-	    ve::transition(this, aa, bb) << ve::event("in1");
-	    ve::transition(this, bb, aa) << ve::event("in2");
-	    ve::transition(this, bb, cc) << ve::event("in1");
-	    ve::transition(this, cc, bb) << ve::event("in2");
-	    ve::transition(this, cc, aa) << ve::event("in1");
-	    ve::transition(this, aa, cc) << ve::event("in2");
-	    ve::transition(this, cc, dd) << ve::when(3);
-	    ve::transition(this, cc, dd) << ve::when(69);
-	    ve::transition(this, dd, cc) << ve::after(2);
+        ve::transition(this, ii, aa);
+        ve::transition(this, aa, bb) << ve::event("in1");
+        ve::transition(this, bb, aa) << ve::event("in2");
+        ve::transition(this, bb, cc) << ve::event("in1");
+        ve::transition(this, cc, bb) << ve::event("in2");
+        ve::transition(this, cc, aa) << ve::event("in1");
+        ve::transition(this, aa, cc) << ve::event("in2");
+        ve::transition(this, cc, dd) << ve::when(3);
+        ve::transition(this, cc, dd) << ve::when(69);
+        ve::transition(this, dd, cc) << ve::after(2);
 
-	    initialState(ii);
-	}
+        initialState(ii);
+    }
 
     virtual ~statechart6() { }
 };

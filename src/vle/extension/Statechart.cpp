@@ -26,12 +26,12 @@
 
 namespace vle { namespace extension {
 
-After_t after(const vle::devs::Time& duration)
+After_t after(const devs::Time& duration)
 {
     return After_t(duration);
 }
 
-When_t when(const vle::devs::Time& date)
+When_t when(const devs::Time& date)
 {
     return When_t(date);
 }

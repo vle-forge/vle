@@ -37,44 +37,44 @@ class moore1 : public ve::Moore < State >
 {
 public:
     moore1(const vd::DynamicsInit& init,
-	   const vd::InitEventList& events) :
-	ve::Moore < State >(init, events)
-        {
-	    ve::states(this) << a << b << c;
+           const vd::InitEventList& events) :
+        ve::Moore < State >(init, events)
+    {
+        ve::states(this) << a << b << c;
 
-	    ve::transition(this, a, c) << ve::event("in1");
-	    ve::transition(this, a, b) << ve::event("in2");
-	    ve::transition(this, b, a) << ve::event("in1");
-	    ve::transition(this, c, a) << ve::event("in2");
-	    ve::transition(this, c, b) << ve::event("in1");
+        ve::transition(this, a, c) << ve::event("in1");
+        ve::transition(this, a, b) << ve::event("in2");
+        ve::transition(this, b, a) << ve::event("in1");
+        ve::transition(this, c, a) << ve::event("in2");
+        ve::transition(this, c, b) << ve::event("in1");
 
-	    ve::inAction(this, &moore1::action1) >> a;
+        ve::inAction(this, &moore1::action1) >> a;
 
-	    ve::output(this, a) >> "out";
-	    ve::output(this, c) >> "out";
+        ve::output(this, a) >> "out";
+        ve::output(this, c) >> "out";
 
-	    initialState(a);
-	}
+        initialState(a);
+    }
 
     virtual ~moore1() { }
 
     void action1(const vd::Time& /*time*/,
-		 const vd::ExternalEvent* /*event */) {  }
+                 const vd::ExternalEvent* /*event */) {  }
 
     virtual vd::ExternalEventList select(
-	const vd::ExternalEventList& events)
-	{
-	    // in1 have a greater priority than in2
-	    if (events.front()->onPort("in2")) {
-		vd::ExternalEventList list;
+        const vd::ExternalEventList& events)
+    {
+        // in1 have a greater priority than in2
+        if (events.front()->onPort("in2")) {
+            vd::ExternalEventList list;
 
-		list.push_back(events.back());
-		list.push_back(events.front());
-		return list;
-	    } else {
-		return events;
-	    }
-	}
+            list.push_back(events.back());
+            list.push_back(events.front());
+            return list;
+        } else {
+            return events;
+        }
+    }
 };
 
 enum State2 { START = 1, RUN };
@@ -83,42 +83,42 @@ class counter2 : public ve::Moore < State2 >
 {
 public:
     counter2(const vd::DynamicsInit& init,
-	     const vd::InitEventList& events) :
-	ve::Moore < State2 >(init, events)
-        {
-	    ve::states(this) << START << RUN;
+             const vd::InitEventList& events) :
+        ve::Moore < State2 >(init, events)
+    {
+        ve::states(this) << START << RUN;
 
-	    ve::transition(this, START, RUN) << ve::event("in");
-	    ve::transition(this, RUN, RUN) << ve::event("in");
+        ve::transition(this, START, RUN) << ve::event("in");
+        ve::transition(this, RUN, RUN) << ve::event("in");
 
-	    ve::inAction(this, &counter2::start) >> START;
-	    ve::inAction(this, &counter2::run) >> RUN;
+        ve::inAction(this, &counter2::start) >> START;
+        ve::inAction(this, &counter2::run) >> RUN;
 
-	    ve::outputFunc(this, &counter2::out) >> RUN;
+        ve::outputFunc(this, &counter2::out) >> RUN;
 
-	    initialState(START);
-	}
+        initialState(START);
+    }
 
     void start(const vd::Time& /*time*/,
-	       const vd::ExternalEvent* /*event */)
-	{ value = 0; }
+               const vd::ExternalEvent* /*event */)
+    { value = 0; }
     void run(const vd::Time& /*time*/,
-		 const vd::ExternalEvent* /*event */)
-	{ ++value; }
+             const vd::ExternalEvent* /*event */)
+    { ++value; }
     void out(const vd::Time& /*time*/,
-	     vd::ExternalEventList& output) const
-	{ output.addEvent(buildEventWithAInteger("out", "counter", value)); }
+             vd::ExternalEventList& output) const
+    { output.addEvent(buildEventWithAInteger("out", "counter", value)); }
 
     virtual ~counter2() { }
 
     virtual vle::value::Value* observation(
-	const vd::ObservationEvent& event) const
-	{
-	    if (event.onPort("counter")) {
-		return vle::value::Integer::create(value);
-	    }
-	    return ve::Moore < State2 >::observation(event);
-	}
+        const vd::ObservationEvent& event) const
+    {
+        if (event.onPort("counter")) {
+            return vle::value::Integer::create(value);
+        }
+        return ve::Moore < State2 >::observation(event);
+    }
 
 private:
     int value;

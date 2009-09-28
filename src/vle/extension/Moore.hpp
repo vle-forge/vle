@@ -26,10 +26,10 @@
 #ifndef VLE_EXTENSION_MOORE_HPP
 #define VLE_EXTENSION_MOORE_HPP
 
+#include <vle/extension/DllDefines.hpp>
+#include <vle/extension/FSA.hpp>
 #include <boost/assign.hpp>
 #include <boost/bind.hpp>
-
-#include <vle/extension/FSA.hpp>
 
 namespace vle { namespace extension {
 
@@ -37,21 +37,22 @@ template < typename C >
 class Moore : public Base < C >
 {
 public:
-    Moore(const vle::devs::DynamicsInit& init,
-	  const vle::devs::InitEventList& events) :
-	Base < C >(init, events) { }
+    Moore(const devs::DynamicsInit& init,
+          const devs::InitEventList& events)
+        : Base < C >(init, events)
+    {}
 
-    virtual ~Moore() { }
+    virtual ~Moore() {}
 
-    virtual vle::devs::ExternalEventList select(
-	const vle::devs::ExternalEventList& events)
-	{ return events; }
+    virtual devs::ExternalEventList select(
+        const devs::ExternalEventList& events)
+    { return events; }
 
 private:
     // output
     typedef std::map < C, std::string > Outputs;
-    typedef boost::function < void (const vle::devs::Time&,
-				    vle::devs::ExternalEventList&) > OutputFunc;
+    typedef boost::function < void (const devs::Time&,
+                                    devs::ExternalEventList&) > OutputFunc;
     typedef std::map < C, OutputFunc > OutputFuncs;
 
     // transition
@@ -60,8 +61,8 @@ private:
 
     // action
     typedef boost::function <
-	void (const vle::devs::Time&,
-	      const vle::devs::ExternalEvent* event) > Action;
+        void (const devs::Time&,
+              const devs::ExternalEvent* event) > Action;
     typedef std::map < C, Action > Actions;
 
 public:
@@ -70,12 +71,12 @@ public:
     OutputFuncs& outputFuncs() { return mOutputFuncs; }
 
     Transition& transitions(const C& c)
-	{
-	    if (mTransitions.find(c) == mTransitions.end()) {
-		mTransitions[c] = Transition();
-	    }
-	    return mTransitions.at(c);
-	}
+    {
+        if (mTransitions.find(c) == mTransitions.end()) {
+            mTransitions[c] = Transition();
+        }
+        return mTransitions.at(c);
+    }
 
 private:
     typedef typename Outputs::const_iterator OutputsIterator;
@@ -83,7 +84,7 @@ private:
     typedef typename Actions::const_iterator ActionsIterator;
     typedef typename Transitions::const_iterator TransitionsIterator;
     typedef typename Transition::const_iterator TransitionIterator;
-    typedef std::list < vle::devs::ExternalEventList* > EventListLILO;
+    typedef std::list < devs::ExternalEventList* > EventListLILO;
 
     // List of actions
     Actions mActions;
@@ -94,21 +95,21 @@ private:
     // Next states in case of external transition
     Transitions mTransitions;
 
-    void process(const vle::devs::Time& time,
-		 const vle::devs::ExternalEvent* event);
+    void process(const devs::Time& time,
+                 const devs::ExternalEvent* event);
 
-    virtual vle::devs::Time init(const vle::devs::Time& time);
-    virtual void output(const vle::devs::Time& time,
-			vle::devs::ExternalEventList& output) const;
-    virtual vle::devs::Time timeAdvance() const;
-    virtual void internalTransition(const vle::devs::Time& time);
+    virtual devs::Time init(const devs::Time& time);
+    virtual void output(const devs::Time& time,
+                        devs::ExternalEventList& output) const;
+    virtual devs::Time timeAdvance() const;
+    virtual void internalTransition(const devs::Time& time);
     virtual void externalTransition(
-	const vle::devs::ExternalEventList& event,
-	const vle::devs::Time& time);
-    virtual vle::devs::Event::EventType confluentTransitions(
-	const vle::devs::Time& /* time */,
-	const vle::devs::ExternalEventList& /* extEventlist */) const
-        { return vle::devs::Event::EXTERNAL; }
+        const devs::ExternalEventList& event,
+        const devs::Time& time);
+    virtual devs::Event::EventType confluentTransitions(
+        const devs::Time& /* time */,
+        const devs::ExternalEventList& /* extEventlist */) const
+    { return devs::Event::EXTERNAL; }
 
     enum Phase { IDLE, PROCESSING };
 
@@ -119,62 +120,63 @@ private:
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 template < typename C >
-void Moore<C>::process(const vle::devs::Time& time,
-		       const vle::devs::ExternalEvent* event)
+void Moore<C>::process(const devs::Time& time,
+                       const devs::ExternalEvent* event)
 {
     if (mTransitions.find(Base<C>::currentState()) !=
-	mTransitions.end() and
-	(mTransitions[Base<C>::currentState()].find(event->
-						    getPortName())
-	 != mTransitions[Base<C>::currentState()].end())) {
-	Base<C>::currentState(mTransitions[Base<C>::currentState()]
-			      [event->getPortName()]);
+        mTransitions.end() and
+        (mTransitions[Base<C>::currentState()].find(event->
+                                                    getPortName())
+         != mTransitions[Base<C>::currentState()].end())) {
+        Base<C>::currentState(mTransitions[Base<C>::currentState()]
+                              [event->getPortName()]);
 
-	ActionsIterator it = mActions.find(Base<C>::currentState());
+        ActionsIterator it = mActions.find(Base<C>::currentState());
 
-	if (it != mActions.end()) {
-	    (it->second)(time, event);
-	}
+        if (it != mActions.end()) {
+            (it->second)(time, event);
+        }
     }
 }
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 template < typename C >
-void Moore<C>::output(const vle::devs::Time& time,
-		      vle::devs::ExternalEventList& output) const
+void Moore<C>::output(const devs::Time& time,
+                      devs::ExternalEventList& output) const
 {
     if (mPhase == PROCESSING) {
-	OutputFuncsIterator it = mOutputFuncs.find(Base<C>::currentState());
+        OutputFuncsIterator it = mOutputFuncs.find(Base<C>::currentState());
 
-	if (it != mOutputFuncs.end()) {
-	    (it->second)(time, output);
-	} else {
-	    OutputsIterator ito = mOutputs.find(Base<C>::currentState());
+        if (it != mOutputFuncs.end()) {
+            (it->second)(time, output);
+        } else {
+            OutputsIterator ito = mOutputs.find(Base<C>::currentState());
 
-	    if (ito != mOutputs.end()) {
-		output.addEvent(buildEvent(ito->second));
-	    }
-	}
+            if (ito != mOutputs.end()) {
+                output.addEvent(buildEvent(ito->second));
+            }
+        }
     }
 }
 
 template < typename C >
-vle::devs::Time Moore<C>::init(const vle::devs::Time& time)
+devs::Time Moore<C>::init(const devs::Time& time)
 {
-    vle::Assert <vle::utils::InternalError>(
-	Base<C>::isInit(),
-	boost::format("FSA::Moore model, initial state not defined"));
+    if (not Base<C>::isInit()) {
+        throw utils::InternalError(
+            _("FSA::Moore model, initial state not defined"));
+    }
 
     Base<C>::currentState(Base<C>::initialState());
 
     ActionsIterator it = mActions.find(Base<C>::initialState());
 
     if (it != mActions.end()) {
-	vle::devs::ExternalEvent* event = new vle::devs::ExternalEvent("");
+        devs::ExternalEvent* event = new devs::ExternalEvent("");
 
-	(it->second)(time, event);
-	delete event;
+        (it->second)(time, event);
+        delete event;
     }
 
     mPhase = IDLE;
@@ -182,62 +184,62 @@ vle::devs::Time Moore<C>::init(const vle::devs::Time& time)
 }
 
 template < typename C >
-void Moore<C>::externalTransition(const vle::devs::ExternalEventList& events,
-				  const vle::devs::Time& /* time */)
+void Moore<C>::externalTransition(const devs::ExternalEventList& events,
+                                  const devs::Time& /* time */)
 {
     // mNewStates.clear();
     if (events.size() > 1) {
-	vle::devs::ExternalEventList sortedEvents = select(events);
-	vle::devs::ExternalEventList* clonedEvents =
-	    new vle::devs::ExternalEventList;
-	vle::devs::ExternalEventList::const_iterator it = sortedEvents.begin();
+        devs::ExternalEventList sortedEvents = select(events);
+        devs::ExternalEventList* clonedEvents =
+            new devs::ExternalEventList;
+        devs::ExternalEventList::const_iterator it = sortedEvents.begin();
 
-	while (it != sortedEvents.end()) {
-	    clonedEvents->addEvent(Base<C>::cloneExternalEvent(*it));
-	    ++it;
-	}
-	mToProcessEvents.push_back(clonedEvents);
+        while (it != sortedEvents.end()) {
+            clonedEvents->addEvent(Base<C>::cloneExternalEvent(*it));
+            ++it;
+        }
+        mToProcessEvents.push_back(clonedEvents);
     } else {
-	vle::devs::ExternalEventList::const_iterator it = events.begin();
-	vle::devs::ExternalEventList* clonedEvents =
-	    new vle::devs::ExternalEventList;
+        devs::ExternalEventList::const_iterator it = events.begin();
+        devs::ExternalEventList* clonedEvents =
+            new devs::ExternalEventList;
 
-	clonedEvents->addEvent(Base<C>::cloneExternalEvent(*it));
-	mToProcessEvents.push_back(clonedEvents);
+        clonedEvents->addEvent(Base<C>::cloneExternalEvent(*it));
+        mToProcessEvents.push_back(clonedEvents);
     }
     mPhase = PROCESSING;
 }
 
 template < typename C >
-vle::devs::Time Moore<C>::timeAdvance() const
+devs::Time Moore<C>::timeAdvance() const
 {
     if (mPhase == IDLE) {
-	return vle::devs::Time::infinity;
+        return devs::Time::infinity;
     } else {
-	return 0;
+        return 0;
     }
 }
 
 template < typename C >
-void Moore<C>::internalTransition(const vle::devs::Time& time)
+void Moore<C>::internalTransition(const devs::Time& time)
 {
     if (mPhase == PROCESSING)
     {
-	vle::devs::ExternalEventList* events = mToProcessEvents.front();
-	vle::devs::ExternalEvent* event = events->front();
+        devs::ExternalEventList* events = mToProcessEvents.front();
+        devs::ExternalEvent* event = events->front();
 
-	process(time, event);
+        process(time, event);
 
-	events->erase(events->begin());
-	delete event;
+        events->erase(events->begin());
+        delete event;
 
-	if (events->empty()) {
-	    mToProcessEvents.pop_front();
-	    delete events;
-	}
-	if (mToProcessEvents.empty()) {
-	    mPhase = IDLE;
-	}
+        if (events->empty()) {
+            mToProcessEvents.pop_front();
+            delete events;
+        }
+        if (mToProcessEvents.empty()) {
+            mPhase = IDLE;
+        }
     }
 }
 
@@ -247,7 +249,7 @@ template < typename C, typename I >
 struct Transition_t
 {
     Transition_t(I obj, const C& state, const C& nextState) :
-	obj(obj), state(state), nextState(nextState)  { }
+        obj(obj), state(state), nextState(nextState)  { }
 
     I obj;
     C state;
@@ -261,8 +263,8 @@ Transition_t<C,I> transition(I obj, const C& state, const C& nextState)
 template < typename C, typename I >
 void operator<<(Transition_t<C,I> transition, Event_t event)
 {
-    insert(transition.obj->transitions(transition.state))(event.event,
-							  transition.nextState);
+    insert(transition.obj->transitions(transition.state))(
+        event.event, transition.nextState);
 }
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
@@ -284,7 +286,7 @@ template < typename C, typename X, typename I >
 InAction_t<X,I> operator>>(InAction_t<X,I> action, const C& state)
 {
     boost::assign::insert(action.obj->actions())(
-	state, boost::bind(action.func, action.obj, _1, _2));
+        state, boost::bind(action.func, action.obj, _1, _2));
     return action;
 }
 
@@ -294,7 +296,7 @@ template < typename C, typename I >
 struct Output2_t
 {
     Output2_t(I obj, const C& state) :
-	obj(obj), state(state)  { }
+        obj(obj), state(state)  { }
 
     I obj;
     C state;
@@ -329,7 +331,7 @@ template < typename C, typename X, typename I >
 void operator>>(OutputFunc2_t<X,I> output, const C& state)
 {
     boost::assign::insert(output.obj->outputFuncs())(
-    	state, boost::bind(output.func, output.obj, _1, _2));
+        state, boost::bind(output.func, output.obj, _1, _2));
 }
 
 }} // namespace vle extension

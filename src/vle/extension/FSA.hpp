@@ -26,6 +26,7 @@
 #ifndef VLE_EXTENSION_FSA_HPP
 #define VLE_EXTENSION_FSA_HPP
 
+#include <vle/extension/DllDefines.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Debug.hpp>
@@ -40,8 +41,10 @@ class Base : public vle::devs::Dynamics
 public:
     Base(const vle::devs::DynamicsInit& init,
 	 const vle::devs::InitEventList& events) :
-	vle::devs::Dynamics(init, events), mInit(false) { }
-    virtual ~Base() { }
+        vle::devs::Dynamics(init, events), mInit(false)
+    {}
+
+    virtual ~Base() {}
 
     /**
      * @brief Specify the initial state.
@@ -54,34 +57,36 @@ public:
     States& states() { return mStates; }
 
     virtual vle::value::Value* observation(
-	const vle::devs::ObservationEvent& event) const
-	{
-	    if (event.onPort("state")) {
-		return buildString((boost::format("%1%") %
-				    Base<C>::currentState()).str());
-	    }
-	    return 0;
-	}
+        const vle::devs::ObservationEvent& event) const
+    {
+        if (event.onPort("state")) {
+            return buildString((boost::format("%1%") %
+                                Base<C>::currentState()).str());
+        }
+        return 0;
+    }
 
 protected:
     C currentState() const
-	{ return mCurrentState; }
+    { return mCurrentState; }
 
     void currentState(C newState)
-	{ mCurrentState = newState; }
+    { mCurrentState = newState; }
 
     bool existState(C state) const
-	{ return std::find(mStates.begin(), mStates.end(), state) !=
-		mStates.end(); }
+    {
+        return std::find(mStates.begin(), mStates.end(), state) !=
+            mStates.end();
+    }
 
     C initialState() const
-	{ return mInitialState; }
+    { return mInitialState; }
 
     bool isInit() const
-	{ return mInit; }
+    { return mInit; }
 
     vle::devs::ExternalEvent* cloneExternalEvent(
-	vle::devs::ExternalEvent* event) const;
+        vle::devs::ExternalEvent* event) const;
 
 private:
     // initial state is defined
@@ -98,23 +103,24 @@ protected:
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-struct Var
+struct VLE_EXTENSION_EXPORT Var
 {
     Var(const std::string& name) : name(name)  { }
     Var(const std::string& name,
-	const vle::devs::ExternalEvent* event) :
-	name(name),
-	value(event->getDoubleAttributeValue("value")) { }
+        const vle::devs::ExternalEvent* event) :
+        name(name),
+        value(event->getDoubleAttributeValue("value")) { }
     virtual Var& operator=(double v) { value = v; return *this; }
 
     std::string name;
     double value;
 };
 
-double operator<<(double& value, const Var& var);
+double VLE_EXTENSION_EXPORT
+operator<<(double& value, const Var& var);
 
-vle::devs::ExternalEventList& operator<<(vle::devs::ExternalEventList& output,
-					 const Var& var);
+vle::devs::ExternalEventList& VLE_EXTENSION_EXPORT
+operator<<(vle::devs::ExternalEventList& output, const Var& var);
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
@@ -122,8 +128,8 @@ template < typename C >
 void Base<C>::initialState(const C& state)
 {
     vle::Assert <vle::utils::InternalError>(
-	existState(state), boost::format(
-	    "FSA::Base model, unknow state %1%") % state);
+        existState(state), boost::format(
+            "FSA::Base model, unknow state %1%") % state);
 
     mInitialState = state;
     mInit = true;
@@ -134,12 +140,12 @@ vle::devs::ExternalEvent* Base<C>::cloneExternalEvent(
     vle::devs::ExternalEvent* event) const
 {
     vle::devs::ExternalEvent* ee = new vle::devs::ExternalEvent(
-	event->getPortName());
+        event->getPortName());
     vle::value::Map::const_iterator it = event->getAttributes().begin();
 
     while (it != event->getAttributes().end()) {
-	ee->putAttribute(it->first, it->second->clone());
-	++it;
+        ee->putAttribute(it->first, it->second->clone());
+        ++it;
     }
     return ee;
 }
@@ -167,25 +173,25 @@ State_t<I> operator<<(State_t<I> state, const C& name)
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-struct Event_t
+struct VLE_EXTENSION_EXPORT Event_t
 {
     Event_t(const std::string& event) : event(event)  { }
 
     std::string event;
 };
 
-Event_t event(const std::string& event);
+Event_t VLE_EXTENSION_EXPORT event(const std::string& event);
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-struct Output_t
+struct VLE_EXTENSION_EXPORT Output_t
 {
     Output_t(const std::string& output) : output(output)  { }
 
     std::string output;
 };
 
-Output_t output(const std::string& output);
+Output_t VLE_EXTENSION_EXPORT output(const std::string& output);
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 

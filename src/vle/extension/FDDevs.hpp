@@ -26,10 +26,11 @@
 #ifndef VLE_EXTENSION_FDDEVS_HPP
 #define VLE_EXTENSION_FDDEVS_HPP
 
+#include <vle/extension/DllDefines.hpp>
+#include <vle/extension/FSA.hpp>
+#include <vle/utils/i18n.hpp>
 #include <boost/assign.hpp>
 #include <boost/bind.hpp>
-
-#include <vle/extension/FSA.hpp>
 
 namespace vle { namespace extension {
 
@@ -47,24 +48,25 @@ template < typename C >
 class FDDevs : public Base < C >
 {
 public:
-    FDDevs(const vle::devs::DynamicsInit& init,
-	   const vle::devs::InitEventList& events) :
-	Base < C >(init, events) { }
+    FDDevs(const devs::DynamicsInit& init,
+           const devs::InitEventList& events)
+        : Base < C >(init, events)
+    {}
 
-    virtual ~FDDevs() { }
+    virtual ~FDDevs() {}
 
-    virtual vle::devs::ExternalEventList select(
-	const vle::devs::ExternalEventList& events)
-	{ return events; }
+    virtual devs::ExternalEventList select(
+        const devs::ExternalEventList& events)
+    { return events; }
 
 private:
     // duration
-    typedef std::map < C , vle::devs::Time > Durations;
+    typedef std::map < C , devs::Time > Durations;
 
     // output
     typedef std::map < C , std::string > Outputs;
-    typedef boost::function < void (const vle::devs::Time&,
-				    vle::devs::ExternalEventList&) > OutputFunc;
+    typedef boost::function < void (const devs::Time&,
+                                    devs::ExternalEventList&) > OutputFunc;
     typedef std::map < C , OutputFunc > OutputFuncs;
 
     // internal
@@ -81,17 +83,17 @@ public:
     Internals& internals() { return mInternals; }
 
     External& externals(const C& c)
-	{
-	    if (mExternals.find(c) == mExternals.end()) {
-		mExternals[c] = External();
-	    }
-	    return mExternals.at(c);
-	}
+    {
+        if (mExternals.find(c) == mExternals.end()) {
+            mExternals[c] = External();
+        }
+        return mExternals.at(c);
+    }
 
-    virtual vle::devs::Event::EventType confluentTransitions(
-	const vle::devs::Time& /* time */,
-	const vle::devs::ExternalEventList& /* extEventlist */) const
-        { return vle::devs::Event::EXTERNAL; }
+    virtual devs::Event::EventType confluentTransitions(
+        const devs::Time& /* time */,
+        const devs::ExternalEventList& /* extEventlist */) const
+    { return devs::Event::EXTERNAL; }
 
 private:
     typedef typename Outputs::const_iterator OutputsIterator;
@@ -110,42 +112,42 @@ private:
     // Next states in case of internal transition
     Internals mInternals;
 
-    void process(const vle::devs::ExternalEvent* event,
-		 const vle::devs::Time& time);
+    void process(const devs::ExternalEvent* event,
+                 const devs::Time& time);
 
-    virtual vle::devs::Time init(const vle::devs::Time& time);
-    virtual void output(const vle::devs::Time& time,
-			vle::devs::ExternalEventList& output) const;
-    virtual vle::devs::Time timeAdvance() const
-	{ return mSigma; }
-    virtual void internalTransition(const vle::devs::Time& event);
+    virtual devs::Time init(const devs::Time& time);
+    virtual void output(const devs::Time& time,
+                        devs::ExternalEventList& output) const;
+    virtual devs::Time timeAdvance() const
+    { return mSigma; }
+    virtual void internalTransition(const devs::Time& event);
     virtual void externalTransition(
-	const vle::devs::ExternalEventList& events,
-	const vle::devs::Time& time);
+        const devs::ExternalEventList& events,
+        const devs::Time& time);
 
-    vle::devs::Time mLastTime;
-    vle::devs::Time mSigma;
+    devs::Time mLastTime;
+    devs::Time mSigma;
 };
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 template < typename C >
-void FDDevs<C>::process(const vle::devs::ExternalEvent* event,
-			const vle::devs::Time& time)
+void FDDevs<C>::process(const devs::ExternalEvent* event,
+                        const devs::Time& time)
 {
     if (mExternals.find(Base<C>::currentState()) != mExternals.end() and
-	(mExternals[Base<C>::currentState()].find(event->getPortName()) !=
-	 mExternals[Base<C>::currentState()].end())) {
-	Base<C>::currentState(mExternals[Base<C>::currentState()]
-			      [event->getPortName()]);
+        (mExternals[Base<C>::currentState()].find(event->getPortName()) !=
+         mExternals[Base<C>::currentState()].end())) {
+        Base<C>::currentState(mExternals[Base<C>::currentState()]
+                              [event->getPortName()]);
 
-	vle::Assert < vle::utils::InternalError > (
-	    mDurations.find(Base<C>::currentState()) != mDurations.end(),
-	    boost::format(
-		"FSA::FDDevs model, unknow duration of state %1%") %
-	    Base<C>::currentState());
+        if (mDurations.find(Base<C>::currentState()) == mDurations.end()) {
+            throw utils::InternalError(
+                fmt(_("FSA::FDDevs model, unknow duration of state %1%")) %
+                Base<C>::currentState());
+        }
 
-	mSigma = mDurations[Base<C>::currentState()];
+        mSigma = mDurations[Base<C>::currentState()];
     }
     else mSigma -= time - mLastTime;
 }
@@ -153,76 +155,77 @@ void FDDevs<C>::process(const vle::devs::ExternalEvent* event,
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 template < typename C >
-void FDDevs<C>::output(const vle::devs::Time& time,
-		       vle::devs::ExternalEventList& output) const
+void FDDevs<C>::output(const devs::Time& time,
+                       devs::ExternalEventList& output) const
 {
     OutputFuncsIterator it = mOutputFuncs.find(Base<C>::currentState());
 
     if (it != mOutputFuncs.end()) {
-	(it->second)(time, output);
+        (it->second)(time, output);
     } else {
-	OutputsIterator ito = mOutputs.find(Base<C>::currentState());
+        OutputsIterator ito = mOutputs.find(Base<C>::currentState());
 
-	if (ito != mOutputs.end()) {
-	    output.addEvent(buildEvent(ito->second));
-	}
+        if (ito != mOutputs.end()) {
+            output.addEvent(buildEvent(ito->second));
+        }
     }
 }
 
 template < typename C >
-vle::devs::Time FDDevs<C>::init(const vle::devs::Time& /* time */)
+devs::Time FDDevs<C>::init(const devs::Time& /* time */)
 {
-    vle::Assert < vle::utils::InternalError > (
-	Base<C>::isInit(),
-	boost::format("FSA::FDDevs model, initial state not defined"));
+    if (not Base<C>::isInit()) {
+        throw utils::InternalError(
+            _("FSA::FDDevs model, initial state not defined"));
+    }
 
     Base<C>::currentState(Base<C>::initialState());
 
-    vle::Assert < vle::utils::InternalError > (
-	mDurations.find(Base<C>::currentState()) != mDurations.end(),
-	boost::format(
-	    "FSA::FDDevs model, unknow duration of state %1%") %
-	Base<C>::currentState());
+    if (mDurations.find(Base<C>::currentState()) == mDurations.end()) {
+        throw utils::InternalError(fmt(
+                _("FSA::FDDevs model, unknow duration of state %1%")) %
+        Base<C>::currentState());
+    }
 
     mSigma = mDurations[Base<C>::currentState()];
     return mSigma;
 }
 
 template < typename C >
-void FDDevs<C>::externalTransition(const vle::devs::ExternalEventList& events,
-				   const vle::devs::Time& time)
+void FDDevs<C>::externalTransition(const devs::ExternalEventList& events,
+                                   const devs::Time& time)
 {
     if (events.size() > 1) {
-	vle::devs::ExternalEventList sortedEvents = select(events);
-	vle::devs::ExternalEventList::const_iterator it = sortedEvents.begin();
+        devs::ExternalEventList sortedEvents = select(events);
+        devs::ExternalEventList::const_iterator it = sortedEvents.begin();
 
-	while (it != sortedEvents.end()) {
-	    process(*it, time);
-	    ++it;
-	}
+        while (it != sortedEvents.end()) {
+            process(*it, time);
+            ++it;
+        }
     } else {
-	vle::devs::ExternalEventList::const_iterator it = events.begin();
+        devs::ExternalEventList::const_iterator it = events.begin();
 
-	process(*it, time);
+        process(*it, time);
     }
 }
 
 template < typename C >
-void FDDevs<C>::internalTransition(const vle::devs::Time& time)
+void FDDevs<C>::internalTransition(const devs::Time& time)
 {
-    vle::Assert < vle::utils::InternalError > (
-	mInternals.find(Base<C>::currentState()) != mInternals.end(),
-	boost::format(
-	    "FSA::FDDevs model, unknow internal transition on state %1%") %
-	Base<C>::currentState());
+    if (mInternals.find(Base<C>::currentState()) == mInternals.end()) {
+        throw utils::InternalError(fmt(
+                _("FSA::FDDevs model, unknow internal transition on state %1%"))
+                % Base<C>::currentState());
+    }
 
     Base<C>::currentState(mInternals[Base<C>::currentState()]);
 
-    vle::Assert < vle::utils::InternalError > (
-	mDurations.find(Base<C>::currentState()) != mDurations.end(),
-	boost::format(
-	    "FSA::FDDevs model, unknow duration of state %1%") %
-	Base<C>::currentState());
+    if (mDurations.find(Base<C>::currentState()) == mDurations.end()) {
+        throw utils::InternalError(fmt(
+                _("FSA::FDDevs model, unknow duration of state %1%")) %
+            Base<C>::currentState());
+    }
 
     mSigma = mDurations[Base<C>::currentState()];
     mLastTime = time;
@@ -234,7 +237,7 @@ template < typename C, typename I >
 struct Internal_t
 {
     Internal_t(I obj, const C& state) :
-	obj(obj), state(state)  { }
+        obj(obj), state(state)  { }
 
     I obj;
     C state;
@@ -256,7 +259,7 @@ template < typename C, typename I >
 struct Duration_t
 {
     Duration_t(I obj, const C& state) :
-	obj(obj), state(state)  { }
+        obj(obj), state(state)  { }
 
     I obj;
     C state;
@@ -267,7 +270,7 @@ Duration_t<C,I> duration(I obj, const C& state)
 { return Duration_t<C,I>(obj, state); }
 
 template < typename C, typename I >
-void operator<<(Duration_t<C,I> duration, const vle::devs::Time& value)
+void operator<<(Duration_t<C,I> duration, const devs::Time& value)
 {
     insert(duration.obj->durations())(duration.state, value);
 }
@@ -278,7 +281,7 @@ template < typename C, typename I >
 struct External_t
 {
     External_t(I obj, C state, const std::string& input) :
-	obj(obj), state(state), input(input)  { }
+        obj(obj), state(state), input(input)  { }
 
     I obj;
     C state;
@@ -301,7 +304,7 @@ template < typename C, typename I >
 struct Output3_t
 {
     Output3_t(I obj, const C& state) :
-	obj(obj), state(state)  { }
+        obj(obj), state(state)  { }
 
     I obj;
     C state;
@@ -336,7 +339,7 @@ template < typename C, typename X, typename I >
 void operator>>(OutputFunc3_t<X,I> output, const C& state)
 {
     boost::assign::insert(output.obj->outputFuncs())(
-    	state, boost::bind(output.func, output.obj, _1, _2));
+        state, boost::bind(output.func, output.obj, _1, _2));
 }
 
 }} // namespace vle extension

@@ -37,24 +37,24 @@ public:
     devs1(const vd::DynamicsInit& init,
 	  const vd::InitEventList& events) :
 	ve::FDDevs < std::string >(init, events)
-        {
-	    ve::states(this) << "a" << "b" << "c";
+    {
+        ve::states(this) << "a" << "b" << "c";
 
-	    ve::duration(this, std::string("a")) << 6;
-	    ve::duration(this, std::string("b")) << 5;
-	    ve::duration(this, std::string("c")) << 2;
+        ve::duration(this, std::string("a")) << 6;
+        ve::duration(this, std::string("b")) << 5;
+        ve::duration(this, std::string("c")) << 2;
 
-	    ve::internal(this, std::string("a")) >> std::string("b");
-	    ve::internal(this, std::string("b")) >> std::string("a");
-	    ve::internal(this, std::string("c")) >> std::string("a");
+        ve::internal(this, std::string("a")) >> std::string("b");
+        ve::internal(this, std::string("b")) >> std::string("a");
+        ve::internal(this, std::string("c")) >> std::string("a");
 
-	    ve::output(this, std::string("a")) >> "out";
+        ve::output(this, std::string("a")) >> "out";
 
-	    ve::external(this, std::string("a"), "in") >> std::string("c");
-	    ve::external(this, std::string("b"), "in") >> std::string("c");
+        ve::external(this, std::string("a"), "in") >> std::string("c");
+        ve::external(this, std::string("b"), "in") >> std::string("c");
 
-	    initialState("a");
-	}
+        initialState("a");
+    }
 
     virtual ~devs1() { }
 };
@@ -65,32 +65,32 @@ class devs2 : public ve::FDDevs < State >
 {
 public:
     devs2(const vd::DynamicsInit& init,
-	  const vd::InitEventList& events) :
-	ve::FDDevs < State >(init, events)
-        {
-	    ve::states(this) << a << b << c;
+          const vd::InitEventList& events) :
+        ve::FDDevs < State >(init, events)
+    {
+        ve::states(this) << a << b << c;
 
-	    ve::duration(this, a) << 6;
-	    ve::duration(this, b) << 5;
-	    ve::duration(this, c) << 2;
+        ve::duration(this, a) << 6;
+        ve::duration(this, b) << 5;
+        ve::duration(this, c) << 2;
 
-	    ve::internal(this, a) >> b;
-	    ve::internal(this, b) >> a;
-	    ve::internal(this, c) >> a;
+        ve::internal(this, a) >> b;
+        ve::internal(this, b) >> a;
+        ve::internal(this, c) >> a;
 
-//	    ve::output(this, a) >> "out";
-	    ve::outputFunc(this, &devs2::out) >> a;
+        //	    ve::output(this, a) >> "out";
+        ve::outputFunc(this, &devs2::out) >> a;
 
-	    ve::external(this, a, "in") >> c;
+        ve::external(this, a, "in") >> c;
 
-	    initialState(a);
-	}
+        initialState(a);
+    }
 
     virtual ~devs2() { }
 
     void out(const vd::Time& /*time*/,
-	     vd::ExternalEventList& output) const
-	{ output.addEvent(buildEvent("out")); }
+             vd::ExternalEventList& output) const
+    { output.addEvent(buildEvent("out")); }
 };
 
 DECLARE_NAMED_DYNAMICS(devs1, devs1)
