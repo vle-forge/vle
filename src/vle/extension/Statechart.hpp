@@ -764,7 +764,7 @@ template < typename I, typename C, typename X >
 Transition_t<I,C> operator<<(Transition_t<I,C> transition, OutputFunc_t<X> func)
 {
     transition.obj->outputFuncs()[transition.id] =
-        boost::bind(func.func, transition.obj, _1);
+        boost::bind(func.func, transition.obj, _1, _2);
     return transition;
 }
 
