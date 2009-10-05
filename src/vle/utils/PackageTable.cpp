@@ -35,9 +35,7 @@ PackageTable::PackageTable()
 void PackageTable::current(const std::string& package)
 {
     std::pair < const_iterator, bool > r = m_table.insert(package);
-    if (r.second) {
-        m_current = r.first;
-    }
+    m_current = r.first;
 }
 
 PackageTable::index PackageTable::get(const std::string& package)
