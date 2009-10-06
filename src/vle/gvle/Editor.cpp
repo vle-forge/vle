@@ -254,7 +254,6 @@ DocumentDrawingArea::DocumentDrawingArea(GVLE* gvle,
 
 DocumentDrawingArea::~DocumentDrawingArea()
 {
-    delete mModel;
     delete mArea;
 }
 
@@ -555,8 +554,8 @@ void Editor::openTabVpz(const std::string& filepath,
 	    focusTab(filepath);
 	    page = get_current_page();
 	    remove_page(page);
-	    mDocuments.erase(it->first);
 	    delete it->second;
+	    mDocuments.erase(it->first);
 
 	    DocumentDrawingArea* doc = new DocumentDrawingArea(
 		mApp,

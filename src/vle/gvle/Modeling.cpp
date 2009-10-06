@@ -96,6 +96,9 @@ Modeling::~Modeling()
     delete mImportClassesBox;
     delete mCoupledBox;
     delete mRand;
+    if (mTop) {
+       delete mTop;
+    }
 }
 
 void Modeling::clearModeling()
@@ -105,6 +108,9 @@ void Modeling::clearModeling()
     mFileName.clear();
     mVpz.clear();
     delViews();
+    if (mTop) {
+       delete mTop;
+    }
     mTop = 0;
     setTitles();
 }
