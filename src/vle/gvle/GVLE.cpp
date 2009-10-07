@@ -510,8 +510,12 @@ void GVLE::refreshEditor(const std::string& oldName, const std::string& newName)
     } else {
 	fs::path filePath(
 	    Glib::build_filename(mPackage, oldName));
-	std::string newFilePath(
-	    Glib::build_filename(filePath.parent_path().string(), newName));
+        std::string newFilePath(
+#if BOOST_VERSION > 103600
+            Glib::build_filename(filePath.parent_path().string(), newName));
+#else
+            Glib::build_filename(filePath.branch_path().string(), newName));
+#endif
 
 	mEditor->changeFile(Glib::build_filename(mPackage, oldName),
 			    newFilePath);
