@@ -32,6 +32,7 @@
 #include <boost/test/auto_unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/version.hpp>
 #include <stdexcept>
 #include <vle/manager.hpp>
 #include <vle/vpz.hpp>
@@ -233,7 +234,11 @@ BOOST_AUTO_TEST_CASE(test_petrinet_meteo)
     BOOST_REQUIRE_EQUAL(result.shape()[1],
                         (value::MatrixView::size_type)31);
 
+#if BOOST_VERSION < 104000
     BOOST_REQUIRE_CLOSE(value::toDouble(result[4][30]), 29., 10e-5);
+#else
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][30]), 28., 10e-5);
+#endif
     BOOST_REQUIRE_CLOSE(value::toDouble(result[5][30]), 4., 10e-5);
 }
 
