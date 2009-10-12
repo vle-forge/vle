@@ -41,7 +41,7 @@ public:
     Statechart(const devs::DynamicsInit& init,
                const devs::InitEventList& events)
         : Base < C >(init, events), mTimeStep(devs::Time::infinity),
-        mTransitionIndex(0)
+	  mTransitionIndex(0), mValidGuard(false), mValidAfterWhen(false)
     {}
 
     virtual ~Statechart() {}
@@ -204,6 +204,9 @@ private:
     // (id -> output function)
     OutputFuncs mOutputFuncs;
 
+    void buildOutputs(int transition,
+		      const devs::Time& time,
+		      devs::ExternalEventList& output) const;
     bool checkGuard(int transition, const devs::Time& time);
     void checkGuards(const devs::Time& time);
     int findTransition(const devs::ExternalEvent* event) const;
@@ -250,6 +253,26 @@ private:
 };
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
+template < typename C >
+void Statechart<C>::buildOutputs(int transition,
+				 const devs::Time& time,
+				 devs::ExternalEventList& output) const
+{
+    if (transition != -1) {
+	OutputFuncsIterator itof = mOutputFuncs.find(transition);
+
+	if (itof != mOutputFuncs.end()) {
+	    (itof->second)(time, output);
+	} else {
+	    OutputsIterator ito = mOutputs.find(transition);
+
+	    if (ito != mOutputs.end()) {
+		output.addEvent(Base<C>::buildEvent(ito->second));
+	    }
+	}
+    }
+}
 
 template < typename C >
 bool Statechart<C>::checkGuard(int transition, const devs::Time& time)
@@ -450,7 +473,13 @@ void Statechart<C>::setSigma(const devs::Time& time)
                         sigma = duration;
                         id = *itt;
                     }
-                }
+                } else {
+		    if (mEvents.find(*itt) == mEvents.end() and
+			mGuards.find(*itt) == mGuards.end()) {
+			sigma = 0;
+			id = *itt;
+		    }
+		}
             }
             ++itt;
         }
@@ -482,22 +511,13 @@ void Statechart<C>::output(const devs::Time& time,
             const devs::ExternalEventList* events =
                 mToProcessEvents.front();
             const devs::ExternalEvent* event = events->front();
-            int transition = findTransition(event);
 
-            if (transition != -1) {
-                OutputFuncsIterator itof = mOutputFuncs.find(transition);
-
-                if (itof != mOutputFuncs.end()) {
-                    (itof->second)(time, output);
-                } else {
-                    OutputsIterator ito = mOutputs.find(transition);
-
-                    if (ito != mOutputs.end()) {
-                        output.addEvent(Base<C>::buildEvent(ito->second));
-                    }
-                }
-            }
+	    buildOutputs(findTransition(event), time, output);
         }
+    } else {
+	if (mValidAfterWhen) {
+	    buildOutputs(mToProcessAfterWhen.first, time, output);
+	}
     }
 }
 
@@ -518,7 +538,7 @@ devs::Time Statechart<C>::init(const devs::Time& time)
 
     setSigma(time);
     mLastTime = time;
-    return 0;
+    return mSigma;
 }
 
 template < typename C >

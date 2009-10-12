@@ -476,3 +476,30 @@ BOOST_AUTO_TEST_CASE(test_stage)
     BOOST_REQUIRE_EQUAL(value::toString(result[2][323]), "8");
     BOOST_REQUIRE_EQUAL(value::toString(result[2][330]), "9");
 }
+
+BOOST_AUTO_TEST_CASE(test_statechart7)
+{
+    vpz::Vpz file(utils::Path::path().getExampleFile("statechart7.vpz"));
+
+    vpz::Output& o(file.project().experiment().views().outputs().get("o"));
+    o.setLocalStream("", "storage");
+
+    manager::RunQuiet r;
+    r.start(file);
+
+    BOOST_REQUIRE_EQUAL(r.haveError(), false);
+    oov::OutputMatrixViewList& out(r.outputs());
+    BOOST_REQUIRE_EQUAL(out.size(),
+                        (oov::OutputMatrixViewList::size_type)1);
+
+    oov::OutputMatrix& view(out["view"]);
+    value::MatrixView result(view.values());
+
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+                       (value::MatrixView::size_type)2);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+                        (value::MatrixView::size_type)101);
+
+    BOOST_REQUIRE_EQUAL(value::toString(result[1][0]), "2");
+    BOOST_REQUIRE_EQUAL(value::toString(result[1][40]), "3");
+}

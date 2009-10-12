@@ -31,7 +31,7 @@ namespace vle { namespace examples { namespace fsa {
 namespace ve = vle::extension;
 namespace vd = vle::devs;
 
-enum State { a = 1 };
+enum State { a = 1, b, c };
 
 class statechart1 : public ve::Statechart < State >
 {
@@ -206,11 +206,30 @@ public:
     virtual ~statechart6() { }
 };
 
+class statechart7 : public ve::Statechart < State >
+{
+public:
+    statechart7(const vd::DynamicsInit& init,
+                const vd::InitEventList& events) :
+        ve::Statechart < State >(init, events)
+    {
+        ve::states(this) << a << b << c;
+
+	ve::transition(this, a, b);
+	ve::transition(this, b, c) << ve::after(4);
+
+        initialState(a);
+    }
+
+    virtual ~statechart7() { }
+};
+
 DECLARE_NAMED_DYNAMICS(statechart1, statechart1)
 DECLARE_NAMED_DYNAMICS(statechart2, statechart2)
 DECLARE_NAMED_DYNAMICS(statechart3, statechart3)
 DECLARE_NAMED_DYNAMICS(statechart4, statechart4)
 DECLARE_NAMED_DYNAMICS(statechart5, statechart5)
 DECLARE_NAMED_DYNAMICS(statechart6, statechart6)
+DECLARE_NAMED_DYNAMICS(statechart7, statechart7)
 
 }}} // namespace vle examples fsa
