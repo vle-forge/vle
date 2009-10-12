@@ -2,9 +2,9 @@
 <!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://vle.univ-littoral.fr/vle-0.8.0.dtd">
 <vle_project version="0.5" date="mar, 18 nov 2008" author="Eric Ramat">
 <structures>
-<model name="m" type="coupled" width="721" height="367"  >
+<model name="m" type="coupled" width="1008" height="544"  >
 <submodels>
-<model name="a" type="atomic" conditions="cond,cond_A" dynamics="dynA" observables="obsA" x="160" y="75" width="100" height="45" >
+<model name="a" type="atomic" conditions="cond,cond_A" dynamics="dynA" observables="obsA" x="364" y="46" width="100" height="45" >
 <in>
  <port name="perturb" />
 </in>
@@ -12,7 +12,7 @@
  <port name="update" />
 </out>
 </model>
-<model name="b" type="atomic" conditions="cond,cond_B" dynamics="dynB" observables="obsB" x="328" y="126" width="100" height="45" >
+<model name="b" type="atomic" conditions="cond,cond_B" dynamics="dynB" observables="obsB" x="531" y="35" width="100" height="45" >
 <in>
  <port name="update" />
 </in>
@@ -20,23 +20,22 @@
  <port name="update" />
 </out>
 </model>
-<model name="c" type="atomic" conditions="cond,cond_C" dynamics="dynC" observables="obsC" x="499" y="189" width="100" height="45" >
+<model name="c" type="atomic" conditions="cond,cond_C" dynamics="dynC" observables="obsC" x="682" y="34" width="100" height="45" >
 <in>
  <port name="update" />
 </in>
+</model>
+<model name="perturb" type="atomic" dynamics="dynPerturb" x="26" y="27" width="100" height="60" >
 <out>
- <port name="update" />
+ <port name="out1" />
+ <port name="out2" />
 </out>
 </model>
-<model name="d" type="atomic" conditions="cond,cond_D" dynamics="dynD" observables="obsD" x="563" y="282" width="100" height="45" >
+<model name="perturb2" type="atomic" dynamics="dynPerturb2" x="228" y="15" width="100" height="60" >
 <in>
- <port name="update" />
+ <port name="in1" />
+ <port name="in2" />
 </in>
-<out>
- <port name="update" />
-</out>
-</model>
-<model name="perturb" type="atomic" dynamics="dynPerturb" x="17" y="27" width="100" height="45" >
 <out>
  <port name="a" />
 </out>
@@ -48,19 +47,19 @@
  <destination model="b" port="update" />
 </connection>
 <connection type="internal">
- <origin model="a" port="update" />
- <destination model="d" port="update" />
-</connection>
-<connection type="internal">
  <origin model="b" port="update" />
  <destination model="c" port="update" />
 </connection>
 <connection type="internal">
- <origin model="c" port="update" />
- <destination model="d" port="update" />
+ <origin model="perturb" port="out1" />
+ <destination model="perturb2" port="in1" />
 </connection>
 <connection type="internal">
- <origin model="perturb" port="a" />
+ <origin model="perturb" port="out2" />
+ <destination model="perturb2" port="in2" />
+</connection>
+<connection type="internal">
+ <origin model="perturb2" port="a" />
  <destination model="a" port="perturb" />
 </connection>
 </connections>
@@ -68,10 +67,10 @@
 </structures>
 <dynamics>
 <dynamic name="dynA" library="equation1" model="A1" type="local"  />
-<dynamic name="dynB" library="equation1" model="B1" type="local"  />
-<dynamic name="dynC" library="equation1" model="C1" type="local"  />
-<dynamic name="dynD" library="equation1" model="D1" type="local"  />
-<dynamic name="dynPerturb" library="equation1" model="Perturb" type="local"  />
+<dynamic name="dynB" library="equation1" model="B3" type="local"  />
+<dynamic name="dynC" library="equation1" model="C3" type="local"  />
+<dynamic name="dynPerturb" library="equation1" model="Perturb2" type="local"  />
+<dynamic name="dynPerturb2" library="equation1" model="Perturb3" type="local"  />
 </dynamics>
 <experiment name="exp" duration="20.000000000000000" begin="0.000000000000000" combination="linear" seed="12389" >
 <replicas seed="3499211612" number="1" />
@@ -97,11 +96,6 @@
 <condition name="cond_C" >
  <port name="name" >
 <string>c</string>
-</port>
-</condition>
-<condition name="cond_D" >
- <port name="name" >
-<string>d</string>
 </port>
 </condition>
 </conditions>

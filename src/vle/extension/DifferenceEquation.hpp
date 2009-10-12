@@ -33,6 +33,8 @@
 
 namespace vle { namespace extension { namespace DifferenceEquation {
 
+    enum Perturbation_t { ADD, SCALE, SET };
+
     /**
      * @brief Base The class Base encapsules the general
      * mecanisms of DifferenceEquation extension.
@@ -103,7 +105,7 @@ namespace vle { namespace extension { namespace DifferenceEquation {
             {
                 if (not mEquation) {
                     throw utils::InternalError(_(
-                       "DifferenceEquation - variable not build"));
+                            "DifferenceEquation - variable not build"));
                 }
 
                 if (mEquation->init(mIterators)) {
@@ -215,13 +217,13 @@ namespace vle { namespace extension { namespace DifferenceEquation {
          */
         double timeStep(const devs::Time& time) const
         {
-	    if (mTimeStepUnit == vle::utils::DateTime::None) {
-		return mTimeStep;
-	    } else {
-		return vle::utils::DateTime::duration(
-		    time, mTimeStep, mTimeStepUnit);
-	    }
-	}
+            if (mTimeStepUnit == vle::utils::DateTime::None) {
+                return mTimeStep;
+            } else {
+                return vle::utils::DateTime::duration(
+                    time, mTimeStep, mTimeStepUnit);
+            }
+        }
 
     protected:
         typedef Values::const_iterator ValuesIterator;
@@ -236,6 +238,19 @@ namespace vle { namespace extension { namespace DifferenceEquation {
         typedef SynchroSet::const_iterator SynchroSetIterator;
         typedef std::set < std::string > DependanceSet;
         typedef DependanceSet::const_iterator DependanceSetIterator;
+        struct Perturbation
+        {
+            std::string name;
+            double value;
+            Perturbation_t type;
+
+            Perturbation(const std::string& name,
+                         double value,
+                         Perturbation_t type) :
+                name(name), value(value), type(type) {}
+        };
+        typedef std::vector < Perturbation > Perturbations;
+        typedef std::vector < std::string > LockedVariables;
 
         /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
@@ -255,6 +270,8 @@ namespace vle { namespace extension { namespace DifferenceEquation {
                               const std::string& name,
                               bool init = false);
 
+        void applyPerturbations(const vle::devs::Time& time, bool update);
+
         void clearReceivedValues();
 
         void createExternalVariable(const std::string& name,
@@ -271,7 +288,8 @@ namespace vle { namespace extension { namespace DifferenceEquation {
 
         void processUpdate(const std::string& name,
                            const vle::devs::ExternalEvent& event,
-                           bool begin, bool end);
+                           bool begin, bool end,
+                           const vle::devs::Time& time);
 
         void pushNoEDValues();
 
@@ -286,9 +304,19 @@ namespace vle { namespace extension { namespace DifferenceEquation {
 
         virtual bool check() =0;
 
+        virtual double getValue(const std::string& name) =0;
+
+        virtual unsigned int getVariableNumber() const =0;
+
         virtual void initValues(const vle::devs::Time& time) =0;
 
+        virtual void invalidValues() =0;
+
+        virtual void lockValue(const std::string& name) =0;
+
         virtual void removeValue(const std::string& name) =0;
+
+        virtual void removeValues() =0;
 
         virtual void updateValues(const vle::devs::Time& time) =0;
 
@@ -313,7 +341,7 @@ namespace vle { namespace extension { namespace DifferenceEquation {
 
         state mState;
         double mTimeStep;
-	vle::utils::DateTime::Unit mTimeStepUnit;
+        vle::utils::DateTime::Unit mTimeStepUnit;
 
         // external variable info section
         ValuesMap mExternalValues;
@@ -323,6 +351,10 @@ namespace vle { namespace extension { namespace DifferenceEquation {
         SizeMap mSize;
         mode mMode;
         Mapping mMapping;
+
+        // perturbation info section
+        Perturbations mPerturbations;
+        LockedVariables mLockedVariables;
 
         // dependance and synchronous info section
         DependanceSet mDepends;
@@ -338,6 +370,8 @@ namespace vle { namespace extension { namespace DifferenceEquation {
         vle::devs::Time mSigma;
         vle::devs::Time mSigma2;
         vle::devs::Time mLastTime;
+        vle::devs::Time mLastComputeTime;
+        vle::devs::Time mLastClearTime;
         int mWaiting;
     };
 
@@ -372,8 +406,8 @@ namespace vle { namespace extension { namespace DifferenceEquation {
             {
                 if (name != ((Simple*)equation)->mVariableName) {
                     throw utils::InternalError(fmt(_(
-                            "DifferenceEquation::simple - wrong variable" \
-                            " name: %1% in %2%")) % name %
+                                "DifferenceEquation::simple - wrong variable" \
+                                " name: %1% in %2%")) % name %
                         ((Simple*)equation)->mVariableName);
                 }
             }
@@ -443,9 +477,21 @@ namespace vle { namespace extension { namespace DifferenceEquation {
         virtual bool check()
         { return mInitValue; }
 
+        virtual double getValue(const std::string& /* name */)
+        { return val(); }
+
+        virtual unsigned int getVariableNumber() const
+        { return 1; }
+
         virtual void initValues(const vle::devs::Time& time);
 
+        virtual void invalidValues() {}
+
+        virtual void lockValue(const std::string& /* name */) {}
+
         virtual void removeValue(const std::string& name);
+
+        virtual void removeValues();
 
         virtual void updateValues(const vle::devs::Time& time);
 
@@ -469,6 +515,7 @@ namespace vle { namespace extension { namespace DifferenceEquation {
         double mInitialValue;
         bool mInitValue;
         int mSize;
+        bool mSetValue;
     };
 
     class VLE_EXTENSION_EXPORT Multiple : public Base
@@ -537,19 +584,14 @@ namespace vle { namespace extension { namespace DifferenceEquation {
             {
                 if (not mEquation) {
                     throw utils::InternalError(fmt(_(
-                       "DifferenceEquation::multiple - variable %1% not build"))
+                                "DifferenceEquation::multiple - variable %1% not build"))
                         % name());
                 }
 
-                if (*mIterators.mSetValues) {
-                    throw utils::InternalError(fmt(_(
-                            "DifferenceEquation::multiple " \
-                            "- variable %1% already assigned"))
-                       % name());
+                if (not *mIterators.mSetValues) {
+                    *mIterators.mMultipleValues = value;
+                    *mIterators.mSetValues = true;
                 }
-
-                *mIterators.mMultipleValues = value;
-                *mIterators.mSetValues = true;
             }
 
             /**
@@ -561,7 +603,7 @@ namespace vle { namespace extension { namespace DifferenceEquation {
             {
                 if (not mEquation) {
                     throw utils::InternalError(_(
-                        "DifferenceEquation::multiple - variable not build"));
+                            "DifferenceEquation::multiple - variable not build"));
                 }
 
                 return ((Multiple*)mEquation)->val(mName, mIterators, shift);
@@ -656,9 +698,21 @@ namespace vle { namespace extension { namespace DifferenceEquation {
 
         virtual bool check();
 
+        virtual double getValue(const std::string& name)
+        { return val(name); }
+
+        virtual unsigned int getVariableNumber() const
+        { return mVariableNames.size(); }
+
         virtual void initValues(const vle::devs::Time& time);
 
+        virtual void invalidValues();
+
+        virtual void lockValue(const std::string& name);
+
         virtual void removeValue(const std::string& name);
+
+        virtual void removeValues();
 
         virtual void updateValues(const vle::devs::Time& time);
 

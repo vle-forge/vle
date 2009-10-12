@@ -2,93 +2,101 @@
 <!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://vle.univ-littoral.fr/vle-0.8.0.dtd">
 <vle_project version="0.5" date="mar, 18 nov 2008" author="Eric Ramat">
  <structures>
-  <model name="m" type="coupled" x="180" y="34" width="803" height="541">
+  <model name="m" type="coupled" width="618" height="361">
    <submodels>
-    <model name="Controller" type="atomic" conditions="cond" dynamics="dynController" observables="">
-     <out>
-      <port name="add"/>
-      <port name="remove"/>
-     </out>
-    </model>
-    <model name="Executive" type="atomic" conditions="cond,cond_executive" dynamics="dynExecutive" observables="">
+    <model name="D" type="atomic" conditions="cond,cond_D" dynamics="dynD" observables="obsD" x="290" y="105" width="100" height="45">
      <in>
       <port name="update"/>
-      <port name="add"/>
-      <port name="remove"/>
      </in>
      <out>
-      <port name="add"/>
-      <port name="remove"/>
-     </out>
-    </model>
-    <model name="A" type="atomic" conditions="cond,cond_A" dynamics="dynA" observables="obsA">
-     <out>
       <port name="update"/>
      </out>
     </model>
-    <model name="sum" type="atomic" conditions="cond,cond_sum" dynamics="dynSum" observables="obsSum">
+    <model name="E" type="atomic" conditions="cond,cond_E" dynamics="dynE" observables="obsE" x="84" y="165" width="100" height="75">
+     <out>
+      <port name="a"/>
+      <port name="b"/>
+      <port name="c"/>
+     </out>
+    </model>
+    <model name="sum" type="atomic" conditions="cond,cond_sum" dynamics="dynSum" observables="obsSum" x="451" y="269" width="100" height="45">
      <in>
-      <port name="add"/>
-      <port name="remove"/>
+      <port name="a"/>
+      <port name="b"/>
+      <port name="c"/>
+      <port name="d"/>
      </in>
     </model>
    </submodels>
    <connections>
     <connection type="internal">
-     <origin model="Controller" port="add"/>
-     <destination model="Executive" port="add"/>
+     <origin model="D" port="update"/>
+     <destination model="sum" port="d"/>
     </connection>
     <connection type="internal">
-     <origin model="Controller" port="remove"/>
-     <destination model="Executive" port="remove"/>
+     <origin model="E" port="a"/>
+     <destination model="D" port="update"/>
     </connection>
     <connection type="internal">
-     <origin model="A" port="update"/>
-     <destination model="Executive" port="update"/>
+     <origin model="E" port="a"/>
+     <destination model="sum" port="a"/>
     </connection>
     <connection type="internal">
-     <origin model="Executive" port="add"/>
-     <destination model="sum" port="add"/>
+     <origin model="E" port="b"/>
+     <destination model="sum" port="b"/>
     </connection>
     <connection type="internal">
-     <origin model="Executive" port="remove"/>
-     <destination model="sum" port="remove"/>
+     <origin model="E" port="c"/>
+     <destination model="D" port="update"/>
+    </connection>
+    <connection type="internal">
+     <origin model="E" port="c"/>
+     <destination model="sum" port="c"/>
     </connection>
    </connections>
   </model>
  </structures>
  <dynamics>
-  <dynamic name="dynController" library="equation1" model="Controller" type="local"/>
-  <dynamic name="dynExecutive" library="equation1" model="Executive" type="local"/>
-  <dynamic name="dynA" library="equation1" model="A1" type="local"/>
+  <dynamic name="dynD" library="equation1" model="D1" type="local"/>
+  <dynamic name="dynE" library="equation3" model="E2" type="local"/>
   <dynamic name="dynSum" library="equation1" model="sum" type="local"/>
  </dynamics>
- <experiment name="exp" duration="20" combination="linear" seed="12389">
+ <experiment name="exp" duration="1" combination="linear" seed="12389">
   <conditions>
    <condition name="cond">
     <port name="size">
      <integer>2</integer>
     </port>
     <port name="time-step">
-     <double>1</double>
+     <double>0.1</double>
     </port>
    </condition>
-   <condition name="cond_A">
+   <condition name="cond_D">
     <port name="name">
-     <string>a</string>
+     <string>d</string>
     </port>
-    <port name="value">
-     <double>0</double>
+   </condition>
+   <condition name="cond_E">
+    <port name="variables">
+     <set>
+      <set>
+       <string>a</string>
+       <double>0</double>
+      </set>
+      <set>
+       <string>b</string>
+       <double>0</double>
+      </set>
+      <set>
+       <string>c</string>
+       <double>1</double>
+      </set>
+     </set>
     </port>
    </condition>
    <condition name="cond_sum">
     <port name="name">
      <string>s</string>
-    </port>
-   </condition>
-   <condition name="cond_executive">
-    <port name="view">
-     <string>view</string>
     </port>
    </condition>
   </conditions>
@@ -97,13 +105,19 @@
     <output name="o" location="" format="local" plugin="text"/>
    </outputs>
    <observables>
-    <observable name="obsA">
-     <port name="a">
+    <observable name="obsD">
+     <port name="d">
       <attachedview name="view"/>
      </port>
     </observable>
-    <observable name="obsB">
+    <observable name="obsE">
+     <port name="a">
+      <attachedview name="view"/>
+     </port>
      <port name="b">
+      <attachedview name="view"/>
+     </port>
+     <port name="c">
       <attachedview name="view"/>
      </port>
     </observable>
@@ -113,7 +127,7 @@
      </port>
     </observable>
    </observables>
-   <view name="view" output="o" type="timed" timestep="1"/>
+   <view name="view" output="o" type="timed" timestep="0.1"/>
   </views>
  </experiment>
 </vle_project>

@@ -12,7 +12,7 @@ LINK_DIRECTORIES(
   ${Boost_LIBRARY_DIRS})
 
 SET(SOURCES1_CPP A1.cpp A1.hpp B1.cpp B1.hpp C1.cpp C1.hpp D1.cpp D1.hpp sum.cpp
-  Executive.hpp Executive.cpp Controller.hpp Controller.cpp)
+  Perturb.cpp B3.cpp C3.cpp D3.cpp)
 
 ADD_LIBRARY(equation1 SHARED ${SOURCES1_CPP})
 
@@ -85,7 +85,9 @@ INSTALL(TARGETS equation3
   LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/simulator")
 
 INSTALL(FILES equation1.vpz equation2.vpz equation3.vpz equation4.vpz
-  equation5.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
+  equation5.vpz equation6.vpz equation7.vpz equation8.vpz equation9.vpz
+  equation10.vpz equation11.vpz equation12.vpz
+  DESTINATION "${VLE_SHARE_DIRS}/examples")
 
 INSTALL(FILES ${SOURCES1_CPP} ${SOURCES2_CPP} ${SOURCES3_CPP} DESTINATION
   "${VLE_SHARE_DIRS}/examples/sources/equation")

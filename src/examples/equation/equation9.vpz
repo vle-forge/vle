@@ -2,7 +2,7 @@
 <!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://vle.univ-littoral.fr/vle-0.8.0.dtd">
 <vle_project version="0.5" date="mar, 18 nov 2008" author="Eric Ramat">
 <structures>
-<model name="m" type="coupled" width="721" height="367"  >
+<model name="m" type="coupled" width="1008" height="544"  >
 <submodels>
 <model name="a" type="atomic" conditions="cond,cond_A" dynamics="dynA" observables="obsA" x="160" y="75" width="100" height="45" >
 <in>
@@ -45,11 +45,11 @@
 <connections>
 <connection type="internal">
  <origin model="a" port="update" />
- <destination model="b" port="update" />
+ <destination model="d" port="update" />
 </connection>
 <connection type="internal">
  <origin model="a" port="update" />
- <destination model="d" port="update" />
+ <destination model="b" port="update" />
 </connection>
 <connection type="internal">
  <origin model="b" port="update" />
@@ -71,7 +71,7 @@
 <dynamic name="dynB" library="equation1" model="B1" type="local"  />
 <dynamic name="dynC" library="equation1" model="C1" type="local"  />
 <dynamic name="dynD" library="equation1" model="D1" type="local"  />
-<dynamic name="dynPerturb" library="equation1" model="Perturb" type="local"  />
+<dynamic name="dynPerturb" library="equation1" model="Perturb6" type="local"  />
 </dynamics>
 <experiment name="exp" duration="20.000000000000000" begin="0.000000000000000" combination="linear" seed="12389" >
 <replicas seed="3499211612" number="1" />

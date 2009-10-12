@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_CASE(test_equation3)
 
 BOOST_AUTO_TEST_CASE(test_equation4)
 {
-    vpz::Vpz file(utils::Path::path().getExampleFile("equation5.vpz"));
+    vpz::Vpz file(utils::Path::path().getExampleFile("equation4.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
     o.setLocalStream("", "storage");
@@ -164,4 +164,352 @@ BOOST_AUTO_TEST_CASE(test_equation4)
     BOOST_REQUIRE_CLOSE(value::toDouble(result[3][10]), 55., 10e-5);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[4][10]), 176., 10e-5);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[5][10]), 867., 10e-5);
+}
+
+BOOST_AUTO_TEST_CASE(test_equation5)
+{
+    vpz::Vpz file(utils::Path::path().getExampleFile("equation5.vpz"));
+
+    vpz::Output& o(file.project().experiment().views().outputs().get("o"));
+    o.setLocalStream("", "storage");
+
+    manager::RunQuiet r;
+    r.start(file);
+
+    BOOST_REQUIRE_EQUAL(r.haveError(), false);
+    oov::OutputMatrixViewList& out(r.outputs());
+    BOOST_REQUIRE_EQUAL(out.size(),
+                        (oov::OutputMatrixViewList::size_type)1);
+
+    oov::OutputMatrix& view(out["view"]);
+    value::MatrixView result(view.values());
+
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+                        (value::MatrixView::size_type)5);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+                        (value::MatrixView::size_type)21);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][5]), 10., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][5]), 12., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][5]), 10., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][5]), 30., 10e-5);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][10]), 0., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][10]), 77., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][10]), 195., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][10]), 565., 10e-5);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][15]), 10., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][15]), 92., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][15]), 605., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][15]), 2770., 10e-5);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][20]), 0., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][20]), 157., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][20]), 1190., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][20]), 7480., 10e-5);
+}
+
+BOOST_AUTO_TEST_CASE(test_equation6)
+{
+    vpz::Vpz file(utils::Path::path().getExampleFile("equation6.vpz"));
+
+    vpz::Output& o(file.project().experiment().views().outputs().get("o"));
+    o.setLocalStream("", "storage");
+
+    manager::RunQuiet r;
+    r.start(file);
+
+    BOOST_REQUIRE_EQUAL(r.haveError(), false);
+    oov::OutputMatrixViewList& out(r.outputs());
+    BOOST_REQUIRE_EQUAL(out.size(),
+                        (oov::OutputMatrixViewList::size_type)1);
+
+    oov::OutputMatrix& view(out["view"]);
+    value::MatrixView result(view.values());
+
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+                        (value::MatrixView::size_type)5);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+                        (value::MatrixView::size_type)21);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][5]), 10., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][5]), 57., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][5]), 59., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][5]), 58., 10e-5);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][10]), 0., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][10]), 975., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][10]), 977., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][10]), 976., 10e-5);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][15]), 10., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][15]), 15673., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][15]), 15675., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][15]), 15674., 10e-5);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][20]), 0., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][20]), 250831., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][20]), 250833., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][20]), 250832., 10e-5);
+}
+
+BOOST_AUTO_TEST_CASE(test_equation7)
+{
+    vpz::Vpz file(utils::Path::path().getExampleFile("equation7.vpz"));
+
+    vpz::Output& o(file.project().experiment().views().outputs().get("o"));
+    o.setLocalStream("", "storage");
+
+    manager::RunQuiet r;
+    r.start(file);
+
+    BOOST_REQUIRE_EQUAL(r.haveError(), false);
+    oov::OutputMatrixViewList& out(r.outputs());
+    BOOST_REQUIRE_EQUAL(out.size(),
+                        (oov::OutputMatrixViewList::size_type)1);
+
+    oov::OutputMatrix& view(out["view"]);
+    value::MatrixView result(view.values());
+
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+                        (value::MatrixView::size_type)4);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+                        (value::MatrixView::size_type)21);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][5]), 10., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][5]), 22., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][5]), 41., 10e-5);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][10]), 0., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][10]), 77., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][10]), 341., 10e-5);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][15]), 10., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][15]), 102., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][15]), 786., 10e-5);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][20]), 0., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][20]), 157., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][20]), 1486., 10e-5);
+}
+
+BOOST_AUTO_TEST_CASE(test_equation8)
+{
+    vpz::Vpz file(utils::Path::path().getExampleFile("equation8.vpz"));
+
+    vpz::Output& o(file.project().experiment().views().outputs().get("o"));
+    o.setLocalStream("", "storage");
+
+    manager::RunQuiet r;
+    r.start(file);
+
+    BOOST_REQUIRE_EQUAL(r.haveError(), false);
+    oov::OutputMatrixViewList& out(r.outputs());
+    BOOST_REQUIRE_EQUAL(out.size(),
+                        (oov::OutputMatrixViewList::size_type)1);
+
+    oov::OutputMatrix& view(out["view"]);
+    value::MatrixView result(view.values());
+
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+                        (value::MatrixView::size_type)5);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+                        (value::MatrixView::size_type)21);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][5]), 10., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][5]), 22., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][5]), 10., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][5]), 31., 10e-5);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][10]), 0., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][10]), 77., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][10]), 0., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][10]), 561., 10e-5);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][15]), 10., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][15]), 102., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][15]), 10., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][15]), 1411., 10e-5);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][20]), 0., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][20]), 157., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][20]), 0., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][20]), 2741., 10e-5);
+}
+
+BOOST_AUTO_TEST_CASE(test_equation9)
+{
+    vpz::Vpz file(utils::Path::path().getExampleFile("equation9.vpz"));
+
+    vpz::Output& o(file.project().experiment().views().outputs().get("o"));
+    o.setLocalStream("", "storage");
+
+    manager::RunQuiet r;
+    r.start(file);
+
+    BOOST_REQUIRE_EQUAL(r.haveError(), false);
+    oov::OutputMatrixViewList& out(r.outputs());
+    BOOST_REQUIRE_EQUAL(out.size(),
+                        (oov::OutputMatrixViewList::size_type)1);
+
+    oov::OutputMatrix& view(out["view"]);
+    value::MatrixView result(view.values());
+
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+                        (value::MatrixView::size_type)5);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+                        (value::MatrixView::size_type)21);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][5]), 11., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][5]), 18., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][5]), 10., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][5]), 31., 10e-5);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][10]), 3., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][10]), 49., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][10]), 196., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][10]), 605., 10e-5);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][15]), 13., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][15]), 94., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][15]), 511., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][15]), 2500., 10e-5);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][20]), 11., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][20]), 115., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][20]), 1006., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][20]), 6541., 10e-5);
+}
+
+BOOST_AUTO_TEST_CASE(test_equation10)
+{
+    vpz::Vpz file(utils::Path::path().getExampleFile("equation10.vpz"));
+
+    vpz::Output& o(file.project().experiment().views().outputs().get("o"));
+    o.setLocalStream("", "storage");
+
+    manager::RunQuiet r;
+    r.start(file);
+
+    BOOST_REQUIRE_EQUAL(r.haveError(), false);
+    oov::OutputMatrixViewList& out(r.outputs());
+    BOOST_REQUIRE_EQUAL(out.size(),
+                        (oov::OutputMatrixViewList::size_type)1);
+
+    oov::OutputMatrix& view(out["view"]);
+    value::MatrixView result(view.values());
+
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+                        (value::MatrixView::size_type)5);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+                        (value::MatrixView::size_type)21);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][5]), 75., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][5]), 10., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][5]), 15., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][5]), 25., 10e-5);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][10]), 730., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][10]), 0., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][10]), 80., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][10]), 225., 10e-5);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][15]), 3130., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][15]), 10., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][15]), 95., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][15]), 650., 10e-5);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][20]), 8110., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][20]), 0., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][20]), 160., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][20]), 1250., 10e-5);
+}
+
+BOOST_AUTO_TEST_CASE(test_equation11)
+{
+    vpz::Vpz file(utils::Path::path().getExampleFile("equation11.vpz"));
+
+    vpz::Output& o(file.project().experiment().views().outputs().get("o"));
+    o.setLocalStream("", "storage");
+
+    manager::RunQuiet r;
+    r.start(file);
+
+    BOOST_REQUIRE_EQUAL(r.haveError(), false);
+    oov::OutputMatrixViewList& out(r.outputs());
+    BOOST_REQUIRE_EQUAL(out.size(),
+                        (oov::OutputMatrixViewList::size_type)1);
+
+    oov::OutputMatrix& view(out["view"]);
+    value::MatrixView result(view.values());
+
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+                        (value::MatrixView::size_type)5);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+                        (value::MatrixView::size_type)21);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][5]), 60., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][5]), 10., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][5]), 15., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][5]), 10., 10e-5);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][10]), 430., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][10]), 0., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][10]), 80., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][10]), 0., 10e-5);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][15]), 1290., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][15]), 10., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][15]), 95., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][15]), 10., 10e-5);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][20]), 2460., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][20]), 0., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][20]), 160., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][20]), 0., 10e-5);
+}
+
+BOOST_AUTO_TEST_CASE(test_equation12)
+{
+    vpz::Vpz file(utils::Path::path().getExampleFile("equation12.vpz"));
+
+    vpz::Output& o(file.project().experiment().views().outputs().get("o"));
+    o.setLocalStream("", "storage");
+
+    manager::RunQuiet r;
+    r.start(file);
+
+    BOOST_REQUIRE_EQUAL(r.haveError(), false);
+    oov::OutputMatrixViewList& out(r.outputs());
+    BOOST_REQUIRE_EQUAL(out.size(),
+                        (oov::OutputMatrixViewList::size_type)1);
+
+    oov::OutputMatrix& view(out["view"]);
+    value::MatrixView result(view.values());
+
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+                        (value::MatrixView::size_type)5);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+                        (value::MatrixView::size_type)21);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][5]), 7., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][5]), 12., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][5]), 10., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][5]), 27., 10e-5);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][10]), 14., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][10]), 62., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][10]), 165., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][10]), 504., 10e-5);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][15]), 21., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][15]), 147., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][15]), 640., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][15]), 2681., 10e-5);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][20]), 28., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][20]), 267., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][20]), 1610., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][20]), 8683., 10e-5);
 }
