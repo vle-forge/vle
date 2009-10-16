@@ -22,7 +22,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include <cerrno>
 #include <cstdio>
 #include <glibmm/spawn.h>
@@ -38,24 +37,23 @@
 #include <vle/value/Set.hpp>
 #include <vle/value/Integer.hpp>
 
-
-
-namespace vle { namespace manager {
+namespace vle {
+namespace manager {
 
 ManagerRun::~ManagerRun()
 {
     delete m_exp;
 }
 
-ExperimentGenerator* ManagerRun::getCombinationPlan(
-    const vpz::Vpz& file, std::ostream& out)
+ExperimentGenerator* ManagerRun::getCombinationPlan(const vpz::Vpz& file,
+        std::ostream& out)
 {
     const vpz::Experiment& exp = file.project().experiment();
 
     if (exp.combination() == "linear") {
-        return new LinearExperimentGenerator(file, out, m_rand);
+        return new LinearExperimentGenerator(file, out, m_storecomb, m_rand);
     } else {
-        return new TotalExperimentGenerator(file, out, m_rand);
+        return new TotalExperimentGenerator(file, out, m_storecomb, m_rand);
     }
 }
 
@@ -95,15 +93,15 @@ void ManagerRunMono::operator()(const std::string& filename)
 
 void ManagerRunThread::operator()(const vpz::Vpz& file)
 {
-    m_out << fmt(_("Manager: run experimental frames in %1% threads\n")) %
-        m_process;
+    m_out << fmt(_("Manager: run experimental frames in %1% threads\n"))
+            % m_process;
 
     initRandomGenerator(file);
     m_exp = getCombinationPlan(file, m_out);
     m_exp->saveVPZinstance(m_writefile);
 
-    Glib::Thread* prod(Glib::Thread::create(
-            sigc::mem_fun(*this, &ManagerRunThread::read), true));
+    Glib::Thread* prod(Glib::Thread::create(sigc::mem_fun(*this,
+            &ManagerRunThread::read), true));
 
     for (unsigned int i = 0; i < m_process; ++i) {
         m_pool.push(sigc::mem_fun(*this, &ManagerRunThread::run));
@@ -114,8 +112,8 @@ void ManagerRunThread::operator()(const vpz::Vpz& file)
 
     if (utils::Trace::trace().haveWarning()) {
         m_out << fmt(_(
-            "\n/!\\ Some warnings during simulation: See file %1%\n")) %
-            utils::Trace::trace().getLogFile();
+                "\n/!\\ Some warnings during simulation: See file %1%\n"))
+                % utils::Trace::trace().getLogFile();
     }
 
     m_out << std::endl;
@@ -157,7 +155,6 @@ void ManagerRunThread::run()
             while (m_exp->vpzInstances().empty() and not m_finish) {
                 m_prodcond.wait(m_mutex);
             }
-
             if (not m_exp->vpzInstances().empty()) {
                 file = m_exp->vpzInstances().front();
                 m_exp->vpzInstances().pop_front();
@@ -192,12 +189,13 @@ void ManagerRunThread::run()
 }
 
 ManagerRunDistant::ManagerRunDistant(std::ostream& out, bool writefile,
-                                     RandPtr rnd) :
-    ManagerRun(out, writefile, rnd)
+        bool storecomb, RandPtr rnd) :
+    ManagerRun(out, writefile, storecomb, rnd)
 {
     try {
         mHost.read();
-    } catch(const std::exception& e) {
+    }
+    catch(const std::exception& e) {
         m_out << fmt(_("manager parsing host file error: %1%\n")) % e.what();
     }
 }
@@ -214,9 +212,8 @@ vpz::Vpz* ManagerRunDistant::getVpz()
             while (m_exp->vpzInstances().empty() and not m_finish) {
                 m_prodcond.wait(m_mutex);
             }
-
             if (not m_exp->vpzInstances().empty()) {
-                file  = m_exp->vpzInstances().front();
+                file = m_exp->vpzInstances().front();
                 m_exp->vpzInstances().pop_front();
                 return file;
             }
@@ -252,19 +249,19 @@ void ManagerRunDistant::operator()(const vpz::Vpz& file)
 
     m_exp = getCombinationPlan(file, m_out);
 
-    Glib::Thread* prod(Glib::Thread::create(
-            sigc::mem_fun(*this, &ManagerRunDistant::read), true));
+    Glib::Thread* prod(Glib::Thread::create(sigc::mem_fun(*this,
+            &ManagerRunDistant::read), true));
 
-    Glib::Thread* cond(Glib::Thread::create(
-            sigc::mem_fun(*this, &ManagerRunDistant::send), true));
+    Glib::Thread* cond(Glib::Thread::create(sigc::mem_fun(*this,
+            &ManagerRunDistant::send), true));
 
     prod->join();
     cond->join();
 
     if (utils::Trace::trace().haveWarning()) {
         m_out << fmt(_(
-            "\n/!\\ Some warnings during simulation: See file %1%\n")) %
-            utils::Trace::trace().getLogFile();
+                "\n/!\\ Some warnings during simulation: See file %1%\n"))
+                % utils::Trace::trace().getLogFile();
     }
 }
 
@@ -283,13 +280,13 @@ void ManagerRunDistant::read()
 void ManagerRunDistant::send()
 {
     openConnectionWithSimulators();
-    Assert < utils::InternalError >(not mClients.empty(),
-           _("Manager have no simulator connection."));
+    Assert<utils::InternalError> (not mClients.empty(),
+            _("Manager have no simulator connection."));
 
     const utils::Hosts::SetHosts hosts = mHost.hosts();
 
     utils::Hosts::SetHosts::const_iterator ithost = hosts.begin();
-    std::list < utils::net::Client*>::iterator itclient = mClients.begin();
+    std::list<utils::net::Client*>::iterator itclient = mClients.begin();
     ithost = hosts.begin();
     itclient = mClients.begin();
 
@@ -297,8 +294,8 @@ void ManagerRunDistant::send()
 
     while (getVpzNumber() > 0) {
         if (ithost != hosts.end()) {
-            int nbfiletosend = (*ithost).process() -
-                getCurrentNumberVpzi(*(*itclient));
+            int nbfiletosend = (*ithost).process() - getCurrentNumberVpzi(
+                    *(*itclient));
 
             getResult(*(*itclient));
 
@@ -325,22 +322,26 @@ void ManagerRunDistant::openConnectionWithSimulators()
     utils::Hosts::SetHosts::const_iterator ithost = hosts.begin();
 
     m_out << fmt(_(
-        "Manager: try to open connection with %1% simulators\n")) %
-        mHost.hosts().size();
+            "Manager: try to open connection with %1% simulators\n"))
+            % mHost.hosts().size();
 
     while (ithost != hosts.end()) {
         utils::net::Client* client = 0;
         try {
-            m_out << fmt(_("Manager: try to open %1% on %2%\n")) %
-                (*ithost).hostname() % (*ithost).port();
+            m_out << fmt(_("Manager: try to open %1% on %2%\n"))
+                    % (*ithost).hostname() % (*ithost).port();
 
             client = new utils::net::Client((*ithost).hostname(),
-                                            (*ithost).port());
+                    (*ithost).port());
             mClients.push_back(client);
-        } catch (const std::exception& e) {
-            m_out << fmt(_(
-                "Manager: Can not connect %1% simulator on port %2%: %3%\n")) %
-                (*ithost).hostname() % (*ithost).port() % e.what();
+        }
+        catch (const std::exception& e) {
+            m_out
+                    << fmt(
+                            _(
+                                    "Manager: Can not connect %1% simulator on port %2%: %3%\n"))
+                            % (*ithost).hostname() % (*ithost).port()
+                            % e.what();
         }
         ++ithost;
     }
@@ -348,7 +349,7 @@ void ManagerRunDistant::openConnectionWithSimulators()
 
 void ManagerRunDistant::closeConnectionWithSimulators()
 {
-    std::list < utils::net::Client* >::iterator it = mClients.begin();
+    std::list<utils::net::Client*>::iterator it = mClients.begin();
     while (it != mClients.end()) {
         (*it)->sendString("exit");
         getResult(*(*it));
@@ -365,7 +366,8 @@ gint32 ManagerRunDistant::getMaxProcessor(utils::net::Client& cl)
     try {
         cl.sendString("proc");
         maxprocess = cl.recvInteger();
-    } catch (const std::exception& e) {
+    }
+    catch (const std::exception& e) {
         m_out << fmt(_("Manager: error get max processor: %1%\n")) % e.what();
     }
     return maxprocess;
@@ -377,7 +379,8 @@ gint32 ManagerRunDistant::getCurrentNumberVpzi(utils::net::Client& cl)
     try {
         cl.sendString("size");
         current = cl.recvInteger();
-    } catch (const std::exception& e) {
+    }
+    catch (const std::exception& e) {
         m_out << fmt(_("Manager: error get number vpz: %1%\n")) % e.what();
     }
     return current;
@@ -421,20 +424,22 @@ void ManagerRunDistant::getResult(utils::net::Client& cl)
                 }
             }
         }
-    } catch (const std::exception& e) {
+    }
+    catch (const std::exception& e) {
         m_out << fmt(_("Manager: error get result: %1%")) % e.what();
     }
 }
 
 void ManagerRunDistant::sendVpzi(utils::net::Client& cl,
-                                 const Glib::ustring& file)
+        const Glib::ustring& file)
 {
     try {
         cl.sendString("file");
         cl.sendInteger(file.size());
         std::string tmp = cl.recvString();
         cl.sendBuffer(file);
-    } catch (const std::exception& e) {
+    }
+    catch (const std::exception& e) {
         m_out << fmt(_("Manager: error send vpz %1%: %2%\n")) % file % e.what();
     }
 }
@@ -443,11 +448,11 @@ void ManagerRun::initRandomGenerator(const vpz::Vpz& file)
 {
     if (m_rand.get() == 0) {
         m_out << _("Use the seed from vpz::Vpz replicas tags\n");
-        m_rand = boost::shared_ptr < utils::Rand >(new utils::Rand());
+        m_rand = boost::shared_ptr<utils::Rand>(new utils::Rand());
 
-        Assert < utils::ArgError >(
-               file.project().experiment().replicas().number() > 0,
-               fmt(_("The replicas's tag does not defined")));
+        Assert<utils::ArgError> (
+                file.project().experiment().replicas().number() > 0, fmt(
+                        _("The replicas's tag does not defined")));
 
         m_rand->seed(file.project().experiment().replicas().seed());
     }

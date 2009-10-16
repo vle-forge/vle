@@ -22,44 +22,47 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_MANAGER_LINEAREXPERIMENTGENERATOR_HPP
 #define VLE_MANAGER_LINEAREXPERIMENTGENERATOR_HPP
 
 #include <vle/manager/ExperimentGenerator.hpp>
 #include <vle/manager/DllDefines.hpp>
 
-namespace vle { namespace manager {
+namespace vle {
+namespace manager {
+
+/**
+ * @brief A class to translate Experiment file into Instance of Experiment.
+ */
+class VLE_MANAGER_EXPORT LinearExperimentGenerator: public ExperimentGenerator
+{
+public:
+    /**
+     * Just get a constant reference to VPZ. Use get_instances_files() to
+     * generate all VPZ instance file.
+     *
+     */
+    LinearExperimentGenerator(const vpz::Vpz& file, std::ostream& out,
+            bool storecomb, RandPtr rnd) :
+        ExperimentGenerator(file, out, storecomb, rnd)
+    {
+    }
+
+    virtual ~LinearExperimentGenerator()
+    {
+    }
+
+    virtual void buildCombination(size_t& nb);
 
     /**
-     * @brief A class to translate Experiment file into Instance of Experiment.
+     * @brief Get the number of combination from vpz file.
+     *
+     * @return A value greater than 0.
      */
-    class VLE_MANAGER_EXPORT LinearExperimentGenerator : public ExperimentGenerator
-    {
-    public:
-        /**
-         * Just get a constant reference to VPZ. Use get_instances_files() to
-         * generate all VPZ instance file.
-         *
-         */
-        LinearExperimentGenerator(const vpz::Vpz& file, std::ostream& out,
-                                  RandPtr rnd) :
-            ExperimentGenerator(file, out, rnd)
-        { }
+    virtual size_t getCombinationNumber() const;
+};
 
-        virtual ~LinearExperimentGenerator()
-        { }
-
-        virtual void buildCombination(size_t& nb);
-
-        /**
-         * @brief Get the number of combination from vpz file.
-         *
-         * @return A value greater than 0.
-         */
-        virtual size_t getCombinationNumber() const;
-    };
-
-}} // namespace vle manager
+}
+} // namespace vle manager
 
 #endif

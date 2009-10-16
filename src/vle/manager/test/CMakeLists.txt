@@ -26,4 +26,20 @@ TARGET_LINK_LIBRARIES(test_experimentalframes
   vlevpz
   vlemanager)
 
-ADD_TEST(managertest test_experimentalframes)
+ADD_EXECUTABLE(test_combination_storage test2.cpp)
+TARGET_LINK_LIBRARIES(test_combination_storage
+  ${GLIBMM_LIBRARIES}
+  ${LIBXML_LIBRARIES}
+  ${GTHREAD_LIBRARIES}
+  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
+  vlegeometry
+  vleutils
+  vledata
+  vlevalue
+  vlegraph
+  vledevs
+  vlevpz
+  vlemanager)
+
+ADD_TEST(manager_test_exp test_experimentalframes)
+ADD_TEST(manager_combination_storage test_combination_storage)

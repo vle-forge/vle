@@ -22,37 +22,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include <vle/manager/ExperimentGenerator.hpp>
 #include <vle/vpz/Conditions.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/value/Set.hpp>
 #include <fstream>
+#include <iostream>
 
-
-
-namespace vle { namespace manager {
+namespace vle {
+namespace manager {
 
 ExperimentGenerator::ExperimentGenerator(const vpz::Vpz& file,
-                                         std::ostream& out,
-                                         RandPtr rnd) :
-    mFile(file),
-    mTmpfile(file),
-    mOut(out),
-    mSaveVpz(false),
-    mMutex(0),
-    mProdcond(0),
-    mRand(rnd)
+        std::ostream& out, bool storecomb, RandPtr rnd) :
+    mFile(file), mTmpfile(file), mOut(out), mSaveVpz(false), mStoreComb(
+            storecomb), mMutex(0), mProdcond(0), mRand(rnd)
 {
     vpz::Conditions& dest(mTmpfile.project().experiment().conditions());
     vpz::ConditionList::const_iterator itDest(dest.conditionlist().begin());
-    vpz::ConditionValues::const_iterator
-        itValueDest(itDest->second.conditionvalues().begin());
+    vpz::ConditionValues::const_iterator itValueDest(
+            itDest->second.conditionvalues().begin());
 
     const vpz::Conditions& orig(mFile.project().experiment().conditions());
     vpz::ConditionList::const_iterator itOrig(orig.conditionlist().begin());
-    vpz::ConditionValues::const_iterator
-        itValueOrig(itOrig->second.conditionvalues().begin());
+    vpz::ConditionValues::const_iterator itValueOrig(
+            itOrig->second.conditionvalues().begin());
 
     mTmpfile.project().experiment().conditions().rebuildValueSet();
 }
@@ -73,15 +66,15 @@ void ExperimentGenerator::build(OutputSimulationMatrix* matrix)
 
     OutputSimulationMatrix::extent_gen extent;
 
-    mOut << fmt(_("Generator: build (%1% rep. x %2% cmb.)\n")) %
-        mReplicasTab.size() % getCombinationNumber();
+    mOut << fmt(_("Generator: build (%1% rep. x %2% cmb.)\n"))
+            % mReplicasTab.size() % getCombinationNumber();
     mMatrix->resize(extent[mReplicasTab.size()][getCombinationNumber()]);
 
     buildCombinations();
 }
 
 void ExperimentGenerator::build(Glib::Mutex* mutex, Glib::Cond* prod,
-                                OutputSimulationMatrix* matrix)
+        OutputSimulationMatrix* matrix)
 {
     mMutex = mutex;
     mProdcond = prod;
@@ -89,12 +82,11 @@ void ExperimentGenerator::build(Glib::Mutex* mutex, Glib::Cond* prod,
 
     buildReplicasList();
     buildConditionsList();
-
     {
         Glib::Mutex::Lock lock(*mMutex);
         OutputSimulationMatrix::extent_gen extent;
-        mOut << fmt(_("Generator: build (%1% rep. x %2% cmb.)\n")) %
-            mReplicasTab.size() % getCombinationNumber();
+        mOut << fmt(_("Generator: build (%1% rep. x %2% cmb.)\n"))
+                % mReplicasTab.size() % getCombinationNumber();
         mMatrix->resize(extent[mReplicasTab.size()][getCombinationNumber()]);
     }
 
@@ -103,12 +95,12 @@ void ExperimentGenerator::build(Glib::Mutex* mutex, Glib::Cond* prod,
 
 void ExperimentGenerator::buildReplicasList()
 {
-    Assert < utils::ArgError >(mFile.project().experiment().replicas().number() > 0,
-                               _("The replicas's tag is not defined in the vpz file"));
+    Assert<utils::ArgError> (mFile.project().experiment().replicas().number()
+            > 0, _("The replicas's tag is not defined in the vpz file"));
 
     mReplicasTab.resize(mFile.project().experiment().replicas().number());
-    for (std::vector < guint32 >::iterator it = mReplicasTab.begin();
-         it != mReplicasTab.end(); ++it) {
+    for (std::vector<guint32>::iterator it = mReplicasTab.begin(); it
+            != mReplicasTab.end(); ++it) {
         *it = mRand->getInt();
     }
 }
@@ -118,14 +110,13 @@ void ExperimentGenerator::buildConditionsList()
     const vpz::Conditions& cnds(mFile.project().experiment().conditions());
     vpz::ConditionList::const_iterator it;
 
-    for (it = cnds.conditionlist().begin();
-         it != cnds.conditionlist().end(); ++it) {
+    for (it = cnds.conditionlist().begin(); it != cnds.conditionlist().end(); ++it) {
         const vpz::Condition& cnd(it->second);
         vpz::ConditionValues::const_iterator jt;
 
         if (not cnd.conditionvalues().empty()) {
-            for (jt = cnd.conditionvalues().begin();
-                 jt != cnd.conditionvalues().end(); ++jt) {
+            for (jt = cnd.conditionvalues().begin(); jt
+                    != cnd.conditionvalues().end(); ++jt) {
                 mCondition.push_back(cond_t());
 
                 mCondition[mCondition.size() - 1].sz = jt->second->size();
@@ -141,8 +132,10 @@ void ExperimentGenerator::buildConditionsList()
 
 void ExperimentGenerator::buildCombinations()
 {
+    if (mStoreComb) {
+        mCombinationDiff.resize(getCombinationNumber());
+    }
     size_t nb = 0;
-
     do {
         mTmpfile.project().experiment().conditions().rebuildValueSet();
         buildCombinationsFromReplicas(nb);
@@ -154,23 +147,28 @@ void ExperimentGenerator::buildCombinationsFromReplicas(size_t cmbnumber)
 {
     vpz::Conditions& dest(mTmpfile.project().experiment().conditions());
     vpz::ConditionList::const_iterator itDest(dest.conditionlist().begin());
-    vpz::ConditionValues::const_iterator
-        itValueDest(itDest->second.conditionvalues().begin());
+    vpz::ConditionValues::const_iterator itValueDest(
+            itDest->second.conditionvalues().begin());
 
     const vpz::Conditions& orig(mFile.project().experiment().conditions());
     vpz::ConditionList::const_iterator itOrig(orig.conditionlist().begin());
-    vpz::ConditionValues::const_iterator
-        itValueOrig(itOrig->second.conditionvalues().begin());
+    vpz::ConditionValues::const_iterator itValueOrig(
+            itOrig->second.conditionvalues().begin());
 
-    Assert < utils::InternalError >(
-        dest.conditionlist().size() == orig.conditionlist().size(),
-        fmt(_("Error: %1% %2% %3%\n")) % dest.conditionlist().size() %
-        orig.conditionlist().size() % mCondition.size());
-
+    Assert<utils::InternalError> (dest.conditionlist().size()
+            == orig.conditionlist().size(), fmt(_("Error: %1% %2% %3%\n"))
+            % dest.conditionlist().size() % orig.conditionlist().size()
+            % mCondition.size());
     for (size_t jcom = 0; jcom < mCondition.size(); ++jcom) {
         if (not itOrig->second.conditionvalues().empty()) {
             size_t index = mCondition[jcom].pos;
             value::Value& val = itValueOrig->second->get(index);
+
+            if (mStoreComb && (index != 0)) {
+                diff_key_t key(itOrig, itValueOrig);
+                mCombinationDiff[cmbnumber].insert(std::pair<diff_key_t, int>(
+                        key, index));
+            }
             itValueDest->second->clear();
             itValueDest->second->add(val);
 
@@ -178,11 +176,11 @@ void ExperimentGenerator::buildCombinationsFromReplicas(size_t cmbnumber)
             itValueOrig++;
 
             if (itValueDest == itDest->second.conditionvalues().end()) {
-                Assert < utils::InternalError >(itValueOrig ==
-                                                itOrig->second.conditionvalues().end(),
-                                                fmt(_("Error: %1% %2%\n")) %
-                                                itDest->second.conditionvalues().size() %
-                                                itOrig->second.conditionvalues().size());
+                Assert<utils::InternalError> (itValueOrig
+                        == itOrig->second.conditionvalues().end(), fmt(
+                        _("Error: %1% %2%\n"))
+                        % itDest->second.conditionvalues().size()
+                        % itOrig->second.conditionvalues().size());
                 itDest++;
                 itOrig++;
                 itValueDest = itDest->second.conditionvalues().begin();
@@ -207,13 +205,14 @@ void ExperimentGenerator::buildCombinationsFromReplicas(size_t cmbnumber)
             writeInstanceThread(cmbnumber, irep);
         }
     }
+
 }
 
 void ExperimentGenerator::writeInstance(size_t cmbnumber, size_t replnumber)
 {
     std::string expname(
-        (fmt(_("%1%-%2%-%3%")) % mFile.project().experiment().
-         name() % cmbnumber % replnumber).str());
+            (fmt(_("%1%-%2%-%3%")) % mFile.project().experiment(). name()
+                    % cmbnumber % replnumber).str());
 
     mTmpfile.project().experiment().setName(expname);
     vpz::Vpz* newvpz = new vpz::Vpz(mTmpfile);
@@ -230,12 +229,12 @@ void ExperimentGenerator::writeInstance(size_t cmbnumber, size_t replnumber)
     mFileList.push_back(newvpz);
 }
 
-
-void ExperimentGenerator::writeInstanceThread(size_t cmbnumber, size_t replnumber)
+void ExperimentGenerator::writeInstanceThread(size_t cmbnumber,
+        size_t replnumber)
 {
     std::string expname(
-        (fmt(_("%1%-%2%-%3%")) % mFile.project().experiment().
-         name() % cmbnumber % replnumber).str());
+            (fmt(_("%1%-%2%-%3%")) % mFile.project().experiment(). name()
+                    % cmbnumber % replnumber).str());
 
     mTmpfile.project().experiment().setName(expname);
     vpz::Vpz* newvpz = new vpz::Vpz(mTmpfile);
@@ -259,6 +258,37 @@ void ExperimentGenerator::writeInstanceThread(size_t cmbnumber, size_t replnumbe
 size_t ExperimentGenerator::getReplicasNumber() const
 {
     return mReplicasTab.size();
+}
+
+const value::Value&
+ExperimentGenerator::getInputFromCombination(unsigned int comb,
+        const std::string& condition, const std::string& port) const
+{
+
+    const vpz::ConditionList& orig(
+            mFile.project().experiment().conditions().conditionlist());
+    vpz::ConditionList::const_iterator itOrig = orig.find(condition);
+    if (itOrig == orig.end()) {
+        throw utils::ArgError(fmt(_("Condition %1% does not exist."))
+                % condition);
+    }
+    const vpz::ConditionValues& origValues(itOrig->second.conditionvalues());
+    vpz::ConditionValues::const_iterator itOrigValues = origValues.find(port);
+    if (itOrigValues == origValues.end()) {
+        throw utils::ArgError(fmt(_("Port %1% does not exist.")) % port);
+    }
+    diff_key_t key(itOrig, itOrigValues);
+    if (comb > mCombinationDiff.size() - 1) {
+        throw utils::ArgError(fmt(_("Combination number %1% does not exist."))
+                % comb);
+    }
+    diff_t::const_iterator itDiff = mCombinationDiff[comb].find(key);
+
+    if (itDiff != mCombinationDiff[comb].end()) {
+        return itOrigValues->second->get(itDiff->second);
+    } else {
+        return itOrigValues->second->get(0);
+    }
 }
 
 }} // namespace vle manager

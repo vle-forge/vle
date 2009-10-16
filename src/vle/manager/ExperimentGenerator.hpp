@@ -22,7 +22,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef VLE_MANAGER_EXPERIMENTGENERATOR_HPP
 #define VLE_MANAGER_EXPERIMENTGENERATOR_HPP
 
@@ -34,6 +33,7 @@
 #include <vector>
 #include <list>
 #include <glibmm/thread.h>
+#include <utility>
 
 namespace vle { namespace manager {
 
@@ -52,7 +52,7 @@ namespace vle { namespace manager {
          * @param rnd A reference random number generator.
          */
         ExperimentGenerator(const vpz::Vpz& file, std::ostream& out,
-                            RandPtr rnd);
+                            bool storecomb, RandPtr rnd);
 
         virtual ~ExperimentGenerator();
 
@@ -61,7 +61,9 @@ namespace vle { namespace manager {
          * @return the list of filename.
          */
         std::list < vpz::Vpz* >& vpzInstances()
-        { return mFileList; }
+        {
+            return mFileList;
+        }
 
         void build(OutputSimulationMatrix* matrix);
 
@@ -75,7 +77,23 @@ namespace vle { namespace manager {
          * The default option is to remove file.
          */
         void saveVPZinstance(bool save = false)
-        { mSaveVpz = save; }
+        {
+            mSaveVpz = save;
+        }
+
+        /**
+         * @brief Get the input value used for simulating a given combination
+         *
+         * @param comb number of combination
+         * @param condition name of a condition
+         * @param port name of a port from the condition
+         * @return the value, on port port_name of condition condition_name,
+         *  used for simulation of combination comb
+         */
+        const value::Value&
+            getInputFromCombination(unsigned int comb,
+                                    const std::string& condition,
+                                    const std::string& port) const;
 
     protected:
         /**
@@ -134,28 +152,53 @@ namespace vle { namespace manager {
         /**
          * @brief Define a condition used to generate combination list.
          */
-        struct cond_t {
-            cond_t() : sz(0), pos(0) { }
+        struct cond_t
+        {
+            cond_t() : sz(0), pos(0) {}
 
-            size_t  sz;
-            size_t  pos;
+            size_t sz;
+            size_t pos;
         };
 
         void cleanCondition(vpz::Vpz& file);
 
-        const vpz::Vpz&             mFile;
-        vpz::Vpz                    mTmpfile;
-        std::ostream&               mOut;
-        std::vector < guint32 >     mReplicasTab;
-        std::vector < cond_t >      mCondition;
-        std::list < vpz::Vpz* >     mFileList;
-        bool                        mSaveVpz;
-        OutputSimulationMatrix*     mMatrix;
-        Glib::Mutex*                mMutex;
-        Glib::Cond*                 mProdcond;
-        RandPtr                     mRand;
+        /**
+         * @brief Define a structure that stores the differences
+         * between the default condition values and a combination
+         */
+        typedef std::pair<vpz::ConditionList::const_iterator,
+                vpz::ConditionValues::const_iterator> diff_key_t;
+
+        struct less_diff_keys
+        {
+            bool operator()(diff_key_t s1, diff_key_t s2) const
+            {
+                int comp = s1.first->first.compare(s2.first->first);
+                if (comp == 0) {
+                    comp = s1.second->first.compare(s2.second->first);
+                }
+                return comp < 0;
+            }
+        };
+
+        typedef std::map < diff_key_t, int, less_diff_keys > diff_t;
+
+        const vpz::Vpz& mFile;
+        vpz::Vpz mTmpfile;
+        std::ostream& mOut;
+        std::vector < guint32 > mReplicasTab;
+        std::vector < cond_t > mCondition;
+        std::vector < diff_t > mCombinationDiff;
+        std::list< vpz::Vpz* > mFileList;
+        bool mSaveVpz;
+        bool mStoreComb;
+        OutputSimulationMatrix* mMatrix;
+        Glib::Mutex* mMutex;
+        Glib::Cond* mProdcond;
+        RandPtr mRand;
     };
 
-}} // namespace vle manager
+}
+} // namespace vle manager
 
 #endif
