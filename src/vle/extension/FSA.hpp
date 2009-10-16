@@ -35,7 +35,6 @@
 
 namespace vle { namespace extension {
 
-template < typename C >
 class Base : public vle::devs::Dynamics
 {
 public:
@@ -50,9 +49,9 @@ public:
      * @brief Specify the initial state.
      * @param state the name of initial state.
      */
-    void initialState(const C& state);
+    void initialState(int state);
 
-    typedef std::vector < C > States;
+    typedef std::vector < int > States;
 
     States& states() { return mStates; }
 
@@ -60,26 +59,25 @@ public:
         const vle::devs::ObservationEvent& event) const
     {
         if (event.onPort("state")) {
-            return buildString((boost::format("%1%") %
-                                Base<C>::currentState()).str());
+            return buildInteger(currentState());
         }
         return 0;
     }
 
 protected:
-    C currentState() const
+    int currentState() const
     { return mCurrentState; }
 
-    void currentState(C newState)
+    void currentState(int newState)
     { mCurrentState = newState; }
 
-    bool existState(C state) const
+    bool existState(int state) const
     {
         return std::find(mStates.begin(), mStates.end(), state) !=
             mStates.end();
     }
 
-    C initialState() const
+    int initialState() const
     { return mInitialState; }
 
     bool isInit() const
@@ -92,63 +90,14 @@ private:
     // initial state is defined
     bool mInit;
     // Initial state
-    C mInitialState;
+    int mInitialState;
     // Current state
-    C mCurrentState;
+    int mCurrentState;
 
 protected:
     // List of states
     States mStates;
 };
-
-/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
-
-struct VLE_EXTENSION_EXPORT Var
-{
-    Var(const std::string& name) : name(name)  { }
-    Var(const std::string& name,
-        const vle::devs::ExternalEvent* event) :
-        name(name),
-        value(event->getDoubleAttributeValue("value")) { }
-    virtual Var& operator=(double v) { value = v; return *this; }
-
-    std::string name;
-    double value;
-};
-
-double VLE_EXTENSION_EXPORT
-operator<<(double& value, const Var& var);
-
-vle::devs::ExternalEventList& VLE_EXTENSION_EXPORT
-operator<<(vle::devs::ExternalEventList& output, const Var& var);
-
-/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
-
-template < typename C >
-void Base<C>::initialState(const C& state)
-{
-    vle::Assert <vle::utils::InternalError>(
-        existState(state), boost::format(
-            "FSA::Base model, unknow state %1%") % state);
-
-    mInitialState = state;
-    mInit = true;
-}
-
-template < typename C >
-vle::devs::ExternalEvent* Base<C>::cloneExternalEvent(
-    vle::devs::ExternalEvent* event) const
-{
-    vle::devs::ExternalEvent* ee = new vle::devs::ExternalEvent(
-        event->getPortName());
-    vle::value::Map::const_iterator it = event->getAttributes().begin();
-
-    while (it != event->getAttributes().end()) {
-        ee->putAttribute(it->first, it->second->clone());
-        ++it;
-    }
-    return ee;
-}
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 

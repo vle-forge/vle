@@ -33,12 +33,12 @@ namespace vd = vle::devs;
 
 enum State { a = 1, b, c };
 
-class statechart1 : public ve::Statechart < State >
+class statechart1 : public ve::Statechart
 {
 public:
     statechart1(const vd::DynamicsInit& init,
                 const vd::InitEventList& events) :
-        ve::Statechart < State >(init, events)
+        ve::Statechart(init, events)
     {
         ve::states(this) << a;
 
@@ -50,12 +50,12 @@ public:
 
 enum State2 { I = 1, A, B, C };
 
-class statechart2 : public ve::Statechart < State2 >
+class statechart2 : public ve::Statechart
 {
 public:
     statechart2(const vd::DynamicsInit& init,
                 const vd::InitEventList& events) :
-        ve::Statechart < State2 >(init, events)
+        ve::Statechart(init, events)
     {
         ve::states(this) << I << A << B << C;
 
@@ -73,12 +73,12 @@ public:
     virtual ~statechart2() { }
 };
 
-class statechart3 : public ve::Statechart < State2 >
+class statechart3 : public ve::Statechart
 {
 public:
     statechart3(const vd::DynamicsInit& init,
                 const vd::InitEventList& events) :
-        ve::Statechart < State2 >(init, events)
+        ve::Statechart(init, events)
     {
         ve::states(this) << I << A << B << C;
 
@@ -99,12 +99,12 @@ public:
     virtual ~statechart3() { }
 };
 
-class statechart4 : public ve::Statechart < State2 >
+class statechart4 : public ve::Statechart
 {
 public:
     statechart4(const vd::DynamicsInit& init,
                 const vd::InitEventList& events) :
-        ve::Statechart < State2 >(init, events)
+        ve::Statechart(init, events)
     {
         ve::states(this) << I << A << B << C;
 
@@ -137,7 +137,7 @@ public:
         if (event.onPort("a")) {
             return vle::value::Double::create(a);
         } else {
-            return ve::Statechart < State2 >::observation(event);
+            return ve::Statechart::observation(event);
         }
     }
 
@@ -155,12 +155,12 @@ private:
 
 enum State3 { ii = 1, aa, bb, cc, dd };
 
-class statechart5 : public ve::Statechart < State3 >
+class statechart5 : public ve::Statechart
 {
 public:
     statechart5(const vd::DynamicsInit& init,
                 const vd::InitEventList& events) :
-        ve::Statechart < State3 >(init, events)
+        ve::Statechart(init, events)
     {
         ve::states(this) << ii << aa << bb << cc << dd;
 
@@ -180,12 +180,12 @@ public:
     virtual ~statechart5() { }
 };
 
-class statechart6 : public ve::Statechart < State3 >
+class statechart6 : public ve::Statechart
 {
 public:
     statechart6(const vd::DynamicsInit& init,
                 const vd::InitEventList& events) :
-        ve::Statechart < State3 >(init, events)
+        ve::Statechart(init, events)
     {
         ve::states(this) << ii << aa << bb << cc << dd;
 
@@ -206,12 +206,12 @@ public:
     virtual ~statechart6() { }
 };
 
-class statechart7 : public ve::Statechart < State >
+class statechart7 : public ve::Statechart
 {
 public:
     statechart7(const vd::DynamicsInit& init,
                 const vd::InitEventList& events) :
-        ve::Statechart < State >(init, events)
+        ve::Statechart(init, events)
     {
         ve::states(this) << a << b << c;
 

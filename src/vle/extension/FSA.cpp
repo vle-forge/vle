@@ -28,22 +28,31 @@
 
 namespace vle { namespace extension {
 
-double operator<<(double& value, const Var& var)
+void Base::initialState(int state)
 {
-    value = var.value;
-    return value;
+    vle::Assert <vle::utils::InternalError>(
+        existState(state), boost::format(
+            "FSA::Base model, unknow state %1%") % state);
+
+    mInitialState = state;
+    mInit = true;
 }
 
-vle::devs::ExternalEventList& operator<<(vle::devs::ExternalEventList& output,
-					 const Var& var)
+vle::devs::ExternalEvent* Base::cloneExternalEvent(
+    vle::devs::ExternalEvent* event) const
 {
-    vle::devs::ExternalEvent* ee = new vle::devs::ExternalEvent(var.name);
+    vle::devs::ExternalEvent* ee = new vle::devs::ExternalEvent(
+        event->getPortName());
+    vle::value::Map::const_iterator it = event->getAttributes().begin();
 
-    ee << vle::devs::attribute("name", vle::value::String::create(var.name));
-    ee << vle::devs::attribute("value", vle::value::Double::create(var.value));
-    output.addEvent(ee);
-    return output;
+    while (it != event->getAttributes().end()) {
+        ee->putAttribute(it->first, it->second->clone());
+        ++it;
+    }
+    return ee;
 }
+
+/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 Event_t event(const std::string& event)
 {

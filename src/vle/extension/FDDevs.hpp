@@ -44,13 +44,12 @@ namespace vle { namespace extension {
  * The structure and dynamics of Finite State Automaton are
  * specified with C++ code.
  */
-template < typename C >
-class FDDevs : public Base < C >
+class FDDevs : public Base
 {
 public:
     FDDevs(const devs::DynamicsInit& init,
            const devs::InitEventList& events)
-        : Base < C >(init, events)
+        : Base(init, events)
     {}
 
     virtual ~FDDevs() {}
@@ -61,20 +60,20 @@ public:
 
 private:
     // duration
-    typedef std::map < C , devs::Time > Durations;
+    typedef std::map < int , devs::Time > Durations;
 
     // output
-    typedef std::map < C , std::string > Outputs;
+    typedef std::map < int , std::string > Outputs;
     typedef boost::function < void (const devs::Time&,
                                     devs::ExternalEventList&) > OutputFunc;
-    typedef std::map < C , OutputFunc > OutputFuncs;
+    typedef std::map < int , OutputFunc > OutputFuncs;
 
     // internal
-    typedef std::map < C , C > Internals;
+    typedef std::map < int , int > Internals;
 
     // external
-    typedef std::map < std::string , C > External;
-    typedef std::map < C , std::map < std::string , C > > Externals;
+    typedef std::map < std::string , int > External;
+    typedef std::map < int , std::map < std::string , int > > Externals;
 
 public:
     Durations& durations() { return mDurations; }
@@ -82,12 +81,12 @@ public:
     OutputFuncs& outputFuncs() { return mOutputFuncs; }
     Internals& internals() { return mInternals; }
 
-    External& externals(const C& c)
+    External& externals(int s)
     {
-        if (mExternals.find(c) == mExternals.end()) {
-            mExternals[c] = External();
+        if (mExternals.find(s) == mExternals.end()) {
+            mExternals[s] = External();
         }
-        return mExternals.at(c);
+        return mExternals.at(s);
     }
 
     virtual devs::Event::EventType confluentTransitions(
@@ -96,10 +95,10 @@ public:
     { return devs::Event::EXTERNAL; }
 
 private:
-    typedef typename Outputs::const_iterator OutputsIterator;
-    typedef typename OutputFuncs::const_iterator OutputFuncsIterator;
-    typedef typename Internals::const_iterator InternalsIterator;
-    typedef typename Externals::const_iterator ExternalsIterator;
+    typedef Outputs::const_iterator OutputsIterator;
+    typedef OutputFuncs::const_iterator OutputFuncsIterator;
+    typedef Internals::const_iterator InternalsIterator;
+    typedef Externals::const_iterator ExternalsIterator;
 
     // Next states in case of external transition
     Externals mExternals;
@@ -131,191 +130,89 @@ private:
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-template < typename C >
-void FDDevs<C>::process(const devs::ExternalEvent* event,
-                        const devs::Time& time)
-{
-    if (mExternals.find(Base<C>::currentState()) != mExternals.end() and
-        (mExternals[Base<C>::currentState()].find(event->getPortName()) !=
-         mExternals[Base<C>::currentState()].end())) {
-        Base<C>::currentState(mExternals[Base<C>::currentState()]
-                              [event->getPortName()]);
-
-        if (mDurations.find(Base<C>::currentState()) == mDurations.end()) {
-            throw utils::InternalError(
-                fmt(_("FSA::FDDevs model, unknow duration of state %1%")) %
-                Base<C>::currentState());
-        }
-
-        mSigma = mDurations[Base<C>::currentState()];
-    }
-    else mSigma -= time - mLastTime;
-}
-
-/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
-
-template < typename C >
-void FDDevs<C>::output(const devs::Time& time,
-                       devs::ExternalEventList& output) const
-{
-    OutputFuncsIterator it = mOutputFuncs.find(Base<C>::currentState());
-
-    if (it != mOutputFuncs.end()) {
-        (it->second)(time, output);
-    } else {
-        OutputsIterator ito = mOutputs.find(Base<C>::currentState());
-
-        if (ito != mOutputs.end()) {
-            output.addEvent(buildEvent(ito->second));
-        }
-    }
-}
-
-template < typename C >
-devs::Time FDDevs<C>::init(const devs::Time& /* time */)
-{
-    if (not Base<C>::isInit()) {
-        throw utils::InternalError(
-            _("FSA::FDDevs model, initial state not defined"));
-    }
-
-    Base<C>::currentState(Base<C>::initialState());
-
-    if (mDurations.find(Base<C>::currentState()) == mDurations.end()) {
-        throw utils::InternalError(fmt(
-                _("FSA::FDDevs model, unknow duration of state %1%")) %
-        Base<C>::currentState());
-    }
-
-    mSigma = mDurations[Base<C>::currentState()];
-    return mSigma;
-}
-
-template < typename C >
-void FDDevs<C>::externalTransition(const devs::ExternalEventList& events,
-                                   const devs::Time& time)
-{
-    if (events.size() > 1) {
-        devs::ExternalEventList sortedEvents = select(events);
-        devs::ExternalEventList::const_iterator it = sortedEvents.begin();
-
-        while (it != sortedEvents.end()) {
-            process(*it, time);
-            ++it;
-        }
-    } else {
-        devs::ExternalEventList::const_iterator it = events.begin();
-
-        process(*it, time);
-    }
-}
-
-template < typename C >
-void FDDevs<C>::internalTransition(const devs::Time& time)
-{
-    if (mInternals.find(Base<C>::currentState()) == mInternals.end()) {
-        throw utils::InternalError(fmt(
-                _("FSA::FDDevs model, unknow internal transition on state %1%"))
-                % Base<C>::currentState());
-    }
-
-    Base<C>::currentState(mInternals[Base<C>::currentState()]);
-
-    if (mDurations.find(Base<C>::currentState()) == mDurations.end()) {
-        throw utils::InternalError(fmt(
-                _("FSA::FDDevs model, unknow duration of state %1%")) %
-            Base<C>::currentState());
-    }
-
-    mSigma = mDurations[Base<C>::currentState()];
-    mLastTime = time;
-}
-
-/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
-
-template < typename C, typename I >
+template < typename I >
 struct Internal_t
 {
-    Internal_t(I obj, const C& state) :
+    Internal_t(I obj, int state) :
         obj(obj), state(state)  { }
 
     I obj;
-    C state;
+    int state;
 };
 
-template < typename C, typename I >
-Internal_t<C,I> internal(I obj, const C& state)
-{ return Internal_t<C,I>(obj, state); }
+template < typename I >
+Internal_t<I> internal(I obj, int state)
+{ return Internal_t<I>(obj, state); }
 
-template < typename C, typename I >
-void operator>>(Internal_t<C,I> internal, const C& newState)
+template < typename I >
+void operator>>(Internal_t<I> internal, int newState)
 {
     insert(internal.obj->internals())(internal.state, newState);
 }
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-template < typename C, typename I >
+template < typename I >
 struct Duration_t
 {
-    Duration_t(I obj, const C& state) :
+    Duration_t(I obj, int state) :
         obj(obj), state(state)  { }
 
     I obj;
-    C state;
+    int state;
 };
 
-template < typename C, typename I >
-Duration_t<C,I> duration(I obj, const C& state)
-{ return Duration_t<C,I>(obj, state); }
+template < typename I >
+Duration_t<I> duration(I obj, int state)
+{ return Duration_t<I>(obj, state); }
 
-template < typename C, typename I >
-void operator<<(Duration_t<C,I> duration, const devs::Time& value)
+template < typename I >
+void operator<<(Duration_t<I> duration, const devs::Time& value)
 {
     insert(duration.obj->durations())(duration.state, value);
 }
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-template < typename C, typename I >
+template < typename I >
 struct External_t
 {
-    External_t(I obj, C state, const std::string& input) :
+    External_t(I obj, int state, const std::string& input) :
         obj(obj), state(state), input(input)  { }
 
     I obj;
-    C state;
+    int state;
     std::string input;
 };
 
-template < typename C, typename I >
-External_t<C,I> external(I obj, C state, const std::string& input)
-{ return External_t<C,I>(obj, state, input); }
+template < typename I >
+External_t<I> external(I obj, int state, const std::string& input)
+{ return External_t<I>(obj, state, input); }
 
-template < typename C, typename I >
-void operator>>(External_t<C,I> external, const C& state)
+template < typename I >
+void operator>>(External_t<I> external, int state)
 {
     insert(external.obj->externals(external.state))(external.input, state);
 }
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-template < typename C, typename I >
+template < typename I >
 struct Output3_t
 {
-    Output3_t(I obj, const C& state) :
+    Output3_t(I obj, int state) :
         obj(obj), state(state)  { }
 
     I obj;
-    C state;
+    int state;
 };
 
-template < typename C, typename I >
-Output3_t<C,I> output(I obj, const C& state)
-{ return Output3_t<C,I>(obj, state); }
+template < typename I >
+Output3_t<I> output(I obj, int state)
+{ return Output3_t<I>(obj, state); }
 
-template < typename C, typename I >
-void operator>>(Output3_t<C,I> output, const std::string& port)
+template < typename I >
+void operator>>(Output3_t<I> output, const std::string& port)
 {
     insert(output.obj->outputs())(output.state, port);
 }
@@ -335,8 +232,8 @@ template < typename X, typename I >
 OutputFunc3_t<X, I> outputFunc(I obj, X func)
 { return OutputFunc3_t<X, I>(obj, func); }
 
-template < typename C, typename X, typename I >
-void operator>>(OutputFunc3_t<X,I> output, const C& state)
+template < typename X, typename I >
+void operator>>(OutputFunc3_t<X,I> output, int state)
 {
     boost::assign::insert(output.obj->outputFuncs())(
         state, boost::bind(output.func, output.obj, _1, _2));

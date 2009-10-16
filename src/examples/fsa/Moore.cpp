@@ -33,12 +33,12 @@ namespace vd = vle::devs;
 
 enum State { a = 1, b, c };
 
-class moore1 : public ve::Moore < State >
+class moore1 : public ve::Moore
 {
 public:
     moore1(const vd::DynamicsInit& init,
            const vd::InitEventList& events) :
-        ve::Moore < State >(init, events)
+        ve::Moore(init, events)
     {
         ve::states(this) << a << b << c;
 
@@ -79,12 +79,12 @@ public:
 
 enum State2 { START = 1, RUN };
 
-class counter2 : public ve::Moore < State2 >
+class counter2 : public ve::Moore
 {
 public:
     counter2(const vd::DynamicsInit& init,
              const vd::InitEventList& events) :
-        ve::Moore < State2 >(init, events)
+        ve::Moore(init, events)
     {
         ve::states(this) << START << RUN;
 
@@ -117,7 +117,7 @@ public:
         if (event.onPort("counter")) {
             return vle::value::Integer::create(value);
         }
-        return ve::Moore < State2 >::observation(event);
+        return ve::Moore::observation(event);
     }
 
 private:

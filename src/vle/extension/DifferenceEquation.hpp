@@ -816,6 +816,27 @@ namespace vle { namespace extension { namespace DifferenceEquation {
         ValuesMapIterator mNamesIt;
     };
 
+/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
+struct VLE_EXTENSION_EXPORT Var
+{
+    Var(const std::string& name) : name(name)  { }
+    Var(const std::string& name,
+        const vle::devs::ExternalEvent* event) :
+        name(name),
+        value(event->getDoubleAttributeValue("value")) { }
+    virtual Var& operator=(double v) { value = v; return *this; }
+
+    std::string name;
+    double value;
+};
+
+double VLE_EXTENSION_EXPORT
+operator<<(double& value, const Var& var);
+
+vle::devs::ExternalEventList& VLE_EXTENSION_EXPORT
+operator<<(vle::devs::ExternalEventList& output, const Var& var);
+
 }}} // namespace vle extension DifferenceEquation
 
 #endif

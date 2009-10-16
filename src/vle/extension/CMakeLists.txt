@@ -11,12 +11,11 @@ LINK_DIRECTORIES(
 
 SET(EXTENSION_CPP CellDevs.cpp CellQSS.cpp DESS.cpp
   DifferenceEquation.cpp DifferentialEquation.cpp DSDevs.cpp PetriNet.cpp
-  QSS2.cpp QSS.cpp)
+  QSS2.cpp QSS.cpp FSA.cpp Moore.cpp Mealy.cpp Statechart.cpp FDDevs.cpp)
 
 SET(EXTENSION_HPP CellDevs.hpp CellQSS.hpp DESS.hpp DllDefines.hpp
   DifferenceEquation.hpp DifferentialEquation.hpp DSDevs.hpp PetriNet.hpp
-  QSS2.hpp QSS.hpp FSA.hpp FSA.cpp Moore.hpp Moore.cpp Mealy.hpp
-  Mealy.cpp Statechart.hpp Statechart.cpp FDDevs.hpp)
+  QSS2.hpp QSS.hpp FSA.hpp Moore.hpp Mealy.hpp Statechart.hpp FDDevs.hpp)
 
 ADD_LIBRARY(vleextension SHARED ${EXTENSION_HPP};${EXTENSION_CPP})
 

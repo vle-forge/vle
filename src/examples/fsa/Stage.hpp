@@ -26,6 +26,7 @@
 #define FSA_STAGE_HPP
 
 #include <vle/extension/Statechart.hpp>
+#include <vle/extension/DifferenceEquation.hpp>
 
 enum state_t {INIT = 1, PS, LV, IF, DF, DRG, FSLA, MP, FIN };
 
@@ -34,7 +35,7 @@ namespace vle { namespace examples { namespace fsa {
 namespace ve = vle::extension;
 namespace vd = vle::devs;
 
-class Stage : public ve::Statechart < state_t >
+class Stage : public ve::Statechart
 {
 public:
     Stage(const vd::DynamicsInit& init, const vd::InitEventList& lst);
@@ -107,7 +108,7 @@ private:
     void in(const vd::Time& /* time */,
             const vd::ExternalEvent* event)
     {
-        STi << ve::Var("Tmoy", event);
+        STi << ve::DifferenceEquation::Var("Tmoy", event);
         if (STi > 0.0) {
             STiz = STi;
         } else {

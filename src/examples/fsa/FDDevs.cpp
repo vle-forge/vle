@@ -31,42 +31,47 @@ namespace vle { namespace examples { namespace fsa {
 namespace ve = vle::extension;
 namespace vd = vle::devs;
 
-class devs1 : public ve::FDDevs < std::string >
+enum State { a = 1, b, c };
+
+class devs1 : public ve::FDDevs
 {
 public:
     devs1(const vd::DynamicsInit& init,
-	  const vd::InitEventList& events) :
-	ve::FDDevs < std::string >(init, events)
+          const vd::InitEventList& events) :
+        ve::FDDevs(init, events)
     {
-        ve::states(this) << "a" << "b" << "c";
+        ve::states(this) << a << b << c;
 
-        ve::duration(this, std::string("a")) << 6;
-        ve::duration(this, std::string("b")) << 5;
-        ve::duration(this, std::string("c")) << 2;
+        ve::duration(this, a) << 6;
+        ve::duration(this, b) << 5;
+        ve::duration(this, c) << 2;
 
-        ve::internal(this, std::string("a")) >> std::string("b");
-        ve::internal(this, std::string("b")) >> std::string("a");
-        ve::internal(this, std::string("c")) >> std::string("a");
+        ve::internal(this, a) >> b;
+        ve::internal(this, b) >> a;
+        ve::internal(this, c) >> a;
 
-        ve::output(this, std::string("a")) >> "out";
+        //	    ve::output(this, a) >> "out";
+        ve::outputFunc(this, &devs1::out) >> a;
 
-        ve::external(this, std::string("a"), "in") >> std::string("c");
-        ve::external(this, std::string("b"), "in") >> std::string("c");
+        ve::external(this, a, "in") >> c;
+        ve::external(this, b, "in") >> c;
 
-        initialState("a");
+        initialState(a);
     }
 
     virtual ~devs1() { }
+
+    void out(const vd::Time& /*time*/,
+             vd::ExternalEventList& output) const
+    { output.addEvent(buildEvent("out")); }
 };
 
-enum State { a = 1, b, c };
-
-class devs2 : public ve::FDDevs < State >
+class devs2 : public ve::FDDevs
 {
 public:
     devs2(const vd::DynamicsInit& init,
           const vd::InitEventList& events) :
-        ve::FDDevs < State >(init, events)
+        ve::FDDevs(init, events)
     {
         ve::states(this) << a << b << c;
 

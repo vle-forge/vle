@@ -33,12 +33,12 @@ namespace vd = vle::devs;
 
 enum State { a = 1, b, c };
 
-class mealy1 : public ve::Mealy < State >
+class mealy1 : public ve::Mealy
 {
 public:
     mealy1(const vd::DynamicsInit& init,
            const vd::InitEventList& events) :
-        ve::Mealy < State >(init, events)
+        ve::Mealy(init, events)
     {
         ve::states(this) << a << b << c;
 
@@ -78,12 +78,12 @@ public:
 
 enum State2 { START = 1, RUN };
 
-class counter1 : public ve::Mealy < State2 >
+class counter1 : public ve::Mealy
 {
 public:
     counter1(const vd::DynamicsInit& model,
              const vd::InitEventList& events) :
-        ve::Mealy < State2 >(model, events)
+        ve::Mealy(model, events)
     {
         ve::states(this) << START << RUN;
 
@@ -117,7 +117,7 @@ public:
         if (event.onPort("counter")) {
             return vle::value::Integer::create(value);
         }
-        return ve::Mealy < State2 >::observation(event);
+        return ve::Mealy::observation(event);
     }
 
 private:

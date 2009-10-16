@@ -68,21 +68,21 @@ BOOST_AUTO_TEST_CASE(test_moore1)
     BOOST_REQUIRE_EQUAL(result.shape()[1],
                         (value::MatrixView::size_type)101);
 
-    BOOST_REQUIRE_EQUAL(value::toString(result[1][0]), "a");
-    BOOST_REQUIRE_EQUAL(value::toString(result[2][0]), "1");
-    BOOST_REQUIRE_EQUAL(value::toString(result[3][0]), "1");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][0]), 1);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[2][0]), 1);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[3][0]), 1);
 
-    BOOST_REQUIRE_EQUAL(value::toString(result[1][14]), "c");
-    BOOST_REQUIRE_EQUAL(value::toString(result[2][14]), "3");
-    BOOST_REQUIRE_EQUAL(value::toString(result[3][14]), "3");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][14]), 3);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[2][14]), 3);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[3][14]), 3);
 
-    BOOST_REQUIRE_EQUAL(value::toString(result[1][22]), "c");
-    BOOST_REQUIRE_EQUAL(value::toString(result[2][22]), "2");
-    BOOST_REQUIRE_EQUAL(value::toString(result[3][22]), "2");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][22]), 3);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[2][22]), 2);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[3][22]), 2);
 
-    BOOST_REQUIRE_EQUAL(value::toString(result[1][100]), "c");
-    BOOST_REQUIRE_EQUAL(value::toString(result[2][100]), "2");
-    BOOST_REQUIRE_EQUAL(value::toString(result[3][100]), "2");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][100]), 3);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[2][100]), 2);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[3][100]), 2);
 }
 
 BOOST_AUTO_TEST_CASE(test_moore2)
@@ -108,13 +108,13 @@ BOOST_AUTO_TEST_CASE(test_moore2)
     BOOST_REQUIRE_EQUAL(result.shape()[1],
                         (value::MatrixView::size_type)101);
 
-    BOOST_REQUIRE_EQUAL(value::toString(result[1][0]), "a");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][0]), 1);
     BOOST_REQUIRE_EQUAL(value::toInteger(result[2][0]), 0);
-    BOOST_REQUIRE_EQUAL(value::toString(result[3][0]), "1");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[3][0]), 1);
 
-    BOOST_REQUIRE_EQUAL(value::toString(result[1][100]), "a");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][100]), 1);
     BOOST_REQUIRE_EQUAL(value::toInteger(result[2][100]), 9);
-    BOOST_REQUIRE_EQUAL(value::toString(result[3][100]), "2");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[3][100]), 2);
 }
 
 BOOST_AUTO_TEST_CASE(test_mealy1)
@@ -140,25 +140,25 @@ BOOST_AUTO_TEST_CASE(test_mealy1)
     BOOST_REQUIRE_EQUAL(result.shape()[1],
                         (value::MatrixView::size_type)101);
 
-    BOOST_REQUIRE_EQUAL(value::toString(result[1][0]), "a");
-    BOOST_REQUIRE_EQUAL(value::toString(result[2][0]), "1");
-    BOOST_REQUIRE_EQUAL(value::toString(result[3][0]), "1");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][0]), 1);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[2][0]), 1);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[3][0]), 1);
 
-    BOOST_REQUIRE_EQUAL(value::toString(result[1][14]), "a");
-    BOOST_REQUIRE_EQUAL(value::toString(result[2][14]), "1");
-    BOOST_REQUIRE_EQUAL(value::toString(result[3][14]), "2");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][14]), 1);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[2][14]), 1);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[3][14]), 2);
 
-    BOOST_REQUIRE_EQUAL(value::toString(result[1][22]), "a");
-    BOOST_REQUIRE_EQUAL(value::toString(result[2][22]), "1");
-    BOOST_REQUIRE_EQUAL(value::toString(result[3][22]), "1");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][22]), 1);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[2][22]), 1);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[3][22]), 1);
 
-    BOOST_REQUIRE_EQUAL(value::toString(result[1][61]), "c");
-    BOOST_REQUIRE_EQUAL(value::toString(result[2][61]), "2");
-    BOOST_REQUIRE_EQUAL(value::toString(result[3][61]), "3");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][61]), 3);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[2][61]), 2);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[3][61]), 3);
 
-    BOOST_REQUIRE_EQUAL(value::toString(result[1][100]), "a");
-    BOOST_REQUIRE_EQUAL(value::toString(result[2][100]), "1");
-    BOOST_REQUIRE_EQUAL(value::toString(result[3][100]), "1");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][100]), 1);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[2][100]), 1);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[3][100]), 1);
 }
 
 BOOST_AUTO_TEST_CASE(test_mealy2)
@@ -184,13 +184,13 @@ BOOST_AUTO_TEST_CASE(test_mealy2)
     BOOST_REQUIRE_EQUAL(result.shape()[1],
                         (value::MatrixView::size_type)101);
 
-    BOOST_REQUIRE_EQUAL(value::toString(result[1][0]), "a");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][0]), 1);
     BOOST_REQUIRE_EQUAL(value::toInteger(result[2][0]), 0);
-    BOOST_REQUIRE_EQUAL(value::toString(result[3][0]), "1");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[3][0]), 1);
 
-    BOOST_REQUIRE_EQUAL(value::toString(result[1][100]), "a");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][100]), 1);
     BOOST_REQUIRE_EQUAL(value::toInteger(result[2][100]), 9);
-    BOOST_REQUIRE_EQUAL(value::toString(result[3][100]), "2");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[3][100]), 2);
 }
 
 BOOST_AUTO_TEST_CASE(test_statechart1)
@@ -216,13 +216,13 @@ BOOST_AUTO_TEST_CASE(test_statechart1)
     BOOST_REQUIRE_EQUAL(result.shape()[1],
                         (value::MatrixView::size_type)101);
 
-    BOOST_REQUIRE_EQUAL(value::toString(result[1][0]), "a");
-    BOOST_REQUIRE_EQUAL(value::toString(result[2][0]), "1");
-    BOOST_REQUIRE_EQUAL(value::toString(result[3][0]), "1");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][0]), 1);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[2][0]), 1);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[3][0]), 1);
 
-    BOOST_REQUIRE_EQUAL(value::toString(result[1][100]), "a");
-    BOOST_REQUIRE_EQUAL(value::toString(result[2][100]), "1");
-    BOOST_REQUIRE_EQUAL(value::toString(result[3][100]), "1");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][100]), 1);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[2][100]), 1);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[3][100]), 1);
 }
 
 BOOST_AUTO_TEST_CASE(test_statechart2)
@@ -251,17 +251,17 @@ BOOST_AUTO_TEST_CASE(test_statechart2)
     BOOST_REQUIRE_EQUAL(value::toInteger(result[1][0]), 0);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[2][0]), 2.45601, 10e-2);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[3][0]), 3.0058, 10e-2);
-    BOOST_REQUIRE_EQUAL(value::toString(result[4][0]), "2");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[4][0]), 2);
 
     BOOST_REQUIRE_EQUAL(value::toInteger(result[1][25]), 0);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[2][25]), 6.91764, 10e-2);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[3][25]), 3.0058, 10e-2);
-    BOOST_REQUIRE_EQUAL(value::toString(result[4][25]), "3");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[4][25]), 3);
 
     BOOST_REQUIRE_EQUAL(value::toInteger(result[1][1000]), 0);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[2][1000]), 102.532, 10e-2);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[3][1000]), 100.913, 10e-2);
-    BOOST_REQUIRE_EQUAL(value::toString(result[4][1000]), "4");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[4][1000]), 4);
 }
 
 BOOST_AUTO_TEST_CASE(test_statechart3)
@@ -290,17 +290,17 @@ BOOST_AUTO_TEST_CASE(test_statechart3)
     BOOST_REQUIRE_EQUAL(value::toInteger(result[1][0]), 0);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[2][0]), 2.45601, 10e-2);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[3][0]), 3.0058, 10e-2);
-    BOOST_REQUIRE_EQUAL(value::toString(result[4][0]), "2");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[4][0]), 2);
 
     BOOST_REQUIRE_EQUAL(value::toInteger(result[1][25]), 1);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[2][25]), 6.91764, 10e-2);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[3][25]), 3.0058, 10e-2);
-    BOOST_REQUIRE_EQUAL(value::toString(result[4][25]), "3");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[4][25]), 3);
 
     BOOST_REQUIRE_EQUAL(value::toInteger(result[1][1000]), 29);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[2][1000]), 102.532, 10e-2);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[3][1000]), 100.913, 10e-2);
-    BOOST_REQUIRE_EQUAL(value::toString(result[4][1000]), "4");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[4][1000]), 4);
 }
 
 BOOST_AUTO_TEST_CASE(test_statechart4)
@@ -331,28 +331,28 @@ BOOST_AUTO_TEST_CASE(test_statechart4)
     BOOST_REQUIRE_CLOSE(value::toDouble(result[3][0]), 3.0058, 10e-2);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[4][0]), 4.46163, 10e-2);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[5][0]), 0., 10e-2);
-    BOOST_REQUIRE_EQUAL(value::toString(result[6][0]), "2");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[6][0]), 2);
 
     BOOST_REQUIRE_EQUAL(value::toInteger(result[1][25]), 1);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[2][25]), 5.53795, 10e-2);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[3][25]), 3.0058, 10e-2);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[4][25]), 4.46163, 10e-2);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[5][25]), 0., 10e-2);
-    BOOST_REQUIRE_EQUAL(value::toString(result[6][25]), "3");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[6][25]), 3);
 
     BOOST_REQUIRE_EQUAL(value::toInteger(result[1][523]), 16);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[2][523]), 55.9634, 10e-2);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[3][523]), 52.9811, 10e-2);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[4][523]), 53.5509, 10e-2);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[5][523]), 29., 10e-2);
-    BOOST_REQUIRE_EQUAL(value::toString(result[6][523]), "4");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[6][523]), 4);
 
     BOOST_REQUIRE_EQUAL(value::toInteger(result[1][1000]), 29);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[2][1000]), 100.174, 10e-2);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[3][1000]), 100.985, 10e-2);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[4][1000]), 101.733, 10e-2);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[5][1000]), 57., 10e-2);
-    BOOST_REQUIRE_EQUAL(value::toString(result[6][1000]), "2");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[6][1000]), 2);
 }
 
 BOOST_AUTO_TEST_CASE(test_statechart5)
@@ -381,22 +381,22 @@ BOOST_AUTO_TEST_CASE(test_statechart5)
     BOOST_REQUIRE_EQUAL(value::toInteger(result[1][0]), 0);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[2][0]), 2.45601, 10e-2);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[3][0]), 3.0058, 10e-2);
-    BOOST_REQUIRE_EQUAL(value::toString(result[4][0]), "2");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[4][0]), 2);
 
     BOOST_REQUIRE_EQUAL(value::toInteger(result[1][25]), 0);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[2][25]), 6.91764, 10e-2);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[3][25]), 3.0058, 10e-2);
-    BOOST_REQUIRE_EQUAL(value::toString(result[4][25]), "3");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[4][25]), 3);
 
     BOOST_REQUIRE_EQUAL(value::toInteger(result[1][609]), 0);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[2][609]), 63.8111, 10e-2);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[3][609]), 61.0465, 10e-2);
-    BOOST_REQUIRE_EQUAL(value::toString(result[4][609]), "5");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[4][609]), 5);
 
     BOOST_REQUIRE_EQUAL(value::toInteger(result[1][1000]), 0);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[2][1000]), 102.532, 10e-2);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[3][1000]), 100.913, 10e-2);
-    BOOST_REQUIRE_EQUAL(value::toString(result[4][1000]), "2");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[4][1000]), 2);
 }
 
 BOOST_AUTO_TEST_CASE(test_statechart6)
@@ -425,22 +425,22 @@ BOOST_AUTO_TEST_CASE(test_statechart6)
     BOOST_REQUIRE_EQUAL(value::toInteger(result[1][0]), 0);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[2][0]), 2.45601, 10e-2);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[3][0]), 3.0058, 10e-2);
-    BOOST_REQUIRE_EQUAL(value::toString(result[4][0]), "2");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[4][0]), 2);
 
     BOOST_REQUIRE_EQUAL(value::toInteger(result[1][25]), 0);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[2][25]), 6.91764, 10e-2);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[3][25]), 3.0058, 10e-2);
-    BOOST_REQUIRE_EQUAL(value::toString(result[4][25]), "3");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[4][25]), 3);
 
     BOOST_REQUIRE_EQUAL(value::toInteger(result[1][690]), 0);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[2][690]), 69.8031, 10e-2);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[3][690]), 70.1079, 10e-2);
-    BOOST_REQUIRE_EQUAL(value::toString(result[4][690]), "5");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[4][690]), 5);
 
     BOOST_REQUIRE_EQUAL(value::toInteger(result[1][1000]), 0);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[2][1000]), 102.532, 10e-2);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[3][1000]), 100.913, 10e-2);
-    BOOST_REQUIRE_EQUAL(value::toString(result[4][1000]), "4");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[4][1000]), 4);
 }
 
 BOOST_AUTO_TEST_CASE(test_stage)
@@ -466,15 +466,15 @@ BOOST_AUTO_TEST_CASE(test_stage)
     BOOST_REQUIRE_EQUAL(result.shape()[1],
                         (value::MatrixView::size_type)331);
 
-    BOOST_REQUIRE_EQUAL(value::toString(result[2][0]), "1");
-    BOOST_REQUIRE_EQUAL(value::toString(result[2][186]), "2");
-    BOOST_REQUIRE_EQUAL(value::toString(result[2][193]), "3");
-    BOOST_REQUIRE_EQUAL(value::toString(result[2][202]), "4");
-    BOOST_REQUIRE_EQUAL(value::toString(result[2][282]), "5");
-    BOOST_REQUIRE_EQUAL(value::toString(result[2][295]), "6");
-    BOOST_REQUIRE_EQUAL(value::toString(result[2][304]), "7");
-    BOOST_REQUIRE_EQUAL(value::toString(result[2][323]), "8");
-    BOOST_REQUIRE_EQUAL(value::toString(result[2][330]), "9");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[2][0]), 1);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[2][186]), 2);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[2][193]), 3);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[2][202]), 4);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[2][282]), 5);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[2][295]), 6);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[2][304]), 7);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[2][323]), 8);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[2][330]), 9);
 }
 
 BOOST_AUTO_TEST_CASE(test_statechart7)
@@ -500,6 +500,6 @@ BOOST_AUTO_TEST_CASE(test_statechart7)
     BOOST_REQUIRE_EQUAL(result.shape()[1],
                         (value::MatrixView::size_type)101);
 
-    BOOST_REQUIRE_EQUAL(value::toString(result[1][0]), "2");
-    BOOST_REQUIRE_EQUAL(value::toString(result[1][40]), "3");
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][0]), 2);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][40]), 3);
 }

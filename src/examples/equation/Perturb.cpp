@@ -35,11 +35,11 @@ namespace vd = vle::devs;
 
 enum State { A, B };
 
-class Perturb : public ve::Statechart < State >
+class Perturb : public ve::Statechart
 {
 public:
     Perturb(const vd::DynamicsInit& init, const vd::InitEventList& events) :
-        ve::Statechart < State >(init, events)
+        ve::Statechart(init, events)
 	{
 	    ve::states(this) << A << B;
 
@@ -55,21 +55,21 @@ public:
 
     void out1(const vd::Time& /* time */, vd::ExternalEventList& output) const
 	{
-	    output << (ve::Var("a") = 10);
+	    output << (ve::DifferenceEquation::Var("a") = 10);
 	}
 
     void out2(const vd::Time& /* time */, vd::ExternalEventList& output) const
 	{
-	    output << (ve::Var("a") = 0);
+	    output << (ve::DifferenceEquation::Var("a") = 0);
 	}
 
 };
 
-class Perturb2 : public ve::Statechart < State >
+class Perturb2 : public ve::Statechart
 {
 public:
     Perturb2(const vd::DynamicsInit& init, const vd::InitEventList& events) :
-        ve::Statechart < State >(init, events)
+        ve::Statechart(init, events)
 	{
 	    ve::states(this) << A << B;
 
@@ -95,11 +95,11 @@ public:
 
 };
 
-class Perturb3 : public ve::Statechart < State >
+class Perturb3 : public ve::Statechart
 {
 public:
     Perturb3(const vd::DynamicsInit& init, const vd::InitEventList& events) :
-        ve::Statechart < State >(init, events)
+        ve::Statechart(init, events)
 	{
 	    ve::states(this) << A;
 
@@ -115,21 +115,21 @@ public:
 
     void out1(const vd::Time& /* time */, vd::ExternalEventList& output) const
 	{
-	    output << (ve::Var("a") = 10);
+	    output << (ve::DifferenceEquation::Var("a") = 10);
 	}
 
     void out2(const vd::Time& /* time */, vd::ExternalEventList& output) const
 	{
-	    output << (ve::Var("a") = 0);
+	    output << (ve::DifferenceEquation::Var("a") = 0);
 	}
 
 };
 
-class Perturb4 : public ve::Statechart < State >
+class Perturb4 : public ve::Statechart
 {
 public:
     Perturb4(const vd::DynamicsInit& init, const vd::InitEventList& events) :
-        ve::Statechart < State >(init, events)
+        ve::Statechart(init, events)
 	{
 	    ve::states(this) << A;
 
@@ -145,21 +145,21 @@ public:
 
     void out1(const vd::Time& /* time */, vd::ExternalEventList& output) const
 	{
-	    output << (ve::Var("c") = 10);
+	    output << (ve::DifferenceEquation::Var("c") = 10);
 	}
 
     void out2(const vd::Time& /* time */, vd::ExternalEventList& output) const
 	{
-	    output << (ve::Var("c") = 0);
+	    output << (ve::DifferenceEquation::Var("c") = 0);
 	}
 
 };
 
-class Perturb5 : public ve::Statechart < State >
+class Perturb5 : public ve::Statechart
 {
 public:
     Perturb5(const vd::DynamicsInit& init, const vd::InitEventList& events) :
-        ve::Statechart < State >(init, events)
+        ve::Statechart(init, events)
 	{
 	    ve::states(this) << A;
 
@@ -185,11 +185,11 @@ public:
 
 };
 
-class Perturb6 : public ve::Statechart < State >
+class Perturb6 : public ve::Statechart
 {
 public:
     Perturb6(const vd::DynamicsInit& init, const vd::InitEventList& events) :
-        ve::Statechart < State >(init, events)
+        ve::Statechart(init, events)
 	{
 	    ve::states(this) << A << B;
 
@@ -205,21 +205,21 @@ public:
 
     void out1(const vd::Time& /* time */, vd::ExternalEventList& output) const
 	{
-	    output << (ve::Var("a") = 10);
+	    output << (ve::DifferenceEquation::Var("a") = 10);
 	}
 
     void out2(const vd::Time& /* time */, vd::ExternalEventList& output) const
 	{
-	    output << (ve::Var("a") = 0);
+	    output << (ve::DifferenceEquation::Var("a") = 0);
 	}
 
 };
 
-class Perturb7 : public ve::Statechart < State >
+class Perturb7 : public ve::Statechart
 {
 public:
     Perturb7(const vd::DynamicsInit& init, const vd::InitEventList& events) :
-        ve::Statechart < State >(init, events)
+        ve::Statechart(init, events)
 	{
 	    ve::states(this) << A;
 

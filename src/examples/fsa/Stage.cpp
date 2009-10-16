@@ -32,7 +32,7 @@ namespace vle { namespace examples { namespace fsa {
 
 Stage::Stage(const vd::DynamicsInit& init,
 	     const vd::InitEventList& events) :
-    ve::Statechart < state_t >(init, events)
+    ve::Statechart(init, events)
 {
     if (events.exist("datsemis")) {
 	date_sem = boost::gregorian::date(

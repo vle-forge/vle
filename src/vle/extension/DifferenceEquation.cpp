@@ -1280,4 +1280,23 @@ void Generic::externalTransition(const devs::ExternalEventList& events,
     Simple::externalTransition(events, time);
 }
 
+/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
+double operator<<(double& value, const Var& var)
+{
+    value = var.value;
+    return value;
+}
+
+vle::devs::ExternalEventList& operator<<(vle::devs::ExternalEventList& output,
+					 const Var& var)
+{
+    vle::devs::ExternalEvent* ee = new vle::devs::ExternalEvent(var.name);
+
+    ee << vle::devs::attribute("name", vle::value::String::create(var.name));
+    ee << vle::devs::attribute("value", vle::value::Double::create(var.value));
+    output.addEvent(ee);
+    return output;
+}
+
 }}} // namespace vle extension DifferenceEquation

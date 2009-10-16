@@ -33,13 +33,12 @@
 
 namespace vle { namespace extension {
 
-template < typename C >
-class Moore : public Base < C >
+class Moore : public Base
 {
 public:
     Moore(const devs::DynamicsInit& init,
           const devs::InitEventList& events)
-        : Base < C >(init, events)
+        : Base(init, events)
     {}
 
     virtual ~Moore() {}
@@ -50,40 +49,40 @@ public:
 
 private:
     // output
-    typedef std::map < C, std::string > Outputs;
+    typedef std::map < int, std::string > Outputs;
     typedef boost::function < void (const devs::Time&,
                                     devs::ExternalEventList&) > OutputFunc;
-    typedef std::map < C, OutputFunc > OutputFuncs;
+    typedef std::map < int, OutputFunc > OutputFuncs;
 
     // transition
-    typedef std::map < std::string, C > Transition;
-    typedef std::map < C, Transition > Transitions;
+    typedef std::map < std::string, int > Transition;
+    typedef std::map < int, Transition > Transitions;
 
     // action
     typedef boost::function <
         void (const devs::Time&,
               const devs::ExternalEvent* event) > Action;
-    typedef std::map < C, Action > Actions;
+    typedef std::map < int, Action > Actions;
 
 public:
     Actions& actions() { return mActions; }
     Outputs& outputs() { return mOutputs; }
     OutputFuncs& outputFuncs() { return mOutputFuncs; }
 
-    Transition& transitions(const C& c)
+    Transition& transitions(int s)
     {
-        if (mTransitions.find(c) == mTransitions.end()) {
-            mTransitions[c] = Transition();
+        if (mTransitions.find(s) == mTransitions.end()) {
+            mTransitions[s] = Transition();
         }
-        return mTransitions.at(c);
+        return mTransitions.at(s);
     }
 
 private:
-    typedef typename Outputs::const_iterator OutputsIterator;
-    typedef typename OutputFuncs::const_iterator OutputFuncsIterator;
-    typedef typename Actions::const_iterator ActionsIterator;
-    typedef typename Transitions::const_iterator TransitionsIterator;
-    typedef typename Transition::const_iterator TransitionIterator;
+    typedef Outputs::const_iterator OutputsIterator;
+    typedef OutputFuncs::const_iterator OutputFuncsIterator;
+    typedef Actions::const_iterator ActionsIterator;
+    typedef Transitions::const_iterator TransitionsIterator;
+    typedef Transition::const_iterator TransitionIterator;
     typedef std::list < devs::ExternalEventList* > EventListLILO;
 
     // List of actions
@@ -119,149 +118,23 @@ private:
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-template < typename C >
-void Moore<C>::process(const devs::Time& time,
-                       const devs::ExternalEvent* event)
-{
-    if (mTransitions.find(Base<C>::currentState()) !=
-        mTransitions.end() and
-        (mTransitions[Base<C>::currentState()].find(event->
-                                                    getPortName())
-         != mTransitions[Base<C>::currentState()].end())) {
-        Base<C>::currentState(mTransitions[Base<C>::currentState()]
-                              [event->getPortName()]);
-
-        ActionsIterator it = mActions.find(Base<C>::currentState());
-
-        if (it != mActions.end()) {
-            (it->second)(time, event);
-        }
-    }
-}
-
-/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
-
-template < typename C >
-void Moore<C>::output(const devs::Time& time,
-                      devs::ExternalEventList& output) const
-{
-    if (mPhase == PROCESSING) {
-        OutputFuncsIterator it = mOutputFuncs.find(Base<C>::currentState());
-
-        if (it != mOutputFuncs.end()) {
-            (it->second)(time, output);
-        } else {
-            OutputsIterator ito = mOutputs.find(Base<C>::currentState());
-
-            if (ito != mOutputs.end()) {
-                output.addEvent(buildEvent(ito->second));
-            }
-        }
-    }
-}
-
-template < typename C >
-devs::Time Moore<C>::init(const devs::Time& time)
-{
-    if (not Base<C>::isInit()) {
-        throw utils::InternalError(
-            _("FSA::Moore model, initial state not defined"));
-    }
-
-    Base<C>::currentState(Base<C>::initialState());
-
-    ActionsIterator it = mActions.find(Base<C>::initialState());
-
-    if (it != mActions.end()) {
-        devs::ExternalEvent* event = new devs::ExternalEvent("");
-
-        (it->second)(time, event);
-        delete event;
-    }
-
-    mPhase = IDLE;
-    return 0;
-}
-
-template < typename C >
-void Moore<C>::externalTransition(const devs::ExternalEventList& events,
-                                  const devs::Time& /* time */)
-{
-    // mNewStates.clear();
-    if (events.size() > 1) {
-        devs::ExternalEventList sortedEvents = select(events);
-        devs::ExternalEventList* clonedEvents =
-            new devs::ExternalEventList;
-        devs::ExternalEventList::const_iterator it = sortedEvents.begin();
-
-        while (it != sortedEvents.end()) {
-            clonedEvents->addEvent(Base<C>::cloneExternalEvent(*it));
-            ++it;
-        }
-        mToProcessEvents.push_back(clonedEvents);
-    } else {
-        devs::ExternalEventList::const_iterator it = events.begin();
-        devs::ExternalEventList* clonedEvents =
-            new devs::ExternalEventList;
-
-        clonedEvents->addEvent(Base<C>::cloneExternalEvent(*it));
-        mToProcessEvents.push_back(clonedEvents);
-    }
-    mPhase = PROCESSING;
-}
-
-template < typename C >
-devs::Time Moore<C>::timeAdvance() const
-{
-    if (mPhase == IDLE) {
-        return devs::Time::infinity;
-    } else {
-        return 0;
-    }
-}
-
-template < typename C >
-void Moore<C>::internalTransition(const devs::Time& time)
-{
-    if (mPhase == PROCESSING)
-    {
-        devs::ExternalEventList* events = mToProcessEvents.front();
-        devs::ExternalEvent* event = events->front();
-
-        process(time, event);
-
-        events->erase(events->begin());
-        delete event;
-
-        if (events->empty()) {
-            mToProcessEvents.pop_front();
-            delete events;
-        }
-        if (mToProcessEvents.empty()) {
-            mPhase = IDLE;
-        }
-    }
-}
-
-/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
-
-template < typename C, typename I >
+template < typename I >
 struct Transition_t
 {
-    Transition_t(I obj, const C& state, const C& nextState) :
+    Transition_t(I obj, int state, int nextState) :
         obj(obj), state(state), nextState(nextState)  { }
 
     I obj;
-    C state;
-    C nextState;
+    int state;
+    int nextState;
 };
 
-template < typename C, typename I >
-Transition_t<C,I> transition(I obj, const C& state, const C& nextState)
-{ return Transition_t<C,I>(obj, state, nextState); }
+template < typename I >
+Transition_t<I> transition(I obj, int state, int nextState)
+{ return Transition_t<I>(obj, state, nextState); }
 
-template < typename C, typename I >
-void operator<<(Transition_t<C,I> transition, Event_t event)
+template < typename I >
+void operator<<(Transition_t<I> transition, Event_t event)
 {
     insert(transition.obj->transitions(transition.state))(
         event.event, transition.nextState);
@@ -282,8 +155,8 @@ template < typename X, typename I >
 InAction_t<X, I> inAction(I obj, X func)
 { return InAction_t<X, I>(obj, func); }
 
-template < typename C, typename X, typename I >
-InAction_t<X,I> operator>>(InAction_t<X,I> action, const C& state)
+template < typename X, typename I >
+InAction_t<X,I> operator>>(InAction_t<X,I> action, int state)
 {
     boost::assign::insert(action.obj->actions())(
         state, boost::bind(action.func, action.obj, _1, _2));
@@ -292,22 +165,22 @@ InAction_t<X,I> operator>>(InAction_t<X,I> action, const C& state)
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-template < typename C, typename I >
+template < typename I >
 struct Output2_t
 {
-    Output2_t(I obj, const C& state) :
+    Output2_t(I obj, int state) :
         obj(obj), state(state)  { }
 
     I obj;
-    C state;
+    int state;
 };
 
-template < typename C, typename I >
-Output2_t<C,I> output(I obj, const C& state)
-{ return Output2_t<C,I>(obj, state); }
+template < typename I >
+Output2_t<I> output(I obj, int state)
+{ return Output2_t<I>(obj, state); }
 
-template < typename C, typename I >
-void operator>>(Output2_t<C,I> output, const std::string& port)
+template < typename I >
+void operator>>(Output2_t<I> output, const std::string& port)
 {
     insert(output.obj->outputs())(output.state, port);
 }
@@ -327,8 +200,8 @@ template < typename X, typename I >
 OutputFunc2_t<X, I> outputFunc(I obj, X func)
 { return OutputFunc2_t<X, I>(obj, func); }
 
-template < typename C, typename X, typename I >
-void operator>>(OutputFunc2_t<X,I> output, const C& state)
+template < typename X, typename I >
+void operator>>(OutputFunc2_t<X,I> output, int state)
 {
     boost::assign::insert(output.obj->outputFuncs())(
         state, boost::bind(output.func, output.obj, _1, _2));
