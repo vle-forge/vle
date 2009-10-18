@@ -81,6 +81,8 @@ BOOST_AUTO_TEST_CASE(combination_storage_test)
     BOOST_REQUIRE_EQUAL(out.shape()[1],
             (OutputSimulationMatrix::size_type)2);
 
+    BOOST_REQUIRE_EQUAL(r.getCombinations().size(), 2);
+
     BOOST_REQUIRE_EQUAL(value::toDouble(r.getInputFromCombination(0,"ca","x")),1.0);
     BOOST_REQUIRE_EQUAL(value::toDouble(r.getInputFromCombination(0,"cb","x")),3.0);
     BOOST_REQUIRE_EQUAL(value::toDouble(r.getInputFromCombination(0,"cc","x")),4.0);
@@ -99,6 +101,8 @@ BOOST_AUTO_TEST_CASE(combination_storage_test)
             (OutputSimulationMatrix::size_type)1);
     BOOST_REQUIRE_EQUAL(out2.shape()[1],
             (OutputSimulationMatrix::size_type)4);
+
+    BOOST_REQUIRE_EQUAL(r2.getCombinations().size(), 4);
 
     BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(0,"ca","x")),1.0);
     BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(0,"cb","x")),3.0);

@@ -96,6 +96,9 @@ namespace vle { namespace manager {
                                     const std::string& condition,
                                     const std::string& port) const;
 
+        const ExperimentGenerator::Diffs
+            getCombinations() const { return m_exp->getCombinations(); }
+
     protected:
         OutputSimulationMatrix m_matrix;
         std::ostream& m_out;

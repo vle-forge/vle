@@ -44,6 +44,29 @@ namespace vle { namespace manager {
     {
     public:
         /**
+         * @brief Define a structure that stores the differences
+         * between the default condition values and a combination
+         */
+        typedef std::pair < vpz::ConditionList::const_iterator,
+                vpz::ConditionValues::const_iterator> diff_key_t;
+
+        struct less_diff_keys
+        {
+            bool operator()(diff_key_t s1, diff_key_t s2) const
+            {
+                int comp = s1.first->first.compare(s2.first->first);
+                if (comp == 0) {
+                    comp = s1.second->first.compare(s2.second->first);
+                }
+                return comp < 0;
+            }
+        };
+
+        typedef std::map < diff_key_t, int, less_diff_keys > diff_t;
+
+        typedef std::vector < diff_t > Diffs;
+
+        /**
          * @brief Build a experimental frame base on the const vpz::Vpz give in
          * parameters. It allows to build a combination of value from this
          * vpz::Vpz.
@@ -94,6 +117,8 @@ namespace vle { namespace manager {
             getInputFromCombination(unsigned int comb,
                                     const std::string& condition,
                                     const std::string& port) const;
+
+        const Diffs getCombinations() const { return mCombinationDiff; }
 
     protected:
         /**
@@ -146,8 +171,6 @@ namespace vle { namespace manager {
          */
         size_t getReplicasNumber() const;
 
-        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
     protected:
         /**
          * @brief Define a condition used to generate combination list.
@@ -162,26 +185,6 @@ namespace vle { namespace manager {
 
         void cleanCondition(vpz::Vpz& file);
 
-        /**
-         * @brief Define a structure that stores the differences
-         * between the default condition values and a combination
-         */
-        typedef std::pair<vpz::ConditionList::const_iterator,
-                vpz::ConditionValues::const_iterator> diff_key_t;
-
-        struct less_diff_keys
-        {
-            bool operator()(diff_key_t s1, diff_key_t s2) const
-            {
-                int comp = s1.first->first.compare(s2.first->first);
-                if (comp == 0) {
-                    comp = s1.second->first.compare(s2.second->first);
-                }
-                return comp < 0;
-            }
-        };
-
-        typedef std::map < diff_key_t, int, less_diff_keys > diff_t;
 
         const vpz::Vpz& mFile;
         vpz::Vpz mTmpfile;
