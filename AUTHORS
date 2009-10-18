@@ -1,6 +1,36 @@
-VLE development team
-====================
+			      VLE development team
+			      ====================
 
+
+Copyright
+=========
+
+- Gauthier Quesnel
+  - Copyright © 2003-2007
+  - quesnel@users.sourceforge.net
+
+- ULCO 
+  - Copyright © 2003-2009
+  - Université du Littoral Côte d'Opale
+  - http://www.univ-littoral.fr
+
+- INRA
+  - Copyright © 2007-2009
+  - French National Institute for Agricultural Research
+  - Institut National de la Recherche Agronomique
+  - http://www.inra.fr
+
+- Cirad
+  - Copyright © 2007-2009
+  - French Agricultural Research Center for International Development
+  - Centre de coopération internationale en recherche agronomique pour le
+    développement 
+  - http://www.cirad.fr
+
+
+
+Authors
+=======
 
 Main programmer and founder
 ---------------------------
@@ -12,18 +42,19 @@ Main programmer and founder
 Contributors
 ------------
 
-- Aurélien Ansel <camumus@gmail.com>
 - Guillaume Ansel <anselg@users.sourceforge.net>
-- Raphael Duboz <duboz@users.sourceforge.net>
 - Patrick Chabrier <patrick.chabrier@toulouse.inra.fr>
 - Cyril Marcq <cmarcq@users.sourceforge.net>
 - Daniel Salomé <dansal62@users.sourceforge.net>
-- Geoffroy Weisenhorn <geoffroy.weisenhorn@gmail.com>
+- Ronan Trépos <rtrepos@toulouse.inra.fr>
 
 
 Old Contributors
 ----------------
 
+- Aurélien Ansel <camumus@gmail.com>
 - Philippe Blangi <blangi@users.sourceforge.net>
+- Raphael Duboz <duboz@users.sourceforge.net>
 - Romain Hennuyer <romain.hennuyer@gmail.com>
 - David Versmisse <versmisse@users.sourceforge.net>
+- Geoffroy Weisenhorn <geoffroy.weisenhorn@gmail.com>
