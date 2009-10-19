@@ -38,7 +38,6 @@
 #include <vle/utils/Pool.hpp>
 #include <vle/utils/Preferences.hpp>
 #include <vle/utils/Rand.hpp>
-#include <vle/utils/Simpson.hpp>
 #include <vle/utils/Socket.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
