@@ -28,7 +28,6 @@ TARGET_LINK_LIBRARIES(output-cairoplot
   ${OS_SPECIFIC_LIBRARIES}
   vlemanager
   vleutils
-  vledata
   vlevalue
   vlegraph
   vlevpz

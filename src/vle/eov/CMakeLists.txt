@@ -35,7 +35,6 @@ TARGET_LINK_LIBRARIES(vleeov
   ${OS_SPECIFIC_LIBRARIES}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vlevpz

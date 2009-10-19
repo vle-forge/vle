@@ -22,7 +22,6 @@ TARGET_LINK_LIBRARIES(cairoplot
   ${CAIROMM_LIBRARIES}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vleoov)

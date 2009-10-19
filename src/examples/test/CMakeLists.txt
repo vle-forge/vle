@@ -19,7 +19,6 @@ TARGET_LINK_LIBRARIES(test_gens
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vledevs
@@ -34,7 +33,6 @@ TARGET_LINK_LIBRARIES(test_petrinet
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vledevs
@@ -49,7 +47,6 @@ TARGET_LINK_LIBRARIES(test_dess
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vledevs
@@ -64,7 +61,6 @@ TARGET_LINK_LIBRARIES(test_equation
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vledevs
@@ -79,7 +75,6 @@ TARGET_LINK_LIBRARIES(test_qss
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vledevs
@@ -94,7 +89,6 @@ TARGET_LINK_LIBRARIES(test_fsa
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vledevs

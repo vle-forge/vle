@@ -26,7 +26,6 @@ TARGET_LINK_LIBRARIES(vletranslator
   ${OS_SPECIFIC_LIBRARIES}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vleoov

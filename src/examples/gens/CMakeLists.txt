@@ -22,7 +22,6 @@ TARGET_LINK_LIBRARIES(gens
   ${GTHREAD_LIBRARIES}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vlevpz

@@ -24,7 +24,6 @@ TARGET_LINK_LIBRARIES(ladybirdplantlouse
   ${GTHREAD_LIBRARIES}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vlevpz

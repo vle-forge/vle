@@ -22,7 +22,6 @@ TARGET_LINK_LIBRARIES(equation1
   ${GTHREAD_LIBRARIES}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vlevpz
@@ -42,7 +41,6 @@ TARGET_LINK_LIBRARIES(equation2
   ${GTHREAD_LIBRARIES}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vlevpz
@@ -62,7 +60,6 @@ TARGET_LINK_LIBRARIES(equation3
   ${GTHREAD_LIBRARIES}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vlevpz

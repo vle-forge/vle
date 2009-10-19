@@ -23,7 +23,6 @@ TARGET_LINK_LIBRARIES(sir
   ${GTHREAD_LIBRARIES}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vlevpz

@@ -21,7 +21,6 @@ TARGET_LINK_LIBRARIES(caironetview
   ${CAIROMM_LIBRARIES}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vleoov)

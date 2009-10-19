@@ -19,7 +19,6 @@ TARGET_LINK_LIBRARIES(test_values
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
   vlegeometry
   vleutils
-  vledata
   vlevalue)
 
 ADD_EXECUTABLE(test_values_serial test_serialization.cpp)
@@ -31,7 +30,6 @@ TARGET_LINK_LIBRARIES(test_values_serial
   ${Boost_SERIALIZATION_LIBRARY}
   vlegeometry
   vleutils
-  vledata
   vlevalue)
 
 ADD_TEST(valuetest_simple test_values)

@@ -21,7 +21,6 @@ TARGET_LINK_LIBRARIES(counter
   ${GTHREAD_LIBRARIES}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vlevpz
@@ -44,7 +43,6 @@ TARGET_LINK_LIBRARIES(generator
   ${GTHREAD_LIBRARIES}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vlevpz

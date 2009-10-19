@@ -32,7 +32,6 @@ TARGET_LINK_LIBRARIES(gvle
   ${GTKSOURCEVIEWMM_LIBRARIES}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vleoov

@@ -21,7 +21,6 @@ TARGET_LINK_LIBRARIES(petrinet
   ${GTHREAD_LIBRARIES}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vlevpz

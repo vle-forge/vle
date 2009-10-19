@@ -21,7 +21,6 @@ TARGET_LINK_LIBRARIES(generator2
   ${GTHREAD_LIBRARIES}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vlevpz
@@ -45,7 +44,6 @@ TARGET_LINK_LIBRARIES(moore
   ${GTHREAD_LIBRARIES}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vlevpz
@@ -69,7 +67,6 @@ TARGET_LINK_LIBRARIES(mealy
   ${GTHREAD_LIBRARIES}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vlevpz
@@ -93,7 +90,6 @@ TARGET_LINK_LIBRARIES(statechart
   ${GTHREAD_LIBRARIES}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vlevpz
@@ -117,7 +113,6 @@ TARGET_LINK_LIBRARIES(fddevs
   ${GTHREAD_LIBRARIES}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vlevpz
@@ -141,7 +136,6 @@ TARGET_LINK_LIBRARIES(stage
   ${GTHREAD_LIBRARIES}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vlevpz

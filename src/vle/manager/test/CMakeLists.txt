@@ -19,7 +19,6 @@ TARGET_LINK_LIBRARIES(test_experimentalframes
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vledevs
@@ -34,7 +33,6 @@ TARGET_LINK_LIBRARIES(test_combination_storage
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vledevs
@@ -49,7 +47,6 @@ TARGET_LINK_LIBRARIES(test_common_seed
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vledevs

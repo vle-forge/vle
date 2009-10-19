@@ -19,7 +19,6 @@ TARGET_LINK_LIBRARIES(test_graph
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vleoov

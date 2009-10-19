@@ -23,7 +23,6 @@ TARGET_LINK_LIBRARIES(vlemodeltest
   ${GTHREAD_LIBRARIES}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vleoov

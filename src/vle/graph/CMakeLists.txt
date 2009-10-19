@@ -28,7 +28,6 @@ TARGET_LINK_LIBRARIES(vlegraph
   ${OS_SPECIFIC_LIBRARIES}
   vlegeometry
   vleutils
-  vledata
   vlevalue)
 
 INSTALL(TARGETS vlegraph

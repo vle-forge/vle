@@ -20,7 +20,6 @@ TARGET_LINK_LIBRARIES(test_algo
   ${Boost_DATE_TIME_LIBRARY}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vleoov
@@ -39,7 +38,6 @@ TARGET_LINK_LIBRARIES(test_template
   ${Boost_DATE_TIME_LIBRARY}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vleoov

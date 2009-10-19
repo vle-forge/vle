@@ -19,7 +19,6 @@ TARGET_LINK_LIBRARIES(unittest
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vledevs)
@@ -36,7 +35,6 @@ TARGET_LINK_LIBRARIES(test_devsmodel
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vledevs
@@ -52,7 +50,6 @@ TARGET_LINK_LIBRARIES(test_time
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vledevs

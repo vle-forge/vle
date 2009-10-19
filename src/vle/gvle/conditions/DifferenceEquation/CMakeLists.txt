@@ -40,7 +40,6 @@ TARGET_LINK_LIBRARIES(input-simple
   ${OS_SPECIFIC_LIBRARIES}
   vlemanager
   vleutils
-  vledata
   vlevalue
   vlegraph
   vlevpz
@@ -62,7 +61,6 @@ TARGET_LINK_LIBRARIES(input-multiple
   ${OS_SPECIFIC_LIBRARIES}
   vlemanager
   vleutils
-  vledata
   vlevalue
   vlegraph
   vlevpz
@@ -84,7 +82,6 @@ TARGET_LINK_LIBRARIES(input-generic
   ${OS_SPECIFIC_LIBRARIES}
   vlemanager
   vleutils
-  vledata
   vlevalue
   vlegraph
   vlevpz

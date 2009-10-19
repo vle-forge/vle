@@ -30,8 +30,7 @@ TARGET_LINK_LIBRARIES(vlevalue
   ${Boost_SERIALIZATION_LIBRARY}
   ${OS_SPECIFIC_LIBRARIES}
   vlegeometry
-  vleutils
-  vledata)
+  vleutils)
 
 INSTALL(TARGETS vlevalue
   RUNTIME DESTINATION bin

@@ -134,20 +134,6 @@ ELSE (WITH_GVLE AND GTKSOURCEVIEWMM_FOUND)
 ENDIF (WITH_GVLE AND GTKSOURCEVIEWMM_FOUND)
 
 #
- # Test the libsqlxx dependencies
-#
-
-OPTION(WITH_SQLXX "with libsqlxx for the odbc driver [default: on]" ON)
-IF (WITH_SQLXX)
-  CHECK_INCLUDE_FILE_CXX(sqlxx.h HAVE_SQLXX)
-  IF (HAVE_SQLXX)
-    SET(LIBSQLXX_LIBRARIES "sqlxx")
-  ELSE (HAVE_SQLXX)
-    SET(LIBSQLXX_LIBRARIES)
-  ENDIF (HAVE_SQLXX)
-ENDIF (WITH_SQLXX)
-
-#
  # Test the libboost header and libboost-text library.
 #
 
@@ -276,9 +262,6 @@ MESSAGE(STATUS "Build type ${CMAKE_BUILD_TYPE}")
 IF (VLE_HAVE_GCC_ABI_DEMANGLE)
   MESSAGE(STATUS "Build with GCC ABI Demangle...: yes")
 ENDIF (VLE_HAVE_GCC_ABI_DEMANGLE)
-IF (HAVE_SQLXX)
-  MESSAGE(STATUS "Build with SQL................: yes")
-ENDIF (HAVE_SQLXX)
 IF (VLE_HAVE_EXECINFO)
   MESSAGE(STATUS "Build with execinfo.h.........: yes")
 ENDIF (VLE_HAVE_EXECINFO)

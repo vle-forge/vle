@@ -21,7 +21,6 @@ TARGET_LINK_LIBRARIES(default
   ${GTHREAD_LIBRARIES}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vleoov)
@@ -32,7 +31,6 @@ TARGET_LINK_LIBRARIES(text
   ${GTHREAD_LIBRARIES}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vleoov)
@@ -43,7 +41,6 @@ TARGET_LINK_LIBRARIES(rdata
   ${GTHREAD_LIBRARIES}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vleoov)
@@ -54,7 +51,6 @@ TARGET_LINK_LIBRARIES(csv
   ${GTHREAD_LIBRARIES}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vleoov)
@@ -65,7 +61,6 @@ TARGET_LINK_LIBRARIES(storage
   ${GTHREAD_LIBRARIES}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vleoov)

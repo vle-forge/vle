@@ -28,7 +28,6 @@ TARGET_LINK_LIBRARIES(gtkdefault
   vleeov
   vlemanager
   vleutils
-  vledata
   vlevalue
   vlegraph
   vlevpz

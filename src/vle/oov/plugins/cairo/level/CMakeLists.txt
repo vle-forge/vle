@@ -23,7 +23,6 @@ TARGET_LINK_LIBRARIES(cairolevel
   ${CAIROMM_LIBRARIES}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vleoov)

@@ -25,7 +25,6 @@ TARGET_LINK_LIBRARIES(vle
   ${Boost_FILESYSTEM_LIBRARY}
   vlegeometry
   vleutils
-  vledata
   vlevalue
   vlegraph
   vleoov

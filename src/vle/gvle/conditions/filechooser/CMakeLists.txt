@@ -28,7 +28,6 @@ TARGET_LINK_LIBRARIES(input-filechooser
   ${OS_SPECIFIC_LIBRARIES}
   vlemanager
   vleutils
-  vledata
   vlevalue
   vlegraph
   vlevpz
