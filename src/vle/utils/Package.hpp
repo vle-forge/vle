@@ -75,7 +75,8 @@ namespace vle { namespace utils {
         void install();
 
         /**
-         * @brief Clean the package by runngin the 'make clean' command.
+         * @brief Clean the package by running the 'make clean' command and
+         * remove the CMakeCache.txt file.
          */
         void clean();
 

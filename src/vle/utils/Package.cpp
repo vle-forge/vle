@@ -150,19 +150,32 @@ void Package::clean()
     Path& p = utils::Path::path();
     fs::create_directory(p.getPackageBuildDir());
 
-    std::list < std::string > argv;
-#ifdef G_OS_WIN32
-    argv.push_back(Glib::find_program_in_path("mingw32-make.exe"));
-#else
-    argv.push_back(Glib::find_program_in_path("make"));
-#endif
-    argv.push_back("rebuild_cache");
+    fs::path makefile = Path::path().getPackageBuildDir();
+    fs::path cmakecache = Path::path().getPackageBuildDir();
+    makefile /= "Makefile";
+    cmakecache /= "CMakeCache.txt";
 
-    try {
-        process(p.getPackageBuildDir(), argv);
-    } catch(const Glib::SpawnError& e) {
-        throw utils::InternalError(fmt(
-                _("Pkg clean error: clean failed %1%")) % e.what());
+    if (fs::exists(makefile)) {
+        std::list < std::string > argv;
+#ifdef G_OS_WIN32
+        argv.push_back(Glib::find_program_in_path("mingw32-make.exe"));
+#else
+        argv.push_back(Glib::find_program_in_path("make"));
+#endif
+        argv.push_back("clean");
+
+        try {
+            process(p.getPackageBuildDir(), argv);
+        } catch(const Glib::SpawnError& e) {
+            throw utils::InternalError(fmt(
+                    _("Pkg clean error: clean failed %1%")) % e.what());
+        }
+
+        fs::remove(makefile);
+    }
+
+    if (fs::exists(cmakecache)) {
+        fs::remove(cmakecache);
     }
 }
 
