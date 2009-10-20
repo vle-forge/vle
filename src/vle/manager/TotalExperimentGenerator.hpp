@@ -28,41 +28,40 @@
 #include <vle/manager/DllDefines.hpp>
 #include <vle/manager/ExperimentGenerator.hpp>
 
-namespace vle {
-namespace manager {
-
-/**
- * @brief A class to translate Experiment file into Instance of Experiment.
- */
-class VLE_MANAGER_EXPORT TotalExperimentGenerator: public ExperimentGenerator
-{
-public:
-    /**
-     * Just get a constant reference to VPZ. Use get_instances_files() to
-     * generate all VPZ instance file.
-     *
-     */
-    TotalExperimentGenerator(const vpz::Vpz& file, std::ostream& out,
-            bool storecomb, RandPtr rnd) :
-        ExperimentGenerator(file, out, storecomb, rnd)
-    {
-    }
-
-    virtual ~TotalExperimentGenerator()
-    {
-    }
-
-    virtual void buildCombination(size_t& nb);
+namespace vle { namespace manager {
 
     /**
-     * @brief Get the number of combination from vpz file.
-     *
-     * @return A value greater than 0.
+     * @brief A class to translate Experiment file into Instance of Experiment.
      */
-    virtual size_t getCombinationNumber() const;
-};
+    class VLE_MANAGER_EXPORT TotalExperimentGenerator :
+        public ExperimentGenerator
+    {
+    public:
+        /**
+         * Just get a constant reference to VPZ. Use get_instances_files() to
+         * generate all VPZ instance file.
+         *
+         */
+        TotalExperimentGenerator(const vpz::Vpz & file, std::ostream & out,
+                                 bool storecomb, bool commonseed, RandPtr rnd)
+            : ExperimentGenerator(file, out, storecomb, commonseed, rnd)
+        {
+        }
 
-}
-} // namespace vle manager
+        virtual ~TotalExperimentGenerator()
+        {
+        }
+
+        virtual void buildCombination(size_t& nb);
+
+        /**
+         * @brief Get the number of combination from vpz file.
+         *
+         * @return A value greater than 0.
+         */
+        virtual size_t getCombinationNumber() const;
+    };
+
+}} // namespace vle manager
 
 #endif

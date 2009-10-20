@@ -48,18 +48,20 @@ namespace vle { namespace manager {
          * between the default condition values and a combination
          */
         typedef std::pair < vpz::ConditionList::const_iterator,
-                vpz::ConditionValues::const_iterator> diff_key_t;
+                vpz::ConditionValues::const_iterator > diff_key_t;
 
         struct less_diff_keys
         {
             bool operator()(diff_key_t s1, diff_key_t s2) const
             {
                 int comp = s1.first->first.compare(s2.first->first);
+
                 if (comp == 0) {
                     comp = s1.second->first.compare(s2.second->first);
                 }
                 return comp < 0;
             }
+
         };
 
         typedef std::map < diff_key_t, int, less_diff_keys > diff_t;
@@ -72,10 +74,14 @@ namespace vle { namespace manager {
          * vpz::Vpz.
          * @param file A constant reference to a VPZ.
          * @param out Where to send output.
+         * @param storecomb stores simulated combinations in order to access to
+         * the function getInputFromCombination.
+         * @param commonseed if true, the same seed is used for the simulation
+         * of different combinations of one replica
          * @param rnd A reference random number generator.
          */
-        ExperimentGenerator(const vpz::Vpz& file, std::ostream& out,
-                            bool storecomb, RandPtr rnd);
+        ExperimentGenerator(const vpz::Vpz & file, std::ostream & out,
+                            bool storecomb, bool commonseed, RandPtr rnd);
 
         virtual ~ExperimentGenerator();
 
@@ -114,11 +120,14 @@ namespace vle { namespace manager {
          *  used for simulation of combination comb
          */
         const value::Value&
-            getInputFromCombination(unsigned int comb,
+            getInputFromCombination(unsigned int       comb,
                                     const std::string& condition,
                                     const std::string& port) const;
 
-        const Diffs getCombinations() const { return mCombinationDiff; }
+        const Diffs getCombinations() const
+        {
+            return mCombinationDiff;
+        }
 
     protected:
         /**
@@ -175,9 +184,11 @@ namespace vle { namespace manager {
         /**
          * @brief Define a condition used to generate combination list.
          */
-        struct cond_t
-        {
-            cond_t() : sz(0), pos(0) {}
+        struct cond_t {
+            cond_t() :
+                sz(0), pos(0)
+            {
+            }
 
             size_t sz;
             size_t pos;
@@ -192,16 +203,16 @@ namespace vle { namespace manager {
         std::vector < guint32 > mReplicasTab;
         std::vector < cond_t > mCondition;
         std::vector < diff_t > mCombinationDiff;
-        std::list< vpz::Vpz* > mFileList;
+        std::list < vpz::Vpz* > mFileList;
         bool mSaveVpz;
         bool mStoreComb;
+        bool mCommonSeed;
         OutputSimulationMatrix* mMatrix;
         Glib::Mutex* mMutex;
         Glib::Cond* mProdcond;
         RandPtr mRand;
     };
 
-}
-} // namespace vle manager
+}} // namespace vle manager
 
 #endif

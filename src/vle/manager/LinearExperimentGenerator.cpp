@@ -32,8 +32,8 @@ namespace vle { namespace manager {
 void LinearExperimentGenerator::buildCombination(size_t& nb)
 {
     for(size_t i=0; i < mCondition.size(); ++i)
-	if (mCondition[i].sz != 1)
-	    mCondition[i].pos++;
+        if (mCondition[i].sz != 1)
+            mCondition[i].pos++;
     nb++;
 }
 
@@ -47,13 +47,13 @@ size_t LinearExperimentGenerator::getCombinationNumber() const
     size_t nb = 1;
 
     {
-	std::vector < cond_t >::const_iterator it;
-	for (it = mCondition.begin(); it != mCondition.end(); ++it) {
-	    if (it->sz != 1) {
-		nb = it->sz;
-		break;
-	    }
-	}
+        std::vector < cond_t >::const_iterator it;
+        for (it = mCondition.begin(); it != mCondition.end(); ++it) {
+            if (it->sz != 1) {
+                nb = it->sz;
+                break;
+            }
+        }
     }
 
     size_t cndnb = 0;
@@ -63,8 +63,8 @@ size_t LinearExperimentGenerator::getCombinationNumber() const
 
         if (it->sz != nb and it->sz != 1) {
             throw utils::InternalError(fmt(_(
-                    "Build a linear experimental frame with bad"
-                    " number value for condition '%1%'")) % cndnb);
+                        "Build a linear experimental frame with bad"
+                        " number value for condition '%1%'")) % cndnb);
         }
 
         cndnb++;

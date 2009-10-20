@@ -39,18 +39,24 @@
 #include <vle/value/Integer.hpp>
 #include <vle/utils/Path.hpp>
 
-struct F
-{
-    F() { vle::manager::init(); }
-    ~F() { vle::manager::finalize(); }
+struct F {
+    F()
+    {
+        vle::manager::init();
+    }
+
+    ~F()
+    {
+        vle::manager::finalize();
+    }
+
 };
 
 BOOST_GLOBAL_FIXTURE(F)
 
 using namespace vle;
 
-BOOST_AUTO_TEST_CASE(combination_storage_test)
-{
+BOOST_AUTO_TEST_CASE(combination_storage_test){
     using namespace manager;
 
     vpz::Vpz file(utils::Path::path().getExampleFile("unittest.vpz"));
@@ -72,54 +78,60 @@ BOOST_AUTO_TEST_CASE(combination_storage_test)
     cnds.get("cc").addValueToPort("x", value::Double::create(5.0));
     cnds.get("cd").addValueToPort("x", value::Double::create(6.0));
 
-    ManagerRunMono r(std::cout, false, true);
+    bool writefile = false;
+    bool storecomb = true;
+    bool commonseed = true;
+
+    ManagerRunMono r(std::cout, writefile, storecomb, commonseed);
     r.start(file);
 
     const OutputSimulationMatrix& out(r.outputSimulationMatrix());
     BOOST_REQUIRE_EQUAL(out.shape()[0],
-            (OutputSimulationMatrix::size_type)1);
+                        (OutputSimulationMatrix::size_type)1);
     BOOST_REQUIRE_EQUAL(out.shape()[1],
-            (OutputSimulationMatrix::size_type)2);
+                        (OutputSimulationMatrix::size_type)2);
 
     BOOST_REQUIRE_EQUAL(r.getCombinations().size(), 2);
 
-    BOOST_REQUIRE_EQUAL(value::toDouble(r.getInputFromCombination(0,"ca","x")),1.0);
-    BOOST_REQUIRE_EQUAL(value::toDouble(r.getInputFromCombination(0,"cb","x")),3.0);
-    BOOST_REQUIRE_EQUAL(value::toDouble(r.getInputFromCombination(0,"cc","x")),4.0);
-    BOOST_REQUIRE_EQUAL(value::toDouble(r.getInputFromCombination(0,"cd","x")),6.0);
-    BOOST_REQUIRE_EQUAL(value::toDouble(r.getInputFromCombination(1,"ca","x")),2.0);
-    BOOST_REQUIRE_EQUAL(value::toDouble(r.getInputFromCombination(1,"cb","x")),3.0);
-    BOOST_REQUIRE_EQUAL(value::toDouble(r.getInputFromCombination(1,"cc","x")),5.0);
-    BOOST_REQUIRE_EQUAL(value::toDouble(r.getInputFromCombination(1,"cd","x")),6.0);
+    BOOST_REQUIRE_EQUAL(value::toDouble(r.getInputFromCombination(0, "ca", "x")), 1.0);
+    BOOST_REQUIRE_EQUAL(value::toDouble(r.getInputFromCombination(0, "cb", "x")), 3.0);
+    BOOST_REQUIRE_EQUAL(value::toDouble(r.getInputFromCombination(0, "cc", "x")), 4.0);
+    BOOST_REQUIRE_EQUAL(value::toDouble(r.getInputFromCombination(0, "cd", "x")), 6.0);
+    BOOST_REQUIRE_EQUAL(value::toDouble(r.getInputFromCombination(1, "ca", "x")), 2.0);
+    BOOST_REQUIRE_EQUAL(value::toDouble(r.getInputFromCombination(1, "cb", "x")), 3.0);
+    BOOST_REQUIRE_EQUAL(value::toDouble(r.getInputFromCombination(1, "cc", "x")), 5.0);
+    BOOST_REQUIRE_EQUAL(value::toDouble(r.getInputFromCombination(1, "cd", "x")), 6.0);
+
+
 
     file.project().experiment().setCombination("total");
-    ManagerRunMono r2(std::cout, false, true);
+    ManagerRunMono r2(std::cout, writefile, storecomb, commonseed);
     r2.start(file);
 
     const OutputSimulationMatrix& out2(r2.outputSimulationMatrix());
     BOOST_REQUIRE_EQUAL(out2.shape()[0],
-            (OutputSimulationMatrix::size_type)1);
+                        (OutputSimulationMatrix::size_type)1);
     BOOST_REQUIRE_EQUAL(out2.shape()[1],
-            (OutputSimulationMatrix::size_type)4);
+                        (OutputSimulationMatrix::size_type)4);
 
     BOOST_REQUIRE_EQUAL(r2.getCombinations().size(), 4);
 
-    BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(0,"ca","x")),1.0);
-    BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(0,"cb","x")),3.0);
-    BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(0,"cc","x")),4.0);
-    BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(0,"cd","x")),6.0);
-    BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(1,"ca","x")),1.0);
-    BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(1,"cb","x")),3.0);
-    BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(1,"cc","x")),5.0);
-    BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(1,"cd","x")),6.0);
-    BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(2,"ca","x")),2.0);
-    BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(2,"cb","x")),3.0);
-    BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(2,"cc","x")),4.0);
-    BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(2,"cd","x")),6.0);
-    BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(3,"ca","x")),2.0);
-    BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(3,"cb","x")),3.0);
-    BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(3,"cc","x")),5.0);
-    BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(3,"cd","x")),6.0);
+    BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(0, "ca", "x")), 1.0);
+    BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(0, "cb", "x")), 3.0);
+    BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(0, "cc", "x")), 4.0);
+    BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(0, "cd", "x")), 6.0);
+    BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(1, "ca", "x")), 1.0);
+    BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(1, "cb", "x")), 3.0);
+    BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(1, "cc", "x")), 5.0);
+    BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(1, "cd", "x")), 6.0);
+    BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(2, "ca", "x")), 2.0);
+    BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(2, "cb", "x")), 3.0);
+    BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(2, "cc", "x")), 4.0);
+    BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(2, "cd", "x")), 6.0);
+    BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(3, "ca", "x")), 2.0);
+    BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(3, "cb", "x")), 3.0);
+    BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(3, "cc", "x")), 5.0);
+    BOOST_REQUIRE_EQUAL(value::toDouble(r2.getInputFromCombination(3, "cd", "x")), 6.0);
 
     delete file.project().model().model();
 }
