@@ -35,7 +35,7 @@
 
 namespace vle { namespace extension {
 
-class Base : public vle::devs::Dynamics
+class VLE_EXTENSION_EXPORT Base : public vle::devs::Dynamics
 {
 public:
     Base(const vle::devs::DynamicsInit& init,

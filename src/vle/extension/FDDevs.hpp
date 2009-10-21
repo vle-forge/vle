@@ -44,7 +44,7 @@ namespace vle { namespace extension {
  * The structure and dynamics of Finite State Automaton are
  * specified with C++ code.
  */
-class FDDevs : public Base
+class VLE_EXTENSION_EXPORT FDDevs : public Base
 {
 public:
     FDDevs(const devs::DynamicsInit& init,

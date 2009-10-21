@@ -33,7 +33,7 @@
 
 namespace vle { namespace extension {
 
-class Mealy : public Base
+class VLE_EXTENSION_EXPORT Mealy : public Base
 {
 public:
     Mealy(const devs::DynamicsInit& init,

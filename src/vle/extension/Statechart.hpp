@@ -34,7 +34,7 @@
 
 namespace vle { namespace extension {
 
-class Statechart : public Base
+class VLE_EXTENSION_EXPORT Statechart : public Base
 {
 public:
     Statechart(const devs::DynamicsInit& init,

@@ -33,7 +33,7 @@
 
 namespace vle { namespace extension {
 
-class Moore : public Base
+class VLE_EXTENSION_EXPORT Moore : public Base
 {
 public:
     Moore(const devs::DynamicsInit& init,
