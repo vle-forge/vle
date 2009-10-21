@@ -35,6 +35,7 @@
 #include <ostream>
 #include <iostream>
 #include <cstring>
+#include <glib/gstdio.h>
 
 #ifdef G_OS_WIN32
 #   include <windows.h>
@@ -277,6 +278,24 @@ void Package::wait(std::ostream& out, std::ostream& err)
     }
 }
 
+void Package::changeToOutputDirectory()
+{
+    if (utils::Package::package().selected()) {
+        namespace fs = boost::filesystem;
+
+        fs::path outputdir = utils::Path::path().getPackageOutputDir();
+
+        if (not fs::exists(outputdir)) {
+            fs::create_directories(outputdir);
+            g_chdir(outputdir.string().c_str());
+        } else {
+            if (fs::is_directory(outputdir)) {
+                g_chdir(outputdir.string().c_str());
+            }
+        }
+    }
+}
+
 void Package::addFile(const std::string& path, const std::string& name)
 {
     if (not fs::exists(Glib::build_filename(path, name)))
@@ -317,6 +336,10 @@ void Package::select(const std::string& name)
 {
     m_table.current(name);
     Path::path().updatePackageDirs();
+
+    if (selected()) {
+        changeToOutputDirectory();
+    }
 }
 
                             /*   manage thread   */

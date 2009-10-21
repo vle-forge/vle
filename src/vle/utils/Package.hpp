@@ -114,6 +114,14 @@ namespace vle { namespace utils {
         void getOutputAndClear(std::string& str);
         void getErrorAndClear(std::string& str);
 
+
+        /**
+         * @brief Change the current directory to the output directory. If we
+         * are in package mode, the output directory will be create. If a file
+         * named output directory exists, nothing is done.
+         */
+        void changeToOutputDirectory();
+
         void addFile(const std::string& path, const std::string& name);
         void addDirectory(const std::string& path, const std::string& name);
 	void removeFile(const std::string& pathFile);

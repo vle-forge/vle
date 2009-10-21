@@ -397,6 +397,11 @@ std::string Path::getPackageExpDir() const
     return buildDirname(m_currentPackagePath, "exp");
 }
 
+std::string Path::getPackageOutputDir() const
+{
+    return buildDirname(m_currentPackagePath, "output");
+}
+
 std::string Path::getPackageBuildDir() const
 {
     return buildDirname(m_currentPackagePath, "build");
@@ -430,6 +435,11 @@ std::string Path::getPackageDataFile(const std::string& name) const
 std::string Path::getPackageExpFile(const std::string& name) const
 {
     return buildFilename(getPackageExpDir(), name);
+}
+
+std::string Path::getPackageOutputFile(const std::string& name) const
+{
+    return buildFilename(getPackageOutputDir(), name);
 }
 
 std::string Path::getPackageDocFile(const std::string& name) const

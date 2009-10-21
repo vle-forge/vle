@@ -201,12 +201,14 @@ namespace vle { namespace utils {
         std::string getPackageDocDir() const;
         std::string getPackageExpDir() const;
         std::string getPackageBuildDir() const;
+        std::string getPackageOutputDir() const;
         std::string getPackageFile(const std::string& name) const;
         std::string getPackageLibFile(const std::string& name) const;
         std::string getPackageSrcFile(const std::string& name) const;
         std::string getPackageDataFile(const std::string& name) const;
         std::string getPackageDocFile(const std::string& name) const;
         std::string getPackageExpFile(const std::string& name) const;
+        std::string getPackageOutputFile(const std::string& name) const;
 
         std::string getExternalPackageDir(const std::string& name) const;
         std::string getExternalPackageLibDir(const std::string& name) const;

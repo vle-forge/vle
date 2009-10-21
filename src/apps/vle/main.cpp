@@ -187,7 +187,7 @@ int main(int argc, char* argv[])
         } else if (command.simulator()) {
             result = vle.runSimulator(command.processor());
         } else if (command.justRun()) {
-            result = vle.justRun( command.processor(), lst);
+            result = vle.justRun(command.processor(), lst);
         }
     }
 
