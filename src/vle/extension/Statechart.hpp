@@ -211,10 +211,11 @@ private:
     void process(const devs::Time& time,
                  const devs::ExternalEvent* event);
     void process(const devs::Time& time,
-                 int transitionId, int nextState);
+                 int transitionId);
     void processActivities(const devs::Time& time);
     void processEventInStateActions(const devs::Time& time,
                                     const devs::ExternalEvent* event);
+    void processIn(const devs::Time& time, int nextState);
     void processInStateAction(const devs::Time& time);
     void processOutStateAction(const devs::Time& time);
     void processEventTransitionAction(int transition,
@@ -222,6 +223,8 @@ private:
                                       const devs::ExternalEvent* event);
     void processGuardTransitionAction(int transition,
                                       const devs::Time& time);
+    void removeProcessEvent(devs::ExternalEventList* events,
+			    devs::ExternalEvent* event);
     void setSigma(const devs::Time& time);
     void updateSigma(const devs::Time& time);
 
@@ -238,7 +241,7 @@ private:
         const devs::ExternalEventList& /* extEventlist */) const
     { return devs::Event::EXTERNAL; }
 
-    enum Phase { IDLE, PROCESSING };
+    enum Phase { IDLE, PROCESSING, SEND };
 
     Phase mPhase;
     devs::Time mLastTime;
