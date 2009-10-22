@@ -2385,12 +2385,21 @@ the experimental frame</property>
                             <property name="visible">True</property>
                             <property name="resize_mode">GTK_RESIZE_QUEUE</property>
                             <child>
-                              <widget class="GtkTreeView" id="TreeViewObs">
-                                <property name="height_request">200</property>
-                                <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="rules_hint">True</property>
-                              </widget>
+			      <widget class="GtkScrolledWindow" id="scrolledwindowObs">
+				<property name="visible">True</property>
+				<property name="can_focus">True</property>
+				<property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+				<property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+				<property name="shadow_type">GTK_SHADOW_IN</property>
+				<child>
+				  <widget class="GtkTreeView" id="TreeViewObs">
+                                    <property name="height_request">200</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="rules_hint">True</property>
+				  </widget>
+				</child>
+			      </widget>
                             </child>
                           </widget>
                         </child>
@@ -2425,12 +2434,21 @@ the experimental frame</property>
                             <property name="visible">True</property>
                             <property name="resize_mode">GTK_RESIZE_QUEUE</property>
                             <child>
-                              <widget class="GtkTreeView" id="TreeViewViews">
-                                <property name="height_request">200</property>
-                                <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="rules_hint">True</property>
-                              </widget>
+			      <widget class="GtkScrolledWindow" id="scrolledwindowViews">
+				<property name="visible">True</property>
+				<property name="can_focus">True</property>
+				<property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+				<property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+				<property name="shadow_type">GTK_SHADOW_IN</property>
+				<child>
+				  <widget class="GtkTreeView" id="TreeViewViews">
+                                    <property name="height_request">200</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="rules_hint">True</property>
+				  </widget>
+				</child>
+			      </widget>
                             </child>
                           </widget>
                         </child>
@@ -4708,9 +4726,18 @@ into your project.
         <property name="visible">True</property>
         <property name="spacing">2</property>
         <child>
-          <widget class="GtkTreeView" id="TreeViewPackage">
+          <widget class="GtkScrolledWindow" id="scrolledwindowPackage">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+            <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+            <property name="shadow_type">GTK_SHADOW_IN</property>
+            <child>
+              <widget class="GtkTreeView" id="TreeViewPackage">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+              </widget>
+            </child>
           </widget>
           <packing>
             <property name="position">1</property>
