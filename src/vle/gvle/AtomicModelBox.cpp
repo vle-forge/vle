@@ -944,6 +944,7 @@ void AtomicModelBox::DynamicTreeView::onRename()
 		vpz::Dynamic* newDynamic = new vpz::Dynamic(newName);
 		vpz::Dynamic oldDynamic = mModeling->dynamics().get(oldName);
 		newDynamic->setLibrary(oldDynamic.library());
+		newDynamic->setPackage(oldDynamic.package());
 		newDynamic->setModel(oldDynamic.model());
 		newDynamic->setLanguage(oldDynamic.language());
 		if (oldDynamic.location().empty()) {
