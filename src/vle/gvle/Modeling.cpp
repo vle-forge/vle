@@ -228,17 +228,18 @@ void Modeling::showDynamics(const std::string& /* name */)
 
 void Modeling::addView(graph::Model* model)
 {
-    assert(model);
-    if (model->isCoupled()) {
-        graph::CoupledModel* m = (graph::CoupledModel*)(model);
-        addView(m);
-    } else if (model->isAtomic()) {
-        graph::AtomicModel* graph_am = dynamic_cast<graph::AtomicModel*>(model);
-        try {
-            vpz::AtomicModel& vpz_am = get_model(graph_am);
-            mAtomicBox->show(vpz_am, *graph_am);
-        } catch (utils::SaxParserError& E) {
-            parse_model(mVpz.project().model().atomicModels());
+    if (model) {
+        if (model->isCoupled()) {
+            graph::CoupledModel* m = graph::Model::toCoupled(model);
+            addView(m);
+        } else if (model->isAtomic()) {
+            graph::AtomicModel* m = graph::Model::toAtomic(model);
+            try {
+                vpz::AtomicModel& vm = get_model(m);
+                mAtomicBox->show(vm, *m);
+            } catch (utils::SaxParserError& /*e*/) {
+                parse_model(mVpz.project().model().atomicModels());
+            }
         }
     }
     refreshViews();

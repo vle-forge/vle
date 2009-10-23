@@ -836,9 +836,12 @@ bool ViewDrawingArea::on_button_press_event(GdkEventButton* event)
             on_gvlepointer_button_1(model, shiftOrControl);
             queueRedraw();
         } else if (event->type == GDK_2BUTTON_PRESS and event->button == 1) {
-	    mModeling->addView(model);
+	    mView->showModel(model);
         } else if (event->button == 2) {
-	    mModeling->addView(model);
+	    mView->showModel(model);
+        }
+        if (not model) {
+            queueRedraw();
         }
         break;
     case GVLE::ADDMODEL:
