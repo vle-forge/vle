@@ -49,11 +49,17 @@ void LocalStreamReader::onValue(const std::string& simulator,
         plg->needCopy();
         plugin()->onValue(simulator, parent, port, view, time, value);
         if (plg->isCopyDone()) {
-            plg->stored()->write_to_png(
-                Glib::build_filename(plg->location(),
-                                     (fmt("img-%1$08d.png") %
-                                      m_image).str()));
-            m_image++;
+            std::string file(Glib::build_filename(plg->location(),
+                                                  (fmt("img-%1$08d.png") %
+                                                   m_image).str()));
+
+            try {
+                plg->stored()->write_to_png(file);
+                m_image++;
+            } catch(const std::exception& /*e*/) {
+                throw utils::InternalError(fmt(
+                        _("oov: cannot write image '%1%'")) % file);
+            }
         }
     } else {
 #endif
