@@ -69,7 +69,7 @@ OpenPackageBox::~OpenPackageBox()
 void OpenPackageBox::show()
 {
     build();
-    mDialog->set_title("Open Package");
+    mDialog->set_title("Open Project");
     mDialog->show_all();
     mDialog->run();
 }
