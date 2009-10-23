@@ -106,6 +106,10 @@ public:
         return mIndex;
     }
 
+    inline ViewDrawingArea* getArea() {
+	return mDrawing;
+    }
+
     //
     //
     // MANAGE GTK::WINDOW EVENT

@@ -27,6 +27,7 @@
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/GVLEMenuAndToolbar.hpp>
+#include <vle/gvle/View.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Debug.hpp>
@@ -239,7 +240,7 @@ DocumentDrawingArea::DocumentDrawingArea(GVLE* gvle,
 {
     mTitle = filename() + boost::filesystem::extension(filepath)
 	+ " - " + model->getName();
-    mArea = new ViewDrawingArea(mView);
+    mArea = mView->getArea();
     mViewport = new Gtk::Viewport(mAdjustWidth, mAdjustHeight);
 
     mViewport->add(*mArea);
@@ -254,7 +255,8 @@ DocumentDrawingArea::DocumentDrawingArea(GVLE* gvle,
 
 DocumentDrawingArea::~DocumentDrawingArea()
 {
-    delete mArea;
+    remove();
+    delete mViewport;
 }
 
 void DocumentDrawingArea::setHadjustment(double h)
@@ -271,7 +273,7 @@ void DocumentDrawingArea::setVadjustment(double v)
 
 void DocumentDrawingArea::updateView()
 {
-    //maybe useful later
+    mArea->queueRedraw();
 }
 
 void DocumentDrawingArea::undo()

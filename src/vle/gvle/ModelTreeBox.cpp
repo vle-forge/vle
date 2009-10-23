@@ -97,6 +97,8 @@ void ModelTreeBox::onRenameModels()
 		try {
 		    row[m_modelscolumnrecord.name] = newname;
 		    graph::Model::rename(row[m_Columns.mModel], newname);
+		    m_modeling->refreshViews();
+		    m_modeling->setModified(true);
 		} catch(utils::DevsGraphError dge) {
 		    row[m_modelscolumnrecord.name] = oldname;
 		}
@@ -251,6 +253,8 @@ void ModelTreeBox::onEdition(
 		try {
 		    row[m_modelscolumnrecord.name] = newName;
 		    graph::Model::rename(row[m_Columns.mModel], newName);
+		    m_modeling->refreshViews();
+		    m_modeling->setModified(true);
 		} catch(utils::DevsGraphError dge) {
 		    row[m_modelscolumnrecord.name] = m_OldName;
 		}
