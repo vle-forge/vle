@@ -27,7 +27,6 @@
 #include <vle/gvle/About.hpp>
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/Editor.hpp>
-#include <vle/gvle/ExecutionBox.hpp>
 #include <vle/gvle/ExperimentBox.hpp>
 #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/ExperimentBox.hpp>
