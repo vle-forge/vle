@@ -103,9 +103,13 @@ ExperimentBox::~ExperimentBox()
 
 void ExperimentBox::initExperiment()
 {
+    const Modeling& modeling(*mModeling);
+    const vle::vpz::Vpz& vpz(modeling.vpz());
+    const vle::vpz::Experiment& experiment(modeling.experiment());
+
     // Project frame
     {
-        std::string name(mModeling->vpz().project().author());
+        std::string name(vpz.project().author());
 
         if (name.empty()) {
             name = Glib::get_real_name();
@@ -115,40 +119,40 @@ void ExperimentBox::initExperiment()
         }
         mEntryAuthor->set_text(name);
 
-	if (mModeling->vpz().project().date().empty()) {
+	if (vpz.project().date().empty()) {
 	    on_now();
 	} else {
-	    mEntryDate->set_text(mModeling->vpz().project().date());
+	    mEntryDate->set_text(vpz.project().date());
 	}
 
 	mEntryVersion->set_text(utils::to_string(
-				    mModeling->vpz().project().version()));
+				    vpz.project().version()));
     }
 
     // Experiment frame
     {
-        if (mModeling->experiment().name().empty()) {
+        if (experiment.name().empty()) {
 	    mEntryName->set_text("exp");
 	} else {
-	    mEntryName->set_text(mModeling->experiment().name());
+	    mEntryName->set_text(experiment.name());
 	}
 
 	mSpinDuration->set_range(
 	    std::numeric_limits < double >::epsilon(),
 	    std::numeric_limits < double >::max());
-	mSpinDuration->set_value(mModeling->experiment().duration());
+	mSpinDuration->set_value(experiment.duration());
 
         mSpinBeginReal->set_range(std::numeric_limits < int >::min(),
                                   std::numeric_limits < int >::max());
-        mSpinBeginReal->set_value(mModeling->experiment().begin());
+        mSpinBeginReal->set_value(experiment.begin());
         updateBeginTime();
     }
 
     // Simulation frame
     {
 	mSpinSimuSeed->set_range(0, std::numeric_limits < guint32 >::max());
-	if (mModeling->experiment().seed() != 1) {
-	    mSpinSimuSeed->set_value(mModeling->experiment().seed());
+	if (experiment.seed() != 1) {
+	    mSpinSimuSeed->set_value(experiment.seed());
 	} else {
 	    on_random_simu();
 	}
@@ -156,25 +160,22 @@ void ExperimentBox::initExperiment()
 
     // Plan frame
     {
-	if (mModeling->experiment().combination().empty()) {
-	    mModeling->experiment().setCombination("linear");
-	}
-
-	if (mModeling->experiment().combination() == "linear") {
+	if (experiment.combination().empty() or
+	    experiment.combination() == "linear") {
 	    mRadioButtonLinear->set_active();
 	} else {
 	    mRadioButtonTotal->set_active();
 	}
 
 	mSpinPlanSeed->set_range(0, std::numeric_limits < guint32 >::max());
-	if (mModeling->experiment().replicas().seed() != 0) {
-	    mSpinPlanSeed->set_value(mModeling->experiment().replicas().seed());
+	if (experiment.replicas().seed() != 0) {
+	    mSpinPlanSeed->set_value(experiment.replicas().seed());
 	} else {
 	    on_random_plan();
 	}
 
 	mButtonNumber->set_range(1, std::numeric_limits < guint32 >::max());
-	mButtonNumber->set_value(mModeling->experiment().replicas().number());
+	mButtonNumber->set_value(experiment.replicas().number());
     }
 }
 
@@ -182,7 +183,7 @@ void ExperimentBox::run()
 {
     bool ok = false;
 
-    while (!ok) {
+    while (not ok) {
 	if (mDialog->run() == Gtk::RESPONSE_OK) {
 	    ok = apply();
 	} else {
