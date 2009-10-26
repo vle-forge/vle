@@ -421,6 +421,7 @@ GVLE::GVLE(BaseObjectType* cobject,
     Gtk::Window(cobject),
     mModeling(new Modeling(this)),
     mCurrentButton(POINTER),
+    mCurrentTab(-1),
     mHelpBox(0)
 {
     mRefXML = xml;
@@ -1125,30 +1126,50 @@ void GVLE::packageProject()
 
 void GVLE::onCutModel()
 {
-    View* currentView = dynamic_cast<DocumentDrawingArea*>(
-	mEditor->get_nth_page(mCurrentTab))->getView();
-    currentView->onCutModel();
+    if (mCurrentTab >= 0) {
+	View* currentView = dynamic_cast<DocumentDrawingArea*>(
+	    mEditor->get_nth_page(mCurrentTab))->getView();
+
+	if (currentView) {
+	    currentView->onCutModel();
+	}
+    }
 }
 
 void GVLE::onCopyModel()
 {
-    View* currentView = dynamic_cast<DocumentDrawingArea*>(
-	mEditor->get_nth_page(mCurrentTab))->getView();
-    currentView->onCopyModel();
+    if (mCurrentTab >= 0) {
+	View* currentView = dynamic_cast<DocumentDrawingArea*>(
+	    mEditor->get_nth_page(mCurrentTab))->getView();
+
+	if (currentView) {
+	    currentView->onCopyModel();
+	}
+    }
 }
 
 void GVLE::onPasteModel()
 {
-    View* currentView = dynamic_cast<DocumentDrawingArea*>(
-	mEditor->get_nth_page(mCurrentTab))->getView();
-    currentView->onPasteModel();
+    if (mCurrentTab >= 0) {
+	View* currentView = dynamic_cast<DocumentDrawingArea*>(
+	    mEditor->get_nth_page(mCurrentTab))->getView();
+
+	if (currentView) {
+	    currentView->onPasteModel();
+	}
+    }
 }
 
 void GVLE::clearCurrentModel()
 {
-    View* currentView = dynamic_cast<DocumentDrawingArea*>(
-	mEditor->get_nth_page(mCurrentTab))->getView();
-    currentView->clearCurrentModel();
+    if (mCurrentTab >= 0) {
+	View* currentView = dynamic_cast<DocumentDrawingArea*>(
+	    mEditor->get_nth_page(mCurrentTab))->getView();
+
+	if (currentView) {
+	    currentView->clearCurrentModel();
+	}
+    }
 }
 
 void GVLE::importModel()
