@@ -150,12 +150,8 @@ void ExperimentBox::initExperiment()
 
     // Simulation frame
     {
-	mSpinSimuSeed->set_range(0, std::numeric_limits < guint32 >::max());
-	if (experiment.seed() != 1) {
-	    mSpinSimuSeed->set_value(experiment.seed());
-	} else {
-	    on_random_simu();
-	}
+        mSpinSimuSeed->set_range(0, std::numeric_limits < guint32 >::max());
+	    mSpinSimuSeed->set_value(mModeling->experiment().seed());
     }
 
     // Plan frame
@@ -168,11 +164,7 @@ void ExperimentBox::initExperiment()
 	}
 
 	mSpinPlanSeed->set_range(0, std::numeric_limits < guint32 >::max());
-	if (experiment.replicas().seed() != 0) {
-	    mSpinPlanSeed->set_value(experiment.replicas().seed());
-	} else {
-	    on_random_plan();
-	}
+	mSpinPlanSeed->set_value(mModeling->experiment().replicas().seed());
 
 	mButtonNumber->set_range(1, std::numeric_limits < guint32 >::max());
 	mButtonNumber->set_value(experiment.replicas().number());
@@ -234,13 +226,16 @@ bool ExperimentBox::apply()
     }
 
     {
-        long seed = (long)std::floor(std::abs(mSpinSimuSeed->get_value()));
+        boost::uint32_t seed =
+            (boost::uint32_t)std::floor(std::abs(mSpinSimuSeed->get_value()));
 	exp.setSeed(seed);
     }
 
     {
-        long seed = (long)std::floor(std::abs(mSpinPlanSeed->get_value()));
-        long number = (long)std::floor(std::abs(mButtonNumber->get_value()));
+        boost::uint32_t seed =
+            (boost::uint32_t)std::floor(std::abs(mSpinPlanSeed->get_value()));
+        boost::uint32_t number =
+            (boost::uint32_t)std::floor(std::abs(mButtonNumber->get_value()));
         exp.setCombination(mRadioButtonLinear->get_active()?"linear":"total");
 	rep.setSeed(seed);
 	rep.setNumber(number);

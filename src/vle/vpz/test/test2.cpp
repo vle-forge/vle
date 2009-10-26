@@ -240,6 +240,7 @@ BOOST_AUTO_TEST_CASE(experiment_vpz)
     const vpz::Experiment& experiment(project.experiment());
     const vpz::Replicas& replicas(project.experiment().replicas());
     const vpz::Conditions& cnds(project.experiment().conditions());
+    vpz::Experiment& experimentM(vpz.project().experiment());
 
     BOOST_REQUIRE_EQUAL(experiment.name(), "test1");
     BOOST_REQUIRE_EQUAL(experiment.duration(), 0.33);
@@ -247,6 +248,10 @@ BOOST_AUTO_TEST_CASE(experiment_vpz)
 
     BOOST_REQUIRE_EQUAL(replicas.seed(), (guint32)987456);
     BOOST_REQUIRE_EQUAL(replicas.number(), (size_t)5);
+
+
+    experimentM.setSeed((boost::uint32_t) std::numeric_limits < boost::uint32_t >::max());
+    BOOST_REQUIRE_EQUAL(experimentM.seed(), std::numeric_limits < guint32 >::max());
 
     std::list < std::string > lst;
     cnds.conditionnames(lst);
