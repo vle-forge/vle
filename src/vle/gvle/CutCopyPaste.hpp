@@ -68,7 +68,7 @@ public:
      * @param gc graph::CoupledModel where list will be copied.
      */
     void copy(graph::ModelList& l, graph::CoupledModel* gc,
-              vpz::AtomicModelList& src);
+              vpz::AtomicModelList& src, bool isClass);
 
     /**
      * paste the current list GModel into graph::CoupledModel gc. Rename

@@ -32,9 +32,7 @@
 #include <vle/gvle/InteractiveTypeBox.hpp>
 #include <iostream>
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
 ModelClassBox::ModelClassBox(BaseObjectType* cobject,
 			     Glib::RefPtr < Gnome::Glade::Xml > xml):
@@ -59,12 +57,29 @@ ModelClassBox::ModelClassBox(BaseObjectType* cobject,
 
     signal_event().connect(
       sigc::mem_fun(*this, &ModelClassBox::onExposeEvent));
+    signal_cursor_changed().connect(
+	sigc::mem_fun(*this, &ModelClassBox::on_cursor_changed));
     signal_button_release_event().connect(
 	sigc::mem_fun(*this, &ModelClassBox::onButtonRealeaseModels));
 
     expand_all();
     set_rules_hint(true);
     initMenuPopupModels();
+}
+
+void ModelClassBox::on_cursor_changed()
+{
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection =  get_selection();
+    if (refSelection) {
+        Gtk::TreeModel::iterator iter = refSelection->get_selected();
+        if (iter and (mRefTreeModel->iter_depth(iter) == 0)) {
+	    Gtk::TreeModel::Row row = *iter;
+
+	    mModeling->setSelectedClass(row.get_value(mColumns.mName));
+	} else {
+	    mModeling->setSelectedClass("");
+	}
+    }
 }
 
 void ModelClassBox::createNewModelBox(Modeling* m)
@@ -188,7 +203,7 @@ void ModelClassBox::onRename()
 	       std::string oldname(row.get_value(mColumns.mName));
 	       SimpleTypeBox box(_("New name of this model?"), oldname);
 	       std::string newname = boost::trim_copy(box.run());
-	       if (box.valid() and not newname.empty()) {
+	       if (box.valid() and not newname.empty() and newname != oldname) {
 		   try {
 		       row[mColumns.mName] = newname;
 		       graph::Model::rename(row[mColumns.mModel], newname);
@@ -402,8 +417,9 @@ void ModelClassBox::row_activated(const Gtk::TreeModel::Path& path,
         Gtk::TreeIter iter = mRefTreeModel->get_iter(path);
         Gtk::TreeRow row = (*iter);
 	if (mRefTreeModel->iter_depth(iter) == 0) {
-	    mModeling->addViewClass(mModeling->getClassModel(row.get_value(mColumns.mName)),
-				    row.get_value(mColumns.mName));
+	    mModeling->addViewClass(
+		mModeling->getClassModel(row.get_value(mColumns.mName)),
+		row.get_value(mColumns.mName));
 	} else {
 	    std::vector <std::string> Vec;
 	    Glib::ustring str = path.to_string();
@@ -483,5 +499,4 @@ void ModelClassBox::onEdition(
     }
 }
 
-}
-} // namespace vle gvle
+} } // namespace vle gvle

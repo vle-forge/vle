@@ -31,9 +31,7 @@
 #include <vle/vpz/Classes.hpp>
 #include <vle/gvle/NewModelClassBox.hpp>
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
 class Modeling;
 
@@ -156,6 +154,7 @@ private:
 
     void initMenuPopupModels();
     bool onButtonRealeaseModels(GdkEventButton *event);
+    void on_cursor_changed();
 
     Glib::RefPtr<Gnome::Glade::Xml>      mXml;
     Modeling*                            mModeling;
@@ -176,7 +175,6 @@ private:
     guint32                              mDelayTime;
 };
 
-}
-} // namespace vle gvle
+} } // namespace vle gvle
 
 #endif

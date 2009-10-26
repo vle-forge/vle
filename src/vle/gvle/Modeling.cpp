@@ -376,21 +376,41 @@ bool Modeling::exist(const graph::Model* m) const
     return (mTop->findModel(m->getName()) != 0);
 }
 
-void Modeling::cut(graph::ModelList& lst, graph::CoupledModel* gc, std::string className)
+void Modeling::cut(graph::ModelList& lst, graph::CoupledModel* gc,
+		   std::string className)
 {
-    if (className == "") {
+    if (className.empty()) {
 	mCutCopyPaste.cut(lst, gc, mVpz.project().model().atomicModels());
     } else {
 	mCutCopyPaste.cut(lst, gc, mVpz.project().classes().get(className).atomicModels());
     }
 }
 
-void Modeling::copy(graph::ModelList& lst, graph::CoupledModel* gc, std::string className)
+void Modeling::copy(graph::ModelList& lst, graph::CoupledModel* gc,
+		    std::string className)
 {
-    if (className == "") {
-	mCutCopyPaste.copy(lst, gc, mVpz.project().model().atomicModels());
+    // the current view is not a class
+    if (className.empty()) {
+	// no model is selected in current view and a class is selected
+	if (lst.empty() and not mSelectedClass.empty()) {
+	    vpz::Class& currentClass = mVpz.project().classes()
+		.get(mSelectedClass);
+	    graph::Model* model = currentClass.model();
+	    graph::ModelList lst2;
+
+	    lst2[model->getName()] = model;
+	    mCutCopyPaste.copy(lst2, gc,
+			       mVpz.project().classes().get(mSelectedClass)
+			       .atomicModels(), true);
+	} else {
+	    mCutCopyPaste.copy(lst, gc,
+			       mVpz.project().model().atomicModels(),
+			       false);
+	}
     } else {
-	mCutCopyPaste.copy(lst, gc, mVpz.project().classes().get(className).atomicModels());
+	mCutCopyPaste.copy(lst, gc,
+			   mVpz.project().classes().get(className)
+			   .atomicModels(), false);
     }
 }
 

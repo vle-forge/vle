@@ -186,9 +186,8 @@ public:
 	{ vpz().project().classes().get(className).atomicModels().add(
 		new_atom, vpz::AtomicModel("", "", "")); }
 
-
-
-
+    void setSelectedClass(const std::string& name)
+	{ mSelectedClass = name; }
 
     /********************************************************************
      *
@@ -836,6 +835,7 @@ private:
     vpz::Vpz                    mVpz;
     graph::CoupledModel*        mTop;
     std::string                 mCurrentClass;
+    std::string                 mSelectedClass;
     GVLE*                       mGVLE;
     utils::Rand*                mRand;
     ListView                    mListView;

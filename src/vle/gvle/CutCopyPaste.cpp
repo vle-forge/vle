@@ -25,13 +25,12 @@
 
 #include <vle/gvle/CutCopyPaste.hpp>
 #include <vle/gvle/Message.hpp>
+#include <vle/gvle/ViewDrawingArea.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Debug.hpp>
 #include <iostream>
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
 CutCopyPaste::CutCopyPaste() :
         mNumero(0),
@@ -87,9 +86,9 @@ void CutCopyPaste::cut(graph::ModelList& l, graph::CoupledModel* parent,
 }
 
 void CutCopyPaste::copy(graph::ModelList& l, graph::CoupledModel* parent,
-                        vpz::AtomicModelList& src)
+                        vpz::AtomicModelList& src, bool isClass)
 {
-    if (parent->hasConnectionProblem(l) == true) {
+    if (not isClass and parent->hasConnectionProblem(l)) {
         std::cout << _("Selected model list have connection with external model\n");
     } else if (l.empty()) {
         std::cout << _("No model selected\n");
@@ -98,7 +97,7 @@ void CutCopyPaste::copy(graph::ModelList& l, graph::CoupledModel* parent,
         mType = COPY;
 
         // to keep connections
-	if (parent != NULL) {
+	if (not isClass and parent != NULL) {
 	    mCnts = parent->getBasicConnections(l);
 	}
 
@@ -304,6 +303,16 @@ void CutCopyPaste::copy_atomic(graph::Model* model, graph::Model* clone,
 {
     const vpz::AtomicModel& atom(src.get(model));
     mList_vpz.add(clone, atom);
+    if (clone->width() < 0) {
+	clone->setWidth(ViewDrawingArea::MODEL_WIDTH);
+    }
+    if (clone->height() < 0) {
+	clone->setHeight(ViewDrawingArea::MODEL_HEIGHT +
+			 std::max(clone->getInputPortNumber(),
+				  clone->getOutputPortNumber()) *
+			 (ViewDrawingArea::MODEL_SPACING_PORT +
+			  ViewDrawingArea::MODEL_PORT));
+    }
 }
 
 void CutCopyPaste::copy_coupled(graph::Model* model, graph::Model* clone,
@@ -357,5 +366,4 @@ void CutCopyPaste::clone_coupled(graph::Model* model, graph::Model* clone,
     }
 }
 
-}
-} // namespace vle gvle
+} } // namespace vle gvle
