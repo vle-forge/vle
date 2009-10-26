@@ -58,7 +58,7 @@ public:
      * Show in the TextView the class Tree
      */
     void parseClass();
-    Gtk::TreeModel::Row addClass(vpz::Class& classe);
+    Gtk::TreeModel::Row addClass(const vpz::Class& classe);
 
     virtual void onAdd();
     virtual void onRemove();

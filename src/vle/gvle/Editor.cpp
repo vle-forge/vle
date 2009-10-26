@@ -564,7 +564,7 @@ void Editor::openTabVpz(const std::string& filepath,
 		filepath,
 		mApp->getModeling()->findView(model),
 		model);
-	    doc->setTitle(filepath, model, true);
+	    doc->setTitle(filepath, model, mApp->getModeling()->isModified());
 	    mDocuments.insert(
 		std::make_pair < std::string, DocumentDrawingArea* >(
 		    filepath, doc));

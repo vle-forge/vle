@@ -313,14 +313,16 @@ void ModelClassBox::parseClass()
 {
     mRefTreeModel->clear();
 
-    vpz::Classes::iterator iter = mModeling->vpz().project().classes().begin();
-    while (iter != mModeling->vpz().project().classes().end()) {
-	Gtk::TreeModel::Row row = addClass(mModeling->vpz().project().classes().get(
+    const vpz::Vpz& vpz = ((const Modeling*)mModeling)->vpz();
+    vpz::Classes::const_iterator iter = vpz.project().classes().begin();
+    while (iter != vpz.project().classes().end()) {
+	Gtk::TreeModel::Row row = addClass(vpz.project().classes().get(
 					       iter->second.name()));
-	graph::Model* top = mModeling->vpz().project().classes().get(iter->second.name()).model();
-	Gtk::TreeModel::Row row2 = addSubModel(row, top);
+	const graph::Model* top = vpz.project().classes()
+	    .get(iter->second.name()).model();
+	Gtk::TreeModel::Row row2 = addSubModel(row, (graph::Model*)top);
 	if (top->isCoupled()) {
-	    parseModel(row2,  (graph::CoupledModel*)top);
+	    parseModel(row2, (graph::CoupledModel*)top);
 	}
 	++iter;
     }
@@ -333,7 +335,7 @@ void ModelClassBox::clear()
 }
 
 Gtk::TreeModel::Row
-ModelClassBox::addClass(vpz::Class& classe)
+ModelClassBox::addClass(const vpz::Class& classe)
 {
     Gtk::TreeModel::Row row = *(mRefTreeModel->append());
     row[mColumns.mName] = classe.name();

@@ -31,19 +31,14 @@
 #include <libglademm.h>
 #include <gtkmm.h>
 
-namespace vle
-{
-namespace graph {
+namespace vle { namespace graph {
 
 class Model;
 class CoupledModel;
 
-}
-} // namespace vle graph
+} } // namespace vle graph
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
 class Modeling;
 
@@ -117,7 +112,6 @@ protected:
      * @param name model's name
      * @return A Row to the top of TreeView
      */
-    //Gtk::TreeModel::Row addModel(const Glib::ustring& name);
     Gtk::TreeModel::Row addModel(graph::Model* model);
 
     /**
@@ -128,8 +122,6 @@ protected:
      *
      * @return A Row to the child of Row tree
      */
-    //Gtk::TreeModel::Row addSubModel(Gtk::TreeModel::Row tree,
-    //                               const Glib::ustring& name);
     Gtk::TreeModel::Row addSubModel(Gtk::TreeModel::Row tree,
                                     graph::Model* model);
 
@@ -180,18 +172,18 @@ class ModelTreeColumn : public Gtk::TreeModel::ColumnRecord
         Gtk::TreeModelColumn <graph::Model*> mModel;
     };
 
-    ModelTreeColumn              m_Columns;
+    ModelTreeColumn              m_columns;
     Glib::RefPtr<Gtk::TreeStore> m_refTreeModel;
     Gtk::Menu                    m_menu;
     Modeling*                    m_modeling;
     std::string                  m_search;
 
     // Cell
-    int                          m_ColumnName;
-    Gtk::CellRendererText*       m_CellRenderer;
-    std::string                  m_OldName;
-    bool                         m_ValidateRetry;
-    Glib::ustring                m_InvalidTextForRetry;
+    int                          m_columnName;
+    Gtk::CellRendererText*       m_cellRenderer;
+    std::string                  m_oldName;
+    bool                         m_validateRetry;
+    Glib::ustring                m_invalidTextForRetry;
     guint32                      m_delayTime;
 
 private:
@@ -202,10 +194,9 @@ private:
     {
         Gtk::TreeModelColumn < std::string > name;
         ModelsColumnRecord() { add(name); }
-    } m_modelscolumnrecord;
+    } m_modelsColumnRecord;
 };
 
-}
-} // namespace vle gvle
+} } // namespace vle gvle
 
 #endif

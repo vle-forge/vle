@@ -740,6 +740,9 @@ public:
     inline double getLineWidth() const
     { return mLineWidth; }
 
+    inline void updateAdjustment(double h, double v)
+    { return mGVLE->updateAdjustment(h, v); }
+
     inline utils::Rand* getRand() const
     { return mRand; }
 

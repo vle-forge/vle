@@ -74,7 +74,6 @@ ViewDrawingArea::ViewDrawingArea(View* view) :
     mView = view;
     mCurrent = view->getGCoupledModel();
     mModeling = view->getModeling();
-    mGVLE = mModeling->getGVLE();
 }
 
 void ViewDrawingArea::draw()
@@ -1349,7 +1348,7 @@ void ViewDrawingArea::selectZoom(int xmin, int ymin, int xmax, int ymax)
     mContext->set_font_size(mModeling->getFontSize());
     newSize();
 
-    mGVLE->updateAdjustment(xmin * mZoom, ymin * mZoom);
+    mModeling->updateAdjustment(xmin * mZoom, ymin * mZoom);
 }
 
 void ViewDrawingArea::setCoefZoom(double coef)

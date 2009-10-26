@@ -30,34 +30,29 @@
 #include <vle/graph/CoupledModel.hpp>
 #include <queue>
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
 ModelTreeBox::ModelTreeBox(BaseObjectType* cobject,
 			   const Glib::RefPtr<Gnome::Glade::Xml>&) :
     Gtk::TreeView(cobject), m_delayTime(0)
 {
-    m_refTreeModel = Gtk::TreeStore::create(m_Columns);
+    m_refTreeModel = Gtk::TreeStore::create(m_columns);
     set_model(m_refTreeModel);
 
-    m_ColumnName = append_column_editable(_("Model"),
-						     m_Columns.mName);
+    m_columnName = append_column_editable(_("Model"), m_columns.mName);
 
-    m_CellRenderer = dynamic_cast<Gtk::CellRendererText*>(
-	get_column_cell_renderer(m_ColumnName - 1));
-    m_CellRenderer->property_editable() = true;
-    m_CellRenderer->signal_editing_started().connect(
+    m_cellRenderer = dynamic_cast<Gtk::CellRendererText*>(
+	get_column_cell_renderer(m_columnName - 1));
+    m_cellRenderer->property_editable() = true;
+    m_cellRenderer->signal_editing_started().connect(
 	sigc::mem_fun(*this,
 		      &ModelTreeBox::onEditionStarted));
-    m_CellRenderer->signal_edited().connect(
-	sigc::mem_fun(*this,
-		      &ModelTreeBox::onEdition));
+    m_cellRenderer->signal_edited().connect(
+	sigc::mem_fun(*this, &ModelTreeBox::onEdition));
 
-    signal_event().connect(
-      sigc::mem_fun(*this, &ModelTreeBox::onExposeEvent));
+    signal_event().connect(sigc::mem_fun(*this, &ModelTreeBox::onExposeEvent));
     signal_button_release_event().connect(
-    sigc::mem_fun(*this, &ModelTreeBox::onButtonRealeaseModels));
+	sigc::mem_fun(*this, &ModelTreeBox::onButtonRealeaseModels));
 
     expand_all();
     set_rules_hint(true);
@@ -66,9 +61,9 @@ ModelTreeBox::ModelTreeBox(BaseObjectType* cobject,
 
 void ModelTreeBox::initMenuPopupModels()
 {
-    Gtk::Menu::MenuList& menulist(m_menu.items());
+    Gtk::Menu::MenuList& menuList(m_menu.items());
 
-    menulist.push_back(
+    menuList.push_back(
         Gtk::Menu_Helpers::MenuElem(
             _("_Rename"), sigc::mem_fun(
 		*this, &ModelTreeBox::onRenameModels)));
@@ -90,17 +85,17 @@ void ModelTreeBox::onRenameModels()
         Gtk::TreeModel::iterator iter = ref->get_selected();
         if (iter) {
             Gtk::TreeModel::Row row = *iter;
-            std::string oldname(row.get_value(m_modelscolumnrecord.name));
+            std::string oldname(row.get_value(m_modelsColumnRecord.name));
 	    SimpleTypeBox box(_("New name of this model?"), oldname);
 	    std::string newname = boost::trim_copy(box.run());
-	    if (box.valid() and not newname.empty()) {
+	    if (box.valid() and not newname.empty() and newname != m_oldName) {
 		try {
-		    row[m_modelscolumnrecord.name] = newname;
-		    graph::Model::rename(row[m_Columns.mModel], newname);
+		    row[m_modelsColumnRecord.name] = newname;
+		    graph::Model::rename(row[m_columns.mModel], newname);
 		    m_modeling->refreshViews();
 		    m_modeling->setModified(true);
 		} catch(utils::DevsGraphError dge) {
-		    row[m_modelscolumnrecord.name] = oldname;
+		    row[m_modelsColumnRecord.name] = oldname;
 		}
 	    }
 	}
@@ -143,8 +138,8 @@ Gtk::TreeModel::Row
 ModelTreeBox::addModel(graph::Model* model)
 {
     Gtk::TreeModel::Row row = *(m_refTreeModel->append());
-    row[m_Columns.mName] = model->getName();
-    row[m_Columns.mModel] = model;
+    row[m_columns.mName] = model->getName();
+    row[m_columns.mModel] = model;
     return row;
 }
 
@@ -152,8 +147,8 @@ Gtk::TreeModel::Row
 ModelTreeBox::addSubModel(Gtk::TreeModel::Row tree, graph::Model* model)
 {
     Gtk::TreeModel::Row row = *(m_refTreeModel->append(tree.children()));
-    row[m_Columns.mName] = model->getName();
-    row[m_Columns.mModel] = model;
+    row[m_columns.mName] = model->getName();
+    row[m_columns.mModel] = model;
     return row;
 }
 
@@ -183,12 +178,13 @@ bool ModelTreeBox::onExposeEvent(GdkEvent* event)
 	return true;
     }
     if (event->type == GDK_BUTTON_PRESS) {
-	if (m_delayTime + 250 < event->button.time) {
+	if (m_delayTime + 250 < event->button.time and
+	    m_delayTime + 1000 > event->button.time) {
 	    m_delayTime = event->button.time;
-	    m_CellRenderer->property_editable() = true;
+	    m_cellRenderer->property_editable() = true;
 	} else {
 	    m_delayTime = event->button.time;
-	    m_CellRenderer->property_editable() = false;
+	    m_cellRenderer->property_editable() = false;
 	}
     }
     return false;
@@ -201,14 +197,14 @@ void ModelTreeBox::row_activated(const Gtk::TreeModel::Path& path,
     if (column) {
         Gtk::TreeIter iter = m_refTreeModel->get_iter(path);
         Gtk::TreeRow row = (*iter);
-        m_modeling->addView(row.get_value(m_Columns.mModel));
+        m_modeling->addView(row.get_value(m_columns.mModel));
     }
 }
 
 bool ModelTreeBox::on_foreach(const Gtk::TreeModel::Path&,
                               const Gtk::TreeModel::iterator& iter)
 {
-    if ((*iter).get_value(m_Columns.mName) == m_search) {
+    if ((*iter).get_value(m_columns.mName) == m_search) {
         set_cursor(m_refTreeModel->get_path(iter));
         return true;
     }
@@ -222,19 +218,19 @@ void ModelTreeBox::onEditionStarted(
     if (ref) {
         Gtk::TreeModel::iterator iter = ref->get_selected();
         if (iter) {
-	    m_OldName = (*iter)[m_modelscolumnrecord.name];
+	    m_oldName = (*iter)[m_modelsColumnRecord.name];
 	}
     }
 
-    if(m_ValidateRetry)
+    if (m_validateRetry)
     {
 	Gtk::CellEditable* celleditable_validated = cellEditable;
 	Gtk::Entry* pEntry = dynamic_cast<Gtk::Entry*>(celleditable_validated);
 	if(pEntry)
 	{
-	    pEntry->set_text(m_InvalidTextForRetry);
-	    m_ValidateRetry = false;
-	    m_InvalidTextForRetry.clear();
+	    pEntry->set_text(m_invalidTextForRetry);
+	    m_validateRetry = false;
+	    m_invalidTextForRetry.clear();
 	}
     }
 }
@@ -249,21 +245,20 @@ void ModelTreeBox::onEdition(
 	Gtk::TreeModel::iterator iter = ref->get_selected();
 	if (iter) {
 	    Gtk::TreeModel::Row row = *iter;
-	    if (not newName.empty()) {
+	    if (not newName.empty() and newName != m_oldName) {
 		try {
-		    row[m_modelscolumnrecord.name] = newName;
-		    graph::Model::rename(row[m_Columns.mModel], newName);
+		    row[m_modelsColumnRecord.name] = newName;
+		    graph::Model::rename(row[m_columns.mModel], newName);
 		    m_modeling->refreshViews();
 		    m_modeling->setModified(true);
 		} catch(utils::DevsGraphError dge) {
-		    row[m_modelscolumnrecord.name] = m_OldName;
+		    row[m_modelsColumnRecord.name] = m_oldName;
 		}
 	    } else {
-		row[m_modelscolumnrecord.name] = m_OldName;
+		row[m_modelsColumnRecord.name] = m_oldName;
 	    }
 	}
     }
 }
 
-}
-} // namespace vle gvle
+} } // namespace vle gvle

@@ -245,7 +245,6 @@ namespace vle { namespace gvle {
          */
         void delConnection();
 
-	GVLE*                           mGVLE;
         View*                           mView;
         graph::CoupledModel*            mCurrent;
         Modeling*                       mModeling;
