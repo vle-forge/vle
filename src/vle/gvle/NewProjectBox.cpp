@@ -74,6 +74,8 @@ void NewProjectBox::onApply()
 	    utils::Package::package().select(mEntryName->get_text());
 	    vle::utils::Package::package().create();
 	    mModeling->getGVLE()->buildPackageHierarchy();
+	    mModeling->clearModeling();
+	    mModeling->getGVLE()->getEditor()->closeAllTab();
 	    mDialog->hide_all();
 	} else {
 	    Error(_("The Project ") +
