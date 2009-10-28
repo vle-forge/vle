@@ -306,7 +306,7 @@ void GVLE::FileTreeView::onNewFile()
 		mPackage, Glib::build_filename(lstpath));
 	    if (not isDirectory(filepath)) {
 		fs::path path(filepath);
-		filepath = boost::lexical_cast<std::string>(path);
+		filepath = boost::lexical_cast<std::string>(path.parent_path());
 	    }
 	} else {
 	    filepath = mPackage;
@@ -334,7 +334,8 @@ void GVLE::FileTreeView::onNewDirectory()
 		mPackage, Glib::build_filename(lstpath));
 	    if (not isDirectory(directorypath)) {
 		fs::path path(directorypath);
-		directorypath = boost::lexical_cast<std::string>(path);
+		directorypath = boost::lexical_cast<std::string>(
+		    path.parent_path());
 	    }
 	} else {
 	    directorypath = mPackage;
