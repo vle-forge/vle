@@ -286,16 +286,18 @@ void GVLEMenuAndToolbar::createFileActions()
     m_refActionGroup->add(
 	Gtk::Action::create("OpenProject", Gtk::Stock::OPEN,
 			    _("Open P_roject"), _("Open a Package")),
-	Gtk::AccelKey("<control><alt>o"),
+	Gtk::AccelKey("<control>o"),
 	sigc::mem_fun(mParent, &GVLE::onMenuOpenPackage));
     m_refActionGroup->add(
 	Gtk::Action::create("OpenVpz", Gtk::Stock::OPEN,
 			    _("Open Vp_z"), _("Open a Vpz from package")),
+	Gtk::AccelKey("<control><shift>o"),
 	sigc::mem_fun(mParent, &GVLE::onMenuOpenVpz));
     m_refActionGroup->add(
 	Gtk::Action::create("OpenGlobalVpz", Gtk::Stock::OPEN,
 			    _("Open Global Vpz"), _("Open a Vpz from "
 						    "filesystem")),
+	Gtk::AccelKey(""),
 	sigc::mem_fun(mParent, &GVLE::onMenuLoad));
     m_refActionGroup->add(
 	Gtk::Action::create("SaveVpz", Gtk::Stock::SAVE,
