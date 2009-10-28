@@ -840,7 +840,7 @@ Section "-Core installation"
   ;Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
   Push "DisplayName"
-  Push "@CPACK_NSIS_DISPLAY_NAME@"
+  Push "@CPACK_NSIS_DISPLAY_NAME@ (@CPACK_PACKAGE_VERSION@)"
   Call ConditionalAddToRegisty
   Push "DisplayVersion"
   Push "@CPACK_PACKAGE_VERSION@"
