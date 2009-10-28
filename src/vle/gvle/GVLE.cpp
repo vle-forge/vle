@@ -353,13 +353,17 @@ void GVLE::FileTreeView::onRemove()
     if (refSelection) {
 	Gtk::TreeModel::const_iterator it = refSelection->get_selected();
 	const Gtk::TreeModel::Row row = *it;
+	std::list < std::string > lstpath;
+	bool is_directory;
 
-	if (gvle::Question(_("Do you really want remove this file ?\n"))) {
-	    std::list < std::string > lstpath;
-	    std::string oldName;
-
-	    projectFilePath(row, lstpath);
-	    oldName = Glib::build_filename(lstpath);
+	projectFilePath(row, lstpath);
+	is_directory = isDirectory(
+	    Glib::build_filename(mPackage, Glib::build_filename(lstpath)));
+	if ((not is_directory and
+	     gvle::Question(_("Do you really want remove this file ?\n"))) or
+	    (is_directory and gvle::Question(
+		_("Do you really want remove this directory ?\n")))) {
+	    std::string oldName(Glib::build_filename(lstpath));
 	    utils::Package::package().removeFile(oldName);
 	    mParent->refreshEditor(oldName, "");
 	    if (mParent->getEditor()->getDocuments().empty()) {
