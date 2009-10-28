@@ -151,7 +151,7 @@ void ExperimentBox::initExperiment()
     // Simulation frame
     {
         mSpinSimuSeed->set_range(0, std::numeric_limits < guint32 >::max());
-	    mSpinSimuSeed->set_value(mModeling->experiment().seed());
+	    mSpinSimuSeed->set_value(experiment.seed());
     }
 
     // Plan frame
@@ -164,7 +164,7 @@ void ExperimentBox::initExperiment()
 	}
 
 	mSpinPlanSeed->set_range(0, std::numeric_limits < guint32 >::max());
-	mSpinPlanSeed->set_value(mModeling->experiment().replicas().seed());
+	mSpinPlanSeed->set_value(experiment.replicas().seed());
 
 	mButtonNumber->set_range(1, std::numeric_limits < guint32 >::max());
 	mButtonNumber->set_value(experiment.replicas().number());
