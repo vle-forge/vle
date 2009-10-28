@@ -71,10 +71,11 @@ public:
 
     Transition& transitions(int s)
     {
-        if (mTransitions.find(s) == mTransitions.end()) {
-            mTransitions[s] = Transition();
-        }
-        return mTransitions.at(s);
+        std::pair < Transitions::iterator, bool > r;
+
+        r = mTransitions.insert(std::make_pair(s, Transition()));
+
+        return r.first->second;
     }
 
 private:

@@ -73,34 +73,38 @@ private:
 public:
     Output& outputs(int s)
     {
-        if (mOutputs.find(s) == mOutputs.end()) {
-            mOutputs[s] = Output();
-        }
-        return mOutputs.at(s);
+        std::pair < Outputs::iterator, bool > r;
+
+        r = mOutputs.insert(std::make_pair(s, Output()));
+
+        return r.first->second;
     }
 
     OutputFunc& outputFuncs(int s)
     {
-        if (mOutputFuncs.find(s) == mOutputFuncs.end()) {
-            mOutputFuncs[s] = OutputFunc();
-        }
-        return mOutputFuncs.at(s);
+        std::pair < OutputFuncs::iterator, bool > r;
+
+        r = mOutputFuncs.insert(std::make_pair(s, OutputFunc()));
+
+        return r.first->second;
     }
 
     Transition& transitions(int s)
     {
-        if (mTransitions.find(s) == mTransitions.end()) {
-            mTransitions[s] = Transition();
-        }
-        return mTransitions.at(s);
+        std::pair < Transitions::iterator, bool > r;
+
+        r = mTransitions.insert(std::make_pair(s, Transition()));
+
+        return r.first->second;
     }
 
     Actions& actions(int s)
     {
-        if (mActions.find(s) == mActions.end()) {
-            mActions[s] = Actions();
-        }
-        return mActions.at(s);
+        std::pair < ActionsMap::iterator, bool > r;
+
+        r = mActions.insert(std::make_pair(s, Actions()));
+
+        return r.first->second;
     }
 
 private:

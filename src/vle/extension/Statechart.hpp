@@ -111,10 +111,12 @@ public:
 
     EventInStateActions& eventInStateActions(int s)
     {
-        if (mEventInStateActions.find(s) == mEventInStateActions.end()) {
-            mEventInStateActions[s] = EventInStateActions();
-        }
-        return mEventInStateActions.at(s);
+        std::pair < EventInStateActionsMap::iterator, bool > r;
+
+        r = mEventInStateActions.insert(
+            std::make_pair(s, EventInStateActions()));
+
+        return r.first->second;
     }
 
     Actions& inActions() { return mInActions; }

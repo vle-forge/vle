@@ -83,10 +83,11 @@ public:
 
     External& externals(int s)
     {
-        if (mExternals.find(s) == mExternals.end()) {
-            mExternals[s] = External();
-        }
-        return mExternals.at(s);
+        std::pair < Externals::iterator, bool > r;
+
+        r = mExternals.insert(std::make_pair(s, External()));
+
+        return r.first->second;
     }
 
     virtual devs::Event::EventType confluentTransitions(
