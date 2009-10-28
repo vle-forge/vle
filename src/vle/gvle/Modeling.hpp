@@ -587,14 +587,26 @@ public:
      *
      ********************************************************************/
 
+    const vpz::Dynamics& dynamics() const
+    { return mVpz.project().dynamics();  }
+
     vpz::Dynamics& dynamics()
-    { setModified(true); return mVpz.project().dynamics(); }
+    {
+	setModified(true);
+	return mVpz.project().dynamics();
+    }
+
+    const vpz::Observables& observables() const
+    { return mVpz.project().experiment().views().observables(); }
 
     vpz::Observables& observables()
     {
         setModified(true);
         return mVpz.project().experiment().views().observables();
     }
+
+    const vpz::Conditions& conditions() const
+    { return mVpz.project().experiment().conditions(); }
 
     vpz::Conditions& conditions()
     {

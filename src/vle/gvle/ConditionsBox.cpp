@@ -622,9 +622,8 @@ void ConditionsBox::buildTreeValues(const std::string& conditionName,
 
 void ConditionsBox::show()
 {
-    mConditions = &mModeling->conditions();
-    delete mBackup;
-    mBackup = new vpz::Conditions(*mConditions);
+    const Modeling* modeling = (const Modeling*)mModeling;
+    mConditions = new vpz::Conditions(modeling->conditions());
 
     buildTreeConditions();
     mDialog->show_all();
@@ -633,22 +632,31 @@ void ConditionsBox::show()
 
 void ConditionsBox::on_apply()
 {
-    if (mDialog)
+    vpz::Conditions* conditions = &mModeling->conditions();
+
+    conditions->clear();
+    const vpz::ConditionList& list = mConditions->conditionlist();
+    vpz::ConditionList::const_iterator it = list.begin();
+
+    while (it != list.end()) {
+	conditions->add(it->second);
+	++it;
+    }
+
+    delete mConditions;
+    mConditions = 0;
+    if (mDialog) {
         mDialog->hide();
+    }
 }
 
 void ConditionsBox::on_cancel()
 {
-    mConditions->clear();
-    const vpz::ConditionList& conditions = mBackup->conditionlist();
-    vpz::ConditionList::const_iterator it = conditions.begin();
-
-    while (it != conditions.end()) {
-        mConditions->add(it->second);
-        ++it;
-    }
-    if (mDialog)
+    delete mConditions;
+    mConditions = 0;
+    if (mDialog) {
         mDialog->hide();
+    }
 }
 
 } } // namespace vle gvle
