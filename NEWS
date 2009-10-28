@@ -1,3 +1,12 @@
+VLE 0.7.2
+=========
+
+* vle:
+  * Fix bug in confluent function: a bug overrides the possibilities to call the
+    internal transition before the external transition.
+
+
+
 VLE 0.7.1
 =========
 
