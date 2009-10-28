@@ -243,7 +243,6 @@ void View::onPasteModel()
 
 void View::addAtomicModel(int x, int y)
 {
-    mModeling->setModified(true);
     ModelDescriptionBox* box = new
     ModelDescriptionBox(mModeling->getNames());
     if (box->run()) {
@@ -259,14 +258,15 @@ void View::addAtomicModel(int x, int y)
 		    mModeling->addAtomicModelClass(mCurrentClass, new_atom);
 		}
                 redraw();
+		mModeling->getGVLE()->redrawModelTreeBox();
+		mModeling->getGVLE()->redrawModelClassBox();
+		mModeling->setModified(true);
             } catch (utils::SaxParserError& e) {
                 Error(e.what());
             }
         }
     }
     delete box;
-    mModeling->getGVLE()->redrawModelTreeBox();
-    mModeling->getGVLE()->redrawModelClassBox();
 }
 
 void View::addPluginModel(int /*x*/, int /*y*/)
@@ -275,7 +275,6 @@ void View::addPluginModel(int /*x*/, int /*y*/)
 
 void View::addCoupledModel(int x, int y)
 {
-    mModeling->setModified(true);
     ModelDescriptionBox* box;
     box = new ModelDescriptionBox(mModeling->getNames());
     if (box->run()) {
@@ -295,6 +294,7 @@ void View::addCoupledModel(int x, int y)
             mModeling->getGVLE()->redrawModelTreeBox();
             mModeling->getGVLE()->redrawModelClassBox();
             mSelectedModels.clear();
+	    mModeling->setModified(true);
         } else {
             graph::Model* model = mCurrent->findModel(box->getName());
             bool select = false;
@@ -321,6 +321,7 @@ void View::addCoupledModel(int x, int y)
                 mModeling->getGVLE()->redrawModelTreeBox();
                 mModeling->getGVLE()->redrawModelClassBox();
                 mSelectedModels.clear();
+		mModeling->setModified(true);
             }
         }
     }
@@ -341,7 +342,6 @@ void View::showModel(graph::Model* model)
 
 void View::delModel(graph::Model* model)
 {
-    mModeling->setModified(true);
     if (model) {
         if (gvle::Question(_("Do you really want destroy model ?"))) {
             if (model->isCoupled()) {
@@ -351,6 +351,7 @@ void View::delModel(graph::Model* model)
             mCurrent->delModel(model);
             mModeling->getGVLE()->redrawModelTreeBox();
 	    mModeling->getGVLE()->redrawModelClassBox();
+	    mModeling->setModified(true);
         }
     }
 }
