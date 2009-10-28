@@ -371,7 +371,6 @@ void View::displaceModel(int oldx, int oldy, int x, int y)
 
 void View::makeConnection(graph::Model* src, graph::Model* dst)
 {
-    mModeling->setModified(true);
     assert(src and dst);
 
     if (src == mCurrent && dst == mCurrent)
@@ -386,6 +385,7 @@ void View::makeConnection(graph::Model* src, graph::Model* dst)
                  src->getName()).str());
             return;
         }
+	mModeling->setModified(true);
     }
     if (dst == mCurrent and dst->getOutputPortList().empty()) {
         PortDialog box(dst, PortDialog::OUTPUT);
@@ -396,6 +396,7 @@ void View::makeConnection(graph::Model* src, graph::Model* dst)
                  dst->getName()).str());
             return;
         }
+	mModeling->setModified(true);
     }
     if (src != mCurrent and src->getOutputPortList().empty()) {
         PortDialog box(src, PortDialog::OUTPUT);
@@ -406,6 +407,7 @@ void View::makeConnection(graph::Model* src, graph::Model* dst)
                  src->getName()).str());
             return;
         }
+	mModeling->setModified(true);
     }
     if (dst != mCurrent and dst->getInputPortList().empty()) {
         PortDialog box(dst, PortDialog::INPUT);
@@ -416,6 +418,7 @@ void View::makeConnection(graph::Model* src, graph::Model* dst)
                  dst->getName()).str());
             return;
         }
+	mModeling->setModified(true);
     }
 
     ConnectionBox a(mCurrent, src, dst);
@@ -438,6 +441,7 @@ void View::makeConnection(graph::Model* src, graph::Model* dst)
                     dst->getName(), dstPort))
                 mCurrent->addInternalConnection(src, srcPort, dst, dstPort);
         }
+	mModeling->setModified(true);
     }
 }
 
