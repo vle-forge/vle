@@ -41,7 +41,7 @@ namespace vle { namespace gvle {
 ViewOutputBox::ViewOutputBox(Modeling& modeling,
                              Glib::RefPtr < Gnome::Glade::Xml > ref,
                              vpz::Views& views)
-    : m_modeling(modeling), m_viewsorig(views), m_viewscopy(views), m_xml(ref),
+    : m_modeling(modeling), m_viewscopy(views), m_xml(ref),
       m_type(0), m_format(0), m_plugin(0), m_views(0), m_changedView(false),
       m_validateRetry(false)
 {
@@ -129,7 +129,8 @@ void ViewOutputBox::run()
                 }
             }
         }
-        m_viewsorig = m_viewscopy; /* We copy the modified vpz::Views */
+	m_modeling.views() = m_viewscopy;
+	m_modeling.setModified(true);
     }
     m_dialog->hide();
 }

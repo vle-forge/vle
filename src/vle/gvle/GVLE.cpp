@@ -902,7 +902,9 @@ void GVLE::onHelpBox()
 
 void GVLE::onViewOutputBox()
 {
-    ViewOutputBox box(*mModeling, mRefXML, mModeling->views());
+    const Modeling* modeling((const Modeling*)mModeling);
+    vpz::Views views(modeling->views());
+    ViewOutputBox box(*mModeling, mRefXML, views);
     box.run();
 }
 

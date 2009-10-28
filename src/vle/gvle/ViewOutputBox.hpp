@@ -86,11 +86,6 @@ namespace vle { namespace gvle {
     private:
         Modeling&      m_modeling;
 
-        /** a reference to the origin vpz::Views, filled when user modify and
-         * valid the ViewOutputBox.
-         */
-        vpz::Views&         m_viewsorig;
-
         /** A copy of the vpz::Views, filled when user modify datas */
         vpz::Views          m_viewscopy;
 
