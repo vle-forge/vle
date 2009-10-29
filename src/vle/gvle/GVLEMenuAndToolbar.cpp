@@ -198,7 +198,7 @@ void GVLEMenuAndToolbar::onViewMode()
     m_refActionGroup->get_action("MenuEdit")->set_sensitive(true);
     m_refActionGroup->get_action("Cut")->set_sensitive(true);
     m_refActionGroup->get_action("Copy")->set_sensitive(true);
-    m_refActionGroup->get_action("Paste")->set_sensitive(true);
+    m_refActionGroup->get_action("Paste")->set_sensitive(false);
     m_refActionGroup->get_action("MenuSimulation")->set_sensitive(true);
     m_refActionGroup->get_action("ClearModel")->set_sensitive(true);
     m_refActionGroup->get_action("ImportModel")->set_sensitive(true);
@@ -213,8 +213,8 @@ void GVLEMenuAndToolbar::onFileMode()
 {
     m_refActionGroup->get_action("MenuZoom")->set_sensitive(false);
     m_refActionGroup->get_action("MenuEdit")->set_sensitive(true);
-    m_refActionGroup->get_action("Cut")->set_sensitive(false);
-    m_refActionGroup->get_action("Copy")->set_sensitive(false);
+    m_refActionGroup->get_action("Cut")->set_sensitive(true);
+    m_refActionGroup->get_action("Copy")->set_sensitive(true);
     m_refActionGroup->get_action("Paste")->set_sensitive(false);
     m_refActionGroup->get_action("MenuSimulation")->set_sensitive(false);
     m_refActionGroup->get_action("ClearModel")->set_sensitive(false);
@@ -224,6 +224,16 @@ void GVLEMenuAndToolbar::onFileMode()
     m_refActionGroup->get_action("SaveFile")->set_sensitive(true);
     m_refActionGroup->get_action("SaveFileAs")->set_sensitive(true);
     m_refActionGroup->get_action("Random Order")->set_sensitive(false);
+}
+
+void GVLEMenuAndToolbar::hidePaste()
+{
+    m_refActionGroup->get_action("Paste")->set_sensitive(false);
+}
+
+void GVLEMenuAndToolbar::showPaste()
+{
+    m_refActionGroup->get_action("Paste")->set_sensitive(true);
 }
 
 void GVLEMenuAndToolbar::hideCloseTab()

@@ -109,6 +109,10 @@ public:
     virtual void undo();
     virtual void redo();
 
+    void paste();
+    void copy();
+    void cut();
+
 private:
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
     gtksourceview::SourceView mView;

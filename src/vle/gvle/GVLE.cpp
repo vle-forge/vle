@@ -1175,11 +1175,23 @@ void GVLE::packageProject()
 void GVLE::onCutModel()
 {
     if (mCurrentTab >= 0) {
-	View* currentView = dynamic_cast<DocumentDrawingArea*>(
-	    mEditor->get_nth_page(mCurrentTab))->getView();
+	if (dynamic_cast<Document*>(mEditor->get_nth_page(mCurrentTab))
+	    ->isDrawingArea()) {
+	    View* currentView = dynamic_cast<DocumentDrawingArea*>(
+		mEditor->get_nth_page(mCurrentTab))->getView();
 
-	if (currentView) {
-	    currentView->onCutModel();
+	    if (currentView) {
+		currentView->onCutModel();
+		mMenuAndToolbar->showPaste();
+	    }
+	} else {
+	    DocumentText* doc = dynamic_cast<DocumentText*>(
+		mEditor->get_nth_page(mCurrentTab));
+
+	    if (doc) {
+		doc->cut();
+	    }
+	    mMenuAndToolbar->showPaste();
 	}
     }
 }
@@ -1187,11 +1199,23 @@ void GVLE::onCutModel()
 void GVLE::onCopyModel()
 {
     if (mCurrentTab >= 0) {
-	View* currentView = dynamic_cast<DocumentDrawingArea*>(
-	    mEditor->get_nth_page(mCurrentTab))->getView();
+	if (dynamic_cast<Document*>(mEditor->get_nth_page(mCurrentTab))
+	    ->isDrawingArea()) {
+	    View* currentView = dynamic_cast<DocumentDrawingArea*>(
+		mEditor->get_nth_page(mCurrentTab))->getView();
 
-	if (currentView) {
-	    currentView->onCopyModel();
+	    if (currentView) {
+		currentView->onCopyModel();
+		mMenuAndToolbar->showPaste();
+	    }
+	} else {
+	    DocumentText* doc = dynamic_cast<DocumentText*>(
+		mEditor->get_nth_page(mCurrentTab));
+
+	    if (doc) {
+		doc->copy();
+	    }
+	    mMenuAndToolbar->showPaste();
 	}
     }
 }
@@ -1199,11 +1223,21 @@ void GVLE::onCopyModel()
 void GVLE::onPasteModel()
 {
     if (mCurrentTab >= 0) {
-	View* currentView = dynamic_cast<DocumentDrawingArea*>(
-	    mEditor->get_nth_page(mCurrentTab))->getView();
+	if (dynamic_cast<Document*>(mEditor->get_nth_page(mCurrentTab))
+	    ->isDrawingArea()) {
+	    View* currentView = dynamic_cast<DocumentDrawingArea*>(
+		mEditor->get_nth_page(mCurrentTab))->getView();
 
-	if (currentView) {
-	    currentView->onPasteModel();
+	    if (currentView) {
+		currentView->onPasteModel();
+	    }
+	} else {
+	    DocumentText* doc = dynamic_cast<DocumentText*>(
+		mEditor->get_nth_page(mCurrentTab));
+
+	    if (doc) {
+		doc->paste();
+	    }
 	}
     }
 }

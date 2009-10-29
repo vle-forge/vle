@@ -76,6 +76,8 @@ public:
      */
     void onFileMode();
 
+    void hidePaste();
+    void showPaste();
     void hideCloseTab();
     void showCloseTab();
     void hideCloseProject();

@@ -36,6 +36,10 @@
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 
+#ifdef VLE_HAVE_GTKSOURCEVIEWMM
+#include <gtkmm/clipboard.h>
+#endif
+
 namespace vle { namespace gvle {
 
 Document::Document(GVLE* gvle, const std::string& filepath) :
@@ -216,6 +220,43 @@ void DocumentText::redo()
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
     mView.get_source_buffer()->redo();
 #endif
+}
+
+void DocumentText::paste()
+{
+#ifdef VLE_HAVE_GTKSOURCEVIEWMM
+    Glib::RefPtr<gtksourceview::SourceBuffer> buffer(mView.get_source_buffer());
+#else
+    Glib::RefPtr<Gtk::TextBuffer> buffer(mView.get_buffer());
+#endif
+
+    Glib::RefPtr<Gtk::Clipboard> clipboard(Gtk::Clipboard::get());
+    buffer->paste_clipboard(clipboard, true);
+    mView.scroll_to_mark(buffer->get_insert(), 0.02);
+}
+
+void DocumentText::copy()
+{
+#ifdef VLE_HAVE_GTKSOURCEVIEWMM
+    Glib::RefPtr<gtksourceview::SourceBuffer> buffer(mView.get_source_buffer());
+#else
+    Glib::RefPtr<Gtk::TextBuffer> buffer(mView.get_buffer());
+#endif
+
+    Glib::RefPtr<Gtk::Clipboard> clipboard(Gtk::Clipboard::get());
+    buffer->copy_clipboard(clipboard);
+}
+
+void DocumentText::cut()
+{
+#ifdef VLE_HAVE_GTKSOURCEVIEWMM
+    Glib::RefPtr<gtksourceview::SourceBuffer> buffer(mView.get_source_buffer());
+#else
+    Glib::RefPtr<Gtk::TextBuffer> buffer(mView.get_buffer());
+#endif
+
+    Glib::RefPtr<Gtk::Clipboard> clipboard(Gtk::Clipboard::get());
+    buffer->cut_clipboard(clipboard);
 }
 
 void DocumentText::onChanged()
