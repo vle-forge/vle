@@ -76,6 +76,11 @@ public:
      */
     void onFileMode();
 
+    void hideCloseTab();
+    void showCloseTab();
+    void hideCloseProject();
+    void showCloseProject();
+
     void hidePackageMenu();
     void showPackageMenu();
 

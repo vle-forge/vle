@@ -453,10 +453,16 @@ public:
     void importModel();
 
     /**
-     * When click on close menu
+     * When click on close file menu
      *
      */
     void closeFile();
+
+    /**
+     * When click on close project menu
+     *
+     */
+    void closeProject();
 
     /**
      * Whien click on quit as menu

@@ -193,14 +193,18 @@ void GVLE::FileTreeView::clear()
 
 void GVLE::FileTreeView::build()
 {
+    remove_all_columns();
     if (not mPackage.empty()) {
-	remove_all_columns();
 	mColumnName = append_column(
 	    _(fs::basename(mPackage).c_str()),
 	    mColumns.m_col_name);
 	mCellrenderer = dynamic_cast<Gtk::CellRendererText*>(
 	    get_column_cell_renderer(mColumnName - 1));
 	buildHierarchy(0, mPackage);
+    } else {
+	mColumnName = append_column("Project", mColumns.m_col_name);
+	mCellrenderer = dynamic_cast<Gtk::CellRendererText*>(
+	    get_column_cell_renderer(mColumnName - 1));
     }
 }
 
@@ -233,13 +237,14 @@ void GVLE::FileTreeView::on_row_activated(const Gtk::TreeModel::Path&,
 	    } else {
 		mParent->getEditor()->openTab(absolute_path);
 	    }
+	    mParent->getMenu()->showCloseTab();
 	}
-    }
-    else {
-	if (not row_expanded(Gtk::TreePath(it)))
+    } else {
+	if (not row_expanded(Gtk::TreePath(it))) {
 	    expand_row(Gtk::TreePath(it), false);
-	else
+	} else {
 	    collapse_row(Gtk::TreePath(it));
+	}
     }
 }
 
@@ -671,14 +676,16 @@ void GVLE::openFile()
     if (file.run() == Gtk::RESPONSE_OK) {
 	std::string selected_file = file.get_filename();
 	mEditor->openTab(selected_file);
+	mMenuAndToolbar->showCloseTab();
     }
 }
 void GVLE::onMenuOpenPackage()
 {
     mEditor->closeAllTab();
     mOpenPackageBox->show();
-    if (not utils::Package::package().name().empty())
+    if (not utils::Package::package().name().empty()) {
 	mMenuAndToolbar->onPackageMode();
+    }
 }
 
 void GVLE::onMenuOpenVpz()
@@ -690,6 +697,7 @@ void GVLE::onMenuOpenVpz()
 	try {
 	    mOpenVpzBox->show();
 	    mMenuAndToolbar->onViewMode();
+	    mMenuAndToolbar->showCloseTab();
 	} catch(utils::InternalError) {
             Error((fmt(_("No experiments in the package '%1%'")) %
                   utils::Package::package().name()).str());
@@ -724,6 +732,7 @@ void GVLE::onMenuLoad()
 	    mMenuAndToolbar->onGlobalMode();
 	    mMenuAndToolbar->onViewMode();
 	    mFileTreeView->clear();
+	    mMenuAndToolbar->showCloseTab();
         }
     }
 }
@@ -866,6 +875,13 @@ void GVLE::closeFile()
 	    ++it;
 	}
     }
+}
+
+void GVLE::closeProject()
+{
+    utils::Package::package().select("");
+    buildPackageHierarchy();
+    mMenuAndToolbar->hideCloseProject();
 }
 
 void GVLE::tabClosed()

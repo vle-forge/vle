@@ -379,6 +379,7 @@ void Editor::closeAllTab()
     } else {
 	mApp->getMenu()->onGlobalMode();
     }
+    mApp->getMenu()->hideCloseTab();
 }
 
 void Editor::closeTab(const std::string& filepath)
@@ -404,6 +405,7 @@ void Editor::closeTab(const std::string& filepath)
     }
     if (getDocuments().empty()) {
 	mApp->tabClosed();
+	mApp->getMenu()->hideCloseTab();
     }
 }
 

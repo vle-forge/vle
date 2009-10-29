@@ -54,7 +54,8 @@ const Glib::ustring GVLEMenuAndToolbar::UI_DEFINITION =
     "            <menuitem action='ExportModel'/>"
     "            <menuitem action='ExportGraphic'/>"
     "            <separator />"
-    "            <menuitem action='Close'/>"
+    "            <menuitem action='CloseTab'/>"
+    "            <menuitem action='CloseProject'/>"
     "            <menuitem action='Quit'/>"
     "        </menu>"
     "        <menu action='MenuEdit'>"
@@ -166,10 +167,10 @@ void GVLEMenuAndToolbar::onPackageMode()
     m_refActionGroup->get_action("ImportModel")->set_sensitive(false);
     m_refActionGroup->get_action("ExportModel")->set_sensitive(false);
     m_refActionGroup->get_action("ExportGraphic")->set_sensitive(false);
-//    m_refActionGroup->get_action("SaveVpz")->set_sensitive(false);
     m_refActionGroup->get_action("SaveFile")->set_sensitive(false);
     m_refActionGroup->get_action("SaveFileAs")->set_sensitive(false);
     m_refActionGroup->get_action("Random Order")->set_sensitive(false);
+    m_refActionGroup->get_action("CloseProject")->set_sensitive(true);
 }
 
 void GVLEMenuAndToolbar::onGlobalMode()
@@ -184,10 +185,11 @@ void GVLEMenuAndToolbar::onGlobalMode()
     m_refActionGroup->get_action("ImportModel")->set_sensitive(false);
     m_refActionGroup->get_action("ExportModel")->set_sensitive(false);
     m_refActionGroup->get_action("ExportGraphic")->set_sensitive(false);
-//    m_refActionGroup->get_action("SaveVpz")->set_sensitive(false);
     m_refActionGroup->get_action("SaveFile")->set_sensitive(false);
     m_refActionGroup->get_action("SaveFileAs")->set_sensitive(false);
     m_refActionGroup->get_action("Random Order")->set_sensitive(false);
+    m_refActionGroup->get_action("CloseTab")->set_sensitive(false);
+    m_refActionGroup->get_action("CloseProject")->set_sensitive(false);
 }
 
 void GVLEMenuAndToolbar::onViewMode()
@@ -202,7 +204,6 @@ void GVLEMenuAndToolbar::onViewMode()
     m_refActionGroup->get_action("ImportModel")->set_sensitive(true);
     m_refActionGroup->get_action("ExportModel")->set_sensitive(true);
     m_refActionGroup->get_action("ExportGraphic")->set_sensitive(true);
-//    m_refActionGroup->get_action("SaveVpz")->set_sensitive(true);
     m_refActionGroup->get_action("SaveFile")->set_sensitive(true);
     m_refActionGroup->get_action("SaveFileAs")->set_sensitive(true);
     m_refActionGroup->get_action("Random Order")->set_sensitive(true);
@@ -220,10 +221,29 @@ void GVLEMenuAndToolbar::onFileMode()
     m_refActionGroup->get_action("ImportModel")->set_sensitive(false);
     m_refActionGroup->get_action("ExportModel")->set_sensitive(false);
     m_refActionGroup->get_action("ExportGraphic")->set_sensitive(false);
-//    m_refActionGroup->get_action("SaveVpz")->set_sensitive(false);
     m_refActionGroup->get_action("SaveFile")->set_sensitive(true);
     m_refActionGroup->get_action("SaveFileAs")->set_sensitive(true);
     m_refActionGroup->get_action("Random Order")->set_sensitive(false);
+}
+
+void GVLEMenuAndToolbar::hideCloseTab()
+{
+    m_refActionGroup->get_action("CloseTab")->set_sensitive(false);
+}
+
+void GVLEMenuAndToolbar::showCloseTab()
+{
+    m_refActionGroup->get_action("CloseTab")->set_sensitive(true);
+}
+
+void GVLEMenuAndToolbar::hideCloseProject()
+{
+    m_refActionGroup->get_action("CloseProject")->set_sensitive(false);
+}
+
+void GVLEMenuAndToolbar::showCloseProject()
+{
+    m_refActionGroup->get_action("CloseProject")->set_sensitive(true);
 }
 
 void GVLEMenuAndToolbar::hidePackageMenu()
@@ -298,10 +318,6 @@ void GVLEMenuAndToolbar::createFileActions()
 						    "filesystem")),
 	Gtk::AccelKey(""),
 	sigc::mem_fun(mParent, &GVLE::onMenuLoad));
-    // m_refActionGroup->add(
-    // 	Gtk::Action::create("SaveVpz", Gtk::Stock::SAVE,
-    // 			    _("_Save Vpz"), _("Save a Vpz")),
-    // 	sigc::mem_fun(mParent, &GVLE::onMenuSave));
     m_refActionGroup->add(
 	Gtk::Action::create("SaveFile", Gtk::Stock::SAVE,
 			    _("Save File"), _("Save a file")),
@@ -331,12 +347,17 @@ void GVLEMenuAndToolbar::createFileActions()
 			    _("Create a new Package")),
 	sigc::mem_fun(mParent, &GVLE::exportGraphic));
     m_refActionGroup->add(
-	Gtk::Action::create("Close", Gtk::Stock::CLOSE,
-			    _("_Close"), _("Create a new Package")),
+	Gtk::Action::create("CloseTab", Gtk::Stock::CLOSE,
+			    _("_Close Tab"), _("Close the current tab")),
 	sigc::mem_fun(mParent, &GVLE::closeFile));
     m_refActionGroup->add(
+	Gtk::Action::create("CloseProject", Gtk::Stock::CLOSE,
+			    _("_Close Project"), _("Close the project")),
+	Gtk::AccelKey(""),
+	sigc::mem_fun(mParent, &GVLE::closeProject));
+    m_refActionGroup->add(
 	Gtk::Action::create("Quit", Gtk::Stock::QUIT,
-			    _("_Quit"), _("Create a new Package")),
+			    _("_Quit"), _("Quit GVLE")),
 	sigc::mem_fun(mParent, &GVLE::onMenuQuit));
 }
 
