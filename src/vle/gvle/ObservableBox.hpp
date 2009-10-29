@@ -1,12 +1,18 @@
 /**
  * @file vle/gvle/ObservableBox.hpp
  * @author The VLE Development Team
+ * See the AUTHORS or Authors.txt file
  */
 
 /*
  * VLE Environment - the multimodeling and simulation environment
- * This file is a part of the VLE environment (http://vle.univ-littoral.fr)
- * Copyright (C) 2003 - 2008 The VLE Development Team
+ * This file is a part of the VLE environment
+ * http://www.sourceforge.net/projects/vle
+ *
+ * Copyright (C) 2003 - 2007 Gauthier Quesnel <quesnel@users.sourceforge.net>
+ * Copyright (C) 2003 - 2009 ULCO http://www.univ-littoral.fr
+ * Copyright (C) 2007 - 2009 INRA http://www.inra.fr
+ * Copyright (C) 2007 - 2009 Cirad http://www.cirad.fr
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
