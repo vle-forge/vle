@@ -46,6 +46,7 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <boost/filesystem.hpp>
+#include <boost/version.hpp>
 #include <gtkmm/filechooserdialog.h>
 #include <glibmm/spawn.h>
 #include <glibmm/miscutils.h>
@@ -306,7 +307,11 @@ void GVLE::FileTreeView::onNewFile()
 		mPackage, Glib::build_filename(lstpath));
 	    if (not isDirectory(filepath)) {
 		fs::path path(filepath);
-		filepath = boost::lexical_cast<std::string>(path.parent_path());
+#if BOOST_VERSION > 103600
+                filepath = path.parent_path().string();
+#else
+                filepath = path.branch_path().string();
+#endif
 	    }
 	} else {
 	    filepath = mPackage;
@@ -334,8 +339,11 @@ void GVLE::FileTreeView::onNewDirectory()
 		mPackage, Glib::build_filename(lstpath));
 	    if (not isDirectory(directorypath)) {
 		fs::path path(directorypath);
-		directorypath = boost::lexical_cast<std::string>(
-		    path.parent_path());
+#if BOOST_VERSION > 103600
+                directorypath = path.parent_path().string();
+#else
+                directorypath = path.branch_path().string();
+#endif
 	    }
 	} else {
 	    directorypath = mPackage;
