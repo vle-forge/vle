@@ -61,12 +61,12 @@ void QuitBox::show()
     if (not mFileModified.empty()) {
 	if (mFileModified.size() == 1) {
 	    mMessage->set_label(_("One document is not saved.\n" \
-				  "Do you want to saved before close ?"));
+				  "Do you want to save before closing ?"));
 	} else {
 	    mMessage->set_label(boost::lexical_cast<std::string>
 				(mFileModified.size()) +
 				_(" documents are not saved.\n")
-				+ _("Do you want to saved before close ?"));
+				+ _("Do you want to save before closing ?"));
 	}
 	mDialog->set_title("Open Package");
 	mDialog->show_all();
