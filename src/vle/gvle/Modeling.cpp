@@ -32,6 +32,7 @@
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/ModelDescriptionBox.hpp>
 #include <vle/gvle/DialogString.hpp>
+#include <vle/utils/Package.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Path.hpp>
@@ -105,9 +106,9 @@ void Modeling::clearModeling()
 {
     mIsModified = false;
     mIsSaved = false;
+    mGVLE->getEditor()->closeVpzTab();
     mFileName.clear();
     mVpz.clear();
-    delViews();
     if (mTop) {
        delete mTop;
     }
@@ -133,9 +134,22 @@ Glib::RefPtr < Gnome::Glade::Xml > Modeling::getGlade() const
 void Modeling::start()
 {
     clearModeling();
+    delNames();
     mTop = newCoupledModel(0, "Top model", "", 0, 0);
     mVpz.project().model().setModel(mTop);
+    mGVLE->redrawModelTreeBox();
+    mGVLE->redrawModelClassBox();
+    if (utils::Package::package().name().empty()) {
+	mFileName.assign("noname.vpz");
+    } else {
+	mFileName.assign(Glib::build_filename(
+			     utils::Path::path().getPackageExpDir(),
+			     "noname.vpz"));
+    }
+    mIsSaved = false;
+    mIsModified = true;
     addView(mTop);
+    setModifiedTitles();
 }
 
 void Modeling::parseXML(const string& filename)

@@ -646,14 +646,11 @@ void GVLE::newFile()
 
 void GVLE::onMenuNew()
 {
-    if (mModeling->isModified() == false) {
-        mModeling->delNames();
+    if (not mModeling->isModified() or mModeling->getFileName().empty() or
+	(mModeling->isModified() and
+	 gvle::Question(_("Do you really want load a new Model ?\nCurrent "
+			 "model will be destroy and not save")))) {
         mModeling->start();
-        redrawModelTreeBox();
-    } else if (gvle::Question(_("Do you really want destroy model ?"))) {
-        mModeling->delNames();
-        mModeling->start();
-        redrawModelTreeBox();
     }
 }
 
@@ -686,9 +683,10 @@ void GVLE::onMenuOpenPackage()
 
 void GVLE::onMenuOpenVpz()
 {
-    if (mModeling->isModified() == false or
-	gvle::Question(_("Do you really want load a new Model ?\nCurrent"
-			 "model will be destroy and not save"))) {
+    if (not mModeling->isModified() or mModeling->getFileName().empty() or
+	(mModeling->isModified() and
+	 gvle::Question(_("Do you really want load a new Model ?\nCurrent "
+			 "model will be destroy and not save")))) {
 	try {
 	    mOpenVpzBox->show();
 	    mMenuAndToolbar->onViewMode();
@@ -701,9 +699,10 @@ void GVLE::onMenuOpenVpz()
 
 void GVLE::onMenuLoad()
 {
-    if (mModeling->isModified() == false or
-            gvle::Question(_("Do you really want load a new Model ?\nCurrent" \
-                             "model will be destroy and not save"))) {
+    if (not mModeling->isModified() or mModeling->getFileName().empty() or
+	(mModeling->isModified() and
+	 gvle::Question(_("Do you really want load a new Model ?\nCurrent "
+			 "model will be destroy and not save")))) {
         Gtk::FileChooserDialog file("VPZ file", Gtk::FILE_CHOOSER_ACTION_OPEN);
         file.set_transient_for(*this);
         file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
