@@ -46,7 +46,6 @@ const Glib::ustring GVLEMenuAndToolbar::UI_DEFINITION =
     "            <menuitem action='OpenVpz'/>"
     "            <menuitem action='OpenGlobalVpz'/>"
     "            <separator/>"
-    "            <menuitem action='SaveVpz'/>"
     "            <menuitem action='SaveFile'/>"
     "            <menuitem action='SaveFileAs'/>"
     "            <separator />"
@@ -167,7 +166,7 @@ void GVLEMenuAndToolbar::onPackageMode()
     m_refActionGroup->get_action("ImportModel")->set_sensitive(false);
     m_refActionGroup->get_action("ExportModel")->set_sensitive(false);
     m_refActionGroup->get_action("ExportGraphic")->set_sensitive(false);
-    m_refActionGroup->get_action("SaveVpz")->set_sensitive(false);
+//    m_refActionGroup->get_action("SaveVpz")->set_sensitive(false);
     m_refActionGroup->get_action("SaveFile")->set_sensitive(false);
     m_refActionGroup->get_action("SaveFileAs")->set_sensitive(false);
     m_refActionGroup->get_action("Random Order")->set_sensitive(false);
@@ -185,7 +184,7 @@ void GVLEMenuAndToolbar::onGlobalMode()
     m_refActionGroup->get_action("ImportModel")->set_sensitive(false);
     m_refActionGroup->get_action("ExportModel")->set_sensitive(false);
     m_refActionGroup->get_action("ExportGraphic")->set_sensitive(false);
-    m_refActionGroup->get_action("SaveVpz")->set_sensitive(false);
+//    m_refActionGroup->get_action("SaveVpz")->set_sensitive(false);
     m_refActionGroup->get_action("SaveFile")->set_sensitive(false);
     m_refActionGroup->get_action("SaveFileAs")->set_sensitive(false);
     m_refActionGroup->get_action("Random Order")->set_sensitive(false);
@@ -203,9 +202,9 @@ void GVLEMenuAndToolbar::onViewMode()
     m_refActionGroup->get_action("ImportModel")->set_sensitive(true);
     m_refActionGroup->get_action("ExportModel")->set_sensitive(true);
     m_refActionGroup->get_action("ExportGraphic")->set_sensitive(true);
-    m_refActionGroup->get_action("SaveVpz")->set_sensitive(true);
-    m_refActionGroup->get_action("SaveFile")->set_sensitive(false);
-    m_refActionGroup->get_action("SaveFileAs")->set_sensitive(false);
+//    m_refActionGroup->get_action("SaveVpz")->set_sensitive(true);
+    m_refActionGroup->get_action("SaveFile")->set_sensitive(true);
+    m_refActionGroup->get_action("SaveFileAs")->set_sensitive(true);
     m_refActionGroup->get_action("Random Order")->set_sensitive(true);
 }
 
@@ -221,7 +220,7 @@ void GVLEMenuAndToolbar::onFileMode()
     m_refActionGroup->get_action("ImportModel")->set_sensitive(false);
     m_refActionGroup->get_action("ExportModel")->set_sensitive(false);
     m_refActionGroup->get_action("ExportGraphic")->set_sensitive(false);
-    m_refActionGroup->get_action("SaveVpz")->set_sensitive(false);
+//    m_refActionGroup->get_action("SaveVpz")->set_sensitive(false);
     m_refActionGroup->get_action("SaveFile")->set_sensitive(true);
     m_refActionGroup->get_action("SaveFileAs")->set_sensitive(true);
     m_refActionGroup->get_action("Random Order")->set_sensitive(false);
@@ -299,10 +298,10 @@ void GVLEMenuAndToolbar::createFileActions()
 						    "filesystem")),
 	Gtk::AccelKey(""),
 	sigc::mem_fun(mParent, &GVLE::onMenuLoad));
-    m_refActionGroup->add(
-	Gtk::Action::create("SaveVpz", Gtk::Stock::SAVE,
-			    _("_Save Vpz"), _("Save a Vpz")),
-	sigc::mem_fun(mParent, &GVLE::onMenuSave));
+    // m_refActionGroup->add(
+    // 	Gtk::Action::create("SaveVpz", Gtk::Stock::SAVE,
+    // 			    _("_Save Vpz"), _("Save a Vpz")),
+    // 	sigc::mem_fun(mParent, &GVLE::onMenuSave));
     m_refActionGroup->add(
 	Gtk::Action::create("SaveFile", Gtk::Stock::SAVE,
 			    _("Save File"), _("Save a file")),
@@ -311,6 +310,7 @@ void GVLEMenuAndToolbar::createFileActions()
 	Gtk::Action::create("SaveFileAs", Gtk::Stock::SAVE_AS,
 			    _("Save File As"), _("Save a file as a "
 						 "different name")),
+	Gtk::AccelKey("<control><shift>s"),
 	sigc::mem_fun(mParent, &GVLE::saveFileAs));
     m_refActionGroup->add(
 	Gtk::Action::create("ClearModel", _("_Clear Model"),

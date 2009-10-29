@@ -72,11 +72,17 @@ void SaveVpzBox::onApply()
 	if (not exist(mEntryName->get_text()) or
 	    gvle::Question(_("Do you want to replace the file ") +
 		    static_cast<std::string>(mEntryName->get_text()))) {
+	    const Modeling* modeling = (const Modeling*)(mModeling);
+	    std::string fileName = mEntryName->get_text();
+	    vpz::Vpz::fixExtension(fileName);
 	    std::string pathFile = Glib::build_filename(
-		utils::Path::path().getPackageExpDir(),
-		mEntryName->get_text());
-	    vpz::Vpz::fixExtension(pathFile);
+		utils::Path::path().getPackageExpDir(), fileName);
+	    Editor::Documents::const_iterator it = modeling
+		->getDocuments().find(modeling->getFileName());
 	    mModeling->saveXML(pathFile);
+	    if (it != modeling->getDocuments().end()) {
+		it->second->setTitle(pathFile, mModeling->getTopModel(), false);
+	    }
 	    mDialog->hide_all();
 	}
     }

@@ -499,16 +499,14 @@ void GVLE::setModifiedTitle(const std::string& name)
 	Editor::Documents::const_iterator it =
 	    mEditor->getDocuments().find(name);
 	if (it != mEditor->getDocuments().end())
-	    it->second->setTitle(Glib::path_get_basename(name),
-				 getModeling()->getTopModel(),
-				 true);
+	    it->second->setTitle(name ,getModeling()->getTopModel(), true);
     }
 }
 
 void GVLE::buildPackageHierarchy()
 {
-    mModelTreeBox->clear();
-    mModelClassBox->clear();
+    redrawModelTreeBox();
+    redrawModelClassBox();
     mPackage = vle::utils::Path::path().getPackageDir();
     mFileTreeView->clear();
     mFileTreeView->setPackage(mPackage);
@@ -736,26 +734,60 @@ void GVLE::saveFile()
     int page = mEditor->get_current_page();
 
     if (page != -1) {
-	DocumentText* doc = dynamic_cast < DocumentText* >(
-	    mEditor->get_nth_page(page));
-
-	if (not doc->isNew()) {
-	    doc->save();
+	if (dynamic_cast < Document* >(mEditor->get_nth_page(page))
+	    ->isDrawingArea()) {
+	    onMenuSave();
 	} else {
-	    Gtk::FileChooserDialog file(_("VPZ file"),
-					Gtk::FILE_CHOOSER_ACTION_SAVE);
+	    DocumentText* doc = dynamic_cast < DocumentText* >(
+		mEditor->get_nth_page(page));
 
-	    file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-	    file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
-	    file.set_current_folder(utils::Path::path().getPackageDir());
-	    if (file.run() == Gtk::RESPONSE_OK) {
-		std::string filename(file.get_filename());
+	    if (not doc->isNew()) {
+		doc->save();
+	    } else {
+		Gtk::FileChooserDialog file(_("Text file"),
+					    Gtk::FILE_CHOOSER_ACTION_SAVE);
 
-		doc->saveAs(filename);
-		mModeling->setFileName(filename);
+		file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+		file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+		file.set_current_folder(utils::Path::path().getPackageDir());
+		if (file.run() == Gtk::RESPONSE_OK) {
+		    std::string filename(file.get_filename());
+
+		    doc->saveAs(filename);
+		    mModeling->setFileName(filename);
+		}
+	    }
+	    buildPackageHierarchy();
+	}
+    }
+}
+
+void GVLE::saveVpz()
+{
+    if (not utils::Package::package().name().empty()) {
+	mSaveVpzBox->show();
+    } else {
+	Gtk::FileChooserDialog file(_("VPZ file"),
+				    Gtk::FILE_CHOOSER_ACTION_SAVE);
+	file.set_transient_for(*this);
+	file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+	file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+	Gtk::FileFilter filter;
+	filter.set_name(_("Vle Project gZipped"));
+	filter.add_pattern("*.vpz");
+	file.add_filter(filter);
+
+	if (file.run() == Gtk::RESPONSE_OK) {
+	    std::string filename(file.get_filename());
+	    vpz::Vpz::fixExtension(filename);
+	    Editor::Documents::const_iterator it =
+		mEditor->getDocuments().find(mModeling->getFileName());
+	    mModeling->saveXML(filename);
+	    if (it != mEditor->getDocuments().end()) {
+		it->second->setTitle(filename,
+				     mModeling->getTopModel(), false);
 	    }
 	}
-	buildPackageHierarchy();
     }
 }
 
@@ -778,36 +810,17 @@ void GVLE::onMenuSave()
     }
 
     if (mModeling->isSaved()) {
-	mModeling->saveXML(mModeling->getFileName());
 	Editor::Documents::const_iterator it =
 	    mEditor->getDocuments().find(mModeling->getFileName());
-	if (it != mEditor->getDocuments().end())
+
+	mModeling->saveXML(mModeling->getFileName());
+	if (it != mEditor->getDocuments().end()) {
 	    it->second->setTitle(mModeling->getFileName(),
 				 mModeling->getTopModel(), false);
-    } else if (not utils::Package::package().name().empty()) {
-	mSaveVpzBox->show();
-    } else {
-	Gtk::FileChooserDialog file(_("VPZ file"),
-				    Gtk::FILE_CHOOSER_ACTION_SAVE);
-	file.set_transient_for(*this);
-	file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-	file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
-	Gtk::FileFilter filter;
-	filter.set_name(_("Vle Project gZipped"));
-	filter.add_pattern("*.vpz");
-	file.add_filter(filter);
-
-	if (file.run() == Gtk::RESPONSE_OK) {
-	    std::string filename(file.get_filename());
-	    vpz::Vpz::fixExtension(filename);
-
-	    mModeling->saveXML(filename);
-	    Editor::Documents::const_iterator it =
-		mEditor->getDocuments().find(filename);
-	    if (it != mEditor->getDocuments().end())
-		it->second->setTitle(filename,
-				     mModeling->getTopModel(), false);
 	}
+    } else {
+	saveVpz();
+	buildPackageHierarchy();
     }
 }
 
@@ -816,21 +829,27 @@ void GVLE::saveFileAs()
     int page = mEditor->get_current_page();
 
     if (page != -1) {
-	DocumentText* doc = dynamic_cast < DocumentText* >(
-	    mEditor->get_nth_page(page));
-	Gtk::FileChooserDialog file(_("VPZ file"),
-				    Gtk::FILE_CHOOSER_ACTION_SAVE);
+	if (dynamic_cast < Document* >(mEditor->get_nth_page(page))
+	    ->isDrawingArea()) {
+	    saveVpz();
+	    buildPackageHierarchy();
+	} else {
+	    DocumentText* doc = dynamic_cast < DocumentText* >(
+		mEditor->get_nth_page(page));
+	    Gtk::FileChooserDialog file(_("Text file"),
+					Gtk::FILE_CHOOSER_ACTION_SAVE);
 
-	file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-	file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
-	file.set_current_folder(utils::Path::path().getPackageDir());
-	if (file.run() == Gtk::RESPONSE_OK) {
-	    std::string filename(file.get_filename());
+	    file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+	    file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+	    file.set_current_folder(utils::Path::path().getPackageDir());
+	    if (file.run() == Gtk::RESPONSE_OK) {
+		std::string filename(file.get_filename());
 
-	    doc->saveAs(filename);
-	    mModeling->setFileName(filename);
+		doc->saveAs(filename);
+		mModeling->setFileName(filename);
+	    }
+	    buildPackageHierarchy();
 	}
-	buildPackageHierarchy();
     }
 }
 

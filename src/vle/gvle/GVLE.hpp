@@ -411,6 +411,12 @@ public:
     void saveFile();
 
     /**
+     * When click on save vpz file menu.
+     *
+     */
+    void saveVpz();
+
+    /**
      * When click on save menu.
      *
      */
