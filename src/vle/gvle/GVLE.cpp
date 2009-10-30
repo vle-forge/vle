@@ -1402,6 +1402,7 @@ void GVLE::onRandomOrder()
     ViewDrawingArea* tab = dynamic_cast<DocumentDrawingArea*>(
 	mEditor->get_nth_page(mCurrentTab))->getDrawingArea();
     tab->onRandomOrder();
+    mModeling->setModified(true);
 }
 
 }} // namespace vle gvle
