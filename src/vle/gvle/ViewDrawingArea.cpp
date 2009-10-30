@@ -1093,6 +1093,7 @@ void ViewDrawingArea::delUnderMouse(int x, int y)
         mView->delModel(model);
     } else {
         delConnection();
+	mModeling->setModified(true);
     }
 
     queueRedraw();
