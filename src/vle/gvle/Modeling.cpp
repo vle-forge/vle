@@ -845,7 +845,7 @@ void Modeling::vpz_is_correct(std::vector<std::string>& vec)
     DynamicList::const_iterator dyn_it = dyn_list.begin();
     while (dyn_it != dyn_list.end()) {
         if (dyn_it->second.library() == "") {
-            vec.push_back((fmt(_("The Dynamic %1% is not attached to a "
+            vec.push_back((fmt(_("The Dynamic %1% is not attached with a "
                                  "library.")) % dyn_it->first).str());
         }
         ++dyn_it;
@@ -853,16 +853,16 @@ void Modeling::vpz_is_correct(std::vector<std::string>& vec)
 
     const Experiment& exp = project.experiment();
     if (exp.name() == "")
-        vec.push_back(_("The Experiment has not a name."));
+        vec.push_back(_("The Experiment has no name."));
 
     if (exp.duration() == 0)
-        vec.push_back(_("The Experiment has not a duration."));
+        vec.push_back(_("The Experiment has no duration."));
 
     const ViewList& view_list = exp.views().viewlist();
     ViewList::const_iterator view_it = view_list.begin();
     while (view_it != view_list.end()) {
         if (view_it->second.output() == "") {
-            vec.push_back((fmt(_("The view %1% has not an output.")) %
+            vec.push_back((fmt(_("The view %1% has no output.")) %
                            view_it->first).str());
         }
         ++view_it;

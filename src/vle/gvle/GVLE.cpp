@@ -812,7 +812,7 @@ void GVLE::onMenuSave()
     mModeling->vpz_is_correct(vec);
     if (vec.size() != 0) {
         //vpz is correct
-        std::string error = _("Vpz incorrect :\n");
+        std::string error = _("Error - The vpz file is not correct:\n");
         std::vector<std::string>::const_iterator it = vec.begin();
 
         while (it != vec.end()) {
