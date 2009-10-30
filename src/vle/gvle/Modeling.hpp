@@ -344,6 +344,12 @@ public:
     inline const Editor::Documents& getDocuments() const
 	{ return mGVLE->getEditor()->getDocuments(); }
 
+    inline int runConditionsBox(const vpz::Conditions& conditions)
+	{ return mGVLE->runConditionsBox(conditions); }
+
+    inline void applyConditionsBox(vpz::Conditions& conditions)
+	{ mGVLE->applyConditionsBox(conditions); }
+
     /********************************************************************
      *
      * OTHER USEFULL FUNCTION
@@ -620,13 +626,14 @@ public:
         return mVpz.project().experiment().conditions();
     }
 
-    inline vpz::AtomicModel& get_model(graph::AtomicModel* atom, const std::string& className = "")
+    vpz::AtomicModel& get_model(const graph::AtomicModel* atom,
+				const std::string& className = "")
     {
-        setModified(true);
-	if (className == "") {
+	if (className.empty()) {
 	    return mVpz.project().model().atomicModels().get(atom);
 	} else {
-	    return mVpz.project().classes().get(className).atomicModels().get(atom);
+	    return mVpz.project().classes().get(className)
+		.atomicModels().get(atom);
 	}
     }
 

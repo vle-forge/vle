@@ -194,7 +194,8 @@ public:
 
     ~ConditionsBox();
 
-    void show();
+    int run(const vpz::Conditions& conditions);
+    void apply(vpz::Conditions& conditions);
 
     inline Modeling* getModeling()
     { return mModeling; }
@@ -203,7 +204,6 @@ public:
 private:
     Modeling*           mModeling;
     vpz::Conditions*    mConditions;
-    vpz::Conditions*    mBackup;
 
     Gtk::Dialog*        mDialog;
     Gtk::Button*        mButtonCancel;

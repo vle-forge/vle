@@ -229,6 +229,15 @@ namespace vle { namespace vpz {
 			     const std::string& newname);
 
 	/**
+	 * @brief Update the dynamics list of each AtomicModel
+	 * where an oldname became newname.
+	 * @param oldname the old name of the dynamics.
+	 * @param newname the new name of the dynamics.
+	 */
+	void updateDynamics(const std::string& oldname,
+			    const std::string& newname);
+
+	/**
 	 * @brief Update the observable of each AtomicModel
 	 * where an oldname became newname.
 	 * @param oldname the old name of the observable.

@@ -51,7 +51,8 @@ public:
 
     virtual ~AtomicModelBox();
 
-    void show(vpz::AtomicModel& atom,  graph::AtomicModel& model);
+    void show(graph::AtomicModel* model,
+	      const std::string& className = "");
 
     inline Modeling* getModeling()
     { return mModeling; }
@@ -118,7 +119,10 @@ private:
 			  const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
 	virtual ~InputPortTreeView();
 
+	void applyRenaming(graph::AtomicModel* model);
 	void build();
+	void clearRenaming()
+	    { mRenameList.clear(); }
 	void setModel(graph::AtomicModel* model)
 	    { mModel = model; }
 
@@ -141,7 +145,11 @@ private:
 	    const Glib::ustring& newText);
 
     private:
+	typedef std::vector < std::pair < std::string,
+					  std::string > > renameList;
+
 	graph::AtomicModel* mModel;
+	renameList mRenameList;
 	Gtk::Menu mMenuPopup;
 	ModelColumnsPort mColumnsInputPort;
 	Glib::RefPtr<Gtk::ListStore> mRefTreeModelInputPort;
@@ -160,7 +168,10 @@ private:
 			   const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
 	virtual ~OutputPortTreeView();
 
+	void applyRenaming(graph::AtomicModel* model);
 	void build();
+	void clearRenaming()
+	    { mRenameList.clear(); }
 	void setModel(graph::AtomicModel* model)
 	    { mModel = model; }
 
@@ -183,7 +194,11 @@ private:
 	    const Glib::ustring& newText);
 
     private:
+	typedef std::vector < std::pair < std::string,
+					  std::string > > renameList;
+
 	graph::AtomicModel* mModel;
+	renameList mRenameList;
 	Gtk::Menu mMenuPopup;
 	ModelColumnsPort mColumnsOutputPort;
 	Glib::RefPtr<Gtk::ListStore> mRefTreeModelOutputPort;
@@ -202,7 +217,10 @@ private:
 			  const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
 	virtual ~ConditionTreeView();
 
+	void applyRenaming();
 	void build();
+	void clearRenaming()
+	    { mRenameList.clear(); }
 	vpz::Strings getConditions();
 	void setConditions(vpz::Conditions* conditions)
 	    { mConditions = conditions; }
@@ -225,6 +243,9 @@ private:
 	    const Glib::ustring& newText);
 
     private:
+	typedef std::vector < std::pair < std::string,
+					  std::string > > renameList;
+
 	void on_row_activated(const Gtk::TreeModel::Path& path,
 			      Gtk::TreeViewColumn*  column);
 	virtual bool on_button_press_event(GdkEventButton* event);
@@ -232,6 +253,7 @@ private:
 	// class members
 	vpz::AtomicModel* mModel;
 	vpz::Conditions* mConditions;
+	renameList mRenameList;
 	Modeling* mModeling;
 	Gtk::Menu mMenuPopup;
 	ModelColumnsCond mColumns;
@@ -251,9 +273,14 @@ private:
     {
     public:
 	DynamicTreeView(BaseObjectType* cobject,
-			  const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
+			const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
 	virtual ~DynamicTreeView();
+	void applyRenaming();
 	void build();
+	void clearRenaming()
+	    { mRenameList.clear(); }
+	void setDynamics(vpz::Dynamics* dynamics)
+	    { mDynamics = dynamics; }
 	void setModeling(Modeling* modeling)
 	    { mModeling = modeling; }
 	void setModel(vpz::AtomicModel* model)
@@ -261,7 +288,7 @@ private:
 	void setLabel(Gtk::Label* label)
 	    { mLabel = label; }
 	void setParent(AtomicModelBox* parent)
-	  { mParent = parent; }
+	    { mParent = parent; }
 	std::string getDynamic();
 
     protected:
@@ -291,8 +318,13 @@ private:
 	void onClickColumn(int numColum);
 
     private:
+	typedef std::vector < std::pair < std::string,
+					  std::string > > renameList;
+
 	vpz::AtomicModel* mModel;
 	AtomicModelBox* mParent;
+	vpz::Dynamics* mDynamics;
+	renameList mRenameList;
 	Modeling* mModeling;
 	Gtk::Menu mMenuPopup;
 	ModelColumnsDyn mColumnsDyn;
@@ -322,7 +354,12 @@ private:
 	ObservableTreeView(BaseObjectType* cobject,
 			  const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
 	virtual ~ObservableTreeView();
+	void applyRenaming();
 	void build();
+	void clearRenaming()
+	    { mRenameList.clear(); }
+	void setObservables(vpz::Observables* observables)
+	    { mObservables = observables; }
 	void setModeling(Modeling* modeling)
 	    { mModeling = modeling; }
 	void setModel(vpz::AtomicModel* model)
@@ -351,7 +388,12 @@ private:
 	    const Glib::ustring& newName);
 
     private:
+	typedef std::vector < std::pair < std::string,
+					  std::string > > renameList;
+
 	vpz::AtomicModel* mModel;
+	vpz::Observables* mObservables;
+	renameList mRenameList;
 	Modeling* mModeling;
 	Gtk::Menu mMenuPopup;
 	ModelColumnsObs mColumnsObs;
@@ -374,24 +416,13 @@ private:
 
     Gtk::Dialog*                         mDialog;
 
-    //Data
-    vpz::AtomicModel*                    mAtom;
-    graph::AtomicModel*                  mGraph_atom;
+    vpz::AtomicModel*                    mCurrentModel;
+    graph::AtomicModel*                  mCurrentGraphModel;
+    vpz::AtomicModel*                    mModel;
+    graph::AtomicModel*                  mGraphModel;
+    vpz::Conditions*                     mCond;
     vpz::Dynamics*                       mDyn;
     vpz::Observables*                    mObs;
-    vpz::Views*                          mViews;
-    vpz::Conditions*                     mCond;
-    vpz::Outputs*                        mOutputs;
-
-    //Backup
-    vpz::AtomicModel*                    mAtom_backup;
-    vpz::Dynamics*                       mDyn_backup;
-    vpz::Observables*                    mObs_backup;
-    vpz::Views*                          mViews_backup;
-    vpz::Conditions*                     mCond_backup;
-    vpz::Outputs*                        mOutputs_backup;
-    graph::ConnectionList*               mConnection_in_backup;
-    graph::ConnectionList*               mConnection_out_backup;
 
     //Input Ports
     InputPortTreeView*                   mInputPorts;
@@ -417,6 +448,10 @@ private:
 
     Gtk::Menu m_Menu_Popup;
 
+    void applyPorts();
+    void applyConditions();
+    void applyDynamics();
+    void applyObservables();
     void on_apply();
     void on_cancel();
 };

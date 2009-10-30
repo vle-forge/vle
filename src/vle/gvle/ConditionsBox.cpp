@@ -561,7 +561,6 @@ ConditionsBox::ConditionsBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
 			     Modeling* modeling) :
     mModeling(modeling),
     mConditions(0),
-    mBackup(0),
     mDialog(0),
     mButtonCancel(0),
     m_xml(xml)
@@ -595,7 +594,6 @@ ConditionsBox::ConditionsBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
 
 ConditionsBox::~ConditionsBox()
 {
-    delete mBackup;
 }
 
 void ConditionsBox::buildTreeConditions()
@@ -619,28 +617,23 @@ void ConditionsBox::buildTreePorts(const std::string& conditionName)
 void ConditionsBox::buildTreeValues(const std::string& conditionName,
 				    const std::string& portName)
 {
-    value::Set&
-        values(mConditions->get(conditionName).getSetValues(portName));
+    value::Set& values(mConditions->get(conditionName).getSetValues(portName));
 
     m_treeValues->setCondition(&mConditions->get(conditionName));
     m_treeValues->makeTreeView(values);
 }
 
-void ConditionsBox::show()
+int ConditionsBox::run(const vpz::Conditions& conditions)
 {
-    const Modeling* modeling = (const Modeling*)mModeling;
-    mConditions = new vpz::Conditions(modeling->conditions());
-
+    mConditions = new vpz::Conditions(conditions);
     buildTreeConditions();
     mDialog->show_all();
-    mDialog->run();
+    return mDialog->run();
 }
 
-void ConditionsBox::on_apply()
+void ConditionsBox::apply(vpz::Conditions& conditions)
 {
     {
-	vpz::Conditions& conditions = mModeling->conditions();
-
 	conditions.clear();
 	const vpz::ConditionList& list = mConditions->conditionlist();
 	vpz::ConditionList::const_iterator it = list.begin();
@@ -649,31 +642,13 @@ void ConditionsBox::on_apply()
 	    conditions.add(it->second);
 	    ++it;
 	}
-
-	delete mConditions;
-	mConditions = 0;
     }
+    delete mConditions;
+    mConditions = 0;
+}
 
-    {
-	vpz::Conditions& conditions = mModeling->conditions();
-	vpz::AtomicModelList& list =
-	    mModeling->vpz().project().model().atomicModels();
-	vpz::AtomicModelList::iterator it = list.begin();
-
-	while (it != list.end()) {
-	    vpz::Strings mdlConditions = it->second.conditions();
-	    vpz::Strings::const_iterator its = mdlConditions.begin();
-
-	    while (its != mdlConditions.end()) {
-		if (not conditions.exist(*its)) {
-		    it->second.delCondition(*its);
-		}
-		++its;
-	    }
-	    ++it;
-	}
-    }
-
+void ConditionsBox::on_apply()
+{
     if (mDialog) {
         mDialog->hide();
     }

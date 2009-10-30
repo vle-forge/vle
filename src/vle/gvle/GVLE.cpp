@@ -934,7 +934,40 @@ void GVLE::onExperimentsBox()
 
 void GVLE::onConditionsBox()
 {
-    mConditionsBox->show();
+    const Modeling* modeling = (const Modeling*)mModeling;
+
+    if (runConditionsBox(modeling->conditions()) == 1) {
+	applyConditionsBox(mModeling->conditions());
+
+	{
+	    vpz::AtomicModelList& list =
+		mModeling->vpz().project().model().atomicModels();
+	    vpz::AtomicModelList::iterator it = list.begin();
+
+	    while (it != list.end()) {
+		vpz::Strings mdlConditions = it->second.conditions();
+		vpz::Strings::const_iterator its = mdlConditions.begin();
+
+		while (its != mdlConditions.end()) {
+		    if (not mModeling->conditions().exist(*its)) {
+			it->second.delCondition(*its);
+		    }
+		    ++its;
+		}
+		++it;
+	    }
+	}
+    }
+}
+
+int GVLE::runConditionsBox(const vpz::Conditions& conditions)
+{
+    return mConditionsBox->run(conditions);
+}
+
+void GVLE::applyConditionsBox(vpz::Conditions& conditions)
+{
+    mConditionsBox->apply(conditions);
 }
 
 void GVLE::onHostsBox()

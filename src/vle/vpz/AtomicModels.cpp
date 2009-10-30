@@ -159,6 +159,15 @@ void AtomicModelList::updateCondition(const std::string& oldname,
     }
 }
 
+void AtomicModelList::updateDynamics(const std::string& oldname,
+				     const std::string& newname)
+{
+    for (iterator it = m_lst.begin(); it != m_lst.end(); ++it) {
+	if (it->second.dynamics() == oldname)
+	    it->second.setDynamics(newname);
+    }
+}
+
 void AtomicModelList::updateObservable(const std::string& oldname,
 				      const std::string& newname)
 {

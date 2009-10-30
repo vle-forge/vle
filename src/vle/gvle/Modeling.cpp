@@ -253,10 +253,8 @@ void Modeling::addView(graph::Model* model)
             graph::CoupledModel* m = graph::Model::toCoupled(model);
             addView(m);
         } else if (model->isAtomic()) {
-            graph::AtomicModel* m = graph::Model::toAtomic(model);
             try {
-                vpz::AtomicModel& vm = get_model(m);
-                mAtomicBox->show(vm, *m);
+                mAtomicBox->show((graph::AtomicModel*)model);
             } catch (utils::SaxParserError& /*e*/) {
                 parse_model(mVpz.project().model().atomicModels());
             }
@@ -285,10 +283,8 @@ void Modeling::addViewClass(graph::Model* model, std::string name)
         graph::CoupledModel* m = (graph::CoupledModel*)(model);
         addViewClass(m, name);
     } else if (model->isAtomic()) {
-        graph::AtomicModel* graph_am = dynamic_cast<graph::AtomicModel*>(model);
         try {
-	    vpz::AtomicModel& vpz_am = get_model(graph_am, name);
-	    mAtomicBox->show(vpz_am, *graph_am);
+	    mAtomicBox->show((graph::AtomicModel*)model, name);
         } catch (utils::SaxParserError& E) {
             parse_model(mVpz.project().classes().get(mCurrentClass).atomicModels());
         }

@@ -591,6 +591,9 @@ public:
      */
     void onConditionsBox();
 
+    int runConditionsBox(const vpz::Conditions& conditions);
+    void applyConditionsBox(vpz::Conditions& conditions);
+
     /**
      * When click on experiment box to define init, state etc.
      *

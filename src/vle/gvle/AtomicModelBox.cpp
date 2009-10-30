@@ -114,6 +114,17 @@ bool AtomicModelBox::InputPortTreeView::on_button_press_event(
   return return_value;
 }
 
+void AtomicModelBox::InputPortTreeView::applyRenaming(graph::AtomicModel* model)
+{
+    renameList::const_iterator it = mRenameList.begin();
+
+    while (it != mRenameList.end()) {
+	model->renameInputPort(it->first, it->second);
+	++it;
+    }
+    mRenameList.clear();
+}
+
 void AtomicModelBox::InputPortTreeView::build()
 {
     assert(mModel);
@@ -193,8 +204,9 @@ void AtomicModelBox::InputPortTreeView::onRename()
 
 		if (mModel->existInputPort(old_name)) {
 		    mModel->renameInputPort(old_name, new_name);
+		    mRenameList.push_back(std::make_pair(old_name, new_name));
+		    build();
 		}
-		build();
 	    }
 	}
     }
@@ -240,11 +252,12 @@ void AtomicModelBox::InputPortTreeView::onEdition(
 
 	    if (mModel->existInputPort(mOldName)) {
 		mModel->renameInputPort(mOldName, newName);
+		mRenameList.push_back(std::make_pair(mOldName, newName));
+		build();
 	    }
 	    mValidateRetry = true;
 	}
     }
-    build();
 }
 
 
@@ -318,6 +331,18 @@ bool AtomicModelBox::OutputPortTreeView::on_button_press_event(
   }
 
   return return_value;
+}
+
+void AtomicModelBox::OutputPortTreeView::applyRenaming(
+    graph::AtomicModel* model)
+{
+    renameList::const_iterator it = mRenameList.begin();
+
+    while (it != mRenameList.end()) {
+	model->renameOutputPort(it->first, it->second);
+	++it;
+    }
+    mRenameList.clear();
 }
 
 void AtomicModelBox::OutputPortTreeView::build()
@@ -398,6 +423,7 @@ void AtomicModelBox::OutputPortTreeView::onRename()
 
 		if (mModel->existOutputPort(old_name)) {
 		    mModel->renameOutputPort(old_name, new_name);
+		    mRenameList.push_back(std::make_pair(old_name, new_name));
 		}
 		build();
 	    }
@@ -445,11 +471,12 @@ void AtomicModelBox::OutputPortTreeView::onEdition(
 
 	    if (mModel->existOutputPort(mOldName)) {
 		mModel->renameOutputPort(mOldName, newName);
+		mRenameList.push_back(std::make_pair(mOldName, newName));
+		build();
 	    }
 	    mValidateRetry = true;
 	}
     }
-    build();
 }
 
 
@@ -496,14 +523,27 @@ AtomicModelBox::ConditionTreeView::~ConditionTreeView()
 {
 }
 
+void AtomicModelBox::ConditionTreeView::applyRenaming()
+{
+    renameList::const_iterator it = mRenameList.begin();
+
+    while (it != mRenameList.end()) {
+	vpz::AtomicModelList& atomlist(
+	    mModeling->vpz().project().model().atomicModels());
+	atomlist.updateCondition(it->first, it->second);
+	++it;
+    }
+    mRenameList.clear();
+}
+
 void AtomicModelBox::ConditionTreeView::build()
 {
     mRefTreeModel->clear();
 
     const vpz::Strings& cond = mModel->conditions();
     vpz::Strings::const_iterator f;
-    vpz::ConditionList list = mConditions->conditionlist();
-    vpz::ConditionList::iterator it = list.begin();
+    const vpz::ConditionList& list = mConditions->conditionlist();
+    vpz::ConditionList::const_iterator it = list.begin();
     std::string selections("");
 
     while (it != list.end()) {
@@ -542,8 +582,10 @@ vpz::Strings AtomicModelBox::ConditionTreeView::getConditions()
 void AtomicModelBox::ConditionTreeView::on_row_activated(
     const Gtk::TreeModel::Path&, Gtk::TreeViewColumn* )
 {
-    mModeling->getGVLE()->getConditionsBox()->show();
-    build();
+    if (mModeling->runConditionsBox(*mConditions) == 1) {
+	mModeling->applyConditionsBox(*mConditions);
+	build();
+    }
 }
 
 bool AtomicModelBox::ConditionTreeView::on_button_press_event(
@@ -554,7 +596,10 @@ bool AtomicModelBox::ConditionTreeView::on_button_press_event(
 	mMenuPopup.popup(event->button, event->time);
     }
     if (event->type == GDK_2BUTTON_PRESS && event->button == 1) {
-	mModeling->getGVLE()->getConditionsBox()->show();
+	if (mModeling->runConditionsBox(*mConditions) == 1) {
+	    mModeling->applyConditionsBox(*mConditions);
+	    build();
+	}
     }
     return return_value;
 }
@@ -568,15 +613,14 @@ void AtomicModelBox::ConditionTreeView::onRename()
 	Glib::ustring oldname = (*it)[mColumns.m_col_name];
 	SimpleTypeBox box(_("New name of the condition ?"), oldname);
         std::string newname = boost::trim_copy(box.run());
-	vpz::ConditionList& list = mConditions->conditionlist();
+	const vpz::ConditionList& list = mConditions->conditionlist();
 
 	if (box.valid() and not newname.empty()
 	   and list.find(newname) == list.end()) {
 	    mConditions->rename(oldname, newname);
-
-	    vpz::AtomicModelList& atomlist(
-		mModeling->vpz().project().model().atomicModels());
-	    atomlist.updateCondition(oldname, newname);
+	    mModel->delCondition(oldname);
+	    mModel->addCondition(newname);
+	    mRenameList.push_back(std::make_pair(oldname, newname));
 	    build();
 	}
     }
@@ -613,18 +657,15 @@ void AtomicModelBox::ConditionTreeView::onEdition(
     Gtk::TreeModel::iterator it = refSelection->get_selected();
 
     if (it) {
-	vpz::ConditionList& list = mConditions->conditionlist();
+	const vpz::ConditionList& list = mConditions->conditionlist();
 
 	if (not newName.empty() and list.find(newName) == list.end()) {
 	    mConditions->rename(mOldName, newName);
-
-	    vpz::AtomicModelList& atomlist(
-		mModeling->vpz().project().model().atomicModels());
-	    atomlist.updateCondition(mOldName, newName);
+	    mModel->setConditions(getConditions());
+	    mRenameList.push_back(std::make_pair(mOldName, newName));
+	    build();
 	}
     }
-
-    build();
 }
 
 //DynamicTreeView
@@ -710,6 +751,19 @@ AtomicModelBox::DynamicTreeView::~DynamicTreeView()
 
 }
 
+void AtomicModelBox::DynamicTreeView::applyRenaming()
+{
+    renameList::const_iterator it = mRenameList.begin();
+
+    while (it != mRenameList.end()) {
+	vpz::AtomicModelList& atomlist(
+	    mModeling->vpz().project().model().atomicModels());
+	atomlist.updateDynamics(it->first, it->second);
+	++it;
+    }
+    mRenameList.clear();
+}
+
 void AtomicModelBox::DynamicTreeView::build()
 {
     assert(mModeling);
@@ -717,7 +771,7 @@ void AtomicModelBox::DynamicTreeView::build()
 
     mRefListDyn->clear();
 
-    const DynamicList& list = mModeling->dynamics().dynamiclist();
+    const DynamicList& list = mDynamics->dynamiclist();
     DynamicList::const_iterator it = list.begin();
     while (it != list.end()) {
         Gtk::TreeModel::Row row = *(mRefListDyn->append());
@@ -835,7 +889,7 @@ void AtomicModelBox::DynamicTreeView::onRowActivated(
 	and boost::filesystem::exists(
 	    vle::utils::Path::path().getPackageSrcDir())) {
 	Gtk::TreeRow row = (*mRefTreeModelDyn->get_iter(path));
-	vpz::Dynamic& dynamic = mModeling->dynamics().get(
+	vpz::Dynamic& dynamic = mDynamics->get(
 	    row.get_value(mColumnsDyn.m_col_name));
 
 	std::string searchFile;
@@ -869,14 +923,14 @@ void AtomicModelBox::DynamicTreeView::onAdd()
     if (box.valid()) {
 	box.hide_all();
         name = boost::trim_copy(name);
-        if (mModeling->dynamics().exist(name)) {
+        if (mDynamics->exist(name)) {
             Error(boost::str(fmt(
                         _("The Dynamics '%1%' already exists")) % name));
         } else {
             vpz::Dynamic* dyn = new vpz::Dynamic(name);
             mDynamicBox.show(dyn);
             if (mDynamicBox.valid()) {
-                mModeling->dynamics().add(*dyn);
+                mDynamics->add(*dyn);
                 build();
 
 		const Gtk::TreeModel::Children& child(mRefTreeModelDyn->children());
@@ -901,7 +955,7 @@ void AtomicModelBox::DynamicTreeView::onEdit()
     Glib::ustring dyn = (*it)[mColumnsDyn.m_col_name];
 
     if (!dyn.empty()) {
-        mDynamicBox.show(&(mModeling->dynamics().get(dyn)));
+        mDynamicBox.show(&(mDynamics->get(dyn)));
         build();
 
 	const Gtk::TreeModel::Children& child(mRefTreeModelDyn->children());
@@ -924,8 +978,8 @@ void AtomicModelBox::DynamicTreeView::onRemove()
     Gtk::TreeModel::iterator it = refSelection->get_selected();
     Glib::ustring dyn = (*it)[mColumnsDyn.m_col_name];
 
-    if (dyn != "") {
-        mModeling->dynamics().del(dyn);
+    if (not dyn.empty()) {
+        mDynamics->del(dyn);
 	build();
     }
 }
@@ -936,20 +990,20 @@ void AtomicModelBox::DynamicTreeView::onRename()
     Gtk::TreeModel::iterator it = refSelection->get_selected();
     Glib::ustring oldName = (*it)[mColumnsDyn.m_col_name];
 
-    if (oldName != "") {
+    if (not oldName.empty()) {
 	SimpleTypeBox box(_("Name of the Dynamic ?"), oldName);
 
 	std::string newName = box.run();
 	if (box.valid() and not newName.empty()) {
 	    box.hide_all();
 	    newName = boost::trim_copy(newName);
-	    if (mModeling->dynamics().exist(newName)) {
+	    if (mDynamics->exist(newName)) {
 		Error(
 		    boost::str(
 			fmt(_("The Dynamics '%1%' already exists")) % newName));
 	    } else {
 		vpz::Dynamic* newDynamic = new vpz::Dynamic(newName);
-		vpz::Dynamic oldDynamic = mModeling->dynamics().get(oldName);
+		vpz::Dynamic oldDynamic = mDynamics->get(oldName);
 		newDynamic->setLibrary(oldDynamic.library());
 		newDynamic->setPackage(oldDynamic.package());
 		newDynamic->setModel(oldDynamic.model());
@@ -967,10 +1021,11 @@ void AtomicModelBox::DynamicTreeView::onRename()
 		    int port = boost::lexical_cast<int>(vec[vec.size() - 1]);
 
 		    newDynamic->setDistantDynamics(location, port);
-
 		}
-		mModeling->dynamics().add(*newDynamic);
-		mModeling->dynamics().del(oldName);
+		mDynamics->add(*newDynamic);
+		mDynamics->del(oldName);
+		mModel->setDynamics(newName);
+		mRenameList.push_back(std::make_pair(oldName, newName));
 		build();
 	    }
 	}
@@ -1012,9 +1067,9 @@ void AtomicModelBox::DynamicTreeView::onEdition(
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
     if (refSelection and newName != mOldName) {
 	Gtk::TreeModel::iterator it = refSelection->get_selected();
-	if (not newName.empty() and not mModeling->dynamics().exist(newName)) {
+	if (not newName.empty() and not mDynamics->exist(newName)) {
 	    vpz::Dynamic* newDynamic = new vpz::Dynamic(newName);
-	    vpz::Dynamic oldDynamic = mModeling->dynamics().get(mOldName);
+	    vpz::Dynamic oldDynamic = mDynamics->get(mOldName);
 	    newDynamic->setLibrary(oldDynamic.library());
 	    newDynamic->setModel(oldDynamic.model());
 	    newDynamic->setLanguage(oldDynamic.language());
@@ -1033,12 +1088,13 @@ void AtomicModelBox::DynamicTreeView::onEdition(
 		newDynamic->setDistantDynamics(location, port);
 
 	    }
-	    mModeling->dynamics().add(*newDynamic);
-	    mModeling->dynamics().del(mOldName);
+	    mDynamics->add(*newDynamic);
+	    mDynamics->del(mOldName);
+	    mModel->setDynamics(newName);
+	    mRenameList.push_back(std::make_pair(mOldName, newName));
+	    build();
 	}
     }
-    build();
-
 }
 
 std::string AtomicModelBox::DynamicTreeView::getDynamic()
@@ -1110,36 +1166,45 @@ AtomicModelBox::ObservableTreeView::ObservableTreeView(
 
 AtomicModelBox::ObservableTreeView::~ObservableTreeView()
 {
+}
 
+void AtomicModelBox::ObservableTreeView::applyRenaming()
+{
+    renameList::const_iterator it = mRenameList.begin();
+
+    while (it != mRenameList.end()) {
+	vpz::AtomicModelList& atomlist(
+	    mModeling->vpz().project().model().atomicModels());
+	atomlist.updateObservable(it->first, it->second);
+	++it;
+    }
+    mRenameList.clear();
 }
 
 void AtomicModelBox::ObservableTreeView::build()
 {
-    assert(mModeling);
-    using namespace vpz;
-
     mRefTreeModelObs->clear();
 
-    Observables observables = mModeling->observables();
-    Observables::const_iterator it = observables.begin();
-
+    vpz::Observables::const_iterator it = mObservables->begin();
     Gtk::TreeModel::Row row = *(mRefTreeModelObs->append());
+
     row[mColumnsObs.m_col_name] = "";
-
-    while (it != observables.end()) {
+    while (it != mObservables->end()) {
         Gtk::TreeModel::Row row = *(mRefTreeModelObs->append());
-        row[mColumnsObs.m_col_name] = it->first;
 
+        row[mColumnsObs.m_col_name] = it->first;
         ++it;
     }
 
     const Gtk::TreeModel::Children& child = mRefTreeModelObs->children();
     Gtk::TreeModel::Children::const_iterator it_child = child.begin();
     while (it_child != child.end()) {
-        if (it_child->get_value(mColumnsObs.m_col_name) == mModel->observables()) {
+        if (it_child->get_value(mColumnsObs.m_col_name) ==
+	    mModel->observables()) {
 	    Gtk::TreeModel::Path path = mRefTreeModelObs->get_path(it_child);
 	    set_cursor(path);
-	    mLabel->set_label(_("Selected Observable: ") + mModel->observables());
+	    mLabel->set_label(_("Selected Observable: ") +
+			      mModel->observables());
 	}
         ++it_child;
     }
@@ -1148,17 +1213,15 @@ void AtomicModelBox::ObservableTreeView::build()
 bool AtomicModelBox::ObservableTreeView::on_button_press_event(
     GdkEventButton *event)
 {
-  //Call base class, to allow normal handling,
-  //such as allowing the row to be selected by the right-click:
-  bool return_value = TreeView::on_button_press_event(event);
+    //Call base class, to allow normal handling,
+    //such as allowing the row to be selected by the right-click:
+    bool return_value = TreeView::on_button_press_event(event);
 
-  //Then do our custom stuff:
-  if( (event->type == GDK_BUTTON_PRESS) && (event->button == 3) )
-  {
-      mMenuPopup.popup(event->button, event->time);
-  }
-
-  return return_value;
+    //Then do our custom stuff:
+    if ((event->type == GDK_BUTTON_PRESS) and (event->button == 3)) {
+	mMenuPopup.popup(event->button, event->time);
+    }
+    return return_value;
 }
 
 void AtomicModelBox::ObservableTreeView::onAdd()
@@ -1168,11 +1231,11 @@ void AtomicModelBox::ObservableTreeView::onAdd()
     std::string name = box.run();
     if (box.valid()) {
         name = boost::trim_copy(name);
-        if (mModeling->observables().exist(name)) {
+        if (mObservables->exist(name)) {
             Error(boost::str(fmt(
                         _("The observable '%1%' already exists")) % name));
         } else {
-            mModeling->observables().add(vpz::Observable(name));
+            mObservables->add(vpz::Observable(name));
 	    build();
 
             const Gtk::TreeModel::Children& child =
@@ -1198,9 +1261,7 @@ void AtomicModelBox::ObservableTreeView::onEdit()
     Glib::ustring obs = (*it)[mColumnsObs.m_col_name];
 
     if (not obs.empty()) {
-        mObsAndViewBox.show(mModeling->observables(),
-			    std::string(obs),
-			    mModeling->views());
+        mObsAndViewBox.show(*mObservables, obs, mModeling->views());
     }
 }
 
@@ -1211,17 +1272,7 @@ void AtomicModelBox::ObservableTreeView::onRemove()
     Glib::ustring obs = (*it)[mColumnsObs.m_col_name];
 
     if (not obs.empty()) {
-	{
-	    vpz::AtomicModelList& list =
-		mModeling->vpz().project().model().atomicModels();
-	    vpz::AtomicModelList::iterator it = list.begin();
-
-	    while (it != list.end()) {
-		it->second.setObservables("");
-		++it;
-	    }
-	}
-        mModeling->observables().del(obs);
+        mObservables->del(obs);
 	build();
     }
 }
@@ -1240,11 +1291,9 @@ void AtomicModelBox::ObservableTreeView::onRename()
 	if (box.valid() and not newName.empty()) {
 	    box.hide_all();
 	    newName = boost::trim_copy(newName);
-
-	    mModeling->observables().rename(oldName, newName);
-	    vpz::AtomicModelList& atomlist(
-		mModeling->vpz().project().model().atomicModels());
-	    atomlist.updateObservable(oldName, newName);
+	    mObservables->rename(oldName, newName);
+	    mModel->setObservables(newName);
+	    mRenameList.push_back(std::make_pair(oldName, newName));
 	    build();
 	}
     }
@@ -1282,17 +1331,11 @@ void AtomicModelBox::ObservableTreeView::onEdition(
     Gtk::TreeModel::iterator it = refSelection->get_selected();
 
     if (it) {
-	vpz::Observables& listobs = mModeling->observables();
-
-	if (not newName.empty() and (not listobs.exist(newName))) {
-	    listobs.rename(mOldName, newName);
-
-	    vpz::AtomicModelList& atomlist(
-		mModeling->vpz().project().model().atomicModels());
-	    atomlist.updateObservable(mOldName, newName);
+	if (not newName.empty() and (not mObservables->exist(newName))) {
+	    mObservables->rename(mOldName, newName);
+	    mRenameList.push_back(std::make_pair(mOldName, newName));
 	}
     }
-
     build();
 }
 
@@ -1311,19 +1354,11 @@ AtomicModelBox::AtomicModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
 			       Modeling* m):
     mXml(xml),
     mModeling(m),
-    mAtom(0),
-    mDyn(0),
-    mObs(0),
-    mViews(0),
+    mModel(0),
+    mGraphModel(0),
     mCond(0),
-    mAtom_backup(0),
-    mDyn_backup(0),
-    mObs_backup(0),
-    mViews_backup(0),
-    mCond_backup(0),
-    mOutputs_backup(0),
-    mConnection_in_backup(0),
-    mConnection_out_backup(0)
+    mDyn(0),
+    mObs(0)
 {
     xml->get_widget("DialogAtomicModel", mDialog);
 
@@ -1358,234 +1393,272 @@ AtomicModelBox::AtomicModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
 AtomicModelBox::~AtomicModelBox()
 {
     mDialog->hide_all();
-    delete mAtom_backup;
-    delete mDyn_backup;
-    delete mObs_backup;
-    delete mViews_backup;
-    delete mCond_backup;
 }
 
-void AtomicModelBox::show(vpz::AtomicModel& atom,  graph::AtomicModel& model)
+void AtomicModelBox::show(graph::AtomicModel* model,
+			  const std::string& className)
 {
-    mDialog->set_title("Atomic Model " + model.getName());
+    const Modeling& modeling = (*(const Modeling*)mModeling);
+    mDialog->set_title("Atomic Model " + model->getName());
 
-    //Data
-    mAtom = &atom;
-    mGraph_atom = &model;
-    mDyn = &mModeling->dynamics();
-    mObs = &mModeling->observables();
-    mViews = &mModeling->views();
-    mCond = &mModeling->conditions();
-    mOutputs = &mModeling->outputs();
+    mCurrentModel = &mModeling->get_model(model, className);
+    mCurrentGraphModel = model;
 
-    //Backup
-    delete mAtom_backup;
-    mAtom_backup = new vpz::AtomicModel(atom);
+    mModel = new vpz::AtomicModel(*mCurrentModel);
+    mGraphModel = new graph::AtomicModel(*model);
+    mCond = new vpz::Conditions(modeling.conditions());
+    mDyn = new vpz::Dynamics(modeling.dynamics());
+    mObs = new vpz::Observables(modeling.observables());
 
-    delete mObs_backup;
-    mObs_backup = new vpz::Observables(*mObs);
-
-    delete mDyn_backup;
-    mDyn_backup = new vpz::Dynamics(*mDyn);
-
-    delete mCond_backup;
-    mCond_backup = new vpz::Conditions(*mCond);
-
-    delete mViews_backup;
-    mViews_backup = new vpz::Views(*mViews);
-
-    delete mOutputs_backup;
-    mOutputs_backup = new vpz::Outputs(*mOutputs);
-
-    delete mConnection_in_backup;
-    mConnection_in_backup = new graph::ConnectionList(model.getInputPortList());
-
-    delete mConnection_out_backup;
-    mConnection_out_backup = new graph::ConnectionList(model.getOutputPortList());
-
-    mInputPorts->setModel(&model);
+    mInputPorts->setModel(mGraphModel);
+    mInputPorts->clearRenaming();
     mInputPorts->build();
 
-    mOutputPorts->setModel(&model);
+    mOutputPorts->setModel(mGraphModel);
+    mOutputPorts->clearRenaming();
     mOutputPorts->build();
 
-    mConditions->setModel(&atom);
-    mConditions->setConditions(&mModeling->conditions());
+    mConditions->setModel(mModel);
     mConditions->setModeling(mModeling);
     mConditions->setLabel(mLabelConditions);
+    mConditions->setConditions(mCond);
+    mConditions->clearRenaming();
     mConditions->build();
 
-    mDynamics->setModel(&atom);
+    mDynamics->setModel(mModel);
     mDynamics->setModeling(mModeling);
     mDynamics->setLabel(mLabelDynamics);
+    mDynamics->setDynamics(mDyn);
     mDynamics->setParent(this);
+    mDynamics->clearRenaming();
     mDynamics->build();
 
-    mObservables->setModel(&atom);
+    mObservables->setModel(mModel);
     mObservables->setModeling(mModeling);
     mObservables->setLabel(mLabelObservables);
+    mObservables->setObservables(mObs);
+    mObservables->clearRenaming();
     mObservables->build();
 
     mDialog->show_all();
     mDialog->run();
 }
 
+void AtomicModelBox::applyPorts()
+{
+    mInputPorts->applyRenaming(mCurrentGraphModel);
+    mOutputPorts->applyRenaming(mCurrentGraphModel);
+
+    // Apply input ports
+    {
+	graph::ConnectionList connec_in_list =
+	    mCurrentGraphModel->getInputPortList();
+	graph::ConnectionList::iterator it = connec_in_list.begin();
+
+	while (it != connec_in_list.end()) {
+	    if (not mGraphModel->existInputPort(it->first)) {
+		mCurrentGraphModel->delInputPort(it->first);
+	    }
+	    ++it;
+	}
+    }
+    {
+     	graph::ConnectionList connec_in_list =
+     	    mGraphModel->getInputPortList();
+     	graph::ConnectionList::iterator it = connec_in_list.begin();
+
+     	while (it != connec_in_list.end()) {
+	    if (not mCurrentGraphModel->existInputPort(it->first)) {
+		mCurrentGraphModel->addInputPort(it->first);
+	    }
+     	    ++it;
+     	}
+     }
+
+    // Apply output ports
+    {
+	graph::ConnectionList connec_out_list =
+	    mCurrentGraphModel->getOutputPortList();
+	graph::ConnectionList::iterator it = connec_out_list.begin();
+
+	while (it != connec_out_list.end()) {
+	    if (not mGraphModel->existOutputPort(it->first)) {
+		mCurrentGraphModel->delOutputPort(it->first);
+	    }
+	    ++it;
+	}
+    }
+    {
+     	graph::ConnectionList& connec_out_list =
+     	    mGraphModel->getOutputPortList();
+     	graph::ConnectionList::iterator it = connec_out_list.begin();
+
+     	while (it != connec_out_list.end()) {
+	    if (not mCurrentGraphModel->existOutputPort(it->first)) {
+		mCurrentGraphModel->addOutputPort(it->first);
+	    }
+     	    ++it;
+     	}
+    }
+
+    // Apply height
+    {
+	mCurrentGraphModel->setHeight(mGraphModel->height());
+    }
+}
+
+void AtomicModelBox::applyConditions()
+{
+    mModeling->conditions().clear();
+
+    const vpz::ConditionList& list = mCond->conditionlist();
+    vpz::ConditionList::const_iterator it = list.begin();
+
+    while (it != list.end()) {
+	mModeling->conditions().add(it->second);
+	++it;
+    }
+
+    mConditions->applyRenaming();
+
+    {
+	vpz::Conditions& conditions = mModeling->conditions();
+	vpz::AtomicModelList& list =
+	    mModeling->vpz().project().model().atomicModels();
+	vpz::AtomicModelList::iterator it = list.begin();
+
+	while (it != list.end()) {
+	    vpz::Strings mdlConditions = it->second.conditions();
+	    vpz::Strings::const_iterator its = mdlConditions.begin();
+
+	    while (its != mdlConditions.end()) {
+		if (not conditions.exist(*its)) {
+		    it->second.delCondition(*its);
+		}
+		++its;
+	    }
+	    ++it;
+	}
+    }
+
+    {
+	Glib::RefPtr<Gtk::TreeView::Selection> refSelection =
+	    mConditions->get_selection();
+	if (refSelection->get_selected()) {
+	    mCurrentModel->setConditions(mConditions->getConditions());
+	}
+    }
+    delete mCond;
+    mCond = 0;
+}
+
+void AtomicModelBox::applyDynamics()
+{
+    mModeling->dynamics().clear();
+
+    const vpz::DynamicList& list = mDyn->dynamiclist();
+    vpz::DynamicList::const_iterator it = list.begin();
+
+    while (it != list.end()) {
+	mModeling->dynamics().add(it->second);
+	++it;
+    }
+
+    mDynamics->applyRenaming();
+
+    {
+	vpz::AtomicModelList& list =
+	    mModeling->vpz().project().model().atomicModels();
+	vpz::AtomicModelList::iterator it = list.begin();
+
+	while (it != list.end()) {
+	    if (not mModeling->dynamics().exist(it->second.dynamics())) {
+		it->second.setDynamics("");
+	    }
+	    ++it;
+	}
+    }
+
+    {
+	Glib::RefPtr<Gtk::TreeView::Selection> refSelection =
+	    mDynamics->get_selection();
+	if (refSelection->get_selected()) {
+	    mCurrentModel->setDynamics(mDynamics->getDynamic());
+	}
+    }
+    delete mDyn;
+    mDyn = 0;
+}
+
+void AtomicModelBox::applyObservables()
+{
+    mModeling->observables().clear();
+
+    const vpz::ObservableList& list = mObs->observablelist();
+    vpz::ObservableList::const_iterator it = list.begin();
+
+    while (it != list.end()) {
+	mModeling->observables().add(it->second);
+	++it;
+    }
+
+    mObservables->applyRenaming();
+
+    {
+	vpz::AtomicModelList& list =
+	    mModeling->vpz().project().model().atomicModels();
+	vpz::AtomicModelList::iterator it = list.begin();
+
+	while (it != list.end()) {
+	    if (not mModeling->observables().exist(it->second.observables())) {
+		it->second.setObservables("");
+	    }
+	    ++it;
+	}
+    }
+
+    {
+	Glib::RefPtr<Gtk::TreeView::Selection> refSelection =
+	    mObservables->get_selection();
+
+	if (refSelection->get_selected()) {
+	    mCurrentModel->setObservables(mObservables->getObservable());
+	}
+    }
+    delete mObs;
+    mObs = 0;
+}
+
 void AtomicModelBox::on_apply()
 {
-    Glib::RefPtr<Gtk::TreeView::Selection> refSelection =
-	mObservables->get_selection();
+    applyPorts();
+    applyConditions();
+    applyDynamics();
+    applyObservables();
 
-    if (refSelection->get_selected()) {
-	mAtom->setObservables(mObservables->getObservable());
-    }
-
-    refSelection = mDynamics->get_selection();
-    if (refSelection->get_selected()) {
-	mAtom->setDynamics(mDynamics->getDynamic());
-    }
-
-    refSelection = mConditions->get_selection();
-    if (refSelection->get_selected()) {
-	mAtom->setConditions(mConditions->getConditions());
-    }
+    delete mModel;
+    mModel = 0;
+    delete mGraphModel;
+    mGraphModel = 0;
 
     mDialog->hide_all();
 }
 
 void AtomicModelBox::on_cancel()
 {
-    using namespace vpz;
+    delete mModel;
+    mModel = 0;
+    delete mGraphModel;
+    mGraphModel = 0;
 
-    mAtom->setConditions(mAtom_backup->conditions());
-    mAtom->setDynamics(mAtom_backup->dynamics());
-    mAtom->setObservables(mAtom_backup->observables());
-
-    //Dynamics
-    mDyn->clear();
-    const DynamicList& list_dyn = mDyn_backup->dynamiclist();
-    DynamicList::const_iterator it_dyn = list_dyn.begin();
-    while (it_dyn != list_dyn.end()) {
-        mDyn->add(it_dyn->second);
-        ++it_dyn;
-    }
-
-    //Conditions
-    mCond->clear();
-    const ConditionList& list_cond = mCond_backup->conditionlist();
-    ConditionList::const_iterator it_cond = list_cond.begin();
-    while (it_cond != list_cond.end()) {
-        mCond->add(it_cond->second);
-        ++it_cond;
-    }
-
-    //Views
-    mViews->clear();
-    const ViewList& list_view = mViews_backup->viewlist();
-    ViewList::const_iterator it_view = list_view.begin();
-    while (it_view != list_view.end()) {
-        mViews->add(it_view->second);
-        ++it_view;
-    }
-
-    //Outputs
-    mOutputs->clear();
-    const OutputList& list_output = mOutputs_backup->outputlist();
-    OutputList::const_iterator it_out = list_output.begin();
-    while (it_out  != list_output.end()) {
-        mOutputs->add(it_out->second);
-
-        ++it_out;
-    }
-
-    //Observable
-    mObs->clear();
-    const ObservableList& list_obs = mObs_backup->observablelist();
-    ObservableList::const_iterator it_obs = list_obs.begin();
-    while (it_obs != list_obs.end()) {
-        mObs->add(it_obs->second);
-        ++it_obs;
-    }
-
-    //Ports
-    graph::CoupledModel* parent = mGraph_atom->getParent();
-
-    graph::ConnectionList& connec_in_list = mGraph_atom->getInputPortList();
-    {
-        graph::ConnectionList::iterator it = connec_in_list.begin();
-        while (it != connec_in_list.end()) {
-            mGraph_atom->delInputPort(it->first);
-            it = connec_in_list.begin();
-        }
-    }
-
-    for (graph::ConnectionList::iterator it_in_connec
-         =mConnection_in_backup->begin(); it_in_connec !=
-         mConnection_in_backup->end(); ++it_in_connec) {
-        mGraph_atom->addInputPort(it_in_connec->first);
-    }
-
-    graph::ConnectionList& connec_out_list = mGraph_atom->getOutputPortList();
-    {
-        graph::ConnectionList::iterator it = connec_out_list.begin();
-        while (it != connec_out_list.end()) {
-            mGraph_atom->delOutputPort(it->first);
-            it = connec_out_list.begin();
-        }
-    }
-    for (graph::ConnectionList::iterator it_out_connec =
-         mConnection_out_backup->begin(); it_out_connec !=
-         mConnection_out_backup->end(); ++it_out_connec) {
-        mGraph_atom->addOutputPort(it_out_connec->first);
-    }
-
-    //Input Ports
-    for (graph::ConnectionList::iterator it_in_connec = mConnection_in_backup->begin();
-            it_in_connec != mConnection_in_backup->end();
-            ++it_in_connec) {
-        graph::ModelPortList& in_port_list = it_in_connec->second;
-        graph::ModelPortList::iterator it_port_list = in_port_list.begin();
-        while (it_port_list != in_port_list.end()) {
-            if (it_port_list->first == parent) {
-                parent->addInputConnection(it_port_list->second, mGraph_atom,
-					   it_in_connec->first);
-            } else {
-		parent->addInternalConnection(it_port_list->first,
-					      it_port_list->second,
-					      mGraph_atom,
-					      it_in_connec->first);
-            }
-
-            ++it_port_list;
-        }
-    }
-
-    //Output Ports
-    for (graph::ConnectionList::iterator it_out_connec = mConnection_out_backup->begin();
-            it_out_connec != mConnection_out_backup->end();
-            ++it_out_connec) {
-        graph::ModelPortList& out_port_list = it_out_connec->second;
-        graph::ModelPortList::iterator it_port_list = out_port_list.begin();
-        while (it_port_list != out_port_list.end()) {
-            if (it_port_list->first == parent) {
-                parent->addOutputConnection(mGraph_atom, it_out_connec->first,
-					    it_port_list->second);
-            } else {
-		if(not parent->existInternalConnection(mGraph_atom->getName(),
-						       it_out_connec->first,
-						       it_port_list->first->getName(),
-						       it_port_list->second)) {
-		    parent->addInternalConnection(mGraph_atom, it_out_connec->first,
-						  it_port_list->first,
-						  it_port_list->second);
-		}
-            }
-
-            ++it_port_list;
-        }
-    }
+    delete mCond;
+    mCond = 0;
+    delete mDyn;
+    mDyn = 0;
+    delete mObs;
+    mObs = 0;
 
     mDialog->hide_all();
-    mGraph_atom = 0;
 }
 
 } } // namespace vle gvle
