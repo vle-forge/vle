@@ -44,8 +44,8 @@ const Glib::ustring GVLEMenuAndToolbar::UI_DEFINITION =
     "    <menubar name='MenuBar'>"
     "        <menu action='MenuFile'>"
     "            <menuitem action='NewFile'/>"
-    "            <menuitem action='NewVpz'/>"
     "            <menuitem action='NewProject'/>"
+    "            <menuitem action='NewVpz'/>"
     "            <separator/>"
     "            <menuitem action='OpenFile'/>"
     "            <menuitem action='OpenProject'/>"
@@ -302,16 +302,18 @@ void GVLEMenuAndToolbar::createFileActions()
     m_refActionGroup->add(
 	Gtk::Action::create("NewFile", Gtk::Stock::NEW,
 			    _("New File"), _("Create a new editable file")),
-	Gtk::AccelKey("<control><alt>n"),
+	Gtk::AccelKey(""),
 	sigc::mem_fun(mParent, &GVLE::newFile));
-    m_refActionGroup->add(
-	Gtk::Action::create("NewVpz", Gtk::Stock::NEW,
-			    _("New _Vpz"), _("Create a new Vpz")),
-	sigc::mem_fun(mParent, &GVLE::onMenuNew));
     m_refActionGroup->add(
 	Gtk::Action::create("NewProject", Gtk::Stock::DIRECTORY,
 			    _("New Project"), _("Create a new project")),
+	Gtk::AccelKey("<control>n"),
 	sigc::mem_fun(mParent, &GVLE::onMenuNewProject));
+    m_refActionGroup->add(
+	Gtk::Action::create("NewVpz", Gtk::Stock::NEW,
+			    _("New _Vpz"), _("Create a new Vpz")),
+	Gtk::AccelKey("<control><shift>n"),
+	sigc::mem_fun(mParent, &GVLE::onMenuNew));
     m_refActionGroup->add(
 	Gtk::Action::create("OpenFile", Gtk::Stock::OPEN,
 			    _("Open File"), _("Open an editable file "
@@ -500,25 +502,25 @@ void GVLEMenuAndToolbar::createSimulationActions()
     m_refActionGroup->add(
 	Gtk::Action::create("Project", _("Project"),
 			    _("Configure _experiment")),
-	Gtk::AccelKey("<control><alt>e"),
+	Gtk::AccelKey("<control><shift>e"),
 	sigc::mem_fun(mParent, &GVLE::onExperimentsBox));
     m_refActionGroup->add(
 	Gtk::Action::create("Views", _("Views"), _("Manage the _views")),
-	Gtk::AccelKey("<control><alt>v"),
+	Gtk::AccelKey("<control><shift>v"),
 	sigc::mem_fun(mParent, &GVLE::onViewOutputBox));
     m_refActionGroup->add(
 	Gtk::Action::create("Conditions", _("Conditions"),
 			    _("Manage the conditions")),
-	Gtk::AccelKey("<control><alt>c"),
+	Gtk::AccelKey("<control><shift>c"),
 	sigc::mem_fun(mParent, &GVLE::onConditionsBox));
     m_refActionGroup->add(
 	Gtk::Action::create("Hosts", _("Hosts"), _("Manage hosts")),
-	Gtk::AccelKey("<control><alt>h"),
+	Gtk::AccelKey("<control><shift>h"),
 	sigc::mem_fun(mParent, &GVLE::onHostsBox));
     m_refActionGroup->add(
 	Gtk::Action::create("LaunchSimulation", _("Launch Simulation"),
 			    _("Launch the simulation")),
-	Gtk::AccelKey("<control><alt>l"),
+	Gtk::AccelKey("<control><shift>l"),
 	sigc::mem_fun(mParent, &GVLE::onSimulationBox));
 }
 
