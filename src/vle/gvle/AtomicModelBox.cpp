@@ -1197,7 +1197,7 @@ void AtomicModelBox::ObservableTreeView::onEdit()
     Gtk::TreeModel::iterator it = refSelection->get_selected();
     Glib::ustring obs = (*it)[mColumnsObs.m_col_name];
 
-    if (obs != "") {
+    if (not obs.empty()) {
         mObsAndViewBox.show(mModeling->observables(),
 			    std::string(obs),
 			    mModeling->views());
@@ -1210,7 +1210,17 @@ void AtomicModelBox::ObservableTreeView::onRemove()
     Gtk::TreeModel::iterator it = refSelection->get_selected();
     Glib::ustring obs = (*it)[mColumnsObs.m_col_name];
 
-    if (obs != "") {
+    if (not obs.empty()) {
+	{
+	    vpz::AtomicModelList& list =
+		mModeling->vpz().project().model().atomicModels();
+	    vpz::AtomicModelList::iterator it = list.begin();
+
+	    while (it != list.end()) {
+		it->second.setObservables("");
+		++it;
+	    }
+	}
         mModeling->observables().del(obs);
 	build();
     }
@@ -1297,7 +1307,8 @@ std::string AtomicModelBox::ObservableTreeView::getObservable()
 
 // AtomicModelBox
 
-AtomicModelBox::AtomicModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m):
+AtomicModelBox::AtomicModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
+			       Modeling* m):
     mXml(xml),
     mModeling(m),
     mAtom(0),

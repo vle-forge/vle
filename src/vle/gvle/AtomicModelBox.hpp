@@ -40,9 +40,7 @@
 #include <vle/gvle/ObsAndViewBox.hpp>
 #include <vle/gvle/TreeViewConditions.hpp>
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
 class Modeling;
 

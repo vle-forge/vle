@@ -638,19 +638,42 @@ void ConditionsBox::show()
 
 void ConditionsBox::on_apply()
 {
-    vpz::Conditions* conditions = &mModeling->conditions();
+    {
+	vpz::Conditions& conditions = mModeling->conditions();
 
-    conditions->clear();
-    const vpz::ConditionList& list = mConditions->conditionlist();
-    vpz::ConditionList::const_iterator it = list.begin();
+	conditions.clear();
+	const vpz::ConditionList& list = mConditions->conditionlist();
+	vpz::ConditionList::const_iterator it = list.begin();
 
-    while (it != list.end()) {
-	conditions->add(it->second);
-	++it;
+	while (it != list.end()) {
+	    conditions.add(it->second);
+	    ++it;
+	}
+
+	delete mConditions;
+	mConditions = 0;
     }
 
-    delete mConditions;
-    mConditions = 0;
+    {
+	vpz::Conditions& conditions = mModeling->conditions();
+	vpz::AtomicModelList& list =
+	    mModeling->vpz().project().model().atomicModels();
+	vpz::AtomicModelList::iterator it = list.begin();
+
+	while (it != list.end()) {
+	    vpz::Strings mdlConditions = it->second.conditions();
+	    vpz::Strings::const_iterator its = mdlConditions.begin();
+
+	    while (its != mdlConditions.end()) {
+		if (not conditions.exist(*its)) {
+		    it->second.delCondition(*its);
+		}
+		++its;
+	    }
+	    ++it;
+	}
+    }
+
     if (mDialog) {
         mDialog->hide();
     }
