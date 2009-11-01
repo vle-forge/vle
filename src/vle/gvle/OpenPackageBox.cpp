@@ -33,11 +33,10 @@
 #include <vle/gvle/Modeling.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Package.hpp>
+#include <vle/utils/Path.hpp>
 #include <boost/filesystem.hpp>
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
 OpenPackageBox::OpenPackageBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
 			       Modeling* m) :
@@ -73,25 +72,22 @@ OpenPackageBox::~OpenPackageBox()
     delete mDialog;
 }
 
-void OpenPackageBox::show()
+int OpenPackageBox::run()
 {
     build();
     mDialog->set_title("Open Project");
     mDialog->show_all();
-    mDialog->run();
+    return mDialog->run();
 }
-
 
 void OpenPackageBox::build()
 {
-    using namespace utils;
-
     mRefTreePackage->clear();
 
-    PathList list = Path::path().getInstalledPackages();
+    utils::PathList list = utils::Path::path().getInstalledPackages();
 
     list.sort();
-    for (PathList::const_iterator it = list.begin();
+    for (utils::PathList::const_iterator it = list.begin();
 	 it != list.end(); ++it) {
 	Gtk::TreeModel::Row row = *(mRefTreePackage->append());
 	row[mColumns.mName] = boost::filesystem::basename(*it);
@@ -102,14 +98,16 @@ void OpenPackageBox::onApply()
 {
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection
 	= mTreeView->get_selection();
+
     if (refSelection) {
 	Gtk::TreeModel::iterator iter = refSelection->get_selected();
 
 	if (iter) {
 	    Gtk::TreeModel::Row row = *iter;
 	    std::string name = row.get_value(mColumns.mName);
+
 	    utils::Package::package().select(name);
-	    mModeling->getGVLE()->buildPackageHierarchy();
+            mDialog->response(GTK_RESPONSE_OK);
 	}
     }
     mDialog->hide_all();
@@ -117,24 +115,14 @@ void OpenPackageBox::onApply()
 
 void OpenPackageBox::onCancel()
 {
+    mDialog->response(GTK_RESPONSE_CANCEL);
     mDialog->hide_all();
 }
 
-void OpenPackageBox::onRowActivated(const Gtk::TreeModel::Path& path,
-                                     Gtk::TreeViewColumn* column)
+void OpenPackageBox::onRowActivated(const Gtk::TreeModel::Path& /* path */,
+                                    Gtk::TreeViewColumn* /* column */)
 {
-    if (column) {
-        Gtk::TreeIter iter = mRefTreePackage->get_iter(path);
-
-        if (iter) {
-	    Gtk::TreeRow row = *iter;
-	    std::string name = row.get_value(mColumns.mName);
-	    utils::Package::package().select(name);
-	    mModeling->getGVLE()->buildPackageHierarchy();
-        }
-    }
-    mDialog->hide_all();
+    onApply();
 }
 
-}
-} // namespace vle gvle
+}} // namespace vle gvle

@@ -33,12 +33,10 @@
 #include <vle/gvle/Modeling.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Package.hpp>
+#include <vle/utils/Path.hpp>
 #include <boost/filesystem.hpp>
 
-namespace vle
-{
-
-namespace gvle {
+namespace vle { namespace gvle {
 
 OpenVpzBox::OpenVpzBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m) :
     mXml(xml),
@@ -50,6 +48,8 @@ OpenVpzBox::OpenVpzBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m) :
     mRefTreeVpz = Gtk::TreeStore::create(mColumns);
     mTreeView->append_column(_("Name"), mColumns.mName);
     mTreeView->set_model(mRefTreeVpz);
+    mTreeView->signal_row_activated().connect(
+        sigc::mem_fun(*this, &OpenVpzBox::onRowActivated));
 
     xml->get_widget("ButtonVpzApply", mButtonApply);
     mButtonApply->signal_clicked().connect(
@@ -61,24 +61,23 @@ OpenVpzBox::OpenVpzBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m) :
 
 }
 
-void OpenVpzBox::show()
+int OpenVpzBox::run()
 {
     build();
     mDialog->set_title("Open VPZ");
     mDialog->show_all();
-    mDialog->run();
+    return mDialog->run();
 }
 
 void OpenVpzBox::build()
 {
-    using namespace utils;
-
     mRefTreeVpz->clear();
 
-    PathList list = Path::path().getInstalledExperiments();
-    PathList::const_iterator it = list.begin();
+    utils::PathList list = utils::Path::path().getInstalledExperiments();
+    utils::PathList::const_iterator it = list.begin();
     while (it != list.end()) {
 	Gtk::TreeModel::Row row = *(mRefTreeVpz->append());
+
 	row[mColumns.mName] = boost::filesystem::basename(*it);
 	++it;
     }
@@ -99,18 +98,19 @@ void OpenVpzBox::onApply()
 {
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection
 	= mTreeView->get_selection();
+
     if (refSelection) {
 	Gtk::TreeModel::iterator iter = refSelection->get_selected();
 
 	if (iter) {
 	    Gtk::TreeModel::Row row = *iter;
 	    std::string name = row.get_value(mColumns.mName);
-	    namespace fs = boost::filesystem;
-
 	    std::string pathFile = Glib::build_filename(
 		utils::Path::path().getPackageExpDir(), name);
+
 	    pathFile += ".vpz";
 	    mModeling->parseXML(pathFile);
+            mDialog->response(GTK_RESPONSE_OK);
 	}
     }
     mDialog->hide_all();
@@ -118,9 +118,15 @@ void OpenVpzBox::onApply()
 
 void OpenVpzBox::onCancel()
 {
+    mDialog->response(GTK_RESPONSE_CANCEL);
     mDialog->hide_all();
 }
 
+void OpenVpzBox::onRowActivated(const Gtk::TreeModel::Path& /* path */,
+                                Gtk::TreeViewColumn* /* column */)
+{
+    onApply();
 }
-}
+
+}} //namespace vle gvle
 

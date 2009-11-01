@@ -32,29 +32,26 @@
 #ifndef GUI_HELPBOX_HPP
 #define GUI_HELPBOX_HPP
 
-#include <gtkmm/window.h>
+#include <gtkmm/dialog.h>
 #include <gtkmm/textview.h>
 #include <gtkmm/scrolledwindow.h>
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
 /**
  * @brief A Gtk::Window to show the help of GVLE.
  */
-class HelpBox : public Gtk::Window
+class HelpBox : public Gtk::Dialog
 {
 public:
     HelpBox();
-    ~HelpBox();
+    virtual ~HelpBox();
 
 private:
     Gtk::TextView       * mTextView;
     Gtk::ScrolledWindow * mScrolledWindow;
 };
 
-}
-} // namespace vle gvle
+} } // namespace vle gvle
 
 #endif

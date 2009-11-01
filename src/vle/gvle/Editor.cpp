@@ -106,6 +106,7 @@ void DocumentText::save()
 	setModified(false);
 	mTitle = filename() + boost::filesystem::extension(filepath());
 	mGVLE->getEditor()->setModifiedTab(mTitle, filepath(), filepath());
+        mGVLE->getMenu()->hideSave();
     } catch(std::exception& e) {
 	throw _("Error while saving file.");
     }
@@ -124,6 +125,7 @@ void DocumentText::saveAs(const std::string& newFilePath)
 	setModified(false);
 	mTitle = filename() + boost::filesystem::extension(filepath());
 	mGVLE->getEditor()->setModifiedTab(mTitle, newFilePath, oldFilePath);
+        mGVLE->getMenu()->hideSave();
     } catch(std::exception& e) {
 	throw _("Error while saving file.");
     }
@@ -269,6 +271,7 @@ void DocumentText::onChanged()
 {
     if (not isModified()) {
 	setModified(true);
+        mGVLE->getMenu()->showSave();
 	mTitle = "* "+ mTitle;
 	mGVLE->getEditor()->setModifiedTab(mTitle, filepath(), filepath());
     }
@@ -336,7 +339,7 @@ void DocumentDrawingArea::redo()
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 Editor::Editor(BaseObjectType* cobject,
-		     const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/) :
+               const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/) :
     Gtk::Notebook(cobject)
 {
     signal_switch_page().connect(sigc::mem_fun(this, &Editor::changeTab));
@@ -345,6 +348,11 @@ Editor::Editor(BaseObjectType* cobject,
 Editor::~Editor()
 {
     closeAllTab();
+}
+
+void Editor::onCloseTab(const std::string& filepath)
+{
+    mApp->closeTab(filepath);
 }
 
 Gtk::HBox* Editor::addLabel(const std::string& title,
@@ -364,7 +372,7 @@ Gtk::HBox* Editor::addLabel(const std::string& title,
     closeButton->set_relief(Gtk::RELIEF_NONE);
     closeButton->set_tooltip_text(_("Close Tab"));
     closeButton->signal_clicked().connect(
-	sigc::bind(sigc::mem_fun(*this, &Editor::closeTab), filepath));
+        sigc::bind(sigc::mem_fun(this, &Editor::onCloseTab), filepath));
 
     tabLabel->pack_start(*closeButton, false, false, 0);
     tabLabel->show_all();
@@ -378,13 +386,17 @@ void Editor::changeTab(GtkNotebookPage* /*page*/, int num)
 
     while (it != mDocuments.end()) {
 	if (it->second == tab) {
+            mApp->setCurrentTab(num);
 	    if (boost::filesystem::extension(it->first) == ".vpz") {
-		mApp->setCurrentTab(num);
-		mApp->getMenu()->onViewMode();
+		mApp->getMenu()->onOpenVpz();
 	    } else {
-		mApp->setCurrentTab(num);
-		mApp->getMenu()->onFileMode();
+		mApp->getMenu()->onOpenFile();
 	    }
+            if (it->second->isModified()) {
+                mApp->getMenu()->showSave();
+            } else {
+                mApp->getMenu()->hideSave();
+            }
 	    mApp->setTitle(boost::filesystem::basename(it->first) +
 			   boost::filesystem::extension(it->first));
 	    break;
@@ -421,61 +433,20 @@ void Editor::closeAllTab()
 	mDocuments.erase(it->first);
 	++it;
     }
-    if (not vle::utils::Path::path().getPackageDir().empty()) {
-	mApp->getMenu()->onPackageMode();
-    } else {
-	mApp->getMenu()->onGlobalMode();
-    }
-    mApp->getMenu()->hideCloseTab();
 }
 
 void Editor::closeTab(const std::string& filepath)
 {
-    if (boost::filesystem::extension(filepath) == ".vpz") {
-	closeVpzTab();
-    } else {
-	Documents::iterator it = mDocuments.find(filepath);
+    Documents::iterator it = mDocuments.find(filepath);
 
-	if (it != mDocuments.end()) {
-	    if (not it->second->isModified() or
-		gvle::Question(_("The current tab is not saved\n"
-				 "Do you really want to close this file ?"))) {
-		int page = page_num(*it->second);
+    if (it != mDocuments.end()) {
+        int page = page_num(*it->second);
 
-		if (page != -1) {
-		    remove_page(page);
-		    delete it->second;
-		    mDocuments.erase(it->first);
-		}
-	    }
-	}
-    }
-    if (getDocuments().empty()) {
-	mApp->tabClosed();
-	mApp->getMenu()->hideCloseTab();
-    }
-}
-
-void Editor::closeVpzTab()
-{
-    int page;
-    Documents::iterator it = mDocuments.begin();
-
-    while (it != mDocuments.end()) {
-        if (boost::filesystem::extension(it->first) == ".vpz") {
-            if (not it->second->isModified() or
-                gvle::Question(_("The current tab is not saved\n"
-                                 "Do you really want to close this file ?"))) {
-                mApp->clearModelTreeBox();
-                mApp->clearModelClassBox();
-                page = page_num(
-                    *(dynamic_cast<DocumentDrawingArea*>(it->second)));
-                remove_page(page);
-		delete it->second;
-                mDocuments.erase(it->first);
-           }
+        if (page != -1) {
+            remove_page(page);
+            delete it->second;
+            mDocuments.erase(it->first);
         }
-	++it;
     }
 }
 
@@ -507,21 +478,16 @@ void Editor::createBlankNewFile()
     show_all_children();
 }
 
-void Editor::closeFile()
+void Editor::closeVpzTab()
 {
-    int page = get_current_page();
+    Documents::iterator it = mDocuments.begin();
 
-    if (page != -1) {
-	Gtk::Widget* tab = get_nth_page(page);
-	Documents::iterator it = mDocuments.begin();
-
-	while (it != mDocuments.end()) {
-	    if (it->second == tab) {
-		closeTab(it->first);
-		break;
-	    }
-	    ++it;
-	}
+    while (it != mDocuments.end()) {
+	if (boost::filesystem::extension(it->first) == ".vpz") {
+            closeTab(it->first);
+            break;
+        }
+	++it;
     }
 }
 
@@ -568,7 +534,7 @@ void Editor::onRedo()
 
 void Editor::openTab(const std::string& filepath)
 {
-    if(boost::filesystem::extension(filepath) != ".vpz") {
+    if (boost::filesystem::extension(filepath) != ".vpz") {
 	try {
 	    if (mDocuments.find(filepath) == mDocuments.end()) {
 		DocumentText* doc = new DocumentText(mApp, filepath);
@@ -587,7 +553,6 @@ void Editor::openTab(const std::string& filepath)
 	} catch (std::exception& e) {
 	    mApp->insertLog(e.what());
 	}
-	mApp->getMenu()->onFileMode();
     } else {
 	mApp->getModeling()->parseXML(filepath);
     }
@@ -637,7 +602,6 @@ void Editor::openTabVpz(const std::string& filepath,
     }
     show_all_children();
     set_current_page(page);
-    mApp->getMenu()->onViewMode();
 }
 
 void Editor::refreshViews()

@@ -39,8 +39,7 @@ namespace vle { namespace gvle {
 LaunchSimulationBox::LaunchSimulationBox(Glib::RefPtr < Gnome::Glade::Xml > xml,
                                          Modeling* modeling) :
     mModeling(modeling),
-    mDialog(0),
-    m_vpzfile(&modeling->vpz())
+    mDialog(0)
 {
     xml->get_widget("DialogSimulation", mDialog);
     xml->get_widget("RadioSimuMono", mMono);
@@ -95,9 +94,8 @@ void LaunchSimulationBox::on_play()
             mProgressBar->set_fraction(0.);
             updateCurrentTime();
 
-            std::string tmpFile = vle::utils::build_temp("tmpGvleSimu.vpz");
-            m_vpzfile->write(tmpFile);
-            file = new vle::vpz::Vpz(tmpFile);
+            const Modeling* modeling = (const Modeling*)mModeling;
+            file = new vpz::Vpz(modeling->vpz());
             m_max_time = file->project().experiment().duration();
 
             Glib::Thread::create(sigc::mem_fun(

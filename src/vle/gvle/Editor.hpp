@@ -179,28 +179,43 @@ public:
 		     const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
     virtual ~Editor();
 
-    void setParent(GVLE* gvle)
-    { mApp = gvle; }
-
-    /* methods to manage tabs */
-    void focusTab(const std::string& filepath);
-    void openTab(const std::string& filepath);
-    void openTabVpz(const std::string& filepath, graph::CoupledModel* model);
-    void closeTab(const std::string& filepath);
-    void closeVpzTab();
-    void closeAllTab();
-    void changeTab(GtkNotebookPage* page, int num);
-
     /**
      * @brief check if the tab is already openend
      */
+    void changeFile(const std::string& oldName, const std::string& newName);
+
+    void changeTab(GtkNotebookPage* page, int num);
+
+    void closeAllTab();
+    void closeTab(const std::string& filepath);
+    void closeVpzTab();
+
+    void createBlankNewFile();
+
     inline bool existTab(const std::string& name)
-	{ return mDocuments.find(name) != mDocuments.end(); }
+    { return mDocuments.find(name) != mDocuments.end(); }
 
     /**
      * @brief check if a vpz tab is already opened
      */
     bool existVpzTab();
+
+    void focusTab(const std::string& filepath);
+
+    const Documents& getDocuments() const
+    { return mDocuments; }
+
+    void onRedo();
+    void onUndo();
+
+    void openTab(const std::string& filepath);
+    void openTabVpz(const std::string& filepath, graph::CoupledModel* model);
+
+    /**
+     * @brief Apply settings to the source view
+     * @param view The SourceView instance to stylish
+     */
+    void refreshViews();
 
     /**
      * @brief Modify the title of the tab
@@ -212,24 +227,13 @@ public:
     void setModifiedTab(const std::string& title,
 			const std::string& newFilePath,
 			const std::string& oldFilePath);
-    void changeFile(const std::string& oldName, const std::string& newName);
 
-    void createBlankNewFile();
-    void closeFile();
-
-    /**
-     * @brief Apply settings to the source view
-     * @param view The SourceView instance to stylish
-     */
-    void refreshViews();
-
-    void onUndo();
-    void onRedo();
-
-    const Documents& getDocuments() const
-    { return mDocuments; }
+    void setParent(GVLE* gvle)
+    { mApp = gvle; }
 
 private:
+    void onCloseTab(const std::string& filepath);
+
     Documents   mDocuments;
     GVLE*       mApp;
 

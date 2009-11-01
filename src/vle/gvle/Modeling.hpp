@@ -335,6 +335,9 @@ public:
      *
      * @return ptr to application GVLE.
      */
+    inline const GVLE* getGVLE() const
+	{ return mGVLE; }
+
     inline GVLE* getGVLE()
 	{ setModified(true); return mGVLE; }
 

@@ -32,9 +32,7 @@
 #include <vle/gvle/HelpBox.hpp>
 #include <vle/utils/i18n.hpp>
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
 HelpBox::HelpBox()
 {
@@ -68,8 +66,6 @@ HelpBox::HelpBox()
     set_default_size(300, 400);
     show_all();
 }
-
-
 
 HelpBox::~HelpBox()
 {

@@ -33,7 +33,6 @@
 #define GUI_GVLE_HH
 
 #include <vle/gvle/ConditionsBox.hpp>
-#include <vle/gvle/HelpBox.hpp>
 #include <vle/gvle/LaunchSimulationBox.hpp>
 #include <vle/gvle/ModelTreeBox.hpp>
 #include <vle/gvle/ModelClassBox.hpp>
@@ -172,7 +171,8 @@ public:
      * return the ConditionBox
      * @return ConditionBox instance of ConditionBox
      */
-    inline ConditionsBox* getConditionsBox() {
+    inline ConditionsBox* getConditionsBox()
+    {
 	return mConditionsBox;
     }
 
@@ -181,14 +181,14 @@ public:
      * @return ModelTreeBox instance of ModelTreeBox
      */
     inline ModelTreeBox* getModelTreeBox()
-	{ return mModelTreeBox; }
+    { return mModelTreeBox; }
 
     /**
      * return the ModelTreeBox
      * @return ModelTreeBox instance of ModelTreeBox
      */
     inline ModelClassBox* getModelClassBox()
-	{ return mModelClassBox; }
+    { return mModelClassBox; }
 
     /**
      * return the Modeling instance
@@ -252,7 +252,7 @@ public:
         { mPackage = package; }
 
 	void setParent(GVLE* parent)
-	  { mParent = parent; }
+        { mParent = parent; }
 
         Glib::ustring getSelected()
         { return (*mRefTreeSelection->get_selected())[mColumns.m_col_name]; }
@@ -372,67 +372,55 @@ public:
      * When click on new file menu
      *
      */
-    void newFile();
+    void onNewFile();
 
     /**
      * When click on new menu.
      *
      */
-    void onMenuNew();
+    void onNewVpz();
 
     /**
      * When click on new project menu
      *
      */
-    void onMenuNewProject();
+    void onNewProject();
 
     /**
      * When click on open file menu
      *
      */
-    void openFile();
+    void onOpenFile();
 
     /**
-     * When click on open package menu
+     * When click on open project menu
      *
      */
-    void onMenuOpenPackage();
+    void onOpenProject();
 
     /**
-     * When clinck on open vpz menu
+     * When click on open vpz menu
      *
      */
-    void onMenuOpenVpz();
+    void onOpenVpz();
 
     /**
-     * When click on load menu.
+     * When click on open global vpz menu.
      *
      */
-    void onMenuLoad();
-
-    /**
-     * When click on save file menu.
-     *
-     */
-    void saveFile();
-
-    /**
-     * When click on save vpz file menu.
-     *
-     */
-    void saveVpz();
+    void onOpenGlobalVpz();
 
     /**
      * When click on save menu.
      *
      */
-    void onMenuSave();
+    void onSave();
 
     /**
      * When click on save as menu
      *
      */
-    void saveFileAs();
+    void onSaveAs();
 
     /**
      * When click on clear as menu
@@ -459,22 +447,23 @@ public:
     void importModel();
 
     /**
-     * When click on close file menu
+     * When click on close tab menu
      *
      */
-    void closeFile();
+    void onCloseTab();
+    void closeTab(const std::string& filepath = "");
 
     /**
      * When click on close project menu
      *
      */
-    void closeProject();
+    void onCloseProject();
 
     /**
      * Whien click on quit as menu
      *
      */
-    void onMenuQuit();
+    void onQuit();
 
 
     /********************************************************************
@@ -656,13 +645,6 @@ public:
      */
     void onShowAbout();
 
-
-    /**
-     * @brief change the mode when all tabs are closed to block some
-     * menus
-     */
-    void tabClosed();
-
     /**
      * @brief Assign a new title to Gtk::Window managed by the GVLE
      * class.
@@ -671,6 +653,10 @@ public:
     void setTitle(const Glib::ustring& name = "");
 
 private:
+    void fixSave();
+    void saveVpz();
+    void saveFirstVpz();
+
     Glib::RefPtr < Gnome::Glade::Xml >  mRefXML;
 
     /* Widgets */
@@ -702,7 +688,6 @@ private:
     PackageBrowserWindow*           mPackageBrowserWindow;
     NewProjectBox*                  mNewProjectBox;
     SaveVpzBox*                     mSaveVpzBox;
-    HelpBox*                        mHelpBox;
     ModelTreeBox*                   mModelTreeBox;
     ModelClassBox*                  mModelClassBox;
     QuitBox*                        mQuitBox;

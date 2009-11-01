@@ -73,7 +73,6 @@ namespace vle { namespace gvle {
         bool                              m_stop, m_pause, m_vle_error;
 
         vle::vpz::Vpz                     *file;
-        vle::vpz::Vpz                     *m_vpzfile;
 
         Glib::Mutex                       m_mutex;
         Glib::Cond                        m_cond_set_time;

@@ -32,18 +32,18 @@
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/NewProjectBox.hpp>
 #include <vle/gvle/Modeling.hpp>
+#include <vle/gvle/GVLEMenuAndToolbar.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Package.hpp>
 #include <boost/filesystem.hpp>
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
 NewProjectBox::NewProjectBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
-			     Modeling* m) :
+			     Modeling* m, GVLE* app) :
     mXml(xml),
-    mModeling(m)
+    mModeling(m),
+    mApp(app)
 {
     xml->get_widget("DialogNewProject", mDialog);
     xml->get_widget("EntryNameProject", mEntryName);
@@ -77,12 +77,12 @@ void NewProjectBox::onApply()
 {
     if (not mEntryName->get_text().empty()) {
 	if (not exist(mEntryName->get_text())) {
-            std::ostringstream sout, serr;
-	    utils::Package::package().select(mEntryName->get_text());
-	    vle::utils::Package::package().create();
-	    mModeling->getGVLE()->buildPackageHierarchy();
+	    mApp->getEditor()->closeAllTab();
 	    mModeling->clearModeling();
-	    mModeling->getGVLE()->getEditor()->closeAllTab();
+            utils::Package::package().select(mEntryName->get_text());
+	    vle::utils::Package::package().create();
+	    mApp->buildPackageHierarchy();
+            mApp->getMenu()->onOpenProject();
 	    mDialog->hide_all();
 	} else {
 	    Error(_("The Project ") +
@@ -110,8 +110,7 @@ bool NewProjectBox::exist(std::string name)
     return false;
 }
 
-}
-}
+}} // namespace vle gvle
 
 
 

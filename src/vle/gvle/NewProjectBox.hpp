@@ -36,11 +36,10 @@
 #include <libglademm.h>
 #include <vle/utils/Path.hpp>
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
 class Modeling;
+class GVLE;
 
 /**
  * @brief A window to create a package
@@ -49,12 +48,10 @@ class NewProjectBox
 {
 public:
 
-    NewProjectBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m);
+    NewProjectBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m, GVLE* app);
     ~NewProjectBox();
 
     void show();
-
-protected:
 
 private:
 
@@ -62,6 +59,7 @@ private:
 
     Gtk::Dialog*                    mDialog;
     Modeling*                       mModeling;
+    GVLE*                           mApp;
 
     // Text Entry
     Gtk::Entry*                     mEntryName;
@@ -75,7 +73,6 @@ private:
     bool exist(std::string name);
 };
 
-}
-}
+}} //namespace vle gvle
 
 #endif

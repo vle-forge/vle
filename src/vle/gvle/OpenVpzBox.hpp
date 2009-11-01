@@ -38,9 +38,7 @@
 
 class Modeling;
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
 class Modeling;
 
@@ -52,17 +50,17 @@ class OpenVpzBox
 public:
 
    OpenVpzBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m);
-    ~OpenVpzBox();
+    virtual ~OpenVpzBox();
 
-    void show();
-    void build();
+    int run();
 
-protected:
+private:
 
     class VpzTreeColumn : public Gtk::TreeModel::ColumnRecord
     {
     public:
-        VpzTreeColumn() {
+        VpzTreeColumn()
+        {
             add(mName);
         }
 
@@ -80,13 +78,13 @@ protected:
     Gtk::Button*                    mButtonApply;
     Gtk::Button*                    mButtonCancel;
 
-    // To close the window
+    void build();
     void onApply();
     void onCancel();
-
+    void onRowActivated(const Gtk::TreeModel::Path& path,
+                        Gtk::TreeViewColumn* column);
 };
 
-}
-}
+}} // namespace vle gvle
 
 #endif

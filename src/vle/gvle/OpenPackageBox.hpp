@@ -36,10 +36,7 @@
 #include <libglademm.h>
 #include <vle/utils/Path.hpp>
 
-
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
 class Modeling;
 
@@ -49,19 +46,18 @@ class Modeling;
 class OpenPackageBox
 {
 public:
-
     OpenPackageBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m);
-    ~OpenPackageBox();
+    virtual ~OpenPackageBox();
 
-    void show();
-    void build();
+    int run();
 
-protected:
+private:
 
     class PackageTreeColumn : public Gtk::TreeModel::ColumnRecord
     {
     public:
-        PackageTreeColumn() {
+        PackageTreeColumn()
+        {
             add(mName);
         }
 
@@ -80,14 +76,13 @@ protected:
     Gtk::Button*                    mButtonApply;
     Gtk::Button*                    mButtonCancel;
 
+    void build();
     void onApply();
     void onCancel();
-
     void onRowActivated(const Gtk::TreeModel::Path& path,
-                         Gtk::TreeViewColumn *column);
+                        Gtk::TreeViewColumn *column);
 };
 
-}
-}
+}} // namespace vle gvle
 
 #endif

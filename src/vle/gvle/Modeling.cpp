@@ -33,6 +33,7 @@
 #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/Editor.hpp>
 #include <vle/gvle/GVLE.hpp>
+#include <vle/gvle/GVLEMenuAndToolbar.hpp>
 #include <vle/gvle/View.hpp>
 #include <vle/gvle/AtomicModelBox.hpp>
 #include <vle/gvle/Message.hpp>
@@ -55,7 +56,7 @@ namespace vle
 namespace gvle {
 
 Modeling::Modeling(GVLE* gvle, const string& filename) :
-    mTop(NULL),
+    mTop(0),
     mGVLE(gvle),
     mIsModified(false),
     mIsSaved(false),
@@ -68,7 +69,7 @@ Modeling::Modeling(GVLE* gvle, const string& filename) :
     assert(gvle);
 
     mRand = new utils::Rand();
-    if (filename.empty() == false) {
+    if (not filename.empty()) {
         mVpz.parseFile(filename);
         if (mVpz.project().model().model() == 0) {
             gvle::Error(
@@ -85,14 +86,8 @@ Modeling::Modeling(GVLE* gvle, const string& filename) :
             setTitles();
         }
     } else {
-        mTop = newCoupledModel(0, "Top model", "", 0, 0);
-        mVpz.project().model().setModel(mTop);
         setTitles();
     }
-    std::string name = "";
-    View* v = new View(this, mTop, mListView.size());
-    mListView.push_back(v);
-    setModified(false);
 }
 
 Modeling::~Modeling()
@@ -110,7 +105,7 @@ Modeling::~Modeling()
 
 void Modeling::clearModeling()
 {
-    mIsModified = false;
+    setModified(false);
     mIsSaved = false;
     mGVLE->getEditor()->closeVpzTab();
     mFileName.clear();
@@ -153,7 +148,7 @@ void Modeling::start()
 			     "noname.vpz"));
     }
     mIsSaved = false;
-    mIsModified = true;
+    setModified(true);
     addView(mTop);
     setModifiedTitles();
 }
@@ -178,12 +173,10 @@ void Modeling::parseXML(const string& filename)
         } else {
             mTop = (graph::CoupledModel*)(mVpz.project().model().model());
         }
-        mGVLE->redrawModelTreeBox();
-	mGVLE->redrawModelClassBox();
 	mFileName.assign(filename);
         addView(mTop);
         mIsSaved = true;
-        mIsModified = false;
+        setModified(false);
         setTitles();
     } catch (const utils::ParseError& p) {
         gvle::Error((fmt(_("Error parsing file, %1%")) %
@@ -206,7 +199,7 @@ void Modeling::saveXML(const std::string& name)
         mVpz.write(name);
         mFileName.assign(name);
         mIsSaved = true;
-        mIsModified = false;
+        setModified(false);
         setTitles();
     } catch (const utils::FileError& file) {
         gvle::Error(
@@ -360,8 +353,9 @@ void Modeling::refreshViews()
 {
     ListView::iterator it = mListView.begin();
     while (it != mListView.end()) {
-        if (*it)
+        if (*it) {
             (*it)->redraw();
+        }
         ++it;
     }
 }
@@ -435,7 +429,8 @@ void Modeling::paste(graph::CoupledModel* gc, std::string className)
     if (className == "") {
 	mCutCopyPaste.paste(gc, mVpz.project().model().atomicModels());
     } else {
-	mCutCopyPaste.paste(gc, mVpz.project().classes().get(className).atomicModels());
+	mCutCopyPaste.paste(gc, mVpz.project().classes()
+                            .get(className).atomicModels());
     }
 }
 
@@ -446,11 +441,15 @@ void Modeling::setModified(bool modified)
 
         if (mIsModified) {
             setModifiedTitles();
+            mGVLE->getMenu()->showSave();
+        } else {
+            mGVLE->getMenu()->hideSave();
         }
     }
 }
 
-void Modeling::exportCoupledModel(graph::CoupledModel* model, vpz::Vpz* dst, std::string className)
+void Modeling::exportCoupledModel(graph::CoupledModel* model,
+                                  vpz::Vpz* dst, std::string className)
 {
     vpz::Project& project = dst->project();
     project.setAuthor(vpz().project().author());
@@ -465,7 +464,8 @@ void Modeling::exportCoupledModel(graph::CoupledModel* model, vpz::Vpz* dst, std
     dst->write();
 }
 
-void Modeling::exportClass(graph::Model* model, vpz::Class classe, vpz::Vpz* dst)
+void Modeling::exportClass(graph::Model* model, vpz::Class classe,
+                           vpz::Vpz* dst)
 {
     vpz::Project& project = dst->project();
     project.setAuthor(vpz().project().author());
@@ -478,9 +478,11 @@ void Modeling::exportClass(graph::Model* model, vpz::Class classe, vpz::Vpz* dst
     std::string classeName = classe.name();
 
     if (model->isCoupled()) {
-	export_coupled_model(dst, dynamic_cast<graph::CoupledModel*>(model), classeName);
+	export_coupled_model(dst, dynamic_cast<graph::CoupledModel*>(model),
+                             classeName);
     } else {
-	export_atomic_model(dst, dynamic_cast<graph::AtomicModel*>(model), classeName);
+	export_atomic_model(dst, dynamic_cast<graph::AtomicModel*>(model),
+                            classeName);
     }
     dst->project().model().setModel(model);
     dst->write();
@@ -491,7 +493,8 @@ void Modeling::export_atomic_model(vpz::Vpz* dst, graph::AtomicModel* model,
 {
     using namespace vpz;
 
-    AtomicModel atom = get_model(dynamic_cast<graph::AtomicModel*>(model), className);
+    AtomicModel atom = get_model(dynamic_cast<graph::AtomicModel*>(model),
+                                 className);
 
     Project& project = dst->project();
     Dynamics& dyns = project.dynamics();
@@ -696,14 +699,11 @@ bool Modeling::isCorrectName(const Glib::ustring& name) const
 bool Modeling::getNewName(std::string& name) const
 {
     std::list < Glib::ustring > lst(mModelsNames.begin(), mModelsNames.end());
-    gvle::DialogString* box;
-    box = new gvle::DialogString("Get a new name", "Name", lst);
-
-
-    Glib::ustring error = box->run();
+    gvle::DialogString box("Get a new name", "Name", lst);
+    Glib::ustring error = box.run();
 
     if (error.empty() == true) {
-        name.assign(box->get_string());
+        name.assign(box.get_string());
         return true;
     } else {
         gvle::Error(error);

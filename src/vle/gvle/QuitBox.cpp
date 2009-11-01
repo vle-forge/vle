@@ -111,10 +111,7 @@ void QuitBox::onSave()
 
     while (it != mFileModified.end()) {
 	editor->focusTab(*it);
-	if (boost::filesystem::extension(*it) == ".vpz")
-	    mModeling->getGVLE()->onMenuSave();
-	else
-	    mModeling->getGVLE()->saveFile();
+        mModeling->getGVLE()->onSave();
 	++it;
     }
     mModeling->hideGVLE();

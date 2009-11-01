@@ -132,11 +132,12 @@ GVLEMenuAndToolbar::GVLEMenuAndToolbar(GVLE* gvle) :
     m_refActionGroup = Gtk::ActionGroup::create();
     m_refUIManager = Gtk::UIManager::create();
     init();
-    onGlobalMode();
+    showMinimalMenu();
 }
 
 GVLEMenuAndToolbar::~GVLEMenuAndToolbar()
-{}
+{
+}
 
 void GVLEMenuAndToolbar::init()
 {
@@ -158,78 +159,48 @@ void GVLEMenuAndToolbar::init()
 	m_refUIManager->get_widget("/MenuBar"));
     mToolbar = dynamic_cast<Gtk::Toolbar*>(
 	m_refUIManager->get_widget("/Toolbar"));
-
 }
 
-void GVLEMenuAndToolbar::onPackageMode()
+void GVLEMenuAndToolbar::showMinimalMenu()
 {
-    m_refActionGroup->get_action("OpenFile")->set_sensitive(true);
-    m_refActionGroup->get_action("OpenVpz")->set_sensitive(true);
-    m_refActionGroup->get_action("MenuEdit")->set_sensitive(false);
-    m_refActionGroup->get_action("MenuZoom")->set_sensitive(false);
-    m_refActionGroup->get_action("MenuProject")->set_sensitive(true);
-    m_refActionGroup->get_action("MenuSimulation")->set_sensitive(false);
-    m_refActionGroup->get_action("ClearModel")->set_sensitive(false);
-    m_refActionGroup->get_action("ImportModel")->set_sensitive(false);
-    m_refActionGroup->get_action("ExportModel")->set_sensitive(false);
-    m_refActionGroup->get_action("ExportGraphic")->set_sensitive(false);
-    m_refActionGroup->get_action("SaveFile")->set_sensitive(false);
-    m_refActionGroup->get_action("SaveFileAs")->set_sensitive(false);
-    m_refActionGroup->get_action("Random Order")->set_sensitive(false);
-    m_refActionGroup->get_action("CloseProject")->set_sensitive(true);
-}
-
-void GVLEMenuAndToolbar::onGlobalMode()
-{
+    // Menu file
+    m_refActionGroup->get_action("NewFile")->set_sensitive(true);
+    m_refActionGroup->get_action("NewVpz")->set_sensitive(true);
+    m_refActionGroup->get_action("NewProject")->set_sensitive(true);
     m_refActionGroup->get_action("OpenFile")->set_sensitive(false);
+    m_refActionGroup->get_action("OpenProject")->set_sensitive(true);
     m_refActionGroup->get_action("OpenVpz")->set_sensitive(false);
-    m_refActionGroup->get_action("MenuEdit")->set_sensitive(false);
-    m_refActionGroup->get_action("MenuZoom")->set_sensitive(false);
-    m_refActionGroup->get_action("MenuProject")->set_sensitive(false);
-    m_refActionGroup->get_action("MenuSimulation")->set_sensitive(false);
-    m_refActionGroup->get_action("ClearModel")->set_sensitive(false);
-    m_refActionGroup->get_action("ImportModel")->set_sensitive(false);
-    m_refActionGroup->get_action("ExportModel")->set_sensitive(false);
-    m_refActionGroup->get_action("ExportGraphic")->set_sensitive(false);
+    m_refActionGroup->get_action("OpenGlobalVpz")->set_sensitive(true);
     m_refActionGroup->get_action("SaveFile")->set_sensitive(false);
     m_refActionGroup->get_action("SaveFileAs")->set_sensitive(false);
-    m_refActionGroup->get_action("Random Order")->set_sensitive(false);
-    m_refActionGroup->get_action("CloseTab")->set_sensitive(false);
-    m_refActionGroup->get_action("CloseProject")->set_sensitive(false);
+    hideFileModel();
+    hideCloseTab();
+    hideCloseProject();
+
+    hideEditMenu();
+    hideToolsMenu();
+    hideProjectMenu();
+    hideViewMenu();
+    hideSimulationMenu();
+    hideZoomMenu();
 }
 
-void GVLEMenuAndToolbar::onViewMode()
+void GVLEMenuAndToolbar::hideFileModel()
 {
-    m_refActionGroup->get_action("MenuZoom")->set_sensitive(true);
-    m_refActionGroup->get_action("MenuEdit")->set_sensitive(true);
-    m_refActionGroup->get_action("Cut")->set_sensitive(true);
-    m_refActionGroup->get_action("Copy")->set_sensitive(true);
-    m_refActionGroup->get_action("Paste")->set_sensitive(false);
-    m_refActionGroup->get_action("MenuSimulation")->set_sensitive(true);
-    m_refActionGroup->get_action("ClearModel")->set_sensitive(true);
-    m_refActionGroup->get_action("ImportModel")->set_sensitive(true);
-    m_refActionGroup->get_action("ExportModel")->set_sensitive(true);
-    m_refActionGroup->get_action("ExportGraphic")->set_sensitive(true);
-    m_refActionGroup->get_action("SaveFile")->set_sensitive(true);
-    m_refActionGroup->get_action("SaveFileAs")->set_sensitive(true);
-    m_refActionGroup->get_action("Random Order")->set_sensitive(true);
-}
-
-void GVLEMenuAndToolbar::onFileMode()
-{
-    m_refActionGroup->get_action("MenuZoom")->set_sensitive(false);
-    m_refActionGroup->get_action("MenuEdit")->set_sensitive(true);
-    m_refActionGroup->get_action("Cut")->set_sensitive(true);
-    m_refActionGroup->get_action("Copy")->set_sensitive(true);
-    m_refActionGroup->get_action("Paste")->set_sensitive(false);
-    m_refActionGroup->get_action("MenuSimulation")->set_sensitive(false);
     m_refActionGroup->get_action("ClearModel")->set_sensitive(false);
     m_refActionGroup->get_action("ImportModel")->set_sensitive(false);
     m_refActionGroup->get_action("ExportModel")->set_sensitive(false);
     m_refActionGroup->get_action("ExportGraphic")->set_sensitive(false);
-    m_refActionGroup->get_action("SaveFile")->set_sensitive(true);
-    m_refActionGroup->get_action("SaveFileAs")->set_sensitive(true);
-    m_refActionGroup->get_action("Random Order")->set_sensitive(false);
+}
+
+void GVLEMenuAndToolbar::hideOpenVpz()
+{
+    m_refActionGroup->get_action("OpenVpz")->set_sensitive(false);
+}
+
+void GVLEMenuAndToolbar::showOpenVpz()
+{
+    m_refActionGroup->get_action("OpenVpz")->set_sensitive(true);
 }
 
 void GVLEMenuAndToolbar::hidePaste()
@@ -252,6 +223,26 @@ void GVLEMenuAndToolbar::showCloseTab()
     m_refActionGroup->get_action("CloseTab")->set_sensitive(true);
 }
 
+void GVLEMenuAndToolbar::hideSave()
+{
+    m_refActionGroup->get_action("SaveFile")->set_sensitive(false);
+}
+
+void GVLEMenuAndToolbar::showSave()
+{
+    m_refActionGroup->get_action("SaveFile")->set_sensitive(true);
+}
+
+void GVLEMenuAndToolbar::hideSaveAs()
+{
+    m_refActionGroup->get_action("SaveFileAs")->set_sensitive(false);
+}
+
+void GVLEMenuAndToolbar::showSaveAs()
+{
+    m_refActionGroup->get_action("SaveFileAs")->set_sensitive(true);
+}
+
 void GVLEMenuAndToolbar::hideCloseProject()
 {
     m_refActionGroup->get_action("CloseProject")->set_sensitive(false);
@@ -262,20 +253,120 @@ void GVLEMenuAndToolbar::showCloseProject()
     m_refActionGroup->get_action("CloseProject")->set_sensitive(true);
 }
 
-void GVLEMenuAndToolbar::hidePackageMenu()
+void GVLEMenuAndToolbar::hideEditMenu()
 {
+    m_refActionGroup->get_action("MenuEdit")->set_sensitive(false);
+    m_refActionGroup->get_action("Undo")->set_sensitive(false);
+    m_refActionGroup->get_action("Redo")->set_sensitive(false);
+    m_refActionGroup->get_action("Cut")->set_sensitive(false);
+    m_refActionGroup->get_action("Copy")->set_sensitive(false);
+    m_refActionGroup->get_action("Paste")->set_sensitive(false);
+}
+
+void GVLEMenuAndToolbar::showEditMenu()
+{
+    m_refActionGroup->get_action("MenuEdit")->set_sensitive(true);
+    m_refActionGroup->get_action("Undo")->set_sensitive(true);
+    m_refActionGroup->get_action("Redo")->set_sensitive(true);
+    m_refActionGroup->get_action("Cut")->set_sensitive(true);
+    m_refActionGroup->get_action("Copy")->set_sensitive(true);
+    m_refActionGroup->get_action("Paste")->set_sensitive(false);
+}
+
+void GVLEMenuAndToolbar::hideToolsMenu()
+{
+    m_refActionGroup->get_action("MenuTools")->set_sensitive(true);
+    m_refActionGroup->get_action("ArrowTool")->set_sensitive(false);
+    m_refActionGroup->get_action("AddModelsTool")->set_sensitive(false);
+    m_refActionGroup->get_action("AddLinksTool")->set_sensitive(false);
+    m_refActionGroup->get_action("AddCoupledTool")->set_sensitive(false);
+    m_refActionGroup->get_action("DeleteTool")->set_sensitive(false);
+    m_refActionGroup->get_action("ZoomTool")->set_sensitive(false);
+    m_refActionGroup->get_action("QuestionTool")->set_sensitive(true);
+}
+
+void GVLEMenuAndToolbar::showToolsMenu()
+{
+    m_refActionGroup->get_action("MenuTools")->set_sensitive(true);
+    m_refActionGroup->get_action("ArrowTool")->set_sensitive(true);
+    m_refActionGroup->get_action("AddModelsTool")->set_sensitive(true);
+    m_refActionGroup->get_action("AddLinksTool")->set_sensitive(true);
+    m_refActionGroup->get_action("AddCoupledTool")->set_sensitive(true);
+    m_refActionGroup->get_action("DeleteTool")->set_sensitive(true);
+    m_refActionGroup->get_action("ZoomTool")->set_sensitive(true);
+    m_refActionGroup->get_action("QuestionTool")->set_sensitive(true);
+}
+
+void GVLEMenuAndToolbar::hideProjectMenu()
+{
+    m_refActionGroup->get_action("MenuProject")->set_sensitive(false);
     m_refActionGroup->get_action("ConfigureProject")->set_sensitive(false);
     m_refActionGroup->get_action("BuildProject")->set_sensitive(false);
     m_refActionGroup->get_action("CleanProject")->set_sensitive(false);
     m_refActionGroup->get_action("CreateProjectPackage")->set_sensitive(false);
 }
 
-void GVLEMenuAndToolbar::showPackageMenu()
+void GVLEMenuAndToolbar::showProjectMenu()
 {
+    m_refActionGroup->get_action("MenuProject")->set_sensitive(true);
     m_refActionGroup->get_action("ConfigureProject")->set_sensitive(true);
     m_refActionGroup->get_action("BuildProject")->set_sensitive(true);
     m_refActionGroup->get_action("CleanProject")->set_sensitive(true);
     m_refActionGroup->get_action("CreateProjectPackage")->set_sensitive(true);
+}
+
+void GVLEMenuAndToolbar::hideViewMenu()
+{
+    m_refActionGroup->get_action("MenuView")->set_sensitive(true);
+    m_refActionGroup->get_action("Random Order")->set_sensitive(false);
+    m_refActionGroup->get_action("Preferences")->set_sensitive(true);
+}
+
+void GVLEMenuAndToolbar::showViewMenu()
+{
+    m_refActionGroup->get_action("MenuView")->set_sensitive(true);
+    m_refActionGroup->get_action("Random Order")->set_sensitive(true);
+    m_refActionGroup->get_action("Preferences")->set_sensitive(true);
+}
+
+void GVLEMenuAndToolbar::hideSimulationMenu()
+{
+    m_refActionGroup->get_action("MenuSimulation")->set_sensitive(false);
+    m_refActionGroup->get_action("Project")->set_sensitive(false);
+    m_refActionGroup->get_action("Conditions")->set_sensitive(false);
+    m_refActionGroup->get_action("Views")->set_sensitive(false);
+    m_refActionGroup->get_action("Hosts")->set_sensitive(false);
+    m_refActionGroup->get_action("LaunchSimulation")->set_sensitive(false);
+}
+
+void GVLEMenuAndToolbar::showSimulationMenu()
+{
+    m_refActionGroup->get_action("MenuSimulation")->set_sensitive(true);
+    m_refActionGroup->get_action("Project")->set_sensitive(true);
+    m_refActionGroup->get_action("Conditions")->set_sensitive(true);
+    m_refActionGroup->get_action("Views")->set_sensitive(true);
+    m_refActionGroup->get_action("Hosts")->set_sensitive(true);
+    m_refActionGroup->get_action("LaunchSimulation")->set_sensitive(true);
+}
+
+void GVLEMenuAndToolbar::hideZoomMenu()
+{
+    m_refActionGroup->get_action("MenuZoom")->set_sensitive(false);
+    m_refActionGroup->get_action("ZoomPlus")->set_sensitive(false);
+    m_refActionGroup->get_action("ZoomMinus")->set_sensitive(false);
+    m_refActionGroup->get_action("Zoom11")->set_sensitive(false);
+    m_refActionGroup->get_action("Zoom12")->set_sensitive(false);
+    m_refActionGroup->get_action("Zoom21")->set_sensitive(false);
+}
+
+void GVLEMenuAndToolbar::showZoomMenu()
+{
+    m_refActionGroup->get_action("MenuZoom")->set_sensitive(true);
+    m_refActionGroup->get_action("ZoomPlus")->set_sensitive(true);
+    m_refActionGroup->get_action("ZoomMinus")->set_sensitive(true);
+    m_refActionGroup->get_action("Zoom11")->set_sensitive(true);
+    m_refActionGroup->get_action("Zoom12")->set_sensitive(true);
+    m_refActionGroup->get_action("Zoom21")->set_sensitive(true);
 }
 
 void GVLEMenuAndToolbar::createUI()
@@ -303,49 +394,49 @@ void GVLEMenuAndToolbar::createFileActions()
 	Gtk::Action::create("NewFile", Gtk::Stock::NEW,
 			    _("New File"), _("Create a new editable file")),
 	Gtk::AccelKey(""),
-	sigc::mem_fun(mParent, &GVLE::newFile));
+	sigc::mem_fun(mParent, &GVLE::onNewFile));
     m_refActionGroup->add(
 	Gtk::Action::create("NewProject", Gtk::Stock::DIRECTORY,
 			    _("New Project"), _("Create a new project")),
 	Gtk::AccelKey("<control>n"),
-	sigc::mem_fun(mParent, &GVLE::onMenuNewProject));
+	sigc::mem_fun(mParent, &GVLE::onNewProject));
     m_refActionGroup->add(
 	Gtk::Action::create("NewVpz", Gtk::Stock::NEW,
 			    _("New _Vpz"), _("Create a new Vpz")),
 	Gtk::AccelKey("<control><shift>n"),
-	sigc::mem_fun(mParent, &GVLE::onMenuNew));
+	sigc::mem_fun(mParent, &GVLE::onNewVpz));
     m_refActionGroup->add(
 	Gtk::Action::create("OpenFile", Gtk::Stock::OPEN,
 			    _("Open File"), _("Open an editable file "
 					      "from package")),
 	Gtk::AccelKey(""),
-	sigc::mem_fun(mParent, &GVLE::openFile));
+	sigc::mem_fun(mParent, &GVLE::onOpenFile));
     m_refActionGroup->add(
 	Gtk::Action::create("OpenProject", Gtk::Stock::OPEN,
 			    _("Open P_roject"), _("Open a Package")),
 	Gtk::AccelKey("<control>o"),
-	sigc::mem_fun(mParent, &GVLE::onMenuOpenPackage));
+	sigc::mem_fun(mParent, &GVLE::onOpenProject));
     m_refActionGroup->add(
 	Gtk::Action::create("OpenVpz", Gtk::Stock::OPEN,
 			    _("Open Vp_z"), _("Open a Vpz from package")),
 	Gtk::AccelKey("<control><shift>o"),
-	sigc::mem_fun(mParent, &GVLE::onMenuOpenVpz));
+	sigc::mem_fun(mParent, &GVLE::onOpenVpz));
     m_refActionGroup->add(
 	Gtk::Action::create("OpenGlobalVpz", Gtk::Stock::OPEN,
 			    _("Open Global Vpz"), _("Open a Vpz from "
 						    "filesystem")),
 	Gtk::AccelKey(""),
-	sigc::mem_fun(mParent, &GVLE::onMenuLoad));
+	sigc::mem_fun(mParent, &GVLE::onOpenGlobalVpz));
     m_refActionGroup->add(
 	Gtk::Action::create("SaveFile", Gtk::Stock::SAVE,
 			    _("Save File"), _("Save a file")),
-	sigc::mem_fun(mParent, &GVLE::saveFile));
+	sigc::mem_fun(mParent, &GVLE::onSave));
     m_refActionGroup->add(
 	Gtk::Action::create("SaveFileAs", Gtk::Stock::SAVE_AS,
 			    _("Save File As"), _("Save a file as a "
 						 "different name")),
 	Gtk::AccelKey("<control><shift>s"),
-	sigc::mem_fun(mParent, &GVLE::saveFileAs));
+	sigc::mem_fun(mParent, &GVLE::onSaveAs));
     m_refActionGroup->add(
 	Gtk::Action::create("ClearModel", _("_Clear Model"),
 			    _("Clear the current model")),
@@ -367,16 +458,16 @@ void GVLEMenuAndToolbar::createFileActions()
     m_refActionGroup->add(
 	Gtk::Action::create("CloseTab", Gtk::Stock::CLOSE,
 			    _("_Close Tab"), _("Close the current tab")),
-	sigc::mem_fun(mParent, &GVLE::closeFile));
+	sigc::mem_fun(mParent, &GVLE::onCloseTab));
     m_refActionGroup->add(
 	Gtk::Action::create("CloseProject", Gtk::Stock::CLOSE,
 			    _("_Close Project"), _("Close the project")),
 	Gtk::AccelKey(""),
-	sigc::mem_fun(mParent, &GVLE::closeProject));
+	sigc::mem_fun(mParent, &GVLE::onCloseProject));
     m_refActionGroup->add(
 	Gtk::Action::create("Quit", Gtk::Stock::QUIT,
 			    _("_Quit"), _("Quit GVLE")),
-	sigc::mem_fun(mParent, &GVLE::onMenuQuit));
+	sigc::mem_fun(mParent, &GVLE::onQuit));
 }
 
 void GVLEMenuAndToolbar::createEditActions()
@@ -560,4 +651,49 @@ void GVLEMenuAndToolbar::createHelpActions()
 	sigc::mem_fun(mParent, &GVLE::onShowAbout));
 }
 
-}}
+void GVLEMenuAndToolbar::onOpenFile()
+{
+    showEditMenu();
+    hideToolsMenu();
+    hideViewMenu();
+    hideSimulationMenu();
+    hideZoomMenu();
+    showSaveAs();
+    showCloseTab();
+}
+
+void GVLEMenuAndToolbar::onOpenProject()
+{
+    showOpenVpz();
+    showCloseProject();
+    showProjectMenu();
+}
+
+void GVLEMenuAndToolbar::onOpenVpz()
+{
+    showEditMenu();
+    showToolsMenu();
+    showViewMenu();
+    showSimulationMenu();
+    showZoomMenu();
+    showSaveAs();
+    showCloseTab();
+}
+
+void GVLEMenuAndToolbar::onCloseTab(bool vpz, bool empty)
+{
+    if (vpz) {
+        hideToolsMenu();
+        hideViewMenu();
+        hideSimulationMenu();
+        hideZoomMenu();
+    }
+    if (empty) {
+        hideSave();
+        hideSaveAs();
+	hideEditMenu();
+	hideCloseTab();
+    }
+}
+
+}} // namespace vle gvle

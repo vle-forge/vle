@@ -37,8 +37,7 @@
 
 #include <iostream>
 
-namespace vle {
-namespace gvle {
+namespace vle { namespace gvle {
 
 class GVLE;
 
@@ -52,7 +51,7 @@ public:
 
     GVLEMenuAndToolbar(GVLE* gvle);
 
-    ~GVLEMenuAndToolbar();
+    virtual ~GVLEMenuAndToolbar();
 
     void setParent(GVLE* gvle)
     { mParent = gvle; }
@@ -63,35 +62,49 @@ public:
     Gtk::MenuBar* getMenuBar()
     { return mMenuBar; }
 
-    /**
-     * @brief Change to Package Mode to access to the Menu item
-     */
-    void onPackageMode();
-
-    /**
-     * @brief Change to Gobal Mode to lock the Menu item
-     */
-    void onGlobalMode();
-
-    /**
-     * @brief Change to View Mode to access to the Menu Edit
-     */
-    void onViewMode();
-
-    /**
-     * @brief Change to File Mode to access to the Menu Edit
-     */
-    void onFileMode();
-
+    // Menu item
     void hidePaste();
     void showPaste();
+    void hideOpenVpz();
+    void showOpenVpz();
+    void hideSave();
+    void showSave();
+    void hideSaveAs();
+    void showSaveAs();
     void hideCloseTab();
     void showCloseTab();
     void hideCloseProject();
     void showCloseProject();
 
-    void hidePackageMenu();
-    void showPackageMenu();
+    // Menu
+    void showMinimalMenu();
+
+    void hideFileModel();
+
+    void hideEditMenu();
+    void showEditMenu();
+
+    void hideToolsMenu();
+    void showToolsMenu();
+
+    void hideProjectMenu();
+    void showProjectMenu();
+
+    void hideViewMenu();
+    void showViewMenu();
+
+    void hideSimulationMenu();
+    void showSimulationMenu();
+
+    void hideZoomMenu();
+    void showZoomMenu();
+
+    // show/hide on actions
+    void onOpenFile();
+    void onOpenProject();
+    void onOpenVpz();
+
+    void onCloseTab(bool vpz, bool empty);
 
 private:
     void init();
