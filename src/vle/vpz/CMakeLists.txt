@@ -9,10 +9,22 @@ LINK_DIRECTORIES(
   ${GLIBMM_LIBRARY_DIRS}
   ${LIBXML_LIBRARY_DIR})
 
+IF(WIN32)
+  ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vfl.o
+    COMMAND /usr/bin/i586-mingw32msvc-windres
+    -I${CMAKE_BINARY_DIR}/share
+    -i${CMAKE_BINARY_DIR}/share/vfl.rc
+    -o${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
+  SET(OS_SPECIFIC_PATH_IMPL ${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
+ELSE(WIN32)
+  SET(OS_SPECIFIC_PATH_IMPL)
+ENDIF(WIN32)
+
 SET(VPZ_CPP AtomicModels.cpp Class.cpp Classes.cpp Condition.cpp Conditions.cpp
   Dynamic.cpp Dynamics.cpp Experiment.cpp Model.cpp Observable.cpp
   Observables.cpp Output.cpp Outputs.cpp Project.cpp Replicas.cpp
-  SaxStackValue.cpp SaxStackVpz.cpp View.cpp Views.cpp Vpz.cpp SaxParser.cpp)
+  SaxStackValue.cpp SaxStackVpz.cpp View.cpp Views.cpp Vpz.cpp SaxParser.cpp
+  ${OS_SPECIFIC_PATH_IMPL})
 
 SET(VPZ_HPP AtomicModels.hpp Base.hpp Classes.hpp Class.hpp Condition.hpp
   Conditions.hpp DllDefines.hpp Dynamic.hpp Dynamics.hpp Experiment.hpp

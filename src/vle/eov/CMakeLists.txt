@@ -15,7 +15,19 @@ LINK_DIRECTORIES(
   ${GTKMM_LIBRARY_DIRS}
   ${GTHREAD_LIBRARY_DIRS})
 
-SET(EOV_CPP NetStreamReader.cpp Plugin.cpp Window.cpp MainWindow.cpp)
+IF(WIN32)
+  ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vfl.o
+    COMMAND /usr/bin/i586-mingw32msvc-windres
+    -I${CMAKE_BINARY_DIR}/share
+    -i${CMAKE_BINARY_DIR}/share/vfl.rc
+    -o${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
+  SET(OS_SPECIFIC_PATH_IMPL ${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
+ELSE(WIN32)
+  SET(OS_SPECIFIC_PATH_IMPL)
+ENDIF(WIN32)
+
+SET(EOV_CPP NetStreamReader.cpp Plugin.cpp Window.cpp MainWindow.cpp
+  ${OS_SPECIFIC_PATH_IMPL})
 
 SET(EOV_HPP DllDefines.hpp NetStreamReader.hpp Plugin.hpp Window.hpp
   MainWindow.hpp)

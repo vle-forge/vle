@@ -9,8 +9,19 @@ LINK_DIRECTORIES(
   ${GLIBMM_LIBRARY_DIRS}
   ${LIBXML_LIBRARY_DIR})
 
+IF(WIN32)
+  ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vfl.o
+    COMMAND /usr/bin/i586-mingw32msvc-windres
+    -I${CMAKE_BINARY_DIR}/share
+    -i${CMAKE_BINARY_DIR}/share/vfl.rc
+    -o${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
+  SET(OS_SPECIFIC_PATH_IMPL ${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
+ELSE(WIN32)
+  SET(OS_SPECIFIC_PATH_IMPL)
+ENDIF(WIN32)
+
 SET(GRAPH_CPP AtomicModel.cpp CoupledModel.cpp Model.cpp ModelPort.cpp
-  ModelPortList.cpp)
+  ModelPortList.cpp ${OS_SPECIFIC_PATH_IMPL})
 
 SET(GRAPH_HPP AtomicModel.hpp CoupledModel.hpp DllDefines.hpp Model.hpp
   ModelPort.hpp ModelPortList.hpp)

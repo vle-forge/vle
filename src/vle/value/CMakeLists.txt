@@ -10,12 +10,24 @@ LINK_DIRECTORIES(
   ${LIBXML_LIBRARY_DIR}
   ${Boost_LIBRARY_DIRS})
 
+IF(WIN32)
+  ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vfl.o
+    COMMAND /usr/bin/i586-mingw32msvc-windres
+    -I${CMAKE_BINARY_DIR}/share
+    -i${CMAKE_BINARY_DIR}/share/vfl.rc
+    -o${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
+  SET(OS_SPECIFIC_PATH_IMPL ${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
+ELSE(WIN32)
+  SET(OS_SPECIFIC_PATH_IMPL)
+ENDIF(WIN32)
+
 SET(VALUE_HPP Boolean.hpp Deleter.hpp DllDefines.hpp Double.hpp Integer.hpp
   Map.hpp Matrix.hpp Null.hpp Pools.hpp Set.hpp String.hpp Table.hpp Tuple.hpp
   Value.hpp XML.hpp)
 
 SET(VALUE_CPP Boolean.cpp Double.cpp Integer.cpp Map.cpp Matrix.cpp Null.cpp
-  Pools.cpp Set.cpp String.cpp Table.cpp Tuple.cpp Value.cpp XML.cpp)
+  Pools.cpp Set.cpp String.cpp Table.cpp Tuple.cpp Value.cpp XML.cpp
+  ${OS_SPECIFIC_PATH_IMPL})
 
 ADD_LIBRARY(vlevalue SHARED ${VALUE_HPP};${VALUE_CPP})
 

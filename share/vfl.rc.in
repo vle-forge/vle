@@ -1,0 +1,25 @@
+1 VERSIONINFO
+  FILEVERSION     @VLE_MAJOR@,@VLE_MINOR@,@VLE_PATCH@,0
+  PRODUCTVERSION  @VLE_MAJOR@,@VLE_MINOR@,@VLE_PATCH@,0
+  FILEFLAGS      0
+
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+	BLOCK "040904B0"
+        BEGIN
+            VALUE "Comments", "Published under the GNU GPL"
+            VALUE "CompanyName", "VLE Development Team"
+            VALUE "FileDescription", "A part of VFL"
+            VALUE "FileVersion", "@VLE_VERSION@@VLE_EXTRA_VERSION@"
+            VALUE "InternalName", "VFL libraries"
+            VALUE "LegalCopyright", "2003-09 VLE Development Team"
+            VALUE "ProductName", "VFL libraries"
+            VALUE "ProductVersion", "@VLE_VERSION@@VLE_EXTRA_VERSION@"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+	VALUE "Translation", 0x0409, 0x04B0
+    END
+END

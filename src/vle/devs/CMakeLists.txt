@@ -9,11 +9,24 @@ LINK_DIRECTORIES(
   ${GLIBMM_LIBRARY_DIRS}
   ${LIBXML_LIBRARY_DIR})
 
+IF(WIN32)
+  ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vfl.o
+    COMMAND /usr/bin/i586-mingw32msvc-windres
+    -I${CMAKE_BINARY_DIR}/share
+    -i${CMAKE_BINARY_DIR}/share/vfl.rc
+    -o${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
+  SET(OS_SPECIFIC_PATH_IMPL ${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
+ELSE(WIN32)
+  SET(OS_SPECIFIC_PATH_IMPL)
+ENDIF(WIN32)
+
+
 SET(DEVS_CPP Coordinator.cpp Dynamics.cpp Event.cpp EventTable.cpp EventView.cpp
   ExternalEvent.cpp Executive.cpp RequestEvent.cpp FinishView.cpp
   InternalEvent.cpp LocalStreamWriter.cpp ModelFactory.cpp NetStreamWriter.cpp
   Observable.cpp Pools.cpp RootCoordinator.cpp Simulator.cpp
-  ObservationEvent.cpp StreamWriter.cpp Time.cpp TimedView.cpp View.cpp)
+  ObservationEvent.cpp StreamWriter.cpp Time.cpp TimedView.cpp View.cpp
+  ${OS_SPECIFIC_PATH_IMPL})
 
 SET(DEVS_HPP Attribute.hpp Coordinator.hpp Dynamics.hpp DllDefines.hpp
   DynamicsWrapper.hpp Event.hpp EventList.hpp EventView.hpp EventTable.hpp

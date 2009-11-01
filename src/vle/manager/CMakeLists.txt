@@ -9,9 +9,20 @@ LINK_DIRECTORIES(
   ${GLIBMM_LIBRARY_DIRS}
   ${LIBXML_LIBRARY_DIR})
 
+IF(WIN32)
+  ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vfl.o
+    COMMAND /usr/bin/i586-mingw32msvc-windres
+    -I${CMAKE_BINARY_DIR}/share
+    -i${CMAKE_BINARY_DIR}/share/vfl.rc
+    -o${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
+  SET(OS_SPECIFIC_PATH_IMPL ${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
+ELSE(WIN32)
+  SET(OS_SPECIFIC_PATH_IMPL)
+ENDIF(WIN32)
+
 SET(MANAGER_CPP ExperimentGenerator.cpp JustRun.cpp
   LinearExperimentGenerator.cpp Manager.cpp Run.cpp SimulatorDistant.cpp
-  TotalExperimentGenerator.cpp VLE.cpp)
+  TotalExperimentGenerator.cpp VLE.cpp ${OS_SPECIFIC_PATH_IMPL})
 
 SET(MANAGER_HPP DllDefines.hpp ExperimentGenerator.hpp JustRun.hpp
   LinearExperimentGenerator.hpp Manager.hpp Run.hpp SimulatorDistant.hpp

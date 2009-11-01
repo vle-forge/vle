@@ -10,11 +10,16 @@ LINK_DIRECTORIES(
   ${LIBXML_LIBRARY_DIR}
   ${Boost_LIBRARY_DIRS})
 
-IF(WIN32 AND NOT UNIX)
-  SET(OS_SPECIFIC_PATH_IMPL PathWin32.cpp)
-ELSE(WIN32 AND NOT UNIX)
+IF(WIN32)
+  ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vfl.o
+    COMMAND /usr/bin/i586-mingw32msvc-windres
+    -I${CMAKE_BINARY_DIR}/share
+    -i${CMAKE_BINARY_DIR}/share/vfl.rc
+    -o${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
+  SET(OS_SPECIFIC_PATH_IMPL PathWin32.cpp ${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
+ELSE(WIN32)
   SET(OS_SPECIFIC_PATH_IMPL PathUnix.cpp)
-ENDIF(WIN32 AND NOT UNIX)
+ENDIF(WIN32)
 
 SET(UTILS_CPP DateTime.cpp Host.cpp Package.cpp PackageTable.cpp Path.cpp
   Preferences.cpp Rand.cpp Socket.cpp SocketImpl.c Template.cpp Tools.cpp

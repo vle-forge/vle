@@ -11,7 +11,14 @@ LINK_DIRECTORIES(
   ${Boost_LIBRARY_DIRS})
 
 IF (WIN32)
-  ADD_EXECUTABLE(vle main.cpp OptionGroup.cpp OptionGroup.hpp)
+  ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vle.o
+    COMMAND /usr/bin/i586-mingw32msvc-windres
+    -I${CMAKE_BINARY_DIR}/share
+    -i${CMAKE_BINARY_DIR}/share/vle.rc
+    -o${CMAKE_CURRENT_BINARY_DIR}/vle.o)
+
+  ADD_EXECUTABLE(vle main.cpp OptionGroup.cpp OptionGroup.hpp
+    ${CMAKE_CURRENT_BINARY_DIR}/vle.o)
 ELSE (WIN32)
   ADD_EXECUTABLE(vle main.cpp OptionGroup.cpp OptionGroup.hpp)
   SET_TARGET_PROPERTIES(vle PROPERTIES ${VLE_APP_PROPERTIES})

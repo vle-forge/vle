@@ -16,7 +16,14 @@ LINK_DIRECTORIES(
   ${GTHREAD_INCLUDE_DIRS})
 
 IF (WIN32)
-  ADD_EXECUTABLE(eov WIN32 main.cpp OptionGroup.cpp OptionGroup.hpp)
+  ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/eov.o
+    COMMAND /usr/bin/i586-mingw32msvc-windres
+    -I${CMAKE_BINARY_DIR}/share
+    -i${CMAKE_BINARY_DIR}/share/eov.rc
+    -o${CMAKE_CURRENT_BINARY_DIR}/eov.o)
+
+  ADD_EXECUTABLE(eov WIN32 main.cpp OptionGroup.cpp OptionGroup.hpp
+    ${CMAKE_CURRENT_BINARY_DIR}/eov.o)
 ELSE (WIN32)
   ADD_EXECUTABLE(eov main.cpp OptionGroup.cpp OptionGroup.hpp)
   SET_TARGET_PROPERTIES(eov PROPERTIES ${VLE_APP_PROPERTIES})

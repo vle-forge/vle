@@ -10,7 +10,14 @@ LINK_DIRECTORIES(
   ${LIBXML_LIBRARY_DIRS})
 
 IF (WIN32)
-  ADD_EXECUTABLE(oov main.cpp OptionGroup.cpp OptionGroup.hpp)
+  ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/oov.o
+    COMMAND /usr/bin/i586-mingw32msvc-windres
+    -I${CMAKE_BINARY_DIR}/share
+    -i${CMAKE_BINARY_DIR}/share/oov.rc
+    -o${CMAKE_CURRENT_BINARY_DIR}/oov.o)
+
+  ADD_EXECUTABLE(oov main.cpp OptionGroup.cpp OptionGroup.hpp
+    ${CMAKE_CURRENT_BINARY_DIR}/oov.o)
 ELSE (WIN32)
   ADD_EXECUTABLE(oov main.cpp OptionGroup.cpp OptionGroup.hpp)
   SET_TARGET_PROPERTIES(oov PROPERTIES ${VLE_APP_PROPERTIES})

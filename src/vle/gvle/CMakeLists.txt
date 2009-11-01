@@ -15,6 +15,17 @@ LINK_DIRECTORIES(
   ${LIBXML_LIBRARY_DIR}
   ${GTKSOURCEVIEWMM_LIBRARY_DIRS})
 
+IF(WIN32)
+  ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vfl.o
+    COMMAND /usr/bin/i586-mingw32msvc-windres
+    -I${CMAKE_BINARY_DIR}/share
+    -i${CMAKE_BINARY_DIR}/share/vfl.rc
+    -o${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
+  SET(OS_SPECIFIC_PATH_IMPL ${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
+ELSE(WIN32)
+  SET(OS_SPECIFIC_PATH_IMPL)
+ENDIF(WIN32)
+
 SET(GVLE_HPP About.hpp AtomicModelBox.hpp BooleanBox.hpp CalendarBox.hpp
   ComboboxString.hpp ConditionsBox.hpp ConditionPlugin.hpp ConnectionBox.hpp
   CoupledModelBox.hpp CutCopyPaste.hpp DialogString.hpp DynamicBox.hpp
@@ -42,7 +53,7 @@ SET(GVLE_CPP About.cpp AtomicModelBox.cpp BooleanBox.cpp CalendarBox.cpp
   PortDialog.cpp PreferencesBox.cpp ReplicasBox.cpp QuitBox.cpp SaveVpzBox.cpp
   SimpleTypeBox.cpp TableBox.cpp TreeViewConditions.cpp TreeViewObservable.cpp
   TreeViewValue.cpp UndoRedo.cpp ValueBox.cpp ValuesTreeView.cpp View.cpp
-  ViewDrawingArea.cpp ViewOutputBox.cpp XmlTypeBox.cpp)
+  ViewDrawingArea.cpp ViewOutputBox.cpp XmlTypeBox.cpp ${OS_SPECIFIC_PATH_IMPL})
 
 ADD_LIBRARY(vlegvle SHARED ${GVLE_CPP};${GVLE_HPP})
 

@@ -11,8 +11,20 @@ LINK_DIRECTORIES(
   ${LIBXML_LIBRARY_DIR}
   ${CAIROMM_LIBRARY_DIR})
 
+IF(WIN32)
+  ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vfl.o
+    COMMAND /usr/bin/i586-mingw32msvc-windres
+    -I${CMAKE_BINARY_DIR}/share
+    -i${CMAKE_BINARY_DIR}/share/vfl.rc
+    -o${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
+  SET(OS_SPECIFIC_PATH_IMPL ${CMAKE_CURRENT_BINARY_DIR}/vfl.o)
+ELSE(WIN32)
+  SET(OS_SPECIFIC_PATH_IMPL)
+ENDIF(WIN32)
+
 SET(OOV_CPP LocalStreamReader.cpp NetStreamReader.cpp OOV.cpp OutputMatrix.cpp
-  Plugin.cpp PluginFactory.cpp SimpleFile.cpp StreamReader.cpp)
+  Plugin.cpp PluginFactory.cpp SimpleFile.cpp StreamReader.cpp
+  ${OS_SPECIFIC_PATH_IMPL})
 
 SET(OOV_HPP DllDefines.hpp LocalStreamReader.hpp NetStreamReader.hpp OOV.hpp
   OutputMatrix.hpp Plugin.hpp PluginFactory.hpp SimpleFile.hpp StreamReader.hpp)
