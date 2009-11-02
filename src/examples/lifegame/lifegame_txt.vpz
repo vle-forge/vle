@@ -42,7 +42,7 @@
   </conditions>
   <views>
    <outputs>
-    <output name="o" format="local" plugin="rdata"/>
+    <output name="o" format="local" plugin="text"/>
    </outputs>
    <observables>
     <observable name="obs_cell">

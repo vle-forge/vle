@@ -12,7 +12,18 @@
   </structures>
   <dynamics>
     <dynamic name="dyn_executive" library="lifegame" model="executive"/>
+    <dynamic name="dyn_cell" library="lifegame" model="cell"/>
   </dynamics>
+  <classes>
+    <class name="A" >
+      <model name="a" type="atomic" conditions="cond_cell"
+	     dynamics="dyn_cell" observables="obs_cell" >
+	<out>
+	  <port name="update" />
+	</out>
+      </model>
+    </class>
+  </classes>
   <experiment name="exp1" duration="100" seed="544">
     <conditions>
       <condition name="cond_executive">
@@ -24,8 +35,7 @@
 	    <key name="cells">
 	      <map>
 		<key name="connectivity"><string>von neumann</string></key>
-		<key name="library"><string>lifegame</string></key>
-		<key name="model"><string>cell</string></key>
+		<key name="class"><string>A</string></key>
 		<key name="prefix"><string>cell</string></key>
 	      </map>
 	    </key>
@@ -43,41 +53,7 @@
     </conditions>
     <views>
       <outputs>
-	<output name="o" format="distant" plugin="cairocaview"
-		location="localhost:8000:.">
-	  <map>
-	    <key name="size">
-	      <map>
-		<key name="x"><integer>30</integer></key>
-		<key name="y"><integer>30</integer></key>
-	      </map>
-	    </key>
-	    <key name="geometry">
-	      <map>
-		<key name="type"><string>square</string></key>
-	      </map>
-	    </key>
-	    <key name="cellName"><string>cell</string></key>
-	    <key name="states">
-	      <map>
-		<key name="name"><string>state</string></key>
-		<key name="type"><string>boolean</string></key>
-		<key name="values">
-		  <set>
-		    <map>
-		      <key name="red_false"><integer>65535</integer></key>
-		      <key name="green_false"><integer>65535</integer></key>
-		      <key name="blue_false"><integer>65535</integer></key>
-		      <key name="red_true"><integer>0</integer></key>
-		      <key name="green_true"><integer>65535</integer></key>
-		      <key name="blue_true"><integer>0</integer></key>
-		    </map>
-		  </set>
-		</key>
-	  </map>
-	    </key>
-	  </map>
-	</output>
+	<output name="o" format="local" plugin="text" />
       </outputs>
       <observables>
 	<observable name="obs_cell">

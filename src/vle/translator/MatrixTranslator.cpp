@@ -89,7 +89,7 @@ bool MatrixTranslator::existModel(unsigned int i, unsigned int j)
 
 std::string MatrixTranslator::getDynamics(unsigned int i, unsigned int j)
 {
-    if (m_multipleLibrary) {
+    if (m_multiple) {
         if (m_dimension == 0) {
             return (fmt("dyn_cell_%1%") % m_init[i]).str();
         } else {
@@ -102,6 +102,23 @@ std::string MatrixTranslator::getDynamics(unsigned int i, unsigned int j)
         }
     } else {
         return "cell";
+    }
+}
+
+std::string MatrixTranslator::getClass(unsigned int i, unsigned int j)
+{
+    if (m_multiple) {
+        if (m_dimension == 0) {
+            return m_classes[m_init[i]];
+        } else {
+            if (m_dimension == 1) {
+                return m_classes[m_init[i + (j - 1) * m_size[0] - 1]];
+            } else {
+                return std::string();
+            }
+        }
+    } else {
+        return m_class;
     }
 }
 
@@ -150,11 +167,10 @@ void MatrixTranslator::parseXML(const value::Value& value)
 
         if (cells.existValue("library")) {
             m_library = cells.getString("library");
-
             if (cells.existValue("model")) {
                 m_model = cells.getString("model");
             }
-            m_multipleLibrary = false;
+            m_multiple = false;
         } else if (cells.existValue("libraries")) {
             int index = 0;
             const value::Set& libraries = cells.getSet("libraries");
@@ -171,7 +187,19 @@ void MatrixTranslator::parseXML(const value::Value& value)
                     m_libraries[index] = std::make_pair(lib, "");
                 }
             }
-            m_multipleLibrary = true;
+            m_multiple = true;
+        }
+
+        if (cells.existValue("class")) {
+            m_class = cells.getString("class");
+            m_multiple = false;
+        } else if (cells.existValue("classes")) {
+            const value::Set& classes = cells.getSet("classes");
+            for (value::Set::const_iterator it = classes.begin();
+                 it != classes.end(); ++it) {
+                m_classes.push_back(value::toString(*it));
+            }
+            m_multiple = true;
         }
 
         if (cells.existValue("init")) {
@@ -210,16 +238,26 @@ void MatrixTranslator::translate(const value::Value& buffer)
 void MatrixTranslator::translateModel(unsigned int i,
                                       unsigned int j)
 {
-    graph::AtomicModel* atomicModel = new
-        graph::AtomicModel(getName(i, j), &m_exe.coupledmodel());
-    vpz::Strings conditions;
+    graph::AtomicModel* atomicModel;
 
-    conditions.push_back("cond_cell");
-    conditions.push_back((fmt("cond_%1%_%2%_%3%")
-                          % m_prefix % i % j).str());
-    m_models[getName(i,j)] = atomicModel;
+    if (not m_library.empty() or not m_libraries.empty()) {
+        atomicModel = new graph::AtomicModel(getName(i, j),
+                                             &m_exe.coupledmodel());
+        vpz::Strings conditions;
 
-    m_exe.createModel(atomicModel, getDynamics(i, j), conditions, "obs_cell");
+        conditions.push_back("cond_cell");
+        conditions.push_back((fmt("cond_%1%_%2%_%3%")
+                              % m_prefix % i % j).str());
+        m_models[getName(i,j)] = atomicModel;
+
+        m_exe.createModel(atomicModel, getDynamics(i, j), conditions,
+                          "obs_cell");
+    } else {
+        atomicModel = dynamic_cast <graph::AtomicModel*>(
+            m_exe.createModelFromClass(getClass(i, j),
+                                       &m_exe.coupledmodel(),
+                                       getName(i, j)));
+    }
 
     if (i != 1)
         atomicModel->addInputPort("N");
@@ -463,31 +501,32 @@ void MatrixTranslator::translateConnection2D(unsigned int i,
 
 void MatrixTranslator::translateDynamics()
 {
-    if (m_multipleLibrary) {
-        std::map < unsigned int ,
-            std::pair < std::string,
-            std::string > >::const_iterator it = m_libraries.begin();
+    if (m_multiple) {
+        if (not m_libraries.empty()) {
+            libraries_t::const_iterator it = m_libraries.begin();
 
-        while (it != m_libraries.end()) {
-            vpz::Dynamic dynamics((fmt("dyn_cell_%1%") %
-                                   it->first).str());
+            while (it != m_libraries.end()) {
+                vpz::Dynamic dynamics((fmt("dyn_cell_%1%") %
+                                       it->first).str());
 
-            dynamics.setLibrary(it->second.first);
-
-            if (it->second.second != "") dynamics.setModel(it->second.second);
-
-            m_exe.dynamics().add(dynamics);
-
-            ++it;
+                dynamics.setLibrary(it->second.first);
+                if (it->second.second != "") {
+                    dynamics.setModel(it->second.second);
+                }
+                m_exe.dynamics().add(dynamics);
+                ++it;
+            }
         }
     } else {
-        vpz::Dynamic dynamics("cell");
+        if (not m_library.empty()) {
+            vpz::Dynamic dynamics("cell");
 
-        dynamics.setLibrary(m_library);
-
-        if (m_model != "") dynamics.setModel(m_model);
-
-        m_exe.dynamics().add(dynamics);
+            dynamics.setLibrary(m_library);
+            if (not m_model.empty()) {
+                dynamics.setModel(m_model);
+            }
+            m_exe.dynamics().add(dynamics);
+        }
     }
 }
 

@@ -67,6 +67,15 @@ namespace vle { namespace translator {
      *      </map>
      *     </set>
      *    </key>
+     *    <!-- or -->
+     *    <key name="class"><string>Class</string></key>
+     *    <!-- or -->
+     *    <key name="classes">
+     *     <set>
+     *      <string>Class1</string>
+     *      <string>Class2</string>
+     *     </set>
+     *    </key>
      *    <key name="init">
      *     <tuple>
      *    0 0 0 1 1 2 2 2 1 1 0
@@ -125,19 +134,26 @@ namespace vle { namespace translator {
         void translate(const value::Value& buffer);
 
     private:
-        typedef enum { VON_NEUMANN, MOORE, LINEAR } connectivity_type;
+        typedef enum { VON_NEUMANN, MOORE, LINEAR } connectivity_t;
+        typedef std::map < unsigned int, std::pair < std::string,
+            std::string > > libraries_t;
+        typedef std::vector < std::string > classes_t;
 
         devs::Executive& m_exe;
 
         unsigned int m_dimension;
         std::map < unsigned int, unsigned int > m_size;
-        connectivity_type m_connectivity;
-        bool m_multipleLibrary;
+        connectivity_t m_connectivity;
+        bool m_multiple;
+
+        // library + model
         std::string m_library;
         std::string m_model;
-        std::map < unsigned int,
-            std::pair < std::string,
-            std::string > > m_libraries;
+        libraries_t m_libraries;
+        // classes
+        std::string m_class;
+        classes_t m_classes;
+
         std::string m_prefix;
         unsigned int* m_init;
         std::map < std::string , graph::AtomicModel* > m_models;
@@ -145,6 +161,8 @@ namespace vle { namespace translator {
 
         bool existModel(unsigned int i, unsigned int j = 0);
         std::string getDynamics(unsigned int i, unsigned int j = 0);
+
+        std::string getClass(unsigned int i, unsigned int j = 0);
 
         void parseXML(const value::Value& value);
         void translateModel(unsigned int i,
