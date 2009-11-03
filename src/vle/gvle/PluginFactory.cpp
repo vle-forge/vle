@@ -43,6 +43,7 @@ PluginFactory::PluginFactory()
 {
     readConditionPlugins();
     readOutputPlugins();
+    readModelingPlugins();
 }
 
 PluginFactory::~PluginFactory()
@@ -52,6 +53,9 @@ PluginFactory::~PluginFactory()
 
     utils::for_each(m_outs.begin(), m_outs.end(),
                     boost::checked_deleter < OutputPlugin >());
+
+    utils::for_each(m_mods.begin(), m_mods.end(),
+                    boost::checked_deleter < ModelingPlugin >());
 }
 
 void PluginFactory::initCondition(const std::string& name)
@@ -66,6 +70,12 @@ void PluginFactory::initOutput(const std::string& name)
     loadOutputPlugin(it);
 }
 
+void PluginFactory::initModeling(const std::string& name)
+{
+    ModelingPluginList::iterator it = getM(name);
+    loadModelingPlugin(it);
+}
+
 void PluginFactory::clearCondition(const std::string& name)
 {
     ConditionPluginList::iterator it = getC(name);
@@ -76,6 +86,13 @@ void PluginFactory::clearCondition(const std::string& name)
 void PluginFactory::clearOutput(const std::string& name)
 {
     OutputPluginList::iterator it = getO(name);
+    delete it->second;
+    it->second = 0;
+}
+
+void PluginFactory::clearModeling(const std::string& name)
+{
+    ModelingPluginList::iterator it = getM(name);
     delete it->second;
     it->second = 0;
 }
@@ -96,6 +113,15 @@ void PluginFactory::eraseOutput(const std::string& name)
     it->second = 0;
 
     m_outs.erase(it);
+}
+
+void PluginFactory::eraseModeling(const std::string& name)
+{
+    ModelingPluginList::iterator it = getM(name);
+    delete it->second;
+    it->second = 0;
+
+    m_mods.erase(it);
 }
 
 ConditionPlugin& PluginFactory::getCondition(const std::string& name)
@@ -120,7 +146,20 @@ OutputPlugin& PluginFactory::getOutput(const std::string& name)
     return *it->second;
 }
 
-const ConditionPlugin& PluginFactory::getCondition(const std::string& name) const
+ModelingPlugin& PluginFactory::getModeling(const std::string& name)
+{
+    ModelingPluginList::iterator it = getM(name);
+
+    if (not it->second) {
+        loadModelingPlugin(it);
+    }
+
+    return *it->second;
+}
+
+
+const ConditionPlugin& PluginFactory::getCondition(const std::string& name)
+    const
 {
     ConditionPluginList::const_iterator it = getC(name);
 
@@ -144,6 +183,18 @@ const OutputPlugin& PluginFactory::getOutput(const std::string& name) const
     return *it->second;
 }
 
+const ModelingPlugin& PluginFactory::getModeling(const std::string& name) const
+{
+    ModelingPluginList::const_iterator it = getM(name);
+
+    if (not it->second) {
+        throw utils::InternalError(fmt(_(
+                "ModelingPlugin '%1%' is not initialized")) % name);
+    }
+
+    return *it->second;
+}
+
 OutputPluginList::iterator PluginFactory::getO(const std::string& name)
 {
     OutputPluginList::iterator it = m_outs.find(name);
@@ -160,6 +211,27 @@ ConditionPluginList::iterator PluginFactory::getC(const std::string& name)
     if (it == m_cnds.end()) {
         throw utils::InternalError(fmt(_(
                 "Condition plugin '%1%' is not available")) % name);
+    }
+    return it;
+}
+
+ModelingPluginList::iterator PluginFactory::getM(const std::string& name)
+{
+    ModelingPluginList::iterator it = m_mods.find(name);
+    if (it == m_mods.end()) {
+        throw utils::InternalError(fmt(_(
+                "ModelingPlugin '%1%' is not available")) % name);
+    }
+    return it;
+}
+
+ModelingPluginList::const_iterator PluginFactory::getM(
+    const std::string& name) const
+{
+    ModelingPluginList::const_iterator it = m_mods.find(name);
+    if (it == m_mods.end()) {
+        throw utils::InternalError(fmt(_(
+                "Modelingplugin '%1%' is not available")) % name);
     }
     return it;
 }
@@ -242,6 +314,34 @@ void PluginFactory::readOutputPlugins()
     }
 }
 
+void PluginFactory::readModelingPlugins()
+{
+    utils::PathList paths = utils::Path::path().getModelingDirs();
+    utils::PathList::iterator it = paths.begin();
+
+    while (it != paths.end()) {
+        if (Glib::file_test(*it, Glib::FILE_TEST_EXISTS)) {
+            Glib::Dir rep(*it);
+            Glib::DirIterator in = rep.begin();
+            while (in != rep.end()) {
+#ifdef G_OS_WIN32
+                if (((*in).find("lib") == 0) &&
+                    ((*in).rfind(".dll") == (*in).size() - 4)) {
+                    m_mods[(*in).substr(3, (*in).size() - 7)] = 0;
+                }
+#else
+                if (((*in).find("lib") == 0) &&
+                    ((*in).rfind(".so") == (*in).size() - 3)) {
+                    m_mods[(*in).substr(3, (*in).size() - 6)] = 0;
+                }
+#endif
+                in++;
+            }
+        }
+        it++;
+    }
+}
+
 void PluginFactory::loadConditionPlugin(ConditionPluginList::iterator it)
 {
     assert(it != m_cnds.end());
@@ -310,6 +410,42 @@ void PluginFactory::loadOutputPlugin(OutputPluginList::iterator it)
             "OutputPlugin '%1%': plug-in not found") % it->first);
 }
 
+
+void PluginFactory::loadModelingPlugin(ModelingPluginList::iterator it)
+{
+    assert(it != m_mods.end());
+
+    for (utils::PathList::const_iterator jt =
+         utils::Path::path().getModelingDirs().begin(); jt !=
+         utils::Path::path().getModelingDirs().end(); ++jt) {
+
+        std::string filename = Glib::Module::build_path(*jt, it->first);
+        Glib::Module mdl(filename);
+        if (mdl) {
+            mdl.make_resident();
+
+            typedef ModelingPlugin* (*function)(const std::string&);
+            void* fctptr = 0;
+            ModelingPlugin* plg = 0;
+
+            if (mdl.get_symbol("makeNewModelingPlugin", fctptr)) {
+                function fct(utils::pointer_to_function < function >(fctptr));
+                plg = fct(it->first);
+            } else {
+                throw utils::InternalError(fmt(
+                        "ModelingPlugin '%1%': error opening, %2%") % it->first
+                    % Glib::Module::get_last_error());
+            }
+
+            it->second = plg;
+            return;
+        }
+    }
+    throw utils::InternalError(fmt(
+            "ModelingPlugin '%1%': plug-in not found") % it->first);
+}
+
+
 std::ostream& operator<<(std::ostream& out, const PluginFactory& plg)
 {
     out << "Condition: ";
@@ -323,6 +459,12 @@ std::ostream& operator<<(std::ostream& out, const PluginFactory& plg)
     out << "Output: ";
     for (OutputPluginList::const_iterator it = plg.outputPlugins().begin(); it
          != plg.outputPlugins().end(); ++it) {
+        out << "(" << it->first << ", " << it->second << ")\n";
+    }
+
+    out << "Modeling: ";
+    for (ModelingPluginList::const_iterator it = plg.modelingPlugins().begin();
+         it != plg.modelingPlugins().end(); ++it) {
         out << "(" << it->first << ", " << it->second << ")\n";
     }
 

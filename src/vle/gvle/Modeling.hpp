@@ -41,7 +41,6 @@
 #include <vle/gvle/ImportModelBox.hpp>
 #include <vle/gvle/ImportClassesBox.hpp>
 #include <vle/gvle/ViewDrawingArea.hpp>
-#include <vle/gvle/PluginFactory.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/graph/Model.hpp>
 #include <vle/graph/AtomicModel.hpp>
@@ -845,20 +844,6 @@ public:
      *
      ********************************************************************/
 
-    /**
-     * @brief Get a constant reference to the PluginFactory.
-     * @return A constant reference.
-     */
-    const PluginFactory& pluginFactory() const
-    { return mPluginFactory; }
-
-    /**
-     * @brief Get a reference to the PluginFactory.
-     * @return A reference.
-     */
-    PluginFactory& pluginFactory()
-    { return mPluginFactory; }
-
 private:
     vpz::Vpz                    mVpz;
     graph::CoupledModel*        mTop;
@@ -878,7 +863,6 @@ private:
     ImportModelBox*             mImportModelBox;
     ImportClassesBox*           mImportClassesBox;
     CoupledModelBox*            mCoupledBox;
-    PluginFactory               mPluginFactory;
 
     // Drawing attributes
     Color                       mForegroundColor;

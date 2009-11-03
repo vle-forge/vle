@@ -277,18 +277,19 @@ private:
 	virtual ~DynamicTreeView();
 	void applyRenaming();
 	void build();
-	void clearRenaming()
-	    { mRenameList.clear(); }
-	void setDynamics(vpz::Dynamics* dynamics)
-	    { mDynamics = dynamics; }
-	void setModeling(Modeling* modeling)
-	    { mModeling = modeling; }
-	void setModel(vpz::AtomicModel* model)
-	    { mModel = model; }
-	void setLabel(Gtk::Label* label)
-	    { mLabel = label; }
-	void setParent(AtomicModelBox* parent)
-	    { mParent = parent; }
+
+        void clearRenaming() { mRenameList.clear(); }
+        void setDynamics(vpz::Dynamics* dynamics) { mDynamics = dynamics; }
+        void setConditions(vpz::Conditions* conditions)
+        { mConditions = conditions; }
+        void setObservables(vpz::Observables* observables)
+        { mObservables = observables; }
+        void setModeling(Modeling* modeling) { mModeling = modeling; }
+        void setModel(vpz::AtomicModel* model) { mModel = model; }
+        void setGraphModel(graph::AtomicModel* atom) { mAtom = atom; }
+        void setLabel(Gtk::Label* label) { mLabel = label; }
+        void setParent(AtomicModelBox* parent) { mParent = parent; }
+
 	std::string getDynamic();
 
     protected:
@@ -320,10 +321,13 @@ private:
     private:
 	typedef std::vector < std::pair < std::string,
 					  std::string > > renameList;
-
+        Glib::RefPtr<Gnome::Glade::Xml> mXml;
 	vpz::AtomicModel* mModel;
+	graph::AtomicModel* mAtom;
 	AtomicModelBox* mParent;
 	vpz::Dynamics* mDynamics;
+	vpz::Conditions* mConditions;
+	vpz::Observables* mObservables;
 	renameList mRenameList;
 	Modeling* mModeling;
 	Gtk::Menu mMenuPopup;
@@ -331,8 +335,6 @@ private:
 	Glib::RefPtr<Gtk::ListStore> mRefListDyn;
 	Glib::RefPtr<Gtk::TreeModelSort> mRefTreeModelDyn;
 
-	//Dialog Box
-	DynamicBox mDynamicBox;
 	//Label
 	Gtk::Label* mLabel;
 

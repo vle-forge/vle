@@ -40,7 +40,7 @@
 
 namespace vle { namespace gvle {
 
-class Modeling;
+class GVLE;
 
 class ConditionsBox
 {
@@ -190,19 +190,19 @@ public:
      * @param current, current model to show. If current equal NULL then,
      * the modeling top GCoupledModel is used.
      */
-    ConditionsBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* modeling);
+    ConditionsBox(Glib::RefPtr<Gnome::Glade::Xml> xml, GVLE* gvle);
 
     ~ConditionsBox();
 
     int run(const vpz::Conditions& conditions);
     void apply(vpz::Conditions& conditions);
 
-    inline Modeling* getModeling()
-    { return mModeling; }
+    inline GVLE* getGVLE()
+    { return m_gvle; }
 
 
 private:
-    Modeling*           mModeling;
+    GVLE*               m_gvle;
     vpz::Conditions*    mConditions;
 
     Gtk::Dialog*        mDialog;

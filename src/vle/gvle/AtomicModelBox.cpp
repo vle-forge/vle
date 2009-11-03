@@ -36,6 +36,7 @@
 #include <vle/gvle/InteractiveTypeBox.hpp>
 #include <vle/gvle/ViewDrawingArea.hpp>
 #include <vle/utils/Path.hpp>
+#include <vle/utils/Template.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/filesystem.hpp>
@@ -672,9 +673,8 @@ void AtomicModelBox::ConditionTreeView::onEdition(
 
 AtomicModelBox::DynamicTreeView::DynamicTreeView(
     BaseObjectType* cobject,
-    const Glib::RefPtr<Gnome::Glade::Xml>& xml /*refGlade*/) :
-    Gtk::TreeView(cobject),
-    mDynamicBox(xml)
+    const Glib::RefPtr < Gnome::Glade::Xml >& refGlade)
+    : Gtk::TreeView(cobject), mXml(refGlade)
 {
     mRefListDyn = Gtk::ListStore::create(mColumnsDyn);
     mRefTreeModelDyn = Gtk::TreeModelSort::create(mRefListDyn);
@@ -902,15 +902,41 @@ void AtomicModelBox::DynamicTreeView::onRowActivated(
 
 	std::string newTab = pathFileSearch(
 	    utils::Path::path().getPackageSrcDir(), searchFile);
-	if (not newTab.empty()) {
-	    mParent->on_apply();
-	    mModeling->getGVLE()->
-		getEditor()->openTab(newTab);
+        if (not newTab.empty()) {
+            try {
+                std::string pluginname, conf;
+                utils::Template tpl;
+                tpl.open(utils::Path::path().getPackageSrcFile(searchFile));
+                tpl.tag(pluginname, conf);
+
+                PluginFactory& plf = mModeling->getGVLE()->pluginFactory();
+                ModelingPlugin& plugin = plf.getModeling(pluginname);
+
+                if (plugin.modify(*mAtom, *mModel, dynamic, *mConditions,
+                                  *mObservables, conf)) {
+                    const std::string& buffer = plugin.source();
+                    std::string filename = utils::Path::path()
+                        .getPackageSrcFile(dynamic.library());
+                    filename += ".cpp";
+
+                    try {
+                        std::ofstream f(filename.c_str());
+                        f.exceptions(std::ofstream::failbit |
+                                     std::ofstream::badbit);
+                        f << buffer;
+                    } catch(const std::ios_base::failure& e) {
+                        throw utils::ArgError(fmt(
+                                _("Cannot store buffer in file '%1%'")) %
+                            filename);
+                    }
+                }
+            } catch(...) {
+                mParent->on_apply();
+                mModeling->getGVLE()->getEditor()->openTab(newTab);
+            }
 	} else {
-	    std::string message = _("The source file ")
-		+ searchFile
-		+ _(".cpp does not exist");
-	    Error(message);
+            Error((fmt(_("The source file '%1%'.cpp does not exist")) %
+                   searchFile).str());
 	}
     }
 }
@@ -927,16 +953,20 @@ void AtomicModelBox::DynamicTreeView::onAdd()
             Error(boost::str(fmt(
                         _("The Dynamics '%1%' already exists")) % name));
         } else {
-            vpz::Dynamic* dyn = new vpz::Dynamic(name);
-            mDynamicBox.show(dyn);
+            vpz::Dynamic dyn(name);
+            DynamicBox mDynamicBox(mXml,
+                                   mModeling->getGVLE(),
+                                   *mAtom, *mModel,
+                                   dyn, *mConditions, *mObservables);
+            mDynamicBox.show(&dyn);
             if (mDynamicBox.valid()) {
-                mDynamics->add(*dyn);
+                mDynamics->add(dyn);
                 build();
 
 		const Gtk::TreeModel::Children& child(mRefTreeModelDyn->children());
                 Gtk::TreeModel::Children::const_iterator it = child.begin();
                 while (it != child.end()) {
-                    if (it->get_value(mColumnsDyn.m_col_name) == dyn->name()) {
+                    if (it->get_value(mColumnsDyn.m_col_name) == dyn.name()) {
 			Gtk::TreeModel::Path path = mRefTreeModelDyn->get_path(it);
 			set_cursor(path);
                         break;
@@ -955,7 +985,12 @@ void AtomicModelBox::DynamicTreeView::onEdit()
     Glib::ustring dyn = (*it)[mColumnsDyn.m_col_name];
 
     if (!dyn.empty()) {
-        mDynamicBox.show(&(mDynamics->get(dyn)));
+        vpz::Dynamic& dynamic(mDynamics->get(dyn));
+        DynamicBox mDynamicBox(mXml,
+                               mModeling->getGVLE(),
+                               *mAtom, *mModel, dynamic,
+                               *mConditions, *mObservables);
+        mDynamicBox.show(&dynamic);
         build();
 
 	const Gtk::TreeModel::Children& child(mRefTreeModelDyn->children());
@@ -1426,9 +1461,12 @@ void AtomicModelBox::show(graph::AtomicModel* model,
     mConditions->build();
 
     mDynamics->setModel(mModel);
+    mDynamics->setGraphModel(mGraphModel);
     mDynamics->setModeling(mModeling);
     mDynamics->setLabel(mLabelDynamics);
     mDynamics->setDynamics(mDyn);
+    mDynamics->setConditions(mCond);
+    mDynamics->setObservables(mObs);
     mDynamics->setParent(this);
     mDynamics->clearRenaming();
     mDynamics->build();

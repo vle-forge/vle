@@ -282,6 +282,92 @@ std::string Path::getHomeConditionDocFile(const std::string& file) const
     return buildFilename(m_home, "conditions", "doc", file);
 }
 
+
+/*
+ * modeling 
+ */
+
+std::string Path::getModelingDir() const
+{
+    return buildDirname(m_prefix, VLE_LIBRARY_DIRS, "modeling");
+}
+
+std::string Path::getHomeModelingDir() const
+{
+    return buildDirname(m_home, "modeling");
+}
+
+std::string Path::getModelingFile(const std::string& file) const
+{
+    return buildDirname(m_prefix, VLE_SHARE_DIRS, "modeling", file);
+}
+
+std::string Path::getHomeModelingFile(const std::string& file) const
+{
+    return buildDirname(m_home, "modeling", file);
+}
+
+std::string Path::getModelingPixmapDir() const
+{
+    return buildDirname(m_prefix, VLE_SHARE_DIRS, "modeling", "pixmaps");
+}
+
+std::string Path::getHomeModelingPixmapDir() const
+{
+    return buildDirname(m_home, "modeling", "pixmaps");
+}
+
+std::string Path::getModelingPixmapFile(const std::string& file) const
+{
+    return buildFilename(m_prefix, VLE_SHARE_DIRS, "modeling", "pixmaps", file);
+}
+
+std::string Path::getHomeModelingPixmapFile(const std::string& file) const
+{
+    return buildFilename(m_home, "modeling", "pixmaps", file);
+}
+
+std::string Path::getModelingGladeDir() const
+{
+    return buildDirname(m_prefix, VLE_SHARE_DIRS, "modeling", "glade");
+}
+
+std::string Path::getHomeModelingGladeDir() const
+{
+    return buildDirname(m_home, "modeling", "glade");
+}
+
+std::string Path::getModelingGladeFile(const std::string& file) const
+{
+    return buildFilename(m_prefix, VLE_SHARE_DIRS, "modeling", "glade", file);
+}
+
+std::string Path::getHomeModelingGladeFile(const std::string& file) const
+{
+    return buildFilename(m_home, "modeling", "glade", file);
+}
+
+std::string Path::getModelingDocDir() const
+{
+    return buildDirname(m_prefix, VLE_SHARE_DIRS, "modeling", "doc");
+}
+
+std::string Path::getHomeModelingDocDir() const
+{
+    return buildDirname(m_home, "modeling", "doc");
+}
+
+std::string Path::getModelingDocFile(const std::string& file) const
+{
+    return buildFilename(m_prefix, VLE_SHARE_DIRS, "modeling", "doc", file);
+}
+
+std::string Path::getHomeModelingDocFile(const std::string& file) const
+{
+    return buildFilename(m_home, "modeling", "doc", file);
+}
+
+
 /*
  * packages path
  */
@@ -629,6 +715,7 @@ void Path::initVleHomeDirectory()
     fs::create_directory(getHomeStreamDir());
     fs::create_directory(getHomeOutputDir());
     fs::create_directory(getHomeConditionDir());
+    fs::create_directory(getHomeModelingDir());
     fs::create_directory(getHomeSimulatorDir());
     fs::create_directory(getPackagesDir());
 }
@@ -662,6 +749,13 @@ void Path::addConditionDir(const std::string& dirname)
 {
     if (isDirectory(dirname)) {
         m_condition.push_back(dirname);
+    }
+}
+
+void Path::addModelingDir(const std::string& dirname)
+{
+    if (isDirectory(dirname)) {
+        m_modeling.push_back(dirname);
     }
 }
 
@@ -715,10 +809,12 @@ void Path::initPluginDirs()
     addStreamDir(getStreamDir());
     addOutputDir(getOutputDir());
     addConditionDir(getConditionDir());
+    addModelingDir(getModelingDir());
 
     addStreamDir(getHomeStreamDir());
     addOutputDir(getHomeOutputDir());
     addConditionDir(getHomeConditionDir());
+    addModelingDir(getHomeModelingDir());
 }
 
 void Path::initPackageDirs()
@@ -860,6 +956,7 @@ std::ostream& operator<<(std::ostream& out, const Path& p)
         << "simulator.............: " << p.getSimulatorDir() << "\n"
         << "output................: " << p.getOutputDir() << "\n"
         << "condition.............: " << p.getConditionDir() << "\n"
+        << "modeling..............: " << p.getModelingDir() << "\n"
         << "stream................: " << p.getStreamDir() << "\n"
         << "pixmap................: " << p.getPixmapDir() << "\n"
         << "glade.................: " << p.getGladeDir() << "\n"
@@ -870,6 +967,9 @@ std::ostream& operator<<(std::ostream& out, const Path& p)
         << "condition pixmap......: " << p.getConditionPixmapDir() << "\n"
         << "condition glade.......: " << p.getConditionGladeDir() << "\n"
         << "condition doc.........: " << p.getConditionDocDir() << "\n"
+        << "modeling pixmap.......: " << p.getModelingPixmapDir() << "\n"
+        << "modeling glade........: " << p.getModelingGladeDir() << "\n"
+        << "modeling doc..........: " << p.getModelingDocDir() << "\n"
         << "\n"
         << "vle home..............: " << p.getHomeDir() << "\n"
         << "packages..............: " << p.getPackagesDir() << "\n"
@@ -883,6 +983,10 @@ std::ostream& operator<<(std::ostream& out, const Path& p)
         << "condition home pixmap.: " << p.getHomeConditionPixmapDir() << "\n"
         << "condition home glade..: " << p.getHomeConditionGladeDir() << "\n"
         << "condition home doc....: " << p.getHomeConditionDocDir() << "\n"
+        << "modeling home.........: " << p.getHomeModelingDir() << "\n"
+        << "modeling home pixmap..: " << p.getHomeModelingPixmapDir() << "\n"
+        << "modeling home glade...: " << p.getHomeModelingGladeDir() << "\n"
+        << "modeling home doc.....: " << p.getHomeModelingDocDir() << "\n"
         << "\n";
 
     out << "Package dir...........: " << p.getPackageDir() << "\n"
@@ -897,6 +1001,7 @@ std::ostream& operator<<(std::ostream& out, const Path& p)
     out << "Real simulators list..:\n" << p.getSimulatorDirs() << "\n"
         << "Real output list......:\n" << p.getOutputDirs() << "\n"
         << "Real condition list...:\n" << p.getConditionDirs() << "\n"
+        << "Real modeling list....:\n" << p.getModelingDirs() << "\n"
         << "Real stream list......:\n" << p.getStreamDirs() << "\n"
         << std::endl;
 

@@ -427,7 +427,7 @@ void ViewOutputBox::onEditPlugin()
     }
 
     if (not name.empty()) {
-        PluginFactory& plf = m_modeling.pluginFactory();
+        PluginFactory& plf = m_modeling.getGVLE()->pluginFactory();
         try {
             OutputPlugin& plugin = plf.getOutput(m_plugin->get_active_text());
             vpz::View& view(m_viewscopy.get(name));
@@ -453,8 +453,10 @@ void ViewOutputBox::onChangedPlugin()
 	    Gtk::TreeModel::Row row = *iter;
 	    name.assign(row.get_value(m_viewscolumnrecord.name));
 
-	    OutputPluginList list = m_modeling.pluginFactory().outputPlugins();
-	    OutputPluginList::iterator it = list.find(m_plugin->get_active_text());
+            OutputPluginList list =
+                m_modeling.getGVLE()->pluginFactory().outputPlugins();
+            OutputPluginList::iterator it =
+                list.find(m_plugin->get_active_text());
 	    if( it != list.end()) {
 		m_editplugin->set_sensitive(true);
 	    } else {

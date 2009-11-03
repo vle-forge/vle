@@ -59,9 +59,12 @@ struct F
 
 BOOST_GLOBAL_FIXTURE(F)
 
-const char* tpl1 = "a) My name is {{name}} and I am {{year}} old\n" \
-                   "b) My name is {{name}} and I am {{year}} old\n" \
-                   "c) My name is {{name}} and I am {{year}} olds\n";
+const char* tpl1 = "@@tag test1@@" \
+                    "azertyuiop qsdfghjklm wxcvbn,;:!" \
+                    "@@end tag@@" \
+                    "a) My name is {{name}} and I am {{year}} old\n" \
+                    "b) My name is {{name}} and I am {{year}} old\n" \
+                    "c) My name is {{name}} and I am {{year}} olds\n";
 
 const char* tpl2 = "class {{name}} : public DifferenceEquation::Multiple\n" \
                     "{\n" \
@@ -126,6 +129,21 @@ const char* tpl3 = "class {{name}} : public DifferenceEquation::Multiple\n" \
                     "\n" \
                     "};\n";
 
+const char* tpl4 = "@tag test1@@" \
+                    "azertyuiop qsdfghjklm wxcvbn,;:!" \
+                    "@@end tag@@" \
+                    "a) My name is {{name}} and I am {{year}} old\n" \
+                    "b) My name is {{name}} and I am {{year}} old\n" \
+                    "c) My name is {{name}} and I am {{year}} olds\n";
+
+const char* tpl5 = "@@end tag@@" \
+                    "azertyuiop qsdfghjklm wxcvbn,;:!" \
+                    "@@tag tag@@" \
+                    "a) My name is {{name}} and I am {{year}} old\n" \
+                    "b) My name is {{name}} and I am {{year}} old\n" \
+                    "c) My name is {{name}} and I am {{year}} olds\n";
+
+
 BOOST_AUTO_TEST_CASE(test_template_simple)
 {
     vle::utils::Template tpl(tpl1);
@@ -138,6 +156,9 @@ BOOST_AUTO_TEST_CASE(test_template_simple)
     std::string str = out.str();
 
     BOOST_REQUIRE_EQUAL(str,
+                        "@@tag test1@@" \
+                        "azertyuiop qsdfghjklm wxcvbn,;:!" \
+                        "@@end tag@@" \
                         "a) My name is toto and I am 74 old\n"
                         "b) My name is toto and I am 74 old\n"
                         "c) My name is toto and I am 74 olds\n");
@@ -296,3 +317,26 @@ BOOST_AUTO_TEST_CASE(test_template_for_ifnot)
                         "\n"
                         "};\n");
 }
+
+BOOST_AUTO_TEST_CASE(test_template_tag)
+{
+    std::string tag, conf;
+
+    {
+        vle::utils::Template tpl(tpl1);
+        tpl.tag(tag, conf);
+        BOOST_REQUIRE_EQUAL(tag, "test1");
+        BOOST_REQUIRE_EQUAL(conf, "azertyuiop qsdfghjklm wxcvbn,;:!");
+    }
+
+    {
+        vle::utils::Template tpl(tpl5);
+        BOOST_REQUIRE_THROW(tpl.tag(tag, conf), utils::ArgError);
+    }
+
+    {
+        vle::utils::Template tpl(tpl4);
+        BOOST_REQUIRE_THROW(tpl.tag(tag, conf), utils::ArgError);
+    }
+}
+

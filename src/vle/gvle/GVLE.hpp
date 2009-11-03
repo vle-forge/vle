@@ -32,6 +32,7 @@
 #ifndef GUI_GVLE_HH
 #define GUI_GVLE_HH
 
+#include <vle/gvle/PluginFactory.hpp>
 #include <vle/gvle/ConditionsBox.hpp>
 #include <vle/gvle/ModelTreeBox.hpp>
 #include <vle/gvle/ModelClassBox.hpp>
@@ -98,6 +99,20 @@ public:
      *
      */
     virtual ~GVLE();
+
+    /**
+     * @brief Get a constant reference to the PluginFactory.
+     * @return A constant reference.
+     */
+    const PluginFactory& pluginFactory() const
+    { return mPluginFactory; }
+
+    /**
+     * @brief Get a reference to the PluginFactory.
+     * @return A reference.
+     */
+    PluginFactory& pluginFactory()
+    { return mPluginFactory; }
 
     bool on_delete_event(GdkEventAny* event);
 
@@ -194,6 +209,13 @@ public:
      * @return Modeling instance
      */
     inline Modeling* getModeling()
+    { return mModeling; }
+
+    /**
+     * return the Modeling instance
+     * @return Modeling instance
+     */
+    inline const Modeling* getModeling() const
     { return mModeling; }
 
     /**
@@ -689,6 +711,7 @@ private:
     ModelTreeBox*                   mModelTreeBox;
     ModelClassBox*                  mModelClassBox;
     QuitBox*                        mQuitBox;
+    PluginFactory                   mPluginFactory;
 };
 
 std::string valuetype_to_string(value::Value::type type);

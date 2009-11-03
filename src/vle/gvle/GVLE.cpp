@@ -468,7 +468,7 @@ GVLE::GVLE(BaseObjectType* cobject,
 
     mGlobalVpzPrevDirPath = "";
 
-    mConditionsBox = new ConditionsBox(mRefXML, mModeling);
+    mConditionsBox = new ConditionsBox(mRefXML, this);
     mPreferencesBox = new PreferencesBox(mRefXML, mModeling);
     mOpenPackageBox = new OpenPackageBox(mRefXML, mModeling);
     mOpenVpzBox = new OpenVpzBox(mRefXML, mModeling);

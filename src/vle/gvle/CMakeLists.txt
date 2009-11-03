@@ -32,14 +32,15 @@ SET(GVLE_HPP About.hpp AtomicModelBox.hpp BooleanBox.hpp CalendarBox.hpp
   Editor.hpp ExperimentBox.hpp GVLE.hpp GVLEMenuAndToolbar.hpp HelpBox.hpp
   HostsBox.hpp ImportClassesBox.hpp ImportModelBox.hpp InteractiveTypeBox.hpp
   LaunchSimulationBox.hpp MatrixBox.hpp Message.hpp ModelClassBox.hpp
-  ModelDescriptionBox.hpp ModelTreeBox.hpp Modeling.hpp NewModelClassBox.hpp
-  NewProjectBox.hpp NewTypeBox.hpp ObsAndViewBox.hpp ObservableBox.hpp
-  ObserverPlugin.hpp OpenPackageBox.hpp OpenVpzBox.hpp OutputPlugin.hpp
-  ParameterExecutionBox.hpp PluginFactory.hpp PortDialog.hpp PreferencesBox.hpp
-  QuitBox.hpp ReplicasBox.hpp SaveVpzBox.hpp SimpleTypeBox.hpp TableBox.hpp
+  ModelDescriptionBox.hpp ModelingPlugin.hpp ModelTreeBox.hpp Modeling.hpp
+  NewModelClassBox.hpp NewProjectBox.hpp NewTypeBox.hpp ObsAndViewBox.hpp
+  ObservableBox.hpp ObserverPlugin.hpp OpenModelingPluginBox.hpp
+  OpenPackageBox.hpp OpenVpzBox.hpp OutputPlugin.hpp ParameterExecutionBox.hpp
+  PluginFactory.hpp PortDialog.hpp PreferencesBox.hpp QuitBox.hpp
+  ReplicasBox.hpp SaveVpzBox.hpp SimpleTypeBox.hpp TableBox.hpp
   TreeViewConditions.hpp TreeViewObservable.hpp TreeViewValue.hpp UndoRedo.hpp
-  ValueBox.hpp ValuesTreeView.hpp View.hpp ViewDrawingArea.hpp ViewOutputBox.hpp
-  XmlTypeBox.hpp)
+  ValueBox.hpp ValuesTreeView.hpp View.hpp ViewDrawingArea.hpp
+  ViewOutputBox.hpp XmlTypeBox.hpp)
 
 SET(GVLE_CPP About.cpp AtomicModelBox.cpp BooleanBox.cpp CalendarBox.cpp
   ConditionsBox.cpp ConditionPlugin.cpp ConnectionBox.cpp CoupledModelBox.cpp
@@ -47,13 +48,14 @@ SET(GVLE_CPP About.cpp AtomicModelBox.cpp BooleanBox.cpp CalendarBox.cpp
   GVLE.cpp GVLEMenuAndToolbar.cpp HelpBox.cpp HostsBox.cpp ImportClassesBox.cpp
   ImportModelBox.cpp InteractiveTypeBox.cpp LaunchSimulationBox.cpp
   MatrixBox.cpp Message.cpp ModelClassBox.cpp ModelDescriptionBox.cpp
-  ModelTreeBox.cpp Modeling.cpp NewModelClassBox.cpp NewProjectBox.cpp
-  NewTypeBox.cpp ObsAndViewBox.cpp PluginFactory.cpp ObservableBox.cpp
-  OpenPackageBox.cpp OpenVpzBox.cpp OutputPlugin.cpp ParameterExecutionBox.cpp
-  PortDialog.cpp PreferencesBox.cpp ReplicasBox.cpp QuitBox.cpp SaveVpzBox.cpp
-  SimpleTypeBox.cpp TableBox.cpp TreeViewConditions.cpp TreeViewObservable.cpp
-  TreeViewValue.cpp UndoRedo.cpp ValueBox.cpp ValuesTreeView.cpp View.cpp
-  ViewDrawingArea.cpp ViewOutputBox.cpp XmlTypeBox.cpp ${OS_SPECIFIC_PATH_IMPL})
+  ModelTreeBox.cpp Modeling.cpp ModelingPlugin.cpp NewModelClassBox.cpp
+  NewProjectBox.cpp NewTypeBox.cpp ObsAndViewBox.cpp PluginFactory.cpp
+  ObservableBox.cpp OpenModelingPluginBox.cpp OpenPackageBox.cpp OpenVpzBox.cpp
+  OutputPlugin.cpp ParameterExecutionBox.cpp PortDialog.cpp PreferencesBox.cpp
+  ReplicasBox.cpp QuitBox.cpp SaveVpzBox.cpp SimpleTypeBox.cpp TableBox.cpp
+  TreeViewConditions.cpp TreeViewObservable.cpp TreeViewValue.cpp UndoRedo.cpp
+  ValueBox.cpp ValuesTreeView.cpp View.cpp ViewDrawingArea.cpp
+  ViewOutputBox.cpp XmlTypeBox.cpp ${OS_SPECIFIC_PATH_IMPL})
 
 ADD_LIBRARY(vlegvle SHARED ${GVLE_CPP};${GVLE_HPP})
 
@@ -90,3 +92,4 @@ INSTALL(FILES ${GVLE_HPP} DESTINATION ${VLE_INCLUDE_DIRS}/gvle)
 
 ADD_SUBDIRECTORY(outputs)
 ADD_SUBDIRECTORY(conditions)
+ADD_SUBDIRECTORY(modeling)

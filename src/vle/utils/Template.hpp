@@ -127,9 +127,15 @@ public:
      * @code
      * vle::utils::Template tpl;
      * tpl.open("/usr/share/vle/template/diffequ.tpl");
+     * tpl.stringSymbol(...)
+     * tpl.process(std::cout);
+     *
+     * tpl.open("/usr/share/vle/template/diffequ.tpl");
+     * std::string plugin, conf;
+     * tpl.tag(plugin, conf);
      * @endcode
      *
-     * @throw utils::ArgError If an error occured when open or read the file.
+     * @throw utils::ArgError If an error occurred when open or read the file.
      *
      * @param filename The file to open.
      */
@@ -138,12 +144,26 @@ public:
     /**
      * @brief Copy in the stream the result of the templating operation.
      *
-     * @throw utils::ArgError if an error occurend when get symbols in
+     * @throw utils::ArgError if an error occurred when get symbols in
      * SymbolList, SymbolString or SymbolBool.
      *
      * @param result Output parameter to get the result of templating.
      */
     void process(std::ostream& result) const;
+
+    /** 
+     * @brief Parse the buffer an retrieve tag:
+     * @@tag pluginname@@
+     *  ...
+     *  ... // configuration.
+     *  ...
+     * @@end tag@@
+     * 
+     * @param pluginname The name of the plug-in in tag (output parameter).
+     * @param conf The configuration of the plug-in in tag (output parameter).
+     * @throw utils::ArgError if an error occurred when retrieving tag.
+     */
+    void tag(std::string& pluginname, std::string& conf);
 
     const SymbolString& stringSymbol() const { return single_; }
     SymbolString& stringSymbol() { return single_; }

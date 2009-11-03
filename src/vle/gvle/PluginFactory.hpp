@@ -34,12 +34,14 @@
 
 #include <vle/gvle/ConditionPlugin.hpp>
 #include <vle/gvle/OutputPlugin.hpp>
+#include <vle/gvle/ModelingPlugin.hpp>
 #include <boost/noncopyable.hpp>
 
 namespace vle { namespace gvle {
 
     typedef std::map < std::string, ConditionPlugin* > ConditionPluginList;
     typedef std::map < std::string, OutputPlugin* > OutputPluginList;
+    typedef std::map < std::string, ModelingPlugin* > ModelingPluginList;
 
     /**
      * @brief The PluginFactory allows to load the outputs and conditions
@@ -84,6 +86,14 @@ namespace vle { namespace gvle {
         void initOutput(const std::string& name);
 
         /**
+         * @brief Load the dynamic library attached to the modeling name.
+         * @param name The name of the modeling to load.
+         * @throw utils::InternalError if name does not exist or if the plug-in
+         * is not loadable.
+         */
+        void initModeling(const std::string& name);
+
+        /**
          * @brief Delete the plug-in attached to the condition name.
          * @param name The name of the condition to delete.
          * @throw utils::InternalError if name does not exist.
@@ -96,6 +106,13 @@ namespace vle { namespace gvle {
          * @throw utils::InternalError if name does not exist.
          */
         void clearOutput(const std::string& name);
+
+        /**
+         * @brief Delete the plug-in attached to the modeling name.
+         * @param name The name of the modeling to delete.
+         * @throw utils::InternalError if name does not exist.
+         */
+        void clearModeling(const std::string& name);
 
         /**
          * @brief Delete the plug-in attached to the condition name and delete
@@ -114,6 +131,14 @@ namespace vle { namespace gvle {
         void eraseOutput(const std::string& name);
 
         /**
+         * @brief Delete the plug-in attached to the modeling name and delete
+         * the key from modelings list.
+         * @param name The name of the modeling to delete.
+         * @throw utils::InternalError if name does not exist.
+         */
+        void eraseModeling(const std::string& name);
+
+        /**
          * @brief Get a reference to the specified condition plug-in.
          * @param name The name of the condition.
          * @return A reference to the condition.
@@ -128,6 +153,14 @@ namespace vle { namespace gvle {
          * @throw utils::InternalError if name does not exist.
          */
         OutputPlugin& getOutput(const std::string& name);
+
+        /**
+         * @brief Get a reference to the specified modeling plug-in.
+         * @param name The name of the modeling.
+         * @return A reference to the modeling.
+         * @throw utils::InternalError if name does not exist.
+         */
+        ModelingPlugin& getModeling(const std::string& name);
 
         /**
          * @brief Get a const reference to the specified condition plug-in.
@@ -146,6 +179,14 @@ namespace vle { namespace gvle {
         const OutputPlugin& getOutput(const std::string& name) const;
 
         /**
+         * @brief Get a const reference to the specified modeling plug-in.
+         * @param name The name of the modeling.
+         * @return A const reference to the modeling.
+         * @throw utils::InternalError if name does not exist.
+         */
+        const ModelingPlugin& getModeling(const std::string& name) const;
+
+        /**
          * @brief Get a constant reference to the condition plug-ins list.
          * @return Get a constant reference.
          */
@@ -159,19 +200,31 @@ namespace vle { namespace gvle {
         const OutputPluginList& outputPlugins() const
         { return m_outs; }
 
+        /**
+         * @brief Get a constant reference to the modeling plug-ins list.
+         * @return Get a constant reference.
+         */
+        const ModelingPluginList& modelingPlugins() const
+        { return m_mods; }
+
     private:
         ConditionPluginList m_cnds;
         OutputPluginList m_outs;
+        ModelingPluginList m_mods;
 
         void readConditionPlugins();
         void readOutputPlugins();
-        void loadOutputPlugin(OutputPluginList::iterator it);
+        void readModelingPlugins();
         void loadConditionPlugin(ConditionPluginList::iterator it);
+        void loadOutputPlugin(OutputPluginList::iterator it);
+        void loadModelingPlugin(ModelingPluginList::iterator it);
 
         ConditionPluginList::iterator getC(const std::string& name);
         ConditionPluginList::const_iterator getC(const std::string& name) const;
         OutputPluginList::iterator getO(const std::string& name);
         OutputPluginList::const_iterator getO(const std::string& name) const;
+        ModelingPluginList::iterator getM(const std::string& name);
+        ModelingPluginList::const_iterator getM(const std::string& name) const;
     };
 
     /**

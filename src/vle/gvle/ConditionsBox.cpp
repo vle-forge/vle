@@ -113,7 +113,7 @@ void ConditionsBox::ConditionsTreeView::makeMenuEdit()
 {
     Gtk::Menu::MenuList& menulist = mMenuEdit.items();
 
-    PluginFactory& plf = mParent->getModeling()->pluginFactory();
+    PluginFactory& plf = mParent->getGVLE()->pluginFactory();
 
     const ConditionPluginList& pll = plf.conditionPlugins();
 
@@ -214,7 +214,7 @@ void ConditionsBox::ConditionsTreeView::onRename()
 	    mParent->buildTreeConditions();
 
 	    vpz::AtomicModelList& atomlist(
-		mParent->getModeling()->vpz().project().model().atomicModels());
+		mParent->getGVLE()->getModeling()->vpz().project().model().atomicModels());
 	    atomlist.updateCondition(oldname, newname);
 	}
     }
@@ -248,7 +248,7 @@ void ConditionsBox::ConditionsTreeView::onEdit(std::string pluginName)
 
     std::string conditionName = Glib::ustring((*it)[mColumns.m_col_name]);
 
-    PluginFactory& plf = mParent->getModeling()->pluginFactory();
+    PluginFactory& plf = mParent->getGVLE()->pluginFactory();
 
     try {
 	ConditionPlugin& plugin = plf.getCondition(pluginName);
@@ -297,8 +297,8 @@ void ConditionsBox::ConditionsTreeView::onEdition(
 	mConditions->rename(mOldName, newName);
 	mParent->buildTreeConditions();
 
-	vpz::AtomicModelList& atomlist(
-	    mParent->getModeling()->vpz().project().model().atomicModels());
+        vpz::AtomicModelList& atomlist(
+            mParent->getGVLE()->getModeling()->vpz().project().model().atomicModels());
 	atomlist.updateCondition(mOldName, newName);
     }
     build();
@@ -377,7 +377,7 @@ void ConditionsBox::PortsTreeView::makeMenuEdit()
 {
     Gtk::Menu::MenuList& menulist = mMenuEdit.items();
 
-    PluginFactory& plf = mParent->getModeling()->pluginFactory();
+    PluginFactory& plf = mParent->getGVLE()->pluginFactory();
 
     const ConditionPluginList& pll = plf.conditionPlugins();
 
@@ -498,7 +498,7 @@ void ConditionsBox::PortsTreeView::onEdit(std::string pluginName)
 
 	std::string name = Glib::ustring((*it)[mColumns.m_col_name]);
 
-	PluginFactory& plf = mParent->getModeling()->pluginFactory();
+	PluginFactory& plf = mParent->getGVLE()->pluginFactory();
 
 	try {
 	    ConditionPlugin& plugin = plf.getCondition(pluginName);
@@ -558,8 +558,8 @@ void ConditionsBox::PortsTreeView::onEdition(
 ////
 
 ConditionsBox::ConditionsBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
-			     Modeling* modeling) :
-    mModeling(modeling),
+			     GVLE* gvle) :
+    m_gvle(gvle),
     mConditions(0),
     mDialog(0),
     mButtonCancel(0),

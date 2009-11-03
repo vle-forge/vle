@@ -30,7 +30,11 @@
 
 
 #include <vle/gvle/DynamicBox.hpp>
+#include <vle/gvle/OpenModelingPluginBox.hpp>
 #include <vle/gvle/Message.hpp>
+#include <vle/gvle/GVLE.hpp>
+#include <vle/graph/AtomicModel.hpp>
+#include <vle/vpz/AtomicModels.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Socket.hpp>
@@ -38,8 +42,15 @@
 
 namespace vle { namespace gvle {
 
-DynamicBox::DynamicBox(Glib::RefPtr<Gnome::Glade::Xml> xml) :
-    mXml(xml)
+DynamicBox::DynamicBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
+                       GVLE* gvle,
+                       graph::AtomicModel& atom,
+                       vpz::AtomicModel& vatom,
+                       vpz::Dynamic& dynamic,
+                       vpz::Conditions& conditions,
+                       vpz::Observables& observables)
+    : mXml(xml), mGVLE(gvle), mAtom(atom), mVAtom(vatom), mDynamic(dynamic),
+    mConditions(conditions), mObservables(observables)
 {
     xml->get_widget("DialogDynamic", mDialog);
 
@@ -73,11 +84,14 @@ DynamicBox::DynamicBox(Glib::RefPtr<Gnome::Glade::Xml> xml) :
 
     xml->get_widget("ButtonDynamicApply", mButtonApply);
     xml->get_widget("ButtonDynamicCancel", mButtonCancel);
+    xml->get_widget("buttonNewDynamicLibrary", mButtonNew);
 
     mButtonApply->signal_clicked().connect(
         sigc::mem_fun(*this, &DynamicBox::on_apply));
     mButtonCancel->signal_clicked().connect(
         sigc::mem_fun(*this, &DynamicBox::on_cancel));
+    mButtonNew->signal_clicked().connect(
+        sigc::mem_fun(*this, &DynamicBox::onNewLibrary));
     mComboPackage->signal_changed().connect(
         sigc::mem_fun(*this, &DynamicBox::onComboPackageChange));
 }
@@ -212,6 +226,13 @@ void DynamicBox::on_cancel()
 {
     mValid = false;
     mDialog->hide();
+}
+
+void DynamicBox::onNewLibrary()
+{
+    OpenModelingPluginBox box(mXml, mGVLE, mAtom, mVAtom, mDynamic, mConditions,
+                              mObservables);
+    box.run();
 }
 
 }} // namespace vle gvle

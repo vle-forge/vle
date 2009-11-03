@@ -177,6 +177,30 @@ namespace vle { namespace utils {
         std::string getConditionDocFile(const std::string& file) const;
         std::string getHomeConditionDocFile(const std::string& file) const;
 
+        /*
+         * modeling paths
+         */
+
+        std::string getModelingDir() const;
+        std::string getHomeModelingDir() const;
+        std::string getModelingFile(const std::string& file) const;
+        std::string getHomeModelingFile(const std::string& file) const;
+
+        std::string getModelingPixmapDir() const;
+        std::string getHomeModelingPixmapDir() const;
+        std::string getModelingPixmapFile(const std::string& file) const;
+        std::string getHomeModelingPixmapFile(const std::string& file) const;
+
+        std::string getModelingGladeDir() const;
+        std::string getHomeModelingGladeDir() const;
+        std::string getModelingGladeFile(const std::string& file) const;
+        std::string getHomeModelingGladeFile(const std::string& file) const;
+
+        std::string getModelingDocDir() const;
+        std::string getHomeModelingDocDir() const;
+        std::string getModelingDocFile(const std::string& file) const;
+        std::string getHomeModelingDocFile(const std::string& file) const;
+
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
          * Manage package
@@ -303,6 +327,13 @@ namespace vle { namespace utils {
         const PathList& getConditionDirs() const
         { return m_condition; }
 
+        /**
+         * @brief Get the list of modeling directories.
+         * @return A list of directory name.
+         */
+        const PathList& getModelingDirs() const
+        { return m_modeling; }
+
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
          * Manage singleton
@@ -369,6 +400,8 @@ namespace vle { namespace utils {
         void addOutputDir(const std::string& dirname);
 
         void addConditionDir(const std::string& dirname);
+
+        void addModelingDir(const std::string& dirname);
 
         std::string buildPackageDir(const std::string& name) const;
         std::string buildPackageFile(const std::string& name) const;
@@ -443,6 +476,7 @@ namespace vle { namespace utils {
         PathList    m_stream;
         PathList    m_output;
         PathList    m_condition;
+        PathList    m_modeling;
 
         std::string m_prefix; /*!< the $prefix of installation */
         std::string m_home; /*!< the $VLE_HOME */

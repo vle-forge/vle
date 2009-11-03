@@ -40,12 +40,33 @@
 #include <gtkmm/entry.h>
 #include <vle/vpz/Dynamic.hpp>
 
+namespace vle {
+    namespace graph {
+        class AtomicModel;
+    }
+
+    namespace vpz {
+        class AtomicModel;
+        class Dynamic;
+        class Conditions;
+        class Observables;
+    }
+}
+
 namespace vle { namespace gvle {
+
+    class GVLE;
 
     class DynamicBox : public sigc::trackable
     {
     public:
-        DynamicBox(Glib::RefPtr < Gnome::Glade::Xml > xml);
+        DynamicBox(Glib::RefPtr < Gnome::Glade::Xml > xml,
+                   GVLE* gvle,
+                   graph::AtomicModel& atom,
+                   vpz::AtomicModel& vatom,
+                   vpz::Dynamic& dynamic,
+                   vpz::Conditions& conditions,
+                   vpz::Observables& observables);
 
         ~DynamicBox();
 
@@ -60,6 +81,12 @@ namespace vle { namespace gvle {
 
     private:
         Glib::RefPtr < Gnome::Glade::Xml >  mXml;
+        GVLE*                               mGVLE;
+        graph::AtomicModel&                 mAtom;
+        vpz::AtomicModel&                   mVAtom;
+        vpz::Dynamic&                       mDynamic;
+        vpz::Conditions&                    mConditions;
+        vpz::Observables&                   mObservables;
         Gtk::Dialog*                        mDialog;
         Gtk::ComboBoxText*                  mComboLibrary;
         Gtk::ComboBoxText*                  mComboPackage;
@@ -69,6 +96,7 @@ namespace vle { namespace gvle {
         Gtk::ComboBoxText*                  mLanguage;
         Gtk::Button*                        mButtonApply;
         Gtk::Button*                        mButtonCancel;
+        Gtk::Button*                        mButtonNew;
         vpz::Dynamic*                       mDyn;
         bool                                mValid;
 
@@ -82,6 +110,7 @@ namespace vle { namespace gvle {
         void onComboPackageChange();
         void on_apply();
         void on_cancel();
+        void onNewLibrary();
     };
 
 }} // namespace vle gvle
