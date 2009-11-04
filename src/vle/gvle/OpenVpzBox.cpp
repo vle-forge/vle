@@ -118,7 +118,7 @@ void OpenVpzBox::onApply()
 
 void OpenVpzBox::onCancel()
 {
-    mDialog->response(GTK_RESPONSE_CANCEL);
+    mDialog->response(Gtk::RESPONSE_CANCEL);
     mDialog->hide_all();
 }
 

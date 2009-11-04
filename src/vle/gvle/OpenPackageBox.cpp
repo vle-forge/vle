@@ -115,7 +115,7 @@ void OpenPackageBox::onApply()
 
 void OpenPackageBox::onCancel()
 {
-    mDialog->response(GTK_RESPONSE_CANCEL);
+    mDialog->response(Gtk::RESPONSE_CANCEL);
     mDialog->hide_all();
 }
 
