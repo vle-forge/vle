@@ -107,7 +107,7 @@ void OpenPackageBox::onApply()
 	    std::string name = row.get_value(mColumns.mName);
 
 	    utils::Package::package().select(name);
-            mDialog->response(GTK_RESPONSE_OK);
+            mDialog->response(Gtk::RESPONSE_OK);
 	}
     }
     mDialog->hide_all();

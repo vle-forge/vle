@@ -699,7 +699,7 @@ void GVLE::onOpenProject()
     mModeling->clearModeling();
     utils::Package::package().select("");
     // open project
-    if (mOpenPackageBox->run() == GTK_RESPONSE_OK and
+    if (mOpenPackageBox->run() == Gtk::RESPONSE_OK and
         not utils::Package::package().name().empty()) {
         buildPackageHierarchy();
 	mMenuAndToolbar->onOpenProject();
@@ -713,7 +713,7 @@ void GVLE::onOpenVpz()
 	 gvle::Question(_("Do you really want load a new Model ?\nCurrent "
 			 "model will be destroy and not save")))) {
 	try {
-	    if (mOpenVpzBox->run() == GTK_RESPONSE_OK) {
+	    if (mOpenVpzBox->run() == Gtk::RESPONSE_OK) {
                 redrawModelTreeBox();
                 redrawModelClassBox();
                 mMenuAndToolbar->onOpenVpz();

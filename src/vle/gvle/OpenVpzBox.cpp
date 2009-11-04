@@ -110,7 +110,7 @@ void OpenVpzBox::onApply()
 
 	    pathFile += ".vpz";
 	    mModeling->parseXML(pathFile);
-            mDialog->response(GTK_RESPONSE_OK);
+            mDialog->response(Gtk::RESPONSE_OK);
 	}
     }
     mDialog->hide_all();
