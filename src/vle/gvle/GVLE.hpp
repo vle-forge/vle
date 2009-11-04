@@ -33,7 +33,6 @@
 #define GUI_GVLE_HH
 
 #include <vle/gvle/ConditionsBox.hpp>
-#include <vle/gvle/LaunchSimulationBox.hpp>
 #include <vle/gvle/ModelTreeBox.hpp>
 #include <vle/gvle/ModelClassBox.hpp>
 #include <vle/gvle/NewProjectBox.hpp>
@@ -681,7 +680,6 @@ private:
 
     /* Dialog boxes */
     ConditionsBox*                  mConditionsBox;
-    LaunchSimulationBox*            mSimulationBox;
     PreferencesBox*                 mPreferencesBox;
     OpenPackageBox*                 mOpenPackageBox;
     OpenVpzBox*                     mOpenVpzBox;

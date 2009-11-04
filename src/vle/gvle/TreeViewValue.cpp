@@ -36,6 +36,7 @@
 #include <vle/gvle/TreeViewValue.hpp>
 #include <vle/gvle/ValueBox.hpp>
 #include <vle/gvle/XmlTypeBox.hpp>
+#include <vle/utils/Tools.hpp>
 #include <vle/utils/i18n.hpp>
 #include <boost/algorithm/string/trim.hpp>
 

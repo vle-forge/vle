@@ -39,61 +39,105 @@
 #include <gtkmm/button.h>
 #include <gtkmm/progressbar.h>
 #include <gtkmm/label.h>
-#include <vle/vpz/Vpz.hpp>
+
+namespace vle { namespace vpz {
+
+    class Vpz;
+
+}} // namespace vle vpz
 
 namespace vle { namespace gvle {
 
-    class Modeling;
+class LaunchSimulationBox
+{
+public:
+    LaunchSimulationBox(Glib::RefPtr < Gnome::Glade::Xml > xml,
+			const vpz::Vpz& file);
 
-    class LaunchSimulationBox
-    {
-    public:
-        LaunchSimulationBox(Glib::RefPtr < Gnome::Glade::Xml > xml,
-                            Modeling* modeling);
+    ~LaunchSimulationBox();
 
-        void show();
+    void run();
 
-    private:
-        Modeling*                         mModeling;
+private:
+    enum State { Wait, Init, Play, Error, Finish, Close };
 
-        Gtk::Dialog*                      mDialog;
-        Gtk::RadioButton*                 mMono;
-        Gtk::RadioButton*                 mMulti;
-        Gtk::SpinButton*                  mNbProcess;
-        Gtk::RadioButton*                 mDistant;
-        Gtk::Button*                      mPlay;
-        Gtk::Button*                      mPause;
-        Gtk::Button*                      mStop;
-        Gtk::ProgressBar*                 mProgressBar;
-        Gtk::Label*                       mCurrentTime;
+    /* The VPZ to execute */
+    const vpz::Vpz& mVpz;
 
-        double                            m_vle_time, m_gvle_time;
-        double                            m_max_time;
+    /* Gtk Widgets */
+    Gtk::Dialog      *mDialog;
+    Gtk::RadioButton *mMono;
+    Gtk::RadioButton *mMulti;
+    Gtk::SpinButton  *mNbProcess;
+    Gtk::RadioButton *mDistant;
+    Gtk::Button      *mPlay;
+    Gtk::Button      *mStop;
+    Gtk::ProgressBar *mProgressBar;
+    Gtk::Label       *mCurrentTimeLabel;
 
-        bool                              m_stop, m_pause, m_vle_error;
+    /* Signal to disconnect before closing */
+    sigc::connection mConnectionPlayButton;
+    sigc::connection mConnectionStopButton;
+    sigc::connection mConnectionTimer;
 
-        vle::vpz::Vpz                     *file;
+    /* Simulation attributes */
+    double      mCurrentTime;
+    double      mDuration;
+    State       mState;
+    std::string mErrorMsg;
 
-        Glib::Mutex                       m_mutex;
-        Glib::Cond                        m_cond_set_time;
-        Glib::Mutex                       m_mutex_stop;
-        Glib::Cond                        m_cond_set_stop;
-        Glib::Mutex                       m_mutex_pause;
-        Glib::Cond                        m_cond_set_pause;
-        Glib::Mutex                       m_mutex_exception;
-        Glib::Cond                        m_cond_set_exception;
-        std::string                       m_exception;
+    /* thread mutex */
+    Glib::Thread* mThread;
+    Glib::Mutex   mMutex;
+    bool          mThreadRun;
 
-        void catch_vle_exception();
-        void updateCurrentTime();
-        void updateProgressBar();
+    /* accessors to the protected variables */
+    void setState(State state);
+    State state();
+    double currentTime();
+    void setCurrentTime(const double& time);
+    std::string errorMessage();
+    void setErrorMessage(const std::string& msg);
 
-        void on_play();
-        void on_pause();
-        void on_stop();
-        void run_local_simu();
-        bool timer();
-    };
+    void showErrorMsg();
+    void updateCurrentTime();
+    void updateProgressBar();
+
+    void onPlayButtonClicked();
+    void onPauseButtonClicked();
+    void onStopButtonClicked();
+
+    /**
+     * @brief Thread slot to execute simulation.
+     */
+    void runThread();
+
+    /**
+     * @brief Timer slot to update widgets from simulation.
+     *
+     * @return true to continue the timer, stop otherwise.
+     */
+    bool onTimerClock();
+
+    /**
+     * @brief Adapt all widgets to the current State.
+     */
+    void updateWidget();
+
+    //
+    // Cursors
+    //
+
+    /**
+     * @brief Switch cursor to the WATCH cursor.
+     */
+    void changeToWatchCursor();
+
+    /**
+     * @brief Switch cursor to the classical LEFT_PTR.
+     */
+    void resetCursor();
+};
 
 }} // namespace vle gvle
 

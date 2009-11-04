@@ -43,6 +43,7 @@
 #include <vle/gvle/ViewDrawingArea.hpp>
 #include <vle/gvle/ViewOutputBox.hpp>
 #include <vle/gvle/View.hpp>
+#include <vle/gvle/LaunchSimulationBox.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Debug.hpp>
@@ -455,7 +456,6 @@ GVLE::GVLE(BaseObjectType* cobject,
     mGlobalVpzPrevDirPath = "";
 
     mConditionsBox = new ConditionsBox(mRefXML, mModeling);
-    mSimulationBox = new LaunchSimulationBox(mRefXML, mModeling);
     mPreferencesBox = new PreferencesBox(mRefXML, mModeling);
     mOpenPackageBox = new OpenPackageBox(mRefXML, mModeling);
     mOpenVpzBox = new OpenVpzBox(mRefXML, mModeling);
@@ -491,7 +491,6 @@ GVLE::~GVLE()
     delete mModeling;
 
     delete mConditionsBox;
-    delete mSimulationBox;
     delete mPreferencesBox;
     delete mOpenPackageBox;
     delete mOpenVpzBox;
@@ -923,7 +922,8 @@ void GVLE::onPreferences()
 void GVLE::onSimulationBox()
 {
     if (mModeling->isSaved()) {
-        mSimulationBox->show();
+        LaunchSimulationBox box(mRefXML, mModeling->vpz());
+        box.run();
     } else {
         gvle::Error(_("Save or load a project before simulation"));
     }

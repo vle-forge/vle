@@ -30,16 +30,18 @@
 
 
 #include <vle/gvle/LaunchSimulationBox.hpp>
-#include <vle/gvle/Modeling.hpp>
-#include <vle/manager/JustRun.hpp>
-#include <vle/utils/Tools.hpp>
+#include <vle/gvle/Message.hpp>
+#include <vle/devs/RootCoordinator.hpp>
+#include <vle/vpz/Vpz.hpp>
+#include <gdkmm/cursor.h>
 
 namespace vle { namespace gvle {
 
 LaunchSimulationBox::LaunchSimulationBox(Glib::RefPtr < Gnome::Glade::Xml > xml,
-                                         Modeling* modeling) :
-    mModeling(modeling),
-    mDialog(0)
+                                         const vpz::Vpz& vpz)
+    : mVpz(vpz), mDialog(0), mMono(0), mMulti(0), mNbProcess(0), mDistant(0),
+    mPlay(0), mStop(0), mProgressBar(0), mCurrentTimeLabel(0),mState(Wait),
+    mThread(0), mThreadRun(false)
 {
     xml->get_widget("DialogSimulation", mDialog);
     xml->get_widget("RadioSimuMono", mMono);
@@ -47,245 +49,292 @@ LaunchSimulationBox::LaunchSimulationBox(Glib::RefPtr < Gnome::Glade::Xml > xml,
     xml->get_widget("SpinSimuProcess", mNbProcess);
     xml->get_widget("RadioSimuDistant", mDistant);
     xml->get_widget("simuPlay", mPlay);
-    xml->get_widget("simuPause", mPause);
     xml->get_widget("simuStop", mStop);
     xml->get_widget("simuProgressBar", mProgressBar);
-    xml->get_widget("simuCurrentTime", mCurrentTime);
+    xml->get_widget("simuCurrentTime", mCurrentTimeLabel);
 
-    mPlay->signal_clicked().connect(
-        sigc::mem_fun (*this, &LaunchSimulationBox::on_play));
+    mConnectionPlayButton = mPlay->signal_clicked().connect(
+        sigc::mem_fun(*this, &LaunchSimulationBox::onPlayButtonClicked));
 
-    mPause->signal_clicked().connect(
-        sigc::mem_fun (*this, &LaunchSimulationBox::on_pause));
+    mConnectionStopButton = mStop->signal_clicked().connect(
+        sigc::mem_fun(*this, &LaunchSimulationBox::onStopButtonClicked));
 
-    mStop->signal_clicked().connect(
-        sigc::mem_fun (*this, &LaunchSimulationBox::on_stop));
-
-    mMono->set_active();
+    mMono->set_active(true);
     mMulti->set_sensitive(false);
     mDistant->set_sensitive(false);
 
-    mPlay->set_sensitive(true);
-    mPause->set_sensitive(false);
-    mStop->set_sensitive(false);
+    updateWidget();
 }
 
-void LaunchSimulationBox::show()
+LaunchSimulationBox::~LaunchSimulationBox()
+{
+    mConnectionPlayButton.disconnect();
+    mConnectionStopButton.disconnect();
+}
+
+void LaunchSimulationBox::run()
 {
     mDialog->show_all();
     mDialog->run();
+    setState(Close);
+
+    mConnectionTimer.disconnect();
+
     mDialog->hide();
-}
 
-void LaunchSimulationBox::on_play()
-{
-    if (mMono->get_active()) {
-        bool pause;
-        {
-            Glib::Mutex::Lock lock(m_mutex_pause);
-            pause = m_pause;
-            if (pause)
-                m_cond_set_pause.signal();
-        }
+    resetCursor();
 
-        if (not pause) {
-            m_stop = true;
-            m_gvle_time = m_vle_time = 0.;
-            mProgressBar->set_fraction(0.);
-            updateCurrentTime();
-
-            const Modeling* modeling = (const Modeling*)mModeling;
-            file = new vpz::Vpz(modeling->vpz());
-            m_max_time = file->project().experiment().duration();
-
-            Glib::Thread::create(sigc::mem_fun(
-                    *this,&LaunchSimulationBox::run_local_simu),false);
-            Glib::signal_timeout().connect(sigc::mem_fun(
-                    *this,&LaunchSimulationBox::timer), 200);
-        } else {
-            Glib::Mutex::Lock lock(m_mutex_pause);
-            m_pause = false;
-        }
-        mPlay->set_sensitive(false);
-        mPause->set_sensitive(true);
-        mStop->set_sensitive(true);
+    if (mThread and mThreadRun) {
+        mThread->join();
     }
 }
 
-void LaunchSimulationBox::on_pause()
+void LaunchSimulationBox::onPlayButtonClicked()
 {
-    Glib::Mutex::Lock lock(m_mutex_pause);
-    m_pause = true;
-    mPlay->set_sensitive(true);
-    mPause->set_sensitive(false);
+    mPlay->set_sensitive(false);
     mStop->set_sensitive(false);
+    mState = Init;
+
+    mCurrentTime = mVpz.project().experiment().begin();
+    mDuration = mVpz.project().experiment().duration();
+
+    mThread = Glib::Thread::create(
+        sigc::mem_fun(
+            *this, &LaunchSimulationBox::runThread), true);
+
+    mConnectionTimer = Glib::signal_timeout().connect(
+        sigc::mem_fun(
+            *this, &LaunchSimulationBox::onTimerClock), 100);
 }
 
-void LaunchSimulationBox::on_stop()
+void LaunchSimulationBox::onStopButtonClicked()
 {
-    Glib::Mutex::Lock lock(m_mutex_stop);
-    m_stop = true;
-    mPlay->set_sensitive(true);
-    mPause->set_sensitive(false);
+    mPlay->set_sensitive(false);
     mStop->set_sensitive(false);
-    m_cond_set_stop.signal();
+    setState(Finish);
+
+    mThread->join();
+    mThread = 0;
 }
 
-void LaunchSimulationBox::run_local_simu()
+void LaunchSimulationBox::runThread()
 {
-    double duration = m_max_time;
-    vle::devs::RootCoordinator root_coordinator;
+    mThreadRun = true;
+    vpz::Vpz exp(mVpz);
+    devs::RootCoordinator root;
+
     try {
-        root_coordinator.load(*file);
+        root.load(exp);
     } catch (const std::exception &e) {
-        {
-            Glib::Mutex::Lock lock(m_mutex_exception);
-            m_exception = (fmt(_("Error while loading project\n%1%")) %
-                           e.what()).str();
-            m_vle_error = true;
-        }
-        delete file;
+        setState(Error);
+        setErrorMessage((fmt(_("Error while loading project\n%1%")) %
+                         e.what()).str());
         return;
     }
-    delete file;
+
     try {
-        root_coordinator.init();
+        root.init();
     } catch (const std::exception &e) {
-        {
-            Glib::Mutex::Lock lock(m_mutex_exception);
-            m_exception = (fmt(_("Error while initializing project\n%1%")) %
-                           e.what()).str();
-            m_vle_error = true;
-        }
+        setState(Error);
+        setErrorMessage((fmt(_("Error while initializing project\n%1%")) %
+                         e.what()).str());
         return;
     }
+
     {
-        Glib::Mutex::Lock lock(m_mutex_stop);
-        m_cond_set_stop.wait(m_mutex_stop);
-        m_stop = false;
+        Glib::Mutex::Lock lock(mMutex);
+        if (mState != Close) {
+            mState = Play;
+        }
     }
 
-    bool running = true;
-    while (running) {
-        {
-            Glib::Mutex::Lock lock(m_mutex);
-            m_vle_time = root_coordinator.getCurrentTime().getValue();
-            m_cond_set_time.signal();
-        }
+    State current = state();
+    while (current == Play) {
+        setCurrentTime(root.getCurrentTime());
 
         try {
-            running = root_coordinator.run();
-        } catch (const std::exception &e) {
-            {
-                Glib::Mutex::Lock lock(m_mutex_exception);
-                m_exception = (fmt(_("Simulator error\n%1%")) % e.what()).str();
-                m_vle_error = true;
+            if (not root.run()) {
+                Glib::Mutex::Lock lock(mMutex);
+                if (mState != Close) {
+                    mCurrentTime = mVpz.project().experiment().begin() +
+                        mDuration;
+                    mState = Finish;
+                }
             }
+        } catch (const std::exception &e) {
+            setState(Error);
+            setErrorMessage((fmt(_("Simulator error\n%1%")) % e.what()).str());
             return;
         }
-        {
-            Glib::Mutex::Lock lock(m_mutex_stop);
-            if (m_stop)
-                running=false;
-        }
-
-        {
-            Glib::Mutex::Lock lock(m_mutex_pause);
-            if (m_pause)
-                m_cond_set_pause.wait(m_mutex_pause);
-        }
-
+        current = state();
     }
 
-    {
-        Glib::Mutex::Lock lock(m_mutex);
-        {
-            Glib::Mutex::Lock lock_stop(m_mutex_stop);
-            if (m_stop) {
-                root_coordinator.finish();
-                m_gvle_time = m_vle_time;
-                m_cond_set_stop.wait(m_mutex_stop);
-            } else {
-                root_coordinator.finish();
-                m_gvle_time = duration;
-            }
-            m_stop = true;
+    if (state() == Finish) {
+        try {
+            root.finish();
+        } catch (const std::exception& e) {
+            setState(Error);
+            setErrorMessage((fmt(_("Simulator error\n%1%")) % e.what()).str());
         }
-        m_cond_set_time.signal();
     }
+    mThreadRun = false;
 }
 
-bool LaunchSimulationBox::timer()
+bool LaunchSimulationBox::onTimerClock()
 {
-    {
-        Glib::Mutex::Lock lock(m_mutex_exception);
-        if (m_vle_error) {
-            catch_vle_exception();
-            return false;
-        }
-    }
+    updateWidget();
 
-    {
-        Glib::Mutex::Lock lock(m_mutex_pause);
-        if (m_pause) {
-            mProgressBar->set_text(_("PAUSE"));
-            return true;
-        }
-    }
-
-    bool stop;
-    {
-        Glib::Mutex::Lock lock(m_mutex_stop);
-        stop = m_stop;
-        m_cond_set_stop.signal();
-    }
-    if (stop and m_gvle_time == 0.) {
-        mProgressBar->set_text(_("The simulator initializes the models"));
+    switch (mState) {
+    case Wait:
+    case Init:
+    case Play:
         return true;
-    }
-
-    if (stop and(m_gvle_time < m_max_time)) {
-        mProgressBar->set_fraction(0);
-        mProgressBar->set_text(_("Simulation stopped"));
+    case Error:
+        showErrorMsg();
+    case Finish:
+    case Close:
         return false;
     }
-    if (not stop) {
-        {
-            Glib::Mutex::Lock lock(m_mutex);
-            m_cond_set_time.wait(m_mutex);
-            m_gvle_time = m_vle_time;
-        }
-        updateCurrentTime();
-        updateProgressBar();
-        return true;
-    }
 
-    updateProgressBar();
-    updateCurrentTime();
-    mPlay->set_sensitive(true);
-    mPause->set_sensitive(false);
-    mStop->set_sensitive(false);
     return false;
 }
 
-void LaunchSimulationBox::catch_vle_exception()
+void LaunchSimulationBox::showErrorMsg()
 {
-    Gtk::MessageDialog d(m_exception,false,Gtk::MESSAGE_ERROR);
-    d.run();
-    m_vle_error = false;
+    gvle::Error(errorMessage());
 }
 
 void LaunchSimulationBox::updateCurrentTime()
 {
-    std::string s = (fmt("%1$10.0f") % m_gvle_time).str();
-    mCurrentTime->set_label(s);
+    double time = currentTime();
+    mCurrentTimeLabel->set_label((fmt("%1$10.0f") % time).str());
 }
 
 void LaunchSimulationBox::updateProgressBar()
 {
-    double p = m_gvle_time / m_max_time;
-    mProgressBar->set_fraction(p);
-    mProgressBar->set_text((fmt("%1$.0f %%")%(p*100.)).str());
+    double time = currentTime();
+    double p = (time - mVpz.project().experiment().begin()) / mDuration;
+
+    mProgressBar->set_fraction(std::max(0.0, std::min(1.0, p)));
+    mProgressBar->set_text((fmt("%1$.0f %%") % (p * 100.)).str());
+}
+
+void LaunchSimulationBox::updateWidget()
+{
+    switch (mState) {
+    case LaunchSimulationBox::Wait:
+        mPlay->set_sensitive(true);
+        mStop->set_sensitive(false);
+        mProgressBar->set_fraction(0.0);
+        mProgressBar->set_text(_("Wait"));
+        mCurrentTimeLabel->set_text("0");
+        break;
+    case LaunchSimulationBox::Init:
+        changeToWatchCursor();
+        mPlay->set_sensitive(false);
+        mStop->set_sensitive(false);
+        mProgressBar->set_fraction(0.0);
+        mProgressBar->set_text(_("The simulator initializes the models"));
+        mCurrentTimeLabel->set_text("");
+        break;
+    case LaunchSimulationBox::Play:
+        mPlay->set_sensitive(false);
+        mStop->set_sensitive(true);
+        updateCurrentTime();
+        updateProgressBar();
+        break;
+    case LaunchSimulationBox::Error:
+        resetCursor();
+        mPlay->set_sensitive(true);
+        mStop->set_sensitive(false);
+        mProgressBar->set_text(_("Simulation error"));
+        updateCurrentTime();
+        updateProgressBar();
+        break;
+    case LaunchSimulationBox::Finish:
+        resetCursor();
+        mPlay->set_sensitive(true);
+        mStop->set_sensitive(false);
+        mProgressBar->set_text(_("Finished"));
+        updateCurrentTime();
+        updateProgressBar();
+        break;
+    case LaunchSimulationBox::Close:
+        break;
+    }
+}
+
+void LaunchSimulationBox::changeToWatchCursor()
+{
+    if (mDialog->get_window()) {
+        mDialog->get_window()->set_cursor(Gdk::Cursor(Gdk::WATCH));
+    }
+}
+
+void LaunchSimulationBox::resetCursor()
+{
+    if (mDialog->get_window()) {
+        mDialog->get_window()->set_cursor(Gdk::Cursor(Gdk::LEFT_PTR));
+    }
+}
+
+LaunchSimulationBox::State LaunchSimulationBox::state()
+{
+    State result;
+
+    {
+        Glib::Mutex::Lock lock(mMutex);
+        result = mState;
+    }
+
+    return result;
+}
+
+void LaunchSimulationBox::setState(State state)
+{
+    {
+        Glib::Mutex::Lock lock(mMutex);
+        mState = state;
+    }
+}
+
+double LaunchSimulationBox::currentTime()
+{
+    double result;
+
+    {
+        Glib::Mutex::Lock lock(mMutex);
+        result = mCurrentTime;
+    }
+
+    return result;
+}
+
+void LaunchSimulationBox::setCurrentTime(const double& time)
+{
+    {
+        Glib::Mutex::Lock lock(mMutex);
+        mCurrentTime = time;
+    }
+}
+
+std::string LaunchSimulationBox::errorMessage()
+{
+    std::string result;
+    {
+        Glib::Mutex::Lock lock(mMutex);
+        result = mErrorMsg;
+    }
+    return result;
+}
+
+
+void LaunchSimulationBox::setErrorMessage(const std::string& msg)
+{
+    {
+        Glib::Mutex::Lock lock(mMutex);
+        mErrorMsg.assign(msg);
+    }
 }
 
 }} // namespace vle gvle
