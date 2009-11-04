@@ -450,7 +450,7 @@ public:
      *
      */
     void onCloseTab();
-    void closeTab(const std::string& filepath = "");
+    bool closeTab(const std::string& filepath = "");
 
     /**
      * When click on close project menu

@@ -239,9 +239,22 @@ void GVLE::FileTreeView::on_row_activated(const Gtk::TreeModel::Path&,
 	    mParent->getEditor()->focusTab(absolute_path);
 	} else {
 	    if (fs::extension(absolute_path) == ".vpz") {
-		mParent->getEditor()->closeVpzTab();
-		if (not mParent->getEditor()->existVpzTab()) {
-		    mParent->getEditor()->openTab(absolute_path);
+                Editor::Documents::const_iterator it =
+                    mParent->getEditor()->getDocuments().begin();
+                bool found = false;
+
+                while (not found and
+                       it != mParent->getEditor()->getDocuments().end()) {
+                    if (boost::filesystem::extension(it->first) == ".vpz") {
+                        found = true;
+                    } else {
+                        ++it;
+                    }
+                }
+                if (not found or (found and mParent->closeTab(it->first))) {
+                    mParent->getEditor()->openTab(absolute_path);
+                    mParent->redrawModelTreeBox();
+                    mParent->redrawModelClassBox();
                     mParent->getMenu()->onOpenVpz();
                 }
 	    } else {
@@ -843,9 +856,10 @@ void GVLE::fixSave()
     }
 }
 
-void GVLE::closeTab(const std::string& filepath)
+bool GVLE::closeTab(const std::string& filepath)
 {
     bool vpz = false;
+    bool close = false;
     Editor::Documents::const_iterator it =
         mEditor->getDocuments().find(filepath);
 
@@ -858,12 +872,14 @@ void GVLE::closeTab(const std::string& filepath)
                 clearModelTreeBox();
                 clearModelClassBox();
                 vpz = true;
+                close = true;
             }
             mEditor->closeTab(it->first);
             mMenuAndToolbar->onCloseTab(vpz, mEditor->getDocuments().empty());
             fixSave();
         }
     }
+    return close;
 }
 
 void GVLE::onCloseTab()
