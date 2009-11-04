@@ -277,7 +277,6 @@ private:
 	virtual ~DynamicTreeView();
 	void applyRenaming();
 	void build();
-
         void clearRenaming() { mRenameList.clear(); }
         void setDynamics(vpz::Dynamics* dynamics) { mDynamics = dynamics; }
         void setConditions(vpz::Conditions* conditions)
@@ -456,6 +455,7 @@ private:
     void applyObservables();
     void on_apply();
     void on_cancel();
+    void refresh();
 };
 
 } } // namespace vle gvle

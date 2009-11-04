@@ -59,7 +59,7 @@ const std::string& SymbolString::get(const std::string& key) const
 {
     const_iterator it = lst_.find(key);
     if (it == end()) {
-        throw utils::ArgError(fmt(_("Unkwow single symbol '%1%'")) % key);
+        throw utils::ArgError(fmt(_("Unknown single symbol '%1%'")) % key);
     }
     return it->second;
 }
@@ -87,12 +87,20 @@ bool SymbolBool::get(const std::string& key) const
 {
     const_iterator it = lst_.find(key);
     if (it == end()) {
-        throw utils::ArgError(fmt(_("Unkwow bool symbol '%1%'")) % key);
+        throw utils::ArgError(fmt(_("Unknown bool symbol '%1%'")) % key);
     }
     return it->second;
 }
 
          /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+void SymbolList::append(const std::string& key)
+{
+    iterator it = lst_.find(key);
+    if (it == end()) {
+        lst_.insert(std::make_pair(key, value_t()));
+    }
+}
 
 void SymbolList::append(const std::string& key, const std::string& value)
 {
@@ -118,7 +126,7 @@ SymbolList::get(const std::string& key, value_t::size_type i) const
 {
     const_iterator it = lst_.find(key);
     if (it == end()) {
-        throw utils::ArgError(fmt(_("Unkwow list symbol '%1%'")) % key);
+        throw utils::ArgError(fmt(_("Unknown list symbol '%1%'")) % key);
     }
 
     if (it->second.size() < i) {
@@ -133,7 +141,7 @@ SymbolList::size(const std::string& key) const
 {
     const_iterator it = lst_.find(key);
     if (it == end()) {
-        throw utils::ArgError(fmt(_("Unkwow list symbol '%1%'")) % key);
+        throw utils::ArgError(fmt(_("Unknown list symbol '%1%'")) % key);
     }
 
     return it->second.size();

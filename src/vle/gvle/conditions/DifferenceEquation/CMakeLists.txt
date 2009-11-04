@@ -16,17 +16,19 @@ LINK_DIRECTORIES(
   ${GTHREAD_LIBRARY_DIRS})
 
 ADD_LIBRARY(input-simple MODULE Simple.hpp Simple.cpp
-  GenericPlugin.cpp GenericPlugin.hpp Mapping.hpp Mapping.cpp)
+  NameValue.cpp NameValue.hpp Mapping.hpp Mapping.cpp
+  TimeStep.hpp TimeStep.cpp)
 SET_TARGET_PROPERTIES(input-simple PROPERTIES OUTPUT_NAME
   "DifferenceEquationSimple")
 
 ADD_LIBRARY(input-multiple MODULE Multiple.hpp Multiple.cpp
-  Mapping.hpp Mapping.cpp)
+  Mapping.hpp Mapping.cpp Variables.hpp Variables.cpp
+  TimeStep.hpp TimeStep.cpp)
 SET_TARGET_PROPERTIES(input-multiple PROPERTIES OUTPUT_NAME
   "DifferenceEquationMultiple")
 
 ADD_LIBRARY(input-generic MODULE Generic.hpp Generic.cpp
-  GenericPlugin.cpp GenericPlugin.hpp)
+  NameValue.cpp NameValue.hpp TimeStep.hpp TimeStep.cpp)
 SET_TARGET_PROPERTIES(input-generic PROPERTIES OUTPUT_NAME
   "DifferenceEquationGeneric")
 

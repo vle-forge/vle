@@ -93,6 +93,7 @@ public:
     typedef symbols_t::iterator iterator;
     typedef symbols_t::size_type size_type;
 
+    void append(const std::string& key);
     void append(const std::string& key, const std::string& value);
     void remove(const std::string& key);
     const std::string& get(const std::string& key, value_t::size_type i) const;
@@ -151,14 +152,14 @@ public:
      */
     void process(std::ostream& result) const;
 
-    /** 
+    /**
      * @brief Parse the buffer an retrieve tag:
      * @@tag pluginname@@
      *  ...
      *  ... // configuration.
      *  ...
      * @@end tag@@
-     * 
+     *
      * @param pluginname The name of the plug-in in tag (output parameter).
      * @param conf The configuration of the plug-in in tag (output parameter).
      * @throw utils::ArgError if an error occurred when retrieving tag.
@@ -171,6 +172,7 @@ public:
     SymbolBool& boolSymbol() { return bool_; }
     const SymbolList& listSymbol() const { return list_; }
     SymbolList& listSymbol() { return list_; }
+    const std::string& buffer() const { return buffer_; }
 
 private:
     std::string buffer_;

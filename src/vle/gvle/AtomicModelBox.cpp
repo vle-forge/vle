@@ -152,11 +152,6 @@ void AtomicModelBox::InputPortTreeView::onAdd()
 
     if (box.valid() and not name.empty() and list.find(name) == list.end()) {
         mModel->addInputPort(name);
-	mModel->setHeight(ViewDrawingArea::MODEL_HEIGHT +
-			  std::max(mModel->getInputPortNumber(),
-				   mModel->getOutputPortNumber()) *
-			  (ViewDrawingArea::MODEL_SPACING_PORT +
-			   ViewDrawingArea::MODEL_PORT));
 	build();
     }
 }
@@ -174,11 +169,6 @@ void AtomicModelBox::InputPortTreeView::onRemove()
 
             if (mModel->existInputPort(name)) {
                 mModel->delInputPort(name);
-		mModel->setHeight(ViewDrawingArea::MODEL_HEIGHT +
-				  std::max(mModel->getInputPortNumber(),
-					   mModel->getOutputPortNumber()) *
-				  (ViewDrawingArea::MODEL_SPACING_PORT +
-				   ViewDrawingArea::MODEL_PORT));
             }
             build();
         }
@@ -261,7 +251,6 @@ void AtomicModelBox::InputPortTreeView::onEdition(
 	}
     }
 }
-
 
 // OutputPortTreeView
 
@@ -374,11 +363,6 @@ void AtomicModelBox::OutputPortTreeView::onAdd()
 
     if (box.valid() and not name.empty() and list.find(name) == list.end()) {
         mModel->addOutputPort(name);
-	mModel->setHeight(ViewDrawingArea::MODEL_HEIGHT +
-			  std::max(mModel->getInputPortNumber(),
-				   mModel->getOutputPortNumber()) *
-			  (ViewDrawingArea::MODEL_SPACING_PORT +
-			   ViewDrawingArea::MODEL_PORT));
         build();
     }
 }
@@ -396,11 +380,6 @@ void AtomicModelBox::OutputPortTreeView::onRemove()
 
             if (mModel->existOutputPort(name)) {
                 mModel->delOutputPort(name);
-		mModel->setHeight(ViewDrawingArea::MODEL_HEIGHT +
-				  std::max(mModel->getInputPortNumber(),
-					   mModel->getOutputPortNumber()) *
-				  (ViewDrawingArea::MODEL_SPACING_PORT +
-				   ViewDrawingArea::MODEL_PORT));
             }
             build();
         }
@@ -576,7 +555,7 @@ vpz::Strings AtomicModelBox::ConditionTreeView::getConditions()
 	 iter != children.end(); ++iter) {
 	Gtk::TreeModel::Row row = *iter;
 
-	if (row.get_value(mColumns.m_col_activ) == true) {
+	if (row.get_value(mColumns.m_col_activ)) {
 	    vec.push_back(row.get_value(mColumns.m_col_name));
 	}
     }
@@ -895,10 +874,11 @@ void AtomicModelBox::DynamicTreeView::onRowActivated(
 	    row.get_value(mColumnsDyn.m_col_name));
 
 	std::string searchFile;
-	if (dynamic.model() != "")
-	    searchFile = dynamic.model();
-	else
-	    searchFile = row.get_value(mColumnsDyn.m_dyn);
+	if (not dynamic.model().empty()) {
+            searchFile = dynamic.model();
+        } else {
+            searchFile = row.get_value(mColumnsDyn.m_dyn);
+        }
 	std::transform(searchFile.begin(), searchFile.end(),
 		       searchFile.begin(), tolower);
 
@@ -908,14 +888,13 @@ void AtomicModelBox::DynamicTreeView::onRowActivated(
             try {
                 std::string pluginname, conf;
                 utils::Template tpl;
-                tpl.open(utils::Path::path().getPackageSrcFile(searchFile));
+                tpl.open(newTab);
                 tpl.tag(pluginname, conf);
-
                 PluginFactory& plf = mModeling->getGVLE()->pluginFactory();
                 ModelingPlugin& plugin = plf.getModeling(pluginname);
 
                 if (plugin.modify(*mAtom, *mModel, dynamic, *mConditions,
-                                  *mObservables, conf)) {
+                                  *mObservables, conf, tpl.buffer())) {
                     const std::string& buffer = plugin.source();
                     std::string filename = utils::Path::path()
                         .getPackageSrcFile(dynamic.library());
@@ -931,6 +910,7 @@ void AtomicModelBox::DynamicTreeView::onRowActivated(
                                 _("Cannot store buffer in file '%1%'")) %
                             filename);
                     }
+                    mParent->refresh();
                 }
             } catch(...) {
                 mParent->on_apply();
@@ -961,7 +941,7 @@ void AtomicModelBox::DynamicTreeView::onAdd()
             mDynamicBox.show(&dyn);
             if (mDynamicBox.valid()) {
                 mDynamics->add(dyn);
-                build();
+                mParent->refresh();
 
 		const Gtk::TreeModel::Children& child(mRefTreeModelDyn->children());
                 Gtk::TreeModel::Children::const_iterator it = child.begin();
@@ -1541,7 +1521,12 @@ void AtomicModelBox::applyPorts()
 
     // Apply height
     {
-	mCurrentGraphModel->setHeight(mGraphModel->height());
+        mCurrentGraphModel->setHeight(
+            ViewDrawingArea::MODEL_HEIGHT +
+            std::max(mCurrentGraphModel->getInputPortNumber(),
+                     mCurrentGraphModel->getOutputPortNumber()) *
+            (ViewDrawingArea::MODEL_SPACING_PORT +
+             ViewDrawingArea::MODEL_PORT));
     }
 }
 
@@ -1579,13 +1564,7 @@ void AtomicModelBox::applyConditions()
 	}
     }
 
-    {
-	Glib::RefPtr<Gtk::TreeView::Selection> refSelection =
-	    mConditions->get_selection();
-	if (refSelection->get_selected()) {
-	    mCurrentModel->setConditions(mConditions->getConditions());
-	}
-    }
+    mCurrentModel->setConditions(mConditions->getConditions());
     delete mCond;
     mCond = 0;
 }
@@ -1697,6 +1676,15 @@ void AtomicModelBox::on_cancel()
     mObs = 0;
 
     mDialog->hide_all();
+}
+
+void AtomicModelBox::refresh()
+{
+    mInputPorts->build();
+    mOutputPorts->build();
+    mConditions->build();
+    mDynamics->build();
+    mObservables->build();
 }
 
 } } // namespace vle gvle

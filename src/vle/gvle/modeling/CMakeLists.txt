@@ -1,1 +1,1 @@
-MESSAGE("NO PLUGIN")
+ADD_SUBDIRECTORY(DifferenceEquation)

@@ -1,5 +1,5 @@
 /**
- * @file vle/gvle/conditions/DifferenceEquation/Multiple.hpp
+ * @file vle/gvle/NewDynamicsBox.cpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -28,39 +28,45 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <vle/gvle/NewDynamicsBox.hpp>
+#include <vle/utils/Package.hpp>
 
-#ifndef VLE_GVLE_CONDITIONS_DIFFERENCEEQUATION_MULTIPLE_HPP
-#define VLE_GVLE_CONDITIONS_DIFFERENCEEQUATION_MULTIPLE_HPP
+namespace vle { namespace gvle {
 
-#include <vle/gvle/ConditionPlugin.hpp>
-#include <vle/gvle/conditions/DifferenceEquation/Mapping.hpp>
-#include <vle/gvle/conditions/DifferenceEquation/TimeStep.hpp>
-#include <vle/gvle/conditions/DifferenceEquation/Variables.hpp>
-#include <gtkmm/dialog.h>
-#include <libglademm.h>
-
-namespace vle { namespace gvle { namespace conditions {
-
-class Multiple : public ConditionPlugin, public TimeStep,
-		 public Variables, public Mapping
+NewDynamicsBox::NewDynamicsBox(Glib::RefPtr<Gnome::Glade::Xml> xml):
+    mXml(xml)
 {
-public:
-    Multiple(const std::string& name);
-    virtual ~Multiple() { }
+    xml->get_widget("DialogNewDynamics", mDialog);
+    xml->get_widget("EntryClassName", mEntryClassName);
+    xml->get_widget("EntryNamespace", mEntryNamespace);
+    xml->get_widget("ButtonOkNewDynamics", mButtonApply);
+    xml->get_widget("ButtonCancelNewDynamics", mButtonCancel);
 
-    virtual bool start(vpz::Condition& condition);
-    virtual bool start(vpz::Condition&, const std::string&)
-    { return true; }
+    mButtonApply->signal_clicked().connect(
+	sigc::mem_fun(*this, &NewDynamicsBox::onApply));
 
-private:
-    Gtk::Dialog* m_dialog;
+    mButtonCancel->signal_clicked().connect(
+	sigc::mem_fun(*this, &NewDynamicsBox::onCancel));
+}
 
-    void assign(vpz::Condition& condition);
-    void build();
-    void fillFields(vpz::Condition& condition);
-};
+void NewDynamicsBox::onApply()
+{
+    mDialog->response(Gtk::RESPONSE_OK);
+    mDialog->hide_all();
+}
 
-}}} // namespace vle gvle conditions
+void NewDynamicsBox::onCancel()
+{
+    mDialog->response(Gtk::RESPONSE_CANCEL);
+    mDialog->hide_all();
+}
 
-#endif
+int NewDynamicsBox::run()
+{
+    mEntryClassName->set_text("");
+    mEntryNamespace->set_text(utils::Package::package().name());
+    mDialog->show_all();
+    return mDialog->run();
+}
 
+}} // namespace vle gvle

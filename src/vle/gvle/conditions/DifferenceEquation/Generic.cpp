@@ -31,19 +31,11 @@
 
 #include <vle/gvle/conditions/DifferenceEquation/Generic.hpp>
 #include <vle/utils/Path.hpp>
-#include <libglademm/xml.h>
-#include <boost/lexical_cast.hpp>
-#include <boost/assign/list_inserter.hpp>
-
-using namespace std;
-using namespace boost::assign;
-using namespace vle;
 
 namespace vle { namespace gvle { namespace conditions {
 
 Generic::Generic(const std::string& name):
     ConditionPlugin(name),
-    GenericPlugin(),
     m_dialog(0)
 {}
 
@@ -52,33 +44,23 @@ Generic::~Generic()
 
 void Generic::build()
 {
+    Gtk::VBox* vbox;
     std::string glade = utils::Path::path().
-	getConditionGladeFile("DifferenceEquation.glade");
+        getConditionGladeFile("DifferenceEquation.glade");
     Glib::RefPtr<Gnome::Glade::Xml> ref = Gnome::Glade::Xml::create(glade);
 
     ref->get_widget("DialogPluginGenericBox", m_dialog);
     m_dialog->set_title("DifferenceEquation - Generic");
-    ref->get_widget("SpinButtonTimeGeneric", m_spinTime);
-    ref->get_widget("TimestepGlobalButtonGeneric", m_checkGlobal);
-    ref->get_widget("HBoxTimestepGeneric", m_hboxTimestep);
-    ref->get_widget("entryNameGeneric", m_entryName);
-    ref->get_widget("entryValueGeneric", m_entryValue);
-    ref->get_widget_derived("initTreeViewGeneric", m_initTreeView);
+    ref->get_widget("GenericPluginVBox", vbox);
 
-    assert(m_dialog);
-    assert(m_spinTime);
-    assert(m_checkGlobal);
-    assert(m_hboxTimestep);
-    assert(m_entryName);
-    assert(m_entryValue);
-    assert(m_initTreeView);
-
-    buildGeneric();
+    vbox->pack_start(NameValue::build(ref));
+    vbox->pack_start(TimeStep::build(ref));
 }
 
 void Generic::fillFields(vpz::Condition& condition)
 {
-    fillFieldsGeneric(condition);
+    NameValue::fillFields(condition);
+    TimeStep::fillFields(condition);
 }
 
 bool Generic::start(vpz::Condition& condition)
@@ -87,18 +69,19 @@ bool Generic::start(vpz::Condition& condition)
     fillFields(condition);
 
     if (m_dialog->run() == Gtk::RESPONSE_ACCEPT) {
-	assign(condition);
+        Generic::assign(condition);
     }
-
     m_dialog->hide();
-
     return true;
 }
 
 void Generic::assign(vpz::Condition& condition)
 {
-    deletePortsGeneric(condition);
-    assignGeneric(condition);
+    NameValue::deletePorts(condition);
+    TimeStep::deletePorts(condition);
+
+    NameValue::assign(condition);
+    TimeStep::assign(condition);
 }
 
 }}} // namespace vle gvle conditions

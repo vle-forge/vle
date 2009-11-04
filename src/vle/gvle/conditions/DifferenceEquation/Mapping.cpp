@@ -35,9 +35,6 @@
 #include <vle/value/Double.hpp>
 #include <vle/value/String.hpp>
 
-using namespace std;
-using namespace vle;
-
 namespace vle { namespace gvle { namespace conditions {
 
 Mapping::MappingTreeView::MappingTreeView(
@@ -81,17 +78,7 @@ Mapping::MappingTreeView::MappingTreeView(
     m_menuPopup.accelerate(*this);
 }
 
-Mapping::MappingTreeView::~MappingTreeView()
-{}
-
-void Mapping::MappingTreeView::setSizeColumn(int size)
-{
-    Gtk::TreeViewColumn* columnPort = get_column(m_columnPort - 1);
-    columnPort->set_min_width(size);
-    columnPort->set_fixed_width(size);
-}
-
-void Mapping::MappingTreeView::init(vpz::Condition& condition)
+void Mapping::MappingTreeView::init(const vpz::Condition& condition)
 {
     value::MapValue vector = condition.firstValue("mapping").toMap().value();
     value::MapValue::iterator iter = vector.begin();
@@ -172,49 +159,38 @@ void Mapping::MappingTreeView::onEdit()
     m_dialog->hide();
 }
 
-Mapping::Mapping()
-{
-
-}
+/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 Mapping::~Mapping()
 {
+    delete m_RadioButtonName;
+    delete m_RadioButtonPort;
+    delete m_RadioButtonMapping;
 }
 
-void Mapping::buildButtonMapping()
+void Mapping::assign(vpz::Condition& condition)
 {
-    m_RadioButtonName = new Gtk::RadioButton("name");
-    m_RadioButtonPort = new Gtk::RadioButton("port");
-    m_RadioButtonMapping = new Gtk::RadioButton("mapping");
+    condition.addValueToPort("mode", value::String::create(getMode()));
+    createMap(condition);
+}
+
+Gtk::Widget& Mapping::build(Glib::RefPtr<Gnome::Glade::Xml> ref)
+{
+    ref->get_widget("ModeExpander", m_expander);
+    ref->get_widget("ModeHBox", m_hboxMode);
+    ref->get_widget("NameRadioButton", m_RadioButtonName);
+    ref->get_widget("PortRadioButton", m_RadioButtonPort);
+    ref->get_widget("MappingRadioButton", m_RadioButtonMapping);
+
+    ref->get_widget_derived("MappingTreeView", m_mappingTreeView);
+    m_mappingTreeView->set_sensitive(false);
+
     Gtk::RadioButton::Group group = m_RadioButtonName->get_group();
     m_RadioButtonPort->set_group(group);
     m_RadioButtonMapping->set_group(group);
     m_RadioButtonMapping->signal_clicked().connect(
-      sigc::mem_fun( *this, &Mapping::onClickRadioButton));
-    m_hboxMode->pack_start(*m_RadioButtonName, true, false, 5);
-    m_hboxMode->pack_start(*m_RadioButtonPort, true, false, 5);
-    m_hboxMode->pack_start(*m_RadioButtonMapping, true, false, 5);
-    m_hboxMode->show_all();
-}
-
-void Mapping::fillFieldsMapping(vpz::Condition& condition)
-{
-
-    if (validPortMapping(condition, "mode")) {
-	std::string mode = condition.firstValue("mode").toString().value();
-	if (mode == "name")
-	    m_RadioButtonName->set_active();
-	else if (mode == "port")
-	    m_RadioButtonPort->set_active();
-	else if (mode == "mapping") {
-	    m_RadioButtonMapping->set_active();
-	    m_mappingTreeView->set_sensitive(true);
-	}
-    } else
-	m_RadioButtonName->set_active();
-
-    if (validPortMapping(condition, "mapping"))
-	m_mappingTreeView->init(condition);
+        sigc::mem_fun( *this, &Mapping::onClickRadioButton));
+    return *m_expander;
 }
 
 void Mapping::createMap(vpz::Condition& condition)
@@ -222,12 +198,14 @@ void Mapping::createMap(vpz::Condition& condition)
     value::Map* map = 0;
     Glib::RefPtr<Gtk::TreeModel> refModel = m_mappingTreeView->get_model();
     Gtk::TreeRow row;
+
     if (m_RadioButtonMapping->get_active()) {
 	refModel = m_mappingTreeView->get_model();
 	if (refModel->children().size() != 0) {
-	    map = new value::Map();
 	    Gtk::TreeModel::iterator iter = refModel->children().begin();
 	    std::string port, id;
+
+	    map = new value::Map();
 	    while (iter != refModel->children().end()) {
 		row = *iter;
 		port = row.get_value(m_mappingTreeView->getColumns()->
@@ -238,42 +216,74 @@ void Mapping::createMap(vpz::Condition& condition)
 	    }
 	}
     }
-
-    if (map != 0)
-	condition.addValueToPort("mapping", map);
+    if (map != 0) {
+        condition.addValueToPort("mapping", map);
+    }
 }
 
-void Mapping::assignMode(vpz::Condition& condition)
-{
-    condition.addValueToPort("mode",
-			     value::String::create(
-				 getCurrentRadioButton()));
-
-    createMap(condition);
-}
-
-bool Mapping::existPortMapping(vpz::Condition& condition,
-			       const std::string& name)
+void Mapping::deletePorts(vpz::Condition& condition)
 {
     std::list < std::string> list;
+
     condition.portnames(list);
-    if (std::find(list.begin(), list.end(), name) != list.end())
-	return true;
-    else
-	return false;
+    if (std::find(list.begin(), list.end(), "mode") != list.end()) {
+        condition.del("mode");
+    }
+    if (std::find(list.begin(), list.end(), "mapping") != list.end()) {
+	condition.del("mapping");
+    }
 }
 
-
-bool Mapping::validPortMapping(vpz::Condition& condition,
-			       const std::string& name)
+void Mapping::fillFields(const vpz::Condition& condition)
 {
-    if (existPortMapping(condition, name)) {
+    if (validPort(condition, "mode")) {
+	std::string mode = condition.firstValue("mode").toString().value();
+
+	if (mode == "name")
+	    m_RadioButtonName->set_active();
+	else if (mode == "port")
+	    m_RadioButtonPort->set_active();
+	else if (mode == "mapping") {
+	    m_RadioButtonMapping->set_active();
+	    m_mappingTreeView->set_sensitive(true);
+	}
+    } else {
+        m_RadioButtonName->set_active();
+    }
+
+    if (validPort(condition, "mapping")) {
+        m_mappingTreeView->init(condition);
+    }
+}
+
+std::string Mapping::getMode() const
+{
+    if (m_RadioButtonName->get_active()) {
+	return "name";
+    } else if (m_RadioButtonPort->get_active()) {
+        return "port";
+    } else {
+        return "mapping";
+    }
+}
+
+void Mapping::onClickRadioButton()
+{
+    m_mappingTreeView->set_sensitive(m_RadioButtonMapping->get_active());
+}
+
+bool Mapping::validPort(const vpz::Condition& condition,
+                        const std::string& name)
+{
+    std::list < std::string> list;
+
+    condition.portnames(list);
+    if (std::find(list.begin(), list.end(), name) != list.end()) {
 	if (name == "mode") {
 	    if (condition.getSetValues("mode").size() != 0
 		and condition.firstValue("mode").isString())
 		return true;
 	}
-
 	if (name == "mapping") {
 	    if (condition.getSetValues(name).size() != 0
 		and condition.firstValue(name).isMap())
@@ -281,33 +291,6 @@ bool Mapping::validPortMapping(vpz::Condition& condition,
 	}
     }
     return false;
-}
-
-void Mapping::deletePortsMapping(vpz::Condition& condition)
-{
-    if (existPortMapping(condition, "mode"))
-	condition.del("mode");
-
-    if (existPortMapping(condition, "mapping"))
-	condition.del("mapping");
-}
-
-const std::string Mapping::getCurrentRadioButton()
-{
-    if (m_RadioButtonName->get_active())
-	return "name";
-    else if (m_RadioButtonPort->get_active())
-	return "port";
-    else
-	return "mapping";
-}
-
-void Mapping::onClickRadioButton()
-{
-    if (m_RadioButtonMapping->get_active())
-	m_mappingTreeView->set_sensitive(true);
-    else
-	m_mappingTreeView->set_sensitive(false);
 }
 
 }}}

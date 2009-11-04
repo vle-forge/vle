@@ -1,5 +1,5 @@
 /**
- * @file vle/gvle/conditions/DifferenceEquation/Multiple.hpp
+ * @file vle/gvle/conditions/DifferenceEquation/TimeStep.hpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -29,38 +29,55 @@
  */
 
 
-#ifndef VLE_GVLE_CONDITIONS_DIFFERENCEEQUATION_MULTIPLE_HPP
-#define VLE_GVLE_CONDITIONS_DIFFERENCEEQUATION_MULTIPLE_HPP
+#ifndef VLE_GVLE_CONDITIONS_DIFFERENCEEQUATION_TIMESTEP_HPP
+#define VLE_GVLE_CONDITIONS_DIFFERENCEEQUATION_TIMESTEP_HPP
 
-#include <vle/gvle/ConditionPlugin.hpp>
-#include <vle/gvle/conditions/DifferenceEquation/Mapping.hpp>
-#include <vle/gvle/conditions/DifferenceEquation/TimeStep.hpp>
-#include <vle/gvle/conditions/DifferenceEquation/Variables.hpp>
-#include <gtkmm/dialog.h>
+#include <vle/vpz/Condition.hpp>
+#include <gtkmm/button.h>
+#include <gtkmm/comboboxtext.h>
+#include <gtkmm/frame.h>
+#include <gtkmm/spinbutton.h>
 #include <libglademm.h>
 
 namespace vle { namespace gvle { namespace conditions {
 
-class Multiple : public ConditionPlugin, public TimeStep,
-		 public Variables, public Mapping
+class TimeStep
 {
 public:
-    Multiple(const std::string& name);
-    virtual ~Multiple() { }
+    TimeStep() { }
+    virtual ~TimeStep() { }
 
-    virtual bool start(vpz::Condition& condition);
-    virtual bool start(vpz::Condition&, const std::string&)
-    { return true; }
+protected:
+    void assign(vpz::Condition& condition);
+    Gtk::Widget& build(Glib::RefPtr<Gnome::Glade::Xml> ref);
+    void deletePorts(vpz::Condition& condition);
+    void fillFields(const vpz::Condition& condition);
 
 private:
-    Gtk::Dialog* m_dialog;
+    class UnitComboBoxText : public Gtk::ComboBoxText
+    {
+    public:
+	UnitComboBoxText(BaseObjectType* cobject,
+		       const Glib::RefPtr<Gnome::Glade::Xml>&) :
+	    Gtk::ComboBoxText(cobject) { }
+	virtual ~UnitComboBoxText() {}
+    };
 
-    void assign(vpz::Condition& condition);
-    void build();
-    void fillFields(vpz::Condition& condition);
+    Gtk::Frame*       m_frame;
+    Gtk::SpinButton*  m_spinTime;
+    Gtk::CheckButton* m_checkGlobal;
+    UnitComboBoxText* m_comboUnit;
+
+    bool validPort(const vpz::Condition& condition,
+		   const std::string& name);
+
+    void onClickCheckButton();
 };
 
 }}} // namespace vle gvle conditions
 
 #endif
+
+
+
 

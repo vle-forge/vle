@@ -33,8 +33,10 @@
 #include <vle/gvle/OpenModelingPluginBox.hpp>
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/GVLE.hpp>
+#include <vle/gvle/NewDynamicsBox.hpp>
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/vpz/AtomicModels.hpp>
+#include <vle/utils/Package.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Socket.hpp>
@@ -231,9 +233,52 @@ void DynamicBox::on_cancel()
 
 void DynamicBox::onNewLibrary()
 {
-    OpenModelingPluginBox box(mXml, mGVLE, mAtom, mVAtom, mDynamic, mConditions,
-                              mObservables);
-    box.run();
+    OpenModelingPluginBox box(mXml, mGVLE);
+
+    if (box.run() == Gtk::RESPONSE_OK) {
+        NewDynamicsBox box2(mXml);
+
+        if (box2.run() == Gtk::RESPONSE_OK and
+            not box2.getClassName().empty() and
+            not box2.getNamespace().empty()) {
+            if (execPlugin(box.pluginName(),
+                           box2.getClassName(),
+                           box2.getNamespace()) == Gtk::RESPONSE_OK) {
+                mComboPackage->set_active_text(box2.getNamespace());
+                mComboLibrary->append_text(box2.getClassName());
+                mComboLibrary->set_active_text(box2.getClassName());
+                mModel->set_text("");
+            }
+        }
+    }
+}
+
+int DynamicBox::execPlugin(const std::string& pluginname,
+                           const std::string& classname,
+                           const std::string& namespace_)
+{
+    PluginFactory& plf = mGVLE->pluginFactory();
+    ModelingPlugin& plugin = plf.getModeling(pluginname);
+
+    if (plugin.create(mAtom, mVAtom, mDynamic, mConditions, mObservables,
+                      classname, namespace_)) {
+        const std::string& buffer = plugin.source();
+        std::string filename = utils::Path::path().getPackageSrcFile(classname);
+        filename += ".cpp";
+
+        try {
+            std::ofstream f(filename.c_str());
+            f.exceptions(std::ofstream::failbit | std::ofstream::badbit);
+            f << buffer;
+        } catch(const std::ios_base::failure& e) {
+            throw utils::ArgError(fmt(
+                    _("Cannot store buffer in file '%1%'")) % filename);
+        }
+
+        return Gtk::RESPONSE_OK;
+    } else {
+        return Gtk::RESPONSE_CANCEL;
+    }
 }
 
 }} // namespace vle gvle

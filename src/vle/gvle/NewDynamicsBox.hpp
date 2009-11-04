@@ -1,5 +1,5 @@
 /**
- * @file vle/gvle/conditions/DifferenceEquation/Multiple.hpp
+ * @file vle/gvle/NewDynamicsBox.hpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -29,38 +29,44 @@
  */
 
 
-#ifndef VLE_GVLE_CONDITIONS_DIFFERENCEEQUATION_MULTIPLE_HPP
-#define VLE_GVLE_CONDITIONS_DIFFERENCEEQUATION_MULTIPLE_HPP
+#ifndef VLE_GVLE__NEWDYNAMICSBOX_HPP
+#define VLE_GVLE__NEWDYNAMICSBOX_HPP
 
-#include <vle/gvle/ConditionPlugin.hpp>
-#include <vle/gvle/conditions/DifferenceEquation/Mapping.hpp>
-#include <vle/gvle/conditions/DifferenceEquation/TimeStep.hpp>
-#include <vle/gvle/conditions/DifferenceEquation/Variables.hpp>
-#include <gtkmm/dialog.h>
 #include <libglademm.h>
+#include <gtkmm.h>
 
-namespace vle { namespace gvle { namespace conditions {
+namespace vle { namespace gvle {
 
-class Multiple : public ConditionPlugin, public TimeStep,
-		 public Variables, public Mapping
+class NewDynamicsBox
 {
 public:
-    Multiple(const std::string& name);
-    virtual ~Multiple() { }
+    NewDynamicsBox(Glib::RefPtr<Gnome::Glade::Xml> xml);
+    virtual ~NewDynamicsBox() { }
 
-    virtual bool start(vpz::Condition& condition);
-    virtual bool start(vpz::Condition&, const std::string&)
-    { return true; }
+    std::string getClassName() const
+    { return mEntryClassName->get_text(); }
+
+    std::string getNamespace() const
+    { return mEntryNamespace->get_text(); }
+
+    int run();
 
 private:
-    Gtk::Dialog* m_dialog;
+    void onApply();
+    void onCancel();
 
-    void assign(vpz::Condition& condition);
-    void build();
-    void fillFields(vpz::Condition& condition);
+    Glib::RefPtr<Gnome::Glade::Xml> mXml;
+
+    Gtk::Dialog*                    mDialog;
+    //Entry
+    Gtk::Entry*                     mEntryClassName;
+    Gtk::Entry*                     mEntryNamespace;
+    //Button
+    Gtk::Button*                    mButtonApply;
+    Gtk::Button*                    mButtonCancel;
 };
 
-}}} // namespace vle gvle conditions
+}} // namespace vle gvle
 
 #endif
 

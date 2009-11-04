@@ -75,7 +75,8 @@ public:
      * @param dynamic A reference to the current vpz::Dynamic.
      * @param conditions A reference to the list of vpz::Conditions.
      * @param observables A reference ot the list of vpz::Observables.
-     * @param classname The name of the class choose by the user.
+     * @param classname The name of the class choosed by the user.
+     * @param classname The namespace choosed by the user.
      *
      * @return true if all is valid, false otherwise.
      */
@@ -84,7 +85,8 @@ public:
                         vpz::Dynamic& dynamic,
                         vpz::Conditions& conditions,
                         vpz::Observables& observables,
-                        const std::string& classname) = 0;
+                        const std::string& classname,
+                        const std::string& namespace_) = 0;
 
     /**
      * @brief Call to rewrite an atomic model, with input and output ports,
@@ -98,6 +100,7 @@ public:
      * @param conditions A reference to the list of vpz::Conditions.
      * @param observables A reference ot the list of vpz::Observables.
      * @param conf The last configuration of the plug-in.
+     * @param buffer The entire file.
      *
      * @return true if all is valid, false otherwise.
      */
@@ -106,7 +109,8 @@ public:
                         vpz::Dynamic& dynamic,
                         vpz::Conditions& conditions,
                         vpz::Observables& observables,
-                        const std::string& conf) = 0;
+                        const std::string& conf,
+                        const std::string& buffer) = 0;
 
     /**
      * @brief Get the C++ source code to write into the dynamic library.

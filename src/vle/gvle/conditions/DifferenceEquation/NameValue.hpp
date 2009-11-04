@@ -1,5 +1,5 @@
 /**
- * @file vle/gvle/conditions/DifferenceEquation/Mapping.hpp
+ * @file vle/gvle/conditions/DifferenceEquation/NameValue.hpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -29,92 +29,85 @@
  */
 
 
-#ifndef VLE_GVLE_CONDITIONS_DIFFERENCEEQUATION_MAPPING_HPP
-#define VLE_GVLE_CONDITIONS_DIFFERENCEEQUATION_MAPPING_HPP
+#ifndef VLE_GVLE_CONDITIONS_DIFFERENCEEQUATION_NAMEVALUE_HPP
+#define VLE_GVLE_CONDITIONS_DIFFERENCEEQUATION_NAMEVALUE_HPP
 
-#include <vle/gvle/ConditionPlugin.hpp>
-#include <gtkmm/dialog.h>
-#include <gtkmm/expander.h>
+#include <vle/vpz/Condition.hpp>
+#include <gtkmm/box.h>
 #include <gtkmm/liststore.h>
+#include <gtkmm/treestore.h>
 #include <gtkmm/treeview.h>
 #include <libglademm.h>
 
 namespace vle { namespace gvle { namespace conditions {
 
-class Mapping
+class NameValue
 {
 public:
-    Mapping() { }
-    virtual ~Mapping();
+    NameValue() { }
+    virtual ~NameValue() { }
+
+    std::string getVariableName() const
+	{ return m_entryName->get_text(); }
 
 protected:
-    void assign(vpz::Condition& condition);
-    Gtk::Widget& build(Glib::RefPtr<Gnome::Glade::Xml> ref);
-    void deletePorts(vpz::Condition& condition);
-    void fillFields(const vpz::Condition& condition);
-    virtual std::string getMode() const;
-
-    class MappingColumns : public Gtk::TreeModel::ColumnRecord
+    class InitColumns : public Gtk::TreeModelColumnRecord
     {
     public:
-        MappingColumns() {
-            add(m_col_port);
-            add(m_col_id);
-        }
+	InitColumns() {
+	    add(m_col_value);
+	}
 
-        Gtk::TreeModelColumn<Glib::ustring> m_col_port;
-        Gtk::TreeModelColumn<Glib::ustring> m_col_id;
+	Gtk::TreeModelColumn<double> m_col_value;
     };
 
-    class MappingTreeView : public Gtk::TreeView
+    class InitTreeView : public Gtk::TreeView
     {
     public:
-	MappingTreeView(BaseObjectType* cobject,
+	InitTreeView(BaseObjectType* cobject,
 		     const Glib::RefPtr<Gnome::Glade::Xml>& refGlade);
-	virtual ~MappingTreeView() { }
+	virtual ~InitTreeView();
 
-	inline MappingColumns* getColumns()
-	  { return &m_columnsMapping; }
+	const InitColumns& getColumns() const { return m_columnsInit; }
 
 	void init(const vpz::Condition& condition);
 
     protected:
 	virtual bool on_button_press_event(GdkEventButton* ev);
+
 	void onAdd();
 	void onRemove();
-	void onEdit();
+	void onUp();
+	void onDown();
 
     private:
 	Gtk::Menu                    m_menuPopup;
-	MappingColumns               m_columnsMapping;
-	Glib::RefPtr<Gtk::ListStore> m_refTreeMapping;
-
-	Gtk::Dialog* m_dialog;
-	Gtk::Entry*  m_port;
-	Gtk::Entry*  m_id;
-
-	int m_columnPort;
-	int m_columnId;
+	InitColumns                  m_columnsInit;
+	Glib::RefPtr<Gtk::ListStore> m_refTreeInit;
     };
 
-private:
-    Gtk::Expander*     m_expander;
-    MappingTreeView*   m_mappingTreeView;
-    Gtk::HBox*         m_hboxMode;
-    Gtk::RadioButton*  m_RadioButtonName;
-    Gtk::RadioButton*  m_RadioButtonPort;
-    Gtk::RadioButton*  m_RadioButtonMapping;
+    void assign(vpz::Condition& condition);
+    Gtk::Widget& build(Glib::RefPtr<Gnome::Glade::Xml> ref);
+    void deletePorts(vpz::Condition& condition);
+    void fillFields(const vpz::Condition& condition);
 
-    void createMap(vpz::Condition& condition);
+private:
+    void createSetInit(vpz::Condition& condition);
     bool validPort(const vpz::Condition& condition,
                    const std::string& name);
 
-    void onClickRadioButton();
+    void onClickCheckButton();
+
+    Gtk::HBox*         m_hbox;
+    Gtk::Entry*        m_entryName;
+    Gtk::Entry*        m_entryValue;
+    InitTreeView*      m_initTreeView;
 };
 
 }}} // namespace vle gvle conditions
 
 #endif
+
 
 
 

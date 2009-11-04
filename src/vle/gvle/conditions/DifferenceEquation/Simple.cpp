@@ -30,66 +30,37 @@
 
 
 #include <vle/gvle/conditions/DifferenceEquation/Simple.hpp>
-#include <vle/gvle/Message.hpp>
 #include <vle/utils/Path.hpp>
-#include <libglademm/xml.h>
-#include <boost/lexical_cast.hpp>
-#include <boost/assign/list_inserter.hpp>
-
-using namespace std;
-using namespace boost::assign;
-using namespace vle;
 
 namespace vle { namespace gvle { namespace conditions {
 
-Simple::Simple(const std::string& name) :
-    ConditionPlugin(name),
-    GenericPlugin(),
-    Mapping(),
-    m_dialog(0)
-{}
+Simple::Simple(const std::string& name) : ConditionPlugin(name), m_dialog(0)
+{ }
 
 Simple::~Simple()
-{}
+{ }
 
 void Simple::build()
 {
+    Gtk::VBox* vbox;
     std::string glade = utils::Path::path().
-	getConditionGladeFile("DifferenceEquation.glade");
+        getConditionGladeFile("DifferenceEquation.glade");
     Glib::RefPtr<Gnome::Glade::Xml> ref = Gnome::Glade::Xml::create(glade);
 
     ref->get_widget("DialogPluginSimpleBox", m_dialog);
     m_dialog->set_title("DifferenceEquation - Simple");
-    ref->get_widget("SpinButtonTimeSimple", m_spinTime);
-    ref->get_widget("TimestepGlobalButtonSimple", m_checkGlobal);
-    ref->get_widget("HBoxTimestepSimple", m_hboxTimestep);
-    ref->get_widget("HBoxModeSimple", m_hboxMode);
-    ref->get_widget("entryNameSimple", m_entryName);
-    ref->get_widget("entryValueSimple", m_entryValue);
-    ref->get_widget_derived("initTreeViewSimple", m_initTreeView);
-    ref->get_widget_derived("mappingTreeViewSimple", m_mappingTreeView);
-    m_mappingTreeView->setSizeColumn(125);
-    m_mappingTreeView->set_sensitive(false);
+    ref->get_widget("SimplePluginVBox", vbox);
 
-    assert(m_dialog);
-    assert(m_spinTime);
-    assert(m_checkGlobal);
-    assert(m_hboxTimestep);
-    assert(m_hboxMode);
-    assert(m_entryName);
-    assert(m_entryValue);
-    assert(m_initTreeView);
-    assert(m_mappingTreeView);
-
-    buildGeneric();
-    buildButtonMapping();
+    vbox->pack_start(NameValue::build(ref));
+    vbox->pack_start(TimeStep::build(ref));
+    vbox->pack_start(Mapping::build(ref));
 }
 
 void Simple::fillFields(vpz::Condition& condition)
 {
-
-    fillFieldsGeneric(condition);
-    fillFieldsMapping(condition);
+    NameValue::fillFields(condition);
+    Mapping::fillFields(condition);
+    TimeStep::fillFields(condition);
 }
 
 bool Simple::start(vpz::Condition& condition)
@@ -100,18 +71,19 @@ bool Simple::start(vpz::Condition& condition)
     if (m_dialog->run() == Gtk::RESPONSE_ACCEPT) {
 	assign(condition);
     }
-
     m_dialog->hide();
-
     return true;
 }
 
 void Simple::assign(vpz::Condition& condition)
 {
-    deletePortsGeneric(condition);
-    deletePortsMapping(condition);
-    assignGeneric(condition);
-    assignMode(condition);
+    NameValue::deletePorts(condition);
+    Mapping::deletePorts(condition);
+    TimeStep::deletePorts(condition);
+
+    NameValue::assign(condition);
+    Mapping::assign(condition);
+    TimeStep::assign(condition);
 }
 
 }}} // namespace vle gvle conditions

@@ -29,51 +29,36 @@
  */
 
 
-#ifndef VLE_GVLE_CONDITIONS_DIFFERENCEEQUATION_GENRIC_HPP
-#define VLE_GVLE_CONDITIONS_DIFFERENCEEQUATION_GENRIC_HPP
+#ifndef VLE_GVLE_CONDITIONS_DIFFERENCEEQUATION_GENERIC_HPP
+#define VLE_GVLE_CONDITIONS_DIFFERENCEEQUATION_GENERIC_HPP
 
 #include <vle/gvle/ConditionPlugin.hpp>
-#include <vle/gvle/conditions/DifferenceEquation/GenericPlugin.hpp>
+#include <vle/gvle/conditions/DifferenceEquation/NameValue.hpp>
+#include <vle/gvle/conditions/DifferenceEquation/TimeStep.hpp>
 #include <gtkmm/dialog.h>
 #include <libglademm.h>
 
 namespace vle { namespace gvle { namespace conditions {
 
-class Generic : public ConditionPlugin, public GenericPlugin
+class Generic : public ConditionPlugin, public NameValue, public TimeStep
 {
 public:
     Generic(const std::string& name);
-
     virtual ~Generic();
 
     virtual bool start(vpz::Condition& condition);
     virtual bool start(vpz::Condition&,
-	       const std::string&)
+		       const std::string&)
 	{ return true; }
 
 private:
-    Gtk::Dialog*       m_dialog;
+    Gtk::Dialog* m_dialog;
 
-
-    void build();
-
-    /**
-     * @brief fill the fields if the ports already exist
-     * @param condition the current condition
-     *
-     */
-    void fillFields(vpz::Condition& condition);
-
-    /**
-     * @brief save the ports in the condition
-     * @param condition the current condition
-     *
-     */
     void assign(vpz::Condition& condition);
-
+    void build();
+    void fillFields(vpz::Condition& condition);
 };
 
 }}} // namespace vle gvle conditions
 
 #endif
-

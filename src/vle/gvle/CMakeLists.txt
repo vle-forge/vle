@@ -33,13 +33,13 @@ SET(GVLE_HPP About.hpp AtomicModelBox.hpp BooleanBox.hpp CalendarBox.hpp
   HostsBox.hpp ImportClassesBox.hpp ImportModelBox.hpp InteractiveTypeBox.hpp
   LaunchSimulationBox.hpp MatrixBox.hpp Message.hpp ModelClassBox.hpp
   ModelDescriptionBox.hpp ModelingPlugin.hpp ModelTreeBox.hpp Modeling.hpp
-  NewModelClassBox.hpp NewProjectBox.hpp NewTypeBox.hpp ObsAndViewBox.hpp
-  ObservableBox.hpp ObserverPlugin.hpp OpenModelingPluginBox.hpp
-  OpenPackageBox.hpp OpenVpzBox.hpp OutputPlugin.hpp ParameterExecutionBox.hpp
-  PluginFactory.hpp PortDialog.hpp PreferencesBox.hpp QuitBox.hpp
-  ReplicasBox.hpp SaveVpzBox.hpp Settings.hpp SimpleTypeBox.hpp TableBox.hpp
-  TreeViewConditions.hpp TreeViewObservable.hpp TreeViewValue.hpp UndoRedo.hpp
-  ValueBox.hpp ValuesTreeView.hpp View.hpp ViewDrawingArea.hpp
+  NewDynamicsBox.hpp NewModelClassBox.hpp NewProjectBox.hpp NewTypeBox.hpp
+  ObsAndViewBox.hpp ObservableBox.hpp ObserverPlugin.hpp
+  OpenModelingPluginBox.hpp OpenPackageBox.hpp OpenVpzBox.hpp OutputPlugin.hpp
+  ParameterExecutionBox.hpp PluginFactory.hpp PortDialog.hpp PreferencesBox.hpp
+  QuitBox.hpp ReplicasBox.hpp SaveVpzBox.hpp Settings.hpp SimpleTypeBox.hpp
+  TableBox.hpp TreeViewConditions.hpp TreeViewObservable.hpp TreeViewValue.hpp
+  UndoRedo.hpp ValueBox.hpp ValuesTreeView.hpp View.hpp ViewDrawingArea.hpp
   ViewOutputBox.hpp XmlTypeBox.hpp)
 
 SET(GVLE_CPP About.cpp AtomicModelBox.cpp BooleanBox.cpp CalendarBox.cpp
@@ -48,9 +48,10 @@ SET(GVLE_CPP About.cpp AtomicModelBox.cpp BooleanBox.cpp CalendarBox.cpp
   GVLE.cpp GVLEMenuAndToolbar.cpp HelpBox.cpp HostsBox.cpp ImportClassesBox.cpp
   ImportModelBox.cpp InteractiveTypeBox.cpp LaunchSimulationBox.cpp
   MatrixBox.cpp Message.cpp ModelClassBox.cpp ModelDescriptionBox.cpp
-  ModelTreeBox.cpp Modeling.cpp ModelingPlugin.cpp NewModelClassBox.cpp
-  NewProjectBox.cpp NewTypeBox.cpp ObsAndViewBox.cpp PluginFactory.cpp
-  ObservableBox.cpp OpenModelingPluginBox.cpp OpenPackageBox.cpp OpenVpzBox.cpp
+  ModelTreeBox.cpp Modeling.cpp ModelingPlugin.cpp NewDynamicsBox.cpp
+  NewModelClassBox.cpp NewProjectBox.cpp NewTypeBox.cpp ObsAndViewBox.cpp
+  PluginFactory.cpp ObservableBox.cpp OpenModelingPluginBox.cpp
+  OpenPackageBox.cpp OpenVpzBox.cpp
   OutputPlugin.cpp ParameterExecutionBox.cpp PortDialog.cpp PreferencesBox.cpp
   ReplicasBox.cpp QuitBox.cpp SaveVpzBox.cpp Settings.cpp SimpleTypeBox.cpp
   TableBox.cpp TreeViewConditions.cpp TreeViewObservable.cpp TreeViewValue.cpp

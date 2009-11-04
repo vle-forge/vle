@@ -44,14 +44,8 @@
 namespace vle { namespace gvle {
 
 OpenModelingPluginBox::OpenModelingPluginBox(
-    Glib::RefPtr<Gnome::Glade::Xml> xml, GVLE* gvle,
-    graph::AtomicModel& atom,
-    vpz::AtomicModel& vatom,
-    vpz::Dynamic& dynamic,
-    vpz::Conditions& conditions,
-    vpz::Observables& observables)
-    : mXml(xml), mGVLE(gvle), mAtom(atom), mVAtom(vatom), mDynamic(dynamic),
-    mConditions(conditions), mObservables(observables)
+    Glib::RefPtr<Gnome::Glade::Xml> xml, GVLE* gvle)
+    : mXml(xml), mGVLE(gvle)
 {
     xml->get_widget("DialogModelingPlugin", mDialog);
     xml->get_widget("TreeViewModelingPlugin", mTreeView);
@@ -111,15 +105,9 @@ void OpenModelingPluginBox::onApply()
 
 	if (iter) {
 	    Gtk::TreeModel::Row row = *iter;
-	    std::string name = row.get_value(mColumns.mName);
 
-            SimpleTypeBox box("Name of the new C++ class", "");
-            std::string result = box.run();
-            if (box.valid()) {
-                mDialog->response(execPlugin(name, result));
-            } else {
-                mDialog->response(Gtk::RESPONSE_CANCEL);
-            }
+	    mPluginName = row.get_value(mColumns.mName);
+            mDialog->response(Gtk::RESPONSE_OK);
 	}
     }
     mDialog->hide_all();
@@ -136,33 +124,6 @@ void OpenModelingPluginBox::onRowActivated(
     Gtk::TreeViewColumn* /*column*/)
 {
     onApply();
-}
-
-int OpenModelingPluginBox::execPlugin(const std::string& pluginname,
-                                      const std::string& classname)
-{
-    PluginFactory& plf = mGVLE->pluginFactory();
-    ModelingPlugin& plugin = plf.getModeling(pluginname);
-
-    if (plugin.create(mAtom, mVAtom, mDynamic, mConditions, mObservables,
-                      classname)) {
-        const std::string& buffer = plugin.source();
-        std::string filename = utils::Path::path().getPackageSrcFile(classname);
-        filename += ".cpp";
-
-        try {
-            std::ofstream f(filename.c_str());
-            f.exceptions(std::ofstream::failbit | std::ofstream::badbit);
-            f << buffer;
-        } catch(const std::ios_base::failure& e) {
-            throw utils::ArgError(fmt(
-                    _("Cannot store buffer in file '%1%'")) % filename);
-        }
-
-        return Gtk::RESPONSE_OK;
-    } else {
-        return Gtk::RESPONSE_CANCEL;
-    }
 }
 
 }} // namespace vle gvle

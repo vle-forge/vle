@@ -116,6 +116,9 @@ namespace vle { namespace gvle {
         void on_apply();
         void on_cancel();
         void onNewLibrary();
+        int execPlugin(const std::string& pluginname,
+                       const std::string& classname,
+                       const std::string& namespace_);
     };
 
 }} // namespace vle gvle

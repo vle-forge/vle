@@ -59,14 +59,12 @@ class OpenModelingPluginBox
 {
 public:
     OpenModelingPluginBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
-                          GVLE* gvle,
-                          graph::AtomicModel& atom,
-                          vpz::AtomicModel& vatom,
-                          vpz::Dynamic& dynamic,
-                          vpz::Conditions& conditions,
-                          vpz::Observables& observables);
+                          GVLE* gvle);
 
     virtual ~OpenModelingPluginBox();
+
+    std::string pluginName() const
+    { return mPluginName; }
 
     int run();
 
@@ -85,16 +83,12 @@ private:
 
     Glib::RefPtr<Gnome::Glade::Xml> mXml;
     GVLE* mGVLE;
-    graph::AtomicModel& mAtom;
-    vpz::AtomicModel& mVAtom;
-    vpz::Dynamic& mDynamic;
-    vpz::Conditions& mConditions;
-    vpz::Observables& mObservables;
 
     Gtk::Dialog*                    mDialog;
     ModelingPluginTreeColumn        mColumns;
     Gtk::TreeView*                  mTreeView;
     Glib::RefPtr<Gtk::TreeStore>    mRefTreeModelingPlugin;
+    std::string                     mPluginName;
 
     //Buttons
     Gtk::Button*                    mButtonApply;
@@ -105,9 +99,6 @@ private:
     void onCancel();
     void onRowActivated(const Gtk::TreeModel::Path& path,
                         Gtk::TreeViewColumn *column);
-
-    int execPlugin(const std::string& pluginname,
-                   const std::string& classname);
 };
 
 }} // namespace vle gvle

@@ -1,5 +1,5 @@
 /**
- * @file vle/gvle/conditions/DifferenceEquation/GenericPlugin.cpp
+ * @file vle/gvle/conditions/DifferenceEquation/NameValue.cpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -29,22 +29,16 @@
  */
 
 
-#include <vle/gvle/conditions/DifferenceEquation/GenericPlugin.hpp>
+#include <vle/gvle/conditions/DifferenceEquation/NameValue.hpp>
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/SimpleTypeBox.hpp>
-#include <vle/value/Value.hpp>
-#include <vle/value/Set.hpp>
 #include <vle/value/Double.hpp>
-#include <vle/value/String.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
-using namespace std;
-using namespace vle;
-
 namespace vle { namespace gvle { namespace conditions {
 
-GenericPlugin::InitTreeView::InitTreeView(
+NameValue::InitTreeView::InitTreeView(
     BaseObjectType* cobject,
     const Glib::RefPtr<Gnome::Glade::Xml>&):
     Gtk::TreeView(cobject)
@@ -61,34 +55,33 @@ GenericPlugin::InitTreeView::InitTreeView(
 		_("_Add"),
 		sigc::mem_fun(
 		    *this,
-		    &GenericPlugin::InitTreeView::onAdd)));
+		    &NameValue::InitTreeView::onAdd)));
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
 		_("_Remove"),
 		sigc::mem_fun(
 		    *this,
-		    &GenericPlugin::InitTreeView::onRemove)));
+		    &NameValue::InitTreeView::onRemove)));
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
 		_("_Up"),
 		sigc::mem_fun(
 		    *this,
-		    &GenericPlugin::InitTreeView::onUp)));
+		    &NameValue::InitTreeView::onUp)));
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
 		_("_Down"),
 		sigc::mem_fun(
 		    *this,
-		    &GenericPlugin::InitTreeView::onDown)));
+		    &NameValue::InitTreeView::onDown)));
     }
     m_menuPopup.accelerate(*this);
 }
 
-GenericPlugin::InitTreeView::~InitTreeView()
-{
-}
+NameValue::InitTreeView::~InitTreeView()
+{ }
 
-void GenericPlugin::InitTreeView::init(vpz::Condition& condition)
+void NameValue::InitTreeView::init(const vpz::Condition& condition)
 {
     value::VectorValue vector = condition.firstValue("init").toSet().value();
     value::VectorValue::iterator iter = vector.begin();
@@ -102,7 +95,7 @@ void GenericPlugin::InitTreeView::init(vpz::Condition& condition)
     }
 }
 
-bool GenericPlugin::InitTreeView::on_button_press_event(GdkEventButton* event)
+bool NameValue::InitTreeView::on_button_press_event(GdkEventButton* event)
 {
     bool return_value = Gtk::TreeView::on_button_press_event(event);
     if ( (event->type == GDK_BUTTON_PRESS) && (event->button == 3) ) {
@@ -112,7 +105,7 @@ bool GenericPlugin::InitTreeView::on_button_press_event(GdkEventButton* event)
     return return_value;
 }
 
-void GenericPlugin::InitTreeView::onAdd()
+void NameValue::InitTreeView::onAdd()
 {
     SimpleTypeBox box(_("Value of the init"), "");
     try {
@@ -128,7 +121,7 @@ void GenericPlugin::InitTreeView::onAdd()
     }
 }
 
-void GenericPlugin::InitTreeView::onRemove()
+void NameValue::InitTreeView::onRemove()
 {
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
 
@@ -141,7 +134,7 @@ void GenericPlugin::InitTreeView::onRemove()
     }
 }
 
-void GenericPlugin::InitTreeView::onUp()
+void NameValue::InitTreeView::onUp()
 {
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
     Glib::RefPtr<Gtk::TreeModel> refModel = get_model();
@@ -156,7 +149,7 @@ void GenericPlugin::InitTreeView::onUp()
     }
 }
 
-void GenericPlugin::InitTreeView::onDown()
+void NameValue::InitTreeView::onDown()
 {
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
     Glib::RefPtr<Gtk::TreeModel> refModel = get_model();
@@ -170,108 +163,10 @@ void GenericPlugin::InitTreeView::onDown()
     }
 }
 
-GenericPlugin::GenericPlugin()
+/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
+void NameValue::assign(vpz::Condition& condition)
 {
-}
-
-GenericPlugin::~GenericPlugin()
-{
-}
-
-void GenericPlugin::buildGeneric()
-{
-    m_spinTime->set_range(
-	0.01,
-	std::numeric_limits < double >::max());
-    m_spinTime->set_value(1.00);
-
-    m_checkGlobal->signal_clicked().connect(
-	sigc::mem_fun( *this, &GenericPlugin::onClickCheckButton));
-
-    m_comboUnit = new Gtk::ComboBoxText();
-    m_comboUnit->append_text("");
-    m_comboUnit->append_text("day");
-    m_comboUnit->append_text("week");
-    m_comboUnit->append_text("month");
-    m_comboUnit->append_text("year");
-    m_hboxTimestep->pack_start(*m_comboUnit, true, true, 5);
-    m_comboUnit->show_all();
-}
-
-void GenericPlugin::fillFieldsGeneric(vpz::Condition& condition)
-{
-    if (validPortGeneric(condition, "time-step")) {
-       if (condition.firstValue("time-step").isMap()){
-	    value::Map map = condition.firstValue("time-step").toMap();
-	    if (map.value().find("value") != map.end()
-		and map.value().find("unit") != map.end()) {
-		m_spinTime->set_value(map["value"].toDouble().value());
-		m_comboUnit->set_active_text(map["unit"].toString().value());
-	    }
-       } else  {
-	   m_spinTime->set_value(condition.firstValue("time-step").
-				 toDouble().value());
-       }
-    } else {
-	m_checkGlobal->set_active(true);
-	m_spinTime->set_sensitive(false);
-	m_comboUnit->set_sensitive(false);
-    }
-
-    if (validPortGeneric(condition, "name"))
-	m_entryName->set_text(condition.firstValue("name").
-			 toString().value());
-    if (validPortGeneric(condition, "value"))
-	m_entryValue->set_text(boost::lexical_cast<std::string>(
-			      condition.firstValue("value").
-			      toDouble().value()));
-
-    if (validPortGeneric(condition, "init"))
-	m_initTreeView->init(condition);
-}
-
-void GenericPlugin::createTimeStep(vpz::Condition& condition)
-{
-    if (not m_checkGlobal->get_active()) {
-	if (m_comboUnit->get_active_text() == "")
-	    condition.addValueToPort("time-step",
-				     value::Double::create(
-					 m_spinTime->get_value()));
-	else {
-	    value::Map* map = new value::Map();
-	    map->addDouble("value", m_spinTime->get_value() );
-	    map->addString("unit", m_comboUnit->get_active_text());
-	    condition.addValueToPort("time-step", map);
-	}
-    }
-}
-
-void GenericPlugin::createSetInit(vpz::Condition& condition)
-{
-    value::Set* set = 0;
-    Glib::RefPtr<Gtk::TreeModel> refModel = m_initTreeView->get_model();
-    Gtk::TreeRow row;
-    if (refModel->children().size() != 0) {
-	set = new value::Set();
-	Gtk::TreeModel::iterator iter = refModel->children().begin();
-	double initValue;
-	while (iter != refModel->children().end()) {
-	    row = *iter;
-	    initValue = row.get_value(
-		m_initTreeView->getColumns()->m_col_value);
-	    set->addDouble(initValue);
-	    ++iter;
-	}
-    }
-
-    if (set != 0)
-	condition.addValueToPort("init",set);
-}
-
-void GenericPlugin::assignGeneric(vpz::Condition& condition)
-{
-    createTimeStep(condition);
-
     if (not m_entryName->get_text().empty())
 	condition.addValueToPort("name",
 				 value::String::create(
@@ -289,54 +184,88 @@ void GenericPlugin::assignGeneric(vpz::Condition& condition)
     createSetInit(condition);
 }
 
-bool GenericPlugin::existPort(vpz::Condition& condition, std::string name)
+Gtk::Widget& NameValue::build(Glib::RefPtr<Gnome::Glade::Xml> ref)
+{
+    ref->get_widget("NameValueHBox", m_hbox);
+    ref->get_widget("NameEntry", m_entryName);
+    ref->get_widget("ValueEntry", m_entryValue);
+    ref->get_widget_derived("InitTreeView", m_initTreeView);
+    return *m_hbox;
+}
+
+void NameValue::createSetInit(vpz::Condition& condition)
+{
+    value::Set* set = 0;
+    Glib::RefPtr<Gtk::TreeModel> refModel = m_initTreeView->get_model();
+    Gtk::TreeRow row;
+
+    if (refModel->children().size() != 0) {
+	set = new value::Set();
+	Gtk::TreeModel::iterator iter = refModel->children().begin();
+	double initValue;
+
+	while (iter != refModel->children().end()) {
+	    row = *iter;
+	    initValue = row.get_value(
+		m_initTreeView->getColumns().m_col_value);
+	    set->addDouble(initValue);
+	    ++iter;
+	}
+    }
+    if (set != 0) {
+	condition.addValueToPort("init",set);
+    }
+}
+
+void NameValue::deletePorts(vpz::Condition& condition)
 {
     std::list < std::string> list;
+
     condition.portnames(list);
-    if (std::find(list.begin(), list.end(), name) != list.end())
-	return true;
-    else
-	return false;
-}
-
-void GenericPlugin::deletePortsGeneric(vpz::Condition& condition)
-{
-    if (existPort(condition, "name"))
+    if (std::find(list.begin(), list.end(), "name") != list.end()) {
 	condition.del("name");
-
-    if (existPort(condition, "value"))
+    }
+    if (std::find(list.begin(), list.end(), "value") != list.end()) {
 	condition.del("value");
-
-    if (existPort(condition, "time-step"))
-	condition.del("time-step");
-
-    if (existPort(condition, "init"))
+    }
+    if (std::find(list.begin(), list.end(), "init") != list.end()) {
 	condition.del("init");
+    }
 }
 
-bool GenericPlugin::validPortGeneric(vpz::Condition& condition,
-				     const std::string& name)
+void NameValue::fillFields(const vpz::Condition& condition)
 {
-    if (existPort(condition, name)) {
+    if (validPort(condition, "name")) {
+	m_entryName->set_text(condition.firstValue("name").
+			      toString().value());
+    }
+    if (validPort(condition, "value")) {
+	m_entryValue->set_text(boost::lexical_cast<std::string>(
+			      condition.firstValue("value").
+			      toDouble().value()));
+    }
+    if (validPort(condition, "init")) {
+	m_initTreeView->init(condition);
+    }
+}
+
+bool NameValue::validPort(const vpz::Condition& condition,
+                              const std::string& name)
+{
+    std::list < std::string> list;
+
+    condition.portnames(list);
+    if (std::find(list.begin(), list.end(), name) != list.end()) {
 	if (name == "name") {
 	    if (condition.getSetValues(name).size() != 0
 		and condition.firstValue(name).isString())
 		return true;
 	}
-
 	if (name == "value") {
 	    if (condition.getSetValues(name).size() != 0
 		and condition.firstValue(name).isDouble())
 		return true;
 	}
-
-	if (name == "time-step") {
-	    if (condition.getSetValues(name).size() != 0 and
-		(condition.firstValue(name).isDouble()
-		 or condition.firstValue(name).isMap()))
-		return true;
-	}
-
 	if (name == "init") {
 	    if (condition.getSetValues(name).size() != 0
 		and condition.firstValue(name).isSet())
@@ -345,17 +274,5 @@ bool GenericPlugin::validPortGeneric(vpz::Condition& condition,
     }
     return false;
 }
-
-void GenericPlugin::onClickCheckButton()
-{
-    if (m_checkGlobal->get_active()) {
-	m_spinTime->set_sensitive(false);
-	m_comboUnit->set_sensitive(false);
-    } else {
-	m_spinTime->set_sensitive(true);
-	m_comboUnit->set_sensitive(true);
-    }
-}
-
 
 }}} // namespace vle gvle conditions
