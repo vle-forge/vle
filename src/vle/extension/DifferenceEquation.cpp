@@ -59,7 +59,8 @@ Base::Base(const DynamicsInit& model,
             if (events.get("time-step").isDouble()) {
                 mTimeStep = toDouble(events.get("time-step"));
             } else if (events.get("time-step").isMap()) {
-                const value::Map& timeStep = toMapValue(events.get("time-step"));
+                const value::Map& timeStep =
+                    toMapValue(events.get("time-step"));
 
                 mTimeStep = toDouble(timeStep.get("value"));
                 mTimeStepUnit = vle::utils::DateTime::convertUnit(
@@ -74,7 +75,8 @@ Base::Base(const DynamicsInit& model,
         } else {
             if (not events.exist("time-step")) {
                 throw utils::InternalError(fmt(_(
-                            "[%1%] DifferenceEquation - time-step port not exists"))
+                            "[%1%] DifferenceEquation - "\
+                            "time-step port not exists"))
                     % getModelName());
             }
         }
@@ -89,7 +91,8 @@ Base::Base(const DynamicsInit& model,
 
                 if (not events.exist("mapping")) {
                     throw utils::InternalError(fmt(_(
-                                "[%1%] DifferenceEquation - mapping port not exists"))
+                                "[%1%] DifferenceEquation - "\
+                                "mapping port not exists"))
                         % getModelName());
                 }
 
@@ -113,9 +116,9 @@ void Base::addExternalValue(double value,
                             bool init)
 {
     if (mExternalValues.find(name) == mExternalValues.end()) {
-        throw utils::ModellingError(fmt(_(
-                    "[%1%] DifferenceEquation::add - invalid variable name: %2%")) %
-            getModelName() % name);
+        throw utils::ModellingError(
+            fmt(_("[%1%] DifferenceEquation::add - "\
+                  "invalid variable name: %2%")) % getModelName() % name);
     }
 
     mExternalValues[name].push_front(value);
@@ -194,6 +197,10 @@ void Base::createExternalVariable(const std::string& name,
     iterators.mInitValues = &mInitExternalValues.find(name)->second;
     mReceivedValues.insert(std::make_pair(name, false));
     iterators.mReceivedValues = &mReceivedValues.find(name)->second;
+    mNosyncReceivedValues.insert(std::make_pair(name, devs::Time(0)));
+    if (mSize.find(name) == mSize.end()) {
+        mSize[name] = DEFAULT_SIZE;
+    }
 }
 
 void Base::depends(const std::string& name,
@@ -227,10 +234,6 @@ void Base::initExternalVariable(const std::string& name)
         --mWaiting;
     }
 
-    if (mSize.find(name) == mSize.end()) {
-        mSize[name] = DEFAULT_SIZE;
-    }
-
     if (mExternalValues.find(name) == mExternalValues.end()) {
         mReceivedValues[name] = false;
         mExternalValues[name] = Values();
@@ -255,9 +258,9 @@ double Base::val(const std::string& name,
                  int shift) const
 {
     if (shift > 0) {
-        throw utils::ModellingError(fmt(_(
-                    "[%1%] DifferenceEquation::getValue - positive shift on %2%")) %
-            getModelName() % name);
+        throw utils::ModellingError(
+            fmt(_("[%1%] DifferenceEquation::getValue - " \
+                  "positive shift on %2%")) % getModelName() % name);
     }
 
     if (mState == INIT) {
@@ -312,6 +315,7 @@ void Base::processUpdate(const std::string& name,
 {
     double value = 0.0;
     bool ok = true;
+    bool sync = mSynchros.find(name) != mSynchros.end();
 
     if (mState == POST_SEND_INIT) {
 
@@ -348,8 +352,7 @@ void Base::processUpdate(const std::string& name,
     }
 
     if (ok) {
-        if ((not begin) and (not end)
-            and mSynchros.find(name) != mSynchros.end()) {
+        if ((not begin) and (not end) and sync) {
             mExternalValues[name].pop_front();
             addExternalValue(value, name);
             if (mSigma == 0) {
@@ -357,16 +360,24 @@ void Base::processUpdate(const std::string& name,
                 mSigma = mTimeStep;
             }
         } else {
-            if (mLastComputeTime == time and
-                mSynchros.find(name) != mSynchros.end()) {
-                mExternalValues[name].pop_front();
-                mState = RUN;
-                mSigma = 0;
+            if (mLastComputeTime == time) {
+                if (sync) {
+                    mExternalValues[name].pop_front();
+                    mState = RUN;
+                    mSigma = 0;
+                } else {
+                    if (mNosyncReceivedValues[name] == time) {
+                        mExternalValues[name].pop_front();
+                    }
+                }
             }
             addExternalValue(value, name);
-            if ((mState == INIT or (mState == PRE and end))
-                and mSynchros.find(name) != mSynchros.end()) {
-                ++mReceive;
+            if (not sync) {
+                mNosyncReceivedValues[name] = time;
+            } else {
+                if (mState == INIT or (mState == PRE and end)) {
+                    ++mReceive;
+                }
             }
         }
     }
@@ -553,6 +564,9 @@ void Base::internalTransition(const Time& time)
     case PRE:
         if (mSyncs != 0 and (mSynchro or mAllSynchro)) break;
     case RUN:
+        if (mSyncs == 0) {
+            clearReceivedValues();
+        }
         mLastTime = time;
 
         if (mLastComputeTime < time) {
@@ -573,7 +587,6 @@ void Base::internalTransition(const Time& time)
             mState = POST;
             mSigma = 0;
         } else {
-            clearReceivedValues();
             if (mSyncs != 0 and (mSynchro or mAllSynchro)) {
                 mState = PRE;
             } else {
@@ -583,10 +596,7 @@ void Base::internalTransition(const Time& time)
         }
         break;
     case POST:
-        clearReceivedValues();
-
         mReceive = 0;
-
         if (mSynchro or mAllSynchro) {
             mState = PRE;
         } else {
@@ -618,6 +628,10 @@ void Base::externalTransition(const ExternalEventList& event,
         if (mMode == NAME and (*it)->onPort("update")) {
             std::string name = (*it)->getStringAttributeValue("name");
 
+            if (mReceive == 0 and mSyncs > 0 and
+                (mLastComputeTime < time or mLastComputeTime.isInfinity())) {
+                clearReceivedValues();
+            }
             processUpdate(name, **it, begin, end, time);
         }
         else if ((*it)->onPort("perturb")) {
@@ -649,6 +663,11 @@ void Base::externalTransition(const ExternalEventList& event,
             std::string portName = (*it)->getPortName();
             std::string name = (mMode == PORT)?portName:mMapping[portName];
 
+            if (mReceive == 0 and mSyncs > 0 and
+                (mLastComputeTime < time or mLastComputeTime.isInfinity())) {
+                clearReceivedValues();
+            }
+
             processUpdate(name, **it, begin, end, time);
         }
         ++it;
@@ -667,7 +686,7 @@ void Base::externalTransition(const ExternalEventList& event,
     if (mState == INIT) {
         pushNoEDValues();
         if (mWaiting <= 0) {
-            if (!check()) {
+            if (not check()) {
                 initValues(time);
                 mSigma = 0;
                 mState = PRE_INIT2;
@@ -682,12 +701,6 @@ void Base::externalTransition(const ExternalEventList& event,
             }
         }
     } else {
-        if ((mState == PRE or mState == RUN) and not end) {
-            if (begin) {
-                clearReceivedValues();
-            }
-        }
-
         if (mState == PRE and end and (mReceive == mSyncs or reset)) {
             mState = RUN;
             mSigma = 0;

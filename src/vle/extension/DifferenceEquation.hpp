@@ -237,6 +237,8 @@ namespace vle { namespace extension { namespace DifferenceEquation {
         typedef ValuesMap::const_iterator ValuesMapIterator;
         typedef std::map < std::string, bool > ReceivedMap;
         typedef ReceivedMap::const_iterator ReceivedMapIterator;
+        typedef std::map < std::string, devs::Time > NosyncReceivedMap;
+        typedef NosyncReceivedMap::const_iterator NosyncReceivedMapIterator;
         typedef std::map < std::string, int > SizeMap;
         typedef SizeMap::const_iterator SizeMapIterator;
         typedef std::map < std::string, std::string > Mapping;
@@ -354,6 +356,7 @@ namespace vle { namespace extension { namespace DifferenceEquation {
         ValuesMap mInitExternalValues;
         ValuesMap mNoEDValues;
         ReceivedMap mReceivedValues;
+        NosyncReceivedMap mNosyncReceivedValues;
         SizeMap mSize;
         mode mMode;
         Mapping mMapping;

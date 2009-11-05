@@ -249,6 +249,66 @@ public:
 
 };
 
+class Perturb8 : public ve::Statechart
+{
+public:
+    Perturb8(const vd::DynamicsInit& init, const vd::InitEventList& events) :
+        ve::Statechart(init, events)
+	{
+	    ve::states(this) << A << B;
+
+	    ve::transition(this, A, B) << ve::after(5.)
+				       << ve::outputFunc(&Perturb8::out1);
+	    ve::transition(this, B, A) << ve::after(5.)
+				       << ve::outputFunc(&Perturb8::out2);
+
+	    initialState(A);
+	}
+
+    virtual ~Perturb8() { }
+
+    void out1(const vd::Time& /* time */, vd::ExternalEventList& output) const
+	{
+	    output << (ve::DifferenceEquation::Var("g") = 10);
+	}
+
+    void out2(const vd::Time& /* time */, vd::ExternalEventList& output) const
+	{
+	    output << (ve::DifferenceEquation::Var("g") = 0);
+	}
+
+};
+
+class Perturb9 : public ve::Statechart
+{
+public:
+    Perturb9(const vd::DynamicsInit& init, const vd::InitEventList& events) :
+        ve::Statechart(init, events)
+	{
+	    ve::states(this) << A;
+
+	    ve::transition(this, A, A) << ve::event("in1")
+				       << ve::outputFunc(&Perturb9::out1);
+	    ve::transition(this, A, A) << ve::event("in2")
+				       << ve::outputFunc(&Perturb9::out2);
+
+	    initialState(A);
+	}
+
+    virtual ~Perturb9() { }
+
+    void out1(const vd::Time& /* time */, vd::ExternalEventList& output) const
+	{
+	    output << (ve::DifferenceEquation::Var("g") = 10);
+	}
+
+    void out2(const vd::Time& /* time */, vd::ExternalEventList& output) const
+	{
+	    output << (ve::DifferenceEquation::Var("g") = 0);
+	}
+
+};
+
 }}} // namespace vle examples equation
 
 DECLARE_NAMED_DYNAMICS(Perturb, vle::examples::equation::Perturb)
@@ -258,3 +318,5 @@ DECLARE_NAMED_DYNAMICS(Perturb4, vle::examples::equation::Perturb4)
 DECLARE_NAMED_DYNAMICS(Perturb5, vle::examples::equation::Perturb5)
 DECLARE_NAMED_DYNAMICS(Perturb6, vle::examples::equation::Perturb6)
 DECLARE_NAMED_DYNAMICS(Perturb7, vle::examples::equation::Perturb7)
+DECLARE_NAMED_DYNAMICS(Perturb8, vle::examples::equation::Perturb8)
+DECLARE_NAMED_DYNAMICS(Perturb9, vle::examples::equation::Perturb9)

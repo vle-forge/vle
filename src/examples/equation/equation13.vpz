@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://vle.toulouse.inra.fr/vle-0.8.0.dtd">
+<vle_project version="0.5" date="mer, 14 oct 2009" author="Eric Ramat">
+<structures>
+<model name="Top model" type="coupled" x="0" y="0" width="791" height="612"  >
+<submodels>
+<model name="d" type="atomic" conditions="cond" dynamics="dynD" observables="obsD" x="433" y="57" width="100" height="45" >
+<in>
+ <port name="update" />
+</in>
+<out>
+ <port name="update" />
+</out>
+</model>
+<model name="f" type="atomic" conditions="cond,condE" dynamics="dynF" observables="obsE" x="474" y="220" width="100" height="60" >
+<in>
+ <port name="update" />
+</in>
+<out>
+ <port name="a" />
+ <port name="c" />
+</out>
+</model>
+<model name="g" type="atomic" conditions="cond" dynamics="dynG" observables="obsG" x="299" y="262" width="100" height="45" >
+<in>
+ <port name="perturb" />
+</in>
+<out>
+ <port name="update" />
+</out>
+</model>
+<model name="perturb" type="atomic" dynamics="dynPerturb" x="88" y="203" width="100" height="45" >
+<out>
+ <port name="g" />
+</out>
+</model>
+<model name="perturb2" type="atomic" dynamics="dynPerturb2" x="66" y="58" width="100" height="60" >
+<out>
+ <port name="out1" />
+ <port name="out2" />
+</out>
+</model>
+<model name="perturb3" type="atomic" dynamics="dynPerturb3" x="229" y="123" width="100" height="60" >
+<in>
+ <port name="in1" />
+ <port name="in2" />
+</in>
+<out>
+ <port name="g" />
+</out>
+</model>
+</submodels>
+<connections>
+<connection type="internal">
+ <origin model="d" port="update" />
+ <destination model="f" port="update" />
+</connection>
+<connection type="internal">
+ <origin model="f" port="a" />
+ <destination model="d" port="update" />
+</connection>
+<connection type="internal">
+ <origin model="f" port="c" />
+ <destination model="d" port="update" />
+</connection>
+<connection type="internal">
+ <origin model="g" port="update" />
+ <destination model="f" port="update" />
+</connection>
+<connection type="internal">
+ <origin model="perturb" port="g" />
+ <destination model="g" port="perturb" />
+</connection>
+<connection type="internal">
+ <origin model="perturb2" port="out1" />
+ <destination model="perturb3" port="in1" />
+</connection>
+<connection type="internal">
+ <origin model="perturb2" port="out2" />
+ <destination model="perturb3" port="in2" />
+</connection>
+<connection type="internal">
+ <origin model="perturb3" port="g" />
+ <destination model="g" port="perturb" />
+</connection>
+</connections>
+</model>
+</structures>
+<dynamics>
+<dynamic name="dynD" library="equation1" model="D1" type="local"  />
+<dynamic name="dynF" library="equation3" model="F1" type="local"  />
+<dynamic name="dynG" library="equation3" model="G1" type="local"  />
+<dynamic name="dynPerturb" library="equation1" model="Perturb8" type="local"  />
+<dynamic name="dynPerturb2" library="equation1" model="Perturb2" type="local"  />
+<dynamic name="dynPerturb3" library="equation1" model="Perturb9" type="local"  />
+</dynamics>
+<experiment name="exp" duration="20.000000000000000" begin="0.000000000000000" combination="linear" seed="3499211612" >
+<replicas seed="3499211612" number="1" />
+<conditions>
+<condition name="cond" >
+ <port name="time-step" >
+<double>1.000000000000000</double>
+</port>
+</condition>
+<condition name="condE" >
+ <port name="mode" >
+<string>name</string>
+</port>
+ <port name="variables" >
+<set><set><string>a</string><double>0.000000000000000</double></set><set><string>b</string></set><set><string>c</string><double>0.000000000000000</double></set></set>
+</port>
+</condition>
+</conditions>
+<views>
+<outputs>
+<output name="o" location="" format="local" plugin="text" />
+
+</outputs>
+<observables>
+<observable name="obsD" >
+<port name="d" >
+ <attachedview name="view" />
+</port>
+
+</observable>
+
+<observable name="obsE" >
+<port name="a" >
+ <attachedview name="view" />
+</port>
+
+<port name="b" >
+ <attachedview name="view" />
+</port>
+
+<port name="c" >
+ <attachedview name="view" />
+</port>
+
+</observable>
+
+<observable name="obsG" >
+<port name="g" >
+ <attachedview name="view" />
+</port>
+
+</observable>
+
+</observables>
+<view name="view" output="o" type="timed" timestep="1.000000000000000" />
+
+</views>
+</experiment>
+</vle_project>

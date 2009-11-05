@@ -175,6 +175,9 @@ BOOST_AUTO_TEST_CASE(test_equation4)
 
 BOOST_AUTO_TEST_CASE(test_equation5)
 {
+
+    std::cout << "test_equation5" << std::endl;
+
     vpz::Vpz file(utils::Path::path().getExampleFile("equation5.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
@@ -219,6 +222,9 @@ BOOST_AUTO_TEST_CASE(test_equation5)
 
 BOOST_AUTO_TEST_CASE(test_equation6)
 {
+
+    std::cout << "test_equation6" << std::endl;
+
     vpz::Vpz file(utils::Path::path().getExampleFile("equation6.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
@@ -263,6 +269,9 @@ BOOST_AUTO_TEST_CASE(test_equation6)
 
 BOOST_AUTO_TEST_CASE(test_equation7)
 {
+
+    std::cout << "test_equation7" << std::endl;
+
     vpz::Vpz file(utils::Path::path().getExampleFile("equation7.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
@@ -303,6 +312,9 @@ BOOST_AUTO_TEST_CASE(test_equation7)
 
 BOOST_AUTO_TEST_CASE(test_equation8)
 {
+
+    std::cout << "test_equation8" << std::endl;
+
     vpz::Vpz file(utils::Path::path().getExampleFile("equation8.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
@@ -347,6 +359,9 @@ BOOST_AUTO_TEST_CASE(test_equation8)
 
 BOOST_AUTO_TEST_CASE(test_equation9)
 {
+
+    std::cout << "test_equation9" << std::endl;
+
     vpz::Vpz file(utils::Path::path().getExampleFile("equation9.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
@@ -391,6 +406,9 @@ BOOST_AUTO_TEST_CASE(test_equation9)
 
 BOOST_AUTO_TEST_CASE(test_equation10)
 {
+
+    std::cout << "test_equation10" << std::endl;
+
     vpz::Vpz file(utils::Path::path().getExampleFile("equation10.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
@@ -435,6 +453,9 @@ BOOST_AUTO_TEST_CASE(test_equation10)
 
 BOOST_AUTO_TEST_CASE(test_equation11)
 {
+
+    std::cout << "test_equation11" << std::endl;
+
     vpz::Vpz file(utils::Path::path().getExampleFile("equation11.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
@@ -479,6 +500,9 @@ BOOST_AUTO_TEST_CASE(test_equation11)
 
 BOOST_AUTO_TEST_CASE(test_equation12)
 {
+
+    std::cout << "test_equation12" << std::endl;
+
     vpz::Vpz file(utils::Path::path().getExampleFile("equation12.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
@@ -519,4 +543,37 @@ BOOST_AUTO_TEST_CASE(test_equation12)
     BOOST_REQUIRE_CLOSE(value::toDouble(result[2][20]), 267., 10e-5);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[3][20]), 1610., 10e-5);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[4][20]), 8683., 10e-5);
+}
+
+BOOST_AUTO_TEST_CASE(test_equation13)
+{
+
+    std::cout << "test_equation13" << std::endl;
+
+    vpz::Vpz file(utils::Path::path().getExampleFile("equation13.vpz"));
+
+    vpz::Output& o(file.project().experiment().views().outputs().get("o"));
+    o.setLocalStream("", "storage");
+
+    manager::RunQuiet r;
+    r.start(file);
+
+    BOOST_REQUIRE_EQUAL(r.haveError(), false);
+    oov::OutputMatrixViewList& out(r.outputs());
+    BOOST_REQUIRE_EQUAL(out.size(),
+                        (oov::OutputMatrixViewList::size_type)1);
+
+    oov::OutputMatrix& view(out["view"]);
+    value::MatrixView result(view.values());
+
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+                        (value::MatrixView::size_type)6);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+                        (value::MatrixView::size_type)21);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[1][5]), 54., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][5]), 5., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][5]), 29., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][5]), 28., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[5][5]), 10., 10e-5);
 }
