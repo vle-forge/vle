@@ -253,6 +253,22 @@ void GVLEMenuAndToolbar::showCloseProject()
     m_refActionGroup->get_action("CloseProject")->set_sensitive(true);
 }
 
+void GVLEMenuAndToolbar::hideImportExport()
+{
+    m_refActionGroup->get_action("ClearModel")->set_sensitive(false);
+    m_refActionGroup->get_action("ImportModel")->set_sensitive(false);
+    m_refActionGroup->get_action("ExportModel")->set_sensitive(false);
+    m_refActionGroup->get_action("ExportGraphic")->set_sensitive(false);
+}
+
+void GVLEMenuAndToolbar::showImportExport()
+{
+    m_refActionGroup->get_action("ClearModel")->set_sensitive(true);
+    m_refActionGroup->get_action("ImportModel")->set_sensitive(true);
+    m_refActionGroup->get_action("ExportModel")->set_sensitive(true);
+    m_refActionGroup->get_action("ExportGraphic")->set_sensitive(true);
+}
+
 void GVLEMenuAndToolbar::hideEditMenu()
 {
     m_refActionGroup->get_action("MenuEdit")->set_sensitive(false);
@@ -653,6 +669,7 @@ void GVLEMenuAndToolbar::createHelpActions()
 
 void GVLEMenuAndToolbar::onOpenFile()
 {
+    hideImportExport();
     showEditMenu();
     hideToolsMenu();
     hideViewMenu();
@@ -671,6 +688,7 @@ void GVLEMenuAndToolbar::onOpenProject()
 
 void GVLEMenuAndToolbar::onOpenVpz()
 {
+    showImportExport();
     showEditMenu();
     showToolsMenu();
     showViewMenu();
@@ -683,6 +701,7 @@ void GVLEMenuAndToolbar::onOpenVpz()
 void GVLEMenuAndToolbar::onCloseTab(bool vpz, bool empty)
 {
     if (vpz) {
+        hideImportExport();
         hideToolsMenu();
         hideViewMenu();
         hideSimulationMenu();

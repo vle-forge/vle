@@ -75,6 +75,8 @@ public:
     void showCloseTab();
     void hideCloseProject();
     void showCloseProject();
+    void hideImportExport();
+    void showImportExport();
 
     // Menu
     void showMinimalMenu();
