@@ -741,7 +741,19 @@ Simple::Simple(const devs::DynamicsInit& model,
     if (events.exist("name")) {
         mVariableName = toString(events.get("name"));
     } else {
-        mVariableName = getModelName();
+        if (getModel().existOutputPort("update") or
+            getModel().getOutputPortNumber() == 0) {
+            mVariableName = getModelName();
+        } else {
+
+            if (getModel().getOutputPortNumber() > 1) {
+                throw utils::ModellingError(
+                    fmt(_("[%1%] DifferenceEquation::Simple: invalid "  \
+                          "number of output port")) % getModelName());
+            }
+
+            mVariableName = getModel().getOutputPortList().begin()->first;
+        }
     }
 
     if (events.exist("value")) {
