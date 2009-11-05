@@ -49,6 +49,9 @@ public:
     OpenPackageBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m);
     virtual ~OpenPackageBox();
 
+    std::string name() const
+    { return mName; }
+
     int run();
 
 private:
@@ -75,6 +78,8 @@ private:
     //Buttons
     Gtk::Button*                    mButtonApply;
     Gtk::Button*                    mButtonCancel;
+
+    std::string                     mName;
 
     void build();
     void onApply();

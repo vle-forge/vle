@@ -104,9 +104,8 @@ void OpenPackageBox::onApply()
 
 	if (iter) {
 	    Gtk::TreeModel::Row row = *iter;
-	    std::string name = row.get_value(mColumns.mName);
 
-	    utils::Package::package().select(name);
+            mName = row.get_value(mColumns.mName);
             mDialog->response(Gtk::RESPONSE_OK);
 	}
     }

@@ -706,13 +706,9 @@ void GVLE::onOpenFile()
 
 void GVLE::onOpenProject()
 {
-    // close current project
-    mEditor->closeAllTab();
-    mModeling->clearModeling();
-    utils::Package::package().select("");
-    // open project
-    if (mOpenPackageBox->run() == Gtk::RESPONSE_OK and
-        not utils::Package::package().name().empty()) {
+    if (mOpenPackageBox->run() == Gtk::RESPONSE_OK) {
+        onCloseProject();
+        utils::Package::package().select(mOpenPackageBox->name());
         buildPackageHierarchy();
 	mMenuAndToolbar->onOpenProject();
     }
