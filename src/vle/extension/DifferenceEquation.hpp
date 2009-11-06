@@ -472,7 +472,18 @@ namespace vle { namespace extension { namespace DifferenceEquation {
         Var createVar(const std::string& name)
         { return Var(name, this); }
 
+        /**
+         * @brief Specify a new size of history of internal variable
+         * @param new size of history of internal variable
+         */
         void size(int size);
+
+        /**
+         * @brief Get the name of internal variable
+         * @return the name of internal variable
+         */
+        std::string name() const
+        { return mVariableName; }
 
     private:
         double val() const;
