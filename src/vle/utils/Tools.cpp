@@ -302,7 +302,7 @@ void finalize()
 void printHelp(std::ostream& out)
 {
     out << fmt(_("Virtual Laboratory Environment - %1%%2%\n"
-                 "Copyright (C) 2003 - 2008 The VLE Development Team.\n"
+                 "Copyright (C) 2003 - 2009 The VLE Development Team.\n"
                  "VLE is a multi-modeling environment to build,\nsimulate "
                  "and analyse models of dynamic complex systems.\n"
                  "For more information, see manuals with 'man vle' or\n"
@@ -313,14 +313,14 @@ void printHelp(std::ostream& out)
 void printInformations(std::ostream& out)
 {
     out << fmt(_("Virtual Laboratory Environment - %1%%2%\n"
-                 "Copyright (C) 2003 - 2008 The VLE Development Team.\n")) %
+                 "Copyright (C) 2003 - 2009 The VLE Development Team.\n")) %
         VLE_VERSION % VLE_EXTRA_VERSION << Path::path() << "\n" << std::endl;
 }
 
 void printVersion(std::ostream& out)
 {
     out << fmt(_("Virtual Laboratory Environment - %1%%2%\n"
-                 "Copyright (C) 2003 - 2008 The VLE Development Team.\n"
+                 "Copyright (C) 2003 - 2009 The VLE Development Team.\n"
                  "VLE comes with ABSOLUTELY NO WARRANTY.\n"
                  "You may redistribute copies of VLE\n"
                  "under the terms of the GNU General Public License.\n"
