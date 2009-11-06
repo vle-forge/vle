@@ -934,7 +934,7 @@ void GVLE::onPreferences()
 void GVLE::onSimulationBox()
 {
     if (mModeling->isSaved()) {
-        LaunchSimulationBox box(mRefXML, mModeling->vpz());
+        LaunchSimulationBox box(mRefXML, ((const Modeling*)mModeling)->vpz());
         box.run();
     } else {
         gvle::Error(_("Save or load a project before simulation"));
