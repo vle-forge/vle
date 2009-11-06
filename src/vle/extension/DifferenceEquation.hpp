@@ -531,6 +531,7 @@ namespace vle { namespace extension { namespace DifferenceEquation {
         /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
         std::string mVariableName;
+        std::string mPortName;
         Values mValues;
         double mInitialValue;
         bool mInitValue;

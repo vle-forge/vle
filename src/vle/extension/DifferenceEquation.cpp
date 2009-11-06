@@ -736,7 +736,7 @@ Simple::Simple(const devs::DynamicsInit& model,
                const devs::InitEventList& events,
                bool control) :
     Base(model, events, control),
-    mInitValue(false), mSize(DEFAULT_SIZE)
+    mInitValue(false), mSize(DEFAULT_SIZE), mPortName("update")
 {
     if (events.exist("name")) {
         mVariableName = toString(events.get("name"));
@@ -753,6 +753,7 @@ Simple::Simple(const devs::DynamicsInit& model,
             }
 
             mVariableName = getModel().getOutputPortList().begin()->first;
+            mPortName = mVariableName;
         }
     }
 
@@ -863,7 +864,7 @@ void Simple::output(const Time& /* time */,
                     ExternalEventList& output) const
 {
     if (mState == SEND_INIT and not mValues.empty()) {
-        ExternalEvent* ee = new ExternalEvent("update");
+        ExternalEvent* ee = new ExternalEvent(mPortName);
 
         Set* values = Set::create();
         std::deque < double>::const_iterator it = mValues.begin();
@@ -877,7 +878,7 @@ void Simple::output(const Time& /* time */,
     } else {
         if (mActive and (mState == PRE_INIT or mState == PRE_INIT2
                          or mState == POST or mState == POST2)) {
-            ExternalEvent* ee = new ExternalEvent("update");
+            ExternalEvent* ee = new ExternalEvent(mPortName);
 
             ee << attribute("name", mVariableName);
             ee << attribute("value", val());
