@@ -207,7 +207,10 @@ void LaunchSimulationBox::showErrorMsg()
 void LaunchSimulationBox::updateCurrentTime()
 {
     double time = currentTime();
-    mCurrentTimeLabel->set_label((fmt("%1$10.0f") % time).str());
+
+    mCurrentTimeLabel->set_label(
+        (fmt("%1$=10.2f / %2$=10.2f") % time %
+         ((mVpz.project().experiment().begin()) + mDuration)).str());
 }
 
 void LaunchSimulationBox::updateProgressBar()
@@ -227,7 +230,7 @@ void LaunchSimulationBox::updateWidget()
         mStop->set_sensitive(false);
         mProgressBar->set_fraction(0.0);
         mProgressBar->set_text(_("Wait"));
-        mCurrentTimeLabel->set_text("0");
+        mCurrentTimeLabel->set_text("");
         break;
     case LaunchSimulationBox::Init:
         changeToWatchCursor();
