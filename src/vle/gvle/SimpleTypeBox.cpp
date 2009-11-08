@@ -98,14 +98,14 @@ std::string SimpleTypeBox::run()
             case(value::Value::INTEGER):
                 {
                     dynamic_cast < value::Integer* > (mBase)
-                        ->set(utils::to_long(mEntry->get_text()));
+                        ->set(utils::toLong(mEntry->get_text()));
                     return mEntry->get_text();
                 }
                 break;
             case(value::Value::DOUBLE):
                 {
                     dynamic_cast < value::Double* > (mBase)
-                        ->set(utils::to_double(mEntry->get_text()));
+                        ->set(utils::toDouble(mEntry->get_text()));
                     return mEntry->get_text();
                 }
                 break;

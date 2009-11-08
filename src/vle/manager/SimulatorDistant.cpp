@@ -32,6 +32,7 @@
 #include <vle/manager/SimulatorDistant.hpp>
 #include <vle/manager/Run.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/Path.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
 #include <vle/vpz/Vpz.hpp>
@@ -121,7 +122,7 @@ void SimulatorDistant::daemonRecvFile()
     boost::int32_t sz = mServer->recvInteger("manager");
     mServer->sendString("manager", "ok");
     std::string msg = mServer->recvBuffer("manager", sz);
-    std::string filename(utils::write_to_temp("vledae", msg));
+    std::string filename(utils::Path::writeToTemp("vledae", msg));
 
     {
         Glib::Mutex::Lock lock(mMutex);

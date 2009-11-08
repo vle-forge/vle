@@ -182,7 +182,7 @@ void View::exportCurrentModel()
         vpz::Vpz::fixExtension(filename);
 
         vpz::Vpz* save = new vpz::Vpz();
-        if (utils::exist_file(filename)) {
+        if (utils::Path::existFile(filename)) {
             save->clear();
         }
         save->setFilename(filename);

@@ -39,7 +39,6 @@
 #include <vle/utils/Template.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
-#include <boost/filesystem.hpp>
 
 namespace vle { namespace gvle {
 
@@ -870,8 +869,8 @@ std::string AtomicModelBox::DynamicTreeView::pathFileSearch(
 		pathFileSearch(Glib::build_filename(path, (*it)),
 			       filename);
 	    }
-	    if (boost::filesystem::basename(name) == filename
-		and boost::filesystem::extension(name) == ".cpp") {
+	    if (utils::Path::basename(name) == filename
+		and utils::Path::extension(name) == ".cpp") {
 		return Glib::build_filename(
 		  utils::Path::path().getPackageSrcDir(), (*it));
 	    }
@@ -886,8 +885,7 @@ void AtomicModelBox::DynamicTreeView::onRowActivated(
 {
     if (column
 	and not vle::utils::Path::path().getPackageDir().empty()
-	and boost::filesystem::exists(
-	    vle::utils::Path::path().getPackageSrcDir())) {
+        and utils::Path::exist(vle::utils::Path::path().getPackageSrcDir())) {
 	Gtk::TreeRow row = (*mRefTreeModelDyn->get_iter(path));
 	vpz::Dynamic& dynamic = mDynamics->get(
 	    row.get_value(mColumnsDyn.m_col_name));

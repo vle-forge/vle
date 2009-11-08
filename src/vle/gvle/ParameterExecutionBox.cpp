@@ -67,7 +67,7 @@ bool ParameterExecutionBox::run()
     for (;;) {
         int response = Gtk::Dialog::run();
         if (response == Gtk::RESPONSE_OK) {
-            int port = utils::to_int(mEntryPort->get_text());
+            int port = utils::toInt(mEntryPort->get_text());
             if (0 < port and port < 65535) {
                 mModeling->setSocketPort(port);
                 return true;
@@ -98,7 +98,7 @@ void ParameterExecutionBox::buildInterface()
     Gtk::Label* port = Gtk::manage(new Gtk::Label(_("Network port:")));
     Gtk::HBox* HBoxRemote = Gtk::manage(new Gtk::HBox());
     mEntryPort = Gtk::manage(new Gtk::Entry());
-    mEntryPort->set_text(utils::to_string(mModeling->getSocketPort()));
+    mEntryPort->set_text(utils::toString(mModeling->getSocketPort()));
     HBoxRemote->pack_start(*port, false, false);
     HBoxRemote->pack_start(*mEntryPort, true, true);
     HBoxRemote->set_border_width(3);

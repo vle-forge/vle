@@ -36,7 +36,6 @@
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Trace.hpp>
-#include <glibmm/fileutils.h>
 #include <glibmm/spawn.h>
 #include <iostream>
 
@@ -68,7 +67,7 @@ bool run_model(const std::string& modelname)
         std::cout << "Building VPZ file .......... ";
         vpz::Vpz v;
         build_vpz(modelname, v);
-        std::string filename(utils::build_temp("vlemodeltest"));
+        std::string filename(utils::Path::buildTemp("vlemodeltest"));
         v.write(filename);
         std::cout << "ok\n";
 

@@ -32,6 +32,7 @@
 #include <vle/oov/LocalStreamReader.hpp>
 #include <vle/oov/Plugin.hpp>
 #include <vle/utils/Debug.hpp>
+#include <vle/utils/Path.hpp>
 #include <vle/version.hpp>
 #include <boost/format.hpp>
 
@@ -55,9 +56,8 @@ void LocalStreamReader::onValue(const std::string& simulator,
         plg->needCopy();
         plugin()->onValue(simulator, parent, port, view, time, value);
         if (plg->isCopyDone()) {
-            std::string file(Glib::build_filename(plg->location(),
-                                                  (fmt("img-%1$08d.png") %
-                                                   m_image).str()));
+            std::string file(utils::Path::buildFilename(
+                    plg->location(), (fmt("img-%1$08d.png") % m_image).str()));
 
             try {
                 plg->stored()->write_to_png(file);

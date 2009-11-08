@@ -37,51 +37,228 @@
 
 namespace vle { namespace utils {
 
-struct VLE_UTILS_EXPORT DateTime
+class VLE_UTILS_EXPORT DateTime
 {
+public:
     enum Unit { None, Day, Week, Month, Year };
 
+    /**
+     * @brief Write the current date and time conform to RFC 822.
+     * @return string representation of date.
+     */
+    static std::string currentDate();
+
+    /**
+     * @brief Write the current date and time in the format:
+     * @code
+     * std::cout << get_simple_current_date();
+     * // 20080306-1534
+     * @endcode
+     * @return string representation of the date.
+     */
+    static std::string simpleCurrentDate();
+
+                                  /* * * * */
+
+    /**
+     * @brief Get the year in the simulation time.
+     * @code
+     * vle::utils::DateTime::year(2451545) == 2000u;
+     * @endcode
+     * @param time The simulation time.
+     * @return An unsigned int.
+     */
     static unsigned int year(const double& time);
+
+    /**
+     * @brief Get the month in the simulation time.
+     * @code
+     * vle::utils::DateTime::month(2451545) == 1u;
+     * @endcode
+     * @param time The simulation time.
+     * @return An unsigned int.
+     */
     static unsigned int month(const double& time);
+
+    /**
+     * @brief Get the day of the month in the simulation time.
+     * @code
+     * vle::utils::DateTime::dayOfMonth((2451545)) == 1u;
+     * @endcode
+     * @param time The simulation time.
+     * @return An unsigned int.
+     */
     static unsigned int dayOfMonth(const double& time);
+
+    /**
+     * @brief Get the day in the week of the simulation time.
+     * @code
+     * vle::utils::DateTime::dayOfWeek((2451545)) == 6u;
+     * @endcode
+     * @param time The simulation time.
+     * @return An unsigned int.
+     */
     static unsigned int dayOfWeek(const double& time);
+
+    /**
+     * @brief Get the day in the year of the simulation time.
+     * @code
+     * vle::utils::DateTime::dayOfYear((2451545)) == 1u;
+     * @endcode
+     * @param time The simulation time.
+     * @return An unsigned int.
+     */
     static unsigned int dayOfYear(const double& time);
+
+    /**
+     * @brief Get the week in the year of the simulation time.
+     * @code
+     * vle::utils::DateTime::dayOfYear((2451545)) == 1u;
+     * @endcode
+     * @param time The simulation time.
+     * @return An unsigned int.
+     */
     static unsigned int weekOfYear(const double& time);
 
+    /**
+     * @brief Check if the simulation time is a leap year.
+     * @param time The simulation time.
+     * @return true if time is a leap year, false otherwise.
+     */
     static bool isLeapYear(const double& time);
 
+    /**
+     * @brief Get the number of day in the year for the simulaton time.
+     * @code
+     * vle::utils::Datime::aYear(2451545) == 366;
+     * @endcode
+     * @param time The simulation time.
+     * @return number of day.
+     */
     static double aYear(const double& time);
+
+    /**
+     * @brief Get the number of day in the month for the simulation time.
+     * @code
+     * vle::utils::Datime::aMonth(2451545) == 31;
+     * vle::utils::Datime::aMonth(2451576) == 29;
+     * @endcode
+     * @param time The simulation time.
+     * @return number of day.
+     */
     static double aMonth(const double& time);
 
-    static inline double aWeek()
-    {
-        return 7;
-    }
+    /**
+     * @brief Get the number of day in a week.
+     * @return Return 7.
+     */
+    static inline double aWeek() { return 7; }
 
-    static inline double aDay()
-    {
-        return 1;
-    }
+    /**
+     * @brief Get the number of day in a day.
+     * @return Return 1.
+     */
+    static inline double aDay() { return 1; }
 
+    /**
+     * @brief Get number of days in n-years from the simulation time.
+     * @code
+     * vle::utils::DateTime::years((2451545), 1), 366);
+     * vle::utils::DateTime::years((2451545), 2), 731);
+     * @endcode
+     * @param time The simulation time.
+     * @param n The number of years.
+     * @return The number of days in n-years.
+     */
     static double years(const double& time, unsigned int n);
+
+    /**
+     * @brief Get number of days in n-months from the simulation time.
+     * @code
+     * vle::utils::DateTime::months((2451545), 2) = 60;
+     * @endcode
+     * @param time The simulation time.
+     * @param n The number of weeks.
+     * @return The number of days in n-months.
+     */
     static double months(const double& time, unsigned int n);
-    static inline double weeks(unsigned int n)
-    {
-        return (int)(7 * n);
-    }
 
-    static inline double days(unsigned int n)
-    {
-        return (int)n;
-    }
+    /**
+     * @brief Get number of days in n-weeks.
+     * @param n Number of weeks.
+     * @return n * 7.
+     */
+    static inline double weeks(unsigned int n) { return (int)(7 * n); }
 
+    /**
+     * @brief Get number of days in n-days.
+     * @param n Number of days.
+     * @return n.
+     */
+    static inline double days(unsigned int n) { return (int)n; }
+
+    /**
+     * @brief Convert std::string unit ("day", "week", "month", "year") into
+     * the DateTime::Unit type.
+     * @param unit The std::string unit to convert.
+     * @return The convertion of Day if error.
+     */
     static DateTime::Unit convertUnit(const std::string& unit);
+
+    /**
+     * @brief A easy function to call days(), weeks(), months() or years()
+     * using a DateTime::Unit type.
+     * @param time The simulation date (useless for Day, Week).
+     * @param duration The number of DateTime::Unit.
+     * @param unit The unit.
+     * @return A number of day.
+     */
     static double duration(const double& time, double duration,
-                                            DateTime::Unit unit);
+                           DateTime::Unit unit);
+
+                                  /* * * * */
+
+    /**
+     * @brief Convert an julian day number into a string.
+     * @code
+     * vle::utils::DateTime::toJulianDayNumber(2452192) = "2001-10-9";
+     * @endcode
+     * @param date The date to convert.
+     * @return A string representation of the julian day.
+     */
     static std::string toJulianDayNumber(unsigned long date);
+
+    /**
+     * @brief Convert a string into a julian day number;
+     * @code
+     * vle::utils::DateTime::toJulianDayNumber("2001-10-9") = 2452192;
+     * @endcode
+     * @param date The date to convert.
+     * @return A julian day number.
+     */
     static long toJulianDayNumber(const std::string& date);
+
+    /**
+     * @brief Convert a julian date into a string.
+     * @code
+     * vle::utils::DateTime::toJulianDay(2454115.05486)) = "2001-10-9:hh:mm:ss";
+     * @endcode
+     * @param date The date to convert.
+     * @return A string representation of the julian day.
+     */
     static std::string toJulianDay(double date);
+
+    /**
+     * @brief Convert a string into a julian day.
+     * @code
+     * vle::utils::DateTime::toJulianDay("2001-10-9:hh:mm:ss") = 2454115.05486;
+     * @endcode
+     * @param date The date to convert.
+     * @return A string representation of the julian day.
+     */
     static double toJulianDay(const std::string& date);
+
+                                  /* * * * */
 
     /**
      * @brief Explode the specified date attribute to year, month, day in the

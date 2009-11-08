@@ -82,9 +82,9 @@ void NewTypeBox::run()
             mVal = Integer::create();
         } else if (m_Combo->get_active_text() == "Matrix") {
             SimpleTypeBox box("columns ?", "1");
-            int cols = utils::to_int(box.run());
+            int cols = utils::toInt(box.run());
             SimpleTypeBox box2("rows ?", "1");
-            int rows = utils::to_int(box2.run());
+            int rows = utils::toInt(box2.run());
             mVal = Matrix::create(cols, rows, cols*2, rows*2, cols/5, rows/5);
         } else if (m_Combo->get_active_text() == "Map") {
             mVal = Map::create();
@@ -96,9 +96,9 @@ void NewTypeBox::run()
             mVal = String::create();
         } else if (m_Combo->get_active_text() == "Table") {
             SimpleTypeBox box("Width ?", "1");
-            int w = utils::to_int(box.run());
+            int w = utils::toInt(box.run());
             SimpleTypeBox box2("Height ?", "1");
-            int h = utils::to_int(box2.run());
+            int h = utils::toInt(box2.run());
             mVal = Table::create(w, h);
         } else if (m_Combo->get_active_text() == "Tuple") {
             mVal = Tuple::create();

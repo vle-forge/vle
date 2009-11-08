@@ -41,7 +41,7 @@
 #include <glibmm/markup.h>
 #include <glibmm/stringutils.h>
 #include <glibmm/thread.h>
-#include <glibmm/date.h>
+#include <glibmm/miscutils.h>
 #include <glib/gstdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -76,129 +76,14 @@
 
 namespace vle { namespace utils {
 
-std::string write_to_temp(const std::string& prefix,
-                                 const std::string& buffer)
+bool isAlnumString(const std::string& str)
 {
-    std::string filename;
-    int fd;
-
-    if (prefix.size())
-        fd = Glib::file_open_tmp(filename, prefix);
-    else
-        fd = Glib::file_open_tmp(filename);
-
-    Assert(fd != -1, fmt(_(
-            "Cannot open file %2% with prefix %1% in tempory directory\n")) %
-        prefix % filename);
-
-#ifdef G_OS_WIN32
-    ssize_t sz = ::_write(fd, buffer.c_str(), buffer.size());
-#else
-    ssize_t sz = ::write(fd, buffer.c_str(), buffer.size());
-#endif
-
-    Assert(sz != -1 and sz != 0, fmt(_(
-                "Cannot write buffer in file %1% in tempory directory\n")) %
-            filename);
-
-#ifdef G_OS_WIN32
-    ::_close(fd);
-#else
-    ::close(fd);
-#endif
-
-    return filename;
-}
-
-std::string get_current_date()
-{
-    Glib::Date date;
-    date.set_time_current();
-    return date.format_string("%a, %d %b %Y");
-}
-
-std::string get_simple_current_date()
-{
-    Glib::Date date;
-    date.set_time_current();
-    return date.format_string("%a, %d %b %Y");
-}
-
-bool is_vle_string(const Glib::ustring& str)
-{
-    if (str.is_ascii() == false)
-        return false;
-
-    if (str.empty() == true)
-        return false;
-
     const size_t sz = str.size();
     for (size_t i = 0; i < sz; ++i) {
         if (Glib::Ascii::isalpha(str[i]) == false)
             return false;
     }
     return true;
-}
-
-Glib::ustring print_trace_report()
-{
-    Glib::ustring msg;
-#ifdef VLE_HAVE_EXECINFO_H
-    if (Trace::trace().isInLevel(Trace::IMPORTANT)) {
-        const int size_buffer = 255;
-        void* array[size_buffer];
-        char** result = 0;
-        msg.assign("----------\n");
-
-        int size = backtrace(array, size_buffer);
-        result = backtrace_symbols(array, size);
-
-        for (int i = 1; i < size; ++i) {
-            char* p = ::index(result[i], '(');
-            char* l = ::rindex(result[i], '+');
-
-            std::ostringstream out;
-            out << std::setw(3) << i << ". ";
-            if (p and l) {
-                std::string mangled(p + 1, l - p - 1);
-                out << std::string(result[i], p - result[i])
-                    << "\n    " << utils::demangle(mangled)
-                    << " " << l << "\n";
-            } else {
-                out << "unkown function\n    " << result[i] << "\n";
-            }
-            msg += out.str();
-            msg += "\n";
-        }
-    }
-    return msg;
-#else
-    return msg;
-#endif
-}
-
-void print_trace_signals(int signal_number)
-{
-    std::cerr << "\n/!\\ " << Glib::get_prgname()
-        << "  " << Glib::strsignal(signal_number) << " reported.\n";
-    if (utils::Trace::trace().isInLevel(Trace::IMPORTANT)) {
-        std::cerr << utils::print_trace_report();
-    }
-    std::cerr << std::endl;
-    abort();
-}
-
-void install_signal()
-{
-#ifdef VLE_HAVE_SIGNAL_H
-#ifdef G_OS_UNIX
-    //if (utils::Trace::trace().get_level() != 3) {
-    signal(SIGILL, print_trace_signals);
-    signal(SIGBUS, print_trace_signals);
-    signal(SIGSEGV, print_trace_signals);
-    //}
-#endif
-#endif
 }
 
 std::string demangle(const std::type_info& in)
@@ -233,13 +118,12 @@ std::string demangle(const std::string& in)
 std::string getUserDirectory()
 {
 #ifdef G_OS_WIN32
-    std::string home(Glib::build_filename(Glib::get_home_dir(), "vle"));
+    std::string home(utils::Path::buildDirname(Glib::get_home_dir(), "vle"));
 #else
-    std::string home(Glib::build_filename(Glib::get_home_dir(), ".vle"));
+    std::string home(utils::Path::buildDirname(Glib::get_home_dir(), ".vle"));
 #endif
 
-    if (!Glib::file_test(home, Glib::FILE_TEST_IS_DIR |
-                         Glib::FILE_TEST_EXISTS)) {
+    if (not utils::Path::existDirectory(home)) {
 #ifdef G_OS_WIN32
         if (_mkdir(home.c_str()) == -1) {
 #else
@@ -281,8 +165,6 @@ void init()
 
     utils::Path::init();
     utils::Trace::init();
-
-    utils::install_signal();
     utils::net::Base::init();
 
 #ifdef VLE_HAVE_NLS

@@ -131,8 +131,7 @@ void ExperimentBox::initExperiment()
 	    mEntryDate->set_text(vpz.project().date());
 	}
 
-	mEntryVersion->set_text(utils::to_string(
-				    vpz.project().version()));
+        mEntryVersion->set_text(utils::toString(vpz.project().version()));
     }
 
     // Experiment frame
@@ -338,7 +337,7 @@ void ExperimentBox::on_calendarBegin()
 
 void ExperimentBox::on_now()
 {
-    mEntryDate->set_text(utils::get_current_date());
+    mEntryDate->set_text(utils::DateTime::currentDate());
 }
 
 }} // namespace vle gvle

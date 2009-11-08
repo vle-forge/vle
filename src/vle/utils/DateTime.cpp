@@ -31,10 +31,25 @@
 
 #include <vle/utils/DateTime.hpp>
 #include <vle/utils/Exception.hpp>
+#include <glibmm/date.h>
 #include <boost/numeric/conversion/cast.hpp>
 #include <cmath>
 
 namespace vle { namespace utils {
+
+std::string DateTime::currentDate()
+{
+    Glib::Date date;
+    date.set_time_current();
+    return date.format_string("%a, %d %b %Y");
+}
+
+std::string DateTime::simpleCurrentDate()
+{
+    Glib::Date date;
+    date.set_time_current();
+    return date.format_string("%a, %d %b %Y");
+}
 
 unsigned int DateTime::year(const double& time)
 {

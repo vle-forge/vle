@@ -34,6 +34,7 @@
 #include <vle/eov/NetStreamReader.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Tools.hpp>
+#include <vle/utils/DateTime.hpp>
 #include <gtkmm/menuitem.h>
 #include <gtkmm/textbuffer.h>
 #include <gtkmm/messagedialog.h>
@@ -137,7 +138,7 @@ void MainWindow::onNew()
         Glib::RefPtr < Gtk::TextBuffer > buffer = mTextview->get_buffer();
         buffer->insert(buffer->begin(), (fmt(_(
                     "%1%: Eov Stream listen on port %2% at %3%ms\n")) %
-		   utils::get_current_date() % mPort % mRefresh).str());
+		   utils::DateTime::currentDate() % mPort % mRefresh).str());
         mTextview->set_editable(false);
         mTextview->show_all();
     }
@@ -213,7 +214,7 @@ bool MainWindow::isStreamReaderFinish()
 	}
 
         buffer->insert(buffer->begin(), (fmt(_( "%1%: Eov Stream close\n")) %
-                                         utils::get_current_date()).str());
+                                         utils::DateTime::currentDate()).str());
 	showMenu();
 	return false;
     }

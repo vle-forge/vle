@@ -32,7 +32,6 @@
 #ifndef VLE_UTILS_PATH_HPP
 #define VLE_UTILS_PATH_HPP
 
-#include <glibmm/fileutils.h>
 #include <string>
 #include <list>
 #include <ostream>
@@ -372,18 +371,54 @@ namespace vle { namespace utils {
          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
         /**
+         * @brief Check if the current path exist (file or directory).
+         * @param filename The name of the file to check.
+         * @return True if the file is a regular file.
+         */
+        static bool exist(const std::string& filename);
+
+        /**
          * @brief Check if the current filename corresponds to a regular file.
          * @param filename The name of the file to check.
          * @return True if the file is a regular file.
          */
-        bool existFile(const std::string& filename);
+        static bool existFile(const std::string& filename);
 
         /**
          * @brief Check if the current filename corresponds to a directory.
          * @param filename The name of the directory to check.
          * @return True if the file is a directory.
          */
-        bool existDirectory(const std::string& filename);
+        static bool existDirectory(const std::string& filename);
+
+        /**
+         * @brief Return the basename of the current path.
+         * @code
+         * std::string s = "/tmp/test";
+         * std::string file = basename(s); // dir == test
+         * @endcode
+         * @param filename The path.
+         * @return The basename.
+         */
+        static std::string basename(const std::string& filename);
+
+        /**
+         * @brief Return the dirname of the current path.
+         * @code
+         * std::string s = "/tmp/test";
+         * std::string dir = dirname(s); // dir == /tmp
+         * @endcode
+         * @param filename The path.
+         * @return The dirname.
+         */
+        static std::string dirname(const std::string& filename);
+
+        /**
+         * @brief Return the extension of the current path.
+         * @param filename The path.
+         * @return The extension.
+         */
+        static std::string extension(const std::string& filename);
 
 	/**
 	 * @brief return the parent directory of a file or directory
@@ -392,24 +427,26 @@ namespace vle { namespace utils {
 	 */
 	std::string getParentPath(const std::string& path);
 
-    private:
-        void addSimulatorDir(const std::string& dirname);
+        /**
+         * @brief build a portable temporary filename like:
+         * @code
+         * $TMP/<filename> on Unix/Linux
+         * $ c:\windows\tmp\<filename> on Windows
+         * @endcode
+         * @param filename string to add on temporary directory
+         * @return a portable temporary filename
+         */
+        static std::string buildTemp( const std::string& filename);
 
-        void addStreamDir(const std::string& dirname);
-
-        void addOutputDir(const std::string& dirname);
-
-        void addConditionDir(const std::string& dirname);
-
-        void addModelingDir(const std::string& dirname);
-
-        std::string buildPackageDir(const std::string& name) const;
-        std::string buildPackageFile(const std::string& name) const;
-        std::string buildPackageFile(const std::string& dir,
-                                     const std::string& name) const;
-        std::string buildPackageFile(const std::string& dir1,
-                                     const std::string& dir2,
-                                     const std::string& name) const;
+        /**
+         * @brief Write specified buffer to temporary file and return the
+         * filename. The file is created in the temporary directory.
+         * @param prefix if you want to prefix the temporary file.
+         * @param buffer buffer to write.
+         * @return filename of the new temporary file.
+         */
+        static std::string writeToTemp(const std::string& prefix,
+                                       const std::string& buffer);
 
         static std::string buildFilename(const std::string& dir,
                                          const std::string& file);
@@ -437,6 +474,26 @@ namespace vle { namespace utils {
                                         const std::string& dir3,
                                         const std::string& dir4);
 
+
+    private:
+        void addSimulatorDir(const std::string& dirname);
+
+        void addStreamDir(const std::string& dirname);
+
+        void addOutputDir(const std::string& dirname);
+
+        void addConditionDir(const std::string& dirname);
+
+        void addModelingDir(const std::string& dirname);
+
+        std::string buildPackageDir(const std::string& name) const;
+        std::string buildPackageFile(const std::string& name) const;
+        std::string buildPackageFile(const std::string& dir,
+                                     const std::string& name) const;
+        std::string buildPackageFile(const std::string& dir1,
+                                     const std::string& dir2,
+                                     const std::string& name) const;
+
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
          * Functor
@@ -456,21 +513,9 @@ namespace vle { namespace utils {
              */
             bool operator()(const std::string& dirname) const
             {
-                return Glib::file_test(dirname, Glib::FILE_TEST_EXISTS |
-                                       Glib::FILE_TEST_IS_DIR);
+                return utils::Path::existDirectory(dirname);
             }
         };
-
-        /**
-         * @brief Check if the directory exists.
-         * @param dirname the directory to check.
-         * @return true if str is a directory.
-         */
-        static bool isDirectory(const std::string& dirname)
-        {
-            return Glib::file_test(dirname, Glib::FILE_TEST_EXISTS |
-                                   Glib::FILE_TEST_IS_DIR);
-        }
 
         PathList    m_simulator;
         PathList    m_stream;

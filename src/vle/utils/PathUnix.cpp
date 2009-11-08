@@ -29,14 +29,14 @@
  */
 
 
-#include <glibmm/fileutils.h>
-#include <glibmm/miscutils.h>
 #include <list>
 
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/version.hpp>
+
+#include <glibmm/miscutils.h>
 
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>

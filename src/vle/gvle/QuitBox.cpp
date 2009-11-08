@@ -31,7 +31,6 @@
 
 #include <vle/gvle/OpenPackageBox.hpp>
 #include <vle/gvle/Modeling.hpp>
-#include <boost/filesystem.hpp>
 #include <vle/gvle/Editor.hpp>
 
 namespace vle { namespace gvle {
@@ -96,8 +95,8 @@ void QuitBox::build()
 	if (tab->isModified()) {
 	    Gtk::TreeModel::Row row = *(mRefTreeFile->append());
 
-	    row[mColumns.mName] = boost::filesystem::basename(tab->filepath())
-		+ boost::filesystem::extension(tab->filepath());
+	    row[mColumns.mName] = utils::Path::basename(tab->filepath())
+		+ utils::Path::extension(tab->filepath());
 	    mFileModified.push_back(tab->filepath());
 	}
 	++it;

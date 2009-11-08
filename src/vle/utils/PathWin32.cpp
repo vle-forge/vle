@@ -29,11 +29,10 @@
  */
 
 
-#include <glibmm/fileutils.h>
-#include <glibmm/miscutils.h>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/version.hpp>
+#include <glibmm/miscutils.h>
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
 #include <windows.h>
@@ -51,10 +50,7 @@ void Path::initHomeDir()
      * If no VLE_HOME, we build %HOMEDRIVE%%HOMEPATH%\vle directory.
      */
     if (m_home.empty()) {
-        std::list < std::string > lst;
-        lst.push_back(Glib::get_home_dir());
-        lst.push_back("vle");
-        m_home = Glib::build_path(G_DIR_SEPARATOR_S, lst);
+        m_home = utils::Path::buildDirname(Glib::get_home_dir(), "vle");
     }
 }
 

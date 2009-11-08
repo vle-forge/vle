@@ -32,9 +32,10 @@
 #include <vle/gvle/ModelClassBox.hpp>
 #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/Editor.hpp>
+#include <vle/gvle/View.hpp>
+#include <vle/utils/Path.hpp>
 #include <boost/algorithm/string/detail/trim.hpp>
 #include <boost/algorithm/string.hpp>
-#include <vle/gvle/View.hpp>
 #include <vle/gvle/InteractiveTypeBox.hpp>
 #include <iostream>
 
@@ -270,7 +271,7 @@ void ModelClassBox::onExportVpz()
 		vpz::Vpz::fixExtension(filename);
 
 		vpz::Vpz* save = new vpz::Vpz();
-		if (utils::exist_file(filename)) {
+		if (utils::Path::existFile(filename)) {
 		    save->clear();
 		}
 		save->setFilename(filename);

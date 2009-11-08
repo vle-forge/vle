@@ -31,6 +31,7 @@
 
 #include <vle/oov/plugins/Default.hpp>
 #include <vle/utils/Debug.hpp>
+#include <vle/utils/Path.hpp>
 
 
 namespace vle { namespace oov { namespace plugin {
@@ -51,7 +52,7 @@ void Default::onParameter(const std::string& plugin,
                          value::Value* parameters,
                          const double& time)
 {
-    m_filename = Glib::build_filename(location, file);
+    m_filename = utils::Path::buildFilename(location, file);
     m_file.open(m_filename.c_str());
 
     if (not m_file.is_open()) {

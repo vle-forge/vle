@@ -194,7 +194,7 @@ void CairoGauge::draw_text(Cairo::RefPtr < Cairo::Context > m_ctx)
     m_ctx->show_text((fmt("min: %1%") % mMin).str());
 
     m_ctx->move_to(mWindowWidth / 2 - 15, mWindowHeight - 3*mLine ) ;
-    m_ctx->show_text(vle::utils::to_string( mValue));
+    m_ctx->show_text(vle::utils::toString(mValue));
 
     m_ctx->move_to(mWindowWidth / 2 + rayon - 40, mWindowHeight - 3*mLine );
     m_ctx->show_text( (fmt("max: %1%") % mMax).str() );

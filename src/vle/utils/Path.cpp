@@ -29,8 +29,6 @@
  */
 
 
-#include <glibmm/fileutils.h>
-#include <glibmm/miscutils.h>
 #include <list>
 #include <glib.h>
 #include <glib/gstdio.h>
@@ -45,12 +43,19 @@
 #include <vle/utils/i18n.hpp>
 #include <vle/version.hpp>
 
+#include <glibmm/miscutils.h>
+#include <glibmm/fileutils.h>
+
+#include <iostream>
+
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 
 namespace vle { namespace utils {
+
+namespace fs = boost::filesystem;
 
 Path* Path::mPath = 0;
 
@@ -284,7 +289,7 @@ std::string Path::getHomeConditionDocFile(const std::string& file) const
 
 
 /*
- * modeling 
+ * modeling
  */
 
 std::string Path::getModelingDir() const
@@ -394,8 +399,6 @@ std::string Path::getTemplate(const std::string& name) const
 
 void Path::copyTemplate(const std::string& name, const std::string& to) const
 {
-    namespace fs = boost::filesystem;
-
     const std::string& dirname(getTemplate("package"));
     fs::path source(dirname);
 
@@ -611,8 +614,6 @@ std::string Path::getExternalPackageExpFile(const std::string& name,
 
 PathList Path::getInstalledPackages()
 {
-    namespace fs = boost::filesystem;
-
     fs::path pkgs(Path::path().getPackagesDir());
 
     if (not fs::exists(pkgs) or not fs::is_directory(pkgs)) {
@@ -637,8 +638,6 @@ PathList Path::getInstalledPackages()
 
 PathList Path::getInstalledExperiments()
 {
-    namespace fs = boost::filesystem;
-
     fs::path pkgs(Path::path().getPackageExpDir());
 
     if (not fs::exists(pkgs) or not fs::is_directory(pkgs)) {
@@ -666,8 +665,6 @@ PathList Path::getInstalledExperiments()
 
 PathList Path::getInstalledLibraries()
 {
-    namespace fs = boost::filesystem;
-
     PathList result;
     const PathList& dirs = Path::path().getSimulatorDirs();
 
@@ -709,8 +706,6 @@ PathList Path::getInstalledLibraries()
 
 void Path::initVleHomeDirectory()
 {
-    namespace fs = boost::filesystem;
-
     fs::create_directory(getHomeDir());
     fs::create_directory(getHomeStreamDir());
     fs::create_directory(getHomeOutputDir());
@@ -726,35 +721,35 @@ void Path::initVleHomeDirectory()
 
 void Path::addSimulatorDir(const std::string& dirname)
 {
-    if (isDirectory(dirname)) {
+    if (fs::is_directory(dirname)) {
         m_simulator.push_back(dirname);
     }
 }
 
 void Path::addStreamDir(const std::string& dirname)
 {
-    if (isDirectory(dirname)) {
+    if (fs::is_directory(dirname)) {
         m_stream.push_back(dirname);
     }
 }
 
 void Path::addOutputDir(const std::string& dirname)
 {
-    if (isDirectory(dirname)) {
+    if (fs::is_directory(dirname)) {
         m_output.push_back(dirname);
     }
 }
 
 void Path::addConditionDir(const std::string& dirname)
 {
-    if (isDirectory(dirname)) {
+    if (fs::is_directory(dirname)) {
         m_condition.push_back(dirname);
     }
 }
 
 void Path::addModelingDir(const std::string& dirname)
 {
-    if (isDirectory(dirname)) {
+    if (fs::is_directory(dirname)) {
         m_modeling.push_back(dirname);
     }
 }
@@ -782,7 +777,7 @@ void Path::readHomeDir()
 {
     std::string path(Glib::getenv("VLE_HOME"));
     if (not path.empty()) {
-        if (isDirectory(path)) {
+        if (fs::is_directory(path)) {
             m_home = path;
         } else {
             throw FileError(fmt(_(
@@ -842,23 +837,69 @@ std::ostream& operator<<(std::ostream& out, const PathList& paths)
     return out;
 }
 
+std::string Path::buildTemp(const std::string& filename)
+{
+    return utils::Path::buildFilename(Glib::get_tmp_dir(), filename);
+}
+
+std::string Path::writeToTemp(const std::string& prefix,
+                              const std::string& buffer)
+{
+    std::string filename;
+    int fd;
+
+    if (prefix.size()) {
+        fd = Glib::file_open_tmp(filename, prefix);
+    } else {
+        fd = Glib::file_open_tmp(filename);
+    }
+
+    if (fd == -1) {
+        throw utils::InternalError(fmt(
+                _("Cannot open file %2% with prefix %1% in temporary "
+                  "directory\n")) % prefix % filename);
+    }
+
+#ifdef G_OS_WIN32
+    ssize_t sz = ::_write(fd, buffer.c_str(), buffer.size());
+#else
+    ssize_t sz = ::write(fd, buffer.c_str(), buffer.size());
+#endif
+
+    if (sz == -1 or sz == 0) {
+        throw utils::InternalError(fmt(
+            _("Cannot write buffer in file %1% in tempory directory\n")) %
+            filename);
+    }
+
+#ifdef G_OS_WIN32
+    ::_close(fd);
+#else
+    ::close(fd);
+#endif
+
+    return filename;
+}
+
+
 std::string Path::buildFilename(const std::string& dir,
                                 const std::string& file)
 {
-    return Glib::build_filename(dir, file);
+    fs::path f = dir;
+    f /= file;
+
+    return f.string();
 }
 
 std::string Path::buildFilename(const std::string& dir1,
                                 const std::string& dir2,
                                 const std::string& file)
 {
-    std::list < std::string > lst;
-    lst.push_back(dir1);
-    lst.push_back(dir2);
+    fs::path f = dir1;
+    f /= dir2;
+    f /= file;
 
-    std::string path = Glib::build_path(G_DIR_SEPARATOR_S, lst);
-
-    return Glib::build_filename(path, file);
+    return f.string();
 }
 
 std::string Path::buildFilename(const std::string& dir1,
@@ -866,14 +907,12 @@ std::string Path::buildFilename(const std::string& dir1,
                                 const std::string& dir3,
                                 const std::string& file)
 {
-    std::list < std::string > lst;
-    lst.push_back(dir1);
-    lst.push_back(dir2);
-    lst.push_back(dir3);
+    fs::path f = dir1;
+    f /= dir2;
+    f /= dir3;
+    f /= file;
 
-    std::string path = Glib::build_path(G_DIR_SEPARATOR_S, lst);
-
-    return Glib::build_filename(path, file);
+    return f.string();
 }
 
 std::string Path::buildFilename(const std::string& dir1,
@@ -882,37 +921,33 @@ std::string Path::buildFilename(const std::string& dir1,
                                 const std::string& dir4,
                                 const std::string& file)
 {
-    std::list < std::string > lst;
-    lst.push_back(dir1);
-    lst.push_back(dir2);
-    lst.push_back(dir3);
-    lst.push_back(dir4);
+    fs::path f = dir1;
+    f /= dir2;
+    f /= dir3;
+    f /= dir4;
+    f /= file;
 
-    std::string path = Glib::build_path(G_DIR_SEPARATOR_S, lst);
-
-    return Glib::build_filename(path, file);
+    return f.string();
 }
 
 std::string Path::buildDirname(const std::string& dir1,
                                const std::string& dir2)
 {
-    std::list < std::string > lst;
-    lst.push_back(dir1);
-    lst.push_back(dir2);
+    fs::path f = dir1;
+    f /= dir2;
 
-    return Glib::build_path(G_DIR_SEPARATOR_S, lst);
+    return f.string();
 }
 
 std::string Path::buildDirname(const std::string& dir1,
                                const std::string& dir2,
                                const std::string& dir3)
 {
-    std::list < std::string > lst;
-    lst.push_back(dir1);
-    lst.push_back(dir2);
-    lst.push_back(dir3);
+    fs::path f = dir1;
+    f /= dir2;
+    f /= dir3;
 
-    return Glib::build_path(G_DIR_SEPARATOR_S, lst);
+    return f.string();
 }
 
 std::string Path::buildDirname(const std::string& dir1,
@@ -920,33 +955,54 @@ std::string Path::buildDirname(const std::string& dir1,
                                const std::string& dir3,
                                const std::string& dir4)
 {
-    std::list < std::string > lst;
-    lst.push_back(dir1);
-    lst.push_back(dir2);
-    lst.push_back(dir3);
-    lst.push_back(dir4);
+    fs::path f = dir1;
+    f /= dir2;
+    f /= dir3;
+    f /= dir4;
 
-    return Glib::build_path(G_DIR_SEPARATOR_S, lst);
+    return f.string();
+}
+
+bool Path::exist(const std::string& filename)
+{
+    fs::path p(filename);
+    return fs::exists(p);
 }
 
 bool Path::existFile(const std::string& filename)
 {
-    namespace fs = boost::filesystem;
-
     fs::path p(filename);
     return fs::exists(p) and fs::is_directory(p);
 }
 
 bool Path::existDirectory(const std::string& filename)
 {
-    namespace fs = boost::filesystem;
-
     fs::path p(filename);
 #if BOOST_VERSION > 103600
     return fs::exists(p) and fs::is_regular_file(p);
 #else
     return fs::exists(p) and fs::is_regular(p);
 #endif
+}
+
+std::string Path::basename(const std::string& filename)
+{
+    return fs::basename(filename);
+}
+
+std::string Path::dirname(const std::string& filename)
+{
+    fs::path path(filename);
+#if BOOST_VERSION > 103600
+    return path.parent_path().string();
+#else
+    return path.branch_path().string();
+#endif
+}
+
+std::string Path::extension(const std::string& filename)
+{
+    return fs::extension(filename);
 }
 
 std::ostream& operator<<(std::ostream& out, const Path& p)
@@ -1010,7 +1066,7 @@ std::ostream& operator<<(std::ostream& out, const Path& p)
 
 std::string Path::getParentPath(const std::string& pathfile)
 {
-    boost::filesystem::path path(pathfile);
+    fs::path path(pathfile);
 
 #if BOOST_VERSION > 103600
     return path.parent_path().string();

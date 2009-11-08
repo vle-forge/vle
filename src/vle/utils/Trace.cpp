@@ -32,6 +32,7 @@
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Tools.hpp>
+#include <vle/utils/DateTime.hpp>
 #include <vle/utils/Debug.hpp>
 
 
@@ -50,8 +51,8 @@ namespace vle { namespace utils {
             delete m_file;
             m_file = 0;
 	} else {
-            (*m_file) << _("Start log at ") << utils::get_current_date() << "\n\n";
-            (*m_file) << std::flush;
+            (*m_file) << _("Start log at ") << utils::DateTime::currentDate()
+                << "\n\n" << std::flush;
         }
     }
 
@@ -73,8 +74,8 @@ namespace vle { namespace utils {
 	    }
 	    m_filename.assign(filename);
 	    m_file = tmp;
-            (*m_file) << _("Start log at ") << utils::get_current_date() << "\n\n";
-            (*m_file) << std::flush;
+            (*m_file) << _("Start log at ") << utils::DateTime::currentDate()
+                << "\n\n" << std::flush;
 	}
     }
 
@@ -85,7 +86,7 @@ namespace vle { namespace utils {
 
     std::string Trace::getLogFilename(const std::string& filename)
     {
-	return Glib::build_filename(utils::Path::path().getHomeDir(), filename);
+        return Path::buildFilename(utils::Path::path().getHomeDir(), filename);
     }
 
     std::ostream& Trace::output()

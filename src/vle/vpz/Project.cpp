@@ -30,6 +30,7 @@
 
 
 #include <vle/vpz/Project.hpp>
+#include <vle/utils/DateTime.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/version.hpp>
 
@@ -85,7 +86,7 @@ void Project::setAuthor(const std::string& name)
 void Project::setDate(const std::string& date)
 {
     if (date.empty()) {
-        m_date.assign(utils::get_current_date());
+        m_date.assign(utils::DateTime::currentDate());
     } else {
         m_date.assign(date);
     }

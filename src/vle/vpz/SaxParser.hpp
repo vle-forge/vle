@@ -36,6 +36,7 @@
 #include <vle/vpz/Base.hpp>
 #include <vle/vpz/SaxStackValue.hpp>
 #include <vle/vpz/SaxStackVpz.hpp>
+#include <glibmm/ustring.h>
 #include <vle/vpz/DllDefines.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/value/Set.hpp>

@@ -341,9 +341,9 @@ void ValuesTreeView::on_menu_insert(value::Value::type type)
             break;
         case(Value::TABLE): {
             SimpleTypeBox box("Width ?", "1");
-            int w = utils::to_int(box.run());
+            int w = utils::toInt(box.run());
             SimpleTypeBox box2("Height ?", "1");
-            int h = utils::to_int(box2.run());
+            int h = utils::toInt(box2.run());
             vector.insert(it, Table::create(w, h));
         }
             break;
@@ -355,9 +355,9 @@ void ValuesTreeView::on_menu_insert(value::Value::type type)
             break;
         case(Value::MATRIX): {
             SimpleTypeBox box("Columns ?", "1");
-            int cols = utils::to_int(box.run());
+            int cols = utils::toInt(box.run());
             SimpleTypeBox box2("Rows ?", "1");
-            int rows = utils::to_int(box2.run());
+            int rows = utils::toInt(box2.run());
             Matrix* matrix = Matrix::create(cols, rows, cols * 2, rows * 2,
                                             cols / 5, rows / 5);
             vector.insert(it, matrix);
@@ -398,9 +398,9 @@ void ValuesTreeView::on_menu_insert(value::Value::type type)
             break;
         case(Value::TABLE): {
             SimpleTypeBox box("Width ?", "1");
-            int w = utils::to_int(box.run());
+            int w = utils::toInt(box.run());
             SimpleTypeBox box2("Height ?", "1");
-            int h = utils::to_int(box2.run());
+            int h = utils::toInt(box2.run());
             map->addClone(name, Table::create(w, h));
         }
         break;
@@ -412,9 +412,9 @@ void ValuesTreeView::on_menu_insert(value::Value::type type)
         break;
         case(Value::MATRIX): {
             SimpleTypeBox box("Columns ?", "1");
-            int cols = utils::to_int(box.run());
+            int cols = utils::toInt(box.run());
             SimpleTypeBox box2("Rows ?", "1");
-            int rows = utils::to_int(box2.run());
+            int rows = utils::toInt(box2.run());
             Matrix* matrix = Matrix::create(cols, rows,
                                            cols * 2, rows * 2,
                                            cols / 5, rows / 5);

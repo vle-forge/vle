@@ -367,7 +367,7 @@ void Plot::drawVerticalStep(Cairo::RefPtr < Cairo::Context > m_ctx)
         m_ctx->stroke();
 
         m_ctx->move_to(v_x +1, m_minY);
-        m_ctx->show_text(utils::to_string(date));
+        m_ctx->show_text(utils::toString(date));
 
         date += m_stepX;
     }
@@ -394,7 +394,7 @@ void Plot::drawHorizontalStep(Cairo::RefPtr < Cairo::Context > m_ctx)
         m_ctx->set_line_width(1);
 
         m_ctx->move_to(0, y - 1);
-        m_ctx->show_text(utils::to_string(value_show));
+        m_ctx->show_text(utils::toString(value_show));
         m_ctx->stroke();
 
         y -= mParameter.get_text_height();
@@ -448,7 +448,7 @@ void Plot::drawLimits(Cairo::RefPtr < Cairo::Context > m_ctx)
         if (mParameter.is_inside_min_max((*it)->get_value())) {
 
             y_limit = mParameter.to_pixel_height((*it)->get_value());
-            m_ctx->get_text_extents(utils::to_string((*it)->get_value()), mExtents);
+            m_ctx->get_text_extents(utils::toString((*it)->get_value()), mExtents);
 
             m_ctx->set_source_rgba(1, 1, 0, 0.5);
             m_ctx->begin_new_path();
@@ -463,7 +463,7 @@ void Plot::drawLimits(Cairo::RefPtr < Cairo::Context > m_ctx)
 
             m_ctx->set_source_rgba(0., 0., 0., 1.);
             m_ctx->move_to(x_left + 4, y_limit - 4);
-            m_ctx->show_text(utils::to_string((*it)->get_value()));
+            m_ctx->show_text(utils::toString((*it)->get_value()));
 
             m_ctx->set_source_rgba((*it)->get_red_color()/65535.,
                                    (*it)->get_green_color()/65535.,

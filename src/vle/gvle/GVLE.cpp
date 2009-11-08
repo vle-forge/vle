@@ -53,14 +53,10 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
-#include <boost/filesystem.hpp>
-#include <boost/version.hpp>
 #include <gtkmm/filechooserdialog.h>
 #include <glibmm/spawn.h>
 #include <glibmm/miscutils.h>
 #include <gtkmm/stock.h>
-
-namespace fs = boost::filesystem;
 
 namespace vle { namespace gvle {
 
@@ -203,9 +199,8 @@ void GVLE::FileTreeView::build()
 {
     remove_all_columns();
     if (not mPackage.empty()) {
-	mColumnName = append_column(
-	    _(fs::basename(mPackage).c_str()),
-	    mColumns.m_col_name);
+        mColumnName = append_column(utils::Path::basename(mPackage),
+                                    mColumns.m_col_name);
 	mCellrenderer = dynamic_cast<Gtk::CellRendererText*>(
 	    get_column_cell_renderer(mColumnName - 1));
 	buildHierarchy(0, mPackage);
@@ -238,14 +233,14 @@ void GVLE::FileTreeView::on_row_activated(const Gtk::TreeModel::Path&,
 	if (mParent->getEditor()->existTab(absolute_path)) {
 	    mParent->getEditor()->focusTab(absolute_path);
 	} else {
-	    if (fs::extension(absolute_path) == ".vpz") {
+            if (utils::Path::extension(absolute_path) == ".vpz") {
                 Editor::Documents::const_iterator it =
                     mParent->getEditor()->getDocuments().begin();
                 bool found = false;
 
                 while (not found and
                        it != mParent->getEditor()->getDocuments().end()) {
-                    if (boost::filesystem::extension(it->first) == ".vpz") {
+                    if (utils::Path::extension(it->first) == ".vpz") {
                         found = true;
                     } else {
                         ++it;
@@ -334,12 +329,7 @@ void GVLE::FileTreeView::onNewFile()
 	    filepath = Glib::build_filename(
 		mPackage, Glib::build_filename(lstpath));
 	    if (not isDirectory(filepath)) {
-		fs::path path(filepath);
-#if BOOST_VERSION > 103600
-                filepath = path.parent_path().string();
-#else
-                filepath = path.branch_path().string();
-#endif
+                filepath = utils::Path::dirname(filepath);
 	    }
 	} else {
 	    filepath = mPackage;
@@ -366,12 +356,7 @@ void GVLE::FileTreeView::onNewDirectory()
 	    directorypath = Glib::build_filename(
 		mPackage, Glib::build_filename(lstpath));
 	    if (not isDirectory(directorypath)) {
-		fs::path path(directorypath);
-#if BOOST_VERSION > 103600
-                directorypath = path.parent_path().string();
-#else
-                directorypath = path.branch_path().string();
-#endif
+                directorypath = utils::Path::dirname(directorypath);
 	    }
 	} else {
 	    directorypath = mPackage;
@@ -434,8 +419,8 @@ void GVLE::FileTreeView::onRename()
 		    Glib::build_filename(utils::Path::path().getPackageDir(),
 					 oldName);
 
-		if (fs::extension(newName) == "") {
-		    newName += fs::extension(oldAbsolutePath);
+		if (utils::Path::extension(newName) == "") {
+		    newName += utils::Path::extension(oldAbsolutePath);
 		}
 
 		std::string newAbsolutePath =
@@ -443,7 +428,7 @@ void GVLE::FileTreeView::onRename()
 			utils::Path::path().getParentPath(oldAbsolutePath),
 			newName);
 
-		if (not fs::exists(newAbsolutePath)) {
+		if (not utils::Path::exist(newAbsolutePath)) {
 		    utils::Package::package().renameFile(oldName, newName);
 
 		    mParent->refreshEditor(oldName, newName);
@@ -521,8 +506,7 @@ void GVLE::show()
 
 void GVLE::setModifiedTitle(const std::string& name)
 {
-    if (not name.empty() and
-	fs::extension(name) == ".vpz") {
+    if (not name.empty() and utils::Path::extension(name) == ".vpz") {
 	Editor::Documents::const_iterator it =
 	    mEditor->getDocuments().find(name);
 	if (it != mEditor->getDocuments().end())
@@ -544,25 +528,17 @@ void GVLE::refreshEditor(const std::string& oldName, const std::string& newName)
 	mEditor->closeTab(Glib::build_filename(
 			      mPackage, oldName));
     } else {
-	fs::path filePath(
-	    Glib::build_filename(mPackage, oldName));
-        std::string newFilePath(
-#if BOOST_VERSION > 103600
-            Glib::build_filename(filePath.parent_path().string(), newName));
-#else
-            Glib::build_filename(filePath.branch_path().string(), newName));
-#endif
+	std::string filePath = utils::Path::buildFilename(mPackage, oldName);
+        std::string newFilePath = utils::Path::buildFilename(mPackage, newName);
 
-	mEditor->changeFile(Glib::build_filename(mPackage, oldName),
-			    newFilePath);
+        mEditor->changeFile(filePath, newFilePath);
 	mModeling->setFileName(newFilePath);
     }
 }
 
 void GVLE::setFileName(std::string name)
 {
-    if (not name.empty() and
-	fs::extension(name) == ".vpz") {
+    if (not name.empty() and utils::Path::extension(name) == ".vpz") {
 	mModeling->parseXML(name);
 	mMenuAndToolbar->showEditMenu();
 	mMenuAndToolbar->showSimulationMenu();

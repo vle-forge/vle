@@ -34,7 +34,6 @@
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Path.hpp>
-#include <boost/filesystem.hpp>
 
 namespace vle { namespace gvle {
 
@@ -90,7 +89,7 @@ void OpenPackageBox::build()
     for (utils::PathList::const_iterator it = list.begin();
 	 it != list.end(); ++it) {
 	Gtk::TreeModel::Row row = *(mRefTreePackage->append());
-	row[mColumns.mName] = boost::filesystem::basename(*it);
+	row[mColumns.mName] = utils::Path::basename(*it);
     }
 }
 

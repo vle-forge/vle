@@ -595,7 +595,7 @@ void ImportModelBox::rename_dynamic(vpz::Vpz* src, std::string old_name, std::st
     } else {
         std::size_t pos = dyn.location().find_last_of(":");
         new_dyn->setDistantDynamics(dyn.location().substr(0,pos),
-                                    utils::to_int(dyn.location().substr(pos+1)));
+                                    utils::toInt(dyn.location().substr(pos+1)));
     }
     new_dyn->permanent(dyn.isPermanent());
     dyns.del(old_name);

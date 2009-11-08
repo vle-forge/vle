@@ -543,28 +543,27 @@ void SaxParser::onEndBoolean()
 {
     m_valuestack.pushOnVectorValue(
         value::Boolean::create(
-            utils::to_boolean(lastCharactersStored())));
+            utils::toBoolean(lastCharactersStored())));
 }
 
 void SaxParser::onEndInteger()
 {
     m_valuestack.pushOnVectorValue(
         value::Integer::create(
-            utils::to_long(lastCharactersStored())));
+            utils::toLong(lastCharactersStored())));
 }
 
 void SaxParser::onEndDouble()
 {
     m_valuestack.pushOnVectorValue(
         value::Double::create(
-            utils::to_double(lastCharactersStored())));
+            utils::toDouble(lastCharactersStored())));
 }
 
 void SaxParser::onEndString()
 {
     m_valuestack.pushOnVectorValue(
-        value::String::create(
-            utils::to_string(lastCharactersStored())));
+        value::String::create(lastCharactersStored()));
 }
 
 void SaxParser::onEndKey()

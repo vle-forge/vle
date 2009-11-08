@@ -40,7 +40,6 @@
 #include <vle/vpz/Observables.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Path.hpp>
-#include <boost/filesystem.hpp>
 
 namespace vle { namespace gvle {
 
@@ -98,7 +97,7 @@ void OpenModelingPluginBox::build()
     for (ModelingPluginList::const_iterator it = pll.begin();
 	 it != pll.end(); ++it) {
 	Gtk::TreeModel::Row row = *(mRefTreeModelingPlugin->append());
-	row[mColumns.mName] = boost::filesystem::basename(it->first);
+	row[mColumns.mName] = utils::Path::basename(it->first);
     }
 }
 

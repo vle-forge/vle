@@ -430,7 +430,7 @@ void CoupledModelBox::show(graph::CoupledModel* model)
     mModel = model;
 
     mModelName->set_text(model->getName());
-    mModelNbChildren->set_text(utils::to_string(model->getModelList().size()));
+    mModelNbChildren->set_text(utils::toString(model->getModelList().size()));
 
     mInputPorts->setModel(mModel);
     mInputPorts->build();

@@ -39,7 +39,6 @@
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/vpz/Vpz.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
@@ -54,20 +53,20 @@ Document::Document(GVLE* gvle, const std::string& filepath) :
 {
     setModified(false);
     mFilePath = filepath;
-    mFileName = boost::filesystem::basename(filepath);
+    mFileName = utils::Path::basename(filepath);
 }
 
 void Document::setTitle(const std::string& filePath,
 			graph::Model* model,
 			bool modified)
 {
-    if (boost::filesystem::extension(filePath) == ".vpz") {
-	mTitle = boost::filesystem::basename(filePath) +
-	    boost::filesystem::extension(filePath) + " - " +
+    if (utils::Path::extension(filePath) == ".vpz") {
+	mTitle = utils::Path::basename(filePath) +
+	    utils::Path::extension(filePath) + " - " +
 	    model->getName();
     } else {
-	mTitle = boost::filesystem::basename(filePath) +
-	    boost::filesystem::extension(filePath);
+	mTitle = utils::Path::basename(filePath) +
+	    utils::Path::extension(filePath);
     }
     if (modified) {
 	mTitle = "* " + mTitle;
@@ -87,7 +86,7 @@ DocumentText::DocumentText(GVLE* gvle,
     Document(gvle, filepath),
     mNew(newfile)
 {
-    mTitle = filename() + boost::filesystem::extension(filepath);
+    mTitle = filename() + utils::Path::extension(filepath);
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
     gtksourceview::init();
 #endif
@@ -104,7 +103,7 @@ void DocumentText::save()
 	file.close();
 	mNew = false;
 	setModified(false);
-	mTitle = filename() + boost::filesystem::extension(filepath());
+	mTitle = filename() + utils::Path::extension(filepath());
 	mGVLE->getEditor()->setModifiedTab(mTitle, filepath(), filepath());
         mGVLE->getMenu()->hideSave();
     } catch(std::exception& e) {
@@ -117,13 +116,13 @@ void DocumentText::saveAs(const std::string& newFilePath)
     try {
 	std::string oldFilePath(filepath().c_str());
 	setFilePath(newFilePath);
-	setFileName(boost::filesystem::basename(newFilePath));
+	setFileName(utils::Path::basename(newFilePath));
 	std::ofstream file(filepath().c_str());
 	file << mView.get_buffer()->get_text();
 	file.close();
 	mNew = false;
 	setModified(false);
-	mTitle = filename() + boost::filesystem::extension(filepath());
+	mTitle = filename() + utils::Path::extension(filepath());
 	mGVLE->getEditor()->setModifiedTab(mTitle, newFilePath, oldFilePath);
         mGVLE->getMenu()->hideSave();
     } catch(std::exception& e) {
@@ -175,7 +174,7 @@ void DocumentText::init()
 
 std::string DocumentText::getIdLanguage()
 {
-    std::string ext(boost::filesystem::extension(filepath()));
+    std::string ext(utils::Path::extension(filepath()));
     std::string idLang;
 
     if ((ext == ".cpp") or (ext == ".hpp") or (ext == ".cc"))
@@ -288,7 +287,7 @@ DocumentDrawingArea::DocumentDrawingArea(GVLE* gvle,
     mAdjustWidth(0,0,1),
     mAdjustHeight(0,0,1)
 {
-    mTitle = filename() + boost::filesystem::extension(filepath)
+    mTitle = filename() + utils::Path::extension(filepath)
 	+ " - " + model->getName();
     mArea = mView->getArea();
     mViewport = new Gtk::Viewport(mAdjustWidth, mAdjustHeight);
@@ -387,7 +386,7 @@ void Editor::changeTab(GtkNotebookPage* /*page*/, int num)
     while (it != mDocuments.end()) {
 	if (it->second == tab) {
             mApp->setCurrentTab(num);
-	    if (boost::filesystem::extension(it->first) == ".vpz") {
+	    if (utils::Path::extension(it->first) == ".vpz") {
 		mApp->getMenu()->onOpenVpz();
 	    } else {
 		mApp->getMenu()->onOpenFile();
@@ -397,8 +396,8 @@ void Editor::changeTab(GtkNotebookPage* /*page*/, int num)
             } else {
                 mApp->getMenu()->hideSave();
             }
-	    mApp->setTitle(boost::filesystem::basename(it->first) +
-			   boost::filesystem::extension(it->first));
+	    mApp->setTitle(utils::Path::basename(it->first) +
+			   utils::Path::extension(it->first));
 	    break;
 	}
 	++it;
@@ -413,7 +412,7 @@ void Editor::changeFile(const std::string& oldName,
     if (it != mDocuments.end()) {
 	graph::Model* model = 0;
 
-	if (boost::filesystem::extension(oldName) == ".vpz") {
+	if (utils::Path::extension(oldName) == ".vpz") {
 	    model = dynamic_cast < DocumentDrawingArea* >(
 		it->second)->getModel();
 	}
@@ -483,7 +482,7 @@ void Editor::closeVpzTab()
     Documents::iterator it = mDocuments.begin();
 
     while (it != mDocuments.end()) {
-	if (boost::filesystem::extension(it->first) == ".vpz") {
+	if (utils::Path::extension(it->first) == ".vpz") {
             closeTab(it->first);
             break;
         }
@@ -496,7 +495,7 @@ bool Editor::existVpzTab()
     Documents::iterator it = mDocuments.begin();
 
     while (it != mDocuments.end()) {
-	if (boost::filesystem::extension(it->first) == ".vpz")
+	if (utils::Path::extension(it->first) == ".vpz")
 	    return true;
 	++it;
     }
@@ -534,7 +533,7 @@ void Editor::onRedo()
 
 void Editor::openTab(const std::string& filepath)
 {
-    if (boost::filesystem::extension(filepath) != ".vpz") {
+    if (utils::Path::extension(filepath) != ".vpz") {
 	try {
 	    if (mDocuments.find(filepath) == mDocuments.end()) {
 		DocumentText* doc = new DocumentText(mApp, filepath);
@@ -624,13 +623,13 @@ void Editor::setModifiedTab(const std::string& title,
 	Gtk::Widget* tab = get_nth_page(page);
 
 	set_tab_label(*tab, *(addLabel(title, newFilePath)));
-	if (boost::filesystem::basename(newFilePath) !=
-	    boost::filesystem::basename(oldFilePath)) {
+	if (utils::Path::basename(newFilePath) !=
+	    utils::Path::basename(oldFilePath)) {
 	    mDocuments.erase(it);
 	    mDocuments[newFilePath] = doc;
 	}
-	mApp->setTitle(boost::filesystem::basename(newFilePath) +
-		       boost::filesystem::extension(newFilePath));
+	mApp->setTitle(utils::Path::basename(newFilePath) +
+		       utils::Path::extension(newFilePath));
     }
 }
 

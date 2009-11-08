@@ -102,9 +102,9 @@ BOOST_AUTO_TEST_CASE(value_integer)
     char t4[bufferSize];
 
     snprintf(t3, bufferSize, "<?xml version=\"1.0\"?>\n<integer>%s</integer>",
-             utils::to_string(std::numeric_limits< long >::max()).c_str());
+             utils::toString(std::numeric_limits< long >::max()).c_str());
     snprintf(t4, bufferSize, "<?xml version=\"1.0\"?>\n<integer>%s</integer>",
-             utils::to_string(std::numeric_limits< long >::min()).c_str());
+             utils::toString(std::numeric_limits< long >::min()).c_str());
 
     value::Value* v;
 

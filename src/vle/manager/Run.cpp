@@ -30,6 +30,7 @@
 
 
 #include <vle/manager/Run.hpp>
+#include <glibmm/exception.h>
 
 namespace vle { namespace manager {
 

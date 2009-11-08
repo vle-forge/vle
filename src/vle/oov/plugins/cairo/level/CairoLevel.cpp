@@ -213,7 +213,7 @@ void CairoLevel::draw()
                 m_ctx->set_source_rgb(0., 0., 0.);
                 m_ctx->move_to(m_minX + i * stepX + 1,
                                (int)((m_maxY - m_minY - shiftY) / 2));
-                m_ctx->show_text(utils::to_string(value));
+                m_ctx->show_text(utils::toString(value));
 
                 m_ctx->move_to(m_minX+i*stepX+1, m_maxY-shiftY);
                 m_ctx->show_text(m_columns[i]);

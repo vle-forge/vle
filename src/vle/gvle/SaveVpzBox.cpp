@@ -34,7 +34,6 @@
 #include <vle/gvle/Modeling.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Package.hpp>
-#include <boost/filesystem.hpp>
 
 namespace vle
 {
@@ -105,7 +104,7 @@ bool SaveVpzBox::exist(std::string name)
     utils::PathList list = utils::Path::path().getInstalledExperiments();
     utils::PathList::const_iterator it = list.begin();
     while (it != list.end()) {
-	if (boost::filesystem::basename(*it) == name) {
+	if (utils::Path::basename(*it) == name) {
 	    return true;
 	}
 	++it;

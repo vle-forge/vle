@@ -35,6 +35,7 @@
 #include <vle/manager/Manager.hpp>
 #include <vle/manager/JustRun.hpp>
 #include <vle/manager/VLE.hpp>
+#include <vle/utils/DateTime.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Trace.hpp>
@@ -106,7 +107,7 @@ bool VLE::runSimulator(int process)
 
         utils::Trace::trace().setLogFile(
             utils::Trace::getLogFilename(boost::str(fmt(
-                    "distant-%1%") % utils::get_simple_current_date())));
+                    "distant-%1%") % utils::DateTime::simpleCurrentDate())));
 
         SimulatorDistant sim(utils::Trace::trace().output(), process, mPort);
         sim.start();

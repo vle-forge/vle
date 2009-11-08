@@ -35,9 +35,8 @@
 #include <boost/filesystem.hpp>
 #include <boost/version.hpp>
 #include <glibmm/timer.h>
-#include <glibmm/miscutils.h>
-#include <glibmm/fileutils.h>
 #include <glibmm/stringutils.h>
+#include <glibmm/miscutils.h>
 #include <fstream>
 #include <ostream>
 #include <iostream>
@@ -305,35 +304,36 @@ void Package::changeToOutputDirectory()
 
 void Package::addFile(const std::string& path, const std::string& name)
 {
-    if (not fs::exists(Glib::build_filename(path, name)))
-	std::ofstream file(Glib::build_filename(path, name).c_str());
+    if (not fs::exists(utils::Path::buildFilename(path, name))) {
+	std::ofstream file(utils::Path::buildFilename(path, name).c_str());
+    }
 }
 
 void Package::addDirectory(const std::string& path, const std::string& name)
 {
-    if (not fs::exists(Glib::build_filename(path, name)))
-	fs::create_directory(
-	    Glib::build_filename(path, name));
+    if (not fs::exists(utils::Path::buildDirname(path, name))) {
+        fs::create_directory(utils::Path::buildDirname(path, name));
+    }
 }
 
 void Package::removeFile(const std::string& pathFile)
 {
-    std::string path = Glib::build_filename(
-	Path::path().getPackageDir(), pathFile);
+    std::string path = utils::Path::buildFilename(
+        Path::path().getPackageDir(), pathFile);
+
     fs::remove_all(path);
     fs::remove(path);
 }
 
 void Package::renameFile(const std::string& oldFile, std::string& newName)
 {
-    std::string oldAbsolutePath =
-	Glib::build_filename(Path::path().getPackageDir(), oldFile);
+    std::string oldAbsolutePath = utils::Path::buildFilename(
+        Path::path().getPackageDir(), oldFile);
 
     if (fs::extension(newName) == "")
 	newName += fs::extension(oldAbsolutePath);
-    std::string newAbsolutePath =
-	Glib::build_filename(
-	    Path::path().getParentPath(oldAbsolutePath), newName);
+    std::string newAbsolutePath = utils::Path::buildFilename(
+        Path::path().getParentPath(oldAbsolutePath), newName);
 
     if (not fs::exists(newAbsolutePath))
 	fs::rename(oldAbsolutePath, newAbsolutePath);

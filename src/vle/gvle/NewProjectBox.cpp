@@ -35,7 +35,6 @@
 #include <vle/gvle/GVLEMenuAndToolbar.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Package.hpp>
-#include <boost/filesystem.hpp>
 
 namespace vle { namespace gvle {
 
@@ -102,7 +101,7 @@ bool NewProjectBox::exist(std::string name)
     utils::PathList list = utils::Path::path().getInstalledPackages();
     utils::PathList::const_iterator it = list.begin();
     while (it != list.end()) {
-	if (boost::filesystem::basename(*it) == name) {
+	if (utils::Path::basename(*it) == name) {
 	    return true;
 	}
 	++it;

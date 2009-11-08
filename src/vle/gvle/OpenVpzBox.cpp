@@ -34,7 +34,6 @@
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Path.hpp>
-#include <boost/filesystem.hpp>
 
 namespace vle { namespace gvle {
 
@@ -78,7 +77,7 @@ void OpenVpzBox::build()
     while (it != list.end()) {
 	Gtk::TreeModel::Row row = *(mRefTreeVpz->append());
 
-	row[mColumns.mName] = boost::filesystem::basename(*it);
+	row[mColumns.mName] = utils::Path::basename(*it);
 	++it;
     }
 }

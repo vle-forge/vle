@@ -31,6 +31,7 @@
 
 #include <vle/oov/SimpleFile.hpp>
 #include <vle/utils/Debug.hpp>
+#include <vle/utils/Path.hpp>
 #include <vle/value/String.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Map.hpp>
@@ -58,7 +59,7 @@ void SimpleFile::onParameter(const std::string& plugin,
                              value::Value* parameters,
                              const double& /* time */)
 {
-    m_filenametmp = Glib::build_filename(location, file);
+    m_filenametmp = utils::Path::buildFilename(location, file);
     m_filename = m_filenametmp;
     m_filename += extension();
 

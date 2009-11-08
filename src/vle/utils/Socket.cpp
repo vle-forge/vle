@@ -57,8 +57,8 @@ void explodeStringNet(const std::string& input, std::string& ip, int& port)
             if (position + 1 < input.size()) {
                 std::string tmp(input, position + 1, input.size() - position +
                                 1);
-                if (utils::is_int(tmp)) {
-                    port = utils::to_int(tmp);
+                if (utils::isInt(tmp)) {
+                    port = utils::toInt(tmp);
                 }
             }
         }
