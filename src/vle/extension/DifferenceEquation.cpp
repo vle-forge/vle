@@ -735,8 +735,8 @@ void Base::externalTransition(const ExternalEventList& event,
 Simple::Simple(const devs::DynamicsInit& model,
                const devs::InitEventList& events,
                bool control) :
-    Base(model, events, control),
-    mInitValue(false), mSize(DEFAULT_SIZE), mPortName("update")
+    Base(model, events, control), mPortName("update"),
+    mInitValue(false), mSize(DEFAULT_SIZE)
 {
     if (events.exist("name")) {
         mVariableName = toString(events.get("name"));
