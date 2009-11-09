@@ -969,13 +969,13 @@ bool Path::exist(const std::string& filename)
     return fs::exists(p);
 }
 
-bool Path::existFile(const std::string& filename)
+bool Path::existDirectory(const std::string& filename)
 {
     fs::path p(filename);
     return fs::exists(p) and fs::is_directory(p);
 }
 
-bool Path::existDirectory(const std::string& filename)
+bool Path::existFile(const std::string& filename)
 {
     fs::path p(filename);
 #if BOOST_VERSION > 103600
