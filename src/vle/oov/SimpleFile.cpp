@@ -30,6 +30,7 @@
 
 
 #include <vle/oov/SimpleFile.hpp>
+#include <vle/utils/DateTime.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/value/String.hpp>
@@ -39,12 +40,9 @@
 
 namespace vle { namespace oov { namespace plugin {
 
-SimpleFile::SimpleFile(const std::string& location) :
-    Plugin(location),
-    m_time(-1.0),
-    m_isstart(false),
-    m_havefirstevent(false),
-    m_type(SimpleFile::FILE)
+SimpleFile::SimpleFile(const std::string& location)
+    : Plugin(location), m_time(-1.0), m_isstart(false),
+    m_havefirstevent(false), m_julian(false), m_type(SimpleFile::FILE)
 {
 }
 
@@ -85,22 +83,26 @@ void SimpleFile::onParameter(const std::string& plugin,
                 }
             } catch (...) {
                 throw utils::ArgError(fmt(
-                        _("Output plug-in '%1%': unknow locale '%2%'")) % plugin %
-                    locale);
+                        _("Output plug-in '%1%': unknow locale '%2%'")) %
+                    plugin % locale);
             }
         }
 
-        if (map->existValue(_("output"))) {
-            std::string type(map->getString(_("output")));
-            if (type == _("out")) {
+        if (map->existValue("output")) {
+            std::string type(map->getString("output"));
+            if (type == "out") {
                 m_type = SimpleFile::STANDARD_OUT;
-            } else if (type == _("error")) {
+            } else if (type == "error") {
                 m_type = SimpleFile::STANDARD_ERROR;
             } else {
                 throw utils::ArgError(fmt(
-                        _("Output plug-in '%1%': unknow type '%2%'")) % plugin %
-                    type);
+                        _("Output plug-in '%1%': unknow type '%2%'")) % plugin
+                    % type);
             }
+        }
+
+        if (map->existValue("julian-day")) {
+            m_julian = map->getBoolean("julian-day");
         }
     }
 
@@ -169,8 +171,8 @@ void SimpleFile::onValue(const std::string& simulator,
 
     if (it == m_columns.end()) {
         throw utils::InternalError(fmt(
-                _("SimpleFile: columns '%1%' does not exist. No observable ?"))
-            % name);
+                _("Output plugin: columns '%1%' does not exist. "
+                  "No observable ?")) % name);
     }
 
     m_buffer[it->second] = value;
@@ -203,6 +205,16 @@ void SimpleFile::flush(double trame_time)
     if (trame_time != m_time) {
         if (std::find(m_valid.begin(), m_valid.end(), true) != m_valid.end()) {
             m_file << m_time;
+            if (m_julian) {
+                writeSeparator(m_file);
+                try {
+                    m_file << utils::DateTime::toJulianDay(m_time);
+                } catch (const std::exception& /*e*/) {
+                    throw utils::ModellingError(
+                        _("Output plug-in: Year is out of valid range "
+                          "in julian day: 1400..10000"));
+                }
+            }
             writeSeparator(m_file);
 
             const size_t nb(m_buffer.size());
@@ -256,6 +268,9 @@ void SimpleFile::copyToFile(const std::string& filename,
     std::ofstream file(filename.c_str());
 
     std::vector < std::string > tmp(array);
+    if (m_julian) {
+        tmp.insert(tmp.begin(), "julian-day");
+    }
     tmp.insert(tmp.begin(), "time");
     writeHead(file, tmp);
 
@@ -271,6 +286,9 @@ void SimpleFile::copyToStream(std::ostream& stream,
                               const std::vector < std::string >& array)
 {
     std::vector < std::string > tmp(array);
+    if (m_julian) {
+        tmp.insert(tmp.begin(), "julian-day");
+    }
     tmp.insert(tmp.begin(), "time");
     writeHead(stream, tmp);
 
