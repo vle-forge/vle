@@ -426,11 +426,10 @@ void Editor::closeAllTab()
 
     while (it != mDocuments.end()) {
 	int page = page_num(*it->second);
-
 	remove_page(page);
 	delete it->second;
 	mDocuments.erase(it->first);
-	++it;
+	it = mDocuments.begin();
     }
 }
 
