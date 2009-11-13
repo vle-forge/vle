@@ -32,29 +32,27 @@
 #ifndef GUI_CALENDARBOX_HPP
 #define GUI_CALENDARBOX_HPP
 
-#include <gtkmm.h>
+#include <gtkmm/dialog.h>
+#include <gtkmm/calendar.h>
 #include <libglademm.h>
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
 class CalendarBox
 {
 public:
-    CalendarBox(Glib::RefPtr<Gnome::Glade::Xml> xml);
+    CalendarBox(Glib::RefPtr < Gnome::Glade::Xml > xml);
 
-    void get_date(std::string& date);
-    void get_dateBegin(std::string& date);
+    void date(std::string& date);
+    void dateBegin(std::string& date);
 
 private:
-    Glib::RefPtr<Gnome::Glade::Xml>     mXml;
+    Glib::RefPtr < Gnome::Glade::Xml >  mXml;
 
     Gtk::Dialog*                        mDialog;
     Gtk::Calendar*                      mCalendar;
 };
 
-}
-} // namespace vle gvle
+}} // namespace vle gvle
 
 #endif

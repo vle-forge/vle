@@ -67,9 +67,9 @@ namespace vle { namespace gvle {
         void run();
 
     private:
-        Modeling*           mModeling;
+        Modeling*                           mModeling;
+        Glib::RefPtr < Gnome::Glade::Xml >  mXml;
 
-	CalendarBox         mCalendar;
 	Gtk::Entry*         mEntryAuthor;
 	Gtk::Entry*         mEntryDate;
 	Gtk::Button*        mButtonNow;
@@ -83,7 +83,6 @@ namespace vle { namespace gvle {
         Gtk::SpinButton*    mSpinBeginReal;
         Gtk::Entry*         mEntryBeginDate;
         Gtk::Button*        mButtonCalendarBegin;
-        CalendarBox         mCalendarBegin;
         Gtk::SpinButton*    mSpinBeginH;
         Gtk::SpinButton*    mSpinBeginM;
         Gtk::SpinButton*    mSpinBeginS;

@@ -31,19 +31,21 @@
 
 #include <vle/gvle/CalendarBox.hpp>
 #include <gtkmmconfig.h>
+#include <cassert>
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
-CalendarBox::CalendarBox(Glib::RefPtr<Gnome::Glade::Xml> xml):
-        mXml(xml)
+CalendarBox::CalendarBox(Glib::RefPtr < Gnome::Glade::Xml > xml)
+    : mXml(xml)
 {
     xml->get_widget("DialogCalendar", mDialog);
     xml->get_widget("Calendar", mCalendar);
+
+    assert(mDialog);
+    assert(mCalendar);
 }
 
-void CalendarBox::get_date(std::string& date)
+void CalendarBox::date(std::string& date)
 {
     if (mDialog->run() == Gtk::RESPONSE_OK) {
 #if GTKMM_MAJOR_VERSION == 2 && GTKMM_MINOR_VERSION <= 10
@@ -61,7 +63,7 @@ void CalendarBox::get_date(std::string& date)
     mDialog->hide();
 }
 
-void CalendarBox::get_dateBegin(std::string& date)
+void CalendarBox::dateBegin(std::string& date)
 {
     if (mDialog->run() == Gtk::RESPONSE_OK) {
 #if GTKMM_MAJOR_VERSION == 2 && GTKMM_MINOR_VERSION <= 10
@@ -79,5 +81,4 @@ void CalendarBox::get_dateBegin(std::string& date)
     mDialog->hide();
 }
 
-}
-} // namespace vle gvle
+}} // namespace vle gvle

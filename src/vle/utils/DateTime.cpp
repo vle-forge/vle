@@ -33,6 +33,7 @@
 #include <vle/utils/Exception.hpp>
 #include <glibmm/date.h>
 #include <boost/numeric/conversion/cast.hpp>
+#include <fstream>
 #include <cmath>
 
 namespace vle { namespace utils {
@@ -270,15 +271,31 @@ double DateTime::toJulianDay(const std::string& date)
     return -1.0;
 }
 
+bool DateTime::isValidYear(const double& date)
+{
+    namespace bg = boost::gregorian;
+
+    bg::date mindate(bg::min_date_time);
+    bg::date maxdate(bg::max_date_time);
+    bg::date current(boost::numeric_cast < bg::date::date_int_type >(date));
+
+    if (not current.is_special()) {
+        return mindate < current and current < maxdate;
+    } else {
+        return false;
+    }
+}
+
 double DateTime::toTime(const double& date, long& year,
                         long& month, long& day,
                         long& hours, long& minutes,
                         long& seconds)
 {
-    try {
-        namespace bg = boost::gregorian;
-        bg::date d(boost::numeric_cast < bg::date::date_int_type >(date));
+    namespace bg = boost::gregorian;
 
+    bg::date d(boost::numeric_cast < bg::date::date_int_type >(date));
+
+    if (not d.is_special()) {
         year = d.year();
         month = d.month();
         day = d.day();
@@ -299,11 +316,13 @@ double DateTime::toTime(const double& date, long& year,
         f -= seconds;
 
         return f;
-    } catch (const std::exception& e) {
+    } else {
         throw utils::ArgError(fmt(
-                _("Can convert date '%1' to gregorian calendar: %2%")) % date %
-            e.what());
+                _("Can not convert date '%1%' to gregorian calendar")) %
+            date);
     }
+
+    return 0.0;
 }
 
 }} // namespace vle utils

@@ -261,6 +261,15 @@ public:
                                   /* * * * */
 
     /**
+     * @brief Check if the date is a valid year in gregorian calendard.
+     *
+     * @param date The date to check.
+     *
+     * @return True if date is a valid year, false otherwise.
+     */
+    static bool isValidYear(const double& date);
+
+    /**
      * @brief Explode the specified date attribute to year, month, day in the
      * month, hours, minutes and seconds.
      *
@@ -276,14 +285,13 @@ public:
      *
      * @return The remainder of the conversion.
      */
-    static double
-        toTime(const double& date,
-               long& year,
-               long& month,
-               long& day,
-               long& hours,
-               long& minutes,
-               long& seconds);
+    static double toTime(const double& date,
+                         long& year,
+                         long& month,
+                         long& day,
+                         long& hours,
+                         long& minutes,
+                         long& seconds);
 };
 
 }} // namespace vle utils

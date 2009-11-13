@@ -45,7 +45,7 @@ namespace vle { namespace gvle {
 
 ExperimentBox::ExperimentBox(Glib::RefPtr < Gnome::Glade::Xml > xml,
                              Modeling* modeling)
-    : mModeling(modeling), mCalendar(xml), mDialog(0), mCalendarBegin(xml)
+    : mModeling(modeling), mXml(xml), mDialog(0)
 {
     xml->get_widget("DialogExperiment", mDialog);
     xml->get_widget("EntryAuthor", mEntryAuthor);
@@ -262,7 +262,8 @@ void ExperimentBox::on_calendar()
 {
     std::string date;
 
-    mCalendar.get_date(date);
+    CalendarBox cal(mXml);
+    cal.date(date);
     if (not date.empty()) {
         mEntryDate->set_text(date);
     }
@@ -277,18 +278,21 @@ void ExperimentBox::updateBeginReal()
         date = mEntryBeginDate->get_text();
     }
 
-    double begin = utils::DateTime::toJulianDayNumber(date);
+    try {
+        double begin = utils::DateTime::toJulianDayNumber(date);
 
-    begin += (mSpinBeginH->get_value() * 1 / 24);
-    begin += (mSpinBeginM->get_value() * 1 / (24 * 60));
-    begin += (mSpinBeginS->get_value() * 1 / (24 * 60 * 60));
+        begin += (mSpinBeginH->get_value() * 1 / 24);
+        begin += (mSpinBeginM->get_value() * 1 / (24 * 60));
+        begin += (mSpinBeginS->get_value() * 1 / (24 * 60 * 60));
 
-    mSpinBeginReal->set_value(begin);
+        mSpinBeginReal->set_value(begin);
+    } catch (...) {
+    }
 }
 
 void ExperimentBox::updateBeginTime()
 {
-    try {
+    if (utils::DateTime::isValidYear(mSpinBeginReal->get_value())) {
         long year, month, day, hours, minutes, seconds;
         double remain;
 
@@ -306,7 +310,7 @@ void ExperimentBox::updateBeginTime()
 
         mEntryBeginDate->set_text(
             utils::DateTime::toJulianDayNumber(mSpinBeginReal->get_value()));
-    } catch (const std::exception& e) {
+    } else {
         mSpinBeginH->set_value(0);
         mSpinBeginM->set_value(0);
         mSpinBeginS->set_value(0);
@@ -328,7 +332,8 @@ void ExperimentBox::on_calendarBegin()
 {
     std::string date;
 
-    mCalendarBegin.get_dateBegin(date);
+    CalendarBox cal(mXml);
+    cal.dateBegin(date);
     if (not date.empty()) {
         mEntryBeginDate->set_text(date);
         updateBeginReal();
@@ -337,7 +342,10 @@ void ExperimentBox::on_calendarBegin()
 
 void ExperimentBox::on_now()
 {
-    mEntryDate->set_text(utils::DateTime::currentDate());
+    try {
+        mEntryDate->set_text(utils::DateTime::currentDate());
+    } catch(...) {
+    }
 }
 
 }} // namespace vle gvle
