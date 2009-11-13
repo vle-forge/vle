@@ -380,13 +380,13 @@ Dynamics* ModelFactory::getDynamicsObject(Coordinator& coordinator,
     if (module->get_symbol(dynamicsSymbol, symbol)) {
         fctdyn fct(utils::pointer_to_function < fctdyn >(symbol));
         try {
-            dynamics = fct(DynamicsInit(atom, mRoot.rand(),
-                                       utils::Package::package().getId(dyn.package())),
-                           events);
+            dynamics = fct(DynamicsInit(
+                    atom, mRoot.rand(),
+                    utils::Package::package().getId(dyn.package())), events);
         } catch(const std::exception& e) {
             throw utils::ModellingError(fmt(
-                    _("dynamics '%1%' throw error: %2%")) % atom.getParentName() %
-                e.what());
+                    _("atomic model '%1%:%2%' throw error: %3%")) %
+                atom.getParentName() % atom.getName() % e.what());
         }
         return dynamics;
     }
@@ -394,13 +394,14 @@ Dynamics* ModelFactory::getDynamicsObject(Coordinator& coordinator,
     if (module->get_symbol(executiveSymbol, symbol)) {
         fctexe fct(utils::pointer_to_function < fctexe >(symbol));
         try {
-            dynamics = fct(ExecutiveInit(atom, mRoot.rand(),
-                                         utils::Package::package().getId(dyn.package()),
-                                         coordinator), events);
+            dynamics = fct(ExecutiveInit(
+                    atom, mRoot.rand(),
+                    utils::Package::package().getId(dyn.package()),
+                    coordinator), events);
         } catch(const std::exception& e) {
             throw utils::ModellingError(fmt(
-                    _("executive '%1%' throw error: %2%")) % atom.getParentName() %
-                e.what());
+                    _("executive model '%1%:%2%' throw error: %3%")) %
+                atom.getParentName() % atom.getName() % e.what());
         }
         return dynamics;
     }
@@ -412,11 +413,11 @@ Dynamics* ModelFactory::getDynamicsObject(Coordinator& coordinator,
                 DynamicsWrapperInit(
                     atom, mRoot.rand(),
                     utils::Package::package().getId(dyn.package()),
-                dyn.library(), dyn.model()), events);
+                    dyn.library(), dyn.model()), events);
         } catch(const std::exception& e) {
             throw utils::ModellingError(fmt(
-                    _("dynamics wrapper '%1%' throw error: %2%")) % atom.getParentName() %
-                e.what());
+                    _("dynamics wrapper '%1%:%2%' throw error: %3%")) %
+                atom.getParentName() % atom.getName() % e.what());
         }
         return dynamics;
     }
