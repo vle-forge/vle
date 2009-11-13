@@ -779,25 +779,57 @@ void GVLE::onSaveAs()
 {
     int page = mEditor->get_current_page();
 
-    if (page != -1) {
-	if (dynamic_cast < Document* >(mEditor->get_nth_page(page))
-	    ->isDrawingArea()) {
-	    saveVpz();
-	    buildPackageHierarchy();
-	} else {
-	    DocumentText* doc = dynamic_cast < DocumentText* >(
-		mEditor->get_nth_page(page));
-	    Gtk::FileChooserDialog file(_("Text file"),
-					Gtk::FILE_CHOOSER_ACTION_SAVE);
+    Glib::ustring title;
 
-	    file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-	    file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
-	    file.set_current_folder(utils::Path::path().getPackageDir());
-	    if (file.run() == Gtk::RESPONSE_OK) {
-		std::string filename(file.get_filename());
+    bool isVPZ = dynamic_cast < Document* >(mEditor->get_nth_page(page))
+	->isDrawingArea();
+
+    if (page != -1) {
+	if (isVPZ) {
+	    title = _("VPZ file");
+	} else {
+	    title = _("Text file");
+	}
+
+	Gtk::FileChooserDialog file(title,
+				    Gtk::FILE_CHOOSER_ACTION_SAVE);
+
+	file.set_transient_for(*this);
+	file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+	file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+
+	if (isVPZ) {
+	    Gtk::FileFilter filter;
+	    filter.set_name(_("Vle Project gZipped"));
+	    filter.add_pattern("*.vpz");
+	    file.add_filter(filter);
+	}
+
+	// to provide a default filename
+	// but also a default location
+	file.set_filename(dynamic_cast < Document* >(mEditor->get_nth_page(page))
+			  ->filepath());
+
+	if (file.run() == Gtk::RESPONSE_OK) {
+	    std::string filename(file.get_filename());
+
+	    if (isVPZ) {
+		vpz::Vpz::fixExtension(filename);
+
+		Editor::Documents::const_iterator it =
+		    mEditor->getDocuments().find(mModeling->getFileName());
+
+		mModeling->saveXML(filename);
+
+		if (it != mEditor->getDocuments().end()) {
+		    it->second->setTitle(filename,
+					 mModeling->getTopModel(), false);
+		}
+	    } else {
+		DocumentText* doc = dynamic_cast < DocumentText* >(
+		    mEditor->get_nth_page(page));
 
 		doc->saveAs(filename);
-		mModeling->setFileName(filename);
 	    }
 	    buildPackageHierarchy();
 	}
