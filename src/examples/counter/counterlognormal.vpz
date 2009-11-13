@@ -4,7 +4,7 @@
 <structures>
 <model name="m" type="coupled" width="1007" height="496"  >
 <submodels>
-<model name="m1" type="atomic" conditions="m1" dynamics="m1" x="15" y="15" width="100" height="45" >
+<model name="m1" type="atomic" conditions="m1" dynamics="m1" x="15" y="16" width="100" height="45" >
 <out>
  <port name="out" />
 </out>
@@ -37,7 +37,7 @@
 <double>0.500000000000000</double>
 </port>
  <port name="formalism" >
-<string>normal</string>
+<string>lognormal</string>
 </port>
  <port name="stdvariation" >
 <double>0.010000000000000</double>

@@ -38,6 +38,7 @@ namespace vle { namespace examples { namespace generator {
 
 double NormalGenerator::generate()
 {
+    // See normal() in vle/src/vle/utils/Rand.hpp
     return m_rand.normal(m_average, m_standardDeviation);
 }
 

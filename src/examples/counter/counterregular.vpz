@@ -33,14 +33,11 @@
 <experiment name="experimentcounter" duration="1000.000000000000000" begin="0.000000000000000" combination="linear" seed="123456789" >
 <conditions>
 <condition name="m1" >
- <port name="average" >
-<double>0.500000000000000</double>
-</port>
  <port name="formalism" >
-<string>normal</string>
+<string>regular</string>
 </port>
- <port name="stdvariation" >
-<double>0.010000000000000</double>
+ <port name="timestep" >
+<double>0.500000000000000</double>
 </port>
 </condition>
 </conditions>

@@ -37,6 +37,7 @@ namespace vle { namespace examples { namespace generator {
 
 double UniformGenerator::generate()
 {
+    // See getDouble() in vle/src/vle/utils/Rand.hpp
     return m_rand.getDouble(m_min, m_max);
 }
 

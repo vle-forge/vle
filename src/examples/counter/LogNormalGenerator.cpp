@@ -38,6 +38,7 @@ namespace vle { namespace examples { namespace generator {
 
 double LogNormalGenerator::generate()
 {
+    // See logNormal() in vle/src/vle/utils/Rand.hpp
     return m_rand.logNormal(m_average, m_standardDeviation);
 }
 
