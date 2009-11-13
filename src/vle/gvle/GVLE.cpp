@@ -1396,9 +1396,11 @@ void GVLE::exportGraphic()
 {
     ViewDrawingArea* tab = dynamic_cast<DocumentDrawingArea*>(
 	mEditor->get_nth_page(mCurrentTab))->getDrawingArea();
-    vpz::Experiment& experiment = mModeling->vpz().project().experiment();
+
+    const vpz::Experiment& experiment = ((const Modeling*)mModeling)
+	->vpz().project().experiment();
     if (experiment.name().empty() || experiment.duration() == 0) {
-        Error(_("Fix a Value to the name and the duration " \
+	Error(_("Fix a Value to the name and the duration "	\
 		"of the experiment before exportation."));
         return;
     }
