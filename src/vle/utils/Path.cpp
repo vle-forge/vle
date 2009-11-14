@@ -985,6 +985,16 @@ bool Path::existFile(const std::string& filename)
 #endif
 }
 
+std::string Path::filename(const std::string& filename)
+{
+    fs::path path(filename);
+#if BOOST_VERSION > 103600
+    return path.filename();
+#else
+    return path.leaf();
+#endif
+}
+
 std::string Path::basename(const std::string& filename)
 {
     return fs::basename(filename);

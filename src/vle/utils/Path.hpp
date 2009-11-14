@@ -392,9 +392,28 @@ namespace vle { namespace utils {
         static bool existDirectory(const std::string& filename);
 
         /**
+         * @brief Return the filename of the current path.
+         * @code
+         * std::string s = "/tmp/test";
+         * std::string file = filename(s); // dir == test
+         *
+         * std::string x = "/tmp/test.toto";
+         * std::string file = filename(s); // dir == test.toto
+         * @endcode
+         *
+         * @param filename The path.
+         *
+         * @return The filename in the path.
+         */
+        static std::string filename(const std::string& filename);
+
+        /**
          * @brief Return the basename of the current path.
          * @code
          * std::string s = "/tmp/test";
+         * std::string file = basename(s); // dir == test
+         *
+         * std::string x = "/tmp/test.toto";
          * std::string file = basename(s); // dir == test
          * @endcode
          * @param filename The path.

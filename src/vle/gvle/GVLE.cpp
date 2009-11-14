@@ -199,7 +199,7 @@ void GVLE::FileTreeView::build()
 {
     remove_all_columns();
     if (not mPackage.empty()) {
-        mColumnName = append_column(utils::Path::basename(mPackage),
+        mColumnName = append_column(utils::Path::filename(mPackage),
                                     mColumns.m_col_name);
 	mCellrenderer = dynamic_cast<Gtk::CellRendererText*>(
 	    get_column_cell_renderer(mColumnName - 1));

@@ -89,7 +89,7 @@ void OpenPackageBox::build()
     for (utils::PathList::const_iterator it = list.begin();
 	 it != list.end(); ++it) {
 	Gtk::TreeModel::Row row = *(mRefTreePackage->append());
-	row[mColumns.mName] = utils::Path::basename(*it);
+        row[mColumns.mName] = utils::Path::filename(*it);
     }
 }
 
