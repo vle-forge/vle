@@ -42,6 +42,7 @@
 #include <vle/utils/Debug.hpp>
 #include <gtkmm/filechooserdialog.h>
 #include <gdkmm/cursor.h>
+#include <limits>
 #include <iostream>
 
 using std::string;
@@ -370,8 +371,25 @@ void View::displaceModel(int oldx, int oldy, int x, int y)
         int dx = x - oldx;
         int dy = y - oldy;
 
+        int minx(std::numeric_limits < int >::max());
+        int miny(std::numeric_limits < int >::max());
+
         for (graph::ModelList::iterator it = mSelectedModels.begin();
-                it != mSelectedModels.end(); ++it) {
+             it != mSelectedModels.end(); ++it) {
+            minx = std::min(minx, it->second->x());
+            miny = std::min(miny, it->second->y());
+        }
+
+        if ((minx + dx) < 0 or (minx == std::numeric_limits < int >::max())) {
+            dx = 0;
+        }
+
+        if ((miny + dy) < 0 or (miny == std::numeric_limits < int >::max())) {
+            dy = 0;
+        }
+
+        for (graph::ModelList::iterator it = mSelectedModels.begin();
+             it != mSelectedModels.end(); ++it) {
             it->second->setPosition(it->second->x() + dx, it->second->y() + dy);
         }
     }

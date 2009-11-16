@@ -1024,8 +1024,10 @@ bool ViewDrawingArea::on_motion_notify_event(GdkEventMotion* event)
     case GVLE::POINTER :
         if (button == 1) {
 	    if (not mView->isEmptySelectedModels()) {
-		mView->displaceModel(mPrecMouse.get_x(), mPrecMouse.get_y(),
-				     mMouse.get_x(), mMouse.get_y());
+                mView->displaceModel(
+                    mPrecMouse.get_x() == -1 ? 0 : mPrecMouse.get_x(),
+                    mPrecMouse.get_y() == -1 ? 0 : mPrecMouse.get_y(),
+                    mMouse.get_x(), mMouse.get_y());
 		mPrecMouse = mMouse;
 		queueRedraw();
 	    } else {
