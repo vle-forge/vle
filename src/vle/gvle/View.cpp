@@ -360,6 +360,7 @@ void View::delModel(graph::Model* model)
             mModeling->getGVLE()->redrawModelTreeBox();
 	    mModeling->getGVLE()->redrawModelClassBox();
 	    mModeling->setModified(true);
+            mSelectedModels.clear();
         }
     }
 }
