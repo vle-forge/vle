@@ -119,7 +119,9 @@ void AtomicModelBox::InputPortTreeView::applyRenaming(graph::AtomicModel* model)
     renameList::const_iterator it = mRenameList.begin();
 
     while (it != mRenameList.end()) {
-	model->renameInputPort(it->first, it->second);
+        if (model->existInputPort(it->first)) {
+            model->renameInputPort(it->first, it->second);
+        }
 	++it;
     }
     mRenameList.clear();
@@ -339,7 +341,9 @@ void AtomicModelBox::OutputPortTreeView::applyRenaming(
     renameList::const_iterator it = mRenameList.begin();
 
     while (it != mRenameList.end()) {
-	model->renameOutputPort(it->first, it->second);
+        if (model->existOutputPort(it->first)) {
+            model->renameOutputPort(it->first, it->second);
+        }
 	++it;
     }
     mRenameList.clear();
