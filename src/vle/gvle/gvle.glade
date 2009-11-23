@@ -3674,8 +3674,8 @@ Geoffroy Weisenhorn &lt;geoffroy.weisenhorn@gmail.com&gt;</property>
   <widget class="GtkDialog" id="DialogAtomicModel">
     <property name="border_width">5</property>
     <property name="window_position">center-on-parent</property>
-    <property name="default_width">400</property>
-    <property name="default_height">200</property>
+    <property name="default_width">450</property>
+    <property name="default_height">450</property>
     <property name="type_hint">dialog</property>
     <property name="has_separator">False</property>
     <child internal-child="vbox">
