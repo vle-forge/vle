@@ -59,6 +59,8 @@ Switch to the package system.
 * extension:
   * Add the finite state automata extension with Moore, Mealy, FDDevs and
     StateShart formalism.
+  * Add the decision, an extension to build a graph of activities based on
+    temporal, precedence and conditional constraints.
 
 * manager:
   * Store combinations inputs of experimentales frames into Manager classes.
@@ -68,6 +70,7 @@ Switch to the package system.
   * Big update, see changelog for the details.
     * New conditions plug-ins management.
     * New outputs plug-ins management.
+    * New modeling plug-ins management.
     * Merge all Gtk::Window into an only Gtk::Window.
     * Update GVLE to manage source code of VLE packages.
     * Add the Gtksourceviewmm library to show text, c++, cmake files.
