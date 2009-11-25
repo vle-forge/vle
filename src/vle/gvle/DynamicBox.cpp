@@ -55,17 +55,17 @@ DynamicBox::DynamicBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
     xml->get_widget("DialogDynamic", mDialog);
 
     {
-        Gtk::HBox* box;
-        xml->get_widget("HBoxDynamicLibrary", box);
-        mComboLibrary = new Gtk::ComboBoxText();
-        box->pack_start(*mComboLibrary);
+        xml->get_widget("HBoxDynamicLibrary", mBoxDynamicLibrary);
+        mComboLibrary = Gtk::manage(new Gtk::ComboBoxText());
+        mComboLibrary->show();
+        mBoxDynamicLibrary->pack_start(*mComboLibrary);
     }
 
     {
-        Gtk::HBox* box;
-        xml->get_widget("HBoxDynamicPackage", box);
-        mComboPackage = new Gtk::ComboBoxText();
-        box->pack_start(*mComboPackage);
+        xml->get_widget("HBoxDynamicPackage", mBoxDynamicPackage);
+        mComboPackage = Gtk::manage(new Gtk::ComboBoxText());
+        mComboPackage->show();
+        mBoxDynamicPackage->pack_start(*mComboPackage);
     }
 
     xml->get_widget("EntryDynamicLocationHost", mLocationHost);
@@ -73,34 +73,32 @@ DynamicBox::DynamicBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
     xml->get_widget("EntryDynamicModel", mModel);
 
     {
-        Gtk::HBox* box;
-        xml->get_widget("HboxDynamicLanguage", box);
-        mLanguage = new Gtk::ComboBoxText();
-        box->pack_start(*mLanguage);
-
+        xml->get_widget("HboxDynamicLanguage", mBoxDynamicLanguage);
+        mLanguage = Gtk::manage(new Gtk::ComboBoxText());
+        mBoxDynamicLanguage->pack_start(*mLanguage);
+        mLanguage->show();
         mLanguage->append_text("c++");
         mLanguage->append_text("python");
     }
 
-    xml->get_widget("ButtonDynamicApply", mButtonApply);
-    xml->get_widget("ButtonDynamicCancel", mButtonCancel);
     xml->get_widget("buttonNewDynamicLibrary", mButtonNew);
 
-    mButtonApply->signal_clicked().connect(
-        sigc::mem_fun(*this, &DynamicBox::on_apply));
-    mButtonCancel->signal_clicked().connect(
-        sigc::mem_fun(*this, &DynamicBox::on_cancel));
-    mButtonNew->signal_clicked().connect(
-        sigc::mem_fun(*this, &DynamicBox::onNewLibrary));
-    mComboPackage->signal_changed().connect(
-        sigc::mem_fun(*this, &DynamicBox::onComboPackageChange));
+    mList.push_back(mButtonNew->signal_clicked().connect(
+            sigc::mem_fun(*this, &DynamicBox::onNewLibrary)));
+    mList.push_back(mComboPackage->signal_changed().connect(
+            sigc::mem_fun(*this, &DynamicBox::onComboPackageChange)));
 }
 
 DynamicBox::~DynamicBox()
 {
-    delete mComboLibrary;
-    delete mComboPackage;
-    delete mLanguage;
+    for (std::list < sigc::connection >::iterator it = mList.begin();
+         it != mList.end(); ++it) {
+        it->disconnect();
+    }
+
+    mBoxDynamicLibrary->remove(*mComboLibrary);
+    mBoxDynamicPackage->remove(*mComboPackage);
+    mBoxDynamicLanguage->remove(*mLanguage);
 }
 
 void DynamicBox::show(vpz::Dynamic* dyn)
@@ -132,8 +130,13 @@ void DynamicBox::show(vpz::Dynamic* dyn)
         mLanguage->set_active_text(dyn->language());
     }
 
-    mDialog->show_all();
-    mDialog->run();
+    if (mDialog->run() == Gtk::RESPONSE_OK) {
+        mDialog->hide();
+        on_apply();
+    } else {
+        mDialog->hide();
+        on_cancel();
+    }
 }
 
 void DynamicBox::makeComboLibrary()
@@ -219,13 +222,11 @@ void DynamicBox::on_apply()
     } else {
         mDyn->setLanguage(mLanguage->get_active_text());
     }
-    mDialog->hide();
 }
 
 void DynamicBox::on_cancel()
 {
     mValid = false;
-    mDialog->hide();
 }
 
 void DynamicBox::onNewLibrary()

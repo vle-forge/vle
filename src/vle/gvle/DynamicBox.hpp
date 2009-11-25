@@ -94,10 +94,15 @@ namespace vle { namespace gvle {
         Gtk::SpinButton*                    mLocationPort;
         Gtk::Entry*                         mModel;
         Gtk::ComboBoxText*                  mLanguage;
-        Gtk::Button*                        mButtonApply;
-        Gtk::Button*                        mButtonCancel;
         Gtk::Button*                        mButtonNew;
         vpz::Dynamic*                       mDyn;
+
+        Gtk::HBox* mBoxDynamicLibrary;
+        Gtk::HBox* mBoxDynamicPackage;
+        Gtk::HBox* mBoxDynamicLanguage;
+
+        std::list < sigc::connection >      mList;
+
         bool                                mValid;
 
         void makeComboLibrary();

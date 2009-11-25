@@ -952,14 +952,12 @@ void AtomicModelBox::DynamicTreeView::onAdd()
 	box.hide_all();
         name = boost::trim_copy(name);
         if (mDynamics->exist(name)) {
-            Error(boost::str(fmt(
-                        _("The Dynamics '%1%' already exists")) % name));
+            Error((fmt(_("The Dynamics '%1%' already exists")) % name).str());
         } else {
             vpz::Dynamic dyn(name);
-            DynamicBox mDynamicBox(mXml,
-                                   mModeling->getGVLE(),
-                                   *mAtom, *mModel,
-                                   dyn, *mConditions, *mObservables);
+            DynamicBox mDynamicBox(mXml, mModeling->getGVLE(),
+                                   *mAtom, *mModel, dyn, *mConditions,
+                                   *mObservables);
             mDynamicBox.show(&dyn);
             if (mDynamicBox.valid()) {
                 mDynamics->add(dyn);

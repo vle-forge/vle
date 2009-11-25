@@ -1516,7 +1516,7 @@
           <widget class="GtkFrame" id="frame24">
             <property name="visible">True</property>
             <property name="label_xalign">0</property>
-            <property name="shadow_type">out</property>
+            <property name="shadow_type">etched-out</property>
             <child>
               <widget class="GtkAlignment" id="alignment29">
                 <property name="visible">True</property>
@@ -1783,6 +1783,7 @@ containts your devs::Dynamics source code&lt;/span&gt;</property>
             <child>
               <widget class="GtkButton" id="ButtonDynamicCancel">
                 <property name="label">gtk-cancel</property>
+                <property name="response_id">-6</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -1797,6 +1798,7 @@ containts your devs::Dynamics source code&lt;/span&gt;</property>
             <child>
               <widget class="GtkButton" id="ButtonDynamicApply">
                 <property name="label">gtk-ok</property>
+                <property name="response_id">-5</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -3673,6 +3675,7 @@ Geoffroy Weisenhorn &lt;geoffroy.weisenhorn@gmail.com&gt;</property>
   </widget>
   <widget class="GtkDialog" id="DialogAtomicModel">
     <property name="border_width">5</property>
+    <property name="modal">True</property>
     <property name="window_position">center-on-parent</property>
     <property name="default_width">450</property>
     <property name="default_height">450</property>
