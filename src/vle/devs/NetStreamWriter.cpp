@@ -31,7 +31,6 @@
 
 #include <vle/devs/NetStreamWriter.hpp>
 #include <vle/devs/Simulator.hpp>
-#include <vle/utils/Trace.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/oov/PluginFactory.hpp>
@@ -74,8 +73,6 @@ void NetStreamWriter::open(const std::string& plugin,
     try {
         utils::net::explodeStringNet(location, host, port, directory);
         m_client = new utils::net::Client(host, port);
-        TraceInformation(fmt(_("NetStreamWriter init %1%:%2% %3% %4%")) % host %
-                         port % directory % file);
 
         buildParameters(plugin, directory, file, parameters, time.getValue());
 

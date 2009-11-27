@@ -101,7 +101,7 @@ bool VLE::runSimulator(int process)
     try {
         std::cerr << _("Simulator start in daemon mode\n");
 
-        if (utils::Trace::trace().getLevel() != utils::Trace::DEBUG) {
+        if (utils::Trace::trace().getLevel() != utils::Trace::DEVS) {
             utils::buildDaemon();
         }
 

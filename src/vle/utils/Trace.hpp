@@ -39,22 +39,19 @@ namespace vle { namespace utils {
 
     /**
      * A logging class to push information onto a stream or a file. We define
-     * two macros to simplify the calls of this function. In ndebug mode, only
+     * two macros to simplify the calls of this function. In NDEBUG mode, only
      * TRACE and DTRACE ie. ALWAYS message are streamed all other macros are
      * empty.
      *
      * @code
-     * Trace(utils::compose("Send event at time %1", time));
+     * Trace(utils::fmt("Send event at time %1%", time));
      * DTrace("Clear file");
-     *
-     * Trace2(utils::compose("Send event at time %1", time));
-     * DTrace2("Clear file");
      * @endcode
      */
     class VLE_UTILS_EXPORT Trace
     {
     public:
-	enum Level { ALWAYS, IMPORTANT, INFORMATION, DEBUG };
+	enum Level { ALWAYS, MODEL, EXTENSION, DEVS };
 
 	/**
 	 * @brief Singleton method to return Trace object.
@@ -131,8 +128,8 @@ namespace vle { namespace utils {
 	 */
 	inline void setLevel(Trace::Level level)
         {
-            m_minlevel = (level < 0 or level > utils::Trace::DEBUG) ?
-                utils::Trace::DEBUG : level;
+            m_minlevel = (level < 0 or level > utils::Trace::DEVS) ?
+                utils::Trace::DEVS : level;
         }
 
         /**
@@ -185,19 +182,19 @@ namespace vle { namespace utils {
         vle::utils::Trace::trace().push(x, vle::utils::Trace::ALWAYS); \
     } \
 }
-#define TraceImportant(x) { \
-    if (vle::utils::Trace::trace().isInLevel(vle::utils::Trace::IMPORTANT)) { \
-        vle::utils::Trace::trace().push(x, vle::utils::Trace::IMPORTANT); \
+#define TraceModel(x) { \
+    if (vle::utils::Trace::trace().isInLevel(vle::utils::Trace::MODEL)) { \
+        vle::utils::Trace::trace().push(x, vle::utils::Trace::MODEL); \
     } \
 }
-#define TraceInformation(x) { \
-    if (vle::utils::Trace::trace().isInLevel(vle::utils::Trace::INFORMATION)) {\
-        vle::utils::Trace::trace().push(x, vle::utils::Trace::INFORMATION); \
+#define TraceExtension(x) { \
+    if (vle::utils::Trace::trace().isInLevel(vle::utils::Trace::EXTENSION)) { \
+        vle::utils::Trace::trace().push(x, vle::utils::Trace::EXTENSION); \
     } \
 }
-#define TraceDebug(x) { \
-    if (vle::utils::Trace::trace().isInLevel(vle::utils::Trace::DEBUG)) { \
-        vle::utils::Trace::trace().push(x, vle::utils::Trace::DEBUG); \
+#define TraceDevs(x) { \
+    if (vle::utils::Trace::trace().isInLevel(vle::utils::Trace::DEVS)) { \
+        vle::utils::Trace::trace().push(x, vle::utils::Trace::DEVS); \
     } \
 }
 
@@ -207,26 +204,26 @@ namespace vle { namespace utils {
         vle::utils::Trace::trace().push(x, vle::utils::Trace::ALWAYS); \
     } \
 }
-#define DTraceImportant(x) { \
-    if (vle::utils::Trace::trace().isInLevel(vle::utils::Trace::IMPORTANT)) { \
-        vle::utils::Trace::trace().push(x, vle::utils::Trace::IMPORTANT); \
+#define DTraceModel(x) { \
+    if (vle::utils::Trace::trace().isInLevel(vle::utils::Trace::MODEL)) { \
+        vle::utils::Trace::trace().push(x, vle::utils::Trace::MODEL); \
     } \
 }
-#define DTraceInformation(x) { \
-    if (vle::utils::Trace::trace().isInLevel(vle::utils::Trace::INFORMATION)) {\
-        vle::utils::Trace::trace().push(x, vle::utils::Trace::INFORMATION); \
+#define DTraceExtension(x) { \
+    if (vle::utils::Trace::trace().isInLevel(vle::utils::Trace::EXTENSION)) { \
+        vle::utils::Trace::trace().push(x, vle::utils::Trace::EXTENSION); \
     } \
 }
-#define DTraceDebug(x) { \
-    if (vle::utils::Trace::trace().isInLevel(vle::utils::Trace::DEBUG)) { \
-        vle::utils::Trace::trace().push(x, vle::utils::Trace::DEBUG); \
+#define DTraceDevs(x) { \
+    if (vle::utils::Trace::trace().isInLevel(vle::utils::Trace::DEVS)) { \
+        vle::utils::Trace::trace().push(x, vle::utils::Trace::DEVS); \
     } \
 }
 #else
 #define DTraceAlways(x) {}
-#define DTraceImportant(x) {}
-#define DTraceInformation(x) {}
-#define DTraceDebug(x) {}
+#define DTraceModel(x) {}
+#define DTraceExtension(x) {}
+#define DTraceDevs(x) {}
 #endif
 
 #endif

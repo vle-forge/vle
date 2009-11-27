@@ -96,6 +96,7 @@ const Time& Coordinator::getNextTime()
 
 ExternalEventList* Coordinator::run()
 {
+    DTraceDevs(_("-------- BAG --------"));
     SimulatorList::size_type oldToDelete(m_toDelete);
 
     CompleteEventBagModel& bags = m_eventTable.popEvent();

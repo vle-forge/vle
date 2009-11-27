@@ -37,7 +37,6 @@
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/utils/Debug.hpp>
-#include <vle/utils/Trace.hpp>
 #include <vle/value/Null.hpp>
 
 namespace vle { namespace devs {
@@ -105,25 +104,16 @@ InternalEvent * Simulator::buildInternalEvent(const Time& currentTime)
 
 void Simulator::finish()
 {
-    DTraceDebug(fmt(_("                     %1% finish")) %
-                getName());
-
     m_dynamics->finish();
 }
 
 void Simulator::output(const Time& currentTime, ExternalEventList& output)
 {
-    DTraceDebug(fmt(_("%1$20.10g %2% output")) % currentTime %
-                getName());
-
     m_dynamics->output(currentTime, output);
 }
 
 Time Simulator::timeAdvance()
 {
-    DTraceDebug(fmt(_("                     %1% ta")) %
-                getName());
-
     Time result = m_dynamics->timeAdvance();
     if (result < 0.0) {
         throw utils::ModellingError(fmt(
@@ -135,9 +125,6 @@ Time Simulator::timeAdvance()
 
 InternalEvent* Simulator::init(const Time& time)
 {
-    DTraceDebug(fmt(_("%1$20.10g %2% init")) % time %
-                getName());
-
     return new InternalEvent(m_dynamics->init(time) + time, this);
 }
 
@@ -145,17 +132,11 @@ Event::EventType Simulator::confluentTransitions(
     const InternalEvent& internal,
     const ExternalEventList& extEventlist) const
 {
-    DTraceDebug(fmt(_("%1$20.10g %2% confluent transition: [%3%]")) %
-                internal.getTime() % getName() % extEventlist);
-
     return m_dynamics->confluentTransitions(internal.getTime(), extEventlist);
 }
 
 InternalEvent* Simulator::internalTransition(const InternalEvent& event)
 {
-    DTraceDebug(fmt(_("%1$20.10g %2% internal transition")) %
-                event.getTime() % getName());
-
     m_dynamics->internalTransition(event.getTime());
     return buildInternalEvent(event.getTime());
 }
@@ -164,15 +145,7 @@ InternalEvent* Simulator::externalTransition(
     const ExternalEventList& event,
     const Time& time)
 {
-    DTraceDebug(fmt(_("%1$20.10g %2% external transition: [%3%]")) % time
-                % getName() % event);
-
-    try {
-        m_dynamics->externalTransition(event, time);
-    } catch(const std::exception& e) {
-        throw utils::ModellingError(fmt(_(
-                    "%1% in external: %2%")) % getName() % e.what());
-    }
+    m_dynamics->externalTransition(event, time);
     return buildInternalEvent(time);
 }
 
@@ -180,12 +153,7 @@ InternalEvent* Simulator::internalTransitionConflict(
     const InternalEvent& event,
     const ExternalEventList& events)
 {
-    DTraceDebug(fmt(_("                .... %1% internal transition")) %
-                getName());
     m_dynamics->internalTransition(event.getTime());
-
-    DTraceDebug(fmt(_("                .... %1% external transition: [%2%]")) %
-                getName() % events);
     m_dynamics->externalTransition(events, event.getTime());
     return buildInternalEvent(event.getTime());
 }
@@ -194,12 +162,7 @@ InternalEvent* Simulator::externalTransitionConflict(
     const InternalEvent& event,
     const ExternalEventList& events)
 {
-    DTraceDebug(fmt(_("                .... %1% external transition: [%2%]")) %
-                getName() % events);
     m_dynamics->externalTransition(events, event.getTime());
-
-    DTraceDebug(fmt(_("                .... %1% internal transition")) %
-                getName());
     m_dynamics->internalTransition(event.getTime());
 
     return buildInternalEvent(event.getTime());
@@ -208,22 +171,11 @@ InternalEvent* Simulator::externalTransitionConflict(
 void Simulator::request(const RequestEvent& event, const Time& time,
                         ExternalEventList& output)
 {
-    DTraceDebug(fmt(_("%1$20.10g %2% request: [%3%]")) % time %
-                getName() % event);
-
-    try {
-        m_dynamics->request(event, time, output);
-    } catch(const std::exception& e) {
-        throw utils::ModellingError(fmt(_(
-                    "%1% in request: %2%")) % getName() % e.what());
-    }
+    m_dynamics->request(event, time, output);
 }
 
 ObservationEvent* Simulator::observation(const ObservationEvent& event) const
 {
-    DTraceDebug(fmt(_("%1$20.10g %2% observation: [%3%]")) %
-                event.getTime() % getName() % event);
-
     value::Value* val;
     ObservationEvent* nevent = 0;
 
@@ -231,11 +183,7 @@ ObservationEvent* Simulator::observation(const ObservationEvent& event) const
         val = m_dynamics->observation(event);
         nevent = new ObservationEvent(event);
 
-        if (not val) {
-            TraceAlways((fmt(_(
-                        "Simulator %1% return an empty value on event %2%")) %
-                    getName() % event));
-        } else {
+        if (val) {
             nevent->putAttribute(event.getPortName(), val);
         }
     }

@@ -129,8 +129,8 @@ std::string getUserDirectory()
 #else
         if (g_mkdir(home.c_str(), 0755) == -1) {
 #endif
-            TraceImportant(fmt(_("Error mkdir %1% directory user\n")) % home);
-            return std::string();
+            throw utils::InternalError(fmt(
+                _("Error mkdir '%1%' directory user\n")) % home);
         }
     }
     return home;

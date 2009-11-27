@@ -38,64 +38,63 @@
 
 namespace vle { namespace utils {
 
-    Trace* Trace::m_trace = 0;
+Trace* Trace::m_trace = 0;
 
-    Trace::Trace() :
-        m_minlevel(utils::Trace::ALWAYS),
-        m_warnings(0)
-    {
-	m_filename = getDefaultLogFilename();
-	m_file = new std::ofstream(m_filename.c_str());
+Trace::Trace()
+    : m_minlevel(utils::Trace::ALWAYS), m_warnings(0)
+{
+    m_filename = getDefaultLogFilename();
+    m_file = new std::ofstream(m_filename.c_str());
 
-	if (not m_file->is_open()) {
-            delete m_file;
-            m_file = 0;
-	} else {
-            (*m_file) << _("Start log at ") << utils::DateTime::currentDate()
-                << "\n\n" << std::flush;
-        }
-    }
-
-    Trace::~Trace()
-    {
+    if (not m_file->is_open()) {
         delete m_file;
+        m_file = 0;
+    } else {
+        (*m_file) << _("Start log at ") << utils::DateTime::currentDate()
+            << "\n\n" << std::flush;
     }
+}
 
-    void Trace::setLogFile(const std::string& filename)
-    {
-	std::ofstream* tmp = new std::ofstream(filename.c_str());
+Trace::~Trace()
+{
+    delete m_file;
+}
 
-	if (not tmp->is_open()) {
-	    delete tmp;
-	} else {
-	    if (m_file) {
-		m_file->close();
-		delete m_file;
-	    }
-	    m_filename.assign(filename);
-	    m_file = tmp;
-            (*m_file) << _("Start log at ") << utils::DateTime::currentDate()
-                << "\n\n" << std::flush;
-	}
+void Trace::setLogFile(const std::string& filename)
+{
+    std::ofstream* tmp = new std::ofstream(filename.c_str());
+
+    if (not tmp->is_open()) {
+        delete tmp;
+    } else {
+        if (m_file) {
+            m_file->close();
+            delete m_file;
+        }
+        m_filename.assign(filename);
+        m_file = tmp;
+        (*m_file) << _("Start log at ") << utils::DateTime::currentDate()
+            << "\n\n" << std::flush;
     }
+}
 
-    std::string Trace::getDefaultLogFilename()
-    {
-        return getLogFilename("vle.log");
-    }
+std::string Trace::getDefaultLogFilename()
+{
+    return getLogFilename("vle.log");
+}
 
-    std::string Trace::getLogFilename(const std::string& filename)
-    {
-        return Path::buildFilename(utils::Path::path().getHomeDir(), filename);
-    }
+std::string Trace::getLogFilename(const std::string& filename)
+{
+    return Path::buildFilename(utils::Path::path().getHomeDir(), filename);
+}
 
-    std::ostream& Trace::output()
-    {
-        Assert(m_file, _("Trace stream is empty"));
-        Assert(m_file->is_open(), _("Trace stream is not opened"));
+std::ostream& Trace::output()
+{
+    Assert(m_file, _("Trace stream is empty"));
+    Assert(m_file->is_open(), _("Trace stream is not opened"));
 
-        return *m_file;
+    return *m_file;
 
-    }
+}
 
 }} // namespace vle utils

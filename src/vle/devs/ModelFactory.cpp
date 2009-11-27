@@ -43,7 +43,6 @@
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Package.hpp>
-#include <vle/utils/Trace.hpp>
 #include <vle/utils/Algo.hpp>
 
 namespace vle { namespace devs {

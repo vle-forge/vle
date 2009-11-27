@@ -98,7 +98,7 @@ bool run_model(const std::string& modelname)
 int main(int argc, char* argv[])
 {
     vle::manager::init();
-    vle::utils::Trace::trace().setLevel(vle::utils::Trace::DEBUG);
+    vle::utils::Trace::trace().setLevel(vle::utils::Trace::DEVS);
 
     bool success = true;
 

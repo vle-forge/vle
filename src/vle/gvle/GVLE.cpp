@@ -45,7 +45,6 @@
 #include <vle/gvle/View.hpp>
 #include <vle/gvle/LaunchSimulationBox.hpp>
 #include <vle/utils/Exception.hpp>
-#include <vle/utils/Trace.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Path.hpp>

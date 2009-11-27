@@ -35,7 +35,6 @@
 #include <vle/gvle/GVLEMenuAndToolbar.hpp>
 #include <vle/gvle/View.hpp>
 #include <vle/utils/Exception.hpp>
-#include <vle/utils/Trace.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/vpz/Vpz.hpp>

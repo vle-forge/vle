@@ -108,9 +108,12 @@ namespace vle { namespace devs {
 
     inline std::ostream& operator<<(std::ostream& o, const ExternalEvent& evt)
     {
-        return o << "from: '" << evt.getSourceModelName()
-            << "' value: '" << (evt.haveAttributes() ?
-            evt.getAttributes().writeToString() : "")
+        if (evt.getModel()) {
+            o << "from: '" << evt.getSourceModelName();
+        }
+
+        return o << "' value: '"
+            << (evt.haveAttributes() ? evt.getAttributes().writeToString() : "")
             << "' to port: '" << evt.getPortName()
             << "'";
     }
