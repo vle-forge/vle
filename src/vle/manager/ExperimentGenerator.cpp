@@ -103,9 +103,10 @@ void ExperimentGenerator::build(Glib::Mutex* mutex, Glib::Cond* prod,
 
 void ExperimentGenerator::buildReplicasList()
 {
-    Assert < utils::ArgError > (
-        mFile.project().experiment().replicas().number() > 0,
-        _("The replicas's tag is not defined in the vpz file"));
+    if (mFile.project().experiment().replicas().number() <= 0) {
+        throw utils::ArgError(
+            _("The replicas's tag is not defined in the vpz file"));
+    }
 
     mReplicasTab.resize(mFile.project().experiment().replicas().number());
     for (std::vector < guint32 >::iterator it = mReplicasTab.begin(); it
@@ -169,10 +170,11 @@ void ExperimentGenerator::buildCombinationsFromReplicas(size_t cmbnumber)
     vpz::ConditionValues::const_iterator itValueOrig(
         itOrig->second.conditionvalues().begin());
 
-    Assert < utils::InternalError > (
-        dest.conditionlist().size() == orig.conditionlist().size(),
-        fmt(_("Error: %1% %2% %3%\n")) % dest.conditionlist().size() %
-        orig.conditionlist().size() % mCondition.size());
+    if (dest.conditionlist().size() != orig.conditionlist().size()) {
+        throw utils::InternalError(fmt(
+                _("Error: %1% %2% %3%\n")) % dest.conditionlist().size() %
+            orig.conditionlist().size() % mCondition.size());
+    }
 
     for (size_t jcom = 0; jcom < mCondition.size(); ++jcom) {
         if (not itOrig->second.conditionvalues().empty()) {
@@ -191,11 +193,13 @@ void ExperimentGenerator::buildCombinationsFromReplicas(size_t cmbnumber)
             itValueOrig++;
 
             if (itValueDest == itDest->second.conditionvalues().end()) {
-                Assert < utils::InternalError > (
-                    itValueOrig == itOrig->second.conditionvalues().end(),
-                    fmt(_("Error: %1% %2%\n")) %
-                    itDest->second.conditionvalues().size() %
-                    itOrig->second.conditionvalues().size());
+
+                if (itValueOrig != itOrig->second.conditionvalues().end()) {
+                    throw utils::InternalError(fmt(
+                            _("Error: %1% %2%\n")) %
+                        itDest->second.conditionvalues().size() %
+                        itOrig->second.conditionvalues().size());
+                }
 
                 itDest++;
                 itOrig++;

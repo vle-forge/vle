@@ -128,14 +128,20 @@ void Model::getTargetPortList(const std::string& portname,
 
 void Model::rename(Model* mdl, const std::string& newname)
 {
-    Assert < utils::DevsGraphError >(mdl,fmt(
-            _("Cannot rename empty model with '%1%'")) % newname);
+    if (not mdl) {
+        throw utils::DevsGraphError(fmt(
+                _("Cannot rename empty model with '%1%'")) % newname);
+    }
 
     CoupledModel* parent = mdl->getParent();
     if (parent) {
         ModelList::iterator it = parent->getModelList().find(mdl->getName());
-        Assert < utils::DevsGraphError >(it != parent->getModelList().end(),
-               _("Cannot rename a model without parent"));
+
+        if (it == parent->getModelList().end()) {
+            throw utils::DevsGraphError(
+                _("Cannot rename a model without parent"));
+        }
+
 	ModelList::iterator itfind = parent->getModelList().find(newname);
 	if (itfind != parent->getModelList().end()) {
 	    throw utils::DevsGraphError(fmt(
@@ -188,8 +194,9 @@ Model* Model::getModel(const CoupledModelVector& lst,
     if (lst.empty()) {
         return findModel(name);
     } else {
-        Assert < utils::DevsGraphError >(isCoupled(),
-               _("Bad use of getModel from a list"));
+        if (not isCoupled()) {
+            throw utils::DevsGraphError(_("Bad use of getModel from a list"));
+        }
         CoupledModelVector::const_reverse_iterator it = lst.rbegin();
         CoupledModel* top = static_cast < CoupledModel* >(this);
         CoupledModel* other = *it;
@@ -488,8 +495,11 @@ bool Model::existOutputPort(const std::string & name)
 int Model::getInputPortIndex(const std::string& name) const
 {
     ConnectionList::const_iterator it = m_inPortList.find(name);
-    Assert < utils::DevsGraphError >(it != m_inPortList.end(),fmt(
-      _("Input port %1% not exist in model %2%")) % name % getName());
+
+    if (it == m_inPortList.end()) {
+        throw utils::DevsGraphError(fmt(
+                _("Input port %1% not exist in model %2%")) % name % getName());
+    }
 
     return std::distance(m_inPortList.begin(), it);
 }
@@ -497,8 +507,12 @@ int Model::getInputPortIndex(const std::string& name) const
 int Model::getOutputPortIndex(const std::string& name) const
 {
     ConnectionList::const_iterator it = m_outPortList.find(name);
-    Assert < utils::DevsGraphError >(it != m_outPortList.end(),fmt(
-            _("Output port %1% not exist in model %2%")) % name % getName());
+
+    if (it == m_outPortList.end()) {
+        throw utils::DevsGraphError(fmt(
+                _("Output port %1% not exist in model %2%")) % name %
+            getName());
+    }
 
     return std::distance(m_outPortList.begin(), it);
 }

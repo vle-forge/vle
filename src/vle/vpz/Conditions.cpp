@@ -74,8 +74,10 @@ Condition& Conditions::add(const Condition& condition)
     x = m_list.insert(std::make_pair < std::string, Condition >(
             condition.name(), condition));
 
-    Assert < utils::ArgError >(x.second, fmt(_(
-            "The condition '%1%' already exists")) % condition.name());
+    if (not x.second) {
+        throw utils::ArgError(fmt(
+                _("The condition '%1%' already exists")) % condition.name());
+    }
 
     return x.first->second;
 }
@@ -85,12 +87,9 @@ void Conditions::del(const std::string& condition)
     m_list.erase(condition);
 }
 
-void Conditions::rename(const std::string& oldconditionname, const std::string& newconditionname)
+void Conditions::rename(const std::string& oldconditionname,
+                        const std::string& newconditionname)
 {
-    /* Make a copy the oldconditionname condition and rename it with newconditionname.
-     * Add this new copy in the map
-     * Then delete the old Condition
-     */
     Condition c = get(oldconditionname);
     c.setName(newconditionname);
     add(c);
@@ -108,8 +107,11 @@ void Conditions::copy(const std::string& conditionname,
 const Condition& Conditions::get(const std::string& condition) const
 {
     const_iterator it = m_list.find(condition);
-    Assert < utils::ArgError >(it != end(), fmt(_(
-            "The condition '%1%' does not exists")) % condition);
+
+    if (it == end()) {
+        throw utils::ArgError(fmt(
+                _("The condition '%1%' does not exists")) % condition);
+    }
 
     return it->second;
 }
@@ -117,8 +119,11 @@ const Condition& Conditions::get(const std::string& condition) const
 Condition& Conditions::get(const std::string& condition)
 {
     iterator it = m_list.find(condition);
-    Assert < utils::ArgError >(it != end(), fmt(_(
-            "The condition '%1%' does not exists")) % condition);
+
+    if (it == end()) {
+        throw utils::ArgError(fmt(
+                _("The condition '%1%' does not exists")) % condition);
+    }
 
     return it->second;
 }

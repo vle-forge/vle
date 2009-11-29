@@ -90,11 +90,15 @@ std::string Trace::getLogFilename(const std::string& filename)
 
 std::ostream& Trace::output()
 {
-    Assert(m_file, _("Trace stream is empty"));
-    Assert(m_file->is_open(), _("Trace stream is not opened"));
+    if (not m_file) {
+        throw utils::InternalError(_("Trace stream is empty"));
+    }
+
+    if (not m_file->is_open()) {
+        throw utils::InternalError(_("Trace stream is not opened"));
+    }
 
     return *m_file;
-
 }
 
 }} // namespace vle utils

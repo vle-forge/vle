@@ -212,8 +212,6 @@ void Plot::onParameter(const std::string& /* plugin */,
                        value::Value* parameters,
                        const double& /* time */)
 {
-    Assert < utils::InternalError >(m_ctx, _("Cairo plot drawing error"));
-
     mParameter.set_drawing_area_size(mWidth, mHeight);
     mParameter.set_screen_size(mWidth, mHeight);
 

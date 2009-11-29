@@ -36,9 +36,10 @@ namespace vle { namespace extension {
 
 void Base::initialState(int state)
 {
-    vle::Assert <vle::utils::InternalError>(
-        existState(state), boost::format(
-            "FSA::Base model, unknow state %1%") % state);
+    if (not existState(state)) {
+        throw utils::InternalError(fmt(
+                _("FSA::Base model, unknow state %1%")) % state);
+    }
 
     mInitialState = state;
     mInit = true;

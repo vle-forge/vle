@@ -154,8 +154,10 @@ void ValueStackSax::popValue()
 
 value::Value* ValueStackSax::topValue()
 {
-    Assert < utils::SaxParserError >(not m_valuestack.empty(),
-           _("Empty sax parser value stack for the top operation"));
+    if (m_valuestack.empty()) {
+        throw utils::SaxParserError(
+            _("Empty sax parser value stack for the top operation"));
+    }
 
     return m_valuestack.top();
 }

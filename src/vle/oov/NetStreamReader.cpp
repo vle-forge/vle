@@ -85,8 +85,10 @@ void NetStreamReader::readConnection()
         try {
             boost::int32_t val = m_server->recvInteger("vle");
 
-            Assert <utils::InternalError >(val > 0,
-                   _("NetStreamReader: bad size for package"));
+            if (val <= 0) {
+                throw utils::InternalError(
+                    _("NetStreamReader: bad size for package"));
+            }
 
             m_buffer = m_server->recvBuffer("vle", val);
 
@@ -218,11 +220,10 @@ void NetStreamReader::serializePlugin()
 
 void NetStreamReader::setBufferSize(size_t buffer)
 {
-    Assert < utils::InternalError >(buffer != 0,
-           _("Cannot build a buffer with an empty size"));
-
-    Assert < utils::InternalError >(buffer < m_buffer.max_size(), fmt(
-            _("Cannot allocate a buffer of size %1%")) % buffer);
+    if (buffer <= 0 or buffer >= m_buffer.max_size()) {
+        throw utils::InternalError(fmt(
+                _("Can not allocate a buffer of size '%1%'")) % buffer);
+    }
 
     m_buffer.reserve(buffer);
 }

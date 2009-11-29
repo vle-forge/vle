@@ -188,9 +188,10 @@ namespace vle { namespace vpz {
          */
         inline value::Value* getResult(size_t i) const
         {
-            Assert < utils::SaxParserError >(m_result.size() >= i,
-                   (fmt(_("Get result value with to big index %1%.")) %
-                    i));
+            if (m_result.size() < i) {
+                throw utils::SaxParserError(fmt(
+                        _("Get result value with to big index %1%.")) % i);
+            }
 
             return m_result[i];
         }
@@ -202,8 +203,10 @@ namespace vle { namespace vpz {
          */
         inline value::Value* getLastResult() const
         {
-            Assert < utils::SaxParserError >(not m_result.empty(),
-                   _("Get last result value with empty result vector"));
+            if (m_result.empty()) {
+                throw utils::SaxParserError(
+                    _("Get last result value with empty result vector"));
+            }
 
             return m_result[m_result.size() - 1];
         }

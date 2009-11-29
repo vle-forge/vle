@@ -114,8 +114,10 @@ View& Views::add(const View& view)
     std::pair < iterator, bool > x;
     x = m_list.insert(std::make_pair < std::string, View >(view.name(), view));
 
-    Assert < utils::ArgError >(x.second, fmt(
-            _("View '%1%' already exist")) % view.name());
+    if (not x.second) {
+        throw utils::ArgError(fmt(
+                _("View '%1%' already exist")) % view.name());
+    }
 
     return x.first->second;
 }
@@ -123,9 +125,11 @@ View& Views::add(const View& view)
 View& Views::addEventView(const std::string& name,
                           const std::string& output)
 {
-    Assert < utils::ArgError >(not isUsedOutput(output),
-           fmt(_("Output '%1%' of view '%2%' is already used")) %
-           output % name);
+    if (isUsedOutput(output)) {
+        throw utils::ArgError(fmt(
+                _("Output '%1%' of view '%2%' is already used")) % output %
+            name);
+    }
 
     return add(View(name, View::EVENT, output));
 }
@@ -134,9 +138,11 @@ View& Views::addTimedView(const std::string& name,
                           double timestep,
                           const std::string& output)
 {
-    Assert < utils::ArgError >(not isUsedOutput(output),
-           fmt(_("Output '%1%' of view '%2%' is already used")) %
-           output % name);
+    if (isUsedOutput(output)) {
+        throw utils::ArgError(fmt(
+                _("Output '%1%' of view '%2%' is already used")) % output %
+            name);
+    }
 
     return add(View(name, View::TIMED, output, timestep));
 }
@@ -144,9 +150,11 @@ View& Views::addTimedView(const std::string& name,
 View& Views::addFinishView(const std::string& name,
                            const std::string& output)
 {
-    Assert < utils::ArgError >(not isUsedOutput(output),
-           fmt(_("Output '%1%' of view '%2%' is already used")) %
-           output % name);
+    if (isUsedOutput(output)) {
+        throw utils::ArgError(fmt(
+                _("Output '%1%' of view '%2%' is already used")) % output %
+            name);
+    }
 
     return add(View(name, View::FINISH, output));
 }
@@ -159,8 +167,10 @@ void Views::del(const std::string& name)
 const View& Views::get(const std::string& name) const
 {
     ViewList::const_iterator it = m_list.find(name);
-    Assert < utils::ArgError >(it != end(),
-           fmt(_("Unknow view '%1%'\n")) % name);
+
+    if (it == end()) {
+        throw utils::ArgError(fmt(_("Unknow view '%1%'\n")) % name);
+    }
 
     return it->second;
 }
@@ -168,8 +178,10 @@ const View& Views::get(const std::string& name) const
 View& Views::get(const std::string& name)
 {
     ViewList::iterator it = m_list.find(name);
-    Assert < utils::ArgError >(it != end(),
-           fmt(_("Unknow view '%1%'\n")) % name);
+
+    if (it == end()) {
+        throw utils::ArgError(fmt(_("Unknow view '%1%'\n")) % name);
+    }
 
     return it->second;
 }

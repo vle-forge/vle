@@ -103,8 +103,6 @@ void CairoLevel::onParameter(const std::string& /* plugin */,
                              value::Value* parameters,
                              const double& /* time */)
 {
-    Assert < utils::InternalError >(m_ctx, _("Cairo level drawing error"));
-
     m_minX = 1;
     m_maxX = 106;
     m_minY = 1;

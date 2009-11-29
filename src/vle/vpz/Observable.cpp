@@ -50,9 +50,10 @@ void ObservablePort::write(std::ostream& out) const
 
 void ObservablePort::add(const std::string& portname)
 {
-    Assert < utils::ArgError >(not exist(portname),
-           (fmt(_("The port %1% have already a view %2%")) %
-            m_name % portname));
+    if (exist(portname)) {
+        throw utils::ArgError(fmt(
+                _("The port %1% have already a view %2%")) % m_name % portname);
+    }
 
     m_list.push_back(portname);
 }
@@ -91,9 +92,11 @@ ObservablePort& Observable::add(const std::string& portname)
     x = m_list.insert(std::make_pair < std::string, ObservablePort >(
             portname, ObservablePort(portname)));
 
-    Assert < utils::ArgError >(x.second,
-           (fmt(_("The observable %1% have already a port %2%")) %
-            m_name, portname));
+    if (not x.second) {
+        throw utils::ArgError(fmt(
+                _("The observable %1% have already a port %2%")) %
+            m_name % portname);
+    }
 
     return x.first->second;
 }
@@ -105,9 +108,11 @@ ObservablePort& Observable::add(const ObservablePort& obs)
     x = m_list.insert(std::make_pair < std::string, ObservablePort >(
                 obs.name(), obs));
 
-    Assert < utils::ArgError >(x.second,
-           (fmt(_("The observable %1% have already a port %2%")) %
-            m_name, obs.name()));
+    if (not x.second) {
+        throw utils::ArgError(fmt(
+                _("The observable %1% have already a port %2%")) %
+            m_name % obs.name());
+    }
 
     return x.first->second;
 }
@@ -115,18 +120,24 @@ ObservablePort& Observable::add(const ObservablePort& obs)
 ObservablePort& Observable::get(const std::string& portname)
 {
     iterator it = m_list.find(portname);
-    Assert < utils::ArgError >(it != m_list.end(),
-           (fmt(_("The observable %1% have not port %2%")) %
-            m_name, portname));
+
+    if (it == m_list.end()) {
+        throw utils::ArgError(fmt(
+                _("The observable %1% have not port %2%")) % m_name % portname);
+    }
+
     return it->second;
 }
 
 const ObservablePort& Observable::get(const std::string& portname) const
 {
     const_iterator it = m_list.find(portname);
-    Assert < utils::ArgError >(it != m_list.end(),
-           (fmt(_("The observable %1% have not port %2%")) %
-            m_name, portname));
+
+    if (it == m_list.end()) {
+        throw utils::ArgError(fmt(
+                _("The observable %1% have not port %2%")) % m_name % portname);
+    }
+
     return it->second;
 }
 

@@ -74,9 +74,12 @@ AtomicModel& AtomicModelList::add(graph::Model* mdl,
                                   const AtomicModel& atom)
 {
     const_iterator it = m_lst.find(mdl);
-    Assert < utils::ArgError >(it == end(), fmt(_(
-            "The model [%1%] already have external information"))
-            % mdl->getName());
+
+    if (it != end()) {
+        throw utils::ArgError(fmt(
+                _("The model '%1%' already have external information")) %
+            mdl->getName());
+    }
 
     return (*m_lst.insert(std::make_pair < graph::Model*, AtomicModel >(
                 mdl, atom)).first).second;
@@ -85,9 +88,12 @@ AtomicModel& AtomicModelList::add(graph::Model* mdl,
 void AtomicModelList::del(graph::Model* mdl)
 {
     iterator it = m_lst.find(mdl);
-    Assert < utils::ArgError >(it != end(), fmt(_(
-            "The model [%1%] have not external information"))
-        % mdl->getName());
+
+    if (it == end()) {
+        throw utils::ArgError(fmt(
+                _("The model [%1%] have not external information")) %
+            mdl->getName());
+    }
 
     m_lst.erase(it);
 }

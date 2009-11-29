@@ -59,8 +59,6 @@ void CairoNetView::onParameter(const std::string& /* plugin */,
 {
     m_display_node_names = false;
 
-    Assert < utils::InternalError >(m_ctx, _("Cairo netview drawing error"));
-
     if (parameters) {
 
         if (not parameters->isMap()) {

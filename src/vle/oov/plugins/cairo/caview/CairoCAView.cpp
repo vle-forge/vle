@@ -62,8 +62,6 @@ void CairoCAView::onParameter(const std::string& /* plugin */,
                               value::Value* parameters,
                               const double& /* time */)
 {
-    Assert < utils::InternalError >(m_ctx, _("Cairo caview drawing error"));
-
     if (parameters) {
         if (not parameters->isMap()) {
             throw utils::ArgError(

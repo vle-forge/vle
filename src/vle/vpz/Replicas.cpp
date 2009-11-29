@@ -47,8 +47,9 @@ void Replicas::write(std::ostream& out) const
 
 void Replicas::setNumber(const size_t number)
 {
-    Assert < utils::ArgError >(number != 0,
-           _("Cannot assign zero number of replica\n"));
+    if (number <= 0) {
+        throw utils::ArgError(_("Cannot assign zero number of replica\n"));
+    }
 
     m_number = number;
 }

@@ -41,17 +41,13 @@ ModelPort::ModelPort(Model* model, const std::string& portname) :
     m_model(model),
     m_port(portname)
 {
-    Assert < utils::DevsGraphError >(model,
-           _("Build a ModelPort without model"));
+    if (not model) {
+        throw utils::DevsGraphError(_("Build a ModelPort without model"));
+    }
 
-    Assert < utils::DevsGraphError >(not portname.empty(),
-           _("Build a ModelPort without portname"));
-
-    Assert < utils::DevsGraphError >(
-        model->existInputPort(portname) or model->existOutputPort(portname),
-        fmt(_("Build a ModelPort '(%1%, %2%)' and model does not have this "
-              "port"))
-        % model->getName() % portname);
+    if (portname.empty()) {
+        throw utils::DevsGraphError(_("Build a ModelPort without portname"));
+    }
 }
 
 

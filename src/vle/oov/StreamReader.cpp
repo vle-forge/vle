@@ -45,8 +45,10 @@ namespace vle { namespace oov {
 
 PluginPtr StreamReader::plugin() const
 {
-    Assert < utils::InternalError >(m_plugin.get(),
+    if (not m_plugin.get()) {
+        throw utils::InternalError(
             _("Plugin are not loaded and cannot respond to the StreamReader"));
+    }
 
     return m_plugin;
 }

@@ -78,8 +78,9 @@ void Experiment::addViews(const Views& m)
 
 void Experiment::setName(const std::string& name)
 {
-    Assert < utils::ArgError >(not name.empty(),
-                               _("Empty experiment name"));
+    if (name.empty()) {
+        throw utils::ArgError(_("Empty experiment name"));
+    }
 
     m_name.assign(name);
 }
@@ -92,16 +93,19 @@ void Experiment::cleanNoPermanent()
 
 void Experiment::setDuration(double duration)
 {
-    Assert < utils::ArgError >(duration > 0, fmt(_(
-            "Experiment duraction error: %1% (must be > 0")) % duration);
+    if (duration <= 0.0) {
+        throw utils::ArgError(fmt(
+                _("Experiment duraction error: %1% (must be > 0")) % duration);
+    }
 
     m_duration = duration;
 }
 
 void Experiment::setCombination(const std::string& name)
 {
-    Assert < utils::ArgError >(name == "linear" or name == "total",
-           fmt(_("Unknow combination '%1%'")) % name);
+    if (name != "linear" and name != "total") {
+        throw utils::ArgError(fmt(_("Unknow combination '%1%'")) % name);
+    }
 
     m_combination.assign(name);
 }

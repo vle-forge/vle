@@ -107,8 +107,10 @@ value::Value* Vpz::parseValue(const std::string& buffer)
     SaxParser sax(vpz);
     sax.parseMemory(buffer);
 
-    Assert < utils::ArgError >(sax.isValue(), fmt(_(
-                "The buffer [%1%] is not a value.")) % buffer);
+    if (not sax.isValue()) {
+        throw utils::ArgError(fmt(_("The buffer [%1%] is not a value.")) %
+                              buffer);
+    }
 
     return sax.getValue(0);
 }
@@ -119,8 +121,10 @@ std::vector < value::Value* > Vpz::parseValues(const std::string& buffer)
     SaxParser sax(vpz);
     sax.parseMemory(buffer);
 
-    Assert < utils::ArgError >(sax.isValue(),
-           fmt(_("The buffer [%1%] is not a value.")) % buffer);
+    if (not sax.isValue()) {
+        throw utils::ArgError(fmt(_("The buffer [%1%] is not a value.")) %
+                              buffer);
+    }
 
     return sax.getValues();
 }

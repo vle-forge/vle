@@ -37,6 +37,7 @@
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/DllDefines.hpp>
 #include <boost/format.hpp>
+#include <iostream>
 
 namespace vle {
 
@@ -48,40 +49,10 @@ namespace vle {
             }
         }
 
-    template < typename X >
-        inline void Assert(bool test, const std::string& error)
-        {
-            if (not test) {
-                throw X(error);
-            }
-        }
-
-    template < typename X >
-        inline void Assert(bool test, const fmt& error)
-        {
-            if (not test) {
-                throw X(error);
-            }
-        }
-
     inline void Assert(bool test)
     {
         if (not test) {
             throw utils::InternalError();
-        }
-    }
-
-    inline void Assert(bool test, const std::string& error)
-    {
-        if (not test) {
-            throw utils::InternalError(error);
-        }
-    }
-
-    inline void Assert(bool test, const fmt& error)
-    {
-        if (not test) {
-            throw utils::InternalError(error);
         }
     }
 

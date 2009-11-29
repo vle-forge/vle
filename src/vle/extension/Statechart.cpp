@@ -301,9 +301,10 @@ void Statechart::output(const devs::Time& time,
 
 devs::Time Statechart::init(const devs::Time& time)
 {
-    Assert <utils::InternalError>(
-        isInit(),
-        _("FSA::Statechart model, initial state not defined"));
+    if (not isInit()) {
+        throw utils::InternalError(
+            _("FSA::Statechart model, initial state not defined"));
+    }
 
     currentState(initialState());
 

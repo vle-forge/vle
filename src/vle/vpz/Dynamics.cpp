@@ -58,8 +58,10 @@ Dynamic& Dynamics::add(const Dynamic& dynamic)
     r = m_list.insert(std::make_pair < std::string, Dynamic >(
             dynamic.name(), dynamic));
 
-    Assert < utils::ArgError >(r.second, fmt(
-            _("The dynamics '%1%' already exists")) % dynamic.name());
+    if (not r.second) {
+        throw utils::ArgError(fmt(
+                _("The dynamics '%1%' already exists")) % dynamic.name());
+    }
 
     return r.first->second;
 }
@@ -72,8 +74,11 @@ void Dynamics::del(const std::string& name)
 const Dynamic& Dynamics::get(const std::string& name) const
 {
     const_iterator it = m_list.find(name);
-    Assert < utils::ArgError >(it != end(), fmt(_(
-            "The dynamics %1% does not exist")) % name);
+
+    if (it == end()) {
+        throw utils::ArgError(fmt(
+                _("The dynamics %1% does not exist")) % name);
+    }
 
     return it->second;
 }
@@ -81,8 +86,11 @@ const Dynamic& Dynamics::get(const std::string& name) const
 Dynamic& Dynamics::get(const std::string& name)
 {
     iterator it = m_list.find(name);
-    Assert < utils::ArgError >(it != end(), fmt(_(
-            "The dynamics %1% does not exist")) % name);
+
+    if (it == end()) {
+        throw utils::ArgError(fmt(
+                _( "The dynamics %1% does not exist")) % name);
+    }
 
     return it->second;
 }

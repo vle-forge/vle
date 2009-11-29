@@ -58,8 +58,6 @@ void CairoGauge::onParameter(const std::string& /* plugin */,
                              value::Value* parameters,
                              const double& /* time */)
 {
-    Assert < utils::InternalError >(m_ctx, _("Cairo gauge drawing error"));
-
     if (parameters) {
         if (not parameters->isMap()) {
             throw utils::ArgError(
@@ -82,9 +80,10 @@ void CairoGauge::onNewObservable(const std::string& simulator,
 {
     std::string name(buildname(simulator, port));
 
-    Assert < utils::InternalError >(mName == "",
-           fmt(_("CairoGauge: observable '%1%' already exists"))
-           % name);
+    if (not mName.empty()) {
+        throw utils::InternalError(fmt(
+                _("CairoGauge: observable '%1%' already exists")) % name);
+    }
 
     mName = name;
 }

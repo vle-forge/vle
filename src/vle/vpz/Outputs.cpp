@@ -86,9 +86,10 @@ Output& Outputs::add(const Output& o)
 
     x = m_list.insert(std::make_pair < std::string, Output >( o.name(), o));
 
-    Assert < utils::ArgError >(x.second, fmt(
-            _("An output have already this name '%1%'\n")) %
-        o.name());
+    if (not x.second) {
+        throw utils::ArgError(fmt(
+                _("An output have already this name '%1%'\n")) % o.name());
+    }
 
     return x.first->second;
 }
@@ -96,8 +97,10 @@ Output& Outputs::add(const Output& o)
 Output& Outputs::get(const std::string& name)
 {
     iterator it = m_list.find(name);
-    Assert < utils::ArgError >(it != end(),
-           fmt(_("Unknow output '%1%'\n")) % name);
+
+    if (it == end()) {
+        throw utils::ArgError(fmt(_("Unknow output '%1%'\n")) % name);
+    }
 
     return it->second;
 }
@@ -105,8 +108,10 @@ Output& Outputs::get(const std::string& name)
 const Output& Outputs::get(const std::string& name) const
 {
     const_iterator it = m_list.find(name);
-    Assert < utils::ArgError >(it != end(),
-           fmt(_("Unknow output '%1%'\n")) % name);
+
+    if (it == end()) {
+        throw utils::ArgError(fmt(_("Unknow output '%1%'\n")) % name);
+    }
 
     return it->second;
 }
