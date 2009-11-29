@@ -6,29 +6,18 @@ vle \(em The simulator for VLE framework
 .SH "SYNOPSIS"
 .PP
 \fBvle\fR
-[\fB-?\fP]
-[\fB\-\-help\fP]
-[\fB\-\-help-all\fP]
-[\fB\-\-help-mangroup\fP]
-[\fB\-\-help-simgroup\fP]
-[\fB\-\-help-globalgroup\fP]
-[\fB\-\-allinlocal\fP]
-[\fB-o \fIint\fP\fR]
-[\fB\-\-process=\fIint\fP\fR]
-[\fB-i\fP]
-[\fB\-\-infos\fP]
+[\fB-?\fP,\fB\-h\fP,\fB\-\-help\fP]
 [\fB\-\-version\fP]
-[\fB-v\fP]
-[\fB\-\-verbose=\fIint\fP\fR]
+[\fB\-i\fP,\fB\-\-infos\fP]
+[\fB\-P \fIname\fP,\fB\-\-package=\fIname\fP]
+[\fB\-\-allinlocal\fP]
+[\fB-o \fIint\fP,\fB\-\-process=\fIint\fP\fR]
+[\fB-v \fIint\fP,\fB\-\-verbose=\fIint\fP\fR]
 [\fB-m\fP]
 [\fB-s\fP]
 [\fB-j\fP]
 [\fB-p \fIint\fP\fR]
-[\fB--path=\fIdirname\fP\fR]
-[\fB--path-simulator=\fIdirname\fP\fR]
-[\fB--path-translator=\fIdirname\fP\fR]
-[\fB--path-stream=\fIdirname\fP\fR]
-[\fB--path-model=\fIdirname\fP\fR]
+[\fBconfigure\fP,\fBbuild\fP,\fBclean\fP,\fBpackage\fP]
 [\fB\fIVPZ\fP or \fIVPZi\fP files...\fR]
 
 .SH "DESCRIPTION"
@@ -54,7 +43,7 @@ or VPZi directly. This command is used by \fBSimulator\fP.
 These programs follow the usual GNU command line syntax, with long options
 starting with two dashes (`\-'). A summary of options is included below.
 
-.IP "\fB-?\fP, \fB\-\-help\fP" 10
+.IP "\fB-?\fP, \fB-h\fP, \fB\-\-help\fP" 10
 Show summary of options.
 
 .IP "\fB-i\fP, \fB\-\-info\fP" 10
@@ -62,6 +51,16 @@ Show somes informations for vle framework.
 
 .IP "\fB\-\-version\fP" 10
 Show version of program.
+
+.IP "\fB-v\fI int\fR\fP, \fB\-\-verbose\fI int \fR\fP"
+Set the verbosity of this application. Default is \fI0\fR, only problem in VLE,
+\fI1\fR trace users' models problem, \fI2\fR trace extension process and
+\fI3\fR trace all DEVS API. Logs are stored in $VLE_HOME/vle.log.
+
+.IP "\fB\-P \fIname\fP, \fB\-\-package \fIname\fP" 10
+Select a package (in $VLE_HOME/pkgs). After this command you can use
+\fIcreate\fR, \fIconfigure\fR, \fIbuild\fR, \fIlist\fR and \fIpackage\fR and/or
+a list of VPZ files.
 
 .IP "\fB-m\fP" 10
 Run \fBVLE\fP in
@@ -73,11 +72,6 @@ Run \fBVLE\fP in
 
 .IP "\fB-j\fP" 10
 Run \fBVLE\fP directly on all specified files (default mode).
-
-.IP "\fB-v\fI int\fR\fP, \fB\-\-verbose\fI int \fR\fP"
-Set the verbosity of application. Default is \fI0\fR, no trace and no long
-exception. \fI1\fR for small simulation trace and long exception. \fI2\fR for
-long simulation trace. 3 for all simulation trace.
 
 .IP "\fB-l\fP, \fB\-\-allinlocal\fP"
 Run all instances of the experimental frame on the same computer. This option
@@ -91,33 +85,27 @@ is only available for the \fBsimulator\fP application.
 Define the listening port for vle application. Default is 8888. This option is
 only available for the mode \fBManager\fP and \fBSimulator\fP.
 
-.IP "\fB--port=\fIdirname\fR\fP
-Add the \fBdirname\fP directory to the search path for all VLE plugins,
-simulators, stream, models, translators.
-
-.IP "\fB--port-simulator=\fIdirname\fR\fP
-Add the \fBdirname\fP directory to the search path for the simulators plugins.
-
-.IP "\fB--port-translator=\fIdirname\fR\fP
-Add the \fBdirname\fP directory to the search path for the translators plugins.
-
-.IP "\fB--port-model=\fIdirname\fR\fP
-Add the \fBdirname\fP directory to the search path for the modeling plugins.
-
-.IP "\fB--port-stream=\fIdirname\fR\fP
-Add the \fBdirname\fP directory to the search path for the stream plugins.
-
 .SH "EXAMPLES"
 .PP
-Run the simulator in just mode with the simulator and global plugins search
-path modified:
-.PP
-$ vle --path-simulator=$HOME/usr --path=$HOME/tmp file.vpz
-
-.PP
-Run the simulator with on vpz file:
+Run the simulator in just mode for a global Vpz files:
 .PP
 $ vle file.vpz
+
+.PP
+Create a new package firemaqss:
+.PP
+$ vle -P firemanqss create
+
+.PP
+Configure and build the source and list all library and vpz existing in this
+package:
+.PP
+$ vle -P firemanqss configure build list
+
+.PP
+Run the simulator in just mode in for the package firemanqss for a vpz file:
+.PP
+$ vle -P firemanqss file.vpz
 
 .PP
 Run the simulator with multiple vpz files:
@@ -135,7 +123,14 @@ Run the manager to build experimental frames on localhost with one thread:
 $ vle -m -l file.vpz
 
 .PP
+Run the manager to build experimental frames on localhost with one thread in
+the package firemanqss:
+.PP
+$ vle --package firemanqss -m -l file.vpz
+
+.PP
 Run the manager to build experimental frames on localhost with four threads:
+.PP
 $ vle -o 4 -m -l file.vpz
 
 .PP
@@ -148,6 +143,13 @@ $ vle -m file.vpz
 .IP VLE_HOME
 A path where you push models packages (ie. simulators, vpz files, data, etc.),
 and the outputs, streams and conditions plug-ins.
+
+.SH "FILES"
+.IP $VLE_HOME/vle.log 10
+All log of the last call of VLE.
+
+.IP $VLE_HOME/gvle.log 10
+All log of the last call of VLE.
 
 .SH "SEE ALSO"
 .PP
