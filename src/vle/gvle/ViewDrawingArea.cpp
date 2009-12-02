@@ -29,6 +29,7 @@
  */
 
 
+#include <vle/gvle/Settings.hpp>
 #include <vle/gvle/ViewDrawingArea.hpp>
 #include <vle/gvle/View.hpp>
 #include <vle/utils/Debug.hpp>
@@ -103,20 +104,20 @@ void ViewDrawingArea::draw()
 
 void ViewDrawingArea::drawCurrentCoupledModel()
 {
-    setColor(mModeling->getBackgroundColor());
+    setColor(Settings::settings().getBackgroundColor());
     mContext->rectangle(0 + mOffset, 0 + mOffset, mWidth, mHeight);
     mContext->fill();
     mContext->stroke();
 
     if (mView->existInSelectedModels(mCurrent)) {
-	setColor(mModeling->getSelectedColor());
+	setColor(Settings::settings().getSelectedColor());
 	mContext->rectangle(0 + mOffset, 0 + mOffset,
 			    mRectWidth,
 			    mRectHeight);
 	mContext->fill();
 	mContext->stroke();
 
-	setColor(mModeling->getBackgroundColor());
+	setColor(Settings::settings().getBackgroundColor());
 	mContext->rectangle(MODEL_PORT + mOffset,
 			    MODEL_PORT + mOffset,
 			    (mRectWidth - 2 * MODEL_PORT),
@@ -124,21 +125,21 @@ void ViewDrawingArea::drawCurrentCoupledModel()
 	mContext->fill();
 	mContext->stroke();
 
-	setColor(mModeling->getForegroundColor());
+	setColor(Settings::settings().getForegroundColor());
 	mContext->rectangle(MODEL_PORT + mOffset,
 			    MODEL_PORT + mOffset,
 			    (mRectWidth - 2 * MODEL_PORT),
 			    (mRectHeight - 2 * MODEL_PORT));
 	mContext->stroke();
     } else {
-	setColor(mModeling->getBackgroundColor());
+	setColor(Settings::settings().getBackgroundColor());
 	mContext->rectangle(0 + mOffset, 0 + mOffset,
 			    mRectWidth,
 			    mRectHeight);
 	mContext->fill();
 	mContext->stroke();
 
-	setColor(mModeling->getForegroundColor());
+	setColor(Settings::settings().getForegroundColor());
 	mContext->rectangle(MODEL_PORT + mOffset,
 			    MODEL_PORT + mOffset,
 			    (mRectWidth - 2 * MODEL_PORT),
@@ -159,17 +160,17 @@ void ViewDrawingArea::drawCurrentModelPorts()
     const size_t stepInput = (int)(mRectHeight / (maxInput + 1));
     const size_t stepOutput = (int)(mRectHeight / (maxOutput + 1));
 
-    mContext->select_font_face(mModeling->getFont(),
+    mContext->select_font_face(Settings::settings().getFont(),
 			  Cairo::FONT_SLANT_OBLIQUE,
 			  Cairo::FONT_WEIGHT_NORMAL);
-    mContext->set_font_size(mModeling->getFontSize());
+    mContext->set_font_size(Settings::settings().getFontSize());
 
     itl = ipl.begin();
 
     for (size_t i = 0; i < maxInput; ++i) {
 
         // to draw the port
-	setColor(mModeling->getForegroundColor());
+	setColor(Settings::settings().getForegroundColor());
 	mContext->move_to((MODEL_PORT),
 			  (stepInput * (i + 1) - MODEL_PORT));
 	mContext->line_to((MODEL_PORT),
@@ -181,7 +182,7 @@ void ViewDrawingArea::drawCurrentModelPorts()
 	mContext->fill();
 	mContext->stroke();
 
-	setColor(mModeling->getForegroundColor());
+	setColor(Settings::settings().getForegroundColor());
 	mContext->move_to((MODEL_PORT),
 			  (stepInput * (i + 1) - MODEL_PORT));
 	mContext->line_to((MODEL_PORT),
@@ -195,7 +196,7 @@ void ViewDrawingArea::drawCurrentModelPorts()
 
         // to draw the label of the port
 	if (mZoom >= 1.0) {
-	    setColor(mModeling->getForegroundColor());
+	    setColor(Settings::settings().getForegroundColor());
 	    mContext->move_to((MODEL_PORT + MODEL_PORT_SPACING_LABEL),
 			      (stepInput * (i + 1) + 10));
 	    mContext->show_text(itl->first);
@@ -208,7 +209,7 @@ void ViewDrawingArea::drawCurrentModelPorts()
 
     for (guint i = 0; i < maxOutput; ++i) {
 
-	setColor(mModeling->getForegroundColor());
+	setColor(Settings::settings().getForegroundColor());
 	mContext->move_to((mRectWidth - MODEL_PORT),
 			  (stepOutput * (i + 1) - MODEL_PORT));
 	mContext->line_to((mRectWidth - MODEL_PORT),
@@ -513,9 +514,10 @@ void ViewDrawingArea::drawLines()
     while (itl != mLines.end()) {
         if (i != mHighlightLine) {
 	    mContext->set_line_join(Cairo::LINE_JOIN_ROUND);
-	    setColor(mModeling->getConnectionColor());
+	    setColor(Settings::settings().getConnectionColor());
         }
-	mContext->move_to(itl->begin()->first + mOffset, itl->begin()->second + mOffset);
+	mContext->move_to(itl->begin()->first + mOffset,
+                          itl->begin()->second + mOffset);
 	std::vector <Point>::const_iterator iter = itl->begin();
 	while (iter != itl->end()) {
 	    mContext->line_to(iter->first + mOffset, iter->second + mOffset);
@@ -532,12 +534,13 @@ void ViewDrawingArea::drawHighlightConnection()
 {
     if (mHighlightLine != -1) {
 
-	mContext->set_line_width(mModeling->getLineWidth());
+	mContext->set_line_width(Settings::settings().getLineWidth());
 	mContext->set_line_cap(Cairo::LINE_CAP_ROUND);
 	mContext->set_line_join(Cairo::LINE_JOIN_ROUND);
 
 	Color color(0.41, 0.34, 0.35);
-	std::vector <Point>::const_iterator iter = mLines[mHighlightLine].begin();
+	std::vector <Point>::const_iterator iter =
+            mLines[mHighlightLine].begin();
 	mContext->move_to(iter->first + mOffset, iter->second + mOffset);
 	while (iter != mLines[mHighlightLine].end()) {
 	    mContext->line_to(iter->first + mOffset, iter->second + mOffset);
@@ -545,16 +548,22 @@ void ViewDrawingArea::drawHighlightConnection()
 	}
 	mContext->stroke();
 
-	mContext->set_line_width(mModeling->getLineWidth());
-	mContext->select_font_face(mModeling->getFont(),
+	mContext->set_line_width(Settings::settings().getLineWidth());
+	mContext->select_font_face(Settings::settings().getFont(),
 				   Cairo::FONT_SLANT_NORMAL,
 				   Cairo::FONT_WEIGHT_NORMAL);
-	mContext->set_font_size(mModeling->getFontSize());
+	mContext->set_font_size(Settings::settings().getFontSize());
 
 	Cairo::TextExtents textExtents;
 	mContext->get_text_extents(mText[mHighlightLine],textExtents);
-	Color c(1.0, 1.0, 0.25);
-	setColor(c);
+
+        {
+            Gdk::Color c;
+
+            c.set_rgb_p(1.0, 1.0, 0.25);
+            setColor(c);
+        }
+
 	mContext->rectangle(mMouse.get_x(),
 			    (mMouse.get_y() - textExtents.height - 6),
 			    (textExtents.width + 5),
@@ -562,7 +571,7 @@ void ViewDrawingArea::drawHighlightConnection()
 	mContext->fill();
 	mContext->stroke();
 
-	setColor(mModeling->getForegroundColor());
+	setColor(Settings::settings().getForegroundColor());
 	mContext->rectangle((mMouse.get_x()),
 			    (mMouse.get_y() - textExtents.height - 6),
 			    (textExtents.width + 5),
@@ -592,12 +601,13 @@ void ViewDrawingArea::drawChildrenModels()
         }
 
         if (mView->existInSelectedModels(model)) {
-            drawChildrenModel(model, mModeling->getSelectedColor());
+            drawChildrenModel(model, Settings::settings().getSelectedColor());
         } else {
             if (model->isAtomic()) {
-                drawChildrenModel(model, mModeling->getAtomicColor());
+                drawChildrenModel(model, Settings::settings().getAtomicColor());
             } else {
-                drawChildrenModel(model, mModeling->getCoupledColor());
+                drawChildrenModel(model,
+                                  Settings::settings().getCoupledColor());
             }
         }
         ++it;
@@ -605,12 +615,12 @@ void ViewDrawingArea::drawChildrenModels()
     if (mView->getDestinationModel() != NULL and
 	mView->getDestinationModel() != mCurrent) {
         drawChildrenModel(mView->getDestinationModel(),
-			  mModeling->getAtomicColor());
+			  Settings::settings().getAtomicColor());
     }
 }
 
 void ViewDrawingArea::drawChildrenModel(graph::Model* model,
-                                        Color color)
+                                        const Gdk::Color& color)
 {
     setColor(color);
     mContext->rectangle(model->x() + mOffset,
@@ -623,7 +633,7 @@ void ViewDrawingArea::drawChildrenModel(graph::Model* model,
 }
 
 void ViewDrawingArea::drawChildrenPorts(graph::Model* model,
-                                        Color color)
+                                        const Gdk::Color& color)
 {
     const graph::ConnectionList ipl =  model->getInputPortList();
     const graph::ConnectionList opl =  model->getOutputPortList();
@@ -636,10 +646,10 @@ void ViewDrawingArea::drawChildrenPorts(graph::Model* model,
     const int    mX = model->x();
     const int    mY = model->y();
 
-    mContext->select_font_face(mModeling->getFont(),
+    mContext->select_font_face(Settings::settings().getFont(),
 			       Cairo::FONT_SLANT_OBLIQUE,
 			       Cairo::FONT_WEIGHT_NORMAL);
-    mContext->set_font_size(mModeling->getFontSize());
+    mContext->set_font_size(Settings::settings().getFontSize());
 
     itl = ipl.begin();
 
@@ -704,10 +714,10 @@ void ViewDrawingArea::drawChildrenPorts(graph::Model* model,
 	itl++;
     }
 
-    mContext->select_font_face(mModeling->getFont(),
+    mContext->select_font_face(Settings::settings().getFont(),
 			       Cairo::FONT_SLANT_NORMAL,
 			       Cairo::FONT_WEIGHT_NORMAL);
-    mContext->set_font_size(mModeling->getFontSize());
+    mContext->set_font_size(Settings::settings().getFontSize());
 
     if (mZoom >= 1.0) {
         Cairo::TextExtents textExtents;
@@ -725,7 +735,7 @@ void ViewDrawingArea::drawLink()
     if (mView->getCurrentButton() == GVLE::ADDLINK and
         mView->isEmptySelectedModels() == false) {
         graph::Model* src = mView->getFirstSelectedModels();
-	setColor(mModeling->getForegroundColor());
+	setColor(Settings::settings().getForegroundColor());
         if (src == mCurrent) {
 	    mContext->move_to(MODEL_PORT,
 			      (mHeight / 2));
@@ -757,7 +767,7 @@ void ViewDrawingArea::drawZoomFrame()
         int ymin = std::min(mMouse.get_y(), mPrecMouse.get_y());
         int ymax = std::max(mMouse.get_y(), mPrecMouse.get_y());
 
-	setColor(mModeling->getForegroundColor());
+	setColor(Settings::settings().getForegroundColor());
 	mContext->rectangle(xmin,
 			    ymin,
 			    (xmax - xmin),
@@ -995,8 +1005,9 @@ bool ViewDrawingArea::on_expose_event(GdkEventExpose*)
         if (mBuffer) {
             if (mNeedRedraw) {
 		mContext = mBuffer->create_cairo_context();
-		mContext->set_line_width(mModeling->getLineWidth());
-		mOffset = (mModeling->getLineWidth() < 1.1) ? 0.5 : 0.0;
+		mContext->set_line_width(Settings::settings().getLineWidth());
+		mOffset = (Settings::settings().getLineWidth() < 1.1)
+                    ? 0.5 : 0.0;
                 draw();
                 mNeedRedraw = false;
             }
@@ -1323,7 +1334,7 @@ void ViewDrawingArea::onZoom(int button)
 void ViewDrawingArea::addCoefZoom()
 {
     mZoom = (mZoom >= ZOOM_MAX) ? ZOOM_MAX : mZoom + ZOOM_FACTOR_SUP;
-    mContext->set_font_size(mModeling->getFontSize() * mZoom);
+    mContext->set_font_size(Settings::settings().getFontSize() * mZoom);
     newSize();
 }
 
@@ -1333,14 +1344,14 @@ void ViewDrawingArea::delCoefZoom()
         mZoom = mZoom - ZOOM_FACTOR_SUP;
     else
         mZoom = (mZoom <= ZOOM_MIN) ? ZOOM_MIN : mZoom - ZOOM_FACTOR_INF;
-    mContext->set_font_size(mModeling->getFontSize() * mZoom);
+    mContext->set_font_size(Settings::settings().getFontSize() * mZoom);
     newSize();
 }
 
 void ViewDrawingArea::restoreZoom()
 {
     mZoom = 1.0;
-    mContext->set_font_size(mModeling->getFontSize());
+    mContext->set_font_size(Settings::settings().getFontSize());
     newSize();
 }
 
@@ -1354,7 +1365,7 @@ void ViewDrawingArea::selectZoom(int xmin, int ymin, int xmax, int ymax)
         mZoom = 0.1;
     if (mZoom >= 4.0)
         mZoom = 4.0;
-    mContext->set_font_size(mModeling->getFontSize());
+    mContext->set_font_size(Settings::settings().getFontSize());
     newSize();
 
     mModeling->updateAdjustment(xmin * mZoom, ymin * mZoom);
@@ -1366,9 +1377,11 @@ void ViewDrawingArea::setCoefZoom(double coef)
     newSize();
 }
 
-void ViewDrawingArea::setColor(Color color)
+void ViewDrawingArea::setColor(const Gdk::Color& color)
 {
-    mContext->set_source_rgb(color.m_r, color.m_g, color.m_b);
+    mContext->set_source_rgb(color.get_red_p(),
+                             color.get_green_p(),
+                             color.get_blue_p());
 }
 
 void ViewDrawingArea::exportPng(const std::string& filename)
@@ -1377,11 +1390,11 @@ void ViewDrawingArea::exportPng(const std::string& filename)
     Cairo::RefPtr<Cairo::ImageSurface> surface =
         Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, mWidth, mHeight);
     mContext = Cairo::Context::create(surface);
-    mContext->set_line_width(mModeling->getLineWidth());
-    mContext->select_font_face(mModeling->getFont(),
+    mContext->set_line_width(Settings::settings().getLineWidth());
+    mContext->select_font_face(Settings::settings().getFont(),
 			       Cairo::FONT_SLANT_NORMAL,
 			       Cairo::FONT_WEIGHT_NORMAL);
-    mContext->set_font_size(mModeling->getFontSize());
+    mContext->set_font_size(Settings::settings().getFontSize());
     draw();
     surface->write_to_png(filename + ".png");
 }
@@ -1391,11 +1404,11 @@ void ViewDrawingArea::exportPdf(const std::string& filename)
     Cairo::RefPtr<Cairo::PdfSurface> surface =
         Cairo::PdfSurface::create(filename + ".pdf", mWidth, mHeight);
     mContext = Cairo::Context::create(surface);
-    mContext->set_line_width(mModeling->getLineWidth());
-    mContext->select_font_face(mModeling->getFont(),
+    mContext->set_line_width(Settings::settings().getLineWidth());
+    mContext->select_font_face(Settings::settings().getFont(),
 			       Cairo::FONT_SLANT_NORMAL,
 			       Cairo::FONT_WEIGHT_NORMAL);
-    mContext->set_font_size(mModeling->getFontSize());
+    mContext->set_font_size(Settings::settings().getFontSize());
     draw();
     mContext->show_page();
     surface->finish();
@@ -1407,11 +1420,11 @@ void ViewDrawingArea::exportSvg(const std::string& filename)
         Cairo::SvgSurface::create(filename + ".svg", mWidth, mHeight);
 
     mContext = Cairo::Context::create(surface);
-    mContext->set_line_width(mModeling->getLineWidth());
-    mContext->select_font_face(mModeling->getFont(),
+    mContext->set_line_width(Settings::settings().getLineWidth());
+    mContext->select_font_face(Settings::settings().getFont(),
 			       Cairo::FONT_SLANT_NORMAL,
 			       Cairo::FONT_WEIGHT_NORMAL);
-    mContext->set_font_size(mModeling->getFontSize());
+    mContext->set_font_size(Settings::settings().getFontSize());
     draw();
     mContext->show_page();
     surface->finish();

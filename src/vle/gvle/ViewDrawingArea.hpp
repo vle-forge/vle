@@ -33,6 +33,7 @@
 #define VLE_GVLE_VIEWDRAWINGAREA_HPP
 
 #include <gtkmm/drawingarea.h>
+#include <gdkmm/color.h>
 
 namespace vle { namespace graph {
 
@@ -212,9 +213,9 @@ namespace vle { namespace gvle {
         void drawHighlightConnection();
         void drawChildrenModels();
 	void drawChildrenModel(graph::Model* model,
-			       Color color);
+			       const Gdk::Color& color);
 	void drawChildrenPorts(graph::Model* model,
-			       Color color);
+			       const Gdk::Color& color);
         void drawLines();
         void drawLink();
         void drawZoomFrame();
@@ -244,7 +245,7 @@ namespace vle { namespace gvle {
 	/**
 	 * Change the color of the drawing
 	 */
-	void setColor(Color color);
+	void setColor(const Gdk::Color& color);
 
 	/**
          * Return nearest connection between all connection and mouse position

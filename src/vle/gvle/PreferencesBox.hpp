@@ -33,20 +33,21 @@
 #define VLE_GVLE_PREFERENCESBOX_HPP
 
 #include <gtkmm.h>
-#include <vle/gvle/Modeling.hpp>
-#include <gdkmm/gc.h>
-#include <gdkmm/types.h>
+#include <libglademm.h>
+#include <vle/gvle/Settings.hpp>
 
-namespace vle {
-namespace gvle {
+namespace vle { namespace gvle {
 
 class PreferencesBox
 {
 public:
-    PreferencesBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m);
+    PreferencesBox(Glib::RefPtr<Gnome::Glade::Xml> xml);
     ~PreferencesBox();
 
-    void show();
+    int run();
+
+    std::string getGraphicsFont();
+    std::string getEditorFont();
 
 protected:
     // Actions
@@ -77,42 +78,20 @@ protected:
     void onEditorFontChange();
 
 private:
-    /**
-     * A struct to store the configuration
-     */
-    struct Settings {
-	Gdk::Color background;
-	Gdk::Color foreground;
-	Gdk::Color atomic;
-	Gdk::Color coupled;
-	Gdk::Color selected;
-        Gdk::Color connection;
-	std::string font;
-	double fontSize;
-	double lineWidth;
-	bool highlightSyntax;
-	bool highlightBrackets;
-	bool highlightLine;
-	bool lineNumbers;
-	bool rightMargin;
-	bool autoIndent;
-	bool indentOnTab;
-	int  indentSize;
-	bool smartHomeEnd;
-	std::string fontEditor;
-    };
+    void init();
+    void activate();
+    void saveSettings();
+    void loadSettings();
 
-    //Class members
     Glib::RefPtr<Gnome::Glade::Xml> mXml;
-    Gtk::Dialog* mDialog;
-    Modeling*    mModeling;
-    Settings     currentSettings;
-    Settings     backupSettings;
+    Gtk::Dialog*                    mDialog;
+    Settings                        mCurrentSettings;
 
     //Dialog widgets - Action
     Gtk::Button* mButtonApply;
     Gtk::Button* mButtonCancel;
     Gtk::Button* mButtonRestore;
+
     //Dialog widgets - Graphics
     Gtk::ColorButton* mBackgroundColor;
     Gtk::ColorButton* mForegroundColor;
@@ -122,6 +101,7 @@ private:
     Gtk::ColorButton* mConnectionColor;
     Gtk::FontButton*  mFont;
     Gtk::HScale*      mLineWidth;
+
     //Dialog widgets - Editor
     Gtk::CheckButton* mHighlightSyntax;
     Gtk::CheckButton* mHighlightMatchingBrackets;
@@ -134,15 +114,8 @@ private:
     Gtk::CheckButton* mSmartHomeEnd;
     Gtk::FontButton*  mFontEditor;
 
-    //Methods
-    void init();
-    void activate(const Settings& set);
-    void copy(const Settings& src, Settings& dest);
-    Gdk::Color makeColorFromString(const std::string& value);
-    std::string makeStringFromColor(const Gdk::Color& color);
-    void saveSettings();
-    void loadSettings();
 };
 
 }} //namespace vle gvle
+
 #endif

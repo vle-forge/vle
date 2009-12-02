@@ -40,6 +40,7 @@
 #include <vle/gvle/HostsBox.hpp>
 #include <vle/gvle/GVLEMenuAndToolbar.hpp>
 #include <vle/gvle/PreferencesBox.hpp>
+#include <vle/gvle/Settings.hpp>
 #include <vle/gvle/ViewDrawingArea.hpp>
 #include <vle/gvle/ViewOutputBox.hpp>
 #include <vle/gvle/View.hpp>
@@ -450,15 +451,25 @@ GVLE::GVLE(BaseObjectType* cobject,
     mRefXML = xml;
     mModeling->setGlade(mRefXML);
 
+    Settings::settings().load();
+
     mGlobalVpzPrevDirPath = "";
 
     mConditionsBox = new ConditionsBox(mRefXML, this);
-    mPreferencesBox = new PreferencesBox(mRefXML, mModeling);
+    mPreferencesBox = new PreferencesBox(mRefXML);
     mOpenPackageBox = new OpenPackageBox(mRefXML, mModeling);
     mOpenVpzBox = new OpenVpzBox(mRefXML, mModeling);
     mNewProjectBox = new NewProjectBox(mRefXML, mModeling, this);
     mSaveVpzBox = new SaveVpzBox(mRefXML, mModeling);
     mQuitBox = new QuitBox(mRefXML, mModeling);
+
+    if (Settings::settings().getFont().empty()) {
+        Settings::settings().setFont(mPreferencesBox->getGraphicsFont());
+    }
+
+    if (Settings::settings().getFontEditor().empty()) {
+        Settings::settings().setFontEditor(mPreferencesBox->getEditorFont());
+    }
 
     mRefXML->get_widget("MenuAndToolbarVbox", mMenuAndToolbarVbox);
     mRefXML->get_widget("StatusBarPackageBrowser", mStatusbar);
@@ -495,6 +506,8 @@ GVLE::~GVLE()
     delete mSaveVpzBox;
     delete mQuitBox;
     delete mMenuAndToolbar;
+
+    Settings::settings().kill();
 }
 
 void GVLE::show()
@@ -935,7 +948,10 @@ void GVLE::onQuit()
 
 void GVLE::onPreferences()
 {
-    mPreferencesBox->show();
+    if (mPreferencesBox->run() == Gtk::RESPONSE_OK) {
+        mModeling->refreshViews();
+        mEditor->refreshViews();
+    }
 }
 
 void GVLE::onSimulationBox()

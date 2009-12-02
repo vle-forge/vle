@@ -33,6 +33,7 @@
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/GVLEMenuAndToolbar.hpp>
+#include <vle/gvle/Settings.hpp>
 #include <vle/gvle/View.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Debug.hpp>
@@ -188,24 +189,23 @@ std::string DocumentText::getIdLanguage()
 
 void DocumentText::applyEditingProperties()
 {
-    Modeling* modeling = mGVLE->getModeling();
-
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
     mView.get_source_buffer()->
-	set_highlight_syntax(modeling->getHighlightSyntax());
+	set_highlight_syntax(Settings::settings().getHighlightSyntax());
     mView.get_source_buffer()->
-	set_highlight_matching_brackets(modeling->getHighlightBrackets());
-    mView.set_highlight_current_line(modeling->getHighlightLine());
-    mView.set_show_line_numbers(modeling->getLineNumbers());
-    mView.set_show_right_margin(modeling->getRightMargin());
-    mView.set_auto_indent(modeling->getAutoIndent());
-    mView.set_indent_on_tab(modeling->getIndentOnTab());
-    mView.set_indent_width(modeling->getIndentSize());
-    if (modeling->getSmartHomeEnd())
+	set_highlight_matching_brackets(
+            Settings::settings().getHighlightBrackets());
+    mView.set_highlight_current_line(Settings::settings().getHighlightLine());
+    mView.set_show_line_numbers(Settings::settings().getLineNumbers());
+    mView.set_show_right_margin(Settings::settings().getRightMargin());
+    mView.set_auto_indent(Settings::settings().getAutoIndent());
+    mView.set_indent_on_tab(Settings::settings().getIndentOnTab());
+    mView.set_indent_width(Settings::settings().getIndentSize());
+    if (Settings::settings().getSmartHomeEnd())
 	mView.set_smart_home_end(gtksourceview::SOURCE_SMART_HOME_END_ALWAYS);
 #endif
     Pango::FontDescription font = Pango::FontDescription(
-	modeling->getFontEditor());
+	Settings::settings().getFontEditor());
     mView.modify_font(font);
 }
 

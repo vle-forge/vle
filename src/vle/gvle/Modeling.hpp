@@ -712,131 +712,11 @@ public:
      *
      ********************************************************************/
 
-    inline void setForegroundColor(Color color)
-    { mForegroundColor = color; }
-
-    inline const Color getForegroundColor() const
-    { return mForegroundColor; }
-
-    inline void setBackgroundColor(const Color color)
-    { mBackgroundColor = color; }
-
-    inline const Color getBackgroundColor() const
-    { return mBackgroundColor; }
-
-    inline void setSelectedColor(const Color color)
-    { mSelectedColor = color; }
-
-    inline const Color getSelectedColor() const
-    { return mSelectedColor; }
-
-    inline void setCoupledColor(const Color color)
-    { mCoupledColor = color; }
-
-    inline const Color getCoupledColor() const
-    { return mCoupledColor; }
-
-    inline void setAtomicColor(const Color color)
-    { mAtomicColor = color; }
-
-    inline const Color getAtomicColor() const
-    { return mAtomicColor; }
-
-    inline void setConnectionColor(const Color color)
-    { mConnectionColor = color; }
-
-    inline const Color getConnectionColor() const
-    { return mConnectionColor; }
-
-    inline void setFont(const std::string font)
-    { mFont = font; }
-
-    inline const std::string getFont() const
-    { return mFont; }
-
-    inline void setFontSize(const double size)
-    { mFontSize = size; }
-
-    inline double getFontSize() const
-    { return mFontSize; }
-
-    inline void setLineWidth(const double width)
-    { mLineWidth = width; }
-
-    inline double getLineWidth() const
-    { return mLineWidth; }
-
     inline void updateAdjustment(double h, double v)
     { return mGVLE->updateAdjustment(h, v); }
 
     inline utils::Rand* getRand() const
     { return mRand; }
-
-
-    /********************************************************************
-     *
-     * MANAGE THE EDITOR SETTINGS
-     *
-     ********************************************************************/
-    inline void setHighlightSyntax(bool syntax)
-    { mHighlightSyntax = syntax; }
-
-    inline bool getHighlightSyntax()
-    { return mHighlightSyntax; }
-
-    inline void setHighlightBrackets(bool brackets)
-    { mHighlightBrackets = brackets; }
-
-    inline bool getHighlightBrackets()
-    { return mHighlightBrackets; }
-
-    inline void setHighlightLine(bool line)
-    { mHighlightLine = line; }
-
-    inline bool getHighlightLine()
-    { return mHighlightLine; }
-
-    inline void setLineNumbers(bool numbers)
-    { mLineNumbers = numbers; }
-
-    inline bool getLineNumbers()
-    { return mLineNumbers; }
-
-    inline void setRightMargin(bool margin)
-    { mRightMargin = margin; }
-
-    inline bool getRightMargin()
-    { return mRightMargin; }
-
-    inline void setAutoIndent(bool auto_indent)
-    { mAutoIndent = auto_indent; }
-
-    inline bool getAutoIndent()
-    { return mAutoIndent; }
-
-    inline void setIndentOnTab(bool indent_tab)
-    { mIndentOnTab = indent_tab; }
-
-    inline bool getIndentOnTab()
-    { return mIndentOnTab; }
-
-    inline void setIndentSize(int size)
-    { mIndentSize = size; }
-
-    inline int getIndentSize()
-    { return mIndentSize; }
-
-    inline void setSmartHomeEnd(bool smart)
-    { mSmartHomeEnd = smart; }
-
-    inline bool getSmartHomeEnd()
-    { return mSmartHomeEnd; }
-
-    inline void setFontEditor(const std::string& font)
-    { mFontEditor = font; }
-
-    inline std::string& getFontEditor()
-    { return mFontEditor; }
 
     /********************************************************************
      *
@@ -863,29 +743,6 @@ private:
     ImportModelBox*             mImportModelBox;
     ImportClassesBox*           mImportClassesBox;
     CoupledModelBox*            mCoupledBox;
-
-    // Drawing attributes
-    Color                       mForegroundColor;
-    Color                       mBackgroundColor;
-    Color                       mSelectedColor;
-    Color                       mCoupledColor;
-    Color                       mAtomicColor;
-    Color                       mConnectionColor;
-    std::string                 mFont;
-    double                      mFontSize;
-    double                      mLineWidth;
-
-    // Editor attributes
-    bool mHighlightSyntax;
-    bool mHighlightBrackets;
-    bool mHighlightLine;
-    bool mLineNumbers;
-    bool mRightMargin;
-    bool mAutoIndent;
-    bool mIndentOnTab;
-    int  mIndentSize;
-    bool mSmartHomeEnd;
-    std::string mFontEditor;
 
     Glib::RefPtr < Gnome::Glade::Xml >  mRefXML;
 
