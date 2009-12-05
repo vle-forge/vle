@@ -40,6 +40,12 @@
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/lognormal_distribution.hpp>
 #include <boost/random/exponential_distribution.hpp>
+#include <boost/random/poisson_distribution.hpp>
+#include <boost/random/gamma_distribution.hpp>
+#include <boost/random/binomial_distribution.hpp>
+#include <boost/random/geometric_distribution.hpp>
+#include <boost/random/cauchy_distribution.hpp>
+#include <boost/random/triangle_distribution.hpp>
 #include <vle/utils/DllDefines.hpp>
 
 namespace vle { namespace utils {
@@ -63,6 +69,12 @@ namespace vle { namespace utils {
      * r.getDouble(0.0, 1.0); // double [0.0, 1.0)
      * r.normal(1.0, 0.0);
      * r.lognormal(1.0, 0.0);
+     * r.poisson(1.0);
+     * r.gamma(1.0);
+     * r.binomial(1, 0.5);
+     * r.geometric(0.5);
+     * r.cauchy(0.0, 1.0);
+     * r.triangle(0.0, 0.5, 1.0);
      * @endcode
      */
     class VLE_UTILS_EXPORT Rand
@@ -158,12 +170,12 @@ namespace vle { namespace utils {
             return gen();
         }
 
-	/**
-	 * @brief Generate a real using the normal law.
-	 * @param mean
-	 * @param sigma
-	 * @return a real.
-	 */
+        /**
+         * @brief Generate a real using the normal law.
+         * @param mean
+         * @param sigma
+         * @return a real.
+         */
         double normal(double mean, double sigma)
         {
             boost::normal_distribution < > distrib(mean, sigma);
@@ -173,12 +185,12 @@ namespace vle { namespace utils {
             return gen();
         }
 
-	/**
-	 * @brief Generate a real using the Log Normal law.
-	 * @param mean
-	 * @param sigma
-	 * @return a real.
-	 */
+        /**
+         * @brief Generate a real using the Log Normal law.
+         * @param mean
+         * @param sigma
+         * @return a real.
+         */
         double logNormal(double mean, double sigma)
         {
             boost::lognormal_distribution < > distrib(mean, sigma);
@@ -202,7 +214,7 @@ namespace vle { namespace utils {
             return gen();
         }
 
-	/**
+        /**
          * @brief Generate a random number between 0 and 2*PI using the von
          * Mises law [0..2*PI]. mu is the mean angle, expressed in radians
          * between 0 and 2*pi, and kappa is the concentration parameter, which
@@ -212,11 +224,99 @@ namespace vle { namespace utils {
          * the concentration parameter, which must be greater than or equal to
          * zero.  If kappa is equal to zero, this distribution reduces to a
          * uniform random angle over the range 0 to 2*pi.
-	 * @param kappa
-	 * @param mu
-	 * @return a random number [0,2PI]
-	 */
+         * @param kappa
+         * @param mu
+         * @return a random number [0,2PI]
+         */
         double vonMises(double kappa, double mu);
+
+        /**
+         * @brief Generate a real using the Poisson distribution.
+         * @param mean
+         * @return a real.
+         */
+        double poisson(double mean)
+        {
+            boost::poisson_distribution < > distrib(mean);
+            boost::variate_generator < boost::mt19937&,
+                boost::poisson_distribution < > > gen(m_rand, distrib);
+
+            return gen();
+        }
+
+        /**
+         * @brief Generate a real using the Gamma distribution.
+         * @param alpha
+         * @return a real.
+         */
+        double gamma(double alpha)
+        {
+            boost::gamma_distribution < > distrib(alpha);
+            boost::variate_generator < boost::mt19937&,
+                boost::gamma_distribution < > > gen(m_rand, distrib);
+
+            return gen();
+        }
+
+        /**
+         * @brief Generate a real using the Binomial distribution.
+         * @param t
+         * @param p
+         * @return a real.
+         */
+        double binomial(int t, double p)
+        {
+            boost::binomial_distribution < > distrib(t, p);
+            boost::variate_generator < boost::mt19937&,
+                boost::binomial_distribution < > > gen(m_rand, distrib);
+
+            return gen();
+        }
+
+        /**
+         * @brief Generate a real using the Geometric distribution.
+         * @param p
+         * @return a real.
+         */
+        double geometric(double p)
+        {
+            boost::geometric_distribution < > distrib(p);
+            boost::variate_generator < boost::mt19937&,
+                boost::geometric_distribution < > > gen(m_rand, distrib);
+
+            return gen();
+        }
+
+        /**
+         * @brief Generate a real using the Cauchy law.
+         * @param median
+         * @param sigma
+         * @return a real.
+         */
+        double cauchy(double median, double sigma)
+        {
+            boost::cauchy_distribution < > distrib(median, sigma);
+            boost::variate_generator < boost::mt19937&,
+                boost::cauchy_distribution < > > gen(m_rand, distrib);
+
+            return gen();
+        }
+
+        /**
+         * @brief Generate a real using the triangular law.
+         * @param a
+         * @param b
+         * @param c
+         * @return a real.
+         */
+        double triangle(double a, double b, double c)
+        {
+            boost::triangle_distribution < > distrib(a, b, c);
+            boost::variate_generator < boost::mt19937&,
+                boost::triangle_distribution < > > gen(m_rand, distrib);
+
+            return gen();
+        }
 
         /**
          * @brief Get a reference to the Mersenne Twister PRNG.
