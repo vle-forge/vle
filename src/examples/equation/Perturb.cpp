@@ -309,6 +309,37 @@ public:
 
 };
 
+class Perturb10 : public ve::Statechart
+{
+public:
+    Perturb10(const vd::DynamicsInit& init, const vd::InitEventList& events) :
+        ve::Statechart(init, events)
+	{
+	    ve::states(this) << A << B;
+
+	    ve::transition(this, A, B) << ve::after(5.)
+				       << ve::outputFunc(&Perturb10::out1);
+	    ve::transition(this, B, A) << ve::after(5.)
+				       << ve::outputFunc(&Perturb10::out2);
+
+	    initialState(A);
+	}
+
+    virtual ~Perturb10() { }
+
+    void out1(const vd::Time& /* time */, vd::ExternalEventList& output) const
+	{
+	    output << (ve::DifferenceEquation::Var("g") = 10);
+	    output << (ve::DifferenceEquation::Var("b") = 10);
+	}
+
+    void out2(const vd::Time& /* time */, vd::ExternalEventList& output) const
+	{
+	    output << (ve::DifferenceEquation::Var("g") = 0);
+	    output << (ve::DifferenceEquation::Var("b") = 0);
+	}
+};
+
 }}} // namespace vle examples equation
 
 DECLARE_NAMED_DYNAMICS(Perturb, vle::examples::equation::Perturb)
@@ -320,3 +351,4 @@ DECLARE_NAMED_DYNAMICS(Perturb6, vle::examples::equation::Perturb6)
 DECLARE_NAMED_DYNAMICS(Perturb7, vle::examples::equation::Perturb7)
 DECLARE_NAMED_DYNAMICS(Perturb8, vle::examples::equation::Perturb8)
 DECLARE_NAMED_DYNAMICS(Perturb9, vle::examples::equation::Perturb9)
+DECLARE_NAMED_DYNAMICS(Perturb10, vle::examples::equation::Perturb10)

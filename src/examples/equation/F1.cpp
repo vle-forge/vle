@@ -33,7 +33,7 @@
 
 namespace vle { namespace examples { namespace equation {
 
-void F1::compute(const devs::Time& /*time*/)
+void F1::compute(const devs::Time& /* time */)
 {
     a = a(-1) + 1;
     b = b(-1) + d(-1) - g() + 1;

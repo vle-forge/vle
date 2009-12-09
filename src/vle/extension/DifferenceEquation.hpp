@@ -705,7 +705,7 @@ namespace vle { namespace extension { namespace DifferenceEquation {
         void create(const std::string& name,
                     MultipleVariableIterators& iterator);
 
-        void unset();
+        void unset(bool all = false);
 
         double val(const std::string& name) const;
 

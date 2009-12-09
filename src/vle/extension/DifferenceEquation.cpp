@@ -576,12 +576,11 @@ void Base::internalTransition(const Time& time)
             clearReceivedValues();
         }
         mLastTime = time;
-
-        if (mLastComputeTime < time) {
+        if (mLastClearTime < time) {
             mLockedVariables.clear();
+	    invalidValues();
             mLastClearTime = time;
         }
-
         if (mPerturbations.empty()) {
             if (mLastComputeTime == time) {
                 removeValues();
@@ -636,7 +635,7 @@ void Base::externalTransition(const ExternalEventList& event,
         if (mMode == NAME and (*it)->onPort("update")) {
             std::string name = (*it)->getStringAttributeValue("name");
 
-            if (mReceive == 0 and mSyncs > 0 and
+           if (mReceive == 0 and mSyncs > 0 and
                 (mLastComputeTime < time or mLastComputeTime.isInfinity())) {
                 clearReceivedValues();
             }
@@ -654,6 +653,7 @@ void Base::externalTransition(const ExternalEventList& event,
 
             if (mLastClearTime.isInfinity() or mLastClearTime < time) {
                 mLockedVariables.clear();
+		invalidValues();
                 mLastClearTime = time;
             }
             mLockedVariables.push_back(name);
@@ -1081,7 +1081,7 @@ void Multiple::init(const Var& variable, double value)
 
 void Multiple::invalidValues()
 {
-    unset();
+    unset(true);
 }
 
 void Multiple::lockValue(const std::string& name)
@@ -1108,12 +1108,16 @@ void Multiple::removeValues()
     }
 }
 
-void Multiple::unset()
+void Multiple::unset(bool all)
 {
     std::map < std::string, bool >::iterator it = mSetValues.begin();
 
     while (it != mSetValues.end()) {
-        it->second = false;
+	if (all or
+	    std::find(mLockedVariables.begin(), mLockedVariables.end(),
+	 	      it->first) == mLockedVariables.end()) {
+	    it->second = false;
+	}
         ++it;
     }
 }
@@ -1147,7 +1151,6 @@ double Multiple::val(const std::string& name,
         if (not *iterators.mSetValues) {
             ++shift;
         }
-
         if ((int)(iterators.mMultipleValues->size() - 1) < -shift) {
             throw utils::InternalError(fmt(_(
                         "[%1%] - %2%[%3%] - shift too large")) % getModelName() %
