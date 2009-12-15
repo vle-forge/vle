@@ -29,10 +29,10 @@
  */
 
 
-#ifndef VLE_TUTORIAL_0_PLANTLOUSE_HPP
-#define VLE_TUTORIAL_0_PLANTLOUSE_HPP
+#ifndef EXAMPLES_QSS_PLANTLOUSE_HPP
+#define EXAMPLES_QSS_PLANTLOUSE_HPP
 
-#include <vle/extension/QSS.hpp>
+#include <vle/extension/differential-equation/QSS.hpp>
 
 using namespace vle;
 

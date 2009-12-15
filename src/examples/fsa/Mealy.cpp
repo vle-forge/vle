@@ -29,35 +29,35 @@
  */
 
 
-#include <vle/extension/Mealy.hpp>
+#include <vle/extension/fsa/Mealy.hpp>
 
 using namespace boost::assign;
 
 namespace vle { namespace examples { namespace fsa {
 
-namespace ve = vle::extension;
+namespace vf = vle::extension::fsa;
 namespace vd = vle::devs;
 
 enum State { a = 1, b, c };
 
-class mealy1 : public ve::Mealy
+class mealy1 : public vf::Mealy
 {
 public:
     mealy1(const vd::DynamicsInit& init,
            const vd::InitEventList& events) :
-        ve::Mealy(init, events)
+        vf::Mealy(init, events)
     {
-        ve::states(this) << a << b << c;
+        states(this) << a << b << c;
 
-        ve::transition(this, a, c) << ve::event("in1")
-            << ve::action(&mealy1::action1)
-            << ve::output("out1");
-        ve::transition(this, a, c) << ve::event("in2")
-            << ve::output("out2");
-        ve::transition(this, b, a) << ve::event("in1")
-            << ve::output("out1");
-        ve::transition(this, c, a) << ve::event("in2");
-        ve::transition(this, c, b) << ve::event("in1");
+        transition(this, a, c) << event("in1")
+                               << action(&mealy1::action1)
+                               << output("out1");
+        transition(this, a, c) << event("in2")
+                               << output("out2");
+        transition(this, b, a) << event("in1")
+                               << output("out1");
+        transition(this, c, a) << event("in2");
+        transition(this, c, b) << event("in1");
 
         initialState(a);
     }
@@ -85,21 +85,21 @@ public:
 
 enum State2 { START = 1, RUN };
 
-class counter1 : public ve::Mealy
+class counter1 : public vf::Mealy
 {
 public:
     counter1(const vd::DynamicsInit& model,
              const vd::InitEventList& events) :
-        ve::Mealy(model, events)
+        vf::Mealy(model, events)
     {
-        ve::states(this) << START << RUN;
+        states(this) << START << RUN;
 
-        ve::transition(this, START, RUN) << ve::event("in")
-            << ve::outputFunc(&counter1::out)
-            << ve::action(&counter1::start);
-        ve::transition(this, RUN, RUN) << ve::event("in")
-            << ve::outputFunc(&counter1::out)
-            << ve::action(&counter1::run);
+        transition(this, START, RUN) << event("in")
+                                     << outputFunc(&counter1::out)
+                                     << action(&counter1::start);
+        transition(this, RUN, RUN) << event("in")
+                                   << outputFunc(&counter1::out)
+                                   << action(&counter1::run);
 
         initialState(START);
 
@@ -124,7 +124,7 @@ public:
         if (event.onPort("counter")) {
             return vle::value::Integer::create(value);
         }
-        return ve::Mealy::observation(event);
+        return vf::Mealy::observation(event);
     }
 
 private:

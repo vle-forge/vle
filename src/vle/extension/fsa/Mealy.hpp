@@ -1,5 +1,5 @@
 /**
- * @file vle/extension/Mealy.hpp
+ * @file vle/extension/fsa/Mealy.hpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -29,15 +29,28 @@
  */
 
 
-#ifndef VLE_EXTENSION_MEALY_HPP
-#define VLE_EXTENSION_MEALY_HPP
+#ifndef VLE_EXTENSION_FSA_MEALY_HPP
+#define VLE_EXTENSION_FSA_MEALY_HPP 1
 
 #include <vle/extension/DllDefines.hpp>
-#include <vle/extension/FSA.hpp>
+#include <vle/extension/fsa/FSA.hpp>
 #include <boost/assign.hpp>
 #include <boost/bind.hpp>
+#include <boost/function.hpp>
 
-namespace vle { namespace extension {
+namespace vle { namespace extension { namespace fsa {
+
+template < typename I>
+struct MealyTransition_t
+{
+    MealyTransition_t(I obj, int state, int nextState) :
+        obj(obj), state(state), nextState(nextState)  { }
+
+    I obj;
+    int state;
+    int nextState;
+    std::string event;
+};
 
 class VLE_EXTENSION_EXPORT Mealy : public Base
 {
@@ -113,6 +126,13 @@ public:
         return r.first->second;
     }
 
+    Output_t output(const std::string& output)
+    { return Base::output(output); }
+
+    template < typename I >
+        MealyTransition_t<I> transition(I obj, int state, int nextState)
+    { return MealyTransition_t<I>(obj, state, nextState); }
+
 private:
     typedef ActionsMap::const_iterator ActionsIterator;
     typedef Outputs::const_iterator OutputsIterator;
@@ -153,24 +173,9 @@ private:
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-template < typename I>
-struct Transition_t
-{
-    Transition_t(I obj, int state, int nextState) :
-        obj(obj), state(state), nextState(nextState)  { }
-
-    I obj;
-    int state;
-    int nextState;
-    std::string event;
-};
-
 template < typename I >
-Transition_t<I> transition(I obj, int state, int nextState)
-{ return Transition_t<I>(obj, state, nextState); }
-
-template < typename I >
-Transition_t<I> operator<<(Transition_t<I> transition, Event_t event)
+MealyTransition_t<I> operator<<(MealyTransition_t<I> transition,
+                                Event_t event)
 {
     insert(transition.obj->transitions(transition.state))(event.event,
                                                           transition.nextState);
@@ -179,7 +184,8 @@ Transition_t<I> operator<<(Transition_t<I> transition, Event_t event)
 }
 
 template < typename I >
-Transition_t<I> operator<<(Transition_t<I> transition, Output_t output)
+MealyTransition_t<I> operator<<(MealyTransition_t<I> transition,
+                                Output_t output)
 {
     insert(transition.obj->outputs(transition.state))(transition.event,
                                                       output.output);
@@ -187,7 +193,8 @@ Transition_t<I> operator<<(Transition_t<I> transition, Output_t output)
 }
 
 template < typename I, typename X >
-Transition_t<I> operator<<(Transition_t<I> transition, OutputFunc_t<X> func)
+MealyTransition_t<I> operator<<(MealyTransition_t<I> transition,
+                                OutputFunc_t<X> func)
 {
     boost::assign::insert(transition.obj->outputFuncs(transition.state))(
         transition.event, boost::bind(func.func, transition.obj, _1, _2));
@@ -195,13 +202,14 @@ Transition_t<I> operator<<(Transition_t<I> transition, OutputFunc_t<X> func)
 }
 
 template < typename I, typename X >
-Transition_t<I> operator<<(Transition_t<I> transition, Action_t<X> action)
+MealyTransition_t<I> operator<<(MealyTransition_t<I> transition,
+                                Action_t<X> action)
 {
     boost::assign::insert(transition.obj->actions(transition.state))(
         transition.event, boost::bind(action.action, transition.obj, _1, _2));
     return transition;
 }
 
-}} // namespace vle extension
+}}} // namespace vle extension fsa
 
 #endif

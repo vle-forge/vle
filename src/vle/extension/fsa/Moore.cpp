@@ -1,5 +1,5 @@
 /**
- * @file vle/extension/Moore.cpp
+ * @file vle/extension/fsa/Moore.cpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -29,9 +29,9 @@
  */
 
 
-#include <vle/extension/Moore.hpp>
+#include <vle/extension/fsa/Moore.hpp>
 
-namespace vle { namespace extension {
+namespace vle { namespace extension { namespace fsa {
 
 void Moore::process(const devs::Time& time,
                        const devs::ExternalEvent* event)
@@ -151,4 +151,4 @@ void Moore::internalTransition(const devs::Time& time)
     }
 }
 
-}} // namespace vle extension
+}}} // namespace vle extension fsa

@@ -1,5 +1,5 @@
 /**
- * @file vle/extension/Statechart.cpp
+ * @file vle/extension/fsa/Statechart.cpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -29,9 +29,9 @@
  */
 
 
-#include <vle/extension/Statechart.hpp>
+#include <vle/extension/fsa/Statechart.hpp>
 
-namespace vle { namespace extension {
+namespace vle { namespace extension { namespace fsa {
 
 void Statechart::buildOutputs(int transition,
 			      const devs::Time& time,
@@ -443,16 +443,4 @@ void Statechart::internalTransition(const devs::Time& time)
     mLastTime = time;
 }
 
-/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
-
-After_t after(const devs::Time& duration)
-{
-    return After_t(duration);
-}
-
-When_t when(const devs::Time& date)
-{
-    return When_t(date);
-}
-
-}} // namespace vle extension
+}}} // namespace vle extension fsa

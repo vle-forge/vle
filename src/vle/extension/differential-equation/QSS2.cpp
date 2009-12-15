@@ -1,5 +1,5 @@
 /**
- * @file vle/extension/QSS2.cpp
+ * @file vle/extension/differential-equation/QSS2.cpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -29,18 +29,17 @@
  */
 
 
-#include <vle/extension/QSS2.hpp>
+#include <vle/extension/differential-equation/QSS2.hpp>
 #include <vle/value/Map.hpp>
 #include <vle/utils/Debug.hpp>
 #include <cmath>
 
-namespace vle { namespace extension {
+namespace vle { namespace extension { namespace DifferentialEquation {
 
 using namespace devs;
-using namespace graph;
 using namespace value;
 
-mfi::mfi(qss2* qss,unsigned int i,unsigned int n):
+mfi::mfi(QSS2* qss,unsigned int i,unsigned int n):
     m_qss(qss),
     index(i),
     m_functionNumber(n)
@@ -145,7 +144,7 @@ Couple mfi::ext(const Time& p_time, unsigned int i,const Couple & input)
     return ret;
 }
 
-qss2::qss2(const DynamicsInit& p_model,
+QSS2::QSS2(const DynamicsInit& p_model,
            const InitEventList& events) :
     Dynamics(p_model, events),
     m_value(0),
@@ -194,72 +193,72 @@ qss2::qss2(const DynamicsInit& p_model,
     }
 }
 
-double qss2::getDerivative(unsigned int i) const
+double QSS2::getDerivative(unsigned int i) const
 {
     return m_derivative[i];
 }
 
-double qss2::getDerivative2(unsigned int i) const
+double QSS2::getDerivative2(unsigned int i) const
 {
     return m_derivative2[i];
 }
 
-double qss2::getIndex(unsigned int i) const
+double QSS2::getIndex(unsigned int i) const
 {
     return m_index[i];
 }
 
-double qss2::getIndex2(unsigned int i) const
+double QSS2::getIndex2(unsigned int i) const
 {
     return m_index2[i];
 }
 
-const Time & qss2::getLastTime(unsigned int i) const
+const Time & QSS2::getLastTime(unsigned int i) const
 {
     return m_lastTime[i];
 }
 
-const Time & qss2::getSigma(unsigned int i) const
+const Time & QSS2::getSigma(unsigned int i) const
 {
     return m_sigma[i];
 }
 
-void qss2::setIndex(unsigned int i,double p_index)
+void QSS2::setIndex(unsigned int i,double p_index)
 {
     m_index[i] = p_index;
 }
 
-void qss2::setIndex2(unsigned int i,double p_index)
+void QSS2::setIndex2(unsigned int i,double p_index)
 {
     m_index2[i] = p_index;
 }
 
-void qss2::setDerivative(unsigned int i,double p_derivative)
+void QSS2::setDerivative(unsigned int i,double p_derivative)
 {
     m_derivative[i] = p_derivative;
 }
 
-void qss2::setDerivative2(unsigned int i,double p_derivative)
+void QSS2::setDerivative2(unsigned int i,double p_derivative)
 {
     m_derivative2[i] = p_derivative;
 }
 
-void qss2::setLastTime(unsigned int i,const Time & p_time)
+void QSS2::setLastTime(unsigned int i,const Time & p_time)
 {
     m_lastTime[i] = p_time;
 }
 
-void qss2::setSigma(unsigned int i,const Time & p_time)
+void QSS2::setSigma(unsigned int i,const Time & p_time)
 {
     m_sigma[i] = p_time;
 }
 
-void qss2::setValue(unsigned int i,double p_value)
+void QSS2::setValue(unsigned int i,double p_value)
 {
     m_value[i] = p_value;
 }
 
-void qss2::updateSigma(unsigned int) //i)
+void QSS2::updateSigma(unsigned int) //i)
 {
     // Calcul du sigma de la ième fonction
     //   if (std::abs(getGradient(i)) < m_threshold)
@@ -272,7 +271,7 @@ void qss2::updateSigma(unsigned int) //i)
     // 			    /getGradient(i)));
 }
 
-void qss2::minSigma()
+void QSS2::minSigma()
 {
     // Recherche de la prochaine fonction à calculer
     unsigned int j = 1;
@@ -291,7 +290,7 @@ void qss2::minSigma()
     m_currentModel = j_min;
 }
 
-bool qss2::delta(double a,double b,double c,double& s)
+bool QSS2::delta(double a,double b,double c,double& s)
 {
     if (a!=0) {
         double d = b*b-4*a*c;
@@ -320,7 +319,7 @@ bool qss2::delta(double a,double b,double c,double& s)
     return false;
 }
 
-bool qss2::intermediaire(double a,double b,double c,double cp,double& s)
+bool QSS2::intermediaire(double a,double b,double c,double cp,double& s)
 {
     double s1,s2;
 
@@ -354,7 +353,7 @@ bool qss2::intermediaire(double a,double b,double c,double cp,double& s)
 
 // DEVS Methods
 
-void qss2::finish()
+void QSS2::finish()
 {
     delete[] m_value;
     delete[] m_derivative;
@@ -368,7 +367,7 @@ void qss2::finish()
     delete[] m_mfi;
 }
 
-void qss2::init2()
+void QSS2::init2()
 {
     for(unsigned int i = 0;i < m_functionNumber;i++)
     {
@@ -389,7 +388,7 @@ void qss2::init2()
     minSigma();
 }
 
-Time qss2::init(const devs::Time& /* time */)
+Time QSS2::init(const devs::Time& /* time */)
 {
     std::vector < std::pair < unsigned int , double > >::const_iterator it =
         m_initialValueList.begin();
@@ -402,7 +401,7 @@ Time qss2::init(const devs::Time& /* time */)
     return getSigma(m_currentModel);
 }
 
-void qss2::output(const Time& /* time */,
+void QSS2::output(const Time& /* time */,
                   ExternalEventList& output) const
 {
     if (m_active) {
@@ -414,7 +413,7 @@ void qss2::output(const Time& /* time */,
 
             if (it == m_variableName.end()) {
                 throw utils::ModellingError(fmt(_(
-                        "Qss2: unknow variable %1%")) % it->second);
+                        "QSS2: unknow variable %1%")) % it->second);
             }
             ee << attribute(it->second, getValue(i));
         }
@@ -422,18 +421,18 @@ void qss2::output(const Time& /* time */,
     }
 }
 
-Time qss2::timeAdvance() const
+Time QSS2::timeAdvance() const
 {
     return getSigma(m_currentModel);
 }
 
-Event::EventType qss2::confluentTransitions(const Time& /* internal */,
+Event::EventType QSS2::confluentTransitions(const Time& /* internal */,
                                             const ExternalEventList& /* extEventlist */) const
 {
     return Event::EXTERNAL;
 }
 
-void qss2::internalTransition(const Time& time)
+void QSS2::internalTransition(const Time& time)
 {
     unsigned int i = m_currentModel;
     Couple input;
@@ -498,7 +497,7 @@ void qss2::internalTransition(const Time& time)
     minSigma();
 }
 
-void qss2::externalTransition(const ExternalEventList& event,
+void QSS2::externalTransition(const ExternalEventList& event,
                               const Time& /* time */)
 {
     ExternalEventList::const_iterator it = event.begin();
@@ -515,7 +514,7 @@ void qss2::externalTransition(const ExternalEventList& event,
     }
 }
 
-Value* qss2::observation(const ObservationEvent& event) const
+Value* QSS2::observation(const ObservationEvent& event) const
 {
     //  unsigned int i = to_int(event->getPortName());
     unsigned int i = m_variableIndex.find(event.getPortName())->second;
@@ -525,4 +524,4 @@ Value* qss2::observation(const ObservationEvent& event) const
     return Double::create(x);
 }
 
-}} // namespace vle extension
+}}} // namespace vle extension DifferentialEquation

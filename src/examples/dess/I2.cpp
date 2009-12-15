@@ -30,14 +30,13 @@
 
 
 #include "I2.hpp"
-#include <vle/utils/Debug.hpp>
 #include <cmath>
 
 namespace vle { namespace examples { namespace dess {
 
 I2::I2(const devs::DynamicsInit& model,
        const devs::InitEventList& evList):
-    extension::DESS(model, evList)
+    extension::DifferentialEquation::DESS(model, evList)
 {
     // birth and death rate
     m = value::toDouble(evList.get("m"));

@@ -1,5 +1,5 @@
 /**
- * @file vle/extension/FSA.cpp
+ * @file vle/extension/fsa/FSA.cpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -29,10 +29,11 @@
  */
 
 
-#include <vle/extension/FSA.hpp>
+#include <vle/extension/fsa/FSA.hpp>
+#include <vle/utils/Exception.hpp>
 #include <vle/value/Value.hpp>
 
-namespace vle { namespace extension {
+namespace vle { namespace extension { namespace fsa {
 
 void Base::initialState(int state)
 {
@@ -59,16 +60,4 @@ vle::devs::ExternalEvent* Base::cloneExternalEvent(
     return ee;
 }
 
-/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
-
-Event_t event(const std::string& event)
-{
-    return Event_t(event);
-}
-
-Output_t output(const std::string& output)
-{
-    return Output_t(output);
-}
-
-}} // namespace vle extension
+}}} // namespace vle extension fsa

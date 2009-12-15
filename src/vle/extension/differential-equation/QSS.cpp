@@ -1,5 +1,5 @@
 /**
- * @file vle/extension/QSS.cpp
+ * @file vle/extension/differential-equation/QSS.cpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -29,7 +29,7 @@
  */
 
 
-#include <vle/extension/QSS.hpp>
+#include <vle/extension/differential-equation/QSS.hpp>
 #include <vle/value/Map.hpp>
 #include <vle/utils/Debug.hpp>
 #include <cmath>
@@ -37,12 +37,11 @@
 namespace vle { namespace extension { namespace QSS {
 
 using namespace devs;
-using namespace graph;
 using namespace value;
 
 Simple::Simple(const DynamicsInit& model,
 	       const InitEventList& events) :
-    DifferentialEquation(model, events)
+    DifferentialEquation::Base(model, events)
 {
     const Value& precision = events.get("precision");
     mPrecision = toDouble(precision);
@@ -57,7 +56,7 @@ double Simple::getEstimatedValue(double e) const
     return mValue + e * mGradient;
 }
 
-void Simple::updateGradient(bool external, const vle::devs::Time& time)
+void Simple::updateGradient(bool external, const Time& time)
 {
     mLastTime = time;
     mGradient = compute(time);
@@ -68,7 +67,7 @@ void Simple::updateGradient(bool external, const vle::devs::Time& time)
     else updateSigma(time);
 }
 
-void Simple::updateSigma(const vle::devs::Time& /* time */)
+void Simple::updateSigma(const Time& /* time */)
 {
     if (std::abs(mGradient) < mThreshold) {
         mSigma = Time::infinity;
@@ -81,7 +80,7 @@ void Simple::updateSigma(const vle::devs::Time& /* time */)
     }
 }
 
-void Simple::updateValue(bool external, const vle::devs::Time& time)
+void Simple::updateValue(bool external, const Time& time)
 {
     if (external) {
 	pushValue(time, mValue + (time - mLastTime).getValue() * mGradient);
@@ -105,9 +104,9 @@ void Simple::reset(const Time& time, double value)
 }
 
 // DEVS Methods
-Time Simple::init(const devs::Time& time)
+Time Simple::init(const Time& time)
 {
-    Time r = DifferentialEquation::init(time);
+    Time r = DifferentialEquation::Base::init(time);
 
     mIndex = (long)(floor(mValue/mPrecision));
     return r;
@@ -396,15 +395,16 @@ void Multiple::externalTransition(const ExternalEventList& event,
             if ((*it)->onPort("update")) {
 
                 if (mVariableIndex.find(name) == mVariableIndex.end()) {
-                   throw utils::ModellingError(fmt(_(
-                           "QSS::Multiple update, invalid variable name: '%1%'"))
-                       % name);
+                   throw utils::ModellingError(
+                       fmt(_("QSS::Multiple update, invalid variable name:" \
+                             " '%1%'")) % name);
                 }
 
                 setExternalValue(name, value);
                 if (mIsGradient[mExternalVariableIndex[name]])
-                    setExternalGradient(name,
-                                        (*it)->getDoubleAttributeValue("gradient"));
+                    setExternalGradient(
+                        name,
+                        (*it)->getDoubleAttributeValue("gradient"));
             }
             // c'est une perturbation sur une variable interne
             if ((*it)->onPort("perturb")) {
@@ -436,7 +436,8 @@ void Multiple::externalTransition(const ExternalEventList& event,
                 if (_reset) setSigma(i, 0);
                 else {
                     // Mise à jour de la valeur
-                    setValue(i, getValue(i) + (time - mLastTime[i]).getValue()*getGradient(i));
+                    setValue(i, getValue(i) +
+                             (time - mLastTime[i]).getValue()*getGradient(i));
                     setLastTime(i, time);
                     setGradient(i, compute(i, time));
 

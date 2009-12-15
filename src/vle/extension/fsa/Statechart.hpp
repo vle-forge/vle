@@ -1,5 +1,5 @@
 /**
- * @file vle/extension/Statechart.hpp
+ * @file vle/extension/fsa/Statechart.hpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -29,16 +29,91 @@
  */
 
 
-#ifndef VLE_EXTENSION_STATECHART_HPP
-#define VLE_EXTENSION_STATECHART_HPP
+#ifndef VLE_EXTENSION_FSA_STATECHART_HPP
+#define VLE_EXTENSION_FSA_STATECHART_HPP
 
 #include <vle/extension/DllDefines.hpp>
-#include <vle/extension/FSA.hpp>
+#include <vle/extension/fsa/FSA.hpp>
 #include <vle/utils/DateTime.hpp>
 #include <boost/assign.hpp>
 #include <boost/bind.hpp>
+#include <boost/function.hpp>
 
-namespace vle { namespace extension {
+namespace vle { namespace extension { namespace fsa {
+
+template < typename X, typename I >
+struct StatechartInAction_t
+{
+    StatechartInAction_t(I obj, X func) : obj(obj), func(func) { }
+
+    I obj;
+    X func;
+};
+
+template < typename X, typename I >
+struct OutAction_t
+{
+    OutAction_t(I obj, X func) : obj(obj), func(func) { }
+
+    I obj;
+    X func;
+};
+
+template < typename X, typename I >
+struct Activity_t
+{
+    Activity_t(I obj, X func) : obj(obj), func(func)  { }
+
+    I obj;
+    X func;
+};
+
+template < typename X >
+struct Guard_t
+{
+    Guard_t(X guard) : guard(guard)  { }
+
+    X guard;
+};
+
+struct VLE_EXTENSION_EXPORT After_t
+{
+    After_t(const devs::Time& duration) : duration(duration)  { }
+
+    devs::Time duration;
+};
+
+struct VLE_EXTENSION_EXPORT When_t
+{
+    When_t(const devs::Time& date) : date(date)  { }
+
+    devs::Time date;
+};
+
+template < typename I >
+struct StatechartTransition_t
+{
+    StatechartTransition_t(I obj, int state, int nextState, int id) :
+        obj(obj), state(state), nextState(nextState), id(id)  { }
+
+    I obj;
+    int state;
+    int nextState;
+    int id;
+};
+
+template < typename I, typename X >
+struct EventInState_t
+{
+    EventInState_t(I obj, const std::string& event, X func) :
+        obj(obj), event(event), func(func)  { }
+
+    I obj;
+    std::string event;
+    X func;
+};
+
+/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 class VLE_EXTENSION_EXPORT Statechart : public Base
 {
@@ -139,15 +214,43 @@ public:
     GuardTransitionActions& guardTransitionActions()
     { return mGuardTransitionActions; }
 
-    int addTransition(int state, int nextState)
+    template < typename X, typename I >
+        StatechartInAction_t<X, I> inAction(I obj, X func)
+    { return StatechartInAction_t<X, I>(obj, func); }
+
+    template < typename X, typename I >
+        OutAction_t<X, I> outAction(I obj, X func)
+    { return OutAction_t<X, I>(obj, func); }
+
+    template < typename X, typename I >
+        Activity_t<X, I> activity(I obj, X func)
+    { return Activity_t<X, I>(obj, func); }
+
+    template < typename X >
+        Guard_t<X> guard(X guard)
+    { return Guard_t<X>(guard); }
+
+    After_t after(const devs::Time& duration)
+    { return After_t(duration); }
+
+    When_t when(const devs::Time& date)
+    { return When_t(date); }
+
+    template < typename I >
+        StatechartTransition_t<I> transition(I obj, int state, int nextState)
     {
-        if (mTransitionsMap.find(state) == mTransitionsMap.end()) {
-            mTransitionsMap[state] = Transitions();
-        }
-        mTransitionsMap[state].push_back(++mTransitionIndex);
-        mNextStates[mTransitionIndex] = nextState;
-        return mTransitionIndex;
+        int id = obj->addTransition(state, nextState);
+
+        return StatechartTransition_t<I>(obj, state, nextState, id);
     }
+
+    template < typename I, typename X >
+        EventInState_t<I,X> eventInState(I obj, const std::string& event,
+                                         X func)
+    { return EventInState_t<I,X>(obj, event, func); }
+
+    Output_t output(const std::string& output_)
+    { return Base::output(output_); }
 
 private:
     typedef Actions::const_iterator ActionsIterator;
@@ -210,6 +313,16 @@ private:
     // (id -> output function)
     OutputFuncs mOutputFuncs;
 
+    int addTransition(int state, int nextState)
+    {
+        if (mTransitionsMap.find(state) == mTransitionsMap.end()) {
+            mTransitionsMap[state] = Transitions();
+        }
+        mTransitionsMap[state].push_back(++mTransitionIndex);
+        mNextStates[mTransitionIndex] = nextState;
+        return mTransitionIndex;
+    }
+
     void buildOutputs(int transition,
 		      const devs::Time& time,
 		      devs::ExternalEventList& output) const;
@@ -263,23 +376,9 @@ private:
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
-
-template < typename X, typename I >
-struct InAction_t
-{
-    InAction_t(I obj, X func) : obj(obj), func(func) { }
-
-    I obj;
-    X func;
-};
-
-template < typename X, typename I >
-InAction_t<X, I> inAction(I obj, X func)
-{ return InAction_t<X, I>(obj, func); }
-
 template < typename C, typename X, typename I >
-InAction_t<X,I> operator>>(InAction_t<X,I> action, const C& state)
+StatechartInAction_t<X,I> operator>>(StatechartInAction_t<X,I> action,
+                                     const C& state)
 {
     boost::assign::insert(action.obj->inActions())(
         state, boost::bind(action.func, action.obj, _1));
@@ -287,19 +386,6 @@ InAction_t<X,I> operator>>(InAction_t<X,I> action, const C& state)
 }
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
-
-template < typename X, typename I >
-struct OutAction_t
-{
-    OutAction_t(I obj, X func) : obj(obj), func(func) { }
-
-    I obj;
-    X func;
-};
-
-template < typename X, typename I >
-OutAction_t<X, I> outAction(I obj, X func)
-{ return OutAction_t<X, I>(obj, func); }
 
 template < typename X, typename I >
 OutAction_t<X,I> operator>>(OutAction_t<X,I> action, int state)
@@ -312,19 +398,6 @@ OutAction_t<X,I> operator>>(OutAction_t<X,I> action, int state)
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 template < typename X, typename I >
-struct Activity_t
-{
-    Activity_t(I obj, X func) : obj(obj), func(func)  { }
-
-    I obj;
-    X func;
-};
-
-template < typename X, typename I >
-Activity_t<X, I> activity(I obj, X func)
-{ return Activity_t<X, I>(obj, func); }
-
-template < typename X, typename I >
 Activity_t<X,I> operator>>(Activity_t<X,I> activity, int state)
 {
     boost::assign::insert(activity.obj->activities())(
@@ -334,58 +407,9 @@ Activity_t<X,I> operator>>(Activity_t<X,I> activity, int state)
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-template < typename I >
-struct Transition_t
-{
-    Transition_t(I obj, int state, int nextState, int id) :
-        obj(obj), state(state), nextState(nextState), id(id)  { }
-
-    I obj;
-    int state;
-    int nextState;
-    int id;
-};
-
-template < typename I >
-Transition_t<I> transition(I obj, int state, int nextState)
-{
-    int id = obj->addTransition(state, nextState);
-
-    return Transition_t<I>(obj, state, nextState, id);
-}
-
-template < typename X >
-struct Guard_t
-{
-    Guard_t(X guard) : guard(guard)  { }
-
-    X guard;
-};
-
-template < typename X >
-Guard_t<X> guard(X guard)
-{ return Guard_t<X>(guard); }
-
-struct VLE_EXTENSION_EXPORT After_t
-{
-    After_t(const devs::Time& duration) : duration(duration)  { }
-
-    devs::Time duration;
-};
-
-After_t VLE_EXTENSION_EXPORT after(const devs::Time& duration);
-
-struct VLE_EXTENSION_EXPORT When_t
-{
-    When_t(const devs::Time& date) : date(date)  { }
-
-    devs::Time date;
-};
-
-When_t VLE_EXTENSION_EXPORT when(const devs::Time& date);
-
 template < typename I, typename X >
-Transition_t<I> operator<<(Transition_t<I> transition, Guard_t<X> guard)
+StatechartTransition_t<I> operator<<(StatechartTransition_t<I> transition,
+                                     Guard_t<X> guard)
 {
     transition.obj->guards()[transition.id] =
         boost::bind(guard.guard, transition.obj, _1);
@@ -393,35 +417,40 @@ Transition_t<I> operator<<(Transition_t<I> transition, Guard_t<X> guard)
 }
 
 template < typename I >
-Transition_t<I> operator<<(Transition_t<I> transition, Event_t event)
+StatechartTransition_t<I> operator<<(StatechartTransition_t<I> transition,
+                                     Event_t event)
 {
     transition.obj->events()[transition.id] = event.event;
     return transition;
 }
 
 template < typename I >
-Transition_t<I> operator<<(Transition_t<I> transition, After_t after)
+StatechartTransition_t<I> operator<<(StatechartTransition_t<I> transition,
+                                     After_t after)
 {
     transition.obj->afters()[transition.id] = after.duration;
     return transition;
 }
 
 template < typename I >
-Transition_t<I> operator<<(Transition_t<I> transition, When_t when)
+StatechartTransition_t<I> operator<<(StatechartTransition_t<I> transition,
+                                     When_t when)
 {
     transition.obj->whens()[transition.id] = when.date;
     return transition;
 }
 
 template < typename I >
-Transition_t<I> operator<<(Transition_t<I> transition, Output_t output)
+StatechartTransition_t<I> operator<<(StatechartTransition_t<I> transition,
+                                     Output_t output)
 {
     transition.obj->outputs()[transition.id] = output.output;
     return transition;
 }
 
 template < typename I, typename X >
-Transition_t<I> operator<<(Transition_t<I> transition, OutputFunc_t<X> func)
+StatechartTransition_t<I> operator<<(StatechartTransition_t<I> transition,
+                                     OutputFunc_t<X> func)
 {
     transition.obj->outputFuncs()[transition.id] =
         boost::bind(func.func, transition.obj, _1, _2);
@@ -429,7 +458,8 @@ Transition_t<I> operator<<(Transition_t<I> transition, OutputFunc_t<X> func)
 }
 
 template < typename I, typename X >
-Transition_t<I> operator<<(Transition_t<I> transition, Action_t<X> action)
+StatechartTransition_t<I> operator<<(StatechartTransition_t<I> transition,
+                                     Action_t<X> action)
 {
     if (transition.obj->events().find(transition.id) !=
         transition.obj->events().end()) {
@@ -445,21 +475,6 @@ Transition_t<I> operator<<(Transition_t<I> transition, Action_t<X> action)
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 template < typename I, typename X >
-struct EventInState_t
-{
-    EventInState_t(I obj, const std::string& event, X func) :
-        obj(obj), event(event), func(func)  { }
-
-    I obj;
-    std::string event;
-    X func;
-};
-
-template < typename I, typename X >
-EventInState_t<I,X> eventInState(I obj, const std::string& event, X func)
-{ return EventInState_t<I,X>(obj, event, func); }
-
-template < typename I, typename X >
 EventInState_t<I,X> operator>>(EventInState_t<I,X> event, int state)
 {
     insert(event.obj->eventInStateActions(state))(
@@ -467,6 +482,6 @@ EventInState_t<I,X> operator>>(EventInState_t<I,X> event, int state)
     return event;
 }
 
-}} // namespace vle extension
+}}} // namespace vle extension fsa
 
 #endif

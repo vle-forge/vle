@@ -32,26 +32,26 @@
 #ifndef VLE_EXAMPLES_E_HPP
 #define VLE_EXAMPLES_E_HPP
 
-#include <vle/extension/DESS.hpp>
+#include <vle/extension/differential-equation/DESS.hpp>
 
 namespace vle { namespace examples { namespace dess {
 
-class E : public extension::DESS
+class E : public extension::DifferentialEquation::DESS
 {
 public:
     E(const devs::DynamicsInit& model,
       const devs::InitEventList& events);
     virtual ~E()
         { }
-    
+
     virtual double compute(const devs::Time& time) const;
-    
+
 private:
     double b0;
     double b1;
     double m;
     double a;
-    
+
     Var _E;
     Ext S;
     Ext I;

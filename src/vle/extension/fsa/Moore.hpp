@@ -1,5 +1,5 @@
 /**
- * @file vle/extension/Moore.hpp
+ * @file vle/extension/fsa/Moore.hpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -29,15 +29,55 @@
  */
 
 
-#ifndef VLE_EXTENSION_MOORE_HPP
-#define VLE_EXTENSION_MOORE_HPP
+#ifndef VLE_EXTENSION_FSA_MOORE_HPP
+#define VLE_EXTENSION_FSA_MOORE_HPP 1
 
 #include <vle/extension/DllDefines.hpp>
-#include <vle/extension/FSA.hpp>
+#include <vle/extension/fsa/FSA.hpp>
 #include <boost/assign.hpp>
 #include <boost/bind.hpp>
+#include <boost/function.hpp>
 
-namespace vle { namespace extension {
+namespace vle { namespace extension { namespace fsa {
+
+template < typename I >
+struct MooreTransition_t
+{
+    MooreTransition_t(I obj, int state, int nextState) :
+        obj(obj), state(state), nextState(nextState)  { }
+
+    I obj;
+    int state;
+    int nextState;
+};
+
+template < typename X, typename I >
+struct MooreInAction_t
+{
+    MooreInAction_t(I obj, X func) : obj(obj), func(func) { }
+
+    I obj;
+    X func;
+};
+
+template < typename I >
+struct MooreOutput_t
+{
+    MooreOutput_t(I obj, int state) :
+        obj(obj), state(state)  { }
+
+    I obj;
+    int state;
+};
+
+template < typename X, typename I >
+struct MooreOutputFunc_t
+{
+    MooreOutputFunc_t(I obj, X func) : obj(obj), func(func)  { }
+
+    I obj;
+    X func;
+};
 
 class VLE_EXTENSION_EXPORT Moore : public Base
 {
@@ -84,6 +124,22 @@ public:
         return r.first->second;
     }
 
+    template < typename I >
+        MooreTransition_t<I> transition(I obj, int state, int nextState)
+    { return MooreTransition_t<I>(obj, state, nextState); }
+
+    template < typename X, typename I >
+        MooreInAction_t<X, I> inAction(I obj, X func)
+    { return MooreInAction_t<X, I>(obj, func); }
+
+    template < typename I >
+        MooreOutput_t<I> output(I obj, int state)
+    { return MooreOutput_t<I>(obj, state); }
+
+    template < typename X, typename I >
+        MooreOutputFunc_t<X, I> outputFunc(I obj, X func)
+    { return MooreOutputFunc_t<X, I>(obj, func); }
+
 private:
     typedef Outputs::const_iterator OutputsIterator;
     typedef OutputFuncs::const_iterator OutputFuncsIterator;
@@ -126,22 +182,7 @@ private:
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 template < typename I >
-struct Transition_t
-{
-    Transition_t(I obj, int state, int nextState) :
-        obj(obj), state(state), nextState(nextState)  { }
-
-    I obj;
-    int state;
-    int nextState;
-};
-
-template < typename I >
-Transition_t<I> transition(I obj, int state, int nextState)
-{ return Transition_t<I>(obj, state, nextState); }
-
-template < typename I >
-void operator<<(Transition_t<I> transition, Event_t event)
+void operator<<(MooreTransition_t<I> transition, Event_t event)
 {
     insert(transition.obj->transitions(transition.state))(
         event.event, transition.nextState);
@@ -150,20 +191,7 @@ void operator<<(Transition_t<I> transition, Event_t event)
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 template < typename X, typename I >
-struct InAction_t
-{
-    InAction_t(I obj, X func) : obj(obj), func(func) { }
-
-    I obj;
-    X func;
-};
-
-template < typename X, typename I >
-InAction_t<X, I> inAction(I obj, X func)
-{ return InAction_t<X, I>(obj, func); }
-
-template < typename X, typename I >
-InAction_t<X,I> operator>>(InAction_t<X,I> action, int state)
+MooreInAction_t<X,I> operator>>(MooreInAction_t<X,I> action, int state)
 {
     boost::assign::insert(action.obj->actions())(
         state, boost::bind(action.func, action.obj, _1, _2));
@@ -173,21 +201,7 @@ InAction_t<X,I> operator>>(InAction_t<X,I> action, int state)
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 template < typename I >
-struct Output2_t
-{
-    Output2_t(I obj, int state) :
-        obj(obj), state(state)  { }
-
-    I obj;
-    int state;
-};
-
-template < typename I >
-Output2_t<I> output(I obj, int state)
-{ return Output2_t<I>(obj, state); }
-
-template < typename I >
-void operator>>(Output2_t<I> output, const std::string& port)
+void operator>>(MooreOutput_t<I> output, const std::string& port)
 {
     insert(output.obj->outputs())(output.state, port);
 }
@@ -195,25 +209,12 @@ void operator>>(Output2_t<I> output, const std::string& port)
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 template < typename X, typename I >
-struct OutputFunc2_t
-{
-    OutputFunc2_t(I obj, X func) : obj(obj), func(func)  { }
-
-    I obj;
-    X func;
-};
-
-template < typename X, typename I >
-OutputFunc2_t<X, I> outputFunc(I obj, X func)
-{ return OutputFunc2_t<X, I>(obj, func); }
-
-template < typename X, typename I >
-void operator>>(OutputFunc2_t<X,I> output, int state)
+void operator>>(MooreOutputFunc_t<X,I> output, int state)
 {
     boost::assign::insert(output.obj->outputFuncs())(
         state, boost::bind(output.func, output.obj, _1, _2));
 }
 
-}} // namespace vle extension
+}}} // namespace vle extension fsa
 
 #endif

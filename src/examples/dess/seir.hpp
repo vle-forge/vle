@@ -32,7 +32,7 @@
 #ifndef VLE_EXAMPLES_SEIR_HPP
 #define VLE_EXAMPLES_SEIR_HPP
 
-#include <vle/extension/QSS.hpp>
+#include <vle/extension/differential-equation/QSS.hpp>
 
 namespace vle { namespace examples { namespace dess {
 

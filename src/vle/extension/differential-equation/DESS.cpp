@@ -1,5 +1,5 @@
 /**
- * @file vle/extension/DESS.cpp
+ * @file vle/extension/differential-equation/DESS.cpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -29,21 +29,19 @@
  */
 
 
-#include <vle/extension/DESS.hpp>
+#include <vle/extension/differential-equation/DESS.hpp>
 #include <vle/value/Map.hpp>
 #include <vle/utils/Debug.hpp>
 #include <cmath>
 
-namespace vle { namespace extension {
+namespace vle { namespace extension { namespace DifferentialEquation {
 
 using namespace devs;
-using namespace graph;
 using namespace value;
 
 DESS::DESS(const DynamicsInit& model,
 	   const InitEventList& events) :
-    DifferentialEquation(model, events),
-    mMethod(0)
+    Base(model, events), mMethod(0)
 {
     mUseGradient = false;
     mTimeStep = vle::value::toDouble(events.get("timeStep"));
@@ -131,4 +129,4 @@ void Euler::operator()(const Time& time)
     dess.mValue += dess.mTimeStep * dess.mGradient;
 }
 
-}} // namespace vle extension
+}}} // namespace vle extension DifferentialEquation

@@ -1,5 +1,5 @@
 /**
- * @file vle/extension/Mealy.cpp
+ * @file vle/extension/fsa/Mealy.cpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -29,9 +29,9 @@
  */
 
 
-#include <vle/extension/Mealy.hpp>
+#include <vle/extension/fsa/Mealy.hpp>
 
-namespace vle { namespace extension {
+namespace vle { namespace extension { namespace fsa {
 
 void Mealy::process(const devs::Time& time,
 		    const devs::ExternalEvent* event)
@@ -147,4 +147,4 @@ void Mealy::internalTransition(const devs::Time& time)
     }
 }
 
-}} // namespace vle extension
+}}} // namespace vle extension fsa

@@ -32,7 +32,7 @@
 #ifndef VLE_EXAMPLES_S3_HPP
 #define VLE_EXAMPLES_S3_HPP
 
-#include <vle/extension/QSS.hpp>
+#include <vle/extension/differential-equation/QSS.hpp>
 
 namespace vle { namespace examples { namespace dess {
 
@@ -46,7 +46,7 @@ public:
     virtual double compute(const devs::Time& time) const;
 private:
     double r;
-    
+
     Var S;
     Ext I;
 };

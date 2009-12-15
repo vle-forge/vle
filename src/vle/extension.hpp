@@ -35,15 +35,10 @@
 #include <vle/extension/CellDevs.hpp>
 #include <vle/extension/CellQSS.hpp>
 #include <vle/extension/Decision.hpp>
-#include <vle/extension/DESS.hpp>
 #include <vle/extension/DifferenceEquation.hpp>
 #include <vle/extension/DifferentialEquation.hpp>
 #include <vle/extension/DSDevs.hpp>
 #include <vle/extension/PetriNet.hpp>
-#include <vle/extension/QSS2.hpp>
-#include <vle/extension/QSS.hpp>
-
-
 
 namespace vle {
 

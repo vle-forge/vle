@@ -29,39 +29,39 @@
  */
 
 
-#include <vle/extension/FDDevs.hpp>
+#include <vle/extension/fsa/FDDevs.hpp>
 
 using namespace boost::assign;
 
 namespace vle { namespace examples { namespace fsa {
 
-namespace ve = vle::extension;
+namespace vf = vle::extension::fsa;
 namespace vd = vle::devs;
 
 enum State { a = 1, b, c };
 
-class devs1 : public ve::FDDevs
+class devs1 : public vf::FDDevs
 {
 public:
     devs1(const vd::DynamicsInit& init,
           const vd::InitEventList& events) :
-        ve::FDDevs(init, events)
+        vf::FDDevs(init, events)
     {
-        ve::states(this) << a << b << c;
+        states(this) << a << b << c;
 
-        ve::duration(this, a) << 6;
-        ve::duration(this, b) << 5;
-        ve::duration(this, c) << 2;
+        duration(this, a) << 6;
+        duration(this, b) << 5;
+        duration(this, c) << 2;
 
-        ve::internal(this, a) >> b;
-        ve::internal(this, b) >> a;
-        ve::internal(this, c) >> a;
+        internal(this, a) >> b;
+        internal(this, b) >> a;
+        internal(this, c) >> a;
 
-        //	    ve::output(this, a) >> "out";
-        ve::outputFunc(this, &devs1::out) >> a;
+        //	    output(this, a) >> "out";
+        outputFunc(this, &devs1::out) >> a;
 
-        ve::external(this, a, "in") >> c;
-        ve::external(this, b, "in") >> c;
+        external(this, a, "in") >> c;
+        external(this, b, "in") >> c;
 
         initialState(a);
     }
@@ -73,27 +73,27 @@ public:
     { output.addEvent(buildEvent("out")); }
 };
 
-class devs2 : public ve::FDDevs
+class devs2 : public vf::FDDevs
 {
 public:
     devs2(const vd::DynamicsInit& init,
           const vd::InitEventList& events) :
-        ve::FDDevs(init, events)
+        vf::FDDevs(init, events)
     {
-        ve::states(this) << a << b << c;
+        states(this) << a << b << c;
 
-        ve::duration(this, a) << 6;
-        ve::duration(this, b) << 5;
-        ve::duration(this, c) << 2;
+        duration(this, a) << 6;
+        duration(this, b) << 5;
+        duration(this, c) << 2;
 
-        ve::internal(this, a) >> b;
-        ve::internal(this, b) >> a;
-        ve::internal(this, c) >> a;
+        internal(this, a) >> b;
+        internal(this, b) >> a;
+        internal(this, c) >> a;
 
-        //	    ve::output(this, a) >> "out";
-        ve::outputFunc(this, &devs2::out) >> a;
+        //	    output(this, a) >> "out";
+        outputFunc(this, &devs2::out) >> a;
 
-        ve::external(this, a, "in") >> c;
+        external(this, a, "in") >> c;
 
         initialState(a);
     }

@@ -29,36 +29,36 @@
  */
 
 
-#include <vle/extension/Moore.hpp>
+#include <vle/extension/fsa/Moore.hpp>
 
 using namespace boost::assign;
 
 namespace vle { namespace examples { namespace fsa {
 
-namespace ve = vle::extension;
+namespace vf = vle::extension::fsa;
 namespace vd = vle::devs;
 
 enum State { a = 1, b, c };
 
-class moore1 : public ve::Moore
+class moore1 : public vf::Moore
 {
 public:
     moore1(const vd::DynamicsInit& init,
            const vd::InitEventList& events) :
-        ve::Moore(init, events)
+        vf::Moore(init, events)
     {
-        ve::states(this) << a << b << c;
+        states(this) << a << b << c;
 
-        ve::transition(this, a, c) << ve::event("in1");
-        ve::transition(this, a, b) << ve::event("in2");
-        ve::transition(this, b, a) << ve::event("in1");
-        ve::transition(this, c, a) << ve::event("in2");
-        ve::transition(this, c, b) << ve::event("in1");
+        transition(this, a, c) << event("in1");
+        transition(this, a, b) << event("in2");
+        transition(this, b, a) << event("in1");
+        transition(this, c, a) << event("in2");
+        transition(this, c, b) << event("in1");
 
-        ve::inAction(this, &moore1::action1) >> a;
+        inAction(this, &moore1::action1) >> a;
 
-        ve::output(this, a) >> "out";
-        ve::output(this, c) >> "out";
+        output(this, a) >> "out";
+        output(this, c) >> "out";
 
         initialState(a);
     }
@@ -86,22 +86,22 @@ public:
 
 enum State2 { START = 1, RUN };
 
-class counter2 : public ve::Moore
+class counter2 : public vf::Moore
 {
 public:
     counter2(const vd::DynamicsInit& init,
              const vd::InitEventList& events) :
-        ve::Moore(init, events)
+        vf::Moore(init, events)
     {
-        ve::states(this) << START << RUN;
+        states(this) << START << RUN;
 
-        ve::transition(this, START, RUN) << ve::event("in");
-        ve::transition(this, RUN, RUN) << ve::event("in");
+        transition(this, START, RUN) << event("in");
+        transition(this, RUN, RUN) << event("in");
 
-        ve::inAction(this, &counter2::start) >> START;
-        ve::inAction(this, &counter2::run) >> RUN;
+        inAction(this, &counter2::start) >> START;
+        inAction(this, &counter2::run) >> RUN;
 
-        ve::outputFunc(this, &counter2::out) >> RUN;
+        outputFunc(this, &counter2::out) >> RUN;
 
         initialState(START);
     }
@@ -124,7 +124,7 @@ public:
         if (event.onPort("counter")) {
             return vle::value::Integer::create(value);
         }
-        return ve::Moore::observation(event);
+        return vf::Moore::observation(event);
     }
 
 private:

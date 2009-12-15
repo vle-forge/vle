@@ -1,5 +1,5 @@
 /**
- * @file vle/extension/FDDevs.hpp
+ * @file vle/extension/fsa/FDDevs.hpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -29,16 +29,67 @@
  */
 
 
-#ifndef VLE_EXTENSION_FDDEVS_HPP
-#define VLE_EXTENSION_FDDEVS_HPP
+#ifndef VLE_EXTENSION_FSA_FDDEVS_HPP
+#define VLE_EXTENSION_FSA_FDDEVS_HPP 1
 
 #include <vle/extension/DllDefines.hpp>
-#include <vle/extension/FSA.hpp>
+#include <vle/extension/fsa/FSA.hpp>
 #include <vle/utils/i18n.hpp>
 #include <boost/assign.hpp>
 #include <boost/bind.hpp>
+#include <boost/function.hpp>
 
-namespace vle { namespace extension {
+namespace vle { namespace extension { namespace fsa {
+
+template < typename I >
+struct Internal_t
+{
+    Internal_t(I obj, int state) :
+        obj(obj), state(state)  { }
+
+    I obj;
+    int state;
+};
+
+template < typename I >
+struct Duration_t
+{
+    Duration_t(I obj, int state) :
+        obj(obj), state(state)  { }
+
+    I obj;
+    int state;
+};
+
+template < typename I >
+struct External_t
+{
+    External_t(I obj, int state, const std::string& input) :
+        obj(obj), state(state), input(input)  { }
+
+    I obj;
+    int state;
+    std::string input;
+};
+
+template < typename I >
+struct FDDevsOutput_t
+{
+    FDDevsOutput_t(I obj, int state) :
+        obj(obj), state(state)  { }
+
+    I obj;
+    int state;
+};
+
+template < typename X, typename I >
+struct FDDevsOutputFunc_t
+{
+    FDDevsOutputFunc_t(I obj, X func) : obj(obj), func(func)  { }
+
+    I obj;
+    X func;
+};
 
 /**
  * @brief Devs The class Devs is a DEVS mapping of structure and
@@ -101,6 +152,26 @@ public:
         const devs::ExternalEventList& /* extEventlist */) const
     { return devs::Event::EXTERNAL; }
 
+    template < typename I >
+        Internal_t<I> internal(I obj, int state)
+    { return Internal_t<I>(obj, state); }
+
+    template < typename I >
+        Duration_t<I> duration(I obj, int state)
+    { return Duration_t<I>(obj, state); }
+
+    template < typename I >
+        External_t<I> external(I obj, int state, const std::string& input)
+    { return External_t<I>(obj, state, input); }
+
+    template < typename I >
+        FDDevsOutput_t<I> output(I obj, int state)
+    { return FDDevsOutput_t<I>(obj, state); }
+
+    template < typename X, typename I >
+        FDDevsOutputFunc_t<X, I> outputFunc(I obj, X func)
+    { return FDDevsOutputFunc_t<X, I>(obj, func); }
+
 private:
     typedef Outputs::const_iterator OutputsIterator;
     typedef OutputFuncs::const_iterator OutputFuncsIterator;
@@ -138,40 +209,12 @@ private:
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 template < typename I >
-struct Internal_t
-{
-    Internal_t(I obj, int state) :
-        obj(obj), state(state)  { }
-
-    I obj;
-    int state;
-};
-
-template < typename I >
-Internal_t<I> internal(I obj, int state)
-{ return Internal_t<I>(obj, state); }
-
-template < typename I >
 void operator>>(Internal_t<I> internal, int newState)
 {
     insert(internal.obj->internals())(internal.state, newState);
 }
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
-
-template < typename I >
-struct Duration_t
-{
-    Duration_t(I obj, int state) :
-        obj(obj), state(state)  { }
-
-    I obj;
-    int state;
-};
-
-template < typename I >
-Duration_t<I> duration(I obj, int state)
-{ return Duration_t<I>(obj, state); }
 
 template < typename I >
 void operator<<(Duration_t<I> duration, const devs::Time& value)
@@ -182,21 +225,6 @@ void operator<<(Duration_t<I> duration, const devs::Time& value)
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 template < typename I >
-struct External_t
-{
-    External_t(I obj, int state, const std::string& input) :
-        obj(obj), state(state), input(input)  { }
-
-    I obj;
-    int state;
-    std::string input;
-};
-
-template < typename I >
-External_t<I> external(I obj, int state, const std::string& input)
-{ return External_t<I>(obj, state, input); }
-
-template < typename I >
 void operator>>(External_t<I> external, int state)
 {
     insert(external.obj->externals(external.state))(external.input, state);
@@ -205,21 +233,7 @@ void operator>>(External_t<I> external, int state)
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 template < typename I >
-struct Output3_t
-{
-    Output3_t(I obj, int state) :
-        obj(obj), state(state)  { }
-
-    I obj;
-    int state;
-};
-
-template < typename I >
-Output3_t<I> output(I obj, int state)
-{ return Output3_t<I>(obj, state); }
-
-template < typename I >
-void operator>>(Output3_t<I> output, const std::string& port)
+void operator>>(FDDevsOutput_t<I> output, const std::string& port)
 {
     insert(output.obj->outputs())(output.state, port);
 }
@@ -227,25 +241,12 @@ void operator>>(Output3_t<I> output, const std::string& port)
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 template < typename X, typename I >
-struct OutputFunc3_t
-{
-    OutputFunc3_t(I obj, X func) : obj(obj), func(func)  { }
-
-    I obj;
-    X func;
-};
-
-template < typename X, typename I >
-OutputFunc3_t<X, I> outputFunc(I obj, X func)
-{ return OutputFunc3_t<X, I>(obj, func); }
-
-template < typename X, typename I >
-void operator>>(OutputFunc3_t<X,I> output, int state)
+void operator>>(FDDevsOutputFunc_t<X,I> output, int state)
 {
     boost::assign::insert(output.obj->outputFuncs())(
         state, boost::bind(output.func, output.obj, _1, _2));
 }
 
-}} // namespace vle extension
+}}} // namespace vle extension fsa
 
 #endif

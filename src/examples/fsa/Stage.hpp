@@ -32,7 +32,7 @@
 #ifndef FSA_STAGE_HPP
 #define FSA_STAGE_HPP
 
-#include <vle/extension/Statechart.hpp>
+#include <vle/extension/fsa/Statechart.hpp>
 #include <vle/extension/DifferenceEquation.hpp>
 
 enum state_t {INIT = 1, PS, LV, IF, DF, DRG, FSLA, MP, FIN };
@@ -40,9 +40,10 @@ enum state_t {INIT = 1, PS, LV, IF, DF, DRG, FSLA, MP, FIN };
 namespace vle { namespace examples { namespace fsa {
 
 namespace ve = vle::extension;
+namespace vf = vle::extension::fsa;
 namespace vd = vle::devs;
 
-class Stage : public ve::Statechart
+class Stage : public vf::Statechart
 {
 public:
     Stage(const vd::DynamicsInit& init, const vd::InitEventList& lst);

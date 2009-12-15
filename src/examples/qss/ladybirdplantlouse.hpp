@@ -29,10 +29,10 @@
  */
 
 
-#ifndef VLE_TUTORIAL_0_LADYBIRD_PLANT_LOUSE_HPP
-#define VLE_TUTORIAL_0_LADYBIRD_PLANT_LOUSE_HPP
+#ifndef EXAMPLES_QSS_LADYBIRD_PLANT_LOUSE_HPP
+#define EXAMPLES_QSS_LADYBIRD_PLANT_LOUSE_HPP 1
 
-#include <vle/extension/QSS.hpp>
+#include <vle/extension/differential-equation/QSS.hpp>
 
 namespace vle { namespace examples { namespace qss {
 

@@ -39,7 +39,7 @@ namespace vle { namespace examples { namespace fsa {
 
 Stage::Stage(const vd::DynamicsInit& init,
 	     const vd::InitEventList& events) :
-    ve::Statechart(init, events)
+    vf::Statechart(init, events)
 {
     if (events.exist("datsemis")) {
 	date_sem = boost::gregorian::date(
@@ -80,37 +80,37 @@ Stage::Stage(const vd::DynamicsInit& init,
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-    ve::states(this) << INIT << PS << LV << IF << DF << DRG << FSLA
+    states(this) << INIT << PS << LV << IF << DF << DRG << FSLA
 		     << MP << FIN;
 
-    ve::activity(this, &Stage::activity1) >> PS;
-    ve::activity(this, &Stage::activity2) >> LV;
-    ve::activity(this, &Stage::activity3) >> IF;
-    ve::activity(this, &Stage::activity4) >> DF;
-    ve::activity(this, &Stage::activity5) >> DRG;
-    ve::activity(this, &Stage::activity6) >> FSLA;
-    ve::activity(this, &Stage::activity7) >> MP;
+    activity(this, &Stage::activity1) >> PS;
+    activity(this, &Stage::activity2) >> LV;
+    activity(this, &Stage::activity3) >> IF;
+    activity(this, &Stage::activity4) >> DF;
+    activity(this, &Stage::activity5) >> DRG;
+    activity(this, &Stage::activity6) >> FSLA;
+    activity(this, &Stage::activity7) >> MP;
 
-    ve::inAction(this, &Stage::action1) >> PS;
-    ve::inAction(this, &Stage::action2) >> IF;
-    ve::inAction(this, &Stage::action3) >> DF;
-    ve::inAction(this, &Stage::action4) >> DRG;
+    inAction(this, &Stage::action1) >> PS;
+    inAction(this, &Stage::action2) >> IF;
+    inAction(this, &Stage::action3) >> DF;
+    inAction(this, &Stage::action4) >> DRG;
 
-    ve::transition(this, INIT, PS) << ve::when((double)date_sem);
-    ve::transition(this, PS, LV) << ve::guard(&Stage::c2);
-    ve::transition(this, LV, IF) << ve::guard(&Stage::c3);
-    ve::transition(this, IF, DF) << ve::when((double)date_DF);
-    ve::transition(this, DF, DRG) << ve::guard(&Stage::c5);
-    ve::transition(this, DRG, FSLA) << ve::guard(&Stage::c6);
-    ve::transition(this, FSLA, MP) << ve::guard(&Stage::c7);
-    ve::transition(this, MP, FIN) << ve::when((double)date_rec);
+    transition(this, INIT, PS) << when((double)date_sem);
+    transition(this, PS, LV) << guard(&Stage::c2);
+    transition(this, LV, IF) << guard(&Stage::c3);
+    transition(this, IF, DF) << when((double)date_DF);
+    transition(this, DF, DRG) << guard(&Stage::c5);
+    transition(this, DRG, FSLA) << guard(&Stage::c6);
+    transition(this, FSLA, MP) << guard(&Stage::c7);
+    transition(this, MP, FIN) << when((double)date_rec);
 
-    ve::eventInState(this, "Tmoy", &Stage::in) >> INIT >> PS >> LV >> IF >> DF
-					       >> DRG >> FSLA >> MP >> FIN;
+    eventInState(this, "Tmoy", &Stage::in) >> INIT >> PS >> LV >> IF >> DF
+                                           >> DRG >> FSLA >> MP >> FIN;
 
     initialState(INIT);
 
-    timeStep(vle::utils::DateTime::aDay());
+    timeStep(utils::DateTime::aDay());
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 

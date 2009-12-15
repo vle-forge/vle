@@ -32,7 +32,7 @@
 #ifndef VLE_EXAMPLES_I3_HPP
 #define VLE_EXAMPLES_I3_HPP
 
-#include <vle/extension/QSS.hpp>
+#include <vle/extension/differential-equation/QSS.hpp>
 
 namespace vle { namespace examples { namespace dess {
 
@@ -43,13 +43,13 @@ public:
        const devs::InitEventList& events);
     virtual ~I3()
         { }
-    
+
     virtual double compute(const devs::Time& time) const;
-    
+
 private:
     double a;
     double r;
-    
+
     Var I;
     Ext S;
 };

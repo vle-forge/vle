@@ -1,5 +1,5 @@
 /**
- * @file vle/extension/FDDevs.cpp
+ * @file vle/extension/fsa/FDDevs.cpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -29,9 +29,9 @@
  */
 
 
-#include <vle/extension/FDDevs.hpp>
+#include <vle/extension/fsa/FDDevs.hpp>
 
-namespace vle { namespace extension {
+namespace vle { namespace extension { namespace fsa {
 
 void FDDevs::process(const devs::ExternalEvent* event,
                         const devs::Time& time)
@@ -128,4 +128,4 @@ void FDDevs::internalTransition(const devs::Time& time)
     mLastTime = time;
 }
 
-}} // namespace vle extension
+}}} // namespace vle extension fsa

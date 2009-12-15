@@ -1,5 +1,5 @@
 /**
- * @file vle/extension/DifferentialEquation.cpp
+ * @file vle/extension/differential-equation/DifferentialEquation.cpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -29,18 +29,14 @@
  */
 
 
-#include <vle/extension/DifferentialEquation.hpp>
-#include <vle/value/Map.hpp>
-#include <vle/utils/Debug.hpp>
-#include <cmath>
+#include <vle/extension/differential-equation/DifferentialEquation.hpp>
 
-namespace vle { namespace extension {
+namespace vle { namespace extension { namespace DifferentialEquation {
 
 using namespace devs;
-using namespace graph;
 using namespace value;
 
-DifferentialEquation::DifferentialEquation(const DynamicsInit& model,
+Base::Base(const DynamicsInit& model,
 					   const InitEventList& events) :
     Dynamics(model, events),
     mUseGradient(true),
@@ -85,7 +81,7 @@ DifferentialEquation::DifferentialEquation(const DynamicsInit& model,
     }
 }
 
-double DifferentialEquation::getValue(const Time& now,
+double Base::getValue(const Time& now,
                                       double delay) const
 {
     if (not (delay <= 0 and (mSize < 0 or -delay <= (int)mSize))) {
@@ -134,7 +130,7 @@ double DifferentialEquation::getValue(const Time& now,
     }
 }
 
-double DifferentialEquation::getValue(const std::string& name) const
+double Base::getValue(const std::string& name) const
 {
     std::map < std::string, double >::const_iterator it(
         mExternalVariableValue.find(name));
@@ -148,7 +144,7 @@ double DifferentialEquation::getValue(const std::string& name) const
 }
 
 
-double DifferentialEquation::getValue(const std::string& name,
+double Base::getValue(const std::string& name,
                                       const Time& now,
                                       double delay) const
 {
@@ -202,7 +198,7 @@ double DifferentialEquation::getValue(const std::string& name,
     }
 }
 
-void DifferentialEquation::pushValue(const Time& now,
+void Base::pushValue(const Time& now,
                                      double value)
 {
     mValue = value;
@@ -226,7 +222,7 @@ void DifferentialEquation::pushValue(const Time& now,
     }
 }
 
-void DifferentialEquation::pushExternalValue(const std::string& name,
+void Base::pushExternalValue(const std::string& name,
                                              const Time& now,
                                              double value)
 {
@@ -253,7 +249,7 @@ void DifferentialEquation::pushExternalValue(const std::string& name,
     }
 }
 
-void DifferentialEquation::updateExternalVariable(const Time& time)
+void Base::updateExternalVariable(const Time& time)
 {
     if (mExternalVariableNumber > 1) {
         std::map < std::string , double >::iterator it =
@@ -268,7 +264,7 @@ void DifferentialEquation::updateExternalVariable(const Time& time)
     }
 }
 
-Time DifferentialEquation::init(const Time& time)
+Time Base::init(const Time& time)
 {
     mStartTime = time;
     mPreviousValue = mInitialValue;
@@ -280,7 +276,7 @@ Time DifferentialEquation::init(const Time& time)
     return Time(0);
 }
 
-void DifferentialEquation::output(const Time& time,
+void Base::output(const Time& time,
                                   ExternalEventList& output) const
 {
     // change value outputs
@@ -322,19 +318,19 @@ void DifferentialEquation::output(const Time& time,
     }
 }
 
-Time DifferentialEquation::timeAdvance() const
+Time Base::timeAdvance() const
 {
     return mSigma;
 }
 
-Event::EventType DifferentialEquation::confluentTransitions(
+Event::EventType Base::confluentTransitions(
     const Time& /* time*/,
     const ExternalEventList& /* ext*/) const
 {
     return Event::EXTERNAL;
 }
 
-void DifferentialEquation::internalTransition(const Time& time)
+void Base::internalTransition(const Time& time)
 {
     switch (mState) {
     case INIT:
@@ -380,7 +376,7 @@ void DifferentialEquation::internalTransition(const Time& time)
     }
 }
 
-void DifferentialEquation::externalTransition(const ExternalEventList& event,
+void Base::externalTransition(const ExternalEventList& event,
                                               const Time& time)
 {
     if (mState == POST_INIT) {
@@ -456,7 +452,7 @@ void DifferentialEquation::externalTransition(const ExternalEventList& event,
     }
 }
 
-Value* DifferentialEquation::observation(const ObservationEvent& event) const
+Value* Base::observation(const ObservationEvent& event) const
 {
     if (event.getPortName() != mVariableName) {
         throw utils::InternalError(fmt(_(
@@ -468,7 +464,7 @@ Value* DifferentialEquation::observation(const ObservationEvent& event) const
     return Double::create(getEstimatedValue(e));
 }
 
-void DifferentialEquation::request(const RequestEvent& event,
+void Base::request(const RequestEvent& event,
                                    const Time& time,
                                    ExternalEventList& output) const
 {
@@ -489,8 +485,7 @@ void DifferentialEquation::request(const RequestEvent& event,
     output.addEvent(ee);
 }
 
-const DifferentialEquation::valueBuffer&
-DifferentialEquation::externalValueBuffer(
+const Base::valueBuffer& Base::externalValueBuffer(
     const std::string& name) const
 {
     std::map < std::string, valueBuffer >::const_iterator it(
@@ -504,9 +499,7 @@ DifferentialEquation::externalValueBuffer(
     return it->second;
 }
 
-DifferentialEquation::valueBuffer&
-DifferentialEquation::externalValueBuffer(
-    const std::string& name)
+Base::valueBuffer& Base::externalValueBuffer(const std::string& name)
 {
     std::map < std::string, valueBuffer >::iterator it(
         mExternalValueBuffer.find(name));
@@ -519,4 +512,4 @@ DifferentialEquation::externalValueBuffer(
     return it->second;
 }
 
-}} // namespace vle extension
+}}} // namespace vle extension DifferentialEquation

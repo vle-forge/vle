@@ -32,28 +32,28 @@
 #ifndef VLE_EXAMPLES_R2_HPP
 #define VLE_EXAMPLES_R2_HPP
 
-#include <vle/extension/DESS.hpp>
+#include <vle/extension/differential-equation/DESS.hpp>
 
 namespace vle { namespace examples { namespace dess {
 
-class R2 : public extension::DESS
+class R2 : public extension::DifferentialEquation::DESS
 {
 public:
     R2(const devs::DynamicsInit& model,
        const devs::InitEventList& events);
     virtual ~R2()
         { }
-    
+
     virtual double compute(const devs::Time& time) const;
-    
+
 private:
     double g;
     double m;
-    
+
     Var R;
     Ext I;
 };
-	    
+
 }}} // namespace vle examples dess
 
 #endif

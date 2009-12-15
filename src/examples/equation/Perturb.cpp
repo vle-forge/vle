@@ -30,29 +30,30 @@
 
 
 #include <vle/extension/DifferenceEquation.hpp>
-#include <vle/extension/Statechart.hpp>
+#include <vle/extension/fsa/Statechart.hpp>
 
 using namespace boost::assign;
 
 namespace vle { namespace examples { namespace equation {
 
 namespace ve = vle::extension;
+namespace vf = vle::extension::fsa;
 namespace vd = vle::devs;
 
 enum State { A, B };
 
-class Perturb : public ve::Statechart
+class Perturb : public vf::Statechart
 {
 public:
     Perturb(const vd::DynamicsInit& init, const vd::InitEventList& events) :
-        ve::Statechart(init, events)
+        vf::Statechart(init, events)
 	{
-	    ve::states(this) << A << B;
+	    states(this) << A << B;
 
-	    ve::transition(this, A, B) << ve::after(5.)
-				       << ve::outputFunc(&Perturb::out1);
-	    ve::transition(this, B, A) << ve::after(5.)
-				       << ve::outputFunc(&Perturb::out2);
+	    transition(this, A, B) << after(5.)
+                                   << outputFunc(&Perturb::out1);
+	    transition(this, B, A) << after(5.)
+                                   << outputFunc(&Perturb::out2);
 
 	    initialState(A);
 	}
@@ -71,18 +72,18 @@ public:
 
 };
 
-class Perturb2 : public ve::Statechart
+class Perturb2 : public vf::Statechart
 {
 public:
     Perturb2(const vd::DynamicsInit& init, const vd::InitEventList& events) :
-        ve::Statechart(init, events)
+        vf::Statechart(init, events)
 	{
-	    ve::states(this) << A << B;
+	    states(this) << A << B;
 
-	    ve::transition(this, A, B) << ve::after(5.)
-				       << ve::outputFunc(&Perturb2::out1);
-	    ve::transition(this, B, A) << ve::after(5.)
-				       << ve::outputFunc(&Perturb2::out2);
+	    transition(this, A, B) << after(5.)
+                                   << outputFunc(&Perturb2::out1);
+	    transition(this, B, A) << after(5.)
+                                   << outputFunc(&Perturb2::out2);
 
 	    initialState(A);
 	}
@@ -101,18 +102,18 @@ public:
 
 };
 
-class Perturb3 : public ve::Statechart
+class Perturb3 : public vf::Statechart
 {
 public:
     Perturb3(const vd::DynamicsInit& init, const vd::InitEventList& events) :
-        ve::Statechart(init, events)
+        vf::Statechart(init, events)
 	{
-	    ve::states(this) << A;
+	    states(this) << A;
 
-	    ve::transition(this, A, A) << ve::event("in1")
-				       << ve::outputFunc(&Perturb3::out1);
-	    ve::transition(this, A, A) << ve::event("in2")
-				       << ve::outputFunc(&Perturb3::out2);
+	    transition(this, A, A) << event("in1")
+                                   << outputFunc(&Perturb3::out1);
+	    transition(this, A, A) << event("in2")
+                                   << outputFunc(&Perturb3::out2);
 
 	    initialState(A);
 	}
@@ -131,18 +132,18 @@ public:
 
 };
 
-class Perturb4 : public ve::Statechart
+class Perturb4 : public vf::Statechart
 {
 public:
     Perturb4(const vd::DynamicsInit& init, const vd::InitEventList& events) :
-        ve::Statechart(init, events)
+        vf::Statechart(init, events)
 	{
-	    ve::states(this) << A;
+	    states(this) << A;
 
-	    ve::transition(this, A, A) << ve::event("in1")
-				       << ve::outputFunc(&Perturb4::out1);
-	    ve::transition(this, A, A) << ve::event("in2")
-				       << ve::outputFunc(&Perturb4::out2);
+	    transition(this, A, A) << event("in1")
+                                   << outputFunc(&Perturb4::out1);
+	    transition(this, A, A) << event("in2")
+                                   << outputFunc(&Perturb4::out2);
 
 	    initialState(A);
 	}
@@ -161,18 +162,18 @@ public:
 
 };
 
-class Perturb5 : public ve::Statechart
+class Perturb5 : public vf::Statechart
 {
 public:
     Perturb5(const vd::DynamicsInit& init, const vd::InitEventList& events) :
-        ve::Statechart(init, events)
+        vf::Statechart(init, events)
 	{
-	    ve::states(this) << A;
+	    states(this) << A;
 
-	    ve::transition(this, A, A) << ve::event("in1")
-				       << ve::outputFunc(&Perturb5::out1);
-	    ve::transition(this, A, A) << ve::event("in2")
-				       << ve::outputFunc(&Perturb5::out2);
+	    transition(this, A, A) << event("in1")
+                                   << outputFunc(&Perturb5::out1);
+	    transition(this, A, A) << event("in2")
+                                   << outputFunc(&Perturb5::out2);
 
 	    initialState(A);
 	}
@@ -191,18 +192,18 @@ public:
 
 };
 
-class Perturb6 : public ve::Statechart
+class Perturb6 : public vf::Statechart
 {
 public:
     Perturb6(const vd::DynamicsInit& init, const vd::InitEventList& events) :
-        ve::Statechart(init, events)
+        vf::Statechart(init, events)
 	{
-	    ve::states(this) << A << B;
+	    states(this) << A << B;
 
-	    ve::transition(this, A, B) << ve::after(4.5)
-				       << ve::outputFunc(&Perturb6::out1);
-	    ve::transition(this, B, A) << ve::after(3.2)
-				       << ve::outputFunc(&Perturb6::out2);
+	    transition(this, A, B) << after(4.5)
+                                   << outputFunc(&Perturb6::out1);
+	    transition(this, B, A) << after(3.2)
+                                   << outputFunc(&Perturb6::out2);
 
 	    initialState(A);
 	}
@@ -221,16 +222,16 @@ public:
 
 };
 
-class Perturb7 : public ve::Statechart
+class Perturb7 : public vf::Statechart
 {
 public:
     Perturb7(const vd::DynamicsInit& init, const vd::InitEventList& events) :
-        ve::Statechart(init, events)
+        vf::Statechart(init, events)
 	{
-	    ve::states(this) << A;
+	    states(this) << A;
 
-	    ve::transition(this, A, A) << ve::after(5.)
-				       << ve::outputFunc(&Perturb7::out);
+	    transition(this, A, A) << after(5.)
+                                   << outputFunc(&Perturb7::out);
 
 	    initialState(A);
 	}
@@ -249,18 +250,18 @@ public:
 
 };
 
-class Perturb8 : public ve::Statechart
+class Perturb8 : public vf::Statechart
 {
 public:
     Perturb8(const vd::DynamicsInit& init, const vd::InitEventList& events) :
-        ve::Statechart(init, events)
+        vf::Statechart(init, events)
 	{
-	    ve::states(this) << A << B;
+	    states(this) << A << B;
 
-	    ve::transition(this, A, B) << ve::after(5.)
-				       << ve::outputFunc(&Perturb8::out1);
-	    ve::transition(this, B, A) << ve::after(5.)
-				       << ve::outputFunc(&Perturb8::out2);
+	    transition(this, A, B) << after(5.)
+                                   << outputFunc(&Perturb8::out1);
+	    transition(this, B, A) << after(5.)
+                                   << outputFunc(&Perturb8::out2);
 
 	    initialState(A);
 	}
@@ -279,18 +280,18 @@ public:
 
 };
 
-class Perturb9 : public ve::Statechart
+class Perturb9 : public vf::Statechart
 {
 public:
     Perturb9(const vd::DynamicsInit& init, const vd::InitEventList& events) :
-        ve::Statechart(init, events)
+        vf::Statechart(init, events)
 	{
-	    ve::states(this) << A;
+	    states(this) << A;
 
-	    ve::transition(this, A, A) << ve::event("in1")
-				       << ve::outputFunc(&Perturb9::out1);
-	    ve::transition(this, A, A) << ve::event("in2")
-				       << ve::outputFunc(&Perturb9::out2);
+	    transition(this, A, A) << event("in1")
+                                   << outputFunc(&Perturb9::out1);
+	    transition(this, A, A) << event("in2")
+                                   << outputFunc(&Perturb9::out2);
 
 	    initialState(A);
 	}
@@ -309,18 +310,18 @@ public:
 
 };
 
-class Perturb10 : public ve::Statechart
+class Perturb10 : public vf::Statechart
 {
 public:
     Perturb10(const vd::DynamicsInit& init, const vd::InitEventList& events) :
-        ve::Statechart(init, events)
+        vf::Statechart(init, events)
 	{
-	    ve::states(this) << A << B;
+	    states(this) << A << B;
 
-	    ve::transition(this, A, B) << ve::after(5.)
-				       << ve::outputFunc(&Perturb10::out1);
-	    ve::transition(this, B, A) << ve::after(5.)
-				       << ve::outputFunc(&Perturb10::out2);
+	    transition(this, A, B) << after(5.)
+                                   << outputFunc(&Perturb10::out1);
+	    transition(this, B, A) << after(5.)
+                                   << outputFunc(&Perturb10::out2);
 
 	    initialState(A);
 	}

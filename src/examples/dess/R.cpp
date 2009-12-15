@@ -30,14 +30,13 @@
 
 
 #include "R.hpp"
-#include <vle/utils/Debug.hpp>
 #include <cmath>
 
 namespace vle { namespace examples { namespace dess {
 
 R::R(const devs::DynamicsInit& model,
      const devs::InitEventList& events):
-    extension::DESS(model, events)
+    extension::DifferentialEquation::DESS(model, events)
 {
     a = value::toDouble(events.get("a"));
 
