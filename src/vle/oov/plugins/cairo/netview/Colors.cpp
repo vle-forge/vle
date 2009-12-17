@@ -30,6 +30,11 @@
 
 
 #include <vle/oov/plugins/cairo/netview/Colors.hpp>
+#include <vle/value/Map.hpp>
+#include <vle/value/Boolean.hpp>
+#include <vle/value/Double.hpp>
+#include <vle/value/Integer.hpp>
+#include <vle/value/String.hpp>
 #include <boost/lexical_cast.hpp>
 #include <cmath>
 

@@ -32,7 +32,10 @@
 #ifndef VLE_OOV_PLUGINS_CAIRO_COLORS_HPP
 #define VLE_OOV_PLUGINS_CAIRO_COLORS_HPP
 
-#include <vle/value.hpp>
+#include <vle/value/Set.hpp>
+#include <map>
+#include <string>
+#include <list>
 
 namespace vle { namespace oov { namespace plugin {
 
