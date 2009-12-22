@@ -32,6 +32,7 @@
 #ifndef VLE_GVLE_MODELINGPLUGIN_HPP
 #define VLE_GVLE_MODELINGPLUGIN_HPP
 
+#include <vle/gvle/DllDefines.hpp>
 #include <gdkmm/pixbuf.h>
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/vpz/AtomicModels.hpp>
@@ -45,7 +46,7 @@ namespace vle { namespace gvle {
  * @brief Define a plug-in to build source code, DEVS atomic model and its
  * experiment infortion (dynamics, conditions, observations).
  */
-class ModelingPlugin
+class VLE_GVLE_EXPORT ModelingPlugin
 {
 public:
     /**

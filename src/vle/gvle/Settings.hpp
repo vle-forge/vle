@@ -32,15 +32,18 @@
 #ifndef VLE_GVLE_SETTINGS_HPP
 #define VLE_GVLE_SETTINGS_HPP
 
+#include <vle/gvle/DllDefines.hpp>
 #include <vle/utils/Preferences.hpp>
 #include <gdkmm/color.h>
 
 namespace vle { namespace gvle {
 
-class EditorSettings
+class VLE_GVLE_EXPORT EditorSettings
 {
 public:
-    EditorSettings(const std::string& font) : mFontEditor(font) { }
+    EditorSettings(const std::string& font)
+        : mFontEditor(font)
+    {}
 
     void setDefault();
     void load(vle::utils::Preferences& prefs);
@@ -120,10 +123,12 @@ private:
     std::string mFontEditor;
 };
 
-class GraphicsSettings
+class VLE_GVLE_EXPORT GraphicsSettings
 {
 public:
-    GraphicsSettings(const std::string& font) : mFont(font) { }
+    GraphicsSettings(const std::string& font)
+        : mFont(font)
+    {}
 
     void setDefault();
     void load(vle::utils::Preferences& prefs);
@@ -199,16 +204,17 @@ private:
     double mLineWidth;
 };
 
-class Settings : public EditorSettings, public GraphicsSettings
+class VLE_GVLE_EXPORT Settings : public EditorSettings, public GraphicsSettings
 {
 public:
-    Settings() : EditorSettings(""), GraphicsSettings("")
-    { }
+    Settings()
+        : EditorSettings(""), GraphicsSettings("")
+    {}
 
     Settings(const std::string& editorFont,
-             const std::string& graphicsFont) :
-        EditorSettings(editorFont), GraphicsSettings(graphicsFont)
-    { }
+             const std::string& graphicsFont)
+        : EditorSettings(editorFont), GraphicsSettings(graphicsFont)
+    {}
 
     void setDefault();
 
@@ -231,9 +237,7 @@ public:
     }
 
     void kill()
-    {
-        if (mSettings) delete mSettings;
-    }
+    { if (mSettings) delete mSettings; }
 
 private:
     static Settings* mSettings;

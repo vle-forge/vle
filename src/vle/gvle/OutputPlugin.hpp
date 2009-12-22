@@ -32,6 +32,7 @@
 #ifndef VLE_GVLE_OUTPUTPLUGIN_HPP
 #define VLE_GVLE_OUTPUTPLUGIN_HPP
 
+#include <vle/gvle/DllDefines.hpp>
 #include <gdkmm/pixbuf.h>
 #include <vle/vpz/Output.hpp>
 #include <vle/vpz/View.hpp>
@@ -53,7 +54,7 @@ namespace vle { namespace gvle {
  * };
  * @endcode
  */
-class OutputPlugin
+class VLE_GVLE_EXPORT OutputPlugin
 {
 public:
     OutputPlugin(const std::string& name);

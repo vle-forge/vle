@@ -40,7 +40,7 @@
 #include <gtksourceviewmm-2.0/gtksourceviewmm.h>
 #endif
 
-namespace vle { namespace gvle {
+namespace vle { namespace gvle { namespace modeling {
 
 class Source : public Gtk::ScrolledWindow {
 public:
@@ -95,7 +95,7 @@ private:
     Source*                         mUserFunctions;
 };
 
-}} // namespace vle gvle
+}}} // namespace vle gvle modeling
 
 #endif
 

@@ -1,5 +1,5 @@
 /**
- * @file vle/gvle/Message.hpp
+ * @file vle/gvle/DllDefines.hpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -29,47 +29,17 @@
  */
 
 
-#ifndef GVLE_WIDGETS_MESSAGE_HPP
-#define GVLE_WIDGETS_MESSAGE_HPP
+#ifndef VLE_GVLE_DLLDEFINES_HPP
+#define VLE_GVLE_DLLDEFINES_HPP
 
-#include <vle/gvle/DllDefines.hpp>
-#include <glibmm/ustring.h>
-
-namespace vle { namespace gvle {
-
-/**
- * Show a Gtk dialog box with warning icon and output error on console.
- *
- * @param debug a string representation of debugging message.
- */
-void VLE_GVLE_EXPORT Debug(const Glib::ustring& debug);
-
-/**
- * Show a Gtk dialog box with info icon and output information on
- * console.
- *
- * @param information a string representation of information message.
- */
-void VLE_GVLE_EXPORT Info(const Glib::ustring& information);
-
-/**
- * Show a Gtk dialog box with error icon and output information on
- * consolse.
- *
- * @param msg a string representation of error message.
- */
-void VLE_GVLE_EXPORT Error(const Glib::ustring& msg);
-
-/**
- * Show a Gtk dialog box with a question. User have two choices YES or
- * NO.
- *
- * @param question a string representation of question.
- *
- * @return true if user have clicked on YES, otherwise false.
- */
-bool VLE_GVLE_EXPORT Question(const Glib::ustring& question);
-
-}} // namespace vle gvle
+#if defined(__WIN32__)
+  #if defined(vlegvle_EXPORTS)
+    #define VLE_GVLE_EXPORT __declspec(dllexport)
+  #else
+    #define VLE_GVLE_EXPORT __declspec(dllimport)
+  #endif
+#else
+ #define VLE_GVLE_EXPORT
+#endif
 
 #endif

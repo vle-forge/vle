@@ -33,6 +33,7 @@
 #define VLE_GVLE_SIMPLETYPEBOX_HPP
 
 #include <gtkmm.h>
+#include <vle/gvle/DllDefines.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/value/Integer.hpp>
 #include <vle/value/Double.hpp>
@@ -41,7 +42,7 @@
 
 namespace vle { namespace gvle {
 
-    class SimpleTypeBox : public Gtk::Dialog
+    class VLE_GVLE_EXPORT SimpleTypeBox : public Gtk::Dialog
     {
     public:
         SimpleTypeBox(value::Value* base);

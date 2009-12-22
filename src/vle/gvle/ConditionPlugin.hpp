@@ -32,6 +32,7 @@
 #ifndef VLE_GVLE_CONDITIONPLUGIN_HPP
 #define VLE_GVLE_CONDITIONPLUGIN_HPP
 
+#include <vle/gvle/DllDefines.hpp>
 #include <gdkmm/pixbuf.h>
 #include <vle/vpz/Condition.hpp>
 
@@ -51,7 +52,7 @@ namespace vle { namespace gvle {
  * };
  * @endcode
  */
-class ConditionPlugin
+class VLE_GVLE_EXPORT ConditionPlugin
 {
 public:
     ConditionPlugin(const std::string& name);

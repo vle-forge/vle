@@ -31,7 +31,7 @@
 #include <vle/gvle/modeling/DifferenceEquation/SourceDialog.hpp>
 #include <vle/gvle/Settings.hpp>
 
-namespace vle { namespace gvle {
+namespace vle { namespace gvle { namespace modeling {
 
 Source::Source(const std::string& buffer)
 {
@@ -195,4 +195,4 @@ int SourceDialog::run()
     return mDialog->run();
 }
 
-}} // namespace vle gvle
+}}} // namespace vle gvle modeling
