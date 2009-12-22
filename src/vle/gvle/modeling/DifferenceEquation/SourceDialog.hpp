@@ -60,7 +60,8 @@ private:
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
     gtksourceview::SourceView mView;
 #else
-    Gtk::TextView  mView;
+    mutable Gtk::TextView  mView; // mutable to enable the getBuffer function,
+                                  // begin() and end() are non-const.
 #endif
 
     void init(const std::string& buffer);

@@ -43,7 +43,11 @@ Source::Source(const std::string& buffer)
 
 std::string Source::getBuffer() const
 {
+#ifdef VLE_HAVE_GTKSOURCEVIEWMM
     return mView.get_source_buffer()->get_text();
+#else
+    return mView.get_buffer()->get_text();
+#endif
 }
 
 void Source::init(const std::string& buffer)
