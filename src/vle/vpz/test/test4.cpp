@@ -549,10 +549,10 @@ BOOST_AUTO_TEST_CASE(test_connection)
     graph::CoupledModel* top1((graph::CoupledModel*)cpled->findModel("top1"));
     graph::AtomicModel* x((graph::AtomicModel*)top1->findModel("x"));
 
-    graph::TargetModelList out;
-    x->getTargetPortList("out", out);
+    graph::ModelPortList out;
+    x->getAtomicModelsTarget("out", out);
 
-    BOOST_REQUIRE_EQUAL(out.size(), (graph::TargetModelList::size_type)10);
+    BOOST_REQUIRE_EQUAL(out.size(), (graph::ModelPortList::size_type)10);
 
     delete vpz.project().model().model();
 }

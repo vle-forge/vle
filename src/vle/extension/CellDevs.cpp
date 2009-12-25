@@ -487,25 +487,13 @@ void CellDevs::externalTransition(const ExternalEventList& event,
     while (it != event.end()) {
         string v_portName = (*it)->getPortName();
 
-        //     std::cout << event->getTime().getValue() << " " << getModelName()
-        //	      << ":" << v_portName<< " -> ext" << std::endl;
-
         if (existNeighbourState(v_portName)) {
-
-            //	std::cout << "ok" << std::endl;
-
             map < string , value::Value* >::const_iterator it2 =
                 m_neighbourState[v_portName].begin();
 
             while (it2 != m_neighbourState[v_portName].end()) {
                 string v_name = it2->first;
                 const value::Value* v_value = &(*it)->getAttributeValue(v_name);
-
-                //	    std::cout << "ext : " << event->getTime().getValue()
-                //		      << " " << getModelName() << ":" << v_portName
-                //		      << " = " << v_value->toString()
-                //		      << std::endl;
-
                 setNeighbourState(v_portName,v_name,v_value);
                 ++it2;
             }
@@ -520,12 +508,6 @@ void CellDevs::externalTransition(const ExternalEventList& event,
 
 Value* CellDevs::observation(const ObservationEvent& event) const
 {
-
-    //     cout << event->getTime().getValue() << ":" << getModelName()
-    //	  << "->" << event->getPortName() << " = "
-    //	 << getState(event->getPortName())->toString()
-    //	  << endl;
-
     if (existState(event.getPortName())) {
         return getState(event.getPortName())->clone();
     } else {

@@ -51,7 +51,6 @@ namespace vle { namespace graph {
     typedef std::vector < AtomicModel * > AtomicModelVector;
     typedef std::vector < CoupledModel* > CoupledModelVector;
     typedef std::map < std::string, Model* > ModelList;
-    typedef std::list < ModelPort > TargetModelList;
 
     /**
      * @brief The DEVS model base class.
@@ -103,37 +102,20 @@ namespace vle { namespace graph {
         virtual Model* findModel(const std::string& name) const = 0;
 
         /**
-         * @brief A output stream operator for graph::Model hierarchy
-         * (AtomicModel or CoupledModel).
-         * @param out Output stream.
-         * @param mdl Model to write.
-         * @return A reference to the output stream.
-         */
-        //friend std::ostream& operator<<(std::ostream& out, const Model& mdl)
-        //{
-        //mdl.writeXML(out);
-        //return out;
-        //}
-
-        /**
          * @brief Write the model in the output stream.
          * @param out output stream.
          */
         virtual void writeXML(std::ostream& out) const = 0;
 
+        void getAtomicModelsSource(const std::string& portname,
+                                   ModelPortList& result);
 
-        /**
-         * @brief Return a list of couple (graph::AtomicModel, portname) where
-         * the current model is connected with his specified output port.
-         * @param portname The portname of the model.
-         * @param out An output parameter to push result.
-         */
-        void getTargetPortList(const std::string& portname,
-                               TargetModelList& out);
+        void getAtomicModelsTarget(const std::string& portname,
+                                   ModelPortList& result);
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
-         * Model base
+         * model base
          *
          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -141,16 +123,16 @@ namespace vle { namespace graph {
         { return m_name; }
 
         /**
-         * @brief Change the name of the specified model to the new name. If mdl
+         * @brief change the name of the specified model to the new name. if mdl
          * have a parent, the this coupled model change is model list.
-         * @param mdl graph::Model to change.
+         * @param mdl graph::model to change.
          * @param newmane the new name.
          */
         static void rename(Model* mdl, const std::string& newmane);
 
         /**
-         * @brief Build a std::string based on the construction of the
-         * concatenation of all coupled model parent. Each parent name are
+         * @brief build a std::string based on the construction of the
+         * concatenation of all coupled model parent. each parent name are
          * separated by a comma.
          * @code
          * top model,coupled modela
@@ -276,22 +258,6 @@ namespace vle { namespace graph {
         inline ConnectionList& getOutputPortList()
         { return m_outPortList; }
 
-        /**
-         * Merge define port of this model with input, output, state and init
-         * lists. If two port have same name be nothing, if port not in
-         * parameter list port delete, if port not in this model add this port.
-         * If connection exist with a deleted port, connection is delete.
-         *
-         * @param inlist input list port name.
-         * @param outlist ouput list port name.
-         * @param statelist state list port name.
-         * @param initlist init list port name.
-         */
-        //void mergePort(std::list < std::string >& inlist,
-        //std::list < std::string >& outlist,
-        //std::list < std::string >& statelist,
-        //std::list < std::string >& initlist);
-
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
          * XML manage
@@ -324,6 +290,21 @@ namespace vle { namespace graph {
          */
         static CoupledModel* toCoupled(Model* m);
 
+        /**
+         * @brief Cast the current graph::Model to graph::CoupledModel.
+         *
+         * @return A graph::CoupledModel pointer or 0 if this model is not a
+         * coupled model.
+         */
+        CoupledModel* toCoupled() { return toCoupled(this); }
+
+        /**
+         * @brief Cast the current graph::Model to graph::AtomicModel.
+         *
+         * @return A graph::AtomicModel pointer of 0 if this model is not an
+         * atomic model.
+         */
+        AtomicModel* toAtomic() { return toAtomic(this); }
 
         static void getAtomicModelList(Model* model,
                                        std::vector < AtomicModel* >& list);

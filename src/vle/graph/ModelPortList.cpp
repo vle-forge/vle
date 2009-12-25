@@ -30,8 +30,8 @@
 
 
 #include <vle/graph/ModelPortList.hpp>
+#include <vle/graph/Model.hpp>
 #include <vle/utils/Debug.hpp>
-
 
 
 namespace vle { namespace graph {
@@ -80,11 +80,6 @@ void ModelPortList::remove(Model* model, const std::string& portname)
     }
 }
 
-void ModelPortList::removeAll()
-{
-    m_lst.clear();
-}
-
 void ModelPortList::merge(ModelPortList& lst)
 {
     for (iterator it = lst.begin(); it != lst.end(); ++it) {
@@ -114,6 +109,15 @@ bool ModelPortList::exist(const Model* model, const std::string& portname) const
         }
     }
     return false;
+}
+
+std::ostream& operator<<(std::ostream& out, const ModelPortList& lst)
+{
+    ModelPortList::const_iterator it;
+    for (it = lst.begin(); it != lst.end(); ++it) {
+        out << "(" << it->first->getName() << "," << it->second << ")\n";
+    }
+    return out;
 }
 
 }} // namespace vle graph

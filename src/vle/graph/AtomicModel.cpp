@@ -61,7 +61,8 @@ Model* AtomicModel::findModel(const std::string& name) const
 
 void AtomicModel::writeXML(std::ostream& out) const
 {
-    out << "<model name=\"" << getName().c_str() << "\" type=\"atomic\"" << ">\n";
+    out << "<model name=\"" << getName().c_str() << "\" type=\"atomic\""
+        << ">\n";
     writePortListXML(out);
     out << "</model>\n";
 }

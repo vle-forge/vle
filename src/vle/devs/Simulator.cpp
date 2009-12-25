@@ -63,6 +63,71 @@ void Simulator::clear()
     m_atomicModel = 0;
 }
 
+void
+Simulator::updateSimulatorTargets(
+        const std::string& port,
+        std::map < graph::AtomicModel*, devs::Simulator* >& simulators)
+{
+    mTargets.erase(port);
+
+    graph::ModelPortList result;
+    m_atomicModel->getAtomicModelsTarget(port, result);
+
+    if (result.begin() == result.end()) {
+        mTargets.insert(
+                std::make_pair(port, TargetSimulator(0, std::string())));
+    } else {
+        for (graph::ModelPortList::iterator it = result.begin(); it !=
+                result.end(); ++it) {
+
+            std::map < graph::AtomicModel*, devs::Simulator* >::iterator target;
+            target = simulators.find(
+                    reinterpret_cast < graph::AtomicModel*>(it->first));
+
+            if (target == simulators.end()) {
+                mTargets.erase(port);
+                break;
+            } else {
+                mTargets.insert(std::make_pair(port, TargetSimulator(
+                            target->second, it->second)));
+            }
+        }
+    }
+}
+
+std::pair < Simulator::iterator, Simulator::iterator >
+Simulator::targets(
+    const std::string& port,
+    std::map < graph::AtomicModel*, devs::Simulator* >& simulators)
+{
+    std::pair < iterator, iterator > x = mTargets.equal_range(port);
+
+    if (x.first == x.second) {
+        updateSimulatorTargets(port, simulators);
+        x = mTargets.equal_range(port);
+    } else if (x.first->second.first == 0) {
+        x = make_pair(mTargets.end(), mTargets.end());
+    }
+
+    return x;
+}
+
+void Simulator::removeTargetPort(const std::string& port)
+{
+    iterator it = mTargets.find(port);
+
+    assert(it != mTargets.end());
+
+    mTargets.erase(it);
+}
+
+void Simulator::addTargetPort(const std::string& port)
+{
+    assert(mTargets.find(port) == mTargets.end());
+
+    mTargets.insert(std::make_pair(port, TargetSimulator(0, std::string())));
+}
+
 void Simulator::addDynamics(Dynamics* dynamics)
 {
     delete m_dynamics;
@@ -98,7 +163,7 @@ InternalEvent * Simulator::buildInternalEvent(const Time& currentTime)
     if (not time.isInfinity()) {
         return new InternalEvent(currentTime + time, this);
     } else {
-	return 0;
+        return 0;
     }
 }
 

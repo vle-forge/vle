@@ -20,11 +20,11 @@ ELSE(WIN32)
   SET(OS_SPECIFIC_PATH_IMPL)
 ENDIF(WIN32)
 
-SET(GRAPH_CPP AtomicModel.cpp CoupledModel.cpp Model.cpp ModelPort.cpp
-  ModelPortList.cpp ${OS_SPECIFIC_PATH_IMPL})
+SET(GRAPH_CPP AtomicModel.cpp CoupledModel.cpp Model.cpp ModelPortList.cpp
+  ${OS_SPECIFIC_PATH_IMPL})
 
 SET(GRAPH_HPP AtomicModel.hpp CoupledModel.hpp DllDefines.hpp Model.hpp
-  ModelPort.hpp ModelPortList.hpp)
+  ModelPortList.hpp)
 
 ADD_LIBRARY(vlegraph SHARED ${GRAPH_CPP};${GRAPH_HPP})
 

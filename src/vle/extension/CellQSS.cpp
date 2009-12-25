@@ -201,10 +201,6 @@ void CellQSS::updateSigma(unsigned int i)
     }
     m_currentModel = j_min;
     CellDevs::setSigma(getSigma(m_currentModel));
-
-    //    std::cout << " ====> " << m_currentModel << "/"
-    //	      << m_functionNumber << std::endl;
-
 }
 
 // DEVS Methods
@@ -244,8 +240,6 @@ devs::Time CellQSS::init(const Time& /* time */)
 void CellQSS::internalTransition(const Time& time)
 {
     unsigned int i = m_currentModel;
-
-    //    std::cout << event->getTime().getValue() << std::endl;
 
     setCurrentTime(i, time);
     switch (getState(i)) {

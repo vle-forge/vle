@@ -168,6 +168,24 @@ namespace vle { namespace devs {
         void delModel(graph::CoupledModel* parent,
                       const std::string& modelname);
 
+        void getSimulatorsSource(
+            graph::Model* model,
+            std::vector < std::pair < Simulator*, std::string > >& lst);
+
+        void getSimulatorsSource(
+            graph::Model* model,
+            const std::string& port,
+            std::vector < std::pair < Simulator*, std::string > >& lst);
+
+        void updateSimulatorsTarget(
+            std::vector < std::pair < Simulator*, std::string > >& lst);
+
+        void addSimulatorTargetPort(graph::AtomicModel* model,
+                                    const std::string& port);
+
+        void removeSimulatorTargetPort(graph::AtomicModel* model,
+                                       const std::string& port);
+
         //
         ///
         //// Some usefull functions.
@@ -228,7 +246,8 @@ namespace vle { namespace devs {
          * @brief Get a constant reference to the list of vpz::Dynamics objects.
          * @return A constant reference to the list of vpz::Dynamics objects.
          */
-        const vpz::Dynamics& dynamics() const { return m_modelFactory.dynamics(); }
+        const vpz::Dynamics& dynamics() const
+        { return m_modelFactory.dynamics(); }
 
         /**
          * @brief Get a reference to the list of vpz::Dynamics objects.
@@ -237,30 +256,38 @@ namespace vle { namespace devs {
         vpz::Dynamics& dynamics() { return m_modelFactory.dynamics(); }
 
         /**
-         * @brief Get a constant reference to the list of vpz::Conditions objects.
+         * @brief Get a constant reference to the list of vpz::Conditions
+         * objects.
          * @return A constant reference to the list of vpz::Conditions objects.
          */
-        const vpz::Conditions& conditions() const { return m_modelFactory.conditions(); }
+        const vpz::Conditions& conditions() const
+        { return m_modelFactory.conditions(); }
 
         /**
          * @brief Get a reference to the list of vpz::Conditions objects.
          * @return A reference to the list of vpz::Conditions objects.
          */
-        vpz::Conditions& conditions() { return m_modelFactory.conditions(); }
+        vpz::Conditions& conditions()
+        { return m_modelFactory.conditions(); }
 
         /**
-         * @brief Get a constant reference to the list of vpz::Observables objects.
+         * @brief Get a constant reference to the list of vpz::Observables
+         * objects.
          * @return A constant reference to the list of vpz::Observables objects.
          */
-        const vpz::Observables& observables() const { return m_modelFactory.observables(); }
+        const vpz::Observables& observables() const
+        { return m_modelFactory.observables(); }
 
         /**
          * @brief Get a reference to the list of vpz::Conditions objects.
          * @return A reference to the list of vpz::Conditions objects.
          */
-        vpz::Observables& observables() { return m_modelFactory.observables(); }
+        vpz::Observables& observables()
+        { return m_modelFactory.observables(); }
 
         oov::OutputMatrixViewList outputs() const;
+
+        bool isStarted() const { return m_isStarted; }
 
     private:
         Time                        m_currentTime;
@@ -274,6 +301,7 @@ namespace vle { namespace devs {
         SimulatorList               m_deletedSimulator;
         SimulatorList::size_type    m_toDelete;
         ObservationEventList        m_obsEventBuffer;
+        bool                        m_isStarted;
 
         /**
          * @brief Build, for each vpz::View a StreamWriter and View.
@@ -354,6 +382,8 @@ namespace vle { namespace devs {
          */
         void delCoupledModel(graph::CoupledModel* parent,
                              graph::CoupledModel* mdl);
+
+
 
         void processEventView(Simulator& model, const Event* event = 0);
 

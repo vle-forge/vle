@@ -114,11 +114,11 @@ void GenExecutiveClass::add_new_model()
 {
     std::string name((fmt("beep-%1%") % m_stacknames.size()).str());
     if (m_buildbeepbeep) {
-        createModelFromClass("beepbeep", &coupledmodel(), name);
+        createModelFromClass("beepbeep", name);
     } else {
-        createModelFromClass("beepbeepbeep", &coupledmodel(), name);
+        createModelFromClass("beepbeepbeep", name);
     }
-    coupledmodel().addInternalConnection(name, "out", "counter", "in");
+    addConnection(name, "out", "counter", "in");
 
     m_stacknames.push(name);
     m_buildbeepbeep = not m_buildbeepbeep;
@@ -132,7 +132,7 @@ void GenExecutiveClass::del_first_model()
                 "element.").str());
     }
 
-    delModel(&coupledmodel(), m_stacknames.top());
+    delModel(m_stacknames.top());
     m_stacknames.pop();
 }
 

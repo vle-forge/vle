@@ -139,11 +139,13 @@ void GenExecutive::add_new_model()
 {
     std::string name((fmt("beep_%1%") % m_stacknames.size()).str());
 
-    graph::AtomicModel* atom(new graph::AtomicModel(name, &coupledmodel()));
-    atom->addOutputPort("out");
-    coupledmodel().addInternalConnection(name, "out", "counter", "in");
+    std::vector < std::string > outputs;
+    outputs.push_back("out");
 
-    createModel(atom, "gensbeep", vpz::Strings(), "");
+    createModel(name, std::vector < std::string >(), outputs, "gensbeep",
+                vpz::Strings(), "");
+    addConnection(name, "out", "counter", "in");
+
     m_stacknames.push(name);
 }
 
@@ -155,7 +157,7 @@ void GenExecutive::del_first_model()
                 "element.").str());
     }
 
-    delModel(&coupledmodel(), m_stacknames.top());
+    delModel(m_stacknames.top());
     m_stacknames.pop();
 }
 

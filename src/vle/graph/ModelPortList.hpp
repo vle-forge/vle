@@ -32,11 +32,13 @@
 #ifndef VLE_GRAPH_MODELPORTLIST_HPP
 #define VLE_GRAPH_MODELPORTLIST_HPP
 
-#include <vle/graph/ModelPort.hpp>
 #include <vle/graph/DllDefines.hpp>
+#include <string>
 #include <map>
 
 namespace vle { namespace graph {
+
+    class Model;
 
     class VLE_GRAPH_EXPORT ModelPortList
     {
@@ -44,6 +46,7 @@ namespace vle { namespace graph {
         typedef std::multimap < Model*, std::string > value_type;
         typedef value_type::iterator iterator;
         typedef value_type::const_iterator const_iterator;
+        typedef value_type::size_type size_type;
 
         ModelPortList()
         { }
@@ -68,10 +71,17 @@ namespace vle { namespace graph {
         void remove(Model* model, const std::string& portname);
 
         /**
+         * @brief Remove the specified model.
+         *
+         * @param model Model to be removed.
+         */
+        void erase(Model* model) { m_lst.erase(model); }
+
+        /**
          * @brief Remove all graph::ModelPort from the vector. Linear
          * complexity.
          */
-        void removeAll();
+        void clear() { m_lst.clear(); }
 
         /**
          * @brief Merge the vector from graph::ModelPort vector. Linera
@@ -105,29 +115,17 @@ namespace vle { namespace graph {
          */
         bool exist(const Model* model, const std::string& portname) const;
 
-        /**
-         * @brief Remove the specified model.
-         *
-         * @param model Model to be removed.
-         */
-        void erase(Model* model)
-        { m_lst.erase(model); }
-
-        inline iterator begin()
-        { return m_lst.begin(); }
-
-        inline const_iterator begin() const
-        { return m_lst.begin(); }
-
-        inline iterator end()
-        { return m_lst.end(); }
-
-        inline const_iterator end() const
-        { return m_lst.end(); }
+        inline iterator begin() { return m_lst.begin(); }
+        inline const_iterator begin() const { return m_lst.begin(); }
+        inline iterator end() { return m_lst.end(); }
+        inline const_iterator end() const { return m_lst.end(); }
+        inline size_type size() const { return m_lst.size(); }
 
     private:
         value_type m_lst;
     };
+
+    std::ostream& operator<<(std::ostream& out, const ModelPortList& lst);
 
 }} // namespace vle graph
 

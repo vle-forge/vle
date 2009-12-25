@@ -29,8 +29,8 @@
  */
 
 
-#ifndef DEVS_SIMULATOR_HPP
-#define DEVS_SIMULATOR_HPP
+#ifndef VLE_DEVS_SIMULATOR_HPP
+#define VLE_DEVS_SIMULATOR_HPP
 
 #include <vle/devs/DllDefines.hpp>
 #include <vle/devs/Time.hpp>
@@ -43,7 +43,6 @@
 
 namespace vle { namespace devs {
 
-    class Coordinator;
     class Dynamics;
 
     /**
@@ -54,6 +53,13 @@ namespace vle { namespace devs {
     class VLE_DEVS_EXPORT Simulator
     {
     public:
+        typedef std::pair < Simulator*, std::string > TargetSimulator;
+        typedef std::multimap < std::string, TargetSimulator >
+            TargetSimulatorList;
+        typedef TargetSimulatorList::const_iterator const_iterator;
+        typedef TargetSimulatorList::iterator iterator;
+        typedef TargetSimulatorList::size_type size_type;
+
         /**
          * @brief Build a new devs::Simulator with an empty devs::Dynamics, a
          * null last time but a graph::AtomicModel node.
@@ -108,6 +114,42 @@ namespace vle { namespace devs {
          */
         inline const Dynamics* dynamics() const
         { return m_dynamics; }
+
+
+                             /*-*-*-*-*-*-*-*-*-*/
+
+        /**
+         * @brief Call this function to browse the model's structure (atomic
+         * and coupled models) to find all devs::Simulator connected to the
+         * specified output port.
+         * @param port The output port used to build simulators' target list.
+         * @param simulators list of available simulators.
+         */
+        void updateSimulatorTargets(
+            const std::string& port,
+            std::map < graph::AtomicModel*, devs::Simulator* >& simulators);
+
+        /**
+         * @brief Get two iterators (begin, end) on TargetSimulator.
+         * @param port The output port to get the simulators' target list.
+         * @param simulators list of available simulators.
+         * @return Two iterators.
+         */
+        std::pair < iterator, iterator > targets(
+            const std::string& port,
+            std::map < graph::AtomicModel*, devs::Simulator* >& simulators);
+
+        /**
+         * @brief Add an empty target port.
+         * @param port Name of the port.
+         */
+        void removeTargetPort(const std::string& port);
+
+        /**
+         * @brief Remove a target port.
+         * @param port Name of the port to remove.
+         */
+        void addTargetPort(const std::string& port);
 
                              /*-*-*-*-*-*-*-*-*-*/
 
@@ -171,9 +213,10 @@ namespace vle { namespace devs {
         ObservationEvent* observation(const ObservationEvent& event) const;
 
     private:
-	Dynamics            *m_dynamics;
-	graph::AtomicModel  *m_atomicModel;
-	std::string          m_parents;
+        TargetSimulatorList mTargets;
+        Dynamics*           m_dynamics;
+        graph::AtomicModel* m_atomicModel;
+        std::string         m_parents;
 
 	InternalEvent* buildInternalEvent(const Time& currentTime);
     };

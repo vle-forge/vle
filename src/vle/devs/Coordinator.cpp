@@ -60,7 +60,8 @@ namespace vle { namespace devs {
 
 Coordinator::Coordinator(ModelFactory& modelfactory) :
     m_currentTime(0),
-    m_modelFactory(modelfactory)
+    m_modelFactory(modelfactory),
+    m_isStarted(false)
 {
     buildViews();
 }
@@ -87,6 +88,7 @@ void Coordinator::init(const vpz::Model& mdls, const Time& current)
     m_currentTime = current;
     addModels(mdls);
     m_toDelete = 0;
+    m_isStarted = true;
 }
 
 const Time& Coordinator::getNextTime()
@@ -248,7 +250,8 @@ void Coordinator::addObservableToView(graph::AtomicModel* model,
     }
 
     View* obs = it->second;
-    ObservationEvent* evt = obs->addObservable(simulator, portname, m_currentTime);
+    ObservationEvent* evt(obs->addObservable(simulator, portname,
+                                             m_currentTime));
     if (evt != 0) {
         m_eventTable.putObservationEvent(evt);
     }
@@ -274,12 +277,71 @@ void Coordinator::delModel(graph::CoupledModel* parent,
     }
 }
 
+void Coordinator::getSimulatorsSource(
+    graph::Model* model,
+    std::vector < std::pair < Simulator*, std::string > >& lst)
+{
+    if (m_isStarted) {
+        graph::ConnectionList& inputs(model->getInputPortList());
+        for (graph::ConnectionList::iterator it = inputs.begin(); it !=
+             inputs.end(); ++it) {
 
+            const std::string& port(it->first);
+            getSimulatorsSource(model, port, lst);
+        }
+    }
+}
+
+void Coordinator::getSimulatorsSource(
+    graph::Model* model,
+    const std::string& port,
+    std::vector < std::pair < Simulator*, std::string > >& lst)
+{
+    if (m_isStarted) {
+        graph::ModelPortList result;
+        model->getAtomicModelsSource(port, result);
+
+        for (graph::ModelPortList::iterator jt = result.begin();
+             jt != result.end(); ++jt) {
+            lst.push_back(
+                std::make_pair(
+                    getModel(
+                        reinterpret_cast < graph::AtomicModel* >(jt->first)),
+                    jt->second));
+        }
+    }
+}
+
+void Coordinator::updateSimulatorsTarget(
+    std::vector < std::pair < Simulator*, std::string > >& lst)
+{
+    if (m_isStarted) {
+        for (std::vector < std::pair < Simulator*, std::string > >::iterator
+             it = lst.begin(); it != lst.end(); ++it) {
+            if (it->first != 0) {
+                it->first->updateSimulatorTargets(it->second, m_modelList);
+            }
+        }
+    }
+}
+
+void Coordinator::addSimulatorTargetPort(graph::AtomicModel* model,
+                                         const std::string& port)
+{
+    getModel(model)->addTargetPort(port);
+}
+
+void Coordinator::removeSimulatorTargetPort(graph::AtomicModel* model,
+                                            const std::string& port)
+{
+    getModel(model)->removeTargetPort(port);
+}
+
+// / / / /
 //
-///
-//// Some usefull functions.
-///
+// Some usefull functions.
 //
+// / / / /
 
 void Coordinator::addModel(graph::AtomicModel* model, Simulator* simulator)
 {
@@ -416,28 +478,25 @@ void Coordinator::dispatchExternalEvent(ExternalEventList& eventList,
          eventList.end(); ++it) {
         (*it)->setModel(sim);
 
-        graph::TargetModelList out;
-        sim->getStructure()->getTargetPortList((*it)->getPortName(), out);
+        std::pair < Simulator::iterator, Simulator::iterator > x;
+        x = sim->targets((*it)->getPortName(), m_modelList);
 
-        if (out.empty()) {    // If this external event have no destination
+        if (x.first == x.second or x.first->second.first == 0) {
             (*it)->deleter(); // it must delete allocated values, else
         } else {              // the first newly external manage values.
-            for (graph::TargetModelList::iterator jt = out.begin();
-                 jt != out.end(); ++jt) {
-                assert(jt->model()->isAtomic());
-                Simulator* dst = getModel(
-                    reinterpret_cast < graph::AtomicModel* >(jt->model()));
-                const std::string& port(jt->port());
+            for (Simulator::iterator jt = x.first; jt != x.second; ++jt) {
+                Simulator* dst = jt->second.first;
+                const std::string& port(jt->second.second);
 
                 if ((*it)->isRequest()) {
                     m_eventTable.putRequestEvent(
                         new RequestEvent(
                             reinterpret_cast < RequestEvent* >((*it)),
-                            dst, port, jt == out.begin()));
+                            dst, port, jt == x.first));
                 } else {
                     m_eventTable.putExternalEvent(
                         new ExternalEvent((*it), dst, port,
-                                          jt == out.begin()));
+                                          jt == x.first));
                 }
             }
         }

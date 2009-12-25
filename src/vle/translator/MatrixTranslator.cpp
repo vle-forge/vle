@@ -52,10 +52,11 @@ MatrixTranslator::~MatrixTranslator()
     }
 }
 
-graph::AtomicModel* MatrixTranslator::getModel(const std::string& name) const
+const graph::AtomicModel*
+MatrixTranslator::getModel(const std::string& name) const
 {
-    std::map < std::string, graph::AtomicModel* >::const_iterator it(
-        m_models.find(name));
+    std::map < std::string, const graph::AtomicModel* >::const_iterator it;
+    it = m_models.find(name);
 
     if (it == m_models.end()) {
         throw utils::InternalError(fmt(
@@ -242,93 +243,91 @@ void MatrixTranslator::translate(const value::Value& buffer)
 void MatrixTranslator::translateModel(unsigned int i,
                                       unsigned int j)
 {
-    graph::AtomicModel* atomicModel;
+    const graph::AtomicModel* atomicModel;
 
     if (not m_library.empty() or not m_libraries.empty()) {
-        atomicModel = new graph::AtomicModel(getName(i, j),
-                                             &m_exe.coupledmodel());
         vpz::Strings conditions;
-
         conditions.push_back("cond_cell");
         conditions.push_back((fmt("cond_%1%_%2%_%3%")
                               % m_prefix % i % j).str());
-        m_models[getName(i,j)] = atomicModel;
 
-        m_exe.createModel(atomicModel, getDynamics(i, j), conditions,
-                          "obs_cell");
+        atomicModel = m_exe.createModel(getName(i, j),
+                                        std::vector < std::string >(),
+                                        std::vector < std::string >(),
+                                        getDynamics(i, j),
+                                        conditions, "obs_cell");
+        m_models[getName(i,j)] = atomicModel;
     } else {
-        atomicModel = dynamic_cast <graph::AtomicModel*>(
-            m_exe.createModelFromClass(getClass(i, j),
-                                       &m_exe.coupledmodel(),
-                                       getName(i, j)));
+        atomicModel = dynamic_cast < const graph::AtomicModel*>(
+            m_exe.createModelFromClass(getClass(i, j), getName(i, j)));
     }
 
     if (i != 1)
-        atomicModel->addInputPort("N");
+        m_exe.addInputPort(atomicModel->getName(), "N");
 
     if (j != 1)
-        atomicModel->addInputPort("W");
+        m_exe.addInputPort(atomicModel->getName(), "W");
 
     if (i != m_size[0])
-        atomicModel->addInputPort("S");
+        m_exe.addInputPort(atomicModel->getName(), "S");
 
     if (j != m_size[1])
-        atomicModel->addInputPort("E");
+        m_exe.addInputPort(atomicModel->getName(), "E");
 
     if (m_connectivity == VON_NEUMANN) {
         if (i != 1 and j != 1) {
-            atomicModel->addInputPort("NW");
+            m_exe.addInputPort(atomicModel->getName(), "NW");
         }
 
         if (i != 1 and j != m_size[1]) {
-            atomicModel->addInputPort("NE");
+            m_exe.addInputPort(atomicModel->getName(), "NE");
         }
 
         if (i != m_size[0] and j != 1) {
-            atomicModel->addInputPort("SW");
+            m_exe.addInputPort(atomicModel->getName(), "SW");
         }
 
         if (i != m_size[0] and j != m_size[1]) {
-            atomicModel->addInputPort("SE");
+            m_exe.addInputPort(atomicModel->getName(), "SE");
         }
     }
 
     if (m_symmetricport) {
         if (i != 1) {
-            atomicModel->addOutputPort("N");
+            m_exe.addOutputPort(atomicModel->getName(), "N");
         }
 
         if (j != 1) {
-            atomicModel->addOutputPort("W");
+            m_exe.addOutputPort(atomicModel->getName(), "W");
         }
 
         if (i != m_size[0]) {
-            atomicModel->addOutputPort("S");
+            m_exe.addOutputPort(atomicModel->getName(), "S");
         }
 
         if (j != m_size[1]) {
-            atomicModel->addOutputPort("E");
+            m_exe.addOutputPort(atomicModel->getName(), "E");
         }
 
         if (m_connectivity == VON_NEUMANN) {
             if (i != 1 and j != 1) {
-                atomicModel->addOutputPort("NW");
+                m_exe.addOutputPort(atomicModel->getName(), "NW");
             }
 
             if (i != 1 and j != m_size[1]) {
-                atomicModel->addOutputPort("NE");
+                m_exe.addOutputPort(atomicModel->getName(), "NE");
             }
 
             if (i != m_size[0] and j != 1) {
-                atomicModel->addOutputPort("SW");
+                m_exe.addOutputPort(atomicModel->getName(), "SW");
             }
 
             if (i != m_size[0] and j != m_size[1]) {
-                atomicModel->addOutputPort("SE");
+                m_exe.addOutputPort(atomicModel->getName(), "SE");
             }
         }
     } else {
-        atomicModel->addOutputPort("out");
+        m_exe.addOutputPort(atomicModel->getName(), "out");
     }
 }
 
@@ -336,35 +335,35 @@ void MatrixTranslator::translateStructures()
 {
     if (m_dimension == 0) {
         for (unsigned int i = 1; i <= m_size[0]; i++) {
-            graph::AtomicModel* atomicModel =
-                new graph::AtomicModel(getName(i), &m_exe.coupledmodel());
             vpz::Strings conditions;
 
             conditions.push_back("cond_cell");
             conditions.push_back((fmt("cond_%1%_%2%") % m_prefix %
                                   i).str());
+            const graph::AtomicModel* atomicModel = m_exe.createModel(
+                getName(i), std::vector < std::string >(),
+                std::vector < std::string >(), getDynamics(i), conditions,
+                "obs_cell");
             m_models[getName(i)] = atomicModel;
-            m_exe.createModel(atomicModel, getDynamics(i), conditions,
-                                      "obs_cell");
 
             if (i != 1) {
-                atomicModel->addInputPort("L");
+                m_exe.addInputPort(atomicModel->getName(), "L");
             }
 
             if (i != m_size[0]) {
-                atomicModel->addInputPort("R");
+                m_exe.addInputPort(atomicModel->getName(), "R");
             }
 
             if (m_symmetricport) {
                 if (i != 1) {
-                    atomicModel->addOutputPort("L");
+                    m_exe.addOutputPort(atomicModel->getName(), "L");
                 }
 
                 if (i != m_size[0]) {
-                    atomicModel->addOutputPort("R");
+                    m_exe.addOutputPort(atomicModel->getName(), "R");
                 }
             } else {
-                atomicModel->addOutputPort("out");
+                m_exe.addOutputPort(atomicModel->getName(), "out");
             }
         }
     } else {
@@ -383,23 +382,19 @@ void MatrixTranslator::translateStructures()
         for (unsigned int i = 1; i <= m_size[0]; i++) {
             if (m_symmetricport) {
                 if (i != 1) {
-                    m_exe.coupledmodel().addInternalConnection(
-                        getName(i), "L", getName(i - 1), "R");
+                    m_exe.addConnection(getName(i), "L", getName(i - 1), "R");
                 }
 
                 if (i != m_size[0]) {
-                    m_exe.coupledmodel().addInternalConnection(
-                        getName(i), "R", getName(i + 1), "L");
+                    m_exe.addConnection(getName(i), "R", getName(i + 1), "L");
                 }
             } else {
                 if (i != 1) {
-                    m_exe.coupledmodel().addInternalConnection(
-                        getName(i), "out", getName(i - 1), "R");
+                    m_exe.addConnection(getName(i), "out", getName(i - 1), "R");
                 }
 
                 if (i != m_size[0]) {
-                    m_exe.coupledmodel().addInternalConnection(
-                        getName(i), "out", getName(i + 1), "L");
+                    m_exe.addConnection(getName(i), "out", getName(i + 1), "L");
                 }
             }
         }
@@ -430,38 +425,33 @@ void MatrixTranslator::translateSymmetricConnection2D(unsigned int i,
                                                       unsigned int j)
 {
     if (j != 1 and existModel(i, j - 1))
-        m_exe.coupledmodel().addInternalConnection
-            (getName(i, j), "W", getName(i, j - 1),
-             "E");
+        m_exe.addConnection(getName(i, j), "W", getName(i, j - 1), "E");
 
     if (i != 1 and existModel(i - 1, j))
-        m_exe.coupledmodel().addInternalConnection(getName(i, j), "N",
-                                             getName(i - 1, j), "S");
+        m_exe.addConnection(getName(i, j), "N", getName(i - 1, j), "S");
 
     if (j != m_size[1] and existModel(i, j + 1))
-        m_exe.coupledmodel().addInternalConnection(getName(i, j), "E",
-                                             getName(i, j + 1), "W");
+        m_exe.addConnection(getName(i, j), "E", getName(i, j + 1), "W");
 
     if (i != m_size[0] and existModel(i + 1, j))
-        m_exe.coupledmodel().addInternalConnection(getName(i, j), "S",
-                                             getName(i + 1, j), "N");
+        m_exe.addConnection(getName(i, j), "S", getName(i + 1, j), "N");
 
     if (m_connectivity == VON_NEUMANN) {
         if (j != 1 and i != 1 and existModel(i - 1, j - 1))
-            m_exe.coupledmodel().addInternalConnection(getName(i, j), "SW",
-                                                 getName(i - 1, j - 1), "SE");
+            m_exe.addConnection(getName(i, j), "SW", getName(i - 1, j - 1),
+                                "SE");
 
         if (j != m_size[1] and i != 1 and existModel(i - 1, j + 1))
-            m_exe.coupledmodel().addInternalConnection(getName(i, j), "SE",
-                                                 getName(i - 1, j + 1), "SW");
+            m_exe.addConnection(getName(i, j), "SE", getName(i - 1, j + 1),
+                                "SW");
 
         if (j != 1 and i != m_size[0] and existModel(i + 1, j - 1))
-            m_exe.coupledmodel().addInternalConnection(getName(i, j), "NW",
-                                                 getName(i + 1, j - 1), "NE");
+            m_exe.addConnection(getName(i, j), "NW", getName(i + 1, j - 1),
+                                "NE");
 
         if (j != m_size[1] and i != m_size[0] and existModel(i + 1, j + 1))
-            m_exe.coupledmodel().addInternalConnection(getName(i, j), "NE",
-                                                 getName(i + 1, j + 1), "NW");
+            m_exe.addConnection(getName(i, j), "NE", getName(i + 1, j + 1),
+                                "NW");
     }
 }
 
@@ -469,37 +459,33 @@ void MatrixTranslator::translateConnection2D(unsigned int i,
                                              unsigned int j)
 {
     if (j != 1 and existModel(i, j - 1))
-        m_exe.coupledmodel().addInternalConnection(getName(i, j), "out",
-                                             getName(i, j - 1), "E");
+        m_exe.addConnection(getName(i, j), "out", getName(i, j - 1), "E");
 
     if (i != 1 and existModel(i - 1, j))
-        m_exe.coupledmodel().addInternalConnection(getName(i, j), "out",
-                                             getName(i - 1, j), "S");
+        m_exe.addConnection(getName(i, j), "out", getName(i - 1, j), "S");
 
     if (j != m_size[1] and existModel(i, j + 1))
-        m_exe.coupledmodel().addInternalConnection(getName(i, j), "out",
-                                             getName(i, j + 1), "W");
+        m_exe.addConnection(getName(i, j), "out", getName(i, j + 1), "W");
 
     if (i != m_size[0] and existModel(i + 1, j))
-        m_exe.coupledmodel().addInternalConnection(getName(i, j), "out",
-                                             getName(i + 1, j), "N");
+        m_exe.addConnection(getName(i, j), "out", getName(i + 1, j), "N");
 
     if (m_connectivity == VON_NEUMANN) {
         if (j != 1 and i != 1 and existModel(i - 1, j - 1))
-            m_exe.coupledmodel().addInternalConnection(getName(i, j), "out",
-                                                 getName(i - 1, j - 1), "SE");
+            m_exe.addConnection(getName(i, j), "out", getName(i - 1, j - 1),
+                                "SE");
 
         if (j != m_size[1] and i != 1 and existModel(i - 1, j + 1))
-            m_exe.coupledmodel().addInternalConnection(getName(i, j), "out",
-                                                 getName(i - 1, j + 1), "SW");
+            m_exe.addConnection(getName(i, j), "out", getName(i - 1, j + 1),
+                                "SW");
 
         if (j != 1 and i != m_size[0] and existModel(i + 1, j - 1))
-            m_exe.coupledmodel().addInternalConnection(getName(i, j), "out",
-                                                 getName(i + 1, j - 1), "NE");
+            m_exe.addConnection(getName(i, j), "out", getName(i + 1, j - 1),
+                                "NE");
 
         if (j != m_size[1] and i != m_size[0] and existModel(i + 1, j + 1))
-            m_exe.coupledmodel().addInternalConnection(getName(i, j), "out",
-                                                 getName(i + 1, j + 1), "NW");
+            m_exe.addConnection(getName(i, j), "out", getName(i + 1, j + 1),
+                                "NW");
     }
 }
 

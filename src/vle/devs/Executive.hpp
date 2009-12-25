@@ -122,16 +122,19 @@ namespace vle { namespace devs {
          * @brief Get a constant reference to the list of vpz::Dynamics objects.
          * @return A constant reference to the list of vpz::Dynamics objects.
          */
-        const vpz::Dynamics& dynamics() const { return m_coordinator.dynamics(); }
+        const vpz::Dynamics& dynamics() const
+        { return m_coordinator.dynamics(); }
 
         /**
          * @brief Get a reference to the list of vpz::Dynamics objects.
          * @return A reference to the list of vpz::Dynamics objects.
          */
-        vpz::Dynamics& dynamics() { return m_coordinator.dynamics(); }
+        vpz::Dynamics& dynamics()
+        { return m_coordinator.dynamics(); }
 
         /**
-         * @brief Get a constant reference to the list of vpz::Conditions objects.
+         * @brief Get a constant reference to the list of vpz::Conditions
+         * objects.
          * @return A constant reference to the list of vpz::Conditions objects.
          */
         const vpz::Conditions& conditions() const
@@ -145,7 +148,8 @@ namespace vle { namespace devs {
         { return m_coordinator.conditions(); }
 
         /**
-         * @brief Get a constant reference to the list of vpz::Observables objects.
+         * @brief Get a constant reference to the list of vpz::Observables
+         * objects.
          * @return A constant reference to the list of vpz::Observables objects.
          */
         const vpz::Observables& observables() const
@@ -159,33 +163,6 @@ namespace vle { namespace devs {
         { return m_coordinator.observables(); }
 
         /**
-         * @brief Build a new devs::Simulator from the dynamics library. Attach
-         * to this model information of dynamics, condition and observable.
-         * @param model the graph::AtomicModel reference source of
-         * devs::Simulator.
-         * @param dynamics the name of the dynamics to attach.
-         * @param condition the name of the condition to attach.
-         * @param observable the name of the observable to attach.
-         * @throw utils::InternalError if dynamics not exist.
-         */
-        void createModel(graph::AtomicModel* model, const std::string& dynamics,
-                         const vpz::Strings& conditions,
-                         const std::string& observable)
-        { return m_coordinator.createModel(model, dynamics, conditions, observable); }
-
-        /**
-         * @brief Build a new devs::Simulator from the vpz::Classes information.
-         * @param classname the name of the class to clone.
-         * @param parent the parent of the model.
-         * @param modelname the new name of the model.
-         * @throw utils::badArg if modelname already exist.
-         */
-        graph::Model* createModelFromClass(const std::string& classname,
-                                           graph::CoupledModel* parent,
-                                           const std::string& modelname)
-        { return m_coordinator.createModelFromClass(classname, parent, modelname); }
-
-        /**
          * @brief Add an observable, ie. a reference and a model to the
          * specified view.
          * @param model the model to attach to the view.
@@ -197,15 +174,74 @@ namespace vle { namespace devs {
                                  const std::string& view)
         { m_coordinator.addObservableToView(model, portname, view); }
 
+        // / / / /
+        //
+        // DynamicDEVS API
+        //
+        // / / / /
+
+        /**
+         * @brief Build a new devs::Simulator from the dynamics library. Attach
+         * to this model information of dynamics, condition and observable.
+         * @param model the graph::AtomicModel reference source of
+         * devs::Simulator.
+         * @param dynamics the name of the dynamics to attach.
+         * @param condition the name of the condition to attach.
+         * @param observable the name of the observable to attach.
+         * @throw utils::InternalError if dynamics not exist.
+         */
+        const graph::AtomicModel*
+            createModel(
+                const std::string& name,
+                const std::vector < std::string >& inputs,
+                const std::vector < std::string >& outputs,
+                const std::string& dynamics,
+                const vpz::Strings& conditions,
+                const std::string& observable);
+
+        /**
+         * @brief Build a new devs::Simulator from the vpz::Classes information.
+         * @param classname the name of the class to clone.
+         * @param parent the parent of the model.
+         * @param modelname the new name of the model.
+         * @throw utils::badArg if modelname already exist.
+         */
+        const graph::Model*
+            createModelFromClass(
+                const std::string& classname,
+                const std::string& modelname);
+
         /**
          * @brief Delete the specified model from coupled model. All
          * connection are deleted, Simulator are deleted and all events are
          * deleted from event table.
-         * @param parent the coupled model parent of model to delete.
          * @param modelname the name of model to delete.
          */
-        void delModel(graph::CoupledModel* parent, const std::string& modelname)
-        { m_coordinator.delModel(parent, modelname); }
+        void delModel(const std::string& modelname);
+
+        void addConnection(const std::string& modelsource,
+                           const std::string& outputport,
+                           const std::string& modeldestination,
+                           const std::string& inputport);
+        void removeConnection(const std::string& modelsource,
+                              const std::string& outputport,
+                              const std::string& modeldestination,
+                              const std::string& inputport);
+        void addInputPort(const std::string& modelName,
+                          const std::string& portName);
+        void addOutputPort(const std::string& modelName,
+                           const std::string& portName);
+        void removeInputPort(const std::string& modelName,
+                             const std::string& portName);
+        void removeOutputPort(const std::string& modelName,
+                              const std::string& portName);
+
+
+        // / / / /
+        //
+        // Give access to attributes
+        //
+        // / / / /
 
         /**
          * @brief Get a reference to the current coupled model.
@@ -215,16 +251,23 @@ namespace vle { namespace devs {
         { return *getModel().getParent(); }
 
         /**
-         * @brief Get a reference to the current coupled model.
-         * @return A reference to the coupled model.
+         * @brief Get the name of the coupled model.
+         * @return A constant reference to the name of the coupled model.
          */
-        graph::CoupledModel& coupledmodel()
-        { return *getModel().getParent(); }
+        const std::string& coupledmodelName() const
+        { return coupledmodel().getName(); }
 
     private:
         Coordinator& m_coordinator; /**< A reference to the coordinator of this
                                       executive to allow modification of
                                       coupled model. */
+
+        /**
+         * @brief Get a reference to the current coupled model.
+         * @return A reference to the coupled model.
+         */
+        graph::CoupledModel* coupledmodel()
+        { return getModel().getParent(); }
     };
 
 }} // namespace vle devs

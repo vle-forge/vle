@@ -170,7 +170,8 @@ void ModelFactory::createModel(Coordinator& coordinator,
     const vpz::Dynamic& dyn = mDynamics.get(dynamics);
     switch(dyn.type()) {
     case vpz::Dynamic::LOCAL:
-        attachDynamics(coordinator, sim, dyn, getPlugin(dyn.name()), initValues);
+        attachDynamics(coordinator, sim, dyn, getPlugin(dyn.name()),
+                       initValues);
         break;
     case vpz::Dynamic::DISTANT:
         throw utils::NotYetImplemented(_("Distant dynamics is not supported"));
@@ -351,10 +352,11 @@ void ModelFactory::attachDynamics(Coordinator& coordinator,
         } catch (const std::exception& e) {
             throw utils::ModellingError(fmt(
                     _("Dynamic library loading problem: cannot get dynamics"
-                      " '%1%', model '%2%' in module '%3%': %4%")) % dyn.name() %
-                dyn.model() % module->get_name() % e.what());
+                      " '%1%', model '%2%' in module '%3%': %4%")) % dyn.name()
+                % dyn.model() % module->get_name() % e.what());
         }
     }
+
     assert(r);
     atom->addDynamics(r);
 }

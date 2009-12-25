@@ -38,16 +38,15 @@
 #include <vle/value/Set.hpp>
 #include <vle/value/String.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/Trace.hpp>
 #include <iostream>
 
 
 namespace vle { namespace extension {
 
 DSDevs::DSDevs(const devs::ExecutiveInit& model,
-               const devs::InitEventList& events) :
-    devs::Executive(model, events),
-    m_state(IDLE),
-    m_response(false)
+               const devs::InitEventList& events)
+    : devs::Executive(model, events), m_state(IDLE), m_response(false)
 {
     assert(model.model().getParent());
 }
@@ -99,7 +98,7 @@ devs::Event::EventType DSDevs::confluentTransitions(
     const devs::Time& /* time */,
     const devs::ExternalEventList& /* extEventlist */) const
 {
-    return devs::Event::EXTERNAL;
+    return devs::Event::INTERNAL;
 }
 
 void DSDevs::externalTransition(const devs::ExternalEventList& event,
@@ -619,28 +618,14 @@ bool DSDevs::addConnection(const std::string& srcModelName,
                            const std::string& dstModelName,
                            const std::string& dstPortName)
 {
-    const std::string& modelName = coupledmodel().getName();
-    graph::Model* srcModel = (modelName == srcModelName)?
-        &coupledmodel() : coupledmodel().findModel(srcModelName);
-    graph::Model* dstModel = (modelName == dstModelName)?
-        &coupledmodel() : coupledmodel().findModel(dstModelName);
-
-    if (srcModel and dstModel) {
-        if (modelName == srcModelName) {
-            coupledmodel().addInputConnection(srcPortName,
-                                               dstModel, dstPortName);
-        } else {
-            if (modelName == dstModelName) {
-                coupledmodel().addOutputConnection(srcModel, srcPortName,
-                                                    dstPortName);
-            } else {
-                coupledmodel().addInternalConnection(srcModel, srcPortName,
-                                                      dstModel, dstPortName);
-            }
-        }
+    try {
+        Executive::addConnection(srcModelName, srcPortName, dstModelName,
+                                 dstPortName);
         return true;
+    } catch (const std::exception& e) {
+        TraceExtension(fmt(_("DSDevs add connection error: %1%")) % e.what());
+        return false;
     }
-    return false;
 }
 
 bool DSDevs::changeConnection(const std::string& srcModelName,
@@ -650,37 +635,17 @@ bool DSDevs::changeConnection(const std::string& srcModelName,
                               const std::string& newDstModelName,
                               const std::string& newDstPortName)
 {
-    const std::string& modelName = coupledmodel().getName();
-    graph::Model* srcModel = (modelName == srcModelName)?
-        &coupledmodel() : coupledmodel().findModel(srcModelName);
-    graph::Model* oldDstModel = (modelName == oldDstModelName)?
-        &coupledmodel() : coupledmodel().findModel(oldDstModelName);
-    graph::Model* newDstModel = (modelName == newDstModelName)?
-        &coupledmodel() : coupledmodel().findModel(newDstModelName);
-
-    if (newDstModel) {
-        if (modelName == srcModelName) {
-            coupledmodel().delInputConnection(srcPortName,
-                                               oldDstModel, oldDstPortName);
-            coupledmodel().addInputConnection(srcPortName,
-                                               newDstModel, newDstPortName);
-        } else {
-            if (modelName == oldDstModelName) {
-                coupledmodel().delOutputConnection(
-                    srcModel, srcPortName, oldDstPortName);
-                coupledmodel().addOutputConnection(
-                    srcModel, srcPortName, newDstPortName);
-            } else {
-                coupledmodel().delInternalConnection(
-                    srcModel, srcPortName, oldDstModel, oldDstPortName);
-                coupledmodel().addInternalConnection(
-                    srcModel, srcPortName, newDstModel, newDstPortName);
-            }
-        }
+    try {
+        Executive::removeConnection(srcModelName, srcPortName, oldDstModelName,
+                                    oldDstPortName);
+        Executive::addConnection(srcModelName, srcPortName, newDstModelName,
+                                 newDstPortName);
         return true;
-    }
-    else
+    } catch (const std::exception& e) {
+        TraceExtension(fmt(_("DSDevs change connection error: %1%")) %
+                       e.what());
         return false;
+    }
 }
 
 bool DSDevs::removeConnection(const std::string& srcModelName,
@@ -688,90 +653,32 @@ bool DSDevs::removeConnection(const std::string& srcModelName,
                               const std::string& dstModelName,
                               const std::string& dstPortName)
 {
-    const std::string& modelName = coupledmodel().getName();
-    graph::Model* srcModel = (modelName == srcModelName)?
-        &coupledmodel() : coupledmodel().findModel(srcModelName);
-    graph::Model* dstModel = (modelName == dstModelName)?
-        &coupledmodel() : coupledmodel().findModel(dstModelName);
-
-    if (srcModel and dstModel) {
-        if (modelName == srcModelName) {
-            coupledmodel().delInputConnection(srcPortName, dstModel,
-                                               dstPortName);
-        } else {
-            if (modelName == dstModelName) {
-                coupledmodel().delOutputConnection(srcModel, srcPortName,
-                                                    dstPortName);
-            } else {
-                coupledmodel().delInternalConnection(srcModel, srcPortName,
-                                                      dstModel, dstPortName);
-            }
-        }
+    try {
+        Executive::removeConnection(srcModelName, srcPortName, dstModelName,
+                                    dstPortName);
         return true;
+    } catch (const std::exception& e) {
+        TraceExtension(fmt(_("DSDevs remove connection: %1%")) % e.what());
+        return false;
     }
-    return false;
 }
 
 bool DSDevs::addModel(const std::string& /* prefixModelName */,
                       const std::string& /* className */,
                       const value::Set* /* connection */)
 {
-    //std::string newname(coupledmodel().buildNewName(prefixModelName));
-    //m_newName.push_back(newname);
-
-    //try {
-        //vpz::Dynamic dyn("FIXME");
-        //vpz::Condition cond("FIXME");
-        //vpz::Observable obs("FIXME");
-        //coordinator().createModelFromClass(&coupledmodel(), className);
-    //} catch (const std::exception& e) {
-        //std::cerr << fmt(
-            //"Warning: Unable to dynamic add model, with prefixname '%1%' "
-            //"class name '%2%'. Error reported is: '%3%\n'") %
-            //prefixModelName % className % e.what();
-        //return false;
-    //}
-
-    //if (connection) {
-        //for (value::Set::VectorValueIt it =
-             //connection->getValue().begin(); it !=
-             //connection->getValue().end(); ++it) {
-
-            //if ((*it)->isMap()) {
-                //value::Map* mp = value::to_map(*it);
-                //std::string srcm, srcp, dstm, dstp;
-
-                //if (mp->existValue("srcModelName")) {
-                    //srcm.assign(mp->getStringValue("srcModelName"));
-                    //if (srcm.empty())
-                        //srcm.assign(newname);
-                //} else
-                    //srcm.assign(newname);
-
-                //if (mp->existValue("dstModelName")) {
-                    //dstm.assign(mp->getStringValue("dstModelName"));
-                    //if (dstm.empty())
-                        //dstm.assign(newname);
-                //} else
-                    //dstm.assign(newname);
-
-                //srcp = mp->getStringValue("srcPortName");
-                //dstp = mp->getStringValue("dstPortName");
-                //addConnection(srcm, srcp, dstm, dstp);
-                 //}
-             //}
-         //}
-         //return true;
-
     throw utils::NotYetImplemented(_(
-        "DSDevs ext.: addModel from class not allowed"));
+            "DSDevs ext.: addModel from class not allowed"));
 }
 
-bool DSDevs::removeModel(const std::string& /* modelName */)
+bool DSDevs::removeModel(const std::string& modelname)
 {
-    // FIX ME
-    //    getModel().getSimulator()->delModel(&coupledmodel(), modelName);
-    return true;
+    try {
+        Executive::delModel(modelname);
+        return true;
+    } catch (const std::exception& e) {
+        return false;
+    }
 }
 
 bool DSDevs::changeModel(const std::string& /*modelName*/,
@@ -780,8 +687,6 @@ bool DSDevs::changeModel(const std::string& /*modelName*/,
 {
     throw utils::NotYetImplemented(_(
             "DSDevs ext.: changeModel not allowed"));
-
-    return false;
 }
 
 bool DSDevs::buildModel(const std::string& /*prefixModelName*/,
@@ -792,40 +697,56 @@ bool DSDevs::buildModel(const std::string& /*prefixModelName*/,
 {
     throw utils::NotYetImplemented(_(
             "DSDevs ext.: buildModel Not yet available"));
-
-    return false;
 }
 
 bool DSDevs::addInputPort(const std::string& modelName,
                           const std::string& portName)
 {
-    graph::Model* mdl = coupledmodel().findModel(modelName);
-    mdl->addInputPort(portName);
-    return true;
+    try {
+        Executive::addInputPort(modelName, portName);
+        return true;
+    } catch (const std::exception& e) {
+        TraceExtension(fmt(_("DSDevs add input port error: %1%")) % e.what());
+        return false;
+    }
 }
 
 bool DSDevs::addOutputPort(const std::string& modelName,
                            const std::string& portName)
 {
-    graph::Model* mdl = coupledmodel().findModel(modelName);
-    mdl->addOutputPort(portName);
-    return true;
+    try {
+        Executive::addOutputPort(modelName, portName);
+        return true;
+    } catch (const std::exception& e) {
+        TraceExtension(fmt(_("DSDevs add output port error: %1%")) % e.what());
+        return false;
+    }
 }
 
 bool DSDevs::removeInputPort(const std::string& modelName,
                              const std::string& portName)
 {
-    graph::Model* mdl = coupledmodel().findModel(modelName);
-    mdl->delInputPort(portName);
-    return true;
+    try {
+        Executive::removeInputPort(modelName, portName);
+        return true;
+    } catch (const std::exception& e) {
+        TraceExtension(fmt(_("DSDevs remove input port error: %1%")) %
+                       e.what());
+        return false;
+    }
 }
 
 bool DSDevs::removeOutputPort(const std::string& modelName,
                               const std::string& portName)
 {
-    graph::Model* mdl = coupledmodel().findModel(modelName);
-    mdl->delOutputPort(portName);
-    return true;
+    try {
+        Executive::removeOutputPort(modelName, portName);
+        return true;
+    } catch (const std::exception& e) {
+        TraceExtension(fmt(_("DSDevs remove output port error: %1%")) %
+                       e.what());
+        return false;
+    }
 }
 
 const graph::ModelList& DSDevs::getModelList() const

@@ -80,46 +80,78 @@ void Model::swap(Model& mdl)
     std::swap(m_name, mdl.m_name);
 }
 
-void Model::getTargetPortList(const std::string& portname,
-                              TargetModelList& out)
+void Model::getAtomicModelsSource(const std::string& portname,
+                                  ModelPortList& result)
 {
-    typedef boost::tuple < CoupledModel*, std::string, bool > DataTarget;
-    std::stack < DataTarget > stk;
+    std::stack < std::pair < ModelPortList*, Model* > > stack;
 
-    ModelPortList& outs(getOutPort(portname));
-    for (ModelPortList::iterator it = outs.begin(); it != outs.end(); ++it) {
-        if (it->first->isAtomic()) {
-            out.push_back(ModelPort(it->first, it->second));
-        } else if (it->first->isCoupled()) {
-            CoupledModel* cpl = static_cast < CoupledModel* >(it->first);
-            if (it->first == getParent()) {
-                stk.push(DataTarget(cpl, it->second, false));
+    if (isAtomic()) {
+        stack.push(std::make_pair(&getInPort(portname), this));
+    } else {
+        stack.push(std::make_pair(
+                &(reinterpret_cast < CoupledModel* >
+                  (this))->getInternalOutPort(portname), this));
+    }
+
+    while (not stack.empty()) {
+        ModelPortList* top = stack.top().first;
+        Model* source = stack.top().second;
+        stack.pop();
+
+        ModelPortList::iterator it, jt;
+        for (it = top->begin(); it != top->end(); ++it) {
+            const std::string& port(it->second);
+            Model* mdl(it->first);
+
+            if (mdl->isAtomic()) {
+                result.add(mdl, port);
             } else {
-                stk.push(DataTarget(cpl, it->second, true));
+                CoupledModel* cpled = mdl->toCoupled();
+                if (cpled == source->getParent()) {
+                    stack.push(std::make_pair(
+                            &cpled->getInPort(port), mdl));
+                } else {
+                    stack.push(std::make_pair(
+                            &cpled->getInternalOutPort(port), mdl));
+                }
             }
         }
     }
+}
 
-    while (not stk.empty()) {
-        DataTarget tmp(stk.top());
-        stk.pop();
+void Model::getAtomicModelsTarget(const std::string& portname,
+                                  ModelPortList& result)
+{
+    std::stack < std::pair < ModelPortList*, Model* > > stack;
 
-        ModelPortList* outs = 0;
-        if (tmp.get<2>())
-            outs = &(tmp.get<0>()->getInternalInPort(tmp.get<1>()));
-        else
-            outs = &(tmp.get<0>()->getOutPort(tmp.get<1>()));
+    if (isAtomic()) {
+        stack.push(std::make_pair(&getOutPort(portname), this));
+    } else {
+        stack.push(std::make_pair(
+                &(reinterpret_cast < CoupledModel* >
+                  (this))->getInternalInPort(portname), this));
+    }
 
-        for (ModelPortList::iterator it = outs->begin(); it != outs->end();
-             ++it) {
-            if (it->first->isAtomic()) {
-                out.push_back(ModelPort(it->first, it->second));
-            } else if (it->first->isCoupled()) {
-                CoupledModel* cpl = static_cast < CoupledModel* >(it->first);
-                if (it->first == tmp.get<0>()->getParent()) {
-                    stk.push(DataTarget(cpl, it->second, false));
+    while (not stack.empty()) {
+        ModelPortList* top = stack.top().first;
+        Model* source = stack.top().second;
+        stack.pop();
+
+        ModelPortList::iterator it, jt;
+        for (it = top->begin(); it != top->end(); ++it) {
+            const std::string& port(it->second);
+            Model* mdl(it->first);
+
+            if (mdl->isAtomic()) {
+                result.add(mdl, port);
+            } else {
+                CoupledModel* cpled = mdl->toCoupled();
+                if (cpled == source->getParent()) {
+                    stack.push(std::make_pair(
+                            &cpled->getOutPort(port), mdl));
                 } else {
-                    stk.push(DataTarget(cpl, it->second, true));
+                    stack.push(std::make_pair(
+                            &cpled->getInternalInPort(port), mdl));
                 }
             }
         }
@@ -294,10 +326,10 @@ void Model::delInputPort(const std::string& name)
 	    jt->first->getInPort(jt->second).erase(this);
 	    ++jt;
 	}
-	intern.removeAll();
+	intern.clear();
     }
 
-    lst.removeAll();
+    lst.clear();
     m_inPortList.erase(name);
 }
 
@@ -321,10 +353,10 @@ void Model::delOutputPort(const std::string & name)
 	    jt->first->getOutPort(jt->second).erase(this);
 	    ++jt;
 	}
-	intern.removeAll();
+	intern.clear();
     }
 
-    lst.removeAll();
+    lst.clear();
     m_outPortList.erase(name);
 }
 

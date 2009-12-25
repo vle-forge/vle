@@ -595,3 +595,127 @@ BOOST_AUTO_TEST_CASE(test_bug_duplication_connections)
     top->displace(mSelectedModels, coupled);
     BOOST_REQUIRE_EQUAL(coupled->nbInternalConnection("atom1", "out", "atom2", "in"), 1);
 }
+
+BOOST_AUTO_TEST_CASE(test_atomic_model_source)
+{
+    vpz::Vpz file(utils::Path::path().getExampleFile("unittest.vpz"));
+
+    CoupledModel* top((file.project().model().model())->toCoupled());
+    BOOST_REQUIRE(top);
+    AtomicModel* e(top->findModel("e")->toAtomic());
+    BOOST_REQUIRE(e);
+    AtomicModel* d(top->findModel("d")->toAtomic());
+    BOOST_REQUIRE(d);
+
+    graph::ModelPortList result;
+    e->getAtomicModelsSource("in1", result);
+    BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
+    result.clear();
+    e->getAtomicModelsSource("in2", result);
+    BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
+    result.clear();
+    d->getAtomicModelsSource("in", result);
+    BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
+    result.clear();
+
+    CoupledModel* top1(top->findModel("top1")->toCoupled());
+    BOOST_REQUIRE(top1);
+
+    AtomicModel* a(top1->findModel("a")->toAtomic());
+    BOOST_REQUIRE(a);
+    a->getAtomicModelsSource("in", result);
+    BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
+    result.clear();
+    AtomicModel* b(top1->findModel("b")->toAtomic());
+    BOOST_REQUIRE(b);
+    b->getAtomicModelsSource("in", result);
+    BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
+    result.clear();
+    AtomicModel* c(top1->findModel("c")->toAtomic());
+    BOOST_REQUIRE(c);
+    c->getAtomicModelsSource("in1", result);
+    BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
+    result.clear();
+    c->getAtomicModelsSource("in2", result);
+    BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
+    result.clear();
+
+    AtomicModel* x(top1->findModel("x")->toAtomic());
+    BOOST_REQUIRE(x);
+    x->getAtomicModelsSource("in", result);
+    BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
+    result.clear();
+
+    CoupledModel* top2(top->findModel("top2")->toCoupled());
+    BOOST_REQUIRE(top2);
+
+    AtomicModel* f(top2->findModel("f")->toAtomic());
+    BOOST_REQUIRE(f);
+    AtomicModel* g(top2->findModel("g")->toAtomic());
+    BOOST_REQUIRE(g);
+
+    f->getAtomicModelsSource("in", result);
+    BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
+    result.clear();
+    g->getAtomicModelsSource("in", result);
+    BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
+    result.clear();
+}
+
+BOOST_AUTO_TEST_CASE(test_atomic_model_source_2)
+{
+    vpz::Vpz file(utils::Path::path().getExampleFile("unittest.vpz"));
+
+    CoupledModel* top((file.project().model().model())->toCoupled());
+    CoupledModel* top1(top->findModel("top1")->toCoupled());
+    CoupledModel* top2(top->findModel("top2")->toCoupled());
+
+    AtomicModel* e(top->findModel("e")->toAtomic());
+    AtomicModel* d(top->findModel("d")->toAtomic());
+
+    AtomicModel* a(top1->findModel("a")->toAtomic());
+    AtomicModel* b(top1->findModel("b")->toAtomic());
+    AtomicModel* c(top1->findModel("c")->toAtomic());
+    AtomicModel* x(top1->findModel("x")->toAtomic());
+
+    AtomicModel* f(top2->findModel("f")->toAtomic());
+    AtomicModel* g(top2->findModel("g")->toAtomic());
+
+    top2->addOutputConnection(f, "out", "out");
+    top2->addOutputConnection(g, "out", "out");
+
+    graph::ModelPortList result;
+    e->getAtomicModelsSource("in1", result);
+    BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
+    result.clear();
+    e->getAtomicModelsSource("in2", result);
+    BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
+    result.clear();
+    d->getAtomicModelsSource("in", result);
+    BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
+    result.clear();
+
+    a->getAtomicModelsSource("in", result);
+    BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
+    result.clear();
+    b->getAtomicModelsSource("in", result);
+    BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
+    result.clear();
+    c->getAtomicModelsSource("in1", result);
+    BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
+    result.clear();
+    c->getAtomicModelsSource("in2", result);
+    BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
+    result.clear();
+
+    x->getAtomicModelsSource("in", result);
+    BOOST_REQUIRE_EQUAL(result.size(), (size_t)3);
+    result.clear();
+
+    f->getAtomicModelsSource("in", result);
+    BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
+    result.clear();
+    g->getAtomicModelsSource("in", result);
+    BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
+    result.clear();
+}
