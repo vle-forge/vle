@@ -62,6 +62,7 @@ SaxParser::SaxParser(Vpz& vpz)
 
 void SaxParser::parseFile(const std::string& filename)
 {
+    setlocale(LC_ALL, "C");
     memset(&m_sax, 0, sizeof(xmlSAXHandler));
     m_sax.initialized = XML_SAX2_MAGIC;
     m_sax.startDocument = &SaxParser::onStartDocument;
@@ -90,10 +91,12 @@ void SaxParser::parseFile(const std::string& filename)
     }
 
     xmlMemoryDump();
+    setlocale(LC_ALL, "");
 }
 
 void SaxParser::parseMemory(const std::string& buffer)
 {
+    setlocale(LC_ALL, "C");
     memset(&m_sax, 0, sizeof(xmlSAXHandler));
     m_sax.initialized = XML_SAX2_MAGIC;
     m_sax.startDocument = &SaxParser::onStartDocument;
@@ -120,6 +123,7 @@ void SaxParser::parseMemory(const std::string& buffer)
                 _("Error when parsing memory: %1%")) % m_error);
     }
     xmlMemoryDump();
+    setlocale(LC_ALL, "");
 }
 
 void SaxParser::stopParser(const std::string& error)
@@ -237,6 +241,8 @@ void SaxParser::onWarning(void* /* ctx */, const char *msg, ...)
 
 void SaxParser::onError(void* ctx, const char *msg, ...)
 {
+    setlocale(LC_ALL, "");
+
     SaxParser* sax = static_cast < SaxParser* >(ctx);
     char* buffer = new char[1024];
     memset(buffer, 0, 1024);
@@ -252,6 +258,8 @@ void SaxParser::onError(void* ctx, const char *msg, ...)
 
 void SaxParser::onFatalError(void* ctx, const char *msg, ...)
 {
+    setlocale(LC_ALL, "");
+
     SaxParser* sax = static_cast < SaxParser* >(ctx);
     char* buffer = new char[1024];
     memset(buffer, 0, 1024);
@@ -794,11 +802,9 @@ long int xmlCharToInt(const xmlChar* str)
 {
     char* res = 0;
 
-    setlocale(LC_ALL, "C");
     errno = 0;
     long int r = strtol((const char*)str, &res, 10);
     int err = errno;
-    setlocale(LC_ALL, "");
 
     if ((err == ERANGE and (r == LONG_MAX || r == LONG_MIN)) or
         (err != 0 and r == 0)) {
@@ -819,11 +825,9 @@ unsigned long int xmlCharToUnsignedInt(const xmlChar* str)
 {
     char* res = 0;
 
-    setlocale(LC_ALL, "C");
     errno = 0;
     unsigned long int r = strtoul((const char*)str, &res, 10);
     int err = errno;
-    setlocale(LC_ALL, "");
 
     if ((err == ERANGE and (r == ULONG_MAX)) or
         (err != 0 and r == 0)) {
@@ -844,11 +848,9 @@ double xmlCharToDouble(const xmlChar* str)
 {
     char* res = 0;
 
-    setlocale(LC_ALL, "C");
     errno = 0;
     double r = strtod((const char*)str, &res);
     int err = errno;
-    setlocale(LC_ALL, "");
 
     if ((err == ERANGE and r == HUGE_VAL) or (err != 0 and r == 0)) {
         throw utils::SaxParserError(fmt(
