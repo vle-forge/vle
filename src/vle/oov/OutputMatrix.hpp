@@ -34,6 +34,7 @@
 
 #include <vle/oov/DllDefines.hpp>
 #include <vle/value/Matrix.hpp>
+#include <vle/value/Double.hpp>
 #include <boost/utility.hpp>
 #include <list>
 #include <string>
@@ -195,7 +196,23 @@ namespace vle { namespace oov {
          * @return A view on the Time column;
          */
         value::VectorView getTime()
-        { return m_values->row(0); }
+        { return m_values->column(0); }
+
+        /**
+         * @brief Get the Time vector.
+         *
+         * @return A view on the Time column;
+         */
+        value::ConstVectorView getTime() const
+        { return m_values->column(0); }
+
+        /**
+         * @brief Get the last observation date (ie. last value in the column
+         * time (0)).
+         * @return A real.
+         */
+        double getLastTime() const
+        { return getTime()[m_values->rows() - 1]->toDouble().value(); }
 
         /**
          * @brief Return the list of model name.

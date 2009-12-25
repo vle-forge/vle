@@ -87,6 +87,15 @@ BOOST_AUTO_TEST_CASE(test_gens)
     BOOST_REQUIRE_EQUAL(result.shape()[1],
                         (value::MatrixView::size_type)101);
 
+    {
+        value::VectorView vectorTime(view1.getTime());
+        BOOST_REQUIRE_EQUAL(vectorTime.shape()[0], 101);
+        BOOST_REQUIRE_EQUAL(vectorTime[vectorTime.shape()[0] -
+                            1]->toDouble().value(), 100);
+        BOOST_REQUIRE_EQUAL(view1.getLastTime(), 100.0);
+    }
+
+
     BOOST_REQUIRE_EQUAL(value::toDouble(result[0][0]), 0);
     BOOST_REQUIRE_EQUAL(value::toDouble(result[1][0]), 0);
     BOOST_REQUIRE_EQUAL(value::toInteger(result[2][0]), 1);

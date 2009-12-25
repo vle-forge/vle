@@ -270,6 +270,7 @@ BOOST_AUTO_TEST_CASE(test_petrinet_inout)
                         (value::MatrixView::size_type)5);
     BOOST_REQUIRE_EQUAL(result.shape()[1],
                         (value::MatrixView::size_type)11);
+    BOOST_REQUIRE_CLOSE(view.getLastTime(), 1., 1.);
 
     BOOST_REQUIRE_CLOSE((double)value::toInteger(result[2][10]), 6., 10e-5);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[3][10]), 1., 10e-5);
