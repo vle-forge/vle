@@ -120,6 +120,7 @@ private:
  *   <hosts>
  *     <host hostname="vle.univ-littoral.fr" port="8000" process="2" />
  *     <host hostname="vle.toulouse.inra.fr" port="8000" process="2" />
+ *     <host hostname="www.vle-project.org" port="8000" process="2" />
  *     <host hostname="193.49.192.226" port="934" process="2" />
  *      ...
  *   </hosts>

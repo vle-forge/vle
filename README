@@ -102,7 +102,7 @@ Usage
 -----
 
 VLE is a multi-modeling environment to build model, to simulate and analys them.
-To more information, see the VLE website (http://vle.toulouse.inra.fr).
+To more information, see the VLE website (http://www.vle-projet.org).
 
 - To start a simulation:
 $ vle file.vpz

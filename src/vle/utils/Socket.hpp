@@ -208,6 +208,7 @@ namespace vle { namespace utils {
      * @code
      * utils::net::Client c("vle.univ-littoral.fr", 8000);
      * utils::net::Client c("vle.toulouse.inra.fr", 8000);
+     * utils::net::Client c("www.vle-project.org", 8000);
      * @endcode
      */
     class VLE_UTILS_EXPORT Client : public Base
