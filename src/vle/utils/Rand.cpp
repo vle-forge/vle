@@ -41,7 +41,7 @@ double Rand::vonMises(const double kappa, const double mu)
 {
     // FIXME: get_double_included instead of getDouble()
     if (kappa <= 1e-6){
-	return 2.*G_PI * getDouble();
+        return 2. * G_PI * getDouble();
     }
 
     double a = 1.0 + sqrt(1.0 + 4.0 * kappa * kappa);
@@ -63,6 +63,24 @@ double Rand::vonMises(const double kappa, const double mu)
     double u3 = getDouble();
 
     return (u3 > 0.5) ? mu + acos(f) : mu - acos(f);
+}
+
+double Rand::getDoubleExcluded()
+{
+    double x ;
+    do {
+        x = getDouble();
+    }
+    while (x == 0);
+
+    return x ;
+}
+
+double Rand::weibull(const double a, const double b)
+{
+    double x = pow(-log(getDoubleExcluded()), 1. / a);
+
+    return b * x;
 }
 
 }} // namespace vle utils

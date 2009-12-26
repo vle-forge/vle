@@ -67,6 +67,7 @@ namespace vle { namespace utils {
      * r.getBool(); // bool [true, false]
      * r.getDouble(); // double [0.0, 1.0)
      * r.getDouble(0.0, 1.0); // double [0.0, 1.0)
+     * r.getDoubleExcluded(0.0, 1.0); // double (0.0, 1.0)
      * r.normal(1.0, 0.0);
      * r.lognormal(1.0, 0.0);
      * r.poisson(1.0);
@@ -75,6 +76,7 @@ namespace vle { namespace utils {
      * r.geometric(0.5);
      * r.cauchy(0.0, 1.0);
      * r.triangle(0.0, 0.5, 1.0);
+     * r.weibull(1.0, 1.0);
      * @endcode
      */
     class VLE_UTILS_EXPORT Rand
@@ -169,6 +171,13 @@ namespace vle { namespace utils {
 
             return gen();
         }
+
+        /**
+         * @brief Generate a real value (0, 1);
+         * 0 and 1 are excluded from the generated values.
+         * @return a random real.
+         */
+        double getDoubleExcluded();
 
         /**
          * @brief Generate a real using the normal law.
@@ -317,6 +326,15 @@ namespace vle { namespace utils {
 
             return gen();
         }
+
+        /**
+         * @brief Generate a real using the Weibull law. This version is a
+         * two-parameter Weibull distribution (where c or gamma = 0)
+         * @param a continuous shape parameter alpha > 0
+         * @param b continuous scale parameter beta > 0
+         * @return a real.
+         */
+        double weibull(const double a, const double b);
 
         /**
          * @brief Get a reference to the Mersenne Twister PRNG.
