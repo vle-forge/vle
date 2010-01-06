@@ -69,11 +69,22 @@ Activity& Activities::add(const std::string& name,
 
 void Activities::addStartToStartConstraint(const std::string& acti,
                                            const std::string& actj,
-                                           const devs::Time& timelag)
+                                           const devs::Time& mintimelag,
+                                           const devs::Time& maxtimelag)
 {
     addPrecedenceConstraint(
         PrecedenceConstraint(get(acti), get(actj), PrecedenceConstraint::SS,
-                             timelag, timelag));
+                             mintimelag, maxtimelag));
+}
+
+void Activities::addFinishToFinishConstraint(const std::string& acti,
+                                             const std::string& actj,
+                                             const devs::Time& mintimelag,
+                                             const devs::Time& maxtimelag)
+{
+    addPrecedenceConstraint(
+        PrecedenceConstraint(get(acti), get(actj), PrecedenceConstraint::FF,
+                             mintimelag, maxtimelag));
 }
 
 void Activities::addFinishToStartConstraint(const std::string& acti,
@@ -84,24 +95,6 @@ void Activities::addFinishToStartConstraint(const std::string& acti,
     addPrecedenceConstraint(
         PrecedenceConstraint(get(acti), get(actj), PrecedenceConstraint::FS,
                              mintimelag, maxtimelag));
-}
-
-void Activities::addFinishToStartConstraint(const std::string& acti,
-                                            const std::string& actj,
-                                            const devs::Time& mintimelag)
-{
-    addPrecedenceConstraint(
-        PrecedenceConstraint(get(acti), get(actj), PrecedenceConstraint::FS,
-                             mintimelag, devs::Time::infinity));
-}
-
-void Activities::addFinishToFinishConstraint(const std::string& acti,
-                                             const std::string& actj,
-                                             const devs::Time& timelag)
-{
-    addPrecedenceConstraint(
-        PrecedenceConstraint(get(acti), get(actj), PrecedenceConstraint::FF,
-                             timelag, timelag));
 }
 
 void Activities::process(const devs::Time& time, result_t& waitedact,
@@ -330,6 +323,51 @@ PrecedenceConstraint::Result Activities::updateState(iterator activity,
             }
         } else {
             newstate = PrecedenceConstraint::Wait;
+
+            PrecedencesGraph::findIn in = m_graph.findPrecedenceIn(activity);
+            PrecedencesGraph::iteratorIn it;
+
+            if (activity->second.waitAllFsBeforeStart()) {
+                it = in.first;
+                while (newstate == PrecedenceConstraint::Wait and
+                       it != in.second) {
+                    PrecedenceConstraint::Result r = it->isValid(time);
+
+                    switch (r) {
+                    case PrecedenceConstraint::Wait:
+                        newstate = r;
+                        break;
+                    case PrecedenceConstraint::Failed:
+                        newstate = r;
+                        break;
+                    case PrecedenceConstraint::Valid:
+                    case PrecedenceConstraint::Inapplicable:
+                        newstate = PrecedenceConstraint::Wait;
+                        break;
+                    }
+                    ++it;
+                }
+            } else {
+                it = in.first;
+                while (it != in.second and
+                       newstate != PrecedenceConstraint::Wait) {
+                    PrecedenceConstraint::Result r = it->isValid(time);
+
+                    switch (r) {
+                    case PrecedenceConstraint::Wait:
+                        newstate = r;
+                        break;
+                    case PrecedenceConstraint::Failed:
+                        newstate = r;
+                        break;
+                    case PrecedenceConstraint::Valid:
+                    case PrecedenceConstraint::Inapplicable:
+                        newstate = PrecedenceConstraint::Wait;;
+                        break;
+                    }
+                    ++it;
+                }
+            }
         }
     }
     return newstate;

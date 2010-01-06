@@ -234,10 +234,6 @@ BOOST_AUTO_TEST_CASE(kb2)
 
     for (vmd::Activities::result_t::iterator it = lst.begin(); it !=
          lst.end(); ++it) {
-        (*it)->second.start(0.0);
-    }
-    for (vmd::Activities::result_t::iterator it = lst.begin(); it !=
-         lst.end(); ++it) {
         (*it)->second.end(0.0);
     }
 

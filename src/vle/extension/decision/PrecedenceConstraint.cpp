@@ -45,13 +45,7 @@ PrecedenceConstraint::PrecedenceConstraint(iterator first,
             _("Decision: Precedence constraint, bad min TL"));
     }
 
-    if (type == SS or type == FF) {
-        if (maxtimelag != mintimelag) {
-            throw utils::ModellingError(
-                _("Decision: Precedence constraint, SS or FF need "
-                  "min = max TL"));
-        }
-    } else if (mintimelag > maxtimelag) {
+    if (mintimelag > maxtimelag) {
         throw utils::ModellingError(
             _("Decision: Precedence constraint, FS min >= max TL"));
     }
@@ -72,23 +66,28 @@ PrecedenceConstraint::isValid(const devs::Time& time) const
                 return Wait;
             case Activity::STARTED:
             case Activity::DONE:
-                if (timelag() == 0.0) {
-                    return Valid;
-                } else {
-                    return (j.startedDate() + timelag() > time) ? Wait : Valid;
-                }
             case Activity::ENDED:
-                return Inapplicable;
+                throw utils::InternalError(_("Decision: impossible state (SS)"));
             case Activity::FAILED:
                 return Failed;
             }
         case Activity::STARTED:
             switch (j.state()) {
             case Activity::WAIT:
-                if (timelag() == 0.0) {
-                    return Valid;
-                } else {
-                    return (i.startedDate() + timelag() > time) ? Wait : Valid;
+                {
+                    devs::Time dmin = i.startedDate() + mintimelag();
+                    devs::Time dmax = i.startedDate() + maxtimelag();
+
+                    if (i.startedDate() <= time and time == dmin and
+                        time == dmax) {
+                        return Valid;
+                    } else if (i.startedDate() <= time and time < dmin) {
+                        return Wait;
+                    } else if (dmin <= time and time <= dmax) {
+                        return Valid;
+                    } else if (dmax < time) {
+                        return Failed;
+                    }
                 }
             case Activity::STARTED:
             case Activity::DONE:
@@ -101,10 +100,20 @@ PrecedenceConstraint::isValid(const devs::Time& time) const
         case Activity::DONE:
             switch (j.state()) {
             case Activity::WAIT:
-                if (timelag() == 0.0) {
-                    return Valid;
-                } else {
-                    return (i.startedDate() + timelag() > time) ? Wait : Valid;
+                {
+                    devs::Time dmin = i.startedDate() + mintimelag();
+                    devs::Time dmax = i.startedDate() + maxtimelag();
+
+                    if (i.startedDate() <= time and time == dmin and
+                        time == dmax) {
+                        return Valid;
+                    } else if (i.startedDate() <= time and time < dmin) {
+                        return Wait;
+                    } else if (dmin <= time and time <= dmax) {
+                        return Valid;
+                    } else if (dmax < time) {
+                        return Failed;
+                    }
                 }
             case Activity::STARTED:
             case Activity::DONE:
@@ -135,10 +144,9 @@ PrecedenceConstraint::isValid(const devs::Time& time) const
             switch (j.state()) {
             case Activity::WAIT:
             case Activity::STARTED:
-                return Inapplicable;
             case Activity::DONE:
             case Activity::ENDED:
-                return (j.doneDate() + timelag() >= time) ? Wait : Failed;
+                return Inapplicable;
             case Activity::FAILED:
                 return Failed;
             }
@@ -146,22 +154,32 @@ PrecedenceConstraint::isValid(const devs::Time& time) const
             switch (j.state()) {
             case Activity::WAIT:
             case Activity::STARTED:
-                return Inapplicable;
             case Activity::DONE:
-                return (j.doneDate() + timelag() >= time) ? Wait : Failed;
             case Activity::ENDED:
-                return Wait;
+                return Inapplicable;
             case Activity::FAILED:
                 return Failed;
             }
         case Activity::DONE:
             switch (j.state()) {
             case Activity::WAIT:
-                return (i.doneDate() + timelag() >= time) ? Wait : Failed;
             case Activity::STARTED:
-                return (i.doneDate() + timelag() >= time) ? Wait : Failed;
             case Activity::DONE:
-                return (i.doneDate() + timelag() >= time) ? Valid : Failed;
+                {
+                    devs::Time dmin = i.doneDate() + mintimelag();
+                    devs::Time dmax = i.doneDate() + maxtimelag();
+
+                    if (i.doneDate() <= time and time == dmin and
+                        time == dmax) {
+                        return Valid;
+                    } else if (i.doneDate() <= time and time < dmin) {
+                        return Wait;
+                    } else if (dmin <= time and time <= dmax) {
+                        return Valid;
+                    } else if (dmax < time) {
+                        return Failed;
+                    }
+                }
             case Activity::ENDED:
                 return Valid;
             case Activity::FAILED:
@@ -170,13 +188,24 @@ PrecedenceConstraint::isValid(const devs::Time& time) const
         case Activity::ENDED:
             switch (j.state()) {
             case Activity::WAIT:
-                return (i.doneDate() + timelag() >= time) ? Wait : Failed;
             case Activity::STARTED:
-                return (i.doneDate() + timelag() >= time) ? Wait : Failed;
             case Activity::DONE:
-                return (i.doneDate() + timelag() >= time) ? Valid: Failed;
             case Activity::ENDED:
-                return (i.doneDate() + timelag() >= time) ? Valid: Failed;
+                {
+                    devs::Time dmin = i.doneDate() + mintimelag();
+                    devs::Time dmax = i.doneDate() + maxtimelag();
+
+                    if (i.doneDate() <= time and time == dmin and
+                        time == dmax) {
+                        return Valid;
+                    } else if (i.doneDate() <= time and time < dmin) {
+                        return Wait;
+                    } else if (dmin <= time and time <= dmax) {
+                        return Valid;
+                    } else if (dmax < time) {
+                        return Failed;
+                    }
+                }
             case Activity::FAILED:
                 return Failed;
             }
@@ -223,14 +252,21 @@ PrecedenceConstraint::isValid(const devs::Time& time) const
         case Activity::ENDED:
             switch (j.state()) {
             case Activity::WAIT:
-                if (i.finishedDate() + mintimelag() > time) {
-                    return Wait;
-                } else {
-                    if (i.finishedDate() + maxtimelag() >= time) {
+                {
+                    devs::Time dmin = i.finishedDate() + mintimelag();
+                    devs::Time dmax = i.finishedDate() + maxtimelag();
+
+                    if (i.finishedDate() <= time and time == dmin and
+                        time == dmax) {
                         return Valid;
+                    } else if (i.finishedDate() <= time and time < dmin) {
+                        return Wait;
+                    } else if (dmin <= time and time <= dmax) {
+                        return Valid;
+                    } else if (dmax < time) {
+                        return Failed;
                     }
                 }
-                return Failed;
             case Activity::STARTED:
             case Activity::DONE:
             case Activity::ENDED:

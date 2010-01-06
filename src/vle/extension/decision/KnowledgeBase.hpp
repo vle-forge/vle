@@ -69,12 +69,27 @@ namespace vle { namespace extension { namespace decision {
          * activity (j) can start.
          * @param acti The (i) activity in SiSj relationship.
          * @param actj The (j) activity in SiSj relationship.
-         * @param timelag time lag in SiSj relationship.
+         * @param maxtimelag time lag in SiSj relationship.
          */
         void addStartToStartConstraint(const std::string& acti,
                                        const std::string& actj,
-                                       const devs::Time& timelag = 0.0)
-        { m_activities.addStartToStartConstraint(acti, actj, timelag); }
+                                       const devs::Time& maxtimelag)
+        { m_activities.addStartToStartConstraint(acti, actj, 0, maxtimelag); }
+
+        /**
+         * @brief The predecessor activity (i) must start before the successor
+         * activity (j) can start.
+         * @param acti The (i) activity in SiSj relationship.
+         * @param actj The (j) activity in SiSj relationship.
+         * @param mintimelag time lag in SiSj relationship.
+         * @param maxtimelag time lag in SiSj relationship.
+         */
+        void addStartToStartConstraint(const std::string& acti,
+                                       const std::string& actj,
+                                       const devs::Time& mintimelag,
+                                       const devs::Time& maxtimelag)
+        { m_activities.addStartToStartConstraint(acti, actj, mintimelag,
+                                                 maxtimelag); }
 
         /**
          * @brief The predecessor activity (i) must finish before the successor
@@ -100,8 +115,23 @@ namespace vle { namespace extension { namespace decision {
          */
         void addFinishToFinishConstraint(const std::string& acti,
                                          const std::string& actj,
-                                         const devs::Time& timelag = 0.0)
-        { m_activities.addFinishToFinishConstraint(acti, actj, timelag); }
+                                         const devs::Time& maxtimelag)
+        { m_activities.addFinishToFinishConstraint(acti, actj, 0, maxtimelag); }
+
+        /**
+         * @brief The predecessor activity (i) must finish before the successor
+         * activity (j) can finish.
+         * @param acti The (i) activity in FiFj relationship.
+         * @param actj The (j) activity in FiFj relationship.
+         * @param mintimelag time lag in FiFj relationship.
+         * @param maxtimelag time lag in FiFj relationship.
+         */
+        void addFinishToFinishConstraint(const std::string& acti,
+                                         const std::string& actj,
+                                         const devs::Time& mintimelag,
+                                         const devs::Time& maxtimelag)
+        { m_activities.addFinishToFinishConstraint(
+                acti, actj, mintimelag, maxtimelag); }
 
         const Facts& facts() const { return m_facts; }
         const Rules& rules() const { return m_rules; }

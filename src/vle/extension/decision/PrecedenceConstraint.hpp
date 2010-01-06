@@ -72,7 +72,6 @@ namespace vle { namespace extension { namespace decision {
         bool isFF() const { return m_type == FF; }
         const Type& type() const { return m_type; }
 
-        const devs::Time& timelag() const { return m_mintimelag; }
         const devs::Time& mintimelag() const { return m_mintimelag; }
         const devs::Time& maxtimelag() const { return m_maxtimelag; }
 
