@@ -70,9 +70,14 @@ namespace vle { namespace extension { namespace decision {
         Activity()
             : m_state(WAIT), m_waitall(true), m_date((Activity::DateType)0),
             m_start(devs::Time::negativeInfinity),
-            m_finish(devs::Time::infinity), m_minstart(-1.0), m_maxstart(-1.0),
-            m_minfinish(-1.0), m_maxfinish(-1.0), m_started(-1.0),
-            m_finished(-1.0), m_done(-1.0)
+            m_finish(devs::Time::infinity),
+            m_minstart(devs::Time::negativeInfinity),
+            m_maxstart(devs::Time::negativeInfinity),
+            m_minfinish(devs::Time::negativeInfinity),
+            m_maxfinish(devs::Time::negativeInfinity),
+            m_started(devs::Time::negativeInfinity),
+            m_finished(devs::Time::negativeInfinity),
+            m_done(devs::Time::negativeInfinity)
         {}
 
         void addRule(const std::string& name, const Rule& rule)
