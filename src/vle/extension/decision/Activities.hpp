@@ -110,9 +110,9 @@ namespace vle { namespace extension { namespace decision {
          * @param failedact
          * @param endedact
          */
-        void process(const devs::Time& time, result_t& waitact, result_t& starttact,
-                     result_t& doneact, result_t& failedact,
-                     result_t& endedact);
+        void process(const devs::Time& time, result_t& waitact,
+                     result_t& starttact, result_t& doneact,
+                     result_t& failedact, result_t& endedact);
 
         iterator begin() { return m_lst.begin(); }
         const_iterator begin() const { return m_lst.begin(); }
@@ -145,29 +145,30 @@ namespace vle { namespace extension { namespace decision {
         activities_t    m_lst;
         PrecedencesGraph m_graph;
 
-        bool processWaitState(iterator activity, const devs::Time& time, result_t&
-                              waitedact, result_t& startedact, result_t&
-                              doneact, result_t& failedact, result_t& endedact);
+        bool processWaitState(iterator activity, const devs::Time& time,
+                              result_t& waitedact, result_t& startedact,
+                              result_t& doneact, result_t& failedact,
+                              result_t& endedact);
 
         bool processStartedState(iterator activity, const devs::Time& time,
                                  result_t& waitedact, result_t& startedact,
                                  result_t& doneact, result_t& failedact,
                                  result_t& endedact);
 
-        bool processDoneState(iterator activity, const devs::Time& time, result_t&
-                              waitedact, result_t& startedact, result_t&
-                              doneact, result_t& failedact, result_t&
-                              endedact);
+        bool processDoneState(iterator activity, const devs::Time& time,
+                              result_t& waitedact, result_t& startedact,
+                              result_t& doneact, result_t& failedact,
+                              result_t& endedact);
 
-        bool processFailedState(iterator activity, const devs::Time& time, result_t&
-                                waitedact, result_t& startedact, result_t&
-                                doneact, result_t& failedact, result_t&
-                                endedact);
+        bool processFailedState(iterator activity, const devs::Time& time,
+                                result_t& waitedact, result_t& startedact,
+                                result_t& doneact, result_t& failedact,
+                                result_t& endedact);
 
-        bool processEndedState(iterator activity, const devs::Time& time, result_t&
-                               waitedact, result_t& startedact, result_t&
-                               doneact, result_t& failedact, result_t&
-                               endedact);
+        bool processEndedState(iterator activity, const devs::Time& time,
+                               result_t& waitedact, result_t& startedact,
+                               result_t& doneact, result_t& failedact,
+                               result_t& endedact);
 
         PrecedenceConstraint::Result updateState(iterator activity,
                                                  const devs::Time& time);

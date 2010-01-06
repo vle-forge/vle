@@ -28,10 +28,30 @@
 
 
 #include <vle/devs/Time.hpp>
+#include <sstream>
+#include <iomanip>
 
 namespace vle { namespace devs {
 
 const Time Time::infinity(std::numeric_limits < double >::max());
 const Time Time::negativeInfinity(std::numeric_limits < double >::min());
+
+std::string Time::toString() const
+{
+    if (m_value == std::numeric_limits < double >::max()) {
+        return std::string("+infinity");
+    } else if (m_value == std::numeric_limits < double >::min()) {
+        return std::string("-infinity");
+    } else {
+        std::ostringstream out;
+
+        out << std::showpoint
+            << std::fixed
+            << std::setprecision(std::numeric_limits < double >::digits10)
+            << m_value;
+
+        return out.str();
+    }
+}
 
 }} // namespace vle devs

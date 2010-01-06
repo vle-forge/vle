@@ -126,11 +126,16 @@ namespace vle { namespace extension { namespace decision {
         bool isInFailedState() const { return m_state == FAILED; }
         bool isInEndedState() const { return m_state == ENDED; }
 
-	void wait() { m_state = WAIT; }
-        void start(const devs::Time& date) { m_state = STARTED; startedDate(date); }
-        void done(const devs::Time& date) { m_state = DONE; doneDate(date); }
-	void end(const devs::Time& date) { m_state = ENDED; finishedDate(date); }
-	void fail(const devs::Time& date) { m_state = FAILED; finishedDate(date); }
+        void wait()
+        { m_state = WAIT; }
+        void start(const devs::Time& date)
+        { m_state = STARTED; startedDate(date); }
+        void done(const devs::Time& date)
+        { m_state = DONE; doneDate(date); }
+        void end(const devs::Time& date)
+        { m_state = ENDED; finishedDate(date); }
+        void fail(const devs::Time& date)
+        { m_state = FAILED; finishedDate(date); }
 
         const Rules& rules() const { return m_rules; }
         const DateType& date() const { return m_date; }
@@ -175,7 +180,8 @@ namespace vle { namespace extension { namespace decision {
         devs::Time m_done; /**< Date when the activity is done. */
     };
 
-    inline std::ostream& operator<<(std::ostream& o, const Activity::State& dt)
+    inline std::ostream& operator<<(
+        std::ostream& o, const Activity::State& dt)
     {
         return o << "state: " <<
             ((dt == Activity::WAIT) ? "wait" :
@@ -184,20 +190,72 @@ namespace vle { namespace extension { namespace decision {
              (dt == Activity::ENDED) ? "ended" : "failed");
     }
 
-    inline std::ostream& operator<<(std::ostream& o, const Activity& a)
+    inline std::ostream& operator<<(
+        std::ostream& out, const Activity& a)
     {
-        std::ios_base::fmtflags fl = o.flags();
-        o << std::fixed;
-        o << a.state() << " "
-            << a.rules()
-            << " Expected: (" << a.start() << ", " << a.finish() << ")"
-            << " EL start: (" << a.minstart() << ", " << a.maxstart() << ")"
-            << " EL finish: (" << a.minfinish() << ", " << a.maxfinish() << ")"
-            << " Started at: (" << a.startedDate()<< ")"
-            << " Done at: (" << a.doneDate() << ")"
-            << " FInished at: (" << a.finishedDate() << "))";
-        o.flags(fl);
-        return o;
+        out << a.state() << " " << a.rules() << " Temporal ctr: ";
+
+        switch (a.date() & (Activity::START | Activity::FINISH | Activity::MINS
+                            | Activity::MAXS | Activity::MINF |
+                            Activity::MAXF)) {
+        case Activity::START:
+        case Activity::FINISH:
+        case Activity::START | Activity::FINISH:
+            out << "[" << a.start().toString() << "," << a.finish().toString()
+                << "]";
+            break;
+        case Activity::START | Activity::MAXF:
+        case Activity::START | Activity::MINF:
+        case Activity::START | Activity::MINF | Activity::MAXF:
+            out << "[" << a.start().toString() << ", ["
+                << a.minfinish().toString() << ","
+                << a.maxfinish().toString() << "]]";
+            break;
+        case Activity::FINISH | Activity::MAXS:
+        case Activity::FINISH | Activity::MINS:
+        case Activity::FINISH | Activity::MINS | Activity::MAXS:
+            out << "[[" << a.minstart().toString() << ","
+                << a.maxstart().toString() << "],"
+                << a.finish().toString() << "]";
+            break;
+        case Activity::MAXF:
+        case Activity::MINF:
+        case Activity::MINF | Activity::MAXF:
+        case Activity::MAXS:
+        case Activity::MAXS | Activity::MAXF:
+        case Activity::MAXS | Activity::MINF:
+        case Activity::MAXS | Activity::MINF | Activity::MAXF:
+        case Activity::MINS:
+        case Activity::MINS | Activity::MAXF:
+        case Activity::MINS | Activity::MINF:
+        case Activity::MINS | Activity::MINF | Activity::MAXF:
+        case Activity::MINS | Activity::MAXS:
+        case Activity::MINS | Activity::MAXS | Activity::MAXF:
+        case Activity::MINS | Activity::MAXS | Activity::MINF:
+        case Activity::MINS | Activity::MAXS | Activity::MINF | Activity::MAXF:
+            out << "[["
+                << a.minstart().toString() << ","
+                << a.maxstart().toString() << "],["
+                << a.minfinish().toString() << ","
+                << a.maxfinish().toString() << "]]";
+            break;
+        default:
+            out << "[internal error, report bug]";
+        }
+
+        if (not a.startedDate().isNegativeInfinity()) {
+            out << " Started at: (" << a.startedDate().toString()<< ")";
+        }
+
+        if (not a.doneDate().isNegativeInfinity()) {
+            out << " Done at: (" << a.doneDate().toString() << ")";
+        }
+
+        if (not a.finishedDate().isNegativeInfinity()) {
+            out << " Finished at: (" << a.finishedDate().toString() << "))";
+        }
+
+        return out;
     }
 
 }}} // namespace vle model decision

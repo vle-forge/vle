@@ -123,7 +123,8 @@ namespace vle { namespace extension { namespace decision {
     {
         return o << "Precedence: "
             << "type: " << p.type()
-            << " delta [" << p.mintimelag() << ", " << p.maxtimelag() << "] "
+            << " delta [" << p.mintimelag().toString() << ", "
+            << p.maxtimelag().toString() << "] "
             << "(" << p.first()->first << ") - (" << p.second()->first << ")";
     }
 

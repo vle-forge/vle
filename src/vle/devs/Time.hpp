@@ -360,6 +360,8 @@ public:
         return out << t.m_value;
     }
 
+    std::string toString() const;
+
 private:
     double m_value;
 };
