@@ -50,7 +50,7 @@ namespace vle { namespace extension { namespace decision {
         /**
          * @brief Defines the types of the validity function.
          */
-        enum Result {
+        enum ResultType {
             Inapplicable, /**< Constraint is inapplicable, for instance in FF
                             and A and B are in wait state. */
             Wait, /**< Constraint is not valid be can be valid in future. */
@@ -58,6 +58,13 @@ namespace vle { namespace extension { namespace decision {
             Failed /**< Constraint is not valid and can not be valid in
                      future. */
         };
+
+        /**
+         * @brief Define the return of the isValid function. The attribute Type
+         * defines the result of the validity, the attribute devs::Time the next
+         * date to wake up the activity.
+         */
+        typedef std::pair < ResultType, devs::Time > Result;
 
                                  /* * * * * */
 
@@ -130,7 +137,7 @@ namespace vle { namespace extension { namespace decision {
     inline std::ostream&
         operator<<(std::ostream& o, const PrecedenceConstraint::Result& p)
     {
-        switch (p) {
+        switch (p.first) {
         case PrecedenceConstraint::Inapplicable: o << "Inapplicable"; break;
         case PrecedenceConstraint::Wait: o << "Wait"; break;
         case PrecedenceConstraint::Valid: o << "Valid"; break;

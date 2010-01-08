@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://www.vle-project.org/vle-0.8.0.dtd">
+<vle_project version="1.0" date="mar., 05 janv. 2010" author="Gauthier Quesnel">
+<structures>
+<model name="Top model" type="coupled" x="0" y="0" width="464" height="301"  >
+<submodels>
+<model name="Agent" type="atomic" dynamics="agent" observables="TextAgent" x="222" y="101" width="100" height="60" >
+<in>
+ <port name="ack" />
+ <port name="start" />
+</in>
+</model>
+<model name="Start" type="atomic" conditions="StartInit" dynamics="start" x="22" y="30" width="100" height="45" >
+<out>
+ <port name="out" />
+</out>
+</model>
+</submodels>
+<connections>
+<connection type="internal">
+ <origin model="Start" port="out" />
+ <destination model="Agent" port="start" />
+</connection>
+</connections>
+</model>
+</structures>
+<dynamics>
+<dynamic name="agent" library="simpleagent" model="" package="DecisionTutorial" type="local"  />
+<dynamic name="start" library="start" model="" package="DecisionTutorial" type="local"  />
+</dynamics>
+<experiment name="SimpleAgent" duration="10.000000000000000" begin="0.000000000000000" combination="linear" seed="3586334585" >
+<conditions>
+<condition name="StartInit" >
+ <port name="start" >
+<double>5.000000000000000</double>
+</port>
+</condition>
+</conditions>
+<views>
+<outputs>
+<output name="text" location="" format="local" plugin="text" >
+<map><key name="output"><string>out</string></key></map></output>
+
+</outputs>
+<observables>
+<observable name="TextAgent" >
+<port name="text" >
+ <attachedview name="text" />
+</port>
+
+</observable>
+
+</observables>
+<view name="text" output="text" type="timed" timestep="1.000000000000000" />
+
+</views>
+</experiment>
+</vle_project>

@@ -40,7 +40,14 @@ namespace vle { namespace devs {
 /**
  * @brief The definition of time in DEVS simulators. This class encapsulates
  * a real type in a double simple type.
- * - The infinity is represented by std::numeric_limits < double >::max().
+ * - The infinity is represented by.
+ *   @code
+ *   std::numeric_limits < double >::max()
+ *   @endcode
+ * - The negative infinity is represented by:
+ *   @code
+ *   -1 * std::numeric_limits < double >::max().
+ *   @endcode
  * - The infinity constant static object is used to simplify the source code.
  */
 class VLE_DEVS_EXPORT Time
@@ -97,7 +104,7 @@ public:
      * @return true if time is infinity, otherwise false.
      */
     inline bool isNegativeInfinity() const
-    { return m_value == std::numeric_limits < double >::min(); }
+    { return m_value == - std::numeric_limits < double >::max(); }
 
     /**
      * @brief Test if the time represents the infinity.
@@ -105,7 +112,7 @@ public:
      * @return true if time is infinity, otherwise false.
      */
     inline static bool isNegativeInfinity(const double& value)
-    { return value == std::numeric_limits < double >::min(); }
+    { return value == - std::numeric_limits < double >::max(); }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -149,49 +156,43 @@ public:
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     inline bool operator<(const Time& time) const
-    { return (m_value < time.m_value and !isInfinity()) or time.isInfinity(); }
+    { return m_value < time.m_value; }
 
     inline bool operator<(const double& time) const
-    { return (m_value < time and !isInfinity()) or isInfinity(time); }
+    { return m_value < time; }
 
     inline bool operator<(const int& time) const
-    { return (m_value < time and !isInfinity()) or isInfinity(time); }
+    { return m_value < time; }
 
 
     inline bool operator<=(const Time& time) const
-    { return (m_value <= time.m_value and !isInfinity()) or time.isInfinity(); }
+    { return m_value <= time.m_value; }
 
     inline bool operator<=(const double& time) const
-    { return (m_value <= time and !isInfinity()) or isInfinity(time); }
+    { return m_value <= time; }
 
     inline bool operator<=(const int& time) const
-    { return (m_value <= time and !isInfinity()) or isInfinity(time); }
+    { return m_value <= time; }
 
 
     inline bool operator>(const Time& time) const
-    { return (m_value > time.m_value and !time.isInfinity()) or
-        (isInfinity() and !time.isInfinity()); }
+    { return m_value > time.m_value; }
 
     inline bool operator>(const double& time) const
-    { return (m_value > time and not isInfinity(time)) or
-        (isInfinity() and not isInfinity(time)); }
+    { return m_value > time; }
 
     inline bool operator>(const int& time) const
-    { return (m_value > time and not isInfinity(time)) or
-        (isInfinity() and not isInfinity(time)); }
+    { return m_value > time; }
 
 
     inline bool operator>=(const Time& time) const
-    { return (m_value >= time.m_value and !time.isInfinity()) or
-        (isInfinity() and !time.isInfinity()); }
+    { return m_value >= time.m_value; }
 
     inline bool operator>=(const double& time) const
-    { return (m_value >= time and not isInfinity(time)) or
-        (isInfinity() and not isInfinity(time)); }
+    { return m_value >= time; }
 
     inline bool operator>=(const int& time) const
-    { return ( m_value >= time and not isInfinity(time)) or
-        (isInfinity() and not isInfinity(time)); }
+    { return m_value >= time; }
 
 
     inline bool operator==(const Time& time) const

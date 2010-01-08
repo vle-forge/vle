@@ -39,6 +39,7 @@
 #include <vle/extension/decision/KnowledgeBase.hpp>
 
 namespace vmd = vle::extension::decision;
+namespace vd = vle::devs;
 using vle::fmt;
 
 namespace ex {
@@ -169,6 +170,22 @@ namespace ex {
         }
 
         virtual ~KnowledgeBaseGraph3() {}
+    };
+
+    class KB4 : public vmd::KnowledgeBase
+    {
+    public:
+        KB4()
+        {
+            addActivity("A", 0.0, vd::Time::infinity);
+            addActivity("B", 1.0, vd::Time::infinity);
+            addActivity("C", 1.0, vd::Time::infinity);
+            addActivity("D", 2.0, vd::Time::infinity);
+            addActivity("E", 3.0, vd::Time::infinity);
+            addActivity("F", 4.0, vd::Time::infinity);
+        }
+
+        virtual ~KB4() {}
     };
 
 } // namespace ex
@@ -333,4 +350,60 @@ BOOST_AUTO_TEST_CASE(Activity4)
     lst = base.startedActivities();
     BOOST_REQUIRE_EQUAL(lst.size(), vmd::Activities::result_t::size_type(3));
     base.setActivityDone("B", 0.0);
+}
+
+BOOST_AUTO_TEST_CASE(ActivitiesnextDate1)
+{
+    vle::value::init();
+
+    ex::KB4 base;
+
+    vmd::Activities::result_t lst;
+
+    BOOST_REQUIRE_CLOSE((double)base.nextDate(0.), 0., 1.);
+    base.processChanges(0.);
+    base.setActivityDone("A", 0.5);
+    BOOST_REQUIRE_CLOSE((double)base.nextDate(1.), 1., 1.);
+    base.processChanges(1.);
+    base.setActivityDone("B", 1.5);
+    BOOST_REQUIRE_CLOSE((double)base.nextDate(1.), 1., 1.);
+    base.processChanges(1.);
+    base.setActivityDone("C", 1.5);
+    BOOST_REQUIRE_CLOSE((double)base.nextDate(2.), 2., 1.);
+    base.processChanges(2.);
+    base.setActivityDone("D", 2.5);
+    BOOST_REQUIRE_CLOSE((double)base.nextDate(3.), 3., 1.);
+    base.processChanges(3.);
+    base.setActivityDone("E", 3.5);
+    BOOST_REQUIRE_CLOSE((double)base.nextDate(4.), 4., 1.);
+    base.processChanges(4.);
+    base.setActivityDone("F", 4.5);
+}
+
+BOOST_AUTO_TEST_CASE(ActivitiesnextDate2)
+{
+    vle::value::init();
+
+    ex::KB4 base;
+
+    vmd::Activities::result_t lst;
+
+    BOOST_REQUIRE_CLOSE((double)base.duration(0.), 0., 1.);
+    base.processChanges(0.);
+    base.setActivityDone("A", 0.5);
+    BOOST_REQUIRE_CLOSE((double)base.duration(.5), .5, 1.);
+    base.processChanges(1.);
+    base.setActivityDone("B", 1.);
+    BOOST_REQUIRE_CLOSE((double)base.duration(1.), 0., 1.);
+    base.processChanges(1.);
+    base.setActivityDone("C", 1.5);
+    BOOST_REQUIRE_CLOSE((double)base.duration(1.5), .5, 1.);
+    base.processChanges(2.);
+    base.setActivityDone("D", 2.5);
+    BOOST_REQUIRE_CLOSE((double)base.duration(2.5), .5, 1.);
+    base.processChanges(3.);
+    base.setActivityDone("E", 3.5);
+    BOOST_REQUIRE_CLOSE((double)base.duration(3.5), .5, 1.);
+    base.processChanges(4.);
+    base.setActivityDone("F", 4.5);
 }

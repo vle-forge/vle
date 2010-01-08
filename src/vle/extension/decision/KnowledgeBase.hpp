@@ -38,6 +38,13 @@ namespace vle { namespace extension { namespace decision {
     class KnowledgeBase
     {
     public:
+        /**
+         * @brief Define the return of the processChanges function. A boolean
+         * if this function has changed at least one activity and a date to
+         * wake up the knowledge base.
+         */
+        typedef std::pair < bool, devs::Time > Result;
+
         void addFact(const std::string& name, const Fact& fact)
         { m_facts.add(name, fact); }
 
@@ -138,9 +145,24 @@ namespace vle { namespace extension { namespace decision {
         const Activities& activities() const { return m_activities; }
 
         /**
-         * @brief This function is call to change the states of the activities.
+         * @brief Compute the next date when change in activity status.
+         * @param time The current time.
+         * @return A date in range ]devs::Time::negativeInfinity,
+         * devs::Time::infinity[.
          */
-        void processChanges(const devs::Time& time);
+        devs::Time nextDate(const devs::Time& time)
+        { return m_activities.nextDate(time); }
+
+        devs::Time duration(const devs::Time& time);
+
+        /**
+         * @brief This function is call to change the states of the activities.
+         * @return The next date on which the knowledge base must be change
+         * (temporal constraints, temporal precedence constraints)
+         * ]-devs::negativeInfinity, devs::infinity[ and a boolean if a change
+         * has come.
+         */
+        Result processChanges(const devs::Time& time);
 
         /**
          * @brief Change the stage of the activity from STARTED to DONE.

@@ -63,13 +63,13 @@ PrecedenceConstraint::isValid(const devs::Time& time) const
         case Activity::Activity::WAIT:
             switch (j.state()) {
             case Activity::WAIT:
-                return Wait;
+                return std::make_pair(Wait, devs::Time::infinity);
             case Activity::STARTED:
             case Activity::DONE:
             case Activity::ENDED:
                 throw utils::InternalError(_("Decision: impossible state (SS)"));
             case Activity::FAILED:
-                return Failed;
+                return std::make_pair(Failed, devs::Time::infinity);
             }
         case Activity::STARTED:
             switch (j.state()) {
@@ -80,22 +80,22 @@ PrecedenceConstraint::isValid(const devs::Time& time) const
 
                     if (i.startedDate() <= time and time == dmin and
                         time == dmax) {
-                        return Valid;
+                        return std::make_pair(Valid, dmin);
                     } else if (i.startedDate() <= time and time < dmin) {
-                        return Wait;
+                        return std::make_pair(Wait, dmin);
                     } else if (dmin <= time and time <= dmax) {
-                        return Valid;
+                        return std::make_pair(Valid, dmax);
                     } else if (dmax < time) {
-                        return Failed;
+                        return std::make_pair(Failed, devs::Time::infinity);
                     }
                 }
             case Activity::STARTED:
             case Activity::DONE:
-                return Valid;
+                return std::make_pair(Valid, devs::Time::infinity);
             case Activity::ENDED:
-                return Inapplicable;
+                return std::make_pair(Inapplicable, devs::Time::infinity);
             case Activity::FAILED:
-                return Failed;
+                return std::make_pair(Failed, devs::Time::infinity);
             }
         case Activity::DONE:
             switch (j.state()) {
@@ -106,22 +106,22 @@ PrecedenceConstraint::isValid(const devs::Time& time) const
 
                     if (i.startedDate() <= time and time == dmin and
                         time == dmax) {
-                        return Valid;
+                        return std::make_pair(Valid, dmin);
                     } else if (i.startedDate() <= time and time < dmin) {
-                        return Wait;
+                        return std::make_pair(Wait, dmin);
                     } else if (dmin <= time and time <= dmax) {
-                        return Valid;
+                        return std::make_pair(Valid, dmax);
                     } else if (dmax < time) {
-                        return Failed;
+                        return std::make_pair(Failed, devs::Time::infinity);
                     }
                 }
             case Activity::STARTED:
             case Activity::DONE:
-                return Valid;
+                return std::make_pair(Valid, devs::Time::infinity);
             case Activity::ENDED:
-                return Inapplicable;
+                return std::make_pair(Inapplicable, devs::Time::infinity);
             case Activity::FAILED:
-                return Failed;
+                return std::make_pair(Failed, devs::Time::infinity);
             }
         case Activity::ENDED:
             switch (j.state()) {
@@ -129,12 +129,12 @@ PrecedenceConstraint::isValid(const devs::Time& time) const
             case Activity::STARTED:
             case Activity::DONE:
             case Activity::ENDED:
-                return Inapplicable;
+                return std::make_pair(Inapplicable, devs::Time::infinity);
             case Activity::FAILED:
-                return Failed;
+                return std::make_pair(Failed, devs::Time::infinity);
             }
         case Activity::FAILED:
-            return Failed;
+            return std::make_pair(Failed, devs::Time::infinity);
         }
         break;
 
@@ -146,9 +146,9 @@ PrecedenceConstraint::isValid(const devs::Time& time) const
             case Activity::STARTED:
             case Activity::DONE:
             case Activity::ENDED:
-                return Inapplicable;
+                return std::make_pair(Inapplicable, devs::Time::infinity);
             case Activity::FAILED:
-                return Failed;
+                return std::make_pair(Failed, devs::Time::infinity);
             }
         case Activity::STARTED:
             switch (j.state()) {
@@ -156,9 +156,9 @@ PrecedenceConstraint::isValid(const devs::Time& time) const
             case Activity::STARTED:
             case Activity::DONE:
             case Activity::ENDED:
-                return Inapplicable;
+                return std::make_pair(Inapplicable, devs::Time::infinity);
             case Activity::FAILED:
-                return Failed;
+                return std::make_pair(Failed, devs::Time::infinity);
             }
         case Activity::DONE:
             switch (j.state()) {
@@ -171,19 +171,19 @@ PrecedenceConstraint::isValid(const devs::Time& time) const
 
                     if (i.doneDate() <= time and time == dmin and
                         time == dmax) {
-                        return Valid;
+                        return std::make_pair(Valid, dmin);
                     } else if (i.doneDate() <= time and time < dmin) {
-                        return Wait;
+                        return std::make_pair(Wait, dmin);
                     } else if (dmin <= time and time <= dmax) {
-                        return Valid;
+                        return std::make_pair(Valid, dmax);
                     } else if (dmax < time) {
-                        return Failed;
+                        return std::make_pair(Failed, devs::Time::infinity);
                     }
                 }
             case Activity::ENDED:
-                return Valid;
+                return std::make_pair(Valid, devs::Time::infinity);
             case Activity::FAILED:
-                return Failed;
+                return std::make_pair(Failed, devs::Time::infinity);
             }
         case Activity::ENDED:
             switch (j.state()) {
@@ -197,20 +197,20 @@ PrecedenceConstraint::isValid(const devs::Time& time) const
 
                     if (i.doneDate() <= time and time == dmin and
                         time == dmax) {
-                        return Valid;
+                        return std::make_pair(Valid, dmin);
                     } else if (i.doneDate() <= time and time < dmin) {
-                        return Wait;
+                        return std::make_pair(Wait, dmin);
                     } else if (dmin <= time and time <= dmax) {
-                        return Valid;
+                        return std::make_pair(Valid, dmax);
                     } else if (dmax < time) {
-                        return Failed;
+                        return std::make_pair(Failed, devs::Time::infinity);
                     }
                 }
             case Activity::FAILED:
-                return Failed;
+                return std::make_pair(Failed, devs::Time::infinity);
             }
         case Activity::FAILED:
-            return Failed;
+            return std::make_pair(Failed, devs::Time::infinity);
         }
         break;
 
@@ -219,35 +219,35 @@ PrecedenceConstraint::isValid(const devs::Time& time) const
         case Activity::WAIT:
             switch (j.state()) {
             case Activity::WAIT:
-                return Wait;
+                return std::make_pair(Wait, devs::Time::infinity);
             case Activity::STARTED:
             case Activity::DONE:
             case Activity::ENDED:
-                return Inapplicable;
+                return std::make_pair(Inapplicable, devs::Time::infinity);
             case Activity::FAILED:
-                return Failed;
+                return std::make_pair(Failed, devs::Time::infinity);
             }
         case Activity::STARTED:
             switch (j.state()) {
             case Activity::WAIT:
-                return Wait;
+                return std::make_pair(Wait, devs::Time::infinity);
             case Activity::STARTED:
             case Activity::DONE:
             case Activity::ENDED:
-                return Inapplicable;
+                return std::make_pair(Inapplicable, devs::Time::infinity);
             case Activity::FAILED:
-                return Failed;
+                return std::make_pair(Failed, devs::Time::infinity);
             }
         case Activity::DONE:
             switch (j.state()) {
             case Activity::WAIT:
-                return Wait;
+                return std::make_pair(Wait, devs::Time::infinity);
             case Activity::STARTED:
             case Activity::DONE:
             case Activity::ENDED:
-                return Inapplicable;
+                return std::make_pair(Inapplicable, devs::Time::infinity);
             case Activity::FAILED:
-                return Failed;
+                return std::make_pair(Failed, devs::Time::infinity);
             }
         case Activity::ENDED:
             switch (j.state()) {
@@ -258,24 +258,24 @@ PrecedenceConstraint::isValid(const devs::Time& time) const
 
                     if (i.finishedDate() <= time and time == dmin and
                         time == dmax) {
-                        return Valid;
+                        return std::make_pair(Valid, devs::Time::infinity);
                     } else if (i.finishedDate() <= time and time < dmin) {
-                        return Wait;
+                        return std::make_pair(Wait, dmin);
                     } else if (dmin <= time and time <= dmax) {
-                        return Valid;
+                        return std::make_pair(Valid, devs::Time::infinity);
                     } else if (dmax < time) {
-                        return Failed;
+                        return std::make_pair(Failed, devs::Time::infinity);
                     }
                 }
             case Activity::STARTED:
             case Activity::DONE:
             case Activity::ENDED:
-                return Inapplicable;
+                return std::make_pair(Inapplicable, devs::Time::infinity);
             case Activity::FAILED:
-                return Failed;
+                return std::make_pair(Failed, devs::Time::infinity);
             }
         case Activity::FAILED:
-            return Failed;
+            return std::make_pair(Failed, devs::Time::infinity);
         }
         break;
     }

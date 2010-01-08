@@ -68,13 +68,14 @@ namespace vle { namespace extension { namespace decision {
         };
 
         Activity()
-            : m_state(WAIT), m_waitall(true), m_date((Activity::DateType)0),
+            : m_state(WAIT), m_waitall(true),
+            m_date((Activity::DateType)(Activity::START | Activity::FINISH)),
             m_start(devs::Time::negativeInfinity),
             m_finish(devs::Time::infinity),
             m_minstart(devs::Time::negativeInfinity),
             m_maxstart(devs::Time::negativeInfinity),
-            m_minfinish(devs::Time::negativeInfinity),
-            m_maxfinish(devs::Time::negativeInfinity),
+            m_minfinish(devs::Time::infinity),
+            m_maxfinish(devs::Time::infinity),
             m_started(devs::Time::negativeInfinity),
             m_finished(devs::Time::negativeInfinity),
             m_done(devs::Time::negativeInfinity)
@@ -159,6 +160,14 @@ namespace vle { namespace extension { namespace decision {
         bool waitOnlyOneFsBeforeStart() const { return not m_waitall; }
         void waitAllFs() { m_waitall = true; }
         void waitOnlyOneFs() { m_waitall = false; }
+
+        /**
+         * @brief Compute the next date when change in activity status.
+         * @param time The current time.
+         * @return A date in range ]devs::Time::negativeInfinity,
+         * devs::Time::infinity[.
+         */
+        devs::Time nextTime(const devs::Time& time);
 
     private:
         void startedDate(const devs::Time& date) { m_started = date; }

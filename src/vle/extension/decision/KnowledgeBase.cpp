@@ -29,6 +29,7 @@
 #include <vle/extension/decision/KnowledgeBase.hpp>
 #include <vle/utils/i18n.hpp>
 #include <algorithm>
+#include <cassert>
 
 namespace vle { namespace extension { namespace decision {
 
@@ -61,19 +62,16 @@ void KnowledgeBase::setActivityFailed(const std::string& name,
     }
 
     if (it->second.isInWaitState()) {
-        Activities::result_t::iterator toDel = std::find(m_waitedAct.begin(),
-                                                         m_waitedAct.end(),
-                                                         it);
+        Activities::result_t::iterator toDel = std::find(
+            m_waitedAct.begin(), m_waitedAct.end(), it);
         m_waitedAct.erase(toDel);
     } else if (it->second.isInStartedState()) {
-        Activities::result_t::iterator toDel = std::find(m_startedAct.begin(),
-                                                         m_startedAct.end(),
-                                                         it);
+        Activities::result_t::iterator toDel = std::find(
+            m_startedAct.begin(), m_startedAct.end(), it);
         m_startedAct.erase(toDel);
     } else if (it->second.isInDoneState()) {
-        Activities::result_t::iterator toDel = std::find(m_doneAct.begin(),
-                                                         m_doneAct.end(),
-                                                         it);
+        Activities::result_t::iterator toDel = std::find(
+            m_doneAct.begin(), m_doneAct.end(), it);
         m_doneAct.erase(toDel);
     }
 
@@ -81,7 +79,19 @@ void KnowledgeBase::setActivityFailed(const std::string& name,
     it->second.fail(date);
 }
 
-void KnowledgeBase::processChanges(const devs::Time& time)
+devs::Time KnowledgeBase::duration(const devs::Time& time)
+{
+    devs::Time next = nextDate(time);
+
+    if (next == devs::Time::negativeInfinity) {
+        return 0.0;
+    } else {
+        assert(next >= time);
+        return next - time;
+    }
+}
+
+KnowledgeBase::Result KnowledgeBase::processChanges(const devs::Time& time)
 {
     m_latestWaitedAct = m_waitedAct;
     m_latestStartedAct = m_startedAct;
@@ -95,14 +105,16 @@ void KnowledgeBase::processChanges(const devs::Time& time)
     m_failedAct.clear();
     m_endedAct.clear();
 
-    m_activities.process(time, m_waitedAct, m_startedAct, m_doneAct,
-                         m_failedAct, m_endedAct);
+    Activities::Result r = m_activities.process(
+        time, m_waitedAct, m_startedAct, m_doneAct, m_failedAct, m_endedAct);
 
     buildLatestList(m_waitedAct, m_latestWaitedAct);
     buildLatestList(m_startedAct, m_latestStartedAct);
     buildLatestList(m_doneAct, m_latestDoneAct);
     buildLatestList(m_failedAct, m_latestFailedAct);
     buildLatestList(m_endedAct, m_latestEndedAct);
+
+    return std::make_pair(r.first, r.second);
 }
 
 void KnowledgeBase::buildLatestList(const Activities::result_t& in,

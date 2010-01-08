@@ -34,13 +34,13 @@
 namespace vle { namespace devs {
 
 const Time Time::infinity(std::numeric_limits < double >::max());
-const Time Time::negativeInfinity(std::numeric_limits < double >::min());
+const Time Time::negativeInfinity(-std::numeric_limits < double >::max());
 
 std::string Time::toString() const
 {
-    if (m_value == std::numeric_limits < double >::max()) {
+    if (m_value == devs::Time::infinity) {
         return std::string("+infinity");
-    } else if (m_value == std::numeric_limits < double >::min()) {
+    } else if (m_value == devs::Time::negativeInfinity) {
         return std::string("-infinity");
     } else {
         std::ostringstream out;

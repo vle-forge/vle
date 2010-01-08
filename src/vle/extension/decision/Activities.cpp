@@ -97,11 +97,25 @@ void Activities::addFinishToStartConstraint(const std::string& acti,
                              mintimelag, maxtimelag));
 }
 
-void Activities::process(const devs::Time& time, result_t& waitedact,
-                         result_t& startedact, result_t& doneact,
-                         result_t& failedact, result_t& endedact)
+devs::Time Activities::nextDate(const devs::Time& time)
 {
-    bool update = false;
+    devs::Time result = devs::Time::infinity;
+
+    for (iterator activity = begin(); activity != end(); ++activity) {
+        result = std::min(result, activity->second.nextTime(time));
+    }
+
+    return result;
+}
+
+Activities::Result
+Activities::process(const devs::Time& time, result_t& waitedact,
+                    result_t& startedact, result_t& doneact,
+                    result_t& failedact, result_t& endedact)
+{
+    devs::Time nextDate = devs::Time::infinity;
+    Result update = std::make_pair(false, devs::Time::infinity);
+    bool isUpdated = false;
 
     do {
         waitedact.clear();
@@ -144,135 +158,163 @@ void Activities::process(const devs::Time& time, result_t& waitedact,
             default:
                 throw utils::InternalError(_("Decision: unknow state"));
             }
+
+            if (not isUpdated and update.first) {
+                isUpdated = true;
+            }
+
+            if (update.second != time and
+                update.second != devs::Time::negativeInfinity) {
+                nextDate = std::min(nextDate, update.second);
+            }
+
+            devs::Time nextActivityDate = activity->second.nextTime(time);
+            if (nextActivityDate != time and
+                nextActivityDate != devs::Time::negativeInfinity) {
+                nextDate = std::min(nextDate, nextActivityDate);
+            }
         }
-    } while (update);
+    } while (update.first);
+
+    return std::make_pair(isUpdated, nextDate);
 }
 
 
-bool Activities::processWaitState(iterator activity,
-                                  const devs::Time& time, result_t& waitedact,
-                                  result_t& startedact,
-                                  result_t& /* doneact */,
-                                  result_t& failedact,
-                                  result_t& /* endedact */)
+Activities::Result
+Activities::processWaitState(iterator activity,
+                             const devs::Time& time,
+                             result_t& waitedact,
+                             result_t& startedact,
+                             result_t& /* doneact */,
+                             result_t& failedact,
+                             result_t& /* endedact */)
 {
     PrecedenceConstraint::Result newstate = updateState(activity, time);
-    bool update = false;
+    Result update = std::make_pair(false, newstate.second);
 
-    switch (newstate) {
+    switch (newstate.first) {
     case PrecedenceConstraint::Valid:
     case PrecedenceConstraint::Inapplicable:
         activity->second.start(time);
         startedact.push_back(activity);
-        update = true;
+        update.first = true;
         break;
     case PrecedenceConstraint::Wait:
         waitedact.push_back(activity);
-        update = false;
+        update.first = false;
         break;
     case PrecedenceConstraint::Failed:
         activity->second.fail(time);
         failedact.push_back(activity);
-        update = true;
+        update.first = true;
         break;
     }
 
     return update;
 }
 
-bool Activities::processStartedState(iterator activity,
-                                     const devs::Time& time,
-                                     result_t& /* waitedact */,
-                                     result_t& startedact,
-                                     result_t& /*doneact*/,
-                                     result_t& failedact,
-                                     result_t& /* endedact */)
+Activities::Result
+Activities::processStartedState(iterator activity,
+                                const devs::Time& time,
+                                result_t& /* waitedact */,
+                                result_t& startedact,
+                                result_t& /*doneact*/,
+                                result_t& failedact,
+                                result_t& /* endedact */)
 {
     PrecedenceConstraint::Result newstate = updateState(activity, time);
-    bool update = false;
+    Result update = std::make_pair(false, newstate.second);
 
-    switch (newstate) {
+    switch (newstate.first) {
     case PrecedenceConstraint::Valid:
     case PrecedenceConstraint::Inapplicable:
     case PrecedenceConstraint::Wait:
         startedact.push_back(activity);
-        update = false;
+        update.first = false;
         break;
     case PrecedenceConstraint::Failed:
         activity->second.fail(time);
         failedact.push_back(activity);
-        update = true;
+        update.first = true;
         break;
     }
+
 
     return update;
 }
 
-bool Activities::processDoneState(iterator activity,
-                                  const devs::Time& time,
-                                  result_t& /*waitedact*/,
-                                  result_t& /*startedact*/,
-                                  result_t& doneact,
-                                  result_t& failedact,
-                                  result_t& endedact)
+Activities::Result
+Activities::processDoneState(iterator activity,
+                             const devs::Time& time,
+                             result_t& /*waitedact*/,
+                             result_t& /*startedact*/,
+                             result_t& doneact,
+                             result_t& failedact,
+                             result_t& endedact)
 {
-    bool update = false;
     PrecedenceConstraint::Result newstate = updateState(activity, time);
+    Result update = std::make_pair(false, newstate.second);
 
-    switch (newstate) {
+    switch (newstate.first) {
     case PrecedenceConstraint::Valid:
     case PrecedenceConstraint::Inapplicable:
         activity->second.end(time);
         endedact.push_back(activity);
-        update = true;
+        update.first = true;
         break;
     case PrecedenceConstraint::Wait:
         doneact.push_back(activity);
-        update = false;
+        update.first = false;
         break;
     case PrecedenceConstraint::Failed:
         activity->second.fail(time);
         failedact.push_back(activity);
-        update = true;
+        update.first = true;
         break;
     }
 
     return update;
 }
 
-bool Activities::processFailedState(iterator activity,
-                                    const devs::Time& /* time */,
-                                    result_t& /* waitedact */,
-                                    result_t& /* startedact */,
-                                    result_t& /* doneact */,
-                                    result_t& failedact,
-                                    result_t& /* endedact */)
+Activities::Result
+Activities::processFailedState(iterator activity,
+                               const devs::Time& /* time */,
+                               result_t& /* waitedact */,
+                               result_t& /* startedact */,
+                               result_t& /* doneact */,
+                               result_t& failedact,
+                               result_t& /* endedact */)
 {
+    Result update = std::make_pair(false, devs::Time::infinity);
     failedact.push_back(activity);
-    return false;
+    return update;
 }
 
-bool Activities::processEndedState(iterator activity,
-                                   const devs::Time& /* time */,
-                                   result_t& /* waitedact */,
-                                   result_t& /* startedact */,
-                                   result_t& /* doneact */,
-                                   result_t& /* failedact */,
-                                   result_t& endedact)
+Activities::Result
+Activities::processEndedState(iterator activity,
+                              const devs::Time& /* time */,
+                              result_t& /* waitedact */,
+                              result_t& /* startedact */,
+                              result_t& /* doneact */,
+                              result_t& /* failedact */,
+                              result_t& endedact)
 {
+    Result update = std::make_pair(false, devs::Time::infinity);
     endedact.push_back(activity);
-    return false;
+    return update;
 }
 
 PrecedenceConstraint::Result Activities::updateState(iterator activity,
                                                      const devs::Time& time)
 {
-    PrecedenceConstraint::Result newstate = PrecedenceConstraint::Valid;
+    PrecedenceConstraint::Result newstate;
+    newstate.first = PrecedenceConstraint::Valid;
+    newstate.second = devs::Time::infinity;
 
     if (activity->second.isBeforeTimeConstraint(time)) {
-        newstate = PrecedenceConstraint::Wait;
+        newstate.first = PrecedenceConstraint::Wait;
     } else if (activity->second.isAfterTimeConstraint(time)) {
-        newstate = PrecedenceConstraint::Failed;
+        newstate.first = PrecedenceConstraint::Failed;
     } else {
         if (activity->second.validRules()) {
             PrecedencesGraph::findIn in = m_graph.findPrecedenceIn(activity);
@@ -280,20 +322,23 @@ PrecedenceConstraint::Result Activities::updateState(iterator activity,
 
             if (activity->second.waitAllFsBeforeStart()) {
                 it = in.first;
-                while (newstate == PrecedenceConstraint::Valid and
+                while (newstate.first == PrecedenceConstraint::Valid and
                        it != in.second) {
                     PrecedenceConstraint::Result r = it->isValid(time);
 
-                    switch (r) {
+                    switch (r.first) {
                     case PrecedenceConstraint::Wait:
-                        newstate = r;
+                        newstate.first = r.first;
+                        newstate.second = std::min(newstate.second, r.second);
                         break;
                     case PrecedenceConstraint::Failed:
-                        newstate = r;
+                        newstate.first = r.first;
+                        newstate.second = std::min(newstate.second, r.second);
                         break;
                     case PrecedenceConstraint::Valid:
                     case PrecedenceConstraint::Inapplicable:
-                        newstate = PrecedenceConstraint::Valid;
+                        newstate.first = PrecedenceConstraint::Valid;
+                        newstate.second = std::min(newstate.second, r.second);
                         break;
                     }
                     ++it;
@@ -301,48 +346,55 @@ PrecedenceConstraint::Result Activities::updateState(iterator activity,
             } else {
                 it = in.first;
                 while (it != in.second and
-                       newstate != PrecedenceConstraint::Valid) {
+                       newstate.first != PrecedenceConstraint::Valid) {
                     PrecedenceConstraint::Result r = it->isValid(time);
 
-                    switch (r) {
+                    switch (r.first) {
                     case PrecedenceConstraint::Wait:
-                        newstate = r;
+                        newstate.first = r.first;
+                        newstate.second = std::min(newstate.second, r.second);
                         break;
                     case PrecedenceConstraint::Failed:
-                        newstate = r;
+                        newstate.first = r.first;
+                        newstate.second = std::min(newstate.second, r.second);
                         break;
                     case PrecedenceConstraint::Valid:
-                        newstate = r;
+                        newstate.first = r.first;
+                        newstate.second = std::min(newstate.second, r.second);
                         break;
                     case PrecedenceConstraint::Inapplicable:
-                        newstate = r;
+                        newstate.first = r.first;
+                        newstate.second = std::min(newstate.second, r.second);
                         break;
                     }
                     ++it;
                 }
             }
         } else {
-            newstate = PrecedenceConstraint::Wait;
+            newstate.first = PrecedenceConstraint::Wait;
 
             PrecedencesGraph::findIn in = m_graph.findPrecedenceIn(activity);
             PrecedencesGraph::iteratorIn it;
 
             if (activity->second.waitAllFsBeforeStart()) {
                 it = in.first;
-                while (newstate == PrecedenceConstraint::Wait and
+                while (newstate.first == PrecedenceConstraint::Wait and
                        it != in.second) {
                     PrecedenceConstraint::Result r = it->isValid(time);
 
-                    switch (r) {
+                    switch (r.first) {
                     case PrecedenceConstraint::Wait:
-                        newstate = r;
+                        newstate.first = r.first;
+                        newstate.second = std::min(newstate.second, r.second);
                         break;
                     case PrecedenceConstraint::Failed:
-                        newstate = r;
+                        newstate.first = r.first;
+                        newstate.second = std::min(newstate.second, r.second);
                         break;
                     case PrecedenceConstraint::Valid:
                     case PrecedenceConstraint::Inapplicable:
-                        newstate = PrecedenceConstraint::Wait;
+                        newstate.first = PrecedenceConstraint::Wait;
+                        newstate.second = std::min(newstate.second, r.second);
                         break;
                     }
                     ++it;
@@ -350,19 +402,22 @@ PrecedenceConstraint::Result Activities::updateState(iterator activity,
             } else {
                 it = in.first;
                 while (it != in.second and
-                       newstate != PrecedenceConstraint::Wait) {
+                       newstate.first != PrecedenceConstraint::Wait) {
                     PrecedenceConstraint::Result r = it->isValid(time);
 
-                    switch (r) {
+                    switch (r.first) {
                     case PrecedenceConstraint::Wait:
-                        newstate = r;
+                        newstate.first = r.first;
+                        newstate.second = std::min(newstate.second, r.second);
                         break;
                     case PrecedenceConstraint::Failed:
-                        newstate = r;
+                        newstate.first = r.first;
+                        newstate.second = std::min(newstate.second, r.second);
                         break;
                     case PrecedenceConstraint::Valid:
                     case PrecedenceConstraint::Inapplicable:
-                        newstate = PrecedenceConstraint::Wait;;
+                        newstate.first = PrecedenceConstraint::Wait;;
+                        newstate.second = std::min(newstate.second, r.second);
                         break;
                     }
                     ++it;

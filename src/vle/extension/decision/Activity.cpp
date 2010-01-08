@@ -105,62 +105,59 @@ void Activity::initStartRangeFinishRange(const devs::Time& minstart,
     m_maxfinish = maxfinish;
 }
 
+devs::Time Activity::nextTime(const devs::Time& time)
+{
+    devs::Time result = devs::Time::infinity;
+
+    switch (m_state) {
+    case WAIT:
+    case STARTED:
+    case DONE:
+        if (m_date & START and time <= m_start) {
+            result = m_start;
+        } else if (m_date & MINS and time <= m_minstart) {
+            result = m_minstart;
+        } else if (m_date & MAXS and time <= m_maxstart) {
+            result = m_maxstart;
+        } else {
+            if (m_date & FINISH and time <= m_finish) {
+                result = m_finish;
+            } else if (m_date & MINF and time <= m_minfinish) {
+                result = m_minfinish;
+            } else if (m_date & MAXF and time <= m_maxfinish) {
+                result = m_maxfinish;
+            } else {
+                result = devs::Time::infinity;
+            }
+        }
+        break;
+    case ENDED:
+    case FAILED:
+        result = devs::Time::infinity;
+        break;
+    }
+
+    return result;
+}
+
 bool Activity::isValidTimeConstraint(const devs::Time& time) const
 {
     switch (m_date & (START | FINISH | MINS | MAXS | MINF | MAXF)) {
-        // nothing declared
-    case 0:
-        return true;
-        // only start / finish or start & finish
-    case START:
-        return m_start <= time;
-    case FINISH:
-        return time < m_finish;
     case START | FINISH:
-        return m_start <= time and time < m_finish;
+        return m_start <= time and time <= m_finish;
 
-        // only start and min/max finish
-    case START | MAXF:
-        return m_start <= time and time < m_maxfinish;
-    case START | MINF:
-        return m_start <= time and time < m_minfinish;
     case START | MINF | MAXF:
-        return m_start <= time and time <= m_minfinish;
+        return m_start <= time and time <= m_maxfinish;
 
-        // only finish and min/max start
-    case FINISH | MAXS:
-        return time < m_maxstart ;
-    case FINISH | MINS:
-        return m_minstart <= time;
-    case FINISH | MINS | MAXS:
-        return m_minstart <= time and time < m_maxstart;
+    case MINS | MAXS | FINISH:
+        return m_minstart <= time and time <= m_maxfinish;
 
-    case MAXF:
-        return time < m_maxfinish;
-    case MINF:
-        return m_minstart <= time;
-    case MINF | MAXF:
-        return time < m_maxfinish;
-    case MAXS:
-    case MAXS | MAXF:
-    case MAXS | MINF:
-    case MAXS | MINF | MAXF:
-        return time < m_maxstart;
-    case MINS:
-        return m_minstart <= time;
-    case MINS | MAXF:
-        return m_minstart <= time and time < m_maxfinish;
-    case MINS | MINF:
-        return m_minstart <= time and time < m_minfinish;
-    case MINS | MINF | MAXF:
-        return m_minstart <= time and time < m_maxfinish;
-    case MINS | MAXS:
-    case MINS | MAXS | MAXF:
-    case MINS | MAXS | MINF:
     case MINS | MAXS | MINF | MAXF:
-        return m_minstart <= time and time < m_maxstart;
-    }
+        return m_minstart <= time and time <= m_maxfinish;
 
+    default:
+        break;
+    }
     throw utils::InternalError(fmt(
             _("Decision: activity time type invalid: %1%")) % (int)m_date);
 }
@@ -168,51 +165,21 @@ bool Activity::isValidTimeConstraint(const devs::Time& time) const
 bool Activity::isBeforeTimeConstraint(const devs::Time& time) const
 {
     switch (m_date & (START | FINISH | MINS | MAXS | MINF | MAXF)) {
-        // nothing declared
-    case 0:
-        return false;
-        // only start / finish or start & finish
-    case START:
-        return time < m_start;
-    case FINISH:
-        return time < m_finish;
     case START | FINISH:
         return time < m_start;
 
-        // only start and min/max finish
-    case START | MAXF:
-    case START | MINF:
     case START | MINF | MAXF:
         return time < m_start;
 
-        // only finish and min/max start
-    case FINISH | MAXS:
-        return time < m_maxstart ;
-    case FINISH | MINS:
-    case FINISH | MINS | MAXS:
+    case MINS | MAXS | FINISH :
         return time < m_minstart;
 
-    case MAXF:
-        return time < m_maxfinish;
-    case MINF:
-    case MINF | MAXF:
-        return time < m_minfinish;
-    case MAXS:
-    case MAXS | MAXF:
-    case MAXS | MINF:
-    case MAXS | MINF | MAXF:
-        return time < m_maxstart;
-    case MINS:
-    case MINS | MAXF:
-    case MINS | MINF:
-    case MINS | MINF | MAXF:
-    case MINS | MAXS:
-    case MINS | MAXS | MAXF:
-    case MINS | MAXS | MINF:
     case MINS | MAXS | MINF | MAXF:
         return time < m_minstart;
-    }
 
+    default:
+        break;
+    }
     throw utils::InternalError(fmt(
             _("Decision: activity time type invalid: %1%")) % (int)m_date);
 }
@@ -220,60 +187,21 @@ bool Activity::isBeforeTimeConstraint(const devs::Time& time) const
 bool Activity::isAfterTimeConstraint(const devs::Time& time) const
 {
     switch (m_date & (START | FINISH | MINS | MAXS | MINF | MAXF)) {
-        // nothing declared
-    case 0:
-        return false;
-        // only start / finish or start & finish
-    case START:
-        return time > m_start;
-    case FINISH:
     case START | FINISH:
-        return time > m_finish;
+        return m_finish < time;
 
-        // only start and min/max finish
-    case START | MAXF:
-        return time > m_maxfinish;
-    case START | MINF:
-        return time > m_minfinish;
     case START | MINF | MAXF:
-        return time > m_maxfinish;;
+        return m_maxfinish < time;
 
-        // only finish and min/max start
-    case FINISH | MAXS:
-    case FINISH | MINS:
-    case FINISH | MINS | MAXS:
-        return time > m_finish;
+    case MINS | MAXS | FINISH:
+        return m_finish < time;
 
-    case MAXF:
-        return time > m_maxfinish;
-    case MINF:
-        return time > m_minfinish;
-    case MINF | MAXF:
-        return time > m_maxfinish;
-    case MAXS:
-    case MAXS | MAXF:
-    case MAXS | MINF:
-        return time > m_minfinish;
-    case MAXS | MINF | MAXF:
-        return time > m_maxfinish;
-    case MINS:
-        return time > m_minstart;
-    case MINS | MAXF:
-        return time > m_maxfinish;
-    case MINS | MINF:
-        return time > m_minfinish;
-    case MINS | MINF | MAXF:
-        return time > m_maxfinish;
-    case MINS | MAXS:
-        return time > m_maxstart;
-    case MINS | MAXS | MAXF:
-        return time > m_maxfinish;
-    case MINS | MAXS | MINF:
-        return time > m_minfinish;
     case MINS | MAXS | MINF | MAXF:
-        return time > m_maxfinish;
-    }
+        return m_maxfinish < time;
 
+    default:
+        break;
+    }
     throw utils::InternalError(fmt(
             _("Decision: activity time type invalid: %1%")) % (int)m_date);
 }

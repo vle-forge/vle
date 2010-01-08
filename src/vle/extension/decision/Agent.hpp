@@ -41,7 +41,7 @@ namespace vle { namespace extension { namespace decision {
     public:
         Agent(const devs::DynamicsInit& mdl,
               const devs::InitEventList& evts)
-            : devs::Dynamics(mdl, evts), mState(Idle), mCurrentTime(0.0),
+            : devs::Dynamics(mdl, evts), mState(Init), mCurrentTime(0.0),
             mPortMode(true)
         {}
 
@@ -157,12 +157,18 @@ namespace vle { namespace extension { namespace decision {
          * @brief DEVS phase of the autotmate.
          */
         enum State {
-            Idle, /**<  Wait external events. */
-            Update /**< Update facts. */
+            Init, /**< The initial state. */
+            Process, /**< call the process function of the KnowledgeBase. */
+            UpdateFact, /**< Update the facts. */
+            Output /**< State to output result. */
         };
 
         State      mState;
-        devs::Time mCurrentTime;
+        mutable devs::Time mCurrentTime; /* To assign mCurrentTime in output
+                                            function. */
+
+        KnowledgeBase::Result mNextChangeTime;
+
         bool       mPortMode;
     };
 

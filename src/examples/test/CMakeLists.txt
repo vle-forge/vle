@@ -95,9 +95,24 @@ TARGET_LINK_LIBRARIES(test_fsa
   vlevpz
   vlemanager)
 
+ADD_EXECUTABLE(test_decision testdecision.cpp)
+TARGET_LINK_LIBRARIES(test_decision
+  ${GLIBMM_LIBRARIES}
+  ${LIBXML_LIBRARIES}
+  ${GTHREAD_LIBRARIES}
+  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
+  vlegeometry
+  vleutils
+  vlevalue
+  vlegraph
+  vledevs
+  vlevpz
+  vlemanager)
+
 ADD_TEST(exemples_generator test_gens)
 ADD_TEST(examples_petrinet test_petrinet)
 ADD_TEST(examples_dess test_dess)
 ADD_TEST(examples_equation test_equation)
 ADD_TEST(examples_qss test_qss)
 ADD_TEST(examples_fsa test_fsa)
+ADD_TEST(examples_decision test_decision)

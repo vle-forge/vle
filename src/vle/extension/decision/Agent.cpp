@@ -34,34 +34,58 @@ namespace vle { namespace extension { namespace decision {
 
 devs::Time Agent::init(const devs::Time& time)
 {
-    mState = Idle;
+    mState = Output;
     mCurrentTime = time;
+    mNextChangeTime = processChanges(time);
 
-    return devs::Time::infinity;
+    return 0.0;
 }
 
-void Agent::output(const devs::Time& /*time*/,
+void Agent::output(const devs::Time& time,
                    devs::ExternalEventList& output) const
 {
-    onOutput(output);
+    if (mState == Output) {
+        mCurrentTime = time;
+        onOutput(output);
+    }
 }
 
 devs::Time Agent::timeAdvance() const
 {
     switch (mState) {
-    case Idle:
-        return devs::Time::infinity;
-    default:
+    case Init:
+        return 0.0;
+    case Process:
+        if (mNextChangeTime.second == devs::Time::negativeInfinity or
+            mNextChangeTime.first == true) {
+            return 0.0;
+        } else {
+            return mNextChangeTime.second - mCurrentTime;
+        }
+    case Output:
+        return 0.0;
+    case UpdateFact:
         return 0.0;
     }
 
-    assert(false);
+    throw utils::InternalError();
 }
 
 void Agent::internalTransition(const devs::Time& time)
 {
     mCurrentTime = time;
-    mState = Idle;
+
+    switch (mState) {
+    case Init:
+    case Output:
+    case UpdateFact:
+        mNextChangeTime = processChanges(time);
+        mState = Process;
+        break;
+    case Process:
+        mState = Output;
+        break;
+    }
 }
 
 void Agent::externalTransition(
@@ -94,9 +118,7 @@ void Agent::externalTransition(
         }
     }
 
-    processChanges(time);
-
-    mState = Update;
+    mState = UpdateFact;
 }
 
 devs::Event::EventType Agent::confluentTransitions(
