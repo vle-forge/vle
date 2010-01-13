@@ -50,7 +50,7 @@ void Generic::beginExt()
     mNamesIt = mExternalValues.begin();
 }
 
-bool Generic::endExt()
+bool Generic::endExt() const
 {
     return mNamesIt == mExternalValues.end();
 }
@@ -60,14 +60,14 @@ void Generic::nextExt()
     ++mNamesIt;
 }
 
-std::string Generic::nameExt()
+std::string Generic::nameExt() const
 {
     return mNamesIt->first;
 }
 
 double Generic::valueExt(int shift)
 {
-    const std::string name = mNamesIt->first;
+    std::string name = mNamesIt->first;
     VariableIterators iterators;
 
     iterators.mValues = &mExternalValues.find(name)->second;

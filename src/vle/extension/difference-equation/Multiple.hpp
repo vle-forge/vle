@@ -27,9 +27,9 @@
 
 
 #ifndef VLE_EXTENSION_DIFFERENCE_EQUATION_MULTIPLE_HPP
-#define VLE_EXTENSION_DIFFERENCE_EQUATION_MULTPLE_HPP
+#define VLE_EXTENSION_DIFFERENCE_EQUATION_MULTIPLE_HPP 1
 
-#include <vle/extension/difference-equation/DifferenceEquation.hpp>
+#include <vle/extension/difference-equation/Base.hpp>
 
 namespace vle { namespace extension { namespace DifferenceEquation {
 
@@ -43,8 +43,14 @@ class VLE_EXTENSION_EXPORT Multiple : public Base
         MultipleValues() {}
         virtual ~MultipleValues() {}
 
+        Values::const_iterator begin() const
+        { return mDeque.begin(); }
+
         bool empty() const
         { return mDeque.empty(); }
+
+        Values::const_iterator end() const
+        { return mDeque.end(); }
 
         double front() const
         { return mDeque.front(); }
@@ -106,6 +112,14 @@ public:
 
             if (not *mIterators.mSetValues) {
                 *mIterators.mMultipleValues = value;
+                {
+                    int s = mEquation->size(name());
+
+                    if (s > 0
+                        and mIterators.mMultipleValues->size() > (size_t)s) {
+                        mIterators.mMultipleValues->pop_back();
+                    }
+                }
                 *mIterators.mSetValues = true;
             }
         }
@@ -195,6 +209,10 @@ public:
      * @return the initial value of internal variable.
      */
     virtual void initValue(const vle::devs::Time& time);
+
+protected:
+    const MultipleValuesMap& values() const
+    { return mValues; }
 
 private:
     void create(const std::string& name,

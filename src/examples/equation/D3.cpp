@@ -27,7 +27,7 @@
  */
 
 
-#include <vle/extension/DifferenceEquation.hpp>
+#include <vle/extension/difference-equation/Simple.hpp>
 
 namespace vle { namespace examples { namespace equation {
 

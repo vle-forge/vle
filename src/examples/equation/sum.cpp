@@ -27,10 +27,10 @@
  */
 
 
-#ifndef EXAMPLES_EQUATION_sum_HPP
-#define EXAMPLES_EQUATION_sum_HPP
+#ifndef EXAMPLES_EQUATION_SUM_HPP
+#define EXAMPLES_EQUATION_SUM_HPP 1
 
-#include <vle/extension/DifferenceEquation.hpp>
+#include <vle/extension/difference-equation/Generic.hpp>
 
 namespace vle { namespace examples { namespace equation {
 
@@ -38,30 +38,26 @@ class sum : public extension::DifferenceEquation::Generic
 {
 public:
     sum(const devs::DynamicsInit& model,
-       const devs::InitEventList& events) :
+        const devs::InitEventList& events) :
 	extension::DifferenceEquation::Generic(model, events)
-        {
-	    allSync();
-	}
+    { allSync(); }
 
     virtual ~sum() { }
 
     virtual double compute(const devs::Time& /* time */)
-	{
-	    double s = 0;
+    {
+        double s = 0;
 
-	    beginExt();
-	    while (not endExt()) {
-		s += valueExt(0);
-		nextExt();
-	    }
-	    return s;
-	}
+        beginExt();
+        while (not endExt()) {
+            s += valueExt(0);
+            nextExt();
+        }
+        return s;
+    }
 
     virtual double initValue(const devs::Time& time)
-	{
-	    return compute(time);
-	}
+    { return compute(time); }
 };
 
 }}} // namespace vle examples equation

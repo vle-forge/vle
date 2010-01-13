@@ -28,12 +28,10 @@
  */
 
 
-#ifndef VLE_TUTORIAL_0_PLANTLOUSE_HPP
-#define VLE_TUTORIAL_0_PLANTLOUSE_HPP
+#ifndef EXAMPLES_QSS_PLANTLOUSE_HPP
+#define EXAMPLES_QSS_PLANTLOUSE_HPP 1
 
-#include <vle/extension/DifferenceEquation.hpp>
-
-using namespace vle;
+#include <vle/extension/difference-equation/Simple.hpp>
 
 namespace vle { namespace examples { namespace qss {
 

@@ -31,7 +31,7 @@
 #ifndef VLE_EXTENSION_DIFFERENCE_EQUATION_HPP
 #define VLE_EXTENSION_DIFFERENCE_EQUATION_HPP 1
 
-#include <vle/extension/difference-equation/DifferenceEquation.hpp>
+#include <vle/extension/difference-equation/Base.hpp>
 #include <vle/extension/difference-equation/Generic.hpp>
 #include <vle/extension/difference-equation/Multiple.hpp>
 #include <vle/extension/difference-equation/Simple.hpp>

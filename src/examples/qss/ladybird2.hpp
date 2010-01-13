@@ -28,10 +28,10 @@
  */
 
 
-#ifndef VLE_TUTORIAL_0_LADYBIRD_HPP
-#define VLE_TUTORIAL_0_LADYBIRD_HPP
+#ifndef EXAMPLES_QSS_LADYBIRD_HPP
+#define EXAMPLES_QSS_LADYBIRD_HPP 1
 
-#include <vle/extension/DifferenceEquation.hpp>
+#include <vle/extension/difference-equation/Simple.hpp>
 
 namespace vle { namespace examples { namespace qss {
 

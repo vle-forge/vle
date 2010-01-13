@@ -1,5 +1,5 @@
 /**
- * @file vle/extension/difference-equation/DifferenceEquation.cpp
+ * @file vle/extension/difference-equation/Base.cpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -26,7 +26,7 @@
  */
 
 
-#include <vle/extension/difference-equation/DifferenceEquation.hpp>
+#include <vle/extension/difference-equation/Base.hpp>
 #include <vle/value/Tuple.hpp>
 #include <cmath>
 
@@ -234,6 +234,7 @@ void Base::initExternalVariable(const std::string& name)
     if (mExternalValues.find(name) == mExternalValues.end()) {
         mReceivedValues[name] = false;
         mExternalValues[name] = Values();
+        mSize[name] = DEFAULT_SIZE;
     }
 
     if (mInitExternalValues.find(name) != mInitExternalValues.end()) {
@@ -267,7 +268,11 @@ double Base::val(const std::string& name,
         }
 
         if (shift == 0) {
-            ValuesIterator itv = mExternalValues.find(name)->second.begin();
+            if (it->empty()) {
+                throw utils::ModellingError(fmt(_(
+                            "[%1%] - %2%[0] - shift too large")) %
+                    getModelName() % name);
+            }
 
             return it->front();
         } else {
@@ -293,6 +298,12 @@ double Base::val(const std::string& name,
         }
 
         if (shift == 0) {
+            if (it->empty()) {
+                throw utils::ModellingError(fmt(_(
+                            "[%1%] - %2%[0] - shift too large")) %
+                    getModelName() % name);
+            }
+
             return it->front();
         } else {
             if ((int)(it->size() - 1) < -shift) {
@@ -314,7 +325,7 @@ void Base::processUpdate(const std::string& name,
     bool ok = true;
     bool sync = mSynchros.find(name) != mSynchros.end();
 
-    if (mState == POST_SEND_INIT) {
+    if (mState == SEND_INIT or mState == POST_SEND_INIT) {
 
         if (not (mControl and mDepends.find(name) != mDepends.end())) {
             throw utils::ModellingError(fmt(_(
@@ -346,6 +357,7 @@ void Base::processUpdate(const std::string& name,
          mInitExternalValues.find(name) != mInitExternalValues.end() and
          not mInitExternalValues[name].empty())) {
         initExternalVariable(name);
+        sync = mSynchros.find(name) != mSynchros.end();
     }
 
     if (ok) {

@@ -31,7 +31,7 @@
 #define MODEL_LIFEGAME_CELL_HPP
 
 #include <vle/devs.hpp>
-#include <vle/extension.hpp>
+#include <vle/extension/CellDevs.hpp>
 
 namespace vle { namespace examples { namespace lifegame {
 

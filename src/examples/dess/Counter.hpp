@@ -27,7 +27,6 @@
  */
 
 
-#include <vle/extension.hpp>
 #include <vle/devs.hpp>
 
 namespace vle { namespace examples { namespace dess {
@@ -51,7 +50,8 @@ namespace vle { namespace examples { namespace dess {
         virtual void externalTransition(const devs::ExternalEventList& evts,
                                         const devs::Time& time);
 
-        virtual value::Value* observation(const devs::ObservationEvent& e) const;
+        virtual value::Value* observation(
+            const devs::ObservationEvent& e) const;
 
     private:
         devs::Time mDate;

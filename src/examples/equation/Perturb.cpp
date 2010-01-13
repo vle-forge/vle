@@ -27,7 +27,7 @@
  */
 
 
-#include <vle/extension/DifferenceEquation.hpp>
+#include <vle/extension/difference-equation/Base.hpp>
 #include <vle/extension/fsa/Statechart.hpp>
 
 using namespace boost::assign;

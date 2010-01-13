@@ -27,7 +27,7 @@
 
 
 #ifndef VLE_EXTENSION_DIFFERENCE_EQUATION_GENERIC_HPP
-#define VLE_EXTENSION_DIFFERENCE_EQUATION_GENERIC_HPP
+#define VLE_EXTENSION_DIFFERENCE_EQUATION_GENERIC_HPP 1
 
 #include <vle/extension/difference-equation/Simple.hpp>
 
@@ -73,7 +73,7 @@ public:
      * @return true if the iterator is at the ending
      * of the list of external variables.
      */
-    bool endExt();
+    bool endExt() const;
 
     /**
      * @brief Return the value of current external variable.
@@ -85,7 +85,7 @@ public:
      * @brief Return the name of current external variable.
      * @return the name of current variable.
      */
-    std::string nameExt();
+    std::string nameExt() const;
 
     /**
      * @brief The iterator points to the next external variable.

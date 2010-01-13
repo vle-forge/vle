@@ -1,5 +1,5 @@
 /**
- * @file vle/extension/difference-equation/DifferenceEquation.hpp
+ * @file vle/extension/difference-equation/Base.hpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -26,13 +26,12 @@
  */
 
 
-#ifndef VLE_EXTENSION_DIFFERENCE_EQUATION_DIFFERENCE_EQUATION_HPP
-#define VLE_EXTENSION_DIFFERENCE_EQUATION_DIFFERENCE_EQUATION_HPP 1
+#ifndef VLE_EXTENSION_DIFFERENCE_EQUATION_BASE_HPP
+#define VLE_EXTENSION_DIFFERENCE_EQUATION_BASE_HPP 1
 
 #include <vle/extension/DllDefines.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/utils/DateTime.hpp>
-#include <set>
 
 namespace vle { namespace extension { namespace DifferenceEquation {
 
@@ -206,8 +205,15 @@ public:
      * @param name the name of external variable.
      * @param size the size of buffer.
      */
-    void size(const std::string& /* name */,
-              int /* size */);
+    void size(const std::string& name, int size);
+
+    /**
+     * @brief Get the size of value buffer of an external
+     * variable.
+     * @param name the name of external variable.
+     */
+    int size(const std::string& name)
+    { return mSize.find(name)->second; }
 
     /**
      * @brief Returns the time step of equation.
@@ -280,10 +286,11 @@ protected:
     void depends(const std::string& name,
                  bool synchronized);
 
+    const ValuesMap& externalValues() const
+    { return mExternalValues; }
+
     bool init(const VariableIterators& it) const
-    {
-        return (mState == INIT and not it.mInitValues->empty());
-    }
+    { return (mState == INIT and not it.mInitValues->empty()); }
 
     void initExternalVariable(const std::string& name);
 
@@ -293,6 +300,9 @@ protected:
                        const vle::devs::Time& time);
 
     void pushNoEDValues();
+
+    const ReceivedMap& receivedValues() const
+    { return mReceivedValues; }
 
     virtual double val(const std::string& name,
                        const Values* it,

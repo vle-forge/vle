@@ -29,7 +29,7 @@
 #ifndef VLE_EXTENSION_DIFFERENCE_EQUATION_SIMPLE_HPP
 #define VLE_EXTENSION_DIFFERENCE_EQUATION_SIMPLE_HPP 1
 
-#include <vle/extension/difference-equation/DifferenceEquation.hpp>
+#include <vle/extension/difference-equation/Base.hpp>
 
 namespace vle { namespace extension { namespace DifferenceEquation {
 
@@ -133,6 +133,10 @@ public:
      */
     std::string name() const
     { return mVariableName; }
+
+protected:
+    const Values& values() const
+    { return mValues; }
 
 private:
     double val() const;

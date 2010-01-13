@@ -28,7 +28,7 @@
  */
 
 
-#include <vle/extension.hpp>
+#include <vle/extension/PetriNet.hpp>
 #include <vle/devs.hpp>
 
 namespace vle { namespace examples { namespace petrinet {

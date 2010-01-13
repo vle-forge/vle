@@ -31,7 +31,7 @@
 #define FSA_STAGE_HPP
 
 #include <vle/extension/fsa/Statechart.hpp>
-#include <vle/extension/DifferenceEquation.hpp>
+#include <vle/extension/difference-equation/Base.hpp>
 
 enum state_t {INIT = 1, PS, LV, IF, DF, DRG, FSLA, MP, FIN };
 

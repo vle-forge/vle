@@ -1,5 +1,5 @@
 /**
- * @file examples/equation/B2.hpp
+ * @file vle/extension/DifferenceEquationDbg.hpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -9,8 +9,6 @@
  * This file is a part of the VLE environment
  * http://www.vle-project.org
  *
- * Copyright (C) 2003-2007 Gauthier Quesnel quesnel@users.sourceforge.net
- * Copyright (C) 2007-2009 INRA http://www.inra.fr
  * Copyright (C) 2003-2009 ULCO http://www.univ-littoral.fr
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,29 +26,11 @@
  */
 
 
-#ifndef EXAMPLES_EQUATION_B2_HPP
-#define EXAMPLES_EQUATION_B2_HPP
+#ifndef VLE_EXTENSION_DIFFERENCE_EQUATION_DBG_HPP
+#define VLE_EXTENSION_DIFFERENCE_EQUATION_DBG_HPP 1
 
-#include <vle/extension/difference-equation/Simple.hpp>
-
-namespace vle { namespace examples { namespace equation {
-
-    class B2 : public extension::DifferenceEquation::Simple
-    {
-        Var b;
-        Sync a;
-        Nosync c;
-
-    public:
-        B2(const devs::DynamicsInit& model,
-           const devs::InitEventList& events);
-        virtual ~B2() { }
-
-        virtual double compute(const devs::Time& time);
-    };
-
-}}} // namespace vle examples equation
-
-DECLARE_NAMED_DYNAMICS(B2, vle::examples::equation::B2)
+#include <vle/extension/difference-equation/GenericDbg.hpp>
+#include <vle/extension/difference-equation/MultipleDbg.hpp>
+#include <vle/extension/difference-equation/SimpleDbg.hpp>
 
 #endif

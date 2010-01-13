@@ -30,7 +30,7 @@
 #ifndef EXAMPLES_EQUATION_E1_HPP
 #define EXAMPLES_EQUATION_E1_HPP
 
-#include <vle/extension/DifferenceEquation.hpp>
+#include <vle/extension/difference-equation/Multiple.hpp>
 
 namespace vle { namespace examples { namespace equation {
 

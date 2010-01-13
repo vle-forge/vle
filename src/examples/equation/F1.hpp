@@ -29,7 +29,7 @@
 #ifndef EXAMPLES_EQUATION_F1_HPP
 #define EXAMPLES_EQUATION_F1_HPP
 
-#include <vle/extension/DifferenceEquation.hpp>
+#include <vle/extension/difference-equation/Multiple.hpp>
 
 namespace vle { namespace examples { namespace equation {
 
