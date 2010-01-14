@@ -30,7 +30,8 @@
 #ifndef EXAMPLES_GENS_GENEXECUTIVE_HPP
 #define EXAMPLES_GENS_GENEXECUTIVE_HPP
 
-#include <vle/devs.hpp>
+#include <vle/devs/Executive.hpp>
+#include <vle/devs/ExecutiveDbg.hpp>
 #include <stack>
 
 namespace vle { namespace examples { namespace gens {
@@ -65,6 +66,6 @@ namespace vle { namespace examples { namespace gens {
 
 }}} // namespace vle examples gens
 
-DECLARE_NAMED_EXECUTIVE(executive, vle::examples::gens::GenExecutive)
+DECLARE_NAMED_EXECUTIVE_DBG(executive, vle::examples::gens::GenExecutive)
 
 #endif

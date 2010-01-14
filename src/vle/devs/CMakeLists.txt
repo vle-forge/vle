@@ -30,11 +30,11 @@ SET(DEVS_CPP Coordinator.cpp Dynamics.cpp DynamicsDbg.cpp Event.cpp
 
 SET(DEVS_HPP Attribute.hpp Coordinator.hpp Dynamics.hpp DynamicsDbg.hpp
   DllDefines.hpp DynamicsWrapper.hpp Event.hpp EventList.hpp EventView.hpp
-  EventTable.hpp Executive.hpp ExternalEvent.hpp ExternalEventList.hpp
-  FinishView.hpp RequestEvent.hpp RequestEventList.hpp InternalEvent.hpp
-  LocalStreamWriter.hpp ModelFactory.hpp NetStreamWriter.hpp Observable.hpp
-  Pools.hpp RootCoordinator.hpp Simulator.hpp ObservationEvent.hpp
-  StreamWriter.hpp TimedView.hpp Time.hpp View.hpp)
+  EventTable.hpp Executive.hpp ExecutiveDbg.hpp ExternalEvent.hpp
+  ExternalEventList.hpp FinishView.hpp RequestEvent.hpp RequestEventList.hpp
+  InternalEvent.hpp LocalStreamWriter.hpp ModelFactory.hpp NetStreamWriter.hpp
+  Observable.hpp Pools.hpp RootCoordinator.hpp Simulator.hpp
+  ObservationEvent.hpp StreamWriter.hpp TimedView.hpp Time.hpp View.hpp)
 
 ADD_LIBRARY(vledevs SHARED ${DEVS_CPP};${DEVS_HPP})
 

@@ -78,7 +78,7 @@ namespace vle { namespace devs {
     };
 
     /**
-     * @brief Dynamics class for the Barros DEVS extension. Provite graph
+     * @brief Dynamics class for the Barros DEVS extension. Provide graph
      * manipulation at runtime using namespace graph and the coordinator. By
      * default, this model does nothing and it will be inherit to build
      * simulation components.
@@ -188,7 +188,7 @@ namespace vle { namespace devs {
          * @param observable the name of the observable to attach.
          * @throw utils::InternalError if dynamics not exist.
          */
-        const graph::AtomicModel*
+        virtual const graph::AtomicModel*
             createModel(
                 const std::string& name,
                 const std::vector < std::string >& inputs,
@@ -204,7 +204,7 @@ namespace vle { namespace devs {
          * @param modelname the new name of the model.
          * @throw utils::badArg if modelname already exist.
          */
-        const graph::Model*
+        virtual const graph::Model*
             createModelFromClass(
                 const std::string& classname,
                 const std::string& modelname);
@@ -215,24 +215,24 @@ namespace vle { namespace devs {
          * deleted from event table.
          * @param modelname the name of model to delete.
          */
-        void delModel(const std::string& modelname);
+        virtual void delModel(const std::string& modelname);
 
-        void addConnection(const std::string& modelsource,
-                           const std::string& outputport,
-                           const std::string& modeldestination,
-                           const std::string& inputport);
-        void removeConnection(const std::string& modelsource,
-                              const std::string& outputport,
-                              const std::string& modeldestination,
-                              const std::string& inputport);
-        void addInputPort(const std::string& modelName,
-                          const std::string& portName);
-        void addOutputPort(const std::string& modelName,
-                           const std::string& portName);
-        void removeInputPort(const std::string& modelName,
-                             const std::string& portName);
-        void removeOutputPort(const std::string& modelName,
-                              const std::string& portName);
+        virtual void addConnection(const std::string& modelsource,
+                                   const std::string& outputport,
+                                   const std::string& modeldestination,
+                                   const std::string& inputport);
+        virtual void removeConnection(const std::string& modelsource,
+                                      const std::string& outputport,
+                                      const std::string& modeldestination,
+                                      const std::string& inputport);
+        virtual void addInputPort(const std::string& modelName,
+                                  const std::string& portName);
+        virtual void addOutputPort(const std::string& modelName,
+                                   const std::string& portName);
+        virtual void removeInputPort(const std::string& modelName,
+                                     const std::string& portName);
+        virtual void removeOutputPort(const std::string& modelName,
+                                      const std::string& portName);
 
 
         // / / / /

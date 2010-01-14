@@ -36,40 +36,40 @@ DynamicsDbg::DynamicsDbg(const DynamicsInit& init,
                          const InitEventList& events)
     : Dynamics(init, events), mDynamics(0)
 {
-    TraceDevs(fmt(_("                     %1% constructor")) % getModelName());
-}
+    TraceDevs(fmt(_("                     %1% [DEVS] constructor")) %
+              getModelName()); }
 
 Time DynamicsDbg::init(const Time& time)
 {
-    TraceDevs(fmt(_("%1$20.10g %2% init")) % time % getModelName());
+    TraceDevs(fmt(_("%1$20.10g %2% [DEVS] init")) % time % getModelName());
 
     return mDynamics->init(time);
 }
 
 void DynamicsDbg::output(const Time& time, ExternalEventList& output) const
 {
-    TraceDevs(fmt(_("%1$20.10g %2% output")) % time % getModelName());
+    TraceDevs(fmt(_("%1$20.10g %2% [DEVS] output")) % time % getModelName());
 
     mDynamics->output(time, output);
 
     if (output.empty()) {
         TraceDevs(fmt(
-                _("                .... %1% output returns empty output")) %
-            getModelName());
+                _("                .... %1% [DEVS] output returns "
+                  "empty output")) % getModelName());
     } else {
         TraceDevs(fmt(
-                _("                .... %1% output returns %2%")) %
-            getModelName() % output);
+                _("                .... %1% [DEVS] output returns "
+                  "%2%")) % getModelName() % output);
     }
 }
 
 Time DynamicsDbg::timeAdvance() const
 {
-    TraceDevs(fmt(_("                     %1% ta")) % getModelName());
+    TraceDevs(fmt(_("                     %1% [DEVS] ta")) % getModelName());
 
     Time time(mDynamics->timeAdvance());
 
-    TraceDevs(fmt(_("                .... %1% ta returns %2%")) %
+    TraceDevs(fmt(_("                .... %1% [DEVS] ta returns %2%")) %
               getModelName() % time);
 
     return time;
@@ -77,7 +77,7 @@ Time DynamicsDbg::timeAdvance() const
 
 void DynamicsDbg::internalTransition(const Time& time)
 {
-    TraceDevs(fmt(_("%1$20.10g %2% internal transition")) % time %
+    TraceDevs(fmt(_("%1$20.10g %2% [DEVS] internal transition")) % time %
               getModelName());
 
     mDynamics->internalTransition(time);
@@ -86,7 +86,7 @@ void DynamicsDbg::internalTransition(const Time& time)
 void DynamicsDbg::externalTransition(const ExternalEventList& event,
                                      const Time& time)
 {
-    TraceDevs(fmt(_("%1$20.10g %2% external transition: [%3%]")) % time
+    TraceDevs(fmt(_("%1$20.10g %2% [DEVS] external transition: [%3%]")) % time
               % getModelName() % event);
 
     mDynamics->externalTransition(event, time);
@@ -97,7 +97,7 @@ Event::EventType DynamicsDbg::confluentTransitions(
     const ExternalEventList& extEventlist) const
 {
     TraceDevs(fmt(
-            _("%1$20.10g %2% confluent transition: [%3%]")) % time %
+            _("%1$20.10g %2% [DEVS] confluent transition: [%3%]")) % time %
         getModelName() % extEventlist);
 
     return mDynamics->confluentTransitions(time, extEventlist);
@@ -107,18 +107,18 @@ void DynamicsDbg::request(const RequestEvent& event,
                           const Time& time,
                           ExternalEventList& output) const
 {
-    TraceDevs(fmt(_("%1$20.10g %2% request: [%3%]")) % time % getModelName() %
-              event);
+    TraceDevs(fmt(_("%1$20.10g %2% [DEVS] request: [%3%]")) % time %
+              getModelName() % event);
 
     mDynamics->request(event, time, output);
 
     if (output.empty()) {
         TraceDevs(fmt(
-                _("                .... %1% request returns empty output")) %
-            getModelName());
+                _("                .... %1% [DEVS] request returns empty "
+                  "output")) % getModelName());
     } else {
         TraceDevs(fmt(
-                _("                .... %1% request returns %2%")) %
+                _("                .... %1% [DEVS] request returns %2%")) %
             getModelName() % output);
     }
 }
@@ -126,7 +126,7 @@ void DynamicsDbg::request(const RequestEvent& event,
 vle::value::Value* DynamicsDbg::observation(
     const ObservationEvent& event) const
 {
-    TraceDevs(fmt(_("%1$20.10g %2% observation: [%3%]")) %
+    TraceDevs(fmt(_("%1$20.10g %2% [DEVS] observation: [%3%]")) %
               event.getTime() % getModelName() % event);
 
     return mDynamics->observation(event);
@@ -134,7 +134,7 @@ vle::value::Value* DynamicsDbg::observation(
 
 void DynamicsDbg::finish()
 {
-    TraceDevs(fmt(_("                     %1% finish")) % getModelName());
+    TraceDevs(fmt(_("                     %1% [DEVS] finish")) % getModelName());
 
     mDynamics->finish();
 }

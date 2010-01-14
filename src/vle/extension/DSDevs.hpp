@@ -293,50 +293,49 @@ namespace vle { namespace extension {
             value::Set* currentbag);
 
     protected:
-        bool addConnection(const std::string& srcModelName,
-                           const std::string& srcPortName,
-                           const std::string& dstModelName,
-                           const std::string& dstPortName);
+        bool addConnectionT(const std::string& srcModelName,
+                            const std::string& srcPortName,
+                            const std::string& dstModelName,
+                            const std::string& dstPortName);
+        bool changeConnectionT(const std::string& srcModelName,
+                               const std::string& srcPortName,
+                               const std::string& oldDstModelName,
+                               const std::string& oldDstPortName,
+                               const std::string& newDstModelName,
+                               const std::string& newDstPortName);
 
-        bool changeConnection(const std::string& srcModelName,
-                              const std::string& srcPortName,
-                              const std::string& oldDstModelName,
-                              const std::string& oldDstPortName,
-                              const std::string& newDstModelName,
-                              const std::string& newDstPortName);
+        bool removeConnectionT(const std::string& srcModelName,
+                               const std::string& srcPortName,
+                               const std::string& dstModelName,
+                               const std::string& dstPortName);
 
-        bool removeConnection(const std::string& srcModelName,
-                              const std::string& srcPortName,
-                              const std::string& dstModelName,
-                              const std::string& dstPortName);
+        bool addModelT(const std::string& prefixModelName,
+                       const std::string& className,
+                       const value::Set* connection);
 
-        bool addModel(const std::string& prefixModelName,
-                      const std::string& className,
-                      const value::Set* connection);
+        bool removeModelT(const std::string& modelName);
 
-        bool removeModel(const std::string& modelName);
+        bool changeModelT(const std::string& modelName,
+                          const std::string& className,
+                          const std::string& newClassName);
 
-        bool changeModel(const std::string& modelName,
+        bool buildModelT(const std::string& prefixModelName,
                          const std::string& className,
-                         const std::string& newClassName);
+                         const std::string& xmlCode,
+                         const std::string& xmlDynamics,
+                         const std::string& xmlInits);
 
-        bool buildModel(const std::string& prefixModelName,
-                        const std::string& className,
-                        const std::string& xmlCode,
-                        const std::string& xmlDynamics,
-                        const std::string& xmlInits);
-
-        bool addInputPort(const std::string& modelName,
-                          const std::string& portName);
-
-        bool addOutputPort(const std::string& modelName,
+        bool addInputPortT(const std::string& modelName,
                            const std::string& portName);
 
-        bool removeInputPort(const std::string& modelName,
-                             const std::string& portName);
+        bool addOutputPortT(const std::string& modelName,
+                            const std::string& portName);
 
-        bool removeOutputPort(const std::string& modelName,
+        bool removeInputPortT(const std::string& modelName,
                               const std::string& portName);
+
+        bool removeOutputPortT(const std::string& modelName,
+                               const std::string& portName);
 
         const graph::ModelList& getModelList() const;
 

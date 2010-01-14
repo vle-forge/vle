@@ -101,7 +101,7 @@ devs::Event::EventType DSDevs::confluentTransitions(
 }
 
 void DSDevs::externalTransition(const devs::ExternalEventList& event,
-                                   const devs::Time& /* time */)
+                                const devs::Time& /* time */)
 {
     devs::ExternalEventList::const_iterator it = event.begin();
 
@@ -145,9 +145,9 @@ value::Value* DSDevs::observation(const devs::ObservationEvent& event) const
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 value::Map* DSDevs::buildMessageAddConnection(const std::string& srcModelName,
-                                             const std::string& srcPortName,
-                                             const std::string& dstModelName,
-                                             const std::string& dstPortName)
+                                              const std::string& srcPortName,
+                                              const std::string& dstModelName,
+                                              const std::string& dstPortName)
 {
     value::Map* lst =value::Map::create();
     lst->addString("srcModelName", srcModelName);
@@ -190,10 +190,10 @@ value::Map* DSDevs::buildMessageRemoveConnection(
 }
 
 value::Map* DSDevs::buildMessageAddModel(const std::string& prefixModelName,
-                                        const std::string& className,
-                                        const std::string& xmlDynamics,
-                                        const std::string& xmlInits,
-                                        value::Set* connection)
+                                         const std::string& className,
+                                         const std::string& xmlDynamics,
+                                         const std::string& xmlInits,
+                                         value::Set* connection)
 {
     value::Map* lst =value::Map::create();
     lst->addString("prefixModelName", prefixModelName);
@@ -212,8 +212,8 @@ value::Map* DSDevs::buildMessageRemoveModel(const std::string& modelName)
 }
 
 value::Map* DSDevs::buildMessageChangeModel(const std::string& modelName,
-                                           const std::string& className,
-                                           const std::string& newClassName)
+                                            const std::string& className,
+                                            const std::string& newClassName)
 {
     value::Map* lst =value::Map::create();
     lst->addString("modelName", modelName);
@@ -223,10 +223,10 @@ value::Map* DSDevs::buildMessageChangeModel(const std::string& modelName,
 }
 
 value::Map* DSDevs::buildMessageBuildModel(const std::string& prefixModelName,
-                                          const std::string& className,
-                                          const std::string& xmlCode,
-                                          const std::string& xmlDynamics,
-                                          const std::string& xmlInits)
+                                           const std::string& className,
+                                           const std::string& xmlCode,
+                                           const std::string& xmlDynamics,
+                                           const std::string& xmlInits)
 {
     value::Map* lst =value::Map::create();
     lst->addString("prefixModelName", prefixModelName);
@@ -238,15 +238,6 @@ value::Map* DSDevs::buildMessageBuildModel(const std::string& prefixModelName,
 }
 
 value::Map* DSDevs::buildMessageAddInputPort(const std::string& modelName,
-                                            const std::string& portName)
-{
-    value::Map* lst =value::Map::create();
-    lst->addString("modelName", modelName);
-    lst->addString("portName", portName);
-    return lst;
-}
-
-value::Map* DSDevs::buildMessageAddOutputPort(const std::string& modelName,
                                              const std::string& portName)
 {
     value::Map* lst =value::Map::create();
@@ -255,8 +246,17 @@ value::Map* DSDevs::buildMessageAddOutputPort(const std::string& modelName,
     return lst;
 }
 
+value::Map* DSDevs::buildMessageAddOutputPort(const std::string& modelName,
+                                              const std::string& portName)
+{
+    value::Map* lst =value::Map::create();
+    lst->addString("modelName", modelName);
+    lst->addString("portName", portName);
+    return lst;
+}
+
 value::Map* DSDevs::buildMessageRemoveInputPort(const std::string& modelName,
-                                               const std::string& portName)
+                                                const std::string& portName)
 {
     value::Map* lst =value::Map::create();
     lst->addString("modelName", modelName);
@@ -265,7 +265,7 @@ value::Map* DSDevs::buildMessageRemoveInputPort(const std::string& modelName,
 }
 
 value::Map* DSDevs::buildMessageRemoveOutputPort(const std::string& modelName,
-                                                const std::string& portName)
+                                                 const std::string& portName)
 {
     value::Map* lst =value::Map::create();
     lst->addString("modelName", modelName);
@@ -276,13 +276,13 @@ value::Map* DSDevs::buildMessageRemoveOutputPort(const std::string& modelName,
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 value::Set* DSDevs::addToBagAddConnection(const std::string& srcModelName,
-                                         const std::string& srcPortName,
-                                         const std::string& dstModelName,
-                                         const std::string& dstPortName,
-                                         value::Set* currentbag)
+                                          const std::string& srcPortName,
+                                          const std::string& dstModelName,
+                                          const std::string& dstPortName,
+                                          value::Set* currentbag)
 {
     value::Map* mp = buildMessageAddConnection(srcModelName, srcPortName,
-                                              dstModelName, dstPortName);
+                                               dstModelName, dstPortName);
     mp->addString("action", "addStringConnection");
 
     if (currentbag == 0) {
@@ -293,12 +293,12 @@ value::Set* DSDevs::addToBagAddConnection(const std::string& srcModelName,
 }
 
 value::Set* DSDevs::addToBagChangeConnection(const std::string& srcModelName,
-                                            const std::string& srcPortName,
-                                            const std::string& oldDstModelName,
-                                            const std::string& oldDstPortName,
-                                            const std::string& newDstModelName,
-                                            const std::string& newDstPortName,
-                                            value::Set* currentbag)
+                                             const std::string& srcPortName,
+                                             const std::string& oldDstModelName,
+                                             const std::string& oldDstPortName,
+                                             const std::string& newDstModelName,
+                                             const std::string& newDstPortName,
+                                             value::Set* currentbag)
 {
     value::Map* mp = buildMessageChangeConnection(
         srcModelName, srcPortName, oldDstModelName, oldDstPortName,
@@ -313,13 +313,13 @@ value::Set* DSDevs::addToBagChangeConnection(const std::string& srcModelName,
 
 
 value::Set* DSDevs::addToBagRemoveConnection(const std::string& srcModelName,
-                                            const std::string& srcPortName,
-                                            const std::string& dstModelName,
-                                            const std::string& dstPortName,
-                                            value::Set* currentbag)
+                                             const std::string& srcPortName,
+                                             const std::string& dstModelName,
+                                             const std::string& dstPortName,
+                                             value::Set* currentbag)
 {
     value::Map* mp = buildMessageRemoveConnection(srcModelName, srcPortName,
-                                                 dstModelName, dstPortName);
+                                                  dstModelName, dstPortName);
     mp->addString("action", "removeConnection");
     if (currentbag == 0) {
         currentbag = value::Set::create();
@@ -329,11 +329,11 @@ value::Set* DSDevs::addToBagRemoveConnection(const std::string& srcModelName,
 }
 
 value::Set* DSDevs::addToBagAddModel(const std::string& prefixModelName,
-                                    const std::string& className,
-                                    const std::string& xmlDynamics,
-                                    const std::string& xmlInits,
-                                    value::Set* connection,
-                                    value::Set* currentbag)
+                                     const std::string& className,
+                                     const std::string& xmlDynamics,
+                                     const std::string& xmlInits,
+                                     value::Set* connection,
+                                     value::Set* currentbag)
 {
     value::Map* mp = buildMessageAddModel(prefixModelName, className,
                                           xmlDynamics, xmlInits, connection);
@@ -347,7 +347,7 @@ value::Set* DSDevs::addToBagAddModel(const std::string& prefixModelName,
 
 
 value::Set* DSDevs::addToBagRemoveModel(const std::string& modelName,
-                                       value::Set* currentbag)
+                                        value::Set* currentbag)
 {
     value::Map* mp = buildMessageRemoveModel(modelName);
     mp->addString("action", "removeModel");
@@ -360,9 +360,9 @@ value::Set* DSDevs::addToBagRemoveModel(const std::string& modelName,
 
 
 value::Set* DSDevs::addToBagChangeModel(const std::string& modelName,
-                                       const std::string& className,
-                                       const std::string& newClassName,
-                                       value::Set* currentbag)
+                                        const std::string& className,
+                                        const std::string& newClassName,
+                                        value::Set* currentbag)
 {
     value::Map* mp = buildMessageChangeModel(modelName, className, newClassName);
     mp->addString("action", "changeModel");
@@ -374,11 +374,11 @@ value::Set* DSDevs::addToBagChangeModel(const std::string& modelName,
 }
 
 value::Set* DSDevs::addToBagBuildModel(const std::string& prefixModelName,
-                                      const std::string& className,
-                                      const std::string& xmlCode,
-                                      const std::string& xmlDynamics,
-                                      const std::string& xmlInits,
-                                      value::Set* currentbag)
+                                       const std::string& className,
+                                       const std::string& xmlCode,
+                                       const std::string& xmlDynamics,
+                                       const std::string& xmlInits,
+                                       value::Set* currentbag)
 {
     value::Map* mp = buildMessageBuildModel(prefixModelName, className, xmlCode,
                                             xmlDynamics, xmlInits);
@@ -391,8 +391,8 @@ value::Set* DSDevs::addToBagBuildModel(const std::string& prefixModelName,
 }
 
 value::Set* DSDevs::addToBagAddInputPort(const std::string& modelName,
-                                        const std::string& portName,
-                                        value::Set* currentbag)
+                                         const std::string& portName,
+                                         value::Set* currentbag)
 {
     value::Map* mp = buildMessageAddInputPort(modelName, portName);
     mp->addString("action", "addStringInputPort");
@@ -404,8 +404,8 @@ value::Set* DSDevs::addToBagAddInputPort(const std::string& modelName,
 }
 
 value::Set* DSDevs::addToBagAddOutputPort(const std::string& modelName,
-                                         const std::string& portName,
-                                         value::Set* currentbag)
+                                          const std::string& portName,
+                                          value::Set* currentbag)
 {
     value::Map* mp = buildMessageAddOutputPort(modelName, portName);
     mp->addString("action", "addStringOutputPort");
@@ -417,8 +417,8 @@ value::Set* DSDevs::addToBagAddOutputPort(const std::string& modelName,
 }
 
 value::Set* DSDevs::addToBagRemoveInputPort(const std::string& modelName,
-                                           const std::string& portName,
-                                           value::Set* currentbag)
+                                            const std::string& portName,
+                                            value::Set* currentbag)
 {
     value::Map* mp = buildMessageRemoveInputPort(modelName, portName);
     mp->addString("action", "removeInputPort");
@@ -430,8 +430,8 @@ value::Set* DSDevs::addToBagRemoveInputPort(const std::string& modelName,
 }
 
 value::Set* DSDevs::addToBagRemoveOutputPort(const std::string& modelName,
-                                            const std::string& portName,
-                                            value::Set* currentbag)
+                                             const std::string& portName,
+                                             value::Set* currentbag)
 {
     value::Map* mp = buildMessageRemoveOutputPort(modelName, portName);
     mp->addString("action", "removeOutputPort");
@@ -472,7 +472,7 @@ bool DSDevs::processSwitch(const std::string& action, const value::Map& val)
         return processBag(val);
     } else {
         throw utils::InternalError(fmt(_(
-                "DSDevs ext.: unknow action '%1%'")) % action);
+                    "DSDevs ext.: unknow action '%1%'")) % action);
     }
 }
 
@@ -493,14 +493,14 @@ bool DSDevs::processAddModel(const value::Map& val)
         cnt = &val.getSet("addConnection");
 
     m_state = ADD_MODEL;
-    return addModel(pre, cls, cnt);
+    return addModelT(pre, cls, cnt);
 }
 
 bool DSDevs::processRemoveModel(const value::Map& val)
 {
     const std::string& nam(val.getString("modelName"));
     m_state = REMOVE_MODEL;
-    return removeModel(nam);
+    return removeModelT(nam);
 }
 
 bool DSDevs::processChangeModel(const value::Map& val)
@@ -509,7 +509,7 @@ bool DSDevs::processChangeModel(const value::Map& val)
     const std::string& oldc(val.getString("className"));
     const std::string& newc(val.getString("newClassName"));
     m_state = CHANGE_MODEL;
-    return changeModel(nam, oldc, newc);
+    return changeModelT(nam, oldc, newc);
 }
 
 bool DSDevs::processBuildModel(const value::Map& val)
@@ -520,7 +520,7 @@ bool DSDevs::processBuildModel(const value::Map& val)
     const std::string& xmld(val.getString("xmlDynamics"));
     const std::string& xmli(val.getString("xmlInits"));
     m_state = BUILD_MODEL;
-    return buildModel(pre, cls, cod, xmld, xmli);
+    return buildModelT(pre, cls, cod, xmld, xmli);
 }
 
 bool DSDevs::processAddInputPort(const value::Map& val)
@@ -528,7 +528,7 @@ bool DSDevs::processAddInputPort(const value::Map& val)
     const std::string& mdl(val.getString("modelName"));
     const std::string& prt(val.getString("portName"));
     m_state = ADD_INPUTPORT;
-    return addInputPort(mdl, prt);
+    return addInputPortT(mdl, prt);
 }
 
 bool DSDevs::processRemoveInputPort(const value::Map& val)
@@ -536,7 +536,7 @@ bool DSDevs::processRemoveInputPort(const value::Map& val)
     const std::string& mdl(val.getString("modelName"));
     const std::string& prt(val.getString("portName"));
     m_state = REMOVE_INPUTPORT;
-    return removeInputPort(mdl, prt);
+    return removeInputPortT(mdl, prt);
 }
 
 bool DSDevs::processAddOutputPort(const value::Map& val)
@@ -544,7 +544,7 @@ bool DSDevs::processAddOutputPort(const value::Map& val)
     const std::string& mdl(val.getString("modelName"));
     const std::string& prt(val.getString("portName"));
     m_state = ADD_OUTPUTPORT;
-    return addOutputPort(mdl, prt);
+    return addOutputPortT(mdl, prt);
 }
 
 bool DSDevs::processRemoveOutputPort(const value::Map& val)
@@ -552,7 +552,7 @@ bool DSDevs::processRemoveOutputPort(const value::Map& val)
     const std::string& mdl(val.getString("modelName"));
     const std::string& prt(val.getString("portName"));
     m_state = REMOVE_OUTPUTPORT;
-    return removeOutputPort(mdl, prt);
+    return removeOutputPortT(mdl, prt);
 }
 
 bool DSDevs::processAddConnection(const value::Map& val)
@@ -562,7 +562,7 @@ bool DSDevs::processAddConnection(const value::Map& val)
     const std::string& dstmn(val.getString("dstModelName"));
     const std::string& dstpn(val.getString("dstPortName"));
     m_state = ADD_CONNECTION;
-    return addConnection(srcmn, srcpn, dstmn, dstpn);
+    return addConnectionT(srcmn, srcpn, dstmn, dstpn);
 }
 
 bool DSDevs::processRemoveConnection(const value::Map& val)
@@ -572,7 +572,7 @@ bool DSDevs::processRemoveConnection(const value::Map& val)
     const std::string& dstmn(val.getString("dstModelName"));
     const std::string& dstpn(val.getString("dstPortName"));
     m_state = REMOVE_CONNECTION;
-    return removeConnection(srcmn, srcpn, dstmn, dstpn);
+    return removeConnectionT(srcmn, srcpn, dstmn, dstpn);
 }
 
 bool DSDevs::processChangeConnection(const value::Map& val)
@@ -584,7 +584,7 @@ bool DSDevs::processChangeConnection(const value::Map& val)
     const std::string& newm(val.getString("newDstModelName"));
     const std::string& newp(val.getString("newDstPortName"));
     m_state = CHANGE_CONNECTION;
-    return changeConnection(srcmn, srcpn, oldm, oldp, newm, newp);
+    return changeConnectionT(srcmn, srcpn, oldm, oldp, newm, newp);
 }
 
 bool DSDevs::processBag(const value::Map& val)
@@ -612,10 +612,10 @@ bool DSDevs::processBag(const value::Map& val)
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-bool DSDevs::addConnection(const std::string& srcModelName,
-                           const std::string& srcPortName,
-                           const std::string& dstModelName,
-                           const std::string& dstPortName)
+bool DSDevs::addConnectionT(const std::string& srcModelName,
+                            const std::string& srcPortName,
+                            const std::string& dstModelName,
+                            const std::string& dstPortName)
 {
     try {
         Executive::addConnection(srcModelName, srcPortName, dstModelName,
@@ -627,12 +627,12 @@ bool DSDevs::addConnection(const std::string& srcModelName,
     }
 }
 
-bool DSDevs::changeConnection(const std::string& srcModelName,
-                              const std::string& srcPortName,
-                              const std::string& oldDstModelName,
-                              const std::string& oldDstPortName,
-                              const std::string& newDstModelName,
-                              const std::string& newDstPortName)
+bool DSDevs::changeConnectionT(const std::string& srcModelName,
+                               const std::string& srcPortName,
+                               const std::string& oldDstModelName,
+                               const std::string& oldDstPortName,
+                               const std::string& newDstModelName,
+                               const std::string& newDstPortName)
 {
     try {
         Executive::removeConnection(srcModelName, srcPortName, oldDstModelName,
@@ -647,10 +647,10 @@ bool DSDevs::changeConnection(const std::string& srcModelName,
     }
 }
 
-bool DSDevs::removeConnection(const std::string& srcModelName,
-                              const std::string& srcPortName,
-                              const std::string& dstModelName,
-                              const std::string& dstPortName)
+bool DSDevs::removeConnectionT(const std::string& srcModelName,
+                               const std::string& srcPortName,
+                               const std::string& dstModelName,
+                               const std::string& dstPortName)
 {
     try {
         Executive::removeConnection(srcModelName, srcPortName, dstModelName,
@@ -662,15 +662,15 @@ bool DSDevs::removeConnection(const std::string& srcModelName,
     }
 }
 
-bool DSDevs::addModel(const std::string& /* prefixModelName */,
-                      const std::string& /* className */,
-                      const value::Set* /* connection */)
+bool DSDevs::addModelT(const std::string& /* prefixModelName */,
+                       const std::string& /* className */,
+                       const value::Set* /* connection */)
 {
     throw utils::NotYetImplemented(_(
             "DSDevs ext.: addModel from class not allowed"));
 }
 
-bool DSDevs::removeModel(const std::string& modelname)
+bool DSDevs::removeModelT(const std::string& modelname)
 {
     try {
         Executive::delModel(modelname);
@@ -680,26 +680,26 @@ bool DSDevs::removeModel(const std::string& modelname)
     }
 }
 
-bool DSDevs::changeModel(const std::string& /*modelName*/,
-                         const std::string& /*className*/,
-                         const std::string& /*newClassName*/)
+bool DSDevs::changeModelT(const std::string& /*modelName*/,
+                          const std::string& /*className*/,
+                          const std::string& /*newClassName*/)
 {
     throw utils::NotYetImplemented(_(
             "DSDevs ext.: changeModel not allowed"));
 }
 
-bool DSDevs::buildModel(const std::string& /*prefixModelName*/,
-                        const std::string& /*className*/,
-                        const std::string& /*xmlCode*/,
-                        const std::string& /*xmlDynamics*/,
-                        const std::string& /*xmlInits*/)
+bool DSDevs::buildModelT(const std::string& /*prefixModelName*/,
+                         const std::string& /*className*/,
+                         const std::string& /*xmlCode*/,
+                         const std::string& /*xmlDynamics*/,
+                         const std::string& /*xmlInits*/)
 {
     throw utils::NotYetImplemented(_(
             "DSDevs ext.: buildModel Not yet available"));
 }
 
-bool DSDevs::addInputPort(const std::string& modelName,
-                          const std::string& portName)
+bool DSDevs::addInputPortT(const std::string& modelName,
+                           const std::string& portName)
 {
     try {
         Executive::addInputPort(modelName, portName);
@@ -710,8 +710,8 @@ bool DSDevs::addInputPort(const std::string& modelName,
     }
 }
 
-bool DSDevs::addOutputPort(const std::string& modelName,
-                           const std::string& portName)
+bool DSDevs::addOutputPortT(const std::string& modelName,
+                            const std::string& portName)
 {
     try {
         Executive::addOutputPort(modelName, portName);
@@ -722,8 +722,8 @@ bool DSDevs::addOutputPort(const std::string& modelName,
     }
 }
 
-bool DSDevs::removeInputPort(const std::string& modelName,
-                             const std::string& portName)
+bool DSDevs::removeInputPortT(const std::string& modelName,
+                              const std::string& portName)
 {
     try {
         Executive::removeInputPort(modelName, portName);
@@ -735,8 +735,8 @@ bool DSDevs::removeInputPort(const std::string& modelName,
     }
 }
 
-bool DSDevs::removeOutputPort(const std::string& modelName,
-                              const std::string& portName)
+bool DSDevs::removeOutputPortT(const std::string& modelName,
+                               const std::string& portName)
 {
     try {
         Executive::removeOutputPort(modelName, portName);
