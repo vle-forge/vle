@@ -1,5 +1,5 @@
 /**
- * @file vle/gvle/conditions/DifferenceEquation/Variables.cpp
+ * @file vle/gvle/modeling/DifferenceEquation/Variables.cpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -26,12 +26,12 @@
  */
 
 
-#include <vle/gvle/conditions/DifferenceEquation/Variables.hpp>
+#include <vle/gvle/modeling/difference-equation/Variables.hpp>
 #include <vle/gvle/SimpleTypeBox.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
-namespace vle { namespace gvle { namespace conditions {
+namespace vle { namespace gvle { namespace modeling {
 
 Variables::ValuesTreeView::ValuesTreeView(
     BaseObjectType* cobject,
@@ -96,8 +96,8 @@ bool Variables::ValuesTreeView::on_button_press_event(GdkEventButton* event)
 
 void Variables::ValuesTreeView::onAdd()
 {
-
     SimpleTypeBox box(_("Value"), "");
+
     try {
 	double value = boost::lexical_cast< double >(
 	    boost::trim_copy(box.run()));
@@ -278,6 +278,7 @@ void Variables::VariablesTreeView::onAdd()
 {
     m_name->set_text("");
     m_value->set_text("");
+    m_dialog->set_focus(*m_name);
     if (m_dialog->run() == Gtk::RESPONSE_ACCEPT) {
 	if (not m_name->get_text().empty()) {
 	    try {
@@ -293,9 +294,7 @@ void Variables::VariablesTreeView::onAdd()
 			    boost::lexical_cast <std::string> (value);
 		    }
 		}
-	    } catch(const boost::bad_lexical_cast& e ) {
-
-	    }
+	    } catch(const boost::bad_lexical_cast& e ) { }
 	}
     }
     m_dialog->hide();
@@ -329,12 +328,14 @@ void Variables::VariablesTreeView::onEdit()
 		m_columnsVariable.m_col_name);
 	    Glib::ustring oldValue = row.get_value(
 		m_columnsVariable.m_col_value);
+
 	    m_name->set_text(oldName);
 	    m_value->set_text(oldValue);
+            m_dialog->set_focus(*m_name);
 	    if (m_dialog->run() == Gtk::RESPONSE_ACCEPT) {
 		try {
-
 		    std::string name = m_name->get_text();
+
 		    if (not exist(m_name->get_text())) {
 			row[m_columnsVariable.m_col_name] = name;
 			m_parent->getVectorValues(name) =
@@ -344,6 +345,7 @@ void Variables::VariablesTreeView::onEdit()
 		    if (not m_value->get_text().empty()) {
 			double value = boost::lexical_cast< double >(
 			    m_value->get_text());
+
 			row[m_columnsVariable.m_col_value] =
 			    boost::lexical_cast <std::string> (value);
 		    } else
@@ -464,4 +466,4 @@ bool Variables::validPort(const vpz::Condition& condition,
     return false;
 }
 
-}}}
+}}} // namespace vle gvle modeling

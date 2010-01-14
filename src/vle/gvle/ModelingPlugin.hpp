@@ -112,6 +112,26 @@ public:
                         const std::string& buffer) = 0;
 
     /**
+     * @brief Call to start the graphics interfaces. Use it to show the
+     * Gtk::Dialog for instance. This function is called each time user selects
+     * the plug-in.
+     * @param condition The condition to modify.
+     * @return true if successful, otherwise false
+     */
+    virtual bool start(vpz::Condition& condition) = 0;
+
+    /**
+     * @brief Call to start the graphic interface. Use it to show the
+     * Gtk::Dialog for instance. This function is called each time user select
+     * the plug-in from the parameters treeview.
+     * @param condition The condition to modify.
+     * @param parameters The selected parameters to modify.
+     * @return true if successful, otherwise false
+     */
+    virtual bool start(vpz::Condition& condition,
+                       const std::string& parameters) = 0;
+
+    /**
      * @brief Get the C++ source code to write into the dynamic library.
      * @return A constant reference to the source code.
      */

@@ -1,5 +1,5 @@
 /**
- * @file vle/gvle/conditions/DifferenceEquation/Variables.hpp
+ * @file vle/gvle/modeling/DifferenceEquation/Variables.hpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -26,8 +26,8 @@
  */
 
 
-#ifndef VLE_GVLE_CONDITIONS_DIFFERENCEEQUATION_VARIABLES_HPP
-#define VLE_GVLE_CONDITIONS_DIFFERENCEEQUATION_VARIABLES_HPP
+#ifndef VLE_GVLE_MODELING_DIFFERENCEEQUATION_VARIABLES_HPP
+#define VLE_GVLE_MODELING_DIFFERENCEEQUATION_VARIABLES_HPP
 
 #include <vle/vpz/Condition.hpp>
 #include <gtkmm/dialog.h>
@@ -36,7 +36,7 @@
 #include <gtkmm/treeview.h>
 #include <libglademm.h>
 
-namespace vle { namespace gvle { namespace conditions {
+namespace vle { namespace gvle { namespace modeling {
 
 class Variables
 {
@@ -188,7 +188,7 @@ private:
 
 };
 
-}}} // namespace vle gvle conditions
+}}} // namespace vle gvle modeling
 
 #endif
 

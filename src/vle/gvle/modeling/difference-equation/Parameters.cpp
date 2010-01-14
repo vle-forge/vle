@@ -26,7 +26,7 @@
  */
 
 
-#include <vle/gvle/modeling/DifferenceEquation/Parameters.hpp>
+#include <vle/gvle/modeling/difference-equation/Parameters.hpp>
 #include <boost/lexical_cast.hpp>
 #include <vle/utils.hpp>
 #include <vle/value/Double.hpp>
@@ -151,6 +151,7 @@ void Parameters::ParametersTreeView::onAdd()
 {
     m_name->set_text("");
     m_value->set_text("");
+    m_dialog->set_focus(*m_name);
     if (m_dialog->run() == Gtk::RESPONSE_ACCEPT) {
 	if (not m_name->get_text().empty()) {
 	    try {
@@ -166,9 +167,7 @@ void Parameters::ParametersTreeView::onAdd()
 			    boost::lexical_cast <std::string> (value);
 		    }
 		}
-	    } catch(const boost::bad_lexical_cast& e ) {
-
-	    }
+	    } catch(const boost::bad_lexical_cast& e ) { }
 	}
     }
     m_dialog->hide();
@@ -201,18 +200,21 @@ void Parameters::ParametersTreeView::onEdit()
 		m_columnsParameter.m_col_name);
 	    Glib::ustring oldValue = row.get_value(
 		m_columnsParameter.m_col_value);
+
 	    m_name->set_text(oldName);
 	    m_value->set_text(oldValue);
+            m_dialog->set_focus(*m_name);
 	    if (m_dialog->run() == Gtk::RESPONSE_ACCEPT) {
 		try {
-
 		    std::string name = m_name->get_text();
+
 		    if (not exist(m_name->get_text())) {
 			row[m_columnsParameter.m_col_name] = name;
 		    }
 		    if (not m_value->get_text().empty()) {
 			double value = boost::lexical_cast< double >(
 			    m_value->get_text());
+
 			row[m_columnsParameter.m_col_value] =
 			    boost::lexical_cast <std::string> (value);
 		    } else

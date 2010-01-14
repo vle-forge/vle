@@ -113,9 +113,9 @@ void ConditionsBox::ConditionsTreeView::makeMenuEdit()
 
     PluginFactory& plf = mParent->getGVLE()->pluginFactory();
 
-    const ConditionPluginList& pll = plf.conditionPlugins();
+    const ModelingPluginList& pll = plf.modelingPlugins();
 
-    for (ConditionPluginList::const_iterator it = pll.begin();
+    for (ModelingPluginList::const_iterator it = pll.begin();
 	 it != pll.end(); ++it) {
 
 	menulist.push_back(
@@ -249,7 +249,7 @@ void ConditionsBox::ConditionsTreeView::onEdit(std::string pluginName)
     PluginFactory& plf = mParent->getGVLE()->pluginFactory();
 
     try {
-	ConditionPlugin& plugin = plf.getCondition(pluginName);
+	ModelingPlugin& plugin = plf.getModeling(pluginName);
 	vpz::Condition& cond = mConditions->get(conditionName);
 	plugin.start(cond);
 
@@ -377,9 +377,9 @@ void ConditionsBox::PortsTreeView::makeMenuEdit()
 
     PluginFactory& plf = mParent->getGVLE()->pluginFactory();
 
-    const ConditionPluginList& pll = plf.conditionPlugins();
+    const ModelingPluginList& pll = plf.modelingPlugins();
 
-    for (ConditionPluginList::const_iterator it = pll.begin();
+    for (ModelingPluginList::const_iterator it = pll.begin();
 	 it != pll.end(); ++it) {
 
 	menulist.push_back(
@@ -499,7 +499,7 @@ void ConditionsBox::PortsTreeView::onEdit(std::string pluginName)
 	PluginFactory& plf = mParent->getGVLE()->pluginFactory();
 
 	try {
-	    ConditionPlugin& plugin = plf.getCondition(pluginName);
+	    ModelingPlugin& plugin = plf.getModeling(pluginName);
 	    plugin.start(*mCondition, name);
 	    mParent->buildTreeValues(mCondition->name(), name);
 	} catch(const std::exception& e) {

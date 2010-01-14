@@ -27,7 +27,7 @@
  */
 
 
-#include <vle/gvle/modeling/DifferenceEquation/SourceDialog.hpp>
+#include <vle/gvle/modeling/difference-equation/SourceDialog.hpp>
 #include <vle/gvle/Settings.hpp>
 
 namespace vle { namespace gvle { namespace modeling {
@@ -150,6 +150,8 @@ void Source::cut()
     buffer->cut_clipboard(clipboard);
 }
 
+/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
 SourceDialog::SourceDialog(Glib::RefPtr<Gnome::Glade::Xml> xml,
                            const std::string& computeFunction,
                            const std::string& initValueFunction,
@@ -170,6 +172,9 @@ SourceDialog::SourceDialog(Glib::RefPtr<Gnome::Glade::Xml> xml,
 
 SourceDialog::~SourceDialog()
 {
+    mNotebook->remove_page(*mComputeFunction);
+    mNotebook->remove_page(*mInitValueFunction);
+    mNotebook->remove_page(*mUserFunctions);
     mDialog->hide_all();
 }
 

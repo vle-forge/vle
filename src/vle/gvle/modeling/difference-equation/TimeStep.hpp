@@ -26,8 +26,8 @@
  */
 
 
-#ifndef VLE_GVLE_CONDITIONS_DIFFERENCEEQUATION_TIMESTEP_HPP
-#define VLE_GVLE_CONDITIONS_DIFFERENCEEQUATION_TIMESTEP_HPP
+#ifndef VLE_GVLE_MODELING_DIFFERENCEEQUATION_TIMESTEP_HPP
+#define VLE_GVLE_MODELING_DIFFERENCEEQUATION_TIMESTEP_HPP
 
 #include <vle/vpz/Condition.hpp>
 #include <gtkmm/button.h>
@@ -36,7 +36,7 @@
 #include <gtkmm/spinbutton.h>
 #include <libglademm.h>
 
-namespace vle { namespace gvle { namespace conditions {
+namespace vle { namespace gvle { namespace modeling {
 
 class TimeStep
 {
@@ -71,7 +71,7 @@ private:
     void onClickCheckButton();
 };
 
-}}} // namespace vle gvle conditions
+}}} // namespace vle gvle modeling
 
 #endif
 

@@ -1,5 +1,5 @@
 /**
- * @file vle/gvle/conditions/DifferenceEquation/Mapping.cpp
+ * @file vle/gvle/modeling/DifferenceEquation/Mapping.cpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -27,13 +27,13 @@
  */
 
 
-#include <vle/gvle/conditions/DifferenceEquation/Mapping.hpp>
+#include <vle/gvle/modeling/difference-equation/Mapping.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/value/Map.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/String.hpp>
 
-namespace vle { namespace gvle { namespace conditions {
+namespace vle { namespace gvle { namespace modeling {
 
 Mapping::MappingTreeView::MappingTreeView(
     BaseObjectType* cobject,
@@ -291,4 +291,4 @@ bool Mapping::validPort(const vpz::Condition& condition,
     return false;
 }
 
-}}}
+}}} // namespace vle gvle modeling

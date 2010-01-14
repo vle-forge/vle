@@ -776,15 +776,15 @@ void AtomicModelBox::DynamicTreeView::build()
     }
 }
 
-bool AtomicModelBox::DynamicTreeView::on_button_press_event(GdkEventButton *event)
+bool AtomicModelBox::DynamicTreeView::on_button_press_event(
+    GdkEventButton *event)
 {
   //Call base class, to allow normal handling,
   //such as allowing the row to be selected by the right-click:
   bool return_value = TreeView::on_button_press_event(event);
 
   //Then do our custom stuff:
-  if( (event->type == GDK_BUTTON_PRESS) && (event->button == 3) )
-  {
+  if ((event->type == GDK_BUTTON_PRESS) and (event->button == 3)) {
       mMenuPopup.popup(event->button, event->time);
   }
 
@@ -804,7 +804,6 @@ bool AtomicModelBox::DynamicTreeView::on_button_press_event(GdkEventButton *even
 	  mCellRenderer->property_editable() = false;
       }
   }
-
   return return_value;
 }
 
@@ -963,7 +962,7 @@ void AtomicModelBox::DynamicTreeView::onEdit()
     Gtk::TreeModel::iterator it = refSelection->get_selected();
     Glib::ustring dyn = (*it)[mColumnsDyn.m_col_name];
 
-    if (!dyn.empty()) {
+    if (not dyn.empty()) {
         vpz::Dynamic& dynamic(mDynamics->get(dyn));
         DynamicBox mDynamicBox(mXml,
                                mModeling->getGVLE(),

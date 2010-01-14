@@ -26,14 +26,14 @@
  */
 
 
-#include <vle/gvle/conditions/DifferenceEquation/NameValue.hpp>
+#include <vle/gvle/modeling/difference-equation/NameValue.hpp>
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/SimpleTypeBox.hpp>
 #include <vle/value/Double.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
-namespace vle { namespace gvle { namespace conditions {
+namespace vle { namespace gvle { namespace modeling {
 
 NameValue::InitTreeView::InitTreeView(
     BaseObjectType* cobject,
@@ -272,4 +272,4 @@ bool NameValue::validPort(const vpz::Condition& condition,
     return false;
 }
 
-}}} // namespace vle gvle conditions
+}}} // namespace vle gvle modeling

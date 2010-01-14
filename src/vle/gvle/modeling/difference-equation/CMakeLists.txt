@@ -19,12 +19,8 @@ LINK_DIRECTORIES(
 
 ADD_LIBRARY(modeling-DE-simple MODULE Simple.hpp Simple.cpp Plugin.hpp
   Plugin.cpp Parameters.hpp Parameters.cpp SourceDialog.hpp SourceDialog.cpp
-  ../../conditions/DifferenceEquation/NameValue.hpp
-  ../../conditions/DifferenceEquation/NameValue.cpp
-  ../../conditions/DifferenceEquation/TimeStep.hpp
-  ../../conditions/DifferenceEquation/TimeStep.cpp
-  ../../conditions/DifferenceEquation/Mapping.hpp
-  ../../conditions/DifferenceEquation/Mapping.cpp)
+  NameValue.hpp NameValue.cpp TimeStep.hpp TimeStep.cpp Mapping.hpp
+  Mapping.cpp)
 SET_TARGET_PROPERTIES(modeling-DE-simple PROPERTIES OUTPUT_NAME
   "DifferenceEquationSimple")
 
@@ -56,12 +52,8 @@ INSTALL(TARGETS modeling-DE-simple
 
 ADD_LIBRARY(modeling-DE-generic MODULE Generic.hpp Generic.cpp Plugin.hpp
   Plugin.cpp Parameters.hpp Parameters.cpp SourceDialog.hpp SourceDialog.cpp
-  ../../conditions/DifferenceEquation/NameValue.hpp
-  ../../conditions/DifferenceEquation/NameValue.cpp
-  ../../conditions/DifferenceEquation/TimeStep.hpp
-  ../../conditions/DifferenceEquation/TimeStep.cpp
-  ../../conditions/DifferenceEquation/Mapping.hpp
-  ../../conditions/DifferenceEquation/Mapping.cpp)
+  NameValue.hpp NameValue.cpp TimeStep.hpp TimeStep.cpp Mapping.hpp
+  Mapping.cpp)
 SET_TARGET_PROPERTIES(modeling-DE-generic PROPERTIES OUTPUT_NAME
   "DifferenceEquationGeneric")
 
@@ -93,12 +85,8 @@ INSTALL(TARGETS modeling-DE-generic
 
 ADD_LIBRARY(modeling-DE-multiple MODULE Multiple.hpp Multiple.cpp Plugin.hpp
   Plugin.cpp Parameters.hpp Parameters.cpp SourceDialog.hpp SourceDialog.cpp
-  ../../conditions/DifferenceEquation/Mapping.hpp
-  ../../conditions/DifferenceEquation/Mapping.cpp
-  ../../conditions/DifferenceEquation/TimeStep.hpp
-  ../../conditions/DifferenceEquation/TimeStep.cpp
-   ../../conditions/DifferenceEquation/Variables.hpp
-  ../../conditions/DifferenceEquation/Variables.cpp)
+  Mapping.hpp Mapping.cpp TimeStep.hpp TimeStep.cpp Variables.hpp
+  Variables.cpp)
 SET_TARGET_PROPERTIES(modeling-DE-multiple PROPERTIES OUTPUT_NAME
   "DifferenceEquationMultiple")
 

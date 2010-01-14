@@ -1,5 +1,5 @@
 /**
- * @file vle/gvle/conditions/DifferenceEquation/TimeStep.cpp
+ * @file vle/gvle/modeling/DifferenceEquation/TimeStep.cpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -26,11 +26,11 @@
  */
 
 
-#include <vle/gvle/conditions/DifferenceEquation/TimeStep.hpp>
+#include <vle/gvle/modeling/difference-equation/TimeStep.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/String.hpp>
 
-namespace vle { namespace gvle { namespace conditions {
+namespace vle { namespace gvle { namespace modeling {
 
 void TimeStep::assign(vpz::Condition& condition)
 {
@@ -135,4 +135,4 @@ void TimeStep::onClickCheckButton()
     }
 }
 
-}}} // namespace vle gvle conditions
+}}} // namespace vle gvle modeling

@@ -30,17 +30,17 @@
 #define VLE_GVLE_MODELING_DIFFERENCEEQUATION_PLUGIN_HPP
 
 #include <vle/gvle/ModelingPlugin.hpp>
-#include <vle/gvle/conditions/DifferenceEquation/Mapping.hpp>
-#include <vle/gvle/conditions/DifferenceEquation/TimeStep.hpp>
-#include <vle/gvle/modeling/DifferenceEquation/Parameters.hpp>
+#include <vle/gvle/modeling/difference-equation/Mapping.hpp>
+#include <vle/gvle/modeling/difference-equation/TimeStep.hpp>
+#include <vle/gvle/modeling/difference-equation/Parameters.hpp>
 #include <vle/utils/Template.hpp>
 #include <vle/vpz/Dynamic.hpp>
 #include <gtkmm/dialog.h>
 
 namespace vle { namespace gvle { namespace modeling {
 
-class Plugin : public ModelingPlugin, public conditions::TimeStep,
-               public conditions::Mapping, public modeling::Parameters
+class Plugin : public ModelingPlugin, public TimeStep,
+               public Mapping, public Parameters
 {
 public:
     Plugin(const std::string& name);

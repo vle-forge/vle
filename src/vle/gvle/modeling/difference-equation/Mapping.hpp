@@ -1,5 +1,5 @@
 /**
- * @file vle/gvle/conditions/DifferenceEquation/Mapping.hpp
+ * @file vle/gvle/modeling/DifferenceEquation/Mapping.hpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -27,17 +27,17 @@
  */
 
 
-#ifndef VLE_GVLE_CONDITIONS_DIFFERENCEEQUATION_MAPPING_HPP
-#define VLE_GVLE_CONDITIONS_DIFFERENCEEQUATION_MAPPING_HPP
+#ifndef VLE_GVLE_MODELING_DIFFERENCEEQUATION_MAPPING_HPP
+#define VLE_GVLE_MODELING_DIFFERENCEEQUATION_MAPPING_HPP
 
-#include <vle/gvle/ConditionPlugin.hpp>
+#include <vle/vpz/Condition.hpp>
 #include <gtkmm/dialog.h>
 #include <gtkmm/expander.h>
 #include <gtkmm/liststore.h>
 #include <gtkmm/treeview.h>
 #include <libglademm.h>
 
-namespace vle { namespace gvle { namespace conditions {
+namespace vle { namespace gvle { namespace modeling {
 
 class Mapping
 {
@@ -110,7 +110,7 @@ private:
     void onClickRadioButton();
 };
 
-}}} // namespace vle gvle conditions
+}}} // namespace vle gvle modeling
 
 #endif
 

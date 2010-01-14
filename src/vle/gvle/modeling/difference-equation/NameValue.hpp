@@ -26,8 +26,8 @@
  */
 
 
-#ifndef VLE_GVLE_CONDITIONS_DIFFERENCEEQUATION_NAMEVALUE_HPP
-#define VLE_GVLE_CONDITIONS_DIFFERENCEEQUATION_NAMEVALUE_HPP
+#ifndef VLE_GVLE_MODELING_DIFFERENCEEQUATION_NAMEVALUE_HPP
+#define VLE_GVLE_MODELING_DIFFERENCEEQUATION_NAMEVALUE_HPP
 
 #include <vle/vpz/Condition.hpp>
 #include <gtkmm/box.h>
@@ -36,7 +36,7 @@
 #include <gtkmm/treeview.h>
 #include <libglademm.h>
 
-namespace vle { namespace gvle { namespace conditions {
+namespace vle { namespace gvle { namespace modeling {
 
 class NameValue
 {
@@ -101,7 +101,7 @@ private:
     InitTreeView*      m_initTreeView;
 };
 
-}}} // namespace vle gvle conditions
+}}} // namespace vle gvle modeling
 
 #endif
 

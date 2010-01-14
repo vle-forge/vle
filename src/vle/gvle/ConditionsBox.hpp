@@ -34,7 +34,7 @@
 #include <libglademm.h>
 #include <vle/gvle/ValuesTreeView.hpp>
 #include <vle/vpz/Conditions.hpp>
-#include <vle/gvle/ConditionPlugin.hpp>
+#include <vle/gvle/ModelingPlugin.hpp>
 
 namespace vle { namespace gvle {
 

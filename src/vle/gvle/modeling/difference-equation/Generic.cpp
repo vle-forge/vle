@@ -1,5 +1,5 @@
 /**
- * @file vle/gvle/modeling/DifferenceEquation/Simple.cpp
+ * @file vle/gvle/modeling/DifferenceEquation/Generic.cpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -26,20 +26,20 @@
  */
 
 
-#include <vle/gvle/modeling/DifferenceEquation/Simple.hpp>
+#include <vle/gvle/modeling/difference-equation/Generic.hpp>
 #include <vle/utils/Path.hpp>
 
 namespace vle { namespace gvle { namespace modeling {
 
-Simple::Simple(const std::string& name) :
+Generic::Generic(const std::string& name) :
     Plugin(name), m_dialog(0), m_buttonSource(0)
 {}
 
-Simple::~Simple()
+Generic::~Generic()
 {
     Gtk::VBox* vbox;
 
-    mXml->get_widget("SimplePluginVBox", vbox);
+    mXml->get_widget("GenericPluginVBox", vbox);
     vbox->remove(*m_buttonSource);
 
     for (std::list < sigc::connection >::iterator it = mList.begin();
@@ -48,34 +48,34 @@ Simple::~Simple()
     }
 }
 
-void Simple::build()
+void Generic::build(bool modeling)
 {
     Gtk::VBox* vbox;
     std::string glade = utils::Path::path().
         getModelingGladeFile("DifferenceEquation.glade");
 
     mXml = Gnome::Glade::Xml::create(glade);
-    mXml->get_widget("DialogPluginSimpleBox", m_dialog);
-    m_dialog->set_title("DifferenceEquation - Simple");
-    mXml->get_widget("SimplePluginVBox", vbox);
+    mXml->get_widget("DialogPluginGenericBox", m_dialog);
+    m_dialog->set_title("DifferenceEquation - Generic");
+    mXml->get_widget("GenericPluginVBox", vbox);
 
     vbox->pack_start(NameValue::build(mXml));
     vbox->pack_start(TimeStep::build(mXml));
-    vbox->pack_start(Parameters::build(mXml));
 
-    {
-        m_buttonSource = Gtk::manage(
-            new Gtk::Button("Compute / InitValue / User section"));
-        m_buttonSource->show();
-        vbox->pack_start(*m_buttonSource);
-        mList.push_back(m_buttonSource->signal_clicked().connect(
-                            sigc::mem_fun(*this, &Plugin::onSource)));
+    if (modeling) {
+        vbox->pack_start(Parameters::buildParameters(mXml));
+        {
+            m_buttonSource = Gtk::manage(
+                new Gtk::Button("Compute / InitValue / User section"));
+            m_buttonSource->show();
+            vbox->pack_start(*m_buttonSource);
+            mList.push_back(m_buttonSource->signal_clicked().connect(
+                                sigc::mem_fun(*this, &Plugin::onSource)));
+        }
     }
-
-    vbox->pack_start(Mapping::build(mXml));
 }
 
-bool Simple::create(graph::AtomicModel& atom,
+bool Generic::create(graph::AtomicModel& atom,
                     vpz::AtomicModel& model,
                     vpz::Dynamic& dynamic,
                     vpz::Conditions& conditions,
@@ -85,14 +85,14 @@ bool Simple::create(graph::AtomicModel& atom,
 {
     std::string conditionName((fmt("cond_DE_%1%") % atom.getName()).str());
 
-    build();
+    build(true);
 
     if (not conditions.exist(conditionName)) {
         vpz::Condition condition(conditionName);
 
-        Simple::fillFields(condition);
+        Generic::fillFields(condition);
     } else {
-        Simple::fillFields(conditions.get(conditionName));
+        Generic::fillFields(conditions.get(conditionName));
     }
     mComputeFunction =
         "virtual double compute(const vd::Time& /*time*/)\n"        \
@@ -103,7 +103,7 @@ bool Simple::create(graph::AtomicModel& atom,
     mUserFunctions = "";
 
     if (m_dialog->run() == Gtk::RESPONSE_ACCEPT) {
-        generate(atom, model, dynamic, conditions, classname, namespace_);
+        generate(atom, model, dynamic, conditions, classname, namespace_, true);
         m_dialog->hide_all();
         return true;
     }
@@ -111,14 +111,13 @@ bool Simple::create(graph::AtomicModel& atom,
     return false;
 }
 
-void Simple::fillFields(const vpz::Condition& condition)
+void Generic::fillFields(const vpz::Condition& condition)
 {
     NameValue::fillFields(condition);
-    Mapping::fillFields(condition);
     TimeStep::fillFields(condition);
 }
 
-void Simple::generateCondition(graph::AtomicModel& atom,
+void Generic::generateCondition(graph::AtomicModel& atom,
                                vpz::AtomicModel& model,
                                vpz::Conditions& conditions)
 {
@@ -127,19 +126,16 @@ void Simple::generateCondition(graph::AtomicModel& atom,
         vpz::Condition& condition(conditions.get(conditionName));
 
         NameValue::deletePorts(condition);
-        Mapping::deletePorts(condition);
         TimeStep::deletePorts(condition);
         Parameters::deletePorts(condition);
 
         NameValue::assign(condition);
-        Mapping::assign(condition);
         TimeStep::assign(condition);
         Parameters::assign(condition);
     } else {
         vpz::Condition condition(conditionName);
 
         NameValue::assign(condition);
-        Mapping::assign(condition);
         TimeStep::assign(condition);
         Parameters::assign(condition);
         conditions.add(condition);
@@ -152,38 +148,30 @@ void Simple::generateCondition(graph::AtomicModel& atom,
     }
 }
 
-void Simple::generateOutputPorts(graph::AtomicModel& atom)
+void Generic::generateOutputPorts(graph::AtomicModel& atom)
 {
     if (not atom.existOutputPort("update")) {
         atom.addOutputPort("update");
     }
 }
 
-void Simple::generateVariables(utils::Template& tpl_)
+void Generic::generateVariables(utils::Template& tpl_)
 {
     tpl_.stringSymbol().append("varname", getVariableName());
 }
 
-std::string Simple::getTemplate() const
+std::string Generic::getTemplate() const
 {
     return
     "/**\n"                                                             \
     "  * @file {{classname}}.cpp\n"                                     \
     "  * @author ...\n"                                                 \
     "  * ...\n"                                                         \
-    "  * @@tag DifferenceEquationSimple@@"                              \
+    "  * @@tag DifferenceEquationGeneric@@"                              \
     "namespace:{{namespace}};"                                          \
     "class:{{classname}};par:"                                          \
     "{{for i in par}}"                                                  \
     "{{par^i}},{{val^i}}|"                                              \
-    "{{end for}}"                                                       \
-    ";sync:"                                                            \
-    "{{for i in sync}}"                                                 \
-    "{{sync^i}}|"                                                       \
-    "{{end for}}"                                                       \
-    ";nosync:"                                                          \
-    "{{for i in nosync}}"                                               \
-    "{{nosync^i}}|"                                                     \
     "{{end for}}"                                                       \
     "@@end tag@@\n"                                                     \
     "  */\n\n"                                                          \
@@ -192,24 +180,18 @@ std::string Simple::getTemplate() const
     "namespace ve = vle::extension;\n"                                  \
     "namespace vv = vle::value;\n\n"                                    \
     "namespace {{namespace}} {\n\n"                                     \
-    "class {{classname}} : public ve::DifferenceEquation::Simple\n"     \
+    "class {{classname}} : public ve::DifferenceEquation::Generic\n"     \
     "{\n"                                                               \
     "public:\n"                                                         \
     "    {{classname}}(\n"                                              \
     "       const vd::DynamicsInit& atom,\n"                            \
     "       const vd::InitEventList& evts)\n"                           \
-    "        : ve::DifferenceEquation::Simple(atom, evts)\n"            \
+    "        : ve::DifferenceEquation::Generic(atom, evts)\n"            \
     "    {\n"                                                           \
     "{{for i in par}}"                                                  \
     "        {{par^i}} = vv::toDouble(evts.get(\"{{par^i}}\"));\n"      \
     "{{end for}}"                                                       \
     "        {{varname}} = createVar(\"{{varname}}\");\n"               \
-    "{{for i in sync}}"                                                 \
-    "        {{sync^i}} = createSync(\"{{sync^i}}\");\n"                \
-    "{{end for}}"                                                       \
-    "{{for i in nosync}}"                                               \
-    "        {{nosync^i}} = createNosync(\"{{nosync^i}}\");\n"          \
-    "{{end for}}"                                                       \
     "    }\n"                                                           \
     "\n"                                                                \
     "    virtual ~{{classname}}()\n"                                    \
@@ -229,18 +211,12 @@ std::string Simple::getTemplate() const
     "    double {{par^i}};\n"                                           \
     "{{end for}}"                                                       \
     "    Var {{varname}};\n"                                            \
-    "{{for i in sync}}"                                                 \
-    "    Sync {{sync^i}};\n"                                            \
-    "{{end for}}"                                                       \
-    "{{for i in nosync}}"                                               \
-    "    Nosync {{nosync^i}};\n"                                        \
-    "{{end for}}"                                                       \
     "};\n\n"                                                            \
     "} // namespace {{namespace}}\n\n"                                  \
     "DECLARE_DYNAMICS({{namespace}}::{{classname}})\n\n";
 }
 
-bool Simple::modify(graph::AtomicModel& atom,
+bool Generic::modify(graph::AtomicModel& atom,
                     vpz::AtomicModel& model,
                     vpz::Dynamic& dynamic,
                     vpz::Conditions& conditions,
@@ -257,22 +233,22 @@ bool Simple::modify(graph::AtomicModel& atom,
     parseFunctions(buffer);
     std::string conditionName((fmt("cond_DE_%1%") % atom.getName()).str());
 
-    build();
+    build(true);
 
     if (not conditions.exist(conditionName)) {
         vpz::Condition condition(conditionName);
 
-        Simple::fillFields(condition);
-	Parameters::fillFields(parameters, externalVariables);
+        Generic::fillFields(condition);
+	Parameters::fillFields(parameters);
     } else {
-        Simple::fillFields(conditions.get(conditionName));
-	Parameters::fillFields(parameters, externalVariables);
+        Generic::fillFields(conditions.get(conditionName));
+	Parameters::fillFields(parameters);
     }
 
     backup();
 
     if (m_dialog->run() == Gtk::RESPONSE_ACCEPT) {
-        generate(atom, model, dynamic, conditions, classname, namespace_);
+        generate(atom, model, dynamic, conditions, classname, namespace_, true);
         m_dialog->hide_all();
         return true;
     }
@@ -280,7 +256,28 @@ bool Simple::modify(graph::AtomicModel& atom,
     return false;
 }
 
+bool Generic::start(vpz::Condition& condition)
+{
+    build(false);
+    fillFields(condition);
+
+    if (m_dialog->run() == Gtk::RESPONSE_ACCEPT) {
+        Generic::assign(condition);
+    }
+    m_dialog->hide();
+    return true;
+}
+
+void Generic::assign(vpz::Condition& condition)
+{
+    NameValue::deletePorts(condition);
+    TimeStep::deletePorts(condition);
+
+    NameValue::assign(condition);
+    TimeStep::assign(condition);
+}
+
 }}} // namespace vle gvle modeling
 
-DECLARE_GVLE_MODELINGPLUGIN(vle::gvle::modeling::Simple)
+DECLARE_GVLE_MODELINGPLUGIN(vle::gvle::modeling::Generic)
 

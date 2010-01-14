@@ -1,1 +1,1 @@
-ADD_SUBDIRECTORY(DifferenceEquation)
+ADD_SUBDIRECTORY(difference-equation)

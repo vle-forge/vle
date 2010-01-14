@@ -26,8 +26,8 @@
  */
 
 
-#include <vle/gvle/modeling/DifferenceEquation/Plugin.hpp>
-#include <vle/gvle/modeling/DifferenceEquation/SourceDialog.hpp>
+#include <vle/gvle/modeling/difference-equation/Plugin.hpp>
+#include <vle/gvle/modeling/difference-equation/SourceDialog.hpp>
 #include <vle/utils/Package.hpp>
 #include <boost/regex.hpp>
 
@@ -70,7 +70,7 @@ void Plugin::generateDynamic(vpz::Dynamic& dynamic,
 {
     dynamic.setPackage(utils::Package::package().name());
     dynamic.setLibrary(classname);
-    dynamic.setModel("");
+    dynamic.setModel(classname);
 }
 
 void Plugin::generateInputPorts(graph::AtomicModel& atom)
@@ -159,7 +159,8 @@ void Plugin::generateSource(const std::string& classname,
         Parameters::ExternalVariables_t externalVariables =
             getExternalVariables();
         for (Parameters::ExternalVariables_t::const_iterator it =
-                 externalVariables.begin(); it != externalVariables.end(); ++it) {
+                 externalVariables.begin(); it != externalVariables.end();
+             ++it) {
             std::string name(it->first);
 
             if (it->second) {

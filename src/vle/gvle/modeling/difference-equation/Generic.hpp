@@ -1,5 +1,5 @@
 /**
- * @file vle/gvle/modeling/DifferenceEquation/Multiple.hpp
+ * @file vle/gvle/modeling/DifferenceEquation/Generic.hpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -26,23 +26,22 @@
  */
 
 
-#ifndef VLE_GVLE_MODELING_DIFFERENCEEQUATION_MULTIPLE_HPP
-#define VLE_GVLE_MODELING_DIFFERENCEEQUATION_MULTIPLE_HPP
+#ifndef VLE_GVLE_MODELING_DIFFERENCEEQUATION_GENERIC_HPP
+#define VLE_GVLE_MODELING_DIFFERENCEEQUATION_GENERIC_HPP
 
 #include <vle/gvle/ModelingPlugin.hpp>
-#include <vle/gvle/modeling/DifferenceEquation/Plugin.hpp>
-#include <vle/gvle/conditions/DifferenceEquation/Variables.hpp>
+#include <vle/gvle/modeling/difference-equation/NameValue.hpp>
+#include <vle/gvle/modeling/difference-equation/Plugin.hpp>
 #include <vle/utils/Template.hpp>
 #include <gtkmm/dialog.h>
 
 namespace vle { namespace gvle { namespace modeling {
 
-class Multiple : public modeling::Plugin,
-                 public conditions::Variables
+class Generic : public Plugin, public NameValue
 {
 public:
-    Multiple(const std::string& name);
-    virtual ~Multiple();
+    Generic(const std::string& name);
+    virtual ~Generic();
 
     virtual bool create(graph::AtomicModel& atom,
                         vpz::AtomicModel& model,
@@ -52,6 +51,9 @@ public:
                         const std::string& classname,
                         const std::string& namespace_);
 
+    virtual std::string getMode() const
+    { return "port"; }
+
     virtual bool modify(graph::AtomicModel& atom,
                         vpz::AtomicModel& model,
                         vpz::Dynamic& dynamic,
@@ -60,13 +62,19 @@ public:
                         const std::string& conf,
                         const std::string& buffer);
 
+    virtual bool start(vpz::Condition& condition);
+
+    virtual bool start(vpz::Condition&, const std::string&)
+    { return true; }
+
 private:
     Gtk::Dialog*         m_dialog;
     Gtk::Button*         m_buttonSource;
 
     std::list < sigc::connection > mList;
 
-    void build();
+    void assign(vpz::Condition& condition);
+    void build(bool modeling);
     void fillFields(const vpz::Condition& condition);
     virtual void generateCondition(graph::AtomicModel& atom,
                                    vpz::AtomicModel& model,
