@@ -33,7 +33,9 @@
 
 namespace vle { namespace extension { namespace decision {
 
-Activity& Activities::add(const std::string& name, const Activity& act)
+Activity& Activities::add(const std::string& name, const Activity& act,
+                          const Activity::OutFct& out,
+                          const Activity::AckFct& ack)
 {
     iterator it(m_lst.find(name));
 
@@ -41,11 +43,22 @@ Activity& Activities::add(const std::string& name, const Activity& act)
         throw utils::ArgError(_("Decision: activity already exist"));
     }
 
-    return (*m_lst.insert(std::make_pair < std::string, Activity >(
-                name, act)).first).second;
+    Activity& a((*m_lst.insert(std::make_pair < std::string, Activity >(
+                    name, act)).first).second);
+    if (out) {
+        a.addOutputFunction(out);
+    }
+
+    if (ack) {
+        a.addAcknowledgeFunction(ack);
+    }
+
+    return a;
 }
 
-Activity& Activities::add(const std::string& name)
+Activity& Activities::add(const std::string& name,
+                          const Activity::OutFct& out,
+                          const Activity::AckFct& ack)
 {
     iterator it(m_lst.find(name));
 
@@ -53,16 +66,35 @@ Activity& Activities::add(const std::string& name)
         throw utils::ArgError(_("Decision: activity already exist"));
     }
 
-    return (*m_lst.insert(std::make_pair < std::string, Activity >(
-                name, Activity())).first).second;
+    Activity& a((*m_lst.insert(std::make_pair < std::string, Activity >(
+                    name, Activity())).first).second);
+    if (out) {
+        a.addOutputFunction(out);
+    }
+
+    if (ack) {
+        a.addAcknowledgeFunction(ack);
+    }
+
+    return a;
 }
 
 Activity& Activities::add(const std::string& name,
                           const devs::Time& start,
-                          const devs::Time& end)
+                          const devs::Time& end,
+                          const Activity::OutFct& out,
+                          const Activity::AckFct& ack)
 {
     Activity& result = add(name);
     result.initStartTimeFinishTime(start, end);
+
+    if (out) {
+        result.addOutputFunction(out);
+    }
+
+    if (ack) {
+        result.addAcknowledgeFunction(ack);
+    }
 
     return result;
 }
@@ -108,51 +140,263 @@ devs::Time Activities::nextDate(const devs::Time& time)
     return result;
 }
 
+void Activities::removeWaitedAct(Activities::iterator it)
+{
+    removeAct(m_waitedAct, it);
+}
+
+void Activities::removeStartedAct(Activities::iterator it)
+{
+    removeAct(m_startedAct, it);
+}
+
+void Activities::removeFailedAct(Activities::iterator it)
+{
+    removeAct(m_failedAct, it);
+}
+
+void Activities::removeDoneAct(Activities::iterator it)
+{
+    removeAct(m_doneAct, it);
+}
+
+void Activities::removeEndedAct(Activities::iterator it)
+{
+    removeAct(m_endedAct, it);
+}
+
+void Activities::addWaitedAct(Activities::iterator it)
+{
+    addAct(m_waitedAct, it);
+}
+
+void Activities::addStartedAct(Activities::iterator it)
+{
+    addAct(m_startedAct, it);
+}
+
+void Activities::addFailedAct(Activities::iterator it)
+{
+    addAct(m_failedAct, it);
+}
+
+void Activities::addDoneAct(Activities::iterator it)
+{
+    addAct(m_doneAct, it);
+}
+
+void Activities::addEndedAct(Activities::iterator it)
+{
+    addAct(m_endedAct, it);
+}
+
+void Activities::setWaitedAct(Activities::iterator it)
+{
+    switch (it->second.state()) {
+    case Activity::WAIT:
+        removeWaitedAct(it);
+        addWaitedAct(it);
+        updateLatestActivitiesList(m_latestWaitedAct, it);
+        break;
+    case Activity::STARTED:
+        removeStartedAct(it);
+        addStartedAct(it);
+        updateLatestActivitiesList(m_latestStartedAct, it);
+        break;
+    case Activity::DONE:
+        removeDoneAct(it);
+        addDoneAct(it);
+        updateLatestActivitiesList(m_latestDoneAct, it);
+        break;
+    case Activity::ENDED:
+        removeEndedAct(it);
+        addEndedAct(it);
+        updateLatestActivitiesList(m_latestEndedAct, it);
+        break;
+    case Activity::FAILED:
+        removeFailedAct(it);
+        addFailedAct(it);
+        updateLatestActivitiesList(m_latestFailedAct, it);
+        break;
+    }
+}
+
+void Activities::setStartedAct(Activities::iterator it)
+{
+    switch (it->second.state()) {
+    case Activity::WAIT:
+        removeWaitedAct(it);
+        updateLatestActivitiesList(m_latestWaitedAct, it);
+        break;
+    case Activity::STARTED:
+        removeStartedAct(it);
+        updateLatestActivitiesList(m_latestStartedAct, it);
+        break;
+    case Activity::DONE:
+        removeDoneAct(it);
+        updateLatestActivitiesList(m_latestDoneAct, it);
+        break;
+    case Activity::ENDED:
+        removeEndedAct(it);
+        updateLatestActivitiesList(m_latestEndedAct, it);
+        break;
+    case Activity::FAILED:
+        removeFailedAct(it);
+        updateLatestActivitiesList(m_latestFailedAct, it);
+        break;
+    }
+    addStartedAct(it);
+}
+
+void Activities::setFailedAct(Activities::iterator it)
+{
+    switch (it->second.state()) {
+    case Activity::WAIT:
+        removeWaitedAct(it);
+        updateLatestActivitiesList(m_latestWaitedAct, it);
+        break;
+    case Activity::STARTED:
+        removeStartedAct(it);
+        updateLatestActivitiesList(m_latestStartedAct, it);
+        break;
+    case Activity::DONE:
+        removeDoneAct(it);
+        updateLatestActivitiesList(m_latestDoneAct, it);
+        break;
+    case Activity::ENDED:
+        removeEndedAct(it);
+        updateLatestActivitiesList(m_latestEndedAct, it);
+        break;
+    case Activity::FAILED:
+        removeFailedAct(it);
+        updateLatestActivitiesList(m_latestFailedAct, it);
+        break;
+    }
+    addFailedAct(it);
+}
+
+void Activities::setDoneAct(Activities::iterator it)
+{
+    switch (it->second.state()) {
+    case Activity::WAIT:
+        removeWaitedAct(it);
+        updateLatestActivitiesList(m_latestWaitedAct, it);
+        break;
+    case Activity::STARTED:
+        removeStartedAct(it);
+        updateLatestActivitiesList(m_latestStartedAct, it);
+        break;
+    case Activity::DONE:
+        removeDoneAct(it);
+        updateLatestActivitiesList(m_latestDoneAct, it);
+        break;
+    case Activity::ENDED:
+        removeEndedAct(it);
+        updateLatestActivitiesList(m_latestEndedAct, it);
+        break;
+    case Activity::FAILED:
+        removeFailedAct(it);
+        updateLatestActivitiesList(m_latestFailedAct, it);
+        break;
+    }
+    addDoneAct(it);
+}
+
+void Activities::setEndedAct(Activities::iterator it)
+{
+    switch (it->second.state()) {
+    case Activity::WAIT:
+        removeWaitedAct(it);
+        updateLatestActivitiesList(m_latestWaitedAct, it);
+        break;
+    case Activity::STARTED:
+        removeStartedAct(it);
+        updateLatestActivitiesList(m_latestStartedAct, it);
+        break;
+    case Activity::DONE:
+        removeDoneAct(it);
+        updateLatestActivitiesList(m_latestDoneAct, it);
+        break;
+    case Activity::ENDED:
+        removeEndedAct(it);
+        updateLatestActivitiesList(m_latestEndedAct, it);
+        break;
+    case Activity::FAILED:
+        removeFailedAct(it);
+        updateLatestActivitiesList(m_latestFailedAct, it);
+        break;
+    }
+    addEndedAct(it);
+}
+
+void Activities::removeAct(Activities::result_t& lst, Activities::iterator it)
+{
+    Activities::result_t::iterator del = std::find(lst.begin(), lst.end(), it);
+    if (del != lst.end()) {
+        lst.erase(del);
+    }
+}
+
+void Activities::addAct(Activities::result_t& lst, Activities::iterator it)
+{
+    lst.push_back(it);
+}
+
+void Activities::updateLatestActivitiesList(Activities::result_t& lst,
+                                            Activities::iterator it)
+{
+    removeAct(m_latestWaitedAct, it);
+    removeAct(m_latestStartedAct, it);
+    removeAct(m_latestEndedAct, it);
+    removeAct(m_latestDoneAct, it);
+    removeAct(m_latestFailedAct, it);
+
+    addAct(lst, it);
+}
+
+void Activities::clearLatestActivitiesLists()
+{
+    m_latestWaitedAct.clear();
+    m_latestStartedAct.clear();
+    m_latestDoneAct.clear();
+    m_latestFailedAct.clear();
+    m_latestEndedAct.clear();
+}
+
 Activities::Result
-Activities::process(const devs::Time& time, result_t& waitedact,
-                    result_t& startedact, result_t& doneact,
-                    result_t& failedact, result_t& endedact)
+Activities::process(const devs::Time& time)
 {
     devs::Time nextDate = devs::Time::infinity;
     Result update = std::make_pair(false, devs::Time::infinity);
     bool isUpdated = false;
 
     do {
-        waitedact.clear();
-        startedact.clear();
-        doneact.clear();
-        failedact.clear();
-        endedact.clear();
+        m_waitedAct.clear();
+        m_startedAct.clear();
+        m_doneAct.clear();
+        m_failedAct.clear();
+        m_endedAct.clear();
 
         for (iterator activity = begin(); activity != end(); ++activity) {
             switch (activity->second.state()) {
             case Activity::WAIT:
-                update = processWaitState(activity, time, waitedact,
-                                          startedact, doneact, failedact,
-                                          endedact);
+                update = processWaitState(activity, time);
                 break;
 
             case Activity::STARTED:
-                update = processStartedState(activity, time, waitedact,
-                                             startedact, doneact, failedact,
-                                             endedact);
+                update = processStartedState(activity, time);
                 break;
 
             case Activity::DONE:
-                update = processDoneState(activity, time, waitedact, startedact,
-                                          doneact, failedact, endedact);
+                update = processDoneState(activity, time);
                 break;
 
             case Activity::ENDED:
-                update = processEndedState(activity, time, waitedact,
-                                           startedact, doneact, failedact,
-                                           endedact);
+                update = processEndedState(activity, time);
                 break;
 
             case Activity::FAILED:
-                update = processFailedState(activity, time, waitedact,
-                                            startedact, doneact, failedact,
-                                            endedact);
+                update = processFailedState(activity, time);
                 break;
 
             default:
@@ -182,12 +426,7 @@ Activities::process(const devs::Time& time, result_t& waitedact,
 
 Activities::Result
 Activities::processWaitState(iterator activity,
-                             const devs::Time& time,
-                             result_t& waitedact,
-                             result_t& startedact,
-                             result_t& /* doneact */,
-                             result_t& failedact,
-                             result_t& /* endedact */)
+                             const devs::Time& time)
 {
     PrecedenceConstraint::Result newstate = updateState(activity, time);
     Result update = std::make_pair(false, newstate.second);
@@ -196,16 +435,18 @@ Activities::processWaitState(iterator activity,
     case PrecedenceConstraint::Valid:
     case PrecedenceConstraint::Inapplicable:
         activity->second.start(time);
-        startedact.push_back(activity);
+        m_startedAct.push_back(activity);
+        m_latestStartedAct.push_back(activity);
         update.first = true;
         break;
     case PrecedenceConstraint::Wait:
-        waitedact.push_back(activity);
+        m_waitedAct.push_back(activity);
         update.first = false;
         break;
     case PrecedenceConstraint::Failed:
         activity->second.fail(time);
-        failedact.push_back(activity);
+        m_failedAct.push_back(activity);
+        m_latestFailedAct.push_back(activity);
         update.first = true;
         break;
     }
@@ -215,12 +456,7 @@ Activities::processWaitState(iterator activity,
 
 Activities::Result
 Activities::processStartedState(iterator activity,
-                                const devs::Time& time,
-                                result_t& /* waitedact */,
-                                result_t& startedact,
-                                result_t& /*doneact*/,
-                                result_t& failedact,
-                                result_t& /* endedact */)
+                                const devs::Time& time)
 {
     PrecedenceConstraint::Result newstate = updateState(activity, time);
     Result update = std::make_pair(false, newstate.second);
@@ -229,28 +465,23 @@ Activities::processStartedState(iterator activity,
     case PrecedenceConstraint::Valid:
     case PrecedenceConstraint::Inapplicable:
     case PrecedenceConstraint::Wait:
-        startedact.push_back(activity);
+        m_startedAct.push_back(activity);
         update.first = false;
         break;
     case PrecedenceConstraint::Failed:
         activity->second.fail(time);
-        failedact.push_back(activity);
+        m_failedAct.push_back(activity);
+        m_latestFailedAct.push_back(activity);
         update.first = true;
         break;
     }
-
 
     return update;
 }
 
 Activities::Result
 Activities::processDoneState(iterator activity,
-                             const devs::Time& time,
-                             result_t& /*waitedact*/,
-                             result_t& /*startedact*/,
-                             result_t& doneact,
-                             result_t& failedact,
-                             result_t& endedact)
+                             const devs::Time& time)
 {
     PrecedenceConstraint::Result newstate = updateState(activity, time);
     Result update = std::make_pair(false, newstate.second);
@@ -259,16 +490,18 @@ Activities::processDoneState(iterator activity,
     case PrecedenceConstraint::Valid:
     case PrecedenceConstraint::Inapplicable:
         activity->second.end(time);
-        endedact.push_back(activity);
+        m_endedAct.push_back(activity);
+        m_latestEndedAct.push_back(activity);
         update.first = true;
         break;
     case PrecedenceConstraint::Wait:
-        doneact.push_back(activity);
+        m_doneAct.push_back(activity);
         update.first = false;
         break;
     case PrecedenceConstraint::Failed:
         activity->second.fail(time);
-        failedact.push_back(activity);
+        m_failedAct.push_back(activity);
+        m_latestFailedAct.push_back(activity);
         update.first = true;
         break;
     }
@@ -278,29 +511,19 @@ Activities::processDoneState(iterator activity,
 
 Activities::Result
 Activities::processFailedState(iterator activity,
-                               const devs::Time& /* time */,
-                               result_t& /* waitedact */,
-                               result_t& /* startedact */,
-                               result_t& /* doneact */,
-                               result_t& failedact,
-                               result_t& /* endedact */)
+                               const devs::Time& /* time */)
 {
     Result update = std::make_pair(false, devs::Time::infinity);
-    failedact.push_back(activity);
+    m_failedAct.push_back(activity);
     return update;
 }
 
 Activities::Result
 Activities::processEndedState(iterator activity,
-                              const devs::Time& /* time */,
-                              result_t& /* waitedact */,
-                              result_t& /* startedact */,
-                              result_t& /* doneact */,
-                              result_t& /* failedact */,
-                              result_t& endedact)
+                              const devs::Time& /* time */)
 {
     Result update = std::make_pair(false, devs::Time::infinity);
-    endedact.push_back(activity);
+    m_endedAct.push_back(activity);
     return update;
 }
 

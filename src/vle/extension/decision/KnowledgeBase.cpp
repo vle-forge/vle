@@ -43,11 +43,7 @@ void KnowledgeBase::setActivityDone(const std::string& name,
                 _("Decision: activity '%1%' is not started")) % name);
     }
 
-    Activities::result_t::iterator toDel = std::find(m_startedAct.begin(),
-                                                     m_startedAct.end(), it);
-    m_startedAct.erase(toDel);
-
-    m_doneAct.push_back(it);
+    m_activities.setDoneAct(it);
     it->second.done(date);
 }
 
@@ -61,21 +57,7 @@ void KnowledgeBase::setActivityFailed(const std::string& name,
                 _("Decision: activity '%1%' is already finish")) % name);
     }
 
-    if (it->second.isInWaitState()) {
-        Activities::result_t::iterator toDel = std::find(
-            m_waitedAct.begin(), m_waitedAct.end(), it);
-        m_waitedAct.erase(toDel);
-    } else if (it->second.isInStartedState()) {
-        Activities::result_t::iterator toDel = std::find(
-            m_startedAct.begin(), m_startedAct.end(), it);
-        m_startedAct.erase(toDel);
-    } else if (it->second.isInDoneState()) {
-        Activities::result_t::iterator toDel = std::find(
-            m_doneAct.begin(), m_doneAct.end(), it);
-        m_doneAct.erase(toDel);
-    }
-
-    m_failedAct.push_back(it);
+    m_activities.setFailedAct(it);
     it->second.fail(date);
 }
 
@@ -93,58 +75,8 @@ devs::Time KnowledgeBase::duration(const devs::Time& time)
 
 KnowledgeBase::Result KnowledgeBase::processChanges(const devs::Time& time)
 {
-    m_latestWaitedAct = m_waitedAct;
-    m_latestStartedAct = m_startedAct;
-    m_latestDoneAct = m_doneAct;
-    m_latestFailedAct = m_failedAct;
-    m_latestEndedAct = m_endedAct;
-
-    m_waitedAct.clear();
-    m_startedAct.clear();
-    m_doneAct.clear();
-    m_failedAct.clear();
-    m_endedAct.clear();
-
-    Activities::Result r = m_activities.process(
-        time, m_waitedAct, m_startedAct, m_doneAct, m_failedAct, m_endedAct);
-
-    buildLatestList(m_waitedAct, m_latestWaitedAct);
-    buildLatestList(m_startedAct, m_latestStartedAct);
-    buildLatestList(m_doneAct, m_latestDoneAct);
-    buildLatestList(m_failedAct, m_latestFailedAct);
-    buildLatestList(m_endedAct, m_latestEndedAct);
-
+    Activities::Result r = m_activities.process(time);
     return std::make_pair(r.first, r.second);
-}
-
-void KnowledgeBase::buildLatestList(const Activities::result_t& in,
-                                    Activities::result_t& out)
-{
-
-    if (out.empty()) {
-        out = in;
-    } else {
-        Activities::result_t::iterator it;
-        Activities::result_t::const_iterator jt;
-        Activities::result_t result;
-
-        for (it = out.begin(); it != out.end(); ++it) {
-            jt = in.begin();
-            bool found = false;
-
-            while (not found and jt != in.end()) {
-                if (*it == *jt) {
-                    found = true;
-                }
-                ++jt;
-            }
-
-            if (not found) {
-                result.push_back(*it);
-            }
-        }
-        out = result;
-    }
 }
 
 }}} // namespace vle model decision

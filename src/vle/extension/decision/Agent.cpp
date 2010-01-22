@@ -46,7 +46,35 @@ void Agent::output(const devs::Time& time,
 {
     if (mState == Output) {
         mCurrentTime = time;
-        onOutput(output);
+
+        {
+            const Agent::ActivityList& lst = latestStartedActivities();
+            Agent::ActivityList::const_iterator it = lst.begin();
+            for (; it != lst.end(); ++it) {
+                (*it)->second.output((*it)->first, output);
+            }
+        }
+        {
+            const Agent::ActivityList& lst = latestFailedActivities();
+            Agent::ActivityList::const_iterator it = lst.begin();
+            for (; it != lst.end(); ++it) {
+                (*it)->second.output((*it)->first, output);
+            }
+        }
+        {
+            const Agent::ActivityList& lst = latestDoneActivities();
+            Agent::ActivityList::const_iterator it = lst.begin();
+            for (; it != lst.end(); ++it) {
+                (*it)->second.output((*it)->first, output);
+            }
+        }
+        {
+            const Agent::ActivityList& lst = latestEndedActivities();
+            Agent::ActivityList::const_iterator it = lst.begin();
+            for (; it != lst.end(); ++it) {
+                (*it)->second.output((*it)->first, output);
+            }
+        }
     }
 }
 
@@ -76,8 +104,9 @@ void Agent::internalTransition(const devs::Time& time)
     mCurrentTime = time;
 
     switch (mState) {
-    case Init:
     case Output:
+        clearLatestActivitiesLists();
+    case Init:
     case UpdateFact:
         mNextChangeTime = processChanges(time);
         mState = Process;

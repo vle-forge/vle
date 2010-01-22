@@ -30,13 +30,26 @@
 #define VLE_EXTENSION_DECISION_ACTIVITY_HPP
 
 #include <vle/extension/decision/Rules.hpp>
+#include <vle/devs/ExternalEventList.hpp>
 #include <vle/devs/Time.hpp>
+#include <boost/function.hpp>
+#include <boost/bind.hpp>
 
 namespace vle { namespace extension { namespace decision {
 
     class Activity
     {
     public:
+        typedef boost::function <
+            void (const std::string&,
+                  const Activity&,
+                  const vle::devs::ExternalEvent&) > AckFct;
+
+        typedef boost::function <
+            void (const std::string&,
+                  const Activity&,
+                  vle::devs::ExternalEventList&) > OutFct;
+
         /** Defines the state of the temporal constraints. You can use multiple
          * value for a same DateType by combining the with operator|. For
          * instance:
@@ -80,6 +93,38 @@ namespace vle { namespace extension { namespace decision {
             m_finished(devs::Time::negativeInfinity),
             m_done(devs::Time::negativeInfinity)
         {}
+
+        /**
+         * @brief Assign an acknowledge function to this activity.
+         * @param fct An acknowledge function.
+         */
+        void addAcknowledgeFunction(const AckFct& fct)
+        { mAckFct = fct; }
+
+        /**
+         * @brief Call the acknowledge function if it exists.
+         * @param name The name of the activity.
+         * @param event The external event to update the activity.
+         */
+        void acknowledge(const std::string& name,
+                         const devs::ExternalEvent& event)
+        { if (mAckFct) { mAckFct(name, *this, event); } }
+
+        /**
+         * @brief Assign an output function to this activity.
+         * @param fct An output function.
+         */
+        void addOutputFunction(const OutFct& fct)
+        { mOutFct = fct; }
+
+        /**
+         * @brief Call the output function if it exists.
+         * @param name The name of the activity.
+         * @param events A list to add ExternalEvent.
+         */
+        void output(const std::string& name,
+                    devs::ExternalEventList& events)
+        { if (mOutFct) { mOutFct(name, *this, events); } }
 
         void addRule(const std::string& name, const Rule& rule)
         { m_rules.add(name, rule); }
@@ -192,6 +237,9 @@ namespace vle { namespace extension { namespace decision {
         devs::Time m_started; /** Date when the activity is started. */
         devs::Time m_finished; /** Date when the activity is finished. */
         devs::Time m_done; /**< Date when the activity is done. */
+
+        AckFct mAckFct;
+        OutFct mOutFct;
     };
 
     inline std::ostream& operator<<(

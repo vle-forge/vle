@@ -53,11 +53,18 @@ namespace vle { namespace extension { namespace decision {
          */
         typedef std::pair < bool, devs::Time > Result;
 
-        Activity& add(const std::string& name, const Activity& act);
-        Activity& add(const std::string& name);
+        Activity& add(const std::string& name,
+                      const Activity& act,
+                      const Activity::OutFct& out = Activity::OutFct(),
+                      const Activity::AckFct& ack = Activity::AckFct());
+        Activity& add(const std::string& name,
+                      const Activity::OutFct& out = Activity::OutFct(),
+                      const Activity::AckFct& ack = Activity::AckFct());
         Activity& add(const std::string& name,
                       const devs::Time& start,
-                      const devs::Time& end);
+                      const devs::Time& end,
+                      const Activity::OutFct& out = Activity::OutFct(),
+                      const Activity::AckFct& ack = Activity::AckFct());
 
 	void addPrecedenceConstraint(const PrecedenceConstraint& pc)
 	{ m_graph.add(pc); }
@@ -148,16 +155,9 @@ namespace vle { namespace extension { namespace decision {
         /**
          * @brief Change the state of activities
          * @param time
-         * @param waitact
-         * @param starttact
-         * @param doneact
-         * @param failedact
-         * @param endedact
          * @return The next date on which a status change.
          */
-        Result process(const devs::Time& time, result_t& waitact,
-                       result_t& starttact, result_t& doneact,
-                       result_t& failedact, result_t& endedact);
+        Result process(const devs::Time& time);
 
         iterator begin() { return m_lst.begin(); }
         const_iterator begin() const { return m_lst.begin(); }
@@ -186,34 +186,76 @@ namespace vle { namespace extension { namespace decision {
 	const PrecedencesGraph& precedencesGraph() const
 	{ return m_graph; }
 
+        const Activities::result_t& waitedAct() const
+        { return m_waitedAct; }
+        const Activities::result_t& startedAct() const
+        { return m_startedAct; }
+        const Activities::result_t& failedAct() const
+        { return m_failedAct; }
+        const Activities::result_t& doneAct() const
+        { return m_doneAct; }
+        const Activities::result_t& endedAct() const
+        { return m_endedAct; }
+
+        const Activities::result_t& latestWaitedAct() const
+        { return m_latestWaitedAct; }
+        const Activities::result_t& latestStartedAct() const
+        { return m_latestStartedAct; }
+        const Activities::result_t& latestFailedAct() const
+        { return m_latestFailedAct; }
+        const Activities::result_t& latestDoneAct() const
+        { return m_latestDoneAct; }
+        const Activities::result_t& latestEndedAct() const
+        { return m_latestEndedAct; }
+
+        void removeWaitedAct(Activities::iterator it);
+        void removeStartedAct(Activities::iterator it);
+        void removeFailedAct(Activities::iterator it);
+        void removeDoneAct(Activities::iterator it);
+        void removeEndedAct(Activities::iterator it);
+        void addWaitedAct(Activities::iterator it);
+        void addStartedAct(Activities::iterator it);
+        void addFailedAct(Activities::iterator it);
+        void addDoneAct(Activities::iterator it);
+        void addEndedAct(Activities::iterator it);
+
+        void setWaitedAct(Activities::iterator it);
+        void setStartedAct(Activities::iterator it);
+        void setFailedAct(Activities::iterator it);
+        void setDoneAct(Activities::iterator it);
+        void setEndedAct(Activities::iterator it);
+
+        static void removeAct(Activities::result_t& lst,
+                              Activities::iterator it);
+        static void addAct(Activities::result_t& lst,
+                           Activities::iterator it);
+        void updateLatestActivitiesList(Activities::result_t& lst,
+                                        Activities::iterator it);
+
+        void clearLatestActivitiesLists();
+
     private:
         activities_t    m_lst;
         PrecedencesGraph m_graph;
 
-        Result processWaitState(iterator activity, const devs::Time& time,
-                                result_t& waitedact, result_t& startedact,
-                                result_t& doneact, result_t& failedact,
-                                result_t& endedact);
+        Activities::result_t m_waitedAct;
+        Activities::result_t m_startedAct;
+        Activities::result_t m_failedAct;
+        Activities::result_t m_doneAct;
+        Activities::result_t m_endedAct;
 
-        Result processStartedState(iterator activity, const devs::Time& time,
-                                   result_t& waitedact, result_t& startedact,
-                                   result_t& doneact, result_t& failedact,
-                                   result_t& endedact);
+        Activities::result_t m_latestWaitedAct;
+        Activities::result_t m_latestStartedAct;
+        Activities::result_t m_latestFailedAct;
+        Activities::result_t m_latestDoneAct;
+        Activities::result_t m_latestEndedAct;
 
-        Result processDoneState(iterator activity, const devs::Time& time,
-                                result_t& waitedact, result_t& startedact,
-                                result_t& doneact, result_t& failedact,
-                                result_t& endedact);
 
-        Result processFailedState(iterator activity, const devs::Time& time,
-                                  result_t& waitedact, result_t& startedact,
-                                  result_t& doneact, result_t& failedact,
-                                  result_t& endedact);
-
-        Result processEndedState(iterator activity, const devs::Time& time,
-                                 result_t& waitedact, result_t& startedact,
-                                 result_t& doneact, result_t& failedact,
-                                 result_t& endedact);
+        Result processWaitState(iterator activity, const devs::Time& time);
+        Result processStartedState(iterator activity, const devs::Time& time);
+        Result processDoneState(iterator activity, const devs::Time& time);
+        Result processFailedState(iterator activity, const devs::Time& time);
+        Result processEndedState(iterator activity, const devs::Time& time);
 
         PrecedenceConstraint::Result updateState(iterator activity,
                                                  const devs::Time& time);

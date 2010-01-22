@@ -26,6 +26,7 @@
  */
 
 #include <vle/extension/decision/Agent.hpp>
+#include <vle/extension/decision/Activity.hpp>
 #include <sstream>
 
 namespace vd = vle::devs;

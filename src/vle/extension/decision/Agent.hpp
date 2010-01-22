@@ -59,12 +59,6 @@ namespace vle { namespace extension { namespace decision {
         typedef Activities::result_t ActivityList;
 
         /**
-         * @brief When agent process output events, all activities in start
-         * @param output
-         */
-        virtual void onOutput(devs::ExternalEventList& /*output*/) const {}
-
-        /**
          * @brief When agent receive an setDoneActivity from an external event.
          *
          * @param activity The activity done.

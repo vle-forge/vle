@@ -26,6 +26,7 @@
  */
 
 #include <vle/extension/decision/Agent.hpp>
+#include <vle/extension/decision/Activity.hpp>
 #include <vle/devs/DynamicsDbg.hpp>
 #include <vle/utils/Trace.hpp>
 #include <boost/cast.hpp>
@@ -43,15 +44,24 @@ public:
     OnlyAgent(const vd::DynamicsInit& mdl, const vd::InitEventList& evts)
         : vmd::Agent(mdl, evts), mStart(false)
     {
-        addActivity("A", 0.0, 100.0);
-        addActivity("B", 0.5, 100.0);
-        addActivity("C", 0.6, 100.0);
-        addActivity("D", 0.9, 100.0);
-        addActivity("E", 1.1, 100.0);
-        addActivity("F", 1.9, 100.0);
-        addActivity("G", 1.95, 100.0);
-        addActivity("H", 2.1, 100.0);
-        addActivity("I", 9.9, 100.0);
+        addActivity("A", 0.0, 100.0).addOutputFunction(boost::bind(
+            &OnlyAgent::aout, this, _1, _2, _3));
+        addActivity("B", 0.5, 100.0).addOutputFunction(boost::bind(
+            &OnlyAgent::aout, this, _1, _2, _3));
+        addActivity("C", 0.6, 100.0).addOutputFunction(boost::bind(
+            &OnlyAgent::aout, this, _1, _2, _3));
+        addActivity("D", 0.9, 100.0).addOutputFunction(boost::bind(
+            &OnlyAgent::aout, this, _1, _2, _3));
+        addActivity("E", 1.1, 100.0).addOutputFunction(boost::bind(
+            &OnlyAgent::aout, this, _1, _2, _3));
+        addActivity("F", 1.9, 100.0).addOutputFunction(boost::bind(
+            &OnlyAgent::aout, this, _1, _2, _3));
+        addActivity("G", 1.95, 100.0).addOutputFunction(boost::bind(
+            &OnlyAgent::aout, this, _1, _2, _3));
+        addActivity("H", 2.1, 100.0).addOutputFunction(boost::bind(
+            &OnlyAgent::aout, this, _1, _2, _3));
+        addActivity("I", 9.9, 100.0).addOutputFunction(boost::bind(
+            &OnlyAgent::aout, this, _1, _2, _3));
     }
 
     virtual ~OnlyAgent()
@@ -70,13 +80,13 @@ public:
         return 0;
     }
 
-    virtual void onOutput(vd::ExternalEventList& output) const
+    void aout(const std::string& /*name*/, const vmd::Activity& activity,
+              vd::ExternalEventList& out)
     {
-        const Agent::ActivityList lst = startedActivities();
-
-        vd::ExternalEvent* evt = new vd::ExternalEvent("out");
-        evt << vd::attribute("value", boost::numeric_cast < int >(lst.size()));
-        output.addEvent(evt);
+        if (activity.isInStartedState()) {
+            vd::ExternalEvent* evt = new vd::ExternalEvent("out");
+            out.addEvent(evt);
+        }
     }
 
 private:
@@ -90,10 +100,28 @@ public:
                                   const vd::InitEventList& evts)
         : vmd::Agent(mdl, evts), mStart(false)
     {
-        addActivity("A", 0, devs::Time::infinity);
-        addActivity("B", devs::Time::negativeInfinity, devs::Time::infinity);
-        addActivity("C", devs::Time::negativeInfinity, devs::Time::infinity);
-        addActivity("D", devs::Time::negativeInfinity, devs::Time::infinity);
+        vmd::Activity& a = addActivity("A", 0, devs::Time::infinity);
+        a.addOutputFunction(
+            boost::bind(&OnlyAgentPrecedenceConstraint::aout, this, _1, _2,
+                        _3));
+
+        vmd::Activity& b = addActivity("B", devs::Time::negativeInfinity,
+                                       devs::Time::infinity);
+        b.addOutputFunction(
+            boost::bind(&OnlyAgentPrecedenceConstraint::aout, this, _1, _2,
+                        _3));
+
+        vmd::Activity& c = addActivity("C", devs::Time::negativeInfinity,
+                                       devs::Time::infinity);
+        c.addOutputFunction(
+            boost::bind(&OnlyAgentPrecedenceConstraint::aout, this, _1, _2,
+                        _3));
+
+        vmd::Activity& d = addActivity("D", devs::Time::negativeInfinity,
+                                       devs::Time::infinity);
+        d.addOutputFunction(
+            boost::bind(&OnlyAgentPrecedenceConstraint::aout, this, _1, _2,
+                        _3));
 
         addStartToStartConstraint("A", "B", 1.0, devs::Time::infinity);
         addStartToStartConstraint("B", "C", 1.0, devs::Time::infinity);
@@ -116,13 +144,13 @@ public:
         return 0;
     }
 
-    virtual void onOutput(vd::ExternalEventList& output) const
+    void aout(const std::string& /*name*/, const vmd::Activity& activity,
+              vd::ExternalEventList& out)
     {
-        const Agent::ActivityList lst = startedActivities();
-
-        vd::ExternalEvent* evt = new vd::ExternalEvent("out");
-        evt << vd::attribute("value", boost::numeric_cast < int >(lst.size()));
-        output.addEvent(evt);
+        if (activity.isInStartedState()) {
+            vd::ExternalEvent* evt = new vd::ExternalEvent("out");
+            out.addEvent(evt);
+        }
     }
 
 private:

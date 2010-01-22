@@ -92,12 +92,7 @@ public:
     virtual void externalTransition(const vd::ExternalEventList& events,
                                     const devs::Time& time)
     {
-        for (vd::ExternalEventList::const_iterator it = events.begin();
-             it != events.end(); ++it) {
-            if ((*it)->onPort("in")) {
-                mCounter = (*it)->getLongAttributeValue("value");
-            }
-        }
+        mCounter += events.size();
     }
 
     virtual vv::Value* observation(const vd::ObservationEvent& event) const

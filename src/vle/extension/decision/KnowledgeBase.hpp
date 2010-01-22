@@ -68,7 +68,8 @@ namespace vle { namespace extension { namespace decision {
                               const devs::Time& finish)
         { return m_activities.add(name, start, finish); }
 
-        Activity& addActivity(const std::string& name, const Activity& act)
+        Activity& addActivity(const std::string& name,
+                              const Activity& act)
         { return m_activities.add(name, act); }
 
         /**
@@ -178,54 +179,45 @@ namespace vle { namespace extension { namespace decision {
                                const devs::Time& date);
 
         const Activities::result_t& waitedActivities() const
-        { return m_waitedAct; }
+        { return m_activities.waitedAct(); }
 
         const Activities::result_t& startedActivities() const
-        { return m_startedAct; }
+        { return m_activities.startedAct(); }
 
         const Activities::result_t& failedActivities() const
-        { return m_failedAct; }
+        { return m_activities.failedAct(); }
 
         const Activities::result_t& doneActivities() const
-        { return m_doneAct; }
+        { return m_activities.doneAct(); }
 
         const Activities::result_t& endedActivities() const
-        { return m_endedAct; }
+        { return m_activities.endedAct(); }
 
         const Activities::result_t& latestWaitedActivities() const
-        { return m_latestWaitedAct; }
+        { return m_activities.latestWaitedAct(); }
 
         const Activities::result_t& latestStartedActivities() const
-        { return m_latestStartedAct; }
+        { return m_activities.latestStartedAct(); }
 
         const Activities::result_t& latestFailedActivities() const
-        { return m_latestFailedAct; }
+        { return m_activities.latestFailedAct(); }
 
         const Activities::result_t& latestDoneActivities() const
-        { return m_latestDoneAct; }
+        { return m_activities.latestDoneAct(); }
 
         const Activities::result_t& latestEndedActivities() const
-        { return m_latestEndedAct; }
+        { return m_activities.latestEndedAct(); }
+
+        void clearLatestActivitiesLists()
+        { m_activities.clearLatestActivitiesLists(); }
 
     private:
         Facts m_facts;
         Rules m_rules;
         Activities m_activities;
 
-        Activities::result_t m_waitedAct;
-        Activities::result_t m_startedAct;
-        Activities::result_t m_failedAct;
-        Activities::result_t m_doneAct;
-        Activities::result_t m_endedAct;
-
-        Activities::result_t m_latestWaitedAct;
-        Activities::result_t m_latestStartedAct;
-        Activities::result_t m_latestFailedAct;
-        Activities::result_t m_latestDoneAct;
-        Activities::result_t m_latestEndedAct;
-
-        void buildLatestList(const Activities::result_t& in,
-                             Activities::result_t& out);
+        static void unionLists(Activities::result_t& last,
+                               Activities::result_t& recent);
     };
 
     inline std::ostream& operator<<(std::ostream& o, const KnowledgeBase& kb)
@@ -233,6 +225,12 @@ namespace vle { namespace extension { namespace decision {
         return o << kb.facts() << "\n" << kb.rules() << "\n"
             << kb.activities() << "\n";
     }
+
+    struct CompareActivities
+    {
+        bool operator()(Activities::iterator x, Activities::iterator y) const
+        { return &x->second < &y->second; }
+    };
 
 }}} // namespace vle model decision
 
