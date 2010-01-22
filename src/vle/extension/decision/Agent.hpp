@@ -58,15 +58,6 @@ namespace vle { namespace extension { namespace decision {
 
         typedef Activities::result_t ActivityList;
 
-        /**
-         * @brief When agent receive an setDoneActivity from an external event.
-         *
-         * @param activity The activity done.
-         * @param value A value attached
-         */
-        virtual void onUpdateActivity(const std::string& /*activity*/,
-                                      const value::Value& /*value*/) {};
-
                        /* * * * * DEVS methods * * * * */
 
         virtual devs::Time init(const devs::Time& time);

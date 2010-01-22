@@ -42,8 +42,7 @@ namespace vle { namespace extension { namespace decision {
     public:
         typedef boost::function <
             void (const std::string&,
-                  const Activity&,
-                  const vle::devs::ExternalEvent&) > AckFct;
+                  const Activity&) > AckFct;
 
         typedef boost::function <
             void (const std::string&,
@@ -104,11 +103,9 @@ namespace vle { namespace extension { namespace decision {
         /**
          * @brief Call the acknowledge function if it exists.
          * @param name The name of the activity.
-         * @param event The external event to update the activity.
          */
-        void acknowledge(const std::string& name,
-                         const devs::ExternalEvent& event)
-        { if (mAckFct) { mAckFct(name, *this, event); } }
+        void acknowledge(const std::string& name)
+        { if (mAckFct) { mAckFct(name, *this); } }
 
         /**
          * @brief Assign an output function to this activity.

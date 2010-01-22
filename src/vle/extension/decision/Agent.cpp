@@ -133,7 +133,11 @@ void Agent::externalTransition(
 
             if (order == "done") {
                 setActivityDone(activity, time);
-                onUpdateActivity(activity, (*it)->getAttributes());
+            } else if (order == "fail") {
+                setActivityFailed(activity, time);
+            } else {
+                throw utils::ModellingError(
+                    fmt(_("Decision: unknow order `%1%'")) % order);
             }
         } else {
             if (mPortMode) {

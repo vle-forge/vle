@@ -45,6 +45,7 @@ void KnowledgeBase::setActivityDone(const std::string& name,
 
     m_activities.setDoneAct(it);
     it->second.done(date);
+    it->second.acknowledge(name);
 }
 
 void KnowledgeBase::setActivityFailed(const std::string& name,
@@ -59,6 +60,7 @@ void KnowledgeBase::setActivityFailed(const std::string& name,
 
     m_activities.setFailedAct(it);
     it->second.fail(date);
+    it->second.acknowledge(name);
 }
 
 devs::Time KnowledgeBase::duration(const devs::Time& time)
