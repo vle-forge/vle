@@ -199,6 +199,9 @@ public:
     inline Nosync createNosync(const std::string& name)
     { return Base::Nosync(name, this); }
 
+    int phase() const
+    { return mPhase; }
+
     /**
      * @brief Set the size of value buffer of an external
      * variable. By default, this size is DEFAULT_SIZE.
@@ -385,6 +388,9 @@ protected:
     vle::devs::Time mLastComputeTime;
     vle::devs::Time mLastClearTime;
     int mWaiting;
+
+    // phase
+    int mPhase;
 };
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */

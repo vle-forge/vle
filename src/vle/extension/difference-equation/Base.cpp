@@ -440,6 +440,7 @@ Time Base::init(const devs::Time& time)
         mDependance = getModel().existInputPort("update");
     } else {
         mDependance = (getModel().getInputPortNumber() -
+                       (getModel().existInputPort("phase")?1:0) -
                        (getModel().existInputPort("perturb")?1:0) -
                        (getModel().existInputPort("request")?1:0) -
                        (getModel().existInputPort("add")?1:0) -
@@ -460,6 +461,7 @@ Time Base::init(const devs::Time& time)
             }
         } else {
             n = getModel().getInputPortNumber() -
+                (getModel().existInputPort("phase")?1:0) -
                 (getModel().existInputPort("perturb")?1:0) -
                 (getModel().existInputPort("request")?1:0) -
                 (getModel().existInputPort("add")?1:0) -
@@ -481,6 +483,7 @@ Time Base::init(const devs::Time& time)
             }
         } else {
             mWaiting = getModel().getInputPortNumber() -
+                (getModel().existInputPort("phase")?1:0) -
                 (getModel().existInputPort("perturb")?1:0) -
                 (getModel().existInputPort("request")?1:0) -
                 (getModel().existInputPort("add")?1:0) -
@@ -643,7 +646,9 @@ void Base::externalTransition(const ExternalEventList& event,
     bool reset = false;
 
     while (it != event.end()) {
-        if (mMode == NAME and (*it)->onPort("update")) {
+        if ((*it)->onPort("phase")) {
+            mPhase = (*it)->getIntegerAttributeValue("phase");
+        } else if (mMode == NAME and (*it)->onPort("update")) {
             std::string name = (*it)->getStringAttributeValue("name");
 
             if (mReceive == 0 and mSyncs > 0 and
@@ -651,8 +656,7 @@ void Base::externalTransition(const ExternalEventList& event,
                 clearReceivedValues();
             }
             processUpdate(name, **it, begin, end, time);
-        }
-        else if ((*it)->onPort("perturb")) {
+        } else if ((*it)->onPort("perturb")) {
             std::string name = (*it)->getStringAttributeValue("name");
             double value = (*it)->getDoubleAttributeValue("value");
             Perturbation_t type = SET;
