@@ -28,6 +28,7 @@
 
 #include <vle/extension/decision/Agent.hpp>
 #include <vle/utils/Debug.hpp>
+#include <vle/value/String.hpp>
 #include <cassert>
 
 namespace vle { namespace extension { namespace decision {
@@ -169,8 +170,29 @@ void Agent::request(const devs::RequestEvent& /*event*/,
 }
 
 value::Value* Agent::observation(
-    const devs::ObservationEvent& /*event*/) const
+    const devs::ObservationEvent& event) const
 {
+    const std::string port = event.getPortName();
+
+    if (port == "KnowledgeBase") {
+        std::stringstream out;
+        out << *this;
+        return new value::String(out.str());
+    } else if (port == "Activities") {
+        std::stringstream out;
+        out << activities();
+        return new value::String(out.str());
+    } else if (port.compare(0, 9, "Activity_") and port.size() > 9) {
+        std::string activity(port, 10, std::string::npos);
+        const Activity& act(activities().get(activity)->second);
+        std::stringstream out;
+        out << act.state();
+        return new value::String(out.str());
+    } else if (port.compare(0, 6, "Rules_") and port.size() > 6) {
+        std::string rule(port, 7, std::string::npos);
+        const Rule& ru(rules().get(rule));
+        return new value::Boolean(ru.isAvailable());
+    }
     return 0;
 }
 

@@ -50,6 +50,8 @@ namespace vle { namespace extension { namespace decision {
 
         result_t apply() const;
 
+        const Rule& get(const std::string& name) const;
+
         iterator begin() { return m_lst.begin(); }
         const_iterator begin() const { return m_lst.begin(); }
         iterator end() { return m_lst.end(); }

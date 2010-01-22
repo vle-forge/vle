@@ -235,7 +235,7 @@ namespace vle { namespace extension { namespace decision {
         void clearLatestActivitiesLists();
 
     private:
-        activities_t    m_lst;
+        activities_t     m_lst;
         PrecedencesGraph m_graph;
 
         Activities::result_t m_waitedAct;

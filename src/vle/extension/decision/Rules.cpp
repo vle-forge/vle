@@ -72,5 +72,16 @@ Rules::result_t Rules::apply() const
     return result;
 }
 
+const Rule& Rules::get(const std::string& name) const
+{
+    const_iterator it = m_lst.find(name);
+
+    if (it == m_lst.end()) {
+        throw utils::ArgError(_("Decision: rule does not exist"));
+    }
+
+    return it->second;
+}
+
 }}} // namespace vle model decision
 
