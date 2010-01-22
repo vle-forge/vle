@@ -93,11 +93,21 @@ namespace vle { namespace graph {
         { return false; }
 
         /**
-         * Find recursively a model, atomic or coupled, with a specified name.
+         * Find a model, atomic or coupled, with a specified name.
          * @param name model name to search.
          * @return model founded, otherwise 0.
+         * @deprecated
          */
         virtual Model* findModel(const std::string& name) const = 0;
+
+        /**
+          * Find a model, atomic or coupled, thanks to a formatted model path.
+          * @param path formatted model path
+          * (use format "coupled1,coupled2,atomic")
+          * @return model founded, otherwise 0.
+          */
+         Model* findModelFromPath(const std::string& pathname) const;
+
 
         /**
          * @brief Write the model in the output stream.

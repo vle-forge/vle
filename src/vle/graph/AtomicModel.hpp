@@ -71,10 +71,10 @@ namespace vle { namespace graph {
         virtual bool isAtomic() const { return true; }
 
         /**
-         * @brief Return this if name is equal to the model's name. Recursive
-         * function.
+         * @brief Return this if name is equal to the model's name.
          * @param name The name of the model to find.
          * @return this if name is equal to the model's name, null otherwise.
+         * @deprecated
          */
         virtual graph::Model* findModel(const std::string & name) const;
 

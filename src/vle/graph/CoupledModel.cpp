@@ -707,14 +707,10 @@ Model* CoupledModel::findModel(const std::string& name) const
     return (it == m_modelList.end()) ? 0 : it->second;
 }
 
-Model* CoupledModel::findModelRecursively(const std::string& modelname) const
+Model* CoupledModel::getModel(const std::string& name) const
 {
-    if (getName() == modelname) {
-        return const_cast < Model* >(
-            reinterpret_cast < const Model* >(this));
-    } else {
-        return findModel(modelname);
-    }
+    ModelList::const_iterator it = m_modelList.find(name);
+    return (it == m_modelList.end()) ? 0 : it->second;
 }
 
 void CoupledModel::addModel(Model* model)

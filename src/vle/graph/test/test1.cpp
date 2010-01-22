@@ -73,6 +73,31 @@ BOOST_AUTO_TEST_CASE(test_rename_model)
     BOOST_REQUIRE_NO_THROW(graph::Model::rename(top1, "new_top1"));
 }
 
+BOOST_AUTO_TEST_CASE(test_findModelFromPath){
+    vpz::Vpz file(utils::Path::path().getExampleFile("unittest.vpz"));
+    Model* d = file.project().model().model()->findModelFromPath("d");
+    bool found = (d != 0);
+
+    BOOST_REQUIRE_EQUAL(found, true);
+    Model* top1 = file.project().model().model()->findModelFromPath("top1");
+    found = (top1 != 0);
+    BOOST_REQUIRE_EQUAL(found, true);
+    Model* top2_g = file.project().model().model()->findModelFromPath("top2,g");
+    found = (top2_g != 0);
+    BOOST_REQUIRE_EQUAL(found, true);
+    Model* nomodel =
+        file.project().model().model()->findModelFromPath("nomodel");
+    found = (nomodel != 0);
+    BOOST_REQUIRE_EQUAL(found, false);
+    Model* empty = file.project().model().model()->findModelFromPath("");
+    found = (empty != 0);
+    BOOST_REQUIRE_EQUAL(found, false);
+    Model* top1_a_nomodel =
+        file.project().model().model()->findModelFromPath("top1,a,nomodel");
+    found = (top1_a_nomodel != 0);
+    BOOST_REQUIRE_EQUAL(found, false);
+}
+
 BOOST_AUTO_TEST_CASE(test_del_all_connection)
 {
     CoupledModel* top = new CoupledModel("top", 0);

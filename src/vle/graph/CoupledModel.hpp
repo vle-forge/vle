@@ -174,9 +174,21 @@ namespace vle { namespace graph {
          */
         void detachModels(const ModelList& models);
 
+        /**
+         * Find a model, atomic or coupled, with a specified name.
+         * @param name model name to search.
+         * @return model founded, otherwise 0.
+         * @deprecated
+         */
         Model* findModel(const std::string& modelname) const;
 
-        Model* findModelRecursively(const std::string& modelName) const;
+        /**
+         * @brief Gets a model with the specified name
+         * @param name the model name
+         * @return A reference to the found model otherwise 0.
+         */
+        Model* getModel(const std::string& name) const;
+
 
 	void addInputConnection(const std::string& portSrc,
                                 Model* dst, const std::string& portDst);

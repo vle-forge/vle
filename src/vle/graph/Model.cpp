@@ -268,6 +268,36 @@ Model* Model::getModel(const CoupledModelVector& lst,
     }
 }
 
+Model* Model::findModelFromPath(const std::string& path) const
+{
+    std::vector < std::string > splitVect;
+    boost::split(splitVect, path, boost::is_any_of(","));
+    std::vector < std::string >::const_iterator it = splitVect.begin();
+    std::vector < std::string >::const_iterator ite = splitVect.end();
+    Model* currModel = 0;
+    const CoupledModel* currCoupledModel = 0;
+    for (; it != ite; it++) {
+        if (currModel == 0) {
+            if (this->isAtomic()) {
+                return 0;
+            }
+            currCoupledModel = static_cast<const CoupledModel*>(this);
+        }else{
+            if (currModel->isAtomic()) {
+                return 0;
+            }
+            currCoupledModel = static_cast<const CoupledModel*>(currModel);
+        }
+        ModelList::const_iterator itml =
+            currCoupledModel->getModelList().find(*it);
+        if (itml == currCoupledModel->getModelList().end()) {
+            return 0;
+        }
+        currModel = itml->second;
+    }
+    return currModel;
+}
+
 ModelPortList& Model::addInputPort(const std::string& name)
 {
     ConnectionList::iterator it(m_inPortList.find(name));

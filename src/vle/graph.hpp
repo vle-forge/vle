@@ -33,7 +33,6 @@
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/graph/Model.hpp>
-#include <vle/graph/ModelPort.hpp>
 #include <vle/graph/ModelPortList.hpp>
 
 
