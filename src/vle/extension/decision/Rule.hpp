@@ -30,19 +30,20 @@
 #define VLE_EXTENSION_DECISION_RULE_HPP
 
 #include <vle/extension/decision/Predicates.hpp>
+#include <vle/extension/DllDefines.hpp>
 
 namespace vle { namespace extension { namespace decision {
 
-    class Rule
-    {
-    public:
-        void add(const Predicate& pred) { m_predicats.add(pred); }
+class VLE_EXTENSION_EXPORT Rule
+{
+public:
+    void add(const Predicate& pred) { m_predicats.add(pred); }
 
-        bool isAvailable() const { return m_predicats.isAvailable(); }
+    bool isAvailable() const { return m_predicats.isAvailable(); }
 
-    private:
-        Predicates m_predicats;
-    };
+private:
+    Predicates m_predicats;
+};
 
 }}} // namespace vle model decision
 

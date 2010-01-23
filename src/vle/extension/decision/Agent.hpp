@@ -35,127 +35,126 @@
 
 namespace vle { namespace extension { namespace decision {
 
-    class VLE_EXTENSION_EXPORT Agent : public devs::Dynamics,
-                                       public decision::KnowledgeBase
-    {
-    public:
-        Agent(const devs::DynamicsInit& mdl,
-              const devs::InitEventList& evts)
-            : devs::Dynamics(mdl, evts), mState(Init), mCurrentTime(0.0),
-            mPortMode(true)
-        {}
+class VLE_EXTENSION_EXPORT Agent : public devs::Dynamics,
+                                   public decision::KnowledgeBase
+{
+public:
+    Agent(const devs::DynamicsInit& mdl,
+          const devs::InitEventList& evts)
+        : devs::Dynamics(mdl, evts), mState(Init), mCurrentTime(0.0),
+        mPortMode(true)
+    {}
 
-        virtual ~Agent() {}
+    virtual ~Agent() {}
 
+    /**
+     * @brief Return the simulation time.
+     * @return The simulation time.
+     */
+    const devs::Time& currentTime() const { return mCurrentTime; }
 
-        /**
-         * @brief Return the simulation time.
-         * @return The simulation time.
-         */
-        const devs::Time& currentTime() const { return mCurrentTime; }
+    /* * * * * Update methods * * * * */
 
-                      /* * * * * Update methods * * * * */
+    typedef Activities::result_t ActivityList;
 
-        typedef Activities::result_t ActivityList;
+    /* * * * * DEVS methods * * * * */
 
-                       /* * * * * DEVS methods * * * * */
+    virtual devs::Time init(const devs::Time& time);
 
-        virtual devs::Time init(const devs::Time& time);
+    /**
+     * @brief Process the output function: compute the output function.
+     * @param time the time of the occurrence of output function.
+     * @param output the list of external events (output parameter).
+     */
+    virtual void output(
+        const devs::Time& time,
+        devs::ExternalEventList& output) const;
 
-	/**
-	 * @brief Process the output function: compute the output function.
-         * @param time the time of the occurrence of output function.
-         * @param output the list of external events (output parameter).
-	 */
-        virtual void output(
-            const devs::Time& time,
-            devs::ExternalEventList& output) const;
+    /**
+     * @brief Process the time advance function: compute the duration of the
+     * current state.
+     * @return duration of the current state.
+     */
+    virtual devs::Time timeAdvance() const;
 
-	/**
-         * @brief Process the time advance function: compute the duration of the
-         * current state.
-         * @return duration of the current state.
-	 */
-        virtual devs::Time timeAdvance() const;
+    /**
+     * @brief Process an internal transition: compute the new state of the
+     * model with the internal transition function.
+     * @param time the date of occurence of this event.
+     */
+    virtual void internalTransition(const devs::Time& time);
 
-	/**
-         * @brief Process an internal transition: compute the new state of the
-         * model with the internal transition function.
-	 * @param time the date of occurence of this event.
-	 */
-        virtual void internalTransition(const devs::Time& time);
+    /**
+     * @brief Process an external transition: compute the new state of the
+     * model when an external event occurs.
+     * @param event the external event with of the port.
+     * @param time the date of occurrence of this event.
+     */
+    virtual void externalTransition(
+        const devs::ExternalEventList& events,
+        const devs::Time& time);
 
-	/**
-         * @brief Process an external transition: compute the new state of the
-         * model when an external event occurs.
-         * @param event the external event with of the port.
-         * @param time the date of occurrence of this event.
-	 */
-        virtual void externalTransition(
-            const devs::ExternalEventList& events,
-            const devs::Time& time);
+    /**
+     * @brief Process the confluent transition: select the transition to
+     * call when an internal and one or more external event appear in the
+     * same time.
+     * @param internal the internal event.
+     * @param extEventlist the external events list.
+     * @return Event::INTERNAL if internal is priority or Event::EXTERNAL.
+     */
+    virtual devs::Event::EventType confluentTransitions(
+        const devs::Time& time,
+        const devs::ExternalEventList& extEventlist) const;
 
-        /**
-         * @brief Process the confluent transition: select the transition to
-         * call when an internal and one or more external event appear in the
-         * same time.
-         * @param internal the internal event.
-         * @param extEventlist the external events list.
-         * @return Event::INTERNAL if internal is priority or Event::EXTERNAL.
-         */
-        virtual devs::Event::EventType confluentTransitions(
-	    const devs::Time& time,
-            const devs::ExternalEventList& extEventlist) const;
+    /**
+     * @brief Process a request event: these functions occurs when an
+     * RequestEvent is push into an ExternalEventList by the
+     * output function.
+     * @param event RequestEvent to process.
+     * @param time the date of occurrence of this event.
+     * @param output the list of external events (output parameter).
+     * @return a response to the model. This bag can include External and
+     * Request event.
+     */
+    virtual void request(
+        const devs::RequestEvent& event,
+        const devs::Time& time,
+        devs::ExternalEventList& output) const;
 
-        /**
-         * @brief Process a request event: these functions occurs when an
-         * RequestEvent is push into an ExternalEventList by the
-         * output function.
-         * @param event RequestEvent to process.
-         * @param time the date of occurrence of this event.
-         * @param output the list of external events (output parameter).
-         * @return a response to the model. This bag can include External and
-         * Request event.
-         */
-        virtual void request(
-	    const devs::RequestEvent& event,
-            const devs::Time& time,
-            devs::ExternalEventList& output) const;
+    /**
+     * @brief Process an observation event: compute the current state of the
+     * model at a specified time and for a specified port.
+     * @param event the state event with of the port
+     * @return the value of state variable
+     */
+    virtual value::Value* observation(
+        const devs::ObservationEvent& event) const;
 
-	/**
-         * @brief Process an observation event: compute the current state of the
-         * model at a specified time and for a specified port.
-	 * @param event the state event with of the port
-	 * @return the value of state variable
-	 */
-        virtual value::Value* observation(
-            const devs::ObservationEvent& event) const;
+    /**
+     * @brief When the simulation of the atomic model is finished, the
+     * finish method is invoked.
+     */
+    virtual void finish();
 
-        /**
-         * @brief When the simulation of the atomic model is finished, the
-         * finish method is invoked.
-	 */
-        virtual void finish();
-
-    protected:
-        /**
-         * @brief DEVS phase of the autotmate.
-         */
-        enum State {
-            Init, /**< The initial state. */
-            Process, /**< call the process function of the KnowledgeBase. */
-            UpdateFact, /**< Update the facts. */
-            Output /**< State to output result. */
-        };
-
-        State      mState;
-        mutable devs::Time mCurrentTime; /* To assign mCurrentTime in output
-                                            function. */
-
-        KnowledgeBase::Result mNextChangeTime;
-
-        bool       mPortMode;
+protected:
+    /**
+     * @brief DEVS phase of the autotmate.
+     */
+    enum State {
+        Init, /**< The initial state. */
+        Process, /**< call the process function of the KnowledgeBase. */
+        UpdateFact, /**< Update the facts. */
+        Output /**< State to output result. */
     };
+
+    State mState;
+    mutable devs::Time mCurrentTime; /* To assign mCurrentTime in output
+                                        function. */
+
+    KnowledgeBase::Result mNextChangeTime;
+
+    bool mPortMode;
+};
 
 }}} // namespace vle extension decision
 

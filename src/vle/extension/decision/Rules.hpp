@@ -30,49 +30,50 @@
 #define VLE_EXTENSION_DECISION_RULES_HPP
 
 #include <vle/extension/decision/Rule.hpp>
+#include <vle/extension/DllDefines.hpp>
 #include <map>
 #include <string>
 
 namespace vle { namespace extension { namespace decision {
 
-    class Rules
-    {
-    public:
-        typedef std::map < std::string, Rule > rules_t;
-        typedef rules_t::const_iterator const_iterator;
-        typedef rules_t::iterator iterator;
-        typedef rules_t::size_type size_type;
-        typedef std::vector < const_iterator > result_t;
+class VLE_EXTENSION_EXPORT Rules
+{
+public:
+    typedef std::map < std::string, Rule > rules_t;
+    typedef rules_t::const_iterator const_iterator;
+    typedef rules_t::iterator iterator;
+    typedef rules_t::size_type size_type;
+    typedef std::vector < const_iterator > result_t;
 
-        Rule& add(const std::string& name, const Rule& rule = Rule());
+    Rule& add(const std::string& name, const Rule& rule = Rule());
 
-        Rule& add(const std::string& name, const Predicate& pred);
+    Rule& add(const std::string& name, const Predicate& pred);
 
-        result_t apply() const;
+    result_t apply() const;
 
-        const Rule& get(const std::string& name) const;
+    const Rule& get(const std::string& name) const;
 
-        iterator begin() { return m_lst.begin(); }
-        const_iterator begin() const { return m_lst.begin(); }
-        iterator end() { return m_lst.end(); }
-        const_iterator end() const { return m_lst.end(); }
-        size_type size() const { return m_lst.size(); }
-	bool empty() const { return m_lst.empty(); }
+    iterator begin() { return m_lst.begin(); }
+    const_iterator begin() const { return m_lst.begin(); }
+    iterator end() { return m_lst.end(); }
+    const_iterator end() const { return m_lst.end(); }
+    size_type size() const { return m_lst.size(); }
+    bool empty() const { return m_lst.empty(); }
 
-    private:
-        rules_t m_lst;
-    };
+private:
+    rules_t m_lst;
+};
 
-    inline std::ostream& operator<<(std::ostream& s, const Rules& o)
-    {
-        std::ios_base::fmtflags fl = s.flags();
-        s << std::boolalpha << "rules:";
-        for (Rules::const_iterator it = o.begin(); it != o.end(); ++it) {
-            s << " (" << it->first << "," << it->second.isAvailable() << ")";
-        }
-        s.flags(fl);
-        return s;
+inline std::ostream& operator<<(std::ostream& s, const Rules& o)
+{
+    std::ios_base::fmtflags fl = s.flags();
+    s << std::boolalpha << "rules:";
+    for (Rules::const_iterator it = o.begin(); it != o.end(); ++it) {
+        s << " (" << it->first << "," << it->second.isAvailable() << ")";
     }
+    s.flags(fl);
+    return s;
+}
 
 }}} // namespace vle model decision
 

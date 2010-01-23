@@ -30,29 +30,30 @@
 #define VLE_EXTENSION_DECISION_PRECEDENCESGRAPH_HPP
 
 #include <vle/extension/decision/PrecedenceConstraint.hpp>
+#include <vle/extension/DllDefines.hpp>
 #include <set>
 
 namespace vle { namespace extension { namespace decision {
 
-    class PrecedencesGraph
-    {
-    public:
-        typedef std::multiset < PrecedenceConstraint,
-                PrecedenceConstraintCompareFirst > PrecedencesOut;
+class VLE_EXTENSION_EXPORT PrecedencesGraph
+{
+public:
+    typedef std::multiset < PrecedenceConstraint,
+            PrecedenceConstraintCompareFirst > PrecedencesOut;
 
-        typedef std::multiset < PrecedenceConstraint,
-                PrecedenceConstraintCompareSecond > PrecedencesIn;
+    typedef std::multiset < PrecedenceConstraint,
+            PrecedenceConstraintCompareSecond > PrecedencesIn;
 
-        typedef PrecedencesIn::iterator iteratorIn;
-        typedef PrecedencesOut::iterator iteratorOut;
+    typedef PrecedencesIn::iterator iteratorIn;
+    typedef PrecedencesOut::iterator iteratorOut;
 
-        typedef std::pair < iteratorIn, iteratorOut > findIn;
-        typedef std::pair < iteratorOut, iteratorOut > findOut;
+    typedef std::pair < iteratorIn, iteratorOut > findIn;
+    typedef std::pair < iteratorOut, iteratorOut > findOut;
 
-        void add(const PrecedenceConstraint& p);
+    void add(const PrecedenceConstraint& p);
 
-        findIn
-            findPrecedenceIn(PrecedenceConstraint::iterator activity) const
+    findIn
+        findPrecedenceIn(PrecedenceConstraint::iterator activity) const
         {
             return m_lstin.equal_range(
                 PrecedenceConstraint(activity, activity,
@@ -60,8 +61,8 @@ namespace vle { namespace extension { namespace decision {
                                      0.0, 0.0));
         }
 
-        findOut
-            findPrecedenceOut(PrecedenceConstraint::iterator activity) const
+    findOut
+        findPrecedenceOut(PrecedenceConstraint::iterator activity) const
         {
             return m_lstout.equal_range(
                 PrecedenceConstraint(activity, activity,
@@ -69,31 +70,30 @@ namespace vle { namespace extension { namespace decision {
                                      0.0, 0.0));
         }
 
-        const PrecedencesIn& in() const { return m_lstin; }
-        const PrecedencesOut& out() const { return m_lstout; }
+    const PrecedencesIn& in() const { return m_lstin; }
+    const PrecedencesOut& out() const { return m_lstout; }
 
-    private:
-        /** Defines the constraints. */
-        PrecedencesIn m_lstin;
-        PrecedencesOut m_lstout;
+private:
+    /** Defines the constraints. */
+    PrecedencesIn m_lstin;
+    PrecedencesOut m_lstout;
+};
 
-    };
-
-    inline std::ostream&
-        operator<<(std::ostream& o, const PrecedencesGraph& p)
-    {
-        o << "PrecedencesGraph:\n1) Out list:\n";
-        for (PrecedencesGraph::iteratorOut i = p.in().begin();
-             i != p.in().end(); ++i) {
-            o << "- (" << (*i) << ")\n";
-        }
-        o << "PrecedencesGraph:\n1) In list:\n";
-        for (PrecedencesGraph::iteratorIn i = p.out().begin();
-             i != p.out().end(); ++i) {
-            o << "- (" << (*i) << ")\n";
-        }
-        return o << "\n";
+inline std::ostream&
+operator<<(std::ostream& o, const PrecedencesGraph& p)
+{
+    o << "PrecedencesGraph:\n1) Out list:\n";
+    for (PrecedencesGraph::iteratorOut i = p.in().begin();
+         i != p.in().end(); ++i) {
+        o << "- (" << (*i) << ")\n";
     }
+    o << "PrecedencesGraph:\n1) In list:\n";
+    for (PrecedencesGraph::iteratorIn i = p.out().begin();
+         i != p.out().end(); ++i) {
+        o << "- (" << (*i) << ")\n";
+    }
+    return o << "\n";
+}
 
 }}} // namespace vle model decision
 

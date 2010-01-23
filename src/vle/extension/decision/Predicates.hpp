@@ -29,6 +29,7 @@
 #ifndef VLE_EXTENSION_DECISION_PREDICATES_HPP
 #define VLE_EXTENSION_DECISION_PREDICATES_HPP
 
+#include <vle/extension/DllDefines.hpp>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 #include <vector>
@@ -36,42 +37,42 @@
 
 namespace vle { namespace extension { namespace decision {
 
-    /**
-     * @brief Defines a Predicate like a function which returns a boolean
-     * without parameter.
-     */
-    typedef boost::function < bool (void) > Predicate;
+/**
+ * @brief Defines a Predicate like a function which returns a boolean
+ * without parameter.
+ */
+typedef boost::function < bool (void) > Predicate;
 
-    class Predicates
-    {
-    public:
-        typedef std::vector < Predicate > predicates_t;
-        typedef predicates_t::const_iterator const_iterator;
-        typedef predicates_t::iterator iterator;
-        typedef predicates_t::size_type size_type;
+class VLE_EXTENSION_EXPORT Predicates
+{
+public:
+    typedef std::vector < Predicate > predicates_t;
+    typedef predicates_t::const_iterator const_iterator;
+    typedef predicates_t::iterator iterator;
+    typedef predicates_t::size_type size_type;
 
-        void add(const Predicate& pred) { m_lst.push_back(pred); }
+    void add(const Predicate& pred) { m_lst.push_back(pred); }
 
-        bool isAvailable() const;
+    bool isAvailable() const;
 
-        iterator begin() { return m_lst.begin(); }
-        const_iterator begin() const { return m_lst.begin(); }
-        iterator end() { return m_lst.end(); }
-        const_iterator end() const { return m_lst.end(); }
-        size_type size() const { return m_lst.size(); }
+    iterator begin() { return m_lst.begin(); }
+    const_iterator begin() const { return m_lst.begin(); }
+    iterator end() { return m_lst.end(); }
+    const_iterator end() const { return m_lst.end(); }
+    size_type size() const { return m_lst.size(); }
 
-    private:
-        predicates_t m_lst;
-    };
+private:
+    predicates_t m_lst;
+};
 
-    inline std::ostream& operator<<(std::ostream& s, const Predicates& o)
-    {
-        s << "predicats: ";
-        for (Predicates::const_iterator it = o.begin(); it != o.end(); ++it) {
-            s << " [" << &(*it) << "]";
-        }
-        return s;
+inline std::ostream& operator<<(std::ostream& s, const Predicates& o)
+{
+    s << "predicats: ";
+    for (Predicates::const_iterator it = o.begin(); it != o.end(); ++it) {
+        s << " [" << &(*it) << "]";
     }
+    return s;
+}
 
 }}} // namespace vle model decision
 

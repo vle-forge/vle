@@ -30,44 +30,45 @@
 #define VLE_EXTENSION_DECISION_FACTS_HPP
 
 #include <vle/extension/decision/Rules.hpp>
+#include <vle/extension/DllDefines.hpp>
 #include <vle/value/Value.hpp>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 
 namespace vle { namespace extension { namespace decision {
 
-    typedef boost::function < void (const vle::value::Value&) > Fact;
+typedef boost::function < void (const vle::value::Value&) > Fact;
 
-    class Facts
-    {
-    public:
-        typedef std::map < std::string, Fact > facts_t;
-        typedef facts_t::const_iterator const_iterator;
-        typedef facts_t::iterator iterator;
-        typedef facts_t::size_type size_type;
+class VLE_EXTENSION_EXPORT Facts
+{
+public:
+    typedef std::map < std::string, Fact > facts_t;
+    typedef facts_t::const_iterator const_iterator;
+    typedef facts_t::iterator iterator;
+    typedef facts_t::size_type size_type;
 
-        void add(const std::string& name, const Fact& pred);
+    void add(const std::string& name, const Fact& pred);
 
-        void apply(const std::string& name, const value::Value& value);
+    void apply(const std::string& name, const value::Value& value);
 
-        iterator begin() { return m_lst.begin(); }
-        const_iterator begin() const { return m_lst.begin(); }
-        iterator end() { return m_lst.end(); }
-        const_iterator end() const { return m_lst.end(); }
-        size_type size() const { return m_lst.size(); }
+    iterator begin() { return m_lst.begin(); }
+    const_iterator begin() const { return m_lst.begin(); }
+    iterator end() { return m_lst.end(); }
+    const_iterator end() const { return m_lst.end(); }
+    size_type size() const { return m_lst.size(); }
 
-    private:
-        facts_t m_lst;
-    };
+private:
+    facts_t m_lst;
+};
 
-    inline std::ostream& operator<<(std::ostream& s, const Facts& o)
-    {
-        s << "facts: ";
-        for (Facts::const_iterator it = o.begin(); it != o.end(); ++it) {
-            s << " (" << it->first << ")";
-        }
-        return s;
+inline std::ostream& operator<<(std::ostream& s, const Facts& o)
+{
+    s << "facts: ";
+    for (Facts::const_iterator it = o.begin(); it != o.end(); ++it) {
+        s << " (" << it->first << ")";
     }
+    return s;
+}
 
 }}} // namespace vle model decision
 
