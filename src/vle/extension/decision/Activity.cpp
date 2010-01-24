@@ -90,11 +90,11 @@ void Activity::initStartRangeFinishRange(const devs::Time& minstart,
                                          const devs::Time& minfinish,
                                          const devs::Time& maxfinish)
 {
-    if (not (minstart < maxstart and maxstart < minfinish and minfinish <
-             maxfinish)) {
+    if (not (minstart < maxstart and minstart < maxfinish
+             and minfinish < maxfinish)) {
         throw utils::ModellingError(
-            _("Decision: temporal constraint minstart < maxstart < minfinish"
-              " < maxfinish"));
+            _("Decision: temporal constraint minstart < maxstart and minfinish"
+              " < maxfinish and minstart < maxfinish"));
     }
 
     m_date = (DateType)(Activity::MINF | Activity::MAXF | Activity::MINS |
