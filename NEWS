@@ -55,12 +55,18 @@ Switch to the package system.
   * Remove the libvledata library, no user, old code and perhaps a problem of
     license.
   * Remove the Simpson class in libvleutils library. Use GSL or Boost instead.
+  * The routing of external events follows an algorithm based on routing
+    table and cache.
+  * Add a new Debug system.
+  * Update the API of devs::Executive.
 
 * extension:
+  * Update difference equation (see. changelog).
   * Add the finite state automata extension with Moore, Mealy, FDDevs and
     StateShart formalism.
   * Add the decision, an extension to build a graph of activities based on
     temporal, precedence and conditional constraints.
+  * Add debug system for extension.
 
 * manager:
   * Store combinations inputs of experimentales frames into Manager classes.
