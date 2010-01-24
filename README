@@ -84,6 +84,7 @@ $ tar zxf vle-0.8.0.tar.gz
 or
 $ git clone git://vle.git.sourceforge.net/gitroot/vle/vle
 
+$ cd vle
 $ mkdir build
 $ cd build
 $ cmake -DCMAKE_INSTALL_PREFIX=$HOME/usr -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
@@ -119,3 +120,12 @@ $ vle -m -l -o 4 experimentalframe.vpz
 
 - To start an experimental frame and run all simulations on a grid computi
 $ vle -m experimentalframe.vpz
+
+- To build a new package
+$ vle -P mypackage create
+
+- To configure, build a package
+$ vle -P mypackage configure build
+
+- To run vpz in a package
+$ vle -P mypackage file.vpz
