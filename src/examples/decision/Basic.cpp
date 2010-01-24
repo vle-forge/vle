@@ -1,5 +1,5 @@
 /**
- * @file examples/decision/Basic.hpp
+ * @file examples/decision/Basic.cpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -9,7 +9,7 @@
  * This file is a part of the VLE environment
  * http://www.vle-project.org
  *
- * Copyright (C) 2007-2009 INRA http://www.inra.fr
+ * Copyright (C) 2007-2010 INRA http://www.inra.fr
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 
 #include <vle/devs/Dynamics.hpp>
 #include <vle/devs/DynamicsDbg.hpp>

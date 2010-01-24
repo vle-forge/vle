@@ -10,8 +10,8 @@
  * http://www.vle-project.org
  *
  * Copyright (C) 2003-2007 Gauthier Quesnel quesnel@users.sourceforge.net
- * Copyright (C) 2007-2009 INRA http://www.inra.fr
- * Copyright (C) 2003-2009 ULCO http://www.univ-littoral.fr
+ * Copyright (C) 2007-2010 INRA http://www.inra.fr
+ * Copyright (C) 2003-2010 ULCO http://www.univ-littoral.fr
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -183,7 +183,7 @@ void finalize()
 void printHelp(std::ostream& out)
 {
     out << fmt(_("Virtual Laboratory Environment - %1%%2%\n"
-                 "Copyright (C) 2003 - 2009 The VLE Development Team.\n"
+                 "Copyright (C) 2003 - 2010 The VLE Development Team.\n"
                  "VLE is a multi-modeling environment to build,\nsimulate "
                  "and analyse models of dynamic complex systems.\n"
                  "For more information, see manuals with 'man vle' or\n"
@@ -194,14 +194,14 @@ void printHelp(std::ostream& out)
 void printInformations(std::ostream& out)
 {
     out << fmt(_("Virtual Laboratory Environment - %1%%2%\n"
-                 "Copyright (C) 2003 - 2009 The VLE Development Team.\n")) %
+                 "Copyright (C) 2003 - 2010 The VLE Development Team.\n")) %
         VLE_VERSION % VLE_EXTRA_VERSION << Path::path() << "\n" << std::endl;
 }
 
 void printVersion(std::ostream& out)
 {
     out << fmt(_("Virtual Laboratory Environment - %1%%2%\n"
-                 "Copyright (C) 2003 - 2009 The VLE Development Team.\n"
+                 "Copyright (C) 2003 - 2010 The VLE Development Team.\n"
                  "VLE comes with ABSOLUTELY NO WARRANTY.\n"
                  "You may redistribute copies of VLE\n"
                  "under the terms of the GNU General Public License.\n"

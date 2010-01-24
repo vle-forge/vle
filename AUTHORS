@@ -10,18 +10,18 @@ Copyright
   - quesnel@users.sourceforge.net
 
 - ULCO 
-  - Copyright © 2003-2009
+  - Copyright © 2003-2010
   - Université du Littoral Côte d'Opale
   - http://www.univ-littoral.fr
 
 - INRA
-  - Copyright © 2007-2009
+  - Copyright © 2007-2010
   - French National Institute for Agricultural Research
   - Institut National de la Recherche Agronomique
   - http://www.inra.fr
 
 - Cirad
-  - Copyright © 2007-2009
+  - Copyright © 2007-2010
   - French Agricultural Research Center for International Development
   - Centre de coopération internationale en recherche agronomique pour le
     développement 
@@ -31,6 +31,12 @@ Copyright
 
 Authors
 =======
+
+Integrator / Release manager
+----------------------------
+
+- Gauthier Quesnel <quesnel@users.sourceforge.net>
+
 
 Main programmer and founder
 ---------------------------
@@ -44,6 +50,7 @@ Contributors
 
 - Guillaume Ansel <anselg@users.sourceforge.net>
 - Patrick Chabrier <patrick.chabrier@toulouse.inra.fr>
+- Raphael Duboz <duboz@users.sourceforge.net>
 - David Duvivier <duvivier@lil.univ-littoral.fr>
 - Cyril Marcq <cmarcq@users.sourceforge.net>
 - Daniel Salomé <dansal62@users.sourceforge.net>
@@ -55,7 +62,6 @@ Old Contributors
 
 - Aurélien Ansel <camumus@gmail.com>
 - Philippe Blangi <blangi@users.sourceforge.net>
-- Raphael Duboz <duboz@users.sourceforge.net>
 - Romain Hennuyer <romain.hennuyer@gmail.com>
 - David Versmisse <versmisse@users.sourceforge.net>
 - Geoffroy Weisenhorn <geoffroy.weisenhorn@gmail.com>

@@ -1,5 +1,5 @@
 /**
- * @file examples/test/testgens.cpp
+ * @file examples/test/testdecision.cpp
  * @author The VLE Development Team
  * See the AUTHORS or Authors.txt file
  */
@@ -9,8 +9,7 @@
  * This file is a part of the VLE environment
  * http://www.vle-project.org
  *
- * Copyright (C) 2003-2007 Gauthier Quesnel quesnel@users.sourceforge.net
- * Copyright (C) 2007-2009 INRA http://www.inra.fr
+ * Copyright (C) 2007-2010 INRA http://www.inra.fr
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
