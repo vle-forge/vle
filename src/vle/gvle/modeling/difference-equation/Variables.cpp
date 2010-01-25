@@ -73,8 +73,9 @@ void Variables::ValuesTreeView::makeTreeView()
 
     append_column("Value", m_columnsValues.m_col_value);
 
-    std::vector < double > vector = m_parent->getVectorValues(m_variable);
-    for (std::vector<double>::iterator iter = vector.begin(); iter != vector.end (); ++iter) {
+    const Values& vector = m_parent->getVectorValues(m_variable);
+    for (Values::const_iterator iter = vector.begin();
+         iter != vector.end (); ++iter) {
 	Gtk::TreeModel::Row row = *(m_refTreeValues->append());
 	row[m_columnsValues.m_col_value] = *iter;
     }
@@ -105,7 +106,7 @@ void Variables::ValuesTreeView::onAdd()
 	if (box.valid()) {
 	    Gtk::TreeModel::Row row = *(m_refTreeValues->append());
 	    row[m_columnsValues.m_col_value] = value;
-	    std::vector<double>& vector = m_parent->getVectorValues(m_variable);
+	    Values& vector = m_parent->getVectorValues(m_variable);
 	    vector.push_back(value);
 	}
     } catch(const boost::bad_lexical_cast& e ) {
@@ -120,13 +121,14 @@ void Variables::ValuesTreeView::onRemove()
 	Gtk::TreeModel::iterator iter = refSelection->get_selected();
 
 	if (iter) {
-	    std::vector<double>& vector = m_parent->getVectorValues(m_variable);
+	    Values& vector = m_parent->getVectorValues(m_variable);
 	    int pos = boost::lexical_cast< int >(get_model()->get_string(iter));
-	    std::vector<double>::iterator iterVector = vector.begin();
-	    for (int current = 0; current < pos; current++)
-		++iterVector;
-	    vector.erase(iterVector);
+	    Values::iterator iterVector = vector.begin();
 
+	    for (int current = 0; current < pos; current++) {
+                ++iterVector;
+            }
+	    vector.erase(iterVector);
             m_refTreeValues->erase(iter);
 	}
     }
@@ -256,7 +258,7 @@ void Variables::VariablesTreeView::initList(const std::string& name,
 bool Variables::VariablesTreeView::on_button_press_event(GdkEventButton* event)
 {
     bool return_value = Gtk::TreeView::on_button_press_event(event);
-    if ( (event->type == GDK_BUTTON_PRESS) && (event->button == 3) ) {
+    if ( (event->type == GDK_BUTTON_PRESS) and (event->button == 3) ) {
 	m_menuPopup.popup(event->button, event->time);
     }
 
@@ -338,9 +340,7 @@ void Variables::VariablesTreeView::onEdit()
 
 		    if (not exist(m_name->get_text())) {
 			row[m_columnsVariable.m_col_name] = name;
-			m_parent->getVectorValues(name) =
-			    m_parent->getVectorValues(oldName);
-			m_parent->getVectorValues(oldName).clear();
+                        m_parent->changeName(oldName, name);
 		    }
 		    if (not m_value->get_text().empty()) {
 			double value = boost::lexical_cast< double >(
@@ -384,6 +384,23 @@ Gtk::Widget& Variables::build(Glib::RefPtr<Gnome::Glade::Xml> ref)
     return *m_frame;
 }
 
+void Variables::changeName(const std::string& oldName,
+                           const std::string& newName)
+{
+    ValuesMap::const_iterator valueIt = m_listValues.find(oldName);
+
+    if (valueIt != m_listValues.end()) {
+        Values::const_iterator it = valueIt->second.begin();
+
+        m_listValues[newName] = Values();
+        while (it != valueIt->second.end()) {
+            m_listValues[newName].push_back(*it++);
+        }
+        m_listValues.erase(oldName);
+        buildTreeValues(newName);
+    }
+}
+
 void Variables::fillFields(const vpz::Condition& condition)
 {
     if (validPort(condition, "variables")) {
@@ -417,7 +434,7 @@ void Variables::assign(vpz::Condition& condition)
 	    }
 	    if (m_listValues[name].size() != 0) {
 		value::Set* setValues = new value::Set();
-		std::vector<double>::iterator iterVector =
+		Values::iterator iterVector =
 		    m_listValues[name].begin();
 		while (iterVector != m_listValues[name].end()) {
 		    setValues->addDouble(*iterVector);

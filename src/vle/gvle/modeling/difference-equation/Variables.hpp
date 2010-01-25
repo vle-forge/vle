@@ -44,8 +44,13 @@ public:
     Variables() { }
     virtual ~Variables() { }
 
-    std::vector<double>& getVectorValues(const std::string& name)
-	{ return m_listValues[name]; }
+    typedef std::vector < double > Values;
+    typedef std::map < std::string, Values > ValuesMap;
+
+    void changeName(const std::string& oldName, const std::string& newName);
+
+    Values& getVectorValues(const std::string& name)
+    { return m_listValues[name]; }
 
 protected:
     typedef std::vector < std::string > Variables_t;
@@ -99,13 +104,13 @@ private:
 	 *
 	 */
 	inline void setVariable(const std::string& name)
-	  { m_variable = name; }
+        { m_variable = name; }
 
 	inline void setParent(Variables* parent)
-	  { m_parent = parent; }
+        { m_parent = parent; }
 
 	inline ValueColumns* getColumns()
-	  { return &m_columnsValues; }
+        { return &m_columnsValues; }
 
     protected:
 	virtual bool on_button_press_event(GdkEventButton* e);
@@ -154,7 +159,7 @@ private:
 	bool exist(const std::string& name);
 
 	void setParent(Variables* parent)
-	    { m_parent = parent; }
+        { m_parent = parent; }
 
     protected:
 	virtual bool on_button_press_event(GdkEventButton* ev);
@@ -182,7 +187,7 @@ private:
     VariablesTreeView* m_variablesTreeView;
     ValuesTreeView*    m_valuesTreeView;
 
-    std::map < std::string, std::vector < double > > m_listValues;
+    ValuesMap m_listValues;
 
     bool validPort(const vpz::Condition& condition, const std::string& name);
 
