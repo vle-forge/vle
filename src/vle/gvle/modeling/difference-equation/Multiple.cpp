@@ -31,16 +31,18 @@
 
 namespace vle { namespace gvle { namespace modeling {
 
-Multiple::Multiple(const std::string& name) : Plugin(name), m_dialog(0)
+Multiple::Multiple(const std::string& name) :
+    Plugin(name), m_dialog(0), m_buttonSource(0)
 {}
 
 Multiple::~Multiple()
 {
-    Gtk::VBox* vbox;
+    if (m_buttonSource) {
+        Gtk::VBox* vbox;
 
-    mXml->get_widget("MultiplePluginVBox", vbox);
-    vbox->remove(*m_buttonSource);
-
+        mXml->get_widget("MultiplePluginVBox", vbox);
+        vbox->remove(*m_buttonSource);
+    }
     for (std::list < sigc::connection >::iterator it = mList.begin();
          it != mList.end(); ++it) {
         it->disconnect();

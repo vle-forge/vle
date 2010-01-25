@@ -37,11 +37,12 @@ Generic::Generic(const std::string& name) :
 
 Generic::~Generic()
 {
-    Gtk::VBox* vbox;
+    if (m_buttonSource) {
+        Gtk::VBox* vbox;
 
-    mXml->get_widget("GenericPluginVBox", vbox);
-    vbox->remove(*m_buttonSource);
-
+        mXml->get_widget("GenericPluginVBox", vbox);
+        vbox->remove(*m_buttonSource);
+    }
     for (std::list < sigc::connection >::iterator it = mList.begin();
          it != mList.end(); ++it) {
         it->disconnect();
