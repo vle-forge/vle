@@ -269,6 +269,8 @@ public:
 
 	void clear();
 
+        void refresh();
+
 	inline void setPackage(const std::string& package)
         { mPackage = package; }
 
@@ -314,6 +316,15 @@ public:
 			    Gtk::TreeViewColumn*  column);
 	void projectFilePath(const Gtk::TreeRow& row,
 			     std::list<std::string>& lst);
+
+        void refreshHierarchy(const Gtk::TreeModel::Row* parent,
+                              const std::string& dirname);
+	void refreshHierarchyDirectory(const Gtk::TreeModel::Row* parent,
+                                       const std::string& dirname);
+	void refreshHierarchyFile(const Gtk::TreeModel::Row* parent,
+                                  const std::string& dirname);
+        void removeFiles(const Gtk::TreeModel::Row* parent,
+                         const std::list < std::string >& entries);
 
 	GVLE*                            mParent;
 	Gtk::Menu                        mMenuPopup;
@@ -545,7 +556,7 @@ public:
 
     /********************************************************************
      *
-     * MENU SHOW
+     * MENU VIEW
      *
      ********************************************************************/
 
@@ -553,6 +564,11 @@ public:
      * @brief Order the models
      */
     void onRandomOrder();
+
+    /**
+     * @brief Refresh the package tree view
+     */
+    void onRefresh();
 
     /**
      * @brief Show the PreferencesBox
@@ -569,6 +585,11 @@ public:
      * Build the hierarchy in the Package Browser
      */
     void buildPackageHierarchy();
+
+    /**
+     * Refresh the hierarchy in the Package Browser
+     */
+    void refreshPackageHierarchy();
 
     /**
      * Refresh the editor

@@ -335,7 +335,7 @@ void GVLE::FileTreeView::onNewFile()
 	}
 	utils::Package::package().addFile(filepath, name);
     }
-    mParent->buildPackageHierarchy();
+    mParent->refreshPackageHierarchy();
 }
 
 void GVLE::FileTreeView::onNewDirectory()
@@ -362,7 +362,7 @@ void GVLE::FileTreeView::onNewDirectory()
 	}
 	utils::Package::package().addDirectory(directorypath, name);
     }
-    mParent->buildPackageHierarchy();
+    mParent->refreshPackageHierarchy();
 }
 
 
@@ -391,7 +391,7 @@ void GVLE::FileTreeView::onRemove()
 	    }
 	}
     }
-    mParent->buildPackageHierarchy();
+    mParent->refreshPackageHierarchy();
 }
 
 void GVLE::FileTreeView::onRename()
@@ -433,8 +433,155 @@ void GVLE::FileTreeView::onRename()
 		    mParent->refreshEditor(oldName, newName);
 		}
 	    }
-	    mParent->buildPackageHierarchy();
+	    mParent->refreshPackageHierarchy();
 	}
+    }
+}
+
+void GVLE::FileTreeView::refresh()
+{
+    refreshHierarchy(0, mPackage);
+}
+
+void GVLE::FileTreeView::refreshHierarchy(
+    const Gtk::TreeModel::Row* parent,
+    const std::string& dirname)
+{
+    refreshHierarchyDirectory(parent, dirname);
+    refreshHierarchyFile(parent, dirname);
+}
+
+void GVLE::FileTreeView::refreshHierarchyDirectory(
+    const Gtk::TreeModel::Row* parent,
+    const std::string& dirname)
+{
+    Glib::Dir dir(dirname);
+    std::list < std::string > entries(dir.begin(), dir.end());
+
+    entries.sort();
+    removeFiles(parent, entries);
+
+    for (std::list < std::string >::iterator it = entries.begin();
+         it != entries.end(); ++it) {
+	if (((*it)[0] != '.') //Don't show hidden files
+	    and (std::find(mIgnoredFilesList.begin(),
+			   mIgnoredFilesList.end(), *it)
+	         == mIgnoredFilesList.end())) {
+	    std::string nextpath = Glib::build_filename(dirname, *it);
+	    if (isDirectory(nextpath)) {
+		if (parent) {
+                    Gtk::TreeModel::const_iterator itt =
+                        parent->children().begin();
+
+                    while (itt != parent->children().end()
+                           and (*itt)[mColumns.m_col_name] != *it) {
+                        ++itt;
+                    }
+                    if (itt == parent->children().end()) {
+                        Gtk::TreeModel::Row row =
+                            *(mRefTreeModel->append(parent->children()));
+                        row[mColumns.m_col_name] = *it;
+                        refreshHierarchy(&(*row), nextpath);
+                    } else {
+                        refreshHierarchy(&(*itt), nextpath);
+                    }
+		} else {
+                    Gtk::TreeModel::const_iterator itt =
+                        mRefTreeModel->children().begin();
+
+                    while (itt != mRefTreeModel->children().end()
+                           and (*itt)[mColumns.m_col_name] != *it) {
+                        ++itt;
+                    }
+                    if (itt == mRefTreeModel->children().end()) {
+                        Gtk::TreeModel::Row row =
+                            *(mRefTreeModel->append());
+                        row[mColumns.m_col_name] = *it;
+                        refreshHierarchy(&(*row), nextpath);
+                    } else {
+                        refreshHierarchy(&(*itt), nextpath);
+                    }
+		}
+	    }
+	}
+    }
+}
+
+void GVLE::FileTreeView::refreshHierarchyFile(
+    const Gtk::TreeModel::Row* parent,
+    const std::string& dirname)
+{
+    Glib::Dir dir(dirname);
+    std::list < std::string > entries(dir.begin(), dir.end());
+
+    entries.sort();
+    removeFiles(parent, entries);
+
+    for (std::list < std::string >::iterator it = entries.begin();
+         it != entries.end(); ++it) {
+	if (((*it)[0] != '.') //Don't show hidden files
+	    and (std::find(mIgnoredFilesList.begin(),
+			   mIgnoredFilesList.end(), *it)
+	         == mIgnoredFilesList.end())) {
+	    std::string nextpath = Glib::build_filename(dirname, *it);
+
+	    if (not isDirectory(nextpath)) {
+		if (parent) {
+                    Gtk::TreeModel::const_iterator itt =
+                        parent->children().begin();
+
+                    while (itt != parent->children().end()
+                           and (*itt)[mColumns.m_col_name] != *it) {
+                        ++itt;
+                    }
+                    if (itt == parent->children().end()) {
+                        Gtk::TreeModel::Row row =
+                            *(mRefTreeModel->append(parent->children()));
+                        row[mColumns.m_col_name] = *it;
+                    }
+		} else {
+                    Gtk::TreeModel::const_iterator itt =
+                        mRefTreeModel->children().begin();
+
+                    while (itt != mRefTreeModel->children().end()
+                           and (*itt)[mColumns.m_col_name] != *it) {
+                        ++itt;
+                    }
+                    if (itt == mRefTreeModel->children().end()) {
+                        Gtk::TreeModel::Row row =
+                            *(mRefTreeModel->append());
+                        row[mColumns.m_col_name] = *it;
+                    }
+		}
+	    }
+	}
+    }
+}
+
+void GVLE::FileTreeView::removeFiles(const Gtk::TreeModel::Row* parent,
+                                     const std::list < std::string >& entries)
+{
+    std::list < Gtk::TreeModel::RowReference > rows;
+    Gtk::TreeModel::const_iterator itt = parent ? parent->children().begin() :
+        mRefTreeModel->children().begin();
+
+    while (itt != (parent ? parent->children().end() :
+                   mRefTreeModel->children().end())) {
+        if (std::find(entries.begin(), entries.end(),
+                      (*itt)[mColumns.m_col_name]) == entries.end()) {
+            rows.push_back(Gtk::TreeRowReference(
+                               mRefTreeModel,
+                               mRefTreeModel->get_path(itt)));
+        }
+        ++itt;
+    }
+
+    for (std::list < Gtk::TreeModel::RowReference >::iterator it =
+             rows.begin(); it != rows.end(); ++it) {
+        Gtk::TreeModel::iterator treeiter =
+            mRefTreeModel->get_iter(it->get_path());
+
+        mRefTreeModel->erase(treeiter);
     }
 }
 
@@ -531,6 +678,11 @@ void GVLE::buildPackageHierarchy()
     mFileTreeView->clear();
     mFileTreeView->setPackage(mPackage);
     mFileTreeView->build();
+}
+
+void GVLE::refreshPackageHierarchy()
+{
+    mFileTreeView->refresh();
 }
 
 void GVLE::refreshEditor(const std::string& oldName, const std::string& newName)
@@ -753,6 +905,11 @@ void GVLE::onOpenGlobalVpz()
     }
 }
 
+void GVLE::onRefresh()
+{
+    mFileTreeView->refresh();
+}
+
 void GVLE::onSave()
 {
     int page = mEditor->get_current_page();
@@ -781,7 +938,7 @@ void GVLE::onSave()
 		    mModeling->setFileName(filename);
 		}
 	    }
-	    buildPackageHierarchy();
+	    refreshPackageHierarchy();
 	}
     }
 }
@@ -842,7 +999,7 @@ void GVLE::onSaveAs()
 
 		doc->saveAs(filename);
 	    }
-	    buildPackageHierarchy();
+	    refreshPackageHierarchy();
 	}
     }
 }
@@ -1065,7 +1222,7 @@ void GVLE::saveVpz()
         }
     } else {
         saveFirstVpz();
-        buildPackageHierarchy();
+        refreshPackageHierarchy();
     }
 }
 

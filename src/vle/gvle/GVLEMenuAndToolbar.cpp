@@ -87,6 +87,7 @@ const Glib::ustring GVLEMenuAndToolbar::UI_DEFINITION =
     "        </menu>"
     "        <menu action='MenuView'>"
     "            <menuitem action='Random Order' />"
+    "            <menuitem action='Refresh' />"
     "            <separator />"
     "            <menuitem action='Preferences' />"
     "        </menu>"
@@ -251,6 +252,16 @@ void GVLEMenuAndToolbar::showCloseProject()
     m_refActionGroup->get_action("CloseProject")->set_sensitive(true);
 }
 
+void GVLEMenuAndToolbar::hideRefresh()
+{
+    m_refActionGroup->get_action("Refresh")->set_sensitive(false);
+}
+
+void GVLEMenuAndToolbar::showRefresh()
+{
+    m_refActionGroup->get_action("Refresh")->set_sensitive(true);
+}
+
 void GVLEMenuAndToolbar::hideImportExport()
 {
     m_refActionGroup->get_action("ClearModel")->set_sensitive(false);
@@ -333,6 +344,7 @@ void GVLEMenuAndToolbar::hideViewMenu()
 {
     m_refActionGroup->get_action("MenuView")->set_sensitive(true);
     m_refActionGroup->get_action("Random Order")->set_sensitive(false);
+    m_refActionGroup->get_action("Refresh")->set_sensitive(false);
     m_refActionGroup->get_action("Preferences")->set_sensitive(true);
 }
 
@@ -340,6 +352,7 @@ void GVLEMenuAndToolbar::showViewMenu()
 {
     m_refActionGroup->get_action("MenuView")->set_sensitive(true);
     m_refActionGroup->get_action("Random Order")->set_sensitive(true);
+    m_refActionGroup->get_action("Refresh")->set_sensitive(true);
     m_refActionGroup->get_action("Preferences")->set_sensitive(true);
 }
 
@@ -593,6 +606,12 @@ void GVLEMenuAndToolbar::createViewActions()
 	sigc::mem_fun(mParent, &GVLE::onRandomOrder));
 
     m_refActionGroup->add(
+	Gtk::Action::create("Refresh", _("Refresh"),
+			    _("Refresh the package tree view")),
+	Gtk::AccelKey("<control>r"),
+	sigc::mem_fun(mParent, &GVLE::onRefresh));
+
+    m_refActionGroup->add(
 	Gtk::Action::create("Preferences", Gtk::Stock::PREFERENCES,
 			    _("Preferences"), _("Create the project package")),
 	Gtk::AccelKey("<control>p"),
@@ -682,6 +701,7 @@ void GVLEMenuAndToolbar::onOpenProject()
     showOpenVpz();
     showCloseProject();
     showProjectMenu();
+    showRefresh();
 }
 
 void GVLEMenuAndToolbar::onOpenVpz()
