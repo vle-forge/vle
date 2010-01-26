@@ -177,12 +177,15 @@ void CellQSS::updateSigma(unsigned int i)
     // Calcul du sigma de la ième fonction
     if (std::abs(getGradient(i)) < 1e-10)
         setSigma(i,Time::infinity);
-    else
-        if (getGradient(i) > 0)
-            setSigma(i,Time((d(getIndex(i)+1)-getValue(i))/getGradient(i)));
-        else
-            setSigma(i,Time(((d(getIndex(i))-getValue(i))-m_epsilon)
-                            /getGradient(i)));
+    else {
+        devs::Time r;
+        if (getGradient(i) > 0) {
+            r = (d(getIndex(i) + 1) - getValue(i)) / getGradient(i);
+        } else {
+            r = ((d(getIndex(i)) - getValue(i)) - m_epsilon) / getGradient(i);
+        }
+        setSigma(i, std::max(0.0, r.getValue()));
+    }
 
     // Recherche de la prochaine fonction à calculer
     unsigned int j = 1;
