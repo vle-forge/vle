@@ -66,8 +66,14 @@ void Executive::delModel(const std::string& modelname)
 {
     std::vector < std::pair < Simulator*, std::string > > toupdate;
 
-    m_coordinator.getSimulatorsSource(coupledmodel()->findModel(modelname),
-                                      toupdate);
+    graph::Model* mdl = coupledmodel()->findModel(modelname);
+    if (not mdl) {
+        throw utils::DevsGraphError(fmt(
+                _("Executive error: unknown model `%1%'")) %
+            modelname);
+    }
+
+    m_coordinator.getSimulatorsSource(mdl, toupdate);
 
     m_coordinator.delModel(coupledmodel(), modelname);
 
@@ -148,6 +154,11 @@ void Executive::addInputPort(const std::string& modelName,
                              const std::string& portName)
 {
     graph::Model* mdl = coupledmodel()->findModel(modelName);
+    if (not mdl) {
+        throw utils::DevsGraphError(fmt(
+                _("Executive error: unknown model `%1%'")) %
+            modelName);
+    }
 
     mdl->addInputPort(portName);
 }
@@ -156,6 +167,11 @@ void Executive::addOutputPort(const std::string& modelName,
                               const std::string& portName)
 {
     graph::Model* mdl = coupledmodel()->findModel(modelName);
+    if (not mdl) {
+        throw utils::DevsGraphError(fmt(
+                _("Executive error: unknown model `%1%'")) %
+            modelName);
+    }
 
     mdl->addOutputPort(portName);
 }
@@ -164,6 +180,11 @@ void Executive::removeInputPort(const std::string& modelName,
                                 const std::string& portName)
 {
     graph::Model* mdl = coupledmodel()->findModel(modelName);
+    if (not mdl) {
+        throw utils::DevsGraphError(fmt(
+                _("Executive error: unknown model `%1%'")) %
+            modelName);
+    }
 
     std::vector < std::pair < Simulator*, std::string > > toupdate;
     m_coordinator.getSimulatorsSource(mdl, portName, toupdate);
@@ -175,6 +196,11 @@ void Executive::removeOutputPort(const std::string& modelName,
                                  const std::string& portName)
 {
     graph::Model* mdl = coupledmodel()->findModel(modelName);
+    if (not mdl) {
+        throw utils::DevsGraphError(fmt(
+                _("Executive error: unknown model `%1%'")) %
+            modelName);
+    }
 
     if (mdl->isAtomic()) {
         mdl->delOutputPort(portName);
