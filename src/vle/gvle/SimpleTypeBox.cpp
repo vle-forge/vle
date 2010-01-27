@@ -28,8 +28,10 @@
  */
 
 
+#include <vle/gvle/Message.hpp>
 #include <vle/gvle/SimpleTypeBox.hpp>
 #include <vle/utils/Tools.hpp>
+#include <vle/utils/i18n.hpp>
 
 namespace vle { namespace gvle {
 
@@ -82,7 +84,18 @@ void SimpleTypeBox::makeDialog()
     mEntry->set_editable(true);
     mEntry->set_activates_default(true);
     if (mBase) {
-        mEntry->set_text(mBase->writeToString());
+        if (mBase->getType() == value::Value::TUPLE) {
+            std::string buffer;
+            value::Tuple* tuple =
+                        dynamic_cast < value::Tuple* >(mBase);
+
+            for (value::Tuple::size_type i = 0; i < tuple->size(); ++i) {
+                buffer += (fmt("%1% ") % (*tuple)[i]).str();
+            }
+            mEntry->set_text(buffer);
+        } else {
+            mEntry->set_text(mBase->writeToString());
+        }
     }
     get_vbox()->pack_start(*mEntry);
 }
@@ -90,27 +103,26 @@ void SimpleTypeBox::makeDialog()
 std::string SimpleTypeBox::run()
 {
     mValid = Gtk::Dialog::run() == Gtk::RESPONSE_OK;
-
     if (mValid) {
         if (mBase) {
             switch (mBase->getType()) {
             case(value::Value::INTEGER):
                 {
-                    dynamic_cast < value::Integer* > (mBase)
+                    dynamic_cast < value::Integer* >(mBase)
                         ->set(utils::toLong(mEntry->get_text()));
                     return mEntry->get_text();
                 }
                 break;
             case(value::Value::DOUBLE):
                 {
-                    dynamic_cast < value::Double* > (mBase)
+                    dynamic_cast < value::Double* >(mBase)
                         ->set(utils::toDouble(mEntry->get_text()));
                     return mEntry->get_text();
                 }
                 break;
             case(value::Value::STRING):
                 {
-                    dynamic_cast < value::String* > (mBase)
+                    dynamic_cast < value::String* >(mBase)
                         ->set(mEntry->get_text());
                     return mEntry->get_text();
                 }
@@ -118,9 +130,14 @@ std::string SimpleTypeBox::run()
             case(value::Value::TUPLE):
                 {
                     value::Tuple* tuple =
-                        dynamic_cast<value::Tuple*>(mBase);
+                        dynamic_cast < value::Tuple* >(mBase);
+
                     tuple->value().clear();
-                    tuple->fill(mEntry->get_text());
+                    try {
+                        tuple->fill(mEntry->get_text());
+                    } catch (...) {
+                        Error("Bad format for tuple: numeric with space.");
+                    }
                     return mEntry->get_text();
                 }
                 break;

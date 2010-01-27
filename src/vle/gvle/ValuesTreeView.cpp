@@ -170,7 +170,8 @@ void ValuesTreeView::makeTreeView(value::Set& set)
             break;
         }
         row[m_Columns.m_col_view] =
-	    boost::trim_copy((*it)->writeToString()).substr(0, GVLE::overview_max);
+	    boost::trim_copy((*it)->writeToString()).substr(0,
+                                                            GVLE::overview_max);
         row[m_Columns.m_col_value] = *it;
 
         it++;
@@ -233,8 +234,8 @@ void ValuesTreeView::makeTreeView(value::Map& map)
             break;
         }
         row[m_Columns.m_col_view] =
-	    boost::trim_copy(it->second->writeToString()).substr(0,
-							    GVLE::overview_max);
+	    boost::trim_copy(it->second->writeToString()).substr(
+                0, GVLE::overview_max);
         row[m_Columns.m_col_value] = it->second;
         it++;
     }
@@ -291,7 +292,8 @@ void ValuesTreeView::on_row_activated(const Gtk::TreeModel::Path& path,
         }
         value::Value* val =  &*row.get_value(m_Columns.m_col_value);
         row[m_Columns.m_col_view] =
-	    boost::trim_copy(val->writeToString()).substr(0, GVLE::overview_max);
+	    boost::trim_copy(val->writeToString()).substr(0,
+                                                          GVLE::overview_max);
         refresh();
     }
 }
@@ -374,25 +376,25 @@ void ValuesTreeView::on_menu_insert(value::Value::type type)
         switch (type) {
             using namespace value;
         case(Value::BOOLEAN):
-                        map->addBoolean(name, false);
+            map->addBoolean(name, false);
             break;
         case(Value::INTEGER):
-                        map->addInt(name, 0);
+            map->addInt(name, 0);
             break;
         case(Value::DOUBLE):
-                        map->addDouble(name, 0);
+            map->addDouble(name, 0);
             break;
         case(Value::STRING):
-                        map->addString(name, "");
+            map->addString(name, "");
             break;
         case(Value::SET):
-                        map->addClone(name, Set::create());
+            map->addClone(name, Set::create());
             break;
         case(Value::MAP):
-                        map->addClone(name, Map::create());
+            map->addClone(name, Map::create());
             break;
         case(Value::TUPLE):
-                        map->addClone(name, Tuple::create());
+            map->addClone(name, Tuple::create());
             break;
         case(Value::TABLE): {
             SimpleTypeBox box("Width ?", "1");
@@ -414,8 +416,8 @@ void ValuesTreeView::on_menu_insert(value::Value::type type)
             SimpleTypeBox box2("Rows ?", "1");
             int rows = utils::toInt(box2.run());
             Matrix* matrix = Matrix::create(cols, rows,
-                                           cols * 2, rows * 2,
-                                           cols / 5, rows / 5);
+                                            cols * 2, rows * 2,
+                                            cols / 5, rows / 5);
             map->addClone(name, matrix);
         }
         break;
