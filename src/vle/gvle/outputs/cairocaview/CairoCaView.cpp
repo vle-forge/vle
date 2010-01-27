@@ -337,7 +337,8 @@ bool CairoCaView::start(vpz::Output& output, vpz::View& /* view */)
 {
     assert(output.plugin() == "cairocaview");
 
-    std::string glade = utils::Path::path().getOutputGladeFile("cairocaview.glade");
+    std::string glade(
+        utils::Path::path().getOutputGladeFile("cairocaview.glade"));
     Glib::RefPtr<Gnome::Glade::Xml> ref = Gnome::Glade::Xml::create(glade);
 
     ref->get_widget("dialog", m_dialog);
@@ -355,8 +356,6 @@ bool CairoCaView::start(vpz::Output& output, vpz::View& /* view */)
     assert(m_dialog);
     assert(m_spinSizeX);
     assert(m_spinSizeY);
-    assert(m_comboGeometryType);
-    assert(m_comboStateType);
     assert(m_entryCellName);
     assert(m_entryStateName);
     assert(m_buttonAddValue);
@@ -379,6 +378,9 @@ bool CairoCaView::start(vpz::Output& output, vpz::View& /* view */)
     m_comboStateType->set_active_text("boolean");
     m_previousType = m_comboStateType->get_active_text();
     m_hboxStates->pack_start(*m_comboStateType);
+
+    assert(m_comboGeometryType);
+    assert(m_comboStateType);
 
     m_buttonAddValue->signal_clicked().connect(
 	sigc::mem_fun(*this, &CairoCaView::onAddValue));

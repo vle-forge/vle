@@ -105,8 +105,6 @@ namespace vle { namespace gvle {
         Gtk::TreeView*      m_views;
         Gtk::TextView*      m_data;
 
-	bool                m_changedView;
-
 	Gtk::CellRendererText* m_cellrenderer;
 	int                    m_columnName;
 	std::string            m_oldName;
