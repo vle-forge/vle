@@ -323,7 +323,8 @@ void ViewDrawingArea::preComputeConnection(graph::Model* src,
     if (src == mCurrent) {
         getCurrentModelInPosition(portsrc, xs, ys);
         getModelInPosition(dst, portdst, xd, yd);
-        preComputeConnection(xs, ys, xd, yd, ytms, ybms);
+        preComputeConnection(xs, ys, xd, yd, ys - SPACING_MODEL,
+                             ys + SPACING_MODEL);
     } else if (dst == mCurrent) {
         getModelOutPosition(src, portsrc, xs, ys);
         getCurrentModelOutPosition(portdst, xd, yd);
