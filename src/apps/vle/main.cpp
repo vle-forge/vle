@@ -99,6 +99,7 @@ void buildCommandLineList(int argc, char* argv[], manager::CmdArgs& lst)
                 stop = not Package::package().isSuccess();
             } else if (strcmp(argv[i], "list") == 0) {
                 PathList vpz(Path::path().getInstalledExperiments());
+                vpz.sort();
                 std::copy(vpz.begin(), vpz.end(), std::ostream_iterator
                           < std::string >(std::cout, "\n"));
                 PathList libs(utils::Path::path().getInstalledLibraries());

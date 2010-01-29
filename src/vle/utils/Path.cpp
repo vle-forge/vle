@@ -645,16 +645,26 @@ PathList Path::getInstalledExperiments()
     }
 
     PathList result;
-    for (fs::directory_iterator it(pkgs), end; it != end; ++it) {
+    std::stack < fs::path > stack;
+    stack.push(pkgs);
+
+    while (not stack.empty()) {
+        fs::path dir = stack.top();
+        stack.pop();
+
+        for (fs::directory_iterator it(dir), end; it != end; ++it) {
 #if BOOST_VERSION > 103600
-        if (fs::is_regular_file(it->status())) {
-            fs::path::string_type ext = it->path().extension();
+            if (fs::is_regular_file(it->status())) {
+                fs::path::string_type ext = it->path().extension();
 #else
-        if (fs::is_regular(it->status())) {
-            fs::path::string_type ext = fs::extension(it->path());
+            if (fs::is_regular(it->status())) {
+                fs::path::string_type ext = fs::extension(it->path());
 #endif
-            if (ext == ".vpz") {
-                result.push_back(it->path().file_string());
+                if (ext == ".vpz") {
+                    result.push_back(it->path().file_string());
+                }
+            } else if (fs::is_directory(it->status())) {
+                stack.push(it->path());
             }
         }
     }
