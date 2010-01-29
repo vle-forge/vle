@@ -73,9 +73,11 @@ void OpenVpzBox::build()
     utils::PathList list = utils::Path::path().getInstalledExperiments();
     utils::PathList::const_iterator it = list.begin();
     while (it != list.end()) {
-	Gtk::TreeModel::Row row = *(mRefTreeVpz->append());
+	Gtk::TreeModel::Row row(*mRefTreeVpz->append());
+        size_t begin = utils::Path::path().getPackageExpDir().size() + 1;
+        std::string name(*it, begin, it->size() - begin - 4);
 
-	row[mColumns.mName] = utils::Path::basename(*it);
+	row[mColumns.mName] = name;
 	++it;
     }
 }
