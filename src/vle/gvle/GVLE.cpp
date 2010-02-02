@@ -896,11 +896,13 @@ void GVLE::onOpenGlobalVpz()
 	    utils::Package::package().select("");
 	    mPackage = "";
             mModeling->parseXML(file.get_filename());
-            redrawModelTreeBox();
-            redrawModelClassBox();
-            mMenuAndToolbar->onOpenVpz();
-            mMenuAndToolbar->hideCloseProject();
-	    mFileTreeView->clear();
+            if (mModeling->getTopModel()) {
+                redrawModelTreeBox();
+                redrawModelClassBox();
+                mMenuAndToolbar->onOpenVpz();
+                mMenuAndToolbar->hideCloseProject();
+                mFileTreeView->clear();
+            }
         }
     }
 }
