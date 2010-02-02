@@ -91,7 +91,7 @@ public:
     }
 
     virtual void externalTransition(const vd::ExternalEventList& events,
-                                    const devs::Time& time)
+                                    const devs::Time& /*time*/)
     {
         mCounter += events.size();
     }
@@ -109,7 +109,57 @@ private:
     int mCounter;
 };
 
+class Retarder : public vd::Dynamics
+{
+public:
+    Retarder(const vd::DynamicsInit& model,
+             const vd::InitEventList& events)
+        : vd::Dynamics(model, events), mVal(0)
+    {
+    }
+
+    virtual ~Retarder()
+    {
+    }
+
+    virtual vd::Time timeAdvance() const
+    {
+        if (mVal == 0) {
+            return vd::Time::infinity;
+        } else {
+            return 0.0;
+        }
+    }
+
+    virtual void output(const vd::Time& /*time*/,
+                        vd::ExternalEventList& output) const
+    {
+        if (mVal) {
+            vd::ExternalEvent* evt = new vd::ExternalEvent("out");
+            evt->putAttribute("value", mVal);
+            output.addEvent(evt);
+        }
+    }
+
+    virtual void internalTransition(const devs::Time& /*time*/)
+    {
+        mVal = 0;
+    }
+
+    virtual void externalTransition(const vd::ExternalEventList& events,
+                                    const devs::Time& /*time*/)
+    {
+        for (vd::ExternalEventList::const_iterator it = events.begin();
+             it != events.end(); ++it) {
+            mVal = (*it)->getAttributeValue("value").clone();
+        }
+    }
+
+    vv::Value*  mVal;
+};
+
 }}} // namespace vle examples decision
 
 DECLARE_NAMED_DYNAMICS_DBG(Start, vle::examples::decision::Start)
 DECLARE_NAMED_DYNAMICS_DBG(Counter, vle::examples::decision::Counter)
+DECLARE_NAMED_DYNAMICS(Retarder, vle::examples::decision::Retarder)

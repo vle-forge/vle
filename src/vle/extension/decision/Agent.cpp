@@ -83,18 +83,17 @@ devs::Time Agent::timeAdvance() const
 {
     switch (mState) {
     case Init:
+    case Output:
+    case UpdateFact:
         return 0.0;
     case Process:
         if (mNextChangeTime.second == devs::Time::negativeInfinity or
-            mNextChangeTime.first == true) {
+            mNextChangeTime.first == true or
+            haveActivityInLatestActivitiesLists()) {
             return 0.0;
         } else {
             return mNextChangeTime.second - mCurrentTime;
         }
-    case Output:
-        return 0.0;
-    case UpdateFact:
-        return 0.0;
     }
 
     throw utils::InternalError();

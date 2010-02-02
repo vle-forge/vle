@@ -158,9 +158,66 @@ private:
     bool mStart;
 };
 
+class OnlyAgentWakeUp : public vmd::Agent
+{
+public:
+    OnlyAgentWakeUp(const vd::DynamicsInit& mdl, const vd::InitEventList& evts)
+        : vmd::Agent(mdl, evts), mWakeup(false)
+    {
+        addFact("wakeup", boost::bind(&OnlyAgentWakeUp::wakeup, this, _1));
+
+        vmd::Activity& a = addActivity("A", 1.0, 100.0);
+
+        a.addOutputFunction(boost::bind(
+                &OnlyAgentWakeUp::aout, this, _1, _2, _3));
+
+        vmd::Rule& r = addRule("r1");
+        r.add(boost::bind(&OnlyAgentWakeUp::isWakeup, this));
+
+        a.addRule("r1", r);
+
+        vmd::Activity& b = addActivity("B", 6.0, 100.0);
+        b.addOutputFunction(boost::bind(
+                &OnlyAgentWakeUp::aout, this, _1, _2, _3));
+    }
+
+    virtual ~OnlyAgentWakeUp()
+    {
+    }
+
+    void wakeup(const vv::Value& val)
+    {
+        if (not mWakeup) {
+            mWakeup = val.toBoolean().value();
+        }
+    }
+
+    bool isWakeup() const
+    {
+        return mWakeup;
+    }
+
+    void aout(const std::string& /*name*/, const vmd::Activity& activity,
+              vd::ExternalEventList& out)
+    {
+        if (activity.isInStartedState()) {
+            vd::ExternalEvent* evt = new vd::ExternalEvent("out");
+            out.addEvent(evt);
+        }
+    }
+
+private:
+    bool mWakeup;
+};
 
 }}} // namespace vle examples decision
 
-DECLARE_NAMED_DYNAMICS_DBG(OnlyAgent, vle::examples::decision::OnlyAgent)
-DECLARE_NAMED_DYNAMICS_DBG(OnlyAgentPrecedenceConstraint,
-                           vle::examples::decision::OnlyAgentPrecedenceConstraint)
+DECLARE_NAMED_DYNAMICS_DBG(
+    OnlyAgent,
+    vle::examples::decision::OnlyAgent)
+DECLARE_NAMED_DYNAMICS_DBG(
+    OnlyAgentPrecedenceConstraint,
+    vle::examples::decision::OnlyAgentPrecedenceConstraint)
+DECLARE_NAMED_DYNAMICS_DBG(
+    OnlyAgentWakeUp,
+    vle::examples::decision::OnlyAgentWakeUp)

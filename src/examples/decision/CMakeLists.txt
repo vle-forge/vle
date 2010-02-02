@@ -34,8 +34,8 @@ INSTALL(TARGETS decision
   RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/simulator"
   LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/simulator")
 
-INSTALL(FILES agentonly.vpz agentonlyc.vpz agentsimple.vpz DESTINATION
-  "${VLE_SHARE_DIRS}/examples")
+INSTALL(FILES agentonly.vpz agentonlyc.vpz agentonlywakeup.vpz agentsimple.vpz
+  DESTINATION "${VLE_SHARE_DIRS}/examples")
 
 INSTALL(FILES ${SOURCES_CPP} DESTINATION
   "${VLE_SHARE_DIRS}/examples/sources/decision")

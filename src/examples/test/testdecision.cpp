@@ -120,3 +120,37 @@ BOOST_AUTO_TEST_CASE(test_agentonlyprecedenceconstraint)
     BOOST_REQUIRE_EQUAL(value::toInteger(result[1][10]), 4);
 }
 
+BOOST_AUTO_TEST_CASE(test_agentonlywakeup)
+{
+    vpz::Vpz file(utils::Path::path().getExampleFile("agentonlywakeup.vpz"));
+
+    manager::RunQuiet r;
+    r.start(file);
+
+    BOOST_REQUIRE_EQUAL(r.haveError(), false);
+    oov::OutputMatrixViewList& out(r.outputs());
+    BOOST_REQUIRE_EQUAL(out.size(),
+                        (oov::OutputMatrixViewList::size_type)1);
+
+    oov::OutputMatrix& view1(out["storage"]);
+
+    value::MatrixView result(view1.values());
+
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+                        (value::MatrixView::size_type)2);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+                        (value::MatrixView::size_type)11);
+
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][0]), 0);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][1]), 1);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][2]), 1);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][3]), 1);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][4]), 1);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][5]), 1);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][6]), 2);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][7]), 2);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][8]), 2);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][9]), 2);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][10]), 2);
+}
+

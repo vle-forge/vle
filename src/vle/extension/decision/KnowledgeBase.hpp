@@ -209,6 +209,24 @@ public:
     const Activities::result_t& latestEndedActivities() const
     { return m_activities.latestEndedAct(); }
 
+    /**
+     * @brief Return true if at least on list of activities (waited, started,
+     * failed, done or ended lists) is not empty.
+     * @return true or false.
+     */
+    bool haveActivityInLatestActivitiesLists() const
+    {
+        return not (m_activities.latestWaitedAct().empty() and
+                    m_activities.latestStartedAct().empty() and
+                    m_activities.latestFailedAct().empty() and
+                    m_activities.latestDoneAct().empty() and
+                    m_activities.latestEndedAct().empty());
+    }
+
+    /**
+     * @brief Clear the lists of activities (waited, started, failed, done or
+     * ended lists).
+     */
     void clearLatestActivitiesLists()
     { m_activities.clearLatestActivitiesLists(); }
 
