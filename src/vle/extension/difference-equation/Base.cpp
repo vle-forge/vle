@@ -549,8 +549,13 @@ void Base::internalTransition(const Time& time)
         } else {
             if (mWaiting <= 0) {
                 initValues(time);
-                mState = RUN;
-                mSigma = timeStep(time);
+                if (mActive) {
+                    mState = POST;
+                    mSigma = 0;
+                } else {
+                    mState = RUN;
+                    timeStep(time);
+                }
             } else {
                 mState = INIT;
                 mSigma = Time::infinity;

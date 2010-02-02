@@ -149,6 +149,9 @@ void Statechart::processIn(const devs::Time& time, int nextState)
     currentState(nextState);
     processInStateAction(time);
     checkGuards(time);
+    if (mValidGuard) {
+        mSigma = 0;
+    }
 }
 
 void Statechart::processInStateAction(const devs::Time& time)
@@ -312,7 +315,11 @@ devs::Time Statechart::init(const devs::Time& time)
     mValidGuard = false;
     checkGuards(time);
 
-    setSigma(time);
+    if (mValidGuard) {
+        mSigma = 0;
+    } else {
+        setSigma(time);
+    }
     mLastTime = time;
     return mSigma;
 }
@@ -429,13 +436,15 @@ void Statechart::internalTransition(const devs::Time& time)
 		if (mValidAfterWhen) {
 		    processIn(time, mToProcessAfterWhen.second);
 		    mValidAfterWhen = false;
-		    mPhase = IDLE;
+                    if (not mValidGuard) {
+                        mPhase = IDLE;
+                    }
 		}
 	    }
         }
     }
     }
-    if (mPhase == IDLE) {
+    if (mPhase == IDLE and not mValidGuard) {
 	setSigma(time);
     }
     mLastTime = time;

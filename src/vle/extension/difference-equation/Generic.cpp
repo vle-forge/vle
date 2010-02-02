@@ -96,7 +96,14 @@ void Generic::externalTransition(const ExternalEventList& events,
             if (mState != INIT) {
                 initExternalVariable(name);
             }
-        } else if ((*it)->onPort("remove")) {
+
+            if (mLastComputeTime == time) {
+                mReceive = mReceivedValues.size() - 1;
+                mState = PRE;
+                mLastComputeTime = vle::devs::Time::infinity;
+            }
+
+       } else if ((*it)->onPort("remove")) {
             std::string name = (*it)->getStringAttributeValue("name");
 
             if (mAllSynchro) {
@@ -110,6 +117,12 @@ void Generic::externalTransition(const ExternalEventList& events,
                 --mReceive;
             }
             mReceivedValues.erase(name);
+
+            if (mLastComputeTime == time) {
+                mReceive = mReceivedValues.size();
+                mState = PRE;
+                mLastComputeTime = vle::devs::Time::infinity;
+            }
         }
         ++it;
     }
