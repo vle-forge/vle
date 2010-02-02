@@ -43,7 +43,12 @@ Time DynamicsDbg::init(const Time& time)
 {
     TraceDevs(fmt(_("%1$20.10g %2% [DEVS] init")) % time % getModelName());
 
-    return mDynamics->init(time);
+    Time duration(mDynamics->init(time));
+
+    TraceDevs(fmt(_("                .... %1% [DEVS] init returns %2%")) %
+              getModelName() % duration);
+
+    return duration;
 }
 
 void DynamicsDbg::output(const Time& time, ExternalEventList& output) const
