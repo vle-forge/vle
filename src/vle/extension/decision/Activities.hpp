@@ -160,6 +160,16 @@ public:
      */
     Result process(const devs::Time& time);
 
+    /**
+     * @brief Returns true if the activity exists, false otherwise
+     * @param name the name of an activity
+     * @return true if the activity exists, false otherwise
+     */
+    bool exist(const std::string& name) const
+    {
+        return (m_lst.find(name) != m_lst.end());
+    }
+
     iterator begin() { return m_lst.begin(); }
     const_iterator begin() const { return m_lst.begin(); }
     iterator end() { return m_lst.end(); }

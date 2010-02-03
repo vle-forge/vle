@@ -407,3 +407,15 @@ BOOST_AUTO_TEST_CASE(ActivitiesnextDate2)
     base.processChanges(4.);
     base.setActivityDone("F", 4.5);
 }
+
+BOOST_AUTO_TEST_CASE(activitiesExist)
+{
+    vle::value::init();
+
+    ex::KB4 base;
+
+    bool b = base.activities().exist("A");
+    BOOST_REQUIRE_EQUAL(b, true);
+    b = base.activities().exist("Z");
+    BOOST_REQUIRE_EQUAL(b, false);
+}
