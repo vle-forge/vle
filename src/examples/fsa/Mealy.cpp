@@ -29,8 +29,6 @@
 
 #include <vle/extension/fsa/Mealy.hpp>
 
-using namespace boost::assign;
-
 namespace vle { namespace examples { namespace fsa {
 
 namespace vf = vle::extension::fsa;
@@ -49,11 +47,11 @@ public:
 
         transition(this, a, c) << event("in1")
                                << action(&mealy1::action1)
-                               << output("out1");
+                               << send(std::string("out1"));
         transition(this, a, c) << event("in2")
-                               << output("out2");
+                               << send(std::string("out2"));
         transition(this, b, a) << event("in1")
-                               << output("out1");
+                               << send(std::string("out1"));
         transition(this, c, a) << event("in2");
         transition(this, c, b) << event("in1");
 
@@ -93,10 +91,10 @@ public:
         states(this) << START << RUN;
 
         transition(this, START, RUN) << event("in")
-                                     << outputFunc(&counter1::out)
+                                     << send(&counter1::out)
                                      << action(&counter1::start);
         transition(this, RUN, RUN) << event("in")
-                                   << outputFunc(&counter1::out)
+                                   << send(&counter1::out)
                                    << action(&counter1::run);
 
         initialState(START);

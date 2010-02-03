@@ -32,7 +32,6 @@
 
 #include <vle/extension/DllDefines.hpp>
 #include <vle/extension/fsa/FSA.hpp>
-#include <boost/assign.hpp>
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 
@@ -124,8 +123,8 @@ public:
         return r.first->second;
     }
 
-    Output_t output(const std::string& output)
-    { return Base::output(output); }
+    // Output_t < std::string > output(const std::string& output)
+    // { return Base::outputF(output); }
 
     template < typename I >
         MealyTransition_t<I> transition(I obj, int state, int nextState)
@@ -175,27 +174,27 @@ template < typename I >
 MealyTransition_t<I> operator<<(MealyTransition_t<I> transition,
                                 Event_t event)
 {
-    insert(transition.obj->transitions(transition.state))(event.event,
-                                                          transition.nextState);
+    transition.obj->transitions(transition.state)[event.event] =
+        transition.nextState;
     transition.event = event.event;
     return transition;
 }
 
 template < typename I >
 MealyTransition_t<I> operator<<(MealyTransition_t<I> transition,
-                                Output_t output)
+                                Output_t < std::string > output)
 {
-    insert(transition.obj->outputs(transition.state))(transition.event,
-                                                      output.output);
+    transition.obj->outputs(transition.state)[transition.event] =
+        output.output;
     return transition;
 }
 
 template < typename I, typename X >
 MealyTransition_t<I> operator<<(MealyTransition_t<I> transition,
-                                OutputFunc_t<X> func)
+                                Output_t<X> func)
 {
-    boost::assign::insert(transition.obj->outputFuncs(transition.state))(
-        transition.event, boost::bind(func.func, transition.obj, _1, _2));
+    transition.obj->outputFuncs(transition.state)[transition.event] =
+        boost::bind(func.output, transition.obj, _1, _2);
     return transition;
 }
 
@@ -203,8 +202,8 @@ template < typename I, typename X >
 MealyTransition_t<I> operator<<(MealyTransition_t<I> transition,
                                 Action_t<X> action)
 {
-    boost::assign::insert(transition.obj->actions(transition.state))(
-        transition.event, boost::bind(action.action, transition.obj, _1, _2));
+    transition.obj->actions(transition.state)[transition.event] =
+        boost::bind(action.action, transition.obj, _1, _2);
     return transition;
 }
 

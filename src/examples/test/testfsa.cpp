@@ -393,15 +393,15 @@ BOOST_AUTO_TEST_CASE(test_statechart5)
     BOOST_REQUIRE_CLOSE(value::toDouble(result[3][25]), 3.0058, 10e-2);
     BOOST_REQUIRE_EQUAL(value::toInteger(result[4][25]), 3);
 
-    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][609]), 0);
-    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][609]), 63.8111, 10e-2);
-    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][609]), 61.0465, 10e-2);
-    BOOST_REQUIRE_EQUAL(value::toInteger(result[4][609]), 5);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][295]), 0);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[2][295]), 30.8661, 10e-2);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[3][295]), 31.4728, 10e-2);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[4][295]), 5);
 
     BOOST_REQUIRE_EQUAL(value::toInteger(result[1][1000]), 0);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[2][1000]), 102.532, 10e-2);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[3][1000]), 100.913, 10e-2);
-    BOOST_REQUIRE_EQUAL(value::toInteger(result[4][1000]), 2);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[4][1000]), 3);
 }
 
 BOOST_AUTO_TEST_CASE(test_statechart6)
@@ -507,4 +507,70 @@ BOOST_AUTO_TEST_CASE(test_statechart7)
 
     BOOST_REQUIRE_EQUAL(value::toInteger(result[1][0]), 2);
     BOOST_REQUIRE_EQUAL(value::toInteger(result[1][40]), 3);
+}
+
+BOOST_AUTO_TEST_CASE(test_statechart8)
+{
+    vpz::Vpz file(utils::Path::path().getExampleFile("statechart8.vpz"));
+
+    vpz::Output& o(file.project().experiment().views().outputs().get("o"));
+    o.setLocalStream("", "storage");
+
+    manager::RunQuiet r;
+    r.start(file);
+
+    BOOST_REQUIRE_EQUAL(r.haveError(), false);
+    oov::OutputMatrixViewList& out(r.outputs());
+    BOOST_REQUIRE_EQUAL(out.size(),
+                        (oov::OutputMatrixViewList::size_type)1);
+
+    oov::OutputMatrix& view(out["view"]);
+    value::MatrixView result(view.values());
+
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+                       (value::MatrixView::size_type)3);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+                        (value::MatrixView::size_type)101);
+
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][3]), 3);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[2][3]), 2);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][6]), 5);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][30]), 19);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][100]), 63);
+}
+
+BOOST_AUTO_TEST_CASE(test_statechart9)
+{
+    vpz::Vpz file(utils::Path::path().getExampleFile("statechart9.vpz"));
+
+    vpz::Output& o(file.project().experiment().views().outputs().get("o"));
+    o.setLocalStream("", "storage");
+
+    manager::RunQuiet r;
+    r.start(file);
+
+    BOOST_REQUIRE_EQUAL(r.haveError(), false);
+    oov::OutputMatrixViewList& out(r.outputs());
+    BOOST_REQUIRE_EQUAL(out.size(),
+                        (oov::OutputMatrixViewList::size_type)1);
+
+    oov::OutputMatrix& view(out["view"]);
+    value::MatrixView result(view.values());
+
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+                       (value::MatrixView::size_type)4);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+                        (value::MatrixView::size_type)101);
+
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][0]), 0);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[2][0]), 0);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[3][0]), 2);
+
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][15]), 1);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[2][15]), 4);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[3][15]), 2);
+
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][100]), 8);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[2][100]), 31);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[3][100]), 2);
 }

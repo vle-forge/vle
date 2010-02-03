@@ -30,8 +30,6 @@
 #include <vle/extension/difference-equation/Base.hpp>
 #include <vle/extension/fsa/Statechart.hpp>
 
-using namespace boost::assign;
-
 namespace vle { namespace examples { namespace equation {
 
 namespace ve = vle::extension;
@@ -49,9 +47,9 @@ public:
 	    states(this) << A << B;
 
 	    transition(this, A, B) << after(5.)
-                                   << outputFunc(&Perturb::out1);
+                                   << send(&Perturb::out1);
 	    transition(this, B, A) << after(5.)
-                                   << outputFunc(&Perturb::out2);
+                                   << send(&Perturb::out2);
 
 	    initialState(A);
 	}
@@ -79,9 +77,9 @@ public:
 	    states(this) << A << B;
 
 	    transition(this, A, B) << after(5.)
-                                   << outputFunc(&Perturb2::out1);
+                                   << send(&Perturb2::out1);
 	    transition(this, B, A) << after(5.)
-                                   << outputFunc(&Perturb2::out2);
+                                   << send(&Perturb2::out2);
 
 	    initialState(A);
 	}
@@ -109,9 +107,9 @@ public:
 	    states(this) << A;
 
 	    transition(this, A, A) << event("in1")
-                                   << outputFunc(&Perturb3::out1);
+                                   << send(&Perturb3::out1);
 	    transition(this, A, A) << event("in2")
-                                   << outputFunc(&Perturb3::out2);
+                                   << send(&Perturb3::out2);
 
 	    initialState(A);
 	}
@@ -139,9 +137,9 @@ public:
 	    states(this) << A;
 
 	    transition(this, A, A) << event("in1")
-                                   << outputFunc(&Perturb4::out1);
+                                   << send(&Perturb4::out1);
 	    transition(this, A, A) << event("in2")
-                                   << outputFunc(&Perturb4::out2);
+                                   << send(&Perturb4::out2);
 
 	    initialState(A);
 	}
@@ -169,9 +167,9 @@ public:
 	    states(this) << A;
 
 	    transition(this, A, A) << event("in1")
-                                   << outputFunc(&Perturb5::out1);
+                                   << send(&Perturb5::out1);
 	    transition(this, A, A) << event("in2")
-                                   << outputFunc(&Perturb5::out2);
+                                   << send(&Perturb5::out2);
 
 	    initialState(A);
 	}
@@ -199,9 +197,9 @@ public:
 	    states(this) << A << B;
 
 	    transition(this, A, B) << after(4.5)
-                                   << outputFunc(&Perturb6::out1);
+                                   << send(&Perturb6::out1);
 	    transition(this, B, A) << after(3.2)
-                                   << outputFunc(&Perturb6::out2);
+                                   << send(&Perturb6::out2);
 
 	    initialState(A);
 	}
@@ -229,7 +227,7 @@ public:
 	    states(this) << A;
 
 	    transition(this, A, A) << after(5.)
-                                   << outputFunc(&Perturb7::out);
+                                   << send(&Perturb7::out);
 
 	    initialState(A);
 	}
@@ -257,9 +255,9 @@ public:
 	    states(this) << A << B;
 
 	    transition(this, A, B) << after(5.)
-                                   << outputFunc(&Perturb8::out1);
+                                   << send(&Perturb8::out1);
 	    transition(this, B, A) << after(5.)
-                                   << outputFunc(&Perturb8::out2);
+                                   << send(&Perturb8::out2);
 
 	    initialState(A);
 	}
@@ -287,9 +285,9 @@ public:
 	    states(this) << A;
 
 	    transition(this, A, A) << event("in1")
-                                   << outputFunc(&Perturb9::out1);
+                                   << send(&Perturb9::out1);
 	    transition(this, A, A) << event("in2")
-                                   << outputFunc(&Perturb9::out2);
+                                   << send(&Perturb9::out2);
 
 	    initialState(A);
 	}
@@ -317,9 +315,9 @@ public:
 	    states(this) << A << B;
 
 	    transition(this, A, B) << after(5.)
-                                   << outputFunc(&Perturb10::out1);
+                                   << send(&Perturb10::out1);
 	    transition(this, B, A) << after(5.)
-                                   << outputFunc(&Perturb10::out2);
+                                   << send(&Perturb10::out2);
 
 	    initialState(A);
 	}

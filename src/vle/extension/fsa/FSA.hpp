@@ -43,6 +43,15 @@ struct State_t
     I obj;
 };
 
+template < typename I >
+struct State2_t
+{
+    State2_t(I obj, int state) : obj(obj), state(state)  { }
+
+    I obj;
+    int state;
+};
+
 struct VLE_EXTENSION_EXPORT Event_t
 {
     Event_t(const std::string& event) : event(event)  { }
@@ -50,19 +59,12 @@ struct VLE_EXTENSION_EXPORT Event_t
     std::string event;
 };
 
-struct VLE_EXTENSION_EXPORT Output_t
-{
-    Output_t(const std::string& output) : output(output)  { }
-
-    std::string output;
-};
-
 template < typename X >
-struct OutputFunc_t
+struct Output_t
 {
-    OutputFunc_t(X func) : func(func)  { }
+    Output_t(X output) : output(output)  { }
 
-    X func;
+    X output;
 };
 
 template < typename X >
@@ -91,10 +93,6 @@ public:
      */
     void initialState(int state);
 
-    typedef std::vector < int > States;
-
-    States& states() { return mStates; }
-
     virtual vle::value::Value* observation(
         const vle::devs::ObservationEvent& event) const
     {
@@ -108,21 +106,24 @@ public:
         State_t<I> states(I obj)
     { return State_t<I>(obj); }
 
+    template < typename I >
+        State2_t<I> state(I obj, int state)
+    { return State2_t<I>(obj, state); }
+
     Event_t event(const std::string& event_)
     { return Event_t(event_); }
 
-    Output_t output(const std::string& output_)
-    { return Output_t(output_); }
-
     template < typename X >
-        OutputFunc_t<X> outputFunc(X func)
-    { return OutputFunc_t<X>(func); }
+        Output_t<X> send(const X& func)
+    { return Output_t<X>(func); }
 
     template < typename X >
         Action_t<X> action(X action)
     { return Action_t<X>(action); }
 
 protected:
+    typedef std::vector < int > States;
+
     int currentState() const
     { return mCurrentState; }
 
@@ -144,6 +145,8 @@ protected:
     vle::devs::ExternalEvent* cloneExternalEvent(
         vle::devs::ExternalEvent* event) const;
 
+    States& states() { return mStates; }
+
 private:
     // initial state is defined
     bool mInit;
@@ -155,13 +158,27 @@ private:
 protected:
     // List of states
     States mStates;
+
+    template < typename I >
+        friend State_t<I> operator<<(State_t<I> state, int name);
 };
+
+template <>
+inline Output_t < std::string > Base::send< std::string >(
+    const std::string& output_)
+{ return Output_t < std::string >(output_); }
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-template < typename C, typename I >
-State_t<I> operator<<(State_t<I> state, const C& name)
+template < typename I >
+State_t<I> operator<<(State_t<I> state, int name)
 {
+    if (state.obj->existState(name)) {
+        throw vle::utils::ModellingError(
+            vle::fmt(_("[%1%] FSA::Base: state %2% is already defined"))
+            % state.obj->getModelName() % name);
+    }
+
     state.obj->states().push_back(name);
     return state;
 }

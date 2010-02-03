@@ -160,6 +160,8 @@ INSTALL(FILES statechart4.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
 INSTALL(FILES statechart5.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
 INSTALL(FILES statechart6.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
 INSTALL(FILES statechart7.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
+INSTALL(FILES statechart8.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
+INSTALL(FILES statechart9.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
 INSTALL(FILES fddevs.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
 INSTALL(FILES stage.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
 

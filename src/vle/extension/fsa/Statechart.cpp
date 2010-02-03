@@ -72,7 +72,9 @@ void Statechart::checkGuards(const devs::Time& time)
 	    // transition without event/after/when
 	    if (mEvents.find(*itt) == mEvents.end() and
 		mAfters.find(*itt) == mAfters.end() and
-		mWhens.find(*itt) == mWhens.end()) {
+		mWhens.find(*itt) == mWhens.end() and
+		mAfterFuncs.find(*itt) == mAfterFuncs.end() and
+		mWhenFuncs.find(*itt) == mWhenFuncs.end()) {
 		GuardsIterator itg = mGuards.find(*itt);
 
 		if (itg != mGuards.end()) { // guarded transition
@@ -122,6 +124,7 @@ void Statechart::process(const devs::Time& time,
         if (checkGuard(transition, time)) {
             processOutStateAction(time);
             processEventTransitionAction(transition, time, event);
+            processGuardTransitionAction(transition, time);
         }
     } else {
         processEventInStateActions(time, event);
@@ -243,22 +246,44 @@ void Statechart::setSigma(const devs::Time& time)
                     id = *itt;
                 }
             } else {
-                WhensIterator itw = mWhens.find(*itt);
+                AfterFuncsIterator itaf = mAfterFuncs.find(*itt);
 
-                if (itw != mWhens.end()) {
-                    devs::Time duration = itw->second - time;
+                if (itaf != mAfterFuncs.end()) {
+                    double duration = (itaf->second)(time);
 
-                    if (duration > 0 and duration < sigma) {
+                    if (duration < sigma) {
                         sigma = duration;
                         id = *itt;
                     }
                 } else {
-		    if (mEvents.find(*itt) == mEvents.end() and
-			mGuards.find(*itt) == mGuards.end()) {
-			sigma = 0;
-			id = *itt;
-		    }
-		}
+                    WhensIterator itw = mWhens.find(*itt);
+
+                    if (itw != mWhens.end()) {
+                        devs::Time duration = itw->second - time;
+
+                        if (duration > 0 and duration < sigma) {
+                            sigma = duration;
+                            id = *itt;
+                        }
+                    } else {
+                        WhenFuncsIterator itwf = mWhenFuncs.find(*itt);
+
+                        if (itwf != mWhenFuncs.end()) {
+                            devs::Time duration = (itwf->second)(time) - time;
+
+                            if (duration > 0 and duration < sigma) {
+                                sigma = duration;
+                                id = *itt;
+                            }
+                        } else {
+                            if (mEvents.find(*itt) == mEvents.end() and
+                                mGuards.find(*itt) == mGuards.end()) {
+                                sigma = 0;
+                                id = *itt;
+                            }
+                        }
+                    }
+                }
             }
             ++itt;
         }
@@ -363,6 +388,8 @@ devs::Time Statechart::timeAdvance() const
 
 void Statechart::internalTransition(const devs::Time& time)
 {
+    bool update = true;
+
     switch (mPhase) {
     case PROCESSING:
     {
@@ -382,6 +409,7 @@ void Statechart::internalTransition(const devs::Time& time)
 			    mPhase = PROCESSING;
 			} else {
 			    mPhase = IDLE;
+                            update = false;
 			}
 		    } else {
 			mPhase = PROCESSING;
@@ -396,8 +424,12 @@ void Statechart::internalTransition(const devs::Time& time)
     case IDLE:
     {
         if (mValidAfterWhen) {
-            process(time, mToProcessAfterWhen.first);
-	    mPhase = SEND;
+            if (checkGuard(mToProcessAfterWhen.first, time)) {
+                process(time, mToProcessAfterWhen.first);
+                mPhase = SEND;
+            } else {
+                mValidAfterWhen = false;
+            }
         } else {
             processActivities(time);
             checkGuards(time);
@@ -444,7 +476,7 @@ void Statechart::internalTransition(const devs::Time& time)
         }
     }
     }
-    if (mPhase == IDLE and not mValidGuard) {
+    if (mPhase == IDLE and update) {
 	setSigma(time);
     }
     mLastTime = time;
