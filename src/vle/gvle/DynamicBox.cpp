@@ -246,7 +246,7 @@ void DynamicBox::onNewLibrary()
                 mComboPackage->set_active_text(box2.getNamespace());
                 mComboLibrary->append_text(box2.getClassName());
                 mComboLibrary->set_active_text(box2.getClassName());
-                mModel->set_text(box2.getClassName());
+                mModel->set_text("");
             }
         }
     }

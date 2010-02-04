@@ -70,7 +70,7 @@ void Plugin::generateDynamic(vpz::Dynamic& dynamic,
 {
     dynamic.setPackage(utils::Package::package().name());
     dynamic.setLibrary(classname);
-    dynamic.setModel(classname);
+    dynamic.setModel("");
 }
 
 void Plugin::generateInputPorts(graph::AtomicModel& atom)
