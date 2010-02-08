@@ -658,6 +658,11 @@ void CoupledModel::displace(ModelList& models, CoupledModel* destination)
     ModelConnections listInput = saveInputConnections(models);
     ModelConnections listOutput = saveOutputConnections(models);
 
+    for (ModelList::const_iterator it = models.begin(); it != models.end();
+         ++it) {
+        delAllConnection(it->second);
+    }
+
     if (hasConnectionProblem(models)) {
         throw utils::DevsGraphError(
             _("One or more models are connected to another model"));
@@ -1002,20 +1007,18 @@ CoupledModel::ModelConnections CoupledModel::saveInputConnections(
 {
     ModelConnections listModel;
     ModelList::iterator it = models.begin();
-    while (it != models.end()) {
 
+    while (it != models.end()) {
 	ConnectionList connectIn;
 	ConnectionList::iterator iter =
 	    it->second->getInputPortList().begin();
+
 	while (iter != it->second->getInputPortList().end()) {
-
 	    ModelPortList lst(it->second->getInPort(iter->first));
-	    connectIn[iter->first] = lst;
-	    ConnectionList::iterator iterPrec = iter;
-	    ++iter;
-	    it->second->delInputPort(iterPrec->first);
-	}
 
+	    connectIn[iter->first] = lst;
+	    ++iter;
+	}
 	listModel[it->first] = connectIn;
 	++it;
     }
@@ -1027,17 +1030,17 @@ CoupledModel::ModelConnections CoupledModel::saveOutputConnections(
 {
     ModelConnections listModel;
     ModelList::iterator it = models.begin();
-    while (it != models.end()) {
 
+    while (it != models.end()) {
 	ConnectionList connectOut;
 	ConnectionList::iterator iter =
 	    it->second->getOutputPortList().begin();
+
 	while (iter != it->second->getOutputPortList().end()) {
 	    ModelPortList lst(it->second->getOutPort(iter->first));
+
 	    connectOut[iter->first] = lst;
-	    ConnectionList::iterator iterPrec = iter;
 	    ++iter;
-	    it->second->delOutputPort(iterPrec->first);
 	}
 	listModel[it->first] = connectOut;
 	++it;
@@ -1057,8 +1060,6 @@ void CoupledModel::restoreInputConnections(ModelList& models,
 	ConnectionList::iterator iterPort = connectIn.begin();
 
 	while (iterPort != connectIn.end()) {
-	    models[iterConnection->first]->addInputPort(iterPort->first);
-
 	    for (iterModel = connectIn[iterPort->first].begin();
 		 iterModel != connectIn[iterPort->first].end();
 		 ++iterModel) {
@@ -1106,8 +1107,6 @@ void CoupledModel::restoreOutputConnections(ModelList& models,
 	ConnectionList connectOut = iterConnection->second;
 	ConnectionList::iterator iterPort = connectOut.begin();
 	while (iterPort != connectOut.end()) {
-	    models[iterConnection->first]->addOutputPort(iterPort->first);
-
 	    for (iterModel = connectOut[iterPort->first].begin();
 		 iterModel != connectOut[iterPort->first].end();
 		 ++iterModel) {
