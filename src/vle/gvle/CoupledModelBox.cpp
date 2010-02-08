@@ -31,16 +31,13 @@
 #include <vle/gvle/CoupledModelBox.hpp>
 #include <vle/gvle/PortDialog.hpp>
 #include <vle/gvle/Message.hpp>
+#include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/SimpleTypeBox.hpp>
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/utils/Tools.hpp>
 #include <gtkmm/stock.h>
 
-using namespace vle;
-
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
 CoupledModelBox::InputPortTreeView::InputPortTreeView(
     BaseObjectType* cobject,
@@ -93,6 +90,20 @@ CoupledModelBox::InputPortTreeView::InputPortTreeView(
 
 CoupledModelBox::InputPortTreeView::~InputPortTreeView()
 {
+}
+
+void CoupledModelBox::InputPortTreeView::applyRenaming(
+    graph::CoupledModel* model)
+{
+    renameList::const_iterator it = mRenameList.begin();
+
+    while (it != mRenameList.end()) {
+        if (model->existInputPort(it->first)) {
+            model->renameInputPort(it->first, it->second);
+        }
+	++it;
+    }
+    mRenameList.clear();
 }
 
 bool CoupledModelBox::InputPortTreeView::on_button_press_event(
@@ -166,6 +177,7 @@ void CoupledModelBox::InputPortTreeView::onRename()
 
 		if (mModel->existInputPort(old_name)) {
 		    mModel->renameInputPort(old_name, new_name);
+		    mRenameList.push_back(std::make_pair(old_name, new_name));
 		}
 		build();
 	    }
@@ -214,6 +226,7 @@ void CoupledModelBox::InputPortTreeView::onEdition(
 
 	    if (mModel->existInputPort(mOldName)) {
 		mModel->renameInputPort(mOldName, newName);
+                mRenameList.push_back(std::make_pair(mOldName, newName));
 	    }
 	    mValidateRetry = true;
 	}
@@ -221,7 +234,7 @@ void CoupledModelBox::InputPortTreeView::onEdition(
     build();
 }
 
-
+/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 CoupledModelBox::OutputPortTreeView::OutputPortTreeView(
     BaseObjectType* cobject,
@@ -274,6 +287,20 @@ CoupledModelBox::OutputPortTreeView::OutputPortTreeView(
 
 CoupledModelBox::OutputPortTreeView::~OutputPortTreeView()
 {
+}
+
+void CoupledModelBox::OutputPortTreeView::applyRenaming(
+    graph::CoupledModel* model)
+{
+    renameList::const_iterator it = mRenameList.begin();
+
+    while (it != mRenameList.end()) {
+        if (model->existOutputPort(it->first)) {
+            model->renameOutputPort(it->first, it->second);
+        }
+	++it;
+    }
+    mRenameList.clear();
 }
 
 bool CoupledModelBox::OutputPortTreeView::on_button_press_event(
@@ -349,6 +376,7 @@ void CoupledModelBox::OutputPortTreeView::onRename()
 
 		if (mModel->existOutputPort(old_name)) {
 		    mModel->renameOutputPort(old_name, new_name);
+		    mRenameList.push_back(std::make_pair(old_name, new_name));
 		}
 		build();
 	    }
@@ -397,6 +425,7 @@ void CoupledModelBox::OutputPortTreeView::onEdition(
 
 	    if (mModel->existOutputPort(mOldName)) {
 		mModel->renameOutputPort(mOldName, newName);
+                mRenameList.push_back(std::make_pair(mOldName, newName));
 	    }
 	    mValidateRetry = true;
 	}
@@ -404,10 +433,14 @@ void CoupledModelBox::OutputPortTreeView::onEdition(
     build();
 }
 
-CoupledModelBox::CoupledModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m):
-        mXml(xml),
-        mModeling(m),
-        mModel(0)
+/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
+CoupledModelBox::CoupledModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
+                                 Modeling* m):
+    mXml(xml),
+    mModeling(m),
+    mGraphModel(0),
+    mCurrentGraphModel(0)
 {
     xml->get_widget("DialogCoupledModel", mDialog);
 
@@ -419,31 +452,102 @@ CoupledModelBox::CoupledModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* 
     xml->get_widget_derived("CoupledModelTreeViewOutput", mOutputPorts);
 
 
-    xml->get_widget("ButtonCoupledValidate", mButtonValidate);
-    mButtonValidate->signal_clicked().connect(
+    xml->get_widget("CoupledModel-okbutton", mOkButton);
+    mOkButton->signal_clicked().connect(
         sigc::mem_fun(*this, &CoupledModelBox::on_validate));
+    xml->get_widget("CoupledModel-cancelbutton", mCancelButton);
+    mCancelButton->signal_clicked().connect(
+        sigc::mem_fun(*this, &CoupledModelBox::on_cancel));
 }
 
 void CoupledModelBox::show(graph::CoupledModel* model)
 {
-    mModel = model;
+    mCurrentGraphModel = model;
+    mGraphModel = new graph::CoupledModel(*model);
 
-    mModelName->set_text(model->getName());
-    mModelNbChildren->set_text(utils::toString(model->getModelList().size()));
+    mModelName->set_text(mGraphModel->getName());
+    mModelNbChildren->set_text(
+        utils::toString(mGraphModel->getModelList().size()));
 
-    mInputPorts->setModel(mModel);
+    mInputPorts->setModel(mGraphModel);
     mInputPorts->build();
-    mOutputPorts->setModel(mModel);
+    mOutputPorts->setModel(mGraphModel);
     mOutputPorts->build();
 
     mDialog->show_all();
     mDialog->run();
 }
 
-void CoupledModelBox::on_validate()
+void CoupledModelBox::applyPorts()
 {
-    mDialog->hide_all();
+    mInputPorts->applyRenaming(mCurrentGraphModel);
+    mOutputPorts->applyRenaming(mCurrentGraphModel);
+
+    // Apply input ports
+    {
+	graph::ConnectionList connec_in_list =
+	    mCurrentGraphModel->getInputPortList();
+	graph::ConnectionList::iterator it = connec_in_list.begin();
+
+	while (it != connec_in_list.end()) {
+	    if (not mGraphModel->existInputPort(it->first)) {
+		mCurrentGraphModel->delInputPort(it->first);
+	    }
+	    ++it;
+	}
+    }
+    {
+     	graph::ConnectionList connec_in_list =
+     	    mGraphModel->getInputPortList();
+     	graph::ConnectionList::iterator it = connec_in_list.begin();
+
+     	while (it != connec_in_list.end()) {
+	    if (not mCurrentGraphModel->existInputPort(it->first)) {
+		mCurrentGraphModel->addInputPort(it->first);
+	    }
+     	    ++it;
+     	}
+     }
+
+    // Apply output ports
+    {
+	graph::ConnectionList connec_out_list =
+	    mCurrentGraphModel->getOutputPortList();
+	graph::ConnectionList::iterator it = connec_out_list.begin();
+
+	while (it != connec_out_list.end()) {
+	    if (not mGraphModel->existOutputPort(it->first)) {
+		mCurrentGraphModel->delOutputPort(it->first);
+	    }
+	    ++it;
+	}
+    }
+    {
+     	graph::ConnectionList& connec_out_list =
+     	    mGraphModel->getOutputPortList();
+     	graph::ConnectionList::iterator it = connec_out_list.begin();
+
+     	while (it != connec_out_list.end()) {
+	    if (not mCurrentGraphModel->existOutputPort(it->first)) {
+		mCurrentGraphModel->addOutputPort(it->first);
+	    }
+     	    ++it;
+     	}
+    }
 }
 
+void CoupledModelBox::on_validate()
+{
+    applyPorts();
+    mDialog->hide_all();
+    delete mGraphModel;
+    mModeling->setModified(true);
 }
-} // namespace vle gvle
+
+void CoupledModelBox::on_cancel()
+{
+    mDialog->hide_all();
+    delete mGraphModel;
+}
+
+} } // namespace vle gvle

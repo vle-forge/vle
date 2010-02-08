@@ -34,18 +34,7 @@
 #include <libglademm.h>
 #include <vle/graph/CoupledModel.hpp>
 
-namespace vle
-{
-namespace graph {
-
-class CoupledModel;
-
-}
-} // namespace vle graph
-
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
 class Modeling;
 
@@ -77,7 +66,10 @@ private:
 			  const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
 	virtual ~InputPortTreeView();
 
+	void applyRenaming(graph::CoupledModel* model);
 	void build();
+	void clearRenaming()
+	    { mRenameList.clear(); }
 	void setModel(graph::CoupledModel* model)
 	    { mModel = model; }
 
@@ -96,6 +88,8 @@ private:
 	    const Glib::ustring& newName);
 
     private:
+	typedef std::vector < std::pair < std::string,
+					  std::string > > renameList;
 	graph::CoupledModel* mModel;
 	Gtk::Menu mMenuPopup;
 	ModelColumns mColumnsInputPort;
@@ -106,6 +100,7 @@ private:
 	std::string mOldName;
 	Gtk::CellRendererText* mCellRenderer;
 	Glib::ustring mInvalidTextForRetry;
+	renameList mRenameList;
     };
 
     class OutputPortTreeView : public Gtk::TreeView
@@ -115,7 +110,10 @@ private:
 			   const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
 	virtual ~OutputPortTreeView();
 
+	void applyRenaming(graph::CoupledModel* model);
 	void build();
+	void clearRenaming()
+	    { mRenameList.clear(); }
 	void setModel(graph::CoupledModel* model)
 	    { mModel = model; }
     protected:
@@ -134,6 +132,8 @@ private:
 	    const Glib::ustring& newName);
 
     private:
+	typedef std::vector < std::pair < std::string,
+					  std::string > > renameList;
 	graph::CoupledModel* mModel;
 	Gtk::Menu mMenuPopup;
 	ModelColumns mColumnsOutputPort;
@@ -144,13 +144,17 @@ private:
 	std::string mOldName;
 	Gtk::CellRendererText* mCellRenderer;
 	Glib::ustring mInvalidTextForRetry;
+	renameList mRenameList;
     };
 
+    void applyPorts();
     void on_validate();
+    void on_cancel();
 
     Glib::RefPtr<Gnome::Glade::Xml>        mXml;
     Modeling*                              mModeling;
-    graph::CoupledModel*                   mModel;
+    graph::CoupledModel*                   mGraphModel;
+    graph::CoupledModel*                   mCurrentGraphModel;
 
     Gtk::Dialog*                           mDialog;
     Gtk::Label*                            mModelName;
@@ -165,11 +169,11 @@ private:
     ModelColumns                           mColumnsOutput;
     Glib::RefPtr<Gtk::ListStore>           mRefListOutput;
 
-    Gtk::Button*                           mButtonValidate;
+    Gtk::Button*                           mOkButton;
+    Gtk::Button*                           mCancelButton;
 
 };
 
-}
-} // namespace vle gvle
+} } // namespace vle gvle
 
 #endif

@@ -2825,12 +2825,12 @@ to an observable a View.
           </packing>
         </child>
         <child internal-child="action_area">
-          <widget class="GtkHButtonBox" id="dialog-action_area14">
+          <widget class="GtkHButtonBox" id="CoupledModel-dialog-action_area">
             <property name="visible">True</property>
             <property name="layout_style">end</property>
             <child>
-              <widget class="GtkButton" id="ButtonCoupledValidate">
-                <property name="label">gtk-close</property>
+              <widget class="GtkButton" id="CoupledModel-cancelbutton">
+                <property name="label">gtk-cancel</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -2840,6 +2840,20 @@ to an observable a View.
                 <property name="expand">False</property>
                 <property name="fill">False</property>
                 <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkButton" id="CoupledModel-okbutton">
+                <property name="label">gtk-ok</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_stock">True</property>
+              </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">1</property>
               </packing>
             </child>
           </widget>
