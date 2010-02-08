@@ -1068,9 +1068,15 @@ void CoupledModel::restoreInputConnections(ModelList& models,
 
 		    destination->addInputPort(iterPort->first);
 
-		    addInternalConnection(
-			iterModel->first, iterModel->second,
-			destination, iterPort->first);
+                    if (not existInternalConnection(iterModel->first->getName(),
+                                                    iterModel->second,
+                                                    destination->getName(),
+                                                    iterPort->first))
+                    {
+                        addInternalConnection(
+                            iterModel->first, iterModel->second,
+                            destination, iterPort->first);
+                    }
 
 		    destination->addInputConnection(
 			iterPort->first,
@@ -1111,9 +1117,14 @@ void CoupledModel::restoreOutputConnections(ModelList& models,
 
 		    destination->addOutputPort(iterPort->first);
 
-		    addInternalConnection(
-			destination, iterPort->first,
-			iterModel->first, iterModel->second);
+                    if (not existInternalConnection(destination->getName(),
+                                                    iterPort->first,
+                                                    iterModel->first->getName(),
+                                                    iterModel->second)) {
+                        addInternalConnection(
+                            destination, iterPort->first,
+                            iterModel->first, iterModel->second);
+                    }
 
 		    destination->addOutputConnection(
 			models[iterConnection->first], iterPort->first,
