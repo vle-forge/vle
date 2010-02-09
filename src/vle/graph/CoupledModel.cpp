@@ -671,8 +671,8 @@ void CoupledModel::displace(ModelList& models, CoupledModel* destination)
     detachModels(models);
     destination->attachModels(models);
 
-    restoreOutputConnections(models, destination, listOutput);
     restoreInputConnections(models, destination, listInput);
+    restoreOutputConnections(destination, listOutput);
 }
 
 bool CoupledModel::hasConnectionProblem(const ModelList& lst) const
@@ -1052,87 +1052,156 @@ void CoupledModel::restoreInputConnections(ModelList& models,
 					   CoupledModel* destination,
 					   ModelConnections connections)
 {
-    CoupledModel::ModelConnections::iterator iterConnection =
-	connections.begin();
-    ModelPortList::iterator iterModel;
-    while (iterConnection != connections.end()) {
-	ConnectionList connectIn = iterConnection->second;
-	ConnectionList::iterator iterPort = connectIn.begin();
+    typedef std::map < std::pair < std::string, std::string >,
+        std::string > inputPort_t;
+    typedef std::map < std::string, unsigned int > index_t;
+    inputPort_t inputPorts;
+    index_t indexes;
 
-	while (iterPort != connectIn.end()) {
-	    for (iterModel = connectIn[iterPort->first].begin();
-		 iterModel != connectIn[iterPort->first].end();
-		 ++iterModel) {
+    for (CoupledModel::ModelConnections::const_iterator iterConnection =
+             connections.begin(); iterConnection != connections.end();
+         ++iterConnection) {
+        ConnectionList connectIn = iterConnection->second;
 
-		if (models.find(iterModel->first->getName()) == models.end()
-		    and destination != NULL) {
+        for (ConnectionList::const_iterator iterPort = connectIn.begin();
+             iterPort != connectIn.end(); ++iterPort) {
+            for (ModelPortList::const_iterator iterModel =
+                     connectIn[iterPort->first].begin();
+         	 iterModel != connectIn[iterPort->first].end(); ++iterModel) {
+                if (connections.find(iterModel->first->getName()) !=
+                    connections.end()) {
+                    addInternalConnection(iterModel->first, iterModel->second,
+                                          models[iterConnection->first],
+                                          iterPort->first);
+                } else {
+                    std::string portName;
 
-		    destination->addInputPort(iterPort->first);
+                    if (not destination->existInputPort(iterModel->second)) {
+                        portName = iterModel->second;
+                        destination->addInputPort(portName);
+                        inputPorts[std::make_pair(
+                                iterModel->first->getName(),
+                                iterModel->second)] = portName;
+                        indexes[iterModel->second] = 0;
+                    } else {
+                        std::pair < std::string, std::string > inputPort(
+                            std::make_pair(iterModel->first->getName(),
+                                           iterModel->second));
+                        inputPort_t::const_iterator it =
+                            inputPorts.find(inputPort);
 
-                    if (not existInternalConnection(iterModel->first->getName(),
-                                                    iterModel->second,
-                                                    destination->getName(),
-                                                    iterPort->first))
-                    {
-                        addInternalConnection(
-                            iterModel->first, iterModel->second,
-                            destination, iterPort->first);
+                        if (it == inputPorts.end()) {
+                            indexes[iterModel->second]++;
+                            portName = (fmt("%1%_%2%") % iterModel->second %
+                                        (indexes[iterModel->second])).str();
+                            destination->addInputPort(portName);
+                            inputPorts[
+                                std::make_pair(iterModel->first->getName(),
+                                               iterModel->second)] = portName;
+                        } else {
+                            portName = it->second;
+                        }
                     }
-
-		    destination->addInputConnection(
-			iterPort->first,
-			models[iterConnection->first], iterPort->first);
-
-		} else {
-		    destination->addInternalConnection(
-			iterModel->first, iterModel->second,
-			models[iterConnection->first], iterPort->first);
-		}
-	    }
-	    ++iterPort;
-	}
-	++iterConnection;
+                    destination->addInputConnection(portName,
+                                                    iterConnection->first,
+                                                    iterPort->first);
+                    if (iterModel->first == this) {
+                        if (not existInputConnection(iterModel->second,
+                                                     destination->getName(),
+                                                     portName)) {
+                            addInputConnection(iterModel->second,
+                                               destination,
+                                               portName);
+                        }
+                    } else {
+                        if (not existInternalConnection(
+                                iterModel->first->getName(),
+                                iterModel->second, destination->getName(),
+                                portName)) {
+                            addInternalConnection(iterModel->first,
+                                                  iterModel->second,
+                                                  destination,
+                                                  portName);
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
 
-void CoupledModel::restoreOutputConnections(ModelList& models,
-					    CoupledModel* destination,
+void CoupledModel::restoreOutputConnections(CoupledModel* destination,
 					    ModelConnections connections)
 {
-    CoupledModel::ModelConnections::iterator iterConnection =
-	connections.begin();
-    ModelPortList::iterator iterModel;
-    while (iterConnection != connections.end()) {
-	ConnectionList connectOut = iterConnection->second;
-	ConnectionList::iterator iterPort = connectOut.begin();
-	while (iterPort != connectOut.end()) {
-	    for (iterModel = connectOut[iterPort->first].begin();
-		 iterModel != connectOut[iterPort->first].end();
-		 ++iterModel) {
+    typedef std::map < std::pair < std::string, std::string >,
+        std::string > outputPort_t;
+    typedef std::map < std::string, unsigned int > index_t;
+    outputPort_t outputPorts;
+    index_t indexes;
 
-		if (models.find(iterModel->first->getName()) == models.end()
-		    and destination != NULL) {
+    for (CoupledModel::ModelConnections::const_iterator iterConnection =
+             connections.begin(); iterConnection != connections.end();
+         ++iterConnection) {
+        ConnectionList connectOut = iterConnection->second;
 
-		    destination->addOutputPort(iterPort->first);
+        for (ConnectionList::const_iterator iterPort = connectOut.begin();
+             iterPort != connectOut.end(); ++iterPort) {
+            for (ModelPortList::const_iterator iterModel =
+                     connectOut[iterPort->first].begin();
+         	 iterModel != connectOut[iterPort->first].end(); ++iterModel) {
+                if (connections.find(iterModel->first->getName()) ==
+                    connections.end()) {
+                    std::string portName;
 
-                    if (not existInternalConnection(destination->getName(),
-                                                    iterPort->first,
-                                                    iterModel->first->getName(),
-                                                    iterModel->second)) {
-                        addInternalConnection(
-                            destination, iterPort->first,
-                            iterModel->first, iterModel->second);
+                    if (not destination->existOutputPort(iterModel->second)) {
+                        portName = iterModel->second;
+                        destination->addOutputPort(portName);
+                        outputPorts[std::make_pair(
+                                iterModel->first->getName(),
+                                iterModel->second)] = portName;
+                        indexes[iterModel->second] = 0;
+                    } else {
+                        std::pair < std::string, std::string > outputPort(
+                            std::make_pair(iterModel->first->getName(),
+                                           iterModel->second));
+                        outputPort_t::const_iterator it =
+                            outputPorts.find(outputPort);
+
+                        if (it == outputPorts.end()) {
+                            indexes[iterModel->second]++;
+                            portName = (fmt("%1%_%2%") % iterModel->second %
+                                        (indexes[iterModel->second])).str();
+                            destination->addOutputPort(portName);
+                            outputPorts[
+                                std::make_pair(iterModel->first->getName(),
+                                               iterModel->second)] = portName;
+                        } else {
+                            portName = it->second;
+                        }
                     }
-
-		    destination->addOutputConnection(
-			models[iterConnection->first], iterPort->first,
-			iterPort->first);
-		}
-	    }
-	    ++iterPort;
-	}
-	++iterConnection;
+                    destination->addOutputConnection(iterConnection->first,
+                                                     iterPort->first, portName);
+                    if (iterModel->first == this) {
+                        if (not existOutputConnection(destination->getName(),
+                                                      portName,
+                                                      iterModel->second)) {
+                            addOutputConnection(destination, portName,
+                                                iterModel->second);
+                        }
+                    } else {
+                        if (not existInternalConnection(
+                                destination->getName(),portName,
+                                iterModel->first->getName(),
+                                iterModel->second)) {
+                            addInternalConnection(destination, portName,
+                                                  iterModel->first,
+                                                  iterModel->second);
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

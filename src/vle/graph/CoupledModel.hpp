@@ -377,8 +377,7 @@ namespace vle { namespace graph {
 	 * @param conenction the old connections
 	 *
 	 */
-	void restoreOutputConnections(ModelList& models,
-				      CoupledModel* destination,
+	void restoreOutputConnections(CoupledModel* destination,
 				      ModelConnections connections);
 
         /**
