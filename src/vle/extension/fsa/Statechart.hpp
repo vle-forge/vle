@@ -421,8 +421,16 @@ private:
             mAfterFuncs.find(transition) != mAfterFuncs.end(); }
     bool existEvent(int transition)
     { return mEvents.find(transition) != mEvents.end(); }
-    bool existEventInState(int state)
-    { return mEventInStateActions.find(state) != mEventInStateActions.end(); }
+    bool existEventInState(int state, const std::string& event)
+    {
+        EventInStateActionsMap::const_iterator it =
+            mEventInStateActions.find(state);
+
+        if (it != mEventInStateActions.end()) {
+            return it->second.find(event) != it->second.end();
+        }
+        return false;
+    }
     bool existGuard(int transition)
     { return mGuards.find(transition) != mGuards.end(); }
     bool existInAction(int state)
@@ -794,7 +802,7 @@ StatechartTransition_t<I> operator<<(StatechartTransition_t<I> transition,
 template < typename I, typename X >
 EventInState_t<I,X> operator>>(EventInState_t<I,X> event, int state)
 {
-    if (event.obj->existEventInState(state)) {
+    if (event.obj->existEventInState(state, event.event)) {
         throw vle::utils::ModellingError(
             vle::fmt(_("[%1%] FSA::Statechart: state %2% have " \
                        "already an event action in state"))
@@ -855,7 +863,7 @@ Activity_t<X,I> operator>>(Activity_t<X,I> activity, int state)
 template < typename I, typename X >
 State2_t<I> operator<<(State2_t<I> state, EventInState2_t<X> event)
 {
-    if (state.obj->existEventInState(state.state)) {
+    if (state.obj->existEventInState(state.state, event.event)) {
         throw vle::utils::ModellingError(
             vle::fmt(_("[%1%] FSA::Statechart: state %2% have " \
                        "already an event action in state"))
