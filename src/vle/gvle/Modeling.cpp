@@ -582,14 +582,16 @@ void Modeling::importModel(graph::CoupledModel* parent, vpz::Vpz* src)
 	if (mImportModelBox->show(src)) {
 	    graph::Model* import = src->project().model().model();
 	    parent->addModel(import);
-	    if (import->isAtomic())
+	    if (import->isAtomic()) {
 		import_atomic_model(src, graph::Model::toAtomic(import));
-	    else
-		import_coupled_model(src, graph::Model::toCoupled(import));
+            } else {
+                import_coupled_model(src, graph::Model::toCoupled(import));
+            }
 	    dynamics().add(src->project().dynamics());
 	    conditions().add(src->project().experiment().conditions());
 	    views().add(src->project().experiment().views());
 	    mGVLE->redrawModelTreeBox();
+            refreshViews();
 	    setModified(true);
 	}
     }
@@ -608,15 +610,18 @@ void Modeling::importModelToClass(vpz::Vpz* src, std::string& className)
 	    graph::Model* import = src->project().model().model();
 	    if (import->isAtomic()) {
 		new_class.setModel(graph::Model::toAtomic(import));
-		import_atomic_model(src, graph::Model::toAtomic(import), className);
+                import_atomic_model(src, graph::Model::toAtomic(import),
+                                    className);
 	    } else {
 		new_class.setModel(graph::Model::toCoupled(import));
-		import_coupled_model(src, graph::Model::toCoupled(import), className);
+                import_coupled_model(src, graph::Model::toCoupled(import),
+                                     className);
 	    }
 	    dynamics().add(src->project().dynamics());
 	    conditions().add(src->project().experiment().conditions());
 	    views().add(src->project().experiment().views());
 	    mGVLE->redrawModelClassBox();
+            refreshViews();
 	    setModified(true);
 	}
     }
