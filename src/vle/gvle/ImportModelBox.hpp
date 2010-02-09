@@ -144,12 +144,17 @@ private:
     void makeViews();
     void makeModels();
 
-    void rename_dynamic(vpz::Vpz* src, std::string old_name, std::string new_name);
-    void rename_condition(vpz::Vpz* src, std::string old_name, std::string new_name);
-    void rename_output(vpz::Vpz* src, std::string old_name, std::string new_name);
-    void rename_observable(vpz::Vpz* src, std::string old_name, std::string new_name);
+    void rename_dynamic(vpz::Vpz* src, std::string old_name,
+                        std::string new_name);
+    void rename_condition(vpz::Vpz* src, std::string old_name,
+                          std::string new_name);
+    void rename_output(vpz::Vpz* src, std::string old_name,
+                       std::string new_name);
+    void rename_observable(vpz::Vpz* src, std::string old_name,
+                           std::string new_name);
     void rename_view(vpz::Vpz* src, std::string old_name, std::string new_name);
-    void rename_model(vpz::Vpz* src, graph::Model* old_model, std::string new_name);
+    void rename_model(vpz::Vpz* src, graph::Model* old_model,
+                      std::string new_name);
 
     void on_apply();
     void on_cancel();

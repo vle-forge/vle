@@ -34,11 +34,8 @@
 #include <vle/gvle/GVLE.hpp>
 #include <vle/gvle/ModelTreeBox.hpp>
 #include <vle/gvle/ModelClassBox.hpp>
-#include <vle/gvle/CoupledModelBox.hpp>
 #include <vle/gvle/CutCopyPaste.hpp>
 #include <vle/gvle/Editor.hpp>
-#include <vle/gvle/ImportModelBox.hpp>
-#include <vle/gvle/ImportClassesBox.hpp>
 #include <vle/gvle/ViewDrawingArea.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/graph/Model.hpp>
@@ -56,7 +53,8 @@ namespace vle { namespace gvle {
 
 class AtomicModelBox;
 class ImportModelBox;
-
+class ImportClassesBox;
+class CoupledModelBox;
 class View;
 
 /**

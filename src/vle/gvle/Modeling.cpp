@@ -38,6 +38,9 @@
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/ModelDescriptionBox.hpp>
 #include <vle/gvle/DialogString.hpp>
+#include <vle/gvle/CoupledModelBox.hpp>
+#include <vle/gvle/ImportModelBox.hpp>
+#include <vle/gvle/ImportClassesBox.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Exception.hpp>

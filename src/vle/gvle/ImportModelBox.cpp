@@ -148,23 +148,16 @@ bool ImportWidget::evaluate()
     }
 }
 
-ImportModelBox::ImportModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* modeling):
-        mXml(xml),
-        mModeling(modeling),
-        mNbWidgetIncorrect(0)
+ImportModelBox::ImportModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
+                               Modeling* modeling)
+  : mXml(xml), mModeling(modeling), mNbWidgetIncorrect(0)
 {
     xml->get_widget("DialogImportModel", mDialog);
-
     xml->get_widget("ImportVboxDynamics", mVboxDyns);
-
     xml->get_widget("ImportVboxConditions", mVboxConds);
-
     xml->get_widget("ImportVboxOutputs", mVboxOutputs);
-
     xml->get_widget("ImportVboxObservables", mVboxObs);
-
     xml->get_widget("ImportVboxViews", mVboxViews);
-
     xml->get_widget("ImportVboxModels", mVboxModels);
 
     xml->get_widget("ButtonImportApply", mButtonApply);
@@ -179,6 +172,11 @@ ImportModelBox::ImportModelBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* mo
 bool ImportModelBox::show(vpz::Vpz* src)
 {
     mSrc = src;
+
+    mButtonApply->set_sensitive(true);
+    mButtonCancel->set_sensitive(true);
+    mNbWidgetIncorrect = 0;
+    mReturn = true;
 
     makeDynamics();
     makeConditions();
@@ -508,54 +506,42 @@ void ImportModelBox::on_apply()
     ImportWidget* widget;
     list_widget::iterator it;
 
-    for (it = mListDyns.begin();
-            it != mListDyns.end();
-            ++it) {
+    for (it = mListDyns.begin(); it != mListDyns.end(); ++it) {
         widget = *it;
         vpz::Dynamic* dyn = dynamic_cast<vpz::Dynamic*>((*it)->get_base());
         if (dyn->name() != widget->get_text())
             rename_dynamic(mSrc, dyn->name(), widget->get_text());
     }
 
-    for (it = mListConds.begin();
-            it != mListConds.end();
-            ++it) {
+    for (it = mListConds.begin(); it != mListConds.end(); ++it) {
         widget = *it;
         vpz::Condition* cond = dynamic_cast<vpz::Condition*>((*it)->get_base());
         if (cond->name() != widget->get_text())
             rename_condition(mSrc, cond->name(), widget->get_text());
     }
 
-    for (it = mListOutputs.begin();
-            it != mListOutputs.end();
-            ++it) {
+    for (it = mListOutputs.begin(); it != mListOutputs.end(); ++it) {
         widget = *it;
         vpz::Output* output = dynamic_cast<vpz::Output*>((*it)->get_base());
         if (output->name() != widget->get_text())
             rename_output(mSrc, output->name(), widget->get_text());
     }
 
-    for (it = mListObs.begin();
-            it != mListObs.end();
-            ++it) {
+    for (it = mListObs.begin(); it != mListObs.end(); ++it) {
         widget = *it;
         vpz::Observable* obs = dynamic_cast<vpz::Observable*>((*it)->get_base());
         if (obs->name() != widget->get_text())
             rename_observable(mSrc, obs->name(), widget->get_text());
     }
 
-    for (it = mListViews.begin();
-            it != mListViews.end();
-            ++it) {
+    for (it = mListViews.begin(); it != mListViews.end(); ++it) {
         widget = *it;
         vpz::View* view = dynamic_cast<vpz::View*>((*it)->get_base());
         if (view->name() != widget->get_text())
             rename_view(mSrc, view->name(), widget->get_text());
     }
 
-    for (it = mListModels.begin();
-            it != mListModels.end();
-            ++it) {
+    for (it = mListModels.begin(); it != mListModels.end(); ++it) {
         widget = *it;
 	if (widget->get_model()->getName() != widget->get_text())
 	    rename_model(mSrc, widget->get_model(), widget->get_text());
