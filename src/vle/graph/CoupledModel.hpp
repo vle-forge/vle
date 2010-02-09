@@ -446,7 +446,7 @@ namespace vle { namespace graph {
         inline const ConnectionList& getInternalInputPortList() const
         { return m_internalInputList; }
 
-        inline const ConnectionList& getInternalOuputPortList() const
+        inline const ConnectionList& getInternalOutputPortList() const
         { return m_internalOutputList; }
 
         inline ConnectionList& getInternalInputPortList()
