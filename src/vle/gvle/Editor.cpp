@@ -377,27 +377,29 @@ Gtk::HBox* Editor::addLabel(const std::string& title,
 
 void Editor::changeTab(GtkNotebookPage* /*page*/, int num)
 {
-    Gtk::Widget* tab = get_nth_page(num);
-    Documents::iterator it = mDocuments.begin();
+    if (mApp->getCurrentTab() != num) {
+        Gtk::Widget* tab = get_nth_page(num);
+        Documents::iterator it = mDocuments.begin();
 
-    while (it != mDocuments.end()) {
-	if (it->second == tab) {
-            mApp->setCurrentTab(num);
-	    if (utils::Path::extension(it->first) == ".vpz") {
-		mApp->getMenu()->onOpenVpz();
-	    } else {
-		mApp->getMenu()->onOpenFile();
-	    }
-            if (it->second->isModified()) {
-                mApp->getMenu()->showSave();
-            } else {
-                mApp->getMenu()->hideSave();
+        while (it != mDocuments.end()) {
+            if (it->second == tab) {
+                mApp->setCurrentTab(num);
+                if (utils::Path::extension(it->first) == ".vpz") {
+                    mApp->getMenu()->onOpenVpz();
+                } else {
+                    mApp->getMenu()->onOpenFile();
+                }
+                if (it->second->isModified()) {
+                    mApp->getMenu()->showSave();
+                } else {
+                    mApp->getMenu()->hideSave();
+                }
+                mApp->setTitle(utils::Path::basename(it->first) +
+                               utils::Path::extension(it->first));
+                break;
             }
-	    mApp->setTitle(utils::Path::basename(it->first) +
-			   utils::Path::extension(it->first));
-	    break;
-	}
-	++it;
+            ++it;
+        }
     }
 }
 
@@ -577,8 +579,7 @@ void Editor::openTabVpz(const std::string& filepath,
 	    mDocuments.insert(
 		std::make_pair < std::string, DocumentDrawingArea* >(
 		    filepath, doc));
-	    append_page(*doc, *(addLabel(doc->getTitle(),
-						    filepath)));
+	    append_page(*doc, *(addLabel(doc->getTitle(), filepath)));
 	    reorder_child(*doc, page);
 	} else {
 	    return;
@@ -591,9 +592,8 @@ void Editor::openTabVpz(const std::string& filepath,
 	    model);
 	mDocuments.insert(
 	    std::make_pair < std::string, DocumentDrawingArea* >(filepath,
-								 doc));
-	page = append_page(*doc, *(addLabel(doc->getTitle(),
-					    filepath)));
+                                                                 doc));
+	page = append_page(*doc, *(addLabel(doc->getTitle(), filepath)));
     }
     show_all_children();
     set_current_page(page);

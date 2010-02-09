@@ -401,6 +401,7 @@ void Modeling::copy(graph::ModelList& lst, graph::CoupledModel* gc,
     // the current view is not a class
     if (className.empty()) {
 	// no model is selected in current view and a class is selected
+        // -> class instantiation
 	if (lst.empty() and not mSelectedClass.empty()) {
 	    vpz::Class& currentClass = mVpz.project().classes()
 		.get(mSelectedClass);
@@ -425,11 +426,11 @@ void Modeling::copy(graph::ModelList& lst, graph::CoupledModel* gc,
 
 void Modeling::paste(graph::CoupledModel* gc, std::string className)
 {
-    if (className == "") {
+    if (className.empty()) {
 	mCutCopyPaste.paste(gc, mVpz.project().model().atomicModels());
     } else {
-	mCutCopyPaste.paste(gc, mVpz.project().classes()
-                            .get(className).atomicModels());
+	mCutCopyPaste.paste(gc, mVpz.project().classes().
+                            get(className).atomicModels());
     }
 }
 

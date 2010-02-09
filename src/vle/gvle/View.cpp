@@ -217,7 +217,6 @@ void View::importModel()
 
 void View::onCutModel()
 {
-    // TODO
     mModeling->setModified(true);
     mModeling->cut(mSelectedModels, mCurrent, mCurrentClass);
     mModeling->getGVLE()->redrawModelTreeBox();
@@ -228,7 +227,6 @@ void View::onCutModel()
 
 void View::onCopyModel()
 {
-    //TODO
     if (existInSelectedModels(mCurrent)) {
 	mModeling->copy(mSelectedModels, mCurrent->getParent(), mCurrentClass);
     } else {
@@ -240,7 +238,6 @@ void View::onCopyModel()
 
 void View::onPasteModel()
 {
-    //TODO
     mModeling->setModified(true);
     mModeling->paste(mCurrent, mCurrentClass);
     mModeling->getGVLE()->redrawModelTreeBox();
@@ -340,10 +337,11 @@ void View::showModel(graph::Model* model)
     if (not model) {
         mModeling->EditCoupledModel(mCurrent);
     } else {
-	if (mCurrentClass == "")
-	    mModeling->addView(model);
-	else
-	    mModeling->addViewClass(model, mCurrentClass);
+	if (mCurrentClass.empty()) {
+            mModeling->addView(model);
+        } else {
+            mModeling->addViewClass(model, mCurrentClass);
+        }
     }
 }
 

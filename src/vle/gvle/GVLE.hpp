@@ -240,6 +240,9 @@ public:
      */
     void updateAdjustment(double h, double v);
 
+    int getCurrentTab() const
+    { return mCurrentTab; }
+
     void setCurrentTab(int n)
     { mCurrentTab = n; }
 

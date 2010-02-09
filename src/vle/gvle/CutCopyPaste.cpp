@@ -38,10 +38,9 @@
 namespace vle { namespace gvle {
 
 CutCopyPaste::CutCopyPaste() :
-        mNumero(0),
-        mType(NOTHING)
-{
-}
+    mNumero(0),
+    mType(NOTHING)
+{ }
 
 CutCopyPaste::~CutCopyPaste()
 {
@@ -60,8 +59,9 @@ CutCopyPaste::~CutCopyPaste()
 void CutCopyPaste::cut(graph::ModelList& l, graph::CoupledModel* parent,
                        vpz::AtomicModelList& src)
 {
-    if (parent->hasConnectionProblem(l) == true) {
-        std::cout << _("Selected model list have connection with external model\n");
+    if (parent->hasConnectionProblem(l)) {
+        std::cout << _("Selected model list have connection with "      \
+                       "external model\n");
     } else if (l.empty()) {
         std::cout << _("No model selected\n");
     } else if (l.find(parent->getName()) == l.end()) {
@@ -75,18 +75,16 @@ void CutCopyPaste::cut(graph::ModelList& l, graph::CoupledModel* parent,
         mList_graph = l;
 
         for (graph::ModelList::const_iterator it = mList_graph.begin();
-                it !=  mList_graph.end();
-                ++it) {
+             it !=  mList_graph.end(); ++it) {
             if (it->second->isAtomic()) {
                 cut_atomic(it->second, src);
             } else {
                 cut_coupled(it->second, src);
             }
-
         }
-
     } else {
-        std::cout << _("Nothing to Cut - parent is '") << parent->getName() << "'\n";
+        std::cout << _("Nothing to Cut - parent is '")
+                  << parent->getName() << "'\n";
     }
 }
 
@@ -94,7 +92,8 @@ void CutCopyPaste::copy(graph::ModelList& l, graph::CoupledModel* parent,
                         vpz::AtomicModelList& src, bool isClass)
 {
     if (not isClass and parent->hasConnectionProblem(l)) {
-        std::cout << _("Selected model list have connection with external model\n");
+        std::cout << _("Selected model list have connection with "      \
+                       "external model\n");
     } else if (l.empty()) {
         std::cout << _("No model selected\n");
     } else {
@@ -107,12 +106,11 @@ void CutCopyPaste::copy(graph::ModelList& l, graph::CoupledModel* parent,
 	}
 
         for (graph::ModelList::iterator it = l.begin();
-                it != l.end();
-                ++it) {
+             it != l.end(); ++it) {
             graph::Model* m = it->second->clone();
+
             m->setParent(NULL);
             mList_graph.insert(make_pair(m->getName(), m));
-
             if (m->isAtomic()) {
                 copy_atomic(it->second, m, src);
             } else {
@@ -124,12 +122,10 @@ void CutCopyPaste::copy(graph::ModelList& l, graph::CoupledModel* parent,
 
 void CutCopyPaste::paste(graph::CoupledModel* gc, vpz::AtomicModelList& dst)
 {
-    using namespace graph;
-
     graph::ModelList list_graph_clone;
     vpz::AtomicModelList list_vpz_clone;
 
-    if (gc) {
+   if (gc) {
         if (mType == CUT) {
             clone(list_graph_clone,
                   list_vpz_clone,
@@ -146,22 +142,19 @@ void CutCopyPaste::paste(graph::CoupledModel* gc, vpz::AtomicModelList& dst)
         std::vector <std::string> mwCnts= mCnts;
 
         // to avoid naming conflicts.
-        for (ModelList::const_iterator itmls = list_graph_clone.begin();
-                itmls != list_graph_clone.end();
-                ++itmls) {
-
+        for (graph::ModelList::const_iterator itmls = list_graph_clone.begin();
+             itmls != list_graph_clone.end(); ++itmls) {
             std::string mname = itmls->second->getName();
 
             if (gc->exist(mname)) {
+                int mcounter = 1;
+                std::string mnewname = mname + "_" +
+                    boost::lexical_cast<std::string>(mcounter) ;
 
-                int mcounter =  1;
-
-                std::string mnewname = mname + "_" +   \
-                                       boost::lexical_cast<std::string>(mcounter) ;
-
-                while (gc->exist(mnewname))
-                    mnewname = mname + "_" +    \
-                               boost::lexical_cast<std::string>(mcounter++) ;
+                while (gc->exist(mnewname)) {
+                    mnewname = mname + "_" +
+                        boost::lexical_cast<std::string>(mcounter++) ;
+                }
 
                 graph::Model::rename(itmls->second, mnewname);
 
@@ -169,12 +162,10 @@ void CutCopyPaste::paste(graph::CoupledModel* gc, vpz::AtomicModelList& dst)
                 std::vector <std::string>::iterator itc = mwCnts.begin();
 
                 for (std::vector <std::string>::iterator itco = mCnts.begin();
-                        itco != mCnts.end();
-                        itco = itco + 2) {
-
-                    if (*itco == mname)
+                     itco != mCnts.end(); itco = itco + 2) {
+                    if (*itco == mname) {
                         *itc = mnewname;
-
+                    }
                     itc = itc + 2;
                 }
             }
@@ -185,8 +176,6 @@ void CutCopyPaste::paste(graph::CoupledModel* gc, vpz::AtomicModelList& dst)
     } else {
         std::cout << _("No Coupled Model\n");
     }
-
-    //state();
 }
 
 /*********************************************************************
