@@ -277,7 +277,7 @@ CoupledModelBox::OutputPortTreeView::OutputPortTreeView(
 		    &CoupledModelBox::OutputPortTreeView::onRemove)));
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
-		_("_Rename)"),
+		_("_Rename"),
 		sigc::mem_fun(
 		    *this,
 		    &CoupledModelBox::OutputPortTreeView::onRename)));
