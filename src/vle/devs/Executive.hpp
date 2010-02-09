@@ -264,8 +264,7 @@ namespace vle { namespace devs {
          * @brief Get a reference to the current coupled model.
          * @return A reference to the coupled model.
          */
-        graph::CoupledModel* coupledmodel()
-        { return getModel().getParent(); }
+        graph::CoupledModel* cpled() { return getModel().getParent(); }
     };
 
 }} // namespace vle devs

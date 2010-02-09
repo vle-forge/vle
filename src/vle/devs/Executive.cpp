@@ -39,7 +39,7 @@ Executive::createModel(const std::string& name,
                            const vpz::Strings& conditions,
                            const std::string& observable)
 {
-    graph::AtomicModel* model = new graph::AtomicModel(name, coupledmodel());
+    graph::AtomicModel* model = new graph::AtomicModel(name, cpled());
     std::vector < std::string >::const_iterator it;
 
     for (it = inputs.begin(); it != inputs.end(); ++it) {
@@ -58,15 +58,14 @@ const graph::Model*
 Executive::createModelFromClass(const std::string& classname,
                                 const std::string& modelname)
 {
-    return m_coordinator.createModelFromClass(classname, coupledmodel(),
-                                              modelname);
+    return m_coordinator.createModelFromClass(classname, cpled(), modelname);
 }
 
 void Executive::delModel(const std::string& modelname)
 {
     std::vector < std::pair < Simulator*, std::string > > toupdate;
 
-    graph::Model* mdl = coupledmodel()->findModel(modelname);
+    graph::Model* mdl = cpled()->findModel(modelname);
     if (not mdl) {
         throw utils::DevsGraphError(fmt(
                 _("Executive error: unknown model `%1%'")) %
@@ -75,7 +74,7 @@ void Executive::delModel(const std::string& modelname)
 
     m_coordinator.getSimulatorsSource(mdl, toupdate);
 
-    m_coordinator.delModel(coupledmodel(), modelname);
+    m_coordinator.delModel(cpled(), modelname);
 
     m_coordinator.updateSimulatorsTarget(toupdate);
 }
@@ -87,20 +86,18 @@ void Executive::addConnection(const std::string& srcModelName,
 {
     const std::string& modelName(coupledmodelName());
     graph::Model* srcModel = (modelName == srcModelName)?
-        coupledmodel() : coupledmodel()->findModel(srcModelName);
+        cpled() : cpled()->findModel(srcModelName);
     graph::Model* dstModel = (modelName == dstModelName)?
-        coupledmodel() : coupledmodel()->findModel(dstModelName);
+        cpled() : cpled()->findModel(dstModelName);
 
     if (srcModel and dstModel) {
         if (modelName == srcModelName) {
-            coupledmodel()->addInputConnection(srcPortName,
-                                               dstModel, dstPortName);
+            cpled()->addInputConnection(srcPortName, dstModel, dstPortName);
         } else if (modelName == dstModelName) {
-            coupledmodel()->addOutputConnection(srcModel, srcPortName,
-                                                dstPortName);
+            cpled()->addOutputConnection(srcModel, srcPortName, dstPortName);
         } else {
-            coupledmodel()->addInternalConnection(srcModel, srcPortName,
-                                                  dstModel, dstPortName);
+            cpled()->addInternalConnection(srcModel, srcPortName, dstModel,
+                                           dstPortName);
         }
 
         std::vector < std::pair < Simulator*, std::string > > toupdate;
@@ -122,23 +119,21 @@ void Executive::removeConnection(const std::string& srcModelName,
 {
     const std::string& modelName(coupledmodelName());
     graph::Model* srcModel = (modelName == srcModelName) ?
-        coupledmodel() : coupledmodel()->findModel(srcModelName);
+        cpled() : cpled()->findModel(srcModelName);
     graph::Model* dstModel = (modelName == dstModelName) ?
-        coupledmodel() : coupledmodel()->findModel(dstModelName);
+        cpled() : cpled()->findModel(dstModelName);
 
     if (srcModel and dstModel) {
         std::vector < std::pair < Simulator*, std::string > > toupdate;
         m_coordinator.getSimulatorsSource(dstModel, dstPortName, toupdate);
 
         if (modelName == srcModelName) {
-            coupledmodel()->delInputConnection(srcPortName, dstModel,
-                                               dstPortName);
+            cpled()->delInputConnection(srcPortName, dstModel, dstPortName);
         } else if (modelName == dstModelName) {
-            coupledmodel()->delOutputConnection(srcModel, srcPortName,
-                                                dstPortName);
+            cpled()->delOutputConnection(srcModel, srcPortName, dstPortName);
         } else {
-            coupledmodel()->delInternalConnection(srcModel, srcPortName,
-                                                  dstModel, dstPortName);
+            cpled()->delInternalConnection(srcModel, srcPortName, dstModel,
+                                           dstPortName);
         }
 
         m_coordinator.updateSimulatorsTarget(toupdate);
@@ -153,7 +148,7 @@ void Executive::removeConnection(const std::string& srcModelName,
 void Executive::addInputPort(const std::string& modelName,
                              const std::string& portName)
 {
-    graph::Model* mdl = coupledmodel()->findModel(modelName);
+    graph::Model* mdl = cpled()->findModel(modelName);
     if (not mdl) {
         throw utils::DevsGraphError(fmt(
                 _("Executive error: unknown model `%1%'")) %
@@ -166,7 +161,7 @@ void Executive::addInputPort(const std::string& modelName,
 void Executive::addOutputPort(const std::string& modelName,
                               const std::string& portName)
 {
-    graph::Model* mdl = coupledmodel()->findModel(modelName);
+    graph::Model* mdl = cpled()->findModel(modelName);
     if (not mdl) {
         throw utils::DevsGraphError(fmt(
                 _("Executive error: unknown model `%1%'")) %
@@ -179,7 +174,7 @@ void Executive::addOutputPort(const std::string& modelName,
 void Executive::removeInputPort(const std::string& modelName,
                                 const std::string& portName)
 {
-    graph::Model* mdl = coupledmodel()->findModel(modelName);
+    graph::Model* mdl = cpled()->findModel(modelName);
     if (not mdl) {
         throw utils::DevsGraphError(fmt(
                 _("Executive error: unknown model `%1%'")) %
@@ -195,7 +190,7 @@ void Executive::removeInputPort(const std::string& modelName,
 void Executive::removeOutputPort(const std::string& modelName,
                                  const std::string& portName)
 {
-    graph::Model* mdl = coupledmodel()->findModel(modelName);
+    graph::Model* mdl = cpled()->findModel(modelName);
     if (not mdl) {
         throw utils::DevsGraphError(fmt(
                 _("Executive error: unknown model `%1%'")) %
