@@ -141,7 +141,7 @@ void ManagerRunThread::read()
     {
         Glib::Mutex::Lock lock(m_mutex);
         m_finish = true;
-        m_prodcond.signal();
+        m_prodcond.broadcast();
     }
 }
 
@@ -292,7 +292,7 @@ void ManagerRunDistant::read()
     {
         Glib::Mutex::Lock lock(m_mutex);
         m_finish = true;
-        m_prodcond.signal();
+        m_prodcond.broadcast();
     }
 }
 
