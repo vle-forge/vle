@@ -697,6 +697,8 @@ public:
      */
     void setTitle(const Glib::ustring& name = "");
 
+    void updateTitle();
+
 private:
     void fixSave();
     void saveVpz();

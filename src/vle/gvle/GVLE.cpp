@@ -850,6 +850,7 @@ void GVLE::onOpenProject()
         utils::Package::package().select(mOpenPackageBox->name());
         buildPackageHierarchy();
 	mMenuAndToolbar->onOpenProject();
+        setTitle("");
     }
 }
 
@@ -1051,6 +1052,7 @@ bool GVLE::closeTab(const std::string& filepath)
             mEditor->closeTab(it->first);
             mMenuAndToolbar->onCloseTab(vpz, mEditor->getDocuments().empty());
             fixSave();
+            updateTitle();
         }
     }
     return close;
@@ -1084,6 +1086,7 @@ void GVLE::onCloseTab()
             mEditor->closeTab(it->first);
             mMenuAndToolbar->onCloseTab(vpz, mEditor->getDocuments().empty());
             fixSave();
+            updateTitle();
         }
     }
 }
@@ -1097,6 +1100,7 @@ void GVLE::onCloseProject()
     utils::Package::package().select("");
     buildPackageHierarchy();
     mMenuAndToolbar->showMinimalMenu();
+    setTitle("");
 }
 
 void GVLE::onQuit()
@@ -1269,6 +1273,25 @@ void GVLE::setTitle(const Glib::ustring& name)
         title += " - " + Glib::path_get_basename(name);
     }
     set_title(title);
+}
+
+void GVLE::updateTitle()
+{
+    if (not mEditor->getDocuments().empty()) {
+        int page = mEditor->get_current_page();
+        Gtk::Widget* tab = mEditor->get_nth_page(page);
+        bool found = false;
+        Editor::Documents::const_iterator it =
+            mEditor->getDocuments().begin();
+
+        while (not found and it != mEditor->getDocuments().end()) {
+            if (it->second == tab) { found = true; } else { ++it; }
+        }
+        if (found) {
+            setTitle(utils::Path::basename(it->second->filename()) +
+                     utils::Path::extension(it->second->filename()));
+        }
+    }
 }
 
 std::string valuetype_to_string(value::Value::type type)
