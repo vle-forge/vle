@@ -570,12 +570,12 @@ private:
                                       Activity2_t<X> activity);
 };
 
-template <>
+template <> inline
 After_t < double > Statechart::after < double >(
     const double& duration)
 { return After_t < double >(duration); }
 
-template < >
+template <> inline
 When_t < double > Statechart::when < double >(
     const double& date)
 { return When_t < double >(date); }
