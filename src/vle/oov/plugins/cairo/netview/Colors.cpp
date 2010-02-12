@@ -61,7 +61,6 @@ void cairo_color::build_color(const std::string & value)
             double d = it->m_max - it->m_min;
             double v = v_value - it->m_min;
             double c = v/d;
-
             if (it->m_type == RealColor::HIGHVALUE)
                 c = std::pow(c,it->m_coef);
             else if (it->m_type == RealColor::LOWVALUE)
@@ -162,11 +161,10 @@ void cairo_color::build_color_list(const std::string &type,
 	    if (v_type == RealColor::HIGHVALUE or
 		v_type == RealColor::LOWVALUE) {
 		v_coef = toDouble(value->get("coef"));
-
+                }
 		mRealColorList.push_back(
 		    RealColor(v_minValue, v_maxValue, v_color,
-			      v_type, v_coef));
-	    }
+                              v_type, v_coef));
 	}
         break;
     }

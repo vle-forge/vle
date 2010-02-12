@@ -75,17 +75,20 @@ void CairoNetView::onParameter(const std::string& /* plugin */,
 
         const value::Map& nodes = toMapValue(init->get("nodes"));
 
+        std::string matrix = toString(init->get("adjacency_matrix"));
+
         std::string node_names;
+        m_degree=0;
         if (toString(nodes.get("type")) == "set") {
             node_names = toString(nodes.get("names"));
         } else {
             node_names = toString(nodes.get("prefix"));
+            if (nodes.existValue("depth"))
+                m_degree= toInteger(nodes.get("depth"));
         }
-
-        std::string matrix = toString(init->get("adjacency_matrix"));
-
         // create the graph
         mGraph = new Graph(node_names, matrix);
+
 
         // set the positions
         const value::Map& positions = toMapValue(init->get("positions"));
@@ -146,7 +149,7 @@ void CairoNetView::onDelObservable(const std::string& /* simulator */,
 }
 
 void CairoNetView::onValue(const std::string& simulator,
-                           const std::string& /* parent */,
+                           const std::string&  parent ,
                            const std::string& /*port*/,
                            const std::string& /* view */,
                            const double& time,
@@ -155,10 +158,8 @@ void CairoNetView::onValue(const std::string& simulator,
     mTime = time;
     boost::char_separator<char> sep(" \n\t");
     typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-
     if (simulator == mExecutiveName) {
         value::Set set(value::toSetValue(*value));
-
         mValues[simulator] = set.get(0).writeToString();
         mReceiveCell++;
 
@@ -199,7 +200,25 @@ void CairoNetView::onValue(const std::string& simulator,
         draw();
         copy();
     } else { // receive a node value
-        mValues[simulator] = value->writeToString();
+        if (m_degree == 0)
+            mValues[simulator] = value->writeToString();
+        else {
+            std::string par=parent;
+            std::reverse(par.begin(),par.end());
+            boost::char_separator<char> sep(",");
+            tokenizer tokens(par, sep);
+            tokenizer::iterator tok_iter = tokens.begin();
+            int i=0;
+
+            while (i < m_degree-1) {
+                ++tok_iter;
+                ++i;
+            }
+
+            std::string nodename= *tok_iter;
+            std::reverse(nodename.begin(),nodename.end());
+            mValues[nodename] = value->writeToString();
+        }
         ++mReceiveCell;
         if (mReceiveCell == mGraph->num_nodes()) {
             draw();

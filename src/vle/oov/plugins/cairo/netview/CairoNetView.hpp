@@ -98,6 +98,7 @@ namespace vle { namespace oov { namespace plugin {
 
         std::string mExecutiveName;
         std::string mStateName;
+        int m_degree;
 
         int mWidth;
         int mHeight;
