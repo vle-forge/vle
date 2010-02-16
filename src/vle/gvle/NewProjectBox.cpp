@@ -77,6 +77,7 @@ void NewProjectBox::onApply()
 	    mApp->getEditor()->closeAllTab();
 	    mModeling->clearModeling();
             utils::Package::package().select(mEntryName->get_text());
+            mApp->pluginFactory().update();
 	    vle::utils::Package::package().create();
 	    mApp->buildPackageHierarchy();
             mApp->getMenu()->onOpenProject();

@@ -88,6 +88,10 @@ private:
     Glib::RefPtr<Gtk::TreeStore>    mRefTreeModelingPlugin;
     std::string                     mPluginName;
 
+    sigc::connection                mSignalTreeViewRowActivated;
+    sigc::connection                mSignalApplyClicked;
+    sigc::connection                mSignalCancelClicked;
+
     //Buttons
     Gtk::Button*                    mButtonApply;
     Gtk::Button*                    mButtonCancel;

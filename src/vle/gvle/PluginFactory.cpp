@@ -52,6 +52,21 @@ PluginFactory::~PluginFactory()
                     boost::checked_deleter < ModelingPlugin >());
 }
 
+void PluginFactory::update()
+{
+    utils::for_each(m_outs.begin(), m_outs.end(),
+                    boost::checked_deleter < OutputPlugin >());
+
+    utils::for_each(m_mods.begin(), m_mods.end(),
+                    boost::checked_deleter < ModelingPlugin >());
+
+    m_outs.clear();
+    m_mods.clear();
+
+    readOutputPlugins();
+    readModelingPlugins();
+}
+
 void PluginFactory::initOutput(const std::string& name)
 {
     OutputPluginList::iterator it = getO(name);

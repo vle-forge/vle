@@ -62,6 +62,13 @@ namespace vle { namespace utils {
     class VLE_UTILS_EXPORT Path
     {
     public:
+
+        /**
+         * @brief Rebuild path lists of plug-ins directories (package mode,
+         * global mode etc.).
+         */
+        void updateDirs();
+
         /**
          * @brief Return the prefix of the compilation on Unix or installation
          * directory taken from registry on Windows.
@@ -120,14 +127,7 @@ namespace vle { namespace utils {
         std::string getExampleFile(const std::string& file) const;
 
         /*
-         * stream paths
-         */
-
-        std::string getStreamDir() const;
-        std::string getHomeStreamDir() const;
-
-        /*
-         * output paths
+         * output paths (gvle's output plug-ins).
          */
 
         std::string getOutputDir() const;
@@ -151,28 +151,13 @@ namespace vle { namespace utils {
         std::string getHomeOutputDocFile(const std::string& file) const;
 
         /*
-         * condition paths
+         * output paths (oov's output plug-ins
          */
 
-        std::string getConditionDir() const;
-        std::string getHomeConditionDir() const;
-        std::string getConditionFile(const std::string& file) const;
-        std::string getHomeConditionFile(const std::string& file) const;
-
-        std::string getConditionPixmapDir() const;
-        std::string getHomeConditionPixmapDir() const;
-        std::string getConditionPixmapFile(const std::string& file) const;
-        std::string getHomeConditionPixmapFile(const std::string& file) const;
-
-        std::string getConditionGladeDir() const;
-        std::string getHomeConditionGladeDir() const;
-        std::string getConditionGladeFile(const std::string& file) const;
-        std::string getHomeConditionGladeFile(const std::string& file) const;
-
-        std::string getConditionDocDir() const;
-        std::string getHomeConditionDocDir() const;
-        std::string getConditionDocFile(const std::string& file) const;
-        std::string getHomeConditionDocFile(const std::string& file) const;
+        std::string getStreamDir() const;
+        std::string getHomeStreamDir() const;
+        std::string getStreamFile(const std::string& file) const;
+        std::string getHomeStreamFile(const std::string& file) const;
 
         /*
          * modeling paths
@@ -211,13 +196,6 @@ namespace vle { namespace utils {
         std::string getPackagesDir() const;
 
         /**
-         * @brief Update the packages variables. Assign the current package path
-         * and the simulator plug-ins list. If the package is empty then, we use
-         * global simlutor, otherwise, we use the package lib directory.
-         */
-        void updatePackageDirs();
-
-        /**
          * @brief Return the $VLE_HOME/packages/current_package dirname.
          * @return A string.
          */
@@ -229,6 +207,11 @@ namespace vle { namespace utils {
         std::string getPackageExpDir() const;
         std::string getPackageBuildDir() const;
         std::string getPackageOutputDir() const;
+        std::string getPackagePluginDir() const;
+        std::string getPackagePluginOutputDir() const;
+        std::string getPackagePluginGvleModelingDir() const;
+        std::string getPackagePluginGvleOutputDir() const;
+
         std::string getPackageFile(const std::string& name) const;
         std::string getPackageLibFile(const std::string& name) const;
         std::string getPackageSrcFile(const std::string& name) const;
@@ -583,16 +566,21 @@ namespace vle { namespace utils {
         void initPrefixDir();
 
         /**
+         * @brief Clear all plug-ins lists.
+         */
+        void clearPluginDirs();
+
+        /**
          * @brief Assign to the plug-ins directories lists paths from prefix and
          * home directory.
          */
-        void initPluginDirs();
+        void initGlobalPluginDirs();
 
         /**
          * @brief Assign the current package path and simulator packages lists
          * paths from prefix or vle user dir.
          */
-        void initPackageDirs();
+        void initPackagePluginDirs();
 
         static Path* VLE_UTILS_EXPORT mPath; /**< The static variable Path for
                                                singleton design pattern. */

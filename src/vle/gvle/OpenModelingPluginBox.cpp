@@ -54,13 +54,13 @@ OpenModelingPluginBox::OpenModelingPluginBox(
     mTreeView->append_column(_("Name"), mColumns.mName);
     mTreeView->set_model(mRefTreeModelingPlugin);
 
-    mTreeView->signal_row_activated().connect(
+    mSignalTreeViewRowActivated = mTreeView->signal_row_activated().connect(
         sigc::mem_fun(*this, &OpenModelingPluginBox::onRowActivated));
 
-    mButtonApply->signal_clicked().connect(
+    mSignalApplyClicked = mButtonApply->signal_clicked().connect(
 	sigc::mem_fun(*this, &OpenModelingPluginBox::onApply));
 
-    mButtonCancel->signal_clicked().connect(
+    mSignalCancelClicked = mButtonCancel->signal_clicked().connect(
 	sigc::mem_fun(*this, &OpenModelingPluginBox::onCancel));
 }
 
@@ -69,6 +69,10 @@ OpenModelingPluginBox::~OpenModelingPluginBox()
     if (mTreeView) {
 	mTreeView->remove_all_columns();
     }
+
+    mSignalCancelClicked.disconnect();
+    mSignalApplyClicked.disconnect();
+    mSignalTreeViewRowActivated.disconnect();
 }
 
 int OpenModelingPluginBox::run()

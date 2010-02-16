@@ -339,7 +339,8 @@ void Package::renameFile(const std::string& oldFile, std::string& newName)
 void Package::select(const std::string& name)
 {
     m_table.current(name);
-    Path::path().updatePackageDirs();
+
+    Path::path().updateDirs();
 
     if (selected()) {
         changeToOutputDirectory();

@@ -848,6 +848,7 @@ void GVLE::onOpenProject()
     if (mOpenPackageBox->run() == Gtk::RESPONSE_OK) {
         onCloseProject();
         utils::Package::package().select(mOpenPackageBox->name());
+        mPluginFactory.update();
         buildPackageHierarchy();
 	mMenuAndToolbar->onOpenProject();
         setTitle("");
@@ -895,6 +896,7 @@ void GVLE::onOpenGlobalVpz()
 	    mGlobalVpzPrevDirPath = file.get_current_folder();
 	    mEditor->closeAllTab();
 	    utils::Package::package().select("");
+            mPluginFactory.update();
 	    mPackage = "";
             mModeling->parseXML(file.get_filename());
             if (mModeling->getTopModel()) {
@@ -1098,6 +1100,7 @@ void GVLE::onCloseProject()
     clearModelTreeBox();
     clearModelClassBox();
     utils::Package::package().select("");
+    mPluginFactory.update();
     buildPackageHierarchy();
     mMenuAndToolbar->showMinimalMenu();
     setTitle("");

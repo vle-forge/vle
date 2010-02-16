@@ -59,6 +59,12 @@ namespace vle { namespace gvle {
          */
         ~PluginFactory();
 
+        /**
+         * @brief Delete all loaded plug-ins and fill the outputs plug-ins list
+         * with files readed from conditions and outputs directories.
+         */
+        void update();
+
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
          * Manage plug-ins

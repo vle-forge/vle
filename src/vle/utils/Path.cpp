@@ -82,16 +82,6 @@ std::string Path::getLocaleDir() const
     return buildDirname(m_prefix, "share", "locale");
 }
 
-std::string Path::getStreamDir() const
-{
-    return buildDirname(m_prefix, VLE_LIBRARY_DIRS, "stream");
-}
-
-std::string Path::getHomeStreamDir() const
-{
-    return buildDirname(m_home, "stream");
-}
-
 std::string Path::getHomeFile(const std::string& name) const
 {
     return buildFilename(m_home, name);
@@ -202,89 +192,28 @@ std::string Path::getHomeOutputDocFile(const std::string& file) const
 }
 
 /*
- * conditions
+ * stream
  */
 
-std::string Path::getConditionDir() const
+std::string Path::getStreamDir() const
 {
-    return buildDirname(m_prefix, VLE_LIBRARY_DIRS, "conditions");
+    return buildDirname(m_prefix, VLE_LIBRARY_DIRS, "stream");
 }
 
-std::string Path::getHomeConditionDir() const
+std::string Path::getHomeStreamDir() const
 {
-    return buildDirname(m_home, "conditions");
+    return buildDirname(m_home, "stream");
 }
 
-std::string Path::getConditionFile(const std::string& file) const
+std::string Path::getStreamFile(const std::string& file) const
 {
-    return buildDirname(m_prefix, VLE_SHARE_DIRS, "conditions", file);
+    return buildDirname(m_prefix, VLE_SHARE_DIRS, "stream", file);
 }
 
-std::string Path::getHomeConditionFile(const std::string& file) const
+std::string Path::getHomeStreamFile(const std::string& file) const
 {
-    return buildDirname(m_home, "conditions", file);
+    return buildDirname(m_home, "stream", file);
 }
-
-std::string Path::getConditionPixmapDir() const
-{
-    return buildDirname(m_prefix, VLE_SHARE_DIRS, "conditions", "pixmaps");
-}
-
-std::string Path::getHomeConditionPixmapDir() const
-{
-    return buildDirname(m_home, "conditions", "pixmaps");
-}
-
-std::string Path::getConditionPixmapFile(const std::string& file) const
-{
-    return buildFilename(m_prefix, VLE_SHARE_DIRS, "conditions", "pixmaps", file);
-}
-
-std::string Path::getHomeConditionPixmapFile(const std::string& file) const
-{
-    return buildFilename(m_home, "conditions", "pixmaps", file);
-}
-
-std::string Path::getConditionGladeDir() const
-{
-    return buildDirname(m_prefix, VLE_SHARE_DIRS, "conditions", "glade");
-}
-
-std::string Path::getHomeConditionGladeDir() const
-{
-    return buildDirname(m_home, "conditions", "glade");
-}
-
-std::string Path::getConditionGladeFile(const std::string& file) const
-{
-    return buildFilename(m_prefix, VLE_SHARE_DIRS, "conditions", "glade", file);
-}
-
-std::string Path::getHomeConditionGladeFile(const std::string& file) const
-{
-    return buildFilename(m_home, "conditions", "glade", file);
-}
-
-std::string Path::getConditionDocDir() const
-{
-    return buildDirname(m_prefix, VLE_SHARE_DIRS, "conditions", "doc");
-}
-
-std::string Path::getHomeConditionDocDir() const
-{
-    return buildDirname(m_home, "conditions", "doc");
-}
-
-std::string Path::getConditionDocFile(const std::string& file) const
-{
-    return buildFilename(m_prefix, VLE_SHARE_DIRS, "conditions", "doc", file);
-}
-
-std::string Path::getHomeConditionDocFile(const std::string& file) const
-{
-    return buildFilename(m_home, "conditions", "doc", file);
-}
-
 
 /*
  * modeling
@@ -380,11 +309,6 @@ std::string Path::getPackagesDir() const
     return buildDirname(m_home, "pkgs");
 }
 
-void Path::updatePackageDirs()
-{
-    initPackageDirs();
-}
-
 std::string Path::getTemplateDir() const
 {
     return buildFilename(m_prefix, VLE_SHARE_DIRS, "template");
@@ -401,15 +325,16 @@ void Path::copyTemplate(const std::string& name, const std::string& to) const
     fs::path source(dirname);
 
     if (not fs::exists(source)) {
-        throw utils::InternalError(fmt(
-                _("Can not copy '%1%' into '%2%'. '%1%' does not exist in '%3%'"))
-            % name % to % dirname);
+        throw utils::InternalError(
+            fmt(_("Can not copy '%1%' into '%2%'. '%1%' does not exist in"
+                  "'%3%'")) % name % to % dirname);
     }
 
     if (fs::is_directory(source)) {
         try {
             std::list < std::string > buildeddir;
-            for (fs::recursive_directory_iterator it(source), end; it != end; ++it) {
+            for (fs::recursive_directory_iterator it(source), end; it != end;
+                 ++it) {
                 std::list < std::string > store;
                 {
                     fs::path tmp(it->path());
@@ -445,8 +370,8 @@ void Path::copyTemplate(const std::string& name, const std::string& to) const
             }
         } catch (const std::exception& e) {
             throw utils::InternalError(fmt(
-                    _("Error when copy template '%1%' into '%2%: %3%")) % name % to %
-                e.what());
+                    _("Error when copy template '%1%' into '%2%: %3%")) % name
+                % to % e.what());
         }
     } else {
         try {
@@ -493,6 +418,26 @@ std::string Path::getPackageExpDir() const
 std::string Path::getPackageOutputDir() const
 {
     return buildDirname(m_currentPackagePath, "output");
+}
+
+std::string Path::getPackagePluginDir() const
+{
+    return buildDirname(m_currentPackagePath, "plugins");
+}
+
+std::string Path::getPackagePluginOutputDir() const
+{
+    return buildDirname(m_currentPackagePath, "plugins", "output");
+}
+
+std::string Path::getPackagePluginGvleModelingDir() const
+{
+    return buildDirname(m_currentPackagePath, "plugins", "gvle", "modeling");
+}
+
+std::string Path::getPackagePluginGvleOutputDir() const
+{
+    return buildDirname(m_currentPackagePath, "plugins", "gvle", "output");
 }
 
 std::string Path::getPackageBuildDir() const
@@ -717,7 +662,6 @@ void Path::initVleHomeDirectory()
     fs::create_directory(getHomeDir());
     fs::create_directory(getHomeStreamDir());
     fs::create_directory(getHomeOutputDir());
-    fs::create_directory(getHomeConditionDir());
     fs::create_directory(getHomeModelingDir());
     fs::create_directory(getHomeSimulatorDir());
     fs::create_directory(getPackagesDir());
@@ -745,13 +689,6 @@ void Path::addOutputDir(const std::string& dirname)
 {
     if (fs::is_directory(dirname)) {
         m_output.push_back(dirname);
-    }
-}
-
-void Path::addConditionDir(const std::string& dirname)
-{
-    if (fs::is_directory(dirname)) {
-        m_condition.push_back(dirname);
     }
 }
 
@@ -801,38 +738,69 @@ Path::Path()
     initHomeDir();
     initPrefixDir();
 
-    initPluginDirs();
-    initPackageDirs();
+    updateDirs();
 
     initVleHomeDirectory();
 }
 
-void Path::initPluginDirs()
+void Path::updateDirs()
 {
+    if (utils::Package::package().name().empty()) {
+        initGlobalPluginDirs();
+    } else {
+        initPackagePluginDirs();
+    }
+}
+
+void Path::clearPluginDirs()
+{
+    m_simulator.clear();
+    m_stream.clear();
+    m_output.clear();
+    m_condition.clear();
+    m_modeling.clear();
+}
+
+void Path::initGlobalPluginDirs()
+{
+    assert(utils::Package::package().name().empty());
+
+    clearPluginDirs();
+    m_currentPackagePath.clear();
+
     addStreamDir(getStreamDir());
     addOutputDir(getOutputDir());
-    addConditionDir(getConditionDir());
+    addModelingDir(getModelingDir());
+    addSimulatorDir(getSimulatorDir());
+
+    addStreamDir(getHomeStreamDir());
+    addOutputDir(getHomeOutputDir());
+    addModelingDir(getHomeModelingDir());
+    addSimulatorDir(getHomeSimulatorDir());
+}
+
+void Path::initPackagePluginDirs()
+{
+    assert(not utils::Package::package().name().empty());
+
+    clearPluginDirs();
+
+    m_currentPackagePath.assign(buildDirname(
+            m_home, "pkgs", utils::Package::package().name()));
+
+    addStreamDir(getPackagePluginOutputDir());
+    addOutputDir(getPackagePluginGvleOutputDir());
+    addModelingDir(getPackagePluginGvleModelingDir());
+
+    addStreamDir(getStreamDir());
+    addOutputDir(getOutputDir());
     addModelingDir(getModelingDir());
 
     addStreamDir(getHomeStreamDir());
     addOutputDir(getHomeOutputDir());
-    addConditionDir(getHomeConditionDir());
     addModelingDir(getHomeModelingDir());
-}
 
-void Path::initPackageDirs()
-{
-    m_simulator.clear();
-
-    if (utils::Package::package().name().empty()) {
-        m_currentPackagePath.clear();
-        addSimulatorDir(getSimulatorDir());
-        addSimulatorDir(getHomeSimulatorDir());
-    } else {
-        m_currentPackagePath.assign(buildDirname(
-                m_home, "pkgs", utils::Package::package().name()));
-        addSimulatorDir(getPackageLibDir());
-    }
+    addSimulatorDir(getPackageLibDir());
 }
 
 std::ostream& operator<<(std::ostream& out, const PathList& paths)
@@ -1029,7 +997,6 @@ std::ostream& operator<<(std::ostream& out, const Path& p)
         << "\n"
         << "simulator.............: " << p.getSimulatorDir() << "\n"
         << "output................: " << p.getOutputDir() << "\n"
-        << "condition.............: " << p.getConditionDir() << "\n"
         << "modeling..............: " << p.getModelingDir() << "\n"
         << "stream................: " << p.getStreamDir() << "\n"
         << "pixmap................: " << p.getPixmapDir() << "\n"
@@ -1038,9 +1005,6 @@ std::ostream& operator<<(std::ostream& out, const Path& p)
         << "output pixmap.........: " << p.getOutputPixmapDir() << "\n"
         << "outout glade..........: " << p.getOutputGladeDir() << "\n"
         << "output doc............: " << p.getOutputDocDir() << "\n"
-        << "condition pixmap......: " << p.getConditionPixmapDir() << "\n"
-        << "condition glade.......: " << p.getConditionGladeDir() << "\n"
-        << "condition doc.........: " << p.getConditionDocDir() << "\n"
         << "modeling pixmap.......: " << p.getModelingPixmapDir() << "\n"
         << "modeling glade........: " << p.getModelingGladeDir() << "\n"
         << "modeling doc..........: " << p.getModelingDocDir() << "\n"
@@ -1053,10 +1017,6 @@ std::ostream& operator<<(std::ostream& out, const Path& p)
         << "output home pixmap....: " << p.getHomeOutputPixmapDir() << "\n"
         << "output home glade.....: " << p.getHomeOutputGladeDir() << "\n"
         << "output home doc.......: " << p.getHomeOutputDocDir() << "\n"
-        << "condition home........: " << p.getHomeConditionDir() << "\n"
-        << "condition home pixmap.: " << p.getHomeConditionPixmapDir() << "\n"
-        << "condition home glade..: " << p.getHomeConditionGladeDir() << "\n"
-        << "condition home doc....: " << p.getHomeConditionDocDir() << "\n"
         << "modeling home.........: " << p.getHomeModelingDir() << "\n"
         << "modeling home pixmap..: " << p.getHomeModelingPixmapDir() << "\n"
         << "modeling home glade...: " << p.getHomeModelingGladeDir() << "\n"
@@ -1070,11 +1030,14 @@ std::ostream& operator<<(std::ostream& out, const Path& p)
         << "Package doc dir.......: " << p.getPackageDocDir() << "\n"
         << "Package exp dir.......: " << p.getPackageExpDir() << "\n"
         << "Package build dir.....: " << p.getPackageBuildDir() << "\n"
-        << "\n";
+        << "Package stream........: " << p.getPackagePluginOutputDir() << "\n"
+        << "Package gvle output...: " << p.getPackagePluginGvleOutputDir()
+        << "\n"
+        << "Package gvle modeling.: " << p.getPackagePluginGvleModelingDir()
+        << "\n" << "\n";
 
     out << "Real simulators list..:\n" << p.getSimulatorDirs() << "\n"
         << "Real output list......:\n" << p.getOutputDirs() << "\n"
-        << "Real condition list...:\n" << p.getConditionDirs() << "\n"
         << "Real modeling list....:\n" << p.getModelingDirs() << "\n"
         << "Real stream list......:\n" << p.getStreamDirs() << "\n"
         << std::endl;
