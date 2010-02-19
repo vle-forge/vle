@@ -28,9 +28,11 @@
 
 
 #include <vle/extension/fsa/Statechart.hpp>
+#include <vle/extension/difference-equation/Base.hpp>
 
 namespace vle { namespace examples { namespace fsa {
 
+namespace ve = vle::extension;
 namespace vf = vle::extension::fsa;
 namespace vd = vle::devs;
 
@@ -87,13 +89,13 @@ public:
 
         transition(this, I, A);
         transition(this, A, B) << event("in1")
-                               << send(std::string("out"));
+            << send(std::string("out"));
         transition(this, B, A) << event("in2");
         transition(this, B, C) << event("in1")
-                               << send(std::string("out"));
+            << send(std::string("out"));
         transition(this, C, B) << event("in2");
         transition(this, C, A) << event("in1")
-                               << send(std::string("out"));
+            << send(std::string("out"));
         transition(this, A, C) << event("in2");
 
         initialState(I);
@@ -113,17 +115,17 @@ public:
 
         transition(this, I, A);
         transition(this, A, B) << event("in1")
-                               << send(std::string("out"));
+            << send(std::string("out"));
         transition(this, B, A) << event("in2")
-                               << action(&statechart4::add);
+            << action(&statechart4::add);
         transition(this, B, C) << event("in1")
-                               << send(std::string("out"));
+            << send(std::string("out"));
         transition(this, C, B) << event("in2")
-                               << action(&statechart4::add);
+            << action(&statechart4::add);
         transition(this, C, A) << event("in1")
-                               << send(std::string("out"));
+            << send(std::string("out"));
         transition(this, A, C) << event("in2")
-                               << action(&statechart4::add);
+            << action(&statechart4::add);
 
         state(this, I) << inAction(&statechart4::start);
         // other syntax: inAction(this, &statechart4::start) >> I;
@@ -221,8 +223,8 @@ public:
     {
         states(this) << a << b << c;
 
-	transition(this, a, b);
-	transition(this, b, c) << after(&statechart7::after1);
+        transition(this, a, b);
+        transition(this, b, c) << after(&statechart7::after1);
 
         initialState(a);
     }
@@ -245,10 +247,10 @@ public:
         states(this) << b;
         states(this) << c;
 
-	transition(this, a, b) << action(&statechart8::start);
-	transition(this, b, c) << guard(&statechart8::c1);
-	transition(this, c, b) << action(&statechart8::add)
-                               << send(std::string("out"));
+        transition(this, a, b) << action(&statechart8::start);
+        transition(this, b, c) << guard(&statechart8::c1);
+        transition(this, c, b) << action(&statechart8::add)
+            << send(std::string("out"));
 
         eventInState(this, "in", &statechart8::in) >> b;
 
@@ -279,10 +281,10 @@ public:
     {
         states(this) << a << b;
 
-	transition(this, a, b) << action(&statechart9::start);
-	transition(this, b, b) << after(&statechart9::d)
-                               << guard(&statechart9::c1)
-                               << send(std::string("out"));
+        transition(this, a, b) << action(&statechart9::start);
+        transition(this, b, b) << after(&statechart9::d)
+            << guard(&statechart9::c1)
+            << send(std::string("out"));
 
         state(this, b) << eventInState("in", &statechart9::in);
 
@@ -316,6 +318,58 @@ private:
     { return a % 2 == 0; }
 };
 
+typedef std::pair < double, double > param_pair;
+typedef std::map < double, param_pair > param_pair_map;
+
+class StagesThreshold : public vf::Statechart
+{
+public:
+    StagesThreshold(const vd::DynamicsInit& init,
+                    const vd::InitEventList& events) :
+        vf::Statechart(init, events)
+    {
+        mStages[25.0] = std::make_pair(1.0, -25.0);
+        mStages[55.0] = std::make_pair(0.0, 30.0);
+        mStages[64.0] = std::make_pair(-1.5, 126);
+
+        states(this) << I << A << B << C;
+
+        transition(this, I, A) << when(25.0)
+            << send(&StagesThreshold::output0);
+
+        state(this, A) << eventInState("Y", &StagesThreshold::in);
+
+        transition(this, A, B) << guard(&StagesThreshold::c1)
+            << send(&StagesThreshold::output0);
+
+        transition(this, B, C) << when(64.0)
+            << send(&StagesThreshold::output0);
+
+        initialState(I);
+    }
+
+    virtual ~StagesThreshold() { }
+
+    void output0(const vd::Time& time,
+                 vd::ExternalEventList& output) const
+    {
+        param_pair_map::const_iterator it = mStages.find(time);
+
+        output << (ve::DifferenceEquation::Var("A") = it->second.first);
+        output << (ve::DifferenceEquation::Var("B") = it->second.second);
+    }
+
+    void in(const vd::Time& /* time */, const vd::ExternalEvent* event)
+    { Y << ve::DifferenceEquation::Var("Y", event); }
+
+    bool c1(const vd::Time& /* time */)
+    { return Y >= 30; }
+
+private:
+    double Y;
+    param_pair_map mStages;
+};
+
 DECLARE_NAMED_DYNAMICS(statechart1, statechart1)
 DECLARE_NAMED_DYNAMICS(statechart2, statechart2)
 DECLARE_NAMED_DYNAMICS(statechart3, statechart3)
@@ -325,5 +379,6 @@ DECLARE_NAMED_DYNAMICS(statechart6, statechart6)
 DECLARE_NAMED_DYNAMICS(statechart7, statechart7)
 DECLARE_NAMED_DYNAMICS(statechart8, statechart8)
 DECLARE_NAMED_DYNAMICS(statechart9, statechart9)
+DECLARE_NAMED_DYNAMICS(StagesThreshold, StagesThreshold)
 
 }}} // namespace vle examples fsa

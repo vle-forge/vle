@@ -445,12 +445,12 @@ private:
             mWhenFuncs.find(transition) != mWhenFuncs.end(); }
 
     int findTransition(const devs::ExternalEvent* event) const;
-    void process(const devs::Time& time,
+    bool process(const devs::Time& time,
                  const devs::ExternalEvent* event);
     void process(const devs::Time& time,
                  int transitionId);
     void processActivities(const devs::Time& time);
-    void processEventInStateActions(const devs::Time& time,
+    bool processEventInStateActions(const devs::Time& time,
                                     const devs::ExternalEvent* event);
     void processIn(const devs::Time& time, int nextState);
     void processInStateAction(const devs::Time& time);

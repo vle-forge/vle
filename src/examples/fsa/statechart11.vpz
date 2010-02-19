@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://www.vle-project.org/vle-0.8.0.dtd">
+<vle_project version="0.8.0" date="jeu., 18 févr. 2010" author="Patrick Chabrier">
+<structures>
+<model name="Top model" type="coupled" x="0" y="0" width="484" height="359"  >
+<submodels>
+<model name="Linear" type="atomic" conditions="cond_DE_Linear" dynamics="dyn_lin" observables="obs_Y" x="352" y="137" width="100" height="75" >
+<in>
+ <port name="perturb" />
+ <port name="update" />
+</in>
+<out>
+ <port name="A" />
+ <port name="B" />
+ <port name="Y" />
+</out>
+</model>
+<model name="Stages" type="atomic" dynamics="dyn_Stages" x="114" y="135" width="100" height="60" >
+<in>
+ <port name="Y" />
+</in>
+<out>
+ <port name="A" />
+ <port name="B" />
+</out>
+</model>
+<model name="generator" type="atomic" conditions="cond_DE_generator" dynamics="dyn_gen" observables="obs_X" x="143" y="259" width="100" height="60" >
+<in>
+ <port name="perturb" />
+ <port name="update" />
+</in>
+<out>
+ <port name="update" />
+</out>
+</model>
+</submodels>
+<connections>
+<connection type="internal">
+ <origin model="Linear" port="Y" />
+ <destination model="Stages" port="Y" />
+</connection>
+<connection type="internal">
+ <origin model="Stages" port="A" />
+ <destination model="Linear" port="perturb" />
+</connection>
+<connection type="internal">
+ <origin model="Stages" port="B" />
+ <destination model="Linear" port="perturb" />
+</connection>
+<connection type="internal">
+ <origin model="generator" port="update" />
+ <destination model="Linear" port="update" />
+</connection>
+</connections>
+</model>
+</structures>
+<dynamics>
+<dynamic name="dyn_Stages" library="statechart" model="StagesThreshold" type="local"  />
+<dynamic name="dyn_gen" library="linear" model="GenLin" type="local"  />
+<dynamic name="dyn_lin" library="linear" model="EqLin" type="local"  />
+</dynamics>
+<experiment name="exp" duration="100.000000000000000" begin="0.000000000000000" combination="linear" seed="1" >
+<conditions>
+<condition name="cond_DE_Linear" >
+ <port name="a" >
+<double>0.000000000000000</double>
+</port>
+ <port name="b" >
+<double>0.000000000000000</double>
+</port>
+ <port name="mode" >
+<string>name</string>
+</port>
+ <port name="time-step" >
+<double>1.000000000000000</double>
+</port>
+ <port name="variables" >
+<set><set><string>Y</string></set><set><string>A</string></set><set><string>B</string></set></set>
+</port>
+</condition>
+<condition name="cond_DE_generator" >
+ <port name="a" >
+<double>1.000000000000000</double>
+</port>
+ <port name="mode" >
+<string>name</string>
+</port>
+ <port name="name" >
+<string>X</string>
+</port>
+ <port name="time-step" >
+<double>1.000000000000000</double>
+</port>
+ <port name="value" >
+<double>0.000000000000000</double>
+</port>
+</condition>
+</conditions>
+<views>
+<outputs>
+<output name="o" location="" format="local" plugin="text" />
+
+</outputs>
+<observables>
+<observable name="obs_X" >
+<port name="X" >
+ <attachedview name="view" />
+</port>
+
+</observable>
+
+<observable name="obs_Y" >
+<port name="A" >
+ <attachedview name="view" />
+</port>
+
+<port name="B" >
+ <attachedview name="view" />
+</port>
+
+<port name="Y" >
+ <attachedview name="view" />
+</port>
+
+</observable>
+
+</observables>
+<view name="view" output="o" type="timed" timestep="1.000000000000000" />
+
+</views>
+</experiment>
+</vle_project>

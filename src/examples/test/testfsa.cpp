@@ -574,3 +574,76 @@ BOOST_AUTO_TEST_CASE(test_statechart9)
     BOOST_REQUIRE_EQUAL(value::toInteger(result[2][100]), 31);
     BOOST_REQUIRE_EQUAL(value::toInteger(result[3][100]), 2);
 }
+
+BOOST_AUTO_TEST_CASE(test_statechart10)
+{
+    vpz::Vpz file(utils::Path::path().getExampleFile("statechart10.vpz"));
+
+    vpz::Output& o(file.project().experiment().views().outputs().get("o"));
+    o.setLocalStream("", "storage");
+
+    manager::RunQuiet r;
+    r.start(file);
+
+    BOOST_REQUIRE_EQUAL(r.haveError(), false);
+    oov::OutputMatrixViewList& out(r.outputs());
+    BOOST_REQUIRE_EQUAL(out.size(),
+                        (oov::OutputMatrixViewList::size_type)1);
+
+    oov::OutputMatrix& view(out["view"]);
+    value::MatrixView result(view.values());
+
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+                       (value::MatrixView::size_type)3);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+                        (value::MatrixView::size_type)1001);
+}
+
+BOOST_AUTO_TEST_CASE(test_statechart11)
+{
+    vpz::Vpz file(utils::Path::path().getExampleFile("statechart11.vpz"));
+
+    vpz::Output& o(file.project().experiment().views().outputs().get("o"));
+    o.setLocalStream("", "storage");
+
+    manager::RunQuiet r;
+    r.start(file);
+
+    BOOST_REQUIRE_EQUAL(r.haveError(), false);
+    oov::OutputMatrixViewList& out(r.outputs());
+    BOOST_REQUIRE_EQUAL(out.size(),
+                        (oov::OutputMatrixViewList::size_type)1);
+
+    oov::OutputMatrix& view(out["view"]);
+    value::MatrixView result(view.values());
+
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+                       (value::MatrixView::size_type)5);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+                        (value::MatrixView::size_type)101);
+
+    BOOST_REQUIRE_EQUAL(value::toDouble(result[1][0]), 0);
+    BOOST_REQUIRE_EQUAL(value::toDouble(result[2][0]), 0);
+    BOOST_REQUIRE_EQUAL(value::toDouble(result[3][0]), 0);
+    BOOST_REQUIRE_EQUAL(value::toDouble(result[4][0]), 0);
+
+    BOOST_REQUIRE_EQUAL(value::toDouble(result[1][25]), 1);
+    BOOST_REQUIRE_EQUAL(value::toDouble(result[2][25]), -25);
+    BOOST_REQUIRE_EQUAL(value::toDouble(result[3][25]), 0);
+    BOOST_REQUIRE_EQUAL(value::toDouble(result[4][25]), 25);
+
+    BOOST_REQUIRE_EQUAL(value::toDouble(result[1][55]), 0);
+    BOOST_REQUIRE_EQUAL(value::toDouble(result[2][55]), 30);
+    BOOST_REQUIRE_EQUAL(value::toDouble(result[3][55]), 30);
+    BOOST_REQUIRE_EQUAL(value::toDouble(result[4][55]), 55);
+
+    BOOST_REQUIRE_EQUAL(value::toDouble(result[1][64]), -1.5);
+    BOOST_REQUIRE_EQUAL(value::toDouble(result[2][64]), 126);
+    BOOST_REQUIRE_EQUAL(value::toDouble(result[3][64]), 30);
+    BOOST_REQUIRE_EQUAL(value::toDouble(result[4][64]), 64);
+
+    BOOST_REQUIRE_EQUAL(value::toDouble(result[1][100]), -1.5);
+    BOOST_REQUIRE_EQUAL(value::toDouble(result[2][100]), 126);
+    BOOST_REQUIRE_EQUAL(value::toDouble(result[3][100]), -24);
+    BOOST_REQUIRE_EQUAL(value::toDouble(result[4][100]), 100);
+}

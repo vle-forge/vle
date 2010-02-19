@@ -115,9 +115,10 @@ int Statechart::findTransition(const devs::ExternalEvent* event) const
     return transition;
 }
 
-void Statechart::process(const devs::Time& time,
+bool Statechart::process(const devs::Time& time,
 			 const devs::ExternalEvent* event)
 {
+    bool proceed = true;
     int transition = findTransition(event);
 
     if (transition != -1) {
@@ -127,8 +128,9 @@ void Statechart::process(const devs::Time& time,
             processGuardTransitionAction(transition, time);
         }
     } else {
-        processEventInStateActions(time, event);
+        proceed = processEventInStateActions(time, event);
     }
+    return proceed;
 }
 
 void Statechart::process(const devs::Time& time,
@@ -200,10 +202,12 @@ void Statechart::processGuardTransitionAction(
     }
 }
 
-void Statechart::processEventInStateActions(
+bool Statechart::processEventInStateActions(
     const devs::Time& time,
     const devs::ExternalEvent* event)
 {
+    bool proceed = false;
+
     if (mEventInStateActions.find(currentState()) !=
         mEventInStateActions.end()) {
         EventInStateActions& actions = eventInStateActions(
@@ -212,9 +216,11 @@ void Statechart::processEventInStateActions(
 
         if (it != actions.end()) {
             (it->second)(time, event);
+            checkGuards(time);
+            proceed = true;
         }
-        checkGuards(time);
     }
+    return proceed;
 }
 
 void Statechart::removeProcessEvent(devs::ExternalEventList* events,
@@ -374,7 +380,9 @@ void Statechart::externalTransition(
     }
     updateSigma(time);
     mLastTime = time;
-    mPhase = PROCESSING;
+    if (mPhase != SEND) {
+        mPhase = PROCESSING;
+    }
 }
 
 devs::Time Statechart::timeAdvance() const
@@ -401,22 +409,27 @@ void Statechart::internalTransition(const devs::Time& time)
                 devs::ExternalEventList* events = mToProcessEvents.front();
                 devs::ExternalEvent* event = events->front();
 
-                process(time, event);
-		if (findTransition(event) == -1) { // eventInState
-		    removeProcessEvent(events, event);
-		    if (mToProcessEvents.empty()) {
-			if (mValidGuard) {
-			    mPhase = PROCESSING;
-			} else {
-			    mPhase = IDLE;
-                            update = false;
-			}
-		    } else {
-			mPhase = PROCESSING;
-		    }
-		} else {
-		    mPhase = SEND;
-		}
+                if (process(time, event)) {
+                    if (findTransition(event) == -1) { // eventInState
+                        removeProcessEvent(events, event);
+                        if (mToProcessEvents.empty()) {
+                            if (mValidGuard) {
+                                mPhase = PROCESSING;
+                            } else {
+                                mPhase = IDLE;
+                                update = false;
+                            }
+                        } else {
+                            mPhase = PROCESSING;
+                        }
+                    } else {
+                        mPhase = SEND;
+                    }
+                } else {
+                    removeProcessEvent(events, event);
+                    mPhase = IDLE;
+                    update = false;
+                }
             }
         }
 	break;
