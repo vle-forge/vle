@@ -36,7 +36,13 @@
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/gursoy_atun_layout.hpp>
 #include <boost/random.hpp>
-#include <boost/property_map.hpp>
+
+#include <boost/version.hpp>
+#if BOOST_VERSION > 104100
+# include <boost/property_map/property_map.hpp>
+#else
+# include <boost/property_map.hpp>
+#endif
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/tokenizer.hpp>
