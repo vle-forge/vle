@@ -58,9 +58,11 @@ void KnowledgeBase::setActivityFailed(const std::string& name,
                 _("Decision: activity '%1%' is already finish")) % name);
     }
 
-    m_activities.setFailedAct(it);
-    it->second.fail(date);
-    it->second.acknowledge(name);
+    if (not it->second.isInFailedState()) {
+        m_activities.setFailedAct(it);
+        it->second.fail(date);
+        it->second.acknowledge(name);
+    }
 }
 
 devs::Time KnowledgeBase::duration(const devs::Time& time)

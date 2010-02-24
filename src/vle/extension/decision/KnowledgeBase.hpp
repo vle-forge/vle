@@ -168,13 +168,18 @@ public:
 
     /**
      * @brief Change the stage of the activity from STARTED to DONE.
-     * @param name.
+     * @param name Name of the activity to done.
+     * @param date Date when activity failed.
+     * @throw utils::ArgError if activity is not in START state.
      */
     void setActivityDone(const std::string& name,
                          const devs::Time& date);
     /**
-     * @brief Change the stage of the activity from * to FAILED.
-     * @param name.
+     * @brief Change the stage of the activity from * to FAILED. This function
+     * does nothing if activity is already in FAILED state.
+     * @param name Name of the activity to failed.
+     * @param date Date when activity failed.
+     * @throw utils::ArgError if activity is in FAILED state.
      */
     void setActivityFailed(const std::string& name,
                            const devs::Time& date);
