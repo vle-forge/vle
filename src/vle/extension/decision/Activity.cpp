@@ -47,7 +47,7 @@ void Activity::initStartTimeFinishTime(const devs::Time& start,
 {
     if (start > finish) {
         throw utils::ModellingError(
-            _("Decision: temporal constraint start < finish"));
+            _("Decision: temporal constraint start before finish"));
     }
 
     m_date = (DateType)(Activity::START | Activity::FINISH);
@@ -61,7 +61,8 @@ void Activity::initStartTimeFinishRange(const devs::Time& start,
 {
     if (not (start < minfinish and minfinish < maxfinish)) {
         throw utils::ModellingError(
-            _("Decision: temporal constraint start < minfinish < maxfinish"));
+            _("Decision: temporal constraint start before "
+                    "minfinish before maxfinish"));
     }
 
     m_date = (DateType)(Activity::START | Activity::MINF | Activity::MAXF);
@@ -76,7 +77,8 @@ void Activity::initStartRangeFinishTime(const devs::Time& minstart,
 {
     if (not (minstart < maxstart and maxstart < finish)) {
         throw utils::ModellingError(
-            _("Decision: temporal constraint start < minfinish < maxfinish"));
+            _("Decision: temporal constraint start before "
+                    "minfinish before maxfinish"));
     }
 
     m_date = (DateType)(Activity::MINS | Activity::MAXS | Activity::FINISH);
@@ -93,8 +95,9 @@ void Activity::initStartRangeFinishRange(const devs::Time& minstart,
     if (not (minstart < maxstart and minstart < maxfinish
              and minfinish < maxfinish)) {
         throw utils::ModellingError(
-            _("Decision: temporal constraint minstart < maxstart and minfinish"
-              " < maxfinish and minstart < maxfinish"));
+            _("Decision: temporal constraint minstart before maxstart and "
+                    "minfinish before maxfinish and minstart before "
+                    "maxfinish"));
     }
 
     m_date = (DateType)(Activity::MINF | Activity::MAXF | Activity::MINS |
