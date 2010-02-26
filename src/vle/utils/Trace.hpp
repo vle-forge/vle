@@ -204,7 +204,7 @@ namespace vle { namespace utils {
 }
 #define DTraceModel(x) { \
     if (vle::utils::Trace::trace().isInLevel(vle::utils::Trace::MODEL)) { \
-        vle::utils::Trace::trace().push(x, vle::utils::Trace::MODEL); \
+        vle::utils::Trace::trace().push(x, vle::utils::Trace::MODEL); \
     } \
 }
 #define DTraceExtension(x) { \
