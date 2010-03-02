@@ -84,7 +84,7 @@ INSTALL(TARGETS equation3
 INSTALL(FILES equation1.vpz equation2.vpz equation3.vpz equation4.vpz
   equation5.vpz equation6.vpz equation7.vpz equation8.vpz equation9.vpz
   equation10.vpz equation11.vpz equation12.vpz equation13.vpz equation14.vpz
-  DESTINATION "${VLE_SHARE_DIRS}/examples")
+  equation15.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
 
 INSTALL(FILES ${SOURCES1_CPP} ${SOURCES2_CPP} ${SOURCES3_CPP} DESTINATION
   "${VLE_SHARE_DIRS}/examples/sources/equation")

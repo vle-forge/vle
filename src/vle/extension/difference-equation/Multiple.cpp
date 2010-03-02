@@ -40,40 +40,42 @@ Multiple::Multiple(const DynamicsInit& model,
                    bool control) :
     Base(model, events, control)
 {
-    const value::Set& variables = toSetValue(events.get("variables"));
-    unsigned int index;
+    if (events.exist("variables")) {
+        const value::Set& variables = toSetValue(events.get("variables"));
+        unsigned int index;
 
-    for (index = 0; index < variables.size(); ++index) {
-        const value::Set& tab(toSetValue(variables.get(index)));
-        std::string name = toString(tab.get(0));
+        for (index = 0; index < variables.size(); ++index) {
+            const value::Set& tab(toSetValue(variables.get(index)));
+            std::string name = toString(tab.get(0));
 
-        mVariableNames.push_back(name);
-        mValues[name] = MultipleValues();
-        mInitValues[name] = false;
-        size(name, DEFAULT_SIZE);
+            mVariableNames.push_back(name);
+            mValues[name] = MultipleValues();
+            mInitValues[name] = false;
+            size(name, DEFAULT_SIZE);
 
-        if (tab.size() > 1) {
-            if (tab.get(1).isDouble()) {
-                double init = toDouble(tab.get(1));
+            if (tab.size() > 1) {
+                if (tab.get(1).isDouble()) {
+                    double init = toDouble(tab.get(1));
 
-                mInitialValues[name] = init;
-                mInitValues[name] = true;
-            } else {
-                if (tab.get(1).isSet()) {
-                    const Set& init = toSetValue(tab.get(1));
+                    mInitialValues[name] = init;
+                    mInitValues[name] = true;
+                } else {
+                    if (tab.get(1).isSet()) {
+                        const Set& init = toSetValue(tab.get(1));
+                        unsigned int i;
+
+                        for (i = 0; i < init.size(); ++i) {
+                            addValue(toDouble(init.get(i)), name);
+                        }
+                    }
+                }
+                if (tab.size() == 3) {
+                    const Set& init = toSetValue(tab.get(2));
                     unsigned int i;
 
                     for (i = 0; i < init.size(); ++i) {
                         addValue(toDouble(init.get(i)), name);
                     }
-                }
-            }
-            if (tab.size() == 3) {
-                const Set& init = toSetValue(tab.get(2));
-                unsigned int i;
-
-                for (i = 0; i < init.size(); ++i) {
-                    addValue(toDouble(init.get(i)), name);
                 }
             }
         }
@@ -121,11 +123,11 @@ void Multiple::create(const std::string& name,
                       MultipleVariableIterators& iterators)
 {
     if (mValues.find(name) == mValues.end()) {
-        throw utils::InternalError(
-            fmt(_("DifferenceEquation - wrong variable name: %1% in %2%"))
-            % name % getModelName());
+        mVariableNames.push_back(name);
+        mValues[name] = MultipleValues();
+        mInitValues[name] = false;
+        size(name, DEFAULT_SIZE);
     }
-
     mSetValues.insert(std::make_pair(name, false)).first;
     iterators.mSetValues = &mSetValues[name];
     iterators.mMultipleValues = &mValues[name];
