@@ -80,7 +80,7 @@ Installation
 
 The following commands configure, build and install VLE into your account:
 
-$ tar zxf vle-0.8.0.tar.gz
+$ tar zxf vle-0.9.0.tar.gz
 or
 $ git clone git://vle.git.sourceforge.net/gitroot/vle/vle
 

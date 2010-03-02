@@ -5,7 +5,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vle 0.8.0-dev\n"
+"Project-Id-Version: vle 0.9.0-dev\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-05-18 01:22+0200\n"
 "PO-Revision-Date: 2009-05-16 00:34+0100\n"

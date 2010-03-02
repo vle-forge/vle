@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE vle_project SYSTEM "http://vle.univ-littoral.fr/vle-0.8.0.dtd">
+<!DOCTYPE vle_project SYSTEM "http://vle.univ-littoral.fr/vle-0.9.0.dtd">
 <vle_project version="1.0" date="" author="Gauthier Quesnel">
  <structures>
  </structures>
