@@ -49,7 +49,7 @@ BOOST_GLOBAL_FIXTURE(F)
 
 namespace vmd = vle::extension::decision;
 
-namespace ex {
+namespace vle { namespace extension { namespace decision { namespace ex {
 
     class Before: public vmd::KnowledgeBase
     {
@@ -175,11 +175,11 @@ namespace ex {
         virtual ~Equal() {}
     };
 
-} // namespace ex
+}}}} // namespace vle extension decision ex
 
 BOOST_AUTO_TEST_CASE(Before1)
 {
-    ex::Before base;
+    vmd::ex::Before base;
     vmd::Activities::result_t lst;
 
     base.processChanges(0.0);
@@ -212,7 +212,7 @@ BOOST_AUTO_TEST_CASE(Before1)
 
 BOOST_AUTO_TEST_CASE(Before2)
 {
-    ex::Before base;
+    vmd::ex::Before base;
     vmd::Activities::result_t lst;
 
     base.processChanges(0.0);
@@ -258,7 +258,7 @@ BOOST_AUTO_TEST_CASE(Before2)
 
 BOOST_AUTO_TEST_CASE(Meets1)
 {
-    ex::Meets base;
+    vmd::ex::Meets base;
     vmd::Activities::result_t lst;
 
     base.processChanges(0.0);
@@ -295,7 +295,7 @@ BOOST_AUTO_TEST_CASE(Meets1)
 
 BOOST_AUTO_TEST_CASE(Overlaps1)
 {
-    ex::Overlaps base;
+    vmd::ex::Overlaps base;
     vmd::Activities::result_t lst;
 
     base.processChanges(0.0);
@@ -327,7 +327,7 @@ BOOST_AUTO_TEST_CASE(Overlaps1)
 
 BOOST_AUTO_TEST_CASE(Overlaps2)
 {
-    ex::Overlaps base;
+    vmd::ex::Overlaps base;
     vmd::Activities::result_t lst;
 
     base.processChanges(0.0);
@@ -366,7 +366,7 @@ BOOST_AUTO_TEST_CASE(Overlaps2)
 
 BOOST_AUTO_TEST_CASE(During1)
 {
-    ex::During base;
+    vmd::ex::During base;
     vmd::Activities::result_t lst;
 
     base.processChanges(0.0);
@@ -402,7 +402,7 @@ BOOST_AUTO_TEST_CASE(During1)
 
 BOOST_AUTO_TEST_CASE(During2)
 {
-    ex::During base;
+    vmd::ex::During base;
     vmd::Activities::result_t lst;
 
     base.processChanges(0.0);
@@ -440,7 +440,7 @@ BOOST_AUTO_TEST_CASE(During2)
 
 BOOST_AUTO_TEST_CASE(Starts1)
 {
-    ex::Starts base;
+    vmd::ex::Starts base;
     vmd::Activities::result_t lst;
 
     base.processChanges(0.0);
@@ -468,7 +468,7 @@ BOOST_AUTO_TEST_CASE(Starts1)
 
 BOOST_AUTO_TEST_CASE(Starts2)
 {
-    ex::StartsFailed base;
+    vmd::ex::StartsFailed base;
     vmd::Activities::result_t lst;
 
     base.processChanges(0.0);
@@ -482,7 +482,7 @@ BOOST_AUTO_TEST_CASE(Starts2)
 
 BOOST_AUTO_TEST_CASE(finishes)
 {
-    ex::Finishes base;
+    vmd::ex::Finishes base;
     vmd::Activities::result_t lst;
 
     base.processChanges(0.0);
@@ -514,7 +514,7 @@ BOOST_AUTO_TEST_CASE(finishes)
 
 BOOST_AUTO_TEST_CASE(Equal)
 {
-    ex::Equal base;
+    vmd::ex::Equal base;
     vmd::Activities::result_t lst;
 
     base.processChanges(0.0);
@@ -537,7 +537,7 @@ BOOST_AUTO_TEST_CASE(Equal)
 
 BOOST_AUTO_TEST_CASE(EqualFail)
 {
-    ex::Equal base;
+    vmd::ex::Equal base;
     vmd::Activities::result_t lst;
 
     base.processChanges(0.0);

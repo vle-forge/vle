@@ -42,7 +42,7 @@ namespace vmd = vle::extension::decision;
 namespace vd = vle::devs;
 using vle::fmt;
 
-namespace ex {
+namespace vle { namespace extension { namespace decision { namespace ex {
 
     class KnowledgeBase : public vmd::KnowledgeBase
     {
@@ -50,14 +50,15 @@ namespace ex {
         KnowledgeBase()
             : vmd::KnowledgeBase(), today(0), yesterday(0)
         {
-            addFact("today", boost::bind(&ex::KnowledgeBase::date, this, _1));
+            addFact("today", boost::bind(&vmd::ex::KnowledgeBase::date,
+                                         this, _1));
 
             vmd::Rule& r1 = addRule("Rule 1");
-            r1.add(boost::bind(&ex::KnowledgeBase::haveGoodTemp, this));
-            r1.add(boost::bind(&ex::KnowledgeBase::isAlwaysTrue, this));
+            r1.add(boost::bind(&vmd::ex::KnowledgeBase::haveGoodTemp, this));
+            r1.add(boost::bind(&vmd::ex::KnowledgeBase::isAlwaysTrue, this));
 
             vmd::Rule& r2 = addRule("Rule 2");
-            r2.add(boost::bind(&ex::KnowledgeBase::haveGoodTemp, this));
+            r2.add(boost::bind(&vmd::ex::KnowledgeBase::haveGoodTemp, this));
 
             vmd::Activity& act1 = addActivity("act1");
             act1.addRule("Rule 1", r1);
@@ -188,13 +189,13 @@ namespace ex {
         virtual ~KB4() {}
     };
 
-} // namespace ex
+}}}} // namespace vle extension decision ex
 
 BOOST_AUTO_TEST_CASE(kb)
 {
     vle::value::init();
 
-    ex::KnowledgeBase base;
+    vmd::ex::KnowledgeBase base;
 
     vmd::Activities::result_t lst;
     double date = 0.0;
@@ -234,7 +235,7 @@ BOOST_AUTO_TEST_CASE(kb2)
 {
     vle::value::init();
 
-    ex::KnowledgeBaseGraph base;
+    vmd::ex::KnowledgeBaseGraph base;
 
     vmd::Activities::result_t lst;
 
@@ -282,7 +283,7 @@ BOOST_AUTO_TEST_CASE(kb3)
 {
     vle::value::init();
 
-    ex::KnowledgeBaseGraph2 base;
+    vmd::ex::KnowledgeBaseGraph2 base;
 
     vmd::Activities::result_t lst;
 
@@ -337,7 +338,7 @@ BOOST_AUTO_TEST_CASE(Activity4)
 {
     vle::value::init();
 
-    ex::KnowledgeBaseGraph3 base;
+    vmd::ex::KnowledgeBaseGraph3 base;
 
     vmd::Activities::result_t lst;
 
@@ -356,7 +357,7 @@ BOOST_AUTO_TEST_CASE(ActivitiesnextDate1)
 {
     vle::value::init();
 
-    ex::KB4 base;
+    vmd::ex::KB4 base;
 
     vmd::Activities::result_t lst;
 
@@ -384,7 +385,7 @@ BOOST_AUTO_TEST_CASE(ActivitiesnextDate2)
 {
     vle::value::init();
 
-    ex::KB4 base;
+    vmd::ex::KB4 base;
 
     vmd::Activities::result_t lst;
 
@@ -412,7 +413,7 @@ BOOST_AUTO_TEST_CASE(activitiesExist)
 {
     vle::value::init();
 
-    ex::KB4 base;
+    vmd::ex::KB4 base;
 
     bool b = base.activities().exist("A");
     BOOST_REQUIRE_EQUAL(b, true);
