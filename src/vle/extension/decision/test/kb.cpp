@@ -40,7 +40,7 @@
 
 namespace vmd = vle::extension::decision;
 
-namespace ex {
+namespace vle { namespace extension { namespace decision { namespace ex {
 
     class KnowledgeBase : public vmd::KnowledgeBase
     {
@@ -48,14 +48,14 @@ namespace ex {
         KnowledgeBase()
             : vmd::KnowledgeBase(), today(0), yesterday(0)
         {
-            addFact("today", boost::bind(&ex::KnowledgeBase::date, this, _1));
+            addFact("today", boost::bind(&vmd::ex::KnowledgeBase::date, this, _1));
 
             vmd::Rule& r1 = addRule("Rule 1");
-            r1.add(boost::bind(&ex::KnowledgeBase::haveGoodTemp, this));
-            r1.add(boost::bind(&ex::KnowledgeBase::isAlwaysTrue, this));
+            r1.add(boost::bind(&vmd::ex::KnowledgeBase::haveGoodTemp, this));
+            r1.add(boost::bind(&vmd::ex::KnowledgeBase::isAlwaysTrue, this));
 
             vmd::Rule& r2 = addRule("Rule 2");
-            r2.add(boost::bind(&ex::KnowledgeBase::haveGoodTemp, this));
+            r2.add(boost::bind(&vmd::ex::KnowledgeBase::haveGoodTemp, this));
 
             vmd::Activity& act1 = addActivity("act1");
             act1.addRule("Rule 1", r1);
@@ -91,13 +91,13 @@ namespace ex {
         double today, yesterday;
     };
 
-} // namespace ex
+}}}} // namespace vle extension decision ex
 
 BOOST_AUTO_TEST_CASE(kb)
 {
     vle::value::init();
 
-    ex::KnowledgeBase base;
+    vmd::ex::KnowledgeBase base;
 
     vmd::Activities::result_t lst;
 

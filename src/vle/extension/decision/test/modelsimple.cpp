@@ -31,7 +31,7 @@
 
 namespace vmd = vle::extension::decision;
 
-namespace ex {
+namespace vle { namespace extension { namespace decision { namespace ex {
 
     class SimpleAgent: public vmd::Agent
     {
@@ -43,11 +43,11 @@ namespace ex {
             addFact("today", boost::bind(&SimpleAgent::date, this, _1));
 
             vmd::Rule& r1 = addRule("Rule 1");
-            r1.add(boost::bind(&ex::SimpleAgent::haveGoodTemp, this));
-            r1.add(boost::bind(&ex::SimpleAgent::isAlwaysTrue, this));
+            r1.add(boost::bind(&vmd::ex::SimpleAgent::haveGoodTemp, this));
+            r1.add(boost::bind(&vmd::ex::SimpleAgent::isAlwaysTrue, this));
 
             vmd::Rule& r2 = addRule("Rule 2");
-            r2.add(boost::bind(&ex::SimpleAgent::haveGoodTemp, this));
+            r2.add(boost::bind(&vmd::ex::SimpleAgent::haveGoodTemp, this));
 
             vmd::Activity& act1 = addActivity("act1");
             act1.addRule("Rule 1", r1);
@@ -88,5 +88,4 @@ namespace ex {
         double today, yesterday;
     };
 
-
-} // namespace ex
+}}}} // namespace vle extension decision ex
