@@ -142,9 +142,9 @@
  <experiment name="generatorexecutiveclass" duration="100.0" seed="123">
   <views>
    <outputs>
-    <output name="o" format="local" plugin="text"/>
-    <output name="o2" format="local" plugin="text"/>
-    <output name="o3" format="local" plugin="text"/>
+    <output name="o" format="local" plugin="file"/>
+    <output name="o2" format="local" plugin="file"/>
+    <output name="o3" format="local" plugin="file"/>
    </outputs>
    <observables>
     <observable name="obs1">

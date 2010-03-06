@@ -30,7 +30,7 @@
 <experiment name="Only" duration="10.000000000000000" begin="0.000000000000000" combination="linear" seed="10" >
 <views>
 <outputs>
-<output name="output" location="" format="local" plugin="text" >
+<output name="output" location="" format="local" plugin="file" >
 <map><key name="output"><string>out</string></key></map></output>
 
 <output name="storage" location="" format="local" plugin="storage" />

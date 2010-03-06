@@ -72,7 +72,7 @@
   </conditions>
   <views>
    <outputs>
-    <output name="o2" format="local" plugin="text" location=""/>
+    <output name="o2" format="local" plugin="file" location=""/>
    </outputs>
    <observables>
     <observable name="obs_seir">

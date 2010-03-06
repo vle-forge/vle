@@ -54,7 +54,7 @@
   </conditions>
   <views>
    <outputs>
-    <output name="o1" format="local" plugin="text" location=""/>
+    <output name="o1" format="local" plugin="file" location=""/>
    </outputs>
    <observables>
     <observable name="obs_sir">

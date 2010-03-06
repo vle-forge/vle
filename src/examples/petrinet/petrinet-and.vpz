@@ -144,7 +144,7 @@
   </conditions>
   <views>
    <outputs>
-    <output name="out" location="" format="local" plugin="text"/>
+    <output name="out" location="" format="local" plugin="file"/>
    </outputs>
    <observables>
     <observable name="cnt">

@@ -40,7 +40,7 @@
 <experiment name="exp1" duration="100.000000000000000" begin="0.000000000000000" seed="123456789" >
 <views>
 <outputs>
-<output name="out" location="" format="local" plugin="text" />
+<output name="out" location="" format="local" plugin="file" />
 
 </outputs>
 <observables>

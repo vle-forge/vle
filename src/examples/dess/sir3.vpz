@@ -136,7 +136,7 @@
   </conditions>
   <views>
    <outputs>
-    <output name="o5" format="local" plugin="text"/>
+    <output name="o5" format="local" plugin="file"/>
    </outputs>
    <observables>
     <observable name="obs_S">

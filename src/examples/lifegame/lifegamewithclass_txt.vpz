@@ -53,7 +53,7 @@
     </conditions>
     <views>
       <outputs>
-	<output name="o" format="local" plugin="text" />
+	<output name="o" format="local" plugin="file" />
       </outputs>
       <observables>
 	<observable name="obs_cell">

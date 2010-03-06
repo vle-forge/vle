@@ -89,7 +89,7 @@
 </conditions>
 <views>
 <outputs>
-<output name="output" location="" format="local" plugin="text" >
+<output name="output" location="" format="local" plugin="file" >
 <map><key name="output"><string>out</string></key></map></output>
 
 <output name="storage" location="" format="local" plugin="storage" />
