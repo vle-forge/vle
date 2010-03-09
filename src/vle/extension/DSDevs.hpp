@@ -140,9 +140,9 @@ namespace vle { namespace extension {
 
         virtual devs::Time timeAdvance() const;
 
-        virtual devs::Event::EventType confluentTransitions(
+        virtual void confluentTransitions(
             const devs::Time& /* time */,
-            const devs::ExternalEventList& /* extEventlist */) const;
+            const devs::ExternalEventList& /* extEventlist */);
 
         virtual void internalTransition(const devs::Time& /* event */);
 

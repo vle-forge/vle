@@ -97,7 +97,7 @@ void DynamicsDbg::externalTransition(const ExternalEventList& event,
     mDynamics->externalTransition(event, time);
 }
 
-Event::EventType DynamicsDbg::confluentTransitions(
+void DynamicsDbg::confluentTransitions(
     const Time& time,
     const ExternalEventList& extEventlist) const
 {
@@ -105,7 +105,7 @@ Event::EventType DynamicsDbg::confluentTransitions(
             _("%1$20.10g %2% [DEVS] confluent transition: [%3%]")) % time %
         getModelName() % extEventlist);
 
-    return mDynamics->confluentTransitions(time, extEventlist);
+    mDynamics->confluentTransitions(time, extEventlist);
 }
 
 void DynamicsDbg::request(const RequestEvent& event,

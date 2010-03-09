@@ -86,9 +86,10 @@ public:
     virtual void output(const vle::devs::Time& /* time */,
                         vle::devs::ExternalEventList& /* output */) const;
     virtual vle::devs::Time timeAdvance() const;
-    virtual vle::devs::Event::EventType confluentTransitions(
+
+    virtual void confluentTransitions(
         const vle::devs::Time& /* internal */,
-        const vle::devs::ExternalEventList& /* extEventlist */) const;
+        const vle::devs::ExternalEventList& /* extEventlist */);
     virtual void internalTransition(const vle::devs::Time& /* event */);
     virtual void externalTransition
         (const vle::devs::ExternalEventList& /* event */,

@@ -259,9 +259,9 @@ private:
 
     virtual vle::devs::Time timeAdvance() const;
 
-    virtual vle::devs::Event::EventType confluentTransitions(
+    virtual void confluentTransitions(
         const vle::devs::Time& time,
-        const vle::devs::ExternalEventList& extEventlist) const;
+        const vle::devs::ExternalEventList& extEventlist);
 
     virtual void internalTransition(
         const vle::devs::Time& event);

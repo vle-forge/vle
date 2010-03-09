@@ -138,9 +138,8 @@ namespace vle { namespace devs {
          * same time.
          * @param internal the internal event.
          * @param extEventlist the external events list.
-         * @return Event::INTERNAL if internal is priority or Event::EXTERNAL.
          */
-        virtual Event::EventType
+        virtual void
             confluentTransitions(const Time& time,
                                  const ExternalEventList& extEventlist) const;
 

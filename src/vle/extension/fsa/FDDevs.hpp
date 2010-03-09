@@ -145,10 +145,13 @@ public:
         return r.first->second;
     }
 
-    virtual devs::Event::EventType confluentTransitions(
-        const devs::Time& /* time */,
-        const devs::ExternalEventList& /* extEventlist */) const
-    { return devs::Event::EXTERNAL; }
+    virtual void confluentTransitions(
+        const devs::Time& time,
+        const devs::ExternalEventList& extEventlist)
+    {
+        externalTransition(extEventlist, time);
+        internalTransition(time);
+    }
 
     template < typename I >
         Internal_t<I> internal(I obj, int state)

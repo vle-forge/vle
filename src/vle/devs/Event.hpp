@@ -51,10 +51,6 @@ namespace vle { namespace devs {
     class VLE_DEVS_EXPORT Event
     {
     public:
-        /** Define an enumeration to type event in conflict function.
-         */
-        enum EventType { INTERNAL, EXTERNAL };
-
         /**
 	 * @brief Generate a new Event with and model source name.
          * @param model model source name.

@@ -473,10 +473,13 @@ private:
     virtual void externalTransition(
         const devs::ExternalEventList& event,
         const devs::Time& time);
-    virtual devs::Event::EventType confluentTransitions(
-        const devs::Time& /* time */,
-        const devs::ExternalEventList& /* extEventlist */) const
-    { return devs::Event::EXTERNAL; }
+    virtual void confluentTransitions(
+        const devs::Time& time,
+        const devs::ExternalEventList& extEventlist)
+    {
+        externalTransition(extEventlist, time);
+        internalTransition(time);
+    }
 
     enum Phase { IDLE, PROCESSING, SEND };
 

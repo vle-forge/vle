@@ -113,15 +113,15 @@ public:
         UserModel::externalTransition(event, time);
     }
 
-    Event::EventType confluentTransitions(
+    void confluentTransitions(
         const Time& time,
-        const ExternalEventList& extEventlist) const
+        const ExternalEventList& extEventlist)
     {
         TraceDevs(fmt(
                 _("%1$20.10g %2% [DEVS] confluent transition: [%3%]")) % time %
             UserModel::getModelName() % extEventlist);
 
-        return UserModel::confluentTransitions(time, extEventlist);
+        UserModel::confluentTransitions(time, extEventlist);
     }
 
     void request(const RequestEvent& event,

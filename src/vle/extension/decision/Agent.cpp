@@ -154,11 +154,12 @@ void Agent::externalTransition(
     mState = UpdateFact;
 }
 
-devs::Event::EventType Agent::confluentTransitions(
-    const devs::Time& /*time*/,
-    const devs::ExternalEventList& /*extEventlist*/) const
+void Agent::confluentTransitions(
+    const devs::Time& time,
+    const devs::ExternalEventList& extEventlist)
 {
-    return devs::Event::INTERNAL;
+    internalTransition(time);
+    externalTransition(extEventlist, time);
 }
 
 void Agent::request(const devs::RequestEvent& /*event*/,

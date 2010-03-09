@@ -340,9 +340,9 @@ protected:
 
     virtual devs::Time timeAdvance() const;
 
-    virtual devs::Event::EventType confluentTransitions(
+    virtual void confluentTransitions(
         const devs::Time& internal,
-        const devs::ExternalEventList& extEventlist) const;
+        const devs::ExternalEventList& extEventlist);
 
     virtual void internalTransition(
         const devs::Time& time);

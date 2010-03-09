@@ -267,11 +267,12 @@ Time Multiple::timeAdvance() const
     return getSigma(mCurrentModel);
 }
 
-Event::EventType Multiple::confluentTransitions(
-    const Time& /* internal */,
-    const ExternalEventList& /* extEventlist */) const
+void Multiple::confluentTransitions(
+    const Time& time,
+    const ExternalEventList& extEventlist)
 {
-    return Event::EXTERNAL;
+    externalTransition(extEventlist, time);
+    internalTransition(time);
 }
 
 void Multiple::internalTransition(const Time& time)

@@ -93,11 +93,12 @@ devs::Time DSDevs::timeAdvance() const
     return (m_state != IDLE) ? devs::Time(0.0) : devs::Time::infinity;
 }
 
-devs::Event::EventType DSDevs::confluentTransitions(
-    const devs::Time& /* time */,
-    const devs::ExternalEventList& /* extEventlist */) const
+void DSDevs::confluentTransitions(
+    const devs::Time& time,
+    const devs::ExternalEventList& extEventlist)
 {
-    return devs::Event::INTERNAL;
+    internalTransition(time);
+    externalTransition(extEventlist, time);
 }
 
 void DSDevs::externalTransition(const devs::ExternalEventList& event,

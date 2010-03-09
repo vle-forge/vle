@@ -102,9 +102,9 @@ public:
      * @param extEventlist the external events list.
      * @return Event::INTERNAL if internal is priority or Event::EXTERNAL.
      */
-    virtual devs::Event::EventType confluentTransitions(
+    virtual void confluentTransitions(
         const devs::Time& time,
-        const devs::ExternalEventList& extEventlist) const;
+        const devs::ExternalEventList& extEventlist);
 
     /**
      * @brief Process a request event: these functions occurs when an

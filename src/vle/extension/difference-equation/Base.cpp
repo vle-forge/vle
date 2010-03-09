@@ -502,11 +502,12 @@ Time Base::timeAdvance() const
     return mSigma;
 }
 
-Event::EventType Base::confluentTransitions(
-    const Time& /* internal */,
-    const ExternalEventList& /* extEventlist */) const
+void Base::confluentTransitions(
+    const Time& time,
+    const ExternalEventList& extEventlist)
 {
-    return Event::EXTERNAL;
+    externalTransition(extEventlist, time);
+    internalTransition(time);
 }
 
 void Base::internalTransition(const Time& time)

@@ -176,17 +176,19 @@ namespace vle { namespace devs {
         { }
 
         /**
-         * @brief Process the confluent transition: select the transition to
-         * call when an internal and one or more external event appear in the
-         * same time.
-         * @param internal the internal event.
+         * @brief Process the confluent transition, by default,
+         * confluentTransitions call internalTransition and externalTransition
+         * but this function can be overidden to develop its own dynamics.
+         * @param time the time of the simulation.
          * @param extEventlist the external events list.
-         * @return Event::INTERNAL if internal is priority or Event::EXTERNAL.
          */
-        virtual vle::devs::Event::EventType confluentTransitions(
-	    const vle::devs::Time& /* time */,
-            const vle::devs::ExternalEventList& /* extEventlist */) const
-        { return Event::INTERNAL; }
+        virtual void confluentTransitions(
+	    const vle::devs::Time& time,
+            const vle::devs::ExternalEventList& extEventlist)
+        {
+            internalTransition(time);
+            externalTransition(extEventlist, time);
+        }
 
         /**
          * @brief Process a request event: these functions occurs when an

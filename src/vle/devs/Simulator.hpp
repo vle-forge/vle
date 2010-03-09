@@ -167,10 +167,8 @@ namespace vle { namespace devs {
 
         void output(const Time& currentTime, ExternalEventList& output);
 
-
-        Event::EventType confluentTransitions(
-            const InternalEvent& ie,
-            const ExternalEventList& ees) const;
+        InternalEvent* confluentTransitions(const InternalEvent& ie,
+                                            const ExternalEventList& ees);
 
         InternalEvent* internalTransition(const InternalEvent& event);
 

@@ -424,10 +424,12 @@ Time QSS2::timeAdvance() const
     return getSigma(m_currentModel);
 }
 
-Event::EventType QSS2::confluentTransitions(const Time& /* internal */,
-                                            const ExternalEventList& /* extEventlist */) const
+void QSS2::confluentTransitions(
+    const Time& time,
+    const ExternalEventList& extEventlist)
 {
-    return Event::EXTERNAL;
+    externalTransition(extEventlist, time);
+    internalTransition(time);
 }
 
 void QSS2::internalTransition(const Time& time)

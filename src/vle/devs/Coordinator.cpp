@@ -629,16 +629,8 @@ void Coordinator::processConflictEvents(
         dispatchExternalEvent(result, sim);
     }
 
-    InternalEvent* internal;
-
-    if (sim->confluentTransitions(*modelbag.internal(), modelbag.externals())
-        == Event::INTERNAL) {
-        internal = sim->internalTransitionConflict(
-            *modelbag.internal(), modelbag.externals());
-    } else {
-        internal = sim->externalTransitionConflict(
-            *modelbag.internal(), modelbag.externals());
-    }
+    InternalEvent* internal = sim->confluentTransitions(
+        *modelbag.internal(), modelbag.externals());
 
     processEventView(*sim, 0);
 

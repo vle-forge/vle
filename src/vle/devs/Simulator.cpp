@@ -192,11 +192,12 @@ InternalEvent* Simulator::init(const Time& time)
     return new InternalEvent(m_dynamics->init(time) + time, this);
 }
 
-Event::EventType Simulator::confluentTransitions(
+InternalEvent* Simulator::confluentTransitions(
     const InternalEvent& internal,
-    const ExternalEventList& extEventlist) const
+    const ExternalEventList& extEventlist)
 {
-    return m_dynamics->confluentTransitions(internal.getTime(), extEventlist);
+    m_dynamics->confluentTransitions(internal.getTime(), extEventlist);
+    return buildInternalEvent(internal.getTime());
 }
 
 InternalEvent* Simulator::internalTransition(const InternalEvent& event)
