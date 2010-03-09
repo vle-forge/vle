@@ -68,11 +68,12 @@ public:
     {
     }
 
-    virtual devs::Event::EventType confluentTransitions(
-        const devs::Time& /* time */,
-        const devs::ExternalEventList& /* extEventlist */) const
+    virtual void confluentTransitions(
+        const devs::Time& time,
+        const devs::ExternalEventList& events)
     {
-        return devs::Event::INTERNAL;
+        internalTransition(time);
+        externalTransition(events, time);
     }
 
     virtual void request(
