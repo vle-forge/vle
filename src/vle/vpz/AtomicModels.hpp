@@ -314,6 +314,13 @@ namespace vle { namespace vpz {
         { return m_lst.end(); }
 
         /**
+         * @brief Return true if the list of atomic models is empty.
+         * @return True if empty, false otherwise.
+         */
+        bool empty() const
+        { return m_lst.empty(); }
+
+        /**
          * @brief Write the model or hierarchy of models into the output stream.
          * @param mdl The top node of the hierarchy or a single atomic model.
          * @param out The output stream.

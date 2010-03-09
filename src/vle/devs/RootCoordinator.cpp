@@ -63,6 +63,11 @@ void RootCoordinator::load(const vpz::Vpz& io)
         delete m_root;
     }
 
+    if (io.project().model().atomicModels().empty()) {
+        throw utils::ArgError(_("RootCoordinator: no atomic model in this"
+                                " vpz"));
+    }
+
     m_rand.seed(io.project().experiment().seed());
     m_begin = io.project().experiment().begin();
     m_end = m_begin + io.project().experiment().duration();
