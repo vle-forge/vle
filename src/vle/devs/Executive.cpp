@@ -91,17 +91,26 @@ void Executive::addConnection(const std::string& srcModelName,
         cpled() : cpled()->findModel(dstModelName);
 
     if (srcModel and dstModel) {
+        std::vector < std::pair < Simulator*, std::string > > toupdate;
+
         if (modelName == srcModelName) {
             cpled()->addInputConnection(srcPortName, dstModel, dstPortName);
+            m_coordinator.getSimulatorsSource(srcModel, srcPortName, toupdate);
         } else if (modelName == dstModelName) {
             cpled()->addOutputConnection(srcModel, srcPortName, dstPortName);
+            graph::ModelPortList lst;
+            cpled()->getAtomicModelsTarget(dstPortName, lst);
+
+            for (graph::ModelPortList::iterator it = lst.begin(); it !=
+                 lst.end(); ++it) {
+                m_coordinator.getSimulatorsSource(it->first, it->second,
+                                                  toupdate);
+            }
         } else {
             cpled()->addInternalConnection(srcModel, srcPortName, dstModel,
                                            dstPortName);
+            m_coordinator.getSimulatorsSource(dstModel, dstPortName, toupdate);
         }
-
-        std::vector < std::pair < Simulator*, std::string > > toupdate;
-        m_coordinator.getSimulatorsSource(dstModel, dstPortName, toupdate);
 
         m_coordinator.updateSimulatorsTarget(toupdate);
     } else {
