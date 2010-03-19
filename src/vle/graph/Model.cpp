@@ -31,7 +31,6 @@
 #include <vle/graph/AtomicModel.hpp>
 #include <vle/graph/Model.hpp>
 #include <vle/utils/Debug.hpp>
-#include <boost/tuple/tuple.hpp>
 #include <stack>
 
 namespace vle { namespace graph {
@@ -83,13 +82,7 @@ void Model::getAtomicModelsSource(const std::string& portname,
 {
     std::stack < std::pair < ModelPortList*, Model* > > stack;
 
-    if (isAtomic()) {
-        stack.push(std::make_pair(&getInPort(portname), this));
-    } else {
-        stack.push(std::make_pair(
-                &(reinterpret_cast < CoupledModel* >
-                  (this))->getInternalOutPort(portname), this));
-    }
+    stack.push(std::make_pair(&getInPort(portname), this));
 
     while (not stack.empty()) {
         ModelPortList* top = stack.top().first;
@@ -122,13 +115,7 @@ void Model::getAtomicModelsTarget(const std::string& portname,
 {
     std::stack < std::pair < ModelPortList*, Model* > > stack;
 
-    if (isAtomic()) {
-        stack.push(std::make_pair(&getOutPort(portname), this));
-    } else {
-        stack.push(std::make_pair(
-                &(reinterpret_cast < CoupledModel* >
-                  (this))->getInternalInPort(portname), this));
-    }
+    stack.push(std::make_pair(&getOutPort(portname), this));
 
     while (not stack.empty()) {
         ModelPortList* top = stack.top().first;

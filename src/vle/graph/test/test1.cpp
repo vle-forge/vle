@@ -742,3 +742,15 @@ BOOST_AUTO_TEST_CASE(test_atomic_model_source_2)
     BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
     result.clear();
 }
+
+BOOST_AUTO_TEST_CASE(test_atomic_model_source_3)
+{
+    vpz::Vpz file(utils::Path::path().getExampleFile("unittest.vpz"));
+
+    CoupledModel* top((file.project().model().model())->toCoupled());
+    CoupledModel* top2(top->findModel("top2")->toCoupled());
+    graph::ModelPortList result;
+
+    top2->getAtomicModelsSource("in", result);
+    BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
+}

@@ -115,9 +115,21 @@ namespace vle { namespace graph {
          */
         virtual void writeXML(std::ostream& out) const = 0;
 
+        /**
+         * @brief Get all atomic models source of the input port `portname' and
+         * fill the ModelList `result'.
+         * @param portname An input port of the model.
+         * @param result A structure to store result.
+         */
         void getAtomicModelsSource(const std::string& portname,
                                    ModelPortList& result);
 
+        /**
+         * @brief Get all atomic models target of the output port `portname'
+         * and fill the ModelList `result'.
+         * @param portname An input port of the model.
+         * @param result A structure to store result.
+         */
         void getAtomicModelsTarget(const std::string& portname,
                                    ModelPortList& result);
 
