@@ -42,6 +42,9 @@ SimpleFile::SimpleFile(const std::string& location)
     : Plugin(location), m_time(-1.0), m_isstart(false),
     m_havefirstevent(false), m_julian(false), m_type(SimpleFile::FILE)
 {
+    std::cerr << fmt(
+        _("/!\\ SimpleFile plug-ins (csv, rdata and text) are absolete in this"
+          " branch. You must use the oov plugin File now")) << std::endl;
 }
 
 SimpleFile::~SimpleFile()
