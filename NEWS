@@ -3,6 +3,32 @@ VLE 0.9.0
 
 
 
+
+VLE 0.8.1
+=========
+
+* project:
+  * vle: fix patch in the same version of VLE:
+      In the same version of VLE (ie. same major and minor version, only the
+      patch changes), we do not modify the paths of share, include and modules
+      directories.
+
+* extension:
+  * decision: move unittest of decision in correct namespace:
+      The namespace 'ex' is used instead of a classical
+      'vle::extension::decisio Replace the current namespace.
+
+
+* devs:
+  * fix crash with empty vpz instance:
+      If an empty vpz (file or instance) is used to start a simulation, a
+      segmentation fault occurred. This patch fix the problem by checking the
+      vp before launching the simulation.
+  * fix addConnection function in Executive:
+      When we try to build an internal connection between an atomic model and a
+      coupled moddel, an exception is raised. (Closes: #2971825).
+
+
 VLE 0.8.0
 =========
 
