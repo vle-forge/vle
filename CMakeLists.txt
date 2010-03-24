@@ -18,11 +18,11 @@ SET(VLE_NAME_COMPLETE "${VLE_NAME}-${VLE_COMPLETE}")
  # Installation variables
 #
 
-SET(VLE_LIBRARY_DIRS "lib/${VLE_NAME_VERSION}")
-SET(VLE_INCLUDE_DIRS "include/${VLE_NAME_VERSION}/vle")
-SET(VLE_INCLUDE_DIR "include/${VLE_NAME_VERSION}")
+SET(VLE_LIBRARY_DIRS "lib/vle-${VLE_VERSION_SHORT}.0")
+SET(VLE_INCLUDE_DIRS "include/vle-${VLE_VERSION_SHORT}.0/vle")
+SET(VLE_INCLUDE_DIR "include/vle-${VLE_VERSION_SHORT}.0")
 SET(VLE_MANPAGE_PATH "share/man/man1")
-SET(VLE_SHARE_DIRS "share/${VLE_NAME_VERSION}")
+SET(VLE_SHARE_DIRS "share/vle-${VLE_VERSION_SHORT}.0")
 
 #
  # Append the library version information to the library target
