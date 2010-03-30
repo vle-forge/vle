@@ -64,7 +64,7 @@ namespace vle { namespace oov { namespace plugin {
      *  </key>
      * </map>
      */
-    class VLE_OOV_EXPORT File : public Plugin
+    class File : public Plugin
     {
     public:
         /**
