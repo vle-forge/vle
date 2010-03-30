@@ -13,4 +13,4 @@ Libs:	-L${libdir} \
     -lvlemanager-@VLE_VERSION_SHORT@ -lvleutils-@VLE_VERSION_SHORT@ \
     -lvleoov-@VLE_VERSION_SHORT@ -lvlevalue-@VLE_VERSION_SHORT@ \
     -lvlevpz-@VLE_VERSION_SHORT@ -lvletranslator-@VLE_VERSION_SHORT@
-Cflags: -I${includedir}/@VLE_NAME_VERSION@ -I@VLE_PKGCONFIG_BOOSTINCLUDE_DIRS@
+Cflags: -I${includedir}/vle-@VLE_VERSION_SHORT@.0 -I@VLE_PKGCONFIG_BOOSTINCLUDE_DIRS@
