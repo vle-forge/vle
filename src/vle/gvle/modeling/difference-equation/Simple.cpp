@@ -36,18 +36,7 @@ Simple::Simple(const std::string& name) :
 {}
 
 Simple::~Simple()
-{
-    if (m_buttonSource) {
-        Gtk::VBox* vbox;
-
-        mXml->get_widget("SimplePluginVBox", vbox);
-        vbox->remove(*m_buttonSource);
-    }
-    for (std::list < sigc::connection >::iterator it = mList.begin();
-         it != mList.end(); ++it) {
-        it->disconnect();
-    }
-}
+{}
 
 void Simple::build(bool modeling)
 {
@@ -109,10 +98,26 @@ bool Simple::create(graph::AtomicModel& atom,
         generate(atom, model, dynamic, conditions, observables, classname,
                  namespace_);
         m_dialog->hide_all();
+        destroy();
         return true;
     }
     m_dialog->hide_all();
+    destroy();
     return false;
+}
+
+void Simple::destroy()
+{
+    if (m_buttonSource) {
+        Gtk::VBox* vbox;
+
+        mXml->get_widget("SimplePluginVBox", vbox);
+        vbox->remove(*m_buttonSource);
+    }
+    for (std::list < sigc::connection >::iterator it = mList.begin();
+         it != mList.end(); ++it) {
+        it->disconnect();
+    }
 }
 
 void Simple::fillFields(const vpz::Condition& condition)
@@ -302,9 +307,11 @@ bool Simple::modify(graph::AtomicModel& atom,
         generate(atom, model, dynamic, conditions, observables, classname,
                  namespace_);
         m_dialog->hide_all();
+        destroy();
         return true;
     }
     m_dialog->hide_all();
+    destroy();
     return false;
 }
 
@@ -317,6 +324,7 @@ bool Simple::start(vpz::Condition& condition)
 	assign(condition);
     }
     m_dialog->hide();
+    destroy();
     return true;
 }
 

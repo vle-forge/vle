@@ -75,6 +75,7 @@ private:
 
     void assign(vpz::Condition& condition);
     void build(bool modeling);
+    void destroy();
     void fillFields(const vpz::Condition& condition);
     virtual void generateCondition(graph::AtomicModel& atom,
                                    vpz::AtomicModel& model,

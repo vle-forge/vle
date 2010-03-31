@@ -36,18 +36,7 @@ Multiple::Multiple(const std::string& name) :
 {}
 
 Multiple::~Multiple()
-{
-    if (m_buttonSource) {
-        Gtk::VBox* vbox;
-
-        mXml->get_widget("MultiplePluginVBox", vbox);
-        vbox->remove(*m_buttonSource);
-    }
-    for (std::list < sigc::connection >::iterator it = mList.begin();
-         it != mList.end(); ++it) {
-        it->disconnect();
-    }
-}
+{}
 
 void Multiple::build(bool modeling)
 {
@@ -107,10 +96,26 @@ bool Multiple::create(graph::AtomicModel& atom,
         generate(atom, model, dynamic, conditions, observables, classname,
                  namespace_);
         m_dialog->hide_all();
+        destroy();
         return true;
     }
     m_dialog->hide_all();
+    destroy();
     return false;
+}
+
+void Multiple::destroy()
+{
+    if (m_buttonSource) {
+        Gtk::VBox* vbox;
+
+        mXml->get_widget("MultiplePluginVBox", vbox);
+        vbox->remove(*m_buttonSource);
+    }
+    for (std::list < sigc::connection >::iterator it = mList.begin();
+         it != mList.end(); ++it) {
+        it->disconnect();
+    }
 }
 
 void Multiple::fillFields(const vpz::Condition& condition)
@@ -325,9 +330,11 @@ bool Multiple::modify(graph::AtomicModel& atom,
         generate(atom, model, dynamic, conditions, observables, classname,
                  namespace_);
         m_dialog->hide_all();
+        destroy();
         return true;
     }
     m_dialog->hide_all();
+    destroy();
     return false;
 }
 
@@ -339,6 +346,7 @@ bool Multiple::start(vpz::Condition& condition)
 	Multiple::assign(condition);
     }
     m_dialog->hide();
+    destroy();
     return true;
 }
 

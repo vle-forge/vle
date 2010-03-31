@@ -36,18 +36,7 @@ Generic::Generic(const std::string& name) :
 {}
 
 Generic::~Generic()
-{
-    if (m_buttonSource) {
-        Gtk::VBox* vbox;
-
-        mXml->get_widget("GenericPluginVBox", vbox);
-        vbox->remove(*m_buttonSource);
-    }
-    for (std::list < sigc::connection >::iterator it = mList.begin();
-         it != mList.end(); ++it) {
-        it->disconnect();
-    }
-}
+{}
 
 void Generic::build(bool modeling)
 {
@@ -107,10 +96,26 @@ bool Generic::create(graph::AtomicModel& atom,
         generate(atom, model, dynamic, conditions, observables, classname,
                  namespace_, true);
         m_dialog->hide_all();
+        destroy();
         return true;
     }
     m_dialog->hide_all();
+    destroy();
     return false;
+}
+
+void Generic::destroy()
+{
+    if (m_buttonSource) {
+        Gtk::VBox* vbox;
+
+        mXml->get_widget("GenericPluginVBox", vbox);
+        vbox->remove(*m_buttonSource);
+    }
+    for (std::list < sigc::connection >::iterator it = mList.begin();
+         it != mList.end(); ++it) {
+        it->disconnect();
+    }
 }
 
 void Generic::fillFields(const vpz::Condition& condition)
@@ -276,9 +281,11 @@ bool Generic::modify(graph::AtomicModel& atom,
         generate(atom, model, dynamic, conditions, observables, classname,
                  namespace_, true);
         m_dialog->hide_all();
+        destroy();
         return true;
     }
     m_dialog->hide_all();
+    destroy();
     return false;
 }
 
@@ -291,6 +298,7 @@ bool Generic::start(vpz::Condition& condition)
         Generic::assign(condition);
     }
     m_dialog->hide();
+    destroy();
     return true;
 }
 
