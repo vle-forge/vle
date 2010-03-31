@@ -650,18 +650,24 @@ void Base::externalTransition(const ExternalEventList& event,
     bool begin = (e == 0);
     ExternalEventList::const_iterator it = event.begin();
     bool reset = false;
+    bool ignore = true;
 
     while (it != event.end()) {
         if ((*it)->onPort("phase")) {
             mPhase = (*it)->getIntegerAttributeValue("phase");
         } else if (mMode == NAME and (*it)->onPort("update")) {
-            std::string name = (*it)->getStringAttributeValue("name");
+            if ((*it)->existAttributeValue("value") or
+                (mState == SEND_INIT or mState == POST_SEND_INIT)) {
+                std::string name = (*it)->getStringAttributeValue("name");
 
-            if (mReceive == 0 and mSyncs > 0 and
-                (mLastComputeTime < time or mLastComputeTime.isInfinity())) {
-                clearReceivedValues();
+                if (mReceive == 0 and mSyncs > 0 and
+                    (mLastComputeTime < time or
+                     mLastComputeTime.isInfinity())) {
+                    clearReceivedValues();
+                }
+                processUpdate(name, **it, begin, end, time);
+                ignore = false;
             }
-            processUpdate(name, **it, begin, end, time);
         } else if ((*it)->onPort("perturb")) {
             std::string name = (*it)->getStringAttributeValue("name");
             double value = (*it)->getDoubleAttributeValue("value");
@@ -680,6 +686,9 @@ void Base::externalTransition(const ExternalEventList& event,
             mLockedVariables.push_back(name);
 
             mPerturbations.push_back(Perturbation(name, value, type));
+
+            ignore = false;
+
         } else if (not (*it)->onPort("add") and
                    not (*it)->onPort("remove")) {
 
@@ -692,66 +701,72 @@ void Base::externalTransition(const ExternalEventList& event,
             std::string portName = (*it)->getPortName();
             std::string name = (mMode == PORT)?portName:mMapping[portName];
 
-            if (mReceive == 0 and mSyncs > 0 and
-                (mLastComputeTime < time or mLastComputeTime.isInfinity())) {
-                clearReceivedValues();
+            if ((*it)->existAttributeValue("value") or
+                (mState == SEND_INIT or mState == POST_SEND_INIT)) {
+                if (mReceive == 0 and mSyncs > 0 and
+                    (mLastComputeTime < time or
+                     mLastComputeTime.isInfinity())) {
+                    clearReceivedValues();
+                }
+                processUpdate(name, **it, begin, end, time);
+                ignore = false;
             }
-
-            processUpdate(name, **it, begin, end, time);
         }
         ++it;
     }
 
-    if (not mPerturbations.empty()) {
-        if (not end and e > 0) {
-            applyPerturbations(time, false);
-            reset = true;
-        } else {
-            mState = RUN;
-            mSigma = 0;
+    if (not ignore) {
+        if (not mPerturbations.empty()) {
+            if (not end and e > 0) {
+                applyPerturbations(time, false);
+                reset = true;
+            } else {
+                mState = RUN;
+                mSigma = 0;
+            }
         }
-    }
 
-    if (mState == INIT) {
-        pushNoEDValues();
-        if (mWaiting <= 0) {
-            if (not check()) {
-                initValues(time);
-                mSigma = 0;
-                mState = PRE_INIT2;
-                clearReceivedValues();
-            } else {
-                clearReceivedValues();
-                mSigma = timeStep(time);
-                mState = PRE;
-            }
-            if (mReceive == mSyncs) {
-                mReceive = 0;
-            }
-        }
-    } else {
-        if (mState == PRE and end and (mReceive == mSyncs or reset)) {
-            mState = RUN;
-            mSigma = 0;
-            if (mReceive == mSyncs and mWaiting <= 0) {
-                mReceive = 0;
+        if (mState == INIT) {
+            pushNoEDValues();
+            if (mWaiting <= 0) {
+                if (not check()) {
+                    initValues(time);
+                    mSigma = 0;
+                    mState = PRE_INIT2;
+                    clearReceivedValues();
+                } else {
+                    clearReceivedValues();
+                    mSigma = timeStep(time);
+                    mState = PRE;
+                }
+                if (mReceive == mSyncs) {
+                    mReceive = 0;
+                }
             }
         } else {
-            if ((mState == RUN or mState == PRE)
-                and (not end) and (not begin) and reset) {
-                mLastTime = time;
-                mState = POST2;
-                mSigma2 = mSigma - e;
+            if (mState == PRE and end and (mReceive == mSyncs or reset)) {
+                mState = RUN;
                 mSigma = 0;
+                if (mReceive == mSyncs and mWaiting <= 0) {
+                    mReceive = 0;
+                }
             } else {
-                if (mState == POST) {
-                    mState = POST3;
+                if ((mState == RUN or mState == PRE)
+                    and (not end) and (not begin) and reset) {
+                    mLastTime = time;
+                    mState = POST2;
+                    mSigma2 = mSigma - e;
                     mSigma = 0;
                 } else {
-                    mLastTime = time;
-                    mSigma -= e;
-                    if (mSigma < 0.0) {
-                        mSigma = 0.0;
+                    if (mState == POST) {
+                        mState = POST3;
+                        mSigma = 0;
+                    } else {
+                        mLastTime = time;
+                        mSigma -= e;
+                        if (mSigma < 0.0) {
+                            mSigma = 0.0;
+                        }
                     }
                 }
             }

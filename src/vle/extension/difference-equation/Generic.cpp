@@ -91,6 +91,7 @@ void Generic::externalTransition(const ExternalEventList& events,
             if (mAllSynchro) {
                 mSynchros.insert(name);
                 ++mWaiting;
+                mState = PRE;
             }
             mDepends.insert(name);
             if (mState != INIT) {
@@ -99,10 +100,9 @@ void Generic::externalTransition(const ExternalEventList& events,
 
             if (mLastComputeTime == time) {
                 mReceive = mReceivedValues.size() - 1;
-                mState = PRE;
                 mLastComputeTime = vle::devs::Time::infinity;
+                mSigma = 0;
             }
-
        } else if ((*it)->onPort("remove")) {
             std::string name = (*it)->getStringAttributeValue("name");
 
