@@ -82,7 +82,7 @@ bool Simple::create(graph::AtomicModel& atom,
                     vpz::AtomicModel& model,
                     vpz::Dynamic& dynamic,
                     vpz::Conditions& conditions,
-                    vpz::Observables& /*observables*/,
+                    vpz::Observables& observables,
                     const std::string& classname,
                     const std::string& namespace_)
 {
@@ -106,7 +106,8 @@ bool Simple::create(graph::AtomicModel& atom,
     mUserFunctions = "";
 
     if (m_dialog->run() == Gtk::RESPONSE_ACCEPT) {
-        generate(atom, model, dynamic, conditions, classname, namespace_);
+        generate(atom, model, dynamic, conditions, observables, classname,
+                 namespace_);
         m_dialog->hide_all();
         return true;
     }
@@ -152,6 +153,29 @@ void Simple::generateCondition(graph::AtomicModel& atom,
     if (std::find(cond.begin(), cond.end(), conditionName) == cond.end()) {
         cond.push_back(conditionName);
         model.setConditions(cond);
+    }
+}
+
+void Simple::generateObservables(graph::AtomicModel& atom,
+                                 vpz::AtomicModel& model,
+                                 vpz::Observables& observables)
+{
+    std::string observableName((fmt("obs_DE_%1%") % atom.getName()).str());
+
+    if (observables.exist(observableName)) {
+        vpz::Observable& observable(observables.get(observableName));
+
+        if (not observable.exist(getVariableName())) {
+            observable.add(getVariableName());
+        }
+    } else {
+        vpz::Observable observable(observableName);
+
+        observable.add(getVariableName());
+        observables.add(observable);
+    }
+    if (model.observables().empty()) {
+        model.setObservables(observableName);
     }
 }
 
@@ -247,7 +271,7 @@ bool Simple::modify(graph::AtomicModel& atom,
                     vpz::AtomicModel& model,
                     vpz::Dynamic& dynamic,
                     vpz::Conditions& conditions,
-                    vpz::Observables& /*observables*/,
+                    vpz::Observables& observables,
                     const std::string& conf,
                     const std::string& buffer)
 {
@@ -275,7 +299,8 @@ bool Simple::modify(graph::AtomicModel& atom,
     backup();
 
     if (m_dialog->run() == Gtk::RESPONSE_ACCEPT) {
-        generate(atom, model, dynamic, conditions, classname, namespace_);
+        generate(atom, model, dynamic, conditions, observables, classname,
+                 namespace_);
         m_dialog->hide_all();
         return true;
     }

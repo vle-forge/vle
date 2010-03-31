@@ -62,12 +62,16 @@ protected:
                   vpz::AtomicModel& model,
                   vpz::Dynamic& dynamic,
                   vpz::Conditions& conditions,
+                  vpz::Observables& observables,
                   const std::string& classname,
                   const std::string& namespace_,
                   bool generic = false);
     virtual void generateCondition(graph::AtomicModel& atom,
                                    vpz::AtomicModel& model,
                                    vpz::Conditions& conditions) =0;
+    virtual void generateObservables(graph::AtomicModel& atom,
+                                     vpz::AtomicModel& model,
+                                     vpz::Observables& observables) =0;
     virtual void generateOutputPorts(graph::AtomicModel& atom) =0;
     virtual void generateVariables(utils::Template& tpl_) =0;
     virtual std::string getTemplate() const =0;

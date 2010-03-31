@@ -81,7 +81,7 @@ bool Multiple::create(graph::AtomicModel& atom,
                     vpz::AtomicModel& model,
                     vpz::Dynamic& dynamic,
                     vpz::Conditions& conditions,
-                    vpz::Observables& /*observables*/,
+                    vpz::Observables& observables,
                     const std::string& classname,
                     const std::string& namespace_)
 {
@@ -104,7 +104,8 @@ bool Multiple::create(graph::AtomicModel& atom,
         "{ }\n";
     mUserFunctions = "";
     if (m_dialog->run() == Gtk::RESPONSE_ACCEPT) {
-        generate(atom, model, dynamic, conditions, classname, namespace_);
+        generate(atom, model, dynamic, conditions, observables, classname,
+                 namespace_);
         m_dialog->hide_all();
         return true;
     }
@@ -149,6 +150,37 @@ void Multiple::generateCondition(graph::AtomicModel& atom,
     if (std::find(cond.begin(), cond.end(), conditionName) == cond.end()) {
         cond.push_back(conditionName);
         model.setConditions(cond);
+    }
+}
+
+void Multiple::generateObservables(graph::AtomicModel& atom,
+                                   vpz::AtomicModel& model,
+                                   vpz::Observables& observables)
+{
+    std::string observableName((fmt("obs_DE_%1%") % atom.getName()).str());
+
+    if (observables.exist(observableName)) {
+        vpz::Observable& observable(observables.get(observableName));
+        Variables::Variables_t variables = getVariables();
+
+        for (Variables::Variables_t::const_iterator it = variables.begin();
+             it != variables.end(); ++it) {
+            if (not observable.exist(*it)) {
+                observable.add(*it);
+            }
+        }
+    } else {
+        vpz::Observable observable(observableName);
+        Variables::Variables_t variables = getVariables();
+
+        for (Variables::Variables_t::const_iterator it = variables.begin();
+             it != variables.end(); ++it) {
+            observable.add(*it);
+        }
+        observables.add(observable);
+    }
+    if (model.observables().empty()) {
+        model.setObservables(observableName);
     }
 }
 
@@ -260,7 +292,7 @@ bool Multiple::modify(graph::AtomicModel& atom,
                       vpz::AtomicModel& model,
                       vpz::Dynamic& dynamic,
                       vpz::Conditions& conditions,
-                      vpz::Observables& /*observables*/,
+                      vpz::Observables& observables,
                       const std::string& conf,
                       const std::string& buffer)
 {
@@ -290,7 +322,8 @@ bool Multiple::modify(graph::AtomicModel& atom,
     backup();
 
     if (m_dialog->run() == Gtk::RESPONSE_ACCEPT) {
-        generate(atom, model, dynamic, conditions, classname, namespace_);
+        generate(atom, model, dynamic, conditions, observables, classname,
+                 namespace_);
         m_dialog->hide_all();
         return true;
     }
