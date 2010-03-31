@@ -55,6 +55,7 @@ void Plugin::generate(graph::AtomicModel& atom,
                       vpz::AtomicModel& model,
                       vpz::Dynamic& dynamic,
                       vpz::Conditions& conditions,
+                      vpz::Observables& observables,
                       const std::string& classname,
                       const std::string& namespace_,
                       bool generic)
@@ -63,6 +64,7 @@ void Plugin::generate(graph::AtomicModel& atom,
     generateCondition(atom, model, conditions);
     generateDynamic(dynamic, classname);
     generateSource(classname, namespace_, generic);
+    generateObservables(atom, model, observables);
 }
 
 void Plugin::generateDynamic(vpz::Dynamic& dynamic,

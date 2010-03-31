@@ -76,6 +76,9 @@ private:
     virtual void generateCondition(graph::AtomicModel& atom,
                                    vpz::AtomicModel& model,
                                    vpz::Conditions& conditions);
+    virtual void generateObservables(graph::AtomicModel& atom,
+                                     vpz::AtomicModel& model,
+                                     vpz::Observables& observables);
     virtual void generateOutputPorts(graph::AtomicModel& atom);
     virtual void generateVariables(utils::Template& tpl_);
     std::string getTemplate() const;
