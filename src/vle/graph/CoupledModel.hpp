@@ -44,7 +44,7 @@ namespace vle { namespace graph {
     {
     public:
         typedef std::vector < std::string > StringList;
-	typedef std::map <std::string, ConnectionList> ModelConnections;
+        typedef std::map <std::string, ConnectionList> ModelConnections;
 
         /**
          * @brief Constructor to intialize parent, position (0,0), size (0,0)
@@ -65,7 +65,7 @@ namespace vle { namespace graph {
         /**
          * @brief Delete his children.
          */
-	virtual ~CoupledModel();
+        virtual ~CoupledModel();
 
         /**
          * @brief Return true, CoupledModel is a coupled model.
@@ -145,8 +145,8 @@ namespace vle { namespace graph {
         void delAllModel();
 
         /**
-         * @brief Attach an existing model into this coupled model. Parent will be
-         * informed and detached of this model.
+         * @brief Attach an existing model into this coupled model. Parent will
+         * be informed and detached of this model.
          * @param model a model to attach.
          */
         void attachModel(Model* model);
@@ -190,13 +190,13 @@ namespace vle { namespace graph {
         Model* getModel(const std::string& name) const;
 
 
-	void addInputConnection(const std::string& portSrc,
+        void addInputConnection(const std::string& portSrc,
                                 Model* dst, const std::string& portDst);
 
-	void addOutputConnection(Model* src, const std::string& portSrc,
+        void addOutputConnection(Model* src, const std::string& portSrc,
                                  const std::string& portDst);
 
-	void addInternalConnection(Model* src, const std::string& portSrc,
+        void addInternalConnection(Model* src, const std::string& portSrc,
                                    Model* dst, const std::string& portDst);
 
         void addInputConnection(const std::string& portSrc,
@@ -212,18 +212,18 @@ namespace vle { namespace graph {
                                    const std::string& dst,
                                    const std::string& portDst);
 
-	void delInputConnection(const std::string& portSrc,
-				Model* dst, const std::string& portDst);
-	void delOutputConnection(Model* src, const std::string& portSrc,
-				 const std::string& portDst);
-	void delInternalConnection(Model* src, const std::string& portSrc,
+        void delInputConnection(const std::string& portSrc,
+                                Model* dst, const std::string& portDst);
+        void delOutputConnection(Model* src, const std::string& portSrc,
+                                 const std::string& portDst);
+        void delInternalConnection(Model* src, const std::string& portSrc,
                                    Model* dst, const std::string& portDst);
-	void delInputConnection(const std::string& portSrc,
+        void delInputConnection(const std::string& portSrc,
                                 const std::string& dst,
                                 const std::string& portDst);
         void delOutputConnection(const std::string& src,
                                  const std::string& portSrc,
-				 const std::string& portDst);
+                                 const std::string& portDst);
         void delInternalConnection(const std::string& src,
                                    const std::string& portSrc,
                                    const std::string& Model,
@@ -248,24 +248,24 @@ namespace vle { namespace graph {
         bool existInternalOutputPort(const std::string& name) const
         { return m_internalOutputList.find(name) != m_internalOutputList.end(); }
 
-	int nbInputConnection(const std::string& portsrc,
-			      const std::string& dst,
-			      const std::string& portdst);
+        int nbInputConnection(const std::string& portsrc,
+                              const std::string& dst,
+                              const std::string& portdst);
 
-	int nbOutputConnection(const std::string& src,
-			       const std::string& portsrc,
-			       const std::string& portdst);
+        int nbOutputConnection(const std::string& src,
+                               const std::string& portsrc,
+                               const std::string& portdst);
 
-	int nbInternalConnection(const std::string& src,
-				 const std::string& portsrc,
-				 const std::string& dst,
-				 const std::string& portdst);
+        int nbInternalConnection(const std::string& src,
+                                 const std::string& portsrc,
+                                 const std::string& dst,
+                                 const std::string& portdst);
         /**
          * @brief Delete all connection around model m.
          *
          * @param m model to delete connection.
          */
-	void delAllConnection(Model* m);
+        void delAllConnection(Model* m);
 
         /**
          * @brief delete all connection (input, output and internal) into
@@ -338,47 +338,89 @@ namespace vle { namespace graph {
 
         void displace(ModelList& models, CoupledModel* destination);
 
-	/**
-	 * @brief save all the input connections in relation with
-	 * selected models
-	 * @param models the selected models
-	 * @return a list of the connections
-	 *
-	 */
-	ModelConnections saveInputConnections(
-	    ModelList& models);
+        /**
+         * @brief save all the input connections in relation with
+         * selected models
+         * @param models the selected models
+         * @return a list of the connections
+         *
+         */
+        ModelConnections saveInputConnections(
+            ModelList& models);
 
-	/**
-	 * @brief save all the output connections in relation with
-	 * selected models
-	 * @param models the selected models
-	 * @return a list of the connections
-	 *
-	 */
-	ModelConnections  saveOutputConnections(
-	    ModelList& models);
+        /**
+         * @brief save all the output connections in relation with
+         * selected models
+         * @param models the selected models
+         * @return a list of the connections
+         *
+         */
+        ModelConnections  saveOutputConnections(
+            ModelList& models);
 
-	/**
-	 * @brief restore the input connections in relation with the
-	 * selected models, with a new Coupled model
-	 * @param models the selected models
-	 * @param destination the new coupled model
-	 * @param conenction the old connections
-	 *
-	 */
-	void restoreInputConnections(ModelList& models,
-				     CoupledModel* destination,
-				     ModelConnections connection);
-	/**
-	 * @brief restore the output connections in relation with the
-	 * selected models, with a new Coupled model
-	 * @param models the selected models
-	 * @param destination the new coupled model
-	 * @param conenction the old connections
-	 *
-	 */
-	void restoreOutputConnections(CoupledModel* destination,
-				      ModelConnections connections);
+        /**
+         * @brief restore the input connections in relation with the
+         * selected models, with a new Coupled model
+         * @param models the selected models
+         * @param destination the new coupled model
+         * @param conenction the old connections
+         *
+         */
+        void restoreInputConnections(ModelList& models,
+                                     CoupledModel* destination,
+                                     ModelConnections connection);
+        /**
+         * @brief restore the output connections in relation with the
+         * selected models, with a new Coupled model
+         * @param models the selected models
+         * @param destination the new coupled model
+         * @param conenction the old connections
+         *
+         */
+        void restoreOutputConnections(CoupledModel* destination,
+                                      ModelConnections connections);
+
+        /**
+         * @brief init the connections models
+         */
+        void initConnections();
+
+        /**
+         * @brief init the internal input connections
+         */
+        void initInternalInputConnections();
+
+        /**
+         * @brief init the internal output connections
+         */
+        void initInternalOutputConnections();
+
+        /**
+         * @brief calculate the distance between two models
+         * @param src the first model
+         * @param dst the second model
+         */
+        float distanceModels(Model* src, Model* dst);
+
+        /**
+         * @brief calculate the repulsion force for all models
+         */
+        void repulsionForce();
+
+        /**
+         * @brief calculate the atttraction force of all models
+         */
+        void attractionForce();
+
+        /**
+         * @brief set the new position
+         */
+        bool newPosition();
+
+        /**
+         * @brief order the models
+         */
+        void order();
 
         /**
          * @brief return true if the model list has no connection with another
@@ -412,6 +454,19 @@ namespace vle { namespace graph {
          * @return A reference to the founded model otherwise null.
          */
         Model* find(int x, int y) const;
+
+        /**
+         * @brief Return a reference to the children graph::Model under the
+         * specified position.
+         *
+         * @param x the position of graph::Model.
+         * @param y the position of graph::Model.
+         * @param width the width of the simple graph::Model
+         * @param height the height of the simple graph::Model
+         *
+         * @return A reference to the founded model otherwise null.
+         */
+        Model* find(int x, int y, int width, int height) const;
 
         /**
          * @brief Build a new string for model name. This function assert that
@@ -526,7 +581,7 @@ namespace vle { namespace graph {
                 value.second->width() and value.second->y() <= y and y <=
                     value.second->y() + value.second->height(); };
 
-            int x, y;
+                int x, y;
         };
 
         /**
@@ -566,6 +621,10 @@ namespace vle { namespace graph {
         ModelList       m_modelList;
         ConnectionList  m_internalInputList;
         ConnectionList  m_internalOutputList;
+
+        /* Connections */
+        std::vector<Model*> m_srcConnections;
+        std::vector<Model*> m_dstConnections;
     };
 
 }} // namespace vle graph

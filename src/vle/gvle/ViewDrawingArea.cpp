@@ -82,24 +82,6 @@ ViewDrawingArea::ViewDrawingArea(View* view) :
     mModeling = view->getModeling();
 }
 
-void ViewDrawingArea::draw()
-{
-    if (mIsRealized and mBuffer) {
-	maxModelWidthHeight();
-        calcRectSize();
-	mContext->save();
-	mContext->scale(mZoom, mZoom);
-	drawCurrentCoupledModel();
-        drawCurrentModelPorts();
-        drawConnection();
-        drawChildrenModels();
-        drawLink();
-        drawZoomFrame();
-        drawHighlightConnection();
-	set_size_request(mRectWidth * mZoom, mRectHeight * mZoom);
-	mContext->restore();
-    }
-}
 
 void ViewDrawingArea::drawCurrentCoupledModel()
 {
@@ -233,109 +215,6 @@ void ViewDrawingArea::drawCurrentModelPorts()
     }
 }
 
-void ViewDrawingArea::preComputeConnection(int xs, int ys,
-                                           int xd, int yd,
-                                           int ytms, int ybms)
-{
-    Connection con(xs, ys, xd, yd, xs + SPACING_MODEL_PORT, xd -
-                   SPACING_MODEL_PORT, 0, 0, 0);
-    Point inpt(xd, yd);
-
-    if (mDirect.find(inpt) == mDirect.end()) {
-        mDirect[inpt] = false;
-    }
-
-    if (mInPts.find(xd) == mInPts.end()) {
-        mInPts[xd] = std::pair < int, int >(0, 0);
-    }
-
-    if (ys > yd) {
-        int p = ++(mInPts[xd].first);
-
-        if (p == 1) {
-            if (mDirect[inpt]) {
-                p = ++(mInPts[xd].first);
-            } else {
-                mDirect[inpt] = true;
-            }
-        }
-        con.y3 = yd;
-        if (p > 1) {
-            con.x2 -= (p - 1) * SPACING_LINE;
-            con.y3 += (p - 1) * SPACING_LINE;
-        }
-        con.top = false;
-    } else {
-        int p = ++(mInPts[xd].second);
-
-        if (p == 1) {
-            if (mDirect[inpt]) {
-                p = ++(mInPts[xd].second);
-            } else {
-                mDirect[inpt] = true;
-            }
-        }
-        con.y3 = yd;
-        if (p > 1) {
-            con.x2 -= (p - 1) * SPACING_LINE;
-            con.y3 -= (p - 1) * SPACING_LINE;
-        }
-        con.top = true;
-    }
-
-    Point outpt(xs, ys);
-
-    if (mOutPts.find(xs) == mOutPts.end()) {
-        mOutPts[xs] = std::pair < int, int >(0, 0);
-    }
-    if (ys > yd) {
-        int p = ++(mOutPts[xs].first);
-
-        con.y4 = ys;
-        con.x1 += (p - 1) * SPACING_LINE;
-        con.y4 -= (p - 1) * SPACING_LINE;
-        if (con.x2 <= con.x1) {
-            con.y1 = ytms - SPACING_MODEL - (p - 1) * SPACING_LINE;
-        }
-    } else {
-        int p = ++(mOutPts[xs].second);
-
-        con.y4 = ys;
-        con.x1 += (p - 1) * SPACING_LINE;
-        con.y4 += (p - 1) * SPACING_LINE;
-        if (con.x2 <= con.x1) {
-            con.y1 = ybms + SPACING_MODEL + (p - 1) * SPACING_LINE;
-        }
-    }
-
-    mConnections.push_back(con);
-}
-
-void ViewDrawingArea::preComputeConnection(graph::Model* src,
-                                           const std::string& portsrc,
-                                           graph::Model* dst,
-                                           const std::string& portdst)
-{
-    int xs, ys, xd, yd;
-    int ytms = src->y();
-    int ybms = src->y() + src->height();
-
-    if (src == mCurrent) {
-        getCurrentModelInPosition(portsrc, xs, ys);
-        getModelInPosition(dst, portdst, xd, yd);
-        preComputeConnection(xs, ys, xd, yd, ys - SPACING_MODEL,
-                             ys + SPACING_MODEL);
-    } else if (dst == mCurrent) {
-        getModelOutPosition(src, portsrc, xs, ys);
-        getCurrentModelOutPosition(portdst, xd, yd);
-        preComputeConnection(xs, ys, xd, yd, ytms, ybms);
-    } else {
-        getModelOutPosition(src, portsrc, xs, ys);
-        getModelInPosition(dst, portdst, xd, yd);
-        preComputeConnection(xs, ys, xd, yd, ytms, ybms);
-    }
-}
-
 void ViewDrawingArea::preComputeConnection()
 {
     using namespace graph;
@@ -390,65 +269,27 @@ void ViewDrawingArea::preComputeConnection()
     }
 }
 
-ViewDrawingArea::StraightLine ViewDrawingArea::computeConnection(
-    int xs, int ys,
-    int xd, int yd,
-    int index)
+void ViewDrawingArea::drawLines()
 {
-    StraightLine list;
-    Connection con = mConnections[index];
-    Point inpt(xd, yd);
-    Point outpt(xs, ys);
+    std::vector < StraightLine >::const_iterator itl = mLines.begin();
+    int i =0;
 
-    list.push_back(Point((int)(xs),
-			 (int)(ys)));
-    list.push_back(Point((int)((xs + SPACING_MODEL_PORT)),
-			 (int)(ys)));
-    if (con.x2 >= con.x1) {
-	list.push_back(Point((int)(con.x1),
-			     (int)(con.y4)));
-
-	if (con.x2 > con.x1) {
-	    list.push_back(Point((int)(con.x1),
-				 (int)(con.y3)));
+    while (itl != mLines.end()) {
+        if (i != mHighlightLine) {
+	    mContext->set_line_join(Cairo::LINE_JOIN_ROUND);
+	    setColor(Settings::settings().getConnectionColor());
+        }
+	mContext->move_to(itl->begin()->first + mOffset,
+                          itl->begin()->second + mOffset);
+	std::vector <Point>::const_iterator iter = itl->begin();
+	while (iter != itl->end()) {
+	    mContext->line_to(iter->first + mOffset, iter->second + mOffset);
+	    ++iter;
 	}
-    } else {
-	list.push_back(Point((int)(con.x1),
-			     (int)(con.y4)));
-	list.push_back(Point((int)(con.x1),
-			     (int)(con.y1)));
-	list.push_back(Point((int)(con.x2),
-			     (int)(con.y1)));
-    }
-    list.push_back(Point((int)(con.x2),
-			 (int)(con.y3)));
-    list.push_back(Point((int)(xd - SPACING_MODEL_PORT),
-			 (int)(yd)));
-    list.push_back(Point((int)(xd),
-			 (int)(yd)));
-    return list;
-}
 
-void ViewDrawingArea::computeConnection(graph::Model* src,
-                                        const std::string& portsrc,
-                                        graph::Model* dst,
-                                        const std::string& portdst,
-                                        int index)
-{
-    int xs, ys, xd, yd;
-
-    if (src == mCurrent) {
-        getCurrentModelInPosition(portsrc, xs, ys);
-        getModelInPosition(dst, portdst, xd, yd);
-        mLines.push_back(computeConnection(xs, ys, xd, yd, index));
-    } else if (dst == mCurrent) {
-        getModelOutPosition(src, portsrc, xs, ys);
-        getCurrentModelOutPosition(portdst, xd, yd);
-        mLines.push_back(computeConnection(xs, ys, xd, yd, index));
-    } else {
-        getModelOutPosition(src, portsrc, xs, ys);
-        getModelInPosition(dst, portdst, xd, yd);
-        mLines.push_back(computeConnection(xs, ys, xd, yd, index));
+	mContext->stroke();
+        ++i;
+        ++itl;
     }
 }
 
@@ -496,37 +337,6 @@ void ViewDrawingArea::computeConnection()
                 }
             }
         }
-    }
-}
-
-void ViewDrawingArea::drawConnection()
-{
-    preComputeConnection();
-    computeConnection();
-    drawLines();
-}
-
-void ViewDrawingArea::drawLines()
-{
-    std::vector < StraightLine >::const_iterator itl = mLines.begin();
-    int i =0;
-
-    while (itl != mLines.end()) {
-        if (i != mHighlightLine) {
-	    mContext->set_line_join(Cairo::LINE_JOIN_ROUND);
-	    setColor(Settings::settings().getConnectionColor());
-        }
-	mContext->move_to(itl->begin()->first + mOffset,
-                          itl->begin()->second + mOffset);
-	std::vector <Point>::const_iterator iter = itl->begin();
-	while (iter != itl->end()) {
-	    mContext->line_to(iter->first + mOffset, iter->second + mOffset);
-	    ++iter;
-	}
-
-	mContext->stroke();
-        ++i;
-        ++itl;
     }
 }
 
@@ -619,116 +429,8 @@ void ViewDrawingArea::drawChildrenModels()
     }
 }
 
-void ViewDrawingArea::drawChildrenModel(graph::Model* model,
-                                        const Gdk::Color& color)
-{
-    setColor(color);
-    mContext->rectangle(model->x() + mOffset,
-			(model->y()) + mOffset,
-			(model->width()),
-			(model->height()));
-    mContext->stroke();
 
-    drawChildrenPorts(model, color);
-}
 
-void ViewDrawingArea::drawChildrenPorts(graph::Model* model,
-                                        const Gdk::Color& color)
-{
-    const graph::ConnectionList ipl =  model->getInputPortList();
-    const graph::ConnectionList opl =  model->getOutputPortList();
-    graph::ConnectionList::const_iterator itl;
-
-    const size_t maxInput = model->getInputPortList().size();
-    const size_t maxOutput = model->getOutputPortList().size();
-    const size_t stepInput = model->height() / (maxInput + 1);
-    const size_t stepOutput = model->height() / (maxOutput + 1);
-    const int    mX = model->x();
-    const int    mY = model->y();
-
-    mContext->select_font_face(Settings::settings().getFont(),
-			       Cairo::FONT_SLANT_OBLIQUE,
-			       Cairo::FONT_WEIGHT_NORMAL);
-    mContext->set_font_size(Settings::settings().getFontSize());
-
-    itl = ipl.begin();
-
-    for (size_t i = 0; i < maxInput; ++i) {
-
-        // to draw the port
-	setColor(color);
-	mContext->move_to(mX,
-			  (mY + stepInput * (i + 1) -
-			   MODEL_SPACING_PORT));
-	mContext->line_to((mX),
-			  (mY + stepInput * (i + 1) +
-			   MODEL_SPACING_PORT));
-	mContext->line_to((mX + MODEL_SPACING_PORT),
-			  (mY + stepInput * (i + 1)));
-	mContext->line_to(mX,
-			  (mY + stepInput * (i + 1) -
-					 MODEL_SPACING_PORT));
-	mContext->fill();
-	mContext->stroke();
-
-	// to draw the label of the port
-	if (mZoom >= 1.0) {
-	    mContext->move_to((mX + PORT_SPACING_LABEL),
-			      (mY + stepInput * (i + 1) + 10));
-	    mContext->show_text(itl->first);
-	    mContext->stroke();
-	}
-	itl++;
-    }
-
-    itl = opl.begin();
-
-    for (size_t i = 0; i < maxOutput; ++i) {
-
-        // to draw the port
-	setColor(color);
-	mContext->move_to((mX + model->width()),
-			  (mY + stepOutput * (i + 1) -
-			   MODEL_SPACING_PORT));
-	mContext->line_to((mX + model->width()),
-			  (mY + stepOutput * (i + 1) +
-			   MODEL_SPACING_PORT));
-	mContext->line_to((mX + MODEL_SPACING_PORT +
-			   model->width()),
-			  (mY + stepOutput * (i + 1)));
-	mContext->line_to((mX + model->width()),
-			  (mY + stepOutput * (i + 1) -
-			    MODEL_SPACING_PORT));
-	mContext->fill();
-	mContext->stroke();
-
-	// to draw the label of the port
-	if (mZoom >= 1.0) {
-	    setColor(color);
-	    mContext->move_to((mX + model->width() +
-			     PORT_SPACING_LABEL),
-			    (mY + stepOutput * (i + 1) + 10));
-	    mContext->show_text(itl->first);
-	    mContext->stroke();
-	}
-	itl++;
-    }
-
-    mContext->select_font_face(Settings::settings().getFont(),
-			       Cairo::FONT_SLANT_NORMAL,
-			       Cairo::FONT_WEIGHT_NORMAL);
-    mContext->set_font_size(Settings::settings().getFontSize());
-
-    if (mZoom >= 1.0) {
-        Cairo::TextExtents textExtents;
-        mContext->get_text_extents(model->getName(), textExtents);
-        mContext->move_to((model->x() + (model->width() / 2) -
-                           (textExtents.width / 2)),
-			  (model->y() + model->height() +
-			   MODEL_SPACING_PORT) + 10);
-        mContext->show_text(model->getName());
-    }
-}
 
 void ViewDrawingArea::drawLink()
 {
@@ -836,127 +538,7 @@ void ViewDrawingArea::highlightLine(int mx, int my)
     }
 }
 
-bool ViewDrawingArea::on_button_press_event(GdkEventButton* event)
-{
-    GVLE::ButtonType currentbutton = mView->getCurrentButton();
-    mMouse.set_x((int)(event->x / mZoom));
-    mMouse.set_y((int)(event->y / mZoom));
-    bool shiftOrControl = (event->state & GDK_SHIFT_MASK) or(event->state &
-                                                             GDK_CONTROL_MASK);
-    graph::Model* model = mCurrent->find(mMouse.get_x(), mMouse.get_y());
 
-    switch (currentbutton) {
-    case GVLE::POINTER:
-        if (event->type == GDK_BUTTON_PRESS and event->button == 1) {
-            on_gvlepointer_button_1(model, shiftOrControl);
-            queueRedraw();
-        } else if (event->type == GDK_2BUTTON_PRESS and event->button == 1) {
-	    mView->showModel(model);
-        } else if (event->button == 2) {
-	    mView->showModel(model);
-        }
-        if (not model) {
-            queueRedraw();
-        }
-        break;
-    case GVLE::ADDMODEL:
-        mView->addAtomicModel(mMouse.get_x(), mMouse.get_y());
-        queueRedraw();
-        break;
-    case GVLE::ADDLINK:
-        if (event->button == 1) {
-            addLinkOnButtonPress(mMouse.get_x(), mMouse.get_y());
-            mPrecMouse = mMouse;
-            queueRedraw();
-        }
-        break;
-    case GVLE::DELETE:
-        delUnderMouse(mMouse.get_x(), mMouse.get_y());
-        queueRedraw();
-        break;
-    case GVLE::QUESTION:
-        mModeling->showDynamics((model) ? model->getName() :
-                                mCurrent->getName());
-        break;
-    case GVLE::ZOOM:
-        if (event->button == 1) {
-            mPrecMouse = mMouse;
-            queueRedraw();
-        }
-        queueRedraw();
-        break;
-    case GVLE::PLUGINMODEL:
-        mView->addPluginModel(mMouse.get_x(), mMouse.get_y());
-        queueRedraw();
-        break;
-    case GVLE::ADDCOUPLED:
-        if (event->button == 1) {
-            mView->addModelInListModel(model, shiftOrControl);
-        } else if (event->button == 2) {
-            mView->addCoupledModel(mMouse.get_x(), mMouse.get_y());
-        }
-        queueRedraw();
-        break;
-    default:
-        break;
-    }
-    return true;
-}
-
-bool ViewDrawingArea::on_button_release_event(GdkEventButton* event)
-{
-    mMouse.set_x((int)(event->x / mZoom));
-    mMouse.set_y((int)(event->y / mZoom));
-
-    switch (mView->getCurrentButton()) {
-    case GVLE::POINTER:
-	if (event->button == 1) {
-	    for(int x = std::min(mMouse.get_x(), mPrecMouse.get_x());
-		x <= std::max(mMouse.get_x(), mPrecMouse.get_x());
-		++x) {
-		for (int y = std::min(mMouse.get_y(), mPrecMouse.get_y());
-		     y <= std::max(mMouse.get_y(), mPrecMouse.get_y());
-		     ++y) {
-		    graph::Model* model = mCurrent->find(x, y);
-		    if (model)
-			if (not mView->existInSelectedModels(model))
-			    mView->addModelToSelectedModels(model);
-		}
-	    }
-	    queueRedraw();
-	}
-	mPrecMouse.set_x(-1);
-	mPrecMouse.set_y(-1);
-	break;
-    case GVLE::ADDLINK:
-        addLinkOnButtonRelease(mMouse.get_x(), mMouse.get_y());
-        queueRedraw();
-        break;
-    case GVLE::ZOOM:
-        if (event->button == 1) {
-            // to not zoom in case of very small selection.
-            if (std::max(mMouse.get_x(), mPrecMouse.get_x()) -
-                std::min(mMouse.get_x(), mPrecMouse.get_x()) > 5 &&
-                std::max(mMouse.get_y(), mPrecMouse.get_y()) -
-                std::min(mMouse.get_y(), mPrecMouse.get_y()) > 5) {
-                selectZoom(std::min(mMouse.get_x(), mPrecMouse.get_x()),
-                           std::min(mMouse.get_y(), mPrecMouse.get_y()),
-                           std::max(mMouse.get_x(), mPrecMouse.get_x()),
-                           std::max(mMouse.get_y(), mPrecMouse.get_y()));
-                queueRedraw();
-            }
-            mPrecMouse.set_x(-1);
-            mPrecMouse.set_y(-1);
-
-        } else
-            onZoom(event->button);
-        break;
-    default:
-        break;
-    }
-
-    return true;
-}
 
 bool ViewDrawingArea::on_configure_event(GdkEventConfigure* event)
 {
@@ -1110,43 +692,6 @@ void ViewDrawingArea::delUnderMouse(int x, int y)
     }
 
     queueRedraw();
-}
-
-void ViewDrawingArea::getCurrentModelInPosition(const std::string& port, int& x,
-                                                int& y)
-{
-    x = 2 * MODEL_PORT;
-
-    y = ((int)mRectHeight / (mCurrent->getInputPortList().size() + 1)) *
-    (mCurrent->getInputPortIndex(port) + 1);
-
-}
-
-void ViewDrawingArea::getCurrentModelOutPosition(const std::string& port, int&
-                                                 x, int& y)
-{
-    x = (int)mRectWidth - MODEL_PORT;
-
-    y = ((int)mRectHeight / (mCurrent->getOutputPortNumber() + 1)) *
-    (mCurrent->getOutputPortIndex(port) + 1);
-}
-
-void ViewDrawingArea::getModelInPosition(graph::Model* model,
-                                         const std::string& port,
-                                         int& x, int& y)
-{
-    x = model->x();
-    y = model->y() + (model->height() / (model->getInputPortNumber() + 1)) *
-        (model->getInputPortIndex(port) + 1);
-}
-
-void ViewDrawingArea::getModelOutPosition(graph::Model* model,
-                                          const std::string& port,
-                                          int& x, int& y)
-{
-    x = model->x() + model->width();
-    y = model->y() + (model->height() / (model->getOutputPortNumber() + 1)) *
-        (model->getOutputPortIndex(port) + 1);
 }
 
 void ViewDrawingArea::calcRectSize()
@@ -1463,46 +1008,11 @@ void ViewDrawingArea::setUndefinedModels()
     }
 }
 
-void ViewDrawingArea::onRandomOrder()
+void ViewDrawingArea::drawConnection()
 {
-    mGrid.clear();
-
-    std::string key;
-    int x, y;
-    int compteur = 0;
-
-    setUndefinedModels();
-
-    mCasesWidth = (mRectWidth - (MODEL_PORT + mOffset)) / (mMaxWidth + 15);
-    mCasesHeight = (mRectHeight - (MODEL_PORT + mOffset)) / (mMaxHeight + 15);
-
-    graph::ModelList::const_iterator it = mCurrent->getModelList().begin();
-
-    while (it != mCurrent->getModelList().end()) {
-	do {
-	    ++compteur;
-	    x = mModeling->getRand()->getInt(0, mCasesWidth - 1);
-	    y = mModeling->getRand()->getInt(0, mCasesHeight - 1);
-	    key = boost::lexical_cast < std::string > (x) + ":" +
-		boost::lexical_cast < std::string > (y);
-	    if (compteur == 100) {
-		mRectWidth += mMaxWidth + 15;
-		mRectHeight += mMaxHeight + 15;
-		mCasesWidth = (mRectWidth - (MODEL_PORT + mOffset)) /
-		    (mMaxWidth + 15);
-		mCasesHeight = (mRectHeight - (MODEL_PORT + mOffset)) /
-		    (mMaxHeight + 15);
-		compteur = 0;
-	    }
-	} while (std::find(mGrid.begin(), mGrid.end(), key) != mGrid.end());
-
-	compteur = 0;
-	mGrid.push_back(key);
-	it->second->setX((x * (mMaxWidth + 15)) + MODEL_PORT + mOffset + 15);
-	it->second->setY((y * (mMaxHeight + 15)) + MODEL_PORT + mOffset + 15);
-	++it;
-    }
-    queueRedraw();
+    preComputeConnection();
+    computeConnection();
+    drawLines();
 }
 
 void ViewDrawingArea::maxModelWidthHeight()

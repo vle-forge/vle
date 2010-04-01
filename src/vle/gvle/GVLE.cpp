@@ -916,6 +916,32 @@ void GVLE::onRefresh()
     mFileTreeView->refresh();
 }
 
+void GVLE::onShowCompleteView()
+{
+    DocumentDrawingArea* tab = dynamic_cast<DocumentDrawingArea*>(
+	mEditor->get_nth_page(mCurrentTab));
+    graph::CoupledModel* currentModel;
+    if (tab-> isComplete()) {
+	currentModel = tab->getCompleteDrawingArea()->getModel();
+    } else {
+	currentModel = tab->getSimpleDrawingArea()->getModel();
+    }
+    mEditor->showCompleteView(mModeling->getFileName(),currentModel);
+}
+
+void GVLE::onShowSimpleView()
+{
+    DocumentDrawingArea* tab = dynamic_cast<DocumentDrawingArea*>(
+	mEditor->get_nth_page(mCurrentTab));
+    graph::CoupledModel* currentModel;
+    if (tab-> isComplete()) {
+	currentModel = tab->getCompleteDrawingArea()->getModel();
+    } else {
+	currentModel = tab->getSimpleDrawingArea()->getModel();
+    }
+    mEditor->showSimpleView(mModeling->getFileName(), currentModel);
+}
+
 void GVLE::onSave()
 {
     int page = mEditor->get_current_page();
@@ -1594,15 +1620,23 @@ void GVLE::exportCurrentModel()
 
 void GVLE::exportGraphic()
 {
-    ViewDrawingArea* tab = dynamic_cast<DocumentDrawingArea*>(
-	mEditor->get_nth_page(mCurrentTab))->getDrawingArea();
+    ViewDrawingArea* tab;
+    if ( dynamic_cast<DocumentDrawingArea*>(
+	     mEditor->get_nth_page(mCurrentTab))->isComplete()) {
+	tab = dynamic_cast<DocumentDrawingArea*>(
+	    mEditor->get_nth_page(mCurrentTab))->getCompleteDrawingArea();
+    } else {
+	tab = dynamic_cast<DocumentDrawingArea*>(
+	    mEditor->get_nth_page(mCurrentTab))->getSimpleDrawingArea();
+    }
+
 
     const vpz::Experiment& experiment = ((const Modeling*)mModeling)
 	->vpz().project().experiment();
     if (experiment.name().empty() || experiment.duration() == 0) {
 	Error(_("Fix a Value to the name and the duration "	\
 		"of the experiment before exportation."));
-        return;
+	return;
     }
 
     Gtk::FileChooserDialog file(_("Image file"), Gtk::FILE_CHOOSER_ACTION_SAVE);
@@ -1657,22 +1691,43 @@ void GVLE::exportGraphic()
 
 void GVLE::addCoefZoom()
 {
-    ViewDrawingArea* tab = dynamic_cast<DocumentDrawingArea*>(
-	mEditor->get_nth_page(mCurrentTab))->getDrawingArea();
+    ViewDrawingArea* tab;
+    if ( dynamic_cast<DocumentDrawingArea*>(
+	     mEditor->get_nth_page(mCurrentTab))->isComplete()) {
+	tab = dynamic_cast<DocumentDrawingArea*>(
+	    mEditor->get_nth_page(mCurrentTab))->getCompleteDrawingArea();
+    } else {
+	tab = dynamic_cast<DocumentDrawingArea*>(
+	    mEditor->get_nth_page(mCurrentTab))->getSimpleDrawingArea();
+    }
     tab->addCoefZoom();
 }
 
 void GVLE::delCoefZoom()
 {
-    ViewDrawingArea* tab = dynamic_cast<DocumentDrawingArea*>(
-	mEditor->get_nth_page(mCurrentTab))->getDrawingArea();
+    ViewDrawingArea* tab;
+    if ( dynamic_cast<DocumentDrawingArea*>(
+	     mEditor->get_nth_page(mCurrentTab))->isComplete()) {
+	tab = dynamic_cast<DocumentDrawingArea*>(
+	    mEditor->get_nth_page(mCurrentTab))->getCompleteDrawingArea();
+    } else {
+	tab = dynamic_cast<DocumentDrawingArea*>(
+	    mEditor->get_nth_page(mCurrentTab))->getSimpleDrawingArea();
+    }
     tab->delCoefZoom();
 }
 
 void GVLE::setCoefZoom(double coef)
 {
-    ViewDrawingArea* tab = dynamic_cast<DocumentDrawingArea*>(
-	mEditor->get_nth_page(mCurrentTab))->getDrawingArea();
+    ViewDrawingArea* tab;
+    if ( dynamic_cast<DocumentDrawingArea*>(
+	     mEditor->get_nth_page(mCurrentTab))->isComplete()) {
+	tab = dynamic_cast<DocumentDrawingArea*>(
+	    mEditor->get_nth_page(mCurrentTab))->getCompleteDrawingArea();
+    } else {
+	tab = dynamic_cast<DocumentDrawingArea*>(
+	    mEditor->get_nth_page(mCurrentTab))->getSimpleDrawingArea();
+    }
     tab->setCoefZoom(coef);
 }
 
@@ -1684,11 +1739,18 @@ void  GVLE::updateAdjustment(double h, double v)
     tab->setVadjustment(v);
 }
 
-void GVLE::onRandomOrder()
+void GVLE::onOrder()
 {
-    ViewDrawingArea* tab = dynamic_cast<DocumentDrawingArea*>(
-	mEditor->get_nth_page(mCurrentTab))->getDrawingArea();
-    tab->onRandomOrder();
+    ViewDrawingArea* tab;
+    if ( dynamic_cast<DocumentDrawingArea*>(
+	     mEditor->get_nth_page(mCurrentTab))->isComplete()) {
+	tab = dynamic_cast<DocumentDrawingArea*>(
+	    mEditor->get_nth_page(mCurrentTab))->getCompleteDrawingArea();
+    } else {
+	tab = dynamic_cast<DocumentDrawingArea*>(
+	    mEditor->get_nth_page(mCurrentTab))->getSimpleDrawingArea();
+    }
+    tab->onOrder();
     mModeling->setModified(true);
 }
 

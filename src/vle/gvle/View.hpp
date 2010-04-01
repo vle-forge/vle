@@ -33,6 +33,7 @@
 
 #include <vle/gvle/GVLE.hpp>
 #include <vle/gvle/Modeling.hpp>
+#include <vle/gvle/SimpleViewDrawingArea.hpp>
 #include <vle/graph/Model.hpp>
 #include <gtkmm/window.h>
 #include <gtkmm/viewport.h>
@@ -47,7 +48,8 @@ namespace gvle {
 
 class Modeling;
 class ViewMenu;
-class ViewDrawingArea;
+class CompleteViewDrawingArea;
+//class SimpleViewDrawingArea;
 
 /**
  * @brief A Gtk::Window is use to define the view of a GCoupledModel. This
@@ -111,8 +113,12 @@ public:
         return mIndex;
     }
 
-    inline ViewDrawingArea* getArea() {
-	return mDrawing;
+    inline CompleteViewDrawingArea* getCompleteArea() {
+	return mCompleteDrawing;
+    }
+
+    inline SimpleViewDrawingArea* getSimpleArea() {
+	return mSimpleDrawing;
     }
 
     //
@@ -325,7 +331,8 @@ private:
     std::string                 mCurrentClass;
     size_t                      mIndex;
 
-    ViewDrawingArea*            mDrawing;
+    CompleteViewDrawingArea*    mCompleteDrawing;
+    SimpleViewDrawingArea*      mSimpleDrawing;
 
     graph::ModelList            mSelectedModels;
     graph::Model*               mDestinationModel;

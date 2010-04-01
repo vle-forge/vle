@@ -566,12 +566,23 @@ public:
     /**
      * @brief Order the models
      */
-    void onRandomOrder();
+    void onOrder();
 
     /**
      * @brief Refresh the package tree view
      */
     void onRefresh();
+
+    /**
+     * @brief Show the complete view with all details
+     */
+    void onShowCompleteView();
+
+    /**
+     * @brief Show the simple view
+     */
+    void onShowSimpleView();
+
 
     /**
      * @brief Show the PreferencesBox

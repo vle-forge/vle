@@ -85,7 +85,10 @@ namespace vle { namespace gvle {
 
         virtual ~ViewDrawingArea() {}
 
-        void draw();
+        virtual void draw()=0;
+
+	graph::CoupledModel* getModel()
+	    { return mCurrent; }
 
         //
         // MANAGE ZOOM / UNZOOM IN VIEW
@@ -137,12 +140,6 @@ namespace vle { namespace gvle {
         /** Calculate the new size of DrawingArea. */
         void newSize();
 
-        void getCurrentModelInPosition(const std::string& p, int& x, int& y);
-        void getCurrentModelOutPosition(const std::string& p, int& x, int& y);
-        void getModelInPosition(graph::Model* model, const std::string& p,
-                                int& x, int& y);
-        void getModelOutPosition(graph::Model* model, const std::string& p,
-                                 int& x, int& y);
         void calcRectSize();
 
 	/**
@@ -161,7 +158,7 @@ namespace vle { namespace gvle {
 	/**
 	 * Order the models
 	 */
-	void onRandomOrder();
+	virtual void onOrder()=0;
 
         /**
          * @brief Add to the Gdk stack a call to expose event function with the
@@ -170,7 +167,7 @@ namespace vle { namespace gvle {
         void queueRedraw()
         { mNeedRedraw = true; queue_draw(); }
 
-    private:
+    protected:
 
 	typedef std::pair < int, int > Point;
 	typedef std::vector < Point > StraightLine;
@@ -191,19 +188,17 @@ namespace vle { namespace gvle {
 	void drawCurrentCoupledModel();
         void drawCurrentModelPorts();
 
-        void preComputeConnection(int xs, int ys, int xd, int yd,
-                                  int ytms, int ybms);
-        void preComputeConnection(graph::Model* src,
+	virtual void preComputeConnection(graph::Model* src,
                                   const std::string& srcport,
                                   graph::Model* dst,
-                                  const std::string& dstport);
+                                  const std::string& dstport)=0;
         void preComputeConnection();
 
-        StraightLine computeConnection(int xs, int ys, int xd, int yd,
-                                       int index);
-        void computeConnection(graph::Model* src, const std::string& srcport,
+        virtual StraightLine computeConnection(int xs, int ys, int xd, int yd,
+                                       int index)=0;
+        virtual void computeConnection(graph::Model* src, const std::string& srcport,
                                graph::Model* dst, const std::string& dstport,
-                               int index);
+                               int index)=0;
         void computeConnection();
 
         void highlightLine(int mx, int my);
@@ -211,18 +206,14 @@ namespace vle { namespace gvle {
         void drawConnection();
         void drawHighlightConnection();
         void drawChildrenModels();
-	void drawChildrenModel(graph::Model* model,
-			       const Gdk::Color& color);
-	void drawChildrenPorts(graph::Model* model,
-			       const Gdk::Color& color);
-        void drawLines();
+	virtual void drawChildrenModel(graph::Model* model,
+			       const Gdk::Color& color)=0;
+	void drawLines();
         void drawLink();
         void drawZoomFrame();
 
 	void setUndefinedModels();
 
-        bool on_button_press_event(GdkEventButton* event);
-        bool on_button_release_event(GdkEventButton* event);
         bool on_configure_event(GdkEventConfigure* event);
         bool on_expose_event(GdkEventExpose* event);
         bool on_motion_notify_event(GdkEventMotion* event);

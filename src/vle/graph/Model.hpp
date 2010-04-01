@@ -101,12 +101,12 @@ namespace vle { namespace graph {
         virtual Model* findModel(const std::string& name) const = 0;
 
         /**
-          * Find a model, atomic or coupled, thanks to a formatted model path.
-          * @param path formatted model path
-          * (use format "coupled1,coupled2,atomic")
-          * @return model founded, otherwise 0.
-          */
-         Model* findModelFromPath(const std::string& pathname) const;
+         * Find a model, atomic or coupled, thanks to a formatted model path.
+         * @param path formatted model path
+         * (use format "coupled1,coupled2,atomic")
+         * @return model founded, otherwise 0.
+         */
+        Model* findModelFromPath(const std::string& pathname) const;
 
 
         /**
@@ -234,14 +234,14 @@ namespace vle { namespace graph {
          */
         void delOutputPort(const std::string & name);
 
-	void addInPort(ModelPortList& model, ModelPortList& intern,
-		       const std::string& name);
-	void addOutPort(ModelPortList& model, ModelPortList& intern,
-			const std::string& name);
-	ModelPortList& renameInputPort(const std::string& old_name,
-				       const std::string& new_name);
-	ModelPortList& renameOutputPort(const std::string& old_name,
-					const std::string& new_name);
+        void addInPort(ModelPortList& model, ModelPortList& intern,
+                       const std::string& name);
+        void addOutPort(ModelPortList& model, ModelPortList& intern,
+                        const std::string& name);
+        ModelPortList& renameInputPort(const std::string& old_name,
+                                       const std::string& new_name);
+        ModelPortList& renameOutputPort(const std::string& old_name,
+                                        const std::string& new_name);
 
         void addInputPort(const std::list < std::string > & lst);
         void addOutputPort(const std::list < std::string > & lst);
@@ -368,6 +368,18 @@ namespace vle { namespace graph {
         inline int height() const { return m_height; }
 
         /**
+         * @brief Get the X force of model.
+         * @return a force.
+         */
+        inline const float& dx() const { return m_dx; }
+
+        /**
+         * @brief Get the Y force of model.
+         * @return a force.
+         */
+        inline const float& dy() const { return m_dy; }
+
+        /**
          * @brief Set a new X position to model.
          * @param x new X position.
          */
@@ -392,11 +404,31 @@ namespace vle { namespace graph {
         inline void setHeight(int height) { m_height = height; }
 
         /**
+         * @brief Set a new X force to model.
+         * @param dx new force.
+         */
+        inline void setDx(const float& dx) { m_dx = dx; }
+
+        /**
+         * @brief Set a new Y force to model.
+         * @param dy new force.
+         */
+        inline void setDy(const float& dy) { m_dy = dy; }
+
+        /**
          * @brief Set a new position to model.
          * @param x new X position.
          * @param y new Y position.
          */
         inline void setPosition(int x, int y) { setX(x); setY(y); }
+
+        /**
+         * @brief Set a new force to model.
+         * @param dx new X force.
+         * @param dy new Y force.
+         */
+        inline void setForce(const float& dx, const float& dy)
+        { setDx(dx); setDy(dy); }
 
         /**
          * @brief Set a new site to model.
@@ -445,10 +477,12 @@ namespace vle { namespace graph {
         ConnectionList  m_inPortList;
         ConnectionList  m_outPortList;
 
-        int             m_x;
-        int             m_y;
-        int             m_width;
-        int             m_height;
+        int   m_x;
+        int   m_y;
+        int   m_width;
+        int   m_height;
+        float m_dx;
+        float m_dy;
 
     private:
         /**

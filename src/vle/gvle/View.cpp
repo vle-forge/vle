@@ -59,17 +59,20 @@ View::View(Modeling* m, graph::CoupledModel* c, size_t index) :
     assert(m);
     assert(c);
 
-    mDrawing = new ViewDrawingArea(this);
+    mCompleteDrawing = new CompleteViewDrawingArea(this);
+    mSimpleDrawing = new SimpleViewDrawingArea(this);
 }
 
 View::~View()
 {
-    delete mDrawing;
+    delete mCompleteDrawing;
+    delete mSimpleDrawing;
 }
 
 void View::redraw()
 {
-    mDrawing->queueRedraw();
+    mCompleteDrawing->queueRedraw();
+    mSimpleDrawing->queueRedraw();
 }
 
 void View::initAllOptions()

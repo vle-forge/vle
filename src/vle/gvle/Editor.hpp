@@ -31,6 +31,8 @@
 #define VLE_GVLE_EDITOR_HPP
 
 #include <vle/graph/Model.hpp>
+#include <vle/gvle/CompleteViewDrawingArea.hpp>
+#include <vle/gvle/SimpleViewDrawingArea.hpp>
 #include <vle/version.hpp>
 #include <gtkmm.h>
 #include <gdkmm/gc.h>
@@ -45,7 +47,6 @@ namespace vle { namespace gvle {
 
 class GVLE;
 class View;
-class ViewDrawingArea;
 
 /**
  * @brief Document class used within Gtk::Notebook
@@ -141,14 +142,19 @@ public:
     inline View* getView() const
 	{ return mView; }
 
-    inline ViewDrawingArea* getDrawingArea() const
-	{ return mArea; }
+    inline CompleteViewDrawingArea* getCompleteDrawingArea() const
+	{ return mCompleteArea; }
+
+    inline SimpleViewDrawingArea* getSimpleDrawingArea() const
+      { return mSimpleArea; }
 
     inline graph::Model* getModel() const
 	{ return mModel; }
 
     virtual inline bool isDrawingArea() const
 	{ return true; }
+
+    virtual bool isComplete()=0;
 
     void setHadjustment(double h);
     void setVadjustment(double v);
@@ -158,13 +164,38 @@ public:
     virtual void undo();
     virtual void redo();
 
-private:
-    View*               mView;
-    ViewDrawingArea*    mArea;
+protected:
+    View*                       mView;
+    CompleteViewDrawingArea*    mCompleteArea;
+    SimpleViewDrawingArea*      mSimpleArea;
     graph::Model*       mModel;
     Gtk::Viewport*      mViewport;
     Gtk::Adjustment     mAdjustWidth;
     Gtk::Adjustment     mAdjustHeight;
+};
+
+class DocumentCompleteDrawingArea : public DocumentDrawingArea {
+public:
+    DocumentCompleteDrawingArea(GVLE* gvle, const std::string& filePath,
+			View* view, graph::Model* model);
+    virtual ~DocumentCompleteDrawingArea();
+
+    virtual bool isComplete()
+	{ return true; }
+
+private:
+};
+
+
+class DocumentSimpleDrawingArea : public DocumentDrawingArea {
+public:
+    DocumentSimpleDrawingArea(GVLE* gvle, const std::string& filePath,
+			View* view, graph::Model* model);
+    virtual ~DocumentSimpleDrawingArea();
+
+    virtual bool isComplete()
+	{ return false; }
+
 };
 
 
@@ -208,6 +239,25 @@ public:
 
     void openTab(const std::string& filepath);
     void openTabVpz(const std::string& filepath, graph::CoupledModel* model);
+
+    /**
+     * @brief create a tab for the current vpz file with the complete
+     * view
+     * @param filepath the current file
+     * @param model the current model
+     */
+    void showCompleteView(const::std::string& filepath,
+			  graph::CoupledModel* model);
+
+    /**
+     * @brief create a tab for the current vpz file with the simple
+     * view
+     * @param filepath the current file
+     * @param model the current model
+     */
+    void showSimpleView(const std::string& filepath,
+			graph::CoupledModel* model);
+
 
     /**
      * @brief Apply settings to the source view

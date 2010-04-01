@@ -284,25 +284,11 @@ DocumentDrawingArea::DocumentDrawingArea(GVLE* gvle,
     mAdjustWidth(0,0,1),
     mAdjustHeight(0,0,1)
 {
-    mTitle = filename() + utils::Path::extension(filepath)
-	+ " - " + model->getName();
-    mArea = mView->getArea();
-    mViewport = new Gtk::Viewport(mAdjustWidth, mAdjustHeight);
-
-    mViewport->add(*mArea);
-    mViewport->set_shadow_type(Gtk::SHADOW_NONE);
-    mViewport->set_border_width(0);
-    set_policy(Gtk::POLICY_ALWAYS, Gtk::POLICY_ALWAYS);
-    set_flags(Gtk::CAN_FOCUS);
-    add(*mViewport);
-    set_shadow_type(Gtk::SHADOW_NONE);
-    set_border_width(0);
 }
 
 DocumentDrawingArea::~DocumentDrawingArea()
 {
-    remove();
-    delete mViewport;
+
 }
 
 void DocumentDrawingArea::setHadjustment(double h)
@@ -319,7 +305,7 @@ void DocumentDrawingArea::setVadjustment(double v)
 
 void DocumentDrawingArea::updateView()
 {
-    mArea->queueRedraw();
+    mCompleteArea->queueRedraw();
 }
 
 void DocumentDrawingArea::undo()
@@ -331,6 +317,64 @@ void DocumentDrawingArea::redo()
 {
     //TODO
 }
+
+/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
+DocumentCompleteDrawingArea::DocumentCompleteDrawingArea(GVLE* gvle,
+							 const std::string& filepath,
+							 View* view, graph::Model* model) :
+    DocumentDrawingArea(gvle, filepath, view, model)
+{
+    mTitle = filename() + utils::Path::extension(filepath)
+	+ " - " + model->getName();
+    mCompleteArea = mView->getCompleteArea();
+    mViewport = new Gtk::Viewport(mAdjustWidth, mAdjustHeight);
+    mViewport->add(*mCompleteArea);
+    mViewport->set_shadow_type(Gtk::SHADOW_NONE);
+    mViewport->set_border_width(0);
+
+    set_policy(Gtk::POLICY_ALWAYS, Gtk::POLICY_ALWAYS);
+    set_flags(Gtk::CAN_FOCUS);
+    add(*mViewport);
+    set_shadow_type(Gtk::SHADOW_NONE);
+    set_border_width(0);
+}
+
+DocumentCompleteDrawingArea::~DocumentCompleteDrawingArea()
+{
+    remove();
+    delete mViewport;
+}
+
+
+/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+
+DocumentSimpleDrawingArea::DocumentSimpleDrawingArea(GVLE* gvle,
+					 const std::string& filepath,
+					 View* view, graph::Model* model) :
+    DocumentDrawingArea(gvle, filepath, view, model)
+{
+    mTitle = filename() + utils::Path::extension(filepath)
+	+ " - " + model->getName();
+    mSimpleArea = mView->getSimpleArea();
+    mViewport = new Gtk::Viewport(mAdjustWidth, mAdjustHeight);
+    mViewport->add(*mSimpleArea);
+    mViewport->set_shadow_type(Gtk::SHADOW_NONE);
+    mViewport->set_border_width(0);
+
+    set_policy(Gtk::POLICY_ALWAYS, Gtk::POLICY_ALWAYS);
+    set_flags(Gtk::CAN_FOCUS);
+    add(*mViewport);
+    set_shadow_type(Gtk::SHADOW_NONE);
+    set_border_width(0);
+}
+
+DocumentSimpleDrawingArea::~DocumentSimpleDrawingArea()
+{
+    remove();
+    delete mViewport;
+}
+
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
@@ -566,34 +610,90 @@ void Editor::openTabVpz(const std::string& filepath,
 	    != model) {
 	    focusTab(filepath);
 	    page = get_current_page();
-	    remove_page(page);
-	    delete it->second;
-	    mDocuments.erase(it->first);
-
-	    DocumentDrawingArea* doc = new DocumentDrawingArea(
-		mApp,
-		filepath,
-		mApp->getModeling()->findView(model),
-		model);
-	    doc->setTitle(filepath, model, mApp->getModeling()->isModified());
-	    mDocuments.insert(
-		std::make_pair < std::string, DocumentDrawingArea* >(
-		    filepath, doc));
-	    append_page(*doc, *(addLabel(doc->getTitle(), filepath)));
-	    reorder_child(*doc, page);
+	    DocumentDrawingArea* currentTab =
+		dynamic_cast<DocumentDrawingArea*>(get_nth_page(page));
+	    if (currentTab->isComplete()) {
+		showCompleteView(filepath, model);
+	    } else {
+		showSimpleView(filepath, model);
+	    }
 	} else {
 	    return;
 	}
     } else {
-	DocumentDrawingArea* doc = new DocumentDrawingArea(
+	showCompleteView(filepath, model);
+    }
+}
+
+void Editor::showCompleteView(const std::string& filepath,
+			      graph::CoupledModel* model)
+{
+    Documents::iterator it = mDocuments.find(filepath);
+    int page;
+
+    if (it != mDocuments.end()) {
+	focusTab(filepath);
+	page = get_current_page();
+	remove_page(page);
+	delete it->second;
+	mDocuments.erase(it->first);
+
+	DocumentCompleteDrawingArea* doc = new DocumentCompleteDrawingArea(
+	    mApp,
+	    filepath,
+	    mApp->getModeling()->findView(model),
+	    model);
+	mDocuments.insert(
+	    std::make_pair < std::string, DocumentDrawingArea* >
+	    (filepath,doc));
+	append_page(*doc, *(addLabel(doc->getTitle(),
+				     filepath)));
+	reorder_child(*doc, page);
+    } else {
+	DocumentCompleteDrawingArea* doc = new DocumentCompleteDrawingArea(
 	    mApp,
 	    filepath,
 	    mApp->getModeling()->findView(model),
 	    model);
 	mDocuments.insert(
 	    std::make_pair < std::string, DocumentDrawingArea* >(filepath,
-                                                                 doc));
-	page = append_page(*doc, *(addLabel(doc->getTitle(), filepath)));
+								 doc));
+	page = append_page(*doc, *(addLabel(doc->getTitle(),
+	filepath)));
+    }
+
+    show_all_children();
+    set_current_page(page);
+}
+
+void Editor::showSimpleView(const std::string& filepath,
+			    graph::CoupledModel* model)
+{
+    Documents::iterator it = mDocuments.find(filepath);
+    int page;
+
+    if (it != mDocuments.end()) {
+	focusTab(filepath);
+	page = get_current_page();
+	remove_page(page);
+	delete it->second;
+	mDocuments.erase(it->first);
+
+	DocumentSimpleDrawingArea* doc = new DocumentSimpleDrawingArea(
+	    mApp,
+	    filepath,
+	    mApp->getModeling()->findView(model),
+	    model);
+	mDocuments.insert(
+	    std::make_pair < std::string, DocumentDrawingArea* >
+	    (filepath, doc));
+	append_page(*doc, *(addLabel(doc->getTitle(),
+				     filepath)));
+
+	reorder_child(*doc, page);
+
+    } else {
+	return;
     }
     show_all_children();
     set_current_page(page);
