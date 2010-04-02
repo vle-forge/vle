@@ -115,7 +115,7 @@ void ManagerRunThread::operator()(const vpz::Vpz& file)
     }
 
     prod->join();
-    m_pool.shutdown();
+    m_pool.stop_unused_threads();
 
     if (utils::Trace::trace().haveWarning()) {
         m_out << fmt(_(

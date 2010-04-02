@@ -57,6 +57,7 @@ SimulatorDistant::SimulatorDistant(std::ostream& out, size_t cpu, int port) :
 
 SimulatorDistant::~SimulatorDistant()
 {
+    mPool.shutdown();
     delete mServer;
 }
 
@@ -68,7 +69,7 @@ void SimulatorDistant::start()
         sigc::mem_fun(*this, &SimulatorDistant::wait), true);
 
     mWait->join();
-    mPool.shutdown();
+    mPool.stop_unused_threads();
 }
 
 void SimulatorDistant::wait()
