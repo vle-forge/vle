@@ -59,6 +59,11 @@ namespace vle { namespace manager {
         JustRun(std::ostream& out);
 
         /**
+         * @brief Destroys a JustRun object
+         */
+        virtual ~JustRun();
+
+        /**
          * @brief Get a reference to the oov::PluginPtr list of the simulation
          * sort by filename.
          * @return A reference to the oov::PluginPtr list.
@@ -127,12 +132,17 @@ namespace vle { namespace manager {
     {
     public:
         /**
-         * @brief Build a JustRunMono object with a specified output
-         * std::ostream.
+         * @brief Build a JustRunThread object with a specified output
+         * std::ostream and a number of processes.
          * @param out output to log error.
          * @param process number of thread.
          */
         JustRunThread(std::ostream& out, int process);
+
+        /**
+         * @brief Destroys a JustRunThread
+         */
+        virtual ~JustRunThread();
 
         /**
          * @brief Read specified vpz files an start simulations on the number of
@@ -175,6 +185,10 @@ namespace vle { namespace manager {
     {
     }
 
+    inline JustRun::~JustRun()
+    {
+    }
+
     inline OutputSimulationList& JustRun::outputSimulationList()
     {
         return m_lst;
@@ -206,6 +220,11 @@ namespace vle { namespace manager {
         m_process(process),
         m_finish(false)
     {
+    }
+
+    inline JustRunThread::~JustRunThread()
+    {
+        m_pool.shutdown();
     }
 
 }} // namespace vle manager
