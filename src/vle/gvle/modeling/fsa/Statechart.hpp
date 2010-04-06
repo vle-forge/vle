@@ -33,7 +33,7 @@
 #include <string>
 #include <vector>
 
-namespace vle { namespace gvle { namespace modeling {
+namespace vle { namespace gvle { namespace modeling { namespace fsa {
 
 enum function_type { CONSTANT, FUNCTION };
 
@@ -501,6 +501,6 @@ private:
     strings_t     mOutputPorts;
 };
 
-}}} // namespace vle gvle modeling
+}}}} // namespace vle gvle modeling fsa
 
 #endif

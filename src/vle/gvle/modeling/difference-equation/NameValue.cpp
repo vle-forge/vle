@@ -33,7 +33,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
-namespace vle { namespace gvle { namespace modeling {
+namespace vle { namespace gvle { namespace modeling { namespace de {
 
 NameValue::InitTreeView::InitTreeView(
     BaseObjectType* cobject,
@@ -272,4 +272,4 @@ bool NameValue::validPort(const vpz::Condition& condition,
     return false;
 }
 
-}}} // namespace vle gvle modeling
+}}}} // namespace vle gvle modeling de

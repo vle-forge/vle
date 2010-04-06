@@ -29,14 +29,16 @@
 #include <vle/gvle/modeling/difference-equation/Simple.hpp>
 #include <vle/utils/Path.hpp>
 
-namespace vle { namespace gvle { namespace modeling {
+namespace vle { namespace gvle { namespace modeling { namespace de {
 
-Simple::Simple(const std::string& name) :
-    Plugin(name), m_dialog(0), m_buttonSource(0)
-{}
+Simple::Simple(const std::string& name)
+    : Plugin(name), m_dialog(0), m_buttonSource(0)
+{
+}
 
 Simple::~Simple()
-{}
+{
+}
 
 void Simple::build(bool modeling)
 {
@@ -49,10 +51,10 @@ void Simple::build(bool modeling)
     m_dialog->set_title("DifferenceEquation - Simple");
     mXml->get_widget("SimplePluginVBox", vbox);
 
-    vbox->pack_start(NameValue::build(mXml));
-    vbox->pack_start(TimeStep::build(mXml));
+    vbox->pack_start(mNameValue.build(mXml));
+    vbox->pack_start(mTimeStep.build(mXml));
     if (modeling) {
-        vbox->pack_start(Parameters::build(mXml));
+        vbox->pack_start(mParameters.build(mXml));
 
         {
             m_buttonSource = Gtk::manage(
@@ -64,7 +66,7 @@ void Simple::build(bool modeling)
         }
     }
 
-    vbox->pack_start(Mapping::build(mXml));
+    vbox->pack_start(mMapping.build(mXml));
 }
 
 bool Simple::create(graph::AtomicModel& atom,
@@ -122,9 +124,9 @@ void Simple::destroy()
 
 void Simple::fillFields(const vpz::Condition& condition)
 {
-    NameValue::fillFields(condition);
-    Mapping::fillFields(condition);
-    TimeStep::fillFields(condition);
+    mNameValue.fillFields(condition);
+    mMapping.fillFields(condition);
+    mTimeStep.fillFields(condition);
 }
 
 void Simple::generateCondition(graph::AtomicModel& atom,
@@ -135,22 +137,22 @@ void Simple::generateCondition(graph::AtomicModel& atom,
     if (conditions.exist(conditionName)) {
         vpz::Condition& condition(conditions.get(conditionName));
 
-        NameValue::deletePorts(condition);
-        Mapping::deletePorts(condition);
-        TimeStep::deletePorts(condition);
-        Parameters::deletePorts(condition);
+        mNameValue.deletePorts(condition);
+        mMapping.deletePorts(condition);
+        mTimeStep.deletePorts(condition);
+        mParameters.deletePorts(condition);
 
-        NameValue::assign(condition);
-        Mapping::assign(condition);
-        TimeStep::assign(condition);
-        Parameters::assign(condition);
+        mNameValue.assign(condition);
+        mMapping.assign(condition);
+        mTimeStep.assign(condition);
+        mParameters.assign(condition);
     } else {
         vpz::Condition condition(conditionName);
 
-        NameValue::assign(condition);
-        Mapping::assign(condition);
-        TimeStep::assign(condition);
-        Parameters::assign(condition);
+        mNameValue.assign(condition);
+        mMapping.assign(condition);
+        mTimeStep.assign(condition);
+        mParameters.assign(condition);
         conditions.add(condition);
     }
 
@@ -170,13 +172,13 @@ void Simple::generateObservables(graph::AtomicModel& atom,
     if (observables.exist(observableName)) {
         vpz::Observable& observable(observables.get(observableName));
 
-        if (not observable.exist(getVariableName())) {
-            observable.add(getVariableName());
+        if (not observable.exist(mNameValue.getVariableName())) {
+            observable.add(mNameValue.getVariableName());
         }
     } else {
         vpz::Observable observable(observableName);
 
-        observable.add(getVariableName());
+        observable.add(mNameValue.getVariableName());
         observables.add(observable);
     }
     if (model.observables().empty()) {
@@ -193,7 +195,7 @@ void Simple::generateOutputPorts(graph::AtomicModel& atom)
 
 void Simple::generateVariables(utils::Template& tpl_)
 {
-    tpl_.stringSymbol().append("varname", getVariableName());
+    tpl_.stringSymbol().append("varname", mNameValue.getVariableName());
 }
 
 std::string Simple::getTemplate() const
@@ -295,10 +297,10 @@ bool Simple::modify(graph::AtomicModel& atom,
         vpz::Condition condition(conditionName);
 
         Simple::fillFields(condition);
-	Parameters::fillFields(parameters, externalVariables);
+	mParameters.fillFields(parameters, externalVariables);
     } else {
         Simple::fillFields(conditions.get(conditionName));
-	Parameters::fillFields(parameters, externalVariables);
+	mParameters.fillFields(parameters, externalVariables);
     }
 
     backup();
@@ -330,16 +332,16 @@ bool Simple::start(vpz::Condition& condition)
 
 void Simple::assign(vpz::Condition& condition)
 {
-    NameValue::deletePorts(condition);
-    Mapping::deletePorts(condition);
-    TimeStep::deletePorts(condition);
+    mNameValue.deletePorts(condition);
+    mMapping.deletePorts(condition);
+    mTimeStep.deletePorts(condition);
 
-    NameValue::assign(condition);
-    Mapping::assign(condition);
-    TimeStep::assign(condition);
+    mNameValue.assign(condition);
+    mMapping.assign(condition);
+    mTimeStep.assign(condition);
 }
 
-}}} // namespace vle gvle modeling
+}}}} // namespace vle gvle modeling de
 
-DECLARE_GVLE_MODELINGPLUGIN(vle::gvle::modeling::Simple)
+DECLARE_GVLE_MODELINGPLUGIN(vle::gvle::modeling::de::Simple)
 

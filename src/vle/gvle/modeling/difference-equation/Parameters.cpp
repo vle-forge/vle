@@ -32,7 +32,7 @@
 #include <vle/value/Double.hpp>
 #include <gtkmm/frame.h>
 
-namespace vle { namespace gvle { namespace modeling {
+namespace vle { namespace gvle { namespace modeling { namespace de {
 
 Parameters::ParametersTreeView::ParametersTreeView(
     BaseObjectType* cobject,
@@ -491,4 +491,4 @@ void Parameters::fillFields(const Parameters_t& parameters,
     }
 }
 
-}}}
+}}}} // vle gvle modeling de

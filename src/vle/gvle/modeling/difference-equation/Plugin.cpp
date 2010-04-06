@@ -31,20 +31,23 @@
 #include <vle/utils/Package.hpp>
 #include <boost/regex.hpp>
 
-namespace vle { namespace gvle { namespace modeling {
+namespace vle { namespace gvle { namespace modeling { namespace de {
 
-Plugin::Plugin(const std::string& name) : ModelingPlugin(name)
-{}
+Plugin::Plugin(const std::string& name)
+    : ModelingPlugin(name)
+{
+}
 
 Plugin::~Plugin()
-{}
+{
+}
 
 void Plugin::backup()
 {
-    mOldMode = getMode();
+    mOldMode = mMapping.getMode();
 
     Parameters::ExternalVariables_t externalVariables =
-        getExternalVariables();
+        mParameters.getExternalVariables();
     for (Parameters::ExternalVariables_t::const_iterator it =
              externalVariables.begin(); it != externalVariables.end(); ++it) {
         mOldExternalVariables.push_back(it->first);
@@ -77,7 +80,7 @@ void Plugin::generateDynamic(vpz::Dynamic& dynamic,
 
 void Plugin::generateInputPorts(graph::AtomicModel& atom)
 {
-    if (mOldMode != getMode()) {
+    if (mOldMode != mMapping.getMode()) {
         if (mOldMode == "name") {
             if (atom.existInputPort("update")) {
                 atom.delInputPort("update");
@@ -94,20 +97,20 @@ void Plugin::generateInputPorts(graph::AtomicModel& atom)
         }
     }
 
-    if (getMode() == "name") {
+    if (mMapping.getMode() == "name") {
         if (not atom.existInputPort("update")) {
             atom.addInputPort("update");
         }
-    } else if (getMode() == "port") {
+    } else if (mMapping.getMode() == "port") {
         Parameters::ExternalVariables_t externalVariables =
-            getExternalVariables();
+            mParameters.getExternalVariables();
         for (Parameters::ExternalVariables_t::const_iterator it =
              externalVariables.begin(); it != externalVariables.end(); ++it) {
             if (not atom.existInputPort(it->first)) {
                 atom.addInputPort(it->first);
             }
         }
-    } else if (getMode() == "mapping") {
+    } else if (mMapping.getMode() == "mapping") {
     }
 
     if (not atom.existInputPort("perturb")) {
@@ -137,7 +140,7 @@ void Plugin::generateSource(const std::string& classname,
     tpl_.listSymbol().append("par");
     tpl_.listSymbol().append("val");
 
-    Parameters::Parameters_t parameters = getParameters();
+    Parameters::Parameters_t parameters = mParameters.getParameters();
     for (std::vector < std::string >::const_iterator it =
              parameters.mNames.begin(); it != parameters.mNames.end(); ++it) {
         std::string name(*it);
@@ -159,7 +162,7 @@ void Plugin::generateSource(const std::string& classname,
         tpl_.listSymbol().append("nosync");
 
         Parameters::ExternalVariables_t externalVariables =
-            getExternalVariables();
+            mParameters.getExternalVariables();
         for (Parameters::ExternalVariables_t::const_iterator it =
                  externalVariables.begin(); it != externalVariables.end();
              ++it) {
@@ -296,4 +299,4 @@ void Plugin::parseFunctions(const std::string& buffer)
                                         "//@@end:user@@", "user"));
 }
 
-}}} // namespace vle gvle modeling
+}}}} // namespace vle gvle modeling de

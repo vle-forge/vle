@@ -29,7 +29,7 @@
 #include <vle/gvle/modeling/fsa/SourceDialog.hpp>
 #include <vle/utils/i18n.hpp>
 
-namespace vle { namespace gvle { namespace modeling {
+namespace vle { namespace gvle { namespace modeling { namespace fsa {
 
 NewStateDialog::NewStateDialog(const Glib::RefPtr < Gnome::Glade::Xml >& xml)
 {
@@ -319,4 +319,4 @@ int StateDialog::run()
     return response;
 }
 
-}}} // namespace vle gvle modeling
+}}}} // namespace vle gvle modeling fsa

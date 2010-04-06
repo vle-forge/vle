@@ -36,7 +36,7 @@
 #include <gtkmm/treeview.h>
 #include <libglademm.h>
 
-namespace vle { namespace gvle { namespace modeling {
+namespace vle { namespace gvle { namespace modeling { namespace de {
 
 class Mapping
 {
@@ -44,12 +44,11 @@ public:
     Mapping() { }
     virtual ~Mapping();
 
-protected:
     void assign(vpz::Condition& condition);
     Gtk::Widget& build(Glib::RefPtr<Gnome::Glade::Xml> ref);
     void deletePorts(vpz::Condition& condition);
     void fillFields(const vpz::Condition& condition);
-    virtual std::string getMode() const;
+    std::string getMode() const;
 
     class MappingColumns : public Gtk::TreeModel::ColumnRecord
     {
@@ -109,9 +108,6 @@ private:
     void onClickRadioButton();
 };
 
-}}} // namespace vle gvle modeling
+}}}} // namespace vle gvle modeling de
 
 #endif
-
-
-

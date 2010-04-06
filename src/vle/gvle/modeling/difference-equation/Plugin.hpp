@@ -37,16 +37,16 @@
 #include <vle/vpz/Dynamic.hpp>
 #include <gtkmm/dialog.h>
 
-namespace vle { namespace gvle { namespace modeling {
+namespace vle { namespace gvle { namespace modeling { namespace de {
 
-class Plugin : public ModelingPlugin, public TimeStep,
-               public Mapping, public Parameters
+class Plugin : public ModelingPlugin
 {
 public:
     Plugin(const std::string& name);
     virtual ~Plugin();
 
     void onSource();
+
 protected:
     Glib::RefPtr<Gnome::Glade::Xml> mXml;
 
@@ -56,6 +56,11 @@ protected:
     std::string mComputeFunction;
     std::string mInitValueFunction;
     std::string mUserFunctions;
+
+    TimeStep mTimeStep;
+    Mapping mMapping;
+    Parameters mParameters;
+
 
     void backup();
     void generate(graph::AtomicModel& atom,
@@ -96,6 +101,6 @@ private:
                               const std::string& name);
 };
 
-}}} // namespace vle gvle modeling
+}}}} // namespace vle gvle modeling de
 
 #endif

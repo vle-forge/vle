@@ -39,13 +39,13 @@
 #include <gtkmm/uimanager.h>
 #include <libglademm.h>
 
-namespace vle { namespace gvle { namespace modeling {
+namespace vle { namespace gvle { namespace modeling { namespace fsa {
 
-class Plugin : public ModelingPlugin
+class PluginFSA : public ModelingPlugin
 {
 public:
-    Plugin(const std::string& name);
-    virtual ~Plugin();
+    PluginFSA(const std::string& name);
+    virtual ~PluginFSA();
 
     virtual bool create(graph::AtomicModel& atom,
                         vpz::AtomicModel& model,
@@ -69,7 +69,6 @@ public:
     { return true; }
 
 private:
-    void build();
     void createActions();
     void createUI();
     void destroy();
@@ -129,6 +128,6 @@ private:
     std::string mTimeStep;
 };
 
-}}} // namespace vle gvle modeling
+}}}} // namespace vle gvle modeling fsa
 
 #endif

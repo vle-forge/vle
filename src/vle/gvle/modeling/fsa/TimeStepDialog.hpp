@@ -33,7 +33,7 @@
 #include <gtkmm/entry.h>
 #include <libglademm.h>
 
-namespace vle { namespace gvle { namespace modeling {
+namespace vle { namespace gvle { namespace modeling { namespace fsa {
 
 class TimeStepDialog
 {
@@ -53,6 +53,6 @@ private:
     Gtk::Entry*  mTimeStepEntry;
 };
 
-}}} // namespace vle gvle modeling
+}}}} // namespace vle gvle modeling fsa
 
 #endif

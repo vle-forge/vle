@@ -37,12 +37,13 @@
 #include <gtksourceviewmm-2.0/gtksourceviewmm.h>
 #endif
 
-namespace vle { namespace gvle { namespace modeling {
+namespace vle { namespace gvle { namespace modeling { namespace de {
 
-class Source : public Gtk::ScrolledWindow {
+class Source : public Gtk::ScrolledWindow
+{
 public:
     Source(const std::string& buffer);
-    virtual ~Source() { }
+    virtual ~Source() {}
 
     std::string getBuffer() const;
 
@@ -58,7 +59,7 @@ private:
     gtksourceview::SourceView mView;
 #else
     mutable Gtk::TextView  mView; // mutable to enable the getBuffer function,
-                                  // begin() and end() are non-const.
+    // begin() and end() are non-const.
 #endif
 
     void init(const std::string& buffer);
@@ -92,7 +93,7 @@ private:
     Source*                         mUserFunctions;
 };
 
-}}} // namespace vle gvle modeling
+}}}} // namespace vle gvle modeling de
 
 #endif
 

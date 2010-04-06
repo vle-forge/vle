@@ -36,7 +36,7 @@
 #include <gtkmm/spinbutton.h>
 #include <libglademm.h>
 
-namespace vle { namespace gvle { namespace modeling {
+namespace vle { namespace gvle { namespace modeling { namespace de {
 
 class TimeStep
 {
@@ -44,7 +44,6 @@ public:
     TimeStep() { }
     virtual ~TimeStep() { }
 
-protected:
     void assign(vpz::Condition& condition);
     Gtk::Widget& build(Glib::RefPtr<Gnome::Glade::Xml> ref);
     void deletePorts(vpz::Condition& condition);
@@ -71,10 +70,6 @@ private:
     void onClickCheckButton();
 };
 
-}}} // namespace vle gvle modeling
+}}}} // namespace vle gvle modeling de
 
 #endif
-
-
-
-
