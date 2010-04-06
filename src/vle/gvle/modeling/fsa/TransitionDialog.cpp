@@ -30,7 +30,7 @@
 #include <vle/utils/i18n.hpp>
 #include <boost/lexical_cast.hpp>
 
-namespace vle { namespace gvle { namespace modeling {
+namespace vle { namespace gvle { namespace modeling { namespace fsa {
 
 TransitionDialog::TransitionDialog(
     const Glib::RefPtr < Gnome::Glade::Xml >& xml,
@@ -363,4 +363,4 @@ int TransitionDialog::run()
     return response;
 }
 
-}}} // namespace vle gvle modeling
+}}}} // namespace vle gvle modeling fsa

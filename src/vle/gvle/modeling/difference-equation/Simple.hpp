@@ -35,9 +35,9 @@
 #include <vle/utils/Template.hpp>
 #include <gtkmm/dialog.h>
 
-namespace vle { namespace gvle { namespace modeling {
+namespace vle { namespace gvle { namespace modeling { namespace de {
 
-class Simple : public Plugin, public NameValue
+class Simple : public Plugin
 {
 public:
     Simple(const std::string& name);
@@ -67,6 +67,7 @@ public:
 private:
     Gtk::Dialog*         m_dialog;
     Gtk::Button*         m_buttonSource;
+    NameValue           mNameValue;
 
     std::list < sigc::connection > mList;
 
@@ -85,6 +86,6 @@ private:
     std::string getTemplate() const;
 };
 
-}}} // namespace vle gvle modeling
+}}}} // namespace vle gvle modeling de
 
 #endif

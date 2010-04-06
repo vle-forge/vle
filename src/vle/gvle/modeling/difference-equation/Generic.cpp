@@ -29,14 +29,16 @@
 #include <vle/gvle/modeling/difference-equation/Generic.hpp>
 #include <vle/utils/Path.hpp>
 
-namespace vle { namespace gvle { namespace modeling {
+namespace vle { namespace gvle { namespace modeling { namespace de {
 
 Generic::Generic(const std::string& name) :
     Plugin(name), m_dialog(0), m_buttonSource(0)
-{}
+{
+}
 
 Generic::~Generic()
-{}
+{
+}
 
 void Generic::build(bool modeling)
 {
@@ -49,29 +51,31 @@ void Generic::build(bool modeling)
     m_dialog->set_title("DifferenceEquation - Generic");
     mXml->get_widget("GenericPluginVBox", vbox);
 
-    vbox->pack_start(NameValue::build(mXml));
-    vbox->pack_start(TimeStep::build(mXml));
+    vbox->pack_start(mNameValue.build(mXml));
+    vbox->pack_start(mTimeStep.build(mXml));
+    vbox->pack_start(mMapping.build(mXml));
 
     if (modeling) {
-        vbox->pack_start(Parameters::buildParameters(mXml));
-        {
-            m_buttonSource = Gtk::manage(
-                new Gtk::Button("Compute / InitValue / User section"));
-            m_buttonSource->show();
-            vbox->pack_start(*m_buttonSource);
-            mList.push_back(m_buttonSource->signal_clicked().connect(
-                                sigc::mem_fun(*this, &Plugin::onSource)));
-        }
+        Gtk::VBox* vbox;
+        mXml->get_widget("GenericPluginVBox", vbox);
+        vbox->pack_start(mParameters.buildParameters(mXml));
+
+        m_buttonSource = Gtk::manage(
+            new Gtk::Button("Compute / InitValue / User section"));
+        m_buttonSource->show();
+        vbox->pack_start(*m_buttonSource);
+        mList.push_back(m_buttonSource->signal_clicked().connect(
+                sigc::mem_fun(*this, &Plugin::onSource)));
     }
 }
 
 bool Generic::create(graph::AtomicModel& atom,
-                    vpz::AtomicModel& model,
-                    vpz::Dynamic& dynamic,
-                    vpz::Conditions& conditions,
-                    vpz::Observables& observables,
-                    const std::string& classname,
-                    const std::string& namespace_)
+                     vpz::AtomicModel& model,
+                     vpz::Dynamic& dynamic,
+                     vpz::Conditions& conditions,
+                     vpz::Observables& observables,
+                     const std::string& classname,
+                     const std::string& namespace_)
 {
     std::string conditionName((fmt("cond_DE_%1%") % atom.getName()).str());
 
@@ -84,6 +88,7 @@ bool Generic::create(graph::AtomicModel& atom,
     } else {
         Generic::fillFields(conditions.get(conditionName));
     }
+
     mComputeFunction =
         "virtual double compute(const vd::Time& /*time*/)\n"        \
         "{ return 0; }\n";
@@ -93,8 +98,8 @@ bool Generic::create(graph::AtomicModel& atom,
     mUserFunctions = "";
 
     if (m_dialog->run() == Gtk::RESPONSE_ACCEPT) {
-        generate(atom, model, dynamic, conditions, observables, classname,
-                 namespace_, true);
+        Plugin::generate(atom, model, dynamic, conditions, observables,
+                         classname, namespace_, true);
         m_dialog->hide_all();
         destroy();
         return true;
@@ -112,6 +117,7 @@ void Generic::destroy()
         mXml->get_widget("GenericPluginVBox", vbox);
         vbox->remove(*m_buttonSource);
     }
+
     for (std::list < sigc::connection >::iterator it = mList.begin();
          it != mList.end(); ++it) {
         it->disconnect();
@@ -120,8 +126,8 @@ void Generic::destroy()
 
 void Generic::fillFields(const vpz::Condition& condition)
 {
-    NameValue::fillFields(condition);
-    TimeStep::fillFields(condition);
+    mNameValue.fillFields(condition);
+    mTimeStep.fillFields(condition);
 }
 
 void Generic::generateCondition(graph::AtomicModel& atom,
@@ -132,19 +138,19 @@ void Generic::generateCondition(graph::AtomicModel& atom,
     if (conditions.exist(conditionName)) {
         vpz::Condition& condition(conditions.get(conditionName));
 
-        NameValue::deletePorts(condition);
-        TimeStep::deletePorts(condition);
-        Parameters::deletePorts(condition);
+        mNameValue.deletePorts(condition);
+        mTimeStep.deletePorts(condition);
+        mParameters.deletePorts(condition);
 
-        NameValue::assign(condition);
-        TimeStep::assign(condition);
-        Parameters::assign(condition);
+        mNameValue.assign(condition);
+        mTimeStep.assign(condition);
+        mParameters.assign(condition);
     } else {
         vpz::Condition condition(conditionName);
 
-        NameValue::assign(condition);
-        TimeStep::assign(condition);
-        Parameters::assign(condition);
+        mNameValue.assign(condition);
+        mTimeStep.assign(condition);
+        mParameters.assign(condition);
         conditions.add(condition);
     }
 
@@ -164,13 +170,13 @@ void Generic::generateObservables(graph::AtomicModel& atom,
     if (observables.exist(observableName)) {
         vpz::Observable& observable(observables.get(observableName));
 
-        if (not observable.exist(getVariableName())) {
-            observable.add(getVariableName());
+        if (not observable.exist(mNameValue.getVariableName())) {
+            observable.add(mNameValue.getVariableName());
         }
     } else {
         vpz::Observable observable(observableName);
 
-        observable.add(getVariableName());
+        observable.add(mNameValue.getVariableName());
         observables.add(observable);
     }
     if (model.observables().empty()) {
@@ -187,7 +193,7 @@ void Generic::generateOutputPorts(graph::AtomicModel& atom)
 
 void Generic::generateVariables(utils::Template& tpl_)
 {
-    tpl_.stringSymbol().append("varname", getVariableName());
+    tpl_.stringSymbol().append("varname", mNameValue.getVariableName());
 }
 
 std::string Generic::getTemplate() const
@@ -269,10 +275,10 @@ bool Generic::modify(graph::AtomicModel& atom,
         vpz::Condition condition(conditionName);
 
         Generic::fillFields(condition);
-	Parameters::fillFields(parameters);
+	mParameters.fillFields(parameters);
     } else {
         Generic::fillFields(conditions.get(conditionName));
-	Parameters::fillFields(parameters);
+	mParameters.fillFields(parameters);
     }
 
     backup();
@@ -304,14 +310,14 @@ bool Generic::start(vpz::Condition& condition)
 
 void Generic::assign(vpz::Condition& condition)
 {
-    NameValue::deletePorts(condition);
-    TimeStep::deletePorts(condition);
+    mNameValue.deletePorts(condition);
+    mTimeStep.deletePorts(condition);
 
-    NameValue::assign(condition);
-    TimeStep::assign(condition);
+    mNameValue.assign(condition);
+    mTimeStep.assign(condition);
 }
 
-}}} // namespace vle gvle modeling
+}}}} // namespace vle gvle modeling de
 
-DECLARE_GVLE_MODELINGPLUGIN(vle::gvle::modeling::Generic)
+DECLARE_GVLE_MODELINGPLUGIN(vle::gvle::modeling::de::Generic)
 

@@ -38,7 +38,7 @@
 #include <gtkmm/treeview.h>
 #include <libglademm.h>
 
-namespace vle { namespace gvle { namespace modeling {
+namespace vle { namespace gvle { namespace modeling { namespace fsa {
 
 class NewStateDialog
 {
@@ -242,6 +242,6 @@ private:
     std::list < sigc::connection > mList;
 };
 
-}}} // namespace vle gvle modeling
+}}}} // namespace vle gvle modeling fsa
 
 #endif

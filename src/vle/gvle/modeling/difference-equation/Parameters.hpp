@@ -36,7 +36,7 @@
 #include <gtkmm/liststore.h>
 #include <gtkmm/treeview.h>
 
-namespace vle { namespace gvle { namespace modeling {
+namespace vle { namespace gvle { namespace modeling { namespace de {
 
 class Parameters
 {
@@ -44,7 +44,6 @@ public:
     Parameters() : m_parametersTreeView(0), m_externalVariablesTreeView(0) { }
     virtual ~Parameters() { }
 
-protected:
     struct Parameters_t
     {
         std::vector < std::string > mNames;
@@ -183,7 +182,7 @@ private:
     std::vector < std::string > m_oldParameters;
 };
 
-}}} // namespace vle gvle modeling
+}}}} // namespace vle gvle modeling de
 
 #endif
 

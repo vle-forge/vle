@@ -35,7 +35,7 @@
 #include <gtkmm/entry.h>
 #include <libglademm.h>
 
-namespace vle { namespace gvle { namespace modeling {
+namespace vle { namespace gvle { namespace modeling { namespace fsa {
 
 class TransitionDialog
 {
@@ -124,6 +124,6 @@ private:
     std::list < sigc::connection > mList;
 };
 
-}}} // namespace vle gvle modeling
+}}}} // namespace vle gvle modeling fsa
 
 #endif

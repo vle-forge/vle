@@ -35,7 +35,7 @@
 #include <iostream>
 #include <limits>
 
-namespace vle { namespace gvle { namespace modeling {
+namespace vle { namespace gvle { namespace modeling { namespace fsa {
 
 const guint StatechartDrawingArea::OFFSET = 10;
 const guint StatechartDrawingArea::HEADER_HEIGHT = 20;
@@ -1286,4 +1286,4 @@ void StatechartDrawingArea::setColor(const Gdk::Color& color)
                              color.get_blue_p());
 }
 
-}}} // namespace vle gvle modeling
+}}}} // namespace vle gvle modeling fsa

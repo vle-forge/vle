@@ -29,7 +29,7 @@
 #include <vle/gvle/modeling/fsa/SourceDialog.hpp>
 #include <vle/gvle/Settings.hpp>
 
-namespace vle { namespace gvle { namespace modeling {
+namespace vle { namespace gvle { namespace modeling { namespace fsa {
 
 Source::Source(const std::string& buffer)
 {
@@ -183,4 +183,4 @@ int SourceDialog::run()
     return mDialog->run();
 }
 
-}}} // namespace vle gvle modeling
+}}}} // namespace vle gvle modeling fsa

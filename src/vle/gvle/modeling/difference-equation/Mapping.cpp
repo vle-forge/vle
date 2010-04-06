@@ -32,7 +32,7 @@
 #include <vle/value/Double.hpp>
 #include <vle/value/String.hpp>
 
-namespace vle { namespace gvle { namespace modeling {
+namespace vle { namespace gvle { namespace modeling { namespace de {
 
 Mapping::MappingTreeView::MappingTreeView(
     BaseObjectType* cobject,
@@ -255,9 +255,9 @@ void Mapping::fillFields(const vpz::Condition& condition)
 
 std::string Mapping::getMode() const
 {
-    if (m_RadioButtonName->get_active()) {
+    if (m_RadioButtonName and m_RadioButtonName->get_active()) {
 	return "name";
-    } else if (m_RadioButtonPort->get_active()) {
+    } else if (m_RadioButtonPort and m_RadioButtonPort->get_active()) {
         return "port";
     } else {
         return "mapping";
@@ -290,4 +290,4 @@ bool Mapping::validPort(const vpz::Condition& condition,
     return false;
 }
 
-}}} // namespace vle gvle modeling
+}}}} // namespace vle gvle modeling de

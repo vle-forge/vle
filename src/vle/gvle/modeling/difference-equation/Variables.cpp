@@ -31,7 +31,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
-namespace vle { namespace gvle { namespace modeling {
+namespace vle { namespace gvle { namespace modeling { namespace de {
 
 Variables::ValuesTreeView::ValuesTreeView(
     BaseObjectType* cobject,
@@ -483,4 +483,4 @@ bool Variables::validPort(const vpz::Condition& condition,
     return false;
 }
 
-}}} // namespace vle gvle modeling
+}}}} // namespace vle gvle modeling de

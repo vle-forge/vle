@@ -30,7 +30,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
-namespace vle { namespace gvle { namespace modeling {
+namespace vle { namespace gvle { namespace modeling { namespace fsa {
 
 const int Statechart::INITIAL_HEIGHT = 400;
 const int Statechart::INITIAL_WIDTH = 400;
@@ -353,4 +353,4 @@ void Statechart::resizeState(State* state, int width, int height)
     }
 }
 
-}}} // namespace vle gvle modeling
+}}}} // namespace vle gvle modeling fsa

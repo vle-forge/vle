@@ -30,7 +30,7 @@
 #include <vle/value/Double.hpp>
 #include <vle/value/String.hpp>
 
-namespace vle { namespace gvle { namespace modeling {
+namespace vle { namespace gvle { namespace modeling { namespace de {
 
 void TimeStep::assign(vpz::Condition& condition)
 {
@@ -135,4 +135,4 @@ void TimeStep::onClickCheckButton()
     }
 }
 
-}}} // namespace vle gvle modeling
+}}}} // namespace vle gvle modeling de

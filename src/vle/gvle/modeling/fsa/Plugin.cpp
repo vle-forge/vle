@@ -34,9 +34,9 @@
 #include <gtkmm/stock.h>
 #include <boost/regex.hpp>
 
-namespace vle { namespace gvle { namespace modeling {
+namespace vle { namespace gvle { namespace modeling { namespace fsa {
 
-const std::string Plugin::TEMPLATE_DEFINITION =
+const std::string PluginFSA::TEMPLATE_DEFINITION =
     "/**\n"                                                             \
     "  * @file {{classname}}.cpp\n"                                     \
     "  * @author ...\n"                                                 \
@@ -98,7 +98,7 @@ const std::string Plugin::TEMPLATE_DEFINITION =
     "    }\n"                                                           \
     "\n"                                                                \
     "    virtual ~{{classname}}()\n"                                    \
-    "    {}\n\n"                                                          \
+    "    {}\n\n"                                                        \
     "private:\n"                                                        \
     "{{for i in actions}}"                                              \
     "\n"                                                                \
@@ -149,7 +149,7 @@ const std::string Plugin::TEMPLATE_DEFINITION =
     "} // namespace {{namespace}}\n\n"                                  \
     "DECLARE_DYNAMICS({{namespace}}::{{classname}})\n\n";
 
-const Glib::ustring Plugin::UI_DEFINITION =
+const Glib::ustring PluginFSA::UI_DEFINITION =
     "<ui>"
     "    <toolbar name='Toolbar'>"
     "        <toolitem action='Select' />"
@@ -160,15 +160,8 @@ const Glib::ustring Plugin::UI_DEFINITION =
     "    </toolbar>"
     "</ui>";
 
-Plugin::Plugin(const std::string& name) : ModelingPlugin(name),
-                                          mDialog(0),
-                                          mStatechart(0)
-{ }
-
-Plugin::~Plugin()
-{ }
-
-void Plugin::build()
+PluginFSA::PluginFSA(const std::string& name)
+    : ModelingPlugin(name), mDialog(0), mStatechart(0)
 {
     std::string glade = utils::Path::path().getModelingGladeFile("FSA.glade");
 
@@ -184,13 +177,13 @@ void Plugin::build()
 
     mList.push_back(mIncludeButton->signal_clicked().connect(
                         sigc::mem_fun(*this,
-                                      &Plugin::onIncludeSource)));
+                                      &PluginFSA::onIncludeSource)));
     mList.push_back(mUserButton->signal_clicked().connect(
                         sigc::mem_fun(*this,
-                                      &Plugin::onUserSource)));
+                                      &PluginFSA::onUserSource)));
     mList.push_back(mTimeStepButton->signal_clicked().connect(
                         sigc::mem_fun(*this,
-                                      &Plugin::onTimeStep)));
+                                      &PluginFSA::onTimeStep)));
 
     {
         Gtk::HBox* hbox;
@@ -211,7 +204,17 @@ void Plugin::build()
     }
 }
 
-void Plugin::createActions()
+PluginFSA::~PluginFSA()
+{
+    destroy();
+
+    for (std::list < sigc::connection >::iterator it = mList.begin();
+         it != mList.end(); ++it) {
+        it->disconnect();
+    }
+}
+
+void PluginFSA::createActions()
 {
     Gtk::RadioAction::Group toolsGroup;
 
@@ -219,80 +222,81 @@ void Plugin::createActions()
 	Gtk::RadioAction::create(toolsGroup, "Select", Gtk::Stock::INDEX,
                                  _("Select"),
                                  _("Select state or transition (F1)")),
-	Gtk::AccelKey("F1"), sigc::mem_fun(this, &Plugin::onSelect));
+	Gtk::AccelKey("F1"), sigc::mem_fun(this, &PluginFSA::onSelect));
     mActionGroup->add(
 	Gtk::RadioAction::create(toolsGroup, "AddState", Gtk::Stock::ADD,
                                  _("Add state"),
                                  _("Add state (F2)")),
 	Gtk::AccelKey("F2"),
-	sigc::mem_fun(this, &Plugin::onAddState));
+	sigc::mem_fun(this, &PluginFSA::onAddState));
     mActionGroup->add(
 	Gtk::RadioAction::create(toolsGroup, "AddTransition",
                                  Gtk::Stock::DISCONNECT,
                                  _("Add transition"),
                                  _("Add transition (F3)")),
 	Gtk::AccelKey("F3"),
-	sigc::mem_fun(this, &Plugin::onAddTransition));
+	sigc::mem_fun(this, &PluginFSA::onAddTransition));
     mActionGroup->add(
 	Gtk::RadioAction::create(toolsGroup, "Delete", Gtk::Stock::DELETE,
                                  _("Delete"),
                                  _("Delete state or transition (F4)")),
 	Gtk::AccelKey("F4"),
-	sigc::mem_fun(this, &Plugin::onDelete));
+	sigc::mem_fun(this, &PluginFSA::onDelete));
     mActionGroup->add(
 	Gtk::RadioAction::create(toolsGroup, "Help", Gtk::Stock::HELP,
                                  _("Help"), _("Help (F5)")),
 	Gtk::AccelKey("F5"),
-	sigc::mem_fun(this, &Plugin::onHelp));
+	sigc::mem_fun(this, &PluginFSA::onHelp));
 }
 
-void Plugin::createUI()
+void PluginFSA::createUI()
 {
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
     try {
 	mUIManager->add_ui_from_string(UI_DEFINITION);
     } catch(const Glib::Error& ex) {
-	std::cerr << "building menus failed: " << ex.what();
+        throw utils::InternalError(fmt(
+                _("FSA modeling plugin building menus failed: %1%")) %
+            ex.what());
     }
 #else
     std::auto_ptr<Glib::Error> ex;
     mUIManager->add_ui_from_string(UI_DEFINITION, ex);
     if (ex.get()) {
-	std::cerr << "building menus failed: " << ex->what();
+        throw utils::InternalError(fmt(
+                _("FSA modeling plugin building menus failed: %1%")) %
+            ex->what());
     }
-#endif //GLIBMM_EXCEPTIONS_ENABLED
+#endif
 }
 
-void Plugin::destroy()
+void PluginFSA::destroy()
 {
-    for (std::list < sigc::connection >::iterator it = mList.begin();
-         it != mList.end(); ++it) {
-        it->disconnect();
-    }
-    if (mStatechart) delete mStatechart;
+    delete mStatechart;
+    mStatechart = 0;
 }
 
-void Plugin::onAddState()
+void PluginFSA::onAddState()
 {
     mView->setState(StatechartDrawingArea::ADD_STATE);
 }
 
-void Plugin::onAddTransition()
+void PluginFSA::onAddTransition()
 {
     mView->setState(StatechartDrawingArea::ADD_TRANSITION);
 }
 
-void Plugin::onDelete()
+void PluginFSA::onDelete()
 {
     mView->setState(StatechartDrawingArea::DELETE);
 }
 
-void Plugin::onHelp()
+void PluginFSA::onHelp()
 {
     mView->setState(StatechartDrawingArea::HELP);
 }
 
-void Plugin::onIncludeSource()
+void PluginFSA::onIncludeSource()
 {
     SourceDialog dialog(mXml);
 
@@ -302,12 +306,12 @@ void Plugin::onIncludeSource()
     }
 }
 
-void Plugin::onSelect()
+void PluginFSA::onSelect()
 {
     mView->setState(StatechartDrawingArea::SELECT);
 }
 
-void Plugin::onTimeStep()
+void PluginFSA::onTimeStep()
 {
     TimeStepDialog dialog(mXml);
 
@@ -316,7 +320,7 @@ void Plugin::onTimeStep()
     }
 }
 
-void Plugin::onUserSource()
+void PluginFSA::onUserSource()
 {
     SourceDialog dialog(mXml);
 
@@ -328,13 +332,13 @@ void Plugin::onUserSource()
     }
 }
 
-bool Plugin::create(graph::AtomicModel& atom,
-                    vpz::AtomicModel& model,
-                    vpz::Dynamic& /*dynamic*/,
-                    vpz::Conditions& /*conditions*/,
-                    vpz::Observables& observables,
-                    const std::string& classname,
-                    const std::string& namespace_)
+bool PluginFSA::create(graph::AtomicModel& atom,
+                       vpz::AtomicModel& model,
+                       vpz::Dynamic& /*dynamic*/,
+                       vpz::Conditions& /*conditions*/,
+                       vpz::Observables& observables,
+                       const std::string& classname,
+                       const std::string& namespace_)
 {
     strings_t inputPorts;
     strings_t outputPorts;
@@ -344,6 +348,7 @@ bool Plugin::create(graph::AtomicModel& atom,
          it != atom.getInputPortList().end(); ++it) {
         inputPorts.push_back(it->first);
     }
+
     for (graph::ConnectionList::const_iterator it =
              atom.getOutputPortList().begin();
          it != atom.getOutputPortList().end(); ++it) {
@@ -351,25 +356,23 @@ bool Plugin::create(graph::AtomicModel& atom,
     }
 
     mStatechart = new Statechart(classname, inputPorts, outputPorts);
-
-    build();
     mView->setStatechart(mStatechart);
 
     if (mDialog->run() == Gtk::RESPONSE_ACCEPT) {
         generateSource(classname, namespace_);
         generateStructure(atom);
         generateObservables(atom, model, observables);
-        mDialog->hide_all();
+        mDialog->hide();
         destroy();
         return true;
     } else {
-        mDialog->hide_all();
+        mDialog->hide();
         destroy();
         return false;
     }
 }
 
-void Plugin::generateObservables(graph::AtomicModel& atom,
+void PluginFSA::generateObservables(graph::AtomicModel& atom,
                                  vpz::AtomicModel& model,
                                  vpz::Observables& observables)
 {
@@ -392,7 +395,7 @@ void Plugin::generateObservables(graph::AtomicModel& atom,
     }
 }
 
-void Plugin::generateSource(const std::string& classname,
+void PluginFSA::generateSource(const std::string& classname,
                             const std::string& namespace_)
 {
     utils::Template tpl_(TEMPLATE_DEFINITION);
@@ -540,7 +543,7 @@ void Plugin::generateSource(const std::string& classname,
     mSource = out.str();
 }
 
-void Plugin::generateStructure(graph::AtomicModel& atom)
+void PluginFSA::generateStructure(graph::AtomicModel& atom)
 {
     for (strings_t::const_iterator it = mStatechart->inputPorts().begin();
          it != mStatechart->inputPorts().end(); ++it) {
@@ -557,7 +560,7 @@ void Plugin::generateStructure(graph::AtomicModel& atom)
     }
 }
 
-bool Plugin::modify(graph::AtomicModel& atom,
+bool PluginFSA::modify(graph::AtomicModel& atom,
                     vpz::AtomicModel& model,
                     vpz::Dynamic& /*dynamic*/,
                     vpz::Conditions& /*conditions*/,
@@ -607,25 +610,24 @@ bool Plugin::modify(graph::AtomicModel& atom,
     mDefinitionUser.assign(parseFunction(buffer, "//@@begin:definitionUser@@",
                                          "//@@end:definitionUser@@",
                                          "definitionUser"));
-    build();
     mView->setStatechart(mStatechart);
 
     if (mDialog->run() == Gtk::RESPONSE_ACCEPT) {
         generateSource(classname, namespace_);
         generateStructure(atom);
         generateObservables(atom, model, observables);
-        mDialog->hide_all();
+        mDialog->hide();
         destroy();
         return true;
     } else {
-        mDialog->hide_all();
+        mDialog->hide();
         destroy();
         return false;
     }
     return true;
 }
 
-void Plugin::parseConf(const strings_t& lst,
+void PluginFSA::parseConf(const strings_t& lst,
                        std::string& classname,
                        std::string& namespace_)
 {
@@ -639,7 +641,7 @@ void Plugin::parseConf(const strings_t& lst,
     mTimeStep.assign(lst[5], 2, lst[5].size() - 2);
 }
 
-std::string Plugin::parseFunction(const std::string& buffer,
+std::string PluginFSA::parseFunction(const std::string& buffer,
                                   const std::string& begin,
                                   const std::string& end,
                                   const std::string& name)
@@ -664,7 +666,7 @@ std::string Plugin::parseFunction(const std::string& buffer,
     return std::string((*it)[0].second + 1, (*jt)[0].first);
 }
 
-void Plugin::parseFunction(const std::string& buffer,
+void PluginFSA::parseFunction(const std::string& buffer,
                            const std::string& begin,
                            const std::string& end,
                            strings_t& names,
@@ -688,7 +690,7 @@ void Plugin::parseFunction(const std::string& buffer,
     }
 }
 
-void Plugin::parseFunctions(const std::string& buffer)
+void PluginFSA::parseFunctions(const std::string& buffer)
 {
     // actions
     {
@@ -803,7 +805,7 @@ void Plugin::parseFunctions(const std::string& buffer)
     }
 }
 
-void Plugin::parseStates(const strings_t& lst)
+void PluginFSA::parseStates(const strings_t& lst)
 {
     std::string state_lst(lst[3], 2, lst[3].size() - 2);
     strings_t states;
@@ -817,7 +819,7 @@ void Plugin::parseStates(const strings_t& lst)
     }
 }
 
-void Plugin::parseTransitions(const strings_t& lst)
+void PluginFSA::parseTransitions(const strings_t& lst)
 {
     std::string transition_lst(lst[4], 2, lst[4].size() - 2);
     strings_t transitions;
@@ -831,11 +833,11 @@ void Plugin::parseTransitions(const strings_t& lst)
     }
 }
 
-bool Plugin::start(vpz::Condition& /*condition*/)
+bool PluginFSA::start(vpz::Condition& /*condition*/)
 {
     return true;
 }
 
-DECLARE_GVLE_MODELINGPLUGIN(vle::gvle::modeling::Plugin)
+}}}} // namespace vle gvle modeling fsa
 
-}}} // namespace vle gvle modeling
+DECLARE_GVLE_MODELINGPLUGIN(vle::gvle::modeling::fsa::PluginFSA)

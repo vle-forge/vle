@@ -36,7 +36,7 @@
 #include <gtkmm/treeview.h>
 #include <libglademm.h>
 
-namespace vle { namespace gvle { namespace modeling {
+namespace vle { namespace gvle { namespace modeling { namespace de {
 
 class Variables
 {
@@ -52,7 +52,6 @@ public:
     Values& getVectorValues(const std::string& name)
     { return m_listValues[name]; }
 
-protected:
     typedef std::vector < std::string > Variables_t;
 
     void assign(vpz::Condition& condition);
@@ -193,7 +192,7 @@ private:
 
 };
 
-}}} // namespace vle gvle modeling
+}}}} // namespace vle gvle modeling
 
 #endif
 

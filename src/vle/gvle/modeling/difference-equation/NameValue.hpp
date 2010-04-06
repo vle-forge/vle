@@ -36,7 +36,7 @@
 #include <gtkmm/treeview.h>
 #include <libglademm.h>
 
-namespace vle { namespace gvle { namespace modeling {
+namespace vle { namespace gvle { namespace modeling { namespace de {
 
 class NameValue
 {
@@ -46,6 +46,11 @@ public:
 
     std::string getVariableName() const
 	{ return m_entryName->get_text(); }
+
+    Gtk::Widget& build(Glib::RefPtr<Gnome::Glade::Xml> ref);
+    void assign(vpz::Condition& condition);
+    void deletePorts(vpz::Condition& condition);
+    void fillFields(const vpz::Condition& condition);
 
 protected:
     class InitColumns : public Gtk::TreeModelColumnRecord
@@ -83,10 +88,6 @@ protected:
 	Glib::RefPtr<Gtk::ListStore> m_refTreeInit;
     };
 
-    void assign(vpz::Condition& condition);
-    Gtk::Widget& build(Glib::RefPtr<Gnome::Glade::Xml> ref);
-    void deletePorts(vpz::Condition& condition);
-    void fillFields(const vpz::Condition& condition);
 
 private:
     void createSetInit(vpz::Condition& condition);
@@ -101,10 +102,6 @@ private:
     InitTreeView*      m_initTreeView;
 };
 
-}}} // namespace vle gvle modeling
+}}}} // namespace vle gvle modeling de
 
 #endif
-
-
-
-

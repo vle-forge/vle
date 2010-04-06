@@ -35,7 +35,7 @@
 #include <gtkmm/scrolledwindow.h>
 #include <libglademm.h>
 
-namespace vle { namespace gvle { namespace modeling {
+namespace vle { namespace gvle { namespace modeling { namespace fsa {
 
 class StatechartDrawingArea : public Gtk::DrawingArea
 {
@@ -138,6 +138,6 @@ private:
     State*                             mStartState;
 };
 
-}}} // namespace vle gvle modeling
+}}}} // namespace vle gvle modeling fsa
 
 #endif

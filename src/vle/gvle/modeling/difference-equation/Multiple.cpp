@@ -29,14 +29,16 @@
 #include <vle/gvle/modeling/difference-equation/Multiple.hpp>
 #include <vle/utils/Path.hpp>
 
-namespace vle { namespace gvle { namespace modeling {
+namespace vle { namespace gvle { namespace modeling { namespace de {
 
-Multiple::Multiple(const std::string& name) :
-    Plugin(name), m_dialog(0), m_buttonSource(0)
-{}
+Multiple::Multiple(const std::string& name)
+    : Plugin(name), m_dialog(0), m_buttonSource(0)
+{
+}
 
 Multiple::~Multiple()
-{}
+{
+}
 
 void Multiple::build(bool modeling)
 {
@@ -49,10 +51,10 @@ void Multiple::build(bool modeling)
     m_dialog->set_title("DifferenceEquation - Multiple");
     mXml->get_widget("MultiplePluginVBox", vbox);
 
-    vbox->pack_start(Variables::build(mXml));
-    vbox->pack_start(TimeStep::build(mXml));
+    vbox->pack_start(mVariables.build(mXml));
+    vbox->pack_start(mTimeStep.build(mXml));
     if (modeling) {
-        vbox->pack_start(Parameters::build(mXml));
+        vbox->pack_start(mParameters.build(mXml));
 
         {
             m_buttonSource = Gtk::manage(
@@ -63,7 +65,7 @@ void Multiple::build(bool modeling)
                                 sigc::mem_fun(*this, &Plugin::onSource)));
         }
     }
-    vbox->pack_start(Mapping::build(mXml));
+    vbox->pack_start(mMapping.build(mXml));
 }
 
 bool Multiple::create(graph::AtomicModel& atom,
@@ -120,8 +122,8 @@ void Multiple::destroy()
 
 void Multiple::fillFields(const vpz::Condition& condition)
 {
-    Variables::fillFields(condition);
-    Mapping::fillFields(condition);
+    mVariables.fillFields(condition);
+    mMapping.fillFields(condition);
 }
 
 void Multiple::generateCondition(graph::AtomicModel& atom,
@@ -132,22 +134,22 @@ void Multiple::generateCondition(graph::AtomicModel& atom,
     if (conditions.exist(conditionName)) {
         vpz::Condition& condition(conditions.get(conditionName));
 
-	TimeStep::deletePorts(condition);
-        Variables::deletePorts(condition);
-        Mapping::deletePorts(condition);
-        Parameters::deletePorts(condition);
+	mTimeStep.deletePorts(condition);
+        mVariables.deletePorts(condition);
+        mMapping.deletePorts(condition);
+        mParameters.deletePorts(condition);
 
-	TimeStep::assign(condition);
-        Variables::assign(condition);
-        Mapping::assign(condition);
-	Parameters::assign(condition);
+	mTimeStep.assign(condition);
+        mVariables.assign(condition);
+        mMapping.assign(condition);
+	mParameters.assign(condition);
     } else {
         vpz::Condition condition(conditionName);
 
-	TimeStep::assign(condition);
-	Variables::assign(condition);
-        Mapping::assign(condition);
-	Parameters::assign(condition);
+	mTimeStep.assign(condition);
+	mVariables.assign(condition);
+        mMapping.assign(condition);
+	mParameters.assign(condition);
         conditions.add(condition);
     }
 
@@ -166,7 +168,7 @@ void Multiple::generateObservables(graph::AtomicModel& atom,
 
     if (observables.exist(observableName)) {
         vpz::Observable& observable(observables.get(observableName));
-        Variables::Variables_t variables = getVariables();
+        Variables::Variables_t variables = mVariables.getVariables();
 
         for (Variables::Variables_t::const_iterator it = variables.begin();
              it != variables.end(); ++it) {
@@ -176,7 +178,7 @@ void Multiple::generateObservables(graph::AtomicModel& atom,
         }
     } else {
         vpz::Observable observable(observableName);
-        Variables::Variables_t variables = getVariables();
+        Variables::Variables_t variables = mVariables.getVariables();
 
         for (Variables::Variables_t::const_iterator it = variables.begin();
              it != variables.end(); ++it) {
@@ -191,7 +193,7 @@ void Multiple::generateObservables(graph::AtomicModel& atom,
 
 void Multiple::generateOutputPorts(graph::AtomicModel& atom)
 {
-    Variables::Variables_t variables = getVariables();
+    Variables::Variables_t variables = mVariables.getVariables();
 
     for (Variables::Variables_t::const_iterator it = variables.begin();
          it != variables.end(); ++it) {
@@ -205,7 +207,7 @@ void Multiple::generateVariables(utils::Template& tpl_)
 {
     tpl_.listSymbol().append("var");
 
-    Variables::Variables_t variables = getVariables();
+    Variables::Variables_t variables = mVariables.getVariables();
 
     for (Variables::Variables_t::const_iterator it = variables.begin();
          it != variables.end(); ++it) {
@@ -315,13 +317,13 @@ bool Multiple::modify(graph::AtomicModel& atom,
     if (not conditions.exist(conditionName)) {
         vpz::Condition condition(conditionName);
 
-        TimeStep::fillFields(condition);
+        mTimeStep.fillFields(condition);
         Multiple::fillFields(condition);
-	Parameters::fillFields(parameters, externalVariables);
+	mParameters.fillFields(parameters, externalVariables);
     } else {
-        TimeStep::fillFields(conditions.get(conditionName));
+        mTimeStep.fillFields(conditions.get(conditionName));
         Multiple::fillFields(conditions.get(conditionName));
-	Parameters::fillFields(parameters, externalVariables);
+	mParameters.fillFields(parameters, externalVariables);
     }
 
     backup();
@@ -352,16 +354,16 @@ bool Multiple::start(vpz::Condition& condition)
 
 void Multiple::assign(vpz::Condition& condition)
 {
-    Mapping::deletePorts(condition);
-    TimeStep::deletePorts(condition);
-    Variables::deletePorts(condition);
+    mMapping.deletePorts(condition);
+    mTimeStep.deletePorts(condition);
+    mVariables.deletePorts(condition);
 
-    Mapping::assign(condition);
-    TimeStep::assign(condition);
-    Variables::assign(condition);
+    mMapping.assign(condition);
+    mTimeStep.assign(condition);
+    mVariables.assign(condition);
 }
 
-}}} // namespace vle gvle modeling
+}}}} // namespace vle gvle modeling de
 
-DECLARE_GVLE_MODELINGPLUGIN(vle::gvle::modeling::Multiple)
+DECLARE_GVLE_MODELINGPLUGIN(vle::gvle::modeling::de::Multiple)
 
