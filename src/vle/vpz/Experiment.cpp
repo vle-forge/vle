@@ -56,7 +56,7 @@ void Experiment::write(std::ostream& out) const
 void Experiment::clear()
 {
     m_name.clear();
-    m_duration = 0;
+    m_duration = 1.0;
     m_begin = 0;
     m_seed = 1;
 
