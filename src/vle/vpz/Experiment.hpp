@@ -47,11 +47,11 @@ namespace vle { namespace vpz {
     {
     public:
         /**
-         * @brief Build an empty experiment with null duration an beginning date
+         * @brief Build an empty experiment with 1 unit duration an beginning date
          * and seed to 1.
          */
         Experiment()
-            : m_duration(0), m_begin(0.0), m_seed(1)
+            : m_duration(1.0), m_begin(0.0), m_seed(1)
         {}
 
         /**
