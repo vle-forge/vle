@@ -503,9 +503,11 @@ void GVLEMenuAndToolbar::createEditActions()
 
     m_refActionGroup->add(
 	Gtk::Action::create("Undo", Gtk::Stock::UNDO),
+    Gtk::AccelKey("<control>z"),
 	sigc::mem_fun(mParent->getEditor(), &Editor::onUndo));
     m_refActionGroup->add(
 	Gtk::Action::create("Redo", Gtk::Stock::REDO),
+    Gtk::AccelKey("<control>y"),
 	sigc::mem_fun(mParent->getEditor(), &Editor::onRedo));
     m_refActionGroup->add(
 	Gtk::Action::create("Cut", Gtk::Stock::CUT),
@@ -581,10 +583,12 @@ void GVLEMenuAndToolbar::createProjectActions()
     m_refActionGroup->add(
 	Gtk::Action::create("ConfigureProject", _("Configure Project"),
 			    _("Configure the project")),
+	Gtk::AccelKey("<control>g"),
 	sigc::mem_fun(mParent, &GVLE::configureProject));
     m_refActionGroup->add(
 	Gtk::Action::create("BuildProject", _("Build Project"),
 			    _("Build the project")),
+	Gtk::AccelKey("<control>b"),
 	sigc::mem_fun(mParent, &GVLE::buildProject));
     m_refActionGroup->add(
 	Gtk::Action::create("CleanProject", _("Clean Project"),
