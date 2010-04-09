@@ -705,6 +705,7 @@ void GVLE::setFileName(std::string name)
 	mModeling->parseXML(name);
 	mMenuAndToolbar->showEditMenu();
 	mMenuAndToolbar->showSimulationMenu();
+	redrawModelTreeBox();
     }
     mModeling->setModified(false);
 }
