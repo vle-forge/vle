@@ -3,6 +3,33 @@ VLE 0.9.0
 
 
 
+VLE 0.8.2
+=========
+
+* project:
+  * vle: fix cflags include directories in pc files: In the same version of VLE
+    (ie. same major and minor version, only the patch changes), we do not odify
+    the paths of include directories.
+
+* extension:
+  * difference equation: fix bug on dynamic creation and history: When a
+    coupled model is created dynamically and it have several atomic models based
+    on DifferenceEquation extension, if an atomic model have a history, this
+    history goes out the coupled model and it is possible that an atomic model
+    is running and receive this history. This case proceed a bug (an xception).
+
+* manager:
+  * fix the way to stop threads: In multi threading (JustRunThread,
+    ManagerRunThread, SimulatorDistant), when the threads were stopped, delete
+    functions were called on Mutex objects that yielded to segmentation fault.
+
+* gvle:
+  * Modeling plugin:
+    * FSA: Add fsa modeling plug-in for Statechart, the code, the input/output
+      ports and observables are generated. The conditions are generated because
+      the Statechart extension doesn't need specific conditions.
+    * Difference Equation: add the generation of observables.
+
 
 VLE 0.8.1
 =========
