@@ -1144,7 +1144,6 @@ void CoupledModel::restoreInputConnections(ModelList& models,
     }
 }
 
-
 void CoupledModel::restoreOutputConnections(CoupledModel* destination,
                                             ModelConnections connections)
 {
@@ -1315,7 +1314,8 @@ void CoupledModel::repulsionForce()
 
 void CoupledModel::attractionForce()
 {
-    for (uint i=0; i < m_srcConnections.size(); i++) {
+    for (std::vector < Model* >::size_type i = 0; i <
+         m_srcConnections.size(); ++i) {
         float distance =
             distanceModels(m_srcConnections[i], m_dstConnections[i]);
 

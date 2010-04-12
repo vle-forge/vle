@@ -623,8 +623,8 @@ namespace vle { namespace graph {
         ConnectionList  m_internalOutputList;
 
         /* Connections */
-        std::vector<Model*> m_srcConnections;
-        std::vector<Model*> m_dstConnections;
+        std::vector < Model* > m_srcConnections;
+        std::vector < Model* > m_dstConnections;
     };
 
 }} // namespace vle graph
