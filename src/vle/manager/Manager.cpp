@@ -103,12 +103,17 @@ void ManagerRunThread::operator()(const vpz::Vpz& file)
     m_out << fmt(_("Manager: run experimental frames in %1% threads\n"))
         % m_process;
 
+    if (m_finish) {
+        throw utils::InternalError(
+            _("ManagerRunThread cannot be started more than one time."));
+    }
+
     initRandomGenerator(file);
     m_exp = getCombinationPlan(file, m_out);
     m_exp->saveVPZinstance(m_writefile);
 
-    Glib::Thread* prod(Glib::Thread::create(sigc::mem_fun(*this,
-                                                          &ManagerRunThread::read), true));
+    Glib::Thread* prod(Glib::Thread::create(
+            sigc::mem_fun(*this, &ManagerRunThread::read), true));
 
     for (unsigned int i = 0; i < m_process; ++i) {
         m_pool.push(sigc::mem_fun(*this, &ManagerRunThread::run));
@@ -116,6 +121,7 @@ void ManagerRunThread::operator()(const vpz::Vpz& file)
 
     prod->join();
     m_pool.stop_unused_threads();
+    m_pool.shutdown();
 
     if (utils::Trace::trace().haveWarning()) {
         m_out << fmt(_(

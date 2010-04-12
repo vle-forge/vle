@@ -89,6 +89,7 @@ void JustRunThread::operator()(const CmdArgs& args)
 
     prod->join();
     m_pool.stop_unused_threads();
+    m_pool.shutdown();
 
     for (std::map < std::string, std::string >::const_iterator it =
          m_outputs.begin(); it != m_outputs.end(); ++it) {

@@ -308,7 +308,6 @@ namespace vle { namespace manager {
 
         virtual ~ManagerRunThread()
         {
-            m_pool.shutdown();
         }
 
         /**
