@@ -224,7 +224,6 @@ namespace vle { namespace manager {
 
     inline JustRunThread::~JustRunThread()
     {
-        m_pool.shutdown();
     }
 
 }} // namespace vle manager
