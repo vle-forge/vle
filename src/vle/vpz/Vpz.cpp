@@ -197,19 +197,24 @@ void Vpz::validateFile(const std::string& filename)
 
     doc = xmlCtxtReadFile(ctxt, filename.c_str(), NULL, XML_PARSE_DTDVALID);
     if (not doc) {
+        std::string msg((fmt(_("Failed to parse '%1%': %2%")) % filename %
+                         (ctxt->lastError.message ? ctxt->lastError.message :
+                          "")).str());
+
         xmlFreeParserCtxt(ctxt);
-        throw utils::SaxParserError(fmt(_("Failed to parse '%1%': %2%")) %
-                                        filename % (ctxt->lastError.message ?
-                                                    ctxt->lastError.message :
-                                                    ""));
+
+        throw utils::SaxParserError(msg);
     }
 
     if (ctxt->valid == 0) {
+        std::string msg((fmt(_("Failed to validate '%1%': %2%")) % filename %
+                         (ctxt->lastError.message ? ctxt->lastError.message :
+                          "")).str());
+
         xmlFreeDoc(doc);
         xmlFreeParserCtxt(ctxt);
-        throw utils::SaxParserError(fmt(
-                _("Failed to validate '%1%': %2%")) % filename %
-            (ctxt->lastError.message ? ctxt->lastError.message : ""));
+
+        throw utils::SaxParserError(msg);
     }
     xmlFreeParserCtxt(ctxt);
 }
