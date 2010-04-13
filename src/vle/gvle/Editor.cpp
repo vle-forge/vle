@@ -123,7 +123,7 @@ void DocumentText::saveAs(const std::string& newFilePath)
 	mTitle = filename() + utils::Path::extension(filepath());
 	mGVLE->getEditor()->setModifiedTab(mTitle, newFilePath, oldFilePath);
         mGVLE->getMenu()->hideSave();
-    } catch(std::exception& e) {
+    } catch (const std::exception& /*e*/) {
 	throw _("Error while saving file.");
     }
 }
@@ -148,9 +148,13 @@ void DocumentText::init()
 	    file.close();
 	    Glib::ustring buffer_content = filecontent.str();
 	    if (not buffer_content.validate()) {
-		throw utils::FileError(_("This file isn't UTF-8 valid. Please"
-					 " convert this file with your source"
-					 " code editor."));
+                try {
+                    buffer_content = Glib::locale_to_utf8(buffer_content);
+                } catch (const Glib::ConvertError& e){
+                    throw utils::FileError(_("This file isn't UTF-8 valid,"
+                                             " and convert from locale"
+                                             " encoding failed."));
+                }
 	    }
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
 	    buffer->begin_not_undoable_action();
