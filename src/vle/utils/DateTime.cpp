@@ -273,13 +273,17 @@ bool DateTime::isValidYear(const double& date)
 {
     namespace bg = boost::gregorian;
 
-    bg::date mindate(bg::min_date_time);
-    bg::date maxdate(bg::max_date_time);
-    bg::date current(boost::numeric_cast < bg::date::date_int_type >(date));
+    try {
+        bg::date mindate(bg::min_date_time);
+        bg::date maxdate(bg::max_date_time);
+        bg::date current(boost::numeric_cast < bg::date::date_int_type >(date));
 
-    if (not current.is_special()) {
-        return mindate < current and current < maxdate;
-    } else {
+        if (not current.is_special()) {
+            return mindate < current and current < maxdate;
+        } else {
+            return false;
+        }
+    } catch(...) {
         return false;
     }
 }
