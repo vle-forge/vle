@@ -766,42 +766,49 @@ bool GVLE::on_delete_event(GdkEventAny* event)
 void GVLE::onArrow()
 {
     mCurrentButton = POINTER;
+    updateCursor();
     mStatusBar.push(_("Selection"));
 }
 
 void GVLE::onAddModels()
 {
     mCurrentButton = ADDMODEL;
+    updateCursor();
     mStatusBar.push(_("Add models"));
 }
 
 void GVLE::onAddLinks()
 {
     mCurrentButton = ADDLINK;
+    updateCursor();
     mStatusBar.push(_("Add links"));
 }
 
 void GVLE::onDelete()
 {
     mCurrentButton = DELETE;
+    updateCursor();
     mStatusBar.push(_("Delete object"));
 }
 
 void GVLE::onAddCoupled()
 {
     mCurrentButton = ADDCOUPLED;
+    updateCursor();
     mStatusBar.push(_("Coupled Model"));
 }
 
 void GVLE::onZoom()
 {
     mCurrentButton = ZOOM;
+    updateCursor();
     mStatusBar.push(_("Zoom"));
 }
 
 void GVLE::onQuestion()
 {
     mCurrentButton = QUESTION;
+    updateCursor();
     mStatusBar.push(_("Question"));
 }
 
@@ -821,12 +828,16 @@ void GVLE::onNewVpz()
         mModeling->start();
         mMenuAndToolbar->onOpenVpz();
         mMenuAndToolbar->showSave();
+        updateCursor();
     }
 }
 
 void GVLE::onNewProject()
 {
     mNewProjectBox->show();
+    clearModelTreeBox();
+    clearModelClassBox();
+    updateCursor();
 }
 
 void GVLE::onOpenFile()
@@ -873,6 +884,7 @@ void GVLE::onOpenVpz()
                   utils::Package::package().name()).str());
 	}
     }
+    updateCursor();
 }
 
 void GVLE::onOpenGlobalVpz()
@@ -1137,6 +1149,51 @@ void GVLE::onQuit()
 {
     mQuitBox->show();
 }
+
+void GVLE::updateCursor()
+{
+    Editor::Documents::const_iterator it = mEditor->getDocuments().begin();
+
+    while (it != mEditor->getDocuments().end() and
+           it->second->isDrawingArea() == false) {
+        ++it;
+    }
+
+    if (it != mEditor->getDocuments().end())
+    {
+        DocumentDrawingArea* da =
+            dynamic_cast < DocumentDrawingArea* > (it->second);
+        Glib::RefPtr< Gdk::Window > daw =
+            da->getCompleteDrawingArea()->get_window();
+
+        switch(mCurrentButton) {
+        case POINTER :
+            daw->set_cursor(Gdk::Cursor(Gdk::HAND2));
+            break;
+        case ADDMODEL :
+            daw->set_cursor(Gdk::Cursor(Gdk::CROSS));
+            break;
+        case ADDLINK :
+            daw->set_cursor(Gdk::Cursor(Gdk::PENCIL));
+            break;
+        case DELETE :
+            daw->set_cursor(Gdk::Cursor(Gdk::X_CURSOR));
+            break;
+        case ADDCOUPLED :
+            daw->set_cursor(Gdk::Cursor(Gdk::DRAPED_BOX));
+            break;
+        case ZOOM :
+            daw->set_cursor(Gdk::Cursor(Gdk::SIZING));
+            break;
+        case QUESTION :
+            daw->set_cursor(Gdk::Cursor(Gdk::QUESTION_ARROW));
+            break;
+        default :
+            daw->set_cursor(Gdk::Cursor(Gdk::ARROW));
+        }
+    }
+}
+
 
 void GVLE::onPreferences()
 {

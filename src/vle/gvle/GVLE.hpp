@@ -709,6 +709,7 @@ public:
     void setTitle(const Glib::ustring& name = "");
 
     void updateTitle();
+    void updateCursor();
 
 private:
     void fixSave();

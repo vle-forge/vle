@@ -627,6 +627,7 @@ void Editor::openTabVpz(const std::string& filepath,
     } else {
 	showCompleteView(filepath, model);
     }
+    mApp->updateCursor();
 }
 
 void Editor::showCompleteView(const std::string& filepath,
