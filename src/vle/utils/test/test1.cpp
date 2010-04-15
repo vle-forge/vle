@@ -300,6 +300,9 @@ BOOST_AUTO_TEST_CASE(date_time)
     BOOST_REQUIRE(not vle::utils::DateTime::isLeapYear(
 		      (2451911)));
 
+    BOOST_REQUIRE(not vle::utils::DateTime::isValidYear(
+		      (-1)));
+
     BOOST_REQUIRE_EQUAL(
 	vle::utils::DateTime::aYear((2451545)), 366);
     BOOST_REQUIRE_EQUAL(
