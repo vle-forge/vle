@@ -250,6 +250,8 @@ void GVLE::FileTreeView::on_row_activated(const Gtk::TreeModel::Path&,
                     mParent->redrawModelTreeBox();
                     mParent->redrawModelClassBox();
                     mParent->getMenu()->onOpenVpz();
+                    mParent->mModelTreeBox->set_sensitive(true);
+                    mParent->mModelClassBox->set_sensitive(true);
                 }
 	    } else {
 		mParent->getEditor()->openTab(absolute_path);
@@ -628,6 +630,9 @@ GVLE::GVLE(BaseObjectType* cobject,
     mModelTreeBox->setModeling(mModeling);
     mRefXML->get_widget_derived("TreeViewClass", mModelClassBox);
     mModelClassBox->createNewModelBox(mModeling);
+    mModelTreeBox->set_sensitive(false);
+    mModelClassBox->set_sensitive(false);
+    mFileTreeView->set_sensitive(false);
 
     mMenuAndToolbar = new GVLEMenuAndToolbar(this);
     mMenuAndToolbarVbox->pack_start(*mMenuAndToolbar->getMenuBar());
@@ -829,6 +834,8 @@ void GVLE::onNewVpz()
         mMenuAndToolbar->onOpenVpz();
         mMenuAndToolbar->showSave();
         mEditor->getDocumentDrawingArea()->updateCursor();
+        mModelTreeBox->set_sensitive(true);
+        mModelClassBox->set_sensitive(true);
     }
 }
 
@@ -838,6 +845,7 @@ void GVLE::onNewProject()
     clearModelTreeBox();
     clearModelClassBox();
     mEditor->getDocumentDrawingArea()->updateCursor();
+    mFileTreeView->set_sensitive(true);
 }
 
 void GVLE::onOpenFile()
@@ -864,6 +872,7 @@ void GVLE::onOpenProject()
         buildPackageHierarchy();
 	mMenuAndToolbar->onOpenProject();
         setTitle("");
+        mFileTreeView->set_sensitive(true);
     }
 }
 
@@ -878,6 +887,8 @@ void GVLE::onOpenVpz()
                 redrawModelTreeBox();
                 redrawModelClassBox();
                 mMenuAndToolbar->onOpenVpz();
+                mModelTreeBox->set_sensitive(true);
+                mModelClassBox->set_sensitive(true);
             }
 	} catch(utils::InternalError) {
             Error((fmt(_("No experiments in the package '%1%'")) %
@@ -915,12 +926,15 @@ void GVLE::onOpenGlobalVpz()
             if (mModeling->getTopModel()) {
                 redrawModelTreeBox();
                 redrawModelClassBox();
+                mModelTreeBox->set_sensitive(true);
+                mModelClassBox->set_sensitive(true);
                 mMenuAndToolbar->onOpenVpz();
                 mMenuAndToolbar->hideCloseProject();
                 mFileTreeView->clear();
             }
         }
     }
+
 }
 
 void GVLE::onRefresh()
@@ -1109,6 +1123,8 @@ bool GVLE::closeTab(const std::string& filepath)
                 mModeling->clearModeling();
                 clearModelTreeBox();
                 clearModelClassBox();
+                mModelTreeBox->set_sensitive(false);
+                mModelClassBox->set_sensitive(false);
                 vpz = true;
                 close = true;
             }
@@ -1144,6 +1160,8 @@ void GVLE::onCloseTab()
                 mModeling->clearModeling();
                 clearModelTreeBox();
                 clearModelClassBox();
+                mModelTreeBox->set_sensitive(false);
+                mModelClassBox->set_sensitive(false);
                 vpz = true;
             }
             mEditor->closeTab(it->first);
@@ -1160,11 +1178,15 @@ void GVLE::onCloseProject()
     mModeling->clearModeling();
     clearModelTreeBox();
     clearModelClassBox();
+    mModelTreeBox->set_sensitive(false);
+    mModelClassBox->set_sensitive(false);
     utils::Package::package().select("");
     mPluginFactory.update();
     buildPackageHierarchy();
     mMenuAndToolbar->showMinimalMenu();
     setTitle("");
+    mFileTreeView->set_sensitive(false);
+
 }
 
 void GVLE::onQuit()

@@ -463,6 +463,8 @@ Gtk::HBox* Editor::addLabel(const std::string& title,
 
 void Editor::changeTab(GtkNotebookPage* /*page*/, int num)
 {
+
+
     if (mApp->getCurrentTab() != num) {
         Gtk::Widget* tab = get_nth_page(num);
         Documents::iterator it = mDocuments.begin();
@@ -472,8 +474,12 @@ void Editor::changeTab(GtkNotebookPage* /*page*/, int num)
                 mApp->setCurrentTab(num);
                 if (utils::Path::extension(it->first) == ".vpz") {
                     mApp->getMenu()->onOpenVpz();
+                    mApp->getModelTreeBox()->set_sensitive(true);
+                    mApp->getModelClassBox()->set_sensitive(true);
                 } else {
                     mApp->getMenu()->onOpenFile();
+                    mApp->getModelTreeBox()->set_sensitive(false);
+                    mApp->getModelClassBox()->set_sensitive(false);
                 }
                 if (it->second->isModified()) {
                     mApp->getMenu()->showSave();
