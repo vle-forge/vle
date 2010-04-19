@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://www.vle-project.org/vle-0.9.0.dtd">
+<vle_project version="0.5" date="" author="Gauthier Quesnel">
+ <structures>
+  <model name="top" type="coupled">
+   <submodels>
+    <model name="executive" type="atomic" dynamics="executive" />
+   </submodels>
+  </model>
+ </structures>
+ <dynamics>
+  <dynamic name="executive" library="gens" model="exegraph"/>
+  <dynamic name="counter" library="gens" model="counter"/>
+  <dynamic name="gensbeep" library="gens" model="beep"/>
+ </dynamics>
+ <classes>
+  <class name="beepbeep">
+   <model name="a" type="atomic" dynamics="gensbeep" />
+  </class>
+  <class name="counter">
+   <model name="counter" type="atomic" dynamics="counter" observables="obs1">
+    <out>
+     <port name="out" />
+    </out>
+   </model>
+  </class>
+  <class name="beepbeepbeep">
+   <model name="c" type="atomic" dynamics="gensbeep" />
+  </class>
+ </classes>
+ <experiment name="generatorexecutiveclass" duration="100.0" seed="123">
+  <views>
+   <outputs>
+    <output name="o" format="local" plugin="file"/>
+   </outputs>
+   <observables>
+    <observable name="obs1">
+     <port name="c">
+      <attachedview name="view1"/>
+     </port>
+    </observable>
+   </observables>
+   <view name="view1" type="timed" timestep="1" output="o"/>
+  </views>
+ </experiment>
+</vle_project>

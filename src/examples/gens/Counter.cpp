@@ -77,7 +77,7 @@ void Counter::externalTransition(const devs::ExternalEventList& events,
 
 value::Value* Counter::observation(const devs::ObservationEvent&  ev) const
 {
-    if (ev.onPort("c")){
+    if (ev.onPort("c")) {
         if (m_counter > 100 and m_counter < 500) {
             return 0;
         } else {

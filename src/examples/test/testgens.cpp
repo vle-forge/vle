@@ -173,3 +173,55 @@ BOOST_AUTO_TEST_CASE(test_gens_with_class)
 
     vle::utils::finalize();
 }
+
+BOOST_AUTO_TEST_CASE(test_gens_with_graph)
+{
+    vpz::Vpz* file = new vpz::Vpz(
+        utils::Path::path().getExampleFile("gensgraph.vpz"));
+
+    /* change the output text to storage output */
+    vpz::Output& o(file->project().experiment().views().outputs().get("o"));
+    o.setLocalStream("", "storage");
+
+    /* run the simulation */
+    manager::RunVerbose r(std::cerr);
+    r.start(file);
+    file = 0;
+
+    /* begin check */
+    BOOST_REQUIRE_EQUAL(r.haveError(), false);
+    oov::OutputMatrixViewList& out(r.outputs());
+    BOOST_REQUIRE_EQUAL(out.size(), (oov::OutputMatrixViewList::size_type)1);
+
+    /* get result of simulation */
+    oov::OutputMatrix& view1(out["view1"]);
+
+    /* check matrix */
+    value::MatrixView result(view1.values());
+
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+                        (value::MatrixView::size_type)2);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+                        (value::MatrixView::size_type)101);
+
+    BOOST_REQUIRE_EQUAL(value::toDouble(result[0][0]), 0);
+    BOOST_REQUIRE_EQUAL(value::toDouble(result[1][0]), 5);
+
+    BOOST_REQUIRE_EQUAL(value::toDouble(result[0][5]), 5);
+    BOOST_REQUIRE_EQUAL(value::toDouble(result[1][5]), 30);
+
+    BOOST_REQUIRE_EQUAL(value::toDouble(result[0][20]), 20);
+    BOOST_REQUIRE_EQUAL(result[1][20], (value::Value*)0);
+
+    BOOST_REQUIRE_EQUAL(value::toDouble(result[0][99]), 99);
+    BOOST_REQUIRE_EQUAL(value::toDouble(result[1][99]), 500);
+
+    BOOST_REQUIRE_EQUAL(value::toDouble(result[0][100]), 100);
+    BOOST_REQUIRE_EQUAL(value::toDouble(result[1][100]), 505);
+
+    vle::utils::finalize();
+}
+
+
+
+

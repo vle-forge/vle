@@ -12,7 +12,8 @@ LINK_DIRECTORIES(
   ${Boost_LIBRARY_DIRS})
 
 SET(SOURCES_CPP Beep.cpp Beep.hpp Counter.cpp Counter.hpp GenExecutive.cpp
-  GenExecutive.hpp GenExecutiveClass.cpp GenExecutiveClass.hpp)
+  GenExecutive.hpp GenExecutiveClass.cpp GenExecutiveClass.hpp
+  GenExecutiveGraph.cpp)
 
 ADD_LIBRARY(gens SHARED ${SOURCES_CPP})
 
@@ -38,5 +39,6 @@ INSTALL(TARGETS gens
 INSTALL(FILES gens.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
 INSTALL(FILES genswithclass.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
 INSTALL(FILES gensnetview.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
+INSTALL(FILES gensgraph.vpz DESTINATION "${VLE_SHARE_DIRS}/examples")
 INSTALL(FILES ${SOURCES_CPP} DESTINATION
   "${VLE_SHARE_DIRS}/examples/sources/gens")
