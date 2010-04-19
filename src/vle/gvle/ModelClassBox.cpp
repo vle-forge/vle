@@ -213,6 +213,7 @@ void ModelClassBox::onRename()
 		   try {
 		       row[mColumns.mName] = newname;
 		       graph::Model::rename(row[mColumns.mModel], newname);
+		       mModeling->setModified(true);
 		   } catch(utils::DevsGraphError dge) {
 		       row[mColumns.mName] = oldname;
 		   }
@@ -322,6 +323,7 @@ void ModelClassBox::onImportClassesFromVpz()
 	std::string project_file = file.get_filename();
         try {
             vpz::Vpz* import = new vpz::Vpz(project_file);
+            mModeling->setModified(true);
 	    mModeling->importClasses(import);
             delete import;
 	} catch (std::exception& E) {
@@ -495,6 +497,7 @@ void ModelClassBox::onEdition(
 		    try {
 			row[mColumns.mName] = newName;
 			graph::Model::rename(row[mColumns.mModel], newName);
+			mModeling->setModified(true);
 		    } catch(utils::DevsGraphError dge) {
 			row[mColumns.mName] = mOldName;
 		    }

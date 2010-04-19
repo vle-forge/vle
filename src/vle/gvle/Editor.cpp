@@ -642,12 +642,12 @@ void Editor::showCompleteView(const std::string& filepath,
 	remove_page(page);
 	delete it->second;
 	mDocuments.erase(it->first);
-
 	DocumentCompleteDrawingArea* doc = new DocumentCompleteDrawingArea(
 	    mApp,
 	    filepath,
 	    mApp->getModeling()->findView(model),
 	    model);
+	doc->setTitle(filepath, model, mApp->getModeling()->isModified());
 	mDocuments.insert(
 	    std::make_pair < std::string, DocumentDrawingArea* >
 	    (filepath,doc));
@@ -660,6 +660,7 @@ void Editor::showCompleteView(const std::string& filepath,
 	    filepath,
 	    mApp->getModeling()->findView(model),
 	    model);
+	doc->setTitle(filepath, model, mApp->getModeling()->isModified());
 	mDocuments.insert(
 	    std::make_pair < std::string, DocumentDrawingArea* >(filepath,
 								 doc));
@@ -689,6 +690,7 @@ void Editor::showSimpleView(const std::string& filepath,
 	    filepath,
 	    mApp->getModeling()->findView(model),
 	    model);
+	doc->setTitle(filepath, model, mApp->getModeling()->isModified());
 	mDocuments.insert(
 	    std::make_pair < std::string, DocumentDrawingArea* >
 	    (filepath, doc));
