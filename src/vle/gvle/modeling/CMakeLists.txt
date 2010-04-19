@@ -1,2 +1,3 @@
 ADD_SUBDIRECTORY(difference-equation)
+ADD_SUBDIRECTORY(petrinet)
 ADD_SUBDIRECTORY(fsa)
