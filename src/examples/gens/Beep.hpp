@@ -30,7 +30,8 @@
 #ifndef VLE_EXAMPLES_BEEP_HPP
 #define VLE_EXAMPLES_BEEP_HPP
 
-#include <vle/devs.hpp>
+#include <vle/devs/Dynamics.hpp>
+#include <vle/devs/DynamicsDbg.hpp>
 
 namespace vle { namespace examples { namespace gens {
 
@@ -55,6 +56,6 @@ namespace vle { namespace examples { namespace gens {
 
 }}} // namespace vle examples gens
 
-DECLARE_NAMED_DYNAMICS(beep, vle::examples::gens::Beep)
+DECLARE_NAMED_DYNAMICS_DBG(beep, vle::examples::gens::Beep)
 
 #endif

@@ -20,9 +20,10 @@ ELSE(WIN32)
   SET(OS_SPECIFIC_PATH_IMPL)
 ENDIF(WIN32)
 
-SET(TRANSLATOR_HPP DllDefines.hpp MatrixTranslator.hpp)
+SET(TRANSLATOR_HPP DllDefines.hpp GraphTranslator.hpp MatrixTranslator.hpp)
 
-SET(TRANSLATOR_CPP MatrixTranslator.cpp ${OS_SPECIFIC_PATH_IMPL})
+SET(TRANSLATOR_CPP GraphTranslator.cpp MatrixTranslator.cpp
+  ${OS_SPECIFIC_PATH_IMPL})
 
 ADD_LIBRARY(vletranslator SHARED ${TRANSLATOR_HPP};${TRANSLATOR_CPP})
 
