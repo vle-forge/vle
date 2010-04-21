@@ -386,3 +386,32 @@ BOOST_AUTO_TEST_CASE(to_time_function)
     BOOST_REQUIRE_EQUAL(minutes, 35);
     BOOST_REQUIRE_EQUAL(seconds, 26);
 }
+
+BOOST_AUTO_TEST_CASE(localized_conversion)
+{
+    namespace vu = vle::utils;
+
+    /* convert a C locale real */
+    BOOST_REQUIRE_CLOSE(vu::convert < double >("123456789"), 123456789., 0.1);
+    BOOST_REQUIRE_CLOSE(vu::convert < double >("12.3456789"), 12.3456789, 0.1);
+    BOOST_REQUIRE_CLOSE(vu::convert < double >("12345678.9"), 12345678., 0.1);
+    BOOST_REQUIRE_CLOSE(vu::convert < double >("-12345e5"), -12345e5, 0.1);
+    BOOST_REQUIRE_CLOSE(vu::convert < double >("12345e5"), 12345e5, 0.1);
+    BOOST_REQUIRE_CLOSE(vu::convert < double >("12345."), 12345., 0.1);
+
+    /* convert a fr_FR locale real */
+    if (vu::isLocaleAvailable("fr_FR")) {
+        BOOST_REQUIRE_CLOSE(vu::convert < double >("123 456 789", true,
+                                                   "fr_FR"), 123456789., 0.1);
+        BOOST_REQUIRE_CLOSE(vu::convert < double >("12,3456789", true,
+                                                   "fr_FR"), 12.3456789, 0.1);
+        BOOST_REQUIRE_CLOSE(vu::convert < double >("12345678,9", true,
+                                                   "fr_FR"), 12345678., 0.1);
+        BOOST_REQUIRE_CLOSE(vu::convert < double >("-12345,0e5", true,
+                                                   "fr_FR"), -12345e5, 0.1);
+        BOOST_REQUIRE_CLOSE(vu::convert < double >("12345,0e5", true, "fr_FR"),
+                            12345e5, 0.1);
+        BOOST_REQUIRE_CLOSE(vu::convert < double >("12345,", true, "fr_FR"),
+                            12345., 0.1);
+    }
+}

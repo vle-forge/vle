@@ -120,6 +120,84 @@ namespace vle { namespace utils {
     }
 
     /**
+     * @brief Check if the locale exists on this operating system.
+     * @param locale The locale to check.
+     * @return True if the locale exists, false otherwise.
+     */
+    inline bool isLocaleAvailable(const std::string& locale)
+    {
+        try {
+            std::locale tmp(locale.c_str());
+            return true;
+        } catch (const std::runtime_error& /*e*/) {
+            return false;
+        }
+    }
+
+    /**
+     * @brief Convert the string to the output template type with or without
+     * the use of locale.
+     * @code
+     * vle::utils::convert < double >("123.456");
+     * // returns 123.456
+     *
+     * vle::utils::convert < double >("123 456,789", true, "fr_FR");
+     * // returns 123456.789
+     * @endcode
+     * @param value The string to convert
+     * @param locale True to use the default locale, false otherwise.
+     * @param loc The locale to use.
+     * @throw utils::ArgError if a convertion failed.
+     * @return A template output type.
+     */
+    template < typename output > output convert(
+        const std::string& value,
+        bool locale = false,
+        const std::string& loc = std::string())
+    {
+        std::stringstream s;
+
+        if (locale or not loc.empty()) {
+            if (not isLocaleAvailable(loc)) {
+                s.imbue(std::locale::classic());
+                locale = false;
+            } else {
+                s.imbue(std::locale(loc.c_str()));
+                locale = true;
+            }
+        }
+
+        s << value;
+
+        if (s.bad() or s.fail()) {
+            throw ArgError("failed to read the value");
+        }
+
+        output result;
+        s >> result;
+
+        if (s.bad()) {
+            throw ArgError("failed to write the value");
+        } else {
+            std::streambuf* buf = s.rdbuf();
+
+            if (buf->in_avail() > 0 and locale) {
+                s.imbue(std::locale::classic());
+                s.str(value);
+                s >> result;
+
+                if (s.bad()) {
+                    throw ArgError("failed to write the value");
+                } else {
+                    return result;
+                }
+            } else {
+                return result;
+            }
+        }
+    }
+
+    /**
      * Return conversion from string into double.
      *
      * @param str string to convert.
