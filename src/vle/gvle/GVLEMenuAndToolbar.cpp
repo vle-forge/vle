@@ -41,11 +41,9 @@ const Glib::ustring GVLEMenuAndToolbar::UI_DEFINITION =
     "<ui>"
     "    <menubar name='MenuBar'>"
     "        <menu action='MenuFile'>"
-    "            <menuitem action='NewFile'/>"
     "            <menuitem action='NewProject'/>"
     "            <menuitem action='NewVpz'/>"
     "            <separator/>"
-    "            <menuitem action='OpenFile'/>"
     "            <menuitem action='OpenProject'/>"
     "            <menuitem action='OpenVpz'/>"
     "            <menuitem action='OpenGlobalVpz'/>"
@@ -165,10 +163,8 @@ void GVLEMenuAndToolbar::init()
 void GVLEMenuAndToolbar::showMinimalMenu()
 {
     // Menu file
-    m_refActionGroup->get_action("NewFile")->set_sensitive(true);
     m_refActionGroup->get_action("NewVpz")->set_sensitive(true);
     m_refActionGroup->get_action("NewProject")->set_sensitive(true);
-    m_refActionGroup->get_action("OpenFile")->set_sensitive(false);
     m_refActionGroup->get_action("OpenProject")->set_sensitive(true);
     m_refActionGroup->get_action("OpenVpz")->set_sensitive(false);
     m_refActionGroup->get_action("OpenGlobalVpz")->set_sensitive(true);
@@ -424,11 +420,6 @@ void GVLEMenuAndToolbar::createFileActions()
     m_refActionGroup->add(Gtk::Action::create("MenuFile", _("_File")));
 
     m_refActionGroup->add(
-	Gtk::Action::create("NewFile", Gtk::Stock::NEW,
-			    _("New File"), _("Create a new editable file")),
-	Gtk::AccelKey(""),
-	sigc::mem_fun(mParent, &GVLE::onNewFile));
-    m_refActionGroup->add(
 	Gtk::Action::create("NewProject", Gtk::Stock::DIRECTORY,
 			    _("New Project"), _("Create a new project")),
 	Gtk::AccelKey("<control>n"),
@@ -438,12 +429,6 @@ void GVLEMenuAndToolbar::createFileActions()
 			    _("New _Vpz"), _("Create a new Vpz")),
 	Gtk::AccelKey("<control><shift>n"),
 	sigc::mem_fun(mParent, &GVLE::onNewVpz));
-    m_refActionGroup->add(
-	Gtk::Action::create("OpenFile", Gtk::Stock::OPEN,
-			    _("Open File"), _("Open an editable file "
-					      "from package")),
-	Gtk::AccelKey(""),
-	sigc::mem_fun(mParent, &GVLE::onOpenFile));
     m_refActionGroup->add(
 	Gtk::Action::create("OpenProject", Gtk::Stock::OPEN,
 			    _("Open P_roject"), _("Open a Package")),
