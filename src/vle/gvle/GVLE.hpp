@@ -712,6 +712,7 @@ public:
     void updateCursor();
 
 private:
+    bool checkVpz();
     void fixSave();
     void saveVpz();
     void saveFirstVpz();

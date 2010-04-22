@@ -954,6 +954,25 @@ void GVLE::onShowSimpleView()
     mEditor->showSimpleView(mModeling->getFileName(), currentModel);
 }
 
+bool GVLE::checkVpz()
+{
+    std::vector<std::string> vec;
+    mModeling->vpz_is_correct(vec);
+
+    if (vec.size() != 0) {
+        std::string error = _("Vpz incorrect :\n");
+        std::vector<std::string>::const_iterator it = vec.begin();
+
+        while (it != vec.end()) {
+            error += *it + "\n";
+            ++it;
+        }
+        Error(error);
+        return false;
+    }
+    return true;
+}
+
 void GVLE::onSave()
 {
     int page = mEditor->get_current_page();
@@ -997,6 +1016,9 @@ void GVLE::onSaveAs()
 	->isDrawingArea();
 
     if (page != -1) {
+        if (!checkVpz()) {
+            return;
+        }
 	if (isVPZ) {
 	    title = _("VPZ file");
 	} else {
@@ -1289,21 +1311,9 @@ void GVLE::onShowAbout()
 
 void GVLE::saveVpz()
 {
-    std::vector<std::string> vec;
-
-    mModeling->vpz_is_correct(vec);
-    if (vec.size() != 0) {
-        std::string error = _("Vpz incorrect :\n");
-        std::vector<std::string>::const_iterator it = vec.begin();
-
-        while (it != vec.end()) {
-            error += *it + "\n";
-            ++it;
-        }
-        Error(error);
+    if (!checkVpz()){
         return;
     }
-
     if (mModeling->isSaved()) {
         Editor::Documents::const_iterator it =
             mEditor->getDocuments().find(mModeling->getFileName());
