@@ -257,6 +257,13 @@ public:
     //
 
     /**
+     * Unselect a model
+     *
+     * @param mdl model to unselect
+     */
+    void removeFromSelectedModel(graph::Model* mdl);
+
+	/**
      * Add a single atomic model in position x, y.
      *
      * @param x new position of atomic model

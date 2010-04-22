@@ -31,6 +31,7 @@
 #ifndef VLE_GVLE_VIEWDRAWINGAREA_HPP
 #define VLE_GVLE_VIEWDRAWINGAREA_HPP
 
+#include <gtkmm.h>
 #include <gtkmm/drawingarea.h>
 #include <gdkmm/color.h>
 

@@ -68,6 +68,21 @@ public:
     void parseModel(graph::Model* top);
 
     /**
+     * active a row for a particular model
+     *
+     * @param mdl model to activate
+     */
+    void showRow(const graph::Model* mdl);
+
+    /**
+     * Get the treview row as an iterator from the selected model
+     *
+     * @param mdl selected model
+     * @param current model child 
+     */
+    Gtk::TreeModel::iterator getModelRow(const graph::Model* mdl, Gtk::TreeModel::Children child);
+
+    /**
      * active a row for a particular string, all activated row are hide
      *
      * @param model_name model name to activate
@@ -100,6 +115,12 @@ public:
      * @brief Clear the current Treeview
      */
     void clear();
+
+    /**
+     * @brief Clear the selection
+     */
+    void selectNone();
+
 
 protected:
     /**
@@ -193,6 +214,9 @@ class ModelTreeColumn : public Gtk::TreeModel::ColumnRecord
 
 private:
     void initMenuPopupModels();
+    bool select_function(
+        const Glib::RefPtr<Gtk::TreeModel>& model,
+        const Gtk::TreeModel::Path& path, bool);
     bool onButtonRealeaseModels(GdkEventButton* event);
 
     struct ModelsColumnRecord : public Gtk::TreeModel::ColumnRecord

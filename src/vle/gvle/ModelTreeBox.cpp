@@ -30,6 +30,7 @@
 
 #include <vle/gvle/ModelTreeBox.hpp>
 #include <vle/gvle/Modeling.hpp>
+#include <vle/gvle/View.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/graph/Model.hpp>
 #include <vle/graph/CoupledModel.hpp>
@@ -59,9 +60,51 @@ ModelTreeBox::ModelTreeBox(BaseObjectType* cobject,
     signal_button_release_event().connect(
 	sigc::mem_fun(*this, &ModelTreeBox::onButtonRealeaseModels));
 
+    Glib::RefPtr<Gtk::TreeSelection> selection = Gtk::TreeView::get_selection();
+
+    selection->set_select_function(
+        sigc::mem_fun(*this, &ModelTreeBox::select_function) );
+
     expand_all();
     set_rules_hint(true);
     initMenuPopupModels();
+}
+
+bool ModelTreeBox::select_function(
+    const Glib::RefPtr<Gtk::TreeModel>& model,
+    const Gtk::TreeModel::Path& path, bool info)
+{
+    const Gtk::TreeModel::iterator iter = model->get_iter(path);
+
+    View* view =
+        m_modeling->getGVLE()->getEditor()->getDocumentDrawingArea()->getView();
+
+    graph::Model* mdl;
+
+    if (iter) {
+        Gtk::TreeModel::Row row = *iter;
+        mdl = (graph::Model*)row[m_columns.mModel];
+        if (mdl) {
+            if (info) {
+                view->removeFromSelectedModel(mdl);
+            } else {
+                if (not view->existInSelectedModels(mdl) &&
+                    mdl->getParent()) {
+                    m_modeling->addView(mdl->getParent());
+                }
+                view->clearSelectedModels();
+                view->addModelToSelectedModels(mdl);
+            }
+            view->redraw();
+        }
+    }
+    return true;
+}
+
+void ModelTreeBox::selectNone()
+{
+    Glib::RefPtr<Gtk::TreeSelection> selection = get_selection();
+    selection->unselect_all();
 }
 
 void ModelTreeBox::initMenuPopupModels()
@@ -128,6 +171,38 @@ void ModelTreeBox::parseModel(graph::Model* top)
     expand_all();
 }
 
+Gtk::TreeModel::iterator ModelTreeBox::getModelRow(const graph::Model* mdl,
+                                                   Gtk::TreeModel::Children child)
+{
+    Gtk::TreeModel::iterator iter = child.begin();
+
+    while (iter != child.end()) {
+        if ((*iter).get_value(m_columns.mModel) == mdl) {
+            return iter;
+        }
+        if (!((*iter).children().empty())) {
+            Gtk::TreeModel::iterator iterin = getModelRow(mdl, (*iter).children());
+            if (iterin != (*iter).children().end()) {
+                return iterin;
+            }
+        }
+        iter++;
+    }
+    return iter;
+}
+
+void ModelTreeBox::showRow(const graph::Model* mdl)
+{
+    if (mdl->getParent()) {
+        Gtk::TreeModel::iterator iter = getModelRow(mdl->getParent(),
+                                                    m_refTreeModel->children());
+        expand_to_path(Gtk::TreePath(iter));
+    }
+
+    Gtk::TreeModel::iterator iter = getModelRow(mdl, m_refTreeModel->children());
+    set_cursor(Gtk::TreePath(iter));
+}
+
 void ModelTreeBox::showRow(const std::string& model_name)
 {
     m_search.assign(model_name);
@@ -138,6 +213,7 @@ void ModelTreeBox::clear()
 {
     m_refTreeModel->clear();
 }
+
 
 Gtk::TreeModel::Row
 ModelTreeBox::addModel(graph::Model* model)

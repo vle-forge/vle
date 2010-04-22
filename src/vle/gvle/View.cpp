@@ -139,7 +139,6 @@ void View::addModelToSelectedModels(graph::Model* m)
 	if (existInSelectedModels(mCurrent) or m == mCurrent) {
 	    clearSelectedModels();
 	}
-
         mSelectedModels[m->getName()] = m;
     }
 }
@@ -246,6 +245,16 @@ void View::onPasteModel()
     mModeling->getGVLE()->redrawModelTreeBox();
     mModeling->getGVLE()->redrawModelClassBox();
     redraw();
+}
+
+void View::removeFromSelectedModel(graph::Model* mdl)
+{
+    std :: map < std::string, graph::Model* >:: iterator it;
+    it = mSelectedModels.find(mdl->getName());
+    if (it != mSelectedModels.end ()) {
+        mSelectedModels.erase(it++);
+        redraw();
+    }
 }
 
 void View::addAtomicModel(int x, int y)

@@ -670,13 +670,23 @@ void ViewDrawingArea::on_gvlepointer_button_1(graph::Model* mdl,
         if (mView->existInSelectedModels(mdl) == false) {
             if (state == false) {
                 mView->clearSelectedModels();
+                mModeling->getGVLE()->getModelTreeBox()->showRow(mdl);
+            } else {
+                graph::Model* mod = mView->getFirstSelectedModels();
+                if (mod == 0) {
+                    mModeling->getGVLE()->getModelTreeBox()->showRow(mdl);
+                } else if (mView->getAllSelectedModels().size() == 1) {
+                    mModeling->getGVLE()->getModelTreeBox()->selectNone();
+                    mView->addModelToSelectedModels(mod);
+                }
             }
             mView->addModelToSelectedModels(mdl);
-	}
+        }
     } else {
-	mView->clearSelectedModels();
-	mPrecMouse = mMouse;
-	queueRedraw();
+        mModeling->getGVLE()->getModelTreeBox()->selectNone();
+        mView->clearSelectedModels();
+        mPrecMouse = mMouse;
+        queueRedraw();
     }
     queueRedraw();
 }

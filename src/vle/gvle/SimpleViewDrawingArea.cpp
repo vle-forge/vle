@@ -436,6 +436,10 @@ bool SimpleViewDrawingArea::on_button_release_event(GdkEventButton* event)
 	    }
 	    queueRedraw();
 	}
+        if (mView->getAllSelectedModels().size() == 1) {
+            graph::Model* mod = mView->getFirstSelectedModels();
+            mModeling->getGVLE()->getModelTreeBox()->showRow(mod);
+        }
 	mPrecMouse.set_x(-1);
 	mPrecMouse.set_y(-1);
 	break;
