@@ -708,6 +708,7 @@ void GVLEMenuAndToolbar::onOpenProject()
     showCloseProject();
     showProjectMenu();
     showRefresh();
+    hideToolsMenu();
 }
 
 void GVLEMenuAndToolbar::onOpenVpz()

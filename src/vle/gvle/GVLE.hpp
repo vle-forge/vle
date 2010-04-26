@@ -718,7 +718,6 @@ private:
     /* Widgets */
     Gtk::VBox*                      mMenuAndToolbarVbox;
     GVLEMenuAndToolbar*             mMenuAndToolbar;
-    Gtk::Statusbar                  mStatusBar;
     Gtk::TextView*                  mLog;
     Gtk::Statusbar*                 mStatusbar;
     Editor*                         mEditor;

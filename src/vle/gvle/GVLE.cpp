@@ -773,49 +773,49 @@ void GVLE::onArrow()
 {
     mCurrentButton = POINTER;
     mEditor->getDocumentDrawingArea()->updateCursor();
-    mStatusBar.push(_("Selection"));
+    mStatusbar->push(_("Selection"));
 }
 
 void GVLE::onAddModels()
 {
     mCurrentButton = ADDMODEL;
     mEditor->getDocumentDrawingArea()->updateCursor();
-    mStatusBar.push(_("Add models"));
+    mStatusbar->push(_("Add models"));
 }
 
 void GVLE::onAddLinks()
 {
     mCurrentButton = ADDLINK;
     mEditor->getDocumentDrawingArea()->updateCursor();
-    mStatusBar.push(_("Add links"));
+    mStatusbar->push(_("Add links"));
 }
 
 void GVLE::onDelete()
 {
     mCurrentButton = DELETE;
     mEditor->getDocumentDrawingArea()->updateCursor();
-    mStatusBar.push(_("Delete object"));
+    mStatusbar->push(_("Delete object"));
 }
 
 void GVLE::onAddCoupled()
 {
     mCurrentButton = ADDCOUPLED;
     mEditor->getDocumentDrawingArea()->updateCursor();
-    mStatusBar.push(_("Coupled Model"));
+    mStatusbar->push(_("Coupled Model"));
 }
 
 void GVLE::onZoom()
 {
     mCurrentButton = ZOOM;
     mEditor->getDocumentDrawingArea()->updateCursor();
-    mStatusBar.push(_("Zoom"));
+    mStatusbar->push(_("Zoom"));
 }
 
 void GVLE::onQuestion()
 {
     mCurrentButton = QUESTION;
     mEditor->getDocumentDrawingArea()->updateCursor();
-    mStatusBar.push(_("Question"));
+    mStatusbar->push(_("Question"));
 }
 
 void GVLE::onNewFile()
@@ -837,15 +837,18 @@ void GVLE::onNewVpz()
         mEditor->getDocumentDrawingArea()->updateCursor();
         mModelTreeBox->set_sensitive(true);
         mModelClassBox->set_sensitive(true);
+        if (mCurrentButton == POINTER){
+            mStatusbar->push(_("Selection"));
+        }
     }
 }
 
 void GVLE::onNewProject()
 {
     mNewProjectBox->show();
+    mMenuAndToolbar->onOpenProject();
     clearModelTreeBox();
     clearModelClassBox();
-    mEditor->getDocumentDrawingArea()->updateCursor();
     mFileTreeView->set_sensitive(true);
 }
 
@@ -897,6 +900,9 @@ void GVLE::onOpenVpz()
 	}
     }
     mEditor->getDocumentDrawingArea()->updateCursor();
+    if (mCurrentButton == POINTER){
+        mStatusbar->push(_("Selection"));
+    }
 }
 
 void GVLE::onOpenGlobalVpz()
