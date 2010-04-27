@@ -549,21 +549,24 @@ void SaxParser::onEndBoolean()
 {
     m_valuestack.pushOnVectorValue(
         value::Boolean::create(
-            utils::toBoolean(lastCharactersStored())));
+            xmlCharToBoolean(
+                ((xmlChar*)lastCharactersStored().c_str()))));
 }
 
 void SaxParser::onEndInteger()
 {
     m_valuestack.pushOnVectorValue(
         value::Integer::create(
-            utils::toLong(lastCharactersStored())));
+            xmlCharToInt(
+                ((xmlChar*)lastCharactersStored().c_str()))));
 }
 
 void SaxParser::onEndDouble()
 {
     m_valuestack.pushOnVectorValue(
         value::Double::create(
-            utils::toDouble(lastCharactersStored())));
+            xmlCharToDouble(
+                ((xmlChar*)lastCharactersStored().c_str()))));
 }
 
 void SaxParser::onEndString()
@@ -594,14 +597,56 @@ void SaxParser::onEndMap()
 void SaxParser::onEndTuple()
 {
     value::Tuple& tuple(m_valuestack.topValue()->toTuple());
-    tuple.fill(lastCharactersStored());
+
+    std::string cpy(lastCharactersStored());
+    boost::algorithm::trim(cpy);
+
+    std::vector < std::string > result;
+    boost::algorithm::split(result, cpy,
+                            boost::algorithm::is_any_of(" \n\t\r"));
+
+    for (std::vector < std::string >::iterator it = result.begin();
+         it != result.end(); ++it) {
+        boost::algorithm::trim(*it);
+        if (not (*it).empty()) {
+            tuple.add(xmlCharToDouble((const xmlChar*)((*it).c_str())));
+        }
+    }
+
     m_valuestack.popValue();
 }
 
 void SaxParser::onEndTable()
 {
     value::Table& table(m_valuestack.topValue()->toTable());
-    table.fill(lastCharactersStored());
+
+    std::string cpy(lastCharactersStored());
+    boost::algorithm::trim(cpy);
+
+    std::vector < std::string > result;
+    boost::algorithm::split(result, cpy,
+                            boost::algorithm::is_any_of(" \n\t\r"));
+
+    value::Table::index i = 0;
+    value::Table::index j = 0;
+    for (std::vector < std::string >::iterator it = result.begin(); it !=
+         result.end(); ++it) {
+        boost::algorithm::trim(*it);
+        if (not (*it).empty()) {
+            table.get(i, j) = xmlCharToDouble((const xmlChar*)((*it).c_str()));
+            if (i + 1 >= table.width()) {
+                i = 0;
+                if (j + 1 >= table.height()) {
+                    return;
+                } else {
+                    j++;
+                }
+            } else {
+                i++;
+            }
+        }
+    }
+
     m_valuestack.popValue();
 }
 
@@ -794,6 +839,16 @@ void SaxParser::clearLastCharactersStored()
 void SaxParser::addToCharacters(const Glib::ustring& characters)
 {
     m_lastCharacters.append(characters);
+}
+
+bool xmlCharToBoolean(const xmlChar* str)
+{
+    if ((xmlStrncmp(str, (const xmlChar*)"true", 4) == 0) or
+        (xmlStrncmp(str, (const xmlChar*)"1", 1) == 0)) {
+        return true;
+    }
+
+    return false;
 }
 
 long int xmlCharToInt(const xmlChar* str)

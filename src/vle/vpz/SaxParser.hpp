@@ -338,8 +338,17 @@ namespace vle { namespace vpz {
     { return (const char*)str; }
 
     /**
+     * @brief Convert the xmlChar pointer to a boolean.
+     * @param str The constant xmlChar pointer to translator.
+     * @throw utils::SaxParserError if the xmlChar can not be translated into a
+     * boolean
+     * @return The boolean.
+     */
+    VLE_VPZ_EXPORT bool xmlCharToBoolean(const xmlChar* str);
+
+    /**
      * @brief Convert the xmlChar pointer to a long integer.
-     * @param str The constant xmlChat pointer to translate.
+     * @param str The constant xmlChar pointer to translate.
      * @throw utils::SaxParserError if the xmlChar can not be translated into a
      * long integer.
      * @return The long integer.
@@ -348,7 +357,7 @@ namespace vle { namespace vpz {
 
     /**
      * @brief Convert the xmlChar pointer to an unsigned long integer.
-     * @param str The constant xmlChat pointer to translate.
+     * @param str The constant xmlChar pointer to translate.
      * @throw utils::SaxParserError if the xmlChar can not be translated into an
      * unsigned long integer.
      * @return The unsigned long integer.
@@ -357,7 +366,7 @@ namespace vle { namespace vpz {
 
     /**
      * @brief Convert the xmlChar pointer to a double.
-     * @param str The constant xmlChat pointer to translate.
+     * @param str The constant xmlChar pointer to translate.
      * @throw utils::SaxParserError if the xmlChar can not be translated into a
      * double
      * @return The double.
