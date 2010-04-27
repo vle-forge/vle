@@ -34,6 +34,7 @@
 #include <gtkmm/comboboxentrytext.h>
 #include <gtkmm/dialog.h>
 #include <gtkmm/entry.h>
+#include <gtkmm/image.h>
 #include <libglademm.h>
 
 namespace vle { namespace gvle { namespace modeling { namespace petrinet {
