@@ -974,14 +974,12 @@
                               </packing>
                             </child>
                             <child>
-                              <widget class="GtkSpinButton" id="SpinButtonDuration">
+                              <widget class="GtkEntry" id="EntryDuration">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
-                                <property name="adjustment">0 0 0 1 10 0</property>
-                                <property name="digits">5</property>
+                                <property name="invisible_char">&#x25CF;</property>
                               </widget>
                               <packing>
-                                <property name="padding">5</property>
                                 <property name="position">1</property>
                               </packing>
                             </child>
@@ -1010,14 +1008,12 @@
                               </packing>
                             </child>
                             <child>
-                              <widget class="GtkSpinButton" id="SpinBeginReal">
+                              <widget class="GtkEntry" id="EntryBeginReal">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
-                                <property name="adjustment">0 0 0 1 10 0</property>
-                                <property name="digits">9</property>
+                                <property name="invisible_char">&#x25CF;</property>
                               </widget>
                               <packing>
-                                <property name="padding">5</property>
                                 <property name="position">1</property>
                               </packing>
                             </child>
@@ -3224,12 +3220,10 @@ Old Contributors:
                               </packing>
                             </child>
                             <child>
-                              <widget class="GtkSpinButton" id="spinbuttonTimestepDialogViewOutput">
+                              <widget class="GtkEntry" id="entryTimestepDialogViewOutput">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
-                                <property name="adjustment">0 0 100 1 10 0</property>
-                                <property name="digits">5</property>
-                                <property name="numeric">True</property>
+                                <property name="invisible_char">&#x25CF;</property>
                               </widget>
                               <packing>
                                 <property name="position">1</property>

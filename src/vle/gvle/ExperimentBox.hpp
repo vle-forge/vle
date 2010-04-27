@@ -78,8 +78,8 @@ namespace vle { namespace gvle {
 
         Gtk::Dialog*        mDialog;
         Gtk::Entry*         mEntryName;
-        Gtk::SpinButton*    mSpinDuration;
-        Gtk::SpinButton*    mSpinBeginReal;
+        Gtk::Entry*         mEntryDuration;
+        Gtk::Entry*         mEntryBeginReal;
         Gtk::Entry*         mEntryBeginDate;
         Gtk::Button*        mButtonCalendarBegin;
         Gtk::SpinButton*    mSpinBeginH;

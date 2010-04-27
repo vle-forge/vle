@@ -32,12 +32,13 @@
 
 using namespace vle;
 
-namespace vle
-{
-namespace gvle {
+namespace vu = vle::utils;
+
+namespace vle { namespace gvle {
+
 TableBox::TableBox(value::Table* t):
-        Gtk::Dialog("Table",true,true),
-        mValue(t)
+    Gtk::Dialog("Table",true,true),
+    mValue(t)
 {
     add_button(Gtk::Stock::APPLY, Gtk::RESPONSE_APPLY);
     add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
@@ -75,7 +76,9 @@ void TableBox::run()
         value::TableValue& table = mValue->value();
         for (index i = 0; i != mValue->height(); ++i) {
             for (index j = 0; j != mValue->width(); ++j) {
-                table[j][i] = utils::toDouble((*mArray)[j][i]->get_text());
+                double x = vu::convert < double > ((*mArray)[j][i]->get_text(),
+                                                   true);
+                table[j][i] = x;
             }
         }
     }
@@ -88,7 +91,7 @@ void TableBox::makeTable()
         for (index j = 0; j != mValue->width(); ++j) {
             (*mArray)[j][i] = new Gtk::Entry();
             (*mArray)[j][i]->set_width_chars(10);
-            (*mArray)[j][i]->set_text(utils::toString(mValue->get(j, i)));
+            (*mArray)[j][i]->set_text(utils::toScientificString(mValue->get(j, i),true));
             (*mArray)[j][i]->set_editable(true);
             mTable->attach(*(*mArray)[j][i], j , j+1, i, i+1, Gtk::FILL, Gtk::FILL);
         }

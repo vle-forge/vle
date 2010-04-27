@@ -96,7 +96,7 @@ namespace vle { namespace gvle {
         Glib::RefPtr < Gnome::Glade::Xml > m_xml;
         Gtk::Dialog*        m_dialog;
         Gtk::ComboBoxText*  m_type;
-        Gtk::SpinButton*    m_timestep;
+        Gtk::Entry*         m_timestep;
         Gtk::ComboBoxText*  m_format;
         Gtk::Entry*         m_location;
         Gtk::Button*        m_directory;

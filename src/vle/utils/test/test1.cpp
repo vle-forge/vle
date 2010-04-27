@@ -415,3 +415,24 @@ BOOST_AUTO_TEST_CASE(localized_conversion)
                             12345., 0.1);
     }
 }
+
+BOOST_AUTO_TEST_CASE(to_scientific_string_function)
+{
+    namespace vu = vle::utils;
+
+    BOOST_REQUIRE_EQUAL(vu::toScientificString(0.0),"0");
+    BOOST_REQUIRE_EQUAL(vu::toScientificString(-1504),"-1504");
+    BOOST_REQUIRE_EQUAL(vu::toScientificString(3022),"3022");
+    BOOST_REQUIRE_EQUAL(vu::toScientificString(123456789123456789.0),
+                        "1.23456789123457e+17");
+    BOOST_REQUIRE_EQUAL(vu::toScientificString(0.00000000000000000000982),
+                        "9.82e-21");
+    BOOST_REQUIRE_EQUAL(vu::toScientificString(-0.12345),
+                        "-0.12345");
+    BOOST_REQUIRE_EQUAL(vu::toScientificString(0.12345),
+                        "0.12345");
+    BOOST_REQUIRE_EQUAL(vu::toScientificString(0.0001),
+                        "0.0001");
+    BOOST_REQUIRE_EQUAL(vu::toScientificString(1000.0001),
+                        "1000.0001");
+}

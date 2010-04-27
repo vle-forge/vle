@@ -33,6 +33,8 @@
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/i18n.hpp>
 
+namespace vu = vle::utils;
+
 namespace vle { namespace gvle {
 
 SimpleTypeBox::SimpleTypeBox(value::Value* b):
@@ -90,9 +92,13 @@ void SimpleTypeBox::makeDialog()
                         dynamic_cast < value::Tuple* >(mBase);
 
             for (value::Tuple::size_type i = 0; i < tuple->size(); ++i) {
-                buffer += (fmt("%1% ") % (*tuple)[i]).str();
+                buffer += (fmt("%1% ") %
+                          utils::toScientificString((*tuple)[i],true)).str();
             }
             mEntry->set_text(buffer);
+        } else if (mBase->getType() == value::Value::DOUBLE) {
+            value::Double* v = dynamic_cast < value::Double* >(mBase);
+            mEntry->set_text(utils::toScientificString(v->value(),true));
         } else {
             mEntry->set_text(mBase->writeToString());
         }
@@ -115,8 +121,8 @@ std::string SimpleTypeBox::run()
                 break;
             case(value::Value::DOUBLE):
                 {
-                    dynamic_cast < value::Double* >(mBase)
-                        ->set(utils::toDouble(mEntry->get_text()));
+                    double x = vu::convert < double >(mEntry->get_text(),true);
+                    dynamic_cast < value::Double* >(mBase)->set(x);
                     return mEntry->get_text();
                 }
                 break;

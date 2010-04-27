@@ -40,6 +40,8 @@
 #include <limits>
 #include <iostream>
 
+namespace vu = vle::utils;
+
 namespace vle { namespace gvle {
 
 ViewOutputBox::ViewOutputBox(Modeling& modeling,
@@ -50,7 +52,7 @@ ViewOutputBox::ViewOutputBox(Modeling& modeling,
       m_validateRetry(false)
 {
     m_xml->get_widget("DialogViewOutput", m_dialog);
-    m_xml->get_widget("spinbuttonTimestepDialogViewOutput", m_timestep);
+    m_xml->get_widget("entryTimestepDialogViewOutput", m_timestep);
     m_xml->get_widget("entryLocationDialogViewOutput", m_location);
     m_xml->get_widget("buttonLocationDialogViewOutput", m_directory);
     m_xml->get_widget("treeviewDialogViewOutput", m_views);
@@ -62,9 +64,7 @@ ViewOutputBox::ViewOutputBox(Modeling& modeling,
     fillViews();
     initMenuPopupViews();
 
-    m_timestep->set_value(1.0);
-    m_timestep->set_range(std::numeric_limits < double >::epsilon(),
-                          std::numeric_limits < double >::max());
+    m_timestep->set_text("1,0");
 
     m_cntViewButtonRelease = m_views->signal_button_release_event().connect(
         sigc::mem_fun( *this, &ViewOutputBox::onButtonRealeaseViews));
@@ -549,7 +549,11 @@ void ViewOutputBox::assignView(const std::string& name)
     view.setType(m_type->get_active_text() == "timed" ? vpz::View::TIMED :
                  m_type->get_active_text() == "event" ? vpz::View::EVENT :
                  vpz::View::FINISH);
-    view.setTimestep(m_timestep->get_value());
+
+    {
+        double x = vu::convert < double >(m_timestep->get_text(), true);
+        view.setTimestep(x);
+    }
 
     if (m_format->get_active_text() == "distant") {
         output.setDistantStream(m_location->get_text(),
@@ -580,7 +584,7 @@ void ViewOutputBox::updateView(const std::string& name)
 
     m_type->set_active_text(view.streamtype());
     m_timestep->set_sensitive(view.type() == vpz::View::TIMED);
-    m_timestep->set_value(view.timestep());
+    m_timestep->set_text(utils::toScientificString(view.timestep()));
 
     m_format->set_active_text(output.streamformat());
     m_location->set_text(output.location());

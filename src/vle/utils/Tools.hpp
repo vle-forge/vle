@@ -301,6 +301,17 @@ namespace vle { namespace utils {
     }
 
     /**
+     * Return the a string version of v, in scientific notation
+     * (if v is too small or big) or in a standard representaion.
+     *
+     * @param v double to convert.
+     * @param locale  if true, use "," else use "."
+     * @return the string representation of the double.
+     */
+    VLE_UTILS_EXPORT std::string toScientificString(const double& v,
+                                                    bool locale = false);
+
+    /**
      * Return true if unicode string str is an ascii string with only
      * character between A-Z and a-z and size not empty.
      *

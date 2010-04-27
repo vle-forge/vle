@@ -38,6 +38,7 @@
 #include <vle/value/Double.hpp>
 #include <vle/value/String.hpp>
 #include <vle/value/Tuple.hpp>
+#include <vle/value/Table.hpp>
 
 namespace vle { namespace gvle {
 

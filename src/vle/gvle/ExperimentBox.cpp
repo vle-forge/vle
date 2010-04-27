@@ -40,6 +40,9 @@
 #include <glibmm/miscutils.h>
 #include <limits>
 
+namespace vz = vle::vpz;
+namespace vu = vle::utils;
+
 namespace vle { namespace gvle {
 
 ExperimentBox::ExperimentBox(Glib::RefPtr < Gnome::Glade::Xml > xml,
@@ -53,8 +56,8 @@ ExperimentBox::ExperimentBox(Glib::RefPtr < Gnome::Glade::Xml > xml,
     xml->get_widget("ButtonNow", mButtonNow);
     xml->get_widget("EntryVersion", mEntryVersion);
     xml->get_widget("EntryName", mEntryName);
-    xml->get_widget("SpinButtonDuration", mSpinDuration);
-    xml->get_widget("SpinBeginReal", mSpinBeginReal);
+    xml->get_widget("EntryDuration", mEntryDuration);
+    xml->get_widget("EntryBeginReal", mEntryBeginReal);
     xml->get_widget("EntryBeginDate", mEntryBeginDate);
     xml->get_widget("ButtonCalendarBegin", mButtonCalendarBegin);
     xml->get_widget("SpinBeginH", mSpinBeginH);
@@ -92,7 +95,7 @@ ExperimentBox::ExperimentBox(Glib::RefPtr < Gnome::Glade::Xml > xml,
     mSigcConnection.push_back(mSpinBeginS->signal_value_changed().connect(
         sigc::mem_fun(*this, &ExperimentBox::on_time_changed)));
 
-    mSigcConnection.push_back(mSpinBeginReal->signal_value_changed().connect(
+    mSigcConnection.push_back(mEntryBeginReal->signal_changed().connect(
         sigc::mem_fun(*this, &ExperimentBox::on_julianDate_changed)));
 
     mDialog->show_all();
@@ -141,14 +144,9 @@ void ExperimentBox::initExperiment()
 	    mEntryName->set_text(experiment.name());
 	}
 
-	mSpinDuration->set_range(
-	    std::numeric_limits < double >::epsilon(),
-	    std::numeric_limits < double >::max());
-	mSpinDuration->set_value(experiment.duration());
+	mEntryDuration->set_text(utils::toScientificString(experiment.duration(),true));
 
-        mSpinBeginReal->set_range(std::numeric_limits < int >::min(),
-                                  std::numeric_limits < int >::max());
-        mSpinBeginReal->set_value(experiment.begin());
+        mEntryBeginReal->set_text(utils::toScientificString(experiment.begin(),true));
         updateBeginTime();
     }
 
@@ -220,13 +218,16 @@ bool ExperimentBox::apply()
     vpz::Experiment& exp = mModeling->experiment();
     vpz::Replicas& rep = exp.replicas();
 
-    {
-	exp.setName(mEntryName->get_text());
+    exp.setName(mEntryName->get_text());
 
-	exp.setDuration(mSpinDuration->get_value() <= 0.0 ?
-			std::numeric_limits < double >::epsilon() :
-			mSpinDuration->get_value());
-        exp.setBegin(mSpinBeginReal->get_value());
+    {
+        double x = vu::convert < double >(mEntryDuration->get_text(),true);
+        exp.setDuration(x <= 0.0 ? 1 : x);
+    }
+
+    {
+        double x =  vu::convert < double >(mEntryBeginReal->get_text(),true);
+        exp.setBegin(x);
     }
 
     {
@@ -284,19 +285,21 @@ void ExperimentBox::updateBeginReal()
         begin += (mSpinBeginM->get_value() * 1 / (24 * 60));
         begin += (mSpinBeginS->get_value() * 1 / (24 * 60 * 60));
 
-        mSpinBeginReal->set_value(begin);
+        mEntryBeginReal->set_text(utils::toScientificString(begin));
     } catch (...) {
     }
 }
 
 void ExperimentBox::updateBeginTime()
 {
-    if (utils::DateTime::isValidYear(mSpinBeginReal->get_value())) {
+    double x = vu::convert < double >(mEntryBeginReal->get_text(),true);
+
+    if (utils::DateTime::isValidYear(x)) {
         long year, month, day, hours, minutes, seconds;
         double remain;
 
-        remain = utils::DateTime::toTime(mSpinBeginReal->get_value(), year,
-                                         month, day, hours, minutes, seconds);
+        remain = utils::DateTime::toTime(x, year, month, day, hours,
+                                         minutes, seconds);
 
         mSpinBeginH->set_value(hours);
         mSpinBeginM->set_value(minutes);
@@ -308,7 +311,7 @@ void ExperimentBox::updateBeginTime()
         }
 
         mEntryBeginDate->set_text(
-            utils::DateTime::toJulianDayNumber(mSpinBeginReal->get_value()));
+            utils::DateTime::toJulianDayNumber(x));
     } else {
         mSpinBeginH->set_value(0);
         mSpinBeginM->set_value(0);

@@ -49,6 +49,7 @@
 #include <iomanip>
 #include <iostream>
 #include <libxml/parser.h>
+#include <cmath>
 
 #include <glib.h>
 #include <glib/gstdio.h>
@@ -74,6 +75,19 @@
 #endif
 
 namespace vle { namespace utils {
+
+std::string toScientificString (const double& v, bool locale)
+{
+    std::ostringstream o;
+    if (locale) {
+        std::locale selected("");
+        o.imbue(selected);
+    }
+
+    o << std::setprecision(std::numeric_limits<double>::digits10) << v;
+
+    return o.str();
+}
 
 bool isAlnumString(const std::string& str)
 {
