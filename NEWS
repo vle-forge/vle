@@ -1,3 +1,50 @@
+VLE 0.8.3
+=========
+
+* utils:
+  fix isValidYear when negative applied date:
+    isValidYear has now a supplementary control, in order to check for example
+    if a date can be build from a negative value.
+
+* manager:
+  * Thread manager is limited to one run: to avoid risky reinitialisation, the
+    start method of a ManagerRunThread object can be now called only once.
+    Concatenating simulation of plans require the building of new
+    ManagerRunThread objects.
+
+* gvle:
+  * Modeling plugin:
+    Petrinet: Add Petri net modeling plug-in, the code, the input/output ports
+    and observables ared generated.
+  * Bugs:
+    * Set Experiment duration to a non null value: In order to prevent bad VPZs,
+      the duration is now set up to 1.0 (m_duration is now set to 1.0, instead
+      of 0.0).
+    * Rename a tab of the Atomic Model window: The tab of the window "Atomic
+      Model" which has for title "Views" becomes the tab of the "Observables".
+    * Update contributors: 3 authors have been added inside the gvle.glade file.
+    * Load VPZ tree when using command line: When opening a VPZ in command line
+      mode, the tree representation of the VPZ was NOT shown (but it was when
+      using "File/Open Global VPZ").
+    * Add shortcuts to menu items: Four shortcuts have been added inside the
+      GVLEMenuAndToolbar.cpp file:
+      In the "Project" menu:
+      * Configure Project item: (Ctrl g)
+      * Build Project item: (Ctrl b)
+      And in the "Edit"menu:
+      * Annuler item: (Ctrl z)
+      * Rétablir item: (Ctrl y)
+    * Fix empty error message when loading invalid VPZ When a invalid VPZ was
+      loaded, an empty error message was displayed.
+    * Add convert from locale encoding to UTF-8: When a non UTF-8 file is
+      loaded, the GUI try to convert the file from the locale encoding of the
+      user.
+
+* translator:
+  * Add graph builder: Add a graph translator which builds the structure of a
+    model from an adjacency matrix and a list of classes
+
+
 VLE 0.8.2
 =========
 
