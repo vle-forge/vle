@@ -29,8 +29,10 @@
 
 #include <vle/gvle/BooleanBox.hpp>
 #include <vle/gvle/MatrixBox.hpp>
+#include <vle/gvle/Message.hpp>
 #include <vle/gvle/SimpleTypeBox.hpp>
 #include <vle/gvle/TableBox.hpp>
+#include <vle/gvle/TupleBox.hpp>
 #include <vle/gvle/TreeViewValue.hpp>
 #include <vle/gvle/ValueBox.hpp>
 #include <vle/gvle/XmlTypeBox.hpp>
@@ -272,9 +274,12 @@ void ValuesTreeView::on_row_activated(const Gtk::TreeModel::Path& path,
             box.run();
         } else if (row[m_Columns.m_col_type] == "integer" or
                    row[m_Columns.m_col_type] == "double" or
-                   row[m_Columns.m_col_type] == "string" or
-                   row[m_Columns.m_col_type] == "tuple") {
+                   row[m_Columns.m_col_type] == "string") {
             SimpleTypeBox box(v);
+            box.run();
+        } else if (row[m_Columns.m_col_type] == "tuple") {
+            value::Tuple* tuple = dynamic_cast<value::Tuple*>(v);
+            TupleBox box(tuple);
             box.run();
         } else if (row[m_Columns.m_col_type] == "table") {
             value::Table* table = dynamic_cast<value::Table*>(v);
@@ -336,8 +341,17 @@ void ValuesTreeView::on_menu_insert(value::Value::type type)
         case(Value::MAP):
             vector.insert(it, Map::create());
             break;
-        case(Value::TUPLE):
-            vector.insert(it, Tuple::create());
+        case(Value::TUPLE): {
+            SimpleTypeBox box("Size ?", "1");
+            int s = utils::toInt(box.run());
+            if(s<1) {
+                gvle::Error(_("The size can not be nul or negative"));
+            } else {
+                value::Tuple* tmp = Tuple::create();
+                tmp->value().resize(s);
+                vector.insert(it, tmp);
+            }
+        }
             break;
         case(Value::TABLE): {
             SimpleTypeBox box("Width ?", "1");
