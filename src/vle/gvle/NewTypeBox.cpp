@@ -27,7 +27,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
+#include <vle/gvle/Message.hpp>
 #include <vle/gvle/NewTypeBox.hpp>
 #include <vle/gvle/SimpleTypeBox.hpp>
 #include <vle/utils/Tools.hpp>
@@ -82,8 +82,16 @@ void NewTypeBox::run()
         } else if (m_Combo->get_active_text() == "Matrix") {
             SimpleTypeBox box("columns ?", "1");
             int cols = utils::toInt(box.run());
+            if (cols < 1) {
+                gvle::Error(_("The size can not be null or negative"));
+                return;
+            }
             SimpleTypeBox box2("rows ?", "1");
             int rows = utils::toInt(box2.run());
+            if (rows < 1) {
+                gvle::Error(_("The size can not be null or negative"));
+                return;
+            }
             mVal = Matrix::create(cols, rows, cols*2, rows*2, cols/5, rows/5);
         } else if (m_Combo->get_active_text() == "Map") {
             mVal = Map::create();
@@ -96,8 +104,16 @@ void NewTypeBox::run()
         } else if (m_Combo->get_active_text() == "Table") {
             SimpleTypeBox box("Width ?", "1");
             int w = utils::toInt(box.run());
+            if (w < 1) {
+                gvle::Error(_("The size can not be null or negative"));
+                return;
+            }
             SimpleTypeBox box2("Height ?", "1");
             int h = utils::toInt(box2.run());
+            if (h < 1){
+                gvle::Error(_("The size can not be null or negative"));
+                return;
+            }
             mVal = Table::create(w, h);
         } else if (m_Combo->get_active_text() == "Tuple") {
             mVal = Tuple::create();
