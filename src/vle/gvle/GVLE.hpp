@@ -121,9 +121,8 @@ public:
      *
      * @return ButtonType of current selected button.
      */
-    inline ButtonType getCurrentButton() const {
-        return mCurrentButton;
-    }
+    inline ButtonType getCurrentButton() const 
+    { return mCurrentButton; }
 
     /**
      * Create the hierarchy in the package browser
@@ -186,9 +185,7 @@ public:
      * @return ConditionBox instance of ConditionBox
      */
     inline ConditionsBox* getConditionsBox()
-    {
-	return mConditionsBox;
-    }
+    { return mConditionsBox; }
 
     /**
      * return the ModelTreeBox
@@ -266,13 +263,13 @@ public:
     public:
 	FileTreeView(BaseObjectType* cobject,
 		     const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
-        virtual ~FileTreeView();
+    virtual ~FileTreeView();
 
-        void build();
+    void build();
 
 	void clear();
 
-        void refresh();
+    void refresh();
 
 	inline void setPackage(const std::string& package)
         { mPackage = package; }
@@ -280,7 +277,7 @@ public:
 	void setParent(GVLE* parent)
         { mParent = parent; }
 
-        Glib::ustring getSelected()
+    Glib::ustring getSelected()
         { return (*mRefTreeSelection->get_selected())[mColumns.m_col_name]; }
 
     protected:
@@ -300,7 +297,7 @@ public:
 	 *
 	 */
 	void buildHierarchyDirectory(const Gtk::TreeModel::Row* parent,
-				     const std::string& dirname);
+			    const std::string& dirname);
 
 	/**
 	 * Create the hierarchy with the files
@@ -318,16 +315,16 @@ public:
 	void on_row_activated(const Gtk::TreeModel::Path& path,
 			    Gtk::TreeViewColumn*  column);
 	void projectFilePath(const Gtk::TreeRow& row,
-			     std::list<std::string>& lst);
+			    std::list<std::string>& lst);
 
-        void refreshHierarchy(const Gtk::TreeModel::Row* parent,
-                              const std::string& dirname);
+    void refreshHierarchy(const Gtk::TreeModel::Row* parent,
+                const std::string& dirname);
 	void refreshHierarchyDirectory(const Gtk::TreeModel::Row* parent,
-                                       const std::string& dirname);
+                const std::string& dirname);
 	void refreshHierarchyFile(const Gtk::TreeModel::Row* parent,
-                                  const std::string& dirname);
-        void removeFiles(const Gtk::TreeModel::Row* parent,
-                         const std::list < std::string >& entries);
+                const std::string& dirname);
+    void removeFiles(const Gtk::TreeModel::Row* parent,
+                const std::list < std::string >& entries);
 
 	GVLE*                            mParent;
 	Gtk::Menu                        mMenuPopup;
@@ -709,7 +706,6 @@ public:
     void setTitle(const Glib::ustring& name = "");
 
     void updateTitle();
-    void updateCursor();
 
 private:
     bool checkVpz();

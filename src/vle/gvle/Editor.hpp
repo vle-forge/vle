@@ -160,6 +160,7 @@ public:
     void setVadjustment(double v);
 
     void updateView();
+    void updateCursor();
 
     virtual void undo();
     virtual void redo();
@@ -278,6 +279,16 @@ public:
 
     void setParent(GVLE* gvle)
     { mApp = gvle; }
+
+    inline DocumentDrawingArea* getDocumentDrawingArea() const
+    {
+        Documents::const_iterator it = mDocuments.begin();
+        while (it != mDocuments.end() and
+               it->second->isDrawingArea() == false) {
+            ++it;
+        }
+        return dynamic_cast < DocumentDrawingArea* > (it->second);
+    }
 
 private:
     void onCloseTab(const std::string& filepath);

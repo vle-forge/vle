@@ -30,6 +30,7 @@
 #include <vle/gvle/Editor.hpp>
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/Modeling.hpp>
+#include <vle/gvle/GVLE.hpp>
 #include <vle/gvle/GVLEMenuAndToolbar.hpp>
 #include <vle/gvle/Settings.hpp>
 #include <vle/gvle/View.hpp>
@@ -310,6 +311,43 @@ void DocumentDrawingArea::setVadjustment(double v)
 void DocumentDrawingArea::updateView()
 {
     mCompleteArea->queueRedraw();
+}
+
+void DocumentDrawingArea::updateCursor()
+{
+    Glib::RefPtr< Gdk::Window > daw;
+
+    if (isComplete()) {
+        daw = mCompleteArea->get_window();
+    } else {
+        daw = mSimpleArea->get_window();
+    }
+
+    switch(Document::mGVLE->getCurrentButton()) {
+        case GVLE::POINTER :
+        daw->set_cursor(Gdk::Cursor(Gdk::HAND2));
+        break;
+        case GVLE::ADDMODEL :
+        daw->set_cursor(Gdk::Cursor(Gdk::CROSS));
+        break;
+        case GVLE::ADDLINK :
+        daw->set_cursor(Gdk::Cursor(Gdk::PENCIL));
+        break;
+        case GVLE::DELETE :
+        daw->set_cursor(Gdk::Cursor(Gdk::X_CURSOR));
+        break;
+        case GVLE::ADDCOUPLED :
+        daw->set_cursor(Gdk::Cursor(Gdk::DRAPED_BOX));
+        break;
+        case GVLE::ZOOM :
+        daw->set_cursor(Gdk::Cursor(Gdk::SIZING));
+        break;
+        case GVLE::QUESTION :
+        daw->set_cursor(Gdk::Cursor(Gdk::QUESTION_ARROW));
+        break;
+    default :
+        daw->set_cursor(Gdk::Cursor(Gdk::ARROW));
+    }
 }
 
 void DocumentDrawingArea::undo()
@@ -615,7 +653,7 @@ void Editor::openTabVpz(const std::string& filepath,
 	    focusTab(filepath);
 	    page = get_current_page();
 	    DocumentDrawingArea* currentTab =
-		dynamic_cast<DocumentDrawingArea*>(get_nth_page(page));
+            dynamic_cast<DocumentDrawingArea*>(get_nth_page(page));
 	    if (currentTab->isComplete()) {
 		showCompleteView(filepath, model);
 	    } else {
@@ -627,7 +665,7 @@ void Editor::openTabVpz(const std::string& filepath,
     } else {
 	showCompleteView(filepath, model);
     }
-    mApp->updateCursor();
+    getDocumentDrawingArea()->updateCursor();
 }
 
 void Editor::showCompleteView(const std::string& filepath,
@@ -670,6 +708,7 @@ void Editor::showCompleteView(const std::string& filepath,
 
     show_all_children();
     set_current_page(page);
+    getDocumentDrawingArea()->updateCursor();
 }
 
 void Editor::showSimpleView(const std::string& filepath,
@@ -704,6 +743,7 @@ void Editor::showSimpleView(const std::string& filepath,
     }
     show_all_children();
     set_current_page(page);
+    getDocumentDrawingArea()->updateCursor();
 }
 
 void Editor::refreshViews()
