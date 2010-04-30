@@ -32,10 +32,126 @@
 #include <vle/extension/decision/Facts.hpp>
 #include <vle/extension/decision/Rules.hpp>
 #include <vle/extension/decision/Activities.hpp>
+#include <vle/extension/decision/Table.hpp>
 #include <vle/extension/DllDefines.hpp>
 
 namespace vle { namespace extension { namespace decision {
 
+typedef Table < Fact > FactsTable;
+typedef Table < Predicate > PredicatesTable;
+typedef Table < Activity::AckFct > AcknowledgeFunctions;
+typedef Table < Activity::OutFct > OutputFunctions;
+
+inline std::ostream& operator<<(std::ostream& o, const FactsTable& kb)
+{
+    o << "facts: ";
+    for (FactsTable::const_iterator it = kb.begin(); it != kb.end(); ++it) {
+        o << " (" << it->first << ")";
+    }
+    return o;
+}
+
+template < typename F >
+struct f
+{
+    f(const std::string& name, F func)
+        : name(name), func(func)
+    {}
+
+    std::string name;
+    F func;
+};
+
+template < typename F >
+struct p
+{
+    p(const std::string& name, F func)
+        : name(name), func(func)
+    {}
+
+    std::string name;
+    F func;
+};
+
+template < typename F >
+struct o
+{
+    o(const std::string& name, F func)
+        : name(name), func(func)
+    {}
+
+    std::string name;
+    F func;
+};
+
+template < typename F >
+struct a
+{
+    a(const std::string& name, F func)
+        : name(name), func(func)
+    {}
+
+    std::string name;
+    F func;
+};
+
+template < typename X >
+struct AddFacts
+{
+    AddFacts(X kb) : kb(kb) {}
+
+    X kb;
+};
+
+
+template < typename X >
+struct AddPredicates
+{
+    AddPredicates(X kb) : kb(kb) {}
+
+    X kb;
+};
+
+template < typename X >
+struct AddOutputFunctions
+{
+    AddOutputFunctions(X kb) : kb(kb) {}
+
+   X kb;
+};
+
+template < typename X >
+struct AddAcknowledgeFunctions
+{
+    AddAcknowledgeFunctions(X kb) : kb(kb) {}
+
+    X kb;
+};
+
+/**
+ * @brief KnowledgeBase stores facts, rules, activites and precedence
+ * constraints to build a plan activity model.
+ * @code
+ * // To add facts, predicates, outputs and acknowledge functions, use the
+ * // following methods:
+ * addFacts(this) +=
+ *      F("rain", &KnowledgeBase::rain);
+ *
+ * addPredicates(this) +=
+ *      P("pred 1", &KnowledgeBase::isAlwaysTrue),
+ *      P("pred 2", &KnowledgeBase::isAlwaysFalse),
+ *      P("pred 3", &KnowledgeBase::randIsTrue,
+ *      P("pred 4", &KnowledgeBase::randIsFalse);
+ *
+ * addOutputFunctions(this) +=
+ *      O("output function", &KnowledgeBase::out);
+ *
+ * addAcknowledgeFunctions(this) +=
+ *      A("ack function", &KnowledgeBase::ack);
+ *
+ * // And use a Parser to fill KnowledgeBase with datas.
+ * @endcode
+ */
 class VLE_EXTENSION_EXPORT KnowledgeBase
 {
 public:
@@ -46,11 +162,16 @@ public:
      */
     typedef std::pair < bool, devs::Time > Result;
 
+    /**
+     * @brief Add a fac into the facts tables.
+     * @param name
+     * @param fact
+     */
     void addFact(const std::string& name, const Fact& fact)
-    { m_facts.add(name, fact); }
+    { mFactsTable.add(name, fact); }
 
     void applyFact(const std::string& name, const value::Value& value)
-    { m_facts.apply(name, value); }
+    { mFactsTable[name](value); }
 
     Rule& addRule(const std::string& name)
     { return m_rules.add(name); }
@@ -142,7 +263,6 @@ public:
     { m_activities.addFinishToFinishConstraint(
             acti, actj, mintimelag, maxtimelag); }
 
-    const Facts& facts() const { return m_facts; }
     const Rules& rules() const { return m_rules; }
     const Activities& activities() const { return m_activities; }
 
@@ -235,14 +355,180 @@ public:
     void clearLatestActivitiesLists()
     { m_activities.clearLatestActivitiesLists(); }
 
+    /**
+     * @brief Get the table of available facts.
+     * @return Table of available facts.
+     */
+    const FactsTable& facts() const { return mFactsTable; }
+
+    /**
+     * @brief Get the table of available predicates.
+     * @return Table of available predicates.
+     */
+    const PredicatesTable& predicates() const { return mPredicatesTable; }
+
+    /**
+     * @brief Get the table of available acknowledge functions.
+     * @return Table of available acknowledge functions.
+     */
+    const AcknowledgeFunctions& acknowledgeFunctions() const
+    { return mAckFunctions; }
+
+    /**
+     * @brief Get the table of available output functions;
+     * @return Table of available output functions.
+     */
+    const OutputFunctions& outputFunctions() const { return mOutFunctions; }
+
+    /**
+     * @brief Get the table of available facts.
+     * @return Table of available facts.
+     */
+    FactsTable& facts() { return mFactsTable; }
+
+    /**
+     * @brief Get the table of available predicates.
+     * @return Table of available predicates.
+     */
+    PredicatesTable& predicates() { return mPredicatesTable; }
+
+    /**
+     * @brief Get the table of available acknowledge functions.
+     * @return Table of available acknowledge functions.
+     */
+    AcknowledgeFunctions& acknowledgeFunctions() { return mAckFunctions; }
+
+    /**
+     * @brief Get the table of available output functions;
+     * @return Table of available output functions.
+     */
+    OutputFunctions& outputFunctions() { return mOutFunctions; }
+
+    template < typename O >
+        AddFacts < O > addFacts(O obj)
+        {
+            return AddFacts < O >(obj);
+        }
+
+    template < typename X >
+        f < X > F(const std::string& name, X func)
+        {
+            return f < X >(name, func);
+        }
+
+    template < typename O >
+        AddPredicates < O > addPredicates(O obj)
+        {
+            return AddPredicates < O >(obj);
+        }
+
+    template < typename F >
+        p < F > P(const std::string& name, F func)
+        {
+            return p < F >(name, func);
+        }
+
+    template < typename O >
+        AddOutputFunctions < O > addOutputFunctions(O obj)
+        {
+            return AddOutputFunctions < O >(obj);
+        }
+
+    template < typename F >
+        o < F > O(const std::string& name, F func)
+        {
+            return o < F >(name, func);
+        }
+
+    template < typename O >
+        AddAcknowledgeFunctions < O > addAcknowledgeFunctions(O obj)
+        {
+            return AddAcknowledgeFunctions < O >(obj);
+        }
+
+    template < typename F >
+        a < F > A(const std::string& name, F func)
+        {
+            return a < F >(name, func);
+        }
+
 private:
-    Facts m_facts;
     Rules m_rules;
     Activities m_activities;
+
+    FactsTable mFactsTable;
+    PredicatesTable mPredicatesTable;
+    AcknowledgeFunctions mAckFunctions;
+    OutputFunctions mOutFunctions;
 
     static void unionLists(Activities::result_t& last,
                            Activities::result_t& recent);
 };
+
+template < typename X, typename F >
+AddFacts < X > operator+=(AddFacts < X > add, f < F > pred)
+{
+    add.kb->facts().add(pred.name, boost::bind(pred.func, add.kb, _1));
+    return add;
+}
+
+template < typename X, typename F >
+AddFacts < X > operator,(AddFacts < X > add, f < F > pred)
+{
+    add.kb->facts().add(pred.name, boost::bind(pred.func, add.kb, _1));
+    return add;
+}
+
+template < typename X, typename F >
+AddPredicates < X > operator+=(AddPredicates < X > add, p < F > pred)
+{
+    add.kb->predicates().add(pred.name, boost::bind(pred.func, add.kb));
+    return add;
+}
+
+template < typename X, typename F >
+AddPredicates < X > operator,(AddPredicates < X > add, p < F > pred)
+{
+    add.kb->predicates().add(pred.name, boost::bind(pred.func, add.kb));
+    return add;
+}
+
+template < typename X, typename F >
+AddAcknowledgeFunctions < X > operator+=(AddAcknowledgeFunctions < X > add,
+                                         a < F > pred)
+{
+    add.kb->acknowledgeFunctions().add(pred.name,
+                                       boost::bind(pred.func, add.kb, _1, _2));
+    return add;
+}
+
+template < typename X, typename F >
+AddAcknowledgeFunctions < X > operator,(AddAcknowledgeFunctions < X > add,
+                                        a < F > pred)
+{
+    add.kb->acknowledgeFunctions().add(pred.name,
+                                       boost::bind(pred.func, add.kb, _1, _2));
+    return add;
+}
+
+template < typename X, typename F >
+AddOutputFunctions < X > operator+=(AddOutputFunctions < X > add,
+                                    o < F > pred)
+{
+    add.kb->outputFunctions().add(pred.name,
+                                  boost::bind(pred.func, add.kb, _1, _2, _3));
+    return add;
+}
+
+template < typename X, typename F >
+AddOutputFunctions < X > operator,(AddOutputFunctions < X > add,
+                                   o < F > pred)
+{
+    add.kb->outputFunctions().add(pred.name,
+                                  boost::bind(pred.func, add.kb, _1, _2, _3));
+    return add;
+}
+
 
 inline std::ostream& operator<<(std::ostream& o, const KnowledgeBase& kb)
 {
@@ -252,11 +538,10 @@ inline std::ostream& operator<<(std::ostream& o, const KnowledgeBase& kb)
 
 struct VLE_EXTENSION_EXPORT CompareActivities
 {
-    inline bool
-        operator()(Activities::iterator x, Activities::iterator y) const
-        {
-            return &x->second < &y->second;
-        }
+    inline bool operator()(Activities::iterator x, Activities::iterator y) const
+    {
+        return &x->second < &y->second;
+    }
 };
 
 }}} // namespace vle model decision

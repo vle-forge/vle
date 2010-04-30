@@ -56,6 +56,7 @@
 #cmakedefine VLE_HAVE_POOL
 #cmakedefine VLE_HAVE_NLS
 #cmakedefine VLE_HAVE_GTKSOURCEVIEWMM
+#cmakedefine VLE_HAVE_BOOST_SPIRIT2
 
 /**
  * @brief Check whether a VLE version equal to or greather than major.mino.patch

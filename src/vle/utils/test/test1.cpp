@@ -42,7 +42,9 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <iterator>
 #include <iostream>
+#include <sstream>
 #include <numeric>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/DateTime.hpp>
@@ -435,4 +437,17 @@ BOOST_AUTO_TEST_CASE(to_scientific_string_function)
                         "0.0001");
     BOOST_REQUIRE_EQUAL(vu::toScientificString(1000.0001),
                         "1000.0001");
+}
+
+BOOST_AUTO_TEST_CASE(test_format_copy)
+{
+    namespace vu = vle::utils;
+
+    std::ostringstream out;
+    int myints[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    vu::formatCopy(myints, myints + 9, out, ", ", ";", "\"");
+
+    BOOST_REQUIRE_EQUAL(out.str(),
+                        "\"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\", "
+                        "\"8\", \"9\";");
 }

@@ -36,6 +36,67 @@
 namespace vle { namespace utils {
 
     /**
+     * @brief Copies the values of the elements in the range [first, last) in
+     * the output `out'.
+     * @code
+     * template < typename InputIterator >
+     *     void formatCopy(InputIterator first, InputIterator last,
+     *                     ostream& out,
+     *                     const std::string& middle = std::string(),
+     *                     const std::string& last = std::string(),
+     *                     const std::string& around = std::string())
+     * {
+     *     for (; first != last; ++first) {
+     *         out << around << *first << around;
+     *         if (first + 1 != last) {
+     *            out << middle;
+     *         } else {
+     *            out << last;
+     *         }
+     *     }
+     * }
+     *
+     * #include <vector>
+     * #include <iterator>
+     * #include <iostream>
+     *
+     * int main()
+     * {
+     *     int myints[] = {1,2,3,4,5,6,7,8,9};
+     *     vector < int >  myvector out;
+     *
+     *      utils::formatCopy(myints, myints + 9, std::cout, ", ", ";", "\"");
+     *      // produce the stream:
+     *      // "1", "2", "3", "4", "5", "6", "7", "8", "9";
+     * }
+     * @endcode
+     *
+     * @param first Forward iterator to the initial position in a sequence.
+     * @param end Forward iterator to the final position in a sequence.
+     * @param out An output stream.
+     * @param middle The string to push between each element of the sequence.
+     * @param last The string to push at the end of the sequence.
+     * @param around Sttrings to push around each element of the sequence.
+     */
+    template < typename InputIterator >
+        void formatCopy(InputIterator first, InputIterator end,
+                        std::ostream& out,
+                        const std::string& middle = std::string(),
+                        const std::string& last = std::string(),
+                        const std::string& around = std::string())
+        {
+            for (; first != end; ++first) {
+                out << around << *first << around;
+
+                if (first + 1 != end) {
+                    out << middle;
+                } else {
+                    out << last;
+                }
+            }
+        }
+
+    /**
      * @brief Copies the values of the elements in the range [first,last) to
      * the range positions beginning at result, except those for which pred is
      * false, which are not copied. The behavior of this function template is

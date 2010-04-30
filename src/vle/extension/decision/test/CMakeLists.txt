@@ -14,6 +14,7 @@ LINK_DIRECTORIES(
 ADD_EXECUTABLE(kb kb.cpp)
 ADD_EXECUTABLE(activity activity.cpp)
 ADD_EXECUTABLE(allenrelation allenrelation.cpp)
+ADD_EXECUTABLE(parser parser.cpp)
 ADD_LIBRARY(modelsimple SHARED modelsimple.cpp)
 
 TARGET_LINK_LIBRARIES(kb
@@ -58,6 +59,20 @@ TARGET_LINK_LIBRARIES(allenrelation
   vleextension
   vlemanager)
 
+TARGET_LINK_LIBRARIES(parser
+  ${GLIBMM_LIBRARIES}
+  ${LIBXML_LIBRARIES}
+  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
+  vlegeometry
+  vleutils
+  vlevalue
+  vlegraph
+  vleoov
+  vlevpz
+  vledevs
+  vleextension
+  vlemanager)
+
 TARGET_LINK_LIBRARIES(modelsimple
   ${GLIBMM_LIBRARIES}
   ${LIBXML_LIBRARIES}
@@ -75,3 +90,4 @@ TARGET_LINK_LIBRARIES(modelsimple
 ADD_TEST(extension_decision_kb kb)
 ADD_TEST(extension_decision_activity activity)
 ADD_TEST(extension_decision_allen allenrelation)
+ADD_TEST(extension_decision_parser parser)
