@@ -76,7 +76,7 @@
 
 namespace vle { namespace utils {
 
-std::string toScientificString (const double& v, bool locale)
+std::string toScientificString(const double& v, bool locale)
 {
     std::ostringstream o;
     if (locale) {

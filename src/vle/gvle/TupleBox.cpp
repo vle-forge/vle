@@ -27,11 +27,7 @@
  */
 
 #include <vle/gvle/TupleBox.hpp>
-#include <vle/utils/Tools.cpp>
-
-using namespace vle;
-
-namespace vu = vle::utils;
+#include <vle/utils/Tools.hpp>
 
 namespace vle { namespace gvle {
 
@@ -64,9 +60,9 @@ void TupleBox::run()
     int ret = Gtk::Dialog::run();
     if (ret ==  Gtk::RESPONSE_APPLY) {
         value::TupleValue& tuple = mValue->value();
-        for (uint i = 0; i != mValue->size(); ++i) {
-            double x = vu::convert < double >((*mArray)[i]->get_text(),
-                                              true);
+        for (value::Tuple::size_type i = 0; i != mValue->size(); ++i) {
+            double x = utils::convert < double >((*mArray)[i]->get_text(),
+                                                 true);
             tuple[i] = x;
         }
     }
@@ -75,7 +71,7 @@ void TupleBox::run()
 void TupleBox::makeTable()
 {
     mArray = new array_type(boost::extents[mValue->size()]);
-    for (uint i = 0; i != mValue->size(); ++i) {
+    for (value::Tuple::size_type i = 0; i != mValue->size(); ++i) {
         (*mArray)[i] = new Gtk::Entry();
         (*mArray)[i]->set_text(utils::toScientificString(mValue->at(i),true));
         (*mArray)[i]->set_editable(true);
