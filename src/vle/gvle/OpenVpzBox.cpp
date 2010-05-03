@@ -108,9 +108,12 @@ void OpenVpzBox::onApply()
 		utils::Path::path().getPackageExpDir(), name);
 
 	    pathFile += ".vpz";
+
 	    mModeling->parseXML(pathFile);
-            mDialog->response(Gtk::RESPONSE_OK);
-	}
+            if (mModeling->getTopModel()) {
+                mDialog->response(Gtk::RESPONSE_OK);
+            }
+        }
     }
     mDialog->hide_all();
 }

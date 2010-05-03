@@ -247,11 +247,13 @@ void GVLE::FileTreeView::on_row_activated(const Gtk::TreeModel::Path&,
                 }
                 if (not found or (found and mParent->closeTab(it->first))) {
                     mParent->getEditor()->openTab(absolute_path);
-                    mParent->redrawModelTreeBox();
-                    mParent->redrawModelClassBox();
-                    mParent->getMenu()->onOpenVpz();
-                    mParent->mModelTreeBox->set_sensitive(true);
-                    mParent->mModelClassBox->set_sensitive(true);
+                    if (mParent->mModeling->getTopModel()) {
+                        mParent->redrawModelTreeBox();
+                        mParent->redrawModelClassBox();
+                        mParent->getMenu()->onOpenVpz();
+                        mParent->mModelTreeBox->set_sensitive(true);
+                        mParent->mModelClassBox->set_sensitive(true);
+                    }
                 }
 	    } else {
 		mParent->getEditor()->openTab(absolute_path);
@@ -707,11 +709,13 @@ void GVLE::refreshEditor(const std::string& oldName, const std::string& newName)
 void GVLE::setFileName(std::string name)
 {
     if (not name.empty() and utils::Path::extension(name) == ".vpz") {
-	mModeling->parseXML(name);
-	mMenuAndToolbar->showEditMenu();
-	mMenuAndToolbar->showSimulationMenu();
-	redrawModelTreeBox();
-        redrawModelClassBox();
+        mModeling->parseXML(name);
+        if (mModeling->getTopModel()) {
+            mMenuAndToolbar->showEditMenu();
+            mMenuAndToolbar->showSimulationMenu();
+            redrawModelTreeBox();
+            redrawModelClassBox();
+        }
     }
     mModeling->setModified(false);
 }
@@ -893,15 +897,15 @@ void GVLE::onOpenVpz()
                 mMenuAndToolbar->onOpenVpz();
                 mModelTreeBox->set_sensitive(true);
                 mModelClassBox->set_sensitive(true);
+                mEditor->getDocumentDrawingArea()->updateCursor();
+                if (mCurrentButton == POINTER){
+                    mStatusbar->push(_("Selection"));
+                }
             }
 	} catch(utils::InternalError) {
             Error((fmt(_("No experiments in the package '%1%'")) %
-                  utils::Package::package().name()).str());
+                   utils::Package::package().name()).str());
 	}
-    }
-    mEditor->getDocumentDrawingArea()->updateCursor();
-    if (mCurrentButton == POINTER){
-        mStatusbar->push(_("Selection"));
     }
 }
 
