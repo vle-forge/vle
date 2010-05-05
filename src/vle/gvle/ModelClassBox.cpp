@@ -41,7 +41,7 @@
 namespace vle { namespace gvle {
 
 ModelClassBox::ModelClassBox(BaseObjectType* cobject,
-			     Glib::RefPtr < Gnome::Glade::Xml > xml):
+                             Glib::RefPtr < Gnome::Glade::Xml > xml):
     Gtk::TreeView(cobject),
     mXml(xml),
     mClasses_backup(0),
@@ -52,21 +52,19 @@ ModelClassBox::ModelClassBox(BaseObjectType* cobject,
     mColumnName = append_column_editable(_("Class"), mColumns.mName);
 
     mCellRenderer = dynamic_cast<Gtk::CellRendererText*>(
-	get_column_cell_renderer(mColumnName - 1));
+        get_column_cell_renderer(mColumnName - 1));
     mCellRenderer->property_editable() = true;
     mCellRenderer->signal_editing_started().connect(
-	sigc::mem_fun(*this,
-		      &ModelClassBox::onEditionStarted));
+        sigc::mem_fun(*this, &ModelClassBox::onEditionStarted));
     mCellRenderer->signal_edited().connect(
-	sigc::mem_fun(*this,
-		      &ModelClassBox::onEdition));
+        sigc::mem_fun(*this, &ModelClassBox::onEdition));
 
     signal_event().connect(
-      sigc::mem_fun(*this, &ModelClassBox::onExposeEvent));
+        sigc::mem_fun(*this, &ModelClassBox::onExposeEvent));
     signal_cursor_changed().connect(
-	sigc::mem_fun(*this, &ModelClassBox::on_cursor_changed));
+        sigc::mem_fun(*this, &ModelClassBox::on_cursor_changed));
     signal_button_release_event().connect(
-	sigc::mem_fun(*this, &ModelClassBox::onButtonRealeaseModels));
+        sigc::mem_fun(*this, &ModelClassBox::onButtonRealeaseModels));
 
     expand_all();
     set_rules_hint(true);
@@ -79,12 +77,11 @@ void ModelClassBox::on_cursor_changed()
     if (refSelection) {
         Gtk::TreeModel::iterator iter = refSelection->get_selected();
         if (iter and (mRefTreeModel->iter_depth(iter) == 0)) {
-	    Gtk::TreeModel::Row row = *iter;
-
-	    mModeling->setSelectedClass(row.get_value(mColumns.mName));
-	} else {
-	    mModeling->setSelectedClass("");
-	}
+            Gtk::TreeModel::Row row = *iter;
+            mModeling->setSelectedClass(row.get_value(mColumns.mName));
+        } else {
+            mModeling->setSelectedClass("");
+        }
     }
 }
 
@@ -99,46 +96,46 @@ void ModelClassBox::initMenuPopupModels()
     Gtk::Menu::MenuList& menulist(mMenuPopup.items());
 
     menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		_("_Add"),
-		sigc::mem_fun(
-		    *this,
-		    &ModelClassBox::onAdd)));
+        Gtk::Menu_Helpers::MenuElem(
+            _("_Add"),
+            sigc::mem_fun(
+                *this,
+                &ModelClassBox::onAdd)));
 
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		_("_Remove"),
-		sigc::mem_fun(
-		    *this,
-		    &ModelClassBox::onRemove)));
+    menulist.push_back(
+        Gtk::Menu_Helpers::MenuElem(
+            _("_Remove"),
+            sigc::mem_fun(
+                *this,
+                &ModelClassBox::onRemove)));
 
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		_("_Rename"),
-		sigc::mem_fun(
-		    *this,
-		    &ModelClassBox::onRename)));
+    menulist.push_back(
+        Gtk::Menu_Helpers::MenuElem(
+            _("_Rename"),
+            sigc::mem_fun(
+                *this,
+                &ModelClassBox::onRename)));
 
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		_("_Export Class"),
-		sigc::mem_fun(
-		    *this,
-		    &ModelClassBox::onExportVpz)));
+    menulist.push_back(
+        Gtk::Menu_Helpers::MenuElem(
+            _("_Export Class"),
+            sigc::mem_fun(
+                *this,
+                &ModelClassBox::onExportVpz)));
 
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		_("Import Model as _Class"),
-		sigc::mem_fun(
-		    *this,
-		    &ModelClassBox::onImportModelAsClass)));
+    menulist.push_back(
+        Gtk::Menu_Helpers::MenuElem(
+            _("Import Model as _Class"),
+            sigc::mem_fun(
+                *this,
+                &ModelClassBox::onImportModelAsClass)));
 
-	menulist.push_back(
-	    Gtk::Menu_Helpers::MenuElem(
-		_("Import Classes from Vpz"),
-		sigc::mem_fun(
-		    *this,
-		    &ModelClassBox::onImportClassesFromVpz)));
+    menulist.push_back(
+        Gtk::Menu_Helpers::MenuElem(
+            _("Import Classes from Vpz"),
+            sigc::mem_fun(
+                *this,
+                &ModelClassBox::onImportClassesFromVpz)));
 
     mMenuPopup.accelerate(*this);
 }
@@ -156,9 +153,20 @@ void ModelClassBox::hide()
 
 bool ModelClassBox::onButtonRealeaseModels(GdkEventButton* event)
 {
-    if (event->button == 3) {
-	mMenuPopup.popup(event->button, event->time);
+    Gtk::Menu::MenuList& menulist(mMenuPopup.items());
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+    Gtk::TreeModel::iterator iter = refSelection->get_selected();
+
+    if (iter and (mRefTreeModel->iter_depth(iter) == 0)) {
+        menulist[1].set_sensitive(true);
+    } else {
+        menulist[1].set_sensitive(false);
     }
+
+    if (event->button == 3) {
+        mMenuPopup.popup(event->button, event->time);
+    }
+
     return true;
 }
 
@@ -171,13 +179,13 @@ void ModelClassBox::onAdd()
 void ModelClassBox::onRemove()
 {
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection =  get_selection();
+
     if (refSelection) {
         Gtk::TreeModel::iterator iter = refSelection->get_selected();
         if (iter and (mRefTreeModel->iter_depth(iter) == 0)) {
-	    Gtk::TreeModel::Row row = *iter;
-
+            Gtk::TreeModel::Row row = *iter;
             vpz::Class& class_ = mModeling->vpz().project().classes().get(
-		row.get_value(mColumns.mName));
+                row.get_value(mColumns.mName));
             if (class_.model()->isCoupled()) {
                 graph::CoupledModel* c_model = dynamic_cast<graph::CoupledModel*>(class_.model());
                 if (mModeling->existView(c_model)) {
@@ -185,43 +193,43 @@ void ModelClassBox::onRemove()
                 }
             }
             mModeling->vpz().project().classes().del(row.get_value(mColumns.mName));
-	    parseClass();
+            parseClass();
         }
     }
 }
 
 void ModelClassBox::onRename()
 {
-   Glib::RefPtr<Gtk::TreeView::Selection> refSelection =  get_selection();
-   if (refSelection) {
-       Gtk::TreeModel::iterator iter = refSelection->get_selected();
-       if (iter) {
-	   if (mRefTreeModel->iter_depth(iter) == 0) {
-	       Gtk::TreeModel::Row row = *iter;
-	       mOldName = row.get_value(mColumns.mName);
-	       SimpleTypeBox box(_("Name of the Class ?"), mOldName);
-	       std::string name = boost::trim_copy(box.run());
-	       if (box.valid() and not name.empty()) {
-		   onRenameClass(name);
-	       }
-	   } else {
-	       Gtk::TreeModel::Row row = *iter;
-	       std::string oldname(row.get_value(mColumns.mName));
-	       SimpleTypeBox box(_("New name of this model?"), oldname);
-	       std::string newname = boost::trim_copy(box.run());
-	       if (box.valid() and not newname.empty() and newname != oldname) {
-		   try {
-		       row[mColumns.mName] = newname;
-		       graph::Model::rename(row[mColumns.mModel], newname);
-		       mModeling->setModified(true);
-		   } catch(utils::DevsGraphError dge) {
-		       row[mColumns.mName] = oldname;
-		   }
-	       }
-	   }
-	   parseClass();
-       }
-   }
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection =  get_selection();
+    if (refSelection) {
+        Gtk::TreeModel::iterator iter = refSelection->get_selected();
+        if (iter) {
+            if (mRefTreeModel->iter_depth(iter) == 0) {
+                Gtk::TreeModel::Row row = *iter;
+                mOldName = row.get_value(mColumns.mName);
+                SimpleTypeBox box(_("Name of the Class ?"), mOldName);
+                std::string name = boost::trim_copy(box.run());
+                if (box.valid() and not name.empty()) {
+                    onRenameClass(name);
+                }
+            } else {
+                Gtk::TreeModel::Row row = *iter;
+                std::string oldname(row.get_value(mColumns.mName));
+                SimpleTypeBox box(_("New name of this model?"), oldname);
+                std::string newname = boost::trim_copy(box.run());
+                if (box.valid() and not newname.empty() and newname != oldname) {
+                    try {
+                        row[mColumns.mName] = newname;
+                        graph::Model::rename(row[mColumns.mModel], newname);
+                        mModeling->setModified(true);
+                    } catch(utils::DevsGraphError dge) {
+                        row[mColumns.mName] = oldname;
+                    }
+                }
+            }
+            parseClass();
+        }
+    }
 }
 
 void ModelClassBox::onRenameClass(const std::string& newName)
@@ -232,16 +240,16 @@ void ModelClassBox::onRenameClass(const std::string& newName)
     mModeling->vpz().project().classes().add(newName);
     mModeling->vpz().project().classes().get(newName).setModel(model);
     mModeling->vpz().project().classes().get(newName).
-	setAtomicModel(atomicModel);
+        setAtomicModel(atomicModel);
 
     if (oldClass.model()->isCoupled()) {
-	graph::CoupledModel* c_model =
-	    dynamic_cast<graph::CoupledModel*>(oldClass.model());
+        graph::CoupledModel* c_model =
+            dynamic_cast<graph::CoupledModel*>(oldClass.model());
 
-	if (mModeling->existView(c_model)) {
-	    mModeling->delViewOnModel(c_model);
-	    mModeling->addViewClass(c_model, newName);
-	}
+        if (mModeling->existView(c_model)) {
+            mModeling->delViewOnModel(c_model);
+            mModeling->addViewClass(c_model, newName);
+        }
     }
     mModeling->vpz().project().classes().get(mOldName).setModel(0);
     mModeling->vpz().project().classes().del(mOldName);
@@ -251,35 +259,35 @@ void ModelClassBox::onExportVpz()
 {
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
     if (refSelection) {
-	Gtk::TreeModel::iterator iter = refSelection->get_selected();
-	if (iter and (mRefTreeModel->iter_depth(iter) == 0)) {
-	    Gtk::TreeModel::Row row = *iter;
-	    vpz::Class& currentClass = mModeling->vpz().project().classes().get(
-		row.get_value(mColumns.mName));
-	    graph::Model* model = currentClass.model();
+        Gtk::TreeModel::iterator iter = refSelection->get_selected();
+        if (iter and (mRefTreeModel->iter_depth(iter) == 0)) {
+            Gtk::TreeModel::Row row = *iter;
+            vpz::Class& currentClass = mModeling->vpz().project().classes().get(
+                row.get_value(mColumns.mName));
+            graph::Model* model = currentClass.model();
 
-	    Gtk::FileChooserDialog file(_("VPZ file"), Gtk::FILE_CHOOSER_ACTION_SAVE);
-	    file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-	    file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
-	    Gtk::FileFilter filter;
-	    filter.set_name(_("Vle Project gZipped"));
-	    filter.add_pattern("*.vpz");
-	    file.add_filter(filter);
+            Gtk::FileChooserDialog file(_("VPZ file"), Gtk::FILE_CHOOSER_ACTION_SAVE);
+            file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+            file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+            Gtk::FileFilter filter;
+            filter.set_name(_("Vle Project gZipped"));
+            filter.add_pattern("*.vpz");
+            file.add_filter(filter);
 
-	    if (file.run() == Gtk::RESPONSE_OK) {
-		std::string filename(file.get_filename());
-		vpz::Vpz::fixExtension(filename);
+            if (file.run() == Gtk::RESPONSE_OK) {
+                std::string filename(file.get_filename());
+                vpz::Vpz::fixExtension(filename);
 
-		vpz::Vpz* save = new vpz::Vpz();
-		if (utils::Path::existFile(filename)) {
-		    save->clear();
-		}
-		save->setFilename(filename);
+                vpz::Vpz* save = new vpz::Vpz();
+                if (utils::Path::existFile(filename)) {
+                    save->clear();
+                }
+                save->setFilename(filename);
 
-		mModeling->exportClass(model, currentClass, save);
-		delete save;
-	    }
-	}
+                mModeling->exportClass(model, currentClass, save);
+                delete save;
+            }
+        }
     }
 }
 
@@ -294,14 +302,14 @@ void ModelClassBox::onImportModelAsClass()
     file.add_filter(filter);
 
     if (file.run() == Gtk::RESPONSE_OK) {
-	std::string project_file = file.get_filename();
+        std::string project_file = file.get_filename();
         try {
             vpz::Vpz* import = new vpz::Vpz(project_file);
-	    InteractiveTypeBox box(_("Name of the Class ?"),
-				   &mModeling->vpz().project().classes());
-	    std::string name = boost::trim_copy(box.run());
+            InteractiveTypeBox box(_("Name of the Class ?"),
+                                   &mModeling->vpz().project().classes());
+            std::string name = boost::trim_copy(box.run());
             if (not name.empty())
-		mModeling->importModelToClass(import, name);
+                mModeling->importModelToClass(import, name);
             delete import;
         } catch (std::exception& E) {
             std::cout << "Exception :\n" << E.what() << "\n";
@@ -320,13 +328,13 @@ void ModelClassBox::onImportClassesFromVpz()
     file.add_filter(filter);
 
     if (file.run() == Gtk::RESPONSE_OK) {
-	std::string project_file = file.get_filename();
+        std::string project_file = file.get_filename();
         try {
             vpz::Vpz* import = new vpz::Vpz(project_file);
             mModeling->setModified(true);
-	    mModeling->importClasses(import);
+            mModeling->importClasses(import);
             delete import;
-	} catch (std::exception& E) {
+        } catch (std::exception& E) {
             std::cout << "Exception :\n" << E.what() << "\n";
         }
     }
@@ -339,15 +347,15 @@ void ModelClassBox::parseClass()
     const vpz::Vpz& vpz = ((const Modeling*)mModeling)->vpz();
     vpz::Classes::const_iterator iter = vpz.project().classes().begin();
     while (iter != vpz.project().classes().end()) {
-	Gtk::TreeModel::Row row = addClass(vpz.project().classes().get(
-					       iter->second.name()));
-	const graph::Model* top = vpz.project().classes()
-	    .get(iter->second.name()).model();
-	Gtk::TreeModel::Row row2 = addSubModel(row, (graph::Model*)top);
-	if (top->isCoupled()) {
-	    parseModel(row2, (graph::CoupledModel*)top);
-	}
-	++iter;
+        Gtk::TreeModel::Row row = addClass(vpz.project().classes().get(
+                                               iter->second.name()));
+        const graph::Model* top = vpz.project().classes()
+            .get(iter->second.name()).model();
+        Gtk::TreeModel::Row row2 = addSubModel(row, (graph::Model*)top);
+        if (top->isCoupled()) {
+            parseModel(row2, (graph::CoupledModel*)top);
+        }
+        ++iter;
     }
     expand_all();
 }
@@ -357,16 +365,15 @@ void ModelClassBox::clear()
     mRefTreeModel->clear();
 }
 
-Gtk::TreeModel::Row
-ModelClassBox::addClass(const vpz::Class& classe)
+Gtk::TreeModel::Row ModelClassBox::addClass(const vpz::Class& classe)
 {
     Gtk::TreeModel::Row row = *(mRefTreeModel->append());
     row[mColumns.mName] = classe.name();
     return row;
 }
 
-Gtk::TreeModel::Row
-ModelClassBox::addSubModel(Gtk::TreeModel::Row tree, graph::Model* model)
+Gtk::TreeModel::Row ModelClassBox::addSubModel(Gtk::TreeModel::Row tree,
+                                               graph::Model* model)
 {
     Gtk::TreeModel::Row row = *(mRefTreeModel->append(tree.children()));
     row[mColumns.mName] = model->getName();
@@ -375,7 +382,7 @@ ModelClassBox::addSubModel(Gtk::TreeModel::Row tree, graph::Model* model)
 }
 
 void ModelClassBox::parseModel(Gtk::TreeModel::Row row,
-                              const graph::CoupledModel* top)
+                               const graph::CoupledModel* top)
 {
     const graph::ModelList& list = top->getModelList();
     graph::ModelList::const_iterator it = list.begin();
@@ -398,113 +405,112 @@ void ModelClassBox::showRow(const std::string& model_name)
 bool ModelClassBox::onExposeEvent(GdkEvent* event)
 {
     if (event->type == GDK_2BUTTON_PRESS) {
-	mDelayTime = event->button.time;
-	Gtk::TreeModel::Path path;
-	Gtk::TreeViewColumn* column;
-	get_cursor(path, column);
-	row_activated(path, column);
-	return true;
+        mDelayTime = event->button.time;
+        Gtk::TreeModel::Path path;
+        Gtk::TreeViewColumn* column;
+        get_cursor(path, column);
+        row_activated(path, column);
+        return true;
     }
     if (event->type == GDK_BUTTON_PRESS) {
-	if (mDelayTime + 250 < event->button.time) {
-	    mDelayTime = event->button.time;
-	    mCellRenderer->property_editable() = true;
-	} else {
-	    mDelayTime = event->button.time;
-	    mCellRenderer->property_editable() = false;
-	}
+        if (mDelayTime + 250 < event->button.time) {
+            mDelayTime = event->button.time;
+            mCellRenderer->property_editable() = true;
+        } else {
+            mDelayTime = event->button.time;
+            mCellRenderer->property_editable() = false;
+        }
     }
     return false;
 
 }
 
 void ModelClassBox::row_activated(const Gtk::TreeModel::Path& path,
-                                 Gtk::TreeViewColumn* column)
+                                  Gtk::TreeViewColumn* column)
 {
     if (column) {
         Gtk::TreeIter iter = mRefTreeModel->get_iter(path);
         Gtk::TreeRow row = (*iter);
-	if (mRefTreeModel->iter_depth(iter) == 0) {
-	    mModeling->addViewClass(
-		mModeling->getClassModel(row.get_value(mColumns.mName)),
-		row.get_value(mColumns.mName));
-	} else {
-	    std::vector <std::string> Vec;
-	    Glib::ustring str = path.to_string();
-	    boost::split(Vec, str, boost::is_any_of(":"));
-	    Gtk::TreeIter iterClass = mRefTreeModel->get_iter(Vec[0]);
-	    Gtk::TreeRow rowClass = (*iterClass);
-	    mModeling->addViewClass(row.get_value(mColumns.mModel),
-				    rowClass.get_value(mColumns.mName));
-	}
+        if (mRefTreeModel->iter_depth(iter) == 0) {
+            mModeling->addViewClass(
+                mModeling->getClassModel(row.get_value(mColumns.mName)),
+                row.get_value(mColumns.mName));
+        } else {
+            std::vector <std::string> Vec;
+            Glib::ustring str = path.to_string();
+            boost::split(Vec, str, boost::is_any_of(":"));
+            Gtk::TreeIter iterClass = mRefTreeModel->get_iter(Vec[0]);
+            Gtk::TreeRow rowClass = (*iterClass);
+            mModeling->addViewClass(row.get_value(mColumns.mModel),
+                                    rowClass.get_value(mColumns.mName));
+        }
     }
 }
 
-
 bool ModelClassBox::on_foreach(const Gtk::TreeModel::Path&,
-                              const Gtk::TreeModel::iterator& iter)
+                               const Gtk::TreeModel::iterator& iter)
 {
     if ((*iter).get_value(mColumns.mName) == mSearch) {
-	set_cursor(mRefTreeModel->get_path(iter));
+        set_cursor(mRefTreeModel->get_path(iter));
         return true;
     }
     return false;
 }
 
-void ModelClassBox::onEditionStarted(
-    Gtk::CellEditable* cell_editable, const Glib::ustring& /* path */)
+void ModelClassBox::onEditionStarted(Gtk::CellEditable* cell_editable,
+                                     const Glib::ustring& /* path */)
 {
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
     if (refSelection) {
-	Gtk::TreeModel::iterator iter = refSelection->get_selected();
-	if (iter) {
-	    Gtk::TreeModel::Row row = *iter;
-	    mOldName = row.get_value(mColumns.mName);
-	}
+        Gtk::TreeModel::iterator iter = refSelection->get_selected();
+        if (iter) {
+            Gtk::TreeModel::Row row = *iter;
+            mOldName = row.get_value(mColumns.mName);
+        }
     }
 
     if(mValidateRetry)
     {
-	Gtk::CellEditable* celleditable_validated = cell_editable;
-	Gtk::Entry* pEntry = dynamic_cast<Gtk::Entry*>(
-	    celleditable_validated);
-	if(pEntry)
-	{
-	    pEntry->set_text(mInvalidTextForRetry);
-	    mValidateRetry = false;
-	    mInvalidTextForRetry.clear();
-	}
+        Gtk::CellEditable* celleditable_validated = cell_editable;
+        Gtk::Entry* pEntry = dynamic_cast<Gtk::Entry*>(
+            celleditable_validated);
+        if(pEntry)
+        {
+            pEntry->set_text(mInvalidTextForRetry);
+            mValidateRetry = false;
+            mInvalidTextForRetry.clear();
+        }
     }
 }
 
 void ModelClassBox::onEdition(
-        const Glib::ustring& pathString,
-        const Glib::ustring& newName)
+    const Glib::ustring& pathString,
+    const Glib::ustring& newName)
 {
     Gtk::TreePath path(pathString);
 
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
     if (refSelection and newName != mOldName) {
-	Gtk::TreeModel::iterator iter = refSelection->get_selected();
-	if (iter) {
-	    if ((mRefTreeModel->iter_depth(iter) == 0)
-		and (newName != "")
-		and not mModeling->vpz().project().classes().exist(newName)) {
-		onRenameClass(newName);
-	    } else {
-		if (not newName.empty()) {
-		    Gtk::TreeModel::Row row = *iter;
-		    try {
-			row[mColumns.mName] = newName;
-			graph::Model::rename(row[mColumns.mModel], newName);
-			mModeling->setModified(true);
-		    } catch(utils::DevsGraphError dge) {
-			row[mColumns.mName] = mOldName;
-		    }
-		}
-	    }
-	}
-	parseClass();
+        Gtk::TreeModel::iterator iter = refSelection->get_selected();
+        if (iter) {
+            if ((mRefTreeModel->iter_depth(iter) == 0)
+                and (newName != "")
+                and not mModeling->vpz().project().classes().exist(newName)) {
+                onRenameClass(newName);
+            } else {
+                if (not newName.empty()) {
+                    Gtk::TreeModel::Row row = *iter;
+                    try {
+                        row[mColumns.mName] = newName;
+                        graph::Model::rename(row[mColumns.mModel], newName);
+                        mModeling->setModified(true);
+                    } catch(utils::DevsGraphError dge) {
+                        row[mColumns.mName] = mOldName;
+                    }
+                }
+            }
+        }
+        parseClass();
     }
 }
 
