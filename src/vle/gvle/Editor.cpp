@@ -55,6 +55,12 @@ Document::Document(GVLE* gvle, const std::string& filepath) :
     mFileName = utils::Path::basename(filepath);
 }
 
+Document::Document() :
+    Gtk::ScrolledWindow()
+{
+    setModified(false);
+}
+
 void Document::setTitle(const std::string& filePath,
 			graph::Model* model,
 			bool modified)
@@ -86,12 +92,49 @@ DocumentText::DocumentText(GVLE* gvle,
     mNew(newfile)
 {
     mTitle = filename() + utils::Path::extension(filepath);
+
+    mIdLang = guessIdLanguage();
+
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
     gtksourceview::init();
 #endif
-    init();
+
+    if (not mNew) {
+	std::ifstream file(filepath.c_str());
+	if (file) {
+	    std::stringstream filecontent;
+	    filecontent << file.rdbuf();
+	    file.close();
+	    Glib::ustring buffer_content = filecontent.str();
+	    if (not buffer_content.validate()) {
+                try {
+                    buffer_content = Glib::locale_to_utf8(buffer_content);
+                }
+                catch(const Glib::ConvertError& e){
+                    throw utils::FileError(_("This file isn't UTF-8 valid,"
+                                             " and convert from locale"
+                                             " encoding failed."));
+                }
+	    }
+            init(buffer_content);
+        } else {
+	    Error(std::string("cannot open: " + filename()));
+	}
+    }
+
     mView.get_buffer()->signal_changed().connect(
 	sigc::mem_fun(this, &DocumentText::onChanged));
+}
+
+DocumentText::DocumentText(const std::string& buffer)
+{
+
+    mIdLang = "cpp";
+
+#ifdef VLE_HAVE_GTKSOURCEVIEWMM
+    gtksourceview::init();
+#endif
+    init(buffer);
 }
 
 void DocumentText::save()
@@ -129,53 +172,37 @@ void DocumentText::saveAs(const std::string& newFilePath)
     }
 }
 
-void DocumentText::init()
+void DocumentText::init(const std::string& buffer)
 {
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
     Glib::RefPtr<gtksourceview::SourceLanguageManager> manager
 	= gtksourceview::SourceLanguageManager::create();
     Glib::RefPtr<gtksourceview::SourceLanguage> language =
-	manager->get_language(getIdLanguage());
-    Glib::RefPtr<gtksourceview::SourceBuffer> buffer =
+	manager->get_language(mIdLang);
+    Glib::RefPtr<gtksourceview::SourceBuffer> buffer_ =
 	gtksourceview::SourceBuffer::create(language);
 #else
-    Glib::RefPtr<Gtk::TextBuffer> buffer = mView.get_buffer();
+    Glib::RefPtr<Gtk::TextBuffer> buffer_ = mView.get_buffer();
 #endif
-    if (not mNew) {
-	std::ifstream file(filepath().c_str());
-	if (file) {
-	    std::stringstream filecontent;
-	    filecontent << file.rdbuf();
-	    file.close();
-	    Glib::ustring buffer_content = filecontent.str();
-	    if (not buffer_content.validate()) {
-                try {
-                    buffer_content = Glib::locale_to_utf8(buffer_content);
-                } catch (const Glib::ConvertError& e){
-                    throw utils::FileError(_("This file isn't UTF-8 valid,"
-                                             " and convert from locale"
-                                             " encoding failed."));
-                }
-	    }
+
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
-	    buffer->begin_not_undoable_action();
-	    buffer->insert(buffer->end(), buffer_content);
-	    buffer->end_not_undoable_action();
+    buffer_->begin_not_undoable_action();
+    buffer_->insert(buffer_->end(), buffer);
+    buffer_->end_not_undoable_action();
 #else
-	    buffer->insert(buffer->end(), buffer_content);
+    buffer_->insert(buffer_->end(), buffer);
 #endif
-	} else {
-	    Error(std::string("cannot open: " + filename()));
-	}
-    }
+
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    mView.set_source_buffer(buffer);
+    mView.set_source_buffer(buffer_);
 #endif
+
     applyEditingProperties();
+
     add(mView);
 }
 
-std::string DocumentText::getIdLanguage()
+std::string DocumentText::guessIdLanguage()
 {
     std::string ext(utils::Path::extension(filepath()));
     std::string idLang;
@@ -276,6 +303,15 @@ void DocumentText::onChanged()
 	mTitle = "* "+ mTitle;
 	mGVLE->getEditor()->setModifiedTab(mTitle, filepath(), filepath());
     }
+}
+
+std::string DocumentText::getBuffer() const
+{
+#ifdef VLE_HAVE_GTKSOURCEVIEWMM
+    return mView.get_source_buffer()->get_text();
+#else
+    return mView.get_buffer()->get_text();
+#endif
 }
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */

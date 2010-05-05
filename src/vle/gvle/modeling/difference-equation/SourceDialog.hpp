@@ -32,39 +32,13 @@
 #include <vle/version.hpp>
 #include <libglademm.h>
 #include <gtkmm.h>
+#include <vle/gvle/Editor.hpp>
 
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
 #include <gtksourceviewmm-2.0/gtksourceviewmm.h>
 #endif
 
 namespace vle { namespace gvle { namespace modeling { namespace de {
-
-class Source : public Gtk::ScrolledWindow
-{
-public:
-    Source(const std::string& buffer);
-    virtual ~Source() {}
-
-    std::string getBuffer() const;
-
-    virtual void undo();
-    virtual void redo();
-
-    void paste();
-    void copy();
-    void cut();
-
-private:
-#ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    gtksourceview::SourceView mView;
-#else
-    mutable Gtk::TextView  mView; // mutable to enable the getBuffer function,
-    // begin() and end() are non-const.
-#endif
-
-    void init(const std::string& buffer);
-    void applyEditingProperties();
-};
 
 class SourceDialog
 {
@@ -88,12 +62,11 @@ private:
     //Notebook
     Gtk::Notebook*                  mNotebook;
     //Documents
-    Source*                         mComputeFunction;
-    Source*                         mInitValueFunction;
-    Source*                         mUserFunctions;
+    DocumentText*                   mComputeFunction;
+    DocumentText*                   mInitValueFunction;
+    DocumentText*                   mUserFunctions;
 };
 
 }}}} // namespace vle gvle modeling de
 
 #endif
-

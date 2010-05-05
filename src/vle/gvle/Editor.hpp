@@ -51,9 +51,13 @@ class View;
 /**
  * @brief Document class used within Gtk::Notebook
  */
+
 class Document : public Gtk::ScrolledWindow {
 public:
     Document(GVLE* gvle, const std::string& filepath);
+
+    Document();
+
     virtual ~Document() { }
 
     virtual inline bool isDrawingArea() const
@@ -101,6 +105,9 @@ private:
 class DocumentText : public Document {
 public:
     DocumentText(GVLE* gvle, const std::string& filePath, bool newfile = false);
+
+    DocumentText(const std::string& buffer);
+
     virtual ~DocumentText() { }
 
     void save();
@@ -118,18 +125,22 @@ public:
     void copy();
     void cut();
 
+    std::string getBuffer() const;
+
 private:
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
     gtksourceview::SourceView mView;
 #else
-    Gtk::TextView  mView;
+    mutable Gtk::TextView  mView; // mutable to enable the getBuffer function,
+    // begin() and end() are non-const.
 #endif
     bool           mModified;
     bool           mNew;
+    std::string    mIdLang;
 
-    void init();
+    void init(const std::string& buffer);
     void onChanged();
-    std::string getIdLanguage();
+    std::string guessIdLanguage();
     void applyEditingProperties();
 };
 
