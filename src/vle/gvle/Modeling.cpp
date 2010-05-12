@@ -887,5 +887,83 @@ void parse_model(vpz::AtomicModelList& list)
     }
 }
 
+
+std::string Modeling::getDynamicInfo(std::string dynamicName) const
+{
+
+    std::string cardp = "";
+
+    const vpz::Dynamic& dyn = dynamics().get(dynamicName);
+
+    cardp += "\nProject: " + dyn.package();
+    cardp += "\nLibrary: " + dyn.library();
+    cardp += "\nClass: " + dyn.model();
+
+    return cardp;
+}
+
+std::string Modeling::getIdCard(std::string className) const
+{
+    const vpz::Class& mclasses = vpz().project().classes().get(className);
+    std::string nclas = "Class: "+ mclasses.name();
+    return nclas;
+}
+
+std::string Modeling::getIdCard(graph::Model* model) const
+{
+
+    if (model->isCoupled()) {
+        graph::CoupledModel* m = (graph::CoupledModel*)(model);
+        return getIdCard(m);
+    } else if (model->isAtomic()) {
+        Glib::ustring card = "Model : "+ model->getName() + " (Atomic)";
+
+        const vpz::Model& mmodel = vpz().project().model();
+        const vpz::AtomicModel& atm = mmodel.atomicModels().get(model);
+        const std::string nom_dyn = atm.dynamics();
+
+        card += "\nDynamic : " + nom_dyn;
+
+        if (!nom_dyn.empty()) {
+            card += getDynamicInfo(nom_dyn);
+        }
+        return card;
+    }
+    return "";
+}
+
+std::string Modeling::getIdCard(graph::CoupledModel* model) const
+{
+    return ("Model: " + model->getName() + " (Coupled)");
+}
+
+std::string Modeling::getClassIdCard(graph::Model* model,
+                                     std::string className) const
+{
+    if (model->isCoupled()) {
+        graph::CoupledModel* m = (graph::CoupledModel*)(model);
+        return getClassIdCard(m);
+    } else if (model->isAtomic()) {
+        Glib::ustring card = "Model : " + model->getName() + " (Atomic)";
+
+        const vpz::Class& classes = vpz().project().classes().get(className);
+        const vpz::AtomicModel& atm = classes.atomicModels().get(model);
+        const std::string nom_dyn = atm.dynamics();
+
+        card += "\nDynamic : " + nom_dyn;
+
+        if (!nom_dyn.empty()) {
+            card += getDynamicInfo(nom_dyn);
+        }
+        return card;
+    }
+    return "";
+}
+
+std::string Modeling::getClassIdCard(graph::CoupledModel* model) const
+{
+    return ("Model: " + model->getName() + " (Coupled)");
+}
+
 }
 } // namespace vle gvle

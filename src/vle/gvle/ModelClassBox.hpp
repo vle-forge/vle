@@ -91,6 +91,9 @@ public:
      */
     void clear();
 
+    bool onQueryTooltip(int wx,int wy, bool keyboard_tooltip,
+                        const Glib::RefPtr<Gtk::Tooltip>& tooltip);
+
 protected:
     /**
      * a recursive function to complete tree

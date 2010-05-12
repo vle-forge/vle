@@ -78,7 +78,7 @@ public:
      * Get the treview row as an iterator from the selected model
      *
      * @param mdl selected model
-     * @param current model child 
+     * @param current model child
      */
     Gtk::TreeModel::iterator getModelRow(const graph::Model* mdl, Gtk::TreeModel::Children child);
 
@@ -121,6 +121,8 @@ public:
      */
     void selectNone();
 
+    bool onQueryTooltip(int wx,int wy, bool keyboard_tooltip,
+                        const Glib::RefPtr<Gtk::Tooltip>& tooltip);
 
 protected:
     /**

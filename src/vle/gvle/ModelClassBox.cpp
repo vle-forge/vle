@@ -69,6 +69,10 @@ ModelClassBox::ModelClassBox(BaseObjectType* cobject,
     expand_all();
     set_rules_hint(true);
     initMenuPopupModels();
+
+    set_has_tooltip();
+    signal_query_tooltip().connect(
+        sigc::mem_fun(*this, &ModelClassBox::onQueryTooltip));
 }
 
 void ModelClassBox::on_cursor_changed()
@@ -363,6 +367,35 @@ void ModelClassBox::parseClass()
 void ModelClassBox::clear()
 {
     mRefTreeModel->clear();
+}
+
+bool ModelClassBox::onQueryTooltip(int wx,int wy, bool keyboard_tooltip,
+                                   const Glib::RefPtr<Gtk::Tooltip>& tooltip)
+{
+    Gtk::TreeModel::iterator iter;
+    Glib::ustring card;
+
+    if (get_tooltip_context_iter(wx, wy, keyboard_tooltip, iter) == true) {
+        Gtk::TreeModel::Path path = Gtk::TreePath(iter);
+        Gtk::TreeIter iter = mRefTreeModel->get_iter(path);
+        Gtk::TreeRow row = (*iter);
+        if (mRefTreeModel->iter_depth(iter) == 0) {
+            card = mModeling->getIdCard(row.get_value(mColumns.mName));
+        } else {
+            std::vector <std::string> Vec;
+            Glib::ustring str = path.to_string();
+            boost::split(Vec, str, boost::is_any_of(":"));
+            Gtk::TreeIter iterClass = mRefTreeModel->get_iter(Vec[0]);
+            Gtk::TreeRow rowClass = (*iterClass);
+
+            card = mModeling->getClassIdCard(row.get_value(mColumns.mModel),
+                                             rowClass.get_value(mColumns.mName));
+        }
+        tooltip->set_text(card);
+        set_tooltip_row(tooltip, Gtk::TreePath(iter));
+        return true;
+    }
+    return false;
 }
 
 Gtk::TreeModel::Row ModelClassBox::addClass(const vpz::Class& classe)

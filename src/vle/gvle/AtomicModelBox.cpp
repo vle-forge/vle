@@ -1596,7 +1596,23 @@ void AtomicModelBox::applyDynamics()
 	    ++it;
 	}
     }
+    {
+        vpz::ClassList& list =
+            mModeling->vpz().project().classes().list();
+        vpz::ClassList::iterator it = list.begin();
+        while (it != list.end()) {
+            vpz::AtomicModelList& atomicList = it->second.atomicModels();
+            vpz::AtomicModelList::iterator ital = atomicList.begin();
 
+            while (ital != atomicList.end()) {
+                if (not mModeling->dynamics().exist(ital->second.dynamics())) {
+                    ital->second.setDynamics("");
+                }
+                ++ital;
+            }
+            ++it;
+        }
+    }
     {
 	Glib::RefPtr<Gtk::TreeView::Selection> refSelection =
 	    mDynamics->get_selection();

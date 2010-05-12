@@ -68,6 +68,10 @@ ModelTreeBox::ModelTreeBox(BaseObjectType* cobject,
     expand_all();
     set_rules_hint(true);
     initMenuPopupModels();
+
+    set_has_tooltip();
+    signal_query_tooltip().connect(
+	sigc::mem_fun(*this, &ModelTreeBox::onQueryTooltip));
 }
 
 bool ModelTreeBox::select_function(
@@ -214,6 +218,22 @@ void ModelTreeBox::clear()
     m_refTreeModel->clear();
 }
 
+bool ModelTreeBox::onQueryTooltip(int wx,int wy, bool keyboard_tooltip,
+                                  const Glib::RefPtr<Gtk::Tooltip>& tooltip)
+{
+    Gtk::TreeModel::iterator iter;
+    Glib::ustring card;
+
+    if (get_tooltip_context_iter(wx, wy, keyboard_tooltip, iter)) {
+        graph::Model* mModel = (*iter).get_value(m_columns.mModel);
+        card = m_modeling->getIdCard(mModel);
+        tooltip->set_text(card);
+        set_tooltip_row(tooltip, Gtk::TreePath(iter));
+        return true;
+    } else {
+        return false;
+    }
+}
 
 Gtk::TreeModel::Row
 ModelTreeBox::addModel(graph::Model* model)

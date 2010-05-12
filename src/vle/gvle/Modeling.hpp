@@ -717,9 +717,22 @@ public:
 
     /********************************************************************
      *
-     * MANAGE OUTPUT AND CONDITION PLUG-INS
+     * GET PIECES OF INFORMATION
      *
      ********************************************************************/
+
+    std::string getDynamicInfo(std::string dynamicName) const;
+
+    std::string getIdCard(std::string className) const;
+
+    std::string getIdCard(graph::Model* model) const;
+
+    std::string getIdCard(graph::CoupledModel* model) const;
+
+    std::string getClassIdCard(graph::Model* model,
+                               std::string className) const;
+
+    std::string getClassIdCard(graph::CoupledModel* model) const;
 
 private:
     vpz::Vpz                    mVpz;
