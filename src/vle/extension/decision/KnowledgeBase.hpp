@@ -404,10 +404,10 @@ public:
      */
     OutputFunctions& outputFunctions() { return mOutFunctions; }
 
-    template < typename O >
-        AddFacts < O > addFacts(O obj)
+    template < typename X >
+        AddFacts < X > addFacts(X obj)
         {
-            return AddFacts < O >(obj);
+            return AddFacts < X >(obj);
         }
 
     template < typename X >
@@ -416,40 +416,40 @@ public:
             return f < X >(name, func);
         }
 
-    template < typename O >
-        AddPredicates < O > addPredicates(O obj)
+    template < typename X >
+        AddPredicates < X > addPredicates(X obj)
         {
-            return AddPredicates < O >(obj);
+            return AddPredicates < X >(obj);
         }
 
-    template < typename F >
-        p < F > P(const std::string& name, F func)
+    template < typename X >
+        p < X > P(const std::string& name, X func)
         {
-            return p < F >(name, func);
+            return p < X >(name, func);
         }
 
-    template < typename O >
-        AddOutputFunctions < O > addOutputFunctions(O obj)
+    template < typename X >
+        AddOutputFunctions < X > addOutputFunctions(X obj)
         {
-            return AddOutputFunctions < O >(obj);
+            return AddOutputFunctions < X >(obj);
         }
 
-    template < typename F >
-        o < F > O(const std::string& name, F func)
+    template < typename X >
+        o < X > O(const std::string& name, X func)
         {
-            return o < F >(name, func);
+            return o < X >(name, func);
         }
 
-    template < typename O >
-        AddAcknowledgeFunctions < O > addAcknowledgeFunctions(O obj)
+    template < typename X >
+        AddAcknowledgeFunctions < X > addAcknowledgeFunctions(X obj)
         {
-            return AddAcknowledgeFunctions < O >(obj);
+            return AddAcknowledgeFunctions < X >(obj);
         }
 
-    template < typename F >
-        a < F > A(const std::string& name, F func)
+    template < typename X >
+        a < X > A(const std::string& name, X func)
         {
-            return a < F >(name, func);
+            return a < X >(name, func);
         }
 
 private:
