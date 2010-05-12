@@ -31,126 +31,6 @@
 
 namespace vle { namespace gvle { namespace modeling { namespace fsa {
 
-Source::Source(const std::string& buffer)
-{
-#ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    gtksourceview::init();
-#endif
-    init(buffer);
-}
-
-std::string Source::getBuffer() const
-{
-#ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    return mView.get_source_buffer()->get_text();
-#else
-    return mView.get_buffer()->get_text();
-#endif
-}
-
-void Source::init(const std::string& buffer)
-{
-#ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    Glib::RefPtr<gtksourceview::SourceLanguageManager> manager
-	= gtksourceview::SourceLanguageManager::create();
-    Glib::RefPtr<gtksourceview::SourceLanguage> language =
-	manager->get_language("cpp");
-    Glib::RefPtr<gtksourceview::SourceBuffer> buffer_ =
-	gtksourceview::SourceBuffer::create(language);
-#else
-    Glib::RefPtr<Gtk::TextBuffer> buffer_ = mView.get_buffer();
-#endif
-
-#ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    buffer_->begin_not_undoable_action();
-    buffer_->insert(buffer_->end(), buffer);
-    buffer_->end_not_undoable_action();
-#else
-    buffer_->insert(buffer_->end(), buffer);
-#endif
-
-#ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    mView.set_source_buffer(buffer_);
-#endif
-    applyEditingProperties();
-    add(mView);
-}
-
-void Source::applyEditingProperties()
-{
-#ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    mView.get_source_buffer()->
-	set_highlight_syntax(Settings::settings().getHighlightSyntax());
-    mView.get_source_buffer()->
-	set_highlight_matching_brackets(
-            Settings::settings().getHighlightBrackets());
-    mView.set_highlight_current_line(Settings::settings().getHighlightLine());
-    mView.set_show_line_numbers(Settings::settings().getLineNumbers());
-    mView.set_show_right_margin(Settings::settings().getRightMargin());
-    mView.set_auto_indent(Settings::settings().getAutoIndent());
-    mView.set_indent_on_tab(Settings::settings().getIndentOnTab());
-    mView.set_indent_width(Settings::settings().getIndentSize());
-    if (Settings::settings().getSmartHomeEnd())
-	mView.set_smart_home_end(gtksourceview::SOURCE_SMART_HOME_END_ALWAYS);
-#endif
-    Pango::FontDescription font = Pango::FontDescription(
-	Settings::settings().getFontEditor());
-    mView.modify_font(font);
-}
-
-void Source::undo()
-{
-#ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    mView.get_source_buffer()->undo();
-#endif
-}
-
-void Source::redo()
-{
-#ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    mView.get_source_buffer()->redo();
-#endif
-}
-
-void Source::paste()
-{
-#ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    Glib::RefPtr<gtksourceview::SourceBuffer> buffer(mView.get_source_buffer());
-#else
-    Glib::RefPtr<Gtk::TextBuffer> buffer(mView.get_buffer());
-#endif
-
-    Glib::RefPtr<Gtk::Clipboard> clipboard(Gtk::Clipboard::get());
-    buffer->paste_clipboard(clipboard, true);
-    mView.scroll_to_mark(buffer->get_insert(), 0.02);
-}
-
-void Source::copy()
-{
-#ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    Glib::RefPtr<gtksourceview::SourceBuffer> buffer(mView.get_source_buffer());
-#else
-    Glib::RefPtr<Gtk::TextBuffer> buffer(mView.get_buffer());
-#endif
-
-    Glib::RefPtr<Gtk::Clipboard> clipboard(Gtk::Clipboard::get());
-    buffer->copy_clipboard(clipboard);
-}
-
-void Source::cut()
-{
-#ifdef VLE_HAVE_GTKSOURCEVIEWMM
-    Glib::RefPtr<gtksourceview::SourceBuffer> buffer(mView.get_source_buffer());
-#else
-    Glib::RefPtr<Gtk::TextBuffer> buffer(mView.get_buffer());
-#endif
-
-    Glib::RefPtr<Gtk::Clipboard> clipboard(Gtk::Clipboard::get());
-    buffer->cut_clipboard(clipboard);
-}
-
-/*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
-
 SourceDialog::SourceDialog(Glib::RefPtr<Gnome::Glade::Xml> xml) : mXml(xml)
 {
     xml->get_widget("SourceDialog", mDialog);
@@ -159,7 +39,7 @@ SourceDialog::SourceDialog(Glib::RefPtr<Gnome::Glade::Xml> xml) : mXml(xml)
 
 SourceDialog::~SourceDialog()
 {
-    for (std::map < std::string, Source* >::const_iterator it =
+    for (std::map < std::string, DocumentText* >::const_iterator it =
              mFunctions.begin(); it != mFunctions.end(); ++it) {
         mNotebook->remove_page(*it->second);
     }
@@ -168,7 +48,7 @@ SourceDialog::~SourceDialog()
 
 void SourceDialog::add(const std::string& name, const std::string& buffer)
 {
-    mFunctions[name] = Gtk::manage(new Source(buffer));
+    mFunctions[name] = Gtk::manage(new DocumentText(buffer));
     mNotebook->append_page(*mFunctions[name], name);
 }
 
