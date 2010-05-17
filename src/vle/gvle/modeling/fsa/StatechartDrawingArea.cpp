@@ -31,6 +31,9 @@
 #include <vle/gvle/Message.hpp>
 #include <vle/gvle/Settings.hpp>
 #include <vle/utils/i18n.hpp>
+#include <gtkmm/filechooserdialog.h>
+#include <gtkmm/radioaction.h>
+#include <gtkmm/stock.h>
 #include <boost/lexical_cast.hpp>
 #include <iostream>
 #include <limits>
@@ -66,12 +69,12 @@ StatechartDrawingArea::StatechartDrawingArea(
                Gdk::BUTTON1_MOTION_MASK | Gdk::BUTTON2_MOTION_MASK |
                Gdk::BUTTON3_MOTION_MASK | Gdk::BUTTON_PRESS_MASK |
                Gdk::BUTTON_RELEASE_MASK);
+    initMenuPopupModels();
 }
 
 void StatechartDrawingArea::addState(guint x, guint y)
 {
     NewStateDialog dialog(mXml);
-
     if (dialog.run() == Gtk::RESPONSE_ACCEPT) {
         int newWidth = x + STATE_WIDTH + OFFSET;
         int newHeight = y + STATE_HEIGHT + OFFSET;
@@ -87,6 +90,115 @@ void StatechartDrawingArea::addState(guint x, guint y)
             mHeight = mStatechart->height() + OFFSET;
         }
     }
+}
+
+void StatechartDrawingArea::exportPng(const std::string& filename)
+{
+    Cairo::RefPtr<Cairo::ImageSurface> surface =
+        Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, mWidth, mHeight);
+    mContext = Cairo::Context::create(surface);
+    mContext->set_line_width(Settings::settings().getLineWidth());
+    mContext->select_font_face(Settings::settings().getFont(),
+			       Cairo::FONT_SLANT_NORMAL,
+			       Cairo::FONT_WEIGHT_NORMAL);
+    mContext->set_font_size(Settings::settings().getFontSize());
+    draw();
+    surface->write_to_png(filename + ".png");
+}
+
+void StatechartDrawingArea::exportPdf(const std::string& filename)
+{
+    Cairo::RefPtr<Cairo::PdfSurface> surface =
+        Cairo::PdfSurface::create(filename + ".pdf", mWidth, mHeight);
+    mContext = Cairo::Context::create(surface);
+    mContext->set_line_width(Settings::settings().getLineWidth());
+    mContext->select_font_face(Settings::settings().getFont(),
+			       Cairo::FONT_SLANT_NORMAL,
+			       Cairo::FONT_WEIGHT_NORMAL);
+    mContext->set_font_size(Settings::settings().getFontSize());
+    draw();
+    mContext->show_page();
+    surface->finish();
+}
+
+void StatechartDrawingArea::exportSvg(const std::string& filename)
+{
+    Cairo::RefPtr<Cairo::SvgSurface> surface =
+        Cairo::SvgSurface::create(filename + ".svg", mWidth, mHeight);
+    mContext = Cairo::Context::create(surface);
+    mContext->set_line_width(Settings::settings().getLineWidth());
+    mContext->select_font_face(Settings::settings().getFont(),
+			       Cairo::FONT_SLANT_NORMAL,
+			       Cairo::FONT_WEIGHT_NORMAL);
+    mContext->set_font_size(Settings::settings().getFontSize());
+    draw();
+    mContext->show_page();
+    surface->finish();
+}
+
+void StatechartDrawingArea::exportGraphic()
+{
+    Gtk::FileChooserDialog file(_("Image file"), Gtk::FILE_CHOOSER_ACTION_SAVE);
+    file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+    file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+    Gtk::FileFilter filterAuto;
+    Gtk::FileFilter filterPng;
+    Gtk::FileFilter filterPdf;
+    Gtk::FileFilter filterSvg;
+    filterAuto.set_name(_("Guess type from file name"));
+    filterAuto.add_pattern("*");
+    filterPng.set_name(_("Portable Newtork Graphics (.png)"));
+    filterPng.add_pattern("*.png");
+    filterPdf.set_name(_("Portable Format Document (.pdf)"));
+    filterPdf.add_pattern("*.pdf");
+    filterSvg.set_name(_("Scalable Vector Graphics (.svg)"));
+    filterSvg.add_pattern("*.svg");
+    file.add_filter(filterAuto);
+    file.add_filter(filterPng);
+    file.add_filter(filterPdf);
+    file.add_filter(filterSvg);
+
+
+    if (file.run() == Gtk::RESPONSE_OK) {
+        std::string filename(file.get_filename());
+        std::string extension(file.get_filter()->get_name());
+
+        if (extension == _("Guess type from file name")) {
+            size_t ext_pos = filename.find_last_of('.');
+            if (ext_pos != std::string::npos) {
+                std::string type(filename, ext_pos+1);
+                filename.resize(ext_pos);
+                if (type == "png")
+                    exportPng(filename);
+                else if (type == "pdf")
+                    exportPdf(filename);
+                else if (type == "svg")
+                    exportSvg(filename);
+                else
+                    Error(_("Unsupported file format"));
+            }
+        }
+        else if (extension == _("Portable Newtork Graphics (.png)"))
+            exportPng(filename);
+        else if (extension == _("Portable Format Document (.pdf)"))
+            exportPdf(filename);
+        else if (extension == _("Scalable Vector Graphics (.svg)"))
+            exportSvg(filename);
+    }
+}
+
+void StatechartDrawingArea::initMenuPopupModels()
+{
+    Gtk::Menu::MenuList& menulist(mMenuPopup.items());
+
+    menulist.push_back(
+        Gtk::Menu_Helpers::MenuElem(
+            _("_Export Graphic"),
+            sigc::mem_fun(
+                *this,
+                &StatechartDrawingArea::exportGraphic)));
+
+    mMenuPopup.accelerate(*this);
 }
 
 void StatechartDrawingArea::checkSize(State* state)
@@ -824,6 +936,9 @@ bool StatechartDrawingArea::modifyCurrentTransition()
 
 bool StatechartDrawingArea::on_button_press_event(GdkEventButton* event)
 {
+    if (event->button == 3) {
+        mMenuPopup.popup(event->button, event->time);
+    }
     switch (mState)
     {
     case SELECT:
@@ -855,8 +970,10 @@ bool StatechartDrawingArea::on_button_press_event(GdkEventButton* event)
         }
         break;
     case ADD_STATE:
-        addState(event->x, event->y);
-        queueRedraw();
+        if (event->type == GDK_BUTTON_PRESS and event->button == 1) {
+            addState(event->x, event->y);
+            queueRedraw();
+        }
         break;
     case ADD_TRANSITION:
         if (event->type == GDK_BUTTON_PRESS and event->button == 1) {

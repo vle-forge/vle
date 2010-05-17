@@ -30,6 +30,7 @@
 #include <vle/gvle/modeling/fsa/SourceDialog.hpp>
 #include <vle/gvle/modeling/fsa/TimeStepDialog.hpp>
 #include <vle/utils/Template.hpp>
+#include <vle/gvle/Message.hpp>
 #include <gtkmm/radioaction.h>
 #include <gtkmm/stock.h>
 #include <boost/regex.hpp>
@@ -187,7 +188,6 @@ PluginFSA::PluginFSA(const std::string& name)
 
     {
         Gtk::HBox* hbox;
-
         mXml->get_widget("StatechartHBox", hbox);
         mActionGroup = Gtk::ActionGroup::create();
         mUIManager = Gtk::UIManager::create();
@@ -276,6 +276,11 @@ void PluginFSA::destroy()
     mStatechart = 0;
 }
 
+void PluginFSA::onSelect()
+{
+    mView->setState(StatechartDrawingArea::SELECT);
+}
+
 void PluginFSA::onAddState()
 {
     mView->setState(StatechartDrawingArea::ADD_STATE);
@@ -304,11 +309,6 @@ void PluginFSA::onIncludeSource()
     if (dialog.run() == Gtk::RESPONSE_ACCEPT) {
         mInclude.assign(dialog.buffer("Include"));
     }
-}
-
-void PluginFSA::onSelect()
-{
-    mView->setState(StatechartDrawingArea::SELECT);
 }
 
 void PluginFSA::onTimeStep()

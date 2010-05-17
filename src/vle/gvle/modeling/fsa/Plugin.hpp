@@ -41,6 +41,7 @@
 
 namespace vle { namespace gvle { namespace modeling { namespace fsa {
 
+
 class PluginFSA : public ModelingPlugin
 {
 public:
@@ -104,12 +105,13 @@ private:
     void parseStates(const strings_t& lst);
     void parseTransitions(const strings_t& lst);
 
-    static const Glib::ustring UI_DEFINITION;
-    static const std::string   TEMPLATE_DEFINITION;
+    static const Glib::ustring         UI_DEFINITION;
+    static const std::string           TEMPLATE_DEFINITION;
 
     Glib::RefPtr < Gnome::Glade::Xml > mXml;
     Gtk::Dialog*                       mDialog;
     StatechartDrawingArea*             mView;
+    Cairo::RefPtr<Cairo::Context>      mContext;
 
     Gtk::Toolbar*                      mToolbar;
     Glib::RefPtr < Gtk::UIManager >    mUIManager;
@@ -121,11 +123,11 @@ private:
 
     std::list < sigc::connection >     mList;
 
-    Statechart* mStatechart;
-    std::string mInclude;
-    std::string mConstructorUser;
-    std::string mDefinitionUser;
-    std::string mTimeStep;
+    Statechart*                        mStatechart;
+    std::string                        mInclude;
+    std::string                        mConstructorUser;
+    std::string                        mDefinitionUser;
+    std::string                        mTimeStep;
 };
 
 }}}} // namespace vle gvle modeling fsa
