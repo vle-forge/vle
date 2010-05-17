@@ -113,7 +113,7 @@ void Generic::externalTransition(const ExternalEventList& events,
             mDepends.erase(name);
             mExternalValues.erase(name);
             mInitExternalValues.erase(name);
-            if (mReceivedValues.find(name)->second) {
+            if (mReceive > 0 and mReceivedValues.find(name)->second) {
                 --mReceive;
             }
             mReceivedValues.erase(name);
