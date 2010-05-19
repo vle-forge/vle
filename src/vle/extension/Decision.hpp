@@ -29,15 +29,21 @@
 #ifndef VLE_EXTENSION_DECISION_HPP
 #define VLE_EXTENSION_DECISION_HPP 1
 
-#include <vle/extension/decision/Activities.hpp>
-#include <vle/extension/decision/Activity.hpp>
-#include <vle/extension/decision/Agent.hpp>
-#include <vle/extension/decision/Facts.hpp>
-#include <vle/extension/decision/KnowledgeBase.hpp>
-#include <vle/extension/decision/PrecedenceConstraint.hpp>
-#include <vle/extension/decision/PrecedencesGraph.hpp>
-#include <vle/extension/decision/Predicates.hpp>
-#include <vle/extension/decision/Rule.hpp>
 #include <vle/extension/decision/Rules.hpp>
+#include <vle/extension/decision/Activity.hpp>
+#include <vle/extension/decision/Activities.hpp>
+#include <vle/extension/decision/Rule.hpp>
+#include <vle/extension/decision/Facts.hpp>
+#include <vle/extension/decision/PrecedenceConstraint.hpp>
+#include <vle/extension/decision/Agent.hpp>
+#include <vle/extension/decision/Table.hpp>
+#include <vle/extension/decision/Predicates.hpp>
+#include <vle/extension/decision/PrecedencesGraph.hpp>
+#include <vle/extension/decision/KnowledgeBase.hpp>
+#include <vle/version.hpp>
+
+#ifdef VLE_HAVE_BOOST_SPIRIT2
+#   include <vle/extension/decision/Parser.hpp>
+#endif
 
 #endif

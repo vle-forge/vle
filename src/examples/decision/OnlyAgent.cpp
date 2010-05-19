@@ -26,8 +26,7 @@
  */
 
 
-#include <vle/extension/decision/Agent.hpp>
-#include <vle/extension/decision/Activity.hpp>
+#include <vle/extension/Decision.hpp>
 #include <vle/devs/DynamicsDbg.hpp>
 #include <vle/utils/Trace.hpp>
 #include <boost/cast.hpp>

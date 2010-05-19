@@ -35,11 +35,11 @@
 #include <boost/test/floating_point_comparison.hpp>
 #include <iostream>
 #include <iterator>
-#include <vle/value/Double.hpp>
-#include <vle/extension/decision/Parser.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/assign.hpp>
 #include <vle/version.hpp>
+#include <vle/value/Double.hpp>
+#include <vle/extension/Decision.hpp>
 
 #ifdef VLE_HAVE_BOOST_SPIRIT2
 

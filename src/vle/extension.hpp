@@ -31,13 +31,15 @@
 #ifndef VLE_EXTENSION_EXTENSION_HPP
 #define VLE_EXTENSION_EXTENSION_HPP
 
-#include <vle/extension/CellDevs.hpp>
-#include <vle/extension/CellQSS.hpp>
+#include <vle/extension/DifferenceEquationDbg.hpp>
+#include <vle/extension/FSA.hpp>
 #include <vle/extension/Decision.hpp>
-#include <vle/extension/DifferenceEquation.hpp>
-#include <vle/extension/DifferentialEquation.hpp>
-#include <vle/extension/DSDevs.hpp>
 #include <vle/extension/PetriNet.hpp>
+#include <vle/extension/DifferentialEquation.hpp>
+#include <vle/extension/DifferenceEquation.hpp>
+#include <vle/extension/CellQSS.hpp>
+#include <vle/extension/CellDevs.hpp>
+#include <vle/extension/DSDevs.hpp>
 
 namespace vle {
 
