@@ -1013,47 +1013,49 @@ bool StatechartDrawingArea::on_button_release_event(GdkEventButton* event)
 {
     switch (mState) {
     case SELECT:
-	mPreviousX = -1;
-	mPreviousY = -1;
+        mPreviousX = -1;
+        mPreviousY = -1;
         mStatechartResize= false;
-	break;
-    case ADD_TRANSITION:
-        if (mCurrentTransition) {
-            if (mBreakpoint) {
-                removeBreakpoint();
-                mBreakpoint = 0;
-            } else if (mFirstBreakpoint) {
-                mFirstBreakpoint = 0;
-            } else if (mLastBreakpoint) {
-                mLastBreakpoint = 0;
-            }
-        } else if (not mCurrentStates.empty() and mStartPoint.x != event->x
-            and mStartPoint.y != event->y) {
-            if (selectState(event->x, event->y, false)) {
-                State*   dst = *mCurrentStates.begin();
-                points_t pts;
-
-                if (mStartState == dst) {
-                    pts.push_back(mBegin);
-                } else {
-                    point_t anchor = searchAnchor(dst, event->x, event->y);
-
-                    pts.push_back(mBegin);
-                    pts.push_back(anchor);
-                }
-                mStatechart->addTransition(mStartState->name(),
-                                           dst->name(), pts);
-            }
-        }
-
-        mMouse.invalid();
-        mBegin.invalid();
-        mStartPoint.invalid();
-        mCurrentStates.clear();
-        mCurrentTransition = 0;
-        mStartState = 0;
-        queueRedraw();
         break;
+    case ADD_TRANSITION:
+        if (event->button == 1) {
+            if (mCurrentTransition) {
+                if (mBreakpoint) {
+                    removeBreakpoint();
+                    mBreakpoint = 0;
+                } else if (mFirstBreakpoint) {
+                    mFirstBreakpoint = 0;
+                } else if (mLastBreakpoint) {
+                    mLastBreakpoint = 0;
+                }
+            } else if (not mCurrentStates.empty() and mStartPoint.x != event->x
+                       and mStartPoint.y != event->y) {
+                if (selectState(event->x, event->y, false)) {
+                    State*   dst = *mCurrentStates.begin();
+                    points_t pts;
+
+                    if (mStartState == dst) {
+                        pts.push_back(mBegin);
+                    } else {
+                        point_t anchor = searchAnchor(dst, event->x, event->y);
+
+                        pts.push_back(mBegin);
+                        pts.push_back(anchor);
+                    }
+                    mStatechart->addTransition(mStartState->name(),
+                                               dst->name(), pts);
+                }
+            }
+
+            mMouse.invalid();
+            mBegin.invalid();
+            mStartPoint.invalid();
+            mCurrentStates.clear();
+            mCurrentTransition = 0;
+            mStartState = 0;
+            queueRedraw();
+            break;
+        }
     default:
         break;
     }
