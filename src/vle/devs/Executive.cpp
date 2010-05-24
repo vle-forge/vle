@@ -31,6 +31,28 @@
 
 namespace vle { namespace devs {
 
+void Executive::addObservableToView(const std::string& model,
+                                    const std::string& portname,
+                                    const std::string& view)
+{
+    graph::Model* mdl = cpled()->findModel(model);
+
+    if (mdl == 0) {
+        throw utils::DevsGraphError(fmt(
+                _("Executive error: unknown model `%1%'")) % model);
+    }
+
+    if (mdl->isCoupled()) {
+        throw utils::DevsGraphError(fmt(
+                _("Executive error: can not add observable to coupled "
+                  "model %1%")) % model);
+    }
+
+    graph::AtomicModel* atom = mdl->toAtomic();
+
+    m_coordinator.addObservableToView(atom, portname, view);
+}
+
 const graph::AtomicModel*
 Executive::createModel(const std::string& name,
                            const std::vector < std::string >& inputs,

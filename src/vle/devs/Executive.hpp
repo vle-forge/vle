@@ -166,11 +166,12 @@ namespace vle { namespace devs {
          * @param model the model to attach to the view.
          * @param portname the port of the model to attach.
          * @param view the view.
+         * @throw utils::DevsGraphError if model does not exist or if model is
+         * not an atomic model.
          */
-        void addObservableToView(graph::AtomicModel* model,
+        void addObservableToView(const std::string& model,
                                  const std::string& portname,
-                                 const std::string& view)
-        { m_coordinator.addObservableToView(model, portname, view); }
+                                 const std::string& view);
 
         // / / / /
         //
