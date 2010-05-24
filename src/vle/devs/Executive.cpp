@@ -217,4 +217,35 @@ void Executive::removeOutputPort(const std::string& modelName,
     }
 }
 
+void Executive::dump(std::ostream& out, const std::string& name) const
+{
+    vpz::Vpz f;
+
+    f.project().setAuthor(getModelName());
+    f.project().model().setModel(coupledmodel().clone());
+    f.project().dynamics().add(m_coordinator.dynamics());
+    f.project().experiment().addConditions(m_coordinator.conditions());
+    f.project().experiment().setName(name);
+    f.project().experiment().setBegin(0.0);
+    f.project().experiment().setDuration(1.0);
+
+    if (not f.project().dynamics().exist("unknow")) {
+        f.project().dynamics().add(vpz::Dynamic("unknow"));
+    }
+
+    std::vector < graph::AtomicModel* > lst;
+    graph::Model::getAtomicModelList(f.project().model().model(), lst);
+
+    for (std::vector < graph::AtomicModel* >::iterator it = lst.begin();
+         it != lst.end(); ++it) {
+        f.project().model().atomicModels().add(
+            *it, vpz::AtomicModel("", "unknow", ""));
+    }
+
+    f.write(out);
+
+    delete f.project().model().model();
+    f.project().model().setModel(0);
+}
+
 }} // namespace vle devs

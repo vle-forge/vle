@@ -242,6 +242,20 @@ namespace vle { namespace devs {
         // / / / /
 
         /**
+         * @brief Dump a valid XML VPZ into the output stream.
+         * @param out The stream to flush valid XML VPZ.
+         * @param name The name of the experiment.
+         * @code
+         * virtual internalTransition(const devs::Time& time) const
+         * {
+         *     std::ofstream file("output.vpz");
+         *     dump(file, "dump");
+         * }
+         * @endcode
+         */
+        void dump(std::ostream& out, const std::string& name = "default") const;
+
+        /**
          * @brief Get a reference to the current coupled model.
          * @return A constant reference to the coupled model.
          */
