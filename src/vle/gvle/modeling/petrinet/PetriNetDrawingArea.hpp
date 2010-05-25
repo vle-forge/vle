@@ -31,6 +31,7 @@
 
 #include <vle/gvle/modeling/petrinet/PetriNet.hpp>
 #include <gdkmm/color.h>
+#include <gtkmm.h>
 #include <gtkmm/drawingarea.h>
 #include <gtkmm/scrolledwindow.h>
 #include <libglademm.h>
@@ -56,6 +57,11 @@ public:
 private:
     void addPlace(guint x, guint y);
     void addTransition(guint x, guint y);
+    void exportPng(const std::string& filename);
+    void exportPdf(const std::string& filename);
+    void exportSvg(const std::string& filename);
+    void exportGraphic();
+    void initMenuPopupModels();
     points_t computeMarking(const Place* place);
     void displacePlaces(int oldx, int oldy, int newx, int newy,
                         bool& xok, bool& yok);
@@ -138,6 +144,8 @@ private:
     bool                               mPetriNetResize;
     Place*                             mStartPlace;
     Transition*                        mStartTransition;
+    Gtk::Menu                          mMenuPopup;
+
 };
 
 }}}} // namespace vle gvle modeling petrinet
