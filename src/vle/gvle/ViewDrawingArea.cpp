@@ -80,6 +80,10 @@ ViewDrawingArea::ViewDrawingArea(View* view) :
     mView = view;
     mCurrent = view->getGCoupledModel();
     mModeling = view->getModeling();
+
+    set_has_tooltip();
+    signal_query_tooltip().connect(
+        sigc::mem_fun(*this, &ViewDrawingArea::onQueryTooltip));
 }
 
 
@@ -356,41 +360,6 @@ void ViewDrawingArea::drawHighlightConnection()
 	    mContext->line_to(iter->first + mOffset, iter->second + mOffset);
 	    ++iter;
 	}
-	mContext->stroke();
-
-	mContext->set_line_width(Settings::settings().getLineWidth());
-	mContext->select_font_face(Settings::settings().getFont(),
-				   Cairo::FONT_SLANT_NORMAL,
-				   Cairo::FONT_WEIGHT_NORMAL);
-	mContext->set_font_size(Settings::settings().getFontSize());
-
-	Cairo::TextExtents textExtents;
-	mContext->get_text_extents(mText[mHighlightLine],textExtents);
-
-        {
-            Gdk::Color c;
-
-            c.set_rgb_p(1.0, 1.0, 0.25);
-            setColor(c);
-        }
-
-	mContext->rectangle(mMouse.get_x(),
-			    (mMouse.get_y() - textExtents.height - 6),
-			    (textExtents.width + 5),
-			    (textExtents.height + 5));
-	mContext->fill();
-	mContext->stroke();
-
-	setColor(Settings::settings().getForegroundColor());
-	mContext->rectangle((mMouse.get_x()),
-			    (mMouse.get_y() - textExtents.height - 6),
-			    (textExtents.width + 5),
-			    (textExtents.height + 5));
-
-	mContext->move_to((mMouse.get_x() + 2),
-			  (mMouse.get_y() - textExtents.height + 5));
-	mContext->show_text(mText[mHighlightLine]);
-
 	mContext->stroke();
     }
 }
@@ -1004,6 +973,28 @@ void ViewDrawingArea::exportSvg(const std::string& filename)
     draw();
     mContext->show_page();
     surface->finish();
+}
+
+bool ViewDrawingArea::onQueryTooltip(int wx,int wy, bool keyboard_tooltip,
+                                     const Glib::RefPtr<Gtk::Tooltip>& tooltip)
+{
+    graph::Model* model = mCurrent->find(wx/mZoom, wy/mZoom);
+    Glib::ustring card;
+
+    if (mHighlightLine != -1) {
+        tooltip->set_text(mText[mHighlightLine]);
+        return true;
+    } else if (model) {
+        if (mView->isClassView()) {
+            card = mModeling->getClassIdCard(model , mView->getCurrentClass());
+        } else {
+            card = mModeling->getIdCard(model);
+        }
+        tooltip->set_text(card);
+        return true;
+    } else {
+        return false;
+    }
 }
 
 void ViewDrawingArea::setUndefinedModels()

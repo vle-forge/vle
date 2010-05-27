@@ -168,6 +168,9 @@ namespace vle { namespace gvle {
         void queueRedraw()
         { mNeedRedraw = true; queue_draw(); }
 
+	bool onQueryTooltip(int wx,int wy, bool keyboard_tooltip,
+                            const Glib::RefPtr<Gtk::Tooltip>& tooltip);
+
     protected:
 
 	typedef std::pair < int, int > Point;
