@@ -51,8 +51,8 @@ class View;
 /**
  * @brief Document class used within Gtk::Notebook
  */
-
-class Document : public Gtk::ScrolledWindow {
+class Document : public Gtk::ScrolledWindow
+{
 public:
     Document(GVLE* gvle, const std::string& filepath);
 
@@ -61,32 +61,32 @@ public:
     virtual ~Document() { }
 
     virtual inline bool isDrawingArea() const
-	{ return false; }
+    { return false; }
 
     inline const std::string& filename() const
-	{ return mFileName; }
+    { return mFileName; }
 
     inline void setFileName(const std::string& filename)
-	{ mFileName = filename; }
+    { mFileName = filename; }
 
     inline const std::string& filepath() const
-	{ return mFilePath; }
+    { return mFilePath; }
 
     inline void setFilePath(const std::string& filepath)
-	{ mFilePath = filepath; }
+    { mFilePath = filepath; }
 
     inline bool isModified() const
-	{ return mModified; }
+    { return mModified; }
 
     inline void setModified(bool modified)
-	{ mModified = modified; }
+    { mModified = modified; }
 
     inline const std::string& getTitle() const
-	{ return mTitle; }
+    { return mTitle; }
 
     void setTitle(const std::string& fileName,
-		  graph::Model* model,
-		  bool modified);
+                  graph::Model* model,
+                  bool modified);
 
     virtual void updateView() = 0;
     virtual void undo() = 0;
@@ -102,7 +102,8 @@ private:
     std::string    mFileName;
 };
 
-class DocumentText : public Document {
+class DocumentText : public Document
+{
 public:
     DocumentText(GVLE* gvle, const std::string& filePath, bool newfile = false);
 
@@ -125,15 +126,15 @@ public:
     void copy();
     void cut();
 
-    std::string getBuffer() const;
+    std::string getBuffer();
 
 private:
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
     gtksourceview::SourceView mView;
 #else
-    mutable Gtk::TextView  mView; // mutable to enable the getBuffer function,
-    // begin() and end() are non-const.
+    Gtk::TextView  mView;
 #endif
+
     bool           mModified;
     bool           mNew;
     std::string    mIdLang;
@@ -144,26 +145,27 @@ private:
     void applyEditingProperties();
 };
 
-class DocumentDrawingArea : public Document {
+class DocumentDrawingArea : public Document
+{
 public:
     DocumentDrawingArea(GVLE* gvle, const std::string& filePath,
-			View* view, graph::Model* model);
+                        View* view, graph::Model* model);
     virtual ~DocumentDrawingArea();
 
     inline View* getView() const
-	{ return mView; }
+    { return mView; }
 
     inline CompleteViewDrawingArea* getCompleteDrawingArea() const
-	{ return mCompleteArea; }
+    { return mCompleteArea; }
 
     inline SimpleViewDrawingArea* getSimpleDrawingArea() const
-      { return mSimpleArea; }
+    { return mSimpleArea; }
 
     inline graph::Model* getModel() const
-	{ return mModel; }
+    { return mModel; }
 
     virtual inline bool isDrawingArea() const
-	{ return true; }
+    { return true; }
 
     virtual bool isComplete()=0;
 
@@ -186,30 +188,30 @@ protected:
     Gtk::Adjustment     mAdjustHeight;
 };
 
-class DocumentCompleteDrawingArea : public DocumentDrawingArea {
+class DocumentCompleteDrawingArea : public DocumentDrawingArea
+{
 public:
     DocumentCompleteDrawingArea(GVLE* gvle, const std::string& filePath,
-			View* view, graph::Model* model);
+                                View* view, graph::Model* model);
     virtual ~DocumentCompleteDrawingArea();
 
     virtual bool isComplete()
-	{ return true; }
+    { return true; }
 
 private:
 };
 
-
-class DocumentSimpleDrawingArea : public DocumentDrawingArea {
+class DocumentSimpleDrawingArea : public DocumentDrawingArea
+{
 public:
     DocumentSimpleDrawingArea(GVLE* gvle, const std::string& filePath,
-			View* view, graph::Model* model);
+                              View* view, graph::Model* model);
     virtual ~DocumentSimpleDrawingArea();
 
     virtual bool isComplete()
-	{ return false; }
+    { return false; }
 
 };
-
 
 class Editor : public Gtk::Notebook
 {
@@ -217,7 +219,7 @@ public:
     typedef std::map < std::string, Document* > Documents;
 
     Editor(BaseObjectType* cobject,
-		     const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
+           const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
     virtual ~Editor();
 
     /**
@@ -259,7 +261,7 @@ public:
      * @param model the current model
      */
     void showCompleteView(const::std::string& filepath,
-			  graph::CoupledModel* model);
+                          graph::CoupledModel* model);
 
     /**
      * @brief create a tab for the current vpz file with the simple
@@ -268,7 +270,7 @@ public:
      * @param model the current model
      */
     void showSimpleView(const std::string& filepath,
-			graph::CoupledModel* model);
+                        graph::CoupledModel* model);
 
 
     /**
@@ -285,8 +287,8 @@ public:
      *
      */
     void setModifiedTab(const std::string& title,
-			const std::string& newFilePath,
-			const std::string& oldFilePath);
+                        const std::string& newFilePath,
+                        const std::string& oldFilePath);
 
     void setParent(GVLE* gvle)
     { mApp = gvle; }
@@ -316,7 +318,7 @@ private:
      * @return a pointeur of the new label
      */
     Gtk::HBox* addLabel(const std::string& title,
-			const std::string& filepath);
+                        const std::string& filepath);
 };
 
 }} // namespace vle gvle

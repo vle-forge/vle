@@ -128,7 +128,6 @@ DocumentText::DocumentText(GVLE* gvle,
 
 DocumentText::DocumentText(const std::string& buffer)
 {
-
     mIdLang = "cpp";
 
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
@@ -305,7 +304,7 @@ void DocumentText::onChanged()
     }
 }
 
-std::string DocumentText::getBuffer() const
+std::string DocumentText::getBuffer()
 {
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
     return mView.get_source_buffer()->get_text();
@@ -398,9 +397,10 @@ void DocumentDrawingArea::redo()
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
-DocumentCompleteDrawingArea::DocumentCompleteDrawingArea(GVLE* gvle,
-							 const std::string& filepath,
-							 View* view, graph::Model* model) :
+DocumentCompleteDrawingArea::DocumentCompleteDrawingArea(
+    GVLE* gvle,
+    const std::string& filepath,
+    View* view, graph::Model* model) :
     DocumentDrawingArea(gvle, filepath, view, model)
 {
     mTitle = filename() + utils::Path::extension(filepath)
@@ -423,7 +423,6 @@ DocumentCompleteDrawingArea::~DocumentCompleteDrawingArea()
     remove();
     delete mViewport;
 }
-
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
@@ -452,7 +451,6 @@ DocumentSimpleDrawingArea::~DocumentSimpleDrawingArea()
     remove();
     delete mViewport;
 }
-
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
