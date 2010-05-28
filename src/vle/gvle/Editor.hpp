@@ -30,6 +30,7 @@
 #ifndef VLE_GVLE_EDITOR_HPP
 #define VLE_GVLE_EDITOR_HPP
 
+#include <vle/gvle/DllDefines.hpp>
 #include <vle/graph/Model.hpp>
 #include <vle/gvle/CompleteViewDrawingArea.hpp>
 #include <vle/gvle/SimpleViewDrawingArea.hpp>
@@ -51,7 +52,7 @@ class View;
 /**
  * @brief Document class used within Gtk::Notebook
  */
-class Document : public Gtk::ScrolledWindow
+class VLE_GVLE_EXPORT Document : public Gtk::ScrolledWindow
 {
 public:
     Document(GVLE* gvle, const std::string& filepath);
@@ -102,7 +103,7 @@ private:
     std::string    mFileName;
 };
 
-class DocumentText : public Document
+class VLE_GVLE_EXPORT DocumentText : public Document
 {
 public:
     DocumentText(GVLE* gvle, const std::string& filePath, bool newfile = false);
@@ -145,7 +146,7 @@ private:
     void applyEditingProperties();
 };
 
-class DocumentDrawingArea : public Document
+class VLE_GVLE_EXPORT DocumentDrawingArea : public Document
 {
 public:
     DocumentDrawingArea(GVLE* gvle, const std::string& filePath,
@@ -188,7 +189,7 @@ protected:
     Gtk::Adjustment     mAdjustHeight;
 };
 
-class DocumentCompleteDrawingArea : public DocumentDrawingArea
+class VLE_GVLE_EXPORT DocumentCompleteDrawingArea : public DocumentDrawingArea
 {
 public:
     DocumentCompleteDrawingArea(GVLE* gvle, const std::string& filePath,
@@ -201,7 +202,7 @@ public:
 private:
 };
 
-class DocumentSimpleDrawingArea : public DocumentDrawingArea
+class VLE_GVLE_EXPORT DocumentSimpleDrawingArea : public DocumentDrawingArea
 {
 public:
     DocumentSimpleDrawingArea(GVLE* gvle, const std::string& filePath,
@@ -213,7 +214,7 @@ public:
 
 };
 
-class Editor : public Gtk::Notebook
+class VLE_GVLE_EXPORT Editor : public Gtk::Notebook
 {
 public:
     typedef std::map < std::string, Document* > Documents;
