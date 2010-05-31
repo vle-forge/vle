@@ -1,3 +1,19 @@
+VLE 0.8.4
+=========
+
+* devs:
+  To allow a better debugging, add a function allowing to store or dump a valid
+  XML VPZ stream from the API of devs::Executive. (Closes: #3006604).
+    void devs::Executive::dump(std::ostream& out) const;
+
+* extension:
+  * difference equation:
+    When a model connected to a generic DifferenceEquation model is removed,
+    the number of connected models isn't updated correctly if some models have
+    send your value.
+
+
+
 VLE 0.8.3
 =========
 
