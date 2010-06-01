@@ -119,6 +119,13 @@ namespace vle { namespace vpz {
         { m_language.assign(name); }
 
         /**
+         * @brief Assign a name to the dynamics.
+         * @param name of the dynamics.
+         */
+        void setName(const std::string& name)
+        { m_name.assign(name); }
+
+        /**
          * @brief Assign a location to the dynamics.
          * @param host the host where the dynamics library is running.
          * @param port the port of the host.

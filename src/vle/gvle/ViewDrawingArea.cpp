@@ -966,7 +966,7 @@ void ViewDrawingArea::exportSvg(const std::string& filename)
     surface->finish();
 }
 
-bool ViewDrawingArea::onQueryTooltip(int wx,int wy, bool keyboard_tooltip,
+bool ViewDrawingArea::onQueryTooltip(int wx,int wy, bool /* keyboard_tooltip */,
                                      const Glib::RefPtr<Gtk::Tooltip>& tooltip)
 {
     graph::Model* model = mCurrent->find(wx/mZoom, wy/mZoom);

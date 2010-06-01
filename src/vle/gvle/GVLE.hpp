@@ -667,6 +667,11 @@ public:
      */
     void onViewOutputBox();
 
+    /**
+     * @brief When user select the gvle::DynamicsBox.
+     */
+    void onDynamicsBox();
+
     /*********************************************************************
      *
      * MENU ZOOM

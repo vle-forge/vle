@@ -31,6 +31,7 @@
 #include <vle/gvle/GVLE.hpp>
 #include <vle/gvle/About.hpp>
 #include <vle/gvle/Message.hpp>
+#include <vle/gvle/DynamicsBox.hpp>
 #include <vle/gvle/Editor.hpp>
 #include <vle/gvle/ExperimentBox.hpp>
 #include <vle/gvle/Modeling.hpp>
@@ -1323,6 +1324,14 @@ void GVLE::onViewOutputBox()
     const Modeling* modeling((const Modeling*)mModeling);
     vpz::Views views(modeling->views());
     ViewOutputBox box(*mModeling, mRefXML, views);
+    box.run();
+}
+
+void GVLE::onDynamicsBox()
+{
+    const Modeling* modeling((const Modeling*)mModeling);
+    vpz::Dynamics dynamics(modeling->dynamics());
+    DynamicsBox box(*mModeling, mRefXML, dynamics);
     box.run();
 }
 

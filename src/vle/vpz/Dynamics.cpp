@@ -103,4 +103,20 @@ void Dynamics::cleanNoPermanent()
     }
 }
 
+void Dynamics::copy(const std::string& sourcename,
+                    const std::string& targetname)
+{
+    vpz::Dynamic copy = get(sourcename);
+    copy.setName(targetname);
+
+    add(copy);
+}
+
+void Dynamics::rename(const std::string& oldname,
+                      const std::string& newname)
+{
+    copy(oldname, newname);
+    del(oldname);
+}
+
 }} // namespace vle vpz

@@ -153,6 +153,23 @@ namespace vle { namespace vpz {
          */
         void cleanNoPermanent();
 
+        /**
+         * @brief Copy a specified vpz::Dynamic.
+         * @param sourcename the name of the current vpz::Dynamic
+         * @param targetname the name of the copy
+         */
+        void copy(const std::string& sourcename,
+                  const std::string& targetname);
+
+        /**
+         * @brief Rename a specified vpz::Dynamic oldname with the newname
+         * parameter.
+         * @param oldname The old name of the vpz::Dynamics
+         * @param newname The new name of the vpz::Dynamics
+         */
+        void rename(const std::string& oldname,
+                    const std::string& newname);
+
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
          * Get/Set
@@ -232,7 +249,6 @@ namespace vle { namespace vpz {
         };
     private:
         DynamicList     m_list;
-
     };
 
 }} // namespace vle vpz

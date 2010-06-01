@@ -29,8 +29,8 @@ ENDIF(WIN32)
 SET(GVLE_HPP About.hpp AtomicModelBox.hpp BooleanBox.hpp CalendarBox.hpp
   ComboboxString.hpp CompleteViewDrawingArea.hpp ConditionsBox.hpp
   ConnectionBox.hpp CoupledModelBox.hpp CutCopyPaste.hpp DllDefines.hpp
-  DialogString.hpp DynamicBox.hpp Editor.hpp ExperimentBox.hpp GVLE.hpp
-  GVLEMenuAndToolbar.hpp HelpBox.hpp HostsBox.hpp ImportClassesBox.hpp
+  DialogString.hpp DynamicBox.hpp DynamicsBox.hpp Editor.hpp ExperimentBox.hpp
+  GVLE.hpp GVLEMenuAndToolbar.hpp HelpBox.hpp HostsBox.hpp ImportClassesBox.hpp
   ImportModelBox.hpp InteractiveTypeBox.hpp LaunchSimulationBox.hpp
   MatrixBox.hpp Message.hpp ModelClassBox.hpp ModelDescriptionBox.hpp
   ModelingPlugin.hpp ModelTreeBox.hpp Modeling.hpp NewDynamicsBox.hpp
@@ -47,12 +47,12 @@ SET(GVLE_HPP About.hpp AtomicModelBox.hpp BooleanBox.hpp CalendarBox.hpp
 SET(GVLE_CPP About.cpp AtomicModelBox.cpp BooleanBox.cpp CalendarBox.cpp
   CompleteViewDrawingArea.cpp ConditionsBox.cpp ConnectionBox.cpp
   CoupledModelBox.cpp CutCopyPaste.cpp DialogString.cpp DynamicBox.cpp
-  Editor.cpp ExperimentBox.cpp GVLE.cpp GVLEMenuAndToolbar.cpp HelpBox.cpp
-  HostsBox.cpp ImportClassesBox.cpp ImportModelBox.cpp InteractiveTypeBox.cpp
-  LaunchSimulationBox.cpp MatrixBox.cpp Message.cpp ModelClassBox.cpp
-  ModelDescriptionBox.cpp ModelTreeBox.cpp Modeling.cpp ModelingPlugin.cpp
-  NewDynamicsBox.cpp NewModelClassBox.cpp NewProjectBox.cpp NewTypeBox.cpp
-  ObsAndViewBox.cpp PluginFactory.cpp ObservableBox.cpp
+  DynamicsBox.cpp Editor.cpp ExperimentBox.cpp GVLE.cpp GVLEMenuAndToolbar.cpp
+  HelpBox.cpp HostsBox.cpp ImportClassesBox.cpp ImportModelBox.cpp
+  InteractiveTypeBox.cpp LaunchSimulationBox.cpp MatrixBox.cpp Message.cpp
+  ModelClassBox.cpp ModelDescriptionBox.cpp ModelTreeBox.cpp Modeling.cpp
+  ModelingPlugin.cpp NewDynamicsBox.cpp NewModelClassBox.cpp NewProjectBox.cpp
+  NewTypeBox.cpp ObsAndViewBox.cpp PluginFactory.cpp ObservableBox.cpp
   OpenModelingPluginBox.cpp OpenPackageBox.cpp OpenVpzBox.cpp OutputPlugin.cpp
   ParameterExecutionBox.cpp PortDialog.cpp PreferencesBox.cpp ReplicasBox.cpp
   QuitBox.cpp SaveVpzBox.cpp Settings.cpp SimpleViewDrawingArea.cpp
