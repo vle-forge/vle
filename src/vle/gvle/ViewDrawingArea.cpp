@@ -670,20 +670,41 @@ void ViewDrawingArea::on_gvlepointer_button_1(graph::Model* mdl,
         if (mView->existInSelectedModels(mdl) == false) {
             if (state == false) {
                 mView->clearSelectedModels();
-                mModeling->getGVLE()->getModelTreeBox()->showRow(mdl);
+                if (mView->isClassView()) {
+                    mModeling->getGVLE()->getModelTreeBox()->selectNone();
+                    mModeling->getGVLE()->getModelClassBox()->showRow(mdl);
+                } else{
+                    mModeling->getGVLE()->getModelClassBox()->selectNone();
+                    mModeling->getGVLE()->getModelTreeBox()->showRow(mdl);
+                }
             } else {
                 graph::Model* mod = mView->getFirstSelectedModels();
                 if (mod == 0) {
-                    mModeling->getGVLE()->getModelTreeBox()->showRow(mdl);
+                    if (mView->isClassView()) {
+                        mModeling->getGVLE()->getModelTreeBox()->selectNone();
+                        mModeling->getGVLE()->getModelClassBox()->showRow(mdl);
+                    } else{
+                        mModeling->getGVLE()->getModelClassBox()->selectNone();
+                        mModeling->getGVLE()->getModelTreeBox()->showRow(mdl);
+                    }
                 } else if (mView->getAllSelectedModels().size() == 1) {
-                    mModeling->getGVLE()->getModelTreeBox()->selectNone();
+                    if (mView->isClassView()) {
+                        mModeling->getGVLE()->getModelTreeBox()->selectNone();
+                        mModeling->getGVLE()->getModelClassBox()->selectNone();
+                    } else {
+                        mModeling->getGVLE()->getModelClassBox()->selectNone();
+                        mModeling->getGVLE()->getModelTreeBox()->selectNone();
+                    }
                     mView->addModelToSelectedModels(mod);
                 }
             }
             mView->addModelToSelectedModels(mdl);
         }
     } else {
-        mModeling->getGVLE()->getModelTreeBox()->selectNone();
+        if (mView->isClassView()) {
+        } else {
+            mModeling->getGVLE()->getModelTreeBox()->selectNone();
+        }
         mView->clearSelectedModels();
         mPrecMouse = mMouse;
         queueRedraw();

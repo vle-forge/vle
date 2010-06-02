@@ -215,8 +215,20 @@ public:
         return mDestinationModel;
     }
 
+    //
+    //
+    // MANAGE CLASS ASPECT
+    //
+    //
+
     inline void setCurrentClass(std::string classeName)
-	{ mCurrentClass = classeName; }
+    { mCurrentClass = classeName; }
+
+    inline std::string getCurrentClass() const
+    { return mCurrentClass; }
+
+    inline bool isClassView() const
+    { return !mCurrentClass.empty(); }
 
     //
     //

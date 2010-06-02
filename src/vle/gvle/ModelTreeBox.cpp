@@ -63,7 +63,7 @@ ModelTreeBox::ModelTreeBox(BaseObjectType* cobject,
     Glib::RefPtr<Gtk::TreeSelection> selection = Gtk::TreeView::get_selection();
 
     selection->set_select_function(
-        sigc::mem_fun(*this, &ModelTreeBox::select_function) );
+        sigc::mem_fun(*this, &ModelTreeBox::onSelect) );
 
     expand_all();
     set_rules_hint(true);
@@ -74,7 +74,7 @@ ModelTreeBox::ModelTreeBox(BaseObjectType* cobject,
 	sigc::mem_fun(*this, &ModelTreeBox::onQueryTooltip));
 }
 
-bool ModelTreeBox::select_function(
+bool ModelTreeBox::onSelect(
     const Glib::RefPtr<Gtk::TreeModel>& model,
     const Gtk::TreeModel::Path& path, bool info)
 {
@@ -92,9 +92,15 @@ bool ModelTreeBox::select_function(
             if (info) {
                 view->removeFromSelectedModel(mdl);
             } else {
-                if (not view->existInSelectedModels(mdl) &&
-                    mdl->getParent()) {
-                    m_modeling->addView(mdl->getParent());
+                m_modeling->getGVLE()->getModelClassBox()->selectNone();
+                if (not view->existInSelectedModels(mdl)) {
+                        if(mdl->getParent()) {
+                            m_modeling->addView(mdl->getParent());
+                        } else {
+                            m_modeling->addView(mdl);
+                        }
+                        view =
+                            m_modeling->getGVLE()->getEditor()->getDocumentDrawingArea()->getView();
                 }
                 view->clearSelectedModels();
                 view->addModelToSelectedModels(mdl);

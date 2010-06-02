@@ -66,6 +66,11 @@ ModelClassBox::ModelClassBox(BaseObjectType* cobject,
     signal_button_release_event().connect(
         sigc::mem_fun(*this, &ModelClassBox::onButtonRealeaseModels));
 
+    Glib::RefPtr<Gtk::TreeSelection> selection = Gtk::TreeView::get_selection();
+
+    selection->set_select_function(
+        sigc::mem_fun(*this, &ModelClassBox::onSelect) );
+
     expand_all();
     set_rules_hint(true);
     initMenuPopupModels();
@@ -75,9 +80,89 @@ ModelClassBox::ModelClassBox(BaseObjectType* cobject,
         sigc::mem_fun(*this, &ModelClassBox::onQueryTooltip));
 }
 
+bool ModelClassBox::onSelect(
+    const Glib::RefPtr<Gtk::TreeModel>& model,
+    const Gtk::TreeModel::Path& path, bool info)
+{
+    const Gtk::TreeModel::iterator iter = model->get_iter(path);
+
+    View* view =
+        mModeling->getGVLE()->getEditor()->getDocumentDrawingArea()->getView();
+
+    graph::Model* mdl;
+
+    if (iter) {
+        Gtk::TreeModel::Row row = *iter;
+        mdl = (graph::Model*)row[mColumns.mModel];
+        if (mdl) {
+            if (info) {
+                view->removeFromSelectedModel(mdl);
+            } else {
+                mModeling->getGVLE()->getModelTreeBox()->selectNone();
+                if (not view->existInSelectedModels(mdl)) {
+                    if(mdl->getParent()) {
+                        mModeling->addViewClass(mdl->getParent(),
+                                                getClassName(path));
+                    } else {
+                        mModeling->addViewClass(mdl,
+                                                getClassName(path));
+                    }
+                    view = mModeling->getGVLE()->getEditor()->getDocumentDrawingArea()->getView();
+                }
+                view->clearSelectedModels();
+                view->addModelToSelectedModels(mdl);
+            }
+            view->redraw();
+        } else {
+            mModeling->getGVLE()->getModelTreeBox()->selectNone();
+            mModeling->addViewClass(mModeling->getClassModel(row.get_value(mColumns.mName)),
+                                    row.get_value(mColumns.mName));
+        }
+    }
+    return true;
+}
+
+void ModelClassBox::selectNone()
+{
+    Glib::RefPtr<Gtk::TreeSelection> selection = get_selection();
+    selection->unselect_all();
+}
+
+Gtk::TreeModel::iterator ModelClassBox::getModelRow(const graph::Model* mdl,
+                                                    Gtk::TreeModel::Children child)
+{
+    Gtk::TreeModel::iterator iter = child.begin();
+
+    while (iter != child.end()) {
+        if ((*iter).get_value(mColumns.mModel) == mdl) {
+            return iter;
+        }
+        if (!((*iter).children().empty())) {
+            Gtk::TreeModel::iterator iterin = getModelRow(mdl, (*iter).children());
+            if (iterin != (*iter).children().end()) {
+                return iterin;
+            }
+        }
+        iter++;
+    }
+    return iter;
+}
+
+void ModelClassBox::showRow(const graph::Model* mdl)
+{
+    if (mdl->getParent()) {
+        Gtk::TreeModel::iterator iter = getModelRow(mdl->getParent(),
+                                                    mRefTreeModel->children());
+        expand_to_path(Gtk::TreePath(iter));
+    }
+
+    Gtk::TreeModel::iterator iter = getModelRow(mdl, mRefTreeModel->children());
+    set_cursor(Gtk::TreePath(iter));
+}
+
 void ModelClassBox::on_cursor_changed()
 {
-    Glib::RefPtr<Gtk::TreeView::Selection> refSelection =  get_selection();
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
     if (refSelection) {
         Gtk::TreeModel::iterator iter = refSelection->get_selected();
         if (iter and (mRefTreeModel->iter_depth(iter) == 0)) {
@@ -382,14 +467,8 @@ bool ModelClassBox::onQueryTooltip(int wx,int wy, bool keyboard_tooltip,
         if (mRefTreeModel->iter_depth(iter) == 0) {
             card = mModeling->getIdCard(row.get_value(mColumns.mName));
         } else {
-            std::vector <std::string> Vec;
-            Glib::ustring str = path.to_string();
-            boost::split(Vec, str, boost::is_any_of(":"));
-            Gtk::TreeIter iterClass = mRefTreeModel->get_iter(Vec[0]);
-            Gtk::TreeRow rowClass = (*iterClass);
-
             card = mModeling->getClassIdCard(row.get_value(mColumns.mModel),
-                                             rowClass.get_value(mColumns.mName));
+                                             getClassName(path));
         }
         tooltip->set_text(card);
         set_tooltip_row(tooltip, Gtk::TreePath(iter));
@@ -469,13 +548,8 @@ void ModelClassBox::row_activated(const Gtk::TreeModel::Path& path,
                 mModeling->getClassModel(row.get_value(mColumns.mName)),
                 row.get_value(mColumns.mName));
         } else {
-            std::vector <std::string> Vec;
-            Glib::ustring str = path.to_string();
-            boost::split(Vec, str, boost::is_any_of(":"));
-            Gtk::TreeIter iterClass = mRefTreeModel->get_iter(Vec[0]);
-            Gtk::TreeRow rowClass = (*iterClass);
             mModeling->addViewClass(row.get_value(mColumns.mModel),
-                                    rowClass.get_value(mColumns.mName));
+                                    getClassName(path));
         }
     }
 }
@@ -545,6 +619,18 @@ void ModelClassBox::onEdition(
         }
         parseClass();
     }
+}
+
+std::string ModelClassBox::getClassName(const Gtk::TreeModel::Path& path)
+{
+
+    std::vector <std::string> Vec;
+    Glib::ustring str = path.to_string();
+    boost::split(Vec, str, boost::is_any_of(":"));
+    Gtk::TreeIter iterClass = mRefTreeModel->get_iter(Vec[0]);
+    Gtk::TreeRow rowClass = (*iterClass);
+
+    return rowClass.get_value(mColumns.mName);
 }
 
 } } // namespace vle gvle

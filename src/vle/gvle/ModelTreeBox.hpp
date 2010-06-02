@@ -216,7 +216,7 @@ class ModelTreeColumn : public Gtk::TreeModel::ColumnRecord
 
 private:
     void initMenuPopupModels();
-    bool select_function(
+    bool onSelect(
         const Glib::RefPtr<Gtk::TreeModel>& model,
         const Gtk::TreeModel::Path& path, bool);
     bool onButtonRealeaseModels(GdkEventButton* event);

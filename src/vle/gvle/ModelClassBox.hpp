@@ -61,6 +61,18 @@ public:
      * Show in the TextView the class Tree
      */
     void parseClass();
+
+    /**
+     * active a row for a particular model
+     *
+     * @param mdl model to activate
+     */
+    void showRow(const graph::Model* mdl);
+
+    Gtk::TreeModel::iterator getModelRow(const graph::Model* mdl,
+                                         Gtk::TreeModel::Children child);
+
+
     Gtk::TreeModel::Row addClass(const vpz::Class& classe);
 
     virtual void onAdd();
@@ -90,6 +102,11 @@ public:
      * @brief Clear the current Treeview
      */
     void clear();
+
+    /**
+     * @brief Clear the selection
+     */
+    void selectNone();
 
     bool onQueryTooltip(int wx,int wy, bool keyboard_tooltip,
                         const Glib::RefPtr<Gtk::Tooltip>& tooltip);
@@ -161,8 +178,19 @@ protected:
 private:
 
     void initMenuPopupModels();
+    bool onSelect(
+        const Glib::RefPtr<Gtk::TreeModel>& model,
+        const Gtk::TreeModel::Path& path, bool);
     bool onButtonRealeaseModels(GdkEventButton *event);
     void on_cursor_changed();
+
+    /**
+     * @brief the Class name of a model
+     *
+     * @param the path of the row where the model is stored
+     */
+    std::string getClassName(const Gtk::TreeModel::Path&);
+
 
     Glib::RefPtr<Gnome::Glade::Xml>      mXml;
     Modeling*                            mModeling;
