@@ -55,8 +55,11 @@ void VLE_GVLE_EXPORT Info(const Glib::ustring& information);
  * consolse.
  *
  * @param msg a string representation of error message.
+ * @param use_markup to enhance or not the text presentation by
+ * inserting html tags inside the message string.
+ *
  */
-void VLE_GVLE_EXPORT Error(const Glib::ustring& msg);
+void VLE_GVLE_EXPORT Error(const Glib::ustring& msg, bool use_markup = true);
 
 /**
  * Show a Gtk dialog box with a question. User have two choices YES or

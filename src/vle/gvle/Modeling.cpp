@@ -155,6 +155,21 @@ void Modeling::start()
     setModifiedTitles();
 }
 
+void Modeling::start(const std::string& path, const std::string& fileName)
+{
+    clearModeling();
+    delNames();
+    mTop = newCoupledModel(0, "Top model", "", 0, 0);
+    mVpz.project().model().setModel(mTop);
+    mGVLE->redrawModelTreeBox();
+    mGVLE->redrawModelClassBox();
+    mFileName = path + "/" + fileName;
+    mIsSaved = false;
+    setModified(true);
+    addView(mTop);
+    setModifiedTitles();
+}
+
 void Modeling::parseXML(const string& filename)
 {
     try {
@@ -180,6 +195,9 @@ void Modeling::parseXML(const string& filename)
         mIsSaved = true;
         setModified(false);
         setTitles();
+    } catch (const utils::SaxParserError& e) {
+        gvle::Error((fmt(_("Error parsing file, %1%")) %
+                     e.what()).str(),false);
     } catch (const utils::ParseError& p) {
         gvle::Error((fmt(_("Error parsing file, %1%")) %
                      p.what()).str());

@@ -83,37 +83,43 @@ void Info(const Glib::ustring& information)
     delete box;
 }
 
-void Error(const Glib::ustring& msg)
+void Error(const Glib::ustring& msg, bool use_markup)
 {
+    Gtk::MessageDialog* box;
     Glib::ustring msg_first;
     Glib::ustring msg_second;
 
-    Glib::ustring::size_type pos1 = msg.find("----------");
-    if (pos1 == Glib::ustring::npos) {
-        msg_first.assign(msg);
-    } else {
-        msg_first.assign(msg, 0, pos1);
-        msg_second.assign(msg, pos1 + 10, Glib::ustring::npos);
-        msg_second = Glib::Markup::escape_text(msg_second);
+    if (use_markup) {
 
-        Glib::ustring::size_type pos2 = msg_second.find("----------");
-        if (pos2 == Glib::ustring::npos) {
-            msg_second.insert(0, "<i>");
-            msg_second.append("</i>");
+        Glib::ustring::size_type pos1 = msg.find("----------");
+        if (pos1 == Glib::ustring::npos) {
+            msg_first.assign(msg);
         } else {
-            msg_second.erase(pos2, 10);
-            msg_second.insert(pos2, "</i>\n<tt>");
-            msg_second.insert(0, "<i>");
-            msg_second.append("</tt>");
+            msg_first.assign(msg, 0, pos1);
+            msg_second.assign(msg, pos1 + 10, Glib::ustring::npos);
+            msg_second = Glib::Markup::escape_text(msg_second);
+
+            Glib::ustring::size_type pos2 = msg_second.find("----------");
+            if (pos2 == Glib::ustring::npos) {
+                msg_second.insert(0, "<i>");
+                msg_second.append("</i>");
+            } else {
+                msg_second.erase(pos2, 10);
+                msg_second.insert(pos2, "</i>\n<tt>");
+                msg_second.insert(0, "<i>");
+                msg_second.append("</tt>");
+            }
         }
+
+        msg_first.insert(0, "<b>");
+        msg_first.append("</b>\n");
+        msg_first += msg_second;
+    } else {
+        msg_first.assign(msg);
     }
 
-    msg_first.insert(0, "<b>");
-    msg_first.append("</b>\n");
-    msg_first += msg_second;
-
-    Gtk::MessageDialog* box = new Gtk::MessageDialog(
-        msg_first, true, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+    box = new Gtk::MessageDialog(
+        msg_first, use_markup, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
 
     box->run();
     delete box;

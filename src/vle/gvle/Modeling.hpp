@@ -105,10 +105,19 @@ public:
 
 
     /**
-     * delete all models and views and restart with one view.
+     * @brief delete all models and views and restart with one view.
      *
      */
     void start();
+
+    /**
+     * @brief delete all models and views and restart with one view.
+     *
+     * @param path path where the vpz file is wanted to be stored
+     * @param fileName vpz file name
+     *
+     */
+    void start(const std::string& path, const std::string& fileName);
 
     /**
      * parse XML project file to get filename of XML files structures and

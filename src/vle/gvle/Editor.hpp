@@ -106,7 +106,8 @@ private:
 class VLE_GVLE_EXPORT DocumentText : public Document
 {
 public:
-    DocumentText(GVLE* gvle, const std::string& filePath, bool newfile = false);
+    DocumentText(GVLE* gvle, const std::string& filePath, bool newfile = false,
+                 bool hasFullName = false);
 
     DocumentText(const std::string& buffer);
 
@@ -117,6 +118,9 @@ public:
 
     inline bool isNew() const
     { return mNew == true; }
+
+    inline bool hasFullName() const
+    { return mHasFullName; }
 
     void updateView();
 
@@ -138,6 +142,7 @@ private:
 
     bool           mModified;
     bool           mNew;
+    bool           mHasFullName;
     std::string    mIdLang;
 
     void init(const std::string& buffer);
@@ -235,6 +240,8 @@ public:
     void closeVpzTab();
 
     void createBlankNewFile();
+    void createBlankNewFile(const std::string& path,
+                            const std::string& fileName);
 
     inline bool existTab(const std::string& name)
     { return mDocuments.find(name) != mDocuments.end(); }

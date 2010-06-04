@@ -121,7 +121,7 @@ public:
      *
      * @return ButtonType of current selected button.
      */
-    inline ButtonType getCurrentButton() const 
+    inline ButtonType getCurrentButton() const
     { return mCurrentButton; }
 
     /**
@@ -407,10 +407,24 @@ public:
     void onNewFile();
 
     /**
+     * @brief When asking for, from the project treeview, and after
+     * the name has been choosen with a dialog.
+     *
+     */
+    void onNewFile(const std::string& path, const std::string& fileName);
+
+    /**
      * When click on new menu.
      *
      */
     void onNewVpz();
+
+    /**
+     * @brief When asking for, from the project treeview, and after
+     * the name has been choosen with a dialog.
+     *
+     */
+    void onNewNamedVpz(const std::string& path, const std::string& fileName);
 
     /**
      * When click on new project menu

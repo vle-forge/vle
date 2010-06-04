@@ -322,22 +322,28 @@ void GVLE::FileTreeView::onNewFile()
     std::string filepath;
 
     if (box.valid() and not name.empty()) {
-	Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+        Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
 
-	if (refSelection) {
-	    Gtk::TreeModel::const_iterator it = refSelection->get_selected();
-	    const Gtk::TreeModel::Row row = *it;
-	    std::list<std::string> lstpath;
-	    projectFilePath(row, lstpath);
-	    filepath = Glib::build_filename(
-		mPackage, Glib::build_filename(lstpath));
-	    if (not isDirectory(filepath)) {
+        if (refSelection) {
+            Gtk::TreeModel::const_iterator it = refSelection->get_selected();
+            const Gtk::TreeModel::Row row = *it;
+            std::list<std::string> lstpath;
+            projectFilePath(row, lstpath);
+            filepath = Glib::build_filename(
+                mPackage, Glib::build_filename(lstpath));
+            if (not isDirectory(filepath)) {
                 filepath = utils::Path::dirname(filepath);
-	    }
-	} else {
-	    filepath = mPackage;
-	}
-	utils::Package::package().addFile(filepath, name);
+            }
+        } else {
+            filepath = mPackage;
+        }
+
+        if(name.find(".vpz") != std::string::npos) {
+            mParent->onNewNamedVpz(filepath, name);
+            mParent->getModeling()->setSaved(true);
+        } else {
+            mParent->onNewFile(filepath, name);
+        }
     }
     mParent->refreshPackageHierarchy();
 }
@@ -829,6 +835,13 @@ void GVLE::onNewFile()
     mMenuAndToolbar->showSave();
 }
 
+void GVLE::onNewFile(const std::string& path, const std::string& fileName)
+{
+    mEditor->createBlankNewFile(path, fileName);
+    mMenuAndToolbar->onOpenFile();
+    mMenuAndToolbar->showSave();
+}
+
 void GVLE::onNewVpz()
 {
     if (not mModeling->isModified() or mModeling->getFileName().empty() or
@@ -845,6 +858,26 @@ void GVLE::onNewVpz()
             mStatusbar->push(_("Selection"));
         }
     }
+    onExperimentsBox();
+}
+
+void GVLE::onNewNamedVpz(const std::string& path, const std::string& filename)
+{
+    if (not mModeling->isModified() or mModeling->getFileName().empty() or
+	(mModeling->isModified() and
+	 gvle::Question(_("Do you really want load a new Model ?\nCurrent "
+                          "model will be destroy and not save")))) {
+        mModeling->start(path.c_str(), filename.c_str());
+        mMenuAndToolbar->onOpenVpz();
+        mMenuAndToolbar->showSave();
+        mEditor->getDocumentDrawingArea()->updateCursor();
+        mModelTreeBox->set_sensitive(true);
+        mModelClassBox->set_sensitive(true);
+        if (mCurrentButton == POINTER){
+            mStatusbar->push(_("Selection"));
+        }
+    }
+    onExperimentsBox();
 }
 
 void GVLE::onNewProject()
@@ -1010,7 +1043,7 @@ void GVLE::onSave()
 	    DocumentText* doc = dynamic_cast < DocumentText* >(
 		mEditor->get_nth_page(page));
 
-	    if (not doc->isNew()) {
+	    if (not doc->isNew() || doc->hasFullName()) {
 		doc->save();
 	    } else {
 		Gtk::FileChooserDialog file(_("Text file"),

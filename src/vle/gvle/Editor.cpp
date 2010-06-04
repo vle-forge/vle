@@ -87,9 +87,10 @@ void Document::setTitle(const std::string& filePath,
 
 DocumentText::DocumentText(GVLE* gvle,
 			   const std::string& filepath,
-			   bool newfile) :
+			   bool newfile, bool hasFullName) :
     Document(gvle, filepath),
-    mNew(newfile)
+    mNew(newfile),
+    mHasFullName(hasFullName)
 {
     mTitle = filename() + utils::Path::extension(filepath);
 
@@ -575,6 +576,23 @@ void Editor::closeTab(const std::string& filepath)
             mDocuments.erase(it->first);
         }
     }
+}
+
+void Editor::createBlankNewFile(const std::string& path,
+            const std::string& fileName)
+{
+    try {
+	    DocumentText* doc =
+            new DocumentText(mApp,  path + "/" + fileName, true, true);
+        mDocuments.insert(
+            std::make_pair < std::string, DocumentText* >
+            (path + "/" + fileName, doc));
+	    append_page(*doc, *(addLabel(fileName,
+				         path + "/" + fileName)));
+    } catch (std::exception& e) {
+	    std::cout << e.what() << std::endl;
+    }
+    show_all_children();
 }
 
 void Editor::createBlankNewFile()
