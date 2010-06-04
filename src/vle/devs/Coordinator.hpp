@@ -132,7 +132,7 @@ namespace vle { namespace devs {
          */
         void createModel(graph::AtomicModel* model,
                          const std::string& dynamics,
-                         const vpz::Strings& conditions,
+                         const std::vector < std::string >& conditions,
                          const std::string& observable);
 
         /**

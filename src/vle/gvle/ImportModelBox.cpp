@@ -591,9 +591,10 @@ void ImportModelBox::rename_condition(vpz::Vpz* src, std::string old_name, std::
     vpz::AtomicModelList& list = src->project().model().atomicModels();
     vpz::AtomicModelList::iterator it = list.begin();
     while (it != list.end()) {
-        vpz::Strings vec = it->second.conditions();
-        vpz::Strings ::iterator it_vec = std::find(vec.begin(), vec.end(),
-                                                   old_name);
+        std::vector < std::string > vec = it->second.conditions();
+        std::vector < std::string >::iterator it_vec = std::find(vec.begin(),
+                                                                 vec.end(),
+                                                                 old_name);
         if (it_vec != vec.end()) {
             *it_vec = new_name;
             it->second.setConditions(vec);

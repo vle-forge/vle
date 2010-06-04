@@ -522,8 +522,8 @@ void AtomicModelBox::ConditionTreeView::build()
 {
     mRefTreeModel->clear();
 
-    const vpz::Strings& cond = mModel->conditions();
-    vpz::Strings::const_iterator f;
+    const std::vector < std::string >& cond = mModel->conditions();
+    std::vector < std::string >::const_iterator f;
     const vpz::ConditionList& list = mConditions->conditionlist();
     vpz::ConditionList::const_iterator it = list.begin();
     std::string selections("");
@@ -544,9 +544,11 @@ void AtomicModelBox::ConditionTreeView::build()
     mLabel->set_label(_("Selected conditions: ") + selections);
 }
 
-vpz::Strings AtomicModelBox::ConditionTreeView::getConditions()
+std::vector < std::string >
+AtomicModelBox::ConditionTreeView::getConditions()
 {
-    vpz::Strings vec;
+    std::vector < std::string > vec;
+
     typedef Gtk::TreeModel::Children type_children;
     type_children children = mRefTreeModel->children();
 
@@ -1549,8 +1551,9 @@ void AtomicModelBox::applyConditions()
 	vpz::AtomicModelList::iterator it = list.begin();
 
 	while (it != list.end()) {
-	    vpz::Strings mdlConditions = it->second.conditions();
-	    vpz::Strings::const_iterator its = mdlConditions.begin();
+            std::vector < std::string > mdlConditions = it->second.conditions();
+            std::vector < std::string >::const_iterator its =
+                mdlConditions.begin();
 
 	    while (its != mdlConditions.end()) {
 		if (not conditions.exist(*its)) {

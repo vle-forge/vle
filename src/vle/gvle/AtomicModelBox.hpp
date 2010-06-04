@@ -220,7 +220,7 @@ private:
 	void build();
 	void clearRenaming()
 	    { mRenameList.clear(); }
-	vpz::Strings getConditions();
+	std::vector < std::string > getConditions();
 	void setConditions(vpz::Conditions* conditions)
 	    { mConditions = conditions; }
 	void setModeling(Modeling* modeling)

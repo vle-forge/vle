@@ -40,11 +40,6 @@
 namespace vle { namespace vpz {
 
     /**
-     * @brief Define a list of string for the list of conditions.
-     */
-    typedef std::list < std::string > Strings;
-
-    /**
      * @brief The AtomicModel class is used by the AtomicModelList to attach an
      * atomic model to his conditions, observables and dynamics names.
      */
@@ -66,7 +61,7 @@ namespace vle { namespace vpz {
          * @brief Get the list of conditions.
          * @return List of conditions.
          */
-        inline const Strings& conditions() const
+        inline const std::vector < std::string >& conditions() const
         { return m_conditions; }
 
         /**
@@ -87,7 +82,7 @@ namespace vle { namespace vpz {
          * @brief Assign a list of condition.
          * @param vect A list of condition.
          */
-        inline void setConditions(const Strings& vect)
+        inline void setConditions(const std::vector < std::string >& vect)
         { m_conditions = vect; }
 
         /**
@@ -135,7 +130,7 @@ namespace vle { namespace vpz {
     private:
         AtomicModel() {}
 
-	Strings     m_conditions;
+	std::vector < std::string > m_conditions;
         std::string m_dynamics;
         std::string m_observables;
     };

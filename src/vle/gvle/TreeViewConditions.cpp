@@ -94,8 +94,8 @@ std::vector<std::string>* TreeViewConditions::get_conditions_checked()
 void TreeViewConditions::makeTreeView()
 {
     m_refTreeModel->clear();
-    const vpz::Strings& cond = mAtom->conditions();
-    vpz::Strings::const_iterator f;
+    const std::vector < std::string >& cond = mAtom->conditions();
+    std::vector < std::string >::const_iterator f;
     vpz::ConditionList list = mCond->conditionlist();
     vpz::ConditionList::iterator it = list.begin();
 

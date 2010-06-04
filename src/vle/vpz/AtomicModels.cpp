@@ -55,7 +55,7 @@ AtomicModel::AtomicModel(const std::string& conditions,
 
 void AtomicModel::delCondition(const std::string& str)
 {
-    std::list < std::string >::iterator itfind =
+    std::vector < std::string >::iterator itfind =
 	std::find(m_conditions.begin(), m_conditions.end(), str);
 
     m_conditions.erase(itfind);
@@ -145,7 +145,7 @@ void AtomicModelList::updateCondition(const std::string& oldname,
 				      const std::string& newname)
 {
     for (iterator it = m_lst.begin(); it != m_lst.end(); ++it) {
-        const std::list<std::string>& lstconds(it->second.conditions());
+        const std::vector < std::string >& lstconds(it->second.conditions());
 
 	if (std::find(lstconds.begin(), lstconds.end(), newname)
                 != lstconds.end()) {
@@ -154,7 +154,7 @@ void AtomicModelList::updateCondition(const std::string& oldname,
                         newname));
         }
 
-        std::list < std::string >::const_iterator itfind =
+        std::vector < std::string >::const_iterator itfind =
                 std::find(lstconds.begin(), lstconds.end(), oldname);
 
         if (itfind != lstconds.end()) {
@@ -253,7 +253,8 @@ void AtomicModelList::writeAtomic(std::ostream& out, const graph::AtomicModel* m
     if (not vpzatom.conditions().empty()) {
 	out << "conditions=\"";
 
-        Strings::const_iterator it = vpzatom.conditions().begin();
+        std::vector < std::string >::const_iterator it =
+            vpzatom.conditions().begin();
         while (it != vpzatom.conditions().end()) {
             out << it->c_str();
             ++it;

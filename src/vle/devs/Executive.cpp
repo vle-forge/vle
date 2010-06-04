@@ -58,7 +58,7 @@ Executive::createModel(const std::string& name,
                            const std::vector < std::string >& inputs,
                            const std::vector < std::string >& outputs,
                            const std::string& dynamics,
-                           const vpz::Strings& conditions,
+                           const std::vector < std::string >& conditions,
                            const std::string& observable)
 {
     graph::AtomicModel* model = new graph::AtomicModel(name, cpled());

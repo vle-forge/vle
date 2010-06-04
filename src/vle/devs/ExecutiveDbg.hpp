@@ -176,7 +176,7 @@ public:
         const std::vector < std::string >& inputs,
         const std::vector < std::string >& outputs,
         const std::string& dynamics,
-        const vpz::Strings& conditions,
+        const std::vector < std::string >& conditions,
         const std::string& observable)
     {
         std::string inputsString, outputsString, conditionsString;
@@ -200,7 +200,8 @@ public:
             }
         }
         {
-            vpz::Strings::const_iterator it = conditions.begin();
+            std::vector < std::string >::const_iterator it =
+                conditions.begin();
             while (it != conditions.begin()) {
                 conditionsString += *it;
                 ++it;

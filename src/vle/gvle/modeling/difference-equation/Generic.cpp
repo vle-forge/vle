@@ -154,7 +154,7 @@ void Generic::generateCondition(graph::AtomicModel& atom,
         conditions.add(condition);
     }
 
-    vpz::Strings cond(model.conditions());
+    std::vector < std::string > cond(model.conditions());
     if (std::find(cond.begin(), cond.end(), conditionName) == cond.end()) {
         cond.push_back(conditionName);
         model.setConditions(cond);

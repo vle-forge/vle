@@ -512,9 +512,9 @@ void Modeling::export_atomic_model(vpz::Vpz* dst, graph::AtomicModel* model,
     }
 
     //Conditions
-    const Strings& vec = atom.conditions();
-    for (Strings::const_iterator it_cond = vec.begin(); it_cond != vec.end();
-         ++it_cond) {
+    const std::vector < std::string >& vec = atom.conditions();
+    for (std::vector < std::string >::const_iterator it_cond = vec.begin();
+         it_cond != vec.end(); ++it_cond) {
         if (!it_cond->empty() && !cond.exist(*it_cond)) {
             cond.add(vpz().project().experiment().conditions().get(*it_cond));
         }
@@ -675,9 +675,8 @@ void parse_recurs(graph::Model* m, vpz::Vpz* vpz, int level)
         <<" dyn("<<atom.dynamics()<<")"
         <<" obs("<<atom.observables()<<")"
         <<" cond(";
-        for (vpz::Strings::const_iterator it = atom.conditions().begin();
-                it != atom.conditions().end();
-                ++it) {
+        for (std::vector < std::string >::const_iterator it =
+             atom.conditions().begin(); it != atom.conditions().end(); ++it) {
             std::cout << *it << ";";
         }
         std::cout << ")\n";
@@ -763,7 +762,8 @@ const Modeling::SetString& Modeling::getNames() const
 }
 
 
-const vpz::Strings* Modeling::get_conditions(graph::AtomicModel* atom)
+const std::vector < std::string >*
+Modeling::get_conditions(graph::AtomicModel* atom)
 {
     assert(atom);
 

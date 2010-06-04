@@ -636,7 +636,7 @@ public:
 	}
     }
 
-    const vpz::Strings* get_conditions(graph::AtomicModel* atom);
+    const std::vector < std::string >* get_conditions(graph::AtomicModel* atom);
 
     /********************************************************************
      *

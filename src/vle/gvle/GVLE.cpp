@@ -1248,8 +1248,10 @@ void GVLE::onConditionsBox()
 	    vpz::AtomicModelList::iterator it = list.begin();
 
 	    while (it != list.end()) {
-		vpz::Strings mdlConditions = it->second.conditions();
-		vpz::Strings::const_iterator its = mdlConditions.begin();
+                std::vector < std::string > mdlConditions =
+                    it->second.conditions();
+                std::vector < std::string >::const_iterator its =
+                    mdlConditions.begin();
 
 		while (its != mdlConditions.end()) {
 		    if (not mModeling->conditions().exist(*its)) {

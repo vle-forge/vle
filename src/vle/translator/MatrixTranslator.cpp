@@ -245,7 +245,7 @@ void MatrixTranslator::translateModel(unsigned int i,
     const graph::AtomicModel* atomicModel;
 
     if (not m_library.empty() or not m_libraries.empty()) {
-        vpz::Strings conditions;
+        std::vector < std::string > conditions;
         conditions.push_back("cond_cell");
         conditions.push_back((fmt("cond_%1%_%2%_%3%")
                               % m_prefix % i % j).str());
@@ -334,7 +334,7 @@ void MatrixTranslator::translateStructures()
 {
     if (m_dimension == 0) {
         for (unsigned int i = 1; i <= m_size[0]; i++) {
-            vpz::Strings conditions;
+            std::vector < std::string > conditions;
 
             conditions.push_back("cond_cell");
             conditions.push_back((fmt("cond_%1%_%2%") % m_prefix %

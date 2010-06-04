@@ -141,8 +141,7 @@ void GenExecutive::add_new_model()
     std::vector < std::string > outputs;
     outputs.push_back("out");
 
-    createModel(name, std::vector < std::string >(), outputs, "gensbeep",
-                vpz::Strings(), "");
+    createModel(name, std::vector < std::string >(), outputs, "gensbeep");
     addConnection(name, "out", "counter", "in");
 
     m_stacknames.push(name);
