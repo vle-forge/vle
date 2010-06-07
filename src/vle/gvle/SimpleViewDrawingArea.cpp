@@ -320,6 +320,58 @@ void SimpleViewDrawingArea::getModelOutPosition(graph::Model* src,
 
 }
 
+void SimpleViewDrawingArea::preComputeConnectInfo()
+{
+    using namespace graph;
+
+    mConnectionInfo.clear();
+
+    {
+        ConnectionList& outs(mCurrent->getInternalInputPortList());
+        ConnectionList::const_iterator it;
+
+        for (it = outs.begin(); it != outs.end(); ++it) {
+            const ModelPortList& ports(it->second);
+            ModelPortList::const_iterator jt ;
+
+            for (jt = ports.begin(); jt != ports.end(); ++jt) {
+                record.source = mCurrent;
+                record.destination = jt->first;
+                mConnectionInfo.push_back(record);
+            }
+        }
+    }
+
+    {
+        const ModelList& children(mCurrent->getModelList());
+        ModelList::const_iterator it;
+
+        for (it = children.begin(); it != children.end(); ++it) {
+            const ConnectionList& outs(it->second->getOutputPortList());
+            ConnectionList::const_iterator jt;
+
+            for (jt = outs.begin(); jt != outs.end(); ++jt) {
+                const ModelPortList&  ports(jt->second);
+                ModelPortList::const_iterator kt;
+
+                for (kt = ports.begin(); kt != ports.end(); ++kt) {
+                    record.source = it->second;
+                    record.destination = kt->first;
+                    mConnectionInfo.push_back(record);
+                }
+            }
+        }
+    }
+}
+
+std::string SimpleViewDrawingArea::getConnectionInfo(int mHighlightLine)
+{
+	return mModeling->getIdCardConnection(
+								mConnectionInfo[mHighlightLine].source,
+								mConnectionInfo[mHighlightLine].destination,
+								mCurrent);
+}
+
 float SimpleViewDrawingArea::getPositiveDelta(int xs, int ys, int xd, int yd,
 					 int xc, int yc)
 {

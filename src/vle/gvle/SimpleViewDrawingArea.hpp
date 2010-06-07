@@ -49,6 +49,11 @@ namespace vle { namespace gvle {
     class SimpleViewDrawingArea : public ViewDrawingArea
     {
     public:
+        typedef struct connexion
+        {
+            graph::Model* source;
+            graph::Model* destination;
+        } Connexion;
 	static const gint MODEL_RADIUS;
         SimpleViewDrawingArea(View* view);
 
@@ -109,6 +114,10 @@ namespace vle { namespace gvle {
 	 * Order the models
 	 */
 	virtual void onOrder();
+
+	void preComputeConnectInfo();
+
+	std::string getConnectionInfo(int mHighlightLine);
 
     private:
 
@@ -173,6 +182,9 @@ namespace vle { namespace gvle {
 
 	bool on_button_press_event(GdkEventButton* event);
 	bool on_button_release_event(GdkEventButton* event);
+
+	connexion record;
+	std::vector < connexion > mConnectionInfo;
     };
 
 

@@ -89,7 +89,7 @@ namespace vle { namespace gvle {
         virtual void draw()=0;
 
 	graph::CoupledModel* getModel()
-	    { return mCurrent; }
+        { return mCurrent; }
 
         //
         // MANAGE ZOOM / UNZOOM IN VIEW
@@ -198,6 +198,10 @@ namespace vle { namespace gvle {
                                   const std::string& dstport)=0;
         void preComputeConnection();
 
+        virtual void preComputeConnectInfo()=0;
+
+        virtual std::string getConnectionInfo(int mHighlightLine)=0;
+
         virtual StraightLine computeConnection(int xs, int ys, int xd, int yd,
                                        int index)=0;
         virtual void computeConnection(graph::Model* src, const std::string& srcport,
@@ -276,7 +280,7 @@ namespace vle { namespace gvle {
         std::vector < Connection > mConnections;
         std::map < Point, bool > mDirect;
         std::vector < StraightLine > mLines;
-        std::vector < std::string > mText;
+        std::vector < graph::Model* > mModelInfo;
         int mHighlightLine;
 
 	// Grid

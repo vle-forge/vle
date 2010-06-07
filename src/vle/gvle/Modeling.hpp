@@ -743,6 +743,15 @@ public:
 
     std::string getClassIdCard(graph::CoupledModel* model) const;
 
+    std::string getIdCardConnection(graph::Model* src,
+                                    graph::Model* dest,
+                                    graph::CoupledModel* mTop) const;
+
+    std::string getIdCardConnection(graph::Model* src, std::string srcport,
+                                    graph::Model* dest,
+                                    std::string destport,
+                                    graph::CoupledModel* mTop) const;
+
 private:
     vpz::Vpz                    mVpz;
     graph::CoupledModel*        mTop;

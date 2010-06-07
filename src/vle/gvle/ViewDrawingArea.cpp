@@ -227,7 +227,6 @@ void ViewDrawingArea::preComputeConnection()
     mDirect.clear();
     mInPts.clear();
     mOutPts.clear();
-    mText.clear();
 
     {
         ConnectionList& outs(mCurrent->getInternalInputPortList());
@@ -240,10 +239,6 @@ void ViewDrawingArea::preComputeConnection()
             for (jt = ports.begin(); jt != ports.end(); ++jt) {
                 preComputeConnection(mCurrent, it->first,
 				     jt->first, jt->second);
-                mText.push_back(mCurrent->getName() +
-                                ":" + it->first +
-                                " -> " + jt->first->getName() +
-                                ":" + jt->second);
 	    }
 	}
     }
@@ -263,10 +258,6 @@ void ViewDrawingArea::preComputeConnection()
                 for (kt = ports.begin(); kt != ports.end(); ++kt) {
                     preComputeConnection(it->second, jt->first,
                                          kt->first, kt->second);
-                    mText.push_back(it->second->getName() +
-                                    ":" + jt->first +
-                                    " -> " + kt->first->getName() +
-                                    ":" + kt->second);
                 }
             }
         }
@@ -978,18 +969,21 @@ void ViewDrawingArea::exportSvg(const std::string& filename)
 bool ViewDrawingArea::onQueryTooltip(int wx,int wy, bool keyboard_tooltip,
                                      const Glib::RefPtr<Gtk::Tooltip>& tooltip)
 {
+
     graph::Model* model = mCurrent->find(wx/mZoom, wy/mZoom);
     Glib::ustring card;
 
     if (mHighlightLine != -1) {
-        tooltip->set_text(mText[mHighlightLine]);
+        card = getConnectionInfo(mHighlightLine);
+        tooltip->set_text(card);
         return true;
     } else if (model) {
         if (mView->isClassView()) {
-            card = mModeling->getClassIdCard(model , mView->getCurrentClass());
+            card = mModeling->getClassIdCard(model, mView->getCurrentClass());
         } else {
             card = mModeling->getIdCard(model);
         }
+
         tooltip->set_text(card);
         return true;
     } else {
@@ -1033,6 +1027,7 @@ void ViewDrawingArea::setUndefinedModels()
 void ViewDrawingArea::drawConnection()
 {
     preComputeConnection();
+    preComputeConnectInfo();
     computeConnection();
     drawLines();
 }

@@ -49,6 +49,13 @@ namespace vle { namespace gvle {
     class CompleteViewDrawingArea : public ViewDrawingArea
     {
     public:
+        typedef struct connexion
+        {
+            graph::Model* src;
+            std::string srcport;
+            graph::Model* dst;
+            std::string dstport;
+        } Connexion;
         CompleteViewDrawingArea(View* view);
 
         virtual ~CompleteViewDrawingArea() {}
@@ -100,6 +107,10 @@ namespace vle { namespace gvle {
 	 */
 	virtual void onOrder();
 
+	void preComputeConnectInfo();
+
+	std::string getConnectionInfo(int mHighlightLine);
+
     private:
 	void preComputeConnection(int xs, int ys, int xd, int yd,
 				  int ytms, int ybms);
@@ -135,6 +146,8 @@ namespace vle { namespace gvle {
 	bool on_button_press_event(GdkEventButton* event);
 	bool on_button_release_event(GdkEventButton* event);
 
+	connexion record;
+	std::vector < connexion > mConnectionInfo;
     };
 
 

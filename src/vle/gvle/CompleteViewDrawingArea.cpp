@@ -66,8 +66,8 @@ void CompleteViewDrawingArea::draw()
 }
 
 void CompleteViewDrawingArea::preComputeConnection(int xs, int ys,
-                                           int xd, int yd,
-                                           int ytms, int ybms)
+                                                   int xd, int yd,
+                                                   int ytms, int ybms)
 {
     Connection con(xs, ys, xd, yd, xs + SPACING_MODEL_PORT, xd -
                    SPACING_MODEL_PORT, 0, 0, 0);
@@ -555,5 +555,62 @@ void CompleteViewDrawingArea::onOrder()
     queueRedraw();
 }
 
+void CompleteViewDrawingArea::preComputeConnectInfo()
+{
+    using namespace graph;
+
+    mConnectionInfo.clear();
+
+    {
+        ConnectionList& outs(mCurrent->getInternalInputPortList());
+        ConnectionList::const_iterator it;
+
+        for (it = outs.begin(); it != outs.end(); ++it) {
+            const ModelPortList& ports(it->second);
+            ModelPortList::const_iterator jt ;
+
+            for (jt = ports.begin(); jt != ports.end(); ++jt) {
+                record.src = mCurrent;
+                record.srcport = jt->second;
+                record.dst = jt->first;
+                record.dstport = jt->second;
+                mConnectionInfo.push_back(record);
+            }
+        }
+    }
+
+    {
+        const ModelList& children(mCurrent->getModelList());
+        ModelList::const_iterator it;
+
+        for (it = children.begin(); it != children.end(); ++it) {
+            const ConnectionList& outs(it->second->getOutputPortList());
+            ConnectionList::const_iterator jt;
+
+            for (jt = outs.begin(); jt != outs.end(); ++jt) {
+                const ModelPortList&  ports(jt->second);
+                ModelPortList::const_iterator kt;
+
+                for (kt = ports.begin(); kt != ports.end(); ++kt) {
+                    record.src = it->second;
+                    record.srcport = jt->first+"";
+                    record.dst = kt->first;
+                    record.dstport = kt->second;
+                    mConnectionInfo.push_back(record);
+                }
+            }
+        }
+    }
+}
+
+std::string CompleteViewDrawingArea::getConnectionInfo(int mHighlightLine)
+{
+    return mModeling->getIdCardConnection(
+        mConnectionInfo[mHighlightLine].src,
+        mConnectionInfo[mHighlightLine].srcport,
+        mConnectionInfo[mHighlightLine].dst,
+        mConnectionInfo[mHighlightLine].dstport,
+        mCurrent);
+}
 
 }} // namespace vle gvle

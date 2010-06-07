@@ -983,5 +983,48 @@ std::string Modeling::getClassIdCard(graph::CoupledModel* model) const
     return ("Model: " + model->getName() + " (Coupled)");
 }
 
+
+std::string Modeling::getIdCardConnection(graph::Model* src,
+                                          graph::Model* dest,
+                                          graph::CoupledModel* mTop) const
+{
+    Glib::ustring card;
+    const graph::ModelList& children(mTop->getModelList());
+    graph::ModelList::const_iterator it;
+
+    for (it = children.begin(); it != children.end(); ++it) {
+    	const graph::ConnectionList& outs(it->second->getOutputPortList());
+        graph::ConnectionList::const_iterator jt;
+        if ((it->second == src) or (it->second == dest)){
+            for (jt = outs.begin(); jt != outs.end(); ++jt) {
+                const graph::ModelPortList&  ports(jt->second);
+                graph::ModelPortList::const_iterator kt;
+                for (kt = ports.begin(); kt != ports.end(); ++kt){
+                    if ((kt->first == src) or (kt->first == dest)) {
+                        if (card.compare("") != 0) {
+                            card += "\n";
+                        }
+                        card += it->second->getName() +
+                            ":" + jt->first +
+                            " -> " + kt->first->getName() +
+                            ":" + kt->second;
+                    }
+                }
+            }
+        }
+    }
+    return card;
+}
+
+std::string Modeling::getIdCardConnection(graph::Model* src,
+                                          std::string srcport,
+                                          graph::Model* dest,
+                                          std::string destport,
+                                          graph::CoupledModel* mTop) const
+{
+    return (src->getName() + ":" + srcport + " -> " + dest->getName() +
+            ":" + destport);
+}
+
 }
 } // namespace vle gvle
