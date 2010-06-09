@@ -122,6 +122,10 @@ DocumentText::DocumentText(GVLE* gvle,
 	}
     }
 
+    applyEditingProperties();
+
+    add(mView);
+
     mView.get_buffer()->signal_changed().connect(
 	sigc::mem_fun(this, &DocumentText::onChanged));
 }
@@ -134,6 +138,10 @@ DocumentText::DocumentText(const std::string& buffer)
     gtksourceview::init();
 #endif
     init(buffer);
+
+    add(mView);
+
+    applyEditingProperties();
 }
 
 void DocumentText::save()
@@ -195,10 +203,6 @@ void DocumentText::init(const std::string& buffer)
 #ifdef VLE_HAVE_GTKSOURCEVIEWMM
     mView.set_source_buffer(buffer_);
 #endif
-
-    applyEditingProperties();
-
-    add(mView);
 }
 
 std::string DocumentText::guessIdLanguage()
