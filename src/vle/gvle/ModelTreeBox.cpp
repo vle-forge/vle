@@ -233,7 +233,7 @@ bool ModelTreeBox::onQueryTooltip(int wx,int wy, bool keyboard_tooltip,
     if (get_tooltip_context_iter(wx, wy, keyboard_tooltip, iter)) {
         graph::Model* mModel = (*iter).get_value(m_columns.mModel);
         card = m_modeling->getIdCard(mModel);
-        tooltip->set_text(card);
+        tooltip->set_markup(card);
         set_tooltip_row(tooltip, Gtk::TreePath(iter));
         return true;
     } else {

@@ -969,13 +969,12 @@ void ViewDrawingArea::exportSvg(const std::string& filename)
 bool ViewDrawingArea::onQueryTooltip(int wx,int wy, bool keyboard_tooltip,
                                      const Glib::RefPtr<Gtk::Tooltip>& tooltip)
 {
-
     graph::Model* model = mCurrent->find(wx/mZoom, wy/mZoom);
     Glib::ustring card;
 
     if (mHighlightLine != -1) {
         card = getConnectionInfo(mHighlightLine);
-        tooltip->set_text(card);
+        tooltip->set_markup(card);
         return true;
     } else if (model) {
         if (mView->isClassView()) {
@@ -983,8 +982,7 @@ bool ViewDrawingArea::onQueryTooltip(int wx,int wy, bool keyboard_tooltip,
         } else {
             card = mModeling->getIdCard(model);
         }
-
-        tooltip->set_text(card);
+        tooltip->set_markup(card);
         return true;
     } else {
         return false;

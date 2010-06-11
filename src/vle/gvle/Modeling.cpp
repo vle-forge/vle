@@ -913,9 +913,9 @@ std::string Modeling::getDynamicInfo(std::string dynamicName) const
 
     const vpz::Dynamic& dyn = dynamics().get(dynamicName);
 
-    cardp += "\nProject: " + dyn.package();
-    cardp += "\nLibrary: " + dyn.library();
-    cardp += "\nClass: " + dyn.model();
+    cardp += "\n<b>Project: </b>" + dyn.package();
+    cardp += "\n<b>Library: </b>" + dyn.library();
+    cardp += "\n<b>Class: </b>" + dyn.model();
 
     return cardp;
 }
@@ -923,26 +923,25 @@ std::string Modeling::getDynamicInfo(std::string dynamicName) const
 std::string Modeling::getIdCard(std::string className) const
 {
     const vpz::Class& mclasses = vpz().project().classes().get(className);
-    std::string nclas = "Class: "+ mclasses.name();
+    std::string nclas = "<b>Class: </b>"+ mclasses.name();
     return nclas;
 }
 
 std::string Modeling::getIdCard(graph::Model* model) const
 {
-
     if (model->isCoupled()) {
         graph::CoupledModel* m = (graph::CoupledModel*)(model);
         return getIdCard(m);
     } else if (model->isAtomic()) {
-        Glib::ustring card = "Model : "+ model->getName() + " (Atomic)";
+        Glib::ustring card = "<b>Model : </b>"+
+            model->getName() + " <i>(Atomic)</i>";
 
         const vpz::Model& mmodel = vpz().project().model();
         const vpz::AtomicModel& atm = mmodel.atomicModels().get(model);
         const std::string nom_dyn = atm.dynamics();
 
-        card += "\nDynamic : " + nom_dyn;
-
         if (!nom_dyn.empty()) {
+			card += "\n<b>Dynamic : </b>" + nom_dyn;
             card += getDynamicInfo(nom_dyn);
         }
         return card;
@@ -952,7 +951,7 @@ std::string Modeling::getIdCard(graph::Model* model) const
 
 std::string Modeling::getIdCard(graph::CoupledModel* model) const
 {
-    return ("Model: " + model->getName() + " (Coupled)");
+    return ("<b>Model: </b>" + model->getName() + " <i>(Coupled)</i>");
 }
 
 std::string Modeling::getClassIdCard(graph::Model* model,
@@ -962,15 +961,15 @@ std::string Modeling::getClassIdCard(graph::Model* model,
         graph::CoupledModel* m = (graph::CoupledModel*)(model);
         return getClassIdCard(m);
     } else if (model->isAtomic()) {
-        Glib::ustring card = "Model : " + model->getName() + " (Atomic)";
+        Glib::ustring card = "<b>Model : </b>" +
+			model->getName() + " <i>(Atomic)</i>";
 
         const vpz::Class& classes = vpz().project().classes().get(className);
         const vpz::AtomicModel& atm = classes.atomicModels().get(model);
         const std::string nom_dyn = atm.dynamics();
 
-        card += "\nDynamic : " + nom_dyn;
-
         if (!nom_dyn.empty()) {
+			card += "\n<b>Dynamic : </b>" + nom_dyn;
             card += getDynamicInfo(nom_dyn);
         }
         return card;
@@ -980,7 +979,7 @@ std::string Modeling::getClassIdCard(graph::Model* model,
 
 std::string Modeling::getClassIdCard(graph::CoupledModel* model) const
 {
-    return ("Model: " + model->getName() + " (Coupled)");
+    return ("<b>Model: </b>" + model->getName() + " <i>(Coupled)</i>");
 }
 
 
@@ -1004,10 +1003,10 @@ std::string Modeling::getIdCardConnection(graph::Model* src,
                         if (card.compare("") != 0) {
                             card += "\n";
                         }
-                        card += it->second->getName() +
-                            ":" + jt->first +
-                            " -> " + kt->first->getName() +
-                            ":" + kt->second;
+                        card += "<b>" + it->second->getName() + "</b>" +
+                            + ":" + "<i>" + jt->first + "</i>" +
+                            + " -> " + "<b>" + kt->first->getName() + "</b>" +
+                            + ":" + "<i>" + kt->second + "</i>";
                     }
                 }
             }
@@ -1022,8 +1021,9 @@ std::string Modeling::getIdCardConnection(graph::Model* src,
                                           std::string destport,
                                           graph::CoupledModel* mTop) const
 {
-    return (src->getName() + ":" + srcport + " -> " + dest->getName() +
-            ":" + destport);
+    return ("<b>" + src->getName() + "</b>" + ":" + "<i>" + srcport + "</i>"
+            +  " -> " + "<b>" +dest->getName() + "</b>" + ":" + "<i>" +
+            destport + "</i>");
 }
 
 }

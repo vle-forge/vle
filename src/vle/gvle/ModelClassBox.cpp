@@ -470,7 +470,7 @@ bool ModelClassBox::onQueryTooltip(int wx,int wy, bool keyboard_tooltip,
             card = mModeling->getClassIdCard(row.get_value(mColumns.mModel),
                                              getClassName(path));
         }
-        tooltip->set_text(card);
+        tooltip->set_markup(card);
         set_tooltip_row(tooltip, Gtk::TreePath(iter));
         return true;
     }
