@@ -228,7 +228,7 @@ BOOST_AUTO_TEST_CASE(test_complex_displace)
     BOOST_REQUIRE_EQUAL(top->getModelList().size(),
                         (ModelList::size_type)2);
     BOOST_REQUIRE_EQUAL(newtop->getModelList().size(),
-			(ModelList::size_type)2);
+                        (ModelList::size_type)2);
 
     newtop->existInternalConnection("a", "out", "b", "in");
     newtop->existInternalConnection("b", "out", "a", "in");
@@ -340,8 +340,10 @@ BOOST_AUTO_TEST_CASE(test_del_port)
 BOOST_AUTO_TEST_CASE(test_clone1)
 {
     CoupledModel* top = new CoupledModel("top", 0);
+    top->addInputPort("in");
+    top->addOutputPort("out");
 
-    AtomicModel* a(top->addAtomicModel("a"));
+    AtomicModel* a(top->addAtomicModel("top"));
     a->addInputPort("in");
     a->addOutputPort("out");
 
@@ -349,28 +351,36 @@ BOOST_AUTO_TEST_CASE(test_clone1)
     b->addInputPort("in");
     b->addOutputPort("out");
 
-    top->addInternalConnection("a", "out", "b", "in");
-    top->addInternalConnection("b", "out", "a", "in");
+    top->addInputConnection("in", "top", "in");
+    top->addInternalConnection("top", "out", "b", "in");
+    top->addInternalConnection("b", "out", "top", "in");
+    top->addOutputConnection("top", "out", "out");
 
-    BOOST_REQUIRE(top->existInternalConnection("a", "out", "b", "in"));
-    BOOST_REQUIRE(top->existInternalConnection("b", "out", "a", "in"));
+    BOOST_REQUIRE(top->existInternalConnection("top", "out", "b", "in"));
+    BOOST_REQUIRE(top->existInternalConnection("b", "out", "top", "in"));
 
     CoupledModel* newtop(dynamic_cast < CoupledModel* >(top->clone()));
     BOOST_REQUIRE(newtop != 0);
     BOOST_REQUIRE(newtop->getModelList().size() == 2);
 
-    AtomicModel* newa = dynamic_cast < AtomicModel* >(newtop->findModel("a"));
+    AtomicModel* newa = dynamic_cast < AtomicModel* >(newtop->findModel("top"));
     BOOST_REQUIRE(newa != a);
     AtomicModel* newb = dynamic_cast < AtomicModel* >(newtop->findModel("b"));
     BOOST_REQUIRE(newb != b);
 
-    BOOST_REQUIRE(newtop->existInternalConnection("a", "out", "b", "in"));
-    BOOST_REQUIRE(newtop->existInternalConnection("b", "out", "a", "in"));
+    BOOST_REQUIRE(newtop->existInternalConnection("top", "out", "b", "in"));
+    BOOST_REQUIRE(newtop->existInternalConnection("b", "out", "top", "in"));
+    BOOST_REQUIRE(newtop->existInputConnection("in", "top", "in"));
+    BOOST_REQUIRE(newtop->existOutputConnection("top", "out", "out"));
     newtop->delAllConnection();
-    BOOST_REQUIRE(not newtop->existInternalConnection("a", "out", "b", "in"));
-    BOOST_REQUIRE(not newtop->existInternalConnection("b", "out", "a", "in"));
-    BOOST_REQUIRE(top->existInternalConnection("a", "out", "b", "in"));
-    BOOST_REQUIRE(top->existInternalConnection("b", "out", "a", "in"));
+    BOOST_REQUIRE(not newtop->existOutputConnection("top", "out", "out"));
+    BOOST_REQUIRE(not newtop->existInternalConnection("top", "out", "b", "in"));
+    BOOST_REQUIRE(not newtop->existInternalConnection("top", "out", "b", "in"));
+    BOOST_REQUIRE(not newtop->existInternalConnection("b", "out", "top", "in"));
+    BOOST_REQUIRE(top->existInternalConnection("top", "out", "b", "in"));
+    BOOST_REQUIRE(top->existInternalConnection("b", "out", "top", "in"));
+    BOOST_REQUIRE(top->existInputConnection("in", "top", "in"));
+    BOOST_REQUIRE(top->existOutputConnection("top", "out", "out"));
 
     delete newtop;
     delete top;
@@ -493,7 +503,7 @@ BOOST_AUTO_TEST_CASE(test_rename_port)
                                                      "in"), false);
     BOOST_REQUIRE_EQUAL(d->existInputPort("new_in"), true);
     BOOST_REQUIRE_EQUAL(top->existInternalConnection("top1", "out", "d",
-						     "new_in"), true);
+                                                     "new_in"), true);
 
     //Atomic Model -- Output Port
     d->renameOutputPort("out", "new_out");
@@ -538,14 +548,14 @@ BOOST_AUTO_TEST_CASE(test_rename_port)
     BOOST_REQUIRE_EQUAL(top->existInternalConnection("top1", "out", "e",
                                                      "in2"), false);
     BOOST_REQUIRE_EQUAL(top1->existOutputConnection("x", "out", "out"),
-			false);
+                        false);
     BOOST_REQUIRE_EQUAL(top1->existOutputPort("new_out"), true);
     BOOST_REQUIRE_EQUAL(top->existInternalConnection("top1", "new_out", "e",
                                                      "in1"), true);
     BOOST_REQUIRE_EQUAL(top->existInternalConnection("top1", "new_out", "e",
                                                      "in2"), true);
     BOOST_REQUIRE_EQUAL(top1->existOutputConnection("x", "out", "new_out"),
-			true);
+                        true);
     BOOST_REQUIRE_EQUAL(top1->nbOutputConnection("x", "out", "new_out"), 1);
 }
 
@@ -609,7 +619,7 @@ BOOST_AUTO_TEST_CASE(test_bug_duplication_connections)
 
     top->addInternalConnection("atom1", "out", "atom2", "in");
     BOOST_REQUIRE_EQUAL(top->existInternalConnection("atom1", "out", "atom2", "in"),
-						     true);
+                                                     true);
 
     mSelectedModels[atom1->getName()] = atom1;
     mSelectedModels[atom2->getName()] = atom2;
