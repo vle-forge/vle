@@ -70,8 +70,10 @@ CoupledModel::CoupledModel(const CoupledModel& mdl) :
     while (it != mdl.getModelList().end()) {
         const Model* src = it->second;
         Model* dst = jt->second;
-        copyConnection(src->getInputPortList(), dst->getInputPortList());
-        copyConnection(src->getOutputPortList(), dst->getOutputPortList());
+        copyInternalConnection(src->getInputPortList(),
+                               dst->getInputPortList(), mdl, *this);
+        copyInternalConnection(src->getOutputPortList(),
+                               dst->getOutputPortList(), mdl, *this);
         ++it;
         ++jt;
     }
@@ -978,12 +980,45 @@ const ModelPortList& CoupledModel::getInternalOutPort(
     return it->second;
 }
 
+void CoupledModel::copyInternalConnection(const ConnectionList& src,
+                                          ConnectionList& dst,
+                                          const Model& parentSrc,
+                                          Model& parentDst)
+{
+    assert(src.size() == dst.size());
+
+    ConnectionList::const_iterator it = src.begin();
+    ConnectionList::iterator jt = dst.begin();
+
+    while (it != src.end()) {
+        copyInternalPort(it->second, jt->second, parentSrc, parentDst);
+        ++it;
+        ++jt;
+    }
+}
+
+void CoupledModel::copyInternalPort(const ModelPortList& src,
+                                    ModelPortList& dst,
+                                    const Model& parentSrc,
+                                    Model& parentDst)
+{
+    typedef ModelPortList::const_iterator const_iterator;
+
+    for (const_iterator it = src.begin(); it != src.end(); ++it) {
+        if (it->first == &parentSrc) {
+            dst.add(&parentDst, it->second);
+        } else {
+            Model* dstmodel = findModel(it->first->getName());
+            assert(dstmodel);
+            dst.add(dstmodel, it->second);
+        }
+    }
+}
+
 void CoupledModel::copyConnection(const ConnectionList& src,
                                   ConnectionList& dst)
 {
-    if (src.size() != dst.size()) {
-        throw utils::DevsGraphError("Cannot copy connection");
-    }
+    assert(src.size() == dst.size());
 
     ConnectionList::const_iterator it = src.begin();
     ConnectionList::iterator jt = dst.begin();
@@ -997,22 +1032,11 @@ void CoupledModel::copyConnection(const ConnectionList& src,
 
 void CoupledModel::copyPort(const ModelPortList& src, ModelPortList& dst)
 {
-    for (ModelPortList::const_iterator it = src.begin();
-         it != src.end(); ++it) {
-        const std::string& srcmodelname(it->first->getName());
+    typedef ModelPortList::const_iterator const_iterator;
 
-        Model* dstmodel(findModel(srcmodelname));
-
-        if (dstmodel == 0) {
-            dstmodel = this;
-        }
-
-        if (not dstmodel) {
-            throw utils::DevsGraphError(fmt(
-                    _("Destination model %1% not found in copy port")) %
-                srcmodelname);
-        }
-
+    for (const_iterator it = src.begin(); it != src.end(); ++it) {
+        Model* dstmodel = findModel(it->first->getName());
+        assert(dstmodel);
         dst.add(dstmodel, it->second);
     }
 }

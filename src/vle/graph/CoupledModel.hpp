@@ -603,8 +603,7 @@ namespace vle { namespace graph {
                            Model* dst, const std::string& portDst);
 
         /**
-         * @brief Copy the connections list from the ConnectionList src to the
-         * dst.
+         * @brief Copy input and output connections list from src to dst. dst.
          * @param src The source of the copy.
          * @param dst The destination of the copy.
          */
@@ -617,6 +616,29 @@ namespace vle { namespace graph {
          * @param dst The destination of the copy.
          */
         void copyPort(const ModelPortList& src, ModelPortList& dst);
+
+        /**
+         * @brief Copy internal connections list from src to dst.
+         * @param src The source of the copy.
+         * @param dst The destination of the copy.
+         * @param parentSrc Parent of src's ConnectionList.
+         * @param parentDst Parent of dst's ConnectionList.
+         */
+        void copyInternalConnection(const ConnectionList& src,
+                                    ConnectionList& dst,
+                                    const Model& parentSrc,
+                                    Model& parentDst);
+
+        /**
+         * @brief Copy the connection from ModelPortList src to the
+         * ModelPortList dst.
+         * @param src The source of the copy.
+         * @param dst The destination of the copy.
+         * @param parentSrc Parent of src's ModelPortList.
+         * @param parentDst Parent of dst's ModelPortList.
+         */
+        void copyInternalPort(const ModelPortList& src, ModelPortList& dst,
+                              const Model& parentSrc, Model& parentDst);
 
         ModelList       m_modelList;
         ConnectionList  m_internalInputList;
