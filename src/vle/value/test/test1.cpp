@@ -223,16 +223,16 @@ BOOST_AUTO_TEST_CASE(check_null)
 BOOST_AUTO_TEST_CASE(check_matrix)
 {
     value::Matrix* mx = value::Matrix::create(100, 100, 10, 10);
-    BOOST_REQUIRE_EQUAL(mx->rows(), (value::Matrix::size_type)0);
-    BOOST_REQUIRE_EQUAL(mx->columns(), (value::Matrix::size_type)0);
+    BOOST_REQUIRE_EQUAL(mx->rows(), (value::Matrix::size_type)100);
+    BOOST_REQUIRE_EQUAL(mx->columns(), (value::Matrix::size_type)100);
 
     mx->addColumn();
-    BOOST_REQUIRE_EQUAL(mx->rows(), (value::Matrix::size_type)0);
-    BOOST_REQUIRE_EQUAL(mx->columns(), (value::Matrix::size_type)1);
+    BOOST_REQUIRE_EQUAL(mx->rows(), (value::Matrix::size_type)100);
+    BOOST_REQUIRE_EQUAL(mx->columns(), (value::Matrix::size_type)101);
 
     mx->addRow();
-    BOOST_REQUIRE_EQUAL(mx->rows(), (value::Matrix::size_type)1);
-    BOOST_REQUIRE_EQUAL(mx->columns(), (value::Matrix::size_type)1);
+    BOOST_REQUIRE_EQUAL(mx->rows(), (value::Matrix::size_type)101);
+    BOOST_REQUIRE_EQUAL(mx->columns(), (value::Matrix::size_type)101);
 
     mx->add(0, 0, value::Integer::create(10));
     BOOST_REQUIRE_EQUAL(mx->value()[0][0]->isInteger(), true);

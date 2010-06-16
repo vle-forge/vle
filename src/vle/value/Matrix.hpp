@@ -93,7 +93,8 @@ namespace vle { namespace value {
         Matrix(index columns, index rows, index resizeColumns, index resizeRow);
 
         /**
-         * @brief Build an empty matrix of value of size [colums][row].
+         * @brief Build an empty buffered matrix of value of size
+         * [colums][rows] in a matrix of [columnmax][rowmax].
          * @param columns the initial number of columns.
          * @param rows the initial number of rows.
          * @param columnmax The max number of columns.
@@ -101,9 +102,11 @@ namespace vle { namespace value {
          * @param resizeColumns the number of columns to add when resize the
          * matrix.
          * @param resizeRow the number of rows to add when resize the matrix.
+         *
+         * @throw utils::ArgError if columns > columnmax or if rows > rowmax.
          */
-        Matrix(index columns, index rows, index columnmax, index rowmax, index
-               resizeColumns, index resizeRow);
+        Matrix(index columns, index rows, index columnmax, index rowmax,
+               index resizeColumns, index resizeRow);
 
         /**
          * @brief Build a new Matrix, all the value::Value from the
