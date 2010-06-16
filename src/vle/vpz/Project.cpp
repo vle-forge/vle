@@ -85,7 +85,7 @@ void Project::setAuthor(const std::string& name)
 void Project::setDate(const std::string& date)
 {
     if (date.empty()) {
-        m_date.assign(utils::DateTime::currentDate());
+        m_date.assign(utils::DateTime::simpleCurrentDate());
     } else {
         m_date.assign(date);
     }
