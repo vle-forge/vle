@@ -362,7 +362,7 @@ void TreeViewValue::on_menu_insert(value::Value::type type)
         std::string name;
         do {
             name = box.run();
-        } while (map->existValue(name));
+        } while (map->exist(name));
 
         switch (type) {
             using namespace value;
@@ -379,35 +379,36 @@ void TreeViewValue::on_menu_insert(value::Value::type type)
                         map->addString(name, "");
             break;
         case(Value::SET):
-                        map->addClone(name, Set::create());
+                        map->addSet(name);
             break;
         case(Value::MAP):
-                        map->addClone(name, Map::create());
+                        map->addMap(name);
             break;
         case(Value::TUPLE):
-                        map->addClone(name, Tuple::create());
+                        map->addTuple(name);
             break;
         case(Value::TABLE): {
             SimpleTypeBox box(_("width ?"), "1");
             int w = utils::toInt(box.run());
             SimpleTypeBox box2(_("Height ?"), "1");
             int h = utils::toInt(box2.run());
-            map->addClone(name, Table::create(w, h));
+            map->add(name, Table::create(w, h));
         }
         break;
         case(Value::XMLTYPE):
         map->addXml(name, "");
             break;
         case(Value::NIL):
-            map->addClone(name, Null::create());
+            map->add(name, Null::create());
             break;
         case(Value::MATRIX): {
             SimpleTypeBox box(_("columns ?"), "1");
             int cols = utils::toInt(box.run());
             SimpleTypeBox box2(_("rows ?"), "1");
             int rows = utils::toInt(box2.run());
-            Matrix* matrix = Matrix::create(cols, rows, cols*2, rows*2, cols/5, rows/5);
-            map->addClone(name, matrix);
+            Matrix* matrix = Matrix::create(cols, rows, cols*2, rows*2, cols/5,
+                                            rows/5);
+            map->add(name, matrix);
         }
         break;
         }

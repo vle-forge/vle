@@ -221,7 +221,7 @@ oov::PluginPtr NetStreamWriter::getPlugin() const
         value::Set vals;
         value::Set::deserializeBinaryBuffer(vals, result);
 
-        const std::string& name(vals.get(0).toString().value());
+        const std::string& name(vals.getString(0));
 
         utils::PathList lst(utils::Path::path().getStreamDirs());
         utils::PathList::const_iterator it;
@@ -240,7 +240,7 @@ oov::PluginPtr NetStreamWriter::getPlugin() const
         if (not plugin.get()) {
             throw utils::ArgError(error);
         } else {
-            plugin->deserialize(vals.get(1));
+            plugin->deserialize(*vals.get(1));
             return plugin;
         }
     }
@@ -262,11 +262,11 @@ void NetStreamWriter::buildParameters(const std::string& plugin,
         m_paramFrame->add(parameters);
         m_paramFrame->addDouble(time);
     } else {
-        m_paramFrame->get(1).toString().value() = plugin;
-        m_paramFrame->get(2).toString().value() = directory;
-        m_paramFrame->get(3).toString().value() = file;
+        m_paramFrame->getString(1) = plugin;
+        m_paramFrame->getString(2) = directory;
+        m_paramFrame->getString(3) = file;
         m_valueFrame->value()[4] = parameters;
-        m_paramFrame->get(5).toDouble().value() = time;
+        m_paramFrame->getDouble(5) = time;
     }
 }
 
@@ -285,11 +285,11 @@ void NetStreamWriter::buildNewObs(const std::string& simulator,
         m_newObsFrame->addString(view);
         m_newObsFrame->addDouble(time);
     } else {
-        m_newObsFrame->get(1).toString().value() = simulator;
-        m_newObsFrame->get(2).toString().value() = parents;
-        m_newObsFrame->get(3).toString().value() = port;
-        m_newObsFrame->get(4).toString().value() = view;
-        m_newObsFrame->get(5).toDouble().value() = time;
+        m_newObsFrame->getString(1) = simulator;
+        m_newObsFrame->getString(2) = parents;
+        m_newObsFrame->getString(3) = port;
+        m_newObsFrame->getString(4) = view;
+        m_newObsFrame->getDouble(5) = time;
     }
 }
 
@@ -308,11 +308,11 @@ void NetStreamWriter::buildDelObs(const std::string& simulator,
         m_delObsFrame->addString(view);
         m_delObsFrame->addDouble(time);
     } else {
-        m_delObsFrame->get(1).toString().value() = simulator;
-        m_delObsFrame->get(2).toString().value() = parents;
-        m_delObsFrame->get(3).toString().value() = port;
-        m_delObsFrame->get(4).toString().value() = view;
-        m_delObsFrame->get(5).toDouble().value() = time;
+        m_delObsFrame->getString(1) = simulator;
+        m_delObsFrame->getString(2) = parents;
+        m_delObsFrame->getString(3) = port;
+        m_delObsFrame->getString(4) = view;
+        m_delObsFrame->getDouble(5) = time;
     }
 }
 
@@ -333,12 +333,12 @@ void NetStreamWriter::buildValue(const std::string& simulator,
         m_valueFrame->addDouble(time);
         m_valueFrame->add(value);
     } else {
-        m_valueFrame->get(1).toString().value() = simulator;
-        m_valueFrame->get(2).toString().value() = parents;
-        m_valueFrame->get(3).toString().value() = port;
-        m_valueFrame->get(4).toString().value() = view;
-        m_valueFrame->get(5).toDouble().value() = time;
-        m_valueFrame->value()[6] = value;
+        m_valueFrame->getString(1) = simulator;
+        m_valueFrame->getString(2) = parents;
+        m_valueFrame->getString(3) = port;
+        m_valueFrame->getString(4) = view;
+        m_valueFrame->getDouble(5) = time;
+        m_valueFrame->set(6, value);
     }
 }
 
@@ -349,7 +349,7 @@ void NetStreamWriter::buildClose(const double& time)
         m_closeFrame->addInt(4);
         m_closeFrame->addDouble(time);
     } else {
-        m_closeFrame->get(1).toDouble().value() = time;
+        m_closeFrame->getDouble(1) = time;
     }
 }
 

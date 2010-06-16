@@ -59,7 +59,8 @@ BOOST_GLOBAL_FIXTURE(F)
 
 using namespace vle;
 
-BOOST_AUTO_TEST_CASE(common_seed_test){
+BOOST_AUTO_TEST_CASE(common_seed_test)
+{
     using namespace manager;
 
     vpz::Vpz file(utils::Path::path().getExampleFile("petrinet-meteo.vpz"));

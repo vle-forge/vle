@@ -34,6 +34,7 @@
 #include <vle/value/Integer.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Boolean.hpp>
+#include <vle/value/Matrix.hpp>
 #include <vle/value/XML.hpp>
 #include <vle/value/Deleter.hpp>
 #include <vle/utils/Debug.hpp>
@@ -42,24 +43,23 @@
 
 namespace vle { namespace value {
 
-Map::Map(const Map& orig) :
-    Value(orig)
+Map::Map(const Map& orig)
+    : Value(orig)
 {
-    for (MapValue::const_iterator it = orig.m_value.begin();
-         it != orig.m_value.end(); ++it) {
-        m_value[(*it).first] = ((*it).second)->clone();
+    for (const_iterator it = orig.m_value.begin(); it != orig.m_value.end();
+         ++it) {
+        if ((*it).second) {
+            m_value.insert(std::make_pair((*it).first,
+                                          ((*it).second)->clone()));
+        } else {
+            m_value.insert(std::make_pair((*it).first, (value::Value*)0));
+        }
     }
-}
-
-Map::~Map()
-{
-    clear();
 }
 
 void Map::writeFile(std::ostream& out) const
 {
-    for (MapValue::const_iterator it = m_value.begin();
-         it != m_value.end(); ++it) {
+    for (const_iterator it = m_value.begin(); it != m_value.end(); ++it) {
         if (it != m_value.begin()) {
             out << " ";
         }
@@ -71,8 +71,7 @@ void Map::writeFile(std::ostream& out) const
 
 void Map::writeString(std::ostream& out) const
 {
-    for (MapValue::const_iterator it = m_value.begin();
-         it != m_value.end(); ++it) {
+    for (const_iterator it = m_value.begin(); it != m_value.end(); ++it) {
         if (it != m_value.begin()) {
             out << " ";
         }
@@ -86,8 +85,7 @@ void Map::writeXml(std::ostream& out) const
 {
     out << "<map>";
 
-    for (MapValue::const_iterator it = m_value.begin();
-         it != m_value.end(); ++it) {
+    for (const_iterator it = m_value.begin(); it != m_value.end(); ++it) {
         out << "<key name=\"" << (*it).first.c_str() << "\">";
         (*it).second->writeXml(out);
         out << "</key>";
@@ -95,49 +93,34 @@ void Map::writeXml(std::ostream& out) const
     out << "</map>";
 }
 
-void Map::add(const std::string& name, Value* value)
+Matrix& Map::addMatrix(const std::string& name)
 {
-    if (not value) {
-        throw utils::ArgError(_("Map: add empty value"));
-    }
+    value::Matrix* value = new Matrix();
 
-    iterator it = m_value.find(name);
-    if (it != m_value.end()) {
-        delete it->second;
-        it->second = value;
-    } else {
-        m_value[name] = value;
-    }
+    add(name, value);
+
+    return *value;
 }
 
-void Map::addClone(const std::string& name, const Value& value)
+Set& Map::addSet(const std::string& name)
 {
-    iterator it = m_value.find(name);
-    if (it != m_value.end()) {
-	delete it->second;
-        it->second = value.clone();
-    } else {
-        m_value[name] = value.clone();
-    }
+    value::Set* value = new Set();
+
+    add(name, value);
+
+    return *value;
 }
 
-void Map::addClone(const std::string& name, const Value* value)
+Map& Map::addMap(const std::string& name)
 {
-    if (not value) {
-        throw utils::ArgError(fmt(_(
-                "Map: add empty value with key '%1%'")) % name);
-    }
+    value::Map* value = new Map();
 
-    iterator it = m_value.find(name);
-    if (it != m_value.end()) {
-        delete it->second;
-        it->second = value->clone();
-    } else {
-        m_value[name] = value->clone();
-    }
+    add(name, value);
+
+    return *value;
 }
 
-const Value& Map::operator[](const std::string& name) const
+const Value* Map::operator[](const std::string& name) const
 {
     const_iterator it = m_value.find(name);
 
@@ -146,11 +129,10 @@ const Value& Map::operator[](const std::string& name) const
                 "Map: the key '%1%' does not exist")) % name);
     }
 
-    assert(it->second);
-    return *it->second;
+    return it->second;
 }
 
-Value& Map::operator[](const std::string& name)
+Value* Map::operator[](const std::string& name)
 {
     iterator it = m_value.find(name);
 
@@ -159,34 +141,7 @@ Value& Map::operator[](const std::string& name)
                 "Map: the key '%1%' does not exist")) % name);
     }
 
-    assert((*it).second);
-    return *it->second;
-}
-
-const Value& Map::get(const std::string& name) const
-{
-    const_iterator it = m_value.find(name);
-
-    if (it == m_value.end()) {
-        throw utils::ArgError(fmt(_(
-                "Map: the key '%1%' does not exist")) % name);
-    }
-
-    assert((*it).second);
-    return *(*it).second;
-}
-
-Value& Map::get(const std::string& name)
-{
-    iterator it = m_value.find(name);
-
-    if (it == m_value.end()) {
-        throw utils::ArgError(fmt(_(
-                "Map: the key '%1%' does not exist")) % name);
-    }
-
-    assert((*it).second);
-    return *(*it).second;
+    return it->second;
 }
 
 Value* Map::give(const std::string& name)
@@ -205,75 +160,34 @@ Value* Map::give(const std::string& name)
     return result;
 }
 
-const std::string& Map::getString(const std::string& name) const
-{
-    return value::toString(get(name));
-}
-
-void Map::addString(const std::string& name, const std::string& value)
-{
-    add(name, String::create(value));
-}
-
-bool Map::getBoolean(const std::string& name) const
-{
-    const Value* r = getPointer(name);
-    return value::toBoolean(r);
-}
-
-void Map::addBoolean(const std::string& name, bool value)
-{
-    add(name, Boolean::create(value));
-}
-
-long Map::getLong(const std::string& name) const
-{
-    return value::toLong(get(name));
-}
-
-void Map::addLong(const std::string& name, long value)
-{
-    add(name, Integer::create(value));
-}
-
-int Map::getInt(const std::string& name) const
-{
-    return value::toInteger(get(name));
-}
-
-void Map::addInt(const std::string& name, int value)
-{
-    add(name, Integer::create(value));
-}
-
-double Map::getDouble(const std::string& name) const
-{
-    return value::toDouble(get(name));
-}
-
-void Map::addDouble(const std::string& name, double value)
-{
-    add(name, Double::create(value));
-}
-
-const std::string& Map::getXml(const std::string& name) const
-{
-    return value::toXml(get(name));
-}
-
-void Map::addXml(const std::string& name, const std::string& value)
-{
-    add(name, Xml::create(value));
-}
-
 const Map& Map::getMap(const std::string& name) const
 {
-    return value::toMapValue(get(name));
+    return value::toMapValue(value::reference(get(name)));
 }
 
 const Set& Map::getSet(const std::string& name) const
 {
-    return value::toSetValue(get(name));
+    return value::toSetValue(value::reference(get(name)));
+}
+
+const Matrix& Map::getMatrix(const std::string& name) const
+{
+    return value::toMatrixValue(value::reference(get(name)));
+}
+
+Map& Map::getMap(const std::string& name)
+{
+    return value::toMapValue(value::reference(get(name)));
+}
+
+Set& Map::getSet(const std::string& name)
+{
+    return value::toSetValue(value::reference(get(name)));
+}
+
+Matrix& Map::getMatrix(const std::string& name)
+{
+    return value::toMatrixValue(value::reference(get(name)));
 }
 
 void Map::clear()
@@ -286,13 +200,13 @@ void Map::clear()
                 composite.push(it->second);
             } else {
                 delete it->second;
-                it->second = 0;
             }
+            it->second = 0;
         }
     }
 
-    deleter(composite);
     m_value.clear();
+    deleter(composite);
 }
 
 Value* Map::getPointer(const std::string& name)

@@ -197,7 +197,7 @@ BOOST_AUTO_TEST_CASE(value_set)
     v = value::toSetValue(vpz::Vpz::parseValue(t2));
     BOOST_CHECK(value::toInteger(v->get(0)) == 1);
     {
-        value::Set& v2 = value::toSetValue(v->get(1));
+        value::Set& v2 = value::toSetValue(*v->get(1));
         BOOST_CHECK(value::toString(v2.get(0)) == "test");
     }
     std::string t3(v->writeToXml());
@@ -206,7 +206,7 @@ BOOST_AUTO_TEST_CASE(value_set)
     v = value::toSetValue(vpz::Vpz::parseValue(t3));
     BOOST_CHECK(value::toInteger(v->get(0)) == 1);
     {
-        value::Set& v2 = value::toSetValue(v->get(1));
+        value::Set& v2 = value::toSetValue(*v->get(1));
         BOOST_CHECK(value::toString(v2.get(0)) == "test");
     }
     delete v;
@@ -240,7 +240,7 @@ BOOST_AUTO_TEST_CASE(value_map)
     v = value::toMapValue(vpz::Vpz::parseValue(t2));
     std::string t3(v->writeToXml());
     {
-        value::Set& s = value::toSetValue(v->get("a"));
+        value::Set& s = v->getSet("a");
         BOOST_CHECK(value::toInteger(s.get(0)) == 1);
         BOOST_CHECK(value::toString(s.get(1)) == "test");
     }
@@ -248,7 +248,7 @@ BOOST_AUTO_TEST_CASE(value_map)
 
     v = value::toMapValue(vpz::Vpz::parseValue(t3));
     {
-        value::Set& s = value::toSetValue(v->get("a"));
+        value::Set& s = v->getSet("a");
         BOOST_CHECK(value::toInteger(s.get(0)) == 1);
         BOOST_CHECK(value::toString(s.get(1)) == "test");
     }
@@ -279,7 +279,7 @@ BOOST_AUTO_TEST_CASE(value_tuple)
     value::Map* m;
     m = value::toMapValue(vpz::Vpz::parseValue(t2));
 
-    value::Value& t = m->get("testtest");
+    value::Value& t = value::reference(m->get("testtest"));
     value::Tuple& v2(toTupleValue(t));
     BOOST_CHECK_CLOSE(v2.operator[](0), 100.0, 0.1);
     BOOST_CHECK_CLOSE(v2.operator[](1), 200.0, 0.1);

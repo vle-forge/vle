@@ -56,11 +56,11 @@ ExperimentGenerator* ManagerRun::getCombinationPlan(const vpz::Vpz& file,
     const vpz::Experiment& exp = file.project().experiment();
 
     if (exp.combination() == "linear") {
-        return new LinearExperimentGenerator(file, out,
-                                             m_storecomb, m_commonseed, m_rand);
+        return new LinearExperimentGenerator(file, out, m_storecomb,
+                                             m_commonseed, m_rand);
     } else {
-        return new TotalExperimentGenerator(file, out,
-                                            m_storecomb, m_commonseed, m_rand);
+        return new TotalExperimentGenerator(file, out, m_storecomb,
+                                            m_commonseed, m_rand);
     }
 }
 
@@ -274,11 +274,11 @@ void ManagerRunDistant::operator()(const vpz::Vpz& file)
 
     m_exp = getCombinationPlan(file, m_out);
 
-    Glib::Thread* prod(Glib::Thread::create(sigc::mem_fun(*this,
-                                                          &ManagerRunDistant::read), true));
+    Glib::Thread* prod(Glib::Thread::create(
+            sigc::mem_fun(*this, &ManagerRunDistant::read), true));
 
-    Glib::Thread* cond(Glib::Thread::create(sigc::mem_fun(*this,
-                                                          &ManagerRunDistant::send), true));
+    Glib::Thread* cond(Glib::Thread::create(
+            sigc::mem_fun(*this, &ManagerRunDistant::send), true));
 
     prod->join();
     cond->join();
@@ -443,7 +443,10 @@ void ManagerRunDistant::getResult(utils::net::Client& cl)
                 std::string view = value::toString(vals->get(0));
 
                 oov::OutputMatrix m;
-                m.deserialize(vals->get(1));
+
+                if (vals->get(1)) {
+                    m.deserialize(*vals->get(1));
+                }
 
                 {
                     Glib::Mutex::Lock lock(m_mutex);

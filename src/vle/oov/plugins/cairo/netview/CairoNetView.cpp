@@ -66,14 +66,14 @@ void CairoNetView::onParameter(const std::string& /* plugin */,
 
         value::Map* init = dynamic_cast < value::Map* >(parameters);
 
-        const value::Map& dimensions = toMapValue(init->get("dimensions"));
+        const value::Map& dimensions = init->getMap("dimensions");
 
         mMaxX = toDouble(dimensions.get("x"));
         mMaxY = toDouble(dimensions.get("y"));
 
         mExecutiveName = toString(init->get("executiveName"));
 
-        const value::Map& nodes = toMapValue(init->get("nodes"));
+        const value::Map& nodes = init->getMap("nodes");
 
         std::string matrix = toString(init->get("adjacency_matrix"));
 
@@ -83,7 +83,7 @@ void CairoNetView::onParameter(const std::string& /* plugin */,
             node_names = toString(nodes.get("names"));
         } else {
             node_names = toString(nodes.get("prefix"));
-            if (nodes.existValue("depth"))
+            if (nodes.exist("depth"))
                 m_degree= toInteger(nodes.get("depth"));
         }
         // create the graph
@@ -91,7 +91,7 @@ void CairoNetView::onParameter(const std::string& /* plugin */,
 
 
         // set the positions
-        const value::Map& positions = toMapValue(init->get("positions"));
+        const value::Map& positions = init->getMap("positions");
         if (toString(positions.get("type")) == "set") {
             mGraph->set_positions(toString(positions.get("values")));
         } else {
@@ -102,20 +102,19 @@ void CairoNetView::onParameter(const std::string& /* plugin */,
 
         mGraph->scale_positions(mWindowWidth / mMaxX, mWindowHeight / mMaxY);
 
-        const value::Map& states = toMapValue(init->get("states"));
+        const value::Map& states = init->getMap("states");
 
-        if (states.existValue("name")) {
+        if (states.exist("name")) {
             mStateName = toString(states.get("name"));
         }
 
         std::string type = toString(states.get("type"));
-        const value::Set& values = toSetValue(states.get("values"));
+        const value::Set& values = states.getSet("values");
 
         mColors.build_color_list(type, values);
 
-        if (init->existValue("display_names")) {
-            const value::Map& display_names =
-                toMapValue(init->get("display_names"));
+        if (init->exist("display_names")) {
+            const value::Map& display_names = init->getMap("display_names");
             if (toString(display_names.get("activate")) == "yes") {
                 m_display_node_names = true;
             }
@@ -160,7 +159,7 @@ void CairoNetView::onValue(const std::string& simulator,
     typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
     if (simulator == mExecutiveName) {
         value::Set set(value::toSetValue(*value));
-        mValues[simulator] = set.get(0).writeToString();
+        mValues[simulator] = set.get(0)->writeToString();
         mReceiveCell++;
 
         if (set.getString(1) == "add") {

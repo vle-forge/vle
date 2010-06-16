@@ -407,32 +407,32 @@ void CairoCaView::init(vpz::Output& output)
     if (init and init->isMap()) {
 	const value::Map* map = value::toMapValue(init);
 
-	if (map->existValue("size")) {
+	if (map->exist("size")) {
 	    const value::Map& sizeMap = map->getMap("size");
-	    if (sizeMap.existValue("x"))
+	    if (sizeMap.exist("x"))
 		m_spinSizeX->set_value(sizeMap.getInt("x"));
-	    if (sizeMap.existValue("y"))
+	    if (sizeMap.exist("y"))
 		m_spinSizeY->set_value(sizeMap.getInt("y"));
 	}
 
-	if (map->existValue("geometry")) {
+	if (map->exist("geometry")) {
 	    const value::Map& geoMap = map->getMap("geometry");
-	    if (geoMap.existValue("type"))
+	    if (geoMap.exist("type"))
 		m_comboGeometryType->set_active_text(geoMap.getString("type"));
 	}
 
-	if (map->existValue("cellName")) {
+	if (map->exist("cellName")) {
 	    m_entryCellName->set_text(map->getString("cellName"));
 	}
 
-	if (map->existValue("states")) {
+	if (map->exist("states")) {
 	    const value::Map& statesMap = map->getMap("states");
 
-	    if (statesMap.existValue("name"))
+	    if (statesMap.exist("name"))
 		m_entryStateName->set_text(statesMap.getString("name"));
-	    if (statesMap.existValue("type"))
+	    if (statesMap.exist("type"))
 		m_comboStateType->set_active_text(statesMap.getString("type"));
-	    if (statesMap.existValue("values")) {
+	    if (statesMap.exist("values")) {
 		const value::Set& valuesSet = statesMap.getSet("values");
 
 		for (value::Set::const_iterator it = valuesSet.begin();
@@ -445,9 +445,9 @@ void CairoCaView::init(vpz::Output& output)
 		    {
 			int rf, gf, bf, rt, gt, bt;
 
-			if (valueMap->existValue("red_true")
-			    and valueMap->existValue("green_true")
-			    and valueMap->existValue("blue_true"))
+			if (valueMap->exist("red_true")
+			    and valueMap->exist("green_true")
+			    and valueMap->exist("blue_true"))
 			{
 			    rt = valueMap->getInt("red_true");
 			    gt = valueMap->getInt("green_true");
@@ -459,9 +459,9 @@ void CairoCaView::init(vpz::Output& output)
 			    gt = color.get_green();
 			    bt = color.get_blue();
 			}
-			if (valueMap->existValue("red_false")
-			    and valueMap->existValue("green_false")
-			    and valueMap->existValue("blue_false"))
+			if (valueMap->exist("red_false")
+			    and valueMap->exist("green_false")
+			    and valueMap->exist("blue_false"))
 			{
 			    rf = valueMap->getInt("red_false");
 			    gf = valueMap->getInt("green_false");
@@ -490,9 +490,9 @@ void CairoCaView::init(vpz::Output& output)
 			int r, g, b;
 			double value;
 
-			if (valueMap->existValue("red")
-			    and valueMap->existValue("green")
-			    and valueMap->existValue("blue"))
+			if (valueMap->exist("red")
+			    and valueMap->exist("green")
+			    and valueMap->exist("blue"))
 			{
 			    r = valueMap->getInt("red");
 			    g = valueMap->getInt("green");
@@ -504,7 +504,7 @@ void CairoCaView::init(vpz::Output& output)
 			    g = color.get_green();
 			    b = color.get_blue();
 			}
-			if (valueMap->existValue("value"))
+			if (valueMap->exist("value"))
 			    value = valueMap->getDouble("value");
 			else
 			    value = 1.0;
@@ -522,23 +522,23 @@ void CairoCaView::init(vpz::Output& output)
 		    {
 			double min, max, coef;
 			std::string color, type;
-			if (valueMap->existValue("min"))
+			if (valueMap->exist("min"))
 			    min = valueMap->getDouble("min");
 			else
 			    min = 0.0;
-			if (valueMap->existValue("max"))
+			if (valueMap->exist("max"))
 			    max = valueMap->getDouble("max");
 			else
 			    max = 10.0;
-			if (valueMap->existValue("coef"))
+			if (valueMap->exist("coef"))
 			    coef = valueMap->getDouble("coef");
 			else
 			    coef = 1.0;
-			if (valueMap->existValue("color"))
+			if (valueMap->exist("color"))
 			    color = valueMap->getString("color");
 			else
 			    color = "red";
-			if (valueMap->existValue("type"))
+			if (valueMap->exist("type"))
 			    type = valueMap->getString("type");
 			else
 			    type = "linear";
@@ -556,7 +556,7 @@ void CairoCaView::init(vpz::Output& output)
 		}
 	    }
 	}
-	if (map->existValue("objects")) {
+	if (map->exist("objects")) {
 	    const value::Set& setObjects = map->getSet("objects");
 
 	    for (value::Set::const_iterator it = setObjects.begin();
@@ -566,9 +566,9 @@ void CairoCaView::init(vpz::Output& output)
 
 		int number, r, g, b;
 		std::string name, shape;
-		if (objMap->existValue("color_red")
-		    and objMap->existValue("color_green")
-		    and objMap->existValue("color_blue"))
+		if (objMap->exist("color_red")
+		    and objMap->exist("color_green")
+		    and objMap->exist("color_blue"))
 		{
 		    r = objMap->getInt("color_red");
 		    g = objMap->getInt("color_green");
@@ -580,17 +580,17 @@ void CairoCaView::init(vpz::Output& output)
 		    g = color.get_green();
 		    b = color.get_blue();
 		}
-		if (objMap->existValue("number"))
+		if (objMap->exist("number"))
 		    number = objMap->getInt("number");
 		else
 		    number = m_counter_values;
-		if (objMap->existValue("name"))
+		if (objMap->exist("name"))
 		    name = objMap->getString("name");
 		else {
 		    name = "object ";
 		    name += boost::lexical_cast<std::string>(m_counter_objects);
 		}
-		if (objMap->existValue("shape"))
+		if (objMap->exist("shape"))
 		    shape = objMap->getString("shape");
 		else
 		    shape = "circle";

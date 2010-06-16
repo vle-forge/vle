@@ -248,28 +248,28 @@ void check_experiment_unittest_vpz(const vpz::Experiment& exp)
             const vpz::Condition& c(exp.conditions().get("ca"));
             const value::Set& x(c.getSetValues("x"));
             BOOST_REQUIRE(not x.value().empty());
-            BOOST_REQUIRE(x.get(0).isDouble());
+            BOOST_REQUIRE(x.get(0)->isDouble());
             BOOST_CHECK_CLOSE(value::toDouble(x.get(0)), 1.2, 0.1);
         }
         {
             const vpz::Condition& c(exp.conditions().get("cb"));
             const value::Set& x(c.getSetValues("x"));
             BOOST_REQUIRE(not x.value().empty());
-            BOOST_REQUIRE(x.get(0).isDouble());
+            BOOST_REQUIRE(x.get(0)->isDouble());
             BOOST_CHECK_CLOSE(value::toDouble(x.get(0)), 1.3, 0.1);
         }
         {
             const vpz::Condition& c(exp.conditions().get("cc"));
             const value::Set& x(c.getSetValues("x"));
             BOOST_REQUIRE(not x.value().empty());
-            BOOST_REQUIRE(x.get(0).isDouble());
+            BOOST_REQUIRE(x.get(0)->isDouble());
             BOOST_CHECK_CLOSE(value::toDouble(x.get(0)), 1.4, 0.1);
         }
         {
             const vpz::Condition& c(exp.conditions().get("cd"));
             const value::Set& x(c.getSetValues("x"));
             BOOST_REQUIRE(not x.value().empty());
-            BOOST_REQUIRE(x.get(0).isDouble());
+            BOOST_REQUIRE(x.get(0)->isDouble());
             BOOST_CHECK_CLOSE(value::toDouble(x.get(0)), 1.5, 0.1);
         }
     }
@@ -288,24 +288,25 @@ void check_experiment_unittest_vpz(const vpz::Experiment& exp)
 
             const value::Map* map(value::toMapValue(o.data()));
 
-            BOOST_REQUIRE(map->existValue("columns"));
-            BOOST_REQUIRE(map->existValue("rows"));
-            BOOST_REQUIRE(map->existValue("inc_columns"));
-            BOOST_REQUIRE(map->existValue("inc_rows"));
+            BOOST_REQUIRE(map->exist("columns"));
+            BOOST_REQUIRE(map->exist("rows"));
+            BOOST_REQUIRE(map->exist("inc_columns"));
+            BOOST_REQUIRE(map->exist("inc_rows"));
 
-            const value::Value& columns(map->get("columns"));
+            const value::Value& columns(value::reference(map->get("columns")));
             BOOST_REQUIRE(columns.isInteger());
             BOOST_REQUIRE_EQUAL(value::toInteger(columns), 5);
 
-            const value::Value& rows(map->get("rows"));
+            const value::Value& rows(value::reference(map->get("rows")));
             BOOST_REQUIRE(rows.isInteger());
             BOOST_REQUIRE_EQUAL(value::toInteger(rows), 100);
 
-            const value::Value& inccolumns(map->get("inc_columns"));
+            const value::Value&
+                inccolumns(value::reference(map->get("inc_columns")));
             BOOST_REQUIRE(inccolumns.isInteger());
             BOOST_REQUIRE_EQUAL(value::toInteger(inccolumns), 10);
 
-            const value::Value& incrows (map->get("inc_rows"));
+            const value::Value& incrows(value::reference(map->get("inc_rows")));
             BOOST_REQUIRE(incrows.isInteger());
             BOOST_REQUIRE_EQUAL(value::toInteger(incrows), 50);
         }

@@ -27,7 +27,7 @@
 
 
 #ifndef VLE_VALUE_DLLDEFINES_HPP
-#define VLE_VALUE_DLLDEFINES_HPP
+#define VLE_VALUE_DLLDEFINES_HPP 1
 
 #if defined(__WIN32__)
   #if defined(vlevalue_EXPORTS)

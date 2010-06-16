@@ -29,7 +29,7 @@
 
 
 #ifndef VLE_VALUE_VALUE_HPP
-#define VLE_VALUE_VALUE_HPP
+#define VLE_VALUE_VALUE_HPP 1
 
 #include <vle/version.hpp>
 #include <vle/value/Pools.hpp>
@@ -226,7 +226,17 @@ namespace vle { namespace value {
          * @param val The Value to check.
          * @return True if the Value is a Map, a Set or a Matrix.
          */
-        static bool isComposite(const Value* val);
+        inline static bool isComposite(const Value* val)
+        {
+            switch (val->getType()) {
+            case Value::MAP:
+            case Value::SET:
+            case Value::MATRIX:
+                return true;
+            default:
+                return false;
+            }
+        }
 
         Boolean& toBoolean();
         Integer& toInteger();
@@ -289,33 +299,33 @@ namespace vle { namespace value {
         Value& operator=(const Value& /* value */) { return *this; }
     };
 
+    /**
+     * @brief Convert a constant value::Value pointer to a constant
+     * value::Value reference.
+     * @param value The pointer to convert.
+     * @return A reference.
+     * @throw utils::ArgError if value is NULL.
+     */
     inline const Value& reference(const Value* value)
     {
-        if (not value) throw utils::ArgError(_("Null value"));
+        if (not value) {
+            throw utils::ArgError(_("Null value"));
+        }
         return *value;
     }
 
+    /**
+     * @brief Convert a value::Value pointer to a value::Value reference.
+     * @param value The pointer to convert.
+     * @return A reference.
+     * @throw utils::ArgError if value is NULL.
+     */
     inline Value& reference(Value* value)
     {
-        if (not value) throw utils::ArgError(_("Null value"));
-        return *value;
-    }
-
-    inline bool Value::isComposite(const Value* val)
-    {
-        switch (val->getType()) {
-        case Value::BOOLEAN:
-        case Value::INTEGER:
-        case Value::DOUBLE:
-        case Value::NIL:
-        case Value::STRING:
-        case Value::TUPLE:
-        case Value::TABLE:
-        case Value::XMLTYPE:
-            return false;
-        default:
-            return true;
+        if (not value) {
+            throw utils::ArgError(_("Null value"));
         }
+        return *value;
     }
 
     ///

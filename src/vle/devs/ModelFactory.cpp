@@ -374,8 +374,8 @@ Dynamics* ModelFactory::getDynamicsObject(Coordinator& coordinator,
     typedef Dynamics* (*fctdw) ( const DynamicsWrapperInit&,
                                  const InitEventList&);
 
-    Dynamics* dynamics;
-    void* symbol;
+    Dynamics* dynamics = 0;
+    void* symbol = 0;
 
     if (module->get_symbol(dynamicsSymbol, symbol)) {
         fctdyn fct(utils::pointer_to_function < fctdyn >(symbol));

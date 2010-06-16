@@ -27,106 +27,21 @@
 
 
 #ifndef VLE_VALUE_DELETER_HPP
-#define VLE_VALUE_DELETER_HPP
+#define VLE_VALUE_DELETER_HPP 1
 
-#include <vle/value/Value.hpp>
-#include <vle/value/Boolean.hpp>
-#include <vle/value/Double.hpp>
-#include <vle/value/Integer.hpp>
-#include <vle/value/Map.hpp>
-#include <vle/value/Matrix.hpp>
-#include <vle/value/Null.hpp>
-#include <vle/value/Set.hpp>
-#include <vle/value/String.hpp>
-#include <vle/value/Table.hpp>
-#include <vle/value/Tuple.hpp>
-#include <vle/value/Value.hpp>
-#include <vle/value/XML.hpp>
+
 #include <vle/value/DllDefines.hpp>
 #include <stack>
 
 namespace vle { namespace value {
 
-    inline void deleter(std::stack < Value* >& composite)
-    {
-        while (not composite.empty()) {
-            Value* val = composite.top();
-            composite.pop();
+class Value;
 
-            switch (val->getType()) {
-            case Value::BOOLEAN:
-            case Value::INTEGER:
-            case Value::DOUBLE:
-            case Value::NIL:
-            case Value::STRING:
-            case Value::TUPLE:
-            case Value::TABLE:
-            case Value::XMLTYPE:
-                delete val;
-                break;
-            case Value::SET:
-                {
-                    for (Set::iterator it = static_cast < Set* >
-                         (val)->begin(); it != static_cast < Set* >
-                         (val)->end(); ++it) {
-                        if (*it) {
-                            if (Value::isComposite(*it)) {
-                                composite.push(*it);
-                            } else {
-                                delete *it;
-                                *it = 0;
-                            }
-                        }
-                    }
-                    static_cast < Set* >(val)->value().clear();
-                    delete val;
-                }
-                break;
-            case Value::MAP:
-                {
-                    for (Map::iterator it = static_cast < Map* >
-                         (val)->begin(); it != static_cast < Map* >
-                         (val)->end(); ++it) {
-                        if (it->second) {
-                            if (Value::isComposite(it->second)) {
-                                composite.push(it->second);
-                            } else {
-                                delete it->second;
-                                it->second = 0;
-                            }
-                        }
-                    }
-                    static_cast < Map* >(val)->value().clear();
-                    delete val;
-                }
-                break;
-            case Value::MATRIX:
-                {
-                    for (Matrix::size_type row = 0; row < static_cast <
-                         Matrix* > (val)->rows(); ++row) {
-                        for (Matrix::size_type col = 0; col < static_cast <
-                             Matrix* > (val)->columns(); ++col) {
-                            if (static_cast < Matrix* >
-                                (val)->value()[col][row]) {
-                                if (Value::isComposite(static_cast < Matrix* >
-                                                (val)->value()[col][row])) {
-                                    composite.push(static_cast < Matrix* >
-                                                   (val)->value()[col][row]);
-                                } else {
-                                    delete static_cast < Matrix* >
-                                        (val)->value()[col][row];
-                                    static_cast < Matrix* >
-                                        (val)->value()[col][row] = 0;
-                                }
-                            }
-                        }
-                    }
-                    delete val;
-                }
-                break;
-            }
-        }
-    }
+/**
+ * @brief Thus function allow to delete value without recursive algorithm.
+ * @param composite The stack of Value to delete.
+ */
+void VLE_VALUE_EXPORT deleter(std::stack < Value* >& composite);
 
 }} // namespace vle value
 

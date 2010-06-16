@@ -46,7 +46,12 @@ void Integer::writeFile(std::ostream& out) const
 
 void Integer::writeString(std::ostream& out) const
 {
-    out << m_value;
+    std::streamsize old = out.precision();
+
+    out << std::setprecision(std::numeric_limits < long >::digits10)
+        << m_value;
+
+    out.precision(old);
 }
 
 void Integer::writeXml(std::ostream& out) const

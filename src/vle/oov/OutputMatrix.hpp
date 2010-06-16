@@ -286,6 +286,9 @@ namespace vle { namespace oov {
         inline value::MatrixView values()
         { return m_values->value(); }
 
+        inline value::Matrix* matrix()
+        { return m_values; }
+
         /**
          * @brief Return the index of the specified couple model port.
          * @param model Name of the model.

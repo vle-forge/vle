@@ -43,11 +43,8 @@
 
 namespace vle { namespace oov { namespace plugin {
 
-Storage::Storage(const std::string& location) :
-    Plugin(location),
-    m_matrix(2, 2, 1, 1),
-    m_time(-1.0),
-    m_isstart(false)
+Storage::Storage(const std::string& location)
+    : Plugin(location), m_matrix(2, 2, 1, 1), m_time(-1.0), m_isstart(false)
 {
 }
 
@@ -89,19 +86,19 @@ void Storage::onParameter(const std::string& /* plugin */,
         value::Map* init = dynamic_cast < value::Map* >(parameters);
         int columns = -1, rows = -1, rzcolumns = -1, rzrows = -1;
 
-        if (init->existValue("columns")) {
+        if (init->exist("columns")) {
             columns = value::toInteger(init->get("columns"));
         }
 
-        if (init->existValue("rows")) {
+        if (init->exist("rows")) {
             rows = value::toInteger(init->get("rows"));
         }
 
-        if (init->existValue("inc_columns")) {
+        if (init->exist("inc_columns")) {
             rzcolumns = value::toInteger(init->get("inc_columns"));
         }
 
-        if (init->existValue("inc_rows")) {
+        if (init->exist("inc_rows")) {
             rzrows = value::toInteger(init->get("inc_rows"));
         }
 

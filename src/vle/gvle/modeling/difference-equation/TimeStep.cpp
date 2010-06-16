@@ -93,8 +93,8 @@ void TimeStep::fillFields(const vpz::Condition& condition)
 
 	    if (map.value().find("value") != map.end()
 		and map.value().find("unit") != map.end()) {
-		m_spinTime->set_value(map["value"].toDouble().value());
-		m_comboUnit->set_active_text(map["unit"].toString().value());
+		m_spinTime->set_value(map.getDouble("value"));
+		m_comboUnit->set_active_text(map.getString("unit"));
 	    }
        } else  {
 	   m_spinTime->set_value(condition.firstValue("time-step").

@@ -84,12 +84,12 @@ void CairoGauge::init(vpz::Output& output)
     const value::Value* init = output.data();
     if (init and init->isMap()) {
 	const value::Map* map = value::toMapValue(init);
-	if (map->existValue("min")) {
+	if (map->exist("min")) {
             m_min->set_value(value::toDouble(map->get("min")));
         } else {
             m_min->set_value(1.0);
         }
-	if (map->existValue("max")) {
+	if (map->exist("max")) {
             m_max->set_value(value::toDouble(map->get("max")));
         } else {
             m_max->set_value(10.0);

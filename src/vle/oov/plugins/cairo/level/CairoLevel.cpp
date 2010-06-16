@@ -114,7 +114,7 @@ void CairoLevel::onParameter(const std::string& /* plugin */,
         }
         value::Map* init = dynamic_cast < value::Map* >(parameters);
 
-	const value::Set& curves = toSetValue(init->get("curves"));
+	const value::Set& curves = init->getSet("curves");
 	int i = 0;
 
 	for(value::Set::const_iterator it = curves.begin();
@@ -129,7 +129,7 @@ void CairoLevel::onParameter(const std::string& /* plugin */,
 	    m_maxList[i] = toDouble(curve->get("max"));
 	}
 
-	const value::Map& size = toMapValue(init->get("size"));
+	const value::Map& size = init->getMap("size");
 
 	m_minX = toInteger(size.get("minx"));
 	m_maxX = toInteger(size.get("maxx"));

@@ -144,7 +144,7 @@ void MatrixTranslator::parseXML(const value::Value& value)
     const value::Map& root = value::toMapValue(value);
 
     {
-        const value::Tuple& grid = value::toTupleValue(root.get("grid"));
+        const value::Tuple& grid = root.getTuple("grid");
         m_dimension = grid.size() - 1;
         int dim = 0;
         for (value::Tuple::const_iterator it = grid.value().begin(); it !=
@@ -154,7 +154,7 @@ void MatrixTranslator::parseXML(const value::Value& value)
     }
 
     {
-        const value::Map& cells = value::toMapValue(root.get("cells"));
+        const value::Map& cells = root.getMap("cells");
         const std::string& connectivity = cells.getString("connectivity");
         if (connectivity == "von neumann") {
             m_connectivity = VON_NEUMANN;
@@ -164,18 +164,18 @@ void MatrixTranslator::parseXML(const value::Value& value)
             m_connectivity = LINEAR;
         }
 
-        if (cells.existValue("symmetricport")) {
+        if (cells.exist("symmetricport")) {
             m_symmetricport = cells.getBoolean("symmetricport");
         }
         m_prefix = cells.getString("prefix");
 
-        if (cells.existValue("library")) {
+        if (cells.exist("library")) {
             m_library = cells.getString("library");
-            if (cells.existValue("model")) {
+            if (cells.exist("model")) {
                 m_model = cells.getString("model");
             }
             m_multiple = false;
-        } else if (cells.existValue("libraries")) {
+        } else if (cells.exist("libraries")) {
             int index = 0;
             const value::Set& libraries = cells.getSet("libraries");
             for (value::Set::const_iterator it = libraries.begin();
@@ -184,7 +184,7 @@ void MatrixTranslator::parseXML(const value::Value& value)
 
                 const std::string& lib = library->getString("library");
 
-                if (library->existValue("model")) {
+                if (library->exist("model")) {
                     const std::string& model = library->getString("model");
                     m_libraries[index] = std::make_pair(lib, model);
                 } else {
@@ -194,10 +194,10 @@ void MatrixTranslator::parseXML(const value::Value& value)
             m_multiple = true;
         }
 
-        if (cells.existValue("class")) {
+        if (cells.exist("class")) {
             m_class = cells.getString("class");
             m_multiple = false;
-        } else if (cells.existValue("classes")) {
+        } else if (cells.exist("classes")) {
             const value::Set& classes = cells.getSet("classes");
             for (value::Set::const_iterator it = classes.begin();
                  it != classes.end(); ++it) {
@@ -206,14 +206,14 @@ void MatrixTranslator::parseXML(const value::Value& value)
             m_multiple = true;
         }
 
-        if (cells.existValue("init")) {
+        if (cells.exist("init")) {
             if (m_dimension == 0) {
                 m_init = new unsigned int[m_size[0]];
             } else {
                 m_init = new unsigned int[m_size[0]*m_size[1]];
             }
 
-            const value::Tuple& init = value::toTupleValue(cells.get("init"));
+            const value::Tuple& init = cells.getTuple("init");
             unsigned int i = 0;
 
             for (value::Tuple::const_iterator it = init.value().begin(); it !=

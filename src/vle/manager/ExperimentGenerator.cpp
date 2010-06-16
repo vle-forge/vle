@@ -149,12 +149,15 @@ void ExperimentGenerator::buildCombinations()
     if (mStoreComb) {
         mCombinationDiff.resize(getCombinationNumber());
     }
+
     size_t nb = 0;
     do {
         mTmpfile.project().experiment().conditions().rebuildValueSet();
         buildCombinationsFromReplicas(nb);
         buildCombination(nb);
     } while (nb < getCombinationNumber());
+
+    mTmpfile.project().experiment().conditions().rebuildValueSet();
 }
 
 void ExperimentGenerator::buildCombinationsFromReplicas(size_t cmbnumber)
@@ -178,7 +181,7 @@ void ExperimentGenerator::buildCombinationsFromReplicas(size_t cmbnumber)
     for (size_t jcom = 0; jcom < mCondition.size(); ++jcom) {
         if (not itOrig->second.conditionvalues().empty()) {
             size_t index = mCondition[jcom].pos;
-            value::Value& val = itValueOrig->second->get(index);
+            value::Value* val = itValueOrig->second->get(index);
 
             if (mStoreComb && (index != 0)) {
                 diff_key_t key(itOrig, itValueOrig);
@@ -312,9 +315,9 @@ ExperimentGenerator::getInputFromCombination(unsigned int comb,
     diff_t::const_iterator itDiff = mCombinationDiff[comb].find(key);
 
     if (itDiff != mCombinationDiff[comb].end()) {
-        return itOrigValues->second->get(itDiff->second);
+        return *itOrigValues->second->get(itDiff->second);
     } else {
-        return itOrigValues->second->get(0);
+        return *itOrigValues->second->get(0);
     }
 }
 

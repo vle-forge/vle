@@ -28,178 +28,206 @@
 
 
 #ifndef VLE_VALUE_INTEGER_HPP
-#define VLE_VALUE_INTEGER_HPP
+#define VLE_VALUE_INTEGER_HPP 1
 
 #include <vle/value/Value.hpp>
+#include <vle/utils/Exception.hpp>
+#include <vle/utils/i18n.hpp>
 #include <vle/value/DllDefines.hpp>
-#include <boost/cast.hpp>
+#include <numeric>
 
 namespace vle { namespace value {
 
+/**
+ * @brief Integer Value encapsulate a C++ 'long' type into a class.
+ */
+class VLE_VALUE_EXPORT Integer : public Value
+{
+public:
     /**
-     * @brief Integer Value encapsulate a C++ 'long' type into a class to
-     * perform serialization, pool of memory etc.
+     * @brief Build an Integer object with a default value as zero.
      */
-    class VLE_VALUE_EXPORT Integer : public Value
+    Integer()
+        : m_value(0)
+    {}
+
+    /**
+     * @brief Build an Integer object with a specified value.
+     * @param value The value to copy.
+     */
+    Integer(const long& value)
+        : m_value(value)
+    {}
+
+    /**
+     * @brief Copy constructor.
+     * @param value The value to copy.
+     */
+    Integer(const Integer& value)
+        : Value(value), m_value(value.m_value)
+    {}
+
+    /**
+     * @brief Nothing to delete.
+     */
+    virtual ~Integer() {}
+
+    ///
+    ////
+    ///
+
+    /**
+     * @brief Build a Integer.
+     * @param value the value of the Integer.
+     * @return A new Integer.
+     */
+    static Integer* create(const long& value = 0)
+    { return new Integer(value); }
+
+    ///
+    ////
+    ///
+
+    /**
+     * @brief Clone the current Integer with the same value.
+     * @return A new Integer.
+     */
+    virtual Value* clone() const
+    { return new Integer(m_value); }
+
+    /**
+     * @brief Get the type of this class.
+     * @return Return Value::INTEGER.
+     */
+    virtual Value::type getType() const
+    { return Value::INTEGER; }
+
+    /**
+     * @brief Push the long in the stream.
+     * @param out The output stream.
+     */
+    virtual void writeFile(std::ostream& out) const;
+
+    /**
+     * @brief Push the long in the stream.
+     * @param out The output stream.
+     */
+    virtual void writeString(std::ostream& out) const;
+
+    /**
+     * @brief Push the long in the stream. The string pushed in the stream:
+     * @code
+     * <integer>-12345</integer>
+     * <integer><987654321/integer>
+     * @endcode
+     * @param out The output stream.
+     */
+    virtual void writeXml(std::ostream& out) const;
+
+    ///
+    ////
+    ///
+
+    /**
+     * @brief Get the numeric int value from the long. This function ensure
+     * that the value returned is defined in the int range.
+     * @return The int representation of the long.
+     * @throw utils::ArgError if the long can not be represented in the
+     * int.
+     */
+    inline long& intValue()
     {
-    public:
-        /**
-         * @brief Build an Integer object with a default value as zero.
-         */
-        Integer() :
-            m_value(0)
-        {}
+        if (m_value < std::numeric_limits < int >::min() or
+            m_value > std::numeric_limits < int >::max()) {
+            throw utils::ArgError(_("Can not convert long into int"));
+        }
+        return m_value;
+    }
 
-        /**
-         * @brief Build an Integer object with a specified value.
-         * @param value The value to copy.
-         */
-        Integer(long value) :
-            m_value(value)
-        {}
+    /**
+     * @brief Get the numeric int value from the long. This function ensure
+     * that the value returned is defined in the int range.
+     * @return The int representation of the long.
+     * @throw utils::ArgError if the long can not be represented in the
+     * int.
+     */
+    inline const long& intValue() const
+    {
+        if (m_value < std::numeric_limits < int >::min() or
+            m_value > std::numeric_limits < int >::max()) {
+            throw utils::ArgError(_("Can not convert long into int"));
+        }
+        return m_value;
+    }
 
-        /**
-         * @brief Copy constructor.
-         * @param value The value to copy.
-         */
-        Integer(const Integer& value) :
-            Value(value),
-            m_value(value.m_value)
-        {}
+    /**
+     * @brief Get the value of the long.
+     * @return An integer.
+     */
+    inline const long& value() const
+    { return m_value; }
 
-        /**
-         * @brief Nothing to delete.
-         */
-        virtual ~Integer() {}
+    /**
+     * @brief Get a reference to the encapsulated long.
+     * @return A reference to the encapsulated long.
+     */
+    inline long& value()
+    { return m_value; }
 
-        ///
-        ////
-        ///
+    /**
+     * @brief Assign a value to the encapsulated long.
+     * @param value The value to set.
+     */
+    inline void set(const long& value)
+    { m_value = value; }
 
-        /**
-         * @brief Build a Integer using the boost::pool memory management.
-         * @param value the value of the Integer.
-         * @return A new Integer allocated from the boost::pool.
-         */
-        static Integer* create(long value = 0)
-        { return new Integer(value); }
+private:
+    long m_value;
 
-        ///
-        ////
-        ///
+    friend class boost::serialization::access;
+    template < class Archive >
+        void serialize(Archive& ar, const unsigned int /* version */)
+        {
+            ar & boost::serialization::base_object < Value >(*this);
+            ar & m_value;
+        }
+};
 
-        /**
-         * @brief Clone the current Integer with the same value.
-         * @return A new boost::pool allocated value::Value.
-         */
-        virtual Value* clone() const
-        { return new Integer(m_value); }
+inline const Integer& toIntegerValue(const Value& value)
+{ return value.toInteger(); }
 
-        /**
-         * @brief Get the type of this class.
-         * @return Return Value::INTEGER.
-         */
-        virtual Value::type getType() const
-        { return Value::INTEGER; }
+inline const Integer* toIntegerValue(const Value* value)
+{ return value ? &value->toInteger() : 0; }
 
-        /**
-         * @brief Push the long in the stream.
-         * @param out The output stream.
-         */
-        virtual void writeFile(std::ostream& out) const;
+inline Integer& toIntegerValue(Value& value)
+{ return value.toInteger(); }
 
-        /**
-         * @brief Push the long in the stream.
-         * @param out The output stream.
-         */
-	virtual void writeString(std::ostream& out) const;
+inline Integer* toIntegerValue(Value* value)
+{ return value ? &value->toInteger() : 0; }
 
-        /**
-         * @brief Push the long in the stream. The string pushed in the stream:
-         * @code
-         * <integer>-12345</integer>
-         * <integer><987654321/integer>
-         * @endcode
-         * @param out The output stream.
-         */
-	virtual void writeXml(std::ostream& out) const;
+inline const long& toInteger(const Value& value)
+{ return value.toInteger().intValue(); }
 
-        ///
-        ////
-        ///
+inline const long& toLong(const Value& value)
+{ return value.toInteger().value(); }
 
-        /**
-         * @brief Get the numeric int value from the long. Be carrefull, the int
-         * can represent lesser integer than long.
-         * @return The int representation of the long.
-         * @throw boost::numeric_cast_error if the long is greather than the
-         * int.
-         */
-        inline int intValue() const
-        { return boost::numeric_cast < int >(m_value); }
+inline long& toInteger(Value& value)
+{ return value.toInteger().intValue(); }
 
-        /**
-         * @brief Get the value of the long.
-         * @return An integer.
-         */
-        inline long value() const
-        { return m_value; }
+inline long& toLong(Value& value)
+{ return value.toInteger().value(); }
 
-        /**
-         * @brief Get a reference to the encapsulated long.
-         * @return A reference to the encapsulated long.
-         */
-        inline long& value()
-        { return m_value; }
+inline const long& toInteger(const Value* value)
+{ return value::reference(value).toInteger().intValue(); }
 
-        /**
-         * @brief Assign a value to the encapsulated long.
-         * @param value The value to set.
-         */
-        inline void set(long value)
-        { m_value = value; }
+inline const long& toLong(const Value* value)
+{ return value::reference(value).toInteger().value(); }
 
-    private:
-        long m_value;
+inline long& toInteger(Value* value)
+{ return value::reference(value).toInteger().intValue(); }
 
-	friend class boost::serialization::access;
-	template < class Archive >
-	    void serialize(Archive& ar, const unsigned int /* version */)
-	    {
-		ar & boost::serialization::base_object < Value >(*this);
-		ar & m_value;
-	    }
-    };
-
-    inline const Integer& toIntegerValue(const Value& value)
-    { return value.toInteger(); }
-
-    inline const Integer* toIntegerValue(const Value* value)
-    { return value ? &value->toInteger() : 0; }
-
-    inline Integer& toIntegerValue(Value& value)
-    { return value.toInteger(); }
-
-    inline Integer* toIntegerValue(Value* value)
-    { return value ? &value->toInteger() : 0; }
-
-    inline int toInteger(const Value& value)
-    { return value.toInteger().intValue(); }
-
-    inline long toLong(const Value& value)
-    { return value.toInteger().value(); }
-
-    inline long toLong(Value& value)
-    { return value.toInteger().value(); }
-
-    inline int toInteger(const Value* value)
-    { return value::reference(value).toInteger().intValue(); }
-
-    inline long toLong(const Value* value)
-    { return value::reference(value).toInteger().value(); }
-
-    inline long toLong(Value* value)
-    { return value::reference(value).toInteger().value(); }
+inline long& toLong(Value* value)
+{ return value::reference(value).toInteger().value(); }
 
 }} // namespace vle value
 

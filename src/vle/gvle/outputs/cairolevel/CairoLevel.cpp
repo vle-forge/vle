@@ -165,31 +165,31 @@ void CairoLevel::init(vpz::Output& output)
 
     if (init and init->isMap()) {
 	const value::Map* map = value::toMapValue(init);
-	if (map->existValue("size")) {
+	if (map->exist("size")) {
 	    const value::Map& sizeMap = map->getMap("size");
 
-	    if (sizeMap.existValue("minx")) {
+	    if (sizeMap.exist("minx")) {
 		m_minx->set_value(value::toDouble(sizeMap.get("minx")));
 	    } else {
 		m_minx->set_value(0.0);
 	    }
-	    if (sizeMap.existValue("maxx")) {
+	    if (sizeMap.exist("maxx")) {
 		m_maxx->set_value(value::toDouble(sizeMap.get("maxx")));
 	    } else {
 		m_maxx->set_value(10.0);
 	    }
-	    if (sizeMap.existValue("miny")) {
+	    if (sizeMap.exist("miny")) {
 		m_miny->set_value(value::toDouble(sizeMap.get("miny")));
 	    } else {
 		m_miny->set_value(0.0);
 	    }
-	    if (sizeMap.existValue("maxy")) {
+	    if (sizeMap.exist("maxy")) {
 		m_maxy->set_value(value::toDouble(sizeMap.get("maxy")));
 	    } else {
 		m_maxy->set_value(10.0);
 	    }
 	}
-	if (map->existValue("curves")) {
+	if (map->exist("curves")) {
 	    const value::Set& curvesSet = map->getSet("curves");
 
 	    for (value::Set::const_iterator it = curvesSet.begin();
@@ -197,17 +197,17 @@ void CairoLevel::init(vpz::Output& output)
 		value::Map* curveMap = value::toMapValue(*it);
 		Gdk::Color color; double min; double max; std::string curve;
 
-		if (curveMap->existValue("color")) {
+		if (curveMap->exist("color")) {
 		    color = Gdk::Color(curveMap->getString("color"));
 		} else {
 		    color = Gdk::Color(m_colors[++m_counter % m_colors.size()]);
 		}
-		if (curveMap->existValue("min")) {
+		if (curveMap->exist("min")) {
 		    min = curveMap->getDouble("min");
 		} else {
 		    min = -10.0;
 		}
-		if (curveMap->existValue("max")) {
+		if (curveMap->exist("max")) {
 		    max = curveMap->getDouble("max");
 		} else {
 		    max = 10.0;

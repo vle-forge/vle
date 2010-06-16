@@ -59,7 +59,7 @@ void File::onParameter(const std::string& plugin,
 {
     if (parameters and parameters->isMap()) {
         const value::Map* map = value::toMapValue(parameters);
-        if (map->existValue("locale")) {
+        if (map->exist("locale")) {
             std::string locale(map->getString("locale"));
             try {
                 if (locale == "user") {
@@ -76,7 +76,7 @@ void File::onParameter(const std::string& plugin,
             }
         }
 
-        if (map->existValue("type")) {
+        if (map->exist("type")) {
             std::string type(map->getString("type"));
             if (type == "csv") {
                 m_filetype = new CSV();
@@ -91,7 +91,7 @@ void File::onParameter(const std::string& plugin,
             }
         }
 
-        if (map->existValue("output")) {
+        if (map->exist("output")) {
             std::string type(map->getString("output"));
             if (type == "out") {
                 m_type = File::STANDARD_OUT;
@@ -104,7 +104,7 @@ void File::onParameter(const std::string& plugin,
             }
         }
 
-        if (map->existValue("julian-day")) {
+        if (map->exist("julian-day")) {
             m_julian = map->getBoolean("julian-day");
         }
     }

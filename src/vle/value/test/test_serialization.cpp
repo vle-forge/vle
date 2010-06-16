@@ -217,7 +217,7 @@ BOOST_AUTO_TEST_CASE(check_set_serialization)
         BOOST_REQUIRE_CLOSE(st->getDouble(2), 12.34, 1e-10);
         BOOST_REQUIRE_EQUAL(st->getString(3), "test");
         BOOST_REQUIRE_EQUAL(st->getXml(4), "xml test");
-        BOOST_REQUIRE_EQUAL(st->get(5).getType(), value::Value::NIL);
+        BOOST_REQUIRE_EQUAL(st->get(5)->getType(), value::Value::NIL);
 
         BOOST_REQUIRE_THROW(st->getInt(0), utils::CastError);
         BOOST_REQUIRE_NO_THROW(st->getInt(1));
@@ -306,7 +306,7 @@ BOOST_AUTO_TEST_CASE(check_composite1_serialization)
         BOOST_REQUIRE_EQUAL(mp.getString("test-3"), "test 3");
         BOOST_REQUIRE_EQUAL(mp.getString("test-4"), "test 4");
 
-        const value::Set& st(mp.get("copain").toSet());
+        const value::Set& st(mp.getSet("copain"));
 
         BOOST_REQUIRE_EQUAL(st.size(), (value::Set::size_type)4);
         BOOST_REQUIRE_EQUAL(st.getString(0), "test 5");
@@ -352,7 +352,7 @@ BOOST_AUTO_TEST_CASE(check_composite2_serialization)
         BOOST_REQUIRE_CLOSE(st->getDouble(2), 12.34, 1e-10);
         BOOST_REQUIRE_EQUAL(st->getString(3), "test");
         BOOST_REQUIRE_EQUAL(st->getXml(4), "xml test");
-        BOOST_REQUIRE_EQUAL(st->get(5).getType(), value::Value::NIL);
+        BOOST_REQUIRE_EQUAL(st->get(5)->getType(), value::Value::NIL);
 
         BOOST_REQUIRE_THROW(st->getInt(0), utils::CastError);
         BOOST_REQUIRE_NO_THROW(st->getInt(1));

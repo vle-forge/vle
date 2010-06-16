@@ -44,14 +44,14 @@ void GraphTranslator::translate(const value::Map& buffer)
         mGraph.resize(extents[mNodeNumber][mNodeNumber]);
     }
 
-    if (init.existValue("prefix")) {
+    if (init.exist("prefix")) {
         mPrefix = toString(init.get("prefix"));
         if (mPrefix.empty()) {
             throw utils::ArgError("GraphTranslator: bad prefix");
         }
     }
 
-    if (init.existValue("port")) {
+    if (init.exist("port")) {
         mPort = toString(init.get("port"));
     }
 

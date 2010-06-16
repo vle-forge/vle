@@ -378,21 +378,21 @@ void CairoNetView::init(vpz::Output& output)
     if (init and init->isMap()) {
 	const value::Map* map = value::toMapValue(init);
 
-	if (map->existValue("dimensions")) {
+	if (map->exist("dimensions")) {
 	    const value::Map& sizeMap = map->getMap("dimensions");
-	    if (sizeMap.existValue("x"))
+	    if (sizeMap.exist("x"))
 		m_spinDimensionX->set_value(sizeMap.getDouble("x"));
-	    if (sizeMap.existValue("y"))
+	    if (sizeMap.exist("y"))
 		m_spinDimensionY->set_value(sizeMap.getDouble("y"));
 	}
 
-	if (map->existValue("executiveName")) {
+	if (map->exist("executiveName")) {
 	    m_entryExecutiveName->set_text(map->getString("executiveName"));
 	}
 
-	if (map->existValue("nodes")) {
+	if (map->exist("nodes")) {
 	    const value::Map& nodesMap = map->getMap("nodes");
-	    if (nodesMap.existValue("type")) {
+	    if (nodesMap.exist("type")) {
 		m_comboNodesType->set_active_text(nodesMap.getString("type"));
 		if (nodesMap.getString("type") == "set") {
 		    m_entryNodesNames->set_text(nodesMap.getString("names"));
@@ -402,18 +402,18 @@ void CairoNetView::init(vpz::Output& output)
 	    }
 	}
 
-	if (map->existValue("adjacency_matrix")) {
+	if (map->exist("adjacency_matrix")) {
 	    m_textviewMatrix->get_buffer()->set_text(
 		map->getString("adjacency_matrix"));
 	}
 
-	if (map->existValue("positions")) {
+	if (map->exist("positions")) {
 	    const value::Map& positionsMap = map->getMap("positions");
-	    if (positionsMap.existValue("type")) {
+	    if (positionsMap.exist("type")) {
 		m_comboPositionsType->set_active_text(
 		    positionsMap.getString("type"));
 		if (positionsMap.getString("type") == "set") {
-		    if (positionsMap.existValue("values")) {
+		    if (positionsMap.exist("values")) {
 			m_textviewPositions->get_buffer()->set_text(
 			    positionsMap.getString("values"));
 		    }
@@ -421,16 +421,16 @@ void CairoNetView::init(vpz::Output& output)
 	    }
 	}
 
-	if (map->existValue("states")) {
+	if (map->exist("states")) {
 	    const value::Map& statesMap = map->getMap("states");
 
-	    if (statesMap.existValue("name")) {
+	    if (statesMap.exist("name")) {
 		m_useStatesName->set_active(true);
 		m_entryStateName->set_text(statesMap.getString("name"));
 	    }
-	    if (statesMap.existValue("type"))
+	    if (statesMap.exist("type"))
 		m_comboStateType->set_active_text(statesMap.getString("type"));
-	    if (statesMap.existValue("values")) {
+	    if (statesMap.exist("values")) {
 		const value::Set& valuesSet = statesMap.getSet("values");
 
 		for (value::Set::const_iterator it = valuesSet.begin();
@@ -443,9 +443,9 @@ void CairoNetView::init(vpz::Output& output)
 		    {
 			int rf, gf, bf, rt, gt, bt;
 
-			if (valueMap->existValue("red_true")
-			    and valueMap->existValue("green_true")
-			    and valueMap->existValue("blue_true"))
+			if (valueMap->exist("red_true")
+			    and valueMap->exist("green_true")
+			    and valueMap->exist("blue_true"))
 			{
 			    rt = valueMap->getInt("red_true");
 			    gt = valueMap->getInt("green_true");
@@ -457,9 +457,9 @@ void CairoNetView::init(vpz::Output& output)
 			    gt = color.get_green();
 			    bt = color.get_blue();
 			}
-			if (valueMap->existValue("red_false")
-			    and valueMap->existValue("green_false")
-			    and valueMap->existValue("blue_false"))
+			if (valueMap->exist("red_false")
+			    and valueMap->exist("green_false")
+			    and valueMap->exist("blue_false"))
 			{
 			    rf = valueMap->getInt("red_false");
 			    gf = valueMap->getInt("green_false");
@@ -489,9 +489,9 @@ void CairoNetView::init(vpz::Output& output)
 			int r, g, b;
 			double value;
 
-			if (valueMap->existValue("red")
-			    and valueMap->existValue("green")
-			    and valueMap->existValue("blue"))
+			if (valueMap->exist("red")
+			    and valueMap->exist("green")
+			    and valueMap->exist("blue"))
 			{
 			    r = valueMap->getInt("red");
 			    g = valueMap->getInt("green");
@@ -503,7 +503,7 @@ void CairoNetView::init(vpz::Output& output)
 			    g = color.get_green();
 			    b = color.get_blue();
 			}
-			if (valueMap->existValue("value"))
+			if (valueMap->exist("value"))
 			    value = valueMap->getInt("value");
 			else
 			    value = 1.0;
@@ -522,23 +522,23 @@ void CairoNetView::init(vpz::Output& output)
 		    {
 			double min, max, coef;
 			std::string color, type;
-			if (valueMap->existValue("min"))
+			if (valueMap->exist("min"))
 			    min = valueMap->getDouble("min");
 			else
 			    min = 0.0;
-			if (valueMap->existValue("max"))
+			if (valueMap->exist("max"))
 			    max = valueMap->getDouble("max");
 			else
 			    max = 10.0;
-			if (valueMap->existValue("coef"))
+			if (valueMap->exist("coef"))
 			    coef = valueMap->getDouble("coef");
 			else
 			    coef = 1.0;
-			if (valueMap->existValue("color"))
+			if (valueMap->exist("color"))
 			    color = valueMap->getString("color");
 			else
 			    color = "red";
-			if (valueMap->existValue("type"))
+			if (valueMap->exist("type"))
 			    type = valueMap->getString("type");
 			else
 			    type = "linear";
@@ -558,9 +558,9 @@ void CairoNetView::init(vpz::Output& output)
 	    }
 	}
 
-	if (map->existValue("display_names")) {
+	if (map->exist("display_names")) {
 	    const value::Map& displayMap = map->getMap("display_names");
-	    if (displayMap.existValue("activate")) {
+	    if (displayMap.exist("activate")) {
 		m_useDisplayNames->set_active(
 		    (displayMap.getString("activate") == "yes" ? true : false));
 	    }

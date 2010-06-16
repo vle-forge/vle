@@ -315,10 +315,10 @@ void SaxParser::onMatrix(const xmlChar** att)
             rows = att[i + 1];
         } else if (xmlStrcmp(att[i], (const xmlChar*)"columns") == 0) {
             columns = att[i + 1];
-        } else if (xmlStrcmp(att[i], (const xmlChar*)"rowmax") == 0) {
-            rowmax = att[i + 1];
         } else if (xmlStrcmp(att[i], (const xmlChar*)"columnmax") == 0) {
             columnmax = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"rowmax") == 0) {
+            rowmax = att[i + 1];
         } else if (xmlStrcmp(att[i], (const xmlChar*)"columnstep") == 0) {
             columnstep = att[i + 1];
         } else if (xmlStrcmp(att[i], (const xmlChar*)"rowstep") == 0) {

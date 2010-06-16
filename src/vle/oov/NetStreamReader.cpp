@@ -104,39 +104,39 @@ bool NetStreamReader::dispatch(value::Set& frame)
 {
     bool end = false;
 
-    switch (frame.get(0).toInteger().value()) {
+    switch (frame.getInt(0)) {
     case 0:
-        onParameter(frame.get(1).toString().value(),
-                    frame.get(2).toString().value(),
-                    frame.get(3).toString().value(),
+        onParameter(frame.getString(1),
+                    frame.getString(2),
+                    frame.getString(3),
                     frame.give(4),
-                    frame.get(5).toDouble().value());
+                    frame.getDouble(5));
         break;
     case 1:
-        onNewObservable(frame.get(1).toString().value(),
-                        frame.get(2).toString().value(),
-                        frame.get(3).toString().value(),
-                        frame.get(4).toString().value(),
-                        frame.get(5).toDouble().value());
+        onNewObservable(frame.getString(1),
+                        frame.getString(2),
+                        frame.getString(3),
+                        frame.getString(4),
+                        frame.getDouble(5));
         break;
     case 2:
-        onDelObservable(frame.get(1).toString().value(),
-                        frame.get(2).toString().value(),
-                        frame.get(3).toString().value(),
-                        frame.get(4).toString().value(),
-                        frame.get(5).toDouble().value());
+        onDelObservable(frame.getString(1),
+                        frame.getString(2),
+                        frame.getString(3),
+                        frame.getString(4),
+                        frame.getDouble(5));
         break;
     case 3:
-        onValue(frame.get(1).toString().value(),
-                frame.get(2).toString().value(),
-                frame.get(3).toString().value(),
-                frame.get(4).toString().value(),
-                frame.get(5).toDouble().value(),
+        onValue(frame.getString(1),
+                frame.getString(2),
+                frame.getString(3),
+                frame.getString(4),
+                frame.getDouble(5),
                 frame.give(6));
         break;
     case 4:
         serializePlugin();
-        onClose(frame.get(1).toDouble().value());
+        onClose(frame.getDouble(1));
         end = true;
         break;
     case 5:
@@ -145,7 +145,7 @@ bool NetStreamReader::dispatch(value::Set& frame)
     default:
         throw(utils::InternalError(fmt(
                 _("NetStreamReader: unknow tag '%1%'")) %
-            frame.get(0).toInteger().value()));
+            frame.getInt(0)));
     }
     return end;
 }

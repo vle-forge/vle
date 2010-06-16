@@ -30,8 +30,8 @@
 
 #include <vle/value/Set.hpp>
 #include <vle/value/Map.hpp>
+#include <vle/value/Matrix.hpp>
 #include <vle/value/String.hpp>
-#include <vle/value/Set.hpp>
 #include <vle/value/Integer.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Boolean.hpp>
@@ -45,8 +45,8 @@
 
 namespace vle { namespace value {
 
-Set::Set(const Set& setfactory) :
-    Value(setfactory)
+Set::Set(const Set& setfactory)
+    : Value(setfactory)
 {
     m_value.resize(setfactory.size());
 
@@ -54,17 +54,11 @@ Set::Set(const Set& setfactory) :
                    m_value.begin(), CloneValue());
 }
 
-Set::~Set()
-{
-    clear();
-}
-
 void Set::writeFile(std::ostream& out) const
 {
-    for (VectorValue::const_iterator it = m_value.begin();
-         it != m_value.end(); ++it) {
-	if (it != m_value.begin()) {
-	    out << ",";
+    for (const_iterator it = m_value.begin(); it != m_value.end(); ++it) {
+        if (it != m_value.begin()) {
+            out << ",";
         }
         if (*it) {
             (*it)->writeFile(out);
@@ -77,10 +71,10 @@ void Set::writeFile(std::ostream& out) const
 void Set::writeString(std::ostream& out) const
 {
     out << "(";
-    for (VectorValue::const_iterator it = m_value.begin();
-         it != m_value.end(); ++it) {
-	if (it != m_value.begin()) {
-	    out << ",";
+
+    for (const_iterator it = m_value.begin(); it != m_value.end(); ++it) {
+        if (it != m_value.begin()) {
+            out << ",";
         }
         if (*it) {
             (*it)->writeString(out);
@@ -88,123 +82,29 @@ void Set::writeString(std::ostream& out) const
             out << "NA";
         }
     }
+
     out << ")";
 }
 
 void Set::writeXml(std::ostream& out) const
 {
     out << "<set>";
-    for (VectorValue::const_iterator it = m_value.begin();
-         it != m_value.end(); ++it) {
+
+    for (const_iterator it = m_value.begin(); it != m_value.end(); ++it) {
         if (*it) {
             (*it)->writeXml(out);
         } else {
             out << "<null />";
         }
     }
+
     out << "</set>";
-}
-
-void Set::add(Value* value)
-{
-    m_value.push_back(value);
-}
-
-void Set::addNull()
-{
-    m_value.push_back(Null::create());
-}
-
-void Set::addBoolean(bool value)
-{
-    m_value.push_back(Boolean::create(value));
-}
-
-bool Set::getBoolean(const size_type i) const
-{
-    return get(i).toBoolean().value();
-}
-
-void Set::addDouble(double value)
-{
-    m_value.push_back(Double::create(value));
-}
-
-double Set::getDouble(const size_type i) const
-{
-    return get(i).toDouble().value();
-}
-
-void Set::addInt(int value)
-{
-    m_value.push_back(Integer::create(value));
-}
-
-int Set::getInt(const size_type i) const
-{
-    return get(i).toInteger().intValue();
-}
-
-void Set::addLong(long value)
-{
-    m_value.push_back(Integer::create(value));
-}
-
-long Set::getLong(const size_type i) const
-{
-    return get(i).toInteger().value();
-}
-
-void Set::addString(const std::string& value)
-{
-    m_value.push_back(String::create(value));
-}
-
-const std::string& Set::getString(const size_type i) const
-{
-    return value::toString(get(i));
-}
-
-void Set::addXml(const std::string& value)
-{
-    m_value.push_back(Xml::create(value));
-}
-
-const std::string& Set::getXml(const size_type i) const
-{
-    return value::toXml(get(i));
-}
-
-const Value& Set::get(const size_type i) const
-{
-    if (i >= size()) {
-        throw std::out_of_range(_("Set: too big index"));
-    }
-
-    if (m_value[i] == 0) {
-        throw utils::ArgError(_("Set: no value in this cell"));
-    }
-
-    return *m_value[i];
-}
-
-Value& Set::get(const size_type i)
-{
-    if (i >= size()) {
-        throw std::out_of_range(_("Set: too big index"));
-    }
-
-    if (m_value[i] == 0) {
-        throw utils::ArgError(_("Set: no value in this cell"));
-    }
-
-    return *m_value[i];
 }
 
 Value* Set::give(const size_type& i)
 {
     if (i >= size()) {
-        throw std::out_of_range(_("Set: too big index"));
+        throw utils::ArgError(_("Set: too big index"));
     }
 
     Value* result = m_value[i];
@@ -215,7 +115,7 @@ Value* Set::give(const size_type& i)
 void Set::del(const size_type i)
 {
     if (i >= size()) {
-        throw std::out_of_range(_("Set: too big index"));
+        throw utils::ArgError(_("Set: too big index"));
     }
 
     delete m_value[i];
@@ -233,13 +133,82 @@ void Set::clear()
                 composite.push(*it);
             } else {
                 delete *it;
-                *it = 0;
             }
+            *it = 0;
         }
     }
 
-    deleter(composite);
     m_value.clear();
+    deleter(composite);
+}
+
+Set& Set::addSet()
+{
+    Set* value = new Set();
+
+    m_value.push_back(value);
+
+    return *value;
+}
+
+Map& Set::addMap()
+{
+    Map* value = new Map();
+
+    m_value.push_back(value);
+
+    return *value;
+}
+
+Matrix& Set::addMatrix()
+{
+    Matrix* value = new Matrix();
+
+    m_value.push_back(value);
+
+    return *value;
+}
+
+Set& Set::getSet(const size_type& i)
+{
+    value::Value& value = value::reference(get(i));
+
+    return value::toSetValue(value);
+}
+
+Map& Set::getMap(const size_type& i)
+{
+    value::Value& value = value::reference(get(i));
+
+    return value::toMapValue(value);
+}
+
+Matrix& Set::getMatrix(const size_type& i)
+{
+    value::Value& value = value::reference(get(i));
+
+    return value::toMatrixValue(value);
+}
+
+const Set& Set::getSet(const size_type& i) const
+{
+    const value::Value& value = value::reference(get(i));
+
+    return value::toSetValue(value);
+}
+
+const Map& Set::getMap(const size_type& i) const
+{
+    const value::Value& value = value::reference(get(i));
+
+    return value::toMapValue(value);
+}
+
+const Matrix& Set::getMatrix(const size_type& i) const
+{
+    const value::Value& value = value::reference(get(i));
+
+    return value::toMatrixValue(value);
 }
 
 void Set::serializeTxtFile(const Set& set, const std::string& filename)
@@ -247,7 +216,7 @@ void Set::serializeTxtFile(const Set& set, const std::string& filename)
     std::ofstream out(filename.c_str());
     if (not out.is_open()) {
         throw utils::ArgError(fmt(_(
-                "serialize error: cannot open file '%1%'")) % filename);
+                    "serialize error: cannot open file '%1%'")) % filename);
     }
 
     boost::archive::text_oarchive oa(out);
@@ -273,7 +242,7 @@ void Set::serializeBinaryFile(const Set& set, const std::string& filename)
     std::ofstream out(filename.c_str(), std::ofstream::binary);
     if (not out.is_open()) {
         throw utils::ArgError(fmt(_(
-                "serialize error: cannot open file '%1%'")) % filename);
+                    "serialize error: cannot open file '%1%'")) % filename);
     }
 
     boost::archive::text_oarchive oa(out);
@@ -299,7 +268,7 @@ void Set::deserializeTxtFile(Set& set, const std::string& filename)
     std::ifstream out(filename.c_str());
     if (not out.is_open()) {
         throw utils::ArgError(fmt(_(
-                "deserialize error: can not open file '%1%'")) % filename);
+                    "deserialize error: can not open file '%1%'")) % filename);
     }
 
     boost::archive::text_iarchive ia(out);
@@ -323,7 +292,7 @@ void Set::deserializeBinaryFile(Set& set, const std::string& filename)
     std::ifstream out(filename.c_str(), std::ifstream::binary);
     if (not out.is_open()) {
         throw utils::ArgError(fmt(_(
-                "deserialize error: can not open file '%1%'")) % filename);
+                    "deserialize error: can not open file '%1%'")) % filename);
     }
 
     boost::archive::text_iarchive ia(out);

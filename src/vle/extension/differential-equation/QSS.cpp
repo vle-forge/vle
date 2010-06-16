@@ -143,7 +143,7 @@ Multiple::Multiple(const DynamicsInit& model,
     unsigned int index;
 
     for (index = 0; index < variables.size(); ++index) {
-        const value::Set& tab(value::toSetValue(variables.get(index)));
+        const value::Set& tab(variables.getSet(index));
 	std::string name = value::toString(tab.get(0));
 	double init = value::toDouble(tab.get(1));
 	double precision = value::toDouble(tab.get(2));

@@ -228,7 +228,7 @@ void Plot::onParameter(const std::string& /* plugin */,
         }
         value::Map* init = dynamic_cast < value::Map* >(parameters);
 
-        const value::Set& curves = toSetValue(init->get("curves"));
+        const value::Set& curves = init->getSet("curves");
 
         IntCurve* ic = 0;
         RealCurve* rc = 0;
@@ -255,7 +255,7 @@ void Plot::onParameter(const std::string& /* plugin */,
             }
         }
 
-        if (init->existValue("window")) {
+        if (init->exist("window")) {
             double windowSize = toDouble(init->get("window"));
 
             mParameter.set_min_draw_date(0.0f);
@@ -264,23 +264,23 @@ void Plot::onParameter(const std::string& /* plugin */,
                 (int)mParameter.get_max_draw_date());
         }
 
-        if (init->existValue("value")) {
-            const value::Map& value = toMapValue(init->get("value"));
+        if (init->exist("value")) {
+            const value::Map& value = init->getMap("value");
 
-            if (value.existValue("min")) {
+            if (value.exist("min")) {
                 mParameter.set_min_value(toDouble(value.get("min")));
             }
-            if (value.existValue("max")) {
+            if (value.exist("max")) {
                 mParameter.set_max_value(toDouble(value.get("max")));
             }
         }
 
-        if (init->existValue("scrolling")) {
+        if (init->exist("scrolling")) {
             mParameter.set_scrolling(toBoolean(init->get("scrolling")));
         }
 
-        if (init->existValue("limits")) {
-            const value::Set& limits = toSetValue(init->get("limits"));
+        if (init->exist("limits")) {
+            const value::Set& limits = init->getSet("limits");
 
             for(value::Set::const_iterator it = limits.begin();
                 it != limits.end(); ++it) {

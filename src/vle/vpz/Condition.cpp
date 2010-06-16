@@ -33,6 +33,7 @@
 #include <vle/utils/Algo.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/value/Set.hpp>
+#include <vle/value/Deleter.hpp>
 #include <boost/utility.hpp>
 
 namespace vle { namespace vpz {
@@ -86,15 +87,21 @@ Condition::Condition(const Condition& cnd) :
 {
     for (ConditionValues::const_iterator it = cnd.m_list.begin();
          it != cnd.m_list.end(); ++it) {
-        assert(it->second);
         m_list[it->first] = dynamic_cast < value::Set*>(it->second->clone());
     }
 }
 
 Condition::~Condition()
 {
-    utils::for_each(m_list.begin(), m_list.end(),
-                   boost::checked_deleter < value::Set >());
+    std::stack < value::Value* > lst;
+
+    for (iterator it = m_list.begin(); it != m_list.end(); ++it) {
+        if (it->second) {
+            lst.push(it->second);
+        }
+    }
+
+    value::deleter(lst);
 }
 
 void Condition::write(std::ostream& out) const
@@ -219,7 +226,7 @@ ValueList Condition::firstValues() const
          m_list.end();
          ++it) {
         if (it->second->size() > 0) {
-            result.add(it->first, &it->second->get(0));
+            result.add(it->first, it->second->get(0));
         } else {
             throw(utils::ArgError(fmt(
                         "Build a empty first values for condition %1%.") %
@@ -257,13 +264,13 @@ value::Set& Condition::getSetValues(const std::string& portname)
 
 const value::Value& Condition::firstValue(const std::string& portname) const
 {
-    return getSetValues(portname).get(0);
+    return *getSetValues(portname).get(0);
 }
 
 const value::Value& Condition::nValue(const std::string& portname,
                                       size_t i) const
 {
-    return getSetValues(portname).get(i);
+    return *getSetValues(portname).get(i);
 }
 
 value::Set& Condition::lastAddedPort()
@@ -283,7 +290,7 @@ void Condition::rebuildValueSet()
 {
     for (ConditionValues::iterator it = m_list.begin(); it != m_list.end();
          ++it) {
-        it->second = value::Set::create();
+        it->second = new value::Set();
     }
 }
 

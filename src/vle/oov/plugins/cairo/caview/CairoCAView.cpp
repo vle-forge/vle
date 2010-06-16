@@ -69,7 +69,7 @@ void CairoCAView::onParameter(const std::string& /* plugin */,
 
         value::Map* init = dynamic_cast < value::Map* >(parameters);
 
-	const value::Map& size = toMapValue(init->get("size"));
+	const value::Map& size = init->getMap("size");
 
 	mColumns = toInteger(size.get("x"));
 	mRows = toInteger(size.get("y"));
@@ -81,7 +81,7 @@ void CairoCAView::onParameter(const std::string& /* plugin */,
 	mMaxX = mWindowWidth;
 	mMaxY = mWindowHeight;
 
-	const value::Map& geometry = toMapValue(init->get("geometry"));
+	const value::Map& geometry = init->getMap("geometry");
 
 	if (toString(geometry.get("type")) == "square") {
 	    mGeometry = SQUARE;
@@ -96,13 +96,13 @@ void CairoCAView::onParameter(const std::string& /* plugin */,
 	    mStepY7 = (int)(mStepY * 0.7);
 	}
 
-	if (init->existValue("cellName")) {
+	if (init->exist("cellName")) {
 	    mCellName = toString(init->get("cellName"));
 	}
 
-	const value::Map& states = toMapValue(init->get("states"));
+	const value::Map& states = init->getMap("states");
 
-	if (states.existValue("name")) {
+	if (states.exist("name")) {
 	    mStateName = toString(states.get("name"));
 	}
 	if (toString(states.get("type")) == "integer") {
@@ -115,7 +115,7 @@ void CairoCAView::onParameter(const std::string& /* plugin */,
 
 	switch (mType) {
 	case INTEGER: {
-	    const value::Set& values = toSetValue(states.get("values"));
+	    const value::Set& values = states.getSet("values");
 
 	    for(value::Set::const_iterator it = values.begin();
 		it != values.end(); ++it) {
@@ -129,7 +129,7 @@ void CairoCAView::onParameter(const std::string& /* plugin */,
 	    break;
 	}
 	case REAL: {
-	    const value::Set& values = toSetValue(states.get("values"));
+	    const value::Set& values = states.getSet("values");
 
 	    for(value::Set::const_iterator it = values.begin();
 		it != values.end(); ++it) {
@@ -159,7 +159,7 @@ void CairoCAView::onParameter(const std::string& /* plugin */,
 	    break;
 	}
 	case BOOLEAN: {
-	    const value::Set& values = toSetValue(states.get("values"));
+	    const value::Set& values = states.getSet("values");
 
 	    for(value::Set::const_iterator it = values.begin();
 		it != values.end(); ++it) {
@@ -180,8 +180,8 @@ void CairoCAView::onParameter(const std::string& /* plugin */,
 
 	mObjectNumber = 0;
 
-	if (init->existValue("objects")) {
-	    const value::Set& objects = toSetValue(init->get("objects"));
+	if (init->exist("objects")) {
+	    const value::Set& objects = init->getSet("objects");
 	    std::vector<int> tmp_vector(5, 0);
 
 	    for(value::Set::const_iterator it = objects.begin();
@@ -252,11 +252,11 @@ void CairoCAView::onValue(const std::string& simulator,
         if (port == "c") {
             value::Set v_color = value->toSet();
             mObjects[v[0]][boost::lexical_cast < int >(v[1])-1][2] =
-		v_color.get(0).toInteger().value();
+		v_color.getLong(0);
             mObjects[v[0]][boost::lexical_cast < int >(v[1])-1][3] =
-		v_color.get(1).toInteger().value();
+		v_color.getLong(1);
             mObjects[v[0]][boost::lexical_cast < int >(v[1])-1][4] =
-		v_color.get(2).toInteger().value();
+		v_color.getLong(2);
         } else {
             if (port == "x") {
                 mObjects[v[0]][boost::lexical_cast < int >(v[1])-1][0] =

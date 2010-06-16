@@ -221,7 +221,7 @@ void CairoPlot::init(vpz::Output& output)
     if (init and init->isMap()) {
 	const value::Map* map = value::toMapValue(init);
 
-	if (map->existValue("curves")) {
+	if (map->exist("curves")) {
 	    const value::Set& curvesSet = map->getSet("curves");
 
 	    for (value::Set::const_iterator it = curvesSet.begin();
@@ -230,9 +230,9 @@ void CairoPlot::init(vpz::Output& output)
 		int r, g, b; std::string name, type, curve;
 
 		m_counter_curves++;
-		if (curveMap->existValue("color_red")
-		    and curveMap->existValue("color_green")
-		    and curveMap->existValue("color_blue"))
+		if (curveMap->exist("color_red")
+		    and curveMap->exist("color_green")
+		    and curveMap->exist("color_blue"))
 		{
 		    r = curveMap->getInt("color_red");
 		    g = curveMap->getInt("color_green");
@@ -244,12 +244,12 @@ void CairoPlot::init(vpz::Output& output)
 		    g = color.get_green();
 		    b = color.get_blue();
 		}
-		if (curveMap->existValue("name")) {
+		if (curveMap->exist("name")) {
 		    name = curveMap->getString("name");
 		} else {
 		    name = "curve ";
 		}
-		if (curveMap->existValue("type")) {
+		if (curveMap->exist("type")) {
 		    type = curveMap->getString("type");
 		} else {
 		    type = "real";
@@ -263,7 +263,7 @@ void CairoPlot::init(vpz::Output& output)
 		addCurve(curve, color, type, name);
 	    }
 	}
-	if (map->existValue("limits")) {
+	if (map->exist("limits")) {
 	    m_useLimits->set_active(true);
 	    sensitiveArea(LIMITS);
 	    const value::Set& limitsSet = map->getSet("limits");
@@ -274,9 +274,9 @@ void CairoPlot::init(vpz::Output& output)
 		int r, g, b; double value; std::string limit;
 
 		m_counter_limits++;
-		if (limitMap->existValue("color_red")
-		    and limitMap->existValue("color_green")
-		    and limitMap->existValue("color_blue"))
+		if (limitMap->exist("color_red")
+		    and limitMap->exist("color_green")
+		    and limitMap->exist("color_blue"))
 		{
 		    r = limitMap->getInt("color_red");
 		    g = limitMap->getInt("color_green");
@@ -288,7 +288,7 @@ void CairoPlot::init(vpz::Output& output)
 		    g = color.get_green();
 		    b = color.get_blue();
 		}
-		if (limitMap->existValue("value")) {
+		if (limitMap->exist("value")) {
 		    value = limitMap->getDouble("value");
 		} else {
 		    value = 1.0;
@@ -301,23 +301,23 @@ void CairoPlot::init(vpz::Output& output)
 		addLimit(limit, color, value);
 	    }
 	}
-	if (map->existValue("value")) {
+	if (map->exist("value")) {
 	    const value::Map& valueMap = map->getMap("value");
 	    m_useValue->set_active(true);
 	    sensitiveArea(VALUE);
-	    if (valueMap.existValue("min")) {
+	    if (valueMap.exist("min")) {
 		m_spinValueMin->set_value(valueMap.getDouble("min"));
 	    }
-	    if (valueMap.existValue("max")) {
+	    if (valueMap.exist("max")) {
 		m_spinValueMax->set_value(valueMap.getDouble("max"));
 	    }
 	}
-	if (map->existValue("scrolling")) {
+	if (map->exist("scrolling")) {
 	    m_useScrolling->set_active(true);
 	    sensitiveArea(SCROLLING);
 	    m_checkScrolling->set_active(map->getBoolean("scrolling"));
 	}
-	if (map->existValue("window")) {
+	if (map->exist("window")) {
 	    m_useWindow->set_active(true);
 	    sensitiveArea(WINDOW);
 	    m_spinWindow->set_value(map->getDouble("window"));

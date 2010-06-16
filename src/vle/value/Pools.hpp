@@ -36,76 +36,76 @@
 #ifdef VLE_HAVE_POOL
 namespace vle { namespace value {
 
-    class Value;
+class Value;
+
+/**
+ * @brief A thread-safe singleton to manage a set of boost::pools defined in
+ * the utils::Pools class.
+ */
+class VLE_VALUE_EXPORT Pools
+{
+public:
+    /**
+     * @brief Thread-Safe access to the Pools singleton.
+     * @return A reference to the boost::pools.
+     */
+    static utils::Pools < Value >& pools();
 
     /**
-     * @brief A thread-safe singleton to manage a set of boost::pools defined in
-     * the utils::Pools class.
+     * @brief Initialize the singleton.
      */
-    class VLE_VALUE_EXPORT Pools
-    {
-    public:
-        /**
-         * @brief Thread-Safe access to the Pools singleton.
-         * @return A reference to the boost::pools.
-         */
-        static utils::Pools < Value >& pools();
+    static void init()
+    { pools(); }
 
-        /**
-         * @brief Initialize the singleton.
-         */
-        static void init()
-        { pools(); }
+    /**
+     * @brief Delete the singleton.
+     */
+    static void kill()
+    { delete m_pool; m_pool = 0; }
 
-        /**
-         * @brief Delete the singleton.
-         */
-        static void kill()
-        { delete m_pool; m_pool = 0; }
+private:
+    /**
+     * @brief The singleton object.
+     */
+    static Pools* m_pool;
 
-    private:
-        /**
-         * @brief The singleton object.
-         */
-        static Pools* m_pool;
+    /**
+     * @brief The set of boost::pool for Value class.
+     */
+    utils::Pools < Value > m_pools;
 
-        /**
-         * @brief The set of boost::pool for Value class.
-         */
-        utils::Pools < Value > m_pools;
+    ///
+    ////
+    ///
 
-        ///
-        ////
-        ///
+    /**
+     * @brief Build a new utils::Pools with a default size defined to the
+     * max size of the Value (Boolean, Integer, Map, Matrix, Null, Set,
+     * String, Table, Tuple or Xml).
+     */
+    Pools();
 
-        /**
-         * @brief Build a new utils::Pools with a default size defined to the
-         * max size of the Value (Boolean, Integer, Map, Matrix, Null, Set,
-         * String, Table, Tuple or Xml).
-         */
-        Pools();
+    /**
+     * @brief Private copy constructor.
+     * @param other
+     */
+    Pools(const Pools& other);
 
-        /**
-         * @brief Private copy constructor.
-         * @param other
-         */
-        Pools(const Pools& other);
+    /**
+     * @brief Private assign operator.
+     * @param other
+     * @return
+     */
+    Pools& operator=(const Pools& /* other */) { return *this; }
+};
 
-        /**
-         * @brief Private assign operator.
-         * @param other
-         * @return
-         */
-        Pools& operator=(const Pools& /* other */) { return *this; }
-    };
-
-    inline utils::Pools < Value >& Pools::pools()
-    {
-        if (not m_pool) {
-            m_pool = new Pools();
-        }
-        return m_pool->m_pools;
+inline utils::Pools < Value >& Pools::pools()
+{
+    if (not m_pool) {
+        m_pool = new Pools();
     }
+    return m_pool->m_pools;
+}
 
 }} // namespace vle
 

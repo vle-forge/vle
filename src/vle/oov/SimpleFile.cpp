@@ -72,7 +72,7 @@ void SimpleFile::onParameter(const std::string& plugin,
 
     if (parameters and parameters->isMap()) {
         const value::Map* map = value::toMapValue(parameters);
-        if (map->existValue("locale")) {
+        if (map->exist("locale")) {
             std::string locale(map->getString("locale"));
             try {
                 if (locale == "user") {
@@ -89,7 +89,7 @@ void SimpleFile::onParameter(const std::string& plugin,
             }
         }
 
-        if (map->existValue("output")) {
+        if (map->exist("output")) {
             std::string type(map->getString("output"));
             if (type == "out") {
                 m_type = SimpleFile::STANDARD_OUT;
@@ -102,7 +102,7 @@ void SimpleFile::onParameter(const std::string& plugin,
             }
         }
 
-        if (map->existValue("julian-day")) {
+        if (map->exist("julian-day")) {
             m_julian = map->getBoolean("julian-day");
         }
     }

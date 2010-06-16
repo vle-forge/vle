@@ -80,25 +80,25 @@ void Storage::init(vpz::Output& output)
     const value::Value* init = output.data();
     if (init and init->isMap()) {
         const value::Map* map = value::toMapValue(init);
-        if (map->existValue("columns")) {
+        if (map->exist("columns")) {
             m_columns->set_value(value::toInteger(map->get("columns")));
         } else {
             m_columns->set_value(50.0);
         }
 
-        if (map->existValue("rows")) {
+        if (map->exist("rows")) {
             m_rows->set_value(value::toInteger(map->get("rows")));
         } else {
             m_rows->set_value(100.0);
         }
 
-        if (map->existValue("inc_columns")) {
+        if (map->exist("inc_columns")) {
             m_rzcolumns->set_value(value::toInteger(map->get("inc_columns")));
         } else {
             m_rzcolumns->set_value(50.0);
         }
 
-        if (map->existValue("inc_rows")) {
+        if (map->exist("inc_rows")) {
             m_rzrows->set_value(value::toInteger(map->get("inc_rows")));
         } else {
             m_rzrows->set_value(1000.0);

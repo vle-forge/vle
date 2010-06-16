@@ -484,13 +484,13 @@ bool DSDevs::processAddModel(const value::Map& val)
     std::string xmld, xmli;
     const value::Set* cnt = 0;
 
-    if (val.existValue("xmlDynamics"))
+    if (val.exist("xmlDynamics"))
         xmld.assign(val.getString("xmlDynamics"));
 
-    if (val.existValue("xmlInits"))
+    if (val.exist("xmlInits"))
         xmli.assign(val.getString("xmlInits"));
 
-    if (val.existValue("addConnection"))
+    if (val.exist("addConnection"))
         cnt = &val.getSet("addConnection");
 
     m_state = ADD_MODEL;
@@ -590,7 +590,7 @@ bool DSDevs::processChangeConnection(const value::Map& val)
 
 bool DSDevs::processBag(const value::Map& val)
 {
-    const value::Value* valuebag(&val.get("bag"));
+    const value::Value* valuebag(val.get("bag"));
     const value::Set* bag = value::toSetValue(valuebag);
     bool result = true;
 
@@ -598,7 +598,7 @@ bool DSDevs::processBag(const value::Map& val)
     for (value::VectorValue::const_iterator it = vv.begin();
          it != vv.end(); ++it) {
         value::Map* msg = value::toMapValue(*it);
-        value::Value& msgaction = msg->get("action");
+        value::Value& msgaction = value::reference(msg->get("action"));
         value::String& straction = value::toStringValue(msgaction);
 
         const std::string& action = straction.value();

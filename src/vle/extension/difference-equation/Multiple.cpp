@@ -45,7 +45,7 @@ Multiple::Multiple(const DynamicsInit& model,
         unsigned int index;
 
         for (index = 0; index < variables.size(); ++index) {
-            const value::Set& tab(toSetValue(variables.get(index)));
+            const value::Set& tab(variables.getSet(index));
             std::string name = toString(tab.get(0));
 
             mVariableNames.push_back(name);
@@ -54,14 +54,14 @@ Multiple::Multiple(const DynamicsInit& model,
             size(name, DEFAULT_SIZE);
 
             if (tab.size() > 1) {
-                if (tab.get(1).isDouble()) {
+                if (tab.get(1)->isDouble()) {
                     double init = toDouble(tab.get(1));
 
                     mInitialValues[name] = init;
                     mInitValues[name] = true;
                 } else {
-                    if (tab.get(1).isSet()) {
-                        const Set& init = toSetValue(tab.get(1));
+                    if (tab.get(1)->isSet()) {
+                        const Set& init = tab.getSet(1);
                         unsigned int i;
 
                         for (i = 0; i < init.size(); ++i) {
@@ -70,7 +70,7 @@ Multiple::Multiple(const DynamicsInit& model,
                     }
                 }
                 if (tab.size() == 3) {
-                    const Set& init = toSetValue(tab.get(2));
+                    const Set& init = tab.getSet(2);
                     unsigned int i;
 
                     for (i = 0; i < init.size(); ++i) {

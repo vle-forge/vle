@@ -165,9 +165,9 @@ BOOST_AUTO_TEST_CASE(check_clone)
     mp->add("x3", value::String::create("toto"));
 
     value::Map* mpclone = dynamic_cast < value::Map* >(mp->clone());
-    BOOST_REQUIRE(&mp->get("x1") != &mpclone->get("x1"));
-    BOOST_REQUIRE(&mp->get("x2") != &mpclone->get("x2"));
-    BOOST_REQUIRE(&mp->get("x3") != &mpclone->get("x3"));
+    BOOST_REQUIRE(mp->get("x1") != mpclone->get("x1"));
+    BOOST_REQUIRE(mp->get("x2") != mpclone->get("x2"));
+    BOOST_REQUIRE(mp->get("x3") != mpclone->get("x3"));
 
     value::Set* st = value::Set::create();
     st->add(value::String::create("toto"));
@@ -178,9 +178,9 @@ BOOST_AUTO_TEST_CASE(check_clone)
 
     BOOST_REQUIRE_EQUAL(st->size(), stclone->size());
 
-    BOOST_REQUIRE(&st->get(0) != &stclone->get(0));
-    BOOST_REQUIRE(&st->get(1) != &stclone->get(1));
-    BOOST_REQUIRE(&st->get(2) != &stclone->get(2));
+    BOOST_REQUIRE(st->get(0) != stclone->get(0));
+    BOOST_REQUIRE(st->get(1) != stclone->get(1));
+    BOOST_REQUIRE(st->get(2) != stclone->get(2));
 
     delete(mp);
     delete(mpclone);

@@ -46,7 +46,7 @@ OutputMatrix::OutputMatrix(int columns,
     m_values = value::Matrix::create(
         1, // one row by default for the time column.
         0, // no data by default.
-        (columns == 0) ? 1 : columns, // default size, minimun 1 column.
+        (columns <= 0) ? 1 : columns, // default size, minimun 1 column.
         rows, resizeColumns, resizeRows);
 }
 
@@ -82,8 +82,8 @@ void OutputMatrix::deserialize(const value::Value& vals)
         throw utils::ArgError(_("Bad OutputMatrix deserialize flows"));
     }
 
-    m_values = value::toMatrixValue(result.get(0).clone());
-    const value::Set& id(result.get(1).toSet());
+    m_values = value::toMatrixValue(result.get(0)->clone());
+    const value::Set& id(result.get(1)->toSet());
 
     if (id.size() % 3 != 0) {
         throw utils::ArgError(fmt(
@@ -124,7 +124,7 @@ void OutputMatrix::updateStep(value::Matrix::size_type resizeColumns,
 }
 
 value::Matrix::index OutputMatrix::addModel(const std::string& model,
-                                                   const std::string& port)
+                                            const std::string& port)
 {
     PairString colref(model, port);
 

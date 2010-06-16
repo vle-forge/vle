@@ -28,44 +28,18 @@
 
 
 #include <vle/value/Matrix.hpp>
+#include <vle/value/Set.hpp>
+#include <vle/value/Map.hpp>
 #include <vle/value/Deleter.hpp>
 #include <vle/utils/Debug.hpp>
 #include <boost/utility.hpp>
 
 namespace vle { namespace value {
 
-Matrix::Matrix() :
-    m_matrix(),
-    m_nbcol(0),
-    m_nbrow(0),
-    m_stepcol(1),
-    m_steprow(1),
-    m_lastX(0),
-    m_lastY(0)
-{
-}
-
-Matrix::Matrix(index columns, index rows, index resizeColumns, index
-               resizeRows) :
-    m_matrix(m_extents[columns][rows]),
-    m_nbcol(columns),
-    m_nbrow(rows),
-    m_stepcol(resizeColumns),
-    m_steprow(resizeRows),
-    m_lastX(0),
-    m_lastY(0)
-{
-}
-
 Matrix::Matrix(index columns, index rows, index columnmax, index rowmax, index
-               resizeColumns, index resizeRows) :
-    m_matrix(m_extents[columnmax][rowmax]),
-    m_nbcol(columns),
-    m_nbrow(rows),
-    m_stepcol(resizeColumns),
-    m_steprow(resizeRows),
-    m_lastX(0),
-    m_lastY(0)
+               resizeColumns, index resizeRows)
+    : m_matrix(m_extents[columnmax][rowmax]), m_nbcol(columns), m_nbrow(rows),
+    m_stepcol(resizeColumns), m_steprow(resizeRows), m_lastX(0), m_lastY(0)
 {
     if (columns > columnmax) {
         throw utils::ArgError(fmt(_(
@@ -78,29 +52,21 @@ Matrix::Matrix(index columns, index rows, index columnmax, index rowmax, index
     }
 }
 
-
-Matrix::Matrix(const Matrix& m) :
-    Value(m),
-    m_matrix(m.m_matrix),
-    m_nbcol(m.m_nbcol),
-    m_nbrow(m.m_nbrow),
-    m_stepcol(m.m_stepcol),
-    m_steprow(m.m_steprow)
+Matrix::Matrix(const Matrix& m)
+    : Value(m), m_nbcol(m.m_nbcol), m_nbrow(m.m_nbrow), m_stepcol(m.m_stepcol),
+    m_steprow(m.m_steprow), m_lastX(0), m_lastY(0)
 {
+    m_matrix.resize(m_extents[m_nbcol][m_nbrow]);
+
     for (size_type i = 0; i < m_nbcol; ++i) {
         for (size_type j = 0; j < m_nbrow; ++j) {
-            if( m_matrix[i][j]) {
-                m_matrix[i][j] = m_matrix[i][j]->clone();
+            if (m.m_matrix[i][j]) {
+                m_matrix[i][j] = m.m_matrix[i][j]->clone();
             } else {
                 m_matrix[i][j] = 0;
             }
         }
     }
-}
-
-Matrix::~Matrix()
-{
-    clear();
 }
 
 void Matrix::writeFile(std::ostream& out) const
@@ -168,21 +134,71 @@ void Matrix::clear()
                     composite.push(m_matrix[i][j]);
                 } else {
                     delete m_matrix[i][j];
-                    m_matrix[i][j] = 0;
                 }
+                m_matrix[i][j] = 0;
             }
         }
     }
 
     deleter(composite);
 
-    m_nbcol = 0;
-    m_nbrow = 0;
     m_lastX = 0;
     m_lastY = 0;
 }
 
-void Matrix::resize(size_type columns, size_type rows)
+Set& Matrix::addSet(const size_type& column, const size_type& row)
+{
+    value::Set* tmp = new value::Set();
+    add(column, row, tmp);
+    return *tmp;
+}
+
+Map& Matrix::addMap(const size_type& column, const size_type& row)
+{
+    value::Map* tmp = new value::Map();
+    add(column, row, tmp);
+    return *tmp;
+}
+
+Matrix& Matrix::addMatrix(const size_type& column, const size_type& row)
+{
+    value::Matrix* tmp = new value::Matrix();
+    add(column, row, tmp);
+    return *tmp;
+}
+
+Set& Matrix::getSet(const size_type& column, const size_type& row)
+{
+    return value::toSetValue(value::reference(get(column, row)));
+}
+
+Map& Matrix::getMap(const size_type& column, const size_type& row)
+{
+    return value::toMapValue(value::reference(get(column, row)));
+}
+
+Matrix& Matrix::getMatrix(const size_type& column, const size_type& row)
+{
+    return value::toMatrixValue(value::reference(get(column, row)));
+}
+
+const Set& Matrix::getSet(const size_type& column, const size_type& row) const
+{
+    return value::toSetValue(value::reference(get(column, row)));
+}
+
+const Map& Matrix::getMap(const size_type& column, const size_type& row) const
+{
+    return value::toMapValue(value::reference(get(column, row)));
+}
+
+const Matrix& Matrix::getMatrix(const size_type& column,
+                                const size_type& row) const
+{
+    return value::toMatrixValue(value::reference(get(column, row)));
+}
+
+void Matrix::resize(const size_type& columns, const size_type& rows)
 {
     m_matrix.resize(m_extents[columns][rows]);
 }
@@ -205,34 +221,6 @@ void Matrix::addRow()
             [m_matrix.shape()[1] + m_steprow]);
     }
     ++m_nbrow;
-}
-
-void Matrix::add(size_type column, size_type row, value::Value* val)
-{
-    if (m_matrix[column][row]) {
-        delete m_matrix[column][row];
-    }
-    m_matrix[column][row] = val;
-}
-
-
-void Matrix::add(size_type column, size_type row, const value::Value& val)
-{
-    if (m_matrix[column][row]) {
-        delete m_matrix[column][row];
-    }
-    m_matrix[column][row] = val.clone();
-}
-
-void Matrix::addToLastCell(const value::Value& val)
-{
-    m_matrix[m_lastX][m_lastY] = val.clone();
-}
-
-void Matrix::addToLastCell(value::Value* val)
-{
-    assert(val);
-    m_matrix[m_lastX][m_lastY] = val;
 }
 
 void Matrix::moveLastCell()

@@ -105,20 +105,20 @@ value::Value* GenExecutive::observation(const devs::ObservationEvent& ev) const
         return value::String::create(out.str());
     } else if (ev.onPort("adjacency_matrix")) {
         value::Set *set = value::Set::create();
-        set->addCloneValue(*value::Integer::create(1));
+        set->add(value::Integer::create(1));
         if(get_nb_model() > 0 and ev.getTime() < 50.0){
-            set->addCloneValue(*value::String::create("add"));
+            set->add(value::String::create("add"));
             std::string name = (fmt("beep_%1%") % m_stacknames.size()).str();
-            set->addCloneValue(*value::String::create(name));
-            set->addCloneValue(*value::String::create("2"));
+            set->add(value::String::create(name));
+            set->add(value::String::create("2"));
             std::string edge =  name + std::string(" counter ");
-            set->addCloneValue(*value::String::create(edge));
+            set->add(value::String::create(edge));
         }
         else if(get_nb_model() > 0){
-            set->addCloneValue(*value::String::create("delete"));
+            set->add(value::String::create("delete"));
             std::string name = (fmt(
                     "beep_%1%") % (get_nb_model())).str();
-            set->addCloneValue(*value::String::create(name));
+            set->add(value::String::create(name));
         }
 
         return set;

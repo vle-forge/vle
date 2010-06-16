@@ -227,7 +227,7 @@ namespace vle { namespace devs {
          * @return true if Value exist, false otherwise.
          */
         inline bool existAttributeValue(const std::string& name) const
-        { return haveAttributes() ? attributes().existValue(name) : false; }
+        { return haveAttributes() ? attributes().exist(name) : false; }
 
         /**
          * Get an attribute from this Event.
@@ -236,7 +236,7 @@ namespace vle { namespace devs {
          */
         inline const value::Value& getAttributeValue(
             const std::string& name) const
-        { return attributes().get(name); }
+        { return value::reference(attributes().get(name)); }
 
         /**
          * Get a double attribute from this Event.

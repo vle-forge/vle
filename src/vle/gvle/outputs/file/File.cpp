@@ -102,7 +102,7 @@ void File::init(vpz::Output& output)
     const value::Value* init = output.data();
     if (init and init->isMap()) {
         const value::Map* map = value::toMapValue(init);
-        if (map->existValue("type")) {
+        if (map->exist("type")) {
             std::string type = map->getString("type");
 
             if (type != "csv" and type != "rdata" and type != "text") {
@@ -113,7 +113,7 @@ void File::init(vpz::Output& output)
             mComboType->set_active_text(type);
         }
 
-        if (map->existValue("locale")) {
+        if (map->exist("locale")) {
             std::string loc = map->getString("locale");
             if (not loc.empty() and loc != "user") {
                 mComboFile->append_text(loc);
@@ -122,7 +122,7 @@ void File::init(vpz::Output& output)
             mComboFile->set_active_text(loc);
         }
 
-        if (map->existValue("output")) {
+        if (map->exist("output")) {
             std::string type = map->getString("output");
 
             if (type == "out") {
