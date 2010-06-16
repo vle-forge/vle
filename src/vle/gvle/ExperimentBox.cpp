@@ -342,7 +342,7 @@ void ExperimentBox::on_calendarBegin()
 void ExperimentBox::on_now()
 {
     try {
-        mEntryDate->set_text(utils::DateTime::currentDate());
+        mEntryDate->set_text(utils::DateTime::simpleCurrentDate());
     } catch(...) {
     }
 }

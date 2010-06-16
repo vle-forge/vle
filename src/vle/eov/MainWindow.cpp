@@ -135,7 +135,8 @@ void MainWindow::onNew()
         Glib::RefPtr < Gtk::TextBuffer > buffer = mTextview->get_buffer();
         buffer->insert(buffer->begin(), (fmt(_(
                     "%1%: Eov Stream listen on port %2% at %3%ms\n")) %
-		   utils::DateTime::currentDate() % mPort % mRefresh).str());
+                   utils::DateTime::simpleCurrentDate() % mPort %
+                   mRefresh).str());
         mTextview->set_editable(false);
         mTextview->show_all();
     }
@@ -210,9 +211,10 @@ bool MainWindow::isStreamReaderFinish()
                                              mNet->finishError()).str());
 	}
 
-        buffer->insert(buffer->begin(), (fmt(_( "%1%: Eov Stream close\n")) %
-                                         utils::DateTime::currentDate()).str());
-	showMenu();
+        buffer->insert(buffer->begin(),
+                       (fmt(_( "%1%: Eov Stream close\n")) %
+                        utils::DateTime::simpleCurrentDate()).str());
+        showMenu();
 	return false;
     }
     return true;

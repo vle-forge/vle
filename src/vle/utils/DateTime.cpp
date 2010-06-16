@@ -31,6 +31,7 @@
 #include <vle/utils/Exception.hpp>
 #include <glibmm/date.h>
 #include <boost/numeric/conversion/cast.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <fstream>
 #include <cmath>
 
@@ -38,9 +39,13 @@ namespace vle { namespace utils {
 
 std::string DateTime::currentDate()
 {
-    Glib::Date date;
-    date.set_time_current();
-    return date.format_string("%a, %d %b %Y");
+    boost::posix_time::ptime current(
+        boost::posix_time::second_clock::local_time());
+
+    std::ostringstream out;
+    out << current;
+
+    return out.str();
 }
 
 std::string DateTime::simpleCurrentDate()
