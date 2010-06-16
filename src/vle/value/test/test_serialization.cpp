@@ -256,8 +256,8 @@ BOOST_AUTO_TEST_CASE(check_matrix_serialization)
         value::Value::registerValues(ia);
         ia >> (value::Matrix&)*mx;
 
-        BOOST_REQUIRE_EQUAL(mx->rows(), (value::Matrix::size_type)1);
-        BOOST_REQUIRE_EQUAL(mx->columns(), (value::Matrix::size_type)1);
+        BOOST_REQUIRE_EQUAL(mx->rows(), (value::Matrix::size_type)101);
+        BOOST_REQUIRE_EQUAL(mx->columns(), (value::Matrix::size_type)101);
 
         BOOST_REQUIRE_EQUAL(mx->value()[0][0]->isInteger(), true);
         BOOST_REQUIRE_EQUAL(value::toInteger(*mx->value()[0][0]), 10);

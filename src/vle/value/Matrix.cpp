@@ -48,8 +48,8 @@ Matrix::Matrix() :
 Matrix::Matrix(index columns, index rows, index resizeColumns, index
                resizeRows) :
     m_matrix(m_extents[columns][rows]),
-    m_nbcol(0),
-    m_nbrow(0),
+    m_nbcol(columns),
+    m_nbrow(rows),
     m_stepcol(resizeColumns),
     m_steprow(resizeRows),
     m_lastX(0),
@@ -67,12 +67,12 @@ Matrix::Matrix(index columns, index rows, index columnmax, index rowmax, index
     m_lastX(0),
     m_lastY(0)
 {
-    if (columns >= columnmax) {
+    if (columns > columnmax) {
         throw utils::ArgError(fmt(_(
                 "Number of columns error: %1% on %2%")) % columns % columnmax);
     }
 
-    if (rows >= rowmax) {
+    if (rows > rowmax) {
         throw utils::ArgError(fmt(_(
                 "Number of row error: %1% on %2%")) % rows % rowmax);
     }
