@@ -397,7 +397,8 @@ protected:
 
 struct VLE_EXTENSION_EXPORT Var
 {
-    Var(const std::string& name) : name(name)  { }
+    Var(const std::string& name) : name(name), value(0.0)  { }
+
     Var(const std::string& name,
         const vle::devs::ExternalEvent* event) :
         name(name),
