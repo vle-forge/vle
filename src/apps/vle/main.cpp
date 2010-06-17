@@ -46,8 +46,17 @@ void appendToCommandLineList(const char* param, manager::CmdArgs& out)
     using utils::Path;
     using utils::Package;
 
-    std::string p(param);
+    const std::string p(param);
     if (Path::existFile(p)) {
+        if (not Package::package().name().empty()) {
+            const std::string np = Path::path().getPackageExpFile(param);
+            if (Path::existFile(np)) {
+                throw utils::ArgError(fmt(
+                        _("Filename '%1%' exists in current directory (%2%) "
+                          "and in the package exp directory (%3%).")) % param %
+                    utils::Path::getCurrentPath() % np);
+            }
+        }
         out.push_back(p);
         return;
     } else if (not Package::package().name().empty()) {
