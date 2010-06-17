@@ -939,6 +939,13 @@ std::string Path::buildDirname(const std::string& dir1,
     return f.string();
 }
 
+std::string Path::getCurrentPath()
+{
+    fs::path current = fs::current_path();
+
+    return current.file_string();
+}
+
 bool Path::exist(const std::string& filename)
 {
     fs::path p(filename);

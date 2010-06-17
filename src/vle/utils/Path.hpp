@@ -352,6 +352,13 @@ namespace vle { namespace utils {
          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
         /**
+         * @brief Get the current path of the process.
+         *
+         * @return The current path of the process.
+         */
+        static std::string getCurrentPath();
+
+        /**
          * @brief Check if the current path exist (file or directory).
          * @param filename The name of the file to check.
          * @return True if the file is a regular file.
