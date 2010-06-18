@@ -51,9 +51,12 @@ AtomicModelBox::InputPortTreeView::InputPortTreeView(
 {
     mRefTreeModelInputPort = Gtk::ListStore::create(mColumnsInputPort);
     set_model(mRefTreeModelInputPort);
-    //append_column(_("Name"), mColumnsInputPort.m_col_name);
+
     mColumnName = append_column_editable(_("Name"),
 					 mColumnsInputPort.m_col_name);
+    Gtk::TreeViewColumn* nameCol = get_column(mColumnName - 1);
+    nameCol->set_sort_column(mColumnsInputPort.m_col_name);
+
     mCellrendererValidated = dynamic_cast<Gtk::CellRendererText*>(
 	get_column_cell_renderer(mColumnName - 1));
     mCellrendererValidated->property_editable() = true;
@@ -264,6 +267,9 @@ AtomicModelBox::OutputPortTreeView::OutputPortTreeView(
 
     mColumnName = append_column_editable(_("Name"),
 				     mColumnsOutputPort.m_col_name);
+    Gtk::TreeViewColumn* nameCol = get_column(mColumnName - 1);
+    nameCol->set_sort_column(mColumnsOutputPort.m_col_name);
+
     mCellrendererValidated = dynamic_cast<Gtk::CellRendererText*>(
 	get_column_cell_renderer(mColumnName - 1));
     mCellrendererValidated->property_editable() = true;
@@ -414,7 +420,7 @@ void AtomicModelBox::OutputPortTreeView::onRename()
 }
 
 void AtomicModelBox::OutputPortTreeView::onEditionStarted(
-    Gtk::CellEditable* cell_editable, const Glib::ustring& /* path */)
+    Gtk::CellEditable* cell_editable, const Glib::ustring& /* path */ )
 {
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
     Gtk::TreeModel::iterator iter = refSelection->get_selected();
@@ -472,7 +478,10 @@ AtomicModelBox::ConditionTreeView::ConditionTreeView(
     mRefTreeModel = Gtk::ListStore::create(mColumns);
     set_model(mRefTreeModel);
     append_column_editable(_("In"), mColumns.m_col_activ);
+
     mColumnName = append_column_editable(_("Name"), mColumns.m_col_name);
+    Gtk::TreeViewColumn* nameCol = get_column(mColumnName - 1);
+    nameCol->set_sort_column(mColumns.m_col_name);
 
     mCellrendererValidated = dynamic_cast<Gtk::CellRendererText*>(
 	get_column_cell_renderer(mColumnName - 1));
@@ -486,7 +495,6 @@ AtomicModelBox::ConditionTreeView::ConditionTreeView(
 	sigc::mem_fun(*this,
 		      &AtomicModelBox::ConditionTreeView::
 		      onEdition) );
-
     //Fill popup menu
     {
 	Gtk::Menu::MenuList& menulist = mMenuPopup.items();
@@ -660,15 +668,21 @@ AtomicModelBox::DynamicTreeView::DynamicTreeView(
     : Gtk::TreeView(cobject), mXml(refGlade)
 {
     mRefListDyn = Gtk::ListStore::create(mColumnsDyn);
-    mRefTreeModelDyn = Gtk::TreeModelSort::create(mRefListDyn);
-    set_model(mRefTreeModelDyn);
+    set_model(mRefListDyn);
+
+    mColumnSel = append_column_editable(_(" "), mColumnsDyn.m_sel);
+    Gtk::CellRendererToggle* cellRenderer
+        = dynamic_cast<Gtk::CellRendererToggle*>(
+            get_column_cell_renderer(mColumnSel - 1));
+    cellRenderer->set_radio();
+    cellRenderer->signal_toggled().connect(
+        sigc::mem_fun(*this,
+                      &AtomicModelBox::DynamicTreeView::
+                      onToggled));
+
     mColumnName = append_column_editable(_("Name"), mColumnsDyn.m_col_name);
     Gtk::TreeViewColumn* nameCol = get_column(mColumnName - 1);
-    nameCol->set_clickable(true);
-    nameCol->signal_clicked().connect(
-	sigc::bind(sigc::mem_fun(*this,
-		&AtomicModelBox::DynamicTreeView::onClickColumn), mColumnName));
-    nameCol->set_sort_order(Gtk::SORT_DESCENDING);
+    nameCol->set_sort_column(mColumnsDyn.m_col_name);
 
     mCellRenderer = dynamic_cast<Gtk::CellRendererText*>(
 	get_column_cell_renderer(mColumnName - 1));
@@ -682,29 +696,15 @@ AtomicModelBox::DynamicTreeView::DynamicTreeView(
 
     mColumnPackage = append_column(_("Package"), mColumnsDyn.m_package);
     Gtk::TreeViewColumn* packageCol = get_column(mColumnPackage - 1);
-    packageCol->set_clickable(true);
-    packageCol->signal_clicked().connect(
-        sigc::bind(sigc::mem_fun(*this,
-                                 &AtomicModelBox::DynamicTreeView::onClickColumn),
-                   mColumnPackage));
-    packageCol->set_sort_order(Gtk::SORT_DESCENDING);
+    packageCol->set_sort_column(mColumnsDyn.m_package);
 
     mColumnDyn = append_column(_("Library"), mColumnsDyn.m_dyn);
     Gtk::TreeViewColumn* dynCol = get_column(mColumnDyn - 1);
-    dynCol->set_clickable(true);
-    dynCol->signal_clicked().connect(
-	sigc::bind(sigc::mem_fun(*this,
-		&AtomicModelBox::DynamicTreeView::onClickColumn), mColumnDyn));
-    dynCol->set_sort_order(Gtk::SORT_DESCENDING);
+    dynCol->set_sort_column(mColumnsDyn.m_dyn);
 
     mColumnModel = append_column(_("Model"), mColumnsDyn.m_model);
     Gtk::TreeViewColumn* modelCol = get_column(mColumnModel - 1);
-    modelCol->set_clickable(true);
-    modelCol->signal_clicked().connect(
-	sigc::bind(sigc::mem_fun(*this,
-		&AtomicModelBox::DynamicTreeView::onClickColumn),
-		   mColumnModel));
-    modelCol->set_sort_order(Gtk::SORT_DESCENDING);
+    modelCol->set_sort_column(mColumnsDyn.m_model);
 
     {
 	Gtk::Menu::MenuList& menulist = mMenuPopup.items();
@@ -753,6 +753,7 @@ void AtomicModelBox::DynamicTreeView::build()
     using namespace vpz;
 
     mRefListDyn->clear();
+    mLabel->set_label(_("Selected Dynamic: "));
 
     const DynamicList& list = mDynamics->dynamiclist();
     DynamicList::const_iterator it = list.begin();
@@ -762,18 +763,19 @@ void AtomicModelBox::DynamicTreeView::build()
         row[mColumnsDyn.m_package] = it->second.package();
         row[mColumnsDyn.m_dyn] = it->second.library();
 	row[mColumnsDyn.m_model] = it->second.model();
-
+        row[mColumnsDyn.m_sel] = false;
         ++it;
     }
 
-    const Gtk::TreeModel::Children& child = mRefTreeModelDyn->children();
+    const Gtk::TreeModel::Children& child = mRefListDyn->children();
     Gtk::TreeModel::Children::const_iterator it_child = child.begin();
     while (it_child != child.end()) {
         if (it_child->get_value(mColumnsDyn.m_col_name) == mModel->dynamics()) {
-	    Gtk::TreeModel::Path path = mRefTreeModelDyn->get_path(it_child);
+	    Gtk::TreeModel::Path path = mRefListDyn->get_path(it_child);
 	    set_cursor(path);
+            (*it_child)[mColumnsDyn.m_sel] = true;
 	    mLabel->set_label(_("Selected Dynamic: ") + mModel->dynamics());
-	}
+        }
         ++it_child;
     }
 }
@@ -809,35 +811,6 @@ bool AtomicModelBox::DynamicTreeView::on_button_press_event(
   return return_value;
 }
 
-void AtomicModelBox::DynamicTreeView::onClickColumn(int numColumn)
-{
-    if (get_column(numColumn - 1)->get_sort_order() == Gtk::SORT_ASCENDING) {
-        mRefTreeModelDyn->set_sort_column(numColumn - 1, Gtk::SORT_DESCENDING);
-	get_column(numColumn - 1)->set_sort_order(Gtk::SORT_DESCENDING);
-    } else {
-        mRefTreeModelDyn->set_sort_column_id(numColumn - 1,
-                                             Gtk::SORT_ASCENDING);
-	get_column(numColumn - 1)->set_sort_order(Gtk::SORT_ASCENDING);
-    }
-
-    if (numColumn == 1) {
-	get_column(mColumnPackage - 1)->set_sort_order(Gtk::SORT_DESCENDING);
-	get_column(mColumnDyn - 1)->set_sort_order(Gtk::SORT_DESCENDING);
-	get_column(mColumnModel - 1)->set_sort_order(Gtk::SORT_DESCENDING);
-    } else if (numColumn == 2) {
-	get_column(mColumnName - 1)->set_sort_order(Gtk::SORT_DESCENDING);
-	get_column(mColumnDyn - 1)->set_sort_order(Gtk::SORT_DESCENDING);
-	get_column(mColumnModel - 1)->set_sort_order(Gtk::SORT_DESCENDING);
-    } else if (numColumn == 3) {
-	get_column(mColumnName - 1)->set_sort_order(Gtk::SORT_DESCENDING);
-	get_column(mColumnPackage - 1)->set_sort_order(Gtk::SORT_DESCENDING);
-	get_column(mColumnModel - 1)->set_sort_order(Gtk::SORT_DESCENDING);
-    } else {
-	get_column(mColumnName - 1)->set_sort_order(Gtk::SORT_DESCENDING);
-	get_column(mColumnPackage - 1)->set_sort_order(Gtk::SORT_DESCENDING);
-	get_column(mColumnDyn - 1)->set_sort_order(Gtk::SORT_DESCENDING);
-    }
-}
 
 std::string AtomicModelBox::DynamicTreeView::pathFileSearch(
     const std::string& path, const std::string& filename)
@@ -869,7 +842,9 @@ void AtomicModelBox::DynamicTreeView::onRowActivated(
     if (column
 	and not vle::utils::Path::path().getPackageDir().empty()
         and utils::Path::exist(vle::utils::Path::path().getPackageSrcDir())) {
-	Gtk::TreeRow row = (*mRefTreeModelDyn->get_iter(path));
+
+        Gtk::TreeRow row = (*mRefListDyn->get_iter(path));
+
 	vpz::Dynamic& dynamic = mDynamics->get(
 	    row.get_value(mColumnsDyn.m_col_name));
 
@@ -943,11 +918,11 @@ void AtomicModelBox::DynamicTreeView::onAdd()
                 mDynamics->add(dyn);
                 mParent->refresh();
 
-		const Gtk::TreeModel::Children& child(mRefTreeModelDyn->children());
+		const Gtk::TreeModel::Children& child(mRefListDyn->children());
                 Gtk::TreeModel::Children::const_iterator it = child.begin();
                 while (it != child.end()) {
                     if (it->get_value(mColumnsDyn.m_col_name) == dyn.name()) {
-			Gtk::TreeModel::Path path = mRefTreeModelDyn->get_path(it);
+			Gtk::TreeModel::Path path = mRefListDyn->get_path(it);
 			set_cursor(path);
                         break;
                     }
@@ -960,42 +935,50 @@ void AtomicModelBox::DynamicTreeView::onAdd()
 
 void AtomicModelBox::DynamicTreeView::onEdit()
 {
-    Glib::RefPtr<Gtk::TreeView::Selection> refSelection	= get_selection();
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
     Gtk::TreeModel::iterator it = refSelection->get_selected();
-    Glib::ustring dyn = (*it)[mColumnsDyn.m_col_name];
 
-    if (not dyn.empty()) {
-        vpz::Dynamic& dynamic(mDynamics->get(dyn));
-        DynamicBox mDynamicBox(mXml,
-                               mModeling->getGVLE(),
-                               *mAtom, *mModel, dynamic,
-                               *mConditions, *mObservables);
-        mDynamicBox.show(&dynamic);
-        build();
+    if (it) {
+        Glib::ustring dyn = (*it)[mColumnsDyn.m_col_name];
 
-	const Gtk::TreeModel::Children& child(mRefTreeModelDyn->children());
-	Gtk::TreeModel::Children::const_iterator it = child.begin();
-	while (it != child.end()) {
-	    if (it->get_value(mColumnsDyn.m_col_name) == dyn) {
-		Gtk::TreeModel::Path path = mRefTreeModelDyn->get_path(it);
-		set_cursor(path);
-		mLabel->set_label(_("Selected Dynamic: ") + mModel->dynamics());
-		break;
-	    }
-	    ++it;
-	}
+        if (not dyn.empty()) {
+            vpz::Dynamic& dynamic(mDynamics->get(dyn));
+            DynamicBox mDynamicBox(mXml,
+                                   mModeling->getGVLE(),
+                                   *mAtom, *mModel, dynamic,
+                                   *mConditions, *mObservables);
+            mDynamicBox.show(&dynamic);
+            build();
+
+            const Gtk::TreeModel::Children& child(mRefListDyn->children());
+            Gtk::TreeModel::Children::const_iterator it = child.begin();
+            while (it != child.end()) {
+                if (it->get_value(mColumnsDyn.m_col_name) == dyn) {
+                    Gtk::TreeModel::Path path = mRefListDyn->get_path(it);
+                    set_cursor(path);
+                    mLabel->set_label(_("Selected Dynamic: ") + mModel->dynamics());
+                    break;
+                }
+                ++it;
+            }
+        }
     }
 }
 
 void AtomicModelBox::DynamicTreeView::onRemove()
 {
-    Glib::RefPtr<Gtk::TreeView::Selection> refSelection	= get_selection();
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
     Gtk::TreeModel::iterator it = refSelection->get_selected();
-    Glib::ustring dyn = (*it)[mColumnsDyn.m_col_name];
 
-    if (not dyn.empty()) {
-        mDynamics->del(dyn);
-	build();
+    if (it) {
+        Glib::ustring dyn = (*it)[mColumnsDyn.m_col_name];
+        if (not dyn.empty()) {
+            if ((*it)[mColumnsDyn.m_sel] == true) {
+                mModel->setDynamics("");
+            }
+            mDynamics->del(dyn);
+            build();
+        }
     }
 }
 
@@ -1003,47 +986,52 @@ void AtomicModelBox::DynamicTreeView::onRename()
 {
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
     Gtk::TreeModel::iterator it = refSelection->get_selected();
-    Glib::ustring oldName = (*it)[mColumnsDyn.m_col_name];
 
-    if (not oldName.empty()) {
-	SimpleTypeBox box(_("Name of the Dynamic ?"), oldName);
+    if (it) {
+        Glib::ustring oldName = (*it)[mColumnsDyn.m_col_name];
 
-	std::string newName = box.run();
-	if (box.valid() and not newName.empty()) {
-	    box.hide_all();
-	    newName = boost::trim_copy(newName);
-	    if (mDynamics->exist(newName)) {
-		Error(
-		    boost::str(
-			fmt(_("The Dynamics '%1%' already exists")) % newName));
-	    } else {
-		vpz::Dynamic* newDynamic = new vpz::Dynamic(newName);
-		vpz::Dynamic oldDynamic = mDynamics->get(oldName);
-		newDynamic->setLibrary(oldDynamic.library());
-		newDynamic->setPackage(oldDynamic.package());
-		newDynamic->setModel(oldDynamic.model());
-		newDynamic->setLanguage(oldDynamic.language());
-		if (oldDynamic.location().empty()) {
-		    newDynamic->setLocalDynamics();
-		} else {
-		    std::vector<std::string> vec;
-		    boost::split(vec, oldDynamic.location(),
-				 boost::is_any_of(":"));
-		    std::string location =
-			oldDynamic.location().substr(
-			    0, oldDynamic.location().size()
-			    - vec[vec.size() - 1].size() - 1);
-		    int port = boost::lexical_cast<int>(vec[vec.size() - 1]);
+        if (not oldName.empty()) {
+            SimpleTypeBox box(_("Name of the Dynamic ?"), oldName);
 
-		    newDynamic->setDistantDynamics(location, port);
-		}
-		mDynamics->add(*newDynamic);
-		mDynamics->del(oldName);
-		mModel->setDynamics(newName);
-		mRenameList.push_back(std::make_pair(oldName, newName));
-		build();
-	    }
-	}
+            std::string newName = box.run();
+            if (box.valid() and not newName.empty()) {
+                box.hide_all();
+                newName = boost::trim_copy(newName);
+                if (mDynamics->exist(newName)) {
+                    Error(
+                        boost::str(
+                            fmt(_("The Dynamics '%1%' already exists")) % newName));
+                } else {
+                    vpz::Dynamic* newDynamic = new vpz::Dynamic(newName);
+                    vpz::Dynamic oldDynamic = mDynamics->get(oldName);
+                    newDynamic->setLibrary(oldDynamic.library());
+                    newDynamic->setPackage(oldDynamic.package());
+                    newDynamic->setModel(oldDynamic.model());
+                    newDynamic->setLanguage(oldDynamic.language());
+                    if (oldDynamic.location().empty()) {
+                        newDynamic->setLocalDynamics();
+                    } else {
+                        std::vector<std::string> vec;
+                        boost::split(vec, oldDynamic.location(),
+                                     boost::is_any_of(":"));
+                        std::string location =
+                            oldDynamic.location().substr(
+                                0, oldDynamic.location().size()
+                                - vec[vec.size() - 1].size() - 1);
+                        int port = boost::lexical_cast<int>(vec[vec.size() - 1]);
+
+                        newDynamic->setDistantDynamics(location, port);
+                    }
+                    mDynamics->add(*newDynamic);
+                    mDynamics->del(oldName);
+                    if ((*it)[mColumnsDyn.m_sel] == true) {
+                        mModel->setDynamics(newName);
+                    }
+                    mRenameList.push_back(std::make_pair(oldName, newName));
+                    build();
+                }
+            }
+        }
     }
 }
 
@@ -1051,12 +1039,13 @@ void AtomicModelBox::DynamicTreeView::onEditionStarted(
     Gtk::CellEditable* cell_editable, const Glib::ustring& /* path */)
 {
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+
     if (refSelection) {
-	Gtk::TreeModel::iterator iter = refSelection->get_selected();
-	if (iter) {
-	    Gtk::TreeModel::Row row = *iter;
-	    mOldName = row.get_value(mColumnsDyn.m_col_name);
-	}
+        Gtk::TreeModel::iterator iter = refSelection->get_selected();
+        if (iter) {
+            Gtk::TreeModel::Row row = *iter;
+            mOldName = row.get_value(mColumnsDyn.m_col_name);
+        }
     }
 
     if(mValidateRetry)
@@ -1074,12 +1063,11 @@ void AtomicModelBox::DynamicTreeView::onEditionStarted(
 }
 
 void AtomicModelBox::DynamicTreeView::onEdition(
-        const Glib::ustring& pathString,
+        const Glib::ustring& path,
         const Glib::ustring& newName)
 {
-    Gtk::TreePath path(pathString);
-
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+
     if (refSelection and newName != mOldName) {
 	Gtk::TreeModel::iterator it = refSelection->get_selected();
 	if (not newName.empty() and not mDynamics->exist(newName)) {
@@ -1105,20 +1093,59 @@ void AtomicModelBox::DynamicTreeView::onEdition(
 	    }
 	    mDynamics->add(*newDynamic);
 	    mDynamics->del(mOldName);
-	    mModel->setDynamics(newName);
+
+            const Gtk::TreeModel::iterator iter = mRefListDyn->get_iter(path);
+            if ((*iter)[mColumnsDyn.m_sel] == true) {
+                mModel->setDynamics(newName);
+            }
+
 	    mRenameList.push_back(std::make_pair(mOldName, newName));
 	    build();
 	}
     }
 }
 
+void AtomicModelBox::DynamicTreeView::onToggled(const Glib::ustring&  path)
+{
+    const Gtk::TreeModel::iterator iterOnToggled = mRefListDyn->get_iter(path);
+
+    Gtk::TreeModel::Children child = mRefListDyn->children();
+    Gtk::TreeModel::iterator iter = child.begin();
+
+    while (iter != child.end()) {
+        if (iter != iterOnToggled) {
+            (*iter)[mColumnsDyn.m_sel] = false;
+        }
+        iter++;
+    }
+    mModel->setDynamics(getDynamic());
+    mLabel->set_label(_("Selected Dynamic: ") + getDynamic());
+}
+
+Gtk::TreeModel::iterator AtomicModelBox::DynamicTreeView::getSelectedRadio()
+{
+    Gtk::TreeModel::Children child = mRefListDyn->children();
+    Gtk::TreeModel::iterator it = child.begin();
+    Gtk::TreeModel::iterator iter;
+    while (it != child.end()) {
+        if ((*it)[mColumnsDyn.m_sel] == true) {
+            return it;
+        }
+        it++;
+    }
+    return iter;
+}
+
 std::string AtomicModelBox::DynamicTreeView::getDynamic()
 {
-    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
-    Gtk::TreeModel::iterator iter = refSelection->get_selected();
-    Gtk::TreeModel::Row row = *iter;
-    std::string dynamicname = row.get_value(mColumnsDyn.m_col_name);
-    return dynamicname;
+    Gtk::TreeModel::iterator iter = getSelectedRadio();
+    if (iter) {
+        Gtk::TreeModel::Row row = *iter;
+        std::string dynamicname = row.get_value(mColumnsDyn.m_col_name);
+        return dynamicname;
+    } else {
+        return "";
+    }
 }
 
 //ObservableTreeView
@@ -1131,8 +1158,22 @@ AtomicModelBox::ObservableTreeView::ObservableTreeView(
 {
     mRefTreeModelObs = Gtk::ListStore::create(mColumnsObs);
     set_model(mRefTreeModelObs);
+
+    mColumnSel = append_column_editable(_(" "), mColumnsObs.m_col_sel);
+    Gtk::CellRendererToggle* cellRenderer = dynamic_cast<Gtk::CellRendererToggle*>(
+        get_column_cell_renderer(mColumnSel - 1));
+    cellRenderer->set_radio();
+    // to change the behaviour
+    cellRenderer->signal_toggled().connect(
+    sigc::mem_fun(*this,
+                  &AtomicModelBox::ObservableTreeView::
+                  onToggled));
+
     mColumnName = append_column_editable(_("Name"),
 					 mColumnsObs.m_col_name);
+    Gtk::TreeViewColumn* nameCol = get_column(mColumnName - 1);
+    nameCol->set_sort_column(mColumnsObs.m_col_name);
+
     mCellRenderer = dynamic_cast<Gtk::CellRendererText*>(
 	get_column_cell_renderer(mColumnName - 1));
     mCellRenderer->property_editable() = true;
@@ -1145,7 +1186,6 @@ AtomicModelBox::ObservableTreeView::ObservableTreeView(
 	sigc::mem_fun(*this,
 		      &AtomicModelBox::ObservableTreeView::
 		      onEdition) );
-
 
     //Fill popup menu:
     {
@@ -1199,25 +1239,27 @@ void AtomicModelBox::ObservableTreeView::applyRenaming()
 void AtomicModelBox::ObservableTreeView::build()
 {
     mRefTreeModelObs->clear();
+    mLabel->set_label(_("Selected Observable: "));
 
     vpz::Observables::const_iterator it = mObservables->begin();
-    Gtk::TreeModel::Row row = *(mRefTreeModelObs->append());
 
-    row[mColumnsObs.m_col_name] = "";
     while (it != mObservables->end()) {
         Gtk::TreeModel::Row row = *(mRefTreeModelObs->append());
 
         row[mColumnsObs.m_col_name] = it->first;
+        row[mColumnsObs.m_col_sel] = false;
         ++it;
     }
 
     const Gtk::TreeModel::Children& child = mRefTreeModelObs->children();
     Gtk::TreeModel::Children::const_iterator it_child = child.begin();
+
     while (it_child != child.end()) {
         if (it_child->get_value(mColumnsObs.m_col_name) ==
 	    mModel->observables()) {
 	    Gtk::TreeModel::Path path = mRefTreeModelObs->get_path(it_child);
 	    set_cursor(path);
+            (*it_child)[mColumnsObs.m_col_sel] = true;
 	    mLabel->set_label(_("Selected Observable: ") +
 			      mModel->observables());
 	}
@@ -1271,46 +1313,59 @@ void AtomicModelBox::ObservableTreeView::onAdd()
 
 void AtomicModelBox::ObservableTreeView::onEdit()
 {
-    Glib::RefPtr<Gtk::TreeView::Selection> refSelection	= get_selection();
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
     Gtk::TreeModel::iterator it = refSelection->get_selected();
-    Glib::ustring obs = (*it)[mColumnsObs.m_col_name];
 
-    if (not obs.empty()) {
-        mObsAndViewBox.show(*mObservables, obs, mModeling->views());
+    if (it) {
+        Glib::ustring obs = (*it)[mColumnsObs.m_col_name];
+
+        if (not obs.empty()) {
+            mObsAndViewBox.show(*mObservables, obs, mModeling->views());
+        }
     }
 }
 
 void AtomicModelBox::ObservableTreeView::onRemove()
 {
-    Glib::RefPtr<Gtk::TreeView::Selection> refSelection	= get_selection();
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
     Gtk::TreeModel::iterator it = refSelection->get_selected();
-    Glib::ustring obs = (*it)[mColumnsObs.m_col_name];
 
-    if (not obs.empty()) {
-        mObservables->del(obs);
-	build();
+    if (it) {
+        Glib::ustring obs = (*it)[mColumnsObs.m_col_name];
+        if (not obs.empty()) {
+            if ((*it)[mColumnsObs.m_col_sel] == true) {
+                mModel->setObservables("");
+            }
+            mObservables->del(obs);
+            build();
+        }
     }
 }
 
 void AtomicModelBox::ObservableTreeView::onRename()
 {
-    Glib::RefPtr<Gtk::TreeView::Selection> refSelection	= get_selection();
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
     Gtk::TreeModel::iterator it = refSelection->get_selected();
-    Glib::ustring oldName = (*it)[mColumnsObs.m_col_name];
 
-    if (not oldName.empty()) {
-	InteractiveTypeBox box(_("New name for this observable ?"),
-			       &(mModeling->observables()),
-			       oldName);
-	std::string newName = box.run();
-	if (box.valid() and not newName.empty()) {
-	    box.hide_all();
-	    newName = boost::trim_copy(newName);
-	    mObservables->rename(oldName, newName);
-	    mModel->setObservables(newName);
-	    mRenameList.push_back(std::make_pair(oldName, newName));
-	    build();
-	}
+    if (it) {
+        Glib::ustring oldName = (*it)[mColumnsObs.m_col_name];
+
+        if (not oldName.empty()) {
+            InteractiveTypeBox box(_("New name for this observable ?"),
+                                   &(mModeling->observables()),
+                                   oldName);
+            std::string newName = box.run();
+            if (box.valid() and not newName.empty()) {
+                box.hide_all();
+                newName = boost::trim_copy(newName);
+                if ((*it)[mColumnsObs.m_col_sel] == true) {
+                    mModel->setObservables(newName);
+                }
+                mObservables->rename(oldName, newName);
+                mRenameList.push_back(std::make_pair(oldName, newName));
+                build();
+            }
+        }
     }
 }
 
@@ -1338,29 +1393,61 @@ void AtomicModelBox::ObservableTreeView::onEditionStarted(
 }
 
 void AtomicModelBox::ObservableTreeView::onEdition(
-    const Glib::ustring& pathString,
+    const Glib::ustring& path,
     const Glib::ustring& newName)
 {
-    Gtk::TreePath path(pathString);
-    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
-    Gtk::TreeModel::iterator it = refSelection->get_selected();
-
-    if (it) {
-	if (not newName.empty() and (not mObservables->exist(newName))) {
-	    mObservables->rename(mOldName, newName);
-	    mRenameList.push_back(std::make_pair(mOldName, newName));
-	}
+    if (not newName.empty() and (not mObservables->exist(newName))) {
+        const Gtk::TreeModel::iterator iter =
+            mRefTreeModelObs->get_iter(path);
+        if ((*iter)[mColumnsObs.m_col_sel] == true) {
+            mModel->setObservables(newName);
+        }
+        mObservables->rename(mOldName, newName);
+        mRenameList.push_back(std::make_pair(mOldName, newName));
     }
     build();
 }
 
+void AtomicModelBox::ObservableTreeView::onToggled(const Glib::ustring&  path)
+{
+    const Gtk::TreeModel::iterator iterOnToggled =
+        mRefTreeModelObs->get_iter(path);
+    Gtk::TreeModel::Children child = mRefTreeModelObs->children();
+    Gtk::TreeModel::iterator iter = child.begin();
+
+    while (iter != child.end()) {
+        if (iter != iterOnToggled) {
+            (*iter)[mColumnsObs.m_col_sel] = false;
+        }
+        iter++;
+    }
+    mModel->setObservables(getObservable());
+    mLabel->set_label(_("Selected Observable: ") + getObservable());
+}
+
+
+Gtk::TreeModel::iterator AtomicModelBox::ObservableTreeView::getSelectedRadio()
+{
+    Gtk::TreeModel::Children child = mRefTreeModelObs->children();
+    Gtk::TreeModel::iterator it = child.begin();
+    Gtk::TreeModel::iterator iter;
+    while (it != child.end()) {
+        if ((*it)[mColumnsObs.m_col_sel] == true) {
+            return it;
+        }
+        it++;
+    }
+    return iter;
+}
+
 std::string AtomicModelBox::ObservableTreeView::getObservable()
 {
-    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
-    Gtk::TreeModel::iterator iter = refSelection->get_selected();
-    Gtk::TreeModel::Row row = *iter;
-    std::string observablename = row.get_value(mColumnsObs.m_col_name);
-    return observablename;
+    Gtk::TreeModel::iterator iter = getSelectedRadio();
+    if (iter) {
+        return (*iter).get_value(mColumnsObs.m_col_name);
+    } else {
+        return "";
+    }
 }
 
 // AtomicModelBox

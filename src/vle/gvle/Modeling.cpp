@@ -1019,7 +1019,7 @@ std::string Modeling::getIdCardConnection(graph::Model* src,
                                           std::string srcport,
                                           graph::Model* dest,
                                           std::string destport,
-                                          graph::CoupledModel* mTop) const
+                                          graph::CoupledModel* /* mTop */) const
 {
     return ("<b>" + src->getName() + "</b>" + ":" + "<i>" + srcport + "</i>"
             +  " -> " + "<b>" +dest->getName() + "</b>" + ":" + "<i>" +

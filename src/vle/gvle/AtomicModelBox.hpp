@@ -77,12 +77,14 @@ protected:
             add(m_package);
 	    add(m_dyn);
 	    add(m_model);
+            add(m_sel);
         }
 
         Gtk::TreeModelColumn<Glib::ustring> m_col_name;
         Gtk::TreeModelColumn<Glib::ustring> m_package;
         Gtk::TreeModelColumn<Glib::ustring> m_dyn;
 	Gtk::TreeModelColumn<Glib::ustring> m_model;
+        Gtk::TreeModelColumn<bool> m_sel;
     };
 
     class ModelColumnsCond : public Gtk::TreeModel::ColumnRecord
@@ -104,9 +106,11 @@ protected:
 
         ModelColumnsObs() {
             add(m_col_name);
+            add(m_col_sel);
         }
 
         Gtk::TreeModelColumn<Glib::ustring> m_col_name;
+        Gtk::TreeModelColumn<bool> m_col_sel;
     };
 
 private:
@@ -311,10 +315,12 @@ private:
 	    Gtk::CellEditable* cellEditatble,
 	    const Glib::ustring& path);
 	virtual void onEdition(
-	    const Glib::ustring& pathString,
+	    const Glib::ustring& path,
 	    const Glib::ustring& newName);
 
-	void onClickColumn(int numColum);
+        void onToggled(const Glib::ustring&  path);
+
+        Gtk::TreeModel::iterator getSelectedRadio();
 
     private:
 	typedef std::vector < std::pair < std::string,
@@ -331,7 +337,6 @@ private:
 	Gtk::Menu mMenuPopup;
 	ModelColumnsDyn mColumnsDyn;
 	Glib::RefPtr<Gtk::ListStore> mRefListDyn;
-	Glib::RefPtr<Gtk::TreeModelSort> mRefTreeModelDyn;
 
 	//Label
 	Gtk::Label* mLabel;
@@ -346,6 +351,7 @@ private:
 	int                      mColumnPackage;
 	int                      mColumnDyn;
 	int                      mColumnModel;
+        int                      mColumnSel;
     };
 
     class ObservableTreeView : public Gtk::TreeView
@@ -384,8 +390,12 @@ private:
 	    Gtk::CellEditable* cellEditable,
 	    const Glib::ustring& path);
 	virtual void onEdition(
-	    const Glib::ustring& pathString,
+	    const Glib::ustring& path,
 	    const Glib::ustring& newName);
+
+        void onToggled(const Glib::ustring&  path);
+
+        Gtk::TreeModel::iterator getSelectedRadio();
 
     private:
 	typedef std::vector < std::pair < std::string,
@@ -402,8 +412,9 @@ private:
 	ObsAndViewBox mObsAndViewBox;
 	//Label
 	Gtk::Label* mLabel;
-	 //Cell
+        //Cell
 	int                      mColumnName;
+        int                      mColumnSel;
 	Gtk::CellRendererText*   mCellRenderer;
 	std::string              mOldName;
 	bool                     mValidateRetry;
