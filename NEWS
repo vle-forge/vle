@@ -1,6 +1,145 @@
 VLE 0.9.0
 =========
 
+* dev:
+  * change the behavior of the confluent transition. Now, the confluent
+    transition have its own behavior. Modeler can call internal and/or external
+    transition or add its own source code. By default, the internal transition
+    and the external transition are called. This change breaks the API and ABI
+    between 0.8 and 0.9.
+* gvle:
+  * Big improve the user experience.
+  * Add a placement algorithm.
+  * Modeling plug-ins:
+    * Difference equation: add observables.
+    * FSA: add a new plug-in.
+* oov:
+  * The plug-ins csv, rdata and text are merged into a new one called File. This
+    plugin have three parameters:
+     <map>
+      <key name="type">csv|rdata|text</key>
+      <key name="locale">user|...</key>
+      <key name="output">out|error</key>
+     </map>
+    Type defines the type of desired output file (csv, rdata or text). Locale
+    defines the language of the file ('user' to use the current user locale, fr,
+    de etc.). Finally, output parameter have two values: out to redirect output
+    to the standard output, error to redirect output to the standard error
+    output.
+  * add a dummy plug-in which does nothing: Views can be specific to model use
+    (ie. a view dedicated to sensitivity analysis). It could be handy to
+    temporary "deactivate" other views so that they not produce outputs (files
+    or storage objects) when working with a specific view.
+* translator:
+  * Addition of a graph translator which builds the structure of a model from an
+    adjacency matrix and a list of classes.
+
+
+VLE 0.8.5
+=========
+
+* command line interface:
+  * fix conflict in cli with multiple vpz: When starting a simulation with a vpz
+    (in CLI), if a vpz file exists in the current directory and a file exists in
+    exp directory of the package, by default, the priority is set on the current
+    file. We change the behavior by throwing a exception in this case.
+
+* graph:
+  * fix cloning connections for coupledmodels: The algorithm to copy connections
+    for coupled models computes bad connections for input and output connections
+    when the coupled model have the same name than one of its sub-models
+    (closes: #3011555).
+
+* extension:
+  * difference equation:
+    * assign zero to all variable: By default, the class extension::Var does not
+     initialise the value (a double). Consequences, if the user does not
+     initialize his variables, the simulations are not reproducibles. Fix the
+     constructor of extension::Var to assign 0.0 by default.
+
+* oov:
+  * add a dummy plug-in which does nothing: Views can be specific to model use
+    (ie. a view dedicated to sensitivity analysis). It could be handy to
+    temporary "deactivate" other views so that they not produce outputs (files
+    or storage objects) when working with a specific view (closes: #3016973).
+
+* utils:
+  * add time in vle.log header: The `vle.log' file, generated during
+    simulations, provides only the current date of simulation `yyyy-mmm-dd' and
+    not the hour in its header.
+
+* value:
+  * fix value::Matrix constructor: One of the value::Matrix constructor
+    initialise badly the size of the matrix. By default, it assigns a null size
+    whatever the parameters.
+
+* vpz:
+  * fix double representation when writing on steam: By default, the
+   vpz::write(std::ostream& out) function does not use the correct parameters to
+   show a correct representation of the double type. We fix it by adding before
+   flushing the Vpz data.
+
+
+VLE 0.8.4
+=========
+
+* devs:
+  To allow a better debugging, add a function allowing to store or dump a valid
+  XML VPZ stream from the API of devs::Executive. (Closes: #3006604).
+    void devs::Executive::dump(std::ostream& out) const;
+
+* extension:
+  * difference equation:
+    When a model connected to a generic DifferenceEquation model is removed,
+    the number of connected models isn't updated correctly if some models have
+    send your value.
+
+
+VLE 0.8.3
+=========
+
+* utils:
+  fix isValidYear when negative applied date:
+    isValidYear has now a supplementary control, in order to check for example
+    if a date can be build from a negative value.
+
+* manager:
+  * Thread manager is limited to one run: to avoid risky reinitialisation, the
+    start method of a ManagerRunThread object can be now called only once.
+    Concatenating simulation of plans require the building of new
+    ManagerRunThread objects.
+
+* gvle:
+  * Modeling plugin:
+    Petrinet: Add Petri net modeling plug-in, the code, the input/output ports
+    and observables ared generated.
+  * Bugs:
+    * Set Experiment duration to a non null value: In order to prevent bad VPZs,
+      the duration is now set up to 1.0 (m_duration is now set to 1.0, instead
+      of 0.0).
+    * Rename a tab of the Atomic Model window: The tab of the window "Atomic
+      Model" which has for title "Views" becomes the tab of the "Observables".
+    * Update contributors: 3 authors have been added inside the gvle.glade file.
+    * Load VPZ tree when using command line: When opening a VPZ in command line
+      mode, the tree representation of the VPZ was NOT shown (but it was when
+      using "File/Open Global VPZ").
+    * Add shortcuts to menu items: Four shortcuts have been added inside the
+      GVLEMenuAndToolbar.cpp file:
+      In the "Project" menu:
+      * Configure Project item: (Ctrl g)
+      * Build Project item: (Ctrl b)
+      And in the "Edit"menu:
+      * Annuler item: (Ctrl z)
+      * Rétablir item: (Ctrl y)
+    * Fix empty error message when loading invalid VPZ When a invalid VPZ was
+      loaded, an empty error message was displayed.
+    * Add convert from locale encoding to UTF-8: When a non UTF-8 file is
+      loaded, the GUI try to convert the file from the locale encoding of the
+      user.
+
+* translator:
+  * Add graph builder: Add a graph translator which builds the structure of a
+    model from an adjacency matrix and a list of classes
 
 
 VLE 0.8.2
