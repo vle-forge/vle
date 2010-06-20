@@ -319,10 +319,10 @@ void SaxParser::onMatrix(const xmlChar** att)
             rowmax = att[i + 1];
         } else if (xmlStrcmp(att[i], (const xmlChar*)"columnmax") == 0) {
             columnmax = att[i + 1];
-        } else if (xmlStrcmp(att[i], (const xmlChar*)"rows") == 0) {
-            rows = att[i + 1];
-        } else if (xmlStrcmp(att[i], (const xmlChar*)"rows") == 0) {
-            rows = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"columnstep") == 0) {
+            columnstep = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"rowstep") == 0) {
+            rowstep = att[i + 1];
         }
     }
 
@@ -338,7 +338,7 @@ void SaxParser::onMatrix(const xmlChar** att)
         m_valuestack.pushMatrix(
             numeric_cast < m_t >(xmlCharToInt(columns)),
             numeric_cast < m_t >(xmlCharToInt(rows)),
-            numeric_cast < m_t >(columns ? xmlCharToInt(columnmax) : 0),
+            numeric_cast < m_t >(columnmax ? xmlCharToInt(columnmax) : 0),
             numeric_cast < m_t >(rowmax ? xmlCharToInt(rowmax) : 0),
             numeric_cast < m_t >(columnstep ? xmlCharToInt(columnstep) : 0),
             numeric_cast < m_t >(rowstep ? xmlCharToInt(rowstep) : 0));

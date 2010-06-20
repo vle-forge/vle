@@ -367,6 +367,10 @@ BOOST_AUTO_TEST_CASE(value_matrix)
 
     BOOST_REQUIRE_EQUAL(m->rows(), (value::Matrix::size_type)3);
     BOOST_REQUIRE_EQUAL(m->columns(), (value::Matrix::size_type)2);
+    BOOST_REQUIRE_EQUAL(m->matrix().shape()[0], (value::Matrix::size_type)15);
+    BOOST_REQUIRE_EQUAL(m->matrix().shape()[1], (value::Matrix::size_type)25);
+    BOOST_REQUIRE_EQUAL(m->resizeRow(), (value::Matrix::size_type)200);
+    BOOST_REQUIRE_EQUAL(m->resizeColumn(), (value::Matrix::size_type)100);
 
     BOOST_REQUIRE_EQUAL(mv[0][0]->isInteger(), true);
     BOOST_REQUIRE_EQUAL(mv[0][1]->isInteger(), true);
