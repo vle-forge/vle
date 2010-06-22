@@ -408,12 +408,12 @@ void Base::pushNoEDValues()
         while (itl != mNoEDValues.end()) {
             std::deque < double >::const_iterator itv = itl->second.begin();
 
+            initExternalVariable(itl->first);
+            if (mSynchros.find(itl->first) != mSynchros.end()) {
+                ++mReceive;
+            }
             while (itv != itl->second.end()) {
-                initExternalVariable(itl->first);
                 addExternalValue(*itv, itl->first);
-                if (mSynchros.find(itl->first) != mSynchros.end()) {
-                    ++mReceive;
-                }
                 ++itv;
             }
             ++itl;
@@ -595,7 +595,7 @@ void Base::internalTransition(const Time& time)
         }
         mLastTime = time;
 
-        if (mLastClearTime < time) {
+        if (mLastClearTime.isInfinity() or mLastClearTime < time) {
             mLockedVariables.clear();
             invalidValues();
             mLastClearTime = time;
