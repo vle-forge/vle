@@ -336,6 +336,11 @@ void Package::renameFile(const std::string& oldFile, std::string& newName)
 	fs::rename(oldAbsolutePath, newAbsolutePath);
 }
 
+void Package::copyFile(const std::string& sourceFile, std::string& targetFile)
+{
+    fs::copy_file(sourceFile, targetFile);
+}
+
 void Package::select(const std::string& name)
 {
     m_table.current(name);

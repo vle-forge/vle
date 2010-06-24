@@ -106,6 +106,18 @@ GVLE::FileTreeView::FileTreeView(
 		    &GVLE::FileTreeView::onNewFile)));
 	menulist.push_back(
 	    Gtk::Menu_Helpers::MenuElem(
+		_("_Copy"),
+		sigc::mem_fun(
+		    *this,
+		    &GVLE::FileTreeView::onCopy)));
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
+		_("_Paste"),
+		sigc::mem_fun(
+		    *this,
+		    &GVLE::FileTreeView::onPaste)));
+	menulist.push_back(
+	    Gtk::Menu_Helpers::MenuElem(
 		_("_Remove"),
 		sigc::mem_fun(
 		    *this,
@@ -118,6 +130,8 @@ GVLE::FileTreeView::FileTreeView(
 		    &GVLE::FileTreeView::onRename)));
     }
     mMenuPopup.accelerate(*this);
+
+    signal_event().connect(sigc::mem_fun(*this, &GVLE::FileTreeView::onEvent));
 }
 
 GVLE::FileTreeView::~FileTreeView()
@@ -199,21 +213,103 @@ void GVLE::FileTreeView::build()
 {
     remove_all_columns();
     if (not mPackage.empty()) {
-        mColumnName = append_column(utils::Path::filename(mPackage),
+        mColumnName = append_column_editable(utils::Path::filename(mPackage),
                                     mColumns.m_col_name);
 	mCellrenderer = dynamic_cast<Gtk::CellRendererText*>(
 	    get_column_cell_renderer(mColumnName - 1));
 	buildHierarchy(0, mPackage);
     } else {
-	mColumnName = append_column("Project", mColumns.m_col_name);
+	mColumnName = append_column_editable("Project", mColumns.m_col_name);
 	mCellrenderer = dynamic_cast<Gtk::CellRendererText*>(
 	    get_column_cell_renderer(mColumnName - 1));
     }
+
+    mCellrenderer->signal_edited().connect(
+             sigc::mem_fun(*this, &GVLE::FileTreeView::onEdition));
+    mCellrenderer->signal_editing_started().connect(
+             sigc::mem_fun(*this, &GVLE::FileTreeView::onEditionStarted));
 }
 
 bool GVLE::FileTreeView::isDirectory(const std::string& dirname)
 {
     return Glib::file_test(dirname, Glib::FILE_TEST_IS_DIR);
+}
+
+
+bool GVLE::FileTreeView::onEvent(GdkEvent* event)
+{
+    if (event->type == GDK_2BUTTON_PRESS) {
+	    mDelayTime = event->button.time;
+        Gtk::TreeModel::Path path;
+        Gtk::TreeViewColumn* column;
+        get_cursor(path, column);
+        on_row_activated(path, column);
+	    return true;
+    }
+
+    if (event->type == GDK_BUTTON_PRESS) {
+	    if (mDelayTime + 250 < event->button.time and
+	        mDelayTime + 1000 > event->button.time) {
+	        mDelayTime = event->button.time;
+	        mCellrenderer->property_editable() = true;
+	    } else {
+	        mDelayTime = event->button.time;
+	        mCellrenderer->property_editable() = false;
+	    }
+
+    }
+    return false;
+}
+
+void GVLE::FileTreeView::onEditionStarted(Gtk::CellEditable* cellEditable,
+                                          const Glib::ustring& /* path */)
+{
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+    if (refSelection) {
+	    Gtk::TreeModel::const_iterator it = refSelection->get_selected();
+	    if (it) {
+            const Gtk::TreeModel::Row row = *it;
+            mOldName = row.get_value(mColumns.m_col_name);
+        }
+    }
+}
+
+void GVLE::FileTreeView::onEdition(const Glib::ustring& pathString,
+                                   const Glib::ustring& newFileName)
+{
+    std::string oldName = mOldName;
+    std::string newName = newFileName;
+
+    Gtk::TreeModel::const_iterator it = mRefTreeModel->get_iter(pathString);
+
+    if (it) {
+        const Gtk::TreeModel::Row row = *it;
+
+        std::list < std::string > lstpath;
+        projectFilePath(row, lstpath);
+
+        if (utils::Path::extension(mOldName) != utils::Path::extension(newFileName)) {
+            Error(_("When renaming a file, changing his extension is not allowed!"));
+            Glib::ustring oldName = mOldName;
+            row.set_value(mColumns.m_col_name, oldName);
+            return;
+        }
+
+        std::string newFilePath = Glib::build_filename(lstpath);
+        std::string oldFilePath =
+            Glib::path_get_dirname(newFilePath) + "/" + oldName;
+
+        if (not utils::Path::exist(Glib::build_filename(
+            utils::Path::path().getPackageDir(), newFilePath))) {
+                utils::Package::package().renameFile(oldFilePath, newName);
+                mParent->refreshEditor(oldFilePath, newFilePath);
+        } else {
+            Glib::ustring oldName = mOldName;
+            row.set_value(mColumns.m_col_name, oldName);
+        }
+
+        mParent->refreshPackageHierarchy();
+    }
 }
 
 void GVLE::FileTreeView::on_row_activated(const Gtk::TreeModel::Path&,
@@ -376,6 +472,102 @@ void GVLE::FileTreeView::onNewDirectory()
     mParent->refreshPackageHierarchy();
 }
 
+void GVLE::FileTreeView::onCopy()
+{
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+    if (refSelection) {
+        Gtk::TreeModel::const_iterator it = refSelection->get_selected();
+        if (it) {
+            const Gtk::TreeModel::Row row = *it;
+
+            std::list < std::string > lstpath;
+            projectFilePath(row, lstpath);
+
+            mFileName = row.get_value(mColumns.m_col_name);
+
+            mFilePath = Glib::build_filename(lstpath);
+
+            mAbsolutePath =
+                Glib::build_filename(utils::Path::path().getPackageDir(),
+                                     mFilePath);
+        }
+    }
+}
+
+void GVLE::FileTreeView::onPaste()
+{
+    if (!(utils::Path::exist(mAbsolutePath))) {
+        return;
+    }
+
+    Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
+    if (refSelection) {
+        Gtk::TreeModel::const_iterator it = refSelection->get_selected();
+        if (it) {
+            const Gtk::TreeModel::Row row = *it;
+
+            std::list < std::string > lstpath;
+            projectFilePath(row, lstpath);
+            std::string newAbsolutePath;
+            std::string newFileName;
+            std::string newFilePath;
+
+            int copyNumber = 1;
+            std::string suffixe;
+            do {
+                suffixe = "_" + boost::lexical_cast < std::string >(copyNumber);
+
+                newFileName = mFileName;
+                newFileName.insert(newFileName.find_last_of("."),suffixe);
+
+                if (isDirectory(Glib::build_filename(utils::Path::path().getPackageDir(),Glib::build_filename(lstpath)))) {
+                    newFilePath = Glib::build_filename(lstpath) + "/" + newFileName;
+                } else {
+                    newFilePath = Glib::path_get_dirname(Glib::build_filename(lstpath)) + "/" + newFileName;
+                }
+
+                newAbsolutePath =
+                    Glib::build_filename(utils::Path::path().getPackageDir(),
+                                         newFilePath);
+                copyNumber++;
+
+            } while (utils::Path::exist(newAbsolutePath));
+
+            if (utils::Path::extension(newFileName) == "") {
+                newFileName += utils::Path::extension(mAbsolutePath);
+            }
+
+            if (not isDirectory(mAbsolutePath)){
+                utils::Package::package().copyFile(mAbsolutePath, newAbsolutePath);
+            }
+
+            mParent->refreshPackageHierarchy();
+
+            m_search = newFilePath;
+            mRefTreeModel->foreach(sigc::mem_fun(*this, &GVLE::FileTreeView::on_foreach));
+        }
+    }
+}
+
+bool GVLE::FileTreeView::on_foreach(const Gtk::TreeModel::Path&,
+                              const Gtk::TreeModel::iterator& iter)
+{
+    const Gtk::TreeModel::Row row = *iter;
+
+    std::list < std::string > lstpath;
+    projectFilePath(row, lstpath);
+
+    std::string  fileName = row.get_value(mColumns.m_col_name);
+    std::string  filePath = Glib::build_filename(lstpath);
+
+    if (filePath == m_search) {
+        mCellrenderer->property_editable() = true;
+        Gtk::TreeViewColumn* nameCol = get_column(mColumnName - 1);
+        set_cursor(mRefTreeModel->get_path(iter),*nameCol,true);
+        return true;
+    }
+    return false;
+}
 
 void GVLE::FileTreeView::onRemove()
 {
@@ -414,37 +606,14 @@ void GVLE::FileTreeView::onRename()
 
 	if (it) {
 	    const Gtk::TreeModel::Row row = *it;
-	    std::string oldName = row.get_value(mColumns.m_col_name);
-	    SimpleTypeBox box(_("Name of the file ?"), oldName);
-	    std::string newName = boost::trim_copy(box.run());
 
-	    if (box.valid() and not newName.empty()) {
-		std::list < std::string > lstpath;
-		std::string oldName;
+        Gtk::TreeViewColumn* nameCol = get_column(mColumnName - 1);
 
-		projectFilePath(row, lstpath);
-		oldName = Glib::build_filename(lstpath);
+        mCellrenderer->property_editable() =  true;
 
-		std::string oldAbsolutePath =
-		    Glib::build_filename(utils::Path::path().getPackageDir(),
-					 oldName);
+        set_cursor(mRefTreeModel->get_path(it),*nameCol,true);
 
-		if (utils::Path::extension(newName) == "") {
-		    newName += utils::Path::extension(oldAbsolutePath);
-		}
-
-		std::string newAbsolutePath =
-		    Glib::build_filename(
-			utils::Path::path().getParentPath(oldAbsolutePath),
-			newName);
-
-		if (not utils::Path::exist(newAbsolutePath)) {
-		    utils::Package::package().renameFile(oldName, newName);
-
-		    mParent->refreshEditor(oldName, newName);
-		}
-	    }
-	    mParent->refreshPackageHierarchy();
+        mParent->refreshPackageHierarchy();
 	}
     }
 }
@@ -596,6 +765,38 @@ void GVLE::FileTreeView::removeFiles(const Gtk::TreeModel::Row* parent,
     }
 }
 
+void GVLE::FileTreeView::openTab(std::string path)
+{
+    if (utils::Path::extension(path) == ".vpz") {
+        Editor::Documents::const_iterator it =
+            mParent->getEditor()->getDocuments().begin();
+        bool found = false;
+
+        while (not found and
+               it != mParent->getEditor()->getDocuments().end()) {
+            if (utils::Path::extension(it->first) == ".vpz") {
+                found = true;
+            } else {
+                ++it;
+            }
+        }
+
+        if (not found or (found and mParent->closeTab(it->first))) {
+            mParent->getEditor()->openTab(path);
+            if (mParent->mModeling->getTopModel()) {
+                mParent->redrawModelTreeBox();
+                mParent->redrawModelClassBox();
+                mParent->getMenu()->onOpenVpz();
+                mParent->mModelTreeBox->set_sensitive(true);
+                mParent->mModelClassBox->set_sensitive(true);
+            }
+        }
+    } else {
+        mParent->getEditor()->openTab(path);
+        mParent->getMenu()->onOpenFile();
+    }
+}
+
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
 GVLE::GVLE(BaseObjectType* cobject,
@@ -702,14 +903,12 @@ void GVLE::refreshPackageHierarchy()
 void GVLE::refreshEditor(const std::string& oldName, const std::string& newName)
 {
     if (newName.empty()) { // the file is removed
-	mEditor->closeTab(Glib::build_filename(
-			      mPackage, oldName));
+        mEditor->closeTab(Glib::build_filename(mPackage, oldName));
     } else {
-	std::string filePath = utils::Path::buildFilename(mPackage, oldName);
-        std::string newFilePath = utils::Path::buildFilename(mPackage, newName);
-
+        std::string filePath = utils::Path::buildFilename(mPackage, oldName);
+        std::string newFilePath = utils::Path::buildFilename(mPackage, newName);;
         mEditor->changeFile(filePath, newFilePath);
-	mModeling->setFileName(newFilePath);
+        mModeling->setFileName(newFilePath);
     }
 }
 

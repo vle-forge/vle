@@ -282,9 +282,18 @@ public:
 
     protected:
 	bool on_button_press_event(GdkEventButton* event);
+        bool on_foreach(const Gtk::TreeModel::Path&,
+                        const Gtk::TreeModel::iterator& iter);
+        void onEdition(const Glib::ustring& pathString,
+                       const Glib::ustring& newName);
+        void onEditionStarted(Gtk::CellEditable* cellEditable,
+                              const Glib::ustring& /* path */);
+        bool onEvent(GdkEvent* event);
 	void onOpen();
 	void onNewFile();
 	void onNewDirectory();
+	void onCopy();
+	void onPaste();
 	void onRemove();
 	void onRename();
 
@@ -325,6 +334,7 @@ public:
                 const std::string& dirname);
     void removeFiles(const Gtk::TreeModel::Row* parent,
                 const std::list < std::string >& entries);
+    void openTab(std::string path);
 
 	GVLE*                            mParent;
 	Gtk::Menu                        mMenuPopup;
@@ -333,6 +343,12 @@ public:
 	Glib::RefPtr<Gtk::TreeStore>     mRefTreeModel;
 	Glib::RefPtr<Gtk::TreeSelection> mRefTreeSelection;
 	std::list<std::string>           mIgnoredFilesList;
+
+    std::string                      mOldName;
+    std::string                      m_search;
+    std::string                      mAbsolutePath;
+    std::string                      mFilePath;
+    std::string                      mFileName;
 
 	//Cell
 	int                              mColumnName;

@@ -129,6 +129,7 @@ namespace vle { namespace utils {
         void addDirectory(const std::string& path, const std::string& name);
 	void removeFile(const std::string& pathFile);
         void renameFile(const std::string& oldFile, std::string& newName);
+        void copyFile(const std::string& sourceFile, std::string& targetName);
 
         /**
          * @brief Get the name of the current selected Package. Get the current
