@@ -327,10 +327,11 @@ void Base::processUpdate(const std::string& name,
 
     if (mState == SEND_INIT or mState == POST_SEND_INIT) {
 
-        if (not (mControl and mDepends.find(name) != mDepends.end())) {
-            throw utils::ModellingError(fmt(_(
-                        "[%1%] DifferenceEquation::init " \
-                        "- invalid variable name: %2%")) % getModelName() %
+        if (mControl and not (mControl and
+                              mDepends.find(name) != mDepends.end())) {
+            throw utils::ModellingError(
+                fmt(_("[%1%] DifferenceEquation::init "                 \
+                      "- invalid variable name: %2%")) % getModelName() %
                 name);
         }
 
