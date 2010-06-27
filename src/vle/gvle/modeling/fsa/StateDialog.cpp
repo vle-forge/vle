@@ -28,10 +28,16 @@
 #include <vle/gvle/modeling/fsa/StateDialog.hpp>
 #include <vle/gvle/modeling/fsa/SourceDialog.hpp>
 #include <vle/utils/i18n.hpp>
+#include <boost/algorithm/string.hpp>
+#include <iostream>
 
-namespace vle { namespace gvle { namespace modeling { namespace fsa {
+namespace vle {
+namespace gvle {
+namespace modeling {
+namespace fsa {
 
-NewStateDialog::NewStateDialog(const Glib::RefPtr < Gnome::Glade::Xml >& xml)
+NewStateDialog::NewStateDialog(
+    const Glib::RefPtr < Gnome::Glade::Xml >& xml)
 {
     xml->get_widget("NewStateDialog", mDialog);
     xml->get_widget("NewStateNameEntry", mNameEntry);
@@ -64,11 +70,11 @@ EventInStateDialog::EventInStateDialog(
     xml->get_widget("EventInStateButton", mActionButton);
 
     mList.push_back(mActionEntry->signal_changed().connect(
-                        sigc::mem_fun(*this, &EventInStateDialog::onAction)));
+            sigc::mem_fun(*this, &EventInStateDialog::onAction)));
     mList.push_back(mActionButton->signal_clicked().connect(
-                        sigc::mem_fun(*this,
-                                      &EventInStateDialog::onEventActionSource
-                            )));
+            sigc::mem_fun(*this,
+                &EventInStateDialog::onEventActionSource
+                )));
 }
 
 void EventInStateDialog::onAction()
@@ -85,7 +91,7 @@ void EventInStateDialog::onEventActionSource()
 
     if (buffer.empty()) {
         dialog.add(name,
-                   (fmt(Statechart::EVENT_ACTION_DEFINITION) % name).str());
+            (fmt(Statechart::EVENT_ACTION_DEFINITION) % name).str());
     } else {
         dialog.add(name, buffer);
     }
@@ -95,7 +101,7 @@ void EventInStateDialog::onEventActionSource()
 }
 
 int EventInStateDialog::run(const std::string& event,
-                            const std::string& action)
+    const std::string& action)
 {
     mEventEntry->set_text(event);
 
@@ -131,12 +137,12 @@ void StateDialog::EventInStateTreeView::onEdit()
     Glib::RefPtr < Gtk::TreeView::Selection > selection = get_selection();
 
     if (selection) {
-	Gtk::TreeModel::iterator iter = selection->get_selected();
+        Gtk::TreeModel::iterator iter = selection->get_selected();
 
-	if (iter) {
+        if (iter) {
             Gtk::TreeModel::Row row = *iter;
-	    std::string event = row.get_value(mColumns.mEvent);
-	    std::string action = row.get_value(mColumns.mAction);
+            std::string event = row.get_value(mColumns.mEvent);
+            std::string action = row.get_value(mColumns.mAction);
             EventInStateDialog dialog(mXml, mStatechart, *mEventInStates);
 
             if (dialog.run(event, action) == Gtk::RESPONSE_ACCEPT) {
@@ -153,7 +159,7 @@ void StateDialog::EventInStateTreeView::onRemove()
     Glib::RefPtr < Gtk::TreeView::Selection > selection = get_selection();
 
     if (selection) {
-	Gtk::TreeModel::iterator iter = selection->get_selected();
+        Gtk::TreeModel::iterator iter = selection->get_selected();
 
         mTreeModel->erase(iter);
     }
@@ -181,93 +187,142 @@ StateDialog::StateDialog(const Glib::RefPtr < Gnome::Glade::Xml >& xml,
     xml->get_widget("InActionSourceButton", mInActionButton);
     xml->get_widget("OutActionSourceButton", mOutActionButton);
     xml->get_widget("ActivitySourceButton", mActivityButton);
+    xml->get_widget("StateOkButton", mOkButton);
 
     xml->get_widget_derived("EventInStateTreeView", mEventInStateTreeView);
     mEventInStateTreeView->setStatechart(mStatechart, &mEventInStates);
 
     mList.push_back(mInActionButton->signal_clicked().connect(
-                        sigc::mem_fun(*this,
-                                      &StateDialog::onInActionSource)));
+            sigc::mem_fun(*this,
+                &StateDialog::onInActionSource)));
     mList.push_back(mInActionEntry->signal_changed().connect(
-                        sigc::mem_fun(*this, &StateDialog::onInAction)));
+            sigc::mem_fun(*this, &StateDialog::onInAction)));
     mList.push_back(mOutActionButton->signal_clicked().connect(
-                        sigc::mem_fun(*this,
-                                      &StateDialog::onOutActionSource)));
+            sigc::mem_fun(*this,
+                &StateDialog::onOutActionSource)));
     mList.push_back(mOutActionEntry->signal_changed().connect(
-                        sigc::mem_fun(*this, &StateDialog::onOutAction)));
+            sigc::mem_fun(*this, &StateDialog::onOutAction)));
     mList.push_back(mActivityButton->signal_clicked().connect(
-                        sigc::mem_fun(*this,
-                                      &StateDialog::onActivitySource)));
+            sigc::mem_fun(*this,
+                &StateDialog::onActivitySource)));
     mList.push_back(mActivityEntry->signal_changed().connect(
-                        sigc::mem_fun(*this, &StateDialog::onActivity)));
+            sigc::mem_fun(*this, &StateDialog::onActivity)));
 }
 
 void StateDialog::onActivity()
 {
-    mActivityButton->set_sensitive(
-        not mActivityEntry->get_entry()->get_text().empty());
+    std::string entryActivity = activity();
+    boost::trim(entryActivity);
+    if (entryActivity.empty()) {
+        mActivityButton->set_sensitive(false);
+        if (mActivityEntry->get_entry()->get_text().empty()) {
+            mOkButton->set_sensitive(true);
+        } else {
+            mOkButton->set_sensitive(false);
+        }
+    } else {
+        if (isValidName(entryActivity)) {
+            mTrimActivity = entryActivity;
+            mActivityButton->set_sensitive(true);
+            mOkButton->set_sensitive(true);
+        } else {
+            mActivityButton->set_sensitive(false);
+            mOkButton->set_sensitive(false);
+        }
+    }
 }
 
 void StateDialog::onActivitySource()
 {
     SourceDialog dialog(mXml);
-    const std::string& name = mActivityEntry->get_entry()->get_text();
-    const std::string& buffer = mStatechart->activity(name);
+    const std::string& buffer = mStatechart->activity(mTrimActivity);
 
     if (buffer.empty()) {
-        dialog.add(name,
-                   (fmt(Statechart::ACTIVITY_DEFINITION) % name).str());
+        dialog.add(mTrimActivity,
+            (fmt(Statechart::ACTIVITY_DEFINITION) % mTrimActivity).str());
     } else {
-        dialog.add(name, buffer);
+        dialog.add(mTrimActivity, buffer);
     }
     if (dialog.run() == Gtk::RESPONSE_ACCEPT) {
-        mStatechart->activity(name, dialog.buffer(name));
+        mStatechart->activity(mTrimActivity, dialog.buffer(mTrimActivity));
     }
 }
 
 void StateDialog::onInAction()
 {
-    mInActionButton->set_sensitive(
-        not mInActionEntry->get_entry()->get_text().empty());
+    std::string entryInAction = inAction();
+    boost::trim(entryInAction);
+    if (entryInAction.empty()) {
+        mInActionButton->set_sensitive(false);
+        if (mInActionEntry->get_entry()->get_text().empty()) {
+            mOkButton->set_sensitive(true);
+        } else {
+            mOkButton->set_sensitive(false);
+        }
+    } else {
+        if (isValidName(entryInAction)) {
+            mTrimInAction = entryInAction;
+            mInActionButton->set_sensitive(true);
+            mOkButton->set_sensitive(true);
+        } else {
+            mInActionButton->set_sensitive(false);
+            mOkButton->set_sensitive(false);
+        }
+    }
 }
 
 void StateDialog::onInActionSource()
 {
     SourceDialog dialog(mXml);
-    const std::string& name = mInActionEntry->get_entry()->get_text();
-    const std::string& buffer = mStatechart->eventAction(name);
+    const std::string& buffer = mStatechart->eventAction(mTrimInAction);
 
     if (buffer.empty()) {
-        dialog.add(name,
-                   (fmt(Statechart::ACTION_DEFINITION) % name).str());
+        dialog.add(mTrimInAction,
+            (fmt(Statechart::ACTION_DEFINITION) % mTrimInAction).str());
     } else {
-        dialog.add(name, buffer);
+        dialog.add(mTrimInAction, buffer);
     }
     if (dialog.run() == Gtk::RESPONSE_ACCEPT) {
-        mStatechart->action(name, dialog.buffer(name));
+        mStatechart->action(mTrimInAction, dialog.buffer(mTrimInAction));
     }
 }
 
 void StateDialog::onOutAction()
 {
-    mOutActionButton->set_sensitive(
-        not mOutActionEntry->get_entry()->get_text().empty());
+    std::string entryOutAction = outAction();
+    boost::trim(entryOutAction);
+    if (entryOutAction.empty()) {
+        mOutActionButton->set_sensitive(false);
+        if (mOutActionEntry->get_entry()->get_text().empty()) {
+            mOkButton->set_sensitive(true);
+        } else {
+            mOkButton->set_sensitive(false);
+        }
+    } else {
+        if (isValidName(entryOutAction)) {
+            mTrimOutAction = entryOutAction;
+            mOutActionButton->set_sensitive(true);
+            mOkButton->set_sensitive(true);
+        } else {
+            mOutActionButton->set_sensitive(false);
+            mOkButton->set_sensitive(false);
+        }
+    }
 }
 
 void StateDialog::onOutActionSource()
 {
     SourceDialog dialog(mXml);
-    const std::string& name = mOutActionEntry->get_entry()->get_text();
-    const std::string& buffer = mStatechart->eventAction(name);
+    const std::string& buffer = mStatechart->eventAction(mTrimOutAction);
 
     if (buffer.empty()) {
-        dialog.add(name,
-                   (fmt(Statechart::ACTION_DEFINITION) % name).str());
+        dialog.add(mTrimOutAction,
+            (fmt(Statechart::ACTION_DEFINITION) % mTrimOutAction).str());
     } else {
-        dialog.add(name, buffer);
+        dialog.add(mTrimOutAction, buffer);
     }
     if (dialog.run() == Gtk::RESPONSE_ACCEPT) {
-        mStatechart->action(name, dialog.buffer(name));
+        mStatechart->action(mTrimOutAction, dialog.buffer(mTrimOutAction));
     }
 }
 
@@ -319,4 +374,7 @@ int StateDialog::run()
     return response;
 }
 
-}}}} // namespace vle gvle modeling fsa
+}
+}
+}
+}    // namespace vle gvle modeling fsa

@@ -83,6 +83,22 @@ public:
 
     int run();
 
+    bool isValidName(std::string name)
+    {
+        size_t i = 0;
+        if (isdigit(name[0])) {
+            return false;
+        } else {
+            while (i < name.length()) {
+                if (!isalnum(name[i])) {
+                    return false;
+                }
+                i++;
+            }
+            return true;
+        }
+    }
+
 private:
     void onAction();
     void onActionSource();
@@ -121,6 +137,13 @@ private:
     Gtk::ComboBoxEntryText*  mSendEntry;
     Gtk::Button*             mSendButton;
 
+    Gtk::Button* mOkButton;
+
+    std::string mTrimAction;
+    std::string mTrimAfter;
+    std::string mTrimWhen;
+    std::string mTrimSend;
+    std::string mTrimGuard;
     std::list < sigc::connection > mList;
 };
 

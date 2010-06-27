@@ -37,8 +37,12 @@
 #include <gtkmm/menu.h>
 #include <gtkmm/treeview.h>
 #include <libglademm.h>
+#include <iostream>
 
-namespace vle { namespace gvle { namespace modeling { namespace fsa {
+namespace vle {
+namespace gvle {
+namespace modeling {
+namespace fsa {
 
 class NewStateDialog
 {
@@ -46,19 +50,24 @@ public:
     NewStateDialog(const Glib::RefPtr < Gnome::Glade::Xml >& xml);
 
     virtual ~NewStateDialog()
-    { }
+    {
+    }
 
     bool initial() const
-    { return mInitialCheckbox->get_active(); }
+    {
+        return mInitialCheckbox->get_active();
+    }
 
     std::string name() const
-    { return mNameEntry->get_text(); }
+    {
+        return mNameEntry->get_text();
+    }
 
     int run();
 
 private:
-    Gtk::Dialog*      mDialog;
-    Gtk::Entry*       mNameEntry;
+    Gtk::Dialog* mDialog;
+    Gtk::Entry* mNameEntry;
     Gtk::CheckButton* mInitialCheckbox;
 };
 
@@ -80,10 +89,14 @@ public:
     }
 
     std::string action() const
-    { return mActionEntry->get_entry()->get_text(); }
+    {
+        return mActionEntry->get_entry()->get_text();
+    }
 
     std::string event() const
-    { return mEventEntry->get_text(); }
+    {
+        return mEventEntry->get_text();
+    }
 
     int run(const std::string& event, const std::string& action);
 
@@ -92,13 +105,13 @@ private:
     void onEventActionSource();
 
     Glib::RefPtr < Gnome::Glade::Xml > mXml;
-    Statechart*                        mStatechart;
+    Statechart* mStatechart;
     const eventInStates_t&             mEventInStates;
-    Gtk::Dialog*                       mDialog;
-    Gtk::Entry*                        mEventEntry;
-    Gtk::VBox*                         mEventInStateVBox;
-    Gtk::ComboBoxEntryText*            mActionEntry;
-    Gtk::Button*                       mActionButton;
+    Gtk::Dialog* mDialog;
+    Gtk::Entry* mEventEntry;
+    Gtk::VBox* mEventInStateVBox;
+    Gtk::ComboBoxEntryText* mActionEntry;
+    Gtk::Button* mActionButton;
     std::list < sigc::connection >     mList;
 };
 
@@ -108,7 +121,10 @@ class StateDialog
     {
     public:
         EventInStateColumns()
-        { add(mEvent); add(mAction); }
+        {
+            add(mEvent);
+            add(mAction);
+        }
 
         Gtk::TreeModelColumn < Glib::ustring > mEvent;
         Gtk::TreeModelColumn < Glib::ustring > mAction;
@@ -118,8 +134,10 @@ class StateDialog
     {
     public:
         EventInStateTreeView(BaseObjectType* cobject,
-                             const Glib::RefPtr < Gnome::Glade::Xml >& xml) :
-            Gtk::TreeView(cobject), mXml(xml), mStatechart(0), mEventInStates(0)
+                             const Glib::RefPtr < Gnome::Glade::Xml >& xml)
+            :
+            Gtk::TreeView(cobject), mXml(xml), mStatechart(0),
+            mEventInStates(0)
         {
             mTreeModel = Gtk::ListStore::create(mColumns);
             set_model(mTreeModel);
@@ -129,19 +147,20 @@ class StateDialog
             Gtk::Menu::MenuList& items(mMenu.items());
 
             items.push_back(Gtk::Menu_Helpers::MenuElem(
-                                _("Add"), sigc::mem_fun(
-                                    *this, &EventInStateTreeView::onAdd)));
+                    _("Add"), sigc::mem_fun(
+                        *this, &EventInStateTreeView::onAdd)));
             items.push_back(Gtk::Menu_Helpers::MenuElem(
-                                _("Edit"), sigc::mem_fun(
-                                    *this, &EventInStateTreeView::onEdit)));
+                    _("Edit"), sigc::mem_fun(
+                        *this, &EventInStateTreeView::onEdit)));
             items.push_back(Gtk::Menu_Helpers::MenuElem(
-                                _("Remove"), sigc::mem_fun(
-                                    *this, &EventInStateTreeView::onRemove)));
+                    _("Remove"), sigc::mem_fun(
+                        *this, &EventInStateTreeView::onRemove)));
             mMenu.show_all();
         }
 
         virtual ~EventInStateTreeView()
-        { }
+        {
+        }
 
         void add(const std::string& event, const std::string& action)
         {
@@ -151,11 +170,16 @@ class StateDialog
         }
 
         void clear()
-        { mTreeModel->clear(); }
+        {
+            mTreeModel->clear();
+        }
 
         void setStatechart(Statechart* statechart,
-                           eventInStates_t* eventInStates)
-        { mStatechart = statechart; mEventInStates = eventInStates; }
+            eventInStates_t* eventInStates)
+        {
+            mStatechart = statechart;
+            mEventInStates = eventInStates;
+        }
 
         bool on_button_press_event(GdkEventButton* event)
         {
@@ -171,11 +195,11 @@ class StateDialog
         void onRemove();
 
         Glib::RefPtr < Gnome::Glade::Xml > mXml;
-        Statechart*                        mStatechart;
-        eventInStates_t*                   mEventInStates;
-        EventInStateColumns                mColumns;
-        Glib::RefPtr < Gtk::ListStore >    mTreeModel;
-        Gtk::Menu                          mMenu;
+        Statechart* mStatechart;
+        eventInStates_t* mEventInStates;
+        EventInStateColumns mColumns;
+        Glib::RefPtr < Gtk::ListStore > mTreeModel;
+        Gtk::Menu mMenu;
     };
 
 public:
@@ -195,22 +219,65 @@ public:
     }
 
     std::string activity() const
-    { return mActivityEntry->get_entry()->get_text(); }
+    {
+        return mActivityEntry->get_entry()->get_text();
+    }
 
-    eventInStates_t eventInStates() const
-    { return mEventInStates; }
+    std::string getActivity() const
+    {
+        return mTrimActivity;
+    }
 
     std::string inAction() const
-    { return mInActionEntry->get_entry()->get_text(); }
+    {
+        return mInActionEntry->get_entry()->get_text();
+    }
 
-    bool initial() const
-    { return mInitialCheckbox->get_active(); }
-
-    std::string name() const
-    { return mNameEntry->get_text(); }
+    std::string getInAction() const
+    {
+        return mTrimInAction;
+    }
 
     std::string outAction() const
-    { return mOutActionEntry->get_entry()->get_text(); }
+    {
+        return mOutActionEntry->get_entry()->get_text();
+    }
+
+    std::string getOutAction() const
+    {
+        return mTrimOutAction;
+    }
+
+    eventInStates_t eventInStates() const
+    {
+        return mEventInStates;
+    }
+
+    bool initial() const
+    {
+        return mInitialCheckbox->get_active();
+    }
+
+    std::string name() const
+    {
+        return mNameEntry->get_text();
+    }
+
+    bool isValidName(std::string name)
+    {
+        size_t i = 0;
+        if (isdigit(name[0])) {
+            return false;
+        } else {
+            while (i < name.length()) {
+                if (!isalnum(name[i])) {
+                    return false;
+                }
+                i++;
+            }
+            return true;
+        }
+    }
 
     int run();
 
@@ -222,26 +289,34 @@ private:
     void onOutAction();
     void onOutActionSource();
 
-    Glib::RefPtr < Gnome::Glade::Xml > mXml;
-    Statechart*                        mStatechart;
-    const State*                       mState;
+    Glib::RefPtr < Gnome::Glade::Xml >  mXml;
+    Statechart* mStatechart;
+    const State* mState;
 
-    Gtk::Dialog*            mDialog;
-    Gtk::Entry*             mNameEntry;
-    Gtk::CheckButton*       mInitialCheckbox;
-    Gtk::VBox*              mStateVBox;
+    Gtk::Dialog* mDialog;
+    Gtk::Entry* mNameEntry;
+    Gtk::CheckButton* mInitialCheckbox;
+    Gtk::VBox* mStateVBox;
     Gtk::ComboBoxEntryText* mInActionEntry;
-    Gtk::Button*            mInActionButton;
+    Gtk::Button* mInActionButton;
     Gtk::ComboBoxEntryText* mOutActionEntry;
-    Gtk::Button*            mOutActionButton;
+    Gtk::Button* mOutActionButton;
     Gtk::ComboBoxEntryText* mActivityEntry;
-    Gtk::Button*            mActivityButton;
-    EventInStateTreeView*   mEventInStateTreeView;
-    eventInStates_t         mEventInStates;
+    Gtk::Button* mActivityButton;
+    Gtk::Button* mOkButton;
+    EventInStateTreeView* mEventInStateTreeView;
+    eventInStates_t mEventInStates;
+
+    std::string mTrimInAction;
+    std::string mTrimOutAction;
+    std::string mTrimActivity;
 
     std::list < sigc::connection > mList;
 };
 
-}}}} // namespace vle gvle modeling fsa
+}
+}
+}
+}    // namespace vle gvle modeling fsa
 
 #endif

@@ -28,6 +28,7 @@
 #include <vle/gvle/modeling/fsa/TransitionDialog.hpp>
 #include <vle/gvle/modeling/fsa/SourceDialog.hpp>
 #include <vle/utils/i18n.hpp>
+#include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
 namespace vle { namespace gvle { namespace modeling { namespace fsa {
@@ -46,6 +47,8 @@ TransitionDialog::TransitionDialog(
     xml->get_widget("GuardSourceButton", mGuardButton);
     xml->get_widget("ActionSourceButton", mActionButton);
     xml->get_widget("SendSourceButton", mSendButton);
+
+    xml->get_widget("TransitionOkButton", mOkButton);
 
     // event
     mEventEntry = Gtk::manage(new Gtk::ComboBoxEntryText);
@@ -121,8 +124,25 @@ TransitionDialog::~TransitionDialog()
 
 void TransitionDialog::onAction()
 {
-    mActionButton->set_sensitive(
-        not mActionEntry->get_entry()->get_text().empty());
+    std::string entryAction = action();
+    boost::trim(entryAction);
+    if (entryAction.empty()) {
+        mActionButton->set_sensitive(false);
+        if (mActionEntry->get_entry()->get_text().empty()) {
+            mOkButton->set_sensitive(true);
+        } else {
+            mOkButton->set_sensitive(false);
+        }
+    } else {
+        if (isValidName(entryAction)) {
+            mTrimAction = entryAction;
+            mActionButton->set_sensitive(true);
+            mOkButton->set_sensitive(true);
+        } else {
+            mActionButton->set_sensitive(false);
+            mOkButton->set_sensitive(false);
+        }
+    }
 }
 
 void TransitionDialog::onActionSource()
@@ -161,15 +181,25 @@ void TransitionDialog::onActionSource()
 
 void TransitionDialog::onAfter()
 {
-    std::string name = mAfterEntry->get_entry()->get_text();
-    bool ok = false;
-
-    try {
-        boost::lexical_cast < double >(name);
-    } catch (...) {
-        ok = not name.empty();
+    std::string entryAfter = after();
+    boost::trim(entryAfter);
+    if (entryAfter.empty()) {
+        mAfterButton->set_sensitive(false);
+        if (mAfterEntry->get_entry()->get_text().empty()) {
+            mOkButton->set_sensitive(true);
+        } else {
+            mOkButton->set_sensitive(false);
+        }
+    } else {
+        if (isValidName(entryAfter)) {
+            mTrimAfter = entryAfter;
+            mAfterButton->set_sensitive(true);
+            mOkButton->set_sensitive(true);
+        } else {
+            mAfterButton->set_sensitive(false);
+            mOkButton->set_sensitive(false);
+        }
     }
-    mAfterButton->set_sensitive(ok);
 }
 
 void TransitionDialog::onAfterSource()
@@ -191,8 +221,25 @@ void TransitionDialog::onAfterSource()
 
 void TransitionDialog::onGuard()
 {
-    mGuardButton->set_sensitive(
-        not mGuardEntry->get_entry()->get_text().empty());
+    std::string entryGuard = guard();
+    boost::trim(entryGuard);
+    if (entryGuard.empty()) {
+        mGuardButton->set_sensitive(false);
+        if (mGuardEntry->get_entry()->get_text().empty()) {
+            mOkButton->set_sensitive(true);
+        } else {
+            mOkButton->set_sensitive(false);
+        }
+    } else {
+        if (isValidName(entryGuard)) {
+            mTrimGuard = entryGuard;
+            mGuardButton->set_sensitive(true);
+            mOkButton->set_sensitive(true);
+        } else {
+            mGuardButton->set_sensitive(false);
+            mOkButton->set_sensitive(false);
+        }
+    }
 }
 
 void TransitionDialog::onGuardSource()
@@ -214,13 +261,28 @@ void TransitionDialog::onGuardSource()
 
 void TransitionDialog::onSend()
 {
-    const std::string& name = mSendEntry->get_entry()->get_text();
+    std::string entrySend = send();
+    boost::trim(entrySend);
+    if (entrySend.empty() and std::find(mStatechart->outputPorts().begin(),
+        mStatechart->outputPorts().end(), entrySend) !=
+        mStatechart->outputPorts().end()) {
 
-    mSendButton->set_sensitive(not name.empty()
-                               and std::find(mStatechart->outputPorts().begin(),
-                                             mStatechart->outputPorts().end(),
-                                             name) ==
-                               mStatechart->outputPorts().end());
+        mSendButton->set_sensitive(false);
+        if (mSendEntry->get_entry()->get_text().empty()) {
+            mOkButton->set_sensitive(true);
+        } else {
+            mOkButton->set_sensitive(false);
+        }
+    } else {
+        if (isValidName(entrySend)) {
+            mTrimSend = entrySend;
+            mSendButton->set_sensitive(true);
+            mOkButton->set_sensitive(true);
+        } else {
+            mSendButton->set_sensitive(false);
+            mOkButton->set_sensitive(false);
+        }
+    }
 }
 
 void TransitionDialog::onSendSource()
@@ -242,15 +304,25 @@ void TransitionDialog::onSendSource()
 
 void TransitionDialog::onWhen()
 {
-    std::string name = mWhenEntry->get_entry()->get_text();
-    bool ok = false;
-
-    try {
-        boost::lexical_cast < double >(name);
-    } catch (...) {
-        ok = not name.empty();
+    std::string entryWhen = when();
+    boost::trim(entryWhen);
+    if (entryWhen.empty()) {
+        mWhenButton->set_sensitive(false);
+        if (mWhenEntry->get_entry()->get_text().empty()) {
+            mOkButton->set_sensitive(true);
+        } else {
+            mOkButton->set_sensitive(false);
+        }
+    } else {
+        if (isValidName(entryWhen)) {
+            mTrimWhen = entryWhen;
+            mWhenButton->set_sensitive(true);
+            mOkButton->set_sensitive(true);
+        } else {
+            mWhenButton->set_sensitive(false);
+            mOkButton->set_sensitive(false);
+        }
     }
-    mWhenButton->set_sensitive(ok);
 }
 
 void TransitionDialog::onWhenSource()

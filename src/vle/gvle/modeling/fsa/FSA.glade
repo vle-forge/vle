@@ -121,8 +121,8 @@
                     <property name="height_request">500</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="hadjustment">0 0 1 0.10000000000000001 0.90000000000000002 1</property>
-                    <property name="vadjustment">0 0 1 0.10000000000000001 0.90000000000000002 1</property>
+                    <property name="hadjustment">0 0 164 16.400000000000002 147.59999999999999 164</property>
+                    <property name="vadjustment">0 0 144 14.4 129.59999999999999 144</property>
                     <property name="hscrollbar_policy">automatic</property>
                     <property name="vscrollbar_policy">automatic</property>
                     <child>
@@ -338,7 +338,7 @@
             <property name="visible">True</property>
             <property name="layout_style">end</property>
             <child>
-              <widget class="GtkButton" id="StateCancelButton">
+              <widget class="GtkButton" id="StatenameCancelButton">
                 <property name="label">gtk-cancel</property>
                 <property name="response_id">-6</property>
                 <property name="visible">True</property>
@@ -353,7 +353,7 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkButton" id="StateOkButton">
+              <widget class="GtkButton" id="StateNameOkButton">
                 <property name="label">gtk-ok</property>
                 <property name="response_id">-3</property>
                 <property name="visible">True</property>
@@ -1073,7 +1073,7 @@
             <property name="visible">True</property>
             <property name="layout_style">end</property>
             <child>
-              <widget class="GtkButton" id="StateCancelButton">
+              <widget class="GtkButton" id="StateTimeCancelButton">
                 <property name="label">gtk-cancel</property>
                 <property name="response_id">-6</property>
                 <property name="visible">True</property>
@@ -1088,7 +1088,7 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkButton" id="StateOkButton">
+              <widget class="GtkButton" id="StateTimeOkButton">
                 <property name="label">gtk-ok</property>
                 <property name="response_id">-3</property>
                 <property name="visible">True</property>
