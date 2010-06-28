@@ -31,15 +31,14 @@
 
 using namespace vle;
 
-namespace vle
-{
+namespace vle {
 namespace gvle {
-BooleanBox::BooleanBox(value::Boolean* boolean):
-        Gtk::Dialog(_("Boolean"),true,true),
-        mValue(boolean)
+BooleanBox::BooleanBox(value::Boolean* boolean) :
+    Gtk::Dialog(_("Boolean"), true, true),
+    mValue(boolean)
 {
-    add_button(Gtk::Stock::APPLY, Gtk::RESPONSE_APPLY);
     add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+    add_button(Gtk::Stock::OK, Gtk::RESPONSE_APPLY);
 
     m_Combo = new Gtk::ComboBoxText();
     get_vbox()->pack_start(*m_Combo);
@@ -62,10 +61,11 @@ void BooleanBox::run()
     if (ret == Gtk::RESPONSE_APPLY) {
         std::string new_val = m_Combo->get_active_text();
 
-        if (new_val == "true")
+        if (new_val == "true") {
             mValue->set(true);
-        else
+        } else {
             mValue->set(false);
+        }
     }
 
 }

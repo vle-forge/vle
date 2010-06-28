@@ -34,16 +34,15 @@
 
 using namespace vle;
 
-namespace vle
-{
+namespace vle {
 namespace gvle {
 
-NewTypeBox::NewTypeBox(value::Value* val):
-        Gtk::Dialog("?",true,true),
-        mVal(val)
+NewTypeBox::NewTypeBox(value::Value* val) :
+    Gtk::Dialog("?", true, true),
+    mVal(val)
 {
-    add_button(Gtk::Stock::APPLY, Gtk::RESPONSE_APPLY);
     add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+    add_button(Gtk::Stock::OK, Gtk::RESPONSE_APPLY);
 
     m_Combo = new Gtk::ComboBoxText();
     get_vbox()->pack_start(*m_Combo);
@@ -92,7 +91,12 @@ void NewTypeBox::run()
                 gvle::Error(_("The size can not be null or negative"));
                 return;
             }
-            mVal = Matrix::create(cols, rows, cols*2, rows*2, cols/5, rows/5);
+            mVal = Matrix::create(cols,
+                    rows,
+                    cols * 2,
+                    rows * 2,
+                    cols / 5,
+                    rows / 5);
         } else if (m_Combo->get_active_text() == "Map") {
             mVal = Map::create();
         } else if (m_Combo->get_active_text() == "Null") {
@@ -110,7 +114,7 @@ void NewTypeBox::run()
             }
             SimpleTypeBox box2("Height ?", "1");
             int h = utils::toInt(box2.run());
-            if (h < 1){
+            if (h < 1) {
                 gvle::Error(_("The size can not be null or negative"));
                 return;
             }

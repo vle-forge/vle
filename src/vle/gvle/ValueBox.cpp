@@ -31,13 +31,12 @@
 
 using namespace vle;
 
-namespace vle
-{
+namespace vle {
 namespace gvle {
-ValueBox::ValueBox(value::Map* map):
-        Gtk::Dialog("Map",true,true),
-        mTreeView(0),
-        mValue(map)
+ValueBox::ValueBox(value::Map* map) :
+    Gtk::Dialog("Map", true, true),
+    mTreeView(0),
+    mValue(map)
 {
     mBackup = map->clone();
 
@@ -48,10 +47,10 @@ ValueBox::ValueBox(value::Map* map):
     show_all();
 }
 
-ValueBox::ValueBox(value::Set* set):
-        Gtk::Dialog("Set",true,true),
-        mTreeView(0),
-        mValue(set)
+ValueBox::ValueBox(value::Set* set) :
+    Gtk::Dialog("Set", true, true),
+    mTreeView(0),
+    mValue(set)
 {
     mBackup = set->clone();
 
@@ -73,8 +72,8 @@ void ValueBox::run()
     int ret = Gtk::Dialog::run();
     if (ret == Gtk::RESPONSE_CANCEL) {
         if (mValue->getType() == value::Value::MAP) {
-            value::Map* map = dynamic_cast<value::Map*>(mValue);
-            value::Map* backup = dynamic_cast<value::Map*>(&*mBackup);
+            value::Map* map = dynamic_cast < value::Map* > (mValue);
+            value::Map* backup = dynamic_cast < value::Map* > (&*mBackup);
 
             map->value().clear();
 
@@ -84,8 +83,8 @@ void ValueBox::run()
                 ++it;
             }
         } else if (mValue->getType() == value::Value::SET) {
-            value::Set* set = dynamic_cast<value::Set*>(mValue);
-            value::Set* backup = dynamic_cast<value::Set*>(&*mBackup);
+            value::Set* set = dynamic_cast < value::Set* > (mValue);
+            value::Set* backup = dynamic_cast < value::Set* > (&*mBackup);
 
             set->value().clear();
 
@@ -100,8 +99,8 @@ void ValueBox::run()
 
 void ValueBox::makeDialog()
 {
-    add_button(Gtk::Stock::APPLY, Gtk::RESPONSE_APPLY);
     add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+    add_button(Gtk::Stock::OK, Gtk::RESPONSE_APPLY);
 }
 }
 } // namespace vle gvle

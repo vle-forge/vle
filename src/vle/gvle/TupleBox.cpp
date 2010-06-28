@@ -29,14 +29,15 @@
 #include <vle/gvle/TupleBox.hpp>
 #include <vle/utils/Tools.hpp>
 
-namespace vle { namespace gvle {
+namespace vle {
+namespace gvle {
 
-TupleBox::TupleBox(value::Tuple* t):
-    Gtk::Dialog("Tuple",true,true),
+TupleBox::TupleBox(value::Tuple* t) :
+    Gtk::Dialog("Tuple", true, true),
     mValue(t)
 {
-    add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     add_button(Gtk::Stock::APPLY, Gtk::RESPONSE_APPLY);
+    add_button(Gtk::Stock::OK, Gtk::RESPONSE_CANCEL);
 
     mScroll = new Gtk::ScrolledWindow();
     mScroll->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
@@ -45,7 +46,7 @@ TupleBox::TupleBox(value::Tuple* t):
     mTable = new Gtk::Table(mValue->size(), 1, true);
     mScroll->add(*mTable);
     makeTable();
-    resize(300,200);
+    resize(300, 200);
 
     show_all();
 }
@@ -58,11 +59,11 @@ TupleBox::~TupleBox()
 void TupleBox::run()
 {
     int ret = Gtk::Dialog::run();
-    if (ret ==  Gtk::RESPONSE_APPLY) {
+    if (ret == Gtk::RESPONSE_APPLY) {
         value::TupleValue& tuple = mValue->value();
         for (value::Tuple::size_type i = 0; i != mValue->size(); ++i) {
-            double x = utils::convert < double >((*mArray)[i]->get_text(),
-                                                 true);
+            double x = utils::convert < double > ((*mArray)[i]->get_text(),
+                                                  true);
             tuple[i] = x;
         }
     }
@@ -73,10 +74,12 @@ void TupleBox::makeTable()
     mArray = new array_type(boost::extents[mValue->size()]);
     for (value::Tuple::size_type i = 0; i != mValue->size(); ++i) {
         (*mArray)[i] = new Gtk::Entry();
-        (*mArray)[i]->set_text(utils::toScientificString(mValue->at(i),true));
+        (*mArray)[i]->set_text(utils::toScientificString(mValue->at(i),
+                true));
         (*mArray)[i]->set_editable(true);
-        mTable->attach(*(*mArray)[i], 0, 1, i, i+1);
+        mTable->attach(*(*mArray)[i], 0, 1, i, i + 1);
     }
 }
 
-}} // namespace vle gvle
+}
+}  // namespace vle gvle

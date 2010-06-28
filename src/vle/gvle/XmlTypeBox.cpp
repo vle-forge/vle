@@ -31,13 +31,12 @@
 
 using namespace vle;
 
-namespace vle
-{
+namespace vle {
 namespace gvle {
 
-XmlTypeBox::XmlTypeBox(value::Xml* xml):
-        Gtk::Dialog("XML",true,true),
-        mValue(xml)
+XmlTypeBox::XmlTypeBox(value::Xml* xml) :
+    Gtk::Dialog("XML", true, true),
+    mValue(xml)
 {
     makeBox();
     mBuff->set_text(xml->writeToString());
@@ -46,10 +45,10 @@ XmlTypeBox::XmlTypeBox(value::Xml* xml):
     show_all();
 }
 
-XmlTypeBox::XmlTypeBox(std::string& string):
-        Gtk::Dialog("XML",true,true),
-        mValue(0),
-        mXml(&string)
+XmlTypeBox::XmlTypeBox(std::string& string) :
+    Gtk::Dialog("XML", true, true),
+    mValue(0),
+    mXml(&string)
 {
     makeBox();
     mBuff->set_text(string);
@@ -68,19 +67,21 @@ void XmlTypeBox::run()
 {
     int ret = Gtk::Dialog::run();
     if (ret == Gtk::RESPONSE_APPLY) {
-        if (mValue != 0)
+        if (mValue != 0) {
             mValue->set(mBuff->get_text());
-        else
+        } else {
             *mXml = mBuff->get_text();
+        }
     }
 }
 
 void XmlTypeBox::makeBox()
 {
-    add_button(Gtk::Stock::APPLY, Gtk::RESPONSE_APPLY);
     add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+    add_button(Gtk::Stock::OK, Gtk::RESPONSE_APPLY);
 
-    mScrolledWindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+    mScrolledWindow.set_policy(Gtk::POLICY_AUTOMATIC,
+        Gtk::POLICY_AUTOMATIC);
 
     mView = new Gtk::TextView();
     mBuff = mView->get_buffer();

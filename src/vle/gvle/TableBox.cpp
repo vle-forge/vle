@@ -34,14 +34,15 @@ using namespace vle;
 
 namespace vu = vle::utils;
 
-namespace vle { namespace gvle {
+namespace vle {
+namespace gvle {
 
-TableBox::TableBox(value::Table* t):
-    Gtk::Dialog("Table",true,true),
+TableBox::TableBox(value::Table* t) :
+    Gtk::Dialog("Table", true, true),
     mValue(t)
 {
-    add_button(Gtk::Stock::APPLY, Gtk::RESPONSE_APPLY);
     add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+    add_button(Gtk::Stock::OK, Gtk::RESPONSE_APPLY);
 
     mScroll = new Gtk::ScrolledWindow();
     mScroll->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
@@ -50,7 +51,7 @@ TableBox::TableBox(value::Table* t):
     mTable = new Gtk::Table(t->height(), t->width(), true);
     mScroll->add(*mTable);
     makeTable();
-    resize(300,200);
+    resize(300, 200);
 
     show_all();
 }
@@ -63,7 +64,7 @@ TableBox::~TableBox()
 
     for (index i = 0; i != mValue->height(); ++i) {
         for (index j = 0; j != mValue->width(); ++j) {
-            delete(*mArray)[j][i];
+            delete (*mArray)[j][i];
         }
     }
     delete mArray;
@@ -72,12 +73,13 @@ TableBox::~TableBox()
 void TableBox::run()
 {
     int ret = Gtk::Dialog::run();
-    if (ret ==  Gtk::RESPONSE_APPLY) {
+    if (ret == Gtk::RESPONSE_APPLY) {
         value::TableValue& table = mValue->value();
         for (index i = 0; i != mValue->height(); ++i) {
             for (index j = 0; j != mValue->width(); ++j) {
-                double x = vu::convert < double > ((*mArray)[j][i]->get_text(),
-                                                   true);
+                double x = vu::convert < double > (
+                        (*mArray)[j][i]->get_text(),
+                        true);
                 table[j][i] = x;
             }
         }
@@ -86,14 +88,22 @@ void TableBox::run()
 
 void TableBox::makeTable()
 {
-    mArray = new array_type(boost::extents[mValue->width()][mValue->height()]);
+    mArray = new array_type(boost::extents[mValue->width()][mValue->height(
+                                                                )]);
     for (index i = 0; i != mValue->height(); ++i) {
         for (index j = 0; j != mValue->width(); ++j) {
             (*mArray)[j][i] = new Gtk::Entry();
             (*mArray)[j][i]->set_width_chars(10);
-            (*mArray)[j][i]->set_text(utils::toScientificString(mValue->get(j, i),true));
+            (*mArray)[j][i]->set_text(utils::toScientificString(mValue->
+                    get(j, i), true));
             (*mArray)[j][i]->set_editable(true);
-            mTable->attach(*(*mArray)[j][i], j , j+1, i, i+1, Gtk::FILL, Gtk::FILL);
+            mTable->attach(*(*mArray)[j][i],
+                j,
+                j + 1,
+                i,
+                i + 1,
+                Gtk::FILL,
+                Gtk::FILL);
         }
     }
 }
