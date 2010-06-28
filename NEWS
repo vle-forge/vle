@@ -1,3 +1,19 @@
+VLE 0.8.6
+=========
+
+* extension:
+  * difference equation:
+    * fix bug on generic model: When an external event occurs on SEND_INIT or
+      POST_SEND_INIT, the exception on "invalid variable name" is raised.
+    * fix bug on init process: When an external variable have several values
+      for its initialization, the initExternalVariable method is invoked
+      several times.
+
+* vpz:
+  * fix bad reading of value::Matrix parameters: The sax reader reads badly the
+    value::Matrix parameters rowstep and columnstep.
+
+
 VLE 0.8.5
 =========
 
