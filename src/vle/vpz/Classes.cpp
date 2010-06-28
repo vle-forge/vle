@@ -51,7 +51,7 @@ Class& Classes::add(const std::string& name)
             name, Class(name)));
 
     if (not x.second) {
-        throw utils::ArgError(fmt(_("Class '%1%' already exist")) % name);
+        throw utils::ArgError(fmt(_("Class '%1%' already exists")) % name);
     }
 
     return x.first->second;
@@ -82,6 +82,25 @@ Class& Classes::get(const std::string& name)
     }
 
     return it->second;
+}
+
+void Classes::rename(const std::string& oldname, const std::string& newname)
+{
+    if (exist(newname)) {
+        throw utils::ArgError(fmt(_("Class '%1%' already exists")) % newname);
+    }
+
+    iterator it = m_lst.find(oldname);
+    if (it == end()) {
+        throw utils::ArgError(fmt(_("Unknow class '%1%'")) % oldname);
+    }
+
+    std::pair < iterator, bool > x;
+    x = m_lst.insert(std::make_pair < std::string, Class >(
+            newname, it->second));
+    x.first->second.setName(newname);
+
+    m_lst.erase(it);
 }
 
 }} // namespace vle vpz

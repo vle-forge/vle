@@ -156,6 +156,13 @@ namespace vle { namespace vpz {
         const std::string& name() const
         { return m_name; }
 
+        /**
+         * @brief Set a new name to this Class.
+         * @param newname The new name.
+         */
+        void setName(const std::string& newname)
+        { m_name.assign(newname); }
+
     private:
         AtomicModelList m_atomicmodels;
         std::string     m_name;

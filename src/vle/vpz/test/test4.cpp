@@ -348,8 +348,11 @@ void check_experiment_unittest_vpz(const vpz::Experiment& exp)
     }
 }
 
-void check_classes_unittest_vpz(const vpz::Classes& cls)
+void check_classes_unittest_vpz(vpz::Classes& cls)
 {
+    void* ptr1 = 0;
+    void* ptr2 = 0;
+
     BOOST_REQUIRE(cls.exist("beepbeep"));
     {
         const vpz::Class& c(cls.get("beepbeep"));
@@ -357,6 +360,8 @@ void check_classes_unittest_vpz(const vpz::Classes& cls)
         BOOST_REQUIRE(c.model()->isCoupled());
         BOOST_REQUIRE_EQUAL(c.model()->getName(), "top");
         graph::CoupledModel* cpled((graph::CoupledModel*)c.model());
+
+        ptr1 = cpled;
 
         BOOST_REQUIRE(cpled->exist("a"));
         BOOST_REQUIRE(cpled->findModel("a")->isAtomic());
@@ -368,6 +373,7 @@ void check_classes_unittest_vpz(const vpz::Classes& cls)
         BOOST_REQUIRE(cpled->existOutputConnection("b", "out", "out"));
         BOOST_REQUIRE(cpled->existOutputConnection("c", "out", "out"));
     }
+
     BOOST_REQUIRE(cls.exist("beepbeepbeep"));
     {
         const vpz::Class& c(cls.get("beepbeepbeep"));
@@ -375,6 +381,8 @@ void check_classes_unittest_vpz(const vpz::Classes& cls)
         BOOST_REQUIRE(c.model()->isCoupled());
         BOOST_REQUIRE_EQUAL(c.model()->getName(), "top");
         graph::CoupledModel* cpled((graph::CoupledModel*)c.model());
+
+        ptr2 = cpled;
 
         BOOST_REQUIRE(cpled->exist("a"));
         BOOST_REQUIRE(cpled->findModel("a")->isAtomic());
@@ -403,9 +411,77 @@ void check_classes_unittest_vpz(const vpz::Classes& cls)
         BOOST_REQUIRE(cpled->existOutputConnection("c", "out", "out"));
         BOOST_REQUIRE(cpled->existOutputConnection("d", "out", "out"));
     }
+
+    cls.rename("beepbeep", "newbeepbeep");
+    cls.rename("beepbeepbeep", "newbeepbeepbeep");
+
+    BOOST_REQUIRE(cls.exist("newbeepbeep"));
+    {
+        const vpz::Class& c(cls.get("newbeepbeep"));
+        BOOST_REQUIRE(c.model());
+        BOOST_REQUIRE(c.model()->isCoupled());
+        BOOST_REQUIRE_EQUAL(c.model()->getName(), "top");
+        graph::CoupledModel* cpled((graph::CoupledModel*)c.model());
+
+        BOOST_REQUIRE(ptr1 != cpled);
+
+        BOOST_REQUIRE(cpled->exist("a"));
+        BOOST_REQUIRE(cpled->findModel("a")->isAtomic());
+        BOOST_REQUIRE(cpled->exist("b"));
+        BOOST_REQUIRE(cpled->findModel("b")->isAtomic());
+        BOOST_REQUIRE(cpled->exist("c"));
+        BOOST_REQUIRE(cpled->findModel("c")->isAtomic());
+        BOOST_REQUIRE(cpled->existOutputConnection("a", "out", "out"));
+        BOOST_REQUIRE(cpled->existOutputConnection("b", "out", "out"));
+        BOOST_REQUIRE(cpled->existOutputConnection("c", "out", "out"));
+    }
+
+    BOOST_REQUIRE(cls.exist("newbeepbeepbeep"));
+    {
+        const vpz::Class& c(cls.get("newbeepbeepbeep"));
+        BOOST_REQUIRE(c.model());
+        BOOST_REQUIRE(c.model()->isCoupled());
+        BOOST_REQUIRE_EQUAL(c.model()->getName(), "top");
+        graph::CoupledModel* cpled((graph::CoupledModel*)c.model());
+
+        BOOST_REQUIRE(ptr2 != cpled);
+
+        BOOST_REQUIRE(cpled->exist("a"));
+        BOOST_REQUIRE(cpled->findModel("a")->isAtomic());
+        BOOST_REQUIRE(cpled->exist("b"));
+        BOOST_REQUIRE(cpled->findModel("b")->isAtomic());
+        BOOST_REQUIRE(cpled->exist("c"));
+        BOOST_REQUIRE(cpled->findModel("c")->isAtomic());
+        BOOST_REQUIRE(cpled->exist("d"));
+        BOOST_REQUIRE(cpled->findModel("d")->isCoupled());
+        {
+            graph::CoupledModel* cpled_d(
+                graph::Model::toCoupled(cpled->findModel("d")));
+
+            BOOST_REQUIRE(cpled_d->exist("a"));
+            BOOST_REQUIRE(cpled_d->findModel("a")->isAtomic());
+            BOOST_REQUIRE(cpled_d->exist("b"));
+            BOOST_REQUIRE(cpled_d->findModel("b")->isAtomic());
+            BOOST_REQUIRE(cpled_d->exist("c"));
+            BOOST_REQUIRE(cpled_d->findModel("c")->isAtomic());
+            BOOST_REQUIRE(cpled_d->existOutputConnection("a", "out", "out"));
+            BOOST_REQUIRE(cpled_d->existOutputConnection("b", "out", "out"));
+            BOOST_REQUIRE(cpled_d->existOutputConnection("c", "out", "out"));
+        }
+        BOOST_REQUIRE(cpled->existOutputConnection("a", "out", "out"));
+        BOOST_REQUIRE(cpled->existOutputConnection("b", "out", "out"));
+        BOOST_REQUIRE(cpled->existOutputConnection("c", "out", "out"));
+        BOOST_REQUIRE(cpled->existOutputConnection("d", "out", "out"));
+    }
+
+    BOOST_REQUIRE(not cls.exist("beepbeep"));
+    BOOST_REQUIRE(not cls.exist("beepbeepbeep"));
+
+    cls.rename("newbeepbeep", "beepbeep");
+    cls.rename("newbeepbeepbeep", "beepbeepbeep");
 }
 
-void check_unittest_vpz(const vpz::Vpz& file)
+void check_unittest_vpz(vpz::Vpz& file)
 {
     BOOST_REQUIRE_EQUAL(file.project().author(), "Gauthier Quesnel");
     BOOST_REQUIRE_EQUAL(file.project().version(), "0.6");
@@ -419,7 +495,7 @@ void check_unittest_vpz(const vpz::Vpz& file)
     const vpz::Experiment& exp(file.project().experiment());
     check_experiment_unittest_vpz(exp);
 
-    const vpz::Classes& cls(file.project().classes());
+    vpz::Classes& cls(file.project().classes());
     check_classes_unittest_vpz(cls);
 }
 

@@ -139,6 +139,16 @@ namespace vle { namespace vpz {
         { return m_lst.find(name) != m_lst.end(); }
 
         /**
+         * @brief Rename an existant Class to a newname. Be carefull, the Class
+         * is cloned.
+         * @param oldname The Class to rename.
+         * @param newname The destination name.
+         * @throw utils::ArgError if Class oldname does not exist or if newname
+         * exists.
+         */
+        void rename(const std::string& oldname, const std::string& newname);
+
+        /**
          * @brief Remove all class from the class list.
          */
         void clear()
