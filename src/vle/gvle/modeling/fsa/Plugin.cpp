@@ -35,7 +35,10 @@
 #include <gtkmm/stock.h>
 #include <boost/regex.hpp>
 
-namespace vle { namespace gvle { namespace modeling { namespace fsa {
+namespace vle {
+namespace gvle {
+namespace modeling {
+namespace fsa {
 
 const std::string PluginFSA::TEMPLATE_DEFINITION =
     "/**\n"                                                             \
@@ -164,7 +167,8 @@ const Glib::ustring PluginFSA::UI_DEFINITION =
 PluginFSA::PluginFSA(const std::string& name)
     : ModelingPlugin(name), mDialog(0), mStatechart(0)
 {
-    std::string glade = utils::Path::path().getModelingGladeFile("FSA.glade");
+    std::string glade = utils::Path::path().getModelingGladeFile(
+            "FSA.glade");
 
     mXml = Gnome::Glade::Xml::create(glade);
     mXml->get_widget("StatechartDialog", mDialog);
@@ -177,14 +181,14 @@ PluginFSA::PluginFSA(const std::string& name)
     mXml->get_widget("TimeStepButton", mTimeStepButton);
 
     mList.push_back(mIncludeButton->signal_clicked().connect(
-                        sigc::mem_fun(*this,
-                                      &PluginFSA::onIncludeSource)));
+            sigc::mem_fun(*this,
+                &PluginFSA::onIncludeSource)));
     mList.push_back(mUserButton->signal_clicked().connect(
-                        sigc::mem_fun(*this,
-                                      &PluginFSA::onUserSource)));
+            sigc::mem_fun(*this,
+                &PluginFSA::onUserSource)));
     mList.push_back(mTimeStepButton->signal_clicked().connect(
-                        sigc::mem_fun(*this,
-                                      &PluginFSA::onTimeStep)));
+            sigc::mem_fun(*this,
+                &PluginFSA::onTimeStep)));
 
     {
         Gtk::HBox* hbox;
@@ -195,8 +199,8 @@ PluginFSA::PluginFSA(const std::string& name)
         mUIManager->insert_action_group(mActionGroup);
         mDialog->add_accel_group(mUIManager->get_accel_group());
         createUI();
-        mToolbar = dynamic_cast < Gtk::Toolbar* >(
-            mUIManager->get_widget("/Toolbar"));
+        mToolbar = dynamic_cast < Gtk::Toolbar* > (
+                mUIManager->get_widget("/Toolbar"));
         mToolbar->set_toolbar_style(Gtk::TOOLBAR_BOTH);
         mToolbar->set_orientation(Gtk::ORIENTATION_VERTICAL);
         mToolbar->set_size_request(100, 50);
@@ -219,48 +223,48 @@ void PluginFSA::createActions()
     Gtk::RadioAction::Group toolsGroup;
 
     mActionGroup->add(
-	Gtk::RadioAction::create(toolsGroup, "Select", Gtk::Stock::INDEX,
-                                 _("Select"),
-                                 _("Select state or transition (F1)")),
-	Gtk::AccelKey("F1"), sigc::mem_fun(this, &PluginFSA::onSelect));
+        Gtk::RadioAction::create(toolsGroup, "Select", Gtk::Stock::INDEX,
+            _("Select"),
+            _("Select state or transition (F1)")),
+        Gtk::AccelKey("F1"), sigc::mem_fun(this, &PluginFSA::onSelect));
     mActionGroup->add(
-	Gtk::RadioAction::create(toolsGroup, "AddState", Gtk::Stock::ADD,
-                                 _("Add state"),
-                                 _("Add state (F2)")),
-	Gtk::AccelKey("F2"),
-	sigc::mem_fun(this, &PluginFSA::onAddState));
+        Gtk::RadioAction::create(toolsGroup, "AddState", Gtk::Stock::ADD,
+            _("Add state"),
+            _("Add state (F2)")),
+        Gtk::AccelKey("F2"),
+        sigc::mem_fun(this, &PluginFSA::onAddState));
     mActionGroup->add(
-	Gtk::RadioAction::create(toolsGroup, "AddTransition",
-                                 Gtk::Stock::DISCONNECT,
-                                 _("Add transition"),
-                                 _("Add transition (F3)")),
-	Gtk::AccelKey("F3"),
-	sigc::mem_fun(this, &PluginFSA::onAddTransition));
+        Gtk::RadioAction::create(toolsGroup, "AddTransition",
+            Gtk::Stock::DISCONNECT,
+            _("Add transition"),
+            _("Add transition (F3)")),
+        Gtk::AccelKey("F3"),
+        sigc::mem_fun(this, &PluginFSA::onAddTransition));
     mActionGroup->add(
-	Gtk::RadioAction::create(toolsGroup, "Delete", Gtk::Stock::DELETE,
-                                 _("Delete"),
-                                 _("Delete state or transition (F4)")),
-	Gtk::AccelKey("F4"),
-	sigc::mem_fun(this, &PluginFSA::onDelete));
+        Gtk::RadioAction::create(toolsGroup, "Delete", Gtk::Stock::DELETE,
+            _("Delete"),
+            _("Delete state or transition (F4)")),
+        Gtk::AccelKey("F4"),
+        sigc::mem_fun(this, &PluginFSA::onDelete));
     mActionGroup->add(
-	Gtk::RadioAction::create(toolsGroup, "Help", Gtk::Stock::HELP,
-                                 _("Help"), _("Help (F5)")),
-	Gtk::AccelKey("F5"),
-	sigc::mem_fun(this, &PluginFSA::onHelp));
+        Gtk::RadioAction::create(toolsGroup, "Help", Gtk::Stock::HELP,
+            _("Help"), _("Help (F5)")),
+        Gtk::AccelKey("F5"),
+        sigc::mem_fun(this, &PluginFSA::onHelp));
 }
 
 void PluginFSA::createUI()
 {
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
     try {
-	mUIManager->add_ui_from_string(UI_DEFINITION);
-    } catch(const Glib::Error& ex) {
+        mUIManager->add_ui_from_string(UI_DEFINITION);
+    } catch (const Glib::Error& ex) {
         throw utils::InternalError(fmt(
                 _("FSA modeling plugin building menus failed: %1%")) %
             ex.what());
     }
 #else
-    std::auto_ptr<Glib::Error> ex;
+    std::auto_ptr < Glib::Error > ex;
     mUIManager->add_ui_from_string(UI_DEFINITION, ex);
     if (ex.get()) {
         throw utils::InternalError(fmt(
@@ -333,12 +337,12 @@ void PluginFSA::onUserSource()
 }
 
 bool PluginFSA::create(graph::AtomicModel& atom,
-                       vpz::AtomicModel& model,
-                       vpz::Dynamic& /*dynamic*/,
-                       vpz::Conditions& /*conditions*/,
-                       vpz::Observables& observables,
-                       const std::string& classname,
-                       const std::string& namespace_)
+    vpz::AtomicModel& model,
+    vpz::Dynamic& /*dynamic*/,
+    vpz::Conditions& /*conditions*/,
+    vpz::Observables& observables,
+    const std::string& classname,
+    const std::string& namespace_)
 {
     strings_t inputPorts;
     strings_t outputPorts;
@@ -373,8 +377,8 @@ bool PluginFSA::create(graph::AtomicModel& atom,
 }
 
 void PluginFSA::generateObservables(graph::AtomicModel& atom,
-                                 vpz::AtomicModel& model,
-                                 vpz::Observables& observables)
+    vpz::AtomicModel& model,
+    vpz::Observables& observables)
 {
     std::string observableName((fmt("obs_FSA_%1%") % atom.getName()).str());
 
@@ -396,7 +400,7 @@ void PluginFSA::generateObservables(graph::AtomicModel& atom,
 }
 
 void PluginFSA::generateSource(const std::string& classname,
-                            const std::string& namespace_)
+    const std::string& namespace_)
 {
     utils::Template tpl_(TEMPLATE_DEFINITION);
 
@@ -404,11 +408,11 @@ void PluginFSA::generateSource(const std::string& classname,
     tpl_.stringSymbol().append("classname", classname);
 
     tpl_.stringSymbol().append("width",
-                               boost::lexical_cast < std::string >(
-                                   mStatechart->width()));
+        boost::lexical_cast < std::string > (
+            mStatechart->width()));
     tpl_.stringSymbol().append("height",
-                               boost::lexical_cast < std::string >(
-                                   mStatechart->height()));
+        boost::lexical_cast < std::string > (
+            mStatechart->height()));
 
     // states
     tpl_.listSymbol().append("states");
@@ -449,14 +453,16 @@ void PluginFSA::generateSource(const std::string& classname,
 
     // transitions
     tpl_.listSymbol().append("transitions");
-    for (transitions_t::const_iterator it = mStatechart->transitions().begin();
+    for (transitions_t::const_iterator it =
+             mStatechart->transitions().begin();
          it != mStatechart->transitions().end(); ++it) {
         tpl_.listSymbol().append("transitions", (*it)->toString());
     }
     tpl_.listSymbol().append("src");
     tpl_.listSymbol().append("dst");
     tpl_.listSymbol().append("clauses");
-    for (transitions_t::const_iterator it = mStatechart->transitions().begin();
+    for (transitions_t::const_iterator it =
+             mStatechart->transitions().begin();
          it != mStatechart->transitions().end(); ++it) {
         tpl_.listSymbol().append("src", (*it)->source());
         tpl_.listSymbol().append("dst", (*it)->destination());
@@ -561,16 +567,16 @@ void PluginFSA::generateStructure(graph::AtomicModel& atom)
 }
 
 bool PluginFSA::modify(graph::AtomicModel& atom,
-                    vpz::AtomicModel& model,
-                    vpz::Dynamic& /*dynamic*/,
-                    vpz::Conditions& /*conditions*/,
-                    vpz::Observables& observables,
-                    const std::string& conf,
-                    const std::string& buffer)
+    vpz::AtomicModel& model,
+    vpz::Dynamic& /*dynamic*/,
+    vpz::Conditions& /*conditions*/,
+    vpz::Observables& observables,
+    const std::string& conf,
+    const std::string& buffer)
 {
     std::string namespace_;
     std::string classname;
-    strings_t   lst;
+    strings_t lst;
 
     boost::split(lst, conf, boost::is_any_of(";"));
     parseConf(lst, classname, namespace_);
@@ -595,21 +601,23 @@ bool PluginFSA::modify(graph::AtomicModel& atom,
     strings_t wh;
 
     boost::split(wh, lst[2], boost::is_any_of("|"));
-    mStatechart->width(boost::lexical_cast < int >(wh[0]));
-    mStatechart->height(boost::lexical_cast < int >(wh[1]));
+    mStatechart->width(boost::lexical_cast < int > (wh[0]));
+    mStatechart->height(boost::lexical_cast < int > (wh[1]));
 
     parseStates(lst);
     parseTransitions(lst);
     parseFunctions(buffer);
 
     mInclude.assign(parseFunction(buffer, "//@@begin:include@@",
-                                  "//@@end:include@@", "include"));
-    mConstructorUser.assign(parseFunction(buffer, "//@@begin:constructorUser@@",
-                                          "//@@end:constructorUser@@",
-                                          "constructorUser"));
-    mDefinitionUser.assign(parseFunction(buffer, "//@@begin:definitionUser@@",
-                                         "//@@end:definitionUser@@",
-                                         "definitionUser"));
+            "//@@end:include@@", "include"));
+    mConstructorUser.assign(parseFunction(buffer,
+            "//@@begin:constructorUser@@",
+            "//@@end:constructorUser@@",
+            "constructorUser"));
+    mDefinitionUser.assign(parseFunction(buffer,
+            "//@@begin:definitionUser@@",
+            "//@@end:definitionUser@@",
+            "definitionUser"));
     mView->setStatechart(mStatechart);
 
     if (mDialog->run() == Gtk::RESPONSE_ACCEPT) {
@@ -628,8 +636,8 @@ bool PluginFSA::modify(graph::AtomicModel& atom,
 }
 
 void PluginFSA::parseConf(const strings_t& lst,
-                       std::string& classname,
-                       std::string& namespace_)
+    std::string& classname,
+    std::string& namespace_)
 {
 // namespace
     namespace_ = std::string(lst[0], 10, lst[0].size() - 10);
@@ -642,9 +650,9 @@ void PluginFSA::parseConf(const strings_t& lst,
 }
 
 std::string PluginFSA::parseFunction(const std::string& buffer,
-                                  const std::string& begin,
-                                  const std::string& end,
-                                  const std::string& name)
+    const std::string& begin,
+    const std::string& end,
+    const std::string& name)
 {
     boost::regex tagbegin(begin, boost::regex::grep);
     boost::regex tagend(end, boost::regex::grep);
@@ -655,22 +663,22 @@ std::string PluginFSA::parseFunction(const std::string& buffer,
 
     if (it == itend or jt == itend) {
         throw utils::ArgError(fmt(_("FSA plugin error, " \
-                                    "no begin or end tag (%1%)")) % name);
+                    "no begin or end tag (%1%)")) % name);
     }
 
     if ((*it)[0].second >= (*jt)[0].first) {
         throw utils::ArgError(fmt(_("FSA plugin error, " \
-                                    "bad tag (%1%)")) % name);
+                    "bad tag (%1%)")) % name);
     }
 
     return std::string((*it)[0].second + 1, (*jt)[0].first);
 }
 
 void PluginFSA::parseFunction(const std::string& buffer,
-                           const std::string& begin,
-                           const std::string& end,
-                           strings_t& names,
-                           strings_t& buffers)
+    const std::string& begin,
+    const std::string& end,
+    strings_t& names,
+    strings_t& buffers)
 {
     boost::regex tagbegin(begin, boost::regex::grep);
     boost::regex tagend(end, boost::regex::grep);
@@ -698,12 +706,12 @@ void PluginFSA::parseFunctions(const std::string& buffer)
         strings_t buffers;
 
         parseFunction(buffer, "//@@begin:action(", "//@@end:action@@",
-                      names, buffers);
+            names, buffers);
 
         strings_t::const_iterator itn = names.begin();
         strings_t::const_iterator itf = buffers.begin();
 
-        while(itn != names.end()) {
+        while (itn != names.end()) {
             mStatechart->action(*itn++, *itf++);
         }
     }
@@ -713,13 +721,16 @@ void PluginFSA::parseFunctions(const std::string& buffer)
         strings_t names;
         strings_t buffers;
 
-        parseFunction(buffer, "//@@begin:eventAction(", "//@@end:eventAction@@",
-                      names, buffers);
+        parseFunction(buffer,
+            "//@@begin:eventAction(",
+            "//@@end:eventAction@@",
+            names,
+            buffers);
 
         strings_t::const_iterator itn = names.begin();
         strings_t::const_iterator itf = buffers.begin();
 
-        while(itn != names.end()) {
+        while (itn != names.end()) {
             mStatechart->eventAction(*itn++, *itf++);
         }
     }
@@ -730,12 +741,12 @@ void PluginFSA::parseFunctions(const std::string& buffer)
         strings_t buffers;
 
         parseFunction(buffer, "//@@begin:guard(", "//@@end:guard@@",
-                      names, buffers);
+            names, buffers);
 
         strings_t::const_iterator itn = names.begin();
         strings_t::const_iterator itf = buffers.begin();
 
-        while(itn != names.end()) {
+        while (itn != names.end()) {
             mStatechart->guard(*itn++, *itf++);
         }
     }
@@ -746,12 +757,12 @@ void PluginFSA::parseFunctions(const std::string& buffer)
         strings_t buffers;
 
         parseFunction(buffer, "//@@begin:after(", "//@@end:after@@",
-                      names, buffers);
+            names, buffers);
 
         strings_t::const_iterator itn = names.begin();
         strings_t::const_iterator itf = buffers.begin();
 
-        while(itn != names.end()) {
+        while (itn != names.end()) {
             mStatechart->after(*itn++, *itf++);
         }
     }
@@ -762,12 +773,12 @@ void PluginFSA::parseFunctions(const std::string& buffer)
         strings_t buffers;
 
         parseFunction(buffer, "//@@begin:when(", "//@@end:when@@",
-                      names, buffers);
+            names, buffers);
 
         strings_t::const_iterator itn = names.begin();
         strings_t::const_iterator itf = buffers.begin();
 
-        while(itn != names.end()) {
+        while (itn != names.end()) {
             mStatechart->when(*itn++, *itf++);
         }
     }
@@ -778,12 +789,12 @@ void PluginFSA::parseFunctions(const std::string& buffer)
         strings_t buffers;
 
         parseFunction(buffer, "//@@begin:send(", "//@@end:send@@",
-                      names, buffers);
+            names, buffers);
 
         strings_t::const_iterator itn = names.begin();
         strings_t::const_iterator itf = buffers.begin();
 
-        while(itn != names.end()) {
+        while (itn != names.end()) {
             mStatechart->send(*itn++, *itf++);
         }
     }
@@ -794,12 +805,12 @@ void PluginFSA::parseFunctions(const std::string& buffer)
         strings_t buffers;
 
         parseFunction(buffer, "//@@begin:activity(", "//@@end:activity@@",
-                      names, buffers);
+            names, buffers);
 
         strings_t::const_iterator itn = names.begin();
         strings_t::const_iterator itf = buffers.begin();
 
-        while(itn != names.end()) {
+        while (itn != names.end()) {
             mStatechart->activity(*itn++, *itf++);
         }
     }
@@ -838,6 +849,9 @@ bool PluginFSA::start(vpz::Condition& /*condition*/)
     return true;
 }
 
-}}}} // namespace vle gvle modeling fsa
+}
+}
+}
+}    // namespace vle gvle modeling fsa
 
 DECLARE_GVLE_MODELINGPLUGIN(vle::gvle::modeling::fsa::PluginFSA)

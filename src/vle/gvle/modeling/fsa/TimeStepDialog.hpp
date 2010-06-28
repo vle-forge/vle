@@ -33,7 +33,10 @@
 #include <gtkmm/entry.h>
 #include <libglademm.h>
 
-namespace vle { namespace gvle { namespace modeling { namespace fsa {
+namespace vle {
+namespace gvle {
+namespace modeling {
+namespace fsa {
 
 class TimeStepDialog
 {
@@ -41,18 +44,24 @@ public:
     TimeStepDialog(const Glib::RefPtr < Gnome::Glade::Xml >& xml);
 
     virtual ~TimeStepDialog()
-    { }
+    {
+    }
 
     std::string timeStep() const
-    { return mTimeStepEntry->get_text(); }
+    {
+        return mTimeStepEntry->get_text();
+    }
 
     int run(const std::string& timeStep);
 
 private:
     Gtk::Dialog* mDialog;
-    Gtk::Entry*  mTimeStepEntry;
+    Gtk::Entry* mTimeStepEntry;
 };
 
-}}}} // namespace vle gvle modeling fsa
+}
+}
+}
+}    // namespace vle gvle modeling fsa
 
 #endif

@@ -29,12 +29,15 @@
 #include <vle/utils/i18n.hpp>
 #include <gtkmm/stock.h>
 
-namespace vle { namespace gvle { namespace modeling { namespace petrinet {
+namespace vle {
+namespace gvle {
+namespace modeling {
+namespace petrinet {
 
 PlaceDialog::PlaceDialog(const Glib::RefPtr < Gnome::Glade::Xml >& xml,
                          const PetriNet& petrinet,
                          const Place* place) : mPetriNet(petrinet),
-                                               mPlace(place)
+    mPlace(place)
 {
     xml->get_widget("PlaceDialog", mDialog);
     xml->get_widget("PlaceNameEntry", mNameEntry);
@@ -52,11 +55,11 @@ PlaceDialog::PlaceDialog(const Glib::RefPtr < Gnome::Glade::Xml >& xml,
     xml->get_widget("PlaceDelayEntry", mDelayEntry);
 
     mList.push_back(mNameEntry->signal_changed().connect(
-                        sigc::mem_fun(*this, &PlaceDialog::onChangeName)));
+            sigc::mem_fun(*this, &PlaceDialog::onChangeName)));
     mList.push_back(mOutputCheckbox->signal_toggled().connect(
-                        sigc::mem_fun(*this, &PlaceDialog::onOutput)));
+            sigc::mem_fun(*this, &PlaceDialog::onOutput)));
     mList.push_back(mDelayCheckbox->signal_toggled().connect(
-                        sigc::mem_fun(*this, &PlaceDialog::onDelay)));
+            sigc::mem_fun(*this, &PlaceDialog::onDelay)));
 }
 
 PlaceDialog::~PlaceDialog()
@@ -121,7 +124,9 @@ int PlaceDialog::run()
                 mDelayEntry->set_text("");
             }
         }
-        mMarkingEntry->set_text((fmt("%1%") % mPlace->initialMarking()).str());
+        mMarkingEntry->set_text((fmt(
+	     "%1%") %
+                                 mPlace->initialMarking()).str());
     } else {
         mNameEntry->set_text("");
         mInitialName = "";
@@ -149,4 +154,7 @@ void PlaceDialog::setStatus()
     }
 }
 
-}}}} // namespace vle gvle modeling petrinet
+}
+}
+}
+}    // namespace vle gvle modeling petrinet

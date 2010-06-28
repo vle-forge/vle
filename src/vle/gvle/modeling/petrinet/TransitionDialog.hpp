@@ -37,47 +37,67 @@
 #include <gtkmm/image.h>
 #include <libglademm.h>
 
-namespace vle { namespace gvle { namespace modeling { namespace petrinet {
+namespace vle {
+namespace gvle {
+namespace modeling {
+namespace petrinet {
 
 class TransitionDialog
 {
 public:
     TransitionDialog(const Glib::RefPtr < Gnome::Glade::Xml >& xml,
-        const PetriNet& petrinet, const Transition* transition = 0);
+                     const PetriNet& petrinet,
+                     const Transition* transition = 0);
 
     virtual ~TransitionDialog();
 
     bool delay() const
-    { return mDelayCheckbox->get_active(); }
+    {
+        return mDelayCheckbox->get_active();
+    }
 
     std::string delayValue() const
-    { return mDelayEntry->get_text(); }
+    {
+        return mDelayEntry->get_text();
+    }
 
     bool input() const
-    { return mInputCheckbox->get_active(); }
+    {
+        return mInputCheckbox->get_active();
+    }
 
     std::string inputPortName() const
-    { return mInputEntry->get_entry()->get_text(); }
+    {
+        return mInputEntry->get_entry()->get_text();
+    }
 
     std::string name() const
-    { return mNameEntry->get_text(); }
+    {
+        return mNameEntry->get_text();
+    }
 
     bool output() const
-    { return mOutputCheckbox->get_active(); }
+    {
+        return mOutputCheckbox->get_active();
+    }
 
     std::string outputPortName() const
-    { return mOutputEntry->get_entry()->get_text(); }
+    {
+        return mOutputEntry->get_entry()->get_text();
+    }
 
     std::string priority() const
-    { return mPriorityEntry->get_text(); }
+    {
+        return mPriorityEntry->get_text();
+    }
 
     int run();
 
     bool valid() const
     {
         return not (mNameEntry->get_text().empty() or
-            (mPetriNet.existTransition(name()) and
-             mNameEntry->get_text() != mInitialName));
+                    (mPetriNet.existTransition(name()) and
+                     mNameEntry->get_text() != mInitialName));
     }
 
 private:
@@ -87,29 +107,32 @@ private:
     void onOutput();
     void setStatus();
 
-    Gtk::Dialog*            mDialog;
-    Gtk::Entry*             mNameEntry;
-    Gtk::Entry*             mPriorityEntry;
-    Gtk::Image*             mStatusName;
+    Gtk::Dialog* mDialog;
+    Gtk::Entry* mNameEntry;
+    Gtk::Entry* mPriorityEntry;
+    Gtk::Image* mStatusName;
     // input
-    Gtk::HBox*              mInputHBox;
-    Gtk::CheckButton*       mInputCheckbox;
+    Gtk::HBox* mInputHBox;
+    Gtk::CheckButton* mInputCheckbox;
     Gtk::ComboBoxEntryText* mInputEntry;
     // output
-    Gtk::HBox*              mOutputHBox;
-    Gtk::CheckButton*       mOutputCheckbox;
+    Gtk::HBox* mOutputHBox;
+    Gtk::CheckButton* mOutputCheckbox;
     Gtk::ComboBoxEntryText* mOutputEntry;
     // delay
-    Gtk::CheckButton*       mDelayCheckbox;
-    Gtk::Entry*             mDelayEntry;
+    Gtk::CheckButton* mDelayCheckbox;
+    Gtk::Entry* mDelayEntry;
 
     const PetriNet&         mPetriNet;
-    const Transition*       mTransition;
-    std::string             mInitialName;
+    const Transition* mTransition;
+    std::string mInitialName;
 
     std::list < sigc::connection > mList;
 };
 
-}}}} // namespace vle gvle modeling petrinet
+}
+}
+}
+}    // namespace vle gvle modeling petrinet
 
 #endif

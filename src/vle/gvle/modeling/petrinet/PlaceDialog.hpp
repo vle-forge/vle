@@ -37,7 +37,10 @@
 #include <gtkmm/image.h>
 #include <libglademm.h>
 
-namespace vle { namespace gvle { namespace modeling { namespace petrinet {
+namespace vle {
+namespace gvle {
+namespace modeling {
+namespace petrinet {
 
 class PlaceDialog
 {
@@ -47,30 +50,42 @@ public:
     virtual ~PlaceDialog();
 
     bool delay() const
-    { return mDelayCheckbox->get_active(); }
+    {
+        return mDelayCheckbox->get_active();
+    }
 
     std::string delayValue() const
-    { return mDelayEntry->get_text(); }
+    {
+        return mDelayEntry->get_text();
+    }
 
     std::string initialMarking() const
-    { return mMarkingEntry->get_text(); }
+    {
+        return mMarkingEntry->get_text();
+    }
 
     std::string name() const
-    { return mNameEntry->get_text(); }
+    {
+        return mNameEntry->get_text();
+    }
 
     bool output() const
-    { return mOutputCheckbox->get_active(); }
+    {
+        return mOutputCheckbox->get_active();
+    }
 
     std::string outputPortName() const
-    { return mOutputEntry->get_entry()->get_text(); }
+    {
+        return mOutputEntry->get_entry()->get_text();
+    }
 
     int run();
 
     bool valid() const
     {
         return not (mNameEntry->get_text().empty() or
-            (mPetriNet.existPlace(name()) and
-             mNameEntry->get_text() != mInitialName));
+                    (mPetriNet.existPlace(name()) and
+                     mNameEntry->get_text() != mInitialName));
     }
 
 private:
@@ -80,26 +95,29 @@ private:
     void onOutput();
     void setStatus();
 
-    Gtk::Dialog*            mDialog;
-    Gtk::Entry*             mNameEntry;
-    Gtk::Image*             mStatusName;
+    Gtk::Dialog* mDialog;
+    Gtk::Entry* mNameEntry;
+    Gtk::Image* mStatusName;
     // output
-    Gtk::HBox*              mOutputHBox;
-    Gtk::CheckButton*       mOutputCheckbox;
+    Gtk::HBox* mOutputHBox;
+    Gtk::CheckButton* mOutputCheckbox;
     Gtk::ComboBoxEntryText* mOutputEntry;
     // marking
-    Gtk::Entry*             mMarkingEntry;
+    Gtk::Entry* mMarkingEntry;
     // delay
-    Gtk::CheckButton*       mDelayCheckbox;
-    Gtk::Entry*             mDelayEntry;
+    Gtk::CheckButton* mDelayCheckbox;
+    Gtk::Entry* mDelayEntry;
 
     const PetriNet&         mPetriNet;
-    const Place*            mPlace;
-    std::string             mInitialName;
+    const Place* mPlace;
+    std::string mInitialName;
 
     std::list < sigc::connection > mList;
 };
 
-}}}} // namespace vle gvle modeling petrinet
+}
+}
+}
+}    // namespace vle gvle modeling petrinet
 
 #endif

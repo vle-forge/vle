@@ -35,7 +35,10 @@
 #include <gtkmm/entry.h>
 #include <libglademm.h>
 
-namespace vle { namespace gvle { namespace modeling { namespace fsa {
+namespace vle {
+namespace gvle {
+namespace modeling {
+namespace fsa {
 
 class TransitionDialog
 {
@@ -46,22 +49,34 @@ public:
     virtual ~TransitionDialog();
 
     std::string action() const
-    { return mActionEntry->get_entry()->get_text(); }
+    {
+        return mActionEntry->get_entry()->get_text();
+    }
 
     std::string after() const
-    { return mAfterEntry->get_entry()->get_text(); }
+    {
+        return mAfterEntry->get_entry()->get_text();
+    }
 
     std::string event() const
-    { return mEventEntry->get_entry()->get_text(); }
+    {
+        return mEventEntry->get_entry()->get_text();
+    }
 
     std::string guard() const
-    { return mGuardEntry->get_entry()->get_text(); }
+    {
+        return mGuardEntry->get_entry()->get_text();
+    }
 
     const strings_t& inputPorts() const
-    { return mStatechart->inputPorts(); }
+    {
+        return mStatechart->inputPorts();
+    }
 
     const strings_t& outputPorts() const
-    { return mStatechart->outputPorts(); }
+    {
+        return mStatechart->outputPorts();
+    }
 
     std::string send() const
     {
@@ -75,11 +90,13 @@ public:
     function_type typeSend() const
     {
         return mSendEntry->get_entry()->get_text().empty() ?
-            CONSTANT : FUNCTION;
+               CONSTANT : FUNCTION;
     }
 
     std::string when() const
-    { return mWhenEntry->get_entry()->get_text(); }
+    {
+        return mWhenEntry->get_entry()->get_text();
+    }
 
     int run();
 
@@ -112,30 +129,30 @@ private:
     void onWhenSource();
 
     Glib::RefPtr < Gnome::Glade::Xml > mXml;
-    const Transition*        mTransition;
-    Statechart*              mStatechart;
+    const Transition* mTransition;
+    Statechart* mStatechart;
 
-    Gtk::Dialog*             mDialog;
-    Gtk::VBox*               mComboVBox;
+    Gtk::Dialog* mDialog;
+    Gtk::VBox* mComboVBox;
     // event
-    Gtk::ComboBoxEntryText*  mEventEntry;
+    Gtk::ComboBoxEntryText* mEventEntry;
     // after
-    Gtk::ComboBoxEntryText*  mAfterEntry;
-    Gtk::Button*             mAfterButton;
+    Gtk::ComboBoxEntryText* mAfterEntry;
+    Gtk::Button* mAfterButton;
     // when
-    Gtk::ComboBoxEntryText*  mWhenEntry;
-    Gtk::Button*             mWhenButton;
+    Gtk::ComboBoxEntryText* mWhenEntry;
+    Gtk::Button* mWhenButton;
     // guard
-    Gtk::ComboBoxEntryText*  mGuardEntry;
-    Gtk::Button*             mGuardButton;
+    Gtk::ComboBoxEntryText* mGuardEntry;
+    Gtk::Button* mGuardButton;
     // action
-    Gtk::ComboBoxEntryText*  mActionEntry;
-    Gtk::Button*             mActionButton;
+    Gtk::ComboBoxEntryText* mActionEntry;
+    Gtk::Button* mActionButton;
     // send
-    Gtk::HBox*               mSendHBox;
-    Gtk::ComboBoxEntryText*  mOutputPortEntry;
-    Gtk::ComboBoxEntryText*  mSendEntry;
-    Gtk::Button*             mSendButton;
+    Gtk::HBox* mSendHBox;
+    Gtk::ComboBoxEntryText* mOutputPortEntry;
+    Gtk::ComboBoxEntryText* mSendEntry;
+    Gtk::Button* mSendButton;
 
     Gtk::Button* mOkButton;
 
@@ -147,6 +164,9 @@ private:
     std::list < sigc::connection > mList;
 };
 
-}}}} // namespace vle gvle modeling fsa
+}
+}
+}
+}    // namespace vle gvle modeling fsa
 
 #endif

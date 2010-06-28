@@ -31,7 +31,10 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
-namespace vle { namespace gvle { namespace modeling { namespace fsa {
+namespace vle {
+namespace gvle {
+namespace modeling {
+namespace fsa {
 
 TransitionDialog::TransitionDialog(
     const Glib::RefPtr < Gnome::Glade::Xml >& xml,
@@ -81,30 +84,30 @@ TransitionDialog::TransitionDialog(
     mComboVBox->show_all();
 
     mList.push_back(mActionButton->signal_clicked().connect(
-                        sigc::mem_fun(*this,
-                                      &TransitionDialog::onActionSource)));
+            sigc::mem_fun(*this,
+                &TransitionDialog::onActionSource)));
     mList.push_back(mActionEntry->signal_changed().connect(
-                        sigc::mem_fun(*this, &TransitionDialog::onAction)));
+            sigc::mem_fun(*this, &TransitionDialog::onAction)));
     mList.push_back(mAfterButton->signal_clicked().connect(
-                        sigc::mem_fun(*this,
-                                      &TransitionDialog::onAfterSource)));
+            sigc::mem_fun(*this,
+                &TransitionDialog::onAfterSource)));
     mList.push_back(mAfterEntry->signal_changed().connect(
-                        sigc::mem_fun(*this, &TransitionDialog::onAfter)));
+            sigc::mem_fun(*this, &TransitionDialog::onAfter)));
     mList.push_back(mGuardButton->signal_clicked().connect(
-                        sigc::mem_fun(*this,
-                                      &TransitionDialog::onGuardSource)));
+            sigc::mem_fun(*this,
+                &TransitionDialog::onGuardSource)));
     mList.push_back(mGuardEntry->signal_changed().connect(
-                        sigc::mem_fun(*this, &TransitionDialog::onGuard)));
+            sigc::mem_fun(*this, &TransitionDialog::onGuard)));
     mList.push_back(mSendButton->signal_clicked().connect(
-                        sigc::mem_fun(*this,
-                                      &TransitionDialog::onSendSource)));
+            sigc::mem_fun(*this,
+                &TransitionDialog::onSendSource)));
     mList.push_back(mSendEntry->signal_changed().connect(
-                        sigc::mem_fun(*this, &TransitionDialog::onSend)));
+            sigc::mem_fun(*this, &TransitionDialog::onSend)));
     mList.push_back(mWhenButton->signal_clicked().connect(
-                        sigc::mem_fun(*this,
-                                      &TransitionDialog::onWhenSource)));
+            sigc::mem_fun(*this,
+                &TransitionDialog::onWhenSource)));
     mList.push_back(mWhenEntry->signal_changed().connect(
-                        sigc::mem_fun(*this, &TransitionDialog::onWhen)));
+            sigc::mem_fun(*this, &TransitionDialog::onWhen)));
 }
 
 TransitionDialog::~TransitionDialog()
@@ -155,7 +158,7 @@ void TransitionDialog::onActionSource()
 
         if (buffer.empty()) {
             dialog.add(name,
-                       (fmt(Statechart::EVENT_ACTION_DEFINITION) % name).str());
+                (fmt(Statechart::EVENT_ACTION_DEFINITION) % name).str());
         } else {
             dialog.add(name, buffer);
         }
@@ -164,7 +167,7 @@ void TransitionDialog::onActionSource()
 
         if (buffer.empty()) {
             dialog.add(name,
-                       (fmt(Statechart::ACTION_DEFINITION) % name).str());
+                (fmt(Statechart::ACTION_DEFINITION) % name).str());
         } else {
             dialog.add(name, buffer);
         }
@@ -210,7 +213,7 @@ void TransitionDialog::onAfterSource()
 
     if (buffer.empty()) {
         dialog.add(name,
-                   (fmt(Statechart::AFTER_DEFINITION) % name).str());
+            (fmt(Statechart::AFTER_DEFINITION) % name).str());
     } else {
         dialog.add(name, buffer);
     }
@@ -250,7 +253,7 @@ void TransitionDialog::onGuardSource()
 
     if (buffer.empty()) {
         dialog.add(name,
-                   (fmt(Statechart::GUARD_DEFINITION) % name).str());
+            (fmt(Statechart::GUARD_DEFINITION) % name).str());
     } else {
         dialog.add(name, buffer);
     }
@@ -293,7 +296,7 @@ void TransitionDialog::onSendSource()
 
     if (buffer.empty()) {
         dialog.add(name,
-                   (fmt(Statechart::SEND_DEFINITION) % name).str());
+            (fmt(Statechart::SEND_DEFINITION) % name).str());
     } else {
         dialog.add(name, buffer);
     }
@@ -333,7 +336,7 @@ void TransitionDialog::onWhenSource()
 
     if (buffer.empty()) {
         dialog.add(name,
-                   (fmt(Statechart::WHEN_DEFINITION) % name).str());
+            (fmt(Statechart::WHEN_DEFINITION) % name).str());
     } else {
         dialog.add(name, buffer);
     }
@@ -357,7 +360,8 @@ int TransitionDialog::run()
     // action
     mActionEntry->clear_items();
     if (not mTransition->event().empty()) {
-        for (buffers_t::const_iterator it = mStatechart->eventActions().begin();
+        for (buffers_t::const_iterator it =
+                 mStatechart->eventActions().begin();
              it != mStatechart->eventActions().end(); ++it) {
             mActionEntry->append_text(it->first);
         }
@@ -406,15 +410,16 @@ int TransitionDialog::run()
     }
     if (not mTransition->send().empty()) {
         if (std::find(mStatechart->outputPorts().begin(),
-                      mStatechart->outputPorts().end(),
-                      mTransition->send()) !=
+                mStatechart->outputPorts().end(),
+                mTransition->send()) !=
             mStatechart->outputPorts().end()) {
             mOutputPortEntry->set_active_text(mTransition->send());
         } else {
             mSendEntry->set_active_text(mTransition->send());
         }
     }
-    mSendButton->set_sensitive(not mSendEntry->get_entry()->get_text().empty());
+    mSendButton->set_sensitive(
+        not mSendEntry->get_entry()->get_text().empty());
 
     // when
     mWhenEntry->clear_items();
@@ -435,4 +440,7 @@ int TransitionDialog::run()
     return response;
 }
 
-}}}} // namespace vle gvle modeling fsa
+}
+}
+}
+}    // namespace vle gvle modeling fsa

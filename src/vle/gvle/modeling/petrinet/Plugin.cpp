@@ -32,7 +32,10 @@
 #include <gtkmm/stock.h>
 #include <boost/regex.hpp>
 
-namespace vle { namespace gvle { namespace modeling { namespace petrinet {
+namespace vle {
+namespace gvle {
+namespace modeling {
+namespace petrinet {
 
 const std::string PluginPetriNet::TEMPLATE_DEFINITION =
     "/**\n"                                                             \
@@ -122,7 +125,7 @@ PluginPetriNet::PluginPetriNet(const std::string& name)
     : ModelingPlugin(name), mDialog(0), mPetriNet(0)
 {
     std::string glade = utils::Path::path().getModelingGladeFile(
-        "PetriNet.glade");
+            "PetriNet.glade");
 
     mXml = Gnome::Glade::Xml::create(glade);
     mXml->get_widget("PetriNetDialog", mDialog);
@@ -140,8 +143,8 @@ PluginPetriNet::PluginPetriNet(const std::string& name)
         mUIManager->insert_action_group(mActionGroup);
         mDialog->add_accel_group(mUIManager->get_accel_group());
         createUI();
-        mToolbar = dynamic_cast < Gtk::Toolbar* >(
-            mUIManager->get_widget("/Toolbar"));
+        mToolbar = dynamic_cast < Gtk::Toolbar* > (
+                mUIManager->get_widget("/Toolbar"));
         mToolbar->set_toolbar_style(Gtk::TOOLBAR_BOTH);
         mToolbar->set_orientation(Gtk::ORIENTATION_VERTICAL);
         mToolbar->set_size_request(100, 50);
@@ -164,59 +167,63 @@ void PluginPetriNet::createActions()
     Gtk::RadioAction::Group toolsGroup;
 
     mActionGroup->add(
-	Gtk::RadioAction::create(toolsGroup, "Select", Gtk::Stock::INDEX,
-                                 _("Select"),
-                                 _("Select arc or state or transition (F1)")),
-	Gtk::AccelKey("F1"), sigc::mem_fun(this, &PluginPetriNet::onSelect));
+        Gtk::RadioAction::create(toolsGroup, "Select", Gtk::Stock::INDEX,
+            _("Select"),
+            _("Select arc or state or transition (F1)")),
+        Gtk::AccelKey("F1"), sigc::mem_fun(this, &PluginPetriNet::onSelect));
     mActionGroup->add(
-	Gtk::RadioAction::create(toolsGroup, "AddPlace", Gtk::Stock::ADD,
-                                 _("Add place"),
-                                 _("Add place (F2)")),
-	Gtk::AccelKey("F2"),
-	sigc::mem_fun(this, &PluginPetriNet::onAddPlace));
+        Gtk::RadioAction::create(toolsGroup, "AddPlace", Gtk::Stock::ADD,
+            _("Add place"),
+            _("Add place (F2)")),
+        Gtk::AccelKey("F2"),
+        sigc::mem_fun(this, &PluginPetriNet::onAddPlace));
     mActionGroup->add(
-	Gtk::RadioAction::create(toolsGroup, "AddTransition",
-                                 Gtk::Stock::REMOVE,
-                                 _("Add transition"),
-                                 _("Add transition (F3)")),
-	Gtk::AccelKey("F3"),
-	sigc::mem_fun(this, &PluginPetriNet::onAddTransition));
+        Gtk::RadioAction::create(toolsGroup, "AddTransition",
+            Gtk::Stock::REMOVE,
+            _("Add transition"),
+            _("Add transition (F3)")),
+        Gtk::AccelKey("F3"),
+        sigc::mem_fun(this, &PluginPetriNet::onAddTransition));
     mActionGroup->add(
-	Gtk::RadioAction::create(toolsGroup, "AddArc",
-                                 Gtk::Stock::DISCONNECT,
-                                 _("Add arc"),
-                                 _("Add arc (F4)")),
-	Gtk::AccelKey("F4"),
-	sigc::mem_fun(this, &PluginPetriNet::onAddArc));
+        Gtk::RadioAction::create(toolsGroup, "AddArc",
+            Gtk::Stock::DISCONNECT,
+            _("Add arc"),
+            _("Add arc (F4)")),
+        Gtk::AccelKey("F4"),
+        sigc::mem_fun(this, &PluginPetriNet::onAddArc));
     mActionGroup->add(
-	Gtk::RadioAction::create(toolsGroup, "Delete", Gtk::Stock::DELETE,
-                                 _("Delete"),
-                                 _("Delete arc or state or transition (F5)")),
-	Gtk::AccelKey("F5"),
-	sigc::mem_fun(this, &PluginPetriNet::onDelete));
+        Gtk::RadioAction::create(toolsGroup, "Delete", Gtk::Stock::DELETE,
+            _("Delete"),
+            _("Delete arc or state or transition (F5)")),
+        Gtk::AccelKey("F5"),
+        sigc::mem_fun(this, &PluginPetriNet::onDelete));
     mActionGroup->add(
-	Gtk::RadioAction::create(toolsGroup, "Help", Gtk::Stock::HELP,
-                                 _("Help"), _("Help (F6)")),
-	Gtk::AccelKey("F6"),
-	sigc::mem_fun(this, &PluginPetriNet::onHelp));
+        Gtk::RadioAction::create(toolsGroup, "Help", Gtk::Stock::HELP,
+            _("Help"), _("Help (F6)")),
+        Gtk::AccelKey("F6"),
+        sigc::mem_fun(this, &PluginPetriNet::onHelp));
 }
 
 void PluginPetriNet::createUI()
 {
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
     try {
-	mUIManager->add_ui_from_string(UI_DEFINITION);
-    } catch(const Glib::Error& ex) {
+        mUIManager->add_ui_from_string(UI_DEFINITION);
+    } catch (const Glib::Error& ex) {
         throw utils::InternalError(fmt(
-                _("PetriNet modeling plugin building menus failed: %1%")) %
+                _(
+                    "PetriNet modeling plugin building menus failed: %1%"))
+            %
             ex.what());
     }
 #else
-    std::auto_ptr<Glib::Error> ex;
+    std::auto_ptr < Glib::Error > ex;
     mUIManager->add_ui_from_string(UI_DEFINITION, ex);
     if (ex.get()) {
         throw utils::InternalError(fmt(
-                _("PetriNet modeling plugin building menus failed: %1%")) %
+                _(
+                    "PetriNet modeling plugin building menus failed: %1%"))
+            %
             ex->what());
     }
 #endif
@@ -259,12 +266,12 @@ void PluginPetriNet::onSelect()
 }
 
 bool PluginPetriNet::create(graph::AtomicModel& atom,
-                            vpz::AtomicModel& model,
-                            vpz::Dynamic& /*dynamic*/,
-                            vpz::Conditions& /*conditions*/,
-                            vpz::Observables& observables,
-                            const std::string& classname,
-                            const std::string& namespace_)
+    vpz::AtomicModel& model,
+    vpz::Dynamic& /*dynamic*/,
+    vpz::Conditions& /*conditions*/,
+    vpz::Observables& observables,
+    const std::string& classname,
+    const std::string& namespace_)
 {
     strings_t inputPorts;
     strings_t outputPorts;
@@ -299,8 +306,8 @@ bool PluginPetriNet::create(graph::AtomicModel& atom,
 }
 
 void PluginPetriNet::generateObservables(graph::AtomicModel& atom,
-                                         vpz::AtomicModel& model,
-                                         vpz::Observables& observables)
+    vpz::AtomicModel& model,
+    vpz::Observables& observables)
 {
     std::string observableName((fmt("obs_PetriNet_%1%") %
                                 atom.getName()).str());
@@ -327,7 +334,7 @@ void PluginPetriNet::generateObservables(graph::AtomicModel& atom,
 }
 
 void PluginPetriNet::generateSource(const std::string& classname,
-                                    const std::string& namespace_)
+    const std::string& namespace_)
 {
     utils::Template tpl_(TEMPLATE_DEFINITION);
 
@@ -335,11 +342,11 @@ void PluginPetriNet::generateSource(const std::string& classname,
     tpl_.stringSymbol().append("classname", classname);
 
     tpl_.stringSymbol().append("width",
-                               boost::lexical_cast < std::string >(
-                                   mPetriNet->width()));
+        boost::lexical_cast < std::string > (
+            mPetriNet->width()));
     tpl_.stringSymbol().append("height",
-                               boost::lexical_cast < std::string >(
-                                   mPetriNet->height()));
+        boost::lexical_cast < std::string > (
+            mPetriNet->height()));
 
     // states
     tpl_.listSymbol().append("places");
@@ -410,7 +417,7 @@ void PluginPetriNet::generateSource(const std::string& classname,
         if (transition->input()) {
             tpl_.listSymbol().append("inputTransitions", transition->name());
             tpl_.listSymbol().append("inputPortTransitions",
-                                     transition->inputPortName());
+                transition->inputPortName());
             if (transition->delay()) {
                 tpl_.listSymbol().append(
                     "inputTransitionDelays",
@@ -421,7 +428,7 @@ void PluginPetriNet::generateSource(const std::string& classname,
         } else if (transition->output()) {
             tpl_.listSymbol().append("outputTransitions", transition->name());
             tpl_.listSymbol().append("outputPortTransitions",
-                                     transition->outputPortName());
+                transition->outputPortName());
             if (transition->delay()) {
                 tpl_.listSymbol().append(
                     "outputTransitionDelays",
@@ -455,7 +462,7 @@ void PluginPetriNet::generateSource(const std::string& classname,
             tpl_.listSymbol().append("weights", "0");
         } else {
             tpl_.listSymbol().append("weights",
-                                     (fmt("%1%") % (*it)->weight()).str());
+                (fmt("%1%") % (*it)->weight()).str());
         }
     }
 
@@ -483,16 +490,16 @@ void PluginPetriNet::generateStructure(graph::AtomicModel& atom)
 }
 
 bool PluginPetriNet::modify(graph::AtomicModel& atom,
-                            vpz::AtomicModel& model,
-                            vpz::Dynamic& /*dynamic*/,
-                            vpz::Conditions& /*conditions*/,
-                            vpz::Observables& observables,
-                            const std::string& conf,
-                            const std::string& /*buffer*/)
+    vpz::AtomicModel& model,
+    vpz::Dynamic& /*dynamic*/,
+    vpz::Conditions& /*conditions*/,
+    vpz::Observables& observables,
+    const std::string& conf,
+    const std::string& buffer)
 {
     std::string namespace_;
     std::string classname;
-    strings_t   lst;
+    strings_t lst;
 
     boost::split(lst, conf, boost::is_any_of(";"));
     parseConf(lst, classname, namespace_);
@@ -517,8 +524,8 @@ bool PluginPetriNet::modify(graph::AtomicModel& atom,
     strings_t wh;
 
     boost::split(wh, lst[2], boost::is_any_of("|"));
-    mPetriNet->width(boost::lexical_cast < int >(wh[0]));
-    mPetriNet->height(boost::lexical_cast < int >(wh[1]));
+    mPetriNet->width(boost::lexical_cast < int > (wh[0]));
+    mPetriNet->height(boost::lexical_cast < int > (wh[1]));
 
     parsePlaces(lst);
     parseTransitions(lst);
@@ -542,8 +549,8 @@ bool PluginPetriNet::modify(graph::AtomicModel& atom,
 }
 
 void PluginPetriNet::parseConf(const strings_t& lst,
-                               std::string& classname,
-                               std::string& namespace_)
+    std::string& classname,
+    std::string& namespace_)
 {
 // namespace
     namespace_ = std::string(lst[0], 10, lst[0].size() - 10);
@@ -599,6 +606,9 @@ bool PluginPetriNet::start(vpz::Condition& /*condition*/)
     return true;
 }
 
-}}}} // namespace vle gvle modeling petrinet
+}
+}
+}
+}    // namespace vle gvle modeling petrinet
 
 DECLARE_GVLE_MODELINGPLUGIN(vle::gvle::modeling::petrinet::PluginPetriNet)

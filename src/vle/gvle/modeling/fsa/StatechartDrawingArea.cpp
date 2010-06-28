@@ -38,7 +38,10 @@
 #include <iostream>
 #include <limits>
 
-namespace vle { namespace gvle { namespace modeling { namespace fsa {
+namespace vle {
+namespace gvle {
+namespace modeling {
+namespace fsa {
 
 const guint StatechartDrawingArea::OFFSET = 10;
 const guint StatechartDrawingArea::HEADER_HEIGHT = 20;
@@ -66,21 +69,21 @@ StatechartDrawingArea::StatechartDrawingArea(
     mStartState(0)
 {
     set_events(Gdk::POINTER_MOTION_MASK | Gdk::BUTTON_MOTION_MASK |
-               Gdk::BUTTON1_MOTION_MASK | Gdk::BUTTON2_MOTION_MASK |
-               Gdk::BUTTON3_MOTION_MASK | Gdk::BUTTON_PRESS_MASK |
-               Gdk::BUTTON_RELEASE_MASK);
+        Gdk::BUTTON1_MOTION_MASK | Gdk::BUTTON2_MOTION_MASK |
+        Gdk::BUTTON3_MOTION_MASK | Gdk::BUTTON_PRESS_MASK |
+        Gdk::BUTTON_RELEASE_MASK);
     initMenuPopupModels();
 }
 
 void StatechartDrawingArea::addState(guint x, guint y)
 {
-    NewStateDialog dialog(mXml);
-    if (dialog.run() == Gtk::RESPONSE_ACCEPT) {
+    NewStateDialog dialog(mXml, *mStatechart);
+    if (dialog.run() == Gtk::RESPONSE_ACCEPT and dialog.valid()) {
         int newWidth = x + STATE_WIDTH + OFFSET;
         int newHeight = y + STATE_HEIGHT + OFFSET;
 
         mStatechart->addState(dialog.name(), dialog.initial(),
-                              x, y, STATE_WIDTH, STATE_HEIGHT);
+            x, y, STATE_WIDTH, STATE_HEIGHT);
         if (newWidth > mStatechart->width()) {
             mStatechart->width(newWidth);
             mWidth = mStatechart->width() + OFFSET;
@@ -94,13 +97,13 @@ void StatechartDrawingArea::addState(guint x, guint y)
 
 void StatechartDrawingArea::exportPng(const std::string& filename)
 {
-    Cairo::RefPtr<Cairo::ImageSurface> surface =
+    Cairo::RefPtr < Cairo::ImageSurface > surface =
         Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, mWidth, mHeight);
     mContext = Cairo::Context::create(surface);
     mContext->set_line_width(Settings::settings().getLineWidth());
     mContext->select_font_face(Settings::settings().getFont(),
-			       Cairo::FONT_SLANT_NORMAL,
-			       Cairo::FONT_WEIGHT_NORMAL);
+        Cairo::FONT_SLANT_NORMAL,
+        Cairo::FONT_WEIGHT_NORMAL);
     mContext->set_font_size(Settings::settings().getFontSize());
     draw();
     surface->write_to_png(filename + ".png");
@@ -108,13 +111,13 @@ void StatechartDrawingArea::exportPng(const std::string& filename)
 
 void StatechartDrawingArea::exportPdf(const std::string& filename)
 {
-    Cairo::RefPtr<Cairo::PdfSurface> surface =
+    Cairo::RefPtr < Cairo::PdfSurface > surface =
         Cairo::PdfSurface::create(filename + ".pdf", mWidth, mHeight);
     mContext = Cairo::Context::create(surface);
     mContext->set_line_width(Settings::settings().getLineWidth());
     mContext->select_font_face(Settings::settings().getFont(),
-			       Cairo::FONT_SLANT_NORMAL,
-			       Cairo::FONT_WEIGHT_NORMAL);
+        Cairo::FONT_SLANT_NORMAL,
+        Cairo::FONT_WEIGHT_NORMAL);
     mContext->set_font_size(Settings::settings().getFontSize());
     draw();
     mContext->show_page();
@@ -123,13 +126,13 @@ void StatechartDrawingArea::exportPdf(const std::string& filename)
 
 void StatechartDrawingArea::exportSvg(const std::string& filename)
 {
-    Cairo::RefPtr<Cairo::SvgSurface> surface =
+    Cairo::RefPtr < Cairo::SvgSurface > surface =
         Cairo::SvgSurface::create(filename + ".svg", mWidth, mHeight);
     mContext = Cairo::Context::create(surface);
     mContext->set_line_width(Settings::settings().getLineWidth());
     mContext->select_font_face(Settings::settings().getFont(),
-			       Cairo::FONT_SLANT_NORMAL,
-			       Cairo::FONT_WEIGHT_NORMAL);
+        Cairo::FONT_SLANT_NORMAL,
+        Cairo::FONT_WEIGHT_NORMAL);
     mContext->set_font_size(Settings::settings().getFontSize());
     draw();
     mContext->show_page();
@@ -138,7 +141,9 @@ void StatechartDrawingArea::exportSvg(const std::string& filename)
 
 void StatechartDrawingArea::exportGraphic()
 {
-    Gtk::FileChooserDialog file(_("Image file"), Gtk::FILE_CHOOSER_ACTION_SAVE);
+    Gtk::FileChooserDialog file(_(
+	    "Image file"),
+                                Gtk::FILE_CHOOSER_ACTION_SAVE);
     file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
     Gtk::FileFilter filterAuto;
@@ -166,24 +171,25 @@ void StatechartDrawingArea::exportGraphic()
         if (extension == _("Guess type from file name")) {
             size_t ext_pos = filename.find_last_of('.');
             if (ext_pos != std::string::npos) {
-                std::string type(filename, ext_pos+1);
+                std::string type(filename, ext_pos + 1);
                 filename.resize(ext_pos);
-                if (type == "png")
+                if (type == "png") {
                     exportPng(filename);
-                else if (type == "pdf")
+                } else if (type == "pdf") {
                     exportPdf(filename);
-                else if (type == "svg")
+                } else if (type == "svg") {
                     exportSvg(filename);
-                else
+                } else {
                     Error(_("Unsupported file format"));
+                }
             }
-        }
-        else if (extension == _("Portable Newtork Graphics (.png)"))
+        } else if (extension == _("Portable Newtork Graphics (.png)")) {
             exportPng(filename);
-        else if (extension == _("Portable Format Document (.pdf)"))
+        } else if (extension == _("Portable Format Document (.pdf)")) {
             exportPdf(filename);
-        else if (extension == _("Scalable Vector Graphics (.svg)"))
+        } else if (extension == _("Scalable Vector Graphics (.svg)")) {
             exportSvg(filename);
+        }
     }
 }
 
@@ -207,23 +213,25 @@ void StatechartDrawingArea::checkSize(State* state)
 
     checkSize(state, state->name());
     if (not state->inAction().empty()) {
-        height += checkSize(state, (fmt("in: %1%") % state->inAction()).str());
+        height += checkSize(state, (fmt(
+	        "in: %1%") %
+                                    state->inAction()).str());
     }
     if (not state->outAction().empty()) {
         height += checkSize(state,
-                            (fmt("out: %1%") % state->outAction()).str());
+                (fmt("out: %1%") % state->outAction()).str());
     }
     if (not state->activity().empty()) {
         height += checkSize(state,
-                            (fmt("activity: %1%") % state->activity()).str());
+                (fmt("activity: %1%") % state->activity()).str());
     }
     if (not state->eventInStates().empty()) {
         for (eventInStates_t::const_iterator it =
                  state->eventInStates().begin();
              it != state->eventInStates().end(); ++it) {
             height += checkSize(state,
-                                (fmt("%1%: %2%") % it->first
-                                 % it->second).str());
+                    (fmt("%1%: %2%") % it->first
+                     % it->second).str());
         }
     }
     if (height > (int)STATE_HEIGHT) {
@@ -238,14 +246,14 @@ int StatechartDrawingArea::checkSize(State* state, const std::string& str)
     mContext->get_text_extents(str, textExtents);
     if (state->width() < textExtents.width + 2 * OFFSET) {
         mStatechart->resizeState(state, textExtents.width + 2 * OFFSET,
-                                 state->height());
+            state->height());
     }
     return textExtents.height + OFFSET;
 }
 
 void StatechartDrawingArea::displaceStates(int oldx, int oldy,
-                                           int newx, int newy,
-                                           bool& xok, bool& yok)
+    int newx, int newy,
+    bool& xok, bool& yok)
 {
     int deltax = newx - oldx;
     int deltay = newy - oldy;
@@ -254,12 +262,13 @@ void StatechartDrawingArea::displaceStates(int oldx, int oldy,
     xok = false;
     yok = false;
     if (deltax != 0 or deltay != 0) {
-        for (std::vector < State* >::const_iterator it = mCurrentStates.begin();
+        for (std::vector < State* >::const_iterator it =
+                 mCurrentStates.begin();
              it != mCurrentStates.end(); ++it) {
             int _deltax = deltax;
             int _deltay = deltay;
 
-            if ((*it)->x() + deltax < (int)(2 *OFFSET)) {
+            if ((*it)->x() + deltax < (int)(2 * OFFSET)) {
                 _deltax = 0;
             } else {
                 xok = true;
@@ -302,7 +311,7 @@ void StatechartDrawingArea::draw()
     if (mIsRealized and mBuffer) {
         mContext->save();
 
-	mContext->set_line_width(Settings::settings().getLineWidth());
+        mContext->set_line_width(Settings::settings().getLineWidth());
 
         drawBackground();
         drawRectangle();
@@ -335,7 +344,7 @@ void StatechartDrawingArea::draw()
         }
 
         mContext->restore();
-	set_size_request(mWidth, mHeight);
+        set_size_request(mWidth, mHeight);
     }
 }
 
@@ -402,7 +411,7 @@ void StatechartDrawingArea::drawCurrentBreakpoint()
 }
 
 void StatechartDrawingArea::drawDirectConnection(int xs, int ys,
-                                                 int xd, int yd)
+    int xd, int yd)
 {
     mContext->move_to(xs, ys);
     mContext->line_to(xd, yd);
@@ -442,7 +451,7 @@ void StatechartDrawingArea::drawInitialState(State* state)
     int yd;
 
     if (state->y() - 25 < (int)(2 * OFFSET + HEADER_HEIGHT)) {
-        if (state->x() - 25 < (int)(2 *OFFSET)) {
+        if (state->x() - 25 < (int)(2 * OFFSET)) {
             x = state->x() + state->width() + 25;
             y = state->y() + state->height() / 2;
             xs = x - 5;
@@ -468,7 +477,7 @@ void StatechartDrawingArea::drawInitialState(State* state)
 
     // draw initial state
     mContext->set_source_rgb(0., 0., 0.);
-    mContext->arc(x, y, 5, 0, 2*M_PI);
+    mContext->arc(x, y, 5, 0, 2 * M_PI);
     mContext->fill();
     mContext->stroke();
 
@@ -479,15 +488,16 @@ void StatechartDrawingArea::drawInitialState(State* state)
 void StatechartDrawingArea::drawName()
 {
     mContext->select_font_face(Settings::settings().getFont(),
-			  Cairo::FONT_SLANT_NORMAL,
-			  Cairo::FONT_WEIGHT_NORMAL);
+        Cairo::FONT_SLANT_NORMAL,
+        Cairo::FONT_WEIGHT_NORMAL);
     mContext->set_font_size(Settings::settings().getFontSize());
 
     Cairo::TextExtents textExtents;
     mContext->get_text_extents(mStatechart->name(), textExtents);
 
-    mContext->move_to((mStatechart->width() - textExtents.width) / 2 + OFFSET,
-                      OFFSET + (HEADER_HEIGHT + textExtents.height) / 2);
+    mContext->move_to(
+        (mStatechart->width() - textExtents.width) / 2 + OFFSET,
+        OFFSET + (HEADER_HEIGHT + textExtents.height) / 2);
     mContext->show_text(mStatechart->name());
     mContext->stroke();
 }
@@ -497,21 +507,22 @@ void StatechartDrawingArea::drawRectangle()
     setColor(Settings::settings().getForegroundColor());
 
     drawRoundedRectangle(OFFSET, OFFSET, mStatechart->width(),
-                         mStatechart->height(), 1.0, 20,
-                         1., 1., 1.);
+        mStatechart->height(), 1.0, 20,
+        1., 1., 1.);
 
     mContext->move_to(OFFSET, OFFSET + HEADER_HEIGHT);
-    mContext->line_to(mStatechart->width() + OFFSET, OFFSET + HEADER_HEIGHT);
+    mContext->line_to(
+        mStatechart->width() + OFFSET, OFFSET + HEADER_HEIGHT);
     mContext->stroke();
 }
 
 void StatechartDrawingArea::drawRoundedRectangle(guint x, guint y,
-                                                 guint width, guint height,
-                                                 double aspect,
-                                                 double corner_radius,
-                                                 double red,
-                                                 double green,
-                                                 double blue)
+    guint width, guint height,
+    double aspect,
+    double corner_radius,
+    double red,
+    double green,
+    double blue)
 {
     double radius = corner_radius / aspect;
     double degrees = M_PI / 180.0;
@@ -519,13 +530,13 @@ void StatechartDrawingArea::drawRoundedRectangle(guint x, guint y,
     mContext->set_line_width(Settings::settings().getLineWidth());
     mContext->begin_new_sub_path();
     mContext->arc(x + width - radius, y + radius, radius,
-                  -90 * degrees, 0 * degrees);
+        -90 * degrees, 0 * degrees);
     mContext->arc(x + width - radius, y + height - radius,
-                  radius, 0 * degrees, 90 * degrees);
+        radius, 0 * degrees, 90 * degrees);
     mContext->arc(x + radius, y + height - radius, radius,
-                  90 * degrees, 180 * degrees);
+        90 * degrees, 180 * degrees);
     mContext->arc(x + radius, y + radius, radius,
-                  180 * degrees, 270 * degrees);
+        180 * degrees, 270 * degrees);
     mContext->close_path();
 
     mContext->set_source_rgb(red, green, blue);
@@ -537,7 +548,7 @@ void StatechartDrawingArea::drawRoundedRectangle(guint x, guint y,
 void StatechartDrawingArea::drawSelfConnection(Transition* transition)
 {
     const point_t& source = *transition->points().begin();
-    State * state = mStatechart->state(transition->source());
+    State* state = mStatechart->state(transition->source());
     int xs, ys;
     int xt, yt;
 
@@ -581,13 +592,13 @@ void StatechartDrawingArea::drawState(State* state)
     }
 
     drawRoundedRectangle(state->x(), state->y(),
-                         state->width(), state->height(), 1.0, 10,
-                         1., 1., 0.75);
+        state->width(), state->height(), 1.0, 10,
+        1., 1., 0.75);
     mContext->stroke();
 
     mContext->move_to(state->x(), state->y() + STATE_NAME_HEIGHT);
     mContext->line_to(state->x() + state->width(),
-                      state->y() + STATE_NAME_HEIGHT);
+        state->y() + STATE_NAME_HEIGHT);
     mContext->stroke();
 
     drawStateName(state);
@@ -650,16 +661,17 @@ void StatechartDrawingArea::drawStateName(State* state)
 {
     setColor(Settings::settings().getForegroundColor());
     mContext->select_font_face(Settings::settings().getFont(),
-			  Cairo::FONT_SLANT_NORMAL,
-			  Cairo::FONT_WEIGHT_NORMAL);
+        Cairo::FONT_SLANT_NORMAL,
+        Cairo::FONT_WEIGHT_NORMAL);
     mContext->set_font_size(Settings::settings().getFontSize());
 
     Cairo::TextExtents textExtents;
 
     mContext->get_text_extents(state->name(), textExtents);
-    mContext->move_to(state->x() + (state->width() - textExtents.width) / 2,
-                      state->y() + (STATE_NAME_HEIGHT +
-                                    textExtents.height) / 2);
+    mContext->move_to(
+        state->x() + (state->width() - textExtents.width) / 2,
+        state->y() + (STATE_NAME_HEIGHT +
+                      textExtents.height) / 2);
     mContext->show_text(state->name());
     mContext->stroke();
 }
@@ -705,15 +717,16 @@ void StatechartDrawingArea::drawTransition(Transition* transition)
 void StatechartDrawingArea::drawTransitions()
 {
     mContext->set_source_rgb(0., 0., 0.);
-    for (transitions_t::const_iterator it = mStatechart->transitions().begin();
+    for (transitions_t::const_iterator it =
+             mStatechart->transitions().begin();
          it != mStatechart->transitions().end(); ++it) {
         drawTransition(*it);
     }
 }
 
 void StatechartDrawingArea::drawTransitionText(Transition* transition,
-                                               int xs, int ys,
-                                               int xd, int yd)
+    int xs, int ys,
+    int xd, int yd)
 {
     std::string str = transition->event();
     double d = std::sqrt((xd - xs) * (xd - xs) + (yd - ys) * (yd - ys));
@@ -736,8 +749,8 @@ void StatechartDrawingArea::drawTransitionText(Transition* transition,
 
     mContext->set_source_rgb(0., 0., 0.);
     mContext->select_font_face(Settings::settings().getFont(),
-                               Cairo::FONT_SLANT_NORMAL,
-                               Cairo::FONT_WEIGHT_NORMAL);
+        Cairo::FONT_SLANT_NORMAL,
+        Cairo::FONT_WEIGHT_NORMAL);
     mContext->set_font_size(Settings::settings().getFontSize());
 
     Cairo::TextExtents textExtents;
@@ -767,7 +780,7 @@ function_type StatechartDrawingArea::getFunctionType(
     const std::string& value) const
 {
     try {
-        boost::lexical_cast < double >(value);
+        boost::lexical_cast < double > (value);
     } catch (...) {
         return FUNCTION;
     }
@@ -828,7 +841,7 @@ void StatechartDrawingArea::makeBreakpoint(guint mx, guint my, bool ctrl)
                         if (ctrl) {
                             mCurrentStates.clear();
                             mCurrentStates.push_back(
-                                mStatechart->state((*itt)->destination()));
+	mStatechart->state((*itt)->destination()));
                             mLastBreakpoint = mBreakpoint;
                         }
                         mBreakpoint = 0;
@@ -842,14 +855,15 @@ void StatechartDrawingArea::makeBreakpoint(guint mx, guint my, bool ctrl)
                         const double a = (ys - yd) / (double)(xs - xd);
                         const double b = ys - a * xs;
                         h = std::abs((my - (a * mx) - b) /
-                                     std::sqrt(1 + a * a));
+	std::sqrt(1 + a * a));
                         if (h <= 10) {
                             point_t pt(mx, my);
 
                             found = true;
                             mCurrentTransition = *itt;
-                            mBreakpoint = &(*mCurrentTransition->addPoint(it,
-                                                                          pt));
+                            mBreakpoint =
+                                &(*mCurrentTransition->addPoint(it,
+	      pt));
                         }
                     }
                 }
@@ -886,7 +900,7 @@ bool StatechartDrawingArea::modifyCurrentState()
                      state->eventInStates().begin();
                  it != state->eventInStates().end(); ++it) {
                 if (std::find(mStatechart->inputPorts().begin(),
-                              mStatechart->inputPorts().end(), it->first)
+                        mStatechart->inputPorts().end(), it->first)
                     == mStatechart->inputPorts().end()) {
                     mStatechart->addInputPort(it->first);
                 }
@@ -909,23 +923,23 @@ bool StatechartDrawingArea::modifyCurrentTransition()
         if (dialog.run() == Gtk::RESPONSE_ACCEPT) {
             mCurrentTransition->action(dialog.action());
             mCurrentTransition->after(dialog.after(),
-                                      getFunctionType(dialog.after()));
+                getFunctionType(dialog.after()));
             mCurrentTransition->event(dialog.event());
             mCurrentTransition->guard(dialog.guard());
             mCurrentTransition->send(dialog.send(), dialog.typeSend());
             mCurrentTransition->when(dialog.when(),
-                                     getFunctionType(dialog.when()));
+                getFunctionType(dialog.when()));
 
             if (not dialog.event().empty() and
                 std::find(mStatechart->inputPorts().begin(),
-                          mStatechart->inputPorts().end(),
-                          dialog.event()) == mStatechart->inputPorts().end()) {
+                    mStatechart->inputPorts().end(),
+                    dialog.event()) == mStatechart->inputPorts().end()) {
                 mStatechart->addInputPort(dialog.event());
             }
             if (dialog.typeSend() == CONSTANT and
                 std::find(mStatechart->outputPorts().begin(),
-                          mStatechart->outputPorts().end(),
-                          dialog.send()) == mStatechart->outputPorts().end()) {
+                    mStatechart->outputPorts().end(),
+                    dialog.send()) == mStatechart->outputPorts().end()) {
                 mStatechart->addOutputPort(dialog.send());
             }
             result = true;
@@ -944,7 +958,7 @@ bool StatechartDrawingArea::on_button_press_event(GdkEventButton* event)
     case SELECT:
         if (event->type == GDK_BUTTON_PRESS and event->button == 1) {
             if (not selectState(event->x, event->y,
-                                event->state & GDK_CONTROL_MASK)) {
+                    event->state & GDK_CONTROL_MASK)) {
                 int x = event->x - OFFSET;
                 int y = event->y - OFFSET;
 
@@ -953,7 +967,8 @@ bool StatechartDrawingArea::on_button_press_event(GdkEventButton* event)
                     y >= mStatechart->height() - 20 and
                     y <= mStatechart->height();
             }
-        } else if (event->type == GDK_2BUTTON_PRESS and event->button == 1) {
+        } else if (event->type == GDK_2BUTTON_PRESS and event->button ==
+                   1) {
             if (selectState(event->x, event->y, false)) {
                 if (modifyCurrentState()) {
                     queueRedraw();
@@ -980,13 +995,13 @@ bool StatechartDrawingArea::on_button_press_event(GdkEventButton* event)
             if (not (event->state & GDK_CONTROL_MASK) and
                 selectState(event->x, event->y, false)) {
                 mBegin = searchAnchor(*mCurrentStates.begin(),
-                                      event->x, event->y);
+                        event->x, event->y);
                 mStartPoint.x = event->x;
                 mStartPoint.y = event->y;
                 mStartState = mCurrentStates.front();
             } else {
                 makeBreakpoint(event->x, event->y,
-                               event->state & GDK_CONTROL_MASK);
+                    event->state & GDK_CONTROL_MASK);
             }
         }
         break;
@@ -1015,7 +1030,7 @@ bool StatechartDrawingArea::on_button_release_event(GdkEventButton* event)
     case SELECT:
         mPreviousX = -1;
         mPreviousY = -1;
-        mStatechartResize= false;
+        mStatechartResize = false;
         break;
     case ADD_TRANSITION:
         if (event->button == 1) {
@@ -1028,22 +1043,25 @@ bool StatechartDrawingArea::on_button_release_event(GdkEventButton* event)
                 } else if (mLastBreakpoint) {
                     mLastBreakpoint = 0;
                 }
-            } else if (not mCurrentStates.empty() and mStartPoint.x != event->x
+            } else if (not mCurrentStates.empty() and mStartPoint.x !=
+                       event->x
                        and mStartPoint.y != event->y) {
                 if (selectState(event->x, event->y, false)) {
-                    State*   dst = *mCurrentStates.begin();
+                    State* dst = *mCurrentStates.begin();
                     points_t pts;
 
                     if (mStartState == dst) {
                         pts.push_back(mBegin);
                     } else {
-                        point_t anchor = searchAnchor(dst, event->x, event->y);
+                        point_t anchor = searchAnchor(dst,
+	event->x,
+	event->y);
 
                         pts.push_back(mBegin);
                         pts.push_back(anchor);
                     }
                     mStatechart->addTransition(mStartState->name(),
-                                               dst->name(), pts);
+                        dst->name(), pts);
                 }
             }
 
@@ -1075,7 +1093,7 @@ bool StatechartDrawingArea::on_configure_event(GdkEventConfigure* event)
         mHeight = event->height;
     }
     if (change and mIsRealized) {
-	set_size_request(mWidth, mHeight);
+        set_size_request(mWidth, mHeight);
         mBuffer = Gdk::Pixmap::create(mWin, mWidth, mHeight, -1);
         queueRedraw();
     }
@@ -1090,13 +1108,13 @@ bool StatechartDrawingArea::on_expose_event(GdkEventExpose*)
         }
         if (mBuffer) {
             if (mNeedRedraw) {
-		mContext = mBuffer->create_cairo_context();
-		mContext->set_line_width(Settings::settings().getLineWidth());
+                mContext = mBuffer->create_cairo_context();
+                mContext->set_line_width(Settings::settings().getLineWidth());
                 draw();
                 mNeedRedraw = false;
             }
             mWin->draw_drawable(mWingc, mBuffer, 0, 0, 0, 0, -1, -1);
-	}
+        }
     }
     return true;
 }
@@ -1116,32 +1134,32 @@ bool StatechartDrawingArea::on_motion_notify_event(GdkEventMotion* event)
     switch (mState) {
     case SELECT:
         if (button == 1) {
-	    if (not mCurrentStates.empty()) {
+            if (not mCurrentStates.empty()) {
                 bool xok, yok;
 
                 displaceStates(mPreviousX == -1 ? event->x : mPreviousX,
-                               mPreviousY == -1 ? event->y : mPreviousY,
-                               event->x, event->y, xok, yok);
-		if (xok) {
+                    mPreviousY == -1 ? event->y : mPreviousY,
+                    event->x, event->y, xok, yok);
+                if (xok) {
                     mPreviousX = event->x;
                 }
                 if (yok) {
                     mPreviousY = event->y;
                 }
-		queueRedraw();
-	    } else if (mStatechartResize) {
+                queueRedraw();
+            } else if (mStatechartResize) {
                 bool xok, yok;
 
                 resizeStatechart(mPreviousX == -1 ? event->x : mPreviousX,
-                                 mPreviousY == -1 ? event->y : mPreviousY,
-                                 event->x, event->y, xok, yok);
-		if (xok) {
+                    mPreviousY == -1 ? event->y : mPreviousY,
+                    event->x, event->y, xok, yok);
+                if (xok) {
                     mPreviousX = event->x;
                 }
                 if (yok) {
                     mPreviousY = event->y;
                 }
-		queueRedraw();
+                queueRedraw();
             }
         }
         break;
@@ -1153,14 +1171,14 @@ bool StatechartDrawingArea::on_motion_notify_event(GdkEventMotion* event)
                     mBreakpoint->y = event->y;
                 } else if (mFirstBreakpoint) {
                     point_t pt = searchAnchor(mCurrentStates.front(),
-                                              event->x, event->y);
+                            event->x, event->y);
 
                     if (pt != *mFirstBreakpoint) {
                         *mFirstBreakpoint = pt;
                     }
                 } else if (mLastBreakpoint) {
                     point_t pt = searchAnchor(mCurrentStates.front(),
-                                              event->x, event->y);
+                            event->x, event->y);
 
                     if (pt != *mLastBreakpoint) {
                         *mLastBreakpoint = pt;
@@ -1169,7 +1187,7 @@ bool StatechartDrawingArea::on_motion_notify_event(GdkEventMotion* event)
             } else if (mBegin.valid()) {
                 if (selectState(event->x, event->y, false)) {
                     mEnd = searchAnchor(mCurrentStates.front(),
-                                        event->x, event->y);
+                            event->x, event->y);
                 }
             }
         } else if (button == 0) {
@@ -1221,8 +1239,9 @@ void StatechartDrawingArea::removeBreakpoint()
             guint yd = it->y;
             double a = (ys - yd) / (double)(xs - xd);
             double b = ys - a * xs;
-            double h = std::abs((mBreakpoint->y - (a * mBreakpoint->x) - b) /
-                                std::sqrt(1 + a * a));
+            double h = std::abs(
+                    (mBreakpoint->y - (a * mBreakpoint->x) - b) /
+                    std::sqrt(1 + a * a));
 
             if (h < 5) {
                 mCurrentTransition->points().erase(itb);
@@ -1232,8 +1251,8 @@ void StatechartDrawingArea::removeBreakpoint()
 }
 
 void StatechartDrawingArea::resizeStatechart(int oldx, int oldy,
-                                             int newx, int newy,
-                                             bool& xok, bool& yok)
+    int newx, int newy,
+    bool& xok, bool& yok)
 {
     int deltax = newx - oldx;
     int deltay = newy - oldy;
@@ -1267,11 +1286,11 @@ void StatechartDrawingArea::resizeStatechart(int oldx, int oldy,
 }
 
 point_t StatechartDrawingArea::searchAnchor(const State* state,
-                                            guint x, guint y)
+    guint x, guint y)
 {
     const points_t& anchors = state->anchors();
-    point_t         anchor;
-    double          min = std::numeric_limits < double >::max();
+    point_t anchor;
+    double min = std::numeric_limits < double >::max();
 
     for (points_t::const_iterator it = anchors.begin(); it != anchors.end();
          ++it) {
@@ -1303,7 +1322,7 @@ bool StatechartDrawingArea::selectState(guint x, guint y, bool ctrl)
             mCurrentStates.clear();
         }
         if (std::find(mCurrentStates.begin(), mCurrentStates.end(),
-                      it->second) == mCurrentStates.end()) {
+                it->second) == mCurrentStates.end()) {
             mCurrentStates.push_back(it->second);
         }
     } else {
@@ -1373,7 +1392,8 @@ bool StatechartDrawingArea::selectTransition(guint mx, guint my)
                 }
 
                 double h = -1;
-                if (std::min(xs, xd) <= (int)mx and (int)mx <= std::max(xs, xd)
+                if (std::min(xs,
+                        xd) <= (int)mx and (int)mx <= std::max(xs, xd)
                     and std::min(ys, yd) <= (int)my
                     and (int)my <= std::max(ys, yd)) {
                     const double a = (ys - yd) / (double)(xs - xd);
@@ -1401,8 +1421,11 @@ bool StatechartDrawingArea::selectTransition(guint mx, guint my)
 void StatechartDrawingArea::setColor(const Gdk::Color& color)
 {
     mContext->set_source_rgb(color.get_red_p(),
-                             color.get_green_p(),
-                             color.get_blue_p());
+        color.get_green_p(),
+        color.get_blue_p());
 }
 
-}}}} // namespace vle gvle modeling fsa
+}
+}
+}
+}    // namespace vle gvle modeling fsa

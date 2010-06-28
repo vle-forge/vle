@@ -38,12 +38,15 @@
 #include <gtksourceviewmm-2.0/gtksourceviewmm.h>
 #endif
 
-namespace vle { namespace gvle { namespace modeling { namespace fsa {
+namespace vle {
+namespace gvle {
+namespace modeling {
+namespace fsa {
 
 class SourceDialog
 {
 public:
-    SourceDialog(Glib::RefPtr<Gnome::Glade::Xml> xml);
+    SourceDialog(Glib::RefPtr < Gnome::Glade::Xml > xml);
     virtual ~SourceDialog();
 
     void add(const std::string& name, const std::string& buffer);
@@ -52,14 +55,17 @@ public:
     int run();
 
 private:
-    Glib::RefPtr<Gnome::Glade::Xml> mXml;
+    Glib::RefPtr < Gnome::Glade::Xml > mXml;
 
-    Gtk::Dialog*                      mDialog;
-    Gtk::Notebook*                    mNotebook;
+    Gtk::Dialog* mDialog;
+    Gtk::Notebook* mNotebook;
     std::map < std::string, DocumentText* > mFunctions;
 };
 
-}}}} // namespace vle gvle modeling fsa
+}
+}
+}
+}    // namespace vle gvle modeling fsa
 
 #endif
 

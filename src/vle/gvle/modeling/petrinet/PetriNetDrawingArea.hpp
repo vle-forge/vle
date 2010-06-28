@@ -36,23 +36,36 @@
 #include <gtkmm/scrolledwindow.h>
 #include <libglademm.h>
 
-namespace vle { namespace gvle { namespace modeling { namespace petrinet {
+namespace vle {
+namespace gvle {
+namespace modeling {
+namespace petrinet {
 
 class PetriNetDrawingArea : public Gtk::DrawingArea
 {
 public:
-    enum tool_states { SELECT, ADD_ARC, ADD_PLACE, ADD_TRANSITION, DELETE,
-                       HELP };
+    enum tool_states {
+        SELECT, ADD_ARC, ADD_PLACE, ADD_TRANSITION, DELETE,
+        HELP
+    };
 
     PetriNetDrawingArea(BaseObjectType* cobject,
                         const Glib::RefPtr < Gnome::Glade::Xml >& xml);
-    virtual ~PetriNetDrawingArea() { }
+    virtual ~PetriNetDrawingArea()
+    {
+    }
 
     void setState(int state)
-    { mState = state; mCurrentPlaces.clear(); mCurrentTransitions.clear(); }
+    {
+        mState = state;
+        mCurrentPlaces.clear();
+        mCurrentTransitions.clear();
+    }
 
     void setPetriNet(PetriNet* petrinet)
-    { mPetriNet = petrinet; }
+    {
+        mPetriNet = petrinet;
+    }
 
 private:
     void addPlace(guint x, guint y);
@@ -100,7 +113,10 @@ private:
     bool on_motion_notify_event(GdkEventMotion* event);
     void on_realize();
     void queueRedraw()
-    { mNeedRedraw = true; queue_draw(); }
+    {
+        mNeedRedraw = true;
+        queue_draw();
+    }
     void removeBreakpoint();
     point_t searchAnchor(const Place* place, guint x, guint y);
     point_t searchAnchor(const Transition* transition, guint x, guint y);
@@ -120,34 +136,37 @@ private:
     Cairo::RefPtr < Cairo::Context >   mContext;
     Glib::RefPtr < Gdk::Window >       mWin;
     Glib::RefPtr < Gdk::GC >           mWingc;
-    bool                               mIsRealized;
-    bool                               mNeedRedraw;
+    bool mIsRealized;
+    bool mNeedRedraw;
 
-    PetriNet*                          mPetriNet;
-    int                                mState;
+    PetriNet* mPetriNet;
+    int mState;
 
-    int                                mHeight;
-    int                                mWidth;
+    int mHeight;
+    int mWidth;
 
     std::vector < Place* >             mCurrentPlaces;
     std::vector < Transition* >        mCurrentTransitions;
-    int                                mPreviousX;
-    int                                mPreviousY;
-    point_t                            mMouse;
-    point_t                            mBegin;
-    point_t                            mEnd;
-    point_t                            mStartPoint;
-    point_t*                           mBreakpoint;
-    point_t*                           mFirstBreakpoint;
-    point_t*                           mLastBreakpoint;
-    Arc*                               mCurrentArc;
-    bool                               mPetriNetResize;
-    Place*                             mStartPlace;
-    Transition*                        mStartTransition;
-    Gtk::Menu                          mMenuPopup;
+    int mPreviousX;
+    int mPreviousY;
+    point_t mMouse;
+    point_t mBegin;
+    point_t mEnd;
+    point_t mStartPoint;
+    point_t* mBreakpoint;
+    point_t* mFirstBreakpoint;
+    point_t* mLastBreakpoint;
+    Arc* mCurrentArc;
+    bool mPetriNetResize;
+    Place* mStartPlace;
+    Transition* mStartTransition;
+    Gtk::Menu mMenuPopup;
 
 };
 
-}}}} // namespace vle gvle modeling petrinet
+}
+}
+}
+}    // namespace vle gvle modeling petrinet
 
 #endif

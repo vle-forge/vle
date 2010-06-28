@@ -121,8 +121,8 @@
                     <property name="height_request">500</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="hadjustment">0 0 164 16.400000000000002 147.59999999999999 164</property>
-                    <property name="vadjustment">0 0 144 14.4 129.59999999999999 144</property>
+                    <property name="hadjustment">0 0 1 0.10000000000000001 0.90000000000000002 1</property>
+                    <property name="vadjustment">0 0 1 0.10000000000000001 0.90000000000000002 1</property>
                     <property name="hscrollbar_policy">automatic</property>
                     <property name="vscrollbar_policy">automatic</property>
                     <child>
@@ -301,11 +301,28 @@
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkEntry" id="NewStateNameEntry">
+                  <widget class="GtkHBox" id="hbox2">
                     <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="invisible_char">&#x25CF;</property>
-                    <property name="activates_default">True</property>
+                    <child>
+                      <widget class="GtkEntry" id="NewStateNameEntry">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="invisible_char">&#x25CF;</property>
+                        <property name="activates_default">True</property>
+                      </widget>
+                      <packing>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkImage" id="PlaceStatusImage">
+                        <property name="visible">True</property>
+                        <property name="stock">gtk-no</property>
+                      </widget>
+                      <packing>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
                   </widget>
                   <packing>
                     <property name="position">1</property>

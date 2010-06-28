@@ -30,7 +30,10 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
-namespace vle { namespace gvle { namespace modeling { namespace petrinet {
+namespace vle {
+namespace gvle {
+namespace modeling {
+namespace petrinet {
 
 const int PetriNet::INITIAL_HEIGHT = 400;
 const int PetriNet::INITIAL_WIDTH = 400;
@@ -46,15 +49,15 @@ Place::Place(const std::string& conf)
 
     boost::split(state, conf, boost::is_any_of(","));
     mName = state[0];
-    mX = boost::lexical_cast < int >(state[1]);
-    mY = boost::lexical_cast < int >(state[2]);
-    mRadius = boost::lexical_cast < int >(state[3]);
-    mOutput = boost::lexical_cast < bool >(state[4]);
+    mX = boost::lexical_cast < int > (state[1]);
+    mY = boost::lexical_cast < int > (state[2]);
+    mRadius = boost::lexical_cast < int > (state[3]);
+    mOutput = boost::lexical_cast < bool > (state[4]);
     mOutputPortName = state[5];
-    mInitialMarking = boost::lexical_cast < unsigned int >(state[6]);
+    mInitialMarking = boost::lexical_cast < unsigned int > (state[6]);
     mDelay = not state[7].empty();
     if (mDelay) {
-        mDelayValue = boost::lexical_cast < double >(state[7]);
+        mDelayValue = boost::lexical_cast < double > (state[7]);
     } else {
         mDelayValue = 0;
     }
@@ -114,21 +117,21 @@ Transition::Transition(const std::string& conf)
 
     boost::split(state, conf, boost::is_any_of(","));
     mName = state[0];
-    mX = boost::lexical_cast < int >(state[1]);
-    mY = boost::lexical_cast < int >(state[2]);
-    mWidth = boost::lexical_cast < int >(state[3]);
-    mHeight = boost::lexical_cast < int >(state[4]);
-    mInput = boost::lexical_cast < bool >(state[5]);
+    mX = boost::lexical_cast < int > (state[1]);
+    mY = boost::lexical_cast < int > (state[2]);
+    mWidth = boost::lexical_cast < int > (state[3]);
+    mHeight = boost::lexical_cast < int > (state[4]);
+    mInput = boost::lexical_cast < bool > (state[5]);
     mInputPortName = state[6];
-    mOutput = boost::lexical_cast < bool >(state[7]);
+    mOutput = boost::lexical_cast < bool > (state[7]);
     mOutputPortName = state[8];
     mDelay = not state[9].empty();
     if (mDelay) {
-        mDelayValue = boost::lexical_cast < double >(state[9]);
+        mDelayValue = boost::lexical_cast < double > (state[9]);
     } else {
         mDelayValue = 0;
     }
-    mPriority = boost::lexical_cast < unsigned int >(state[10]);
+    mPriority = boost::lexical_cast < unsigned int > (state[10]);
     computeAnchors();
 }
 
@@ -181,7 +184,8 @@ std::string Transition::toString() const
         delay = (fmt("%1%") % mDelayValue).str();
     }
     return (fmt("%1%,%2%,%3%,%4%,%5%,%6%,%7%,%8%,%9%,%10%,%11%")
-            % mName % mX % mY % mWidth % mHeight % mInput % mInputPortName %
+            % mName % mX % mY % mWidth % mHeight % mInput %
+            mInputPortName %
             mOutput % mOutputPortName % delay % mPriority).str();
 }
 
@@ -194,8 +198,8 @@ Arc::Arc(const std::string& conf)
     boost::split(transition, conf, boost::is_any_of(","));
     mSource = transition[0];
     mDestination = transition[1];
-    mWeight = boost::lexical_cast < unsigned int >(transition[2]);
-    mInhibitor = boost::lexical_cast < bool >(transition[3]);
+    mWeight = boost::lexical_cast < unsigned int > (transition[2]);
+    mInhibitor = boost::lexical_cast < bool > (transition[3]);
 
     strings_t pts;
 
@@ -204,8 +208,8 @@ Arc::Arc(const std::string& conf)
         strings_t pt;
 
         boost::split(pt, pts[i], boost::is_any_of("/"));
-        mPoints.push_back(point_t(boost::lexical_cast < int >(pt[0]),
-                                  boost::lexical_cast < int >(pt[1])));
+        mPoints.push_back(point_t(boost::lexical_cast < int > (pt[0]),
+                boost::lexical_cast < int > (pt[1])));
     }
 }
 
@@ -292,4 +296,7 @@ void PetriNet::removeArc(Arc* arc)
     mArcs.erase(it);
 }
 
-}}}} // namespace vle gvle modeling petrinet
+}
+}
+}
+}    // namespace vle gvle modeling petrinet

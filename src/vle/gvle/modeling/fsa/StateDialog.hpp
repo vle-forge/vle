@@ -47,7 +47,7 @@ namespace fsa {
 class NewStateDialog
 {
 public:
-    NewStateDialog(const Glib::RefPtr < Gnome::Glade::Xml >& xml);
+    NewStateDialog(const Glib::RefPtr < Gnome::Glade::Xml >& xml, const Statechart& statechart);
 
     virtual ~NewStateDialog()
     {
@@ -65,9 +65,21 @@ public:
 
     int run();
 
+    bool valid() const
+    {
+        return not (mNameEntry->get_text().empty() or
+                    (mStatechart.existState(name()) and
+                     mNameEntry->get_text() != ""));//mInitialName));
+    }
+
 private:
+    void onChangeName();
+    void setStatus();
+    const Statechart& mStatechart;
+    std::list < sigc::connection > mList;
     Gtk::Dialog* mDialog;
     Gtk::Entry* mNameEntry;
+    Gtk::Image* mStatusName;
     Gtk::CheckButton* mInitialCheckbox;
 };
 

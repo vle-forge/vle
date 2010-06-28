@@ -28,7 +28,10 @@
 #include <vle/gvle/modeling/petrinet/ArcDialog.hpp>
 #include <vle/utils/i18n.hpp>
 
-namespace vle { namespace gvle { namespace modeling { namespace petrinet {
+namespace vle {
+namespace gvle {
+namespace modeling {
+namespace petrinet {
 
 ArcDialog::ArcDialog(const Glib::RefPtr < Gnome::Glade::Xml >& xml,
                      const Arc* arc) : mArc(arc)
@@ -54,4 +57,7 @@ int ArcDialog::run()
     mDialog->hide();
     return response;
 }
-}}}} // namespace vle gvle modeling petrinet
+}
+}
+}
+}    // namespace vle gvle modeling petrinet

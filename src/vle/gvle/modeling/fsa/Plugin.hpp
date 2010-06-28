@@ -39,7 +39,10 @@
 #include <gtkmm/uimanager.h>
 #include <libglademm.h>
 
-namespace vle { namespace gvle { namespace modeling { namespace fsa {
+namespace vle {
+namespace gvle {
+namespace modeling {
+namespace fsa {
 
 
 class PluginFSA : public ModelingPlugin
@@ -67,7 +70,9 @@ public:
     virtual bool start(vpz::Condition& condition);
 
     virtual bool start(vpz::Condition&, const std::string&)
-    { return true; }
+    {
+        return true;
+    }
 
 private:
     void createActions();
@@ -105,31 +110,34 @@ private:
     void parseStates(const strings_t& lst);
     void parseTransitions(const strings_t& lst);
 
-    static const Glib::ustring         UI_DEFINITION;
-    static const std::string           TEMPLATE_DEFINITION;
+    static const Glib::ustring UI_DEFINITION;
+    static const std::string TEMPLATE_DEFINITION;
 
     Glib::RefPtr < Gnome::Glade::Xml > mXml;
-    Gtk::Dialog*                       mDialog;
-    StatechartDrawingArea*             mView;
-    Cairo::RefPtr<Cairo::Context>      mContext;
+    Gtk::Dialog* mDialog;
+    StatechartDrawingArea* mView;
+    Cairo::RefPtr < Cairo::Context >      mContext;
 
-    Gtk::Toolbar*                      mToolbar;
+    Gtk::Toolbar* mToolbar;
     Glib::RefPtr < Gtk::UIManager >    mUIManager;
     Glib::RefPtr < Gtk::ActionGroup >  mActionGroup;
 
-    Gtk::Button*                       mIncludeButton;
-    Gtk::Button*                       mTimeStepButton;
-    Gtk::Button*                       mUserButton;
+    Gtk::Button* mIncludeButton;
+    Gtk::Button* mTimeStepButton;
+    Gtk::Button* mUserButton;
 
     std::list < sigc::connection >     mList;
 
-    Statechart*                        mStatechart;
-    std::string                        mInclude;
-    std::string                        mConstructorUser;
-    std::string                        mDefinitionUser;
-    std::string                        mTimeStep;
+    Statechart* mStatechart;
+    std::string mInclude;
+    std::string mConstructorUser;
+    std::string mDefinitionUser;
+    std::string mTimeStep;
 };
 
-}}}} // namespace vle gvle modeling fsa
+}
+}
+}
+}    // namespace vle gvle modeling fsa
 
 #endif

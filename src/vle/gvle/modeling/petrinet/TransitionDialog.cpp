@@ -29,12 +29,16 @@
 #include <vle/utils/i18n.hpp>
 #include <gtkmm/stock.h>
 
-namespace vle { namespace gvle { namespace modeling { namespace petrinet {
+namespace vle {
+namespace gvle {
+namespace modeling {
+namespace petrinet {
 
 TransitionDialog::TransitionDialog(
     const Glib::RefPtr < Gnome::Glade::Xml >& xml,
     const PetriNet& petrinet,
-    const Transition* transition) : mPetriNet(petrinet), mTransition(transition)
+    const Transition* transition) : mPetriNet(petrinet),
+    mTransition(transition)
 {
     xml->get_widget("TransitionDialog", mDialog);
     xml->get_widget("TransitionNameEntry", mNameEntry);
@@ -57,13 +61,13 @@ TransitionDialog::TransitionDialog(
     xml->get_widget("TransitionDelayEntry", mDelayEntry);
 
     mList.push_back(mNameEntry->signal_changed().connect(
-                        sigc::mem_fun(*this, &TransitionDialog::onChangeName)));
+            sigc::mem_fun(*this, &TransitionDialog::onChangeName)));
     mList.push_back(mInputCheckbox->signal_toggled().connect(
-                        sigc::mem_fun(*this, &TransitionDialog::onInput)));
+            sigc::mem_fun(*this, &TransitionDialog::onInput)));
     mList.push_back(mOutputCheckbox->signal_toggled().connect(
-                        sigc::mem_fun(*this, &TransitionDialog::onOutput)));
+            sigc::mem_fun(*this, &TransitionDialog::onOutput)));
     mList.push_back(mDelayCheckbox->signal_toggled().connect(
-                        sigc::mem_fun(*this, &TransitionDialog::onDelay)));
+            sigc::mem_fun(*this, &TransitionDialog::onDelay)));
 }
 
 TransitionDialog::~TransitionDialog()
@@ -135,12 +139,12 @@ int TransitionDialog::run()
         mDelayEntry->set_sensitive(mTransition->delay());
         if (mTransition->delay()) {
             mDelayEntry->set_text((fmt("%1%") %
-                                      mTransition->delayValue()).str());
+                                   mTransition->delayValue()).str());
         } else {
             mDelayEntry->set_text("");
         }
         mPriorityEntry->set_sensitive(not mTransition->output() and
-                                      not mTransition->input());
+            not mTransition->input());
     } else {
         mNameEntry->set_text("");
         mInitialName = "";
@@ -170,4 +174,7 @@ void TransitionDialog::setStatus()
     }
 }
 
-}}}} // namespace vle gvle modeling petrinet
+}
+}
+}
+}    // namespace vle gvle modeling petrinet

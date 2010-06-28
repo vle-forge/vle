@@ -36,23 +36,35 @@
 #include <gtkmm/scrolledwindow.h>
 #include <libglademm.h>
 
-namespace vle { namespace gvle { namespace modeling { namespace fsa {
+namespace vle {
+namespace gvle {
+namespace modeling {
+namespace fsa {
 
 class StatechartDrawingArea : public Gtk::DrawingArea
 {
 public:
-    enum tool_states { SELECT, ADD_STATE, ADD_TRANSITION, DELETE, HELP};
+    enum tool_states {
+        SELECT, ADD_STATE, ADD_TRANSITION, DELETE, HELP
+    };
 
     StatechartDrawingArea(BaseObjectType* cobject,
                           const Glib::RefPtr < Gnome::Glade::Xml >& xml);
 
-    virtual ~StatechartDrawingArea() { }
+    virtual ~StatechartDrawingArea()
+    {
+    }
 
     void setState(int state)
-    { mState = state; mCurrentStates.clear(); }
+    {
+        mState = state;
+        mCurrentStates.clear();
+    }
 
     void setStatechart(Statechart* statechart)
-    { mStatechart = statechart; }
+    {
+        mStatechart = statechart;
+    }
 
 private:
     void addState(guint x, guint y);
@@ -100,7 +112,10 @@ private:
     bool on_motion_notify_event(GdkEventMotion* event);
     void on_realize();
     void queueRedraw()
-    { mNeedRedraw = true; queue_draw(); }
+    {
+        mNeedRedraw = true;
+        queue_draw();
+    }
     void removeBreakpoint();
     void resizeStatechart(int oldx, int oldy, int newx, int newy,
                           bool& xok, bool& yok);
@@ -121,32 +136,35 @@ private:
     Cairo::RefPtr < Cairo::Context >   mContext;
     Glib::RefPtr < Gdk::Window >       mWin;
     Glib::RefPtr < Gdk::GC >           mWingc;
-    bool                               mIsRealized;
-    bool                               mNeedRedraw;
+    bool mIsRealized;
+    bool mNeedRedraw;
 
-    Statechart*                        mStatechart;
-    int                                mState;
+    Statechart* mStatechart;
+    int mState;
 
-    int                                mHeight;
-    int                                mWidth;
+    int mHeight;
+    int mWidth;
 
     std::vector < State* >             mCurrentStates;
-    int                                mPreviousX;
-    int                                mPreviousY;
-    point_t                            mMouse;
-    point_t                            mBegin;
-    point_t                            mEnd;
-    point_t                            mStartPoint;
-    point_t*                           mBreakpoint;
-    point_t*                           mFirstBreakpoint;
-    point_t*                           mLastBreakpoint;
-    Transition*                        mCurrentTransition;
-    bool                               mStatechartResize;
-    State*                             mStartState;
+    int mPreviousX;
+    int mPreviousY;
+    point_t mMouse;
+    point_t mBegin;
+    point_t mEnd;
+    point_t mStartPoint;
+    point_t* mBreakpoint;
+    point_t* mFirstBreakpoint;
+    point_t* mLastBreakpoint;
+    Transition* mCurrentTransition;
+    bool mStatechartResize;
+    State* mStartState;
 
-    Gtk::Menu                          mMenuPopup;
+    Gtk::Menu mMenuPopup;
 };
 
-}}}} // namespace vle gvle modeling fsa
+}
+}
+}
+}    // namespace vle gvle modeling fsa
 
 #endif

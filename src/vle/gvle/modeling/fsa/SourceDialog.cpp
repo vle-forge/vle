@@ -29,9 +29,13 @@
 #include <vle/gvle/modeling/fsa/SourceDialog.hpp>
 #include <vle/gvle/Settings.hpp>
 
-namespace vle { namespace gvle { namespace modeling { namespace fsa {
+namespace vle {
+namespace gvle {
+namespace modeling {
+namespace fsa {
 
-SourceDialog::SourceDialog(Glib::RefPtr<Gnome::Glade::Xml> xml) : mXml(xml)
+SourceDialog::SourceDialog(Glib::RefPtr < Gnome::Glade::Xml > xml) : mXml(
+        xml)
 {
     xml->get_widget("SourceDialog", mDialog);
     xml->get_widget("NotebookSource", mNotebook);
@@ -63,4 +67,7 @@ int SourceDialog::run()
     return mDialog->run();
 }
 
-}}}} // namespace vle gvle modeling fsa
+}
+}
+}
+}    // namespace vle gvle modeling fsa

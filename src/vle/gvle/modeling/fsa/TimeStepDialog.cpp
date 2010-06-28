@@ -27,9 +27,13 @@
 
 #include <vle/gvle/modeling/fsa/TimeStepDialog.hpp>
 
-namespace vle { namespace gvle { namespace modeling { namespace fsa {
+namespace vle {
+namespace gvle {
+namespace modeling {
+namespace fsa {
 
-TimeStepDialog::TimeStepDialog(const Glib::RefPtr < Gnome::Glade::Xml >& xml)
+TimeStepDialog::TimeStepDialog(
+    const Glib::RefPtr < Gnome::Glade::Xml >& xml)
 {
     xml->get_widget("TimeStepDialog", mDialog);
     xml->get_widget("TimeStepEntry", mTimeStepEntry);
@@ -46,4 +50,7 @@ int TimeStepDialog::run(const std::string& timeStep)
     return response;
 }
 
-}}}} // namespace vle gvle modeling fsa
+}
+}
+}
+}    // namespace vle gvle modeling fsa

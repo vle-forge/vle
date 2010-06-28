@@ -39,7 +39,10 @@
 #include <gtkmm/uimanager.h>
 #include <libglademm.h>
 
-namespace vle { namespace gvle { namespace modeling { namespace petrinet {
+namespace vle {
+namespace gvle {
+namespace modeling {
+namespace petrinet {
 
 class PluginPetriNet : public ModelingPlugin
 {
@@ -66,7 +69,9 @@ public:
     virtual bool start(vpz::Condition& condition);
 
     virtual bool start(vpz::Condition&, const std::string&)
-    { return true; }
+    {
+        return true;
+    }
 
 private:
     void createActions();
@@ -95,13 +100,13 @@ private:
     void parseArcs(const strings_t& lst);
 
     static const Glib::ustring UI_DEFINITION;
-    static const std::string   TEMPLATE_DEFINITION;
+    static const std::string TEMPLATE_DEFINITION;
 
     Glib::RefPtr < Gnome::Glade::Xml > mXml;
-    Gtk::Dialog*                       mDialog;
-    PetriNetDrawingArea*               mView;
+    Gtk::Dialog* mDialog;
+    PetriNetDrawingArea* mView;
 
-    Gtk::Toolbar*                      mToolbar;
+    Gtk::Toolbar* mToolbar;
     Glib::RefPtr < Gtk::UIManager >    mUIManager;
     Glib::RefPtr < Gtk::ActionGroup >  mActionGroup;
 
@@ -110,6 +115,9 @@ private:
     PetriNet* mPetriNet;
 };
 
-}}}} // namespace vle gvle modeling petrinet
+}
+}
+}
+}    // namespace vle gvle modeling petrinet
 
 #endif

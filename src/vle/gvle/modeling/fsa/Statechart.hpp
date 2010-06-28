@@ -33,9 +33,14 @@
 #include <string>
 #include <vector>
 
-namespace vle { namespace gvle { namespace modeling { namespace fsa {
+namespace vle {
+namespace gvle {
+namespace modeling {
+namespace fsa {
 
-enum function_type { CONSTANT, FUNCTION };
+enum function_type {
+    CONSTANT, FUNCTION
+};
 
 typedef std::vector < std::string > strings_t;
 typedef std::map < std::string, std::string > buffers_t;
@@ -46,19 +51,29 @@ struct point_t
     int y;
 
     point_t(int x = -1, int y = -1) : x(x), y(y)
-    { }
+    {
+    }
 
     bool valid() const
-    { return x != -1 and y != -1; }
+    {
+        return x != -1 and y != -1;
+    }
 
     void invalid()
-    { x = -1; y = -1; }
+    {
+        x = -1;
+        y = -1;
+    }
 
     bool operator==(const point_t& pt) const
-    { return pt.x == x and pt.y == y; }
+    {
+        return pt.x == x and pt.y == y;
+    }
 
     bool operator!=(const point_t& pt) const
-    { return pt.x != x or pt.y != y; }
+    {
+        return pt.x != x or pt.y != y;
+    }
 };
 
 typedef std::vector < point_t > points_t;
@@ -67,25 +82,40 @@ typedef std::map < std::string, std::string > eventInStates_t;
 class State
 {
 public:
-    State(const std::string& name, bool initial, int x, int y, int w, int h) :
+    State(const std::string& name,
+          bool initial,
+          int x,
+          int y,
+          int w,
+          int h) :
         mName(name), mInitial(initial), mX(x), mY(y), mWidth(w), mHeight(h)
-    { computeAnchors(); }
+    {
+        computeAnchors();
+    }
 
     State(const std::string& conf);
 
     const std::string& activity() const
-    { return mActivity; }
+    {
+        return mActivity;
+    }
 
     void activity(const std::string& act)
-    { mActivity = act; }
+    {
+        mActivity = act;
+    }
 
     const points_t& anchors() const
-    { return mAnchors; }
+    {
+        return mAnchors;
+    }
 
     void displace(int deltax, int deltay);
 
     const eventInStates_t& eventInStates() const
-    { return mEventInStates; }
+    {
+        return mEventInStates;
+    }
 
     std::string eventInState(const std::string& name) const
     {
@@ -98,7 +128,9 @@ public:
     }
 
     void eventInStates(const std::string& event, const std::string& action)
-    { mEventInStates[event] = action; }
+    {
+        mEventInStates[event] = action;
+    }
 
     void eventInStates(const eventInStates_t& eventInStates)
     {
@@ -109,67 +141,94 @@ public:
     }
 
     int height() const
-    { return mHeight; }
+    {
+        return mHeight;
+    }
 
     void height(int height);
 
     const std::string& inAction() const
-    { return mInAction; }
+    {
+        return mInAction;
+    }
 
     void inAction(const std::string& act)
-    { mInAction = act; }
+    {
+        mInAction = act;
+    }
 
     bool initial() const
-    { return mInitial; }
+    {
+        return mInitial;
+    }
 
     void initial(bool initial)
-    { mInitial = initial; }
+    {
+        mInitial = initial;
+    }
 
     const std::string& name() const
-    { return mName; }
+    {
+        return mName;
+    }
 
     void name(const std::string& name)
-    { mName = name; }
+    {
+        mName = name;
+    }
 
     const std::string& outAction() const
-    { return mOutAction; }
+    {
+        return mOutAction;
+    }
 
     void outAction(const std::string& act)
-    { mOutAction = act; }
+    {
+        mOutAction = act;
+    }
 
     void parseEventInStates(const std::string& conf);
 
     bool select(int x, int y) const
-    { return x >= mX and x <= mX + mWidth and y >= mY and y <= mY + mHeight; }
+    {
+        return x >= mX and x <= mX + mWidth and y >= mY and y <= mY +
+               mHeight;
+    }
 
     std::string toString() const;
 
     int x() const
-    { return mX; }
+    {
+        return mX;
+    }
 
     int width() const
-    { return mWidth; }
+    {
+        return mWidth;
+    }
 
     void width(int w);
 
     int y() const
-    { return mY; }
+    {
+        return mY;
+    }
 
 private:
     void computeAnchors();
 
     std::string mName;
-    bool        mInitial;
+    bool mInitial;
     std::string mInAction;
     std::string mOutAction;
     std::string mActivity;
     eventInStates_t mEventInStates;
 
-    int         mX;
-    int         mY;
-    int         mWidth;
-    int         mHeight;
-    points_t    mAnchors;
+    int mX;
+    int mY;
+    int mWidth;
+    int mHeight;
+    points_t mAnchors;
 };
 
 class Transition
@@ -178,30 +237,46 @@ public:
     Transition(const std::string& src, const std::string& dst,
                const points_t& pts) :
         mSource(src), mDestination(dst), mPoints(pts)
-    { }
+    {
+    }
 
     Transition(const std::string& conf);
 
     const std::string& action() const
-    { return mAction; }
+    {
+        return mAction;
+    }
 
     void action(const std::string& act)
-    { mAction = act; }
+    {
+        mAction = act;
+    }
 
     points_t::iterator addPoint(points_t::iterator& it, const point_t& pt)
-    { return mPoints.insert(it, pt); }
+    {
+        return mPoints.insert(it, pt);
+    }
 
     const std::string& after() const
-    { return mAfter; }
+    {
+        return mAfter;
+    }
 
     void after(const std::string& aft, function_type func_type)
-    { mAfter = aft; mAfterType = func_type; }
+    {
+        mAfter = aft;
+        mAfterType = func_type;
+    }
 
     function_type afterType() const
-    { return mAfterType; }
+    {
+        return mAfterType;
+    }
 
     const std::string& destination() const
-    { return mDestination; }
+    {
+        return mDestination;
+    }
 
     void displaceDestination(int deltax, int deltay)
     {
@@ -210,60 +285,89 @@ public:
     }
 
     void displaceSource(int deltax, int deltay)
-    { mPoints[0].x += deltax; mPoints[0].y += deltay; }
+    {
+        mPoints[0].x += deltax;
+        mPoints[0].y += deltay;
+    }
 
     const std::string& event() const
-    { return mEvent; }
+    {
+        return mEvent;
+    }
 
     void event(const std::string& evt)
-    { mEvent = evt; }
+    {
+        mEvent = evt;
+    }
 
     const std::string& guard() const
-    { return mGuard; }
+    {
+        return mGuard;
+    }
 
     void guard(const std::string& grd)
-    { mGuard = grd; }
+    {
+        mGuard = grd;
+    }
 
     const std::string& send() const
-    { return mSend; }
+    {
+        return mSend;
+    }
 
     void send(const std::string& opt, function_type func_type)
-    { mSend = opt; mSendType = func_type; }
+    {
+        mSend = opt;
+        mSendType = func_type;
+    }
 
     function_type sendType() const
-    { return mSendType; }
+    {
+        return mSendType;
+    }
 
     points_t& points()
-    { return mPoints; }
+    {
+        return mPoints;
+    }
 
     std::string toString() const;
 
     const std::string& when() const
-    { return mWhen; }
+    {
+        return mWhen;
+    }
 
     void when(const std::string& whn, function_type func_type)
-    { mWhen = whn; mWhenType = func_type; }
+    {
+        mWhen = whn;
+        mWhenType = func_type;
+    }
 
     function_type whenType() const
-    { return mWhenType; }
+    {
+        return mWhenType;
+    }
 
     const std::string& source() const
-    { return mSource; }
+    {
+        return mSource;
+    }
 
 private:
-    std::string   mSource;
-    std::string   mDestination;
-    std::string   mEvent;
-    std::string   mGuard;
-    std::string   mWhen;
+    std::string mSource;
+    std::string mDestination;
+    std::string mEvent;
+    std::string mGuard;
+    std::string mWhen;
     function_type mWhenType;
-    std::string   mAfter;
+    std::string mAfter;
     function_type mAfterType;
-    std::string   mAction;
-    std::string   mSend;
+    std::string mAction;
+    std::string mSend;
     function_type mSendType;
 
-    points_t      mPoints;
+    points_t mPoints;
 };
 
 typedef std::map < std::string, State* > states_t;
@@ -276,7 +380,8 @@ public:
                const strings_t& outputPorts) :
         mName(name), mWidth(INITIAL_WIDTH), mHeight(INITIAL_HEIGHT),
         mInputPorts(inputPorts), mOutputPorts(outputPorts)
-    { }
+    {
+    }
 
     virtual ~Statechart()
     {
@@ -287,7 +392,9 @@ public:
     }
 
     const buffers_t& actions() const
-    { return mActions; }
+    {
+        return mActions;
+    }
 
     std::string action(const std::string& name) const
     {
@@ -300,10 +407,14 @@ public:
     }
 
     void action(const std::string& name, const std::string& buffer)
-    { mActions[name] = buffer; }
+    {
+        mActions[name] = buffer;
+    }
 
     const buffers_t& activities() const
-    { return mActivities; }
+    {
+        return mActivities;
+    }
 
     std::string activity(const std::string& name) const
     {
@@ -316,16 +427,24 @@ public:
     }
 
     void activity(const std::string& name, const std::string& buffer)
-    { mActivities[name] = buffer; }
+    {
+        mActivities[name] = buffer;
+    }
 
     void addInputPort(const std::string& name)
-    { mInputPorts.push_back(name); }
+    {
+        mInputPorts.push_back(name);
+    }
 
     void addOutputPort(const std::string& name)
-    { mOutputPorts.push_back(name); }
+    {
+        mOutputPorts.push_back(name);
+    }
 
     const buffers_t& afters() const
-    { return mAfters; }
+    {
+        return mAfters;
+    }
 
     std::string after(const std::string& name) const
     {
@@ -338,7 +457,9 @@ public:
     }
 
     void after(const std::string& name, const std::string& buffer)
-    { mAfters[name] = buffer; }
+    {
+        mAfters[name] = buffer;
+    }
 
     void addState(const std::string& conf)
     {
@@ -348,15 +469,21 @@ public:
     }
 
     void addState(const std::string& name, bool initial,
-                  int x, int y, int w, int h)
-    { mStates[name] = new State(name, initial, x, y, w, h); }
+        int x, int y, int w, int h)
+    {
+        mStates[name] = new State(name, initial, x, y, w, h);
+    }
 
     void addTransition(const std::string& conf)
-    { mTransitions.push_back(new Transition(conf)); }
+    {
+        mTransitions.push_back(new Transition(conf));
+    }
 
     void addTransition(const std::string& src, const std::string& dst,
-                       const points_t& pts)
-    { mTransitions.push_back(new Transition(src, dst, pts)); }
+        const points_t& pts)
+    {
+        mTransitions.push_back(new Transition(src, dst, pts));
+    }
 
     std::string clause(const Transition* transition) const;
 
@@ -365,7 +492,9 @@ public:
     void displace(State* state, int deltax, int deltay);
 
     const buffers_t& eventActions() const
-    { return mEventActions; }
+    {
+        return mEventActions;
+    }
 
     std::string eventAction(const std::string& name) const
     {
@@ -378,10 +507,14 @@ public:
     }
 
     void eventAction(const std::string& name, const std::string& buffer)
-    { mEventActions[name] = buffer; }
+    {
+        mEventActions[name] = buffer;
+    }
 
     const buffers_t& guards() const
-    { return mGuards; }
+    {
+        return mGuards;
+    }
 
     std::string guard(const std::string& name) const
     {
@@ -394,36 +527,53 @@ public:
     }
 
     void guard(const std::string& name, const std::string& buffer)
-    { mGuards[name] = buffer; }
+    {
+        mGuards[name] = buffer;
+    }
 
     int height() const
-    { return mHeight; }
+    {
+        return mHeight;
+    }
 
     void height(int height)
-    { mHeight = height; }
+    {
+        mHeight = height;
+    }
 
     std::string initialState() const;
 
     const strings_t& inputPorts() const
-    { return mInputPorts; }
+    {
+        return mInputPorts;
+    }
 
     const std::string& name() const
-    { return mName; }
+    {
+        return mName;
+    }
 
     const strings_t& outputPorts() const
-    { return mOutputPorts; }
+    {
+        return mOutputPorts;
+    }
 
     void removeState(State* state);
 
     void removeTransition(Transition* transition);
 
     void resize(int deltax, int deltay)
-    { mWidth += deltax; mHeight += deltay; }
+    {
+        mWidth += deltax;
+        mHeight += deltay;
+    }
 
     void resizeState(State* state, int widht, int height);
 
     const buffers_t& sends() const
-    { return mSends; }
+    {
+        return mSends;
+    }
 
     std::string send(const std::string& name) const
     {
@@ -436,19 +586,34 @@ public:
     }
 
     void send(const std::string& name, const std::string& buffer)
-    { mSends[name] = buffer; }
+    {
+        mSends[name] = buffer;
+    }
+
+    bool existState(const std::string& name) const
+    {
+        return mStates.find(name) != mStates.end();
+    }
 
     State* state(const std::string& name) const
-    { return mStates.find(name)->second; }
+    {
+        return mStates.find(name)->second;
+    }
 
     const states_t& states() const
-    { return mStates; }
+    {
+        return mStates;
+    }
 
     const transitions_t& transitions() const
-    { return mTransitions; }
+    {
+        return mTransitions;
+    }
 
     const buffers_t& whens() const
-    { return mWhens; }
+    {
+        return mWhens;
+    }
 
     std::string when(const std::string& name) const
     {
@@ -461,13 +626,19 @@ public:
     }
 
     void when(const std::string& name, const std::string& buffer)
-    { mWhens[name] = buffer; }
+    {
+        mWhens[name] = buffer;
+    }
 
     int width() const
-    { return mWidth; }
+    {
+        return mWidth;
+    }
 
     void width(int width)
-    { mWidth = width; }
+    {
+        mWidth = width;
+    }
 
     static const int INITIAL_HEIGHT;
     static const int INITIAL_WIDTH;
@@ -483,24 +654,27 @@ public:
     static const std::string WHEN_DEFINITION;
 
 private:
-    std::string   mName;
-    int           mWidth;
-    int           mHeight;
-    states_t      mStates;
+    std::string mName;
+    int mWidth;
+    int mHeight;
+    states_t mStates;
     transitions_t mTransitions;
 
-    buffers_t     mActions;
-    buffers_t     mActivities;
-    buffers_t     mAfters;
-    buffers_t     mGuards;
-    buffers_t     mEventActions;
-    buffers_t     mSends;
-    buffers_t     mWhens;
+    buffers_t mActions;
+    buffers_t mActivities;
+    buffers_t mAfters;
+    buffers_t mGuards;
+    buffers_t mEventActions;
+    buffers_t mSends;
+    buffers_t mWhens;
 
-    strings_t     mInputPorts;
-    strings_t     mOutputPorts;
+    strings_t mInputPorts;
+    strings_t mOutputPorts;
 };
 
-}}}} // namespace vle gvle modeling fsa
+}
+}
+}
+}    // namespace vle gvle modeling fsa
 
 #endif

@@ -39,7 +39,10 @@
 #include <iostream>
 #include <limits>
 
-namespace vle { namespace gvle { namespace modeling { namespace petrinet {
+namespace vle {
+namespace gvle {
+namespace modeling {
+namespace petrinet {
 
 const guint PetriNetDrawingArea::OFFSET = 10;
 const guint PetriNetDrawingArea::TRANSITION_HEIGHT = 10;
@@ -66,9 +69,9 @@ PetriNetDrawingArea::PetriNetDrawingArea(
     mStartTransition(0)
 {
     set_events(Gdk::POINTER_MOTION_MASK | Gdk::BUTTON_MOTION_MASK |
-               Gdk::BUTTON1_MOTION_MASK | Gdk::BUTTON2_MOTION_MASK |
-               Gdk::BUTTON3_MOTION_MASK | Gdk::BUTTON_PRESS_MASK |
-               Gdk::BUTTON_RELEASE_MASK);
+        Gdk::BUTTON1_MOTION_MASK | Gdk::BUTTON2_MOTION_MASK |
+        Gdk::BUTTON3_MOTION_MASK | Gdk::BUTTON_PRESS_MASK |
+        Gdk::BUTTON_RELEASE_MASK);
     initMenuPopupModels();
 }
 
@@ -82,13 +85,14 @@ void PetriNetDrawingArea::addPlace(guint x, guint y)
 
         try {
             Place* place = mPetriNet->addPlace(
-                dialog.name(), dialog.output(),
-                boost::lexical_cast < unsigned int >(dialog.initialMarking()),
-                x, y, PLACE_RADIUS);
+                    dialog.name(), dialog.output(),
+                    boost::lexical_cast < unsigned int > (dialog.
+                        initialMarking()),
+                    x, y, PLACE_RADIUS);
 
             if (dialog.delay()) {
                 place->delayValue(
-                    boost::lexical_cast < double >(dialog.delayValue()));
+                    boost::lexical_cast < double > (dialog.delayValue()));
             }
             place->delay(dialog.delay());
             if (not dialog.outputPortName().empty()) {
@@ -115,16 +119,16 @@ void PetriNetDrawingArea::addTransition(guint x, guint y)
         int newWidth = x + TRANSITION_WIDTH + OFFSET;
         int newHeight = y + TRANSITION_HEIGHT + OFFSET;
         Transition* transition = mPetriNet->addTransition(
-            dialog.name(), dialog.input(), dialog.output(),
-            x, y, TRANSITION_WIDTH, TRANSITION_HEIGHT);
+                dialog.name(), dialog.input(), dialog.output(),
+                x, y, TRANSITION_WIDTH, TRANSITION_HEIGHT);
 
         if (dialog.delay()) {
             transition->delayValue(
-                boost::lexical_cast < double >(dialog.delayValue()));
+                boost::lexical_cast < double > (dialog.delayValue()));
         }
         transition->delay(dialog.delay());
         transition->priority(
-            boost::lexical_cast < unsigned int  >(dialog.priority()));
+            boost::lexical_cast < unsigned int > (dialog.priority()));
         if (not dialog.inputPortName().empty()) {
             transition->inputPortName(dialog.inputPortName());
         }
@@ -145,13 +149,13 @@ void PetriNetDrawingArea::addTransition(guint x, guint y)
 void PetriNetDrawingArea::exportPng(const std::string& filename)
 {
 
-    Cairo::RefPtr<Cairo::ImageSurface> surface =
+    Cairo::RefPtr < Cairo::ImageSurface > surface =
         Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, mWidth, mHeight);
     mContext = Cairo::Context::create(surface);
     mContext->set_line_width(Settings::settings().getLineWidth());
     mContext->select_font_face(Settings::settings().getFont(),
-			       Cairo::FONT_SLANT_NORMAL,
-			       Cairo::FONT_WEIGHT_NORMAL);
+        Cairo::FONT_SLANT_NORMAL,
+        Cairo::FONT_WEIGHT_NORMAL);
     mContext->set_font_size(Settings::settings().getFontSize());
     draw();
     surface->write_to_png(filename + ".png");
@@ -159,13 +163,13 @@ void PetriNetDrawingArea::exportPng(const std::string& filename)
 
 void PetriNetDrawingArea::exportPdf(const std::string& filename)
 {
-    Cairo::RefPtr<Cairo::PdfSurface> surface =
+    Cairo::RefPtr < Cairo::PdfSurface > surface =
         Cairo::PdfSurface::create(filename + ".pdf", mWidth, mHeight);
     mContext = Cairo::Context::create(surface);
     mContext->set_line_width(Settings::settings().getLineWidth());
     mContext->select_font_face(Settings::settings().getFont(),
-			       Cairo::FONT_SLANT_NORMAL,
-			       Cairo::FONT_WEIGHT_NORMAL);
+        Cairo::FONT_SLANT_NORMAL,
+        Cairo::FONT_WEIGHT_NORMAL);
     mContext->set_font_size(Settings::settings().getFontSize());
     draw();
     mContext->show_page();
@@ -174,13 +178,13 @@ void PetriNetDrawingArea::exportPdf(const std::string& filename)
 
 void PetriNetDrawingArea::exportSvg(const std::string& filename)
 {
-    Cairo::RefPtr<Cairo::SvgSurface> surface =
+    Cairo::RefPtr < Cairo::SvgSurface > surface =
         Cairo::SvgSurface::create(filename + ".svg", mWidth, mHeight);
     mContext = Cairo::Context::create(surface);
     mContext->set_line_width(Settings::settings().getLineWidth());
     mContext->select_font_face(Settings::settings().getFont(),
-			       Cairo::FONT_SLANT_NORMAL,
-			       Cairo::FONT_WEIGHT_NORMAL);
+        Cairo::FONT_SLANT_NORMAL,
+        Cairo::FONT_WEIGHT_NORMAL);
     mContext->set_font_size(Settings::settings().getFontSize());
     draw();
     mContext->show_page();
@@ -190,7 +194,9 @@ void PetriNetDrawingArea::exportSvg(const std::string& filename)
 void PetriNetDrawingArea::exportGraphic()
 {
 
-    Gtk::FileChooserDialog file(_("Image file"), Gtk::FILE_CHOOSER_ACTION_SAVE);
+    Gtk::FileChooserDialog file(_(
+	    "Image file"),
+                                Gtk::FILE_CHOOSER_ACTION_SAVE);
     file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
     Gtk::FileFilter filterAuto;
@@ -218,24 +224,25 @@ void PetriNetDrawingArea::exportGraphic()
         if (extension == _("Guess type from file name")) {
             size_t ext_pos = filename.find_last_of('.');
             if (ext_pos != std::string::npos) {
-                std::string type(filename, ext_pos+1);
+                std::string type(filename, ext_pos + 1);
                 filename.resize(ext_pos);
-                if (type == "png")
+                if (type == "png") {
                     exportPng(filename);
-                else if (type == "pdf")
+                } else if (type == "pdf") {
                     exportPdf(filename);
-                else if (type == "svg")
+                } else if (type == "svg") {
                     exportSvg(filename);
-                else
+                } else {
                     Error(_("Unsupported file format"));
+                }
             }
-        }
-        else if (extension == _("Portable Newtork Graphics (.png)"))
+        } else if (extension == _("Portable Newtork Graphics (.png)")) {
             exportPng(filename);
-        else if (extension == _("Portable Format Document (.pdf)"))
+        } else if (extension == _("Portable Format Document (.pdf)")) {
             exportPdf(filename);
-        else if (extension == _("Scalable Vector Graphics (.svg)"))
+        } else if (extension == _("Scalable Vector Graphics (.svg)")) {
             exportSvg(filename);
+        }
     }
 }
 
@@ -265,21 +272,21 @@ points_t PetriNetDrawingArea::computeMarking(const Place* place)
         pts.push_back(point_t(place->x() + delta, place->y()));
     } else if (place->initialMarking() == 3) {
         pts.push_back(point_t(place->x() - delta,
-                              place->y() + delta));
+                place->y() + delta));
         pts.push_back(point_t(place->x() + delta,
-                              place->y() + delta));
+                place->y() + delta));
         pts.push_back(point_t(place->x(),
-                              place->y() - delta));
+                place->y() - delta));
     } else if (place->initialMarking() == 4 or
                place->initialMarking() == 5) {
         pts.push_back(point_t(place->x() - delta,
-                              place->y() - delta));
+                place->y() - delta));
         pts.push_back(point_t(place->x() + delta,
-                              place->y() - delta));
+                place->y() - delta));
         pts.push_back(point_t(place->x() - delta,
-                              place->y() + delta));
+                place->y() + delta));
         pts.push_back(point_t(place->x() + delta,
-                              place->y() + delta));
+                place->y() + delta));
         if (place->initialMarking() == 5) {
             pts.push_back(point_t(place->x(), place->y()));
         }
@@ -289,8 +296,8 @@ points_t PetriNetDrawingArea::computeMarking(const Place* place)
 }
 
 void PetriNetDrawingArea::displacePlaces(int oldx, int oldy,
-                                         int newx, int newy,
-                                         bool& xok, bool& yok)
+    int newx, int newy,
+    bool& xok, bool& yok)
 {
     int deltax = newx - oldx;
     int deltay = newy - oldy;
@@ -299,7 +306,8 @@ void PetriNetDrawingArea::displacePlaces(int oldx, int oldy,
     xok = false;
     yok = false;
     if (deltax != 0 or deltay != 0) {
-        for (std::vector < Place* >::const_iterator it = mCurrentPlaces.begin();
+        for (std::vector < Place* >::const_iterator it =
+                 mCurrentPlaces.begin();
              it != mCurrentPlaces.end(); ++it) {
             int _deltax = deltax;
             int _deltay = deltay;
@@ -343,8 +351,8 @@ void PetriNetDrawingArea::displacePlaces(int oldx, int oldy,
 }
 
 void PetriNetDrawingArea::displaceTransitions(int oldx, int oldy,
-                                              int newx, int newy,
-                                              bool& xok, bool& yok)
+    int newx, int newy,
+    bool& xok, bool& yok)
 {
     int deltax = newx - oldx;
     int deltay = newy - oldy;
@@ -359,7 +367,7 @@ void PetriNetDrawingArea::displaceTransitions(int oldx, int oldy,
             int _deltax = deltax;
             int _deltay = deltay;
 
-            if ((*it)->x() + deltax < (int)(2 *OFFSET)) {
+            if ((*it)->x() + deltax < (int)(2 * OFFSET)) {
                 _deltax = 0;
             } else {
                 xok = true;
@@ -402,7 +410,7 @@ void PetriNetDrawingArea::draw()
     if (mIsRealized and mBuffer) {
         mContext->save();
 
-	mContext->set_line_width(Settings::settings().getLineWidth());
+        mContext->set_line_width(Settings::settings().getLineWidth());
 
         drawBackground();
         drawPlaces();
@@ -434,7 +442,7 @@ void PetriNetDrawingArea::draw()
         }
 
         mContext->restore();
-	set_size_request(mWidth, mHeight);
+        set_size_request(mWidth, mHeight);
     }
 }
 
@@ -475,7 +483,7 @@ void PetriNetDrawingArea::drawArc(Arc* arc)
     }
 
     mContext->move_to(xs, ys);
-    if (arc->inhibitor() and *it == arc->points().back()) {
+    if (arc->inhibitor() and * it == arc->points().back()) {
         drawInhibitor(xs, ys, xd, yd);
     } else {
         while (it != arc->points().end()) {
@@ -487,7 +495,7 @@ void PetriNetDrawingArea::drawArc(Arc* arc)
                 xd = it->x;
                 yd = it->y;
                 if (arc->inhibitor() and
-                    *it == arc->points().back()) {
+                    * it == arc->points().back()) {
                     drawInhibitor(xs, ys, xd, yd);
                     break;
                 }
@@ -511,8 +519,8 @@ void PetriNetDrawingArea::drawArcs()
 }
 
 void PetriNetDrawingArea::drawArcText(Arc* arc,
-                                      int xs, int ys,
-                                      int xd, int yd)
+    int xs, int ys,
+    int xd, int yd)
 {
     std::string str((fmt("%1%") % arc->weight()).str());
     double d = std::sqrt((xd - xs) * (xd - xs) + (yd - ys) * (yd - ys));
@@ -520,8 +528,8 @@ void PetriNetDrawingArea::drawArcText(Arc* arc,
 
     mContext->set_source_rgb(0., 0., 0.);
     mContext->select_font_face(Settings::settings().getFont(),
-                               Cairo::FONT_SLANT_NORMAL,
-                               Cairo::FONT_WEIGHT_NORMAL);
+        Cairo::FONT_SLANT_NORMAL,
+        Cairo::FONT_WEIGHT_NORMAL);
     mContext->set_font_size(Settings::settings().getFontSize());
 
     Cairo::TextExtents textExtents;
@@ -597,19 +605,21 @@ void PetriNetDrawingArea::drawCurrentBreakpoint()
     mContext->fill();
 }
 
-void PetriNetDrawingArea::drawInhibitor(double /* xs */, double ys, double xd,
-                                        double& yd)
+void PetriNetDrawingArea::drawInhibitor(double /* xs */,
+    double ys,
+    double xd,
+    double& yd)
 {
     if (ys < yd) {
         mContext->line_to(xd, yd - 6);
         mContext->stroke();
-        mContext->arc(xd, yd - 3, 3, 0, 2*M_PI);
+        mContext->arc(xd, yd - 3, 3, 0, 2 * M_PI);
         mContext->stroke();
         yd -= 6;
     } else {
         mContext->line_to(xd, yd + 6);
         mContext->stroke();
-        mContext->arc(xd, yd + 3, 3, 0, 2*M_PI);
+        mContext->arc(xd, yd + 3, 3, 0, 2 * M_PI);
         mContext->stroke();
         yd += 6;
     }
@@ -624,11 +634,12 @@ void PetriNetDrawingArea::drawPlace(Place* place)
         setColor(Settings::settings().getSelectedColor());
     }
 
-    mContext->arc(place->x(), place->y(), place->radius(), 0, 2*M_PI);
+    mContext->arc(place->x(), place->y(), place->radius(), 0, 2 * M_PI);
     mContext->stroke();
 
     if (place->output()) {
-        mContext->arc(place->x(), place->y(), place->radius() - 2, 0, 2*M_PI);
+        mContext->arc(place->x(), place->y(),
+            place->radius() - 2, 0, 2 * M_PI);
         mContext->stroke();
     }
 
@@ -638,17 +649,17 @@ void PetriNetDrawingArea::drawPlace(Place* place)
 
             for (points_t::const_iterator it = pts.begin(); it != pts.end();
                  ++it) {
-                mContext->arc(it->x, it->y, 3, 0, 2*M_PI);
+                mContext->arc(it->x, it->y, 3, 0, 2 * M_PI);
                 mContext->fill();
                 mContext->stroke();
             }
         } else {
-            mContext->arc(place->x(), place->y(), 3, 0, 2*M_PI);
+            mContext->arc(place->x(), place->y(), 3, 0, 2 * M_PI);
             mContext->fill();
             mContext->stroke();
 
             mContext->move_to(place->x() + 4,
-                              place->y() - 4);
+                place->y() - 4);
             mContext->show_text((fmt("%1%") % place->initialMarking()).str());
             mContext->stroke();
         }
@@ -666,8 +677,8 @@ void PetriNetDrawingArea::drawPlaceName(Place* place)
 {
     setColor(Settings::settings().getForegroundColor());
     mContext->select_font_face(Settings::settings().getFont(),
-			  Cairo::FONT_SLANT_NORMAL,
-			  Cairo::FONT_WEIGHT_NORMAL);
+        Cairo::FONT_SLANT_NORMAL,
+        Cairo::FONT_WEIGHT_NORMAL);
     mContext->set_font_size(Settings::settings().getFontSize());
 
     std::string str(place->name());
@@ -681,7 +692,7 @@ void PetriNetDrawingArea::drawPlaceName(Place* place)
     }
     mContext->get_text_extents(str, textExtents);
     mContext->move_to(place->x() + place->radius() + 2,
-                      place->y() + textExtents.height / 2);
+        place->y() + textExtents.height / 2);
     mContext->show_text(str);
     mContext->stroke();
 }
@@ -697,34 +708,35 @@ void PetriNetDrawingArea::drawPlaces()
 void PetriNetDrawingArea::drawTransition(Transition* transition)
 {
     if (std::find(mCurrentTransitions.begin(), mCurrentTransitions.end(),
-                  transition) == mCurrentTransitions.end()) {
+            transition) == mCurrentTransitions.end()) {
         setColor(Settings::settings().getAtomicColor());
     } else {
         setColor(Settings::settings().getSelectedColor());
     }
 
-    mContext->rectangle(transition->x(), transition->y(), transition->width(),
-                        transition->height());
+    mContext->rectangle(transition->x(),
+        transition->y(), transition->width(),
+        transition->height());
     mContext->stroke();
 
     if (transition->input()) {
         mContext->rectangle(transition->x() + 2, transition->y() + 2,
-                            transition->width() - 4,
-                            transition->height() - 4);
+            transition->width() - 4,
+            transition->height() - 4);
         mContext->stroke();
     }
 
     if (transition->output()) {
         mContext->move_to(transition->x() + transition->width() / 2,
-                          transition->y());
+            transition->y());
         mContext->line_to(transition->x() + transition->width(),
-                          transition->y() + transition->height() / 2);
+            transition->y() + transition->height() / 2);
         mContext->line_to(transition->x() + transition->width() / 2,
-                          transition->y() + transition->height());
+            transition->y() + transition->height());
         mContext->line_to(transition->x(),
-                          transition->y() + transition->height() / 2);
+            transition->y() + transition->height() / 2);
         mContext->line_to(transition->x() + transition->width() / 2,
-                          transition->y());
+            transition->y());
         mContext->stroke();
     }
 
@@ -740,8 +752,8 @@ void PetriNetDrawingArea::drawTransitionName(Transition* transition)
 {
     setColor(Settings::settings().getForegroundColor());
     mContext->select_font_face(Settings::settings().getFont(),
-			  Cairo::FONT_SLANT_NORMAL,
-			  Cairo::FONT_WEIGHT_NORMAL);
+        Cairo::FONT_SLANT_NORMAL,
+        Cairo::FONT_WEIGHT_NORMAL);
     mContext->set_font_size(Settings::settings().getFontSize());
 
     std::string str(transition->name());
@@ -761,8 +773,8 @@ void PetriNetDrawingArea::drawTransitionName(Transition* transition)
     }
     mContext->get_text_extents(str, textExtents);
     mContext->move_to(transition->x() + transition->width() + 2,
-                      transition->y() + (transition->height() +
-                                         textExtents.height / 2));
+        transition->y() + (transition->height() +
+                           textExtents.height / 2));
     mContext->show_text(str);
     mContext->stroke();
 }
@@ -842,18 +854,18 @@ void PetriNetDrawingArea::makeBreakpoint(guint mx, guint my, bool ctrl)
                             Place* p = mPetriNet->place((*itt)->source());
 
                             if (p) {
-                                mCurrentPlaces.clear();
-                                mCurrentPlaces.push_back(p);
-                                mLastBreakpoint = mBreakpoint;
+	mCurrentPlaces.clear();
+	mCurrentPlaces.push_back(p);
+	mLastBreakpoint = mBreakpoint;
                             } else {
-                                Transition* t =
-                                    mPetriNet->transition((*itt)->source());
+	Transition* t =
+	    mPetriNet->transition((*itt)->source());
 
-                                if (t) {
-                                    mCurrentTransitions.clear();
-                                    mCurrentTransitions.push_back(t);
-                                    mLastBreakpoint = mBreakpoint;
-                                }
+	if (t) {
+	    mCurrentTransitions.clear();
+	    mCurrentTransitions.push_back(t);
+	    mLastBreakpoint = mBreakpoint;
+	}
                             }
                         }
                         mBreakpoint = 0;
@@ -867,7 +879,7 @@ void PetriNetDrawingArea::makeBreakpoint(guint mx, guint my, bool ctrl)
                         const double a = (ys - yd) / (double)(xs - xd);
                         const double b = ys - a * xs;
                         h = std::abs((my - (a * mx) - b) /
-                                     std::sqrt(1 + a * a));
+	std::sqrt(1 + a * a));
                         if (h <= 10) {
                             point_t pt(mx, my);
 
@@ -899,8 +911,8 @@ bool PetriNetDrawingArea::modifyCurrentArc()
 
         if (dialog.run() == Gtk::RESPONSE_ACCEPT) {
             try {
-                mCurrentArc->weight(boost::lexical_cast < unsigned int >(
-                                        dialog.weight()));
+                mCurrentArc->weight(boost::lexical_cast < unsigned int > (
+                        dialog.weight()));
                 mCurrentArc->inhibitor(dialog.inhibitor());
                 result = true;
             } catch (...) {
@@ -921,12 +933,12 @@ bool PetriNetDrawingArea::modifyCurrentPlace()
         if (dialog.run() == Gtk::RESPONSE_ACCEPT and dialog.valid()) {
             try {
                 place->initialMarking(
-                    boost::lexical_cast < unsigned int >(
+                    boost::lexical_cast < unsigned int > (
                         dialog.initialMarking()));
                 place->name(dialog.name());
                 if (dialog.delay()) {
                     place->delayValue(
-                        boost::lexical_cast < double >(dialog.delayValue()));
+                        boost::lexical_cast < double > (dialog.delayValue()));
                 }
                 place->delay(dialog.delay());
                 place->output(dialog.output());
@@ -953,7 +965,7 @@ bool PetriNetDrawingArea::modifyCurrentTransition()
             try {
                 if (dialog.delay()) {
                     transition->delayValue(
-                        boost::lexical_cast < double >(dialog.delayValue()));
+                        boost::lexical_cast < double > (dialog.delayValue()));
                 }
                 transition->delay(dialog.delay());
                 transition->name(dialog.name());
@@ -966,7 +978,7 @@ bool PetriNetDrawingArea::modifyCurrentTransition()
                     transition->outputPortName(dialog.outputPortName());
                 }
                 transition->priority(
-                    boost::lexical_cast < unsigned int  >(dialog.priority()));
+                    boost::lexical_cast < unsigned int > (dialog.priority()));
                 result = true;
             } catch (...) {
             }
@@ -986,12 +998,13 @@ bool PetriNetDrawingArea::on_button_press_event(GdkEventButton* event)
     case SELECT:
         if (event->type == GDK_BUTTON_PRESS and event->button == 1) {
             if (not selectPlace(event->x, event->y,
-                                event->state & GDK_CONTROL_MASK)) {
+                    event->state & GDK_CONTROL_MASK)) {
                 if (not selectTransition(event->x, event->y,
-                                         event->state & GDK_CONTROL_MASK)) {
+                        event->state & GDK_CONTROL_MASK)) {
                 }
             }
-        } else if (event->type == GDK_2BUTTON_PRESS and event->button == 1) {
+        } else if (event->type == GDK_2BUTTON_PRESS and event->button ==
+                   1) {
             if (selectPlace(event->x, event->y, false)) {
                 if (modifyCurrentPlace()) {
                     queueRedraw();
@@ -1028,20 +1041,20 @@ bool PetriNetDrawingArea::on_button_press_event(GdkEventButton* event)
             if (not (event->state & GDK_CONTROL_MASK) and
                 selectPlace(event->x, event->y, false)) {
                 mBegin = searchAnchor(*mCurrentPlaces.begin(),
-                                      event->x, event->y);
+                        event->x, event->y);
                 mStartPoint.x = event->x;
                 mStartPoint.y = event->y;
                 mStartPlace = mCurrentPlaces.front();
             } else if (not (event->state & GDK_CONTROL_MASK) and
-                selectTransition(event->x, event->y, false)) {
+                       selectTransition(event->x, event->y, false)) {
                 mBegin = searchAnchor(*mCurrentTransitions.begin(),
-                                      event->x, event->y);
+                        event->x, event->y);
                 mStartPoint.x = event->x;
                 mStartPoint.y = event->y;
                 mStartTransition = mCurrentTransitions.front();
             } else {
                 makeBreakpoint(event->x, event->y,
-                               event->state & GDK_CONTROL_MASK);
+                    event->state & GDK_CONTROL_MASK);
             }
         }
         break;
@@ -1074,10 +1087,10 @@ bool PetriNetDrawingArea::on_button_release_event(GdkEventButton* event)
 {
     switch (mState) {
     case SELECT:
-	mPreviousX = -1;
-	mPreviousY = -1;
+        mPreviousX = -1;
+        mPreviousY = -1;
         mPetriNetResize = false;
-	break;
+        break;
     case ADD_ARC:
         if (mCurrentArc) {
             if (mBreakpoint) {
@@ -1089,7 +1102,7 @@ bool PetriNetDrawingArea::on_button_release_event(GdkEventButton* event)
                 mLastBreakpoint = 0;
             }
         } else if (mStartPlace and mStartPoint.x != event->x and
-            mStartPoint.y != event->y) {
+                   mStartPoint.y != event->y) {
             if (selectTransition(event->x, event->y, false)) {
                 Transition* dst = *mCurrentTransitions.begin();
                 points_t pts;
@@ -1098,19 +1111,19 @@ bool PetriNetDrawingArea::on_button_release_event(GdkEventButton* event)
                 pts.push_back(mBegin);
                 pts.push_back(anchor);
                 mPetriNet->addArc(mStartPlace->name(),
-                                  dst->name(), pts);
+                    dst->name(), pts);
             }
         } else if (mStartTransition and mStartPoint.x != event->x and
                    mStartPoint.y != event->y) {
             if (selectPlace(event->x, event->y, false)) {
-                Place*   dst = *mCurrentPlaces.begin();
+                Place* dst = *mCurrentPlaces.begin();
                 points_t pts;
                 point_t anchor = searchAnchor(dst, event->x, event->y);
 
                 pts.push_back(mBegin);
                 pts.push_back(anchor);
                 mPetriNet->addArc(mStartTransition->name(),
-                                  dst->name(), pts);
+                    dst->name(), pts);
             }
         }
 
@@ -1143,7 +1156,7 @@ bool PetriNetDrawingArea::on_configure_event(GdkEventConfigure* event)
         mHeight = event->height;
     }
     if (change and mIsRealized) {
-	set_size_request(mWidth, mHeight);
+        set_size_request(mWidth, mHeight);
         mBuffer = Gdk::Pixmap::create(mWin, mWidth, mHeight, -1);
         queueRedraw();
     }
@@ -1158,13 +1171,13 @@ bool PetriNetDrawingArea::on_expose_event(GdkEventExpose*)
         }
         if (mBuffer) {
             if (mNeedRedraw) {
-		mContext = mBuffer->create_cairo_context();
-		mContext->set_line_width(Settings::settings().getLineWidth());
+                mContext = mBuffer->create_cairo_context();
+                mContext->set_line_width(Settings::settings().getLineWidth());
                 draw();
                 mNeedRedraw = false;
             }
             mWin->draw_drawable(mWingc, mBuffer, 0, 0, 0, 0, -1, -1);
-	}
+        }
     }
     return true;
 }
@@ -1184,32 +1197,36 @@ bool PetriNetDrawingArea::on_motion_notify_event(GdkEventMotion* event)
     switch (mState) {
     case SELECT:
         if (button == 1) {
-	    if (not mCurrentPlaces.empty()) {
+            if (not mCurrentPlaces.empty()) {
                 bool xok, yok;
 
                 displacePlaces(mPreviousX == -1 ? event->x : mPreviousX,
-                               mPreviousY == -1 ? event->y : mPreviousY,
-                               event->x, event->y, xok, yok);
-		if (xok) {
+                    mPreviousY == -1 ? event->y : mPreviousY,
+                    event->x, event->y, xok, yok);
+                if (xok) {
                     mPreviousX = event->x;
                 }
                 if (yok) {
                     mPreviousY = event->y;
                 }
-		queueRedraw();
+                queueRedraw();
             } else if (not mCurrentTransitions.empty()) {
                 bool xok, yok;
 
-                displaceTransitions(mPreviousX == -1 ? event->x : mPreviousX,
-                                    mPreviousY == -1 ? event->y : mPreviousY,
-                                    event->x, event->y, xok, yok);
-		if (xok) {
+                displaceTransitions(
+                    mPreviousX == -1 ? event->x : mPreviousX,
+                    mPreviousY == -1 ? event->y : mPreviousY,
+                    event->x,
+                    event->y,
+                    xok,
+                    yok);
+                if (xok) {
                     mPreviousX = event->x;
                 }
                 if (yok) {
                     mPreviousY = event->y;
                 }
-		queueRedraw();
+                queueRedraw();
             }
         }
         break;
@@ -1222,14 +1239,16 @@ bool PetriNetDrawingArea::on_motion_notify_event(GdkEventMotion* event)
                 } else if (mFirstBreakpoint) {
                     if (not mCurrentPlaces.empty()) {
                         point_t pt = searchAnchor(mCurrentPlaces.front(),
-                                                  event->x, event->y);
+	event->x, event->y);
 
                         if (pt != *mFirstBreakpoint) {
                             *mFirstBreakpoint = pt;
                         }
                     } else if (not mCurrentTransitions.empty()) {
-                        point_t pt = searchAnchor(mCurrentTransitions.front(),
-                                                  event->x, event->y);
+                        point_t pt = searchAnchor(
+	mCurrentTransitions.front(),
+	event->x,
+	event->y);
 
                         if (pt != *mFirstBreakpoint) {
                             *mFirstBreakpoint = pt;
@@ -1238,14 +1257,16 @@ bool PetriNetDrawingArea::on_motion_notify_event(GdkEventMotion* event)
                 } else if (mLastBreakpoint) {
                     if (not mCurrentPlaces.empty()) {
                         point_t pt = searchAnchor(mCurrentPlaces.front(),
-                                                  event->x, event->y);
+	event->x, event->y);
 
                         if (pt != *mLastBreakpoint) {
                             *mLastBreakpoint = pt;
                         }
                     } else if (not mCurrentTransitions.empty()) {
-                        point_t pt = searchAnchor(mCurrentTransitions.front(),
-                                                  event->x, event->y);
+                        point_t pt = searchAnchor(
+	mCurrentTransitions.front(),
+	event->x,
+	event->y);
 
                         if (pt != *mLastBreakpoint) {
                             *mLastBreakpoint = pt;
@@ -1255,10 +1276,10 @@ bool PetriNetDrawingArea::on_motion_notify_event(GdkEventMotion* event)
             } else if (mBegin.valid()) {
                 if (selectPlace(event->x, event->y, false)) {
                     mEnd = searchAnchor(mCurrentPlaces.front(),
-                                        event->x, event->y);
+                            event->x, event->y);
                 } else if (selectTransition(event->x, event->y, false)) {
                     mEnd = searchAnchor(mCurrentTransitions.front(),
-                                        event->x, event->y);
+                            event->x, event->y);
                 }
             }
         } else if (button == 0) {
@@ -1313,8 +1334,9 @@ void PetriNetDrawingArea::removeBreakpoint()
             guint yd = it->y;
             double a = (ys - yd) / (double)(xs - xd);
             double b = ys - a * xs;
-            double h = std::abs((mBreakpoint->y - (a * mBreakpoint->x) - b) /
-                                std::sqrt(1 + a * a));
+            double h = std::abs(
+                    (mBreakpoint->y - (a * mBreakpoint->x) - b) /
+                    std::sqrt(1 + a * a));
 
             if (h < 5) {
                 mCurrentArc->points().erase(itb);
@@ -1324,18 +1346,22 @@ void PetriNetDrawingArea::removeBreakpoint()
 }
 
 point_t PetriNetDrawingArea::searchAnchor(const Place* place,
-                                          guint x, guint y)
-{ return searchAnchor(place->anchors(), x, y); }
+    guint x, guint y)
+{
+    return searchAnchor(place->anchors(), x, y);
+}
 
 point_t PetriNetDrawingArea::searchAnchor(const Transition* transition,
-                                          guint x, guint y)
-{ return searchAnchor(transition->anchors(), x, y); }
+    guint x, guint y)
+{
+    return searchAnchor(transition->anchors(), x, y);
+}
 
 point_t PetriNetDrawingArea::searchAnchor(const points_t& anchors,
-                                          guint x, guint y)
+    guint x, guint y)
 {
     point_t anchor;
-    double  min = std::numeric_limits < double >::max();
+    double min = std::numeric_limits < double >::max();
 
     for (points_t::const_iterator it = anchors.begin(); it != anchors.end();
          ++it) {
@@ -1424,7 +1450,7 @@ bool PetriNetDrawingArea::selectPlace(guint x, guint y, bool ctrl)
             mCurrentPlaces.clear();
         }
         if (std::find(mCurrentPlaces.begin(), mCurrentPlaces.end(),
-                      it->second) == mCurrentPlaces.end()) {
+                it->second) == mCurrentPlaces.end()) {
             mCurrentPlaces.push_back(it->second);
         }
     } else {
@@ -1451,7 +1477,7 @@ bool PetriNetDrawingArea::selectTransition(guint x, guint y, bool ctrl)
             mCurrentTransitions.clear();
         }
         if (std::find(mCurrentTransitions.begin(), mCurrentTransitions.end(),
-                      it->second) == mCurrentTransitions.end()) {
+                it->second) == mCurrentTransitions.end()) {
             mCurrentTransitions.push_back(it->second);
         }
     } else {
@@ -1464,8 +1490,11 @@ bool PetriNetDrawingArea::selectTransition(guint x, guint y, bool ctrl)
 void PetriNetDrawingArea::setColor(const Gdk::Color& color)
 {
     mContext->set_source_rgb(color.get_red_p(),
-                             color.get_green_p(),
-                             color.get_blue_p());
+        color.get_green_p(),
+        color.get_blue_p());
 }
 
-}}}} // namespace vle gvle modeling petrinet
+}
+}
+}
+}    // namespace vle gvle modeling petrinet

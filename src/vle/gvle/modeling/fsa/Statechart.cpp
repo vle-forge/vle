@@ -30,7 +30,10 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
-namespace vle { namespace gvle { namespace modeling { namespace fsa {
+namespace vle {
+namespace gvle {
+namespace modeling {
+namespace fsa {
 
 const int Statechart::INITIAL_HEIGHT = 400;
 const int Statechart::INITIAL_WIDTH = 400;
@@ -83,11 +86,11 @@ State::State(const std::string& conf)
 
     boost::split(state, conf, boost::is_any_of(","));
     mName = state[0];
-    mX = boost::lexical_cast < int >(state[1]);
-    mY = boost::lexical_cast < int >(state[2]);
-    mWidth = boost::lexical_cast < int >(state[3]);
-    mHeight = boost::lexical_cast < int >(state[4]);
-    mInitial = boost::lexical_cast < bool >(state[5]);
+    mX = boost::lexical_cast < int > (state[1]);
+    mY = boost::lexical_cast < int > (state[2]);
+    mWidth = boost::lexical_cast < int > (state[3]);
+    mHeight = boost::lexical_cast < int > (state[4]);
+    mInitial = boost::lexical_cast < bool > (state[5]);
     mInAction = state[6];
     mOutAction = state[7];
     mActivity = state[8];
@@ -177,7 +180,7 @@ Transition::Transition(const std::string& conf)
     mAfter = transition[5];
     mAction = transition[6];
     mSend = transition[7];
-    mSendType = (function_type)(boost::lexical_cast < int >(transition[8]));
+    mSendType = (function_type)(boost::lexical_cast < int > (transition[8]));
 
     strings_t pts;
 
@@ -186,8 +189,8 @@ Transition::Transition(const std::string& conf)
         strings_t pt;
 
         boost::split(pt, pts[i], boost::is_any_of("/"));
-        mPoints.push_back(point_t(boost::lexical_cast < int >(pt[0]),
-                                  boost::lexical_cast < int >(pt[1])));
+        mPoints.push_back(point_t(boost::lexical_cast < int > (pt[0]),
+                boost::lexical_cast < int > (pt[1])));
     }
 }
 
@@ -213,18 +216,18 @@ std::string Statechart::clause(const State* state) const
     const std::string& outAction = state->outAction();
 
     if (not inAction.empty()) {
-        str +=(fmt(" << inAction(&%1%::%2%)") % mName % inAction).str();
+        str += (fmt(" << inAction(&%1%::%2%)") % mName % inAction).str();
     }
     if (not activity.empty()) {
-        str +=(fmt(" << activity(&%1%::%2%)") % mName % activity).str();
+        str += (fmt(" << activity(&%1%::%2%)") % mName % activity).str();
     }
     if (not outAction.empty()) {
-        str +=(fmt(" << outAction(&%1%::%2%)") % mName % outAction).str();
+        str += (fmt(" << outAction(&%1%::%2%)") % mName % outAction).str();
     }
     for (eventInStates_t::const_iterator it = state->eventInStates().begin();
          it != state->eventInStates().end(); ++it) {
         str += (fmt(" << eventInState(\"%1%\", &%2%::%3%)") % it->first
-            % mName % it->second).str();
+                % mName % it->second).str();
     }
     return str;
 }
@@ -257,16 +260,16 @@ std::string Statechart::clause(const Transition* transition) const
         }
     }
     if (not guard.empty()) {
-        str +=(fmt(" << guard(&%1%::%2%)") % mName % guard).str();
+        str += (fmt(" << guard(&%1%::%2%)") % mName % guard).str();
     }
     if (not action.empty()) {
-        str +=(fmt(" << action(&%1%::%2%)") % mName % action).str();
+        str += (fmt(" << action(&%1%::%2%)") % mName % action).str();
     }
     if (not send.empty()) {
         if (transition->sendType() == CONSTANT) {
             str += (fmt(" << send(std::string(\"%1%\"))") % send).str();
         } else {
-            str +=(fmt(" << send(&%1%::%2%)") % mName % send).str();
+            str += (fmt(" << send(&%1%::%2%)") % mName % send).str();
         }
     }
     return str;
@@ -317,7 +320,7 @@ void Statechart::removeState(State* state)
 void Statechart::removeTransition(Transition* transition)
 {
     transitions_t::iterator it = std::find(mTransitions.begin(),
-                                           mTransitions.end(), transition);
+            mTransitions.end(), transition);
 
     mTransitions.erase(it);
 }
@@ -329,7 +332,7 @@ void Statechart::resizeState(State* state, int width, int height)
     int deltay = height - state->height();
 
     while (it != mTransitions.end()) {
-        if ((*it)->source() == state->name()){
+        if ((*it)->source() == state->name()) {
             const point_t pt = (*it)->points().front();
 
             if (pt.x != state->x() and pt.y != state->y()) {
@@ -353,4 +356,7 @@ void Statechart::resizeState(State* state, int width, int height)
     }
 }
 
-}}}} // namespace vle gvle modeling fsa
+}
+}
+}
+}    // namespace vle gvle modeling fsa

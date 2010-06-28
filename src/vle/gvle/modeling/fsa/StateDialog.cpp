@@ -37,11 +37,14 @@ namespace modeling {
 namespace fsa {
 
 NewStateDialog::NewStateDialog(
-    const Glib::RefPtr < Gnome::Glade::Xml >& xml)
+    const Glib::RefPtr < Gnome::Glade::Xml >& xml,const Statechart& statechart): mStatechart(statechart)
 {
     xml->get_widget("NewStateDialog", mDialog);
     xml->get_widget("NewStateNameEntry", mNameEntry);
+    xml->get_widget("PlaceStatusImage", mStatusName);
     xml->get_widget("NewStateInitialCheckbox", mInitialCheckbox);
+    mList.push_back(mNameEntry->signal_changed().connect(
+            sigc::mem_fun(*this, &NewStateDialog::onChangeName)));
 }
 
 int NewStateDialog::run()
@@ -54,6 +57,20 @@ int NewStateDialog::run()
 
     mDialog->hide();
     return response;
+}
+
+void NewStateDialog::onChangeName()
+{
+    setStatus();
+}
+
+void NewStateDialog::setStatus()
+{
+    if (valid()) {
+        mStatusName->set(Gtk::StockID(Gtk::Stock::YES), Gtk::IconSize(1));
+    } else {
+        mStatusName->set(Gtk::StockID(Gtk::Stock::NO), Gtk::IconSize(1));
+    }
 }
 
 EventInStateDialog::EventInStateDialog(

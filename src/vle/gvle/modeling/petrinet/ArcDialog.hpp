@@ -35,7 +35,10 @@
 #include <gtkmm/entry.h>
 #include <libglademm.h>
 
-namespace vle { namespace gvle { namespace modeling { namespace petrinet {
+namespace vle {
+namespace gvle {
+namespace modeling {
+namespace petrinet {
 
 class ArcDialog
 {
@@ -44,24 +47,32 @@ public:
               const Arc* arc = 0);
 
     virtual ~ArcDialog()
-    { }
+    {
+    }
 
     bool inhibitor() const
-    { return mInhibitorCheckbox->get_active(); }
+    {
+        return mInhibitorCheckbox->get_active();
+    }
 
     std::string weight() const
-    { return mWeightEntry->get_text(); }
+    {
+        return mWeightEntry->get_text();
+    }
 
     int run();
 
 private:
-    Gtk::Dialog*      mDialog;
-    Gtk::Entry*       mWeightEntry;
+    Gtk::Dialog* mDialog;
+    Gtk::Entry* mWeightEntry;
     Gtk::CheckButton* mInhibitorCheckbox;
 
-    const Arc*        mArc;
+    const Arc* mArc;
 };
 
-}}}} // namespace vle gvle modeling petrinet
+}
+}
+}
+}    // namespace vle gvle modeling petrinet
 
 #endif
