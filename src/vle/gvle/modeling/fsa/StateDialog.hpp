@@ -47,7 +47,8 @@ namespace fsa {
 class NewStateDialog
 {
 public:
-    NewStateDialog(const Glib::RefPtr < Gnome::Glade::Xml >& xml, const Statechart& statechart);
+    NewStateDialog(const Glib::RefPtr < Gnome::Glade::Xml >& xml,
+                   const Statechart& statechart);
 
     virtual ~NewStateDialog()
     {
@@ -118,13 +119,13 @@ private:
 
     Glib::RefPtr < Gnome::Glade::Xml > mXml;
     Statechart* mStatechart;
-    const eventInStates_t&             mEventInStates;
+    const eventInStates_t& mEventInStates;
     Gtk::Dialog* mDialog;
     Gtk::Entry* mEventEntry;
     Gtk::VBox* mEventInStateVBox;
     Gtk::ComboBoxEntryText* mActionEntry;
     Gtk::Button* mActionButton;
-    std::list < sigc::connection >     mList;
+    std::list < sigc::connection > mList;
 };
 
 class StateDialog

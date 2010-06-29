@@ -37,7 +37,8 @@ namespace modeling {
 namespace fsa {
 
 NewStateDialog::NewStateDialog(
-    const Glib::RefPtr < Gnome::Glade::Xml >& xml,const Statechart& statechart): mStatechart(statechart)
+    const Glib::RefPtr < Gnome::Glade::Xml >& xml,
+    const Statechart& statechart) : mStatechart(statechart)
 {
     xml->get_widget("NewStateDialog", mDialog);
     xml->get_widget("NewStateNameEntry", mNameEntry);
@@ -291,11 +292,11 @@ void StateDialog::onInAction()
 void StateDialog::onInActionSource()
 {
     SourceDialog dialog(mXml);
-    const std::string& buffer = mStatechart->eventAction(mTrimInAction);
+    const std::string& buffer = mStatechart->action(mTrimInAction);
 
     if (buffer.empty()) {
         dialog.add(mTrimInAction,
-            (fmt(Statechart::ACTION_DEFINITION) % mTrimInAction).str());
+                   (fmt(Statechart::ACTION_DEFINITION) % mTrimInAction).str());
     } else {
         dialog.add(mTrimInAction, buffer);
     }
@@ -330,7 +331,7 @@ void StateDialog::onOutAction()
 void StateDialog::onOutActionSource()
 {
     SourceDialog dialog(mXml);
-    const std::string& buffer = mStatechart->eventAction(mTrimOutAction);
+    const std::string& buffer = mStatechart->action(mTrimOutAction);
 
     if (buffer.empty()) {
         dialog.add(mTrimOutAction,
@@ -357,11 +358,24 @@ int StateDialog::run()
         mOutActionEntry->append_text(it->first);
     }
     if (not mState->inAction().empty()) {
-        mInActionEntry->set_active_text(mState->inAction());
+        const std::string action = mState->inAction();
+        const std::string& buffer = mStatechart->action(action);
+        if (buffer.empty()) {
+            mInActionEntry->get_entry()->set_text(mState->inAction());
+        } else {
+            mInActionEntry->set_active_text(mState->inAction());
+        }
     }
     mInActionButton->set_sensitive(not mState->inAction().empty());
+
     if (not mState->outAction().empty()) {
-        mOutActionEntry->set_active_text(mState->outAction());
+        const std::string action = mState->outAction();
+        const std::string& buffer = mStatechart->action(action);
+        if (buffer.empty()) {
+            mOutActionEntry->get_entry()->set_text(mState->outAction());
+        } else {
+            mOutActionEntry->set_active_text(mState->outAction());
+        }
     }
     mOutActionButton->set_sensitive(not mState->outAction().empty());
 
@@ -372,7 +386,13 @@ int StateDialog::run()
         mActivityEntry->append_text(it->first);
     }
     if (not mState->activity().empty()) {
-        mActivityEntry->set_active_text(mState->activity());
+        const std::string action = mState->activity();
+        const std::string& buffer = mStatechart->action(action);
+        if (buffer.empty()) {
+            mActivityEntry->get_entry()->set_text(mState->activity());
+        } else {
+            mActivityEntry->set_active_text(mState->activity());
+          }
     }
     mActivityButton->set_sensitive(not mState->activity().empty());
 
@@ -382,7 +402,6 @@ int StateDialog::run()
          it != mState->eventInStates().end(); ++it) {
         mEventInStateTreeView->add(it->first, it->second);
     }
-
     mDialog->set_default_response(Gtk::RESPONSE_ACCEPT);
 
     int response = mDialog->run();
