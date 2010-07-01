@@ -461,6 +461,13 @@ public:
         mAfters[name] = buffer;
     }
 
+    void changeStateName (const std::string& oldName,
+            const std::string& newName) {
+        State* state = mStates.find(oldName)->second;
+        mStates.erase(mStates.find(oldName));
+        mStates[newName] = state;
+    }
+
     void addState(const std::string& conf)
     {
         State* state = new State(conf);

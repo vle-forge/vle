@@ -78,7 +78,7 @@ StatechartDrawingArea::StatechartDrawingArea(
 void StatechartDrawingArea::addState(guint x, guint y)
 {
     NewStateDialog dialog(mXml, *mStatechart);
-    if (dialog.run() == Gtk::RESPONSE_ACCEPT and dialog.valid()) {
+    if (dialog.run() == Gtk::RESPONSE_ACCEPT) {
         int newWidth = x + STATE_WIDTH + OFFSET;
         int newHeight = y + STATE_HEIGHT + OFFSET;
 
@@ -883,19 +883,22 @@ void StatechartDrawingArea::makeBreakpoint(guint mx, guint my, bool ctrl)
 bool StatechartDrawingArea::modifyCurrentState()
 {
     bool result = false;
-
     if (not mCurrentStates.empty()) {
         State* state = *mCurrentStates.begin();
+        std::string oldName = state->name();
         StateDialog dialog(mXml, mStatechart, state);
 
         if (dialog.run() == Gtk::RESPONSE_ACCEPT) {
             state->name(dialog.name());
             state->initial(dialog.initial());
-            state->inAction(dialog.inAction());
-            state->outAction(dialog.outAction());
-            state->activity(dialog.activity());
+            state->inAction(dialog.getInAction());
+            state->outAction(dialog.getOutAction());
+            state->activity(dialog.getActivity());
             state->eventInStates(dialog.eventInStates());
-
+            if(oldName != dialog.name()){
+                mStatechart->changeStateName(oldName,
+                                             dialog.name());
+            }
             for (eventInStates_t::const_iterator it =
                      state->eventInStates().begin();
                  it != state->eventInStates().end(); ++it) {

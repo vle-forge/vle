@@ -79,7 +79,7 @@ void PetriNetDrawingArea::addPlace(guint x, guint y)
 {
     PlaceDialog dialog(mXml, *mPetriNet);
 
-    if (dialog.run() == Gtk::RESPONSE_ACCEPT and dialog.valid()) {
+    if (dialog.run() == Gtk::RESPONSE_ACCEPT) {
         int newWidth = x + PLACE_RADIUS + OFFSET;
         int newHeight = y + PLACE_RADIUS + OFFSET;
 
@@ -97,7 +97,10 @@ void PetriNetDrawingArea::addPlace(guint x, guint y)
             place->delay(dialog.delay());
             if (not dialog.outputPortName().empty()) {
                 place->outputPortName(dialog.outputPortName());
+            } else {
+                place->output(false);
             }
+
             if (newWidth > mPetriNet->width()) {
                 mPetriNet->width(newWidth);
                 mWidth = mPetriNet->width() + OFFSET;
@@ -115,7 +118,7 @@ void PetriNetDrawingArea::addTransition(guint x, guint y)
 {
     TransitionDialog dialog(mXml, *mPetriNet);
 
-    if (dialog.run() == Gtk::RESPONSE_ACCEPT and dialog.valid()) {
+    if (dialog.run() == Gtk::RESPONSE_ACCEPT) {
         int newWidth = x + TRANSITION_WIDTH + OFFSET;
         int newHeight = y + TRANSITION_HEIGHT + OFFSET;
         Transition* transition = mPetriNet->addTransition(
@@ -131,9 +134,13 @@ void PetriNetDrawingArea::addTransition(guint x, guint y)
             boost::lexical_cast < unsigned int > (dialog.priority()));
         if (not dialog.inputPortName().empty()) {
             transition->inputPortName(dialog.inputPortName());
+        } else {
+            transition->input(false);
         }
         if (not dialog.outputPortName().empty()) {
             transition->outputPortName(dialog.outputPortName());
+        } else {
+            transition->output(false);
         }
         if (newWidth > mPetriNet->width()) {
             mPetriNet->width(newWidth);
@@ -928,9 +935,10 @@ bool PetriNetDrawingArea::modifyCurrentPlace()
 
     if (not mCurrentPlaces.empty()) {
         Place* place = *mCurrentPlaces.begin();
+        std::string oldName = place->name();
         PlaceDialog dialog(mXml, *mPetriNet, place);
 
-        if (dialog.run() == Gtk::RESPONSE_ACCEPT and dialog.valid()) {
+        if (dialog.run() == Gtk::RESPONSE_ACCEPT) {
             try {
                 place->initialMarking(
                     boost::lexical_cast < unsigned int > (
@@ -942,8 +950,13 @@ bool PetriNetDrawingArea::modifyCurrentPlace()
                 }
                 place->delay(dialog.delay());
                 place->output(dialog.output());
+                if(oldName != dialog.name()){
+                    mPetriNet->changePlaceName(oldName, dialog.name());
+                }
                 if (not dialog.outputPortName().empty()) {
                     place->outputPortName(dialog.outputPortName());
+                } else {
+                    place->output(false);
                 }
                 result = true;
             } catch (...) {
@@ -959,9 +972,10 @@ bool PetriNetDrawingArea::modifyCurrentTransition()
 
     if (not mCurrentTransitions.empty()) {
         Transition* transition = *mCurrentTransitions.begin();
+        std::string oldName = transition->name();
         TransitionDialog dialog(mXml, *mPetriNet, transition);
 
-        if (dialog.run() == Gtk::RESPONSE_ACCEPT and dialog.valid()) {
+        if (dialog.run() == Gtk::RESPONSE_ACCEPT) {
             try {
                 if (dialog.delay()) {
                     transition->delayValue(
@@ -971,11 +985,18 @@ bool PetriNetDrawingArea::modifyCurrentTransition()
                 transition->name(dialog.name());
                 transition->input(dialog.input());
                 transition->output(dialog.output());
+                if(oldName != dialog.name()){
+                    mPetriNet->changeTransitionName(oldName, dialog.name());
+                }
                 if (not dialog.inputPortName().empty()) {
                     transition->inputPortName(dialog.inputPortName());
+                } else {
+                    transition->input(false);
                 }
                 if (not dialog.outputPortName().empty()) {
                     transition->outputPortName(dialog.outputPortName());
+                } else {
+                    transition->output(false);
                 }
                 transition->priority(
                     boost::lexical_cast < unsigned int > (dialog.priority()));

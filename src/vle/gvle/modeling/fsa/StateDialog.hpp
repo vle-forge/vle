@@ -37,6 +37,7 @@
 #include <gtkmm/menu.h>
 #include <gtkmm/treeview.h>
 #include <libglademm.h>
+#include <boost/algorithm/string.hpp>
 #include <iostream>
 
 namespace vle {
@@ -61,27 +62,34 @@ public:
 
     std::string name() const
     {
-        return mNameEntry->get_text();
+        std::string entryName = mNameEntry->get_text();
+        boost::trim(entryName);
+        return entryName;
     }
 
     int run();
 
-    bool valid() const
+    bool isValidName(std::string name)
     {
-        return not (mNameEntry->get_text().empty() or
-                    (mStatechart.existState(name()) and
-                     mNameEntry->get_text() != ""));//mInitialName));
+        size_t i = 0;
+        while (i < name.length()) {
+            if (!isalnum(name[i])) {
+                return false;
+            }
+            i++;
+        }
+        return true;
     }
 
 private:
     void onChangeName();
-    void setStatus();
     const Statechart& mStatechart;
     std::list < sigc::connection > mList;
     Gtk::Dialog* mDialog;
     Gtk::Entry* mNameEntry;
     Gtk::Image* mStatusName;
     Gtk::CheckButton* mInitialCheckbox;
+    Gtk::Button* mOkButton;
 };
 
 class EventInStateDialog
@@ -273,7 +281,9 @@ public:
 
     std::string name() const
     {
-        return mNameEntry->get_text();
+        std::string entryName = mNameEntry->get_text();
+        boost::trim(entryName);
+        return entryName;
     }
 
     bool isValidName(std::string name)
@@ -295,6 +305,7 @@ public:
     int run();
 
 private:
+    void onName();
     void onActivity();
     void onActivitySource();
     void onInAction();

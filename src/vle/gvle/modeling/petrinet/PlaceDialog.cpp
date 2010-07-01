@@ -28,6 +28,8 @@
 #include <vle/gvle/modeling/petrinet/PlaceDialog.hpp>
 #include <vle/utils/i18n.hpp>
 #include <gtkmm/stock.h>
+#include <boost/algorithm/string.hpp>
+#include <iostream>
 
 namespace vle {
 namespace gvle {
@@ -54,6 +56,7 @@ PlaceDialog::PlaceDialog(const Glib::RefPtr < Gnome::Glade::Xml >& xml,
     xml->get_widget("PlaceDelayCheckbox", mDelayCheckbox);
     xml->get_widget("PlaceDelayEntry", mDelayEntry);
 
+    xml->get_widget("PlaceOkButton", mOkButton);
     mList.push_back(mNameEntry->signal_changed().connect(
             sigc::mem_fun(*this, &PlaceDialog::onChangeName)));
     mList.push_back(mOutputCheckbox->signal_toggled().connect(
@@ -74,7 +77,30 @@ PlaceDialog::~PlaceDialog()
 
 void PlaceDialog::onChangeName()
 {
-    setStatus();
+    std::string entryName = name();
+
+    if (entryName.empty()) {
+        mOkButton->set_sensitive(false);
+        mStatusName->set(Gtk::StockID(Gtk::Stock::NO),
+                         Gtk::IconSize(1));
+    } else {
+        if (entryName != mInitialName) {
+            if (not(mPetriNet.existPlace(entryName))) {
+
+                mStatusName->set(Gtk::StockID(Gtk::Stock::YES),
+                                 Gtk::IconSize(1));
+                    mOkButton->set_sensitive(true);
+            } else {
+                mStatusName->set(Gtk::StockID(Gtk::Stock::NO),
+                                 Gtk::IconSize(1));
+                mOkButton->set_sensitive(false);
+            }
+        } else {
+            mStatusName->set(Gtk::StockID(Gtk::Stock::YES),
+                             Gtk::IconSize(1));
+            mOkButton->set_sensitive(true);
+        }
+    }
 }
 
 void PlaceDialog::onDelay()
@@ -89,6 +115,7 @@ void PlaceDialog::onOutput()
         mDelayEntry->set_sensitive(false);
         mDelayCheckbox->set_sensitive(false);
     } else {
+        mOutputEntry->get_entry()->set_text("");
         mDelayCheckbox->set_sensitive(true);
         mDelayEntry->set_sensitive(mDelayCheckbox->get_active());
     }
@@ -136,22 +163,13 @@ int PlaceDialog::run()
         mDelayCheckbox->set_active(false);
         mDelayEntry->set_sensitive(false);
     }
-    setStatus();
+    onChangeName();
     mDialog->set_default_response(Gtk::RESPONSE_ACCEPT);
 
     int response = mDialog->run();
 
     mDialog->hide();
     return response;
-}
-
-void PlaceDialog::setStatus()
-{
-    if (valid()) {
-        mStatusName->set(Gtk::StockID(Gtk::Stock::YES), Gtk::IconSize(1));
-    } else {
-        mStatusName->set(Gtk::StockID(Gtk::Stock::NO), Gtk::IconSize(1));
-    }
 }
 
 }

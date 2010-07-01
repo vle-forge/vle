@@ -27,7 +27,9 @@
 
 #include <vle/gvle/modeling/petrinet/TransitionDialog.hpp>
 #include <vle/utils/i18n.hpp>
+#include <boost/algorithm/string.hpp>
 #include <gtkmm/stock.h>
+#include <iostream>
 
 namespace vle {
 namespace gvle {
@@ -60,6 +62,7 @@ TransitionDialog::TransitionDialog(
     xml->get_widget("TransitionDelayCheckbox", mDelayCheckbox);
     xml->get_widget("TransitionDelayEntry", mDelayEntry);
 
+    xml->get_widget("TransitionOkButton", mOkButton);
     mList.push_back(mNameEntry->signal_changed().connect(
             sigc::mem_fun(*this, &TransitionDialog::onChangeName)));
     mList.push_back(mInputCheckbox->signal_toggled().connect(
@@ -83,7 +86,30 @@ TransitionDialog::~TransitionDialog()
 
 void TransitionDialog::onChangeName()
 {
-    setStatus();
+    std::string entryName = name();
+
+    if (entryName.empty()) {
+        mOkButton->set_sensitive(false);
+        mStatusName->set(Gtk::StockID(Gtk::Stock::NO),
+                         Gtk::IconSize(1));
+    } else {
+        if (entryName != mInitialName){
+            if (not(mPetriNet.existTransition(entryName))) {
+
+                mStatusName->set(Gtk::StockID(Gtk::Stock::YES),
+                                 Gtk::IconSize(1));
+                mOkButton->set_sensitive(true);
+            } else {
+                mStatusName->set(Gtk::StockID(Gtk::Stock::NO),
+                                 Gtk::IconSize(1));
+                mOkButton->set_sensitive(false);
+            }
+        } else {
+            mStatusName->set(Gtk::StockID(Gtk::Stock::YES),
+                             Gtk::IconSize(1));
+            mOkButton->set_sensitive(true);
+        }
+    }
 }
 
 void TransitionDialog::onDelay()
@@ -95,12 +121,18 @@ void TransitionDialog::onInput()
 {
     mInputEntry->set_sensitive(input());
     mPriorityEntry->set_sensitive(not input());
+    if (not(input())) {
+        mInputEntry->get_entry()->set_text("");
+    }
 }
 
 void TransitionDialog::onOutput()
 {
     mOutputEntry->set_sensitive(output());
     mPriorityEntry->set_sensitive(not output());
+    if (not(output())) {
+        mOutputEntry->get_entry()->set_text("");
+    }
 }
 
 int TransitionDialog::run()
@@ -156,22 +188,13 @@ int TransitionDialog::run()
         mDelayCheckbox->set_active(false);
         mDelayEntry->set_sensitive(false);
     }
-    setStatus();
+
     mDialog->set_default_response(Gtk::RESPONSE_ACCEPT);
 
     int response = mDialog->run();
 
     mDialog->hide();
     return response;
-}
-
-void TransitionDialog::setStatus()
-{
-    if (valid()) {
-        mStatusName->set(Gtk::StockID(Gtk::Stock::YES), Gtk::IconSize(1));
-    } else {
-        mStatusName->set(Gtk::StockID(Gtk::Stock::NO), Gtk::IconSize(1));
-    }
 }
 
 }

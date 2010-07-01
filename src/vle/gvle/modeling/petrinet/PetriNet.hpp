@@ -480,6 +480,20 @@ public:
         mOutputPorts.push_back(name);
     }
 
+    void changePlaceName (const std::string& oldName, 
+            const std::string& newName) {
+        Place* place = mPlaces.find(oldName)->second;
+        mPlaces.erase(mPlaces.find(oldName));
+        mPlaces[newName] = place;
+    }
+
+    void changeTransitionName (const std::string& oldName, 
+            const std::string& newName) {
+        Transition* transition = mTransitions.find(oldName)->second;
+        mTransitions.erase(mTransitions.find(oldName));
+        mTransitions[newName] = transition;
+    }
+
     Place* addPlace(const std::string& conf)
     {
         Place* place = new Place(conf);

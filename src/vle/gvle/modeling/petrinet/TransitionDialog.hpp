@@ -35,6 +35,7 @@
 #include <gtkmm/dialog.h>
 #include <gtkmm/entry.h>
 #include <gtkmm/image.h>
+#include <boost/algorithm/string.hpp>
 #include <libglademm.h>
 
 namespace vle {
@@ -68,12 +69,16 @@ public:
 
     std::string inputPortName() const
     {
-        return mInputEntry->get_entry()->get_text();
+        std::string inputPortName = mInputEntry->get_entry()->get_text();
+        boost::trim(inputPortName);
+        return inputPortName;
     }
 
     std::string name() const
     {
-        return mNameEntry->get_text();
+        std::string entryName = mNameEntry->get_text();
+        boost::trim(entryName);
+        return entryName;
     }
 
     bool output() const
@@ -83,7 +88,9 @@ public:
 
     std::string outputPortName() const
     {
-        return mOutputEntry->get_entry()->get_text();
+        std::string outputPortName = mOutputEntry->get_entry()->get_text();
+        boost::trim(outputPortName);
+        return outputPortName;
     }
 
     std::string priority() const
@@ -93,19 +100,13 @@ public:
 
     int run();
 
-    bool valid() const
-    {
-        return not (mNameEntry->get_text().empty() or
-                    (mPetriNet.existTransition(name()) and
-                     mNameEntry->get_text() != mInitialName));
-    }
-
 private:
     void onChangeName();
     void onDelay();
     void onInput();
     void onOutput();
-    void setStatus();
+    void onChangeOutput();
+    void onChangeInput();
 
     Gtk::Dialog* mDialog;
     Gtk::Entry* mNameEntry;
@@ -123,9 +124,11 @@ private:
     Gtk::CheckButton* mDelayCheckbox;
     Gtk::Entry* mDelayEntry;
 
-    const PetriNet&         mPetriNet;
+    const PetriNet& mPetriNet;
     const Transition* mTransition;
     std::string mInitialName;
+
+    Gtk::Button* mOkButton;
 
     std::list < sigc::connection > mList;
 };

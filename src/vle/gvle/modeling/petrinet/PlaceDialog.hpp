@@ -35,6 +35,7 @@
 #include <gtkmm/dialog.h>
 #include <gtkmm/entry.h>
 #include <gtkmm/image.h>
+#include <boost/algorithm/string.hpp>
 #include <libglademm.h>
 
 namespace vle {
@@ -66,7 +67,9 @@ public:
 
     std::string name() const
     {
-        return mNameEntry->get_text();
+        std::string entryName = mNameEntry->get_text();
+        boost::trim(entryName);
+        return entryName;
     }
 
     bool output() const
@@ -76,24 +79,18 @@ public:
 
     std::string outputPortName() const
     {
-        return mOutputEntry->get_entry()->get_text();
+        std::string entryOutput = mOutputEntry->get_entry()->get_text();
+        boost::trim(entryOutput);
+        return entryOutput;
     }
 
     int run();
-
-    bool valid() const
-    {
-        return not (mNameEntry->get_text().empty() or
-                    (mPetriNet.existPlace(name()) and
-                     mNameEntry->get_text() != mInitialName));
-    }
 
 private:
     void onChangeName();
     void onDelay();
     void onInput();
     void onOutput();
-    void setStatus();
 
     Gtk::Dialog* mDialog;
     Gtk::Entry* mNameEntry;
@@ -107,11 +104,13 @@ private:
     // delay
     Gtk::CheckButton* mDelayCheckbox;
     Gtk::Entry* mDelayEntry;
-
-    const PetriNet&         mPetriNet;
+    Gtk::Button* mOkButton;
+    const PetriNet& mPetriNet;
     const Place* mPlace;
     std::string mInitialName;
 
+    std::string mTrimName;
+    std::string mTrimOutput;
     std::list < sigc::connection > mList;
 };
 

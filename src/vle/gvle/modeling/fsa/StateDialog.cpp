@@ -44,8 +44,34 @@ NewStateDialog::NewStateDialog(
     xml->get_widget("NewStateNameEntry", mNameEntry);
     xml->get_widget("PlaceStatusImage", mStatusName);
     xml->get_widget("NewStateInitialCheckbox", mInitialCheckbox);
+    xml->get_widget("StateNameOkButton", mOkButton);
+    mOkButton->set_sensitive(false);
     mList.push_back(mNameEntry->signal_changed().connect(
             sigc::mem_fun(*this, &NewStateDialog::onChangeName)));
+}
+
+void NewStateDialog::onChangeName()
+{
+    std::string entryName = name();
+
+    if (entryName.empty()) {
+        mStatusName->set(Gtk::StockID(Gtk::Stock::NO),
+                         Gtk::IconSize(1));
+        mOkButton->set_sensitive(false);
+    } else {
+        if (not(mStatechart.existState(entryName)) &&
+            entryName != "" &&
+            isValidName(entryName)) {
+
+            mStatusName->set(Gtk::StockID(Gtk::Stock::YES),
+                             Gtk::IconSize(1));
+            mOkButton->set_sensitive(true);
+        } else {
+            mStatusName->set(Gtk::StockID(Gtk::Stock::NO),
+                             Gtk::IconSize(1));
+            mOkButton->set_sensitive(false);
+        }
+    }
 }
 
 int NewStateDialog::run()
@@ -58,20 +84,6 @@ int NewStateDialog::run()
 
     mDialog->hide();
     return response;
-}
-
-void NewStateDialog::onChangeName()
-{
-    setStatus();
-}
-
-void NewStateDialog::setStatus()
-{
-    if (valid()) {
-        mStatusName->set(Gtk::StockID(Gtk::Stock::YES), Gtk::IconSize(1));
-    } else {
-        mStatusName->set(Gtk::StockID(Gtk::Stock::NO), Gtk::IconSize(1));
-    }
 }
 
 EventInStateDialog::EventInStateDialog(
@@ -184,7 +196,7 @@ void StateDialog::EventInStateTreeView::onRemove()
 }
 
 StateDialog::StateDialog(const Glib::RefPtr < Gnome::Glade::Xml >& xml,
-                         Statechart* statechart, const State* state)  :
+                         Statechart* statechart, const State* state) :
     mXml(xml), mStatechart(statechart), mState(state)
 {
     xml->get_widget("StateDialog", mDialog);
@@ -210,6 +222,8 @@ StateDialog::StateDialog(const Glib::RefPtr < Gnome::Glade::Xml >& xml,
     xml->get_widget_derived("EventInStateTreeView", mEventInStateTreeView);
     mEventInStateTreeView->setStatechart(mStatechart, &mEventInStates);
 
+    mList.push_back(mNameEntry->signal_changed().connect(
+            sigc::mem_fun(*this, &StateDialog::onName)));
     mList.push_back(mInActionButton->signal_clicked().connect(
             sigc::mem_fun(*this,
                 &StateDialog::onInActionSource)));
@@ -225,6 +239,27 @@ StateDialog::StateDialog(const Glib::RefPtr < Gnome::Glade::Xml >& xml,
                 &StateDialog::onActivitySource)));
     mList.push_back(mActivityEntry->signal_changed().connect(
             sigc::mem_fun(*this, &StateDialog::onActivity)));
+}
+
+void StateDialog::onName()
+{
+    std::string entryName = name();
+
+    if (entryName.empty()) {
+        mOkButton->set_sensitive(false);
+    } else {
+        if (mState->name() != entryName) {
+            if (not(mStatechart->existState(entryName)) &&
+                isValidName(entryName)) {
+
+                mOkButton->set_sensitive(true);
+            } else {
+                mOkButton->set_sensitive(false);
+            }
+        } else {
+            mOkButton->set_sensitive(true);
+        }
+    }
 }
 
 void StateDialog::onActivity()

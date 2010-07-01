@@ -29,6 +29,7 @@
 #include <vle/utils/i18n.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
+#include <iostream>
 
 namespace vle {
 namespace gvle {
@@ -304,7 +305,6 @@ std::string Statechart::initialState() const
 void Statechart::removeState(State* state)
 {
     transitions_t::iterator it = mTransitions.begin();
-
     while (it != mTransitions.end()) {
         if ((*it)->source() == state->name() or
             (*it)->destination() == state->name()) {

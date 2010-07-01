@@ -132,10 +132,10 @@ private:
     static const guint SELF_TRANSITION_SIZE;
 
     Glib::RefPtr < Gnome::Glade::Xml > mXml;
-    Glib::RefPtr < Gdk::Pixmap >       mBuffer;
-    Cairo::RefPtr < Cairo::Context >   mContext;
-    Glib::RefPtr < Gdk::Window >       mWin;
-    Glib::RefPtr < Gdk::GC >           mWingc;
+    Glib::RefPtr < Gdk::Pixmap > mBuffer;
+    Cairo::RefPtr < Cairo::Context > mContext;
+    Glib::RefPtr < Gdk::Window > mWin;
+    Glib::RefPtr < Gdk::GC > mWingc;
     bool mIsRealized;
     bool mNeedRedraw;
 
@@ -145,7 +145,7 @@ private:
     int mHeight;
     int mWidth;
 
-    std::vector < State* >             mCurrentStates;
+    std::vector < State* > mCurrentStates;
     int mPreviousX;
     int mPreviousY;
     point_t mMouse;
