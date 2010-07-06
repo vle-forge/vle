@@ -143,7 +143,7 @@ public:
         const vd::ObservationEvent& event) const
     {
         if (event.onPort("a")) {
-            return vle::value::Double::create(a);
+            return vle::value::Double::create(x);
         } else {
             return vf::Statechart::observation(event);
         }
@@ -151,14 +151,16 @@ public:
 
 private:
     void add(const vd::Time& /* time */)
-    { ++a; }
+    { ++x; }
+
     void in(const vd::Time& /* time */,
             const vd::ExternalEvent* /* event */)
-    { ++a; }
-    void start(const vd::Time& /* time */)
-    { a = 0; }
+    { ++x; }
 
-    int a;
+    void start(const vd::Time& /* time */)
+    { x = 0; }
+
+    int x;
 };
 
 enum State3 { ii = 1, aa, bb, cc, dd };
@@ -260,16 +262,16 @@ public:
     virtual ~statechart8() { }
 
 private:
-    int a;
+    int x;
 
     void add(const vd::Time& /* time */)
-    { ++a; }
+    { ++x; }
     void in(const vd::Time& /* time */, const vd::ExternalEvent* /* event */)
-    { ++a; }
+    { ++x; }
     void start(const vd::Time& /* time */)
-    { a = 0; }
+    { x = 0; }
     bool c1(const vd::Time& /* time */)
-    { return a % 2 == 0; }
+    { return x % 2 == 0; }
 };
 
 class statechart9 : public vf::Statechart
@@ -297,25 +299,25 @@ public:
         const vd::ObservationEvent& event) const
     {
         if (event.onPort("a")) {
-            return vle::value::Integer::create(a);
+            return vle::value::Integer::create(x);
         } else {
             return vf::Statechart::observation(event);
         }
     }
 
 private:
-    int a;
+    int x;
 
     void add(const vd::Time& /* time */)
-    { ++a; }
+    { ++x; }
     vle::devs::Time d(const vd::Time& /* time */)
     { return 5.; }
     void in(const vd::Time& /* time */, const vd::ExternalEvent* /* event */)
-    { ++a; }
+    { ++x; }
     void start(const vd::Time& /* time */)
-    { a = 0; }
+    { x = 0; }
     bool c1(const vd::Time& /* time */)
-    { return a % 2 == 0; }
+    { return x % 2 == 0; }
 };
 
 typedef std::pair < double, double > param_pair;
@@ -346,6 +348,8 @@ public:
             << send(&StagesThreshold::output0);
 
         initialState(I);
+
+        Y = 0.0;
     }
 
     virtual ~StagesThreshold() { }
