@@ -908,15 +908,18 @@ void parse_model(vpz::AtomicModelList& list)
 
 std::string Modeling::getDynamicInfo(std::string dynamicName) const
 {
-
     std::string cardp = "";
 
-    const vpz::Dynamic& dyn = dynamics().get(dynamicName);
+    if  (dynamics().exist(dynamicName))
+    {
+        const vpz::Dynamic& dyn = dynamics().get(dynamicName);
 
-    cardp += "\n<b>Project: </b>" + dyn.package();
-    cardp += "\n<b>Library: </b>" + dyn.library();
-    cardp += "\n<b>Class: </b>" + dyn.model();
-
+        cardp += "\n<b>Project: </b>" + dyn.package();
+        cardp += "\n<b>Library: </b>" + dyn.library();
+        cardp += "\n<b>Class: </b>" + dyn.model();
+    } else {
+        cardp += "<i> (missing)</i>";
+    }
     return cardp;
 }
 
