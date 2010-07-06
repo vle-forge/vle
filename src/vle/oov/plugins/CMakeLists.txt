@@ -117,6 +117,7 @@ INSTALL(TARGETS storage
 
 INSTALL(FILES Storage.hpp DESTINATION ${VLE_INCLUDE_DIRS}/oov/plugins)
 
-IF (VLE_HAVE_CAIRO)
-  ADD_SUBDIRECTORY(cairo)
-ENDIF (VLE_HAVE_CAIRO)
+# TODO Add a default Cairo plugin to illustrate the use of the API.
+#IF (VLE_HAVE_CAIRO)
+#  ADD_SUBDIRECTORY(cairo)
+#ENDIF (VLE_HAVE_CAIRO)
