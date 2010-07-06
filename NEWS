@@ -30,9 +30,30 @@ VLE 0.9.0
     (ie. a view dedicated to sensitivity analysis). It could be handy to
     temporary "deactivate" other views so that they not produce outputs (files
     or storage objects) when working with a specific view.
+  * remove all oov::CairoPlugin from the VLE distribution. The oov::CairoPlugin
+    (gauge, caview, level, netview and plot) and associated GVLE output plug-ins
+    are removed from the VLE distribution. They may be packaged into a specific
+    Cairo package outside of the VLE environment.
 * translator:
   * Addition of a graph translator which builds the structure of a model from an
     adjacency matrix and a list of classes.
+* value: update to a clean value's API..
+
+
+VLE 0.8.6
+=========
+
+* extension:
+  * difference equation:
+    * fix bug on generic model: When an external event occurs on SEND_INIT or
+      POST_SEND_INIT, the exception on "invalid variable name" is raised.
+    * fix bug on init process: When an external variable have several values
+      for its initialization, the initExternalVariable method is invoked
+      several times.
+
+* vpz:
+  * fix bad reading of value::Matrix parameters: The sax reader reads badly the
+    value::Matrix parameters rowstep and columnstep.
 
 
 VLE 0.8.5
