@@ -468,7 +468,7 @@ namespace vle { namespace extension {
         /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
         // initial values
-        const devs::InitEventList& mInitEvents;
+        value::Map* mInitEvents;
 
         // structure
         PlaceList mPlaces;

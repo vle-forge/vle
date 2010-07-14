@@ -38,41 +38,6 @@
 
 namespace vle { namespace vpz {
 
-void ValueList::add(const std::string& key, const value::Value* val)
-{
-    std::pair < iterator, bool > x;
-
-    x = m_lst.insert(
-        std::make_pair < std::string, const value::Value* >(key, val));
-
-    if (not x.second) {
-        throw utils::ArgError(fmt(_(
-                    "Initialization port '%1%' already exist")) % key);
-    }
-}
-
-const value::Value& ValueList::get(const std::string& name)
-{
-    iterator it;
-    if ((it = m_lst.find(name)) == end()) {
-        throw(utils::ArgError(fmt(_(
-                "Initialization port '%1%' does not exist")) % name));
-    }
-    assert(it->second);
-    return *it->second;
-}
-
-const value::Value& ValueList::get(const std::string& name) const
-{
-    const_iterator it;
-    if ((it = m_lst.find(name)) == end()) {
-        throw(utils::ArgError(fmt(
-                "Initilization port '%1%' does not exist") % name));
-    }
-    assert(it->second);
-    return *it->second;
-}
-
 Condition::Condition(const std::string& name) :
     Base(),
     m_name(name)
@@ -218,21 +183,20 @@ void Condition::clearValueOfPort(const std::string& portname)
     it->second->clear();
 }
 
-ValueList Condition::firstValues() const
+value::Map* Condition::firstValues() const
 {
-    ValueList result;
+    value::Map* result = new value::Map();
 
-    for (ConditionValues::const_iterator it = m_list.begin(); it !=
-         m_list.end();
-         ++it) {
+    for (const_iterator it = m_list.begin(); it != m_list.end(); ++it) {
         if (it->second->size() > 0) {
-            result.add(it->first, it->second->get(0));
+            result->add(it->first, it->second->get(0));
         } else {
             throw(utils::ArgError(fmt(
                         "Build a empty first values for condition %1%.") %
                     m_name));
         }
     }
+
     return result;
 }
 

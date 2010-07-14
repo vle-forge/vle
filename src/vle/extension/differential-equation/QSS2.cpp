@@ -152,17 +152,14 @@ QSS2::QSS2(const DynamicsInit& p_model,
     m_index2(0),
     m_sigma(0),m_lastTime(0),m_mfi(0)
 {
-    const Value& precision = events.get("precision");
-    m_precision = toDouble(precision);
+    m_precision = events.getDouble("precision");
     m_epsilon = m_precision;
 
-    const Value& threshold = events.get("threshold");
-    m_threshold = toDouble(threshold);
+    m_threshold = events.getDouble("threshold");
 
-    const Value& active = events.get("active");
-    m_active = toBoolean(active);
+    m_active = events.getBoolean("active");
 
-    const Map& variables = toMapValue(events.get("variables"));
+    const Map& variables = events.getMap("variables");
     const MapValue& lst = variables.value();
 
     m_functionNumber = lst.size();

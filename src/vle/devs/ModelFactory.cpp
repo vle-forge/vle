@@ -146,15 +146,15 @@ void ModelFactory::createModel(Coordinator& coordinator,
     Simulator* sim = new Simulator(model);
     coordinator.addModel(model, sim);
 
-    vpz::ValueList initValues;
+    value::Map initValues;
     if (not conditions.empty()) {
         for (std::vector < std::string >::const_iterator it =
              conditions.begin(); it != conditions.end(); ++it) {
 	    const vpz::Condition& cnd(mExperiment.conditions().get(*it));
-	    vpz::ValueList vl = cnd.firstValues();
+	    value::Map* vl = cnd.firstValues();
 
-	    for (vpz::ValueList::const_iterator itv = vl.begin();
-		 itv != vl.end(); ++itv) {
+	    for (value::Map::const_iterator itv = vl->begin();
+		 itv != vl->end(); ++itv) {
 
                 if (initValues.exist(itv->first)) {
                     throw utils::InternalError(fmt(_(
@@ -163,6 +163,8 @@ void ModelFactory::createModel(Coordinator& coordinator,
                 }
                 initValues.add(itv->first, itv->second);
             }
+
+            vl->value().clear();
 	}
     }
 
@@ -201,6 +203,8 @@ void ModelFactory::createModel(Coordinator& coordinator,
             }
         }
     }
+
+    initValues.value().clear();
 
     if (InternalEvent* evt = sim->init(coordinator.getCurrentTime())) {
         coordinator.eventtable().putInternalEvent(evt);

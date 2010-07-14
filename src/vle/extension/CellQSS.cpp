@@ -58,17 +58,14 @@ CellQSS::CellQSS(const vle::devs::DynamicsInit& model,
     m_currentTime(0),
     m_state(0)
 {
-    const value::Value& precision = events.get("precision");
-    m_precision = value::toDouble(precision);
+    m_precision = events.getDouble("precision");
     m_epsilon = m_precision;
 
-    const value::Value& threshold = events.get("threshold");
-    m_epsilon = value::toDouble(threshold);
+    m_epsilon = events.getDouble("threshold");
 
-    const value::Value& active = events.get("active");
-    m_active = value::toBoolean(active);
+    m_active = events.getBoolean("active");
 
-    const value::Map& variables = value::toMapValue(events.get("variables"));
+    const value::Map& variables = events.getMap("variables");
     const value::MapValue& lst = variables.value();
 
     m_functionNumber = lst.size();

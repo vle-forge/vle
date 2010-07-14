@@ -39,7 +39,7 @@ Executive::Executive(const devs::ExecutiveInit& model,
                      const devs::InitEventList& events) :
     devs::Executive(model, events)
 {
-    m_buffer = events.get("translate").clone();
+    m_buffer = events.get("translate")->clone();
 }
 
 devs::Time Executive::init(const devs::Time& /* time */)

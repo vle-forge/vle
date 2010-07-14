@@ -353,7 +353,7 @@ PetriNet::Transition* PetriNet::selectTransition()
 PetriNet::PetriNet(const devs::DynamicsInit& model,
                    const devs::InitEventList& events) :
     devs::Dynamics(model, events),
-    mInitEvents(events),
+    mInitEvents(dynamic_cast < value::Map* >(events.clone())),
     mTokenNumber(0)
 {
 }
@@ -376,6 +376,8 @@ PetriNet::~PetriNet()
     for (MarkingList::const_iterator it = mMarkings.begin();
          it != mMarkings.end(); it++)
         delete it->second;
+
+    delete mInitEvents;
 }
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
@@ -516,10 +518,10 @@ void PetriNet::addTransition(const std::string& transitionName,
 
 void PetriNet::build()
 {
-    initPlaces(value::toSet(mInitEvents.get("places")));
-    initTransitions(value::toSet(mInitEvents.get("transitions")));
-    initArcs(value::toSet(mInitEvents.get("arcs")));
-    initInitialMarking(value::toSet(mInitEvents.get("initialMarkings")));
+    initPlaces(mInitEvents->getSet("places").value());
+    initTransitions(mInitEvents->getSet("transitions").value());
+    initArcs(mInitEvents->getSet("arcs").value());
+    initInitialMarking(mInitEvents->getSet("initialMarkings").value());
 }
 
 void PetriNet::buildInitialMarking(const devs::Time& time)

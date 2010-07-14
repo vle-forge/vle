@@ -65,7 +65,7 @@ Simple::Simple(const DynamicsInit& model,
     }
 
     if (events.exist("init")) {
-        const value::Set& init = toSetValue(events.get("init"));
+        const value::Set& init = events.getSet("init");
         unsigned int i;
 
         for (i = 0; i < init.size(); ++i) {

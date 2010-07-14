@@ -45,20 +45,16 @@ Base::Base(const DynamicsInit& model,
     mBuffer(false)
 {
     if (events.exist("active")) {
-        const Value& active = events.get("active");
-        mActive = toBoolean(active);
+        mActive = events.getBoolean("active");
     }
 
     if (events.exist("dependance")) {
-        const Value& dependance = events.get("dependance");
-        mDependance = toBoolean(dependance);
+        mDependance = events.getBoolean("dependance");
     }
 
-    const Value& value = events.get("value");
-    mInitialValue = toDouble(value);
+    mInitialValue = events.getDouble("value");
 
-    const Value& name = events.get("name");
-    mVariableName = toString(name);
+    mVariableName = events.getString("name");
 
     if (events.exist("thresholds")) {
         const MapValue& thresholds =

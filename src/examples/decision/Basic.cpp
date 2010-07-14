@@ -41,7 +41,7 @@ public:
     Start(const vd::DynamicsInit& mdl, const vd::InitEventList& evts)
         : vd::Dynamics(mdl, evts)
     {
-        mStart = evts.get("start").toDouble().value();
+        mStart = evts.getDouble("start");
     }
 
     virtual ~Start()

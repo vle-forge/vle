@@ -41,12 +41,10 @@ Simple::Simple(const DynamicsInit& model,
 	       const InitEventList& events) :
     DifferentialEquation::Base(model, events)
 {
-    const Value& precision = events.get("precision");
-    mPrecision = toDouble(precision);
+    mPrecision = events.getDouble("precision");
     mEpsilon = mPrecision;
 
-    const Value& threshold = events.get("threshold");
-    mThreshold = toDouble(threshold);
+    mThreshold = events.getDouble("threshold");
 }
 
 double Simple::getEstimatedValue(double e) const
@@ -126,20 +124,17 @@ Multiple::Multiple(const DynamicsInit& model,
     mLastTime(0),
     mState(0)
 {
-    const Value& threshold = events.get("threshold");
-    mThreshold = toDouble(threshold);
+    mThreshold = events.getDouble("threshold");
 
     if (events.exist("active")) {
-        const Value& active = events.get("active");
-        mActive = toBoolean(active);
+        mActive = events.getBoolean("active");
     }
 
     if (events.exist("dependance")) {
-        const Value& dependance = events.get("dependance");
-        mDependance = toBoolean(dependance);
+        mDependance = events.getBoolean("dependance");
     }
 
-    const value::Set& variables = value::toSetValue(events.get("variables"));
+    const value::Set& variables = events.getSet("variables");
     unsigned int index;
 
     for (index = 0; index < variables.size(); ++index) {

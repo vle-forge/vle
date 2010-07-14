@@ -41,7 +41,7 @@ Multiple::Multiple(const DynamicsInit& model,
     Base(model, events, control)
 {
     if (events.exist("variables")) {
-        const value::Set& variables = toSetValue(events.get("variables"));
+        const value::Set& variables = events.getSet("variables");
         unsigned int index;
 
         for (index = 0; index < variables.size(); ++index) {

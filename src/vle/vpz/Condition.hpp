@@ -47,98 +47,6 @@ namespace vle { namespace vpz {
     typedef std::map < std::string, value::Set* > ConditionValues;
 
     /**
-     * @brief Define the ConditionValue like a dictionary, (portname, value).
-     */
-    typedef std::map < std::string, const value::Value* > ConditionValue;
-
-    /**
-     * @brief Define the ValueList, a wrapper to the ConditionValue which
-     * represents the (portname, value) list.
-     */
-    class VLE_VPZ_EXPORT ValueList
-    {
-    public:
-        /**
-         * @brief Define an iterator to the ConditionValue.
-         */
-        typedef ConditionValue::iterator iterator;
-
-        /**
-         * @brief Define a constant iterator to the ConditionValue.
-         */
-        typedef ConditionValue::const_iterator const_iterator;
-
-        /**
-         * @brief Add a new pair portname, values to the dictionary.
-         * @param key The name of the port.
-         * @param val The value to clone and attach.
-         * @throw utils::ArgError if name already exists.
-         */
-        void add(const std::string& key, const value::Value* val);
-
-        /**
-         * @brief Get a constant reference to the specified Value.
-         * @param name The name of the port to get Value.
-         * @return A constant reference to the Value.
-         * @throw utils::ArgError if name does not exist.
-         */
-        const value::Value& get(const std::string& name);
-
-        /**
-         * @brief Get a constant reference to the specified Value.
-         * @param name The name of the port to get Value.
-         * @return A constant reference to the Value.
-         * @throw utils::ArgError if name does not exist.
-         */
-        const value::Value& get(const std::string& name) const;
-
-        /**
-         * @brief Check if the port exists.
-         * @param name The name of the port.
-         * @return True if exists, false otherwise.
-         */
-        bool exist(const std::string& name) const
-        { return m_lst.find(name) != end(); }
-
-        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-         *
-         * Get/Set functions.
-         *
-         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-        /**
-         * @brief Get a iterator the begin of the ConditionValue.
-         * @return Get a iterator the begin of the ConditionValue.
-         */
-        iterator begin()
-        { return m_lst.begin(); }
-
-        /**
-         * @brief Get a constant iterator the begin of the ConditionValue.
-         * @return Get a constant iterator the begin of the ConditionValue.
-         */
-        const_iterator begin() const
-        { return m_lst.begin(); }
-
-        /**
-         * @brief Get a iterator the end of the ConditionValue.
-         * @return Get a iterator the end of the ConditionValue.
-         */
-        iterator end()
-        { return m_lst.end(); }
-
-        /**
-         * @brief Get a constant iterator the end of the ConditionValue.
-         * @return Get a constant iterator the end of the ConditionValue.
-         */
-        const_iterator end() const
-        { return m_lst.end(); }
-
-    private:
-        ConditionValue m_lst;
-    };
-
-    /**
      * @brief A condition define a couple model name, port name and a Value.
      * This class allow loading and writing a condition.
      */
@@ -260,11 +168,14 @@ namespace vle { namespace vpz {
         void clearValueOfPort(const std::string& portname);
 
         /**
-         * @brief Build a new ValueList based on the SetList with only the
-         * first value for each Set.
-         * @return A cloned ValueList based on the SetList.
+         * @brief Build a new Map with the first values of each port of this
+         * condition. Be carrefull, dont delete the value::Map directly, you
+         * don't delete value::Value from the value::Map.
+         *
+         * @return A new value::Map, but don't delete the content, just clear
+         * the value::Map::MapValue.
          */
-        ValueList firstValues() const;
+        value::Map* firstValues() const;
 
         /**
          * @brief Get the value::Set attached to a port.

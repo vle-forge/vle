@@ -34,12 +34,12 @@
 #include <vle/devs/DllDefines.hpp>
 #include <vle/devs/EventList.hpp>
 #include <vle/devs/ExternalEvent.hpp>
-#include <vle/vpz/Condition.hpp>
+#include <vle/value/Map.hpp>
 
 namespace vle { namespace devs {
 
     typedef EventList < ExternalEvent > ExternalEventList;
-    typedef vpz::ValueList InitEventList;
+    typedef value::Map InitEventList;
 
     inline std::ostream& operator<<(std::ostream& o,
                                     const ExternalEventList& evts)

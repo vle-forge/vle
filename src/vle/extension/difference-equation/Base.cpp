@@ -53,11 +53,10 @@ Base::Base(const DynamicsInit& model,
     mWaiting(0)
     {
         if (events.exist("time-step")) {
-            if (events.get("time-step").isDouble()) {
+            if (events.get("time-step")->isDouble()) {
                 mTimeStep = toDouble(events.get("time-step"));
-            } else if (events.get("time-step").isMap()) {
-                const value::Map& timeStep =
-                    toMapValue(events.get("time-step"));
+            } else if (events.get("time-step")->isMap()) {
+                const value::Map& timeStep = events.getMap("time-step");
 
                 mTimeStep = toDouble(timeStep.get("value"));
                 mTimeStepUnit = vle::utils::DateTime::convertUnit(
@@ -93,8 +92,7 @@ Base::Base(const DynamicsInit& model,
                         % getModelName());
                 }
 
-                const value::Map& mapping = value::toMapValue(
-                    events.get("mapping"));
+                const value::Map& mapping = events.getMap("mapping");
                 const value::MapValue& lst = mapping.value();
                 for (value::MapValue::const_iterator it = lst.begin();
                      it != lst.end(); ++it) {
