@@ -101,6 +101,12 @@ public:
     virtual ~GVLE();
 
     /**
+     * @brief Used to erase the status bar.
+     * @return a boolean
+     */
+    bool on_timeout();
+
+    /**
      * @brief Get a constant reference to the PluginFactory.
      * @return A constant reference.
      */
@@ -125,9 +131,14 @@ public:
     { return mCurrentButton; }
 
     /**
-     * Create the hierarchy in the package browser
+     * @brief Create the hierarchy in the package browser
      */
     void show();
+
+    /**
+     * @brief Provide a message to the StatusBar
+     */
+    void showMessage(const std::string& message);
 
     /**
      * @brief Append an asterisk to the Gtk::Window's title with an asterick.
@@ -328,19 +339,19 @@ public:
 			    const std::string& dirname);
 	bool isDirectory(const std::string& dirname);
 	void on_row_activated(const Gtk::TreeModel::Path& path,
-			    Gtk::TreeViewColumn*  column);
+                              Gtk::TreeViewColumn*  column);
 	void projectFilePath(const Gtk::TreeRow& row,
-			    std::list<std::string>& lst);
+                             std::list<std::string>& lst);
 
-    void refreshHierarchy(const Gtk::TreeModel::Row* parent,
-                const std::string& dirname);
+        void refreshHierarchy(const Gtk::TreeModel::Row* parent,
+                              const std::string& dirname);
 	void refreshHierarchyDirectory(const Gtk::TreeModel::Row* parent,
-                const std::string& dirname);
+                                       const std::string& dirname);
 	void refreshHierarchyFile(const Gtk::TreeModel::Row* parent,
-                const std::string& dirname);
-    void removeFiles(const Gtk::TreeModel::Row* parent,
-                const std::list < std::string >& entries);
-    void openTab(std::string path);
+                                  const std::string& dirname);
+        void removeFiles(const Gtk::TreeModel::Row* parent,
+                         const std::list < std::string >& entries);
+        void openTab(std::string path);
 
 	GVLE*                            mParent;
 	Gtk::Menu                        mMenuPopup;
@@ -350,11 +361,11 @@ public:
 	Glib::RefPtr<Gtk::TreeSelection> mRefTreeSelection;
 	std::list<std::string>           mIgnoredFilesList;
 
-    std::string                      mOldName;
-    std::string                      m_search;
-    std::string                      mAbsolutePath;
-    std::string                      mFilePath;
-    std::string                      mFileName;
+        std::string                      mOldName;
+        std::string                      m_search;
+        std::string                      mAbsolutePath;
+        std::string                      mFilePath;
+        std::string                      mFileName;
 
 	//Cell
 	int                              mColumnName;
@@ -760,6 +771,9 @@ private:
     void saveFirstVpz();
 
     Glib::RefPtr < Gnome::Glade::Xml >  mRefXML;
+
+    sigc::connection                 mConnectionTimeout;
+
 
     /* Widgets */
     Gtk::VBox*                      mMenuAndToolbarVbox;

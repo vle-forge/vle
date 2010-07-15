@@ -31,6 +31,7 @@
 #ifndef GUI_CUTCOPYPAST_HPP
 #define GUI_CUTCOPYPAST_HPP
 
+#include <vle/gvle/GVLE.hpp>
 #include <vle/graph/CoupledModel.hpp>
 #include <vle/vpz/Model.hpp>
 #include <list>
@@ -51,7 +52,7 @@ public:
     enum Type { CUT, COPY, NOTHING };
 
     /** create a cut copy paste object with no type */
-    CutCopyPaste();
+    CutCopyPaste(GVLE* gvle);
 
     /** delete list of GModel if present */
     ~CutCopyPaste();
@@ -84,8 +85,6 @@ public:
      */
     void paste(graph::CoupledModel* gc, vpz::AtomicModelList& list);
 
-    void state();
-
 private:
     /** delete list of GModel if present */
     void clear();
@@ -101,8 +100,6 @@ private:
     void clone(graph::ModelList& lst_graph_clone,
                vpz::AtomicModelList& lst_vpz_clone, int num);
 
-    void state(vpz::AtomicModelList& list);
-
     void cut_atomic(graph::Model* model, vpz::AtomicModelList& src);
     void cut_coupled(graph::Model* model, vpz::AtomicModelList& src);
 
@@ -111,6 +108,8 @@ private:
 
     void clone_atomic(graph::Model* model, graph::Model* clone, vpz::AtomicModelList& vpz_list);
     void clone_coupled(graph::Model* model, graph::Model* clone, vpz::AtomicModelList& vpz_list);
+
+    GVLE*                       mGVLE;
 
     graph::ModelList           mList_graph;
     vpz::AtomicModelList       mList_vpz;

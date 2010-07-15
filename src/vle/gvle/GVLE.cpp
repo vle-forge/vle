@@ -70,8 +70,7 @@ const std::string GVLE::WINDOW_TITLE =
 GVLE::FileTreeView::FileTreeView(
     BaseObjectType* cobject,
     const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/) :
-    Gtk::TreeView(cobject),
-    mDelayTime(0)
+    Gtk::TreeView(cobject)
 {
     mRefTreeModel = Gtk::TreeStore::create(mColumns);
     set_model(mRefTreeModel);
@@ -239,29 +238,29 @@ bool GVLE::FileTreeView::isDirectory(const std::string& dirname)
 bool GVLE::FileTreeView::onEvent(GdkEvent* event)
 {
     if (event->type == GDK_2BUTTON_PRESS) {
-	    mDelayTime = event->button.time;
+        mDelayTime = event->button.time;
         Gtk::TreeModel::Path path;
         Gtk::TreeViewColumn* column;
         get_cursor(path, column);
         on_row_activated(path, column);
-	    return true;
+        return true;
     }
 
     if (event->type == GDK_BUTTON_PRESS) {
-	    if (mDelayTime + 250 < event->button.time and
-	        mDelayTime + 1000 > event->button.time) {
-	        mDelayTime = event->button.time;
-	        mCellrenderer->property_editable() = true;
-	    } else {
-	        mDelayTime = event->button.time;
-	        mCellrenderer->property_editable() = false;
-	    }
+        if (mDelayTime + 250 < event->button.time and
+            mDelayTime + 1000 > event->button.time) {
+            mDelayTime = event->button.time;
+            mCellrenderer->property_editable() = true;
+        } else {
+            mDelayTime = event->button.time;
+            mCellrenderer->property_editable() = false;
+        }
 
     }
     return false;
 }
 
-void GVLE::FileTreeView::onEditionStarted(Gtk::CellEditable* cellEditable,
+void GVLE::FileTreeView::onEditionStarted(Gtk::CellEditable* /* cellEditable */,
                                           const Glib::ustring& /* path */)
 {
     Glib::RefPtr<Gtk::TreeView::Selection> refSelection = get_selection();
@@ -850,6 +849,9 @@ GVLE::GVLE(BaseObjectType* cobject,
     mMenuAndToolbar->getToolbar()->set_toolbar_style(Gtk::TOOLBAR_BOTH);
 
     mModeling->setModified(false);
+
+    Glib::signal_timeout().connect( sigc::mem_fun(*this, &GVLE::on_timeout), 1000 );
+
     set_title(WINDOW_TITLE);
     resize(900, 550);
     show();
@@ -871,10 +873,27 @@ GVLE::~GVLE()
     Settings::settings().kill();
 }
 
+bool GVLE::on_timeout()
+{
+    mConnectionTimeout.disconnect();
+
+    mStatusbar->push("");
+    return false;
+}
+
 void GVLE::show()
 {
     buildPackageHierarchy();
     show_all();
+}
+
+void GVLE::showMessage(const std::string& message)
+{
+    mConnectionTimeout.disconnect();
+    mConnectionTimeout = Glib::signal_timeout().
+        connect(sigc::mem_fun(*this, &GVLE::on_timeout), 30000);
+
+    mStatusbar->push(message);
 }
 
 void GVLE::setModifiedTitle(const std::string& name)
@@ -1002,49 +1021,49 @@ void GVLE::onArrow()
 {
     mCurrentButton = POINTER;
     mEditor->getDocumentDrawingArea()->updateCursor();
-    mStatusbar->push(_("Selection"));
+   showMessage(_("Selection"));
 }
 
 void GVLE::onAddModels()
 {
     mCurrentButton = ADDMODEL;
     mEditor->getDocumentDrawingArea()->updateCursor();
-    mStatusbar->push(_("Add models"));
+   showMessage(_("Add models"));
 }
 
 void GVLE::onAddLinks()
 {
     mCurrentButton = ADDLINK;
     mEditor->getDocumentDrawingArea()->updateCursor();
-    mStatusbar->push(_("Add links"));
+   showMessage(_("Add links"));
 }
 
 void GVLE::onDelete()
 {
     mCurrentButton = DELETE;
     mEditor->getDocumentDrawingArea()->updateCursor();
-    mStatusbar->push(_("Delete object"));
+   showMessage(_("Delete object"));
 }
 
 void GVLE::onAddCoupled()
 {
     mCurrentButton = ADDCOUPLED;
     mEditor->getDocumentDrawingArea()->updateCursor();
-    mStatusbar->push(_("Coupled Model"));
+   showMessage(_("Coupled Model"));
 }
 
 void GVLE::onZoom()
 {
     mCurrentButton = ZOOM;
     mEditor->getDocumentDrawingArea()->updateCursor();
-    mStatusbar->push(_("Zoom"));
+   showMessage(_("Zoom"));
 }
 
 void GVLE::onQuestion()
 {
     mCurrentButton = QUESTION;
     mEditor->getDocumentDrawingArea()->updateCursor();
-    mStatusbar->push(_("Question"));
+   showMessage(_("Question"));
 }
 
 void GVLE::onNewFile()
@@ -1074,7 +1093,7 @@ void GVLE::onNewVpz()
         mModelTreeBox->set_sensitive(true);
         mModelClassBox->set_sensitive(true);
         if (mCurrentButton == POINTER){
-            mStatusbar->push(_("Selection"));
+           showMessage(_("Selection"));
         }
     }
     onExperimentsBox();
@@ -1093,7 +1112,7 @@ void GVLE::onNewNamedVpz(const std::string& path, const std::string& filename)
         mModelTreeBox->set_sensitive(true);
         mModelClassBox->set_sensitive(true);
         if (mCurrentButton == POINTER){
-            mStatusbar->push(_("Selection"));
+           showMessage(_("Selection"));
         }
     }
     onExperimentsBox();
@@ -1151,7 +1170,7 @@ void GVLE::onOpenVpz()
                 mModelClassBox->set_sensitive(true);
                 mEditor->getDocumentDrawingArea()->updateCursor();
                 if (mCurrentButton == POINTER){
-                    mStatusbar->push(_("Selection"));
+                   showMessage(_("Selection"));
                 }
             }
 	} catch(utils::InternalError) {

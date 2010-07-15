@@ -781,7 +781,6 @@ private:
     void import_coupled_model(vpz::Vpz* src, graph::CoupledModel* atom, std::string className = "");
 };
 
-void parse_recurs(graph::Model*, vpz::Vpz*, int level = 0);
 void parse_model(vpz::AtomicModelList& list);
 
 } } // namespace vle gvle

@@ -37,7 +37,8 @@
 
 namespace vle { namespace gvle {
 
-CutCopyPaste::CutCopyPaste() :
+CutCopyPaste::CutCopyPaste(GVLE* gvle) :
+    mGVLE(gvle),
     mNumero(0),
     mType(NOTHING)
 { }
@@ -60,10 +61,10 @@ void CutCopyPaste::cut(graph::ModelList& l, graph::CoupledModel* parent,
                        vpz::AtomicModelList& src)
 {
     if (parent->hasConnectionProblem(l)) {
-        std::cout << _("Selected model list have connection with "      \
-                       "external model\n");
+        mGVLE->showMessage(_("Selected model list have connection with " \
+                             "external model"));
     } else if (l.empty()) {
-        std::cout << _("No model selected\n");
+        mGVLE->showMessage(_("No model selected"));
     } else if (l.find(parent->getName()) == l.end()) {
         clear();
         mType = CUT;
@@ -83,8 +84,7 @@ void CutCopyPaste::cut(graph::ModelList& l, graph::CoupledModel* parent,
             }
         }
     } else {
-        std::cout << _("Nothing to Cut - parent is '")
-                  << parent->getName() << "'\n";
+        mGVLE->showMessage(_("Nothing to Cut - parent is ") + parent->getName());
     }
 }
 
@@ -92,10 +92,10 @@ void CutCopyPaste::copy(graph::ModelList& l, graph::CoupledModel* parent,
                         vpz::AtomicModelList& src, bool isClass)
 {
     if (not isClass and parent->hasConnectionProblem(l)) {
-        std::cout << _("Selected model list have connection with "      \
-                       "external model\n");
+        mGVLE->showMessage(_("Selected model list have connection with " \
+                             "external model"));
     } else if (l.empty()) {
-        std::cout << _("No model selected\n");
+        mGVLE->showMessage(_("No model selected\n"));
     } else {
         clear();
         mType = COPY;
@@ -125,7 +125,7 @@ void CutCopyPaste::paste(graph::CoupledModel* gc, vpz::AtomicModelList& dst)
     graph::ModelList list_graph_clone;
     vpz::AtomicModelList list_vpz_clone;
 
-   if (gc) {
+    if (gc) {
         if (mType == CUT) {
             clone(list_graph_clone,
                   list_vpz_clone,
@@ -174,7 +174,7 @@ void CutCopyPaste::paste(graph::CoupledModel* gc, vpz::AtomicModelList& dst)
         gc->setBasicConnections(mwCnts);
         dst.add(list_vpz_clone);
     } else {
-        std::cout << _("No Coupled Model\n");
+        mGVLE->showMessage(_("No Coupled Model"));
     }
 }
 
@@ -234,39 +234,6 @@ void CutCopyPaste::clone(graph::ModelList& lst_graph_clone,
                 clone_atomic(it->second, m, lst_vpz_clone);
             }
         }
-    }
-}
-
-void CutCopyPaste::state(vpz::AtomicModelList& list)
-{
-    vpz::AtomicModelList::const_iterator it = list.begin();
-    while (it != list.end()) {
-        std::cout << "\t" << it->first->getName() << "\n";
-
-        ++it;
-    }
-}
-
-void CutCopyPaste::state()
-{
-    std::cout << "------STATE(Cut Memory graph)-----\n";
-    vpz::AtomicModel* model;
-    graph::ModelList::iterator it = mList_graph.begin();
-
-    while (it != mList_graph.end()) {
-        std::cout << "Model '" << it->first << "' -> ";
-        if (it->second->isAtomic()) {
-            model = &(mList_vpz.get(it->second));
-            std::cout<<"dyn("<<model->dynamics()<<") "
-            <<"obs("<<model->observables()<<") "
-            <<"cond("<<model->conditions().size()<<") "
-            << std::endl;
-        } else {
-            graph::CoupledModel* c_model = dynamic_cast<graph::CoupledModel*>(it->second);
-            std::cout << "Coupled - " << c_model->getModelList().size() << " sons\n";
-        }
-
-        ++it;
     }
 }
 
@@ -341,14 +308,11 @@ void CutCopyPaste::clone_atomic(graph::Model* model, graph::Model* clone,
 void CutCopyPaste::clone_coupled(graph::Model* model, graph::Model* clone,
                                  vpz::AtomicModelList& vpz_list)
 {
-    //std::cout << "clone_coupled '"<<model->getName()<<"'\n";
-
     graph::ModelList& list = dynamic_cast<graph::CoupledModel*>(model)->getModelList();
     graph::ModelList& list_clone = dynamic_cast<graph::CoupledModel*>(clone)->getModelList();
     graph::ModelList::iterator it = list.begin();
     graph::ModelList::iterator it_clone = list_clone.begin();
     while (it != list.end()) {
-        //std::cout << it->first << "  -  " << it_clone->first << "\n";
         if (it->second->isAtomic()) {
             clone_atomic(it->second, it_clone->second, vpz_list);
         } else {

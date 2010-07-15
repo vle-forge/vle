@@ -34,15 +34,12 @@
 #include <vle/vpz/Observable.hpp>
 #include <vle/vpz/Views.hpp>
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
 class TreeViewObservable : public Gtk::TreeView
 {
 public:
-    //Tree model columns:
-class ModelColumns : public Gtk::TreeModel::ColumnRecord
+    class ModelColumns : public Gtk::TreeModel::ColumnRecord
     {
     public:
         ModelColumns() {
@@ -52,7 +49,6 @@ class ModelColumns : public Gtk::TreeModel::ColumnRecord
 
         Gtk::TreeModelColumn<Glib::ustring> m_col_name;
         Gtk::TreeModelColumn<vpz::ObservablePort*> m_col_parent;
-        //Gtk::TreeModelColumn<vpz::Base*> m_col_value;
     };
 
     ModelColumns m_Columns;
@@ -63,24 +59,12 @@ class ModelColumns : public Gtk::TreeModel::ColumnRecord
 
     void refresh();
 
-protected:
-    virtual void on_row_activated(const Gtk::TreeModel::Path& path,
-                                  Gtk::TreeViewColumn* column);
-    //virtual bool on_button_press_event(GdkEventButton* event);
 private:
-    //The Tree model:
     Glib::RefPtr<Gtk::TreeStore> m_refTreeModel;
 
-    //Gtk::Menu mMenu_port;
-    //Gtk::Menu mMenu_no_port;
     vpz::Observable* mObservable;
-    //vpz::Views* mViews;
-
-    //void on_menu_insert_port();
-    //void on_menu_insert_view();
-    //void on_menu_remove();
 };
 
-}
-} // namespace vle gvle
+}} // namespace vle gvle
+
 #endif

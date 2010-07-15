@@ -45,9 +45,6 @@ ObservableBox::ObservableBox(vpz::Observable& obs, vpz::Views& views):
     add_button(Gtk::Stock::APPLY, Gtk::RESPONSE_APPLY);
     add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
 
-    //mTreeView = new TreeViewObservable(obs, views);
-    //get_vbox()->pack_start(*mTreeView);
-
     show_all_children();
 }
 

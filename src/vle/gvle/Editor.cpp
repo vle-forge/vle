@@ -579,18 +579,18 @@ void Editor::closeTab(const std::string& filepath)
 }
 
 void Editor::createBlankNewFile(const std::string& path,
-            const std::string& fileName)
+                                const std::string& fileName)
 {
     try {
-	    DocumentText* doc =
+        DocumentText* doc =
             new DocumentText(mApp,  path + "/" + fileName, true, true);
         mDocuments.insert(
             std::make_pair < std::string, DocumentText* >
             (path + "/" + fileName, doc));
-	    append_page(*doc, *(addLabel(fileName,
-				         path + "/" + fileName)));
+        append_page(*doc, *(addLabel(fileName,
+                                     path + "/" + fileName)));
     } catch (std::exception& e) {
-	    std::cout << e.what() << std::endl;
+        Error(e.what());
     }
     show_all_children();
 }
@@ -618,7 +618,7 @@ void Editor::createBlankNewFile()
 	append_page(*doc, *(addLabel(doc->filename(),
 				     nameTmp)));
     } catch (std::exception& e) {
-	std::cout << e.what() << std::endl;
+	Error(e.what());
     }
     show_all_children();
 }

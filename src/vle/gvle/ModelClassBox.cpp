@@ -30,6 +30,7 @@
 
 #include <vle/gvle/ModelClassBox.hpp>
 #include <vle/gvle/Modeling.hpp>
+#include <vle/gvle/Message.hpp>
 #include <vle/gvle/Editor.hpp>
 #include <vle/gvle/View.hpp>
 #include <vle/utils/Path.hpp>
@@ -401,7 +402,7 @@ void ModelClassBox::onImportModelAsClass()
                 mModeling->importModelToClass(import, name);
             delete import;
         } catch (std::exception& E) {
-            std::cout << "Exception :\n" << E.what() << "\n";
+            Error(E.what());
         }
     }
 }
@@ -424,7 +425,7 @@ void ModelClassBox::onImportClassesFromVpz()
             mModeling->importClasses(import);
             delete import;
         } catch (std::exception& E) {
-            std::cout << "Exception :\n" << E.what() << "\n";
+            Error(E.what());
         }
     }
 }

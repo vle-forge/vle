@@ -27,6 +27,7 @@
 
 
 #include <vle/gvle/InteractiveTypeBox.hpp>
+#include <vle/gvle/Message.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/vpz/Classes.hpp>
 #include <vle/vpz/Conditions.hpp>
@@ -142,7 +143,7 @@ bool InteractiveTypeBox::isValid()
 	    mState = not (dynamic_cast< vpz::Views* >(mBase))->exist(mEntry->get_text());
 	    break;
 	default:
-	    std::cout << _("Unknown argument type.") << std::endl;
+	    Error(_("Unknown argument type."));
 	    return false;
 	}
     } else {

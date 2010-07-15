@@ -212,7 +212,7 @@ void View::importModel()
             mModeling->importModel(mCurrent, import);
             delete import;
         } catch (std::exception& E) {
-            std::cout << "Exception :\n" << E.what() << "\n";
+            Error(E.what());
         }
     }
 }

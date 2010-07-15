@@ -27,7 +27,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include <vle/gvle/AtomicModelBox.hpp>
 #include <vle/gvle/Modeling.hpp>
 #include <vle/gvle/Editor.hpp>
@@ -60,6 +59,7 @@ namespace gvle {
 Modeling::Modeling(GVLE* gvle, const string& filename) :
     mTop(0),
     mGVLE(gvle),
+    mCutCopyPaste(gvle),
     mIsModified(false),
     mIsSaved(false),
     mSocketPort(8000),
@@ -679,33 +679,6 @@ void Modeling::import_coupled_model(vpz::Vpz* src, graph::CoupledModel* model, s
             }
 
             ++it;
-        }
-    }
-}
-
-void parse_recurs(graph::Model* m, vpz::Vpz* vpz, int level)
-{
-    if (m->isAtomic()) {
-        vpz::AtomicModel& atom = vpz->project().model().atomicModels().get(graph::Model::toAtomic(m));
-        for (int i = 0; i < level; ++i)
-            std::cout << "\t";
-        std::cout << m->getName()
-        <<" dyn("<<atom.dynamics()<<")"
-        <<" obs("<<atom.observables()<<")"
-        <<" cond(";
-        for (std::vector < std::string >::const_iterator it =
-             atom.conditions().begin(); it != atom.conditions().end(); ++it) {
-            std::cout << *it << ";";
-        }
-        std::cout << ")\n";
-    } else {
-        for (int i = 0; i < level; ++i)
-            std::cout << "\t";
-        std::cout << m->getName() << "\n";
-        graph::ModelList ml = (graph::Model::toCoupled(m))->getModelList();
-        graph::ModelList::iterator it;
-        for (it = ml.begin(); it != ml.end(); ++it) {
-            parse_recurs(it->second, vpz, level+1);
         }
     }
 }
