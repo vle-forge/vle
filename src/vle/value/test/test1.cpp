@@ -112,11 +112,13 @@ BOOST_AUTO_TEST_CASE(check_map_value)
 {
     value::Map* mp = value::Map::create();
 
+    BOOST_REQUIRE_EQUAL(mp->empty(), true);
     mp->addBoolean("boolean", true);
     mp->addInt("integer", 1234);
     mp->addDouble("double", 12.34);
     mp->addString("string", "test");
     mp->addXml("xml", "xml test");
+    BOOST_REQUIRE_EQUAL(mp->empty(), false);
 
     BOOST_REQUIRE_EQUAL(mp->getBoolean("boolean"), true);
     BOOST_REQUIRE_EQUAL(mp->getInt("integer"), 1234);
@@ -136,11 +138,14 @@ BOOST_AUTO_TEST_CASE(check_map_value)
 BOOST_AUTO_TEST_CASE(check_set_value)
 {
     value::Set* st = value::Set::create();
+
+    BOOST_REQUIRE_EQUAL(st->empty(), true);
     st->addBoolean(true);
     st->addInt(1234);
     st->addDouble(12.34);
     st->addString("test");
     st->addXml("xml test");
+    BOOST_REQUIRE_EQUAL(st->empty(), false);
 
     BOOST_REQUIRE_EQUAL(st->getBoolean(0), true);
     BOOST_REQUIRE_EQUAL(st->getInt(1), 1234);

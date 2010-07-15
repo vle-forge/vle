@@ -334,6 +334,13 @@ public:
     void clear();
 
     /**
+     * @brief Return true if the value::Map does not contain any element.
+     * @return True if empty, false otherwise.
+     */
+    inline bool empty() const
+    { return m_value.empty(); }
+
+    /**
      * @brief Get the first constant iterator from Map.
      * @return the first iterator.
      */

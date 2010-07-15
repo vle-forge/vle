@@ -332,6 +332,13 @@ public:
     { return m_value.size(); }
 
     /**
+     * @brief Return true if the value::Map does not contain any element.
+     * @return True if empty, false otherwise.
+     */
+    inline bool empty() const
+    { return m_value.empty(); }
+
+    /**
      * @brief Delete all value from the VectorValue and clean the
      * VectorValue.
      */
