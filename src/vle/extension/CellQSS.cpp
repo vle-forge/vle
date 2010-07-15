@@ -61,7 +61,7 @@ CellQSS::CellQSS(const vle::devs::DynamicsInit& model,
     m_precision = events.getDouble("precision");
     m_epsilon = m_precision;
 
-    m_epsilon = events.getDouble("threshold");
+    m_threshold = events.getDouble("threshold");
 
     m_active = events.getBoolean("active");
 
@@ -172,7 +172,7 @@ void CellQSS::updateSigma(unsigned int i)
         if (i != j) setSigma(j,getSigma(j) - getSigma(i));
 
     // Calcul du sigma de la ième fonction
-    if (std::abs(getGradient(i)) < 1e-10)
+    if (std::abs(getGradient(i)) < m_threshold)
         setSigma(i,Time::infinity);
     else {
         devs::Time r;

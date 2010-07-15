@@ -90,6 +90,7 @@ namespace vle { namespace extension {
         //
         double m_precision;
         double m_epsilon;
+        double m_threshold;
         bool m_active;
 
         inline double d(long x);
