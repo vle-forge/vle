@@ -16,6 +16,7 @@ ADD_LIBRARY(rdata SHARED Rdata.cpp Rdata.hpp)
 ADD_LIBRARY(csv SHARED csv.cpp csv.hpp)
 ADD_LIBRARY(file SHARED File.cpp File.hpp FileType.cpp FileType.hpp)
 ADD_LIBRARY(storage SHARED Storage.cpp Storage.hpp)
+ADD_LIBRARY(console SHARED Console.cpp)
 
 TARGET_LINK_LIBRARIES(dummy
   ${GLIBMM_LIBRARIES}
@@ -77,6 +78,16 @@ TARGET_LINK_LIBRARIES(file
   vlegraph
   vleoov)
 
+TARGET_LINK_LIBRARIES(console
+  ${GLIBMM_LIBRARIES}
+  ${LIBXML_LIBRARIES}
+  ${GTHREAD_LIBRARIES}
+  vlegeometry
+  vleutils
+  vlevalue
+  vlegraph
+  vleoov)
+
 TARGET_LINK_LIBRARIES(storage
   ${GLIBMM_LIBRARIES}
   ${LIBXML_LIBRARIES}
@@ -112,6 +123,10 @@ INSTALL(TARGETS file
   LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/stream")
 
 INSTALL(TARGETS storage
+  RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/stream"
+  LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/stream")
+
+INSTALL(TARGETS console
   RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/stream"
   LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/stream")
 
