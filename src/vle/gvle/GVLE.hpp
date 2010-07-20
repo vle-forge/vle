@@ -544,6 +544,11 @@ public:
     void installProject();
 
     /**
+     * @brief When click on test project menu.
+     */
+    void testProject();
+
+    /**
      * When click on clean project menu
      *
      */
