@@ -92,6 +92,27 @@ void Package::configure()
     }
 }
 
+void Package::test()
+{
+    Path& p = utils::Path::path();
+    fs::create_directory(p.getPackageBuildDir());
+
+    std::list < std::string > argv;
+#ifdef G_OS_WIN32
+    argv.push_back(Glib::find_program_in_path("mingw32-make.exe"));
+#else
+    argv.push_back(Glib::find_program_in_path("make"));
+#endif
+    argv.push_back("test");
+
+    try {
+        process(p.getPackageBuildDir(), argv);
+    } catch(const Glib::SpawnError& e) {
+        throw utils::InternalError(fmt(
+                _("Pkg error: test launch failed %1%")) % e.what());
+    }
+}
+
 void Package::build()
 {
     Path& p = utils::Path::path();

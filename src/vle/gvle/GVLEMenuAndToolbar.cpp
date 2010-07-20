@@ -80,6 +80,7 @@ const Glib::ustring GVLEMenuAndToolbar::UI_DEFINITION =
     "        <menu action='MenuProject'>"
     "            <menuitem action='ConfigureProject' />"
     "            <menuitem action='BuildProject' />"
+    "            <menuitem action='TestProject' />"
     "            <menuitem action='CleanProject' />"
     "            <menuitem action='CreateProjectPackage' />"
     "        </menu>"
@@ -326,6 +327,7 @@ void GVLEMenuAndToolbar::hideProjectMenu()
     m_refActionGroup->get_action("MenuProject")->set_sensitive(false);
     m_refActionGroup->get_action("ConfigureProject")->set_sensitive(false);
     m_refActionGroup->get_action("BuildProject")->set_sensitive(false);
+    m_refActionGroup->get_action("TestProject")->set_sensitive(false);
     m_refActionGroup->get_action("CleanProject")->set_sensitive(false);
     m_refActionGroup->get_action("CreateProjectPackage")->set_sensitive(false);
 }
@@ -335,6 +337,7 @@ void GVLEMenuAndToolbar::showProjectMenu()
     m_refActionGroup->get_action("MenuProject")->set_sensitive(true);
     m_refActionGroup->get_action("ConfigureProject")->set_sensitive(true);
     m_refActionGroup->get_action("BuildProject")->set_sensitive(true);
+    m_refActionGroup->get_action("TestProject")->set_sensitive(true);
     m_refActionGroup->get_action("CleanProject")->set_sensitive(true);
     m_refActionGroup->get_action("CreateProjectPackage")->set_sensitive(true);
 }
@@ -584,6 +587,10 @@ void GVLEMenuAndToolbar::createProjectActions()
 			    _("Build the project")),
 	Gtk::AccelKey("<control>b"),
 	sigc::mem_fun(mParent, &GVLE::buildProject));
+	m_refActionGroup->add(
+	Gtk::Action::create("TestProject", _("Test Project"),
+			    _("Test the project")),
+	sigc::mem_fun(mParent, &GVLE::testProject));
     m_refActionGroup->add(
 	Gtk::Action::create("CleanProject", _("Clean Project"),
 			    _("Clean the project")),

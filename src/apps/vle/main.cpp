@@ -94,6 +94,10 @@ void buildCommandLineList(int argc, char* argv[], manager::CmdArgs& lst)
                     Package::package().wait(std::cout, std::cerr);
                 }
                 stop = not Package::package().isSuccess();
+            } else if (strcmp(argv[i], "test") == 0) {
+                Package::package().test();
+                Package::package().wait(std::cout, std::cerr);
+                stop = not Package::package().isSuccess();
             } else if (strcmp(argv[i], "install") == 0) {
                 Package::package().install();
                 Package::package().wait(std::cout, std::cerr);

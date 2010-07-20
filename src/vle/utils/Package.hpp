@@ -67,6 +67,11 @@ namespace vle { namespace utils {
         void configure();
 
         /**
+         * @brief Launch unit test by running the 'make test' command.
+         */
+        void test();
+
+        /**
          * @brief Build the package by running the 'make all' command.
          */
         void build();
@@ -127,7 +132,7 @@ namespace vle { namespace utils {
 
         void addFile(const std::string& path, const std::string& name);
         void addDirectory(const std::string& path, const std::string& name);
-	void removeFile(const std::string& pathFile);
+        void removeFile(const std::string& pathFile);
         void renameFile(const std::string& oldFile, std::string& newName);
         void copyFile(const std::string& sourceFile, std::string& targetName);
 

@@ -1760,6 +1760,26 @@ void GVLE::buildProject()
         sigc::mem_fun(*this, &GVLE::packageBuildTimer), 250);
 }
 
+void GVLE::testProject()
+{
+    mLog->get_buffer()->insert(mLog->get_buffer()->end(),
+                               "test package\n");
+    getMenu()->hideProjectMenu();
+    try {
+        utils::Package::package().test();
+    } catch (const std::exception& e) {
+        getMenu()->showProjectMenu();
+        gvle::Error(e.what());
+        return;
+    } catch (const Glib::Exception& e) {
+        getMenu()->showProjectMenu();
+        gvle::Error(e.what());
+        return;
+    }
+    Glib::signal_timeout().connect(
+        sigc::mem_fun(*this, &GVLE::packageTimer), 250);
+}
+
 void GVLE::installProject()
 {
     mLog->get_buffer()->insert(mLog->get_buffer()->end(),
