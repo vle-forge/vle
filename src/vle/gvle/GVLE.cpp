@@ -712,8 +712,27 @@ void GVLE::setFileName(std::string name)
 
 void GVLE::insertLog(const std::string& text)
 {
-    mLog->get_buffer()->insert(
-	mLog->get_buffer()->end(), text);
+    if (not text.empty()) {
+        Glib::RefPtr < Gtk::TextBuffer > ref = mLog->get_buffer();
+        if (ref) {
+            ref->insert(ref->end(), text);
+        }
+    }
+}
+
+void GVLE::scrollLogToLastLine()
+{
+    Glib::RefPtr < Gtk::TextBuffer > ref = mLog->get_buffer();
+    if (ref) {
+        Glib::RefPtr < Gtk::TextMark > mark = ref->get_mark("end");
+        if (mark) {
+            ref->move_mark(mark, ref->end());
+        } else {
+            mark = ref->create_mark("end", ref->end());
+        }
+
+        mLog->scroll_to(mark, 0.0, 0.0, 1.0);
+    }
 }
 
 void GVLE::redrawView()
@@ -1345,18 +1364,11 @@ bool GVLE::packageTimer()
     std::string o, e;
     utils::Package::package().getOutputAndClear(o);
     utils::Package::package().getErrorAndClear(e);
+    Glib::RefPtr < Gtk::TextBuffer > ref = mLog->get_buffer();
 
-    if (not o.empty()) {
-        mLog->get_buffer()->insert(mLog->get_buffer()->end(), o);
-    }
-
-    if (not e.empty()) {
-        mLog->get_buffer()->insert(mLog->get_buffer()->end(), e);
-    }
-
-    Gtk::TextBuffer::iterator iter = mLog->get_buffer()->end();
-    mLog->get_buffer()->place_cursor(iter);
-    mLog->scroll_to(iter, 0.0, 0.0, 1.0);
+    insertLog(o);
+    insertLog(e);
+    scrollLogToLastLine();
 
     if (utils::Package::package().isFinish()) {
         getMenu()->showProjectMenu();
@@ -1372,17 +1384,9 @@ bool GVLE::packageBuildTimer()
     utils::Package::package().getOutputAndClear(o);
     utils::Package::package().getErrorAndClear(e);
 
-    if (not o.empty()) {
-        mLog->get_buffer()->insert(mLog->get_buffer()->end(), o);
-    }
-
-    if (not e.empty()) {
-        mLog->get_buffer()->insert(mLog->get_buffer()->end(), e);
-    }
-
-    Gtk::TextBuffer::iterator iter = mLog->get_buffer()->end();
-    mLog->get_buffer()->place_cursor(iter);
-    mLog->scroll_to(iter, 0.0, 0.0, 1.0);
+    insertLog(o);
+    insertLog(e);
+    scrollLogToLastLine();
 
     if (utils::Package::package().isFinish()) {
         if (utils::Package::package().isSuccess()) {
@@ -1390,6 +1394,7 @@ bool GVLE::packageBuildTimer()
         } else {
             getMenu()->showProjectMenu();
         }
+        scrollLogToLastLine();
         return false;
     } else {
         return true;
@@ -1398,8 +1403,7 @@ bool GVLE::packageBuildTimer()
 
 void GVLE::configureProject()
 {
-    mLog->get_buffer()->insert(mLog->get_buffer()->end(),
-                               "configure package\n");
+    insertLog("configure package\n");
     getMenu()->hideProjectMenu();
     try {
         utils::Package::package().configure();
@@ -1418,8 +1422,7 @@ void GVLE::configureProject()
 
 void GVLE::buildProject()
 {
-    mLog->get_buffer()->insert(mLog->get_buffer()->end(),
-                               "build package\n");
+    insertLog("build package\n");
     getMenu()->hideProjectMenu();
     try {
         utils::Package::package().build();
@@ -1438,8 +1441,7 @@ void GVLE::buildProject()
 
 void GVLE::testProject()
 {
-    mLog->get_buffer()->insert(mLog->get_buffer()->end(),
-                               "test package\n");
+    insertLog("test package\n");
     getMenu()->hideProjectMenu();
     try {
         utils::Package::package().test();
@@ -1458,8 +1460,7 @@ void GVLE::testProject()
 
 void GVLE::installProject()
 {
-    mLog->get_buffer()->insert(mLog->get_buffer()->end(),
-                               "build package\n");
+    insertLog("install package");
     getMenu()->hideProjectMenu();
     try {
         utils::Package::package().install();
@@ -1478,8 +1479,7 @@ void GVLE::installProject()
 
 void GVLE::cleanProject()
 {
-    mLog->get_buffer()->insert(mLog->get_buffer()->end(),
-                               "clean package\n");
+    insertLog("clean package\n");
     getMenu()->hideProjectMenu();
     try {
         utils::Package::package().clean();
@@ -1498,8 +1498,7 @@ void GVLE::cleanProject()
 
 void GVLE::packageProject()
 {
-    mLog->get_buffer()->insert(mLog->get_buffer()->end(),
-                               "make tarball\n");
+    insertLog("make source and binary packages\n");
     getMenu()->hideProjectMenu();
     try {
         utils::Package::package().pack();

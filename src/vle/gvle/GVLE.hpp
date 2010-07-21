@@ -149,6 +149,12 @@ public:
     void insertLog(const std::string& text);
 
     /**
+     * @brief For the Gtk::TextView log widget, move the Gtk::TextView to the
+     * last line of the Gtk::Buffer.
+     */
+    void scrollLogToLastLine();
+
+    /**
      * Redraw the VPZ view
      */
     void redrawView();
