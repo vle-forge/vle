@@ -158,5 +158,36 @@ BOOST_AUTO_TEST_CASE(modify_and_infinity)
         BOOST_REQUIRE_EQUAL(a, devs::Time::infinity);
         BOOST_REQUIRE_EQUAL(b, 1.0);
     }
-
 }
+
+BOOST_AUTO_TEST_CASE(prefix_and_postfix_operator)
+{
+    devs::Time a(1.0);
+
+    devs::Time b = a++;
+    BOOST_REQUIRE_EQUAL(a, 2.0);
+    BOOST_REQUIRE_EQUAL(b, 1.0);
+
+    ++a;
+    BOOST_REQUIRE_EQUAL(a, 3.0);
+
+    ++(++a);
+    BOOST_REQUIRE_EQUAL(a, 5.0);
+
+    (++a) = 7;
+    BOOST_REQUIRE_EQUAL(a, 7.0);
+
+    devs::Time c = a--;
+    BOOST_REQUIRE_EQUAL(a, 6.0);
+    BOOST_REQUIRE_EQUAL(c, 7.0);
+
+    --a;
+    BOOST_REQUIRE_EQUAL(a, 5.0);
+
+    --(--a);
+    BOOST_REQUIRE_EQUAL(a, 3.0);
+
+    (--a) = 0;
+    BOOST_REQUIRE_EQUAL(a, 0.0);
+}
+

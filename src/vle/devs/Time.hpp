@@ -216,11 +216,19 @@ public:
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-    inline void operator++()
+    inline Time operator++(int /*value*/)
+    {
+        Time t(*this);
+        ++(*this);
+        return t;
+    }
+
+    inline Time& operator++()
     {
         if (not isInfinity()) {
             ++m_value;
         }
+        return *this;
     }
 
     inline void operator+=(const Time& step)
@@ -245,7 +253,6 @@ public:
             m_value += step;
         }
     }
-
 
     inline Time operator+(const Time& step) const
     {
@@ -274,14 +281,20 @@ public:
         }
     }
 
-
-    inline void operator--()
+    inline Time operator--(int /*value*/)
     {
-        if (not isInfinity()) {
-            --m_value;
-        }
+        Time t(*this);
+        --(*this);
+        return t;
     }
 
+    inline Time& operator--()
+    {
+        if (not isNegativeInfinity()) {
+            --m_value;
+        }
+        return *this;
+    }
 
     inline void operator-=(const Time& step)
     {
