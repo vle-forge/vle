@@ -12,7 +12,7 @@ BEGIN
         BEGIN
             VALUE "Comments", "Published under the GNU GPL"
             VALUE "CompanyName", "VLE Development Team"
-            VALUE "FileDescription", "Output For VLE"
+            VALUE "FileDescription", "Output Of VLE"
             VALUE "FileVersion", "@VLE_VERSION@@VLE_EXTRA_VERSION@"
             VALUE "InternalName", "oov"
             VALUE "LegalCopyright", "2003-2010 VLE Development Team"
