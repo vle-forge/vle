@@ -1,3 +1,50 @@
+VLE 0.8.7
+=========
+
+* command line interface:
+  * add test command on package: It not possible to use a command $vle -P
+    pkg-name test in order to launch unit test. This patch has been done to do
+    so. The object Package.cpp Package.hpp are impacted by this. A function
+    test() has been added to the singleton Package. Several update are done to
+    add this feature in gvle.
+
+* extension:
+  * fsa:
+    * fix unit test in Statechart: without Boost::pool, the Statechart unit-test
+      failed. We fix the initialization of some variables and remove a conflict
+      between an enumeration and attribute variable.
+
+* gvle:
+ * fix the Gtk::TextView log scroll: The default behavior of the Gtk::TextView
+   log (shows the results of configure, build, test, clean and package commands)
+   is not effective. It does not scroll across the entire buffer. This patch
+   uses the Gtk::TextBuffer::Mark to store the last line changed and uses this
+   Mark to scroll effectively the Gtk::TextView.
+ * add a test command into the GVLE project menu.
+
+* oov
+  * add a on-the-fly output stream. By default, the oov file plug-in can only
+    use standard output at the end of the simulation. This approach cancels the
+    possibility of using tools which draws on-the-fly for instance Gnuplot with
+    scripts. We add a new oov plug-in which flush observation directly on the
+    standard output stream. The last line is used to show the column's name.
+    Parameters are:
+    - locale: used C by default, but can use the user's locale (`user') or a
+      specified locale (fr_FR).
+    - julian-day: to show a second column of time with a conversion of the
+      time into a julian date.
+    - header: to show (by default, header is hide) in the latest line of the
+      observation.
+
+* template:
+  * add unit test for the default template: This patch adds the unit tests
+    functionality to the template package.
+
+* win32:
+  * fix a bad word in the OOV file description: Replacement of the String
+    "Output For VLE" by "Output Of VLE" for the file /share/oov.rc.in.
+
+
 VLE 0.8.6
 =========
 
