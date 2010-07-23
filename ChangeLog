@@ -1,4 +1,109 @@
-vle-0.8.6
+vle-0.8.7
+
+commit 399975c1550b59cf1a635fe33b826961ade15871
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Thu Jul 22 22:20:29 2010 +0200
+
+    vle: update NEWS
+
+commit 0c6337a58d1f6d2f41d4bd9c468a06a1267ead3c
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Thu Jul 22 22:13:50 2010 +0200
+
+    vle: update AUTHORS
+
+commit 9209502499545634b944a76c27824cd4ff97a0e2
+Author: Jennifer Baudet <jennifer.baudet@toulouse.inra.fr>
+Date:   Thu Jul 22 18:34:20 2010 +0200
+
+    win32: fix a bad word in the OOV file description
+    
+    Replacement of the String "Output For VLE" by "Output Of VLE" for the
+    file /share/oov.rc.in.
+    
+    Signed-off-by: Gauthier Quesnel <quesnel@users.sourceforge.net>
+    (cherry picked from commit 2ddff2b56c4586d90ef10c68b6696d0887c0ece6)
+
+commit d4af7c56dc2b91a0843bd6030c5365a09e0c2f03
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Wed Jul 21 17:27:06 2010 +0200
+
+    template: add unit test for the default template
+    
+    This patch adds the unit tests functionality to the template package.
+    
+    - tests the existence of boost unit_test.
+    - prepares a directory 'test' in the root of the package.
+    (cherry picked from commit 9dccece8ee59c48cf6f4cfa61f095d30dbd5fb38)
+
+commit 0effedcf5fd74c0cb9b6e89482a9021a79769f33
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Wed Jul 21 15:30:24 2010 +0200
+
+    gvle: fix the Gtk::TextView log scroll
+    
+    The default behavior of the Gtk::TextView log (shows the results of
+    configure, build, test, clean and package commands) is not effective. It
+    does not scroll across the entire buffer. This patch uses the
+    Gtk::TextBuffer::Mark to store the last line changed and uses this Mark
+    to scroll effectively the Gtk::TextView.
+    
+    - add an effective scroll functionality.
+    - use insertLog function to reduce the source.
+    (cherry picked from commit f9cba87eb4af3c58bf120ed88c67db351e85c248)
+
+commit 563b9afa198e01a588cb955a7ada1c18a8b698bb
+Author: Mahuna Akplogan <makploga@users.sourceforge.net>
+Date:   Tue Jul 20 15:08:59 2010 +0200
+
+    utils: add test command on package
+    
+    It not possible to use a command $vle -P pkg-name test in order to
+    launch unit test. This patch has been done to do so. The object
+    Package.cpp Package.hpp are impacted by this. A function test() has been
+    added to the singleton Package. Several update are done to add this
+    feature in gvle. These update also impact gvle/GVLE.cpp gvle/GVLE.hpp
+    and gvle/GVLEMenuAndToolbar.cpp. (closes: #3031597).
+    
+    Signed-off-by: Gauthier Quesnel <quesnel@users.sourceforge.net>
+    (cherry picked from commit e70021f2be83803bbcb72ab671ee88dc204c4b14)
+
+commit 5d8d193c770b7727b87b73d9ec942573371a6e29
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Sun Jul 18 18:13:08 2010 +0200
+
+    oov: add a on-the-fly output stream
+    
+    By default, the oov file plug-in can only use standard output at the end
+    of the simulation. This approach cancels the possibility of using tools
+    which draws on-the-fly for instance Gnuplot with scripts. We add a new
+    oov plug-in which flush observation directly on the standard output
+    stream. The last line is used to show the column's name.
+    
+    Parameters are:
+    - locale: used C by default, but can use the user's locale (`user') or a
+      specified locale (fr_FR).
+    - julian-day: to show a second column of time with a conversion of the
+      time into a julian date.
+    - header: to show (by default, header is hide) in the latest line of the
+      observation.
+
+commit 52751f3d91776604fca049da0a779fd8106133de
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Tue Jul 6 16:53:16 2010 +0200
+
+    ext/fsa: fix unit test in Statechart
+    
+    Without Boost::pool, the Statechart unit-test failed. We fix the
+    initialization of some variables and remove a conflict between an
+    enumeration and attribute variable.
+    (cherry picked from commit e7524d025334afac1ccec4f1443129eb94c70770)
+
+commit 6c37cea2db3e4612ab080d7455c13609763767fc
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Tue Jun 29 10:56:42 2010 +0200
+
+    vle-0.8.6
 
 commit eeabc7cc8d9b09a49be8b994fe0ff55058685c11
 Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
