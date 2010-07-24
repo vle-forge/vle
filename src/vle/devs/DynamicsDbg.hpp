@@ -175,6 +175,7 @@ namespace vle { namespace devs {
 
     private:
         Dynamics* mDynamics;
+        std::string mName;
     };
 
 }} // namespace vle devs

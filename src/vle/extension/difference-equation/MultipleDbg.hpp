@@ -40,10 +40,10 @@ class MultipleDbg : public UserModel
 public:
     MultipleDbg(const devs::DynamicsInit& model,
                 const devs::InitEventList& events)
-        : UserModel(model, events)
+        : UserModel(model, events), mName(model.model().getCompleteName())
     {
         TraceExtension(fmt(_("                     %1% [DE] constructor"))
-                       % UserModel::getModelName());
+                       % mName);
     }
 
     virtual ~MultipleDbg() {}
@@ -51,24 +51,24 @@ public:
     virtual void compute(const vle::devs::Time& time)
     {
         TraceExtension(fmt(_("%1$20.10g %2% [DE] compute with: %3%"))
-                       % time % UserModel::getModelName() % traceVariables());
+                       % time % mName % traceVariables());
 
         UserModel::compute(time);
 
         TraceExtension(fmt(_("                .... %1% [DE] compute returns "
-                             "%2%")) % UserModel::getModelName()
+                             "%2%")) % mName
                        % traceInternalVariables());
     }
 
     virtual void initValue(const vle::devs::Time& time)
     {
         TraceExtension(fmt(_("%1$20.10g %2% [DE] initValue with: %3%"))
-                       % time % UserModel::getModelName() % traceVariables());
+                       % time % mName % traceVariables());
 
         UserModel::initValue(time);
 
         TraceExtension(fmt(_("                .... %1% [DE] initValue "
-                             "returns %2%")) % UserModel::getModelName() %
+                             "returns %2%")) % mName %
                        traceInternalVariables());
     }
 
@@ -126,6 +126,7 @@ private:
         return line;
     }
 
+    std::string mName;
 };
 
 }}} // namespace vle extension DifferenceEquation

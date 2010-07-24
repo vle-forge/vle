@@ -73,7 +73,8 @@ BOOST_AUTO_TEST_CASE(test_rename_model)
     BOOST_REQUIRE_NO_THROW(graph::Model::rename(top1, "new_top1"));
 }
 
-BOOST_AUTO_TEST_CASE(test_findModelFromPath){
+BOOST_AUTO_TEST_CASE(test_findModelFromPath)
+{
     vpz::Vpz file(utils::Path::path().getExampleFile("unittest.vpz"));
     Model* d = file.project().model().model()->findModelFromPath("d");
     bool found = (d != 0);
@@ -763,4 +764,19 @@ BOOST_AUTO_TEST_CASE(test_atomic_model_source_3)
 
     top2->getAtomicModelsSource("in", result);
     BOOST_REQUIRE_EQUAL(result.size(), (size_t)1);
+}
+
+BOOST_AUTO_TEST_CASE(test_name)
+{
+    vpz::Vpz file(utils::Path::path().getExampleFile("unittest.vpz"));
+    Model *a, *b;
+
+    a = file.project().model().model()->findModelFromPath("top2,g");
+    b = file.project().model().model()->findModelFromPath("top1,x");
+
+    BOOST_REQUIRE(a);
+    BOOST_REQUIRE(b);
+
+    BOOST_REQUIRE_EQUAL(a->getCompleteName(), "top,top2,g");
+    BOOST_REQUIRE_EQUAL(b->getCompleteName(), "top,top1,x");
 }

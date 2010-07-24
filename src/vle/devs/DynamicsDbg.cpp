@@ -34,48 +34,48 @@ namespace vle { namespace devs {
 
 DynamicsDbg::DynamicsDbg(const DynamicsInit& init,
                          const InitEventList& events)
-    : Dynamics(init, events), mDynamics(0)
+    : Dynamics(init, events), mDynamics(0),
+    mName(init.model().getCompleteName())
 {
-    TraceDevs(fmt(_("                     %1% [DEVS] constructor")) %
-              getModelName()); }
+    TraceDevs(fmt(_("                     %1% [DEVS] constructor")) % mName); }
 
 Time DynamicsDbg::init(const Time& time)
 {
-    TraceDevs(fmt(_("%1$20.10g %2% [DEVS] init")) % time % getModelName());
+    TraceDevs(fmt(_("%1$20.10g %2% [DEVS] init")) % time % mName);
 
     Time duration(mDynamics->init(time));
 
     TraceDevs(fmt(_("                .... %1% [DEVS] init returns %2%")) %
-              getModelName() % duration);
+              mName % duration);
 
     return duration;
 }
 
 void DynamicsDbg::output(const Time& time, ExternalEventList& output) const
 {
-    TraceDevs(fmt(_("%1$20.10g %2% [DEVS] output")) % time % getModelName());
+    TraceDevs(fmt(_("%1$20.10g %2% [DEVS] output")) % time % mName);
 
     mDynamics->output(time, output);
 
     if (output.empty()) {
         TraceDevs(fmt(
                 _("                .... %1% [DEVS] output returns "
-                  "empty output")) % getModelName());
+                  "empty output")) % mName);
     } else {
         TraceDevs(fmt(
                 _("                .... %1% [DEVS] output returns "
-                  "%2%")) % getModelName() % output);
+                  "%2%")) % mName % output);
     }
 }
 
 Time DynamicsDbg::timeAdvance() const
 {
-    TraceDevs(fmt(_("                     %1% [DEVS] ta")) % getModelName());
+    TraceDevs(fmt(_("                     %1% [DEVS] ta")) % mName);
 
     Time time(mDynamics->timeAdvance());
 
     TraceDevs(fmt(_("                .... %1% [DEVS] ta returns %2%")) %
-              getModelName() % time);
+              mName % time);
 
     return time;
 }
@@ -83,7 +83,7 @@ Time DynamicsDbg::timeAdvance() const
 void DynamicsDbg::internalTransition(const Time& time)
 {
     TraceDevs(fmt(_("%1$20.10g %2% [DEVS] internal transition")) % time %
-              getModelName());
+              mName);
 
     mDynamics->internalTransition(time);
 }
@@ -92,7 +92,7 @@ void DynamicsDbg::externalTransition(const ExternalEventList& event,
                                      const Time& time)
 {
     TraceDevs(fmt(_("%1$20.10g %2% [DEVS] external transition: [%3%]")) % time
-              % getModelName() % event);
+              % mName % event);
 
     mDynamics->externalTransition(event, time);
 }
@@ -103,7 +103,7 @@ void DynamicsDbg::confluentTransitions(
 {
     TraceDevs(fmt(
             _("%1$20.10g %2% [DEVS] confluent transition: [%3%]")) % time %
-        getModelName() % extEventlist);
+        mName % extEventlist);
 
     mDynamics->confluentTransitions(time, extEventlist);
 }
@@ -113,18 +113,18 @@ void DynamicsDbg::request(const RequestEvent& event,
                           ExternalEventList& output) const
 {
     TraceDevs(fmt(_("%1$20.10g %2% [DEVS] request: [%3%]")) % time %
-              getModelName() % event);
+              mName % event);
 
     mDynamics->request(event, time, output);
 
     if (output.empty()) {
         TraceDevs(fmt(
                 _("                .... %1% [DEVS] request returns empty "
-                  "output")) % getModelName());
+                  "output")) % mName);
     } else {
         TraceDevs(fmt(
                 _("                .... %1% [DEVS] request returns %2%")) %
-            getModelName() % output);
+            mName % output);
     }
 }
 
@@ -132,14 +132,14 @@ vle::value::Value* DynamicsDbg::observation(
     const ObservationEvent& event) const
 {
     TraceDevs(fmt(_("%1$20.10g %2% [DEVS] observation: [%3%]")) %
-              event.getTime() % getModelName() % event);
+              event.getTime() % mName % event);
 
     return mDynamics->observation(event);
 }
 
 void DynamicsDbg::finish()
 {
-    TraceDevs(fmt(_("                     %1% [DEVS] finish")) % getModelName());
+    TraceDevs(fmt(_("                     %1% [DEVS] finish")) % mName);
 
     mDynamics->finish();
 }

@@ -195,6 +195,30 @@ std::string Model::getParentName() const
     return result;
 }
 
+std::string Model::getCompleteName() const
+{
+    std::list < const Model* > stack;
+    std::list < const Model* >::iterator it, jt;
+    std::string result;
+
+    stack.push_back(this);
+
+    while (stack.front()->getParent()) {
+        stack.push_front(stack.front()->getParent());
+    }
+
+    it = stack.begin();
+    while (it != stack.end()) {
+        result += (*it)->getName();
+        jt = it++;
+        if (it != stack.end()) {
+            result += ',';
+        }
+    }
+
+    return result;
+}
+
 void Model::getParents(CoupledModelVector& parents) const
 {
     CoupledModel* parent = m_parent;

@@ -163,6 +163,17 @@ namespace vle { namespace graph {
         std::string getParentName() const;
 
         /**
+         * @brief Build an std::string from the model's parent names and the
+         * name of the model.
+         * @code
+         * top model,coupled model,a
+         * @endcode
+         *
+         * @return Return the complete name of the model.
+         */
+        std::string getCompleteName() const;
+
+        /**
          * @brief Build a list of coupled model parents. The first model in the
          * vector is the direct parent of model.
          * @param parents A output vector.

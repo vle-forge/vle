@@ -40,10 +40,10 @@ class GenericDbg : public UserModel
 public:
     GenericDbg(const devs::DynamicsInit& model,
                const devs::InitEventList& events)
-        : UserModel(model, events)
+        : UserModel(model, events), mName(model.model().getCompleteName())
     {
         TraceExtension(fmt(_("                     %1% [DE] constructor"))
-                       % UserModel::getModelName());
+                       % mName);
     }
 
     virtual ~GenericDbg() {}
@@ -51,12 +51,12 @@ public:
     virtual double compute(const vle::devs::Time& time)
     {
         TraceExtension(fmt(_("%1$20.10g %2% [DE] compute with: %3%"))
-                       % time % UserModel::getModelName() % traceVariables());
+                       % time % mName % traceVariables());
 
         double result = UserModel::compute(time);
 
         TraceExtension(fmt(_("                .... %1% [DE] compute returns "
-                             "%2%")) % UserModel::getModelName() % result);
+                             "%2%")) % mName % result);
 
         return result;
     }
@@ -64,12 +64,12 @@ public:
     virtual double initValue(const vle::devs::Time& time)
     {
         TraceExtension(fmt(_("%1$20.10g %2% [DE] initValue with: %3%"))
-                       % time % UserModel::getModelName() % traceVariables());
+                       % time % mName % traceVariables());
 
         double result = UserModel::initValue(time);
 
         TraceExtension(fmt(_("                .... %1% [DE] initValue "
-                             "returns %2%")) % UserModel::getModelName() %
+                             "returns %2%")) % mName %
                        result);
 
         return result;
@@ -108,6 +108,8 @@ private:
         }
         return line;
     }
+
+    std::string mName;
 };
 
 }}} // namespace vle extension DifferenceEquation
