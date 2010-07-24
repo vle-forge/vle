@@ -62,7 +62,7 @@ IF (VLE_HAVE_BOOST_SPIRIT2)
     decision/Agent.hpp decision/Facts.hpp decision/KnowledgeBase.hpp
     decision/Parser.hpp decision/PrecedenceConstraint.hpp
     decision/PrecedencesGraph.hpp decision/Predicates.hpp decision/Rule.hpp
-    decision/Rules.hpp)
+    decision/Rules.hpp decision/Table.hpp)
 ELSE (VLE_HAVE_BOOST_SPIRIT2)
   SET(EXT_DECISION_CPP decision/Activities.cpp decision/Activity.cpp
     decision/Agent.cpp decision/KnowledgeBase.cpp
@@ -72,7 +72,8 @@ ELSE (VLE_HAVE_BOOST_SPIRIT2)
   SET(EXT_DECISION_HPP decision/Activities.hpp decision/Activity.hpp
     decision/Agent.hpp decision/Facts.hpp decision/KnowledgeBase.hpp
     decision/PrecedenceConstraint.hpp decision/PrecedencesGraph.hpp
-    decision/Predicates.hpp decision/Rule.hpp decision/Rules.hpp)
+    decision/Predicates.hpp decision/Rule.hpp decision/Rules.hpp
+    decision/Table.hpp)
 ENDIF (VLE_HAVE_BOOST_SPIRIT2)
 
 ADD_LIBRARY(vleextension SHARED ${EXTENSION_HPP};${EXTENSION_CPP};
