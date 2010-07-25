@@ -78,25 +78,49 @@ different license. Check the headers for the copyright info.
 Installation
 ------------
 
-The following commands configure, build and install VLE into your account:
+Several approaches are possible:
 
-$ tar zxf vle-0.9.0.tar.gz
-or
-$ git clone git://vle.git.sourceforge.net/gitroot/vle/vle
+1. The following commands configure and build a package for your distribution,
+   the best way to use VLE:
 
-$ cd vle
-$ mkdir build
-$ cd build
-$ cmake -DCMAKE_INSTALL_PREFIX=$HOME/usr -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
-$ make
-$ make install
+  $ tar zxf vle-0.9.0.tar.gz
+  or
+  $ git clone git://vle.git.sourceforge.net/gitroot/vle/vle
 
-Add the following line into your bashrc (if you use bash as shell).:
+  $ cd vle
+  $ mkdir build
+  $ cd build
+  $ cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+  $ make
 
-export PATH=$PATH:$HOME/usr/bin
-export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HOME/usr/lib/pkgconfig
-export LD_LIBRARY_PATH=$LD_LIRABRY_PATH:$HOME/usr/lib
-export MANPATH=$HOME/usr/share/man
+  $ # for deb distribution (debian, ubuntu etc.)
+  $ cpack -G DEB
+  $ dpkg -i vle-0.8.7-Linux-i686.deb
+
+  $ # for rpm distribution (redhat, mandrike, suse etc.)
+  $ cpack -G RPM
+  $ rpm -i vle-0.8.7-Linux-i686.rpm
+
+2. The following commands configure, build and install VLE into your account
+   ($HOME directory):
+
+  $ tar zxf vle-0.9.0.tar.gz
+  or
+  $ git clone git://vle.git.sourceforge.net/gitroot/vle/vle
+
+  $ cd vle
+  $ mkdir build
+  $ cd build
+  $ cmake -DCMAKE_INSTALL_PREFIX=$HOME/usr -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+  $ make
+  $ make install
+
+  Add the following line into your bashrc (if you use bash as shell).:
+
+  export PATH=$PATH:$HOME/usr/bin
+  export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HOME/usr/lib/pkgconfig
+  export LD_LIBRARY_PATH=$LD_LIRABRY_PATH:$HOME/usr/lib
+  export MANPATH=$HOME/usr/share/man
 
 
 Usage
