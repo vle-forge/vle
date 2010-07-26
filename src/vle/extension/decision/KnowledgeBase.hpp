@@ -41,6 +41,7 @@ typedef Table < Fact > FactsTable;
 typedef Table < Predicate > PredicatesTable;
 typedef Table < Activity::AckFct > AcknowledgeFunctions;
 typedef Table < Activity::OutFct > OutputFunctions;
+typedef Table < Activity::UpdateFct > UpdateFunctions;
 
 inline std::ostream& operator<<(std::ostream& o, const FactsTable& kb)
 {
@@ -95,6 +96,17 @@ struct a
     F func;
 };
 
+template < typename F >
+struct u
+{
+    u(const std::string& name, F func)
+        : name(name), func(func)
+    {}
+
+    std::string name;
+    F func;
+};
+
 template < typename X >
 struct AddFacts
 {
@@ -124,6 +136,14 @@ template < typename X >
 struct AddAcknowledgeFunctions
 {
     AddAcknowledgeFunctions(X kb) : kb(kb) {}
+
+    X kb;
+};
+
+template < typename X >
+struct AddUpdateFunctions
+{
+    AddUpdateFunctions(X kb) : kb(kb) {}
 
     X kb;
 };
@@ -375,6 +395,13 @@ public:
     { return mAckFunctions; }
 
     /**
+     * @brief Get the table of available update functions.
+     * @return Table of available update functions.
+     */
+    const UpdateFunctions& updateFunctions() const
+    { return mUpdateFunctions; }
+
+    /**
      * @brief Get the table of available output functions;
      * @return Table of available output functions.
      */
@@ -403,6 +430,12 @@ public:
      * @return Table of available output functions.
      */
     OutputFunctions& outputFunctions() { return mOutFunctions; }
+
+    /**
+     * @brief Get the table of available update functions.
+     * @return Table of available update functions.
+     */
+    UpdateFunctions& updateFunctions() { return mUpdateFunctions; }
 
     template < typename X >
         AddFacts < X > addFacts(X obj)
@@ -452,6 +485,18 @@ public:
             return a < X >(name, func);
         }
 
+    template < typename X >
+        AddUpdateFunctions < X > addUpdateFunctions(X obj)
+        {
+            return AddUpdateFunctions < X >(obj);
+        }
+
+    template < typename X >
+        u < X > U(const std::string& name, X func)
+        {
+            return u < X >(name, func);
+        }
+
 private:
     Rules m_rules;
     Activities m_activities;
@@ -460,6 +505,7 @@ private:
     PredicatesTable mPredicatesTable;
     AcknowledgeFunctions mAckFunctions;
     OutputFunctions mOutFunctions;
+    UpdateFunctions mUpdateFunctions;
 
     static void unionLists(Activities::result_t& last,
                            Activities::result_t& recent);
@@ -529,6 +575,23 @@ AddOutputFunctions < X > operator,(AddOutputFunctions < X > add,
     return add;
 }
 
+template < typename X, typename F >
+AddUpdateFunctions < X > operator+=(AddUpdateFunctions < X > add,
+                                    u < F > pred)
+{
+    add.kb->updateFunctions().add(pred.name,
+                                  boost::bind(pred.func, add.kb, _1, _2));
+    return add;
+}
+
+template < typename X, typename F >
+AddUpdateFunctions < X > operator,(AddUpdateFunctions < X > add,
+                                   u < F > pred)
+{
+    add.kb->updateFunctions().add(pred.name,
+                                  boost::bind(pred.func, add.kb, _1, _2));
+    return add;
+}
 
 inline std::ostream& operator<<(std::ostream& o, const KnowledgeBase& kb)
 {

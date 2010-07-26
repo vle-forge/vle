@@ -407,6 +407,10 @@ Activities::process(const devs::Time& time)
                 isUpdated = true;
             }
 
+            if (update.first) {
+                activity->second.update(activity->first);
+            }
+
             if (update.second != time and
                 update.second != devs::Time::negativeInfinity) {
                 nextDate = std::min(nextDate, update.second);

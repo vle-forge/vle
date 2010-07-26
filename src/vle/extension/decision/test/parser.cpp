@@ -54,11 +54,11 @@ class KnowledgeBase : public vmd::KnowledgeBase
 {
 public:
     KnowledgeBase()
-        : vmd::KnowledgeBase()
+        : vmd::KnowledgeBase(), mNbUpdate(0), mNbAck(0), mNbOut(0)
     {
         addFacts(this) +=
-            F("fact 1", &KnowledgeBase::update),
-            F("fact 2", &KnowledgeBase::update);
+            F("fact 1", &KnowledgeBase::updateFact1),
+            F("fact 2", &KnowledgeBase::updateFact2);
 
         addPredicates(this) +=
             P("pred 1", &KnowledgeBase::isAlwaysTrue),
@@ -74,27 +74,58 @@ public:
 
         addAcknowledgeFunctions(this) +=
             A("ack function", &KnowledgeBase::ack);
+
+        addUpdateFunctions(this) +=
+            U("update function", &KnowledgeBase::update);
     }
 
     virtual ~KnowledgeBase() {}
 
-    void update(const value::Value&)
+    void updateFact1(const value::Value&)
+    {
+    }
+
+    void updateFact2(const value::Value&)
     {
     }
 
     void ack(const std::string&, const Activity&)
     {
+        mNbAck++;
     }
 
     void out(const std::string&, const Activity&,
              vle::devs::ExternalEventList&)
     {
+        mNbOut++;
+    }
+
+    void update(const std::string&, const Activity&)
+    {
+        mNbUpdate++;
     }
 
     bool isAlwaysTrue() const
     {
         return true;
     }
+
+    int getNumberOfUpdate() const
+    {
+        return mNbUpdate;
+    }
+
+    int getNumberOfAck() const
+    {
+        return mNbAck;
+    }
+
+    int getNumberOfOut() const
+    {
+        return mNbOut;
+    }
+
+    int mNbUpdate, mNbAck, mNbOut;
 };
 
 
@@ -216,8 +247,7 @@ BOOST_AUTO_TEST_CASE(parser)
     vmd::ex::KnowledgeBase b;
     vmd::Parser parser(b, vmd::ex::Plan1);
 
-    BOOST_REQUIRE_EQUAL(b.activities().size(),
-                        (vmd::Activities::size_type)4);
+    BOOST_REQUIRE_EQUAL(b.activities().size(), (vmd::Activities::size_type)4);
 }
 #else
 BOOST_AUTO_TEST_CASE(parser)

@@ -50,6 +50,10 @@ public:
               const Activity&,
               vle::devs::ExternalEventList&) > OutFct;
 
+    typedef boost::function <
+        void (const std::string&,
+              const Activity&) > UpdateFct;
+
     /** Defines the state of the temporal constraints. You can use multiple
      * value for a same DateType by combining the with operator|. For
      * instance:
@@ -94,6 +98,11 @@ public:
         m_done(devs::Time::negativeInfinity)
     {}
 
+    //
+    // Slot functions to acknowledge an change of state, to send and output or
+    // to update the state of an activity.
+    //
+
     /**
      * @brief Assign an acknowledge function to this activity.
      * @param fct An acknowledge function.
@@ -123,6 +132,24 @@ public:
     void output(const std::string& name,
                 devs::ExternalEventList& events)
     { if (mOutFct) { mOutFct(name, *this, events); } }
+
+    /**
+     * @brief Assign an update function to this activity.
+     * @param fct An update function.
+     */
+    void addUpdateFunction(const UpdateFct& fct)
+    { mUpdateFct = fct; }
+
+    /**
+     * @brief Call the update function if it exists.
+     * @param name The name of the activity.
+     */
+    void update(const std::string& name)
+    { if (mUpdateFct) { mUpdateFct(name, *this); } }
+
+    //
+    // Settings the activity.
+    //
 
     void addRule(const std::string& name, const Rule& rule)
     { m_rules.add(name, rule); }
@@ -238,6 +265,7 @@ private:
 
     AckFct mAckFct;
     OutFct mOutFct;
+    UpdateFct mUpdateFct;
 };
 
 inline std::ostream& operator<<(
