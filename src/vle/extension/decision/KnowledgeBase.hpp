@@ -27,11 +27,12 @@
 
 
 #ifndef VLE_EXTENSION_DECISION_KNOWLEDGEBASE_HPP
-#define VLE_EXTENSION_DECISION_KNOWLEDGEBASE_HPP
+#define VLE_EXTENSION_DECISION_KNOWLEDGEBASE_HPP 1
 
-#include <vle/extension/decision/Facts.hpp>
-#include <vle/extension/decision/Rules.hpp>
 #include <vle/extension/decision/Activities.hpp>
+#include <vle/extension/decision/Facts.hpp>
+#include <vle/extension/decision/Library.hpp>
+#include <vle/extension/decision/Rules.hpp>
 #include <vle/extension/decision/Table.hpp>
 #include <vle/extension/DllDefines.hpp>
 
@@ -497,6 +498,30 @@ public:
             return u < X >(name, func);
         }
 
+    //
+    // Manage the plan library.
+    //
+
+    /**
+     * @brief Get a constant reference to the plan Library.
+     * @return A constant reference.
+     */
+    const Library& library() const { return mLibrary; }
+
+    /**
+     * @brief Get a reference to the plan Library.
+     * @return A reference.
+     */
+    Library& library() { return mLibrary; }
+
+    /**
+     * @brief Merge the specified Plan `name' from the Library with the current
+     * KnowledgeBase.
+     *
+     * @param name The name of the Plan to merge.
+     */
+    void instantiatePlan(const std::string& name);
+
 private:
     Rules m_rules;
     Activities m_activities;
@@ -506,6 +531,9 @@ private:
     AcknowledgeFunctions mAckFunctions;
     OutputFunctions mOutFunctions;
     UpdateFunctions mUpdateFunctions;
+
+    Library mLibrary; /**< The plan library. It stocks all plans availabled for
+                        this decision knowledge base. */
 
     static void unionLists(Activities::result_t& last,
                            Activities::result_t& recent);

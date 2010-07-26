@@ -52,29 +52,16 @@ SET(EXT_DIFFERENTIAL_EQUATION_HPP differential-equation/DifferentialEquation.hpp
   differential-equation/DESS.hpp differential-equation/QSS.hpp
   differential-equation/QSS2.hpp)
 
-IF (VLE_HAVE_BOOST_SPIRIT2)
-  SET(EXT_DECISION_CPP decision/Activities.cpp decision/Activity.cpp
-    decision/Agent.cpp decision/KnowledgeBase.cpp decision/Parser.cpp
-    decision/PrecedenceConstraint.cpp decision/PrecedencesGraph.cpp
-    decision/Predicates.cpp decision/Rules.cpp)
+SET(EXT_DECISION_CPP decision/Activities.cpp decision/Activity.cpp
+  decision/Agent.cpp decision/KnowledgeBase.cpp decision/Library.cpp
+  decision/Parser.cpp decision/PrecedenceConstraint.cpp
+  decision/PrecedencesGraph.cpp decision/Predicates.cpp decision/Rules.cpp)
 
-  SET(EXT_DECISION_HPP decision/Activities.hpp decision/Activity.hpp
-    decision/Agent.hpp decision/Facts.hpp decision/KnowledgeBase.hpp
-    decision/Parser.hpp decision/PrecedenceConstraint.hpp
-    decision/PrecedencesGraph.hpp decision/Predicates.hpp decision/Rule.hpp
-    decision/Rules.hpp decision/Table.hpp)
-ELSE (VLE_HAVE_BOOST_SPIRIT2)
-  SET(EXT_DECISION_CPP decision/Activities.cpp decision/Activity.cpp
-    decision/Agent.cpp decision/KnowledgeBase.cpp
-    decision/PrecedenceConstraint.cpp decision/PrecedencesGraph.cpp
-    decision/Predicates.cpp decision/Rules.cpp)
-
-  SET(EXT_DECISION_HPP decision/Activities.hpp decision/Activity.hpp
-    decision/Agent.hpp decision/Facts.hpp decision/KnowledgeBase.hpp
-    decision/PrecedenceConstraint.hpp decision/PrecedencesGraph.hpp
-    decision/Predicates.hpp decision/Rule.hpp decision/Rules.hpp
-    decision/Table.hpp)
-ENDIF (VLE_HAVE_BOOST_SPIRIT2)
+SET(EXT_DECISION_HPP decision/Activities.hpp decision/Activity.hpp
+  decision/Agent.hpp decision/Facts.hpp decision/KnowledgeBase.hpp
+  decision/Library.hpp decision/Parser.hpp decision/PrecedenceConstraint.hpp
+  decision/PrecedencesGraph.hpp decision/Predicates.hpp decision/Rule.hpp
+  decision/Rules.hpp decision/Table.hpp)
 
 ADD_LIBRARY(vleextension SHARED ${EXTENSION_HPP};${EXTENSION_CPP};
   ${EXT_DECISION_HPP};${EXT_DECISION_CPP};${EXT_FSA_HPP};${EXT_FSA_CPP}

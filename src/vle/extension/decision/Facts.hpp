@@ -27,7 +27,7 @@
 
 
 #ifndef VLE_EXTENSION_DECISION_FACTS_HPP
-#define VLE_EXTENSION_DECISION_FACTS_HPP
+#define VLE_EXTENSION_DECISION_FACTS_HPP 1
 
 #include <vle/extension/DllDefines.hpp>
 #include <vle/value/Value.hpp>

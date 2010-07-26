@@ -95,6 +95,30 @@ public:
     }
 
     /**
+     * @brief Get an iterator from the list.
+     *
+     * @param name The key to find.
+     *
+     * @return An iterator.
+     */
+    iterator find(const std::string& name)
+    {
+        return mLst.find(name);
+    }
+
+    /**
+     * @brief Get a constant iterator from the list.
+     *
+     * @param name The key to find.
+     *
+     * @return A constant iterator.
+     */
+    const_iterator find(const std::string& name) const
+    {
+        return mLst.find(name);
+    }
+
+    /**
      * @brief Get an iterator to the value_type referenced by the key.
      *
      * @param name The key to find.

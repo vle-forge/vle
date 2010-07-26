@@ -27,7 +27,7 @@
 
 
 #ifndef VLE_EXTENSION_DECISION_ACTIVITY_HPP
-#define VLE_EXTENSION_DECISION_ACTIVITY_HPP
+#define VLE_EXTENSION_DECISION_ACTIVITY_HPP 1
 
 #include <vle/extension/decision/Rules.hpp>
 #include <vle/extension/DllDefines.hpp>

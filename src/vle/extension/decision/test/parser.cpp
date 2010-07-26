@@ -41,8 +41,6 @@
 #include <vle/value/Double.hpp>
 #include <vle/extension/Decision.hpp>
 
-#ifdef VLE_HAVE_BOOST_SPIRIT2
-
 namespace vmd = vle::extension::decision;
 namespace vd = vle::devs;
 using vle::fmt;
@@ -245,12 +243,8 @@ BOOST_AUTO_TEST_CASE(parser)
     vle::value::init();
 
     vmd::ex::KnowledgeBase b;
-    vmd::Parser parser(b, vmd::ex::Plan1);
+    b.library().add("main", std::string(vmd::ex::Plan1));
+    b.instantiatePlan("main");
 
     BOOST_REQUIRE_EQUAL(b.activities().size(), (vmd::Activities::size_type)4);
 }
-#else
-BOOST_AUTO_TEST_CASE(parser)
-{
-}
-#endif

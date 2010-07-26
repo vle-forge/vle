@@ -27,7 +27,15 @@
 
 
 #include <vle/extension/decision/Parser.hpp>
+#include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
+#include <vector>
+#include <string>
+#include <sstream>
+#include <iterator>
+
+#ifdef VLE_HAVE_BOOST_SPIRIT2
+
 #include <boost/spirit/include/qi.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
@@ -35,25 +43,21 @@
 #include <boost/spirit/include/phoenix_fusion.hpp>
 #include <boost/spirit/include/phoenix_stl.hpp>
 #include <boost/spirit/include/support_multi_pass.hpp>
-#include <vector>
-#include <string>
-#include <sstream>
-#include <iterator>
 
 BOOST_FUSION_ADAPT_STRUCT(
-    vle::extension::decision::Parser::Rules,
-    (std::vector < vle::extension::decision::Parser::Rule >, rules)
+    vle::extension::decision::RulesToken,
+    (std::vector < vle::extension::decision::RuleToken >, rules)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    vle::extension::decision::Parser::Rule,
+    vle::extension::decision::RuleToken,
     (std::string, id)
     (std::vector < std::string >, predicates)
 )
 
 
 BOOST_FUSION_ADAPT_STRUCT(
-    vle::extension::decision::Parser::Temporal,
+    vle::extension::decision::TemporalToken,
     (double, start)
     (double, finish)
     (double, minstart)
@@ -64,21 +68,21 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    vle::extension::decision::Parser::Activity,
+    vle::extension::decision::ActivityToken,
     (std::string, id)
     (std::vector < std::string >, rules)
-    (vle::extension::decision::Parser::Temporal, temporal)
+    (vle::extension::decision::TemporalToken, temporal)
     (std::string, ack)
     (std::string, output)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    vle::extension::decision::Parser::Activities,
-    (std::vector < vle::extension::decision::Parser::Activity >, activities)
+    vle::extension::decision::ActivitiesToken,
+    (std::vector < vle::extension::decision::ActivityToken >, activities)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    vle::extension::decision::Parser::Precedence,
+    vle::extension::decision::PrecedenceToken,
     (int, type)
     (std::string, first)
     (std::string, second)
@@ -87,15 +91,15 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    vle::extension::decision::Parser::Precedences,
-    (std::vector < vle::extension::decision::Parser::Precedence >, precedences)
+    vle::extension::decision::PrecedencesToken,
+    (std::vector < vle::extension::decision::PrecedenceToken >, precedences)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    vle::extension::decision::Parser::Plan,
-    (vle::extension::decision::Parser::Rules, rules)
-    (vle::extension::decision::Parser::Activities, activities)
-    (vle::extension::decision::Parser::Precedences, precedences)
+    vle::extension::decision::PlanToken,
+    (vle::extension::decision::RulesToken, rules)
+    (vle::extension::decision::ActivitiesToken, activities)
+    (vle::extension::decision::PrecedencesToken, precedences)
 )
 
 namespace vle { namespace extension { namespace decision {
@@ -138,7 +142,7 @@ struct WhiteSpace :
 template < typename Iterator >
 struct PlanGrammar :
     boost::spirit::qi::grammar < Iterator,
-    vle::extension::decision::Parser::Plan(), WhiteSpace < Iterator > >
+    vle::extension::decision::PlanToken(), WhiteSpace < Iterator > >
 {
     typedef WhiteSpace < Iterator > WhiteSpaceT;
 
@@ -325,54 +329,44 @@ struct PlanGrammar :
     }
 
     boost::spirit::qi::rule < Iterator,
-        vle::extension::decision::Parser::Plan(), WhiteSpaceT > planToken;
+        vle::extension::decision::PlanToken(), WhiteSpaceT > planToken;
     boost::spirit::qi::rule < Iterator,
-        vle::extension::decision::Parser::Rules(), WhiteSpaceT > rulesToken;
+        vle::extension::decision::RulesToken(), WhiteSpaceT > rulesToken;
     boost::spirit::qi::rule < Iterator,
-        vle::extension::decision::Parser::Rule(), WhiteSpaceT > ruleToken;
+        vle::extension::decision::RuleToken(), WhiteSpaceT > ruleToken;
     boost::spirit::qi::rule < Iterator,
-        vle::extension::decision::Parser::Activities(), WhiteSpaceT >
+        vle::extension::decision::ActivitiesToken(), WhiteSpaceT >
             activitiesToken;
     boost::spirit::qi::rule < Iterator,
-        vle::extension::decision::Parser::Activity(), WhiteSpaceT >
+        vle::extension::decision::ActivityToken(), WhiteSpaceT >
             activityToken;
     boost::spirit::qi::rule < Iterator,
-        vle::extension::decision::Parser::Temporal(), WhiteSpaceT >
+        vle::extension::decision::TemporalToken(), WhiteSpaceT >
             temporalToken;
     boost::spirit::qi::rule < Iterator,
-        vle::extension::decision::Parser::Precedences(), WhiteSpaceT >
+        vle::extension::decision::PrecedencesToken(), WhiteSpaceT >
             precedencesToken;
     boost::spirit::qi::rule < Iterator,
-        vle::extension::decision::Parser::Precedence(), WhiteSpaceT >
+        vle::extension::decision::PrecedenceToken(), WhiteSpaceT >
             precedenceToken;
     boost::spirit::qi::rule < Iterator, std::string(), WhiteSpaceT >
         stringToken;
 };
 
-Parser::Parser(KnowledgeBase& kb, const std::string& buffer) : mKb(kb)
+Parser::Parser(const std::string& buffer)
 {
     std::string::const_iterator begin = buffer.begin();
     std::string::const_iterator end = buffer.end();
     PlanGrammar < std::string::const_iterator > pl;
     WhiteSpace < std::string::const_iterator > ws;
 
-    Plan plan;
-
-    bool r = boost::spirit::qi::phrase_parse(begin, end, pl, ws, plan);
+    bool r = boost::spirit::qi::phrase_parse(begin, end, pl, ws, mPlan);
     if (not (r and begin == end)) {
         throw utils::ArgError("Decision: error parsing plan");
     }
-
-    try {
-        fillKnowledegeBase(plan);
-    } catch (const std::exception& e) {
-        throw utils::ArgError(
-            fmt(_("Decision: error fill KnowledgeBase from plan: %1%")) %
-            e.what());;
-    }
 }
 
-Parser::Parser(KnowledgeBase& kb, std::istream& /*stream*/) : mKb(kb)
+Parser::Parser(std::istream& /*stream*/)
 {
     throw utils::NotYetImplemented("Parser::Parser(std::istream& stream");
     // FIXME found a solution
@@ -402,18 +396,22 @@ Parser::Parser(KnowledgeBase& kb, std::istream& /*stream*/) : mKb(kb)
     //}
 }
 
-void Parser::fillKnowledegeBase(const Plan& plan)
+}}} // namespace vle model decision
+
+#else // VLE_HAVE_BOOST_SPIRIT2
+
+namespace vle { namespace extension { namespace decision {
+
+Parser::Parser(const std::string& /*buffer*/)
 {
-    std::for_each(plan.rules.rules.begin(), plan.rules.rules.end(),
-                  AddRule(mKb));
-
-    std::for_each(plan.activities.activities.begin(),
-                  plan.activities.activities.end(),
-                  AddActivity(mKb));
-
-    std::for_each(plan.precedences.precedences.begin(),
-                  plan.precedences.precedences.end(),
-                  AddPrecedence(mKb));
+    throw utils::NotYetImplemented("Parser::Parser(const std::string&");
 }
+
+Parser::Parser(std::istream& /*stream*/)
+{
+    throw utils::NotYetImplemented("Parser::Parser(std::istream&");
+}
+
+#endif // VLE_HAVE_BOOST_SPIRIT2
 
 }}} // namespace vle model decision

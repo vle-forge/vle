@@ -27,7 +27,7 @@
 
 
 #ifndef VLE_EXTENSION_DECISION_ACTIVITIES_HPP
-#define VLE_EXTENSION_DECISION_ACTIVITIES_HPP
+#define VLE_EXTENSION_DECISION_ACTIVITIES_HPP 1
 
 #include <vle/extension/decision/Activity.hpp>
 #include <vle/extension/decision/PrecedenceConstraint.hpp>

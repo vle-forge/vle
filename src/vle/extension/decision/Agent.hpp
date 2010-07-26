@@ -27,7 +27,7 @@
 
 
 #ifndef VLE_EXTENSION_DECISION_AGENT_HPP
-#define VLE_EXTENSION_DECISION_AGENT_HPP
+#define VLE_EXTENSION_DECISION_AGENT_HPP 1
 
 #include <vle/extension/decision/KnowledgeBase.hpp>
 #include <vle/extension/DllDefines.hpp>
