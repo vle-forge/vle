@@ -78,9 +78,9 @@ public:
     enum State {
         WAIT, /**< Before the activation of the activity. */
         STARTED, /**< If the activity is launched and operation too. */
-        DONE, /**< Activity is finish, but need to check all FF precedence
-                constraint. */
-        ENDED, /**< If the activity and operation are done. */
+        FF, /**< Activity is finish, but need to check all FF precedence
+              constraint. */
+        DONE, /**< If the activity and operation are done. */
         FAILED /**< If the operation failed. */
     };
 
@@ -94,8 +94,8 @@ public:
         m_minfinish(devs::Time::infinity),
         m_maxfinish(devs::Time::infinity),
         m_started(devs::Time::negativeInfinity),
-        m_finished(devs::Time::negativeInfinity),
-        m_done(devs::Time::negativeInfinity)
+        m_done(devs::Time::negativeInfinity),
+        m_ff(devs::Time::negativeInfinity)
     {}
 
     //
@@ -198,20 +198,20 @@ public:
     const State& state() const { return m_state; }
     bool isInWaitState() const { return m_state == WAIT; }
     bool isInStartedState() const { return m_state == STARTED; }
-    bool isInDoneState() const { return m_state == DONE; }
+    bool isInFFState() const { return m_state == FF; }
     bool isInFailedState() const { return m_state == FAILED; }
-    bool isInEndedState() const { return m_state == ENDED; }
+    bool isInDoneState() const { return m_state == DONE; }
 
     void wait()
     { m_state = WAIT; }
     void start(const devs::Time& date)
     { m_state = STARTED; startedDate(date); }
-    void done(const devs::Time& date)
-    { m_state = DONE; doneDate(date); }
+    void ff(const devs::Time& date)
+    { m_state = FF; ffDate(date); }
     void end(const devs::Time& date)
-    { m_state = ENDED; finishedDate(date); }
+    { m_state = DONE; doneDate(date); }
     void fail(const devs::Time& date)
-    { m_state = FAILED; finishedDate(date); }
+    { m_state = FAILED; doneDate(date); }
 
     const Rules& rules() const { return m_rules; }
     const DateType& date() const { return m_date; }
@@ -223,8 +223,8 @@ public:
     const devs::Time& maxfinish() const { return m_maxfinish; }
 
     const devs::Time& startedDate() const { return m_started; }
-    const devs::Time& finishedDate() const { return m_finished; }
     const devs::Time& doneDate() const { return m_done; }
+    const devs::Time& ffDate() const { return m_ff; }
 
     bool waitAllFsBeforeStart() const { return m_waitall; }
     bool waitOnlyOneFsBeforeStart() const { return not m_waitall; }
@@ -241,8 +241,8 @@ public:
 
 private:
     void startedDate(const devs::Time& date) { m_started = date; }
+    void ffDate(const devs::Time& date) { m_ff = date; }
     void doneDate(const devs::Time& date) { m_done = date; }
-    void finishedDate(const devs::Time& date) { m_finished = date; }
 
     State m_state;
     Rules m_rules;
@@ -260,8 +260,8 @@ private:
     devs::Time m_maxfinish;
 
     devs::Time m_started; /** Date when the activity is started. */
-    devs::Time m_finished; /** Date when the activity is finished. */
-    devs::Time m_done; /**< Date when the activity is done. */
+    devs::Time m_done; /** Date when the activity is finished. */
+    devs::Time m_ff; /**< Date when the activity is valid ff. */
 
     AckFct mAckFct;
     OutFct mOutFct;
@@ -274,8 +274,8 @@ inline std::ostream& operator<<(
     return o << "state: " <<
         ((dt == Activity::WAIT) ? "wait" :
          (dt == Activity::STARTED) ? "started" :
-         (dt == Activity::DONE) ? "done" :
-         (dt == Activity::ENDED) ? "ended" : "failed");
+         (dt == Activity::FF) ? "started-ff" :
+         (dt == Activity::DONE) ? "done" : "failed");
 }
 
 inline std::ostream& operator<<(
@@ -335,12 +335,12 @@ inline std::ostream& operator<<(
         out << " Started at: (" << a.startedDate().toString()<< ")";
     }
 
-    if (not a.doneDate().isNegativeInfinity()) {
-        out << " Done at: (" << a.doneDate().toString() << ")";
+    if (not a.ffDate().isNegativeInfinity()) {
+        out << " Done at: (" << a.ffDate().toString() << ")";
     }
 
-    if (not a.finishedDate().isNegativeInfinity()) {
-        out << " Finished at: (" << a.finishedDate().toString() << "))";
+    if (not a.doneDate().isNegativeInfinity()) {
+        out << " Finished at: (" << a.doneDate().toString() << "))";
     }
 
     return out;

@@ -115,7 +115,7 @@ devs::Time Activity::nextTime(const devs::Time& time)
     switch (m_state) {
     case WAIT:
     case STARTED:
-    case DONE:
+    case FF:
         if (m_date & START and time <= m_start) {
             result = m_start;
         } else if (m_date & MINS and time <= m_minstart) {
@@ -134,7 +134,7 @@ devs::Time Activity::nextTime(const devs::Time& time)
             }
         }
         break;
-    case ENDED:
+    case DONE:
     case FAILED:
         result = devs::Time::infinity;
         break;

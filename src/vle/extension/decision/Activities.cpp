@@ -203,12 +203,12 @@ void Activities::setWaitedAct(Activities::iterator it)
         addStartedAct(it);
         updateLatestActivitiesList(m_latestStartedAct, it);
         break;
-    case Activity::DONE:
+    case Activity::FF:
         removeDoneAct(it);
         addDoneAct(it);
         updateLatestActivitiesList(m_latestDoneAct, it);
         break;
-    case Activity::ENDED:
+    case Activity::DONE:
         removeEndedAct(it);
         addEndedAct(it);
         updateLatestActivitiesList(m_latestEndedAct, it);
@@ -232,11 +232,11 @@ void Activities::setStartedAct(Activities::iterator it)
         removeStartedAct(it);
         updateLatestActivitiesList(m_latestStartedAct, it);
         break;
-    case Activity::DONE:
+    case Activity::FF:
         removeDoneAct(it);
         updateLatestActivitiesList(m_latestDoneAct, it);
         break;
-    case Activity::ENDED:
+    case Activity::DONE:
         removeEndedAct(it);
         updateLatestActivitiesList(m_latestEndedAct, it);
         break;
@@ -259,11 +259,11 @@ void Activities::setFailedAct(Activities::iterator it)
         removeStartedAct(it);
         updateLatestActivitiesList(m_latestStartedAct, it);
         break;
-    case Activity::DONE:
+    case Activity::FF:
         removeDoneAct(it);
         updateLatestActivitiesList(m_latestDoneAct, it);
         break;
-    case Activity::ENDED:
+    case Activity::DONE:
         removeEndedAct(it);
         updateLatestActivitiesList(m_latestEndedAct, it);
         break;
@@ -286,11 +286,11 @@ void Activities::setDoneAct(Activities::iterator it)
         removeStartedAct(it);
         updateLatestActivitiesList(m_latestStartedAct, it);
         break;
-    case Activity::DONE:
+    case Activity::FF:
         removeDoneAct(it);
         updateLatestActivitiesList(m_latestDoneAct, it);
         break;
-    case Activity::ENDED:
+    case Activity::DONE:
         removeEndedAct(it);
         updateLatestActivitiesList(m_latestEndedAct, it);
         break;
@@ -313,11 +313,11 @@ void Activities::setEndedAct(Activities::iterator it)
         removeStartedAct(it);
         updateLatestActivitiesList(m_latestStartedAct, it);
         break;
-    case Activity::DONE:
+    case Activity::FF:
         removeDoneAct(it);
         updateLatestActivitiesList(m_latestDoneAct, it);
         break;
-    case Activity::ENDED:
+    case Activity::DONE:
         removeEndedAct(it);
         updateLatestActivitiesList(m_latestEndedAct, it);
         break;
@@ -387,11 +387,11 @@ Activities::process(const devs::Time& time)
                 update = processStartedState(activity, time);
                 break;
 
-            case Activity::DONE:
+            case Activity::FF:
                 update = processDoneState(activity, time);
                 break;
 
-            case Activity::ENDED:
+            case Activity::DONE:
                 update = processEndedState(activity, time);
                 break;
 

@@ -44,7 +44,7 @@ void KnowledgeBase::setActivityDone(const std::string& name,
     }
 
     m_activities.setDoneAct(it);
-    it->second.done(date);
+    it->second.ff(date);
     it->second.acknowledge(name);
 }
 
@@ -53,7 +53,7 @@ void KnowledgeBase::setActivityFailed(const std::string& name,
 {
     Activities::iterator it(m_activities.get(name));
 
-    if (it->second.isInEndedState()) {
+    if (it->second.isInDoneState()) {
         throw utils::ArgError(fmt(
                 _("Decision: activity '%1%' is already finish")) % name);
     }
