@@ -77,9 +77,16 @@ double Rand::getDoubleExcluded()
 
 double Rand::weibull(const double a, const double b)
 {
-    double x = pow(-log(getDoubleExcluded()), 1. / a);
+    double x = pow(-log(getDoubleExcluded()), 1.0 / a);
 
     return b * x;
+}
+
+double Rand::weibull3(const double a, const double b, const double c)
+{
+    double x = pow(-log(getDoubleExcluded()), 1.0 / a);
+
+    return c + b * x;
 }
 
 }} // namespace vle utils

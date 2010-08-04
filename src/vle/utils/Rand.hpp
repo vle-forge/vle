@@ -330,11 +330,30 @@ namespace vle { namespace utils {
         /**
          * @brief Generate a real using the Weibull law. This version is a
          * two-parameter Weibull distribution (where c or gamma = 0)
-         * @param a continuous shape parameter alpha > 0
-         * @param b continuous scale parameter beta > 0
+         * @param a continuous shape parameter (beta > 0)
+         * @param b continuous scale parameter (alpha > 0)
          * @return a real.
+         *
+         * @note: Several notations exist where:
+         * a = beta = k to represent the shape;
+         * b = alpha = lambda to represent the scale.
          */
         double weibull(const double a, const double b);
+
+        /**
+         * @brief Generate a real using the Weibull law. This version is a
+         * three-parameter Weibull distribution
+         * @param a continuous shape parameter (beta > 0)
+         * @param b continuous scale parameter (alpha > 0)
+         * @param c continuous location parameter (gamma > 0)
+         * @return a real.
+         *
+         * @note: Several notations exist where:
+         * a = beta = k to represent the shape;
+         * b = alpha = lambda to represent the scale;
+         * c = gamma to represent the location.
+         */
+        double weibull3(const double a, const double b, const double c);
 
         /**
          * @brief Get a reference to the Mersenne Twister PRNG.
