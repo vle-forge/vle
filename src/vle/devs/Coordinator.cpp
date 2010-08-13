@@ -344,13 +344,14 @@ void Coordinator::removeSimulatorTargetPort(graph::AtomicModel* model,
 
 void Coordinator::addModel(graph::AtomicModel* model, Simulator* simulator)
 {
-    if (m_modelList.find(model) != m_modelList.end()) {
+    std::pair < SimulatorMap::iterator, bool > r =
+        m_modelList.insert(std::make_pair(model, simulator));
+
+    if (not r.second) {
         throw utils::InternalError(fmt(_(
-                "The Atomic model node '%1% have already a simulator"))
+                    "The Atomic model node '%1% have already a simulator"))
             % model->getName());
     }
-
-    m_modelList[model] = simulator;
 }
 
 Simulator* Coordinator::getModel(const graph::AtomicModel* model) const
