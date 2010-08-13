@@ -51,14 +51,16 @@ ModuleCache::~ModuleCache()
     std::for_each(m_lst.begin(), m_lst.end(), DeleteModule());
 }
 
-void ModuleCache::add(const std::string& library, Glib::Module* module)
+void ModuleCache::add(const std::string& /*library*/, Glib::Module* module)
 {
-    if (exist(library)) {
-        throw utils::InternalError(fmt(_(
-                "The Module '%1%' already exist in cache")) % library);
-    }
+    std::pair < ModuleList::iterator, bool > r = m_lst.insert(
+        std::pair < std::string, Glib::Module* >(module->get_name(), module));
 
-    m_lst[library] = module;
+    if (not r.second) {
+        throw utils::InternalError(fmt(_(
+                "The Module '%1%' already exist in cache")) %
+            module->get_name());
+    }
 }
 
 bool ModuleCache::exist(const std::string& library) const
@@ -171,8 +173,7 @@ void ModelFactory::createModel(Coordinator& coordinator,
     const vpz::Dynamic& dyn = mDynamics.get(dynamics);
     switch(dyn.type()) {
     case vpz::Dynamic::LOCAL:
-        attachDynamics(coordinator, sim, dyn, getPlugin(dyn.name()),
-                       initValues);
+        attachDynamics(coordinator, sim, dyn, getPlugin(dyn), initValues);
         break;
     case vpz::Dynamic::DISTANT:
         throw utils::NotYetImplemented(_("Distant dynamics is not supported"));
@@ -261,7 +262,7 @@ graph::Model* ModelFactory::createModelFromClass(Coordinator& coordinator,
     return mdl;
 }
 
-Glib::Module* ModelFactory::buildPlugin(const vpz::Dynamic& dyn)
+Glib::Module* ModelFactory::getPlugin(const vpz::Dynamic& dyn)
 {
     std::string path, error;
 
@@ -282,42 +283,34 @@ Glib::Module* ModelFactory::buildPlugin(const vpz::Dynamic& dyn)
         path = utils::Path::path().getExternalPackageLibDir(dyn.package());
     }
 
-    Glib::Module* module;
+    std::string filename;
 
     if (dyn.language().empty()) {
-        module = new Glib::Module(
-            Glib::Module::build_path(path, dyn.library()));
+        filename = Glib::Module::build_path(path, dyn.library());
     } else {
-        module = new Glib::Module(
-            Glib::Module::build_path(path, "pydynamics"));
+        filename = Glib::Module::build_path(path, "pydynamics");
     }
 
-    if (not (*module)) {
-        error += "\n";
-        error += Glib::Module::get_last_error();
-        delete module;
-    } else {
+    Glib::Module* module = mModule.get(filename);
+    if (not module) {
+        module = new Glib::Module(filename);
+        if (not (*module)) {
+            error += "\n";
+            error += Glib::Module::get_last_error();
+            delete module;
+        } else {
 #ifdef G_OS_WIN32
-        module->make_resident();
+            module->make_resident();
 #endif
-        mModule.add(dyn.language() == "python" ? "pydynamics" : dyn.library(),
-                    module);
+            mModule.add(dyn.language() == "python" ? "pydynamics" :
+                        dyn.library(), module);
+            return module;
+        }
+    } else {
         return module;
     }
+
     throw utils::FileError(error);
-}
-
-Glib::Module* ModelFactory::getPlugin(const std::string& name)
-{
-    const vpz::Dynamic& dyn(mDynamics.get(name));
-    Glib::Module* r = mModule.get(
-        dyn.language() == "python" ? "pydynamics" : dyn.library());
-
-    if (r == 0) {
-        return buildPlugin(dyn);
-    } else {
-        return r;
-    }
 }
 
 void ModelFactory::attachDynamics(Coordinator& coordinator,

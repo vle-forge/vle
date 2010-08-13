@@ -305,18 +305,7 @@ namespace vle { namespace devs {
          * @return a reference to a Glib::Module.
          * @throw Exception::Internal if file is not found.
          */
-        Glib::Module* buildPlugin(const vpz::Dynamic& dyn);
-
-        /**
-         * @brief Load a new Glib::Module plugin for the specified dynamicname.
-         * If dynamicname is not found in mDynamics variable it will search into
-         * classes dynamics.
-         * @param dynamicname the dynamic name to load.
-         * @return a reference to a Glib::Module.
-         * @throw Exception::Internal if file is not found or if dynamicname is
-         * not found.
-         */
-        Glib::Module* getPlugin(const std::string& dynamicname);
+        Glib::Module* getPlugin(const vpz::Dynamic& dyn);
 
         /**
          * @brief Attach to the specified devs::Simulator reference a

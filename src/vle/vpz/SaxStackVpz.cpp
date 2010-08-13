@@ -183,8 +183,7 @@ void SaxStackVpz::pushModel(const xmlChar** att)
         }
     } else if (xmlStrcmp(type, (const xmlChar*)"coupled") == 0) {
         try {
-            gmdl = new graph::CoupledModel(
-                reinterpret_cast < const char* >(name), cplparent);
+            gmdl = new graph::CoupledModel((const char*)name, cplparent);
         } catch(const utils::DevsGraphError& e) {
             throw(utils::SaxParserError(fmt(_(
                     "Error build coupled model '%1%' with error: %2%")) % name %
