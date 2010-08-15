@@ -77,9 +77,9 @@ namespace vle { namespace devs {
                     const InitEventList& events);
 
         /**
-         * @brief Destructor (nothing to do)
+         * @brief Destructor.
          */
-        virtual ~DynamicsDbg() {}
+        virtual ~DynamicsDbg() { delete mDynamics; }
 
         /**
          * @brief Assign a Dynamics to debug for this DynamicsDbg class.
