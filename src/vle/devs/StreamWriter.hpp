@@ -65,13 +65,15 @@ namespace vle { namespace devs {
 
         /**
          * @brief Initialise plugin with specified information.
-         * @param plugin the plugin' name.
+         * @param plugin the plugin's name.
+         * @param package the plugin's package.
          * @param location where the plugin write data.
          * @param file name of the file.
          * @param parameters the value attached to the plug-in.
          * @param time the date when the plug-in was opened.
          */
         virtual void open(const std::string& plugin,
+                          const std::string& package,
                           const std::string& location,
                           const std::string& file,
                           value::Value* parameters,

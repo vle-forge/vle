@@ -109,8 +109,9 @@ bool NetStreamReader::dispatch(value::Set& frame)
         onParameter(frame.getString(1),
                     frame.getString(2),
                     frame.getString(3),
-                    frame.give(4),
-                    frame.getDouble(5));
+                    frame.getString(4),
+                    frame.give(5),
+                    frame.getDouble(6));
         break;
     case 1:
         onNewObservable(frame.getString(1),

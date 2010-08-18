@@ -35,12 +35,13 @@
 namespace vle { namespace devs {
 
 void LocalStreamWriter::open(const std::string& plugin,
+                             const std::string& package,
                              const std::string& location,
                              const std::string& file,
                              value::Value* parameters,
                              const devs::Time& time)
 {
-    m_reader.onParameter(plugin, location, file, parameters,
+    m_reader.onParameter(plugin, package, location, file, parameters,
                          time.getValue());
 }
 

@@ -97,6 +97,7 @@
   name CDATA #REQUIRED
   format (local|distant) #REQUIRED
   location CDATA #IMPLIED
+  package CDATA #IMPLIED
   plugin CDATA #REQUIRED >
 
 <!ATTLIST observable

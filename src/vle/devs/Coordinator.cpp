@@ -548,7 +548,7 @@ StreamWriter* Coordinator::buildOutput(const vpz::View& view,
     std::string file((fmt("%1%_%2%") %
                       m_modelFactory.experiment().name() %
                       view.name()).str());
-    stream->open(output.plugin(), output.location(), file,
+    stream->open(output.plugin(), output.package(), output.location(), file,
                  (output.data()) ? output.data()->clone() : 0, m_currentTime);
 
     return stream;

@@ -44,6 +44,7 @@ namespace vle { namespace devs {
         virtual ~NetStreamWriter();
 
         virtual void open(const std::string& plugin,
+                          const std::string& package,
                           const std::string& location,
                           const std::string& file,
                           value::Value* parameters,
@@ -76,6 +77,7 @@ namespace vle { namespace devs {
         value::Set*      m_refreshFrame;
 
         void buildParameters(const std::string& plugin,
+                             const std::string& package,
                              const std::string& location,
                              const std::string& directory,
                              value::Value* file,

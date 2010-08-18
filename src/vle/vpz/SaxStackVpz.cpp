@@ -732,6 +732,7 @@ void SaxStackVpz::pushOutput(const xmlChar** att)
     const xmlChar* format = 0;
     const xmlChar* plugin = 0;
     const xmlChar* location = 0;
+    const xmlChar* package = 0;
 
     for (int i = 0; att[i] != 0; i += 2) {
         if (xmlStrcmp(att[i], (const xmlChar*)"name") == 0) {
@@ -742,19 +743,30 @@ void SaxStackVpz::pushOutput(const xmlChar** att)
             plugin = att[i + 1];
         } else if (xmlStrcmp(att[i], (const xmlChar*)"location") == 0) {
             location = att[i + 1];
+        } else if (xmlStrcmp(att[i], (const xmlChar*)"package") == 0) {
+            package = att[i + 1];
         }
     }
 
     Outputs& outs(m_vpz.project().experiment().views().outputs());
 
     if (xmlStrcmp(format, (const xmlChar*)"local") == 0) {
-        push(&outs.addLocalStream(xmlCharToString(name),
-                                  location ? xmlCharToString(location) : "",
-                                  xmlCharToString(plugin)));
+        Output& result = outs.addLocalStream(xmlCharToString(name), location ?
+                                             xmlCharToString(location) : "",
+                                             xmlCharToString(plugin));
+        if (package) {
+            result.setPackage(xmlCharToString(package));
+        }
+        push(&result);
     } else if (xmlStrcmp(format, (const xmlChar*)"distant") == 0) {
-        push(&outs.addDistantStream(xmlCharToString(name),
-                                    location ? xmlCharToString(location) : "",
-                                    xmlCharToString(plugin)));
+        Output& result = outs.addDistantStream(xmlCharToString(name),
+                                               location ?
+                                               xmlCharToString(location) : "",
+                                               xmlCharToString(plugin));
+        if (package) {
+            result.setPackage(xmlCharToString(package));
+        }
+        push(&result);
     } else {
         throw utils::SaxParserError(fmt(
                 _("Output tag does not define a '%1%' format")) % name);

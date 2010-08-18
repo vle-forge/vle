@@ -118,6 +118,13 @@ namespace vle {
          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
         /**
+         * @brief Assign a new package name to the output.
+         * @param name new name of the package.
+         */
+        void setPackage(const std::string& name)
+        { m_package.assign(name); }
+
+        /**
          * @brief Set the output with text stream information. The name is
          * obligatory, the location defines a filename.
          * @param location the file name.
@@ -178,6 +185,13 @@ namespace vle {
         { return m_plugin; }
 
         /**
+         * @brief Return the package name of this output.
+         * @return a string represnetion of the package.
+         */
+        const std::string& package() const
+        { return m_package; }
+
+        /**
          * @brief Get the location of this Output.
          * @return a string representation of location.
          */
@@ -217,6 +231,7 @@ namespace vle {
         std::string     m_name;
         std::string     m_plugin;
         std::string     m_location;
+        std::string     m_package;
         value::Value*   m_data;
     };
 

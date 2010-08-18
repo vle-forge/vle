@@ -35,9 +35,8 @@
 namespace vle { namespace oov {
 
 PluginFactory::PluginFactory(const std::string& plugin,
-                             const std::string& pathname) :
-    m_module(0),
-    m_plugin(plugin)
+                             const std::string& pathname)
+    : m_module(0), m_plugin(plugin)
 {
     std::string file(Glib::Module::build_path(pathname, plugin));
     m_module = new Glib::Module(file);

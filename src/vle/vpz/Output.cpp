@@ -40,7 +40,8 @@ Output::Output()
 
 Output::Output(const Output& output)
     : Base(output), m_format(output.m_format), m_name(output.m_name),
-    m_plugin(output.m_plugin), m_location(output.m_location)
+    m_plugin(output.m_plugin), m_location(output.m_location),
+    m_package(output.m_package)
 {
     if (output.m_data) {
         m_data = output.m_data->clone();
@@ -67,6 +68,7 @@ void Output::swap(Output& output)
     std::swap(m_name, output.m_name);
     std::swap(m_plugin, output.m_plugin);
     std::swap(m_location, output.m_location);
+    std::swap(m_package, output.m_package);
     std::swap(m_data, output.m_data);
 }
 
@@ -83,6 +85,10 @@ void Output::write(std::ostream& out) const
     case Output::DISTANT:
         out << "format=\"distant\"";
         break;
+    }
+
+    if (not m_package.empty()) {
+        out << " package=\"" << m_package.c_str() << "\" ";
     }
 
     out << " plugin=\"" << m_plugin.c_str() << "\" ";
@@ -141,8 +147,8 @@ void Output::clearData()
 bool Output::operator==(const Output& output) const
 {
     return m_format == output.format() and m_name == output.name()
-	and m_plugin == output.plugin() and m_location == output.location()
-	and m_data == output.data();
+        and m_plugin == output.plugin() and m_location == output.location()
+        and m_package == output.package() and m_data == output.data();
 
 }
 

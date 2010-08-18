@@ -68,6 +68,7 @@ namespace vle { namespace oov {
          * parameter provided by the devs::StreamWritter class.
          */
         virtual void onParameter(const std::string& plugin,
+                                 const std::string& package,
                                  const std::string& location,
                                  const std::string& file,
                                  value::Value* parameters,
@@ -152,6 +153,7 @@ namespace vle { namespace oov {
          * @throw utils::InternalError if the plugin was not found.
          */
         virtual void initPlugin(const std::string& plugin,
+                                const std::string& package,
                                 const std::string& location);
 
     };

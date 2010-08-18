@@ -53,34 +53,43 @@ PluginPtr StreamReader::plugin() const
 }
 
 void StreamReader::initPlugin(const std::string& plugin,
+                              const std::string& package,
                               const std::string& location)
 {
-    utils::PathList lst(utils::Path::path().getStreamDirs());
-    utils::PathList::const_iterator it;
+    if (not package.empty()) {
+        PluginFactory pf(
+            plugin,
+            utils::Path::path().getExternalPackagePluginOutputDir(package));
+        m_plugin = pf.build(location);
+    } else {
+        utils::PathList lst(utils::Path::path().getStreamDirs());
+        utils::PathList::const_iterator it;
 
-    std::string error((fmt(
-                _("Error opening oov plugin '%1%' in:")) % plugin).str());
+        std::string error((fmt(
+                    _("Error opening oov plugin '%1%' in:")) % plugin).str());
 
-    for (it = lst.begin(); it != lst.end(); ++it) {
-        try {
-            PluginFactory pf(plugin, *it);
-            m_plugin = pf.build(location);
-            return;
-        } catch (const std::exception& e) {
-            error += e.what();
+        for (it = lst.begin(); it != lst.end(); ++it) {
+            try {
+                PluginFactory pf(plugin, *it);
+                m_plugin = pf.build(location);
+                return;
+            } catch (const std::exception& e) {
+                error += e.what();
+            }
         }
+        throw utils::InternalError(error);
     }
 
-    throw utils::InternalError(error);
 }
 
 void StreamReader::onParameter(const std::string& pluginname,
+                               const std::string& package,
                                const std::string& location,
                                const std::string& file,
                                value::Value* parameters,
                                const double& time)
 {
-    initPlugin(pluginname, location);
+    initPlugin(pluginname, package, location);
 
 #ifdef VLE_HAVE_CAIRO
     /*

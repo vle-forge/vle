@@ -38,14 +38,9 @@
 
 namespace vle { namespace devs {
 
-NetStreamWriter::NetStreamWriter() :
-    m_paramFrame(0),
-    m_newObsFrame(0),
-    m_delObsFrame(0),
-    m_valueFrame(0),
-    m_closeFrame(0),
-    m_refreshFrame(0),
-    m_client(0)
+NetStreamWriter::NetStreamWriter()
+    : m_paramFrame(0), m_newObsFrame(0), m_delObsFrame(0), m_valueFrame(0),
+    m_closeFrame(0), m_refreshFrame(0), m_client(0)
 {
 }
 
@@ -61,6 +56,7 @@ NetStreamWriter::~NetStreamWriter()
 }
 
 void NetStreamWriter::open(const std::string& plugin,
+                           const std::string& package,
                            const std::string& location,
                            const std::string& file,
                            value::Value* parameters,
@@ -73,7 +69,8 @@ void NetStreamWriter::open(const std::string& plugin,
         utils::net::explodeStringNet(location, host, port, directory);
         m_client = new utils::net::Client(host, port);
 
-        buildParameters(plugin, directory, file, parameters, time.getValue());
+        buildParameters(plugin, package, directory, file, parameters,
+                        time.getValue());
 
         value::Set::serializeBinaryBuffer(*m_paramFrame, out);
 
@@ -248,6 +245,7 @@ oov::PluginPtr NetStreamWriter::getPlugin() const
 }
 
 void NetStreamWriter::buildParameters(const std::string& plugin,
+                                      const std::string& package,
                                       const std::string& directory,
                                       const std::string& file,
                                       value::Value* parameters,
@@ -257,16 +255,18 @@ void NetStreamWriter::buildParameters(const std::string& plugin,
         m_paramFrame = new value::Set();
         m_paramFrame->addInt(0);
         m_paramFrame->addString(plugin);
+        m_paramFrame->addString(package);
         m_paramFrame->addString(directory);
         m_paramFrame->addString(file);
         m_paramFrame->add(parameters);
         m_paramFrame->addDouble(time);
     } else {
         m_paramFrame->getString(1) = plugin;
-        m_paramFrame->getString(2) = directory;
-        m_paramFrame->getString(3) = file;
-        m_valueFrame->value()[4] = parameters;
-        m_paramFrame->getDouble(5) = time;
+        m_paramFrame->getString(2) = package;
+        m_paramFrame->getString(3) = directory;
+        m_paramFrame->getString(4) = file;
+        m_valueFrame->value()[5] = parameters;
+        m_paramFrame->getDouble(6) = time;
     }
 }
 

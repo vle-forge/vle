@@ -520,6 +520,31 @@ std::string Path::getExternalPackageBuildDir(const std::string& name) const
     return buildDirname(getPackagesDir(), name, "build");
 }
 
+std::string Path::getExternalPackageOutputDir(const std::string& name) const
+{
+    return buildDirname(getPackagesDir(), name, "plugins");
+}
+
+std::string Path::getExternalPackagePluginDir(const std::string& name) const
+{
+    return buildDirname(getPackagesDir(), name, "plugins");
+}
+
+std::string Path::getExternalPackagePluginOutputDir(const std::string& name) const
+{
+    return buildDirname(getPackagesDir(), name, "plugins", "output");
+}
+
+std::string Path::getExternalPackagePluginGvleModelingDir(const std::string& name) const
+{
+    return buildDirname(getPackagesDir(), name, "plugins", "gvle", "output");
+}
+
+std::string Path::getExternalPackagePluginGvleOutputDir(const std::string& name) const
+{
+    return buildDirname(getPackagesDir(), name, "plugins", "gvle", "modeling");
+}
+
 std::string Path::getExternalPackageFile(const std::string& name,
                                          const std::string& file) const
 {
@@ -935,6 +960,21 @@ std::string Path::buildDirname(const std::string& dir1,
     f /= dir2;
     f /= dir3;
     f /= dir4;
+
+    return f.string();
+}
+
+std::string Path::buildDirname(const std::string& dir1,
+                               const std::string& dir2,
+                               const std::string& dir3,
+                               const std::string& dir4,
+                               const std::string& dir5)
+{
+    fs::path f = dir1;
+    f /= dir2;
+    f /= dir3;
+    f /= dir4;
+    f /= dir5;
 
     return f.string();
 }

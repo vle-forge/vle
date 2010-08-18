@@ -62,13 +62,14 @@ void NetStreamReader::process()
 }
 
 void NetStreamReader::onParameter(const std::string& pluginname,
+                                  const std::string& package,
                                   const std::string& location,
                                   const std::string& file,
                                   value::Value* parameters,
                                   const double& time)
 {
-    oov::NetStreamReader::onParameter(pluginname, location, file, parameters,
-                                      time);
+    oov::NetStreamReader::onParameter(pluginname, package, location, file,
+                                      parameters, time);
 
     oov::PluginPtr poov = plugin();
 

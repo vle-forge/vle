@@ -227,6 +227,12 @@ namespace vle { namespace utils {
         std::string getExternalPackageDocDir(const std::string& name) const;
         std::string getExternalPackageExpDir(const std::string& name) const;
         std::string getExternalPackageBuildDir(const std::string& name) const;
+        std::string getExternalPackageOutputDir(const std::string& name) const;
+        std::string getExternalPackagePluginDir(const std::string& name) const;
+        std::string getExternalPackagePluginOutputDir(const std::string& name) const;
+        std::string getExternalPackagePluginGvleModelingDir(const std::string& name) const;
+        std::string getExternalPackagePluginGvleOutputDir(const std::string& name) const;
+
         std::string getExternalPackageFile(const std::string& name,
                                            const std::string& file) const;
         std::string getExternalPackageLibFile(const std::string& name,
@@ -480,6 +486,11 @@ namespace vle { namespace utils {
                                         const std::string& dir2,
                                         const std::string& dir3,
                                         const std::string& dir4);
+        static std::string buildDirname(const std::string& dir1,
+                                        const std::string& dir2,
+                                        const std::string& dir3,
+                                        const std::string& dir4,
+                                        const std::string& dir5);
 
 
     private:

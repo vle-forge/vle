@@ -50,6 +50,7 @@ namespace vle { namespace devs {
         {}
 
         virtual void open(const std::string& plugin,
+                          const std::string& package,
                           const std::string& location,
                           const std::string& file,
                           value::Value* parameters,
