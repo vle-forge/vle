@@ -142,6 +142,27 @@ bool VLE::justRun(int nbProcessor, const CmdArgs& args)
     return true;
 }
 
+std::map < std::string, std::set < std::string > > VLE::depends() const
+{
+    std::map < std::string, std::set < std::string > > result;
+
+    utils::PathList vpz(utils::Path::path().getInstalledExperiments());
+    std::sort(vpz.begin(), vpz.end());
+
+    for (utils::PathList::iterator it = vpz.begin(); it != vpz.end(); ++it) {
+        std::set < std::string > depends;
+        try {
+            vpz::Vpz vpz(*it);
+            depends = vpz.depends();
+        } catch (const std::exception& /*e*/) {
+        }
+        result[*it] = depends;
+    }
+
+    return result;
+}
+
+
 void init()
 {
     value::init();

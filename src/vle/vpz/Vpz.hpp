@@ -33,6 +33,7 @@
 #include <vle/vpz/DllDefines.hpp>
 #include <vle/vpz/Project.hpp>
 #include <vle/vpz/SaxParser.hpp>
+#include <set>
 #include <string>
 
 namespace vle { namespace vpz {
@@ -207,6 +208,13 @@ namespace vle { namespace vpz {
          */
         inline Project& project()
         { return m_project; }
+
+        /**
+         * @brief Fill the std::set with all the package dependencies of the
+         * VPZ.
+         * @return A list of package name.
+         */
+        std::set < std::string > depends() const;
 
     private:
         bool                m_isGzip;

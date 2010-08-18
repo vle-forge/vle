@@ -85,6 +85,13 @@ namespace vle { namespace manager {
          */
         bool justRun(int nbProcessor, const CmdArgs& args);
 
+        /**
+         * @brief Build a dictonnary of dependencies. For each vpz file in
+         * experiment directory, we produce a list of dependencies.
+         * @return The dictionnary.
+         */
+        std::map < std::string, std::set < std::string > > depends() const;
+
     private:
         int             mPort;
     };

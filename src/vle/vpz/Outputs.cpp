@@ -130,6 +130,19 @@ void Outputs::rename(const std::string& oldoutputname,
     }
 }
 
+std::set < std::string > Outputs::depends() const
+{
+    std::set < std::string > result;
+
+    for (const_iterator it = begin(); it != end(); ++it) {
+        if (not it->second.package().empty()) {
+            result.insert(it->second.package());
+        }
+    }
+
+    return result;
+}
+
 std::vector < std::string > Outputs::outputsname() const
 {
     std::vector < std::string > result(m_list.size());

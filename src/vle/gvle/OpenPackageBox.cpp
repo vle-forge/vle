@@ -83,7 +83,7 @@ void OpenPackageBox::build()
 
     utils::PathList list = utils::Path::path().getInstalledPackages();
 
-    list.sort();
+    std::sort(list.begin(), list.end());
     for (utils::PathList::const_iterator it = list.begin();
 	 it != list.end(); ++it) {
 	Gtk::TreeModel::Row row = *(mRefTreePackage->append());

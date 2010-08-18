@@ -31,7 +31,7 @@
 #define VLE_UTILS_PATH_HPP
 
 #include <string>
-#include <list>
+#include <vector>
 #include <ostream>
 #include <vle/utils/DllDefines.hpp>
 
@@ -40,7 +40,7 @@ namespace vle { namespace utils {
     /**
      * @brief Define a list of directories.
      */
-    typedef std::list < std::string > PathList;
+    typedef std::vector < std::string > PathList;
 
     /**
      * @brief Portable way, i.e. Linux/Unix/Windows to get VLE paths. Linux

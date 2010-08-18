@@ -32,6 +32,7 @@
 
 #include <vle/vpz/DllDefines.hpp>
 #include <vle/vpz/Dynamic.hpp>
+#include <set>
 #include <map>
 
 namespace vle { namespace vpz {
@@ -169,6 +170,13 @@ namespace vle { namespace vpz {
          */
         void rename(const std::string& oldname,
                     const std::string& newname);
+
+        /**
+         * @brief Fill the std::set with all external Dynamic (ie. in
+         * another package).
+         * @return A list of package name.
+         */
+        std::set < std::string > depends() const;
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *

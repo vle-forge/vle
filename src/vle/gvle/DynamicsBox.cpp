@@ -514,7 +514,7 @@ void DynamicsBox::fillPackage()
     mPackageListStore->clear();
 
     utils::PathList paths = utils::Path::path().getInstalledPackages();
-    paths.sort();
+    std::sort(paths.begin(), paths.end());
     for (utils::PathList::const_iterator i = paths.begin(), e = paths.end();
          i != e; ++i) {
         mRowPackage = *(mPackageListStore->append());

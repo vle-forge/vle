@@ -184,7 +184,7 @@ void DynamicBox::makeComboPackage()
 
     utils::PathList paths = utils::Path::path().getInstalledPackages();
 
-    paths.sort();
+    std::sort(paths.begin(), paths.end());
     for (utils::PathList::const_iterator i = paths.begin(), e = paths.end();
          i != e; ++i) {
         mComboPackage->append_text(*i);

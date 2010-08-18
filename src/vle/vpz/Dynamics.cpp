@@ -119,4 +119,17 @@ void Dynamics::rename(const std::string& oldname,
     del(oldname);
 }
 
+std::set < std::string > Dynamics::depends() const
+{
+    std::set < std::string > result;
+
+    for (const_iterator it = begin(); it != end(); ++it) {
+        if (not it->second.package().empty()) {
+            result.insert(it->second.package());
+        }
+    }
+
+    return result;
+}
+
 }} // namespace vle vpz

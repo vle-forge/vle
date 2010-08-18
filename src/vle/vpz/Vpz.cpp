@@ -247,4 +247,15 @@ void Vpz::validateMemory(const std::string& buffer)
     xmlFreeParserCtxt(ctxt);
 }
 
+std::set < std::string > Vpz::depends() const
+{
+    std::set < std::string > dynamics = project().dynamics().depends();
+    std::set < std::string > outputs = project().experiment().views().outputs().depends();
+
+    std::set < std::string > result(dynamics);
+    result.insert(outputs.begin(), outputs.end());
+
+    return result;
+}
+
 }} // namespace vle vpz

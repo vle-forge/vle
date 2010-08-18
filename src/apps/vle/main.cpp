@@ -41,6 +41,30 @@
 
 namespace vle {
 
+void showDepends(const std::map < std::string, Depends >& deps)
+{
+    typedef std::map < std::string, Depends > AllDepends;
+
+    for (AllDepends::const_iterator it = deps.begin(); it != deps.end(); ++it) {
+        if (it->second.empty()) {
+            std::cout << utils::Path::basename(it->first) << ": -\n";
+        } else {
+            std::cout << utils::Path::basename(it->first) << ": ";
+
+            Depends::const_iterator jt = it->second.begin();
+            while (jt != it->second.end()) {
+                Depends::const_iterator kt = jt++;
+                std::cout << *kt;
+                if (jt != it->second.end()) {
+                    std::cout << ", ";
+                } else {
+                    std::cout << '\n';
+                }
+            }
+        }
+    }
+}
+
 void appendToCommandLineList(const char* param, manager::CmdArgs& out)
 {
     using utils::Path;
@@ -110,9 +134,14 @@ void buildCommandLineList(int argc, char* argv[], manager::CmdArgs& lst)
                 Package::package().pack();
                 Package::package().wait(std::cout, std::cerr);
                 stop = not Package::package().isSuccess();
+            } else if (strcmp(argv[i], "depends") == 0) {
+                std::map < std::string, std::set < std::string > > r;
+                manager::VLE v;
+                r = v.depends();
+                showDepends(r);
             } else if (strcmp(argv[i], "list") == 0) {
                 PathList vpz(Path::path().getInstalledExperiments());
-                vpz.sort();
+                std::sort(vpz.begin(), vpz.end());
                 std::copy(vpz.begin(), vpz.end(), std::ostream_iterator
                           < std::string >(std::cout, "\n"));
                 PathList libs(utils::Path::path().getInstalledLibraries());

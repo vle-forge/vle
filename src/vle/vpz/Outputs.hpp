@@ -34,6 +34,7 @@
 #include <vle/vpz/Output.hpp>
 #include <vle/vpz/DllDefines.hpp>
 #include <map>
+#include <set>
 #include <vector>
 #include <string>
 
@@ -186,6 +187,13 @@ namespace vle { namespace vpz {
 	 */
         void rename(const std::string& oldoutputname,
                     const std::string& newoutputname);
+
+        /**
+         * @brief Fill the std::set with all external Output (ie. in
+         * another package).
+         * @return A list of package name.
+         */
+        std::set < std::string > depends() const;
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
