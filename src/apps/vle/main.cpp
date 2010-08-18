@@ -41,8 +41,52 @@
 
 namespace vle {
 
-void showDepends(const std::map < std::string, Depends >& deps)
+void makeAll(const std::map < std::string, std::set < std::string > >& deps)
 {
+    typedef std::set < std::string > Depends;
+    typedef std::map < std::string, Depends > AllDepends;
+    Depends uniq;
+
+    for (AllDepends::const_iterator it = deps.begin(); it != deps.end(); ++it) {
+        for (Depends::const_iterator jt = it->second.begin(); jt !=
+             it->second.end(); ++jt) {
+            uniq.insert(*jt);
+        }
+    }
+
+    using utils::Path;
+    using utils::Package;
+
+    std::string current = Package::package().name();
+
+    std::string error(Path::buildTemp("build-cerr"));
+    std::ofstream f(error.c_str());
+
+    for (Depends::iterator it = uniq.begin(); it != uniq.end(); ++it) {
+        Package::package().select(*it);
+        std::cout << fmt("Package [%1%]") % *it;
+        Package::package().configure();
+        Package::package().wait(std::cout, f);
+        if (Package::package().isSuccess()) {
+            Package::package().build();
+            Package::package().wait(std::cout, f);
+            if (Package::package().isSuccess()) {
+                Package::package().install();
+                Package::package().wait(std::cout, f);
+            }
+        }
+    }
+
+    if (not Package::package().isSuccess()) {
+        std::cout << fmt("See %1% for log\n") % error;
+    }
+
+    utils::Package::package().select(current);
+}
+
+void showDepends(const std::map < std::string, std::set < std::string > >& deps)
+{
+    typedef std::set < std::string > Depends;
     typedef std::map < std::string, Depends > AllDepends;
 
     for (AllDepends::const_iterator it = deps.begin(); it != deps.end(); ++it) {
@@ -133,6 +177,12 @@ void buildCommandLineList(int argc, char* argv[], manager::CmdArgs& lst)
             } else if (strcmp(argv[i], "package") == 0) {
                 Package::package().pack();
                 Package::package().wait(std::cout, std::cerr);
+                stop = not Package::package().isSuccess();
+            } else if (strcmp(argv[i], "all") == 0) {
+                std::map < std::string, std::set < std::string > > r;
+                manager::VLE v;
+                r = v.depends();
+                makeAll(r);
                 stop = not Package::package().isSuccess();
             } else if (strcmp(argv[i], "depends") == 0) {
                 std::map < std::string, std::set < std::string > > r;
