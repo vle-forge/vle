@@ -135,7 +135,15 @@ int PlaceDialog::run()
         mInitialName = mPlace->name();
         mOutputCheckbox->set_active(mPlace->output());
         if (mPlace->output()) {
-            mOutputEntry->set_active_text(mPlace->outputPortName());
+            if (find(mPetriNet.outputPorts().begin(),
+                     mPetriNet.outputPorts().end(),
+                     mPlace->outputPortName()) !=
+                mPetriNet.outputPorts().end()) {
+
+                mOutputEntry->set_active_text(mPlace->outputPortName());
+            } else {
+                mOutputEntry->get_entry()->set_text(mPlace->outputPortName());
+            }
             mDelayEntry->set_sensitive(false);
             mDelayEntry->set_text("");
             mDelayCheckbox->set_sensitive(false);
@@ -152,7 +160,7 @@ int PlaceDialog::run()
             }
         }
         mMarkingEntry->set_text((fmt(
-	     "%1%") %
+                                     "%1%") %
                                  mPlace->initialMarking()).str());
     } else {
         mNameEntry->set_text("");

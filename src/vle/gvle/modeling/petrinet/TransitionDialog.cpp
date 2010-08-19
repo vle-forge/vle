@@ -157,13 +157,29 @@ int TransitionDialog::run()
                                   mTransition->priority()).str());
         mInputCheckbox->set_active(mTransition->input());
         if (mTransition->input()) {
+            if (find(mPetriNet.inputPorts().begin(),
+                     mPetriNet.inputPorts().end(),
+                     mTransition->inputPortName()) !=
+                mPetriNet.inputPorts().end()) {
+                mInputEntry->set_active_text(mTransition->inputPortName());
+            } else {
+                mInputEntry->get_entry()->set_text(mTransition->inputPortName());
+            }
             mInputEntry->set_active_text(mTransition->inputPortName());
         } else {
             mInputEntry->set_sensitive(false);
         }
         mOutputCheckbox->set_active(mTransition->output());
         if (mTransition->output()) {
-            mOutputEntry->set_active_text(mTransition->outputPortName());
+            if (find(mPetriNet.outputPorts().begin(),
+                     mPetriNet.outputPorts().end(),
+                     mTransition->outputPortName()) !=
+                mPetriNet.outputPorts().end()) {
+
+                mOutputEntry->set_active_text(mTransition->outputPortName());
+            } else {
+                mOutputEntry->get_entry()->set_text(mTransition->outputPortName());
+            }
         } else {
             mOutputEntry->set_sensitive(false);
         }

@@ -372,7 +372,13 @@ int TransitionDialog::run()
         }
     }
     if (not mTransition->action().empty()) {
-        mActionEntry->set_active_text(mTransition->action());
+        const std::string name =  mTransition->action();
+        const std::string& buffer = mStatechart->action(name);
+        if (buffer.empty()) {
+            mActionEntry->get_entry()->set_text(name);
+        } else {
+            mActionEntry->set_active_text(name);
+        }
     }
     mActionButton->set_sensitive(not mTransition->action().empty());
 
@@ -383,7 +389,13 @@ int TransitionDialog::run()
         mAfterEntry->append_text(it->first);
     }
     if (not mTransition->after().empty()) {
-        mAfterEntry->set_active_text(mTransition->after());
+        const std::string name =  mTransition->after();
+        const std::string& buffer = mStatechart->after(name);
+        if (buffer.empty()) {
+            mAfterEntry->get_entry()->set_text(name);
+        } else {
+            mAfterEntry->set_active_text(name);
+        }
     }
     mAfterButton->set_sensitive(not mTransition->after().empty());
 
@@ -394,7 +406,13 @@ int TransitionDialog::run()
         mGuardEntry->append_text(it->first);
     }
     if (not mTransition->guard().empty()) {
-        mGuardEntry->set_active_text(mTransition->guard());
+        const std::string name =  mTransition->guard();
+        const std::string& buffer = mStatechart->guard(name);
+        if (buffer.empty()) {
+            mGuardEntry->get_entry()->set_text(name);
+        } else {
+            mGuardEntry->set_active_text(name);
+        }
     }
     mGuardButton->set_sensitive(not mTransition->guard().empty());
 
@@ -415,7 +433,13 @@ int TransitionDialog::run()
             mStatechart->outputPorts().end()) {
             mOutputPortEntry->set_active_text(mTransition->send());
         } else {
-            mSendEntry->set_active_text(mTransition->send());
+            const std::string name =  mTransition->send();
+            const std::string& buffer = mStatechart->send(name);
+            if (buffer.empty()) {
+                mSendEntry->get_entry()->set_text(name);
+            } else {
+                mSendEntry->set_active_text(mTransition->send());
+            }
         }
     }
     mSendButton->set_sensitive(
@@ -428,7 +452,13 @@ int TransitionDialog::run()
         mWhenEntry->append_text(it->first);
     }
     if (not mTransition->when().empty()) {
-        mWhenEntry->set_active_text(mTransition->when());
+        const std::string name =  mTransition->when();
+        const std::string& buffer = mStatechart->when(name);
+        if (buffer.empty()) {
+            mWhenEntry->get_entry()->set_text(name);
+        } else {
+            mWhenEntry->set_active_text(name);
+        }
     }
     mWhenButton->set_sensitive(not mTransition->when().empty());
 

@@ -141,7 +141,12 @@ int EventInStateDialog::run(const std::string& event,
         mActionEntry->append_text(it->first);
     }
     if (not action.empty()) {
-        mActionEntry->set_active_text(action);
+        const std::string& buffer = mStatechart->eventAction(action);
+        if (buffer.empty()) {
+            mActionEntry->get_entry()->set_text(action);
+        } else {
+            mActionEntry->set_active_text(action);
+        }
     }
     mActionButton->set_sensitive(not action.empty());
     mDialog->set_default_response(Gtk::RESPONSE_ACCEPT);
@@ -396,9 +401,9 @@ int StateDialog::run()
         const std::string action = mState->inAction();
         const std::string& buffer = mStatechart->action(action);
         if (buffer.empty()) {
-            mInActionEntry->get_entry()->set_text(mState->inAction());
+            mInActionEntry->get_entry()->set_text(action);
         } else {
-            mInActionEntry->set_active_text(mState->inAction());
+            mInActionEntry->set_active_text(action);
         }
     }
     mInActionButton->set_sensitive(not mState->inAction().empty());
@@ -407,9 +412,9 @@ int StateDialog::run()
         const std::string action = mState->outAction();
         const std::string& buffer = mStatechart->action(action);
         if (buffer.empty()) {
-            mOutActionEntry->get_entry()->set_text(mState->outAction());
+            mOutActionEntry->get_entry()->set_text(action);
         } else {
-            mOutActionEntry->set_active_text(mState->outAction());
+            mOutActionEntry->set_active_text(action);
         }
     }
     mOutActionButton->set_sensitive(not mState->outAction().empty());
@@ -424,9 +429,9 @@ int StateDialog::run()
         const std::string action = mState->activity();
         const std::string& buffer = mStatechart->action(action);
         if (buffer.empty()) {
-            mActivityEntry->get_entry()->set_text(mState->activity());
+            mActivityEntry->get_entry()->set_text(action);
         } else {
-            mActivityEntry->set_active_text(mState->activity());
+            mActivityEntry->set_active_text(action);
           }
     }
     mActivityButton->set_sensitive(not mState->activity().empty());
