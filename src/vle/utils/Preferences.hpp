@@ -27,7 +27,7 @@
 
 
 #ifndef VLE_UTILS_PREFERENCES_HPP
-#define VLE_UTILS_PREFERENCES_HPP
+#define VLE_UTILS_PREFERENCES_HPP 1
 
 #include <fstream>
 #include <map>
@@ -42,8 +42,17 @@ typedef std::map < std::string, KeyValue > Settings;
 class VLE_UTILS_EXPORT Preferences
 {
 public:
-    Preferences(const std::string& file = "vle.conf");
-    Preferences(Preferences& pref);
+    /**
+     * @brief Build new Preferences object with a specified filename.
+     * @param file The filename to open.
+     */
+    Preferences(const std::string& file = std::string("vle.conf"));
+
+    /**
+     * @brief Copy constructor.
+     * @param pref The Preferences object to copy.
+     */
+    Preferences(const Preferences& pref);
 
     /**
      * @brief Load the content of a config file into settings map
@@ -63,6 +72,13 @@ public:
      */
     std::string getAttributes(const std::string& section,
                               const std::string& key);
+
+    /**
+     * @brief Get the values for a specified keys.
+     * @param section The section to search values.
+     * @return The values.
+     */
+    const KeyValue& getKeyValues(const std::string& section) const;
 
     /**
      * @brief Set the value of an attribute

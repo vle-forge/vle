@@ -38,7 +38,7 @@ Preferences::Preferences(const std::string& file)
 {
 }
 
-Preferences::Preferences(Preferences& pref)
+Preferences::Preferences(const Preferences& pref)
     : m_filepath(pref.m_filepath)
 {
 }
@@ -81,16 +81,26 @@ void Preferences::save()
     }
 
     m_file << "# VLE config file" << std::endl << std::endl;
-    for (Settings::const_iterator it_sections = m_settings.begin();
-         it_sections != m_settings.end();
-         ++it_sections) {
-        m_file << "[" << it_sections->first << "]" << std::endl;
-        for (KeyValue::const_iterator it_keys = it_sections->second.begin();
-             it_keys != it_sections->second.end();
-             ++it_keys) {
-            m_file << it_keys->first << "=" << it_keys->second << std::endl;
+    for (Settings::const_iterator it = m_settings.begin();
+         it != m_settings.end(); ++it) {
+        m_file << "\n[" << it->first << "]" << std::endl;
+        for (KeyValue::const_iterator jt = it->second.begin();
+             jt != it->second.end(); ++jt) {
+            m_file << jt->first << "=" << jt->second << std::endl;
         }
     }
+}
+
+const KeyValue& Preferences::getKeyValues(const std::string& section) const
+{
+    Settings::const_iterator it = m_settings.find(section);
+
+    if (it == m_settings.end()) {
+        throw utils::ArgError(fmt(_(
+                    "Preferences: section `%1%' is empty")) % section);
+    }
+
+    return it->second;
 }
 
 std::string Preferences::getAttributes(const std::string& section,
