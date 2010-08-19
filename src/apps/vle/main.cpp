@@ -41,10 +41,12 @@
 
 namespace vle {
 
-void makeAll(const std::map < std::string, std::set < std::string > >& deps)
+void makeAll()
 {
     typedef std::set < std::string > Depends;
     typedef std::map < std::string, Depends > AllDepends;
+
+    AllDepends deps = manager::depends();
     Depends uniq;
 
     for (AllDepends::const_iterator it = deps.begin(); it != deps.end(); ++it) {
@@ -84,10 +86,12 @@ void makeAll(const std::map < std::string, std::set < std::string > >& deps)
     utils::Package::package().select(current);
 }
 
-void showDepends(const std::map < std::string, std::set < std::string > >& deps)
+void showDepends()
 {
     typedef std::set < std::string > Depends;
     typedef std::map < std::string, Depends > AllDepends;
+
+    AllDepends deps = manager::depends();
 
     for (AllDepends::const_iterator it = deps.begin(); it != deps.end(); ++it) {
         if (it->second.empty()) {
@@ -107,6 +111,21 @@ void showDepends(const std::map < std::string, std::set < std::string > >& deps)
             }
         }
     }
+}
+
+void listContentPackage()
+{
+    using utils::Path;
+
+    utils::PathList packages = Path::path().getInstalledExperiments();
+    std::sort(packages.begin(), packages.end());
+
+    std::copy(packages.begin(), packages.end(),
+              std::ostream_iterator < std::string >(std::cout, "\n"));
+
+    utils::PathList libs(utils::Path::path().getInstalledLibraries());
+    std::copy(libs.begin(), libs.end(),
+              std::ostream_iterator < std::string >(std::cout, "\n"));
 }
 
 void appendToCommandLineList(const char* param, manager::CmdArgs& out)
@@ -179,24 +198,14 @@ void buildCommandLineList(int argc, char* argv[], manager::CmdArgs& lst)
                 Package::package().wait(std::cout, std::cerr);
                 stop = not Package::package().isSuccess();
             } else if (strcmp(argv[i], "all") == 0) {
-                std::map < std::string, std::set < std::string > > r;
-                manager::VLE v;
-                r = v.depends();
-                makeAll(r);
+                makeAll();
                 stop = not Package::package().isSuccess();
             } else if (strcmp(argv[i], "depends") == 0) {
-                std::map < std::string, std::set < std::string > > r;
-                manager::VLE v;
-                r = v.depends();
-                showDepends(r);
+                showDepends();
+                stop = not Package::package().isSuccess();
             } else if (strcmp(argv[i], "list") == 0) {
-                PathList vpz(Path::path().getInstalledExperiments());
-                std::sort(vpz.begin(), vpz.end());
-                std::copy(vpz.begin(), vpz.end(), std::ostream_iterator
-                          < std::string >(std::cout, "\n"));
-                PathList libs(utils::Path::path().getInstalledLibraries());
-                std::copy(libs.begin(), libs.end(), std::ostream_iterator
-                          < std::string >(std::cout, "\n"));
+                listContentPackage();
+                stop = not Package::package().isSuccess();
             } else {
                 break;
             }
@@ -269,15 +278,16 @@ int main(int argc, char* argv[])
 
     bool result = true;
     if (not lst.empty()) {
-        manager::VLE vle(command.port());
-
         if (command.manager()) {
-            result = vle.runManager(command.allInLocal(), command.savevpz(),
-                                    command.processor(), lst);
+            result = manager::runManager(command.allInLocal(),
+                                         command.savevpz(),
+                                         command.processor(),
+                                         lst);
         } else if (command.simulator()) {
-            result = vle.runSimulator(command.processor());
+            result = manager::runSimulator(command.processor(),
+                                           command.port());
         } else if (command.justRun()) {
-            result = vle.justRun(command.processor(), lst);
+            result = manager::justRun(command.processor(), lst);
         }
     }
 

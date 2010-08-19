@@ -37,65 +37,49 @@
 
 namespace vle { namespace manager {
 
+    typedef std::set < std::string > Depends;
+
     /**
-     * @brief A class to start the simulation. This class initialises
-     * the user directory and install signal. The desctructor clear all
-     * singleton classes.
+     * @brief read an experimental frame VPZ, build the complete condition
+     * combinations and launch or connect to the vle::Simulator and send
+     * experimental frame instance VPZi. vle::Manager can listening on
+     * localhost port and wait for VPZ stream like a daemon.
+     * @param nbProcessor number of processor.
+     * @return true if manager is a success.
      */
-    class VLE_MANAGER_EXPORT VLE
-    {
-    public:
-        /**
-         * @brief Initialise signal and user directory.
-         */
-        explicit VLE(int port = 8000);
+    VLE_MANAGER_EXPORT bool runManager(bool allInLocal, bool savevpz,
+                                       int nbProcessor, const CmdArgs& args);
 
-        /**
-         * @brief Delete all singleton classes.
-         */
-        ~VLE();
+    /**
+     * @brief vle::Simulator: manage a number of processor and launch
+     * simulation on it. vle::Simulator run in localhost daemon.
+     * @param nbProcessor number of processor.
+     * @param port The port [0..65535] to listen.
+     * @return true if simulator is a success.
+     */
+    VLE_MANAGER_EXPORT bool runSimulator(int nbProcessor, int port);
 
-        /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
+    /**
+     * @brief vle::JustRun: start a simulation without analysis of the
+     * complete condition combinations, just take the fist and run
+     * simulation.
+     *
+     * @return true if justRun simulation is a success.
+     */
+    VLE_MANAGER_EXPORT bool justRun(int nbProcessor, const CmdArgs& args);
 
-        /**
-         * @brief read an experimental frame VPZ, build the complete condition
-         * combinations and launch or connect to the vle::Simulator and send
-         * experimental frame instance VPZi. vle::Manager can listening on
-         * localhost port and wait for VPZ stream like a daemon.
-         * @param nbProcessor number of processor.
-         * @return true if manager is a success.
-         */
-        bool runManager(bool allInLocal, bool savevpz, int nbProcessor,
-                        const CmdArgs& args);
+    /**
+     * @brief Build a dictonnary of dependencies. For each vpz file in
+     * experiment directory, we produce a list of dependencies.
+     * @return The dictionnary.
+     */
+    VLE_MANAGER_EXPORT std::map < std::string, Depends > depends();
 
-        /**
-         * @brief vle::Simulator: manage a number of processor and launch
-         * simulation on it. vle::Simulator run in localhost daemon.
-         * @param nbProcessor number of processor.
-         * @return true if simulator is a success.
-         */
-        bool runSimulator(int nbProcessor);
-
-        /**
-         * @brief vle::JustRun: start a simulation without analysis of the
-         * complete condition combinations, just take the fist and run
-         * simulation.
-         *
-         * @return true if justRun simulation is a success.
-         */
-        bool justRun(int nbProcessor, const CmdArgs& args);
-
-        /**
-         * @brief Build a dictonnary of dependencies. For each vpz file in
-         * experiment directory, we produce a list of dependencies.
-         * @return The dictionnary.
-         */
-        std::map < std::string, std::set < std::string > > depends() const;
-
-    private:
-        int             mPort;
-    };
-
+    /*
+     *
+     * initialisation and finalize functions of the system
+     *
+     */
 
     /**
      * @brief Initialize the VLE system by:

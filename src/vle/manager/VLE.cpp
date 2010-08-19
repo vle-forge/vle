@@ -48,22 +48,9 @@
 #include <fstream>
 #include <string>
 
-
-
 namespace vle { namespace manager {
 
-VLE::VLE(int port) :
-    mPort(port)
-{
-}
-
-VLE::~VLE()
-{
-    utils::Path::kill();
-    utils::Trace::kill();
-}
-
-bool VLE::runManager(bool allInLocal, bool savevpz, int nbProcessor, const
+bool runManager(bool allInLocal, bool savevpz, int nbProcessor, const
                      CmdArgs& args)
 {
     CmdArgs::const_iterator it = args.begin();
@@ -77,7 +64,8 @@ bool VLE::runManager(bool allInLocal, bool savevpz, int nbProcessor, const
                 r.start(args.front());
             } else {
                 std::cerr << fmt(_(
-                    "Manager all simulations in %1% processor\n")) % nbProcessor;
+                    "Manager all simulations in %1% processor\n")) %
+                    nbProcessor;
                 ManagerRunThread r(std::cerr, savevpz, nbProcessor);
                 r.start(args.front());
             }
@@ -94,7 +82,7 @@ bool VLE::runManager(bool allInLocal, bool savevpz, int nbProcessor, const
     return true;
 }
 
-bool VLE::runSimulator(int process)
+bool runSimulator(int process, int port)
 {
     try {
         std::cerr << _("Simulator start in daemon mode\n");
@@ -107,7 +95,7 @@ bool VLE::runSimulator(int process)
             utils::Trace::getLogFilename(boost::str(fmt(
                     "distant-%1%") % utils::DateTime::simpleCurrentDate())));
 
-        SimulatorDistant sim(utils::Trace::trace().output(), process, mPort);
+        SimulatorDistant sim(utils::Trace::trace().output(), process, port);
         sim.start();
     } catch(const std::exception& e) {
         std::cerr << fmt(_("\n/!\\ vle distant simulator error "
@@ -118,7 +106,7 @@ bool VLE::runSimulator(int process)
     return true;
 }
 
-bool VLE::justRun(int nbProcessor, const CmdArgs& args)
+bool justRun(int nbProcessor, const CmdArgs& args)
 {
     if (nbProcessor == 1) {
         try {
@@ -135,16 +123,17 @@ bool VLE::justRun(int nbProcessor, const CmdArgs& args)
             jrt.operator()(args);
         } catch(const std::exception& e) {
             std::cerr << fmt(_("\n/!\\ vle thread simulator error reported: "
-                               " %1%")) % utils::demangle(typeid(e)) << e.what();
+                               " %1%")) % utils::demangle(typeid(e)) <<
+                e.what();
             return false;
         }
     }
     return true;
 }
 
-std::map < std::string, std::set < std::string > > VLE::depends() const
+std::map < std::string, Depends > depends()
 {
-    std::map < std::string, std::set < std::string > > result;
+    std::map < std::string, Depends > result;
 
     utils::PathList vpz(utils::Path::path().getInstalledExperiments());
     std::sort(vpz.begin(), vpz.end());
@@ -161,7 +150,6 @@ std::map < std::string, std::set < std::string > > VLE::depends() const
 
     return result;
 }
-
 
 void init()
 {
