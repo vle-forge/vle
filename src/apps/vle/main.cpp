@@ -128,6 +128,17 @@ void listContentPackage()
               std::ostream_iterator < std::string >(std::cout, "\n"));
 }
 
+void listPackages()
+{
+    using utils::Path;
+
+    utils::PathList vpz = Path::path().getInstalledPackages();
+    std::sort(vpz.begin(), vpz.end());
+
+    std::copy(vpz.begin(), vpz.end(),
+              std::ostream_iterator < std::string >(std::cout, "\n"));
+}
+
 void appendToCommandLineList(const char* param, manager::CmdArgs& out)
 {
     using utils::Path;
@@ -254,6 +265,11 @@ int main(int argc, char* argv[])
 
     if (command.version()) {
         utils::printVersion(std::cerr);
+        return EXIT_SUCCESS;
+    }
+
+    if (command.list()) {
+        listPackages();
         return EXIT_SUCCESS;
     }
 

@@ -42,7 +42,7 @@ OptionGroup::OptionGroup()
     : Glib::OptionGroup(_("Commands"), _("Descriptions of commands")),
     mManager(false), mSimulator(false), mJustrun(false), mPort(8000),
     mProcess(1), mAllinlocal(false), mSaveVpz(false), mInfos(false),
-    mVersion(false), mVerbose(0)
+    mVersion(false), mList(false), mVerbose(0)
 {
     {
         Glib::OptionEntry en;
@@ -114,6 +114,12 @@ OptionGroup::OptionGroup()
         en.set_long_name("version");
         en.set_description(_("The VLE Version."));
         add_entry(en, mVersion);
+    }
+    {
+        Glib::OptionEntry en;
+        en.set_long_name("list");
+        en.set_description(_("Show the list of installed packages."));
+        add_entry(en, mList);
     }
     {
         Glib::OptionEntry en;

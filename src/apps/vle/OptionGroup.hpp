@@ -54,6 +54,7 @@ namespace vle { namespace apps {
         bool savevpz() const { return mSaveVpz; }
         bool infos() const { return mInfos; }
         bool version() const { return mVersion; }
+        bool list() const { return mList; }
         int verbose() const { return mVerbose; }
         const Glib::ustring& package() const { return mPackage; }
 
@@ -74,6 +75,7 @@ namespace vle { namespace apps {
         bool          mSaveVpz;
         bool          mInfos;
         bool          mVersion;
+        bool          mList;
         int           mVerbose;
         Glib::ustring mPackage;
     };
