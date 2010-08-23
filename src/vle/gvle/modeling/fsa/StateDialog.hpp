@@ -36,6 +36,7 @@
 #include <gtkmm/liststore.h>
 #include <gtkmm/menu.h>
 #include <gtkmm/treeview.h>
+#include <gtkmm/image.h>
 #include <libglademm.h>
 #include <boost/algorithm/string.hpp>
 #include <iostream>
