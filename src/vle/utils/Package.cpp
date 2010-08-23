@@ -226,6 +226,28 @@ void Package::pack()
     }
 }
 
+void Package::unzip(const std::string& filename)
+{
+    Path& p = utils::Path::path();
+    fs::create_directory(p.getPackageBuildDir());
+
+    std::list < std::string > argv;
+#ifdef G_OS_WIN32
+    argv.push_back(Glib::find_program_in_path("unzip.exe"));
+#else
+    argv.push_back(Glib::find_program_in_path("unzip"));
+#endif
+    argv.push_back(filename);
+
+    try {
+        process(p.getPackagesDir(), argv);
+    } catch(const Glib::SpawnError& e) {
+        throw utils::InternalError(fmt(
+                _("Pkg packaging error: unzip `%1%' failed %2%")) % filename %
+            e.what());
+    }
+}
+
 void Package::waitProcess()
 {
     m_success = false;

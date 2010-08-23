@@ -95,6 +95,12 @@ namespace vle { namespace utils {
         void pack();
 
         /**
+         * @brief Try to unzip the provided file.
+         * @param file The filename to unzip.
+         */
+        void unzip(const std::string& file);
+
+        /**
          * @brief Return true if the current process is finished.
          * @return True if finish, false otherwise.
          */
