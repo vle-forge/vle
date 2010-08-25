@@ -53,6 +53,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
+#include <sstream>
 #include <gtkmm/filechooserdialog.h>
 #include <glibmm/spawn.h>
 #include <glibmm/miscutils.h>
@@ -1702,6 +1703,36 @@ std::string valuetype_to_string(value::Value::type type)
     }
 }
 
+bool GVLE::packageAllTimer()
+{
+    std::string o, e;
+    utils::Package::package().getOutputAndClear(o);
+    utils::Package::package().getErrorAndClear(e);
+    Glib::RefPtr < Gtk::TextBuffer > ref = mLog->get_buffer();
+
+    insertLog(o);
+    insertLog(e);
+    scrollLogToLastLine();
+
+    if (utils::Package::package().isFinish()) {
+        ++itDependencies;
+        if (itDependencies != mDependencies.end()) {
+            utils::Package::package().select(*itDependencies);
+            buildAllProject();
+        } else {
+            utils::Package::package().select(utils::Path::filename(mPackage));
+            insertLog("package " +
+                      utils::Package::package().name() +
+                      " & first level dependencies built\n");
+            getMenu()->showProjectMenu();
+        }
+        scrollLogToLastLine();
+        return false;
+    } else {
+        return true;
+    }
+}
+
 bool GVLE::packageTimer()
 {
     std::string o, e;
@@ -1715,6 +1746,52 @@ bool GVLE::packageTimer()
 
     if (utils::Package::package().isFinish()) {
         getMenu()->showProjectMenu();
+        return false;
+    } else {
+        return true;
+    }
+}
+
+bool GVLE::packageConfigureAllTimer()
+{
+    std::string o, e;
+    utils::Package::package().getOutputAndClear(o);
+    utils::Package::package().getErrorAndClear(e);
+
+    insertLog(o);
+    insertLog(e);
+    scrollLogToLastLine();
+
+    if (utils::Package::package().isFinish()) {
+        if (utils::Package::package().isSuccess()) {
+            buildAllProject();
+        } else {
+            getMenu()->showProjectMenu();
+        }
+        scrollLogToLastLine();
+        return false;
+    } else {
+        return true;
+    }
+}
+
+bool GVLE::packageBuildAllTimer()
+{
+    std::string o, e;
+    utils::Package::package().getOutputAndClear(o);
+    utils::Package::package().getErrorAndClear(e);
+
+    insertLog(o);
+    insertLog(e);
+    scrollLogToLastLine();
+
+    if (utils::Package::package().isFinish()) {
+        if (utils::Package::package().isSuccess()) {
+            installAllProject();
+        } else {
+            getMenu()->showProjectMenu();
+        }
+        scrollLogToLastLine();
         return false;
     } else {
         return true;
@@ -1744,6 +1821,25 @@ bool GVLE::packageBuildTimer()
     }
 }
 
+void GVLE::configureAllProject()
+{
+    insertLog("configure package " + utils::Package::package().name() + "\n");
+    getMenu()->hideProjectMenu();
+    try {
+        utils::Package::package().configure();
+    } catch (const std::exception& e) {
+        getMenu()->showProjectMenu();
+        gvle::Error(e.what());
+        return;
+    } catch (const Glib::Exception& e) {
+        getMenu()->showProjectMenu();
+        gvle::Error(e.what());
+        return;
+    }
+    Glib::signal_timeout().connect(
+        sigc::mem_fun(*this, &GVLE::packageConfigureAllTimer), 250);
+}
+
 void GVLE::configureProject()
 {
     insertLog("configure package\n");
@@ -1761,6 +1857,24 @@ void GVLE::configureProject()
     }
     Glib::signal_timeout().connect(
         sigc::mem_fun(*this, &GVLE::packageTimer), 250);
+}
+
+void GVLE::buildAllProject()
+{
+    insertLog("build package " + utils::Package::package().name() + "\n");
+    try {
+        utils::Package::package().build();
+    } catch (const std::exception& e) {
+        getMenu()->showProjectMenu();
+        gvle::Error(e.what());
+        return;
+    } catch (const Glib::Exception& e) {
+        getMenu()->showProjectMenu();
+        gvle::Error(e.what());
+        return;
+    }
+    Glib::signal_timeout().connect(
+        sigc::mem_fun(*this, &GVLE::packageBuildAllTimer), 250);
 }
 
 void GVLE::buildProject()
@@ -1782,6 +1896,104 @@ void GVLE::buildProject()
         sigc::mem_fun(*this, &GVLE::packageBuildTimer), 250);
 }
 
+std::map < std::string, Depends > GVLE::depends()
+{
+    std::map < std::string, Depends > result;
+
+    utils::PathList vpz(utils::Path::path().getInstalledExperiments());
+    std::sort(vpz.begin(), vpz.end());
+
+    for (utils::PathList::iterator it = vpz.begin(); it != vpz.end(); ++it) {
+        std::set < std::string > depends;
+        try {
+            vpz::Vpz vpz(*it);
+            depends = vpz.depends();
+        } catch (const std::exception& /*e*/) {
+        }
+        result[*it] = depends;
+    }
+
+    return result;
+}
+
+void GVLE::makeAllProject()
+{
+    AllDepends deps = depends();
+
+    insertLog("\nbuild package "  +
+              utils::Package::package().name() +
+              " & first level of dependencies\n");
+
+    getMenu()->hideProjectMenu();
+
+    mDependencies.clear();
+
+    for (AllDepends::const_iterator it = deps.begin(); it != deps.end(); ++it) {
+        for (Depends::const_iterator jt = it->second.begin(); jt !=
+                 it->second.end(); ++jt) {
+            mDependencies.insert(*jt);
+        }
+    }
+
+    mDependencies.insert(utils::Package::package().name());
+
+    using utils::Path;
+    using utils::Package;
+
+    itDependencies = mDependencies.begin();
+
+    if (itDependencies != mDependencies.end()) {
+
+        Package::package().select(*itDependencies);
+
+        insertLog("configure package " + utils::Package::package().name() + "\n");
+
+        Package::package().configure();
+
+        Glib::signal_timeout().connect(
+            sigc::mem_fun(*this, &GVLE::packageConfigureAllTimer), 250);
+    }
+}
+
+void GVLE::displayDependencies()
+{
+    std::string dependsbuffer;
+
+    AllDepends deps = depends();
+
+    for (AllDepends::const_iterator it = deps.begin(); it != deps.end(); ++it) {
+        if (it->second.empty()) {
+            dependsbuffer += "<b>" + utils::Path::basename(it->first) + "</b> : -\n";
+        } else {
+            dependsbuffer += "<b>" + utils::Path::basename(it->first) + "</b> : ";
+
+            Depends::const_iterator jt = it->second.begin();
+            while (jt != it->second.end()) {
+                Depends::const_iterator kt = jt++;
+                dependsbuffer += *kt;
+                if (jt != it->second.end()) {
+                    dependsbuffer += ", ";
+                } else {
+                    dependsbuffer += '\n';
+                }
+            }
+        }
+    }
+
+    const std::string title =
+        utils::Path::filename(mPackage) +
+        _(" - Package Dependencies");
+
+    Gtk::MessageDialog* box;
+
+    box = new Gtk::MessageDialog(dependsbuffer, true, Gtk::MESSAGE_INFO,
+                                 Gtk::BUTTONS_OK, true);
+    box->set_title(title);
+
+    box->run();
+    delete box;
+}
+
 void GVLE::testProject()
 {
     insertLog("test package\n");
@@ -1801,9 +2013,31 @@ void GVLE::testProject()
         sigc::mem_fun(*this, &GVLE::packageTimer), 250);
 }
 
+
+void GVLE::installAllProject()
+{
+    insertLog("install package : " +
+              utils::Package::package().name() +
+              "\n");
+    try {
+        utils::Package::package().install();
+    } catch (const std::exception& e) {
+        getMenu()->showProjectMenu();
+        gvle::Error(e.what());
+        return;
+    } catch (const Glib::Exception& e) {
+        getMenu()->showProjectMenu();
+        gvle::Error(e.what());
+        return;
+    }
+    Glib::signal_timeout().connect(
+        sigc::mem_fun(*this, &GVLE::packageAllTimer), 250);
+}
+
+
 void GVLE::installProject()
 {
-    insertLog("install package");
+    insertLog("install package\n");
     getMenu()->hideProjectMenu();
     try {
         utils::Package::package().install();

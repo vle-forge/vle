@@ -63,6 +63,8 @@ void makeAll()
 
     std::string current = Package::package().name();
 
+    uniq.insert(current);
+
     std::string error(Path::buildTemp("build-cerr"));
     std::ofstream f(error.c_str());
 

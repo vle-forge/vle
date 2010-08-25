@@ -67,6 +67,9 @@ class Modeling;
 class PreferencesBox;
 class PackageBrowserWindow;
 
+typedef std::set < std::string > Depends;
+typedef std::map < std::string, Depends > AllDepends;
+
 /**
  * @brief GVLE is a Gtk::Window use to build the main window with all button
  * to control project.
@@ -567,26 +570,103 @@ public:
      *
      ********************************************************************/
 
+    /**
+     * @brief log the output of the current operation an manage the
+     * launch of the next one
+     */
+    bool packageAllTimer();
+    /**
+     * @brief log the output of the current operation an manage the
+     * launch of the next one
+     */
+    bool packageConfigureAllTimer();
+    /**
+     * @brief log the output of the current operation an manage the
+     * launch of the next one
+     */
+    bool packageBuildAllTimer();
+    /**
+     * @brief log the output of the current operation an manage the
+     * launch of the next one
+     */
     bool packageTimer();
+    /**
+     * @brief log the output of the current operation an manage the
+     * launch of the next one
+     */
     bool packageBuildTimer();
 
     /**
-     * When click on configure project menu
+     * @brief configure the current project and connect a timer
+     *
+     * The launched timer used can manage the next operation to be
+     * done on the package: build. The build operation is expected.
+     */
+    void configureAllProject();
+
+    /**
+     * @brief only configure the current project and connect a timer
      *
      */
     void configureProject();
 
     /**
-     * When click on build project menu
+     * @brief build the current project and connect a timer
+     *
+     * The launched timer used can manage the next operation to be
+     * done on the package: install. The Install operation is expected.
+     */
+    void buildAllProject();
+
+    /**
+     * @brief When click on build project menu
      *
      */
     void buildProject();
 
     /**
+     * @brief build the project and the first level of
+     * dependencies.
+     *
+     * After gathered the list of dependencies. The chain of operation
+     * is started by launching the first operation: the configure on
+     * the first package.
+     *
+     * @warning This code is close from makeAll() of the CLI application.
+     */
+    void makeAllProject();
+
+    /**
+     * @brief get all the dependencies generated from each experiment
+     *
+     * @warning This code is duplicated from the main of the CLI application.
+     */
+    AllDepends depends();
+
+    /**
+     * @brief display the the dependencies of the current project
+     *
+     * For each simulator of the current package, a list of package
+     * is displayed. This mean that a simulator uses a component
+     * available inside a package of the list.
+     *
+     * @warning This code is close from showDepends() of the CLI application.
+     */
+    void displayDependencies();
+
+    /**
+     * @brief install the current project and connect a timer
+     *
+     * The launched timer used can manage the next operation to be
+     * done on the next package: configure. The build configure
+     * operation on the next package is expected.
+     */
+    void installAllProject();
+
+    /**
      * @brief When click on install project menu.
      */
     void installProject();
-
     /**
      * @brief When click on test project menu.
      */
@@ -806,6 +886,10 @@ private:
     ModelClassBox*                  mModelClassBox;
     QuitBox*                        mQuitBox;
     PluginFactory                   mPluginFactory;
+
+    /* Project managment */
+    Depends mDependencies;
+    Depends::const_iterator itDependencies;
 };
 
 std::string valuetype_to_string(value::Value::type type);
