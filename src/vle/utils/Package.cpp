@@ -28,6 +28,7 @@
 
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Path.hpp>
+#include <vle/utils/Preferences.hpp>
 #include <vle/utils/Exception.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/version.hpp>
@@ -39,6 +40,9 @@
 #include <iostream>
 #include <cstring>
 #include <glib/gstdio.h>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/constants.hpp>
+#include <boost/algorithm/string/classification.hpp>
 
 #ifdef G_OS_WIN32
 #   include <windows.h>
@@ -71,18 +75,9 @@ void Package::configure()
 
     fs::create_directory(p.getPackageBuildDir());
 
+    std::string cmd = (vle::fmt(mCommandConfigure) % p.getPackageDir()).str();
     std::list < std::string > argv;
-#ifdef G_OS_WIN32
-    argv.push_back(Glib::find_program_in_path("cmake.exe"));;
-    argv.push_back("-G");
-    argv.push_back("MinGW Makefiles");
-#else
-    argv.push_back(Glib::find_program_in_path("cmake"));;
-#endif
-    argv.push_back((fmt("-DCMAKE_INSTALL_PREFIX=%1%") %
-                    p.getPackageDir()).str());
-    argv.push_back("-DCMAKE_BUILD_TYPE=RelWithDebInfo");
-    argv.push_back("..");
+    buildCommandLine(cmd, argv);
 
     try {
         process(p.getPackageBuildDir(), argv);
@@ -98,12 +93,7 @@ void Package::test()
     fs::create_directory(p.getPackageBuildDir());
 
     std::list < std::string > argv;
-#ifdef G_OS_WIN32
-    argv.push_back(Glib::find_program_in_path("mingw32-make.exe"));
-#else
-    argv.push_back(Glib::find_program_in_path("make"));
-#endif
-    argv.push_back("test");
+    buildCommandLine(mCommandTest, argv);
 
     try {
         process(p.getPackageBuildDir(), argv);
@@ -119,12 +109,7 @@ void Package::build()
     fs::create_directory(p.getPackageBuildDir());
 
     std::list < std::string > argv;
-#ifdef G_OS_WIN32
-    argv.push_back(Glib::find_program_in_path("mingw32-make.exe"));
-#else
-    argv.push_back(Glib::find_program_in_path("make"));
-#endif
-    argv.push_back("all");
+    buildCommandLine(mCommandBuild, argv);
 
     try {
         process(p.getPackageBuildDir(), argv);
@@ -140,12 +125,7 @@ void Package::install()
     fs::create_directory(p.getPackageBuildDir());
 
     std::list < std::string > argv;
-#ifdef G_OS_WIN32
-    argv.push_back(Glib::find_program_in_path("mingw32-make.exe"));
-#else
-    argv.push_back(Glib::find_program_in_path("make"));
-#endif
-    argv.push_back("install");
+    buildCommandLine(mCommandInstall, argv);
 
     fs::path src = p.getPackageBuildDir();
     src /= "src";
@@ -176,18 +156,10 @@ void Package::clean()
     fs::create_directory(p.getPackageBuildDir());
 
     fs::path makefile = Path::path().getPackageBuildDir();
-    fs::path cmakecache = Path::path().getPackageBuildDir();
     makefile /= "Makefile";
-    cmakecache /= "CMakeCache.txt";
-
     if (fs::exists(makefile)) {
         std::list < std::string > argv;
-#ifdef G_OS_WIN32
-        argv.push_back(Glib::find_program_in_path("mingw32-make.exe"));
-#else
-        argv.push_back(Glib::find_program_in_path("make"));
-#endif
-        argv.push_back("clean");
+        buildCommandLine(mCommandClean, argv);
 
         try {
             process(p.getPackageBuildDir(), argv);
@@ -195,12 +167,6 @@ void Package::clean()
             throw utils::InternalError(fmt(
                     _("Pkg clean error: clean failed %1%")) % e.what());
         }
-
-        fs::remove(makefile);
-    }
-
-    if (fs::exists(cmakecache)) {
-        fs::remove(cmakecache);
     }
 }
 
@@ -210,13 +176,7 @@ void Package::pack()
     fs::create_directory(p.getPackageBuildDir());
 
     std::list < std::string > argv;
-#ifdef G_OS_WIN32
-    argv.push_back(Glib::find_program_in_path("mingw32-make.exe"));
-#else
-    argv.push_back(Glib::find_program_in_path("make"));
-#endif
-    argv.push_back("package");
-    argv.push_back("package_source");
+    buildCommandLine(mCommandPack, argv);
 
     try {
         process(p.getPackageBuildDir(), argv);
@@ -232,12 +192,7 @@ void Package::unzip(const std::string& filename)
     fs::create_directory(p.getPackageBuildDir());
 
     std::list < std::string > argv;
-#ifdef G_OS_WIN32
-    argv.push_back(Glib::find_program_in_path("unzip.exe"));
-#else
-    argv.push_back(Glib::find_program_in_path("unzip"));
-#endif
-    argv.push_back(filename);
+    buildCommandLine(mCommandUnzip, argv);
 
     try {
         process(p.getPackagesDir(), argv);
@@ -395,6 +350,46 @@ void Package::select(const std::string& name)
     }
 }
 
+void Package::refresh()
+{
+    utils::Preferences prefs;
+    prefs.load();
+
+    prefs.assign("package", "configure", mCommandConfigure);
+    prefs.assign("package", "test", mCommandTest);
+    prefs.assign("package", "build", mCommandBuild);
+    prefs.assign("package", "install", mCommandInstall);
+    prefs.assign("package", "clean", mCommandClean);
+    prefs.assign("package", "pack", mCommandPack);
+    prefs.assign("package", "unzip", mCommandUnzip);
+}
+
+Package::Package()
+    : m_stop(true), m_success(false), m_out(0), m_err(0), m_wait(0), m_pid(0)
+{
+#ifdef G_OS_WIN32
+    mCommandConfigure = "cmake.exe -G MinGWMakefile " \
+                       "-DCMAKE_INSTALL_PREFIX=%1% " \
+                       "-DCMAKE_BUILD_TYPE=RelWithDebInfo ..";
+    mCommandTest = "mingw32-make.exe test";
+    mCommandBuild = "mingw32-make.exe all";
+    mCommandInstall = "mingw32-make.exe install";
+    mCommandClean = "mingw32-make.exe clean";
+    mCommandPack = "mingw32-make.exe package package_source";
+    mCommandUnzip = "unzip.exe";
+
+#else
+    mCommandConfigure = "cmake " \
+                       "-DCMAKE_INSTALL_PREFIX=%1% " \
+                       "-DCMAKE_BUILD_TYPE=RelWithDebInfo ..";
+    mCommandTest = "make test";
+    mCommandBuild = "make all";
+    mCommandInstall = "make install";
+    mCommandClean = "make clean";
+    mCommandPack = "make package package_source";
+    mCommandUnzip = "unzip";
+#endif
+}
                             /*   manage thread   */
 
 void Package::process(const std::string& workingDir,
@@ -561,6 +556,23 @@ void Package::appendError(const std::string& str)
     Glib::Mutex::Lock lock(m_mutex);
 
     m_strerr.append(str);
+}
+
+void Package::buildCommandLine(const std::string& cmd,
+                               std::list < std::string >& argv)
+{
+    namespace ba = boost::algorithm;
+
+    ba::split(argv, cmd, ba::is_space(), ba::token_compress_on);
+
+    if (argv.empty()) {
+        throw utils::ArgError(fmt(_(
+                    "Package command line: error in command `%1%'")) % cmd);
+    }
+
+    std::string exe = argv.front();
+    argv.pop_front();
+    argv.push_front(Glib::find_program_in_path(exe));
 }
 
 }} // namespace vle utils

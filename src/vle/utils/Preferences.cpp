@@ -91,6 +91,18 @@ void Preferences::save()
     }
 }
 
+void Preferences::assign(const std::string& section, const std::string& key,
+                         std::string& value) const
+{
+    Settings::const_iterator it = m_settings.find(section);
+    if (it != m_settings.end()) {
+        KeyValue::const_iterator jt = it->second.find(key);
+        if (jt != it->second.end()) {
+            value = jt->second;
+        }
+    }
+}
+
 const KeyValue& Preferences::getKeyValues(const std::string& section) const
 {
     Settings::const_iterator it = m_settings.find(section);

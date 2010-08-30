@@ -65,6 +65,18 @@ public:
     void save();
 
     /**
+     * @brief Set the variable `value' with the value read in section `section'
+     * for the key `key'. If the key or the section do not exist, value is not
+     * modified.
+     *
+     * @param section The section of the attribute to set.
+     * @param key The key of the attribute to set.
+     * @param value The value to set.
+     */
+    void assign(const std::string& section, const std::string& key,
+                std::string& value) const;
+
+    /**
      * @brief Get the value of an attribute
      * @param section The section of the attribute to read
      * @param key The key of the attribute to read

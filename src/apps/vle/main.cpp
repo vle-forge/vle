@@ -188,6 +188,8 @@ void cliPackage(int argc, char* argv[], manager::CmdArgs& lst)
     int i = 1;
     bool stop = false;
 
+    utils::Package::package().refresh();
+
     if (not Package::package().name().empty()) {
         while (stop == false and i < argc) {
             if (strcmp(argv[i], "create") == 0) {
@@ -325,8 +327,8 @@ void cliConfig(int argc, char* argv[])
     if ((argc - 1) % 3) {
         throw utils::ArgError(
             _("Bad argument: vle --config [section key value] ...\n"
-              "\tvle --config build make \"make -j 2\"\n"
-              "\tvle --config build install \"make-mingw32.exe install\"\n"));
+              "\tvle --config package make \"make -j 2\"\n"
+              "\tvle --config package install \"make-mingw32.exe install\"\n"));
     }
 
     for (int i = 1; i < argc; i += 3) {

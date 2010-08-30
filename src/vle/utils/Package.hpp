@@ -164,6 +164,11 @@ namespace vle { namespace utils {
         void select(const std::string& name);
 
         /**
+         * @brief Refresh the command line option from the `vle.conf' file.
+         */
+        void refresh();
+
+        /**
          * @brief Get an identifiant for the specified package. If the name is
          * not defined in the table list, it will be add.
          * @param name The package to get an Id.
@@ -197,10 +202,7 @@ namespace vle { namespace utils {
         /**
          * @brief Hide constructor.
          */
-        Package()
-            : m_stop(true), m_success(false), m_out(0), m_err(0), m_wait(0),
-            m_pid(0)
-        {}
+        Package();
 
         static Package* m_package; ///< singleton attribute.
         PackageTable m_table; ///< the list of package available.
@@ -213,6 +215,14 @@ namespace vle { namespace utils {
         Glib::Pid m_pid; ///< pid of the current process.
         std::string m_strout; ///< standard output string.
         std::string m_strerr; ///< standard error string.
+
+        std::string mCommandConfigure;
+        std::string mCommandTest;
+        std::string mCommandBuild;
+        std::string mCommandInstall;
+        std::string mCommandClean;
+        std::string mCommandPack;
+        std::string mCommandUnzip;
 
         /**
          * @brief Start the process taken from the list of argument in the
@@ -245,6 +255,14 @@ namespace vle { namespace utils {
         void appendError(const char* str);
         void appendOutput(const std::string& str);
         void appendError(const std::string& str);
+
+        /**
+         * @brief Split the string `cmd' into argv argumenent.
+         * @param cmd
+         * @param argv
+         */
+        void buildCommandLine(const std::string& cmd,
+                              std::list < std::string >& argv);
     };
 
 }} // namespace vle utils
