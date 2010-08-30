@@ -34,6 +34,8 @@
 #include <vle/utils/Trace.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Package.hpp>
+#include <vle/utils/Preferences.hpp>
+#include <vle/utils/Remote.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/i18n.hpp>
 #include <boost/version.hpp>
@@ -113,6 +115,16 @@ void showDepends()
     }
 }
 
+void unzip(const std::string& filename)
+{
+    utils::Package::package().unzip(filename);
+    utils::Package::package().wait(std::cout, std::cerr);
+
+    if (utils::Package::package().isSuccess()) {
+        throw utils::InternalError(fmt(_("Failed to unzip `%1%'")) % filename);
+    }
+}
+
 void listContentPackage()
 {
     using utils::Path;
@@ -167,7 +179,7 @@ void appendToCommandLineList(const char* param, manager::CmdArgs& out)
     throw utils::ArgError(fmt(_("Filename '%1%' does not exist")) % param);
 }
 
-void buildCommandLineList(int argc, char* argv[], manager::CmdArgs& lst)
+void cliPackage(int argc, char* argv[], manager::CmdArgs& lst)
 {
     using utils::Package;
     using utils::Path;
@@ -227,7 +239,101 @@ void buildCommandLineList(int argc, char* argv[], manager::CmdArgs& lst)
         for (; i < argc; ++i) {
             appendToCommandLineList(argv[i], lst);
         }
+    } else {
     }
+}
+
+void showRemoteList(const utils::RemoteList& list)
+{
+    typedef utils::RemoteList::const_iterator Iterator;
+
+    for (Iterator it = list.begin(); it != list.end(); ++it) {
+        std::cout << it->first << " " << it->second << "\n";
+    }
+}
+
+void showPackageList(const utils::PackageList& list)
+{
+    typedef utils::PackageList::const_iterator Iterator;
+
+    for (Iterator it = list.begin(); it != list.end(); ++it) {
+        std::cout << *it << "\n";
+    }
+}
+
+void cliRemote(int argc, char* argv[])
+{
+    using utils::Package;
+    using utils::Path;
+    using utils::PathList;
+    using utils::Remote;
+
+    Remote r;
+    bool error = false;
+
+    if (argc > 1) {
+        if (strcmp(argv[1], "list") == 0) {
+            showRemoteList(r.list());
+        } else {
+            if (argc > 2) {
+                char* host = argv[1];
+                char* command = argv[2];
+                char* package = 0;
+
+                if (argc > 3) {
+                    package = argv[3];
+                }
+
+                if (strcmp(command, "show") == 0) {
+                    if (package) {
+                        std::cout << r.show(host, package);
+                    } else {
+                        showPackageList(r.show(host));
+                    }
+                } else if (strcmp(command, "get") == 0) {
+                    if (package == 0) {
+                        error = true;
+                    } else {
+                        unzip(r.get(host, package));
+                    }
+                } else {
+                    error = true;
+                }
+            } else {
+                error = true;
+            }
+        }
+    } else {
+        error = true;
+    }
+
+    if (error) {
+        throw utils::ArgError(
+            _("Bad argument:\n"
+              "\tvle --remote list\n"
+              "\tvle --remote vle-project.org show\n"
+              "\tvle --remote vle-project.org show glue\n"
+              "\tvle --remote vle-project.org get glue\n"));
+    }
+}
+
+void cliConfig(int argc, char* argv[])
+{
+    utils::Preferences prefs;
+    prefs.load();
+
+    if ((argc - 1) % 3) {
+        throw utils::ArgError(
+            _("Bad argument: vle --config [section key value] ...\n"
+              "\tvle --config build make \"make -j 2\"\n"
+              "\tvle --config build install \"make-mingw32.exe install\"\n"));
+    }
+
+    for (int i = 1; i < argc; i += 3) {
+        prefs.setAttributes(argv[i], argv[i + 1], argv[i + 2]);
+    }
+
+    prefs.save();
 }
 
 } // namespace vle
@@ -247,7 +353,7 @@ int main(int argc, char* argv[])
         command.check();
         utils::Trace::trace().setLevel(static_cast < utils::Trace::Level >(
                 command.verbose()));
-        utils::Package::package().select(command.package());
+        utils::Package::package().select(command.currentPackage());
     } catch(const Glib::Error& e) {
         std::cerr << fmt(_("Command line error: %1%\n")) % e.what();
         manager::finalize();
@@ -281,7 +387,13 @@ int main(int argc, char* argv[])
     manager::CmdArgs lst;
 
     try {
-        buildCommandLineList(argc, argv, lst);
+        if (not utils::Package::package().name().empty()) {
+            cliPackage(argc, argv, lst);
+        } else if (command.remote()) {
+            cliRemote(argc, argv);
+        } else if (command.config()) {
+            cliConfig(argc, argv);
+        }
     } catch(const Glib::Error& e) {
         std::cerr << fmt(_("Error: %1%\n")) % e.what();
         manager::finalize();

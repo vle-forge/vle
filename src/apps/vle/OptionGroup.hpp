@@ -56,7 +56,10 @@ namespace vle { namespace apps {
         bool version() const { return mVersion; }
         bool list() const { return mList; }
         int verbose() const { return mVerbose; }
-        const Glib::ustring& package() const { return mPackage; }
+        const Glib::ustring& currentPackage() const { return mCurrentPackage; }
+        bool package() const { return mPackage; }
+        bool remote() const { return mRemote; }
+        bool config() const { return mConfig; }
 
         /**
          * @brief Check the validity of the selected option from the command
@@ -77,7 +80,10 @@ namespace vle { namespace apps {
         bool          mVersion;
         bool          mList;
         int           mVerbose;
-        Glib::ustring mPackage;
+        Glib::ustring mCurrentPackage;
+        bool          mPackage;
+        bool          mRemote;
+        bool          mConfig;
     };
 
 }} // namespace vle apps

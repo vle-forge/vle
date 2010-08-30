@@ -42,7 +42,7 @@ OptionGroup::OptionGroup()
     : Glib::OptionGroup(_("Commands"), _("Descriptions of commands")),
     mManager(false), mSimulator(false), mJustrun(false), mPort(8000),
     mProcess(1), mAllinlocal(false), mSaveVpz(false), mInfos(false),
-    mVersion(false), mList(false), mVerbose(0)
+    mVersion(false), mList(false), mVerbose(0), mRemote(false), mConfig(false)
 {
     {
         Glib::OptionEntry en;
@@ -84,8 +84,19 @@ OptionGroup::OptionGroup()
         Glib::OptionEntry en;
         en.set_long_name(_("package"));
         en.set_short_name('P');
-        en.set_description(_("Select the package."));
-        add_entry(en, mPackage);
+        en.set_description(_(
+                "Switch to package mode.\n"
+                "\tvle --package foo create: build new foo package\n"
+                "\tvle --package foo configure: configure the foo package\n"
+                "\tvle --package foo build: build the foo package\n"
+                "\tvle --package foo test: start a unit test campaign\n"
+                "\tvle --package foo install: install libs\n"
+                "\tvle --package foo clean: clean up the build directory\n"
+                "\tvle --package foo package: build package source and binary\n"
+                "\tvle --package foo all: build all depends of foo package\n"
+                "\tvle --package foo depends: list depends of foo package\n"
+                "\tvle --package foo list: list vpz and library package\n"));
+        add_entry(en, mCurrentPackage);
     }
     {
         Glib::OptionEntry en;
@@ -133,14 +144,45 @@ OptionGroup::OptionGroup()
             "\t(3) all simulation trace\n"));
         add_entry(en, mVerbose);
     }
+    {
+        Glib::OptionEntry en;
+        en.set_long_name("remote");
+        en.set_short_name('R');
+        en.set_description(_(
+                "Switch to remote commands:\n"
+                "\tvle --remote vle-project show\n"
+                "\tvle --remote vle-project list\n"
+                "\tvle --remote vle-project get Package\n"));
+        add_entry(en, mRemote);
+    }
+    {
+        Glib::OptionEntry en;
+        en.set_long_name("config");
+        en.set_short_name('C');
+        en.set_description(_(
+                "Add a command into the $VLE_HOME/vle.conf configuration file\n"
+                "\tvle --config vle-project http://www.vle-project.org\n"
+                "\tvle --config build make \"make -j 2\"\n"
+                "\tvle --config build install \"make-mingw32.exe install\"\n"));
+        add_entry(en, mConfig);
+    }
 }
 
 void OptionGroup::check()
 {
+    mPackage = not mCurrentPackage.empty();
+
     if ((mManager and mSimulator) or (mManager and mJustrun) or
         (mSimulator and mJustrun)) {
         throw utils::InternalError(
             _("Cannot start vle in simulator, manager and just run mode"));
+    }
+
+    if ((mPackage and mRemote) or (mPackage and mConfig) or
+        (mRemote and mConfig)) {
+        throw utils::InternalError(
+            _("Only one mode is available at the same time (Package, Remote "
+              "or Config mode)."));
     }
 
     if (not mManager and not mSimulator and not mJustrun)
