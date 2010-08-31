@@ -241,7 +241,13 @@ void cliPackage(int argc, char* argv[], manager::CmdArgs& lst)
         for (; i < argc; ++i) {
             appendToCommandLineList(argv[i], lst);
         }
-    } else {
+    }
+}
+
+void cliDirect(int argc, char* argv[], manager::CmdArgs& lst)
+{
+    for (int i = 1; i < argc; ++i) {
+        appendToCommandLineList(argv[i], lst);
     }
 }
 
@@ -395,6 +401,8 @@ int main(int argc, char* argv[])
             cliRemote(argc, argv);
         } else if (command.config()) {
             cliConfig(argc, argv);
+        } else {
+            cliDirect(argc, argv, lst);
         }
     } catch(const Glib::Error& e) {
         std::cerr << fmt(_("Error: %1%\n")) % e.what();
