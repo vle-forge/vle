@@ -93,7 +93,7 @@ void Experiment::setDuration(double duration)
 {
     if (duration <= 0.0) {
         throw utils::ArgError(fmt(
-                _("Experiment duraction error: %1% (must be > 0")) % duration);
+                _("Experiment duration error: %1% (must be > 0)")) % duration);
     }
 
     m_duration = duration;
