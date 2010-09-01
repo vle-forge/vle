@@ -47,9 +47,10 @@ Dummy::~Dummy()
 void Dummy::onParameter(const std::string& /*plugin*/,
                          const std::string& /*location*/,
                          const std::string& /*file*/,
-                         value::Value* /*parameters*/,
+                         value::Value* parameters,
                          const double& /*time*/)
 {
+    delete parameters;
 }
 
 void Dummy::onNewObservable(const std::string& /*simulator*/,
@@ -73,8 +74,9 @@ void Dummy::onValue(const std::string& /*simulator*/,
                      const std::string& /*port*/,
                      const std::string& /*view*/,
                      const double& /*time*/,
-                     value::Value* /*value*/)
+                     value::Value* value)
 {
+    delete value;
 }
 
 void Dummy::close(const double& /*time*/)
