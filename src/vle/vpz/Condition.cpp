@@ -31,6 +31,7 @@
 #include <vle/vpz/Condition.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Algo.hpp>
+#include <vle/utils/Exception.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/value/Deleter.hpp>
@@ -185,19 +186,23 @@ void Condition::clearValueOfPort(const std::string& portname)
 
 value::Map* Condition::firstValues() const
 {
-    value::Map* result = new value::Map();
+    throw utils::InternalError("vpz::Condition::firstValues : "
+            " deprecated function");
+    return 0;
+}
 
+void Condition::fillWithFirstValues(value::MapValue& mapToFill) const
+{
+    mapToFill.clear();
     for (const_iterator it = m_list.begin(); it != m_list.end(); ++it) {
         if (it->second->size() > 0) {
-            result->add(it->first, it->second->get(0));
+            mapToFill[it->first] = it->second->get(0);
         } else {
             throw(utils::ArgError(fmt(
-                        "Build a empty first values for condition %1%.") %
-                    m_name));
+                "Build a empty first values for condition %1%.") %
+                m_name));
         }
     }
-
-    return result;
 }
 
 const value::Set& Condition::getSetValues(const std::string& portname) const
@@ -250,11 +255,20 @@ value::Set& Condition::lastAddedPort()
     return *it->second;
 }
 
+
 void Condition::rebuildValueSet()
 {
     for (ConditionValues::iterator it = m_list.begin(); it != m_list.end();
          ++it) {
-        it->second = new value::Set();
+        it->second->value().clear();
+    }
+}
+
+void Condition::deleteValueSet()
+{
+    for (ConditionValues::iterator it = m_list.begin(); it != m_list.end();
+         ++it) {
+        it->second->clear();
     }
 }
 

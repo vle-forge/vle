@@ -190,10 +190,15 @@ namespace vle { namespace vpz {
         void cleanNoPermanent();
 
         /**
-         * @brief This function initialise every, to each port, a new
+         * @brief This function initialises every, to each port, a new
          * value::Set.
          */
         void rebuildValueSet();
+
+        /**
+         * @brief This function deletes on each port the value::Set stored
+         */
+        void deleteValueSet();
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *

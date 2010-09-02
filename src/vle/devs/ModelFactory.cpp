@@ -153,10 +153,11 @@ void ModelFactory::createModel(Coordinator& coordinator,
         for (std::vector < std::string >::const_iterator it =
              conditions.begin(); it != conditions.end(); ++it) {
 	    const vpz::Condition& cnd(mExperiment.conditions().get(*it));
-	    value::Map* vl = cnd.firstValues();
+	    value::MapValue vl;
+	    cnd.fillWithFirstValues(vl);
 
-	    for (value::Map::const_iterator itv = vl->begin();
-		 itv != vl->end(); ++itv) {
+	    for (value::MapValue::const_iterator itv = vl.begin();
+		 itv != vl.end(); ++itv) {
 
                 if (initValues.exist(itv->first)) {
                     throw utils::InternalError(fmt(_(
@@ -166,7 +167,7 @@ void ModelFactory::createModel(Coordinator& coordinator,
                 initValues.add(itv->first, itv->second);
             }
 
-            vl->value().clear();
+            vl.clear();
 	}
     }
 

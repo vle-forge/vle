@@ -178,6 +178,16 @@ namespace vle { namespace vpz {
         value::Map* firstValues() const;
 
         /**
+         * @brief Fill a MapValue with the first value::Value of each port
+         * of this condition. Be careful, values contained in the value::Map
+         * are not copies.
+         *
+         * @param map, the value::MapValue to fill with the first value::Value
+         * of each port of the condition.
+         */
+        void fillWithFirstValues(value::MapValue& mapToFill) const;
+
+        /**
          * @brief Get the value::Set attached to a port.
          * @param portname The name of the port.
          * @return A reference to a value::Set.
@@ -224,8 +234,16 @@ namespace vle { namespace vpz {
         /**
          * @brief This function initialise every, to each port, a new
          * value::Set.
+         *
          */
         void rebuildValueSet();
+
+        /**
+         * @brief This function deletes on each port the values stored
+         * in the value::Set
+         */
+        void deleteValueSet();
+
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
@@ -311,7 +329,20 @@ namespace vle { namespace vpz {
             void operator()(Condition& x) const
             { x.rebuildValueSet(); }
         };
-
+        /**
+         * @brief Unary function to delete the value set.
+         * To use with std::for_each
+         * or vle::for_each.
+         */
+        struct DeleteValueSet
+        {
+            /**
+             * @brief Delete and rebuild the Value of the specified Condition.
+             * @param x the Condition to delete and rebuild the Value.
+             */
+            void operator()(Condition& x) const
+            { x.deleteValueSet(); }
+        };
     private:
         Condition();
 

@@ -48,7 +48,9 @@ namespace vle { namespace devs {
 	InternalEvent(const Time& time, Simulator* model) :
             Event(model),
             m_time(time)
-	{}
+	{
+           deleter();
+	}
 
 	virtual ~ InternalEvent()
 	{}
