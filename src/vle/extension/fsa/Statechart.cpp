@@ -226,6 +226,7 @@ void Statechart::removeProcessEvent(devs::ExternalEventList* events,
 				    devs::ExternalEvent* event)
 {
     events->erase(events->begin());
+    event->deleter();
     delete event;
     if (events->empty()) {
 	mToProcessEvents.pop_front();
@@ -426,7 +427,11 @@ void Statechart::internalTransition(const devs::Time& time)
                     }
                 } else {
                     removeProcessEvent(events, event);
-                    mPhase = IDLE;
+                    if (mToProcessEvents.empty()) {
+                        mPhase = IDLE;
+                    } else {
+                        mPhase = PROCESSING;
+                    }
                     update = false;
                 }
             }
