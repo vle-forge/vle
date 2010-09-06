@@ -195,6 +195,11 @@ namespace vle { namespace vpz {
          */
         void rebuildValueSet();
 
+        /**
+         * @brief This function deletes on each port the value::Set stored
+         */
+        void deleteValueSet();
+
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
          * Get/Set

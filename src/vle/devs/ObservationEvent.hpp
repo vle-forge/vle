@@ -52,14 +52,18 @@ namespace vle { namespace devs {
             m_time(time),
 	    m_viewName(viewname),
 	    m_portName(portName)
-	{}
+	{
+	    deleter();
+	}
 
 	ObservationEvent(const ObservationEvent& event) :
             Event(event),
             m_time(event.m_time),
 	    m_viewName(event.m_viewName),
 	    m_portName(event.m_portName)
-	{}
+	{
+	    deleter();
+	}
 
         virtual ~ObservationEvent()
         {}

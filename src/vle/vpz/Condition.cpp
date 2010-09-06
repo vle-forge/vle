@@ -31,6 +31,7 @@
 #include <vle/vpz/Condition.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Algo.hpp>
+#include <vle/utils/Exception.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/value/Set.hpp>
 #include <boost/utility.hpp>
@@ -211,6 +212,20 @@ void Condition::clearValueOfPort(const std::string& portname)
     it->second->clear();
 }
 
+void Condition::fillWithFirstValues(value::MapValue& mapToFill) const
+{
+    mapToFill.clear();
+    for (const_iterator it = m_list.begin(); it != m_list.end(); ++it) {
+        if (it->second->size() > 0) {
+            mapToFill[it->first] = &it->second->get(0);
+        } else {
+            throw(utils::ArgError(fmt(
+                "Build a empty first values for condition %1%.") %
+                m_name));
+        }
+    }
+}
+
 ValueList Condition::firstValues() const
 {
     ValueList result;
@@ -283,8 +298,16 @@ void Condition::rebuildValueSet()
 {
     for (ConditionValues::iterator it = m_list.begin(); it != m_list.end();
          ++it) {
-        it->second = value::Set::create();
+        it->second->value().clear();
     }
+}
+
+void Condition::deleteValueSet()
+{
+    for (ConditionValues::iterator it = m_list.begin(); it != m_list.end();
+         ++it) {
+        it->second->clear();
+     }
 }
 
 }} // namespace vle vpz

@@ -44,16 +44,7 @@ ExperimentGenerator::ExperimentGenerator(const vpz::Vpz& file,
     mStoreComb(storecomb), mCommonSeed(commonseed), mMutex(0), mProdcond(0),
     mRand(rnd)
 {
-    vpz::Conditions& dest(mTmpfile.project().experiment().conditions());
-    vpz::ConditionList::const_iterator itDest(dest.conditionlist().begin());
-    vpz::ConditionValues::const_iterator itValueDest(
-        itDest->second.conditionvalues().begin());
-
-    const vpz::Conditions& orig(mFile.project().experiment().conditions());
-    vpz::ConditionList::const_iterator itOrig(orig.conditionlist().begin());
-    vpz::ConditionValues::const_iterator itValueOrig(
-        itOrig->second.conditionvalues().begin());
-
+    mTmpfile.project().experiment().conditions().deleteValueSet();
     mTmpfile.project().experiment().conditions().rebuildValueSet();
 }
 
@@ -151,9 +142,9 @@ void ExperimentGenerator::buildCombinations()
     }
     size_t nb = 0;
     do {
-        mTmpfile.project().experiment().conditions().rebuildValueSet();
         buildCombinationsFromReplicas(nb);
         buildCombination(nb);
+        mTmpfile.project().experiment().conditions().rebuildValueSet();
     } while (nb < getCombinationNumber());
 }
 
@@ -185,7 +176,6 @@ void ExperimentGenerator::buildCombinationsFromReplicas(size_t cmbnumber)
                 mCombinationDiff[cmbnumber].insert(
                     std::pair < diff_key_t, int >(key, index));
             }
-            itValueDest->second->clear();
             itValueDest->second->add(val);
 
             itValueDest++;

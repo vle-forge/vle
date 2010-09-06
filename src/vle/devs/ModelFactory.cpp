@@ -153,9 +153,10 @@ void ModelFactory::createModel(Coordinator& coordinator,
 	for (vpz::Strings::const_iterator it = conditions.begin();
 	     it != conditions.end(); ++it) {
 	    const vpz::Condition& cnd(mExperiment.conditions().get(*it));
-	    vpz::ValueList vl = cnd.firstValues();
+	    value::MapValue vl;
+	    cnd.fillWithFirstValues(vl);
 
-	    for (vpz::ValueList::const_iterator itv = vl.begin();
+	    for (value::MapValue::const_iterator itv = vl.begin();
 		 itv != vl.end(); ++itv) {
 
                 if (initValues.exist(itv->first)) {
@@ -165,6 +166,7 @@ void ModelFactory::createModel(Coordinator& coordinator,
                 }
                 initValues.add(itv->first, itv->second);
             }
+	    vl.clear();
 	}
     }
 

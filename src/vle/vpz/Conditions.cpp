@@ -141,4 +141,10 @@ void Conditions::rebuildValueSet()
     utils::for_each(m_list.begin(), m_list.end(), Condition::RebuildValueSet());
 }
 
+void Conditions::deleteValueSet()
+{
+    utils::for_each(m_list.begin(), m_list.end(), Condition::DeleteValueSet());
+}
+
+
 }} // namespace vle vpz
