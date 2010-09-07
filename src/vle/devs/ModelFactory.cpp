@@ -205,7 +205,8 @@ void ModelFactory::createModel(Coordinator& coordinator,
         }
     }
 
-    if (InternalEvent* evt = sim->init(coordinator.getCurrentTime())) {
+    InternalEvent* evt = sim->init(coordinator.getCurrentTime());
+    if (evt) {
         coordinator.eventtable().putInternalEvent(evt);
     }
 }
