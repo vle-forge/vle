@@ -187,9 +187,15 @@ Time Simulator::timeAdvance()
     return result;
 }
 
-InternalEvent* Simulator::init(const Time& time)
+InternalEvent* Simulator::init(const Time& currentTime)
 {
-    return new InternalEvent(m_dynamics->init(time) + time, this);
+    Time time(m_dynamics->init(currentTime));
+
+    if (not time.isInfinity()) {
+        return new InternalEvent(currentTime + time, this);
+    } else {
+        return 0;
+    }
 }
 
 InternalEvent* Simulator::confluentTransitions(
