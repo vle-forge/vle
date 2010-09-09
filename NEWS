@@ -38,6 +38,11 @@ VLE 0.9.0
   * Addition of a graph translator which builds the structure of a model from an
     adjacency matrix and a list of classes.
 * value: update to a clean value's API..
+* cli:
+  * add `depends' and `all' commands in the package mode to respectively list or
+    build all dependencies of the current package.
+  * add a remote mode to access a repository of packages.
+  * add a config mode to update the `vle.conf' file.
 
 
 VLE 0.8.7
