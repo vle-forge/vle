@@ -22,17 +22,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vle/devs/Dynamics.hpp>
+#include <vle/value.hpp>
+#include <vle/devs.hpp>
 
-namespace vle { namespace examples {
+namespace vd = vle::devs;
+namespace vv = vle::value;
 
-class Simple : public devs::Dynamics
+namespace examples {
+
+class Simple : public vd::Dynamics
 {
 public:
-    Simple(
-        const devs::DynamicsInit& init,
-        const devs::InitEventList& events)
-        : devs::Dynamics(init, events)
+    Simple(const vd::DynamicsInit& init, const vd::InitEventList& events)
+        : vd::Dynamics(init, events)
     {
     }
 
@@ -40,51 +42,44 @@ public:
     {
     }
 
-    virtual devs::Time init(
-        const devs::Time& /* time */)
+    virtual vd::Time init(const vd::Time& /*time*/)
     {
-        return devs::Time::infinity;
+        return vd::Time::infinity;
     }
 
-    virtual void output(
-        const devs::Time& /* time */,
-        devs::ExternalEventList& /* output */) const
+    virtual void output(const vd::Time& /*time*/,
+                        vd::ExternalEventList& /*output*/) const
     {
     }
 
-    virtual devs::Time timeAdvance() const
+    virtual vd::Time timeAdvance() const
     {
-        return devs::Time::infinity;
+        return vd::Time::infinity;
     }
 
-    virtual void internalTransition(
-        const devs::Time& /* time */)
-    {
-    }
-
-    virtual void externalTransition(
-        const devs::ExternalEventList& /* event */,
-        const devs::Time& /* time */)
+    virtual void internalTransition(const vd::Time& /*time*/)
     {
     }
 
-    virtual void confluentTransitions(
-        const devs::Time& time,
-        const devs::ExternalEventList& events)
+    virtual void externalTransition(const vd::ExternalEventList& /*event*/,
+                                    const vd::Time& /*time*/)
+    {
+    }
+
+    virtual void confluentTransitions(const vd::Time& time,
+                                      const vd::ExternalEventList& events)
     {
         internalTransition(time);
         externalTransition(events, time);
     }
 
-    virtual void request(
-        const devs::RequestEvent& /* event */,
-        const devs::Time& /* time */,
-        devs::ExternalEventList& /* output */) const
+    virtual void request(const vd::RequestEvent& /*event*/,
+                         const vd::Time& /*time*/,
+                         vd::ExternalEventList& /*output*/) const
     {
     }
 
-    virtual value::Value* observation(
-        const devs::ObservationEvent& /* event */) const
+    virtual vv::Value* observation(const vd::ObservationEvent& /*event*/) const
     {
         return 0;
     }
@@ -94,6 +89,6 @@ public:
     }
 };
 
-}} // namespace vle example
+} // namespace vle example
 
-DECLARE_NAMED_DYNAMICS(simple, vle::examples::Simple)
+DECLARE_NAMED_DYNAMICS(simple, examples::Simple)
