@@ -21,12 +21,12 @@ ELSE(WIN32)
   SET(OS_SPECIFIC_PATH_IMPL PathUnix.cpp)
 ENDIF(WIN32)
 
-SET(UTILS_CPP DateTime.cpp Host.cpp Package.cpp PackageTable.cpp Path.cpp
-  Preferences.cpp Rand.cpp Remote.cpp Socket.cpp SocketImpl.c Template.cpp
-  Tools.cpp Trace.cpp ${OS_SPECIFIC_PATH_IMPL})
+SET(UTILS_CPP DateTime.cpp Host.cpp Package.cpp PackageTable.cpp Parser.cpp
+  Path.cpp Preferences.cpp Rand.cpp Remote.cpp Socket.cpp SocketImpl.c
+  Template.cpp Tools.cpp Trace.cpp ${OS_SPECIFIC_PATH_IMPL})
 
 SET(UTILS_HPP Algo.hpp DateTime.hpp Debug.hpp DllDefines.hpp Exception.hpp
-  Host.hpp i18n.hpp Package.hpp PackageTable.hpp Path.hpp Pool.hpp
+  Host.hpp i18n.hpp Package.hpp PackageTable.hpp Parser.hpp Path.hpp Pool.hpp
   Preferences.hpp Rand.hpp Remote.hpp Socket.hpp Template.hpp Tools.hpp
   Trace.hpp)
 

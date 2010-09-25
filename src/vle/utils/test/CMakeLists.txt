@@ -47,5 +47,24 @@ TARGET_LINK_LIBRARIES(test_template
   vlemanager
   vletranslator)
 
+ADD_EXECUTABLE(test_parser test_parser.cpp)
+TARGET_LINK_LIBRARIES(test_parser
+  ${GLIBMM_LIBRARIES}
+  ${LIBXML_LIBRARIES}
+  ${GTHREAD_LIBRARIES}
+  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
+  ${Boost_DATE_TIME_LIBRARY}
+  vlegeometry
+  vleutils
+  vlevalue
+  vlegraph
+  vleoov
+  vlevpz
+  vledevs
+  vleextension
+  vlemanager
+  vletranslator)
+
 ADD_TEST(utilstest_algo test_algo)
 ADD_TEST(utilstest_template test_template)
+ADD_TEST(utilstest_parser test_parser)
