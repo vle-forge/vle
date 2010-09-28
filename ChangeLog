@@ -1,4 +1,130 @@
-vle-0.8.7
+vle-0.8.8
+
+commit fad51b707176114dff5e6e328df4f4dfcb541848
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Tue Sep 28 15:40:48 2010 +0200
+
+    vle: update NEWS
+
+commit 47011648af0136108648b848cf94ba81da689b2d
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Tue Sep 28 15:31:05 2010 +0200
+
+    vle: update AUTHORS
+
+commit 7fdb10eb6d3add9a6a8bf68a0dfbb180e6f12bb2
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Tue Sep 7 11:53:37 2010 +0200
+
+    devs: fix memory leaks in init function
+    
+    The devs::ModelFactory builds automatically an internal event after
+    loading the devs::Dynamics from shared library even if the
+    devs::Dynamics::init function returns devs::Time::infinity. If all
+    models in the simulation return devs::Time::infinity, a memory leaks
+    appears for each model.
+
+commit 6cf09f2f58c2560deb09fcb8a47e9c31c745a3fd
+Author: Ronan Trépos <rtrepos@toulouse.inra.fr>
+Date:   Mon Sep 6 11:20:01 2010 +0200
+
+    devs: fix memory leaks in condition and event handling
+    
+    - The delete operators of ObservationEvent and InternalEvent now delete
+      the map of attributes, on contrary to the delete operator of
+      ExternalEvent;
+    - devs::ModelFactory::createModel: first condition values were not
+      deleted;
+    - manager::ExperimentGenerator: leaks in the building of conditions vpz
+      instances of the plan.
+    
+    Signed-off-by: Gauthier Quesnel <quesnel@users.sourceforge.net>
+
+commit a97bb2b4ce7867e3608ba5fa8ae5fb8e389e71b7
+Author: Jerome Thiard <jerome.thiard@toulouse.inra.fr>
+Date:   Wed Sep 1 16:48:43 2010 +0200
+
+    vpz: fix typos in an error message
+    
+    Fix typos in function vle::vpz::experiment::setDuration(double duration)
+    function.
+    
+    Signed-off-by: Gauthier Quesnel <quesnel@users.sourceforge.net>
+
+commit 6c2d2f0323a6a96fd51380b2caed2ef51b5e1cea
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Wed Sep 1 10:49:42 2010 +0200
+
+    oov: fix memory leak in Dummy plugin
+    
+    The Dummy plug-in does not destroy vale::Value in oov::Plugin::onValue
+    and oov::Plugin::onParameter abstract functions.
+    (cherry picked from commit 8a36095a425ff298937714dc786b3e7ee89da132)
+
+commit d9baf0da183305f3367ec3658597a22860ca09ad
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Tue Aug 31 10:02:44 2010 +0200
+
+    package: remove references to i386 architecture
+    
+    Since CMake 2.6, the resolution of the Debian architecture is dynamic.
+    We remove the assignment.
+
+commit 602a2a227a4efc7dd1ccf8d14ce21c11d6b1cd4c
+Author: David Duvivier <david.duvivier@lil.univ-littoral.fr>
+Date:   Wed Aug 4 12:29:06 2010 +0200
+
+    utils: add one distribution in the PRNG
+    
+    Add the three-parameter Weibull distribution.
+    
+    Add notes in Rand.hpp file to precisely explain the role/name of each
+    parameter in the weibull laws when considering various notations.
+    
+    Signed-off-by: Gauthier Quesnel <quesnel@users.sourceforge.net>
+    (cherry picked from commit 8379709110ca75bcba9d89b3024473d29069ed9f)
+
+commit e5d822997afe69b360afd22c6847efd4eec5f0c0
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Sun Aug 15 22:25:31 2010 +0200
+
+    devs: fix a memory leak in Dynamics debug mode
+    
+    The devs::DynamicsDbg mode allocates the devs::Dynamics to debug but the
+    destructor does not delete the devs::Dynamics.
+
+commit f888f0e0b79924c4d5ed180de56219a0d5652556
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Fri Aug 13 14:06:33 2010 +0200
+
+    devs: fix bad id in ModelFactory
+    
+    The devs::ModelFactory uses the name of the library to distinguish
+    loaded Glib::Module. However, the name of the library is not sufficient
+    now with the package mode introduced in VLE 0.8. We fix algorithm and
+    ModelCache to use the Glib::Module::get_name() function instead of the
+    vpz library string.
+    
+    - Update the devs::ModelFactory and devs::ModelCache.
+    - The devs::ModelFactory::getPlugin is deprecated.
+    
+    - Optimize the devs::Coordinator::addModel function 0(2log(n)) to O(log(n)).
+
+commit 912d5a555dc4db0011edc9f53189773e3fc065fc
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Fri Aug 13 14:06:23 2010 +0200
+
+    vle: remove CMake policy CMP0015 error
+    
+    Update the apps/gvle/CMakeLists.txt file to remove CMake policy error:
+    - Remove bad variable VLE_LIBRARIES from the LINK_DIRECTORIES.
+    - Change the variable LIBXML_LIBRARIES to LIBXML_LIBRARY_DIRS.
+
+commit 35fbac947cdff8262938b1036810437f0bbecead
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Fri Jul 23 19:15:09 2010 +0200
+
+    vle-0.8.7
 
 commit 399975c1550b59cf1a635fe33b826961ade15871
 Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
