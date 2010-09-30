@@ -257,7 +257,7 @@ void Multiple::output(const Time& time, ExternalEventList& output) const
 
         ee << attribute("value", getValue(mCurrentModel) + e
                               * getGradient(mCurrentModel));
-        ee << attribute("gardient", getGradient(mCurrentModel));
+        ee << attribute("gradient", getGradient(mCurrentModel));
         output.addEvent(ee);
     }
 }
