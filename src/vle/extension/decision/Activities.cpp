@@ -39,7 +39,7 @@ Activity& Activities::add(const std::string& name, const Activity& act,
 {
     iterator it(m_lst.find(name));
 
-    if (it == m_lst.end()) {
+    if (it != m_lst.end()) {
         throw utils::ArgError(_("Decision: activity already exist"));
     }
 
