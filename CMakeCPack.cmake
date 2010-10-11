@@ -6,8 +6,8 @@ IF (WIN32)
 ENDIF (WIN32)
 
 IF (UNIX)
-  SET(CPACK_STRIP_FILES "bin/vle;bin/gvle;bin/eov;bin/oov;bin/vlemodeltest")
-  SET(CPACK_GENERATOR "STGZ;TGZ;DEB;RPM")
+  SET(CPACK_STRIP_FILES "bin/vle;bin/gvle;bin/eov;bin/oov")
+  SET(CPACK_GENERATOR "TGZ;DEB;RPM")
   SET(CPACK_SOURCE_GENERATOR "ZIP;TGZ;TBZ2")
 ENDIF (UNIX)
 
