@@ -1,7 +1,7 @@
-VLE 0.9.0
+VLE 1.0.0
 =========
 
-* dev:
+* devs:
   * change the behavior of the confluent transition. Now, the confluent
     transition have its own behavior. Modeler can call internal and/or external
     transition or add its own source code. By default, the internal transition
@@ -37,12 +37,66 @@ VLE 0.9.0
 * translator:
   * Addition of a graph translator which builds the structure of a model from an
     adjacency matrix and a list of classes.
-* value: update to a clean value's API..
+* value: update to a clean value's API.
 * cli:
   * add `depends' and `all' commands in the package mode to respectively list or
     build all dependencies of the current package.
   * add a remote mode to access a repository of packages.
   * add a config mode to update the `vle.conf' file.
+
+
+VLE 0.8.8
+=========
+
+* vle:
+  * remove CMake policy CMP0015 error: Update the apps/gvle/CMakeLists.txt file
+    to remove CMake policy error:
+    - Remove bad variable VLE_LIBRARIES from the LINK_DIRECTORIES.
+    - Change the variable LIBXML_LIBRARIES to LIBXML_LIBRARY_DIRS.
+
+* devs:
+  * fix memory leaks in init function: The devs::ModelFactory builds
+    automatically an internal event after loading the devs::Dynamics from shared
+    library even if the devs::Dynamics::init function returns
+    devs::Time::infinity. If all models in the simulation return
+    devs::Time::infinity, a memory leaks appears for each model.
+  * fix memory leaks in condition and event handling:
+    - The delete operators of ObservationEvent and InternalEvent now delete
+      the map of attributes, on contrary to the delete operator of
+      ExternalEvent;
+    - devs::ModelFactory::createModel: first condition values were not
+      deleted;
+    - manager::ExperimentGenerator: leaks in the building of conditions vpz
+      instances of the plan.
+  * fix a memory leak in Dynamics debug mode:
+    The devs::DynamicsDbg mode allocates the devs::Dynamics to debug but the
+    destructor does not delete the devs::Dynamics.
+  * fix bad id in ModelFactory:
+    The devs::ModelFactory uses the name of the library to distinguish
+    loaded Glib::Module. However, the name of the library is not sufficient
+    now with the package mode introduced in VLE 0.8. We fix algorithm and
+    ModelCache to use the Glib::Module::get_name() function instead of the
+    vpz library string.
+    - Update the devs::ModelFactory and devs::ModelCache.
+    - The devs::ModelFactory::getPlugin is deprecated.
+    - Optimize the devs::Coordinator::addModel function 0(2log(n)) to O(log(n)).
+
+* oov:
+  * fix memory leak in Dummy plugin: The Dummy plug-in does not destroy
+    vale::Value in oov::Plugin::onValue and oov::Plugin::onParameter abstract
+    functions.
+
+* package:
+  * remove references to i386 architecture: Since CMake 2.6, the resolution of
+    the Debian architecture is dynamic. We remove the assignment.
+
+* utils:
+  * add one distribution in the PRNG: Add the three-parameter Weibull
+    distribution.
+
+* vpz:
+  * fix typos in an error message: Fix typos in function
+    vle::vpz::experiment::setDuration(double duration) function.
 
 
 VLE 0.8.7
