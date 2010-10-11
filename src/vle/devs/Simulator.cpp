@@ -113,9 +113,9 @@ void Simulator::removeTargetPort(const std::string& port)
 {
     iterator it = mTargets.find(port);
 
-    assert(it != mTargets.end());
-
-    mTargets.erase(it);
+    if (it != mTargets.end()) {
+        mTargets.erase(it);
+    }
 }
 
 void Simulator::addTargetPort(const std::string& port)
