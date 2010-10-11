@@ -27,7 +27,9 @@
 
 
 #include <vle/gvle/About.hpp>
+#include <vle/utils/Path.hpp>
 #include <vle/version.hpp>
+#include <gdkmm/pixbuf.h>
 
 namespace vle { namespace gvle {
 
@@ -42,6 +44,15 @@ About::About(Glib::RefPtr < Gnome::Glade::Xml > refXml) :
         std::string version(VLE_VERSION);
         version += extra;
         mAbout->set_version(version);
+    }
+
+    Glib::RefPtr < Gdk::Pixbuf > pix;
+
+    pix = Gdk::Pixbuf::create_from_file(
+        utils::Path::path().getPixmapFile("yellowvle.svg"));
+
+    if (pix) {
+        mAbout->set_logo(pix);
     }
 
     mAbout->signal_response().connect(
