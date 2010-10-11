@@ -301,14 +301,14 @@ void GVLEMenuAndToolbar::showEditMenu()
 
 void GVLEMenuAndToolbar::hideToolsMenu()
 {
-    m_refActionGroup->get_action("MenuTools")->set_sensitive(true);
+    m_refActionGroup->get_action("MenuTools")->set_sensitive(false);
     m_refActionGroup->get_action("ArrowTool")->set_sensitive(false);
     m_refActionGroup->get_action("AddModelsTool")->set_sensitive(false);
     m_refActionGroup->get_action("AddLinksTool")->set_sensitive(false);
     m_refActionGroup->get_action("AddCoupledTool")->set_sensitive(false);
     m_refActionGroup->get_action("DeleteTool")->set_sensitive(false);
     m_refActionGroup->get_action("ZoomTool")->set_sensitive(false);
-    m_refActionGroup->get_action("QuestionTool")->set_sensitive(true);
+    m_refActionGroup->get_action("QuestionTool")->set_sensitive(false);
 }
 
 void GVLEMenuAndToolbar::showToolsMenu()

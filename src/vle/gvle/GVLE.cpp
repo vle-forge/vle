@@ -1020,49 +1020,49 @@ void GVLE::onArrow()
 {
     mCurrentButton = POINTER;
     mEditor->getDocumentDrawingArea()->updateCursor();
-   showMessage(_("Selection"));
+    showMessage(_("Selection"));
 }
 
 void GVLE::onAddModels()
 {
     mCurrentButton = ADDMODEL;
     mEditor->getDocumentDrawingArea()->updateCursor();
-   showMessage(_("Add models"));
+    showMessage(_("Add models"));
 }
 
 void GVLE::onAddLinks()
 {
     mCurrentButton = ADDLINK;
     mEditor->getDocumentDrawingArea()->updateCursor();
-   showMessage(_("Add links"));
+    showMessage(_("Add links"));
 }
 
 void GVLE::onDelete()
 {
     mCurrentButton = DELETE;
     mEditor->getDocumentDrawingArea()->updateCursor();
-   showMessage(_("Delete object"));
+    showMessage(_("Delete object"));
 }
 
 void GVLE::onAddCoupled()
 {
     mCurrentButton = ADDCOUPLED;
     mEditor->getDocumentDrawingArea()->updateCursor();
-   showMessage(_("Coupled Model"));
+    showMessage(_("Coupled Model"));
 }
 
 void GVLE::onZoom()
 {
     mCurrentButton = ZOOM;
     mEditor->getDocumentDrawingArea()->updateCursor();
-   showMessage(_("Zoom"));
+    showMessage(_("Zoom"));
 }
 
 void GVLE::onQuestion()
 {
     mCurrentButton = QUESTION;
     mEditor->getDocumentDrawingArea()->updateCursor();
-   showMessage(_("Question"));
+    showMessage(_("Question"));
 }
 
 void GVLE::onNewFile()
@@ -1082,9 +1082,9 @@ void GVLE::onNewFile(const std::string& path, const std::string& fileName)
 void GVLE::onNewVpz()
 {
     if (not mModeling->isModified() or mModeling->getFileName().empty() or
-	(mModeling->isModified() and
-	 gvle::Question(_("Do you really want load a new Model ?\nCurrent "
-			 "model will be destroy and not save")))) {
+        (mModeling->isModified() and
+         gvle::Question(_("Do you really want load a new Model ?\nCurrent "
+                          "model will be destroy and not save")))) {
         mModeling->start();
         mMenuAndToolbar->onOpenVpz();
         mMenuAndToolbar->showSave();
@@ -1092,7 +1092,7 @@ void GVLE::onNewVpz()
         mModelTreeBox->set_sensitive(true);
         mModelClassBox->set_sensitive(true);
         if (mCurrentButton == POINTER){
-           showMessage(_("Selection"));
+            showMessage(_("Selection"));
         }
     }
     onExperimentsBox();
@@ -1101,8 +1101,8 @@ void GVLE::onNewVpz()
 void GVLE::onNewNamedVpz(const std::string& path, const std::string& filename)
 {
     if (not mModeling->isModified() or mModeling->getFileName().empty() or
-	(mModeling->isModified() and
-	 gvle::Question(_("Do you really want load a new Model ?\nCurrent "
+        (mModeling->isModified() and
+         gvle::Question(_("Do you really want load a new Model ?\nCurrent "
                           "model will be destroy and not save")))) {
         mModeling->start(path.c_str(), filename.c_str());
         mMenuAndToolbar->onOpenVpz();
@@ -1111,7 +1111,7 @@ void GVLE::onNewNamedVpz(const std::string& path, const std::string& filename)
         mModelTreeBox->set_sensitive(true);
         mModelClassBox->set_sensitive(true);
         if (mCurrentButton == POINTER){
-           showMessage(_("Selection"));
+            showMessage(_("Selection"));
         }
     }
     onExperimentsBox();
@@ -1129,15 +1129,15 @@ void GVLE::onNewProject()
 void GVLE::onOpenFile()
 {
     Gtk::FileChooserDialog file(_("Choose a file"),
-				Gtk::FILE_CHOOSER_ACTION_OPEN);
+                                Gtk::FILE_CHOOSER_ACTION_OPEN);
     file.set_transient_for(*this);
     file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
 
     if (file.run() == Gtk::RESPONSE_OK) {
-	std::string selected_file = file.get_filename();
-	mEditor->openTab(selected_file);
-	mMenuAndToolbar->onOpenFile();
+        std::string selected_file = file.get_filename();
+        mEditor->openTab(selected_file);
+        mMenuAndToolbar->onOpenFile();
     }
 }
 
@@ -1148,7 +1148,7 @@ void GVLE::onOpenProject()
         utils::Package::package().select(mOpenPackageBox->name());
         mPluginFactory.update();
         buildPackageHierarchy();
-	mMenuAndToolbar->onOpenProject();
+        mMenuAndToolbar->onOpenProject();
         setTitle("");
         mFileTreeView->set_sensitive(true);
     }
@@ -1157,11 +1157,11 @@ void GVLE::onOpenProject()
 void GVLE::onOpenVpz()
 {
     if (not mModeling->isModified() or mModeling->getFileName().empty() or
-	(mModeling->isModified() and
-	 gvle::Question(_("Do you really want load a new Model ?\nCurrent "
-			 "model will be destroy and not save")))) {
-	try {
-	    if (mOpenVpzBox->run() == Gtk::RESPONSE_OK) {
+        (mModeling->isModified() and
+         gvle::Question(_("Do you really want load a new Model ?\nCurrent "
+                          "model will be destroy and not save")))) {
+        try {
+            if (mOpenVpzBox->run() == Gtk::RESPONSE_OK) {
                 redrawModelTreeBox();
                 redrawModelClassBox();
                 mMenuAndToolbar->onOpenVpz();
@@ -1169,22 +1169,22 @@ void GVLE::onOpenVpz()
                 mModelClassBox->set_sensitive(true);
                 mEditor->getDocumentDrawingArea()->updateCursor();
                 if (mCurrentButton == POINTER){
-                   showMessage(_("Selection"));
+                    showMessage(_("Selection"));
                 }
             }
-	} catch(utils::InternalError) {
+        } catch(utils::InternalError) {
             Error((fmt(_("No experiments in the package '%1%'")) %
                    utils::Package::package().name()).str());
-	}
+        }
     }
 }
 
 void GVLE::onOpenGlobalVpz()
 {
     if (not mModeling->isModified() or mModeling->getFileName().empty() or
-	(mModeling->isModified() and
-	 gvle::Question(_("Do you really want load a new Model ?\nCurrent "
-			 "model will be destroy and not save")))) {
+        (mModeling->isModified() and
+         gvle::Question(_("Do you really want load a new Model ?\nCurrent "
+                          "model will be destroy and not save")))) {
         Gtk::FileChooserDialog file("VPZ file", Gtk::FILE_CHOOSER_ACTION_OPEN);
         file.set_transient_for(*this);
         file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
@@ -1193,16 +1193,16 @@ void GVLE::onOpenGlobalVpz()
         filter.set_name(_("Vle Project gZipped"));
         filter.add_pattern("*.vpz");
         file.add_filter(filter);
-	if (mGlobalVpzPrevDirPath != "") {
-	    file.set_current_folder(mGlobalVpzPrevDirPath);
+        if (mGlobalVpzPrevDirPath != "") {
+            file.set_current_folder(mGlobalVpzPrevDirPath);
         }
 
         if (file.run() == Gtk::RESPONSE_OK) {
-	    mGlobalVpzPrevDirPath = file.get_current_folder();
-	    mEditor->closeAllTab();
-	    utils::Package::package().select("");
+            mGlobalVpzPrevDirPath = file.get_current_folder();
+            mEditor->closeAllTab();
+            utils::Package::package().select("");
             mPluginFactory.update();
-	    mPackage = "";
+            mPackage = "";
             mModeling->parseXML(file.get_filename());
             if (mModeling->getTopModel()) {
                 redrawModelTreeBox();
@@ -1226,12 +1226,12 @@ void GVLE::onRefresh()
 void GVLE::onShowCompleteView()
 {
     DocumentDrawingArea* tab = dynamic_cast<DocumentDrawingArea*>(
-	mEditor->get_nth_page(mCurrentTab));
+        mEditor->get_nth_page(mCurrentTab));
     graph::CoupledModel* currentModel;
     if (tab-> isComplete()) {
-	currentModel = tab->getCompleteDrawingArea()->getModel();
+        currentModel = tab->getCompleteDrawingArea()->getModel();
     } else {
-	currentModel = tab->getSimpleDrawingArea()->getModel();
+        currentModel = tab->getSimpleDrawingArea()->getModel();
     }
     mEditor->showCompleteView(mModeling->getFileName(),currentModel);
 }
@@ -1239,12 +1239,12 @@ void GVLE::onShowCompleteView()
 void GVLE::onShowSimpleView()
 {
     DocumentDrawingArea* tab = dynamic_cast<DocumentDrawingArea*>(
-	mEditor->get_nth_page(mCurrentTab));
+        mEditor->get_nth_page(mCurrentTab));
     graph::CoupledModel* currentModel;
     if (tab-> isComplete()) {
-	currentModel = tab->getCompleteDrawingArea()->getModel();
+        currentModel = tab->getCompleteDrawingArea()->getModel();
     } else {
-	currentModel = tab->getSimpleDrawingArea()->getModel();
+        currentModel = tab->getSimpleDrawingArea()->getModel();
     }
     mEditor->showSimpleView(mModeling->getFileName(), currentModel);
 }
@@ -1273,31 +1273,31 @@ void GVLE::onSave()
     int page = mEditor->get_current_page();
 
     if (page != -1) {
-	if (dynamic_cast < Document* >(mEditor->get_nth_page(page))
-	    ->isDrawingArea()) {
-	    saveVpz();
-	} else {
-	    DocumentText* doc = dynamic_cast < DocumentText* >(
-		mEditor->get_nth_page(page));
+        if (dynamic_cast < Document* >(mEditor->get_nth_page(page))
+            ->isDrawingArea()) {
+            saveVpz();
+        } else {
+            DocumentText* doc = dynamic_cast < DocumentText* >(
+                mEditor->get_nth_page(page));
 
-	    if (not doc->isNew() || doc->hasFullName()) {
-		doc->save();
-	    } else {
-		Gtk::FileChooserDialog file(_("Text file"),
-					    Gtk::FILE_CHOOSER_ACTION_SAVE);
+            if (not doc->isNew() || doc->hasFullName()) {
+                doc->save();
+            } else {
+                Gtk::FileChooserDialog file(_("Text file"),
+                                            Gtk::FILE_CHOOSER_ACTION_SAVE);
 
-		file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-		file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
-		file.set_current_folder(utils::Path::path().getPackageDir());
-		if (file.run() == Gtk::RESPONSE_OK) {
-		    std::string filename(file.get_filename());
+                file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+                file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+                file.set_current_folder(utils::Path::path().getPackageDir());
+                if (file.run() == Gtk::RESPONSE_OK) {
+                    std::string filename(file.get_filename());
 
-		    doc->saveAs(filename);
-		    mModeling->setFileName(filename);
-		}
-	    }
-	    refreshPackageHierarchy();
-	}
+                    doc->saveAs(filename);
+                    mModeling->setFileName(filename);
+                }
+            }
+            refreshPackageHierarchy();
+        }
     }
 }
 
@@ -1308,60 +1308,60 @@ void GVLE::onSaveAs()
     Glib::ustring title;
 
     bool isVPZ = dynamic_cast < Document* >(mEditor->get_nth_page(page))
-	->isDrawingArea();
+        ->isDrawingArea();
 
     if (page != -1) {
         if (!checkVpz()) {
             return;
         }
-	if (isVPZ) {
-	    title = _("VPZ file");
-	} else {
-	    title = _("Text file");
-	}
+        if (isVPZ) {
+            title = _("VPZ file");
+        } else {
+            title = _("Text file");
+        }
 
-	Gtk::FileChooserDialog file(title,
-				    Gtk::FILE_CHOOSER_ACTION_SAVE);
+        Gtk::FileChooserDialog file(title,
+                                    Gtk::FILE_CHOOSER_ACTION_SAVE);
 
-	file.set_transient_for(*this);
-	file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-	file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+        file.set_transient_for(*this);
+        file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+        file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
 
-	if (isVPZ) {
-	    Gtk::FileFilter filter;
-	    filter.set_name(_("Vle Project gZipped"));
-	    filter.add_pattern("*.vpz");
-	    file.add_filter(filter);
-	}
+        if (isVPZ) {
+            Gtk::FileFilter filter;
+            filter.set_name(_("Vle Project gZipped"));
+            filter.add_pattern("*.vpz");
+            file.add_filter(filter);
+        }
 
-	// to provide a default filename
-	// but also a default location
-	file.set_filename(dynamic_cast < Document* >(mEditor->get_nth_page(page))
-			  ->filepath());
+        // to provide a default filename
+        // but also a default location
+        file.set_filename(dynamic_cast < Document* >(mEditor->get_nth_page(page))
+                          ->filepath());
 
-	if (file.run() == Gtk::RESPONSE_OK) {
-	    std::string filename(file.get_filename());
+        if (file.run() == Gtk::RESPONSE_OK) {
+            std::string filename(file.get_filename());
 
-	    if (isVPZ) {
-		vpz::Vpz::fixExtension(filename);
+            if (isVPZ) {
+                vpz::Vpz::fixExtension(filename);
 
-		Editor::Documents::const_iterator it =
-		    mEditor->getDocuments().find(mModeling->getFileName());
+                Editor::Documents::const_iterator it =
+                    mEditor->getDocuments().find(mModeling->getFileName());
 
-		mModeling->saveXML(filename);
+                mModeling->saveXML(filename);
 
-		if (it != mEditor->getDocuments().end()) {
-		    it->second->setTitle(filename,
-					 mModeling->getTopModel(), false);
-		}
-	    } else {
-		DocumentText* doc = dynamic_cast < DocumentText* >(
-		    mEditor->get_nth_page(page));
+                if (it != mEditor->getDocuments().end()) {
+                    it->second->setTitle(filename,
+                                         mModeling->getTopModel(), false);
+                }
+            } else {
+                DocumentText* doc = dynamic_cast < DocumentText* >(
+                    mEditor->get_nth_page(page));
 
-		doc->saveAs(filename);
-	    }
-	    refreshPackageHierarchy();
-	}
+                doc->saveAs(filename);
+            }
+            refreshPackageHierarchy();
+        }
     }
 }
 
@@ -1510,28 +1510,28 @@ void GVLE::onConditionsBox()
     const Modeling* modeling = (const Modeling*)mModeling;
 
     if (runConditionsBox(modeling->conditions()) == 1) {
-	applyConditionsBox(mModeling->conditions());
+        applyConditionsBox(mModeling->conditions());
 
-	{
-	    vpz::AtomicModelList& list =
-		mModeling->vpz().project().model().atomicModels();
-	    vpz::AtomicModelList::iterator it = list.begin();
+        {
+            vpz::AtomicModelList& list =
+                mModeling->vpz().project().model().atomicModels();
+            vpz::AtomicModelList::iterator it = list.begin();
 
-	    while (it != list.end()) {
+            while (it != list.end()) {
                 std::vector < std::string > mdlConditions =
                     it->second.conditions();
                 std::vector < std::string >::const_iterator its =
                     mdlConditions.begin();
 
-		while (its != mdlConditions.end()) {
-		    if (not mModeling->conditions().exist(*its)) {
-			it->second.delCondition(*its);
-		    }
-		    ++its;
-		}
-		++it;
-	    }
-	}
+                while (its != mdlConditions.end()) {
+                    if (not mModeling->conditions().exist(*its)) {
+                        it->second.delCondition(*its);
+                    }
+                    ++its;
+                }
+                ++it;
+            }
+        }
     }
 }
 
@@ -1600,29 +1600,29 @@ void GVLE::saveVpz()
 void GVLE::saveFirstVpz()
 {
     if (not utils::Package::package().name().empty()) {
-	mSaveVpzBox->show();
+        mSaveVpzBox->show();
     } else {
-	Gtk::FileChooserDialog file(_("VPZ file"),
-				    Gtk::FILE_CHOOSER_ACTION_SAVE);
-	file.set_transient_for(*this);
-	file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-	file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
-	Gtk::FileFilter filter;
-	filter.set_name(_("Vle Project gZipped"));
-	filter.add_pattern("*.vpz");
-	file.add_filter(filter);
+        Gtk::FileChooserDialog file(_("VPZ file"),
+                                    Gtk::FILE_CHOOSER_ACTION_SAVE);
+        file.set_transient_for(*this);
+        file.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+        file.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+        Gtk::FileFilter filter;
+        filter.set_name(_("Vle Project gZipped"));
+        filter.add_pattern("*.vpz");
+        file.add_filter(filter);
 
-	if (file.run() == Gtk::RESPONSE_OK) {
-	    std::string filename(file.get_filename());
-	    vpz::Vpz::fixExtension(filename);
-	    Editor::Documents::const_iterator it =
-		mEditor->getDocuments().find(mModeling->getFileName());
-	    mModeling->saveXML(filename);
-	    if (it != mEditor->getDocuments().end()) {
-		it->second->setTitle(filename,
-				     mModeling->getTopModel(), false);
-	    }
-	}
+        if (file.run() == Gtk::RESPONSE_OK) {
+            std::string filename(file.get_filename());
+            vpz::Vpz::fixExtension(filename);
+            Editor::Documents::const_iterator it =
+                mEditor->getDocuments().find(mModeling->getFileName());
+            mModeling->saveXML(filename);
+            if (it != mEditor->getDocuments().end()) {
+                it->second->setTitle(filename,
+                                     mModeling->getTopModel(), false);
+            }
+        }
     }
 }
 
@@ -1631,7 +1631,7 @@ void GVLE::setTitle(const Glib::ustring& name)
     Glib::ustring title(WINDOW_TITLE);
 
     if (utils::Package::package().selected()) {
-	title += " - " + utils::Package::package().name();
+        title += " - " + utils::Package::package().name();
     }
 
     if (not name.empty()) {
@@ -1928,7 +1928,7 @@ void GVLE::makeAllProject()
 
     for (AllDepends::const_iterator it = deps.begin(); it != deps.end(); ++it) {
         for (Depends::const_iterator jt = it->second.begin(); jt !=
-                 it->second.end(); ++jt) {
+             it->second.end(); ++jt) {
             mDependencies.insert(*jt);
         }
     }
@@ -2093,96 +2093,96 @@ void GVLE::packageProject()
 void GVLE::onCutModel()
 {
     if (mCurrentTab >= 0) {
-	if (dynamic_cast<Document*>(mEditor->get_nth_page(mCurrentTab))
-	    ->isDrawingArea()) {
-	    View* currentView = dynamic_cast<DocumentDrawingArea*>(
-		mEditor->get_nth_page(mCurrentTab))->getView();
+        if (dynamic_cast<Document*>(mEditor->get_nth_page(mCurrentTab))
+            ->isDrawingArea()) {
+            View* currentView = dynamic_cast<DocumentDrawingArea*>(
+                mEditor->get_nth_page(mCurrentTab))->getView();
 
-	    if (currentView) {
-		currentView->onCutModel();
-		mMenuAndToolbar->showPaste();
-	    }
-	} else {
-	    DocumentText* doc = dynamic_cast<DocumentText*>(
-		mEditor->get_nth_page(mCurrentTab));
+            if (currentView) {
+                currentView->onCutModel();
+                mMenuAndToolbar->showPaste();
+            }
+        } else {
+            DocumentText* doc = dynamic_cast<DocumentText*>(
+                mEditor->get_nth_page(mCurrentTab));
 
-	    if (doc) {
-		doc->cut();
-	    }
-	    mMenuAndToolbar->showPaste();
-	}
+            if (doc) {
+                doc->cut();
+            }
+            mMenuAndToolbar->showPaste();
+        }
     }
 }
 
 void GVLE::onCopyModel()
 {
     if (mCurrentTab >= 0) {
-	if (dynamic_cast<Document*>(mEditor->get_nth_page(mCurrentTab))
-	    ->isDrawingArea()) {
-	    View* currentView = dynamic_cast<DocumentDrawingArea*>(
-		mEditor->get_nth_page(mCurrentTab))->getView();
+        if (dynamic_cast<Document*>(mEditor->get_nth_page(mCurrentTab))
+            ->isDrawingArea()) {
+            View* currentView = dynamic_cast<DocumentDrawingArea*>(
+                mEditor->get_nth_page(mCurrentTab))->getView();
 
-	    if (currentView) {
-		currentView->onCopyModel();
-		mMenuAndToolbar->showPaste();
-	    }
-	} else {
-	    DocumentText* doc = dynamic_cast<DocumentText*>(
-		mEditor->get_nth_page(mCurrentTab));
+            if (currentView) {
+                currentView->onCopyModel();
+                mMenuAndToolbar->showPaste();
+            }
+        } else {
+            DocumentText* doc = dynamic_cast<DocumentText*>(
+                mEditor->get_nth_page(mCurrentTab));
 
-	    if (doc) {
-		doc->copy();
-	    }
-	    mMenuAndToolbar->showPaste();
-	}
+            if (doc) {
+                doc->copy();
+            }
+            mMenuAndToolbar->showPaste();
+        }
     }
 }
 
 void GVLE::onPasteModel()
 {
     if (mCurrentTab >= 0) {
-	if (dynamic_cast<Document*>(mEditor->get_nth_page(mCurrentTab))
-	    ->isDrawingArea()) {
-	    View* currentView = dynamic_cast<DocumentDrawingArea*>(
-		mEditor->get_nth_page(mCurrentTab))->getView();
+        if (dynamic_cast<Document*>(mEditor->get_nth_page(mCurrentTab))
+            ->isDrawingArea()) {
+            View* currentView = dynamic_cast<DocumentDrawingArea*>(
+                mEditor->get_nth_page(mCurrentTab))->getView();
 
-	    if (currentView) {
-		currentView->onPasteModel();
-	    }
-	} else {
-	    DocumentText* doc = dynamic_cast<DocumentText*>(
-		mEditor->get_nth_page(mCurrentTab));
+            if (currentView) {
+                currentView->onPasteModel();
+            }
+        } else {
+            DocumentText* doc = dynamic_cast<DocumentText*>(
+                mEditor->get_nth_page(mCurrentTab));
 
-	    if (doc) {
-		doc->paste();
-	    }
-	}
+            if (doc) {
+                doc->paste();
+            }
+        }
     }
 }
 
 void GVLE::clearCurrentModel()
 {
     if (mCurrentTab >= 0) {
-	View* currentView = dynamic_cast<DocumentDrawingArea*>(
-	    mEditor->get_nth_page(mCurrentTab))->getView();
+        View* currentView = dynamic_cast<DocumentDrawingArea*>(
+            mEditor->get_nth_page(mCurrentTab))->getView();
 
-	if (currentView) {
-	    currentView->clearCurrentModel();
-	}
+        if (currentView) {
+            currentView->clearCurrentModel();
+        }
     }
 }
 
 void GVLE::importModel()
 {
     View* currentView = dynamic_cast<DocumentDrawingArea*>(
-	mEditor->get_nth_page(mCurrentTab))->getView();
+        mEditor->get_nth_page(mCurrentTab))->getView();
     currentView->importModel();
 }
 
 void GVLE::exportCurrentModel()
 {
     View* currentView = dynamic_cast<DocumentDrawingArea*>(
-	mEditor->get_nth_page(mCurrentTab))->getView();
+        mEditor->get_nth_page(mCurrentTab))->getView();
     currentView->exportCurrentModel();
 }
 
@@ -2190,21 +2190,21 @@ void GVLE::exportGraphic()
 {
     ViewDrawingArea* tab;
     if ( dynamic_cast<DocumentDrawingArea*>(
-	     mEditor->get_nth_page(mCurrentTab))->isComplete()) {
-	tab = dynamic_cast<DocumentDrawingArea*>(
-	    mEditor->get_nth_page(mCurrentTab))->getCompleteDrawingArea();
+            mEditor->get_nth_page(mCurrentTab))->isComplete()) {
+        tab = dynamic_cast<DocumentDrawingArea*>(
+            mEditor->get_nth_page(mCurrentTab))->getCompleteDrawingArea();
     } else {
-	tab = dynamic_cast<DocumentDrawingArea*>(
-	    mEditor->get_nth_page(mCurrentTab))->getSimpleDrawingArea();
+        tab = dynamic_cast<DocumentDrawingArea*>(
+            mEditor->get_nth_page(mCurrentTab))->getSimpleDrawingArea();
     }
 
 
     const vpz::Experiment& experiment = ((const Modeling*)mModeling)
-	->vpz().project().experiment();
+        ->vpz().project().experiment();
     if (experiment.name().empty() || experiment.duration() == 0) {
-	Error(_("Fix a Value to the name and the duration "	\
-		"of the experiment before exportation."));
-	return;
+        Error(_("Fix a Value to the name and the duration "	\
+                "of the experiment before exportation."));
+        return;
     }
 
     Gtk::FileChooserDialog file(_("Image file"), Gtk::FILE_CHOOSER_ACTION_SAVE);
@@ -2231,29 +2231,29 @@ void GVLE::exportGraphic()
 
     if (file.run() == Gtk::RESPONSE_OK) {
         std::string filename(file.get_filename());
-	std::string extension(file.get_filter()->get_name());
+        std::string extension(file.get_filter()->get_name());
 
-	if (extension == _("Guess type from file name")) {
-	    size_t ext_pos = filename.find_last_of('.');
-	    if (ext_pos != std::string::npos) {
-		std::string type(filename, ext_pos+1);
-		filename.resize(ext_pos);
-		if (type == "png")
-		    tab->exportPng(filename);
-		else if (type == "pdf")
-		    tab->exportPdf(filename);
-		else if (type == "svg")
-		    tab->exportSvg(filename);
-		else
-		    Error(_("Unsupported file format"));
-	    }
-	}
-	else if (extension == _("Portable Newtork Graphics (.png)"))
-	    tab->exportPng(filename);
-	else if (extension == _("Portable Format Document (.pdf)"))
-	    tab->exportPdf(filename);
-	else if (extension == _("Scalable Vector Graphics (.svg)"))
-	    tab->exportSvg(filename);
+        if (extension == _("Guess type from file name")) {
+            size_t ext_pos = filename.find_last_of('.');
+            if (ext_pos != std::string::npos) {
+                std::string type(filename, ext_pos+1);
+                filename.resize(ext_pos);
+                if (type == "png")
+                    tab->exportPng(filename);
+                else if (type == "pdf")
+                    tab->exportPdf(filename);
+                else if (type == "svg")
+                    tab->exportSvg(filename);
+                else
+                    Error(_("Unsupported file format"));
+            }
+        }
+        else if (extension == _("Portable Newtork Graphics (.png)"))
+            tab->exportPng(filename);
+        else if (extension == _("Portable Format Document (.pdf)"))
+            tab->exportPdf(filename);
+        else if (extension == _("Scalable Vector Graphics (.svg)"))
+            tab->exportSvg(filename);
     }
 }
 
@@ -2261,12 +2261,12 @@ void GVLE::addCoefZoom()
 {
     ViewDrawingArea* tab;
     if ( dynamic_cast<DocumentDrawingArea*>(
-	     mEditor->get_nth_page(mCurrentTab))->isComplete()) {
-	tab = dynamic_cast<DocumentDrawingArea*>(
-	    mEditor->get_nth_page(mCurrentTab))->getCompleteDrawingArea();
+            mEditor->get_nth_page(mCurrentTab))->isComplete()) {
+        tab = dynamic_cast<DocumentDrawingArea*>(
+            mEditor->get_nth_page(mCurrentTab))->getCompleteDrawingArea();
     } else {
-	tab = dynamic_cast<DocumentDrawingArea*>(
-	    mEditor->get_nth_page(mCurrentTab))->getSimpleDrawingArea();
+        tab = dynamic_cast<DocumentDrawingArea*>(
+            mEditor->get_nth_page(mCurrentTab))->getSimpleDrawingArea();
     }
     tab->addCoefZoom();
 }
@@ -2275,12 +2275,12 @@ void GVLE::delCoefZoom()
 {
     ViewDrawingArea* tab;
     if ( dynamic_cast<DocumentDrawingArea*>(
-	     mEditor->get_nth_page(mCurrentTab))->isComplete()) {
-	tab = dynamic_cast<DocumentDrawingArea*>(
-	    mEditor->get_nth_page(mCurrentTab))->getCompleteDrawingArea();
+            mEditor->get_nth_page(mCurrentTab))->isComplete()) {
+        tab = dynamic_cast<DocumentDrawingArea*>(
+            mEditor->get_nth_page(mCurrentTab))->getCompleteDrawingArea();
     } else {
-	tab = dynamic_cast<DocumentDrawingArea*>(
-	    mEditor->get_nth_page(mCurrentTab))->getSimpleDrawingArea();
+        tab = dynamic_cast<DocumentDrawingArea*>(
+            mEditor->get_nth_page(mCurrentTab))->getSimpleDrawingArea();
     }
     tab->delCoefZoom();
 }
@@ -2289,12 +2289,12 @@ void GVLE::setCoefZoom(double coef)
 {
     ViewDrawingArea* tab;
     if ( dynamic_cast<DocumentDrawingArea*>(
-	     mEditor->get_nth_page(mCurrentTab))->isComplete()) {
-	tab = dynamic_cast<DocumentDrawingArea*>(
-	    mEditor->get_nth_page(mCurrentTab))->getCompleteDrawingArea();
+            mEditor->get_nth_page(mCurrentTab))->isComplete()) {
+        tab = dynamic_cast<DocumentDrawingArea*>(
+            mEditor->get_nth_page(mCurrentTab))->getCompleteDrawingArea();
     } else {
-	tab = dynamic_cast<DocumentDrawingArea*>(
-	    mEditor->get_nth_page(mCurrentTab))->getSimpleDrawingArea();
+        tab = dynamic_cast<DocumentDrawingArea*>(
+            mEditor->get_nth_page(mCurrentTab))->getSimpleDrawingArea();
     }
     tab->setCoefZoom(coef);
 }
@@ -2302,7 +2302,7 @@ void GVLE::setCoefZoom(double coef)
 void  GVLE::updateAdjustment(double h, double v)
 {
     DocumentDrawingArea* tab = dynamic_cast<DocumentDrawingArea*>(
-	mEditor->get_nth_page(mCurrentTab));
+        mEditor->get_nth_page(mCurrentTab));
     tab->setHadjustment(h);
     tab->setVadjustment(v);
 }
@@ -2311,12 +2311,12 @@ void GVLE::onOrder()
 {
     ViewDrawingArea* tab;
     if ( dynamic_cast<DocumentDrawingArea*>(
-	     mEditor->get_nth_page(mCurrentTab))->isComplete()) {
-	tab = dynamic_cast<DocumentDrawingArea*>(
-	    mEditor->get_nth_page(mCurrentTab))->getCompleteDrawingArea();
+            mEditor->get_nth_page(mCurrentTab))->isComplete()) {
+        tab = dynamic_cast<DocumentDrawingArea*>(
+            mEditor->get_nth_page(mCurrentTab))->getCompleteDrawingArea();
     } else {
-	tab = dynamic_cast<DocumentDrawingArea*>(
-	    mEditor->get_nth_page(mCurrentTab))->getSimpleDrawingArea();
+        tab = dynamic_cast<DocumentDrawingArea*>(
+            mEditor->get_nth_page(mCurrentTab))->getSimpleDrawingArea();
     }
     tab->onOrder();
     mModeling->setModified(true);

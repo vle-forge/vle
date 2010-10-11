@@ -307,7 +307,12 @@ public:
                it->second->isDrawingArea() == false) {
             ++it;
         }
-        return dynamic_cast < DocumentDrawingArea* > (it->second);
+
+        if (it != mDocuments.end()) {
+            return dynamic_cast < DocumentDrawingArea* > (it->second);
+        } else {
+            return 0;
+        }
     }
 
 private:
