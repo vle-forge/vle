@@ -35,7 +35,6 @@
 #include <vle/value/Boolean.hpp>
 #include <vle/value/XML.hpp>
 #include <vle/value/Null.hpp>
-#include <vle/value/Deleter.hpp>
 #include <vle/utils/Debug.hpp>
 #include <boost/utility.hpp>
 #include <fstream>
@@ -123,21 +122,11 @@ void Set::del(const size_type i)
 
 void Set::clear()
 {
-    std::stack < Value* > composite;
-
     for (iterator it = begin(); it != end(); ++it) {
-        if (*it) {
-            if (isComposite(*it)) {
-                composite.push(*it);
-            } else {
-                delete *it;
-            }
-            *it = 0;
-        }
+        delete *it;
     }
 
     m_value.clear();
-    deleter(composite);
 }
 
 Set& Set::addSet()

@@ -31,7 +31,6 @@
 
 #include <vle/devs/DllDefines.hpp>
 #include <vle/version.hpp>
-#include <vle/devs/Pools.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/devs/Attribute.hpp>
 #include <vle/value/Map.hpp>
@@ -60,30 +59,6 @@ namespace vle { namespace devs {
             m_delete(false),
             m_attributes(0)
         {}
-
-        ///
-        ////
-        ///
-
-#ifdef VLE_HAVE_POOL
-        /**
-         * @brief Override the new operator to use the boost::pool allocator.
-         * See the class Pools.
-         * @param size The size of the object to allocate.
-         * @return A pointer to the newly area.
-         */
-        inline static void* operator new(size_t size)
-        { return Pools::pools().allocate(size); }
-
-        /**
-         * @brief Override the delete operator to use the boost::pool allocator.
-         * See the class Pools.
-         * @param deletable The pointer to delete.
-         * @param size The size of the memory.
-         */
-        inline static void operator delete(void* deletable, size_t size)
-        { Pools::pools().deallocate(deletable, size); }
-#endif
 
         ///
         ////
@@ -390,12 +365,12 @@ namespace vle { namespace devs {
     };
 
     /**
-     * @brief Initialize the Pools singleton.
+     * @brief Initialize the devs library.
      */
     VLE_DEVS_EXPORT void init();
 
     /**
-     * @brief Kill the Pools singleton.
+     * @brief Kill singleton from the devs library.
      */
     VLE_DEVS_EXPORT void finalize();
 

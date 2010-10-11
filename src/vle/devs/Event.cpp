@@ -27,7 +27,6 @@
 
 
 #include <vle/devs/Event.hpp>
-#include <vle/devs/Pools.hpp>
 #include <vle/devs/Simulator.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
@@ -62,16 +61,10 @@ void Event::putAttributes(const value::Map& mp)
 
 void init()
 {
-#ifdef VLE_HAVE_POOL
-    devs::Pools::init();
-#endif
 }
 
 void finalize()
 {
-#ifdef VLE_HAVE_POOL
-    devs::Pools::kill();
-#endif
 }
 
 }} // namespace vle devs

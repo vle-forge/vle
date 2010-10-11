@@ -34,7 +34,6 @@
 #include <vle/value/Boolean.hpp>
 #include <vle/value/Matrix.hpp>
 #include <vle/value/XML.hpp>
-#include <vle/value/Deleter.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Algo.hpp>
 #include <boost/utility.hpp>
@@ -190,21 +189,11 @@ Matrix& Map::getMatrix(const std::string& name)
 
 void Map::clear()
 {
-    std::stack < Value* > composite;
-
     for (iterator it = begin(); it != end(); ++it) {
-        if (it->second) {
-            if (isComposite(it->second)) {
-                composite.push(it->second);
-            } else {
-                delete it->second;
-            }
-            it->second = 0;
-        }
+        delete it->second;
     }
 
     m_value.clear();
-    deleter(composite);
 }
 
 Value* Map::getPointer(const std::string& name)

@@ -88,7 +88,7 @@ public:
     ///
 
     /**
-     * @brief Build a Tuple using the boost::pool memory management.
+     * @brief Build a Tuple.
      * @return A new Tuple.
      */
     static Tuple* create()
@@ -110,7 +110,7 @@ public:
 
     /**
      * @brief Clone the current Tuple with the same TupleValue datas.
-     * @return A new boost pool allocated value::Value.
+     * @return A new Tuple.
      */
     virtual Value* clone() const
     { return new Tuple(*this); }

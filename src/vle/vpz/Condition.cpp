@@ -32,7 +32,6 @@
 #include <vle/utils/Exception.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/value/Set.hpp>
-#include <vle/value/Deleter.hpp>
 #include <boost/utility.hpp>
 
 namespace vle { namespace vpz {
@@ -57,15 +56,9 @@ Condition::Condition(const Condition& cnd) :
 
 Condition::~Condition()
 {
-    std::stack < value::Value* > lst;
-
     for (iterator it = m_list.begin(); it != m_list.end(); ++it) {
-        if (it->second) {
-            lst.push(it->second);
-        }
+        delete it->second;
     }
-
-    value::deleter(lst);
 }
 
 void Condition::write(std::ostream& out) const

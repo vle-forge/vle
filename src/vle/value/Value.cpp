@@ -245,9 +245,6 @@ Matrix& Value::toMatrix()
 void init()
 {
     utils::init();
-#ifdef VLE_HAVE_POOL
-    value::Pools::init();
-#endif
 
     boost::serialization::void_cast_register(
         static_cast<Boolean*>(0), static_cast<Value*>(0));
@@ -275,9 +272,6 @@ void init()
 
 void finalize()
 {
-#ifdef VLE_HAVE_POOL
-    value::Pools::kill();
-#endif
 }
 
 }} // namespace vle value

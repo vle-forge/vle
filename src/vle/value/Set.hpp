@@ -87,8 +87,8 @@ public:
     { clear(); }
 
     /**
-     * @brief Build a new Set using the boost::pool memory management.
-     * @return A new Set allocated from the boost::pool.
+     * @brief Build a new Set.
+     * @return A new Set.
      */
     static Set* create(const size_type& size = 0)
     { return new Set(size); }

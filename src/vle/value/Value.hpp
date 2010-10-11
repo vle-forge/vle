@@ -30,7 +30,6 @@
 #define VLE_VALUE_VALUE_HPP 1
 
 #include <vle/version.hpp>
-#include <vle/value/Pools.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/value/DllDefines.hpp>
 #include <boost/archive/text_iarchive.hpp>
@@ -63,30 +62,6 @@ namespace vle { namespace value {
     public:
         enum type { BOOLEAN, INTEGER, DOUBLE, STRING, SET, MAP, TUPLE, TABLE,
             XMLTYPE, NIL, MATRIX };
-
-#ifdef VLE_HAVE_POOL
-        /**
-         * @brief Override the new operator to use the boost::pool allocator.
-         * See the class Pools.
-         * @param size The size of the object to allocate.
-         * @return A pointer to the newly area.
-         */
-        inline static void* operator new(size_t size)
-        { return Pools::pools().allocate(size); }
-
-        /**
-         * @brief Override the delete operator to use the boost::pool allocator.
-         * See the class Pools.
-         * @param deletable The pointer to delete.
-         * @param size The size of the memory.
-         */
-        inline static void operator delete(void* deletable, size_t size)
-        { Pools::pools().deallocate(deletable, size); }
-#endif
-
-        ///
-        ////
-        ///
 
 	/**
 	 * @brief Default constructor.
@@ -363,12 +338,12 @@ namespace vle { namespace value {
     };
 
     /**
-     * @brief Initialize the Pools singleton.
+     * @brief Initialize the boost::serialization object.
      */
     VLE_VALUE_EXPORT void init();
 
     /**
-     * @brief Kill the Pools singleton.
+     * @brief Delete all singleton.
      */
     VLE_VALUE_EXPORT void finalize();
 

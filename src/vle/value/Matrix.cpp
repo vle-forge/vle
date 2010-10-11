@@ -29,7 +29,6 @@
 #include <vle/value/Matrix.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/value/Map.hpp>
-#include <vle/value/Deleter.hpp>
 #include <vle/utils/Debug.hpp>
 #include <boost/utility.hpp>
 
@@ -124,22 +123,12 @@ void Matrix::writeXml(std::ostream& out) const
 
 void Matrix::clear()
 {
-    std::stack < Value* > composite;
-
     for (size_type j = 0; j < m_nbrow; ++j) {
         for (size_type i = 0; i < m_nbcol; ++i) {
-            if (m_matrix[i][j]) {
-                if (isComposite(m_matrix[i][j])) {
-                    composite.push(m_matrix[i][j]);
-                } else {
-                    delete m_matrix[i][j];
-                }
-                m_matrix[i][j] = 0;
-            }
+            delete m_matrix[i][j];
+            m_matrix[i][j] = 0;
         }
     }
-
-    deleter(composite);
 
     m_lastX = 0;
     m_lastY = 0;

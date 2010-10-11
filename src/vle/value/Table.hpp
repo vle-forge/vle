@@ -116,8 +116,7 @@ public:
 
     /**
      * @brief Clone the current Table with the same TableValue datas.
-     *
-     * @return A new boost::pool allocated value::Value.
+     * @return A new Table.
      */
     virtual Value* clone() const
     { return new Table(*this); }

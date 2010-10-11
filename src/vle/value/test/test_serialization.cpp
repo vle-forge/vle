@@ -41,7 +41,6 @@
 #include <sstream>
 #include <functional>
 #include <vle/value/Boolean.hpp>
-#include <vle/value/Deleter.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
 #include <vle/value/Map.hpp>

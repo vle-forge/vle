@@ -21,12 +21,11 @@ ELSE(WIN32)
   SET(OS_SPECIFIC_PATH_IMPL)
 ENDIF(WIN32)
 
-SET(VALUE_HPP Boolean.hpp Deleter.hpp DllDefines.hpp Double.hpp Integer.hpp
-  Map.hpp Matrix.hpp Null.hpp Pools.hpp Set.hpp String.hpp Table.hpp Tuple.hpp
-  Value.hpp XML.hpp)
+SET(VALUE_HPP Boolean.hpp DllDefines.hpp Double.hpp Integer.hpp Map.hpp
+  Matrix.hpp Null.hpp Set.hpp String.hpp Table.hpp Tuple.hpp Value.hpp XML.hpp)
 
-SET(VALUE_CPP Boolean.cpp Deleter.cpp Double.cpp Integer.cpp Map.cpp Matrix.cpp
-  Null.cpp Pools.cpp Set.cpp String.cpp Table.cpp Tuple.cpp Value.cpp XML.cpp
+SET(VALUE_CPP Boolean.cpp Double.cpp Integer.cpp Map.cpp Matrix.cpp Null.cpp
+  Set.cpp String.cpp Table.cpp Tuple.cpp Value.cpp XML.cpp
   ${OS_SPECIFIC_PATH_IMPL})
 
 ADD_LIBRARY(vlevalue SHARED ${VALUE_HPP};${VALUE_CPP})

@@ -81,8 +81,8 @@ public:
     { clear(); }
 
     /**
-     * @brief Build a new Map using the boost::pool memory management.
-     * @return A new Map allocated from the boost::pool.
+     * @brief Build a new Map.
+     * @return A new Map allocated.
      */
     static Map* create()
     { return new Map(); }
@@ -94,7 +94,7 @@ public:
     /**
      * @brief Clone the current Map and recursively for all Value in the
      * MapValue.
-     * @return A new boost pool allocated value::Value.
+     * @return A new Map.
      */
     virtual Value* clone() const
     { return new Map(*this); }

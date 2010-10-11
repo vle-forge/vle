@@ -495,7 +495,7 @@ bool PluginPetriNet::modify(graph::AtomicModel& atom,
     vpz::Conditions& /*conditions*/,
     vpz::Observables& observables,
     const std::string& conf,
-    const std::string& buffer)
+    const std::string& /*buffer*/)
 {
     std::string namespace_;
     std::string classname;
