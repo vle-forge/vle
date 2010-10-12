@@ -29,13 +29,19 @@
 
 #include <vle/manager/Run.hpp>
 #include <glibmm/exception.h>
+#include <boost/progress.hpp>
+#include <cmath>
 
 namespace vle { namespace manager {
 
 void RunVerbose::operator()(vpz::Vpz* vpz)
 {
     m_error = false;
+    boost::timer timer;
     try {
+        const double duration = vpz->project().experiment().duration();
+        const double begin = vpz->project().experiment().begin();
+
         m_out << "[" << vpz->filename() << "]\n";
 
         m_out << _(" - Coordinator load models ......: ");
@@ -52,12 +58,22 @@ void RunVerbose::operator()(vpz::Vpz* vpz)
         m_out << _("ok\n");
 
         m_out << _(" - Simulation run................: ");
-        while (m_root.run()) {}
-        m_out << _("ok\n");
+        boost::progress_display display(100, m_out, "\n   ", "   ", "   ");
+        long previous = 0;
+        while (m_root.run()) {
+            long pc = std::floor(100. * (m_root.getCurrentTime() - begin) /
+                                 duration);
+
+            display += pc - previous;
+            previous = pc;
+        }
+        display += 100 - previous;
 
         m_out << _(" - Coordinator cleaning .........: ");
         m_root.finish();
         m_out << _("ok\n");
+        m_out << _(" - Time spent in kernel .........: ") << timer.elapsed()
+            << "s\n";
     } catch(const std::exception& e) {
         m_out << _("\n/!\\ vle error reported: ") <<
             utils::demangle(typeid(e)) << "\n" << e.what();
@@ -73,7 +89,10 @@ void RunVerbose::operator()(vpz::Vpz* vpz)
 void RunVerbose::operator()(const std::string& filename)
 {
     m_error = false;
+    boost::timer timer;
     try {
+        double duration, begin;
+
         m_out << "[" << filename << "]\n";
         {
             m_out << _(" - Open file.....................: ");
@@ -85,6 +104,8 @@ void RunVerbose::operator()(const std::string& filename)
             m_out << _("ok\n");
 
             m_out << _(" - Clean project file ...........: ");
+            duration = vpz.project().experiment().duration();
+            begin = vpz.project().experiment().begin();
         }
         m_out << _("ok\n");
 
@@ -93,12 +114,22 @@ void RunVerbose::operator()(const std::string& filename)
         m_out << _("ok\n");
 
         m_out << _(" - Simulation run................: ");
-        while (m_root.run()) {}
-        m_out << _("ok\n");
+        boost::progress_display display(100, m_out, "\n   ", "   ", "   ");
+        long previous = 0;
+        while (m_root.run()) {
+            long pc = std::floor(100. * (m_root.getCurrentTime() - begin) /
+                                 duration);
+
+            display += pc - previous;
+            previous = pc;
+        }
+        display += 100 - previous;
 
         m_out << _(" - Coordinator cleaning .........: ");
         m_root.finish();
         m_out << _("ok\n");
+        m_out << _(" - Time spent in kernel .........: ") << timer.elapsed()
+            << "s\n";
     } catch(const std::exception& e) {
         m_out << _("\n/!\\ vle error reported: ") <<
             utils::demangle(typeid(e)) << "\n" << e.what();
