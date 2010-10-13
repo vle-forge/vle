@@ -1,4 +1,112 @@
-vle-0.8.8
+vle-0.8.9
+
+commit 5c55234e21cf681890da6b3c5a54e3be4be7c6ce
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Wed Oct 13 13:51:06 2010 +0200
+
+    vle: update NEWS
+
+commit 86adc138f0619b80683bbd64392260266a3fb789
+Author: Eric Ramat <ramat@lil.univ-littoral.fr>
+Date:   Thu Sep 2 16:07:48 2010 +0200
+
+    ext/fsa: fix memory leak in statechart
+    
+    * When several events occurs simultaneously, the first event is deleted but next not.
+    * Add attribute map deletion.
+    
+    Signed-off-by: Gauthier Quesnel <quesnel@users.sourceforge.net>
+    (cherry picked from commit 3a3d0c3d5374bf0cb62a1603a0c898945d2afa8a)
+
+commit 9985b2b8a86ee2a8b9ecd1c8b0c8b0e99ac0ae53
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Wed Oct 13 11:08:20 2010 +0200
+
+    vle: update AUTHORS
+
+commit 9412428508e39d1976de26c465233b2539335c90
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Tue Oct 12 21:49:55 2010 +0200
+
+    manager: add a progress bar and a timer in CLI
+    
+    Add new informations into the CLI just run mode. In `Simulation run', we add a
+    progress bar based on boost::progress_display (low memory and reduced cpu
+    time). And after `Coordinator cleaning', we add a description of the time spent
+    into the VLE kernel.
+    
+    For example:
+    
+      $ vle seir2.vpz
+      JustRun: run 1 simples simulations in one thread
+      [seir2.vpz]
+       - Open file.....................: ok
+       - Coordinator load models ......: ok
+       - Clean project file ...........: ok
+       - Coordinator initializing .....: ok
+       - Simulation run................:
+         0%   10   20   30   40   50   60   70   80   90   100%
+         |----|----|----|----|----|----|----|----|----|----|
+         ***************************************************
+       - Coordinator cleaning .........: ok
+       - Time spent in kernel .........: 2.79s
+    (cherry picked from commit d6f79d6728a0b3d6eefcebcae7dc69efabc43bbc)
+
+commit 2af9b78acbd66d4a983e0652a2e882820d3650d0
+Author: Jerome Thiard <jerome.thiard@toulouse.inra.fr>
+Date:   Thu Sep 30 14:49:39 2010 +0200
+
+    ext/dec: fix bad test when adding activities
+    
+    Fix a bad test when adding an activity. The bad test checks if the
+    activity already exist before adding.
+    (cherry picked from commit fc1da769166a65158499e9a049c65092671e3b71)
+
+commit 3e16b93c6d1cbeeed9576cb81fd872b189dcebbc
+Author: Jerome Thiard <jerome.thiard@toulouse.inra.fr>
+Date:   Thu Sep 30 14:48:10 2010 +0200
+
+    ext/qss: fix typo in output function
+    
+    The output function build an external event with a bad attribute
+    `gardient' instead of `gradient'.
+    (cherry picked from commit 7380b911339379ed663d5b093a449b0c7d2c5fb5)
+
+commit 67fa1bc29de09cfbcd0311a1d5c4c2aa955d5d2a
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Mon Oct 11 18:59:54 2010 +0200
+
+    gvle: update the size of the logo
+    
+    The file `yellowvle.svg' includes many white space. We fix it to reduce
+    the size of the AboutDialog.
+    (cherry picked from commit 7f9223805dc2b7020c53ae02e31306a45cd6fdec)
+
+commit f3808e4ebdb116d3eab6e1ef77da53b340e80a42
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Mon Oct 11 18:24:27 2010 +0200
+
+    gvle: add the yellowvle.svg in AboutDialog
+    
+    A tiny patch to add a logo into the AboutDialog of GVLE.
+    (cherry picked from commit 184bf80039e4e20c5b053cf07302228d6c065346)
+
+commit fba93a77c99efed98cdc11e36f51060f85862be0
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Mon Oct 11 14:12:05 2010 +0200
+
+    devs: remove a strange assertion
+    
+    We replace the assertion with a classical test. The assert is very
+    strange. If the cache for a specific port is empty, the deletion of this
+    port throw assertion.
+    (cherry picked from commit c8e4d6147dfa1b8f158f0ea608daf28b1c04e227)
+
+commit 05c3a29f39abae0d715a05362fe090bf09fd8088
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Tue Sep 28 18:44:41 2010 +0200
+
+    vle-0.8.8
 
 commit fad51b707176114dff5e6e328df4f4dfcb541848
 Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
