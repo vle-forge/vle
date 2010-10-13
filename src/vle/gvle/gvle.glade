@@ -3062,36 +3062,36 @@ You may redistribute copies of VLE
 under the terms of the GNU General Public License.
 For more information about these matters, see the file named COPYING.</property>
     <property name="authors">Integrator / Release manager
-Gauthier Quesnel &lt;quesnel@users.sourceforge.net&gt;
+- Gauthier Quesnel &lt;quesnel@users.sourceforge.net&gt;
 
 
 Main programmer and founder
-Gauthier Quesnel &lt;quesnel@users.sourceforge.net&gt;
-Eric Ramat &lt;eramat@users.sourceforge.net&gt;
+- Gauthier Quesnel &lt;quesnel@users.sourceforge.net&gt;
+- Eric Ramat &lt;eramat@users.sourceforge.net&gt;
 
 
 Contributors
-Mahuna Akplogan &lt;makploga@users.sourceforge.net&gt;
-Guillaume Ansel &lt;anselg@users.sourceforge.net&gt;
-Jennifer Baudet &lt;jennifer.baudet@toulouse.inra.fr&gt;
-Patrick Chabrier &lt;patrick.chabrier@toulouse.inra.fr&gt;
-R&#xE9;my Desrivi&#xE8;res &lt;remy.desrivieres@gmail.com&gt;
-Raphael Duboz &lt;duboz@users.sourceforge.net&gt;
-David Duvivier &lt;duvivier@lil.univ-littoral.fr&gt;
-Cyril Marcq &lt;cmarcq@users.sourceforge.net&gt;
-Tatiana Pruvost &lt;tatiana.pruvost@gmail.com&gt;
-Guillaume Radenne &lt;guillaume.radenne@gmail.com&gt;
-Daniel Salom&#xE9; &lt;dansal62@users.sourceforge.net&gt;
-J&#xE9;rome Thiard &lt;jerome.thiard@toulouse.inra.fr&gt;
-Ronan Tr&#xE9;pos &lt;rtrepos@toulouse.inra.fr&gt;
+- Mahuna Akplogan &lt;makploga@users.sourceforge.net&gt;
+- Guillaume Ansel &lt;anselg@users.sourceforge.net&gt;
+- Jennifer Baudet &lt;jennifer.baudet@toulouse.inra.fr&gt;
+- Patrick Chabrier &lt;patrick.chabrier@toulouse.inra.fr&gt;
+- R&#xE9;my Desrivi&#xE8;res &lt;remy.desrivieres@gmail.com&gt;
+- Raphael Duboz &lt;duboz@users.sourceforge.net&gt;
+- David Duvivier &lt;duvivier@lil.univ-littoral.fr&gt;
+- Cyril Marcq &lt;cmarcq@users.sourceforge.net&gt;
+- Tatiana Pruvost &lt;tatiana.pruvost@gmail.com&gt;
+- Guillaume Radenne &lt;guillaume.radenne@gmail.com&gt;
+- Daniel Salom&#xE9; &lt;dansal62@users.sourceforge.net&gt;
+- J&#xE9;rome Thiard &lt;jerome.thiard@toulouse.inra.fr&gt;
+- Ronan Tr&#xE9;pos &lt;rtrepos@toulouse.inra.fr&gt;
 
 
 Retired Contributors
-Aur&#xE9;lien Ansel &lt;camumus@gmail.com&gt;
-Philippe Blangi &lt;blangi@users.sourceforge.net&gt;
-Romain Hennuyer &lt;romain.hennuyer@gmail.com&gt;
-David Versmisse &lt;versmisse@users.sourceforge.net&gt;
-Geoffroy Weisenhorn &lt;geoffroy.weisenhorn@gmail.com&gt;</property>
+- Aur&#xE9;lien Ansel &lt;camumus@gmail.com&gt;
+- Philippe Blangi &lt;blangi@users.sourceforge.net&gt;
+- Romain Hennuyer &lt;romain.hennuyer@gmail.com&gt;
+- David Versmisse &lt;versmisse@users.sourceforge.net&gt;
+- Geoffroy Weisenhorn &lt;geoffroy.weisenhorn@gmail.com&gt;</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox17">
         <property name="visible">True</property>
