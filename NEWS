@@ -1,3 +1,49 @@
+VLE 0.8.9
+=========
+
+* devs:
+  * remove a strange assertion: We replace the assertion with a classical test.
+    The assert is very strange. If the cache for a specific port is empty, the
+    deletion of this port throw assertion.
+
+* extension:
+  * fsa: fix memory leak in statechart. When several events occurs
+    simultaneously, the first event is deleted but next not. Add attribute map
+    deletion.
+  * decision: fix bad test when adding activities: Fix a bad test when adding
+    an activity. The bad test checks if the activity already exist before
+    adding.
+  * qss: fix typo in output function: The output function build an external
+    event with a bad attribute `gardient' instead of `gradient'.
+
+* gvle:
+  * add the yellowvle.svg in AboutDialog: A tiny patch to add a logo into
+    the AboutDialog of GVLE.
+
+* manager:
+   * add a progress bar and a timer in CLI: Add new informations into the CLI
+     just run mode. In `Simulation run', we add a progress bar based on
+     boost::progress_display (low memory and reduced cpu time). And after
+     `Coordinator cleaning', we add a description of the time spent into the
+     VLE kernel.
+
+    For example:
+
+      $ vle seir2.vpz
+      JustRun: run 1 simples simulations in one thread
+      [seir2.vpz]
+       - Open file.....................: ok
+       - Coordinator load models ......: ok
+       - Clean project file ...........: ok
+       - Coordinator initializing .....: ok
+       - Simulation run................:
+         0%   10   20   30   40   50   60   70   80   90   100%
+         |----|----|----|----|----|----|----|----|----|----|
+         ***************************************************
+       - Coordinator cleaning .........: ok
+       - Time spent in kernel .........: 2.79s
+
+
 VLE 0.8.8
 =========
 
