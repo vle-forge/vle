@@ -99,7 +99,7 @@ void DynamicsDbg::externalTransition(const ExternalEventList& event,
 
 void DynamicsDbg::confluentTransitions(
     const Time& time,
-    const ExternalEventList& extEventlist) const
+    const ExternalEventList& extEventlist)
 {
     TraceDevs(fmt(
             _("%1$20.10g %2% [DEVS] confluent transition: [%3%]")) % time %

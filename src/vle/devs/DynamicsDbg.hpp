@@ -141,7 +141,7 @@ namespace vle { namespace devs {
          */
         virtual void
             confluentTransitions(const Time& time,
-                                 const ExternalEventList& extEventlist) const;
+                                 const ExternalEventList& extEventlist);
 
         /**
          * @brief Process a request event: these functions occurs when an
