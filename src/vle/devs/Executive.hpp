@@ -224,6 +224,16 @@ public:
     virtual void delModel(const std::string& modelname);
 
     /**
+     * @brief Rename the specified model.
+     * @param oldname The name of the model to rename.
+     * @param newname The new name of the model.
+     * @throw utils::ModelingError if model `oldname' does not exist or if a
+     * model `newname' already exists.
+     */
+    virtual void renameModel(const std::string& oldname,
+                             const std::string& newname);
+
+    /**
      * @brief Add an internal, input or output connection in coupled model.
      *
      * @param modelsource An internal model or coupledmodelName() if you want

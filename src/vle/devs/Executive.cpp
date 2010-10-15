@@ -100,6 +100,31 @@ void Executive::delModel(const std::string& modelname)
     m_coordinator.updateSimulatorsTarget(toupdate);
 }
 
+void Executive::renameModel(const std::string& oldname,
+                            const std::string& newname)
+{
+    graph::Model* mdl = cpled()->findModel(oldname);
+    if (mdl == 0) {
+        throw utils::DevsGraphError(
+            fmt(_("Executive error: rename `%1%' into `%2%' failed, `%1%' "
+                  "does not exist")) % oldname % newname);
+    }
+
+    if (cpled()->exist(newname)) {
+        throw utils::DevsGraphError(
+            fmt(_("Executive error: rename `%1%' into `%2%' failed, `%2%' "
+                  "already exists")) % oldname % newname);
+    }
+
+    try {
+        graph::Model::rename(mdl, newname);
+    } catch (const std::exception& e) {
+        throw utils::DevsGraphError(
+            fmt(_("Executive error: rename `%1%' into `%2%' failed: `%3%' ")) %
+            oldname % newname % e.what());
+    }
+}
+
 void Executive::addConnection(const std::string& srcModelName,
                               const std::string& srcPortName,
                               const std::string& dstModelName,
