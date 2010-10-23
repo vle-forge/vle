@@ -32,33 +32,20 @@
 #include <vle/gvle/GVLEMenuAndToolbar.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Package.hpp>
+#include <vle/utils/i18n.hpp>
 
 namespace vle { namespace gvle {
 
-NewProjectBox::NewProjectBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
-			     Modeling* m, GVLE* app) :
-    mXml(xml),
-    mModeling(m),
-    mApp(app)
+NewProjectBox::NewProjectBox(Glib::RefPtr < Gnome::Glade::Xml > xml,
+                             Modeling* m, GVLE* app)
+    : mXml(xml), mModeling(m), mApp(app)
 {
     xml->get_widget("DialogNewProject", mDialog);
     xml->get_widget("EntryNameProject", mEntryName);
-
-    xml->get_widget("ButtonNewProjectApply", mButtonApply);
-    mButtonApply->signal_clicked().connect(
-	sigc::mem_fun(*this, &NewProjectBox::onApply));
-
-    xml->get_widget("ButtonNewProjectCancel", mButtonCancel);
-    mButtonCancel->signal_clicked().connect(
-	sigc::mem_fun(*this, &NewProjectBox::onCancel));
 }
 
 NewProjectBox::~NewProjectBox()
 {
-    delete mButtonApply;
-    delete mButtonCancel;
-    delete mEntryName;
-    delete mDialog;
 }
 
 void NewProjectBox::show()
@@ -66,10 +53,16 @@ void NewProjectBox::show()
     mEntryName->set_text("");
     mDialog->set_title("New Project");
     mDialog->show_all();
-    mDialog->run();
+    mDialog->set_default_response(-3);
+
+    if (mDialog->run() == Gtk::RESPONSE_ACCEPT) {
+        apply();
+    }
+
+    mDialog->hide_all();
 }
 
-void NewProjectBox::onApply()
+void NewProjectBox::apply()
 {
     if (not mEntryName->get_text().empty()) {
 	if (not exist(mEntryName->get_text())) {
@@ -80,21 +73,14 @@ void NewProjectBox::onApply()
 	    vle::utils::Package::package().create();
 	    mApp->buildPackageHierarchy();
             mApp->getMenu()->onOpenProject();
-	    mDialog->hide_all();
 	} else {
-	    Error(_("The Project ") +
-		  static_cast<std::string>(mEntryName->get_text()) +
-		  (_(" already exist")));
+            Error(fmt(_("The project `%1%' already exists in VLE home "
+                         "directory")) % mEntryName->get_text().raw());
 	}
     }
 }
 
-void NewProjectBox::onCancel()
-{
-    mDialog->hide_all();
-}
-
-bool NewProjectBox::exist(std::string name)
+bool NewProjectBox::exist(const std::string& name)
 {
     utils::PathList list = utils::Path::path().getInstalledPackages();
     utils::PathList::const_iterator it = list.begin();
@@ -108,6 +94,3 @@ bool NewProjectBox::exist(std::string name)
 }
 
 }} // namespace vle gvle
-
-
-

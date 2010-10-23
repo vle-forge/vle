@@ -43,6 +43,7 @@
 #include <vle/gvle/ViewOutputBox.hpp>
 #include <vle/gvle/View.hpp>
 #include <vle/gvle/LaunchSimulationBox.hpp>
+#include <vle/gvle/NewProjectBox.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Package.hpp>
@@ -56,6 +57,7 @@
 #include <glibmm/spawn.h>
 #include <glibmm/miscutils.h>
 #include <gtkmm/stock.h>
+#include <boost/algorithm/string/case_conv.hpp>
 
 namespace vle { namespace gvle {
 
@@ -815,7 +817,6 @@ GVLE::GVLE(BaseObjectType* cobject,
     mPreferencesBox = new PreferencesBox(mRefXML);
     mOpenPackageBox = new OpenPackageBox(mRefXML, mModeling);
     mOpenVpzBox = new OpenVpzBox(mRefXML, mModeling);
-    mNewProjectBox = new NewProjectBox(mRefXML, mModeling, this);
     mSaveVpzBox = new SaveVpzBox(mRefXML, mModeling);
     mQuitBox = new QuitBox(mRefXML, mModeling);
 
@@ -864,7 +865,6 @@ GVLE::~GVLE()
     delete mPreferencesBox;
     delete mOpenPackageBox;
     delete mOpenVpzBox;
-    delete mNewProjectBox;
     delete mSaveVpzBox;
     delete mQuitBox;
     delete mMenuAndToolbar;
@@ -1119,11 +1119,13 @@ void GVLE::onNewNamedVpz(const std::string& path, const std::string& filename)
 
 void GVLE::onNewProject()
 {
-    mNewProjectBox->show();
+    NewProjectBox box(mRefXML, mModeling, this);
+    box.show();
     mMenuAndToolbar->onOpenProject();
     clearModelTreeBox();
     clearModelClassBox();
     mFileTreeView->set_sensitive(true);
+    onTrouble();
 }
 
 void GVLE::onOpenFile()
@@ -1151,6 +1153,7 @@ void GVLE::onOpenProject()
         mMenuAndToolbar->onOpenProject();
         setTitle("");
         mFileTreeView->set_sensitive(true);
+        onTrouble();
     }
 }
 
@@ -2320,6 +2323,60 @@ void GVLE::onOrder()
     }
     tab->onOrder();
     mModeling->setModified(true);
+}
+
+void GVLE::onTrouble()
+{
+    if (utils::Package::package().selected()) {
+        std::string package = utils::Package::package().name();
+        boost::algorithm::to_lower(package);
+
+        if (package == "canabis" and not mTroubleTimemout.connected()) {
+            mTroubleTimemout = Glib::signal_timeout().connect(
+                sigc::mem_fun(*this, &GVLE::signalTroubleTimer), 50);
+        }
+    }
+}
+
+bool GVLE::signalTroubleTimer()
+{
+    static int nb = 0;
+
+    if (not utils::Package::package().selected()) {
+        return false;
+    }
+
+    std::string package = utils::Package::package().name();
+    if (package.empty()) {
+        return false;
+    }
+
+    boost::algorithm::to_lower(package);
+    if (package == "canabis") {
+        int x, y;
+
+        get_position(x, y);
+
+        switch (nb % 4) {
+        case 0:
+            x = x - 5;
+            break;
+        case 1:
+            y = y + 5;
+            break;
+        case 2:
+            x = x + 5;
+            break;
+        default:
+            y = y - 5;
+            break;
+        }
+
+        move(x, y);
+        nb++;
+        return true;
+    }
+    return false;
 }
 
 }} // namespace vle gvle

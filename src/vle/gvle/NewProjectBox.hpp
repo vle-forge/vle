@@ -44,14 +44,13 @@ class GVLE;
 class NewProjectBox
 {
 public:
-
     NewProjectBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m, GVLE* app);
+
     ~NewProjectBox();
 
     void show();
 
 private:
-
     Glib::RefPtr<Gnome::Glade::Xml> mXml;
 
     Gtk::Dialog*                    mDialog;
@@ -61,13 +60,8 @@ private:
     // Text Entry
     Gtk::Entry*                     mEntryName;
 
-    // Buttons
-    Gtk::Button*                    mButtonApply;
-    Gtk::Button*                    mButtonCancel;
-
-    void onApply();
-    void onCancel();
-    bool exist(std::string name);
+    void apply();
+    bool exist(const std::string& name);
 };
 
 }} //namespace vle gvle

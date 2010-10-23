@@ -5041,7 +5041,10 @@ into your project.
             <child>
               <widget class="GtkAlignment" id="alignment38">
                 <property name="visible">True</property>
-                <property name="left_padding">12</property>
+                <property name="top_padding">5</property>
+                <property name="bottom_padding">5</property>
+                <property name="left_padding">10</property>
+                <property name="right_padding">10</property>
                 <child>
                   <widget class="GtkHBox" id="hbox13">
                     <property name="visible">True</property>
@@ -5058,6 +5061,7 @@ into your project.
                       <widget class="GtkEntry" id="EntryNameProject">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <property name="activates_default">True</property>
                       </widget>
                       <packing>
                         <property name="position">1</property>
@@ -5089,9 +5093,10 @@ into your project.
             <child>
               <widget class="GtkButton" id="ButtonNewProjectCancel">
                 <property name="label">gtk-cancel</property>
+                <property name="response_id">-6</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
+                <property name="receives_default">False</property>
                 <property name="use_stock">True</property>
               </widget>
               <packing>
@@ -5103,8 +5108,11 @@ into your project.
             <child>
               <widget class="GtkButton" id="ButtonNewProjectApply">
                 <property name="label">gtk-ok</property>
+                <property name="response_id">-3</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="can_default">True</property>
+                <property name="has_default">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
               </widget>

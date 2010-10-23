@@ -34,7 +34,6 @@
 #include <vle/gvle/ConditionsBox.hpp>
 #include <vle/gvle/ModelTreeBox.hpp>
 #include <vle/gvle/ModelClassBox.hpp>
-#include <vle/gvle/NewProjectBox.hpp>
 #include <vle/gvle/ObserverPlugin.hpp>
 #include <vle/gvle/OpenPackageBox.hpp>
 #include <vle/gvle/OpenVpzBox.hpp>
@@ -848,9 +847,22 @@ private:
     void saveVpz();
     void saveFirstVpz();
 
+    /**
+     * @brief Start the trouble system.
+     */
+    void onTrouble();
+
+    /**
+     * @brief Trouble timer callback.
+     *
+     * @return true or false to close or continue the callback.
+     */
+    bool signalTroubleTimer();
+
     Glib::RefPtr < Gnome::Glade::Xml >  mRefXML;
 
-    sigc::connection                 mConnectionTimeout;
+    sigc::connection                mConnectionTimeout;
+    sigc::connection                mTroubleTimemout;
 
 
     /* Widgets */
@@ -878,7 +890,6 @@ private:
     OpenPackageBox*                 mOpenPackageBox;
     OpenVpzBox*                     mOpenVpzBox;
     PackageBrowserWindow*           mPackageBrowserWindow;
-    NewProjectBox*                  mNewProjectBox;
     SaveVpzBox*                     mSaveVpzBox;
     ModelTreeBox*                   mModelTreeBox;
     ModelClassBox*                  mModelClassBox;
