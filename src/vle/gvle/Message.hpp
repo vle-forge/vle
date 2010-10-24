@@ -26,49 +26,98 @@
  */
 
 
-#ifndef GVLE_WIDGETS_MESSAGE_HPP
-#define GVLE_WIDGETS_MESSAGE_HPP
+#ifndef VLE_GVLE_WIDGETS_MESSAGE_HPP
+#define VLE_GVLE_WIDGETS_MESSAGE_HPP 1
 
 #include <vle/gvle/DllDefines.hpp>
-#include <glibmm/ustring.h>
+#include <vle/utils/i18n.hpp>
 
 namespace vle { namespace gvle {
 
 /**
- * Show a Gtk dialog box with warning icon and output error on console.
+ * @brief Show a Gtk dialog box with warning icon and error message.
  *
- * @param debug a string representation of debugging message.
+ * @param str a string representation of debugging message.
  */
-void VLE_GVLE_EXPORT Debug(const Glib::ustring& debug);
+void VLE_GVLE_EXPORT Debug(const std::string& str);
 
 /**
- * Show a Gtk dialog box with info icon and output information on
- * console.
+ * @brief Show a Gtk dialog box with warning icon and error message.
+ * @code
+ * vle::gvle::Debug(vle::fmt("%1% - %2%") % 1.23 % "a string");
+ * @encode
  *
- * @param information a string representation of information message.
+ * @param argv A boost::format argument.
  */
-void VLE_GVLE_EXPORT Info(const Glib::ustring& information);
+inline void VLE_GVLE_EXPORT Debug(const boost::format& str)
+{
+    Debug(str.str());
+}
 
 /**
- * Show a Gtk dialog box with error icon and output information on
- * consolse.
+ * @brief Show a Gtk dialog box with warning icon and information message.
+ *
+ * @param str a string representation of information message.
+ */
+void VLE_GVLE_EXPORT Info(const std::string& str);
+
+/**
+ * @brief Show a Gtk dialog box with warning icon and information message.
+ * @code
+ * vle::gvle::Debug(vle::fmt("%1% - %2%") % 1.23 % "a string");
+ * @encode
+ *
+ * @param argv A boost::format argument.
+ */
+inline void VLE_GVLE_EXPORT Info(const boost::format& str)
+{
+    Info(str.str());
+}
+
+/**
+ * @brief Show a Gtk dialog box with error icon and error message.
  *
  * @param msg a string representation of error message.
  * @param use_markup to enhance or not the text presentation by
  * inserting html tags inside the message string.
- *
  */
-void VLE_GVLE_EXPORT Error(const Glib::ustring& msg, bool use_markup = true);
+void VLE_GVLE_EXPORT Error(const std::string& msg, bool use_markup = true);
 
 /**
- * Show a Gtk dialog box with a question. User have two choices YES or
+ * @brief Show a Gtk dialog box with error icon and error message.
+ *
+ * @param msg a boost::format of error message.
+ * @param use_markup to enhance or not the text presentation by
+ * inserting html tags inside the message string.
+ */
+inline void VLE_GVLE_EXPORT Error(const boost::format& msg,
+                                  bool use_markup = true)
+{
+    Error(msg.str(), use_markup);
+}
+
+/**
+ * @brief Show a Gtk dialog box with a question. User have two choices, YES or
  * NO.
  *
- * @param question a string representation of question.
+ * @param str a string representation of question.
  *
  * @return true if user have clicked on YES, otherwise false.
  */
-bool VLE_GVLE_EXPORT Question(const Glib::ustring& question);
+bool VLE_GVLE_EXPORT Question(const std::string& str);
+
+/**
+ * @brief Show a Gtk dialog box with a question. User have two choices, YES or
+ * NO.
+ *
+ * @param str a boost::format representation of question.
+ *
+ * @return true if user have clicked on YES, otherwise false.
+ */
+inline bool VLE_GVLE_EXPORT Question(const boost::format& str)
+{
+    return Question(str.str());
+}
 
 }} // namespace vle gvle
 

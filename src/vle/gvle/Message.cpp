@@ -26,26 +26,24 @@
  */
 
 
-#include <gtkmm/messagedialog.h>
-#include <gtkmmconfig.h>
 #include <vle/gvle/Message.hpp>
 #include <vle/utils/Tools.hpp>
+#include <gtkmm/messagedialog.h>
+#include <gtkmmconfig.h>
 
-namespace vle
-{
-namespace gvle {
+namespace vle { namespace gvle {
 
-void Debug(const Glib::ustring& debug)
+void Debug(const std::string& debug)
 {
     Gtk::MessageDialog* box;
 
-    Glib::ustring::size_type pos = debug.find("----------\n");
-    if (pos == Glib::ustring::npos) {
+    std::string::size_type pos = debug.find("----------\n");
+    if (pos == std::string::npos) {
         box = new Gtk::MessageDialog(debug, false, Gtk::MESSAGE_WARNING,
                                      Gtk::BUTTONS_OK, true);
     } else {
-        Glib::ustring left(debug, 0, pos);
-        Glib::ustring right(debug, pos + 12);
+        std::string left(debug, 0, pos);
+        std::string right(debug, pos + 12);
 
         box = new Gtk::MessageDialog(left, false, Gtk::MESSAGE_WARNING,
                                      Gtk::BUTTONS_OK, true);
@@ -59,17 +57,17 @@ void Debug(const Glib::ustring& debug)
     delete box;
 }
 
-void Info(const Glib::ustring& information)
+void Info(const std::string& information)
 {
     Gtk::MessageDialog* box;
 
-    Glib::ustring::size_type pos = information.find("----------\n");
-    if (pos == Glib::ustring::npos) {
+    std::string::size_type pos = information.find("----------\n");
+    if (pos == std::string::npos) {
         box = new Gtk::MessageDialog(information, false, Gtk::MESSAGE_INFO,
                                      Gtk::BUTTONS_OK, true);
     } else {
-        Glib::ustring left(information, 0, pos);
-        Glib::ustring right(information, pos + 12);
+        std::string left(information, 0, pos);
+        std::string right(information, pos + 12);
 
         box = new Gtk::MessageDialog(left, false, Gtk::MESSAGE_INFO,
                                      Gtk::BUTTONS_OK, true);
@@ -82,24 +80,24 @@ void Info(const Glib::ustring& information)
     delete box;
 }
 
-void Error(const Glib::ustring& msg, bool use_markup)
+void Error(const std::string& msg, bool use_markup)
 {
     Gtk::MessageDialog* box;
-    Glib::ustring msg_first;
-    Glib::ustring msg_second;
+    std::string msg_first;
+    std::string msg_second;
 
     if (use_markup) {
 
-        Glib::ustring::size_type pos1 = msg.find("----------");
-        if (pos1 == Glib::ustring::npos) {
+        std::string::size_type pos1 = msg.find("----------");
+        if (pos1 == std::string::npos) {
             msg_first.assign(msg);
         } else {
             msg_first.assign(msg, 0, pos1);
-            msg_second.assign(msg, pos1 + 10, Glib::ustring::npos);
+            msg_second.assign(msg, pos1 + 10, std::string::npos);
             msg_second = Glib::Markup::escape_text(msg_second);
 
-            Glib::ustring::size_type pos2 = msg_second.find("----------");
-            if (pos2 == Glib::ustring::npos) {
+            std::string::size_type pos2 = msg_second.find("----------");
+            if (pos2 == std::string::npos) {
                 msg_second.insert(0, "<i>");
                 msg_second.append("</i>");
             } else {
@@ -124,7 +122,7 @@ void Error(const Glib::ustring& msg, bool use_markup)
     delete box;
 }
 
-bool Question(const Glib::ustring& question)
+bool Question(const std::string& question)
 {
     Gtk::MessageDialog* box = NULL;
     int r;
@@ -137,5 +135,4 @@ bool Question(const Glib::ustring& question)
     return (r == Gtk::RESPONSE_YES);
 }
 
-}
-} // namespace vle gvle
+}} // namespace vle gvle
