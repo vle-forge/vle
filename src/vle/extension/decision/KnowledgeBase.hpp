@@ -34,6 +34,7 @@
 #include <vle/extension/decision/Library.hpp>
 #include <vle/extension/decision/Rules.hpp>
 #include <vle/extension/decision/Table.hpp>
+#include <vle/extension/decision/Plan.hpp>
 #include <vle/extension/DllDefines.hpp>
 
 namespace vle { namespace extension { namespace decision {
@@ -183,37 +184,41 @@ public:
      */
     typedef std::pair < bool, devs::Time > Result;
 
+    KnowledgeBase()
+        : mPlan(*this), mLibrary(*this)
+    {}
+
     /**
      * @brief Add a fac into the facts tables.
      * @param name
      * @param fact
      */
     void addFact(const std::string& name, const Fact& fact)
-    { mFactsTable.add(name, fact); }
+    { facts().add(name, fact); }
 
     void applyFact(const std::string& name, const value::Value& value)
-    { mFactsTable[name](value); }
+    { facts()[name](value); }
 
     Rule& addRule(const std::string& name)
-    { return m_rules.add(name); }
+    { return mPlan.rules().add(name); }
 
     Rule& addRule(const std::string& name, const Rule& rule)
-    { return m_rules.add(name, rule); }
+    { return mPlan.rules().add(name, rule); }
 
     Rule& addPredicateToRule(const std::string& name, const Predicate& pred)
-    { return m_rules.add(name, pred); }
+    { return mPlan.rules().add(name, pred); }
 
     Activity& addActivity(const std::string& name)
-    { return m_activities.add(name); }
+    { return mPlan.activities().add(name); }
 
     Activity& addActivity(const std::string& name,
                           const devs::Time& start,
                           const devs::Time& finish)
-    { return m_activities.add(name, start, finish); }
+    { return mPlan.activities().add(name, start, finish); }
 
     Activity& addActivity(const std::string& name,
                           const Activity& act)
-    { return m_activities.add(name, act); }
+    { return mPlan.activities().add(name, act); }
 
     /**
      * @brief The predecessor activity (i) must start before the successor
@@ -225,7 +230,7 @@ public:
     void addStartToStartConstraint(const std::string& acti,
                                    const std::string& actj,
                                    const devs::Time& maxtimelag)
-    { m_activities.addStartToStartConstraint(acti, actj, 0, maxtimelag); }
+    { mPlan.activities().addStartToStartConstraint(acti, actj, 0, maxtimelag); }
 
     /**
      * @brief The predecessor activity (i) must start before the successor
@@ -239,7 +244,7 @@ public:
                                    const std::string& actj,
                                    const devs::Time& mintimelag,
                                    const devs::Time& maxtimelag)
-    { m_activities.addStartToStartConstraint(acti, actj, mintimelag,
+    { mPlan.activities().addStartToStartConstraint(acti, actj, mintimelag,
                                              maxtimelag); }
 
     /**
@@ -254,7 +259,7 @@ public:
                                     const std::string& actj,
                                     const devs::Time& mintimelag,
                                     const devs::Time& maxtimelag)
-    { m_activities.addFinishToStartConstraint(
+    { mPlan.activities().addFinishToStartConstraint(
             acti, actj, mintimelag, maxtimelag); }
 
     /**
@@ -267,7 +272,7 @@ public:
     void addFinishToFinishConstraint(const std::string& acti,
                                      const std::string& actj,
                                      const devs::Time& maxtimelag)
-    { m_activities.addFinishToFinishConstraint(acti, actj, 0, maxtimelag); }
+    { mPlan.activities().addFinishToFinishConstraint(acti, actj, 0, maxtimelag); }
 
     /**
      * @brief The predecessor activity (i) must finish before the successor
@@ -281,11 +286,11 @@ public:
                                      const std::string& actj,
                                      const devs::Time& mintimelag,
                                      const devs::Time& maxtimelag)
-    { m_activities.addFinishToFinishConstraint(
+    { mPlan.activities().addFinishToFinishConstraint(
             acti, actj, mintimelag, maxtimelag); }
 
-    const Rules& rules() const { return m_rules; }
-    const Activities& activities() const { return m_activities; }
+    const Rules& rules() const { return mPlan.rules(); }
+    const Activities& activities() const { return mPlan.activities(); }
 
     /**
      * @brief Compute the next date when change in activity status.
@@ -294,7 +299,7 @@ public:
      * devs::Time::infinity[.
      */
     devs::Time nextDate(const devs::Time& time)
-    { return m_activities.nextDate(time); }
+    { return mPlan.activities().nextDate(time); }
 
     devs::Time duration(const devs::Time& time);
 
@@ -326,34 +331,34 @@ public:
                            const devs::Time& date);
 
     const Activities::result_t& waitedActivities() const
-    { return m_activities.waitedAct(); }
+    { return mPlan.activities().waitedAct(); }
 
     const Activities::result_t& startedActivities() const
-    { return m_activities.startedAct(); }
+    { return mPlan.activities().startedAct(); }
 
     const Activities::result_t& failedActivities() const
-    { return m_activities.failedAct(); }
+    { return mPlan.activities().failedAct(); }
 
     const Activities::result_t& doneActivities() const
-    { return m_activities.doneAct(); }
+    { return mPlan.activities().doneAct(); }
 
     const Activities::result_t& endedActivities() const
-    { return m_activities.endedAct(); }
+    { return mPlan.activities().endedAct(); }
 
     const Activities::result_t& latestWaitedActivities() const
-    { return m_activities.latestWaitedAct(); }
+    { return mPlan.activities().latestWaitedAct(); }
 
     const Activities::result_t& latestStartedActivities() const
-    { return m_activities.latestStartedAct(); }
+    { return mPlan.activities().latestStartedAct(); }
 
     const Activities::result_t& latestFailedActivities() const
-    { return m_activities.latestFailedAct(); }
+    { return mPlan.activities().latestFailedAct(); }
 
     const Activities::result_t& latestDoneActivities() const
-    { return m_activities.latestDoneAct(); }
+    { return mPlan.activities().latestDoneAct(); }
 
     const Activities::result_t& latestEndedActivities() const
-    { return m_activities.latestEndedAct(); }
+    { return mPlan.activities().latestEndedAct(); }
 
     /**
      * @brief Return true if at least on list of activities (waited, started,
@@ -362,11 +367,11 @@ public:
      */
     bool haveActivityInLatestActivitiesLists() const
     {
-        return not (m_activities.latestWaitedAct().empty() and
-                    m_activities.latestStartedAct().empty() and
-                    m_activities.latestFailedAct().empty() and
-                    m_activities.latestDoneAct().empty() and
-                    m_activities.latestEndedAct().empty());
+        return not (mPlan.activities().latestWaitedAct().empty() and
+                    mPlan.activities().latestStartedAct().empty() and
+                    mPlan.activities().latestFailedAct().empty() and
+                    mPlan.activities().latestDoneAct().empty() and
+                    mPlan.activities().latestEndedAct().empty());
     }
 
     /**
@@ -374,19 +379,21 @@ public:
      * ended lists).
      */
     void clearLatestActivitiesLists()
-    { m_activities.clearLatestActivitiesLists(); }
+    { mPlan.activities().clearLatestActivitiesLists(); }
 
     /**
      * @brief Get the table of available facts.
      * @return Table of available facts.
      */
-    const FactsTable& facts() const { return mFactsTable; }
+    const FactsTable& facts() const
+    { return mFactsTable; }
 
     /**
      * @brief Get the table of available predicates.
      * @return Table of available predicates.
      */
-    const PredicatesTable& predicates() const { return mPredicatesTable; }
+    const PredicatesTable& predicates() const
+    { return mPredicatesTable; }
 
     /**
      * @brief Get the table of available acknowledge functions.
@@ -406,37 +413,43 @@ public:
      * @brief Get the table of available output functions;
      * @return Table of available output functions.
      */
-    const OutputFunctions& outputFunctions() const { return mOutFunctions; }
+    const OutputFunctions& outputFunctions() const
+    { return mOutFunctions; }
 
     /**
      * @brief Get the table of available facts.
      * @return Table of available facts.
      */
-    FactsTable& facts() { return mFactsTable; }
+    FactsTable& facts()
+    { return mFactsTable; }
 
     /**
      * @brief Get the table of available predicates.
      * @return Table of available predicates.
      */
-    PredicatesTable& predicates() { return mPredicatesTable; }
+    PredicatesTable& predicates()
+    { return mPredicatesTable; }
 
     /**
      * @brief Get the table of available acknowledge functions.
      * @return Table of available acknowledge functions.
      */
-    AcknowledgeFunctions& acknowledgeFunctions() { return mAckFunctions; }
+    AcknowledgeFunctions& acknowledgeFunctions()
+    { return mAckFunctions; }
 
     /**
      * @brief Get the table of available output functions;
      * @return Table of available output functions.
      */
-    OutputFunctions& outputFunctions() { return mOutFunctions; }
+    OutputFunctions& outputFunctions()
+    { return mOutFunctions; }
 
     /**
      * @brief Get the table of available update functions.
      * @return Table of available update functions.
      */
-    UpdateFunctions& updateFunctions() { return mUpdateFunctions; }
+    UpdateFunctions& updateFunctions()
+    { return mUpdateFunctions; }
 
     template < typename X >
         AddFacts < X > addFacts(X obj)
@@ -515,25 +528,36 @@ public:
     Library& library() { return mLibrary; }
 
     /**
+     * @brief Get a constant reference to the current plan.
+     * @return A constant reference.
+     */
+    const Plan& plan() const { return mPlan; }
+
+    /**
+     * @brief Get a reference to the current plan.
+     * @return A reference.
+     */
+    Plan& plan() { return mPlan; }
+
+    /**
      * @brief Merge the specified Plan `name' from the Library with the current
      * KnowledgeBase.
      *
      * @param name The name of the Plan to merge.
      */
-    void instantiatePlan(const std::string& name);
+    //void instantiatePlan(const std::string& name); FIXME
 
 private:
-    Rules m_rules;
-    Activities m_activities;
+    Plan mPlan; /**< The current plan to interpret */
+
+    Library mLibrary; /**< The plan library. It stocks all plans available for
+                        this decision knowledge base. */
 
     FactsTable mFactsTable;
     PredicatesTable mPredicatesTable;
     AcknowledgeFunctions mAckFunctions;
     OutputFunctions mOutFunctions;
     UpdateFunctions mUpdateFunctions;
-
-    Library mLibrary; /**< The plan library. It stocks all plans availabled for
-                        this decision knowledge base. */
 
     static void unionLists(Activities::result_t& last,
                            Activities::result_t& recent);

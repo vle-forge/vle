@@ -78,7 +78,7 @@ public:
     enum State {
         WAIT, /**< Before the activation of the activity. */
         STARTED, /**< If the activity is launched and operation too. */
-        FF, /**< Activity is finish, but need to check all FF precedence
+        FF, /**< Activity is done, but need to check all FF precedence
               constraint. */
         DONE, /**< If the activity and operation are done. */
         FAILED /**< If the operation failed. */
@@ -94,8 +94,8 @@ public:
         m_minfinish(devs::Time::infinity),
         m_maxfinish(devs::Time::infinity),
         m_started(devs::Time::negativeInfinity),
-        m_done(devs::Time::negativeInfinity),
-        m_ff(devs::Time::negativeInfinity)
+        m_ff(devs::Time::negativeInfinity),
+        m_done(devs::Time::negativeInfinity)
     {}
 
     //
@@ -202,16 +202,11 @@ public:
     bool isInFailedState() const { return m_state == FAILED; }
     bool isInDoneState() const { return m_state == DONE; }
 
-    void wait()
-    { m_state = WAIT; }
-    void start(const devs::Time& date)
-    { m_state = STARTED; startedDate(date); }
-    void ff(const devs::Time& date)
-    { m_state = FF; ffDate(date); }
-    void end(const devs::Time& date)
-    { m_state = DONE; doneDate(date); }
-    void fail(const devs::Time& date)
-    { m_state = FAILED; doneDate(date); }
+    void wait() { m_state = WAIT; }
+    void start(const devs::Time& date) { m_state = STARTED; startedDate(date); }
+    void ff(const devs::Time& date) { m_state = FF; ffDate(date); }
+    void end(const devs::Time& date) { m_state = DONE; doneDate(date); }
+    void fail(const devs::Time& date) { m_state = FAILED; doneDate(date); }
 
     const Rules& rules() const { return m_rules; }
     const DateType& date() const { return m_date; }
@@ -260,8 +255,8 @@ private:
     devs::Time m_maxfinish;
 
     devs::Time m_started; /** Date when the activity is started. */
-    devs::Time m_done; /** Date when the activity is finished. */
     devs::Time m_ff; /**< Date when the activity is valid ff. */
+    devs::Time m_done; /** Date when the activity is done. */
 
     AckFct mAckFct;
     OutFct mOutFct;
@@ -336,11 +331,11 @@ inline std::ostream& operator<<(
     }
 
     if (not a.ffDate().isNegativeInfinity()) {
-        out << " Done at: (" << a.ffDate().toString() << ")";
+        out << " FF valid at: (" << a.ffDate().toString() << ")";
     }
 
     if (not a.doneDate().isNegativeInfinity()) {
-        out << " Finished at: (" << a.doneDate().toString() << "))";
+        out << " Done at: (" << a.doneDate().toString() << "))";
     }
 
     return out;

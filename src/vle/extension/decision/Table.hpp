@@ -133,7 +133,7 @@ public:
 
         if (it == mLst.end()) {
             throw utils::ArgError(
-                fmt(_("Decision: unknow id `%1%'")) % name);
+                fmt(_("Decision: unknown id `%1%'")) % name);
         }
 
         return it;
@@ -154,7 +154,7 @@ public:
 
         if (it == mLst.end()) {
             throw utils::ArgError(
-                fmt(_("Decision: unknow id `%1%'")) % name);
+                fmt(_("Decision: unknown id `%1%'")) % name);
         }
 
         return it;

@@ -137,7 +137,7 @@ void Agent::externalTransition(
                 setActivityFailed(activity, time);
             } else {
                 throw utils::ModellingError(
-                    fmt(_("Decision: unknow order `%1%'")) % order);
+                    fmt(_("Decision: unknown order `%1%'")) % order);
             }
         } else {
             if (mPortMode) {

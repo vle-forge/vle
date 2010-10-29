@@ -50,20 +50,15 @@ void Block::addReal(const std::string& key, const double& val)
 
 Block& Block::addBlock(const std::string& name)
 {
-    std::pair < std::map < std::string, Block >::iterator, bool > r;
-    r = blocks.insert(std::make_pair(name, Block(name)));
+    std::multimap < std::string, Block >::iterator it =
+        blocks.insert(std::make_pair(name, Block(name)));
 
-    if (not r.second) {
-        throw utils::ParseError(fmt(_("The block `%1%' already exists")) %
-                                name);
-    }
-
-    return r.first->second;
+    return it->second;
 }
 
 const Block& Block::getBlock(const std::string& name) const
 {
-    std::map < std::string, Block >::const_iterator it = blocks.find(name);
+    std::multimap < std::string, Block >::const_iterator it = blocks.find(name);
     if (it == blocks.end()) {
         throw utils::ArgError(fmt(_("The block `%1%' does not exist")) % name);
     }

@@ -155,9 +155,9 @@ void Activities::removeFailedAct(Activities::iterator it)
     removeAct(m_failedAct, it);
 }
 
-void Activities::removeDoneAct(Activities::iterator it)
+void Activities::removeFFAct(Activities::iterator it)
 {
-    removeAct(m_doneAct, it);
+    removeAct(m_ffAct, it);
 }
 
 void Activities::removeEndedAct(Activities::iterator it)
@@ -180,9 +180,9 @@ void Activities::addFailedAct(Activities::iterator it)
     addAct(m_failedAct, it);
 }
 
-void Activities::addDoneAct(Activities::iterator it)
+void Activities::addFFAct(Activities::iterator it)
 {
-    addAct(m_doneAct, it);
+    addAct(m_ffAct, it);
 }
 
 void Activities::addEndedAct(Activities::iterator it)
@@ -204,9 +204,9 @@ void Activities::setWaitedAct(Activities::iterator it)
         updateLatestActivitiesList(m_latestStartedAct, it);
         break;
     case Activity::FF:
-        removeDoneAct(it);
-        addDoneAct(it);
-        updateLatestActivitiesList(m_latestDoneAct, it);
+        removeFFAct(it);
+        addFFAct(it);
+        updateLatestActivitiesList(m_latestFFAct, it);
         break;
     case Activity::DONE:
         removeEndedAct(it);
@@ -233,8 +233,8 @@ void Activities::setStartedAct(Activities::iterator it)
         updateLatestActivitiesList(m_latestStartedAct, it);
         break;
     case Activity::FF:
-        removeDoneAct(it);
-        updateLatestActivitiesList(m_latestDoneAct, it);
+        removeFFAct(it);
+        updateLatestActivitiesList(m_latestFFAct, it);
         break;
     case Activity::DONE:
         removeEndedAct(it);
@@ -260,8 +260,8 @@ void Activities::setFailedAct(Activities::iterator it)
         updateLatestActivitiesList(m_latestStartedAct, it);
         break;
     case Activity::FF:
-        removeDoneAct(it);
-        updateLatestActivitiesList(m_latestDoneAct, it);
+        removeFFAct(it);
+        updateLatestActivitiesList(m_latestFFAct, it);
         break;
     case Activity::DONE:
         removeEndedAct(it);
@@ -275,7 +275,7 @@ void Activities::setFailedAct(Activities::iterator it)
     addFailedAct(it);
 }
 
-void Activities::setDoneAct(Activities::iterator it)
+void Activities::setFFAct(Activities::iterator it)
 {
     switch (it->second.state()) {
     case Activity::WAIT:
@@ -287,8 +287,8 @@ void Activities::setDoneAct(Activities::iterator it)
         updateLatestActivitiesList(m_latestStartedAct, it);
         break;
     case Activity::FF:
-        removeDoneAct(it);
-        updateLatestActivitiesList(m_latestDoneAct, it);
+        removeFFAct(it);
+        updateLatestActivitiesList(m_latestFFAct, it);
         break;
     case Activity::DONE:
         removeEndedAct(it);
@@ -299,7 +299,7 @@ void Activities::setDoneAct(Activities::iterator it)
         updateLatestActivitiesList(m_latestFailedAct, it);
         break;
     }
-    addDoneAct(it);
+    addFFAct(it);
 }
 
 void Activities::setEndedAct(Activities::iterator it)
@@ -314,8 +314,8 @@ void Activities::setEndedAct(Activities::iterator it)
         updateLatestActivitiesList(m_latestStartedAct, it);
         break;
     case Activity::FF:
-        removeDoneAct(it);
-        updateLatestActivitiesList(m_latestDoneAct, it);
+        removeFFAct(it);
+        updateLatestActivitiesList(m_latestFFAct, it);
         break;
     case Activity::DONE:
         removeEndedAct(it);
@@ -348,7 +348,7 @@ void Activities::updateLatestActivitiesList(Activities::result_t& lst,
     removeAct(m_latestWaitedAct, it);
     removeAct(m_latestStartedAct, it);
     removeAct(m_latestEndedAct, it);
-    removeAct(m_latestDoneAct, it);
+    removeAct(m_latestFFAct, it);
     removeAct(m_latestFailedAct, it);
 
     addAct(lst, it);
@@ -358,7 +358,7 @@ void Activities::clearLatestActivitiesLists()
 {
     m_latestWaitedAct.clear();
     m_latestStartedAct.clear();
-    m_latestDoneAct.clear();
+    m_latestFFAct.clear();
     m_latestFailedAct.clear();
     m_latestEndedAct.clear();
 }
@@ -373,7 +373,7 @@ Activities::process(const devs::Time& time)
     do {
         m_waitedAct.clear();
         m_startedAct.clear();
-        m_doneAct.clear();
+        m_ffAct.clear();
         m_failedAct.clear();
         m_endedAct.clear();
 
@@ -388,7 +388,7 @@ Activities::process(const devs::Time& time)
                 break;
 
             case Activity::FF:
-                update = processDoneState(activity, time);
+                update = processFFState(activity, time);
                 break;
 
             case Activity::DONE:
@@ -400,7 +400,7 @@ Activities::process(const devs::Time& time)
                 break;
 
             default:
-                throw utils::InternalError(_("Decision: unknow state"));
+                throw utils::InternalError(_("Decision: unknown state"));
             }
 
             if (not isUpdated and update.first) {
@@ -485,7 +485,7 @@ Activities::processStartedState(iterator activity,
 }
 
 Activities::Result
-Activities::processDoneState(iterator activity,
+Activities::processFFState(iterator activity,
                              const devs::Time& time)
 {
     PrecedenceConstraint::Result newstate = updateState(activity, time);
@@ -500,7 +500,7 @@ Activities::processDoneState(iterator activity,
         update.first = true;
         break;
     case PrecedenceConstraint::Wait:
-        m_doneAct.push_back(activity);
+        m_ffAct.push_back(activity);
         update.first = false;
         break;
     case PrecedenceConstraint::Failed:

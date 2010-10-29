@@ -281,7 +281,7 @@ PrecedenceConstraint::isValid(const devs::Time& time) const
     }
 
     throw utils::InternalError(fmt(
-            _("Decision: unknow precedence constraint %1%")) % (int)m_type);
+            _("Decision: unknown precedence constraint %1%")) % (int)m_type);
 }
 
 }}} // namespace vle model decision

@@ -38,6 +38,8 @@
 
 namespace vle { namespace extension { namespace decision {
 
+class KnowledgeBase;
+
 class VLE_EXTENSION_EXPORT Library
 {
 public:
@@ -46,6 +48,10 @@ public:
     typedef LibraryT::const_iterator const_iterator;
     typedef LibraryT::iterator iterator;
     typedef LibraryT::size_type size_type;
+
+    Library(KnowledgeBase& kb)
+        : mKb(kb)
+    {}
 
     void add(const std::string& name, const std::string& content);
 
@@ -123,6 +129,7 @@ public:
 
 private:
     LibraryT mLst;
+    KnowledgeBase& mKb;
 };
 
 }}} // namespace vle model decision

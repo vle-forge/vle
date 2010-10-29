@@ -54,12 +54,12 @@ SET(EXT_DIFFERENTIAL_EQUATION_HPP differential-equation/DifferentialEquation.hpp
 
 SET(EXT_DECISION_CPP decision/Activities.cpp decision/Activity.cpp
   decision/Agent.cpp decision/KnowledgeBase.cpp decision/Library.cpp
-  decision/Parser.cpp decision/PrecedenceConstraint.cpp
+  decision/Plan.cpp decision/PrecedenceConstraint.cpp
   decision/PrecedencesGraph.cpp decision/Predicates.cpp decision/Rules.cpp)
 
 SET(EXT_DECISION_HPP decision/Activities.hpp decision/Activity.hpp
   decision/Agent.hpp decision/Facts.hpp decision/KnowledgeBase.hpp
-  decision/Library.hpp decision/Parser.hpp decision/PrecedenceConstraint.hpp
+  decision/Library.hpp decision/Plan.hpp decision/PrecedenceConstraint.hpp
   decision/PrecedencesGraph.hpp decision/Predicates.hpp decision/Rule.hpp
   decision/Rules.hpp decision/Table.hpp)
 

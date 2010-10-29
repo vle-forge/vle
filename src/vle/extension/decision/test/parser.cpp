@@ -126,7 +126,6 @@ public:
     int mNbUpdate, mNbAck, mNbOut;
 };
 
-
 const char* Plan1 = \
 "# This file is a part of the VLE environment # http://www.vle-project.org\n"
 "# Copyright (C) 2010 INRA http://www.inra.fr\n"
@@ -148,13 +147,13 @@ const char* Plan1 = \
 "rules { # listes des règles.\n"
 "    rule { # définition de la rèle `rule 1'.\n"
 "        id = \"rule 1\";\n"
-"        predicates = \"pred 1\" \"pred 2\" \"pred 3\"\n"
-"            \"pred 4\" \"pred 5\" \"pred 6\"; # sa liste de prédicats.\n"
+"        predicates = \"pred 1\", \"pred 2\", \"pred 3\",\n"
+"            \"pred 4\", \"pred 5\", \"pred 6\"; # sa liste de prédicats.\n"
 "    }\n"
 "\n"
 "    rule {\n"
 "        id = \"rule 2\";\n"
-"        predicates = \"pr ed 5\" \"pred 6\";\n"
+"        predicates = \"pr ed 5\", \"pred 6\";\n"
 "    }\n"
 "\n"
 "    rule {\n"
@@ -165,7 +164,7 @@ const char* Plan1 = \
 "activities {\n"
 "    activity {\n"
 "        id = \"activity1\";\n"
-"        rules = \"rule 1\" \"rule 2\";\n"
+"        rules = \"rule 1\", \"rule 2\";\n"
 "        temporal {\n"
 "            start = 0;\n"
 "            finish = 101;\n"
@@ -175,7 +174,7 @@ const char* Plan1 = \
 "    }\n"
 "    activity {\n"
 "        id = \"activity2\";\n"
-"        rules = \"rule 1\" \"rule 2\";\n"
+"        rules = \"rule 1\", \"rule 2\";\n"
 "        temporal {\n"
 "            start = 0;\n"
 "            minfinish = 99;\n"
@@ -186,7 +185,7 @@ const char* Plan1 = \
 "    }\n"
 "    activity {\n"
 "        id = \"activity3\";\n"
-"        rules = \"rule 1\" \"rule 2\";\n"
+"        rules = \"rule 1\", \"rule 2\";\n"
 "        temporal {\n"
 "            minstart = 0;\n"
 "            maxstart = 10;\n"
@@ -197,7 +196,7 @@ const char* Plan1 = \
 "    }\n"
 "    activity {\n"
 "        id = \"activity4\";\n"
-"        rules = \"rule 1\" \"rule 2\";\n"
+"        rules = \"rule 1\", \"rule 2\";\n"
 "        temporal {\n"
 "            minstart = 0;\n"
 "            maxstart = 10;\n"
@@ -236,15 +235,34 @@ const char* Plan1 = \
 "    }\n"
 "}\n";
 
+std::string Block(
+    "name {\n"
+    " type = \"FS\";\n"
+    "   first = \"activity3\";\n"
+    " second = \"activity4\";\n"
+    "}\n");
+
 }}}} // namespace vle extension decision ex
+
+BOOST_AUTO_TEST_CASE(parser_00)
+{
+    vle::value::init();
+
+    vmd::ex::KnowledgeBase b;
+
+    BOOST_REQUIRE_NO_THROW(b.library().add("main", vmd::ex::Block));
+    BOOST_REQUIRE_NO_THROW(b.library().add("main2", vmd::ex::Plan1));
+}
 
 BOOST_AUTO_TEST_CASE(parser)
 {
     vle::value::init();
 
     vmd::ex::KnowledgeBase b;
-    b.library().add("main", std::string(vmd::ex::Plan1));
-    b.instantiatePlan("main");
+    b.plan().fill(std::string(vmd::ex::Plan1));
+
+    std::cout << fmt("parser: %1%\n") % b;
+    std::cout << fmt("graph: %1%\n") % b.activities().precedencesGraph();
 
     BOOST_REQUIRE_EQUAL(b.activities().size(), (vmd::Activities::size_type)4);
 }

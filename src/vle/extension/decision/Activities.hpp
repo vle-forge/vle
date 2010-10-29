@@ -180,7 +180,7 @@ public:
     {
         const_iterator it = m_lst.find(name);
         if (it == m_lst.end()) {
-            throw utils::ArgError("Decision: unknow activity");
+            throw utils::ArgError("Decision: unknown activity");
         }
         return it;
     }
@@ -189,7 +189,7 @@ public:
     {
         iterator it = m_lst.find(name);
         if (it == m_lst.end()) {
-            throw utils::ArgError("Decision: unknow activity");
+            throw utils::ArgError("Decision: unknown activity");
         }
         return it;
     }
@@ -204,7 +204,7 @@ public:
     const Activities::result_t& failedAct() const
     { return m_failedAct; }
     const Activities::result_t& doneAct() const
-    { return m_doneAct; }
+    { return m_ffAct; }
     const Activities::result_t& endedAct() const
     { return m_endedAct; }
 
@@ -215,25 +215,25 @@ public:
     const Activities::result_t& latestFailedAct() const
     { return m_latestFailedAct; }
     const Activities::result_t& latestDoneAct() const
-    { return m_latestDoneAct; }
+    { return m_latestFFAct; }
     const Activities::result_t& latestEndedAct() const
     { return m_latestEndedAct; }
 
     void removeWaitedAct(Activities::iterator it);
     void removeStartedAct(Activities::iterator it);
     void removeFailedAct(Activities::iterator it);
-    void removeDoneAct(Activities::iterator it);
+    void removeFFAct(Activities::iterator it);
     void removeEndedAct(Activities::iterator it);
     void addWaitedAct(Activities::iterator it);
     void addStartedAct(Activities::iterator it);
     void addFailedAct(Activities::iterator it);
-    void addDoneAct(Activities::iterator it);
+    void addFFAct(Activities::iterator it);
     void addEndedAct(Activities::iterator it);
 
     void setWaitedAct(Activities::iterator it);
     void setStartedAct(Activities::iterator it);
     void setFailedAct(Activities::iterator it);
-    void setDoneAct(Activities::iterator it);
+    void setFFAct(Activities::iterator it);
     void setEndedAct(Activities::iterator it);
 
     static void removeAct(Activities::result_t& lst,
@@ -252,19 +252,19 @@ private:
     Activities::result_t m_waitedAct;
     Activities::result_t m_startedAct;
     Activities::result_t m_failedAct;
-    Activities::result_t m_doneAct;
+    Activities::result_t m_ffAct;
     Activities::result_t m_endedAct;
 
     Activities::result_t m_latestWaitedAct;
     Activities::result_t m_latestStartedAct;
     Activities::result_t m_latestFailedAct;
-    Activities::result_t m_latestDoneAct;
+    Activities::result_t m_latestFFAct;
     Activities::result_t m_latestEndedAct;
 
 
     Result processWaitState(iterator activity, const devs::Time& time);
     Result processStartedState(iterator activity, const devs::Time& time);
-    Result processDoneState(iterator activity, const devs::Time& time);
+    Result processFFState(iterator activity, const devs::Time& time);
     Result processFailedState(iterator activity, const devs::Time& time);
     Result processEndedState(iterator activity, const devs::Time& time);
 

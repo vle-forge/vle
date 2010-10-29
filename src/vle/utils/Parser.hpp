@@ -41,7 +41,14 @@ struct VLE_UTILS_EXPORT Block
 {
     typedef std::multimap < std::string, std::string > Strings;
     typedef std::multimap < std::string, double > Reals;
-    typedef std::map < std::string, Block > Blocks;
+    typedef std::multimap < std::string, Block > Blocks;
+
+    typedef std::pair < Reals::const_iterator,
+            Reals::const_iterator > RealsResult;
+    typedef std::pair < Strings::const_iterator,
+            Strings::const_iterator > StringsResult;
+    typedef std::pair < Blocks::const_iterator,
+            Blocks::const_iterator > BlocksResult;
 
     Block(const std::string& name)
         : name(name)

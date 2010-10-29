@@ -27,34 +27,35 @@
 
 
 #include <vle/extension/decision/Library.hpp>
-#include <vle/extension/decision/Parser.hpp>
+#include <vle/utils/Parser.hpp>
+#include <sstream>
 
 namespace vle { namespace extension { namespace decision {
 
 void Library::add(const std::string& name, const std::string& content)
 {
-    Parser p(content);
-    std::pair < iterator, bool > r;
+    Plan p(mKb, content);
 
-    r = mLst.insert(std::make_pair(name, p.plan()));
+    std::pair < iterator, bool > r;
+    r = mLst.insert(std::make_pair(name, p));
 
     if (not r.second) {
         throw utils::ArgError(
-            fmt(_("Decision: plan library, plan `%1%' already exist")) %
+            fmt(_("Decision: plan library, plan `%1%' already exists")) %
             name);
     }
 }
 
 void Library::add(const std::string& name, std::istream& stream)
 {
-    Parser p(stream);
-    std::pair < iterator, bool > r;
+    Plan p(mKb, stream);
 
-    r = mLst.insert(std::make_pair(name, p.plan()));
+    std::pair < iterator, bool > r;
+    r = mLst.insert(std::make_pair(name, p));
 
     if (not r.second) {
         throw utils::ArgError(
-            fmt(_("Decision: plan library, plan `%1%' already exist")) %
+            fmt(_("Decision: plan library, plan `%1%' already exists")) %
             name);
     }
 }
