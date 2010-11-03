@@ -127,23 +127,22 @@ void Package::install()
     std::list < std::string > argv;
     buildCommandLine(mCommandInstall, argv);
 
-    fs::path src = p.getPackageBuildDir();
-    src /= "src";
+    fs::path builddir = p.getPackageBuildDir();
 
-    if (not fs::exists(src)) {
+    if (not fs::exists(builddir)) {
         throw utils::ArgError(fmt(
                 _("Pkg build error: directory '%1%' does not exist")) %
-            src.file_string());
+            builddir.file_string());
     }
 
-    if (not fs::is_directory(src)) {
+    if (not fs::is_directory(builddir)) {
         throw utils::ArgError(fmt(
                 _("Pkg build error: '%1%' is not a directory")) %
-            src.file_string());
+            builddir.file_string());
     }
 
     try {
-        process(src.file_string(), argv);
+        process(builddir.file_string(), argv);
     } catch(const Glib::SpawnError& e) {
         throw utils::InternalError(fmt(
                 _("Pkg build error: install lib failed %1%")) % e.what());
