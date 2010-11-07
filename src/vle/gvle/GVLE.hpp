@@ -58,6 +58,7 @@
 namespace vle { namespace gvle {
 
 class Editor;
+class FileTreeView;
 class GVLEMenuAndToolbar;
 class Modeling;
 class PreferencesBox;
@@ -258,121 +259,6 @@ public:
 
     void setCurrentTab(int n)
     { mCurrentTab = n; }
-
-    /**
-     * @brief Tree model columns used in FileTreeView
-     */
-    class FileModelColumns : public Gtk::TreeModel::ColumnRecord
-    {
-    public:
-	FileModelColumns()
-	    { add(m_col_name); }
-
-	Gtk::TreeModelColumn<Glib::ustring> m_col_name;
-    };
-
-    /**
-     * @brief FileTreeView used for display file hierarchy
-     */
-    class FileTreeView : public Gtk::TreeView
-    {
-    public:
-	FileTreeView(BaseObjectType* cobject,
-		     const Glib::RefPtr<Gnome::Glade::Xml>& /*refGlade*/);
-    virtual ~FileTreeView();
-
-    void build();
-
-	void clear();
-
-    void refresh();
-
-	inline void setPackage(const std::string& package)
-        { mPackage = package; }
-
-	void setParent(GVLE* parent)
-        { mParent = parent; }
-
-    Glib::ustring getSelected()
-        { return (*mRefTreeSelection->get_selected())[mColumns.m_col_name]; }
-
-    protected:
-	bool on_button_press_event(GdkEventButton* event);
-        bool on_foreach(const Gtk::TreeModel::Path&,
-                        const Gtk::TreeModel::iterator& iter);
-        void onEdition(const Glib::ustring& pathString,
-                       const Glib::ustring& newName);
-        void onEditionStarted(Gtk::CellEditable* cellEditable,
-                              const Glib::ustring& /* path */);
-        bool onEvent(GdkEvent* event);
-	void onOpen();
-	void onNewFile();
-	void onNewDirectory();
-	void onCopy();
-	void onPaste();
-	void onRemove();
-	void onRename();
-
-    private:
-	/**
-	 * Create the hierarchy with the directories
-	 *
-	 * @param parent the parent's of the current row
-	 * @param dirname the name of the parent directory
-	 *
-	 */
-	void buildHierarchyDirectory(const Gtk::TreeModel::Row* parent,
-			    const std::string& dirname);
-
-	/**
-	 * Create the hierarchy with the files
-	 *
-	 * @param parent the parent's of the current row
-	 * @param dirname the name of the parent directory
-	 *
-	 */
-	void buildHierarchyFile(const Gtk::TreeModel::Row* parent,
-				const std::string& dirname);
-
-	void buildHierarchy(const Gtk::TreeModel::Row* parent,
-			    const std::string& dirname);
-	bool isDirectory(const std::string& dirname);
-	void on_row_activated(const Gtk::TreeModel::Path& path,
-                              Gtk::TreeViewColumn*  column);
-	void projectFilePath(const Gtk::TreeRow& row,
-                             std::list<std::string>& lst);
-
-        void refreshHierarchy(const Gtk::TreeModel::Row* parent,
-                              const std::string& dirname);
-	void refreshHierarchyDirectory(const Gtk::TreeModel::Row* parent,
-                                       const std::string& dirname);
-	void refreshHierarchyFile(const Gtk::TreeModel::Row* parent,
-                                  const std::string& dirname);
-        void removeFiles(const Gtk::TreeModel::Row* parent,
-                         const std::list < std::string >& entries);
-        void openTab(std::string path);
-
-	GVLE*                            mParent;
-	Gtk::Menu                        mMenuPopup;
-	FileModelColumns                 mColumns;
-	std::string                      mPackage;
-	Glib::RefPtr<Gtk::TreeStore>     mRefTreeModel;
-	Glib::RefPtr<Gtk::TreeSelection> mRefTreeSelection;
-	std::list<std::string>           mIgnoredFilesList;
-
-        std::string                      mOldName;
-        std::string                      m_search;
-        std::string                      mAbsolutePath;
-        std::string                      mFilePath;
-        std::string                      mFileName;
-
-	//Cell
-	int                              mColumnName;
-	bool                             mValidateRetry;
-	Gtk::CellRendererText*           mCellrenderer;
-	Glib::ustring                    mInvalidTextForRetry;
-	guint32                          mDelayTime;
-    };
 
 public:
     /*********************************************************************

@@ -30,36 +30,36 @@ SET(GVLE_HPP About.hpp AtomicModelBox.hpp BooleanBox.hpp CalendarBox.hpp
   ComboboxString.hpp CompleteViewDrawingArea.hpp ConditionsBox.hpp
   ConnectionBox.hpp CoupledModelBox.hpp CutCopyPaste.hpp DllDefines.hpp
   DialogString.hpp DynamicBox.hpp DynamicsBox.hpp Editor.hpp ExperimentBox.hpp
-  GVLE.hpp GVLEMenuAndToolbar.hpp HelpBox.hpp HostsBox.hpp ImportClassesBox.hpp
-  ImportModelBox.hpp InteractiveTypeBox.hpp LaunchSimulationBox.hpp
-  MatrixBox.hpp Message.hpp ModelClassBox.hpp ModelDescriptionBox.hpp
-  ModelingPlugin.hpp ModelTreeBox.hpp Modeling.hpp NewDynamicsBox.hpp
-  NewModelClassBox.hpp NewProjectBox.hpp NewTypeBox.hpp ObsAndViewBox.hpp
-  ObservableBox.hpp ObserverPlugin.hpp OpenModelingPluginBox.hpp
-  OpenPackageBox.hpp OpenVpzBox.hpp OutputPlugin.hpp ParameterExecutionBox.hpp
-  PluginFactory.hpp PortDialog.hpp PreferencesBox.hpp QuitBox.hpp
-  ReplicasBox.hpp SaveVpzBox.hpp Settings.hpp SimpleViewDrawingArea.hpp
-  SimpleTypeBox.hpp TableBox.hpp TupleBox.hpp TreeViewConditions.hpp 
-  TreeViewObservable.hpp TreeViewValue.hpp UndoRedo.hpp ValueBox.hpp 
-  ValuesTreeView.hpp View.hpp ViewDrawingArea.hpp ViewOutputBox.hpp 
-  XmlTypeBox.hpp)
+  FileTreeView.hpp GVLE.hpp GVLEMenuAndToolbar.hpp HelpBox.hpp HostsBox.hpp
+  ImportClassesBox.hpp ImportModelBox.hpp InteractiveTypeBox.hpp
+  LaunchSimulationBox.hpp MatrixBox.hpp Message.hpp ModelClassBox.hpp
+  ModelDescriptionBox.hpp ModelingPlugin.hpp ModelTreeBox.hpp Modeling.hpp
+  NewDynamicsBox.hpp NewModelClassBox.hpp NewProjectBox.hpp NewTypeBox.hpp
+  ObsAndViewBox.hpp ObservableBox.hpp ObserverPlugin.hpp
+  OpenModelingPluginBox.hpp OpenPackageBox.hpp OpenVpzBox.hpp OutputPlugin.hpp
+  ParameterExecutionBox.hpp PluginFactory.hpp PortDialog.hpp PreferencesBox.hpp
+  QuitBox.hpp ReplicasBox.hpp SaveVpzBox.hpp Settings.hpp
+  SimpleViewDrawingArea.hpp SimpleTypeBox.hpp TableBox.hpp TupleBox.hpp
+  TreeViewConditions.hpp TreeViewObservable.hpp TreeViewValue.hpp UndoRedo.hpp
+  ValueBox.hpp ValuesTreeView.hpp View.hpp ViewDrawingArea.hpp
+  ViewOutputBox.hpp XmlTypeBox.hpp)
 
 SET(GVLE_CPP About.cpp AtomicModelBox.cpp BooleanBox.cpp CalendarBox.cpp
   CompleteViewDrawingArea.cpp ConditionsBox.cpp ConnectionBox.cpp
   CoupledModelBox.cpp CutCopyPaste.cpp DialogString.cpp DynamicBox.cpp
-  DynamicsBox.cpp Editor.cpp ExperimentBox.cpp GVLE.cpp GVLEMenuAndToolbar.cpp
-  HelpBox.cpp HostsBox.cpp ImportClassesBox.cpp ImportModelBox.cpp
-  InteractiveTypeBox.cpp LaunchSimulationBox.cpp MatrixBox.cpp Message.cpp
-  ModelClassBox.cpp ModelDescriptionBox.cpp ModelTreeBox.cpp Modeling.cpp
-  ModelingPlugin.cpp NewDynamicsBox.cpp NewModelClassBox.cpp NewProjectBox.cpp
-  NewTypeBox.cpp ObsAndViewBox.cpp PluginFactory.cpp ObservableBox.cpp
-  OpenModelingPluginBox.cpp OpenPackageBox.cpp OpenVpzBox.cpp OutputPlugin.cpp
-  ParameterExecutionBox.cpp PortDialog.cpp PreferencesBox.cpp ReplicasBox.cpp
-  QuitBox.cpp SaveVpzBox.cpp Settings.cpp SimpleViewDrawingArea.cpp
-  SimpleTypeBox.cpp TableBox.cpp TupleBox.cpp TreeViewConditions.cpp 
-  TreeViewObservable.cpp TreeViewValue.cpp UndoRedo.cpp ValueBox.cpp
-  ValuesTreeView.cpp View.cpp ViewDrawingArea.cpp ViewOutputBox.cpp 
-  XmlTypeBox.cpp ${OS_SPECIFIC_PATH_IMPL})
+  DynamicsBox.cpp Editor.cpp ExperimentBox.cpp FileTreeView.cpp GVLE.cpp
+  GVLEMenuAndToolbar.cpp HelpBox.cpp HostsBox.cpp ImportClassesBox.cpp
+  ImportModelBox.cpp InteractiveTypeBox.cpp LaunchSimulationBox.cpp
+  MatrixBox.cpp Message.cpp ModelClassBox.cpp ModelDescriptionBox.cpp
+  ModelTreeBox.cpp Modeling.cpp ModelingPlugin.cpp NewDynamicsBox.cpp
+  NewModelClassBox.cpp NewProjectBox.cpp NewTypeBox.cpp ObsAndViewBox.cpp
+  PluginFactory.cpp ObservableBox.cpp OpenModelingPluginBox.cpp
+  OpenPackageBox.cpp OpenVpzBox.cpp OutputPlugin.cpp ParameterExecutionBox.cpp
+  PortDialog.cpp PreferencesBox.cpp ReplicasBox.cpp QuitBox.cpp SaveVpzBox.cpp
+  Settings.cpp SimpleViewDrawingArea.cpp SimpleTypeBox.cpp TableBox.cpp
+  TupleBox.cpp TreeViewConditions.cpp TreeViewObservable.cpp TreeViewValue.cpp
+  UndoRedo.cpp ValueBox.cpp ValuesTreeView.cpp View.cpp ViewDrawingArea.cpp
+  ViewOutputBox.cpp XmlTypeBox.cpp ${OS_SPECIFIC_PATH_IMPL})
 
 ADD_LIBRARY(vlegvle SHARED ${GVLE_CPP};${GVLE_HPP})
 
