@@ -296,46 +296,93 @@ void Package::changeToOutputDirectory()
     }
 }
 
+void Package::removePackage(const std::string& package)
+{
+    if (not package.empty()) {
+        fs::path tmp = Path::path().getPackagesDir();
+        tmp /= package;
+
+        if (fs::exists(tmp)) {
+            fs::remove_all(tmp);
+            fs::remove(tmp);
+        }
+    }
+}
+
+bool Package::existsPackage(const std::string& package)
+{
+    if (not package.empty()) {
+        fs::path tmp = Path::path().getPackagesDir();
+        tmp /= package;
+
+        return fs::exists(tmp);
+    }
+
+    return false;
+}
+
 void Package::addFile(const std::string& path, const std::string& name)
 {
-    if (not fs::exists(utils::Path::buildFilename(path, name))) {
-	std::ofstream file(utils::Path::buildFilename(path, name).c_str());
+    if (Package::package().selected()) {
+        fs::path tmp = Path::path().getPackageDir();
+        tmp /= path;
+        tmp /= name;
+
+        if (not fs::exists(tmp)) {
+            std::ofstream file(tmp.file_string().c_str());
+        }
     }
 }
 
 void Package::addDirectory(const std::string& path, const std::string& name)
 {
-    if (not fs::exists(utils::Path::buildDirname(path, name))) {
-        fs::create_directory(utils::Path::buildDirname(path, name));
+    if (Package::package().selected()) {
+        fs::path tmp(Path::path().getPackageDir());
+        tmp /= path;
+        tmp /= name;
+
+        if (not fs::exists(tmp)) {
+            fs::create_directory(tmp);
+        }
     }
 }
 
-void Package::removeFile(const std::string& pathFile)
+void Package::remove(const std::string& path)
 {
-    std::string path = utils::Path::buildFilename(
-        Path::path().getPackageDir(), pathFile);
+    fs::path tmp = Path::path().getPackageDir();
+    tmp /= path;
 
-    fs::remove_all(path);
-    fs::remove(path);
+    fs::remove_all(tmp);
+    fs::remove(tmp);
 }
 
-void Package::renameFile(const std::string& oldFile, std::string& newName)
+std::string Package::rename(const std::string& oldname,
+                            const std::string& newname)
 {
-    std::string oldAbsolutePath = utils::Path::buildFilename(
-        Path::path().getPackageDir(), oldFile);
+    fs::path oldfilepath = Path::path().getPackageDir();
+    oldfilepath /= oldname;
 
-    if (fs::extension(newName) == "")
-	newName += fs::extension(oldAbsolutePath);
-    std::string newAbsolutePath = utils::Path::buildFilename(
-        Path::path().getParentPath(oldAbsolutePath), newName);
+#if BOOST_VERSION > 103600
+    fs::path newfilepath = oldfilepath.parent_path();
+#else
+    fs::path newfilepath = oldfilepath.branch_path();
+#endif
+    newfilepath /= newname;
 
-    if (not fs::exists(newAbsolutePath))
-	fs::rename(oldAbsolutePath, newAbsolutePath);
+    if (not fs::exists(oldfilepath) or fs::exists(newfilepath)) {
+        throw utils::ArgError(fmt(
+                _("In Package `%1%', can not rename `%2%' in `%3%'")) %
+            name() % oldfilepath.file_string() % newfilepath.file_string());
+    }
+
+    fs::rename(oldfilepath, newfilepath);
+
+    return newfilepath.file_string();
 }
 
-void Package::copyFile(const std::string& sourceFile, std::string& targetFile)
+void Package::copy(const std::string& source, std::string& target)
 {
-    fs::copy_file(sourceFile, targetFile);
+    fs::copy_file(source, target);
 }
 
 void Package::select(const std::string& name)

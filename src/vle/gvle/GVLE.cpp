@@ -301,7 +301,7 @@ void GVLE::FileTreeView::onEdition(const Glib::ustring& pathString,
 
         if (not utils::Path::exist(Glib::build_filename(
             utils::Path::path().getPackageDir(), newFilePath))) {
-                utils::Package::package().renameFile(oldFilePath, newName);
+                utils::Package::package().rename(oldFilePath, newName);
                 mParent->refreshEditor(oldFilePath, newFilePath);
         } else {
             Glib::ustring oldName = mOldName;
@@ -538,7 +538,7 @@ void GVLE::FileTreeView::onPaste()
             }
 
             if (not isDirectory(mAbsolutePath)){
-                utils::Package::package().copyFile(mAbsolutePath, newAbsolutePath);
+                utils::Package::package().copy(mAbsolutePath, newAbsolutePath);
             }
 
             mParent->refreshPackageHierarchy();
@@ -587,7 +587,7 @@ void GVLE::FileTreeView::onRemove()
 	    (is_directory and gvle::Question(
 		_("Do you really want remove this directory ?\n")))) {
 	    std::string oldName(Glib::build_filename(lstpath));
-	    utils::Package::package().removeFile(oldName);
+	    utils::Package::package().remove(oldName);
 	    mParent->refreshEditor(oldName, "");
 	    if (mParent->getEditor()->getDocuments().empty()) {
 		mParent->setTitle();

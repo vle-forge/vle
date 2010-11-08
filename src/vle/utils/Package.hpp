@@ -136,11 +136,74 @@ namespace vle { namespace utils {
          */
         void changeToOutputDirectory();
 
+        /**
+         * @brief Remove the specified package from the user directory.
+         *
+         * @param package The package to remove (recursively).
+         */
+        void removePackage(const std::string& package);
+
+
+        /**
+         * @brief Test if the specified package exists in the user directory.
+         *
+         * @param package The package to test.
+         *
+         * @return true if the package already exist, false otherwise.
+         */
+        bool existsPackage(const std::string& package);
+
+        /**
+         * @brief Add an empty file into the current Package.
+         *
+         * @param path The path, for example: "data" to build a new file
+         * "PKG/data/name".
+         * @param name The name of the file.
+         */
         void addFile(const std::string& path, const std::string& name);
+
+        /**
+         * @brief Add an empty directgory into the current Package.
+         *
+         * @param path The path, for example: "data" to build a new directory
+         * "PKG/data/name".
+         * @param name The name of the directory.
+         */
         void addDirectory(const std::string& path, const std::string& name);
-        void removeFile(const std::string& pathFile);
-        void renameFile(const std::string& oldFile, std::string& newName);
-        void copyFile(const std::string& sourceFile, std::string& targetName);
+
+        /**
+         * @brief Remove file or directory and (recursively) the specified path.
+         *
+         * @param path The name of the file or the directory.
+         */
+        void remove(const std::string& path);
+
+        /**
+         * @brief Rename the path oldname to the new name newname.
+         * @code
+         * utils::Package::package().rename("output/exp_view1.dat", "toto.dat");
+         *     // rename PKG/output/exp_view1.dat in PKG/output/toto.dat")
+         *     // and return the string "PKG/output/toto.dat".
+         * @endcode
+         *
+         * @param oldname The path, in PKG, of the file to rename.
+         * @param newname The new name.
+         *
+         * @return The string representation of the path of the new file.
+         *
+         * @throw utils::ArgError if the file already exists or if the old file
+         * does not exist.
+         */
+        std::string rename(const std::string& oldname,
+                           const std::string& newname);
+
+        /**
+         * @brief Copy the file.
+         *
+         * @param source The file source.
+         * @param target The destination path.
+         */
+        void copy(const std::string& source, std::string& target);
 
         /**
          * @brief Get the name of the current selected Package. Get the current
