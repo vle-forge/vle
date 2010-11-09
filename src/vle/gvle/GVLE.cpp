@@ -43,6 +43,7 @@
 #include <vle/gvle/ViewOutputBox.hpp>
 #include <vle/gvle/View.hpp>
 #include <vle/gvle/LaunchSimulationBox.hpp>
+#include <vle/gvle/OpenPackageBox.hpp>
 #include <vle/gvle/NewProjectBox.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Debug.hpp>
@@ -815,7 +816,6 @@ GVLE::GVLE(BaseObjectType* cobject,
 
     mConditionsBox = new ConditionsBox(mRefXML, this);
     mPreferencesBox = new PreferencesBox(mRefXML);
-    mOpenPackageBox = new OpenPackageBox(mRefXML, mModeling);
     mOpenVpzBox = new OpenVpzBox(mRefXML, mModeling);
     mSaveVpzBox = new SaveVpzBox(mRefXML, mModeling);
     mQuitBox = new QuitBox(mRefXML, mModeling);
@@ -863,7 +863,6 @@ GVLE::~GVLE()
 
     delete mConditionsBox;
     delete mPreferencesBox;
-    delete mOpenPackageBox;
     delete mOpenVpzBox;
     delete mSaveVpzBox;
     delete mQuitBox;
@@ -1145,15 +1144,20 @@ void GVLE::onOpenFile()
 
 void GVLE::onOpenProject()
 {
-    if (mOpenPackageBox->run() == Gtk::RESPONSE_OK) {
+    OpenPackageBox box(mRefXML);
+
+    if (box.run()) {
         onCloseProject();
-        utils::Package::package().select(mOpenPackageBox->name());
+        utils::Package::package().select(box.name());
         mPluginFactory.update();
         buildPackageHierarchy();
         mMenuAndToolbar->onOpenProject();
         setTitle("");
         mFileTreeView->set_sensitive(true);
         onTrouble();
+    } else if (not utils::Package::package().existsPackage(
+            utils::Package::package().name())) {
+        onCloseProject();
     }
 }
 

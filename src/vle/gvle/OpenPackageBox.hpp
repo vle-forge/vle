@@ -26,33 +26,37 @@
  */
 
 
-#ifndef GUI_OPENPACKAGEBOX_HPP
-#define GUI_OPENPACKAGEBOX_HPP
+#ifndef VLE_GVLE_OPENPACKAGEBOX_HPP
+#define VLE_GVLE_OPENPACKAGEBOX_HPP 1
 
-#include <gtkmm.h>
-#include <libglademm.h>
-#include <vle/utils/Path.hpp>
+#include <gtkmm/treeview.h>
+#include <gtkmm/dialog.h>
+#include <gtkmm/treestore.h>
+#include <libglademm/xml.h>
 
 namespace vle { namespace gvle {
 
-class Modeling;
-
 /**
- * @brief A window to choice a package
+ * @brief A window to choice a package.
  */
 class OpenPackageBox
 {
 public:
-    OpenPackageBox(Glib::RefPtr<Gnome::Glade::Xml> xml, Modeling* m);
+    OpenPackageBox(Glib::RefPtr<Gnome::Glade::Xml> xml);
+
     virtual ~OpenPackageBox();
 
-    std::string name() const
+    const std::string& name() const
     { return mName; }
 
-    int run();
+    /**
+     * @brief Show the dialog box and run it.
+     *
+     * @return true if the user correctly fill the entry, false otherwise.
+     */
+    bool run();
 
 private:
-
     class PackageTreeColumn : public Gtk::TreeModel::ColumnRecord
     {
     public:
@@ -69,20 +73,23 @@ private:
     Gtk::Dialog*                    mDialog;
     PackageTreeColumn               mColumns;
     Gtk::TreeView*                  mTreeView;
-    Glib::RefPtr<Gtk::TreeStore>    mRefTreePackage;
-    Modeling*                       mModeling;
+    Gtk::Menu                       mMenuPopup;
 
-    //Buttons
-    Gtk::Button*                    mButtonApply;
-    Gtk::Button*                    mButtonCancel;
+    Glib::RefPtr < Gtk::TreeStore >     mTreeModel;
+    Glib::RefPtr < Gtk::TreeSelection > mTreeSelection;
 
     std::string                     mName;
 
     void build();
-    void onApply();
     void onCancel();
     void onRowActivated(const Gtk::TreeModel::Path& path,
                         Gtk::TreeViewColumn *column);
+    bool onEvent(GdkEvent* event);
+
+    void onRemove();
+    void onRemoveCallBack(const Gtk::TreeModel::iterator& it);
+
+    std::list < sigc::connection > mConnections;
 };
 
 }} // namespace vle gvle

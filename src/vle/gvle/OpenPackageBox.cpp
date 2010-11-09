@@ -27,34 +27,40 @@
 
 
 #include <vle/gvle/OpenPackageBox.hpp>
-#include <vle/gvle/Modeling.hpp>
+#include <vle/gvle/Message.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Path.hpp>
 
 namespace vle { namespace gvle {
 
-OpenPackageBox::OpenPackageBox(Glib::RefPtr<Gnome::Glade::Xml> xml,
-			       Modeling* m) :
-    mXml(xml),
-    mModeling(m)
+OpenPackageBox::OpenPackageBox(Glib::RefPtr<Gnome::Glade::Xml> xml)
+    : mXml(xml)
 {
     xml->get_widget("DialogPackage", mDialog);
-
     xml->get_widget("TreeViewPackage", mTreeView);
-    mRefTreePackage = Gtk::TreeStore::create(mColumns);
+
+    mTreeModel = Gtk::TreeStore::create(mColumns);
     mTreeView->append_column(_("Name"), mColumns.mName);
-    mTreeView->set_model(mRefTreePackage);
-    mTreeView->signal_row_activated().connect(
-        sigc::mem_fun(*this, &OpenPackageBox::onRowActivated));
+    mTreeView->set_model(mTreeModel);
 
-    xml->get_widget("ButtonPackageApply", mButtonApply);
-    mButtonApply->signal_clicked().connect(
-	sigc::mem_fun(*this, &OpenPackageBox::onApply));
+    mTreeSelection = mTreeView->get_selection();
+    mTreeSelection->set_mode(Gtk::SELECTION_MULTIPLE);
 
-    xml->get_widget("ButtonPackageCancel", mButtonCancel);
-    mButtonCancel->signal_clicked().connect(
-	sigc::mem_fun(*this, &OpenPackageBox::onCancel));
+    Gtk::Menu::MenuList& menulist = mMenuPopup.items();
+    menulist.push_back(
+        Gtk::Menu_Helpers::MenuElem(
+            _("_Remove"),
+            sigc::mem_fun(
+                *this, &OpenPackageBox::onRemove)));
+
+    mMenuPopup.accelerate(*mDialog);
+
+    mConnections.push_back(mTreeView->signal_row_activated().connect(
+            sigc::mem_fun(*this, &OpenPackageBox::onRowActivated)));
+
+    mConnections.push_back(mTreeView->signal_event().connect(
+            sigc::mem_fun(*this, &OpenPackageBox::onEvent)));
 }
 
 OpenPackageBox::~OpenPackageBox()
@@ -62,62 +68,121 @@ OpenPackageBox::~OpenPackageBox()
     if (mTreeView) {
 	mTreeView->remove_all_columns();
     }
-    delete mButtonApply;
-    delete mButtonCancel;
-    delete mTreeView;
-    delete mDialog;
+
+    for (std::list < sigc::connection >::iterator it = mConnections.begin();
+         it != mConnections.end(); ++it) {
+        it->disconnect();
+    }
 }
 
-int OpenPackageBox::run()
+bool OpenPackageBox::run()
 {
     build();
+
     mDialog->set_title("Open Project");
     mDialog->show_all();
-    return mDialog->run();
+
+    int result = mDialog->run();
+    mDialog->hide_all();
+
+    return result == Gtk::RESPONSE_OK and not mName.empty();
 }
 
 void OpenPackageBox::build()
 {
-    mRefTreePackage->clear();
+    mTreeModel->clear();
+    mName.clear();
 
     utils::PathList list = utils::Path::path().getInstalledPackages();
 
     std::sort(list.begin(), list.end());
     for (utils::PathList::const_iterator it = list.begin();
 	 it != list.end(); ++it) {
-	Gtk::TreeModel::Row row = *(mRefTreePackage->append());
+	Gtk::TreeModel::Row row = *(mTreeModel->append());
         row[mColumns.mName] = utils::Path::filename(*it);
     }
 }
 
-void OpenPackageBox::onApply()
-{
-    Glib::RefPtr<Gtk::TreeView::Selection> refSelection
-	= mTreeView->get_selection();
-
-    if (refSelection) {
-	Gtk::TreeModel::iterator iter = refSelection->get_selected();
-
-	if (iter) {
-	    Gtk::TreeModel::Row row = *iter;
-
-            mName = row.get_value(mColumns.mName);
-            mDialog->response(Gtk::RESPONSE_OK);
-	}
-    }
-    mDialog->hide_all();
-}
-
-void OpenPackageBox::onCancel()
-{
-    mDialog->response(Gtk::RESPONSE_CANCEL);
-    mDialog->hide_all();
-}
-
-void OpenPackageBox::onRowActivated(const Gtk::TreeModel::Path& /* path */,
+void OpenPackageBox::onRowActivated(const Gtk::TreeModel::Path& path,
                                     Gtk::TreeViewColumn* /* column */)
 {
-    onApply();
+    Gtk::TreeModel::Path p(path);
+    Gtk::TreeModel::iterator it = mTreeModel->get_iter(p);
+    Gtk::TreeModel::Row row = *it;
+
+    if (row) {
+        mName = row.get_value(mColumns.mName);
+        mDialog->response(Gtk::RESPONSE_OK);
+        mDialog->hide_all();
+    }
+}
+
+void OpenPackageBox::onRemove()
+{
+    typedef std::list < Gtk::TreeModel::Path > paths_t;
+
+    paths_t p = mTreeSelection->get_selected_rows();
+
+    if (not p.empty()) {
+        std::string result;
+        paths_t::iterator it = p.begin();
+        while (it != p.end()) {
+            Gtk::TreeModel::iterator jt = mTreeModel->get_iter(*it);
+            result.append("   - ");
+            result.append((*jt).get_value(mColumns.mName));
+            ++it;
+            if (it != p.end()) {
+                result.append("\n");
+            }
+        }
+
+        if (gvle::Question(fmt(_("Do you really want to remove:\n%1% ?")) %
+                           result)) {
+            mTreeSelection->selected_foreach_iter(
+                sigc::mem_fun(*this, &OpenPackageBox::onRemoveCallBack));
+            mTreeSelection->unselect_all();
+            build();
+        }
+    }
+}
+
+void OpenPackageBox::onRemoveCallBack(const Gtk::TreeModel::iterator& it)
+{
+    const Gtk::TreeModel::Row row = *it;
+
+    if (row) {
+        Glib::ustring package = row[mColumns.mName];
+        utils::Package::package().removePackage(package.raw());
+    }
+}
+
+bool OpenPackageBox::onEvent(GdkEvent* event)
+{
+    if (event->type == GDK_BUTTON_PRESS) {
+        if (event->button.button == 3) {
+            mMenuPopup.popup(event->button.button, event->button.time);
+            return true;
+        }
+    }
+
+    if (event->type == GDK_BUTTON_RELEASE) {
+        if (event->button.button == 1) {
+            Gtk::TreeModel::Path path;
+            Gtk::TreeViewColumn* column;
+
+            mTreeView->get_cursor(path, column);
+            Gtk::TreeModel::iterator it = mTreeModel->get_iter(path);
+            Gtk::TreeModel::Row row = *it;
+
+            if (row) {
+                mName = row.get_value(mColumns.mName);
+            } else {
+                mName.clear();
+            }
+        }
+    }
+
+    return false;
 }
 
 }} // namespace vle gvle

@@ -35,7 +35,6 @@
 #include <vle/gvle/ModelTreeBox.hpp>
 #include <vle/gvle/ModelClassBox.hpp>
 #include <vle/gvle/ObserverPlugin.hpp>
-#include <vle/gvle/OpenPackageBox.hpp>
 #include <vle/gvle/OpenVpzBox.hpp>
 #include <vle/gvle/ParameterExecutionBox.hpp>
 #include <vle/gvle/QuitBox.hpp>
@@ -887,7 +886,6 @@ private:
     /* Dialog boxes */
     ConditionsBox*                  mConditionsBox;
     PreferencesBox*                 mPreferencesBox;
-    OpenPackageBox*                 mOpenPackageBox;
     OpenVpzBox*                     mOpenVpzBox;
     PackageBrowserWindow*           mPackageBrowserWindow;
     SaveVpzBox*                     mSaveVpzBox;

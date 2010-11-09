@@ -4911,6 +4911,8 @@ into your project.
               <widget class="GtkTreeView" id="TreeViewPackage">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="rules_hint">True</property>
+                <property name="rubber_banding">True</property>
               </widget>
             </child>
           </widget>
@@ -4925,9 +4927,10 @@ into your project.
             <child>
               <widget class="GtkButton" id="ButtonPackageCancel">
                 <property name="label">gtk-cancel</property>
+                <property name="response_id">-6</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
+                <property name="receives_default">False</property>
                 <property name="use_stock">True</property>
               </widget>
               <packing>
@@ -4939,8 +4942,11 @@ into your project.
             <child>
               <widget class="GtkButton" id="ButtonPackageApply">
                 <property name="label">gtk-ok</property>
+                <property name="response_id">-5</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="can_default">True</property>
+                <property name="has_default">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
               </widget>
