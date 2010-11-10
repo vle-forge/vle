@@ -57,15 +57,9 @@ const guint ViewDrawingArea::SPACING_LINE = 5;
 const guint ViewDrawingArea::SPACING_MODEL_PORT = 10;
 
 
-ViewDrawingArea::ViewDrawingArea(View* view) :
-    mMouse(-1, -1),
-    mPrecMouse(-1, -1),
-    mHeight(300),
-    mWidth(450),
-    mRectHeight(300),
-    mRectWidth(450),
-    mZoom(1.0),
-    mIsRealized(false),
+ViewDrawingArea::ViewDrawingArea(View* view)
+    : mMouse(-1, -1), mPrecMouse(-1, -1), mHeight(300), mWidth(450),
+    mRectHeight(300), mRectWidth(450), mZoom(1.0), mIsRealized(false),
     mHighlightLine(-1)
 {
     assert(view);

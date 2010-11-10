@@ -451,9 +451,13 @@ bool SimpleViewDrawingArea::on_button_press_event(GdkEventButton* event)
         break;
     case GVLE::ADDCOUPLED:
         if (event->button == 1) {
-            mView->addModelInListModel(model, shiftOrControl);
-        } else if (event->button == 2) {
-            mView->addCoupledModel(mMouse.get_x(), mMouse.get_y());
+            if (model) {
+                mView->addModelInListModel(model, shiftOrControl);
+            } else {
+                mView->addCoupledModel(mMouse.get_x(), mMouse.get_y());
+            }
+        } else if (event->button == 3) {
+            mView->clearSelectedModels();
         }
         queueRedraw();
         break;
@@ -486,7 +490,11 @@ bool SimpleViewDrawingArea::on_button_release_event(GdkEventButton* event)
 		}
 	    }
 	    queueRedraw();
-	}
+        } else if (event->button == 3) {
+            mView->clearSelectedModels();
+	    queueRedraw();
+        }
+
         if (mView->getAllSelectedModels().size() == 1) {
             graph::Model* mod = mView->getFirstSelectedModels();
             if (mView->isClassView()) {
