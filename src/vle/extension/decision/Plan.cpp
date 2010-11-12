@@ -147,8 +147,8 @@ void Plan::fillActivities(const utils::Block::BlocksResult& acts)
         Activity& act = mActivities.add(id.first->second, Activity());
 
         UB::StringsResult rules = block.strings.equal_range("rules");
-        for (UBS::const_iterator jt = id.first; jt != id.second; ++jt) {
-            act.addRule(jt->second);
+        for (UBS::const_iterator jt = rules.first; jt != rules.second; ++jt) {
+            act.addRule(jt->second, mRules.get(jt->second));
         }
 
         UB::StringsResult ack = block.strings.equal_range("ack");

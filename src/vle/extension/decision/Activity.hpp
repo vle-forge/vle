@@ -247,7 +247,7 @@ private:
 
     DateType m_date;
 
-    devs::Time m_start,;
+    devs::Time m_start;
     devs::Time m_finish;
     devs::Time m_minstart;
     devs::Time m_maxstart;

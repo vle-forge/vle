@@ -65,7 +65,8 @@ public:
             P("pred 4", &KnowledgeBase::isAlwaysTrue),
             P("pred 5", &KnowledgeBase::isAlwaysTrue),
             P("pr ed 5", &KnowledgeBase::isAlwaysTrue),
-            P("pred 6", &KnowledgeBase::isAlwaysTrue);
+            P("pred 6", &KnowledgeBase::isAlwaysTrue),
+            P("pred 7", &KnowledgeBase::isAlwaysFalse);
 
         addOutputFunctions(this) +=
             O("output function", &KnowledgeBase::out);
@@ -106,6 +107,11 @@ public:
     bool isAlwaysTrue() const
     {
         return true;
+    }
+
+    bool isAlwaysFalse() const
+    {
+        return false;
     }
 
     int getNumberOfUpdate() const
@@ -159,6 +165,11 @@ const char* Plan1 = \
 "    rule {\n"
 "        id = \"rule 3\";\n"
 "    }\n"
+"\n"
+"    rule {\n"
+"        id = \"rule 4\";\n"
+"        predicates = \"pred 7\";\n"
+"    }\n"
 "}\n"
 "\n"
 "activities {\n"
@@ -197,6 +208,18 @@ const char* Plan1 = \
 "    activity {\n"
 "        id = \"activity4\";\n"
 "        rules = \"rule 1\", \"rule 2\";\n"
+"        temporal {\n"
+"            minstart = 0;\n"
+"            maxstart = 10;\n"
+"            minfinish = 100;\n"
+"            maxfinish = 1000;\n"
+"        }\n"
+"        ack = \"ack function\";\n"
+"        output = \"output function\";\n"
+"    }\n"
+"    activity {\n"
+"        id = \"activity5\";\n"
+"        rules = \"rule 4\";\n"
 "        temporal {\n"
 "            minstart = 0;\n"
 "            maxstart = 10;\n"
@@ -264,5 +287,10 @@ BOOST_AUTO_TEST_CASE(parser)
     std::cout << fmt("parser: %1%\n") % b;
     std::cout << fmt("graph: %1%\n") % b.activities().precedencesGraph();
 
-    BOOST_REQUIRE_EQUAL(b.activities().size(), (vmd::Activities::size_type)4);
+    BOOST_REQUIRE_EQUAL(b.activities().size(), (vmd::Activities::size_type)5);
+    BOOST_REQUIRE_EQUAL(
+        b.activities().get("activity2")->second.rules().size(), 2);
+    BOOST_REQUIRE_EQUAL(
+        b.activities().get("activity5")->second.rules().get("rule 4").isAvailable(),
+        false);
 }
