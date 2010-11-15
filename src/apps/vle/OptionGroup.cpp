@@ -40,7 +40,8 @@ OptionGroup::OptionGroup()
     : Glib::OptionGroup(_("Commands"), _("Descriptions of commands")),
     mManager(false), mSimulator(false), mJustrun(false), mPort(8000),
     mProcess(1), mAllinlocal(false), mSaveVpz(false), mInfos(false),
-    mVersion(false), mList(false), mVerbose(0), mRemote(false), mConfig(false)
+    mVersion(false), mList(false), mVerbose(0), mRemote(false),
+    mConfig(false), mQuiet(false)
 {
     {
         Glib::OptionEntry en;
@@ -163,6 +164,12 @@ OptionGroup::OptionGroup()
                 "\tvle --config build make \"make -j 2\"\n"
                 "\tvle --config build install \"make-mingw32.exe install\"\n"));
         add_entry(en, mConfig);
+    }
+    {
+        Glib::OptionEntry en;
+        en.set_long_name("quiet");
+        en.set_description(_("Hide all simulation trace"));
+        add_entry(en, mQuiet);
     }
 }
 

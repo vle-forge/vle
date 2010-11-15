@@ -27,16 +27,53 @@
 
 
 #ifndef VLE_MANAGER_VLE_HPP
-#define VLE_MANAGER_VLE_HPP
+#define VLE_MANAGER_VLE_HPP 1
 
 #include <vle/manager/DllDefines.hpp>
 #include <vle/manager/Types.hpp>
 #include <vle/vpz/Vpz.hpp>
-#include <vector>
+#include <set>
 
 namespace vle { namespace manager {
 
-    typedef std::set < std::string > Depends;
+/**
+ * @brief A std::set of package names.
+ */
+typedef std::set < std::string > Depends;
+
+/**
+ * @brief The main class of the libvlemanager. Manager provides functions to
+ * launch experimental frames, to launch simulator in distant mode or to simply
+ * launch simulations.
+ */
+class VLE_MANAGER_EXPORT Manager
+{
+public:
+    /**
+     * @brief Build a Manager. If `quiet' is true, the Manager send all message
+     * error into a tempory file otherwise, it uses the standard output error
+     * stream.
+     *
+     * @param quiet If `quiet' is true, use a tempory file to store message,
+     * false to use the standard error output stream.
+     */
+    Manager(bool quiet = false);
+
+    /**
+     * @brief Clean up the Manager: if in `quiet' mode, restore the std::cerr
+     * streambuf and delete the `quiet' mode.
+     */
+    ~Manager();
+
+    /**
+     * @brief If in `quiet' mode, restore the std::cerr streambuf and delete
+     * the `quiet' mode.
+     */
+    void close();
+
+    //
+    ///
+    //
 
     /**
      * @brief read an experimental frame VPZ, build the complete condition
@@ -46,8 +83,8 @@ namespace vle { namespace manager {
      * @param nbProcessor number of processor.
      * @return true if manager is a success.
      */
-    VLE_MANAGER_EXPORT bool runManager(bool allInLocal, bool savevpz,
-                                       int nbProcessor, const CmdArgs& args);
+    bool runManager(bool allInLocal, bool savevpz, int nbProcessor,
+                    const CmdArgs& args);
 
     /**
      * @brief vle::Simulator: manage a number of processor and launch
@@ -56,60 +93,98 @@ namespace vle { namespace manager {
      * @param port The port [0..65535] to listen.
      * @return true if simulator is a success.
      */
-    VLE_MANAGER_EXPORT bool runSimulator(int nbProcessor, int port);
+    bool runSimulator(int nbProcessor, int port);
 
     /**
      * @brief vle::JustRun: start a simulation without analysis of the
      * complete condition combinations, just take the fist and run
      * simulation.
-     *
      * @return true if justRun simulation is a success.
      */
-    VLE_MANAGER_EXPORT bool justRun(int nbProcessor, const CmdArgs& args);
+    bool justRun(int nbProcessor, const CmdArgs& args);
 
     /**
      * @brief Build a dictonnary of dependencies. For each vpz file in
      * experiment directory, we produce a list of dependencies.
      * @return The dictionnary.
      */
-    VLE_MANAGER_EXPORT std::map < std::string, Depends > depends();
+    VLE_MANAGER_EXPORT static std::map < std::string, Depends > depends();
 
-    /*
+    //
+    ///
+    //
+
+    /**
+     * @brief Get the mode of the Manager: quiet or not quiet.
      *
-     * initialisation and finalize functions of the system
+     * @return
+     */
+    bool quiet() const { return mQuiet; }
+
+    /**
+     * @brief Get the filename of the Manager's quiet mode.
      *
+     * @return
      */
+    const std::string& filename() const { return mFilename; }
 
     /**
-     * @brief Initialize the VLE system by:
-     * - installling signal (segmentation fault etc.) to standard error
-     *   function.
-     * - initialize the user directory ($HOME/.vle/ etc.).
-     * - initialize the WinSock
-     * - initialize the thread system.
-     * - initialize the singleton utils::Trace system.
-     * - initialize the singleton \c boost::pool devs::Pools and value::Pools.
+     * @brief Get the success of the latest operation of this Manager.
+     *
+     * @return
      */
-    VLE_MANAGER_EXPORT void init();
+    bool success() const { return mSuccess; }
+
+private:
+    bool mQuiet;
+    std::string mFilename; /**< The filename of the temporary file build in the
+                             constructor if the user selects the `quiet'
+                             mode. */
+    std::ofstream* mFileError; /**< The std::ofstream of the temporary file
+                                 build in the constructor if the user selects
+                                 the `quiet' mode. */
+    std::streambuf* mStreamBufError; /**< To store the streambuf of the
+                                       std::cerr output stream if the user
+                                       selects the `quiet' mode. */
+    bool mSuccess;
 
     /**
-     * @brief Delete all singleton from VLE system.
-     * - kill the utils::Trace singleton.
-     * - kill the utils::Path singleton.
-     * - kill the value::Pools singleton.
-     * - kill the devs::Pools singleton.
-     */
-    VLE_MANAGER_EXPORT void finalize();
-
-    /**
-     * @brief A simple functor to produce a vpz::Vpz object from the std::string
-     * filename. To use with std::transform for example.
+     * @brief A simple functor to produce a vpz::Vpz object from the
+     * std::string filename. To use with std::transform for example.
      */
     struct VLE_MANAGER_EXPORT BuildVPZ
     {
         vpz::Vpz* operator()(const std::string& filename) const
         { return new vpz::Vpz(filename); }
     };
+};
+
+/*
+ *
+ * initialisation and finalize functions of the system
+ *
+ */
+
+/**
+ * @brief Initialize the VLE system by:
+ * - installling signal (segmentation fault etc.) to standard error
+ *   function.
+ * - initialize the user directory ($HOME/.vle/ etc.).
+ * - initialize the WinSock
+ * - initialize the thread system.
+ * - initialize the singleton utils::Trace system.
+ * - initialize the singleton \c boost::pool devs::Pools and value::Pools.
+ */
+VLE_MANAGER_EXPORT void init();
+
+/**
+ * @brief Delete all singleton from VLE system.
+ * - kill the utils::Trace singleton.
+ * - kill the utils::Path singleton.
+ * - kill the value::Pools singleton.
+ * - kill the devs::Pools singleton.
+ */
+VLE_MANAGER_EXPORT void finalize();
 
 }} // namespace vle manager
 

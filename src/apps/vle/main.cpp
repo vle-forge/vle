@@ -46,7 +46,7 @@ void makeAll()
     typedef std::set < std::string > Depends;
     typedef std::map < std::string, Depends > AllDepends;
 
-    AllDepends deps = manager::depends();
+    AllDepends deps = manager::Manager::depends();
     Depends uniq;
 
     for (AllDepends::const_iterator it = deps.begin(); it != deps.end(); ++it) {
@@ -68,21 +68,21 @@ void makeAll()
 
     for (Depends::iterator it = uniq.begin(); it != uniq.end(); ++it) {
         Package::package().select(*it);
-        std::cout << fmt("Package [%1%]") % *it;
+        std::cerr << fmt("Package [%1%]") % *it;
         Package::package().configure();
-        Package::package().wait(std::cout, f);
+        Package::package().wait(std::cerr, f);
         if (Package::package().isSuccess()) {
             Package::package().build();
-            Package::package().wait(std::cout, f);
+            Package::package().wait(std::cerr, f);
             if (Package::package().isSuccess()) {
                 Package::package().install();
-                Package::package().wait(std::cout, f);
+                Package::package().wait(std::cerr, f);
             }
         }
     }
 
     if (not Package::package().isSuccess()) {
-        std::cout << fmt("See %1% for log\n") % error;
+        std::cerr << fmt("See %1% for log\n") % error;
     }
 
     utils::Package::package().select(current);
@@ -93,22 +93,22 @@ void showDepends()
     typedef std::set < std::string > Depends;
     typedef std::map < std::string, Depends > AllDepends;
 
-    AllDepends deps = manager::depends();
+    AllDepends deps = manager::Manager::depends();
 
     for (AllDepends::const_iterator it = deps.begin(); it != deps.end(); ++it) {
         if (it->second.empty()) {
-            std::cout << utils::Path::basename(it->first) << ": -\n";
+            std::cerr << utils::Path::basename(it->first) << ": -\n";
         } else {
-            std::cout << utils::Path::basename(it->first) << ": ";
+            std::cerr << utils::Path::basename(it->first) << ": ";
 
             Depends::const_iterator jt = it->second.begin();
             while (jt != it->second.end()) {
                 Depends::const_iterator kt = jt++;
-                std::cout << *kt;
+                std::cerr << *kt;
                 if (jt != it->second.end()) {
-                    std::cout << ", ";
+                    std::cerr << ", ";
                 } else {
-                    std::cout << '\n';
+                    std::cerr << '\n';
                 }
             }
         }
@@ -118,7 +118,7 @@ void showDepends()
 void unzip(const std::string& filename)
 {
     utils::Package::package().unzip(filename);
-    utils::Package::package().wait(std::cout, std::cerr);
+    utils::Package::package().wait(std::cerr, std::cerr);
 
     if (utils::Package::package().isSuccess()) {
         throw utils::InternalError(fmt(_("Failed to unzip `%1%'")) % filename);
@@ -133,11 +133,11 @@ void listContentPackage()
     std::sort(packages.begin(), packages.end());
 
     std::copy(packages.begin(), packages.end(),
-              std::ostream_iterator < std::string >(std::cout, "\n"));
+              std::ostream_iterator < std::string >(std::cerr, "\n"));
 
     utils::PathList libs(utils::Path::path().getInstalledLibraries());
     std::copy(libs.begin(), libs.end(),
-              std::ostream_iterator < std::string >(std::cout, "\n"));
+              std::ostream_iterator < std::string >(std::cerr, "\n"));
 }
 
 void listPackages()
@@ -148,7 +148,7 @@ void listPackages()
     std::sort(vpz.begin(), vpz.end());
 
     std::copy(vpz.begin(), vpz.end(),
-              std::ostream_iterator < std::string >(std::cout, "\n"));
+              std::ostream_iterator < std::string >(std::cerr, "\n"));
 }
 
 void appendToCommandLineList(const char* param, manager::CmdArgs& out)
@@ -196,31 +196,31 @@ void cliPackage(int argc, char* argv[], manager::CmdArgs& lst)
                 Package::package().create();
             } else if (strcmp(argv[i], "configure") == 0) {
                 Package::package().configure();
-                Package::package().wait(std::cout, std::cerr);
+                Package::package().wait(std::cerr, std::cerr);
                 stop = not Package::package().isSuccess();
             } else if (strcmp(argv[i], "build") == 0) {
                 Package::package().build();
-                Package::package().wait(std::cout, std::cerr);
+                Package::package().wait(std::cerr, std::cerr);
                 if (Package::package().isSuccess()) {
                     Package::package().install();
-                    Package::package().wait(std::cout, std::cerr);
+                    Package::package().wait(std::cerr, std::cerr);
                 }
                 stop = not Package::package().isSuccess();
             } else if (strcmp(argv[i], "test") == 0) {
                 Package::package().test();
-                Package::package().wait(std::cout, std::cerr);
+                Package::package().wait(std::cerr, std::cerr);
                 stop = not Package::package().isSuccess();
             } else if (strcmp(argv[i], "install") == 0) {
                 Package::package().install();
-                Package::package().wait(std::cout, std::cerr);
+                Package::package().wait(std::cerr, std::cerr);
                 stop = not Package::package().isSuccess();
             } else if (strcmp(argv[i], "clean") == 0) {
                 Package::package().clean();
-                Package::package().wait(std::cout, std::cerr);
+                Package::package().wait(std::cerr, std::cerr);
                 stop = not Package::package().isSuccess();
             } else if (strcmp(argv[i], "package") == 0) {
                 Package::package().pack();
-                Package::package().wait(std::cout, std::cerr);
+                Package::package().wait(std::cerr, std::cerr);
                 stop = not Package::package().isSuccess();
             } else if (strcmp(argv[i], "all") == 0) {
                 makeAll();
@@ -256,7 +256,7 @@ void showRemoteList(const utils::RemoteList& list)
     typedef utils::RemoteList::const_iterator Iterator;
 
     for (Iterator it = list.begin(); it != list.end(); ++it) {
-        std::cout << it->first << " " << it->second << "\n";
+        std::cerr << it->first << " " << it->second << "\n";
     }
 }
 
@@ -265,7 +265,7 @@ void showPackageList(const utils::PackageList& list)
     typedef utils::PackageList::const_iterator Iterator;
 
     for (Iterator it = list.begin(); it != list.end(); ++it) {
-        std::cout << *it << "\n";
+        std::cerr << *it << "\n";
     }
 }
 
@@ -294,7 +294,7 @@ void cliRemote(int argc, char* argv[])
 
                 if (strcmp(command, "show") == 0) {
                     if (package) {
-                        std::cout << r.show(host, package);
+                        std::cerr << r.show(host, package);
                     } else {
                         showPackageList(r.show(host));
                     }
@@ -414,21 +414,43 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    bool result = true;
+    bool success = true;
     if (not lst.empty()) {
+        manager::Manager manager(command.quiet());
         if (command.manager()) {
-            result = manager::runManager(command.allInLocal(),
-                                         command.savevpz(),
-                                         command.processor(),
-                                         lst);
+            success = manager.runManager(command.allInLocal(),
+                                        command.savevpz(),
+                                        command.processor(),
+                                        lst);
         } else if (command.simulator()) {
-            result = manager::runSimulator(command.processor(),
-                                           command.port());
+            success = manager.runSimulator(command.processor(),
+                                          command.port());
         } else if (command.justRun()) {
-            result = manager::justRun(command.processor(), lst);
+            success = manager.justRun(command.processor(), lst);
+        }
+
+        if (manager.quiet()) {
+            manager.close();
+        }
+
+        if (not success) {
+            if (not manager.filename().empty()) {
+                std::cerr << fmt(_(
+                        "\n/!\\ vle manager error reported in %1%\n")) %
+                    manager.filename();
+            } else {
+                std::cerr << fmt(_(
+                        "\n/!\\ vle manager error reported\n"));
+            }
+        }
+
+        if (utils::Trace::trace().haveWarning()) {
+            std::cerr << fmt(
+                "\n/!\\ Some warnings during run: See file %1%\n") %
+                utils::Trace::trace().getLogFile();
         }
     }
 
     manager::finalize();
-    return result ? EXIT_SUCCESS : EXIT_FAILURE;
+    return success ? EXIT_SUCCESS : EXIT_FAILURE;
 }

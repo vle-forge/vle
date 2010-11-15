@@ -115,8 +115,10 @@ namespace vle { namespace manager {
         /**
          * @brief Read specified vpz files and start simulations on the same
          * process.
+         *
+         * @return true if all simulation are successfull, false otherwise.
          */
-        void operator()(const CmdArgs& args);
+        bool operator()(const CmdArgs& args);
 
     private:
         bool        m_output;
@@ -146,8 +148,10 @@ namespace vle { namespace manager {
         /**
          * @brief Read specified vpz files an start simulations on the number of
          * processor specified in constructor.
+         *
+         * @return true if all simulation are successfull, false otherwise.
          */
-        void operator()(const CmdArgs& args);
+        bool operator()(const CmdArgs& args);
 
     private:
         CmdArgs                                 m_args;
@@ -165,6 +169,9 @@ namespace vle { namespace manager {
         Glib::Mutex                 m_mutex;
         Glib::Cond                  m_prodcond;
         Glib::Cond                  m_conscond;
+        bool                        m_success; /**< true if all simulation are
+                                                 completely successfull, false
+                                                 otherwise. */
 
         /**
          * @brief A thread to convert filename to vpz files.
@@ -217,7 +224,8 @@ namespace vle { namespace manager {
     inline JustRunThread::JustRunThread(std::ostream& out, int process) :
         JustRun(out),
         m_process(process),
-        m_finish(false)
+        m_finish(false),
+        m_success(true)
     {
     }
 

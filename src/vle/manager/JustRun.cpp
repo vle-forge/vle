@@ -31,41 +31,42 @@
 
 namespace vle { namespace manager {
 
-void JustRunMono::operator()(const CmdArgs& args)
+bool JustRunMono::operator()(const CmdArgs& args)
 {
     m_lst.resize(args.size());
 
-    m_out << fmt(
-        "JustRun: run %1% simples simulations in one thread\n") % args.size();
+    m_out << fmt(_("JustRun: run %1% simples simulations in one thread\n")) %
+        args.size();
+
+    int i = 0;
+    bool success = true;
 
     if (m_output) {
-        int i = 0;
-        for (CmdArgs::const_iterator it = args.begin(); it != args.end(); ++it) {
+        for (CmdArgs::const_iterator it = args.begin(); it != args.end();
+             ++it) {
             RunVerbose r(m_out);
             r.start(*it);
             m_names[*it] = i;
             m_lst[i] = r.outputs();
+            success = (success and r.haveError()) ? false : success;
             ++i;
         }
     } else {
-        int i = 0;
-        for (CmdArgs::const_iterator it = args.begin(); it != args.end(); ++it) {
+        for (CmdArgs::const_iterator it = args.begin();
+             it != args.end(); ++it) {
             RunQuiet r;
             r.start(*it);
             m_names[*it] = i;
             m_lst[i] = r.outputs();
+            success = (success and r.haveError()) ? false : success;
             ++i;
         }
     }
 
-    if (utils::Trace::trace().haveWarning()) {
-        m_out << fmt(
-            "\n/!\\ Some warnings during simulation: See file %1%\n") %
-            utils::Trace::trace().getLogFile();
-    }
+    return success;
 }
 
-void JustRunThread::operator()(const CmdArgs& args)
+bool JustRunThread::operator()(const CmdArgs& args)
 {
     m_lst.resize(args.size());
 
@@ -73,9 +74,8 @@ void JustRunThread::operator()(const CmdArgs& args)
         m_process = args.size();
     }
 
-    m_out << fmt(
-        "JustRun: run %1% simples simulations in %2% threads\n") % args.size() %
-        m_process;
+    m_out << fmt(_("JustRun: run %1% simples simulations in %2% threads\n")) %
+        args.size() % m_process;
 
     m_args = args;
 
@@ -95,13 +95,9 @@ void JustRunThread::operator()(const CmdArgs& args)
         m_out << it->second;
     }
 
-    if (utils::Trace::trace().haveWarning()) {
-        m_out << fmt(
-            "\n/!\\ Some warnings during simulation: See file %1%\n") %
-            utils::Trace::trace().getLogFile();
-    }
-
     m_out << std::endl;
+
+    return m_success;
 }
 
 void JustRunThread::read()
@@ -155,6 +151,7 @@ void JustRunThread::run()
             instance = file->project().instance();
             RunVerbose r(ostr);
             r.start(file);
+            m_success = (m_success and r.haveError()) ? false : m_success;
             views = r.outputs();
         }
 

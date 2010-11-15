@@ -36,7 +36,6 @@
 #include <vle/oov/PluginFactory.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Socket.hpp>
-#include <vle/utils/Trace.hpp>
 #include <vle/value/String.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/value/Integer.hpp>
@@ -120,12 +119,6 @@ void ManagerRunThread::operator()(const vpz::Vpz& file)
     prod->join();
     m_pool.stop_unused_threads();
     m_pool.shutdown();
-
-    if (utils::Trace::trace().haveWarning()) {
-        m_out << fmt(_(
-                "\n/!\\ Some warnings during simulation: See file %1%\n"))
-            % utils::Trace::trace().getLogFile();
-    }
 
     m_out << std::endl;
 }
@@ -280,12 +273,6 @@ void ManagerRunDistant::operator()(const vpz::Vpz& file)
 
     prod->join();
     cond->join();
-
-    if (utils::Trace::trace().haveWarning()) {
-        m_out << fmt(_(
-                "\n/!\\ Some warnings during simulation: See file %1%\n"))
-            % utils::Trace::trace().getLogFile();
-    }
 }
 
 void ManagerRunDistant::read()
@@ -362,10 +349,9 @@ void ManagerRunDistant::openConnectionWithSimulators()
             mClients.push_back(client);
         }
         catch (const std::exception& e) {
-            m_out
-                << fmt(_("Manager: Can not connect %1% simulator on port %2%: %3%\n"))
-                % (*ithost).hostname() % (*ithost).port()
-                % e.what();
+            m_out << fmt(
+                _("Manager: Can not connect %1% simulator on port %2%: %3%\n"))
+                % (*ithost).hostname() % (*ithost).port() % e.what();
         }
         ++ithost;
     }
@@ -391,8 +377,7 @@ gint32 ManagerRunDistant::getMaxProcessor(utils::net::Client& cl)
     try {
         cl.sendString("proc");
         maxprocess = cl.recvInteger();
-    }
-    catch (const std::exception& e) {
+    } catch (const std::exception& e) {
         m_out << fmt(_("Manager: error get max processor: %1%\n")) % e.what();
     }
     return maxprocess;
@@ -405,8 +390,7 @@ gint32 ManagerRunDistant::getCurrentNumberVpzi(utils::net::Client& cl)
     try {
         cl.sendString("size");
         current = cl.recvInteger();
-    }
-    catch (const std::exception& e) {
+    } catch (const std::exception& e) {
         m_out << fmt(_("Manager: error get number vpz: %1%\n")) % e.what();
     }
     return current;
@@ -467,8 +451,7 @@ void ManagerRunDistant::sendVpzi(utils::net::Client&  cl,
         cl.sendInteger(file.size());
         std::string tmp = cl.recvString();
         cl.sendBuffer(file);
-    }
-    catch (const std::exception& e) {
+    } catch (const std::exception& e) {
         m_out << fmt(_("Manager: error send vpz %1%: %2%\n")) % file % e.what();
     }
 }

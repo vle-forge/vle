@@ -59,6 +59,7 @@ namespace vle { namespace apps {
         bool package() const { return mPackage; }
         bool remote() const { return mRemote; }
         bool config() const { return mConfig; }
+        bool quiet() const { return mQuiet; }
 
         /**
          * @brief Check the validity of the selected option from the command
@@ -83,6 +84,7 @@ namespace vle { namespace apps {
         bool          mPackage;
         bool          mRemote;
         bool          mConfig;
+        bool          mQuiet;
     };
 
 }} // namespace vle apps

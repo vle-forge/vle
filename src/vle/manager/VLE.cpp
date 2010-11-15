@@ -49,9 +49,49 @@
 
 namespace vle { namespace manager {
 
-bool runManager(bool allInLocal, bool savevpz, int nbProcessor, const
-                     CmdArgs& args)
+Manager::Manager(bool quiet)
+    : mQuiet(quiet), mSuccess(true)
 {
+    if (quiet) {
+        mFilename = utils::Path::buildTemp("manager");
+        mFileError = new std::ofstream(mFilename.c_str());
+
+        if (not mFileError->is_open()) {
+            delete mFileError;
+
+            throw utils::InternalError(
+                _("Manager can not build error file in quiet mode"));
+        }
+
+        mStreamBufError = std::cerr.rdbuf();
+        std::cerr.rdbuf(mFileError->rdbuf());
+    }
+}
+
+Manager::~Manager()
+{
+    close();
+}
+
+void Manager::close()
+{
+    if (mQuiet) {
+        if (mStreamBufError) {
+            std::cerr.rdbuf(mStreamBufError);
+        }
+        delete mFileError;
+
+        mQuiet = false;
+        mFileError = 0;
+        mStreamBufError = 0;
+    }
+}
+
+bool Manager::runManager(bool allInLocal, bool savevpz, int nbProcessor, const
+                         CmdArgs& args)
+{
+    mSuccess = true;
+
     CmdArgs::const_iterator it = args.begin();
 
     try {
@@ -74,15 +114,19 @@ bool runManager(bool allInLocal, bool savevpz, int nbProcessor, const
             r.start(args.front());
         }
     } catch(const std::exception& e) {
-        std::cerr << fmt(_("\n/!\\ vle manager error reported: %1%\n")) %
+        std::cerr << fmt(
+            _("\n/!\\ vle manager error reported: %1%\n")) %
             utils::demangle(typeid(e)) << e.what();
-        return false;
+        mSuccess = false;
     }
-    return true;
+
+    return mSuccess;
 }
 
-bool runSimulator(int process, int port)
+bool Manager::runSimulator(int process, int port)
 {
+    mSuccess = true;
+
     try {
         std::cerr << _("Simulator start in daemon mode\n");
 
@@ -100,37 +144,41 @@ bool runSimulator(int process, int port)
         std::cerr << fmt(_("\n/!\\ vle distant simulator error "
                            " reported: %1%")) % utils::demangle(typeid(e)) <<
                 e.what();
-        return false;
+        mSuccess = false;
     }
-    return true;
+
+    return mSuccess;
 }
 
-bool justRun(int nbProcessor, const CmdArgs& args)
+bool Manager::justRun(int nbProcessor, const CmdArgs& args)
 {
+    mSuccess = true;
+
     if (nbProcessor == 1) {
         try {
             JustRunMono jrm(std::cerr);
-            jrm.operator()(args);
+            mSuccess = jrm.operator()(args);
         } catch(const std::exception& e) {
-            std::cerr << fmt(_("\n/!\\ vle mono simulator error reported: %1%"))
-                % utils::demangle(typeid(e)) << e.what();
-            return false;
+            std::cerr << fmt(_(
+                    "\n/!\\ vle mono simulator error reported: %1%")) %
+                utils::demangle(typeid(e)) << e.what();
+            mSuccess = false;
         }
     } else {
         try {
             JustRunThread jrt(std::cerr, nbProcessor);
-            jrt.operator()(args);
+            mSuccess = jrt.operator()(args);
         } catch(const std::exception& e) {
             std::cerr << fmt(_("\n/!\\ vle thread simulator error reported: "
                                " %1%")) % utils::demangle(typeid(e)) <<
                 e.what();
-            return false;
+            mSuccess = false;
         }
     }
-    return true;
+    return mSuccess;
 }
 
-std::map < std::string, Depends > depends()
+std::map < std::string, Depends > Manager::depends()
 {
     std::map < std::string, Depends > result;
 
@@ -166,4 +214,5 @@ void finalize()
 }
 
 }} // namespace vle manager
+
 
