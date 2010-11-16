@@ -52,15 +52,40 @@ Show somes informations for vle framework.
 .IP "\fB\-\-version\fP" 10
 Show version of program.
 
+.IP "\fB\-\-quiet\fP" 10
+Hide all console output into a temporary file.
+
 .IP "\fB-v\fI int\fR\fP, \fB\-\-verbose\fI int \fR\fP"
 Set the verbosity of this application. Default is \fI0\fR, only problem in VLE,
 \fI1\fR trace users' models problem, \fI2\fR trace extension process and
 \fI3\fR trace all DEVS API. Logs are stored in $VLE_HOME/vle.log.
 
 .IP "\fB\-P \fIname\fP, \fB\-\-package \fIname\fP" 10
-Select a package (in $VLE_HOME/pkgs). After this command you can use
+Select a package (in $VLE_HOME/pkgs). After this command you can use:
 \fIcreate\fR, \fIconfigure\fR, \fIbuild\fR, \fIlist\fR and \fIpackage\fR and/or
-a list of VPZ files.
+a list of VPZ files
+        vle --package foo create: build new foo package
+        vle --package foo configure: configure the foo package
+        vle --package foo build: build the foo package
+        vle --package foo test: start a unit test campaign
+        vle --package foo install: install libs
+        vle --package foo clean: clean up the build directory
+        vle --package foo package: build package source and binary
+        vle --package foo all: build all depends of foo package
+        vle --package foo depends: list depends of foo package
+        vle --package foo list: list vpz and library package
+
+.IP "\fB\-R \fIname\fP, \fB\-\-remote \fIname\fP" 10
+Switch to the remote access. After this command you can use:
+        vle --remote vle-project \fishow\fR
+        vle --remote vle-project \filist\fR
+        vle --remote vle-project \figet\fR Package
+
+.IP "\fB\-C \fIname\fP \fIvalue\fP, \fB\-\-config \fIname\fP \fIvalue\fP" 10
+Switch to the config access. After this command you can use:
+        vle --config vle-project http://www.vle-project.org
+        vle --config build make "make -j 2"
+        vle --config build install "make-mingw32.exe install"
 
 .IP "\fB-m\fP" 10
 Run \fBVLE\fP in
