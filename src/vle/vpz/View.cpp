@@ -81,7 +81,7 @@ void View::write(std::ostream& out) const
 
 void View::setTimestep(double time)
 {
-    if (time <= 0.0) {
+    if ((m_type == View::TIMED) && (time <= 0.0)) {
         throw utils::ArgError(fmt(
                 _("Bad time step %1% for view %2%")) % time % m_name);
     }
