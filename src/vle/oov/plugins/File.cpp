@@ -51,28 +51,30 @@ File::~File()
 }
 
 void File::onParameter(const std::string& plugin,
-                             const std::string& location,
-                             const std::string& file,
-                             value::Value* parameters,
-                             const double& /* time */)
+                       const std::string& location,
+                       const std::string& file,
+                       value::Value* parameters,
+                       const double& /* time */)
 {
     if (parameters and parameters->isMap()) {
         const value::Map* map = value::toMapValue(parameters);
+        std::string locale;
+
         if (map->exist("locale")) {
-            std::string locale(map->getString("locale"));
-            try {
-                if (locale == "user") {
-                    std::locale selected("");
-                    m_file.imbue(selected);
-                } else {
-                    std::locale selected(locale.c_str());
-                    m_file.imbue(selected);
-                }
-            } catch (...) {
-                throw utils::ArgError(fmt(
-                        _("Output plug-in '%1%': unknow locale '%2%'")) %
-                    plugin % locale);
+            locale.assign(map->getString("locale"));
+        }
+        try {
+            if (locale == "user") {
+                std::locale selected("");
+                m_file.imbue(selected);
+            } else {
+                std::locale selected(locale.c_str());
+                m_file.imbue(selected);
             }
+        } catch (...) {
+            throw utils::ArgError(fmt(
+                    _("Output plug-in '%1%': unknow locale '%2%'")) %
+                plugin % locale);
         }
 
         if (map->exist("type")) {
@@ -128,10 +130,10 @@ void File::onParameter(const std::string& plugin,
 }
 
 void File::onNewObservable(const std::string& simulator,
-                                 const std::string& parent,
-                                 const std::string& portname,
-                                 const std::string& /* view */,
-                                 const double& time)
+                           const std::string& parent,
+                           const std::string& portname,
+                           const std::string& /* view */,
+                           const double& time)
 {
     if (m_isstart) {
         flush(time);
@@ -149,7 +151,7 @@ void File::onNewObservable(const std::string& simulator,
 
     if (m_columns.find(name) != m_columns.end()) {
         throw utils::InternalError(fmt(
-           _("Output plug-in: observable '%1%' already exist")) % name);
+                _("Output plug-in: observable '%1%' already exist")) % name);
     }
 
     m_columns[name] = m_buffer.size();
@@ -158,19 +160,19 @@ void File::onNewObservable(const std::string& simulator,
 }
 
 void File::onDelObservable(const std::string& /* simulator */,
-                                 const std::string& /* parent */,
-                                 const std::string& /* portname */,
-                                 const std::string& /* view */,
-                                 const double& /* time */)
+                           const std::string& /* parent */,
+                           const std::string& /* portname */,
+                           const std::string& /* view */,
+                           const double& /* time */)
 {
 }
 
 void File::onValue(const std::string& simulator,
-                         const std::string& parent,
-                         const std::string& port,
-                         const std::string& /* view */,
-                         const double& time,
-                         value::Value* value)
+                   const std::string& parent,
+                   const std::string& port,
+                   const std::string& /* view */,
+                   const double& time,
+                   value::Value* value)
 {
     if (m_isstart) {
         flush(time);
@@ -281,7 +283,7 @@ void File::finalFlush(double trame_time)
 }
 
 void File::copyToFile(const std::string& filename,
-                            const std::vector < std::string >& array)
+                      const std::vector < std::string >& array)
 {
     std::ofstream file(filename.c_str());
 
@@ -301,7 +303,7 @@ void File::copyToFile(const std::string& filename,
 }
 
 void File::copyToStream(std::ostream& stream,
-                              const std::vector < std::string >& array)
+                        const std::vector < std::string >& array)
 {
     std::vector < std::string > tmp(array);
     if (m_julian) {
@@ -319,8 +321,8 @@ void File::copyToStream(std::ostream& stream,
 }
 
 std::string File::buildname(const std::string& parent,
-                                  const std::string& simulator,
-                                  const std::string& port)
+                            const std::string& simulator,
+                            const std::string& port)
 {
     std::string r(parent);
     r += ':';
