@@ -93,9 +93,9 @@ void File::init(vpz::Output& output)
     mComboType->set_active_text("text");
 
     mComboFile->clear_items();
-    mComboFile->append_text("");
+    mComboFile->append_text("C");
     mComboFile->append_text("user");
-    mComboFile->set_active_text("");
+    mComboFile->set_active_text("C");
 
     mRadioFile->set_active();
 
@@ -115,7 +115,7 @@ void File::init(vpz::Output& output)
 
         if (map->exist("locale")) {
             std::string loc = map->getString("locale");
-            if (not loc.empty() and loc != "user") {
+            if (not loc.empty() and loc != "user" and loc != "C") {
                 mComboFile->append_text(loc);
             }
 
