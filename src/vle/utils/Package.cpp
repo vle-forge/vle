@@ -35,6 +35,7 @@
 #include <glibmm/timer.h>
 #include <glibmm/stringutils.h>
 #include <glibmm/miscutils.h>
+#include <glibmm/shell.h>
 #include <fstream>
 #include <ostream>
 #include <iostream>
@@ -414,11 +415,11 @@ Package::Package()
     : m_stop(true), m_success(false), m_out(0), m_err(0), m_wait(0), m_pid(0)
 {
 #ifdef G_OS_WIN32
-    mCommandConfigure = "cmake.exe -G MinGWMakefile " \
-                       "-DCMAKE_INSTALL_PREFIX=%1% " \
+    mCommandConfigure = "cmake.exe -G 'MinGW Makefiles' " \
+                       "-DCMAKE_INSTALL_PREFIX='%1%' " \
                        "-DCMAKE_BUILD_TYPE=RelWithDebInfo ..";
     mCommandTest = "mingw32-make.exe test";
-    mCommandBuild = "mingw32-make.exe all";
+    mCommandBuild = "cmake --build .";
     mCommandInstall = "mingw32-make.exe install";
     mCommandClean = "mingw32-make.exe clean";
     mCommandPack = "mingw32-make.exe package package_source";
@@ -607,9 +608,7 @@ void Package::appendError(const std::string& str)
 void Package::buildCommandLine(const std::string& cmd,
                                std::list < std::string >& argv)
 {
-    namespace ba = boost::algorithm;
-
-    ba::split(argv, cmd, ba::is_space(), ba::token_compress_on);
+    argv = Glib::shell_parse_argv(cmd);
 
     if (argv.empty()) {
         throw utils::ArgError(fmt(_(
