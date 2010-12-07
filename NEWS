@@ -1,5 +1,5 @@
-VLE 1.0.0
-=========
+VLE 1.0.0-alpha1
+================
 
 * devs:
   * change the behavior of the confluent transition. Now, the confluent
