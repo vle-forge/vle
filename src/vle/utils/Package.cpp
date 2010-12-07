@@ -167,6 +167,13 @@ void Package::clean()
             throw utils::InternalError(fmt(
                     _("Pkg clean error: clean failed %1%")) % e.what());
         }
+        fs::remove(makefile);
+    }
+
+    fs::path cmakecache = Path::path().getPackageBuildDir();
+    cmakecache /= "CMakeCache.txt";
+    if (fs::exists(cmakecache)) {
+        fs::remove(cmakecache);
     }
 }
 
