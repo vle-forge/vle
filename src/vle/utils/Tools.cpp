@@ -194,31 +194,31 @@ void finalize()
 
 void printHelp(std::ostream& out)
 {
-    out << fmt(_("Virtual Laboratory Environment - %1%%2%\n"
+    out << fmt(_("Virtual Laboratory Environment - %1%\n"
                  "Copyright (C) 2003 - 2010 The VLE Development Team.\n"
                  "VLE is a multi-modeling environment to build,\nsimulate "
                  "and analyse models of dynamic complex systems.\n"
                  "For more information, see manuals with 'man vle' or\n"
                  "the VLE website http://sourceforge.net/projects/vle/\n")) %
-        VLE_VERSION % VLE_EXTRA_VERSION << std::endl;
+        VLE_NAME_COMPLETE << std::endl;
 }
 
 void printInformations(std::ostream& out)
 {
-    out << fmt(_("Virtual Laboratory Environment - %1%%2%\n"
+    out << fmt(_("Virtual Laboratory Environment - %1%\n"
                  "Copyright (C) 2003 - 2010 The VLE Development Team.\n")) %
-        VLE_VERSION % VLE_EXTRA_VERSION << Path::path() << "\n" << std::endl;
+        VLE_NAME_COMPLETE << "\n" << std::endl;
 }
 
 void printVersion(std::ostream& out)
 {
-    out << fmt(_("Virtual Laboratory Environment - %1%%2%\n"
+    out << fmt(_("Virtual Laboratory Environment - %1%\n"
                  "Copyright (C) 2003 - 2010 The VLE Development Team.\n"
                  "VLE comes with ABSOLUTELY NO WARRANTY.\n"
                  "You may redistribute copies of VLE\n"
                  "under the terms of the GNU General Public License.\n"
                  "For more information about these matters, see the file named "
-                 "COPYING.\n")) % VLE_VERSION % VLE_EXTRA_VERSION << std::endl;
+                 "COPYING.\n")) % VLE_NAME_COMPLETE << std::endl;
 }
 
 }} // namespace vle utils

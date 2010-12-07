@@ -50,6 +50,7 @@
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/vpz/Vpz.hpp>
+#include <vle/version.hpp>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
@@ -61,11 +62,6 @@
 #include <boost/algorithm/string/case_conv.hpp>
 
 namespace vle { namespace gvle {
-
-const std::string GVLE::WINDOW_TITLE =
-    "GVLE  " +
-    std::string(VLE_VERSION) +
-    std::string(VLE_EXTRA_VERSION);
 
 /*  - - - - - - - - - - - - - --ooOoo-- - - - - - - - - - - -  */
 
@@ -121,9 +117,23 @@ GVLE::GVLE(BaseObjectType* cobject,
 
     Glib::signal_timeout().connect( sigc::mem_fun(*this, &GVLE::on_timeout), 1000 );
 
-    set_title(WINDOW_TITLE);
+    set_title(windowTitle());
     resize(900, 550);
     show();
+}
+
+std::string GVLE::windowTitle()
+{
+    std::string result("GVLE ");
+    result += VLE_VERSION;
+
+    std::string extra(VLE_EXTRA_VERSION);
+    if (not extra.empty()) {
+        result += '-';
+        result += VLE_EXTRA_VERSION;
+    }
+
+    return result;
 }
 
 GVLE::~GVLE()
@@ -904,7 +914,7 @@ void GVLE::saveFirstVpz()
 
 void GVLE::setTitle(const Glib::ustring& name)
 {
-    Glib::ustring title(WINDOW_TITLE);
+    Glib::ustring title(windowTitle());
 
     if (utils::Package::package().selected()) {
         title += " - " + utils::Package::package().name();

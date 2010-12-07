@@ -84,7 +84,12 @@ public:
                     };
 
     static const int overview_max = 60;
-    static const std::string WINDOW_TITLE;
+
+    /**
+     * @brief Return the version number of GVLE.
+     * @return A string representation of the version number.
+     */
+    static std::string windowTitle();
 
     /**
      * Create a new window GVLE, if parameter filename is not empty, try to

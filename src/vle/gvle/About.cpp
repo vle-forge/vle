@@ -42,6 +42,7 @@ About::About(Glib::RefPtr < Gnome::Glade::Xml > refXml) :
         mAbout->set_version(VLE_VERSION);
     } else {
         std::string version(VLE_VERSION);
+        version += '-';
         version += extra;
         mAbout->set_version(version);
     }
