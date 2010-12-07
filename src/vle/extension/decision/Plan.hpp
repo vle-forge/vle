@@ -46,7 +46,7 @@ class KnowledgeBase;
  * functions Facts, Predicates, AcknowledgeFunctions, OutputFunctions and
  * UpdateFunctions must be defined.
  */
-class Plan
+class VLE_EXTENSION_EXPORT Plan
 {
 public:
     Plan(KnowledgeBase& kb)
