@@ -1,4 +1,52 @@
-vle-1.0.0-alpha1
+vle-1.0.0-alpha2
+
+commit eb7213474263c2c7835f99d61d73d805bb6354df
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Tue Dec 7 19:56:53 2010 +0100
+
+    gvle: update version number in many class
+    
+    Update the VLE_VERSION_EXTRA management in many class to add a single
+    character `-' in VLE version number show.
+
+commit 08e5bb3ba32d795208a15151a4a422ada18e46e0
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Tue Dec 7 19:32:42 2010 +0100
+
+    utils: update the clean command in package
+    
+    Now the clean() command in the package class removes the `Makefile' and
+    `CmakeCache.txt' files.
+
+commit 7f6876ef581d8ba382a4ce652fc995f56354a5d8
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Tue Dec 7 14:49:30 2010 +0100
+
+    vle: update NEWS
+
+commit 597aadaa98db7e08535f98bdc31ce2e494abae14
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Tue Dec 7 15:00:30 2010 +0100
+
+    cpack: update package generation
+    
+    Fix the VLE_EXTRA variable from `-rc1' or `-alpha1' to `rc1' or `alpha1'
+    to greatly increase the binary and source packages.
+
+commit 70d76c2eb0169b3d9ba75da2353e439d1481526a
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Tue Dec 7 14:45:11 2010 +0100
+
+    win32: fix decision extension portage
+    
+    The vle::extension::decision::Plan class does not use dllexport or
+    dllimport.
+
+commit 42b1f286192530edae338db2c6284369020c90dd
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Tue Dec 7 05:22:39 2010 +0100
+
+    vle-1.0.0-alpha1
 
 commit ca62e2efc2c9558145d0025a3416441ce20782ed
 Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
