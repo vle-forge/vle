@@ -110,6 +110,8 @@ private:
 
         if (mLast == '\n') {
             mOldLine = mLine++;
+            mOldColumn = mColumn;
+            mColumn = 0;
         } else {
             mOldColumn = mColumn++;
         }
@@ -121,6 +123,7 @@ private:
     {
         if (mLast == '\n') {
             mLine = mOldLine;
+            mColumn = mOldColumn;
         } else {
             mColumn = mOldColumn;
         }
@@ -132,6 +135,10 @@ private:
     {
         std::string tmp;
         std::getline(mStream, tmp);
+
+        mOldColumn = mColumn;
+        mColumn = 0;
+        mOldLine = mLine++;
     }
 
     enum Token {

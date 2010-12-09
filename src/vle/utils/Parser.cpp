@@ -60,7 +60,8 @@ const Block& Block::getBlock(const std::string& name) const
 {
     std::multimap < std::string, Block >::const_iterator it = blocks.find(name);
     if (it == blocks.end()) {
-        throw utils::ArgError(fmt(_("The block `%1%' does not exist")) % name);
+        throw utils::ParseError(fmt(
+                _("The block `%1%' does not exist")) % name);
     }
     return it->second;
 }
@@ -73,7 +74,7 @@ Parser::Parser(std::istream& stream) throw(utils::ParseError)
         readBlock(mRoot);
     } catch(const std::exception& e) {
         throw utils::ParseError(fmt(
-                _("Parser error line %1% column %2%:\t%3%")) % mLine %
+                _("Parser error before line %1% column %2%:\t%3%")) % mLine %
             mColumn % e.what());
     }
 }
