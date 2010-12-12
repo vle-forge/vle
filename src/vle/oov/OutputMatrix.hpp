@@ -219,6 +219,13 @@ namespace vle { namespace oov {
         { return m_modelNames; }
 
         /**
+         * @brief Test if a model exists.
+         * @param model The model name.
+         * @return True if the model exists.
+         */
+        bool exist(const std::string& model) const;
+
+        /**
          * @brief Return the list of port for a specific model.
          * @param model The model name to get the list of ports.
          * @return A const reference on a vector of string.

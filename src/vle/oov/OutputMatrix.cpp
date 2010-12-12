@@ -250,6 +250,12 @@ OutputMatrix::getValue(value::Matrix::size_type idx) const
     return m_values->column(idx);
 }
 
+bool OutputMatrix::exist(const std::string& model) const
+{
+    MapStringList::const_iterator it = m_info.find(model);
+    return it != m_info.end();
+}
+
 const OutputMatrix::StringList&
 OutputMatrix::getPortList(const std::string& model) const
 {
