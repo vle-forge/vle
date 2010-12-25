@@ -202,7 +202,7 @@ void SaxParser::onCharacters(void* ctx, const xmlChar* ch, int len)
     SaxParser* sax = static_cast < SaxParser* >(ctx);
 
     if (not sax->isStopped()) {
-        Glib::ustring buf((const char*)ch, len);
+        std::string buf((const char*)ch, len);
 
         sax->addToCharacters(buf);
     }
@@ -214,7 +214,7 @@ void SaxParser::onCDataBlock(void* ctx, const xmlChar* value, int len)
     SaxParser* sax = static_cast < SaxParser* >(ctx);
 
     if (not sax->isStopped()) {
-        Glib::ustring buf((const char*)value, len);
+        std::string buf((const char*)value, len);
 
         sax->m_cdata.assign(buf);
     }
@@ -823,21 +823,6 @@ std::vector < value::Value* >& SaxParser::getValues()
 value::Value* SaxParser::getValue(const size_t pos) const
 {
     return m_valuestack.getResult(pos);
-}
-
-const Glib::ustring& SaxParser::lastCharactersStored() const
-{
-    return m_lastCharacters;
-}
-
-void SaxParser::clearLastCharactersStored()
-{
-    m_lastCharacters.clear();
-}
-
-void SaxParser::addToCharacters(const Glib::ustring& characters)
-{
-    m_lastCharacters.append(characters);
 }
 
 bool xmlCharToBoolean(const xmlChar* str)

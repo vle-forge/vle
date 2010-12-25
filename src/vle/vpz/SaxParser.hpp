@@ -33,7 +33,6 @@
 #include <vle/vpz/Base.hpp>
 #include <vle/vpz/SaxStackValue.hpp>
 #include <vle/vpz/SaxStackVpz.hpp>
-#include <glibmm/ustring.h>
 #include <vle/vpz/DllDefines.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/value/Set.hpp>
@@ -152,16 +151,32 @@ namespace vle { namespace vpz {
          * @brief Get the last characters from internal buffer.
          * @return A characters buffer.
          */
-        const Glib::ustring& lastCharactersStored() const;
+        const std::string& lastCharactersStored() const
+        { return m_lastCharacters; }
 
         /**
          * @brief Clear the internal buffer for last characters.
          */
-        void clearLastCharactersStored();
+        void clearLastCharactersStored()
+        { m_lastCharacters.clear(); }
 
-        void addToCharacters(const Glib::ustring& characters);
+        /**
+         * @brief Append characters to the last characters readed.
+         * @param characters The characters to append.
+         */
+        void addToCharacters(const std::string& characters)
+        { m_lastCharacters.append(characters); }
 
+        /**
+         * @brief Stop the parsing of the XML file.
+         * @param error The message to store into the error's buffer string.
+         */
         void stopParser(const std::string& error);
+
+        /**
+         * @brief Return true if the parsing of the XML file has been stopped.
+         * @return true if the parser was stopped, false otherwise.
+         */
         bool isStopped() const { return m_stop; }
 
         xmlSAXHandler m_sax;
@@ -169,8 +184,8 @@ namespace vle { namespace vpz {
         std::string   m_error;
         SaxStackVpz   m_vpzstack;
         ValueStackSax m_valuestack;
-        Glib::ustring m_lastCharacters;
-        Glib::ustring m_cdata;
+        std::string   m_lastCharacters;
+        std::string   m_cdata;
         Vpz&          m_vpz;
 
         bool          m_isValue;

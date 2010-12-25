@@ -153,6 +153,7 @@ BOOST_AUTO_TEST_CASE(value_string)
 {
     const char* t1 = "<?xml version=\"1.0\"?>\n<string>a b c d e f g h i j</string>";
     const char* t2 = "<?xml version=\"1.0\"?>\n<string>a\nb\tc\n</string>";
+    const char* t4 = "<?xml version=\"1.0\"?>\n<string>é ç € â ô f Û « © ±</string>";
 
     value::Value* v;
 
@@ -163,10 +164,12 @@ BOOST_AUTO_TEST_CASE(value_string)
     v = vpz::Vpz::parseValue(t2);
     BOOST_CHECK(value::toString(v) == "a\nb\tc\n");
     std::string t3(v->writeToXml());
-    delete v;
-
     v = vpz::Vpz::parseValue(t3);
     BOOST_CHECK(value::toString(v) == "a\nb\tc\n");
+    delete v;
+
+    v = vpz::Vpz::parseValue(t4);
+    BOOST_CHECK(value::toString(v) == "é ç € â ô f Û « © ±");
     delete v;
 }
 
