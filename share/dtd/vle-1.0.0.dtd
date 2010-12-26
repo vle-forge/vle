@@ -1,0 +1,132 @@
+<!ELEMENT vle_project (structures?, dynamics?, classes?, experiment) >
+<!ELEMENT structures (model?) >
+<!ELEMENT model (in?, out?, submodels?, connections?) >
+<!ELEMENT in (port*) >
+<!ELEMENT out (port*) >
+<!ELEMENT submodels (model*) >
+<!ELEMENT connections (connection*) >
+<!ELEMENT connection (origin, destination) >
+<!ELEMENT origin EMPTY >
+<!ELEMENT destination EMPTY >
+<!ELEMENT dynamics (dynamic*) >
+<!ELEMENT dynamic EMPTY >
+<!ELEMENT classes (class*) >
+<!ELEMENT class (model?) >
+<!ELEMENT experiment (replicas?, conditions?, views?) >
+<!ELEMENT conditions (condition*) >
+<!ELEMENT condition (port*) >
+<!ELEMENT port ((attachedview*)|(integer|double|boolean|string|table|tuple|set|matrix|map|xml|null)*) >
+<!ELEMENT views (outputs, observables, view*) >
+<!ELEMENT outputs (output*) >
+<!ELEMENT output (integer?|double?|boolean?|string?|table?|tuple?|set?|matrix?|map?|xml?|null?) >
+<!ELEMENT observables (observable*) >
+<!ELEMENT observable (port*) >
+<!ELEMENT attachedview EMPTY >
+<!ELEMENT view (#PCDATA) >
+<!ELEMENT integer (#PCDATA) >
+<!ELEMENT double (#PCDATA) >
+<!ELEMENT boolean (#PCDATA) >
+<!ELEMENT string (#PCDATA) >
+<!ELEMENT table (#PCDATA) >
+<!ELEMENT tuple (#PCDATA) >
+<!ELEMENT set (integer|double|boolean|string|table|tuple|set|matrix|map|xml|null)* >
+<!ELEMENT matrix (integer|double|boolean|string|table|tuple|set|matrix|map|xml|null) >
+<!ELEMENT map (key*) >
+<!ELEMENT key (integer|double|boolean|string|table|tuple|set|matrix|map|xml|null) >
+<!ELEMENT xml (#PCDATA) >
+
+<!ATTLIST vle_project
+  date CDATA #IMPLIED
+  version CDATA #REQUIRED
+  instance CDATA #IMPLIED
+  replica CDATA #IMPLIED
+  author CDATA #REQUIRED >
+
+<!ATTLIST model
+  name CDATA #REQUIRED
+  type (atomic|coupled) #REQUIRED
+  dynamics CDATA #IMPLIED
+  conditions CDATA #IMPLIED
+  observables CDATA #IMPLIED
+  x CDATA #IMPLIED
+  y CDATA #IMPLIED
+  width CDATA #IMPLIED
+  height CDATA #IMPLIED >
+
+<!ATTLIST port
+  name CDATA #REQUIRED >
+
+<!ATTLIST connection
+  type (input|output|internal) #REQUIRED >
+
+<!ATTLIST origin
+  model CDATA #REQUIRED
+  port CDATA #REQUIRED >
+
+<!ATTLIST destination
+  model CDATA #REQUIRED
+  port CDATA #REQUIRED >
+
+<!ATTLIST dynamic
+  name CDATA #REQUIRED
+  library CDATA #REQUIRED
+  package CDATA #IMPLIED
+  location CDATA #IMPLIED
+  model CDATA #IMPLIED
+  type CDATA #IMPLIED
+  language CDATA #IMPLIED >
+
+<!ATTLIST class
+  name CDATA #REQUIRED >
+
+<!ATTLIST experiment
+  name CDATA #REQUIRED
+  begin CDATA #IMPLIED
+  duration CDATA #REQUIRED
+  seed CDATA #IMPLIED
+  combination (linear|total) #IMPLIED >
+
+<!ATTLIST replicas
+  seed CDATA #REQUIRED
+  number CDATA #REQUIRED >
+
+<!ATTLIST condition
+  name CDATA #REQUIRED >
+
+<!ATTLIST output
+  name CDATA #REQUIRED
+  format (local|distant) #REQUIRED
+  location CDATA #IMPLIED
+  package CDATA #IMPLIED
+  plugin CDATA #REQUIRED >
+
+<!ATTLIST observable
+  name CDATA #REQUIRED >
+
+<!ATTLIST attachedview
+  name CDATA #REQUIRED >
+
+<!ATTLIST view
+  name CDATA #REQUIRED
+  type (timed|event|finish) #REQUIRED
+  output CDATA #REQUIRED
+  timestep CDATA #IMPLIED >
+
+<!ATTLIST table
+  width CDATA #REQUIRED
+  height CDATA #REQUIRED >
+
+<!ATTLIST key
+  name CDATA #REQUIRED >
+
+<!ATTLIST matrix
+  rows CDATA #REQUIRED
+  columns CDATA #REQUIRED
+  rowmax CDATA #IMPLIED
+  columnmax CDATA #IMPLIED
+  rowstep CDATA #IMPLIED
+  columnstep CDATA #IMPLIED >
+
+<!--
+vim:ts=8:tw=160:sw=2:sts=2
+-->
