@@ -91,37 +91,32 @@ namespace vle { namespace value {
 	 * @brief Pure virtual clone function.
 	 * @return Clone of instantiate object.
 	 */
-        virtual Value* clone() const
-        { throw utils::InternalError(); }
+        virtual Value* clone() const = 0;
 
 	/**
 	 * @brief Transform value into a simple std::string for text file.
 	 * @return std::string representation of Value.
 	 */
-	virtual void writeFile(std::ostream& /* out */) const
-        { throw utils::InternalError(); }
+	virtual void writeFile(std::ostream& /* out */) const = 0;
 
 	/**
 	 * @brief Transform value into a simple std::string.
 	 * @return std::string representation of Value.
 	 */
-	virtual void writeString(std::ostream& /* out */) const
-        { throw utils::InternalError(); }
+	virtual void writeString(std::ostream& /* out */) const = 0;
 
 	/**
 	 * @brief Transform value into XML structure.
 	 * @return std::string representation of XML structure of Value.
 	 */
-	virtual void writeXml(std::ostream& /* out */) const
-        { throw utils::InternalError(); }
+	virtual void writeXml(std::ostream& /* out */) const = 0;
 
 	/**
 	 * @brief Return the type of value. The type is one of the 'type'
 	 * enumeration ie. BOOL, INTEGER, DOUBLE, STRING, SET, MAP.
 	 * @return the type of value object.
 	 */
-	virtual Value::type getType() const
-        { throw utils::InternalError(); }
+	virtual Value::type getType() const = 0;
 
         ///
         ////
