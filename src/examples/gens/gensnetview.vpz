@@ -1,160 +1,53 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://www.vle-project.org/vle-1.0.0.dtd">
-<vle_project version="0.7" date="" author="Gauthier Quesnel, Raphael Duboz">
- <structures>
-  <model name="top" type="coupled">
-   <submodels>
-    <model name="executive" type="atomic" dynamics="executive" observables="obs1"/>
-    <model name="counter" type="atomic" dynamics="counter" observables="">
-     <in>
-      <port name="in"/>
-     </in>
-     <out>
-      <port name="out"/>
-     </out>
-    </model>
-   </submodels>
-  </model>
- </structures>
- <dynamics>
-  <dynamic name="executive" library="gens" model="executive"/>
-  <dynamic name="counter" library="gens" model="counter"/>
- </dynamics>
- <experiment name="generatorexecutive" duration="100.0" seed="123">
-  <views>
-   <outputs>
-    <output name="o" format="distant" plugin="caironetview" location="localhost:8000:.">
-     <map>
-      <!-- dimension of the modeled space if any -->
-      <key name="dimensions">
-       <map>
-        <key name="x">
-         <double>10</double>
-        </key>
-        <key name="y">
-         <double>10</double>
-        </key>
-       </map>
-      </key>
-      <!-- the "type" of positions can be "set" (defined
-                by the user) or "auto" automatically
-                generated -->
-      <key name="positions">
-       <map>
-        <key name="type">
-         <string>set</string>
-        </key>
-        <key name="values">
-         <string> 2 2 4 4 </string>
-        </key>
-       </map>
-      </key>
-      <key name="executiveName">
-       <!-- if the name of the executive is empty,
-                the changes in model structure are not displayed  -->
-       <string>executive</string>
-      </key>
-      <key name="adjacency_matrix">
-       <!-- A line define edges (connections between vertex).
-              Columns with 1 specify a directed connection between line-vertex
-              toward column vertex. -->
-       <string>0 0 0 0</string>
-      </key>
-      <key name="nodes">
-       <!-- if the type of nodes is "auto", then a prefix must
-              be given to automatically generate models name. Otherwise
-              the user must give the list of models names. The order in the
-              list is the same than lines in the adjacency matrix. -->
-       <map>
-        <key name="type">
-         <string>set</string>
-        </key>
-        <key name="names">
-         <string> executive counter </string>
-        </key>
-       </map>
-      </key>
-      <key name="states">
-       <map>
-        <!-- the name, type and scales of values that vertex display
-          (integer, real, bool) -->
-        <key name="name">
-         <string>status</string>
-        </key>
-        <key name="type">
-         <string>integer</string>
-        </key>
-        <key name="values">
-         <set>
-          <map>
-           <key name="value">
-            <integer>0</integer>
-           </key>
-           <key name="red">
-            <integer>0</integer>
-           </key>
-           <key name="green">
-            <integer>65000</integer>
-           </key>
-           <key name="blue">
-            <integer>65000</integer>
-           </key>
-          </map>
-          <map>
-           <key name="value">
-            <integer>1</integer>
-           </key>
-           <key name="red">
-            <integer>65000</integer>
-           </key>
-           <key name="green">
-            <integer>0</integer>
-           </key>
-           <key name="blue">
-            <integer>65000</integer>
-           </key>
-          </map>
-          <map>
-           <key name="value">
-            <integer>2</integer>
-           </key>
-           <key name="red">
-            <integer>65000</integer>
-           </key>
-           <key name="green">
-            <integer>65000</integer>
-           </key>
-           <key name="blue">
-            <integer>0</integer>
-           </key>
-          </map>
-         </set>
-        </key>
-       </map>
-      </key>
-      <key name="display_names">
-       <map>
-        <key name="activate">
-         <string>yes</string>
-        </key>
-       </map>
-      </key>
-     </map>
-    </output>
-   </outputs>
-   <observables>
-    <observable name="obs1">
-     <port name="adjacency_matrix">
-      <attachedview name="view"/>
-     </port>
-    </observable>
-    <observable name="obs2">
-     <port name="value">
-      <attachedview name="view"/>
-     </port>
-    </observable>
-   </observables>
-   <view name="view" type="timed" timestep="1" output="o"/>
-  </views>
- </experiment>
+<vle_project version="0.7" date="Mon, 27 Dec 2010" author="Gauthier Quesnel, Raphael Duboz">
+<structures>
+<model name="top" type="coupled" width="459"  >
+<submodels>
+<model name="counter" type="atomic" dynamics="counter" x="140" y="25" width="100" height="45" >
+<in>
+ <port name="in" />
+</in>
+<out>
+ <port name="out" />
+</out>
+</model>
+<model name="executive" type="atomic" dynamics="executive" observables="obs1" x="140" y="85" width="100" height="30" >
+</model>
+</submodels>
+<connections>
+</connections>
+</model>
+</structures>
+<dynamics>
+<dynamic name="counter" library="gens" model="counter" type="local"  />
+<dynamic name="executive" library="gens" model="executive" type="local"  />
+</dynamics>
+<experiment name="generatorexecutive" duration="100.000000000000000" begin="0.000000000000000" seed="123" >
+<views>
+<outputs>
+<output name="o" location="localhost:8000:." format="distant" plugin="caironetview" >
+<map><key name="adjacency_matrix"><string>0 0 0 0</string></key><key name="dimensions"><map><key name="x"><double>10.000000000000000</double></key><key name="y"><double>10.000000000000000</double></key></map></key><key name="display_names"><map><key name="activate"><string>yes</string></key></map></key><key name="executiveName"><string>executive</string></key><key name="nodes"><map><key name="names"><string> executive counter </string></key><key name="type"><string>set</string></key></map></key><key name="positions"><map><key name="type"><string>set</string></key><key name="values"><string> 2 2 4 4 </string></key></map></key><key name="states"><map><key name="name"><string>status</string></key><key name="type"><string>integer</string></key><key name="values"><set><map><key name="blue"><integer>65000</integer></key><key name="green"><integer>65000</integer></key><key name="red"><integer>0</integer></key><key name="value"><integer>0</integer></key></map><map><key name="blue"><integer>65000</integer></key><key name="green"><integer>0</integer></key><key name="red"><integer>65000</integer></key><key name="value"><integer>1</integer></key></map><map><key name="blue"><integer>0</integer></key><key name="green"><integer>65000</integer></key><key name="red"><integer>65000</integer></key><key name="value"><integer>2</integer></key></map></set></key></map></key></map></output>
+
+</outputs>
+<observables>
+<observable name="obs1" >
+<port name="adjacency_matrix" >
+ <attachedview name="view" />
+</port>
+
+</observable>
+
+<observable name="obs2" >
+<port name="value" >
+ <attachedview name="view" />
+</port>
+
+</observable>
+
+</observables>
+<view name="view" output="o" type="timed" timestep="1.000000000000000" />
+
+</views>
+</experiment>
 </vle_project>

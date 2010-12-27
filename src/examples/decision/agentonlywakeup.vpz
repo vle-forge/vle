@@ -2,9 +2,9 @@
 <!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://www.vle-project.org/vle-1.0.0.dtd">
 <vle_project version="1.0.0" date="mar., 12 janv. 2010" author="Gauthier Quesnel">
 <structures>
-<model name="Top model" type="coupled" x="0" y="0" width="576" height="314"  >
+<model name="Top model" type="coupled" x="0" y="0" width="576" height="350"  >
 <submodels>
-<model name="Agent" type="atomic" dynamics="agent" observables="obs" x="336" y="84" width="100" height="45" >
+<model name="Agent" type="atomic" dynamics="agent" observables="obs" x="370" y="25" width="100" height="45" >
 <in>
  <port name="wakeup" />
 </in>
@@ -12,20 +12,12 @@
  <port name="out" />
 </out>
 </model>
-<model name="counter" type="atomic" dynamics="counter" observables="storage" x="461" y="20" width="100" height="45" >
+<model name="counter" type="atomic" dynamics="counter" observables="storage" x="370" y="265" width="100" height="45" >
 <in>
  <port name="in" />
 </in>
 </model>
-<model name="retarder" type="atomic" dynamics="retarder" x="183" y="142" width="100" height="45" >
-<in>
- <port name="in" />
-</in>
-<out>
- <port name="out" />
-</out>
-</model>
-<model name="retarder2" type="atomic" dynamics="retarder" x="54" y="51" width="100" height="45" >
+<model name="retarder" type="atomic" dynamics="retarder" x="25" y="265" width="100" height="45" >
 <in>
  <port name="in" />
 </in>
@@ -33,12 +25,20 @@
  <port name="out" />
 </out>
 </model>
-<model name="wakeup" type="atomic" conditions="Startinit" dynamics="start" x="53" y="229" width="100" height="45" >
+<model name="retarder2" type="atomic" dynamics="retarder" x="370" y="85" width="100" height="45" >
+<in>
+ <port name="in" />
+</in>
 <out>
  <port name="out" />
 </out>
 </model>
-<model name="wakeup2" type="atomic" conditions="Start2init" dynamics="start" x="19" y="136" width="100" height="45" >
+<model name="wakeup" type="atomic" conditions="Startinit" dynamics="start" x="255" y="85" width="100" height="45" >
+<out>
+ <port name="out" />
+</out>
+</model>
+<model name="wakeup2" type="atomic" conditions="Start2init" dynamics="start" x="25" y="145" width="100" height="45" >
 <out>
  <port name="out" />
 </out>

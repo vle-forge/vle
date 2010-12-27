@@ -1,68 +1,61 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://www.vle-project.org/vle-1.0.0.dtd">
-<vle_project version="0.5" author="Eric" date="">
-  <structures>
-    <model name="system" type="coupled">
-      <submodels>
-	<model name="executive" type="atomic" conditions="cond_executive"
-	       dynamics="dyn_executive"/>
-      </submodels>
-      <connections/>
-    </model>
-  </structures>
-  <dynamics>
-    <dynamic name="dyn_executive" library="lifegame" model="executive"/>
-    <dynamic name="dyn_cell" library="lifegame" model="cell"/>
-  </dynamics>
-  <classes>
-    <class name="A" >
-      <model name="a" type="atomic" conditions="cond_cell"
-	     dynamics="dyn_cell" observables="obs_cell" >
-	<out>
-	  <port name="update" />
-	</out>
-      </model>
-    </class>
-  </classes>
-  <experiment name="exp1" duration="100" seed="544">
-    <conditions>
-      <condition name="cond_executive">
-	<port name="translate">
-	  <map>
-	    <key name="grid">
-	      <tuple>30 30</tuple>
-	    </key>
-	    <key name="cells">
-	      <map>
-		<key name="connectivity"><string>von neumann</string></key>
-		<key name="class"><string>A</string></key>
-		<key name="prefix"><string>cell</string></key>
-	      </map>
-	    </key>
-	  </map>
-	</port>
-      </condition>
-      <condition name="cond_cell">
-	<port name="Delay">
-	  <double>0</double>
-	</port>
-	<port name="TimeStep">
-	  <double>1.0</double>
-	</port>
-      </condition>
-    </conditions>
-    <views>
-      <outputs>
-	<output name="o" format="local" plugin="file" />
-      </outputs>
-      <observables>
-	<observable name="obs_cell">
-	  <port name="s">
-	    <attachedview name="cell_view"/>
-	  </port>
-	</observable>
-      </observables>
-      <view name="cell_view" type="timed" timestep="0.5" output="o"/>
-    </views>
-  </experiment>
+<vle_project version="0.5" date="Mon, 27 Dec 2010" author="Eric">
+<structures>
+<model name="system" type="coupled" width="459"  >
+<submodels>
+<model name="executive" type="atomic" conditions="cond_executive" dynamics="dyn_executive" x="140" y="25" width="100" height="30" >
+</model>
+</submodels>
+<connections>
+</connections>
+</model>
+</structures>
+<dynamics>
+<dynamic name="dyn_cell" library="lifegame" model="cell" type="local"  />
+<dynamic name="dyn_executive" library="lifegame" model="executive" type="local"  />
+</dynamics>
+<classes>
+<class name="A" >
+<model name="a" type="atomic" conditions="cond_cell" dynamics="dyn_cell" observables="obs_cell" >
+<out>
+ <port name="update" />
+</out>
+</model>
+</class>
+</classes>
+<experiment name="exp1" duration="100.000000000000000" begin="0.000000000000000" seed="544" >
+<conditions>
+<condition name="cond_cell" >
+ <port name="Delay" >
+<double>0.000000000000000</double>
+</port>
+ <port name="TimeStep" >
+<double>1.000000000000000</double>
+</port>
+</condition>
+<condition name="cond_executive" >
+ <port name="translate" >
+<map><key name="cells"><map><key name="class"><string>A</string></key><key name="connectivity"><string>von neumann</string></key><key name="prefix"><string>cell</string></key></map></key><key name="grid"><tuple>30.000000000000000 30.000000000000000</tuple></key></map>
+</port>
+</condition>
+</conditions>
+<views>
+<outputs>
+<output name="o" location="" format="local" plugin="file" />
+
+</outputs>
+<observables>
+<observable name="obs_cell" >
+<port name="s" >
+ <attachedview name="cell_view" />
+</port>
+
+</observable>
+
+</observables>
+<view name="cell_view" output="o" type="timed" timestep="0.500000000000000" />
+
+</views>
+</experiment>
 </vle_project>

@@ -2,9 +2,9 @@
 <!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://www.vle-project.org/vle-1.0.0.dtd">
 <vle_project version="0.5" date="mer, 09 sep 2009" author="Eric Ramat, Gauthier Quesnel">
 <structures>
-<model name="m" type="coupled" width="468" height="360"  >
+<model name="m" type="coupled" width="459" height="350"  >
 <submodels>
-<model name="m1" type="atomic" dynamics="dyn1" observables="obs1" x="250" y="16" width="100" height="45" >
+<model name="m1" type="atomic" dynamics="dyn1" observables="obs1" x="255" y="25" width="100" height="45" >
 <in>
  <port name="in" />
 </in>
@@ -12,7 +12,7 @@
  <port name="out" />
 </out>
 </model>
-<model name="m2" type="atomic" dynamics="dyn2" observables="obs1" x="250" y="232" width="100" height="45" >
+<model name="m2" type="atomic" dynamics="dyn2" observables="obs1" x="255" y="250" width="100" height="45" >
 <in>
  <port name="in" />
 </in>
@@ -20,7 +20,7 @@
  <port name="out" />
 </out>
 </model>
-<model name="m3" type="atomic" dynamics="dyn3" observables="obs1" x="52" y="109" width="100" height="60" >
+<model name="m3" type="atomic" dynamics="dyn3" observables="obs1" x="25" y="250" width="100" height="60" >
 <in>
  <port name="in1" />
  <port name="in2" />

@@ -2,15 +2,15 @@
 <!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://www.vle-project.org/vle-1.0.0.dtd">
 <vle_project version="1.0" date="mar., 05 janv. 2010" author="Gauthier Quesnel">
 <structures>
-<model name="Top model" type="coupled" x="0" y="0" width="464" height="301"  >
+<model name="Top model" type="coupled" x="0" y="0" width="459" height="301"  >
 <submodels>
-<model name="Agent" type="atomic" dynamics="agent" observables="TextAgent" x="222" y="101" width="100" height="60" >
+<model name="Agent" type="atomic" dynamics="agent" observables="TextAgent" x="140" y="25" width="100" height="60" >
 <in>
  <port name="ack" />
  <port name="start" />
 </in>
 </model>
-<model name="Start" type="atomic" conditions="StartInit" dynamics="start" x="22" y="30" width="100" height="45" >
+<model name="Start" type="atomic" conditions="StartInit" dynamics="start" x="140" y="100" width="100" height="45" >
 <out>
  <port name="out" />
 </out>

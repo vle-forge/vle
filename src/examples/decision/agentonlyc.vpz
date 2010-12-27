@@ -2,14 +2,14 @@
 <!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://www.vle-project.org/vle-1.0.0.dtd">
 <vle_project version="1.0.0" date="mar., 12 janv. 2010" author="Gauthier Quesnel">
 <structures>
-<model name="Top model" type="coupled" x="0" y="0" width="464" height="301"  >
+<model name="Top model" type="coupled" x="0" y="0" width="459" height="301"  >
 <submodels>
-<model name="Agent" type="atomic" dynamics="agent" observables="obs" x="30" y="35" width="100" height="45" >
+<model name="Agent" type="atomic" dynamics="agent" observables="obs" x="140" y="25" width="100" height="45" >
 <out>
  <port name="out" />
 </out>
 </model>
-<model name="counter" type="atomic" dynamics="counter" observables="storage" x="179" y="92" width="100" height="45" >
+<model name="counter" type="atomic" dynamics="counter" observables="storage" x="140" y="85" width="100" height="45" >
 <in>
  <port name="in" />
 </in>
