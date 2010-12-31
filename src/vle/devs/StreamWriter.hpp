@@ -92,7 +92,11 @@ namespace vle { namespace devs {
          * @brief Process the devs::ObservationEvent and write it to the Stream.
          * @param event the devs::ObservationEvent to write.
          */
-        virtual void process(ObservationEvent& event) = 0;
+        virtual void process(Simulator* simulator,
+                             const std::string& portname,
+                             const devs::Time& time,
+                             const std::string& view,
+                             value::Value* value) = 0;
 
         /**
          * Close the output stream.

@@ -151,7 +151,8 @@ void File::onNewObservable(const std::string& simulator,
 
     if (m_columns.find(name) != m_columns.end()) {
         throw utils::InternalError(fmt(
-                _("Output plug-in: observable '%1%' already exist")) % name);
+                _("Output plug-in: observable '%1%' already exist")) %
+            name);
     }
 
     m_columns[name] = m_buffer.size();
@@ -186,17 +187,19 @@ void File::onValue(const std::string& simulator,
         }
     }
 
-    std::string name(buildname(parent, simulator, port));
-    Columns::iterator it = m_columns.find(name);
+    if (not simulator.empty()) {
+        std::string name(buildname(parent, simulator, port));
+        Columns::iterator it = m_columns.find(name);
 
-    if (it == m_columns.end()) {
-        throw utils::InternalError(fmt(
-                _("Output plugin: columns '%1%' does not exist. "
-                  "No observable ?")) % name);
+        if (it == m_columns.end()) {
+            throw utils::InternalError(fmt(
+                    _("Output plugin: columns '%1%' does not exist. "
+                      "No observable ?")) % name);
+        }
+
+        m_buffer[it->second] = value;
+        m_valid[it->second] = true;
     }
-
-    m_buffer[it->second] = value;
-    m_valid[it->second] = true;
 }
 
 void File::close(const double& time)
@@ -223,7 +226,8 @@ void File::close(const double& time)
 void File::flush(double trame_time)
 {
     if (trame_time != m_time) {
-        if (std::find(m_valid.begin(), m_valid.end(), true) != m_valid.end()) {
+        if (m_valid.empty() or std::find(m_valid.begin(), m_valid.end(), true)
+            != m_valid.end()) {
             m_file << m_time;
             if (m_julian) {
                 m_filetype->writeSeparator(m_file);

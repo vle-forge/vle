@@ -205,7 +205,7 @@ namespace vle { namespace devs {
                      const Time& time,
                      ExternalEventList& output);
 
-        ObservationEvent* observation(const ObservationEvent& event) const;
+        value::Value* observation(const ObservationEvent& event) const;
 
     private:
         TargetSimulatorList mTargets;

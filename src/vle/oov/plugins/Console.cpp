@@ -208,8 +208,8 @@ public:
     void flush(double trameTime)
     {
         if (trameTime != mTime) {
-            if (std::find(mValid.begin(), mValid.end(), true) !=
-                mValid.end()) {
+            if (mValid.empty() or std::find(mValid.begin(), mValid.end(),
+                                            true) != mValid.end()) {
                 std::cout << mTime;
                 if (mJulian) {
                     std::cout << '\t';

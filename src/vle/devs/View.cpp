@@ -33,37 +33,23 @@
 
 namespace vle { namespace devs {
 
-View::View(const std::string& name, StreamWriter* stream) :
-    m_name(name),
-    m_stream(stream),
-    m_size(0)
-{
-}
-
 View::~View()
 {
     delete m_stream;
 }
 
-ObservationEvent* View::addObservable(Simulator* model,
-                                    const std::string& portname,
-                                    const Time& currenttime)
+void View::addObservable(Simulator* model,
+                         const std::string& portname,
+                         const Time& currenttime)
 {
-    if (not model) {
-        throw utils::InternalError(_(
-           "Cannot add an empty simulator to observe"));
-    }
+    assert(model);
 
     if (not exist(model, portname)) {
         m_observableList.insert(
             std::make_pair < Simulator*, std::string >(model, portname));
         m_stream->processNewObservable(model, portname, currenttime,
                                        getName());
-        if (isTimed()) {
-            return new ObservationEvent(currenttime, model, m_name, portname);
-        }
     }
-    return 0;
 }
 
 void View::finish(const Time& time)
@@ -71,24 +57,31 @@ void View::finish(const Time& time)
     m_plugin = m_stream->close(time);
 }
 
-void View::removeObservable(Simulator* model)
+void View::removeObservable(Simulator* sim)
 {
-    ObservableList::iterator it = m_observableList.find(model);
-    if (it != m_observableList.end()) {
-        m_observableList.erase(model);
-        m_stream->processRemoveObservable(model, "", 0.0, getName());
+    assert(sim);
+
+    std::pair < ObservableList::iterator, ObservableList::iterator > result;
+    ObservableList::iterator it;
+
+    result = m_observableList.equal_range(sim);
+    for (it = result.first; it != result.second; ++it) {
+        m_stream->processRemoveObservable(it->first, it->second, 0.0,
+                                          getName());
     }
+
+    m_observableList.erase(result.first, result.second);
 }
 
 bool View::exist(Simulator* simulator, const std::string& portname) const
 {
     std::pair < ObservableList::const_iterator,
                 ObservableList::const_iterator > result;
+    ObservableList::const_iterator it;
 
     result = m_observableList.equal_range(simulator);
-    for (ObservableList::const_iterator jt = result.first;
-         jt != result.second; ++jt) {
-        if (jt->second == portname) {
+    for (it = result.first; it != result.second; ++it) {
+        if (it->second == portname) {
             return true;
         }
     }
@@ -100,20 +93,18 @@ bool View::exist(Simulator* simulator) const
     return m_observableList.count(simulator) > 0;
 }
 
-std::list < std::string > View::get(Simulator* simulator)
+void View::run(const Time& time)
 {
-    std::pair < ObservableList::iterator,
-                ObservableList::iterator > result;
-
-    result = m_observableList.equal_range(simulator);
-
-    std::list < std::string > toreturn;
-
-    for (ObservableList::iterator it = result.first;
-         it != result.second; ++it) {
-        toreturn.push_back(it->second);
+    if (not m_observableList.empty()) {
+        for (ObservableList::iterator it = m_observableList.begin();
+             it != m_observableList.end(); ++it) {
+            ObservationEvent event(time, it->first, getName(), it->second);
+            value::Value* val = it->first->observation(event);
+            m_stream->process(it->first, it->second, time, getName(), val);
+        }
+    } else {
+        m_stream->process(0, std::string(), time, getName(), 0);
     }
-    return toreturn;
 }
 
 oov::PluginPtr View::plugin() const

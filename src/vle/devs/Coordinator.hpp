@@ -26,17 +26,14 @@
  */
 
 
-#ifndef DEVS_COORDINATOR_HPP
-#define DEVS_COORDINATOR_HPP
+#ifndef VLE_DEVS_COORDINATOR_HPP
+#define VLE_DEVS_COORDINATOR_HPP 1
 
 #include <vle/devs/DllDefines.hpp>
 #include <vle/devs/Simulator.hpp>
-#include <vle/devs/EventView.hpp>
 #include <vle/devs/EventTable.hpp>
 #include <vle/devs/View.hpp>
 #include <vle/devs/Time.hpp>
-#include <vle/devs/TimedView.hpp>
-#include <vle/devs/FinishView.hpp>
 #include <vle/devs/ModelFactory.hpp>
 #include <vle/vpz/Vpz.hpp>
 #include <vle/oov/Plugin.hpp>
@@ -70,7 +67,8 @@ namespace vle { namespace devs {
          * @throw Exception::Internal if a condition have no model port name
          * associed.
          */
-        void init(const vpz::Model& mdls, const Time& current);
+        void init(const vpz::Model& mdls, const Time& current,
+                  const Time& duration);
 
         /**
          * @brief Return the top devs::Time of the devs::EventTable.
@@ -288,6 +286,7 @@ namespace vle { namespace devs {
 
     private:
         Time                        m_currentTime;
+        Time                        m_durationTime;
         SimulatorMap                m_modelList;
         EventTable                  m_eventTable;
         ViewList                    m_viewList;
@@ -297,7 +296,7 @@ namespace vle { namespace devs {
         ModelFactory&               m_modelFactory;
         SimulatorList               m_deletedSimulator;
         SimulatorList::size_type    m_toDelete;
-        ObservationEventList        m_obsEventBuffer;
+        ViewEventList               m_obsEventBuffer;
         bool                        m_isStarted;
 
         /**
@@ -314,8 +313,6 @@ namespace vle { namespace devs {
          */
         StreamWriter* buildOutput(const vpz::View& view,
                                   const vpz::Output& output);
-
-        void addView(devs::View* view);
 
         void processInternalEvent(Simulator* sim,
                                   const EventBagModel& modelbag);
@@ -335,8 +332,9 @@ namespace vle { namespace devs {
          * function and the bag is cleared.
          *
          * @param bag The ObservationEventList to process and clear.
+         * @param time The current time of the simulation.
          */
-        void processTimedObservationEvents(ObservationEventList& bag);
+        void processViewEvents(ViewEventList& bag);
 
         /**
          * @brief build the simulator from the vpz::Model stock.
@@ -382,7 +380,7 @@ namespace vle { namespace devs {
 
 
 
-        void processEventView(Simulator& model, const Event* event = 0);
+        void processEventView(Simulator* model);
 
         /**
          * Set a new date to the Coordinator.

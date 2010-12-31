@@ -243,20 +243,9 @@ void Simulator::request(const RequestEvent& event, const Time& time,
     m_dynamics->request(event, time, output);
 }
 
-ObservationEvent* Simulator::observation(const ObservationEvent& event) const
+value::Value* Simulator::observation(const ObservationEvent& event) const
 {
-    value::Value* val;
-    ObservationEvent* nevent = 0;
-
-    if (m_atomicModel) {
-        val = m_dynamics->observation(event);
-        nevent = new ObservationEvent(event);
-
-        if (val) {
-            nevent->putAttribute(event.getPortName(), val);
-        }
-    }
-    return nevent;
+    return m_dynamics->observation(event);
 }
 
 }} // namespace vle devs

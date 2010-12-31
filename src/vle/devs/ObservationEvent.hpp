@@ -26,8 +26,8 @@
  */
 
 
-#ifndef DEVS_OBSERVATION_EVENT_HPP
-#define DEVS_OBSERVATION_EVENT_HPP
+#ifndef VLE_DEVS_OBSERVATION_EVENT_HPP
+#define VLE_DEVS_OBSERVATION_EVENT_HPP 1
 
 #include <vle/devs/DllDefines.hpp>
 #include <vle/devs/Event.hpp>
@@ -35,101 +35,101 @@
 
 namespace vle { namespace devs {
 
-    /**
-     * @brief State event use to get information from graph::Model using
-     * TimedView or EventView.
-     *
-     */
-    class VLE_DEVS_EXPORT ObservationEvent : public Event
+/**
+ * @brief State event use to get information from graph::Model using
+ * TimedView or EventView.
+ *
+ */
+class VLE_DEVS_EXPORT ObservationEvent : public Event
+{
+public:
+    ObservationEvent(const Time& time,
+                     Simulator* model,
+                     const std::string& viewname,
+                     const std::string& portName) :
+        Event(model),
+        m_time(time),
+        m_viewName(viewname),
+        m_portName(portName)
     {
-    public:
-	ObservationEvent(const Time& time,
-		   Simulator* model,
-		   const std::string& viewname,
-		   const std::string& portName) :
-            Event(model),
-            m_time(time),
-	    m_viewName(viewname),
-	    m_portName(portName)
-	{
-	    deleter();
-	}
-
-	ObservationEvent(const ObservationEvent& event) :
-            Event(event),
-            m_time(event.m_time),
-	    m_viewName(event.m_viewName),
-	    m_portName(event.m_portName)
-	{
-	    deleter();
-	}
-
-        virtual ~ObservationEvent()
-        {}
-
-	inline const std::string& getViewName() const
-        { return m_viewName; }
-
-	inline const std::string& getPortName() const
-        { return m_portName; }
-
-        virtual bool isObservation() const
-        { return true; }
-
-	inline bool onPort(std::string const& portName) const
-        { return m_portName == portName; }
-
-        /**
-	 * @return arrived time.
-	 */
-        inline const Time& getTime() const
-        { return m_time; }
-
-        /**
-	 * Inferior comparator use Time as key.
-         *
-	 * @param event Event to test, no test on validity.
-         * @return true if this Event is inferior to event.
-         */
-        inline bool operator<(const ObservationEvent* event) const
-        { return m_time < event->m_time; }
-
-        /**
-         * Superior comparator use Time as key.
-         *
-         * @param event Event to test, no test on validity.
-         *
-         * @return true if this Event is superior to event.
-         */
-        inline bool operator>(const ObservationEvent* event) const
-        { return m_time > event->m_time; }
-
-        /**
-         * Equality comparator use Time as key.
-         *
-         * @param event Event to test, no test on validity.
-         *
-         * @return true if this Event is equal to  event.
-         */
-        inline bool operator==(const ObservationEvent * event) const
-        { return m_time == event->m_time; }
-
-    private:
-        Time        m_time;
-	std::string m_viewName;
-	std::string m_portName;
-    };
-
-    inline std::ostream& operator<<(std::ostream& o, const ObservationEvent& evt)
-    {
-        return o << "from: '" << evt.getViewName()
-            << "' port: '" << evt.getPortName() << "'";
+        deleter();
     }
 
+    ObservationEvent(const ObservationEvent& event) :
+        Event(event),
+        m_time(event.m_time),
+        m_viewName(event.m_viewName),
+        m_portName(event.m_portName)
+    {
+        deleter();
+    }
+
+    virtual ~ObservationEvent()
+    {}
+
+    inline const std::string& getViewName() const
+    { return m_viewName; }
+
+    inline const std::string& getPortName() const
+    { return m_portName; }
+
+    virtual bool isObservation() const
+    { return true; }
+
+    inline bool onPort(std::string const& portName) const
+    { return m_portName == portName; }
+
     /**
-     * @brief Define a vector pointer of ObservationEvent.
+     * @return arrived time.
      */
-    typedef std::vector < ObservationEvent* > ObservationEventList;
+    inline const Time& getTime() const
+    { return m_time; }
+
+    /**
+     * Inferior comparator use Time as key.
+     *
+     * @param event Event to test, no test on validity.
+     * @return true if this Event is inferior to event.
+     */
+    inline bool operator<(const ObservationEvent* event) const
+    { return m_time < event->m_time; }
+
+    /**
+     * Superior comparator use Time as key.
+     *
+     * @param event Event to test, no test on validity.
+     *
+     * @return true if this Event is superior to event.
+     */
+    inline bool operator>(const ObservationEvent* event) const
+    { return m_time > event->m_time; }
+
+    /**
+     * Equality comparator use Time as key.
+     *
+     * @param event Event to test, no test on validity.
+     *
+     * @return true if this Event is equal to  event.
+     */
+    inline bool operator==(const ObservationEvent * event) const
+    { return m_time == event->m_time; }
+
+private:
+    Time        m_time;
+    std::string m_viewName;
+    std::string m_portName;
+};
+
+inline std::ostream& operator<<(std::ostream& o, const ObservationEvent& evt)
+{
+    return o << "from: '" << evt.getViewName()
+        << "' port: '" << evt.getPortName() << "'";
+}
+
+/**
+ * @brief Define a vector pointer of ObservationEvent.
+ */
+typedef std::vector < ObservationEvent* > ObservationEventList;
 
 }} // namespace vle devs
 

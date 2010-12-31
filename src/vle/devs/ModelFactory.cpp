@@ -181,6 +181,7 @@ void ModelFactory::createModel(Coordinator& coordinator,
     if (not observable.empty()) {
         vpz::Observable& ob(mExperiment.views().observables().get(observable));
         const vpz::ObservablePortList& lst(ob.observableportlist());
+
         for (vpz::ObservablePortList::const_iterator it = lst.begin();
              it != lst.end(); ++it) {
             const vpz::ViewNameList& vnlst(it->second.viewnamelist());
@@ -195,11 +196,8 @@ void ModelFactory::createModel(Coordinator& coordinator,
                                 "view list")) % *jt);
                 }
 
-                ObservationEvent* evt = view->addObservable(
-                    sim, it->first, coordinator.getCurrentTime());
-                if (evt) {
-                    coordinator.eventtable().putObservationEvent(evt);
-                }
+                view->addObservable(sim, it->first,
+                                    coordinator.getCurrentTime());
             }
         }
     }

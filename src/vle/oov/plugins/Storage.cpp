@@ -147,10 +147,12 @@ void Storage::onValue(const std::string& simulator,
         }
     }
 
-    std::string name(parent);
-    name += ":";
-    name += simulator;
-    m_matrix.addValue(name, port, value);
+    if (not simulator.empty()) {
+        std::string name(parent);
+        name += ":";
+        name += simulator;
+        m_matrix.addValue(name, port, value);
+    }
 }
 
 void Storage::close(const double& /* time */)

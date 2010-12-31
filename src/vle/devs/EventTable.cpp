@@ -70,8 +70,7 @@ void CompleteEventBagModel::invalidateModel(Simulator* mdl)
         it->second.clear();
     }
 
-    std::for_each(_states.begin(), _states.end(),
-                  Event::InvalidateSimulator(mdl));
+    _states.remove(mdl);
 }
 
 void CompleteEventBagModel::delModel(Simulator* mdl)
@@ -84,27 +83,9 @@ void CompleteEventBagModel::delModel(Simulator* mdl)
         }
     }
 
-    ObservationEventList::iterator it = _states.begin();
-    size_t previous = 0;
-
-    while (it != _states.end()) {
-        if ((*it)->getModel() == mdl) {
-            if (it == _states.begin()) {
-                _states.erase(it);
-                it = _states.begin();
-                previous = 0;
-            } else if (it == _states.end() - 1) {
-                _states.erase(it);
-                it = _states.end();
-            } else {
-                _states.erase(it);
-                it = _states.begin() + previous;
-            }
-        } else {
-            ++it;
-            ++previous;
-        }
-    }
+    std::for_each(_states.begin(),
+                  _states.end(),
+                  ViewEventList::RemoveSimulator(mdl));
 }
 
 EventTable::EventTable(size_t sz)
@@ -123,7 +104,7 @@ EventTable::~EventTable()
     }
 
     {
-	ObservationEventList::iterator it = mObservationEventList.begin();
+        ViewEventList::iterator it = mObservationEventList.begin();
 	while (it != mObservationEventList.end()) {
 	    delete (*it);
 	    ++it;
@@ -163,17 +144,6 @@ void EventTable::cleanInternalEventList()
 
 }
 
-void EventTable::cleanObservationEventList()
-{
-    while (not mObservationEventList.empty() and
-           not mObservationEventList[0]->isValid()) {
-        delete mObservationEventList[0];
-        std::pop_heap(mObservationEventList.begin(), mObservationEventList.end(),
-                      stateLessThan);
-        mObservationEventList.pop_back();
-    }
-}
-
 const Time& EventTable::topEvent()
 {
     if (not mExternalEventModel.empty()) {
@@ -181,21 +151,19 @@ const Time& EventTable::topEvent()
     } else {
         cleanInternalEventList();
         if (not mInternalEventList.empty()) {
-            cleanObservationEventList();
             if (not mObservationEventList.empty()) {
                 if (mInternalEventList[0]->getTime() <=
-                    mObservationEventList[0]->getTime()) {
+                    mObservationEventList.front()->getTime()) {
                     return mInternalEventList[0]->getTime();
                 } else {
-                    return mObservationEventList[0]->getTime();
+                    return mObservationEventList.front()->getTime();
                 }
             } else {
                 return mInternalEventList[0]->getTime();
             }
         } else {
-            cleanObservationEventList();
             if (not mObservationEventList.empty()) {
-                return mObservationEventList[0]->getTime();
+                return mObservationEventList.front()->getTime();
             } else {
                 return Time::infinity;
             }
@@ -228,8 +196,8 @@ CompleteEventBagModel& EventTable::popEvent()
 
 	if (mCompleteEventBagModel.emptyBag())
 	  while (not mObservationEventList.empty() and
-		 mObservationEventList[0]->getTime() == mCurrentTime) {
-	    mCompleteEventBagModel.addState(mObservationEventList[0]);
+		 mObservationEventList.front()->getTime() == mCurrentTime) {
+	    mCompleteEventBagModel.addState(mObservationEventList.front());
 	    popObservationEvent();
 	  }
     }
@@ -276,11 +244,11 @@ bool EventTable::putRequestEvent(RequestEvent* event)
     return true;
 }
 
-bool EventTable::putObservationEvent(ObservationEvent* event)
+bool EventTable::putObservationEvent(ViewEvent* event)
 {
-    mObservationEventList.push_back(event);
+    mObservationEventList.add(event);
     std::push_heap(mObservationEventList.begin(), mObservationEventList.end(),
-                   stateLessThan);
+                   viewEventLessThan);
 
     return true;
 }
@@ -303,9 +271,10 @@ void EventTable::popInternalEvent()
 void EventTable::popObservationEvent()
 {
     if (not mObservationEventList.empty()) {
-        std::pop_heap(mObservationEventList.begin(), mObservationEventList.end(),
-                      stateLessThan);
-        mObservationEventList.pop_back();
+        std::pop_heap(mObservationEventList.begin(),
+                      mObservationEventList.end(),
+                      viewEventLessThan);
+        mObservationEventList.pop();
     }
 }
 
@@ -329,9 +298,7 @@ void EventTable::invalidateModel(Simulator* mdl)
         }
     }
 
-    std::for_each(mObservationEventList.begin(), mObservationEventList.end(),
-                  Event::InvalidateSimulator(mdl));
-
+    mObservationEventList.remove(mdl);
     mCompleteEventBagModel.invalidateModel(mdl);
 }
 
@@ -355,9 +322,7 @@ void EventTable::delModelEvents(Simulator* mdl)
         }
     }
 
-    std::for_each(mObservationEventList.begin(), mObservationEventList.end(),
-                  Event::InvalidateSimulator(mdl));
-
+    mObservationEventList.remove(mdl);
     mCompleteEventBagModel.delModel(mdl);
 }
 

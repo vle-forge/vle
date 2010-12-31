@@ -78,7 +78,7 @@ void RootCoordinator::load(const vpz::Vpz& io)
                                       *this);
 
     m_coordinator = new Coordinator(*m_modelfactory);
-    m_coordinator->init(io.project().model(), m_currentTime);
+    m_coordinator->init(io.project().model(), m_currentTime, m_end);
 
     m_root = io.project().model().model();
 }

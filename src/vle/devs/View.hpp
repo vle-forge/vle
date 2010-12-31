@@ -27,129 +27,205 @@
 
 
 #ifndef VLE_DEVS_VIEW_HPP
-#define VLE_DEVS_VIEW_HPP
+#define VLE_DEVS_VIEW_HPP 1
 
 #include <vle/devs/DllDefines.hpp>
-#include <vle/devs/Observable.hpp>
-#include <vle/devs/ObservationEvent.hpp>
+#include <vle/devs/Time.hpp>
 #include <vle/oov/Plugin.hpp>
-#include <vle/graph/AtomicModel.hpp>
 #include <vle/utils/Tools.hpp>
 #include <string>
+#include <map>
 #include <vector>
 
 namespace vle { namespace devs {
 
-    class StreamWriter;
-    class View;
+class Simulator;
+class StreamWriter;
+class View;
 
-    typedef std::map < std::string, devs::View* > ViewList;
+typedef std::multimap < Simulator*, std::string > ObservableList;
+typedef std::map < std::string, View* > ViewList;
+
+/**
+ * @brief Represent a View on a devs::Simulator and a port name.
+ *
+ */
+class VLE_DEVS_EXPORT View
+{
+public:
+    View(const std::string& name, StreamWriter* stream)
+        : m_name(name), m_stream(stream), m_size(0)
+    {}
+
+    virtual ~View();
+
+    void addObservable(Simulator* model,
+                       const std::string& portName,
+                       const Time& currenttime);
+
+    void finish(const Time& time);
+
+    virtual bool isEvent() const
+    { return false; }
+
+    virtual bool isTimed() const
+    { return false; }
+
+    virtual bool isFinish() const
+    { return false; }
+
+    void run(const Time& current);
+
+    virtual Time getNextTime(const Time& current) const = 0;
 
     /**
-     * @brief Represent a View on a devs::Simulator and a port name.
-     *
+     * Delete an observable for a specified Simulator. If model does not
+     * exist, nothing is produce otherwise, the stream receives a message
+     * that a observable is dead.
+     * @param model delete observable attached to the specified
+     * Simulator.
      */
-    class VLE_DEVS_EXPORT View
+    void removeObservable(Simulator* model);
+
+    /**
+     * @brief Test if a simulator is already connected with the same port
+     * to the View.
+     * @param simulator the simulator to observe.
+     * @param portname the port of the simulator to observe.
+     * @return true if simulator is already connected with the same port.
+     */
+    bool exist(Simulator* simulator, const std::string& portname) const;
+
+    /**
+     * @brief Test if a simulator is already connected to the View.
+     * @param simulator the simulator to search.
+     * @return true if simulator is already connected.
+     */
+    bool exist(Simulator* simulator) const;
+
+    //
+    // Get/Set functions
+    //
+
+    inline const std::string& getName() const
+    { return m_name; }
+
+    inline const ObservableList& getObservableList() const
+    { return m_observableList; }
+
+    inline unsigned int getSize() const
+    { return m_size; }
+
+    inline StreamWriter * getStream() const
+    { return m_stream; }
+
+    /**
+     * @brief Get the current reference of the plugin.
+     * @return A reference to the plugin.
+     */
+    oov::PluginPtr plugin() const;
+
+    /**
+     * @brief Ask to the StreamWriter a new reference of the plugin and
+     * affect it to the local reference. If the plugin receive from the
+     * StreamWriter is null, then, the previous plugin is not modified.
+     * @return A reference ot the plugin.
+     */
+    oov::PluginPtr updatePlugin();
+
+    struct GetOovPlugin
     {
-    public:
-        View(const std::string& name, StreamWriter* stream);
-
-        virtual ~View();
-
-        ObservationEvent* addObservable(Simulator* model,
-                                  const std::string& portName,
-                                  const Time& currenttime);
-
-        void finish(const Time& time);
-
-        virtual bool isEvent() const
-        { return false; }
-
-        virtual bool isTimed() const
-        { return false; }
-
-        virtual bool isFinish() const
-        { return false; }
-
-        virtual devs::ObservationEvent* processObservationEvent(
-            devs::ObservationEvent* event) = 0;
-
-	/**
-	 * Delete an observable for a specified Simulator. If model does not
-         * exist, nothing is produce otherwise, the stream receives a message
-         * that a observable is dead.
-	 * @param model delete observable attached to the specified
-	 * Simulator.
-	 */
-	void removeObservable(Simulator* model);
-
-        /**
-         * @brief Test if a simulator is already connected with the same port
-         * to the View.
-         * @param simulator the simulator to observe.
-         * @param portname the port of the simulator to observe.
-         * @return true if simulator is already connected with the same port.
-         */
-        bool exist(Simulator* simulator, const std::string& portname) const;
-
-        /**
-         * @brief Test if a simulator is already connected to the View.
-         * @param simulator the simulator to search.
-         * @return true if simulator is already connected.
-         */
-        bool exist(Simulator* simulator) const;
-
-        /**
-         * @brief Get the portnames of the Simulator.
-         * @param simulator the simulator to search.
-         * @return the list of portname of the value.
-         * @throw utils::InternalError if simulator does not exist.
-         */
-        std::list < std::string > get(Simulator* simulator);
-
-        //
-        // Get/Set functions
-        //
-
-        inline const std::string& getName() const
-        { return m_name; }
-
-        inline const ObservableList& getObservableList() const
-        { return m_observableList; }
-
-        inline unsigned int getSize() const
-        { return m_size; }
-
-        inline vle::devs::StreamWriter * getStream() const
-        { return m_stream; }
-
-        /**
-         * @brief Get the current reference of the plugin.
-         * @return A reference to the plugin.
-         */
-        oov::PluginPtr plugin() const;
-
-        /**
-         * @brief Ask to the StreamWriter a new reference of the plugin and
-         * affect it to the local reference. If the plugin receive from the
-         * StreamWriter is null, then, the previous plugin is not modified.
-         * @return A reference ot the plugin.
-         */
-        oov::PluginPtr updatePlugin();
-
-        struct GetOovPlugin
-        {
-            oov::PluginPtr operator()(const ViewList::value_type& x)
-            { return x.second->plugin(); }
-        };
-
-    protected:
-        ObservableList      m_observableList;
-        std::string         m_name;
-        StreamWriter*       m_stream;
-        size_t              m_size;
-        oov::PluginPtr      m_plugin;
+        oov::PluginPtr operator()(const ViewList::value_type& x)
+        { return x.second->plugin(); }
     };
+
+protected:
+    ObservableList      m_observableList;
+    std::string         m_name;
+    StreamWriter*       m_stream;
+    size_t              m_size;
+    oov::PluginPtr      m_plugin;
+};
+
+/**
+ * @brief Define a Timed View base on devs::View class. This class
+ * build state event with timed clock.
+ */
+class VLE_DEVS_EXPORT TimedView : public View
+{
+public:
+    TimedView(const std::string& name, StreamWriter* stream,
+              const Time& timestep)
+        : View(name, stream), mTimestep(timestep)
+    {}
+
+    virtual ~TimedView()
+    {}
+
+    virtual bool isTimed() const
+    { return true; }
+
+    virtual Time getNextTime(const Time& current) const
+    {
+        return current + mTimestep;
+    }
+
+private:
+    Time mTimestep;
+};
+
+/**
+ * @brief Define a Event View base on devs::View class. This class
+ * build state event when event are push.
+ */
+class VLE_DEVS_EXPORT EventView : public View
+{
+public:
+    EventView(const std::string& name, StreamWriter* stream)
+        : View(name, stream)
+    {}
+
+    virtual ~EventView()
+    {}
+
+    virtual bool isEvent() const
+    { return true; }
+
+    virtual Time getNextTime(const Time& /*current*/) const
+    {
+        return Time::infinity;
+    }
+};
+
+/**
+ * @brief Define a Finish view based on devs::View class. This class build
+ * state event only at the end of the simulation.
+ */
+class VLE_DEVS_EXPORT FinishView : public View
+{
+public:
+    FinishView(const std::string& name, StreamWriter* stream, const Time& last)
+        : View(name, stream), mLast(last)
+    {}
+
+    virtual ~FinishView()
+    {}
+
+    virtual bool isFinish() const
+    { return true; }
+
+    virtual Time getNextTime(const Time& /*current*/) const
+    {
+        return Time::infinity;
+    }
+
+private:
+    Time mLast;
+};
+
+typedef std::map < std::string, FinishView* > FinishViewList;
+typedef std::map < std::string, EventView* > EventViewList;
+typedef std::map < std::string, TimedView* > TimedViewList;
 
 }} // namespace vle devs
 

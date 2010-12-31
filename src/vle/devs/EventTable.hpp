@@ -35,6 +35,7 @@
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/devs/RequestEvent.hpp>
 #include <vle/devs/ObservationEvent.hpp>
+#include <vle/devs/ViewEvent.hpp>
 #include <vle/devs/EventList.hpp>
 #include <vle/devs/Simulator.hpp>
 #include <vle/devs/Dynamics.hpp>
@@ -63,8 +64,8 @@ namespace vle { namespace devs {
      * @param e2 second event to compare.
      * @return true if devs::Time e1 is more recent than devs::Time e2.
      */
-    inline bool stateLessThan(const ObservationEvent* e1,
-                              const ObservationEvent* e2)
+    inline bool viewEventLessThan(const ViewEvent* e1,
+                                  const ViewEvent* e2)
     { return (e1->getTime() > e2->getTime()); }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -202,8 +203,8 @@ namespace vle { namespace devs {
         { getBag(m).addRequest(evt); }
 
 
-        inline void addState(ObservationEvent* ev)
-        { _states.push_back(ev); }
+        inline void addState(ViewEvent* ev)
+        { _states.add(ev); }
 
 
         inline bool empty()
@@ -224,18 +225,21 @@ namespace vle { namespace devs {
          */
         std::map < Simulator*, EventBagModel >::value_type& topBag();
 
-        inline ObservationEvent* topObservationEvent()
+        inline ViewEvent* topObservationEvent()
         { return _states.front(); }
 
-        inline ObservationEventList& states()
+        inline ViewEventList& states()
         { return _states; }
 
 
         inline void popBag()
         { _bags.erase(_bags.begin()); }
 
-        inline void popStates()
+        inline void clearStates()
         { _states.clear(); }
+
+        inline void deleteStates()
+        { _states.erase(); }
 
         void invalidateModel(Simulator*);
 
@@ -262,7 +266,7 @@ namespace vle { namespace devs {
         std::list < std::map < Simulator*, EventBagModel >::value_type* > _exec;
         std::list < std::map < Simulator*, EventBagModel >::value_type* >::iterator _itexec;
 
-        ObservationEventList _states;
+        ViewEventList _states;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -342,7 +346,7 @@ namespace vle { namespace devs {
          *
          * @param event state event to push into vector heap.
          */
-        bool putObservationEvent(ObservationEvent* event);
+        bool putObservationEvent(ViewEvent* event);
 
         /**
          * Return the current simulation Time ie. during the latest popEvent.
@@ -389,17 +393,11 @@ namespace vle { namespace devs {
          */
         void cleanInternalEventList();
 
-        /**
-         * @brief delete the first invalid ObservationEvent from
-         * ObservationEventList.
-         */
-        void cleanObservationEventList();
-
 	/// scheduller for internal event.
 	InternalEventList mInternalEventList;
 
 	/// scheduller for state events.
-	ObservationEventList    mObservationEventList;
+	ViewEventList mObservationEventList;
 
 	/// table to quick found event.
 	InternalEventModel mInternalEventModel;

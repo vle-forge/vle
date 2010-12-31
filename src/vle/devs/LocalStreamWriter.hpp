@@ -65,7 +65,11 @@ namespace vle { namespace devs {
                                              const devs::Time& time,
                                              const std::string& view);
 
-        virtual void process(ObservationEvent& event);
+        virtual void process(Simulator* simulator,
+                             const std::string& portname,
+                             const devs::Time& time,
+                             const std::string& view,
+                             value::Value* value);
 
         virtual oov::PluginPtr close(const devs::Time& time);
 

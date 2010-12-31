@@ -27,36 +27,34 @@
 
 
 #ifndef VLE_DEVS_DEVS_HPP
-#define VLE_DEVS_DEVS_HPP
+#define VLE_DEVS_DEVS_HPP 1
 
 #include <vle/devs/Attribute.hpp>
 #include <vle/devs/Coordinator.hpp>
+#include <vle/devs/DllDefines.hpp>
+#include <vle/devs/DynamicsDbg.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/devs/DynamicsWrapper.hpp>
 #include <vle/devs/Event.hpp>
 #include <vle/devs/EventList.hpp>
 #include <vle/devs/EventTable.hpp>
-#include <vle/devs/EventView.hpp>
+#include <vle/devs/ExecutiveDbg.hpp>
 #include <vle/devs/Executive.hpp>
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/devs/ExternalEventList.hpp>
-#include <vle/devs/FinishView.hpp>
 #include <vle/devs/InternalEvent.hpp>
 #include <vle/devs/LocalStreamWriter.hpp>
 #include <vle/devs/ModelFactory.hpp>
 #include <vle/devs/NetStreamWriter.hpp>
-#include <vle/devs/Observable.hpp>
 #include <vle/devs/ObservationEvent.hpp>
 #include <vle/devs/RequestEvent.hpp>
 #include <vle/devs/RequestEventList.hpp>
 #include <vle/devs/RootCoordinator.hpp>
 #include <vle/devs/Simulator.hpp>
 #include <vle/devs/StreamWriter.hpp>
-#include <vle/devs/TimedView.hpp>
 #include <vle/devs/Time.hpp>
+#include <vle/devs/ViewEvent.hpp>
 #include <vle/devs/View.hpp>
-
-
 
 namespace vle {
 

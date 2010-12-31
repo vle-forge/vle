@@ -125,22 +125,27 @@ void NetStreamWriter::processRemoveObservable(Simulator* simulator,
     }
 }
 
-void NetStreamWriter::process(ObservationEvent& event)
+void NetStreamWriter::process(Simulator* simulator,
+                              const std::string& portname,
+                              const devs::Time& time,
+                              const std::string& view,
+                              value::Value* val)
 {
-    value::Value* val = 0;
-    if (event.haveAttributes()) {
-        value::Map::iterator
-            it(event.getAttributes().value().find(event.getPortName()));
-        if (it != event.getAttributes().value().end()) {
-            val = it->second;
-            it->second = 0;
-            event.getAttributes().value().erase(it);
-        }
+    if (simulator) {
+        buildValue(simulator->getName(),
+                   simulator->getParent(),
+                   portname,
+                   view,
+                   time,
+                   val);
+    } else {
+        buildValue(std::string(),
+                   std::string(),
+                   portname,
+                   view,
+                   time,
+                   val);
     }
-
-    buildValue(event.getModel()->getName(), event.getModel()->getParent(),
-               event.getPortName(), event.getViewName(),
-               event.getTime().getValue(), val);
 
     std::string out;
     value::Set::serializeBinaryBuffer(*m_valueFrame, out);

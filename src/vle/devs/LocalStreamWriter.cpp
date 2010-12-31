@@ -62,25 +62,27 @@ void LocalStreamWriter::processRemoveObservable(Simulator* simulator,
                              portname, view, time.getValue());
 }
 
-void LocalStreamWriter::process(ObservationEvent& event)
+void LocalStreamWriter::process(Simulator* simulator,
+                                const std::string& portname,
+                                const devs::Time& time,
+                                const std::string& view,
+                                value::Value* val)
 {
-    value::Value* val = 0;
-    if (event.haveAttributes()) {
-        value::Map::iterator
-            it(event.getAttributes().value().find(event.getPortName()));
-        if (it != event.getAttributes().value().end()) {
-            val = it->second;
-            it->second = 0;
-            event.getAttributes().value().erase(it);
-        }
+    if (simulator) {
+        m_reader.onValue(simulator->getName(),
+                         simulator->getParent(),
+                         portname,
+                         view,
+                         time,
+                         val);
+    } else {
+        m_reader.onValue(std::string(),
+                         std::string(),
+                         portname,
+                         view,
+                         time,
+                         val);
     }
-
-    m_reader.onValue(event.getModel()->getName(),
-                     event.getModel()->getParent(),
-                     event.getPortName(),
-                     event.getViewName(),
-                     event.getTime().getValue(),
-                     val);
 }
 
 oov::PluginPtr LocalStreamWriter::close(const devs::Time& time)
