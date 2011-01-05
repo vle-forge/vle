@@ -613,3 +613,34 @@ BOOST_AUTO_TEST_CASE(test_equation15)
     BOOST_REQUIRE_CLOSE(value::toDouble(result[4][10]), 145., 10e-5);
     BOOST_REQUIRE_CLOSE(value::toDouble(result[5][10]), 657., 10e-5);
 }
+
+BOOST_AUTO_TEST_CASE(test_asynchronous)
+{
+    vpz::Vpz file(utils::Path::path().getExampleFile("asynchronous.vpz"));
+
+    vpz::Output& o(file.project().experiment().views().outputs().get("view"));
+    o.setLocalStream("", "storage");
+
+    manager::RunQuiet r;
+    r.start(file);
+
+    BOOST_REQUIRE_EQUAL(r.haveError(), false);
+    oov::OutputMatrixViewList& out(r.outputs());
+    BOOST_REQUIRE_EQUAL(out.size(),
+        (oov::OutputMatrixViewList::size_type)1);
+
+    oov::OutputMatrix& view(out["view"]);
+    value::MatrixView result(view.values());
+
+    BOOST_REQUIRE_EQUAL(result.shape()[0],
+        (value::MatrixView::size_type)5);
+    BOOST_REQUIRE_EQUAL(result.shape()[1],
+        (value::MatrixView::size_type)6);
+
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][0]), 0, 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][1]), 5, 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][2]), 6, 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][3]), 6, 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][4]), 7, 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][5]), 6, 10e-5);
+}

@@ -383,7 +383,9 @@ void Base::processUpdate(const std::string& name,
                     mExternalValues[name].pop_front();
                     mReceivedValues[name] = false;
                     if (mState == INIT or (mState == PRE and end)) {
-                        --mReceive;
+                        if (sync) {
+                            --mReceive;
+                        }
                     }
                 }
             }
