@@ -45,6 +45,7 @@ Base::Base(const DynamicsInit& model,
     mTimeStep(0),
     mTimeStepUnit(vle::utils::DateTime::None),
     mMode(NAME),
+    mNosyncDependance(false),
     mControl(control),
     mSynchro(false),
     mAllSynchro(false),
@@ -729,7 +730,18 @@ void Base::externalTransition(const ExternalEventList& event,
 
         if (mState == INIT) {
             pushNoEDValues();
-            if (mWaiting <= 0) {
+
+            bool ok = true;
+
+            if (mNosyncDependance) {
+                for (ValuesMapIterator ite = mExternalValues.begin();
+                     ite != mExternalValues.end() and ok; ++ite) {
+                    ok = mSynchros.find(ite->first) != mSynchros.end() or
+                        not mInitExternalValues[ite->first].empty();
+                }
+            }
+
+            if (mWaiting <= 0 and ok) {
                 if (not check()) {
                     initValues(time);
                     mSigma = 0;

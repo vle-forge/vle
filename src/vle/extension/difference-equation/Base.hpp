@@ -199,6 +199,9 @@ public:
     inline Nosync createNosync(const std::string& name)
     { return Base::Nosync(name, this); }
 
+    void enableNosyncDependance()
+    { mNosyncDependance = true; }
+
     int phase() const
     { return mPhase; }
 
@@ -366,6 +369,7 @@ protected:
     SizeMap mSize;
     mode mMode;
     Mapping mMapping;
+    bool mNosyncDependance; // if nosync variable use in initvalue()
 
     // perturbation info section
     Perturbations mPerturbations;
