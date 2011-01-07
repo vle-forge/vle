@@ -27,41 +27,41 @@
 
 
 #ifndef VLE_OOV_PLUGINS_FILETYPE_HPP
-#define VLE_OOV_PLUGINS_FILETYPE_HPP
+#define VLE_OOV_PLUGINS_FILETYPE_HPP 1
 
 #include <vle/oov/plugins/File.hpp>
 
 namespace vle { namespace oov { namespace plugin {
 
-    class Rdata : public File::FileType
-    {
-    public:
-        virtual std::string extension() const;
+class Rdata : public File::FileType
+{
+public:
+    virtual std::string extension() const;
 
-        virtual void writeSeparator(std::ostream& out);
+    virtual void writeSeparator(std::ostream& out);
 
-        virtual void writeHead(std::ostream& out, const File::Strings& heads);
-    };
+    virtual void writeHead(std::ostream& out, const File::Strings& heads);
+};
 
-    class CSV : public File::FileType
-    {
-    public:
-        virtual std::string extension() const;
+class CSV : public File::FileType
+{
+public:
+    virtual std::string extension() const;
 
-        virtual void writeSeparator(std::ostream& out);
+    virtual void writeSeparator(std::ostream& out);
 
-        virtual void writeHead(std::ostream& out, const File::Strings& heads);
-    };
+    virtual void writeHead(std::ostream& out, const File::Strings& heads);
+};
 
-    class Text : public File::FileType
-    {
-    public:
-        virtual std::string extension() const;
+class Text : public File::FileType
+{
+public:
+    virtual std::string extension() const;
 
-        virtual void writeSeparator(std::ostream& out);
+    virtual void writeSeparator(std::ostream& out);
 
-        virtual void writeHead(std::ostream& out, const File::Strings& heads);
-    };
+    virtual void writeHead(std::ostream& out, const File::Strings& heads);
+};
 
 }}} // namespace vle oov plugin
 

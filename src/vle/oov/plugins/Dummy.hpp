@@ -27,11 +27,9 @@
 
 
 #ifndef VLE_OOV_PLUGINS_DUMMY_HPP
-#define VLE_OOV_PLUGINS_DUMMY_HPP
+#define VLE_OOV_PLUGINS_DUMMY_HPP 1
 
 #include <vle/oov/Plugin.hpp>
-
-
 
 namespace vle { namespace oov { namespace plugin {
 
@@ -70,10 +68,9 @@ public:
     virtual void close(const double& time);
 };
 
+}}} // namespace vle oov plugin
 
 DECLARE_OOV_PLUGIN(vle::oov::plugin::Dummy)
-
-}}} // namespace vle oov plugin
 
 #endif
 

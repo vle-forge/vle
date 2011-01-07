@@ -9,56 +9,12 @@ LINK_DIRECTORIES(
   ${GLIBMM_LIBRARY_DIRS}
   ${LIBXML_LIBRARY_DIR})
 
-ADD_LIBRARY(default SHARED Default.cpp Default.hpp)
 ADD_LIBRARY(dummy SHARED Dummy.cpp Dummy.hpp)
-ADD_LIBRARY(text SHARED Text.cpp Text.hpp)
-ADD_LIBRARY(rdata SHARED Rdata.cpp Rdata.hpp)
-ADD_LIBRARY(csv SHARED csv.cpp csv.hpp)
 ADD_LIBRARY(file SHARED File.cpp File.hpp FileType.cpp FileType.hpp)
 ADD_LIBRARY(storage SHARED Storage.cpp Storage.hpp)
 ADD_LIBRARY(console SHARED Console.cpp)
 
 TARGET_LINK_LIBRARIES(dummy
-  ${GLIBMM_LIBRARIES}
-  ${LIBXML_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  vlegeometry
-  vleutils
-  vlevalue
-  vlegraph
-  vleoov)
-
-TARGET_LINK_LIBRARIES(default
-  ${GLIBMM_LIBRARIES}
-  ${LIBXML_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  vlegeometry
-  vleutils
-  vlevalue
-  vlegraph
-  vleoov)
-
-TARGET_LINK_LIBRARIES(text
-  ${GLIBMM_LIBRARIES}
-  ${LIBXML_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  vlegeometry
-  vleutils
-  vlevalue
-  vlegraph
-  vleoov)
-
-TARGET_LINK_LIBRARIES(rdata
-  ${GLIBMM_LIBRARIES}
-  ${LIBXML_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  vlegeometry
-  vleutils
-  vlevalue
-  vlegraph
-  vleoov)
-
-TARGET_LINK_LIBRARIES(csv
   ${GLIBMM_LIBRARIES}
   ${LIBXML_LIBRARIES}
   ${GTHREAD_LIBRARIES}
@@ -99,22 +55,6 @@ TARGET_LINK_LIBRARIES(storage
   vleoov)
 
 INSTALL(TARGETS dummy
-  RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/stream"
-  LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/stream")
-
-INSTALL(TARGETS default
-  RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/stream"
-  LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/stream")
-
-INSTALL(TARGETS text
-  RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/stream"
-  LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/stream")
-
-INSTALL(TARGETS rdata
-  RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/stream"
-  LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/stream")
-
-INSTALL(TARGETS csv
   RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/stream"
   LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/stream")
 

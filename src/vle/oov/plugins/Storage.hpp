@@ -26,8 +26,8 @@
  */
 
 
-#ifndef VLE_OOV_PLUGINS_RPLUG_HPP
-#define VLE_OOV_PLUGINS_RPLUG_HPP
+#ifndef VLE_OOV_PLUGINS_STORAGE_HPP
+#define VLE_OOV_PLUGINS_STORAGE_HPP 1
 
 #include <vle/oov/Plugin.hpp>
 #include <vle/oov/OutputMatrix.hpp>
@@ -35,131 +35,130 @@
 #include <map>
 #include <vector>
 
-
 namespace vle { namespace oov { namespace plugin {
 
-    class Storage : public Plugin
-    {
-    public:
-        Storage(const std::string& location);
+class Storage : public Plugin
+{
+public:
+    Storage(const std::string& location);
 
-        virtual ~Storage();
+    virtual ~Storage();
 
-        virtual bool isSerializable() const;
+    virtual bool isSerializable() const;
 
-        /**
-         * @brief Serialize the storage plugin data's to and output values. The
-         * serialization is defined like:
-         * @code
-         * <set>
-         *  <integer>nbcolumns</integer> <!-- x number of columns -->
-         *  <integer>nbrow</integer>     <!-- y number of rows -->
-         *  <double>time</double>        <!-- double time -->
-         *  <set>                        <!-- x set to represents -->
-         *   <string>model</string>      <!-- model name -->
-         *   <string>port</string>       <!-- port name -->
-         *   <integer>index</integer>    <!-- index in the data array -->
-         *  </set>
-         *  [...] <!-- x number -->
-         *  <set>                        <!-- and now, the big array -->
-         *   <set>                       <!-- y row -->
-         *    [...]                      <!-- x columns -->
-         *  </set>
-         * </set>
-         * @endcode
-         * @param pluginname Name of this plugins
-         * @return The serialized Storage plugin data's.
-         */
-        virtual value::Value* serialize() const;
+    /**
+     * @brief Serialize the storage plugin data's to and output values. The
+     * serialization is defined like:
+     * @code
+     * <set>
+     *  <integer>nbcolumns</integer> <!-- x number of columns -->
+     *  <integer>nbrow</integer>     <!-- y number of rows -->
+     *  <double>time</double>        <!-- double time -->
+     *  <set>                        <!-- x set to represents -->
+     *   <string>model</string>      <!-- model name -->
+     *   <string>port</string>       <!-- port name -->
+     *   <integer>index</integer>    <!-- index in the data array -->
+     *  </set>
+     *  [...] <!-- x number -->
+     *  <set>                        <!-- and now, the big array -->
+     *   <set>                       <!-- y row -->
+     *    [...]                      <!-- x columns -->
+     *  </set>
+     * </set>
+     * @endcode
+     * @param pluginname Name of this plugins
+     * @return The serialized Storage plugin data's.
+     */
+    virtual value::Value* serialize() const;
 
-        virtual void deserialize(const value::Value& vals);
+    virtual void deserialize(const value::Value& vals);
 
-        /*
-         * override the oov::OutputMatrix function to get the result of a
-         * simulation's view.
-         */
+    /*
+     * override the oov::OutputMatrix function to get the result of a
+     * simulation's view.
+     */
 
-        virtual bool haveOutputMatrix() const
-        { return true; }
+    virtual bool haveOutputMatrix() const
+    { return true; }
 
-        virtual oov::OutputMatrix outputMatrix() const
-        { return m_matrix; }
+    virtual oov::OutputMatrix outputMatrix() const
+    { return m_matrix; }
 
-        virtual std::string name() const;
+    virtual std::string name() const;
 
-        ///
-        ////
-        ///
+    ///
+    ////
+    ///
 
-        virtual void onParameter(const std::string& plugin,
-                                 const std::string& location,
-                                 const std::string& file,
-                                 value::Value* parameters,
+    virtual void onParameter(const std::string& plugin,
+                             const std::string& location,
+                             const std::string& file,
+                             value::Value* parameters,
+                             const double& time);
+
+    virtual void onNewObservable(const std::string& simulator,
+                                 const std::string& parent,
+                                 const std::string& port,
+                                 const std::string& view,
                                  const double& time);
 
-        virtual void onNewObservable(const std::string& simulator,
-                                     const std::string& parent,
-                                     const std::string& port,
-                                     const std::string& view,
-                                     const double& time);
+    virtual void onDelObservable(const std::string& simulator,
+                                 const std::string& parent,
+                                 const std::string& port,
+                                 const std::string& view,
+                                 const double& time);
 
-        virtual void onDelObservable(const std::string& simulator,
-                                     const std::string& parent,
-                                     const std::string& port,
-                                     const std::string& view,
-                                     const double& time);
+    virtual void onValue(const std::string& simulator,
+                         const std::string& parent,
+                         const std::string& port,
+                         const std::string& view,
+                         const double& time,
+                         value::Value* value);
 
-        virtual void onValue(const std::string& simulator,
-                             const std::string& parent,
-                             const std::string& port,
-                             const std::string& view,
-                             const double& time,
-                             value::Value* value);
+    virtual void close(const double& time);
 
-        virtual void close(const double& time);
+    ///
+    ////
+    ///
 
-        ///
-        ////
-        ///
+    /**
+     * @brief Return a constant reference to the oov::OutputMatrix.
+     * @return A constant reference.
+     */
+    inline const oov::OutputMatrix& outputmatrix() const
+    { return m_matrix; }
 
-        /**
-         * @brief Return a constant reference to the oov::OutputMatrix.
-         * @return A constant reference.
-         */
-        inline const oov::OutputMatrix& outputmatrix() const
-        { return m_matrix; }
+    /**
+     * @brief Return a view on the Time vector..
+     * @return A view on the Time vector.
+     */
+    value::VectorView getTime();
 
-        /**
-         * @brief Return a view on the Time vector..
-         * @return A view on the Time vector.
-         */
-        value::VectorView getTime();
+    /**
+     * @brief Return the Matrix of the values.
+     * @return A constant reference to the Matrix.
+     */
+    inline const OutputMatrix& values() const
+    { return m_matrix; }
 
-        /**
-         * @brief Return the Matrix of the values.
-         * @return A constant reference to the Matrix.
-         */
-        inline const OutputMatrix& values() const
-        { return m_matrix; }
+    /**
+     * @brief Return the Matrix of the values.
+     * @return A constant reference to the Matrix.
+     */
+    inline OutputMatrix& values()
+    { return m_matrix; }
 
-        /**
-         * @brief Return the Matrix of the values.
-         * @return A constant reference to the Matrix.
-         */
-        inline OutputMatrix& values()
-        { return m_matrix; }
-
-    private:
-        OutputMatrix       m_matrix;
-        double             m_time;
-        bool               m_isstart;
+private:
+    OutputMatrix       m_matrix;
+    double             m_time;
+    bool               m_isstart;
 
 
-        void nextTime(double trame_time);
-    };
-
-    DECLARE_OOV_PLUGIN(vle::oov::plugin::Storage)
+    void nextTime(double trame_time);
+};
 
 }}} // namespace vle oov plugin
+
+DECLARE_OOV_PLUGIN(vle::oov::plugin::Storage)
 
 #endif

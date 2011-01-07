@@ -27,7 +27,7 @@
 
 
 #ifndef VLE_OOV_PLUGINS_FILE_HPP
-#define VLE_OOV_PLUGINS_FILE_HPP
+#define VLE_OOV_PLUGINS_FILE_HPP 1
 
 #include <vle/oov/Plugin.hpp>
 #include <fstream>
@@ -36,136 +36,136 @@
 
 namespace vle { namespace oov { namespace plugin {
 
+/**
+ * @brief File is a virtual class for the csv, text, and rdata
+ * plug-in. When simulation is running, File writes information into a
+ * tempory file localized into the local directory or in the directory
+ * specified in the parameter trame.
+ * The File accepts a value::Map in parameter with two keys:
+ * - out: define the type of output. By default, it uses and file. But if
+ *   the value equal 'out', it copy result into the standard output and if
+ *   the value equal 'error', it copy result into the stardard error.
+ * - locale: define the locale of the stream. By default, the locale 'C' is
+ *   used, ie. the C Ansi locale. If the value equal 'user' then the locale
+ *   is attached to the locale of the user (run locale). Otherwise, the user
+ *   can use all locale defines in the environment. Use the 'locale -a'
+ *   command to show all locale of your system.
+ * <map>
+ *  <key name="output">
+ *   <string>out</string> <!-- or 'error' -->
+ *  </key>
+ *  <key name="type">
+ *   <string>csv, text, rdata</string>
+ *  </key>
+ *  <key name="locale">
+ *   <string>fr_FR.UTF-8</string> <!-- 'user', 'C', '' etc.
+ *  </key>
+ * </map>
+ */
+class File : public Plugin
+{
+public:
     /**
-     * @brief File is a virtual class for the csv, text, and rdata
-     * plug-in. When simulation is running, File writes information into a
-     * tempory file localized into the local directory or in the directory
-     * specified in the parameter trame.
-     * The File accepts a value::Map in parameter with two keys:
-     * - out: define the type of output. By default, it uses and file. But if
-     *   the value equal 'out', it copy result into the standard output and if
-     *   the value equal 'error', it copy result into the stardard error.
-     * - locale: define the locale of the stream. By default, the locale 'C' is
-     *   used, ie. the C Ansi locale. If the value equal 'user' then the locale
-     *   is attached to the locale of the user (run locale). Otherwise, the user
-     *   can use all locale defines in the environment. Use the 'locale -a'
-     *   command to show all locale of your system.
-     * <map>
-     *  <key name="output">
-     *   <string>out</string> <!-- or 'error' -->
-     *  </key>
-     *  <key name="type">
-     *   <string>csv, text, rdata</string>
-     *  </key>
-     *  <key name="locale">
-     *   <string>fr_FR.UTF-8</string> <!-- 'user', 'C', '' etc.
-     *  </key>
-     * </map>
+     * @brief Defines the names of the columns.
      */
-    class File : public Plugin
-    {
-    public:
-        /**
-         * @brief Defines the names of the columns.
-         */
-        typedef std::vector < std::string > Strings;
+    typedef std::vector < std::string > Strings;
 
-        File(const std::string& location);
+    File(const std::string& location);
 
-        virtual ~File();
+    virtual ~File();
 
-        ///
-        //// the interface provided by oov::Plugin.
-        ///
+    ///
+    //// the interface provided by oov::Plugin.
+    ///
 
-        virtual void onParameter(const std::string& plugin,
-                                 const std::string& location,
-                                 const std::string& file,
-                                 value::Value* parameters,
+    virtual void onParameter(const std::string& plugin,
+                             const std::string& location,
+                             const std::string& file,
+                             value::Value* parameters,
+                             const double& time);
+
+    virtual void onNewObservable(const std::string& simulator,
+                                 const std::string& parent,
+                                 const std::string& portname,
+                                 const std::string& view,
                                  const double& time);
 
-        virtual void onNewObservable(const std::string& simulator,
-                                     const std::string& parent,
-                                     const std::string& portname,
-                                     const std::string& view,
-                                     const double& time);
+    virtual void onDelObservable(const std::string& simulator,
+                                 const std::string& parent,
+                                 const std::string& portname,
+                                 const std::string& view,
+                                 const double& time);
 
-        virtual void onDelObservable(const std::string& simulator,
-                                     const std::string& parent,
-                                     const std::string& portname,
-                                     const std::string& view,
-                                     const double& time);
+    virtual void onValue(const std::string& simulator,
+                         const std::string& parent,
+                         const std::string& port,
+                         const std::string& view,
+                         const double& time,
+                         value::Value* value);
 
-        virtual void onValue(const std::string& simulator,
-                             const std::string& parent,
-                             const std::string& port,
-                             const std::string& view,
-                             const double& time,
-                             value::Value* value);
+    virtual void close(const double& time);
 
-        virtual void close(const double& time);
+    class FileType
+    {
+    public:
+        virtual std::string extension() const = 0;
 
-        class FileType
-        {
-        public:
-            virtual std::string extension() const = 0;
+        virtual void writeSeparator(std::ostream& out) = 0;
 
-            virtual void writeSeparator(std::ostream& out) = 0;
-
-            virtual void writeHead(std::ostream& out, const Strings& heads) = 0;
-        };
-
-    private:
-        /** Define a dictionary (model's name, index) */
-        typedef std::map < std::string, int > Columns;
-
-        /** Define the buffer of values. */
-        typedef std::vector < value::Value* > Line;
-
-        /** Define the buffer for valid values (model observed). */
-        typedef std::vector < bool > ValidElement;
-
-        enum OutputType {
-            FILE, /*!< classical file stream (std::ofstream). */
-            STANDARD_OUT, /*!< use the standard output (std::cout). */
-            STANDARD_ERROR /*!< use the error output (std::cerr). */
-        };
-
-        FileType*       m_filetype;
-        Columns         m_columns;
-        Line            m_buffer;
-        ValidElement    m_valid;
-        double          m_time;
-        std::ofstream   m_file;
-        std::string     m_filename;
-        std::string     m_filenametmp;
-        bool            m_isstart;
-        bool            m_havefirstevent;
-        bool            m_julian;
-        OutputType      m_type;
-
-        void flush(double trame_time);
-
-        void finalFlush(double trame_time);
-
-        void copyToFile(const std::string& filename,
-                        const std::vector < std::string >& array);
-
-        void copyToStream(std::ostream& out,
-                          const std::vector < std::string >& array);
-
-        /**
-         * @brief This function is use to build uniq name to each row of the
-         * text output.
-         * @param parent the hierarchy of coupled model.
-         * @param simulator the name of the devs::Model.
-         * @param port the name of the state port of the devs::Model.
-         * @return a representation of the uniq name.
-         */
-        std::string buildname(const std::string& parent,
-                              const std::string& simulator,
-                              const std::string& port);
+        virtual void writeHead(std::ostream& out, const Strings& heads) = 0;
     };
+
+private:
+    /** Define a dictionary (model's name, index) */
+    typedef std::map < std::string, int > Columns;
+
+    /** Define the buffer of values. */
+    typedef std::vector < value::Value* > Line;
+
+    /** Define the buffer for valid values (model observed). */
+    typedef std::vector < bool > ValidElement;
+
+    enum OutputType {
+        FILE, /*!< classical file stream (std::ofstream). */
+        STANDARD_OUT, /*!< use the standard output (std::cout). */
+        STANDARD_ERROR /*!< use the error output (std::cerr). */
+    };
+
+    FileType*       m_filetype;
+    Columns         m_columns;
+    Line            m_buffer;
+    ValidElement    m_valid;
+    double          m_time;
+    std::ofstream   m_file;
+    std::string     m_filename;
+    std::string     m_filenametmp;
+    bool            m_isstart;
+    bool            m_havefirstevent;
+    bool            m_julian;
+    OutputType      m_type;
+
+    void flush(double trame_time);
+
+    void finalFlush(double trame_time);
+
+    void copyToFile(const std::string& filename,
+                    const std::vector < std::string >& array);
+
+    void copyToStream(std::ostream& out,
+                      const std::vector < std::string >& array);
+
+    /**
+     * @brief This function is use to build uniq name to each row of the
+     * text output.
+     * @param parent the hierarchy of coupled model.
+     * @param simulator the name of the devs::Model.
+     * @param port the name of the state port of the devs::Model.
+     * @return a representation of the uniq name.
+     */
+    std::string buildname(const std::string& parent,
+                          const std::string& simulator,
+                          const std::string& port);
+};
 
 }}} // namespace vle oov plugin
 
