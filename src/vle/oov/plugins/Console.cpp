@@ -160,17 +160,19 @@ public:
             }
         }
 
-        std::string name(buildname(parent, simulator, port));
-        Columns::iterator it = mColumns.find(name);
+        if (not simulator.empty()) {
+            std::string name(buildname(parent, simulator, port));
+            Columns::iterator it = mColumns.find(name);
 
-        if (it == mColumns.end()) {
-            throw utils::InternalError(fmt(
-                    _("Output plugin: columns '%1%' does not exist. "
-                      "No observable ?")) % name);
+            if (it == mColumns.end()) {
+                throw utils::InternalError(fmt(
+                        _("Output plugin: columns '%1%' does not exist. "
+                          "No observable ?")) % name);
+            }
+
+            mBuffer[it->second] = value;
+            mValid[it->second] = true;
         }
-
-        mBuffer[it->second] = value;
-        mValid[it->second] = true;
     }
 
     void close(const double& time)
@@ -249,7 +251,8 @@ public:
     {
         flush(trameTime);
 
-        if (std::find(mValid.begin(), mValid.end(), true) != mValid.end()) {
+        if (mValid.empty() or std::find(mValid.begin(), mValid.end(), true) !=
+            mValid.end()) {
             std::cout << trameTime << '\t';
             for (Line::iterator it = mBuffer.begin(); it != mBuffer.end();
                  ++it) {
