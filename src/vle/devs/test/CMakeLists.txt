@@ -27,21 +27,6 @@ INSTALL(TARGETS unittest
   RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/simulator"
   LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/simulator")
 
-ADD_EXECUTABLE(test_devsmodel test1.cpp)
-TARGET_LINK_LIBRARIES(test_devsmodel
-  ${GLIBMM_LIBRARIES}
-  ${LIBXML_LIBRARIES}
-  ${GTHREAD_LIBRARIES}
-  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-  vlegeometry
-  vleutils
-  vlevalue
-  vlegraph
-  vledevs
-  vlevpz)
-
-ADD_TEST(devstest test_devsmodel)
-
 ADD_EXECUTABLE(test_time time.cpp)
 TARGET_LINK_LIBRARIES(test_time
   ${GLIBMM_LIBRARIES}

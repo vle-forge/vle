@@ -222,5 +222,25 @@ BOOST_AUTO_TEST_CASE(test_gens_with_graph)
 }
 
 
+BOOST_AUTO_TEST_CASE(test_gens_delete_connection)
+{
+    vpz::Vpz* file = new vpz::Vpz(
+        utils::Path::path().getExampleFile("gensdelete.vpz"));
+
+    /* change the output text to storage output */
+    vpz::Output& o(file->project().experiment().views().outputs().get("o"));
+    o.setLocalStream("", "storage");
+
+    /* run the simulation */
+    manager::RunVerbose r(std::cerr);
+    r.start(file);
+    file = 0;
+
+    /* begin check */
+    BOOST_REQUIRE_EQUAL(r.haveError(), false);
+
+    vle::utils::finalize();
+}
+
 
 

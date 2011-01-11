@@ -173,20 +173,26 @@ void Executive::removeConnection(const std::string& srcModelName,
                                  const std::string& dstPortName)
 {
     const std::string& modelName(coupledmodelName());
-    graph::Model* srcModel = (modelName == srcModelName) ?
-        cpled() : cpled()->findModel(srcModelName);
-    graph::Model* dstModel = (modelName == dstModelName) ?
-        cpled() : cpled()->findModel(dstModelName);
+    graph::Model* srcModel = cpled()->findModel(srcModelName);
+    graph::Model* dstModel = cpled()->findModel(dstModelName);
+
+    if (not srcModel and srcModelName == modelName) {
+        srcModel = cpled();
+    }
+
+    if (not dstModel and dstModelName == modelName) {
+        dstModel = cpled();
+    }
 
     if (srcModel and dstModel) {
         std::vector < std::pair < Simulator*, std::string > > toupdate;
-        m_coordinator.getSimulatorsSource(dstModel, dstPortName, toupdate);
-
-        if (modelName == srcModelName) {
+        if (cpled() == srcModel) {
+            m_coordinator.getSimulatorsSource(dstModel, dstPortName, toupdate);
             cpled()->delInputConnection(srcPortName, dstModel, dstPortName);
-        } else if (modelName == dstModelName) {
+        } else if (cpled() == dstModel) {
             cpled()->delOutputConnection(srcModel, srcPortName, dstPortName);
         } else {
+            m_coordinator.getSimulatorsSource(dstModel, dstPortName, toupdate);
             cpled()->delInternalConnection(srcModel, srcPortName, dstModel,
                                            dstPortName);
         }
