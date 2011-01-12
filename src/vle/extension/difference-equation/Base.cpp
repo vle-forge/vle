@@ -719,12 +719,14 @@ void Base::externalTransition(const ExternalEventList& event,
 
     if (not ignore) {
         if (not mPerturbations.empty()) {
-            if (not end and e > 0) {
-                applyPerturbations(time, false);
-                reset = true;
-            } else {
-                mState = RUN;
-                mSigma = 0;
+            if (mReceive == mSyncs or mLastComputeTime == time) {
+                if (not end and e > 0) {
+                    applyPerturbations(time, false);
+                    reset = true;
+                } else {
+                    mState = RUN;
+                    mSigma = 0;
+                }
             }
         }
 
