@@ -163,6 +163,17 @@ namespace vle { namespace utils {
         void addFile(const std::string& path, const std::string& name);
 
         /**
+         * @brief Return true if a file package/path/to/file exists in the
+         * package package.
+         *
+         * @param path The path, for example: "data/input1.dat" to test a file
+         * "PKG/data/input1.dat".
+         *
+         * @return true if file exists, false otherwise.
+         */
+        bool existsFile(const std::string& path);
+
+        /**
          * @brief Add an empty directgory into the current Package.
          *
          * @param path The path, for example: "data" to build a new directory
@@ -170,6 +181,17 @@ namespace vle { namespace utils {
          * @param name The name of the directory.
          */
         void addDirectory(const std::string& path, const std::string& name);
+
+        /**
+         * @brief Return true if a directory package/path/to/file exists in the
+         * package package.
+         *
+         * @param path The path, for example: "data/input1.dat" to test a file
+         * "PKG/data/input1.dat".
+         *
+         * @return true if directory exists, false otherwise.
+         */
+        bool existsDirectory(const std::string& path);
 
         /**
          * @brief Remove file or directory and (recursively) the specified path.

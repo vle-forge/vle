@@ -347,7 +347,7 @@ void FileTreeView::on_row_activated(const Gtk::TreeModel::Path& path,
 }
 
 void FileTreeView::projectFilePath(const Gtk::TreeRow& row,
-					 std::list<std::string>& lst)
+                                   std::list<std::string>& lst)
 {
     if (row.parent()) {
 	projectFilePath(*row.parent(), lst);
@@ -435,27 +435,36 @@ void FileTreeView::onNewFile()
 
 void FileTreeView::onNewDirectory()
 {
+    std::list < Gtk::TreeModel::Path > lst(mTreeSelection->get_selected_rows());
+
     SimpleTypeBox box(_("Name of the Directory ?"), "");
-    std::string name = boost::trim_copy(box.run());
-    std::string directorypath;
+    std::string name(boost::trim_copy(box.run()));
 
     if (box.valid() and not name.empty()) {
-        Gtk::TreeModel::iterator it = mTreeModel->get_iter(mRecentSelectedPath);
-        if (*it) {
-	    const Gtk::TreeModel::Row row = *it;
-	    std::list<std::string> lstpath;
-	    projectFilePath(row, lstpath);
-	    directorypath = Glib::build_filename(
-		mPackage, Glib::build_filename(lstpath));
-	    if (not isDirectory(directorypath)) {
-                directorypath = utils::Path::dirname(directorypath);
-	    }
-	} else {
-	    directorypath = mPackage;
-	}
-	utils::Package::package().addDirectory(directorypath, name);
+        std::string path;
+
+        if (not lst.empty()) {
+            Gtk::TreeModel::iterator it = mTreeModel->get_iter(lst.front());
+            if (*it) {
+                std::list < std::string > lstpath;
+
+                do {
+                    Gtk::TreeModel::Row row = *it;
+                    lstpath.push_front(row.get_value(mColumns.mColname));
+                    it = row.parent();
+                } while (*it);
+
+                path = Glib::build_filename(lstpath);
+
+                if (utils::Package::package().existsFile(path)) {
+                    path = utils::Path::dirname(path);
+                }
+            }
+        }
+
+        utils::Package::package().addDirectory(path, name);
+        mParent->refreshPackageHierarchy();
     }
-    mParent->refreshPackageHierarchy();
 }
 
 void FileTreeView::onCopy()

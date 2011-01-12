@@ -342,6 +342,18 @@ void Package::addFile(const std::string& path, const std::string& name)
     }
 }
 
+bool Package::existsFile(const std::string& path)
+{
+    if (Package::package().selected()) {
+        fs::path tmp = Path::path().getPackageDir();
+        tmp /= path;
+
+        return fs::exists(tmp) and fs::is_regular_file(tmp);
+    }
+
+    return false;
+}
+
 void Package::addDirectory(const std::string& path, const std::string& name)
 {
     if (Package::package().selected()) {
@@ -353,6 +365,18 @@ void Package::addDirectory(const std::string& path, const std::string& name)
             fs::create_directory(tmp);
         }
     }
+}
+
+bool Package::existsDirectory(const std::string& path)
+{
+    if (Package::package().selected()) {
+        fs::path tmp = Path::path().getPackageDir();
+        tmp /= path;
+
+        return fs::exists(tmp) and fs::is_directory(tmp);
+    }
+
+    return false;
 }
 
 void Package::remove(const std::string& path)
