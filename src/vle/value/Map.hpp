@@ -199,9 +199,10 @@ public:
 
         if (it != end()) {
             delete it->second;
+            it->second = value;
+        } else {
+            m_value.insert(std::make_pair(name, value));
         }
-
-        m_value.insert(std::make_pair(name, value));
     }
 
     /**
@@ -213,16 +214,14 @@ public:
      */
     void set(const std::string& name, const Value* value)
     {
+        Value* clone = (value) ? value->clone() : (value::Value*)0;
         iterator it = m_value.find(name);
 
         if (it != end()) {
             delete it->second;
-        }
-
-        if (value) {
-            m_value.insert(std::make_pair(name, value->clone()));
+            it->second = clone;
         } else {
-            m_value.insert(std::make_pair(name, (value::Value*)0));
+            m_value.insert(std::make_pair(name, clone));
         }
     }
 
@@ -238,9 +237,10 @@ public:
 
         if (it != end()) {
             delete it->second;
+            it->second = value.clone();
+        } else {
+            m_value.insert(std::make_pair(name, value.clone()));
         }
-
-        m_value.insert(std::make_pair(name, value.clone()));
     }
 
     /**
