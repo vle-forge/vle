@@ -348,7 +348,11 @@ bool Package::existsFile(const std::string& path)
         fs::path tmp = Path::path().getPackageDir();
         tmp /= path;
 
+#if BOOST_VERSION > 103600
         return fs::exists(tmp) and fs::is_regular_file(tmp);
+#else
+        return fs::exists(tmp) and fs::is_regular(tmp);
+#endif
     }
 
     return false;
