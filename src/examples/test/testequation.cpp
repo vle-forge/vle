@@ -637,10 +637,10 @@ BOOST_AUTO_TEST_CASE(test_asynchronous)
     BOOST_REQUIRE_EQUAL(result.shape()[1],
         (value::MatrixView::size_type)6);
 
-    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][0]), 0, 10e-5);
-    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][1]), 5, 10e-5);
-    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][2]), 6, 10e-5);
-    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][3]), 6, 10e-5);
-    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][4]), 7, 10e-5);
-    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][5]), 6, 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][0]), 0., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][1]), 5., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][2]), 6., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][3]), 6., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][4]), 7., 10e-5);
+    BOOST_REQUIRE_CLOSE(value::toDouble(result[4][5]), 6., 10e-5);
 }
