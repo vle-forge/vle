@@ -1,3 +1,47 @@
+VLE 1.0.0-alpha3
+================
+
+* devs and oov: The observation system (devs::View, devs::Observable,
+  devs::StreamWriter, devs::ObservationEvent) is completely rewritten. We
+  replace in the scheduller the devs::ObservationEvent (one event for each
+  devs::Observable (couple atomic model, observation port), by the
+  devs::ViewEvent (one event for each devs::View). This change gives:
+    - Optimisation in the insertion, the deletion, the observation of
+      observable. We switch the complexity of algorithms from O(n log(m)) in
+      O(log(n)), n is the number of View, m, the number of model. This change
+      significantly improves the performance of observations system.
+    - Observation are made even if no observable is attached to the View. This
+      avoids empty outputs when no model is observed.
+    - The behavior of event type observations has changed. When an event view is
+      attached to several models and one of these models does an internal
+      transition, external or conflict transition, all the models is observed.
+      In the previous version, only the model whose state changed was observed.
+
+* devs:
+    - fix crash in simulator cache graph.
+
+* extension difference equation:
+    - fix bug on nosyn variable in initValue.
+    - fix bug with asynchronous variables.
+
+* gvle:
+  - fix crash when adding directory in file treeview.
+
+* oov:
+    - remove deprecated plug-ins.
+
+* utils:
+    - fix line and column calculation in parser.
+
+* value:
+    - the Value class is now a pure virtual class.
+    - fix crash with Map::set functions.
+
+* vpz:
+    - fix parsing of utf-8 strings.
+    - add a DTD for vle 1.0.
+
+
 VLE 1.0.0-alpha2
 ================
 
@@ -12,47 +56,53 @@ VLE 1.0.0-alpha1
 ================
 
 * devs:
-  * change the behavior of the confluent transition. Now, the confluent
-    transition have its own behavior. Modeler can call internal and/or external
-    transition or add its own source code. By default, the internal transition
-    and the external transition are called. This change breaks the API and ABI
-    between 0.8 and 0.9.
+    - change the behavior of the confluent transition. Now, the confluent
+      transition have its own behavior. Modeler can call internal and/or
+      external transition or add its own source code. By default, the internal
+      transition and the external transition are called. This change breaks the
+      API and ABI between 0.8 and 0.9.
+
 * gvle:
-  * Big improve the user experience.
-  * Add a placement algorithm.
-  * Modeling plug-ins:
-    * Difference equation: add observables.
-    * FSA: add a new plug-in.
+    - Big improve the user experience.
+    - Add a placement algorithm.
+    - Modeling plug-ins:
+      - Difference equation: add observables.
+      - FSA: add a new plug-in.
+
 * oov:
-  * The plug-ins csv, rdata and text are merged into a new one called File. This
-    plugin have three parameters:
-     <map>
-      <key name="type">csv|rdata|text</key>
-      <key name="locale">user|...</key>
-      <key name="output">out|error</key>
-     </map>
-    Type defines the type of desired output file (csv, rdata or text). Locale
-    defines the language of the file ('user' to use the current user locale, fr,
-    de etc.). Finally, output parameter have two values: out to redirect output
-    to the standard output, error to redirect output to the standard error
-    output.
-  * add a dummy plug-in which does nothing: Views can be specific to model use
-    (ie. a view dedicated to sensitivity analysis). It could be handy to
-    temporary "deactivate" other views so that they not produce outputs (files
-    or storage objects) when working with a specific view.
-  * remove all oov::CairoPlugin from the VLE distribution. The oov::CairoPlugin
-    (gauge, caview, level, netview and plot) and associated GVLE output plug-ins
-    are removed from the VLE distribution. They may be packaged into a specific
-    Cairo package outside of the VLE environment.
+    - The plug-ins csv, rdata and text are merged into a new one called File.
+      This plugin have three parameters:
+	     <map>
+	      <key name="type">csv|rdata|text</key>
+	      <key name="locale">user|...</key>
+	      <key name="output">out|error</key>
+	     </map>
+      Type defines the type of desired output file (csv, rdata or text). Locale
+      defines the language of the file ('user' to use the current user locale,
+      fr, de etc.). Finally, output parameter have two values: out to redirect
+      output to the standard output, error to redirect output to the standard
+      error output.
+    - add a dummy plug-in which does nothing: Views can be specific to model use
+      (ie. a view dedicated to sensitivity analysis). It could be handy to
+      temporary "deactivate" other views so that they not produce outputs (files
+      or storage objects) when working with a specific view.
+    - remove all oov::CairoPlugin from the VLE distribution. The
+      oov::CairoPlugin (gauge, caview, level, netview and plot) and associated
+      GVLE output plug-ins are removed from the VLE distribution. They may be
+      packaged into a specific Cairo package outside of the VLE environment.
+
 * translator:
-  * Addition of a graph translator which builds the structure of a model from an
-    adjacency matrix and a list of classes.
-* value: update to a clean value's API.
+    - Addition of a graph translator which builds the structure of a model from
+      an adjacency matrix and a list of classes.
+
+* value:
+    - update to a clean value's API.
+
 * cli:
-  * add `depends' and `all' commands in the package mode to respectively list or
-    build all dependencies of the current package.
-  * add a remote mode to access a repository of packages.
-  * add a config mode to update the `vle.conf' file.
+    - add `depends' and `all' commands in the package mode to respectively list
+      or build all dependencies of the current package.
+    - add a remote mode to access a repository of packages.
+    - add a config mode to update the `vle.conf' file.
 
 
 VLE 0.8.9
