@@ -1,4 +1,232 @@
-vle-1.0.0-alpha2
+vle-1.0.0-alpha3
+
+commit 68b6c37586eb2176a5d2e9ce91c97673d47e7bc9
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Mon Jan 17 15:55:09 2011 +0100
+
+    win32: fix compilation error with CMake 2.8.3
+    
+    CMake 2.8.3 throw an error on MODULE shared libraries about __Winmain16.
+    We replace MODULE by SHARED in plug-ins to fix the problem.
+
+commit 06b321c3876f00bf03ab31edefe309994bb279b1
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Fri Jan 14 15:00:38 2011 +0100
+
+    vle: update AUTHORS
+
+commit 2b5b35eca179fc0f26cd94bd3fa4226a874a002d
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Fri Jan 14 14:48:14 2011 +0100
+
+    vle: update NEWS
+
+commit 1bedee4e91f43a43e8ece1161bfa13b32872bd04
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Fri Jan 14 15:20:41 2011 +0100
+
+    test: fix compilation error on mingw32
+    
+    The mingw32 C++ compiler 4.4.0 throws error with BOOST_REQUIRE_CLOSE.
+    The second and third arguments need to be exactly of the same type. We
+    fix the problem using real instead of integer in second argument of the
+    macro.
+
+commit 1b7ac3c63c700497b294429718ee72a705d65470
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Fri Jan 14 14:02:20 2011 +0100
+
+    utils: fix compilation error with boost < 1.36
+    
+    The boost::filesystem::is_regular_file method comes from boost 1.36. The
+    same method in previous boost filesystem is is_regular.
+
+commit 10707cb997056e121cc0b74bbf8f838498d0f620
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Wed Jan 12 13:26:43 2011 +0100
+
+    gvle: fix crash when adding directory in FileTreeView
+    
+    Fix a crash when adding a directory using the popup menu in the
+    FileTreeView widget. (Closes: #3152497).
+    
+    - gvle: rewrite the onNewDirectory function.
+    
+    - utils: adding two functions to help developers to tests if a regular
+      file or a directory exists into a package.
+
+commit cac730b6f1db98f647f9d1f447cf6a983dbaaff6
+Author: Eric Ramat <ramat@lil.univ-littoral.fr>
+Date:   Fri Jan 7 11:15:43 2011 +0100
+
+    ext/de: fix bug on nosync variable in initValue
+    
+    When a nosync variable is used in initValue method, an exception is
+    raised because the value is not available for the computation of model.
+    
+    Signed-off-by: Gauthier Quesnel <quesnel@users.sourceforge.net>
+
+commit 9a60cf96866fa5878f5e2475a02907fd09ced338
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Wed Jan 12 07:21:16 2011 +0100
+
+    value: fix crash with Map::set functions
+    
+    Memory erros occur when manipulating value::Map. Consider the following
+    example :
+      vle::value::::Map mymap;
+      vle::value::::Double v(1.5);
+      mymap.set("Nsol",v);
+      mymap.set("Nsol",v);
+    
+    We fix this problem by correctly rewriting algorithms of the three
+    Map::set functions (Closes: #3155610).
+
+commit 751589c87de8bcb6a3c0bac4c7cb30f8d0d3d99b
+Author: Ronan Trépos <rtrepos@toulouse.inra.fr>
+Date:   Wed Jan 5 18:14:10 2011 +0100
+
+    ext/de: fix a bug with asynchronous variables
+    
+    In DifferenceEquation::Multiple extension, multiple receipts of the same
+    asynchronous variable at a given time could freeze the simulation
+    (chaining of ta=0). This problem appeared when multiple receipts occur
+    between the receipt of two synchronous variables.
+    
+    Signed-off-by: Gauthier Quesnel <quesnel@users.sourceforge.net>
+
+commit 1bac6ea82e15b73540bcc6baae3641034bf9f794
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Tue Jan 11 12:15:27 2011 +0100
+
+    devs: fix crash in simulator cache graph
+    
+    The kernel crashes if an execute remove an output connection with an
+    allocated cache. We correct the crash by ignoring the cache when
+    deleting output connection (Closes: #3151711).
+    - fix crash and optimise removing of output connections.
+    - add new unit test.
+
+commit 76264dfe9afb9b1f27f7869d1a17ed78805731d4
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Fri Jan 7 13:42:39 2011 +0100
+
+    oov: fix Console when observation without observable
+    
+    The commit 8fe6168599df8a1d7491b4f6b021122e6fabff0e has introduced in
+    the kernel the possibility to send observation without observable. We
+    fix the plug-in Console to read correctly this type of observation.
+
+commit 25d0b613e3616cb7bfa56b47117e3a5a70a98895
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Fri Jan 7 12:08:26 2011 +0100
+
+    oov: remove deprecated plug-in
+    
+    As announced, we remove the deprecated oov plug-ins Default, RData, CSV
+    and Text.
+    - remove deprecated plug-in (default, text, rdata and csv).
+    - update coding style in the remaining files.
+
+commit 8fe6168599df8a1d7491b4f6b021122e6fabff0e
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Fri Dec 31 18:55:02 2010 +0100
+
+    devs: rewriting of the observation system
+    
+    The observation system (devs::View, devs::Observable,
+    devs::StreamWriter, devs::ObservationEvent) is completely rewritten. We
+    replace in the scheduller the devs::ObservationEvent (one event for each
+    devs::Observable (couple atomic model, observation port), by the
+    devs::ViewEvent (one event for each devs::View). This change gives:
+    
+    - Optimisation in the insertion, the deletion, the observation of
+      observable. We switch the complexity of algorithms from O(n log(m)) in
+      O(log(n)), n is the number of View, m, the number of model. This
+      change significantly improves the performance of observations system.
+    - Observation are made even if no observable is attached to the View.
+      This avoids empty outputs when no model is observed (closes:
+      #3092046).
+    - The behavior of event type observations has changed. When an event
+      view is attached to several models and one of these models does an
+      internal transition, external or conflict transition, all the models
+      is observed. In the previous version, only the model whose state
+      changed was observed.
+    - Cleanup source code.
+
+commit 2b7b0bf108eb223df952e6a6ace9b99817684233
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Mon Dec 27 23:27:21 2010 +0100
+
+    value: Value is now a pure virtual class
+    
+    Default and copy constructors are provided for Value. Since all methods
+    throw errors the following code may compile but fail at runtime:
+    
+      vle::value::Integer b(1);
+      vle::value::Value v(b);
+    
+    We fix this problem by changing virtual functions in base class Value in
+    pure virtual functions. (closes: #3067682).
+
+commit 6a92f12d02803deb100ffefd7f06711d875bc1f0
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Mon Dec 27 12:35:19 2010 +0100
+
+    examples: assign default position for all models
+    
+    In examples, most files are written by hand without any reference to
+    position for atomic and coupled models. Fix it by assigning a random
+    position for all models.
+
+commit 6e4d93fcd3ece7a8c1107f742d0f8c6d9b799503
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Sun Dec 26 16:59:38 2010 +0100
+
+    vle: add a DTD for vle-1.0.0
+    
+    Add a DTD for vle-1.0.0 and update all examples files.
+
+commit 16aa8981a2291abec25d804c3939a23290538641
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Sat Dec 25 21:39:49 2010 +0100
+
+    vpz: fix parsing utf-8 strings
+    
+    The Glib::ustring can throw exception if the string to read have utf-8
+    chars and the parser split the utf-8 char. To fix it, we remove all
+    reference to the Glib::ustring class. (closes: #3139068).
+    
+    - update the parser by removing all Glib::ustring reference.
+    - update unit test.
+
+commit e8d78379695d5ad2c48110c7c14f54729d8f2882
+Author: Ronan Trépos <rtrepos@toulouse.inra.fr>
+Date:   Sun Dec 12 18:40:14 2010 +0100
+
+    oov: add a function for testing OutputMatrix's models
+    
+    The function 'exist' tests if a model exists in an OutputMatrix.
+    
+    Signed-off-by: Gauthier Quesnel <quesnel@users.sourceforge.net>
+
+commit d60756233c76e791a7108ab2841874c03f9150a5
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Fri Dec 10 00:31:59 2010 +0100
+
+    utils: update line and column calculation in parser
+    
+    We fix the calculation of line and column in parser to show the correct
+    number.
+    
+    - update variable in get and unget functions.
+    - update the error message by including the word `before'.
+
+commit 6c692e4e0d3c0ff68d4e7104b054a73f3ee2618b
+Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
+Date:   Tue Dec 7 20:03:14 2010 +0100
+
+    vle-1.0.0-alpha2
 
 commit eb7213474263c2c7835f99d61d73d805bb6354df
 Author: Gauthier Quesnel <quesnel@users.sourceforge.net>
