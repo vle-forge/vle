@@ -15,7 +15,7 @@ LINK_DIRECTORIES(
   ${GTKMM_LIBRARY_DIRS}
   ${GTHREAD_LIBRARY_DIRS})
 
-ADD_LIBRARY(modeling-petrinet MODULE
+ADD_LIBRARY(modeling-petrinet SHARED
   ArcDialog.hpp ArcDialog.cpp
   Plugin.hpp Plugin.cpp
   PetriNet.hpp PetriNet.cpp

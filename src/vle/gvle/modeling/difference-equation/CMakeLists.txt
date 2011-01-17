@@ -17,7 +17,7 @@ LINK_DIRECTORIES(
   ${GTHREAD_LIBRARY_DIRS}
   ${GTKSOURCEVIEWMM_LIBRARY_DIRS})
 
-ADD_LIBRARY(modeling-DE-simple MODULE Simple.hpp Simple.cpp Plugin.hpp
+ADD_LIBRARY(modeling-DE-simple SHARED Simple.hpp Simple.cpp Plugin.hpp
   Plugin.cpp Parameters.hpp Parameters.cpp SourceDialog.hpp SourceDialog.cpp
   NameValue.hpp NameValue.cpp TimeStep.hpp TimeStep.cpp Mapping.hpp
   Mapping.cpp)
@@ -50,7 +50,7 @@ INSTALL(TARGETS modeling-DE-simple
   RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/modeling"
   LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/modeling")
 
-ADD_LIBRARY(modeling-DE-generic MODULE Generic.hpp Generic.cpp Plugin.hpp
+ADD_LIBRARY(modeling-DE-generic SHARED Generic.hpp Generic.cpp Plugin.hpp
   Plugin.cpp Parameters.hpp Parameters.cpp SourceDialog.hpp SourceDialog.cpp
   NameValue.hpp NameValue.cpp TimeStep.hpp TimeStep.cpp Mapping.hpp
   Mapping.cpp)
@@ -83,7 +83,7 @@ INSTALL(TARGETS modeling-DE-generic
   RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/modeling"
   LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/modeling")
 
-ADD_LIBRARY(modeling-DE-multiple MODULE Multiple.hpp Multiple.cpp Plugin.hpp
+ADD_LIBRARY(modeling-DE-multiple SHARED Multiple.hpp Multiple.cpp Plugin.hpp
   Plugin.cpp Parameters.hpp Parameters.cpp SourceDialog.hpp SourceDialog.cpp
   Mapping.hpp Mapping.cpp TimeStep.hpp TimeStep.cpp Variables.hpp
   Variables.cpp)

@@ -15,7 +15,7 @@ LINK_DIRECTORIES(
   ${GTKMM_LIBRARY_DIRS}
   ${GTHREAD_LIBRARY_DIRS})
 
-ADD_LIBRARY(output-storage MODULE Storage.hpp Storage.cpp)
+ADD_LIBRARY(output-storage SHARED Storage.hpp Storage.cpp)
 SET_TARGET_PROPERTIES(output-storage PROPERTIES OUTPUT_NAME "storage")
 
 TARGET_LINK_LIBRARIES(output-storage

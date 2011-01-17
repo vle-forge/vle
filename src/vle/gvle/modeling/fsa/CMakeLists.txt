@@ -17,7 +17,7 @@ LINK_DIRECTORIES(
   ${GTHREAD_LIBRARY_DIRS}
   ${GTKSOURCEVIEWMM_LIBRARY_DIRS})
 
-ADD_LIBRARY(modeling-fsa-statechart MODULE Plugin.hpp
+ADD_LIBRARY(modeling-fsa-statechart SHARED Plugin.hpp
   Plugin.cpp SourceDialog.hpp SourceDialog.cpp
   Statechart.hpp Statechart.cpp
   StatechartDrawingArea.hpp StatechartDrawingArea.cpp
