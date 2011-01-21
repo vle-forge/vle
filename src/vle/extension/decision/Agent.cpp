@@ -126,10 +126,11 @@ void Agent::externalTransition(
     for (devs::ExternalEventList::const_iterator it = events.begin();
          it != events.end(); ++it) {
         const std::string& port((*it)->getPortName());
+        const value::Map& atts = (*it)->getAttributes();
 
         if (port == "ack") {
-            const std::string& activity((*it)->getStringAttributeValue("name"));
-            const std::string& order((*it)->getStringAttributeValue("value"));
+            const std::string& activity(atts.getString("name"));
+            const std::string& order(atts.getString("value"));
 
             if (order == "done") {
                 setActivityDone(activity, time);
@@ -140,13 +141,22 @@ void Agent::externalTransition(
                     fmt(_("Decision: unknown order `%1%'")) % order);
             }
         } else {
+            value::Map::const_iterator jt = atts.value().find("value");
+            if (jt == atts.end()) {
+                jt = atts.value().find("init");
+            }
+
+            if (jt == atts.end() or not jt->second) {
+                throw utils::ModellingError(
+                    fmt(_("Decision: no value in this message: `%1%'")) %
+                    (*it));
+            }
+
             if (mPortMode) {
-                const value::Value& value((*it)->getAttributeValue("value"));
-                applyFact(port, value);
+                applyFact(port, *jt->second);
             } else {
                 const std::string& fact((*it)->getStringAttributeValue("name"));
-                const value::Value& value((*it)->getAttributeValue("value"));
-                applyFact(fact, value);
+                applyFact(fact, *jt->second);
             }
         }
     }
