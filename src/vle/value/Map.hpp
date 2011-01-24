@@ -195,7 +195,7 @@ public:
      */
     void set(const std::string& name, Value* value)
     {
-        iterator it = m_value.find(name);
+        iterator it = find(name);
 
         if (it != end()) {
             delete it->second;
@@ -215,7 +215,7 @@ public:
     void set(const std::string& name, const Value* value)
     {
         Value* clone = (value) ? value->clone() : (value::Value*)0;
-        iterator it = m_value.find(name);
+        iterator it = find(name);
 
         if (it != end()) {
             delete it->second;
@@ -233,7 +233,7 @@ public:
      */
     void set(const std::string& name, const Value& value)
     {
-        iterator it = m_value.find(name);
+        iterator it = find(name);
 
         if (it != end()) {
             delete it->second;
@@ -249,7 +249,7 @@ public:
      * @return true if Value exist, false otherwise.
      */
     inline bool exist(const std::string& name) const
-    { return m_value.find(name) != m_value.end(); }
+    { return find(name) != end(); }
 
     /**
      * @brief Get a Value from the map specified by his name.
@@ -276,9 +276,9 @@ public:
      */
     const Value* get(const std::string& name) const
     {
-        const_iterator it = m_value.find(name);
+        const_iterator it = find(name);
 
-        if (it == m_value.end()) {
+        if (it == end()) {
             throw utils::ArgError(fmt(_(
                         "Map: the key '%1%' does not exist")) % name);
         }
@@ -294,9 +294,9 @@ public:
      */
     Value* get(const std::string& name)
     {
-        iterator it = m_value.find(name);
+        iterator it = find(name);
 
-        if (it == m_value.end()) {
+        if (it == end()) {
             throw utils::ArgError(fmt(_(
                         "Map: the key '%1%' does not exist")) % name);
         }
@@ -366,6 +366,22 @@ public:
      */
     inline iterator end()
     { return m_value.end(); }
+
+    /**
+     * @brief Find an constant iterator into the value::Map using a key.
+     * @param key The key of the std::pair < key, value > to find.
+     * @return A constant iterator or end() if key is not found.
+     */
+    inline const_iterator find(const std::string& key) const
+    { return m_value.find(key); }
+
+    /**
+     * @brief Find an iterator into the value::Map using a key.
+     * @param key The key of the std::pair < key, value > to find.
+     * @return An iterator or end() if key is not found.
+     */
+    inline iterator find(const std::string& key)
+    { return m_value.find(key); }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
       * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

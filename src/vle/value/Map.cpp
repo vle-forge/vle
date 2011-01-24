@@ -43,8 +43,7 @@ namespace vle { namespace value {
 Map::Map(const Map& orig)
     : Value(orig)
 {
-    for (const_iterator it = orig.m_value.begin(); it != orig.m_value.end();
-         ++it) {
+    for (const_iterator it = orig.begin(); it != orig.end(); ++it) {
         if ((*it).second) {
             m_value.insert(std::make_pair((*it).first,
                                           ((*it).second)->clone()));
@@ -56,8 +55,8 @@ Map::Map(const Map& orig)
 
 void Map::writeFile(std::ostream& out) const
 {
-    for (const_iterator it = m_value.begin(); it != m_value.end(); ++it) {
-        if (it != m_value.begin()) {
+    for (const_iterator it = begin(); it != end(); ++it) {
+        if (it != begin()) {
             out << " ";
         }
         out << "(" << (*it).first.c_str() << ", ";
@@ -68,8 +67,8 @@ void Map::writeFile(std::ostream& out) const
 
 void Map::writeString(std::ostream& out) const
 {
-    for (const_iterator it = m_value.begin(); it != m_value.end(); ++it) {
-        if (it != m_value.begin()) {
+    for (const_iterator it = begin(); it != end(); ++it) {
+        if (it != begin()) {
             out << " ";
         }
         out << "(" << (*it).first.c_str() << ", ";
@@ -82,7 +81,7 @@ void Map::writeXml(std::ostream& out) const
 {
     out << "<map>";
 
-    for (const_iterator it = m_value.begin(); it != m_value.end(); ++it) {
+    for (const_iterator it = begin(); it != end(); ++it) {
         out << "<key name=\"" << (*it).first.c_str() << "\">";
         (*it).second->writeXml(out);
         out << "</key>";
@@ -119,9 +118,9 @@ Map& Map::addMap(const std::string& name)
 
 const Value* Map::operator[](const std::string& name) const
 {
-    const_iterator it = m_value.find(name);
+    const_iterator it = find(name);
 
-    if (it == m_value.end()) {
+    if (it == end()) {
         throw utils::ArgError(fmt(_(
                 "Map: the key '%1%' does not exist")) % name);
     }
@@ -131,9 +130,9 @@ const Value* Map::operator[](const std::string& name) const
 
 Value* Map::operator[](const std::string& name)
 {
-    iterator it = m_value.find(name);
+    iterator it = find(name);
 
-    if (it == m_value.end()) {
+    if (it == end()) {
         throw utils::ArgError(fmt(_(
                 "Map: the key '%1%' does not exist")) % name);
     }
@@ -143,9 +142,9 @@ Value* Map::operator[](const std::string& name)
 
 Value* Map::give(const std::string& name)
 {
-    iterator it = m_value.find(name);
+    iterator it = find(name);
 
-    if (it == m_value.end()) {
+    if (it == end()) {
         throw utils::ArgError(fmt(_(
                 "Map: the key '%1%' does not exist")) % name);
     }
@@ -189,23 +188,23 @@ Matrix& Map::getMatrix(const std::string& name)
 
 void Map::clear()
 {
-    for (iterator it = begin(); it != end(); ++it) {
-        delete it->second;
-    }
+    vle::utils::for_each(begin(), end(), boost::checked_deleter < Value >());
 
     m_value.clear();
 }
 
 Value* Map::getPointer(const std::string& name)
 {
-    iterator it = m_value.find(name);
-    return it == m_value.end() ? 0 : it->second;
+    iterator it = find(name);
+
+    return it == end() ? 0 : it->second;
 }
 
 const Value* Map::getPointer(const std::string& name) const
 {
-    const_iterator it = m_value.find(name);
-    return it == m_value.end() ? 0 : it->second;
+    const_iterator it = find(name);
+
+    return it == end() ? 0 : it->second;
 }
 
 }} // namespace vle value
