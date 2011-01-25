@@ -78,8 +78,9 @@ const std::string PluginFSA::TEMPLATE_DEFINITION =
     "    {\n"                                                           \
     "//@@begin:constructorUser@@\n"                                     \
     "{{constructorUser}}"                                               \
+    "\n"                                                                \
     "//@@end:constructorUser@@\n"                                       \
-    "      // structure"                                                \
+    "      // structure\n"                                              \
     "      states(this)"                                                \
     "{{for i in states2}}"                                              \
     " << {{states2^i}}"                                                 \
@@ -148,6 +149,7 @@ const std::string PluginFSA::TEMPLATE_DEFINITION =
     "{{end for}}"                                                       \
     "//@@begin:definitionUser@@\n"                                      \
     "{{definitionUser}}"                                                \
+    "\n"                                                                \
     "//@@end:definitionUser@@\n"                                        \
     "};\n\n"                                                            \
     "} // namespace {{namespace}}\n\n"                                  \
