@@ -774,6 +774,7 @@ void GVLE::onSimulationBox()
     if (mModeling->isSaved()) {
         LaunchSimulationBox box(mRefXML, ((const Modeling*)mModeling)->vpz());
         box.run();
+        refreshPackageHierarchy();
     } else {
         gvle::Error(_("Save or load a project before simulation"));
     }
