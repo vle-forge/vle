@@ -64,7 +64,7 @@ Multiple::Multiple(const DynamicsInit& model,
                         unsigned int i;
 
                         for (i = 0; i < init.size(); ++i) {
-                            addValue(toDouble(init.get(i)), name);
+                            mValues[name] = toDouble(init.get(i));
                         }
                     }
                 }
@@ -73,7 +73,7 @@ Multiple::Multiple(const DynamicsInit& model,
                     unsigned int i;
 
                     for (i = 0; i < init.size(); ++i) {
-                        addValue(toDouble(init.get(i)), name);
+                        mValues[name] = toDouble(init.get(i));
                     }
                 }
             }
@@ -84,7 +84,7 @@ Multiple::Multiple(const DynamicsInit& model,
 void Multiple::addValue(double value, const std::string& name)
 {
     mValues[name] = value;
-    if (mSize[name] > 0
+    while (mSize[name] > 0
         and mValues[name].size() > (unsigned int)mSize[name]) {
         mValues[name].pop_back();
     }

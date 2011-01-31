@@ -68,7 +68,7 @@ Simple::Simple(const DynamicsInit& model,
         unsigned int i;
 
         for (i = 0; i < init.size(); ++i) {
-            addValue(toDouble(init.get(i)), mVariableName);
+            mValues.push_front(toDouble(init.get(i)));
         }
     }
 }
@@ -76,7 +76,7 @@ Simple::Simple(const DynamicsInit& model,
 void Simple::addValue(double value, const std::string& /* name */)
 {
     mValues.push_front(value);
-    if (mSize > 0
+    while (mSize > 0
         and mValues.size() > (unsigned int)mSize) {
         mValues.pop_back();
     }
