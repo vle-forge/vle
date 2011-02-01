@@ -134,6 +134,7 @@ public:
 
     void eventInStates(const eventInStates_t& eventInStates)
     {
+        mEventInStates.clear();
         for (eventInStates_t::const_iterator it = eventInStates.begin();
              it != eventInStates.end(); ++it) {
             mEventInStates[it->first] = it->second;

@@ -945,9 +945,10 @@ bool StatechartDrawingArea::modifyCurrentTransition()
                 mStatechart->addInputPort(dialog.event());
             }
             if (dialog.typeSend() == CONSTANT and
+                not dialog.send().empty() and
                 std::find(mStatechart->outputPorts().begin(),
-                    mStatechart->outputPorts().end(),
-                    dialog.send()) == mStatechart->outputPorts().end()) {
+                          mStatechart->outputPorts().end(),
+                          dialog.send()) == mStatechart->outputPorts().end()) {
                 mStatechart->addOutputPort(dialog.send());
             }
             result = true;
