@@ -55,20 +55,6 @@ void Views::write(std::ostream& out) const
     out << "</views>\n";
 }
 
-Output& Views::addLocalStreamOutput(const std::string& name,
-                                    const std::string& location,
-                                    const std::string& plugin)
-{
-    return m_outputs.addLocalStream(name, location, plugin);
-}
-
-Output& Views::addDistantStreamOutput(const std::string& name,
-                                      const std::string& location,
-                                      const std::string& plugin)
-{
-    return m_outputs.addDistantStream(name, location, plugin);
-}
-
 void Views::delOutput(const std::string& name)
 {
     m_outputs.del(name);
@@ -233,12 +219,14 @@ void Views::copyOutput(const std::string& outputname,
 {
     const Output& o = m_outputs.get(outputname);
     if (o.format() == Output::LOCAL) {
-        Output& no = addLocalStreamOutput(copyname, o.location(), o.plugin());
+        Output& no = addLocalStreamOutput(copyname, o.location(), o.plugin(),
+                                          o.package());
         if (o.data()) {
             no.setData(o.data()->clone());
         }
     } else {
-        Output& no = addDistantStreamOutput(copyname, o.location(), o.plugin());
+        Output& no = addDistantStreamOutput(copyname, o.location(), o.plugin(),
+                                            o.package());
         if (o.data()) {
             no.setData(o.data()->clone());
         }

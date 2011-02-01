@@ -104,6 +104,20 @@ namespace vle { namespace vpz {
          * @param name the output name.
          * @param location the file name.
          * @param plugin to use in steam.
+         * @param package the package of the plugin.
+         * @throw utils::ArgError if name is empty.
+         */
+        Output& addLocalStream(const std::string& name,
+                               const std::string& location,
+                               const std::string& plugin,
+                               const std::string& package);
+
+        /**
+         * @brief Add an output with text stream information. The name is
+         * obligatory, the location defines a filename.
+         * @param name the output name.
+         * @param location the file name.
+         * @param plugin to use in steam.
          * @throw utils::ArgError if name is empty.
          */
         Output& addLocalStream(const std::string& name,
@@ -116,6 +130,21 @@ namespace vle { namespace vpz {
          * @param name the output name.
          * @param location the file name.
          * @param plugin to use in steam.
+         * @param package the package of the plugin.
+         * @throw utils::ArgError if name is empty.
+         */
+        Output& addDistantStream(const std::string& name,
+                                 const std::string& location,
+                                 const std::string& plugin,
+                                 const std::string& package);
+
+        /**
+         * @brief Add an output with the sdml stream information. The name is
+         * obligatory, the location defines a filename.
+         * @param name the output name.
+         * @param location the file name.
+         * @param plugin to use in steam.
+         * @param package the package of the plugin.
          * @throw utils::ArgError if name is empty.
          */
         Output& addDistantStream(const std::string& name,

@@ -864,11 +864,12 @@ void AtomicModelBox::DynamicTreeView::onRowActivated(
                 tpl.open(newTab);
                 tpl.tag(pluginname, conf);
                 PluginFactory& plf = mModeling->getGVLE()->pluginFactory();
-                ModelingPlugin& plugin = plf.getModeling(pluginname);
+                PluginFactory::ModelingPlg& plugin(plf.getModeling(pluginname));
 
-                if (plugin.modify(*mAtom, *mModel, dynamic, *mConditions,
-                                  *mObservables, conf, tpl.buffer())) {
-                    const std::string& buffer = plugin.source();
+                if (plugin.plugin()->modify(*mAtom, *mModel, dynamic,
+                                            *mConditions, *mObservables, conf,
+                                            tpl.buffer())) {
+                    const std::string& buffer = plugin.plugin()->source();
                     std::string filename = utils::Path::path()
                         .getPackageSrcFile(dynamic.library());
                     filename += ".cpp";

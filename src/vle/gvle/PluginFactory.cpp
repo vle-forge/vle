@@ -30,8 +30,6 @@
 #include <vle/utils/Path.hpp>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/i18n.hpp>
-#include <glibmm/module.h>
-#include <boost/checked_delete.hpp>
 #include <cassert>
 
 namespace vle { namespace gvle {
@@ -40,124 +38,22 @@ PluginFactory::PluginFactory()
 {
     readOutputPlugins();
     readModelingPlugins();
+    readOovPlugins();
 }
 
 PluginFactory::~PluginFactory()
 {
-    utils::for_each(m_outs.begin(), m_outs.end(),
-                    boost::checked_deleter < OutputPlugin >());
-
-    utils::for_each(m_mods.begin(), m_mods.end(),
-                    boost::checked_deleter < ModelingPlugin >());
 }
 
 void PluginFactory::update()
 {
-    utils::for_each(m_outs.begin(), m_outs.end(),
-                    boost::checked_deleter < OutputPlugin >());
-
-    utils::for_each(m_mods.begin(), m_mods.end(),
-                    boost::checked_deleter < ModelingPlugin >());
-
-    m_outs.clear();
-    m_mods.clear();
-
     readOutputPlugins();
     readModelingPlugins();
+    readOovPlugins();
 }
 
-void PluginFactory::initOutput(const std::string& name)
-{
-    OutputPluginList::iterator it = getO(name);
-    loadOutputPlugin(it);
-}
-
-void PluginFactory::initModeling(const std::string& name)
-{
-    ModelingPluginList::iterator it = getM(name);
-    loadModelingPlugin(it);
-}
-
-void PluginFactory::clearOutput(const std::string& name)
-{
-    OutputPluginList::iterator it = getO(name);
-    delete it->second;
-    it->second = 0;
-}
-
-void PluginFactory::clearModeling(const std::string& name)
-{
-    ModelingPluginList::iterator it = getM(name);
-    delete it->second;
-    it->second = 0;
-}
-
-void PluginFactory::eraseOutput(const std::string& name)
-{
-    OutputPluginList::iterator it = getO(name);
-    delete it->second;
-    it->second = 0;
-
-    m_outs.erase(it);
-}
-
-void PluginFactory::eraseModeling(const std::string& name)
-{
-    ModelingPluginList::iterator it = getM(name);
-    delete it->second;
-    it->second = 0;
-
-    m_mods.erase(it);
-}
-
-OutputPlugin& PluginFactory::getOutput(const std::string& name)
-{
-    OutputPluginList::iterator it = getO(name);
-
-    if (not it->second) {
-        loadOutputPlugin(it);
-    }
-
-    return *it->second;
-}
-
-ModelingPlugin& PluginFactory::getModeling(const std::string& name)
-{
-    ModelingPluginList::iterator it = getM(name);
-
-    if (not it->second) {
-        loadModelingPlugin(it);
-    }
-
-    return *it->second;
-}
-
-
-const OutputPlugin& PluginFactory::getOutput(const std::string& name) const
-{
-    OutputPluginList::const_iterator it = getO(name);
-
-    if (not it->second) {
-        throw utils::InternalError(fmt(_(
-                    "Outputplugin '%1%' is not initialized")) % name);
-    }
-
-    return *it->second;
-}
-
-const ModelingPlugin& PluginFactory::getModeling(const std::string& name) const
-{
-    ModelingPluginList::const_iterator it = getM(name);
-
-    if (not it->second) {
-        throw utils::InternalError(fmt(_(
-                    "ModelingPlugin '%1%' is not initialized")) % name);
-    }
-
-    return *it->second;
-}
-
-OutputPluginList::iterator PluginFactory::getO(const std::string& name)
+PluginFactory::OutputPluginList::iterator PluginFactory::getO(
+    const std::string& name)
 {
     OutputPluginList::iterator it = m_outs.find(name);
     if (it == m_outs.end()) {
@@ -167,28 +63,7 @@ OutputPluginList::iterator PluginFactory::getO(const std::string& name)
     return it;
 }
 
-ModelingPluginList::iterator PluginFactory::getM(const std::string& name)
-{
-    ModelingPluginList::iterator it = m_mods.find(name);
-    if (it == m_mods.end()) {
-        throw utils::InternalError(fmt(_(
-                    "ModelingPlugin '%1%' is not available")) % name);
-    }
-    return it;
-}
-
-ModelingPluginList::const_iterator PluginFactory::getM(
-    const std::string& name) const
-{
-    ModelingPluginList::const_iterator it = m_mods.find(name);
-    if (it == m_mods.end()) {
-        throw utils::InternalError(fmt(_(
-                    "Modelingplugin '%1%' is not available")) % name);
-    }
-    return it;
-}
-
-OutputPluginList::const_iterator PluginFactory::getO(
+PluginFactory::OutputPluginList::const_iterator PluginFactory::getO(
     const std::string& name) const
 {
     OutputPluginList::const_iterator it = m_outs.find(name);
@@ -199,145 +74,140 @@ OutputPluginList::const_iterator PluginFactory::getO(
     return it;
 }
 
+PluginFactory::ModelingPluginList::iterator PluginFactory::getM(
+    const std::string& name)
+{
+    ModelingPluginList::iterator it = m_mods.find(name);
+    if (it == m_mods.end()) {
+        throw utils::InternalError(fmt(_(
+                    "ModelingPlugin '%1%' is not available")) % name);
+    }
+    return it;
+}
+
+PluginFactory::ModelingPluginList::const_iterator PluginFactory::getM(
+    const std::string& name) const
+{
+    ModelingPluginList::const_iterator it = m_mods.find(name);
+    if (it == m_mods.end()) {
+        throw utils::InternalError(fmt(_(
+                    "Modelingplugin '%1%' is not available")) % name);
+    }
+    return it;
+}
+
+PluginFactory::OovPluginList::iterator PluginFactory::getD(
+    const std::string& name)
+{
+    OovPluginList::iterator it = m_oov.find(name);
+    if (it == m_oov.end()) {
+        throw utils::InternalError(fmt(_(
+                    "OovPlugin '%1%' is not available")) % name);
+    }
+    return it;
+}
+
+PluginFactory::OovPluginList::const_iterator PluginFactory::getD(
+    const std::string& name) const
+{
+    OovPluginList::const_iterator it = m_oov.find(name);
+    if (it == m_oov.end()) {
+        throw utils::InternalError(fmt(_(
+                    "Oovplugin '%1%' is not available")) % name);
+    }
+    return it;
+}
+
 void PluginFactory::readOutputPlugins()
 {
     utils::PathList paths = utils::Path::path().getOutputDirs();
-    utils::PathList::iterator it = paths.begin();
 
-    while (it != paths.end()) {
-        if (Glib::file_test(*it, Glib::FILE_TEST_EXISTS)) {
-            Glib::Dir rep(*it);
-            Glib::DirIterator in = rep.begin();
-            while (in != rep.end()) {
-#ifdef G_OS_WIN32
-                if (((*in).find("lib") == 0) &&
-                    ((*in).rfind(".dll") == (*in).size() - 4)) {
-                    m_outs[(*in).substr(3, (*in).size() - 7)] = 0;
+    std::vector < utils::ModuleCache::iterator > modules;
+    std::vector < utils::ModuleCache::iterator >::iterator it;
+
+    modules = utils::ModuleCache::instance().browse(paths);
+
+    for (it = modules.begin(); it != modules.end(); ++it) {
+        if (m_outs.find((*it)->path()) == m_outs.end()) {
+            void* symbol = (*it)->get("makeNewOutputPlugin");
+            if (symbol) {
+                typedef OutputPlugin* (*function)(const std::string&);
+                function fct(utils::pointer_to_function < function >(symbol));
+
+                std::string package(utils::Path::getPackageFromPath(
+                        (*it)->path()));
+
+                std::string module(utils::Module::getPluginName(
+                        (*it)->path()));
+
+                OutputPlugin* plg = fct(utils::Module::getPluginName(module));
+
+                if (plg) {
+                    OutputPlg out(module, (*it)->path(), package, plg);
+                    m_outs.insert(std::make_pair(out.string(), out));
                 }
-#else
-                if (((*in).find("lib") == 0) &&
-                    ((*in).rfind(".so") == (*in).size() - 3)) {
-                    m_outs[(*in).substr(3, (*in).size() - 6)] = 0;
-                }
-#endif
-                in++;
             }
         }
-        it++;
     }
 }
 
 void PluginFactory::readModelingPlugins()
 {
     utils::PathList paths = utils::Path::path().getModelingDirs();
-    utils::PathList::iterator it = paths.begin();
 
-    while (it != paths.end()) {
-        if (Glib::file_test(*it, Glib::FILE_TEST_EXISTS)) {
-            Glib::Dir rep(*it);
-            Glib::DirIterator in = rep.begin();
-            while (in != rep.end()) {
-#ifdef G_OS_WIN32
-                if (((*in).find("lib") == 0) &&
-                    ((*in).rfind(".dll") == (*in).size() - 4)) {
-                    m_mods[(*in).substr(3, (*in).size() - 7)] = 0;
+    std::vector < utils::ModuleCache::iterator > modules;
+    std::vector < utils::ModuleCache::iterator >::iterator it;
+
+    modules = utils::ModuleCache::instance().browse(paths);
+
+    for (it = modules.begin(); it != modules.end(); ++it) {
+        if (m_mods.find((*it)->path()) == m_mods.end()) {
+            void* symbol = (*it)->get("makeNewModelingPlugin");
+            if (symbol) {
+                typedef ModelingPlugin* (*function)(const std::string&);
+                function fct(utils::pointer_to_function < function >(symbol));
+
+                std::string package(utils::Path::getPackageFromPath(
+                        (*it)->path()));
+
+                std::string module(utils::Module::getPluginName(
+                        (*it)->path()));
+
+                ModelingPlugin* plg = fct(utils::Module::getPluginName(module));
+
+                if (plg) {
+                    ModelingPlg mod(module, (*it)->path(), package, plg);
+                    m_mods.insert(std::make_pair(mod.string(), mod));
                 }
-#else
-                if (((*in).find("lib") == 0) &&
-                    ((*in).rfind(".so") == (*in).size() - 3)) {
-                    m_mods[(*in).substr(3, (*in).size() - 6)] = 0;
-                }
-#endif
-                in++;
             }
         }
-        it++;
     }
 }
 
-void PluginFactory::loadOutputPlugin(OutputPluginList::iterator it)
+void PluginFactory::readOovPlugins()
 {
-    assert(it != m_outs.end());
+    utils::PathList paths = utils::Path::path().getStreamDirs();
 
-    for (utils::PathList::const_iterator jt =
-         utils::Path::path().getOutputDirs().begin(); jt !=
-         utils::Path::path().getOutputDirs().end(); ++jt) {
+    std::vector < utils::ModuleCache::iterator > modules;
+    std::vector < utils::ModuleCache::iterator >::iterator it;
 
-        std::string filename = Glib::Module::build_path(*jt, it->first);
-        Glib::Module mdl(filename);
-        if (mdl) {
-            mdl.make_resident();
+    modules = utils::ModuleCache::instance().browse(paths);
 
-            typedef OutputPlugin* (*function)(const std::string&);
-            void* fctptr = 0;
-            OutputPlugin* plg = 0;
+    for (it = modules.begin(); it != modules.end(); ++it) {
+        if (m_oov.find((*it)->path()) == m_oov.end()) {
+            void* symbol = (*it)->get("makeNewOovPlugin");
+            if (symbol) {
+                std::string package(utils::Path::getPackageFromPath(
+                        (*it)->path()));
 
-            if (mdl.get_symbol("makeNewOutputPlugin", fctptr)) {
-                function fct(utils::pointer_to_function < function >(fctptr));
-                plg = fct(it->first);
-            } else {
-                throw utils::InternalError(fmt(
-                        "OutputPlugin '%1%': error opening, %2%") % it->first %
-                    Glib::Module::get_last_error());
+                std::string module(utils::Module::getPluginName(
+                        (*it)->path()));
+
+                OovPlg oov(module, (*it)->path(), package, (oov::Plugin*)0);
+                m_oov.insert(std::make_pair(oov.string(), oov));
             }
-
-            it->second = plg;
-            return;
         }
     }
-    throw utils::InternalError(fmt(
-            "OutputPlugin '%1%': plug-in not found") % it->first);
-}
-
-void PluginFactory::loadModelingPlugin(ModelingPluginList::iterator it)
-{
-    assert(it != m_mods.end());
-
-    for (utils::PathList::const_iterator jt =
-         utils::Path::path().getModelingDirs().begin(); jt !=
-         utils::Path::path().getModelingDirs().end(); ++jt) {
-
-        std::string filename = Glib::Module::build_path(*jt, it->first);
-        Glib::Module mdl(filename);
-        if (mdl) {
-            mdl.make_resident();
-
-            typedef ModelingPlugin* (*function)(const std::string&);
-            void* fctptr = 0;
-            ModelingPlugin* plg = 0;
-
-            if (mdl.get_symbol("makeNewModelingPlugin", fctptr)) {
-                function fct(utils::pointer_to_function < function >(fctptr));
-                plg = fct(it->first);
-            } else {
-                throw utils::InternalError(fmt(
-                        "ModelingPlugin '%1%': error opening, %2%") % it->first
-                    % Glib::Module::get_last_error());
-            }
-
-            it->second = plg;
-            return;
-        }
-    }
-    throw utils::InternalError(fmt(
-            "ModelingPlugin '%1%': plug-in not found") % it->first);
-}
-
-std::ostream& operator<<(std::ostream& out, const PluginFactory& plg)
-{
-    out << "Output: ";
-    for (OutputPluginList::const_iterator it = plg.outputPlugins().begin(); it
-         != plg.outputPlugins().end(); ++it) {
-        out << "(" << it->first << ", " << it->second << ")\n";
-    }
-
-    out << "Modeling: ";
-    for (ModelingPluginList::const_iterator it = plg.modelingPlugins().begin();
-         it != plg.modelingPlugins().end(); ++it) {
-        out << "(" << it->first << ", " << it->second << ")\n";
-    }
-
-    return out;
 }
 
 }} // namespace vle gvle

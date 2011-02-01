@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(test_qss1)
     vpz::Vpz file(utils::Path::path().getExampleFile("qss_exp1_test.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
-    o.setLocalStream("", "storage");
+    o.setLocalStream("", "storage", std::string());
 
     manager::RunQuiet r;
     r.start(file);
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(test_qss2)
     vpz::Vpz file(utils::Path::path().getExampleFile("qss_exp3_test.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
-    o.setLocalStream("", "storage");
+    o.setLocalStream("", "storage", std::string());
 
     manager::RunQuiet r;
     r.start(file);

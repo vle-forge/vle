@@ -60,8 +60,8 @@ BOOST_AUTO_TEST_CASE(test_gens)
     /* change the output text to storage output */
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
     vpz::Output& o2(file.project().experiment().views().outputs().get("o2"));
-    o.setLocalStream("", "storage");
-    o2.setLocalStream("", "storage");
+    o.setLocalStream("", "storage", std::string());
+    o2.setLocalStream("", "storage", std::string());
 
     /* run the simulation */
     manager::RunQuiet r;
@@ -125,8 +125,8 @@ BOOST_AUTO_TEST_CASE(test_gens_with_class)
     /* change the output text to storage output */
     vpz::Output& o(file->project().experiment().views().outputs().get("o"));
     vpz::Output& o2(file->project().experiment().views().outputs().get("o2"));
-    o.setLocalStream("", "storage");
-    o2.setLocalStream("", "storage");
+    o.setLocalStream("", "storage", std::string());
+    o2.setLocalStream("", "storage", std::string());
 
     /* run the simulation */
     manager::RunVerbose r(std::cerr);
@@ -180,7 +180,7 @@ BOOST_AUTO_TEST_CASE(test_gens_with_graph)
 
     /* change the output text to storage output */
     vpz::Output& o(file->project().experiment().views().outputs().get("o"));
-    o.setLocalStream("", "storage");
+    o.setLocalStream("", "storage", std::string());
 
     /* run the simulation */
     manager::RunVerbose r(std::cerr);
@@ -229,7 +229,7 @@ BOOST_AUTO_TEST_CASE(test_gens_delete_connection)
 
     /* change the output text to storage output */
     vpz::Output& o(file->project().experiment().views().outputs().get("o"));
-    o.setLocalStream("", "storage");
+    o.setLocalStream("", "storage", std::string());
 
     /* run the simulation */
     manager::RunVerbose r(std::cerr);

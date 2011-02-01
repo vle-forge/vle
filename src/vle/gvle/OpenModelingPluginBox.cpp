@@ -87,10 +87,10 @@ void OpenModelingPluginBox::build()
     mRefTreeModelingPlugin->clear();
 
     const PluginFactory& plf = mGVLE->pluginFactory();
-    const ModelingPluginList& pll = plf.modelingPlugins();
+    const PluginFactory::ModelingPluginList& pll = plf.modelingPlugins();
 
-    for (ModelingPluginList::const_iterator it = pll.begin();
-	 it != pll.end(); ++it) {
+    for (PluginFactory::ModelingPluginList::const_iterator it = pll.begin();
+         it != pll.end(); ++it) {
 	Gtk::TreeModel::Row row = *(mRefTreeModelingPlugin->append());
 	row[mColumns.mName] = utils::Path::basename(it->first);
     }

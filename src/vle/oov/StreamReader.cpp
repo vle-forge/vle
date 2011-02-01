@@ -60,7 +60,7 @@ void StreamReader::initPlugin(const std::string& plugin,
             utils::Path::path().getExternalPackagePluginOutputDir(package));
         m_plugin = pf.build(location);
     } else {
-        utils::PathList lst(utils::Path::path().getStreamDirs());
+        utils::PathList lst(utils::Path::path().getGlobalStreamDirs());
         utils::PathList::const_iterator it;
 
         std::string error((fmt(

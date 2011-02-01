@@ -37,7 +37,6 @@
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 #include <limits>
-#include <iostream>
 
 namespace vu = vle::utils;
 
@@ -58,8 +57,8 @@ ViewOutputBox::ViewOutputBox(Modeling& modeling,
     m_xml->get_widget("textviewDataDialogViewOutput", m_data);
     m_xml->get_widget("buttonEditPlugin", m_editplugin);
 
-    initViews();
     fillCombobox();
+    initViews();
     fillViews();
     initMenuPopupViews();
 
@@ -206,21 +205,34 @@ void ViewOutputBox::onAddViews()
     storePrevious();
     sensitive(true);
 
-    SimpleTypeBox box(_("Name of the view ?"), "");
-    std::string name = boost::trim_copy(box.run());
-    if (box.valid() and not name.empty() and not m_viewscopy.exist(name)) {
-        Gtk::TreeIter iter = m_model->append();
-        if (iter) {
-            Gtk::ListStore::Row row = *iter;
-            row[m_viewscolumnrecord.name] = name;
+    if (not m_plugin->get_model()->children().empty()) {
+        SimpleTypeBox box(_("Name of the view ?"), "");
+        std::string name = boost::trim_copy(box.run());
+        if (box.valid() and not name.empty() and not m_viewscopy.exist(name)) {
+            Gtk::TreeIter iter = m_model->append();
+            if (iter) {
+                Gtk::ListStore::Row row = *iter;
+                row[m_viewscolumnrecord.name] = name;
 
-            std::string outputname(buildOutputName(name));
-            m_viewscopy.addLocalStreamOutput(outputname, "", "default");
-            m_viewscopy.addTimedView(name, 1.0, outputname);
-            m_iter = iter;
-            updateView(name);
-            m_views->set_cursor(m_model->get_path(iter));
-            m_deletedView.erase(name);
+                std::string outputname(buildOutputName(name));
+
+                if (m_plugin->get_active_text().empty()) {
+                    m_plugin->set_active(0);
+                }
+
+                PluginFactory::OutputPlg& plugin =
+                    m_modeling.getGVLE()->pluginFactory().getOutput(
+                        m_plugin->get_active_text());
+
+                m_viewscopy.addLocalStreamOutput(outputname, "",
+                                                 plugin.name(),
+                                                 plugin.package());
+                m_viewscopy.addTimedView(name, 1.0, outputname);
+                m_iter = iter;
+                updateView(name);
+                m_views->set_cursor(m_model->get_path(iter));
+                m_deletedView.erase(name);
+            }
         }
     }
 }
@@ -318,12 +330,10 @@ void ViewOutputBox::onEditionStarted(
 	}
     }
 
-    if(m_validateRetry)
-    {
+    if(m_validateRetry) {
 	Gtk::CellEditable* celleditable_validated = cellEditable;
 	Gtk::Entry* pEntry = dynamic_cast<Gtk::Entry*>(celleditable_validated);
-	if(pEntry)
-	{
+        if(pEntry) {
 	    pEntry->set_text(m_invalidTextForRetry);
 	    m_validateRetry = false;
 	    m_invalidTextForRetry.clear();
@@ -437,11 +447,12 @@ void ViewOutputBox::onEditPlugin()
         PluginFactory& plf = m_modeling.getGVLE()->pluginFactory();
 
         try {
-            OutputPlugin& plugin = plf.getOutput(m_plugin->get_active_text());
+            PluginFactory::OutputPlg& plugin =
+                plf.getOutput(m_plugin->get_active_text());
             vpz::View& view(m_viewscopy.get(name));
             vpz::Output& output(m_viewscopy.outputs().get(view.output()));
 
-            plugin.start(output, view);
+            plugin.plugin()->start(output, view);
             if (output.data()) {
                 m_data->get_buffer()->set_text(output.data()->writeToXml());
             }
@@ -453,29 +464,35 @@ void ViewOutputBox::onEditPlugin()
 
 void ViewOutputBox::onChangedPlugin()
 {
-    Glib::RefPtr < Gtk::TreeView::Selection > ref =
-	m_views->get_selection();
+    Glib::RefPtr < Gtk::TreeView::Selection > ref = m_views->get_selection();
 
     if (ref) {
-	Gtk::TreeModel::iterator iter = ref->get_selected();
+        Gtk::TreeModel::iterator iter = ref->get_selected();
 
-	if (ref->get_selected()) {
-	    Gtk::TreeModel::Row row = *iter;
+        if (ref->get_selected()) {
+            Gtk::TreeModel::Row row = *iter;
             std::string name(row.get_value(m_viewscolumnrecord.name));
             vpz::View& view(m_viewscopy.get(name));
             vpz::Output& output(m_viewscopy.outputs().get(view.output()));
 
-            if (output.plugin() != m_plugin->get_active_text()) {
+            PluginFactory::OovPlg& plugin =
+                m_modeling.getGVLE()->pluginFactory().getOov(
+                    m_plugin->get_active_text());
+
+            if (output.plugin() != plugin.name() or
+                output.package() != plugin.package()) {
                 if (m_format->get_active_text() == "distant") {
                     output.setDistantStream(m_location->get_text(),
-                                            m_plugin->get_active_text());
+                                            plugin.name(),
+                                            plugin.package());
                 } else {
                     output.setLocalStream(m_location->get_text(),
-                                          m_plugin->get_active_text());
+                                          plugin.name(),
+                                          plugin.package());
                 }
                 updateView(name);
             }
-	}
+        }
     }
 }
 
@@ -512,29 +529,16 @@ void ViewOutputBox::fillCombobox()
     m_type->append_text("timed");
     m_format->append_text("distant");
     m_format->append_text("local");
+
     {
-        using namespace utils;
-        PathList paths = Path::path().getStreamDirs();
-        for (PathList::iterator it = paths.begin();
-             it != paths.end(); ++it) {
-            if (Glib::file_test(*it, Glib::FILE_TEST_EXISTS)) {
-                Glib::Dir rep(*it);
-                for (Glib::DirIterator in = rep.begin();
-                     in != rep.end(); ++in) {
-#ifdef G_OS_WIN32
-                    if (((*in).find("lib") == 0) and
-                        ((*in).rfind(".dll") == (*in).size() - 4)) {
-                        m_plugin->append_text((*in).substr(3,
-                                                           (*in).size() - 7));
-                    }
-#else
-                    if (((*in).find("lib") == 0) and
-                        ((*in).rfind(".so") == (*in).size() - 3)) {
-                        m_plugin->append_text((*in).substr(3,
-                                                           (*in).size() - 6));
-                    }
-#endif
-                }
+        PluginFactory& plf = m_modeling.getGVLE()->pluginFactory();
+        const PluginFactory::OovPluginList& plugins = plf.oovPlugins();
+
+        if (not plugins.empty()) {
+            PluginFactory::OovPluginList::const_iterator it;
+
+            for (it = plugins.begin(); it != plugins.end(); ++it) {
+                m_plugin->append_text(it->second.string());
             }
         }
     }
@@ -554,12 +558,18 @@ void ViewOutputBox::assignView(const std::string& name)
         view.setTimestep(x);
     }
 
+    PluginFactory::OovPlg& plugin =
+        m_modeling.getGVLE()->pluginFactory().getOov(
+            m_plugin->get_active_text());
+
     if (m_format->get_active_text() == "distant") {
         output.setDistantStream(m_location->get_text(),
-                                m_plugin->get_active_text());
+                                plugin.name(),
+                                plugin.package());
     } else {
         output.setLocalStream(m_location->get_text(),
-                              m_plugin->get_active_text());
+                              plugin.name(),
+                              plugin.package());
     }
 
     if (not m_data->get_buffer()->get_text().empty()) {
@@ -576,8 +586,6 @@ void ViewOutputBox::assignView(const std::string& name)
 
 void ViewOutputBox::updateView(const std::string& name)
 {
-    std::string plugin = m_plugin->get_active_text();
-
     vpz::View& view(m_viewscopy.get(name));
     vpz::Output& output(m_viewscopy.outputs().get(view.output()));
 
@@ -589,17 +597,22 @@ void ViewOutputBox::updateView(const std::string& name)
     m_location->set_text(output.location());
     m_directory->set_sensitive(output.format() == vpz::Output::LOCAL);
 
-    {
-        OutputPluginList list =
-            m_modeling.getGVLE()->pluginFactory().outputPlugins();
-        OutputPluginList::iterator it = list.find(output.plugin());
+    m_plugin->set_active_text(PluginFactory::OovPlg::generic(
+            output.plugin(), output.package()));
 
-        m_plugin->set_active_text(output.plugin());
+    {
+        PluginFactory::OutputPluginList list =
+            m_modeling.getGVLE()->pluginFactory().outputPlugins();
+        PluginFactory::OutputPluginList::iterator it =
+            list.find(PluginFactory::OutputPlg::generic(
+                    output.plugin(), output.package()));
+
         if (it != list.end()) {
             m_editplugin->set_sensitive(true);
         } else {
             m_editplugin->set_sensitive(false);
         }
+
         if (output.data()) {
             m_data->get_buffer()->set_text(output.data()->writeToXml());
         } else {

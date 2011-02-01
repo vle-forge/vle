@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(common_seed_test)
     vle::vpz::Output& view =
         vle_views.outputs().get(vle_views.get("view").output());
     if (view.plugin() != "storage") {
-        view.setLocalStream("", "storage");
+        view.setLocalStream("", "storage", std::string());
     }
 
     vpz::Conditions& cnds(file.project().experiment().conditions());

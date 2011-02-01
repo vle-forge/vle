@@ -388,6 +388,65 @@ void Path::copyTemplate(const std::string& name, const std::string& to) const
     }
 }
 
+PathList Path::getGlobalStreamDirs()
+{
+    PathList result;
+
+    if (fs::is_directory(getStreamDir())) {
+        result.push_back(getStreamDir());
+    }
+
+    if (fs::is_directory(getHomeStreamDir())) {
+        result.push_back(getHomeStreamDir());
+    }
+
+    return result;
+}
+
+PathList Path::getGlobalOutputDirs()
+{
+    PathList result;
+
+    if (fs::is_directory(getOutputDir())) {
+        result.push_back(getOutputDir());
+    }
+
+    if (fs::is_directory(getHomeOutputDir())) {
+        result.push_back(getHomeOutputDir());
+    }
+
+    return result;
+}
+
+PathList Path::getGlobalModelingDirs()
+{
+    PathList result;
+
+    if (fs::is_directory(getModelingDir())) {
+        result.push_back(getModelingDir());
+    }
+
+    if (fs::is_directory(getHomeModelingDir())) {
+        result.push_back(getHomeModelingDir());
+    }
+
+    return result;
+}
+
+PathList Path::getGlobalSimulatorDirs()
+{
+    PathList result;
+
+    if (fs::is_directory(getSimulatorDir())) {
+        result.push_back(getSimulatorDir());
+    }
+
+    if (fs::is_directory(getHomeSimulatorDir())) {
+        result.push_back(getHomeSimulatorDir());
+    }
+
+    return result;
+}
 
 std::string Path::getPackageDir() const
 {
@@ -681,6 +740,30 @@ PathList Path::getInstalledLibraries()
     return result;
 }
 
+std::string Path::getPackageFromPath(const std::string& path)
+{
+    fs::path source(path);
+    fs::path package(utils::Path::path().getPackagesDir());
+
+    fs::path::iterator it = source.begin();
+    fs::path::iterator jt = package.begin();
+
+    while (it != source.end() and jt != package.end()) {
+        if ((*it) == (*jt)) {
+            ++it;
+            ++jt;
+        } else {
+            break;
+        }
+    }
+
+    if (jt == package.end() and it != source.end()) {
+        return *it;
+    } else {
+        return std::string();
+    }
+}
+
 void Path::initVleHomeDirectory()
 {
     fs::create_directory(getHomeDir());
@@ -781,7 +864,6 @@ void Path::clearPluginDirs()
     m_simulator.clear();
     m_stream.clear();
     m_output.clear();
-    m_condition.clear();
     m_modeling.clear();
 }
 
@@ -812,9 +894,39 @@ void Path::initPackagePluginDirs()
     m_currentPackagePath.assign(buildDirname(
             m_home, "pkgs", utils::Package::package().name()));
 
-    addStreamDir(getPackagePluginOutputDir());
-    addOutputDir(getPackagePluginGvleOutputDir());
-    addModelingDir(getPackagePluginGvleModelingDir());
+    PathList result;
+    for (fs::directory_iterator it(getPackagesDir()), end; it != end; ++it) {
+        if (fs::is_directory(it->status())) {
+            fs::path package(*it);
+            package /= "plugins";
+            if (fs::is_directory(package)) {
+                {
+                    fs::path oov(package);
+                    oov = oov /  "output";
+
+                    if (fs::is_directory(oov)) {
+                        addStreamDir(oov.string());
+                    }
+                }
+                {
+                    fs::path gvleout(package);
+                    gvleout = gvleout / "gvle" / "output";
+
+                    if (fs::is_directory(gvleout)) {
+                        addOutputDir(gvleout.string());
+                    }
+                }
+                {
+                    fs::path gvlemod(package);
+                    gvlemod = gvlemod / "gvle" /  "output";
+
+                    if (fs::is_directory(gvlemod)) {
+                        addModelingDir(gvlemod.string());
+                    }
+                }
+            }
+        }
+    }
 
     addStreamDir(getStreamDir());
     addOutputDir(getOutputDir());

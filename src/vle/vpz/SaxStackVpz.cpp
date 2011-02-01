@@ -750,21 +750,18 @@ void SaxStackVpz::pushOutput(const xmlChar** att)
     Outputs& outs(m_vpz.project().experiment().views().outputs());
 
     if (xmlStrcmp(format, (const xmlChar*)"local") == 0) {
-        Output& result = outs.addLocalStream(xmlCharToString(name), location ?
-                                             xmlCharToString(location) : "",
-                                             xmlCharToString(plugin));
-        if (package) {
-            result.setPackage(xmlCharToString(package));
-        }
+        Output& result = outs.addLocalStream(
+            xmlCharToString(name),
+            location ? xmlCharToString(location) : std::string(),
+            xmlCharToString(plugin),
+            package ? xmlCharToString(package) : std::string());
         push(&result);
     } else if (xmlStrcmp(format, (const xmlChar*)"distant") == 0) {
-        Output& result = outs.addDistantStream(xmlCharToString(name),
-                                               location ?
-                                               xmlCharToString(location) : "",
-                                               xmlCharToString(plugin));
-        if (package) {
-            result.setPackage(xmlCharToString(package));
-        }
+        Output& result = outs.addDistantStream(
+            xmlCharToString(name),
+            location ? xmlCharToString(location) : std::string(),
+            xmlCharToString(plugin),
+            package ? xmlCharToString(package) : std::string());
         push(&result);
     } else {
         throw utils::SaxParserError(fmt(

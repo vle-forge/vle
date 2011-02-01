@@ -103,12 +103,49 @@ namespace vle { namespace vpz {
          * @param name The name of this output.
          * @param location The location of this output (on local filesystem).
          * @param plugin The name of the plugin.
+         * @param package The package of the plugin.
          * @return A reference to the newly output.
          * @throw utils::ArgError if name already exists.
          */
         Output& addLocalStreamOutput(const std::string& name,
                                      const std::string& location,
-                                     const std::string& plugin);
+                                     const std::string& plugin,
+                                     const std::string& package)
+        {
+            return m_outputs.addLocalStream(name, location, plugin, package);
+        }
+
+        /**
+         * @brief Add a local Output stream.
+         * @param name The name of this output.
+         * @param location The location of this output (on local filesystem).
+         * @param plugin The name of the plugin.
+         * @return A reference to the newly output.
+         * @throw utils::ArgError if name already exists.
+         */
+        Output& addLocalStreamOutput(const std::string& name,
+                                     const std::string& location,
+                                     const std::string& plugin)
+        {
+            return m_outputs.addLocalStream(name, location, plugin);
+        }
+
+        /**
+         * @brief Add a distant Output stream.
+         * @param name The name of this output.
+         * @param location The location of this output (on distant host).
+         * @param plugin The name of the plugin.
+         * @param package The package of the plugin.
+         * @return A reference to the newly output.
+         * @throw utils::ArgError if name already exists.
+         */
+        Output& addDistantStreamOutput(const std::string& name,
+                                       const std::string& location,
+                                       const std::string& plugin,
+                                       const std::string& package)
+        {
+            return m_outputs.addDistantStream(name, location, plugin, package);
+        }
 
         /**
          * @brief Add a distant Output stream.
@@ -120,7 +157,10 @@ namespace vle { namespace vpz {
          */
         Output& addDistantStreamOutput(const std::string& name,
                                        const std::string& location,
-                                       const std::string& plugin);
+                                       const std::string& plugin)
+        {
+            return m_outputs.addDistantStream(name, location, plugin);
+        }
 
         /**
          * @brief Delete the specified Output.

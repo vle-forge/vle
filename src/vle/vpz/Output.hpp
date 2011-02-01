@@ -128,10 +128,34 @@ namespace vle {
          * obligatory, the location defines a filename.
          * @param location the file name.
          * @param plugin to use in output stream.
+         * @param package the package of the plugin.
+         * @throw utils::ArgError if name is empty.
+         */
+        void setLocalStream(const std::string& location,
+                            const std::string& plugin,
+                            const std::string& package);
+
+        /**
+         * @brief Set the output with text stream information. The name is
+         * obligatory, the location defines a filename.
+         * @param location the file name.
+         * @param plugin to use in output stream.
          * @throw utils::ArgError if name is empty.
          */
         void setLocalStream(const std::string& location,
                             const std::string& plugin);
+
+        /**
+         * @brief Set the output with the sdml stream information. The name is
+         * obligatory, the location defines a filename.
+         * @param location the file name.
+         * @param plugin to use in output stream.
+         * @param package the package of the plugin
+         * @throw utils::ArgError if name is empty.
+         */
+        void setDistantStream(const std::string& location,
+                              const std::string& plugin,
+                              const std::string& package);
 
         /**
          * @brief Set the output with the sdml stream information. The name is

@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(test_equation1)
     vpz::Vpz file(utils::Path::path().getExampleFile("equation1.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
-    o.setLocalStream("", "storage");
+    o.setLocalStream("", "storage", std::string());
 
     manager::RunQuiet r;
     r.start(file);
@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE(test_equation2)
     vpz::Vpz file(utils::Path::path().getExampleFile("equation2.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
-    o.setLocalStream("", "storage");
+    o.setLocalStream("", "storage", std::string());
 
     manager::RunQuiet r;
     r.start(file);
@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE(test_equation3)
     vpz::Vpz file(utils::Path::path().getExampleFile("equation3.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
-    o.setLocalStream("", "storage");
+    o.setLocalStream("", "storage", std::string());
 
     manager::RunQuiet r;
     r.start(file);
@@ -150,7 +150,7 @@ BOOST_AUTO_TEST_CASE(test_equation4)
     vpz::Vpz file(utils::Path::path().getExampleFile("equation4.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
-    o.setLocalStream("", "storage");
+    o.setLocalStream("", "storage", std::string());
 
     manager::RunQuiet r;
     r.start(file);
@@ -181,7 +181,7 @@ BOOST_AUTO_TEST_CASE(test_equation5)
     vpz::Vpz file(utils::Path::path().getExampleFile("equation5.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
-    o.setLocalStream("", "storage");
+    o.setLocalStream("", "storage", std::string());
 
     manager::RunQuiet r;
     r.start(file);
@@ -226,7 +226,7 @@ BOOST_AUTO_TEST_CASE(test_equation6)
     vpz::Vpz file(utils::Path::path().getExampleFile("equation6.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
-    o.setLocalStream("", "storage");
+    o.setLocalStream("", "storage", std::string());
 
     manager::RunQuiet r;
     r.start(file);
@@ -271,7 +271,7 @@ BOOST_AUTO_TEST_CASE(test_equation7)
     vpz::Vpz file(utils::Path::path().getExampleFile("equation7.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
-    o.setLocalStream("", "storage");
+    o.setLocalStream("", "storage", std::string());
 
     manager::RunQuiet r;
     r.start(file);
@@ -312,7 +312,7 @@ BOOST_AUTO_TEST_CASE(test_equation8)
     vpz::Vpz file(utils::Path::path().getExampleFile("equation8.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
-    o.setLocalStream("", "storage");
+    o.setLocalStream("", "storage", std::string());
 
     manager::RunQuiet r;
     r.start(file);
@@ -357,7 +357,7 @@ BOOST_AUTO_TEST_CASE(test_equation9)
     vpz::Vpz file(utils::Path::path().getExampleFile("equation9.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
-    o.setLocalStream("", "storage");
+    o.setLocalStream("", "storage", std::string());
 
     manager::RunQuiet r;
     r.start(file);
@@ -402,7 +402,7 @@ BOOST_AUTO_TEST_CASE(test_equation10)
     vpz::Vpz file(utils::Path::path().getExampleFile("equation10.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
-    o.setLocalStream("", "storage");
+    o.setLocalStream("", "storage", std::string());
 
     manager::RunQuiet r;
     r.start(file);
@@ -447,7 +447,7 @@ BOOST_AUTO_TEST_CASE(test_equation11)
     vpz::Vpz file(utils::Path::path().getExampleFile("equation11.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
-    o.setLocalStream("", "storage");
+    o.setLocalStream("", "storage", std::string());
 
     manager::RunQuiet r;
     r.start(file);
@@ -492,7 +492,7 @@ BOOST_AUTO_TEST_CASE(test_equation12)
     vpz::Vpz file(utils::Path::path().getExampleFile("equation12.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
-    o.setLocalStream("", "storage");
+    o.setLocalStream("", "storage", std::string());
 
     manager::RunQuiet r;
     r.start(file);
@@ -537,7 +537,7 @@ BOOST_AUTO_TEST_CASE(test_equation13)
     vpz::Vpz file(utils::Path::path().getExampleFile("equation13.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
-    o.setLocalStream("", "storage");
+    o.setLocalStream("", "storage", std::string());
 
     manager::RunQuiet r;
     r.start(file);
@@ -568,7 +568,7 @@ BOOST_AUTO_TEST_CASE(test_equation14)
     vpz::Vpz file(utils::Path::path().getExampleFile("equation14.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
-    o.setLocalStream("", "storage");
+    o.setLocalStream("", "storage", std::string());
 
     manager::RunQuiet r;
     r.start(file);
@@ -605,7 +605,7 @@ BOOST_AUTO_TEST_CASE(test_equation15)
     vpz::Vpz file(utils::Path::path().getExampleFile("equation15.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o"));
-    o.setLocalStream("", "storage");
+    o.setLocalStream("", "storage", std::string());
 
     manager::RunQuiet r;
     r.start(file);
@@ -635,7 +635,7 @@ BOOST_AUTO_TEST_CASE(test_asynchronous)
     vpz::Vpz file(utils::Path::path().getExampleFile("asynchronous.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("view"));
-    o.setLocalStream("", "storage");
+    o.setLocalStream("", "storage", std::string());
 
     manager::RunQuiet r;
     r.start(file);
@@ -666,7 +666,7 @@ BOOST_AUTO_TEST_CASE(test_earlyPerturb)
     vpz::Vpz file(utils::Path::path().getExampleFile("earlyPerturb.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("view"));
-    o.setLocalStream("", "storage");
+    o.setLocalStream("", "storage", std::string());
 
     manager::RunQuiet r;
 

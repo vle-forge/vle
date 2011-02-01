@@ -36,6 +36,7 @@
 #include <gtkmm/button.h>
 #include <gtkmm/progressbar.h>
 #include <gtkmm/label.h>
+#include <vle/utils/Module.hpp>
 
 namespace vle { namespace vpz {
 
@@ -60,6 +61,13 @@ private:
 
     /* The VPZ to execute */
     const vpz::Vpz& mVpz;
+
+    utils::ModuleCache::ModuleList mLoadedPlugin; /**< Stores the loaded
+                                                    plug-ins before simulation.
+                                                    In the descrutor of
+                                                    LaunchSimulationBox we need
+                                                    to erase all newest
+                                                    plugins. */
 
     /* Gtk Widgets */
     Gtk::Dialog      *mDialog;

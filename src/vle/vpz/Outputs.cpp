@@ -45,11 +45,33 @@ void Outputs::write(std::ostream& out) const
 
 Output& Outputs::addLocalStream(const std::string& name,
                                 const std::string& location,
+                                const std::string& plugin,
+                                const std::string& package)
+{
+    Output o;
+    o.setName(name);
+    o.setLocalStream(location, plugin, package);
+    return add(o);
+}
+
+Output& Outputs::addLocalStream(const std::string& name,
+                                const std::string& location,
                                 const std::string& plugin)
 {
     Output o;
     o.setName(name);
     o.setLocalStream(location, plugin);
+    return add(o);
+}
+
+Output& Outputs::addDistantStream(const std::string& name,
+                                  const std::string& location,
+                                  const std::string& plugin,
+                                  const std::string& package)
+{
+    Output o;
+    o.setName(name);
+    o.setDistantStream(location, plugin, package);
     return add(o);
 }
 
@@ -121,10 +143,12 @@ void Outputs::rename(const std::string& oldoutputname,
 
     switch(copy.format()) {
     case Output::LOCAL:
-	addLocalStream(newoutputname, copy.location(), copy.plugin());
+        addLocalStream(newoutputname, copy.location(), copy.plugin(),
+                       copy.package());
 	break;
     case Output::DISTANT:
-	addDistantStream(newoutputname, copy.location(), copy.plugin());
+        addDistantStream(newoutputname, copy.location(), copy.plugin(),
+                         copy.package());
         break;
     }
 }

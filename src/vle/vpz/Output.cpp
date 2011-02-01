@@ -102,6 +102,23 @@ void Output::write(std::ostream& out) const
 }
 
 void Output::setLocalStream(const std::string& location,
+                            const std::string& plugin,
+                            const std::string& package)
+{
+    if (plugin.empty()) {
+        throw utils::ArgError(fmt(
+                _("Output '%1%' have not plugin defined")) % m_name);
+    }
+
+    m_location.assign(location);
+    m_plugin.assign(plugin);
+    m_package.assign(package);
+    m_format = Output::LOCAL;
+
+    clearData();
+}
+
+void Output::setLocalStream(const std::string& location,
                             const std::string& plugin)
 {
     if (plugin.empty()) {
@@ -111,7 +128,25 @@ void Output::setLocalStream(const std::string& location,
 
     m_location.assign(location);
     m_plugin.assign(plugin);
+    m_package.clear();
     m_format = Output::LOCAL;
+
+    clearData();
+}
+
+void Output::setDistantStream(const std::string& location,
+                              const std::string& plugin,
+                              const std::string& package)
+{
+    if (plugin.empty()) {
+        throw utils::ArgError(fmt(
+                _("Output '%1%' have not plugin defined")) % m_name);
+    }
+
+    m_location.assign(location);
+    m_plugin.assign(plugin);
+    m_package.assign(package);
+    m_format = Output::DISTANT;
 
     clearData();
 }
@@ -126,6 +161,7 @@ void Output::setDistantStream(const std::string& location,
 
     m_location.assign(location);
     m_plugin.assign(plugin);
+    m_package.clear();
     m_format = Output::DISTANT;
 
     clearData();

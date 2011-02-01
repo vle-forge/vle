@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(test_dess1)
     vpz::Vpz file(utils::Path::path().getExampleFile("sir2.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o3"));
-    o.setLocalStream("", "storage");
+    o.setLocalStream("", "storage", std::string());
 
     manager::RunQuiet r;
     r.start(file);
@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE(test_dess2)
     vpz::Vpz file(utils::Path::path().getExampleFile("sir3.vpz"));
 
     vpz::Output& o(file.project().experiment().views().outputs().get("o5"));
-    o.setLocalStream("", "storage");
+    o.setLocalStream("", "storage", std::string());
 
     manager::RunQuiet r;
     r.start(file);

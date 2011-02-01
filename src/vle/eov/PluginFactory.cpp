@@ -1,5 +1,5 @@
 /*
- * @file vle/oov/PluginFactory.cpp
+ * @file vle/eov/PluginFactory.cpp
  *
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems
@@ -26,40 +26,39 @@
  */
 
 
-#include <vle/oov/PluginFactory.hpp>
+#include <vle/eov/PluginFactory.hpp>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Module.hpp>
 
 
-namespace vle { namespace oov {
+namespace vle { namespace eov {
 
-PluginPtr PluginFactory::build(const std::string& location)
+PluginPtr PluginFactory::build(oov::PluginPtr oovplugin, NetStreamReader* net)
 {
     utils::ModuleCache::iterator module =
         utils::ModuleCache::instance().load(mPlugin, mPath);
 
-    void* symbol = module->get("makeNewOovPlugin");
+    void* symbol = module->get("makeNewEovPlugin");
 
     if (not symbol) {
         throw utils::ArgError(
-            fmt(_("Error when searching `makeNewOovPlugin' function in"
-                  " plugin `%1%' path `%2%' (%3%)")) % mPlugin % mPath %
+            fmt(_("Error when searching `makeNewEovPlugin' function in"
+                  " eov plugin `%1%' path `%2%' (%3%)")) % mPlugin % mPath %
             module->path());
     }
 
     function fct(utils::pointer_to_function < function >(symbol));
-    Plugin* call = fct(location);
+    Plugin* call = fct(oovplugin, net);
 
     if (not call) {
         throw utils::InternalError(fmt(
-                _("Error when calling constructor of oov plugin `%1%'")) %
+                _("Error when calling constructor of eov plugin `%1%'")) %
             mPlugin);
     }
-
 
     PluginPtr plugin(call);
     return plugin;
 }
 
-}} // namespace vle oov
+}} // namespace vle eov

@@ -66,9 +66,9 @@ BOOST_AUTO_TEST_CASE(vpz_add_output)
 {
     Views views;
 
-    views.addLocalStreamOutput("out1", "", "storage");
-    views.addLocalStreamOutput("out2", "", "storage");
-    views.addLocalStreamOutput("out3", "", "storage");
+    views.addLocalStreamOutput("out1", "", "storage", "");
+    views.addLocalStreamOutput("out2", "", "storage", "");
+    views.addLocalStreamOutput("out3", "", "storage", "");
 
     BOOST_REQUIRE_NO_THROW(views.addEventView("view1", "out1"));
     BOOST_REQUIRE_NO_THROW(views.addEventView("view2", "out4"));

@@ -32,6 +32,7 @@
 #include <vle/utils/Socket.hpp>
 #include <vle/utils/Path.hpp>
 #include <vle/utils/i18n.hpp>
+#include <vle/utils/Module.hpp>
 #include <vle/version.hpp>
 
 #include <glibconfig.h>
@@ -174,6 +175,7 @@ void init()
         Glib::thread_init();
     }
 
+    utils::ModuleCache::init();
     utils::Path::init();
     utils::Trace::init();
     utils::net::Base::init();
@@ -187,6 +189,7 @@ void init()
 
 void finalize()
 {
+    utils::ModuleCache::kill();
     utils::Path::kill();
     utils::Trace::kill();
     xmlCleanupParser();

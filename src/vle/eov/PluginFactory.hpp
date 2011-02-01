@@ -1,5 +1,5 @@
 /*
- * @file vle/oov/PluginFactory.hpp
+ * @file vle/eov/PluginFactory.hpp
  *
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems
@@ -26,14 +26,14 @@
  */
 
 
-#ifndef VLE_OOV_PLUGINFACTORY_HPP
-#define VLE_OOV_PLUGINFACTORY_HPP 1
+#ifndef VLE_EOV_PLUGINFACTORY_HPP
+#define VLE_EOV_PLUGINFACTORY_HPP 1
 
-#include <vle/oov/DllDefines.hpp>
-#include <vle/oov/Plugin.hpp>
+#include <vle/eov/DllDefines.hpp>
+#include <vle/eov/Plugin.hpp>
 #include <string>
 
-namespace vle { namespace oov {
+namespace vle { namespace eov {
 
 /**
  * @brief PluginFactory is used to build boost::shared_ptr to the oov::Plugin
@@ -41,15 +41,16 @@ namespace vle { namespace oov {
  * `makeNewOovPlugin' exists.
  *
  */
-class VLE_OOV_EXPORT PluginFactory
+class VLE_EOV_EXPORT PluginFactory
 {
 public:
-    /** 
-     * @brief Define the pointer to function of the oov::Plugin plug-in.
-     * @param The output location of the oov::Plugin.
-     * @return A pointer to the oov::Plugin newly build.
+    /**
+     * @brief Define the pointer to function of the eov::Plugin plug-in.
+     * @param The reference to the oov::PluginPtr.
+     * @param The reference to the NetStreamReader.
+     * @return A pointer to the eov::Plugin newly build.
      */
-    typedef Plugin* (*function)(const std::string&);
+    typedef Plugin* (*function)(oov::PluginPtr&, NetStreamReader*);
 
     /**
      * @brief Constructor to load oov::Plugin from pathname.
@@ -65,7 +66,7 @@ public:
     ~PluginFactory()
     {}
 
-    PluginPtr build(const std::string& location);
+    PluginPtr build(oov::PluginPtr oovplugin, NetStreamReader* net);
 
 private:
     std::string mPlugin; /**< The name of the plugin, for instance `storage' or
@@ -74,6 +75,6 @@ private:
                          plugin or a package plugin path. */
 };
 
-}} // namespace vle oov
+}} // namespace vle eov
 
 #endif

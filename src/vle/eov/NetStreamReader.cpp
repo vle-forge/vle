@@ -27,6 +27,7 @@
 
 
 #include <vle/eov/NetStreamReader.hpp>
+#include <vle/eov/PluginFactory.hpp>
 #include <vle/eov/Window.hpp>
 #include <vle/utils/Debug.hpp>
 #include <vle/utils/Path.hpp>
@@ -133,7 +134,7 @@ void NetStreamReader::onClose(const double& time)
 
 void NetStreamReader::getGtkPlugin(const std::string& pluginname)
 {
-    utils::PathList lst(utils::Path::path().getStreamDirs());
+    utils::PathList lst(utils::Path::path().getGlobalStreamDirs());
     utils::PathList::const_iterator it;
 
     std::string error((fmt(_(
@@ -164,7 +165,7 @@ void NetStreamReader::getGtkPlugin(const std::string& pluginname)
 
 void NetStreamReader::getDefaultPlugin()
 {
-    utils::PathList lst(utils::Path::path().getStreamDirs());
+    utils::PathList lst(utils::Path::path().getGlobalStreamDirs());
     utils::PathList::const_iterator it;
 
     std::string error(_("Error opening eov default plugin:"));
@@ -200,57 +201,6 @@ void NetStreamReader::runWindow()
     }
 
     m_main.setPlugin(m_plugin);
-}
-
-NetStreamReader::PluginFactory::PluginFactory(const std::string& plugin,
-                                              const std::string& pathname) :
-    m_module(0),
-    m_plugin(plugin)
-{
-    std::string file(Glib::Module::build_path(pathname, plugin));
-    m_module = new Glib::Module(file);
-    if (not (*m_module)) {
-        delete m_module;
-        m_module = 0;
-        throw utils::InternalError(fmt(_(
-                "\n[%1%]: %2%")) % pathname % Glib::Module::get_last_error());
-    }
-    m_module->make_resident();
-}
-
-NetStreamReader::PluginFactory::~PluginFactory()
-{
-    delete m_module;
-}
-
-PluginPtr NetStreamReader::PluginFactory::build(oov::PluginPtr oovplugin,
-                                                NetStreamReader* net)
-{
-    /*
-     * Define the pointer to the fonction of the eov::Plugin plug-in.
-     */
-    typedef Plugin* (*function)(oov::PluginPtr&, NetStreamReader*);
-
-    Plugin* call = 0;
-    void*   makeNewEovPlugin = 0;
-
-    if (not m_module->get_symbol("makeNewEovPlugin", makeNewEovPlugin)) {
-        throw utils::InternalError(fmt(_(
-                "Error when searching makeNewEovPlugin function in plugin %1%"))
-            % m_plugin);
-    }
-
-    function fct(utils::pointer_to_function < function >(makeNewEovPlugin));
-    call = fct(oovplugin, net);
-
-    if (not call) {
-        throw utils::InternalError(fmt(_(
-                "Error when calling makeNewEovPlugin function in plugin %1%"))
-            % m_plugin);
-    }
-
-    PluginPtr plugin(call);
-    return plugin;
 }
 
 }} // namespace vle eov

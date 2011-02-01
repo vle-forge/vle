@@ -27,163 +27,198 @@
 
 
 #ifndef VLE_GVLE_PLUGINFACTORY_HPP
-#define VLE_GVLE_PLUGINFACTORY_HPP
+#define VLE_GVLE_PLUGINFACTORY_HPP 1
 
 #include <vle/gvle/OutputPlugin.hpp>
 #include <vle/gvle/ModelingPlugin.hpp>
+#include <vle/oov/Plugin.hpp>
+#include <vle/utils/Module.hpp>
 #include <boost/noncopyable.hpp>
 
 namespace vle { namespace gvle {
 
-    typedef std::map < std::string, OutputPlugin* > OutputPluginList;
-    typedef std::map < std::string, ModelingPlugin* > ModelingPluginList;
-
-    /**
-     * @brief The PluginFactory allows to load the outputs and conditions
-     * plug-ins (ModelingPlugin and OutputPlugin). At start time, the
-     * PluginFactory build a dictionary of available plug-ins. Use the
-     * getModeling and getOutput to load plug-in.
-     */
-    class PluginFactory : public boost::noncopyable
+/**
+ * @brief The PluginFactory allows to load the outputs and conditions
+ * plug-ins (ModelingPlugin and OutputPlugin). At start time, the
+ * PluginFactory build a dictionary of available plug-ins. Use the
+ * getModeling and getOutput to load plug-in.
+ */
+class PluginFactory : public boost::noncopyable
+{
+public:
+    template < class T >
+    class Plugin
     {
     public:
-        /**
-         * @brief Fill the conditions and outputs plug-ins list with files
-         * readed from conditions and outputs directories.
-         */
-        PluginFactory();
+        Plugin(const std::string& name, const std::string& path,
+               const std::string& package, T* plugin)
+            : mName(name), mPath(path), mPackage(package), mPlugin(plugin)
+        {}
 
         /**
-         * @brief Delete all loaded plug-ins.
-         */
-        ~PluginFactory();
-
-        /**
-         * @brief Delete all loaded plug-ins and fill the outputs plug-ins list
-         * with files readed from conditions and outputs directories.
-         */
-        void update();
-
-        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         * @brief Represents the public string of the plugin. For instance, for
+         * the generic plugin Storage, name is equal to `storage (generic)'.
          *
-         * Manage plug-ins
-         *
-         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-        /**
-         * @brief Load the dynamic library attached to the output name.
-         * @param name The name of the output to load.
-         * @throw utils::InternalError if name does not exist or if the plug-in
-         * is not loadable.
+         * @return A string representation of the plug-in.
          */
-        void initOutput(const std::string& name);
+        std::string string() const
+        { return Plugin::generic(mName, mPackage); }
 
-        /**
-         * @brief Load the dynamic library attached to the modeling name.
-         * @param name The name of the modeling to load.
-         * @throw utils::InternalError if name does not exist or if the plug-in
-         * is not loadable.
-         */
-        void initModeling(const std::string& name);
+        const std::string& path() const { return mPath; }
+        const std::string& name() const { return mName; }
+        const std::string& package() const { return mPackage; }
+        T* plugin() const { return mPlugin; }
 
-        /**
-         * @brief Delete the plug-in attached to the output name.
-         * @param name The name of the output to delete.
-         * @throw utils::InternalError if name does not exist.
-         */
-        void clearOutput(const std::string& name);
+        static std::string generic(const std::string& name,
+                                   const std::string& package)
+        {
+            std::string result(name);
 
-        /**
-         * @brief Delete the plug-in attached to the modeling name.
-         * @param name The name of the modeling to delete.
-         * @throw utils::InternalError if name does not exist.
-         */
-        void clearModeling(const std::string& name);
+            result += " (";
+            result += (package.empty() ? "generic" : package);
+            result += ")";
 
-        /**
-         * @brief Delete the plug-in attached to the output name and delete
-         * the key from outputs list.
-         * @param name The name of the output to delete.
-         * @throw utils::InternalError if name does not exist.
-         */
-        void eraseOutput(const std::string& name);
-
-        /**
-         * @brief Delete the plug-in attached to the modeling name and delete
-         * the key from modelings list.
-         * @param name The name of the modeling to delete.
-         * @throw utils::InternalError if name does not exist.
-         */
-        void eraseModeling(const std::string& name);
-
-        /**
-         * @brief Get a reference to the specified output plug-in.
-         * @param name The name of the output.
-         * @return A reference to the output.
-         * @throw utils::InternalError if name does not exist.
-         */
-        OutputPlugin& getOutput(const std::string& name);
-
-        /**
-         * @brief Get a reference to the specified modeling plug-in.
-         * @param name The name of the modeling.
-         * @return A reference to the modeling.
-         * @throw utils::InternalError if name does not exist.
-         */
-        ModelingPlugin& getModeling(const std::string& name);
-
-        /**
-         * @brief Get a const reference to the specified output plug-in.
-         * @param name The name of the output.
-         * @return A const reference to the output.
-         * @throw utils::InternalError if name does not exist.
-         */
-        const OutputPlugin& getOutput(const std::string& name) const;
-
-        /**
-         * @brief Get a const reference to the specified modeling plug-in.
-         * @param name The name of the modeling.
-         * @return A const reference to the modeling.
-         * @throw utils::InternalError if name does not exist.
-         */
-        const ModelingPlugin& getModeling(const std::string& name) const;
-
-        /**
-         * @brief Get a constant reference to the output plug-ins list.
-         * @return Get a constant reference.
-         */
-        const OutputPluginList& outputPlugins() const
-        { return m_outs; }
-
-        /**
-         * @brief Get a constant reference to the modeling plug-ins list.
-         * @return Get a constant reference.
-         */
-        const ModelingPluginList& modelingPlugins() const
-        { return m_mods; }
+            return result;
+        }
 
     private:
-        OutputPluginList m_outs;
-        ModelingPluginList m_mods;
+        std::string mName; /**< Represents the name of the plug-in. For
+                             example, for the generic plugin Storage,
+                             pluginname is equal to `storage' and for package
+                             plug'ins caview, pluginname is equal to
+                             `caview'. */
 
-        void readOutputPlugins();
-        void readModelingPlugins();
-        void loadOutputPlugin(OutputPluginList::iterator it);
-        void loadModelingPlugin(ModelingPluginList::iterator it);
+        std::string mPath; /**< The complete key path of the dynamic library.
+                             For instance, for the generic plugin Store, path
+                             is equal to
+                             `$prefix/usr/lib/vle-1.0/stream/libstorage.so'. */
 
-        OutputPluginList::iterator getO(const std::string& name);
-        OutputPluginList::const_iterator getO(const std::string& name) const;
-        ModelingPluginList::iterator getM(const std::string& name);
-        ModelingPluginList::const_iterator getM(const std::string& name) const;
+        std::string mPackage; /**< Represents the name of the package. Empty if
+                                the plug-in is generic. */
+
+        T* mPlugin; /**< A pointer to the oov, modeling or output plug-in
+                      loaded from the shared library. */
     };
 
+    typedef Plugin < OutputPlugin > OutputPlg;
+    typedef Plugin < ModelingPlugin > ModelingPlg;
+    typedef Plugin < oov::Plugin > OovPlg;
+
+    typedef std::map < std::string, OutputPlg > OutputPluginList;
+    typedef std::map < std::string, ModelingPlg > ModelingPluginList;
+    typedef std::map < std::string, OovPlg > OovPluginList;
+
     /**
-     * @brief Get a stream representation of this class.
-     * @param out The output stream.
-     * @param plg The factory.
-     * @return The output stream.
+     * @brief Fill the conditions and outputs plug-ins list with files
+     * readed from conditions and outputs directories.
      */
-    std::ostream& operator<<(std::ostream& out, const PluginFactory& plg);
+    PluginFactory();
+
+    /**
+     * @brief Delete all loaded plug-ins.
+     */
+    ~PluginFactory();
+
+    /**
+     * @brief Try to read new oov, gvle-output or gvle-modeling plug-ins.
+     */
+    void update();
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *
+     * Manage plug-ins
+     *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /**
+     * @brief Get a reference to the specified output plug-in.
+     * @param name The name of the output.
+     * @return A reference to the output.
+     * @throw utils::InternalError if name does not exist.
+     */
+    PluginFactory::OutputPlg& getOutput(const std::string& name)
+    { return getO(name)->second; }
+
+    /**
+     * @brief Get a const reference to the specified output plug-in.
+     * @param name The name of the output.
+     * @return A const reference to the output.
+     * @throw utils::InternalError if name does not exist.
+     */
+    const PluginFactory::OutputPlg& getOutput(const std::string& name) const
+    { return getO(name)->second; }
+
+    /**
+     * @brief Get a reference to the specified Oov plug-in.
+     * @param name The name of the Oov-plugin.
+     * @return A reference to the Oov-plugin.
+     * @throw utils::InternalError if name does not exist.
+     */
+    PluginFactory::OovPlg& getOov(const std::string& name)
+    { return getD(name)->second; }
+
+    /**
+     * @brief Get a const reference to the specified Oov plug-in.
+     * @param name The name of the Oov-plugin.
+     * @return A const reference to the Oov-plugin.
+     * @throw utils::InternalError if name does not exist.
+     */
+    const PluginFactory::OovPlg& getOov(const std::string& name) const
+    { return getD(name)->second; }
+
+    /**
+     * @brief Get a reference to the specified modeling plug-in.
+     * @param name The name of the modeling.
+     * @return A reference to the modeling.
+     * @throw utils::InternalError if name does not exist.
+     */
+    PluginFactory::ModelingPlg& getModeling(const std::string& name)
+    { return getM(name)->second; }
+
+    /**
+     * @brief Get a const reference to the specified modeling plug-in.
+     * @param name The name of the modeling.
+     * @return A const reference to the modeling.
+     * @throw utils::InternalError if name does not exist.
+     */
+    const PluginFactory::ModelingPlg& getModeling(
+        const std::string& name) const
+    { return getM(name)->second; }
+
+    /**
+     * @brief Get a constant reference to the output plug-ins list.
+     * @return Get a constant reference.
+     */
+    const OutputPluginList& outputPlugins() const { return m_outs; }
+
+    /**
+     * @brief Get a constant reference to the modeling plug-ins list.
+     * @return Get a constant reference.
+     */
+    const ModelingPluginList& modelingPlugins() const { return m_mods; }
+
+    /**
+     * @brief Get a constant reference to the modeling plug-ins list.
+     * @return Get a constant reference.
+     */
+    const OovPluginList& oovPlugins() const { return m_oov; }
+
+private:
+    OutputPluginList m_outs;
+    ModelingPluginList m_mods;
+    OovPluginList m_oov;
+
+    void readOutputPlugins();
+    void readModelingPlugins();
+    void readOovPlugins();
+
+    OutputPluginList::iterator getO(const std::string& name);
+    OutputPluginList::const_iterator getO(const std::string& name) const;
+    ModelingPluginList::iterator getM(const std::string& name);
+    ModelingPluginList::const_iterator getM(const std::string& name) const;
+    OovPluginList::iterator getD(const std::string& name);
+    OovPluginList::const_iterator getD(const std::string& name) const;
+};
 
 }} // namespace vle gvle
 

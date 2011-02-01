@@ -26,11 +26,11 @@ ELSE(WIN32)
   SET(OS_SPECIFIC_PATH_IMPL)
 ENDIF(WIN32)
 
-SET(EOV_CPP NetStreamReader.cpp Plugin.cpp Window.cpp MainWindow.cpp
-  ${OS_SPECIFIC_PATH_IMPL})
+SET(EOV_CPP NetStreamReader.cpp Plugin.cpp PluginFactory.cpp Window.cpp
+  MainWindow.cpp ${OS_SPECIFIC_PATH_IMPL})
 
-SET(EOV_HPP DllDefines.hpp NetStreamReader.hpp Plugin.hpp Window.hpp
-  MainWindow.hpp)
+SET(EOV_HPP DllDefines.hpp NetStreamReader.hpp Plugin.hpp
+  PluginFactory.hpp Window.hpp MainWindow.hpp)
 
 ADD_LIBRARY(vleeov SHARED ${EOV_CPP};${EOV_HPP})
 

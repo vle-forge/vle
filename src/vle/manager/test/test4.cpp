@@ -90,11 +90,11 @@ BOOST_AUTO_TEST_CASE(manager_thread_result_access)
     vle::vpz::Views& vle_views = file.project().experiment().views();
     vle::vpz::Output& view1 = vle_views.outputs().get(vle_views.get("view1").output());
     if (view1.plugin() != "storage") {
-        view1.setLocalStream("", "storage");
+        view1.setLocalStream("", "storage", std::string());
     }
     vle::vpz::Output& view2 = vle_views.outputs().get(vle_views.get("view2").output());
     if (view2.plugin() != "storage") {
-        view2.setLocalStream("", "storage");
+        view2.setLocalStream("", "storage", std::string());
     }
 
     bool writefile = false;
@@ -173,11 +173,11 @@ BOOST_AUTO_TEST_CASE(manager_thread_fast_producer)
     vle::vpz::Views& vle_views = file.project().experiment().views();
     vle::vpz::Output& view1 = vle_views.outputs().get(vle_views.get("view1").output());
     if (view1.plugin() != "storage") {
-        view1.setLocalStream("", "storage");
+        view1.setLocalStream("", "storage", std::string());
     }
     vle::vpz::Output& view2 = vle_views.outputs().get(vle_views.get("view2").output());
     if (view2.plugin() != "storage") {
-        view2.setLocalStream("", "storage");
+        view2.setLocalStream("", "storage", std::string());
     }
 
     bool writefile = false;
@@ -229,11 +229,11 @@ BOOST_AUTO_TEST_CASE(manager_thread_fast_consumer)
     vle::vpz::Views& vle_views = file.project().experiment().views();
     vle::vpz::Output& view1 = vle_views.outputs().get(vle_views.get("view1").output());
     if (view1.plugin() != "storage") {
-        view1.setLocalStream("", "storage");
+        view1.setLocalStream("", "storage", std::string());
     }
     vle::vpz::Output& view2 = vle_views.outputs().get(vle_views.get("view2").output());
     if (view2.plugin() != "storage") {
-        view2.setLocalStream("", "storage");
+        view2.setLocalStream("", "storage", std::string());
     }
 
     bool writefile = false;

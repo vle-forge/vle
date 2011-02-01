@@ -255,11 +255,11 @@ int DynamicBox::execPlugin(const std::string& pluginname,
                            const std::string& namespace_)
 {
     PluginFactory& plf = mGVLE->pluginFactory();
-    ModelingPlugin& plugin = plf.getModeling(pluginname);
+    PluginFactory::ModelingPlg& plugin = plf.getModeling(pluginname);
 
-    if (plugin.create(mAtom, mVAtom, mDynamic, mConditions, mObservables,
-                      classname, namespace_)) {
-        const std::string& buffer = plugin.source();
+    if (plugin.plugin()->create(mAtom, mVAtom, mDynamic, mConditions,
+                                mObservables, classname, namespace_)) {
+        const std::string& buffer = plugin.plugin()->source();
         std::string filename = utils::Path::path().getPackageSrcFile(classname);
         filename += ".cpp";
 

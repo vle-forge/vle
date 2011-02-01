@@ -250,6 +250,24 @@ namespace vle { namespace utils {
         PathList getInstalledLibraries();
 
 
+        /**
+         * @brief Browser the parameter path and retreive the package if
+         * it exists.
+         * @code
+         * // return toto if /home/foo/bar/ corresponds to VLE_HOME.
+         * getPackageFromPath("/home/foo/bar/pkgs/toto/lib/tutu.so");
+         * // return empty string.
+         * getPackageFromPath("/home/foo/tutu.so");
+         * // return foo if /home/bar/ corresponds to VLE_HOME.
+         * getPackageFromPath("/home/bar/pkgs/tutu.so");
+         * @endcode
+         * @param path The path to get the package.
+         * @return The package founded into the string `path' or an empty
+         * string if not found.
+         */
+        static std::string getPackageFromPath(const std::string& path);
+
+
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
          * Manage template
@@ -306,18 +324,43 @@ namespace vle { namespace utils {
         { return m_output; }
 
         /**
-         * @brief Get the list of condition directories.
-         * @return A list of directory name.
-         */
-        const PathList& getConditionDirs() const
-        { return m_condition; }
-
-        /**
          * @brief Get the list of modeling directories.
          * @return A list of directory name.
          */
         const PathList& getModelingDirs() const
         { return m_modeling; }
+
+        /**
+         * @brief Get a PathList which contains getStreamDir() and
+         * getHomeStreamDir() if this directories exist.
+         *
+         * @return A PathList with 0, 1 or 2 element.
+         */
+        PathList getGlobalStreamDirs();
+
+        /**
+         * @brief Get a PathList which contains getOutputDir() and
+         * getHomeOutputDir() if this directories exist.
+         *
+         * @return A PathList with 0, 1 or 2 element.
+         */
+        PathList getGlobalOutputDirs();
+
+        /**
+         * @brief Get a PathList which contains getModelingDir() and
+         * getHomeModelingDir() if this directories exist.
+         *
+         * @return A PathList with 0, 1 or 2 element.
+         */
+        PathList getGlobalModelingDirs();
+
+        /**
+         * @brief Get a PathList which contains getSimulatorsDir() and
+         * getHomeSimulatorsDir() if this directories exist.
+         *
+         * @return A PathList with 0, 1 or 2 element.
+         */
+        PathList getGlobalSimulatorDirs();
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          *
@@ -499,8 +542,6 @@ namespace vle { namespace utils {
 
         void addOutputDir(const std::string& dirname);
 
-        void addConditionDir(const std::string& dirname);
-
         void addModelingDir(const std::string& dirname);
 
         std::string buildPackageDir(const std::string& name) const;
@@ -537,7 +578,6 @@ namespace vle { namespace utils {
         PathList    m_simulator;
         PathList    m_stream;
         PathList    m_output;
-        PathList    m_condition;
         PathList    m_modeling;
 
         std::string m_prefix; /*!< the $prefix of installation */
