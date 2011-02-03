@@ -531,11 +531,11 @@ BOOST_AUTO_TEST_CASE(test_statechart8)
     BOOST_REQUIRE_EQUAL(result.shape()[1],
                         (value::MatrixView::size_type)101);
 
-    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][3]), 3);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][3]), 2);
     BOOST_REQUIRE_EQUAL(value::toInteger(result[2][3]), 2);
-    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][6]), 5);
-    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][30]), 19);
-    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][100]), 63);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][6]), 3);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][30]), 10);
+    BOOST_REQUIRE_EQUAL(value::toInteger(result[1][100]), 32);
 }
 
 BOOST_AUTO_TEST_CASE(test_statechart9)
@@ -645,4 +645,16 @@ BOOST_AUTO_TEST_CASE(test_statechart11)
     BOOST_REQUIRE_EQUAL(value::toDouble(result[2][100]), 126);
     BOOST_REQUIRE_EQUAL(value::toDouble(result[3][100]), -24);
     BOOST_REQUIRE_EQUAL(value::toDouble(result[4][100]), 100);
+}
+
+BOOST_AUTO_TEST_CASE(test_statechartMultipleSend)
+{
+    vpz::Vpz file(utils::Path::path().getExampleFile(
+        "statechartMultipleSend.vpz"));
+
+    vpz::Output& o(file.project().experiment().views().outputs().get("o"));
+    o.setLocalStream("", "storage");
+
+    manager::RunQuiet r;
+    BOOST_REQUIRE_NO_THROW(r.start(file));
 }

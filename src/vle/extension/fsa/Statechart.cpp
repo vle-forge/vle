@@ -324,8 +324,7 @@ void Statechart::output(const devs::Time& time,
 	}
 	if (mValidGuard) {
 	    buildOutputs(mToProcessGuard.first, time, output);
-	}
-	if (mValidAfterWhen) {
+	} else if (mValidAfterWhen) {
 	    buildOutputs(mToProcessAfterWhen.first, time, output);
 	}
     }
@@ -459,7 +458,11 @@ void Statechart::internalTransition(const devs::Time& time)
             mValidGuard = false;
             if (mToProcessEvents.empty()) {
 		processIn(time, mToProcessGuard.second);
-                mPhase = IDLE;
+                if (mValidGuard) {
+                    mPhase = PROCESSING;
+                } else {
+                    mPhase = IDLE;
+                }
             } else {
 		processIn(time, mToProcessGuard.second);
 		mPhase = PROCESSING;

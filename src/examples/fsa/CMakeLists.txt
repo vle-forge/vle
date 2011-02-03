@@ -80,6 +80,35 @@ INSTALL(TARGETS mealy
   RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/simulator"
   LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/simulator")
 
+####
+# Test statechartMultipleSend.vpz
+####
+
+ADD_LIBRARY(statechartMultipleSend SHARED StatechartMultipleSend.cpp)
+
+TARGET_LINK_LIBRARIES(statechartMultipleSend
+  ${GLIBMM_LIBRARIES}
+  ${LIBXML_LIBRARIES}
+  ${GTHREAD_LIBRARIES}
+  vlegeometry
+  vleutils
+  vlevalue
+  vlegraph
+  vlevpz
+  vleoov
+  vledevs
+  vleextension
+  vlemanager
+  vletranslator)
+
+INSTALL(TARGETS statechartMultipleSend
+  RUNTIME DESTINATION "${VLE_LIBRARY_DIRS}/simulator"
+  LIBRARY DESTINATION "${VLE_LIBRARY_DIRS}/simulator")
+INSTALL(FILES statechartMultipleSend.vpz
+  DESTINATION "${VLE_SHARE_DIRS}/examples")
+
+## Fin test
+
 SET(SOURCES4_CPP Statechart.cpp)
 
 ADD_LIBRARY(statechart SHARED ${SOURCES4_CPP})
